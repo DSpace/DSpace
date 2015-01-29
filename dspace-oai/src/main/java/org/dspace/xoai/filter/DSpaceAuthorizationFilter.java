@@ -12,8 +12,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -26,9 +24,6 @@ import org.dspace.handle.HandleManager;
 import org.dspace.xoai.data.DSpaceItem;
 import org.dspace.xoai.filter.results.DatabaseFilterResult;
 import org.dspace.xoai.filter.results.SolrFilterResult;
-import org.dspace.xoai.services.api.context.ContextService;
-import org.dspace.xoai.services.api.context.ContextServiceException;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * 
@@ -37,24 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class DSpaceAuthorizationFilter extends DSpaceFilter
 {
     private static Logger log = LogManager.getLogger(DSpaceAuthorizationFilter.class);
-
-    @Autowired
-    private ContextService contextService;
-    private Context context;
-
-    @PostConstruct
-    public void intializeContext()
-    {
-        try
-        {
-            this.context = contextService.getContext();
-        }
-        catch (ContextServiceException e)
-        {
-            log.error("Context could not be obtained from the ContextService",
-                    e);
-        }
-    }
 
     @Override
     public DatabaseFilterResult buildDatabaseQuery(Context context)

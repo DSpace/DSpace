@@ -23,8 +23,6 @@ import org.dspace.xoai.exceptions.InvalidMetadataFieldException;
 import org.dspace.xoai.filter.data.DSpaceMetadataFilterOperator;
 import org.dspace.xoai.filter.results.DatabaseFilterResult;
 import org.dspace.xoai.filter.results.SolrFilterResult;
-import org.dspace.xoai.services.api.database.FieldResolver;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.base.Function;
 import com.lyncode.builder.ListBuilder;
@@ -41,9 +39,6 @@ public class DSpaceAtLeastOneMetadataFilter extends DSpaceFilter {
     private String field;
     private DSpaceMetadataFilterOperator operator = DSpaceMetadataFilterOperator.UNDEF;
     private List<String> values;
-
-    @Autowired
-    FieldResolver fieldResolver;
 
     private String getField() {
         if (field == null) {

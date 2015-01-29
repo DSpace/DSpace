@@ -83,16 +83,19 @@ public class BaseDSpaceFilterResolver implements DSpaceFilterResolver {
         try
         {
             result = filterClass.newInstance();
+            if (result instanceof DSpaceFilter)
+            {
+                // add the DSpace filter specific objects
+                ((DSpaceFilter) result).setConfiguration(configuration);
+                ((DSpaceFilter) result).setContext(contextService.getContext());
+                ((DSpaceFilter) result).setFieldResolver(fieldResolver);
+            }
         }
-        catch (InstantiationException | IllegalAccessException e)
+        catch (InstantiationException | IllegalAccessException
+                | ContextServiceException e)
         {
             LOGGER.error("Filter " + filterClass.getName()
                     + " could not be instantiated", e);
-        }
-        if (result instanceof DSpaceFilter)
-        {
-            // add the configuration to the implementing class if there is any.
-            ((DSpaceFilter) result).setConfiguration(configuration);
         }
         return result;
     }

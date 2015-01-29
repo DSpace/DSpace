@@ -19,8 +19,6 @@ import org.dspace.xoai.data.DSpaceItem;
 import org.dspace.xoai.exceptions.InvalidMetadataFieldException;
 import org.dspace.xoai.filter.results.DatabaseFilterResult;
 import org.dspace.xoai.filter.results.SolrFilterResult;
-import org.dspace.xoai.services.api.database.FieldResolver;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.ParameterValue;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.SimpleType;
@@ -39,8 +37,6 @@ public class DSpaceMetadataExistsFilter extends DSpaceFilter {
     private static Logger log = LogManager
             .getLogger(DSpaceMetadataExistsFilter.class);
 
-    @Autowired
-    private FieldResolver fieldResolver;
     private List<String> fields;
 
     private List<String> getFields() {
