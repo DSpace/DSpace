@@ -7,16 +7,13 @@
  */
 package org.dspace.xoai.tests.unit.services.impl.database;
 
-import com.lyncode.builder.DateBuilder;
-import com.lyncode.xoai.dataprovider.data.Filter;
-import com.lyncode.xoai.dataprovider.filter.Scope;
-import com.lyncode.xoai.dataprovider.filter.ScopedFilter;
-import com.lyncode.xoai.dataprovider.filter.conditions.AndCondition;
-import com.lyncode.xoai.dataprovider.filter.conditions.Condition;
-import com.lyncode.xoai.dataprovider.filter.conditions.CustomCondition;
-import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.ParameterList;
-import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.ParameterMap;
-import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.StringValue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.dspace.core.Constants;
 import org.dspace.xoai.filter.DSpaceMetadataExistsFilter;
 import org.dspace.xoai.filter.DSpaceSetSpecFilter;
@@ -29,12 +26,15 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import com.lyncode.builder.DateBuilder;
+import com.lyncode.xoai.dataprovider.data.Filter;
+import com.lyncode.xoai.dataprovider.filter.Scope;
+import com.lyncode.xoai.dataprovider.filter.ScopedFilter;
+import com.lyncode.xoai.dataprovider.filter.conditions.AndCondition;
+import com.lyncode.xoai.dataprovider.filter.conditions.Condition;
+import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.ParameterList;
+import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.ParameterMap;
+import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.StringValue;
 
 public class DSpaceDatabaseQueryResolverTest extends AbstractQueryResolverTest {
     private static final Date DATE = new Date();
@@ -112,7 +112,7 @@ public class DSpaceDatabaseQueryResolverTest extends AbstractQueryResolverTest {
 
         final DSpaceMetadataExistsFilter metadataExistsFilter = new DSpaceMetadataExistsFilter();
         metadataExistsFilter.setConfiguration(filterConfiguration);
-        autowire(metadataExistsFilter);
+        metadataExistsFilter.setFieldResolver(theFieldResolver());
         scopedFilters.add(new ScopedFilter(new Condition()
         {
             @Override
@@ -143,7 +143,7 @@ public class DSpaceDatabaseQueryResolverTest extends AbstractQueryResolverTest {
 
         final DSpaceMetadataExistsFilter metadataExistsFilter = new DSpaceMetadataExistsFilter();
         metadataExistsFilter.setConfiguration(filterConfiguration);
-        autowire(metadataExistsFilter);
+        metadataExistsFilter.setFieldResolver(theFieldResolver());
         scopedFilters.add(new ScopedFilter(new Condition()
         {
             @Override
