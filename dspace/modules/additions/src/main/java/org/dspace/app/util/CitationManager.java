@@ -462,7 +462,7 @@ public class CitationManager {
             String cid = CitationManager.getCid(col.getHandle(), documentType);
             // no documentType
             String ccid = "";
-            if (!documentType.equals("")) {
+            if (documentType!=null && !documentType.equals("")) {
 
                 ccid = CitationManager.getCid(col.getHandle(), "");
             } else {
