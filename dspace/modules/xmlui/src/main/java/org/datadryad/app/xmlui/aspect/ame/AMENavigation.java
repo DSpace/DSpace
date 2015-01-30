@@ -48,16 +48,8 @@ public class AMENavigation extends AbstractDSpaceTransformer implements Cacheabl
     		{
                 if(AuthorizeConfiguration.authorizeManage(this.context,"extract-meta",item))
                 {
-                    try
-                    {
-                        AuthorizeManager.authorizeAction(this.context, item.getCollections()[0].getCommunities()[0], Constants.ADMIN);
-
-                        context.setHead(T_context_head);
-                        context.addItem().addXref(contextPath+"/item/ame?itemID="+item.getID(), T_context_ame);
-                    }catch (AuthorizeException e)
-                    {
-
-                    }
+                    context.setHead(T_context_head);
+                    context.addItem().addXref(contextPath+"/item/ame?itemID="+item.getID(), T_context_ame);
                 }
             }
     	}
