@@ -789,6 +789,12 @@
         <xsl:if test="dri:body/dri:div[@n='lookup']">
             <xsl:call-template name="choiceLookupPopUpSetup"/>
         </xsl:if>
+        
+        <!-- UMD Header -->
+        <script src="//s3.amazonaws.com/umdheader.umd.edu/app/js/main.min.js"></script>
+        <script>
+            umdHeader.init(); 
+        </script>
 
         <!-- Add a google analytics script if the key is present -->
         <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']">

@@ -11,13 +11,9 @@
  * It will be included in all color schemes
  */
 
-//example mixin to set the text-selection style
-@mixin selection {
-    ::-moz-selection { @content; }
-    ::selection { @content; }
-}
-
-@include selection {
-    color: white;
-    background: hotpink;
+/**
+ * Prevent the navbar from covering up the UMD header toggle arrow (#umh-toggle-arrow)
+ */
+.navbar-static-top {
+     z-index: auto;
 }
