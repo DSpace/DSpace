@@ -9,5 +9,8 @@ choices.plugin.dc.language.iso = common_iso_languages
 choices.presentation.dc.language.iso = select
 authority.controlled.dc.language.iso = true
 
+# disable testing of dc.contributor.author, because no test exists
+authority.controlled.dc.contributor.author = false
+
 # use the testing assetstore.dir
 assetstore.dir = ${dspace.dir}/assetstore
