@@ -67,7 +67,14 @@ public class BrowserServlet extends AbstractBrowserServlet
 
         if (scope.getBrowseIndex() == null)
         {
-            throw new ServletException("There is no browse index for the request");
+            String requestURL = request.getRequestURI();
+            if (request.getQueryString() != null)
+            {
+                requestURL += "?" + request.getQueryString();
+            }
+            log.warn("We were unable to parse the browse request (e.g. an unconfigured index or sort option was used). Will send a 400 Bad Request. Requested URL was: " + requestURL);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
         }
 
         // Is this a request to export the metadata, or a normal browse request?
