@@ -14,6 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
@@ -110,12 +111,14 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
 
             // process the input, performing some inline validation
             BrowseIndex bi = null;
-            if (type != null && !"".equals(type))
+            if (StringUtils.isNotEmpty(type))
             {
                 bi = BrowseIndex.getBrowseIndex(type);
             }
 
-            if (bi == null)
+            // don't override a requested index, if no index is set,
+            // try to find it on a possibly specified sort option.
+            if (type == null && bi == null)
             {
                 if (sortBy > 0)
                 {
@@ -168,7 +171,7 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             }
 
             // if no resultsperpage set, default to 20 - if tag cloud enabled, leave it as is!
-            if (resultsperpage < 0 && !bi.isTagCloudEnabled())
+            if (bi != null && resultsperpage < 0 && !bi.isTagCloudEnabled())
             {
                 resultsperpage = 20;
             }
