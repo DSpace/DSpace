@@ -1794,6 +1794,24 @@
                          alt="Ecological Monographs cover"/>
                 </a>
             </xsl:when>
+			<xsl:when test='$journal-name = "Ecology"'>
+			            <a target="_blank">
+			                <xsl:attribute name="href">
+			                    <xsl:choose>
+			                        <xsl:when test="contains($article-doi,'doi:')">
+			                            <xsl:value-of
+			                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+			                        </xsl:when>
+			                        <xsl:otherwise>
+			                            <xsl:value-of
+			                                    select="string('http://www.esajournals.org/loi/ecol')"/>
+			                        </xsl:otherwise>
+			                    </xsl:choose>
+			                </xsl:attribute>
+			                <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/ecology_cover.jpg"
+			                     alt="Ecology cover"/>
+			            </a>
+			        </xsl:when>
             <xsl:when test='$journal-name = "Ecology and Evolution"'>
                 <a target="_blank">
                     <xsl:attribute name="href">
