@@ -429,6 +429,7 @@ public class BrowseListTag extends TagSupport
 			BitstreamList bss = null;
 			if(hasBitstream){
 				bss = BrowseItem.toBitstreamList(items);
+				hrq.setAttribute("itemlist.bitstream", bss);
 			}
 
             // now output each item row

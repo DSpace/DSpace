@@ -394,6 +394,7 @@ public class ItemListTag extends TagSupport
             BitstreamList bss = null;
             if(hasBitstream){
                 bss = Item.toBitstreamList(items);
+                hrq.setAttribute("itemlist.bitstream", bss);
             }
 
             // now output each item row
