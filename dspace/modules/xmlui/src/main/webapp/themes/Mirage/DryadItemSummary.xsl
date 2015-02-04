@@ -1808,7 +1808,7 @@
 			                        </xsl:otherwise>
 			                    </xsl:choose>
 			                </xsl:attribute>
-			                <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/ecology_cover.jpg"
+			                <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/ecology_cover.png"
 			                     alt="Ecology cover"/>
 			            </a>
 			        </xsl:when>
