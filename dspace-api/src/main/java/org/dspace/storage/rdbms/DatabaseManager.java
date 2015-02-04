@@ -15,7 +15,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -35,8 +34,6 @@ import javax.sql.DataSource;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.flywaydb.core.Flyway;
-import org.flywaydb.core.api.MigrationInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1237,10 +1234,6 @@ public class DatabaseManager
 
         try
         {
-            String schema = canonicalize(ConfigurationManager.getProperty("db.schema"));
-            if(StringUtils.isBlank(schema)){
-                schema = null;
-            }
             String catalog = null;
 
             int dotIndex = table.indexOf('.');
@@ -1254,6 +1247,9 @@ public class DatabaseManager
 
             connection = getConnection();
 
+            // Get current database schema name
+            String schema = DatabaseUtils.getSchemaName(connection);
+            
             DatabaseMetaData metadata = connection.getMetaData();
             Map<String, ColumnInfo> results = new HashMap<String, ColumnInfo>();
 
