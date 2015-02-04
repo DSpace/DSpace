@@ -13,8 +13,10 @@ import org.apache.log4j.Logger;
 import org.dspace.app.itemmarking.ItemMarkingExtractor;
 import org.dspace.app.itemmarking.ItemMarkingInfo;
 import org.dspace.app.webui.util.UIUtil;
+import org.dspace.app.webui.util.BitstreamDisplayStrategy;
 import org.dspace.browse.*;
 import org.dspace.content.Bitstream;
+import org.dspace.content.BitstreamList;
 import org.dspace.content.DCDate;
 import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
@@ -287,6 +289,7 @@ public class BrowseListTag extends TagSupport
         boolean viewFull[] = new boolean[fieldArr.length];
         String[] browseType = new String[fieldArr.length];
         String[] cOddOrEven = new String[fieldArr.length];
+		Boolean hasBitstream = false;
 
         try
         {
@@ -386,6 +389,11 @@ public class BrowseListTag extends TagSupport
                 	emph[colIdx] = true;
                 }
 
+				if (field.equals("bitstream"))
+				{
+					hasBitstream = true;
+				}
+
                 // prepare the strings for the header
                 String id = "t" + Integer.toString(colIdx + 1);
                 String css = "oddRow" + cOddOrEven[colIdx] + "Col";
@@ -396,7 +404,7 @@ public class BrowseListTag extends TagSupport
                 {
                 	markClass = " "+field+"_th";
                 }
-                
+
                 // output the header
                 out.print("<th id=\"" + id +  "\" class=\"" + css + markClass +"\">"
                         + (emph[colIdx] ? "<strong>" : "")
@@ -418,10 +426,16 @@ public class BrowseListTag extends TagSupport
 
             out.print("</tr>");
 
+			BitstreamList bss = null;
+			if(hasBitstream){
+				bss = BrowseItem.toBitstreamList(items);
+				hrq.setAttribute("itemlist.bitstream", bss);
+			}
+
             // now output each item row
             for (int i = 0; i < items.length; i++)
             {
-            	out.print("<tr>"); 
+            	out.print("<tr>");
                 // now prepare the XHTML frag for this division
                 String rOddOrEven;
                 if (i == highlightRow)
@@ -487,6 +501,13 @@ public class BrowseListTag extends TagSupport
                     {
                         metadata = UIUtil.getMarkingMarkup(hrq, items[i], field);
                     }
+					else if (field.equals("bitstream"))
+					{
+						metadata = (new BitstreamDisplayStrategy()).getMetadataDisplay(hrq, 0,
+                            viewFull[colIdx], browseType[colIdx], colIdx,
+                            field, metadataArray, items[i], disableCrossLinks,
+                            emph[colIdx], pageContext);
+					}
                     else if (metadataArray.length > 0)
                     {
                         // format the date field correctly
@@ -600,14 +621,14 @@ public class BrowseListTag extends TagSupport
                             + "</a>";
                         }
                     }
-                    
+
                     // prepare extra special layout requirements for dates
                     String extras = "";
                     if (isDate[colIdx])
                     {
                         extras = "nowrap=\"nowrap\" align=\"right\"";
                     }
-                    
+
                     String markClass = "";
                     if (field.startsWith("mark_"))
                     {

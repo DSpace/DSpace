@@ -13,12 +13,14 @@ import org.apache.log4j.Logger;
 import org.dspace.app.itemmarking.ItemMarkingExtractor;
 import org.dspace.app.itemmarking.ItemMarkingInfo;
 import org.dspace.app.webui.util.UIUtil;
+import org.dspace.app.webui.util.BitstreamDisplayStrategy;
 
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.CrossLinks;
 
 import org.dspace.content.Bitstream;
+import org.dspace.content.BitstreamList;
 import org.dspace.content.DCDate;
 import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
@@ -254,6 +256,7 @@ public class ItemListTag extends TagSupport
         boolean viewFull[] = new boolean[fieldArr.length];
         String[] browseType = new String[fieldArr.length];
         String[] cOddOrEven = new String[fieldArr.length];
+        Boolean hasBitstream = false;
 
         try
         {
@@ -351,6 +354,11 @@ public class ItemListTag extends TagSupport
                     emph[colIdx] = true;
                 }
 
+                if (field.equals("bitstream"))
+                {
+                    hasBitstream = true;
+                }
+
                 // prepare the strings for the header
                 String id = "t" + Integer.toString(colIdx + 1);
                 String css = "oddRow" + cOddOrEven[colIdx] + "Col";
@@ -383,11 +391,17 @@ public class ItemListTag extends TagSupport
 
             out.print("</tr>");
 
+            BitstreamList bss = null;
+            if(hasBitstream){
+                bss = Item.toBitstreamList(items);
+                hrq.setAttribute("itemlist.bitstream", bss);
+            }
+
             // now output each item row
             for (int i = 0; i < items.length; i++)
             {
                 // now prepare the XHTML frag for this division
-            	out.print("<tr>"); 
+            	out.print("<tr>");
                 String rOddOrEven;
                 if (i == highlightRow)
                 {
@@ -451,6 +465,13 @@ public class ItemListTag extends TagSupport
                     else  if (field.startsWith("mark_"))
                     {
                         metadata = UIUtil.getMarkingMarkup(hrq, items[i], field);
+                    }
+                    else if (field.equals("bitstream"))
+                    {
+                        metadata = (new BitstreamDisplayStrategy()).getMetadataDisplay(hrq, 0,
+                            viewFull[colIdx], browseType[colIdx], colIdx,
+                            field, metadataArray, items[i], disableCrossLinks,
+                            emph[colIdx], pageContext);
                     }
                     if (metadataArray.length > 0)
                     {
@@ -579,7 +600,7 @@ public class ItemListTag extends TagSupport
                     	markClass = " "+field+"_tr";
                     }
 
-                    
+
                     String id = "t" + Integer.toString(colIdx + 1);
                     out.print("<td headers=\"" + id + "\" class=\""
                     	+ rOddOrEven + "Row" + cOddOrEven[colIdx] + "Col" + markClass + "\" " + extras + ">"
