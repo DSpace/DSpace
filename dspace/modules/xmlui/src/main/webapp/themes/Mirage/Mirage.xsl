@@ -418,7 +418,7 @@
               <div id="recently_integrated_journals" class="ds-static-div primary">
                 <div class="container">
 					<!-- Ecology -->
-							  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aecology%5C%7C%5C%7C%5C%7CEcology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ecology_cover.jpg" alt="Ecology" /></a>
+							  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aecology%5C%7C%5C%7C%5C%7CEcology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ecology_cover.png" alt="Ecology" /></a>
                   <!-- Oikos -->
                   <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aoikos%5C%7C%5C%7C%5C%7COikos"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-Oikos.png" alt="Oikos" /></a>
                   <!-- Systematic Botany -->
