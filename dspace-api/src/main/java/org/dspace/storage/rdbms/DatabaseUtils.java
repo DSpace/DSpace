@@ -889,7 +889,7 @@ public class DatabaseUtils
         DatabaseMetaData meta = connection.getMetaData();
         
         // Check the configured "db.schema" FIRST for the value configured there
-        schema = ConfigurationManager.getProperty("db.schema");
+        schema = DatabaseManager.canonicalize(ConfigurationManager.getProperty("db.schema"));
         
         // If unspecified, determine "sane" defaults based on DB type
         if(StringUtils.isBlank(schema))
