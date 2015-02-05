@@ -44,9 +44,9 @@ public class TopTenViews extends JournalLandingTabbedTransformer {
     {
         super.setup(resolver, objectModel, src, parameters);
 
+        itemType = Constants.ITEM;
+
         divData = new DivData();
-        divData.sortOption = "recent.submissions.sort-option";
-        divData.sortFieldOption = "total.download.sort-option";
         divData.n = TOPTEN_VIEWS;
         divData.T_div_head = message("xmlui.JournalLandingPage.TopTenViews.panel_head");
 
@@ -54,33 +54,31 @@ public class TopTenViews extends JournalLandingTabbedTransformer {
         TabData tb1 = new TabData();
         tb1.n = TOPTEN_VIEWS_MONTH;       
         tb1.buttonLabel = message("xmlui.JournalLandingPage.JournalLandingTabbedTransformer.month");
-        tb1.query = "search.resourcetype:" + Constants.ITEM + " AND " + dateMonth + " AND prism.publicationName:" + journalName;
-        tb1.refHead = message("xmlui.JournalLandingPage.TopTenDownloads.ref_head_month").parameterize("MM","YYYY");
-        tb1.valHead = message("xmlui.JournalLandingPage.TopTenDownloads.val_head");
+        tb1.dateFilter = dateMonth;
+        tb1.refHead = message("xmlui.JournalLandingPage.TopTenViews.ref_head_month").parameterize("MM","YYYY");
+        tb1.valHead = message("xmlui.JournalLandingPage.TopTenViews.val_head");
         tabData.add(tb1);
 
         TabData tb2 = new TabData();
         tb2.n = TOPTEN_VIEWS_YEAR;
         tb2.buttonLabel = message("xmlui.JournalLandingPage.JournalLandingTabbedTransformer.year");
-        tb2.query = "search.resourcetype:" + Constants.ITEM + " AND " + dateYear  + " AND prism.publicationName:" + journalName;
-        tb2.refHead = message("xmlui.JournalLandingPage.TopTenDownloads.ref_head_year").parameterize("YYYY");
+        tb1.dateFilter = dateYear;
+        tb2.refHead = message("xmlui.JournalLandingPage.TopTenViews.ref_head_year").parameterize("YYYY");
         tb2.valHead = message("xmlui.JournalLandingPage.JournalLandingTabbedTransformer.year");
         tabData.add(tb2);
 
         TabData tb3 = new TabData();
         tb3.n = TOPTEN_VIEWS_ALLTIME;
         tb3.buttonLabel = message("xmlui.JournalLandingPage.JournalLandingTabbedTransformer.alltime");
-        tb3.query = "search.resourcetype:" + Constants.ITEM + " AND prism.publicationName:" + journalName;
-        tb3.refHead = message("xmlui.JournalLandingPage.TopTenDownloads.ref_head_alltime");
+        tb3.refHead = message("xmlui.JournalLandingPage.TopTenViews.ref_head_alltime");
         tb3.valHead = message("xmlui.JournalLandingPage.JournalLandingTabbedTransformer.alltime");
         tabData.add(tb3);
     }
-    
+
     @Override
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {        
         super.addBody(body);
     }
-
 }

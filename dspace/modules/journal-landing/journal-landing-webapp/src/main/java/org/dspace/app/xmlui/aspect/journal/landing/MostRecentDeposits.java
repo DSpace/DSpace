@@ -15,7 +15,9 @@ import org.dspace.app.xmlui.wing.element.Division;
 import static org.dspace.app.xmlui.aspect.journal.landing.Const.*;
 
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import org.apache.avalon.framework.parameters.ParameterException;
 import org.apache.commons.collections.ExtendedProperties;
@@ -46,6 +48,7 @@ import org.dspace.workflow.DryadWorkflowUtils;
 public class MostRecentDeposits extends AbstractFiltersTransformer {
     
     private static final Logger log = Logger.getLogger(MostRecentDeposits.class);
+    private final static SimpleDateFormat fmt = new SimpleDateFormat(fmtDateView);
     
     private static final Message T_mostRecent = message("xmlui.JournalLandingPage.MostRecentDeposits.panel_head");
     
@@ -137,6 +140,10 @@ public class MostRecentDeposits extends AbstractFiltersTransformer {
                         if (o instanceof ArrayList) {
                             dates.add(((ArrayList) o).get(0).toString());
                         } else if (o instanceof String) {
+                            dates.add(o.toString());
+                        } else if (o instanceof Date) {
+                            dates.add(fmt.format(o));
+                        } else {
                             dates.add(o.toString());
                         }
                     }

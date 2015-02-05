@@ -150,6 +150,11 @@
             <type>war</type>
             <version>${pom.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-stats</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

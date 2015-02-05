@@ -3,6 +3,11 @@
 
 set -e
 
+if [[ "$LOGNAME" != "vagrant" ]]; then
+    echo "This script is meant to be run on vagrant. Exiting.";
+    exit 1;
+fi
+
 JOURNAL_LANDING="$(dirname "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )")"
 JAR="journal-landing-webapp-1.7.3-SNAPSHOT-classes.jar"
 XMLUI="/opt/dryad/webapps/xmlui/WEB-INF/lib"

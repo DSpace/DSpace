@@ -27,7 +27,11 @@
     <message key="xmlui.JournalLandingPage.TopTenDownloads.val_head">Downloads</message>
     
     <message key="xmlui.JournalLandingPage.TopTenViews.panel_head">Top 10 viewed files</message>
-    <message key="xmlui.JournalLandingPage.TopTenViews.val_head">Views</message>
+    <message key="xmlui.JournalLandingPage.TopTenViews.val_head">Views</message>    
+    <message key="xmlui.JournalLandingPage.TopTenViews.ref_head_month">{0} {1}</message>
+    <message key="xmlui.JournalLandingPage.TopTenViews.ref_head_year">{0}</message>
+    <message key="xmlui.JournalLandingPage.TopTenViews.ref_head_alltime">All-time</message>
+    
     <message key="xmlui.JournalLandingPage.UserGeography.panel_head">Geographic breakdown of users</message>
     <message key="xmlui.JournalLandingPage.UserGeography.ref_head_views">Country</message>
     <message key="xmlui.JournalLandingPage.UserGeography.ref_head_downloads">Country</message>

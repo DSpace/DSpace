@@ -40,10 +40,9 @@ public class TopTenDownloads extends JournalLandingTabbedTransformer {
             IOException
     {
         super.setup(resolver, objectModel, src, parameters);
-        
+        itemType = Constants.BITSTREAM;
+
         divData = new DivData();
-        divData.sortOption = "total.download.sort-option";
-        divData.sortFieldOption = "total.download.sort-option";
         divData.n = TOPTEN_DOWNLOADS;
         divData.T_div_head = message("xmlui.JournalLandingPage.TopTenDownloads.panel_head");
 
@@ -51,7 +50,7 @@ public class TopTenDownloads extends JournalLandingTabbedTransformer {
         TabData tb1 = new TabData();
         tb1.n = TOPTEN_DOWNLOADS_MONTH;
         tb1.buttonLabel = message("xmlui.JournalLandingPage.JournalLandingTabbedTransformer.month");
-        tb1.query = "search.resourcetype:" + Constants.BITSTREAM + " AND " + dateMonth + " AND prism.publicationName:" + journalName;
+        tb1.dateFilter = dateMonth;
         tb1.refHead = message("xmlui.JournalLandingPage.TopTenDownloads.ref_head_month").parameterize("MM","YYYY");
         tb1.valHead = message("xmlui.JournalLandingPage.TopTenDownloads.val_head");
         tabData.add(tb1);
@@ -59,7 +58,7 @@ public class TopTenDownloads extends JournalLandingTabbedTransformer {
         TabData tb2 = new TabData();
         tb2.n = TOPTEN_DOWNLOADS_YEAR;
         tb2.buttonLabel = message("xmlui.JournalLandingPage.JournalLandingTabbedTransformer.year");
-        tb2.query = "search.resourcetype:" + Constants.BITSTREAM + " AND " + dateYear + " AND prism.publicationName:" + journalName;
+        tb1.dateFilter = dateYear;
         tb2.refHead = message("xmlui.JournalLandingPage.TopTenDownloads.ref_head_year").parameterize("YYYY");
         tb2.valHead = message("xmlui.JournalLandingPage.TopTenDownloads.val_head");
         tabData.add(tb2);
@@ -67,7 +66,6 @@ public class TopTenDownloads extends JournalLandingTabbedTransformer {
         TabData tb3 = new TabData();
         tb3.n = TOPTEN_DOWNLOADS_ALLTIME;
         tb3.buttonLabel = message("xmlui.JournalLandingPage.JournalLandingTabbedTransformer.alltime");
-        tb3.query = "search.resourcetype:" + Constants.BITSTREAM + " AND prism.publicationName:" + journalName;
         tb3.refHead = message("xmlui.JournalLandingPage.TopTenDownloads.ref_head_alltime");
         tb3.valHead = message("xmlui.JournalLandingPage.TopTenDownloads.val_head");
         tabData.add(tb3);

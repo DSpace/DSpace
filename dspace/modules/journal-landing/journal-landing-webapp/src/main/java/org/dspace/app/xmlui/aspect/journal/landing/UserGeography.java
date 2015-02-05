@@ -35,8 +35,6 @@ public class UserGeography extends JournalLandingTabbedTransformer {
         super.setup(resolver, objectModel, src, parameters);
         
         divData = new DivData();
-        divData.sortOption = "total.download.sort-option";
-        divData.sortFieldOption = "total.download.sort-option";
         divData.n = USER_GEO;
         divData.T_div_head = message("xmlui.JournalLandingPage.UserGeography.panel_head");
 
@@ -44,7 +42,6 @@ public class UserGeography extends JournalLandingTabbedTransformer {
         TabData tb1 = new TabData();
         tb1.n = USER_GEO_VIEWS;
         tb1.buttonLabel = message("xmlui.JournalLandingPage.UserGeography.tab-views");
-        tb1.query = "search.resourcetype:" + Constants.ITEM + " AND prism.publicationName:" + journalName;
         tb1.refHead = message("xmlui.JournalLandingPage.UserGeography.item_head");
         tb1.valHead = message("xmlui.JournalLandingPage.UserGeography.tab-views");
         tabData.add(tb1);
@@ -52,7 +49,6 @@ public class UserGeography extends JournalLandingTabbedTransformer {
         TabData tb2 = new TabData();
         tb2.n = USER_GEO_DOWNLOADS;
         tb2.buttonLabel = message("xmlui.JournalLandingPage.UserGeography.tab-downloads");
-        tb2.query = "search.resourcetype:" + Constants.BITSTREAM + " AND prism.publicationName:" + journalName;
         tb2.refHead = message("xmlui.JournalLandingPage.UserGeography.item_head");
         tb2.valHead = message("xmlui.JournalLandingPage.UserGeography.tab-downloads");
         tabData.add(tb2);        

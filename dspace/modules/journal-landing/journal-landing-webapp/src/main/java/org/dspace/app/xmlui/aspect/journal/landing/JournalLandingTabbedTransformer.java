@@ -9,18 +9,12 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Map;
 import org.apache.avalon.framework.parameters.ParameterException;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.environment.SourceResolver;
-import org.apache.commons.collections.ExtendedProperties;
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.dspace.app.xmlui.aspect.discovery.AbstractFiltersTransformer;
 import static org.dspace.app.xmlui.aspect.journal.landing.Const.*;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
@@ -33,41 +27,46 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
-import org.dspace.discovery.SearchUtils;
-import org.dspace.workflow.DryadWorkflowUtils;
 import org.xml.sax.SAXException;
+import java.text.SimpleDateFormat;
+import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
+import org.dspace.content.DCValue;
+import org.dspace.handle.HandleManager;
+import org.dspace.statistics.Dataset;
+import org.dspace.statistics.content.DatasetDSpaceObjectGenerator;
+import org.dspace.statistics.content.StatisticsDataVisits;
+import org.dspace.statistics.content.StatisticsListing;
+import org.dspace.statistics.content.filter.StatisticsFilter;
 
 /**
  *
  * @author Nathan Day
  */
-public class JournalLandingTabbedTransformer extends AbstractFiltersTransformer {
+public class JournalLandingTabbedTransformer extends AbstractDSpaceTransformer {
     
-    private static final Logger log = Logger.getLogger(TopTenDownloads.class);
+    private static final Logger log = Logger.getLogger(JournalLandingTabbedTransformer.class);
+    private final static SimpleDateFormat fmt = new SimpleDateFormat(fmtDateView);
+   
+    // query parameters
+    protected int itemType;
+    protected int itemCountMax = 10;
+    protected boolean itemAndPackageCountedSeparately = false;
+    protected int namelength = -1;
    
     // cocoon parameters
     protected String journalName;
         
     // performSearch() values
-    private ArrayList<DSpaceObject> references;
-    private ArrayList<String> values;
-    private String q;
+    protected ArrayList<DSpaceObject> references;
+    protected ArrayList<String> values;
+    private String query;
     private String sortOption;
     private String sortFieldOption;
     private TabData currentTabData;
     
-    // config values (final)
-    private final String submissionSize = "solr.recent-submissions.size";
-    private final int submissionSizeDefault = 5;
-    private final String includeRestricted = "harvest.includerestricted.rss";
-    private final boolean includeRestrictedDefault = false;
-    
     // container for data pertaining to entire div
     protected class DivData {
-        public String sortOption;
-        public String sortFieldOption;
         public String n;
         public Message T_div_head;
     }
@@ -75,11 +74,12 @@ public class JournalLandingTabbedTransformer extends AbstractFiltersTransformer 
     protected class TabData {
         public String n;
         public Message buttonLabel;
-        public String query;
         public Message refHead;
         public Message valHead;
+        public String dateFilter;
     }
     protected ArrayList<TabData> tabData;
+    private String queryDateFilter;
     
     @Override
     public void setup(SourceResolver resolver, Map objectModel, String src,
@@ -107,10 +107,7 @@ public class JournalLandingTabbedTransformer extends AbstractFiltersTransformer 
         for(TabData t : tabData) {
             tablist.addItem(t.buttonLabel);
         }        
-        sortOption = divData.sortOption;
-        sortFieldOption = divData.sortFieldOption;
         for(TabData t : tabData) {
-            q = t.query;
             Division wrapper = outer.addDivision(t.n, t.n);
             Division items = wrapper.addDivision(ITEMS);
             // reference list
@@ -120,7 +117,8 @@ public class JournalLandingTabbedTransformer extends AbstractFiltersTransformer 
             Division count = wrapper.addDivision(VALS);
             List list = count.addList(t.n, List.TYPE_SIMPLE, t.n);
             list.setHead(t.valHead);
-
+            queryDateFilter = t.dateFilter;
+            
             references = new ArrayList<DSpaceObject>();
             values = new ArrayList<String>();
             try {
@@ -139,69 +137,100 @@ public class JournalLandingTabbedTransformer extends AbstractFiltersTransformer 
         }
     }
 
-    /**
-     * 
-     *
-     * @param object
-     */
-    @Override
-    public void performSearch(DSpaceObject object) throws SearchServiceException, UIException {
-        if (queryResults != null) return;        
-        queryArgs = prepareDefaultFilters(getView());
-        queryArgs.setQuery(q);
-        queryArgs.setRows(10);
-        String sortField = SearchUtils.getConfig().getString(sortFieldOption);
-        if(sortField != null){
-            queryArgs.setSortField(
-                    sortField,
-                    SolrQuery.ORDER.desc
-            );
-        }
-        SearchService service = getSearchService();
-log.debug(queryArgs);
-        queryResults = (QueryResponse) service.search(context, queryArgs);
-        boolean includeRestrictedItems = ConfigurationManager.getBooleanProperty(includeRestricted,includeRestrictedDefault);
-        int numberOfItemsToShow= SearchUtils.getConfig().getInt(submissionSize, submissionSizeDefault);
-        String config = SearchUtils.getConfig().getString(sortOption);
-        if (queryResults != null && !includeRestrictedItems)  {
-            for (SolrDocument doc : queryResults.getResults()) {
-                if (references.size() > numberOfItemsToShow) break;
-                DSpaceObject obj = null;
-                try {
-                    obj = SearchUtils.findDSpaceObject(context, doc);
-                } catch (SQLException ex) {
-                    log.error(ex.getMessage());
-                }
-                try {
-                    if (obj != null
-                        && DryadWorkflowUtils.isAtLeastOneDataFileVisible(context, (Item) obj))
-                    {
-                        references.add(obj);
-                        Object o = doc.getFieldValue(config);
-                        
-                        if (o instanceof ArrayList) {
-                            values.add(((ArrayList) o).get(0).toString());
-                        } else if (o instanceof String) {
-                            values.add(o.toString());
-                        }
+    private void performSearch(DSpaceObject object) throws SearchServiceException, UIException {
 
-                    }
-                } catch (SQLException ex) {
-                    log.error(ex.getMessage());
+        DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();
+        dsoAxis.addDsoChild(itemType, itemCountMax, itemAndPackageCountedSeparately, namelength);
+        StatisticsListing statListing = new StatisticsListing(new StatisticsDataVisits());
+        statListing.addDatasetGenerator(dsoAxis);
+        if (queryDateFilter != null) {
+            StatisticsFilter dateFilter = new StatisticsFilter() {
+                @Override
+                public String toQuery() {
+                    return queryDateFilter;
+                }
+            };
+            statListing.addFilter(dateFilter);
+        }
+
+        //Render the list as a table
+        Dataset dataset = null;
+        try {
+            dataset = statListing.getDataset(context);
+        } catch (Exception ex) {
+            log.error(ex);
+            return;
+        }
+        if (dataset != null) {
+            String[][] matrix = dataset.getMatrixFormatted();
+            java.util.List<String[]> resultList = null;
+            try {
+                resultList = retrieveResultList(dataset, matrix[0]);
+            } catch (Exception ex) {
+                log.error(ex);
+                return;
+            }
+            for (String[] temp : resultList) {
+                DSpaceObject dso = null;
+                try {
+                    dso = HandleManager.resolveToObject(context,temp[0]);
+                } catch (Exception ex) {
+                    log.error(ex);
+                }
+                if (dso != null) {
+                    references.add(dso);
+                    values.add(temp[1]);
                 }
             }
         }
     }
 
-    @Override
-    public String getView() {
-        return "site";
+    // 
+    protected Boolean includeDso(DSpaceObject dso) {
+        // filter here on:
+        // add filter for month/year/alltime in dateFacet
+        if (dso != null && dso instanceof Item) {
+            Item item = (Item) dso;
+            return item.getMetadata("prism", "publicationName", null, Item.ANY).equals(journalName)
+                && item.getMetadata("dc", "type", null, Item.ANY).equals("Dataset");
+        }
+        return false;
     }
     
-    @Override
-    public Serializable getKey() {
-        // do not allow this to be cached
-        return null;
-    }
-    
+    private java.util.List<String[]> retrieveResultList(Dataset dataset, String[] strings) throws SQLException {
+        java.util.List<String[]> values = new ArrayList<String[]>();
+        java.util.List<Map<String, String>> urls = dataset.getColLabelsAttrs();
+        int j=0;
+        int i=0;
+        for (Map<String, String> map : urls)
+        {
+            for (Map.Entry<String, String> entry : map.entrySet())
+            {
+               if(i>10)
+               {
+                   break;
+               }
+                String url= entry.getValue();
+                String suffix = url.substring(url.lastIndexOf("/handle/"));
+                suffix=suffix.replace("/handle/","");
+                String partOfURL = url.substring(0,url.lastIndexOf('/'));
+                String prefix = ConfigurationManager.getProperty("dspace.url");
+
+                DSpaceObject dso = HandleManager.resolveToObject(context, suffix);
+                if(includeDso(dso)) {
+                    DCValue[] vals = ((Item)dso).getMetadata("dc", "title", null, Item.ANY);
+                    if(vals != null && 0 < vals.length)
+                    {
+                        String[] temp = new String[3];
+                        temp[0] = suffix;
+                        temp[1]= strings[j];
+                        values.add(temp);
+                        i++;
+                    }
+                    j++;
+                }
+            }
+        }
+        return values;
+    }    
 }
