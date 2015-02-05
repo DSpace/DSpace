@@ -367,7 +367,8 @@ public class SolrLogger
             storeParents(doc1, dspaceObject);
         }
         // Save the current time
-        doc1.addField("time", DateFormatUtils.format(new Date(), DATE_FORMAT_8601));
+        doc1.addField("time",
+                DateFormatUtils.formatUTC(new Date(), DATE_FORMAT_8601));
         if (currentUser != null)
         {
             doc1.addField("epersonid", currentUser.getID());
@@ -452,7 +453,8 @@ public class SolrLogger
             storeParents(doc1, dspaceObject);
         }
         // Save the current time
-        doc1.addField("time", DateFormatUtils.format(new Date(), DATE_FORMAT_8601));
+        doc1.addField("time",
+                DateFormatUtils.formatUTC(new Date(), DATE_FORMAT_8601));
         if (currentUser != null)
         {
             doc1.addField("epersonid", currentUser.getID());

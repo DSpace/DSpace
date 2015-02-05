@@ -242,7 +242,8 @@ public class ElasticSearchLogger {
             docBuilder.field("type", Constants.typeText[dspaceObject.getType()]);
 
             // Save the current time
-            docBuilder.field("time", DateFormatUtils.format(new Date(), DATE_FORMAT_8601));
+            docBuilder.field("time",
+                    DateFormatUtils.formatUTC(new Date(), DATE_FORMAT_8601));
             if (currentUser != null) {
                 docBuilder.field("epersonid", currentUser.getID());
             }
@@ -359,7 +360,8 @@ public class ElasticSearchLogger {
             docBuilder.field("type", Constants.typeText[dspaceObject.getType()]);
 
             // Save the current time
-            docBuilder.field("time", DateFormatUtils.format(new Date(), DATE_FORMAT_8601));
+            docBuilder.field("time",
+                    DateFormatUtils.formatUTC(new Date(), DATE_FORMAT_8601));
             if (currentUser != null) {
                 docBuilder.field("epersonid", currentUser.getID());
             }
