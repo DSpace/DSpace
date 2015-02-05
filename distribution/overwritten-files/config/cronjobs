@@ -1,4 +1,30 @@
+# Edit this file to introduce tasks to be run by cron.
+# 
+# Each task to run has to be defined through a single line
+# indicating with different fields when the task will be run
+# and what command to run for the task
+# 
+# To define the time you can provide concrete values for
+# minute (m), hour (h), day of month (dom), month (mon),
+# and day of week (dow) or use '*' in these fields (for 'any').# 
+# Notice that tasks will be started based on the cron's system
+# daemon's notion of time and timezones.
+# 
+# Output of the crontab jobs (including errors) is sent through
+# email to the user the crontab file belongs to (unless redirected).
+# 
+# For example, you can run a backup of all your user accounts
+# at 5 a.m every week with:
+# 0 5 * * 1 tar -zcf /var/backups/home.tgz /home/
+# 
+# For more information see the manual pages of crontab(5) and cron(8)
+# 
 # m h  dom mon dow   command
+
+#VER https://www.google.com/calendar/b/1/embed?src=sedici.unlp.edu.ar_0ri54lra5dpgau9cth4aff37tk@group.calendar.google.com
+
+JAVA_OPTS=-Xmx1024M
+
 # ########## MAILS ######################
 # Send out subscription e-mails at 01:00 every day
 0 1 * * *  /var/dspace/bin/dspace sub-daily
@@ -11,11 +37,21 @@
 # Mail the results to the sysadmin at 04:00
 2 4 * * 1  /var/dspace/bin/dspace checker-emailer -c
 
-#actualizo el indice de xoai
+#actualizo el indice de xoai 4veces al dia
 1 9,12,15,19 * * *  /var/dspace/bin/dspace xoai import > /dev/null
 
+#Actualizo el indice discovery a las 23hs todos lso dias para optimizarlo y quitarle todos los docs que ya no existen
+0 20 * * *  /var/dspace/bin/dspace update-discovery-index -co > /dev/null
+
+#Reconstruye el indice discovery el dia 2 de cada mes a las 22hs y lo optimiza
+#0 22 2 * *  /var/dspace/bin/dspace update-discovery-index -bo > /dev/null
+
+#Reconstruye el indice xoai el dia 3 de cada mes a las 22 hs y lo optimiza
+#0 22 3 * *  /var/dspace/bin/dspace xoai import -cvo > /dev/null
+
 #actualizo la lista de spiders ips
-10 6 3 * * /var/dspace/bin/dspace stats-util -u && /var/dspace/bin/dspace stats-util -m
+10 6 3 * * /var/dspace/bin/dspace stats-util -u 
+15 4 * * * /var/dspace/bin/dspace stats-util -m
 
 #Generate Sitemaps
 0 6 * * *  /var/dspace/bin/dspace generate-sitemaps 
@@ -44,4 +80,3 @@
 # ########## POSTGRES ######################
 # Clean up the database nightly at 4.20am
 # 20 4 * * * vacuumdb --analyze dspace > /dev/null 2>&1
-

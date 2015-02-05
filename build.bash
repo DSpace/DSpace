@@ -25,7 +25,8 @@ print_help()
 }
 
 
-print_sec(){
+print_sec()
+{
     echo -e "\n===================================================="
 	echo -e "==========$1=========="
     echo "===================================================="
@@ -228,10 +229,10 @@ do_update(){
 #=============================================================================
 
 echo "`whoami` dame tus privilegios de root, dame tu poder!"
-sudo ls > /dev/null 
 
 case "$1" in
     install )
+		sudo ls > /dev/null 
 		do_install $2
     	;;
     update )
