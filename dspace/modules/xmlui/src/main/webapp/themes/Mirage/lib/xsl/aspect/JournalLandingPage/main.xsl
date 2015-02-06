@@ -45,7 +45,7 @@
                     <xsl:variable name="position" select="position()"/>
                     <tr>
                         <td>
-                            <xsl:apply-templates select="."/>
+                            <xsl:apply-templates select="." mode="journalLanding"/>
                         </td>
                         <td>
                             <xsl:apply-templates select="ancestor::dri:div[@n='journal-landing-topten']/dri:div[@n='count']/dri:list/dri:item[position()=$position]"/>
@@ -99,7 +99,7 @@
                             <xsl:variable name="position" select="position()"/>
                             <tr>
                                 <td>
-                                    <xsl:apply-templates select="ancestor::dri:div[@n='items']/preceding-sibling::dri:div[@n='items']/dri:referneceSet/dri:reference[position()=$position]"/>
+                                    <xsl:apply-templates select="ancestor::dri:div[@n='vals']/preceding-sibling::dri:div[@n='items']/dri:referneceSet/dri:reference[position()=$position]" mode="journalLanding"/>
                                 </td>
                                 <td>
                                     <xsl:apply-templates select="."/>
@@ -171,7 +171,7 @@
         </div>
     </xsl:template>
     
-    <xsl:template match="dri:reference">
+    <xsl:template match="dri:reference" mode="journalLanding">
         <xsl:variable name="externalMetadataURL">
             <xsl:text>cocoon:/</xsl:text>
             <xsl:value-of select="@url"/>

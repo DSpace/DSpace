@@ -6,7 +6,6 @@
 package org.dspace.app.xmlui.aspect.journal.landing;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
@@ -26,10 +25,10 @@ import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.discovery.SearchServiceException;
 import org.xml.sax.SAXException;
 import java.text.SimpleDateFormat;
+import org.datadryad.api.DryadDataFile;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.content.DCValue;
 import org.dspace.handle.HandleManager;
@@ -185,18 +184,6 @@ public class JournalLandingTabbedTransformer extends AbstractDSpaceTransformer {
         }
     }
 
-    // 
-    protected Boolean includeDso(DSpaceObject dso) {
-        // filter here on:
-        // add filter for month/year/alltime in dateFacet
-        if (dso != null && dso instanceof Item) {
-            Item item = (Item) dso;
-            return item.getMetadata("prism", "publicationName", null, Item.ANY).equals(journalName)
-                && item.getMetadata("dc", "type", null, Item.ANY).equals("Dataset");
-        }
-        return false;
-    }
-    
     private java.util.List<String[]> retrieveResultList(Dataset dataset, String[] strings) throws SQLException {
         java.util.List<String[]> values = new ArrayList<String[]>();
         java.util.List<Map<String, String>> urls = dataset.getColLabelsAttrs();
@@ -210,24 +197,30 @@ public class JournalLandingTabbedTransformer extends AbstractDSpaceTransformer {
                {
                    break;
                }
-                String url= entry.getValue();
+                String url = entry.getValue();
                 String suffix = url.substring(url.lastIndexOf("/handle/"));
-                suffix=suffix.replace("/handle/","");
-                String partOfURL = url.substring(0,url.lastIndexOf('/'));
-                String prefix = ConfigurationManager.getProperty("dspace.url");
-
+                suffix = suffix.replace("/handle/","");
                 DSpaceObject dso = HandleManager.resolveToObject(context, suffix);
-                if(includeDso(dso)) {
-                    DCValue[] vals = ((Item)dso).getMetadata("dc", "title", null, Item.ANY);
-                    if(vals != null && 0 < vals.length)
-                    {
-                        String[] temp = new String[3];
-                        temp[0] = suffix;
-                        temp[1]= strings[j];
-                        values.add(temp);
-                        i++;
+                if (dso != null && dso instanceof Item ) {
+                    DCValue[] dcvs = ((Item) dso).getMetadata("dc", "type", null, Item.ANY);
+                    for (DCValue dcv : dcvs) {
+                        if (dcv.value.equals("Dataset")) {
+                            DryadDataFile file = new DryadDataFile(((Item) dso));
+                            org.datadryad.api.DryadDataPackage dataPackage = file.getDataPackage(context);
+                            if (dataPackage.getPublicationName().equals(this.journalName)) {
+                                DCValue[] vals = ((Item)dso).getMetadata("dc", "title", null, Item.ANY);
+                                if(vals != null && 0 < vals.length)
+                                {
+                                    String[] temp = new String[2];
+                                    temp[0] = suffix;
+                                    temp[1]= strings[j];
+                                    values.add(temp);
+                                    i++;
+                                }
+                                j++;
+                            }
+                        }
                     }
-                    j++;
                 }
             }
         }
