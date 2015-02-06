@@ -2274,12 +2274,12 @@ este momento. Cuando se usa QDC para los elementos de SEDICI se recomienda el us
 
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.pregunta">Seleccione una licencia:</message>
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.sinLicencia">Sin licencia</message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by">Creative Commons Attribution 2.5 Argentina (CC BY 2.5)</message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc">Creative Commons Attribution-NonCommercial 2.5 Argentina (CC BY-NC 2.5)</message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-nd">Creative Commons Attribution-NonCommercial-NoDerivs 2.5 Argentina (CC BY-NC-ND 2.5)</message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-sa">Creative Commons Attribution-NonCommercial-ShareAlike 2.5 Argentina (CC BY-NC-SA 2.5)</message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nd">Creative Commons Attribution-NoDerivs 2.5 Argentina (CC BY-ND 2.5)</message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-sa">Creative Commons Attribution-ShareAlike 2.5 Argentina (CC BY-SA 2.5)</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by">Creative Commons Attribution 4.0 International (CC BY 4.0)</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc">Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-nd">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-sa">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nd">Creative Commons Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0)</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-sa">Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)</message>
 
 <!-- Otras traducciones -->
 <message key="sedici.aspect.collectionViewer.addItem">Agregar Item</message>
