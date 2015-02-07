@@ -41,6 +41,7 @@ import org.dspace.statistics.content.StatisticsListing;
 import org.dspace.statistics.content.filter.StatisticsFilter;
 import java.util.GregorianCalendar;
 import java.util.Locale;
+import org.datadryad.api.DryadDataPackage;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.I18nUtil;
 
@@ -242,18 +243,27 @@ public class JournalLandingTabbedTransformer extends AbstractDSpaceTransformer {
                     for (DCValue dcv : dcvs) {
                         if (dcv.value.equals("Dataset")) {
                             log.debug(("Item with handle '" + ((Item)dso).getHandle()) + "' is a dataset.");
-                            DryadDataFile file = new DryadDataFile(((Item) dso));
-                            org.datadryad.api.DryadDataPackage dataPackage = file.getDataPackage(context);
-                            if (dataPackage.getPublicationName().equals(this.journalName)) {
-                                DCValue[] vals = ((Item)dso).getMetadata("dc", "title", null, Item.ANY);
-                                if(vals != null && 0 < vals.length) {
-                                    log.debug(("Item with handle '" + ((Item) dso).getHandle())
-                                             + "' to be displayed for journal " + this.journalName);
-                                    values.add(new ResultItem((Item) dso, strings[j]));
+                            DryadDataFile file = null;
+                            DryadDataPackage dataPackage = null;
+                            try {
+                                file = new DryadDataFile(((Item) dso));
+                                dataPackage = file.getDataPackage(context);
+                                if (dataPackage != null) {
+                                    if (dataPackage.getPublicationName().equals(this.journalName)) {
+                                        DCValue[] vals = ((Item)dso).getMetadata("dc", "title", null, Item.ANY);
+                                        if(vals != null && 0 < vals.length) {
+                                            log.debug(("Item with handle '" + ((Item) dso).getHandle())
+                                                     + "' to be displayed for journal " + this.journalName);
+                                            values.add(new ResultItem((Item) dso, strings[j]));
+                                        }
+                                        j++;
+                                    }
+                                } else {
+                                    log.error("Data package for handle '" + suffix + "' is null");
                                 }
-                                j++;
+                            } catch (Exception e) {
+                                log.error(e.getMessage());
                             }
-                            break;
                         }
                     }
                 }
