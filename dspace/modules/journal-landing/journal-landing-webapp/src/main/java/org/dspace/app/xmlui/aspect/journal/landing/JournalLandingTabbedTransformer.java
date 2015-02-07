@@ -172,6 +172,7 @@ public class JournalLandingTabbedTransformer extends AbstractDSpaceTransformer {
             StatisticsFilter dateFilter = new StatisticsFilter() {
                 @Override
                 public String toQuery() {
+                    log.debug("Using query filter '" + queryDateFilter + "' for performSearch()");
                     return queryDateFilter;
                 }
             };
@@ -242,7 +243,7 @@ public class JournalLandingTabbedTransformer extends AbstractDSpaceTransformer {
                     DCValue[] dcvs = ((Item) dso).getMetadata("dc", "type", null, Item.ANY);
                     for (DCValue dcv : dcvs) {
                         if (dcv.value.equals("Dataset")) {
-                            log.debug(("Item with handle '" + ((Item)dso).getHandle()) + "' is a dataset.");
+                            log.debug("Item with handle '" + ((Item) dso).getHandle() + "' is a dataset.");
                             DryadDataFile file = null;
                             DryadDataPackage dataPackage = null;
                             try {
@@ -257,6 +258,8 @@ public class JournalLandingTabbedTransformer extends AbstractDSpaceTransformer {
                                             values.add(new ResultItem((Item) dso, strings[j]));
                                         }
                                         j++;
+                                    } else {
+                                        log.error("Data package for data file with handle '" + suffix + "' is: " + dataPackage.getPublicationName());
                                     }
                                 } else {
                                     log.error("Data package for handle '" + suffix + "' is null");
