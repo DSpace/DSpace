@@ -47,8 +47,8 @@
                         <td>
                             <xsl:apply-templates select="." mode="journalLanding"/>
                         </td>
-                        <td>
-                            <xsl:apply-templates select="ancestor::dri:div[@n='journal-landing-topten']/dri:div[@n='count']/dri:list/dri:item[position()=$position]"/>
+                        <td align="center">
+                            <xsl:apply-templates select="ancestor::dri:div[@n='items']/following-sibling::dri:div[@n='vals']/dri:list/dri:item[$position]"/>
                         </td>
                     </tr>
                 </xsl:for-each>
@@ -99,9 +99,9 @@
                             <xsl:variable name="position" select="position()"/>
                             <tr>
                                 <td>
-                                    <xsl:apply-templates select="ancestor::dri:div[@n='vals']/preceding-sibling::dri:div[@n='items']/dri:referneceSet/dri:reference[position()=$position]" mode="journalLanding"/>
+                                    <xsl:apply-templates select="ancestor::dri:div[@n='vals']/preceding-sibling::dri:div[@n='items']/dri:referenceSet/dri:reference[$position]" mode="journalLanding"/>
                                 </td>
-                                <td>
+                                <td align="center">
                                     <xsl:apply-templates select="."/>
                                 </td>
                             </tr>
