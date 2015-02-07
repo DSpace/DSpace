@@ -224,10 +224,17 @@ public class JournalLandingTabbedTransformer extends AbstractDSpaceTransformer {
                 if(values.size() == itemCountMax) return values;
                 String url = entry.getValue();
                 if (url == null || url.length() == 0 || url.lastIndexOf("/handle/") == -1) continue;
+
                 log.debug("Using url: " + url);
-                String suffix = url.substring(url.lastIndexOf("/handle/"));
-                suffix = suffix.replace("/handle/","");
-                log.debug("Using handle to resolve object: " + suffix);
+                String suffix = url.substring(url.lastIndexOf("/handle/10255/"));
+                suffix = suffix.replace("/handle/10255/","");
+                if (suffix.indexOf("/") != -1) {
+                    String trailer = suffix.substring(suffix.indexOf("/"));
+                    suffix = suffix.replace(trailer, "");
+                }
+                suffix = "10255/" + suffix;
+
+                log.debug("Using handle identifier to resolve object: " + suffix);
                 DSpaceObject dso = HandleManager.resolveToObject(context, suffix);
                 if (dso != null && dso instanceof Item) {
                     log.debug(("Retrieving results for Item with handle: " + ((Item)dso).getHandle()));
