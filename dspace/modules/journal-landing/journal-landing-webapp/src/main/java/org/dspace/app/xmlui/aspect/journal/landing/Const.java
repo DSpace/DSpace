@@ -45,10 +45,8 @@ public class Const {
     public static final String TABLIST = "tablist";
     public static final String EMPTY_VAL = "-";
     
-    // TODO: make this this-month
-    public static final String dateMonth = "time:[NOW-30DAY/DAY TO NOW]";
-    public static final String dateYear = "time:[NOW-1YEAR/DAY TO NOW]";
-    
     // date format string for most recent deposits
     public static final String fmtDateView = "yyyy-MM-dd";
+    public static final String solrDateFormat = "time:[%d-%s-01T00:00:00.000Z TO NOW]";
+    public static final String solrDateAllTime = "[* TO NOW]";
 }

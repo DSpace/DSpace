@@ -28,6 +28,8 @@ import org.dspace.content.Item;
 import org.dspace.discovery.SearchServiceException;
 import org.xml.sax.SAXException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import org.datadryad.api.DryadDataFile;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.content.DCValue;
@@ -37,6 +39,10 @@ import org.dspace.statistics.content.DatasetDSpaceObjectGenerator;
 import org.dspace.statistics.content.StatisticsDataVisits;
 import org.dspace.statistics.content.StatisticsListing;
 import org.dspace.statistics.content.filter.StatisticsFilter;
+import java.util.GregorianCalendar;
+import java.util.Locale;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.I18nUtil;
 
 /**
  *
@@ -45,8 +51,11 @@ import org.dspace.statistics.content.filter.StatisticsFilter;
 public class JournalLandingTabbedTransformer extends AbstractDSpaceTransformer {
     
     private static final Logger log = Logger.getLogger(JournalLandingTabbedTransformer.class);
-    private final static SimpleDateFormat fmt = new SimpleDateFormat(fmtDateView);
-   
+    private int currentMonth;
+    private String currentMonthStr;
+    private int currentYear;
+    Locale defaultLocale = org.dspace.core.I18nUtil.getDefaultLocale();
+
     // query parameters
     protected int itemType;
     protected int itemCountMax = 10;
@@ -79,7 +88,17 @@ public class JournalLandingTabbedTransformer extends AbstractDSpaceTransformer {
     }
     protected ArrayList<TabData> tabData;
     private String queryDateFilter;
-    
+
+    protected int getCurrentMonth() {
+        return currentMonth;
+    }
+    protected int getCurrentYear() {
+        return currentYear;
+    }
+    protected String getCurrentMonthStr() {
+        return currentMonthStr;
+    }
+
     @Override
     public void setup(SourceResolver resolver, Map objectModel, String src,
             Parameters parameters) throws ProcessingException, SAXException,
@@ -92,6 +111,12 @@ public class JournalLandingTabbedTransformer extends AbstractDSpaceTransformer {
             log.error(ex);
             throw new ProcessingException(ex.getMessage());
         }
+        Calendar cal = new GregorianCalendar();
+        Date now = new Date();
+        cal.setTime(now);
+        currentMonth = cal.get(Calendar.MONTH);
+        currentYear = cal.get(Calendar.YEAR);
+        currentMonthStr = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, defaultLocale);
     }
     
     @Override

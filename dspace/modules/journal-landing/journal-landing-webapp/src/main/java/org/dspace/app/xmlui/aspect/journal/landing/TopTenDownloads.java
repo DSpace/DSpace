@@ -40,6 +40,9 @@ public class TopTenDownloads extends JournalLandingTabbedTransformer {
             IOException
     {
         super.setup(resolver, objectModel, src, parameters);
+        int currentMonth = getCurrentMonth();
+        int currentYear = getCurrentYear();
+        String currentMonthStr = getCurrentMonthStr();
         itemType = Constants.BITSTREAM;
 
         divData = new DivData();
@@ -50,22 +53,23 @@ public class TopTenDownloads extends JournalLandingTabbedTransformer {
         TabData tb1 = new TabData();
         tb1.n = TOPTEN_DOWNLOADS_MONTH;
         tb1.buttonLabel = message("xmlui.JournalLandingPage.JournalLandingTabbedTransformer.month");
-        tb1.dateFilter = dateMonth;
-        tb1.refHead = message("xmlui.JournalLandingPage.TopTenDownloads.ref_head_month").parameterize("MM","YYYY");
+        tb1.dateFilter = String.format(solrDateFormat, currentYear, currentMonth);
+        tb1.refHead = message("xmlui.JournalLandingPage.TopTenDownloads.ref_head_month").parameterize(currentMonthStr,currentYear);
         tb1.valHead = message("xmlui.JournalLandingPage.TopTenDownloads.val_head");
         tabData.add(tb1);
 
         TabData tb2 = new TabData();
         tb2.n = TOPTEN_DOWNLOADS_YEAR;
         tb2.buttonLabel = message("xmlui.JournalLandingPage.JournalLandingTabbedTransformer.year");
-        tb1.dateFilter = dateYear;
-        tb2.refHead = message("xmlui.JournalLandingPage.TopTenDownloads.ref_head_year").parameterize("YYYY");
+        tb2.dateFilter = String.format(solrDateFormat, currentYear - 1, currentMonth);
+        tb2.refHead = message("xmlui.JournalLandingPage.TopTenDownloads.ref_head_year").parameterize(currentYear);
         tb2.valHead = message("xmlui.JournalLandingPage.TopTenDownloads.val_head");
         tabData.add(tb2);
 
         TabData tb3 = new TabData();
         tb3.n = TOPTEN_DOWNLOADS_ALLTIME;
         tb3.buttonLabel = message("xmlui.JournalLandingPage.JournalLandingTabbedTransformer.alltime");
+        tb3.dateFilter = solrDateAllTime;
         tb3.refHead = message("xmlui.JournalLandingPage.TopTenDownloads.ref_head_alltime");
         tb3.valHead = message("xmlui.JournalLandingPage.TopTenDownloads.val_head");
         tabData.add(tb3);
