@@ -187,42 +187,49 @@ public class JournalLandingTabbedTransformer extends AbstractDSpaceTransformer {
         }
         if (dataset != null) {
             String[][] matrix = dataset.getMatrixFormatted();
-            java.util.List<String[]> resultList = null;
+            java.util.List<ResultItem> resultList = null;
             try {
                 resultList = retrieveResultList(dataset, matrix[0]);
             } catch (Exception ex) {
                 log.error(ex);
                 return;
             }
-            for (String[] temp : resultList) {
-                DSpaceObject dso = null;
-                try {
-                    dso = HandleManager.resolveToObject(context,temp[0]);
-                } catch (Exception ex) {
-                    log.error(ex);
+            if (resultList != null) {
+                log.debug("Handling " + resultList.size() + " objects for journal " + journalName);
+                for (ResultItem result : resultList) {
+                    references.add(result.item);
+                    values.add(result.value);
                 }
-                if (dso != null) {
-                    references.add(dso);
-                    values.add(temp[1]);
-                }
+            } else {
+                log.debug("Not handling a null result list for journal " + journalName + " (" + this.getClass().getName() + ")");
             }
         }
     }
 
-    private java.util.List<String[]> retrieveResultList(Dataset dataset, String[] strings) throws SQLException {
-        java.util.List<String[]> values = new ArrayList<String[]>();
+    private class ResultItem {
+        public Item item;
+        public String value;
+        public ResultItem(Item item, String value) {
+            this.item = item;
+            this.value = value;
+        }
+    }
+    
+    private java.util.List<ResultItem> retrieveResultList(Dataset dataset, String[] strings) throws SQLException {
+        java.util.List<ResultItem> values = new ArrayList<ResultItem>();
         java.util.List<Map<String, String>> urls = dataset.getColLabelsAttrs();
         int j=0;
         for (Map<String, String> map : urls) {
             for (Map.Entry<String, String> entry : map.entrySet()) {
                 if(values.size() == itemCountMax) return values;
                 String url = entry.getValue();
-                if (url == null || url.length() == 0 || (!url.matches("/handle/"))) continue;
+                if (url == null || url.length() == 0 || url.lastIndexOf("/handle/") == -1) continue;
+                log.debug("Using url: " + url);
                 String suffix = url.substring(url.lastIndexOf("/handle/"));
                 suffix = suffix.replace("/handle/","");
                 log.debug("Using handle to resolve object: " + suffix);
                 DSpaceObject dso = HandleManager.resolveToObject(context, suffix);
-                if (dso != null && dso instanceof Item ) {
+                if (dso != null && dso instanceof Item) {
                     log.debug(("Retrieving results for Item with handle: " + ((Item)dso).getHandle()));
                     DCValue[] dcvs = ((Item) dso).getMetadata("dc", "type", null, Item.ANY);
                     for (DCValue dcv : dcvs) {
@@ -235,13 +242,11 @@ public class JournalLandingTabbedTransformer extends AbstractDSpaceTransformer {
                                 if(vals != null && 0 < vals.length) {
                                     log.debug(("Item with handle '" + ((Item) dso).getHandle())
                                              + "' to be displayed for journal " + this.journalName);
-                                    String[] temp = new String[2];
-                                    temp[0] = suffix;
-                                    temp[1]= strings[j];
-                                    values.add(temp);
+                                    values.add(new ResultItem((Item) dso, strings[j]));
                                 }
                                 j++;
                             }
+                            break;
                         }
                     }
                 }
