@@ -213,34 +213,30 @@ public class JournalLandingTabbedTransformer extends AbstractDSpaceTransformer {
         java.util.List<String[]> values = new ArrayList<String[]>();
         java.util.List<Map<String, String>> urls = dataset.getColLabelsAttrs();
         int j=0;
-        int i=0;
-        for (Map<String, String> map : urls)
-        {
-            for (Map.Entry<String, String> entry : map.entrySet())
-            {
-               if(i>10)
-               {
-                   break;
-               }
+        for (Map<String, String> map : urls) {
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                if(values.size() == itemCountMax) return values;
                 String url = entry.getValue();
                 String suffix = url.substring(url.lastIndexOf("/handle/"));
                 suffix = suffix.replace("/handle/","");
                 DSpaceObject dso = HandleManager.resolveToObject(context, suffix);
                 if (dso != null && dso instanceof Item ) {
+                    log.debug(("Retrieving results for Item with handle: " + ((Item)dso).getHandle()));
                     DCValue[] dcvs = ((Item) dso).getMetadata("dc", "type", null, Item.ANY);
                     for (DCValue dcv : dcvs) {
                         if (dcv.value.equals("Dataset")) {
+                            log.debug(("Item with handle '" + ((Item)dso).getHandle()) + "' is a dataset.");
                             DryadDataFile file = new DryadDataFile(((Item) dso));
                             org.datadryad.api.DryadDataPackage dataPackage = file.getDataPackage(context);
                             if (dataPackage.getPublicationName().equals(this.journalName)) {
                                 DCValue[] vals = ((Item)dso).getMetadata("dc", "title", null, Item.ANY);
-                                if(vals != null && 0 < vals.length)
-                                {
+                                if(vals != null && 0 < vals.length) {
+                                    log.debug(("Item with handle '" + ((Item) dso).getHandle())
+                                             + "' to be displayed for journal " + this.journalName);
                                     String[] temp = new String[2];
                                     temp[0] = suffix;
                                     temp[1]= strings[j];
                                     values.add(temp);
-                                    i++;
                                 }
                                 j++;
                             }
