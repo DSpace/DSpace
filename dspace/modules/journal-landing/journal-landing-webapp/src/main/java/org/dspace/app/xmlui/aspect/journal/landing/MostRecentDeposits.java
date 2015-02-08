@@ -116,29 +116,27 @@ public class MostRecentDeposits extends AbstractFiltersTransformer {
         boolean includeRestrictedItems = ConfigurationManager.getBooleanProperty("harvest.includerestricted.rss", false);
         int numberOfItemsToShow= SearchUtils.getConfig().getInt("solr.recent-submissions.size", 5);
         ExtendedProperties config = SearchUtils.getConfig();
-        Object o;
         if (queryResults != null && !includeRestrictedItems)  {
             for (SolrDocument doc : queryResults.getResults()) {
                 if (references.size() > numberOfItemsToShow) break;
-                DSpaceObject obj = null;
+                DSpaceObject dso = null;
                 try {
-                    obj = SearchUtils.findDSpaceObject(context, doc);
+                    dso = SearchUtils.findDSpaceObject(context, doc);
                 } catch (SQLException ex) {
                     log.error(ex);
                     return;
                 }
                 try {
-                    if (obj != null
-                            && DryadWorkflowUtils.isAtLeastOneDataFileVisible(context, (Item) obj))
+                    if (dso != null
+                     && DryadWorkflowUtils.isAtLeastOneDataFileVisible(context, (Item) dso))
                     {
-                        references.add(obj);
+                        references.add(dso);
                         // dates.add(doc.getFieldValue(config.getString("recent.submissions.sort-option")).toString());
-                        o = doc.getFieldValue(config.getString("recent.submissions.sort-option"));
+                        Object o = doc.getFieldValue(config.getString("recent.submissions.sort-option"));
                         if (o instanceof ArrayList) {
-                            dates.add(((ArrayList) o).get(0).toString());
-                        } else if (o instanceof String) {
-                            dates.add(o.toString());
-                        } else if (o instanceof Date) {
+                            o = ((ArrayList) o).get(0);
+                        }
+                        if (o instanceof Date) {
                             dates.add(fmt.format(o));
                         } else {
                             dates.add(o.toString());
