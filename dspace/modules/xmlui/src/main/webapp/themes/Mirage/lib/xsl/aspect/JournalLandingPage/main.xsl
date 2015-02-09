@@ -14,6 +14,7 @@
 
     <xsl:variable name="upper" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
     <xsl:variable name="lower" select="'abcdefghijklmnopqrstuvwxyz'"/>
+    <xsl:variable name="landing-placeholder" select="'&#x2013;'"/>
 
     <xsl:template match="//dri:document/dri:body/dri:div[@id='aspect.journal.landing.TopTenDownloads.div.journal-landing-topten-downloads']">
         <xsl:call-template name="journal-landing-panel-tabs"/>
@@ -41,17 +42,27 @@
                         <th style="width:20%"><xsl:apply-templates select="dri:div[@n='vals']/dri:list/dri:head"/></th>
                     </tr>
                 </xsl:if>
-                <xsl:for-each select="dri:div[@n='items']/dri:referenceSet/dri:reference">
-                    <xsl:variable name="position" select="position()"/>
-                    <tr>
-                        <td>
-                            <xsl:apply-templates select="." mode="journalLanding"/>
-                        </td>
-                        <td align="center">
-                            <xsl:apply-templates select="ancestor::dri:div[@n='items']/following-sibling::dri:div[@n='vals']/dri:list/dri:item[$position]"/>
-                        </td>
-                    </tr>
-                </xsl:for-each>
+                <xsl:choose>
+                    <xsl:when test="dri:div[@n='items']/dri:referenceSet/dri:reference">
+                        <xsl:for-each select="dri:div[@n='items']/dri:referenceSet/dri:reference">
+                            <xsl:variable name="position" select="position()"/>
+                            <tr>
+                                <td>
+                                    <xsl:apply-templates select="." mode="journalLanding"/>
+                                </td>
+                                <td align="center">
+                                    <xsl:apply-templates select="ancestor::dri:div[@n='items']/following-sibling::dri:div[@n='vals']/dri:list/dri:item[$position]"/>
+                                </td>
+                            </tr>
+                        </xsl:for-each>                        
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <tr>
+                            <td><xsl:value-of select="$landing-placeholder"/></td>
+                            <td align="center"><xsl:value-of select="$landing-placeholder"/></td>
+                        </tr>
+                    </xsl:otherwise>
+                </xsl:choose>
             </table>
         </div>
     </xsl:template>
@@ -95,17 +106,27 @@
                                 <th style="width:20%"><xsl:apply-templates select="dri:div[@n='vals']/dri:list/dri:head"/></th>
                             </tr>
                         </xsl:if>
-                        <xsl:for-each select="dri:div[@n='vals']/dri:list/dri:item">
-                            <xsl:variable name="position" select="position()"/>
-                            <tr>
-                                <td>
-                                    <xsl:apply-templates select="ancestor::dri:div[@n='vals']/preceding-sibling::dri:div[@n='items']/dri:referenceSet/dri:reference[$position]" mode="journalLanding"/>
-                                </td>
-                                <td align="center">
-                                    <xsl:apply-templates select="."/>
-                                </td>
-                            </tr>
-                        </xsl:for-each>
+                        <xsl:choose>
+                            <xsl:when test="dri:div[@n='vals']/dri:list/dri:item">
+                                <xsl:for-each select="dri:div[@n='vals']/dri:list/dri:item">
+                                    <xsl:variable name="position" select="position()"/>
+                                    <tr>
+                                        <td>
+                                            <xsl:apply-templates select="ancestor::dri:div[@n='vals']/preceding-sibling::dri:div[@n='items']/dri:referenceSet/dri:reference[$position]" mode="journalLanding"/>
+                                        </td>
+                                        <td align="center">
+                                            <xsl:apply-templates select="."/>
+                                        </td>
+                                    </tr>
+                                </xsl:for-each>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <tr>
+                                    <td><xsl:value-of select="$landing-placeholder"/></td>
+                                    <td align="center"><xsl:value-of select="$landing-placeholder"/></td>
+                                </tr>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </table>
                 </div>
             </xsl:for-each>

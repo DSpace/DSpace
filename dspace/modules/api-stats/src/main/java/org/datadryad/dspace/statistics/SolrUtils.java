@@ -17,6 +17,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.dspace.core.ConfigurationManager;
 import org.w3c.dom.Document;
 
 /**
@@ -26,6 +27,9 @@ import org.w3c.dom.Document;
 public class SolrUtils {
     
     private static final Logger LOGGER = Logger.getLogger(SolrUtils.class);
+    
+    public static final String solrSearchUrlBase = ConfigurationManager.getProperty("solr.search.server");
+    public static final String solrStatsUrlBase = ConfigurationManager.getProperty("solr.stats.server");
     
     public static String getSolrXPathResult(String searchUrlBase, String queryUrl, String resultPath) {
         String result = "";

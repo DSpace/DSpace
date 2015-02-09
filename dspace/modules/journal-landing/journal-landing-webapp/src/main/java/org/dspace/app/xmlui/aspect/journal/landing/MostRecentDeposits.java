@@ -74,9 +74,7 @@ public class MostRecentDeposits extends AbstractFiltersTransformer {
         } catch (SearchServiceException e) {
             log.error(e.getMessage(), e);
         }
-        if (references.size() == 0) {
-            vals.addItem(EMPTY_VAL);
-        } else {
+        if (references.size() > 0) {
             for (DSpaceObject ref : references)
                 refs.addReference(ref);
             for (String s : dates)

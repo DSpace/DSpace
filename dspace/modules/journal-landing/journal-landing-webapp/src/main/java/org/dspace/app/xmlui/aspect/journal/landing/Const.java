@@ -43,7 +43,6 @@ public class Const {
     public static final String ITEMS = "items";
     public static final String VALS = "vals";
     public static final String TABLIST = "tablist";
-    public static final String EMPTY_VAL = "-";
     
     // date format string for most recent deposits
     public static final String fmtDateView = "yyyy-MM-dd";

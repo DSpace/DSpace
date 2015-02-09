@@ -11,13 +11,20 @@ import static org.dspace.app.xmlui.aspect.journal.landing.Const.*;
 
 import org.xml.sax.SAXException;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.environment.SourceResolver;
+import org.dspace.app.xmlui.utils.UIException;
 import static org.dspace.app.xmlui.wing.AbstractWingTransformer.message;
+import org.dspace.app.xmlui.wing.WingException;
+import org.dspace.app.xmlui.wing.element.Body;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
+import org.dspace.discovery.SearchServiceException;
 
 /**
  *
@@ -52,5 +59,17 @@ public class UserGeography extends JournalLandingTabbedTransformer {
         tb2.refHead = message("xmlui.JournalLandingPage.UserGeography.item_head");
         tb2.valHead = message("xmlui.JournalLandingPage.UserGeography.tab-downloads");
         tabData.add(tb2);        
+    }
+
+    @Override
+    public void addBody(Body body) throws SAXException, WingException,
+            UIException, SQLException, IOException, AuthorizeException
+    {
+        super.addBody(body);
+    }
+
+    @Override
+    protected void performSearch(DSpaceObject object) throws SearchServiceException, UIException {
+        
     }
 }

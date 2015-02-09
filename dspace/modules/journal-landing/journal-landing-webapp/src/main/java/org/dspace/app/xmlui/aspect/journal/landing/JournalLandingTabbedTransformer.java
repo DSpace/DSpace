@@ -151,9 +151,7 @@ public class JournalLandingTabbedTransformer extends AbstractDSpaceTransformer {
             } catch (SearchServiceException e) {
                 log.error(e.getMessage(), e);
             }
-            if (references.size() == 0) {
-                list.addItem(EMPTY_VAL);
-            } else {
+            if (references.size() > 0) {
                 for (DSpaceObject ref : references)
                     refs.addReference(ref);
                 for (String s : values)
@@ -162,7 +160,7 @@ public class JournalLandingTabbedTransformer extends AbstractDSpaceTransformer {
         }
     }
 
-    private void performSearch(DSpaceObject object) throws SearchServiceException, UIException {
+    protected void performSearch(DSpaceObject object) throws SearchServiceException, UIException {
 
         DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();
         dsoAxis.addDsoChild(itemType, itemCountMax, itemAndPackageCountedSeparately, namelength);
