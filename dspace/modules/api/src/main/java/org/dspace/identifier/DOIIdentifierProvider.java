@@ -195,12 +195,10 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                 if(history!=null && history.size() == 2 && !item.isArchived()){
                     revertDoisFirstItem(context, history);
                 }
-
-
             }
         } catch (Exception e) {
-            log.error(LogManager.getHeader(context, "Error while attempting to register doi", "Item id: " + dso.getID()));
-            throw new IdentifierException("Error while moving doi identifier", e);
+            log.error(LogManager.getHeader(context, "Error while deleting doi identifier", "Item id: " + dso.getID()));
+            throw new IdentifierException("Error while deleting doi identifier", e);
         }
     }
 
@@ -208,10 +206,9 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
     private String mintAndRegister(Context context, Item item, boolean register) throws Exception {
         String doi = getDoiValue(item);
         String collection = getCollection(context, item);
-        String myDataPkgColl = configurationService.getProperty("stats.datapkgs.coll");
         VersionHistory history = retrieveVersionHistory(context, item);
 
-        // CASE A: it is a versioned datafile and the user is modifying its content (adding or removing bitstream) upgrade version number.
+        // CASE A: it is a versioned datafile and the user is modifying its content (adding or removing bitstream): upgrade version number.
         if(item.isArchived()){
             if(!collection.equals(myDataPkgColl)){
                 if(lookup(doi)!=null){
@@ -256,7 +253,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         return doi;
     }
 
-    private void revertDoisFirstItem(Context context, VersionHistory history) throws SQLException, IOException, AuthorizeException{
+    private void revertDoisFirstItem(Context context, VersionHistory history) throws SQLException, IOException, AuthorizeException {
         Item previous = history.getPrevious(history.getLatestVersion()).getItem();
         String collection = getCollection(context, previous);
         // remove doi from DOI service .1
@@ -275,15 +272,18 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         }
     }
 
-
-    private void mintDOIFirstVersion(Context context, Item item, boolean register) throws SQLException, IOException, AuthorizeException
-    {
+    // When a DOI needs to be versioned for the first time:
+    // if the item has a versionhistory and the previous version was the first version,
+    // update that previous item to be version 1: dryad.xxxx.1
+    private void mintDOIFirstVersion(Context context, Item item, boolean register) throws SQLException, IOException, AuthorizeException {
         VersionHistory history = retrieveVersionHistory(context, item);
 
         if (history != null) {
             Version version = history.getVersion(item);
             // if it is the first time that is called "create version": mint identifier ".1"
             Version previous = history.getPrevious(version);
+            // if the previous version was the first version,
+            // update that previous item's metadata with the .1 versioned identifier.
             if (history.isFirstVersion(previous)) {
                 String previousDOI= updateIdentifierPreviousItem(context,previous.getItem());
                 DOI firstDOI = new DOI(previousDOI, previous.getItem());
@@ -314,9 +314,9 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
     private void mint(DOI doi, boolean register, Map<String, String> metadata) throws IOException {
         mint(doi, null, register, metadata);
     }
-    
+
     private void mint(DOI doi, String target, boolean register, Map<String, String> metadata) throws IOException {
-        log.debug("mintDOI is going to be called on "+doi.toString());
+        log.debug("mintDOI is going to be called on "+doi.toString() + ", target " + target);
         perstMinter.mintDOI(doi);
 
         if(register) {
@@ -363,7 +363,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         if (identifier != null && identifier.startsWith("doi:")) {
             DOI dbDOI = perstMinter.getKnownDOI(identifier);
             if(dbDOI==null) {
-                throw new IdentifierNotFoundException();
+                throw new IdentifierNotFoundException("identifier " + identifier + " is not found");
             }
             String value = dbDOI.getInternalIdentifier();
 
@@ -410,7 +410,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
     public String getEzidRegistrationURL(Item item) {
         String aDoi = getDoiValue(item);
-        return  perstMinter.getRegistrationURL(aDoi);
+        return perstMinter.getRegistrationURL(aDoi);
     }
 
     public boolean remove(String identifier) {
@@ -469,7 +469,6 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             try {
                 context.turnOffAuthorisationSystem();
                 String collection = getCollection(context, item);
-                log.debug("collection is " + collection);
 
                 // DATAPACKAGE
                 if (collection.equals(myDataPkgColl)) {
@@ -508,7 +507,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
 
     private synchronized DOI calculateDOIDataPackage(Context c, Item item, VersionHistory history) throws IOException, IdentifierException, AuthorizeException, SQLException {
-        DOI doi, oldDoi = null;
+        DOI doi = null;
 
         // Versioning: if it is a new version of an existing Item, the new DOI must be: oldDOI.(versionNumber), retrieve previous Item
         if (history != null) {
@@ -563,9 +562,8 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             itemTitle = titles[0].value;
         }
 
-        log.warn("calculateDOIDataFile() - " + itemTitle + " is part of: " + packageDOIString);
 
-        // Versioning: if it is a new version of an existing Item, the new DOI must be: oldDOI.(versionNumber)
+        // Versioning: if it is a new version of an existing Item, the new DOI must be: oldDOI.(versionNumber)/filesuffix.(versionNumber)
         if (history != null) { // NEW VERSION OF AN EXISTING ITEM
             Version version = history.getVersion(item);
             Version previous = history.getPrevious(version);
@@ -577,7 +575,6 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             String previousDOIString = null;
             // FIRST time a VERSION is created: we need to create the versioned DOIs.
             if (history.isFirstVersion(previous)) {
-                log.warn("calculateDOIDataFile() - calculateDOIDataFileFirstTime()");
                 previousDOIString = calculateDOIDataFileFirstTime(previous.getItem());
             }
             else {
@@ -592,7 +589,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             log.warn("calculateDOIDataFile() - new version of an existing item: " + childDOI.toString());
             return childDOI;
         }
-        else { // NEW ITEM: mint a new DOI
+        else { // NEW ITEM: mint a new DOI with a new file suffix
             // has an arbitrary max; in reality much, much less
             for (int index = 1; index < MAX_NUM_OF_FILES; index++) {
                 // check if canonical already exists
@@ -893,8 +890,9 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
     private String getCollection(Context context, Item item) throws SQLException {
         String collectionResult = null;
 
-        if(item.getOwningCollection()!=null)
+        if(item.getOwningCollection()!=null) {
             return item.getOwningCollection().getHandle();
+        }
 
         // If our item is a workspaceitem it cannot have a collection, so we will need to get our collection from the workspace item
         return getCollectionFromWI(context, item.getID()).getHandle();
@@ -921,15 +919,15 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
      * @return
      */
     public String[] stripHandle(String aHDL) {
-        int start = aHDL.lastIndexOf(myHdlPrefix + "/") + 1
+        int start = aHDL.lastIndexOf(myHdlPrefix + SLASH) + 1
                 + myHdlPrefix.length();
         String id;
 
         if (start > myHdlPrefix.length()) {
             id = aHDL.substring(start, aHDL.length());
-            return new String[]{myHdlPrefix + "/" + id, id};
+            return new String[]{myHdlPrefix + SLASH + id, id};
         } else {
-            return new String[]{myHdlPrefix + "/" + aHDL, aHDL};
+            return new String[]{myHdlPrefix + SLASH + aHDL, aHDL};
         }
     }
 
