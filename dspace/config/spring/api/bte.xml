@@ -84,6 +84,7 @@
                     <value>eisbn</value>
                     <value>arxivCategory</value>
                     <value>keywords</value>
+                    <value>allkeywords</value> 
                     <value>mesh</value>
                     <value>language</value>
                     <value>subtype</value>
@@ -594,8 +595,8 @@
 				<entry value="translators" key="dc.contributor.other" />
 				<entry value="chairs" key="dc.contributor.other" />
 				<entry value="abstract" key="dc.description.abstract" />
-				<entry value="allkeywords" key="dc.subject.other" />
-                                <entry value="keywords" key="dc.subject.other" />
+				<entry value="allkeywords" key="dc.subject" />
+                                <entry value="keywords" key="dc.subject" />
 				<entry value="arxivCategory" key="dc.subject" />
 				<entry value="doi" key="dc.identifier" />
 				<entry value="publisher" key="dc.publisher" />
