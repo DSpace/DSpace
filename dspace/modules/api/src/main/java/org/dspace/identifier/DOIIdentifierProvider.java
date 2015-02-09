@@ -115,8 +115,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         try {
             if (dso instanceof Item && dso.getHandle() != null) {
                 String doi = mintAndRegister(context, (Item) dso, true);
-                ((Item) dso).clearMetadata(identifierMetadata.schema, identifierMetadata.element, identifierMetadata.qualifier, Item.ANY);
-                ((Item) dso).addMetadata(identifierMetadata.schema, identifierMetadata.element, identifierMetadata.qualifier, null, doi);
+                updateItemDOIMetadata((Item) dso, doi);
             }
         } catch (Exception e) {
             log.error(LogManager.getHeader(context, "Error while attempting to register doi", "Item id: " + dso.getID()));
@@ -129,9 +128,9 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
     public String mint(Context context, DSpaceObject dso) throws IdentifierException {
         try {
             if (dso instanceof Item && dso.getHandle() != null) {
-                String doi = mintAndRegister(context, (Item) dso, false);
-                ((Item) dso).clearMetadata(identifierMetadata.schema, identifierMetadata.element, identifierMetadata.qualifier, Item.ANY);
-                ((Item) dso).addMetadata(identifierMetadata.schema, identifierMetadata.element, identifierMetadata.qualifier, null, doi);
+                Item item = (Item) dso;
+                String doi = mintAndRegister(context, item, false);
+                updateItemDOIMetadata(item, doi);
             }
         } catch (Exception e) {
             log.error(LogManager.getHeader(context, "Error while attempting to mint doi", "Item id: " + dso.getID()));
@@ -143,16 +142,15 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
     public void moveCanonical(Context context, DSpaceObject dso) throws IdentifierException {
         try{
             Item item = (Item) dso;
-            String doi = getDoiValue((Item) dso);
-            DOI doi_ = new DOI(doi, item);
             String collection = getCollection(context, item);
-            moveCanonical(item, true, collection, myDataPkgColl, doi_);
+            String doiString = getDoiValue((Item) dso);
+            addNewDOItoItem(getCanonicalDOIString(doiString), item, true, collection);
 
             // if 1st version mint .1
             mintDOIFirstVersion(context, item, true);
 
         }catch (Exception e) {
-            log.error(LogManager.getHeader(context, "Error while attempting to moveCanonical doi", "Item id: " + dso.getID()));
+            log.error(LogManager.getHeader(context, "Error while attempting to addNewDOItoItem doi", "Item id: " + dso.getID()));
             throw new IdentifierException("Error while moving doi identifier", e);
         }
     }
@@ -162,38 +160,37 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         try {
             if (dso instanceof Item) {
                 Item item = (Item) dso;
-                String doi = getDoiValue((Item) dso);
+                String doiString = getDoiValue((Item) dso);
 
-                // Remove from DOI service only if the item is not registered
-                if(doi!=null){
+                if(doiString!=null){
+                    // Remove from DOI service only if the item is not registered
                     if(!item.isArchived()){
-                        remove(doi.toString());
+                        remove(doiString);
                     }
                     // if it is already registered it has to remain in DOI service and when someone looks for it go towards a "tombstone" page
                     // reassign the URL of the DOI
-                    else{
-                        DOI removedDOI = new DOI(doi.toString(), DOI.Type.TOMBSTONE);
+                    else {
+                        DOI removedDOI = new DOI(doiString, DOI.Type.TOMBSTONE);
                         mint(removedDOI, true, null);
                     }
-                }
 
+                    VersionHistory history = retrieveVersionHistory(context, item);
+                    if (history != null && history.size() > 1) {
+                        Item previous = history.getPrevious(history.getLatestVersion()).getItem();
 
-                // If it is the most current version occurs to move the canonical to the previous version
-                VersionHistory history = retrieveVersionHistory(context, item);
-                if(history!=null && history.getLatestVersion().getItem().equals(item) && history.size() > 1){
-                    Item previous = history.getPrevious(history.getLatestVersion()).getItem();
-                    DOI doi_ = new DOI(doi, previous);
+                        // if the item we're deleting is the most recent version in the history
+                        // switch the canonical DOI for the item to the previous version.
+                        if (history.getLatestVersion().getItem().equals(item)) {
+                            String collection = getCollection(context, previous);
+                            addNewDOItoItem(getCanonicalDOIString(doiString), previous, true, collection);
+                        }
 
-                    String collection = getCollection(context, previous);
-                    String myDataPkgColl = configurationService.getProperty("stats.datapkgs.coll");
-                    moveCanonical(previous, true, collection, myDataPkgColl, doi_);
-                }
-
-                //  IF Deleting a 1st version not archived yet:
-                //  The DOI stored in the previous  should revert to the version without ".1".
-                // Canonical DOI already point to the right item: no needs to move it
-                if(history!=null && history.size() == 2 && !item.isArchived()){
-                    revertDoisFirstItem(context, history);
+                        // if the item isn't archived, the canonical DOI already points to the previous item.
+                        // update the metadata for the previous version of the item.
+                        if (history.size() == 2 && !item.isArchived()) {
+                            updateItemDOIMetadata(previous, getCanonicalDOIString(doiString));
+                        }
+                    }
                 }
             }
         } catch (Exception e) {
@@ -255,20 +252,10 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
     private void revertDoisFirstItem(Context context, VersionHistory history) throws SQLException, IOException, AuthorizeException {
         Item previous = history.getPrevious(history.getLatestVersion()).getItem();
-        String collection = getCollection(context, previous);
-        // remove doi from DOI service .1
-        String doiPrevious = getDoiValue(previous);
-        DOI removedDOI = new DOI(doiPrevious.toString(), DOI.Type.TOMBSTONE);
-        mint(removedDOI, true, null);
-
-
-        if (collection.equals(myDataPkgColl)) {
-            // replace doi metadata: dryad.2335.1 with  dryad.2335
-            revertIdentierItem(previous);
-        } else {
-            // replace doi metadata: dryad.2335.1/1.1 with  dryad.2335/1
-            revertIdentifierDF(previous);
-
+        String doiString = getDoiValue(previous);
+        if (doiString != null) {
+            String canonicalDOIString = getCanonicalDOIString(doiString);
+            updateItemDOIMetadata(previous, canonicalDOIString);
         }
     }
 
@@ -285,30 +272,47 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             // if the previous version was the first version,
             // update that previous item's metadata with the .1 versioned identifier.
             if (history.isFirstVersion(previous)) {
-                String previousDOI= updateIdentifierPreviousItem(context,previous.getItem());
-                DOI firstDOI = new DOI(previousDOI, previous.getItem());
-                if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(item)) {
-                    mint(firstDOI, "http://datadryad.org/publicationBlackout", register, createListMetadata(previous.getItem()));
+                Item previousItem = previous.getItem();
+                String previousDOI = getDoiValue(previousItem);
+                String collection = getCollection(context, previousItem);
+                if (collection.equals(myDataFileColl)) {
+                    previousDOI = calculateDOIDataFileFirstTime(previousItem);
+                    String oldDOIstring = getDoiValue(previousItem);
+                    Item dataPackage = DryadWorkflowUtils.getDataPackage(context,previousItem);
+                    if(dataPackage!=null) {
+                        VersionHistory dpHistory = retrieveVersionHistory(context, dataPackage);
+
+                        if (dpHistory != null) {
+                            // if it is the first time that is called "create version": mint identifier ".1"
+                            Version dpHistoryPrevious = dpHistory.getPrevious(dpHistory.getVersion(dataPackage));
+                            if(dpHistoryPrevious!=null && oldDOIstring!=null)
+                            {
+                                Item previousDataPackage = dpHistoryPrevious.getItem();
+
+                                updateHasPartDataFile(context,previousDataPackage,previousDOI,oldDOIstring);
+                                updateIsPartDataFile(context,previousItem,previousDataPackage);
+                            }
+                        }
+                    }
                 } else {
-                    mint(firstDOI, register, createListMetadata(previous.getItem()));
+                    previousDOI = getVersionedDataPackageDOIString(previousDOI,1);
+                }
+                updateItemDOIMetadata(previousItem, previousDOI);
+                DOI firstDOI = new DOI(previousDOI, previousItem);
+                if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(item)) {
+                    mint(firstDOI, "http://datadryad.org/publicationBlackout", register, createListMetadata(previousItem));
+                } else {
+                    mint(firstDOI, register, createListMetadata(previousItem));
                 }
             }
         }
     }
 
-
-    private void moveCanonical(Item item, boolean register, String collection, String myDataPkgColl, DOI doi_) throws IOException, SQLException
+    private void addNewDOItoItem(String newDOIString, Item item, boolean register, String collection) throws IOException, SQLException
     {
-        // move the canonical
-        DOI canonical = null;
-        if (collection.equals(myDataPkgColl)) {
-            canonical = getCanonicalDataPackage(doi_, item);
-        } else {
-            canonical = getCanonicalDataFile(doi_, item);
-
-        }
-
-        mint(canonical, register, createListMetadata(item));
+        // make a new DOI that points to the item, then mint (and register)
+        DOI newDOI = getDOI(newDOIString, item);
+        mint(newDOI, register, createListMetadata(item));
     }
 
     private void mint(DOI doi, boolean register, Map<String, String> metadata) throws IOException {
@@ -559,6 +563,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
         if (titles.length > 0) {
             String itemTitle = titles[0].value;
+            log.warn("calculateDOIDataFile() - " + itemTitle + " is part of: " + packageDOIString);
         }
 
 
@@ -635,12 +640,9 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
                 if(suffixIdPrevious == suffixIdDoi){   // only if it is not upgraded
                     if(countBitstreams(previous.getItem())!= countBitstreams(item)){ // only if a bitstream was added or removed
-                        int versionN = Integer.parseInt(suffixIdPrevious.substring(suffixIdPrevious.lastIndexOf(DOT)+1));
-
-                        String prefix=idDoi.substring(0, idDoi.lastIndexOf(DOT));
-                        String newDoi=prefix + DOT + (versionN+1);
-                        doi = new DOI(newDoi, item);
-                        updateHasPartDataPackage(c, item, doi.toString(), idDoi);
+                        int versionN = Integer.parseInt(getDOIVersion(idPrevious));
+                        String newDoi = getVersionedDataFileDOIString(idDoi, suffixIdDoi,versionN+1);
+                        updateHasPartDataPackage(c, item, newDoi, idDoi);
                     }
                 }
             }
@@ -661,104 +663,34 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         return numberOfBitsream;
     }
 
-    private String updateIdentifierPreviousItem(Context context,Item item) throws AuthorizeException, SQLException {
-        DCValue[] doiVals = item.getMetadata(DOIIdentifierProvider.identifierMetadata.schema, DOIIdentifierProvider.identifierMetadata.element, DOIIdentifierProvider.identifierMetadata.qualifier, Item.ANY);
-
-        String id = doiVals[0].value;
-        String collection = getCollection(context, item);
-        if (collection.equals(myDataFileColl)) {
-            id=updateIdentifierPreviousDF(context,item);
-
-        } else {
-            item.clearMetadata(DOIIdentifierProvider.identifierMetadata.schema, DOIIdentifierProvider.identifierMetadata.element, DOIIdentifierProvider.identifierMetadata.qualifier, Item.ANY);
-            id += DOT + "1";
-            item.addMetadata(DOIIdentifierProvider.identifierMetadata.schema, DOIIdentifierProvider.identifierMetadata.element, DOIIdentifierProvider.identifierMetadata.qualifier, null, id);
-            item.update();
-        }
-
-        return id;
-    }
-    private String calculateDOIDataFileFirstTime(Item item)
-    {
-        DCValue[] doiVals = item.getMetadata(DOIIdentifierProvider.identifierMetadata.schema, DOIIdentifierProvider.identifierMetadata.element, DOIIdentifierProvider.identifierMetadata.qualifier, Item.ANY);
-
-        String id = doiVals[0].value;
-
-        String prefix = id.substring(0, id.lastIndexOf(SLASH));
-        String suffix = id.substring(id.lastIndexOf(SLASH));
-        if(!suffix.endsWith(".1")){
-            id = prefix + DOT + "1" + suffix + DOT + "1";
-        }
-        else
-        {
-            if(!prefix.endsWith(".1")){
-                id = prefix + DOT + "1" + suffix;
+    private String calculateDOIDataFileFirstTime(Item item) {
+        String id = getDoiValue(item);
+        if (id != null) {
+            String packageDOIString = getDataPackageDOIString(id);
+            int suffix = getDataFileSuffix(id);
+            if (!isVersionedDOI(id)) { // file is not versioned, so version it.
+                id = getVersionedDataFileDOIString(packageDOIString,suffix,1);
             }
+
+            return id;
         }
-        return id;
+        return "";
     }
-    private String updateIdentifierPreviousDF(Context context,Item item) throws AuthorizeException, SQLException {
-        String id = calculateDOIDataFileFirstTime(item);
-        DCValue[] oldDOI=  item.getMetadata(DOIIdentifierProvider.identifierMetadata.schema, DOIIdentifierProvider.identifierMetadata.element, DOIIdentifierProvider.identifierMetadata.qualifier, Item.ANY);
 
-        Item dataPackage = DryadWorkflowUtils.getDataPackage(context,item);
-        item.clearMetadata(DOIIdentifierProvider.identifierMetadata.schema, DOIIdentifierProvider.identifierMetadata.element, DOIIdentifierProvider.identifierMetadata.qualifier, Item.ANY);
-        if(dataPackage!=null)
-        {
-            VersionHistory history = retrieveVersionHistory(context, dataPackage);
+    private void updateItemDOIMetadata(Item item, String doiString) throws AuthorizeException, SQLException {
+        item.clearMetadata(identifierMetadata.schema, identifierMetadata.element, identifierMetadata.qualifier, Item.ANY);
+        item.addMetadata(identifierMetadata.schema, identifierMetadata.element, identifierMetadata.qualifier, null, doiString);
+        item.update();
+    }
 
-            if (history != null) {
-                Version version = history.getVersion(dataPackage);
-                // if it is the first time that is called "create version": mint identifier ".1"
-                Version previous = history.getPrevious(version);
-                if(previous!=null&&oldDOI!=null&&oldDOI.length>0)
-                {
-                    Item previousDataPackage = previous.getItem();
-
-                    updateHasPartDataFile(context,previousDataPackage,id,oldDOI[0].value);
-                    updateIsPartDataFile(context,item,previousDataPackage);
-                }
-            }
+    private void updateIsPartDataFile(Context c, Item dataFile, Item dataPackage) throws AuthorizeException, SQLException {
+        //update current datafile's ispartof metadata
+        String doi = getDoiValue(dataPackage);
+        if(doi != null){
+            dataFile.clearMetadata(DOIIdentifierProvider.identifierMetadata.schema,"relation","ispartof",Item.ANY);
+            dataFile.addMetadata(DOIIdentifierProvider.identifierMetadata.schema,"relation","ispartof",Item.ANY,doi);
+            dataFile.update();
         }
-        item.addMetadata(DOIIdentifierProvider.identifierMetadata.schema, DOIIdentifierProvider.identifierMetadata.element, DOIIdentifierProvider.identifierMetadata.qualifier, null, id);
-        item.update();
-        return id;
-
-    }
-
-
-    private String revertIdentierItem(Item item) throws AuthorizeException, SQLException {
-        DCValue[] doiVals = item.getMetadata(DOIIdentifierProvider.identifierMetadata.schema, DOIIdentifierProvider.identifierMetadata.element, DOIIdentifierProvider.identifierMetadata.qualifier, Item.ANY);
-
-        String id = doiVals[0].value;
-
-        item.clearMetadata(DOIIdentifierProvider.identifierMetadata.schema, DOIIdentifierProvider.identifierMetadata.element, DOIIdentifierProvider.identifierMetadata.qualifier, Item.ANY);
-
-        id = id.substring(0, id.lastIndexOf(DOT));
-
-        item.addMetadata(DOIIdentifierProvider.identifierMetadata.schema, DOIIdentifierProvider.identifierMetadata.element, DOIIdentifierProvider.identifierMetadata.qualifier, null, id);
-        item.update();
-        return id;
-    }
-
-    private String revertIdentifierDF(Item item) throws AuthorizeException, SQLException {
-        DCValue[] doiVals = item.getMetadata(DOIIdentifierProvider.identifierMetadata.schema, DOIIdentifierProvider.identifierMetadata.element, DOIIdentifierProvider.identifierMetadata.qualifier, Item.ANY);
-
-        String id = doiVals[0].value;
-
-        item.clearMetadata(DOIIdentifierProvider.identifierMetadata.schema, DOIIdentifierProvider.identifierMetadata.element, DOIIdentifierProvider.identifierMetadata.qualifier, Item.ANY);
-
-        String prefix = id.substring(0, id.lastIndexOf(SLASH));
-        String suffix = id.substring(id.lastIndexOf(SLASH));
-
-        prefix = prefix.substring(0, prefix.lastIndexOf(DOT));
-        suffix = suffix.substring(0, suffix.lastIndexOf(DOT));
-
-        id = prefix + suffix;
-
-        item.addMetadata(DOIIdentifierProvider.identifierMetadata.schema, DOIIdentifierProvider.identifierMetadata.element, DOIIdentifierProvider.identifierMetadata.qualifier, null, id);
-        item.update();
-        return id;
     }
 
     private void updateHasPartDataFile(Context c, Item dataPackage, String idNew, String idOld) throws AuthorizeException, SQLException {
@@ -776,30 +708,12 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
     private void updateHasPartDataPackage(Context c, Item item, String idNew, String idOld) throws AuthorizeException, SQLException {
         //update current datafile's doi that is recorded in the datapackage
-        Item dataPackage =org.dspace.workflow.DryadWorkflowUtils.getDataPackage(c, item);
-        DCValue[] doiVals = dataPackage.getMetadata(DOIIdentifierProvider.identifierMetadata.schema, "relation", "haspart", Item.ANY);
-
-
-        dataPackage.clearMetadata(DOIIdentifierProvider.identifierMetadata.schema, "relation", "haspart", null);
-
-        for(DCValue value : doiVals){
-            if(!value.value.equals(idOld))
-                dataPackage.addMetadata(DOIIdentifierProvider.identifierMetadata.schema, "relation", "haspart", null, value.value);
-        }
-        dataPackage.addMetadata(DOIIdentifierProvider.identifierMetadata.schema, "relation", "haspart", null, idNew);
-        dataPackage.update();
+        Item dataPackage = org.dspace.workflow.DryadWorkflowUtils.getDataPackage(c, item);
+        updateHasPartDataFile(c, dataPackage, idNew, idOld);
     }
 
-    private void updateIsPartDataFile(Context c, Item dataFile, Item previousDataPackage) throws AuthorizeException, SQLException {
-        //update current datafiles ispartof metadata
-        DCValue[] ids = previousDataPackage.getMetadata(DOIIdentifierProvider.identifierMetadata.schema,DOIIdentifierProvider.identifierMetadata.element,DOIIdentifierProvider.identifierMetadata.qualifier,Item.ANY);
-
-        if(ids!=null&&ids.length>0){
-            dataFile.clearMetadata(DOIIdentifierProvider.identifierMetadata.schema,"relation","ispartof",Item.ANY);
-
-           dataFile.addMetadata(DOIIdentifierProvider.identifierMetadata.schema,"relation","ispartof",Item.ANY,ids[0].value);
-           dataFile.update();
-        }
+    public String getVersionedDataFileDOIString(String doiString, int fileSuffix, int versionN) {
+        return getCanonicalDOIString(getDataPackageDOIString(doiString)) + DOT + versionN + SLASH + fileSuffix + DOT + versionN;
     }
 
     public String getVersionedDataPackageDOIString (String doiString, int versionN) {
