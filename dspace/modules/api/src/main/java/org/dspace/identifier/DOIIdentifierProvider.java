@@ -456,11 +456,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
      * @return
      */
     private DOI calculateDOI(Context context, String aDoi, Item item, VersionHistory vh) {
-        URL itemURL;
-        String url;
-        DOI doi = null;
-
-        doi = getDOI(aDoi, item);
+        DOI doi = getDOI(aDoi, item);
 
         log.debug("calculateDOI() doi already exist? : " + (doi!=null));
 
@@ -495,12 +491,16 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
 
     private DOI getDOI(String aDoi, Item item) {
-        DOI doi = null;
         if (aDoi == null) return null;
 
+        DOI doi = new DOI(aDoi, item);
 
-        doi = new DOI(aDoi, item);
-        if (!exists(doi)) return null;
+        String dbDoiURL = lookup(doi.toString());
+        String targetURL = doi.getTargetURL().toString();
+
+        if (!targetURL.equals(dbDoiURL)) {
+            return null;
+        }
 
         return doi;
     }
@@ -513,16 +513,13 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         if (history != null) {
             Version version = history.getVersion(item);
             Version previous = history.getPrevious(version);
-            String canonical = DOIIdentifierProvider.getDoiValue(previous.getItem());
-            //process the canonical id to remove the version number
-            canonical = getCanonicalDataPackage(canonical);
-            String versionNumber = "" + DOT + (version.getVersionNumber());
-            doi = new DOI(canonical+ versionNumber, item);
+            String previousDOI = getDoiValue(previous.getItem());
+            doi = new DOI(getVersionedDataPackageDOIString(previousDOI,version.getVersionNumber()), item);
         } else {
             String var = NoidGenerator.buildVar(mySuffixVarLength);
             doi = new DOI(myDoiPrefix, myLocalPartPrefix + var, item);
 
-            if (existsIdDOI(doi.toString()))
+            if (doiAlreadyExists(doi.toString()))
                 return calculateDOIDataPackage(c, item, history);
         }
 
@@ -530,10 +527,13 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
     }
 
 
-    private boolean exists(DOI doi) {
-        String dbDoiURL = lookup(doi.toString());
+    // This method is used to check if a newly generated DOI String collides
+    // with an existing DOI.  Since the DOIs are randomly-generated,
+    // collisions are possible.
+    private boolean doiAlreadyExists(String idDoi) {
+        String dbDoiId = lookup(idDoi);
 
-        if (doi.getTargetURL().toString().equals(dbDoiURL))
+        if (dbDoiId != null && !dbDoiId.equals(""))
             return true;
 
         return false;
@@ -557,9 +557,8 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
         DCValue[] titles = item.getMetadata("dc.title");
 
-        String itemTitle = "";
         if (titles.length > 0) {
-            itemTitle = titles[0].value;
+            String itemTitle = titles[0].value;
         }
 
 
@@ -572,20 +571,16 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             log.warn("calculateDOIDataFile() - new version of an existing - previous: " + previous.getVersionNumber());
 
             // we need to get the DOI of the previous versioned file so we can update it to the new version.
-            String previousDOIString = null;
+            String previousDOIString = getDoiValue(previous.getItem());
             // FIRST time a VERSION is created: we need to create the versioned DOIs.
             if (history.isFirstVersion(previous)) {
                 previousDOIString = calculateDOIDataFileFirstTime(previous.getItem());
             }
-            else {
-                previousDOIString = getDoiValue(previous.getItem());
-            }
 
             // mint NEW DOI: packageDOIString + fileIndex from previous DOI + new version number
-            String fileSuffix = getDataFileSuffix(previousDOIString);
-            String fileIndex = fileSuffix.substring(0,fileSuffix.indexOf(DOT));
-            String versionN = String.valueOf(version.getVersionNumber());
-            DOI childDOI = new DOI(packageDOIString + SLASH + fileIndex + DOT + versionN, item);
+            int fileSuffix = getDataFileSuffix(previousDOIString);
+            int versionN = version.getVersionNumber();
+            DOI childDOI = new DOI(getVersionedDataFileDOIString(packageDOIString, fileSuffix, versionN), item);
             log.warn("calculateDOIDataFile() - new version of an existing item: " + childDOI.toString());
             return childDOI;
         }
@@ -593,12 +588,12 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             // has an arbitrary max; in reality much, much less
             for (int index = 1; index < MAX_NUM_OF_FILES; index++) {
                 // check if canonical already exists
-                String canonicalFileDOIString = getCanonicalDataPackage(packageDOIString) + SLASH + index;
-                if (existsIdDOI(canonicalFileDOIString)) {
+                String canonicalFileDOIString = getDataFileDOIString(getCanonicalDOIString(packageDOIString), index);
+                if (doiAlreadyExists(canonicalFileDOIString)) {
                     String dbDoiURL = lookup(canonicalFileDOIString);
                     if (dbDoiURL.equals(DOI.getInternalForm(item))) {
                         log.warn("calculateDOIDataFile() - new item canonical exists: " + canonicalFileDOIString);
-                        return new DOI(packageDOIString + SLASH + index, item);
+                        return new DOI(canonicalFileDOIString, item);
                     }
                 }
                 else {
@@ -608,13 +603,13 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                     DOI canonicalFileDOI = new DOI(canonicalFileDOIString, item);
                     mint(canonicalFileDOI,false,createListMetadata(item));
 
-                    String packageVersion = getDataPackageVersion(packageDOIString);
+                    String packageVersion = getDOIVersion(packageDOIString);
                     if (packageVersion.equals("")) {
                         // no version
-                        return new DOI(packageDOIString + SLASH + index, item);
+                        return new DOI(getDataFileDOIString(packageDOIString,index), item);
                     } else {
                         // versioned; file version needs to match package version
-                        return new DOI(packageDOIString + SLASH + index + DOT + packageVersion, item);
+                        return new DOI(getVersionedDataFileDOIString(packageDOIString,index,Integer.parseInt(packageVersion)), item);
                     }
                 }
             }
@@ -634,12 +629,11 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             if(history.isLastVersion(version)){ // only if the user is modifying the last version
                 Version previous = history.getPrevious(version);
 
-                String idPrevious = DOIIdentifierProvider.getDoiValue(previous.getItem());
-                String suffixIdPrevious=idPrevious.substring(idPrevious.lastIndexOf(SLASH)+1);
-                String suffixIdDoi=idDoi.substring(idDoi.lastIndexOf(SLASH)+1);
+                String idPrevious = getDoiValue(previous.getItem());
+                int suffixIdPrevious = getDataFileSuffix(idPrevious);
+                int suffixIdDoi = getDataFileSuffix(idDoi);
 
-
-                if(suffixIdPrevious.equals(suffixIdDoi)){   // only if it is not upgraded
+                if(suffixIdPrevious == suffixIdDoi){   // only if it is not upgraded
                     if(countBitstreams(previous.getItem())!= countBitstreams(item)){ // only if a bitstream was added or removed
                         int versionN = Integer.parseInt(suffixIdPrevious.substring(suffixIdPrevious.lastIndexOf(DOT)+1));
 
