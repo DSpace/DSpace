@@ -27,8 +27,6 @@ import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
-import java.math.BigInteger;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.SecureRandom;
 import java.sql.SQLException;
@@ -772,11 +770,8 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         return id;
     }
 
-
-
     private void updateHasPartDataFile(Context c, Item dataPackage, String idNew, String idOld) throws AuthorizeException, SQLException {
         DCValue[] doiVals = dataPackage.getMetadata(DOIIdentifierProvider.identifierMetadata.schema, "relation", "haspart", Item.ANY);
-
 
         dataPackage.clearMetadata(DOIIdentifierProvider.identifierMetadata.schema, "relation", "haspart", null);
 
@@ -917,29 +912,6 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
     }
 
-    private URL getTarget(String aDSpaceURL) {
-        URL target;
-        try {
-            target = new URL(aDSpaceURL);
-        }
-        catch (MalformedURLException details) {
-            try {
-                log.debug("Using " + myHostname + " for URL domain name");
-                // If we aren't given a full URL, create one with config value
-                if (aDSpaceURL.startsWith("/")) {
-                    target = new URL(myHostname + aDSpaceURL);
-                } else {
-                    target = new URL(myHostname + "/handle/" + aDSpaceURL);
-                }
-            }
-            catch (MalformedURLException moreDetails) {
-                throw new RuntimeException("Passed URL isn't a valid URL: " + aDSpaceURL);
-            }
-        }
-        return target;
-    }
-
-
     /**
      * Breaks down the DSpace handle-like string (e.g.,
      * http://dev.datadryad.org/handle/12345/dryad.620) into a "12345/dryad.620"
@@ -961,51 +933,9 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         }
     }
 
-
-    private String buildVar() {
-        String bigInt = new BigInteger(mySuffixVarLength * 5, myRandom).toString(32);
-        StringBuilder buffer = new StringBuilder(bigInt);
-        int charCount = 0;
-
-        while (buffer.length() < mySuffixVarLength) {
-            buffer.append('0');
-        }
-
-        for (int index = 0; index < buffer.length(); index++) {
-            char character = buffer.charAt(index);
-            int random;
-
-            if (character == 'a' | character == 'l' | character == 'e'
-                    | character == 'i' | character == 'o' | character == 'u') {
-                random = myRandom.nextInt(9);
-                buffer.setCharAt(index, String.valueOf(random).charAt(0));
-                charCount = 0;
-            } else if (Character.isLetter(character)) {
-                charCount += 1;
-
-                if (charCount > 2) {
-                    random = myRandom.nextInt(9);
-                    buffer.setCharAt(index, String.valueOf(random).charAt(0));
-                    charCount = 0;
-                }
-            }
-        }
-
-        return buffer.toString();
-    }
-
-
     private VersionHistory retrieveVersionHistory(Context c, Item item) {
         VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
         VersionHistory history = versioningService.findVersionHistory(c, item.getID());
         return history;
     }
-
-    private Version getVersion(Context c, Item item) {
-        VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
-        return versioningService.getVersion(c, item);
-    }
-
-
-
 }
