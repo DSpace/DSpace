@@ -808,54 +808,22 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         }
     }
 
-    private boolean existsIdDOI(String idDoi) {
-        // This method is used to check if a newly generated DOI String collides
-        // with an existing DOI.  Since the DOIs are randomly-generated,
-        // collisions are possible.
-
-        String dbDoiId = lookup(idDoi.toString());
-
-        if (dbDoiId != null && !dbDoiId.equals(""))
-            return true;
-
-        return false;
+    public String getVersionedDataPackageDOIString (String doiString, int versionN) {
+        return getCanonicalDOIString(getDataPackageDOIString(doiString)) + DOT + versionN;
     }
 
-
-    private DOI getCanonicalDataPackage(DOI doi, Item item) {
-        String canonicalID = getCanonicalDataPackage(doi.toString());
-        return new DOI(canonicalID, item);
+    public String getDataFileDOIString (String doiString, int fileSuffix) {
+        return getDataPackageDOIString(doiString) + SLASH + fileSuffix;
     }
 
-    private String getCanonicalDataPackage(String doi) {
-        // no version present
-        if(!isVersionedDOI(doi)) return doi;
-        return doi.toString().substring(0, doi.toString().lastIndexOf(DOT));
-    }
-
-    // given a package DOI (eg doi:10.5061/dryad.9054.1)
-    // returns the version number of the package (eg 1)
-    private String getDataPackageVersion(String doi) {
-        // no version present
-        if(!isVersionedDOI(doi)) return "";
-        return doi.toString().substring(doi.toString().lastIndexOf(DOT) + 1);
-    }
-
-    // given a file DOI (eg doi:10.5061/dryad.9054.1/3.1)
-    // returns the file portion of the DOI (eg 3.1)
-    private String getDataFileSuffix(String doi) {
-        // TODO: test to make sure this is a file DOI.
-        return doi.toString().substring(doi.toString().lastIndexOf(SLASH) + 1);
-    }
-
-    private boolean isVersionedDOI(String doi){
+    public static boolean isVersionedDOI (String doiString){
         // if a DOI has 2 or less dots, it is not a versioned DOI.
         // eg: doi:10.5061/dryad.xxxxx or doi:10.5061/dryad.xxxxx/4 (two dots)
         // instead of doi:10.5061/dryad.xxxxx.2 or doi:10.5061/dryad.xxxxx.2/4.2 (3 or 4 dots)
         short numDots=0;
-        int indexDot = doi.indexOf(DOT);
+        int indexDot = doiString.indexOf(DOT);
         while(indexDot != -1){
-            indexDot = doi.indexOf(DOT, indexDot+1);
+            indexDot = doiString.indexOf(DOT, indexDot+1);
             numDots++;
         }
 
@@ -865,27 +833,61 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         return true;
     }
 
-
-    /**
-     * input doi.toString()=   doi:10.5061/dryad.9054.1/1.1
-     * output doi.toString()=  2rdfer334/1
-     */
-    private DOI getCanonicalDataFile(DOI doi, Item item) {
-        // doi:10.5061/dryad.9054.1 (based on the input example)
-        String idDP = doi.toString().substring(0, doi.toString().lastIndexOf(SLASH));
-
-        // idDF=1.1
-        String idDF = doi.toString().substring(doi.toString().lastIndexOf(SLASH) + 1);
-
-        String canonicalDP = idDP.substring(0, idDP.lastIndexOf(DOT));
-        String canonicalDF = idDF;
-        if(idDF.lastIndexOf(DOT)!=-1){
-            canonicalDF=idDF.substring(0, idDF.lastIndexOf(DOT));
-        }
-        DOI canonical = new DOI(canonicalDP + SLASH + canonicalDF, item);
-        return canonical;
+    public static boolean isDataPackageDOI (String doiString) {
+        // if the last part of the DOI after the last slash contains the substring "dryad", it's a package.
+        String suffix = doiString.substring(doiString.lastIndexOf(SLASH) + 1);
+        return suffix.contains("dryad");
     }
 
+    public static boolean isDataFileDOI (String doiString) {
+        // if the last part of the DOI after the last slash is just numbers, it is a file.
+        String suffix = doiString.substring(doiString.lastIndexOf(SLASH) + 1);
+        return suffix.matches("\\d+\\.*\\d*");
+    }
+
+    public static String getCanonicalDOIString(String doiString) {
+        // no version present
+        if (!isVersionedDOI(doiString)) return doiString;
+
+        // if it's a file, find the package DOI first.
+        String packageDOIString = getDataPackageDOIString(doiString);
+        int fileSuffix = getDataFileSuffix(doiString);
+        String canonicalDP = packageDOIString.substring(0, packageDOIString.lastIndexOf(DOT));
+
+        if (isDataFileDOI(doiString)) {
+            return canonicalDP + SLASH + String.valueOf(fileSuffix);
+        }
+        if (isDataPackageDOI(doiString)) {
+            return canonicalDP;
+        }
+        return "";
+    }
+
+    public static String getDataPackageDOIString(String doiString) {
+        if (isDataFileDOI(doiString)) return doiString.substring(0,doiString.lastIndexOf(SLASH));
+        return doiString;
+    }
+
+    // given a DOI (eg doi:10.5061/dryad.9054.1)
+    // returns the version number of the package (eg 1)
+    public static String getDOIVersion(String doiString) {
+        // no version present
+        if(!isVersionedDOI(doiString)) return "";
+        String packageDOI = getDataPackageDOIString(doiString);
+        return packageDOI.substring(packageDOI.lastIndexOf(DOT) + 1);
+    }
+
+    // given a file DOI (eg doi:10.5061/dryad.9054.1/3.1)
+    // returns the file portion of the DOI (eg 3)
+    public static int getDataFileSuffix(String doiString) {
+        if (!isDataFileDOI(doiString)) return 0;
+        String fileSuffix = doiString.substring(doiString.lastIndexOf(SLASH) + 1);
+        if (fileSuffix.lastIndexOf(DOT) != -1) {
+            fileSuffix = fileSuffix.substring(0,fileSuffix.lastIndexOf(DOT));
+        }
+
+        return Integer.parseInt(fileSuffix);
+    }
 
     private String getCollection(Context context, Item item) throws SQLException {
         String collectionResult = null;
