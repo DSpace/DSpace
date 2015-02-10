@@ -28,7 +28,7 @@
 	xmlns:dc="http://purl.org/dc/elements/1.1/"
 	xmlns:xalan="http://xml.apache.org/xalan"
 	xmlns="http://www.w3.org/1999/xhtml"
-	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc xalan">
+	exclude-result-prefixes="dri mets xlink xsl dim xhtml mods dc xalan">
 
     <xsl:output indent="yes"/>
 
@@ -192,7 +192,7 @@
     <xsl:template name="pick-label">
         <xsl:choose>
             <xsl:when test="dri:field/dri:label">
-                <xsl:variable name="help" select="string(./dri:field/dri:help)"/>
+                <xsl:variable name="help" select="./dri:field/dri:help"/>
                 <label class="ds-form-label">
                         <xsl:choose>
                                 <xsl:when test="./dri:field/@id">
@@ -208,31 +208,56 @@
                         <xsl:choose>
                             <!-- skip the first help on the forgot-email page -->
                             <xsl:when test="./dri:field[@id='aspect.eperson.StartForgotPassword.field.email']"/>
-                            <!-- put all help text in the hover-over field for these items -->
-                            <xsl:when test="$n = 'dc_subject'
-                                         or $n = 'dwc_ScientificName'
-                                         or $n = 'dc_coverage_spatial'
-                                         or $n = 'dc_coverage_temporal'
-                            ">
-                                <xsl:text> </xsl:text>
-                                <img class="label-mark" src="/themes/Mirage/images/help.jpg">
-                                    <xsl:attribute name="title">
-                                        <xsl:value-of select="$help"/>
-                                    </xsl:attribute>
-                                </img>
-                            </xsl:when>
-                            <!-- for other fields, display subsequent sentences in hover text -->
-                            <xsl:otherwise>
-                                <div class="help-title">
-                                    <xsl:value-of select="substring-before($help,'.')"/>.
-                                    <xsl:if test="string-length(substring-after($help,'.'))>0">
+                            
+                            <!-- handle helptext on submission forms -->
+                            <xsl:when test="ancestor::dri:div[contains(@id,'aspect.submission')]">
+                                <xsl:choose>
+                                    <!-- put all help text in the hover-over field for these items -->
+                                    <xsl:when test="$n = 'dc_subject'
+                                                 or $n = 'dwc_ScientificName'
+                                                 or $n = 'dc_coverage_spatial'
+                                                 or $n = 'dc_coverage_temporal'
+                                    ">
+                                        <xsl:text> </xsl:text>
                                         <img class="label-mark" src="/themes/Mirage/images/help.jpg">
                                             <xsl:attribute name="title">
-                                                <xsl:value-of select="substring-after($help,'.')"/>
+                                                <xsl:value-of select="$help"/>
                                             </xsl:attribute>
                                         </img>
-                                    </xsl:if>
-                                </div>                                
+                                    </xsl:when>
+                                    <!-- for other fields, display subsequent sentences in hover text -->
+                                    <xsl:otherwise>
+                                        <div class="help-title">
+                                            <xsl:value-of select="substring-before($help,'.')"/>.
+                                            <xsl:if test="string-length(substring-after($help,'.'))>0">
+                                                <img class="label-mark" src="/themes/Mirage/images/help.jpg">
+                                                    <xsl:attribute name="title">
+                                                        <xsl:value-of select="substring-after($help,'.')"/>
+                                                    </xsl:attribute>
+                                                </img>
+                                            </xsl:if>
+                                        </div>                                
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <span class="help-title">
+                                    <img class="label-mark" src="/themes/Mirage/images/help.jpg">
+                                        <xsl:choose>
+                                            <xsl:when test="$help/i18n:text">
+                                                <xsl:attribute name="title">
+                                                    <xsl:value-of select="$help/i18n:text"/>
+                                                </xsl:attribute>
+                                                <xsl:attribute name="i18n:attr">title</xsl:attribute>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:attribute name="title">
+                                                    <xsl:value-of select="$help"/>
+                                                </xsl:attribute>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </img>
+                                </span>
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:if>
@@ -270,7 +295,8 @@
                                         </xsl:choose>
                                     <xsl:apply-templates select="preceding-sibling::*[1][local-name()='label']"/>&#160;
                                     <xsl:if test="string-length($help)>0">
-                                        <div class="help-title"><xsl:value-of select="substring-before($help,'.')"/>.
+                                        <div class="help-title">
+                                            <xsl:value-of select="substring-before($help,'.')"/>.
                                             <xsl:if test="string-length(substring-after($help,'.'))>0">
                                         <img class="label-mark" src="/themes/Mirage/images/help.jpg">
                                             <xsl:attribute name="title">
@@ -315,7 +341,8 @@
         </xsl:choose>
         <xsl:apply-templates />
         <xsl:if test="string-length($help)>0">
-            <div class="help-title"><xsl:value-of select="substring-before($help,'.')"/>.
+            <div class="help-title">
+                <xsl:value-of select="substring-before($help,'.')"/>.
                 <xsl:if test="string-length(substring-after($help,'.'))>0">
                     <img class="label-mark" src="/themes/Mirage/images/help.jpg">
                         <xsl:attribute name="title">
@@ -1209,6 +1236,12 @@
         <xsl:choose>
             <!-- don't output the help text in this mode for the forgot-email page -->
             <xsl:when test="(string(parent::dri:field/@id)='aspect.eperson.StartForgotPassword.field.email')"/>
+            
+            <!-- membership form : do not repeat help text -->
+            <xsl:when test="ancestor::dri:div[@id='aspect.dryadfeedback.MembershipApplicationForm.div.membership-form']"/>
+
+            <!-- feedback form : do not repeat help text -->
+            <xsl:when test="ancestor::dri:div[@id='aspect.artifactbrowser.FeedbackForm.div.feedback-form']"/>
             
             <!--Only create the <span> if there is content in the <dri:help> node-->
             <xsl:when test="./text() or ./node()">
