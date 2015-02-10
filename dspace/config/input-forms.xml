@@ -888,6 +888,10 @@
    			<displayed-value>Legislación</displayed-value>
    			<stored-value>Legislacion</stored-value>
    		</pair>
+   		<pair>
+   			<displayed-value>Convenio</displayed-value>
+   			<stored-value>Convenio</stored-value>
+   		</pair>
    </value-pairs>
    
    <value-pairs value-pairs-name="common_subtypes_imagen" dc-term="type_subtype">
