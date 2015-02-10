@@ -34,7 +34,7 @@
 
     <xsl:template name="journal-landing-panel">
         <xsl:apply-templates select="dri:head"/>
-        <div id="aspect_journal_landing_TopTenDownloads_journal-landing-topten" class="ds-static-div primary">
+        <div id="{translate(string(@id), '.', '_')}" class="ds-static-div primary">
             <table>
                 <xsl:if test="dri:div[@n='items']/dri:referenceSet/dri:head or dri:div[@n='vals']/dri:list/dri:head">
                     <tr style="width:100%">
@@ -169,26 +169,21 @@
         </form>
     </xsl:template>
 
-    <xsl:template match="//dri:document/dri:body/dri:div[@id='aspect.journal.landing.TopTenDownloads.div.journal-landing-recent']">
-        <xsl:apply-templates select="dri:head"/>
-        <div id="aspect_journal_landing_TopTenDownloads_journal-journal-landing-recent" class="ds-static-div primary">
-            <table>
-                <tr>
-                    <th><xsl:apply-templates select="dri:div[@n='items']/dri:head"/></th>
-                    <th><xsl:apply-templates select="dri:div[@n='date']/dri:head"/></th>
-                </tr>
-                <xsl:for-each select="dri:div[@n='items']/dri:referenceSet/dri:reference">
-                    <xsl:variable name="position" select="position()"/>
-                    <tr>
-                        <td>
-                            <xsl:apply-templates select="." mode="summaryList"/>
-                        </td>
-                        <td>
-                            <xsl:apply-templates select="ancestor::dri:div[@n='journal-landing-topten']/dri:div[@n='date']/dri:list/dri:item[position()=$position]"/>
-                        </td>
-                    </tr>
-                </xsl:for-each>
-            </table>
+    <xsl:template match="//dri:document/dri:body/dri:div[@n='journal-landing-banner-outer']">
+        <xsl:variable name="journal-name" select="string(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='journalName'])"/>
+        <xsl:variable name="journal-abbr" select="string(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='journalAbbr'])"/>
+        <xsl:variable name="alt" select="concat($journal-name, ' cover')"/>
+        <xsl:variable name="cover" select="concat('/themes/Dryad/images/coverimages/', $journal-abbr, '.png')"/>
+        <xsl:variable name="default" select="'/themes/Dryad/images/invisible.gif'"/>
+        <div id="{translate(string(@id), '.', '_')}" class="ds-static-div primary clearfix">
+            <p style="position: relative; float: right; max-width:100%; max-height:100%">
+                <img alt="{$alt}" 
+                    src="{$cover}" 
+                    id="journal-logo"
+                    class="pub-cover"
+                    onerror="this.src='{$default}'"></img>
+            </p>
+            <xsl:apply-templates/>
         </div>
     </xsl:template>
     

@@ -56,7 +56,7 @@ public class Banner extends AbstractDSpaceTransformer {
         }
 
         Division outer = body.addDivision(BANNER_DIV_OUTER);
-        Division inner = outer.addDivision(BANNER_DIV_OUTER);
+        Division inner = outer.addDivision(BANNER_DIV_INNER);
         inner.setHead(journalName);
 
         inner.addPara().addContent("1 sentence scope");
