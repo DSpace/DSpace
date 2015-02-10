@@ -70,6 +70,10 @@ public class UserGeography extends JournalLandingTabbedTransformer {
 
     @Override
     protected void performSearch(DSpaceObject object) throws SearchServiceException, UIException {
-        
+        /*
+        JournalUserGeo journalUserGeo = new JournalUserGeo(this.context);
+        String responseDownload = journalUserGeo.getResponseDownload();
+        String getResponseView = journalUserGeo.getResponseView();
+        */
     }
 }

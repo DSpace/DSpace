@@ -5,20 +5,9 @@
  */
 package org.datadryad.dspace.statistics;
 
-import java.net.MalformedURLException;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.text.DateFormat;
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrServerException;
 import static org.datadryad.dspace.statistics.SolrUtils.*;
-import org.dspace.content.Collection;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
 
 /**
  *
@@ -26,18 +15,25 @@ import org.dspace.handle.HandleManager;
  */
 public class JournalUserGeo {
 
-    private static final Logger log = Logger.getLogger(JournalUserGeo.class);
+    private static final Logger LOGGER = Logger.getLogger(JournalUserGeo.class);
     private Context context = null;
 
-    private ArrayList<String> viewCountries = new ArrayList<String>();
-    private ArrayList<String> viewCounts = new ArrayList<String>();
-
+    private static final String downloadByCountry = "/select/?q=type:0&facet=true&facet.field=countryCode";
+    private static final String viewByCountry = "/select/?q=type:2&facet=true&facet.field=countryCode";
+    private static final String allTime = "time:[ * TO NOW ]";
+    
+    private String responseDownload;
+    private String responseView;
+    
     public JournalUserGeo(Context context) {
         this.context = context;
+        getStats();
     }
-
+    // TODO: update queries to return response with filtering by item id as well
     private void getStats() {
-        String a = getSolrResponseCount(SolrUtils.solrSearchUrlBase, "location:l2 AND DSpaceStatus:Archived", "dc.date.issued_dt:[NOW-30DAY TO NOW]");
+        responseDownload = getSolrResponseCount(SolrUtils.solrStatsUrlBase, downloadByCountry, allTime);
+        responseView     = getSolrResponseCount(SolrUtils.solrStatsUrlBase, viewByCountry, allTime);
     }
-
+    public String getResponseDownload() { return this.responseDownload; }
+    public String getResponseView()     { return this.responseView;     }
 }

@@ -27,7 +27,6 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.discovery.SearchServiceException;
 import org.xml.sax.SAXException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import org.datadryad.api.DryadDataFile;
@@ -42,8 +41,6 @@ import org.dspace.statistics.content.filter.StatisticsFilter;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import org.datadryad.api.DryadDataPackage;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.I18nUtil;
 
 /**
  *
