@@ -66,7 +66,7 @@ public class TopTenViews extends JournalLandingTabbedTransformer {
         tb2.buttonLabel = message("xmlui.JournalLandingPage.JournalLandingTabbedTransformer.year");
         tb2.dateFilter = String.format(solrDateFormat, currentYear - 1, currentMonth);
         tb2.refHead = message("xmlui.JournalLandingPage.TopTenViews.ref_head_year").parameterize(currentYear);
-        tb2.valHead = message("xmlui.JournalLandingPage.JournalLandingTabbedTransformer.year");
+        tb2.valHead = message("xmlui.JournalLandingPage.TopTenViews.val_head");
         tabData.add(tb2);
 
         TabData tb3 = new TabData();
@@ -74,7 +74,7 @@ public class TopTenViews extends JournalLandingTabbedTransformer {
         tb3.buttonLabel = message("xmlui.JournalLandingPage.JournalLandingTabbedTransformer.alltime");
         tb2.dateFilter = solrDateAllTime;
         tb3.refHead = message("xmlui.JournalLandingPage.TopTenViews.ref_head_alltime");
-        tb3.valHead = message("xmlui.JournalLandingPage.JournalLandingTabbedTransformer.alltime");
+        tb3.valHead = message("xmlui.JournalLandingPage.TopTenViews.val_head");
         tabData.add(tb3);
     }
 

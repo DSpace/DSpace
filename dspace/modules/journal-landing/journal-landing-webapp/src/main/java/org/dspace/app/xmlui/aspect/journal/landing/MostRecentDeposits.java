@@ -44,17 +44,17 @@ import org.dspace.workflow.DryadWorkflowUtils;
  * @author Nathan Day
  */
 public class MostRecentDeposits extends AbstractFiltersTransformer {
-    
+
     private static final Logger log = Logger.getLogger(MostRecentDeposits.class);
     private final static SimpleDateFormat fmt = new SimpleDateFormat(fmtDateView);
-    
+
     private static final Message T_mostRecent = message("xmlui.JournalLandingPage.MostRecentDeposits.panel_head");
     private static final Message T_date = message("xmlui.JournalLandingPage.MostRecentDeposits.date");
-    
+
     private ArrayList<DSpaceObject> references;
     private ArrayList<String> dates;
     private String journalName;
-    
+
     @Override
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
@@ -68,11 +68,11 @@ public class MostRecentDeposits extends AbstractFiltersTransformer {
 
         // ------------------
         // Most recent deposits
-        // 
+        //
         // ------------------
         Division mostRecent = body.addDivision(MOST_RECENT_DEPOSITS_DIV);
         mostRecent.setHead(T_mostRecent);
-        
+
         Division items = mostRecent.addDivision(ITEMS);
         ReferenceSet refs = items.addReferenceSet(MOST_RECENT_DEPOSITS_REFS, "summaryList");
 
@@ -98,7 +98,7 @@ public class MostRecentDeposits extends AbstractFiltersTransformer {
     }
 
     /**
-     * 
+     *
      *
      * @param object
      */

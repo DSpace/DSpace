@@ -16,9 +16,9 @@
     <!--
     <message key="xmlui.JournalLandingPage."></message>
     -->
-    <message key="xmlui.JournalLandingPage.JournalSearch.panel_head">Search data in Dryad associated with %s</message>
+   
     <message key="xmlui.JournalLandingPage.MostRecentDeposits.panel_head">Most recent deposits</message>
-    <message key="xmlui.JournalLandingPage.TopTenRecentDeposits.panel_head">Top ten viewed files</message>
+    <message key="xmlui.JournalLandingPage.MostRecentDeposits.date">Date</message>
     
     <message key="xmlui.JournalLandingPage.TopTenDownloads.panel_head">Top 10 downloads</message>
     <message key="xmlui.JournalLandingPage.TopTenDownloads.ref_head_month">{0} {1}</message>
