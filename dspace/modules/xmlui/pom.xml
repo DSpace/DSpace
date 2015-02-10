@@ -351,6 +351,7 @@
                    <groupId>net.sf.ehcache</groupId>
                </exclusion>
            </exclusions>
+           <version>${project.version}</version>
        </dependency>
 
        <dependency>
