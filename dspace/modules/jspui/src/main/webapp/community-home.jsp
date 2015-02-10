@@ -354,7 +354,7 @@
                     %>
                         <div style="padding-bottom: 50px;" class="item <%= first?"active":""%>">
                             <div class="recent-submission row">
-                                <% if (!displayType.equals("")){%>
+                                <% if (displayType != null && !displayType.equals("")){%>
                                     <div class="col-md-1">
                                         <span class="type-icon icesiicon icesiicon-<%= displayType %>"></span>
                                     </div>

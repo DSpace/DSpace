@@ -462,11 +462,15 @@ public class CitationManager {
             String cid = CitationManager.getCid(col.getHandle(), documentType);
             // no documentType
             String ccid = "";
-            if (!documentType.equals("")) {
+            if (documentType != null) {
+                if (!documentType.equals("")) {
 
-                ccid = CitationManager.getCid(col.getHandle(), "");
+                    ccid = CitationManager.getCid(col.getHandle(), "");
+                } else {
+                    ccid = cid;
+                }
             } else {
-                ccid = cid;
+                   ccid = cid;
             }
 
             // if there is no match up of the cid with the config, try communities
