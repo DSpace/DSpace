@@ -20,6 +20,8 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.authorize.AuthorizeException;
 import org.xml.sax.SAXException;
 import java.io.IOException;
+import org.apache.avalon.framework.parameters.ParameterException;
+import java.net.URLEncoder;
 
 /**
  *
@@ -28,18 +30,25 @@ import java.io.IOException;
 public class JournalSearch extends AbstractDSpaceTransformer {
     
     private static final Logger log = Logger.getLogger(JournalSearch.class);
-    private static final Message T_panelHeadFormatString = message("xmlui.JournalLandingPage.JournalSearch.panel_head"); 
+    private static final Message T_panel_head = message("xmlui.JournalLandingPage.JournalSearch.panel_head"); 
     
     @Override
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
+        String journalName = null;
+        try {
+            journalName = parameters.getParameter(PARAM_JOURNAL_NAME);
+        } catch (ParameterException ex) {
+            log.error((ex));
+        }
+        if (journalName == null || journalName.length() == 0) return;
+
         // ------------------
         // Search data in Dryad associated with Journal X
         // 
         // ------------------
-        Division searchDiv = body.addDivision(SEARCH_DIV);
-        
-        
+        Division searchDiv = body.addDivision(SEARCH_DIV, SEARCH_DIV);
+        searchDiv.setHead(T_panel_head.parameterize(journalName));
     }
 }
