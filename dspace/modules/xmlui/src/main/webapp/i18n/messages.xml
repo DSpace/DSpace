@@ -1007,9 +1007,14 @@
 	<message key="xmlui.administrative.ItemExport.collection.success">The collection was exported successfully.  You should receive an e-mail when the archive is ready for download.  You can also use the 'My Exports' link to view a list of your available archives.</message>
 	<message key="xmlui.administrative.ItemExport.community.success">The community was exported successfully.  You should receive an e-mail when the archive is ready for download.  You can also use the 'My Exports' link to view a list of your available archives.</message>
 	<message key="xmlui.administrative.ItemExport.available.head">Available export archives for download:</message>
-
-
-
+    
+    <!-- DRUM customizations -->
+    <message key="xmlui.administrative.Navigation.DRUM_customizations">DRUM Customizations</message>
+    <message key="xmlui.administrative.Navigation.monthly_statistics">Monthly Statistics</message>
+    <message key="xmlui.administrative.Navigation.embargo_list">Embargo List</message>
+    <message key="xmlui.administrative.Navigation.units">Units</message>
+    <message key="xmlui.administrative.Navigation.ETD_departments">ETD Departments</message>
+    
     <!-- org.dspace.app.xmlui.administrative.eperson.ManageEPeopleMain -->
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.title">Manage E-people</message>
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.main_head">E-person management</message>
@@ -2128,6 +2133,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-viewOpen">View/<wbr/>Open</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-access-rights">Read access available for</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-no-files">There are no files associated with this item.</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-number-downloads">No. of downloads: </message>
 
 	<message key="xmlui.dri2xhtml.METS-1.0.size-bytes">bytes</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.size-kilobytes">Kb</message>
