@@ -6,9 +6,13 @@
 package org.dspace.app.xmlui.aspect.journal.landing;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.sql.SQLException;
+import org.apache.avalon.framework.parameters.ParameterException;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.log4j.Logger;
+import static org.dspace.app.xmlui.aspect.journal.landing.Const.*;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.WingException;
@@ -16,6 +20,7 @@ import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.submit.utils.DryadJournalSubmissionUtils;
 import org.xml.sax.SAXException;
 
 /**
@@ -24,6 +29,9 @@ import org.xml.sax.SAXException;
  */
    
 public class Navigation extends AbstractDSpaceTransformer {
+    
+    private static final Logger log = Logger.getLogger(Navigation.class);
+    private static final String ENCODING = "UTF-8";
 
     public void addOptions(Options options) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
@@ -48,6 +56,7 @@ public class Navigation extends AbstractDSpaceTransformer {
             WingException, UIException, SQLException, IOException,
             AuthorizeException
     {
+        // standard values
     	Request request = ObjectModelHelper.getRequest(objectModel);
         pageMeta.addMetadata("contextPath").addContent(contextPath);
         pageMeta.addMetadata("request","queryString").addContent(request.getQueryString());
@@ -69,6 +78,19 @@ public class Navigation extends AbstractDSpaceTransformer {
         }
         if (nodeName != null) {
             pageMeta.addMetadata("dryad", "node").addContent(nodeName);
+        }
+        // journal landing page values
+        String journalName = null;
+        String journalAbbr = null;
+        try {
+            journalName = parameters.getParameter(PARAM_JOURNAL_NAME);
+            journalAbbr = parameters.getParameter(PARAM_JOURNAL_ABBR);
+        } catch (ParameterException ex) {
+            log.error(ex);
+        }
+        if (journalName != null && journalName.length() != 0) {
+            pageMeta.addMetadata("request","journalName").addContent(journalName);
+            pageMeta.addMetadata("request","journalAbbr").addContent(journalAbbr);        
         }
     }
 }
