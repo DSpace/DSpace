@@ -164,6 +164,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
 
     private String mydate;
     private String res_message="At the request of the author, this document is not available until ";
+    private String res_message_notavailable="At the request of the author, this document is not available.";
     private String restricted_message;
 
     /**
@@ -333,11 +334,17 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                                 request.setAttribute("date", bitstream.getETDEmbargo()
                                     .getEndDate());
                                 java.util.Date date = (java.util.Date)request.getAttribute("date");
+                                if(date!=null)
+                                {
+                                    SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy");
 
-                                SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy");
-
-                                String dateUntil = sdf.format(date).toString();
+                                    String dateUntil = sdf.format(date).toString();
                                 restricted_message=res_message+dateUntil;
+                                }
+                                else
+                                {
+                                    restricted_message=res_message_notavailable;
+                                }
 
                                 AuthenticationUtil.interruptRequest(objectModel, AUTH_REQUIRED_HEADER, restricted_message, null);
                                 String redictURL = request.getContextPath() + "/login";
