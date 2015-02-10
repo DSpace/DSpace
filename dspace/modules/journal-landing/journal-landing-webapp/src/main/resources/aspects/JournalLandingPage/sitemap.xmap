@@ -11,6 +11,7 @@
             <map:transformer name="DryadInfo"           src="org.dspace.app.xmlui.aspect.journal.landing.DryadInfo"/>
             <map:transformer name="JournalSearch"       src="org.dspace.app.xmlui.aspect.journal.landing.JournalSearch"/>
             <map:transformer name="TopTenDownloads"     src="org.dspace.app.xmlui.aspect.journal.landing.TopTenDownloads"/>
+            <map:transformer name="TopTenViews"         src="org.dspace.app.xmlui.aspect.journal.landing.TopTenViews"/>
             <map:transformer name="MostRecentDeposits"  src="org.dspace.app.xmlui.aspect.journal.landing.MostRecentDeposits"/>
             <map:transformer name="UserGeography"       src="org.dspace.app.xmlui.aspect.journal.landing.UserGeography"/>
         </map:transformers>
@@ -26,34 +27,39 @@
 
                 <!-- journal abbreviation is found: return page -->
                 <map:act type="ValidateRequest">
-                    <map:parameter name="journalAbbr" value="{1}"/>
                     <map:parameter name="journalName" value="{1}"/>
-                    <map:transform type="Navigation"/>
-                    <map:transform type="Banner">
-                        <map:parameter name="journalAbbr" value="{journalAbbr}"/>
+                    <map:transform type="Navigation">
                         <map:parameter name="journalName" value="{journalName}"/>
+                        <map:parameter name="journalAbbr" value="{journalAbbr}"/>
                     </map:transform>
-                    <!--
+                    <map:transform type="Banner">
+                        <map:parameter name="journalName" value="{journalName}"/>
+                        <map:parameter name="journalAbbr" value="{journalAbbr}"/>
+                    </map:transform>
                     <map:transform type="DryadInfo">
-                        <map:parameter name="" value="{}"/>
+                        <map:parameter name="journalName" value="{journalName}"/>
+                        <map:parameter name="journalAbbr" value="{journalAbbr}"/>
                     </map:transform>
                     <map:transform type="JournalSearch">
-                        <map:parameter name="" value="{}"/>
-                    </map:transform>
-                    -->
-                    <map:transform type="TopTenDownloads">
-                        <map:parameter name="journalAbbr" value="{journalAbbr}"/>
                         <map:parameter name="journalName" value="{journalName}"/>
+                        <map:parameter name="journalAbbr" value="{journalAbbr}"/>
+                    </map:transform>
+                    <map:transform type="TopTenDownloads">
+                        <map:parameter name="journalName" value="{journalName}"/>
+                        <map:parameter name="journalAbbr" value="{journalAbbr}"/>
+                    </map:transform>
+                    <map:transform type="TopTenViews">
+                        <map:parameter name="journalName" value="{journalName}"/>
+                        <map:parameter name="journalAbbr" value="{journalAbbr}"/>
                     </map:transform>
                     <map:transform type="MostRecentDeposits">
-                        <map:parameter name="journalAbbr" value="{journalAbbr}"/>
                         <map:parameter name="journalName" value="{journalName}"/>
+                        <map:parameter name="journalAbbr" value="{journalAbbr}"/>
                     </map:transform>
-                    <!--
                     <map:transform type="UserGeography">
-                        <map:parameter name="" value="{}"/>
+                        <map:parameter name="journalName" value="{journalName}"/>
+                        <map:parameter name="journalAbbr" value="{journalAbbr}"/>
                     </map:transform>
-                    -->
                     <map:serialize type="xml"/>
                 </map:act>
 
@@ -73,4 +79,3 @@
     </map:pipelines>
     
 </map:sitemap>
-

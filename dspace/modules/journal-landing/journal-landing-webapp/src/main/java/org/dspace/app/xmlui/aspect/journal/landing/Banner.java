@@ -13,11 +13,6 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.Para;
-/*
-import org.dspace.app.xmlui.wing.element.Item;
-import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.Table;
-*/
 import static org.dspace.app.xmlui.aspect.journal.landing.Const.*;
 
 import java.io.IOException;
@@ -26,6 +21,7 @@ import org.apache.avalon.framework.parameters.ParameterException;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.submit.utils.DryadJournalSubmissionUtils;
 import org.xml.sax.SAXException;
 
 /**
@@ -33,12 +29,13 @@ import org.xml.sax.SAXException;
  * @author Nathan Day
  */
 public class Banner extends AbstractDSpaceTransformer {
-    
+
     private static final Logger log = Logger.getLogger(Banner.class);
-    
-    // 
-    private static final Message ABC = message("");
-    
+
+    private static final Message T_pub = message("xmlui.JournalLandingPage.Banner.pub");
+    private static final Message T_soc = message("xmlui.JournalLandingPage.Banner.soc");
+    private static final Message T_edi = message("xmlui.JournalLandingPage.Banner.edi");
+
     @Override
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
@@ -58,8 +55,20 @@ public class Banner extends AbstractDSpaceTransformer {
             return;
         }
 
-        Division div = body.addDivision(BANNER_DIV);
-        Para p = div.addPara(BANNER_PARA, null);
-        p.addContent("The journal name is: " + journalName);
+        Division outer = body.addDivision(BANNER_DIV_OUTER);
+        Division inner = outer.addDivision(BANNER_DIV_OUTER);
+        inner.setHead(journalName);
+
+        inner.addPara().addContent("1 sentence scope");
+
+        Para pub = inner.addPara(BANNER_PUB, BANNER_PUB);
+        pub.addContent(T_pub);
+        pub.addContent(": " + "lorem ipsum");
+        Para soc = inner.addPara(BANNER_SOC, BANNER_SOC);
+        soc.addContent(T_soc);
+        soc.addContent(": " + "lorem ipsum");
+        Para edi = inner.addPara(BANNER_EDI, BANNER_EDI);
+        edi.addContent(T_edi);
+        edi.addContent(": " + "lorem ipsum");
     }
 }

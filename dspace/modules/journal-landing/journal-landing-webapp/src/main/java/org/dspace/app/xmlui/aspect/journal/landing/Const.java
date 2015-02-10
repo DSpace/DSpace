@@ -15,11 +15,22 @@ public class Const {
     public static final String PARAM_JOURNAL_NAME = "journalName";
     public static final String PARAM_JOURNAL_ABBR = "journalAbbr";
     
-    // names used in DRI
-    public static final String BANNER_DIV = "journal-landing-banner";
-    public static final String BANNER_PARA = "journal-landing-banner";
+    // banner
+    public static final String BANNER_DIV_OUTER = "journal-landing-banner-outer";
+    public static final String BANNER_DIV_INNER = "journal-landing-banner-inner";
+    public static final String BANNER_PUB = "journal-landing-banner-pub";
+    public static final String BANNER_SOC = "journal-landing-banner-soc";
+    public static final String BANNER_EDI = "journal-landing-banner-edi";
+
+    // dryad info
+    public static final String DRYAD_INFO_WRA = "journal-landing-dryadinfo-wrapper";
+    public static final String DRYAD_INFO_INN = "journal-landing-dryadinfo-inner";
+    public static final String DRYAD_INFO_INF = "journal-landing-dryadinfo-inf";
+    public static final String DRYAD_INFO_MEM = "journal-landing-dryadinfo-mem";
+    public static final String DRYAD_INFO_PAY = "journal-landing-dryadinfo-pay";
+    public static final String DRYAD_INFO_DAT = "journal-landing-dryadinfo-dat";
+    public static final String DRYAD_INFO_MET = "journal-landing-dryadinfo-met";
     
-    // journal based search
     public static final String SEARCH_DIV = "journal-landing-search";
     
     // most recent deposits
