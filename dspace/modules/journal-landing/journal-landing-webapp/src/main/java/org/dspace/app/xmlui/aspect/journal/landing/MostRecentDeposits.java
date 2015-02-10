@@ -27,6 +27,7 @@ import org.dspace.app.xmlui.aspect.discovery.AbstractFiltersTransformer;
 import org.dspace.app.xmlui.utils.UIException;
 import static org.dspace.app.xmlui.wing.AbstractWingTransformer.message;
 import org.dspace.app.xmlui.wing.WingException;
+import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
@@ -48,14 +49,23 @@ public class MostRecentDeposits extends AbstractFiltersTransformer {
     private final static SimpleDateFormat fmt = new SimpleDateFormat(fmtDateView);
     
     private static final Message T_mostRecent = message("xmlui.JournalLandingPage.MostRecentDeposits.panel_head");
+    private static final Message T_date = message("xmlui.JournalLandingPage.MostRecentDeposits.date");
     
-    ArrayList<DSpaceObject> references;
-    ArrayList<String> dates;
+    private ArrayList<DSpaceObject> references;
+    private ArrayList<String> dates;
+    private String journalName;
     
     @Override
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
+        try {
+            this.journalName = parameters.getParameter(PARAM_JOURNAL_NAME);
+        } catch (ParameterException ex) {
+            log.error(ex);
+        }
+        if (journalName == null || journalName.length() == 0) return;
+
         // ------------------
         // Most recent deposits
         // 
@@ -63,10 +73,13 @@ public class MostRecentDeposits extends AbstractFiltersTransformer {
         Division mostRecent = body.addDivision(MOST_RECENT_DEPOSITS_DIV);
         mostRecent.setHead(T_mostRecent);
         
-        Division items = mostRecent.addDivision("items");
-        Division date = mostRecent.addDivision("date");
-        
+        Division items = mostRecent.addDivision(ITEMS);
         ReferenceSet refs = items.addReferenceSet(MOST_RECENT_DEPOSITS_REFS, "summaryList");
+
+        Division count = mostRecent.addDivision(VALS);
+        List vals = count.addList("date-count", List.TYPE_SIMPLE, "date-count");
+        vals.setHead(T_date);
+
         references = new ArrayList<DSpaceObject>();
         dates = new ArrayList<String>();
         try {
@@ -109,8 +122,7 @@ public class MostRecentDeposits extends AbstractFiltersTransformer {
             log.error(e.getMessage(), e);
             return;
         }
-        
-        
+
         boolean includeRestrictedItems = ConfigurationManager.getBooleanProperty("harvest.includerestricted.rss", false);
         int numberOfItemsToShow= SearchUtils.getConfig().getInt("solr.recent-submissions.size", 5);
         ExtendedProperties config = SearchUtils.getConfig();
