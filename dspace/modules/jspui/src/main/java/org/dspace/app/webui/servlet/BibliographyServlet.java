@@ -75,7 +75,10 @@ public class BibliographyServlet extends DSpaceServlet{
             } else if (bibformat.equals("en")) {
                 //textOutput = (String) getServletConfig().getServletContext().getAttribute("bibliography.enData");
                 textOutput = renderEN(item, request);
-            } else {
+            }else if (bibformat.equals("ris")) {
+                textOutput= renderRIS(item, request);
+            }
+            else {
                 log.error(LogManager.getHeader(context, "invalid_format", "path=" + path));
                 JSPManager.showInvalidIDError(request, response, StringEscapeUtils.escapeHtml(path), -1);
                 textOutput = null;
@@ -368,4 +371,138 @@ public class BibliographyServlet extends DSpaceServlet{
         String ENData = sb.toString();
         return ENData;
     }
-}
+    
+    /*
+     Autor: Christian David Criollo Lopez
+     Fecha: 11-Febrero-2015
+     Descripción: Metodo que se encatga de realizar la exportación de un item en formato RIS
+    */
+     public String renderRIS(Item item, HttpServletRequest request) {
+         //create a stringbuffer for storing the metadata
+        String schema = "dc";
+        String RisHead="TY -";
+        String RisFoot="ER -";
+
+        //define needed metadatafields
+        int risType = 1;
+        String[] DC2Bib = new String[5];
+        DC2Bib[1] = "dc.creator, dc.title, dc.relation.ispartofseries, dc.date.issued, dc.identifier.issn, dc.description.abstract, dc.subject, dc.identifier.uri";
+        DC2Bib[2] = "dc.creator, dc.contributor, dc.title, dc.publisher, dc.date.issued, dc.identifier.isbn,  dc.identifier.uri, dc.description.abstract, dc.subject";
+        DC2Bib[3] = "dc.creator, dc.contributor, dc.title, dc.publisher, dc.date.issued, dc.identifier.isbn,  dc.identifier.uri, dc.description.abstract, dc.subject";
+
+        StringBuffer sb = new StringBuffer();
+
+        //Parsing metadatafields
+        boolean tyFound = false;
+
+        //First needed for BibTex: dc.type
+        DCValue[] types = item.getMetadata(schema, "type", Item.ANY, Item.ANY);
+
+        for (int j = 0; (j < types.length) && !tyFound; j++) {
+            String type = types[j].value;
+
+            log.debug("DEBUG, Der gefundene Typ: " + type);//DEBUG
+
+            if (type.equalsIgnoreCase("Article")) {
+                sb.append(RisHead + " " + "JOUR");
+                risType = 1;
+                tyFound = true;
+            } else if (type.equalsIgnoreCase("Book")) {
+                sb.append(RisHead + " " + "BOOK");
+                risType = 2;
+                tyFound = true;
+            } else if (type.equalsIgnoreCase("BookChapter")) {
+                sb.append(RisHead + " " + "CHAP");
+                risType = 3;
+                tyFound = true;
+            } else if (type.equalsIgnoreCase("Thesis")) {
+                sb.append(RisHead + " " + "THES");
+                risType = 3;
+                tyFound = true;
+            } else if (type.equalsIgnoreCase("Preprint")) {
+                sb.append(RisHead + " " + "JOUR");
+                risType = 1;
+                tyFound = true;
+            }
+        }
+
+        //set type in case no type is given 
+        if (!tyFound) {
+            sb.append(RisHead + " " + "JOUR");
+            risType = 1;
+        }
+
+         sb.append(" \n");
+
+        //Now get all the metadata needed for the requested objecttype
+        StringTokenizer st = new StringTokenizer(DC2Bib[risType], ",");
+            //String[] st=DC2Bib[bibType].split("\\,");
+
+        while (st.hasMoreTokens()) {
+            String field = st.nextToken().trim();
+            String[] eq = field.split("\\.");
+            schema = eq[0];
+            String element = eq[1];
+            String qualifier = Item.ANY;
+            if (eq.length > 2 && eq[2].equals("*")) {
+                qualifier = Item.ANY;
+            } else if (eq.length > 2) {
+                qualifier = eq[2];
+            } else {
+                qualifier = null;
+            }
+            //log.info("Field:"+field+";Tokens:"+eq.toString()+";Element:"+eq[1]+";Qualifier:"+qualifier);
+            DCValue[] values = item.getMetadata(schema, element, qualifier, Item.ANY);
+                //log.info("DCVALUES:"+values);
+
+            //Parse the metadata into a record
+            for (int k = 0; k < values.length; k++) {
+                if (element.equals("contributor") || element.equals("creator")) {
+                    if (k == 0) {
+                        if (element.equals("creator")) {
+                            sb.append("AU - " + values[k].value);
+                        } else {
+                            sb.append("A2 - " + values[k].value);
+                        }
+                    }
+                } else if (element.equals("title")) {
+                    if (k == 0) {
+                        sb.append("TI - " + values[k].value);
+                    }
+                } else if (element.equals("description") && qualifier.equals("abstract")) {
+                    if (k == 0) {
+                        sb.append("AB - " + values[k].value);
+                    }
+                } else if (element.equals("identifier") && qualifier.equals("issn")) {
+                    if (k == 0) {
+                        sb.append("SN - " + values[k].value);
+                    }
+                } else if (element.equals("identifier") && qualifier.equals("uri")) {
+                    sb.append("UR - " + values[k].value);
+                } else if (element.equals("subject")) {
+                    sb.append("KW - " + values[k].value);
+                } else if (element.equals("date")) {
+                    if (k == 0) {
+                        //formating the Date
+                        DCDate dd = new DCDate(values[k].value);
+                        //String date = UIUtil.displayDate(dd, false, false).trim();
+                        String date = dd.displayDate(false, false, UIUtil.getSessionLocale(request)).trim();
+                        int last = date.length();
+                        date = date.substring((last - 4), (last));
+
+                        sb.append("PY - " + date);
+                    }
+                } else {
+                    if (k == 0) {
+                        sb.append(qualifier + " " + values[k].value);
+                    }
+                  }
+                  sb.append("\n");
+               }     
+             }
+            
+            sb.append(RisFoot + "\n");
+            String risData= sb.toString(); 
+            return risData;
+         }
+     }
