@@ -433,7 +433,7 @@
                                         <a href="{/dri:document/dri:meta/dri:userMeta/
                             dri:metadata[@element='identifier' and @qualifier='loginURL']}">
                                             <span class="hidden-xs">
-                                                <i18n:text>xmlui.dri2xhtml.structural.login</i18n:text>
+                                                <i18n:text>xmlui.dri2xhtml.structural.login-register</i18n:text>
                                             </span>
                                         </a>
                                     </li>
