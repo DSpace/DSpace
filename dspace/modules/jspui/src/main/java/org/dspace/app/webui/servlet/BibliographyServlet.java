@@ -423,8 +423,12 @@ public class BibliographyServlet extends DSpaceServlet{
                 sb.append(RisHead + " " + "JOUR");
                 risType = 1;
                 tyFound = true;
+            } else if(type.equalsIgnoreCase("bachelorThesis") || (type.equalsIgnoreCase("masterThesis") || (type.equalsIgnoreCase("doctoralThesis")))){
+                sb.append(RisHead + " " + "THES");
+                risType = 3;
+                tyFound = true; 
             }
-        }
+        } 
 
         //set type in case no type is given 
         if (!tyFound) {
@@ -465,6 +469,13 @@ public class BibliographyServlet extends DSpaceServlet{
                             sb.append("A2 - " + values[k].value);
                         }
                     }
+                    if (k > 0) {
+                        if (element.equals("creator")) {
+                            sb.append("AU - " + values[k].value);
+                        } else {
+                            sb.append("A2 - " + values[k].value);
+                        }
+                    }
                 } else if (element.equals("title")) {
                     if (k == 0) {
                         sb.append("TI - " + values[k].value);
@@ -481,6 +492,8 @@ public class BibliographyServlet extends DSpaceServlet{
                     sb.append("UR - " + values[k].value);
                 } else if (element.equals("subject")) {
                     sb.append("KW - " + values[k].value);
+                } else if(element.equals("publisher")){
+                    sb.append("PB - " + values[k].value);
                 } else if (element.equals("date")) {
                     if (k == 0) {
                         //formating the Date
