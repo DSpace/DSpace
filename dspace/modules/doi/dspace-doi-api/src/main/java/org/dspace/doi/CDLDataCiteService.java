@@ -177,15 +177,6 @@ public class CDLDataCiteService {
     }
 
 
-    private String changePrefixDOIForTestEnv(String doi) {
-        // if test env
-        if (ConfigurationManager.getBooleanProperty("doi.datacite.connected", false)) {
-            doi = doi.substring(doi.indexOf('/') + 1);
-            doi = "doi:10.5072/FK2/" + doi;
-        }
-        return doi;
-    }
-
     /**
      * Determine if Dryad should register a DOI for an item.  We should not
      * register items in workflow/workspace, or items that are part of other
