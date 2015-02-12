@@ -322,7 +322,6 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
     }
 
     private void mint(DOI doi, String target, boolean register, Map<String, String> metadata) throws IOException {
-        log.debug("mintDOI is going to be called on "+doi.toString() + ", target " + target);
         perstMinter.mintDOI(doi);
 
         if(register) {
