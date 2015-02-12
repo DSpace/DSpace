@@ -177,15 +177,6 @@ public class CDLDataCiteService {
     }
 
 
-    private String changePrefixDOIForTestEnv(String doi) {
-        // if test env
-        if (ConfigurationManager.getBooleanProperty("doi.datacite.connected", false)) {
-            doi = doi.substring(doi.indexOf('/') + 1);
-            doi = "doi:10.5072/FK2/" + doi;
-        }
-        return doi;
-    }
-
     /**
      * Determine if Dryad should register a DOI for an item.  We should not
      * register items in workflow/workspace, or items that are part of other
@@ -350,7 +341,7 @@ public class CDLDataCiteService {
             try {
                 // if item is in blackout, change target to the blackout URL
                 if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(item)) {
-                    target = "http://datadryad.org/publicationBlackout";
+                    target = ConfigurationManager.getProperty("dryad.blackout.url");
                 }
             } catch (SQLException ex) {
                 log.error("Error checking if item is in blackout: " + ex.getLocalizedMessage());
