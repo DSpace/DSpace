@@ -14,21 +14,25 @@ Subject: Dryad submission approved {1}
 
 Dear {4},
 
-Thank you for your submission to the Dryad repository. Your data package has been approved and assigned a unique identifier, called a DOI.
+Thank you for your submission to the Dryad repository. Your data package has been approved, and the DOI is now fully registered with the DOI system.
 
 Title: {0}
-Data identifier: {1}
+DOI: {1}
 Journal manuscript number: {5}
 
-Ensure that your readers can find your data!
 
-We recommend that the article include a link to the Dryad data as follows:
-Data available from the Dryad Digital Repository: http://doi.org/10.5061/dryad.NNNNN 
+CITING YOUR DRYAD DATA
 
-Your journal may follow the CrossRef recommendation that the data package be cited in the article Reference list.  
-If so, the citation should include the Dryad package DOI, e.g.: 
+Ensure that readers can find your data!
 
-Author(s), Year, Data from [title]. Dryad Digital Repository {1}
+We recommend that the article include a link to the Dryad data as follows (subsitute your DOI suffix for the xxxxx):
+
+Data available from the Dryad Digital Repository: http://dx.doi.org/10.5061/dryad.xxxxx 
+
+Your journal may follow the CrossRef recommendation that the data package be cited in the article Reference list. If so, the citation should include the Dryad package DOI, e.g.: 
+
+Author(s) (Year). Data from [title]. Dryad Digital Repository. {1}
+
 
 To view your Dryad entry, you may visit the repository at http://datadryad.org
 
@@ -39,7 +43,9 @@ Check out the information for depositors at http://datadryad.org/pages/faq
 - If my data files are embargoed, when will they be released?
 - and more!
 
-Thanks again for taking this important step to preserve and share your research data. We welcome your feedback! Contact us at help@datadryad.org.
+Thanks again for taking this important step to preserve and share your research data.
+
+We welcome your feedback! Contact us at help@datadryad.org.
 
 The Dryad Team
 datadryad.org 
