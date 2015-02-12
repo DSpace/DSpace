@@ -65,6 +65,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
     private String myLocalPartPrefix;
 
     private String myDoiPrefix;
+    private String myBlackoutURL;
 
     private int mySuffixVarLength;
 
@@ -79,6 +80,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
         myHdlPrefix = configurationService.getProperty("handle.prefix");
         myHostname = configurationService.getProperty("dryad.url");
+        myBlackoutURL = configurationService.getProperty("dryad.blackout.url");
         myDataPkgColl = configurationService.getProperty("stats.datapkgs.coll");
         myDataFileColl = configurationService.getProperty("stats.datafiles.coll");
         if (configurationService.getPropertyAsType("doi.service.testmode", true)) {
@@ -241,7 +243,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
             doi = doi_.toString();
             if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(item)) {
-                mint(doi_, "http://datadryad.org/publicationBlackout", register, createListMetadata(item));
+                mint(doi_, myBlackoutURL, register, createListMetadata(item));
             } else {
                 mint(doi_, register, createListMetadata(item));
             }
@@ -300,7 +302,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                 updateItemDOIMetadata(previousItem, previousDOI);
                 DOI firstDOI = new DOI(previousDOI, previousItem);
                 if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(item)) {
-                    mint(firstDOI, "http://datadryad.org/publicationBlackout", register, createListMetadata(previousItem));
+                    mint(firstDOI, myBlackoutURL, register, createListMetadata(previousItem));
                 } else {
                     mint(firstDOI, register, createListMetadata(previousItem));
                 }

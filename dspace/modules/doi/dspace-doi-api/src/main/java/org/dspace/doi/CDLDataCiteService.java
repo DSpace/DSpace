@@ -350,7 +350,7 @@ public class CDLDataCiteService {
             try {
                 // if item is in blackout, change target to the blackout URL
                 if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(item)) {
-                    target = "http://datadryad.org/publicationBlackout";
+                    target = ConfigurationManager.getProperty("dryad.blackout.url");
                 }
             } catch (SQLException ex) {
                 log.error("Error checking if item is in blackout: " + ex.getLocalizedMessage());
