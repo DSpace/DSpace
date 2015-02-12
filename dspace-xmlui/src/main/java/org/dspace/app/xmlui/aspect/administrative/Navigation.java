@@ -30,6 +30,7 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
+import org.dspace.app.xmlui.wing.element.UserMeta;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
@@ -186,8 +187,17 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             }
         }
     }
-    
-    
+
+
+    @Override
+    public void addUserMeta(UserMeta userMeta) throws SAXException, WingException,
+            UIException, SQLException, IOException, AuthorizeException
+    {
+        if (availableExports != null && availableExports.size() > 0) {
+            userMeta.addMetadata("identifier", "accountExportURL")
+                    .addContent(contextPath + "/admin/export");
+        }
+    }
     
     
     public void addOptions(Options options) throws SAXException, WingException,

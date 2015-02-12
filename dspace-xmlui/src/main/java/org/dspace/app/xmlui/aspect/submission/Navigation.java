@@ -20,7 +20,9 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
+import org.dspace.app.xmlui.wing.element.UserMeta;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.eperson.EPerson;
 import org.xml.sax.SAXException;
 
 /**
@@ -52,6 +54,19 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     public SourceValidity getValidity() 
     {
         return NOPValidity.SHARED_INSTANCE;
+    }
+
+    @Override
+    public void addUserMeta(UserMeta userMeta) throws SAXException,
+            WingException, UIException, SQLException, IOException,
+            AuthorizeException
+    {
+        EPerson eperson = context.getCurrentUser();
+
+        if (eperson != null) {
+            userMeta.addMetadata("identifier","submissionsURL")
+                    .addContent(contextPath + "/submissions");
+        }
     }
 	
    
