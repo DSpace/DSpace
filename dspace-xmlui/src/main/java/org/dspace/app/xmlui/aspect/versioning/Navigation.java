@@ -138,7 +138,6 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     	 * even if they are never used
     	 */
         options.addList("browse");
-        options.addList("account");
 
         List context = options.addList("context");
 
