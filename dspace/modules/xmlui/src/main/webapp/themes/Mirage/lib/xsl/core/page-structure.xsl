@@ -453,7 +453,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                   <a href="/handle/10255/3/submit">Submit data</a>
                                 </li>
                                 <li>
-                                  <a href="/discover?query=&submit=Search#advanced">Use data</a>
+                                  <a href="/discover?query=&amp;submit=Search#advanced">Use data</a>
                                 </li>
                                 <li>
                                   <a href="/pages/integratedJournals">Look up your journal</a>
