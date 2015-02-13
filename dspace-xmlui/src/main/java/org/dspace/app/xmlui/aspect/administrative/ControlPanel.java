@@ -482,7 +482,7 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
      * @param value candidate string.
      * @return {@code value} or a constant indicating an unset value.
      */
-    private static String notnull(String value) { return null == value ? T_UNSET : value; }
+    private static String notnull(String value) { return "".equals(value) ? T_UNSET : value; }
 
     /**
      * List important DSpace configuration parameters.
