@@ -585,8 +585,8 @@
 	<!-- org.dspace.app.xmlui.eperson.PasswordLogin.java -->
 	<message key="xmlui.EPerson.PasswordLogin.title">Sign in to Dryad</message>
 	<message key="xmlui.EPerson.PasswordLogin.trail">Sign in to Dryad</message>
-	<message key="xmlui.EPerson.PasswordLogin.head1">I have a Dryad account<br/>and would like to log in</message>
-	<message key="xmlui.EPerson.PasswordLogin.head2">I do not have a Dryad account<br/>and would like to create one</message>
+	<message key="xmlui.EPerson.PasswordLogin.head1">Log in to an existing account</message>
+	<message key="xmlui.EPerson.PasswordLogin.head2">Sign up for a new account</message>
 	<message key="xmlui.EPerson.PasswordLogin.email_address"><nobr>E-mail address: </nobr></message>
 	<message key="xmlui.EPerson.PasswordLogin.error_bad_login">The email address and/or password
 		supplied were not valid.</message>
