@@ -5,7 +5,7 @@ package org.dspace.content.authority;
  * without using a set of authorities predefined in some place. In combination
  * with the 'raw' presentation mode (in the 'dspace.cfg'), use this class to
  * modify 'at hand' the authority value input during the submission.
- *
+ * @author facundo@sedici.unlp.edu.ar
  */
 public class EmptyAuthority implements ChoiceAuthority {
 
