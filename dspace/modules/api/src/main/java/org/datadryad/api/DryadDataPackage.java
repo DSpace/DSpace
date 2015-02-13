@@ -291,6 +291,11 @@ public class DryadDataPackage extends DryadObject {
     }
 
 
+    public String getPublicationName() throws SQLException {
+        return getSingleMetadataValue(PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER);
+    }
+
+    
     public void setPublicationName(String publicationName) throws SQLException {
         addSingleMetadataValue(Boolean.TRUE, PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER, publicationName);
     }
