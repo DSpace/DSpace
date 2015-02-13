@@ -70,7 +70,7 @@ public class ItemBibliographyFormatsTag extends TagSupport{
             //create a link for displaying bibliographic result
         String bibTextLink = "<a class=\"col-md-12 col-sm-12 col-xs-12 btn btn-default\" href=\"" + request.getContextPath() + "/bibliography?bib=tex&handle_item=" + item.getHandle() + "\" target=\"_blank\" alt=\"Download BibText record\" id=\"tex\">BibTex</a>";
         String endNoteLink = "<a class=\"col-md-12 col-sm-12 col-xs-12 btn btn-default\" href=\"" + request.getContextPath() + "/bibliography?bib=en&handle_item=" + item.getHandle() + "\" target=\"_blank\" alt=\"Download EndNote record\" id=\"en\">EndNote</a>";
-        String RisLink = "<a class=\"col-md-12 col-sm-12 col-xs-12 btn btn-default\" href=\"" + request.getContextPath() + "/bibliography?bib=ris&handle_item=" + item.getHandle() + "\" target=\"_blank\" alt=\"Download Ris record\" id=\"en\">Ris</a>";
+        String RisLink = "<a class=\"col-md-12 col-sm-12 col-xs-12 btn btn-default\" href=\"" + request.getContextPath() + "/bibliography?bib=ris&handle_item=" + item.getHandle() + "\" target=\"_blank\" alt=\"Download Ris record\" id=\"en\">RIS</a>";
         StringBuffer sbLink = new StringBuffer();
         sbLink.append(bibTextLink);
         sbLink.append(endNoteLink);
