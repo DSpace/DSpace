@@ -1,0 +1,38 @@
+{
+    "USD": {
+        "revenueThreshold": "10 million US Dollars",
+        "smallOrgFee": "USD $1,000",
+        "largeOrgFee": "USD $5,000",
+        "advocateFee": "USD $500"
+    },
+    "EUR": {
+        "revenueThreshold": "7.8 million Euros",
+        "smallOrgFee": "€780", 
+        "largeOrgFee": "€3900",
+        "advocateFee": "€390"
+    },
+    "GBP": {
+        "revenueThreshold": "6.6 million GB Pounds",
+        "smallOrgFee": "£660",
+        "largeOrgFee": "£3300",
+        "advocateFee": "£330"
+    },
+    "CAD": {
+        "revenueThreshold": "10 million Canadian Dollars",
+        "smallOrgFee": "CAD $1,000",
+        "largeOrgFee": "CAD $5,000",
+        "advocateFee": "CAD $500"
+    },
+    "JPY": {
+        "revenueThreshold": "950 billion Japanese Yen",
+        "smallOrgFee": "¥95,000", 
+        "largeOrgFee": "¥475,000",
+        "advocateFee": "¥47,500"
+    },
+    "AUD": {
+        "revenueThreshold": "9.6 million Australian Dollars",
+        "smallOrgFee": "AUD $960",
+        "largeOrgFee": "AUD $4,800",
+        "advocateFee": "AUD $480"
+    }
+}

@@ -1065,14 +1065,19 @@ parameter that is being used (see variable defined above) -->
     </xsl:template-->
     <!--add hidden class to help text-->
     <xsl:template match="dri:help" mode="compositeComponent">
-        <span class="composite-help">
-            <xsl:if test="ancestor::dri:field[@rend='hidden']">
-                <xsl:attribute name="class">
-                    <xsl:text>hidden</xsl:text>
-                </xsl:attribute>
-            </xsl:if>
-            <xsl:apply-templates />
-        </span>
+        <xsl:choose>
+            <xsl:when test="ancestor::dri:div[@id='aspect.dryadfeedback.MembershipApplicationForm.div.membership-form']"/>
+            <xsl:otherwise>
+                <span class="composite-help">
+                    <xsl:if test="ancestor::dri:field[@rend='hidden']">
+                        <xsl:attribute name="class">
+                            <xsl:text>hidden</xsl:text>
+                        </xsl:attribute>
+                    </xsl:if>
+                    <xsl:apply-templates />
+                </span>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
     <xsl:template match="dri:help">
         <xsl:choose>

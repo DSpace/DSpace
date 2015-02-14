@@ -174,61 +174,45 @@ jQuery(document).ready(function() {
 jQuery(document).ready(function() {
     var $currencySelector = jQuery('select[name=org_annual_revenue_currency]');
     if ($currencySelector.length === 1) {
-        var amountsByCurrency = {
-            'USD': {
-                revenueThreshold: '10 million US Dollars',
-                smallOrgFee: 'USD$1,000',
-                largeOrgFee: 'USD$5,000'
-            },
-            'EUR': {
-                revenueThreshold: '7.8 million Euros',
-                smallOrgFee: '&#128;780',  // €
-                largeOrgFee: '&#128;3900'
-            },
-            'GBP': {
-                revenueThreshold: '6.6 million GB Pounds',
-                smallOrgFee: '&#163;660',  // £
-                largeOrgFee: '&#163;3300'
-            },
-            'CAD': {
-                revenueThreshold: '10 million Canadian Dollars',
-                smallOrgFee: 'CAD$1,000',
-                largeOrgFee: 'CAD$5,000'
-            },
-            'JPY': {
-                revenueThreshold: '950 billion Japanese Yen',
-                smallOrgFee: '&#165;95,000', // ¥
-                largeOrgFee: '&#165;475,000'
-            },
-            'AUD': {
-                revenueThreshold: '9.6 million Australian Dollars',
-                smallOrgFee: 'AUD$960',
-                largeOrgFee: 'AUD$4,800'
+        // callback for retrieved currency info
+        var updateTable = function(amountsByCurrency) {
+            if (amountsByCurrency === null) noCurrencyData(null, "Fail", "Null data");
+            function showPreferredCurrency(currencyCode) {
+                // EXAMPLE: showPreferredCurrency('GBP');
+                var replacements = {
+                    ".revenueThreshold" : amountsByCurrency[currencyCode].revenueThreshold,
+                    ".smallOrgFee" : amountsByCurrency[currencyCode].smallOrgFee,
+                    ".largeOrgFee" : amountsByCurrency[currencyCode].largeOrgFee,
+                    ".advocateFee" : amountsByCurrency[currencyCode].advocateFee
+                };
+                // 
+               jQuery.each(['.msg-less_than_10_million', '.msg-greater_than_10_million', '.msg-advocate-all-organizations'], function(i,klass) {
+                    var $elt = jQuery(klass);
+                    if ($elt.length === 0) return;
+                    jQuery.each(replacements, function(prop, val) {
+                        if ($elt.find(prop)) {
+                            $elt.find(prop).text(val);
+                        }
+                    });
+               }); 
             }
-        };
-
-        function showPreferredCurrency(currencyCode) {
-            // EXAMPLE: showPreferredCurrency('GBP');
-            revenueThreshold = amountsByCurrency[currencyCode].revenueThreshold;
-            smallOrgFee = amountsByCurrency[currencyCode].smallOrgFee;
-            largeOrgFee = amountsByCurrency[currencyCode].largeOrgFee;
-            // build and show display strings in the new currency
-            var msgLessThan = 'Less than {THRESHOLD} per year (annual membership fee {SMALL_ORG_FEE})'
-                .replace('{THRESHOLD}', revenueThreshold)
-                .replace('{SMALL_ORG_FEE}', smallOrgFee);
-            jQuery('#msg-less_than_10_million').html( msgLessThan );
-            var msgGreaterThan = 'Greater than {THRESHOLD} per year (annual membership fee {LARGE_ORG_FEE})'
-                .replace('{THRESHOLD}', revenueThreshold)
-                .replace('{LARGE_ORG_FEE}', largeOrgFee);
-           jQuery('#msg-greater_than_10_million').html( msgGreaterThan );
+            // choosing a currency should modify the displayed org-revenue threshold and fees
+            $currencySelector.unbind('change').change(function() {
+                showPreferredCurrency( $(this).val() );
+            });
+            // show initial values in USD (don't rely on i18n-message text!)
+            showPreferredCurrency('USD');
         }
-
-        // choosing a currency should modify the displayed org-revenue threshold and fees
-        $currencySelector.unbind('change').change(function() {
-            showPreferredCurrency( $(this).val() );
+        var noCurrencyData = function(/*jQuery.jqXHR*/ jqXHR, /*String*/ textStatus, /*String*/ errorThrown) {
+            // console.log(textStatus);
+        }
+        //jQuery.getJSON('static/json/membersip-form.json', updateTable);
+        jQuery.ajax({
+            dataType: 'json',
+            url:      document.location.protocol + '//' + document.location.host + '/static/json/membership-form.json',
+            success:  updateTable,
+            error:    noCurrencyData
         });
-        // show initial values in USD (don't rely on i18n-message text!)
-        showPreferredCurrency('USD');
     }
 });
 

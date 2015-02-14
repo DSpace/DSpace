@@ -2553,3 +2553,36 @@ td.ds-author-input-col {
 td.ds-author-input-col input {
     width: 45%;
 }
+/* membershipOverview.xhtml */
+ul.membership-overview {
+    margin-bottom: 10px;
+}
+h1 + div.field-help {
+    margin-top: -24px;
+    float: right;
+}
+.currency-table {
+    width: 90%;
+    margin: 1.5em auto 0.5em;
+}
+.currency-table td {
+     text-align: center;
+}
+table.currency-table td.left {
+    text-align: left;
+}
+.currency-table th:first-child,
+.currency-table td:first-child {
+    text-align: left;
+    padding-left: 8px;
+}
+.currency-table tr {
+    background-color: #eee;
+}
+.currency-table tr.odd {
+    background-color: #fff;
+}
+.charter-mark {
+    color: #40841C;
+}
+
