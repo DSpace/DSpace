@@ -386,8 +386,11 @@ public class BibliographyServlet extends DSpaceServlet{
         //define needed metadatafields
         int risType = 1;
         String[] DC2Bib = new String[5];
+        // Metadatos para articulos o articulos de revista
         DC2Bib[1] = "dc.creator, dc.title, dc.relation.ispartofseries, dc.date.issued, dc.identifier.issn, dc.description.abstract, dc.subject, dc.identifier.uri";
-        DC2Bib[2] = "dc.creator, dc.contributor, dc.title, dc.publisher, dc.date.issued, dc.identifier.isbn,  dc.identifier.uri, dc.description.abstract, dc.subject";
+        // Metadatos para libros o partes de libro
+        DC2Bib[2] = "dc.creator, dc.contributor, dc.title, dc.publisher, dc.pubplace, dc.date.issued, dc.identifier.isbn,  dc.identifier.uri, dc.description.abstract, dc.subject";
+        //Metadatos para trabajos de grado, tesis de maestria, doctorado
         DC2Bib[3] = "dc.creator, dc.contributor, dc.title, dc.publisher, dc.date.issued, dc.identifier.isbn,  dc.identifier.uri, dc.description.abstract, dc.subject";
 
         StringBuffer sb = new StringBuffer();
@@ -411,9 +414,9 @@ public class BibliographyServlet extends DSpaceServlet{
                 sb.append(RisHead + " " + "BOOK");
                 risType = 2;
                 tyFound = true;
-            } else if (type.equalsIgnoreCase("BookChapter")) {
+            } else if (type.equalsIgnoreCase("BookChapter") || type.equalsIgnoreCase("bookPart")) {
                 sb.append(RisHead + " " + "CHAP");
-                risType = 3;
+                risType = 2;
                 tyFound = true;
             } else if (type.equalsIgnoreCase("Thesis")) {
                 sb.append(RisHead + " " + "THES");
@@ -488,12 +491,18 @@ public class BibliographyServlet extends DSpaceServlet{
                     if (k == 0) {
                         sb.append("SN - " + values[k].value);
                     }
+                } else if (element.equals("relation") && qualifier.equals("ispartofseries")) {
+                    if (k == 0) {
+                        sb.append("JO - " + values[k].value);
+                    }
                 } else if (element.equals("identifier") && qualifier.equals("uri")) {
                     sb.append("UR - " + values[k].value);
                 } else if (element.equals("subject")) {
                     sb.append("KW - " + values[k].value);
                 } else if(element.equals("publisher")){
                     sb.append("PB - " + values[k].value);
+                } else if(element.equals("pubplace")){
+                    sb.append("CY - " + values[k].value);
                 } else if (element.equals("date")) {
                     if (k == 0) {
                         //formating the Date
