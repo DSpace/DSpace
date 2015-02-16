@@ -1541,9 +1541,8 @@ a.learn-to-submit-button:hover {
     padding-top: 0px;
     padding-bottom: 8px;
 }
-div.tab-buttons {
+h1 + div.tab-buttons {
     padding-top: 8px;
-    padding-bottom: 0px;
 } 
 .tab-buttons a {
     display: inline-block;
