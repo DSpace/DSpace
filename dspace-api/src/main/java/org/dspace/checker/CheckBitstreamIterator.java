@@ -19,6 +19,7 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
@@ -35,8 +36,8 @@ public final class CheckBitstreamIterator extends DAOSupport
 {
     private static final Logger LOG = Logger.getLogger(CheckBitstreamIterator.class);
 
-    private static String DEFAULT_EXCLUDES =  ChecksumCheckResults.BITSTREAM_NOT_FOUND + "," +
-            ChecksumCheckResults.BITSTREAM_MARKED_DELETED + "," +
+    private static String DEFAULT_EXCLUDES = ChecksumCheckResults.BITSTREAM_NOT_FOUND + ", " +
+            ChecksumCheckResults.BITSTREAM_MARKED_DELETED + ", " +
             ChecksumCheckResults.CHECKSUM_ALGORITHM_INVALID;
 
     public static final int SENTINEL = -1;
@@ -76,8 +77,8 @@ public final class CheckBitstreamIterator extends DAOSupport
         rs = null;
     }
 
-    public static CheckBitstreamIterator select(String result, String excludes, Context ctxt,
-                                                          Date before_date, Date after_date, DSpaceObject root) throws SQLException
+    public static CheckBitstreamIterator create(String result, String[] excludes, Context ctxt,
+                                                Date before_date, Date after_date, DSpaceObject root) throws SQLException
     {
         CheckBitstreamIterator iter = new CheckBitstreamIterator(ctxt, before_date, after_date, root);
         iter.rs = iter.select_with_result_stmt(result, excludes);
@@ -104,10 +105,10 @@ public final class CheckBitstreamIterator extends DAOSupport
         return rs.getTimestamp(3);
     }
 
-    private ResultSet select_with_result_stmt(String res, String without_res) throws SQLException
+    private ResultSet select_with_result_stmt(String res, String[] without_res) throws SQLException
     {
         with_result = res;
-        without_result = without_res.split(",");
+        without_result = without_res;
         String stmt = "SELECT bitstream_id, result, last_process_end_date FROM MOST_RECENT_CHECKSUM ";
         String operator = " WHERE ";
         if (before != null)
@@ -128,11 +129,14 @@ public final class CheckBitstreamIterator extends DAOSupport
             LOG.debug("last_check result = " + with_result);
             operator = " AND ";
         }
-        for (int i = 0; i < without_result.length; i++)
+        if (without_result != null)
         {
-            stmt = stmt + operator + " RESULT != ?";
-            LOG.debug("last_check result != " + without_result[i]);
-            operator = " AND ";
+            for (int i = 0; i < without_result.length; i++)
+            {
+                stmt = stmt + operator + " RESULT != ?";
+                LOG.debug("last_check result != " + without_result[i]);
+                operator = " AND ";
+            }
         }
         if (root != null)
         {
@@ -178,10 +182,13 @@ public final class CheckBitstreamIterator extends DAOSupport
             sqlStmt.setString(pos, with_result);
             pos++;
         }
-        for (int i = 0; i < without_result.length; i++)
+        if (without_result != null)
         {
-            sqlStmt.setString(pos, without_result[i].trim());
-            pos++;
+            for (int i = 0; i < without_result.length; i++)
+            {
+                sqlStmt.setString(pos, without_result[i]);
+                pos++;
+            }
         }
         if (root != null)
         {
@@ -189,6 +196,30 @@ public final class CheckBitstreamIterator extends DAOSupport
             pos++;
         }
         return sqlStmt.executeQuery();
+    }
+
+    public String toString()
+    {
+        String me =  getClass().getCanonicalName() + "(";
+        DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT, Locale.US);
+
+
+        if (root != null) {
+            me = me + ("in:" + root) + ",";
+        }
+        if (with_result != null) {
+            me = me + ("=" + with_result) + ",";
+        }
+        if (without_result != null) {
+            me = me + ("!=[" + StringUtils.join(without_result, ',') + "],");
+        }
+        if (after != null) {
+            me = me + ("after:" + df.format(after) + ",");
+        }
+        if (before != null) {
+            me = me + ("before:" + df.format(before) + ",");
+        }
+        return me + ")";
     }
 
 
@@ -212,15 +243,14 @@ public final class CheckBitstreamIterator extends DAOSupport
         // create an options object and populate it
         Options options = new Options();
 
-//# TODO add -a option for all bitstreams
-
-        options.addOption("i", "include_result", true, "Check only bitstreams whose last result is <RESULT>");
-        options.addOption("x", "exclude_result", true, "Check only bitstreams whose last result is not one of the given results (use a comma separated list)");
+        options.addOption("i", "include_result", true, "Work on bitstreams whose last result is <RESULT>");
+        options.addOption("x", "exclude_result", true, "Work on bitstreams whose last result is not one of the given results (use a comma separated list)");
+        options.addOption("l", "loop", false, "Work on bitstreams whose last result is not one of " + DEFAULT_EXCLUDES );
         options.addOption("h", "help", false, "Help");
-        options.addOption("b", "before", true, "Check only bitstreams last checked before given date");
-        options.addOption("a", "after", true, "Check only bitstreams last checked after given date");
-        options.addOption("c", "count", true, "Check at most given number of bitstreams");
-        options.addOption("r", "root", true, "Community, Collection, Item, or Bitstream (given as handle or TYPE.ID)");
+        options.addOption("b", "before", true, "CWork on bitstreams last checked before given date");
+        options.addOption("a", "after", true, "Work on bitstreams last checked after given date");
+        options.addOption("c", "count", true, "Work on at most the given number of bitstreams");
+        options.addOption("r", "root", true, "Work on bitstream in given Community, Collection, Item, or on the given Bitstream, give root as handle or TYPE.ID)");
         options.addOption("v", "verbose", false, "Be verbose");
 
         try
@@ -232,19 +262,29 @@ public final class CheckBitstreamIterator extends DAOSupport
                 return;
             }
 
-            String with_result = null;
-            String exclude_results = line.hasOption('x') ? line.getOptionValue('x') : null;
-            if (line.hasOption('i'))
+            String with_result = line.hasOption('i') ? line.getOptionValue('i') : null;
+            // TODO check whether valid check_sum_result
+            Boolean loop = line.hasOption('l');
+            String excludes = line.hasOption('x') ? line.getOptionValue('x') : null;
+            if ((loop && (with_result  != null  || excludes != null)  ) || (with_result != null && excludes != null))
             {
-                with_result = line.getOptionValue('i');
-                if (line.hasOption('x'))
-                {
-                    throw new RuntimeException("may not  give both -i and -x options");
-                }
-            } else {
-                if (! line.hasOption('x'))
-                     exclude_results = DEFAULT_EXCLUDES;
+                throw new RuntimeException("-x, -i, and -l options are mutually exclusive");
             }
+
+            if (loop) {
+                excludes = DEFAULT_EXCLUDES;
+            }
+            String[] exclude_results = null;
+            if (excludes != null)
+            {
+                exclude_results = excludes.split(",");
+                for (int i = 0; i < exclude_results.length; i++)
+                {
+                    exclude_results[i] = exclude_results[i].trim();
+                    // TODO check whether valid check_sum_result
+                }
+            }
+
 
             DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT, Locale.US);
             Date before = line.hasOption('b') ? df.parse(line.getOptionValue('b')) : null;
@@ -255,19 +295,22 @@ public final class CheckBitstreamIterator extends DAOSupport
             {
                 root = DSpaceObject.fromString(context, line.getOptionValue('r'));
             }
-            CheckBitstreamIterator iter = null;
-            iter = CheckBitstreamIterator.select(with_result, exclude_results, context, before, after, root);
+            CheckBitstreamIterator iter = CheckBitstreamIterator.create(with_result, exclude_results, context, before, after, root);
             if (iter == null)
             {
                 throw new RuntimeException("not enough data to create iterator");
             }
 
+            System.out.println("# " + iter);
 
             while (iter.next())
             {
-                System.out.println("" + count + ": " + iter.bitstream_id() +  "\t" + iter.result() +  "\t" + iter.last_process_end_date());
+                System.out.println("" + count + ": " + iter.bitstream_id() + "\t" + iter.result() + "\t" + iter.last_process_end_date());
                 count--;
-                if (count == 0) break;
+                if (count == 0)
+                {
+                    break;
+                }
             }
 
         } catch (Exception e)
