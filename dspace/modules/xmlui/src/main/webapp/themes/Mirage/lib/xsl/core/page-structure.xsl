@@ -473,7 +473,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             <a href="">For organizations</a>
                             <ul>
                                 <li>
-                                    <a href="/pages/journalIntegration">Journal integration</a>
+                                    <a href="/pages/journalIntegration">Submission integration</a>
                                 </li>                            
                                 <li>
                                     <a href="/pages/membershipOverview">Membership</a>
