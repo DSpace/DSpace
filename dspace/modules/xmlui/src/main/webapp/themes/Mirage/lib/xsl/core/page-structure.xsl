@@ -430,7 +430,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                     <a href="/pages/organization">The organization</a>
                                 </li>
                                 <li>
-                                    <a href="/pages/whoWeAre">Our team</a>
+                                    <a href="/pages/ourTeam">Our team</a>
                                 </li>
                                 <li>
                                     <a href="/pages/repository">Repository features and technology</a>
@@ -440,6 +440,9 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                 </li>
                                 <li>
                                     <a href="/pages/employment">Employment opportunities</a>
+                                </li>
+                                <li>
+                                    <a href="/pages/membershipMeeting">Membership meeting</a>
                                 </li>
                                 <li>
                                   <a href="/pages/faq">FAQs</a>
@@ -473,7 +476,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             <a href="">For organizations</a>
                             <ul>
                                 <li>
-                                    <a href="/pages/journalIntegration">Submission integration</a>
+                                    <a href="/pages/submissionIntegration">Submission integration</a>
                                 </li>                            
                                 <li>
                                     <a href="/pages/membershipOverview">Membership</a>
@@ -483,7 +486,10 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                 </li> 
                                 <li>
                                     <a href="/pages/pricingPlanComparisonTool">Pricing plan comparison tool</a>
-                                </li>                             
+                                </li>    
+                                <li>
+                                    <a href="/pages/membershipMeeting">Membership meeting</a>
+                                </li>                         
                             </ul>
                         </li>
                         <li>
