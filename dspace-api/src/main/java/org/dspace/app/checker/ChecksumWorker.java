@@ -46,11 +46,12 @@ public final class ChecksumWorker
             ChecksumCheckResults.BITSTREAM_MARKED_DELETED + ", " +
             ChecksumCheckResults.CHECKSUM_ALGORITHM_INVALID;
 
-    private static final String[] ACTION_LIST = {"check", "print", "history", "delete"};
+    private static final String[] ACTION_LIST = {"check", "print", "history", "delete", "count"};
     private static final int CHECK = 0;
     private static final int PRINT = 1;
     private static final int HISTORY = 2;
     private static final int DELETE = 3;
+    private static final int COUNT = 4;
     private static final int DEFAULT_ACTION = CHECK;
 
     private Context context;
@@ -80,35 +81,41 @@ public final class ChecksumWorker
             System.out.println("# Done  Check for new bitstreams " + new Date());
         }
 
-        int row = 0;
-        while (iter.next())
+        if (action == COUNT) {
+            countMatches(verbose);
+        } else
         {
-
-
-            switch (action) {
-                case PRINT: break;
-                case CHECK:
-                    checkBitstream(verbose);
-                    break;
-                default:
-                    System.out.println("" + row + ": " + iter.bitstream_id() + "\t" + " TODO" + ACTION_LIST[action]);
-            }
-
-            if (verbose || action == PRINT )
+            int row = 0;
+            while (iter.next())
             {
-                printBitstream(row, verbose);
-                row++;
-            } else {
-                System.out.print("#");
-                if (row % 80 == 0)
+                switch (action)
                 {
-                    System.out.println("");
+                    case PRINT:
+                        break;
+                    case CHECK:
+                        checkBitstream(verbose);
+                        break;
+                    default:
+                        System.out.println("" + row + ": " + iter.bitstream_id() + "\t" + " TODO" + ACTION_LIST[action]);
                 }
-            }
-            count--;
-            if (count == 0)
-            {
-                break;
+
+                if (verbose || action == PRINT)
+                {
+                    printBitstream(row, verbose);
+                    row++;
+                } else
+                {
+                    System.out.print("#");
+                    if (row % 80 == 0)
+                    {
+                        System.out.println("");
+                    }
+                }
+                count--;
+                if (count == 0)
+                {
+                    break;
+                }
             }
         }
         System.out.println();
@@ -133,6 +140,11 @@ public final class ChecksumWorker
             }
             System.out.println();
         }
+    }
+
+    private void countMatches(boolean verbose) throws SQLException {
+        int count = iter.count();
+        System.out.println("" + count + " matching bitstreams");
     }
 
     private void checkBitstream(boolean verbose)

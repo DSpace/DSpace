@@ -82,7 +82,7 @@ public final class CheckBitstreamIterator extends DAOSupport
     public boolean next() throws SQLException
     {
         if (rs == null) {
-            rs = select_with_result_stmt();
+            rs = select();
         }
         return rs.next();
     }
@@ -131,11 +131,29 @@ public final class CheckBitstreamIterator extends DAOSupport
         return rs.getString(6);
     }
 
-    private ResultSet select_with_result_stmt() throws SQLException
+    private ResultSet select() throws SQLException
     {
         String stmt = "SELECT MRC.bitstream_id, MRC.result, MRC.last_process_end_date, MRC.current_checksum, \n" +
                 "BITSTREAM.DELETED, BITSTREAM.internal_id \n" +
                 "FROM MOST_RECENT_CHECKSUM MRC JOIN BITSTREAM ON BITSTREAM.BITSTREAM_ID = MRC.BITSTREAM_ID ";
+        stmt = stmt + where_clause();
+        stmt = stmt + " ORDER BY MRC.LAST_PROCESS_END_DATE";
+        LOG.debug(stmt);
+        return prepare(stmt).executeQuery();
+    }
+
+    public int count() throws SQLException
+    {
+        String stmt = "SELECT COUNT(*) AS N FROM MOST_RECENT_CHECKSUM MRC ";
+        stmt = stmt + where_clause();
+        LOG.debug(stmt);
+        ResultSet rs = prepare(stmt).executeQuery();
+        rs.next();
+        return rs.getInt(1);
+    }
+
+    private String where_clause() {
+        String stmt = "";
         String operator = " WHERE ";
         if (after != null)
         {
@@ -188,9 +206,11 @@ public final class CheckBitstreamIterator extends DAOSupport
             stmt = stmt + operator + bitstream_ids;
             operator = " AND ";
         }
-        stmt = stmt + " ORDER BY MRC.LAST_PROCESS_END_DATE";
-        LOG.debug(stmt);
+        return stmt;
+    }
 
+    private PreparedStatement prepare(String stmt) throws SQLException
+    {
         PreparedStatement sqlStmt = prepareStatement(stmt);
         int pos = 1;
         if (before != null)
@@ -221,7 +241,7 @@ public final class CheckBitstreamIterator extends DAOSupport
             sqlStmt.setInt(pos, root.getID());
             pos++;
         }
-        return sqlStmt.executeQuery();
+        return  sqlStmt;
     }
 
     public String toString()
