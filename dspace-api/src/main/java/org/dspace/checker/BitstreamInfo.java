@@ -62,7 +62,7 @@ public final class BitstreamInfo
 
     /**
      * Minimal constructor.
-     * 
+     *
      * @param bid
      *            Bitstream identifier
      */
@@ -84,7 +84,7 @@ public final class BitstreamInfo
 
     /**
      * Complete constructor.
-     * 
+     *
      * @param del
      *            Deleted
      * @param storeNo
@@ -132,7 +132,7 @@ public final class BitstreamInfo
 
     /**
      * Get the deleted flag.
-     * 
+     *
      * @return true if the bitstream has been deleted
      */
     public boolean getDeleted()
@@ -142,7 +142,7 @@ public final class BitstreamInfo
 
     /**
      * Set the deleted flag.
-     * 
+     *
      * @param deleted
      *            deleted flag
      */
@@ -153,7 +153,7 @@ public final class BitstreamInfo
 
     /**
      * Get the bitstream store number.
-     * 
+     *
      * @return int
      */
     public int getStoreNumber()
@@ -174,7 +174,7 @@ public final class BitstreamInfo
 
     /**
      * Get the size.
-     * 
+     *
      * @return int
      */
     public long getSize()
@@ -195,7 +195,7 @@ public final class BitstreamInfo
 
     /**
      * Get the Bitstream Format id.
-     * 
+     *
      * @return int
      */
     public String getBitstreamFormatId()
@@ -216,7 +216,7 @@ public final class BitstreamInfo
 
     /**
      * Get the Bitstream id.
-     * 
+     *
      * @return int
      */
     public int getBitstreamId()
@@ -226,7 +226,7 @@ public final class BitstreamInfo
 
     /**
      * Get the user format description.
-     * 
+     *
      * @return String
      */
     public String getUserFormatDescription()
@@ -247,7 +247,7 @@ public final class BitstreamInfo
 
     /**
      * Get the Internal Id.
-     * 
+     *
      * @return String
      */
     public String getInternalId()
@@ -268,7 +268,7 @@ public final class BitstreamInfo
 
     /**
      * Get the source.
-     * 
+     *
      * @return String
      */
     public String getSource()
@@ -289,7 +289,7 @@ public final class BitstreamInfo
 
     /**
      * Get the checksum algorithm.
-     * 
+     *
      * @return String
      */
     public String getChecksumAlgorithm()
@@ -310,7 +310,7 @@ public final class BitstreamInfo
 
     /**
      * Get the checksum.
-     * 
+     *
      * @return String
      */
     public String getStoredChecksum()
@@ -331,7 +331,7 @@ public final class BitstreamInfo
 
     /**
      * Get the name of the bitstream.
-     * 
+     *
      * @return String
      */
     public String getName()
@@ -352,7 +352,7 @@ public final class BitstreamInfo
 
     /**
      * calculatedChecksum accessor.
-     * 
+     *
      * @return Returns the calculatedChecksum.
      */
     public String getCalculatedChecksum()
@@ -362,7 +362,7 @@ public final class BitstreamInfo
 
     /**
      * calculatedChecksum accessor.
-     * 
+     *
      * @param calculatedChecksum
      *            The calculatedChecksum to set.
      */
@@ -415,7 +415,7 @@ public final class BitstreamInfo
 
     /**
      * Identity entirely dependent upon <code>bitstreamId</code>.
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(Object o)
@@ -437,7 +437,7 @@ public final class BitstreamInfo
 
     /**
      * HashCode method uses <code>bitstreamId</code> as hashing function.
-     * 
+     *
      * @see java.lang.Object#hashCode()
      */
     public int hashCode()
@@ -447,7 +447,7 @@ public final class BitstreamInfo
 
     /**
      * Describes this BitstreamInfo.
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     public String toString()
@@ -458,7 +458,7 @@ public final class BitstreamInfo
 
     /**
      * Sets toBeProcessed.
-     * 
+     *
      * @param toBeProcessed
      *            flag from most_recent_checksum table
      */
@@ -469,7 +469,7 @@ public final class BitstreamInfo
 
     /**
      * Gets toBeProcessed.
-     * 
+     *
      * @return value of toBeProcessed flag (from most_recent_checksum table)
      */
     public boolean getToBeProcessed()
@@ -479,7 +479,7 @@ public final class BitstreamInfo
 
     /**
      * Gets checksumCheckResult.
-     * 
+     *
      * @return result code for comparison of previous and current checksums
      */
     public String getChecksumCheckResult()
@@ -489,7 +489,7 @@ public final class BitstreamInfo
 
     /**
      * Sets checksumCheckResult.
-     * 
+     *
      * @param resultCode
      *            for comparison of previous and current checksums
      */
@@ -500,7 +500,7 @@ public final class BitstreamInfo
 
     /**
      * The start date and time this bitstream is being processed.
-     * 
+     *
      * @return date
      */
     public Date getProcessStartDate()
@@ -510,7 +510,7 @@ public final class BitstreamInfo
 
     /**
      * The date and time the processing started for this bitstream.
-     * 
+     *
      * @param startDate
      *            date to set.
      */
@@ -521,7 +521,7 @@ public final class BitstreamInfo
 
     /**
      * The date and time this bitstream is finished being processed.
-     * 
+     *
      * @return date
      */
     public Date getProcessEndDate()
@@ -531,7 +531,7 @@ public final class BitstreamInfo
 
     /**
      * The date and time this bitstream is finished being processed.
-     * 
+     *
      * @param endDate
      *            the date to set.
      */
@@ -539,4 +539,15 @@ public final class BitstreamInfo
     {
         this.processEndDate = endDate == null ? null : new Date(endDate.getTime());
     }
+
+    public String toLongString()
+    {
+        String me = this.getClass().getName() + "(";
+        me = me + this.dspaceBitstream.getChecksumAlgorithm() + ", ";
+        me = me + "exp=" + this.getStoredChecksum() + ", ";
+        me = me + "calc=" + this.getCalculatedChecksum() + ", ";
+        me = me + this.getChecksumCheckResult() + ")";
+        return me;
+    }
+
 }

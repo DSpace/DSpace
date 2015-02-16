@@ -31,7 +31,7 @@ import org.dspace.storage.rdbms.DatabaseManager;
  * 
  * 
  */
-class ChecksumHistoryDAO extends DAOSupport
+public class ChecksumHistoryDAO extends DAOSupport
 {
     /**
      * Query that selects bitstream IDs from most_recent_checksum table that are

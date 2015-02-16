@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.Locale;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.content.Bitstream;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -31,18 +32,18 @@ public final class CheckBitstreamIterator extends DAOSupport
 {
     private static final Logger LOG = Logger.getLogger(CheckBitstreamIterator.class);
 
-    static final String THIS_BITSTREAM = "BITSTREAM_ID = ?";
+    static final String THIS_BITSTREAM = "MRC.BITSTREAM_ID = ?";
 
-    static final String BITSTREAMS_IN_ITEM = "BITSTREAM_ID in \n" +
+    static final String BITSTREAMS_IN_ITEM = "MRC.BITSTREAM_ID in \n" +
             "(SELECT BITSTREAM_ID FROM BUNDLE2BITSTREAM WHERE BUNDLE_ID in\n" +
             "   (SELECT BUNDLE_ID FROM ITEM2BUNDLE WHERE ITEM_ID = ?))";
 
-    static final String BITSTREAMS_IN_COLLECTION = "BITSTREAM_ID in \n" +
+    static final String BITSTREAMS_IN_COLLECTION = "MRC.BITSTREAM_ID in \n" +
             "(SELECT BITSTREAM_ID FROM BUNDLE2BITSTREAM WHERE BUNDLE_ID in\n" +
             "  (SELECT BUNDLE_ID FROM ITEM2BUNDLE WHERE ITEM_ID  in\n" +
             "     (SELECT ITEM_ID FROM COLLECTION2ITEM WHERE COLLECTION_ID = ?)))";
 
-    static final String BITSTREAMS_IN_COMMUNITY = "BITSTREAM_ID in \n" +
+    static final String BITSTREAMS_IN_COMMUNITY = "MRC.BITSTREAM_ID in \n" +
             "(SELECT BITSTREAM_ID FROM BUNDLE2BITSTREAM WHERE BUNDLE_ID in\n" +
             "   (SELECT BUNDLE_ID FROM ITEM2BUNDLE WHERE ITEM_ID  in\n" +
             "      (SELECT ITEM_ID  FROM COLLECTION2ITEM WHERE COLLECTION_ID in \n" +
@@ -55,6 +56,7 @@ public final class CheckBitstreamIterator extends DAOSupport
     private Date before, after;
     private DSpaceObject root;
     private ResultSet rs;
+    private Bitstream rs_bitstream;
 
     private CheckBitstreamIterator(Context ctxt, Date before_date, Date after_date, DSpaceObject inside)
     {
@@ -64,24 +66,44 @@ public final class CheckBitstreamIterator extends DAOSupport
         before = before_date;
         root = inside;
         rs = null;
+        rs_bitstream = null;
     }
 
-    public static CheckBitstreamIterator create(String result, String[] excludes, Context ctxt,
-                                                Date before_date, Date after_date, DSpaceObject root) throws SQLException
+    public static CheckBitstreamIterator create(String result, String[] excludes,
+                                                Date before_date, Date after_date,
+                                                DSpaceObject root, Context ctxt) throws SQLException
     {
         CheckBitstreamIterator iter = new CheckBitstreamIterator(ctxt, before_date, after_date, root);
-        iter.rs = iter.select_with_result_stmt(result, excludes);
+        iter.with_result = result;
+        iter.without_result = excludes;
         return iter;
     }
 
     public boolean next() throws SQLException
     {
+        if (rs == null) {
+            rs = select_with_result_stmt();
+        }
         return rs.next();
     }
 
     public int bitstream_id() throws SQLException
     {
         return rs.getInt(1);
+    }
+
+    public Bitstream bitstream()
+    {
+        try
+        {
+            if (rs_bitstream == null) {
+                rs_bitstream = Bitstream.find(context, bitstream_id());
+            }
+            return rs_bitstream;
+        } catch (SQLException e)
+        {
+            return null;
+        }
     }
 
     public String result() throws SQLException
@@ -94,27 +116,42 @@ public final class CheckBitstreamIterator extends DAOSupport
         return rs.getTimestamp(3);
     }
 
-    private ResultSet select_with_result_stmt(String res, String[] without_res) throws SQLException
+    public String checksum() throws SQLException
     {
-        with_result = res;
-        without_result = without_res;
-        String stmt = "SELECT bitstream_id, result, last_process_end_date FROM MOST_RECENT_CHECKSUM ";
+        return rs.getString(4);
+    }
+
+    public boolean deleted() throws SQLException
+    {
+        return rs.getBoolean(5);
+    }
+
+    public String internalId() throws SQLException
+    {
+        return rs.getString(6);
+    }
+
+    private ResultSet select_with_result_stmt() throws SQLException
+    {
+        String stmt = "SELECT MRC.bitstream_id, MRC.result, MRC.last_process_end_date, MRC.current_checksum, \n" +
+                "BITSTREAM.DELETED, BITSTREAM.internal_id \n" +
+                "FROM MOST_RECENT_CHECKSUM MRC JOIN BITSTREAM ON BITSTREAM.BITSTREAM_ID = MRC.BITSTREAM_ID ";
         String operator = " WHERE ";
         if (after != null)
         {
-            stmt = stmt + operator + " LAST_PROCESS_END_DATE >= ?";
+            stmt = stmt + operator + " MRC.LAST_PROCESS_END_DATE >= ?";
             LOG.debug("last_check after " + after);
             operator = " AND ";
         }
         if (before != null)
         {
-            stmt = stmt + operator + " LAST_PROCESS_END_DATE < ? ";
+            stmt = stmt + operator + " MRC.LAST_PROCESS_END_DATE < ? ";
             LOG.debug("last_check before " + before);
             operator = " AND ";
         }
         if (with_result != null)
         {
-            stmt = stmt + operator + " RESULT = ?";
+            stmt = stmt + operator + " MRC.RESULT = ?";
             LOG.debug("last_check result = " + with_result);
             operator = " AND ";
         }
@@ -122,7 +159,7 @@ public final class CheckBitstreamIterator extends DAOSupport
         {
             for (int i = 0; i < without_result.length; i++)
             {
-                stmt = stmt + operator + " RESULT != ?";
+                stmt = stmt + operator + " MRC.RESULT != ?";
                 LOG.debug("last_check result != " + without_result[i]);
                 operator = " AND ";
             }
@@ -151,7 +188,7 @@ public final class CheckBitstreamIterator extends DAOSupport
             stmt = stmt + operator + bitstream_ids;
             operator = " AND ";
         }
-        stmt = stmt + " ORDER BY LAST_PROCESS_END_DATE";
+        stmt = stmt + " ORDER BY MRC.LAST_PROCESS_END_DATE";
         LOG.debug(stmt);
 
         PreparedStatement sqlStmt = prepareStatement(stmt);
