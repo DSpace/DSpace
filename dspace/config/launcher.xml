@@ -8,6 +8,13 @@
         </step>
     </command>
     <command>
+        <name>chk</name>
+        <description>Run the checksum checker</description>
+        <step>
+            <class>org.dspace.checker.CheckBitstreamIterator</class>
+        </step>
+    </command>
+    <command>
         <name>checker-emailer</name>
         <description>Send emails related to the checksum checker</description>
         <step>
