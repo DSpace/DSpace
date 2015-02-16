@@ -8,10 +8,10 @@
         </step>
     </command>
     <command>
-        <name>chk</name>
+        <name>checksum</name>
         <description>Run the checksum checker</description>
         <step>
-            <class>org.dspace.checker.CheckBitstreamIterator</class>
+            <class>org.dspace.app.checker.ChecksumWorker</class>
         </step>
     </command>
     <command>
