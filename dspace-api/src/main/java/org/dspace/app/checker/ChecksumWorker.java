@@ -26,7 +26,9 @@ import org.dspace.checker.BitstreamInfoDAO;
 import org.dspace.checker.CheckBitstreamIterator;
 import org.dspace.checker.CheckerCommand;
 import org.dspace.checker.ChecksumCheckResults;
+import org.dspace.checker.ChecksumHistory;
 import org.dspace.checker.ChecksumHistoryDAO;
+import org.dspace.checker.ChecksumHistoryIterator;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -59,29 +61,34 @@ public final class ChecksumWorker
     private BitstreamInfoDAO bitstreamInfoDAO = null;
     private ChecksumHistoryDAO checksumHistoryDAO = null;
 
-    private ChecksumWorker(Context context, CheckBitstreamIterator iterator) {
+    private ChecksumWorker(Context context, CheckBitstreamIterator iterator)
+    {
         this.context = context;
         this.iter = iterator;
         bitstreamInfoDAO = new BitstreamInfoDAO(context.getDBConnection());
         checksumHistoryDAO = new ChecksumHistoryDAO(context.getDBConnection());
     }
 
-    private void process(int action, int count, boolean verbose) throws SQLException {
+    private void process(int action, int count, boolean verbose) throws SQLException
+    {
         if (verbose)
         {
             System.out.println("# " + iter);
             System.out.println("# Action " + ACTION_LIST[action]);
         }
 
-        if (verbose) {
-            System.out.println("# Start Check for new bitstreams: "  + new Date());
+        if (verbose)
+        {
+            System.out.println("# Start Check for new bitstreams: " + new Date());
         }
         bitstreamInfoDAO.updateMissingBitstreams();
-        if (verbose) {
+        if (verbose)
+        {
             System.out.println("# Done  Check for new bitstreams " + new Date());
         }
 
-        if (action == COUNT) {
+        if (action == COUNT)
+        {
             countMatches(verbose);
         } else
         {
@@ -91,26 +98,30 @@ public final class ChecksumWorker
                 switch (action)
                 {
                     case PRINT:
+                        printBitstream(row, verbose);
                         break;
                     case CHECK:
                         checkBitstream(verbose);
+                        if (verbose)
+                        {
+                            printBitstream(row, verbose);
+                        } else
+                        {
+                            System.out.print("#");
+                            if (row % 80 == 0)
+                            {
+                                System.out.println("");
+                            }
+                        }
+                        break;
+                    case HISTORY:
+                        printHistory(verbose);
                         break;
                     default:
                         System.out.println("" + row + ": " + iter.bitstream_id() + "\t" + " TODO" + ACTION_LIST[action]);
                 }
 
-                if (verbose || action == PRINT)
-                {
-                    printBitstream(row, verbose);
-                    row++;
-                } else
-                {
-                    System.out.print("#");
-                    if (row % 80 == 0)
-                    {
-                        System.out.println("");
-                    }
-                }
+                row++;
                 count--;
                 if (count == 0)
                 {
@@ -123,17 +134,18 @@ public final class ChecksumWorker
 
     private void printBitstream(int row, boolean verbose) throws SQLException
     {
-        System.out.println("" + row + " BITSTREAM."  + iter.bitstream_id() + " " + iter.result() +
+        System.out.println("" + row + " BITSTREAM." + iter.bitstream_id() + " " + iter.result() +
                 " internalId=" + iter.internalId() + " " +
                 " delete=" + iter.deleted() + " " +
-                " lastDate=" + iter.last_process_end_date() + " " );
-        if (verbose) {
-            System.out.println("" + row + " "  + iter.bitstream() + " " + iter.result() + " " +
+                " lastDate=" + iter.last_process_end_date() + " ");
+        if (verbose)
+        {
+            System.out.println("" + row + " " + iter.bitstream() + " " + iter.result() + " " +
                     " algo=" + iter.bitstream().getChecksumAlgorithm() +
                     " expected=" + iter.bitstream().getChecksum() +
                     " calculated=" + iter.checksum());
 
-            System.out.print("" + row + " "  + iter.bitstream() + " " + iter.result() + " ");
+            System.out.print("" + row + " " + iter.bitstream() + " " + iter.result() + " ");
             for (DSpaceObject parent = iter.bitstream().getParentObject(); parent != null; parent = parent.getParentObject())
             {
                 System.out.print(Constants.typeText[parent.getType()] + ":" + parent.getHandle() + " ");
@@ -142,8 +154,26 @@ public final class ChecksumWorker
         }
     }
 
-    private void countMatches(boolean verbose) throws SQLException {
-        System.out.print("match_count=" +  iter.count() + "\t" + iter.propertyString("\t"));
+    private void printHistory(boolean verbose) throws SQLException
+    {
+        ChecksumHistoryIterator histIter = new ChecksumHistoryIterator(context, iter.bitstream_id());
+        for (ChecksumHistory cur = histIter.next(); cur != null; cur = histIter.next())
+        {
+            System.out.print("BITSTREAM." + cur.getBitstreamId());
+            System.out.print(" result=" + cur.getResultCode());
+            if (verbose)
+            {
+                System.out.print(" expected=" + cur.getChecksumExpected());
+                System.out.print(" calculated=" + cur.getChecksumCalculated());
+            }
+            System.out.print(" lastDate=" + cur.getProcessEndDate());
+            System.out.println();
+        }
+    }
+
+    private void countMatches(boolean verbose) throws SQLException
+    {
+        System.out.print("match_count=" + iter.count() + "\t" + iter.propertyString("\t"));
     }
 
     private void checkBitstream(boolean verbose)
@@ -167,7 +197,7 @@ public final class ChecksumWorker
             try
             {
                 calcInfo.setChecksumAlgorithm(calcInfo.getBitstream(context).getChecksumAlgorithm());
-                if (! iter.deleted())
+                if (!iter.deleted())
                 {
                     bitstream = BitstreamStorageManager.retrieve(context, id);
                     String checksum = CheckerCommand.digestStream(bitstream, calcInfo.getChecksumAlgorithm());
@@ -177,7 +207,8 @@ public final class ChecksumWorker
                     }
                     calcInfo.setCalculatedChecksum(checksum);
                     result = CheckerCommand.compareChecksums(iter.bitstream().getChecksum(), checksum);
-                } else {
+                } else
+                {
                     calcInfo.setToBeProcessed(false);  // to be compatible with CheckerCommand.processDeletedBitstream
                     result = ChecksumCheckResults.BITSTREAM_MARKED_DELETED;
                 }
@@ -186,13 +217,11 @@ public final class ChecksumWorker
             {
                 result = ChecksumCheckResults.BITSTREAM_NOT_FOUND;
                 e.printStackTrace();
-            }
-            catch (NoSuchAlgorithmException e)
+            } catch (NoSuchAlgorithmException e)
             {
                 result = ChecksumCheckResults.CHECKSUM_ALGORITHM_INVALID;
                 e.printStackTrace();
-            }
-            catch (SQLException e)
+            } catch (SQLException e)
             {
                 result = ChecksumCheckResults.BITSTREAM_NOT_PROCESSED;
                 e.printStackTrace();
@@ -202,7 +231,8 @@ public final class ChecksumWorker
         calcInfo.setChecksumCheckResult(result);
         calcInfo.setProcessEndDate(new Date());
 
-        if (verbose) {
+        if (verbose)
+        {
             System.out.println(getClass().getName() + " " + calcInfo.toLongString());
         }
 
@@ -294,7 +324,8 @@ public final class ChecksumWorker
             if (line.hasOption('r'))
             {
                 root = DSpaceObject.fromString(context, line.getOptionValue('r'));
-                if (root == null) {
+                if (root == null)
+                {
                     throw new RuntimeException("No such DSpaceObject " + line.getOptionValue('r'));
                 }
             }
@@ -321,7 +352,6 @@ public final class ChecksumWorker
             }
 
             new ChecksumWorker(context, iter).process(action, count, verbose);
-
 
 
         } catch (Exception e)
