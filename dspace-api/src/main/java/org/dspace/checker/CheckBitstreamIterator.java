@@ -74,6 +74,7 @@ public final class CheckBitstreamIterator extends DAOSupport
         rs_bitstream = null;
     }
 
+    // TODO return BitstreamInfo instance or null
     public boolean next() throws SQLException
     {
         if (rs == null) {

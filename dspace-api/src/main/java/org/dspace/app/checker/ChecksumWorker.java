@@ -231,11 +231,6 @@ public final class ChecksumWorker
         calcInfo.setChecksumCheckResult(result);
         calcInfo.setProcessEndDate(new Date());
 
-        if (verbose)
-        {
-            System.out.println(getClass().getName() + " " + calcInfo.toLongString());
-        }
-
         // record new checksum and comparison result in db
         LOG.debug("> update bitstreamInfoDAO " + calcInfo.toLongString());
         bitstreamInfoDAO.update(calcInfo);
