@@ -101,18 +101,8 @@ public final class ChecksumWorker
                         printBitstream(row, verbose);
                         break;
                     case CHECK:
-                        checkBitstream(verbose);
-                        if (verbose)
-                        {
-                            printBitstream(row, verbose);
-                        } else
-                        {
-                            System.out.print("#");
-                            if (row % 80 == 0)
-                            {
-                                System.out.println("");
-                            }
-                        }
+                        checkBitstream(row, verbose);
+
                         break;
                     case HISTORY:
                         printHistory(verbose);
@@ -176,7 +166,7 @@ public final class ChecksumWorker
         System.out.print("match_count=" + iter.count() + "\t" + iter.propertyString("\t"));
     }
 
-    private void checkBitstream(boolean verbose)
+    private void checkBitstream(int row, boolean verbose)
     {
         int id = -1;
         BitstreamInfo calcInfo = null;
@@ -197,16 +187,18 @@ public final class ChecksumWorker
             try
             {
                 calcInfo.setChecksumAlgorithm(calcInfo.getBitstream(context).getChecksumAlgorithm());
+                String storedChecksum = iter.bitstream().getChecksum();
+                calcInfo.setStoredChecksum(calcInfo.getBitstream(context).getChecksum());
                 if (!iter.deleted())
                 {
                     bitstream = BitstreamStorageManager.retrieve(context, id);
                     String checksum = CheckerCommand.digestStream(bitstream, calcInfo.getChecksumAlgorithm());
                     if (LOG.isDebugEnabled())
                     {
-                        LOG.debug(iter.bitstream() + " checksum " + checksum + " storeCheckSum " + iter.bitstream().getChecksum());
+                        LOG.debug(iter.bitstream() + " checksum " + checksum + " storedCheckSum " + storedChecksum);
                     }
                     calcInfo.setCalculatedChecksum(checksum);
-                    result = CheckerCommand.compareChecksums(iter.bitstream().getChecksum(), checksum);
+                    result = CheckerCommand.compareChecksums(storedChecksum, checksum);
                 } else
                 {
                     calcInfo.setToBeProcessed(false);  // to be compatible with CheckerCommand.processDeletedBitstream
@@ -239,6 +231,17 @@ public final class ChecksumWorker
         checksumHistoryDAO.insertHistory(calcInfo);
         LOG.debug("< update checksumHistoryDAO");
 
+        if (verbose)
+        {
+            System.out.println("" + row + " " + calcInfo.toLongString());
+        } else
+        {
+            System.out.print("#");
+            if (row % 80 == 0)
+            {
+                System.out.println("");
+            }
+        }
 
     }
 
@@ -266,8 +269,7 @@ public final class ChecksumWorker
         options.addOption("a", "after", true, "Work on bitstreams last checked after given date");
         options.addOption("b", "before", true, "CWork on bitstreams last checked before given date");
         options.addOption("c", "count", true, "Work on at most the given number of bitstreams");
-        options.addOption("d", "do", true, "action to apply to bitstreams, one of " + StringUtils.join(ACTION_LIST, ", ") +
-                ", (default is " + ACTION_LIST[DEFAULT_ACTION] + ")");
+        options.addOption("d", "do", true, "action to apply to bitstreams");
         options.addOption("h", "help", false, "Help");
         options.addOption("i", "include_result", true, "Work on bitstreams whose last result is <RESULT>");
         options.addOption("l", "loop", false, "Work on bitstreams whose last result is not one of " + DEFAULT_EXCLUDES);
@@ -372,9 +374,15 @@ public final class ChecksumWorker
         HelpFormatter myhelp = new HelpFormatter();
 
         myhelp.printHelp("ChecksumWorker:\n", options);
-
+        System.err.println();
+        System.err.println("Available do actions that may be applied to selected bitstreams:");
+        System.err.println("\t" + StringUtils.join(ACTION_LIST, ", "));
+        System.err.println("\t" + "default action: " + ACTION_LIST[DEFAULT_ACTION]);
+        System.err.println();
+        System.err.println("Available checksum results: ");
+        System.err.println("\t" + StringUtils.join(ChecksumCheckResults.RESULTS_LIST, "\n\t"));
+        System.err.println();
         System.err.println("Give dates in the american style: mm/dd/yyyy eg 2/20/2013 for Feb 20th 2013");
-
     }
 
 }
