@@ -58,25 +58,20 @@ public final class CheckBitstreamIterator extends DAOSupport
     private ResultSet rs;
     private Bitstream rs_bitstream;
 
-    private CheckBitstreamIterator(Context ctxt, Date before_date, Date after_date, DSpaceObject inside)
+    public CheckBitstreamIterator(Context ctxt,
+                                   String has_result, String[] has_not_results,
+                                   Date before_date, Date after_date,
+                                   DSpaceObject inside)
     {
         super(ctxt.getDBConnection());
         context = ctxt;
         after = after_date;
         before = before_date;
         root = inside;
+        with_result = has_result;
+        without_result = has_not_results;
         rs = null;
         rs_bitstream = null;
-    }
-
-    public static CheckBitstreamIterator create(String result, String[] excludes,
-                                                Date before_date, Date after_date,
-                                                DSpaceObject root, Context ctxt) throws SQLException
-    {
-        CheckBitstreamIterator iter = new CheckBitstreamIterator(ctxt, before_date, after_date, root);
-        iter.with_result = result;
-        iter.without_result = excludes;
-        return iter;
     }
 
     public boolean next() throws SQLException
@@ -158,7 +153,7 @@ public final class CheckBitstreamIterator extends DAOSupport
         if (after != null)
         {
             stmt = stmt + operator + " MRC.LAST_PROCESS_END_DATE >= ?";
-            LOG.debug("last_check after " + after);
+            LOG.debug(operator + "last_check after " + after);
             operator = " AND ";
         }
         if (before != null)
@@ -246,26 +241,30 @@ public final class CheckBitstreamIterator extends DAOSupport
 
     public String toString()
     {
-        String me =  getClass().getCanonicalName() + "(";
-        DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT, Locale.US);
-
-
-        if (root != null) {
-            me = me + ("in:" + root) + ",";
-        }
-        if (with_result != null) {
-            me = me + ("=" + with_result) + ",";
-        }
-        if (without_result != null) {
-            me = me + ("!=[" + StringUtils.join(without_result, ',') + "],");
-        }
-        if (after != null) {
-            me = me + ("after:" + df.format(after) + ",");
-        }
-        if (before != null) {
-            me = me + ("before:" + df.format(before) + ",");
-        }
-        return me + ")";
+        return getClass().getCanonicalName() + "(" + propertyString(", ") + ")";
     }
 
+    public String propertyString(String sep)
+    {
+        DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT, Locale.US);
+        String me = "";
+        if (root != null) {
+            me = me + sep + "root=" + root;
+        }
+        if (with_result != null) {
+            me = me + sep + "with_result=" + with_result;
+        }
+        if (without_result != null) {
+            me = me + sep + "without_result=[" + StringUtils.join(without_result, ',') + "]";
+        }
+        if (after != null) {
+            me = me + sep + "after=" + df.format(after);
+        }
+        if (before != null) {
+            me = me + sep + "before=" + df.format(before);
+        }
+        if (! me.isEmpty())
+            me = me.substring(sep.length());
+        return me;
+    }
 }

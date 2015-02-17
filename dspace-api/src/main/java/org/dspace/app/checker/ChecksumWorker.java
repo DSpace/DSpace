@@ -143,8 +143,7 @@ public final class ChecksumWorker
     }
 
     private void countMatches(boolean verbose) throws SQLException {
-        int count = iter.count();
-        System.out.println("" + count + " matching bitstreams");
+        System.out.print("match_count=" +  iter.count() + "\t" + iter.propertyString("\t"));
     }
 
     private void checkBitstream(boolean verbose)
@@ -299,7 +298,7 @@ public final class ChecksumWorker
                     throw new RuntimeException("No such DSpaceObject " + line.getOptionValue('r'));
                 }
             }
-            CheckBitstreamIterator iter = CheckBitstreamIterator.create(with_result, exclude_results, before, after, root, context);
+            CheckBitstreamIterator iter = new CheckBitstreamIterator(context, with_result, exclude_results, before, after, root);
             if (iter == null)
             {
                 throw new RuntimeException("not enough data to create iterator");
