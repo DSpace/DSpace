@@ -133,7 +133,6 @@ public final class CheckBitstreamIterator extends DAOSupport
                 "FROM MOST_RECENT_CHECKSUM MRC JOIN BITSTREAM ON BITSTREAM.BITSTREAM_ID = MRC.BITSTREAM_ID ";
         stmt = stmt + where_clause();
         stmt = stmt + " ORDER BY MRC.LAST_PROCESS_END_DATE";
-        LOG.debug(stmt);
         return prepare(stmt).executeQuery();
     }
 

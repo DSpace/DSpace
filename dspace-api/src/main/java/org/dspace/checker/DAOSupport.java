@@ -8,10 +8,10 @@
 package org.dspace.checker;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 import org.apache.log4j.Logger;
 import org.dspace.storage.rdbms.DatabaseManager;
 
@@ -27,6 +27,35 @@ public class DAOSupport
 {
 
     private static final Logger LOG = Logger.getLogger(DAOSupport.class);
+
+    /**
+     * db connection for all queries
+     */
+    protected Connection conn;
+
+    protected PreparedStatement prepareStatement(String stmt) throws SQLException
+    {
+        if (LOG.isDebugEnabled())
+        {
+            String prt = stmt.replaceAll("\n", " ").toLowerCase().replaceAll("where", "\n\twhere").replaceAll("\\(", "\n\t").replaceAll("\\)", ")\n\t");
+            LOG.debug(prt);
+        }
+        return conn.prepareStatement(stmt);
+    }
+
+    protected void commit()  throws SQLException
+    {
+        if (LOG.isDebugEnabled())
+        {
+            LOG.debug("commit");
+        }
+        conn.commit();
+    }
+
+
+    protected  DAOSupport(Connection conn) {
+        this.conn = conn;
+    }
 
     /**
      * Utility method that cleans up the statement and connection.
