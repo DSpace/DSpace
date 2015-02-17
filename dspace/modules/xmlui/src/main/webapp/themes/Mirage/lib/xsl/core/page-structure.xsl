@@ -459,7 +459,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                   <a href="/discover?query=&amp;submit=Search#advanced">Use data</a>
                                 </li>
                                 <li>
-                                  <a href="/pages/integratedJournals">Look up your journal</a>
+                                  <a href="/pages/journalLookup">Look up your journal</a>
                                 </li>
                                 <li>
                                   <a href="/pages/faq">FAQs</a>
@@ -482,10 +482,10 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                     <a href="/pages/membershipOverview">Membership</a>
                                 </li>                            
                                 <li>
-                                    <a href="/pages/pricing">Pricing plans</a>
+                                    <a href="/pages/payment">Payment plans</a>
                                 </li> 
                                 <li>
-                                    <a href="/pages/pricingPlanComparisonTool">Pricing plan comparison tool</a>
+                                    <a href="/pages/paymentPlanComparisonTool">Payment plan comparison tool</a>
                                 </li>    
                                 <li>
                                     <a href="/pages/membershipMeeting">Membership meeting</a>
