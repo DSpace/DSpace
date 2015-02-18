@@ -157,7 +157,7 @@
 			{
 				if (dcv.length > 0)
 				{
-					displayTitle = dcv[0].value;
+					displayTitle = Utils.addEntities(dcv[0].value);
 				}
 			}
 			%>
