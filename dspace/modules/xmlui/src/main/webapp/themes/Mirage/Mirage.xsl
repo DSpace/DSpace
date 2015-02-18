@@ -349,7 +349,7 @@
                                  alt="New data is added to Dryad, and the cycle continues."
                                  title="New data is added to Dryad, and the cycle continues."/>
                             Submission fees support the cost of keeping Dryad's content free to use.
-                            Flexible <a href="/pages/pricing">pricing plans</a> 
+                            Flexible <a href="/pages/payment">payment plans</a> 
                             provide volume discounts.
                         </p>
                     </div>
