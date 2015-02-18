@@ -73,15 +73,21 @@ public final class ChecksumWorker
     {
         System.out.println("# " + iter);
         System.out.println("# Action " + ACTION_LIST[action]);
+        if (!verbose && action == CHECK)
+        {
+            System.out.println("# Printing  m for " + ChecksumCheckResults.CHECKSUM_MATCH +
+                    ", d for " + ChecksumCheckResults.BITSTREAM_MARKED_DELETED  +
+                    ", and e in all other cases");
+        }
 
         if (verbose)
         {
-            System.out.println("# Start Check for new bitstreams: " + new Date());
+            System.out.println("# Checking for new bitstreams: " + new Date());
         }
         bitstreamInfoDAO.updateMissingBitstreams();
         if (verbose)
         {
-            System.out.println("# Done  Check for new bitstreams " + new Date());
+            System.out.println("# Done Checking for new bitstreams " + new Date());
         }
 
         if (action == COUNT)
@@ -115,6 +121,7 @@ public final class ChecksumWorker
                     break;
                 }
             }
+            System.out.println("# worked on " + row + " bitstreams");
         }
         System.out.println();
     }
@@ -234,7 +241,15 @@ public final class ChecksumWorker
             System.out.println("" + row + " " + calcInfo.toLongString());
         } else
         {
-            System.out.print( (result == ChecksumCheckResults.CHECKSUM_MATCH) ? "M" : "e");
+            char resultCode = 'E';
+            if ( result == ChecksumCheckResults.CHECKSUM_MATCH)
+            {
+                resultCode = 'm';
+            } else if (result == ChecksumCheckResults.BITSTREAM_MARKED_DELETED)
+            {
+                resultCode = 'd';
+            }
+            System.out.print( resultCode);
             if (row % 80 == 0)
             {
                 System.out.println("");
