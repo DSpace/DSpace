@@ -121,9 +121,10 @@ public final class ChecksumWorker
                     break;
                 }
             }
-            System.out.println("# worked on " + row + " bitstreams");
+
+            System.out.println();
+            System.out.println("# worked on " + (row-1) + " bitstreams");
         }
-        System.out.println();
     }
 
     private void printBitstream(int row, boolean verbose) throws SQLException
@@ -284,8 +285,8 @@ public final class ChecksumWorker
         options.addOption("i", "include_result", true, "Work on bitstreams whose last result matches the given result");
         options.addOption("x", "exclude_result", true, "Work on bitstreams whose last result is not one of the given results (use a comma separated list)");
         options.addOption("r", "root", true, "Work on bitstream in given Community, Collection, Item, or on the given Bitstream, give root as handle or TYPE.ID)");
-        options.addOption("o", "older", true, "Work on bitstreams last checked before (now minus given duration)");
-        options.addOption("y", "younger", true, "Work on bitstreams last checked after (now minus given duration) ");
+        options.addOption("b", "before", true, "Work on bitstreams last checked before (current time minus given duration)");
+        options.addOption("a", "after", true, "Work on bitstreams last checked after (current time minus given duration) ");
         options.addOption("c", "count", true, "Work on at most the given number of bitstreams");
         options.addOption("v", "verbose", false, "Be verbose");
         options.addOption("h", "help", false, "Print this help");
@@ -326,15 +327,14 @@ public final class ChecksumWorker
             }
 
 
-            Date after = null;
-            if (line.hasOption('y'))
+            Date after = null, before = null;
+            if (line.hasOption('b'))
             {
-                after = new Date(System.currentTimeMillis() - Utils.parseDuration(line.getOptionValue('y')));
+                before = new Date(System.currentTimeMillis() - Utils.parseDuration(line.getOptionValue('b')));
             }
-            Date before = null;
-            if (line.hasOption('o'))
+            if (line.hasOption('a'))
             {
-                before = new Date(System.currentTimeMillis() - Utils.parseDuration(line.getOptionValue('o')));
+                after = new Date(System.currentTimeMillis() - Utils.parseDuration(line.getOptionValue('a')));
             }
 
             DSpaceObject root = null;
