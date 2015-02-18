@@ -240,7 +240,7 @@
                     <!-- REMINDER: slide publication dates are in the format YEAR-MONTH-DAY, eg, 2013-12-28 -->
                     <div class="bxslider" style="">
                         <div><span class="publication-date">2013-03-01</span>
-                            <a href="/pages/pricing">
+                            <a href="/pages/payment">
                                 <img alt="" src="/themes/Mirage/images/watering-can.png" />
                                 <p style="width: 450px; color: #363; font-size: 90%; top: 0px; right: 10px; line-height: 1.2em; position: absolute; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);"> 
                                     Data Publishing Charges help sustain open data at Dryad
@@ -585,7 +585,7 @@
             <ul style="list-style: none; margin-left: 1em;">
                 <li><a href="/pages/membershipOverview">Membership</a></li>
                 <li><a href="/pages/journalIntegration">Submission integration</a></li>
-                <li><a href="/pages/pricing">Pricing plans</a></li>
+                <li><a href="/pages/payment">Payment plans</a></li>
             </ul> 
         </div>      
 	  </div>

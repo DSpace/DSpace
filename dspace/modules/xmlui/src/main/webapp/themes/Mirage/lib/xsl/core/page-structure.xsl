@@ -476,7 +476,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                     <a href="/pages/membershipOverview">Membership</a>
                                 </li>                            
                                 <li>
-                                    <a href="/pages/pricing">Pricing plans</a>
+                                    <a href="/pages/payment">Payment plans</a>
                                 </li>                            
                             </ul>
                         </li>
