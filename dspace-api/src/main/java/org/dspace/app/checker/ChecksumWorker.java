@@ -126,7 +126,7 @@ public final class ChecksumWorker
                 " lastDate=" + iter.last_process_end_date() + " ");
         if (verbose)
         {
-            System.out.println("" + row + " " + iter.bitstream() + " " + iter.result() + " " +
+            System.out.println("" + row + " " + iter.bitstream() + " " + iter.result() +
                     " algo=" + iter.bitstream().getChecksumAlgorithm() +
                     " expected=" + iter.bitstream().getChecksum() +
                     " calculated=" + iter.checksum());
@@ -232,7 +232,7 @@ public final class ChecksumWorker
             System.out.println("" + row + " " + calcInfo.toLongString());
         } else
         {
-            System.out.print("#");
+            System.out.print( (result == ChecksumCheckResults.CHECKSUM_MATCH) ? "M" : "e");
             if (row % 80 == 0)
             {
                 System.out.println("");
