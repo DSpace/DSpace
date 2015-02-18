@@ -351,17 +351,15 @@ jQuery(document).ready(function() {
         var updatePaymentPlanTable = function(amountsByCurrency) {
             function showPreferredCurrency(currencyCode) {
                 // EXAMPLE: showPreferredCurrency('GBP');
-                jQuery('.msg-memberDPC_voucher').html( amountsByCurrency[currencyCode].memberDPC_voucher );
-                jQuery('.msg-nonMemberDPC_voucher').html( amountsByCurrency[currencyCode].nonMemberDPC_voucher );
-                jQuery('.msg-memberDPC_deferred').html( amountsByCurrency[currencyCode].memberDPC_deferred );
-                jQuery('.msg-nonMemberDPC_deferred').html( amountsByCurrency[currencyCode].nonMemberDPC_deferred );
-                jQuery('.msg-memberDPC_subscription').html( amountsByCurrency[currencyCode].memberDPC_subscription );
-                jQuery('.msg-nonMemberDPC_subscription').html( amountsByCurrency[currencyCode].nonMemberDPC_subscription );
-                jQuery('.msg-DPC_pay_on_submission').html( amountsByCurrency[currencyCode].DPC_pay_on_submission );
-                jQuery('.msg-notIntegratedJournalFee').html( amountsByCurrency[currencyCode].notIntegratedJournalFee );
-                jQuery('.msg-DPC_pay_on_submission_nonintegrated').html( amountsByCurrency[currencyCode].DPC_pay_on_submission_nonintegrated );
-                jQuery('.msg-excessDataStorageFee_first_GB').html( amountsByCurrency[currencyCode].excessDataStorageFee_first_GB );
-                jQuery('.msg-excessDataStorageFee_per_additional_GB').html( amountsByCurrency[currencyCode].excessDataStorageFee_per_additional_GB );
+                if (amountsByCurrency.hasOwnProperty(currencyCode)) {
+                    for (var item in amountsByCurrency[currencyCode]) {
+                        if (amountsByCurrency[currencyCode].hasOwnProperty(item)) {
+                            jQuery('.msg-' + item).html(amountsByCurrency[currencyCode][item]);
+                        }
+                    }
+                } else {
+                    //console.log('Unsupported currency code: ' + currencyCode);
+                }
             }
             // choosing a currency should modify the displayed org-revenue threshold and fees
             $currencySelector.unbind('change').change(function() {
