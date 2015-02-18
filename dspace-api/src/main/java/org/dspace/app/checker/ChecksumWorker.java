@@ -11,9 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
-import java.text.DateFormat;
 import java.util.Date;
-import java.util.Locale;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -32,6 +30,7 @@ import org.dspace.checker.ChecksumHistoryIterator;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.Utils;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
 
 /**
@@ -71,11 +70,8 @@ public final class ChecksumWorker
 
     private void process(int action, int count, boolean verbose) throws SQLException
     {
-        if (verbose)
-        {
-            System.out.println("# " + iter);
-            System.out.println("# Action " + ACTION_LIST[action]);
-        }
+        System.out.println("# " + iter);
+        System.out.println("# Action " + ACTION_LIST[action]);
 
         if (verbose)
         {
@@ -266,16 +262,16 @@ public final class ChecksumWorker
         // create an options object and populate it
         Options options = new Options();
 
-        options.addOption("a", "after", true, "Work on bitstreams last checked after given date");
-        options.addOption("b", "before", true, "CWork on bitstreams last checked before given date");
         options.addOption("c", "count", true, "Work on at most the given number of bitstreams");
         options.addOption("d", "do", true, "action to apply to bitstreams");
         options.addOption("h", "help", false, "Help");
         options.addOption("i", "include_result", true, "Work on bitstreams whose last result is <RESULT>");
         options.addOption("l", "loop", false, "Work on bitstreams whose last result is not one of " + DEFAULT_EXCLUDES);
+        options.addOption("o", "older", true, "Work on bitstreams last checked before (now - given duration)");
         options.addOption("r", "root", true, "Work on bitstream in given Community, Collection, Item, or on the given Bitstream, give root as handle or TYPE.ID)");
         options.addOption("v", "verbose", false, "Be verbose");
         options.addOption("x", "exclude_result", true, "Work on bitstreams whose last result is not one of the given results (use a comma separated list)");
+        options.addOption("y", "younger", true, "Work on bitstreams last checked after (now - given duration) ");
 
         try
         {
@@ -313,9 +309,16 @@ public final class ChecksumWorker
             }
 
 
-            DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT, Locale.US);
-            Date before = line.hasOption('b') ? df.parse(line.getOptionValue('b')) : null;
-            Date after = line.hasOption('a') ? df.parse(line.getOptionValue('a')) : null;
+            Date after = null;
+            if (line.hasOption('y'))
+            {
+                after = new Date(System.currentTimeMillis() - Utils.parseDuration(line.getOptionValue('y')));
+            }
+            Date before = null;
+            if (line.hasOption('o'))
+            {
+                before = new Date(System.currentTimeMillis() - Utils.parseDuration(line.getOptionValue('o')));
+            }
 
             DSpaceObject root = null;
             if (line.hasOption('r'))
@@ -382,7 +385,9 @@ public final class ChecksumWorker
         System.err.println("Available checksum results: ");
         System.err.println("\t" + StringUtils.join(ChecksumCheckResults.RESULTS_LIST, "\n\t"));
         System.err.println();
-        System.err.println("Give dates in the american style: mm/dd/yyyy eg 2/20/2013 for Feb 20th 2013");
+        System.err.println("Give duration using y(year) w(week), d(days), h(hours) m(minutes):");
+        System.err.println("\t4w for 4 weeks, 30d for 30 days, or 15m for 15 minutes");
+
     }
 
 }

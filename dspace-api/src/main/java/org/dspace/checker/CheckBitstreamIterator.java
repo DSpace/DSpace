@@ -246,7 +246,7 @@ public final class CheckBitstreamIterator extends DAOSupport
 
     public String propertyString(String sep)
     {
-        DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT, Locale.US);
+        DateFormat df = DateFormat.getDateInstance(DateFormat.LONG, Locale.US);
         String me = "";
         if (root != null) {
             me = me + sep + "root=" + root;
@@ -258,10 +258,10 @@ public final class CheckBitstreamIterator extends DAOSupport
             me = me + sep + "without_result=[" + StringUtils.join(without_result, ',') + "]";
         }
         if (after != null) {
-            me = me + sep + "after=" + df.format(after);
+            me = me + sep + "after=" + after.toString();
         }
         if (before != null) {
-            me = me + sep + "before=" + df.format(before);
+            me = me + sep + "before=" + before.toString();
         }
         if (! me.isEmpty())
             me = me.substring(sep.length());
