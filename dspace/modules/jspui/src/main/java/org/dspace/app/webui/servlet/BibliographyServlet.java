@@ -380,14 +380,14 @@ public class BibliographyServlet extends DSpaceServlet{
      public String renderRIS(Item item, HttpServletRequest request) {
          //create a stringbuffer for storing the metadata
         String schema = "dc";
-        String RisHead="TY -";
-        String RisFoot="ER -";
+        String RisHead="TY  - ";
+        String RisFoot="ER  - ";
 
         //define needed metadatafields
         int risType = 1;
         String[] DC2Bib = new String[5];
         // Metadatos para articulos o articulos de revista
-        DC2Bib[1] = "dc.creator, dc.title, dc.relation.ispartofseries, dc.date.issued, dc.identifier.issn, dc.description.abstract, dc.subject, dc.identifier.uri";
+        DC2Bib[1] = "dc.creator, dc.title, dc.relation.ispartofseries, dc.publisher, dc.date.issued, dc.identifier.issn, dc.description.abstract, dc.subject, dc.identifier.uri";
         // Metadatos para libros o partes de libro
         DC2Bib[2] = "dc.creator, dc.contributor, dc.title, dc.publisher, dc.pubplace, dc.date.issued, dc.identifier.isbn,  dc.identifier.uri, dc.description.abstract, dc.subject";
         //Metadatos para trabajos de grado, tesis de maestria, doctorado
@@ -407,27 +407,27 @@ public class BibliographyServlet extends DSpaceServlet{
             log.debug("DEBUG, Der gefundene Typ: " + type);//DEBUG
 
             if (type.equalsIgnoreCase("Article")) {
-                sb.append(RisHead + " " + "JOUR");
+                sb.append(RisHead + "JOUR");
                 risType = 1;
                 tyFound = true;
             } else if (type.equalsIgnoreCase("Book")) {
-                sb.append(RisHead + " " + "BOOK");
+                sb.append(RisHead + "BOOK");
                 risType = 2;
                 tyFound = true;
             } else if (type.equalsIgnoreCase("BookChapter") || type.equalsIgnoreCase("bookPart")) {
-                sb.append(RisHead + " " + "CHAP");
+                sb.append(RisHead + "CHAP");
                 risType = 2;
                 tyFound = true;
             } else if (type.equalsIgnoreCase("Thesis")) {
-                sb.append(RisHead + " " + "THES");
+                sb.append(RisHead + "THES");
                 risType = 3;
                 tyFound = true;
             } else if (type.equalsIgnoreCase("Preprint")) {
-                sb.append(RisHead + " " + "JOUR");
+                sb.append(RisHead + "JOUR");
                 risType = 1;
                 tyFound = true;
             } else if(type.equalsIgnoreCase("bachelorThesis") || (type.equalsIgnoreCase("masterThesis") || (type.equalsIgnoreCase("doctoralThesis")))){
-                sb.append(RisHead + " " + "THES");
+                sb.append(RisHead + "THES");
                 risType = 3;
                 tyFound = true; 
             }
@@ -467,42 +467,42 @@ public class BibliographyServlet extends DSpaceServlet{
                 if (element.equals("contributor") || element.equals("creator")) {
                     if (k == 0) {
                         if (element.equals("creator")) {
-                            sb.append("AU - " + values[k].value);
+                            sb.append("AU  - " + values[k].value);
                         } else {
-                            sb.append("A2 - " + values[k].value);
+                            sb.append("A2  - " + values[k].value);
                         }
                     }
                     if (k > 0) {
                         if (element.equals("creator")) {
-                            sb.append("AU - " + values[k].value);
+                            sb.append("AU  - " + values[k].value);
                         } else {
-                            sb.append("A2 - " + values[k].value);
+                            sb.append("A2  - " + values[k].value);
                         }
                     }
                 } else if (element.equals("title")) {
                     if (k == 0) {
-                        sb.append("TI - " + values[k].value);
+                        sb.append("TI  - " + values[k].value);
                     }
                 } else if (element.equals("description") && qualifier.equals("abstract")) {
                     if (k == 0) {
-                        sb.append("AB - " + values[k].value);
+                        sb.append("AB  - " + values[k].value);
                     }
                 } else if (element.equals("identifier") && qualifier.equals("issn")) {
                     if (k == 0) {
-                        sb.append("SN - " + values[k].value);
+                        sb.append("SN  - " + values[k].value);
                     }
                 } else if (element.equals("relation") && qualifier.equals("ispartofseries")) {
                     if (k == 0) {
-                        sb.append("JO - " + values[k].value);
+                        sb.append("JO  - " + values[k].value);
                     }
                 } else if (element.equals("identifier") && qualifier.equals("uri")) {
-                    sb.append("UR - " + values[k].value);
+                    sb.append("UR  - " + values[k].value);
                 } else if (element.equals("subject")) {
-                    sb.append("KW - " + values[k].value);
+                    sb.append("KW  - " + values[k].value);
                 } else if(element.equals("publisher")){
-                    sb.append("PB - " + values[k].value);
+                    sb.append("PB  - " + values[k].value);
                 } else if(element.equals("pubplace")){
-                    sb.append("CY - " + values[k].value);
+                    sb.append("CY  - " + values[k].value);
                 } else if (element.equals("date")) {
                     if (k == 0) {
                         //formating the Date
@@ -512,7 +512,7 @@ public class BibliographyServlet extends DSpaceServlet{
                         int last = date.length();
                         date = date.substring((last - 4), (last));
 
-                        sb.append("PY - " + date);
+                        sb.append("PY  - " + date);
                     }
                 } else {
                     if (k == 0) {
@@ -524,7 +524,7 @@ public class BibliographyServlet extends DSpaceServlet{
              }
             
             sb.append(RisFoot + "\n");
-            String risData= sb.toString(); 
+            String risData= sb.toString();
             return risData;
          }
      }
