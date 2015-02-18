@@ -27,6 +27,7 @@ import org.dspace.checker.ChecksumCheckResults;
 import org.dspace.checker.ChecksumHistory;
 import org.dspace.checker.ChecksumHistoryDAO;
 import org.dspace.checker.ChecksumHistoryIterator;
+import org.dspace.content.Bitstream;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -88,7 +89,7 @@ public final class ChecksumWorker
             countMatches(verbose);
         } else
         {
-            int row = 0;
+            int row = 1;
             while (iter.next())
             {
                 switch (action)
@@ -104,7 +105,7 @@ public final class ChecksumWorker
                         printHistory(verbose);
                         break;
                     default:
-                        System.out.println("" + row + ": " + iter.bitstream_id() + "\t" + " TODO" + ACTION_LIST[action]);
+                        System.out.println("" + row + ": " + iter.bitstream_id() + "\t" + " TODO " + ACTION_LIST[action]);
                 }
 
                 row++;
@@ -126,13 +127,14 @@ public final class ChecksumWorker
                 " lastDate=" + iter.last_process_end_date() + " ");
         if (verbose)
         {
-            System.out.println("" + row + " " + iter.bitstream() + " " + iter.result() +
-                    " algo=" + iter.bitstream().getChecksumAlgorithm() +
-                    " expected=" + iter.bitstream().getChecksum() +
+            System.out.println("" + row + " BITSTREAM." + iter.bitstream_id() + " " + iter.result() +
+                    " algo=" + iter.checksumAlgo() +
+                    " expected=" + iter.storedChecksum() +
                     " calculated=" + iter.checksum());
 
-            System.out.print("" + row + " " + iter.bitstream() + " " + iter.result() + " ");
-            for (DSpaceObject parent = iter.bitstream().getParentObject(); parent != null; parent = parent.getParentObject())
+            System.out.print("" + row + " BITSTREAM." + iter.bitstream_id() + " " + iter.result() + " ");
+            Bitstream bitstream = Bitstream.find(context, iter.bitstream_id());
+            for (DSpaceObject parent = bitstream.getParentObject(); parent != null; parent = parent.getParentObject())
             {
                 System.out.print(Constants.typeText[parent.getType()] + ":" + parent.getHandle() + " ");
             }
@@ -182,8 +184,8 @@ public final class ChecksumWorker
             calcInfo.setProcessStartDate(new Date());
             try
             {
-                calcInfo.setChecksumAlgorithm(calcInfo.getBitstream(context).getChecksumAlgorithm());
-                String storedChecksum = iter.bitstream().getChecksum();
+                calcInfo.setChecksumAlgorithm(iter.checksumAlgo());
+                String storedChecksum = iter.storedChecksum();
                 calcInfo.setStoredChecksum(calcInfo.getBitstream(context).getChecksum());
                 if (!iter.deleted())
                 {
@@ -191,7 +193,7 @@ public final class ChecksumWorker
                     String checksum = CheckerCommand.digestStream(bitstream, calcInfo.getChecksumAlgorithm());
                     if (LOG.isDebugEnabled())
                     {
-                        LOG.debug(iter.bitstream() + " checksum " + checksum + " storedCheckSum " + storedChecksum);
+                        LOG.debug("BITSTREAM." + iter.bitstream_id() + " checksum " + checksum + " storedCheckSum " + storedChecksum);
                     }
                     calcInfo.setCalculatedChecksum(checksum);
                     result = CheckerCommand.compareChecksums(storedChecksum, checksum);
@@ -262,16 +264,16 @@ public final class ChecksumWorker
         // create an options object and populate it
         Options options = new Options();
 
-        options.addOption("c", "count", true, "Work on at most the given number of bitstreams");
         options.addOption("d", "do", true, "action to apply to bitstreams");
-        options.addOption("h", "help", false, "Help");
-        options.addOption("i", "include_result", true, "Work on bitstreams whose last result is <RESULT>");
         options.addOption("l", "loop", false, "Work on bitstreams whose last result is not one of " + DEFAULT_EXCLUDES);
-        options.addOption("o", "older", true, "Work on bitstreams last checked before (now - given duration)");
-        options.addOption("r", "root", true, "Work on bitstream in given Community, Collection, Item, or on the given Bitstream, give root as handle or TYPE.ID)");
-        options.addOption("v", "verbose", false, "Be verbose");
+        options.addOption("i", "include_result", true, "Work on bitstreams whose last result matches the given result");
         options.addOption("x", "exclude_result", true, "Work on bitstreams whose last result is not one of the given results (use a comma separated list)");
-        options.addOption("y", "younger", true, "Work on bitstreams last checked after (now - given duration) ");
+        options.addOption("r", "root", true, "Work on bitstream in given Community, Collection, Item, or on the given Bitstream, give root as handle or TYPE.ID)");
+        options.addOption("o", "older", true, "Work on bitstreams last checked before (now minus given duration)");
+        options.addOption("y", "younger", true, "Work on bitstreams last checked after (now minus given duration) ");
+        options.addOption("c", "count", true, "Work on at most the given number of bitstreams");
+        options.addOption("v", "verbose", false, "Be verbose");
+        options.addOption("h", "help", false, "Print this help");
 
         try
         {

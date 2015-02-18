@@ -16,7 +16,6 @@ import java.util.Date;
 import java.util.Locale;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.content.Bitstream;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -56,7 +55,6 @@ public final class CheckBitstreamIterator extends DAOSupport
     private Date before, after;
     private DSpaceObject root;
     private ResultSet rs;
-    private Bitstream rs_bitstream;
 
     public CheckBitstreamIterator(Context ctxt,
                                    String has_result, String[] has_not_results,
@@ -71,7 +69,6 @@ public final class CheckBitstreamIterator extends DAOSupport
         with_result = has_result;
         without_result = has_not_results;
         rs = null;
-        rs_bitstream = null;
     }
 
     // TODO return BitstreamInfo instance or null
@@ -88,19 +85,6 @@ public final class CheckBitstreamIterator extends DAOSupport
         return rs.getInt(1);
     }
 
-    public Bitstream bitstream()
-    {
-        try
-        {
-            if (rs_bitstream == null) {
-                rs_bitstream = Bitstream.find(context, bitstream_id());
-            }
-            return rs_bitstream;
-        } catch (SQLException e)
-        {
-            return null;
-        }
-    }
 
     public String result() throws SQLException
     {
@@ -127,10 +111,20 @@ public final class CheckBitstreamIterator extends DAOSupport
         return rs.getString(6);
     }
 
+    public String checksumAlgo() throws SQLException
+    {
+        return rs.getString(7);
+    }
+
+    public String storedChecksum() throws SQLException
+    {
+        return rs.getString(8);
+    }
+
     private ResultSet select() throws SQLException
     {
         String stmt = "SELECT MRC.bitstream_id, MRC.result, MRC.last_process_end_date, MRC.current_checksum, \n" +
-                "BITSTREAM.DELETED, BITSTREAM.internal_id \n" +
+                "BITSTREAM.DELETED, BITSTREAM.internal_id, BITSTREAM.checksum_algorithm, BITSTREAM.checksum \n" +
                 "FROM MOST_RECENT_CHECKSUM MRC JOIN BITSTREAM ON BITSTREAM.BITSTREAM_ID = MRC.BITSTREAM_ID ";
         stmt = stmt + where_clause();
         stmt = stmt + " ORDER BY MRC.LAST_PROCESS_END_DATE";
