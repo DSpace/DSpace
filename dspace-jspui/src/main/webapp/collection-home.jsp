@@ -377,7 +377,7 @@
 			{
 				if (dcv.length > 0)
 				{
-					displayTitle = dcv[0].value;
+					displayTitle = Utils.addEntities(dcv[0].value);
 				}
 			}
 			%><p class="recentItem"><a href="<%= request.getContextPath() %>/handle/<%= items[i].getHandle() %>"><%= displayTitle %></a></p><%

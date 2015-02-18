@@ -15,6 +15,7 @@
   -    recent.submissions - RecetSubmissions
   --%>
 
+<%@page import="org.dspace.core.Utils"%>
 <%@page import="org.dspace.content.Bitstream"%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
@@ -113,13 +114,13 @@ if (submissions != null && submissions.count() > 0)
 		        String displayTitle = "Untitled";
 		        if (dcv != null & dcv.length > 0)
 		        {
-		            displayTitle = dcv[0].value;
+		            displayTitle = Utils.addEntities(dcv[0].value);
 		        }
 		        dcv = item.getMetadata("dc", "description", "abstract", Item.ANY);
 		        String displayAbstract = "";
 		        if (dcv != null & dcv.length > 0)
 		        {
-		            displayAbstract = dcv[0].value;
+		            displayAbstract = Utils.addEntities(dcv[0].value);
 		        }
 		%>
 		    <div style="padding-bottom: 50px; min-height: 200px;" class="item <%= first?"active":""%>">
