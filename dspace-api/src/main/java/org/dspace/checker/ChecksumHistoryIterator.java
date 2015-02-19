@@ -134,14 +134,18 @@ public final class ChecksumHistoryIterator
             {
                 sqlStmt.setTimestamp(pos, new Timestamp(before.getTime()));
                 if (LOG.isDebugEnabled())
+                {
                     LOG.debug("pos " + pos + " " + before);
+                }
                 pos++;
             }
             if (after != null)
             {
                 sqlStmt.setTimestamp(pos, new Timestamp(after.getTime()));
                 if (LOG.isDebugEnabled())
+                {
                     LOG.debug("pos " + pos + " " + after);
+                }
                 pos++;
             }
             sqlStmt = builder.prepare(pos, sqlStmt);
@@ -149,18 +153,14 @@ public final class ChecksumHistoryIterator
         return sqlStmt.executeQuery();
     }
 
-
-    public String toString()
+    public String propertyString(String sep)
     {
-        String me = getClass().getCanonicalName() + "(";
-        if (
-                bitstream_id != UNDEFINED)
+        if (bitstream_id != UNDEFINED)
         {
-            me = me + "bitstrame_id=" + bitstream_id;
+            return "bitstrame_id=" + bitstream_id;
         } else
         {
-            String sep = ", ";
-            me = builder.propertyString(sep);
+            String me = builder.propertyString(sep);
 
             String s = (me.isEmpty()) ? "" : sep;
             if (after != null)
@@ -174,7 +174,11 @@ public final class ChecksumHistoryIterator
             }
             return me;
         }
-        return me + ")";
+    }
+
+    public String toString()
+    {
+        return getClass().getCanonicalName() + "(" + propertyString(", ") + ")";
     }
 
 }

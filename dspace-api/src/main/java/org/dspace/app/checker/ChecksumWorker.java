@@ -52,7 +52,6 @@ public final class ChecksumWorker
     private static final int CHECK = 0;
     private static final int PRINT = 1;
     private static final int HISTORY = 2;
-    private static final int DELETE = 3;
     private static final int COUNT = 4;
     private static final int DEFAULT_ACTION = CHECK;
 
@@ -401,6 +400,10 @@ public final class ChecksumWorker
         System.err.println("Available do actions that may be applied to selected bitstreams:");
         System.err.println("\t" + StringUtils.join(ACTION_LIST, ", "));
         System.err.println("\t" + "default action: " + ACTION_LIST[DEFAULT_ACTION]);
+        System.err.println("\tcheck  \tcomputes a checkum for selected bitstreams and compares with the epected checksum");
+        System.err.println("\tprint  \tprints selected bitstreams, the last check result, its internal id, and check date");
+        System.err.println("\tcount  \tcounts how may bitstreams match with the given parameters");
+        System.err.println("\thistory\tprints the complete checksum history of selected bitstreams");
         System.err.println();
         System.err.println("Available checksum results: ");
         System.err.println("\t" + StringUtils.join(ChecksumCheckResults.RESULTS_LIST, "\n\t"));
