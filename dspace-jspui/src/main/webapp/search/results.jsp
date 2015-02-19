@@ -396,7 +396,7 @@ if (pageTotal > pageCurrent)
 </p>
 
 <form id="dso-display" action="<%=request.getContextPath()%>/dso-display" method="post">
-    <input type="hidden" name="query"   value="<%=query%>"/>
+    <input type="hidden" name="query"   value="<%=StringEscapeUtils.escapeHtml(query)%>"/>
     <input type="hidden" name="rpp"     value="<%=rpp%>"/>
     <input type="hidden" name="page"   value="<%=pageCurrent%>"/>
     <input type="hidden" name="sort_by" value="<%=(so != null ? so.getNumber() : 0)%>"/>

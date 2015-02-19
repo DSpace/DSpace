@@ -32,6 +32,7 @@ import org.dspace.content.Community;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.core.Utils;
 import org.dspace.discovery.configuration.TagCloudConfiguration;
 
 /**
@@ -89,6 +90,25 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             String month = request.getParameter("month");
             String year = request.getParameter("year");
             String startsWith = request.getParameter("starts_with");
+            //validate input to avoid cross-site scripting
+            try {
+            	if (StringUtils.isNotBlank(month) && !"-1".equals(month)) {
+            		Integer.valueOf(month);
+            	}
+            	if (StringUtils.isNotBlank(year) && !"-1".equals(year)) {
+            		Integer.valueOf(year);
+            	}
+            	if(StringUtils.isNotBlank(startsWith)) {
+            		startsWith = Utils.addEntities(startsWith);
+            	}
+            }
+            catch(Exception ex) {
+                log.warn("We were unable to parse the browse request: maybe a cross-site scripting attach?");
+                return null;
+            }
+            
+            
+            
             String valueFocus = request.getParameter("vfocus");
             String valueFocusLang = request.getParameter("vfocus_lang");
             String authority = request.getParameter("authority");
