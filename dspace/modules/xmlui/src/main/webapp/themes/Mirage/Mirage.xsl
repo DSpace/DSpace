@@ -240,7 +240,7 @@
                     <!-- REMINDER: slide publication dates are in the format YEAR-MONTH-DAY, eg, 2013-12-28 -->
                     <div class="bxslider" style="">
                         <div><span class="publication-date">2013-03-01</span>
-                            <a href="/pages/pricing">
+                            <a href="/pages/payment">
                                 <img alt="" src="/themes/Mirage/images/watering-can.png" />
                                 <p style="width: 450px; color: #363; font-size: 90%; top: 0px; right: 10px; line-height: 1.2em; position: absolute; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);"> 
                                     Data Publishing Charges help sustain open data at Dryad
@@ -1065,14 +1065,19 @@ parameter that is being used (see variable defined above) -->
     </xsl:template-->
     <!--add hidden class to help text-->
     <xsl:template match="dri:help" mode="compositeComponent">
-        <span class="composite-help">
-            <xsl:if test="ancestor::dri:field[@rend='hidden']">
-                <xsl:attribute name="class">
-                    <xsl:text>hidden</xsl:text>
-                </xsl:attribute>
-            </xsl:if>
-            <xsl:apply-templates />
-        </span>
+        <xsl:choose>
+            <xsl:when test="ancestor::dri:div[@id='aspect.dryadfeedback.MembershipApplicationForm.div.membership-form']"/>
+            <xsl:otherwise>
+                <span class="composite-help">
+                    <xsl:if test="ancestor::dri:field[@rend='hidden']">
+                        <xsl:attribute name="class">
+                            <xsl:text>hidden</xsl:text>
+                        </xsl:attribute>
+                    </xsl:if>
+                    <xsl:apply-templates />
+                </span>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
     <xsl:template match="dri:help">
         <xsl:choose>

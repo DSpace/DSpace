@@ -3339,14 +3339,15 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_type.label2">Please briefly describe the nature of the organization and its interest in Dryad’s mission.</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_type">Organization type is required</message>
 
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.label1">3. Gross annual revenue <span class="required-mark">*</span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.label2">Dryad membership fees are based on members' annual revenue. Please specify currency and annual revenue.</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.label1">3. Membership level <span class="required-mark">*</span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.label2">Please specify currency.</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_annual_revenue_currency">Currency selection is required</message>
 
     <!-- Checkbox options for org_annual_revenue -->
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.less_than_10_million"><span id="msg-less_than_10_million">Less than $10 million per year (annual membership fee US$1000)</span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.greater_than_10_million"><span id="msg-greater_than_10_million">Greater than $10 million per year (annual membership fee US$5000)</span></message>
-
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.greater_than_10_million"><span class="msg-greater_than_10_million"><b>Sustainer</b>: annual membership dues <span class="largeOrgFee">&#x00A0;</span> (annual revenue greater than <span class="revenueThreshold">&#x00A0;</span> per year)</span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.less_than_10_million"><span class="msg-less_than_10_million"><b>Supporter</b>: annual membership dues <span class="smallOrgFee">&#x00A0;</span> (annual revenue less than <span class="revenueThreshold">&#x00A0;</span> per year)</span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.org_annual_revenue.advocate_all_organizations"><span class="msg-advocate-all-organizations"><b>Advocate</b>: annual membership dues <span class="advocateFee">&#x00A0;</span> (open to all organizations, no journal discounts)</span></message>
+    
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.org_annual_revenue">Annual revenue is required</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.billing_contact_name.label1">4. Billing contact name<span class="required-mark">*</span></message>
@@ -3359,13 +3360,13 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.billing_address">Billing address is required</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.publications.label1">7. Publications</message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.publications.label2">One member benefit is a discount on payment plans for qualifying journals published by the member. Please list journals that your organization publishes. If too many to list here, please send to <a href="mailto:director@datadryad.org">director@datadryad.org</a>.</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.publications.label2">One benefit for Sustainer and Supporter members is a discount on payment plans for qualifying journals published by the member. Please list journals that your organization publishes. If too many to list here, please send to <a href="mailto:director@datadryad.org">director@datadryad.org</a>.</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_term.label1">8. Membership term <span class="required-mark">*</span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_term.label2">Membership years run January-December.  Membership may start in 2013 or 2014 and may be selected for multiple years.<br/></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.starting_year.label">Membership term starting January </message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.starting_year.2013">2013</message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.starting_year.2014">2014</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_term.label2">Membership years run January&#x2013;December.  Membership may start in the current year or the following year, and may be selected for multiple years.<br/></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.starting_year.label">Membership term starting January of&#x00A0;</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.starting_year.current">current year</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_year.starting_year.following">following year</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_length.label">and having duration </message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_length.1">1 year</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.membership_length.2">2 years</message>
@@ -3375,14 +3376,17 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.membership_length">Duration of membership is required.</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.membership_year_start">Membership term starting year is required.</message>
 
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_name.label1">9. Organizational representative <span class="required-mark">*</span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_name.label2">The organizational representative will receive all regular communications on behalf of the member organization, excepting those concerning dues. The representative may serve as the delegate at the Annual Meeting or appoint another delegate in his/her place. </message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.rep_name">Representative name is required</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_org.label1">9. Organizational representative <span class="required-mark">*</span></message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_org.label2">The organizational representative will receive all regular communications on behalf of the member organization, excepting those concerning dues. The representative may serve as the delegate at the Annual Meeting or appoint another delegate in his/her place. </message>
 
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_email.label1">10. Organizational representative's email address <span class="required-mark">*</span></message>
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.rep_email">Representative's email address is required</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_name">Name</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.rep_name">Name is required</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_title">Title</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.rep_title">Title is required</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.rep_email">Email address</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.errors.rep_email">Email address is required</message>
 
-    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.comments.label1">11. Comments</message>
+    <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.comments.label1">10. Comments</message>
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.fields.comments.label2">Please add any additional information, comments or questions here.</message>
 
     <message key="xmlui.DryadFeedback.MembershipApplicationForm.submit">Submit</message>
