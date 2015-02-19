@@ -444,7 +444,8 @@ div.bioText {
 } 
 
 #aspect_eperson_PasswordLogin_div_register h1, #aspect_eperson_PasswordLogin_div_login h1 {
-    font-size: 130%;
+    margin: 20px 0px 0px; /* top right bottom left */
+	font-size: 130%;
     text-align: center;
 }
 

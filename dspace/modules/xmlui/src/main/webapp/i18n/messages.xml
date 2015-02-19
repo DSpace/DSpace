@@ -117,10 +117,10 @@
 
 
 
-	<message key="xmlui.ArtifactBrowser.SiteViewer.head_recent_submissions">Recently Published
-		Data&#160;&#160;<a href="/feed/atom_1.0/10255/3" class="single-image-link"
+	<message key="xmlui.ArtifactBrowser.SiteViewer.head_recent_submissions">Recently published
+		data&#160;&#160;<a href="/feed/atom_1.0/10255/3" class="single-image-link"
 			title="Web feed of data packages recently added to Dryad"><img
-				src="/themes/Dryad/images/rss.jpg" style="border: 0px;" alt="RSS feed - Recently Published Data"/></a>
+				src="/themes/Dryad/images/rss.jpg" style="border: 0px;" alt="RSS feed - Recently published data"/></a>
 	</message>
 
 
@@ -311,27 +311,27 @@
 	<message key="xmlui.ArtifactBrowser.Contact.head">Contact us</message>
 	<message key="xmlui.ArtifactBrowser.Contact.para1">{0} administrators may be contacted
 		at:</message>
-	<message key="xmlui.ArtifactBrowser.Contact.feedback_label">On-line form</message>
+	<message key="xmlui.ArtifactBrowser.Contact.feedback_label">Online form</message>
 	<message key="xmlui.ArtifactBrowser.Contact.feedback_link">Feedback</message>
 	<message key="xmlui.ArtifactBrowser.Contact.email">Email</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.FeedbackForm.java -->
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.title">Contact Us</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.title">Contact us</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.trail">Give feedback</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.overview.head">Contact Us</message>
-    <message key="xmlui.ArtifactBrowser.FeedbackForm.overview.para1">Journals, publishers or societies seeking more information about <a href="/pages/membershipOverview" target="_blank">membership</a>, <a href="/pages/journalIntegration" target="_blank">submission integration</a>, <a href="/pages/pricing" target="_blank">payment plans</a> or other ways to be part of Dryad please email: <a href="mailto:director@datadryad.org">director@datadryad.org</a>. </message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.overview.head">Contact us</message>
+    <message key="xmlui.ArtifactBrowser.FeedbackForm.overview.para1">Journals, publishers or societies seeking more information about <a href="/pages/membershipOverview">membership</a>, <a href="/pages/submissionIntegration">submission integration</a>, <a href="/pages/payment">payment plans</a> or other ways to be part of Dryad please email: <a href="mailto:director@datadryad.org">director@datadryad.org</a>. </message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.overview.para2">For urgent requests, or to submit a help ticket, send us feedback on the web site or for general technical questions please email: <a href="mailto:help@datadryad.org">help@datadryad.org</a>.</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.overview.para3">For information about Dryad staff and project personnel, please see <a href="/pages/whoWeAre#staff">Who We Are</a>.</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.address.head"><h2 class="feedbackform-heading">Postal Address</h2></message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.overview.para3">For information about Dryad staff and project personnel, please see <a href="/pages/ourTeam#staff">Our Team</a>.</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.address.head"><h2 class="feedbackform-heading">Postal address</h2></message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.address.para1">Dryad<br/>PO Box 585<br/>Durham, NC 27702-0585 USA</message>
   <message key="xmlui.ArtifactBrowser.FeedbackForm.forum.head"><h2 class="feedbackform-heading">Suggest and vote for new features</h2></message>
-  <message key="xmlui.ArtifactBrowser.FeedbackForm.forumLink"><a class="feedbackform-user-voice-link" href="#" onclick="showClassicWidget(); return false;"><img width="16" height="16" src="/themes/Mirage/images/icon.idea.16px.png" alt="Give your Feedback"></img>&#160;Ideas Forum&#160;</a></message>
-  <message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.head"><h2 class="feedbackform-heading">Contact Form</h2></message>
+  <message key="xmlui.ArtifactBrowser.FeedbackForm.forumLink"><a class="feedbackform-user-voice-link" href="#" onclick="showClassicWidget(); return false;"><img width="16" height="16" src="/themes/Mirage/images/icon.idea.16px.png" alt="Give your Feedback"></img>&#160;Ideas forum&#160;</a></message>
+  <message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.head"><h2 class="feedbackform-heading">Contact form</h2></message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.para1"><p>You may also submit your inquiry or help ticket using the form below.</p></message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.email">Your Email</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.email">Your email</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.email_help">This address will ONLY be used to follow up on your feedback.</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.comments">Comments</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.submit">Send Feedback</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.contactform.submit">Send feedback</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.FeedbackSent.java -->
 	<message key="xmlui.ArtifactBrowser.FeedbackSent.title">Give feedback</message>
@@ -585,8 +585,8 @@
 	<!-- org.dspace.app.xmlui.eperson.PasswordLogin.java -->
 	<message key="xmlui.EPerson.PasswordLogin.title">Sign in to Dryad</message>
 	<message key="xmlui.EPerson.PasswordLogin.trail">Sign in to Dryad</message>
-	<message key="xmlui.EPerson.PasswordLogin.head1">I have a Dryad account<br/>and would like to log in</message>
-	<message key="xmlui.EPerson.PasswordLogin.head2">I do not have a Dryad account<br/>and would like to create one</message>
+	<message key="xmlui.EPerson.PasswordLogin.head1">Log in to an existing account</message>
+	<message key="xmlui.EPerson.PasswordLogin.head2">Sign up for a new account</message>
 	<message key="xmlui.EPerson.PasswordLogin.email_address"><nobr>E-mail address: </nobr></message>
 	<message key="xmlui.EPerson.PasswordLogin.error_bad_login">The email address and/or password
 		supplied were not valid.</message>
