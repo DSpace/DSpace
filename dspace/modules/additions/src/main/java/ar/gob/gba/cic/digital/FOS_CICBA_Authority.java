@@ -14,6 +14,7 @@ public class FOS_CICBA_Authority extends CICBAAuthority{
 	@Override
 	protected ParameterizedSparqlString getSparqlSearchByIdQuery(String field,
 			String key, String locale) {
+		//TODO: analizar si es posible pre-compilar el query
 		ParameterizedSparqlString pqs = new ParameterizedSparqlString();
 
 		//pss.setBaseUri("http://example.org/base#");

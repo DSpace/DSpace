@@ -113,6 +113,7 @@ public abstract class SPARQLAuthorityProvider implements ChoiceAuthority {
 	}
 
 	private Syntax getSPARQLSyntax() {
+		//FIXME: la sintaxis debería ser protected
 		return Syntax.syntaxSPARQL_10;
 	}
 
