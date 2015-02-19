@@ -169,7 +169,7 @@ public final class ChecksumWorker
 
     private void countMatches(boolean verbose) throws SQLException
     {
-        System.out.print("match_count=" + iter.count() + "\t" + iter.propertyString("\t"));
+        System.out.println("match_count=" + iter.count() + "\t" + iter.propertyString("\t"));
     }
 
     private void checkBitstream(int row, boolean verbose)
@@ -214,15 +214,18 @@ public final class ChecksumWorker
             } catch (IOException e)
             {
                 result = ChecksumCheckResults.BITSTREAM_NOT_FOUND;
-                e.printStackTrace();
+                if (LOG.isDebugEnabled())
+                    LOG.debug(result + " " + e.getMessage());
             } catch (NoSuchAlgorithmException e)
             {
                 result = ChecksumCheckResults.CHECKSUM_ALGORITHM_INVALID;
-                e.printStackTrace();
+                if (LOG.isDebugEnabled())
+                    LOG.debug(result + " " + e.getMessage());
             } catch (SQLException e)
             {
                 result = ChecksumCheckResults.BITSTREAM_NOT_PROCESSED;
-                e.printStackTrace();
+                if (LOG.isDebugEnabled())
+                    LOG.debug(result + " " + e.getMessage());
             }
         }
 
