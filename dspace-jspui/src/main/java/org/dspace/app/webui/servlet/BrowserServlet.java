@@ -65,7 +65,7 @@ public class BrowserServlet extends AbstractBrowserServlet
         // all browse requests currently come to GET.
         BrowserScope scope = getBrowserScopeForRequest(context, request, response);
 
-        if (scope.getBrowseIndex() == null)
+        if (scope == null || scope.getBrowseIndex() == null)
         {
             String requestURL = request.getRequestURI();
             if (request.getQueryString() != null)
