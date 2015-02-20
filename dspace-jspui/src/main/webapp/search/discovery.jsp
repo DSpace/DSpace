@@ -184,7 +184,7 @@
     }
 %>                                </select><br/>
                                 <label for="query"><fmt:message key="jsp.search.results.searchfor"/></label>
-                                <input type="text" size="50" name="query" value="<%= (query==null ? "" : StringEscapeUtils.escapeHtml(query)) %>"/>
+                                <input type="text" size="50" name="query" value="<%= (query==null ? "" : Utils.addEntities(escapeHtml(query)) %>"/>
                                 <input type="submit" value="<fmt:message key="jsp.general.go"/>" />
                                 <input type="hidden" value="<%= rpp %>" name="rpp" />
                                 <input type="hidden" value="<%= sortedBy %>" name="sort_by" />
