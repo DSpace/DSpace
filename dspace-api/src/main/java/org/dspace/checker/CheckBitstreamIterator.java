@@ -27,8 +27,9 @@ public final class CheckBitstreamIterator extends QueryBuilder
 {
     private static final Logger LOG = Logger.getLogger(CheckBitstreamIterator.class);
 
-    private Date before, after;
-    private ResultSet rs;
+    private Date before = null, after = null;
+    private PreparedStatement sqlStmt = null;
+    private ResultSet rs = null;
 
     public CheckBitstreamIterator(Context ctxt,
                                    String has_result, String[] has_not_results,
@@ -49,9 +50,22 @@ public final class CheckBitstreamIterator extends QueryBuilder
             String stmt = "SELECT MRC.bitstream_id, MRC.result, MRC.last_process_end_date, MRC.current_checksum, \n" +
                     "BITSTREAM.DELETED, BITSTREAM.internal_id, BITSTREAM.checksum_algorithm, BITSTREAM.checksum \n" +
                     "FROM MOST_RECENT_CHECKSUM MRC JOIN BITSTREAM ON BITSTREAM.BITSTREAM_ID = MRC.BITSTREAM_ID ";
-            rs = prepare(stmt).executeQuery();
+            sqlStmt = prepare(stmt);
+            rs = sqlStmt.executeQuery();
         }
-        return rs.next();
+        boolean nxt = rs.next();
+        if (! nxt)
+        {
+            sqlStmt.close();
+        }
+        return nxt;
+    }
+
+    public void close() throws SQLException
+    {
+        if (sqlStmt != null) {
+            sqlStmt.close();
+        }
     }
 
     public int bitstream_id() throws SQLException

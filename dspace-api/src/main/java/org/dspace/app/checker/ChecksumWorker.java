@@ -120,6 +120,7 @@ public final class ChecksumWorker
                     break;
                 }
             }
+            iter.close();
 
             System.out.println();
             System.out.println("# worked on " + (row-1) + " bitstreams");
@@ -164,6 +165,7 @@ public final class ChecksumWorker
             System.out.print(" lastDate=" + cur.getProcessEndDate());
             System.out.println();
         }
+        histIter.close();
     }
 
     private void countMatches(boolean verbose) throws SQLException

@@ -31,18 +31,19 @@ public final class ChecksumHistoryIterator
             + " CSH.process_end_date, CSH.checksum_expected, CSH.checksum_calculated, CSH.result  "
             + " from checksum_history CSH ";
 
-    private static final String COUNT_HISTORY = "select COUNT(*) "
-            + " from checksum_history CSH ";
+    private static final String COUNT_HISTORY = "select COUNT(*)  from checksum_history CSH ";
+    private static final String DELETE_HISTORY = "delete from checksum_history CSH ";
 
     private static final String BITSTREAM_WHERE = " where CSH.bitstream_id = ? ";
     private static final String ORDER_BY = " order by CSH.process_end_date desc ";
 
     private static final int UNDEFINED = -1;
-    private Context context;
-    private int bitstream_id;
-    private Date after, before;
+    private Context context = null;
+    private int bitstream_id = UNDEFINED;
+    private Date after = null, before = null;
     private QueryBuilder builder;
-    private ResultSet rs;
+    private PreparedStatement sqlStmt = null;
+    private ResultSet rs = null;
 
     /**
      * create iterator to loop over checksum_history entries for given bitstream
@@ -54,7 +55,6 @@ public final class ChecksumHistoryIterator
     {
         context = ctxt;
         this.bitstream_id = bitstream_id;
-        rs = null;
     }
 
     public ChecksumHistoryIterator(Context ctxt,
@@ -67,7 +67,6 @@ public final class ChecksumHistoryIterator
         builder = new QueryBuilder(ctxt, has_result, has_not_results, inside);
         after = after_date;
         before = before_date;
-        rs = null;
     }
 
     /**
@@ -75,9 +74,25 @@ public final class ChecksumHistoryIterator
      */
     public int count() throws SQLException
     {
-        ResultSet rs = buildResultSet(COUNT_HISTORY);
+        buildQuery(COUNT_HISTORY, "");
+        rs = sqlStmt.executeQuery();
         rs.next();
-        return rs.getInt(1);
+        int n =  rs.getInt(1);
+        sqlStmt.close();
+        return n;
+    }
+
+
+    /**
+     * delete checksum_history entries in this iterator
+     */
+    public void delete() throws SQLException
+    {
+        buildQuery(DELETE_HISTORY, "");
+        sqlStmt.executeUpdate();
+        LOG.debug("commit");
+        context.getDBConnection().commit();
+        sqlStmt.close();
     }
 
     /**
@@ -87,7 +102,8 @@ public final class ChecksumHistoryIterator
     {
         if (rs == null)
         {
-            rs = buildResultSet(SELECT_HISTORY);
+            buildQuery(SELECT_HISTORY, ORDER_BY);
+            rs = sqlStmt.executeQuery();
         }
         ChecksumHistory hist = null;
         if (rs.next())
@@ -99,13 +115,21 @@ public final class ChecksumHistoryIterator
             String computed = rs.getString(5);
             String resultCode = rs.getString(6);
             hist = new ChecksumHistory(bitId, startDate, endDate, expected, computed, "", resultCode);
+        } else
+        {
+            sqlStmt.close();
         }
         return hist;
     }
 
-    private ResultSet buildResultSet(String stmt) throws SQLException
+    public void close() throws SQLException
     {
-        PreparedStatement sqlStmt = null;
+        if (sqlStmt != null)
+            sqlStmt.close();
+    }
+
+    private void  buildQuery(String stmt, String order) throws SQLException
+    {
         if (bitstream_id != UNDEFINED)
         {
             stmt = stmt + BITSTREAM_WHERE + ORDER_BY;
@@ -117,16 +141,16 @@ public final class ChecksumHistoryIterator
             String operator = " WHERE ";
             if (before != null)
             {
-                stmt = stmt + operator + " MRC.LAST_PROCESS_END_DATE < ? ";
+                stmt = stmt + operator + " CSH.PROCESS_END_DATE < ? ";
                 operator = " AND ";
             }
             if (after != null)
             {
-                stmt = stmt + operator + " MRC.LAST_PROCESS_END_DATE >= ?";
+                stmt = stmt + operator + " CSH.PROCESS_END_DATE >= ?";
                 operator = " AND ";
             }
             stmt = stmt + builder.where_clause(operator, "CSH");
-            stmt = stmt + ORDER_BY;
+            stmt = stmt + order;
 
             sqlStmt = builder.prepareStatement(stmt);
             int pos = 1;
@@ -150,7 +174,6 @@ public final class ChecksumHistoryIterator
             }
             sqlStmt = builder.prepare(pos, sqlStmt);
         }
-        return sqlStmt.executeQuery();
     }
 
     public String propertyString(String sep)

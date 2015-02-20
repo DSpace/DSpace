@@ -92,7 +92,8 @@ public final class ChecksumHistoryWorker
 
     private void delete() throws SQLException
     {
-        System.out.println("NOT IMPLEMENTED");
+        iter.delete();
+        System.out.println("delete " + "\t" + iter.propertyString("\t"));
     }
 
     public static void main(String[] args)
