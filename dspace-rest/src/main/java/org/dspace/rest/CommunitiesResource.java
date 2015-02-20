@@ -36,52 +36,19 @@ http://localhost:8080/<webapp>/communities
 public class CommunitiesResource {
     private static Logger log = Logger.getLogger(CommunitiesResource.class);
 
-    private static org.dspace.core.Context context;
-
     private static final boolean writeStatistics;
 	
 	static{
 		writeStatistics=ConfigurationManager.getBooleanProperty("rest","stats",false);
 	}
-    
-    /*
-    The "GET" annotation indicates this method will respond to HTTP Get requests.
-    The "Produces" annotation indicates the MIME response the method will return.
-     */
-    @GET
-    @Produces(MediaType.TEXT_HTML)
-    public String list() {
-        StringBuilder everything = new StringBuilder();
-        try {
-            if(context == null || !context.isValid() ) {
-                context = new org.dspace.core.Context();
-                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
-                context.getDBConnection().setAutoCommit(true);
-            }
-            org.dspace.content.Community[] communities = org.dspace.content.Community.findAllTop(context);
-            for(org.dspace.content.Community community : communities) {
-                everything.append(community.getName() + "<br/>\n");
-            }
-            return "<html><title>Hello!</title><body>Communities:<br/>" + everything.toString() + ".</body></html> ";
-
-        } catch (SQLException e) {
-            log.error(e.getMessage());
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    //TODO Respond to html for communities/:id
 
     @GET
     @Path("/")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public org.dspace.rest.common.Community[] list(@QueryParam("expand") String expand) {
+        org.dspace.core.Context context = null;
         try {
-            if(context == null || !context.isValid() ) {
-                context = new org.dspace.core.Context();
-                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
-                context.getDBConnection().setAutoCommit(true);
-            }
+            context = new org.dspace.core.Context();
 
             org.dspace.content.Community[] topCommunities = org.dspace.content.Community.findAllTop(context);
             ArrayList<org.dspace.rest.common.Community> communityArrayList = new ArrayList<org.dspace.rest.common.Community>();
@@ -98,7 +65,15 @@ public class CommunitiesResource {
         } catch (SQLException e) {
             log.error(e.getMessage());
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        } //finally?
+        } finally {
+            if(context != null) {
+                try {
+                    context.complete();
+                } catch (SQLException e) {
+                    log.error(e.getMessage() + " occurred while trying to close");
+                }
+            }
+        }
     }
 
     @GET
@@ -107,17 +82,14 @@ public class CommunitiesResource {
     public org.dspace.rest.common.Community getCommunity(@PathParam("community_id") Integer community_id, @QueryParam("expand") String expand,
     		@QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
     		@Context HttpHeaders headers, @Context HttpServletRequest request) {
+        org.dspace.core.Context context = null;
         try {
-            if(context == null || !context.isValid() ) {
-                context = new org.dspace.core.Context();
-                //Failed SQL is ignored as a failed SQL statement, prevent: current transaction is aborted, commands ignored until end of transaction block
-                context.getDBConnection().setAutoCommit(true);
-            }
+            context = new org.dspace.core.Context();
 
             org.dspace.content.Community community = org.dspace.content.Community.find(context, community_id);
             if(AuthorizeManager.authorizeActionBoolean(context, community, org.dspace.core.Constants.READ)) {
             	if(writeStatistics){
-    				writeStats(community_id, user_ip, user_agent, xforwarderfor, headers, request);
+    				writeStats(context, community_id, user_ip, user_agent, xforwarderfor, headers, request);
     			}
                 return new org.dspace.rest.common.Community(community, expand, context);
             } else {
@@ -126,10 +98,18 @@ public class CommunitiesResource {
         } catch (SQLException e) {
             log.error(e.getMessage());
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        } //finally?
+        } finally {
+            if(context != null) {
+                try {
+                    context.complete();
+                } catch (SQLException e) {
+                    log.error(e.getMessage() + " occurred while trying to close");
+                }
+            }
+        }
     }
     
-    private void writeStats(Integer community_id, String user_ip, String user_agent,
+    private void writeStats(org.dspace.core.Context context, Integer community_id, String user_ip, String user_agent,
  			String xforwarderfor, HttpHeaders headers,
  			HttpServletRequest request) {
  		

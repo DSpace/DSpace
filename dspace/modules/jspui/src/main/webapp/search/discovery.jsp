@@ -149,6 +149,9 @@
 				}
 			});
 	});
+	function validateFilters() {
+		return document.getElementById("filterquery").value.length > 0;
+	}
 </script>		
 </c:set>
 
@@ -285,11 +288,11 @@
 			}
 		%>
 		</select>
-		<input type="text" id="filterquery" name="filterquery" size="45"/>
+		<input type="text" id="filterquery" name="filterquery" size="45" required="required" />
         <input type="hidden" value="<%= rpp %>" name="rpp" />
         <input type="hidden" value="<%= sortedBy %>" name="sort_by" />
         <input type="hidden" value="<%= order %>" name="order" />
-		<input class="btn btn-default" type="submit" value="<fmt:message key="jsp.search.filter.add"/>" />
+		<input class="btn btn-default" type="submit" value="<fmt:message key="jsp.search.filter.add"/>" onclick="return validateFilters()" />
 		</form>
 		</div>        
 <% } %>
@@ -458,7 +461,7 @@ else if( qResults != null)
 
 %>
 <hr/>
-<div class="discovery-result-pagination">
+<div class="discovery-result-pagination row container">
 <%
 	long lastHint = qResults.getStart()+qResults.getMaxResults() <= qResults.getTotalSearchResults()?
 	        qResults.getStart()+qResults.getMaxResults():qResults.getTotalSearchResults();
@@ -552,7 +555,7 @@ else if( qResults != null)
 <%-- if the result page is enought long... --%>
 <% if ((communities.length + collections.length + items.length) > 10) {%>
 <%-- show again the navigation info/links --%>
-<div class="discovery-result-pagination">
+<div class="discovery-result-pagination row container">
     <%-- <p align="center">Results <//%=qResults.getStart()+1%>-<//%=qResults.getStart()+qResults.getHitHandles().size()%> of --%>
 	<div class="alert alert-info"><fmt:message key="jsp.search.results.results">
         <fmt:param><%=qResults.getStart()+1%></fmt:param>

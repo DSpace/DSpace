@@ -707,7 +707,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                     // This is so that we can then highlight the correct option in the navigation
                     SortOption bso = bi.getSortOption();
                     SortOption so = SortOption.getSortOption(sortBy);
-                    if ( bso != null && bso.equals(so))
+                    if ( bso != null && !bso.equals(so))
                     {
                         BrowseIndex newBi = BrowseIndex.getBrowseIndex(so);
                         if (newBi != null)

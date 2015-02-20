@@ -7,12 +7,7 @@
  */
 package org.dspace.discovery;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.net.MalformedURLException;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
@@ -31,7 +26,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.TreeMap;
 import java.util.Vector;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -39,7 +33,6 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -53,6 +46,8 @@ import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.request.AbstractUpdateRequest;
+import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
@@ -61,6 +56,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.*;
 import org.apache.solr.common.util.NamedList;
+import org.apache.solr.handler.extraction.ExtractingParams;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -148,7 +144,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     solr = new HttpSolrServer(solrService);
 
                     solr.setBaseURL(solrService);
-
+                    solr.setUseMultiPartPost(true);
                     SolrQuery solrQuery = new SolrQuery()
                             .setQuery("search.resourcetype:2 AND search.resourceid:1");
 
@@ -504,17 +500,34 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 return;
             }
             long start = System.currentTimeMillis();
-            System.out.println("SOLR Search Optimize -- Process Started:"+start);
+            System.out.println("SOLR Search Optimize -- Process Started:" + start);
             getSolr().optimize();
             long finish = System.currentTimeMillis();
-            System.out.println("SOLR Search Optimize -- Process Finished:"+finish);
-            System.out.println("SOLR Search Optimize -- Total time taken:"+(finish-start) + " (ms).");
+            System.out.println("SOLR Search Optimize -- Process Finished:" + finish);
+            System.out.println("SOLR Search Optimize -- Total time taken:" + (finish - start) + " (ms).");
         } catch (SolrServerException sse)
         {
             System.err.println(sse.getMessage());
         } catch (IOException ioe)
         {
             System.err.println(ioe.getMessage());
+        }
+    }
+
+    public void buildSpellCheck() throws SearchServiceException {
+        try {
+            if (getSolr() == null) {
+                return;
+            }
+            SolrQuery solrQuery = new SolrQuery();
+            solrQuery.set("spellcheck", true);
+            solrQuery.set(SpellingParams.SPELLCHECK_BUILD, true);
+            getSolr().query(solrQuery);
+        }catch (SolrServerException e)
+        {
+            //Make sure to also log the exception since this command is usually run from a crontab.
+            log.error(e, e);
+            throw new SearchServiceException(e);
         }
     }
 
@@ -666,15 +679,47 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
     /**
      * Write the document to the index under the appropriate handle.
+     *
      * @param doc the solr document to be written to the server
+     * @param streams
      * @throws IOException IO exception
      */
-    protected void writeDocument(SolrInputDocument doc) throws IOException {
+    protected void writeDocument(SolrInputDocument doc, List<BitstreamContentStream> streams) throws IOException {
 
         try {
             if(getSolr() != null)
             {
-                getSolr().add(doc);
+                if(CollectionUtils.isNotEmpty(streams))
+                {
+                    ContentStreamUpdateRequest req = new ContentStreamUpdateRequest("/update/extract");
+
+                    for(BitstreamContentStream bce : streams)
+                    {
+                        req.addContentStream(bce);
+                    }
+
+                    ModifiableSolrParams params = new ModifiableSolrParams();
+
+                    //req.setParam(ExtractingParams.EXTRACT_ONLY, "true");
+                    for(String name : doc.getFieldNames())
+                    {
+                        for(Object val : doc.getFieldValues(name))
+                        {
+                             params.add(ExtractingParams.LITERALS_PREFIX + name,val.toString());
+                        }
+                    }
+
+                    req.setParams(params);
+                    req.setParam(ExtractingParams.UNKNOWN_FIELD_PREFIX, "attr_");
+                    req.setParam(ExtractingParams.MAP_PREFIX + "content", "fulltext");
+                    req.setParam(ExtractingParams.EXTRACT_FORMAT, "text");
+                    req.setAction(AbstractUpdateRequest.ACTION.COMMIT, true, true);
+                    req.process(getSolr());
+                }
+                else
+                {
+                    getSolr().add(doc);
+                }
             }
         } catch (SolrServerException e)
         {
@@ -727,7 +772,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             solrServiceIndexPlugin.additionalIndex(context, community, doc);
         }
 
-        writeDocument(doc);
+        writeDocument(doc, null);
     }
 
     /**
@@ -783,7 +828,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             solrServiceIndexPlugin.additionalIndex(context, collection, doc);
         }
 
-        writeDocument(doc);
+        writeDocument(doc, null);
     }
 
     /**
@@ -1300,7 +1345,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         log.debug("  Added Grouping");
 
 
-        Vector<InputStreamReader> readers = new Vector<InputStreamReader>();
+
+        List<BitstreamContentStream> streams = new ArrayList<BitstreamContentStream>();
 
         try {
             // now get full text of any bitstreams in the TEXT bundle
@@ -1318,18 +1364,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     for (Bitstream myBitstream : myBitstreams)
                     {
                         try {
-                            InputStreamReader is = new InputStreamReader(
-                                    myBitstream.retrieve()); // get input
-                            readers.add(is);
 
-                            // Add each InputStream to the Indexed Document
-                            String value = IOUtils.toString(is);
-                            doc.addField("fulltext", value);
-
-                            if(hitHighlightingFields.contains("*") || hitHighlightingFields.contains("fulltext"))
-                            {
-                                doc.addField("fulltext_hl", value);
-                            }
+                            streams.add(new BitstreamContentStream(myBitstream));
 
                             log.debug("  Added BitStream: "
                                     + myBitstream.getStoreNumber() + "	"
@@ -1349,16 +1385,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         {
             log.error(e.getMessage(), e);
         }
-        finally {
-            Iterator<InputStreamReader> itr = readers.iterator();
-            while (itr.hasNext()) {
-                InputStreamReader reader = itr.next();
-                if (reader != null) {
-                    reader.close();
-                }
-            }
-            log.debug("closed " + readers.size() + " readers");
-        }
 
         //Do any additional indexing, depends on the plugins
         List<SolrServiceIndexPlugin> solrServiceIndexPlugins = new DSpace().getServiceManager().getServicesByType(SolrServiceIndexPlugin.class);
@@ -1369,7 +1395,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         // write the index and close the inputstreamreaders
         try {
-            writeDocument(doc);
+            writeDocument(doc, streams);
             log.info("Wrote Item: " + handle + " to Index");
         } catch (RuntimeException e)
         {

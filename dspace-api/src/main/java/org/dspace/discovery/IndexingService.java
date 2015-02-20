@@ -7,6 +7,7 @@
  */
 package org.dspace.discovery;
 
+import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 
@@ -58,4 +59,6 @@ public interface IndexingService {
     void commit() throws SearchServiceException;
 
     void optimize() throws SearchServiceException;
+
+    void buildSpellCheck() throws SearchServiceException;
 }
