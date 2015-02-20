@@ -27,18 +27,18 @@ public class QueryBuilder
 {
     private static final Logger LOG = Logger.getLogger(QueryBuilder.class);
 
-    static final String THIS_BITSTREAM = "MRC.BITSTREAM_ID = ?";
+    static final String THIS_BITSTREAM = "BITSTREAM_ID = ?";
 
-    static final String BITSTREAMS_IN_ITEM = "MRC.BITSTREAM_ID in \n" +
+    static final String BITSTREAMS_IN_ITEM = "BITSTREAM_ID in \n" +
             "(SELECT BITSTREAM_ID FROM BUNDLE2BITSTREAM WHERE BUNDLE_ID in\n" +
             "   (SELECT BUNDLE_ID FROM ITEM2BUNDLE WHERE ITEM_ID = ?))";
 
-    static final String BITSTREAMS_IN_COLLECTION = "MRC.BITSTREAM_ID in \n" +
+    static final String BITSTREAMS_IN_COLLECTION = "BITSTREAM_ID in \n" +
             "(SELECT BITSTREAM_ID FROM BUNDLE2BITSTREAM WHERE BUNDLE_ID in\n" +
             "  (SELECT BUNDLE_ID FROM ITEM2BUNDLE WHERE ITEM_ID  in\n" +
             "     (SELECT ITEM_ID FROM COLLECTION2ITEM WHERE COLLECTION_ID = ?)))";
 
-    static final String BITSTREAMS_IN_COMMUNITY = "MRC.BITSTREAM_ID in \n" +
+    static final String BITSTREAMS_IN_COMMUNITY = "BITSTREAM_ID in \n" +
             "(SELECT BITSTREAM_ID FROM BUNDLE2BITSTREAM WHERE BUNDLE_ID in\n" +
             "   (SELECT BUNDLE_ID FROM ITEM2BUNDLE WHERE ITEM_ID  in\n" +
             "      (SELECT ITEM_ID  FROM COLLECTION2ITEM WHERE COLLECTION_ID in \n" +
@@ -83,16 +83,16 @@ public class QueryBuilder
             switch (root.getType())
             {
                 case Constants.ITEM:
-                    bitstream_ids = BITSTREAMS_IN_ITEM;
+                    bitstream_ids = tableName + "." + BITSTREAMS_IN_ITEM;
                     break;
                 case Constants.COLLECTION:
-                    bitstream_ids = BITSTREAMS_IN_COLLECTION;
+                    bitstream_ids = tableName + "." + BITSTREAMS_IN_COLLECTION;
                     break;
                 case Constants.COMMUNITY:
-                    bitstream_ids = BITSTREAMS_IN_COMMUNITY;
+                    bitstream_ids = tableName + "." + BITSTREAMS_IN_COMMUNITY;
                     break;
                 case Constants.BITSTREAM:
-                    bitstream_ids = THIS_BITSTREAM;
+                    bitstream_ids = tableName + "." + THIS_BITSTREAM;
                     break;
                 default:
                     throw new RuntimeException(root.toString() + " does not contains Bitstreams");
