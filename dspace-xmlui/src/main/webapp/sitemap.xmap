@@ -184,7 +184,7 @@
                         <map:selector name="AuthenticatedSelector" src="org.dspace.app.xmlui.aspect.general.AuthenticatedSelector"/>
                 </map:selectors>
                 <map:readers default="resource">
-                    <map:reader name="resource" src="org.apache.cocoon.reading.ResourceReader"
+                    <map:reader name="resource" src="org.dspace.app.xmlui.cocoon.SafeResourceReader"
                             logger="sitemap.reader.resource" pool-max="32">
                             <expires>3600000</expires> <!-- 1000 * 60 * 60 = 3600000 = One hour -->
                     </map:reader>
