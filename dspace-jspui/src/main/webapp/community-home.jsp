@@ -32,6 +32,7 @@
 <%@ page import="org.dspace.browse.ItemCounter" %>
 <%@ page import="org.dspace.content.*" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
+<%@ page import="org.dspace.core.Utils" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%
