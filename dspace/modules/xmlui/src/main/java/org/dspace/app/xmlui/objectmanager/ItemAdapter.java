@@ -921,7 +921,17 @@ public class ItemAdapter extends AbstractAdapter {
     String checksum = bitstream.getChecksum();
     long size = bitstream.getSize();
     int views = bitstream.getIntMetadata("views");
-
+    
+    
+    //Check if bitstream has an embargo. If yes, display a 'Restricted Access' description with bitstream.
+    boolean flagEmbargo=false;
+    try{
+       if(bitstream.isETDEmbargo()) {  
+           flagEmbargo=true;
+       }
+    }catch(SQLException e){
+        e.printStackTrace();
+    }
     // ////////////////////////////////
     // Start the actual file
     attributes = new AttributeMap();
@@ -939,6 +949,7 @@ public class ItemAdapter extends AbstractAdapter {
     }
     attributes.put("SIZE", String.valueOf(size));
     attributes.put("VIEWS", String.valueOf(views));
+    attributes.put("EMBARGO", String.valueOf(flagEmbargo));
     startElement(METS, "file", attributes);
 
     // ////////////////////////////////////
