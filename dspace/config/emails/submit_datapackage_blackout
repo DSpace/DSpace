@@ -13,18 +13,27 @@ Subject: Dryad submission approved pending publication {1}
 
 Dear {4},
 
-Your submission to the Dryad repository has been approved, and will be available in the repository once the associated article has been published.  Your data package has been approved and assigned a unique identifier, called a DOI.
+Thank you for your submission to the Dryad repository. Your data package has been approved, and will be available in the repository once the associated article has been published. 
 
 Title: {0}
-Data identifier: {1}
+DOI: {1}
 Journal manuscript number: {5}
 
-You will receive another email when your data is made available.  If you did not request a data embargo, your data will be publicly available after the article is published.
+You will receive another email when your data package is released. If you did not request a data embargo, your file(s) will be available for download after the article is published.
 
-Ensure that your readers can find your data!
 
-We recommend that the article include a link to the Dryad data as follows:
-Data available from the Dryad Digital Repository: http://doi.org/10.5061/dryad.NNNNN 
+CITING YOUR DRYAD DATA
+
+Ensure that readers can find your data!
+
+We recommend that the article include a link to the Dryad data as follows (subsitute your DOI suffix for the xxxxx):
+
+Data available from the Dryad Digital Repository: http://dx.doi.org/10.5061/dryad.xxxxx 
+
+Your journal may follow the CrossRef recommendation that the data package be cited in the article Reference list. If so, the citation should include the Dryad package DOI, e.g.: 
+
+Author(s) (Year). Data from [title]. Dryad Digital Repository. {1}
+
 
 Check out the information for depositors at http://datadryad.org/pages/faq
 - How do I refer to my Dryad data in my article?
@@ -33,7 +42,8 @@ Check out the information for depositors at http://datadryad.org/pages/faq
 - If my data files are embargoed, when will they be released?
 - and more!
 
-Thanks again for taking this important step to preserve and share your research data. We welcome your feedback! Contact us at help@datadryad.org.
+Thanks again for taking this important step to preserve and share your research data.
+We welcome your feedback! Contact us at help@datadryad.org.
 
 The Dryad Team
 datadryad.org 

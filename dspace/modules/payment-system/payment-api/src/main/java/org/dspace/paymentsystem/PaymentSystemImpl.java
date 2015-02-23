@@ -89,7 +89,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
 
 
 
-    protected static final String Country_Help_Text= "Submitters requesting a Waiver must be employees of an institution in an eligible country or be independent researchers in residence in an eligible country. Eligible countries are those classified by the World Bank as low-income or lower-middle-income economies.";
+    protected static final String Country_Help_Text= "Submitters requesting a waiver must be employees of an institution in an eligible country or be independent researchers in residence in an eligible country. Eligible countries are those classified by the World Bank as low-income or lower-middle-income economies.";
 
     protected static final String Voucher_Help_Text="Organizations may sponsor submissions to Dryad by purchasing and distributing voucher codes redeemable for one Data Publishing Charge.  Submitters redeeming vouchers may only use them with the permission of the purchaser.";
 
@@ -534,7 +534,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
                 Voucher v = Voucher.findById(c, shoppingCart.getVoucher());
                 if(v != null)
                 {
-                    result += format("Voucher Applied", v.getCode());
+                    result += format("Voucher applied", v.getCode());
                 }
             }catch (Exception e)
             {
@@ -660,7 +660,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
 
             countryList.setLabel(T_Country);
             countryList.setHelp(Country_Help_Text);
-            countryList.addOption("","Select Your Country");
+            countryList.addOption("","Select your country");
             for(String temp:countryArray){
                 String[] countryTemp = temp.split(":");
                 if(shoppingCart.getCountry()!=null&&shoppingCart.getCountry().length()>0&&shoppingCart.getCountry().equals(countryTemp[0])) {
@@ -675,7 +675,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
 
         if(shoppingCart.getCountry().length()>0)
         {
-            info.addItem("remove-country","remove-country").addXref("#","Remove Country : "+shoppingCart.getCountry());
+            info.addItem("remove-country","remove-country").addXref("#","Remove country : "+shoppingCart.getCountry());
         }
         else
         {
@@ -739,7 +739,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
         voucher.addButton("apply","apply");
         if(voucher1!=null){
             voucherText.setValue(voucher1.getCode());
-            info.addItem("remove-voucher","remove-voucher").addXref("#", "Remove Voucher : " + voucher1.getCode(), "remove-voucher", "remove-voucher");
+            info.addItem("remove-voucher","remove-voucher").addXref("#", "Remove voucher : " + voucher1.getCode(), "remove-voucher", "remove-voucher");
         }
         else{
             info.addItem("remove-voucher","remove-voucher").addXref("#", "", "remove-voucher", "remove-voucher");

@@ -20,4 +20,10 @@
 
     <bean class="org.dspace.identifier.DOIIdentifierProvider" scope="singleton"/>
 
+    <bean id="com.atmire.authority.indexer.FileIndexer" class="org.datadryad.authority.FileIndexer"/>
+
+
+    <bean id="com.atmire.authority.indexer.LocalIndexer" class="org.datadryad.authority.LocalIndexer"/>
+
+
 </beans>

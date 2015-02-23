@@ -34,6 +34,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
 import org.dspace.eperson.Group;
+import org.dspace.paymentsystem.PaymentSystemConfigurationManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -166,7 +167,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
 
         //Check if a system administrator
-        boolean isSystemAdmin = AuthorizeManager.isAdmin(this.context);
+        boolean isSystemAdmin = AuthorizeManager.isCuratorOrAdmin(this.context);
+
 
         if(isSystemAdmin){
             addContextualOptions(context);

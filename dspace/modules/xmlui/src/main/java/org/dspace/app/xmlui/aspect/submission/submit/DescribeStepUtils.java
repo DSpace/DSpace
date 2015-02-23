@@ -988,12 +988,12 @@ public class DescribeStepUtils extends AbstractDSpaceTransformer {
             }
         }
 
-        form.addLabel(dcInput.getLabel());
         if (filePresent == null) {
             //We do not have a file (yet) so show an upload box
 
             org.dspace.app.xmlui.wing.element.Item fileItem = form.addItem();
             File file = fileItem.addFile(fieldName);
+            file.setLabel(dcInput.getLabel());
             fileItem.addHidden(fieldName + "-description").setValue(fieldName);
 
 
@@ -1005,10 +1005,13 @@ public class DescribeStepUtils extends AbstractDSpaceTransformer {
 
             file.setHelp(dcInput.getHints());
         } else {
+            form.addLabel(dcInput.getLabel());
             //We have the file create an url for it
             String url = makeBitstreamLink(contextPath, item, filePresent);
-//            org.dspace.app.xmlui.wing.element.Item fileItem = form.addItem();
+
+            //org.dspace.app.xmlui.wing.element.Item fileItem = form.addItem();
             Item fileItem = form.addItem("submission-file-" + fieldName, "");
+            
             fileItem.addHighlight("head").addContent(message("xmlui.Submission.submit.UploadStep.column2"));
             fileItem.addHighlight("head").addContent(message("xmlui.Submission.submit.UploadStep.column3"));
             fileItem.addHighlight("head").addContent(message("xmlui.Submission.submit.UploadStep.column5"));

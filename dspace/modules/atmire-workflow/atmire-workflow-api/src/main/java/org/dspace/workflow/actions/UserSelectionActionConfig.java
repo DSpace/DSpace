@@ -18,4 +18,11 @@ public class UserSelectionActionConfig extends WorkflowActionConfig{
     public UserSelectionAction getProcessingAction(){
         return (UserSelectionAction) processingAction;
     }
+
+    // Spring requires getter/setter types to match, so even though
+    // we don't need a custom setter, we must have a setter that takes the same
+    // parameter type as the above getter.
+    public void setProcessingAction(UserSelectionAction processingAction) {
+        super.setProcessingAction(processingAction);
+    }
 }

@@ -34,7 +34,9 @@ public class ManuscriptMetadataSynchronizationHandler implements HandlerInterfac
 
     private static void completeContext(Context context) throws SQLException {
         try {
-            context.complete();
+            if(context != null) {
+                context.complete();
+            }
         } catch (SQLException ex) {
             // Abort the context to force a new connection
             abortContext(context);
@@ -43,7 +45,9 @@ public class ManuscriptMetadataSynchronizationHandler implements HandlerInterfac
     }
 
     private static void abortContext(Context context) {
-        context.abort();
+        if(context != null) {
+            context.abort();
+        }
     }
 
     @Override
@@ -95,8 +99,18 @@ public class ManuscriptMetadataSynchronizationHandler implements HandlerInterfac
     private void processChange(Manuscript manuscript) throws HandlerException {
         try {
             Context context = getContext();
-            DryadDataPackage dataPackage = findDataPackage(manuscript, context);
+            DryadDataPackage dataPackage = null;
+            try {
+                 dataPackage = findDataPackage(manuscript, context);
+            } catch (HandlerException ex) {
+                // Lookup threw an exception
+                abortContext(context);
+                context = null;
+                throw ex;
+            }
             if(dataPackage == null) {
+                abortContext(context);
+                context = null;
                 throw new HandlerException("Data package not found for manuscript: " + manuscript.manuscriptId);
             }
             // Check if rejected or accepted
@@ -106,6 +120,7 @@ public class ManuscriptMetadataSynchronizationHandler implements HandlerInterfac
                 associateWithManuscript(dataPackage, manuscript);
             }
             completeContext(context);
+            context = null;
         } catch (SQLException ex) {
             throw new HandlerException("SQLException updating Data Package with metadata", ex);
         }

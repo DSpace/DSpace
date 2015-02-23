@@ -58,7 +58,7 @@ public class ModelPublication
         "Journal","ISSN", "Manuscript","Article_Title",
         "Article_Type","Author","Email","Corresponding_Author",
         "keyword", "Abstract", "Article_Status", "Citation_Title",
-        "Citation_Authors"
+        "Citation_Authors", "Publication_DOI"
     );
 
 	/**
@@ -563,7 +563,11 @@ public class ModelPublication
                             if(tag.equals("Citation_Authors")) {
                                 pbean.setCitationAuthors(StringEscapeUtils.unescapeXml(text).trim());
                             }
-	            
+                            if(tag.equals("Publication_DOI")) {
+                                String doi = StringEscapeUtils.unescapeXml(text).trim();
+                                pbean.setDOI(formatDOI(doi));
+                            }
+
 			}
 
 		    }
@@ -679,16 +683,7 @@ public class ModelPublication
 		pBean.setAbstract(pubAbstract);
 
 		String doi = req.getParameter("doi");
-		if (doi != null && doi.length() > 0) {
-			doi = doi.trim();
-			if (doi.startsWith("http://dx.doi.org/")) {
-				doi = doi.replace("http://dx.doi.org/", "doi:");
-			}
-			if (doi.startsWith("10.")) {
-				doi = "doi:" + doi;
-			}
-		}
-		pBean.setDOI(doi);
+		pBean.setDOI(formatDOI(doi));
 
 		String journalName = req.getParameter("journalName");
 		pBean.setJournalName(journalName);
@@ -857,5 +852,18 @@ public class ModelPublication
 			return null;
 		}
 	}
+
+        private static String formatDOI(String doi) {
+            if (doi != null && doi.length() > 0) {
+                    doi = doi.trim();
+                    if (doi.startsWith("http://dx.doi.org/")) {
+                            doi = doi.replace("http://dx.doi.org/", "doi:");
+                    }
+                    if (doi.startsWith("10.")) {
+                            doi = "doi:" + doi;
+                    }
+            }
+            return doi;
+        }
 
 }

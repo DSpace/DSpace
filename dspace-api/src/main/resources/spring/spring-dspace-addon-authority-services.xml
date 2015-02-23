@@ -26,11 +26,14 @@
     <!-- the bean processor interceptor -->
     <bean class="org.dspace.servicemanager.spring.DSpaceBeanPostProcessor" />
 
-    <!-- Authority control -->
-    <bean class="org.dspace.content.authority.SolrAuthorityServiceImpl" id="org.dspace.authority.AuthoritySearchService"/>
-    <alias name="org.dspace.authority.AuthoritySearchService"  alias="org.dspace.content.authority.EditableAuthorityIndexingService"/>
+    <!-- Old Solr Authority control (search and Indexing service -->
+    <bean id="org.dspace.authority.AuthoritySearchService" class="org.dspace.authority.AuthoritySolrServiceImpl" />
+    <alias alias="org.dspace.authority.indexer.AuthorityIndexingService"         name="org.dspace.authority.AuthoritySearchService" />
 
-    <bean id="dspace.DSpaceAuthorityIndexer" class="org.dspace.authority.indexer.DSpaceAuthorityIndexer"/>
+    <!-- New editable Authority Indexing Service -->
+    <bean id="org.dspace.content.authority.EditableAuthorityIndexingService" class="org.dspace.content.authority.SolrAuthorityServiceImpl" />
+
+    <!--<bean id="dspace.DSpaceAuthorityIndexer" class="org.dspace.authority.indexer.DSpaceAuthorityIndexer"/>    -->
 
     <bean name="AuthorityTypes" class="org.dspace.authority.AuthorityTypes">
 

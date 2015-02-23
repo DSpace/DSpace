@@ -32,6 +32,7 @@ public class AuthHelper {
         }
         Context context = new Context();
         EPerson eperson = EPerson.find(context, id);
+        context.abort();
         return eperson;
     }
 
