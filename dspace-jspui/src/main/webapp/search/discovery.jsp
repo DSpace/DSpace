@@ -33,6 +33,7 @@
   -   admin_button     - If the user is an admin
   --%>
 
+<%@page import="org.dspace.core.Utils"%>
 <%@page import="org.dspace.discovery.configuration.DiscoverySearchFilterFacet"%>
 <%@page import="org.dspace.app.webui.util.UIUtil"%>
 <%@page import="java.util.HashMap"%>
@@ -55,7 +56,6 @@
     prefix="c" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
-<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="java.net.URLEncoder"            %>
 <%@ page import="org.dspace.content.Community"   %>
 <%@ page import="org.dspace.content.Collection"  %>
@@ -192,10 +192,10 @@
     }
 %>                                </select><br/>
                                 <label for="query"><fmt:message key="jsp.search.results.searchfor"/></label>
-                                <input type="text" size="50" id="query" name="query" value="<%= (query==null ? "" : StringEscapeUtils.escapeHtml(query)) %>"/>
+                                <input type="text" size="50" id="query" name="query" value="<%= (query==null ? "" : Utils.addEntities(query)) %>"/>
                                 <input type="submit" id="main-query-submit" class="btn btn-primary" value="<fmt:message key="jsp.general.go"/>" />
 <% if (StringUtils.isNotBlank(spellCheckQuery)) {%>
-	<p class="lead"><fmt:message key="jsp.search.didyoumean"><fmt:param><a id="spellCheckQuery" data-spell="<%= StringEscapeUtils.escapeHtml(spellCheckQuery) %>" href="#"><%= spellCheckQuery %></a></fmt:param></fmt:message></p>
+	<p class="lead"><fmt:message key="jsp.search.didyoumean"><fmt:param><a id="spellCheckQuery" data-spell="<%= Utils.addEntities(spellCheckQuery) %>" href="#"><%= spellCheckQuery %></a></fmt:param></fmt:message></p>
 <% } %>                  
                                 <input type="hidden" value="<%= rpp %>" name="rpp" />
                                 <input type="hidden" value="<%= sortedBy %>" name="sort_by" />
@@ -214,7 +214,7 @@
 					for (DiscoverySearchFilter searchFilter : availableFilters)
 					{
 					    String fkey = "jsp.search.filter."+searchFilter.getIndexFieldName();
-					    %><option value="<%= searchFilter.getIndexFieldName() %>"<% 
+					    %><option value="<%= Utils.addEntities(searchFilter.getIndexFieldName()) %>"<% 
 					            if (filter[0].equals(searchFilter.getIndexFieldName()))
 					            {
 					                %> selected="selected"<%
@@ -225,7 +225,7 @@
 					if (!found)
 					{
 					    String fkey = "jsp.search.filter."+filter[0];
-					    %><option value="<%= filter[0] %>" selected="selected"><fmt:message key="<%= fkey %>"/></option><%
+					    %><option value="<%= Utils.addEntities(filter[0]) %>" selected="selected"><fmt:message key="<%= fkey %>"/></option><%
 					}
 				%>
 				</select>
@@ -234,11 +234,11 @@
 					for (String opt : options)
 					{
 					    String fkey = "jsp.search.filter.op."+opt;
-					    %><option value="<%= opt %>"<%= opt.equals(filter[1])?" selected=\"selected\"":"" %>><fmt:message key="<%= fkey %>"/></option><%
+					    %><option value="<%= Utils.addEntities(opt) %>"<%= opt.equals(filter[1])?" selected=\"selected\"":"" %>><fmt:message key="<%= fkey %>"/></option><%
 					}
 				%>
 				</select>
-				<input type="text" id="filter_value_<%=idx %>" name="filter_value_<%=idx %>" value="<%= StringEscapeUtils.escapeHtml(filter[2]) %>" size="45"/>
+				<input type="text" id="filter_value_<%=idx %>" name="filter_value_<%=idx %>" value="<%= Utils.addEntities(filter[2]) %>" size="45"/>
 				<input class="btn btn-default" type="submit" id="submit_filter_remove_<%=idx %>" name="submit_filter_remove_<%=idx %>" value="X" />
 				<br/>
 				<%
@@ -255,17 +255,17 @@
 		<h5><fmt:message key="jsp.search.filter.heading" /></h5>
 		<p class="discovery-search-filters-hint"><fmt:message key="jsp.search.filter.hint" /></p>
 		<form action="simple-search" method="get">
-		<input type="hidden" value="<%= StringEscapeUtils.escapeHtml(searchScope) %>" name="location" />
-		<input type="hidden" value="<%= StringEscapeUtils.escapeHtml(query) %>" name="query" />
+		<input type="hidden" value="<%= Utils.addEntities(searchScope) %>" name="location" />
+		<input type="hidden" value="<%= Utils.addEntities(query) %>" name="query" />
 		<% if (appliedFilterQueries.size() > 0 ) { 
 				int idx = 1;
 				for (String[] filter : appliedFilters)
 				{
 				    boolean found = false;
 				    %>
-				    <input type="hidden" id="filter_field_<%=idx %>" name="filter_field_<%=idx %>" value="<%= filter[0] %>" />
-					<input type="hidden" id="filter_type_<%=idx %>" name="filter_type_<%=idx %>" value="<%= filter[1] %>" />
-					<input type="hidden" id="filter_value_<%=idx %>" name="filter_value_<%=idx %>" value="<%= StringEscapeUtils.escapeHtml(filter[2]) %>" />
+				    <input type="hidden" id="filter_field_<%=idx %>" name="filter_field_<%=idx %>" value="<%= Utils.addEntities(filter[0]) %>" />
+					<input type="hidden" id="filter_type_<%=idx %>" name="filter_type_<%=idx %>" value="<%= Utils.addEntities(filter[1]) %>" />
+					<input type="hidden" id="filter_value_<%=idx %>" name="filter_value_<%=idx %>" value="<%= Utils.addEntities(filter[2]) %>" />
 					<%
 					idx++;
 				}
@@ -299,17 +299,17 @@
         <%-- Include a component for modifying sort by, order, results per page, and et-al limit --%>
    <div class="discovery-pagination-controls panel-footer">
    <form action="simple-search" method="get">
-   <input type="hidden" value="<%= StringEscapeUtils.escapeHtml(searchScope) %>" name="location" />
-   <input type="hidden" value="<%= StringEscapeUtils.escapeHtml(query) %>" name="query" />
+   <input type="hidden" value="<%= Utils.addEntities(searchScope) %>" name="location" />
+   <input type="hidden" value="<%= Utils.addEntities(query) %>" name="query" />
 	<% if (appliedFilterQueries.size() > 0 ) { 
 				int idx = 1;
 				for (String[] filter : appliedFilters)
 				{
 				    boolean found = false;
 				    %>
-				    <input type="hidden" id="filter_field_<%=idx %>" name="filter_field_<%=idx %>" value="<%= filter[0] %>" />
-					<input type="hidden" id="filter_type_<%=idx %>" name="filter_type_<%=idx %>" value="<%= filter[1] %>" />
-					<input type="hidden" id="filter_value_<%=idx %>" name="filter_value_<%=idx %>" value="<%= StringEscapeUtils.escapeHtml(filter[2]) %>" />
+				    <input type="hidden" id="filter_field_<%=idx %>" name="filter_field_<%=idx %>" value="<%= Utils.addEntities(filter[0]) %>" />
+					<input type="hidden" id="filter_type_<%=idx %>" name="filter_type_<%=idx %>" value="<%= Utils.addEntities(filter[1]) %>" />
+					<input type="hidden" id="filter_value_<%=idx %>" name="filter_value_<%=idx %>" value="<%= Utils.addEntities(filter[2]) %>" />
 					<%
 					idx++;
 				}
@@ -631,28 +631,30 @@ else
 		
 	for (DiscoverySearchFilterFacet facetConf : facetsConf)
 	{
-	    String f = facetConf.getIndexFieldName();
-	    List<FacetResult> facet = qResults.getFacetResult(f);
-	    if (facet.size() == 0)
-	    {
-	        facet = qResults.getFacetResult(f+".year");
+		if(qResults!=null) {
+		    String f = facetConf.getIndexFieldName();
+		    List<FacetResult> facet = qResults.getFacetResult(f);
 		    if (facet.size() == 0)
 		    {
-		        showFacets.put(f, false);
-		        continue;
+		        facet = qResults.getFacetResult(f+".year");
+			    if (facet.size() == 0)
+			    {
+			        showFacets.put(f, false);
+			        continue;
+			    }
 		    }
-	    }
-	    boolean showFacet = false;
-	    for (FacetResult fvalue : facet)
-	    { 
-			if(!appliedFilterQueries.contains(f+"::"+fvalue.getFilterType()+"::"+fvalue.getAsFilterQuery()))
-		    {
-		        showFacet = true;
-		        break;
+		    boolean showFacet = false;
+		    for (FacetResult fvalue : facet)
+		    { 
+				if(!appliedFilterQueries.contains(f+"::"+fvalue.getFilterType()+"::"+fvalue.getAsFilterQuery()))
+			    {
+			        showFacet = true;
+			        break;
+			    }
 		    }
-	    }
-	    showFacets.put(f, showFacet);
-	    brefine = brefine || showFacet;
+		    showFacets.put(f, showFacet);
+		    brefine = brefine || showFacet;
+		}
 	}
 	if (brefine) {
 %>
@@ -747,4 +749,3 @@ else
 <% } %>
 </dspace:sidebar>
 </dspace:layout>
-
