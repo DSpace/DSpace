@@ -643,7 +643,7 @@ public class ItemTag extends TagSupport
 
         {
             out.println("<br/><br/>");
-            showLicence();
+           // showLicence(); caso sgs 173058
         }
     }
 
@@ -716,7 +716,7 @@ public class ItemTag extends TagSupport
                 .getBooleanProperty("webui.licence_bundle.show"))
         {
             out.println("<br/><br/>");
-            showLicence();
+            //showLicence(); caso sgs 173058
         }
     }
 
