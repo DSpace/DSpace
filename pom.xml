@@ -97,6 +97,8 @@
                     <excludes>
                         <exclude>**/Abstract*</exclude>
                     </excludes>
+                    <!-- Detailed logs in reportsDirectory/testName-output.txt instead of stdout -->
+                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <!--
                     Enable to debug Maven Surefire tests in remote proces
                     <debugForkedProcess>true</debugForkedProcess>
