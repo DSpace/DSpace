@@ -108,12 +108,13 @@ function initFirstSubmissionForm() {
                 jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").hide();
             }
             else if (integrated==true) {
-                jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").show();
-                jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").hide();
-            }
-            else {
                 jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").show();
                 jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").hide();
+            }
+            else {
+                jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").show();
+                jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").hide();
+
             }
 
             enableNextButton();
@@ -254,10 +255,10 @@ function initFirstSubmissionForm() {
 
                 for (var i=0; i<journal_integrated_length; i++)
                 {
-                    var integrated = document.getElementById('aspect_submission_StepTransformer_field_journalIDStatusIntegrated').options[i].value;
+                    var integratedValue = document.getElementById('aspect_submission_StepTransformer_field_journalIDStatusIntegrated').options[i].value;
                     //alert(integrated);
 
-                    if(integrated == journal)
+                    if(integratedValue == journal)
                     {
                         //alert('found');
                         integrated = true;
@@ -271,12 +272,14 @@ function initFirstSubmissionForm() {
                 }
                 //else if (journal.indexOf('*') != -1) {
                 else if(integrated == true){
-                    jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").show();
-                    jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").hide();
-                }
-                else {
                     jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").show();
                     jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").hide();
+                    //update the order form after enter journal name
+                    updateOrder();
+                }
+                else {
+                    jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").show();
+                    jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").hide();
                     //update the order form after enter journal name
                     updateOrder();
                 }

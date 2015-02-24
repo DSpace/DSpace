@@ -7,6 +7,8 @@
  */
 package org.dspace.app.xmlui.aspect.authority.term;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
@@ -26,6 +28,7 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.authority.Concept;
 import org.dspace.content.authority.Scheme;
 import org.dspace.content.authority.Term;
+import org.dspace.core.Constants;
 
 /**
  * The manage term page is the starting point page for managing
@@ -139,7 +142,14 @@ public class ManageTermMain extends AbstractDSpaceTransformer
 
         int page          = parameters.getParameterAsInteger("page",0);
         int highlightID   = parameters.getParameterAsInteger("highlightID",-1);
-        String query      = decodeFromURL(parameters.getParameter("query",null));
+        String query_1      = parameters.getParameter("query", null);
+        String query = "";
+        try{
+            query= URLDecoder.decode(query_1, Constants.DEFAULT_ENCODING);
+        }catch (UnsupportedEncodingException e)
+        {
+            log.error("decode error:"+e);
+        }
         String baseURL    = contextPath+"/admin/term?administrative-continue="+knot.getId();
 
         int resultCount = Term.searchResultCount(context, query, null);

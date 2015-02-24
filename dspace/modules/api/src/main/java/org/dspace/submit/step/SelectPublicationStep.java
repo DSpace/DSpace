@@ -3,7 +3,10 @@ package org.dspace.submit.step;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.log4j.Logger;
+import org.dspace.JournalUtils;
 import org.dspace.content.*;
+import org.dspace.content.authority.Concept;
+import org.dspace.content.authority.Scheme;
 import org.dspace.content.crosswalk.IngestionCrosswalk;
 import org.dspace.core.LogManager;
 import org.dspace.core.PluginManager;
@@ -66,16 +69,6 @@ public class SelectPublicationStep extends AbstractProcessingStep {
     public static final int ERROR_SELECT_COUNTRY = 10;
 
 
-
-    private static Map<String, DCValue> journalToMetadata = new HashMap<String, DCValue>();
-    public static List<String> integratedJournals = new ArrayList<String>();
-    public static List<String> allowReviewWorkflowJournals = new ArrayList<String>();
-    public static final List<String> journalNames = new ArrayList<String>();
-    public static final List<String> journalVals = new ArrayList<String>();
-    public static final List<String> journalDirs = new ArrayList<String>();
-    public static final List<Boolean> journalEmbargo = new ArrayList<Boolean>();
-    public static final Map<String, List<String>> journalNotifyOnReview = new HashMap<String, List<String>>();
-    public static final Map<String, List<String>> journalNotifyOnArchive = new HashMap<String, List<String>>();
     private static Logger log = Logger.getLogger(SelectPublicationStep.class);
 
 
@@ -88,59 +81,14 @@ public class SelectPublicationStep extends AbstractProcessingStep {
     public final static int  UNKNOWN_DOI=5;
     public final static int  MANU_ACC=6;
 
+
     public final static String crossRefApiRoot = "http://api.crossref.org/works/";
     public final static String crossRefApiFormat = "/transform/application/vnd.crossref.unixref+xml";
     
+
+    private static Map<String, DCValue> journalToMetadata = new HashMap<String, DCValue>();
+    
     static {
-        journalVals.add("other");
-        journalNames.add("(please select a journal)");
-        journalDirs.add(null);
-        journalEmbargo.add(false);
-
-	// initialize settings from journal properties file
-        String journalPropFile = ConfigurationManager.getProperty("submit.journal.config");
-        log.info("initializing journal settings from property file " + journalPropFile);
-        Properties properties = new Properties();
-	
-        try {
-            properties.load(new InputStreamReader(new FileInputStream(journalPropFile), "UTF-8"));
-            String journalTypes = properties.getProperty("journal.order");
-            for (int i = 0; i < journalTypes.split(",").length; i++) {
-                String journalType = journalTypes.split(",")[i].trim();
-                String journalDisplay = properties.getProperty("journal." + journalType + ".fullname");
-                String metadataDir = properties.getProperty("journal." + journalType + ".metadataDir");
-                String integrated = properties.getProperty("journal." + journalType + ".integrated");
-                String embargo = properties.getProperty("journal." + journalType + ".embargoAllowed", "true");
-                List<String> onReviewMails = Arrays.asList(properties.getProperty("journal." + journalType + ".notifyOnReview", "").replace(" ", "").split(","));
-                List<String> onArchiveMails = Arrays.asList(properties.getProperty("journal." + journalType + ".notifyOnArchive", "").replace(" ", "").split(","));
-
-                String allowReviewWorkflow = properties.getProperty("journal." + journalType + ".allowReviewWorkflow");
-
-		//once we have read the properties from the file, make the journal's name case-insensitive
-		journalType = journalType.toLowerCase();
-		
-                journalVals.add(journalType);
-                journalNames.add(journalDisplay);
-                journalDirs.add(metadataDir);
-                if(integrated != null && Boolean.valueOf(integrated))
-                    integratedJournals.add(journalType);
-
-                if(allowReviewWorkflow != null && Boolean.valueOf(allowReviewWorkflow))
-                    allowReviewWorkflowJournals.add(journalType);
-
-                journalEmbargo.add(Boolean.valueOf(embargo));
-                journalNotifyOnReview.put(journalType, onReviewMails);
-                journalNotifyOnArchive.put(journalType, onArchiveMails);
-
-            }
-        } catch (IOException e) {
-            log.error("Error while loading journal properties", e);
-        }
-
-        journalVals.add("other");
-        journalNames.add("OTHER JOURNAL");
-        journalDirs.add(null);
-        journalEmbargo.add(false);
 
         int counter = 1;
         String configLine = ConfigurationManager.getProperty("submit.journal.metadata." + counter);
@@ -163,10 +111,9 @@ public class SelectPublicationStep extends AbstractProcessingStep {
     }
 
 
-
     public int doProcessing(Context context, HttpServletRequest request, HttpServletResponse response, SubmissionInfo submissionInfo) throws ServletException, IOException, SQLException, AuthorizeException {
-	log.debug("processing new submission request");
-	
+        log.debug("processing new submission request");
+
         try{
 
             Item item = submissionInfo.getSubmissionItem().getItem();
@@ -175,17 +122,17 @@ public class SelectPublicationStep extends AbstractProcessingStep {
             String articleStatus = request.getParameter("article_status");
             String manuscriptNumber = request.getParameter("manu");
 
-	    // get the journalID selected by the user in the UI
+            // get the journalID selected by the user in the UI
             if(articleStatus!=null){
                 if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED){
                     String manuscriptNumberAcc = request.getParameter("manu-number-status-accepted");
                     String manuAcc = request.getParameter("manu_acc");
                     manuscriptNumber = manuscriptNumberAcc;
-		    manuscriptNumber = manuscriptNumber.trim();
+                    manuscriptNumber = manuscriptNumber.trim();
 
                     String journalName = request.getParameter("prism_publicationName");
                     journalName=journalName.replace("*", "");
-		    journalName=journalName.trim();
+                    journalName=journalName.trim();
                     journalID = DryadJournalSubmissionUtils.findKeyByFullname(journalName);
                     if(journalID==null) journalID=journalName;
                 }
@@ -205,7 +152,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                 EventLogger.log(context, "submission-select-publication", "error=failed_license_accept");
                 return STATUS_LICENSE_NOT_ACCEPTED;
             }
-	    // attempt to process a DOI or PMID entered in the UI
+            // attempt to process a DOI or PMID entered in the UI
             if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_PUBLISHED){
                 String identifier = request.getParameter("article_doi");
                 String journal = request.getParameter("unknown_doi");
@@ -220,12 +167,12 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                         }
                     }
                     else{
-                       if(!processPubMed(context, item, identifier)) {
-                           EventLogger.log(context, "submission-select-publication", "pmid=" + identifier + ",error=failed_pubmed_lookup");
+                        if(!processPubMed(context, item, identifier)) {
+                            EventLogger.log(context, "submission-select-publication", "pmid=" + identifier + ",error=failed_pubmed_lookup");
                             return ERROR_PUBMED_DOI;
-                       } else {
-                           EventLogger.log(context, "submission-select-publication", "pmid=" + identifier);
-                       }
+                        } else {
+                            EventLogger.log(context, "submission-select-publication", "pmid=" + identifier);
+                        }
                     }
                 }
                 else
@@ -255,7 +202,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                 }
 
             }
-	    
+
             // ARTICLE_STATUS_ACCEPTED ||  ARTICLE_STATUS_IN_REVIEW ||  ARTICLE_STATUS_NOT_YET_SUBMITTED
             else{
                 if(journalID==null||journalID.equals("")){
@@ -272,8 +219,8 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                 if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_IN_REVIEW)
                 {
 
-                   item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY,"false");
-                   item.update();
+                    item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY,"false");
+                    item.update();
 
                 }
             }
@@ -288,16 +235,16 @@ public class SelectPublicationStep extends AbstractProcessingStep {
     }
 
     /**
-       Process a DOI entered by the submitter. Use the DOI metadata to initialize publication information.
+     Process a DOI entered by the submitter. Use the DOI metadata to initialize publication information.
      **/
     private boolean processDOI(Context context, Item item, String identifier){
 
-	// normalize and validate the identifier
-	identifier = identifier.toLowerCase().trim();
+        // normalize and validate the identifier
+        identifier = identifier.toLowerCase().trim();
         if(identifier.startsWith("doi:")) {
             identifier = identifier.replaceFirst("doi:", "");
-	}
-	
+        }
+
         try{
             Element jElement = retrieveXML(crossRefApiRoot + identifier + crossRefApiFormat);
             if(jElement != null){
@@ -326,24 +273,24 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
 
     /**
-       Process a PMID entered by the submitter. Use the PMID metadata to initialize publication information.
+     Process a PMID entered by the submitter. Use the PMID metadata to initialize publication information.
      **/
     private boolean processPubMed(Context context, Item item, String identifier){
 
-	// normalize and validate the identifier
-	identifier = identifier.toLowerCase().trim();
-	if(identifier.startsWith("pmid: ")) {
-	    identifier = identifier.substring("pmid: ".length());
-	}
-	if(identifier.startsWith("pmid ")) {
-	    identifier = identifier.substring("pmid ".length());
-	}
-	if(identifier.startsWith("pmid:")) {
-	    identifier = identifier.substring("pmid:".length());
-	}
-	if(identifier.startsWith("pmid")) {
-	    identifier = identifier.substring("pmid".length());
-	}
+        // normalize and validate the identifier
+        identifier = identifier.toLowerCase().trim();
+        if(identifier.startsWith("pmid: ")) {
+            identifier = identifier.substring("pmid: ".length());
+        }
+        if(identifier.startsWith("pmid ")) {
+            identifier = identifier.substring("pmid ".length());
+        }
+        if(identifier.startsWith("pmid:")) {
+            identifier = identifier.substring("pmid:".length());
+        }
+        if(identifier.startsWith("pmid")) {
+            identifier = identifier.substring("pmid".length());
+        }
         if(!isValidPubmedID(identifier)) return false;
 
         try{
@@ -409,18 +356,19 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         return true;
     }
 
-    private void addEmailsAndEmbargoSettings(String journalID, Item item) {
-        List<String> reviewEmails = journalNotifyOnReview.get(journalID);
+    private void addEmailsAndEmbargoSettings(Concept journalConcept, Item item) {
+        String[] reviewEmails = JournalUtils.getListNotifyOnReview(journalConcept);
+
         if(reviewEmails != null) {
-            item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "review", "mailUsers", null, reviewEmails.toArray(new String[reviewEmails.size()]));
+            item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "review", "mailUsers", null, reviewEmails);
         }
 
-        List<String> archiveEmails = journalNotifyOnArchive.get(journalID);
+        String[] archiveEmails = JournalUtils.getListNotifyOnArchive(journalConcept);
         if(archiveEmails != null) {
-            item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "archive", "mailUsers", null, archiveEmails.toArray(new String[archiveEmails.size()]));
+            item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "archive", "mailUsers", null, archiveEmails);
         }
 
-        Boolean embargoAllowed = Boolean.valueOf(journalEmbargo.get(journalVals.indexOf(journalID)));
+        Boolean embargoAllowed = JournalUtils.getBooleanEmbargoAllowed(journalConcept);
         if(!embargoAllowed){
             //We don't need to show the embargo option to any of our data files
             item.addMetadata("internal", "submit", "showEmbargo", null, String.valueOf(embargoAllowed));
@@ -428,36 +376,38 @@ public class SelectPublicationStep extends AbstractProcessingStep {
     }
 
     private boolean processJournal(String journalID, String manuscriptNumber, Item item, Context context,
-				   HttpServletRequest request, String articleStatus) throws AuthorizeException, SQLException {
-	String title = journalID; // Preserve the case of the original entry
-	journalID = journalID.toLowerCase();
-	
-	log.debug("processing journal ID " + journalID);
-	
+                                   HttpServletRequest request, String articleStatus) throws AuthorizeException, SQLException {
+        String title = journalID; // Preserve the case of the original entry
+        journalID = journalID.toLowerCase();
+
+        log.debug("processing journal ID " + journalID);
+
         //We have selected to choose a journal, retrieve it
         if(!journalID.equals("other")){
-            if(!integratedJournals.contains(journalID) || (integratedJournals.contains(journalID) && manuscriptNumber != null && manuscriptNumber.trim().equals(""))){
-		log.debug(journalID + " is not integrated OR manuscript number is null");
-                //Just add the journal title
-                if(journalVals.indexOf(journalID)!=-1){
-                    title = journalNames.get(journalVals.indexOf(journalID));
+            Concept[] journalConcepts = JournalUtils.getJournalConcept(context,journalID);
+            if(journalConcepts!=null&&journalConcepts.length>0){
+                Concept journalConcept = journalConcepts[0];
+                if(JournalUtils.getBooleanIntegrated(journalConcept) || (JournalUtils.getBooleanIntegrated(journalConcept) && manuscriptNumber != null && manuscriptNumber.trim().equals(""))){
+                    log.debug(journalID + " is not integrated OR manuscript number is null");
+                    //Just add the journal title
+
+                    title = journalConcept.getPreferredLabel();
                     //Should it end with a *, remove it.
                     if(title.endsWith("*")) {
                         title = title.substring(0, title.length() - 1);
                     }
-                    addEmailsAndEmbargoSettings(journalID, item);
-                }
-                item.addMetadata("prism", "publicationName", null, null, title);
-                item.update();
-            }
-            else {
-                if(journalVals.indexOf(journalID)!=-1){
 
-                    String journalPath = journalDirs.get(journalVals.indexOf(journalID));
-		    log.debug("journalPath: " + journalPath);
+                    addEmailsAndEmbargoSettings(journalConcept, item);
+                    item.addMetadata("prism", "publicationName", null, null, title);
+                    item.update();
+                }
+                else {
+                    String journalPath = JournalUtils.getMetadataDir(journalConcept);
+                    log.debug("journalPath: " + journalPath);
+
                     //We have a valid journal
                     // Unescape the manuscriptNumber to get the filename
-                    String fileName = DryadJournalSubmissionUtils.unescapeFilename(manuscriptNumber);
+                    String fileName = JournalUtils.unescapeFilename(manuscriptNumber);
                     PublicationBean pBean = ModelPublication.getDataFromPublisherFile(fileName, journalID, journalPath);
                     if (pBean.getMessage().equals((""))) {
 
@@ -492,22 +442,31 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                         }
 
                         importJournalMetadata(context, item, pBean);
-                        addEmailsAndEmbargoSettings(journalID, item);
+                        addEmailsAndEmbargoSettings(journalConcept, item);
 
                         item.update();
                     } else if(pBean.getMessage().equals("Invalid manuscript number")) {
                         // We do not have metadata for this manuscript number
                         // Store the manuscriptNumber & journal title and continue as in-review
-                        addEmailsAndEmbargoSettings(journalID, item);
-                        title = journalNames.get(journalVals.indexOf(journalID));
+                        addEmailsAndEmbargoSettings(journalConcept, item);
+                        
+                        title = journalConcept.getPreferredLabel();
                         addSingleMetadataValueFromJournal(context, item, "journalName", title);
                         addSingleMetadataValueFromJournal(context, item, "manuscriptNumber", manuscriptNumber);
+
                         item.update();
                     }else{
                         request.getSession().setAttribute("submit_error", pBean.getMessage());
                         return false;
                     }
                 }
+
+            }
+
+            else
+            {
+                item.addMetadata("prism", "publicationName", null, null, title);
+                item.update();
             }
         }
         return true;
@@ -515,8 +474,8 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
 
     /**
-       Import metadata from the journal settings into the data package item. If data already exists in
-       the pBean, it will take precedence over the journal metadata.
+     Import metadata from the journal settings into the data package item. If data already exists in
+     the pBean, it will take precedence over the journal metadata.
      **/
     private void importJournalMetadata(Context context, Item item, PublicationBean pBean){
         // These values are common to both Article Types
@@ -537,7 +496,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         addSingleMetadataValueFromJournal(context, item, "manuscriptNumber", pBean.getManuscriptNumber());
         addSingleMetadataValueFromJournal(context, item, "journalID", pBean.getJournalID());
         addSingleMetadataValueFromJournal(context, item, "status", String.valueOf(pBean.isSkipReviewStep()));
-        
+
         // These values differ based on the Article Type
         if(pBean.getArticleType().equals(PublicationBean.TYPE_GR_NOTE)) {
             final String title = String.format("\"%s\" in %s", pBean.getTitle(), pBean.getCitationTitle());
@@ -574,7 +533,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
             publication.addMetadata(dcVal.schema, dcVal.element, dcVal.qualifier, null, values.toArray(new String[values.size()]));
     }
 
-    
+
 
     public int getNumberOfPages(HttpServletRequest request, SubmissionInfo submissionInfo) throws ServletException {
         return 1;
