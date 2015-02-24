@@ -13,6 +13,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.sort.SortOption;
 import org.dspace.sort.SortException;
+import org.dspace.core.ConfigurationManager;
 
 /**
  * A class which represents the initial request to the browse system.
@@ -52,7 +53,7 @@ public class BrowserScope
     private String startsWith;
 
     /** the number of results per page to display */
-    private int resultsPerPage = 20;
+    private int resultsPerPage = 60;
 
     /** the Collection to which to restrict */
     private Collection collection;
@@ -88,6 +89,11 @@ public class BrowserScope
     public BrowserScope(Context context)
     {
         this.context = context;
+
+        if (ConfigurationManager.getProperty("webui.browse.results_per_page") != null)
+        {
+            resultsPerPage = ConfigurationManager.getIntProperty("webui.browse.results_per_page");
+        }
     }
 
     /**
@@ -354,7 +360,7 @@ public class BrowserScope
      */
     public void setResultsPerPage(int resultsPerPage)
     {
-        if (resultsPerPage > -1 || (browseIndex != null && browseIndex.isTagCloudEnabled()))
+        if (resultsPerPage > -1)
         {
             this.resultsPerPage = resultsPerPage;
         }
