@@ -241,12 +241,21 @@
                 <div id="dryad-home-carousel" class="ds-static-div primary">
                     <!-- REMINDER: slide publication dates are in the format YEAR-MONTH-DAY, eg, 2013-12-28 -->
                     <div class="bxslider" style="">
+                        <div><span class="publication-date">2015-02-15</span>
+                            <a href="/dryadlab">
+                                <img alt="" src="/themes/Mirage/images/dryadlab-promo.png" />
+                                <p style="width: 580px; color: #444; font-size: 80%; top: 75px; right: 10px; line-height: 1.2em; position: absolute; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);"> 
+                                    Use Dryad research data in the classroom! Our educational modules are hand-picked and carefully designed for secondary and undergraduate students.
+                                </p>
+                                <p style="drop-shadow: 4px 4px; position: absolute; right: 40px; bottom: 6px; font-size: 70%; text-align: right; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);">Learn More &#187;</p>
+                            </a>
+                        </div>
                         <div><span class="publication-date">2015-03-04</span>
                             <a href="/pages/membershipMeeting2015">
                                 <img src="/themes/Mirage/images/membershipMeeting2015_carousel.jpg" alt="Dryad Community Meeting, 27 May 2015, Washington DC" />
                            </a>
-                       </div>
-						<div><span class="publication-date">2015-03-23</span>
+                        </div>
+                        <div><span class="publication-date">2015-03-23</span>
                             <a href="/pages/membershipOverview">
                                 <img alt="" src="/themes/Mirage/images/watering-can.png" />
                                 <p style="width: 450px; color: #363; font-size: 90%; top: 0px; right: 10px; line-height: 1.2em; position: absolute; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);">Help grow open data at Dryad:<br />Become an organizational member</p>
