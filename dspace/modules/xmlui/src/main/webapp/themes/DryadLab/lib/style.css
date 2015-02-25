@@ -139,14 +139,15 @@ div#ds-body {
 div#ds-header {
 	top: 0px;
 	height: 55px;
-	border: 10px solid #fff;
+	border: 0px solid #fff;
+	border-width: 7px 10px;
 	background-color: #cdb;
 	position:relative;
 }
 div#ds-options {
 	padding: 0px 0px;
 	position: absolute;
-	top: 76px;
+	top: 70px;
 	left: 0;
 	width: 251px;
 	overflow: hidden;
