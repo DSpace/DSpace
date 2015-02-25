@@ -138,14 +138,15 @@ div#ds-body {
 /* amol's additon */
 div#ds-header {
 	top: 0px;
-	height: 119px;
-	background-color: rgb(152, 187, 143);
-    position:relative;
+	height: 55px;
+	border: 10px solid #fff;
+	background-color: #cdb;
+	position:relative;
 }
 div#ds-options {
 	padding: 0px 0px;
 	position: absolute;
-	top: 119px;
+	top: 76px;
 	left: 0;
 	width: 251px;
 	overflow: hidden;
@@ -181,12 +182,12 @@ div#ds-header span.ds-header-name {
 }
 div#ds-header a img#ds-header-logo {
 	border: 0;
-	width: 251px;
-	height: 119px;
+	width: 241px;
+	padding-right: 10px;
 	left: 9px;
 	float: left;
 	background-repeat: no-repeat;
-	background: #868E72;
+	background: #fff;
 }
 div#ds-header a {
 	text-decoration: none;
