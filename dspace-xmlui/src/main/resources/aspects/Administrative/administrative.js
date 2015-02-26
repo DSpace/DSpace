@@ -12,6 +12,7 @@ importClass(Packages.org.dspace.core.Constants);
 importClass(Packages.org.dspace.content.Bitstream);
 importClass(Packages.org.dspace.content.Bundle);
 importClass(Packages.org.dspace.content.Item);
+importClass(Packages.org.dspace.content.EtdUnit);
 importClass(Packages.org.dspace.content.Collection);
 importClass(Packages.org.dspace.content.Community);
 importClass(Packages.org.dspace.harvest.HarvestedCollection);
@@ -26,6 +27,7 @@ importClass(Packages.org.dspace.app.xmlui.utils.FlowscriptUtils);
 importClass(Packages.org.dspace.app.xmlui.utils.ContextUtil);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowEPersonUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowGroupUtils);
+importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowDepartmentUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowRegistryUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowItemUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowMapperUtils);
@@ -196,6 +198,9 @@ function isAuthorized(objectType, objectID, action) {
     case Constants.GROUP:
         object = Group.find(getDSContext(),objectID);
         break;
+    case Constants.ETDUNIT:
+        object = EtdUnit.find(getDSContext(),objectID);
+        break;
     case Constants.EPERSON:
         object = EPerson.find(getDSContext(),objectID);
         break;
@@ -227,7 +232,7 @@ function assertAuthorized(objectType, objectID, action) {
 function canEditItem(itemID)
 {
 	var item = Item.find(getDSContext(),itemID);
-	
+
 	return item.canEdit();
 }
 
@@ -249,7 +254,7 @@ function assertEditItem(itemID) {
 function canEditCollection(collectionID)
 {
 	var collection = Collection.find(getDSContext(),collectionID);
-	
+
 	if (collection == null) {
 		return isAdministrator();
 	}
@@ -275,7 +280,7 @@ function assertEditCollection(collectionID) {
 function canAdminCollection(collectionID)
 {
 	var collection = Collection.find(getDSContext(),collectionID);
-	
+
 	if (collection == null) {
 		return isAdministrator();
 	}
@@ -303,9 +308,9 @@ function canEditCommunity(communityID)
 	if (communityID == -1) {
 		return isAdministrator();
 	}
-	
+
 	var community = Community.find(getDSContext(),communityID);
-	
+
 	if (community == null) {
 		return isAdministrator();
 	}
@@ -368,6 +373,24 @@ function assertEditGroup(groupID)
 }
 
 /**
+ * Assert that the currently authenticated eperson can edit the given group. If they
+ * cannot then this method will never return.
+ */
+function assertEditDepartment(departmentID)
+{
+	// Check authorizations
+	if (departmentID == -1)
+	{
+		// only system admin can create "top level" group
+		assertAdministrator();
+	}
+	else
+	{
+		assertAuthorized(Constants.ETDUNIT, departmentID, Constants.WRITE);
+	}
+}
+
+/**
  * Return whether the currently authenticated eperson is an
  * administrator.
  */
@@ -419,6 +442,22 @@ function startManageGroups()
 	assertAdministrator();
 
 	doManageGroups();
+
+	// This should never return, but just in case it does then point
+	// the user to the home page.
+	cocoon.redirectTo(cocoon.request.getContextPath());
+	getDSContext().complete();
+	cocoon.exit();
+}
+
+/**
+ * Start managing departments
+ */
+function startManageDepartments()
+{
+	assertAdministrator();
+
+	doManageDepartments();
 
 	// This should never return, but just in case it does then point
 	// the user to the home page.
@@ -912,9 +951,9 @@ function doEditGroup(groupID)
     var groupName        = FlowGroupUtils.getName(getDSContext(),groupID);
     var memberEPeopleIDs = FlowGroupUtils.getEPeopleMembers(getDSContext(),groupID);
     var memberGroupIDs   = FlowGroupUtils.getGroupMembers(getDSContext(),groupID);
-    
+
     assertEditGroup(groupID);
-    
+
     var highlightEPersonID;
     var highlightGroupID;
     var type = "";
@@ -1047,6 +1086,196 @@ function doDeleteGroups(groupIDs)
         // The user has confirmed, actually delete these groups
         assertAdministrator();
         var result = FlowGroupUtils.processDeleteGroups(getDSContext(),groupIDs);
+        return result;
+    }
+    return null;
+}
+
+/********************
+ * Department flows
+ ********************/
+
+/**
+ * Manage Departments, allow users to create new, edit existing,
+ * or remove Departments. The user may also search or browse
+ * for Departments.
+ *
+ * The is typically used as an entry point flow.
+ */
+function doManageDepartments()
+{
+    assertAdministrator();
+
+    var highlightID = -1
+    var query = "";
+    var page = 0;
+    var result;
+    do {
+
+
+        sendPageAndWait("admin/departments/main",{"query":query,"page":page,"highlightID":highlightID},result);
+        assertAdministrator();
+		result = null;
+
+
+         // Update the page parameter if supplied.
+        if (cocoon.request.get("page"))
+            page = cocoon.request.get("page");
+
+        if (cocoon.request.get("submit_search"))
+        {
+            // Grab the new query and reset the page parameter
+            query = cocoon.request.get("query");
+            page = 0
+            highlightID = -1
+        }
+        else if (cocoon.request.get("submit_add"))
+        {
+            // Just create a blank department then pass it to the group editor.
+            result = doEditDepartment(-1);
+
+            if (result != null && result.getParameter("departmentID"))
+           		highlightID = result.getParameter("departmentID");
+        }
+        else if (cocoon.request.get("submit_edit") && cocoon.request.get("departmentID"))
+        {
+            // Edit a specific department
+			var departmentID = cocoon.request.get("departmentID");
+			result = doEditDepartment(departmentID);
+			highlightID = departmentID;
+        }
+        else if (cocoon.request.get("submit_delete") && cocoon.request.get("select_department"))
+        {
+            // Delete a set of departments
+            var departmentIDs = cocoon.request.getParameterValues("select_department");
+            result = doDeleteDepartments(departmentIDs);
+            highlightID = -1;
+        }
+        else if (cocoon.request.get("submit_return"))
+        {
+            // Not implemented in the UI, but should be in case someone links to us.
+            return;
+        }
+
+    } while (true) // only way to exit is to hit the submit_back button.
+}
+
+
+/**
+ * This flow allows for the full editing of a department, changing the department's name or
+ * removing members. Users may search for collections to add as members
+ * to this department.
+ */
+function doEditDepartment(departmentID)
+{
+    var departmentName        = FlowDepartmentUtils.getName(getDSContext(),departmentID);
+    var memberCollectionIDs = FlowDepartmentUtils.getCollectionMembers(getDSContext(),departmentID);
+
+//    var memberEPeopleIDs = FlowGroupUtils.getEPeopleMembers(getDSContext(),groupID);
+//    var memberGroupIDs   = FlowGroupUtils.getGroupMembers(getDSContext(),groupID);
+
+    assertEditDepartment(departmentID);
+
+    var highlightCollectionID;
+
+//    var highlightEPersonID;
+//    var highlightGroupID;
+
+    var type = "";
+    var query = "";
+    var page = 0;
+    var result = null;
+
+    do {
+        sendPageAndWait("admin/departments/edit",{"departmentID":departmentID,"departmentName":departmentName,"memberCollectionIDs":memberCollectionIDs.join(','),"highlightCollectionID":highlightCollectionID,"query":query,"page":page,"type":type},result);
+        assertEditDepartment(departmentID);
+
+		result = null;
+		highlightCollectionID = null;
+
+//        highlightEPersonID = null;
+//        highlightGroupID = null;
+
+        // Update the departmentName
+		if (cocoon.request.get("department_name"))
+			departmentName = cocoon.request.get("department_name");
+
+//		// Update the groupName
+//		if (cocoon.request.get("group_name"))
+//			groupName = cocoon.request.get("group_name");
+
+		if (cocoon.request.get("page"))
+			page = cocoon.request.get("page");
+
+        if (cocoon.request.get("submit_cancel"))
+        {
+            // Just return without saving anything.
+            return null;
+        }
+       	else if (cocoon.request.get("submit_save"))
+       	{
+       		result = FlowDepartmentUtils.processSaveDepartment(getDSContext(),departmentID,departmentName,memberCollectionIDs);
+
+       		// In case a department was created, update our id.
+       		if (result != null && result.getParameter("departmentID"))
+           		departmentID = result.getParameter("departmentID");
+       	}
+        else if (cocoon.request.get("submit_search_collection") && cocoon.request.get("query"))
+        {
+            // Perform a new search for collections.
+            query = cocoon.request.get("query");
+            page = 0;
+            type = "collection";
+        }
+        else if (cocoon.request.get("submit_clear"))
+        {
+            // Perform a new search for collections.
+            query = "";
+            page = 0;
+            type = "";
+        }
+
+        // Check if there were any add or delete operations.
+        var names = cocoon.request.getParameterNames();
+        while (names.hasMoreElements())
+        {
+        	var name = names.nextElement();
+        	var match = null;
+
+        	if ((match = name.match(/submit_add_collection_(\d+)/)) != null)
+        	{
+        		// Add a collection
+        		var collectionID = match[1];
+        		memberCollectionIDs = FlowDepartmentUtils.addMember(memberCollectionIDs,collectionID);
+        		highlightCollectionID = collectionID;
+        	}
+        	if ((match = name.match(/submit_remove_collection_(\d+)/)) != null)
+        	{
+        		// remove a collection
+        		var collectionID = match[1];
+				memberCollectionIDs = FlowDepartmentUtils.removeMember(memberCollectionIDs,collectionID);
+				highlightCollectionID = collectionID;
+        	}
+        }
+    } while (result == null || !result.getContinue())
+
+    return result;
+}
+
+/**
+ * Confirm that the given departmentIDs should be deleted, if confirmed they will be deleted.
+ */
+function doDeleteDepartments(departmentIDs)
+{
+    assertAdministrator();
+
+    sendPageAndWait("admin/departments/delete",{"departmentIDs":departmentIDs.join(',')});
+
+    if (cocoon.request.get("submit_confirm"))
+    {
+        // The user has confirmed, actually delete these departments
+        assertAdministrator();
+        var result = FlowDepartmentUtils.processDeleteDepartments(getDSContext(),departmentIDs);
         return result;
     }
     return null;
@@ -1595,7 +1824,7 @@ function doEditItemMetadata(itemID, templateCollectionID)
  * Curate an Item
  * Can only be performed by someone who is able to edit that Item.
  */
-function doCurateItem(itemID, task) 
+function doCurateItem(itemID, task)
 {
     var result;
 
@@ -2626,7 +2855,7 @@ function doCurateCollection(collectionID, task) {
                       sendPageAndWait("admin/collection/curateCollection",{"collectionID":collectionID,"select_curate_group":select_curate_group}, result);
                    } else {
                       sendPageAndWait("admin/collection/curateCollection",{"collectionID":collectionID}, result);
-                   } 
+                   }
 		   assertEditCollection(collectionID);
 		   result = null;
 		   if (cocoon.request.get("submit_return") || cocoon.request.get("submit_metadata") ||
@@ -3097,15 +3326,15 @@ function doDeleteCommunityRole(communityID,role)
  * Curate a DSpace Object, from site-wide Administrator tools
  * (Can only be performed by a DSpace Administrator)
  */
-function doCurate() 
+function doCurate()
 {
     var result;
-    
+
     assertAdministrator();
 
     var identifier;
     var curateTask;
-    do 
+    do
     {
         if (cocoon.request.get("select_curate_group"))
         {
@@ -3115,9 +3344,9 @@ function doCurate()
         }
         else
         {
-             sendPageAndWait("admin/curate/main",{"identifier":identifier,"curate_task":curateTask},result);	   
-        } 
-       	   
+             sendPageAndWait("admin/curate/main",{"identifier":identifier,"curate_task":curateTask},result);
+        }
+
         if (cocoon.request.get("submit_curate_task"))
         {
             result = FlowCurationUtils.processCurateObject(getDSContext(), cocoon.request);
@@ -3126,7 +3355,7 @@ function doCurate()
         {
             result = FlowCurationUtils.processQueueObject(getDSContext(), cocoon.request);
         }
-        
+
         //if 'identifier' parameter was set in result, pass it back to sendPageAndWait call (so it is prepopulated in Admin UI)
         if (result != null && result.getParameter("identifier")) {
             identifier = result.getParameter("identifier");
@@ -3134,14 +3363,14 @@ function doCurate()
         else if (!cocoon.request.get("select_curate_group")) {
              identifier = null;
         }
-       
+
         //if 'curate_task' parameter was set in result, pass it back to sendPageAndWait call (so it is prepopulated in Admin UI)
         if (result != null && result.getParameter("curate_task")) {
             curateTask = result.getParameter("curate_task");
         }
         else if (!cocoon.request.get("select_curate_group")) {
             curateTask = null;
-        }  
+        }
     }
     while (true);
 }
