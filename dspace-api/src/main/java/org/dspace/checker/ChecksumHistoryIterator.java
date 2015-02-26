@@ -114,7 +114,7 @@ public final class ChecksumHistoryIterator
             String expected = rs.getString(4);
             String computed = rs.getString(5);
             String resultCode = rs.getString(6);
-            hist = new ChecksumHistory(bitId, startDate, endDate, expected, computed, "", resultCode);
+            hist = new ChecksumHistory(bitId, startDate, endDate, expected, computed, resultCode);
         } else
         {
             sqlStmt.close();

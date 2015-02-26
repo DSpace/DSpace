@@ -78,7 +78,7 @@ public final class ChecksumHistoryWorker
     private void print(ChecksumHistory hist, int row) throws SQLException
     {
         System.out.println("" + row +
-                        " BITSTREAM." + hist.getBitstreamId() + " " + hist.getResultCode() +
+                        " BITSTREAM." + hist.getBitstreamId() + " " + hist.getResult() +
                         " calulatedCheckSum=" + hist.getChecksumCalculated() + " " +
                         " expectedCheckSum=" + hist.getChecksumExpected() + " " +
                         " startDate=" + hist.getProcessStartDate() + " " +

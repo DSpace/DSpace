@@ -64,8 +64,8 @@ public final class ChecksumWorker
     {
         this.context = context;
         this.iter = iterator;
-        bitstreamInfoDAO = new BitstreamInfoDAO(context.getDBConnection());
-        checksumHistoryDAO = new ChecksumHistoryDAO(context.getDBConnection());
+        bitstreamInfoDAO = new BitstreamInfoDAO();
+        checksumHistoryDAO = new ChecksumHistoryDAO();
     }
 
     private void process(int action, int count, boolean verbose) throws SQLException
@@ -76,7 +76,7 @@ public final class ChecksumWorker
         {
             System.out.println("# Printing  m for " + ChecksumCheckResults.CHECKSUM_MATCH +
                     ", d for " + ChecksumCheckResults.BITSTREAM_MARKED_DELETED  +
-                    ", and e in all other cases");
+                    ", and E in all other cases");
         }
 
         if (verbose)
@@ -104,7 +104,6 @@ public final class ChecksumWorker
                         break;
                     case CHECK:
                         checkBitstream(row, verbose);
-
                         break;
                     case HISTORY:
                         printHistory(verbose);
@@ -156,7 +155,7 @@ public final class ChecksumWorker
         for (ChecksumHistory cur = histIter.next(); cur != null; cur = histIter.next())
         {
             System.out.print("BITSTREAM." + cur.getBitstreamId());
-            System.out.print(" result=" + cur.getResultCode());
+            System.out.print(" result=" + cur.getResult());
             if (verbose)
             {
                 System.out.print(" expected=" + cur.getChecksumExpected());
@@ -195,7 +194,7 @@ public final class ChecksumWorker
             {
                 calcInfo.setChecksumAlgorithm(iter.checksumAlgo());
                 String storedChecksum = iter.storedChecksum();
-                calcInfo.setStoredChecksum(calcInfo.getBitstream(context).getChecksum());
+                calcInfo.setStoredChecksum(iter.storedChecksum());
                 if (!iter.deleted())
                 {
                     bitstream = BitstreamStorageManager.retrieve(context, id);
