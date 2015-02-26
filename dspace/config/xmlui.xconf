@@ -134,10 +134,14 @@
         <!-- <theme name="Test Theme 1" handle="123456789/1" path="theme1/"/>    -->
         <!-- <theme name="Test Theme 2" regex="community-list" path="theme2/"/> -->
 
-	<!-- Use the DryadLab theme for anything with "dryadlab" in the URL or anything in 
-	     the DryadLab activities collection. -->
-	    <theme name="Paypal Theme" regex="submit-paypal-checkout" path="Paypal/"/>
+    <!-- Use the DryadLab theme for anything with "dryadlab" in the URL or anything in 
+         the DryadLab activities collection. -->
+        <theme name="Paypal Theme" regex="submit-paypal-checkout" path="Paypal/"/>
         <theme name="Dryad Lab Theme" regex="dryadlab" path="DryadLab/" />
+        <!-- TODO: Can we specify a case-insensitive regex here? -->
+        <theme name="Dryad Lab Theme" regex="dryadLab" path="DryadLab/" />
+        <theme name="Dryad Lab Theme" regex="DryadLab" path="DryadLab/" />
+        <theme name="Dryad Lab Theme" regex="introToDryad" path="DryadLab/" />
         <theme name="Dryad Lab Theme" handle="10255/dryad.7872" path="DryadLab/" />
         <!-- Default theme for all other pages -->
         <theme name="Dryad Theme" regex=".*" path="Mirage/" />
