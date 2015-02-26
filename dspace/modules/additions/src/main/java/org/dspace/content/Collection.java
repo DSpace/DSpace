@@ -96,7 +96,7 @@ public class Collection extends DSpaceObject
     public static final String SHORT_DESCRIPTION = "short_description";
     public static final String SIDEBAR_TEXT = "side_bar_text";
     public static final String PROVENANCE_TEXT = "provenance_description";
-    
+
     /**
      * Construct a collection with the given table row
      *
@@ -1357,7 +1357,7 @@ public class Collection extends DSpaceObject
      * Get the communities this collection appears in.  Gets only
      * the immediate parent communities, not all ancestors, which is
      * unlike Community.getParents()
-     * 
+     *
      * @return array of <code>Community</code> objects
      * @throws SQLException
      */
@@ -1615,4 +1615,15 @@ public class Collection extends DSpaceObject
         //Also fire a modified event since the collection HAS been modified
         ourContext.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, getID(), null));
     }
+
+//	public static int searchResultCount(Context context, String query) {
+//
+//		return 0;
+//	}
+
+	public static Collection[] search(Context context, String query, int i,
+			int resultsPerPage) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

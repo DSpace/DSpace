@@ -21,8 +21,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
+import org.dspace.content.EtdUnit;
 
 /**
  * Utility methods to processes actions on Groups. These methods are used
@@ -30,104 +29,71 @@ import org.dspace.eperson.Group;
  *
  * @author Scott Phillips
  */
-public class FlowGroupUtils {
+public class FlowDepartmentUtils {
 
 	/** Language Strings */
-	private static final Message T_edit_group_success_notice =
+	private static final Message T_edit_department_success_notice =
 		new Message("default","xmlui.administrative.FlowGroupUtils.edit_group_success_notice");
 
-	private static final Message T_delete_group_success_notice =
+	private static final Message T_delete_department_success_notice =
 		new Message("default","xmlui.administrative.FlowGroupUtils.delete_group_success_notice");
 
 
 	/**
-	 * Return the current name for the given group ID.
+	 * Return the current name for the given department ID.
 	 * @param context The current DSpace context.
-	 * @param groupID The group id.
-	 * @return The group's name.
+	 * @param departmentID The department id.
+	 * @return The department's name.
 	 */
-	public static String getName(Context context, int groupID) throws SQLException
+	public static String getName(Context context, int departmentID) throws SQLException
 	{
-		if (groupID < 0)
+		if (departmentID < 0)
         {
-            return "New Group";
+            return "New Department";
         }
 
-		Group group = Group.find(context,groupID);
+		EtdUnit department = EtdUnit.find(context,departmentID);
 
-		if (group == null)
+		if (department == null)
         {
-            return "New Group";
+            return "New Department";
         }
 
-		return group.getName();
+		return department.getName();
 	}
 
 	/**
-	 * Return the list of current epeople ID's that are a member of this group.
+	 * Return the list of current collection ID's that are a member of this department.
 	 *
 	 * @param context The current DSpace context
-	 * @param groupID The group's id.
+	 * @param departmentID The department's id.
 	 * @return An array of ids.
 	 */
-	public static String[] getEPeopleMembers(Context context, int groupID) throws SQLException
+	public static String[] getCollectionMembers(Context context, int departmentID) throws SQLException
 	{
-		// New group, just return an empty list
-		if (groupID < 0)
+		// New department, just return an empty list
+		if (departmentID < 0)
         {
             return new String[0];
         }
 
-		Group group = Group.find(context,groupID);
+		EtdUnit department = EtdUnit.find(context,departmentID);
 
-		if (group == null)
+		if (department == null)
         {
             return new String[0];
         }
 
-		EPerson[] epeople = group.getMembers();
+		Collection[] collection = department.getCollections();
 
-		String[] epeopleIDs = new String[epeople.length];
-		for (int i=0; i < epeople.length; i++)
+		String[] collectionIDs = new String[collection.length];
+		for (int i=0; i < collection.length; i++)
         {
-			epeopleIDs[i] = String.valueOf(epeople[i].getID());
+			collectionIDs[i] = String.valueOf(collection[i].getID());
         }
 
-		return epeopleIDs;
+		return collectionIDs;
 	}
-
-	/**
-	 * Return the list of current group id's that are a member of this group.
-	 *
-	 * @param context The current DSpace context
-	 * @param groupID The group's id.
-	 * @return An array of ids.
-	 */
-	public static String[] getGroupMembers(Context context, int groupID) throws SQLException
-	{
-		if (groupID < 0)
-        {
-            return new String[0];
-        }
-
-		Group group = Group.find(context,groupID);
-
-		if (group == null)
-        {
-            return new String[0];
-        }
-
-		Group[] groups = group.getMemberGroups();
-
-		String[] groupIDs = new String[groups.length];
-		for (int i=0; i < groups.length; i++)
-        {
-			groupIDs[i] = String.valueOf(groups[i].getID());
-        }
-
-		return groupIDs;
-	}
-
 
 	/**
 	 * Add the given id to the list and return a new list.
@@ -160,19 +126,18 @@ public class FlowGroupUtils {
 	}
 
 	/**
-	 * Save the group. If the name has been changed then it will be updated, if any
+	 * Save the department. If the name has been changed then it will be updated, if any
 	 * members have been added or removed then they are updated.
 	 *
-	 * If the groupID is -1 then a new group is created.
+	 * If the departmentID is -1 then a new department is created.
 	 *
 	 * @param context The current dspace context
-	 * @param groupID The group id, or -1 for a new group.
-	 * @param newName The group's new name.
-	 * @param newEPeopleIDsArray All epeople members
-	 * @param newGroupIDsArray All group members.
+	 * @param departmentID The department id, or -1 for a new department.
+	 * @param newName The department's new name.
+	 * @param newCollectionIDsArray All collection members
 	 * @return A result
 	 */
-	public static FlowResult processSaveGroup(Context context, int groupID, String newName, String[] newEPeopleIDsArray, String[] newGroupIDsArray) throws SQLException, AuthorizeException, UIException
+	public static FlowResult processSaveDepartment(Context context, int departmentID, String newName, String[] newCollectionIDsArray) throws SQLException, AuthorizeException, UIException
 	{
 		FlowResult result = new FlowResult();
 
@@ -186,66 +151,66 @@ public class FlowGroupUtils {
             throw new UIException(uee);
         }
 
-		Group group = null;
-		if (groupID == -1)
+		EtdUnit department = null;
+		if (departmentID == -1)
 		{
 			// First, check if the name is blank.
 			if (newName == null || newName.length() == 0)
 			{
 				// Group's can not have blank names.
 				result.setContinue(false);
-				result.addError("group_name");
+				result.addError("department_name");
 				result.setOutcome(false);
-				result.setMessage(new Message("default","The group name may not be blank."));
+				result.setMessage(new Message("default","The department name may not be blank."));
 
 				return result;
 			}
 
-			// Create a new group, check if the newName is already in use.
-			Group potentialDuplicate = Group.findByName(context,newName);
+			// Create a new department, check if the newName is already in use.
+			EtdUnit potentialDuplicate = EtdUnit.findByName(context,newName);
 
 			if (potentialDuplicate == null)
 	    	{
-				// All good, create the new group.
-				group = Group.create(context);
-				group.setName(newName);
+				// All good, create the new department.
+				department = EtdUnit.create(context);
+				department.setName(newName);
 	    	}
 			else
 			{
 				// The name is already in use, return an error.
     			result.setContinue(false);
-    			result.addError("group_name");
-    			result.addError("group_name_duplicate");
+    			result.addError("department_name");
+    			result.addError("department_name_duplicate");
     			result.setOutcome(false);
-    			result.setMessage(new Message("default","The group name is already in use"));
+    			result.setMessage(new Message("default","The department name is already in use"));
 
     			return result;
 			}
 		}
 		else
 		{
-			group = Group.find(context,groupID);
-			String name = group.getName();
+			department = EtdUnit.find(context,departmentID);
+			String name = department.getName();
 
 			// Only update the name if there has been a change.
 			if (newName != null && newName.length() > 0 && !name.equals(newName))
 			{
-				// The group name is to be updated, check if the newName is already in use.
-				Group potentialDuplicate = Group.findByName(context,newName);
+				// The department name is to be updated, check if the newName is already in use.
+				EtdUnit potentialDuplicate = EtdUnit.findByName(context,newName);
 
 				if (potentialDuplicate == null)
 		    	{
 					// All good, update the name
-					group.setName(newName);
+					department.setName(newName);
 		    	}
 				else
 				{
 					// The name is already in use, return an error.
 	    			result.setContinue(false);
-	    			result.addError("group_name");
-	    			result.addError("group_name_duplicate");
+	    			result.addError("department_name");
+	    			result.addError("department_name_duplicate");
 	    			result.setOutcome(false);
-	    			result.setMessage(new Message("default","The group name is already in use"));
+	    			result.setMessage(new Message("default","The department name is already in use"));
 
 	    			return result;
 				}
@@ -253,74 +218,47 @@ public class FlowGroupUtils {
 		}
 
 		// Second, prepare to check members by turning arrays into lists
-		List<Integer> newEPeopleIDs = new ArrayList<Integer>();
-		for (String epeopleID : newEPeopleIDsArray)
+		List<Integer> newCollectionIDs = new ArrayList<Integer>();
+		for (String collectionID : newCollectionIDsArray)
         {
-			newEPeopleIDs.add(Integer.valueOf(epeopleID));
+			newCollectionIDs.add(Integer.valueOf(collectionID));
         }
-		List<Integer> newGroupIDs = new ArrayList<Integer>();
-		for (String _groupID : newGroupIDsArray)
-        {
-			newGroupIDs.add(Integer.valueOf(_groupID));
-        }
-
 
 		// Third, check if there are any members to remove
-		// i.e. scan the list on the group against the ids.
-		for (EPerson epersonMember : group.getMembers())
+		// i.e. scan the list on the department against the ids.
+		for (Collection collectionMember : department.getCollections())
 		{
-			if (!newEPeopleIDs.contains(epersonMember.getID()))
+			if (!newCollectionIDs.contains(collectionMember.getID()))
 			{
-				// The current eperson is not contained in the new list.
-				group.removeMember(epersonMember);
+				// The current collection is not contained in the new list.
+				department.removeCollection(collectionMember);
 			}
 			else
 			{
 				// If they are still in the list then remove them
-				// from the list of people to add.
-				newEPeopleIDs.remove((Object)epersonMember.getID());
-			}
-		}
-		for (Group groupMember : group.getMemberGroups())
-		{
-			if (!newGroupIDs.contains(groupMember.getID()))
-			{
-				// The current group is not contained in the new list.
-				group.removeMember(groupMember);
-			}
-			else
-			{
-				// If they are still in the list then remove them
-				// from the list of groups to add.
-				newGroupIDs.remove((Object)group.getID());
+				// from the list of collections to add.
+				newCollectionIDs.remove((Object)collectionMember.getID());
 			}
 		}
 
-		// Third, check if there are any members to add
-		// i.e. scan the list of ids against the group.
-		for (Integer epersonID : newEPeopleIDs)
+		// Fourth, check if there are any members to add
+		// i.e. scan the list of ids against the department.
+		for (Integer collectionID : newCollectionIDs)
 		{
-			EPerson eperson = EPerson.find(context, epersonID);
+			Collection collection = Collection.find(context, collectionID);
 
-			group.addMember(eperson);
-		}
-
-		for (Integer _groupID : newGroupIDs)
-		{
-			Group _group = Group.find(context, _groupID);
-
-			group.addMember(_group);
+			department.addCollection(collection);
 		}
 
 		// Last, create the result flow
-		group.update();
+		department.update();
 		context.commit();
 
-		// Let's record our group id in case we created a new one.
-		result.setParameter("groupID", group.getID());
+		// Let's record our department id in case we created a new one.
+		result.setParameter("departmentID", department.getID());
 		result.setContinue(true);
 		result.setOutcome(true);
-		result.setMessage(T_edit_group_success_notice);
+		result.setMessage(T_edit_department_success_notice);
 
 		return result;
 	}
@@ -332,61 +270,61 @@ public class FlowGroupUtils {
 	 * @param groupIDs A list of groups to be removed.
 	 * @return A results object.
 	 */
-	public static FlowResult processDeleteGroups(Context context, String[] groupIDs) throws SQLException, AuthorizeException, IOException
+	public static FlowResult processDeleteDepartments(Context context, String[] departmentIDs) throws SQLException, AuthorizeException, IOException
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(true);
 
-    	for (String id : groupIDs)
+    	for (String id : departmentIDs)
     	{
-    		Group groupDeleted = Group.find(context, Integer.valueOf(id));
+    		EtdUnit departmentDeleted = EtdUnit.find(context, Integer.valueOf(id));
 
-    		// If this group is related to a collection, then un-link it.
-    		int collectionId = getCollectionId(groupDeleted.getName());
-    		Role role = getCollectionRole(groupDeleted.getName());
-    		if (collectionId != -1 && role != Role.none)
-    		{
-	    		Collection collection = Collection.find(context, collectionId);
+//    		// If this group is related to a collection, then un-link it.
+//    		int collectionId = getCollectionId(departmentDeleted.getName());
+//    		Role role = getCollectionRole(departmentDeleted.getName());
+//    		if (collectionId != -1 && role != Role.none)
+//    		{
+//	    		Collection collection = Collection.find(context, collectionId);
+//
+//	    		if (collection != null)
+//	    		{
+//		    		if (role == Role.Administrators)
+//		    		{
+//		    			collection.removeAdministrators();
+//		    			collection.update();
+//		    		}
+//		    		else if (role == Role.Submitters)
+//		    		{
+//		    			collection.removeSubmitters();
+//		    			collection.update();
+//		    		}
+//		    		else if (role == Role.WorkflowStep1)
+//		    		{
+//		    			collection.setWorkflowGroup(1, null);
+//		    			collection.update();
+//		    		}
+//		    		else if (role == Role.WorkflowStep2)
+//		    		{
+//		    			collection.setWorkflowGroup(2, null);
+//		    			collection.update();
+//		    		}
+//		    		else if (role == Role.WorkflowStep3)
+//		    		{
+//		    			collection.setWorkflowGroup(3, null);
+//		    			collection.update();
+//		    		}
+//		    		else if (role == Role.DefaultRead)
+//		    		{
+//		    			// Nothing special needs to happen.
+//		    		}
+//	    		}
+//    		}
 
-	    		if (collection != null)
-	    		{
-		    		if (role == Role.Administrators)
-		    		{
-		    			collection.removeAdministrators();
-		    			collection.update();
-		    		}
-		    		else if (role == Role.Submitters)
-		    		{
-		    			collection.removeSubmitters();
-		    			collection.update();
-		    		}
-		    		else if (role == Role.WorkflowStep1)
-		    		{
-		    			collection.setWorkflowGroup(1, null);
-		    			collection.update();
-		    		}
-		    		else if (role == Role.WorkflowStep2)
-		    		{
-		    			collection.setWorkflowGroup(2, null);
-		    			collection.update();
-		    		}
-		    		else if (role == Role.WorkflowStep3)
-		    		{
-		    			collection.setWorkflowGroup(3, null);
-		    			collection.update();
-		    		}
-		    		else if (role == Role.DefaultRead)
-		    		{
-		    			// Nothing special needs to happen.
-		    		}
-	    		}
-    		}
-
-			groupDeleted.delete();
+    		departmentDeleted.delete();
 	    }
 
     	result.setOutcome(true);
-		result.setMessage(T_delete_group_success_notice);
+		result.setMessage(T_delete_department_success_notice);
 
     	return result;
 	}

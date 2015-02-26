@@ -750,4 +750,19 @@ public class EtdUnit extends DSpaceObject
 
     }
 
+	public boolean isMember(Collection collection) {
+		try {
+			Collection[] collections = getCollections();
+			int verifyID = collection.getID();
+			for (Collection c : collections) {
+				if (c.getID() == verifyID) {
+					return true;
+				}
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
+	}
 }

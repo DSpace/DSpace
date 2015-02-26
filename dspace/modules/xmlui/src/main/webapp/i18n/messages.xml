@@ -935,6 +935,8 @@
 	<message key="xmlui.administrative.FlowEPersonUtils.delete_eperson_failed_notice">The user(s) listed were not deleted because there are constraints preventing them from being deleted, see the eperson detail page for more information.</message>
 	<message key="xmlui.administrative.FlowGroupUtils.edit_group_success_notice">The group was edited successfully.</message>
 	<message key="xmlui.administrative.FlowGroupUtils.delete_group_success_notice">The selected groups were deleted successfully.</message>
+	<message key="xmlui.administrative.FlowDepartmentUtils.edit_department_success_notice">The department was edited successfully.</message>
+	<message key="xmlui.administrative.FlowDepartmentUtils.delete_department_success_notice">The selected departments were deleted successfully.</message>
 	<message key="xmlui.administrative.FlowRegistryUtils.add_metadata_schema_success_notice">New schema has been successfully created.</message>
 	<message key="xmlui.administrative.FlowRegistryUtils.delete_metadata_schema_success_notice">The schema(s) were successfully deleted.</message>
 	<message key="xmlui.administrative.FlowRegistryUtils.add_metadata_field_success_notice">Metadata field successfully added.</message>
@@ -1161,6 +1163,75 @@
 	<message key="xmlui.administrative.group.DeleteGroupsConfirm.column2">Name</message>
 	<message key="xmlui.administrative.group.DeleteGroupsConfirm.column3">E-People</message>
 	<message key="xmlui.administrative.group.DeleteGroupsConfirm.column4">Groups</message>
+
+	<!-- general items for all of the departments classes -->
+	<message key="xmlui.administrative.departments.general.department_trail">Manage Departments</message>
+
+	<!-- org.dspace.app.xmlui.administrative.departments.ManageDepartmentsMain -->
+	<message key="xmlui.administrative.departments.ManageDepartmentsMain.title">Manage Departments</message>
+	<message key="xmlui.administrative.departments.ManageDepartmentsMain.main_head">Department management</message>
+	<message key="xmlui.administrative.departments.ManageDepartmentsMain.actions_head">Actions</message>
+	<message key="xmlui.administrative.departments.ManageDepartmentsMain.actions_create">Create a new department</message>
+	<message key="xmlui.administrative.departments.ManageDepartmentsMain.actions_create_link">Click here to add a new Department.</message>
+	<message key="xmlui.administrative.departments.ManageDepartmentsMain.actions_browse">Browse departments</message>
+	<message key="xmlui.administrative.departments.ManageDepartmentsMain.actions_browse_link">Click here to browse all Departments.</message>
+	<message key="xmlui.administrative.departments.ManageDepartmentsMain.actions_search">Search for departments</message>
+	<message key="xmlui.administrative.departments.ManageDepartmentsMain.search_help">Departments are searched by any partial match on their name</message>
+	<message key="xmlui.administrative.departments.ManageDepartmentsMain.search_head">Search results</message>
+	<message key="xmlui.administrative.departments.ManageDepartmentsMain.search_column1"></message>
+	<message key="xmlui.administrative.departments.ManageDepartmentsMain.search_column2">ID</message>
+	<message key="xmlui.administrative.departments.ManageDepartmentsMain.search_column3">Name</message>
+	<message key="xmlui.administrative.departments.ManageDepartmentsMain.search_column4">Members</message>
+	<message key="xmlui.administrative.departments.ManageDepartmentsMain.search_column5">Community / Collection</message>
+	<message key="xmlui.administrative.departments.ManageDepartmentsMain.collection_link">View</message>
+	<message key="xmlui.administrative.departments.ManageDepartmentsMain.submit_delete">Delete departments</message>
+	<message key="xmlui.administrative.departments.ManageDepartmentsMain.no_results">Your search found no results...</message>
+	<message key="xmlui.administrative.departments.ManageDepartmentsMain.departments_collection_link">view</message>
+
+	<!-- org.dspace.app.xmlui.administrative.departments.EditDepartmentForm -->
+	<message key="xmlui.administrative.departments.EditDepartmentForm.title">Department Editor</message>
+	<message key="xmlui.administrative.departments.EditDepartmentForm.trail">Edit department</message>
+	<message key="xmlui.administrative.departments.EditDepartmentForm.main_head">Department Editor: {0} (id: {1})</message>
+	<message key="xmlui.administrative.departments.EditDepartmentForm.main_head_new">Department Editor: new department</message>
+	<message key="xmlui.administrative.departments.EditDepartmentForm.submit_clear">Clear search</message>
+	<message key="xmlui.administrative.departments.EditDepartmentForm.member">Member</message>
+	<message key="xmlui.administrative.departments.EditDepartmentForm.cycle">Cycle</message>
+	<message key="xmlui.administrative.departments.EditDepartmentForm.pending">Pending</message>
+	<message key="xmlui.administrative.departments.EditDepartmentForm.pending_warn">Note, pending changes are not saved until you click the save button.</message>
+	<message key="xmlui.administrative.departments.EditDepartmentForm.submit_add">Add</message>
+	<message key="xmlui.administrative.departments.EditDepartmentForm.submit_remove">Remove</message>
+	<message key="xmlui.administrative.departments.EditDepartmentForm.collection_para">This department is associated with collection: </message>
+	<message key="xmlui.administrative.departments.EditDepartmentForm.community_para">This department is associated with community: </message>
+	<message key="xmlui.administrative.departments.EditDepartmentForm.label_name">Change department name: </message>
+	<message key="xmlui.administrative.departments.EditDepartmentForm.label_instructions">This department is associated with a specific collection or community and the name cannot be modified.</message>
+	<message key="xmlui.administrative.departments.EditDepartmentForm.label_search">Search collections to add: </message>
+	<message key="xmlui.administrative.departments.EditDepartmentForm.submit_search_collections">Collections...</message>
+	<message key="xmlui.administrative.departments.EditDepartmentForm.no_results">Your search found no results...</message>
+
+	<message key="xmlui.administrative.departments.EditDepartmentForm.collections_column1">ID</message>
+	<message key="xmlui.administrative.departments.EditDepartmentForm.collections_column2">Name</message>
+	<message key="xmlui.administrative.departments.EditDepartmentForm.collections_column3"></message>
+
+	<message key="xmlui.administrative.departments.EditDepartmentForm.members_head">Members</message>
+	<message key="xmlui.administrative.departments.EditDepartmentForm.members_column1">ID</message>
+	<message key="xmlui.administrative.departments.EditDepartmentForm.members_column2">Name</message>
+	<message key="xmlui.administrative.departments.EditDepartmentForm.members_column3"></message>
+
+	<message key="xmlui.administrative.departments.EditDepartmentForm.members_department_name">department: {0}</message>
+	<message key="xmlui.administrative.departments.EditDepartmentForm.members_none">This department has no members.</message>
+	<message key="xmlui.administrative.departments.EditDepartmentForm.members_pending">[pending]</message>
+	<message key="xmlui.administrative.departments.EditDepartmentForm.instructions_para">Remove members</message>
+	<message key="xmlui.administrative.departments.EditDepartmentForm.collection_link_para">Remove members</message>
+
+	<!-- org.dspace.app.xmlui.administrative.departments.DeleteDepartmentsConfirm -->
+	<message key="xmlui.administrative.departments.DeleteDepartmentsConfirm.title">Confirm Department Deletion</message>
+	<message key="xmlui.administrative.departments.DeleteDepartmentsConfirm.trail">Confirm Delete</message>
+	<message key="xmlui.administrative.departments.DeleteDepartmentsConfirm.head">Confirm Deletion</message>
+	<message key="xmlui.administrative.departments.DeleteDepartmentsConfirm.para">The following Departments will be deleted:</message>
+	<message key="xmlui.administrative.departments.DeleteDepartmentsConfirm.column1">ID</message>
+	<message key="xmlui.administrative.departments.DeleteDepartmentsConfirm.column2">Name</message>
+	<message key="xmlui.administrative.departments.DeleteDepartmentsConfirm.column3">E-People</message>
+	<message key="xmlui.administrative.departments.DeleteDepartmentsConfirm.column4">Departments</message>
 
 	<!-- general items for all of the registries classes -->
 	<message key="xmlui.administrative.registries.general.format_registry_trail">Format registry</message>

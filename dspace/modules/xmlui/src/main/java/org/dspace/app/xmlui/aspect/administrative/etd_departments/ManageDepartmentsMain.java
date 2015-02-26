@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.xmlui.aspect.administrative.group;
+package org.dspace.app.xmlui.aspect.administrative.etd_departments;
 
 import java.sql.SQLException;
 
@@ -26,66 +26,65 @@ import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
-import org.dspace.eperson.Group;
+import org.dspace.content.EtdUnit;
 
 /**
- * Manage groups page is the entry point for group management. From here the user
- * may browse/search a the list of groups, they may also add new groups or select
- * existing groups to edit or delete.
+ * Manage departments page is the entry point for department management. From here the user
+ * may browse/search a the list of departments, they may also add new departments or select
+ * existing departments to edit or delete.
  *
  * @author Alexey Maslov
  * @author Scott Phillips
  */
-public class ManageDepartmentsMain
-        extends AbstractDSpaceTransformer
+public class ManageDepartmentsMain extends AbstractDSpaceTransformer
 {
 
     /** Language Strings */
     private static final Message T_dspace_home =
             message("xmlui.general.dspace_home");
-    private static final Message T_group_trail =
-            message("xmlui.administrative.group.general.group_trail");
+    private static final Message T_departments_trail =
+            message("xmlui.administrative.departments.general.department_trail");
     private static final Message T_title =
-            message("xmlui.administrative.group.ManageGroupsMain.title");
+            message("xmlui.administrative.departments.ManageDepartmentsMain.title");
     private static final Message T_main_head =
-            message("xmlui.administrative.group.ManageGroupsMain.main_head");
+            message("xmlui.administrative.departments.ManageDepartmentsMain.main_head");
     private static final Message T_actions_head =
-            message("xmlui.administrative.group.ManageGroupsMain.actions_head");
+            message("xmlui.administrative.departments.ManageDepartmentsMain.actions_head");
     private static final Message T_actions_create =
-            message("xmlui.administrative.group.ManageGroupsMain.actions_create");
+            message("xmlui.administrative.departments.ManageDepartmentsMain.actions_create");
     private static final Message T_actions_create_link =
             message(
-            "xmlui.administrative.group.ManageGroupsMain.actions_create_link");
+            "xmlui.administrative.departments.ManageDepartmentsMain.actions_create_link");
     private static final Message T_actions_browse =
-            message("xmlui.administrative.group.ManageGroupsMain.actions_browse");
+            message("xmlui.administrative.departments.ManageDepartmentsMain.actions_browse");
     private static final Message T_actions_browse_link =
             message(
-            "xmlui.administrative.group.ManageGroupsMain.actions_browse_link");
+            "xmlui.administrative.departments.ManageDepartmentsMain.actions_browse_link");
     private static final Message T_actions_search =
-            message("xmlui.administrative.group.ManageGroupsMain.actions_search");
+            message("xmlui.administrative.departments.ManageDepartmentsMain.actions_search");
     private static final Message T_search_help =
-            message("xmlui.administrative.group.ManageGroupsMain.search_help");
+            message("xmlui.administrative.departments.ManageDepartmentsMain.search_help");
     private static final Message T_go =
             message("xmlui.general.go");
     private static final Message T_search_head =
-            message("xmlui.administrative.group.ManageGroupsMain.search_head");
+            message("xmlui.administrative.departments.ManageDepartmentsMain.search_head");
     private static final Message T_search_column1 =
-            message("xmlui.administrative.group.ManageGroupsMain.search_column1");
+            message("xmlui.administrative.departments.ManageDepartmentsMain.search_column1");
     private static final Message T_search_column2 =
-            message("xmlui.administrative.group.ManageGroupsMain.search_column2");
+            message("xmlui.administrative.departments.ManageDepartmentsMain.search_column2");
     private static final Message T_search_column3 =
-            message("xmlui.administrative.group.ManageGroupsMain.search_column3");
+            message("xmlui.administrative.departments.ManageDepartmentsMain.search_column3");
     private static final Message T_search_column4 =
-            message("xmlui.administrative.group.ManageGroupsMain.search_column4");
+            message("xmlui.administrative.departments.ManageDepartmentsMain.search_column4");
     private static final Message T_search_column5 =
-            message("xmlui.administrative.group.ManageGroupsMain.search_column5");
+            message("xmlui.administrative.departments.ManageDepartmentsMain.search_column5");
     private static final Message T_collection_link =
             message(
-            "xmlui.administrative.group.ManageGroupsMain.collection_link");
+            "xmlui.administrative.departments.ManageDepartmentsMain.collection_link");
     private static final Message T_submit_delete =
-            message("xmlui.administrative.group.ManageGroupsMain.submit_delete");
+            message("xmlui.administrative.departments.ManageDepartmentsMain.submit_delete");
     private static final Message T_no_results =
-            message("xmlui.administrative.group.ManageGroupsMain.no_results");
+            message("xmlui.administrative.departments.ManageDepartmentsMain.no_results");
     /** The number of results to show on one page. */
     private static final int PAGE_SIZE = 15;
     /** The maximum size of a collection or community name allowed */
@@ -96,35 +95,35 @@ public class ManageDepartmentsMain
     {
         pageMeta.addMetadata("title").addContent(T_title);
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
-        pageMeta.addTrailLink(null, T_group_trail);
+        pageMeta.addTrailLink(null, T_departments_trail);
     }
 
     public void addBody(Body body)
             throws WingException, SQLException
     {
         // Get all our parameters
-        String baseURL = contextPath + "/admin/groups?administrative-continue="
+        String baseURL = contextPath + "/admin/departments?administrative-continue="
                 + knot.getId();
         String query = decodeFromURL(parameters.getParameter("query", ""));
         int page = parameters.getParameterAsInteger("page", 0);
         int highlightID = parameters.getParameterAsInteger("highlightID", -1);
-        int resultCount = Group.searchResultCount(context, query);
-        Group[] groups = Group.search(context, query, page * PAGE_SIZE,
+        int resultCount = EtdUnit.searchResultCount(context, query);
+        EtdUnit[] departments = EtdUnit.search(context, query, page * PAGE_SIZE,
                 PAGE_SIZE);
 
 
 
-        // DIVISION: groups-main
-        Division main = body.addInteractiveDivision("groups-main", contextPath
-                + "/admin/groups", Division.METHOD_POST,
-                "primary administrative groups");
+        // DIVISION: departments-main
+        Division main = body.addInteractiveDivision("departments-main", contextPath
+                + "/admin/departments", Division.METHOD_POST,
+                "primary administrative departments");
         main.setHead(T_main_head);
 
 
 
 
-        // DIVISION: group-actions
-        Division actions = main.addDivision("group-actions");
+        // DIVISION: department-actions
+        Division actions = main.addDivision("department-actions");
         actions.setHead(T_actions_head);
 
         // Browse Epeople
@@ -146,8 +145,8 @@ public class ManageDepartmentsMain
         queryField.setHelp(T_search_help);
         actionItem.addButton("submit_search").setValue(T_go);
 
-        // DIVISION: group-search
-        Division search = main.addDivision("group-search");
+        // DIVISION: department-search
+        Division search = main.addDivision("department-search");
         search.setHead(T_search_head);
 
 
@@ -155,7 +154,7 @@ public class ManageDepartmentsMain
         {
             // If there are enough results then paginate the results
             int firstIndex = page * PAGE_SIZE + 1;
-            int lastIndex = page * PAGE_SIZE + groups.length;
+            int lastIndex = page * PAGE_SIZE + departments.length;
 
             String nextURL = null, prevURL = null;
             if (page < (resultCount / PAGE_SIZE))
@@ -172,7 +171,7 @@ public class ManageDepartmentsMain
         }
 
 
-        Table table = search.addTable("groups-search-table", groups.length + 1,
+        Table table = search.addTable("departments-search-table", departments.length + 1,
                 1);
         Row header = table.addRow(Row.ROLE_HEADER);
         header.addCell().addContent(T_search_column1);
@@ -181,10 +180,10 @@ public class ManageDepartmentsMain
         header.addCell().addContent(T_search_column4);
         header.addCell().addContent(T_search_column5);
 
-        for (Group group : groups)
+        for (EtdUnit department : departments)
         {
             Row row;
-            if (group.getID() == highlightID)
+            if (department.getID() == highlightID)
             {
                 row = table.addRow(null, null, "highlight");
             }
@@ -193,34 +192,34 @@ public class ManageDepartmentsMain
                 row = table.addRow();
             }
 
-            if (group.getID() > 1)
+            if (department.getID() > 1)
             {
-                CheckBox select = row.addCell().addCheckBox("select_group");
-                select.setLabel(Integer.valueOf(group.getID()).toString());
-                select.addOption(Integer.valueOf(group.getID()).toString());
+                CheckBox select = row.addCell().addCheckBox("select_department");
+                select.setLabel(Integer.valueOf(department.getID()).toString());
+                select.addOption(Integer.valueOf(department.getID()).toString());
             }
             else
             {
                 // Don't allow the user to remove the administrative (id:1) or
-                // anonymous group (id:0)
+                // anonymous department (id:0)
                 row.addCell();
             }
 
-            row.addCell().addContent(group.getID());
-            row.addCell().addXref(baseURL + "&submit_edit&groupID="
-                    + group.getID(), group.getName());
+            row.addCell().addContent(department.getID());
+            row.addCell().addXref(baseURL + "&submit_edit&departmentID="
+                    + department.getID(), department.getName());
 
-            int memberCount = group.getMembers().length
-                    + group.getMemberGroups().length;
-            row.addCell().addContent(memberCount == 0 ? "-" : String.valueOf(
-                    memberCount));
+            //int memberCount = department.getMembers().length
+            //        + department.getMemberGroups().length;
+            //row.addCell().addContent(memberCount == 0 ? "-" : String.valueOf(
+            //        memberCount));
 
             Cell cell = row.addCell();
-            String groupName = group.getName();
+            String departmentName = department.getName();
             DSpaceObject collectionOrCommunity = null;
             String collectionOrCommunityName = null;
             int id;
-            id = FlowGroupUtils.getCollectionId(groupName);
+            id = FlowGroupUtils.getCollectionId(departmentName);
             if (id > -1)
             {
                 Collection collection = Collection.find(context, id);
@@ -232,7 +231,7 @@ public class ManageDepartmentsMain
             }
             else
             {
-                id = FlowGroupUtils.getCommunityId(groupName);
+                id = FlowGroupUtils.getCommunityId(departmentName);
                 if (id > -1)
                 {
                     Community community = Community.find(context, id);
@@ -268,7 +267,7 @@ public class ManageDepartmentsMain
 
         }
 
-        if (groups.length <= 0)
+        if (departments.length <= 0)
         {
             Cell cell = table.addRow().addCell(1, 5);
             cell.addHighlight("italic").addContent(T_no_results);
