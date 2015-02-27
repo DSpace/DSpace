@@ -29,8 +29,9 @@
     <!-- Check to see if XHTML pages are included via this XSLT -->
     <xsl:variable name="meta" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata"/>
     <xsl:variable name="pageName" select="$meta[@element='request'][@qualifier='URI']"/>
+    <!-- TODO: Render /dryadlab from site root, all others from /pages/{pagename} -->
     <xsl:variable name="doc" select="document(concat('pages/', $pageName, '.xhtml'))"/>
-
+    <!--<xsl:variable name="doc"><xsl:value-of select="document(concat('pages/', $pageName, '.xhtml'))"/></xsl:variable>-->
 
     <!-- Overwriting the default DSpace dri:body template to check for pages -->
     <xsl:template match="dri:body">
