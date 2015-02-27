@@ -135,6 +135,8 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                     journalName=journalName.trim();
                     journalID = DryadJournalSubmissionUtils.findKeyByFullname(journalName);
                     if(journalID==null) journalID=journalName;
+                    log.debug("journalName = " + journalName);
+                    log.debug("journalID = " + journalID);
                 }
                 else if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_NOT_YET_SUBMITTED){
                     journalID = request.getParameter("journalIDStatusNotYetSubmitted");
@@ -397,6 +399,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                         title = title.substring(0, title.length() - 1);
                     }
 
+                    log.debug("adding journal title to item: " + title);
                     addEmailsAndEmbargoSettings(journalConcept, item);
                     item.addMetadata("prism", "publicationName", null, null, title);
                     item.update();
@@ -451,6 +454,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                         addEmailsAndEmbargoSettings(journalConcept, item);
                         
                         title = journalConcept.getPreferredLabel();
+                        log.debug("invalid manuscript nubmer. Setting journal title to: " + title);
                         addSingleMetadataValueFromJournal(context, item, "journalName", title);
                         addSingleMetadataValueFromJournal(context, item, "manuscriptNumber", manuscriptNumber);
 
@@ -465,6 +469,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
             else
             {
+                log.debug("adding journal title to item: " + title);
                 item.addMetadata("prism", "publicationName", null, null, title);
                 item.update();
             }

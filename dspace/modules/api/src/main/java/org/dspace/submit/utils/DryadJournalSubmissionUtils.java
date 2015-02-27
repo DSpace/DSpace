@@ -86,8 +86,11 @@ public class DryadJournalSubmissionUtils {
 
 
             try {
-                Scheme scheme = Scheme.findByIdentifier(c, ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName"));
-                Concept[] concepts = Concept.findByPreferredLabel(c,journal,scheme.getID());
+                String publicationNameProp = ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName");
+                Scheme scheme = Scheme.findByIdentifier(c, publicationNameProp);
+                int schemeID = scheme.getID();
+                Concept[] concepts = Concept.findByPreferredLabel(c,journal, schemeID);
+                log.debug("journal lookup: name = " + journal + ", publicationNameProp = " + publicationNameProp + ", ID  = " + schemeID);
                 //todo:add the journal order
                 Concept concept = concepts[0];
 
