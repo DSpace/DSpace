@@ -186,7 +186,7 @@
             <xsl:apply-templates/>
         </div>
     </xsl:template>
-    
+
     <xsl:template match="dri:reference" mode="journalLanding">
         <xsl:variable name="externalMetadataURL">
             <xsl:text>cocoon:/</xsl:text>
@@ -203,6 +203,9 @@
         <xsl:apply-templates select="document($externalMetadataURL)" mode="summaryList"/>
         <xsl:apply-templates />
     </xsl:template>
-    
-    
+
+    <xsl:template match="//dri:div[@n='journal-landing-banner-inner']/dri:p/dri:hi" priority="2">
+        <strong><xsl:value-of select="."/></strong>
+    </xsl:template>
+
 </xsl:stylesheet>

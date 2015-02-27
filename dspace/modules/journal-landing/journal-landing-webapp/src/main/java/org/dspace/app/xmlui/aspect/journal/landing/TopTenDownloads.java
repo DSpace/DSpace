@@ -43,7 +43,6 @@ public class TopTenDownloads extends JournalLandingTabbedTransformer {
         int currentMonth = getCurrentMonth();
         int currentYear = getCurrentYear();
         String currentMonthStr = getCurrentMonthStr();
-        itemType = Constants.BITSTREAM;
 
         divData = new DivData();
         divData.n = TOPTEN_DOWNLOADS;

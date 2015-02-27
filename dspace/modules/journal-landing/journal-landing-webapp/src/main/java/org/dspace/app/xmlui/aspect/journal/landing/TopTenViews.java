@@ -34,8 +34,6 @@ import org.dspace.core.Constants;
 public class TopTenViews extends JournalLandingTabbedTransformer {
     
     private static final Logger log = Logger.getLogger(TopTenViews.class);
-    private static final Message T_head = message("xmlui.JournalLandingPage.TopTenViews.panel_head");
-    private static final Message T_val_head = message("xmlui.JournalLandingPage.TopTenViews.val_head");
     
     @Override
     public void setup(SourceResolver resolver, Map objectModel, String src,
@@ -46,7 +44,6 @@ public class TopTenViews extends JournalLandingTabbedTransformer {
         int currentMonth = getCurrentMonth();
         int currentYear = getCurrentYear();
         String currentMonthStr = getCurrentMonthStr();
-        itemType = Constants.ITEM;
 
         divData = new DivData();
         divData.n = TOPTEN_VIEWS;
@@ -54,7 +51,7 @@ public class TopTenViews extends JournalLandingTabbedTransformer {
 
         tabData = new ArrayList<TabData>(3);
         TabData tb1 = new TabData();
-        tb1.n = TOPTEN_VIEWS_MONTH;       
+        tb1.n = TOPTEN_VIEWS_MONTH;
         tb1.buttonLabel = message("xmlui.JournalLandingPage.JournalLandingTabbedTransformer.month");
         tb1.dateFilter = String.format(solrDateFormat, currentYear, currentMonth);
         tb1.refHead = message("xmlui.JournalLandingPage.TopTenViews.ref_head_month").parameterize(currentMonthStr,currentYear);

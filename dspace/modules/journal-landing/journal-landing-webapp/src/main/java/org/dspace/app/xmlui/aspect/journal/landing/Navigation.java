@@ -6,7 +6,6 @@
 package org.dspace.app.xmlui.aspect.journal.landing;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.sql.SQLException;
 import org.apache.avalon.framework.parameters.ParameterException;
 import org.apache.cocoon.environment.ObjectModelHelper;
@@ -20,7 +19,6 @@ import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.submit.utils.DryadJournalSubmissionUtils;
 import org.xml.sax.SAXException;
 
 /**

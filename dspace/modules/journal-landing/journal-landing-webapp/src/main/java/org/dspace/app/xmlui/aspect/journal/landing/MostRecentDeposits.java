@@ -19,7 +19,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import org.apache.avalon.framework.parameters.ParameterException;
-import org.apache.commons.collections.ExtendedProperties;
 import org.xml.sax.SAXException;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.SolrDocument;
@@ -32,7 +31,6 @@ import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
@@ -66,10 +64,6 @@ public class MostRecentDeposits extends AbstractFiltersTransformer {
         }
         if (journalName == null || journalName.length() == 0) return;
 
-        // ------------------
-        // Most recent deposits
-        //
-        // ------------------
         Division mostRecent = body.addDivision(MOST_RECENT_DEPOSITS_DIV);
         mostRecent.setHead(T_mostRecent);
 
@@ -98,23 +92,17 @@ public class MostRecentDeposits extends AbstractFiltersTransformer {
     }
 
     /**
+     * Search for recently accessioned data packages
      *
-     *
-     * @param object
+     * @param object: unused
      */
     @Override
     public void performSearch(DSpaceObject object) throws SearchServiceException, UIException {
-        if (queryResults != null) return;
         queryArgs = prepareDefaultFilters(getView());
-        queryArgs.setQuery("search.resourcetype:" + Constants.ITEM + " AND prism.publicationName:" + journalName);
-        queryArgs.setRows(10);
-        String sortField = SearchUtils.getConfig().getString("recent.submissions.sort-option");
-        if(sortField != null){
-            queryArgs.setSortField(
-                    sortField,
-                    SolrQuery.ORDER.desc
-            );
-        }
+        queryArgs.setQuery("DSpaceStatus:Archived AND search.resourcetype:" + Constants.ITEM + " AND prism.publicationName:\"" + journalName + "\"");
+        queryArgs.add("fl", depositsDisplayHandle + "," + depositsDisplayField);
+        queryArgs.setRows(displayCount);
+        queryArgs.setSortField(depositsDisplaySortField, depositsDisplaySortOrder);
         SearchService service = (SearchService) getSearchService();
         try {
             queryResults = service.search(context, queryArgs);
@@ -122,39 +110,36 @@ public class MostRecentDeposits extends AbstractFiltersTransformer {
             log.error(e.getMessage(), e);
             return;
         }
-
-        boolean includeRestrictedItems = ConfigurationManager.getBooleanProperty("harvest.includerestricted.rss", false);
-        int numberOfItemsToShow= SearchUtils.getConfig().getInt("solr.recent-submissions.size", 5);
-        ExtendedProperties config = SearchUtils.getConfig();
-        if (queryResults != null && !includeRestrictedItems)  {
-            for (SolrDocument doc : queryResults.getResults()) {
-                if (references.size() > numberOfItemsToShow) break;
-                DSpaceObject dso = null;
-                try {
-                    dso = SearchUtils.findDSpaceObject(context, doc);
-                } catch (SQLException ex) {
-                    log.error(ex);
-                    return;
-                }
-                try {
-                    if (dso != null
-                     && DryadWorkflowUtils.isAtLeastOneDataFileVisible(context, (Item) dso))
-                    {
-                        references.add(dso);
-                        // dates.add(doc.getFieldValue(config.getString("recent.submissions.sort-option")).toString());
-                        Object o = doc.getFieldValue(config.getString("recent.submissions.sort-option"));
-                        if (o instanceof ArrayList) {
-                            o = ((ArrayList) o).get(0);
-                        }
-                        if (o instanceof Date) {
-                            dates.add(fmt.format(o));
-                        } else {
-                            dates.add(o.toString());
-                        }
+        if (queryResults == null) {
+            log.debug("Null query results for journa: " + journalName);
+            return;
+        }
+        for (SolrDocument doc : queryResults.getResults()) {
+            if (references.size() > displayCount) break;
+            DSpaceObject dso = null;
+            try {
+                dso = SearchUtils.findDSpaceObject(context, doc);
+            } catch (SQLException ex) {
+                log.error(ex);
+                return;
+            }
+            try {
+                if (dso != null
+                 && DryadWorkflowUtils.isAtLeastOneDataFileVisible(context, (Item) dso))
+                {
+                    references.add(dso);
+                    Object o = doc.getFieldValue(depositsDisplayField);
+                    if (o instanceof ArrayList) {
+                        o = ((ArrayList) o).get(0);
                     }
-                } catch (SQLException ex) {
-                    log.error(ex.getMessage(), ex);
+                    if (o instanceof Date) {
+                        dates.add(fmt.format(o));
+                    } else {
+                        dates.add(o.toString());
+                    }
                 }
+            } catch (SQLException ex) {
+                log.error(ex.getMessage(), ex);
             }
         }
     }

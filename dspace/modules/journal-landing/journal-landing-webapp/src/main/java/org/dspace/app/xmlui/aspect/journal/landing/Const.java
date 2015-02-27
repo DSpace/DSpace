@@ -5,6 +5,8 @@
  */
 package org.dspace.app.xmlui.aspect.journal.landing;
 
+import org.apache.solr.client.solrj.SolrQuery;
+
 /**
  * String values in use in journal landing page aspect.
  * @author Nathan Day
@@ -18,18 +20,12 @@ public class Const {
     // banner
     public static final String BANNER_DIV_OUTER = "journal-landing-banner-outer";
     public static final String BANNER_DIV_INNER = "journal-landing-banner-inner";
-    public static final String BANNER_PUB = "journal-landing-banner-pub";
-    public static final String BANNER_SOC = "journal-landing-banner-soc";
-    public static final String BANNER_EDI = "journal-landing-banner-edi";
-
-    // dryad info
-    public static final String DRYAD_INFO_WRA = "journal-landing-dryadinfo-wrapper";
-    public static final String DRYAD_INFO_INN = "journal-landing-dryadinfo-inner";
-    public static final String DRYAD_INFO_INF = "journal-landing-dryadinfo-inf";
-    public static final String DRYAD_INFO_MEM = "journal-landing-dryadinfo-mem";
-    public static final String DRYAD_INFO_PAY = "journal-landing-dryadinfo-pay";
-    public static final String DRYAD_INFO_DAT = "journal-landing-dryadinfo-dat";
-    public static final String DRYAD_INFO_MET = "journal-landing-dryadinfo-met";
+    public static final String BANNER_MEM = "journal-landing-banner-mem";
+    public static final String BANNER_PAY = "journal-landing-banner-pay";
+    public static final String BANNER_DAT = "journal-landing-banner-dat";
+    public static final String BANNER_AUT = "journal-landing-banner-aut";
+    public static final String BANNER_MET = "journal-landing-banner-met";
+    public static final String BANNER_INT = "journal-landing-banner-int";
     
     public static final String SEARCH_DIV = "journal-landing-search";
     
@@ -59,4 +55,9 @@ public class Const {
     public static final String fmtDateView = "yyyy-MM-dd";
     public static final String solrDateFormat = "time:[%d-%s-01T00:00:00.000Z TO NOW]";
     public static final String solrDateAllTime = "[* TO NOW]";
+    public static final int displayCount = 10;
+    public static final String depositsDisplayField = "dc.date.accessioned_dt";
+    public static final String depositsDisplaySortField = "dc.date.accessioned_dt";
+    public static final SolrQuery.ORDER depositsDisplaySortOrder = SolrQuery.ORDER.desc;
+    public static final String depositsDisplayHandle = "handle";
 }

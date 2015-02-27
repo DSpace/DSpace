@@ -8,7 +8,6 @@
         <map:transformers>
             <map:transformer name="Navigation"          src="org.dspace.app.xmlui.aspect.journal.landing.Navigation"/>
             <map:transformer name="Banner"              src="org.dspace.app.xmlui.aspect.journal.landing.Banner"/>
-            <map:transformer name="DryadInfo"           src="org.dspace.app.xmlui.aspect.journal.landing.DryadInfo"/>
             <map:transformer name="JournalSearch"       src="org.dspace.app.xmlui.aspect.journal.landing.JournalSearch"/>
             <map:transformer name="TopTenDownloads"     src="org.dspace.app.xmlui.aspect.journal.landing.TopTenDownloads"/>
             <map:transformer name="TopTenViews"         src="org.dspace.app.xmlui.aspect.journal.landing.TopTenViews"/>
@@ -33,10 +32,6 @@
                         <map:parameter name="journalAbbr" value="{journalAbbr}"/>
                     </map:transform>
                     <map:transform type="Banner">
-                        <map:parameter name="journalName" value="{journalName}"/>
-                        <map:parameter name="journalAbbr" value="{journalAbbr}"/>
-                    </map:transform>
-                    <map:transform type="DryadInfo">
                         <map:parameter name="journalName" value="{journalName}"/>
                         <map:parameter name="journalAbbr" value="{journalAbbr}"/>
                     </map:transform>
