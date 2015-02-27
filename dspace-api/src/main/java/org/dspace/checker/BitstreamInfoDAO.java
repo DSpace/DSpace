@@ -187,10 +187,6 @@ public final class BitstreamInfoDAO extends DAOSupport
         }
 
         Connection conn = null;
-        if (LOG.isDebugEnabled())
-        {
-            LOG.debug("update: " + info.toLongString());
-        }
         PreparedStatement stmt = null;
 
         try

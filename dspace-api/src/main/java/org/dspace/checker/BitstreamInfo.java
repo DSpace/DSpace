@@ -539,16 +539,4 @@ public final class BitstreamInfo
     {
         this.processEndDate = endDate == null ? null : new Date(endDate.getTime());
     }
-
-    public String toLongString()
-    {
-        String me = this.getClass().getName() + "(";
-        me = me + "BITSTREAM." + dspaceBitstream.getBitstreamId() + ", ";
-        me = me + this.getChecksumCheckResult() + ", ";
-        me = me + this.dspaceBitstream.getChecksumAlgorithm() + ", ";
-        me = me + "exp=" + this.getStoredChecksum() + ", ";
-        me = me + "calc=" + this.getCalculatedChecksum() ;
-        me = me + ")";
-        return me;
-    }
 }

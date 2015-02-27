@@ -233,16 +233,16 @@ public final class ChecksumWorker
         calcInfo.setProcessEndDate(new Date());
 
         // record new checksum and comparison result in db
-        LOG.debug("> update bitstreamInfoDAO " + calcInfo.toLongString());
+        LOG.debug("> update bitstreamInfoDAO " + longString(calcInfo));
         bitstreamInfoDAO.update(calcInfo);
         LOG.debug("< update bitstreamInfoDAO");
-        LOG.debug("> update checksumHistoryDAO " + calcInfo.toLongString());
+        LOG.debug("> update checksumHistoryDAO " + longString(calcInfo));
         checksumHistoryDAO.insertHistory(calcInfo);
         LOG.debug("< update checksumHistoryDAO");
 
         if (verbose)
         {
-            System.out.println("" + row + " " + calcInfo.toLongString());
+            System.out.println("" + row + " " + longString(calcInfo));
         } else
         {
             char resultCode = 'E';
@@ -260,6 +260,18 @@ public final class ChecksumWorker
             }
         }
 
+    }
+
+    private String longString(BitstreamInfo bitstreamInfo)
+    {
+        String me = bitstreamInfo.getClass().getName() + "(";
+        me = me + "BITSTREAM." + bitstreamInfo.getBitstreamId() + ", ";
+        me = me + bitstreamInfo.getChecksumCheckResult() + ", ";
+        me = me + bitstreamInfo.getChecksumAlgorithm() + ", ";
+        me = me + "exp=" + bitstreamInfo.getStoredChecksum() + ", ";
+        me = me + "calc=" + bitstreamInfo.getCalculatedChecksum();
+        me = me + ")";
+        return me;
     }
 
     public static void main(String[] args)
