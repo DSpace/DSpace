@@ -22,13 +22,13 @@ import com.hp.hpl.jena.sparql.engine.http.QueryEngineHTTP;
 
 public abstract class SPARQLAuthorityProvider implements ChoiceAuthority {
 
-    protected static Logger log = Logger.getLogger(SPARQLAuthorityProvider.class);
-    
+	protected static Logger log = Logger
+			.getLogger(SPARQLAuthorityProvider.class);
+
 	protected static final String NS_RDFS = "http://www.w3.org/2000/01/rdf-schema#";
 	protected static final String NS_SKOS = "http://www.w3.org/2004/02/skos/core#";
 	protected static final String NS_FOAF = "http://xmlns.com/foaf/0.1/";
 	protected static final String NS_DC = "http://purl.org/dc/terms/";
-	
 
 	private String sparqlEndpoint;
 	private QuerySolutionMap globalParameters;
@@ -39,7 +39,8 @@ public abstract class SPARQLAuthorityProvider implements ChoiceAuthority {
 
 	public SPARQLAuthorityProvider(String sparqlEndpoint,
 			QuerySolutionMap globalParameters) {
-		log.trace("New SPARQLAuthorityProvider created por endpoint: " + sparqlEndpoint);
+		log.trace("New SPARQLAuthorityProvider created por endpoint: "
+				+ sparqlEndpoint);
 		this.sparqlEndpoint = sparqlEndpoint;
 		this.globalParameters = globalParameters;
 	}
@@ -57,7 +58,7 @@ public abstract class SPARQLAuthorityProvider implements ChoiceAuthority {
 		return new Choices(choices, start, limit, Choices.CF_ACCEPTED, false);
 		// TODO hasMore??
 	}
-	
+
 	@Override
 	public final Choices getBestMatch(String field, String text,
 			int collection, String locale) {
@@ -70,13 +71,12 @@ public abstract class SPARQLAuthorityProvider implements ChoiceAuthority {
 		ParameterizedSparqlString query = this.getSparqlSearchByIdQuery(field,
 				key, locale);
 		Choice[] choices = this.evalSparql(query, 0, 1);
-		if (choices.length ==0 )
+		if (choices.length == 0)
 			return null;
-		else 
+		else
 			return choices[0].label;
 	}
 
-	
 	protected abstract ParameterizedSparqlString getSparqlSearchByIdQuery(
 			String field, String key, String locale);
 
@@ -90,7 +90,8 @@ public abstract class SPARQLAuthorityProvider implements ChoiceAuthority {
 			int limit) {
 
 		parameterizedSparqlString.setParams(globalParameters);
-		Query query = QueryFactory.create(parameterizedSparqlString.toString(), this.getSPARQLSyntax());
+		Query query = QueryFactory.create(parameterizedSparqlString.toString(),
+				this.getSPARQLSyntax());
 		query.setOffset(offset);
 
 		if (limit == 0)
@@ -98,22 +99,26 @@ public abstract class SPARQLAuthorityProvider implements ChoiceAuthority {
 		else
 			query.setLimit(limit);
 		long inicio = System.currentTimeMillis();
-		if (log.isDebugEnabled()){ 
-			log.debug("Excecuting SparqlQuery "+query.toString(this.getSPARQLSyntax()));
+		if (log.isDebugEnabled()) {
+			log.debug("Excecuting SparqlQuery "
+					+ query.toString(this.getSPARQLSyntax()));
 		}
 
 		QueryEngineHTTP httpQuery = new QueryEngineHTTP(sparqlEndpoint, query);
+		httpQuery.setAllowDeflate(false);
+		httpQuery.setAllowGZip(false);
 		Choice[] choices = this.extractChoices(httpQuery.execSelect());
 		httpQuery.close();
 
-		if (log.isDebugEnabled()){ 
-			log.debug("El query tardó "+(System.currentTimeMillis() - inicio) + "ms");
+		if (log.isDebugEnabled()) {
+			log.debug("El query tardó " + (System.currentTimeMillis() - inicio)
+					+ "ms");
 		}
 		return choices;
 	}
 
 	private Syntax getSPARQLSyntax() {
-		//FIXME: la sintaxis debería ser protected
+		// FIXME: la sintaxis debería ser protected
 		return Syntax.syntaxSPARQL_10;
 	}
 
@@ -126,9 +131,8 @@ public abstract class SPARQLAuthorityProvider implements ChoiceAuthority {
 		return choices.toArray(new Choice[0]);
 	}
 
-	
 	public static void main(String[] args) {
-	
+
 		log.addAppender(new WriterAppender(new SimpleLayout(), System.out));
 		log.setLevel(Level.TRACE);
 		SPARQLAuthorityProvider s = new SPARQLAuthorityProvider(
@@ -136,7 +140,8 @@ public abstract class SPARQLAuthorityProvider implements ChoiceAuthority {
 
 			@Override
 			protected Choice extractChoice(QuerySolution solution) {
-				String expressionValue = solution.getResource("experiment").getURI();
+				String expressionValue = solution.getResource("experiment")
+						.getURI();
 				String pValue = solution.getLiteral("description").getString();
 				// print the output to stdout
 				return new Choice("0", pValue, expressionValue + "\t" + pValue);
@@ -156,12 +161,12 @@ public abstract class SPARQLAuthorityProvider implements ChoiceAuthority {
 				// pss.setBaseUri("http://example.org/base#");
 				pqs.setNsPrefix("atlasterms",
 						"http://rdf.ebi.ac.uk/terms/atlas/");
-					pqs.setNsPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
+				pqs.setNsPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
 				pqs.setNsPrefix("dcterms", "http://purl.org/dc/terms/");
 				pqs.setCommandText("SELECT DISTINCT ?experiment ?description \n");
 				pqs.append("WHERE { \n");
-					pqs.append("?experiment a atlasterms:Experiment .");
-					pqs.append("?experiment dcterms:description ?description .");
+				pqs.append("?experiment a atlasterms:Experiment .");
+				pqs.append("?experiment dcterms:description ?description .");
 				pqs.append("FILTER regex(?description, ?text, \"i\")");
 				pqs.append("} \n");
 				pqs.append("ORDER BY ASC(?description)");
@@ -170,10 +175,11 @@ public abstract class SPARQLAuthorityProvider implements ChoiceAuthority {
 
 			}
 		};
-		
-		Choices cs = s.getMatches("dc.title", "some",0, 0, 10, "en");
+
+		Choices cs = s.getMatches("dc.title", "some", 0, 0, 10, "en");
 		for (Choice c : cs.values) {
-			System.out.println("AUTHORITY="+c.authority+",LABEL="+c.label+",VALUE="+c.value);
+			System.out.println("AUTHORITY=" + c.authority + ",LABEL=" + c.label
+					+ ",VALUE=" + c.value);
 		}
 	}
 }

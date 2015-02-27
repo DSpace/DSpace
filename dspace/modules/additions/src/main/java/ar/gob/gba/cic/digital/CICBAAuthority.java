@@ -8,7 +8,7 @@ public abstract class CICBAAuthority extends SPARQLAuthorityProvider {
 	protected static final String NS_CIC = "http://www.cic.gba.gov.ar/ns#";
 
 	public CICBAAuthority() {
-		super("http://cicdigital.sedici.unlp.edu.ar/auth/sparql");
+		super("http://digital.cic.gba.gob.ar/auth/sparql");
 	}
 
 }

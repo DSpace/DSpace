@@ -48,6 +48,6 @@ public class Institution_CICBA_Authority extends CICBAAuthority {
 	protected Choice extractChoice(QuerySolution solution) {
 		String key = solution.getResource("concept").getURI();
 		String label = solution.getLiteral("label").getString();
-		return new Choice(key, label, label + "(" + key + ")");
+		return new Choice(key, label, label);
 	}
 }

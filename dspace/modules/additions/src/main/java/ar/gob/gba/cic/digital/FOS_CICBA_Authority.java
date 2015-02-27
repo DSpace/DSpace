@@ -21,7 +21,7 @@ public class FOS_CICBA_Authority extends CICBAAuthority{
 		pqs.setNsPrefix("skos", NS_SKOS);
 		pqs.setNsPrefix("cic", NS_CIC);
 		
-		pqs.setCommandText("SELECT ?concept ?label ?affiliation\n");
+		pqs.setCommandText("SELECT ?concept ?label\n");
 		pqs.append("WHERE {\n");
 		pqs.append("?concept a skos:Concept ; a cic:Materia ; skos:prefLabel ?label .\n");
 			pqs.append("FILTER(REGEX(?concept, ?key, \"i\"))\n");
@@ -49,7 +49,7 @@ public class FOS_CICBA_Authority extends CICBAAuthority{
 		pqs.append("}\n");	
 		pqs.append("ORDER BY ASC(?label)\n");
 		
-		pqs.setLiteral("text", text);
+		pqs.setLiteral("text", "^" + text);
 		return pqs;
 	}
 
@@ -57,7 +57,7 @@ public class FOS_CICBA_Authority extends CICBAAuthority{
 	protected Choice extractChoice(QuerySolution solution) {
 		String key = solution.getResource("concept").getURI();
 		String label = solution.getLiteral("label").getString();
-		return new Choice(key, label, label + "("+ key+")");
+		return new Choice(key, label, label);
 	}
 	
 	public static void main(String[] args) {
@@ -75,7 +75,7 @@ public class FOS_CICBA_Authority extends CICBAAuthority{
 			
 			
 			l = System.currentTimeMillis();
-			String label = ca.getLabel("dc.subject", "http://cicdigital.sedici.unlp.edu.ar/auth/taxonomy/term/67168", "en");
+			String label = ca.getLabel("dc.subject", "http://digital.cic.gba.gob.ar/auth/taxonomy/term/67148", "en");
 			System.out.println("LABEL="+label);
 			System.out.println("Tardo "+(System.currentTimeMillis() - l)+ "MS");
 			

@@ -1,7 +1,6 @@
 package ar.gob.gba.cic.digital;
 
 import org.dspace.content.authority.Choice;
-
 import com.hp.hpl.jena.query.ParameterizedSparqlString;
 import com.hp.hpl.jena.query.QuerySolution;
 
@@ -18,7 +17,8 @@ public class Author_CICBA_Authority extends CICBAAuthority {
 
 		pqs.setCommandText("SELECT ?id ?name ?surname ?affiliation\n");
 		pqs.append("WHERE {\n");
-		pqs.append("?person a foaf:Person ; foaf:name ?name ; foaf:surname ?surname ; dc:identifier ?id; foaf:Organization ?affiliation .\n");
+		pqs.append("?person a foaf:Person ; foaf:givenName ?name ; foaf:familyName ?surname ; dc:identifier ?id .\n");
+		pqs.append("OPTIONAL { ?person foaf:Organization ?a . ?a a foaf:Organization ; dc:title ?affiliation }\n");
 		pqs.append("FILTER(REGEX(?id, ?key, \"i\"))\n");
 		pqs.append("}\n");
 
@@ -36,7 +36,8 @@ public class Author_CICBA_Authority extends CICBAAuthority {
 
 		pqs.setCommandText("SELECT ?id ?name ?surname ?affiliation\n");
 		pqs.append("WHERE {\n");
-		pqs.append("?person a foaf:Person ; foaf:name ?name ; foaf:surname ?surname ; dc:identifier ?id; foaf:Organization ?affiliation .\n");
+		pqs.append("?person a foaf:Person ; foaf:givenName ?name ; foaf:familyName ?surname ; dc:identifier ?id .\n");
+		pqs.append("OPTIONAL { ?person foaf:Organization ?a . ?a a foaf:Organization ; dc:title ?affiliation }\n");
 		pqs.append("FILTER(REGEX(?name, ?text, \"i\") || REGEX(?surname, ?text, \"i\") || REGEX(?id, ?text, \"i\"))\n");
 		pqs.append("}\n");
 		pqs.append("ORDER BY ASC(?surname)\n");
@@ -50,9 +51,14 @@ public class Author_CICBA_Authority extends CICBAAuthority {
 		String key = solution.getLiteral("id").getString();
 		String name = solution.getLiteral("name").getString();
 		String surname = solution.getLiteral("surname").getString();
-		String affiliation = solution.getLiteral("affiliation").getString();
+		
 		String label = surname + ", " + name;
-		return new Choice(key, label, label + "(" + affiliation + ")");
+		String value = label;
+		if (solution.contains("affiliation")) {
+			String affiliation = solution.getLiteral("affiliation").getString();
+			value = value + " (" + affiliation + ")";
+		}
+		
+		return new Choice(key, label, value);
 	}
-
 }
