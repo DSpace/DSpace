@@ -1,5 +1,6 @@
 package org.dspace;
 
+import org.apache.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.content.authority.AuthorityMetadataValue;
 import org.dspace.content.authority.Concept;
@@ -17,11 +18,47 @@ import java.util.List;
  */
 public class JournalUtils {
 
+    private static Logger log = Logger.getLogger(JournalUtils.class);
+
 
     public static Concept[] getJournalConcepts(Context context) throws SQLException {
         Scheme scheme = Scheme.findByIdentifier(context, ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName"));
         return scheme.getConcepts();
     }
+
+    public static Concept getJournalConceptById(Context context, String authorityId) throws SQLException {
+        try
+        {
+            return Concept.findByIdentifier(context,authorityId).iterator().next();
+        }
+        catch(Exception e)
+        {
+            if(log.isDebugEnabled())
+                log.error(e.getMessage(),e);
+            else
+                log.error(e);
+        }
+
+        return null;
+    }
+
+    public static Concept getJournalConceptByName(Context context, String journalName) throws SQLException {
+        Scheme scheme = Scheme.findByIdentifier(context, ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName"));
+        try
+        {
+            return Concept.findByPreferredLabel(context,journalName,scheme.getID())[0];
+        }
+        catch(Exception e)
+        {
+            if(log.isDebugEnabled())
+                log.error(e.getMessage(),e);
+            else
+                log.error(e);
+        }
+
+        return null;
+    }
+
 
     public static Concept[] getJournalConcept(Context context,String journal) throws SQLException {
         Scheme scheme = Scheme.findByIdentifier(context, ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName"));
@@ -67,6 +104,14 @@ public class JournalUtils {
 
     public static String getFullName(Concept concept) {
         AuthorityMetadataValue[] vals = concept.getMetadata("journal","fullname",null, Item.ANY);
+        if(vals != null && vals.length > 0)
+            return vals[0].value;
+
+        return null;
+    }
+
+    public static String getJournalShortID(Concept concept) {
+        AuthorityMetadataValue[] vals = concept.getMetadata("journal","journalID",null, Item.ANY);
         if(vals != null && vals.length > 0)
             return vals[0].value;
 
@@ -194,4 +239,6 @@ public class JournalUtils {
         sb.append(escaped);
         return sb.toString();
     }
+
+
 }
