@@ -664,12 +664,33 @@
     </xsl:template>
 
     <xsl:variable name="meta" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata"/>
+    <!-- These do nothing here because the templates below are using $url instead.
+         (Therefore we can't cheat the convention that puts static pages under /pages/{NAME})
     <xsl:variable name="pageName" select="$meta[@element='request'][@qualifier='URI']"/>
-    <!--xsl:variable name="doc" select="document(concat('pages/', $pageName, '.xhtml'))"/-->
-
+    <xsl:variable name="doc" select="document(concat('pages/', $pageName, '.xhtml'))"/>
+    -->
     <xsl:template match="dri:xref[@rend='embed']">
-               
+        <!--
+        <h1>pageName: <xsl:value-of select="$pageName" /></h1>
+        <h1>doc: <xsl:value-of select="$doc" /></h1>
+        <h1>target: <xsl:value-of select="@target" /></h1>
+        -->
         <xsl:variable name="url" select="concat('pages/',@target)"/>
+        <!-- TODO: Render /dryadlab from site root, all others from /pages/{pagename} 
+	     N.B. This can only work if we match this xsl:template from /dryadlab   
+             Can we do this?
+        <xsl:variable name="url">
+            <xsl:choose>
+                <xsl:when test="@target='dryadlab.xhtml'">
+                    <xsl:value-of select="concat('pages/',@target)"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="@target"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+        <h1>url: <xsl:value-of select="$url" /></h1>
+        -->
                
         <xsl:copy-of select="document(string($url))/html/*"/>
            
