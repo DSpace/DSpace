@@ -64,7 +64,7 @@ a:hover {
 }
 
 #ds-header {
-    border-bottom: 3px solid #87C033;
+    background: url(../../images/dryadlab-image-ribbon.png) repeat-x -105px 10px;
 }
 
 .ds-div-head img.feed-icon {
@@ -78,33 +78,34 @@ a:hover {
 
 .ds-header-logo {
     float:left;
-    width: 155px;
-    height: 88px;
+    width: 250px;
+    height: 57px;
+    margin-left: -8px;
     margin-top: 10px;
     background-position: left bottom;
     background-repeat: no-repeat;
-    background-color: transparent;
-    margin-right: 15px;
+    background-color: #FFFFFF;
+    padding-right: 9px;
 }
 
 #ds-header-logo-prod {
-    background: url('../../images/dryad-logo.png');
+    background-image: url('../../images/dryadlab-logo-prod.png');
 }
 
 #ds-header-logo-dev {
-    background: url('../../images/dryad-logo-dev.png');
+    background-image: url('../../images/dryadlab-logo-dev.png');
 }
 
 #ds-header-logo-demo {
-    background: url('../../images/dryad-logo-demo.png');
+    background-image: url('../../images/dryadlab-logo-demo.png');
 }
 
 #ds-header-logo-staging {
-    background: url('../../images/dryad-logo-staging.png');
+    background-image: url('../../images/dryadlab-logo-staging.png');
 }
 
 #ds-header-logo-mrc {
-    background: url('../../images/dryad-logo-mrc.png');
+    background-image: url('../../images/dryadlab-logo-mrc.png');
 }
 
 #ds-header-logo-text {
@@ -261,6 +262,7 @@ a.discreet {
 
 #ds-options {
     padding: 0;
+    padding-top: 30px;
 }
 
 h1.ds-option-set-head,
@@ -271,7 +273,7 @@ h1.ds-option-set-head,
 {
     color: #333;
     padding: 0px 0px;
-    border-bottom: 3px solid #87C033;
+    border-bottom: 3px solid #bdb;
 }
 h1.ds-option-set-head {
     margin-top: 5px;
@@ -362,6 +364,7 @@ div.ds-option-set {
 #submit-data-sidebar-box {
     text-align: center;
     background-color: #87C033;
+display: none;
 }
 #submit-data-sidebar-box .primary {
     padding: 0;
@@ -1450,9 +1453,7 @@ ul.horizontalVanilla li
 }
 
 #main-menu {
-    position: absolute;
-    bottom: -21px;
-    right: 0px;
+    display: none;
 }
 
 .submitnowbutton,
@@ -1526,7 +1527,8 @@ a.learn-to-submit-button:hover {
     float: right;
     clear: right;
     text-align: right;
-    padding-top: 10px; /* or 18px */
+    position: relative;
+    top: 73px;
 }
 #sharing-tools a {
     display: inline-block;

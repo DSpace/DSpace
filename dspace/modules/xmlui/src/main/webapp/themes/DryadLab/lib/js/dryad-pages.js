@@ -36,7 +36,6 @@ jQuery(document).ready(function() {
 *  > a publication-header box
 *  > a featured image
 *  > or any .primary box
-*/
     var topMainPageElement = jQuery('#ds-body .tab-buttons, #ds-body h1, #ds-body .publication-header, #ds-body .featured-image, #ds-body .primary').eq(0);
     var topSidebarBox = jQuery('#ds-options .simple-box:eq(0)');
     if (topMainPageElement.length && topSidebarBox.length) {
@@ -46,6 +45,7 @@ jQuery(document).ready(function() {
         // ASSUMES that #ds-option has no padding-top!
         jQuery('#ds-options').css('padding-top', boxNudge+"px");
     }
+*/
 
     jQuery('span.field-help').each(function(entry){
         jQuery(jQuery('span.field-help')[entry]).html(jQuery(jQuery('span.field-help')[entry]).text());
