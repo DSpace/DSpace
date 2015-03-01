@@ -45,9 +45,16 @@ select.multiple {
     height: auto;
 }
 
+html {
+    background-color: #eee;
+}
 body {
     background-color: #FFFFFF;
+    width: 1000px;
+    height: 100%;
+    border: 1px solid #ddd;
     font-family: 'Helvetica', sans-serif;
+    margin: -1px auto 0;
 }
 
 a, a:active, a:visited {
@@ -189,7 +196,7 @@ a:hover {
 }
 
 #ds-footer {
-    border-top: 3px solid #87C033;
+    border-top: 3px solid #bdb;
     padding: 4px 0;
     font-size: 93%;
     line-height: 1.6em;
@@ -318,7 +325,7 @@ h1.ds-option-set-head {
 div.ds-option-set {
     margin-top: 8px;
     padding: 8px 12px;
-    background-color: #fff;
+    background-color: #f3f9f3; /* #f5f5f5; */
     -webkit-border-top-left-radius: 8px;
     -webkit-border-top-right-radius: 8px;
     -moz-border-radius-topleft: 8px;
@@ -331,14 +338,14 @@ div.ds-option-set {
     -moz-border-radius-bottomright: 8px;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
-    border: 1px solid #aaa;
+    border: 1px solid #cdc; /* #ddd; */
     -moz-box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
     -webkit-box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
     box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
 }
 
 #submit-data-feature-box h1 {
-    background-color: #87C033;
+    background-color: #bdb;
     border-bottom: none;
     -webkit-border-bottom-left-radius: 0;
     -webkit-border-bottom-right-radius: 0;
@@ -348,7 +355,7 @@ div.ds-option-set {
     border-bottom-right-radius: 0;
 }
 #submit-data-feature-box .primary {
-    background-color: #87C033;
+    background-color: #bdb;
     font-size: 1.2em;
     margin-top: 0;
     text-align: center;
@@ -363,13 +370,13 @@ div.ds-option-set {
 
 #submit-data-sidebar-box {
     text-align: center;
-    background-color: #87C033;
+    background-color: #bdb;
 display: none;
 }
 #submit-data-sidebar-box .primary {
     padding: 0;
     margin: 0;
-    background-color: #87C033;
+    background-color: #bdb;
 }
 #submit-data-sidebar-box a.submitnowbutton {
     display: block;
@@ -516,7 +523,7 @@ div.bioText {
     -moz-border-radius-bottomright: 8px;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
-    border: 1px solid #aaa;
+    border: 1px solid #cdc;
     -moz-box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
     -webkit-box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
     box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
@@ -1270,7 +1277,7 @@ div.simple-item-view-description {
 
 #aspect_artifactbrowser_ItemViewer_div_item-view h2,
 div.simple-item-view-description h3{
-    border-bottom:1px solid #87C033;
+    border-bottom:1px solid #bdb;
     margin-bottom: 3px;
 }
 
@@ -1550,7 +1557,7 @@ a.learn-to-submit-button:hover {
 .tab-buttons a {
     display: inline-block;
     font-size: 14px;
-    background-color: #87C033;
+    background-color: #bdb;
     color: #fff;
     text-decoration: none;
     margin-right: 22px;
@@ -1787,7 +1794,7 @@ img.ds-authority-confidence
     margin: 0 15px 18px;
     margin-top: 6px !important;
     padding: 12px 18px;
-    background-color: #ddd;
+    background-color: #cdc;
     border: 1px solid #d5d5d5;
     -webkit-border-top-left-radius: 8px;
     -webkit-border-top-right-radius: 8px;
@@ -1823,7 +1830,7 @@ img.pub-cover {
     font-weight: bold;
 }
 .citation-sample {
-    background-color: #ddd;
+    background-color: #cdc;
     border: 1px solid #eee;
     padding: 5px 7px;
     margin: 8px 20px;
@@ -2317,12 +2324,12 @@ input.starts_with {
 }
 
 #aspect_paymentsystem_ShoppingCartTransformer_item_payer{
-    border-top: 1px solid #aaa;
+    border-top: 1px solid #cdc;
     margin-top: 0px;
 }
 #aspect_paymentsystem_ShoppingCartTransformer_item_total{
-    border-top: 1px solid #aaa;
-    border-top: 1px solid #aaa;
+    border-top: 1px solid #cdc;
+    border-top: 1px solid #cdc;
 }
 #aspect_paymentsystem_ShoppingCartTransformer_item_country-list label{
     font-size: 13px;
@@ -2374,7 +2381,7 @@ ul.navigation-link{
 ul.navigation-link li{
     display: inline-block;
     font-size: 14px;
-    background-color: #87C033;
+    background-color: #bdb;
     color: #fff;
     text-decoration: none;
     margin-right: 18px;
@@ -2482,7 +2489,7 @@ div.step-link{
 
 table#aspect_submission_workflow_WorkflowTransformer_table_workflow-actions tr.archive_or_blackout_recommended  {
     background-color: #eee;
-    border: thin solid #aaa;
+    border: thin solid #cdc;
 }
 
 .voucher-error{
