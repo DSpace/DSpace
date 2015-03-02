@@ -84,10 +84,12 @@ public class ItemsInReviewPlosMonth extends AbstractCurationTask {
      **/
     @Override
     public int perform(DSpaceObject dso) throws IOException {
+    			// added following one line by DF 20150210
+	report("itemID, publicationName, lastModificationDate, notificationReceived");    
 	try {
-			// added following one line by DF 20150210
 
-			report("itemID, publicationName, lastModificationDate, notificationReceived");
+
+
 			
             if (dso.getType() == Constants.COLLECTION) {
                 // output headers for the CSV file that will be created by processing all items in this collection
@@ -129,7 +131,7 @@ public class ItemsInReviewPlosMonth extends AbstractCurationTask {
                         
                         // Select and write to file PLOS items that have been in review 30 days or more - *DF*
 						int numberOfDays = 31;
-                        String pubName = "plos";
+                        String PUBNAME = "plos";
                         
                         String publicationNameLowerCase = publicationName.toLowerCase();
 
@@ -137,7 +139,7 @@ public class ItemsInReviewPlosMonth extends AbstractCurationTask {
                         
 
                     
-                        if ( (publicationNameLowerCase.contains(pubName)) && (numDaysInReview >= numberOfDays) ) {
+                        if ( (publicationNameLowerCase.contains(PUBNAME)) && (numDaysInReview >= numberOfDays) ) {
                         	// report whether we have a plos notification for the item
                         	//     1. search for the data package DOI in the manuscript table, json_data field. 
                         	//        It should appear in the dataReviewURL of the json, but may appear in the dataAvailabilityStatement
