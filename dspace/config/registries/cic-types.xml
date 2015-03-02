@@ -6,7 +6,7 @@
   - Version:  $Revision$
   -
   - Date:     $Date$
-  -
+  -e
   - CIC-DIGITAL registry used as internal metadata in http://digital.cic.gba.gob.ar/
   - 
   - <dc-type>
@@ -129,7 +129,7 @@
 		<schema>dcterms</schema>
 		<element>rights</element>
 		<qualifier>embargoPeriod</qualifier>
-		<scope_note>Período de tiempo en el que el archivo de un item estará oculto por razones de confidencialidad o similares. El dato es informativo, el embargo efectivo se pone en el step de upload.</scope_note>
+		<scope_note>Periodo de tiempo durante el cual el recurso subido estará oculto al público. Se recomienda no usar excepto en casos extremos como patentes pendientes o convenios de confidencialidad. </scope_note>
 	</dc-type>
 	
 	<dc-type>
