@@ -72,11 +72,13 @@ public class ItemBibliographyFormatsTag extends TagSupport{
         String endNoteLink = "<a class=\"col-md-12 col-sm-12 col-xs-12 btn btn-default\" href=\"" + request.getContextPath() + "/bibliography?bib=en&handle_item=" + item.getHandle() + "\" target=\"_blank\" alt=\"Download EndNote record\" id=\"en\">EndNote</a>";
         String RisLink = "<a class=\"col-md-12 col-sm-12 col-xs-12 btn btn-default\" href=\"" + request.getContextPath() + "/bibliography?bib=ris&handle_item=" + item.getHandle() + "\" target=\"_blank\" alt=\"Download Ris record\" id=\"en\">RIS</a>";
         String CSVLink=  "<a class=\"col-md-12 col-sm-12 col-xs-12 btn btn-default\" href=\"" + request.getContextPath() + "/bibliography?bib=csv&handle_item=" + item.getHandle() + "\" target=\"_blank\" alt=\"Download CSV record\" id=\"en\">CSV</a>";
+        String TSVLink=  "<a class=\"col-md-12 col-sm-12 col-xs-12 btn btn-default\" href=\"" + request.getContextPath() + "/bibliography?bib=tsv&handle_item=" + item.getHandle() + "\" target=\"_blank\" alt=\"Download TSV record\" id=\"en\">TSV</a>";
         StringBuffer sbLink = new StringBuffer();
         sbLink.append(bibTextLink);
         sbLink.append(endNoteLink);
         sbLink.append(RisLink);
         sbLink.append(CSVLink);
+        sbLink.append(TSVLink);
         return sbLink.toString();          
     }
 

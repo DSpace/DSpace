@@ -77,11 +77,13 @@ public class BibliographyServlet extends DSpaceServlet{
             } else if (bibformat.equals("en")) {
                 //textOutput = (String) getServletConfig().getServletContext().getAttribute("bibliography.enData");
                 textOutput = renderEN(item, request);
-            }else if (bibformat.equals("ris")) {
+            } else if (bibformat.equals("ris")) {
                 textOutput= renderRIS(item, request);
-            }else if(bibformat.equals("csv")){
+            } else if(bibformat.equals("csv")){
                textOutput=renderCSV(item, request);
-            } 
+            } else if(bibformat.equals("tsv")){
+               textOutput=renderTSV(item, request);
+            }  
             else {
                 log.error(LogManager.getHeader(context, "invalid_format", "path=" + path));
                 JSPManager.showInvalidIDError(request, response, StringEscapeUtils.escapeHtml(path), -1);
@@ -96,6 +98,10 @@ public class BibliographyServlet extends DSpaceServlet{
               filename= handle.replaceAll("/", "-") + ".csv";
               response.setHeader("Content-Disposition", "attachment; filename=" + filename);
               
+            } else if(bibformat.equals("tsv")){
+              response.setContentType("text/tab-separated-values; charset=UTF-8");
+              filename= handle.replaceAll("/", "-") + ".tsv";
+              response.setHeader("Content-Disposition", "attachment; filename=" + filename); 
             }
             else{
               response.setContentType("text/plain;charset=UTF-8");  
@@ -541,7 +547,13 @@ public class BibliographyServlet extends DSpaceServlet{
             String risData= sb.toString();
             return risData;
          }
+         
      
+         /*
+            Autor: Christian David Criollo Lopez
+            Fecha: 16-Febrero-2015
+            Descripción: Metodo que se encatga de realizar la exportación de un item en formato CSV
+         */
          public String renderCSV(Item item, HttpServletRequest request)  {
              
           //String header= "Authors,Title,Year,Abstract,Author Keywords,Editors,Publisher,Document Type,Source";    
@@ -561,7 +573,7 @@ public class BibliographyServlet extends DSpaceServlet{
             int csvType = 1;
             String[] DC2Bib = new String[5];
             // Metadatos para articulos o articulos de revista
-            DC2Bib[1] = "dc.creator, dc.title, dc.date.issued, dc.identifier.uri, dc.description.abstract, dc.subject, dc.Publisher, dc.language.iso, dc.citation.issue, dc.citation.spage, dc.citation.epage, dc.type";
+            DC2Bib[1] = "dc.creator, dc.title, dc.date.issued, dc.identifier.uri, dc.description.abstract, dc.subject, dc.publisher, dc.language.iso, dc.citation.issue, dc.citation.spage, dc.citation.epage, dc.type";
             // Metadatos para libros o partes de libro
             DC2Bib[2] = "dc.creator, dc.title, dc.date.issued, dc.identifier.uri, dc.description.abstract, dc.subject, dc.contributor, dc.identifier.isbn, dc.publisher,dc.pubplace, dc.type";
             //Metadatos para trabajos de grado, tesis de maestria, doctorado
@@ -651,15 +663,16 @@ public class BibliographyServlet extends DSpaceServlet{
             //Parse the metadata into a record
             for (int k = 0; k < values.length; k++) {
                 if (element.equals("creator")) {
-                    if (k == 0) {
-                        sb.append("\"");
-                        sb.append(values[k].value);
-                        sb.append("\"");
-                      } else if (k > 0) {
-                         sb.append("\"");
-                         sb.append(values[k].value);
-                         sb.append("\"");
-                       }
+                    if ( k==0){
+                      sb.append("\""); 
+                      sb.append(values[k].value);
+                    }
+                    else if (k > 0){
+                      sb.append(values[k].value);
+                    }
+                     if(k == values.length-1){
+                       sb.append("\"");  
+                     } 
                     
                 } else if (element.equals("title")) {
                     if (k == 0) {
@@ -685,7 +698,9 @@ public class BibliographyServlet extends DSpaceServlet{
                   }
                 }  else if(element.equals("identifier") && qualifier.equals("uri")){
                     if(k==0){
+                      sb.append("\"");  
                       sb.append(values[k].value);
+                      sb.append("\"");  
                     }
                 }
                   else if (element.equals("description") && qualifier.equals("abstract")) {
@@ -693,7 +708,6 @@ public class BibliographyServlet extends DSpaceServlet{
                        sb.append("\""); 
                        sb.append(values[k].value);
                        sb.append("\""); 
-                       //sb.append(delimitador);
                     }
                 } else if (element.equals("subject")) {
                     if ( k==0){
@@ -734,21 +748,28 @@ public class BibliographyServlet extends DSpaceServlet{
                     }
                 } else if(element.equals("citation") && qualifier.equals("issue")){
                     if(k==0){
+                      sb.append("\""); 
                       sb.append(values[k].value);
-                     
+                      sb.append("\""); 
                     }
                 } else if(element.equals("citation") && qualifier.equals("spage")){
                     if(k==0){
+                      sb.append("\""); 
                       sb.append(values[k].value);
+                      sb.append("\""); 
                       
                     }
                 } else if(element.equals("citation") && qualifier.equals("epage")){
                     if(k==0){
-                      sb.append(values[k].value); 
+                      sb.append("\""); 
+                      sb.append(values[k].value);
+                      sb.append("\""); 
                     }
                 } else if (element.equals("type")) {
                     if (k == 0) {
-                        sb.append(values[k].value);
+                       sb.append("\""); 
+                       sb.append(values[k].value);
+                       sb.append("\""); 
                     }
                 }
                 sb.append(delimitador);
@@ -756,5 +777,225 @@ public class BibliographyServlet extends DSpaceServlet{
           }
           String csvData= sb.toString();
           return csvData;
+       }
+         
+          /*
+            Autor: Christian David Criollo Lopez
+            Fecha: 27-Febrero-2015
+            Descripción: Metodo que se encatga de realizar la exportación de un item en formato TSV
+         */
+         public String renderTSV(Item item, HttpServletRequest request)  {
+            
+          //Header para articulos o articulos de revista
+          String headerArticle="Authors\tTitle\tYear\tLink\tAbstract\tAuthor Keywords\tPublisher\tlanguage of Original Document\tIssue\tPage start\tPage end\tDocument Type";
+          //Header para trabajos de grado,tesis de maestria, doctorado
+          String headerThesis="Authors\tTitle\tYear\tLink\tAbstract\tAuthor Keywords\tEditors\tPublisher\tpubplace\tLanguage of Original Document\tDocument Type";
+          //Header para libros o partes de libro
+          String headerChapBook="Authors\tTitle\tYear\tLink\tAbstract\tAuthor Keywords\tEditors\tisbn\tPublisher\tpubplace\tDocument Type"; 
+          
+          String delimitador = "\t";
+          String separador = "\n";
+          String schema = "dc";
+          String header="";
+          
+          //define needed metadatafields
+            int tsvType = 1;
+            String[] DC2Bib = new String[5];
+            // Metadatos para articulos o articulos de revista
+            DC2Bib[1] = "dc.creator, dc.title, dc.date.issued, dc.identifier.uri, dc.description.abstract, dc.subject, dc.publisher, dc.language.iso, dc.citation.issue, dc.citation.spage, dc.citation.epage, dc.type";
+            // Metadatos para libros o partes de libro
+            DC2Bib[2] = "dc.creator, dc.title, dc.date.issued, dc.identifier.uri, dc.description.abstract, dc.subject, dc.contributor, dc.identifier.isbn, dc.publisher,dc.pubplace, dc.type";
+            //Metadatos para trabajos de grado, tesis de maestria, doctorado
+            DC2Bib[3] = "dc.creator, dc.title, dc.date.issued, dc.identifier.uri, dc.description.abstract, dc.subject, dc.contributor, dc.publisher, dc.pubplace, dc.language.iso, dc.type";
+            
+            StringBuffer sb = new StringBuffer();
+            
+            //Parsing metadatafields
+            boolean tyFound = false;
+
+        //First needed for BibTex: dc.type
+        DCValue[] types = item.getMetadata(schema, "type", Item.ANY, Item.ANY);
+
+        for (int j = 0; (j < types.length) && !tyFound; j++) {
+            String type = types[j].value;
+
+            //log.debug("DEBUG, Der gefundene Typ: " + type);//DEBUG
+
+            if (type.equalsIgnoreCase("Article")) {
+                tsvType = 1;
+                header= headerArticle;
+                sb.append(header.toString());
+                sb.append(separador);
+                tyFound = true;
+            } else if (type.equalsIgnoreCase("Book")) {
+                tsvType = 2;
+                header= headerChapBook;
+                sb.append(header.toString());
+                sb.append(separador);
+                tyFound = true;
+            } else if (type.equalsIgnoreCase("BookChapter") || type.equalsIgnoreCase("bookPart")) {
+                tsvType = 2;
+                header= headerChapBook;
+                sb.append(header.toString());
+                sb.append(separador);
+                tyFound = true;
+            } else if (type.equalsIgnoreCase("Thesis")) {
+                tsvType = 3;
+                header= headerThesis;
+                sb.append(header.toString());
+                sb.append(separador);
+                tyFound = true;
+            } else if (type.equalsIgnoreCase("Preprint")) {
+                tsvType = 1;
+                header= headerArticle;
+                sb.append(header.toString());
+                sb.append(separador);
+                tyFound = true;
+            } else if(type.equalsIgnoreCase("bachelorThesis") || (type.equalsIgnoreCase("masterThesis") || (type.equalsIgnoreCase("doctoralThesis")))){
+                tsvType = 3;
+                header= headerThesis;
+                sb.append(header.toString());
+                sb.append(separador);
+                tyFound = true; 
+            }
+        } 
+
+        //set type in case no type is given 
+        if (!tyFound) {
+            sb.append(headerArticle.toString());
+            sb.append(separador);
+            tsvType = 1;
+        }
+            //sb.append(header.toString());
+            //sb.append(separador);
+           
+            StringTokenizer st = new StringTokenizer(DC2Bib[tsvType], ",");
+           
+        while (st.hasMoreTokens()) {
+            String field = st.nextToken().trim();
+            String[] eq = field.split("\\.");
+            schema = eq[0];
+            String element = eq[1];
+            String qualifier = Item.ANY;
+            if (eq.length > 2 && eq[2].equals("*")) {
+                qualifier = Item.ANY;
+            } else if (eq.length > 2) {
+                qualifier = eq[2];
+            } else {
+                qualifier = null;
+            }
+           
+            //log.info("Field:"+field+";Tokens:"+eq.toString()+";Element:"+eq[1]+";Qualifier:"+qualifier);
+            DCValue[] values = item.getMetadata(schema, element, qualifier, Item.ANY);
+             // log.info("DCVALUES:"+values);
+            
+            //Parse the metadata into a record
+            for (int k = 0; k < values.length; k++) {
+                if (element.equals("creator")) {
+                    if ( k==0){
+                      sb.append("\""); 
+                      sb.append(values[k].value);
+                    }
+                    else if (k > 0){
+                      sb.append(values[k].value);
+                    }
+                     if(k == values.length-1){
+                       sb.append("\"");  
+                     } 
+                    
+                } else if (element.equals("title")) {
+                    if (k == 0) {
+                        sb.append("\"");
+                        sb.append(values[k].value);
+                        sb.append("\"");
+                    }
+                } else if (element.equals("date")) {
+                    if (k == 0) {
+                        //formating the Date
+                        DCDate dd = new DCDate(values[k].value);
+                        //String date = UIUtil.displayDate(dd, false, false).trim();
+                        String date = dd.displayDate(false, false, UIUtil.getSessionLocale(request)).trim();
+                        int last = date.length();
+                        date = date.substring((last - 4), (last));
+                        sb.append(date);
+                     
+                    }
+                    else {
+                    if (k == 0) {
+                        sb.append(qualifier + " " + values[k].value);
+                    }
+                  }
+                }  else if(element.equals("identifier") && qualifier.equals("uri")){
+                    if(k==0){
+                      sb.append("\"");
+                      sb.append(values[k].value);
+                      sb.append("\"");
+                    }
+                }
+                  else if (element.equals("description") && qualifier.equals("abstract")) {
+                    if (k == 0) {
+                       sb.append("\""); 
+                       sb.append(values[k].value);
+                       sb.append("\"");
+                    }
+                } else if (element.equals("subject")) {
+                    if ( k==0){
+                      sb.append("\""); 
+                      sb.append(values[k].value);
+                    }
+                    else if (k > 0){
+                      sb.append(values[k].value);
+                    }
+                     if(k == values.length-1){
+                       sb.append("\"");  
+                     }  
+                } else if(element.equals("contributor")){
+                   if (k == 0){
+                      sb.append("\"");
+                      sb.append(values[k].value);
+                      sb.append("\"");
+                    }
+                } else if(element.equals("publisher")){
+                   if(k==0){
+                    sb.append("\"");   
+                    sb.append(values[k].value);
+                    sb.append("\"");
+                   }
+                    
+                } else if(element.equals("pubplace")){
+                   if(k==0){
+                    sb.append("\"");  
+                    sb.append(values[k].value);
+                    sb.append("\"");
+                   }
+                    
+                } else if (element.equals("language") && qualifier.equals("iso")) {
+                    if (k == 0) {
+                        sb.append("\"");
+                        sb.append(values[k].value);
+                        sb.append("\"");
+                    }
+                } else if(element.equals("citation") && qualifier.equals("issue")){
+                    if(k==0){ 
+                      sb.append(values[k].value);
+                    }
+                } else if(element.equals("citation") && qualifier.equals("spage")){
+                    if(k==0){
+                      sb.append(values[k].value); 
+                    }
+                } else if(element.equals("citation") && qualifier.equals("epage")){
+                    if(k==0){ 
+                      sb.append(values[k].value); 
+                    }
+                } else if (element.equals("type")) {
+                    if (k == 0) {
+                       sb.append(values[k].value);
+                    }
+                }
+                sb.append(delimitador);
+            }
+          }
+          String tsvData= sb.toString();
+          return tsvData;
        }
     }
