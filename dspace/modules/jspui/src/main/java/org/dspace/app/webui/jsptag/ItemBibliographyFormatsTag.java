@@ -73,12 +73,14 @@ public class ItemBibliographyFormatsTag extends TagSupport{
         String RisLink = "<a class=\"col-md-12 col-sm-12 col-xs-12 btn btn-default\" href=\"" + request.getContextPath() + "/bibliography?bib=ris&handle_item=" + item.getHandle() + "\" target=\"_blank\" alt=\"Download Ris record\" id=\"en\">RIS</a>";
         String CSVLink=  "<a class=\"col-md-12 col-sm-12 col-xs-12 btn btn-default\" href=\"" + request.getContextPath() + "/bibliography?bib=csv&handle_item=" + item.getHandle() + "\" target=\"_blank\" alt=\"Download CSV record\" id=\"en\">CSV</a>";
         String TSVLink=  "<a class=\"col-md-12 col-sm-12 col-xs-12 btn btn-default\" href=\"" + request.getContextPath() + "/bibliography?bib=tsv&handle_item=" + item.getHandle() + "\" target=\"_blank\" alt=\"Download TSV record\" id=\"en\">TSV</a>";
+        String mendeley= "<button class=\"col-md-12 col-sm-12 col-xs-12 btn btn-default\" onclick=\"MendeleyImporterApi.open()\"><img src=\"" +request.getContextPath()+ "/image/mendeley.png"+"\"/>Mendeley</button>";
         StringBuffer sbLink = new StringBuffer();
         sbLink.append(bibTextLink);
         sbLink.append(endNoteLink);
         sbLink.append(RisLink);
         sbLink.append(CSVLink);
         sbLink.append(TSVLink);
+        sbLink.append(mendeley);
         return sbLink.toString();          
     }
 
