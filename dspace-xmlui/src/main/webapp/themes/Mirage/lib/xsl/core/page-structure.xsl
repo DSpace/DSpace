@@ -20,17 +20,17 @@
 -->
 
 <xsl:stylesheet xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
-	xmlns:dri="http://di.tamu.edu/DRI/1.0/"
-	xmlns:mets="http://www.loc.gov/METS/"
-	xmlns:xlink="http://www.w3.org/TR/xlink/"
-	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
-	xmlns:dim="http://www.dspace.org/xmlns/dspace/dim"
-	xmlns:xhtml="http://www.w3.org/1999/xhtml"
-	xmlns:mods="http://www.loc.gov/mods/v3"
-	xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:dri="http://di.tamu.edu/DRI/1.0/"
+    xmlns:mets="http://www.loc.gov/METS/"
+    xmlns:xlink="http://www.w3.org/TR/xlink/"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+    xmlns:dim="http://www.dspace.org/xmlns/dspace/dim"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:mods="http://www.loc.gov/mods/v3"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
     xmlns:confman="org.dspace.core.ConfigurationManager"
-	xmlns="http://www.w3.org/1999/xhtml"
-	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc confman">
+    xmlns="http://www.w3.org/1999/xhtml"
+    exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc confman">
 
     <xsl:output indent="yes"/>
 
@@ -773,32 +773,34 @@
             runAfterJSImports.execute();
         </script>
 
-        <!-- Add a google analytics script if the key is present -->
-        <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']">
-            <script type="text/javascript"><xsl:text>
-                   var _gaq = _gaq || [];
-                   _gaq.push(['_setAccount', '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']"/><xsl:text>']);
-                   _gaq.push(['_trackPageview']);
-
-                   (function() {
-                       var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-                       ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-                       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-                   })();
-           </xsl:text></script>
-        </xsl:if>
+        <xsl:call-template name="addJavascript-google-analytics" />
 
         <!-- Add a contextpath to a JS variable -->
-                <script type="text/javascript"><xsl:text>
-                         if(typeof window.orcid === 'undefined'){
-                            window.orcid={};
-                          };
-                        window.orcid.contextPath= '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/><xsl:text>';</xsl:text>
-                    <xsl:text>window.orcid.themePath= '</xsl:text><xsl:value-of select="$theme-path"/><xsl:text>';</xsl:text>
-                </script>
+        <script type="text/javascript"><xsl:text>
+            if(typeof window.orcid === 'undefined'){
+                window.orcid={};
+            };
+            window.orcid.contextPath= '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/><xsl:text>';</xsl:text>
+            <xsl:text>window.orcid.themePath= '</xsl:text><xsl:value-of select="$theme-path"/><xsl:text>';</xsl:text>
+        </script>
 
     </xsl:template>
     
+    <xsl:template name="addJavascript-google-analytics">
+        <!-- Add a google analytics script if the key is present -->
+        <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']">
+            <script><xsl:text>
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']"/><xsl:text>', '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='serverName']"/><xsl:text>');
+                ga('send', 'pageview');
+            </xsl:text></script>
+        </xsl:if>
+    </xsl:template>
+
     <!-- Display language selection if more than 1 language is supported (overides buggy dir2xhtml-alt). 
     Uses a page metadata curRequestURI which was introduced by in /xmlui/src/main/webapp/themes/Mirage/sitemap.xmap-->
     <xsl:template name="languageSelection">
