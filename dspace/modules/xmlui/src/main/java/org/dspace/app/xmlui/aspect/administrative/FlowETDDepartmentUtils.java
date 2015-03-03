@@ -33,10 +33,10 @@ public class FlowETDDepartmentUtils {
 
 	/** Language Strings */
 	private static final Message T_edit_etd_department_success_notice =
-		new Message("default","xmlui.administrative.FlowGroupUtils.edit_etd_department_success_notice");
+		new Message("default","xmlui.administrative.FlowETDDepartmentUtils.edit_etd_department_success_notice");
 
 	private static final Message T_delete_etd_department_success_notice =
-		new Message("default","xmlui.administrative.FlowGroupUtils.delete_etd_department_success_notice");
+		new Message("default","xmlui.administrative.FlowETDDepartmentUtils.delete_etd_department_success_notice");
 
 
 	/**
@@ -161,7 +161,7 @@ public class FlowETDDepartmentUtils {
 				result.setContinue(false);
 				result.addError("etd_department_name");
 				result.setOutcome(false);
-				result.setMessage(new Message("default","The etd_department name may not be blank."));
+				result.setMessage(new Message("default","The ETD Department name may not be blank."));
 
 				return result;
 			}
@@ -182,7 +182,7 @@ public class FlowETDDepartmentUtils {
     			result.addError("etd_department_name");
     			result.addError("etd_department_name_duplicate");
     			result.setOutcome(false);
-    			result.setMessage(new Message("default","The etd_department name is already in use"));
+    			result.setMessage(new Message("default","The ETD Department name is already in use"));
 
     			return result;
 			}
@@ -210,7 +210,7 @@ public class FlowETDDepartmentUtils {
 	    			result.addError("etd_department_name");
 	    			result.addError("etd_department_name_duplicate");
 	    			result.setOutcome(false);
-	    			result.setMessage(new Message("default","The etd_department name is already in use"));
+	    			result.setMessage(new Message("default","The ETD Department name is already in use"));
 
 	    			return result;
 				}

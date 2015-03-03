@@ -287,7 +287,7 @@
         <message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_withdrawn">The selected item is withdrawn and is no longer available.</message>
         <message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_restricted_auth">The selected item is access restricted and requires credentials to view. Please login to access the item.</message>
         <message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_restricted">Your user account does not have the credentials to view this item. Please contact the system administrator if you have any questions.</message>
-        
+
     <!-- Authentication messages used at the top of the login page:  -->
     <message key="xmlui.ArtifactBrowser.RestrictedItem.auth_header">The item is restricted</message>
     <message key="xmlui.ArtifactBrowser.RestrictedItem.auth_message">The item you are attempting to access is a restricted item and requires credentials to view. Please login below to access the item.</message>
@@ -362,7 +362,7 @@
     <message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.subject">Subject</message>
     <message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.mail">Send</message>
     <message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.back">Back</message>
-    
+
      <!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestChangeStatusForm.java -->
     <message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.title">Change permissions request</message>
     <message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.trail">Change permissions request</message>
@@ -373,14 +373,14 @@
     <message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.name.error">The name is required</message>
     <message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.email.error">The e-mail address is required</message>
     <message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.changeToOpen">Change to open access</message>
-            
+
     <!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestResponseFalseForm.java -->
     <message key="xmlui.ArtifactBrowser.ItemRequestStatusChanged.title">Request sent</message>
     <message key="xmlui.ArtifactBrowser.ItemRequestStatusChanged.trail">Request sent</message>
     <message key="xmlui.ArtifactBrowser.ItemRequestStatusChanged.head">Your request to change permissions has been sent</message>
     <message key="xmlui.ArtifactBrowser.ItemRequestStatusChanged.para1">Your request has been sent to the administrator</message>
     <message key="xmlui.ArtifactBrowser.ItemRequestStatusChanged.para2">Thanks</message>
-    
+
     <!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
                         EPerson Aspect
@@ -983,14 +983,14 @@
     <message key="xmlui.administrative.ItemExport.collection.success">The collection was exported successfully.  You should receive an e-mail when the archive is ready for download.  You can also use the 'My Exports' link to view a list of your available archives.</message>
     <message key="xmlui.administrative.ItemExport.community.success">The community was exported successfully.  You should receive an e-mail when the archive is ready for download.  You can also use the 'My Exports' link to view a list of your available archives.</message>
     <message key="xmlui.administrative.ItemExport.available.head">Available export archives for download:</message>
-    
+
     <!-- DRUM customizations -->
     <message key="xmlui.administrative.Navigation.DRUM_customizations">DRUM Customizations</message>
     <message key="xmlui.administrative.Navigation.monthly_statistics">Monthly Statistics</message>
     <message key="xmlui.administrative.Navigation.embargo_list">Embargo List</message>
     <message key="xmlui.administrative.Navigation.units">Units</message>
     <message key="xmlui.administrative.Navigation.ETD_departments">ETD Departments</message>
-    
+
     <!-- org.dspace.app.xmlui.administrative.eperson.ManageEPeopleMain -->
     <message key="xmlui.administrative.eperson.ManageEPeopleMain.title">Manage E-people</message>
     <message key="xmlui.administrative.eperson.ManageEPeopleMain.main_head">E-person management</message>
@@ -1191,9 +1191,9 @@
     <message key="xmlui.administrative.etd_departments.EditETDDepartmentForm.members_column2">Name</message>
     <message key="xmlui.administrative.etd_departments.EditETDDepartmentForm.members_column3"></message>
 
-    <message key="xmlui.administrative.etd_departments.EditETDDepartmentForm.members_etd_department_name">etd_department: {0}</message>
+    <message key="xmlui.administrative.etd_departments.EditETDDepartmentForm.members_etd_department_name">ETD Department: {0}</message>
     <message key="xmlui.administrative.etd_departments.EditETDDepartmentForm.members_none">This ETD Department has no members.</message>
-    <message key="xmlui.administrative.etd_departments.EditETDDepartmentForm.members_pending">[pending]0</message>
+    <message key="xmlui.administrative.etd_departments.EditETDDepartmentForm.members_pending">[pending]</message>
     <message key="xmlui.administrative.etd_departments.EditETDDepartmentForm.instructions_para">Remove members</message>
     <message key="xmlui.administrative.etd_departments.EditETDDepartmentForm.collection_link_para">Remove members</message>
 
@@ -2012,7 +2012,7 @@
     <message key="xmlui.administrative.NotAuthorized.para1b">system administrators</message>
     <message key="xmlui.administrative.NotAuthorized.para1c">.</message>
     <message key="xmlui.administrative.NotAuthorized.para2">Login as another user</message>
-        
+
     <!-- System-wide Curation Tasks form (org.dspace.app.xmlui.aspect.administrative.CurateForm) -->
     <message key="xmlui.administrative.CurateForm.title">System Curation Tasks</message>
     <message key="xmlui.administrative.CurateForm.trail">Curation Tasks</message>
