@@ -160,12 +160,32 @@ public class HandleServlet extends DSpaceServlet
             // and firing a usage event for the DSO we're reporting for
             return;
         } else if ("/browse".equals((extraPathInfo)) || StringUtils.startsWith(extraPathInfo, "/browse?")) {
+        	// Add the location if we got a community or collection
+        	if (dso instanceof Community)
+        	{
+        		Community c = (Community) dso;
+        		request.setAttribute("dspace.community", c);
+        	} else if (dso instanceof Collection)
+        	{
+        		Collection c = (Collection) dso;
+        		request.setAttribute("dspace.collection", c);
+        	}
             request.getRequestDispatcher(extraPathInfo).forward(request, response);
             // If we don't return here, we keep processing and end up
             // throwing a NPE when checking community authorization
             // and firing a usage event for the DSO we're reporting for
             return;
         } else if ("/simple-search".equals(extraPathInfo) || StringUtils.startsWith(extraPathInfo, "simple-search?")) {
+        	// Add the location if we got a community or collection
+        	if (dso instanceof Community)
+        	{
+        		Community c = (Community) dso;
+        		request.setAttribute("dspace.community", c);
+        	} else if (dso instanceof Collection)
+        	{
+        		Collection c = (Collection) dso;
+        		request.setAttribute("dspace.collection", c);
+        	}
             request.getRequestDispatcher(extraPathInfo).forward(request, response);
             // If we don't return here, we keep processing and end up
             // throwing a NPE when checking community authorization
