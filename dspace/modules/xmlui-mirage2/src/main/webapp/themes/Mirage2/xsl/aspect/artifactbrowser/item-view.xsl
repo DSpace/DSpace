@@ -418,8 +418,21 @@
                                     </xsl:choose>
                                     <xsl:text>)</xsl:text>
                                 </a>
+<<<<<<< HEAD
                             </div>
 
+=======
+                                  	<xsl:if test="@EMBARGO='true'">
+                                  		 <br />
+	                                	<i18n:text>xmlui.dri2xhtml.METS-1.0.item-restricted</i18n:text>
+	                               </xsl:if>
+                                <br />
+                                	<i18n:text>xmlui.dri2xhtml.METS-1.0.item-number-downloads</i18n:text>
+                                	<xsl:value-of select="@VIEWS" />
+                               		                       
+                            </div>
+							 <br />	
+>>>>>>> 937e4ecc9cf4c2ccd1887e4a7f4ca3b2abf58791
                 </xsl:for-each>
             </div>
         </xsl:if>
