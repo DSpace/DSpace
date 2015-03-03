@@ -558,7 +558,7 @@ public class BibliographyServlet extends DSpaceServlet{
              
           //String header= "Authors,Title,Year,Abstract,Author Keywords,Editors,Publisher,Document Type,Source";    
           //Header para articulos o articulos de revista
-          String headerArticle="Authors,Title,Year,Link,Abstract,Author Keywords,Publisher,language of Original Document,Issue,Page start,Page end,Document Type";
+          String headerArticle="Authors,Title,Year,Link,Abstract,Author Keywords,Publisher,language of Original Document,Document Type";
           //Header para trabajos de grado,tesis de maestria, doctorado
           String headerThesis="Authors,Title,Year,Link,Abstract,Author Keywords,Editors,Publisher,pubplace,Language of Original Document,Document Type";
           //Header para libros o partes de libro
@@ -573,7 +573,7 @@ public class BibliographyServlet extends DSpaceServlet{
             int csvType = 1;
             String[] DC2Bib = new String[5];
             // Metadatos para articulos o articulos de revista
-            DC2Bib[1] = "dc.creator, dc.title, dc.date.issued, dc.identifier.uri, dc.description.abstract, dc.subject, dc.publisher, dc.language.iso, dc.citation.issue, dc.citation.spage, dc.citation.epage, dc.type";
+            DC2Bib[1] = "dc.creator, dc.title, dc.date.issued, dc.identifier.uri, dc.description.abstract, dc.subject, dc.publisher, dc.language.iso,dc.type";
             // Metadatos para libros o partes de libro
             DC2Bib[2] = "dc.creator, dc.title, dc.date.issued, dc.identifier.uri, dc.description.abstract, dc.subject, dc.contributor, dc.identifier.isbn, dc.publisher,dc.pubplace, dc.type";
             //Metadatos para trabajos de grado, tesis de maestria, doctorado
@@ -746,25 +746,6 @@ public class BibliographyServlet extends DSpaceServlet{
                         sb.append(values[k].value);
                         sb.append("\"");
                     }
-                } else if(element.equals("citation") && qualifier.equals("issue")){
-                    if(k==0){
-                      sb.append("\""); 
-                      sb.append(values[k].value);
-                      sb.append("\""); 
-                    }
-                } else if(element.equals("citation") && qualifier.equals("spage")){
-                    if(k==0){
-                      sb.append("\""); 
-                      sb.append(values[k].value);
-                      sb.append("\""); 
-                      
-                    }
-                } else if(element.equals("citation") && qualifier.equals("epage")){
-                    if(k==0){
-                      sb.append("\""); 
-                      sb.append(values[k].value);
-                      sb.append("\""); 
-                    }
                 } else if (element.equals("type")) {
                     if (k == 0) {
                        sb.append("\""); 
@@ -787,7 +768,7 @@ public class BibliographyServlet extends DSpaceServlet{
          public String renderTSV(Item item, HttpServletRequest request)  {
             
           //Header para articulos o articulos de revista
-          String headerArticle="Authors\tTitle\tYear\tLink\tAbstract\tAuthor Keywords\tPublisher\tlanguage of Original Document\tIssue\tPage start\tPage end\tDocument Type";
+          String headerArticle="Authors\tTitle\tYear\tLink\tAbstract\tAuthor Keywords\tPublisher\tlanguage of Original Document\tDocument Type";
           //Header para trabajos de grado,tesis de maestria, doctorado
           String headerThesis="Authors\tTitle\tYear\tLink\tAbstract\tAuthor Keywords\tEditors\tPublisher\tpubplace\tLanguage of Original Document\tDocument Type";
           //Header para libros o partes de libro
@@ -802,9 +783,9 @@ public class BibliographyServlet extends DSpaceServlet{
             int tsvType = 1;
             String[] DC2Bib = new String[5];
             // Metadatos para articulos o articulos de revista
-            DC2Bib[1] = "dc.creator, dc.title, dc.date.issued, dc.identifier.uri, dc.description.abstract, dc.subject, dc.publisher, dc.language.iso, dc.citation.issue, dc.citation.spage, dc.citation.epage, dc.type";
+            DC2Bib[1] = "dc.creator, dc.title, dc.date.issued, dc.identifier.uri, dc.description.abstract, dc.subject, dc.publisher, dc.language.iso,dc.type";
             // Metadatos para libros o partes de libro
-            DC2Bib[2] = "dc.creator, dc.title, dc.date.issued, dc.identifier.uri, dc.description.abstract, dc.subject, dc.contributor, dc.identifier.isbn, dc.publisher,dc.pubplace, dc.type";
+            DC2Bib[2] = "dc.creator, dc.title, dc.date.issued, dc.identifier.uri, dc.description.abstract, dc.subject, dc.contributor, dc.identifier.isbn,dc.publisher,dc.pubplace,dc.type";
             //Metadatos para trabajos de grado, tesis de maestria, doctorado
             DC2Bib[3] = "dc.creator, dc.title, dc.date.issued, dc.identifier.uri, dc.description.abstract, dc.subject, dc.contributor, dc.publisher, dc.pubplace, dc.language.iso, dc.type";
             
@@ -974,18 +955,6 @@ public class BibliographyServlet extends DSpaceServlet{
                         sb.append("\"");
                         sb.append(values[k].value);
                         sb.append("\"");
-                    }
-                } else if(element.equals("citation") && qualifier.equals("issue")){
-                    if(k==0){ 
-                      sb.append(values[k].value);
-                    }
-                } else if(element.equals("citation") && qualifier.equals("spage")){
-                    if(k==0){
-                      sb.append(values[k].value); 
-                    }
-                } else if(element.equals("citation") && qualifier.equals("epage")){
-                    if(k==0){ 
-                      sb.append(values[k].value); 
                     }
                 } else if (element.equals("type")) {
                     if (k == 0) {
