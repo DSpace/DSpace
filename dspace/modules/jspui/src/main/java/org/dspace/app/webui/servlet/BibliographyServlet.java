@@ -503,7 +503,7 @@ public class BibliographyServlet extends DSpaceServlet{
                     if (k == 0) {
                         sb.append("TI  - " + values[k].value);
                     }
-                } else if (element.equals("description") && qualifier.equals("abstract")) {
+                } else if ((element.equals("description") && qualifier.equals("abstract")) || (element.equals("description"))) {
                     if (k == 0) {
                         sb.append("AB  - " + values[k].value);
                     }
@@ -558,11 +558,11 @@ public class BibliographyServlet extends DSpaceServlet{
              
           //String header= "Authors,Title,Year,Abstract,Author Keywords,Editors,Publisher,Document Type,Source";    
           //Header para articulos o articulos de revista
-          String headerArticle="Authors,Title,Year,Link,Abstract,Author Keywords,Publisher,language of Original Document,Document Type";
+          String headerArticle="Authors,Title,Year,Link,Abstract,Keywords,Publisher,Language,Document Type";
           //Header para trabajos de grado,tesis de maestria, doctorado
-          String headerThesis="Authors,Title,Year,Link,Abstract,Author Keywords,Editors,Publisher,pubplace,Language of Original Document,Document Type";
+          String headerThesis="Authors,Title,Year,Link,Abstract,Keywords,Editors,Publisher,Pubplace,Language,Document Type";
           //Header para libros o partes de libro
-          String headerChapBook="Authors,Title,Year,Link,Abstract,Author Keywords,Editors,isbn,Publisher, pubplace, Document Type"; 
+          String headerChapBook="Authors,Title,Year,Link,Abstract,Keywords,Editors,Isbn,Publisher, Pubplace, Document Type"; 
           
           String delimitador = ",";
           String separador = "\n";
@@ -703,7 +703,7 @@ public class BibliographyServlet extends DSpaceServlet{
                       sb.append("\"");  
                     }
                 }
-                  else if (element.equals("description") && qualifier.equals("abstract")) {
+                  else if ((element.equals("description") && qualifier.equals("abstract")) || (element.equals("description"))) {
                     if (k == 0) {
                        sb.append("\""); 
                        sb.append(values[k].value);
@@ -768,11 +768,11 @@ public class BibliographyServlet extends DSpaceServlet{
          public String renderTSV(Item item, HttpServletRequest request)  {
             
           //Header para articulos o articulos de revista
-          String headerArticle="Authors\tTitle\tYear\tLink\tAbstract\tAuthor Keywords\tPublisher\tlanguage of Original Document\tDocument Type";
+          String headerArticle="Authors\tTitle\tYear\tLink\tAbstract\tKeywords\tPublisher\tLanguage\tDocument Type";
           //Header para trabajos de grado,tesis de maestria, doctorado
-          String headerThesis="Authors\tTitle\tYear\tLink\tAbstract\tAuthor Keywords\tEditors\tPublisher\tpubplace\tLanguage of Original Document\tDocument Type";
+          String headerThesis="Authors\tTitle\tYear\tLink\tAbstract\tKeywords\tEditors\tPublisher\tPubplace\tLanguage\tDocument Type";
           //Header para libros o partes de libro
-          String headerChapBook="Authors\tTitle\tYear\tLink\tAbstract\tAuthor Keywords\tEditors\tisbn\tPublisher\tpubplace\tDocument Type"; 
+          String headerChapBook="Authors\tTitle\tYear\tLink\tAbstract\tKeywords\tEditors\tisbn\tPublisher\tPubplace\tDocument Type"; 
           
           String delimitador = "\t";
           String separador = "\n";
@@ -878,6 +878,9 @@ public class BibliographyServlet extends DSpaceServlet{
                       sb.append(values[k].value);
                     }
                     else if (k > 0){
+                      if(k <= values.length-1){
+                         sb.append(";");  
+                      }
                       sb.append(values[k].value);
                     }
                      if(k == values.length-1){
@@ -913,7 +916,7 @@ public class BibliographyServlet extends DSpaceServlet{
                       sb.append("\"");
                     }
                 }
-                  else if (element.equals("description") && qualifier.equals("abstract")) {
+                  else if ((element.equals("description") && qualifier.equals("abstract")) || (element.equals("description"))) {
                     if (k == 0) {
                        sb.append("\""); 
                        sb.append(values[k].value);
@@ -925,6 +928,9 @@ public class BibliographyServlet extends DSpaceServlet{
                       sb.append(values[k].value);
                     }
                     else if (k > 0){
+                      if(k <= values.length-1){
+                         sb.append(",");  
+                      }
                       sb.append(values[k].value);
                     }
                      if(k == values.length-1){
