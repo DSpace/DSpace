@@ -12,7 +12,6 @@ importClass(Packages.org.dspace.core.Constants);
 importClass(Packages.org.dspace.content.Bitstream);
 importClass(Packages.org.dspace.content.Bundle);
 importClass(Packages.org.dspace.content.Item);
-importClass(Packages.org.dspace.content.EtdUnit);
 importClass(Packages.org.dspace.content.Collection);
 importClass(Packages.org.dspace.content.Community);
 importClass(Packages.org.dspace.harvest.HarvestedCollection);
@@ -27,7 +26,6 @@ importClass(Packages.org.dspace.app.xmlui.utils.FlowscriptUtils);
 importClass(Packages.org.dspace.app.xmlui.utils.ContextUtil);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowEPersonUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowGroupUtils);
-importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowETDDepartmentUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowRegistryUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowItemUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowMapperUtils);
@@ -197,9 +195,6 @@ function isAuthorized(objectType, objectID, action) {
         break;
     case Constants.GROUP:
         object = Group.find(getDSContext(),objectID);
-        break;
-    case Constants.ETDUNIT:
-        object = EtdUnit.find(getDSContext(),objectID);
         break;
     case Constants.EPERSON:
         object = EPerson.find(getDSContext(),objectID);
@@ -373,24 +368,6 @@ function assertEditGroup(groupID)
 }
 
 /**
- * Assert that the currently authenticated eperson can edit the given group. If they
- * cannot then this method will never return.
- */
-function assertEditETDDepartment(etd_departmentID)
-{
-	// Check authorizations
-	if (etd_departmentID == -1)
-	{
-		// only system admin can create "top level" group
-		assertAdministrator();
-	}
-	else
-	{
-		assertAuthorized(Constants.ETDUNIT, etd_departmentID, Constants.WRITE);
-	}
-}
-
-/**
  * Return whether the currently authenticated eperson is an
  * administrator.
  */
@@ -442,22 +419,6 @@ function startManageGroups()
 	assertAdministrator();
 
 	doManageGroups();
-
-	// This should never return, but just in case it does then point
-	// the user to the home page.
-	cocoon.redirectTo(cocoon.request.getContextPath());
-	getDSContext().complete();
-	cocoon.exit();
-}
-
-/**
- * Start managing etd_departments
- */
-function startManageETDDepartments()
-{
-	assertAdministrator();
-
-	doManageETDDepartments();
 
 	// This should never return, but just in case it does then point
 	// the user to the home page.
@@ -1086,196 +1047,6 @@ function doDeleteGroups(groupIDs)
         // The user has confirmed, actually delete these groups
         assertAdministrator();
         var result = FlowGroupUtils.processDeleteGroups(getDSContext(),groupIDs);
-        return result;
-    }
-    return null;
-}
-
-/********************
- * ETDDepartment flows
- ********************/
-
-/**
- * Manage ETDDepartments, allow users to create new, edit existing,
- * or remove ETDDepartments. The user may also search or browse
- * for ETDDepartments.
- *
- * The is typically used as an entry point flow.
- */
-function doManageETDDepartments()
-{
-    assertAdministrator();
-
-    var highlightID = -1
-    var query = "";
-    var page = 0;
-    var result;
-    do {
-
-
-        sendPageAndWait("admin/etd_departments/main",{"query":query,"page":page,"highlightID":highlightID},result);
-        assertAdministrator();
-		result = null;
-
-
-         // Update the page parameter if supplied.
-        if (cocoon.request.get("page"))
-            page = cocoon.request.get("page");
-
-        if (cocoon.request.get("submit_search"))
-        {
-            // Grab the new query and reset the page parameter
-            query = cocoon.request.get("query");
-            page = 0
-            highlightID = -1
-        }
-        else if (cocoon.request.get("submit_add"))
-        {
-            // Just create a blank etd_department then pass it to the group editor.
-            result = doEditETDDepartment(-1);
-
-            if (result != null && result.getParameter("etd_departmentID"))
-           		highlightID = result.getParameter("etd_departmentID");
-        }
-        else if (cocoon.request.get("submit_edit") && cocoon.request.get("etd_departmentID"))
-        {
-            // Edit a specific etd_department
-			var etd_departmentID = cocoon.request.get("etd_departmentID");
-			result = doEditETDDepartment(etd_departmentID);
-			highlightID = etd_departmentID;
-        }
-        else if (cocoon.request.get("submit_delete") && cocoon.request.get("select_etd_department"))
-        {
-            // Delete a set of etd_departments
-            var etd_departmentIDs = cocoon.request.getParameterValues("select_etd_department");
-            result = doDeleteETDDepartments(etd_departmentIDs);
-            highlightID = -1;
-        }
-        else if (cocoon.request.get("submit_return"))
-        {
-            // Not implemented in the UI, but should be in case someone links to us.
-            return;
-        }
-
-    } while (true) // only way to exit is to hit the submit_back button.
-}
-
-
-/**
- * This flow allows for the full editing of a etd_department, changing the etd_department's name or
- * removing members. Users may search for collections to add as members
- * to this etd_department.
- */
-function doEditETDDepartment(etd_departmentID)
-{
-    var etd_departmentName        = FlowETDDepartmentUtils.getName(getDSContext(),etd_departmentID);
-    var memberCollectionIDs = FlowETDDepartmentUtils.getCollectionMembers(getDSContext(),etd_departmentID);
-
-//    var memberEPeopleIDs = FlowGroupUtils.getEPeopleMembers(getDSContext(),groupID);
-//    var memberGroupIDs   = FlowGroupUtils.getGroupMembers(getDSContext(),groupID);
-
-    assertEditETDDepartment(etd_departmentID);
-
-    var highlightCollectionID;
-
-//    var highlightEPersonID;
-//    var highlightGroupID;
-
-    var type = "";
-    var query = "";
-    var page = 0;
-    var result = null;
-
-    do {
-        sendPageAndWait("admin/etd_departments/edit",{"etd_departmentID":etd_departmentID,"etd_departmentName":etd_departmentName,"memberCollectionIDs":memberCollectionIDs.join(','),"highlightCollectionID":highlightCollectionID,"query":query,"page":page,"type":type},result);
-        assertEditETDDepartment(etd_departmentID);
-
-		result = null;
-		highlightCollectionID = null;
-
-//        highlightEPersonID = null;
-//        highlightGroupID = null;
-
-        // Update the etd_departmentName
-		if (cocoon.request.get("etd_department_name"))
-			etd_departmentName = cocoon.request.get("etd_department_name");
-
-//		// Update the groupName
-//		if (cocoon.request.get("group_name"))
-//			groupName = cocoon.request.get("group_name");
-
-		if (cocoon.request.get("page"))
-			page = cocoon.request.get("page");
-
-        if (cocoon.request.get("submit_cancel"))
-        {
-            // Just return without saving anything.
-            return null;
-        }
-       	else if (cocoon.request.get("submit_save"))
-       	{
-       		result = FlowETDDepartmentUtils.processSaveETDDepartment(getDSContext(),etd_departmentID,etd_departmentName,memberCollectionIDs);
-
-       		// In case a etd_department was created, update our id.
-       		if (result != null && result.getParameter("etd_departmentID"))
-           		etd_departmentID = result.getParameter("etd_departmentID");
-       	}
-        else if (cocoon.request.get("submit_search_collection") && cocoon.request.get("query"))
-        {
-            // Perform a new search for collections.
-            query = cocoon.request.get("query");
-            page = 0;
-            type = "collection";
-        }
-        else if (cocoon.request.get("submit_clear"))
-        {
-            // Perform a new search for collections.
-            query = "";
-            page = 0;
-            type = "";
-        }
-
-        // Check if there were any add or delete operations.
-        var names = cocoon.request.getParameterNames();
-        while (names.hasMoreElements())
-        {
-        	var name = names.nextElement();
-        	var match = null;
-
-        	if ((match = name.match(/submit_add_collection_(\d+)/)) != null)
-        	{
-        		// Add a collection
-        		var collectionID = match[1];
-        		memberCollectionIDs = FlowETDDepartmentUtils.addMember(memberCollectionIDs,collectionID);
-        		highlightCollectionID = collectionID;
-        	}
-        	if ((match = name.match(/submit_remove_collection_(\d+)/)) != null)
-        	{
-        		// remove a collection
-        		var collectionID = match[1];
-				memberCollectionIDs = FlowETDDepartmentUtils.removeMember(memberCollectionIDs,collectionID);
-				highlightCollectionID = collectionID;
-        	}
-        }
-    } while (result == null || !result.getContinue())
-
-    return result;
-}
-
-/**
- * Confirm that the given etd_departmentIDs should be deleted, if confirmed they will be deleted.
- */
-function doDeleteETDDepartments(etd_departmentIDs)
-{
-    assertAdministrator();
-
-    sendPageAndWait("admin/etd_departments/delete",{"etd_departmentIDs":etd_departmentIDs.join(',')});
-
-    if (cocoon.request.get("submit_confirm"))
-    {
-        // The user has confirmed, actually delete these etd_departments
-        assertAdministrator();
-        var result = FlowETDDepartmentUtils.processDeleteETDDepartments(getDSContext(),etd_departmentIDs);
         return result;
     }
     return null;
