@@ -10,6 +10,7 @@ import org.apache.log4j.WriterAppender;
 import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.Choices;
+import org.dspace.core.ConfigurationManager;
 
 import com.hp.hpl.jena.query.ParameterizedSparqlString;
 import com.hp.hpl.jena.query.Query;
@@ -30,20 +31,17 @@ public abstract class SPARQLAuthorityProvider implements ChoiceAuthority {
 	protected static final String NS_FOAF = "http://xmlns.com/foaf/0.1/";
 	protected static final String NS_DC = "http://purl.org/dc/terms/";
 
-	private String sparqlEndpoint;
 	private QuerySolutionMap globalParameters;
 
-	public SPARQLAuthorityProvider(String sparqlEndpoint) {
-		this(sparqlEndpoint, new QuerySolutionMap());
+	public SPARQLAuthorityProvider() {
+		this(new QuerySolutionMap());
 	}
 
-	public SPARQLAuthorityProvider(String sparqlEndpoint,
-			QuerySolutionMap globalParameters) {
-		log.trace("New SPARQLAuthorityProvider created por endpoint: "
-				+ sparqlEndpoint);
-		this.sparqlEndpoint = sparqlEndpoint;
+	public SPARQLAuthorityProvider(QuerySolutionMap globalParameters) {
 		this.globalParameters = globalParameters;
 	}
+	
+	protected abstract String getSparqlEndpoint();
 
 	@Override
 	public Choices getMatches(String field, String text, int collection,
@@ -104,7 +102,7 @@ public abstract class SPARQLAuthorityProvider implements ChoiceAuthority {
 					+ query.toString(this.getSPARQLSyntax()));
 		}
 
-		QueryEngineHTTP httpQuery = new QueryEngineHTTP(sparqlEndpoint, query);
+		QueryEngineHTTP httpQuery = new QueryEngineHTTP(this.getSparqlEndpoint(), query);
 		httpQuery.setAllowDeflate(false);
 		httpQuery.setAllowGZip(false);
 		Choice[] choices = this.extractChoices(httpQuery.execSelect());
@@ -135,8 +133,11 @@ public abstract class SPARQLAuthorityProvider implements ChoiceAuthority {
 
 		log.addAppender(new WriterAppender(new SimpleLayout(), System.out));
 		log.setLevel(Level.TRACE);
-		SPARQLAuthorityProvider s = new SPARQLAuthorityProvider(
-				"http://www.ebi.ac.uk/rdf/services/atlas/sparql") {
+		SPARQLAuthorityProvider s = new SPARQLAuthorityProvider() {
+			
+			protected String getSparqlEndpoint() {
+				return ConfigurationManager.getProperty("sparql-authorities", "sparql-authorities.endpoint.url");
+			}
 
 			@Override
 			protected Choice extractChoice(QuerySolution solution) {
