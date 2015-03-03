@@ -29,9 +29,9 @@
             <map:transformer name="EditGroupForm" src="org.dspace.app.xmlui.aspect.administrative.group.EditGroupForm"/>
             <map:transformer name="DeleteGroupsConfirm" src="org.dspace.app.xmlui.aspect.administrative.group.DeleteGroupsConfirm"/>
 
-            <map:transformer name="ManageDepartmentsMain" src="org.dspace.app.xmlui.aspect.administrative.etd_departments.ManageDepartmentsMain"/>
-            <map:transformer name="EditDepartmentsForm" src="org.dspace.app.xmlui.aspect.administrative.etd_departments.EditDepartmentsForm"/>
-            <map:transformer name="DeleteDepartmentsConfirm" src="org.dspace.app.xmlui.aspect.administrative.etd_departments.DeleteDepartmentsConfirm"/>
+            <map:transformer name="ManageETDDepartmentsMain" src="org.dspace.app.xmlui.aspect.administrative.etd_departments.ManageETDDepartmentsMain"/>
+            <map:transformer name="EditETDDepartmentsForm" src="org.dspace.app.xmlui.aspect.administrative.etd_departments.EditETDDepartmentsForm"/>
+            <map:transformer name="DeleteETDDepartmentsConfirm" src="org.dspace.app.xmlui.aspect.administrative.etd_departments.DeleteETDDepartmentsConfirm"/>
 
             <map:transformer name="MetadataRegistryMain" src="org.dspace.app.xmlui.aspect.administrative.registries.MetadataRegistryMain"/>
             <map:transformer name="EditMetadataSchema" src="org.dspace.app.xmlui.aspect.administrative.registries.EditMetadataSchema"/>
@@ -151,13 +151,13 @@
 
                     <!--
                      This is the general entry / resume point for the
-                     management of all ETD-Departments.
+                     management of all ETD-ETDDepartments.
                      -->
-                    <map:match pattern="admin/departments">
+                    <map:match pattern="admin/etd_departments">
                         <map:match type="request" pattern="administrative-continue">
                             <map:call continuation="{1}"/>
                         </map:match>
-                        <map:call function="startManageDepartments"/>
+                        <map:call function="startManageETDDepartments"/>
                     </map:match>
 
                     <!--
@@ -431,15 +431,15 @@
                         </map:match>
 
 
-                        <!-- Department management pages -->
+                        <!-- ETDDepartment management pages -->
 
 
                         <!--
-                         The main department management page allows for groups to be searched, browsed,
+                         The main etd_department management page allows for groups to be searched, browsed,
                          and selected for editing or deletion.
                          -->
-                        <map:match pattern="admin/departments/main">
-                            <map:transform type="ManageDepartmentsMain">
+                        <map:match pattern="admin/etd_departments/main">
+                            <map:transform type="ManageETDDepartmentsMain">
                                 <map:parameter name="query" value="{flow-attribute:query}"/>
                                 <map:parameter name="page" value="{flow-attribute:page}"/>
                                 <map:parameter name="highlightID" value="{flow-attribute:highlightID}"/>
@@ -447,14 +447,14 @@
                         </map:match>
 
                         <!--
-                         The edit departments form shows a departments's data and allows the user to
-                         edit the departments's membership, edit it's name, search for new collections
-                         to add as members. It also serves as the new department page.
+                         The edit etd_departments form shows a etd_departments's data and allows the user to
+                         edit the etd_departments's membership, edit it's name, search for new collections
+                         to add as members. It also serves as the new etd_department page.
                          -->
-                        <map:match pattern="admin/departments/edit">
-                            <map:transform type="EditDepartmentsForm">
-                                <map:parameter name="departmentID" value="{flow-attribute:departmentID}"/>
-                                <map:parameter name="departmentName" value="{flow-attribute:departmentName}"/>
+                        <map:match pattern="admin/etd_departments/edit">
+                            <map:transform type="EditETDDepartmentsForm">
+                                <map:parameter name="etd_departmentID" value="{flow-attribute:etd_departmentID}"/>
+                                <map:parameter name="etd_departmentName" value="{flow-attribute:etd_departmentName}"/>
                                 <map:parameter name="memberCollectionIDs" value="{flow-attribute:memberCollectionIDs}"/>
                                 <map:parameter name="highlightCollectionID" value="{flow-attribute:highlightCollectionID}"/>
                                 <map:parameter name="query" value="{flow-attribute:query}"/>
@@ -465,12 +465,12 @@
                         </map:match>
 
                         <!--
-                         The delete department page lists all the yet-to-be-deleted pages, if the user
-                         clicks confirm deletion then the departments are removed.
+                         The delete etd_department page lists all the yet-to-be-deleted pages, if the user
+                         clicks confirm deletion then the etd_departments are removed.
                          -->
-                        <map:match pattern="admin/departments/delete">
-                            <map:transform type="DeleteDepartmentsConfirm">
-                                <map:parameter name="departmentIDs" value="{flow-attribute:departmentIDs}"/>
+                        <map:match pattern="admin/etd_departments/delete">
+                            <map:transform type="DeleteETDDepartmentsConfirm">
+                                <map:parameter name="etd_departmentIDs" value="{flow-attribute:etd_departmentIDs}"/>
                             </map:transform>
                         </map:match>
 
@@ -972,7 +972,7 @@
                     <map:match pattern="admin/groups">
                         <map:act type="StartAuthentication"/>
                     </map:match>
-                    <map:match pattern="admin/departments">
+                    <map:match pattern="admin/etd_departments">
                         <map:act type="StartAuthentication"/>
                     </map:match>
                     <map:match pattern="admin/metadata-registry">

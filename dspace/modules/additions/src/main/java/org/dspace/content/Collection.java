@@ -1615,15 +1615,4 @@ public class Collection extends DSpaceObject
         //Also fire a modified event since the collection HAS been modified
         ourContext.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, getID(), null));
     }
-
-//	public static int searchResultCount(Context context, String query) {
-//
-//		return 0;
-//	}
-
-	public static Collection[] search(Context context, String query, int i,
-			int resultsPerPage) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }

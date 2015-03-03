@@ -14,7 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import org.dspace.app.xmlui.aspect.administrative.FlowDepartmentUtils;
+import org.dspace.app.xmlui.aspect.administrative.FlowETDDepartmentUtils;
 import org.dspace.app.xmlui.aspect.administrative.FlowGroupUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
@@ -35,63 +35,63 @@ import org.dspace.eperson.EPerson;
 import org.dspace.content.EtdUnit;
 
 /**
- * Present the user with the department's current state. The user may select to
- * change the department's name, OR search for new Collections to add, OR select
+ * Present the user with the etd_department's current state. The user may select to
+ * change the etd_department's name, OR search for new Collections to add, OR select
  * current collections for removal.
  *
  * @author Alexey Maslov
  * @author Scott Phillips
  */
-public class EditDepartmentsForm extends AbstractDSpaceTransformer
+public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
 {
 	/** Language Strings */
 	private static final Message T_dspace_home =
 		message("xmlui.general.dspace_home");
 
-	private static final Message T_department_trail =
-		message("xmlui.administrative.departments.general.department_trail");
+	private static final Message T_etd_department_trail =
+		message("xmlui.administrative.etd_departments.general.etd_department_trail");
 
 	private static final Message T_title =
-		message("xmlui.administrative.departments.EditDepartmentForm.title");
+		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.title");
 
 	private static final Message T_trail =
-		message("xmlui.administrative.departments.EditDepartmentForm.trail");
+		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.trail");
 
 	private static final Message T_main_head =
-		message("xmlui.administrative.departments.EditDepartmentForm.main_head");
+		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.main_head");
 
 	private static final Message T_collection_para =
-		message("xmlui.administrative.departments.EditDepartmentForm.collection_para");
+		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.collection_para");
 
     private static final Message T_community_para =
-        message("xmlui.administrative.departments.EditDepartmentForm.community_para");
+        message("xmlui.administrative.etd_departments.EditETDDepartmentForm.community_para");
 
 	private static final Message T_label_name =
-		message("xmlui.administrative.departments.EditDepartmentForm.label_name");
+		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.label_name");
 
 	private static final Message T_label_instructions =
-		message("xmlui.administrative.departments.EditDepartmentForm.label_instructions");
+		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.label_instructions");
 
 	private static final Message T_label_search =
-		message("xmlui.administrative.departments.EditDepartmentForm.label_search");
+		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.label_search");
 
 	private static final Message T_submit_search_collections =
-			message("xmlui.administrative.departments.EditDepartmentForm.submit_search_collections");
+			message("xmlui.administrative.etd_departments.EditETDDepartmentForm.submit_search_collections");
 
 //	private static final Message T_submit_search_people =
-//		message("xmlui.administrative.departments.EditDepartmentForm.submit_search_people");
+//		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.submit_search_people");
 //
 //	private static final Message T_submit_search_groups =
-//		message("xmlui.administrative.departments.EditDepartmentForm.submit_search_groups");
+//		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.submit_search_groups");
 
 	private static final Message T_no_results =
-		message("xmlui.administrative.departments.EditDepartmentForm.no_results");
+		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.no_results");
 
 	private static final Message T_main_head_new =
-		message("xmlui.administrative.departments.EditDepartmentForm.main_head_new");
+		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.main_head_new");
 
 	private static final Message T_submit_clear =
-		message("xmlui.administrative.departments.EditDepartmentForm.submit_clear");
+		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.submit_clear");
 
 	private static final Message T_submit_save =
 		message("xmlui.general.save");
@@ -100,92 +100,92 @@ public class EditDepartmentsForm extends AbstractDSpaceTransformer
 		message("xmlui.general.cancel");
 
 	private static final Message T_member =
-		message("xmlui.administrative.departments.EditDepartmentForm.member");
+		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.member");
 
 //	private static final Message T_cycle =
-//		message("xmlui.administrative.departments.EditDepartmentForm.cycle");
+//		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.cycle");
 
 	private static final Message T_pending =
-		message("xmlui.administrative.departments.EditDepartmentForm.pending");
+		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.pending");
 
 	private static final Message T_pending_warn =
-		message("xmlui.administrative.departments.EditDepartmentForm.pending_warn");
+		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.pending_warn");
 
 	private static final Message T_submit_add =
-		message("xmlui.administrative.departments.EditDepartmentForm.submit_add");
+		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.submit_add");
 
 	private static final Message T_submit_remove =
-		message("xmlui.administrative.departments.EditDepartmentForm.submit_remove");
+		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.submit_remove");
 
 	// Collections Search
 	private static final Message T_collections_column1 =
-		message("xmlui.administrative.departments.EditDepartmentForm.collections_column1");
+		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.collections_column1");
 
 	private static final Message T_collections_column2 =
-		message("xmlui.administrative.departments.EditDepartmentForm.collections_column2");
+		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.collections_column2");
 
 	private static final Message T_collections_column3 =
-		message("xmlui.administrative.departments.EditDepartmentForm.collections_column3");
+		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.collections_column3");
 
 //	private static final Message T_collections_column4 =
-//			message("xmlui.administrative.departments.EditDepartmentForm.collections_column4");
+//			message("xmlui.administrative.etd_departments.EditETDDepartmentForm.collections_column4");
 
 //	// EPeople Search
 //	private static final Message T_epeople_column1 =
-//		message("xmlui.administrative.departments.EditDepartmentForm.epeople_column1");
+//		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.epeople_column1");
 //
 //	private static final Message T_epeople_column2 =
-//		message("xmlui.administrative.departments.EditDepartmentForm.epeople_column2");
+//		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.epeople_column2");
 //
 //	private static final Message T_epeople_column3 =
-//		message("xmlui.administrative.departments.EditDepartmentForm.epeople_column3");
+//		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.epeople_column3");
 //
 //	private static final Message T_epeople_column4 =
-//		message("xmlui.administrative.departments.EditDepartmentForm.epeople_column4");
+//		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.epeople_column4");
 //
 //	// Group Search
 //	private static final Message T_groups_column1 =
-//		message("xmlui.administrative.departments.EditDepartmentForm.groups_column1");
+//		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.groups_column1");
 //
 //	private static final Message T_groups_column2 =
-//		message("xmlui.administrative.departments.EditDepartmentForm.groups_column2");
+//		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.groups_column2");
 //
 //	private static final Message T_groups_column3 =
-//		message("xmlui.administrative.departments.EditDepartmentForm.groups_column3");
+//		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.groups_column3");
 //
 //	private static final Message T_groups_column4 =
-//		message("xmlui.administrative.departments.EditDepartmentForm.groups_column4");
+//		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.groups_column4");
 //
 //	private static final Message T_groups_column5 =
-//		message("xmlui.administrative.departments.EditDepartmentForm.groups_column5");
+//		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.groups_column5");
 //
 //	private static final Message T_groups_collection_link =
-//		message("xmlui.administrative.departments.ManageDepartmentsMain.groups_collection_link");
+//		message("xmlui.administrative.etd_departments.ManageETDDepartmentsMain.groups_collection_link");
 
 	// Members
 	private static final Message T_members_head =
-		message("xmlui.administrative.departments.EditDepartmentForm.members_head");
+		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.members_head");
 
 	private static final Message T_members_column1 =
-		message("xmlui.administrative.departments.EditDepartmentForm.members_column1");
+		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.members_column1");
 
 	private static final Message T_members_column2 =
-		message("xmlui.administrative.departments.EditDepartmentForm.members_column2");
+		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.members_column2");
 
 	private static final Message T_members_column3 =
-		message("xmlui.administrative.departments.EditDepartmentForm.members_column3");
+		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.members_column3");
 
 //	private static final Message T_members_column4 =
-//		message("xmlui.administrative.departments.EditDepartmentForm.members_column4");
+//		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.members_column4");
 
-	private static final Message T_members_department_name =
-		message("xmlui.administrative.departments.EditDepartmentForm.members_department_name");
+	private static final Message T_members_etd_department_name =
+		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.members_etd_department_name");
 
 	private static final Message T_members_pending =
-		message("xmlui.administrative.departments.EditDepartmentForm.members_pending");
+		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.members_pending");
 
 	private static final Message T_members_none =
-		message("xmlui.administrative.departments.EditDepartmentForm.members_none");
+		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.members_none");
 
 
 	// How many results to show on a page.
@@ -199,7 +199,7 @@ public class EditDepartmentsForm extends AbstractDSpaceTransformer
     {
         pageMeta.addMetadata("title").addContent(T_title);
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
-        pageMeta.addTrailLink(contextPath + "/admin/departments",T_department_trail);
+        pageMeta.addTrailLink(contextPath + "/admin/etd_departments",T_etd_department_trail);
         pageMeta.addTrail().addContent(T_trail);
     }
 
@@ -207,32 +207,32 @@ public class EditDepartmentsForm extends AbstractDSpaceTransformer
 	public void addBody(Body body) throws WingException, SQLException
 	{
 		// Find the group in question
-		int departmentID = parameters.getParameterAsInteger("departmentID",-1);
-		String currentName = decodeFromURL(parameters.getParameter("departmentName",null));
+		int etd_departmentID = parameters.getParameterAsInteger("etd_departmentID",-1);
+		String currentName = decodeFromURL(parameters.getParameter("etd_departmentName",null));
 		if (currentName == null || currentName.length() == 0)
         {
-            currentName = FlowDepartmentUtils.getName(context, departmentID);
+            currentName = FlowETDDepartmentUtils.getName(context, etd_departmentID);
         }
 
-		EtdUnit department = null;
-		if (departmentID >= 0)
+		EtdUnit etd_department = null;
+		if (etd_departmentID >= 0)
         {
-            department = EtdUnit.find(context, departmentID);
+            etd_department = EtdUnit.find(context, etd_departmentID);
         }
 
 		// Find the collection or community if applicable
 		Collection collection = null;
 		Community community = null;
-		if (department != null)
+		if (etd_department != null)
 		{
-			int collectionID = FlowDepartmentUtils.getCollectionId(department.getName());
+			int collectionID = FlowETDDepartmentUtils.getCollectionId(etd_department.getName());
 			if (collectionID > -1)
             {
                 collection = Collection.find(context, collectionID);
             }
 			else
 			{
-			    int communityID = FlowDepartmentUtils.getCommunityId(department.getName());
+			    int communityID = FlowETDDepartmentUtils.getCommunityId(etd_department.getName());
 			    if (communityID > -1)
                 {
                     community = Community.find(context, communityID);
@@ -303,15 +303,15 @@ public class EditDepartmentsForm extends AbstractDSpaceTransformer
             }
         }
 
-	    //DIVISION: department-edit
-	    Division main = body.addInteractiveDivision("department-edit",contextPath+"/admin/departments",Division.METHOD_POST,"primary administrative departments");
-	    if (department == null)
+	    //DIVISION: etd_department-edit
+	    Division main = body.addInteractiveDivision("etd_department-edit",contextPath+"/admin/etd_departments",Division.METHOD_POST,"primary administrative etd_departments");
+	    if (etd_department == null)
         {
             main.setHead(T_main_head_new);
         }
 	    else
         {
-            main.setHead(T_main_head.parameterize(department.getName(), departmentID));
+            main.setHead(T_main_head.parameterize(etd_department.getName(), etd_departmentID));
         }
 
 
@@ -328,22 +328,22 @@ public class EditDepartmentsForm extends AbstractDSpaceTransformer
             para.addXref(contextPath+"/handle/"+community.getHandle(), community.getMetadata("name"));
         }
 
-	    // DIVISION: department-actions
-	    Division actions = main.addDivision("department-edit-actions");
-	    Para departmentName = actions.addPara();
-        departmentName.addContent(T_label_name);
-        Text departmentText = departmentName.addText("department_name");
-        departmentText.setValue(currentName);
+	    // DIVISION: etd_department-actions
+	    Division actions = main.addDivision("etd_department-edit-actions");
+	    Para etd_departmentName = actions.addPara();
+        etd_departmentName.addContent(T_label_name);
+        Text etd_departmentText = etd_departmentName.addText("etd_department_name");
+        etd_departmentText.setValue(currentName);
         if(collection != null || community != null)
         {
         	// If this group is associated with a collection or community then it is special,
         	// thus they shouldn't be able to update it.
-        	departmentText.setDisabled();
-        	departmentText.setHelp(T_label_instructions);
+        	etd_departmentText.setDisabled();
+        	etd_departmentText.setHelp(T_label_instructions);
         }
-        else if (errors.contains("department_name") || errors.contains("department_name_duplicate"))
+        else if (errors.contains("etd_department_name") || errors.contains("etd_department_name_duplicate"))
         {
-            departmentText.addError("");
+            etd_departmentText.addError("");
         }
 
 
@@ -362,24 +362,24 @@ public class EditDepartmentsForm extends AbstractDSpaceTransformer
         	if ("collection".equals(type))
 	        {
 	        	searchBoxes.addButton("submit_clear").setValue(T_submit_clear);
-	        	addCollectionsSearch(main,query,page,department,memberCollectionIDs);
+	        	addCollectionsSearch(main,query,page,etd_department,memberCollectionIDs);
 	        }
 //        	else if ("eperson".equals(type))
 //	        {
 //	        	searchBoxes.addButton("submit_clear").setValue(T_submit_clear);
-//	        	addEPeopleSearch(main,query,page,department,memberEPeopleIDs);
+//	        	addEPeopleSearch(main,query,page,etd_department,memberEPeopleIDs);
 //	        }
 //	        else if ("group".equals(type))
 //	        {
 //	        	searchBoxes.addButton("submit_clear").setValue(T_submit_clear);
-//        		addGroupSearch(main,department,query,page,department,memberGroupIDs);
+//        		addGroupSearch(main,etd_department,query,page,etd_department,memberGroupIDs);
 //	        }
         }
 
         boolean changes = false;
-        if (department != null)
+        if (etd_department != null)
         {
-            changes = addMemberList(main, department, memberCollectionIDs, highlightCollectionID);
+            changes = addMemberList(main, etd_department, memberCollectionIDs, highlightCollectionID);
         }
 
 
@@ -398,9 +398,9 @@ public class EditDepartmentsForm extends AbstractDSpaceTransformer
 
 
 	/**
-	 * Search for collections to add to this department.
+	 * Search for collections to add to this etd_department.
 	 */
-	private void addCollectionsSearch(Division div, String query, int page, EtdUnit department, List<Integer> memberCollectionIDs) throws SQLException, WingException
+	private void addCollectionsSearch(Division div, String query, int page, EtdUnit etd_department, List<Integer> memberCollectionIDs) throws SQLException, WingException
 	{
         Collection[] collections = Collection.findAll(context);
         int resultCount = collections.length;
@@ -412,7 +412,7 @@ public class EditDepartmentsForm extends AbstractDSpaceTransformer
 		if (resultCount > RESULTS_PER_PAGE)
 		{
         	// If there are enough results then paginate the results
-        	String baseURL = contextPath +"/admin/departments?administrative-continue="+knot.getId();
+        	String baseURL = contextPath +"/admin/etd_departments?administrative-continue="+knot.getId();
         	int firstIndex = page*RESULTS_PER_PAGE+1;
         	int lastIndex = page*RESULTS_PER_PAGE + collections.length;
 
@@ -442,7 +442,7 @@ public class EditDepartmentsForm extends AbstractDSpaceTransformer
 			String collectionID = String.valueOf(collection.getID());
 			String name = collection.getName();
 //			String email = collection.getEmail();
-			String url = contextPath+"/admin/departments?administrative-continue="+knot.getId()+"&submit_edit_collection&collectionID="+collectionID;
+			String url = contextPath+"/admin/etd_departments?administrative-continue="+knot.getId()+"&submit_edit_collection&collectionID="+collectionID;
 
 			Row collectionData = table.addRow();
 
@@ -454,7 +454,7 @@ public class EditDepartmentsForm extends AbstractDSpaceTransformer
 			if (memberCollectionIDs.contains(collection.getID()))
 			{
 				// Check if they really members or just pending members
-				if (department != null && department.isMember(collection))
+				if (etd_department != null && etd_department.isMember(collection))
                 {
                     collectionData.addCellContent(T_member);
                 }
@@ -709,7 +709,7 @@ public class EditDepartmentsForm extends AbstractDSpaceTransformer
 //
 
 	/**
-	 * Add a table with all the current department's member collections to the specified division.
+	 * Add a table with all the current etd_department's member collections to the specified division.
 	 * @throws SQLException
 	 */
 	private boolean addMemberList(Division div, EtdUnit parent, List<Integer> memberCollectionIDs, int highlightCollectionID) throws WingException, SQLException
@@ -720,7 +720,7 @@ public class EditDepartmentsForm extends AbstractDSpaceTransformer
         Division members = div.addDivision("deparment-edit-members");
         members.setHead(T_members_head);
 
-        Table table = members.addTable("department-edit-members-table",memberCollectionIDs.size() + 1, 3);
+        Table table = members.addTable("etd_department-edit-members-table",memberCollectionIDs.size() + 1, 3);
 
         Row header = table.addRow(Row.ROLE_HEADER);
         header.addCell().addContent(T_members_column1);
@@ -832,7 +832,7 @@ public class EditDepartmentsForm extends AbstractDSpaceTransformer
 	{
     	String fullName = collection.getName();
 //    	String email = collection.getEmail();
-    	String url = contextPath+"/admin/departments?administrative-continue="+knot.getId()+"&submit_edit_collection&collectionID="+collection.getID();
+    	String url = contextPath+"/admin/etd_departments?administrative-continue="+knot.getId()+"&submit_edit_collection&collectionID="+collection.getID();
 
     	Row collectionData = table.addRow(null,null,highlight ? "highlight" : null);
 

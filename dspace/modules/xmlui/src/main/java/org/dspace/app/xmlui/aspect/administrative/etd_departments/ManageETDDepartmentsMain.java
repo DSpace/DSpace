@@ -29,62 +29,62 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.EtdUnit;
 
 /**
- * Manage departments page is the entry point for department management. From here the user
- * may browse/search a the list of departments, they may also add new departments or select
- * existing departments to edit or delete.
+ * Manage etd_departments page is the entry point for etd_department management. From here the user
+ * may browse/search a the list of etd_departments, they may also add new etd_departments or select
+ * existing etd_departments to edit or delete.
  *
  * @author Alexey Maslov
  * @author Scott Phillips
  */
-public class ManageDepartmentsMain extends AbstractDSpaceTransformer
+public class ManageETDDepartmentsMain extends AbstractDSpaceTransformer
 {
 
     /** Language Strings */
     private static final Message T_dspace_home =
             message("xmlui.general.dspace_home");
-    private static final Message T_departments_trail =
-            message("xmlui.administrative.departments.general.department_trail");
+    private static final Message T_etd_departments_trail =
+            message("xmlui.administrative.etd_departments.general.etd_department_trail");
     private static final Message T_title =
-            message("xmlui.administrative.departments.ManageDepartmentsMain.title");
+            message("xmlui.administrative.etd_departments.ManageETDDepartmentsMain.title");
     private static final Message T_main_head =
-            message("xmlui.administrative.departments.ManageDepartmentsMain.main_head");
+            message("xmlui.administrative.etd_departments.ManageETDDepartmentsMain.main_head");
     private static final Message T_actions_head =
-            message("xmlui.administrative.departments.ManageDepartmentsMain.actions_head");
+            message("xmlui.administrative.etd_departments.ManageETDDepartmentsMain.actions_head");
     private static final Message T_actions_create =
-            message("xmlui.administrative.departments.ManageDepartmentsMain.actions_create");
+            message("xmlui.administrative.etd_departments.ManageETDDepartmentsMain.actions_create");
     private static final Message T_actions_create_link =
             message(
-            "xmlui.administrative.departments.ManageDepartmentsMain.actions_create_link");
+            "xmlui.administrative.etd_departments.ManageETDDepartmentsMain.actions_create_link");
     private static final Message T_actions_browse =
-            message("xmlui.administrative.departments.ManageDepartmentsMain.actions_browse");
+            message("xmlui.administrative.etd_departments.ManageETDDepartmentsMain.actions_browse");
     private static final Message T_actions_browse_link =
             message(
-            "xmlui.administrative.departments.ManageDepartmentsMain.actions_browse_link");
+            "xmlui.administrative.etd_departments.ManageETDDepartmentsMain.actions_browse_link");
     private static final Message T_actions_search =
-            message("xmlui.administrative.departments.ManageDepartmentsMain.actions_search");
+            message("xmlui.administrative.etd_departments.ManageETDDepartmentsMain.actions_search");
     private static final Message T_search_help =
-            message("xmlui.administrative.departments.ManageDepartmentsMain.search_help");
+            message("xmlui.administrative.etd_departments.ManageETDDepartmentsMain.search_help");
     private static final Message T_go =
             message("xmlui.general.go");
     private static final Message T_search_head =
-            message("xmlui.administrative.departments.ManageDepartmentsMain.search_head");
+            message("xmlui.administrative.etd_departments.ManageETDDepartmentsMain.search_head");
     private static final Message T_search_column1 =
-            message("xmlui.administrative.departments.ManageDepartmentsMain.search_column1");
+            message("xmlui.administrative.etd_departments.ManageETDDepartmentsMain.search_column1");
     private static final Message T_search_column2 =
-            message("xmlui.administrative.departments.ManageDepartmentsMain.search_column2");
+            message("xmlui.administrative.etd_departments.ManageETDDepartmentsMain.search_column2");
     private static final Message T_search_column3 =
-            message("xmlui.administrative.departments.ManageDepartmentsMain.search_column3");
+            message("xmlui.administrative.etd_departments.ManageETDDepartmentsMain.search_column3");
     private static final Message T_search_column4 =
-            message("xmlui.administrative.departments.ManageDepartmentsMain.search_column4");
+            message("xmlui.administrative.etd_departments.ManageETDDepartmentsMain.search_column4");
     private static final Message T_search_column5 =
-            message("xmlui.administrative.departments.ManageDepartmentsMain.search_column5");
+            message("xmlui.administrative.etd_departments.ManageETDDepartmentsMain.search_column5");
     private static final Message T_collection_link =
             message(
-            "xmlui.administrative.departments.ManageDepartmentsMain.collection_link");
+            "xmlui.administrative.etd_departments.ManageETDDepartmentsMain.collection_link");
     private static final Message T_submit_delete =
-            message("xmlui.administrative.departments.ManageDepartmentsMain.submit_delete");
+            message("xmlui.administrative.etd_departments.ManageETDDepartmentsMain.submit_delete");
     private static final Message T_no_results =
-            message("xmlui.administrative.departments.ManageDepartmentsMain.no_results");
+            message("xmlui.administrative.etd_departments.ManageETDDepartmentsMain.no_results");
     /** The number of results to show on one page. */
     private static final int PAGE_SIZE = 15;
     /** The maximum size of a collection or community name allowed */
@@ -95,35 +95,35 @@ public class ManageDepartmentsMain extends AbstractDSpaceTransformer
     {
         pageMeta.addMetadata("title").addContent(T_title);
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
-        pageMeta.addTrailLink(null, T_departments_trail);
+        pageMeta.addTrailLink(null, T_etd_departments_trail);
     }
 
     public void addBody(Body body)
             throws WingException, SQLException
     {
         // Get all our parameters
-        String baseURL = contextPath + "/admin/departments?administrative-continue="
+        String baseURL = contextPath + "/admin/etd_departments?administrative-continue="
                 + knot.getId();
         String query = decodeFromURL(parameters.getParameter("query", ""));
         int page = parameters.getParameterAsInteger("page", 0);
         int highlightID = parameters.getParameterAsInteger("highlightID", -1);
         int resultCount = EtdUnit.searchResultCount(context, query);
-        EtdUnit[] departments = EtdUnit.search(context, query, page * PAGE_SIZE,
+        EtdUnit[] etd_departments = EtdUnit.search(context, query, page * PAGE_SIZE,
                 PAGE_SIZE);
 
 
 
-        // DIVISION: departments-main
-        Division main = body.addInteractiveDivision("departments-main", contextPath
-                + "/admin/departments", Division.METHOD_POST,
-                "primary administrative departments");
+        // DIVISION: etd_departments-main
+        Division main = body.addInteractiveDivision("etd_departments-main", contextPath
+                + "/admin/etd_departments", Division.METHOD_POST,
+                "primary administrative etd_departments");
         main.setHead(T_main_head);
 
 
 
 
-        // DIVISION: department-actions
-        Division actions = main.addDivision("department-actions");
+        // DIVISION: etd_department-actions
+        Division actions = main.addDivision("etd_department-actions");
         actions.setHead(T_actions_head);
 
         // Browse Epeople
@@ -145,8 +145,8 @@ public class ManageDepartmentsMain extends AbstractDSpaceTransformer
         queryField.setHelp(T_search_help);
         actionItem.addButton("submit_search").setValue(T_go);
 
-        // DIVISION: department-search
-        Division search = main.addDivision("department-search");
+        // DIVISION: etd_department-search
+        Division search = main.addDivision("etd_department-search");
         search.setHead(T_search_head);
 
 
@@ -154,7 +154,7 @@ public class ManageDepartmentsMain extends AbstractDSpaceTransformer
         {
             // If there are enough results then paginate the results
             int firstIndex = page * PAGE_SIZE + 1;
-            int lastIndex = page * PAGE_SIZE + departments.length;
+            int lastIndex = page * PAGE_SIZE + etd_departments.length;
 
             String nextURL = null, prevURL = null;
             if (page < (resultCount / PAGE_SIZE))
@@ -171,7 +171,7 @@ public class ManageDepartmentsMain extends AbstractDSpaceTransformer
         }
 
 
-        Table table = search.addTable("departments-search-table", departments.length + 1,
+        Table table = search.addTable("etd_departments-search-table", etd_departments.length + 1,
                 1);
         Row header = table.addRow(Row.ROLE_HEADER);
         header.addCell().addContent(T_search_column1);
@@ -180,10 +180,10 @@ public class ManageDepartmentsMain extends AbstractDSpaceTransformer
         header.addCell().addContent(T_search_column4);
         header.addCell().addContent(T_search_column5);
 
-        for (EtdUnit department : departments)
+        for (EtdUnit etd_department : etd_departments)
         {
             Row row;
-            if (department.getID() == highlightID)
+            if (etd_department.getID() == highlightID)
             {
                 row = table.addRow(null, null, "highlight");
             }
@@ -192,34 +192,34 @@ public class ManageDepartmentsMain extends AbstractDSpaceTransformer
                 row = table.addRow();
             }
 
-            if (department.getID() > 1)
+            if (etd_department.getID() > 1)
             {
-                CheckBox select = row.addCell().addCheckBox("select_department");
-                select.setLabel(Integer.valueOf(department.getID()).toString());
-                select.addOption(Integer.valueOf(department.getID()).toString());
+                CheckBox select = row.addCell().addCheckBox("select_etd_department");
+                select.setLabel(Integer.valueOf(etd_department.getID()).toString());
+                select.addOption(Integer.valueOf(etd_department.getID()).toString());
             }
             else
             {
                 // Don't allow the user to remove the administrative (id:1) or
-                // anonymous department (id:0)
+                // anonymous etd_department (id:0)
                 row.addCell();
             }
 
-            row.addCell().addContent(department.getID());
-            row.addCell().addXref(baseURL + "&submit_edit&departmentID="
-                    + department.getID(), department.getName());
+            row.addCell().addContent(etd_department.getID());
+            row.addCell().addXref(baseURL + "&submit_edit&etd_departmentID="
+                    + etd_department.getID(), etd_department.getName());
 
-            //int memberCount = department.getMembers().length
-            //        + department.getMemberGroups().length;
+            //int memberCount = etd_department.getMembers().length
+            //        + etd_department.getMemberGroups().length;
             //row.addCell().addContent(memberCount == 0 ? "-" : String.valueOf(
             //        memberCount));
 
             Cell cell = row.addCell();
-            String departmentName = department.getName();
+            String etd_departmentName = etd_department.getName();
             DSpaceObject collectionOrCommunity = null;
             String collectionOrCommunityName = null;
             int id;
-            id = FlowGroupUtils.getCollectionId(departmentName);
+            id = FlowGroupUtils.getCollectionId(etd_departmentName);
             if (id > -1)
             {
                 Collection collection = Collection.find(context, id);
@@ -231,7 +231,7 @@ public class ManageDepartmentsMain extends AbstractDSpaceTransformer
             }
             else
             {
-                id = FlowGroupUtils.getCommunityId(departmentName);
+                id = FlowGroupUtils.getCommunityId(etd_departmentName);
                 if (id > -1)
                 {
                     Community community = Community.find(context, id);
@@ -267,7 +267,7 @@ public class ManageDepartmentsMain extends AbstractDSpaceTransformer
 
         }
 
-        if (departments.length <= 0)
+        if (etd_departments.length <= 0)
         {
             Cell cell = table.addRow().addCell(1, 5);
             cell.addHighlight("italic").addContent(T_no_results);

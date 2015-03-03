@@ -29,62 +29,62 @@ import org.dspace.content.EtdUnit;
  *
  * @author Scott Phillips
  */
-public class FlowDepartmentUtils {
+public class FlowETDDepartmentUtils {
 
 	/** Language Strings */
-	private static final Message T_edit_department_success_notice =
-		new Message("default","xmlui.administrative.FlowGroupUtils.edit_group_success_notice");
+	private static final Message T_edit_etd_department_success_notice =
+		new Message("default","xmlui.administrative.FlowGroupUtils.edit_etd_department_success_notice");
 
-	private static final Message T_delete_department_success_notice =
-		new Message("default","xmlui.administrative.FlowGroupUtils.delete_group_success_notice");
+	private static final Message T_delete_etd_department_success_notice =
+		new Message("default","xmlui.administrative.FlowGroupUtils.delete_etd_department_success_notice");
 
 
 	/**
-	 * Return the current name for the given department ID.
+	 * Return the current name for the given etd_department ID.
 	 * @param context The current DSpace context.
-	 * @param departmentID The department id.
-	 * @return The department's name.
+	 * @param etd_departmentID The etd_department id.
+	 * @return The etd_department's name.
 	 */
-	public static String getName(Context context, int departmentID) throws SQLException
+	public static String getName(Context context, int etd_departmentID) throws SQLException
 	{
-		if (departmentID < 0)
+		if (etd_departmentID < 0)
         {
-            return "New Department";
+            return "New ETD Department";
         }
 
-		EtdUnit department = EtdUnit.find(context,departmentID);
+		EtdUnit etd_department = EtdUnit.find(context,etd_departmentID);
 
-		if (department == null)
+		if (etd_department == null)
         {
-            return "New Department";
+            return "New ETD Department";
         }
 
-		return department.getName();
+		return etd_department.getName();
 	}
 
 	/**
-	 * Return the list of current collection ID's that are a member of this department.
+	 * Return the list of current collection ID's that are a member of this etd_department.
 	 *
 	 * @param context The current DSpace context
-	 * @param departmentID The department's id.
+	 * @param etd_departmentID The etd_department's id.
 	 * @return An array of ids.
 	 */
-	public static String[] getCollectionMembers(Context context, int departmentID) throws SQLException
+	public static String[] getCollectionMembers(Context context, int etd_departmentID) throws SQLException
 	{
-		// New department, just return an empty list
-		if (departmentID < 0)
+		// New etd_department, just return an empty list
+		if (etd_departmentID < 0)
         {
             return new String[0];
         }
 
-		EtdUnit department = EtdUnit.find(context,departmentID);
+		EtdUnit etd_department = EtdUnit.find(context,etd_departmentID);
 
-		if (department == null)
+		if (etd_department == null)
         {
             return new String[0];
         }
 
-		Collection[] collection = department.getCollections();
+		Collection[] collection = etd_department.getCollections();
 
 		String[] collectionIDs = new String[collection.length];
 		for (int i=0; i < collection.length; i++)
@@ -126,18 +126,18 @@ public class FlowDepartmentUtils {
 	}
 
 	/**
-	 * Save the department. If the name has been changed then it will be updated, if any
+	 * Save the etd_department. If the name has been changed then it will be updated, if any
 	 * members have been added or removed then they are updated.
 	 *
-	 * If the departmentID is -1 then a new department is created.
+	 * If the etd_departmentID is -1 then a new etd_department is created.
 	 *
 	 * @param context The current dspace context
-	 * @param departmentID The department id, or -1 for a new department.
-	 * @param newName The department's new name.
+	 * @param etd_departmentID The etd_department id, or -1 for a new etd_department.
+	 * @param newName The etd_department's new name.
 	 * @param newCollectionIDsArray All collection members
 	 * @return A result
 	 */
-	public static FlowResult processSaveDepartment(Context context, int departmentID, String newName, String[] newCollectionIDsArray) throws SQLException, AuthorizeException, UIException
+	public static FlowResult processSaveETDDepartment(Context context, int etd_departmentID, String newName, String[] newCollectionIDsArray) throws SQLException, AuthorizeException, UIException
 	{
 		FlowResult result = new FlowResult();
 
@@ -151,66 +151,66 @@ public class FlowDepartmentUtils {
             throw new UIException(uee);
         }
 
-		EtdUnit department = null;
-		if (departmentID == -1)
+		EtdUnit etd_department = null;
+		if (etd_departmentID == -1)
 		{
 			// First, check if the name is blank.
 			if (newName == null || newName.length() == 0)
 			{
 				// Group's can not have blank names.
 				result.setContinue(false);
-				result.addError("department_name");
+				result.addError("etd_department_name");
 				result.setOutcome(false);
-				result.setMessage(new Message("default","The department name may not be blank."));
+				result.setMessage(new Message("default","The etd_department name may not be blank."));
 
 				return result;
 			}
 
-			// Create a new department, check if the newName is already in use.
+			// Create a new etd_department, check if the newName is already in use.
 			EtdUnit potentialDuplicate = EtdUnit.findByName(context,newName);
 
 			if (potentialDuplicate == null)
 	    	{
-				// All good, create the new department.
-				department = EtdUnit.create(context);
-				department.setName(newName);
+				// All good, create the new etd_department.
+				etd_department = EtdUnit.create(context);
+				etd_department.setName(newName);
 	    	}
 			else
 			{
 				// The name is already in use, return an error.
     			result.setContinue(false);
-    			result.addError("department_name");
-    			result.addError("department_name_duplicate");
+    			result.addError("etd_department_name");
+    			result.addError("etd_department_name_duplicate");
     			result.setOutcome(false);
-    			result.setMessage(new Message("default","The department name is already in use"));
+    			result.setMessage(new Message("default","The etd_department name is already in use"));
 
     			return result;
 			}
 		}
 		else
 		{
-			department = EtdUnit.find(context,departmentID);
-			String name = department.getName();
+			etd_department = EtdUnit.find(context,etd_departmentID);
+			String name = etd_department.getName();
 
 			// Only update the name if there has been a change.
 			if (newName != null && newName.length() > 0 && !name.equals(newName))
 			{
-				// The department name is to be updated, check if the newName is already in use.
+				// The etd_department name is to be updated, check if the newName is already in use.
 				EtdUnit potentialDuplicate = EtdUnit.findByName(context,newName);
 
 				if (potentialDuplicate == null)
 		    	{
 					// All good, update the name
-					department.setName(newName);
+					etd_department.setName(newName);
 		    	}
 				else
 				{
 					// The name is already in use, return an error.
 	    			result.setContinue(false);
-	    			result.addError("department_name");
-	    			result.addError("department_name_duplicate");
+	    			result.addError("etd_department_name");
+	    			result.addError("etd_department_name_duplicate");
 	    			result.setOutcome(false);
-	    			result.setMessage(new Message("default","The department name is already in use"));
+	    			result.setMessage(new Message("default","The etd_department name is already in use"));
 
 	    			return result;
 				}
@@ -225,13 +225,13 @@ public class FlowDepartmentUtils {
         }
 
 		// Third, check if there are any members to remove
-		// i.e. scan the list on the department against the ids.
-		for (Collection collectionMember : department.getCollections())
+		// i.e. scan the list on the etd_department against the ids.
+		for (Collection collectionMember : etd_department.getCollections())
 		{
 			if (!newCollectionIDs.contains(collectionMember.getID()))
 			{
 				// The current collection is not contained in the new list.
-				department.removeCollection(collectionMember);
+				etd_department.removeCollection(collectionMember);
 			}
 			else
 			{
@@ -242,23 +242,23 @@ public class FlowDepartmentUtils {
 		}
 
 		// Fourth, check if there are any members to add
-		// i.e. scan the list of ids against the department.
+		// i.e. scan the list of ids against the etd_department.
 		for (Integer collectionID : newCollectionIDs)
 		{
 			Collection collection = Collection.find(context, collectionID);
 
-			department.addCollection(collection);
+			etd_department.addCollection(collection);
 		}
 
 		// Last, create the result flow
-		department.update();
+		etd_department.update();
 		context.commit();
 
-		// Let's record our department id in case we created a new one.
-		result.setParameter("departmentID", department.getID());
+		// Let's record our etd_department id in case we created a new one.
+		result.setParameter("etd_departmentID", etd_department.getID());
 		result.setContinue(true);
 		result.setOutcome(true);
-		result.setMessage(T_edit_department_success_notice);
+		result.setMessage(T_edit_etd_department_success_notice);
 
 		return result;
 	}
@@ -270,18 +270,18 @@ public class FlowDepartmentUtils {
 	 * @param groupIDs A list of groups to be removed.
 	 * @return A results object.
 	 */
-	public static FlowResult processDeleteDepartments(Context context, String[] departmentIDs) throws SQLException, AuthorizeException, IOException
+	public static FlowResult processDeleteETDDepartments(Context context, String[] etd_departmentIDs) throws SQLException, AuthorizeException, IOException
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(true);
 
-    	for (String id : departmentIDs)
+    	for (String id : etd_departmentIDs)
     	{
-    		EtdUnit departmentDeleted = EtdUnit.find(context, Integer.valueOf(id));
+    		EtdUnit etd_DepartmentDeleted = EtdUnit.find(context, Integer.valueOf(id));
 
 //    		// If this group is related to a collection, then un-link it.
-//    		int collectionId = getCollectionId(departmentDeleted.getName());
-//    		Role role = getCollectionRole(departmentDeleted.getName());
+//    		int collectionId = getCollectionId(etd_DepartmentDeleted.getName());
+//    		Role role = getCollectionRole(etd_DepartmentDeleted.getName());
 //    		if (collectionId != -1 && role != Role.none)
 //    		{
 //	    		Collection collection = Collection.find(context, collectionId);
@@ -320,11 +320,11 @@ public class FlowDepartmentUtils {
 //	    		}
 //    		}
 
-    		departmentDeleted.delete();
+    		etd_DepartmentDeleted.delete();
 	    }
 
     	result.setOutcome(true);
-		result.setMessage(T_delete_department_success_notice);
+		result.setMessage(T_delete_etd_department_success_notice);
 
     	return result;
 	}
