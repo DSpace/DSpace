@@ -2134,6 +2134,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-access-rights">Read access available for</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-no-files">There are no files associated with this item.</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-number-downloads">No. of downloads: </message>
+    <message key="xmlui.dri2xhtml.METS-1.0.item-restricted">(RESTRICTED ACCESS)</message>
 
 	<message key="xmlui.dri2xhtml.METS-1.0.size-bytes">bytes</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.size-kilobytes">Kb</message>
