@@ -24,8 +24,6 @@ import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.Constants;
 
-import org.datadryad.rest.models.Manuscript;
-
 import org.dspace.workflow.WorkflowItem;
 import org.datadryad.api.DryadDataPackage;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -34,15 +32,14 @@ import org.dspace.storage.rdbms.TableRow;
 import org.apache.log4j.Logger;
 
 /**
- * PlosItemsReviewMonth reports on items from PLOS publications that have been in the review workflow 
- * longer than one month.
+ * ItemsInReview reports on the status of items in the review workflow.
  *
  * The task succeeds if it was able to calculate the correct result.
  *
  * Input: a collection (any collection)
  * Output: a CSV indicating simple information about the data packages that are in review
  *
- * @author Debra Fagan/Ryan Scherle
+ * @author Ryan Scherle
  */
 @Distributive
 public class ItemsInReviewPlosMonth extends AbstractCurationTask {
@@ -61,22 +58,6 @@ public class ItemsInReviewPlosMonth extends AbstractCurationTask {
             log.fatal("Cannot initialize database connection", e);
         }
     }
-    
-    
-    
-    /** returns the number of days between today's date and anotherDateMS, which is passed in */
-	public static int numDaysSince(long anotherDateMS) {
-
-   		
-        Date todayDate = new Date();
-        long todayDateMS = todayDate.getTime();
-
-        long timeBetweenDatesMS = todayDateMS - anotherDateMS;
-        long timeInReview = timeBetweenDatesMS / (24 * 60 * 60 * 1000);
-        int numDaysInReview = (int) timeInReview;
-
-        return numDaysInReview;
-}
         
     
     /**
@@ -84,16 +65,11 @@ public class ItemsInReviewPlosMonth extends AbstractCurationTask {
      **/
     @Override
     public int perform(DSpaceObject dso) throws IOException {
-    			// added following one line by DF 20150210
-	report("itemID, publicationName, lastModificationDate, notificationReceived");    
 	try {
-
-
-
-			
+        
             if (dso.getType() == Constants.COLLECTION) {
                 // output headers for the CSV file that will be created by processing all items in this collection
-                report("itemID, publicationName, lastModificationDate, notificationReceived");
+                report("itemID, publicationName, lastModificationDate");
 
                 // Iterate over the workflow "collection", calling this perform method on each item.
                 // This bypasses the normal functionality of the curation task system, since items in
@@ -106,7 +82,6 @@ public class ItemsInReviewPlosMonth extends AbstractCurationTask {
             } else if (dso.getType() == Constants.ITEM) {
                 // determine whether this item is in the review workflow
                 // workflow stage is stored in taskowner table
-                
                 DryadDataPackage dataPackage = new DryadDataPackage((Item)dso);
                 log.debug("processing " + dataPackage.getItem().getID());
                 WorkflowItem wfi = dataPackage.getWorkflowItem(context);
@@ -118,62 +93,10 @@ public class ItemsInReviewPlosMonth extends AbstractCurationTask {
                         log.debug(" -- is in review");
                         // report on the item
                         int itemID = dataPackage.getItem().getID();
-                        
-                        // RYAN, Where is getPublicationName method located??? Setter is in:  - *DF*
-                        // /dspace/modules/api/src/main/java/org/datadryad/api/DryadDataPackage.java  - *DF*
-                        // String publicationName = dataPackage.getPublicationName();
-                        String publicationName = "PlosOne";
-
+ //                         String publicationName = dataPackage.getPublicationName();
+                      String publicationName = "Fake Journal";
                         Date lastModificationDate = dataPackage.getItem().getLastModified();
-
-                        
-                        
-                        
-                        // Select and write to file PLOS items that have been in review 30 days or more - *DF*
-						int numberOfDays = 31;
-                        String PUBNAME = "plos";
-                        
-                        String publicationNameLowerCase = publicationName.toLowerCase();
-
-                        int numDaysInReview = numDaysSince(lastModificationDate.getTime());
-                        
-
-                    
-                        if ( (publicationNameLowerCase.contains(PUBNAME)) && (numDaysInReview >= numberOfDays) ) {
-                        	// report whether we have a plos notification for the item
-                        	//     1. search for the data package DOI in the manuscript table, json_data field. 
-                        	//        It should appear in the dataReviewURL of the json, but may appear in the dataAvailabilityStatement
-                        	//     2. select json_data from manuscript where json_data like '%resource/doi:10.5061/dryad.p5hd0%';
-                        	
-                        	//boolean notificationReceived = dataPackage.getPublicationName(); String doi = manuscript.dryadDataDOI; 
-                        	                        
-                        	// get DOI and manuscript number - *DF*
-                        	String packageDOI = dataPackage.getIdentifier();
-                        	String packageManuscriptNumber = dataPackage.getManuscriptNumber();
-                        	
-                        	// RYAN, Create a manuscript manuscript based on manuscript number; pass in STATUS_SUBMITTED? - *DF*
-                        	// Manuscript dummyManuscript = new Manuscript(TEST_MANUSCRIPT_ID_1, "accepted");
-                        	Manuscript packageManuscript = new Manuscript(packageManuscriptNumber, "submitted");
-                        	
-                        	// Create a manuscript
-        					// Manuscript packageManuscript = new Manuscript();
-					        // packageManuscript.manuscriptId = packageManuscriptNumber;
-                        	// getDataReviewURL does not currently exist - *DF*
-                        	String packageDataReviewURL = packageManuscript.getDataReviewURL();
-                        	
-                        	boolean notificationReceived = false;
-                        	// RYAN, Does this cover what has to be true? - *DF*
-                        	if(packageDataReviewURL != null && !packageDataReviewURL.isEmpty()) {
-                        		notificationReceived = true;
-                        	}
-                        	
-                        	if (notificationReceived) {
-                        		report(itemID + ", " + publicationName + ", " + lastModificationDate+ ", " + "Y");
-                        	} else {
-                        		report(itemID + ", " + publicationName + ", " + lastModificationDate+ ", " + "N");
-                        	}
-                        }
-
+                        report(itemID + ", " + publicationName + ", " + lastModificationDate);
                     }
                 }
                 
