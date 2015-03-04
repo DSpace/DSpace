@@ -82,7 +82,7 @@ public class DefaultItemVersionProvider extends AbstractVersionProvider implemen
             {
                 identifierService.reserve(c, itemNew);
             } catch (IdentifierException e) {
-                throw new RuntimeException("Can't create Identifier!");
+                throw new RuntimeException("Can't create Identifier!", e);
             }
             itemNew.update();
             return itemNew;
