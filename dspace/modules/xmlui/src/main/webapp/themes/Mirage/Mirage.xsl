@@ -239,7 +239,12 @@
                 <div id="dryad-home-carousel" class="ds-static-div primary">
                     <!-- REMINDER: slide publication dates are in the format YEAR-MONTH-DAY, eg, 2013-12-28 -->
                     <div class="bxslider" style="">
-                        <div><span class="publication-date">2013-03-01</span>
+                        <div><span class="publication-date">2015-03-04</span>
+                            <a href="/pages/membershipMeeting2015">
+                                <img src="/themes/Mirage/images/membershipMeeting2015.jpg" alt="Dryad Community Meeting, 27 May 2015, Washington DC" />
+                           </a>
+                       </div>
+						<div><span class="publication-date">2013-03-01</span>
                             <a href="/pages/pricing">
                                 <img alt="" src="/themes/Mirage/images/watering-can.png" />
                                 <p style="width: 450px; color: #363; font-size: 90%; top: 0px; right: 10px; line-height: 1.2em; position: absolute; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);"> 
@@ -263,7 +268,7 @@
                         </div>
                         <div><span class="publication-date">2013-01-01</span>
                             <a href="/pages/repository#keyFeatures">
-                                <img src="/themes/Mirage/images/bookmarkSubmissionProcess.png" alt="Desosit data. Get permanent identifier. Watch your citations grow! Relax, your data are discoverable and secure." />
+                                <img src="/themes/Mirage/images/bookmarkSubmissionProcess.png" alt="Deposit data. Get permanent identifier. Watch your citations grow! Relax, your data are discoverable and secure." />
                            </a>
                        </div>
                     </div>
