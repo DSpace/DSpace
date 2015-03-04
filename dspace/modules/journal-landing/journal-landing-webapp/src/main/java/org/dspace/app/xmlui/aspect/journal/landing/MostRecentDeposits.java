@@ -17,25 +17,20 @@ import static org.dspace.app.xmlui.aspect.journal.landing.Const.*;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import org.apache.avalon.framework.parameters.ParameterException;
 import org.xml.sax.SAXException;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.common.SolrDocument;
+import org.datadryad.api.DryadJournal;
 import org.dspace.app.xmlui.aspect.discovery.AbstractFiltersTransformer;
 import org.dspace.app.xmlui.utils.UIException;
 import static org.dspace.app.xmlui.wing.AbstractWingTransformer.message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.ReferenceSet;
+import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.core.Constants;
-import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
-import org.dspace.discovery.SearchUtils;
-import org.dspace.workflow.DryadWorkflowUtils;
 
 /**
  *
@@ -49,7 +44,7 @@ public class MostRecentDeposits extends AbstractFiltersTransformer {
     private static final Message T_mostRecent = message("xmlui.JournalLandingPage.MostRecentDeposits.panel_head");
     private static final Message T_date = message("xmlui.JournalLandingPage.MostRecentDeposits.date");
 
-    private ArrayList<DSpaceObject> references;
+    private ArrayList<Item> references;
     private ArrayList<String> dates;
     private String journalName;
 
@@ -74,7 +69,7 @@ public class MostRecentDeposits extends AbstractFiltersTransformer {
         List vals = count.addList("date-count", List.TYPE_SIMPLE, "date-count");
         vals.setHead(T_date);
 
-        references = new ArrayList<DSpaceObject>();
+        references = new ArrayList<Item>();
         dates = new ArrayList<String>();
         try {
             performSearch(null);
@@ -93,57 +88,32 @@ public class MostRecentDeposits extends AbstractFiltersTransformer {
 
     /**
      * Search for recently accessioned data packages
-     *
      * @param object: unused
+     * @throws org.dspace.discovery.SearchServiceException
+     * @throws org.dspace.app.xmlui.utils.UIException
      */
     @Override
     public void performSearch(DSpaceObject object) throws SearchServiceException, UIException {
-        queryArgs = prepareDefaultFilters(getView());
-        queryArgs.setQuery("DSpaceStatus:Archived AND search.resourcetype:" + Constants.ITEM + " AND prism.publicationName:\"" + journalName + "\"");
-        queryArgs.add("fl", depositsDisplayHandle + "," + depositsDisplayField);
-        queryArgs.setRows(displayCount);
-        queryArgs.setSortField(depositsDisplaySortField, depositsDisplaySortOrder);
-        SearchService service = (SearchService) getSearchService();
+        DryadJournal dryadJournal = new DryadJournal(this.context, this.journalName);
+        java.util.List<Item> packages = null;
         try {
-            queryResults = service.search(context, queryArgs);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            packages = dryadJournal.getArchivedPackagesSortedRecent(displayCount);
+        } catch (SQLException ex) {
+            log.error(ex.getMessage());
             return;
         }
-        if (queryResults == null) {
-            log.debug("Null query results for journa: " + journalName);
-            return;
-        }
-        for (SolrDocument doc : queryResults.getResults()) {
-            if (references.size() > displayCount) break;
-            DSpaceObject dso = null;
-            try {
-                dso = SearchUtils.findDSpaceObject(context, doc);
-            } catch (SQLException ex) {
-                log.error(ex);
-                return;
-            }
-            try {
-                if (dso != null
-                 && DryadWorkflowUtils.isAtLeastOneDataFileVisible(context, (Item) dso))
-                {
-                    references.add(dso);
-                    Object o = doc.getFieldValue(depositsDisplayField);
-                    if (o instanceof ArrayList) {
-                        o = ((ArrayList) o).get(0);
-                    }
-                    if (o instanceof Date) {
-                        dates.add(fmt.format(o));
-                    } else {
-                        dates.add(o.toString());
-                    }
+        for (Item item : packages) {
+            DCValue[] dateAccessioned = item.getMetadata(dcDateAccessioned);
+            if (dateAccessioned.length >= 1) {
+                String dateStr = dateAccessioned[0].value;
+                //String date = fmt.format(dateStr);
+                if (dateStr != null) {
+                    references.add(item);
+                    dates.add(dateStr);                
                 }
-            } catch (SQLException ex) {
-                log.error(ex.getMessage(), ex);
             }
         }
     }
-
     @Override
     public String getView() {
         return "site";

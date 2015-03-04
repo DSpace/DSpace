@@ -42,10 +42,12 @@
                     <map:transform type="TopTenDownloads">
                         <map:parameter name="journalName" value="{journalName}"/>
                         <map:parameter name="journalAbbr" value="{journalAbbr}"/>
+                        <map:parameter name="archivedDatafileIds" value="{archivedDatafileIds}"/>
                     </map:transform>
                     <map:transform type="TopTenViews">
                         <map:parameter name="journalName" value="{journalName}"/>
                         <map:parameter name="journalAbbr" value="{journalAbbr}"/>
+                        <map:parameter name="archivedDatafileIds" value="{archivedDatafileIds}"/>
                     </map:transform>
                     <map:transform type="MostRecentDeposits">
                         <map:parameter name="journalName" value="{journalName}"/>
@@ -54,6 +56,7 @@
                     <map:transform type="UserGeography">
                         <map:parameter name="journalName" value="{journalName}"/>
                         <map:parameter name="journalAbbr" value="{journalAbbr}"/>
+                        <map:parameter name="archivedDatafileIds" value="{archivedDatafileIds}"/>
                     </map:transform>
                     <map:serialize type="xml"/>
                 </map:act>

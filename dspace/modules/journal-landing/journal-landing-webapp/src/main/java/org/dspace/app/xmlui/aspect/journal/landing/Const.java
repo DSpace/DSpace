@@ -58,6 +58,7 @@ public class Const {
     public static final int displayCount = 10;
     public static final String depositsDisplayField = "dc.date.accessioned_dt";
     public static final String depositsDisplaySortField = "dc.date.accessioned_dt";
+    public static final String dcDateAccessioned = "dc.date.accessioned";
     public static final SolrQuery.ORDER depositsDisplaySortOrder = SolrQuery.ORDER.desc;
     public static final String depositsDisplayHandle = "handle";
 }

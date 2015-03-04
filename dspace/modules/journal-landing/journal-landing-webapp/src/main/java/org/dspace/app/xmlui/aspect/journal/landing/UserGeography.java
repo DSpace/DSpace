@@ -22,9 +22,6 @@ import static org.dspace.app.xmlui.wing.AbstractWingTransformer.message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DSpaceObject;
-import org.dspace.core.Constants;
-import org.dspace.discovery.SearchServiceException;
 
 /**
  *
@@ -66,14 +63,5 @@ public class UserGeography extends JournalLandingTabbedTransformer {
             UIException, SQLException, IOException, AuthorizeException
     {
         super.addBody(body);
-    }
-
-    @Override
-    protected void performSearch(DSpaceObject object) throws SearchServiceException, UIException {
-        /*
-        JournalUserGeo journalUserGeo = new JournalUserGeo(this.context);
-        String responseDownload = journalUserGeo.getResponseDownload();
-        String getResponseView = journalUserGeo.getResponseView();
-        */
     }
 }
