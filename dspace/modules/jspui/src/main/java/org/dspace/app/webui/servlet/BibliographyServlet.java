@@ -503,7 +503,7 @@ public class BibliographyServlet extends DSpaceServlet{
                     if (k == 0) {
                         sb.append("TI  - " + values[k].value);
                     }
-                } else if ((element.equals("description") && qualifier.equals("abstract")) || (element.equals("description"))) {
+                } else if (element.equals("description") && qualifier.equals("abstract")) {
                     if (k == 0) {
                         sb.append("AB  - " + values[k].value);
                     }
@@ -668,6 +668,9 @@ public class BibliographyServlet extends DSpaceServlet{
                       sb.append(values[k].value);
                     }
                     else if (k > 0){
+                      if(k <= values.length-1){
+                         sb.append(";");  
+                      }
                       sb.append(values[k].value);
                     }
                      if(k == values.length-1){
@@ -703,7 +706,7 @@ public class BibliographyServlet extends DSpaceServlet{
                       sb.append("\"");  
                     }
                 }
-                  else if ((element.equals("description") && qualifier.equals("abstract")) || (element.equals("description"))) {
+                  else if (element.equals("description") && qualifier.equals("abstract")) {
                     if (k == 0) {
                        sb.append("\""); 
                        sb.append(values[k].value);
@@ -715,6 +718,9 @@ public class BibliographyServlet extends DSpaceServlet{
                       sb.append(values[k].value);
                     }
                     else if (k > 0){
+                     if(k <= values.length-1){
+                         sb.append(",");  
+                      }
                       sb.append(values[k].value);
                     }
                      if(k == values.length-1){
@@ -772,7 +778,7 @@ public class BibliographyServlet extends DSpaceServlet{
           //Header para trabajos de grado,tesis de maestria, doctorado
           String headerThesis="Authors\tTitle\tYear\tLink\tAbstract\tKeywords\tEditors\tPublisher\tPubplace\tLanguage\tDocument Type";
           //Header para libros o partes de libro
-          String headerChapBook="Authors\tTitle\tYear\tLink\tAbstract\tKeywords\tEditors\tisbn\tPublisher\tPubplace\tDocument Type"; 
+          String headerChapBook="Authors\tTitle\tYear\tLink\tAbstract\tKeywords\tEditors\tIsbn\tPublisher\tPubplace\tDocument Type"; 
           
           String delimitador = "\t";
           String separador = "\n";
@@ -916,7 +922,7 @@ public class BibliographyServlet extends DSpaceServlet{
                       sb.append("\"");
                     }
                 }
-                  else if ((element.equals("description") && qualifier.equals("abstract")) || (element.equals("description"))) {
+                  else if (element.equals("description") && qualifier.equals("abstract")) {
                     if (k == 0) {
                        sb.append("\""); 
                        sb.append(values[k].value);
