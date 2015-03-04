@@ -66,9 +66,9 @@ JAVA_OPTS=-Xmx1024M
 5 22 * * sun  date && /var/dspace/bin/dspace packager -d -a -t AIP -e alira@sedici.unlp.edu.ar -u -i 10915/0 /var/dspace/backups/aip/aip-site.zip && date
 
 #GZip de logs viejos los lunes a las 5AM
-0 5 * * mon find /var/log/tomcat6 -maxdepth 1 -name "catalina.*" -type f -mtime +5 -exec gzip {} \; -exec mv {}.gz /var/log/tomcat6/old-logs/ \;
-2 5 * * mon find /var/log/tomcat6 -maxdepth 1 -name "localhost.*" -type f -mtime +5 -exec gzip {} \; -exec mv {}.gz /var/log/tomcat6/old-logs/ \;
-5 5 * * mon find /var/dspace/log -maxdepth 1 -name "dspace.log.*" -type f -mtime +30 -exec gzip {} \; -exec mv {}.gz /var/dspace/log/old-logs/ \;
+0 5 * * mon find /var/log/tomcat6 -maxdepth 1 -name "catalina.*" -type f -mtime +5 -exec -q gzip {} \; -exec mv {}.gz /var/log/tomcat6/old-logs/ \;
+2 5 * * mon find /var/log/tomcat6 -maxdepth 1 -name "localhost.*" -type f -mtime +5 -exec -q gzip {} \; -exec mv {}.gz /var/log/tomcat6/old-logs/ \;
+5 5 * * mon find /var/dspace/log -maxdepth 1 -name "dspace.log.*" -type f -mtime +30 -exec -q gzip {} \; -exec mv {}.gz /var/dspace/log/old-logs/ \;
 
 # ########## STATS ######################
 0 1 * * * /var/dspace/bin/dspace stat-general
