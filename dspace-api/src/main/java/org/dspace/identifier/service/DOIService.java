@@ -68,4 +68,16 @@ public interface DOIService {
             throws DOIIdentifierException;
 
     public List<DOI> getDOIsByStatus(Context context, List<Integer> statuses) throws SQLException;
+    
+    /**
+     * Find all DOIs that are similar to the specified pattern ant not in the specified states.
+     * @param context DSpace context
+     * @param doiPattern The pattern, e.g. "10.5072/123.%"
+     * @param statuses The statuses the DOI should <b>not</b> be in, @{link DOIIdentifierProvider.DELETED}.
+     * @param dsoIsNotNull Boolean whether all DOIs should be excluded where the DSpaceObject is NULL.
+     * @return null or a list of DOIs
+     * @throws SQLException 
+     */
+    public List<DOI> getSimilarDOIsNotInState(Context context, String doiPattern, List<Integer> statuses, boolean dsoIsNotNull)
+            throws SQLException;
 }

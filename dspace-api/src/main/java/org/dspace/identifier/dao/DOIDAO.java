@@ -27,6 +27,9 @@ public interface DOIDAO extends GenericDAO<DOI>
     public DOI findByDoi(Context context, String doi) throws SQLException;
 
     public DOI findDOIByDSpaceObject(Context context, DSpaceObject dso, List<Integer> statusToExclude) throws SQLException;
+    
+    public List<DOI> findSimilarNotInState(Context context, String doi, List<Integer> statuses, boolean dsoNotNull)
+            throws SQLException;
 
     public List<DOI> findByStatus(Context context, List<Integer> statuses) throws SQLException;
 

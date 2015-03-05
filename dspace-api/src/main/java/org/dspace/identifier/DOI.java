@@ -40,6 +40,9 @@ public class DOI
     @JoinColumn(name = "dspace_object")
     private DSpaceObject dSpaceObject;
 
+    @Column(name = "resource_type_id")
+    private Integer resourceTypeId;
+
     @Column(name = "status")
     private Integer status;
 
@@ -67,11 +70,20 @@ public class DOI
     public DSpaceObject getDSpaceObject() {
         return dSpaceObject;
     }
-
+    
     public void setDSpaceObject(DSpaceObject dSpaceObject) {
         this.dSpaceObject = dSpaceObject;
     }
-
+    
+    public Integer getResourceTypeId() {
+        return this.resourceTypeId;
+    }
+    
+    public void setResourceTypeId(Integer resourceTypeId)
+    {
+        this.resourceTypeId = resourceTypeId;
+    }
+    
     public Integer getStatus() {
         return status;
     }
