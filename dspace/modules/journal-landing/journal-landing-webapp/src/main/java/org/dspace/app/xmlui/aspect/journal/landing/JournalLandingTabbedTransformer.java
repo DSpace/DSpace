@@ -32,6 +32,7 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import org.datadryad.api.DryadJournal;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
+import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.workflow.DryadWorkflowUtils;
 
@@ -39,7 +40,7 @@ import org.dspace.workflow.DryadWorkflowUtils;
  *
  * @author Nathan Day
  */
-public class JournalLandingTabbedTransformer extends AbstractDSpaceTransformer {
+public abstract class JournalLandingTabbedTransformer extends AbstractDSpaceTransformer {
 
     private static final Logger log = Logger.getLogger(JournalLandingTabbedTransformer.class);
     private final static SimpleDateFormat fmt = new SimpleDateFormat(fmtDateView);
@@ -66,6 +67,7 @@ public class JournalLandingTabbedTransformer extends AbstractDSpaceTransformer {
         public Message refHead;
         public Message valHead;
         public String dateFilter;
+        public QueryType queryType;
     }
     protected ArrayList<TabData> tabData;
 
@@ -121,14 +123,51 @@ public class JournalLandingTabbedTransformer extends AbstractDSpaceTransformer {
             Division counts = wrapper.addDivision(VALS);
             List countList = counts.addList(t.n, List.TYPE_SIMPLE, t.n);
             countList.setHead(t.valHead);
-            LinkedHashMap<Item, String> results = dryadJournal.getRequestsPerJournal(
-                divData.facetQueryField, t.dateFilter, divData.maxResults
-            );
-            if (results != null) {
-                for (Item item : results.keySet()) {
-                    Item dataPackage = DryadWorkflowUtils.getDataPackage(context, item);
+            if (t.queryType == QueryType.DOWNLOADS ) {
+                doDownloadsQuery(itemsContainer, countList, dryadJournal, divData, t);
+            } else if (t.queryType == QueryType.DEPOSITS ) {
+                doDepositsQuery(itemsContainer, countList, dryadJournal, divData, t);
+            }
+        }
+    }
+
+    private void doDownloadsQuery(ReferenceSet itemsContainer, List countList, DryadJournal dryadJournal, DivData divData, TabData t) {
+        LinkedHashMap<Item, String> results = dryadJournal.getRequestsPerJournal(
+            divData.facetQueryField, t.dateFilter, divData.maxResults
+        );
+        if (results != null) {
+            for (Item item : results.keySet()) {
+                Item dataPackage = DryadWorkflowUtils.getDataPackage(context, item);
+                try {
                     itemsContainer.addReference(dataPackage);
                     countList.addItem().addContent(results.get(item));
+                } catch (WingException ex) {
+                    log.error(ex);
+                }
+            }
+        }
+    }
+
+    private void doDepositsQuery(ReferenceSet itemsContainer, List countList, DryadJournal dryadJournal, DivData divData, TabData t) {
+        java.util.List<Item> packages = null;
+        try {
+            packages = dryadJournal.getArchivedPackagesSortedRecent(divData.maxResults);
+        } catch (SQLException ex) {
+            log.error(ex.getMessage());
+            return;
+        }
+        for (Item item : packages) {
+            DCValue[] dateAccessioned = item.getMetadata(dcDateAccessioned);
+            if (dateAccessioned.length >= 1) {
+                String dateStr = dateAccessioned[0].value;
+                //String date = fmt.format(dateStr);
+                if (dateStr != null) {
+                    try {
+                        itemsContainer.addReference(item);
+                        countList.addItem().addContent(fmt.format(fmt.parse(dateStr)));
+                    } catch (Exception ex) {
+                        log.error(ex);
+                    }
                 }
             }
         }

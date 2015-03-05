@@ -9,8 +9,7 @@
             <map:transformer name="Navigation"          src="org.dspace.app.xmlui.aspect.journal.landing.Navigation"/>
             <map:transformer name="Banner"              src="org.dspace.app.xmlui.aspect.journal.landing.Banner"/>
             <map:transformer name="JournalSearch"       src="org.dspace.app.xmlui.aspect.journal.landing.JournalSearch"/>
-            <map:transformer name="TopTenDownloads"     src="org.dspace.app.xmlui.aspect.journal.landing.TopTenDownloads"/>
-            <map:transformer name="MostRecentDeposits"  src="org.dspace.app.xmlui.aspect.journal.landing.MostRecentDeposits"/>
+            <map:transformer name="JournalStats"        src="org.dspace.app.xmlui.aspect.journal.landing.JournalStats"/>
         </map:transformers>
         <map:matchers default="wildcard"/>
         <map:selectors/>
@@ -37,14 +36,10 @@
                         <map:parameter name="journalName" value="{journalName}"/>
                         <map:parameter name="journalAbbr" value="{journalAbbr}"/>
                     </map:transform>
-                    <map:transform type="TopTenDownloads">
+                    <map:transform type="JournalStats">
                         <map:parameter name="journalName" value="{journalName}"/>
                         <map:parameter name="journalAbbr" value="{journalAbbr}"/>
                         <map:parameter name="archivedDatafileIds" value="{archivedDatafileIds}"/>
-                    </map:transform>
-                    <map:transform type="MostRecentDeposits">
-                        <map:parameter name="journalName" value="{journalName}"/>
-                        <map:parameter name="journalAbbr" value="{journalAbbr}"/>
                     </map:transform>
                     <map:serialize type="xml"/>
                 </map:act>
