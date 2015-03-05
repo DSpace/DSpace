@@ -72,6 +72,7 @@ public final class ChecksumWorker
     {
         System.out.println("# " + iter);
         System.out.println("# Action " + ACTION_LIST[action]);
+        System.out.println("# Max-Count " + count);
         if (!verbose && action == CHECK)
         {
             System.out.println("# Printing  m for " + ChecksumCheckResults.CHECKSUM_MATCH +
@@ -79,14 +80,17 @@ public final class ChecksumWorker
                     ", and E in all other cases");
         }
 
-        if (verbose)
+        if (action == CHECK)
         {
-            System.out.println("# Checking for new bitstreams: " + new Date());
-        }
-        bitstreamInfoDAO.updateMissingBitstreams();
-        if (verbose)
-        {
-            System.out.println("# Done Checking for new bitstreams " + new Date());
+            if (verbose)
+            {
+                System.out.println("# Checking for new bitstreams: " + new Date());
+            }
+            bitstreamInfoDAO.updateMissingBitstreams();
+            if (verbose)
+            {
+                System.out.println("# Done Checking for new bitstreams " + new Date());
+            }
         }
 
         if (action == COUNT)
@@ -302,7 +306,7 @@ public final class ChecksumWorker
         options.addOption("r", "root", true, "Work on bitstream in given Community, Collection, Item, or on the given Bitstream, give root as handle or TYPE.ID)");
         options.addOption("b", "before", true, "Work on bitstreams last checked before (current time minus given duration)");
         options.addOption("a", "after", true, "Work on bitstreams last checked after (current time minus given duration) ");
-        options.addOption("c", "count", true, "Work on at most the given number of bitstreams");
+        options.addOption("c", "count", true, "Work on at most the given number of bitstreams, give negative number to work on all matching bitstreams");
         options.addOption("v", "verbose", false, "Be verbose");
         options.addOption("h", "help", false, "Print this help");
 
@@ -324,6 +328,9 @@ public final class ChecksumWorker
             if ((loop && (with_result != null || excludes != null)) || (with_result != null && excludes != null))
             {
                 throw new RuntimeException("-x, -i, and -l options are mutually exclusive");
+            } else  {
+                // none of  loop, with_result, excludes given ==> default to doing loop
+                loop = with_result == null && excludes == null;
             }
 
             if (loop)
@@ -367,7 +374,7 @@ public final class ChecksumWorker
                 throw new RuntimeException("not enough data to create iterator");
             }
 
-            int count = line.hasOption('c') ? new Integer(line.getOptionValue('c')) : -1;
+            int count = line.hasOption('c') ? new Integer(line.getOptionValue('c')) : 1;
 
             String actionStr = line.hasOption('d') ? line.getOptionValue('d') : ACTION_LIST[DEFAULT_ACTION];
             int action = -1;
