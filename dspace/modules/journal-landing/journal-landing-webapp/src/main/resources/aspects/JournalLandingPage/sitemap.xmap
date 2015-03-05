@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
-    
+
     <map:components>
         <map:actions>
             <map:action name="ValidateRequest" src="org.dspace.app.xmlui.aspect.journal.landing.ValidateRequest"/>
@@ -10,18 +10,16 @@
             <map:transformer name="Banner"              src="org.dspace.app.xmlui.aspect.journal.landing.Banner"/>
             <map:transformer name="JournalSearch"       src="org.dspace.app.xmlui.aspect.journal.landing.JournalSearch"/>
             <map:transformer name="TopTenDownloads"     src="org.dspace.app.xmlui.aspect.journal.landing.TopTenDownloads"/>
-            <map:transformer name="TopTenViews"         src="org.dspace.app.xmlui.aspect.journal.landing.TopTenViews"/>
             <map:transformer name="MostRecentDeposits"  src="org.dspace.app.xmlui.aspect.journal.landing.MostRecentDeposits"/>
-            <map:transformer name="UserGeography"       src="org.dspace.app.xmlui.aspect.journal.landing.UserGeography"/>
         </map:transformers>
         <map:matchers default="wildcard"/>
         <map:selectors/>
     </map:components>
-    
+
     <map:pipelines>
         <map:pipeline type="noncaching">
             <map:generate/>
-            
+
             <map:match type="wildcard" pattern="journal/*">
 
                 <!-- journal abbreviation is found: return page -->
@@ -44,19 +42,9 @@
                         <map:parameter name="journalAbbr" value="{journalAbbr}"/>
                         <map:parameter name="archivedDatafileIds" value="{archivedDatafileIds}"/>
                     </map:transform>
-                    <map:transform type="TopTenViews">
-                        <map:parameter name="journalName" value="{journalName}"/>
-                        <map:parameter name="journalAbbr" value="{journalAbbr}"/>
-                        <map:parameter name="archivedDatafileIds" value="{archivedDatafileIds}"/>
-                    </map:transform>
                     <map:transform type="MostRecentDeposits">
                         <map:parameter name="journalName" value="{journalName}"/>
                         <map:parameter name="journalAbbr" value="{journalAbbr}"/>
-                    </map:transform>
-                    <map:transform type="UserGeography">
-                        <map:parameter name="journalName" value="{journalName}"/>
-                        <map:parameter name="journalAbbr" value="{journalAbbr}"/>
-                        <map:parameter name="archivedDatafileIds" value="{archivedDatafileIds}"/>
                     </map:transform>
                     <map:serialize type="xml"/>
                 </map:act>
@@ -75,5 +63,5 @@
             <map:serialize type="xml"/>
         </map:pipeline>
     </map:pipelines>
-    
+
 </map:sitemap>
