@@ -21,6 +21,7 @@ import org.dspace.app.xmlui.utils.UIException;
 import static org.dspace.app.xmlui.wing.AbstractWingTransformer.message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
+import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
 
 /**
@@ -41,6 +42,9 @@ public class UserGeography extends JournalLandingTabbedTransformer {
         divData = new DivData();
         divData.n = USER_GEO;
         divData.T_div_head = message("xmlui.JournalLandingPage.UserGeography.panel_head");
+        divData.facetQueryField = facetQueryCountryCode;
+        divData.maxResults = displayCountAll;
+        divData.valueClass = List.class;
 
         tabData = new ArrayList<TabData>(2);
         TabData tb1 = new TabData();
@@ -62,6 +66,6 @@ public class UserGeography extends JournalLandingTabbedTransformer {
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
-        super.addBody(body);
+        super.addStatsTable(body);
     }
 }
