@@ -7,7 +7,6 @@ package org.dspace.app.xmlui.aspect.journal.landing;
 
 import org.apache.log4j.Logger;
 
-import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.element.Body;
 
 import java.sql.SQLException;
@@ -25,10 +24,10 @@ import org.apache.cocoon.environment.SourceResolver;
 
 import static org.dspace.app.xmlui.aspect.journal.landing.Const.*;
 import static org.dspace.app.xmlui.wing.AbstractWingTransformer.*;
-import org.dspace.core.Constants;
+import org.dspace.app.xmlui.wing.element.ReferenceSet;
 
 /**
- *
+ * NOTE: this class is unused
  * @author Nathan Day
  */
 public class TopTenViews extends JournalLandingTabbedTransformer {
@@ -48,6 +47,9 @@ public class TopTenViews extends JournalLandingTabbedTransformer {
         divData = new DivData();
         divData.n = TOPTEN_VIEWS;
         divData.T_div_head = message("xmlui.JournalLandingPage.TopTenViews.panel_head");
+        divData.facetQueryField = facetQueryId;
+        divData.maxResults = displayCount;
+        divData.valueClass = ReferenceSet.class;
 
         tabData = new ArrayList<TabData>(3);
         TabData tb1 = new TabData();
@@ -61,7 +63,7 @@ public class TopTenViews extends JournalLandingTabbedTransformer {
         TabData tb2 = new TabData();
         tb2.n = TOPTEN_VIEWS_YEAR;
         tb2.buttonLabel = message("xmlui.JournalLandingPage.JournalLandingTabbedTransformer.year");
-        tb2.dateFilter = String.format(solrDateFormat, currentYear - 1, currentMonth);
+        tb2.dateFilter = String.format(solrDateFormat, currentYear, januaryInd);
         tb2.refHead = message("xmlui.JournalLandingPage.TopTenViews.ref_head_year").parameterize(currentYear);
         tb2.valHead = message("xmlui.JournalLandingPage.TopTenViews.val_head");
         tabData.add(tb2);
@@ -79,6 +81,6 @@ public class TopTenViews extends JournalLandingTabbedTransformer {
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {        
-        super.addBody(body);
+        super.addStatsTable(body);
     }
 }
