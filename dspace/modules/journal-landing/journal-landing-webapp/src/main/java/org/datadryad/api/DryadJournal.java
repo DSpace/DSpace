@@ -4,11 +4,13 @@ package org.datadryad.api;
 import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
@@ -18,6 +20,8 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
@@ -29,7 +33,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
 public class DryadJournal {
 
     private static Logger log = Logger.getLogger(DryadJournal.class);
-    
+
     private static final String solrStatsUrl = ConfigurationManager.getProperty("solr.stats.server");
 
     private Context context = null;
@@ -76,7 +80,7 @@ public class DryadJournal {
     "           AND  mdv_p_pub.text_value = ?                                                                           " + // ? : journal name
     "           AND  item_p.in_archive = true                                                                           " +
     "    ));                                                                                                            ";
-    
+
     /**
      * Executes the SQL query to get archived data file item-ids for a given journal,
      * returning the item ids
@@ -94,8 +98,8 @@ public class DryadJournal {
         return dataFiles;
     }
 
-    private final static String ARCHIVED_DATAPACKAGE_QUERY =
-    " SELECT item_p.item_id                                                                                 " +
+    private final static String ARCHIVED_DATAPACKAGE_QUERY_TEMPL =
+    " SELECT %s                                                                                             " +     // %s: select value
     "  FROM item item_p                                                                                     " +
     "  JOIN metadatavalue          mdv_pub   ON item_p.item_id               = mdv_pub.item_id              " +
     "  JOIN metadatafieldregistry  mdfr_pub  ON mdv_pub.metadata_field_id    = mdfr_pub.metadata_field_id   " +
@@ -104,19 +108,37 @@ public class DryadJournal {
     "  JOIN metadatafieldregistry  mdfr_date ON mdv_date.metadata_field_id   = mdfr_date.metadata_field_id  " +
     "  JOIN metadataschemaregistry mdsr_date ON mdfr_date.metadata_schema_id = mdsr_date.metadata_schema_id " +
     " WHERE item_p.in_archive   = true                                                                      " +
-    "   AND mdsr_pub.short_id   = 'prism'                                                                   " +  
+    "   AND mdsr_pub.short_id   = 'prism'                                                                   " +
     "   AND mdfr_pub.element    = 'publicationName'                                                         " +
-    "   AND mdv_pub.text_value  = ?                                                                         " +
+    "   AND mdv_pub.text_value  = ?                                                                         " +     // ?: journal name
     "   AND mdsr_date.short_id  = 'dc'                                                                      " +
-    "   AND mdfr_date.element   = 'date'                                                                    " +         
+    "   AND mdfr_date.element   = 'date'                                                                    " +
     "   AND mdfr_date.qualifier = 'accessioned'                                                             " +
-    " ORDER BY mdv_date.text_value DESC                                                                     " +
-    " LIMIT ?                                                                                               ";
+    " %s                                                                                                    " +     // %s: group by/order by
+    " LIMIT ?                                                                                               ";      // ?: limit
+    private final static String ARCHIVED_DATAPACKAGE_QUERY_IDS   = String.format(ARCHIVED_DATAPACKAGE_QUERY_TEMPL, "item_p.item_id", "ORDER BY mdv_date.text_value DESC");
+    private final static String ARCHIVED_DATAPACKAGE_QUERY_COUNT = String.format(ARCHIVED_DATAPACKAGE_QUERY_TEMPL, "COUNT(item_p) AS total", "");
 
-    public List<Item> getArchivedPackagesSortedRecent(int count) throws SQLException {
-        TableRowIterator tri = DatabaseManager.query(this.context, ARCHIVED_DATAPACKAGE_QUERY, this.journalName, count);
+    public int getArchivedPackagesCount() {
+        int count = 0;
+        try {
+            PreparedStatement statement = context.getDBConnection().prepareStatement(ARCHIVED_DATAPACKAGE_QUERY_COUNT);
+            statement.setString(1,journalName);
+            statement.setInt(2, 1);
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt("total");
+            }
+        } catch (Exception ex) {
+            log.error(ex);
+        }
+        return count;
+    }
+
+    public List<Item> getArchivedPackagesSortedRecent(int max) throws SQLException {
+        TableRowIterator tri = DatabaseManager.query(this.context, ARCHIVED_DATAPACKAGE_QUERY_IDS, this.journalName, max);
         List<Item> dataPackages = new ArrayList<Item>();
-        while (tri.hasNext() && dataPackages.size() < count) {
+        while (tri.hasNext() && dataPackages.size() < max) {
             TableRow row = tri.next();
             int itemId = row.getIntColumn("item_id");
             try {
@@ -129,16 +151,14 @@ public class DryadJournal {
         return dataPackages;
     }
 
-    /*  
-        @nullable
-
+    /*
         &q=time:%5B2014-01-01T00:00:00.000Z%20TO%20NOW%5D
         &rows=0
         &omitHeader=true
         &facet=true
         &facet.query=owningItem:63687
         &facet.query=owningItem:57221
-        &facet.query=owningItem:...    
+        &facet.query=owningItem:...
 
         <?xml version="1.0" encoding="UTF-8"?>
         <response>
@@ -147,9 +167,9 @@ public class DryadJournal {
                 <lst name="facet_queries">
                     <int name="owningItem:63687">9</int>
                     <int name="owningItem:57221">1</int>
-                    <int name="owningItem:50903">3</int>    
+                    <int name="owningItem:50903">3</int>
     */
-    public LinkedHashMap<Item, String> getRequestsPerJournal(String scope, String facetQueryField, String time, int max) {
+    public LinkedHashMap<Item, String> getRequestsPerJournal(String facetQueryField, String time, int max) {
         // default solr query for site
         SolrQuery queryArgs = new SolrQuery();
         queryArgs.setQuery(time);
@@ -174,28 +194,100 @@ public class DryadJournal {
         }
     }
 
+    /*
+    Query solr for view/download counts per country
+    @param facetQueryField solr/statistics query field, e.g., 'owningItem' or 'id'
+    @param time Solr time query, e.g., [* TO NOW]
+    @param max number of results to return
+    Note: this query must be batched in groups of 1024 due to server setting
+          <maxBooleanClauses>1024</maxBooleanClauses>
+        rows=0
+        &omitHeader=true
+        &fq=time:[* TO NOW]
+        &facet=true
+        &facet.field=countryCode
+        &facet.mincount=1
+        &q={!q.op=OR df=owningItem}63687 57221 50903 73665 ...
+    */
+    public LinkedHashMap<String, Integer> getRequestsPerJournalByCountry(String facetQueryField, String time, int max) {
+        int batchSize = 1024;
+        List<Integer> dataFileIds = null;
+        try {
+            dataFileIds = getArchivedDataFiles();
+        } catch (SQLException ex) {
+            log.error(ex);
+            return new LinkedHashMap<String, Integer>();
+        }
+        LinkedHashMap<String, Integer> result = new LinkedHashMap<String, Integer>();
+        int itemCount = dataFileIds.size();
+        int batchCount = (int) Math.floor(itemCount/batchSize);
+        for (int batchInd = 0; batchInd < batchCount; ++batchInd) {
+            SolrQuery queryArgs = new SolrQuery();
+            queryArgs.setRows(0);
+            queryArgs.set("omitHeader", "true");
+            queryArgs.setFilterQueries(time);
+            queryArgs.setFacet(true);
+            queryArgs.set("facet.field", "countryCode");
+            queryArgs.setFacetMinCount(1);
+            StringBuilder sb = new StringBuilder("{!q.op=OR df=" + facetQueryField + "}");
+            // calculate the size of the current batch per remaining items
+            int start = batchInd * batchSize;
+            // TODO: check for off by one
+            int thisBatchSize = (start + batchSize > itemCount)
+                ? batchSize : itemCount - start;
+            int end = start + thisBatchSize;
+            for(int j = start; j < end; ++j) {
+                sb.append(" ");
+                sb.append(dataFileIds.get(j));
+            }
+            queryArgs.setQuery(sb.toString());
+            try {
+                mergeFilterQuerySumming(result, doSolrPost(solrStatsUrl, queryArgs), facetQueryField, max);
+            } catch (Exception ex) {
+                log.error(ex);
+            }
+        }
+        return result;
+    }
+
+    private void mergeFilterQuerySumming(LinkedHashMap<String, Integer> store, QueryResponse solrResponse, String facetQueryField, int max) {
+        final Map<String,Integer> facets = solrResponse.getFacetQuery();
+        Iterator<Entry<String, Integer>> it = facets.entrySet().iterator();
+        while (it.hasNext()) {
+            Entry<String, Integer> e = it.next();
+            String k = e.getKey();
+            if (store.containsKey(k)) {
+                Integer orig = store.remove(k);
+                store.put(k, e.getValue() + orig);
+            } else {
+                store.put(k, e.getValue());
+            }
+        }
+    }
+
     private LinkedHashMap<Item, String> sortFilterQuery(QueryResponse solrResponse, String facetQueryField, int max) throws SQLException {
         final Map<String,Integer> facets = solrResponse.getFacetQuery();
-        List<String> sortedKeys = new ArrayList<String>();
+        ArrayList<String> sortedKeys = new ArrayList<String>();
         sortedKeys.addAll(facets.keySet());
-        sortedKeys.sort(new Comparator() {
+        Collections.sort(sortedKeys, new Comparator<String>() {
             @Override
-            public int compare(Object o1, Object o2) {
-                return facets.get(o1).compareTo(facets.get(o2));
+            public int compare(String a, String b) {
+                return facets.get(b).compareTo(facets.get(a));
             }
         });
-        sortedKeys = sortedKeys.subList(0, max-1);
         LinkedHashMap<Item, String> result = new LinkedHashMap<Item, String>();
         int pfxLen = (facetQueryField + ":").length();
-        for (String itemStr : sortedKeys) {
-            int i = Integer.valueOf(itemStr.substring(pfxLen));
-            Item item = Item.find(this.context, i);
+        int keyMax = sortedKeys.size();
+        for (int i = 0; i < keyMax && i < max; ++i) {
+            String itemStr = sortedKeys.get(i);
+            int itemId = Integer.valueOf(itemStr.substring(pfxLen));
+            Item item = Item.find(this.context, itemId);
             result.put(item, Integer.toString(facets.get(itemStr)));
         }
         return result;
     }
-    
-    private QueryResponse doSolrPost(String baseUrl, SolrQuery solrQuery) throws MalformedURLException, SolrServerException {        
+    /*  */
+    private QueryResponse doSolrPost(String baseUrl, SolrQuery solrQuery) throws MalformedURLException, SolrServerException {
         CommonsHttpSolrServer server = null;
         try {
             server = new CommonsHttpSolrServer(baseUrl);
@@ -212,4 +304,5 @@ public class DryadJournal {
         }
         return response;
     }
+
 }
