@@ -5,11 +5,16 @@ There are two new applications   ChecksumWorker and ChecksumHistoryWorker.
 ChecksumWorker implements a more flexible version of ChecksumChecker which is not quite as silent about what it does.
 
 It can restrict itself to working on bitstreams
-    * in a given community, collection, or item,
-    * whose last check result is a given value
-    * whose last check result is not one of a list of given values
-    * that have been checked last longer than a given time frame ago
-    * that have been checked last within  a given time  from the current time
+
+ * in a given community, collection, or item,
+
+ * whose last check result is a given value
+
+ * whose last check result is not one of a list of given values
+
+ * that have been checked last longer than a given time frame ago
+
+ * that have been checked last within  a given time  from the current time
 
 The ChecksumHistoryChecker works on the stored check sum results, eg it counts, prints, or deletes. It restricts itself to selected
 check sum results in the same way as the ChecksumWorker  does.
@@ -88,15 +93,15 @@ or within the last 24 hours
 
 print info on last check results for bitstreams whose last chech result was  neither BITSTREAM_MARKED_DELETED nor CHECKSUM_MATCH
 
-> dspace checksum --do print -x BITSTREAM_MARKED_DELETED,CHECKSUM_MATCH --count all
 
 ~~~~
-  # org.dspace.checker.CheckBitstreamIterator(without_result=[BITSTREAM_MARKED_DELETED,CHECKSUM_MATCH])
-  # Action print
-  # Max-Count -1
-  1 BITSTREAM.88134 CHECKSUM_NO_MATCH internalId=100001824138360574590188345356919067125  delete=false  lastDate=2015-02-18 14:47:35.973
-  2 BITSTREAM.55930 BITSTREAM_NOT_FOUND internalId=153938287619075174428757274234693753357  delete=false  lastDate=2015-03-05 11:08:20.911
-  ...
+> dspace checksum --do print -x BITSTREAM_MARKED_DELETED,CHECKSUM_MATCH --count all
+# org.dspace.checker.CheckBitstreamIterator(without_result=[BITSTREAM_MARKED_DELETED,CHECKSUM_MATCH])
+# Action print
+# Max-Count -1
+1 BITSTREAM.88134 CHECKSUM_NO_MATCH internalId=100001824138360574590188345356919067125  delete=false  lastDate=2015-02-18 14:47:35.973
+2 BITSTREAM.55930 BITSTREAM_NOT_FOUND internalId=153938287619075174428757274234693753357  delete=false  lastDate=2015-03-05 11:08:20.911
+...
 ~~~~
 
 Printing in verbose mode includes information of each bitstreams enclosing item, collection, and communities:
@@ -108,8 +113,8 @@ Printing in verbose mode includes information of each bitstreams enclosing item,
 
 You can also print information of stored check results as opposed to just the last result:
 
-> dspace checksum --do history -x BITSTREAM_MARKED_DELETED,CHECKSUM_MATCH --count all
 ~~~~
+> dspace checksum --do history -x BITSTREAM_MARKED_DELETED,CHECKSUM_MATCH --count all
 # org.dspace.checker.CheckBitstreamIterator(without_result=[BITSTREAM_MARKED_DELETED,CHECKSUM_MATCH])
 # Action history
 # Max-Count -1
@@ -121,8 +126,8 @@ BITSTREAM.55930 result=CHECKSUM_MATCH lastDate=Thu Feb 06 00:00:00 EST 2014
 
 The following lists bitstreams whose files could not be found
 
-> dspace checksum --do print --include_result BITSTREAM_NOT_FOUND --count all
 ~~~~
+> dspace checksum --do print --include_result BITSTREAM_NOT_FOUND --count all
 # org.dspace.checker.CheckBitstreamIterator(with_result=BITSTREAM_NOT_FOUND)
 # Action print
 # Max-Count -1
@@ -131,9 +136,8 @@ The following lists bitstreams whose files could not be found
 ~~~~
 
 After restoring files you can recompute the checksum as follows
-~~~~
-> dspace checksum --do print --include_result BITSTREAM_NOT_FOUND --count all
-~~~~
+    > dspace checksum --do print --include_result BITSTREAM_NOT_FOUND --count all
+
 
 ## print and count stored checksum results
 
@@ -164,7 +168,7 @@ You can selectively delete stored checksum in the same way that you can print or
 
 To delete all CHECKSUM_MATCH results that are older than 5 years do
 ~~~~
-dspace checkhistory --include_result CHECKSUM_MATCH --do delete  --before 5y
+> dspace checkhistory --include_result CHECKSUM_MATCH --do delete  --before 5y
 ~~~~
 
 
