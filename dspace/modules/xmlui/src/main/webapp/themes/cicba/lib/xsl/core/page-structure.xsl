@@ -150,28 +150,11 @@
 			<xsl:call-template name="choiceLookupPopUpSetup" />
 		</xsl:if>
 
-
-
-		<!-- Add a google analytics script if the key is present -->
-		<xsl:if
-			test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']">
-			<script type="text/javascript">
-				<xsl:text>
-                   var _gaq = _gaq || [];
-                   _gaq.push(['_setAccount', '</xsl:text>
-				<xsl:value-of
-					select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']" />
-				<xsl:text>']);
-                   _gaq.push(['_trackPageview']);
-
-                   (function() {
-                       var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-                       ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-                       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-                   })();
-           </xsl:text>
-			</script>
-		</xsl:if>
+		<script type="text/javascript">
+			runAfterJSImports.execute();
+		</script>
+		
+		<xsl:call-template name="google-analytic-tracking" />
 
 		<!-- Add a contextpath to a JS variable -->
 		<script type="text/javascript">
@@ -187,7 +170,7 @@
 			<xsl:value-of select="$theme-path" />
 			<xsl:text>';</xsl:text>
 		</script>
-
+		
 		<!-- When on submission process, disable buttons on submission -->
 		<!-- Update an input-forms, if exists a dc.type metadata, every time this 
 			element change its value. -->
@@ -256,10 +239,6 @@
 			
 			</xsl:text>
 	        </script>
-	        
-	        <script type="text/javascript">
-			runAfterJSImports.execute();
-			</script>
 	</xsl:template>
 
 

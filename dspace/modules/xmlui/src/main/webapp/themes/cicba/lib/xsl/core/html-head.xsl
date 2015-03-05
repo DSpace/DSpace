@@ -107,38 +107,6 @@
                     </xsl:attribute>
                 </link>
             </xsl:if>
-
-            <!-- Add the title in -->
-			<xsl:call-template name="addPageTitle"/>            
-
-            <!-- Head metadata in item pages -->
-            <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='xhtml_head_item']">
-                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='xhtml_head_item']"
-                              disable-output-escaping="yes"/>
-            </xsl:if>
-
-            <!-- Add all Google Scholar Metadata values -->
-            <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[substring(@element, 1, 9) = 'citation_']">
-                <meta name="{@element}" content="{.}"></meta>
-            </xsl:for-each>
-            
-            <!-- Add MathJAX JS library to render scientific formulas-->
-            <xsl:if test="confman:getProperty('webui.browse.render-scientific-formulas') = 'true'">
-                <script type="text/x-mathjax-config">
-                    MathJax.Hub.Config({
-                      tex2jax: {
-                        inlineMath: [['$latex','$'], ['\\(','\\)']],
-                        ignoreClass: "detail-field-data|detailtable|exception"
-                      },
-                      TeX: {
-                        Macros: {
-                          AA: '{\\mathring A}'
-                        }
-                      }
-                    });
-                </script>
-                <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">&#160;</script>
-            </xsl:if>
             
             <!-- The following javascript removes the default text of empty text areas when they are focused on or submitted -->
         <!-- There is also javascript to disable submitting a form when the 'enter' key is pressed. -->
@@ -196,6 +164,38 @@
 
                                 var runAfterJSImports = new FnArray();
             </script>
+
+            <!-- Add the title in -->
+			<xsl:call-template name="addPageTitle"/>            
+
+            <!-- Head metadata in item pages -->
+            <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='xhtml_head_item']">
+                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='xhtml_head_item']"
+                              disable-output-escaping="yes"/>
+            </xsl:if>
+
+            <!-- Add all Google Scholar Metadata values -->
+            <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[substring(@element, 1, 9) = 'citation_']">
+                <meta name="{@element}" content="{.}"></meta>
+            </xsl:for-each>
+            
+            <!-- Add MathJAX JS library to render scientific formulas-->
+            <xsl:if test="confman:getProperty('webui.browse.render-scientific-formulas') = 'true'">
+                <script type="text/x-mathjax-config">
+                    MathJax.Hub.Config({
+                      tex2jax: {
+                        inlineMath: [['$latex','$'], ['\\(','\\)']],
+                        ignoreClass: "detail-field-data|detailtable|exception"
+                      },
+                      TeX: {
+                        Macros: {
+                          AA: '{\\mathring A}'
+                        }
+                      }
+                    });
+                </script>
+                <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">&#160;</script>
+            </xsl:if>
 	</xsl:template>
 	
 	<xsl:template name="addPageTitle">
