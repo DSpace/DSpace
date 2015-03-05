@@ -361,7 +361,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                     <xsl:attribute name="href">
                         <xsl:value-of
                                 select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                        <xsl:text>/</xsl:text>
+                        <xsl:text>/pages/dryadlab</xsl:text>
                     </xsl:attribute>
                     <xsl:choose>
                         <xsl:when test="$meta[@element='request'][@qualifier='realServerPort'][. = '9999']">

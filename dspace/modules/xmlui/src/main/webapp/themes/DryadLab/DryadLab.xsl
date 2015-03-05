@@ -302,7 +302,7 @@
                 </div>
             </div>
 
-            <!-- START SEARCH -->
+            <!-- START SEARCH 
             <div class="home-col-2">
                 <h1 class="ds-div-head">Search for data</h1>
 
@@ -315,14 +315,15 @@
                                id="aspect_discovery_SiteViewer_field_query" class="ds-text-field" name="query"
                                placeholder="Enter keyword, author, title, DOI, etc. Example: herbivory"
                                title="Enter keyword, author, title, DOI, etc. Example: herbivory"
-                               type="text" value="" style="width: 224px;"/><!-- no whitespace between these!
-                     --><input xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
+                               type="text" value="" style="width: 224px;"/>< ! - - no whitespace between these!
+                     - - ><input xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
                                id="aspect_discovery_SiteViewer_field_submit" class="ds-button-field" name="submit"
                                type="submit" value="Go" style="margin-right: -4px;"/>
                         <a style="float:left; font-size: 95%;" href="/discover?query=&amp;submit=Search#advanced">Advanced search</a>
                     </p>
                 </form>
             </div>
+            -->
 
             <!-- START CONNECT  -->
             <div class="home-col-2" style="clear: right;">
@@ -558,7 +559,7 @@
 
     <xsl:template match="dri:options/dri:list[@n='DryadSearch']" priority="3">
       <div class="NOT-simple-box">
-        <!-- START SEARCH -->
+        <!-- START SEARCH 
         <div class="home-col-1">
             <h1 class="ds-div-head">Search for data
             </h1>
@@ -571,30 +572,35 @@
                            id="aspect_discovery_SiteViewer_field_query" class="ds-text-field" name="query"
                            placeholder="Enter keyword, DOI, etc."
                            title="Enter keyword, author, title, DOI, etc. Example: herbivory"
-                           type="text" value="" style="width: 175px;"/><!-- no whitespace between these!
-                     --><input xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
+                           type="text" value="" style="width: 175px;"/><!- - no whitespace between these!
+                     - -><input xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
                                id="aspect_discovery_SiteViewer_field_submit" class="ds-button-field" name="submit"
                                type="submit" value="Go" style="margin-right: -4px;"/>
                         <a style="float:left; font-size: 95%;" href="/discover?query=&amp;submit=Search">Advanced search</a>
                 </p>
             </form>
         </div>
+	-->
       </div>
     </xsl:template>
 
     <xsl:template match="dri:options/dri:list[@n='DryadConnect']" priority="3">
       <div class="NOT-simple-box">
         <!-- START CONNECT  -->
+<!--
         <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Be part of Dryad
         </h1>
+-->
         <div id="ds_connect_with_dryad" class="ds-static-div primary" style="font-size: 14px;">
             <p style="margin-bottom: 0;">
                 Learn more about:
             </p>
             <ul style="list-style: none; margin-left: 1em;">
-                <li><a href="/pages/membershipOverview">Membership</a></li>
-                <li><a href="/pages/journalIntegration">Submission integration</a></li>
-                <li><a href="/pages/pricing">Pricing plans</a></li>
+                <li><a href="/pages/aboutDryadLab">DryadLab basics</a></li>
+                <li><a href="/pages/dryadLabFAQ">Frequently asked questions</a></li>
+                <li><a href="/pages/dryadLabProcess">Module development process</a></li>
+                <li><a href="/pages/workWithDryadLab">Turning your data into a module</a></li>
+                <li><a href="/pages/introToDryad">Exploring the Dryad repository</a></li>
             </ul> 
         </div>      
 	  </div>
