@@ -23,15 +23,14 @@ import org.dspace.app.xmlui.utils.UIException;
 import static org.dspace.app.xmlui.wing.AbstractWingTransformer.*;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
+import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.Constants;
-
 /**
  *
  * @author Nathan Day
  */
 public class TopTenDownloads extends JournalLandingTabbedTransformer {
-    
+
     private static final Logger log = Logger.getLogger(TopTenDownloads.class);
 
     @Override
@@ -47,6 +46,8 @@ public class TopTenDownloads extends JournalLandingTabbedTransformer {
         divData = new DivData();
         divData.n = TOPTEN_DOWNLOADS;
         divData.T_div_head = message("xmlui.JournalLandingPage.TopTenDownloads.panel_head");
+        divData.facetQueryField = facetQueryOwningId;
+        divData.maxResults = displayCount;
 
         tabData = new ArrayList<TabData>(3);
         TabData tb1 = new TabData();
@@ -60,7 +61,7 @@ public class TopTenDownloads extends JournalLandingTabbedTransformer {
         TabData tb2 = new TabData();
         tb2.n = TOPTEN_DOWNLOADS_YEAR;
         tb2.buttonLabel = message("xmlui.JournalLandingPage.JournalLandingTabbedTransformer.year");
-        tb2.dateFilter = String.format(solrDateFormat, currentYear - 1, currentMonth);
+        tb2.dateFilter = String.format(solrDateFormat, currentYear, januaryInd);
         tb2.refHead = message("xmlui.JournalLandingPage.TopTenDownloads.ref_head_year").parameterize(currentYear);
         tb2.valHead = message("xmlui.JournalLandingPage.TopTenDownloads.val_head");
         tabData.add(tb2);
@@ -78,6 +79,6 @@ public class TopTenDownloads extends JournalLandingTabbedTransformer {
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
-        super.addBody(body);
+        super.addStatsTable(body);
     }
 }
