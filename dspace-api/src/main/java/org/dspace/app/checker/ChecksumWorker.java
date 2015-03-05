@@ -306,7 +306,7 @@ public final class ChecksumWorker
         options.addOption("r", "root", true, "Work on bitstream in given Community, Collection, Item, or on the given Bitstream, give root as handle or TYPE.ID)");
         options.addOption("b", "before", true, "Work on bitstreams last checked before (current time minus given duration)");
         options.addOption("a", "after", true, "Work on bitstreams last checked after (current time minus given duration) ");
-        options.addOption("c", "count", true, "Work on at most the given number of bitstreams, give negative number to work on all matching bitstreams");
+        options.addOption("c", "count", true, "Work on at most the given number of bitstreams, positive number or 'all'");
         options.addOption("v", "verbose", false, "Be verbose");
         options.addOption("h", "help", false, "Print this help");
 
@@ -328,9 +328,6 @@ public final class ChecksumWorker
             if ((loop && (with_result != null || excludes != null)) || (with_result != null && excludes != null))
             {
                 throw new RuntimeException("-x, -i, and -l options are mutually exclusive");
-            } else  {
-                // none of  loop, with_result, excludes given ==> default to doing loop
-                loop = with_result == null && excludes == null;
             }
 
             if (loop)
@@ -374,7 +371,15 @@ public final class ChecksumWorker
                 throw new RuntimeException("not enough data to create iterator");
             }
 
-            int count = line.hasOption('c') ? new Integer(line.getOptionValue('c')) : 1;
+            int count = 1;
+            if (line.hasOption('c'))
+            {
+                String copt = line.getOptionValue('c');
+                if (copt.equals("all"))
+                    count = -1;
+                else
+                    count = new Integer(copt);
+            }
 
             String actionStr = line.hasOption('d') ? line.getOptionValue('d') : ACTION_LIST[DEFAULT_ACTION];
             int action = -1;

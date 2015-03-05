@@ -122,7 +122,6 @@ public final class ChecksumHistoryWorker
         options.addOption("r", "root", true, "Work on bitstream in given Community, Collection, Item, or on the given Bitstream, give root as handle or TYPE.ID)");
         options.addOption("b", "before", true, "Work on bitstreams last checked before (current time minus given duration)");
         options.addOption("a", "after", true, "Work on bitstreams last checked after (current time minus given duration) ");
-        options.addOption("c", "count", true, "Work on at most the given number of bitstreams");
         options.addOption("h", "help", false, "Print this help");
 
         try
