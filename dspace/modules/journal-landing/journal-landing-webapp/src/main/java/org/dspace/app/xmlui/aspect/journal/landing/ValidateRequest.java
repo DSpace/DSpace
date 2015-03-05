@@ -5,12 +5,8 @@
  */
 package org.dspace.app.xmlui.aspect.journal.landing;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.acting.AbstractAction;
@@ -21,9 +17,6 @@ import org.apache.log4j.Logger;
 
 import static org.dspace.app.xmlui.aspect.journal.landing.Const.*;
 import org.dspace.submit.utils.DryadJournalSubmissionUtils;
-import org.datadryad.api.DryadJournal;
-import org.dspace.app.xmlui.utils.ContextUtil;
-import org.dspace.core.Context;
 
 /**
  *
