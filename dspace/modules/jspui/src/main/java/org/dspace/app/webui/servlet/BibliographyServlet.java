@@ -759,8 +759,10 @@ public class BibliographyServlet extends DSpaceServlet{
                        sb.append("\""); 
                     }
                 }
-                sb.append(delimitador);
-            }
+                if(k == values.length-1){
+                  sb.append(delimitador); 
+                }    
+             }
           }
           String csvData= sb.toString();
           return csvData;
