@@ -241,7 +241,7 @@
                     <div class="bxslider" style="">
                         <div><span class="publication-date">2015-03-04</span>
                             <a href="/pages/membershipMeeting2015">
-                                <img src="/themes/Mirage/images/membershipMeeting2015_carousel.png" alt="Dryad Community Meeting, 27 May 2015, Washington DC" />
+                                <img src="/themes/Mirage/images/membershipMeeting2015_carousel.jpg" alt="Dryad Community Meeting, 27 May 2015, Washington DC" />
                            </a>
                        </div>
 						<div><span class="publication-date">2013-03-01</span>
