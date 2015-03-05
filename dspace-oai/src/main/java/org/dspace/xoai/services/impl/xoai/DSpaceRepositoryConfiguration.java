@@ -83,7 +83,7 @@ public class DSpaceRepositoryConfiguration implements RepositoryConfiguration
     @Override
     public DeleteMethod getDeleteMethod()
     {
-        return DeleteMethod.PERSISTENT;
+        return DeleteMethod.TRANSIENT;
     }
 
     @Override
