@@ -17,7 +17,11 @@ import static org.dspace.app.xmlui.aspect.journal.landing.Const.*;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import org.apache.avalon.framework.parameters.ParameterException;
+import java.util.Map;
+import org.apache.avalon.framework.parameters.Parameters;
+import org.apache.cocoon.ProcessingException;
+import org.apache.cocoon.environment.SourceResolver;
+import org.datadryad.api.DryadJournal;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.authorize.AuthorizeException;
@@ -37,18 +41,35 @@ public class Banner extends AbstractDSpaceTransformer {
     private static final Message T_Authors = message("xmlui.JournalLandingPage.Banner.aut");
     private static final Message T_Embargo = message("xmlui.JournalLandingPage.Banner.dat");
     private static final Message T_Hidden = message("xmlui.JournalLandingPage.Banner.met");
+    private static final Message T_packages = message("xmlui.JournalLandingPage.Banner.pac");
+
+    private String journalName;
+    private DryadJournal dryadJournal;
+
+    @Override
+    public void setup(SourceResolver resolver, Map objectModel, String src,
+            Parameters parameters) throws ProcessingException, SAXException,
+            IOException
+    {
+        super.setup(resolver, objectModel, src, parameters);
+        try {
+            journalName = parameters.getParameter(PARAM_JOURNAL_NAME);
+        } catch (Exception ex) {
+            log.error(ex);
+            throw(new ProcessingException("Bad access of journal name"));
+        }
+        try {
+            dryadJournal = new DryadJournal(context, journalName);
+        } catch (Exception ex) {
+            log.error(ex);
+            throw(new ProcessingException("Failed to make handler for " + journalName));
+        }
+    }
 
     @Override
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
-        String journalName;
-        try {
-            journalName = this.parameters.getParameter(PARAM_JOURNAL_NAME);
-        } catch (ParameterException ex) {
-            log.error("Failed to retrieve journal metadata from parameters");
-            return;
-        }
         Division outer = body.addDivision(BANNER_DIV_OUTER);
         Division inner = outer.addDivision(BANNER_DIV_INNER);
         inner.setHead(journalName);
@@ -86,5 +107,9 @@ public class Banner extends AbstractDSpaceTransformer {
         String journalMetadataInfo = "lorem ipsum";
         pMet.addContent(": " + journalMetadataInfo);
 
+        Para pPac = inner.addPara(BANNER_PAC, BANNER_PAC);
+        pPac.addHighlight(null).addContent(T_packages);
+        int archivedPackageCount = dryadJournal.getArchivedPackagesCount();
+        pPac.addContent(": " + Integer.toString(archivedPackageCount));
     }
 }
