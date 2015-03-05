@@ -24,24 +24,23 @@ import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DSpaceObject;
-import org.dspace.discovery.SearchServiceException;
 import org.xml.sax.SAXException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Locale;
-import org.datadryad.api.DryadJournal.*;
+import org.datadryad.api.DryadJournal;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.content.Item;
+import org.dspace.workflow.DryadWorkflowUtils;
 
 /**
  *
  * @author Nathan Day
  */
 public class JournalLandingTabbedTransformer extends AbstractDSpaceTransformer {
-    
+
     private static final Logger log = Logger.getLogger(JournalLandingTabbedTransformer.class);
     private final static SimpleDateFormat fmt = new SimpleDateFormat(fmtDateView);
     private int currentMonth;
@@ -51,15 +50,14 @@ public class JournalLandingTabbedTransformer extends AbstractDSpaceTransformer {
 
     // cocoon parameters
     protected String journalName;
-
-    // performSearch() values
-    protected ArrayList<Item> references;
-    protected ArrayList<String> values;
+    private DryadJournal dryadJournal;
 
     // container for data pertaining to entire div
     protected class DivData {
         public String n;
         public Message T_div_head;
+        public String facetQueryField;
+        public int maxResults;
     }
     protected DivData divData;
     protected class TabData {
@@ -99,10 +97,10 @@ public class JournalLandingTabbedTransformer extends AbstractDSpaceTransformer {
         currentMonth = cal.get(Calendar.MONTH);
         currentYear = cal.get(Calendar.YEAR);
         currentMonthStr = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, defaultLocale);
+        dryadJournal = new DryadJournal(this.context, this.journalName);
     }
 
-    @Override
-    public void addBody(Body body) throws SAXException, WingException,
+    protected void addStatsTable(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
         Division outer = body.addDivision(divData.n,divData.n);
@@ -115,43 +113,24 @@ public class JournalLandingTabbedTransformer extends AbstractDSpaceTransformer {
         }
         for(TabData t : tabData) {
             Division wrapper = outer.addDivision(t.n, t.n);
+            // dspace referenceset or list to hold references or countries
             Division items = wrapper.addDivision(ITEMS);
-            // reference list
-            ReferenceSet refs = items.addReferenceSet(t.n, ReferenceSet.TYPE_SUMMARY_LIST);
-            refs.setHead(t.refHead);
-            // dspace item value list
-            Division count = wrapper.addDivision(VALS);
-            List list = count.addList(t.n, List.TYPE_SIMPLE, t.n);
-            list.setHead(t.valHead);
-            
-            references = new ArrayList<Item>();
-            values = new ArrayList<String>();
-            try {
-                retrieveItemResults();
-            } catch (SearchServiceException e) {
-                log.error(e.getMessage(), e);
+            ReferenceSet itemsContainer = items.addReferenceSet(t.n, ReferenceSet.TYPE_SUMMARY_LIST);
+            itemsContainer.setHead(t.refHead);
+            // dspace value list, to hold counts
+            Division counts = wrapper.addDivision(VALS);
+            List countList = counts.addList(t.n, List.TYPE_SIMPLE, t.n);
+            countList.setHead(t.valHead);
+            LinkedHashMap<Item, String> results = dryadJournal.getRequestsPerJournal(
+                divData.facetQueryField, t.dateFilter, divData.maxResults
+            );
+            if (results != null) {
+                for (Item item : results.keySet()) {
+                    Item dataPackage = DryadWorkflowUtils.getDataPackage(context, item);
+                    itemsContainer.addReference(dataPackage);
+                    countList.addItem().addContent(results.get(item));
+                }
             }
-            if (references.size() > 0) {
-                for (DSpaceObject ref : references)
-                    refs.addReference(ref);
-                for (String s : values)
-                    list.addItem().addContent(s);
-            }
-        }
-    }
-
-    public void retrieveItemResults() throws SearchServiceException, UIException, SQLException {
-        org.datadryad.api.DryadJournal dryadJournal = new org.datadryad.api.DryadJournal(this.context, this.journalName);
-        SortedQueryResults sortedItems = dryadJournal.getRequestsPerJournal("site", "owningItem", "[* TO NOW]", 10);
-        if (sortedItems.items.size() != sortedItems.values.size()) {
-            log.error("Mismatch in data returned by getRequestsPerJournal()");
-            return;
-        }
-        Iterator<Item> itIt = sortedItems.items.iterator();
-        Iterator<String> valIt = sortedItems.values.iterator();
-        while (itIt.hasNext() && valIt.hasNext() && references.size() < displayCount) {
-            references.add(itIt.next());
-            values.add(valIt.next());
         }
     }
 }
