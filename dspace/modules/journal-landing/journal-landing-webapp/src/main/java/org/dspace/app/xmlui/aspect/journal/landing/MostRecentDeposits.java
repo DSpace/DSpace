@@ -15,6 +15,7 @@ import org.dspace.app.xmlui.wing.element.Division;
 import static org.dspace.app.xmlui.aspect.journal.landing.Const.*;
 
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import org.apache.avalon.framework.parameters.ParameterException;
@@ -108,8 +109,12 @@ public class MostRecentDeposits extends AbstractFiltersTransformer {
                 String dateStr = dateAccessioned[0].value;
                 //String date = fmt.format(dateStr);
                 if (dateStr != null) {
-                    references.add(item);
-                    dates.add(dateStr);                
+                    try {
+                        dates.add(fmt.format(fmt.parse(dateStr)));
+                        references.add(item);
+                    } catch (ParseException ex) {
+                        log.error(ex);
+                    }
                 }
             }
         }
