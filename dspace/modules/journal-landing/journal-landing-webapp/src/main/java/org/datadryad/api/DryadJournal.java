@@ -10,7 +10,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrRequest;
@@ -191,77 +190,6 @@ public class DryadJournal {
         } catch (Exception ex) {
             log.error(ex);
             return new LinkedHashMap<Item, String>();
-        }
-    }
-
-    /*
-    Query solr for view/download counts per country
-    @param facetQueryField solr/statistics query field, e.g., 'owningItem' or 'id'
-    @param time Solr time query, e.g., [* TO NOW]
-    @param max number of results to return
-    Note: this query must be batched in groups of 1024 due to server setting
-          <maxBooleanClauses>1024</maxBooleanClauses>
-        rows=0
-        &omitHeader=true
-        &fq=time:[* TO NOW]
-        &facet=true
-        &facet.field=countryCode
-        &facet.mincount=1
-        &q={!q.op=OR df=owningItem}63687 57221 50903 73665 ...
-    */
-    public LinkedHashMap<String, Integer> getRequestsPerJournalByCountry(String facetQueryField, String time, int max) {
-        int batchSize = 1024;
-        List<Integer> dataFileIds = null;
-        try {
-            dataFileIds = getArchivedDataFiles();
-        } catch (SQLException ex) {
-            log.error(ex);
-            return new LinkedHashMap<String, Integer>();
-        }
-        LinkedHashMap<String, Integer> result = new LinkedHashMap<String, Integer>();
-        int itemCount = dataFileIds.size();
-        int batchCount = (int) Math.floor(itemCount/batchSize);
-        for (int batchInd = 0; batchInd < batchCount; ++batchInd) {
-            SolrQuery queryArgs = new SolrQuery();
-            queryArgs.setRows(0);
-            queryArgs.set("omitHeader", "true");
-            queryArgs.setFilterQueries(time);
-            queryArgs.setFacet(true);
-            queryArgs.set("facet.field", "countryCode");
-            queryArgs.setFacetMinCount(1);
-            StringBuilder sb = new StringBuilder("{!q.op=OR df=" + facetQueryField + "}");
-            // calculate the size of the current batch per remaining items
-            int start = batchInd * batchSize;
-            // TODO: check for off by one
-            int thisBatchSize = (start + batchSize > itemCount)
-                ? batchSize : itemCount - start;
-            int end = start + thisBatchSize;
-            for(int j = start; j < end; ++j) {
-                sb.append(" ");
-                sb.append(dataFileIds.get(j));
-            }
-            queryArgs.setQuery(sb.toString());
-            try {
-                mergeFilterQuerySumming(result, doSolrPost(solrStatsUrl, queryArgs), facetQueryField, max);
-            } catch (Exception ex) {
-                log.error(ex);
-            }
-        }
-        return result;
-    }
-
-    private void mergeFilterQuerySumming(LinkedHashMap<String, Integer> store, QueryResponse solrResponse, String facetQueryField, int max) {
-        final Map<String,Integer> facets = solrResponse.getFacetQuery();
-        Iterator<Entry<String, Integer>> it = facets.entrySet().iterator();
-        while (it.hasNext()) {
-            Entry<String, Integer> e = it.next();
-            String k = e.getKey();
-            if (store.containsKey(k)) {
-                Integer orig = store.remove(k);
-                store.put(k, e.getValue() + orig);
-            } else {
-                store.put(k, e.getValue());
-            }
         }
     }
 
