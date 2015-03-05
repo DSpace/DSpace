@@ -26,6 +26,7 @@ public class Const {
     public static final String BANNER_AUT = "journal-landing-banner-aut";
     public static final String BANNER_MET = "journal-landing-banner-met";
     public static final String BANNER_INT = "journal-landing-banner-int";
+    public static final String BANNER_PAC = "journal-landing-banner-pac";
     
     public static final String SEARCH_DIV = "journal-landing-search";
     
@@ -38,20 +39,12 @@ public class Const {
     public static final String TOPTEN_DOWNLOADS_YEAR = "journal-landing-topten-downloads-year";
     public static final String TOPTEN_DOWNLOADS_ALLTIME = "journal-landing-topten-downloads-alltime";
 
-    public static final String TOPTEN_VIEWS = "journal-landing-topten-views";
-    public static final String TOPTEN_VIEWS_MONTH = "journal-landing-topten-views-month";
-    public static final String TOPTEN_VIEWS_YEAR = "journal-landing-topten-views-year";
-    public static final String TOPTEN_VIEWS_ALLTIME = "journal-landing-topten-views-alltime";
-    
-    public static final String USER_GEO = "journal-landing-user-geo";
-    public static final String USER_GEO_VIEWS = "journal-landing-user-geo-views";
-    public static final String USER_GEO_DOWNLOADS = "journal-landing-user-geo-downloads";
-    
     public static final String ITEMS = "items";
     public static final String VALS = "vals";
     public static final String TABLIST = "tablist";
     
     // date format string for most recent deposits
+    public static final String januaryInd = "01";
     public static final String fmtDateView = "yyyy-MM-dd";
     public static final String solrDateFormat = "time:[%d-%s-01T00:00:00.000Z TO NOW]";
     public static final String solrDateAllTime = "[* TO NOW]";
@@ -60,5 +53,7 @@ public class Const {
     public static final String depositsDisplaySortField = "dc.date.accessioned_dt";
     public static final String dcDateAccessioned = "dc.date.accessioned";
     public static final SolrQuery.ORDER depositsDisplaySortOrder = SolrQuery.ORDER.desc;
-    public static final String depositsDisplayHandle = "handle";
+    public static final String facetQueryId = "id";
+    public static final String facetQueryOwningId = "owningItem";
+    public static final String facetQueryCountryCode = "countryCode";
 }

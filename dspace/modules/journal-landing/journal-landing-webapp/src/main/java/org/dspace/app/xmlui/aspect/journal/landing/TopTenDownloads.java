@@ -23,7 +23,6 @@ import org.dspace.app.xmlui.utils.UIException;
 import static org.dspace.app.xmlui.wing.AbstractWingTransformer.*;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.authorize.AuthorizeException;
 /**
  *

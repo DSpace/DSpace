@@ -16,7 +16,6 @@
     <!--
     <message key="xmlui.JournalLandingPage."></message>
     -->
-   
     <message key="xmlui.JournalLandingPage.MostRecentDeposits.panel_head">Most recent deposits</message>
     <message key="xmlui.JournalLandingPage.MostRecentDeposits.date">Date</message>
     
@@ -25,20 +24,6 @@
     <message key="xmlui.JournalLandingPage.TopTenDownloads.ref_head_year">{0}</message>
     <message key="xmlui.JournalLandingPage.TopTenDownloads.ref_head_alltime">All-time</message>
     <message key="xmlui.JournalLandingPage.TopTenDownloads.val_head">Downloads</message>
-    
-    <message key="xmlui.JournalLandingPage.TopTenViews.panel_head">Top 10 viewed files</message>
-    <message key="xmlui.JournalLandingPage.TopTenViews.val_head">Views</message>    
-    <message key="xmlui.JournalLandingPage.TopTenViews.ref_head_month">{0} {1}</message>
-    <message key="xmlui.JournalLandingPage.TopTenViews.ref_head_year">{0}</message>
-    <message key="xmlui.JournalLandingPage.TopTenViews.ref_head_alltime">All-time</message>
-    
-    <message key="xmlui.JournalLandingPage.UserGeography.panel_head">Geographic breakdown of users</message>
-    <message key="xmlui.JournalLandingPage.UserGeography.ref_head_views">Country</message>
-    <message key="xmlui.JournalLandingPage.UserGeography.ref_head_downloads">Country</message>
-    
-    <message key="xmlui.JournalLandingPage.UserGeography.item_head">Country</message>
-    <message key="xmlui.JournalLandingPage.UserGeography.tab-views">Views</message>
-    <message key="xmlui.JournalLandingPage.UserGeography.tab-downloads">Downloads</message>
 
     <message key="xmlui.JournalLandingPage.JournalSearch.panel_head">Search data in Dryad associated with {0}</message>
     
@@ -48,6 +33,7 @@
     <message key="xmlui.JournalLandingPage.Banner.aut">When authors submit data</message>
     <message key="xmlui.JournalLandingPage.Banner.dat">Data embargo</message>
     <message key="xmlui.JournalLandingPage.Banner.met">Metadata hidden until article publication</message>
+    <message key="xmlui.JournalLandingPage.Banner.pac">Total number of data packages</message>
     
     <message key="xmlui.JournalLandingPage.JournalLandingTabbedTransformer.month">Month</message>
     <message key="xmlui.JournalLandingPage.JournalLandingTabbedTransformer.year">Year</message>
