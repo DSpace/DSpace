@@ -147,24 +147,21 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                     manuscriptNumber = manuscriptNumber.trim();
 
                     // try to get authority id first, its better than name
-                    String journal = request.getParameter("prism_publicationName_authority");
+                    String journalUuid = request.getParameter("prism_publicationName_authority");
 
-                    if(journal==null){
+                    String journal = request.getParameter("prism_publicationName");
 
-                        journal = request.getParameter("prism_publicationName");
-
-                        if(journal!= null)
-                        {
-                            journal=journal.replace("*", "");
-                            journal=journal.trim();
-                        }
+                    if(journal!= null)
+                    {
+                        journal=journal.replace("*", "");
+                        journal=journal.trim();
                     }
 
                     if(journal==null||journal.equals("")){
                         EventLogger.log(context, "submission-select-publication", "error=invalid_journal");
                         return ERROR_INVALID_JOURNAL;
                     }
-                    else if(!processJournal(journal, manuscriptNumber, item, context, request, articleStatus)){
+                    else if(!processJournal(journal, journalUuid, manuscriptNumber, item, context, request, articleStatus)){
                         EventLogger.log(context, "submission-select-publication", "error=no_journal_selected");
                         return ENTER_MANUSCRIPT_NUMBER;
                     }
@@ -217,7 +214,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                                 EventLogger.log(context, "submission-select-publication", "error=invalid_journal");
                                 return ERROR_INVALID_JOURNAL;
                             }
-                            else if(!processJournal(journal, manuscriptNumber, item, context, request, articleStatus)){
+                            else if(!processJournal(journal, null, manuscriptNumber, item, context, request, articleStatus)){
 
                                 if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED) return ENTER_MANUSCRIPT_NUMBER;
 
@@ -240,7 +237,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                         EventLogger.log(context, "submission-select-publication", "error=invalid_journal");
                         return ERROR_INVALID_JOURNAL;
                     }
-                    else if(!processJournal(journal, manuscriptNumber, item, context, request, articleStatus)){
+                    else if(!processJournal(journal, null, manuscriptNumber, item, context, request, articleStatus)){
 
                         EventLogger.log(context, "submission-select-publication", "error=no_journal_selected");
                         return ERROR_SELECT_JOURNAL;
@@ -257,7 +254,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                         EventLogger.log(context, "submission-select-publication", "error=invalid_journal");
                         return ERROR_INVALID_JOURNAL;
                     }
-                    else if(!processJournal(journal, manuscriptNumber, item, context, request, articleStatus)){
+                    else if(!processJournal(journal, null, manuscriptNumber, item, context, request, articleStatus)){
                         EventLogger.log(context, "submission-select-publication", "error=no_journal_selected");
                         return ERROR_SELECT_JOURNAL;
                     }
@@ -426,18 +423,18 @@ public class SelectPublicationStep extends AbstractProcessingStep {
     }
 
 
-    private boolean processJournal(String journal, String manuscriptNumber, Item item, Context context,
+    private boolean processJournal(String journalName, String journalUuid, String manuscriptNumber, Item item, Context context,
                                    HttpServletRequest request, String articleStatus) throws AuthorizeException, SQLException {
 
 
         Concept journalConcept = null;
 
         if(journalConcept==null){
-            journalConcept = JournalUtils.getJournalConceptById(context, journal);
+            journalConcept = JournalUtils.getJournalConceptById(context, journalUuid);
         }
 
         if(journalConcept==null){
-            journalConcept = JournalUtils.getJournalConceptByName(context, journal);
+            journalConcept = JournalUtils.getJournalConceptByName(context, journalName);
         }
 
         //We have selected to choose a journal, retrieve it
@@ -522,8 +519,8 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         }
         else
         {
-            log.debug("adding unknown journal title to item: " + journal);
-            item.addMetadata("prism", "publicationName", null, null, journal);
+            log.debug("adding unknown journal title to item: " + journalName);
+            item.addMetadata("prism", "publicationName", null, null, journalName);
             item.update();
         }
         return true;
