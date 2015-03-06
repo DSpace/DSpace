@@ -142,6 +142,8 @@
         <theme name="Dryad Lab Theme" regex="dryadLab" path="DryadLab/" />
         <theme name="Dryad Lab Theme" regex="DryadLab" path="DryadLab/" />
         <theme name="Dryad Lab Theme" regex="introToDryad" path="DryadLab/" />
+        <!-- Use TEST_ prefix for temporary test pages for DryadLab theme -->
+        <theme name="Dryad Lab Theme" regex="TEST_" path="DryadLab/" />
         <theme name="Dryad Lab Theme" handle="10255/dryad.7872" path="DryadLab/" />
         <!-- Default theme for all other pages -->
         <theme name="Dryad Theme" regex=".*" path="Mirage/" />
