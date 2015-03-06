@@ -75,8 +75,9 @@ public class CollectionRecentSubmissions extends AbstractRecentSubmissionTransfo
                     lastSubmitted.addReference(resultObj);
                 }
             }
-            addViewMoreLink(lastSubmittedDiv, collection);
 
+            if (collection.countItems() > maxRecentSubmissions)
+                addViewMoreLink(lastSubmittedDiv, collection);
         }
     }
 }
