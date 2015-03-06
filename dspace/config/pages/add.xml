@@ -1,0 +1,27 @@
+<document xmlns="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
+
+<body>
+<div id="file.news.div.news" n="news" rend="primary">
+<head>Add to MOspace</head>
+<p>
+Faculty, staff, students and other individuals or entities affiliated or associated with the University of Missouri are encouraged to submit works to MOspace. Works co-authored by those not affiliated with the university are accepted.
+</p>
+<p>
+Authors can submit works directly to <xref target="mailto:mospace@missouri.edu">mospace@missouri.edu</xref>. PDF is the preferred format for documents, but most electronic formats are accepted for submission. For more information, call 573-882-1685 or email <xref target="mailto:mospace@missouri.edu">mospace@missouri.edu</xref>.  We look forward to receiving your submissions.
+</p>
+<p>
+Missouri S&amp;T authors who wish to submit content to Scholars' Mine should visit the <xref target="http://libguides.mst.edu/content.php?pid=362942">Submitting Content</xref> section of the Library Guide to Scholars' Mine.
+</p>
+
+</div>
+
+</body>
+
+<meta>
+<pageMeta>
+<metadata element="title">Add to MOspace</metadata>
+<trail target="../">MOspace Home</trail>
+</pageMeta>
+</meta>
+
+</document>

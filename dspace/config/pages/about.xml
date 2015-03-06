@@ -1,0 +1,65 @@
+<document xmlns="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
+
+<body>
+<div id="file.about.div.about" n="about" rend="primary">
+<head>About MOspace</head>
+
+<p>MOspace is the digital institutional repository of the University of Missouri System, and is a joint
+initiative of the University Libraries, the Office of Library Systems, and the Division of Information
+Technology. It is a permanent digital storehouse of research and knowledge, focusing on works created by
+those connected with the University of Missouri. MOspace is place where faculty, staff and students can
+store their intellectual output, and depend upon a permanent URL.</p>
+
+<p>MOspace allows the library to preserve and provide open access to items in a more
+permanent way than posting to a website. The project uses <xref target="http://dspace.org/">DSpace</xref>,
+an open source application developed at MIT, which provides permanent URLs for documents deposited
+through it to the MOspace server. The Libraries are committed to this ongoing effort as part of the next
+generation of library collections.</p>
+
+<p>MOspace, in addition to acting as a preservation tool, is our part of the international open
+access movement. You have probably heard of the recent votes in favor of open access by
+<xref target="http://www.news.harvard.edu/gazette/2008/02.14/99-fasvote.html">Harvard's Faculty of Arts and Sciences</xref>,
+<xref target="http://ed.stanford.edu/suse/faculty/dspace.html">Stanford's School of Education</xref>, and other institutions
+and faculties. MOspace could even be a home for a new open access journal in the future.</p>
+
+<p>An important part of the MOspace effort is encouraging authors not to sign away rights to their
+own works, as often happens when they publish in commercial journals.  Retaining the copyright
+allows content to be made available to students and scholars without huge subscription fees. In
+MOspace, the author/creator retains copyright in all cases, so an author could also publish an
+item elsewhere, providing that the publisher allows (see this
+<xref target="http://www.arl.org/sparc/author/completeonline.shtml">author's addendum</xref>
+for an example addendum to a publisher's contract).  For items not commercially published, author
+permission is all that is needed to allow the Library to add it to MOspace. Library staff can
+download items from websites or upload items directly via author submission.  Authors can submit
+works directly to <xref target="mailto:mospace@missouri.edu">mospace@missouri.edu</xref>;
+most electronic formats are accepted for submission.</p>
+
+<p>Establishing MOspace is part of the crucial role libraries play in preserving research and
+scholarship in all forms and making knowledge accessible for future scholars.</p>
+
+<p>For more information, <xref target="../pages/help">consult our help page</xref>, call 573-882-1685, or email <xref target="mailto:mospace@missouri.edu">mospace@missouri.edu</xref>.
+To get in touch with a MOspace representative from UMKC, call 816-235-2227 or email <xref target="mospace@umkc.edu">mospace@umkc.edu</xref>.
+To contact a Scholars' Mine representative from Missouri S&amp;T, call 573-341-4221 or email <xref target="scholarsmine@mst.edu">scholarsmine@mst.edu</xref>.
+
+</p>
+
+<p>We look forward to receiving your submissions.</p>
+
+<p>
+<head>Related</head>
+<list n="related" id="file.about.list.related" type="bulleted">
+	<item><xref target="http://hdl.handle.net/10355/37875">MOspace Collection Policy</xref></item>
+</list>
+</p>
+
+</div>
+</body>
+
+<meta>
+<pageMeta>
+<metadata element="title">About MOspace</metadata>
+<trail target="../">MOspace Home</trail>
+</pageMeta>
+</meta>
+
+</document>
