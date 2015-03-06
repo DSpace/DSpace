@@ -7,9 +7,14 @@
  */
 package org.dspace.app.util;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.dspace.core.ConfigurationManager;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
 
 import org.dspace.content.MetadataSchema;
 
@@ -68,6 +73,12 @@ public class DCInput
     /** allowed document types */
     private List<String> typeBind = null;
 
+    /**
+     * Negation of all the typeBind document allowed expression. By default, is FALSE.
+     */
+    
+    private boolean negateTypeBind = false;
+    
     /** 
      * The scope of the input sets, this restricts hidden metadata fields from 
      * view during workflow processing. 
@@ -126,9 +137,17 @@ public class DCInput
         typeBind = new ArrayList<String>();
         String typeBindDef = fieldMap.get("type-bind");
         if(typeBindDef != null && typeBindDef.trim().length() > 0) {
+        	
+        	if(typeBindDef.startsWith("!")){
+        		//Negates all the typeBind definition
+        		negateTypeBind = true;
+        		typeBindDef = typeBindDef.substring(1);
+        		}
+        	
         	String[] types = typeBindDef.split(",");
         	for(String type : types) {
-        		typeBind.add( type.trim() );
+        		//Depurate the string, normalizing UNICODE symbols to the NFD Form and replacing all UNICODE chars that are not in ASCII range. 
+        		typeBind.add( Normalizer.normalize(type.trim(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", ""));
         	}
         }
         
@@ -399,7 +418,21 @@ public class DCInput
 		if(typeBind.size() == 0)
 			return true;
 		
-		return typeBind.contains(typeName);
+		//checks if the pattern must considerate the CASE_SENSITIVE option 
+		boolean is_case_sensitive = ConfigurationManager.getBooleanProperty("inputforms.field.typebind.case_sensitive", false);
+		
+		for(int i=0;i<typeBind.size();i++){
+			//build a regular expression
+			String regex = ".*" + typeBind.get(i).replaceAll(" ", "") + ".*";
+		
+			Pattern pattern = (!is_case_sensitive)? Pattern.compile(regex, Pattern.CASE_INSENSITIVE):Pattern.compile(regex);
+			//The regex match the expression?
+			Matcher matcher = pattern.matcher(typeName);
+			if (matcher.find()) 
+				return (negateTypeBind)? false : true;
+		}
+		//If there is a type denied, and this input does not match with any denied type, then returns "true".
+		return (negateTypeBind || false);
 	}
 	
 }

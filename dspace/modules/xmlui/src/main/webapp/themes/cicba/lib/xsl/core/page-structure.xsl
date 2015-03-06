@@ -171,45 +171,7 @@
 			<xsl:text>';</xsl:text>
 		</script>
 		
-		<!-- When on submission process, disable buttons on submission -->
-		<!-- Update an input-forms, if exists a dc.type metadata, every time this 
-			element change its value. -->
-		<xsl:if test="dri:body/dri:div[contains(@rend,'primary submission')]">
-			<script type="text/javascript">
-				$(function() {
-
-				$('form.submission').submit(function() {
-				if($(this).data("submitted") === true)
-				return false;
-				else
-				$(this).data("submitted", true);
-				});
-
-				/* Variable que guarda el valor del select para chequear si hay que
-				disparar el alert() o no */
-				var dcTypeElement = $('form.submission select[name="dc_type"]');
-				var oldTypeValue = dcTypeElement.val();
-				$('form.submission select[name="dc_type"]').change(function() {
-				var permitirSubmit = false;
-				if(oldTypeValue == "")
-				permitirSubmit = true;
-				else
-				permitirSubmit = confirm("¿Está seguro que desea cambiar el tipo de documento?");
-
-				if(permitirSubmit) {
-				/* Limpiamos el subtype para evitar que quede inconsistente */
-				$('form.submission select[name="sedici_subtype"]').val("");
-				$('form.submission').submit();
-				} else {
-				dcTypeElement.val(oldTypeValue);
-				}
-				});
-
-				});
-			</script>
-		</xsl:if>
-			
-	        <script type="text/javascript">
+	    <script type="text/javascript">
 	        <xsl:text disable-output-escaping="yes">
 	        (function ($) {
 			    /**
@@ -238,7 +200,51 @@
 			
 			
 			</xsl:text>
-	        </script>
+	    </script>
+	    
+		<!-- Update an input-forms, if exists a dc.type metadata, every time this 
+			element change its value. -->
+		<xsl:if test="dri:body/dri:div[contains(@rend,'primary submission')]">
+		<script type="text/javascript">
+			//Hacemos el dc.type field como sólo readonly
+            $('#aspect_submission_StepTransformer_field_dc_type').prop("readonly",true);
+    
+            $('form.submission').submit(function() {
+              if($(this).data("submitted") === true)
+                return false;
+              else
+                $(this).data("submitted", true);
+              });
+    
+    		//Variable que permite detectar el cambio de tipología seleccionada
+            var oldTypeValue = $('#aspect_submission_StepTransformer_field_dc_type').val();
+            
+            
+            //Esto permite que se despliegue automáticamente todas las opciones con sólo hacer click
+            $('#aspect_submission_StepTransformer_field_dc_type').click(function(){
+              ($(this).autocomplete("option","minLength") != 0)? $(this).autocomplete( "option", "minLength" , 0) : null; 
+              $(this).autocomplete( "search", "" );
+            });
+            
+            
+            $('#aspect_submission_StepTransformer_field_dc_type').on("autocompleteclose", function(event, ui){
+              var permitirSubmit = false;
+              if(oldTypeValue == "")
+                permitirSubmit = true;
+              else
+                permitirSubmit = (oldTypeValue == $(this).val())? false : confirm("¿Está seguro que desea cambiar el tipo de documento?");
+              if(permitirSubmit) {
+                //Realizamos el submit de la página en caso de seleccionar una nueva tipología
+                oldTypeValue = $(this).val();
+                $('form.submission').submit();
+              } else {
+                //En caso de que no haya que cambiar el tipo, se lo vuelve a su valor original 
+                $(this).val(oldTypeValue);
+              }
+            });
+            
+			</script>
+		</xsl:if>
 	</xsl:template>
 
 

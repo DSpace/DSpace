@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<node id="cic:types" label="">
+<isComposedBy>
+		<node id="cic:types/articulo/documentoDeTrabajo" label="Documento de trabajo"/>
+		<node id="cic:types/articulo/articulo" label="Artículo"/>
+		<node id="cic:types/articulo/comunicación" label="Comunicacion"/>
+		<node id="cic:types/articulo/revision" label="Revisión"/>
+		<node id="cic:types/articulo/contribucionARevista" label="Contribucion a revista"/>
+		<node id="cic:types/articulo/informeTecnico" label="Informe técnico"/>
+		<node id="cic:types/informeCientifico/informeDeInvestigador" label="Informe de investigador"/>
+		<node id="cic:types/informeCientifico/informeDeBecario" label="Informe de becario"/>
+		<node id="cic:types/informeCientifico/informeDePersonalDeApoyo" label="Informe de personal de apoyo"/>
+		<node id="cic:types/tesis/tesisDeDoctorado" label="Tesis de doctorado"/>
+		<node id="cic:types/tesis/tesisDeMaestria" label="Tesis de maestría"/>
+		<node id="cic:types/tesis/trabajoDeEspecializacion" label="Trabajo de especializacion"/>
+		<node id="cic:types/tesis/tesisDeGrado" label="Tesis de grado"/>
+		<node id="cic:types/tesis/trabajoFinalDeGrado" label="Trabajo final de Grado"/>
+		<node id="cic:types/libro/libro" label="Libro"/>
+		<node id="cic:types/libro/parteDeLibro" label="Parte de libro"/>
+		<node id="cic:types/objetoDeConferencia/documentoDeConferencia" label="Documento de conferencia"/>
+		<node id="cic:types/documentoInstitucional/resolucion" label="Resolucion"/>
+		<node id="cic:types/documentoInstitucional/actasDeDirectorio" label="Actas de directorio"/>
+		<node id="cic:types/documentoInstitucional/legislacion" label="Legislación"/>
+		<node id="cic:types/documentoInstitucional/convenio" label="Convenio"/>
+		<node id="cic:types/imagen/fotografia" label="Fotografía"/>
+		<node id="cic:types/audio/audio" label="Audio"/>
+		<node id="cic:types/objetoDeAprendizaje/objetoDeAprendizaje" label="Objeto de Aprendizaje"/>
+</isComposedBy>
+</node>

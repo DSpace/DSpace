@@ -47,6 +47,7 @@ import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.Choices;
+import org.dspace.core.ConfigurationManager;
 
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
@@ -186,11 +187,19 @@ public class DescribeStep extends AbstractSubmissionStep
 
                 // Fetch the document type (dc.type)
                 String documentType = "";
-                if( (item.getMetadataByMetadataString("dc.type") != null) && (item.getMetadataByMetadataString("dc.type").length >0) )
+                boolean useAuthority = ConfigurationManager.getBooleanProperty("inputforms.field.typebind.use_authority",false);
+                Metadatum[] mtd = item.getMetadataByMetadataString("dc.type");
+                if( (mtd != null) && (mtd.length >0) )
                 {
-                    documentType = item.getMetadataByMetadataString("dc.type")[0].value;
+                	if(useAuthority)
+                	{
+                		documentType = mtd[0].authority;
+                	}
+                	else{
+                	
+	                    documentType = mtd[0].value;
+	                }
                 }
-                
                 // Iterate over all inputs and add it to the form.
                 for(DCInput dcInput : inputs)
                 {
