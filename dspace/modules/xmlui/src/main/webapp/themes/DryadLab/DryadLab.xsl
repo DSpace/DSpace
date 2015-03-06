@@ -593,14 +593,14 @@
 -->
         <div id="ds_connect_with_dryad" class="ds-static-div primary" style="font-size: 14px;">
             <p style="margin-bottom: 0;">
-                Learn more about:
+                <strong>Learn more</strong>
             </p>
             <ul style="list-style: none; margin-left: 1em;">
-                <li><a href="/pages/aboutDryadLab">DryadLab basics</a></li>
+                <li><a href="/pages/aboutDryadLab">About DryadLab</a></li>
                 <li><a href="/pages/dryadLabFAQ">Frequently asked questions</a></li>
-                <li><a href="/pages/dryadLabProcess">Module development process</a></li>
-                <li><a href="/pages/workWithDryadLab">Turning your data into a module</a></li>
-                <li><a href="/pages/introToDryad">Exploring the Dryad repository</a></li>
+                <li><a href="/pages/dryadLabProcess">Developing learning modules</a></li>
+                <li><a href="/pages/workWithDryadLab">Working with DryadLab</a></li>
+                <li><a href="/pages/introToDryad">Introduction to Dryad</a></li>
             </ul> 
         </div>      
 	  </div>
