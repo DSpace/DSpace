@@ -590,7 +590,6 @@
 <!--
         <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Be part of Dryad
         </h1>
--->
         <div id="ds_connect_with_dryad" class="ds-static-div primary" style="font-size: 14px;">
             <p style="margin-bottom: 0;">
                 <strong>Learn more</strong>
@@ -603,6 +602,7 @@
                 <li><a href="/pages/introToDryad">Introduction to Dryad</a></li>
             </ul> 
         </div>      
+-->
 	  </div>
     </xsl:template>
 

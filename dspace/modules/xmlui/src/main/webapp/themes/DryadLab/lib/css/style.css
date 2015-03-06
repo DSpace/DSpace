@@ -72,6 +72,7 @@ a:hover {
 
 #ds-header {
     background: url(../../images/dryadlab-image-ribbon.png) repeat-x -105px 10px;
+    border-bottom: 3px solid #bdb;
 }
 
 .ds-div-head img.feed-icon {
@@ -1460,7 +1461,15 @@ ul.horizontalVanilla li
 }
 
 #main-menu {
-    display: none;
+    /* display: none; */
+}
+#main-menu .sf-menu {
+clear: both;
+    margin-top: 4px;
+    margin-bottom: 0;
+}
+#main-menu .sf-menu * {
+    font-size: 14px;
 }
 
 .submitnowbutton,

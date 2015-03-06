@@ -92,7 +92,7 @@ ul.sf-menu li li li.sfHover ul {
     background:		transparent;
 }
 .sf-menu li.current {
-    background:		#87c033; /* #aaee66; */
+    background:	#bdb;	/* #87c033; */ /* #aaee66; */
 }
 .sf-menu li.current a {
     color: #fff;
@@ -102,34 +102,40 @@ ul.sf-menu li li li.sfHover ul {
     overflow: visible;
 }
 .sf-menu li ul {
-    border-left: 3px solid #87c033;
-    border-bottom: 3px solid #87c033;
-    border-right: 3px solid #87c033;
+    border-left: 3px solid #bdb; /* #87c033; */
+    border-bottom: 3px solid #bdb; /* #87c033; */
+    border-right: 3px solid #bdb; /* #87c033; */
     overflow: visible;
+/*
     -webkit-border-bottom-left-radius: 8px;
     -webkit-border-bottom-right-radius: 8px;
     -moz-border-radius-bottomleft: 8px;
     -moz-border-radius-bottomright: 8px;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
+*/
 }
 .sf-menu li li li {
     background:		#fff;
 }
 .sf-menu li:hover, .sf-menu li.sfHover,
 .sf-menu a:focus, .sf-menu a:hover, .sf-menu a:active {
-    background:		#87c033; /* #aaee66; */
-    color: #fff !important;
+    background:	#bdb;	/* #87c033; */ /* #aaee66; */
     outline:		0;
+/*
+    color: #fff !important;
     -webkit-border-top-left-radius: 8px;
     -webkit-border-top-right-radius: 8px;
     -moz-border-radius-topleft: 8px;
     -moz-border-radius-topright: 8px;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
+*/
 }
 .sf-menu li.sfHover > a {
+/*
     color: #fff !important;
+*/
 }
 .sf-menu li li:hover, .sf-menu li li.sfHover,
 .sf-menu li li a:focus, .sf-menu li li a:hover, .sf-menu li li a:active {

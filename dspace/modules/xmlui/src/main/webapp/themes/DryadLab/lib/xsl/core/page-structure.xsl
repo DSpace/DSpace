@@ -424,160 +424,26 @@ references to stylesheets pulled directly from the pageMeta element. -->
                     </xsl:if>
                     <ul class="sf-menu">
                         <li>
-                            <a href="">About</a>
-                            <ul>
-                                <li>
-                                    <a href="/pages/repository">Repository features and technology</a>
-                                </li>
-                                <li>
-                                    <a href="/pages/organization">The organization</a>
-                                </li>
-                                <li>
-                                    <a href="http://blog.datadryad.org" target="_blank">Blog: News and views</a>
-                                </li>
-                                <li>
-                                    <a href="/pages/aboutDryadLab" target="_blank">DryadLab: Research data for educators</a>
-                                </li>
-                                <li>
-                                    <a href="/pages/whoWeAre">Who we are</a>
-                                </li>
-                                <li>
-                                    <a href="/pages/employment">Employment Opportunities</a>
-                                </li>
-                                <li>
-                                  <a href="/pages/faq">Frequently asked questions</a>
-                                </li>
-                            </ul>
+				<a href="/pages/dryadlab">Home</a>
                         </li>
                         <li>
-                            <a href="">For researchers</a>
-                            <ul>
-                                <li>
-                                  <a href="/pages/faq#depositing">Submit data</a>
-                                </li>
-                                <li>
-                                  <a href="/pages/faq#using">Use data</a>
-                                </li>
-                                <li>
-                                  <a href="/pages/integratedJournals">Look up your journal</a>
-                                </li>
-                                <li>
-                                    <a href="/pages/workWithDryadLab" target="_blank">Educational outreach with DryadLab</a>
-                                </li>
-                                <li>
-                                  <a href="/pages/institutionalSponsors">Institutional sponsors</a>
-                                </li>
-                                <li>
-                                    <a href="/pages/policies">Terms of service</a>
-                                </li>                            
-                            </ul>
+				<a href="/pages/aboutDryadLab">About</a>
                         </li>
                         <li>
-                            <a href="">For organizations</a>
-                            <ul>
-                                <li>
-                                    <a href="/pages/journalIntegration">Journal integration</a>
-                                </li>                            
-                                <li>
-                                    <a href="/pages/membershipOverview">Membership</a>
-                                </li>                            
-                                <li>
-                                    <a href="/pages/pricing">Pricing plans</a>
-                                </li>                            
-                            </ul>
+				<a href="/pages/dryadLabFAQ">FAQ</a>
+                        </li>
+                        <li>
+				<a href="/pages/dryadLabProcess">Developing learning modules</a>
+                        </li>
+                        <li>
+				<a href="/pages/workWithDryadLab">Working with DryadLab</a>
+                        </li>
+                        <li>
+				<a href="/pages/introToDryad">Introduction to Dryad</a>
                         </li>
                         <li>
                             <a href="/feedback">Contact us</a>
                         </li>
-
-
-
-
-
-                        <xsl:choose>
-                            <xsl:when test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
-                                <li>
-                                    <a>
-                                        <xsl:attribute name="href">
-                                            <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
-                                        dri:metadata[@element='identifier' and @qualifier='url']"/>
-                                        </xsl:attribute>
-                                        <i18n:text>xmlui.dri2xhtml.structural.profile</i18n:text>
-                                        <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
-                                    dri:metadata[@element='identifier' and @qualifier='firstName']"/>
-                                        <xsl:text> </xsl:text>
-                                        <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
-                                    dri:metadata[@element='identifier' and @qualifier='lastName']"/>
-                                    </a>
-
-                                    <ul>
-                                        <!--remove the extra login link-->
-                                        <xsl:apply-templates select="/dri:document/dri:options/dri:list[@n='account']/dri:item" mode="menu"/>
-
-                                        <xsl:if test="/dri:document/dri:options/dri:list[@n='context']/*">
-                                            <xsl:for-each select="/dri:document/dri:options/dri:list[@n='context']/dri:item">
-                                                <xsl:choose>
-                                                    <xsl:when test="position()=1">
-                                                        <li class="menu-border">
-                                                            <xsl:apply-templates select="." mode="menu"/>
-                                                        </li>
-                                                    </xsl:when>
-                                                    <xsl:otherwise>
-                                                        <li>
-                                                            <xsl:apply-templates select="." mode="menu"/>
-                                                        </li>
-                                                    </xsl:otherwise>
-                                                </xsl:choose>
-
-                                            </xsl:for-each>
-                                        </xsl:if>
-
-                                        <xsl:if test="/dri:document/dri:options/dri:list[@n='administrative']/*">
-                                            <xsl:for-each select="/dri:document/dri:options/dri:list[@n='administrative']/dri:item">
-                                                <xsl:choose>
-                                                    <xsl:when test="position()=1">
-                                                        <li class="menu-border">
-                                                            <xsl:apply-templates select ="*"/>
-                                                        </li>
-                                                    </xsl:when>
-                                                    <xsl:otherwise>
-                                                        <li>
-                                                            <xsl:apply-templates select ="*"/>
-                                                        </li>
-                                                    </xsl:otherwise>
-                                                </xsl:choose>
-
-                                            </xsl:for-each>
-
-                                            <xsl:for-each select="/dri:document/dri:options/dri:list[@n='administrative']/dri:list">
-                                                <li>
-                                                    <a href="#">
-                                                        <i18n:text><xsl:value-of select="dri:head"/></i18n:text>
-                                                    </a>
-                                                    <ul>
-                                                        <xsl:for-each select="dri:item">
-                                                            <li>
-                                                                <xsl:apply-templates select="*"/>
-                                                            </li>
-                                                        </xsl:for-each>
-                                                    </ul>
-                                                </li>
-                                            </xsl:for-each>
-                                        </xsl:if>
-                                    </ul>
-
-                                </li>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <li class="no-hover-highlight">
-                                    <a href="/login">
-                                        <span id="login-item">Log in</span>
-                                        <span class="accessibly-hidden"> or </span>
-                                        <span id="sign-up-item">Sign up</span>
-                                    </a>
-                                </li>
-                            </xsl:otherwise>
-                        </xsl:choose>
                     </ul>
                 </div>
             </div>
