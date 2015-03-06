@@ -243,6 +243,7 @@ public final class ImportJournal2Authority {
                     aConcept.setLastModified(date);
                     aConcept.setCreated(date);
                     aConcept.setLang("en");
+                    aConcept.setStatus(Concept.Status.ACCEPTED);
                     aConcept.setTopConcept(true);
                     aConcept.setSource("LOCAL-DryadJournal");
 

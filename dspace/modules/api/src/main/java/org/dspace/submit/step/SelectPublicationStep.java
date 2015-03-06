@@ -5,6 +5,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.log4j.Logger;
 import org.dspace.JournalUtils;
 import org.dspace.content.*;
+import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.Concept;
 import org.dspace.content.authority.Scheme;
 import org.dspace.content.crosswalk.IngestionCrosswalk;
@@ -455,7 +456,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
                 log.debug("adding journal title to item: " + title);
                 addEmailsAndEmbargoSettings(journalConcept, item);
-                item.addMetadata("prism", "publicationName", null, null, title, journalConcept.getIdentifier(),1000);
+                item.addMetadata("prism", "publicationName", null, null, title, journalConcept.getIdentifier(), Choices.CF_ACCEPTED);
                 item.update();
             }
             else {
