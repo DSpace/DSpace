@@ -90,7 +90,7 @@ collections / items / and bitstreams.
                     <map:serialize type="xml"/>
             </map:match>
 
-            <map:match pattern="page/*">
+            <map:match pattern="pages/*">
                 <map:transform type="StaticPage"/>
                 <map:serialize type="xml"/>
             </map:match>
