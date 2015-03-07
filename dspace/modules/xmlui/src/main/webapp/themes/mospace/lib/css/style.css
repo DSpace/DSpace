@@ -1402,7 +1402,6 @@ div#ms-navigation {
         left: 50%;
         margin: 0;
         width: 466px;
-        font-weight: bold;
         text-align: right;
         z-index: 20;
 }
@@ -1411,11 +1410,11 @@ ul#ms-navigation-list li.ms-navigation-link {
         list-style: none;
         display: inline;
         margin-left:0px;
-        color: #999999;
+        color: #1F3F5E;
 }
 
 ul#ms-navigation-list li.ms-navigation-link a:link, ul#ms-navigation-list li.ms-navigation-link a:visited {
-        color: #999999;
+        color: #1F3F5E;
         /*text-decoration: none;*/
 }
 
