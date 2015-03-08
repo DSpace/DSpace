@@ -916,22 +916,22 @@ public class ItemsResource extends Resource
      * Find items by one metadada field.
      * 
      * @param metadataEntry
-     *            Metadata field by which will be searched.
+     *            Metadata field to search by.
      * @param scheme
      *            Scheme of metadata(key).
      * @param value
      *            Value of metadata field.
      * @param headers
-     *            If you want to access to item under logged user into context.
-     *            In headers must be set header "rest-dspace-token" with passed
-     *            token from login method.
-     * @return Return array of founded items.
+     *            If you want to access the item as the user logged into context,
+     *            header "rest-dspace-token" must be set to token value retrieved
+     *            from the login method.
+     * @return Return array of found items.
      * @throws WebApplicationException
-     *             It can be thrown: SQLException, when was problem with
-     *             database reading. AuthorizeException. when was problem with
-     *             authorization to item. IOException when was problem with
-     *             reading from metadata field. ContextException, when was
-     *             problem with creating context of DSpace.
+     *             Can be thrown: SQLException - problem with
+     *             database reading. AuthorizeException - problem with
+     *             authorization to item. IOException - problem with
+     *             reading from metadata field. ContextException -
+     *             problem with creating DSpace context.
      */
     @POST
     @Path("/find-by-metadata-field")
@@ -981,7 +981,7 @@ public class ItemsResource extends Resource
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
 
-            String sql = "SELECT ITEM_ID, TEXT_VALUE, TEXT_LANG, SHORT_ID, ELEMENT, QUALIFIER " +
+            String sql = "SELECT RESOURCE_ID, TEXT_VALUE, TEXT_LANG, SHORT_ID, ELEMENT, QUALIFIER " +
                     "FROM METADATAVALUE " +
                     "JOIN METADATAFIELDREGISTRY ON METADATAVALUE.METADATA_FIELD_ID = METADATAFIELDREGISTRY.METADATA_FIELD_ID " +
                     "JOIN METADATASCHEMAREGISTRY ON METADATAFIELDREGISTRY.METADATA_SCHEMA_ID = METADATASCHEMAREGISTRY.METADATA_SCHEMA_ID " +
@@ -992,7 +992,14 @@ public class ItemsResource extends Resource
             {
                 sql += "QUALIFIER='" + metadata[2] + "' AND ";
             }
-            sql += "dbms_lob.substr(TEXT_VALUE, 40)='" + metadataEntry.getValue() + "' AND ";
+            if (org.dspace.storage.rdbms.DatabaseManager.isOracle())
+            {
+                sql += "dbms_lob.compare(TEXT_VALUE, '" + metadataEntry.getValue() + "') = 0 AND ";
+            }
+            else
+            {
+                sql += "TEXT_VALUE='" + metadataEntry.getValue() + "' AND ";
+            }
             if (metadataEntry.getLanguage() != null)
             {
                 sql += "TEXT_LANG='" + metadataEntry.getLanguage() + "'";
@@ -1006,7 +1013,7 @@ public class ItemsResource extends Resource
             while (iterator.hasNext())
             {
                 TableRow row = iterator.next();
-                org.dspace.content.Item dspaceItem = this.findItem(context, row.getIntColumn("ITEM_ID"),
+                org.dspace.content.Item dspaceItem = this.findItem(context, row.getIntColumn("RESOURCE_ID"),
                         org.dspace.core.Constants.READ);
                 Item item = new Item(dspaceItem, "", context);
                 writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers,
@@ -1019,7 +1026,7 @@ public class ItemsResource extends Resource
         }
         catch (SQLException e)
         {
-            processException("Something get wrong while finding item. SQLException, Message: " + e, context);
+            processException("Something went wrong while finding item. SQLException, Message: " + e, context);
         }
         catch (ContextException e)
         {
