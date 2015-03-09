@@ -292,6 +292,8 @@
     {
         boolean item_history_view_admin = ConfigurationManager
                 .getBooleanProperty("versioning", "item.history.view.admin");
+        boolean item_history_include_submitter = ConfigurationManager
+                .getBooleanProperty("versioning", "item.history.include.submitter", false);
         if(!item_history_view_admin || admin_button) {         
 %>
 	<div id="versionHistory" class="panel panel-info">
@@ -302,8 +304,11 @@
 			<th id="tt1" class="oddRowEvenCol"><fmt:message key="jsp.version.history.column1"/></th>
 			<th 			
 				id="tt2" class="oddRowOddCol"><fmt:message key="jsp.version.history.column2"/></th>
-			<th 
-				 id="tt3" class="oddRowEvenCol"><fmt:message key="jsp.version.history.column3"/></th>
+            <%-- Add Information about submitter only for admins or if item.history.include.submitter is true --%>
+            <% if (item_history_include_submitter || admin_button) { %>
+    			<th 
+	    			 id="tt3" class="oddRowEvenCol"><fmt:message key="jsp.version.history.column3"/></th>
+            <% } %>
 			<th 
 				
 				id="tt4" class="oddRowOddCol"><fmt:message key="jsp.version.history.column4"/></th>
@@ -319,8 +324,13 @@
 		<tr>			
 			<td headers="tt1" class="oddRowEvenCol"><%= versRow.getVersionNumber() %></td>
 			<td headers="tt2" class="oddRowOddCol"><a href="<%= request.getContextPath() + identifierPath[0] %>"><%= identifierPath[1] %></a><%= item.getID().equals(versRow.getItem().getID())?"<span class=\"glyphicon glyphicon-asterisk\"></span>":""%></td>
-			<td headers="tt3" class="oddRowEvenCol"><% if(admin_button) { %><a
-				href="mailto:<%= versRowPerson.getEmail() %>"><%=versRowPerson.getFullName() %></a><% } else { %><%=versRowPerson.getFullName() %><% } %></td>
+                        <% if(admin_button) { %> 
+                            <td headers="tt3" class="oddRowEvenCol"><a
+                               href="mailto:<%= versRowPerson.getEmail() %>"><%=versRowPerson.getFullName() %></a> </td>
+                        <% } 
+                        else if(item_history_include_submitter) { %>
+                            <td headers="tt3" class="oddRowEvenCol"> <%=versRowPerson.getFullName() %> </td>
+                        <% }%>
 			<td headers="tt4" class="oddRowOddCol"><%= versRow.getVersionDate() %></td>
 			<td headers="tt5" class="oddRowEvenCol"><%= versRow.getSummary() %></td>
 		</tr>
