@@ -14,7 +14,7 @@ import java.util.Map.Entry;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-public class PagesMembershipOverviewTest extends PagesBaseTest {
+public class PagesMembershipOverviewTest extends PagesBase {
 
     private final static String jsonDataPath = "/static/json/membership-form.json";
     private final static String membershipOverviewPage = "/pages/membershipOverview";
@@ -23,11 +23,6 @@ public class PagesMembershipOverviewTest extends PagesBaseTest {
     );
     private static final String defaultCurrency = "USD";
     private static final ObjectMapper mapper = new ObjectMapper();
-
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-    }
 
     // make sure data file can be retrieved and has expected currencies
     public void testJsonAvailable() throws Exception {

@@ -14,7 +14,7 @@ import java.util.Map.Entry;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-public class PagesPaymentTest extends PagesBaseTest {
+public class PagesPaymentTest extends PagesBase {
 
     private final static String jsonDataPath = "/static/json/payment-plan.json";
     private final static String paymentPage = "/pages/payment";
@@ -29,11 +29,6 @@ public class PagesPaymentTest extends PagesBaseTest {
         ,"msg-nonMemberDPC_subscription" ,"msg-DPC_pay_on_submission"
         ,"msg-excessDataStorageFee_first_GB" ,"msg-excessDataStorageFee_per_additional_GB"
     );
-
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-    }
 
     // make sure data file can be retrieved and has expected currencies
     public void testJsonAvailable() throws Exception {

@@ -6,13 +6,15 @@
 package test;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
@@ -26,11 +28,13 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.safari.SafariDriver;
 
+
 /**
  *
- * @author rnathanday
+ * @author Nathan Day
  */
-public class PagesBaseTest extends TestCase {
+@Ignore
+public class PagesBase extends TestCase {
     
     protected WebDriver driver;
     protected String baseUrl;
@@ -41,7 +45,7 @@ public class PagesBaseTest extends TestCase {
     protected final int waitSleepInterval = 1000;
     protected final int maxWaitSeconds = 10;
 
-    // this is a @Before method
+    @Before
     public void setUp() throws Exception {
         if ("Chrome".equals(System.getProperty("selenium_test_browser"))) {
             driver = new ChromeDriver();
@@ -69,21 +73,21 @@ public class PagesBaseTest extends TestCase {
         driver.manage().timeouts().implicitlyWait(maxWaitSeconds, TimeUnit.SECONDS);
     }
 
+    @After
+    public void tearDown() throws Exception {
+        driver.quit();
+        String verificationErrorString = verificationErrors.toString();
+        if (!"".equals(verificationErrorString)) {
+          fail(verificationErrorString);
+        }
+    }
+
     // NOTE: this key sequence is for OSX
     protected void openConsole() {
         if (driver instanceof org.openqa.selenium.firefox.FirefoxDriver) {
             driver.findElement(By.tagName("html")).sendKeys(Keys.chord(Keys.COMMAND, Keys.SHIFT, "j"));
         } else if (driver instanceof org.openqa.selenium.chrome.ChromeDriver) {
             driver.findElement(By.tagName("html")).sendKeys(Keys.chord(Keys.COMMAND, Keys.ALT, "j"));
-        }
-    }
-
-    // this is an @After method
-    public void tearDown() throws Exception {
-        driver.quit();
-        String verificationErrorString = verificationErrors.toString();
-        if (!"".equals(verificationErrorString)) {
-          fail(verificationErrorString);
         }
     }
 
@@ -109,14 +113,17 @@ public class PagesBaseTest extends TestCase {
     protected void waitOnXpathsPresent(List<String> xpaths) throws InterruptedException {
       // wait for form submission to complete
         for (int second = 0;; second++) {
-            boolean done = true;
-            if (second >= ajaxWaitSeconds) fail("timeout");
-            for (String xpath : xpaths)
-                done = done && isElementPresent(By.xpath(xpath));
-            if (done) break;
+            if (second >= ajaxWaitSeconds) fail("timeout");            
+            if (xpathsPresent(xpaths)) break;
             sleepMS(waitSleepInterval);
         }
     }
+
+    protected boolean xpathsPresent(List<String> xpaths) throws InterruptedException {
+        for (String xpath : xpaths)
+            if (!isElementPresent(By.xpath(xpath))) return false;
+        return true;
+    } 
     
     // put the current thread to sleep for n ms.
     protected void sleepMS(long n) {

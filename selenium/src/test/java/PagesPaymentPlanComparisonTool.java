@@ -10,11 +10,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.junit.Ignore;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-public class PagesPaymentPlanComparisonTool extends PagesBaseTest {
+public class PagesPaymentPlanComparisonTool extends PagesBase {
 
     private final static String jsonDataPath = "/static/json/payment-calculator.json";
     private final static String paymentPlanComparisonToolPage = "/pages/paymentPlanComparisonTool";
@@ -44,7 +45,7 @@ public class PagesPaymentPlanComparisonTool extends PagesBaseTest {
         assertTrue(membershipData.keySet().containsAll(plans));
     }
 
-    // test 
+    @Ignore
     public class PageResult {
         public String articlesPerYear;
         public String percentageWithDeposits;
