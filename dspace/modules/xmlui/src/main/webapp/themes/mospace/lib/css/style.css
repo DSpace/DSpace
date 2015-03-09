@@ -83,6 +83,11 @@ select.multiple {
     right: 0;
     top: 17px;
     position: absolute;
+    left: 50%;
+    margin: 0;
+    width: 466px;
+    text-align: right;
+    z-index: 21;
     color: white;
 }
 
@@ -206,7 +211,7 @@ select.multiple {
 #ds-body {
     float: right;
     width: 675px;
-    padding-top: 10px;
+    padding-top: 30px;
 }
 
 #ds-options-wrapper {
@@ -1398,7 +1403,7 @@ table.discovery-filters th.new-filter-header
 
 div#ms-navigation {
         position: absolute;
-        top: 76px;
+        top: 100px;
         left: 50%;
         margin: 0;
         width: 466px;
