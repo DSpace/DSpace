@@ -427,22 +427,25 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             <a href="">About</a>
                             <ul>
                                 <li>
-                                    <a href="/pages/repository">Repository features and technology</a>
+                                    <a href="/pages/organization">The organization</a>
                                 </li>
                                 <li>
-                                    <a href="/pages/organization">The organization</a>
+                                    <a href="/pages/ourTeam">Our team</a>
+                                </li>
+                                <li>
+                                    <a href="/pages/repository">Repository features and technology</a>
                                 </li>
                                 <li>
                                     <a href="http://blog.datadryad.org" target="_blank">Blog: News and views</a>
                                 </li>
                                 <li>
-                                    <a href="/pages/whoWeAre">Who we are</a>
+                                    <a href="/pages/employment">Employment opportunities</a>
                                 </li>
                                 <li>
-                                    <a href="/pages/employment">Employment Opportunities</a>
+                                    <a href="/pages/membershipMeeting">Membership meeting</a>
                                 </li>
                                 <li>
-                                  <a href="/pages/faq">Frequently asked questions</a>
+                                  <a href="/pages/faq">FAQs</a>
                                 </li>
                             </ul>
                         </li>
@@ -450,13 +453,16 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             <a href="">For researchers</a>
                             <ul>
                                 <li>
-                                  <a href="/pages/faq#depositing">Submit data</a>
+                                  <a href="/handle/10255/3/submit">Submit data</a>
                                 </li>
                                 <li>
-                                  <a href="/pages/faq#using">Use data</a>
+                                  <a href="/discover?query=&amp;submit=Search#advanced">Use data</a>
                                 </li>
                                 <li>
-                                  <a href="/pages/integratedJournals">Look up your journal</a>
+                                  <a href="/pages/journalLookup">Look up your journal</a>
+                                </li>
+                                <li>
+                                  <a href="/pages/faq">FAQs</a>
                                 </li>
                                 <li>
                                   <a href="/pages/institutionalSponsors">Institutional sponsors</a>
@@ -470,14 +476,20 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             <a href="">For organizations</a>
                             <ul>
                                 <li>
-                                    <a href="/pages/journalIntegration">Journal integration</a>
+                                    <a href="/pages/submissionIntegration">Submission integration</a>
                                 </li>                            
                                 <li>
                                     <a href="/pages/membershipOverview">Membership</a>
                                 </li>                            
                                 <li>
-                                    <a href="/pages/pricing">Pricing plans</a>
-                                </li>                            
+                                    <a href="/pages/payment">Payment plans</a>
+                                </li> 
+                                <li>
+                                    <a href="/pages/paymentPlanComparisonTool">Payment plan comparison tool</a>
+                                </li>    
+                                <li>
+                                    <a href="/pages/membershipMeeting">Membership meeting</a>
+                                </li>                         
                             </ul>
                         </li>
                         <li>

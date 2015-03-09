@@ -240,7 +240,7 @@
                     <!-- REMINDER: slide publication dates are in the format YEAR-MONTH-DAY, eg, 2013-12-28 -->
                     <div class="bxslider" style="">
                         <div><span class="publication-date">2013-03-01</span>
-                            <a href="/pages/pricing">
+                            <a href="/pages/payment">
                                 <img alt="" src="/themes/Mirage/images/watering-can.png" />
                                 <p style="width: 450px; color: #363; font-size: 90%; top: 0px; right: 10px; line-height: 1.2em; position: absolute; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);"> 
                                     Data Publishing Charges help sustain open data at Dryad
@@ -330,14 +330,14 @@
                             funders, and other stakeholder organizations are
                             invited to become <a href="/pages/membershipOverview">members</a>.
                             Tap into an active knowledge-sharing network,
-                            receive discounts on submission fees, and help
+                            receive discounts on data publishing fees, and help
                             shape Dryad's future.
                             <img src="/themes/Mirage/images/seed-3.png" style="float: right; margin-right: -8px;" 
                                  alt="Researchers use Dryad data in their new work."
                                  title="Researchers use Dryad data in their new work."/>
                         </p>
                         <p>
-                            <a href="/pages/journalIntegration">Submission integration</a> 
+                            <a href="/pages/submissionIntegration">Submission integration</a> 
                             is a free service that allows publishers to
                             coordinate manuscript and data submissions.
                             It makes submitting data easy for researchers; makes linking
@@ -348,8 +348,8 @@
                             <img src="/themes/Mirage/images/seed-1.png" style="float: left; margin-left: -8px;" 
                                  alt="New data is added to Dryad, and the cycle continues."
                                  title="New data is added to Dryad, and the cycle continues."/>
-                            Submission fees support the cost of keeping Dryad's content free to use.
-                            Flexible <a href="/pages/pricing">pricing plans</a> 
+                            Data Publishing Charges (DPCs) support the cost of keeping Dryad's content free to use.
+                            Flexible <a href="/pages/payment">payment plans</a> 
                             provide volume discounts.
                         </p>
                     </div>
@@ -363,8 +363,8 @@
                     <a href="#recently-published-data"><span>Recently published</span></a>
 
                     <a href="#most-viewed-data"><span>Popular</span></a>
-                    <a id="by_author" href="#by-author"><span>By Author</span></a>
-                    <a id="by_journal" href="#by-journal"><span>By Journal</span></a>
+                    <a id="by_author" href="#by-author"><span>By author</span></a>
+                    <a id="by_journal" href="#by-journal"><span>By journal</span></a>
 
                 </div>
                 <div id="aspect_discovery_RecentlyAdded_div_Home" class="ds-static-div primary" style="height: 649px; overflow: auto;">
@@ -584,8 +584,8 @@
             </p>
             <ul style="list-style: none; margin-left: 1em;">
                 <li><a href="/pages/membershipOverview">Membership</a></li>
-                <li><a href="/pages/journalIntegration">Submission integration</a></li>
-                <li><a href="/pages/pricing">Pricing plans</a></li>
+                <li><a href="/pages/submissionIntegration">Submission integration</a></li>
+                <li><a href="/pages/payment">Payment plans</a></li>
             </ul> 
         </div>      
 	  </div>
@@ -644,7 +644,7 @@
     <xsl:template match="dri:options/dri:list[@n='DryadMail']" priority="3">
         <!-- START MAILING LIST-->
         <div class="home-col-2">
-            <h1 class="ds-div-head">Dryad Mailing List</h1>
+            <h1 class="ds-div-head">Dryad mailing list</h1>
             <div id="file_news_div_mailing_list" class="ds-static-div primary">
                 <p class="ds-paragraph">
                     <xsl:text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a nisi sit amet neque vehicula dignissim accumsan non erat. Pellentesque eu ligula a est hendrerit porta a non ligula. Quisque in orci nisl, eu dictum massa. Aenean vitae lorem et risus dapibus fringilla et sit amet nunc. Donec ac sem risus. Cras a magna sapien, vel facilisis lacus. Fusce sed blandit tellus. </xsl:text>
@@ -959,7 +959,7 @@ parameter that is being used (see variable defined above) -->
             </div>
         </li>
         <li class="ds-form-item">
-            <a id="advanced-search" href="#">Advanced Search</a>
+            <a id="advanced-search" href="#">Advanced search</a>
         </li>
     </xsl:template>
 
@@ -1065,14 +1065,19 @@ parameter that is being used (see variable defined above) -->
     </xsl:template-->
     <!--add hidden class to help text-->
     <xsl:template match="dri:help" mode="compositeComponent">
-        <span class="composite-help">
-            <xsl:if test="ancestor::dri:field[@rend='hidden']">
-                <xsl:attribute name="class">
-                    <xsl:text>hidden</xsl:text>
-                </xsl:attribute>
-            </xsl:if>
-            <xsl:apply-templates />
-        </span>
+        <xsl:choose>
+            <xsl:when test="ancestor::dri:div[@id='aspect.dryadfeedback.MembershipApplicationForm.div.membership-form']"/>
+            <xsl:otherwise>
+                <span class="composite-help">
+                    <xsl:if test="ancestor::dri:field[@rend='hidden']">
+                        <xsl:attribute name="class">
+                            <xsl:text>hidden</xsl:text>
+                        </xsl:attribute>
+                    </xsl:if>
+                    <xsl:apply-templates />
+                </span>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
     <xsl:template match="dri:help">
         <xsl:choose>

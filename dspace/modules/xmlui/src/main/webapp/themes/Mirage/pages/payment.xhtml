@@ -1,0 +1,130 @@
+<!--?xml version="1.0" encoding="UTF-8"?-->
+<!-- We have to comment out the DTD to run, but use it to validate when editing -->
+<!--
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+-->
+<html>
+ <head>
+  <title>Membership Overview</title>
+     <style type="text/css">
+         div#ds-body { margin: 0px 0px 0px 0px;padding-right: 10px; top: 165px;}
+     </style>
+ </head>
+ <body>
+  <div id="ds-body">
+    <h1 class="ds-div-head">Payment plans and Data Publishing Charges<a id="pricing">&#160;</a></h1>
+    <div class="ds-static-div primary">
+        <p>Dryad is a <strong>nonprofit</strong> organization that provides <strong>long-term access</strong> 
+        to its contents at <strong>no cost</strong> to researchers, educators or students, irrespective of 
+        nationality or institutional affiliation. Dryad is able to provide free access to data due to
+        financial support from members and data submitters.</p>
+    
+        <p>Dryad’s <strong>Data Publishing Charges (<abbr title="Data Publishing Charge">DPC</abbr>s)</strong> 
+        are designed to sustain its core functions by recovering the basic costs of curating and preserving 
+        data. New innovations are enabled by research and development grants and by support from donors.</p>
+           
+        <h2>For individuals</h2>
+        <p><a href="/pages/journalLookup">Look up your journal</a> and/or see our 
+        <a href="/pages/institutionalSponsors">list of institutional sponsors</a> to see if your DPC will be covered by 
+        a sponsor. If not sponsored, the base DPC for data from journals with integrated submission is 
+        <span class="msg-DPC_pay_on_submission">$80</span>. For 
+        data from non-integrated journals, an additional <span class="msg-excessDataStorageFee_per_additional_GB">$10</span>
+        will be charged to individual submitters, to cover added curation costs.</p>
+        
+        <p><strong>Waivers</strong> are granted upon request for submissions originating from researchers based in 
+        countries <a href="http://data.worldbank.org/about/country-classifications/country-and-lending-groups">classified 
+        by the World Bank as low-income or lower-middle-income economies</a>.</p>        
+        
+        <h3 id="excess-data-storage">Excess data storage</h3>        
+        <p>For data packages in excess of the 10 GB size limit, <span class="msg-excessDataStorageFee_first_GB">$15</span>
+        will be charged for the first GB and <span class="msg-excessDataStorageFee_per_additional_GB">$10</span> for 
+        each additional GB or part thereof, payable by the submitter.</p>
+
+        <h2>For organizations: Payment plans</h2>
+        <div style="float: right; margin-top:-24px;">
+            <span class="field-help" style="display: inline;">Show all amounts in </span>
+            <!-- TODO: refactor this to share code with 'MembershipApplicationForm' -->
+            <select id="displayed-currency" name="displayed-currency" class="ds-select-field">
+                <option value="USD">USD$</option>
+                <option value="GBP">GBP£</option>
+                <option value="CAD">CAD$</option>
+                <option value="EUR">EUR€</option>
+                <option value="AUD">AUD$</option>
+                <option value="JPY">JPY¥</option>
+            </select>
+        </div>
+        <p>Organizations (including publishers, scientific societies, libraries, funders, and others) can <strong>be a part of 
+            Dryad by <a href="/pages/membershipOverview#becomeAMember">becoming a member</a>, participating in a payment plan,
+            or both</strong>. Membership is open to any organization supporting the mission of Dryad. Members have a voice in 
+            the governance of Dryad, and Sustainer and Supporter-level members receive discounts on DPCs (see chart below).</p> 
+        <p>Organizations are encouraged to <strong>cover the costs of data publishing on behalf of their community of researchers</strong>.
+            For instance, a society or publisher may sponsor the DPCs for all the authors of its journals. To do this, 
+            Dryad offers a variety of flexible payment plans that provide for volume discounts.</p>
+        <p>Use our online <a href="/pages/paymentPlanComparisonTool">payment plan comparison tool</a> to compare the annual 
+            cost of Dryad's plan options.</p>
+        
+        <table class="pricing-table">
+          <thead>
+              <tr>
+                  <th>Payment Plan</th>
+                  <th>Sustainer/Supporter members</th>
+                  <th>All others</th>
+                  <th>Minimum purchase</th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr class="odd">
+                  <td class="plan-name">1. Voucher plan</td>
+                  <td><span class="msg-memberDPC_voucher">$65</span> per data package</td>
+                  <td><span class="msg-nonMemberDPC_voucher">$70</span> per data package</td>
+                  <td>25 vouchers</td>
+              </tr>
+              <tr>
+                  <td class="plan-name">2. Deferred payment plan</td>
+                  <td><span class="msg-memberDPC_deferred">$70</span> per data package</td>
+                  <td><span class="msg-nonMemberDPC_deferred">$75</span> per data package</td>
+                  <td>1 yr contract</td>
+              </tr>
+              <tr class="odd">
+                  <td class="plan-name">3. Subscription plan</td>
+                  <td>annual fee based on <span class="msg-memberDPC_subscription">$25</span> per published research article</td>
+                  <td>annual fee based on <span class="msg-nonMemberDPC_subscription">$30</span> per published research article</td>
+                  <td>2 yr contract</td>
+              </tr>
+          </tbody>
+      </table>
+
+      <h2 class="pricing-plan">Plan 1: Voucher Plan</h2>
+      <p>Organizations are invited to purchase a block of vouchers for future submissions. 
+      The minimum purchase is 25 vouchers. This plan is open to any organization and is a good 
+      option for funders or institutions. Vouchers can be used on any submission for any publication.</p>
+
+      <h2 class="pricing-plan">Plan 2: Deferred Payment</h2>
+      <p>Under the deferred payment plan, organizations are invoiced for DPCs for the number of packages 
+      submitted by your authors in the previous quarter. This plan is open to publishers, publishing societies 
+      and independent journals. Participants must enter into a contract of at least one year in duration and 
+      may cap the number of submissions for which they are charged.</p>
+
+      <h2 class="pricing-plan">Plan 3: Subscription</h2>
+      <p>A journal (or journals) with an active subscription may make an unlimited number of submissions for 
+      a fixed cost. This cost is calculated based on the total number of research articles published by the 
+      journal(s) in the prior year. The minimum contract duration is two years, which can start at any time.
+      <a href="/pages/submissionIntegration">Submission integration</a> is required for subscribing journals.</p>
+      
+      <p>Please contact <a href="mailto:director@datadryad.org">director@datadryad.org</a> to discuss which 
+      payment plan would be most suitable for your organization.</p>
+    </div>
+
+    <div class="page-license">
+      <p>
+        All text on this page is available under a 
+        <a href="http://creativecommons.org/licenses/by/3.0" target="_blank">CC-BY 3.0 license.
+          <img src="/themes/Dryad/images/cc-by.png" alt="CC-BY 3.0 icon"/>
+          <span class="accessibly-hidden">(opens in a new window)</span>
+        </a>             
+      </p>
+    </div>  
+    <div>Last revised: 2015-02-18</div>
+  </div>
+ </body>
+</html>
