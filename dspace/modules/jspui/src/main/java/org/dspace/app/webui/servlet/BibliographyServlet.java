@@ -709,7 +709,7 @@ public class BibliographyServlet extends DSpaceServlet{
                   else if (element.equals("description") && qualifier.equals("abstract")) {
                     if (k == 0) {
                        sb.append("\""); 
-                       sb.append(values[k].value);
+                       sb.append(values[k].value.replace("\n", "").replace("\r", ""));
                        sb.append("\""); 
                     }
                 } else if (element.equals("subject")) {
@@ -927,7 +927,7 @@ public class BibliographyServlet extends DSpaceServlet{
                   else if (element.equals("description") && qualifier.equals("abstract")) {
                     if (k == 0) {
                        sb.append("\""); 
-                       sb.append(values[k].value);
+                       sb.append(values[k].value.replace("\n", "").replace("\r", ""));
                        sb.append("\"");
                     }
                 } else if (element.equals("subject")) {
