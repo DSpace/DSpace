@@ -81,7 +81,7 @@ select.multiple {
 
 #ds-user-box {
     right: 0;
-    top: 17px;
+    top: 22px;
     position: absolute;
     left: 50%;
     margin: 0;
@@ -1403,7 +1403,7 @@ table.discovery-filters th.new-filter-header
 
 div#ms-navigation {
         position: absolute;
-        top: 100px;
+        top: 0;
         left: 50%;
         margin: 0;
         width: 466px;
@@ -1415,11 +1415,11 @@ ul#ms-navigation-list li.ms-navigation-link {
         list-style: none;
         display: inline;
         margin-left:0px;
-        color: #1F3F5E;
+        color: #FFF;
 }
 
 ul#ms-navigation-list li.ms-navigation-link a:link, ul#ms-navigation-list li.ms-navigation-link a:visited {
-        color: #1F3F5E;
+        color: #FFF;
         /*text-decoration: none;*/
 }
 
