@@ -177,7 +177,7 @@ public class PlosItemsReviewMonth extends AbstractCurationTask {
                         	if (plosManuscriptData != NULL) {
                         		// If string contains "doi:10.5061" then print to xml file
                         		if ( plosManuscriptData.toLowerCase().contains(DRYADDOI)) {
-                        			report(itemID + ", " + publicationName + ", " + lastModificationDate+ ");
+                        			report(itemID + ", " + publicationName + ", " + lastModificationDate);
                         		}
 
                         	}
