@@ -34,11 +34,13 @@ public class Journal_CICBA_Authority extends CICBAAuthority {
 		pqs.setCommandText("SELECT ?concept ?label\n");
 		pqs.append("WHERE {\n");
 		pqs.append("?concept a dc:BibliographicResource ; dc:title ?label .\n");
-		pqs.append("FILTER(REGEX(?label, ?text, \"i\"))\n");
+		if (!"".equals(text)) {
+			pqs.append("FILTER(REGEX(?label, ?text, \"i\"))\n");
+			pqs.setLiteral("text", text);
+		}
 		pqs.append("}\n");
 		pqs.append("ORDER BY ASC(?label)\n");
 
-		pqs.setLiteral("text", text);
 		return pqs;
 	}
 

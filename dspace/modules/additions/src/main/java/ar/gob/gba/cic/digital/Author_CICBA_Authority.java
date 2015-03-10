@@ -15,10 +15,10 @@ public class Author_CICBA_Authority extends CICBAAuthority {
 		pqs.setNsPrefix("foaf", NS_FOAF);
 		pqs.setNsPrefix("dc", NS_DC);
 
-		pqs.setCommandText("SELECT ?id ?name ?surname ?affiliation\n");
+		pqs.setCommandText("SELECT ?person ?name ?surname ?id ?affiliation\n");
 		pqs.append("WHERE {\n");
-		pqs.append("?person a foaf:Person ; foaf:givenName ?name ; foaf:familyName ?surname ; dc:identifier ?id .\n");
-		pqs.append("OPTIONAL { ?person foaf:Organization ?a . ?a a foaf:Organization ; dc:title ?affiliation }\n");
+		pqs.append("?person a foaf:Person ; foaf:givenName ?name ; foaf:familyName ?surname .\n");
+		pqs.append("OPTIONAL { ?person foaf:Organization ?a ; dc:identifier ?id . ?a a foaf:Organization ; dc:title ?affiliation }\n");
 		pqs.append("FILTER(REGEX(?id, ?key, \"i\"))\n");
 		pqs.append("}\n");
 
@@ -34,26 +34,34 @@ public class Author_CICBA_Authority extends CICBAAuthority {
 		pqs.setNsPrefix("foaf", NS_FOAF);
 		pqs.setNsPrefix("dc", NS_DC);
 
-		pqs.setCommandText("SELECT ?id ?name ?surname ?affiliation\n");
+		pqs.setCommandText("SELECT ?person ?name ?surname ?id ?affiliation\n");
 		pqs.append("WHERE {\n");
-		pqs.append("?person a foaf:Person ; foaf:givenName ?name ; foaf:familyName ?surname ; dc:identifier ?id .\n");
-		pqs.append("OPTIONAL { ?person foaf:Organization ?a . ?a a foaf:Organization ; dc:title ?affiliation }\n");
-		pqs.append("FILTER(REGEX(?name, ?text, \"i\") || REGEX(?surname, ?text, \"i\") || REGEX(?id, ?text, \"i\"))\n");
+		pqs.append("?person a foaf:Person ; foaf:givenName ?name ; foaf:familyName ?surname .\n");
+		pqs.append("OPTIONAL { ?person foaf:Organization ?a ; dc:identifier ?id . ?a a foaf:Organization ; dc:title ?affiliation }\n");
+		if (!"".equals(text)) {
+			pqs.append("FILTER(REGEX(?name, ?text, \"i\") || REGEX(?surname, ?text, \"i\") || REGEX(?id, ?text, \"i\"))\n");
+			pqs.setLiteral("text", text);
+		}
 		pqs.append("}\n");
 		pqs.append("ORDER BY ASC(?surname)\n");
-
-		pqs.setLiteral("text", text);
+		
 		return pqs;
 	}
 
 	@Override
 	protected Choice extractChoice(QuerySolution solution) {
-		String key = solution.getLiteral("id").getString();
+		String key = solution.getResource("person").getURI();
 		String name = solution.getLiteral("name").getString();
 		String surname = solution.getLiteral("surname").getString();
 		
 		String label = surname + ", " + name;
 		String value = label;
+		
+		if (solution.contains("id")) {
+			String id = solution.getLiteral("id").getString();
+			value = value + " (" + id + ")";
+		}
+			
 		if (solution.contains("affiliation")) {
 			String affiliation = solution.getLiteral("affiliation").getString();
 			value = value + " (" + affiliation + ")";
