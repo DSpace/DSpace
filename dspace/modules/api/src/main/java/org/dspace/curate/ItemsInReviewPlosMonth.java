@@ -49,6 +49,23 @@ public class ItemsInReviewPlosMonth extends AbstractCurationTask {
     private static Logger log = Logger.getLogger(FileSimpleStats.class);
     private static DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
     Context context;
+    
+    
+    
+    // Database objects
+    static final String DB_MANUSCRIPT_TABLE = "manuscript";
+    static final String DB_COLUMN_ID = "manuscript_id";
+    static final String DB_COLUMN_ORGANIZATION_ID = "organization_id";
+    static final String DB_COLUMN_MSID = "msid";
+    static final String DB_COLUMN_VERSION = "version";
+    // active is stored as String because DatabaseManager doesn't support Boolean
+    static final String DB_COLUMN_ACTIVE = "active";
+    static final String DB_COLUMN_JSON_DATA = "json_data";
+    
+    
+    private static final Integer NOT_FOUND = -1;
+    
+    
 
     @Override 
     public void init(Curator curator, String taskId) throws IOException {
@@ -66,23 +83,20 @@ public class ItemsInReviewPlosMonth extends AbstractCurationTask {
      // private static Manuscript getManuscriptByIdAndOrg(Context myContext, String msid, String organizationCode) throws SQLException, IOException {
      private static String getManuscriptData(Context myContext, String msid, String organizationCode) throws SQLException, IOException {
 
-        Integer organizationId = getOrganizationInternalId(myContext, organizationCode);
-        if(organizationId == NOT_FOUND) {
-            return null;
-        } else {
-            String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and organization_id = ? and active = ?";
-            TableRow row = DatabaseManager.querySingleTable(myContext, MANUSCRIPT_TABLE, query, msid, organizationId, ACTIVE_TRUE);
+        // Integer organizationId = getOrganizationInternalId(myContext, organizationCode);
+
+            String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and active = ?";
+            TableRow row = DatabaseManager.querySingleTable(myContext, DB_MANUSCRIPT_TABLE, query, msid, DB_ACTIVE_TRUE);
             // Manuscript manuscript = manuscriptFromTableRow(row);
             // return manuscript;
             
             if(row != null) {
-            	String json_data = row.getStringColumn(COLUMN_JSON_DATA);
+            	String json_data = row.getStringColumn(DB_COLUMN_JSON_DATA);
             	return json_data;
         	} else {
             	return null;
         	}
             // return row;            
-        }
     }
     
     
