@@ -345,7 +345,18 @@ public class FlowETDDepartmentUtils {
 	private static final String[] COLLECTION_SUFFIXES = {"_SUBMIT","_ADMIN","_WFSTEP_1","_WORKFLOW_STEP_1","_WFSTEP_2","_WORKFLOW_STEP_2","_WFSTEP_3","_WORKFLOW_STEP_3","_DEFAULT_ITEM_READ"};
 
 
-	/**
+    /**
+     * Fetch IDs of linked member collections from department ID
+     */
+	public static List<Integer> getMemberCollectionIds(int etd_departmentID) {
+	    List<Integer> tempCollectionIDs = new ArrayList<Integer>();
+
+// TODO
+
+        return null;
+    }
+
+    /**
 	 * Extracts the collection id that may be immbedded in the given group name.
 	 *
 	 * @param groupName - the name of a group (ie group.getName())
@@ -536,6 +547,4 @@ public class FlowETDDepartmentUtils {
 
         return Role.none;
     }
-
-
 }

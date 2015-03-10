@@ -175,8 +175,8 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
 	private static final Message T_members_column3 =
 		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.members_column3");
 
-//	private static final Message T_members_column4 =
-//		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.members_column4");
+	private static final Message T_members_column4 =
+		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.members_column4");
 
 	private static final Message T_members_etd_department_name =
 		message("xmlui.administrative.etd_departments.EditETDDepartmentForm.members_etd_department_name");
@@ -220,7 +220,23 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
             etd_department = EtdUnit.find(context, etd_departmentID);
         }
 
-		// Find the collection or community if applicable
+		// Get related collection from collection2etdunit table
+		Collection collection = null;
+		List<Integer> memberCollectionIDs = new ArrayList<Integer>();
+        List<Collection> memberCollections = new ArrayList<Collection>();
+		if (etd_department!=null) {
+		    memberCollectionIDs = FlowETDDepartmentUtils.getMemberCollectionIds(etd_departmentID);
+		    for (int members : memberCollectionIDs) {
+		        if (members > -1) {
+		            collection = Collection.find(context, members);
+		            memberCollections.add(collection);
+		        }
+		    }
+		}
+
+
+
+/*		// Find the collection or community if applicable
 		Collection collection = null;
 		Community community = null;
 		if (etd_department != null)
@@ -239,6 +255,7 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
                 }
 		    }
 		}
+*/
 
 //		// Get list of member groups
 //		String memberGroupIDsString = parameters.getParameter("memberGroupIDs",null);
@@ -268,9 +285,8 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
 //            }
 //		}
 
-		// Get list of member collections
+		// Get list of member collections from url
 		String memberCollectionIDsString = parameters.getParameter("memberCollectionIDs",null);
-		List<Integer> memberCollectionIDs = new ArrayList<Integer>();
 		if (memberCollectionIDsString != null)
 		{
 			for (String id : memberCollectionIDsString.split(","))
@@ -315,7 +331,7 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
         }
 
 
-	    if(collection != null)
+/*	    if(collection != null)
 	    {
 	    	Para para = main.addPara();
 	    	para.addContent(T_collection_para);
@@ -327,6 +343,7 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
             para.addContent(T_community_para);
             para.addXref(contextPath+"/handle/"+community.getHandle(), community.getMetadata("name"));
         }
+*/
 
 	    // DIVISION: etd_department-actions
 	    Division actions = main.addDivision("etd_department-edit-actions");
@@ -334,14 +351,15 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
         etd_departmentName.addContent(T_label_name);
         Text etd_departmentText = etd_departmentName.addText("etd_department_name");
         etd_departmentText.setValue(currentName);
-        if(collection != null || community != null)
+        /*if(collection != null || community != null)
         {
         	// If this group is associated with a collection or community then it is special,
         	// thus they shouldn't be able to update it.
         	etd_departmentText.setDisabled();
         	etd_departmentText.setHelp(T_label_instructions);
         }
-        else if (errors.contains("etd_department_name") || errors.contains("etd_department_name_duplicate"))
+        else*/
+        if (errors.contains("etd_department_name") || errors.contains("etd_department_name_duplicate"))
         {
             etd_departmentText.addError("");
         }
@@ -725,12 +743,14 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
         Row header = table.addRow(Row.ROLE_HEADER);
         header.addCell().addContent(T_members_column1);
         header.addCell().addContent(T_members_column2);
-        header.addCell().addContent(T_members_column3);
+//        header.addCell().addContent(T_members_column3);
 //        header.addCell().addContent(T_members_column4);
 
         // get all member collections, pend or actual
         @SuppressWarnings("unchecked") // the cast is correct
         List<Integer> allMemberCollectionIDs = new ArrayList<Integer>(memberCollectionIDs);
+        // TODO may b we dont need this: DRUM
+
         for (Collection collection : parent.getCollections())
         {
         	if (!allMemberCollectionIDs.contains(collection.getID()))

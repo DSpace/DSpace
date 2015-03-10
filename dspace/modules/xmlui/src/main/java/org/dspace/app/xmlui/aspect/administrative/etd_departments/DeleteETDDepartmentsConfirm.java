@@ -85,8 +85,8 @@ public class DeleteETDDepartmentsConfirm extends AbstractDSpaceTransformer
         Row header = table.addRow(Row.ROLE_HEADER);
         header.addCell().addContent(T_column1);
         header.addCell().addContent(T_column2);
-        header.addCell().addContent(T_column3);
-        header.addCell().addContent(T_column4);
+//        header.addCell().addContent(T_column3);
+//        header.addCell().addContent(T_column4);
 
     	for (EtdUnit etd_department : etd_departments)
     	{

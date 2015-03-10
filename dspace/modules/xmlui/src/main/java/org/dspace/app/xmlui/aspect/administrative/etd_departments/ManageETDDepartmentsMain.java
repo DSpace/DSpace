@@ -177,8 +177,8 @@ public class ManageETDDepartmentsMain extends AbstractDSpaceTransformer
         header.addCell().addContent(T_search_column1);
         header.addCell().addContent(T_search_column2);
         header.addCell().addContent(T_search_column3);
-        header.addCell().addContent(T_search_column4);
-        header.addCell().addContent(T_search_column5);
+//        header.addCell().addContent(T_search_column4);
+//        header.addCell().addContent(T_search_column5);
 
         for (EtdUnit etd_department : etd_departments)
         {
@@ -192,7 +192,7 @@ public class ManageETDDepartmentsMain extends AbstractDSpaceTransformer
                 row = table.addRow();
             }
 
-            if (etd_department.getID() > 1)
+            if (etd_department.getID() >= 1)
             {
                 CheckBox select = row.addCell().addCheckBox("select_etd_department");
                 select.setLabel(Integer.valueOf(etd_department.getID()).toString());
