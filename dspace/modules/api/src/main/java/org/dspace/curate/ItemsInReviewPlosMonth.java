@@ -44,7 +44,7 @@ import org.apache.log4j.Logger;
  * @author Debra Fagan/Ryan Scherle
  */
 @Distributive
-public class PlosItemsReviewMonth extends AbstractCurationTask {
+public class ItemsInReviewPlosMonth extends AbstractCurationTask {
 
     private static Logger log = Logger.getLogger(FileSimpleStats.class);
     private static DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
