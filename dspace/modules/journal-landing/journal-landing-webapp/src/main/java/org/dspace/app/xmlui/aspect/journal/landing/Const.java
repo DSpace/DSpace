@@ -21,7 +21,7 @@ public class Const {
     public static final String BANNER_DIV_OUTER = "journal-landing-banner-outer";
     public static final String BANNER_DIV_INNER = "journal-landing-banner-inner";
     public static final String BANNER_MEM = "journal-landing-banner-mem";
-    public static final String BANNER_PAY = "journal-landing-banner-pay";
+    public static final String BANNER_SPO = "journal-landing-banner-spo";
     public static final String BANNER_DAT = "journal-landing-banner-dat";
     public static final String BANNER_AUT = "journal-landing-banner-aut";
     public static final String BANNER_MET = "journal-landing-banner-met";
