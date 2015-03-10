@@ -62,9 +62,8 @@ public class ItemsInReviewPlosMonth extends AbstractCurationTask {
     static final String DB_COLUMN_ACTIVE = "active";
     static final String DB_COLUMN_JSON_DATA = "json_data";
     
-    
-    private static final Integer NOT_FOUND = -1;
-    
+    static final String DB_ACTIVE_TRUE = String.valueOf(true);
+    static final String DB_ACTIVE_FALSE = String.valueOf(false);    
     
 
     @Override 
@@ -188,7 +187,7 @@ public class ItemsInReviewPlosMonth extends AbstractCurationTask {
                         	
                         	// String dataDOI = plosManuscript.dryadDataDOI;
 
-                        	if (plosManuscriptData != NULL) {
+                        	if (plosManuscriptData != null) {
                         		// If string contains "doi:10.5061" then print to xml file
                         		if ( plosManuscriptData.toLowerCase().contains(DRYADDOI)) {
                         			report(itemID + ", " + publicationName + ", " + lastModificationDate);
