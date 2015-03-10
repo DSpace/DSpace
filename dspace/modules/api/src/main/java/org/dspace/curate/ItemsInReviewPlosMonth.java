@@ -32,17 +32,19 @@ import org.dspace.storage.rdbms.TableRow;
 import org.apache.log4j.Logger;
 
 /**
- * ItemsInReview reports on the status of items in the review workflow.
+ * PlosItemsReviewMonth reports on items from PLOS publications that have been in the review workflow 
+ * longer than one month.
  *
  * The task succeeds if it was able to calculate the correct result.
  *
  * Input: a collection (any collection)
- * Output: a CSV indicating simple information about the data packages that are in review
+ * Output: a CSV indicating simple information about the PLOS data packages 
+ *         that have been in review longer than one month
  *
- * @author Ryan Scherle
+ * @author Debra Fagan/Ryan Scherle
  */
 @Distributive
-public class ItemsInReviewPlosMonth extends AbstractCurationTask {
+public class PlosItemsReviewMonth extends AbstractCurationTask {
 
     private static Logger log = Logger.getLogger(FileSimpleStats.class);
     private static DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
@@ -58,15 +60,53 @@ public class ItemsInReviewPlosMonth extends AbstractCurationTask {
             log.fatal("Cannot initialize database connection", e);
         }
     }
-        
     
+ 
+    /** returns data from the manuscript table based on the given Manuscript ID and organization code */
+     // private static Manuscript getManuscriptByIdAndOrg(Context myContext, String msid, String organizationCode) throws SQLException, IOException {
+     private static String getManuscriptData(Context myContext, String msid, String organizationCode) throws SQLException, IOException {
+
+        Integer organizationId = getOrganizationInternalId(myContext, organizationCode);
+        if(organizationId == NOT_FOUND) {
+            return null;
+        } else {
+            String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and organization_id = ? and active = ?";
+            TableRow row = DatabaseManager.querySingleTable(myContext, MANUSCRIPT_TABLE, query, msid, organizationId, ACTIVE_TRUE);
+            // Manuscript manuscript = manuscriptFromTableRow(row);
+            // return manuscript;
+            
+            if(row != null) {
+            	String json_data = row.getStringColumn(COLUMN_JSON_DATA);
+            	return json_data;
+        	} else {
+            	return null;
+        	}
+            // return row;            
+        }
+    }
+    
+    
+    /** returns the number of days between today's date and anotherDateMS, which is passed in */
+	public static int numDaysSince(long anotherDateMS) {
+	
+        Date todayDate = new Date();
+        long todayDateMS = todayDate.getTime();
+
+        long timeBetweenDatesMS = todayDateMS - anotherDateMS;
+        long timeInReview = timeBetweenDatesMS / (24 * 60 * 60 * 1000);
+        int numDaysInReview = (int) timeInReview;
+
+        return numDaysInReview;
+}
+
+   
     /**
        Perform 
      **/
     @Override
     public int perform(DSpaceObject dso) throws IOException {
 	try {
-        
+					
             if (dso.getType() == Constants.COLLECTION) {
                 // output headers for the CSV file that will be created by processing all items in this collection
                 report("itemID, publicationName, lastModificationDate");
@@ -82,6 +122,7 @@ public class ItemsInReviewPlosMonth extends AbstractCurationTask {
             } else if (dso.getType() == Constants.ITEM) {
                 // determine whether this item is in the review workflow
                 // workflow stage is stored in taskowner table
+                
                 DryadDataPackage dataPackage = new DryadDataPackage((Item)dso);
                 log.debug("processing " + dataPackage.getItem().getID());
                 WorkflowItem wfi = dataPackage.getWorkflowItem(context);
@@ -93,10 +134,56 @@ public class ItemsInReviewPlosMonth extends AbstractCurationTask {
                         log.debug(" -- is in review");
                         // report on the item
                         int itemID = dataPackage.getItem().getID();
- //                         String publicationName = dataPackage.getPublicationName();
-                      String publicationName = "Fake Journal";
+                        
+                        // RYAN, Where is getPublicationName method located??? Setter is in:  - *DF*
+                        // /dspace/modules/api/src/main/java/org/datadryad/api/DryadDataPackage.java  - *DF*
+                        String publicationName = dataPackage.getPublicationName();
+
+
                         Date lastModificationDate = dataPackage.getItem().getLastModified();
-                        report(itemID + ", " + publicationName + ", " + lastModificationDate);
+
+                        
+                        
+                        
+                        // Select and write to file PLOS items that have been in review 30 days or more - *DF*
+						int NUMBEROFDAYS = 31;
+                        String PUBNAME = "plos";
+                        String DRYADDOI = "doi:10.5061";
+                        boolean notificationReceived = false;
+                        
+                        int numDaysInReview = numDaysSince(lastModificationDate.getTime());
+                        
+
+                    
+                        if ( (publicationName.toLowerCase().contains(PUBNAME)) && (numDaysInReview >= NUMBEROFDAYS) ) {
+                        	// report whether we have a plos notification for the item
+                        	//     1. search for the data package DOI in the manuscript table, json_data field. 
+                        	//        It should appear in the dataReviewURL of the json, but may appear in the dataAvailabilityStatement
+                        	//     2. select json_data from manuscript where json_data like '%resource/doi:10.5061/dryad.p5hd0%';
+                        	
+                        	//boolean notificationReceived = dataPackage.getPublicationName(); String doi = manuscript.dryadDataDOI; 
+                        	                        
+                        	// get DOI and manuscript number - *DF*
+                        	String packageDOI = dataPackage.getIdentifier();
+                        	String packageManuscriptNumber = dataPackage.getManuscriptNumber();
+                        	
+                        	// Get manuscript from the Manuscript table based on manuscript number
+                        	// Check to see if string contains "doi:10.5061"
+                        	// If string contains "doi:10.5061" then print to xml file.
+                        	String plosManuscriptData = getManuscriptData(context, packageManuscriptNumber, PUBNAME);
+                        	
+                        	// String dataDOI = plosManuscript.dryadDataDOI;
+
+                        	if (plosManuscriptData != NULL) {
+                        		// If string contains "doi:10.5061" then print to xml file
+                        		if ( plosManuscriptData.toLowerCase().contains(DRYADDOI)) {
+                        			report(itemID + ", " + publicationName + ", " + lastModificationDate+ ");
+                        		}
+
+                        	}
+
+                        }
+
                     }
                 }
                 
