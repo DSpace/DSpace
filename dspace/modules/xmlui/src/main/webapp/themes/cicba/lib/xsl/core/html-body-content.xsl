@@ -93,13 +93,7 @@
 				   </label>
 				    <div><input type="text" name="query" class="form-control" autofocus="true" size="30" placeholder="Ingrese su búsqueda ..."/>
 				    <button type="submit" name="lr" class="btn btn-link"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
-				  </div>	
-					<span class="badge">Ciencias Agrícolas</span>
-					<span class="badge">Ciencias Médicas y de la Salud</span>
-					<span class="badge">Ciencias Naturales y Exactas</span>
-					<span class="badge">Ciencias Sociales</span>
-					<span class="badge">Humanidades</span>
-					<span class="badge">Ingenierías y Tecnologías</span>
+				  </div>
 				</form>
 			</div>
 		</div>
