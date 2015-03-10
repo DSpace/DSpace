@@ -1130,18 +1130,6 @@ public class ItemImport
             qualifier = null;
         }
 
-        // if language isn't set, use the system's default value
-        if (StringUtils.isEmpty(language))
-        {
-            language = ConfigurationManager.getProperty("default.language");
-        }
-
-        // a goofy default, but there it is
-        if (language == null)
-        {
-            language = "en";
-        }
-
         if (!isTest)
         {
             i.addMetadata(schema, element, qualifier, language, value);
@@ -2374,7 +2362,7 @@ public class ItemImport
     public static void emailErrorMessage(EPerson eperson, String error)
             throws MessagingException
     {
-        log.warn("An error occured during item import, the user will be notified. " + error);
+        log.warn("An error occurred during item import, the user will be notified. " + error);
         try
         {
             Locale supportedLocale = I18nUtil.getEPersonLocale(eperson);

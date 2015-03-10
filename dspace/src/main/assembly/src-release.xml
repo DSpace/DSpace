@@ -34,6 +34,8 @@
             <exclude>**/target/**</exclude>
             <exclude>.*</exclude>
          </excludes>
+         <!-- Ensure line endings in all files are Unix (LF) line endings-->
+         <lineEnding>unix</lineEnding>
       </fileSet>
    </fileSets>
 

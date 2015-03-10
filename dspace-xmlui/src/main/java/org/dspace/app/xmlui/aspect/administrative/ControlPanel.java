@@ -482,7 +482,7 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
      * @param value candidate string.
      * @return {@code value} or a constant indicating an unset value.
      */
-    private static String notnull(String value) { return null == value ? T_UNSET : value; }
+    private static String notempty(String value) { return (null == value || "".equals(value)) ? T_UNSET : value; }
 
     /**
      * List important DSpace configuration parameters.
@@ -498,46 +498,46 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
         dspace.addItem(Util.getSourceVersion());
 
         dspace.addLabel(T_DSPACE_DIR);
-        dspace.addItem(notnull(ConfigurationManager.getProperty("dspace.dir")));
+        dspace.addItem(notempty(ConfigurationManager.getProperty("dspace.dir")));
 
         dspace.addLabel(T_DSPACE_URL);
-        dspace.addItem(notnull(ConfigurationManager.getProperty("dspace.url")));
+        dspace.addItem(notempty(ConfigurationManager.getProperty("dspace.url")));
 
         dspace.addLabel(T_DSPACE_HOST_NAME);
-        dspace.addItem(notnull(ConfigurationManager.getProperty("dspace.hostname")));
+        dspace.addItem(notempty(ConfigurationManager.getProperty("dspace.hostname")));
 
         dspace.addLabel(T_DSPACE_NAME);
-        dspace.addItem(notnull(ConfigurationManager.getProperty("dspace.name")));
+        dspace.addItem(notempty(ConfigurationManager.getProperty("dspace.name")));
 
         dspace.addLabel(T_DB_NAME);
-        dspace.addItem(notnull(DatabaseManager.getDbName()));
+        dspace.addItem(notempty(DatabaseManager.getDbName()));
 
         dspace.addLabel(T_DB_URL);
-        dspace.addItem(notnull(ConfigurationManager.getProperty("db.url")));
+        dspace.addItem(notempty(ConfigurationManager.getProperty("db.url")));
 
         dspace.addLabel(T_DB_DRIVER);
-        dspace.addItem(notnull(ConfigurationManager.getProperty("db.driver")));
+        dspace.addItem(notempty(ConfigurationManager.getProperty("db.driver")));
 
         dspace.addLabel(T_DB_MAX_CONN);
-        dspace.addItem(notnull(ConfigurationManager.getProperty("db.maxconnections")));
+        dspace.addItem(notempty(ConfigurationManager.getProperty("db.maxconnections")));
 
         dspace.addLabel(T_DB_MAX_WAIT);
-        dspace.addItem(notnull(ConfigurationManager.getProperty("db.maxwait")));
+        dspace.addItem(notempty(ConfigurationManager.getProperty("db.maxwait")));
 
         dspace.addLabel(T_DB_MAX_IDLE);
-        dspace.addItem(notnull(ConfigurationManager.getProperty("db.maxidle")));
+        dspace.addItem(notempty(ConfigurationManager.getProperty("db.maxidle")));
 
        	dspace.addLabel(T_MAIL_SERVER);
-        dspace.addItem(notnull(ConfigurationManager.getProperty("mail.server")));
+        dspace.addItem(notempty(ConfigurationManager.getProperty("mail.server")));
 
         dspace.addLabel(T_MAIL_FROM_ADDRESS);
-        dspace.addItem(notnull(ConfigurationManager.getProperty("mail.from.address")));
+        dspace.addItem(notempty(ConfigurationManager.getProperty("mail.from.address")));
 
         dspace.addLabel(T_FEEDBACK_RECIPIENT);
-        dspace.addItem(notnull(ConfigurationManager.getProperty("feedback.recipient")));
+        dspace.addItem(notempty(ConfigurationManager.getProperty("feedback.recipient")));
 
         dspace.addLabel(T_MAIL_ADMIN);
-        dspace.addItem(notnull(ConfigurationManager.getProperty("mail.admin")));
+        dspace.addItem(notempty(ConfigurationManager.getProperty("mail.admin")));
     }
 
     /**

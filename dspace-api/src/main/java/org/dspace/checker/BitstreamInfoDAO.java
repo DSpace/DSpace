@@ -17,7 +17,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.dspace.content.Bitstream;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 
 /**
@@ -43,9 +45,9 @@ public final class BitstreamInfoDAO extends DAOSupport
     /** Query that gets bitstream information for a specified ID. */
     private static final String FIND_BY_BITSTREAM_ID = "select bitstream.deleted, bitstream.store_number, bitstream.size_bytes, "
             + "bitstreamformatregistry.short_description, bitstream.bitstream_id,  "
-            + "bitstream.user_format_description, bitstream.internal_id, "
-            + "bitstream.source, bitstream.checksum_algorithm, bitstream.checksum, "
-            + "bitstream.name, most_recent_checksum.last_process_end_date,"
+            + "bitstream.internal_id, "
+            + "bitstream.checksum_algorithm, bitstream.checksum, "
+            + "most_recent_checksum.last_process_end_date,"
             + "most_recent_checksum.to_be_processed "
             + "from bitstream left outer join bitstreamformatregistry on "
             + "bitstream.bitstream_format_id = bitstreamformatregistry.bitstream_format_id, "
@@ -226,7 +228,7 @@ public final class BitstreamInfoDAO extends DAOSupport
      * @return the bitstream information needed for checksum validation. Returns
      *         null if bitstream info isn't found.
      */
-    public BitstreamInfo findByBitstreamId(int id)
+    public BitstreamInfo findByBitstreamId(Context context, int id)
     {
         Connection conn = null;
         BitstreamInfo info = null;
@@ -246,14 +248,14 @@ public final class BitstreamInfoDAO extends DAOSupport
             // if the bitstream is found return it
             if (rs.next())
             {
+                Bitstream bitstream = Bitstream.find(context, rs.getInt("bitstream_id"));
                 info = new BitstreamInfo(rs.getBoolean("deleted"), rs
                         .getInt("store_number"), rs.getLong("size_bytes"), rs
                         .getString("short_description"), rs
-                        .getInt("bitstream_id"), rs
-                        .getString("user_format_description"), rs
-                        .getString("internal_id"), rs.getString("source"), rs
+                        .getInt("bitstream_id"), bitstream.getUserFormatDescription(), rs
+                        .getString("internal_id"), bitstream.getSource(), rs
                         .getString("checksum_algorithm"), rs
-                        .getString("checksum"), rs.getString("name"), rs
+                        .getString("checksum"), bitstream.getName(), rs
                         .getTimestamp("last_process_end_date"), rs
                         .getBoolean("to_be_processed"), new Date());
             }

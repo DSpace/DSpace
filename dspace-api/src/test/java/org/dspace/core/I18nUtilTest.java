@@ -43,7 +43,8 @@ public class I18nUtilTest
     @Before
     public void setUp()
     {
-        new MockConfigurationManager();
+        // Initialize MockConfigurationManager and tell it to NOT load any properties
+        new MockConfigurationManager(false);
     }
 
     @After

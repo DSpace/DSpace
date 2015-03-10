@@ -1405,7 +1405,7 @@ public class ItemExport
     public static void emailErrorMessage(EPerson eperson, String error)
             throws MessagingException
     {
-        log.warn("An error occured during item export, the user will be notified. " + error);
+        log.warn("An error occurred during item export, the user will be notified. " + error);
         try
         {
             Locale supportedLocale = I18nUtil.getEPersonLocale(eperson);

@@ -728,15 +728,24 @@ public class MediaFilterManager
                 + " (item: " + item.getHandle() + ")");
         }
 
-        InputStream destStream = formatFilter.getDestinationStream(source.retrieve());
-        if (destStream == null)
-        {
-            if (!isQuiet)
+        InputStream destStream;
+        try {
+            System.out.println("File: " + newName);
+            destStream = formatFilter.getDestinationStream(source.retrieve());
+            if (destStream == null)
             {
-                System.out.println("SKIPPED: bitstream " + source.getID()
+                if (!isQuiet)
+                {
+                    System.out.println("SKIPPED: bitstream " + source.getID()
                         + " (item: " + item.getHandle() + ") because filtering was unsuccessful");
-            }
+                }
 
+                return false;
+            }
+        }
+        catch (OutOfMemoryError oome)
+        {
+            System.out.println("!!! OutOfMemoryError !!!");
             return false;
         }
 

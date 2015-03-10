@@ -375,8 +375,8 @@ public class OAIHarvester {
 			}
 		}
 		catch (HarvestingException hex) {
-			log.error("Harvesting error occured while processing an OAI record: " + hex.getMessage());
-			harvestRow.setHarvestMessage("Error occured while processing an OAI record");
+			log.error("Harvesting error occurred while processing an OAI record: " + hex.getMessage());
+			harvestRow.setHarvestMessage("Error occurred while processing an OAI record");
 
 			// if the last status is also an error, alert the admin
 			if (harvestRow.getHarvestMessage().contains("Error")) {
@@ -386,10 +386,10 @@ public class OAIHarvester {
 			return;
 		}
 		catch (Exception ex) {
-			harvestRow.setHarvestMessage("Unknown error occured while generating an OAI response");
+			harvestRow.setHarvestMessage("Unknown error occurred while generating an OAI response");
 			harvestRow.setHarvestStatus(HarvestedCollection.STATUS_UNKNOWN_ERROR);
 			alertAdmin(HarvestedCollection.STATUS_UNKNOWN_ERROR, ex);
-			log.error("Error occured while generating an OAI response: " + ex.getMessage() + " " + ex.getCause());
+			log.error("Error occurred while generating an OAI response: " + ex.getMessage() + " " + ex.getCause());
 			ex.printStackTrace();
 			return;
 		}
@@ -557,13 +557,25 @@ public class OAIHarvester {
     	// Now create the special ORE bundle and drop the ORE document in it
 		if (harvestRow.getHarvestType() == 2 || harvestRow.getHarvestType() == 3)
 		{
-			Bundle OREBundle = item.createBundle("ORE");
+			Bundle OREBundle = null;
+            Bundle[] OREBundles = item.getBundles("ORE");
+			Bitstream OREBitstream = null;
+
+            if ( OREBundles.length > 0 )
+                OREBundle = OREBundles[0];
+            else
+                OREBundle = item.createBundle("ORE");
 
 			XMLOutputter outputter = new XMLOutputter();
 			String OREString = outputter.outputString(oreREM);
 			ByteArrayInputStream OREStream = new ByteArrayInputStream(OREString.getBytes());
 
-			Bitstream OREBitstream = OREBundle.createBitstream(OREStream);
+            OREBitstream = OREBundle.getBitstreamByName("ORE.xml");
+
+            if ( OREBitstream != null )
+                OREBundle.removeBitstream(OREBitstream);
+
+            OREBitstream = OREBundle.createBitstream(OREStream);
 			OREBitstream.setName("ORE.xml");
 
 			BitstreamFormat bf = FormatIdentifier.guessFormat(ourContext, OREBitstream);
@@ -1370,13 +1382,13 @@ public class OAIHarvester {
             catch (RuntimeException e) {
                 log.error("Runtime exception in thread: " + this.toString());
                 log.error(e.getMessage() + " " + e.getCause());
-                hc.setHarvestMessage("Runtime error occured while generating an OAI response");
+                hc.setHarvestMessage("Runtime error occurred while generating an OAI response");
                 hc.setHarvestStatus(HarvestedCollection.STATUS_UNKNOWN_ERROR);
             }
             catch (Exception ex) {
                 log.error("General exception in thread: " + this.toString());
                 log.error(ex.getMessage() + " " + ex.getCause());
-                hc.setHarvestMessage("Error occured while generating an OAI response");
+                hc.setHarvestMessage("Error occurred while generating an OAI response");
                 hc.setHarvestStatus(HarvestedCollection.STATUS_UNKNOWN_ERROR);
             }
             finally

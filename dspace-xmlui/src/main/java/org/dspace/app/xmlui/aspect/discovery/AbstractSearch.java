@@ -34,6 +34,7 @@ import org.dspace.discovery.*;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortConfiguration;
+import org.dspace.discovery.configuration.DiscoverySortConfiguration.SORT_ORDER;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.dspace.handle.HandleManager;
 import org.xml.sax.SAXException;
@@ -979,14 +980,32 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         boolean selected = ("score".equals(currentSort) || (currentSort == null && searchSortConfiguration.getDefaultSort() == null));
         sortOptions.addItem("relevance", "gear-option" + (selected ? " gear-option-selected" : "")).addXref("sort_by=score&order=" + searchSortConfiguration.getDefaultSortOrder(), T_sort_by_relevance);
 
+        if (currentSort == null
+                && searchSortConfiguration.getDefaultSort() != null)
+        {
+            currentSort = SearchUtils.getSearchService()
+                    .toSortFieldIndex(
+                            searchSortConfiguration.getDefaultSort()
+                                    .getMetadataField(),
+                            searchSortConfiguration.getDefaultSort().getType());
+        }
+        String sortOrder = getParameterOrder();
+        if (sortOrder == null
+                && searchSortConfiguration.getDefaultSortOrder() != null)
+        {
+            sortOrder = searchSortConfiguration.getDefaultSortOrder().name();
+        }
+
         if(searchSortConfiguration.getSortFields() != null)
         {
             for (DiscoverySortFieldConfiguration sortFieldConfiguration : searchSortConfiguration.getSortFields())
             {
                 String sortField = SearchUtils.getSearchService().toSortFieldIndex(sortFieldConfiguration.getMetadataField(), sortFieldConfiguration.getType());
 
-                boolean selectedAsc = ((sortField.equals(currentSort) && "asc".equals(getParameterOrder())) || (sortFieldConfiguration.equals(searchSortConfiguration.getDefaultSort())) && DiscoverySortConfiguration.SORT_ORDER.asc.equals(searchSortConfiguration.getDefaultSortOrder()));
-                boolean selectedDesc= ((sortField.equals(currentSort) && "desc".equals(getParameterOrder())) || (sortFieldConfiguration.equals(searchSortConfiguration.getDefaultSort())) && DiscoverySortConfiguration.SORT_ORDER.desc.equals(searchSortConfiguration.getDefaultSortOrder()));
+                boolean selectedAsc = sortField.equals(currentSort)
+                        && SORT_ORDER.asc.name().equals(sortOrder);
+                boolean selectedDesc = sortField.equals(currentSort)
+                        && SORT_ORDER.desc.name().equals(sortOrder);
                 String sortFieldParam = "sort_by=" + sortField + "&order=";
                 sortOptions.addItem(sortField, "gear-option" + (selectedAsc ? " gear-option-selected" : "")).addXref(sortFieldParam + "asc", message("xmlui.Discovery.AbstractSearch.sort_by." + sortField + "_asc"));
                 sortOptions.addItem(sortField, "gear-option" + (selectedDesc ? " gear-option-selected" : "")).addXref(sortFieldParam + "desc", message("xmlui.Discovery.AbstractSearch.sort_by." + sortField + "_desc"));

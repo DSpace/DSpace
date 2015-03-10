@@ -56,7 +56,7 @@ public class UsageEvent extends Event {
 	
 	private transient String userAgent;
 	
-	private transient String xforwarderfor;
+	private transient String xforwardedfor;
 	
 	private transient Context context;
 	
@@ -163,7 +163,7 @@ public class UsageEvent extends Event {
 		this.object = object;
 	}
 
-	public UsageEvent(Action action, String ip, String userAgent, String xforwarderfor, Context context, DSpaceObject object)
+	public UsageEvent(Action action, String ip, String userAgent, String xforwardedfor, Context context, DSpaceObject object)
 	{
 		
 		super(checkParams(action, context, object));
@@ -195,7 +195,7 @@ public class UsageEvent extends Event {
 		this.request = null;
 		this.ip = ip;
 		this.userAgent = userAgent;
-		this.xforwarderfor = xforwarderfor;
+		this.xforwardedfor = xforwardedfor;
 		this.context = context;
 		this.object = object;
 	}
@@ -222,11 +222,11 @@ public class UsageEvent extends Event {
 	}
 
 	public String getXforwarderfor() {
-		return xforwarderfor;
+		return xforwardedfor;
 	}
 
-	public void setXforwarderfor(String xforwarderfor) {
-		this.xforwarderfor = xforwarderfor;
+	public void setXforwarderfor(String xforwardedfor) {
+		this.xforwardedfor = xforwardedfor;
 	}
 
 	public void setRequest(HttpServletRequest request) {
