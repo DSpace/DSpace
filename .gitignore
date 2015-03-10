@@ -27,3 +27,4 @@ META-INF/
 *.properties
 !build.properties
 notes.txt
+.DS_Store

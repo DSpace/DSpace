@@ -24,7 +24,7 @@
                 xmlns:dc="http://purl.org/dc/elements/1.1/"
                 xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:confman="org.dspace.core.ConfigurationManager"
-                exclude-result-prefixes="dri mets xlink xsl dim xhtml mods dc">
+                exclude-result-prefixes="confman dc dim dri i18n mets mods xhtml xlink xsl">
 
     <xsl:import href="../dri2xhtml-alt/dri2xhtml.xsl"/>
     <xsl:import href="lib/xsl/core/global-variables.xsl"/>
@@ -40,10 +40,12 @@
     <xsl:import href="lib/xsl/aspect/artifactbrowser/item-view.xsl"/>
     <xsl:import href="lib/xsl/aspect/artifactbrowser/community-list.xsl"/>
     <xsl:import href="lib/xsl/aspect/artifactbrowser/collection-list.xsl"/>
+    <xsl:import href="lib/xsl/aspect/JournalLandingPage/main.xsl"/>
     <xsl:import href="integrated-view.xsl"/>
     <xsl:import href="DryadItemSummary.xsl"/>
     <xsl:import href="DryadUtils.xsl"/>
     <xsl:import href="DryadSearch.xsl"/>
+    
     <xsl:output indent="yes"/>
     <xsl:variable name="iframe.maxheight" select="confman:getIntProperty('iframe.maxheight', 300)"/>
     <xsl:variable name="iframe.maxwidth" select="confman:getIntProperty('iframe.maxwidth', 600)"/>

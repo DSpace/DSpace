@@ -31,6 +31,50 @@
       </plugins>
     </build>
 
+    <profiles>
+        <!-- profile for module standalone build -->
+        <profile>
+            <id>dev</id>
+            <dependencies>
+                <dependency>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                    <version>1.2.14</version>
+                </dependency>
+                <dependency>
+                    <groupId>commons-cli</groupId>
+                    <artifactId>commons-cli</artifactId>
+                    <version>1.0</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.dspace</groupId>
+                    <artifactId>dspace-api</artifactId>
+                    <version>${pom.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.solr</groupId>
+                    <artifactId>solr-solrj</artifactId>
+                    <version>1.4.1</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.ant</groupId>
+                    <artifactId>ant</artifactId>
+                    <version>1.7.0</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.dspace.dependencies</groupId>
+                    <artifactId>dspace-geoip</artifactId>
+                    <version>1.2.3</version>
+                </dependency>
+                <dependency>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                    <version>4.8.1</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+
    <!--
       Runtime and Compile Time dependencies for DSpace.
    -->

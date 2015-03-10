@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+
+    <map:components>
+        <map:actions>
+            <map:action name="ValidateRequest" src="org.dspace.app.xmlui.aspect.journal.landing.ValidateRequest"/>
+        </map:actions>
+        <map:transformers>
+            <map:transformer name="Navigation"          src="org.dspace.app.xmlui.aspect.journal.landing.Navigation"/>
+            <map:transformer name="Banner"              src="org.dspace.app.xmlui.aspect.journal.landing.Banner"/>
+            <map:transformer name="JournalSearch"       src="org.dspace.app.xmlui.aspect.journal.landing.JournalSearch"/>
+            <map:transformer name="JournalStats"        src="org.dspace.app.xmlui.aspect.journal.landing.JournalStats"/>
+        </map:transformers>
+        <map:matchers default="wildcard"/>
+        <map:selectors/>
+    </map:components>
+
+    <map:pipelines>
+        <map:pipeline type="noncaching">
+            <map:generate/>
+
+            <map:match type="wildcard" pattern="journal/*">
+
+                <!-- journal abbreviation is found: return page -->
+                <map:act type="ValidateRequest">
+                    <map:parameter name="journalName" value="{1}"/>
+                    <map:transform type="Navigation">
+                        <map:parameter name="journalName" value="{journalName}"/>
+                        <map:parameter name="journalAbbr" value="{journalAbbr}"/>
+                    </map:transform>
+                    <map:transform type="Banner">
+                        <map:parameter name="journalName" value="{journalName}"/>
+                        <map:parameter name="journalAbbr" value="{journalAbbr}"/>
+                    </map:transform>
+                    <map:transform type="JournalSearch">
+                        <map:parameter name="journalName" value="{journalName}"/>
+                        <map:parameter name="journalAbbr" value="{journalAbbr}"/>
+                    </map:transform>
+                    <map:transform type="JournalStats">
+                        <map:parameter name="journalName" value="{journalName}"/>
+                        <map:parameter name="journalAbbr" value="{journalAbbr}"/>
+                        <map:parameter name="archivedDatafileIds" value="{archivedDatafileIds}"/>
+                    </map:transform>
+                    <map:serialize type="xml"/>
+                </map:act>
+
+                <!-- journal abbreviation is not found: redirect -->
+                <map:redirect-to uri="journal"/>
+
+            </map:match>
+
+            <!-- page for all journals -->
+            <map:match type="wildcard" pattern="journal">
+                <map:serialize type="xml"/>
+            </map:match>
+
+            <!-- nothing to handle here in this aspect -->
+            <map:serialize type="xml"/>
+        </map:pipeline>
+    </map:pipelines>
+
+</map:sitemap>

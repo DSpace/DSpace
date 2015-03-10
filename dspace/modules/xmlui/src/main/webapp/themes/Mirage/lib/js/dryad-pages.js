@@ -81,7 +81,9 @@ jQuery(document).ready(function() {
     // General support for simple tabs (styled as buttons)
     // NOTE: This logic supports multiple sets of tabs on a page.
     // NOTE: For now, we're only using this on the Home page!
-    if (jQuery('#aspect_discovery_RecentlyAdded_div_Home').length === 1) {
+    if (jQuery('#aspect_discovery_RecentlyAdded_div_Home').length === 1 ||
+        jQuery('#aspect_journal_landing_Banner_div_journal-landing-banner-outer').length === 1)
+    {
         var jQuerytabButtons = jQuery('.tab-buttons a');
         jQuerytabButtons.unbind('click').click(function() {
 
