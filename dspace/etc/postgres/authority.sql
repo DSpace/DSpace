@@ -211,6 +211,7 @@ CREATE TABLE Scheme2Concept
 -- EXAMPLE DATA
 --------------------------------------------------------------------------------------------------------------
 --
+INSERT INTO Scheme VALUES (nextval('scheme_seq'),'Author','2014-09-20','2014-09-20','Accepted','en','true');
 
 INSERT INTO Concept2TermRole VALUES (nextval('concept2termrole_seq'),'prefLabel','prefLabel');
 INSERT INTO Concept2TermRole VALUES (nextval('concept2termrole_seq'),'alt','altfLabel');

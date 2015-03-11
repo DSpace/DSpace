@@ -8,19 +8,17 @@
 package org.dspace.curate;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import org.dspace.JournalUtils;
+import org.dspace.content.authority.Concept;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -84,30 +82,25 @@ public class DataFileStats extends AbstractCurationTask {
 	    throw new IOException("unable to initiate xml processor", e);
 	}
 
-
-	// init list of journals that support embargo and review
-        String journalPropFile = ConfigurationManager.getProperty("submit.journal.config");
-	log.info("initializing journal settings from property file " + journalPropFile);
-        Properties properties = new Properties();
 	try {
-	    properties.load(new InputStreamReader(new FileInputStream(journalPropFile), "UTF-8"));
-	    String journalTypes = properties.getProperty("journal.order");
-	    for (int i = 0; i < journalTypes.split(",").length; i++) {
-		String journalType = journalTypes.split(",")[i].trim();
-		String journalDisplay = properties.getProperty("journal." + journalType + ".fullname");
-		String integrated = properties.getProperty("journal." + journalType + ".integrated");
-		String embargo = properties.getProperty("journal." + journalType + ".embargoAllowed", "true");
-		String allowReviewWorkflow = properties.getProperty("journal." + journalType + ".allowReviewWorkflow", "false");
 
-		if(integrated != null && Boolean.valueOf(integrated)) {
-		    integratedJournals.add(journalDisplay);
-		}
-		if(allowReviewWorkflow != null && Boolean.valueOf(allowReviewWorkflow)) {
-		    journalsThatAllowReview.add(journalDisplay);
-		}
-		if(embargo != null && Boolean.valueOf(embargo)) {
-		    integratedJournalsThatAllowEmbargo.add(journalDisplay);
-		}
+        for(Concept concept:JournalUtils.getJournalConcepts(context)){
+
+            String journalDisplay = concept.getPreferredLabel();
+            String integrated = JournalUtils.getIntegrated(concept);
+            String embargo = JournalUtils.getEmbargoAllowed(concept);
+            String allowReviewWorkflow = JournalUtils.getAllowReviewWorkflow(concept);
+
+            if(integrated != null && Boolean.valueOf(integrated)) {
+                integratedJournals.add(journalDisplay);
+            }
+            if(allowReviewWorkflow != null && Boolean.valueOf(allowReviewWorkflow)) {
+                journalsThatAllowReview.add(journalDisplay);
+            }
+            if(embargo != null && Boolean.valueOf(embargo)) {
+                integratedJournalsThatAllowEmbargo.add(journalDisplay);
+            }
+
 	    }
 	} catch(Exception e) {
 	    log.error("Unable to initialize the journal settings");

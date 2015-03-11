@@ -7,6 +7,8 @@
  */
 package org.dspace.app.xmlui.aspect.authority.scheme;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
@@ -24,6 +26,7 @@ import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.authority.Scheme;
+import org.dspace.core.Constants;
 
 /**
  * The manage scheme page is the starting point page for managing
@@ -126,7 +129,14 @@ public class ManageSchemeMain extends AbstractDSpaceTransformer
         /* Get and setup our parameters */
         int page          = parameters.getParameterAsInteger("page",0);
         int highlightID   = parameters.getParameterAsInteger("highlightID",-1);
-        String query      = decodeFromURL(parameters.getParameter("query",null));
+        String query_1      = parameters.getParameter("query", null);
+        String query = "";
+        try{
+            query= URLDecoder.decode(query_1, Constants.DEFAULT_ENCODING);
+        }catch (UnsupportedEncodingException e)
+        {
+            log.error("decode error:"+e);
+        }
         String baseURL    = contextPath+"/admin/scheme?administrative-continue="+knot.getId();
         int resultCount   = Scheme.searchResultCount(context, query);
         Scheme[] schemes = Scheme.search(context, query, page * PAGE_SIZE, PAGE_SIZE);

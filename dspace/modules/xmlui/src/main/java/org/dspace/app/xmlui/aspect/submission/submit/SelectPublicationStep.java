@@ -2,6 +2,7 @@ package org.dspace.app.xmlui.aspect.submission.submit;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.dspace.JournalUtils;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.app.xmlui.wing.WingException;
@@ -13,10 +14,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
-import org.dspace.content.authority.Choice;
-import org.dspace.content.authority.ChoiceAuthorityManager;
-import org.dspace.content.authority.Choices;
-import org.dspace.content.authority.MetadataAuthorityManager;
+import org.dspace.content.authority.*;
 import org.dspace.handle.HandleManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
@@ -148,9 +146,9 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         if(selectedJournalId!=null){
             String journalPath = "";
             try{
-                final java.util.List<String> journalVals = org.dspace.submit.step.SelectPublicationStep.journalVals;
-                final java.util.List<String> journalDirs = org.dspace.submit.step.SelectPublicationStep.journalDirs;
-                journalPath = org.dspace.submit.step.SelectPublicationStep.journalDirs.get(org.dspace.submit.step.SelectPublicationStep.journalVals.indexOf(selectedJournalId));
+                Scheme journalScheme = Scheme.findByIdentifier(context,"Journal");
+                Concept[] journalConcepts = Concept.findByPreferredLabel(context,selectedJournalId,journalScheme.getID());
+                journalPath = JournalUtils.getMetadataDir(journalConcepts[0]);
                 pBean = ModelPublication.getDataFromPublisherFile(manuscriptNumber, selectedJournalId, journalPath);
                 journalStatus = pBean.getStatus();
                 journalName = pBean.getJournalName();
@@ -327,16 +325,15 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
     }
 
-    private void addJournalSelectStatusNotYetSubmitted(String selectedJournalId, Item newItem) throws WingException {
+    private void addJournalSelectStatusNotYetSubmitted(String selectedJournalId, Item newItem) throws WingException,SQLException {
         Composite optionsList = newItem.addComposite("journalID_status_not_yet_submitted");
         Select journalID = optionsList.addSelect("journalIDStatusNotYetSubmitted");
-        java.util.List<String> journalVals = org.dspace.submit.step.SelectPublicationStep.journalVals;
-        java.util.List<String> journalNames = org.dspace.submit.step.SelectPublicationStep.journalNames;
+        Concept[] journalConcepts = JournalUtils.getJournalConcept(context,selectedJournalId);
 
-        for (int i = 0; i < journalVals.size(); i++) {
-            String val =  journalVals.get(i);
-            String name =  journalNames.get(i);
-            if(org.dspace.submit.step.SelectPublicationStep.integratedJournals.contains(val))
+        for (int i = 0; i < journalConcepts.length; i++) {
+            String val =  journalConcepts[i].getPreferredLabel();
+            String name =  journalConcepts[i].getPreferredLabel();
+            if(JournalUtils.getBooleanIntegrated(journalConcepts[i]))
                 name += "*";
             journalID.addOption(val.equals(selectedJournalId), val, name);
         }
@@ -348,19 +345,19 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     }
 
 
-    private void addJournalSelectStatusInReview(String selectedJournalId, Item newItem, String journalStatus, PublicationBean pBean, Request request) throws WingException {
+    private void addJournalSelectStatusInReview(String selectedJournalId, Item newItem, String journalStatus, PublicationBean pBean, Request request) throws WingException,SQLException {
         Composite optionsList = newItem.addComposite("journalID_status_in_review");
         Select journalID = optionsList.addSelect("journalIDStatusInReview");
         journalID.addOption("", "Please Select a valid journal");
-        java.util.List<String> journalVals = org.dspace.submit.step.SelectPublicationStep.journalVals;
-        java.util.List<String> journalNames = org.dspace.submit.step.SelectPublicationStep.journalNames;
+        Concept[] journalConcepts = JournalUtils.getJournalConcept(context,selectedJournalId);
 
-        for (int i = 0; i < journalVals.size(); i++){
-            String val =  journalVals.get(i);
-            String name =  journalNames.get(i);
+
+        for (int i = 0; i < journalConcepts.length; i++){
+            String val =  journalConcepts[i].getPreferredLabel();
+            String name =  journalConcepts[i].getPreferredLabel();
 
             // add only journal with allowReviewWorkflow=true;
-            if(org.dspace.submit.step.SelectPublicationStep.allowReviewWorkflowJournals.contains(val))
+            if(JournalUtils.getBooleanAllowReviewWorkflow(journalConcepts[i]))
 
                 // select journal only if status is "In Review"
                 if(pBean!=null && (journalStatus!=null && (journalStatus.equals(PublicationBean.STATUS_IN_REVIEW)
@@ -547,17 +544,15 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         {}
     }
 
-    private void addJournalSelectStatusIntegrated(String selectedJournalId, Item newItem, String journalStatus, PublicationBean pBean) throws WingException {
+    private void addJournalSelectStatusIntegrated(String selectedJournalId, Item newItem, String journalStatus, PublicationBean pBean) throws WingException,SQLException {
         Composite optionsList = newItem.addComposite("journalID_status_integrated");
         Select journalID = optionsList.addSelect("journalIDStatusIntegrated");
-        java.util.List<String> journalVals = org.dspace.submit.step.SelectPublicationStep.journalVals;
-        java.util.List<String> journalNames = org.dspace.submit.step.SelectPublicationStep.journalNames;
-
-        for (int i = 0; i < journalVals.size(); i++){
-            String val =  journalVals.get(i);
-            String name =  journalNames.get(i);
+        Concept[] journalConcepts = JournalUtils.getJournalConcept(context,selectedJournalId);
+        for (int i = 0; i < journalConcepts.length; i++){
+            String val =  journalConcepts[i].getPreferredLabel();
+            String name =   journalConcepts[i].getPreferredLabel();
             String no_asterisk = name;
-            if(org.dspace.submit.step.SelectPublicationStep.integratedJournals.contains(val))
+            if(JournalUtils.getBooleanIntegrated(journalConcepts[i]))
                 //name += "*";
                 journalID.addOption(val.equals(selectedJournalId), no_asterisk, name);
 

@@ -225,7 +225,8 @@ public abstract class AuthorityObject extends DSpaceObject {
     {
         // Build up list of matching values
         List<AuthorityMetadataValue> values = new ArrayList<AuthorityMetadataValue>();
-        for (AuthorityMetadataValue dcv : getMetadata())
+        ArrayList<AuthorityMetadataValue> amv = getMetadata();
+        for (AuthorityMetadataValue dcv : amv)
         {
             if (match(schema, element, qualifier, lang, dcv))
             {

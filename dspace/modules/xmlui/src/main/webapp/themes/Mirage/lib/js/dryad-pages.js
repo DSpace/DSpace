@@ -312,7 +312,11 @@ jQuery(document).ready(function() {
 function updateOrder(){
     var transactionId = document.getElementsByName("transactionId")[0].value;
     var country =document.getElementsByName("country")[0].value;
-    var currency =document.getElementsByName("currency")[0].value;
+    var currency = "USD";
+    if(document.getElementsByName("currency")){
+        currency = document.getElementsByName("currency")[0].value;
+    }
+
     var journal =jQuery("#aspect_submission_StepTransformer_field_prism_publicationName").val();
     if(journal=="undefined")
     {
