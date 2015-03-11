@@ -51,7 +51,7 @@ import org.xml.sax.SAXException;
  * @author Jay Paz
  */
 public class Navigation extends AbstractDSpaceTransformer implements
-CacheableProcessingComponent
+        CacheableProcessingComponent
 {
     private static final Message T_context_head = message("xmlui.administrative.Navigation.context_head");
 
@@ -110,6 +110,16 @@ CacheableProcessingComponent
     private static final Message T_account_export = message("xmlui.administrative.Navigation.account_export");
 
     private static final Message T_my_account = message("xmlui.EPerson.Navigation.my_account");
+
+    private static final Message T_DRUM_customizations = message("xmlui.administrative.Navigation.DRUM_customizations");
+
+    private static final Message T_DRUM_monthly_statistics = message("xmlui.administrative.Navigation.monthly_statistics");
+
+    private static final Message T_DRUM_embargo_list = message("xmlui.administrative.Navigation.embargo_list");
+
+    private static final Message T_DRUM_units = message("xmlui.administrative.Navigation.units");
+
+    private static final Message T_DRUM_ETD_departments = message("xmlui.administrative.Navigation.ETD_departments");
 
     /** Cached validity object */
     private SourceValidity validity;
@@ -286,7 +296,7 @@ CacheableProcessingComponent
                     context.addItem().addXref(
                             contextPath + "/admin/export?collectionID="
                                     + collection.getID(),
-                                    T_context_export_collection);
+                            T_context_export_collection);
                     context.addItem().addXref(
                             contextPath + "/csv/handle/" + dso.getHandle(),
                             T_context_export_metadata);
@@ -309,7 +319,7 @@ CacheableProcessingComponent
                     context.addItem().addXref(
                             contextPath + "/admin/export?communityID="
                                     + community.getID(),
-                                    T_context_export_community);
+                            T_context_export_community);
                 }
                 context.addItem().addXref(
                         contextPath + "/csv/handle/" + dso.getHandle(),
@@ -327,7 +337,7 @@ CacheableProcessingComponent
                 context.addItemXref(
                         contextPath + "/admin/community?createNew&communityID="
                                 + community.getID(),
-                                T_context_create_subcommunity);
+                        T_context_create_subcommunity);
             }
         }
 
@@ -346,8 +356,19 @@ CacheableProcessingComponent
         {
             admin.setHead(T_administrative_head);
 
+            List drum = admin.addList("drum");
             List epeople = admin.addList("epeople");
             List registries = admin.addList("registries");
+
+            // DRUM Customizations
+            drum.setHead(T_DRUM_customizations);
+            drum.addItemXref(contextPath + "/monthly-statistics",
+                    T_DRUM_monthly_statistics);
+            drum.addItemXref(contextPath + "/embargo-list", T_DRUM_embargo_list);
+            drum.addItemXref(contextPath + "/ETD-departments",
+                    T_DRUM_ETD_departments);
+            drum.addItemXref(contextPath + "/units", T_DRUM_units);
+            // End DRUM Customizations
 
             epeople.setHead(T_administrative_access_control);
             epeople.addItemXref(contextPath + "/admin/epeople",
@@ -380,7 +401,7 @@ CacheableProcessingComponent
     }
 
     public int addContextualOptions(List context) throws SQLException,
-    WingException
+            WingException
     {
         // How many options were added.
         int options = 0;
@@ -437,7 +458,7 @@ CacheableProcessingComponent
                 context.addItemXref(
                         contextPath + "/admin/community?createNew&communityID="
                                 + community.getID(),
-                                T_context_create_subcommunity);
+                        T_context_create_subcommunity);
                 options++;
             }
         }
