@@ -294,10 +294,16 @@
 	<xsl:template name="buildHeader">
 		<xsl:call-template name="buildTopSidebar" />
 		<div id="cic-header" class="row">
-			<div class="col-md-offset-1 col-md-6">
+			<div class="pull-left">
 				<xsl:call-template name="build-anchor">
-					<xsl:with-param name="img.src">images/logo_72.png</xsl:with-param>
+					<xsl:with-param name="img.src">images/Marca_de_cic.png</xsl:with-param>
 					<xsl:with-param name="img.alt">CIC-DIGITAL</xsl:with-param>
+				</xsl:call-template>
+			</div>
+			<div class="pull-right hidden-xs">
+				<xsl:call-template name="build-img">
+					<xsl:with-param name="img.src">images/marca_de_ba.png</xsl:with-param>
+					<xsl:with-param name="img.alt">Buenos Aires</xsl:with-param>
 				</xsl:call-template>
 			</div>
 		</div>
