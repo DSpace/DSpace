@@ -89,8 +89,8 @@
    </files>
 
    <!--
-   Still allow anyone to put a JAR dependency into
-   [src]/dspace/pom.xml and have it go into 'lib' directory
+   Copy ALL JAR dependencies specified in [src]/dspace/pom.xml
+   into the DSpace 'lib' directory.
    -->
    <dependencySets>
       <dependencySet>
@@ -104,30 +104,30 @@
 
    <moduleSets>
       <!--
-      Take all jar modules in [src]/dspace/modules/ dir
-      and add them into 'lib' directory
+      Take all JAR modules (and their dependencies) under
+      [src]/dspace/modules/ dir and add them into 'lib' directory
       -->
       <moduleSet>
          <includes>
-            <include>*:jar:*</include>
+            <include>org.dspace.modules:*:jar:*</include>
          </includes>
          <binaries>
             <includeDependencies>true</includeDependencies>
             <outputDirectory>lib</outputDirectory>
             <unpack>false</unpack>
+            <!-- Include any dependency JARs as well -->
             <dependencySets>
                <dependencySet>
                   <includes>
                      <include>*:jar:*</include>
                   </includes>
-                  <outputDirectory>lib</outputDirectory>
                </dependencySet>
             </dependencySets>
          </binaries>
       </moduleSet>
 
       <!--
-      Take all war modules (in [src]/dspace/modules/) and explode them into
+      Take all WAR modules (in [src]/dspace/modules/) and unpack them into
       'webapps' directory
       -->
       <moduleSet>

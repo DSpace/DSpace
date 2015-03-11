@@ -32,7 +32,8 @@ import org.dspace.utils.DSpace;
 /**
  * 
  * @author Andrea Bollini (CILEA)
- *
+ * @author Adán Román Ruiz at arvo.es (bugfix)
+ * 
  */
 public class SolrBrowseDAO implements BrowseDAO
 {
@@ -360,11 +361,11 @@ public class SolrBrowseDAO implements BrowseDAO
         query.setMaxResults(0);
         if (isAscending)
         {
-            query.setQuery("bi_"+column + "_sort" + ": [* TO \"" + value + "\"]");
+            query.setQuery("bi_"+column + "_sort" + ": [* TO \"" + value + "\"}");
         }
         else
         {
-            query.setQuery("bi_" + column + "_sort" + ": [\"" + value + "\" TO *]");
+            query.setQuery("bi_" + column + "_sort" + ": {\"" + value + "\" TO *]");
         }
         DiscoverResult resp = null;
         try

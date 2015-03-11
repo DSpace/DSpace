@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
-        <version>7</version>
+        <version>9</version>
         <relativePath />
     </parent> -->
     
@@ -109,6 +109,8 @@
                     <excludes>
                         <exclude>**/Abstract*</exclude>
                     </excludes>
+                    <!-- Detailed logs in reportsDirectory/testName-output.txt instead of stdout -->
+                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <!--
 					Enable to debug Maven Surefire tests in remote proces
 					<debugForkedProcess>true</debugForkedProcess>
@@ -165,7 +167,7 @@
 
          <plugin>
             <artifactId>maven-release-plugin</artifactId>
-            <version>2.3.2</version>
+            <version>2.5</version>
             <configuration>
                 <!-- During release:perform, enable the "release" profile (see below) -->
                 <releaseProfiles>release</releaseProfiles>
