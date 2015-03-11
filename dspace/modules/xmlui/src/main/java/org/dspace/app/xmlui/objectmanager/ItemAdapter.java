@@ -1036,6 +1036,7 @@ public class ItemAdapter extends AbstractAdapter
         String checksumType = bitstream.getChecksumAlgorithm();
         String checksum = bitstream.getChecksum();
         long size = bitstream.getSize();
+        int views = bitstream.getIntMetadata("views");
 
         // ////////////////////////////////
         // Start the actual file
@@ -1056,6 +1057,7 @@ public class ItemAdapter extends AbstractAdapter
             attributes.put("CHECKSUMTYPE", checksumType);
         }
         attributes.put("SIZE", String.valueOf(size));
+        attributes.put("VIEWS", String.valueOf(views));
         startElement(METS, "file", attributes);
 
         // ////////////////////////////////////

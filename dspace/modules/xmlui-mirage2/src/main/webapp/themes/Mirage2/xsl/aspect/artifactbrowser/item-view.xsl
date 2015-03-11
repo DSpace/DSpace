@@ -418,6 +418,8 @@
                                     </xsl:choose>
                                     <xsl:text>)</xsl:text>
                                 </a>
+                                <br/>
+                                <i18n:text>xmlui.dri2xhtml.METS-1.0.item-number-downloads</i18n:text><xsl:value-of select="@VIEWS"/>
                             </div>
 
                 </xsl:for-each>
