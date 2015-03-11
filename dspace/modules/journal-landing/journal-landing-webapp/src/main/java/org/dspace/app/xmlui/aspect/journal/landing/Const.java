@@ -1,14 +1,15 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.journal.landing;
 
 import org.apache.solr.client.solrj.SolrQuery;
 
 /**
- * String values in use in journal landing page aspect.
  * @author Nathan Day
  */
 public class Const {
@@ -43,11 +44,10 @@ public class Const {
 
     public static enum QueryType { DOWNLOADS, DEPOSITS };
 
-    // date format string for most recent deposits
-    public static final String januaryInd = "01";
     public static final String fmtDateView = "yyyy-MM-dd";
-    public static final String solrDateFormat = "time:[%d-%s-01T00:00:00.000Z TO NOW]";
-    public static final String solrDateAllTime = "[* TO NOW]";
+    public static final String solrDatePastMonth = "time:[NOW-1MONTH TO NOW]";
+    public static final String solrDatePastYear = "time:[NOW-1YEAR TO NOW]";
+    public static final String solrDateAllTime = "time:[* TO NOW]";
     public static final int displayCount = 10;
     public static final String depositsDisplayField = "dc.date.accessioned_dt";
     public static final String depositsDisplaySortField = "dc.date.accessioned_dt";

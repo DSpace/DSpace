@@ -1,4 +1,10 @@
-
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.datadryad.api;
 
 import java.net.MalformedURLException;
@@ -26,17 +32,18 @@ import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
 /**
- * Convenience class for querying for data related to a given journal
+ * Convenience class for querying Solr and Postgres for data related to a given 
+ * journal, as used by the journal landing pages reporting.
+ * 
  * @author Nathan Day <nday@datadryad.org>
  */
 public class DryadJournal {
 
     private static Logger log = Logger.getLogger(DryadJournal.class);
-
     private static final String solrStatsUrl = ConfigurationManager.getProperty("solr.stats.server");
 
-    private Context context = null;
-    private String journalName = null;
+    private Context context;
+    private String journalName;
 
     public DryadJournal(Context context, String journalName) throws IllegalArgumentException {
         if (context == null) {
@@ -48,7 +55,11 @@ public class DryadJournal {
         this.journalName = journalName;
     }
 
-    // Params are collection id and publication name
+    /**
+     * Query to request all item id values for the data files associated with
+     * all archived data packages for a given journal.
+     * ? #1: full journal name
+     */
     private final static String ARCHIVED_DATAFILE_QUERY =
     // item.item_id for data file
     " SELECT DISTINCT mdv_df.item_id                                                                                    " +
@@ -81,9 +92,9 @@ public class DryadJournal {
     "    ));                                                                                                            ";
 
     /**
-     * Executes the SQL query to get archived data file item-ids for a given journal,
-     * returning the item ids
-     * @return a List of {@link Integer}
+     * Executes query to Postgres to get archived data file item ids for a given 
+     * journal, returning the item ids.
+     * @return a List of {@link Integer} values representing item.item_id values
      * @throws SQLException
      */
     public List<Integer> getArchivedDataFiles() throws SQLException {
@@ -97,8 +108,11 @@ public class DryadJournal {
         return dataFiles;
     }
 
-    private final static String ARCHIVED_DATAPACKAGE_QUERY_TEMPL =
-    " SELECT %s                                                                                             " +     // %s: select value
+    /**
+     * Query to return a list of item ids for archived data packages for a given journal.
+     */
+    private final static String ARCHIVED_DATAPACKAGE_QUERY_IDS =
+    " SELECT item_p.item_id                                                                                 " +
     "  FROM item item_p                                                                                     " +
     "  JOIN metadatavalue          mdv_pub   ON item_p.item_id               = mdv_pub.item_id              " +
     "  JOIN metadatafieldregistry  mdfr_pub  ON mdv_pub.metadata_field_id    = mdfr_pub.metadata_field_id   " +
@@ -113,11 +127,29 @@ public class DryadJournal {
     "   AND mdsr_date.short_id  = 'dc'                                                                      " +
     "   AND mdfr_date.element   = 'date'                                                                    " +
     "   AND mdfr_date.qualifier = 'accessioned'                                                             " +
-    " %s                                                                                                    " +     // %s: group by/order by
+    " ORDER BY mdv_date.text_value DESC                                                                     " +
     " LIMIT ?                                                                                               ";      // ?: limit
-    private final static String ARCHIVED_DATAPACKAGE_QUERY_IDS   = String.format(ARCHIVED_DATAPACKAGE_QUERY_TEMPL, "item_p.item_id", "ORDER BY mdv_date.text_value DESC");
-    private final static String ARCHIVED_DATAPACKAGE_QUERY_COUNT = String.format(ARCHIVED_DATAPACKAGE_QUERY_TEMPL, "COUNT(item_p) AS total", "");
+    
+    /**
+     * Query to return a count of archived data packages for a given journal.
+     */
+    private final static String ARCHIVED_DATAPACKAGE_QUERY_COUNT =
+    " SELECT COUNT(item_p) AS total                                                                         " +
+    "  FROM item item_p                                                                                     " +
+    "  JOIN metadatavalue          mdv_pub   ON item_p.item_id               = mdv_pub.item_id              " +
+    "  JOIN metadatafieldregistry  mdfr_pub  ON mdv_pub.metadata_field_id    = mdfr_pub.metadata_field_id   " +
+    "  JOIN metadataschemaregistry mdsr_pub  ON mdfr_pub.metadata_schema_id  = mdsr_pub.metadata_schema_id  " +
+    "  JOIN metadatavalue          mdv_date  ON item_p.item_id               = mdv_date.item_id             " +
+    " WHERE item_p.in_archive   = true                                                                      " +
+    "   AND mdsr_pub.short_id   = 'prism'                                                                   " +
+    "   AND mdfr_pub.element    = 'publicationName'                                                         " +
+    "   AND mdv_pub.text_value  = ?                                                                         " +
+    " LIMIT ?                                                                                               ";      // ?: limit
 
+    /**
+     * Return count of archived data packages for the journal associated with this object.
+     * @return int count
+     */
     public int getArchivedPackagesCount() {
         int count = 0;
         try {
@@ -134,6 +166,14 @@ public class DryadJournal {
         return count;
     }
 
+    /**
+     * Return a sorted list of archived data packages (Item objects) for the journal 
+     * associated with this object. The data packages are sorted according to 
+     * date-accessioned, with most recently accessioned package first.
+     * @param max total number of items to return
+     * @return List<org.dspace.content.Item> data packages
+     * @throws SQLException 
+     */
     public List<Item> getArchivedPackagesSortedRecent(int max) throws SQLException {
         TableRowIterator tri = DatabaseManager.query(this.context, ARCHIVED_DATAPACKAGE_QUERY_IDS, this.journalName, max);
         List<Item> dataPackages = new ArrayList<Item>();
@@ -150,24 +190,17 @@ public class DryadJournal {
         return dataPackages;
     }
 
-    /*
-        &q=time:%5B2014-01-01T00:00:00.000Z%20TO%20NOW%5D
-        &rows=0
-        &omitHeader=true
-        &facet=true
-        &facet.query=owningItem:63687
-        &facet.query=owningItem:57221
-        &facet.query=owningItem:...
-
-        <?xml version="1.0" encoding="UTF-8"?>
-        <response>
-            <result name="response" numFound="1818637" start="0"/>
-            <lst name="facet_counts">
-                <lst name="facet_queries">
-                    <int name="owningItem:63687">9</int>
-                    <int name="owningItem:57221">1</int>
-                    <int name="owningItem:50903">3</int>
-    */
+    /**
+     * Return sorted listing of data file Items for the journal associated with
+     * this object, faceted by a given field, for example, page views or data file 
+     * downloads.
+     * @param facetQueryField value for "&facet.query=..." parameter, e.g., "owningItem"
+     * @param time query value to provide in Solr "q=time:[...]" field
+     * @param max maximum number of items to return
+     * @return LinkedHashMap<Item, String> of data package Items and counts. This 
+     *      HashMap structure's iterator returns items in the order in which they were
+     *      inserted, preserving the sort order performed in sortFilterQuery().
+     */
     public LinkedHashMap<Item, String> getRequestsPerJournal(String facetQueryField, String time, int max) {
         // default solr query for site
         SolrQuery queryArgs = new SolrQuery();
@@ -193,6 +226,18 @@ public class DryadJournal {
         }
     }
 
+    /**
+     * Given a solrResponse produced by a faceted query, return a list of items 
+     * sorted by facet query value. Note that this method assumes
+     * that the query producing the response was faceted (&facet=true) and that 
+     * it had one or more query facets (&facet.query=...) that correspond to
+     * Dryad Items, as is produced by getRequestsPerJournal above.
+     * @param solrResponse
+     * @param facetQueryField facet.query field to use as sort key, e.g., "owningItem"
+     * @param max maximum number of items to return
+     * @return LinkedHashMap<Item, String> of 
+     * @throws SQLException 
+     */
     private LinkedHashMap<Item, String> sortFilterQuery(QueryResponse solrResponse, String facetQueryField, int max) throws SQLException {
         final Map<String,Integer> facets = solrResponse.getFacetQuery();
         ArrayList<String> sortedKeys = new ArrayList<String>();
@@ -214,7 +259,16 @@ public class DryadJournal {
         }
         return result;
     }
-    /*  */
+    
+    /**
+     * Query Solr server using an HTTP POST request method to avoid the query
+     * URL length limitations for a GET.
+     * @param baseUrl url of solr server, e.g., http://datadryad.org/solr
+     * @param solrQuery
+     * @return QueryResponse
+     * @throws MalformedURLException
+     * @throws SolrServerException 
+     */
     private QueryResponse doSolrPost(String baseUrl, SolrQuery solrQuery) throws MalformedURLException, SolrServerException {
         CommonsHttpSolrServer server = null;
         try {

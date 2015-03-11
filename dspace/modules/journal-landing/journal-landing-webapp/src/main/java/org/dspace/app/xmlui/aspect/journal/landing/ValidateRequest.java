@@ -1,7 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.journal.landing;
 
@@ -14,12 +16,17 @@ import org.apache.cocoon.environment.Redirector;
 import org.apache.cocoon.environment.SourceResolver;
 
 import org.apache.log4j.Logger;
+import org.dspace.JournalUtils;
 
 import static org.dspace.app.xmlui.aspect.journal.landing.Const.*;
-import org.dspace.submit.utils.DryadJournalSubmissionUtils;
+import org.dspace.app.xmlui.utils.ContextUtil;
+import org.dspace.content.authority.Concept;
+import org.dspace.core.Context;
 
 /**
- *
+ * Cocoon Action to confirm that the requested journal landing page is for 
+ * a journal that is under authority control in Dryad.
+ * 
  * @author Nathan Day
  */
 public class ValidateRequest extends AbstractAction {
@@ -34,7 +41,9 @@ public class ValidateRequest extends AbstractAction {
         if (journalName == null || journalName.length() == 0) return null;
 
         // verify we have an accurate journal
-        String journalAbbr = DryadJournalSubmissionUtils.findKeyByFullname(journalName);
+        Context context = ContextUtil.obtainContext(objectModel);
+        Concept journalConcept = JournalUtils.getJournalConceptByName(context,journalName);
+        String journalAbbr = JournalUtils.getJournalShortID(journalConcept);        
         if (journalAbbr != null && journalAbbr.length() != 0) {
             Map map = new HashMap();
             map.put(PARAM_JOURNAL_NAME, journalName);

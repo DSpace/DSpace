@@ -1,7 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.journal.landing;
 
@@ -22,9 +24,14 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import org.apache.avalon.framework.parameters.ParameterException;
 import java.net.URLEncoder;
+import java.util.Map;
+import org.apache.avalon.framework.parameters.Parameters;
+import org.apache.cocoon.ProcessingException;
+import org.apache.cocoon.environment.SourceResolver;
 
 /**
- *
+ * 
+ * 
  * @author Nathan Day
  */
 public class JournalSearch extends AbstractDSpaceTransformer {
@@ -32,22 +39,26 @@ public class JournalSearch extends AbstractDSpaceTransformer {
     private static final Logger log = Logger.getLogger(JournalSearch.class);
     private static final Message T_panel_head = message("xmlui.JournalLandingPage.JournalSearch.panel_head"); 
     
+    private String journalName;
+    
+    @Override
+    public void setup(SourceResolver resolver, Map objectModel, String src,
+            Parameters parameters) throws ProcessingException, SAXException,
+            IOException
+    {
+        super.setup(resolver, objectModel, src, parameters);
+        try {
+            journalName = parameters.getParameter(PARAM_JOURNAL_NAME);
+        } catch (Exception ex) {
+            log.error(ex);
+            throw(new ProcessingException("Bad access of journal name"));
+        }
+    }
+    
     @Override
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
-        String journalName = null;
-        try {
-            journalName = parameters.getParameter(PARAM_JOURNAL_NAME);
-        } catch (ParameterException ex) {
-            log.error((ex));
-        }
-        if (journalName == null || journalName.length() == 0) return;
-
-        // ------------------
-        // Search data in Dryad associated with Journal X
-        // 
-        // ------------------
         Division searchDiv = body.addDivision(SEARCH_DIV, SEARCH_DIV);
         searchDiv.setHead(T_panel_head.parameterize(journalName));
     }

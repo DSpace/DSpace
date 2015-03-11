@@ -1,7 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.journal.landing;
 
@@ -30,7 +32,8 @@ import org.dspace.content.authority.Concept;
 import org.xml.sax.SAXException;
 
 /**
- *
+ * Journal landing page transformer for top panel containing journal information.
+ * 
  * @author Nathan Day
  */
 public class Banner extends AbstractDSpaceTransformer {
@@ -96,19 +99,17 @@ public class Banner extends AbstractDSpaceTransformer {
         inner.setHead(journalName);
 
         // [Journal description]
-        // JournalUtils.getDescription();
         String journalDescr = JournalUtils.getDescription(journalConcept);
         if (journalDescr != null) {
             inner.addPara().addContent(journalDescr);
         }
 
         // Member: ___
-        // JournalUtils.getMemberName()
-        Para pMem = inner.addPara(BANNER_MEM, BANNER_MEM);
-        pMem.addHighlight(null).addContent(T_Member);
         String memberName = JournalUtils.getMemberName(journalConcept);
-        pMem.addContent(": ");
-        if (memberName != null) {
+        if (memberName != null && memberName.length() > 0) {
+            Para pMem = inner.addPara(BANNER_MEM, BANNER_MEM);
+            pMem.addHighlight(null).addContent(T_Member);
+            pMem.addContent(": ");
             pMem.addContent(memberName);
         }
 

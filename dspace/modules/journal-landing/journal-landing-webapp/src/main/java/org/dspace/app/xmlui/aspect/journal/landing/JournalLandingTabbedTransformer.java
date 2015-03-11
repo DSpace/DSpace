@@ -1,14 +1,15 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.journal.landing;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Map;
 import org.apache.avalon.framework.parameters.ParameterException;
 import org.apache.avalon.framework.parameters.Parameters;
@@ -25,11 +26,7 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.authorize.AuthorizeException;
 import org.xml.sax.SAXException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
-import java.util.Locale;
 import org.datadryad.api.DryadJournal;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.content.DCValue;
@@ -37,27 +34,23 @@ import org.dspace.content.Item;
 import org.dspace.workflow.DryadWorkflowUtils;
 
 /**
- *
+ * Cocoon/DSpace transformer to produce a panel for the journal landing page,
+ * with multiple tabs. The DRI produced here is handled by the Mirage xsl
+ * stylesheet lib/xsl/aspect/JournalLandingPage/main.xsl.
+ * 
  * @author Nathan Day
  */
 public abstract class JournalLandingTabbedTransformer extends AbstractDSpaceTransformer {
 
     private static final Logger log = Logger.getLogger(JournalLandingTabbedTransformer.class);
     private final static SimpleDateFormat fmt = new SimpleDateFormat(fmtDateView);
-    private int currentMonth;
-    private String currentMonthStr;
-    private int currentYear;
-    Locale defaultLocale = org.dspace.core.I18nUtil.getDefaultLocale();
 
-    // cocoon parameters
-    protected String journalName;
+    private String journalName;
     private DryadJournal dryadJournal;
 
-    // container for data pertaining to entire div
     protected class DivData {
         public String n;
         public Message T_div_head;
-        public String facetQueryField;
         public int maxResults;
     }
     protected DivData divData;
@@ -67,19 +60,10 @@ public abstract class JournalLandingTabbedTransformer extends AbstractDSpaceTran
         public Message refHead;
         public Message valHead;
         public String dateFilter;
+        public String facetQueryField;
         public QueryType queryType;
     }
-    protected ArrayList<TabData> tabData;
-
-    protected int getCurrentMonth() {
-        return currentMonth;
-    }
-    protected int getCurrentYear() {
-        return currentYear;
-    }
-    protected String getCurrentMonthStr() {
-        return currentMonthStr;
-    }
+    protected java.util.List<TabData> tabData;
 
     @Override
     public void setup(SourceResolver resolver, Map objectModel, String src,
@@ -93,16 +77,22 @@ public abstract class JournalLandingTabbedTransformer extends AbstractDSpaceTran
             log.error(ex);
             throw new ProcessingException(ex.getMessage());
         }
-        Calendar cal = new GregorianCalendar();
-        Date now = new Date();
-        cal.setTime(now);
-        currentMonth = cal.get(Calendar.MONTH);
-        currentYear = cal.get(Calendar.YEAR);
-        currentMonthStr = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, defaultLocale);
         dryadJournal = new DryadJournal(this.context, this.journalName);
     }
 
-    protected void addStatsTable(Body body) throws SAXException, WingException,
+    /**
+     * Method to add a div element with multiple tabs, each containing a listing
+     * of Dryad references and an associated value, e.g., an accessioned date
+     * or a download count.
+     * @param body DRI body element
+     * @throws SAXException
+     * @throws WingException
+     * @throws UIException
+     * @throws SQLException
+     * @throws IOException
+     * @throws AuthorizeException 
+     */
+    protected void addStatsLists(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
         Division outer = body.addDivision(divData.n,divData.n);
@@ -120,20 +110,29 @@ public abstract class JournalLandingTabbedTransformer extends AbstractDSpaceTran
             ReferenceSet itemsContainer = items.addReferenceSet(t.n, ReferenceSet.TYPE_SUMMARY_LIST);
             itemsContainer.setHead(t.refHead);
             // dspace value list, to hold counts
-            Division counts = wrapper.addDivision(VALS);
-            List countList = counts.addList(t.n, List.TYPE_SIMPLE, t.n);
-            countList.setHead(t.valHead);
+            Division vals = wrapper.addDivision(VALS);
+            List valsList = vals.addList(t.n, List.TYPE_SIMPLE, t.n);
+            valsList.setHead(t.valHead);
             if (t.queryType == QueryType.DOWNLOADS ) {
-                doDownloadsQuery(itemsContainer, countList, dryadJournal, divData, t);
+                doDownloadsQuery(itemsContainer, valsList, dryadJournal, divData, t);
             } else if (t.queryType == QueryType.DEPOSITS ) {
-                doDepositsQuery(itemsContainer, countList, dryadJournal, divData, t);
+                doDepositsQuery(itemsContainer, valsList, dryadJournal, divData, t);
             }
         }
     }
 
+    /**
+     * Populate the given reference and values lists with data from Solr on 
+     * download statistics.
+     * @param itemsContainer DRI ReferenceSet element to contain retrieved Items
+     * @param countList DRI List element to contain download counts
+     * @param dryadJournal DryadJournal object for the given 
+     * @param divData query parameters for the current div
+     * @param t query parameters for the current tab
+     */
     private void doDownloadsQuery(ReferenceSet itemsContainer, List countList, DryadJournal dryadJournal, DivData divData, TabData t) {
         LinkedHashMap<Item, String> results = dryadJournal.getRequestsPerJournal(
-            divData.facetQueryField, t.dateFilter, divData.maxResults
+            t.facetQueryField, t.dateFilter, divData.maxResults
         );
         if (results != null) {
             for (Item item : results.keySet()) {
@@ -148,6 +147,15 @@ public abstract class JournalLandingTabbedTransformer extends AbstractDSpaceTran
         }
     }
 
+    /**
+     * Populate the given reference and values lists with recent deposit data
+     * from Postgres.
+     * @param itemsContainer DRI ReferenceSet element to contain retrieved Items
+     * @param countList DRI List element to contain download counts
+     * @param dryadJournal DryadJournal object for the given 
+     * @param divData query parameters for the current div
+     * @param t query parameters for the current tab
+     */
     private void doDepositsQuery(ReferenceSet itemsContainer, List countList, DryadJournal dryadJournal, DivData divData, TabData t) {
         java.util.List<Item> packages = null;
         try {
