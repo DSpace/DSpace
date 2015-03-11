@@ -16,13 +16,14 @@
       <url>http://www.dspace.org</url>
    </organization>
 
-    <!-- brings the sonatype snapshot repository and signing requirement on board -->
+    <!-- 
+    comment this out to avoid accidental release on sonatype under org.dspace group id
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
         <version>7</version>
         <relativePath />
-    </parent>
+    </parent> -->
     
     <!--Force UTF-8 encoding during build on all platforms-->
     <properties>		
