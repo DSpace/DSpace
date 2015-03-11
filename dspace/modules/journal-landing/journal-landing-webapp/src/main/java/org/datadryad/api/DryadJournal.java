@@ -139,12 +139,10 @@ public class DryadJournal {
     "  JOIN metadatavalue          mdv_pub   ON item_p.item_id               = mdv_pub.item_id              " +
     "  JOIN metadatafieldregistry  mdfr_pub  ON mdv_pub.metadata_field_id    = mdfr_pub.metadata_field_id   " +
     "  JOIN metadataschemaregistry mdsr_pub  ON mdfr_pub.metadata_schema_id  = mdsr_pub.metadata_schema_id  " +
-    "  JOIN metadatavalue          mdv_date  ON item_p.item_id               = mdv_date.item_id             " +
     " WHERE item_p.in_archive   = true                                                                      " +
     "   AND mdsr_pub.short_id   = 'prism'                                                                   " +
     "   AND mdfr_pub.element    = 'publicationName'                                                         " +
-    "   AND mdv_pub.text_value  = ?                                                                         " +
-    " LIMIT ?                                                                                               ";      // ?: limit
+    "   AND mdv_pub.text_value  = ?                                                                         ";
 
     /**
      * Return count of archived data packages for the journal associated with this object.
@@ -155,7 +153,6 @@ public class DryadJournal {
         try {
             PreparedStatement statement = context.getDBConnection().prepareStatement(ARCHIVED_DATAPACKAGE_QUERY_COUNT);
             statement.setString(1,journalName);
-            statement.setInt(2, 1);
             ResultSet rs = statement.executeQuery();
             if (rs.next()) {
                 count = rs.getInt("total");
@@ -286,5 +283,4 @@ public class DryadJournal {
         }
         return response;
     }
-
 }
