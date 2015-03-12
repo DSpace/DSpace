@@ -7,20 +7,14 @@
  */
 package org.datadryad.api;
 
-import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.dspace.content.Item;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.datadryad.test.ContextUnitTest;
-import org.dspace.core.Context;
 import org.junit.Ignore;
 
 /**
@@ -35,7 +29,7 @@ public class DryadJournalTest extends ContextUnitTest {
     @Before
     public void setUp() {
         super.setUp();
-        dryadJournal = new DryadJournal(this.context, journalName);
+        dryadJournal = new DryadJournal(this.context, testJournalName);
     }
     
     /**

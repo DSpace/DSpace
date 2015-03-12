@@ -46,11 +46,11 @@
 
     <profiles>
         <!--
-			when activated a dspace.config configuration file location passed on
-			the commandline (-Ddspace.config=...) can be passed through to be
-			used as a filter source by projects for tasks such as updating the
-			${dspace.dir} in web.xml etc.
-		-->
+            when activated a dspace.config configuration file location passed on
+            the commandline (-Ddspace.config=...) can be passed through to be
+            used as a filter source by projects for tasks such as updating the
+            ${dspace.dir} in web.xml etc.
+        -->
         <profile>
             <activation>
                 <property>
@@ -123,6 +123,14 @@
             <groupId>org.dspace.modules</groupId>
             <artifactId>api</artifactId>
             <version>${pom.version}</version>
+        </dependency>
+        <dependency>
+           <!-- This is required to get the base classes for tests -->
+           <groupId>org.dspace.modules</groupId>
+           <artifactId>api</artifactId>
+           <version>${project.version}</version>
+           <type>test-jar</type>
+           <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.dspace.discovery</groupId>
