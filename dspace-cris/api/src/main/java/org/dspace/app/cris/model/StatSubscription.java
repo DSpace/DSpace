@@ -45,7 +45,7 @@ public class StatSubscription extends IdentifiableObject {
     /** DB Primary key */
     @Id
     @GeneratedValue(generator = "CRIS_STATSUBSCRIPTION_SEQ")
-    @SequenceGenerator(name = "CRIS_STATSUBSCRIPTION_SEQ", sequenceName = "CRIS_STATSUBSCRIPTION_SEQ")
+    @SequenceGenerator(name = "CRIS_STATSUBSCRIPTION_SEQ", sequenceName = "CRIS_STATSUBSCRIPTION_SEQ", allocationSize = 1)
     private Integer id;
 	
     /** Type of the DSpace resource */

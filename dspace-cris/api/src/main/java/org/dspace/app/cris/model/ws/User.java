@@ -52,7 +52,7 @@ public class User implements Identifiable, HasTimeStampInfo
     /** DB Primary key */
     @Id
     @GeneratedValue(generator = "CRIS_WS_USER_SEQ")
-    @SequenceGenerator(name = "CRIS_WS_USER_SEQ", sequenceName = "CRIS_WS_USER_SEQ")
+    @SequenceGenerator(name = "CRIS_WS_USER_SEQ", sequenceName = "CRIS_WS_USER_SEQ", allocationSize = 1)
     private Integer id;
     
     /** timestamp info for creation and last modify */

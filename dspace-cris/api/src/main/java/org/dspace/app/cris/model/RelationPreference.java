@@ -40,7 +40,7 @@ public class RelationPreference extends IdentifiableObject
     /** DB Primary key */
     @Id
     @GeneratedValue(generator = "CRIS_RELPREF_SEQ")
-    @SequenceGenerator(name = "CRIS_RELPREF_SEQ", sequenceName = "CRIS_RELPREF_SEQ")
+    @SequenceGenerator(name = "CRIS_RELPREF_SEQ", sequenceName = "CRIS_RELPREF_SEQ", allocationSize = 1)
     private Integer id;
     
     private String sourceUUID;

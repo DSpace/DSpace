@@ -114,7 +114,7 @@ public class ResearcherPage extends
     /** DB Primary key */
     @Id
     @GeneratedValue(generator = "CRIS_RPAGE_SEQ")
-    @SequenceGenerator(name = "CRIS_RPAGE_SEQ", sequenceName = "CRIS_RPAGE_SEQ")
+    @SequenceGenerator(name = "CRIS_RPAGE_SEQ", sequenceName = "CRIS_RPAGE_SEQ", allocationSize = 1)
     private Integer id;
 
     @Transient

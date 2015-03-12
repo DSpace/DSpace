@@ -57,7 +57,7 @@ public class Project extends ACrisObject<ProjectProperty, ProjectPropertiesDefin
     /** DB Primary key */
     @Id
     @GeneratedValue(generator = "CRIS_PROJECT_SEQ")
-    @SequenceGenerator(name = "CRIS_PROJECT_SEQ", sequenceName = "CRIS_PROJECT_SEQ")
+    @SequenceGenerator(name = "CRIS_PROJECT_SEQ", sequenceName = "CRIS_PROJECT_SEQ", allocationSize = 1)
     private Integer id;
 
     /** timestamp info for creation and last modify */

@@ -64,7 +64,7 @@ public class OrganizationUnit extends
     /** DB Primary key */
     @Id
     @GeneratedValue(generator = "CRIS_OU_SEQ")
-    @SequenceGenerator(name = "CRIS_OU_SEQ", sequenceName = "CRIS_OU_SEQ")
+    @SequenceGenerator(name = "CRIS_OU_SEQ", sequenceName = "CRIS_OU_SEQ", allocationSize = 1)
     private Integer id;
 
     /** timestamp info for creation and last modify */

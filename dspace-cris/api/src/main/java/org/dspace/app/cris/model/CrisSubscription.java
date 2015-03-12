@@ -40,7 +40,7 @@ public class CrisSubscription extends IdentifiableObject {
     /** DB Primary key */
     @Id
     @GeneratedValue(generator = "CRIS_SUBSCRIPTION_SEQ")
-    @SequenceGenerator(name = "CRIS_SUBSCRIPTION_SEQ", sequenceName = "CRIS_SUBSCRIPTION_SEQ")
+    @SequenceGenerator(name = "CRIS_SUBSCRIPTION_SEQ", sequenceName = "CRIS_SUBSCRIPTION_SEQ", allocationSize = 1)
     private Integer id;
 
     private String uuid;

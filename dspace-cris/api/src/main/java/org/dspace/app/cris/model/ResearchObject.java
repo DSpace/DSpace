@@ -62,7 +62,7 @@ public class ResearchObject extends ACrisObjectWithTypeSupport<DynamicProperty, 
     /** DB Primary key */
     @Id
     @GeneratedValue(generator = "CRIS_DYNAOBJ_SEQ")
-    @SequenceGenerator(name = "CRIS_DYNAOBJ_SEQ", sequenceName = "CRIS_DYNAOBJ_SEQ")
+    @SequenceGenerator(name = "CRIS_DYNAOBJ_SEQ", sequenceName = "CRIS_DYNAOBJ_SEQ", allocationSize = 1)
     private Integer id;
     
     /** timestamp info for creation and last modify */

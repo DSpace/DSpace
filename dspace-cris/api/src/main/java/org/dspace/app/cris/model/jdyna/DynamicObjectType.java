@@ -46,7 +46,7 @@ public class DynamicObjectType extends ATypeWithTypeNestedObjectSupport<DynamicP
     /** DB Primary key */
     @Id
     @GeneratedValue(generator = "CRIS_TYPODYNAOBJ_SEQ")
-    @SequenceGenerator(name = "CRIS_TYPODYNAOBJ_SEQ", sequenceName = "CRIS_TYPODYNAOBJ_SEQ")    
+    @SequenceGenerator(name = "CRIS_TYPODYNAOBJ_SEQ", sequenceName = "CRIS_TYPODYNAOBJ_SEQ", allocationSize = 1)    
     private Integer id;
     
     @ManyToMany    

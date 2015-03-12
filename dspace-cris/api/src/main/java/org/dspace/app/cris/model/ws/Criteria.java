@@ -20,7 +20,7 @@ public class Criteria
     /** DB Primary key */
     @Id
     @GeneratedValue(generator = "CRIS_WS_CRITERIA_SEQ")
-    @SequenceGenerator(name = "CRIS_WS_CRITERIA_SEQ", sequenceName = "CRIS_WS_CRITERIA_SEQ")
+    @SequenceGenerator(name = "CRIS_WS_CRITERIA_SEQ", sequenceName = "CRIS_WS_CRITERIA_SEQ", allocationSize = 1)
     private Integer id;
 
     private boolean enabled;
