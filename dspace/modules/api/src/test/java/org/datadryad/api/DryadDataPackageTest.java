@@ -26,6 +26,7 @@ public class DryadDataPackageTest extends ContextUnitTest {
      */
     @Test
     public void testGetCollection() throws Exception {
+        log.info("getCollection");
         Context context = this.context;
         Collection result = DryadDataPackage.getCollection(context);
         assertEquals(result.getName(), "Dryad Data Packages");
@@ -36,6 +37,7 @@ public class DryadDataPackageTest extends ContextUnitTest {
      */
     @Test
     public void testCreate() throws Exception {
+        log.info("create");
         DryadDataPackage result = DryadDataPackage.create(context);
         assertNotNull(result);
         assertNull(result.getWorkflowItem(context));
@@ -47,6 +49,7 @@ public class DryadDataPackageTest extends ContextUnitTest {
      */
     @Test
     public void testCreateInWorkflow() throws Exception {
+        log.info("createInWorkflow");
         DryadDataPackage result = DryadDataPackage.createInWorkflow(context);
         assertNotNull(result);
         assertNotNull(result.getWorkflowItem(context));
@@ -58,6 +61,7 @@ public class DryadDataPackageTest extends ContextUnitTest {
      */
     @Test
     public void testMakeSubmittedProvenance() {
+        log.info("makeSubmittedProvenance");
         DCDate date = new DCDate(BURIED_DATE_STRING);
         String submitterName = "First Last";
         String submitterEmail = "f.last@university.edu";

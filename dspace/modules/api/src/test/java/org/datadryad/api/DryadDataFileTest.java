@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import org.apache.log4j.Logger;
 import org.datadryad.test.ContextUnitTest;
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
