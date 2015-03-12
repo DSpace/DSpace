@@ -73,7 +73,7 @@ public class DSpaceObject {
 
     public String getLink() {
         //TODO, get actual contextPath of /rest/
-        return "/RESTapi/" + English.plural(getType()) + "/" + getId();
+        return "/rest/" + English.plural(getType()) + "/" + getId();
     }
 
     public String getType() {
