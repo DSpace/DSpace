@@ -7,6 +7,7 @@
  */
 package org.datadryad.api;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.log4j.Logger;
@@ -15,6 +16,9 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.datadryad.test.ContextUnitTest;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 
 /**
@@ -31,6 +35,16 @@ public class DryadJournalTest extends ContextUnitTest {
         super.setUp();
         dryadJournal = new DryadJournal(this.context, testJournalName);
     }
+    @After
+    public void tearDown() {
+        super.tearDown();
+    }
+    
+    // override beforeClass, afterClass to avoid kernel setup
+    @BeforeClass
+    public static void setupClass() {}
+    @AfterClass
+    public static void tearDownClass() {}
     
     /**
      * Test of getArchivedDataFiles method, of class DryadJournal.
