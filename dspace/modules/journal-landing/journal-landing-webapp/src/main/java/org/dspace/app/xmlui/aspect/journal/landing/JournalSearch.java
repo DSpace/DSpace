@@ -22,15 +22,14 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.authorize.AuthorizeException;
 import org.xml.sax.SAXException;
 import java.io.IOException;
-import org.apache.avalon.framework.parameters.ParameterException;
-import java.net.URLEncoder;
 import java.util.Map;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.environment.SourceResolver;
 
 /**
- * 
+ * Add "Search data in Dryad associated with ..." by-journal search field
+ * to the journal-landing page.
  * 
  * @author Nathan Day
  */

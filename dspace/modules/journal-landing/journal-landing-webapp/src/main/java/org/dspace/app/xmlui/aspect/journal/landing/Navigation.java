@@ -24,7 +24,7 @@ import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
 
 /**
- * Add options and meta DRI
+ * Add options and meta DRI elements to the journal landing page.
  * 
  * @author Nathan Day
  */
