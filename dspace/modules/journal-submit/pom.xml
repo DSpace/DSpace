@@ -5,7 +5,6 @@
 	<artifactId>journal-submit</artifactId>
 	<packaging>war</packaging>
 	<name>Dryad Journal Submission :: Web Application</name>
-	<version>0.0.1</version>
 	<description>Dryad Journal Submission Web Application</description>
 
 	<parent>

@@ -1,0 +1,80 @@
+{
+    "USD": {
+        "memberDPC_voucher": "$65",
+        "nonMemberDPC_voucher": "$70",
+        "memberDPC_deferred": "$70",
+        "nonMemberDPC_deferred": "$75",
+        "memberDPC_subscription": "$25",
+        "nonMemberDPC_subscription": "$30",
+        "DPC_pay_on_submission": "$80",
+        "notIntegratedJournalFee": "$10",
+        "DPC_pay_on_submission_nonintegrated": "$90",
+        "excessDataStorageFee_first_GB": "$15",
+        "excessDataStorageFee_per_additional_GB": "$10"
+    },
+    "EUR": {
+        "memberDPC_voucher": "€49",
+        "nonMemberDPC_voucher": "€53",
+        "memberDPC_deferred": "€53",
+        "nonMemberDPC_deferred": "€56",
+        "memberDPC_subscription": "€19",
+        "nonMemberDPC_subscription": "€23",
+        "DPC_pay_on_submission": "€60",
+        "notIntegratedJournalFee": "€8",
+        "DPC_pay_on_submission_nonintegrated": "€68",
+        "excessDataStorageFee_first_GB": "€11",
+        "excessDataStorageFee_per_additional_GB": "€8"
+    },
+    "GBP": {
+        "memberDPC_voucher": "£42", 
+        "nonMemberDPC_voucher": "£45",
+        "memberDPC_deferred": "£45",
+        "nonMemberDPC_deferred": "£48",
+        "memberDPC_subscription": "£16",
+        "nonMemberDPC_subscription": "£20",
+        "DPC_pay_on_submission": "£53",
+        "notIntegratedJournalFee": "£7",
+        "DPC_pay_on_submission_nonintegrated": "£60",
+        "excessDataStorageFee_first_GB": "£10",
+        "excessDataStorageFee_per_additional_GB": "£7"
+    },
+    "CAD": {
+        "memberDPC_voucher": "$67",
+        "nonMemberDPC_voucher": "$73",
+        "memberDPC_deferred": "$73",
+        "nonMemberDPC_deferred": "$77",
+        "memberDPC_subscription": "$26",
+        "nonMemberDPC_subscription": "$30",
+        "DPC_pay_on_submission": "$83",
+        "notIntegratedJournalFee": "$10",
+        "DPC_pay_on_submission_nonintegrated": "$93",
+        "excessDataStorageFee_first_GB": "$15",
+        "excessDataStorageFee_per_additional_GB": "$10"
+    },
+    "JPY": {
+        "memberDPC_voucher": "¥6370",
+        "nonMemberDPC_voucher": "¥6860",
+        "memberDPC_deferred": "¥6860",
+        "nonMemberDPC_deferred": "¥7350",
+        "memberDPC_subscription": "¥2450",
+        "nonMemberDPC_subscription": "¥2940",
+        "DPC_pay_on_submission": "¥7840",
+        "notIntegratedJournalFee": "¥980",
+        "DPC_pay_on_submission_nonintegrated": "¥8820",
+        "excessDataStorageFee_first_GB": "¥1470",
+        "excessDataStorageFee_per_additional_GB": "¥980"
+    },
+    "AUD": {
+        "memberDPC_voucher": "$72",
+        "nonMemberDPC_voucher": "$78",
+        "memberDPC_deferred": "$78",
+        "nonMemberDPC_deferred": "$84",
+        "memberDPC_subscription": "$28",
+        "nonMemberDPC_subscription": "$33",
+        "DPC_pay_on_submission": "$89",
+        "notIntegratedJournalFee": "$11",
+        "DPC_pay_on_submission_nonintegrated": "$100",
+        "excessDataStorageFee_first_GB": "$17",
+        "excessDataStorageFee_per_additional_GB": "$11"
+    }
+}
