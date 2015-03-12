@@ -86,4 +86,14 @@
         <element>manuscriptNumberIgnorePattern</element>
     </dc-type>
 
+    <dc-type>
+        <schema>journal</schema>
+        <element>description</element>
+    </dc-type>
+
+    <dc-type>
+        <schema>journal</schema>
+        <element>memberName</element>
+    </dc-type>
+
 </dspace-dc-types>

@@ -145,6 +145,19 @@ public class DryadWorkflowUtils {
         return request.getContextPath() + "/submit?workspaceID=" + newDataFileItem.getID() + "&skipOverview=true";
 
     }
+    
+    public static boolean isAtLeastOneDataFileVisible(Context context, Item item) throws SQLException {
+        Item[] datafiles = DryadWorkflowUtils.getDataFiles(context, item);
+        for (Item i : datafiles) {
+            String lift = ConfigurationManager.getProperty("embargo.field.lift");
+            DCValue[] values = i.getMetadata(lift);
+            if (values == null || values.length == 0)
+                return true;
+
+        }
+        return false;
+    }
+
 
 
 }

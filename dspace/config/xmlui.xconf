@@ -88,7 +88,10 @@
 
 	    <aspect name="Spidert" path="resource://aspects/Spider/"/>
 
-	        <aspect name="Authority" path="resource://aspects/Authority/" />
+	    <aspect name="Authority" path="resource://aspects/Authority/" />
+        
+        <aspect name="Journal Landing Page" path="resource://aspects/JournalLandingPage/"/>
+        
         <!--
             This aspect tests the various possible DRI features,
             it helps a theme developer create themes

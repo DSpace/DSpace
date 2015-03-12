@@ -334,7 +334,6 @@
            <artifactId>payment-webapp</artifactId>
            <type>war</type>
        </dependency>
-
        <dependency>
            <groupId>org.dspace.modules</groupId>
            <artifactId>dryad-widgets-webapp</artifactId>
@@ -352,6 +351,27 @@
                    <groupId>net.sf.ehcache</groupId>
                </exclusion>
            </exclusions>
+           <version>${project.version}</version>
+       </dependency>
+
+       <dependency>
+           <groupId>org.dspace.modules</groupId>
+           <artifactId>journal-landing-webapp</artifactId>
+           <type>jar</type>
+           <classifier>classes</classifier>
+           <exclusions>
+               <exclusion>
+                   <artifactId>ehcache</artifactId>
+                   <groupId>net.sf.ehcache</groupId>
+               </exclusion>
+           </exclusions>
+           <version>${project.version}</version>
+       </dependency>
+       <dependency>
+           <groupId>org.dspace.modules</groupId>
+           <artifactId>journal-landing-webapp</artifactId>
+           <type>war</type>
+           <version>${project.version}</version>
        </dependency>
 
        <dependency>
