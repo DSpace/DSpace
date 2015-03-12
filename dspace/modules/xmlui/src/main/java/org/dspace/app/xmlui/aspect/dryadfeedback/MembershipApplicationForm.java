@@ -3,7 +3,6 @@ package org.dspace.app.xmlui.aspect.dryadfeedback;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.util.HashUtil;
@@ -15,12 +14,10 @@ import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.CheckBox;
 import org.dspace.app.xmlui.wing.element.Composite;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.Hidden;
 import org.dspace.app.xmlui.wing.element.Item;
-import org.dspace.app.xmlui.wing.element.Label;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Radio;
@@ -153,13 +150,13 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
 
         Select orgAnnualRevenueCurrencySelect = orgAnnualRevenue.addSelect("org_annual_revenue_currency");
         orgAnnualRevenueCurrencySelect.setLabel(message(message_prefix + "fields.org_annual_revenue.label1"));
-	orgAnnualRevenueCurrencySelect.setHelp(message(message_prefix + "fields.org_annual_revenue.label2"));
+        orgAnnualRevenueCurrencySelect.setHelp(message(message_prefix + "fields.org_annual_revenue.label2"));
         orgAnnualRevenueCurrencySelect.addOption("USD", "$ USD");
         orgAnnualRevenueCurrencySelect.addOption("GBP", "£ GBP");
         orgAnnualRevenueCurrencySelect.addOption("CAD", "C$ CAD");
         orgAnnualRevenueCurrencySelect.addOption("EUR", "€ EUR");
         orgAnnualRevenueCurrencySelect.addOption("AUD", "$ AUD");
-	orgAnnualRevenueCurrencySelect.addOption("JPY", "¥ JPY");
+    	orgAnnualRevenueCurrencySelect.addOption("JPY", "¥ JPY");
         orgAnnualRevenueCurrencySelect.setOptionSelected(parameters.getParameter("org_annual_revenue_currency", "USD"));
         orgAnnualRevenueCurrencySelect.setRequired();
         if(errorFieldList.contains("org_annual_revenue_currency")) {
@@ -167,8 +164,9 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         }
 
         Radio orgAnnualRevenueRadios = orgAnnualRevenue.addRadio("org_annual_revenue");
-        orgAnnualRevenueRadios.addOption("less_than_10_million", message(message_prefix + "fields.org_annual_revenue.less_than_10_million"));
         orgAnnualRevenueRadios.addOption("greater_than_10_million", message(message_prefix + "fields.org_annual_revenue.greater_than_10_million"));
+        orgAnnualRevenueRadios.addOption("less_than_10_million", message(message_prefix + "fields.org_annual_revenue.less_than_10_million"));
+        orgAnnualRevenueRadios.addOption("advocate_all_organizations", message(message_prefix + "fields.org_annual_revenue.advocate_all_organizations"));        
         orgAnnualRevenueRadios.setRequired();
         orgAnnualRevenueRadios.setOptionSelected(parameters.getParameter("org_annual_revenue", ""));
         if(errorFieldList.contains("org_annual_revenue")) {
@@ -216,53 +214,67 @@ public class MembershipApplicationForm extends AbstractDSpaceTransformer impleme
         publicationsTextArea.setHelp(message(message_prefix + "fields.publications.label2"));
         publicationsTextArea.setValue(parameters.getParameter("publications", ""));
 
-	// Membership Term, start and end
-	Item membershipTerm = form.addItem("membership_term","");
+        // Membership Term, start and end
+        Item membershipTerm = form.addItem("membership_term","");
 
-	Composite membershipTermComposite = membershipTerm.addComposite("membership_term_group");
-	membershipTermComposite.setLabel(message(message_prefix + "fields.membership_term.label1"));
-	membershipTermComposite.setHelp(message(message_prefix + "fields.membership_term.label2"));
+        Composite membershipTermComposite = membershipTerm.addComposite("membership_term_group");
+        membershipTermComposite.setLabel(message(message_prefix + "fields.membership_term.label1"));
+        membershipTermComposite.setHelp(message(message_prefix + "fields.membership_term.label2"));
 
-	Select membershipYearStartSelect = membershipTermComposite.addSelect("membership_year_start","label-at-left");
-	membershipYearStartSelect.setLabel(message(message_prefix + "fields.membership_year.starting_year.label"));
-	membershipYearStartSelect.addOption("2013", message(message_prefix + "fields.membership_year.starting_year.2013"));
-	membershipYearStartSelect.addOption("2014", message(message_prefix + "fields.membership_year.starting_year.2014"));
-	membershipYearStartSelect.setOptionSelected(parameters.getParameter("membership_year_start", ""));
-	membershipYearStartSelect.setRequired();
-	if(errorFieldList.contains("membership_year_start")) {
-	    membershipYearStartSelect.addError(message(message_prefix + "errors.membership_year_start"));
-	}
+        Select membershipYearStartSelect = membershipTermComposite.addSelect("membership_year_start","label-at-left");
+        membershipYearStartSelect.setLabel(message(message_prefix + "fields.membership_year.starting_year.label"));
+        membershipYearStartSelect.addOption("current", message(message_prefix + "fields.membership_year.starting_year.current"));
+        membershipYearStartSelect.addOption("following", message(message_prefix + "fields.membership_year.starting_year.following"));
+        membershipYearStartSelect.setOptionSelected(parameters.getParameter("membership_year_start", ""));
+        membershipYearStartSelect.setRequired();
+        if(errorFieldList.contains("membership_year_start")) {
+            membershipYearStartSelect.addError(message(message_prefix + "errors.membership_year_start"));
+        }
 
-	Select membershipLengthSelect = membershipTermComposite.addSelect("membership_length", "label-at-left");
-	membershipLengthSelect.setLabel(message(message_prefix + "fields.membership_length.label"));
-	membershipLengthSelect.addOption("1yr", message(message_prefix + "fields.membership_length.1"));
-	membershipLengthSelect.addOption("2yr", message(message_prefix + "fields.membership_length.2"));
-	membershipLengthSelect.addOption("3yr", message(message_prefix + "fields.membership_length.3"));
-	membershipLengthSelect.addOption("4yr", message(message_prefix + "fields.membership_length.4"));
-	membershipLengthSelect.addOption("5yr", message(message_prefix + "fields.membership_length.5"));
-	membershipLengthSelect.setOptionSelected(parameters.getParameter("membership_length", ""));
-	membershipLengthSelect.setRequired();
-	if(errorFieldList.contains("membership_length")) {
-	    membershipLengthSelect.addError(message(message_prefix + "errors.membership_length"));
-	}
+        Select membershipLengthSelect = membershipTermComposite.addSelect("membership_length", "label-at-left");
+        membershipLengthSelect.setLabel(message(message_prefix + "fields.membership_length.label"));
+        membershipLengthSelect.addOption("1yr", message(message_prefix + "fields.membership_length.1"));
+        membershipLengthSelect.addOption("2yr", message(message_prefix + "fields.membership_length.2"));
+        membershipLengthSelect.addOption("3yr", message(message_prefix + "fields.membership_length.3"));
+        membershipLengthSelect.addOption("4yr", message(message_prefix + "fields.membership_length.4"));
+        membershipLengthSelect.addOption("5yr", message(message_prefix + "fields.membership_length.5"));
+        membershipLengthSelect.setOptionSelected(parameters.getParameter("membership_length", ""));
+        membershipLengthSelect.setRequired();
+        if(errorFieldList.contains("membership_length")) {
+            membershipLengthSelect.addError(message(message_prefix + "errors.membership_length"));
+    	}
 
+        // Organizational representative
+        Item repOrg = form.addItem("rep_org","");
+        Hidden repOrgHidden = repOrg.addHidden("rep_org");
+        repOrgHidden.setLabel(message(message_prefix + "fields.rep_org.label1"));
+        repOrgHidden.setHelp(message(message_prefix + "fields.rep_org.label2"));
+        if(errorFieldList.contains("rep_org")) {
+            repOrgHidden.addError(message(message_prefix + "errors.rep_org"));
+        }
+        
         // Representatitve Name
         Item repName = form.addItem("rep_name","");
         Text repNameText = repName.addText("rep_name");
-
-        repNameText.setLabel(message(message_prefix + "fields.rep_name.label1"));
-        repNameText.setHelp(message(message_prefix + "fields.rep_name.label2"));
+        repNameText.setLabel(message(message_prefix + "fields.rep_name"));
         repNameText.setValue(parameters.getParameter("rep_name", ""));
         repNameText.setRequired();
         if(errorFieldList.contains("rep_name")) {
             repNameText.addError(message(message_prefix + "errors.rep_name"));
         }
-
-        // Representative email address
+        // Representatitve Ttile
+        Item repTitle = form.addItem("rep_title","");
+        Text repTitleText = repTitle.addText("rep_title");
+        repTitleText.setLabel(message(message_prefix + "fields.rep_title"));
+        repTitleText.setValue(parameters.getParameter("rep_title", ""));
+        repTitleText.setRequired();
+        if(errorFieldList.contains("rep_title")) {
+            repTitleText.addError(message(message_prefix + "errors.rep_title"));
+        }
+        // Representatitve Email
         Item repEmail = form.addItem("rep_email","");
         Text repEmailText = repEmail.addText("rep_email");
-
-        repEmailText.setLabel(message(message_prefix + "fields.rep_email.label1"));
+        repEmailText.setLabel(message(message_prefix + "fields.rep_email"));
         repEmailText.setValue(parameters.getParameter("rep_email", ""));
         repEmailText.setRequired();
         if(errorFieldList.contains("rep_email")) {
