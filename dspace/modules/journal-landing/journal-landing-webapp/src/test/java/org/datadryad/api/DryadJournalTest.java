@@ -7,6 +7,8 @@
  */
 package org.datadryad.api;
 
+import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import org.apache.log4j.Logger;
@@ -18,6 +20,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.datadryad.test.ContextUnitTest;
+import org.dspace.core.Context;
+import org.junit.Ignore;
 
 /**
  *
@@ -25,7 +29,14 @@ import org.datadryad.test.ContextUnitTest;
  */
 public class DryadJournalTest extends ContextUnitTest {
     private static Logger log = Logger.getLogger(DryadJournalTest.class);
-    private static final testJournal = "Evolution";
+    private static final String testJournalName = "Evolution";
+    private DryadJournal dryadJournal;
+    
+    @Before
+    public void setUp() {
+        super.setUp();
+        dryadJournal = new DryadJournal(this.context, journalName);
+    }
     
     /**
      * Test of getArchivedDataFiles method, of class DryadJournal.
@@ -33,8 +44,7 @@ public class DryadJournalTest extends ContextUnitTest {
     @Test
     public void testGetArchivedDataFiles() throws Exception {
         log.debug("getArchivedDataFiles");        
-        DryadJournal dryadJournal = new DryadJournal(context,testJournal);
-        List<Integer> expResult = null;
+        List<Integer> expResult = Arrays.asList(107333);
         List<Integer> result = dryadJournal.getArchivedDataFiles();
         assertEquals(expResult, result);
     }
@@ -45,12 +55,9 @@ public class DryadJournalTest extends ContextUnitTest {
     @Test
     public void testGetArchivedPackagesCount() {
         log.debug("getArchivedPackagesCount");
-        DryadJournal instance = null;
-        int expResult = 0;
-        int result = instance.getArchivedPackagesCount();
+        int expResult = 1;
+        int result = dryadJournal.getArchivedPackagesCount();
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
 
     /**
@@ -59,30 +66,28 @@ public class DryadJournalTest extends ContextUnitTest {
     @Test
     public void testGetArchivedPackagesSortedRecent() throws Exception {
         log.debug("getArchivedPackagesSortedRecent");
-        int max = 0;
-        DryadJournal instance = null;
-        List<Item> expResult = null;
-        List<Item> result = instance.getArchivedPackagesSortedRecent(max);
+        int max = 10;
+        Item item = Item.find(this.context, 107332);
+        List<Item> expResult = Arrays.asList(item);
+        List<Item> result = dryadJournal.getArchivedPackagesSortedRecent(max);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
 
     /**
      * Test of getRequestsPerJournal method, of class DryadJournal.
      */
+    @Ignore("No Solr service running on test system")
     @Test
     public void testGetRequestsPerJournal() {
+        /*
         log.debug("getRequestsPerJournal");
         String facetQueryField = "";
         String time = "";
         int max = 0;
-        DryadJournal instance = null;
         LinkedHashMap<Item, String> expResult = null;
-        LinkedHashMap<Item, String> result = instance.getRequestsPerJournal(facetQueryField, time, max);
+        LinkedHashMap<Item, String> result = dryadJournal.getRequestsPerJournal(facetQueryField, time, max);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        */
     }
     
 }
