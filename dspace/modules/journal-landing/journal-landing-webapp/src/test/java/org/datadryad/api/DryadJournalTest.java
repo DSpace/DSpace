@@ -10,35 +10,35 @@ package org.datadryad.api;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import org.datadryad.test.ContextUnitTest;
 import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.dspace.core.Context;
+import org.dspace.servicemanager.DSpaceKernelInit;
 import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 
 /**
  *
  * @author Nathan Day
  */
-public class DryadJournalTest {
+public class DryadJournalTest extends ContextUnitTest {
     private static final String testJournalName = "Evolution";
 
     private DryadJournal dryadJournal;
     private Context context;
 
     @Before
+    @Override
     public void setUp() {
         try {
             context = new Context();
             dryadJournal = new DryadJournal(context, testJournalName);
-        } catch (SQLException ex) {}
-    }
-    @After
-    public void tearDown() {
-        try {
-            context.complete();
         } catch (SQLException ex) {}
     }
 
