@@ -14,10 +14,12 @@ public class Institution_CICBA_Authority extends CICBAAuthority {
 
 		pqs.setNsPrefix("foaf", NS_FOAF);
 		pqs.setNsPrefix("dc", NS_DC);
+		pqs.setNsPrefix("sioc", NS_SIOC);
 
-		pqs.setCommandText("SELECT ?concept ?label\n");
+		pqs.setCommandText("SELECT ?concept ?label ?initials\n");
 		pqs.append("WHERE {\n");
 		pqs.append("?concept a foaf:Organization ; dc:title ?label .\n");
+		pqs.append("OPTIONAL { ?concept sioc:id ?initials} \n");
 		pqs.append("FILTER(REGEX(?concept, ?key, \"i\"))\n");
 		pqs.append("}\n");
 
@@ -32,12 +34,14 @@ public class Institution_CICBA_Authority extends CICBAAuthority {
 
 		pqs.setNsPrefix("foaf", NS_FOAF);
 		pqs.setNsPrefix("dc", NS_DC);
+		pqs.setNsPrefix("sioc", NS_SIOC);
 
-		pqs.setCommandText("SELECT ?concept ?label\n");
+		pqs.setCommandText("SELECT ?concept ?label ?initials\n");
 		pqs.append("WHERE {\n");
 		pqs.append("?concept a foaf:Organization ; dc:title ?label .\n");
+		pqs.append("OPTIONAL { ?concept sioc:id ?initials} \n");
 		if (!"".equals(text)) {
-			pqs.append("FILTER(REGEX(?label, ?text, \"i\"))\n");
+			pqs.append("FILTER(REGEX(?label, ?text, \"i\") || REGEX(?initials, ?text, \"i\"))\n");
 			pqs.setLiteral("text", text);
 		}
 		pqs.append("}\n");
@@ -50,6 +54,14 @@ public class Institution_CICBA_Authority extends CICBAAuthority {
 	protected Choice extractChoice(QuerySolution solution) {
 		String key = solution.getResource("concept").getURI();
 		String label = solution.getLiteral("label").getString();
-		return new Choice(key, label, label);
+		
+		String value = label;
+		
+		if (solution.contains("id")) {
+			String initials = solution.getLiteral("initials").getString();
+			value = value + " (" + initials + ")";
+		}
+		
+		return new Choice(key, label, value);
 	}
 }

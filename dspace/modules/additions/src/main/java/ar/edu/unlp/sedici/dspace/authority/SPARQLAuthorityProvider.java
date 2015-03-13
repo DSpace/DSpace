@@ -30,6 +30,7 @@ public abstract class SPARQLAuthorityProvider implements ChoiceAuthority {
 	protected static final String NS_SKOS = "http://www.w3.org/2004/02/skos/core#";
 	protected static final String NS_FOAF = "http://xmlns.com/foaf/0.1/";
 	protected static final String NS_DC = "http://purl.org/dc/terms/";
+	protected static final String NS_SIOC = "http://rdfs.org/sioc/ns#";
 
 	private QuerySolutionMap globalParameters;
 
