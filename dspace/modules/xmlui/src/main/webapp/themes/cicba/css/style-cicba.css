@@ -291,7 +291,7 @@ li.ds-artifact-item.community {
 	font-weight: bold;
 }
 
-.metadata-dcterms_type_subtype {
+.metadata-dc_type {
 	color: #31708f;
 	font-size: 95%;
 }
@@ -367,6 +367,17 @@ p.intro-text > a {
 	background-color: #badfe5;
 	color: #509296;
 	padding: 5px;
+}
+
+.discovery-metadata-cic_lugarDeDesarrollo {
+	text-align: right;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.discovery-metadata-dc_type {
+	text-align: right;
 }
 
 .discovery-list-results > li{

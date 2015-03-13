@@ -17,6 +17,8 @@
     xmlns="http://www.w3.org/1999/xhtml"
     xmlns:xalan="http://xml.apache.org/xalan"
     xmlns:encoder="xalan://java.net.URLEncoder"
+    xmlns:xmlui="xalan://ar.edu.unlp.sedici.dspace.xmlui.util.XSLTHelper"
+    extension-element-prefixes="xmlui"
     exclude-result-prefixes="xalan encoder i18n dri mets dim  xlink xsl">
 
     <xsl:output indent="yes"/>
@@ -177,7 +179,7 @@
                     	
                     	<xsl:choose>
 	                        <xsl:when test="dri:list[@n=(concat($handle, ':dcterms.issued')) and descendant::text()]">
-	                            <xsl:value-of select="dri:list[@n=(concat($handle, ':dcterms.issued'))]/dri:item[position()=1]/text()" />
+	                            <xsl:value-of select="substring(dri:list[@n=(concat($handle, ':dcterms.issued'))]/dri:item[position()=1]/text(), 1, 4)" />
 	                        </xsl:when>
 	                        <xsl:otherwise>
 <!-- 	                        		Sin título -->
@@ -188,7 +190,7 @@
                     <xsl:with-param name="classname" select="'dcterms-issued'"/>
                 </xsl:call-template>
             </div>
-            <div class="col-md-10">
+            <div class="col-md-9">
             	<div class="row"><div class="col-md-12 artifact-title" >
             
                 <!-- dc.title -->
@@ -267,27 +269,30 @@
                 </span>
             </div>
             
-            <div class="col-md-1">
-            	<!-- cic.lugarDesarrollo -->
-<!--                 <xsl:if test="dri:list[@n=(concat($handle, ':cic.lugarDesarrollo')) and descendant::text()]"> -->
-                        
-<!--                     <xsl:call-template name="renderDiscoveryField"> -->
-<!--             	        <xsl:with-param name="value"> -->
-<!--                             <xsl:value-of select="dri:list[@n=(concat($handle, ':cic.lugarDesarrollo'))]/dri:item[position()=1]/text()" /> -->
-<!--         	            </xsl:with-param> -->
-<!--     	                <xsl:with-param name="classname" select="'metadata-cic_lugarDeDesarrollo'"/> -->
-<!-- 	                </xsl:call-template> -->
-<!--                 </xsl:if> -->
-                    
-            	<!-- dcterms.type.subtype -->
-            	<xsl:call-template name="renderDiscoveryField">
-            		<xsl:with-param name="value">
-                        <xsl:if test="dri:list[@n=(concat($handle, ':dcterms.type.subtype')) and descendant::text()]">
-                            <xsl:value-of select="dri:list[@n=(concat($handle, ':dcterms.type.subtype'))]/dri:item[position()=1]/text()" />
-                        </xsl:if>
-            		</xsl:with-param>
-            		<xsl:with-param name="classname" select="'metadata-dcterms_type_subtype'"/>
-            	</xsl:call-template>
+            <div class="col-md-2">
+            	<div class="row discovery-metadata-cic_lugarDeDesarrollo">
+	            	<!-- cic.lugarDesarrollo -->
+	                <xsl:if test="dri:list[@n=(concat($handle, ':cic.lugarDesarrollo')) and descendant::text()]">
+	                    <xsl:call-template name="renderDiscoveryField">
+	            	        <xsl:with-param name="value">
+	                            <xsl:value-of select="xmlui:getLugarDesarrollo(dri:list[@n=(concat($handle, ':cic.lugarDesarrollo'))]/dri:item[position()=1]/text())" />
+	        	            </xsl:with-param>
+	    	                <xsl:with-param name="classname" select="'metadata-cic_lugarDeDesarrollo'"/>
+		                </xsl:call-template>
+	                </xsl:if>
+                </div>
+                
+                <div class="row discovery-metadata-dc_type">
+	            	<!-- dc.type -->
+	            	<xsl:call-template name="renderDiscoveryField">
+	            		<xsl:with-param name="value">
+	                        <xsl:if test="dri:list[@n=(concat($handle, ':dc.type')) and descendant::text()]">
+	                            <xsl:value-of select="dri:list[@n=(concat($handle, ':dc.type'))]/dri:item[position()=1]/text()" />
+	                        </xsl:if>
+	            		</xsl:with-param>
+	            		<xsl:with-param name="classname" select="'metadata-dc_type'"/>
+	            	</xsl:call-template>
+            	</div>
             </div>
         
         

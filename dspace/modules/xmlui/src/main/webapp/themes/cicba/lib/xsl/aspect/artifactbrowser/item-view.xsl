@@ -136,7 +136,7 @@
 	    	<div class="row item-head">
 		    	<div class="col-md-12">
 			    	<xsl:call-template name="render-metadata">
-			    		<xsl:with-param name="field" select="'dcterms.type.subtype'" />
+			    		<xsl:with-param name="field" select="'dc.type'" />
 			    		<xsl:with-param name="show_label" select="'false'" />
 			    	</xsl:call-template>
 		    		<xsl:call-template name="render-metadata">

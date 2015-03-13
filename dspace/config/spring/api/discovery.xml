@@ -95,7 +95,7 @@
         <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">
             <list>
-                <ref bean="searchFilterSubtype" />
+                <ref bean="searchFilterType" />
                 <ref bean="searchFilterAuthor" />
                 <ref bean="searchFilterSubject" />
                 <ref bean="searchFilterIssued" />
@@ -107,7 +107,7 @@
         <!--The search filters which can be used on the discovery search page-->
         <property name="searchFilters">
             <list>
-                <ref bean="searchFilterSubtype" />
+                <ref bean="searchFilterType" />
                 <ref bean="searchFilterTitle" />
                 <ref bean="searchFilterAuthor" />
                 <ref bean="searchFilterSubject" />
@@ -368,11 +368,11 @@
         </property>
     </bean>
     
-    <bean id="searchFilterSubtype" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
-    	<property name="indexFieldName" value="subtype"/>
+    <bean id="searchFilterType" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+    	<property name="indexFieldName" value="type"/>
     	<property name="metadataFields">
     		<list>
-    			<value>dcterms.type.subtype</value>
+    			<value>dc.type</value>
     		</list>
     	</property>
     </bean>
