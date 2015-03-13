@@ -300,6 +300,8 @@
     <message key="xmlui.ArtifactBrowser.StatisticsViewer.choose_month">Monthly Reports</message>
     <message key="xmlui.ArtifactBrowser.StatisticsViewer.report.title">Statistical Summary</message>
 
+	<message key="xmlui.ArtifactBrowser.EmbargoList.title">Embargo List</message>
+    
     <message key="xmlui.ArtifactBrowser.StatisticsViewer.no_report.title">No reports currently available</message>
     <message key="xmlui.ArtifactBrowser.StatisticsViewer.no_report.text">There are currently no reports available for this service.  Please check back later.</message>
 
