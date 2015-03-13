@@ -221,7 +221,7 @@
          <repeatable>true</repeatable>
          <label>Area temática</label>
 		 <type-bind>Informe cientifico</type-bind>
-         <input-type>twobox</input-type> <!-- TODO: suggest --> <!-- TODO: vocabulary -->
+         <input-type value-pairs-name="cic_areas">dropdown</input-type>
          <hint>Area de investigación dentro de CIC.</hint>
          <required>Debe indicar el área de investigación en la que se desarrolla el trabajo.</required>
        </field>
@@ -251,8 +251,7 @@
          <dc-element>language</dc-element>
          <repeatable>false</repeatable>
          <label>Idioma</label>
-		 <type-bind></type-bind>
-         <input-type value-pairs-name="cic_common_languages">dropdown</input-type>
+         <input-type>onebox</input-type>
          <hint>Lenguaje principal del documento.</hint>
          <required>Debe ingresar el idioma del documento.</required>
        </field>
@@ -277,6 +276,16 @@
  	</page>
  	<page number="2">
 
+	   <field>
+         <dc-schema>dcterms</dc-schema>
+         <dc-element>rights</dc-element>
+         <dc-qualifier>embargoPeriod</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Período de embargo</label>
+         <input-type>onebox</input-type>
+         <hint>Período de tiempo en el que el archivo de un item estará oculto por razones de confidencialidad o similares.</hint>
+       </field>
+	   
        <field>
          <dc-schema>dcterms</dc-schema>
          <dc-element>identifier</dc-element>
@@ -438,7 +447,7 @@
          <dc-element>license</dc-element>
          <repeatable>false</repeatable>
          <label>Licencia Creative Commons</label>
-		<input-type value-pairs-name="cic_cc_licences">dropdown</input-type>
+		<input-type>onebox</input-type>
          <hint>Elija la licencia Creative Commons adecuada para el ítem.</hint>
          <required>Debe asignarle una licencia Creative Commons al item.</required>
        </field>
@@ -536,6 +545,16 @@
 
        <field>
          <dc-schema>dcterms</dc-schema>
+         <dc-element>rights</dc-element>
+         <dc-qualifier>embargoPeriod</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Período de embargo</label>
+         <input-type>onebox</input-type>
+         <hint>Período de tiempo en el que el archivo de un item estará oculto por razones de confidencialidad o similares.</hint>
+       </field>
+       
+       <field>
+         <dc-schema>dcterms</dc-schema>
          <dc-element>identifier</dc-element>
          <dc-qualifier>url</dc-qualifier>
          <repeatable>true</repeatable>
@@ -620,6 +639,17 @@
        </field>
        
   	</page>
+<!--   	<page number="3"> -->
+<!--   		<field> -->
+<!--          <dc-schema>dcterms</dc-schema> -->
+<!--          <dc-element>license</dc-element> -->
+<!--          <repeatable>false</repeatable> -->
+<!--          <label>Licencia Creative Commons</label> -->
+<!-- 		<input-type>onebox</input-type> -->
+<!--          <hint>Elija la licencia Creative Commons adecuada para el ítem.</hint> -->
+<!--          <required>Debe asignarle una licencia Creative Commons al item.</required> -->
+<!--        </field> -->
+<!--   	</page> -->
    </form>
 
  </form-definitions>
@@ -654,27 +684,27 @@
    <value-pairs value-pairs-name="cic_common_languages" dc-term="language">
      <pair>
        <displayed-value>Español</displayed-value>
-       <stored-value>spa</stored-value>
+       <stored-value>es</stored-value>
      </pair>
      <pair>
        <displayed-value>Inglés</displayed-value>
-       <stored-value>eng</stored-value>
+       <stored-value>en</stored-value>
      </pair>
      <pair>
        <displayed-value>Portugués</displayed-value>
-       <stored-value>por</stored-value>
+       <stored-value>pt</stored-value>
      </pair>
      <pair>
        <displayed-value>Italiano</displayed-value>
-       <stored-value>ita</stored-value>
+       <stored-value>it</stored-value>
      </pair>
      <pair>
        <displayed-value>Alemán</displayed-value>
-       <stored-value>ger</stored-value>
+       <stored-value>de</stored-value>
      </pair>
      <pair>
        <displayed-value>Francés</displayed-value>
-       <stored-value>fra</stored-value>
+       <stored-value>fr</stored-value>
      </pair>
    </value-pairs>
    
@@ -704,81 +734,230 @@
     	</pair>
     </value-pairs>
     
-    <value-pairs value-pairs-name="cic_cc_licences" dc-term="dcterms_licence">
+    <value-pairs value-pairs-name="cic_cc_licences" dc-term="dcterms_license">
 		<pair>
-			<displayed-value>BY 4.0</displayed-value>
-			<stored-value>http://creativecommons.org/licenses/by/4.0</stored-value>
+			<displayed-value>Attribution 4.0 International (BY 4.0)</displayed-value>
+			<stored-value>http://creativecommons.org/licenses/by/4.0/</stored-value>
 		</pair>
 		<pair>
-			<displayed-value>BY-SA 4.0</displayed-value>
-			<stored-value>http://creativecommons.org/licenses/by-sa/4.0</stored-value>
+			<displayed-value>Attribution-ShareAlike 4.0 International (BY-SA 4.0)</displayed-value>
+			<stored-value>http://creativecommons.org/licenses/by-sa/4.0/</stored-value>
 		</pair>
 		<pair>
-			<displayed-value>BY-ND 4.0</displayed-value>
-			<stored-value>http://creativecommons.org/licenses/by-nd/4.0</stored-value>
+			<displayed-value>Attribution-NoDerivatives  4.0 International (BY-ND 4.0)</displayed-value>
+			<stored-value>http://creativecommons.org/licenses/by-nd/4.0/</stored-value>
 		</pair>
 		<pair>
-			<displayed-value>BY-NC 4.0</displayed-value>
-			<stored-value>http://creativecommons.org/licenses/by-nc/4.0</stored-value>
+			<displayed-value>Attribution-NonCommercial 4.0 International (BY-NC 4.0)</displayed-value>
+			<stored-value>http://creativecommons.org/licenses/by-nc/4.0/</stored-value>
 		</pair>
 		<pair>
-			<displayed-value>BY-NC-SA 4.0</displayed-value>
-			<stored-value>http://creativecommons.org/licenses/by-nc-sa/4.0</stored-value>
+			<displayed-value>Attribution-NonCommercial-ShareAlike 4.0 International (BY-NC-SA 4.0)</displayed-value>
+			<stored-value>http://creativecommons.org/licenses/by-nc-sa/4.0/</stored-value>
 		</pair>
 		<pair>
-			<displayed-value>BY-NC-ND 4.0</displayed-value>
-			<stored-value>http://creativecommons.org/licenses/by-nc-nd/4.0</stored-value>
+			<displayed-value>Attribution-NonCommercial-NoDerivatives 4.0 International (BY-NC-ND 4.0)</displayed-value>
+			<stored-value>http://creativecommons.org/licenses/by-nc-nd/4.0/</stored-value>
 		</pair>
 		<pair>
-			<displayed-value>BY 3.0</displayed-value>
-			<stored-value>http://creativecommons.org/licenses/by/3.0</stored-value>
+			<displayed-value>Attribution 3.0 Unported (BY 3.0)</displayed-value>
+			<stored-value>http://creativecommons.org/licenses/by/3.0/</stored-value>
 		</pair>
 		<pair>
-			<displayed-value>BY-SA 3.0</displayed-value>
-			<stored-value>http://creativecommons.org/licenses/by-sa/3.0</stored-value>
+			<displayed-value>Attribution-ShareAlike 3.0 Unported (BY-SA 3.0)</displayed-value>
+			<stored-value>http://creativecommons.org/licenses/by-sa/3.0/</stored-value>
 		</pair>
 		<pair>
-			<displayed-value>BY-ND 3.0</displayed-value>
-			<stored-value>http://creativecommons.org/licenses/by-nd/3.0</stored-value>
+			<displayed-value>Attribution-NoDerivs  3.0 Unported (BY-ND 3.0)</displayed-value>
+			<stored-value>http://creativecommons.org/licenses/by-nd/3.0/</stored-value>
 		</pair>
 		<pair>
-			<displayed-value>BY-NC 3.0</displayed-value>
-			<stored-value>http://creativecommons.org/licenses/by-nc/3.0</stored-value>
+			<displayed-value>Attribution-NonCommercial 3.0 Unported (BY-NC 3.0)</displayed-value>
+			<stored-value>http://creativecommons.org/licenses/by-nc/3.0/</stored-value>
 		</pair>
 		<pair>
-			<displayed-value>BY-NC-SA 3.0</displayed-value>
-			<stored-value>http://creativecommons.org/licenses/by-nc-sa/3.0</stored-value>
+			<displayed-value>Attribution-NonCommercial-ShareAlike 3.0 Unported (BY-NC-SA 3.0)</displayed-value>
+			<stored-value>http://creativecommons.org/licenses/by-nc-sa/3.0/</stored-value>
 		</pair>
 		<pair>
-			<displayed-value>BY-NC-ND 3.0</displayed-value>
-			<stored-value>http://creativecommons.org/licenses/by-nc-nd/3.0</stored-value>
+			<displayed-value>Attribution-NonCommercial-NoDerivs  3.0 Unported (BY-NC-ND 3.0)</displayed-value>
+			<stored-value>http://creativecommons.org/licenses/by-nc-nd/3.0/</stored-value>
 		</pair>
 		<pair>
-			<displayed-value>BY 2.5 (Argentina)</displayed-value>
+			<displayed-value>Attribution 2.5 (BY 2.5 Argentina)</displayed-value>
 			<stored-value>http://creativecommons.org/licenses/by/2.5/ar/</stored-value>
 		</pair>
 		<pair>
-			<displayed-value>BY-SA 2.5 (Argentina)</displayed-value>
+			<displayed-value>Attribution-ShareAlike 2.5 (BY-SA 2.5 Argentina)</displayed-value>
 			<stored-value>http://creativecommons.org/licenses/by-sa/2.5/ar/</stored-value>
 		</pair>
 		<pair>
-			<displayed-value>BY-ND 2.5 (Argentina)</displayed-value>
+			<displayed-value>Attribution-NoDerivs  2.5 (BY-ND 2.5 Argentina)</displayed-value>
 			<stored-value>http://creativecommons.org/licenses/by-nd/2.5/ar/</stored-value>
 		</pair>
 		<pair>
-			<displayed-value>BY-NC 2.5 (Argentina)</displayed-value>
+			<displayed-value>Attribution-NonCommercial 2.5 (BY-NC 2.5 Argentina)</displayed-value>
 			<stored-value>http://creativecommons.org/licenses/by-nc/2.5/ar/</stored-value>
 		</pair>
 		<pair>
-			<displayed-value>BY-NC-SA 2.5 (Argentina)</displayed-value>
+			<displayed-value>Attribution-NonCommercial-ShareAlike 2.5 (BY-NC-SA 2.5 Argentina)</displayed-value>
 			<stored-value>http://creativecommons.org/licenses/by-nc-sa/2.5/ar/</stored-value>
 		</pair>
 		<pair>
-			<displayed-value>BY-NC-ND 2.5 (Argentina)</displayed-value>
+			<displayed-value>Attribution-NonCommercial-NoDerivs  2.5 (BY-NC-ND 2.5 Argentina)</displayed-value>
 			<stored-value>http://creativecommons.org/licenses/by-nc-nd/2.5/ar/</stored-value>
 		</pair>
 	</value-pairs>
-        
+    
+    <value-pairs value-pairs-name="cic_areas" dc-term="dcterms_subject_area">
+		<pair>	
+			<displayed-value>Ciencias Agrícolas, Producción y Salud Animal</displayed-value>
+			<stored-value>Ciencias Agrícolas, Producción y Salud Animal</stored-value>
+		</pair>
+		<pair>
+			<displayed-value>Ciencias Biológicas y de la Salud</displayed-value>
+			<stored-value>Ciencias Biológicas y de la Salud</stored-value>
+		</pair>
+		<pair>
+			<displayed-value>Física, Matemática, Química y Astronomía</displayed-value>
+			<stored-value>Física, Matemática, Química y Astronomía</stored-value>
+		</pair>
+		<pair>
+			<displayed-value>Geología, Minería e Hidrología</displayed-value>
+			<stored-value>Geología, Minería e Hidrología</stored-value>
+		</pair>
+		<pair>
+			<displayed-value>Ingeniería, Tecnol. Qca., de los Alimentos, TIC's y Otras Tecnologías</displayed-value>
+			<stored-value>Ingeniería, Tecnol. Qca., de los Alimentos, TIC's y Otras Tecnologías</stored-value>
+		</pair>
+		<pair>
+			<displayed-value>Ciencias Sociales y Humanas</displayed-value>
+			<stored-value>Ciencias Sociales y Humanas</stored-value>
+		</pair>
+	</value-pairs>
+	
+	<value-pairs value-pairs-name="cic_embargo" dc-term="dcterms_rights_embargoPeriod">
+	<pair>
+		<displayed-value>Sin embargo (Recomendado)</displayed-value>
+		<stored-value>0</stored-value>
+	</pair>
+	<pair>
+		<displayed-value>3 meses</displayed-value>
+		<stored-value>90</stored-value>
+	</pair>
+	<pair>
+		<displayed-value>6 meses</displayed-value>
+		<stored-value>180</stored-value>
+	</pair>
+	<pair>
+		<displayed-value>1 año</displayed-value>
+		<stored-value>365</stored-value>
+	</pair>
+	<pair>
+		<displayed-value>2 años</displayed-value>
+		<stored-value>730</stored-value>
+	</pair>
+</value-pairs>
+
+<value-pairs value-pairs-name="cic_types" dc-term="dc_type">
+	<pair>
+		<displayed-value>Documento de trabajo</displayed-value>
+		<stored-value>cic:types/articulo/documentoDeTrabajo</stored-value>
+	</pair>
+	<pair>
+		<displayed-value>Artículo</displayed-value>
+		<stored-value>cic:types/articulo/articulo</stored-value>
+	</pair>
+	<pair>
+		<displayed-value>Comunicacion</displayed-value>
+		<stored-value>cic:types/articulo/comunicación</stored-value>
+	</pair>
+	<pair>
+		<displayed-value>Revisión</displayed-value>
+		<stored-value>cic:types/articulo/revision</stored-value>
+	</pair>
+	<pair>
+		<displayed-value>Contribucion a revista</displayed-value>
+		<stored-value>cic:types/articulo/contribucionARevista</stored-value>
+	</pair>
+	<pair>
+		<displayed-value>Informe técnico</displayed-value>
+		<stored-value>cic:types/articulo/informeTecnico</stored-value>
+	</pair>
+	<pair>
+		<displayed-value>Informe de investigador</displayed-value>
+		<stored-value>cic:types/informeCientifico/informeDeInvestigador</stored-value>
+	</pair>
+	<pair>
+		<displayed-value>Informe de becario</displayed-value>
+		<stored-value>cic:types/informeCientifico/informeDeBecario</stored-value>
+	</pair>
+	<pair>
+		<displayed-value>Informe de personal de apoyo</displayed-value>
+		<stored-value>cic:types/informeCientifico/informeDePersonalDeApoyo</stored-value>
+	</pair>
+	<pair>
+		<displayed-value>Tesis de doctorado</displayed-value>
+		<stored-value>cic:types/tesis/tesisDeDoctorado</stored-value>
+	</pair>
+	<pair>
+		<displayed-value>Tesis de maestría</displayed-value>
+		<stored-value>cic:types/tesis/tesisDeMaestria</stored-value>
+	</pair>
+	<pair>
+		<displayed-value>Trabajo de especializacion</displayed-value>
+		<stored-value>cic:types/tesis/trabajoDeEspecializacion</stored-value>
+	</pair>
+	<pair>
+		<displayed-value>Tesis de grado</displayed-value>
+		<stored-value>cic:types/tesis/tesisDeGrado</stored-value>
+	</pair>
+	<pair>
+		<displayed-value>Trabajo final de Grado</displayed-value>
+		<stored-value>cic:types/tesis/trabajoFinalDeGrado</stored-value>
+	</pair>
+	<pair>
+		<displayed-value>Libro</displayed-value>
+		<stored-value>cic:types/libro/libro</stored-value>
+	</pair>
+	<pair>
+		<displayed-value>Parte de libro</displayed-value>
+		<stored-value>cic:types/libro/parteDeLibro</stored-value>
+	</pair>
+	<pair>
+		<displayed-value>Documento de conferencia</displayed-value>
+		<stored-value>cic:types/objetoDeConferencia/documentoDeConferencia</stored-value>
+	</pair>
+	<pair>
+		<displayed-value>Resolucion</displayed-value>
+		<stored-value>cic:types/documentoInstitucional/resolucion</stored-value>
+	</pair>
+	<pair>
+		<displayed-value>Actas de directorio</displayed-value>
+		<stored-value>cic:types/documentoInstitucional/actasDeDirectorio</stored-value>
+	</pair>
+	<pair>
+		<displayed-value>Legislación</displayed-value>
+		<stored-value>cic:types/documentoInstitucional/legislacion</stored-value>
+	</pair>
+	<pair>
+		<displayed-value>Convenio</displayed-value>
+		<stored-value>cic:types/documentoInstitucional/convenio</stored-value>
+	</pair>
+	<pair>
+		<displayed-value>Fotografía</displayed-value>
+		<stored-value>cic:types/imagen/fotografia</stored-value>
+	</pair>
+	<pair>
+		<displayed-value>Audio</displayed-value>
+		<stored-value>cic:types/audio/audio</stored-value>
+	</pair>
+	<pair>
+		<displayed-value>Objeto de Aprendizaje</displayed-value>
+		<stored-value>cic:types/objetoDeAprendizaje/objetoDeAprendizaje</stored-value>
+	</pair>
+</value-pairs>
+    
  </form-value-pairs>
 
 </input-forms>

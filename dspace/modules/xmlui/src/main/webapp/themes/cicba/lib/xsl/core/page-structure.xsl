@@ -206,43 +206,152 @@
 			element change its value. -->
 		<xsl:if test="dri:body/dri:div[contains(@rend,'primary submission')]">
 		<script type="text/javascript">
-			//Hacemos el dc.type field como sólo readonly
-            $('#aspect_submission_StepTransformer_field_dc_type').prop("readonly",true);
-    
-            $('form.submission').submit(function() {
-              if($(this).data("submitted") === true)
-                return false;
-              else
-                $(this).data("submitted", true);
-              });
-    
-    		//Variable que permite detectar el cambio de tipología seleccionada
-            var oldTypeValue = $('#aspect_submission_StepTransformer_field_dc_type').val();
-            
-            
-            //Esto permite que se despliegue automáticamente todas las opciones con sólo hacer click
-            $('#aspect_submission_StepTransformer_field_dc_type').click(function(){
-              ($(this).autocomplete("option","minLength") != 0)? $(this).autocomplete( "option", "minLength" , 0) : null; 
-              $(this).autocomplete( "search", "" );
-            });
-            
-            
-            $('#aspect_submission_StepTransformer_field_dc_type').on("autocompleteclose", function(event, ui){
-              var permitirSubmit = false;
-              if(oldTypeValue == "")
-                permitirSubmit = true;
-              else
-                permitirSubmit = (oldTypeValue == $(this).val())? false : confirm("¿Está seguro que desea cambiar el tipo de documento?");
-              if(permitirSubmit) {
-                //Realizamos el submit de la página en caso de seleccionar una nueva tipología
-                oldTypeValue = $(this).val();
-                $('form.submission').submit();
-              } else {
-                //En caso de que no haya que cambiar el tipo, se lo vuelve a su valor original 
-                $(this).val(oldTypeValue);
-              }
-            });
-            
+			<xsl:text disable-output-escaping="yes">
+			/**
+			 * Methods used in the initialize of the XMLUI input-forms page.
+			 */
+			//globals variables
+			var fieldIDPrefix = 'aspect_submission_StepTransformer_field_';
+			var fields = ['dc_type','dcterms_language','dcterms_license','dcterms_rights_embargoPeriod'];
+			var oldTypeValue = $('#aspect_submission_StepTransformer_field_dc_type').val();
+			var oldLicenseValue = $('#aspect_submission_StepTransformer_field_dcterms_license').val();
+			//For each input field can put a function name, having as prefix the input field name. P.e. for the field "dcterms_abstract" we can add the function "dcterms_abstract_make_shorter". 
+			var preProcessorsFunctions = ['dcterms_license_selectChosenCC','dcterms_license_ccInputFieldControl','dc_type_typeVerification'];
+			
+			
+			// Initializes fields when the page loads, for every field declared in the 'fields' array.
+			$(document).ready(function(){
+				fields.forEach(executePreprocessors);
+				fields.forEach(makeReadonly);
+				fields.forEach(setAutocompleteParams);
+			});
+			
+			/**
+			* Executes a list of preprocessing functions declared for every DCInput. If the input is not the current page, then no function is applied.
+			*/
+			function executePreprocessors(inputFieldName, index, array){
+				//exists the input field? checks before apply the preprocessors.
+				if($('#'+ fieldIDPrefix + inputFieldName).length){	
+					preProcessorsFunctions.forEach(function(functionName, index, array){
+						if(functionName.indexOf(inputFieldName) != -1){
+							var functionToProcess = new Function("fieldName", functionName.replace(inputFieldName+"_","") + "(fieldName);");
+							//Execute the function
+							functionToProcess(inputFieldName);
+						}
+					});
+				}
+			}
+			
+			/**
+			* Creates a row with a message indicating the CCLicense value set by the CCLicenseStep. 
+			*/
+			function selectChosenCC(licenseFieldName){
+				$("fieldset.ds-form-list ol li:first-child").before('&lt;li class="ds-form-item cc-license-user-selection"&gt;&lt;/li&gt;').children(".cc-license-user-selection");
+				var ccSelectedRow = $("li.cc-license-user-selection");
+				var licenseText = extractCCLicenseText($('#'+ fieldIDPrefix + licenseFieldName).val());
+				if (licenseText != null){
+					if((licenseText.length > 0) &amp;&amp; licenseText != "undefined"){
+						ccSelectedRow.html("El usuario ha seleccionado la licencia &lt;strong&gt;Creative Commons "+licenseText+"&lt;/strong&gt;.");
+					}else{
+						if($('#'+ fieldIDPrefix + licenseFieldName).val().length == 0)
+							ccSelectedRow.text("No se ha seleccionado una licencia Creative Commons");
+					}
+				}
+			}
+				
+			/**
+			* Returns a CC License from the filtrate in a url. P.e.: for the 'http://creativecommons.org/licenses/by-nc-nd/4.0/
+			* the function returns the string "Attribution NonCommercial NoDerivatives 4.0".
+			*/
+			function extractCCLicenseText(licenseURL){
+			if(licenseURL != null){
+					var ccKey = licenseURL.replace("http://creativecommons.org/licenses/","");
+					var ccSplited = ccKey.split("/");
+					var licenseText = "";
+					//process CC features (p.e = "by-nd")
+					ccKey.split("/")[0].split("-").forEach(function(feature, index, array){
+						switch (feature){
+							case "by": licenseText += "Attribution "; break;
+							case "nd": licenseText += "NonCommercial "; break;
+							case "nc": licenseText += "NoDerivatives "; break;
+						}
+					});
+					//process numberOfLicense
+					licenseText += ccKey.split("/")[1];
+					
+					//process CC Jurisdiction, if exists (p.e = "by-nd")
+					licenseText += (ccKey.split("/")[2] == "ar")? " Argentina":"";
+					return licenseText;
+			}
+			}
+			
+			/**
+			* Controls if the CC License field is selected with the correct CC License,  checking if it differs from value set by the CCLicenseStep.
+			*/
+			function ccInputFieldControl(inputFieldName){
+				if($('#'+ fieldIDPrefix + inputFieldName).val().indexOf("http://creativecommons.org/licenses/") != -1){		
+					var oldFieldValue = $('#'+ fieldIDPrefix + inputFieldName).val();
+					//$('#'+ fieldIDPrefix + inputFieldName).val("");
+					$('form.submission').on("submit unload", function(event){
+						var AllowSubmit = ($('#'+ fieldIDPrefix + inputFieldName).val() == oldFieldValue)? false : true;
+						if(!AllowSubmit){
+							$('#'+ fieldIDPrefix + inputFieldName).addClass("error");
+							(!$("span.msjCCError").length)?$('#'+ fieldIDPrefix + inputFieldName + "_confidence_indicator").after('&lt;span class="error msjCCError"&gt;*Debe seleccionar la licencia correspondiente&lt;/span&gt;'):$.noop();
+						}
+						//Do a submit when the current CCLicense value differs of the old value.
+						return AllowSubmit;
+					});
+				}
+			}
+			
+			/**
+			 * Method used to make a field readonly
+			 */
+			function makeReadonly(inputFieldName, index, array){
+				$('#'+ fieldIDPrefix + inputFieldName).prop("readonly",true);
+			}
+			
+			/**
+			 * Set the autocomplete params on an autocomplete
+			 * @returns
+			 */
+			function setAutocompleteParams(inputFieldName, index, array){
+				$('#'+ fieldIDPrefix + inputFieldName).click(function(){
+					($(this).autocomplete("option","minLength") != 0)? $(this).autocomplete( "option", "minLength" , 0) : null; 
+					 $('#'+ fieldIDPrefix + inputFieldName).autocomplete( "search", "BY-ND" );
+				});
+			}
+			
+			//Evaluates the value of the dc.type field. If it changes, then submits the form and reload.
+			function typeVerification(typeFieldName,index,array){
+				
+				$('form.submission').submit(function() {
+				  if($(this).data("submitted") === true)
+				    return false;
+				  else
+				    $(this).data("submitted", true);
+				  });
+				
+				$('#'+ fieldIDPrefix + typeFieldName).on("autocompleteclose", function(event, ui){
+				  var permitirSubmit = false;
+				  if(oldTypeValue == "")
+				    //Avoids make the submit if the autocomplete is currently empty.
+				    permitirSubmit = ($(this).val() != "");
+				  else
+				    permitirSubmit = (oldTypeValue == $(this).val())? false : confirm("¿Está seguro que desea cambiar el tipo de documento?");
+				  if(permitirSubmit) {
+				    //Make the submit if the user select a new tipology
+				    //Realizamos el submit de la página en caso de seleccionar una nueva tipología
+				    oldTypeValue = $(this).val();
+				    $('form.submission').submit();
+				  } else {
+				    //In case that the type does not have to change, returns to its original value
+				    //En caso de que no haya que cambiar el tipo, se lo vuelve a su valor original 
+				    $(this).val(oldTypeValue);
+				  }
+				});
+			}
+			</xsl:text>
 			</script>
 		</xsl:if>
 	</xsl:template>
