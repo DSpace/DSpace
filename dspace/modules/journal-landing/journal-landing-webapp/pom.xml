@@ -125,12 +125,17 @@
             <version>${pom.version}</version>
         </dependency>
         <dependency>
-           <!-- This is required to get the base classes for tests -->
-           <groupId>org.dspace.modules</groupId>
-           <artifactId>api</artifactId>
-           <version>${project.version}</version>
-           <type>test-jar</type>
-           <scope>test</scope>
+            <!-- This is required to get the base classes for tests -->
+            <groupId>org.dspace.modules</groupId>
+            <artifactId>api</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-api</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.dspace.discovery</groupId>

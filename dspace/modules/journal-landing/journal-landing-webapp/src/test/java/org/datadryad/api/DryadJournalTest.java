@@ -31,15 +31,12 @@ public class DryadJournalTest extends ContextUnitTest {
     private static final String testJournalName = "Evolution";
 
     private DryadJournal dryadJournal;
-    private Context context;
 
     @Before
     @Override
     public void setUp() {
-        try {
-            context = new Context();
-            dryadJournal = new DryadJournal(context, testJournalName);
-        } catch (SQLException ex) {}
+        super.setUp();
+        dryadJournal = new DryadJournal(context, testJournalName);
     }
 
     /**
