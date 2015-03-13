@@ -7,20 +7,13 @@
  */
 package org.datadryad.api;
 
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import org.datadryad.test.ContextUnitTest;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.dspace.core.Context;
-import org.dspace.servicemanager.DSpaceKernelInit;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 
 /**
