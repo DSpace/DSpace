@@ -221,7 +221,7 @@
 	    <!-- Creative Commons Logo -->
         <div class="row">
         	<xsl:variable name="cc-uri">
-				<xsl:copy-of select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='dcterms' and @element='license']/text()"/>
+				<xsl:value-of select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='dcterms' and @element='license']/@authority"/>
 			</xsl:variable>
         	<div class="col-md-1">
 		        <!-- Generate the Creative Commons license information from the file section (DSpace deposit license hidden by default)-->
