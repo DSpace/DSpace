@@ -68,11 +68,6 @@
             <id>dev</id>
             <dependencies>
                 <dependency>
-                    <groupId>org.dspace</groupId>
-                    <artifactId>dspace-api</artifactId>
-                    <version>${pom.version}</version>
-                </dependency>
-                <dependency>
                     <groupId>org.apache.avalon.framework</groupId>
                     <artifactId>avalon-framework-api</artifactId>
                     <version>4.3.1</version>
@@ -135,7 +130,7 @@
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api</artifactId>
-            <scope>test</scope>
+            <version>${pom.version}</version>
         </dependency>
         <dependency>
             <groupId>org.dspace.discovery</groupId>
