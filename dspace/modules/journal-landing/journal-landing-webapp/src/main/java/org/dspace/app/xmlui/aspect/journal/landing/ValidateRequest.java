@@ -43,6 +43,9 @@ public class ValidateRequest extends AbstractAction {
         // verify we have an accurate journal
         Context context = ContextUtil.obtainContext(objectModel);
         Concept journalConcept = JournalUtils.getJournalConceptByName(context,journalName);
+        if (journalConcept == null) {
+            return null;
+        }
         String journalAbbr = JournalUtils.getJournalShortID(journalConcept);        
         if (journalAbbr != null && journalAbbr.length() != 0) {
             Map map = new HashMap();
