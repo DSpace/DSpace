@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
@@ -37,6 +38,8 @@ import org.dspace.utils.DSpace;
 public class Resource
 {
 
+    @javax.ws.rs.core.Context public static ServletContext servletContext;
+
     private static Logger log = Logger.getLogger(Resource.class);
 
     private static final boolean writeStatistics;
@@ -45,6 +48,9 @@ public class Resource
         writeStatistics = ConfigurationManager.getBooleanProperty("rest", "stats", false);
     }
 
+    static public String getServletContextPath() {
+        return servletContext.getContextPath();
+    }
     /**
      * Create context to work with DSpace database. It can create context
      * with or without a logged in user (parameter user is null). Throws
