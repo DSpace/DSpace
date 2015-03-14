@@ -426,13 +426,20 @@ public class Collection extends DSpaceObject
      */
     public ItemIterator getItems(Integer limit, Integer offset) throws SQLException
     {
-        String myQuery = "SELECT item.* FROM item, collection2item WHERE "
-                + "item.item_id=collection2item.item_id AND "
-                + "collection2item.collection_id= ? "
-                + "AND item.in_archive='1' limit ? offset ?";
+        List<Serializable> params = new ArrayList<Serializable>();
+        StringBuffer myQuery = new StringBuffer(
+            "SELECT item.* " + 
+            "FROM item, collection2item " + 
+            "WHERE item.item_id = collection2item.item_id " +
+              "AND collection2item.collection_id = ? " +
+              "AND item.in_archive = '1'"
+        );
 
-        TableRowIterator rows = DatabaseManager.queryTable(ourContext, "item",
-                myQuery,getID(), limit, offset);
+        params.add(getID());
+        DatabaseManager.applyOffsetAndLimit(myQuery, params, offset, limit);
+
+        TableRowIterator rows = DatabaseManager.query(ourContext,
+                myQuery.toString(), params.toArray());
 
         return new ItemIterator(ourContext, rows);
     }
