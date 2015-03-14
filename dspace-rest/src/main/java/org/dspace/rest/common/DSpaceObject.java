@@ -10,8 +10,6 @@ package org.dspace.rest.common;
 import org.atteo.evo.inflector.English;
 import org.dspace.rest.Resource;
 
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -27,9 +25,6 @@ import java.util.List;
  */
 @XmlRootElement(name = "dspaceobject")
 public class DSpaceObject {
-    @Context
-    UriInfo uri;
-
     private Integer id;
 
     private String name;
