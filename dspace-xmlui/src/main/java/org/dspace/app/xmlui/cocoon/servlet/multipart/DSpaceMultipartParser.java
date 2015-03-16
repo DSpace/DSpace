@@ -9,6 +9,7 @@ package org.dspace.app.xmlui.cocoon.servlet.multipart;
 
 import org.apache.cocoon.servlet.multipart.*;
 import org.apache.cocoon.util.NullOutputStream;
+import org.apache.commons.fileupload.ParameterParser;
 import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.Vector;
 
 /**
@@ -362,8 +364,11 @@ public class DSpaceMultipartParser {
         Hashtable headers = new Hashtable();
         String hdrline = readln(in);
 
+	    ParameterParser parser = new ParameterParser();
+
         while (!"".equals(hdrline)) {
-            String name = StringUtils.substringBefore(hdrline, ": ").toLowerCase();
+	        String name = StringUtils.substringBefore(hdrline, ": ").toLowerCase();
+
             String value;
             if(hdrline.contains(";")){
                 value = StringUtils.substringBetween(hdrline, ": ", "; ");
@@ -374,22 +379,13 @@ public class DSpaceMultipartParser {
             headers.put(name, value);
 
             hdrline = StringUtils.substringAfter(hdrline, ";");
-
-            // The extra tokenizer.hasMoreTokens() hdrline headers.put
-            // handles the filename="" case IE6 submits for an empty
-            // upload field.
-            while (0 < hdrline.length()) {
-                name = StringUtils.substringBetween(hdrline, " ", "=");
-                if(hdrline.contains("; ")){
-                    value = StringUtils.substringBetween(hdrline, "=\"", "\";");
-                    hdrline = StringUtils.substringAfter(hdrline, ";");
-                }else{
-                    value = StringUtils.substringBetween(hdrline, "=\"", "\"");
-                    hdrline = "";
-                }
-
-                headers.put(name, value);
-            }
+	        if (StringUtils.isNotBlank(hdrline)) {
+		        Map parsed = parser.parse(hdrline, ';');
+		        if (parsed.containsKey("filename") && parsed.get("filename") == null) {
+			        parsed.put("filename", ""); // apparently, IE6 sometimes submits filename=""
+		        }
+		        headers.putAll(parsed); // source out parsing of the rest of the header - it gets quite tricky with respecting quotes etc
+	        }
 
             hdrline = readln(in);
         }
