@@ -232,7 +232,7 @@
 			</div>
 			<div class="col-md-6">
 				<i18n:text>xmlui.dri2xhtml.structural.cc-item-view-text</i18n:text>
-				<i18n:text><xsl:value-of select="concat('xmlui.dri2xhtml.structural.cc-',xmlui:replaceAll(substring-after($cc-uri, 'http://creativecommons.org/licenses/'), '/', '-'))"/></i18n:text>
+				<i18n:text><xsl:value-of select="concat('xmlui.dri2xhtml.structural.cc-',xmlui:stripDash(xmlui:replaceAll(substring-after($cc-uri, 'http://creativecommons.org/licenses/'), '/', '-')))"/></i18n:text>
 			</div>
 	     </div>
     </xsl:template>

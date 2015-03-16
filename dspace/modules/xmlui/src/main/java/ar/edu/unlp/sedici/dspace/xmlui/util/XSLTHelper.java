@@ -15,5 +15,13 @@ public class XSLTHelper {
  			return source;
  		}
  	}
+	
+	public static String stripDash(String source) {
+		if (source.endsWith("-")) {
+			return source.substring(0, source.length() - 1);
+		} else {
+			return source;
+		}
+	}
 }
 
