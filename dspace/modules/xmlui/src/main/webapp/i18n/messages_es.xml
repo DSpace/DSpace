@@ -811,7 +811,7 @@
 	<!-- org.dspace.app.xmlui.Submission.submit.CCLicenseStep -->
 <message key="xmlui.Submission.submit.CCLicenseStep.ccws_error">Hubo un error .. {0}</message>
 <message key="xmlui.Submission.submit.CCLicenseStep.head">Licencie su trabajo</message>
-<message key="xmlui.Submission.submit.CCLicenseStep.info1">Puede opcionalmente asignar a su ítem una licencia <a href="http://creativecommons.org/">Creative Commons</a>. Las licencias Creative Commons determinan qué pueden hacer los lectores con su trabajo.</message>
+<message key="xmlui.Submission.submit.CCLicenseStep.info1">Asigne a su ítem una licencia <a href="http://creativecommons.org/">Creative Commons</a>. Las licencias Creative Commons determinan qué pueden hacer los lectores con su trabajo.</message>
 <message key="xmlui.Submission.submit.CCLicenseStep.submit_choose_creative_commons">Elija licencia</message>
 <message key="xmlui.Submission.submit.CCLicenseStep.submit_to_creative_commons">Acceder a Creative Commons para elegir una licencia</message>
 <message key="xmlui.Submission.submit.CCLicenseStep.license">Tipo de Licencia</message>

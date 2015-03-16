@@ -273,9 +273,14 @@ public class CCLicenseStep extends AbstractProcessingStep
     	}
     	else if (licenseclass.equals("xmlui.Submission.submit.CCLicenseStep.select_change"))
     	{
-    		//Si no se selecciona alguna licencia CC, se pide que se seleccione alguna.
-    		request.getSession().setAttribute("ccError", "Debe seleccionar un tipo licencia.");
-    		return STATUS_LICENSE_REJECTED;
+    		if(!ConfigurationManager.getBooleanProperty("cc.license.allow_no_license", false)){
+	    		//Si no se selecciona alguna licencia CC, se pide que se seleccione alguna.
+	    		request.getSession().setAttribute("ccError", "Debe seleccionar un tipo licencia.");
+	    		return STATUS_LICENSE_REJECTED;
+    		}else{
+    			removeRequiredAttributes(session);    
+        		return STATUS_COMPLETE;
+    		}
     	}
     	else if (ccLookup.isSuccess()) 
     	{
