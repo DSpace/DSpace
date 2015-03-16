@@ -3,14 +3,14 @@
 A RESTful web services API for DSpace, built using JAX-RS1 JERSEY.
 
 ##Getting Started
-This REST API is integrated directly into the DSpace code-base.
+This REST API is integrated directly into the DSpace codebase.
 
- * Rebuild as normal: mvn + ant
- * Deploy the webapp (i.e to tomcat)
-  * ```<Context path="/rest"  docBase="/dspace/webapps/rest"  allowLinking="true"/>```
+ * Rebuild as usual: mvn + ant
+ * Deploy the webapp (i.e to Tomcat)
+  * ```<Context path="/rest" docBase="/dspace/webapps/rest" />```
 
 
-At this point, REST API can do all CRUD operations over communities, collections, items, bitstream and bitstream policies. Without login into REST api, you can read all as anynomous. If you want to make changes in DSpace by REST api, you must login into api and use generated token from api.
+At this time, REST API can do all CRUD operations over communities, collections, items, bitstream and bitstream policies. Without logging into the REST API, you have read access as an anynomous user (member of the Anonymous group). If you want to make changes in DSpace using the REST API, you must log into the API using the "login" endpoint and then use the returned token in request header of your subsequent API calls.
 
 ##Endpoints
 
@@ -21,171 +21,172 @@ At this point, REST API can do all CRUD operations over communities, collections
 | /items        |  Y   |   Y     |     Y     |  Y |  Y   |  Y   |
 | /bitstreams   |  Y   |   Y     |     Y     |  Y |  Y   |      ||
 
-Search in collections is only by name and search in items is only by metadata field.
+Search in collections is possible only by name and search in items only by metadata field.
 
 ###Index
-Get some usefull information how to use API
-- GET {rest-endpoint}
+Get information on how to use the API
+- GET http://localhost:8080
 
-Test if REST api is up
-- GET {rest-endpoint}/test
+Test whether the REST API is running and available
+- GET http://localhost:8080/test
 
-Login into REST api
-- POST {rest-endpoint}/login
+Log into REST API
+- POST http://localhost:8080/login
 
-Logout from REST api
-- POST {rest-endpoint}/logout
+Logout from REST API
+- POST http://localhost:8080/logout
 
-Get status of REST api and logged user
-- GET {rest-endpoint}/status
+Get status of REST API and the logged-in user
+- GET http://localhost:8080/status
 
 
 ###Communities
 View the list of top-level communities
-- GET {rest-endpoint}/communities/top-communities
+- GET http://localhost:8080/communities/top-communities
 
 View the list of all communities
-- GET {rest-endpoint}/communities[?expand={collections,parentCommunity,subCommunities,logo,all}]
+- GET http://localhost:8080/communities[?expand={collections,parentCommunity,subCommunities,logo,all}]
 
 View a specific community
-- GET {rest-endpoint}/communities/:ID[?expand={collections,parentCommunity,subCommunities,logo,all}]
+- GET http://localhost:8080/communities/:ID[?expand={collections,parentCommunity,subCommunities,logo,all}]
 
-View list of subcollections in community
-- GET {rest-endpoint}/communities/:ID/collections[?expand={items,parentCommunityList,license,logo,all}]
+View the list of subcollections in community
+- GET http://localhost:8080/communities/:ID/collections[?expand={items,parentCommunityList,license,logo,all}]
 
-View lsit of subcommunities in community
-- GET {rest-endpoint}/communities/:ID/communities[?expand={collections,parentCommunity,subCommunities,logo,all}]
+View the list of subcommunities in community
+- GET http://localhost:8080/communities/:ID/communities[?expand={collections,parentCommunity,subCommunities,logo,all}]
 
 Create new top-level community
-- POST {rest-endpoint}/communities
+- POST http://localhost:8080/communities
 
 Create new subcollection in community
-- POST {rest-endpoint}/communities/:ID/collections
+- POST http://localhost:8080/communities/:ID/collections
 
 Create new subcommunity in community
-- POST {rest-endpoint}/communities/:ID/communities
+- POST http://localhost:8080/communities/:ID/communities
 
 Update community
-- PUT {rest-endpoint}/communities/:ID
+- PUT http://localhost:8080/communities/:ID
 
 Delete community
-- DELETE {rest-endpoint}/communities/:ID
+- DELETE http://localhost:8080/communities/:ID
 
 Delete subcollection in community
-- DELETE {rest-endpoint}/communities/:ID/collections/:ID
+- DELETE http://localhost:8080/communities/:ID/collections/:ID
 
 Delete subcommunity in community
-- DELETE {rest-endpoint}/communities/:ID/communities/:ID
+- DELETE http://localhost:8080/communities/:ID/communities/:ID
 
 
 ###Collections
 View the list of collections
-- GET {rest-endpoint}/collections[?expand={items,parentCommunityList,license,logo,all}]
+- GET http://localhost:8080/collections[?expand={items,parentCommunityList,license,logo,all}]
 
 View a specific collection
-- GET {rest-endpoint}/collections/:ID[?expand={items,parentCommunityList,license,logo,all}]
+- GET http://localhost:8080/collections/:ID[?expand={items,parentCommunityList,license,logo,all}]
 
 View items in collection
-- GET {rest-endpoint}/collections/:ID/items[?expand={metadata,parentCollection,parentcollectionList,parentCommunityList,bitsreams,all}]
+- GET http://localhost:8080/collections/:ID/items[?expand={metadata,parentCollection,parentcollectionList,parentCommunityList,bitstreams,all}]
 
 Create item in collection
-- POST {rest-endpoint}/collections/:ID/items
+- POST http://localhost:8080/collections/:ID/items
 
-Find collection defined by name
-- POST {rest-endpoint}/collections/find-collection
+Find collection by name
+- POST http://localhost:8080/collections/find-collection
 
 Update collection
-- PUT {rest-endpoint}/collections/:ID
+- PUT http://localhost:8080/collections/:ID
 
 Delete collection
-- DELETE {rest-endpoint}/collections/:ID
+- DELETE http://localhost:8080/collections/:ID
 
 Delete item in collection
-- DELETE {rest-endpoint}/collections/:ID/items/:ID
+- DELETE http://localhost:8080/collections/:ID/items/:ID
 
 
 ###Items
 View the list of items
-- GET {rest-endpoint}/items[?expand={metadata,parentCollection,parentcollectionList,parentCommunityList,bitsreams,all}]
+- GET http://localhost:8080/items[?expand={metadata,parentCollection,parentcollectionList,parentCommunityList,bitstreams,all}]
 
 View speciific item
-- GET {rest-endpoint}/items/:ID[?expand={metadata,parentCollection,parentcollectionList,parentCommunityList,bitsreams,all}]
+- GET http://localhost:8080/items/:ID[?expand={metadata,parentCollection,parentcollectionList,parentCommunityList,bitstreams,all}]
 
-View an Item, and see its bitstreams
-- GET {rest-endpoint}/items/:ID/bitstreams[?expand={parent,policies,all}]
+View an Item and view its bitstreams
+- GET http://localhost:8080/items/:ID/bitstreams[?expand={parent,policies,all}]
 
-View an Item, and see its metadata
-- GET {rest-endpoint}/items/:ID/metadata
+View an Item, and view its metadata
+- GET http://localhost:8080/items/:ID/metadata
 
 Find item by metadata
-- POST {rest-endpoint}/items/find-by-metadata-field
+- POST http://localhost:8080/items/find-by-metadata-field
 
 Add metadata to item
-- POST {rest-endpoint}/items/:ID/metadata
+- POST http://localhost:8080/items/:ID/metadata
 
 Create bitstream in item
-- POST {rest-endpoint}/items/:ID/bitstreams
+- POST http://localhost:8080/items/:ID/bitstreams
 
 Update metadata in item
-- PUT {rest-endpoint}/items/:ID/metadata
+- PUT http://localhost:8080/items/:ID/metadata
 
 Delete item
-- DELETE {rest-endpoint}/items/:ID
+- DELETE http://localhost:8080/items/:ID
 
 Delete all metadata in item
-- DELETE {rest-endpoint}/items/:ID/metadata
+- DELETE http://localhost:8080/items/:ID/metadata
 
 Delete bitstream in item
-- DELETE {rest-endpoint}/items/:ID/bitstreams/:ID
+- DELETE http://localhost:8080/items/:ID/bitstreams/:ID
 
 
 ###Bitstreams
 View the list of bitstreams
-- GET {rest-endpoint}/bitstreams[?expand={parent,policies,all}]
+- GET http://localhost:8080/bitstreams[?expand={parent,policies,all}]
 
 View information about a bitstream
-- GET {rest-endpoint}/bitstreams/:ID[?expand={parent,policies,all}]
+- GET http://localhost:8080/bitstreams/:ID[?expand={parent,policies,all}]
 
 View/Download a specific Bitstream
-- GET {rest-endpoint}/bitstreams/:ID/retrieve
+- GET http://localhost:8080/bitstreams/:ID/retrieve
 
 View the list of policies of bitstream
-- GET {rest-endpoint}/bitstreams/:ID/policy
+- GET http://localhost:8080/bitstreams/:ID/policy
 
 Add policy to bitstream
-- POST {rest-endpoint}/bitstreams/:ID/policy
+- POST http://localhost:8080/bitstreams/:ID/policy
 
 Update bitstream
-- PUT {rest-endpoint}/bitstreams/:ID
+- PUT http://localhost:8080/bitstreams/:ID
 
 Update data of bitstream
-- PUT {rest-endpoint}/bitstreams/:ID/data
+- PUT http://localhost:8080/bitstreams/:ID/data
 
 Delete bitstream
-- DELETE {rest-endpoint}/bitstreams/:ID
+- DELETE http://localhost:8080/bitstreams/:ID
 
-Delte policy of bitstream
-- DELETE {rest-endpoint}/bitstreams/:ID/policy/:ID
+Delete policy of bitstream
+- DELETE http://localhost:8080/bitstreams/:ID/policy/:ID
 
 
 ####Statistics
-Recording of statistics for view of items or download of bitstreams (set stats = true in rest.cfg to enable stats recording)
-{rest-endpoint}/items/:ID?userIP=ip&userAgent=userAgent&xforwardedfor=xforwardedfor
-If no parameters are given the details of httprequest sender are used in statistics. 
-This enables tools to record the details of their user rather then themselves.
+Recording view events of items and download events of bitstreams (set stats = true in rest.cfg to enable recording of events)
+http://localhost:8080/items/:ID?userIP=ip&userAgent=userAgent&xforwardedfor=xforwardedfor
+If no parameters are given, the details of the HTTP request sender are used in statistics. 
+This enables tools like proxies to supply the details of their user rather than themselves.
 
 
 ###Handles
-Lookup a DSpaceObject by its Handle, this produces the name/ID, that you lookup in /bitstreams, /items, /collections, /communities
-- {rest-endpoint}/handle/{prefix}/{suffix}
+Lookup a DSpaceObject by its Handle, this produces the name/ID that you look up in /bitstreams, /items, /collections, /communities
+- http://localhost:8080/handle/{prefix}/{suffix}
 
 ##Expand
-There is an ?expand= query parameter for more expensive operations. You can tack it on the end of endpoints.
+There is an ?expand= query parameter for more expensive operations. You can add it at the end of the request URL.
 It is optional, all, some or none. The response will usually indicate what the available "expand" options are.
 
 ##HTTP Responses
-* 200 OK            - We have the requested object/objects
+* 200 OK            - The requested object/objects exists
 * 401 Unauthorized  - The anonymous user does not have READ access to that object
-* 404 Not Found     - That object doesn't exist
-* 405 Method Not Allowed - Bad method of request. (GET,POST,PUT,DELETE) Or data are in another format. (json or xml)
+* 404 Not Found     - The specified object doesn't exist
+* 405 Method Not Allowed - Wrong request method (GET,POST,PUT,DELETE) or wrong data format (JSON/XML). 
+* 415 Unsupported Media Type - Missing "Content-Type: application/json" or "Content-Type: application/xml" request header
 * 500 Server Error  - Likely a SQLException, IOException, more details in the logs.
