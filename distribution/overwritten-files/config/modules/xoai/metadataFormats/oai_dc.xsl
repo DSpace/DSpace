@@ -105,7 +105,7 @@
 			</xsl:for-each>
 			
 			<!--sedici.contributor.editor = creator -->
-			<xsl:for-each select="doc:metadata/doc:element[@name='sedici']/doc:element[@name='contributor']/doc:element/doc:field[@name='editor']">
+			<xsl:for-each select="doc:metadata/doc:element[@name='sedici']/doc:element[@name='contributor']/doc:element[@name='editor']/doc:element/doc:field[@name='value']">
 				<dc:creator><xsl:value-of select="." /></dc:creator>
 			</xsl:for-each>
 
