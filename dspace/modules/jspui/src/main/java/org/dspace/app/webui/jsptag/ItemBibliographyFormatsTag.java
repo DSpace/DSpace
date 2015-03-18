@@ -68,19 +68,22 @@ public class ItemBibliographyFormatsTag extends TagSupport{
     
     public String itemButtonsMarkup(HttpServletRequest request, Item item){
             //create a link for displaying bibliographic result
+       
+        String mendeleyLink= "<button class=\"col-md-12 col-sm-12 col-xs-12 btn btn-default\" onclick=\"MendeleyImporterApi.open()\">Mendeley<img src=\"" +request.getContextPath()+ "/image/registered.png"+"\" style=\"margin-top:-8px;\" height=\"10\" width=\"10\"/></button>";
+        String endNoteLink = "<a class=\"col-md-12 col-sm-12 col-xs-12 btn btn-default\" href=\"" + request.getContextPath() + "/bibliography?bib=en&handle_item=" + item.getHandle() + "\" target=\"_blank\" alt=\"Download EndNote record\" id=\"en\">EndNote<img src=\"" +request.getContextPath()+ "/image/registered.png"+"\" style=\"margin-top:-8px;\" height=\"10\" width=\"10\"/></a>";
         String bibTextLink = "<a class=\"col-md-12 col-sm-12 col-xs-12 btn btn-default\" href=\"" + request.getContextPath() + "/bibliography?bib=tex&handle_item=" + item.getHandle() + "\" target=\"_blank\" alt=\"Download BibText record\" id=\"tex\">BibTex</a>";
-        String endNoteLink = "<a class=\"col-md-12 col-sm-12 col-xs-12 btn btn-default\" href=\"" + request.getContextPath() + "/bibliography?bib=en&handle_item=" + item.getHandle() + "\" target=\"_blank\" alt=\"Download EndNote record\" id=\"en\">EndNote</a>";
-        String RisLink = "<a class=\"col-md-12 col-sm-12 col-xs-12 btn btn-default\" href=\"" + request.getContextPath() + "/bibliography?bib=ris&handle_item=" + item.getHandle() + "\" target=\"_blank\" alt=\"Download Ris record\" id=\"en\">RIS</a>";
-        String CSVLink=  "<a class=\"col-md-12 col-sm-12 col-xs-12 btn btn-default\" href=\"" + request.getContextPath() + "/bibliography?bib=csv&handle_item=" + item.getHandle() + "\" target=\"_blank\" alt=\"Download CSV record\" id=\"en\">CSV</a>";
-        String TSVLink=  "<a class=\"col-md-12 col-sm-12 col-xs-12 btn btn-default\" href=\"" + request.getContextPath() + "/bibliography?bib=tsv&handle_item=" + item.getHandle() + "\" target=\"_blank\" alt=\"Download TSV record\" id=\"en\">TSV</a>";
-        String mendeley= "<button class=\"col-md-12 col-sm-12 col-xs-12 btn btn-default\" onclick=\"MendeleyImporterApi.open()\"><img src=\"" +request.getContextPath()+ "/image/mendeley.png"+"\"/>Mendeley</button>";
+        String RisLink = "<a class=\"col-md-12 col-sm-12 col-xs-12 btn btn-default\" href=\"" + request.getContextPath() + "/bibliography?bib=ris&handle_item=" + item.getHandle() + "\" target=\"_blank\" alt=\"Download Ris record\" id=\"ris\">RIS</a>";
+        String CSVLink=  "<a class=\"col-md-12 col-sm-12 col-xs-12 btn btn-default\" href=\"" + request.getContextPath() + "/bibliography?bib=csv&handle_item=" + item.getHandle() + "\" target=\"_blank\" alt=\"Download CSV record\" id=\"csv\">CSV</a>";
+        String TSVLink=  "<a class=\"col-md-12 col-sm-12 col-xs-12 btn btn-default\" href=\"" + request.getContextPath() + "/bibliography?bib=tsv&handle_item=" + item.getHandle() + "\" target=\"_blank\" alt=\"Download TSV record\" id=\"tsv\">TSV</a>";
+       
         StringBuffer sbLink = new StringBuffer();
-        sbLink.append(bibTextLink);
+        sbLink.append(mendeleyLink);
         sbLink.append(endNoteLink);
+        sbLink.append(bibTextLink);
         sbLink.append(RisLink);
         sbLink.append(CSVLink);
         sbLink.append(TSVLink);
-        sbLink.append(mendeley);
+        
         return sbLink.toString();          
     }
 
