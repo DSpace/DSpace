@@ -561,7 +561,7 @@ public class EZIDIdentifierProvider
     /**
      * Map selected DSpace metadata to fields recognized by DataCite.
      */
-    private Map<String, String> crosswalkMetadata(DSpaceObject dso)
+    Map<String, String> crosswalkMetadata(DSpaceObject dso)
     {
         if ((null == dso) || !(dso instanceof Item))
         {
@@ -632,18 +632,42 @@ public class EZIDIdentifierProvider
             mapped.put(DATACITE_PUBLICATION_YEAR, year);
         }
 
-        // TODO find a way to get a current direct URL to the object and set _target
-        // mapped.put("_target", url);
+        // Supply _target link back to this object
+        String handle = dso.getHandle();
+        if (null == handle)
+        {
+            log.warn("{} #{} has no handle -- location not set.",
+                    dso.getTypeText(), dso.getID());
+        }
+        else
+        {
+            String url = configurationService.getProperty("dspace.url")
+                    + "/handle/" + item.getHandle();
+            log.info("Supplying location:  {}", url);
+            mapped.put("_target", url);
+        }
 
         return mapped;
     }
 
+    /**
+     * Provide a map from DSO metadata keys to EZID keys.  This will drive the
+     * generation of EZID metadata for the minting of new identifiers.
+     *
+     * @param aCrosswalk
+     */
     @Required
     public void setCrosswalk(Map<String, String> aCrosswalk)
     {
         crosswalk = aCrosswalk;
     }
 
+    /**
+     * Provide a map from DSO metadata keys to classes which can transform their
+     * values to something acceptable to EZID.
+     *
+     * @param transformMap
+     */
     public void setCrosswalkTransform(Map<String, Transform> transformMap)
     {
         transforms = transformMap;
