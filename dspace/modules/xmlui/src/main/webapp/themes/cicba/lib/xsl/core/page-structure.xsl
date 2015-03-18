@@ -272,8 +272,8 @@
 					ccKey.split("/")[0].split("-").forEach(function(feature, index, array){
 						switch (feature){
 							case "by": licenseText += "Attribution "; break;
-							case "nd": licenseText += "NonCommercial "; break;
-							case "nc": licenseText += "NoDerivatives "; break;
+							case "nd": licenseText += "NoDerivatives "; break;
+							case "nc": licenseText += "NonCommercial "; break;
 						}
 					});
 					//process numberOfLicense
