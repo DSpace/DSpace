@@ -55,7 +55,7 @@ public class Institution_CICBA_Authority extends CICBAAuthority {
 		String key = solution.getResource("concept").getURI();
 		String label = solution.getLiteral("label").getString();
 		
-		if (solution.contains("initials")) {
+		if (solution.contains("initials") && !"".equals(solution.getLiteral("initials").getString())) {
 			String initials = solution.getLiteral("initials").getString();
 			label = label + " (" + initials + ")";
 		}

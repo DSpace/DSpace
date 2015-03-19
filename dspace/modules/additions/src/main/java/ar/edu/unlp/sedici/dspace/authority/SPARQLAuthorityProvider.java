@@ -49,6 +49,8 @@ public abstract class SPARQLAuthorityProvider implements ChoiceAuthority {
 			int start, int limit, String locale) {
 		if (text == null)
 			text = "";
+		else 
+			text = text.replace("\"", "");
 
 		ParameterizedSparqlString query = this.getSparqlSearchByTextQuery(
 				field, text, locale);
