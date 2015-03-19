@@ -159,7 +159,7 @@ public class ItemsInReviewPlosMonth extends AbstractCurationTask {
                         
                         
                         // Select and write to file PLOS items that have been in review 30 days or more - *DF*
-						int NUMBEROFDAYS = 31;
+						int NUMBEROFDAYS = 0;
                         String PUBNAME = "plos";
                         String DRYADDOI = "doi:10.5061";
                         boolean notificationReceived = false;
