@@ -17,16 +17,10 @@
 		</step>
 	</workflow>
 	
-	<workflow start="default_CIC-ADMIN_review" id="default">
+	<workflow start="CIC-ADMIN_review" id="default">
 		<roles>
 			<role id="Administrador_CIC" name="CIC-ADMIN" scope="repository" description="Rol asigando para las personas encargadas de gestionar el repositorio, principalmente a partir de la carga."/>
 		</roles>
-		<step id="default_CIC-ADMIN_review" role="Administrador_CIC" userSelectionMethod="rejectrole">
-			<actions>
-				<action id="editaction"/>
-			</actions>
-		</step>
-		<!-- Step configured for compatibility with the "CIC-ADMIN_review" step in the autoarchive workflow.-->
 		<step id="CIC-ADMIN_review" role="Administrador_CIC" userSelectionMethod="rejectrole">
 			<actions>
 				<action id="editaction"/>
