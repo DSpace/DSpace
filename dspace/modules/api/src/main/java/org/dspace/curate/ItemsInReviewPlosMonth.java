@@ -189,6 +189,8 @@ report("Manuscript #:  " + packageManuscriptNumber);
                         	
                         	// String dataDOI = plosManuscript.dryadDataDOI;
 
+report("ManuscriptData #:  " + plosManuscriptData);
+
                         	if (plosManuscriptData != null) {
                         		// If string contains "doi:10.5061" then print to xml file
                         		if ( plosManuscriptData.toLowerCase().contains(DRYADDOI)) {
