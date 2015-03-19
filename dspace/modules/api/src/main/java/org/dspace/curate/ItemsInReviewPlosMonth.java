@@ -83,12 +83,14 @@ public class ItemsInReviewPlosMonth extends AbstractCurationTask {
      private static String getManuscriptData(Context myContext, String msid, String organizationCode) throws SQLException, IOException {
 
         // Integer organizationId = getOrganizationInternalId(myContext, organizationCode);
-
+System.out.println("In the getManuscriptData method");
             String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and active = ?";
             TableRow row = DatabaseManager.querySingleTable(myContext, DB_MANUSCRIPT_TABLE, query, msid, DB_ACTIVE_TRUE);
             // Manuscript manuscript = manuscriptFromTableRow(row);
             // return manuscript;
-            
+System.out.println("row");
+System.out.println(row);
+
             if(row != null) {
             	String json_data = row.getStringColumn(DB_COLUMN_JSON_DATA);
             	return json_data;
