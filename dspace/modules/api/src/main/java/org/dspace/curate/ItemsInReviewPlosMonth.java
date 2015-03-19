@@ -86,8 +86,9 @@ public class ItemsInReviewPlosMonth extends AbstractCurationTask {
 System.out.println("In the getManuscriptData method");
 System.out.println("MSID: " + msid);
 System.out.println("Org Code: " + organizationCode);
-            String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and active = ?";
-            TableRow row = DatabaseManager.querySingleTable(myContext, DB_MANUSCRIPT_TABLE, query, msid, DB_ACTIVE_TRUE);
+            //String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and active = ?";
+            String query = "SELECT * FROM MANUSCRIPT WHERE active = ?";
+            TableRow row = DatabaseManager.querySingleTable(myContext, DB_MANUSCRIPT_TABLE, query, DB_ACTIVE_TRUE);
             // Manuscript manuscript = manuscriptFromTableRow(row);
             // return manuscript;
 System.out.println("row");
