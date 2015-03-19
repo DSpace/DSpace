@@ -2215,12 +2215,12 @@
 	<message key="xmlui.dri2xhtml.structural.cc-by-nc-3.0">Attribution-NonCommercial 3.0 Unported (BY-NC 3.0)</message>
 	<message key="xmlui.dri2xhtml.structural.cc-by-nc-sa-3.0">Attribution-NonCommercial-ShareAlike 3.0 Unported (BY-NC-SA 3.0)</message>
 	<message key="xmlui.dri2xhtml.structural.cc-by-nc-nd-3.0">Attribution-NonCommercial-NoDerivs  3.0 Unported (BY-NC-ND 3.0)</message>
-	<message key="xmlui.dri2xhtml.structural.cc-by-2.5">Attribution 2.5 (BY 2.5 Argentina)</message>
-	<message key="xmlui.dri2xhtml.structural.cc-by-sa-2.5">Attribution-ShareAlike 2.5 (BY-SA 2.5 Argentina)</message>
-	<message key="xmlui.dri2xhtml.structural.cc-by-nd-2.5">Attribution-NoDerivs  2.5 (BY-ND 2.5 Argentina)</message>
-	<message key="xmlui.dri2xhtml.structural.cc-by-nc-2.5">Attribution-NonCommercial 2.5 (BY-NC 2.5 Argentina)</message>
-	<message key="xmlui.dri2xhtml.structural.cc-by-nc-sa-2.5">Attribution-NonCommercial-ShareAlike 2.5 (BY-NC-SA 2.5 Argentina)</message>
-	<message key="xmlui.dri2xhtml.structural.cc-by-nc-nd-2.5">Attribution-NonCommercial-NoDerivs  2.5 (BY-NC-ND 2.5 Argentina)</message>
+	<message key="xmlui.dri2xhtml.structural.cc-by-2.5-ar">Attribution 2.5 (BY 2.5 Argentina)</message>
+	<message key="xmlui.dri2xhtml.structural.cc-by-sa-2.5-ar">Attribution-ShareAlike 2.5 (BY-SA 2.5 Argentina)</message>
+	<message key="xmlui.dri2xhtml.structural.cc-by-nd-2.5-ar">Attribution-NoDerivs  2.5 (BY-ND 2.5 Argentina)</message>
+	<message key="xmlui.dri2xhtml.structural.cc-by-nc-2.5-ar">Attribution-NonCommercial 2.5 (BY-NC 2.5 Argentina)</message>
+	<message key="xmlui.dri2xhtml.structural.cc-by-nc-sa-2.5-ar">Attribution-NonCommercial-ShareAlike 2.5 (BY-NC-SA 2.5 Argentina)</message>
+	<message key="xmlui.dri2xhtml.structural.cc-by-nc-nd-2.5-ar">Attribution-NonCommercial-NoDerivs  2.5 (BY-NC-ND 2.5 Argentina)</message>
 	
 	
 	<!-- DS-METS-1.0-MODS.xsl -->
