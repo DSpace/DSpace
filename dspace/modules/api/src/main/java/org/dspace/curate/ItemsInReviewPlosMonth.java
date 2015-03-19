@@ -166,7 +166,7 @@ public class ItemsInReviewPlosMonth extends AbstractCurationTask {
                         
                         int numDaysInReview = numDaysSince(lastModificationDate.getTime());
                         
-
+report("Before processing:  " + "Item ID: " + itemID + ", " + "Pub Name: " + publicationName + ", " + "Last Mod: " + lastModificationDate);
                     
                         if ( (publicationName.toLowerCase().contains(PUBNAME)) && (numDaysInReview >= NUMBEROFDAYS) ) {
                         	// report whether we have a plos notification for the item
@@ -179,6 +179,8 @@ public class ItemsInReviewPlosMonth extends AbstractCurationTask {
                         	// get DOI and manuscript number - *DF*
                         	String packageDOI = dataPackage.getIdentifier();
                         	String packageManuscriptNumber = dataPackage.getManuscriptNumber();
+report("DOI:  " + packageDOI);
+report("Manuscript #:  " + packageManuscriptNumber);
                         	
                         	// Get manuscript from the Manuscript table based on manuscript number
                         	// Check to see if string contains "doi:10.5061"
