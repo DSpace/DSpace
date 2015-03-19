@@ -84,6 +84,8 @@ public class ItemsInReviewPlosMonth extends AbstractCurationTask {
 
         // Integer organizationId = getOrganizationInternalId(myContext, organizationCode);
 System.out.println("In the getManuscriptData method");
+System.out.println("MSID: " + msid);
+System.out.println("Org Code: " + organizationCode);
             String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and active = ?";
             TableRow row = DatabaseManager.querySingleTable(myContext, DB_MANUSCRIPT_TABLE, query, msid, DB_ACTIVE_TRUE);
             // Manuscript manuscript = manuscriptFromTableRow(row);
