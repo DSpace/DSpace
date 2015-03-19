@@ -97,7 +97,7 @@ public class WorkflowFactory {
 
     private static Step createFirstStep(Workflow workflow, Node workflowNode) throws TransformerException, WorkflowConfigurationException {
         String firstStepID = workflowNode.getAttributes().getNamedItem("start").getTextContent();
-        Node stepNode = XPathAPI.selectSingleNode(workflowNode, "//step[@id='"+firstStepID+"']");
+        Node stepNode = XPathAPI.selectSingleNode(workflowNode, "step[@id='"+firstStepID+"']");
         if(stepNode == null){
             throw new WorkflowConfigurationException("First step does not exist for workflow: "+workflowNode.getAttributes().getNamedItem("id").getTextContent());
         }
