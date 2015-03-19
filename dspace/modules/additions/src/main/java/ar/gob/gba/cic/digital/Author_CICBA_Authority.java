@@ -39,8 +39,15 @@ public class Author_CICBA_Authority extends CICBAAuthority {
 		pqs.append("?person a foaf:Person ; foaf:givenName ?name ; foaf:familyName ?surname .\n");
 		pqs.append("OPTIONAL { ?person foaf:Organization ?a ; dc:identifier ?id . ?a a foaf:Organization ; dc:title ?affiliation }\n");
 		if (!"".equals(text)) {
-			pqs.append("FILTER(REGEX(?name, ?text, \"i\") || REGEX(?surname, ?text, \"i\") || REGEX(?id, ?text, \"i\"))\n");
-			pqs.setLiteral("text", text);
+			String[] tokens = text.split(",");
+			if (tokens.length > 1) {
+				pqs.append("FILTER(REGEX(?name, ?text2, \"i\") && REGEX(?surname, ?text1, \"i\"))\n");
+				pqs.setLiteral("text1", tokens[0].trim());
+				pqs.setLiteral("text2", tokens[1].trim());
+			} else {
+				pqs.append("FILTER(REGEX(?name, ?text, \"i\") || REGEX(?surname, ?text, \"i\") || REGEX(?id, ?text, \"i\"))\n");
+				pqs.setLiteral("text", tokens[0]);
+			}
 		}
 		pqs.append("}\n");
 		pqs.append("ORDER BY ASC(?surname)\n");
