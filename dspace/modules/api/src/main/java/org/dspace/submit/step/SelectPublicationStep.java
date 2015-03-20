@@ -161,7 +161,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                         EventLogger.log(context, "submission-select-publication", "error=invalid_journal");
                         return ERROR_INVALID_JOURNAL;
                     }
-                    else if(!processJournal(journal, journalUuid, manuscriptNumber, item, context, request, articleStatus)){
+                    else if(!processJournal(journal, null, journalUuid, manuscriptNumber, item, context, request, articleStatus)){
                         EventLogger.log(context, "submission-select-publication", "error=no_journal_selected");
                         return ENTER_MANUSCRIPT_NUMBER;
                     }
@@ -214,7 +214,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                                 EventLogger.log(context, "submission-select-publication", "error=invalid_journal");
                                 return ERROR_INVALID_JOURNAL;
                             }
-                            else if(!processJournal(journal, null, manuscriptNumber, item, context, request, articleStatus)){
+                            else if(!processJournal(journal, null, null, manuscriptNumber, item, context, request, articleStatus)){
 
                                 if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED) return ENTER_MANUSCRIPT_NUMBER;
 
@@ -237,7 +237,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                         EventLogger.log(context, "submission-select-publication", "error=invalid_journal");
                         return ERROR_INVALID_JOURNAL;
                     }
-                    else if(!processJournal(journal, null, manuscriptNumber, item, context, request, articleStatus)){
+                    else if(!processJournal(journal, null, null, manuscriptNumber, item, context, request, articleStatus)){
 
                         EventLogger.log(context, "submission-select-publication", "error=no_journal_selected");
                         return ERROR_SELECT_JOURNAL;
@@ -248,13 +248,13 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                 // ########### ARTICLE_STATUS_IN_REVIEW ###########
                 else if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_IN_REVIEW)
                 {
-                    String journal = request.getParameter("journalIDStatusInReview");
+                    String journalID = request.getParameter("journalIDStatusInReview");
 
-                    if(journal==null||journal.equals("")){
+                    if(journalID==null||journalID.equals("")){
                         EventLogger.log(context, "submission-select-publication", "error=invalid_journal");
                         return ERROR_INVALID_JOURNAL;
                     }
-                    else if(!processJournal(journal, null, manuscriptNumber, item, context, request, articleStatus)){
+                    else if(!processJournal(null, journalID, null, manuscriptNumber, item, context, request, articleStatus)){
                         EventLogger.log(context, "submission-select-publication", "error=no_journal_selected");
                         return ERROR_SELECT_JOURNAL;
                     }
@@ -423,17 +423,21 @@ public class SelectPublicationStep extends AbstractProcessingStep {
     }
 
 
-    private boolean processJournal(String journalName, String journalUuid, String manuscriptNumber, Item item, Context context,
+    private boolean processJournal(String journalName, String journalShortID, String journalUuid, String manuscriptNumber, Item item, Context context,
                                    HttpServletRequest request, String articleStatus) throws AuthorizeException, SQLException {
 
 
         Concept journalConcept = null;
 
-        if(journalConcept==null){
+        if(journalConcept==null && journalUuid != null){
             journalConcept = JournalUtils.getJournalConceptById(context, journalUuid);
         }
 
-        if(journalConcept==null){
+        if(journalConcept==null && journalShortID != null){
+            journalConcept = JournalUtils.getJournalConceptByShortID(context, journalShortID);
+        }
+
+        if(journalConcept==null && journalName != null){
             journalConcept = JournalUtils.getJournalConceptByName(context, journalName);
         }
 
