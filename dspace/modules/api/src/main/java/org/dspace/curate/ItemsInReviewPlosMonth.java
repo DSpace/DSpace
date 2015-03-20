@@ -84,25 +84,24 @@ public class ItemsInReviewPlosMonth extends AbstractCurationTask {
 
         // Integer organizationId = getOrganizationInternalId(myContext, organizationCode);
 
-System.out.println("In the getManuscriptData method");
-System.out.println("MSID: " + msid);
-System.out.println("Org Code: " + organizationCode);
             //String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and active = ?";
             //String query = "SELECT * FROM MANUSCRIPT";
             String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and active = ?";
             TableRow row = DatabaseManager.querySingleTable(myContext, DB_MANUSCRIPT_TABLE, query, msid, DB_ACTIVE_TRUE);
             // Manuscript manuscript = manuscriptFromTableRow(row);
             // return manuscript;
-System.out.println("row");
-System.out.println(row);
+report("***row:  " + row);           
 
-System.out.println("*********** before getting json");
+report("*********** before getting json");
+
 String json_data = row.getStringColumn(DB_COLUMN_JSON_DATA);
-System.out.println("*********** after getting json");
+report("*********** after getting json");
  
              if(row != null) {
-System.out.println("In the if row not null");
+
+report("*********** In the if row not null");
             	String json_data = row.getStringColumn(DB_COLUMN_JSON_DATA);
+report("***json:  " + json_data);
             	return json_data;
         	} else {
             	return null;
