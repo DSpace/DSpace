@@ -83,10 +83,7 @@ public class ItemsInReviewPlosMonth extends AbstractCurationTask {
      private static String getManuscriptData(Context myContext, String msid, String organizationCode) throws SQLException, IOException {
 
         // Integer organizationId = getOrganizationInternalId(myContext, organizationCode);
-if (myContext != null)
-          {
-          System.out.println("myContext is NOT null!!!");
-          }
+
 System.out.println("In the getManuscriptData method");
 System.out.println("MSID: " + msid);
 System.out.println("Org Code: " + organizationCode);
@@ -98,14 +95,14 @@ System.out.println("Org Code: " + organizationCode);
             // return manuscript;
 System.out.println("row");
 System.out.println(row);
-System.out.println("before getstring");
+
+System.out.println("*********** before getting json");
 String json_data = row.getStringColumn(DB_COLUMN_JSON_DATA);
-System.out.println("after getString");
-System.out.println(json_data);
-            if(row != null) {
+System.out.println("*********** after getting json");
+ 
+             if(row != null) {
+System.out.println("In the if row not null");
             	String json_data = row.getStringColumn(DB_COLUMN_JSON_DATA);
-System.out.println("JSON DATA>>>>>>>>");
-System.out.println(json_data);
             	return json_data;
         	} else {
             	return null;
@@ -181,7 +178,7 @@ System.out.println(json_data);
                         
                         int numDaysInReview = numDaysSince(lastModificationDate.getTime());
                         
-report("Before processing:  " + "Item ID: " + itemID + ", " + "Pub Name: " + publicationName + ", " + "Last Mod: " + lastModificationDate);
+report("Before processing new:  " + "Item ID: " + itemID + ", " + "Pub Name: " + publicationName + ", " + "Last Mod: " + lastModificationDate);
                     
                         if ( (publicationName.toLowerCase().contains(PUBNAME)) && (numDaysInReview >= NUMBEROFDAYS) ) {
                         	// report whether we have a plos notification for the item
