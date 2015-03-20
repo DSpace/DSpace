@@ -6,14 +6,13 @@
 	<artifactId>bagit</artifactId>
 	<packaging>war</packaging>
 	<name>DSpace BagIt :: Web Application</name>
-	<version>0.0.1</version>
 
 	<description> DSpace BagIt Webapp </description>
 
 	<parent>
 		<groupId>org.dspace.modules</groupId>
 		<artifactId>bagit-modules</artifactId>
-		<version>0.0.1</version>
+        <version>1.7.3-SNAPSHOT</version>
 	</parent>
 
 	<build>
