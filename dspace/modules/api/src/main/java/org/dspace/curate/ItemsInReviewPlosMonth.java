@@ -100,11 +100,11 @@ System.out.println("row");
 System.out.println(row);
 
 String json_data = row.getStringColumn(DB_COLUMN_JSON_DATA);
-System.out.println("JSON DATA>>>>>>>>);
+System.out.println("JSON DATA>>>>>>>>");
 System.out.println(json_data);
             if(row != null) {
             	String json_data = row.getStringColumn(DB_COLUMN_JSON_DATA);
-System.out.println("JSON DATA>>>>>>>>);
+System.out.println("JSON DATA>>>>>>>>");
 System.out.println(json_data);
             	return json_data;
         	} else {
