@@ -53,7 +53,7 @@ public class WorkflowOverviewDiscovery extends SimpleSearch {
     public void addPageMeta(PageMeta pageMeta) throws WingException, SQLException, AuthorizeException {
         pageMeta.addMetadata("title").addContent(T_title);
 
-        if(!AuthorizeManager.isAdmin(ContextUtil.obtainContext(objectModel))){
+        if(!AuthorizeManager.isCuratorOrAdmin(ContextUtil.obtainContext(objectModel))){
             throw new AuthorizeException();
         }
     }

@@ -48,6 +48,7 @@ import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.VersioningService;
 import org.dspace.workflow.DryadWorkflowUtils;
+import org.dspace.workflow.WorkflowItem;
 
 /**
  * Class representing an item in DSpace.
@@ -390,11 +391,31 @@ public class Item extends DSpaceObject
 
         // get the collection ID
         int cid = itemRow.getIntColumn("owning_collection");
-        if(cid==-1)
+        if(cid!=-1)
         {
-            return null;
+            myCollection = Collection.find(ourContext, cid);
         }
-        myCollection = Collection.find(ourContext, cid);
+        if(myCollection==null)
+        {
+            WorkspaceItem workspaceItem = WorkspaceItem.findByItemId(ourContext,itemRow.getIntColumn("item_id"));
+            if(workspaceItem!=null)
+            {
+                myCollection = workspaceItem.getCollection();
+            }
+            else
+            {
+                try{
+                WorkflowItem workflowItem = WorkflowItem.findByItemId(ourContext,itemRow.getIntColumn("item_id"));
+                if(workflowItem!=null)
+                {
+                    myCollection = workflowItem.getCollection();
+                }
+                }catch (Exception e)
+                {
+                    log.error("error while finding the owning collection for item: "+itemRow.getIntColumn("item_id")+" in workflow");
+                }
+            }
+        }
 
         return myCollection;
     }
