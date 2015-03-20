@@ -80,6 +80,7 @@ public class ItemsInReviewPlosMonth extends AbstractCurationTask {
  
     /** returns data from the manuscript table based on the given Manuscript ID and organization code */
      // private static Manuscript getManuscriptByIdAndOrg(Context myContext, String msid, String organizationCode) throws SQLException, IOException {
+//     private static String getManuscriptData(Context myContext, String msid, String organizationCode) throws SQLException, IOException {
      private String getManuscriptData(Context myContext, String msid, String organizationCode) throws SQLException, IOException {
 
         // Integer organizationId = getOrganizationInternalId(myContext, organizationCode);
@@ -100,9 +101,9 @@ report("*********** after getting json");
              if(row != null) {
 
 report("*********** In the if row not null");
-            	String json_data = row.getStringColumn(DB_COLUMN_JSON_DATA);
-report("***json:  " + json_data);
-            	return json_data;
+            	String the_json_data = row.getStringColumn(DB_COLUMN_JSON_DATA);
+report("***json:  " + the_json_data);
+            	return the_json_data;
         	} else {
             	return null;
         	}
