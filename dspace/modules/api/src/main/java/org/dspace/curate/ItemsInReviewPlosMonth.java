@@ -81,28 +81,15 @@ public class ItemsInReviewPlosMonth extends AbstractCurationTask {
     /** returns data from the manuscript table based on the given Manuscript ID and organization code */
      // private static Manuscript getManuscriptByIdAndOrg(Context myContext, String msid, String organizationCode) throws SQLException, IOException {
 //     private static String getManuscriptData(Context myContext, String msid, String organizationCode) throws SQLException, IOException {
+
      private String getManuscriptData(Context myContext, String msid, String organizationCode) throws SQLException, IOException {
-
-        // Integer organizationId = getOrganizationInternalId(myContext, organizationCode);
-
-            //String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and active = ?";
-            //String query = "SELECT * FROM MANUSCRIPT";
             String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and active = ?";
             TableRow row = DatabaseManager.querySingleTable(myContext, DB_MANUSCRIPT_TABLE, query, msid, DB_ACTIVE_TRUE);
-            // Manuscript manuscript = manuscriptFromTableRow(row);
-            // return manuscript;
-report("***row:  " + row);           
-
-report("*********** before getting json");
 
 String json_data = row.getStringColumn(DB_COLUMN_JSON_DATA);
-report("*********** after getting json");
  
              if(row != null) {
-
-report("*********** In the if row not null");
             	String the_json_data = row.getStringColumn(DB_COLUMN_JSON_DATA);
-report("***json:  " + the_json_data);
             	return the_json_data;
         	} else {
             	return null;
@@ -116,11 +103,9 @@ report("***json:  " + the_json_data);
 	
         Date todayDate = new Date();
         long todayDateMS = todayDate.getTime();
-
         long timeBetweenDatesMS = todayDateMS - anotherDateMS;
         long timeInReview = timeBetweenDatesMS / (24 * 60 * 60 * 1000);
         int numDaysInReview = (int) timeInReview;
-
         return numDaysInReview;
 }
 
@@ -177,9 +162,7 @@ report("***json:  " + the_json_data);
                         boolean notificationReceived = false;
                         
                         int numDaysInReview = numDaysSince(lastModificationDate.getTime());
-                        
-report("Before processing new:  " + "Item ID: " + itemID + ", " + "Pub Name: " + publicationName + ", " + "Last Mod: " + lastModificationDate);
-                    
+                                            
                         if ( (publicationName.toLowerCase().contains(PUBNAME)) && (numDaysInReview >= NUMBEROFDAYS) ) {
                         	// report whether we have a plos notification for the item
                         	//     1. search for the data package DOI in the manuscript table, json_data field. 
@@ -190,19 +173,12 @@ report("Before processing new:  " + "Item ID: " + itemID + ", " + "Pub Name: " +
                         	                        
                         	// get DOI and manuscript number - *DF*
                         	String packageDOI = dataPackage.getIdentifier();
-                        	String packageManuscriptNumber = dataPackage.getManuscriptNumber();
-report("DOI:  " + packageDOI);
-report("Manuscript #:  " + packageManuscriptNumber);
-                        	
+                        	String packageManuscriptNumber = dataPackage.getManuscriptNumber();                        	
                         	// Get manuscript from the Manuscript table based on manuscript number
                         	// Check to see if string contains "doi:10.5061"
                         	// If string contains "doi:10.5061" then print to xml file.
                         	String plosManuscriptData = getManuscriptData(context, packageManuscriptNumber, PUBNAME);
                         	
-                        	// String dataDOI = plosManuscript.dryadDataDOI;
-
-report("ManuscriptData #:  " + plosManuscriptData);
-
                         	if (plosManuscriptData != null) {
                         		// If string contains "doi:10.5072" then print to xml file
                         		if ( plosManuscriptData.toLowerCase().contains(DRYADDOI)) {
