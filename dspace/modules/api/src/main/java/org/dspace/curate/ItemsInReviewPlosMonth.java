@@ -83,19 +83,29 @@ public class ItemsInReviewPlosMonth extends AbstractCurationTask {
      private static String getManuscriptData(Context myContext, String msid, String organizationCode) throws SQLException, IOException {
 
         // Integer organizationId = getOrganizationInternalId(myContext, organizationCode);
+if (myContext != null)
+          {
+          System.out.println("myContext is NOT null!!!");
+          }
 System.out.println("In the getManuscriptData method");
 System.out.println("MSID: " + msid);
 System.out.println("Org Code: " + organizationCode);
             //String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and active = ?";
-            String query = "SELECT * FROM MANUSCRIPT WHERE active = ?";
-            TableRow row = DatabaseManager.querySingleTable(myContext, DB_MANUSCRIPT_TABLE, query, DB_ACTIVE_TRUE);
+            //String query = "SELECT * FROM MANUSCRIPT";
+            String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and active = ?";
+            TableRow row = DatabaseManager.querySingleTable(myContext, DB_MANUSCRIPT_TABLE, query, msid, DB_ACTIVE_TRUE);
             // Manuscript manuscript = manuscriptFromTableRow(row);
             // return manuscript;
 System.out.println("row");
 System.out.println(row);
 
+String json_data = row.getStringColumn(DB_COLUMN_JSON_DATA);
+System.out.println("JSON DATA>>>>>>>>);
+System.out.println(json_data);
             if(row != null) {
             	String json_data = row.getStringColumn(DB_COLUMN_JSON_DATA);
+System.out.println("JSON DATA>>>>>>>>);
+System.out.println(json_data);
             	return json_data;
         	} else {
             	return null;
@@ -166,7 +176,7 @@ System.out.println(row);
                         // Select and write to file PLOS items that have been in review 30 days or more - *DF*
 						int NUMBEROFDAYS = 0;
                         String PUBNAME = "plos";
-                        String DRYADDOI = "doi:10.5061";
+                        String DRYADDOI = "doi:10.5072";
                         boolean notificationReceived = false;
                         
                         int numDaysInReview = numDaysSince(lastModificationDate.getTime());
@@ -197,7 +207,7 @@ report("Manuscript #:  " + packageManuscriptNumber);
 report("ManuscriptData #:  " + plosManuscriptData);
 
                         	if (plosManuscriptData != null) {
-                        		// If string contains "doi:10.5061" then print to xml file
+                        		// If string contains "doi:10.5072" then print to xml file
                         		if ( plosManuscriptData.toLowerCase().contains(DRYADDOI)) {
                         			report(itemID + ", " + publicationName + ", " + lastModificationDate);
                         		}
