@@ -80,7 +80,7 @@ public class ItemsInReviewPlosMonth extends AbstractCurationTask {
  
     /** returns data from the manuscript table based on the given Manuscript ID and organization code */
      // private static Manuscript getManuscriptByIdAndOrg(Context myContext, String msid, String organizationCode) throws SQLException, IOException {
-     private static String getManuscriptData(Context myContext, String msid, String organizationCode) throws SQLException, IOException {
+     private String getManuscriptData(Context myContext, String msid, String organizationCode) throws SQLException, IOException {
 
         // Integer organizationId = getOrganizationInternalId(myContext, organizationCode);
 
