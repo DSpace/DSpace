@@ -1351,25 +1351,33 @@
 					</xsl:otherwise>
 				</xsl:choose>
 			</div>
+
+			<!-- Tiene Localizacion Electronica -->
+			<xsl:if test="dim:field[@element='identifier'  and @qualifier='uri' and @mdschema='sedici']">
+				<span i18n:attr="title">
+					<xsl:attribute name="class">availability linked</xsl:attribute>
+					<xsl:attribute name="title">xmlui.dri2xhtml.METS-1.0.item-availability-linked-help</xsl:attribute>
+					<!-- ERROR: tengo que poner un espacio en blanco porque, sino, XSLT anida todos los <span> entre si. -->
+					<xsl:text> </xsl:text>
+				</span>
+			</xsl:if>
 			
-			<xsl:choose>
-				<!-- Tiene archivos cargados -->
-			 	<xsl:when test="../../../../mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL']"> 
-					<span i18n:attr="title">
-					    <xsl:attribute name="class">availability local</xsl:attribute>
-					    <xsl:attribute name="title">xmlui.dri2xhtml.METS-1.0.item-availability-local-help</xsl:attribute>
-						<xsl:text> </xsl:text>
-					</span>
-	            </xsl:when>					
-				<!-- Tiene Localizacion Electronica -->
-				<xsl:when test="dim:field[@element='identifier'  and @qualifier='uri' and @mdschema='sedici']"> 
-					<span i18n:attr="title">
-					    <xsl:attribute name="class">availability linked</xsl:attribute>
-					    <xsl:attribute name="title">xmlui.dri2xhtml.METS-1.0.item-availability-linked-help</xsl:attribute>
-						<xsl:text> </xsl:text>
-					</span>
-				</xsl:when>
-			</xsl:choose>
+			
+			<!-- Tiene archivos cargados -->
+			<xsl:if test="../../../../mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL']">				
+				<span i18n:attr="title">
+					<xsl:attribute name="class">availability local</xsl:attribute>
+				    <xsl:attribute name="title">xmlui.dri2xhtml.METS-1.0.item-availability-local-help</xsl:attribute>
+				    <xsl:text> </xsl:text>
+				</span>
+			</xsl:if>
+			
+			<!-- Esta a full text? -->
+			<xsl:if test="dim:field[@element='description'  and @qualifier='fulltext' and @mdschema='sedici']/text()='false'">
+				<span class="fulltext-message">
+					<i18n:text>xmlui.dri2xhtml.METS-1.0.item-availability-no-fulltext</i18n:text>
+				</span>
+			</xsl:if>
 			
        	</div>
 	</xsl:template>

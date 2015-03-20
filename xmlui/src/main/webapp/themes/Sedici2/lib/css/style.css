@@ -1281,15 +1281,17 @@ height:20px;
 height:20px;
 	padding:0px;
 	margin:0px;
+	margin-top:3px;
 	float:right;	
 	background-repeat:no-repeat;
-background-image:url(../../images/detail_linked_little2.png);
+background-image:url(../../images/detail_linked_little.png);
 }
 
 .ds-artifact-list .availability.local {
-height:20px;
+	height:20px;
 	padding:0px;
 	margin:0px;
+	margin-top:3px;
 	float:right;	
 	background-repeat:no-repeat;
 background-image:url(../../images/detail_local_little.png);
@@ -3893,4 +3895,13 @@ tbody.ui-accordion-header td{
 #aspect_submission_Submissions_div_submissions 
 table.dropdown-table.ui-accordion tr:hover td{
 	background-color:#F6F8F9;
+}
+
+.fulltext-message {
+    color: #9d9d9d;
+    float: right;
+    margin-top: 3px;
+    padding-left: 2px;
+    padding-right: 4px;
+    font-size: 11px;
 }

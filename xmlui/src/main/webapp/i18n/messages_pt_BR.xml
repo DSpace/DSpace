@@ -1957,6 +1957,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-availability-linked-help">Um link para um site externo está disponível</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-availability-local">Descarga direta</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-availability-local-help">Você pode descarregar este documento de SeDiCI</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-availability-no-fulltext">Sem texto completo</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-contributor-codirector">Co-diretor de tese</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-contributor-colaborator">Colaborador</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-contributor-compiler">Compilador</message>

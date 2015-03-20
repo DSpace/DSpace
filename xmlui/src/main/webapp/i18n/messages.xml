@@ -1998,6 +1998,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-availability-local-help">You can download this document from SEDICI</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-availability-linked">External link</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-availability-linked-help">A link to an external website is available</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-availability-no-fulltext">No full text</message>
 		
 
 	<!-- Internationalization elements specific to the Qualified Dublin Core metadata handler.
