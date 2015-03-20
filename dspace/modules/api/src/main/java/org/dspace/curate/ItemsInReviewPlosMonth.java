@@ -98,9 +98,9 @@ System.out.println("Org Code: " + organizationCode);
             // return manuscript;
 System.out.println("row");
 System.out.println(row);
-
+System.out.println("before getstring");
 String json_data = row.getStringColumn(DB_COLUMN_JSON_DATA);
-System.out.println("JSON DATA>>>>>>>>");
+System.out.println("after getString");
 System.out.println(json_data);
             if(row != null) {
             	String json_data = row.getStringColumn(DB_COLUMN_JSON_DATA);
