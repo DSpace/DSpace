@@ -446,7 +446,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
             String title = journalConcept.getPreferredLabel();
 
-            if(JournalUtils.getBooleanIntegrated(journalConcept) || (JournalUtils.getBooleanIntegrated(journalConcept) && manuscriptNumber != null && manuscriptNumber.trim().equals(""))){
+            if(!JournalUtils.getBooleanIntegrated(journalConcept) || (JournalUtils.getBooleanIntegrated(journalConcept) && manuscriptNumber != null && manuscriptNumber.trim().equals(""))){
                 log.debug(JournalUtils.getJournalShortID(journalConcept) + " is not integrated OR manuscript number is null");
                 //Just add the journal title
 
