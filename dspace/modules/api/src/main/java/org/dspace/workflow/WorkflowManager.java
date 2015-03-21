@@ -327,7 +327,7 @@ public class WorkflowManager {
             for (Item dataFile : dataFiles) {
                 removeUserItemPolicies(c, dataFile, e);
                 // add back the original owner's policies
-                grantUserAllItemPolicies(c, wi.getItem(), e);
+                grantUserAllItemPolicies(c, dataFile, e);
             }
         }
     }
