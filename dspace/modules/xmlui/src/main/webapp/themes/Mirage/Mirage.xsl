@@ -244,11 +244,11 @@
                                 <img src="/themes/Mirage/images/membershipMeeting2015_carousel.jpg" alt="Dryad Community Meeting, 27 May 2015, Washington DC" />
                            </a>
                        </div>
-						<div><span class="publication-date">2013-03-01</span>
-                            <a href="/pages/pricing">
+						<div><span class="publication-date">2015-03-23</span>
+                            <a href="/pages/membershipOverview">
                                 <img alt="" src="/themes/Mirage/images/watering-can.png" />
                                 <p style="width: 450px; color: #363; font-size: 90%; top: 0px; right: 10px; line-height: 1.2em; position: absolute; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);"> 
-                                    Data Publishing Charges help sustain open data at Dryad
+                                    Help grow open data at Dryad: Become an organizational member
                                 </p>
                                 <p style="drop-shadow: 4px 4px; position: absolute; right: 40px; bottom: 80px; font-size: 70%; text-align: right; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);">Learn more &#187;</p>
                             </a>
@@ -585,13 +585,8 @@
         </h1>
         <div id="ds_connect_with_dryad" class="ds-static-div primary" style="font-size: 14px;">
             <p style="margin-bottom: 0;">
-                Learn more about:
+                Orgnanizations can be part of Dryad by becoming a <a href="/pages/membershipOverview">member</a>, choosing a <a href="/pages/payment">payment plan</a>, <a href="/pages/submissionIntegration">integrating a journal</a>, or all of the above.
             </p>
-            <ul style="list-style: none; margin-left: 1em;">
-                <li><a href="/pages/membershipOverview">Membership</a></li>
-                <li><a href="/pages/submissionIntegration">Submission integration</a></li>
-                <li><a href="/pages/payment">Payment plans</a></li>
-            </ul> 
         </div>      
 	  </div>
     </xsl:template>
