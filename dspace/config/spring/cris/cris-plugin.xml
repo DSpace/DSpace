@@ -19,5 +19,5 @@
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
 
 	<bean class="org.dspace.app.cris.integration.CrisRetrievePotentialMatchPlugin" id="org.dspace.app.cris.integration.IRetrievePotentialMatchPlugin"/>
-	
+	<bean id="org.dspace.app.cris.util.IResearcherPageLabelDecorator" class="org.dspace.app.cris.util.BasicResearcherPageLabelDecorator"/>
 </beans>
