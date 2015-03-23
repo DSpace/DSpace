@@ -585,10 +585,11 @@
             <p style="margin-bottom: 0;">
                 We encourage organizations to:</p>
 				<ul style="list-style: none; margin-left: 1em;">
-				<li><a href="/pages/membershipOverview">become a member</a></li>
-				<li><a href="/pages/payment">sponsor data publishing fees</a></li> 
-				<li><a href="/pages/submissionIntegration">integrate your journal(s)</a>, or</li>
+				<li><a href="/pages/membershipOverview">become a member</a>,</li>
+				<li><a href="/pages/payment">sponsor data publishing fees</a>,</li> 
+				<li><a href="/pages/submissionIntegration">integrate your journal(s)</a>, OR</li>
 				<li>all of the above!</li>
+			</ul>
         </div>      
 	  </div>
     </xsl:template>
