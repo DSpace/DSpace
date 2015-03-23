@@ -11,6 +11,9 @@ import java.util.Date;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement(name = "resourcepolicy")
 public class ResourcePolicy{
 	
 	public enum Action {
