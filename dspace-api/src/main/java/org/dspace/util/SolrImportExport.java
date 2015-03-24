@@ -167,7 +167,10 @@ public class SolrImportExport
 		{
 			log.info("Importing file " + file.getCanonicalPath());
 			ContentStreamUpdateRequest contentStreamUpdateRequest = new ContentStreamUpdateRequest("/update/csv");
-			contentStreamUpdateRequest.setParam("skip", "_version_");
+			if (clear)
+			{
+				contentStreamUpdateRequest.setParam("skip", "_version_");
+			}
 			for (String mvField : multivaluedFields) {
 				contentStreamUpdateRequest.setParam("f." + mvField + ".split", "true");
 				contentStreamUpdateRequest.setParam("f." + mvField + ".escape", "\\");
@@ -182,19 +185,30 @@ public class SolrImportExport
 		solr.commit(true, true);
 	}
 
-	private static List<String> getMultiValuedFields(HttpSolrServer solr) {
+	/**
+	 * Determine the names of all multi-valued fields from the data in the index.
+	 * @param solr the solr server to query.
+	 * @return A list containing all multi-valued fields, or an empty list if none are found / there aren't any.
+	 */
+	private static List<String> getMultiValuedFields(HttpSolrServer solr)
+	{
 		List<String> result = new ArrayList<>();
-		try {
+		try
+		{
 			LukeRequest request = new LukeRequest();
 			// this needs to be a non-schema request, otherwise we'll miss dynamic fields
 			LukeResponse response = request.process(solr);
 			Map<String, LukeResponse.FieldInfo> fields = response.getFieldInfo();
-			for (LukeResponse.FieldInfo info : fields.values()) {
-				if (info.getSchema().contains(FieldFlag.MULTI_VALUED.getAbbreviation() + "")) {
+			for (LukeResponse.FieldInfo info : fields.values())
+			{
+				if (info.getSchema().contains(FieldFlag.MULTI_VALUED.getAbbreviation() + ""))
+				{
 					result.add(info.getName());
 				}
 			}
-		} catch (IOException | SolrServerException e) {
+		}
+		catch (IOException | SolrServerException e)
+		{
 			log.fatal("Cannot determine which fields are multi valued: " + e.getMessage(), e);
 		}
 		return result;
