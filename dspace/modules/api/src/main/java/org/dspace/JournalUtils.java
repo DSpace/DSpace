@@ -253,6 +253,23 @@ public class JournalUtils {
 
         return null;
     }
+
+    public static String getDescription(Concept concept) {
+        AuthorityMetadataValue[] vals = concept.getMetadata("journal","description",null, Item.ANY);
+        if(vals != null && vals.length > 0)
+            return vals[0].value;
+
+        return null;
+    }
+
+    public static String getMemberName(Concept concept) {
+        AuthorityMetadataValue[] vals = concept.getMetadata("journal","memberName",null, Item.ANY);
+        if(vals != null && vals.length > 0)
+            return vals[0].value;
+
+        return null;
+    }
+
     /**
      * Replaces escaped characters with their original representations
      * @param escaped a filename that has been escaped by
