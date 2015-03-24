@@ -60,6 +60,29 @@ public class JournalUtils {
     }
 
 
+    public static Concept getJournalConceptByShortID(Context context, String journalShortID) throws SQLException {
+        Scheme scheme = Scheme.findByIdentifier(context, ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName"));
+        try
+        {
+            // TODO : a better query would be in Concept and filter at the db level
+            for(Concept concept : scheme.getConcepts())
+            {
+                String shortId = getJournalShortID(concept);
+                if(shortId != null && shortId.equals(journalShortID))
+                    return concept;
+            }
+        }
+        catch(Exception e)
+        {
+            if(log.isDebugEnabled())
+                log.error(e.getMessage(),e);
+            else
+                log.error(e);
+        }
+
+        return null;
+    }
+
     public static Concept[] getJournalConcept(Context context,String journal) throws SQLException {
         Scheme scheme = Scheme.findByIdentifier(context, ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName"));
 
@@ -94,9 +117,16 @@ public class JournalUtils {
     }
 
     public static String getMetadataDir(Concept concept) {
-        AuthorityMetadataValue[] vals = concept.getMetadata("journal","metadataDir",null, Item.ANY);
-        if(vals != null && vals.length > 0)
-            return vals[0].value;
+        try
+        {
+            AuthorityMetadataValue[] vals = concept.getMetadata("journal","metadataDir",null, Item.ANY);
+            if(vals != null && vals.length > 0)
+                return vals[0].value;
+
+        }catch(Exception e)
+        {
+            log.error(e.getMessage(),e);
+        }
 
         return null;
     }

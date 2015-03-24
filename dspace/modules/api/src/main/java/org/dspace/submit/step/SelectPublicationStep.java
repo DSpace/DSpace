@@ -161,7 +161,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                         EventLogger.log(context, "submission-select-publication", "error=invalid_journal");
                         return ERROR_INVALID_JOURNAL;
                     }
-                    else if(!processJournal(journal, journalUuid, manuscriptNumber, item, context, request, articleStatus)){
+                    else if(!processJournal(journal, null, journalUuid, manuscriptNumber, item, context, request, articleStatus)){
                         EventLogger.log(context, "submission-select-publication", "error=no_journal_selected");
                         return ENTER_MANUSCRIPT_NUMBER;
                     }
@@ -214,7 +214,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                                 EventLogger.log(context, "submission-select-publication", "error=invalid_journal");
                                 return ERROR_INVALID_JOURNAL;
                             }
-                            else if(!processJournal(journal, null, manuscriptNumber, item, context, request, articleStatus)){
+                            else if(!processJournal(journal, null, null, manuscriptNumber, item, context, request, articleStatus)){
 
                                 if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED) return ENTER_MANUSCRIPT_NUMBER;
 
@@ -237,7 +237,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                         EventLogger.log(context, "submission-select-publication", "error=invalid_journal");
                         return ERROR_INVALID_JOURNAL;
                     }
-                    else if(!processJournal(journal, null, manuscriptNumber, item, context, request, articleStatus)){
+                    else if(!processJournal(journal, null, null, manuscriptNumber, item, context, request, articleStatus)){
 
                         EventLogger.log(context, "submission-select-publication", "error=no_journal_selected");
                         return ERROR_SELECT_JOURNAL;
@@ -248,13 +248,13 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                 // ########### ARTICLE_STATUS_IN_REVIEW ###########
                 else if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_IN_REVIEW)
                 {
-                    String journal = request.getParameter("journalIDStatusInReview");
+                    String journalID = request.getParameter("journalIDStatusInReview");
 
-                    if(journal==null||journal.equals("")){
+                    if(journalID==null||journalID.equals("")){
                         EventLogger.log(context, "submission-select-publication", "error=invalid_journal");
                         return ERROR_INVALID_JOURNAL;
                     }
-                    else if(!processJournal(journal, null, manuscriptNumber, item, context, request, articleStatus)){
+                    else if(!processJournal(null, journalID, null, manuscriptNumber, item, context, request, articleStatus)){
                         EventLogger.log(context, "submission-select-publication", "error=no_journal_selected");
                         return ERROR_SELECT_JOURNAL;
                     }
@@ -423,17 +423,21 @@ public class SelectPublicationStep extends AbstractProcessingStep {
     }
 
 
-    private boolean processJournal(String journalName, String journalUuid, String manuscriptNumber, Item item, Context context,
+    private boolean processJournal(String journalName, String journalShortID, String journalUuid, String manuscriptNumber, Item item, Context context,
                                    HttpServletRequest request, String articleStatus) throws AuthorizeException, SQLException {
 
 
         Concept journalConcept = null;
 
-        if(journalConcept==null){
+        if(journalConcept==null && journalUuid != null){
             journalConcept = JournalUtils.getJournalConceptById(context, journalUuid);
         }
 
-        if(journalConcept==null){
+        if(journalConcept==null && journalShortID != null){
+            journalConcept = JournalUtils.getJournalConceptByShortID(context, journalShortID);
+        }
+
+        if(journalConcept==null && journalName != null){
             journalConcept = JournalUtils.getJournalConceptByName(context, journalName);
         }
 
@@ -442,7 +446,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
             String title = journalConcept.getPreferredLabel();
 
-            if(JournalUtils.getBooleanIntegrated(journalConcept) || (JournalUtils.getBooleanIntegrated(journalConcept) && manuscriptNumber != null && manuscriptNumber.trim().equals(""))){
+            if(!JournalUtils.getBooleanIntegrated(journalConcept) || (JournalUtils.getBooleanIntegrated(journalConcept) && manuscriptNumber != null && manuscriptNumber.trim().equals(""))){
                 log.debug(JournalUtils.getJournalShortID(journalConcept) + " is not integrated OR manuscript number is null");
                 //Just add the journal title
 
@@ -453,7 +457,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
                 log.debug("adding journal title to item: " + title);
                 addEmailsAndEmbargoSettings(journalConcept, item);
-                item.addMetadata("prism", "publicationName", null, null, title, journalConcept.getIdentifier(), Choices.CF_ACCEPTED);
+                addSingleMetadataValueFromJournal(context, item, "journalName", journalConcept.getPreferredLabel(), journalConcept.getIdentifier(), Choices.CF_ACCEPTED);
                 item.update();
             }
             else {
@@ -496,7 +500,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                         }
                     }
 
-                    importJournalMetadata(context, item, pBean);
+                    importJournalMetadata(context, item, pBean, journalConcept);
                     addEmailsAndEmbargoSettings(journalConcept, item);
 
                     item.update();
@@ -507,7 +511,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
                     title = journalConcept.getPreferredLabel();
                     log.debug("invalid manuscript nubmer. Setting journal title to: " + title);
-                    addSingleMetadataValueFromJournal(context, item, "journalName", title);
+                    addSingleMetadataValueFromJournal(context, item, "journalName", journalConcept.getPreferredLabel(), journalConcept.getIdentifier(), Choices.CF_ACCEPTED);
                     addSingleMetadataValueFromJournal(context, item, "manuscriptNumber", manuscriptNumber);
 
                     item.update();
@@ -531,9 +535,9 @@ public class SelectPublicationStep extends AbstractProcessingStep {
      Import metadata from the journal settings into the data package item. If data already exists in
      the pBean, it will take precedence over the journal metadata.
      **/
-    private void importJournalMetadata(Context context, Item item, PublicationBean pBean){
+    private void importJournalMetadata(Context context, Item item, PublicationBean pBean, Concept journalConcept) throws SQLException {
         // These values are common to both Article Types
-        addSingleMetadataValueFromJournal(context, item, "journalName", pBean.getJournalName());
+        addSingleMetadataValueFromJournal(context, item, "journalName", journalConcept.getPreferredLabel(), journalConcept.getIdentifier(), Choices.CF_ACCEPTED);
         addSingleMetadataValueFromJournal(context, item, "journalVolume", pBean.getJournalVolume());
         addSingleMetadataValueFromJournal(context, item, "abstract", pBean.getAbstract());
         addSingleMetadataValueFromJournal(context, item, "correspondingAuthor", pBean.getCorrespondingAuthor());
@@ -564,6 +568,17 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         EventLogger.log(context, "submission-import-metadata", userInfo);
     }
 
+    private void addSingleMetadataValueFromJournal(Context ctx, Item publication, String key, String value, String auth_id, int confidence ){
+        DCValue dcVal = journalToMetadata.get(key);
+        if(dcVal == null){
+            log.error(LogManager.getHeader(ctx, "error importing field from journal", "Could not retrieve a metadata field for journal getter: " + key));
+            return;
+        }
+
+        if(value != null)
+            publication.addMetadata(dcVal.schema, dcVal.element, dcVal.qualifier, null, value, auth_id, confidence);
+
+    }
 
     private void addSingleMetadataValueFromJournal(Context ctx, Item publication, String key, String value){
         DCValue dcVal = journalToMetadata.get(key);
