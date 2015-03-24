@@ -3565,4 +3565,15 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.administrative.item.PropagateItemMetadataForm.return">Return</message>
     <message key="xmlui.PaymentSystem.shoppingcart.order.help.title">Total price is calculated based on the currency and rate at the time of submission</message>
     <message key="org.dspace.authenticate.OAuthAuthentication.title">Oauth Authentication</message>
+    
+    <!-- org.datadryad.dspace.statistics: xmlui home page statistics -->
+    <message key="org.datadryad.dspace.statistics.type">Type</message>
+    <message key="org.datadryad.dspace.statistics.total">Total</message>
+    <message key="org.datadryad.dspace.statistics.thirtydays">30 days</message>
+    <message key="org.datadryad.dspace.statistics.datapackges">Data packages</message>
+    <message key="org.datadryad.dspace.statistics.datafiles">Data files</message>
+    <message key="org.datadryad.dspace.statistics.journals">Journals</message>
+    <message key="org.datadryad.dspace.statistics.authors">Authors</message>
+    <message key="org.datadryad.dspace.statistics.downloads">Downloads</message>
+    
 </catalogue>
