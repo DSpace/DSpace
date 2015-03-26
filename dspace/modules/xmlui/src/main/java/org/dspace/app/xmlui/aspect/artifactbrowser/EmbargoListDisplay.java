@@ -19,12 +19,9 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
-import org.apache.cocoon.environment.Response;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
 import org.dspace.app.statistics.Report;
@@ -32,7 +29,6 @@ import org.dspace.app.statistics.ReportTools;
 import org.dspace.app.statistics.Stat;
 import org.dspace.app.statistics.Statistics;
 import org.dspace.app.statistics.StatisticsLoader;
-import org.dspace.app.webui.util.UIUtil;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.UIException;
@@ -48,13 +44,8 @@ import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
-import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
-import org.dspace.storage.rdbms.TableRowIterator;
 import org.xml.sax.SAXException;
-
-import au.com.bytecode.opencsv.CSVWriter;
 
 /**
  * Transformer to display statistics data in XML UI.
@@ -270,121 +261,54 @@ CacheableProcessingComponent
         List download = div.addList("download");
         download.addItemXref(contextPath + "/embargo-list/csv", "Download CSV");
 
-        String sql = "   SELECT" + "   DISTINCT ON (h.handle) h.handle,"
-                + "   i1.item_id," + "   bs.bitstream_id," + "   (SELECT"
-                + "      dc.text_value " + "    FROM "
-                + "      metadatavalue dc" + "    WHERE "
-                + "      dc.metadata_field_id='64' AND"
-                + "      dc.item_id=i1.item_id" + "    LIMIT 1) as title,"
-                + "   (SELECT" + "      dc.text_value " + "    FROM "
-                + "      metadatavalue dc" + "    WHERE "
-                + "      dc.metadata_field_id='2' AND"
-                + "      dc.item_id=i1.item_id" + "    LIMIT 1) as advisor,"
-                + "   (SELECT" + "       dc.text_value" + "    FROM"
-                + "       metadatavalue dc" + "    WHERE"
-                + "       dc.metadata_field_id='3' AND"
-                + "       dc.item_id=i1.item_id" + "    LIMIT 1) as author,"
-                + "   (SELECT" + "       dc.text_value" + "    FROM"
-                + "       metadatavalue dc" + "    WHERE"
-                + "       dc.metadata_field_id='69' AND"
-                + "       dc.item_id=i1.item_id"
-                + "    LIMIT 1) as department," + "   (SELECT"
-                + "       dc.text_value" + "    FROM"
-                + "       metadatavalue dc" + "    WHERE"
-                + "       dc.metadata_field_id='66' AND"
-                + "       dc.item_id=i1.item_id" + "    LIMIT 1) as type,"
-                + "   rp.end_date" + " FROM" + "   handle h," + "   item i1, "
-                + "   item2bundle i2b1," + "   bundle2bitstream b2b1, "
-                + "   bitstream bs, " + "   resourcepolicy rp, "
-                + "   epersongroup g " + " WHERE "
-                + "   h.resource_id=i1.item_id AND"
-                + "   i1.item_id=i2b1.item_id AND"
-                + "   i2b1.bundle_id=b2b1.bundle_id AND"
-                + "   b2b1.bitstream_id=bs.bitstream_id AND"
-                + "   bs.bitstream_id=rp.resource_id AND"
-                + "   (rp.end_date > CURRENT_DATE OR"
-                + "   rp.end_date IS NULL) AND"
-                + "   rp.epersongroup_id = g.eperson_group_id AND"
-                + "   g.name = 'ETD Embargo'";
-
         Request request = ObjectModelHelper.getRequest(objectModel);
-        Response response = ObjectModelHelper.getResponse(objectModel);
-        CSVWriter writer = null;
 
-        Context context = UIUtil.obtainContext(request);
+        ArrayList<TableRow> rowList = (ArrayList<TableRow>) EmbargoListHelper
+                .getEmbargoList(request);
+        Table table = div.addTable("list-of-embargoes", 22, 9);
 
-        TableRowIterator tri = DatabaseManager.query(context, sql);
-        ArrayList<TableRow> rowList = (ArrayList<TableRow>) tri.toList();
+        Row header = table.addRow(Row.ROLE_HEADER);
 
-        String strDownload = request.getParameter("download");
-        if (strDownload.compareTo("csv") == 0)
+        header.addCell().addContent("Handle");
+        header.addCell().addContent("Item ID");
+        header.addCell().addContent("Bitstream ID");
+        header.addCell().addContent("Title");
+        header.addCell().addContent("Advisor");
+        header.addCell().addContent("Author");
+        header.addCell().addContent("Department");
+        header.addCell().addContent("Type");
+        header.addCell().addContent("End Date");
+
+        for (TableRow row : rowList)
+            // for (int i = 0; i < 20; i++)
         {
-            response.setContentType("text/csv; encoding='UTF-8'");
-            response.setStatus(HttpServletResponse.SC_OK);
-            writer = new CSVWriter(response.getWriter());
-            response.setHeader("Content-Disposition",
-                    "attachment; filename=embargo-statistics.csv");
-            writer.writeNext(new String[] { "Handle", "Item ID",
-                    "Bitstream ID", "Title", "Advisor", "Author", "Department",
-                    "Type", "End Date" });
+            // TableRow row = rowList.get(i);
 
-            for (TableRow row : rowList)
+            Row tableRow = table.addRow();
+
+            tableRow.addCell().addXref(
+                    contextPath + "/handle/" + row.getStringColumn("handle"),
+                    row.getStringColumn("handle"));
+            tableRow.addCell().addContent(row.getIntColumn("item_id"));
+            tableRow.addCell().addContent(row.getIntColumn("bitstream_id"));
+            tableRow.addCell().addContent(row.getStringColumn("title"));
+            tableRow.addCell().addContent(row.getStringColumn("advisor"));
+            tableRow.addCell().addContent(row.getStringColumn("author"));
+            tableRow.addCell().addContent(row.getStringColumn("department"));
+            tableRow.addCell().addContent(row.getStringColumn("type"));
+            try
             {
-                String entryData[] = new String[9];
-                entryData[0] = row.getStringColumn("handle");
-                entryData[1] = String.valueOf(row.getIntColumn("item_id"));
-                entryData[2] = String.valueOf(row.getIntColumn("bitstream_id"));
-                entryData[3] = row.getStringColumn("title");
-                entryData[4] = row.getStringColumn("advisor");
-                entryData[5] = row.getStringColumn("author");
-                entryData[6] = row.getStringColumn("department");
-                entryData[7] = row.getStringColumn("type");
-                entryData[8] = row.getDateColumn("end_date").toString();
-                writer.writeNext(entryData);
-            }
-            writer.close();
-
-        }
-
-        else
-        {
-            Table table = div.addTable("list-of-embargoes", 22, 9);
-            div.addPara(String.valueOf(rowList.size()));
-
-            Row header = table.addRow(Row.ROLE_HEADER);
-
-            header.addCell().addContent("Handle");
-            header.addCell().addContent("Item ID");
-            header.addCell().addContent("Bitstream ID");
-            header.addCell().addContent("Title");
-            header.addCell().addContent("Advisor");
-            header.addCell().addContent("Author");
-            header.addCell().addContent("Department");
-            header.addCell().addContent("Type");
-            header.addCell().addContent("End Date");
-
-            // for (TableRow row : rowList) {
-            for (int i = 0; i < 20; i++)
-            {
-                TableRow row = rowList.get(i);
-
-                Row tableRow = table.addRow();
-
-                tableRow.addCell().addContent(row.getStringColumn("handle"));
-                tableRow.addCell().addContent(row.getIntColumn("item_id"));
-                tableRow.addCell().addContent(row.getIntColumn("bitstream_id"));
-                tableRow.addCell().addContent(row.getStringColumn("title"));
-                tableRow.addCell().addContent(row.getStringColumn("advisor"));
-                tableRow.addCell().addContent(row.getStringColumn("author"));
-                tableRow.addCell()
-                .addContent(row.getStringColumn("department"));
-                tableRow.addCell().addContent(row.getStringColumn("type"));
                 tableRow.addCell().addContent(
                         row.getDateColumn("end_date").toString());
-
             }
-            tri.close();
+            catch (NullPointerException e)
+            {
+                tableRow.addCell().addContent("null");
+            }
+
         }
+        // tri.close();
+
     }
 
     /**

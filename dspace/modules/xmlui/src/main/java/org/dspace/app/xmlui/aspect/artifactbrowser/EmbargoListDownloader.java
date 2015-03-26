@@ -95,7 +95,6 @@ public class EmbargoListDownloader extends AbstractReader implements Recyclable
         for (TableRow row : rowList)
         {
             String[] entryData = new String[9];
-
             entryData[0] = row.getStringColumn("handle");
             entryData[1] = String.valueOf(row.getIntColumn("item_id"));
             entryData[2] = String.valueOf(row.getIntColumn("bitstream_id"));
@@ -104,7 +103,17 @@ public class EmbargoListDownloader extends AbstractReader implements Recyclable
             entryData[5] = row.getStringColumn("author");
             entryData[6] = row.getStringColumn("department");
             entryData[7] = row.getStringColumn("type");
-            entryData[8] = row.getDateColumn("end_date").toString();
+            // A NullPointerException is thrown when there is no end date. This
+            // is being handled by this try catch block.
+            try
+            {
+                entryData[8] = row.getDateColumn("end_date").toString();
+            }
+            catch (NullPointerException npe)
+            {
+                // When a NullPointerException occurs, replaced with "null"
+                entryData[8] = "null";
+            }
             writer.writeNext(entryData);
         }
     }

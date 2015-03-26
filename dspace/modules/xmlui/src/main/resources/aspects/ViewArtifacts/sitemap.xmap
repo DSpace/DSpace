@@ -74,19 +74,10 @@ and searching the repository.
 			<map:selector name="IfModifiedSinceSelector" src="org.dspace.app.xmlui.aspect.general.IfModifiedSinceSelector" />
 		</map:selectors>
 
-		<map:readers>
-			<map:reader name="EmbargoListDownloader" src="org.dspace.app.xmlui.aspect.artifactbrowser.EmbargoListDownloader"/>
-		</map:readers>
-
-
 	</map:components>
 	<map:pipelines>
 		<map:pipeline>
-						<map:match pattern="embargo-list/csv">
-							<map:match type="StatisticsAuthorizedMatcher" pattern="READ">
-                                <map:read type="EmbargoListDownloader" />
-                            </map:match>
-            			</map:match>
+						
 
                         <map:generate/>
 
@@ -136,14 +127,10 @@ and searching the repository.
             </map:match>
 
 			<!-- DRUM Customization - Embargo List-->
-			<!-- <map:match pattern="embargo-list">
+			<map:match pattern="embargo-list">
 				<map:transform type="EmbargoListDisplay" />
 				<map:serialize type="xml" />
-            </map:match> -->
-
-            <!-- <map:match pattern="embargo-list/csv">
-            	<map:read type="EmbargoListDownloader" />
-            </map:match> -->
+            </map:match>
 
 			<!-- restricted resource -->
 			<map:match pattern="restricted-resource">
