@@ -37,17 +37,17 @@ public class ValidateRequest extends AbstractAction {
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
                     String source, Parameters parameters) throws Exception
     {
-        String journalName = parameters.getParameter(PARAM_JOURNAL_NAME);
-        if (journalName == null || journalName.length() == 0) return null;
+        String journalAbbr = parameters.getParameter(PARAM_JOURNAL_NAME);
+        if (journalAbbr == null || journalAbbr.length() == 0) return null;
 
         // verify we have an accurate journal
         Context context = ContextUtil.obtainContext(objectModel);
-        Concept journalConcept = JournalUtils.getJournalConceptByName(context,journalName);
+        Concept journalConcept = JournalUtils.getJournalConceptByShortID(context,journalAbbr);
         if (journalConcept == null) {
             return null;
         }
-        String journalAbbr = JournalUtils.getJournalShortID(journalConcept);        
-        if (journalAbbr != null && journalAbbr.length() != 0) {
+        String journalName = JournalUtils.getFullName(journalConcept);        
+        if (journalName != null && journalName.length() != 0) {
             Map map = new HashMap();
             map.put(PARAM_JOURNAL_NAME, journalName);
             map.put(PARAM_JOURNAL_ABBR, journalAbbr);
