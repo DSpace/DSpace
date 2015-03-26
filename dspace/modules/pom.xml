@@ -41,6 +41,7 @@
         <module>payment-system</module>
         <module>dryad-rest-webapp</module>
         <module>dryad-widgets</module>
+        <module>journal-landing</module>
         <!--module>solr-load-tester</module-->
 	</modules>
 
