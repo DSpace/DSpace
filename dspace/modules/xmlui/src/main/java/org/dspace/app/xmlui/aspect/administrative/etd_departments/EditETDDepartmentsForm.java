@@ -167,7 +167,7 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
     @Override
     public void addBody(Body body) throws WingException, SQLException
     {
-        // Find the group in question
+        // Find the department in question
         int etd_departmentID = parameters.getParameterAsInteger(
                 "etd_departmentID", -1);
         String currentName = decodeFromURL(parameters.getParameter(
@@ -331,7 +331,7 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
         queryField.setSize(15);
         // searchBoxes.addButton("submit_search_epeople").setValue(T_submit_search_people);
         // searchBoxes.addButton("submit_search_groups").setValue(T_submit_search_groups);
-        searchBoxes.addButton("submit_search_collections").setValue(
+        searchBoxes.addButton("submit_search_collection").setValue(
                 T_submit_search_collections);
 
         if (query != null)
