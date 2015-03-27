@@ -4,8 +4,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.cocoon.el.objectmodel.ObjectModel;
-import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.core.Context;
@@ -53,22 +51,12 @@ public class EmbargoListHelper
 
     public static List<TableRow> getEmbargoList(Request request)
             throws SQLException
-    {
+            {
         Context context = UIUtil.obtainContext(request);
 
         TableRowIterator tri = DatabaseManager.query(context, sql);
         ArrayList<TableRow> rowList = (ArrayList<TableRow>) tri.toList();
         return rowList;
-    }
+            }
 
-    public static List getEmbargoList(ObjectModel objectModel, int start,
-            int end) throws SQLException
-    {
-        Request request = ObjectModelHelper.getRequest(objectModel);
-        Context context = UIUtil.obtainContext(request);
-
-        TableRowIterator tri = DatabaseManager.query(context, sql);
-        ArrayList<TableRow> rowList = (ArrayList<TableRow>) tri.toList();
-        return rowList;
-    }
 }

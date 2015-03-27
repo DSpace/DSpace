@@ -365,6 +365,14 @@ Maintain mapping from campus departments (from Proquest metadata) to DSpace coll
 
 * [main.jsp](../modules/jspui/src/main/webapp/mydspace/main.jsp) - eliminate hardcoded references to /dspace in links
 
+*XMLUI webapp*
+
+* [messages.xml](../modules/xmlui/src/main/webapp/i18n/messages.xml) - Actual text for content that is linked to from the code.
+
+* [ItemAdapter.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/artifactbrowser/ItemAdapter.java) - Added the code to populate the mets file with the download count.
+
+* [item-view.xsl](../modules/xmlui-mirage2/src/main/webapp/themes/Mirage2/xsl/aspect/artifactbrowser/item-view.xsl) - Added the text and formatting to display the "No. of  Downloads" for each item.
+
 
 *Scripts*
 
@@ -429,6 +437,13 @@ legacy, single-use loaders; do not need testing
 * [navbar-default.jsp](../modules/jspui/src/main/webapp/layout/navbar-default.jsp) - navbar fixups
 
 * [navbar-admin.jsp](../modules/jspui/src/main/webapp/layout/navbar-admin.jsp) - admin navbar fixups
+
+*XMLUI webapp*
+
+* [Navigation.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/administrative/Navigation.java) - Added links in the sidebar for the DRUM Customizations.
+
+* [messages.xml](../modules/xmlui/src/main/webapp/i18n/messages.xml) - Actual text for content that is linked to from the code in Navigation.java.
+
 
 <a name="miscellaneous"></a>
 ## Miscellaneous
@@ -509,6 +524,24 @@ handle-6.2.jar - add handle 6.2 to the lib folder
 * [embargo-list.jsp](../modules/jspui/src/main/webapp/dspace-admin/statistics/embargo-list.jsp) - add a list of all current embargoes to the statistics page
 
 * [navbar-admin.jsp](../modules/jspui/src/main/webapp/layout/navbar-admin.jsp)
+
+*XMLUI webapp*
+
+* [messages.xml](../modules/xmlui/src/main/webapp/i18n/messages.xml) - Actual text for content that is linked to from the code.
+
+* [EmbargoListHelper.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/artifactbrowser/EmbargoListHelper.java) - Helper class that gets the list of embargo files.
+
+* [EmbargoListDisplay.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/artifactbrowser/EmbargoListDisplay.java) - Class used to display the table with the list of embargos.
+
+* [EmbargoListDownloader.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/artifactbrowser/EmbargoListDownloader.java) - Class responsible for populating the CSV of the embargo data.
+
+* [ViewArtifacts/sitemap.xmap](../modules/xmlui/src/main/resources/aspects/ViewArtifacts/sitemap.xmap) - sitemap that triggers the EmbargoListDisplay class and the MonthlyStatistics class.
+
+* [sitemap.xmap](../modules/xmlui/src/main/webapp/sitemap.xmap) - sitemap that triggers the EmbargoListDownloader and the MonthlyStatisticsDownloader.
+
+* [MonthlyStatistics.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/artifactbrowser/MonthlyStatistics.java) - Class used to display a list of the available monthly statistics files.
+
+* [MonthlyStatisticsDownloader.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/artifactbrowser/MonthlyStatisticsDownloader.java) - Class used to download the text file with the monthly statistics data.
 
 
 *Database Schema*
