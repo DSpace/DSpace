@@ -7,31 +7,21 @@
  */
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
-import org.dspace.app.statistics.Report;
-import org.dspace.app.statistics.ReportTools;
-import org.dspace.app.statistics.Stat;
-import org.dspace.app.statistics.Statistics;
 import org.dspace.app.statistics.StatisticsLoader;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
@@ -43,8 +33,6 @@ import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Row;
-import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.ConfigurationManager;
@@ -259,78 +247,48 @@ CacheableProcessingComponent
         Division div = body.addDivision("statistics", "primary");
 
         Request request = ObjectModelHelper.getRequest(objectModel);
-        String strMonth = request.getParameter("month");
-        if (strMonth != null)
+
+        List monthlyReports = div.addList("Monthly Reports");
+        // List the available stat files
+        File aFiles[] = dir.listFiles(new FilenameFilter()
         {
-            String strFile = dir.toString() + "/" + strMonth + "_stats.txt";
-            Table table = div.addTable("statistics-table", 1, 1, "test-box");
-            Row row = table.addRow();
-            File file = new File(strFile);
-            Division fileDisplay = div.addDivision("file-display",
-                    "file-display-panel");
+            @Override
+            public boolean accept(File dir, String name)
+            {
+                return (name.endsWith("_stats.txt") && !name
+                        .endsWith("current_stats.txt"));
+            }
+        });
+
+        if (aFiles.length == 0)
+        {
+            div.setHead(T_empty_title);
+            div.addPara(T_empty_text);
         }
 
-        else
+        java.util.Arrays.sort(aFiles, new Comparator()
         {
-            List monthlyReports = div.addList("Monthly Reports");
-            // List the available stat files
-            File aFiles[] = dir.listFiles(new FilenameFilter()
+            @Override
+            public int compare(Object o1, Object o2)
             {
-                @Override
-                public boolean accept(File dir, String name)
-                {
-                    return (name.endsWith("_stats.txt") && !name
-                            .endsWith("current_stats.txt"));
-                }
-            });
-
-            if (aFiles.length == 0)
-            {
-                div.setHead(T_empty_title);
-                div.addPara(T_empty_text);
+                String s1 = ((File) o1).getName();
+                String s2 = ((File) o2).getName();
+                return s1.compareTo(s2) * -1;
             }
 
-            java.util.Arrays.sort(aFiles, new Comparator()
+            @Override
+            public boolean equals(Object o)
             {
-                @Override
-                public int compare(Object o1, Object o2)
-                {
-                    String s1 = ((File) o1).getName();
-                    String s2 = ((File) o2).getName();
-                    return s1.compareTo(s2) * -1;
-                }
-
-                @Override
-                public boolean equals(Object o)
-                {
-                    return this.equals(o);
-                }
-            });
-
-            for (File f : aFiles)
-            {
-                monthlyReports.addItemXref(
-                        contextPath + "/monthly-statistics?month="
-                                + (f.getName().substring(0, 6)),
-                                (f.getName().substring(0, 6)));
+                return this.equals(o);
             }
-        }
-    }
+        });
 
-    private String readFile(String file) throws IOException
-    {
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-        String line = null;
-        StringBuilder stringBuilder = new StringBuilder();
-        String ls = System.getProperty("line.separator");
-
-        while ((line = reader.readLine()) != null)
+        for (File f : aFiles)
         {
-            stringBuilder.append(line);
-            stringBuilder.append(ls);
+            monthlyReports.addItemXref(contextPath + "/monthly-statistics/"
+                    + (f.getName().substring(0, 6)),
+                    (f.getName().substring(0, 6)));
         }
-
-        return stringBuilder.toString();
     }
 
     /**
@@ -357,422 +315,5 @@ CacheableProcessingComponent
         reportDate = null;
         validity = null;
         super.recycle();
-    }
-
-    /**
-     * Implementation of the Report interface, to output the statistics data for
-     * xmlui Note that all methods that return Strings return 'null' in this
-     * implementation, as all the outputting is done directly using the Wing
-     * framework.
-     */
-    static class XMLUIReport implements Report
-    {
-        private java.util.List<Statistics> blocks = new ArrayList<Statistics>();
-
-        private String mainTitle = null;
-
-        private String pageTitle = null;
-
-        /** start date for report */
-        private Date start = null;
-
-        /** end date for report */
-        private Date end = null;
-
-        private Division rootDiv;
-
-        private Division currDiv;
-
-        /**
-         * Hide the default constructor, so that you have to pass in a Division
-         */
-        private XMLUIReport()
-        {
-        }
-
-        /**
-         * Create instance, providing the Wing element that we will be adding to
-         *
-         * @param myDiv
-         */
-        public XMLUIReport(Division myDiv)
-        {
-            rootDiv = myDiv;
-            currDiv = myDiv;
-        }
-
-        /**
-         * Get the header for the report - currently not supported.
-         */
-        @Override
-        public String header()
-        {
-            return header("");
-        }
-
-        // Currently not supported
-        @Override
-        public String header(String title)
-        {
-            return "";
-        }
-
-        /**
-         * Add the main title to the report.
-         *
-         * @return null.
-         */
-        @Override
-        public String mainTitle()
-        {
-            try
-            {
-                rootDiv.setHead(mainTitle);
-            }
-            catch (WingException we)
-            {
-                log.error("Error creating XML for report", we);
-            }
-            return null;
-        }
-
-        /**
-         * Output the date range for this report.
-         *
-         * @return null.
-         */
-        @Override
-        public String dateRange()
-        {
-            StringBuilder content = new StringBuilder();
-            DateFormat df = DateFormat.getDateInstance();
-            if (start != null)
-            {
-                content.append(df.format(start));
-            }
-            else
-            {
-                content.append("from start of records ");
-            }
-
-            content.append(" to ");
-
-            if (end != null)
-            {
-                content.append(df.format(end));
-            }
-            else
-            {
-                content.append(" end of records");
-            }
-
-            try
-            {
-                rootDiv.addDivision("reportDate").addPara(content.toString());
-            }
-            catch (WingException we)
-            {
-                log.error("Error creating XML for report", we);
-            }
-
-            return null;
-        }
-
-        /**
-         * Output the section header.
-         *
-         * @param title
-         * @return null.
-         */
-        @Override
-        public String sectionHeader(String title)
-        {
-            try
-            {
-                currDiv.setHead(title);
-            }
-            catch (WingException we)
-            {
-                log.error("Error creating XML for report", we);
-            }
-
-            return null;
-        }
-
-        /**
-         * Output the current statistics block.
-         *
-         * @param content
-         * @return null.
-         */
-        @Override
-        public String statBlock(Statistics content)
-        {
-            Stat[] stats = content.getStats();
-            try
-            {
-                int rows = stats.length;
-                if (content.getStatName() != null
-                        || content.getResultName() != null)
-                {
-                    rows++;
-                }
-
-                Table block = currDiv.addTable("reportBlock", rows, 2,
-                        "detailtable");
-
-                // prepare the table headers
-                if (content.getStatName() != null
-                        || content.getResultName() != null)
-                {
-                    Row row = block.addRow();
-                    if (content.getStatName() != null)
-                    {
-                        row.addCellContent(content.getStatName());
-                    }
-                    else
-                    {
-                        row.addCellContent("&nbsp;");
-                    }
-
-                    if (content.getResultName() != null)
-                    {
-                        row.addCellContent(content.getResultName());
-                    }
-                    else
-                    {
-                        row.addCellContent("&nbsp;");
-                    }
-                }
-
-                // output the statistics in the table
-                for (int i = 0; i < stats.length; i++)
-                {
-                    Row row = block.addRow();
-                    if (stats[i].getReference() != null)
-                    {
-                        row.addCell().addXref(stats[i].getReference())
-                        .addContent(label(stats[i].getKey()));
-                    }
-                    else
-                    {
-                        row.addCell().addContent(label(stats[i].getKey()));
-                    }
-
-                    if (stats[i].getUnits() != null)
-                    {
-                        row.addCell(null, null, "right").addContent(
-                                entry(stats[i].getValue() + " "
-                                        + stats[i].getUnits()));
-                    }
-                    else
-                    {
-                        row.addCell(null, null, "right").addContent(
-                                entry(ReportTools.numberFormat(stats[i]
-                                        .getValue())));
-                    }
-                }
-            }
-            catch (WingException we)
-            {
-                log.error("Error creating XML for report", we);
-            }
-
-            return null;
-        }
-
-        /**
-         * Output any information about the lower boundary restriction for this
-         * section.
-         *
-         * @param floor
-         * @return null.
-         */
-        @Override
-        public String floorInfo(int floor)
-        {
-            try
-            {
-                if (floor > 0)
-                {
-                    currDiv.addDivision("reportFloor").addPara(
-                            "(more than " + ReportTools.numberFormat(floor)
-                            + " times)");
-                }
-            }
-            catch (WingException we)
-            {
-                log.error("Error creating XML for report", we);
-            }
-
-            return null;
-        }
-
-        /**
-         * Output an explanation for this section.
-         *
-         * @param explanation
-         * @return null.
-         */
-        @Override
-        public String blockExplanation(String explanation)
-        {
-            try
-            {
-                if (explanation != null)
-                {
-                    currDiv.addDivision("reportExplanation").addPara(
-                            explanation);
-                }
-            }
-            catch (WingException we)
-            {
-                log.error("Error creating XML for report", we);
-            }
-
-            return null;
-        }
-
-        /**
-         * Output the footer.
-         *
-         * @return an empty string.
-         */
-        @Override
-        public String footer()
-        {
-            return "";
-        }
-
-        /**
-         * Set the main title for this report
-         *
-         * @param name
-         * @param serverName
-         */
-        @Override
-        public void setMainTitle(String name, String serverName)
-        {
-            mainTitle = "Statistics for " + name;
-
-            if (ConfigurationManager.getBooleanProperty("report.show.server",
-                    true))
-            {
-                mainTitle += " on " + serverName;
-            }
-
-            if (pageTitle == null)
-            {
-                pageTitle = mainTitle;
-            }
-            return;
-        }
-
-        /**
-         * Add a block to report on
-         *
-         * @param stat
-         */
-        @Override
-        public void addBlock(Statistics stat)
-        {
-            blocks.add(stat);
-            return;
-        }
-
-        /**
-         * Render the statistics into an XML stream.
-         *
-         * @return null.
-         */
-        @Override
-        public String render()
-        {
-            Pattern space = Pattern.compile(" ");
-
-            // Output the heading information
-            header(pageTitle);
-            mainTitle();
-            dateRange();
-
-            // Loop through all the sections
-            for (Statistics stats : blocks)
-            {
-                // navigation();
-                try
-                {
-                    String title = stats.getSectionHeader();
-                    String aName = title.toLowerCase();
-                    Matcher matchSpace = space.matcher(aName);
-                    aName = matchSpace.replaceAll("_");
-
-                    // Create a new division for each section
-                    currDiv = rootDiv.addDivision(aName);
-                    sectionHeader(title);
-                    // topLink();
-                    blockExplanation(stats.getExplanation());
-                    floorInfo(stats.getFloor());
-                    statBlock(stats);
-                    currDiv = rootDiv;
-                }
-                catch (WingException we)
-                {
-                    log.error("Error creating XML for report", we);
-                }
-            }
-
-            return null;
-        }
-
-        /**
-         * Set the start date for this report
-         *
-         * @param start
-         */
-        @Override
-        public void setStartDate(Date start)
-        {
-            this.start = start;
-        }
-
-        /**
-         * Set the end date for this report
-         *
-         * @param end
-         */
-        @Override
-        public void setEndDate(Date end)
-        {
-            this.end = end;
-        }
-    }
-
-    /**
-     * Protect the display from excessively wrong data. Typically this occurs if
-     * a long word finds its way into the data that is not breakable by the
-     * browser because there is no space, dash, period, or other delimiter
-     * character. This just prevents the page from blowing up when bad data are
-     * being presented.
-     */
-    private static final int MAX_ENTRY_LENGTH = 50;
-
-    private static String entry(String entry)
-    {
-        if (entry != null && entry.length() > MAX_ENTRY_LENGTH)
-        {
-            entry = entry.substring(0, MAX_ENTRY_LENGTH - 3) + "...";
-        }
-        return entry;
-    }
-
-    private static final int MAX_LABEL_LENGTH = 100;
-
-    private static String label(String label)
-    {
-        if (label != null && label.length() > MAX_LABEL_LENGTH)
-        {
-            label = label.substring(0, MAX_LABEL_LENGTH - 3) + "...";
-        }
-        return label;
     }
 }
