@@ -100,7 +100,7 @@ public class JSONDiscoverySearcher extends AbstractReader implements Recyclable 
 
 
                 String facetField = request.getParameterValues("facet.field")[i];
-                queryArgs.addFacetField(new DiscoverFacetField(facetField, DiscoveryConfigurationParameters.TYPE_AC, facetLimit, facetSort));
+                queryArgs.addFacetField(new DiscoverFacetField(facetField, DiscoveryConfigurationParameters.TYPE_AC, facetLimit, facetSort, false));
             }
         }
 

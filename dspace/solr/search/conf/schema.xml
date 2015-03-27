@@ -600,6 +600,9 @@
      <!--Dynamic field used for related item searches-->
      <dynamicField name="*_mlt" type="text" indexed="true" stored="true" multiValued="true" omitNorms="true" termVectors="true" termPositions="true" termOffsets="true"/>
 
+     <!--Dynamic field used for collapsing-->
+     <dynamicField name="*_group" type="keywordFilter" indexed="true" stored="true" omitNorms="true"/>
+     
      <!--Date matching-->
     <dynamicField name="*.year" type="sint" indexed="true" stored="true" multiValued="true" omitNorms="true" />
     <dynamicField name="*_dt" type="date" indexed="true" stored="true" multiValued="false" omitNorms="true" />

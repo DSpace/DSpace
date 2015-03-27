@@ -8,8 +8,9 @@
 package org.dspace.browse;
 
 import org.dspace.content.DCValue;
+import org.dspace.discovery.IGlobalSearchResult;
 
-public interface BrowsableDSpaceObject
+public interface BrowsableDSpaceObject extends IGlobalSearchResult
 {
 
     public boolean isArchived();

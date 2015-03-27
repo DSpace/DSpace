@@ -10,6 +10,7 @@ package org.dspace.app.webui.discovery;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,14 +25,22 @@ import org.dspace.core.LogManager;
 import org.dspace.discovery.DiscoverFacetField;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverQuery.SORT_ORDER;
+import org.dspace.discovery.DiscoverHitHighlightingField;
 import org.dspace.discovery.DiscoverResult;
+import org.dspace.discovery.DiscoverViewField;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SearchUtils;
+import org.dspace.discovery.configuration.DiscoveryCollapsingConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
+import org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration;
+import org.dspace.discovery.configuration.DiscoverySearchFilter;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
+import org.dspace.discovery.configuration.DiscoveryViewAndHighlightConfiguration;
+import org.dspace.discovery.configuration.DiscoveryViewConfiguration;
+import org.dspace.discovery.configuration.DiscoveryViewFieldConfiguration;
 import org.dspace.handle.HandleManager;
 
 public class DiscoverUtility
@@ -104,10 +113,58 @@ public class DiscoverUtility
                     discoveryConfiguration, userFilters);
         }
 
+        setCollapsing(context, request, queryArgs, discoveryConfiguration);
+        
+		DiscoveryViewAndHighlightConfiguration discoveryViewAndHighlightConfiguration = SearchUtils
+				.getDiscoveryViewAndHighlightConfigurationByName(discoveryConfiguration.getId());
+		if (discoveryViewAndHighlightConfiguration != null) {
+			Map<String, DiscoveryViewConfiguration> viewMap = discoveryViewAndHighlightConfiguration
+					.getViewConfiguration();
+			for(String key : viewMap.keySet()) {
+				DiscoveryViewConfiguration viewConfiguration = viewMap.get(key);
+				for (DiscoveryViewFieldConfiguration viewFieldConfiguration : viewConfiguration.getMetadataHeadingFields()) {
+					queryArgs.addViewField(key, new DiscoverViewField(viewFieldConfiguration.getField(), viewFieldConfiguration
+						.getDecorator(), viewFieldConfiguration.isMandatory()));
+				}
+				if (viewConfiguration.getMetadataDescriptionFields() != null) {
+					for (DiscoveryViewFieldConfiguration viewFieldConfiguration : viewConfiguration.getMetadataDescriptionFields()) {
+						queryArgs.addViewField(key, new DiscoverViewField(viewFieldConfiguration.getField(), viewFieldConfiguration
+							.getDecorator(), viewFieldConfiguration.isMandatory()));
+					}
+				}
+			}
+		}
+
+        if(discoveryConfiguration.getHitHighlightingConfiguration() != null)
+        {
+        	Map<String, String> additionalParams = discoveryConfiguration.getHitHighlightingConfiguration().getAdditionalParams();
+			if (additionalParams != null) {
+				for (String addParamKey : additionalParams.keySet()) {
+					queryArgs.addProperty(addParamKey, additionalParams.get(addParamKey));
+				}
+			}
+        	
+            List<DiscoveryHitHighlightFieldConfiguration> metadataFields = discoveryConfiguration.getHitHighlightingConfiguration().getMetadataFields();
+            for (DiscoveryHitHighlightFieldConfiguration fieldConfiguration : metadataFields)
+            {				
+                queryArgs.addHitHighlightingField(new DiscoverHitHighlightingField(fieldConfiguration.getField(), fieldConfiguration.getMaxSize(), fieldConfiguration.getSnippets()));
+            }
+        }
+        
         return queryArgs;
     }
 
-    /**
+    private static void setCollapsing(Context context, HttpServletRequest request, DiscoverQuery queryArgs,
+			DiscoveryConfiguration discoveryConfiguration) {
+    	DiscoveryCollapsingConfiguration collapse = discoveryConfiguration.getCollapsingConfiguration();
+    	if(collapse!=null) {
+    		queryArgs.addProperty("group", ""+true);
+    		queryArgs.addProperty("group.limit", ""+collapse.getGroupLimit());
+    		queryArgs.addProperty("group.field", collapse.getGroupField());    		
+    	}  		
+	}
+
+	/**
      * Build the DiscoverQuery object for an autocomplete search using
      * parameters in the request
      * 
@@ -173,7 +230,7 @@ public class DiscoverUtility
         }
         DiscoverFacetField autocompleteField = new DiscoverFacetField(autoIndex, 
                 autoType, 
-                limit, sortBy, autoQuery.toLowerCase());
+                limit, sortBy, autoQuery.toLowerCase(), false);
         queryArgs.addFacetField(autocompleteField);
         queryArgs.setMaxResults(0);
         queryArgs.setFacetMinCount(1);
@@ -200,16 +257,45 @@ public class DiscoverUtility
         {
             queryArgs.setQuery(query);
         }
-
-        List<String> defaultFilterQueries = discoveryConfiguration
-                .getDefaultFilterQueries();
-        if (defaultFilterQueries != null)
+        
+        DiscoveryConfiguration globalConfiguration = null;
+        
+        boolean isGlobalConfiguration = SearchUtils.isGlobalConfiguration(discoveryConfiguration);
+		if (isGlobalConfiguration 
+        		|| discoveryConfiguration.isGlobalConfigurationEnabled())
         {
-            for (String f : defaultFilterQueries)
-            {
-                queryArgs.addFilterQueries(f);
-            }
+        	globalConfiguration = SearchUtils.getGlobalConfiguration();
+        	if(isGlobalConfiguration) {
+        		for(DiscoverySearchFilter searchFilter : globalConfiguration.getSearchFilters()) {
+        			if(searchFilter.isDefaultFieldSearch()) {
+        				queryArgs.addProperty("df", searchFilter.getIndexFieldName());
+        			}
+        		}
+        	}
         }
+        String tagging = "";
+    	if(globalConfiguration!=null) {
+    		tagging = "{!tag=dt}";
+            List<String> defaultFilterQueries = globalConfiguration
+                    .getDefaultFilterQueries();
+            if (defaultFilterQueries != null)
+            {
+                for (String f : defaultFilterQueries)
+                {
+                	queryArgs.addFilterQueries(f);
+                }
+            }
+    	}
+        
+		if (!DiscoveryConfiguration.GLOBAL_CONFIGURATIONNAME.equals(discoveryConfiguration.getId())) {
+			List<String> defaultFilterQueries = discoveryConfiguration.getDefaultFilterQueries();
+			if (defaultFilterQueries != null) {
+				for (String f : defaultFilterQueries) {
+					queryArgs.addFilterQueries(tagging + f);
+				}
+			}
+		}
+		
         List<String[]> filters = getFilters(request);
         List<String> userFilters = new ArrayList<String>();
         for (String[] f : filters)
@@ -221,8 +307,8 @@ public class DiscoverUtility
                     .getFilterQuery();
             if (StringUtils.isNotBlank(newFilterQuery))
             {
-                queryArgs.addFilterQueries(newFilterQuery);
-                userFilters.add(newFilterQuery);
+                queryArgs.addFilterQueries(tagging+newFilterQuery);
+                userFilters.add(tagging+newFilterQuery);
             }
             }
             catch (SQLException e)
@@ -347,20 +433,27 @@ public class DiscoverUtility
             DiscoveryConfiguration discoveryConfiguration,
             List<String> userFilters)
     {
-        List<DiscoverySearchFilterFacet> facets = discoveryConfiguration
-                .getSidebarFacets();
-
+        List<DiscoverySearchFilterFacet> facets = new ArrayList<DiscoverySearchFilterFacet>();
+        DiscoveryConfiguration globalConfiguration = null;
+        
+        if (SearchUtils.isGlobalConfiguration(discoveryConfiguration) 
+        		|| discoveryConfiguration.isGlobalConfigurationEnabled())
+        {
+        	globalConfiguration = SearchUtils.getGlobalConfiguration();
+        	DiscoverySearchFilterFacet facet = new DiscoverySearchFilterFacet();
+        	facet.setIndexFieldName(globalConfiguration.getCollapsingConfiguration().getGroupIndexFieldName());
+        	facets.add(facet);
+        }
+        
+        facets.addAll(discoveryConfiguration.getSidebarFacets());
+        
         log.info("facets for scope, " + scope + ": "
                 + (facets != null ? facets.size() : null));
-        if (facets != null)
-        {
-            queryArgs.setFacetMinCount(1);
-        }
 
         /** enable faceting of search results */
         if (facets != null)
         {
-            queryArgs.setFacetMinCount(1);
+        	queryArgs.setFacetMinCount(1);
             for (DiscoverySearchFilterFacet facet : facets)
             {
                 if (facet.getType().equals(
@@ -541,7 +634,7 @@ public class DiscoverUtility
                             // filterquery
                             queryArgs.addFacetField(new DiscoverFacetField(
                                     facet.getIndexFieldName(), facet.getType(),
-                                    10, facet.getSortOrder()));
+                                    10, facet.getSortOrder(),false));
                         }
                         else
                         {
@@ -618,11 +711,16 @@ public class DiscoverUtility
                     // add the already selected facet so to have a full
                     // top list
                     // if possible
-                    queryArgs.addFacetField(new DiscoverFacetField(facet
-                            .getIndexFieldName(),
-                            DiscoveryConfigurationParameters.TYPE_TEXT,
-                            facetLimit + 1 + alreadySelected, facet
-                                    .getSortOrder(), facetPage * facetLimit));
+					if (discoveryConfiguration.isGlobalConfigurationEnabled() && facet.getIndexFieldName().equals(
+							globalConfiguration.getCollapsingConfiguration().getGroupIndexFieldName())) {
+						queryArgs.addFacetField(new DiscoverFacetField(facet.getIndexFieldName(),
+								DiscoveryConfigurationParameters.TYPE_TEXT, facetLimit + 1 + alreadySelected, facet
+										.getSortOrder(), facetPage * facetLimit, true));
+					} else {
+						queryArgs.addFacetField(new DiscoverFacetField(facet.getIndexFieldName(),
+								DiscoveryConfigurationParameters.TYPE_TEXT, facetLimit + 1 + alreadySelected, facet
+										.getSortOrder(), facetPage * facetLimit, false));
+					}
                 }
             }
         }

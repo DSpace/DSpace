@@ -15,7 +15,8 @@ import java.util.List;
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
 public class DiscoverySearchFilter {
-
+	protected boolean usedForCollapsingFeature;
+	protected boolean defaultFieldSearch;
     protected String indexFieldName;
     protected List<String> metadataFields;
     protected String type = DiscoveryConfigurationParameters.TYPE_TEXT;
@@ -63,5 +64,21 @@ public class DiscoverySearchFilter {
     public String getFilterType(){
         return FILTER_TYPE_DEFAULT;
     }
+
+	public boolean isUsedForCollapsingFeature() {
+		return usedForCollapsingFeature;
+	}
+
+	public void setUsedForCollapsingFeature(boolean usedForCollapsingFeature) {
+		this.usedForCollapsingFeature = usedForCollapsingFeature;
+	}
+
+	public boolean isDefaultFieldSearch() {
+		return defaultFieldSearch;
+	}
+
+	public void setDefaultFieldSearch(boolean defaultFieldSearch) {
+		this.defaultFieldSearch = defaultFieldSearch;
+	}
 
 }

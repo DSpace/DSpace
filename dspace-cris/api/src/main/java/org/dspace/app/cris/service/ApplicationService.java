@@ -8,10 +8,20 @@
 package org.dspace.app.cris.service;
 
 import it.cilea.osd.common.model.Identifiable;
+import it.cilea.osd.jdyna.dao.ContainableDao;
+import it.cilea.osd.jdyna.dao.PropertyHolderDao;
+import it.cilea.osd.jdyna.model.ANestedPropertiesDefinition;
+import it.cilea.osd.jdyna.model.ATypeNestedObject;
+import it.cilea.osd.jdyna.model.Containable;
+import it.cilea.osd.jdyna.model.IContainable;
+import it.cilea.osd.jdyna.model.PropertiesDefinition;
+import it.cilea.osd.jdyna.web.IPropertyHolder;
+import it.cilea.osd.jdyna.web.Tab;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import net.sf.ehcache.Cache;
@@ -887,4 +897,37 @@ public class ApplicationService extends ExtendedTabService
         return researchDao.paginateByType(typo, sort, inverse, (page - 1)
                 * maxResults, maxResults);
     }
+    
+    public IContainable findContainableByDecorable(Class decoratorClass,
+            String decorable)
+    {
+        ContainableDao modelDao = (ContainableDao) getDaoByModel(decoratorClass);
+        IContainable result = modelDao.uniqueContainableByShortName(decorable);
+        return result;
+    }
+//    
+//    public <H extends IPropertyHolder<Containable>, T extends Tab<H>> List<H> findBoxesByContainable(
+//            Class<H> clazzH, IContainable containable)
+//    {
+//        PropertyHolderDao<H> modelDao = (PropertyHolderDao<H>) getDaoByModel(clazzH);
+//        return modelDao.findHolderByContainable(containable);
+//    }
+    
+    public <TP extends PropertiesDefinition, H extends IPropertyHolder<Containable>, T extends Tab<H>, ATTP extends ANestedPropertiesDefinition, TTP extends ATypeNestedObject<ATTP>> List<H> findBoxesByTTP(Class<H> clazzH, Class<TTP> clazzTTP, String decorable) {
+        List<TTP> ttps = getList(clazzTTP);
+
+        for (TTP ttp : ttps)
+        {
+            IContainable ic = findContainableByDecorable(
+                    ttp.getDecoratorClass(), decorable);
+            if (ic != null)
+            {
+              PropertyHolderDao<H> modelDao = (PropertyHolderDao<H>) getDaoByModel(clazzH);
+              return modelDao.findHolderByContainable(ic);
+            }
+        }
+        return null;
+    }
+    
 }
+ 

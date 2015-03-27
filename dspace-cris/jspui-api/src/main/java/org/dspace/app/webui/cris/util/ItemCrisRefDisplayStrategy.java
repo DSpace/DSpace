@@ -23,6 +23,7 @@ import org.dspace.content.DCValue;
 import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.Utils;
 
@@ -35,9 +36,11 @@ public class ItemCrisRefDisplayStrategy extends ASimpleDisplayStrategy
 			String field, DCValue[] metadataArray, boolean disableCrossLinks,
 			boolean emph, PageContext pageContext) throws JspException {
     	String publicPath = null;
+    	int minConfidence = -1;
 		if (metadataArray.length > 0) {
 			ChoiceAuthorityManager cam = ChoiceAuthorityManager.getManager();
 			ChoiceAuthority ca = cam.getChoiceAuthority(metadataArray[0].schema, metadataArray[0].element, metadataArray[0].qualifier);
+			minConfidence = MetadataAuthorityManager.getManager().getMinConfidence(metadataArray[0].schema, metadataArray[0].element, metadataArray[0].qualifier);
 			if (ca != null && ca instanceof CRISAuthority) {
 				CRISAuthority crisAuthority = (CRISAuthority) ca;
 				publicPath = crisAuthority.getPublicPath();
@@ -66,12 +69,11 @@ public class ItemCrisRefDisplayStrategy extends ASimpleDisplayStrategy
         StringBuffer sb = new StringBuffer();
         for (int j = 0; j < loopLimit; j++)
         {
-			if (metadataArray[j].confidence != Choices.CF_ACCEPTED) {
-				continue;
-			}
-            buildBrowseLink(hrq, viewFull, browseType, metadataArray,
+            buildBrowseLink(hrq, viewFull, browseType, metadataArray, minConfidence,
                     disableCrossLinks, sb, j);
-            buildAuthority(hrq, metadataArray, publicPath, sb, j);
+            if (StringUtils.isNotBlank(metadataArray[j].authority) && metadataArray[j].confidence >= minConfidence) {
+            	buildAuthority(hrq, metadataArray, publicPath, sb, j);
+            }
             if (j < (loopLimit - 1))
             {
                 if (colIdx != -1) // we are showing metadata in a table row
@@ -110,62 +112,67 @@ public class ItemCrisRefDisplayStrategy extends ASimpleDisplayStrategy
     }
 
     private void buildBrowseLink(HttpServletRequest hrq, boolean viewFull,
-            String browseType, DCValue[] metadataArray,
+            String browseType, DCValue[] metadataArray, int minConfidence,
             boolean disableCrossLinks, StringBuffer sb, int j)
     {
         String startLink = "";
         String endLink = "";
-        String argument;
-        String value;
-        argument = "authority";
-        String authority = metadataArray[j].authority;
-        value = metadataArray[j].value;
-        if (viewFull)
+        if (!StringUtils.isEmpty(browseType) && !disableCrossLinks)
         {
-            argument = "vfocus";
-        }
-        try
-        {
-            startLink = "<a href=\"" + hrq.getContextPath() + "/browse?type="
-                    + browseType + "&amp;" + argument + "="
-                    + URLEncoder.encode(authority, "UTF-8");
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-
-        if (metadataArray[j].language != null)
-        {
+            String argument;
+            String value;
+            if (metadataArray[j].authority != null &&
+                    metadataArray[j].confidence >= minConfidence)
+            {
+                argument = "authority";
+                value = metadataArray[j].authority;
+            }
+            else
+            {
+                argument = "value";
+                value = metadataArray[j].value;
+            }
+            if (viewFull)
+            {
+                argument = "vfocus";
+            }
             try
             {
-                startLink = startLink + "&amp;" + argument + "_lang="
-                        + URLEncoder.encode(metadataArray[j].language, "UTF-8");
+                startLink = "<a href=\"" + hrq.getContextPath()
+                        + "/browse?type=" + browseType + "&amp;" + argument
+                        + "=" + URLEncoder.encode(value, "UTF-8");
             }
             catch (UnsupportedEncodingException e)
             {
                 throw new RuntimeException(e.getMessage(), e);
             }
-        }
 
-        if ("authority".equals(argument))
-        {
-            startLink += "\" class=\"authority " + browseType + "\">";
+            if (metadataArray[j].language != null)
+            {
+                try
+                {
+                    startLink = startLink + "&amp;" + argument + "_lang="
+                            + URLEncoder.encode(metadataArray[j].language, "UTF-8");
+                }
+                catch (UnsupportedEncodingException e)
+                {
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            }
+
+            if ("authority".equals(argument))
+            {
+                startLink += "\" class=\"authority " + browseType + "\">";
+            }
+            else
+            {
+                startLink = startLink + "\">";
+            }
+            endLink = "</a>";
         }
-        else
-        {
-            startLink = startLink + "\">";
-        }
-        endLink = "</a>";
-        if (StringUtils.isNotEmpty(browseType))
-        {
-        	sb.append(startLink);
-        }
-        sb.append(Utils.addEntities(value));
-        if (StringUtils.isNotEmpty(browseType))
-        {
-        	sb.append(endLink);
-        }
+        sb.append(startLink);
+        sb.append(Utils.addEntities(metadataArray[j].value));
+        sb.append(endLink);
     }
 
     private void buildAuthority(HttpServletRequest hrq,
@@ -174,7 +181,7 @@ public class ItemCrisRefDisplayStrategy extends ASimpleDisplayStrategy
         String startLink = "";
         String endLink = "";
 
-        startLink = "<a href=\"" + hrq.getContextPath() + "/cris/"+publicPath+ "/"
+        startLink = "&nbsp;<a href=\"" + hrq.getContextPath() + "/cris/"+publicPath+ "/"
                 + metadataArray[j].authority;
         startLink += "\" class=\"authority\">";
         endLink = "</a>";
@@ -185,7 +192,7 @@ public class ItemCrisRefDisplayStrategy extends ASimpleDisplayStrategy
 		} catch (MissingResourceException e) {
 			icon = I18nUtil.getMessage("ItemCrisRefDisplayStrategy.default.icon");
 		}
-		sb.append(" &nbsp;").append(icon);
+		sb.append(icon);
         sb.append(endLink);
     }
 }

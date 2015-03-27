@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.discovery.IGlobalSearchResult;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
@@ -168,4 +169,5 @@ public abstract class DSpaceObject
     public abstract void update() throws SQLException, AuthorizeException;
 
     public abstract void updateLastModified();
+
 }

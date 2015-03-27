@@ -7,6 +7,8 @@
  */
 package org.dspace.app.webui.util;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
@@ -15,8 +17,9 @@ import org.dspace.browse.BrowseItem;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.core.Utils;
+import org.dspace.discovery.IGlobalSearchResult;
 
-public class TitleDisplayStrategy implements IDisplayMetadataValueStrategy
+public class TitleDisplayStrategy extends ADiscoveryDisplayStrategy implements IDisplayMetadataValueStrategy
 {
 
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
@@ -71,4 +74,27 @@ public class TitleDisplayStrategy implements IDisplayMetadataValueStrategy
     {
         return null;
     }
+    
+	@Override
+	public String getMetadataDisplay(HttpServletRequest hrq, int limit, boolean viewFull, String browseType,
+			int colIdx, String field, List<String> metadataArray, IGlobalSearchResult item, boolean disableCrossLinks,
+			boolean emph, PageContext pageContext) throws JspException {
+        String metadata = "-";
+        if (metadataArray.size() > 0)
+        {
+            if (item.isWithdrawn())
+            {
+                metadata = Utils.addEntities(metadataArray.get(0));
+            }
+            else
+            {
+                metadata = "<a href=\"" + hrq.getContextPath() + "/handle/"
+                + item.getHandle() + "\">"
+                + Utils.addEntities(metadataArray.get(0))
+                + "</a>";
+            }
+        }
+        metadata = (emph? "<strong>":"") + metadata + (emph? "</strong>":"");
+        return metadata;		
+	}
 }

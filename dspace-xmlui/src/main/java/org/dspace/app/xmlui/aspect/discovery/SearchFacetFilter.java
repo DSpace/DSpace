@@ -220,9 +220,9 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         DiscoverFacetField discoverFacetField;
         if(request.getParameter(SearchFilterParam.STARTS_WITH) != null)
         {
-            discoverFacetField = new DiscoverFacetField(facetField, DiscoveryConfigurationParameters.TYPE_TEXT, DEFAULT_PAGE_SIZE + 1, DiscoveryConfigurationParameters.SORT.VALUE, request.getParameter(SearchFilterParam.STARTS_WITH).toLowerCase());
+            discoverFacetField = new DiscoverFacetField(facetField, DiscoveryConfigurationParameters.TYPE_TEXT, DEFAULT_PAGE_SIZE + 1, DiscoveryConfigurationParameters.SORT.VALUE, request.getParameter(SearchFilterParam.STARTS_WITH).toLowerCase(), false);
         }else{
-            discoverFacetField = new DiscoverFacetField(facetField, DiscoveryConfigurationParameters.TYPE_TEXT, DEFAULT_PAGE_SIZE + 1, DiscoveryConfigurationParameters.SORT.VALUE);
+            discoverFacetField = new DiscoverFacetField(facetField, DiscoveryConfigurationParameters.TYPE_TEXT, DEFAULT_PAGE_SIZE + 1, DiscoveryConfigurationParameters.SORT.VALUE, false);
         }
 
 

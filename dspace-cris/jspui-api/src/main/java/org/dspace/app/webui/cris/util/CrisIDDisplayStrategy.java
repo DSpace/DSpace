@@ -8,20 +8,24 @@
 package org.dspace.app.webui.cris.util;
 
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
 
 import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.util.ResearcherPageUtils;
+import org.dspace.app.webui.util.ADiscoveryDisplayStrategy;
 import org.dspace.app.webui.util.IDisplayMetadataValueStrategy;
 import org.dspace.browse.BrowseDSpaceObject;
 import org.dspace.browse.BrowseItem;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.core.Utils;
+import org.dspace.discovery.IGlobalSearchResult;
 
-public class CrisIDDisplayStrategy implements IDisplayMetadataValueStrategy
+public class CrisIDDisplayStrategy extends ADiscoveryDisplayStrategy implements IDisplayMetadataValueStrategy
 {
 
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
@@ -71,4 +75,23 @@ public class CrisIDDisplayStrategy implements IDisplayMetadataValueStrategy
     {
         return null;
     }
+    
+	@Override
+	public String getMetadataDisplay(HttpServletRequest hrq, int limit, boolean viewFull, String browseType,
+			int colIdx, String field, List<String> metadataArray, IGlobalSearchResult item, boolean disableCrossLinks,
+			boolean emph, PageContext pageContext) throws JspException {
+		ACrisObject crisObject = (ACrisObject)item;
+        String metadata = "";
+        
+        String persistentIdentifier = ResearcherPageUtils.getPersistentIdentifier(crisObject);
+		metadata = "<a href=\"" + hrq.getContextPath() + "/cris/"
+                    + crisObject.getPublicPath() + "/"
+                    + persistentIdentifier
+                    + "\">" + Utils.addEntities(persistentIdentifier)
+                    + "</a>";
+        
+        metadata = (emph ? "<strong>" : "") + metadata
+                + (emph ? "</strong>" : "");
+        return metadata;
+	}
 }

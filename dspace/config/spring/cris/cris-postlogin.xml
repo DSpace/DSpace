@@ -19,8 +19,9 @@
 
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
 
-	<bean class="org.dspace.app.cris.integration.ResearcherLoggedInAction">
+	<bean class="org.dspace.app.cris.integration.ResearcherLoggedInActionEmail">
 		<property name="applicationService" ref="applicationService" />
+		<property name="netidSourceRef" value="ORCID" />
 	</bean>
 		
 </beans>

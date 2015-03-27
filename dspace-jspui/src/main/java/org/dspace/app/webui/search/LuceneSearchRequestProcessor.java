@@ -842,4 +842,10 @@ public class LuceneSearchRequestProcessor implements SearchRequestProcessor
         init();
         return searchIndices;
     }
+
+	@Override
+	public void doGlobalSearch(Context context, HttpServletRequest request, HttpServletResponse response)
+			throws SearchProcessorException, IOException, ServletException {
+		// nothing TO DO this class is deprecated		
+	}
 }
