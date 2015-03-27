@@ -367,61 +367,67 @@
                             <xsl:value-of select="substring-after(@MIMETYPE,'/')"/>
                         </xsl:with-param>
                     </xsl:call-template>
+                    <xsl:choose>
+                        <xsl:when test="contains($label-1, 'label') and mets:FLocat[@LOCTYPE='URL']/@xlink:label">
+                            <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label"/>
+                        </xsl:when>
+                        <xsl:when test="contains($label-1, 'title') and mets:FLocat[@LOCTYPE='URL']/@xlink:title">
+                            <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:title"/>
+                        </xsl:when>
+                        <xsl:when test="contains($label-2, 'label') and mets:FLocat[@LOCTYPE='URL']/@xlink:label">
+                            <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label"/>
+                        </xsl:when>
+                        <xsl:when test="contains($label-2, 'title') and mets:FLocat[@LOCTYPE='URL']/@xlink:title">
+                            <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:title"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:call-template name="getFileTypeDesc">
+                                <xsl:with-param name="mimetype">
+                                    <xsl:value-of select="substring-before(@MIMETYPE,'/')"/>
+                                    <xsl:text>/</xsl:text>
                                     <xsl:choose>
-                                        <xsl:when test="contains($label-1, 'label') and mets:FLocat[@LOCTYPE='URL']/@xlink:label">
-                                            <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label"/>
-                                        </xsl:when>
-                                        <xsl:when test="contains($label-1, 'title') and mets:FLocat[@LOCTYPE='URL']/@xlink:title">
-                                            <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:title"/>
-                                        </xsl:when>
-                                        <xsl:when test="contains($label-2, 'label') and mets:FLocat[@LOCTYPE='URL']/@xlink:label">
-                                            <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label"/>
-                                        </xsl:when>
-                                        <xsl:when test="contains($label-2, 'title') and mets:FLocat[@LOCTYPE='URL']/@xlink:title">
-                                            <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:title"/>
+                                        <xsl:when test="contains(@MIMETYPE,';')">
+                                    <xsl:value-of select="substring-before(substring-after(@MIMETYPE,'/'),';')"/>
                                         </xsl:when>
                                         <xsl:otherwise>
-                                            <xsl:call-template name="getFileTypeDesc">
-                                                <xsl:with-param name="mimetype">
-                                                    <xsl:value-of select="substring-before(@MIMETYPE,'/')"/>
-                                                    <xsl:text>/</xsl:text>
-                                                    <xsl:choose>
-                                                        <xsl:when test="contains(@MIMETYPE,';')">
-                                                    <xsl:value-of select="substring-before(substring-after(@MIMETYPE,'/'),';')"/>
-                                                        </xsl:when>
-                                                        <xsl:otherwise>
-                                                            <xsl:value-of select="substring-after(@MIMETYPE,'/')"/>
-                                                        </xsl:otherwise>
-                                                    </xsl:choose>
-                                                </xsl:with-param>
-                                            </xsl:call-template>
+                                            <xsl:value-of select="substring-after(@MIMETYPE,'/')"/>
                                         </xsl:otherwise>
                                     </xsl:choose>
-                                    <xsl:text> (</xsl:text>
-                                    <xsl:choose>
-                                        <xsl:when test="@SIZE &lt; 1024">
-                                            <xsl:value-of select="@SIZE"/>
-                                            <i18n:text>xmlui.dri2xhtml.METS-1.0.size-bytes</i18n:text>
-                                        </xsl:when>
-                                        <xsl:when test="@SIZE &lt; 1024 * 1024">
-                                            <xsl:value-of select="substring(string(@SIZE div 1024),1,5)"/>
-                                            <i18n:text>xmlui.dri2xhtml.METS-1.0.size-kilobytes</i18n:text>
-                                        </xsl:when>
-                                        <xsl:when test="@SIZE &lt; 1024 * 1024 * 1024">
-                                            <xsl:value-of select="substring(string(@SIZE div (1024 * 1024)),1,5)"/>
-                                            <i18n:text>xmlui.dri2xhtml.METS-1.0.size-megabytes</i18n:text>
-                                        </xsl:when>
-                                        <xsl:otherwise>
-                                            <xsl:value-of select="substring(string(@SIZE div (1024 * 1024 * 1024)),1,5)"/>
-                                            <i18n:text>xmlui.dri2xhtml.METS-1.0.size-gigabytes</i18n:text>
-                                        </xsl:otherwise>
-                                    </xsl:choose>
-                                    <xsl:text>)</xsl:text>
-                                </a>
-                                <br/>
-                                <i18n:text>xmlui.dri2xhtml.METS-1.0.item-number-downloads</i18n:text><xsl:value-of select="@VIEWS"/>
-                            </div>
-
+                                </xsl:with-param>
+                            </xsl:call-template>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <xsl:text> (</xsl:text>
+                    <xsl:choose>
+                        <xsl:when test="@SIZE &lt; 1024">
+                            <xsl:value-of select="@SIZE"/>
+                            <i18n:text>xmlui.dri2xhtml.METS-1.0.size-bytes</i18n:text>
+                        </xsl:when>
+                        <xsl:when test="@SIZE &lt; 1024 * 1024">
+                            <xsl:value-of select="substring(string(@SIZE div 1024),1,5)"/>
+                            <i18n:text>xmlui.dri2xhtml.METS-1.0.size-kilobytes</i18n:text>
+                        </xsl:when>
+                        <xsl:when test="@SIZE &lt; 1024 * 1024 * 1024">
+                            <xsl:value-of select="substring(string(@SIZE div (1024 * 1024)),1,5)"/>
+                            <i18n:text>xmlui.dri2xhtml.METS-1.0.size-megabytes</i18n:text>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="substring(string(@SIZE div (1024 * 1024 * 1024)),1,5)"/>
+                            <i18n:text>xmlui.dri2xhtml.METS-1.0.size-gigabytes</i18n:text>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <xsl:text>)</xsl:text>
+                </a>
+                <br/>
+                <xsl:if test="@EMBARGO='true'">
+                    <i18n:text>xmlui.dri2xhtml.METS-1.0.item-restricted</i18n:text>
+                    <br/>
+                </xsl:if>
+                <i18n:text>xmlui.dri2xhtml.METS-1.0.item-number-downloads</i18n:text>
+                <xsl:value-of select="@VIEWS" />
+                <br/>
+                <br/>
+                </div>
                 </xsl:for-each>
             </div>
         </xsl:if>

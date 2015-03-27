@@ -309,6 +309,9 @@
 	<message key="xmlui.BitstreamReader.auth_header">The file is restricted</message>
 	<message key="xmlui.BitstreamReader.auth_message">The file you are attempting to access is a restricted file and requires credentials to view. Please login below to access the file.</message>
 
+	<!--Restricted Access for Embargoed bitstreams-->
+	<message key="xmlui.BitstreamReader.res_header">Restricted Access</message>
+
 	<!-- Export Archive download messages -->
 	<message key="xmlui.ItemExportDownloadReader.auth_header">This export archive is restricted.</message>
 	<message key="xmlui.ItemExportDownloadReader.auth_message">The export archive you are attempting to access is a restricted resource and requires credentials to view. Please login below to access the export archive.</message>
@@ -2133,6 +2136,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-access-rights">Read access available for</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-no-files">There are no files associated with this item.</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-number-downloads">No. of downloads: </message>
+    <message key="xmlui.dri2xhtml.METS-1.0.item-restricted">(RESTRICTED ACCESS)</message>
 
 	<message key="xmlui.dri2xhtml.METS-1.0.size-bytes">bytes</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.size-kilobytes">Kb</message>
