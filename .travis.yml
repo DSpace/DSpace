@@ -8,7 +8,6 @@ before_install:
 - psql -U postgres -c "create user dryad_test_user with createdb;"
 - createdb -U dryad_test_user dryad_test
 - psql dryad_test -U dryad_test_user < ./dspace/etc/postgres/database_schema.sql
-- psql dryad_test -U dryad_test_user < ./dspace/etc/postgres/authority.sql
 - psql dryad_test -U dryad_test_user < ./dspace/etc/postgres/database_create_doi_table.sql
 - psql dryad_test -U dryad_test_user < ./dspace/etc/postgres/database_change_payment_system.sql
 - psql dryad_test -U dryad_test_user < ./dspace/etc/postgres/database_terms_and_condition.sql
