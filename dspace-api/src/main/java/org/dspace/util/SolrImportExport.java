@@ -228,7 +228,7 @@ public class SolrImportExport
 			origSolr.commit();
 
 			// unload now-temp core (temp core name)
-			CoreAdminRequest.unloadCore(tempIndexName, true, true, adminSolr);
+			CoreAdminRequest.unloadCore(tempIndexName, false, false, adminSolr);
 
 		}
 		finally {
