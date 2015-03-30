@@ -291,13 +291,13 @@ public class FlowETDDepartmentUtils
     }
 
     /**
-     * Remove the specified groups. It is assumed that the user has already
-     * confirmed this selection.
+     * Remove the specified etd_departments. It is assumed that the user has
+     * already confirmed this selection.
      *
      * @param context
      *            The current DSpace context
-     * @param groupIDs
-     *            A list of groups to be removed.
+     * @param etd_departmentIDs
+     *            A list of etd_departments to be removed.
      * @return A results object.
      */
     public static FlowResult processDeleteETDDepartments(Context context,
@@ -311,49 +311,6 @@ public class FlowETDDepartmentUtils
         {
             EtdUnit etd_DepartmentDeleted = EtdUnit.find(context,
                     Integer.valueOf(id));
-
-            // // If this group is related to a collection, then un-link it.
-            // int collectionId =
-            // getCollectionId(etd_DepartmentDeleted.getName());
-            // Role role = getCollectionRole(etd_DepartmentDeleted.getName());
-            // if (collectionId != -1 && role != Role.none)
-            // {
-            // Collection collection = Collection.find(context, collectionId);
-            //
-            // if (collection != null)
-            // {
-            // if (role == Role.Administrators)
-            // {
-            // collection.removeAdministrators();
-            // collection.update();
-            // }
-            // else if (role == Role.Submitters)
-            // {
-            // collection.removeSubmitters();
-            // collection.update();
-            // }
-            // else if (role == Role.WorkflowStep1)
-            // {
-            // collection.setWorkflowGroup(1, null);
-            // collection.update();
-            // }
-            // else if (role == Role.WorkflowStep2)
-            // {
-            // collection.setWorkflowGroup(2, null);
-            // collection.update();
-            // }
-            // else if (role == Role.WorkflowStep3)
-            // {
-            // collection.setWorkflowGroup(3, null);
-            // collection.update();
-            // }
-            // else if (role == Role.DefaultRead)
-            // {
-            // // Nothing special needs to happen.
-            // }
-            // }
-            // }
-
             etd_DepartmentDeleted.delete();
         }
 
@@ -381,19 +338,7 @@ public class FlowETDDepartmentUtils
         "_WFSTEP_3", "_WORKFLOW_STEP_3", "_DEFAULT_ITEM_READ" };
 
     /**
-     * Fetch IDs of linked member collections from department ID
-     */
-    public static List<Integer> getMemberCollectionIds(int etd_departmentID)
-    {
-        List<Integer> tempCollectionIDs = new ArrayList<Integer>();
-
-        // TODO
-
-        return null;
-    }
-
-    /**
-     * Extracts the collection id that may be immbedded in the given group name.
+     * Extracts the collection id that may be embedded in the given group name.
      *
      * @param groupName
      *            - the name of a group (ie group.getName())
@@ -433,164 +378,4 @@ public class FlowETDDepartmentUtils
         return -1;
     }
 
-    public enum Role {
-        Administrators, Submitters, WorkflowStep1, WorkflowStep2, WorkflowStep3, DefaultRead, none
-    };
-
-    public static Role getCollectionRole(String groupName)
-    {
-        if (groupName != null && groupName.startsWith(COLLECTION_PREFIX))
-        {
-            for (String suffix : COLLECTION_SUFFIXES)
-            {
-                if (groupName.endsWith(suffix))
-                {
-                    if (COLLECTION_SUFFIXES[0].equals(suffix))
-                    {
-                        return Role.Submitters;
-                    }
-                    else if (COLLECTION_SUFFIXES[1].equals(suffix))
-                    {
-                        return Role.Administrators;
-                    }
-                    else if (COLLECTION_SUFFIXES[2].equals(suffix))
-                    {
-                        return Role.WorkflowStep1;
-                    }
-                    else if (COLLECTION_SUFFIXES[3].equals(suffix))
-                    {
-                        return Role.WorkflowStep1;
-                    }
-                    else if (COLLECTION_SUFFIXES[4].equals(suffix))
-                    {
-                        return Role.WorkflowStep2;
-                    }
-                    else if (COLLECTION_SUFFIXES[5].equals(suffix))
-                    {
-                        return Role.WorkflowStep2;
-                    }
-                    else if (COLLECTION_SUFFIXES[6].equals(suffix))
-                    {
-                        return Role.WorkflowStep3;
-                    }
-                    else if (COLLECTION_SUFFIXES[7].equals(suffix))
-                    {
-                        return Role.WorkflowStep3;
-                    }
-                    else if (COLLECTION_SUFFIXES[8].equals(suffix))
-                    {
-                        return Role.DefaultRead;
-                    }
-
-                } // if it ends with a proper suffix.
-            } // for each possible suffix
-        } // if it starts with COLLECTION_
-
-        return Role.none;
-    }
-
-    /**
-     * The community prefix: all groups which are specific to a community start
-     * with this.
-     */
-    private static final String COMMUNITY_PREFIX = "COMMUNITY_";
-
-    /**
-     * These are the possible community suffixes. All groups which are specific
-     * to a collection will end with one of these. The collection id should be
-     * between the prefix and the suffix.
-     *
-     * Note: the order of these suffixes are important, see getCollectionRole()
-     */
-    private static final String[] COMMUNITY_SUFFIXES = { "_ADMIN" };
-
-    /**
-     * Extracts the community id that may be embedded in the given group name.
-     *
-     * @param groupName
-     *            - the name of a group (ie group.getName())
-     * @return the integer community id or -1 if the group is not that of a
-     *         community
-     */
-    public static int getCommunityId(String groupName)
-    {
-        if (groupName != null && groupName.startsWith(COMMUNITY_PREFIX))
-        {
-            for (String suffix : COMMUNITY_SUFFIXES)
-            {
-                if (groupName.endsWith(suffix))
-                {
-                    String idString = groupName.substring(COMMUNITY_PREFIX
-                            .length());
-                    idString = idString.substring(0,
-                            idString.length() - suffix.length());
-
-                    int communityID = -1;
-                    try
-                    {
-                        communityID = Integer.valueOf(idString);
-
-                        return communityID;
-                    }
-                    catch (NumberFormatException nfe)
-                    {
-                    }
-                } // if it ends with a proper suffix.
-            } // for each possible suffix
-        } // if it starts with COLLECTION_
-
-        return -1;
-    }
-
-    public static Role getCommunityRole(String groupName)
-    {
-        if (groupName != null && groupName.startsWith(COMMUNITY_PREFIX))
-        {
-            for (String suffix : COMMUNITY_SUFFIXES)
-            {
-                if (groupName.endsWith(suffix))
-                {
-                    if (COLLECTION_SUFFIXES[0].equals(suffix))
-                    {
-                        return Role.Submitters;
-                    }
-                    else if (COLLECTION_SUFFIXES[1].equals(suffix))
-                    {
-                        return Role.Administrators;
-                    }
-                    else if (COLLECTION_SUFFIXES[2].equals(suffix))
-                    {
-                        return Role.WorkflowStep1;
-                    }
-                    else if (COLLECTION_SUFFIXES[3].equals(suffix))
-                    {
-                        return Role.WorkflowStep1;
-                    }
-                    else if (COLLECTION_SUFFIXES[4].equals(suffix))
-                    {
-                        return Role.WorkflowStep2;
-                    }
-                    else if (COLLECTION_SUFFIXES[5].equals(suffix))
-                    {
-                        return Role.WorkflowStep2;
-                    }
-                    else if (COLLECTION_SUFFIXES[6].equals(suffix))
-                    {
-                        return Role.WorkflowStep3;
-                    }
-                    else if (COLLECTION_SUFFIXES[7].equals(suffix))
-                    {
-                        return Role.WorkflowStep3;
-                    }
-                    else if (COLLECTION_SUFFIXES[8].equals(suffix))
-                    {
-                        return Role.DefaultRead;
-                    }
-
-                } // if it ends with a proper suffix.
-            } // for each possible suffix
-        } // if it starts with COMMUNITY_
-
-        return Role.none;
-    }
 }

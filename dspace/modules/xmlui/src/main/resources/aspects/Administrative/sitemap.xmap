@@ -151,7 +151,7 @@
 
                     <!--
                      This is the general entry / resume point for the
-                     management of all ETD-ETDDepartments.
+                     management of all ETDDepartments.
                      -->
                     <map:match pattern="admin/etd_departments">
                         <map:match type="request" pattern="administrative-continue">

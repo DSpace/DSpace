@@ -1171,15 +1171,9 @@ function doEditETDDepartment(etd_departmentID)
     var etd_departmentName        = FlowETDDepartmentUtils.getName(getDSContext(),etd_departmentID);
     var memberCollectionIDs = FlowETDDepartmentUtils.getCollectionMembers(getDSContext(),etd_departmentID);
 
-//    var memberEPeopleIDs = FlowGroupUtils.getEPeopleMembers(getDSContext(),groupID);
-//    var memberGroupIDs   = FlowGroupUtils.getGroupMembers(getDSContext(),groupID);
-
     assertEditETDDepartment(etd_departmentID);
 
     var highlightCollectionID;
-
-//    var highlightEPersonID;
-//    var highlightGroupID;
 
     var type = "";
     var query = "";
@@ -1193,16 +1187,9 @@ function doEditETDDepartment(etd_departmentID)
 		result = null;
 		highlightCollectionID = null;
 
-//        highlightEPersonID = null;
-//        highlightGroupID = null;
-
         // Update the etd_departmentName
 		if (cocoon.request.get("etd_department_name"))
 			etd_departmentName = cocoon.request.get("etd_department_name");
-
-//		// Update the groupName
-//		if (cocoon.request.get("group_name"))
-//			groupName = cocoon.request.get("group_name");
 
 		if (cocoon.request.get("page"))
 			page = cocoon.request.get("page");

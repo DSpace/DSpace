@@ -23,9 +23,9 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.EtdUnit;
 
 /**
- * Present the user with a list of soon-to-be-deleted Groups. If the user clicks
- * confirm deletion then they will be deleted otherwise they will be spared the
- * wrath of deletion.
+ * Present the user with a list of soon-to-be-deleted ETD Departments. If the
+ * user clicks confirm deletion then they will be deleted otherwise they will be
+ * spared the wrath of deletion.
  *
  * @author Scott Phillips
  */
@@ -47,10 +47,6 @@ public class DeleteETDDepartmentsConfirm extends AbstractDSpaceTransformer
     private static final Message T_column1 = message("xmlui.administrative.etd_departments.DeleteETDDepartmentsConfirm.column1");
 
     private static final Message T_column2 = message("xmlui.administrative.etd_departments.DeleteETDDepartmentsConfirm.column2");
-
-    private static final Message T_column3 = message("xmlui.administrative.etd_departments.DeleteETDDepartmentsConfirm.column3");
-
-    private static final Message T_column4 = message("xmlui.administrative.etd_departments.DeleteETDDepartmentsConfirm.column4");
 
     private static final Message T_submit_confirm = message("xmlui.general.delete");
 
@@ -91,16 +87,12 @@ public class DeleteETDDepartmentsConfirm extends AbstractDSpaceTransformer
         Row header = table.addRow(Row.ROLE_HEADER);
         header.addCell().addContent(T_column1);
         header.addCell().addContent(T_column2);
-        // header.addCell().addContent(T_column3);
-        // header.addCell().addContent(T_column4);
 
         for (EtdUnit etd_department : etd_departments)
         {
             Row row = table.addRow();
             row.addCell().addContent(etd_department.getID());
             row.addCell().addContent(etd_department.getName());
-            // row.addCell().addContent(etd_department.getMembers().length);
-            // row.addCell().addContent(etd_department.getMemberGroups().length);
         }
 
         Para buttons = deleted.addPara();

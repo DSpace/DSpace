@@ -171,8 +171,6 @@ public class ManageETDDepartmentsMain extends AbstractDSpaceTransformer
         header.addCell().addContent(T_search_column1);
         header.addCell().addContent(T_search_column2);
         header.addCell().addContent(T_search_column3);
-        // header.addCell().addContent(T_search_column4);
-        // header.addCell().addContent(T_search_column5);
 
         for (EtdUnit etd_department : etd_departments)
         {
@@ -206,11 +204,6 @@ public class ManageETDDepartmentsMain extends AbstractDSpaceTransformer
             row.addCell().addXref(
                     baseURL + "&submit_edit&etd_departmentID="
                             + etd_department.getID(), etd_department.getName());
-
-            // int memberCount = etd_department.getMembers().length
-            // + etd_department.getMemberGroups().length;
-            // row.addCell().addContent(memberCount == 0 ? "-" : String.valueOf(
-            // memberCount));
 
             Cell cell = row.addCell();
             String etd_departmentName = etd_department.getName();
