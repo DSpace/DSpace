@@ -18,6 +18,7 @@ import org.apache.solr.client.solrj.request.AbstractUpdateRequest;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.client.solrj.request.LukeRequest;
+import org.apache.solr.client.solrj.response.CoreAdminResponse;
 import org.apache.solr.client.solrj.response.LukeResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.luke.FieldFlag;
@@ -122,72 +123,11 @@ public class SolrImportExport
 			{
 				for (String indexName : indexNames)
 				{
-					String tempIndexName = indexName + "-temp";
-
-					String origSolrUrl = makeSolrUrl(indexName);
-					String baseSolrUrl = StringUtils.substringBeforeLast(origSolrUrl, "/"); // need to get non-core solr URL
-					String tempSolrUrl = baseSolrUrl + "/" + tempIndexName;
-
-					String solrInstanceDir = ConfigurationManager.getProperty("dspace.dir") + File.separator + "solr" + File.separator + indexName;
-
-					String exportDir = makeDirectoryName(line.getOptionValue(DIRECTORY_OPTION)); // TODO optionally, keep the export?
-					String timeField = makeTimeField(indexName);
-
-					// Create a temp directory to store temporary core data
-					File tempDataDir = new File(ConfigurationManager.getProperty("dspace.dir") + File.separator + "temp" + File.separator + "solr-data");
-					tempDataDir.mkdirs();
-
-					// create a temporary core to hold documents coming in during the reindex
 					try {
-						HttpSolrServer adminSolr = new HttpSolrServer(baseSolrUrl);
-						CoreAdminRequest.Create createRequest = new CoreAdminRequest.Create();
-						createRequest.setInstanceDir(solrInstanceDir);
-						createRequest.setDataDir(tempDataDir.getCanonicalPath());
-						createRequest.setCoreName(tempIndexName);
-						createRequest.process(adminSolr);
-
-						// swap actual core with temporary one
-						CoreAdminRequest swapRequest = new CoreAdminRequest();
-						swapRequest.setCoreName(indexName);
-						swapRequest.setOtherCoreName(tempIndexName);
-						swapRequest.setAction(CoreAdminParams.CoreAdminAction.SWAP);
-						swapRequest.process(adminSolr);
-
-						// export from the actual core (from temp core name, actual data dir)
-						exportIndex(indexName, exportDir, tempSolrUrl, timeField);
-
-						// clear actual core (temp core name, clearing actual data dir) & import
-						importIndex(indexName, exportDir, true, tempSolrUrl);
-
-						// commit changes
-						HttpSolrServer origSolr = new HttpSolrServer(origSolrUrl);
-						origSolr.commit();
-
-						// swap back (statistics now going to actual core name in actual data dir)
-						swapRequest = new CoreAdminRequest();
-						swapRequest.setCoreName(tempIndexName);
-						swapRequest.setOtherCoreName(indexName);
-						swapRequest.setAction(CoreAdminParams.CoreAdminAction.SWAP);
-						swapRequest.process(adminSolr);
-
-						// export all docs from now-temp core...
-						exportIndex(tempIndexName, exportDir, tempSolrUrl, timeField);
-						// ...and import them into the now-again-actual core *without* clearing
-						importIndex(tempIndexName, exportDir, false, origSolrUrl);
-
-						// commit changes
-						origSolr.commit();
-
-						// unload now-temp core (temp core name)
-						CoreAdminRequest.unloadCore(tempIndexName, true, true, adminSolr);
-
-						// clean up
-						FileUtils.deleteDirectory(tempDataDir);
-					} catch (SolrServerException | IOException | SolrImportExportException e) {
-						System.err.println("Problem encountered while trying to reimport index " + indexName + ".");
-						e.printStackTrace(System.err);
+						reindex(line, indexName);
+					} catch (IOException | SolrServerException | SolrImportExportException e) {
+						e.printStackTrace();
 					}
-					// TODO increase resiliency / improve error handling
 				}
 			}
 			else
@@ -200,6 +140,100 @@ public class SolrImportExport
 		{
 			System.err.println("Cannot read command options");
 			printHelpAndExit(options, 1);
+		}
+	}
+
+	/**
+	 * Reindexes the specified core
+	 * @param line the command line options
+	 * @param indexName the name of the core to reindex
+	 */
+	private static void reindex(CommandLine line, String indexName) throws IOException, SolrServerException, SolrImportExportException {
+		// TODO increase resiliency / improve error handling
+		String tempIndexName = indexName + "-temp";
+
+		String origSolrUrl = makeSolrUrl(indexName);
+		String baseSolrUrl = StringUtils.substringBeforeLast(origSolrUrl, "/"); // need to get non-core solr URL
+		String tempSolrUrl = baseSolrUrl + "/" + tempIndexName;
+
+		String solrInstanceDir = ConfigurationManager.getProperty("dspace.dir") + File.separator + "solr" + File.separator + indexName;
+		// the [dspace]/solr/[indexName]/conf directory needs to be available on the local machine for this to work
+		// -- we need access to the schema.xml and solrconfig.xml file, plus files referenced from there
+		// if this directory can't be found, output an error message and skip this index
+		File solrInstance = new File(solrInstanceDir);
+		if (!solrInstance.exists() || !solrInstance.canRead() || !solrInstance.isDirectory())
+		{
+			System.err.println("Directory " + solrInstanceDir + "/conf/ doesn't exist or isn't readable." +
+					                   " The reindexing process requires the solr configuration directory for this index to be present on the local machine" +
+					                   " even if the Solr is running on a different host. Not reindexing index " + indexName);
+			return;
+		}
+
+		String exportDir = makeDirectoryName(line.getOptionValue(DIRECTORY_OPTION)); // TODO optionally, keep the export?
+		String timeField = makeTimeField(indexName);
+
+		// Create a temp directory to store temporary core data
+		File tempDataDir = new File(ConfigurationManager.getProperty("dspace.dir") + File.separator + "temp" + File.separator + "solr-data");
+		boolean tempDirCreated = tempDataDir.mkdirs();
+		if (!tempDirCreated)
+		{
+			throw new SolrImportExportException("Could not create temporary data directory " + tempDataDir.getCanonicalPath());
+		}
+
+		try
+		{
+			// create a temporary core to hold documents coming in during the reindex
+			HttpSolrServer adminSolr = new HttpSolrServer(baseSolrUrl);
+			CoreAdminRequest.Create createRequest = new CoreAdminRequest.Create();
+			createRequest.setInstanceDir(solrInstanceDir);
+			createRequest.setDataDir(tempDataDir.getCanonicalPath());
+			createRequest.setCoreName(tempIndexName);
+
+			int responseCode = createRequest.process(adminSolr).getStatus();
+			if (responseCode != 0) {
+				// the "process" call has probably thrown an exception already -- throw this just in case
+				throw new SolrImportExportException("Could not create temporary core on Solr server " + baseSolrUrl + ", code was: " + responseCode);
+			}
+
+			// swap actual core with temporary one
+			CoreAdminRequest swapRequest = new CoreAdminRequest();
+			swapRequest.setCoreName(indexName);
+			swapRequest.setOtherCoreName(tempIndexName);
+			swapRequest.setAction(CoreAdminParams.CoreAdminAction.SWAP);
+			swapRequest.process(adminSolr);
+
+			// export from the actual core (from temp core name, actual data dir)
+			exportIndex(indexName, exportDir, tempSolrUrl, timeField);
+
+			// clear actual core (temp core name, clearing actual data dir) & import
+			importIndex(indexName, exportDir, true, tempSolrUrl);
+
+			// commit changes
+			HttpSolrServer origSolr = new HttpSolrServer(origSolrUrl);
+			origSolr.commit();
+
+			// swap back (statistics now going to actual core name in actual data dir)
+			swapRequest = new CoreAdminRequest();
+			swapRequest.setCoreName(tempIndexName);
+			swapRequest.setOtherCoreName(indexName);
+			swapRequest.setAction(CoreAdminParams.CoreAdminAction.SWAP);
+			swapRequest.process(adminSolr);
+
+			// export all docs from now-temp core...
+			exportIndex(tempIndexName, exportDir, tempSolrUrl, timeField);
+			// ...and import them into the now-again-actual core *without* clearing
+			importIndex(tempIndexName, exportDir, false, origSolrUrl);
+
+			// commit changes
+			origSolr.commit();
+
+			// unload now-temp core (temp core name)
+			CoreAdminRequest.unloadCore(tempIndexName, true, true, adminSolr);
+
+		}
+		finally {
+			// clean up
+			FileUtils.deleteDirectory(tempDataDir);
 		}
 	}
 
