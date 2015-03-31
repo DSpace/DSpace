@@ -2247,6 +2247,8 @@ Cuando se usa QDC para los elementos de DSpace se recomienda el uso de crosswalk
   <!-- Choice Lookup - sample config for dc.publisher field -->
 <message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.help">Nombre del Editor</message>
 <message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.title">Buscar Editor</message>
+<message key="xmlui.ChoiceLookupTransformer.field.dcterms_subject_materia.help">Nombre de la Materia</message>
+<message key="xmlui.ChoiceLookupTransformer.field.dcterms_subject_materia.title">Buscar Materia</message>
   <!-- Params are: search-value -->
 <message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.nonauthority">No es valor de Autoridad: @1@</message>
 

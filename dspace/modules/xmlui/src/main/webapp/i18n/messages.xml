@@ -2452,6 +2452,8 @@
   <!-- Choice Lookup - sample config for dc.publisher field -->
   <message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.help">Name of Publisher</message>
   <message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.title">Look up Publisher</message>
+  <message key="xmlui.ChoiceLookupTransformer.field.dcterms_subject_materia.help">Name of Subject</message>
+  <message key="xmlui.ChoiceLookupTransformer.field.dcterms_subject_materia.title">Look up Subject</message>
   <!-- Params are: search-value -->
   <message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.nonauthority">Non-authority value: @1@</message>
 
