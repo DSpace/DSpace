@@ -147,6 +147,13 @@ public class ResearcherPageUtils
             {
                  return crisObject.getId();
             }
+            else {
+            	crisObject = applicationService.getEntityByUUID(authorityKey);
+                if (crisObject != null)
+                {
+                     return crisObject.getId();
+                }
+            }
             return Integer.parseInt(id); 
         }
         catch (NumberFormatException e)

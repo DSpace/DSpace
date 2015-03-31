@@ -556,4 +556,37 @@
     
   </tag>  
 
+  <tag>
+    <name>discovery-artifact</name>
+    <tagclass>org.dspace.app.webui.jsptag.DiscoveryArtifactTag</tagclass>
+    <info>
+      Tag for displaying an artifact result into discovery search
+    </info>
+    <attribute>
+      <name>hlt</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>artifact</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+     <attribute>
+      <name>view</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>selectorCssView</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>style</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+
 </taglib>

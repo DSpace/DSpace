@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.ACrisObjectWithTypeSupport;
@@ -47,10 +48,13 @@ public class ResourceTypeSolrIndexer implements CrisServiceIndexPlugin,
 		String fvalue = "";
 
 		Integer type = crisObject.getType();
+		String lowerCase = crisObject.getTypeText().toLowerCase();
+		String lowerCaseWithoutWhitespace = StringUtils.deleteWhitespace(lowerCase);
+		
 		if (type > CrisConstants.CRIS_DYNAMIC_TYPE_ID_START) {
 			acvalue = ConfigurationManager.getProperty(
 					CrisConstants.CFG_MODULE, "facet.type.crisdo."
-							+ crisObject.getTypeText().toLowerCase());
+							+ lowerCaseWithoutWhitespace);
 			if (acvalue == null) {
 				acvalue = ConfigurationManager.getProperty(
 						CrisConstants.CFG_MODULE, "facet.type.crisdo.default");
@@ -60,13 +64,14 @@ public class ResourceTypeSolrIndexer implements CrisServiceIndexPlugin,
 			    String separatorFacets = ConfigurationManager.getProperty("discovery", "solr.facets.split.char");
 				String label = ((ACrisObjectWithTypeSupport<P, TP, NP, NTP, ACNO, ATNO>) crisObject)
 						.getTypo().getLabel();
-				acvalue = label.toLowerCase() + (separatorFacets!=null?separatorFacets:SolrServiceImpl.FILTER_SEPARATOR) + label;
+				String labelWithoutWhiteSpace = StringUtils.deleteWhitespace(label);
+				acvalue = labelWithoutWhiteSpace.toLowerCase() + (separatorFacets!=null?separatorFacets:SolrServiceImpl.FILTER_SEPARATOR) + label + SolrServiceImpl.AUTHORITY_SEPARATOR + "cris"+labelWithoutWhiteSpace.toLowerCase();
 			}
 			fvalue = acvalue;
 		} else {
 			acvalue = ConfigurationManager.getProperty(
 					CrisConstants.CFG_MODULE, "facet.type."
-							+ crisObject.getTypeText().toLowerCase());
+							+ lowerCaseWithoutWhitespace);
 			fvalue = acvalue;
 		}
 
@@ -79,7 +84,7 @@ public class ResourceTypeSolrIndexer implements CrisServiceIndexPlugin,
 
 		String acvalue = ConfigurationManager.getProperty(
 				CrisConstants.CFG_MODULE, "facet.type."
-						+ dso.getTypeText().toLowerCase());
+						+ StringUtils.deleteWhitespace(dso.getTypeText().toLowerCase()));
 		String fvalue = acvalue;
 		addResourceTypeIndex(document, acvalue, fvalue);
 
@@ -87,14 +92,23 @@ public class ResourceTypeSolrIndexer implements CrisServiceIndexPlugin,
 
 	private void addResourceTypeIndex(SolrInputDocument document,
 			String acvalue, String fvalue) {
-		document.addField("resourcetype_ac", acvalue);
 
+		document.addField("resourcetype_filter", acvalue);
+		
+		String[] avalues = acvalue.split(SolrServiceImpl.AUTHORITY_SEPARATOR);
+		acvalue = avalues[0];
+		
+		String avalue = avalues[1];
+		document.addField("resourcetype_authority", avalue);
+		document.addField("resourcetype_group", avalue);
+		document.addField("resourcetype_ac", acvalue);		
+		
 		Pattern pattern = Pattern.compile(REGEX);
 		Matcher matcher = pattern.matcher(acvalue);
 		if (matcher.matches()) {
 			fvalue = matcher.group(1);
 		}
-		document.addField("resourcetype_filter", fvalue);
+				
 		document.addField("resourcetype_keyword", fvalue);
 	}
 

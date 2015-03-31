@@ -191,7 +191,10 @@ INSERT INTO cris_rp_no_pdef VALUES ('303', '3', '0', '0','em', 'em', '0', null, 
 INSERT INTO cris_rp_no_pdef VALUES ('1301', '3', '0', '0','em', 'em', '0', null, 'Qualification', '0','em',  '0', '0', '0', '0', '0', 'qualification', '0', '0', '1301');
 INSERT INTO cris_rp_no_pdef VALUES ('1302', '3', '0', '0','em', 'em', '0', null, 'Awarding Institution', '0','em',  '0', '0', '0', '0', '0', 'qualificationinstitution', '0', '0', '1302');
 INSERT INTO cris_rp_no_pdef VALUES ('1350', '3', '0', '0','em', 'em', '0', null, 'Date issued', '0','em',  '0', '0', '0', '0', '0', 'qualificationdate', '0', '0', '1350');
-
+INSERT INTO cris_rp_no_pdef VALUES ('1401', '3', 'f', '0','em', 'em', '0', null, 'Member of', '0','em',  'f', 'f', 'f', '0', 'f', 'orgunit', 'f', 'f', '1401');
+INSERT INTO cris_rp_no_pdef VALUES ('1402', '3', 'f', '0','em', 'em', '0', null, 'Role', '0','em',  'f', 'f', 'f', '0', 'f', 'role', 'f', 'f', '1402');
+INSERT INTO cris_rp_no_pdef VALUES ('1451', '3', 'f', '0','em', 'em', '0', null, 'Start date', '0','em',  'f', 'f', 'f', '0', 'f', 'startdate', 'f', 'f', '1451');
+INSERT INTO cris_rp_no_pdef VALUES ('1450', '3', 'f', '0','em', 'em', '0', null, 'End date', '0','em',  'f', 'f', 'f', '0', 'f', 'enddate', 'f', 'f', '1450');
 
 -- ----------------------------
 -- Records of cris_rp_no_typo
@@ -199,6 +202,7 @@ INSERT INTO cris_rp_no_pdef VALUES ('1350', '3', '0', '0','em', 'em', '0', null,
 INSERT INTO cris_rp_no_tp VALUES ('5', 'Spoken Languages', 'spoken', '1', null, '1', '1', '0', '0', '1');
 INSERT INTO cris_rp_no_tp VALUES ('6', 'Written Languages', 'written', '3', null, '1', '0', '0', '10', '1');
 INSERT INTO cris_rp_no_tp VALUES ('20', 'Qualifications', 'qualifications', '3', null, '0', '0', '0', '0', '1');
+INSERT INTO cris_rp_no_tp VALUES ('30', 'Affiliations', 'affiliation', '3', null, '0', '0', '0', '0', '1');
 
 -- ----------------------------
 -- Records of cris_rp_no_typo2pdef
@@ -210,7 +214,10 @@ INSERT INTO cris_rp_no_tp2pdef VALUES ('6', '303');
 INSERT INTO cris_rp_no_tp2pdef VALUES ('20', '1301');
 INSERT INTO cris_rp_no_tp2pdef VALUES ('20', '1302');
 INSERT INTO cris_rp_no_tp2pdef VALUES ('20', '1350');
-
+INSERT INTO cris_rp_no_tp2pdef VALUES ('30', '1401');
+INSERT INTO cris_rp_no_tp2pdef VALUES ('30', '1402');
+INSERT INTO cris_rp_no_tp2pdef VALUES ('30', '1450');
+INSERT INTO cris_rp_no_tp2pdef VALUES ('30', '1451');
 -- ----------------------------
 -- Records of cris_rp_pdef
 -- ----------------------------
@@ -300,6 +307,8 @@ INSERT INTO jdyna_containable VALUES ('propertiesdefinition', '1800', null,'1800
 -- ----------------------------
 INSERT INTO jdyna_widget_date VALUES ('101', null, null, '0');
 INSERT INTO jdyna_widget_date VALUES ('1350', null, null, '0');
+INSERT INTO jdyna_widget_date VALUES ('1450', null, null, 'f');
+INSERT INTO jdyna_widget_date VALUES ('1451', null, null, 'f');
 INSERT INTO jdyna_widget_date VALUES ('1550', null, null, '0');
 INSERT INTO jdyna_widget_date VALUES ('1653', null, null, '0');
 
@@ -319,6 +328,7 @@ INSERT INTO cris_rp_wpointer VALUES ('951', '${displayObject.preferredName.value
 INSERT INTO cris_rp_wpointer VALUES ('1000', '${displayObject.preferredName.value}', 'search.resourcetype:9', null, '20', 'org.dspace.app.cris.model.jdyna.value.RPPointer', 'cris/uuid/${displayObject.uuid}');
 INSERT INTO cris_ou_wpointer VALUES ('1251', '${displayObject.name}', 'search.resourcetype:11', null, '20', 'org.dspace.app.cris.model.jdyna.value.OUPointer', 'cris/uuid/${displayObject.uuid}');
 INSERT INTO cris_ou_wpointer VALUES ('1400', '${displayObject.name}', 'search.resourcetype:11', null, '20', 'org.dspace.app.cris.model.jdyna.value.OUPointer', 'cris/uuid/${displayObject.uuid}');
+INSERT INTO cris_ou_wpointer VALUES ('1401', '${displayObject.name}', 'search.resourcetype:11', null, '20', 'org.dspace.app.cris.model.jdyna.value.OUPointer', 'cris/uuid/${displayObject.uuid}');
 INSERT INTO cris_ou_wpointer VALUES ('1557', '${displayObject.name}', 'search.resourcetype:11', null, '20', 'org.dspace.app.cris.model.jdyna.value.OUPointer', 'cris/uuid/${displayObject.uuid}');
 INSERT INTO cris_ou_wpointer VALUES ('1651', '${displayObject.name}', null, null, '20', 'org.dspace.app.cris.model.jdyna.value.OUPointer', 'cris/uuid/${displayObject.uuid}');
 INSERT INTO cris_rp_wpointer VALUES ('1652', '${displayObject.fullName}', null, null, '20', 'org.dspace.app.cris.model.jdyna.value.RPPointer', 'cris/uuid/${displayObject.uuid}');
@@ -343,6 +353,7 @@ INSERT INTO jdyna_widget_text VALUES ('551', '0', '30', 'em', 'em', '1', null, '
 INSERT INTO jdyna_widget_text VALUES ('1050', '0', '30', 'em', 'em', '1', null, '0', null);
 INSERT INTO jdyna_widget_text VALUES ('1301', '0', '30', 'em', 'em', '1', null, '0', null);
 INSERT INTO jdyna_widget_text VALUES ('1302', '0', '30', 'em', 'em', '1', null, '0', null);
+INSERT INTO jdyna_widget_text VALUES ('1402', 'f', '30', 'em', 'em', '1', null, 'f', null);
 INSERT INTO jdyna_widget_text VALUES ('1552', '0', '30', 'em', 'em', '1', null, '0', null);
 INSERT INTO jdyna_widget_text VALUES ('1553', '0', '30', 'em', 'em', '1', null, '0', null);
 INSERT INTO jdyna_widget_text VALUES ('1554', '0', '30', 'em', 'em', '1', null, '0', null);

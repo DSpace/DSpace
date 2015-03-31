@@ -200,6 +200,10 @@ INSERT INTO "public"."cris_rp_no_pdef" VALUES ('303', '3', 'f', '0','em', 'em', 
 INSERT INTO "public"."cris_rp_no_pdef" VALUES ('1301', '3', 'f', '0','em', 'em', '0', null, 'Qualification', '0','em',  'f', 'f', 'f', '0', 'f', 'qualification', 'f', 'f', '1301');
 INSERT INTO "public"."cris_rp_no_pdef" VALUES ('1302', '3', 'f', '0','em', 'em', '0', null, 'Awarding Institution', '0','em',  'f', 'f', 'f', '0', 'f', 'qualificationinstitution', 'f', 'f', '1302');
 INSERT INTO "public"."cris_rp_no_pdef" VALUES ('1350', '3', 'f', '0','em', 'em', '0', null, 'Date issued', '0','em',  'f', 'f', 'f', '0', 'f', 'qualificationdate', 'f', 'f', '1350');
+INSERT INTO "public"."cris_rp_no_pdef" VALUES ('1401', '3', 'f', '0','em', 'em', '0', null, 'Member of', '0','em',  'f', 'f', 'f', '0', 'f', 'orgunit', 'f', 'f', '1401');
+INSERT INTO "public"."cris_rp_no_pdef" VALUES ('1402', '3', 'f', '0','em', 'em', '0', null, 'Role', '0','em',  'f', 'f', 'f', '0', 'f', 'role', 'f', 'f', '1402');
+INSERT INTO "public"."cris_rp_no_pdef" VALUES ('1451', '3', 'f', '0','em', 'em', '0', null, 'Start date', '0','em',  'f', 'f', 'f', '0', 'f', 'startdate', 'f', 'f', '1451');
+INSERT INTO "public"."cris_rp_no_pdef" VALUES ('1450', '3', 'f', '0','em', 'em', '0', null, 'End date', '0','em',  'f', 'f', 'f', '0', 'f', 'enddate', 'f', 'f', '1450');
 
 
 -- ----------------------------
@@ -208,6 +212,7 @@ INSERT INTO "public"."cris_rp_no_pdef" VALUES ('1350', '3', 'f', '0','em', 'em',
 INSERT INTO "public"."cris_rp_no_tp" VALUES ('5', 'Spoken Languages', 'spoken', '1', null, 't', 't', 'f', '0', 't');
 INSERT INTO "public"."cris_rp_no_tp" VALUES ('6', 'Written Languages', 'written', '3', null, 't', 'f', 'f', '10', 't');
 INSERT INTO "public"."cris_rp_no_tp" VALUES ('20', 'Qualifications', 'qualifications', '3', null, 'f', 'f', 'f', '0', 't');
+INSERT INTO "public"."cris_rp_no_tp" VALUES ('30', 'Affiliations', 'affiliation', '3', null, 'f', 'f', 'f', '0', 't');
 
 -- ----------------------------
 -- Records of cris_rp_no_typo2pdef
@@ -219,6 +224,10 @@ INSERT INTO "public"."cris_rp_no_tp2pdef" VALUES ('6', '303');
 INSERT INTO "public"."cris_rp_no_tp2pdef" VALUES ('20', '1301');
 INSERT INTO "public"."cris_rp_no_tp2pdef" VALUES ('20', '1302');
 INSERT INTO "public"."cris_rp_no_tp2pdef" VALUES ('20', '1350');
+INSERT INTO "public"."cris_rp_no_tp2pdef" VALUES ('30', '1401');
+INSERT INTO "public"."cris_rp_no_tp2pdef" VALUES ('30', '1402');
+INSERT INTO "public"."cris_rp_no_tp2pdef" VALUES ('30', '1450');
+INSERT INTO "public"."cris_rp_no_tp2pdef" VALUES ('30', '1451');
 
 -- ----------------------------
 -- Records of cris_rp_pdef
@@ -229,7 +238,7 @@ INSERT INTO "public"."cris_rp_pdef" VALUES ('52', '3', 'f' ,'0','em', 'em', '0',
 INSERT INTO "public"."cris_rp_pdef" VALUES ('53', '3', 'f' ,'0','em', 'em', '5', null, 'Variants', '10', 'em',  'f', 't', 'f', '50', 't', 'variants', 'f', 'f', '53');
 INSERT INTO "public"."cris_rp_pdef" VALUES ('54', '3', 'f' ,'0','em', 'em', '0', null, 'Email', '10', 'em',  't', 't', 'f', '10', 'f', 'email', 'f', 'f', '54');
 INSERT INTO "public"."cris_rp_pdef" VALUES ('55', '1', 'f' ,'0','em', 'em', '0', null, 'Personal Site', '10', 'em',  'f', 't', 'f', '600', 'f', 'personalsite', 'f', 'f', '55');
-INSERT INTO "public"."cris_rp_pdef" VALUES ('1251', '3', 'f', '70', '%', 'em', '0', null, 'Department', '10', 'em',  'f', 'f', 'f', '700', 'f', 'dept', 'f', 'f', '1251');
+INSERT INTO "public"."cris_rp_pdef" VALUES ('1251', '3', 'f', '70', '%', 'em', '0', null, 'Main Affiliation', '10', 'em',  'f', 'f', 'f', '700', 'f', 'dept', 'f', 'f', '1251');
 INSERT INTO "public"."cris_rp_pdef" VALUES ('1300', '3', 'f', '15','em', 'em', '0', null, null, '0', 'em',  'f', 'f', 'f', '1000', 'f', 'personalpicture', 'f', 'f', '1300');
 INSERT INTO "public"."cris_rp_pdef" VALUES ('1400', '3', 'f', '0','em', 'em', '0', null, 'Working groups', '0', 'em', 'f', 'f', 'f', '0', 't', 'workgroups', 'f', 'f', '1400');
 INSERT INTO "public"."cris_rp_pdef" VALUES ('1800', '3', 'f' ,'0','em', 'em', '5', null, 'Interests', '10', 'em',  'f', 't', 'f', '50', 't', 'interests', 'f', 'f', '1800');
@@ -309,6 +318,8 @@ INSERT INTO "public"."jdyna_containable" VALUES ('propertiesdefinition', '1800',
 -- ----------------------------
 INSERT INTO "public"."jdyna_widget_date" VALUES ('101', null, null, 'f');
 INSERT INTO "public"."jdyna_widget_date" VALUES ('1350', null, null, 'f');
+INSERT INTO "public"."jdyna_widget_date" VALUES ('1450', null, null, 'f');
+INSERT INTO "public"."jdyna_widget_date" VALUES ('1451', null, null, 'f');
 INSERT INTO "public"."jdyna_widget_date" VALUES ('1550', null, null, 'f');
 INSERT INTO "public"."jdyna_widget_date" VALUES ('1653', null, null, 'f');
 
@@ -326,6 +337,7 @@ INSERT INTO "public"."cris_rp_wpointer" VALUES ('951', '${displayObject.preferre
 INSERT INTO "public"."cris_rp_wpointer" VALUES ('1000', '${displayObject.preferredName.value}', 'search.resourcetype:9', null, '20', 'org.dspace.app.cris.model.jdyna.value.RPPointer', 'cris/uuid/${displayObject.uuid}');
 INSERT INTO "public"."cris_ou_wpointer" VALUES ('1251', '${displayObject.name}', 'search.resourcetype:11', null, '20', 'org.dspace.app.cris.model.jdyna.value.OUPointer', 'cris/uuid/${displayObject.uuid}');
 INSERT INTO "public"."cris_ou_wpointer" VALUES ('1400', '${displayObject.name}', 'search.resourcetype:11', null, '20', 'org.dspace.app.cris.model.jdyna.value.OUPointer', 'cris/uuid/${displayObject.uuid}');
+INSERT INTO "public"."cris_ou_wpointer" VALUES ('1401', '${displayObject.name}', 'search.resourcetype:11', null, '20', 'org.dspace.app.cris.model.jdyna.value.OUPointer', 'cris/uuid/${displayObject.uuid}');
 INSERT INTO "public"."cris_ou_wpointer" VALUES ('1557', '${displayObject.name}', 'search.resourcetype:11', null, '20', 'org.dspace.app.cris.model.jdyna.value.OUPointer', 'cris/uuid/${displayObject.uuid}');
 INSERT INTO "public"."cris_ou_wpointer" VALUES ('1651', '${displayObject.name}', null, null, '20', 'org.dspace.app.cris.model.jdyna.value.OUPointer', 'cris/uuid/${displayObject.uuid}');
 INSERT INTO "public"."cris_rp_wpointer" VALUES ('1652', '${displayObject.fullName}', null, null, '20', 'org.dspace.app.cris.model.jdyna.value.RPPointer', 'cris/uuid/${displayObject.uuid}');
@@ -347,6 +359,7 @@ INSERT INTO "public"."jdyna_widget_text" VALUES ('551', 'f', '30', 'em', 'em', '
 INSERT INTO "public"."jdyna_widget_text" VALUES ('1050', 'f', '30', 'em', 'em', '1', null, 'f', null);
 INSERT INTO "public"."jdyna_widget_text" VALUES ('1301', 'f', '30', 'em', 'em', '1', null, 'f', null);
 INSERT INTO "public"."jdyna_widget_text" VALUES ('1302', 'f', '30', 'em', 'em', '1', null, 'f', null);
+INSERT INTO "public"."jdyna_widget_text" VALUES ('1402', 'f', '30', 'em', 'em', '1', null, 'f', null);
 INSERT INTO "public"."jdyna_widget_text" VALUES ('1552', 'f', '30', 'em', 'em', '1', null, 'f', null);
 INSERT INTO "public"."jdyna_widget_text" VALUES ('1553', 'f', '30', 'em', 'em', '1', null, 'f', null);
 INSERT INTO "public"."jdyna_widget_text" VALUES ('1554', 'f', '30', 'em', 'em', '1', null, 'f', null);

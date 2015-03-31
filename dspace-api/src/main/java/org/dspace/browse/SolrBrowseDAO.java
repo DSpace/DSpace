@@ -151,7 +151,7 @@ public class SolrBrowseDAO implements BrowseDAO
             {
                 DiscoverFacetField dff = new DiscoverFacetField(facetField,
                         DiscoveryConfigurationParameters.TYPE_TEXT, -1,
-                        DiscoveryConfigurationParameters.SORT.VALUE);
+                        DiscoveryConfigurationParameters.SORT.VALUE, false);
                 query.addFacetField(dff);
                 query.setFacetMinCount(1);
                 query.setMaxResults(0);

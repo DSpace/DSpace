@@ -157,7 +157,7 @@
           </ul>
           
 	<%-- Search Box --%>
-	<form method="get" action="<%= request.getContextPath() %>/simple-search" class="navbar-form navbar-right" scope="search">
+	<form method="get" action="<%= request.getContextPath() %>/global-search" class="navbar-form navbar-right" scope="search">		
 	    <div class="form-group">
           <input type="text" class="form-control" placeholder="<fmt:message key="jsp.layout.navbar-default.search"/>" name="query" id="tequery" size="25"/>
         </div>

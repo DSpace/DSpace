@@ -21,39 +21,46 @@ public class DiscoverFacetField {
     /* The facet prefix, all facet values will have to start with the given prefix */
     private String prefix;
     private String type;
+    private boolean exclude;
+    
     private DiscoveryConfigurationParameters.SORT sortOrder;
 
-    public DiscoverFacetField(String field, String type, int limit, DiscoveryConfigurationParameters.SORT sortOrder) {
+    public DiscoverFacetField(String field, String type, int limit, DiscoveryConfigurationParameters.SORT sortOrder, boolean exclude) {
         this.field = field;
         this.type = type;
         this.limit = limit;
         this.sortOrder = sortOrder;
+        this.exclude = exclude;
     }
 
-    public DiscoverFacetField(String field, String type, int limit, DiscoveryConfigurationParameters.SORT sortOrder, int offset) {
+    public DiscoverFacetField(String field, String type, int limit, DiscoveryConfigurationParameters.SORT sortOrder, int offset, boolean exclude) {
         this.field = field;
         this.type = type;
         this.limit = limit;
         this.sortOrder = sortOrder;
         this.offset = offset;
+        this.exclude = exclude;
     }
 
-    public DiscoverFacetField(String field, String type, int limit, DiscoveryConfigurationParameters.SORT sortOrder, String prefix) {
+    public DiscoverFacetField(String field, String type, int limit, DiscoveryConfigurationParameters.SORT sortOrder, String prefix, boolean exclude) {
         this.prefix = prefix;
         this.limit = limit;
         this.type = type;
         this.sortOrder = sortOrder;
         this.field = field;
+        this.exclude = exclude;
     }
 
-    public DiscoverFacetField(String field, String type, int limit, DiscoveryConfigurationParameters.SORT sortOrder, String prefix, int offset) {
+    public DiscoverFacetField(String field, String type, int limit, DiscoveryConfigurationParameters.SORT sortOrder, String prefix, int offset, boolean exclude) {
         this.prefix = prefix;
         this.limit = limit;
         this.type = type;
         this.sortOrder = sortOrder;
         this.field = field;
         this.offset = offset;
-    }
+        this.exclude = exclude;
+    }    
+    
     public String getField() {
         return field;
     }
@@ -83,4 +90,12 @@ public class DiscoverFacetField {
     {
         this.offset = offset;
     }
+
+	public boolean isExclude() {
+		return exclude;
+	}
+
+	public void setExclude(boolean exclude) {
+		this.exclude = exclude;
+	}
 }

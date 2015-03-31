@@ -7,6 +7,8 @@
  */
 package org.dspace.app.webui.util;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
@@ -15,6 +17,7 @@ import org.dspace.browse.BrowseItem;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.core.SelfNamedPlugin;
+import org.dspace.discovery.IGlobalSearchResult;
 
 public abstract class ASimpleDisplayStrategy extends SelfNamedPlugin implements
         IDisplayMetadataValueStrategy
@@ -70,4 +73,19 @@ public abstract class ASimpleDisplayStrategy extends SelfNamedPlugin implements
                 field, metadataArray, disableCrossLinks, emph, pageContext);
     }
 
+	public String getMetadataDisplay(HttpServletRequest hrq, int limit, boolean viewFull, String browseType,
+			int colIdx, String field, List<String> metadataArray, IGlobalSearchResult item, boolean disableCrossLinks,
+			boolean emph, PageContext pageContext) throws JspException 
+	{		
+        return getMetadataDisplay(hrq, limit, viewFull, browseType, colIdx, item.getID(),
+                field, item.getMetadataValueInDCFormat(field), disableCrossLinks, emph, pageContext);
+	}
+	
+	public String getMetadataDisplay(HttpServletRequest hrq, int limit, boolean viewFull, String browseType,
+			int colIdx, String field, DCValue[] metadataArray, IGlobalSearchResult item, boolean disableCrossLinks,
+			boolean emph, PageContext pageContext) throws JspException 
+	{		
+        return getMetadataDisplay(hrq, limit, viewFull, browseType, colIdx, item.getID(),
+                field, metadataArray, disableCrossLinks, emph, pageContext);
+	}
 }

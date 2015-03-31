@@ -70,3 +70,7 @@ input.ds-authority-lock.is-unlocked
 		border-top: 0;
 		background-color: #fff;
 }
+
+.menu-global-processor{
+		z-index: 1001;
+}

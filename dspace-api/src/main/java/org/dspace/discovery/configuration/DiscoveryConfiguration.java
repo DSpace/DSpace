@@ -14,15 +14,18 @@ import org.springframework.beans.factory.annotation.Required;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
 public class DiscoveryConfiguration implements InitializingBean{
 
+	public static final String GLOBAL_CONFIGURATIONNAME = "global";
+	
     /** The configuration for the sidebar facets **/
     private List<DiscoverySearchFilterFacet> sidebarFacets = new ArrayList<DiscoverySearchFilterFacet>();
-
+    
     /** The default filter queries which will be applied to any search & the recent submissions **/
     private List<String> defaultFilterQueries;
 
@@ -39,8 +42,12 @@ public class DiscoveryConfiguration implements InitializingBean{
     private String id;
     private DiscoveryHitHighlightingConfiguration hitHighlightingConfiguration;
     private DiscoveryMoreLikeThisConfiguration moreLikeThisConfiguration;
-    private boolean spellCheckEnabled;
-
+    private DiscoveryCollapsingConfiguration collapsingConfiguration;
+    
+	private boolean spellCheckEnabled;
+	
+	private boolean globalConfigurationEnabled;
+	
     public String getId() {
         return id;
     }
@@ -53,7 +60,6 @@ public class DiscoveryConfiguration implements InitializingBean{
         return sidebarFacets;
     }
 
-    @Required
     public void setSidebarFacets(List<DiscoverySearchFilterFacet> sidebarFacets) {
         this.sidebarFacets = sidebarFacets;
     }
@@ -82,8 +88,7 @@ public class DiscoveryConfiguration implements InitializingBean{
     public List<DiscoverySearchFilter> getSearchFilters() {
         return searchFilters;
     }
-
-    @Required
+    
     public void setSearchFilters(List<DiscoverySearchFilter> searchFilters) {
         this.searchFilters = searchFilters;
     }
@@ -92,7 +97,6 @@ public class DiscoveryConfiguration implements InitializingBean{
         return searchSortConfiguration;
     }
 
-    @Required
     public void setSearchSortConfiguration(DiscoverySortConfiguration searchSortConfiguration) {
         this.searchSortConfiguration = searchSortConfiguration;
     }
@@ -137,23 +141,39 @@ public class DiscoveryConfiguration implements InitializingBean{
      * @throws Exception throws an exception if this isn't the case
      */
     @Override
-    public void afterPropertiesSet() throws Exception
-    {
-        Collection missingSearchFilters = CollectionUtils.subtract(getSidebarFacets(), getSearchFilters());
-        if(CollectionUtils.isNotEmpty(missingSearchFilters))
-        {
-            StringBuilder error = new StringBuilder();
-            error.append("The following sidebar facet configurations are not present in the search filters list: ");
-            for (Object missingSearchFilter : missingSearchFilters)
-            {
-                DiscoverySearchFilter searchFilter = (DiscoverySearchFilter) missingSearchFilter;
-                error.append(searchFilter.getIndexFieldName()).append(" ");
+	public void afterPropertiesSet() throws Exception {
 
-            }
-            error.append("all the sidebar facets MUST be a part of the search filters list.");
+		StringBuilder error = new StringBuilder();
+		if (getSearchFilters() != null && getSidebarFacets() != null) {
+			Collection missingSearchFilters = CollectionUtils.subtract(getSidebarFacets(), getSearchFilters());
+			if (CollectionUtils.isNotEmpty(missingSearchFilters)) {
 
-            throw new DiscoveryConfigurationException(error.toString());
-        }
+				error.append("The following sidebar facet configurations are not present in the search filters list: ");
+				for (Object missingSearchFilter : missingSearchFilters) {
+					DiscoverySearchFilter searchFilter = (DiscoverySearchFilter) missingSearchFilter;
+					error.append(searchFilter.getIndexFieldName()).append(" ");
 
-    }   
+				}
+				error.append("all the sidebar facets MUST be a part of the search filters list.");
+
+				throw new DiscoveryConfigurationException(error.toString());
+			}
+		}
+	}
+    
+    public DiscoveryCollapsingConfiguration getCollapsingConfiguration() {
+		return collapsingConfiguration;
+	}
+
+	public void setCollapsingConfiguration(DiscoveryCollapsingConfiguration collapsingConfiguration) {
+		this.collapsingConfiguration = collapsingConfiguration;
+	}
+
+	public boolean isGlobalConfigurationEnabled() {
+		return globalConfigurationEnabled;
+	}
+	
+	public void setGlobalConfigurationEnabled(boolean globalConfigurationEnabled) {
+		this.globalConfigurationEnabled = globalConfigurationEnabled;
+	}
 }

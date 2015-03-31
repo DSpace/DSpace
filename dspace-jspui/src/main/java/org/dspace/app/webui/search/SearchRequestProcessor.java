@@ -26,6 +26,10 @@ public interface SearchRequestProcessor
             HttpServletResponse response) throws SearchProcessorException,
             IOException, ServletException;
 
+    public void doGlobalSearch(Context context, HttpServletRequest request,
+            HttpServletResponse response) throws SearchProcessorException,
+            IOException, ServletException;
+    
     public void doOpenSearch(Context context, HttpServletRequest request,
             HttpServletResponse response) throws SearchProcessorException,
             IOException, ServletException;

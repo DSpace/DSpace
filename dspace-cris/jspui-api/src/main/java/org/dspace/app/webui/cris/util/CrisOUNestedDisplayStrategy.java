@@ -7,48 +7,47 @@
  */
 package org.dspace.app.webui.cris.util;
 
+import it.cilea.osd.jdyna.model.Containable;
+import it.cilea.osd.jdyna.model.IContainable;
 
 import java.util.List;
-
-import it.cilea.osd.jdyna.model.Property;
-import it.cilea.osd.jdyna.value.EmbeddedLinkValue;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
+import javax.swing.text.TabExpander;
 
+import org.dspace.app.cris.dao.RPBoxDao;
 import org.dspace.app.cris.model.ACrisObject;
-import org.dspace.app.cris.model.jdyna.RPProperty;
-import org.dspace.app.cris.util.ResearcherPageUtils;
+import org.dspace.app.cris.model.jdyna.BoxOrganizationUnit;
+import org.dspace.app.cris.model.jdyna.BoxResearcherPage;
+import org.dspace.app.cris.model.jdyna.RPNestedObject;
+import org.dspace.app.cris.model.jdyna.RPNestedProperty;
+import org.dspace.app.cris.model.jdyna.TabOrganizationUnit;
+import org.dspace.app.cris.model.jdyna.TabResearcherPage;
+import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.webui.util.ADiscoveryDisplayStrategy;
 import org.dspace.app.webui.util.IDisplayMetadataValueStrategy;
 import org.dspace.browse.BrowseDSpaceObject;
 import org.dspace.browse.BrowseItem;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
-import org.dspace.core.Utils;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.discovery.IGlobalSearchResult;
+import org.dspace.utils.DSpace;
 
-public class CrisLinkDisplayStrategy extends ADiscoveryDisplayStrategy implements IDisplayMetadataValueStrategy
+public class CrisOUNestedDisplayStrategy extends ADiscoveryDisplayStrategy implements
+        IDisplayMetadataValueStrategy
 {
+
+    private DSpace dspace = new DSpace();
 
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
             boolean viewFull, String browseType, int colIdx, String field,
             DCValue[] metadataArray, BrowseItem item,
             boolean disableCrossLinks, boolean emph, PageContext pageContext)
     {
-        String metadata = "";
-        if (metadataArray.length > 0)
-        {
-        	String[] splitted = metadataArray[0].value.split("\\|\\|\\|");
-		    if (splitted.length > 2)
-		    {
-		        throw new IllegalArgumentException("Invalid text string for link: "+ metadataArray[0].value);
-		    }
-		    
-		    metadata = (splitted.length == 2?"<a href=\""+splitted[1]+"\">"+splitted[1]+"</a>":splitted[0]);
-        }
-        return metadata;
+    	return null;
     }
 
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
@@ -77,22 +76,33 @@ public class CrisLinkDisplayStrategy extends ADiscoveryDisplayStrategy implement
     {
         return null;
     }
-    
+
 	@Override
 	public String getMetadataDisplay(HttpServletRequest hrq, int limit, boolean viewFull, String browseType,
 			int colIdx, String field, List<String> metadataArray, IGlobalSearchResult item, boolean disableCrossLinks,
 			boolean emph, PageContext pageContext) throws JspException {
-        String metadata = "";
-        if (metadataArray.size() > 0)
+        ACrisObject crisObject = (ACrisObject)item;
+        String[] splitted = field.split("\\.");
+        //FIXME apply aspectjproxy???
+        ApplicationService applicationService = dspace.getServiceManager()
+                .getServiceByName("applicationService",
+                        ApplicationService.class);
+        
+        List<BoxOrganizationUnit> box = applicationService.findBoxesByTTP(BoxOrganizationUnit.class, crisObject.getClassTypeNested(), splitted[0]);
+        
+        for (BoxOrganizationUnit ano : box)
         {
-        	String[] splitted = metadataArray.get(0).split("\\|\\|\\|");
-		    if (splitted.length > 2)
-		    {
-		        throw new IllegalArgumentException("Invalid text string for link: "+ metadataArray.get(0));
-		    }
-		    
-		    metadata = (splitted.length == 2?"<a href=\""+splitted[1]+"\">"+splitted[1]+"</a>":splitted[0]);
+        	List<TabOrganizationUnit> tabs = applicationService.getList(TabOrganizationUnit.class);
+        	for(TabOrganizationUnit tab : tabs) {
+    			String prefix = ConfigurationManager.getProperty("crisounested.box." + ano.getShortName() +".prefix");
+    			if(prefix==null) {
+    				prefix = "#";
+    			}
+    			return "<a href=\"cris/"+ crisObject.getPublicPath() +"/"+ crisObject.getCrisID() +"/"+tab.getShortName()+".html" + prefix + ano.getShortName() + "\">" + metadataArray.get(0) +"</a>";
+        	}
+            
         }
-        return metadata;
+        return metadataArray.get(0);
 	}
 }
+

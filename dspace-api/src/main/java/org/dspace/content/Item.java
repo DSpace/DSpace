@@ -35,6 +35,7 @@ import org.dspace.core.LogManager;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.MetadataAuthorityManager;
+import org.dspace.discovery.IGlobalSearchResult;
 import org.dspace.event.Event;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -61,7 +62,7 @@ import org.dspace.versioning.VersioningService;
  * @author Martin Hald
  * @version $Revision$
  */
-public class Item extends DSpaceObject implements BrowsableDSpaceObject
+public class Item extends DSpaceObject implements BrowsableDSpaceObject, IGlobalSearchResult
 {
     /**
      * Wild card for Dublin Core metadata qualifiers/languages
@@ -158,7 +159,7 @@ public class Item extends DSpaceObject implements BrowsableDSpaceObject
 
         if (fromCache != null)
         {
-            return fromCache;
+            return fromCache.getWrapper();
         }
 
         TableRow row = DatabaseManager.find(context, "item", id);
@@ -181,7 +182,8 @@ public class Item extends DSpaceObject implements BrowsableDSpaceObject
                     + id));
         }
 
-        return new Item(context, row);
+        Item item = new Item(context, row);
+        return item.getWrapper();
     }
 
     /**
@@ -589,6 +591,14 @@ public class Item extends DSpaceObject implements BrowsableDSpaceObject
         }
         
         return values;
+    }
+    
+    public List<String> getMetadataValue(String mdString) {
+    	List<String> results = new ArrayList<String>();
+    	for(DCValue dcValue : getMetadata(mdString)) {
+    		results.add(dcValue.value);
+    	}
+    	return results;
     }
 
     /**
@@ -2856,4 +2866,9 @@ public class Item extends DSpaceObject implements BrowsableDSpaceObject
 				.getSingletonService(ItemWrapperIntegration.class);
         return wrapperService.getWrapper(this);    
     }
+
+	@Override
+	public DCValue[] getMetadataValueInDCFormat(String mdString) {
+		return getMetadata(mdString);
+	}
 }

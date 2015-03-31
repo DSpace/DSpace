@@ -58,6 +58,8 @@ public class DiscoverQuery
     private Map<String, List<String>> properties;
     private List<String> fields;
     
+    private Map<String, List<DiscoverViewField>> viewFields;
+    
     public DiscoverQuery()
     {
         // Initialize all our lists
@@ -70,7 +72,9 @@ public class DiscoverQuery
         this.hitHighlighting = new HashMap<String, DiscoverHitHighlightingField>();
         //Use a linked hashmap since sometimes insertion order might matter
         this.properties = new LinkedHashMap<String, List<String>>();
-		this.fields = new ArrayList<String>();        
+		this.fields = new ArrayList<String>();       
+		
+		this.viewFields = new LinkedHashMap<String, List<DiscoverViewField>>();
     }
 
     public void setQuery(String query)
@@ -369,5 +373,18 @@ public class DiscoverQuery
 	public List<String> getFields() {
 		return fields;
 	}
-    
+
+    public List<DiscoverViewField> getViewFields(String type)
+    {
+        return viewFields.get(type);
+    }
+
+    public void addViewField(String key,
+    		DiscoverViewField viewFields)
+    {
+    	if(getViewFields(key)==null) {
+    		this.viewFields.put(key, new ArrayList<DiscoverViewField>());
+    	}
+        this.viewFields.get(key).add(viewFields);
+    }
 }

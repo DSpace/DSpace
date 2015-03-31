@@ -266,14 +266,6 @@ public class BrowseListTag extends TagSupport
                     .getProperty("webui.itemlist." + config + ".widths");
         }
 
-        if (browseListLine == null)
-        {
-            browseListLine = ConfigurationManager
-                    .getProperty("webui.itemlist.columns");
-            browseWidthLine = ConfigurationManager
-                    .getProperty("webui.itemlist.widths");
-        }
-
         // Have we read a field configration from dspace.cfg?
         if (browseListLine != null)
         {
@@ -340,10 +332,16 @@ public class BrowseListTag extends TagSupport
                 browseWidthLine = ConfigurationManager
                         .getProperty("webui.itemlist.crisdo.widths");
             }
-            else
+            else 
             {
-                browseListLine = DEFAULT_LIST_FIELDS;
-                browseWidthLine = DEFAULT_LIST_WIDTHS;
+				browseListLine = ConfigurationManager
+						.getProperty("webui.itemlist.columns");
+				browseWidthLine = ConfigurationManager
+						.getProperty("webui.itemlist.widths");
+				if (browseListLine == null) {
+					browseListLine = DEFAULT_LIST_FIELDS;
+					browseWidthLine = DEFAULT_LIST_WIDTHS;
+				}
             }
         }
 
