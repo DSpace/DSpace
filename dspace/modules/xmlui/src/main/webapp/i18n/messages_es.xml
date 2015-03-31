@@ -95,7 +95,7 @@
 <message key="xmlui.cicdigital.discoveryList.no-value.lugar-de-desarrollo">sin lugar de desarrollo asignado</message>
 <message key="xmlui.cicdigital.discoveryList.no-value.dcterms-issued">Sin fecha</message>
 <message key="xmlui.cicdigital.discoveryList.no-value.dcterms-creators">No existen autores asignados</message>
-<message key="xmlui.cicdigital.discoveryList.no-value.dcterms-type-subtype">Sin subtipo asignado</message>
+<message key="xmlui.cicdigital.discoveryList.no-value.dcterms-type-type">Sin tipo asignado</message>
 <message key="xmlui.cicdigital.discoveryList.no-value.dcterms.abstract">Sin resumen asignado</message>
 
 	<!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -140,7 +140,7 @@
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.search_type">Tipo de búsqueda</message>
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.search_for">Buscar por</message>
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_author">Autor</message>
-<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_subtype">Tipo de Documento</message>
+<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_type">Tipo de Documento</message>
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dateIssued">Fecha de Publicación</message>
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_title">Título</message>
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_subject">Materia</message>
@@ -299,7 +299,7 @@
 <message key="xmlui.ArtifactBrowser.SimpleSearch.head">Buscar</message>
 <message key="xmlui.ArtifactBrowser.SimpleSearch.search_scope">Ámbito de búsqueda</message>
 <message key="xmlui.ArtifactBrowser.SimpleSearch.full_text_search">Búsqueda a texto completo</message>
-<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subtype">Tipo de documento</message>
+<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.type">Tipo de documento</message>
 <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.author">Autor</message>
 <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subject">Materia</message>
 <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dateIssued">Fecha de Publicación</message>
@@ -2045,7 +2045,7 @@ Puede reemplazar la plantilla que gestiona el caso general dri2xhtml para mejora
 <message key="xmlui.dri2xhtml.METS-1.0.item-subject">Materia</message>
 
 <!-- dcterms metadata -->
-<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms_type_subtype">Subtipo</message>
+<!--  <message key="xmlui.dri2xhtml.METS-1.0.item-dcterms_type_subtype">Subtipo</message> -->
 <message key="xmlui.dri2xhtml.METS-1.0.item-dcterms_alternative">Título alternativo</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-dcterms_title_investigacion">Título de investigación</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-dcterms_creator_corporate">Autor institucional</message>

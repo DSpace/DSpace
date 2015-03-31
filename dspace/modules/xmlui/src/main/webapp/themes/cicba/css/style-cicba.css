@@ -361,8 +361,7 @@ p.intro-text > a {
 	font-weight: bold;
 }
 
-.discovery-list-results .metadata-cic_lugarDeDesarrollo ,
-.discovery-list-results .metadata-dcterms_type_subtype{
+.discovery-list-results .metadata-cic_lugarDeDesarrollo {
 /* float: right; */
 	background-color: #badfe5;
 	color: #509296;

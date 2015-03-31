@@ -98,7 +98,7 @@
 <message key="xmlui.cicdigital.discoveryList.no-value.lugar-de-desarrollo">No place of development assigned</message>
 <message key="xmlui.cicdigital.discoveryList.no-value.dcterms-issued">No issue date assigned</message>
 <message key="xmlui.cicdigital.discoveryList.no-value.dcterms-creators">No authors assigned</message>
-<message key="xmlui.cicdigital.discoveryList.no-value.dcterms-type-subtype">No subtype assigned</message>
+<message key="xmlui.cicdigital.discoveryList.no-value.dcterms-type-type">No type assigned</message>
 <message key="xmlui.cicdigital.discoveryList.no-value.dcterms.abstract">No abstract assigned</message>
 	<!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -142,7 +142,7 @@
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.search_type">Search type</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.search_for">Search for</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_author">Author</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_subtype">Document type</message>
+	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_type">Document type</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_title">Title</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_subject">Subject</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_abstract">Abstract</message>
@@ -296,7 +296,7 @@
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.head">Search</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.search_scope">Search Scope</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.full_text_search">Full Text Search</message>
-	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subtype">Document type</message>
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.type">Document type</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.keyword">Keyword</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.RestrictedItem.java -->
@@ -2248,7 +2248,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-subject">Subject</message>
 	
 		<!-- dcterms metadata -->
-	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms_type_subtype">Subtype</message>
+	<!--  <message key="xmlui.dri2xhtml.METS-1.0.item-dcterms_type_subtype">Subtype</message> -->
 	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms_alternative">Alternative title</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms_title_investigacion">Investigation title</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-dcterms_creator_corporate">Insitutional author</message>
