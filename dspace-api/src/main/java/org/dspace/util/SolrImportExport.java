@@ -18,7 +18,6 @@ import org.apache.solr.client.solrj.request.AbstractUpdateRequest;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.client.solrj.request.LukeRequest;
-import org.apache.solr.client.solrj.response.CoreAdminResponse;
 import org.apache.solr.client.solrj.response.LukeResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.luke.FieldFlag;
@@ -29,9 +28,9 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Utility class to export, clear and import Solr indexes.
@@ -40,11 +39,22 @@ import java.util.Map;
 public class SolrImportExport
 {
 
-	public static final String HELP_OPTION = "h";
-	public static final String INDEX_NAME_OPTION = "i";
-	public static final String ACTION_OPTION = "a";
-	public static final String DIRECTORY_OPTION = "d";
+	private static final DateFormat SOLR_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+	private static final DateFormat EXPORT_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
+
+	static
+	{
+		SOLR_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
+		EXPORT_DATE_FORMAT.setTimeZone(TimeZone.getDefault());
+	}
+
+	private static final String ACTION_OPTION = "a";
 	private static final String CLEAR_OPTION = "c";
+	private static final String DIRECTORY_OPTION = "d";
+	private static final String HELP_OPTION = "h";
+	private static final String INDEX_NAME_OPTION = "i";
+	private static final String KEEP_OPTION = "k";
+	private static final String LAST_OPTION = "l";
 
 	public static final int ROWS_PER_FILE = 10_000;
 
@@ -58,15 +68,7 @@ public class SolrImportExport
 	public static void main(String[] args) throws ParseException
 	{
 		CommandLineParser parser = new PosixParser();
-		Options options = new Options();
-		options.addOption(HELP_OPTION, "help", false, "Get help on options for this command.");
-		options.addOption(INDEX_NAME_OPTION, "index-name", true,
-				                 "The names of the indexes to process. At least one is required. Available indexes are: authority, statistics.");
-		options.addOption(ACTION_OPTION, "action", true,
-				                 "The action to perform: import or export. Default: export.");
-		options.addOption(CLEAR_OPTION, "clear", false, "When importing, also clear the index first. Ignored when action is export.");
-		options.addOption(DIRECTORY_OPTION, "directory", true,
-				                 "The absolute path for the directory to use for import or export. If none is given, [dspace]/solr-export is used.");
+		Options options = makeOptions();
 
 		try
 		{
@@ -83,6 +85,8 @@ public class SolrImportExport
 			}
 			String[] indexNames = line.getOptionValues(INDEX_NAME_OPTION);
 
+			String exportDir = makeDirectoryName(line.getOptionValue(DIRECTORY_OPTION));
+
 			String action = line.getOptionValue(ACTION_OPTION, "export");
 			if ("import".equals(action))
 			{
@@ -90,9 +94,8 @@ public class SolrImportExport
 				{
 					try
 					{
-						String fromDir = makeDirectoryName(line.getOptionValue(DIRECTORY_OPTION));
 						String solrUrl = makeSolrUrl(indexName);
-						importIndex(indexName, fromDir, line.hasOption(CLEAR_OPTION), solrUrl);
+						importIndex(indexName, exportDir, line.hasOption(CLEAR_OPTION), solrUrl);
 					}
 					catch (IOException | SolrServerException | SolrImportExportException e)
 					{
@@ -105,12 +108,12 @@ public class SolrImportExport
 			{
 				for (String indexName : indexNames)
 				{
+					String lastValue = line.getOptionValue(LAST_OPTION);
 					try
 					{
-						String toDir = makeDirectoryName(line.getOptionValue(DIRECTORY_OPTION));
 						String solrUrl = makeSolrUrl(indexName);
 						String timeField = makeTimeField(indexName);
-						exportIndex(indexName, toDir, solrUrl, timeField);
+						exportIndex(indexName, exportDir, solrUrl, timeField, lastValue);
 					}
 					catch (SolrServerException | IOException | SolrImportExportException e)
 					{
@@ -124,7 +127,8 @@ public class SolrImportExport
 				for (String indexName : indexNames)
 				{
 					try {
-						reindex(line, indexName);
+						boolean keepExport = line.hasOption(KEEP_OPTION);
+						reindex(indexName, exportDir, keepExport);
 					} catch (IOException | SolrServerException | SolrImportExportException e) {
 						e.printStackTrace();
 					}
@@ -132,7 +136,7 @@ public class SolrImportExport
 			}
 			else
 			{
-				System.err.println("Unknown action " + action + "; must be import, export or clear.");
+				System.err.println("Unknown action " + action + "; must be import, export or reindex.");
 				printHelpAndExit(options, 1);
 			}
 		}
@@ -143,13 +147,33 @@ public class SolrImportExport
 		}
 	}
 
+	private static Options makeOptions() {
+		Options options = new Options();
+		options.addOption(ACTION_OPTION, "action", true, "The action to perform: import, export or reindex. Default: export.");
+		options.addOption(CLEAR_OPTION, "clear", false, "When importing, also clear the index first. Ignored when action is export or reindex.");
+		options.addOption(DIRECTORY_OPTION, "directory", true,
+				                 "The absolute path for the directory to use for import or export. If none is given, [dspace]/solr-export is used.");
+		options.addOption(HELP_OPTION, "help", false, "Get help on options for this command.");
+		options.addOption(INDEX_NAME_OPTION, "index-name", true,
+				                 "The names of the indexes to process. At least one is required. Available indexes are: authority, statistics.");
+		options.addOption(KEEP_OPTION, "keep", false, "When reindexing, keep the contents of the data export directory." +
+				                                              " By default, the contents of this directory will be deleted once the reindex has finished." +
+				                                              " Ignored when action is export or import.");
+		options.addOption(LAST_OPTION, "last", true, "When exporting, export records from the last [timeperiod] only." +
+				                                             " This can be one of: 'd' (previous day); 'w' (previous week); 'm' (previous month);" +
+				                                             " a number, in which case the last [number] of days are exported." +
+				                                             " By default, all documents are exported.");
+		return options;
+	}
+
 	/**
 	 * Reindexes the specified core
-	 * @param line the command line options
+	 *
 	 * @param indexName the name of the core to reindex
+	 * @param exportDir the directory to use for export
+	 * @param keepExport whether to keep the contents of the exportDir after the reindex. If false, this directory will be deleted at the end of the reimport.
 	 */
-	private static void reindex(CommandLine line, String indexName) throws IOException, SolrServerException, SolrImportExportException {
-		// TODO increase resiliency / improve error handling
+	private static void reindex(String indexName, String exportDir, boolean keepExport) throws IOException, SolrServerException, SolrImportExportException {
 		String tempIndexName = indexName + "-temp";
 
 		String origSolrUrl = makeSolrUrl(indexName);
@@ -163,13 +187,11 @@ public class SolrImportExport
 		File solrInstance = new File(solrInstanceDir);
 		if (!solrInstance.exists() || !solrInstance.canRead() || !solrInstance.isDirectory())
 		{
-			System.err.println("Directory " + solrInstanceDir + "/conf/ doesn't exist or isn't readable." +
+			throw new SolrImportExportException("Directory " + solrInstanceDir + "/conf/ doesn't exist or isn't readable." +
 					                   " The reindexing process requires the solr configuration directory for this index to be present on the local machine" +
 					                   " even if the Solr is running on a different host. Not reindexing index " + indexName);
-			return;
 		}
 
-		String exportDir = makeDirectoryName(line.getOptionValue(DIRECTORY_OPTION)); // TODO optionally, keep the export?
 		String timeField = makeTimeField(indexName);
 
 		// Create a temp directory to store temporary core data
@@ -190,7 +212,8 @@ public class SolrImportExport
 			createRequest.setCoreName(tempIndexName);
 
 			int responseCode = createRequest.process(adminSolr).getStatus();
-			if (responseCode != 0) {
+			if (responseCode != 0)
+			{
 				// the "process" call has probably thrown an exception already -- throw this just in case
 				throw new SolrImportExportException("Could not create temporary core on Solr server " + baseSolrUrl + ", code was: " + responseCode);
 			}
@@ -230,15 +253,36 @@ public class SolrImportExport
 			// unload now-temp core (temp core name)
 			CoreAdminRequest.unloadCore(tempIndexName, false, false, adminSolr);
 
+			if (!keepExport)
+			{
+				FileUtils.deleteDirectory(new File(exportDir));
+			}
 		}
-		finally {
+		finally
+		{
 			// clean up
 			FileUtils.deleteDirectory(tempDataDir);
 		}
 	}
 
 	/**
+	 * Exports all documents in the given index to the specified target directory in batches of #ROWS_PER_FILE.
+	 * See #makeExportFilename for the file names that are generated.
 	 *
+	 * @param indexName The index to export.
+	 * @param toDir The target directory for the export. Will be created if it doesn't exist yet. The directory must be writeable.
+	 * @param solrUrl The solr URL for the index to export. Must not be null.
+	 * @param timeField The time field to use for sorting the export. Must not be null.
+	 * @throws SolrServerException if there is a problem with exporting the index.
+	 * @throws IOException if there is a problem creating the files or communicating with Solr.
+	 * @throws SolrImportExportException if there is a problem in communicating with Solr.
+	 */
+	public static void exportIndex(String indexName, String toDir, String solrUrl, String timeField) throws SolrServerException, SolrImportExportException, IOException {
+		exportIndex(indexName, toDir, solrUrl, timeField, null);
+	}
+
+	/**
+	 * Import previously exported documents (or externally created CSV files that have the appropriate structure) into the specified index.
 	 * @param indexName the index to import.
 	 * @param fromDir the source directory.
 	 *                   The importer will look for files whose name starts with <pre>indexName</pre>
@@ -249,7 +293,8 @@ public class SolrImportExport
 	 * @throws SolrServerException if there is a problem reading the files or communicating with Solr.
 	 * @throws SolrImportExportException if there is a problem communicating with Solr.
 	 */
-	public static void importIndex(final String indexName, String fromDir, boolean clear, String solrUrl) throws IOException, SolrServerException, SolrImportExportException {
+	public static void importIndex(final String indexName, String fromDir, boolean clear, String solrUrl) throws IOException, SolrServerException, SolrImportExportException
+	{
 		if (StringUtils.isBlank(solrUrl))
 		{
 			throw new SolrImportExportException("Could not construct solr URL for index" + indexName + ", aborting export.");
@@ -348,18 +393,19 @@ public class SolrImportExport
 	}
 
 	/**
-	 * Exports all documents in the given index to the specified target directory in batches of #ROWS_PER_FILE.
+	 * Exports documents from the given index to the specified target directory in batches of #ROWS_PER_FILE, starting at lastValue (or all documents).
 	 * See #makeExportFilename for the file names that are generated.
 	 *
 	 * @param indexName The index to export.
 	 * @param toDir The target directory for the export. Will be created if it doesn't exist yet. The directory must be writeable.
 	 * @param solrUrl The solr URL for the index to export. Must not be null.
 	 * @param timeField The time field to use for sorting the export. Must not be null.
+	 * @param lastValue Optionally, from when to export. See options for allowed values. If null or empty, all documents will be exported.
 	 * @throws SolrServerException if there is a problem with exporting the index.
 	 * @throws IOException if there is a problem creating the files or communicating with Solr.
 	 * @throws SolrImportExportException if there is a problem in communicating with Solr.
 	 */
-	public static void exportIndex(String indexName, String toDir, String solrUrl, String timeField) throws SolrServerException, IOException, SolrImportExportException
+	public static void exportIndex(String indexName, String toDir, String solrUrl, String timeField, String lastValue) throws SolrServerException, IOException, SolrImportExportException
 	{
 		if (StringUtils.isBlank(solrUrl))
 		{
@@ -387,12 +433,24 @@ public class SolrImportExport
 		query.set("wt", "csv");
 		query.set("fl", "*");
 		query.setSort(timeField, SolrQuery.ORDER.asc);
-		// TODO introduce offset
-		for (int i = 0; i < totalRecords; i+= ROWS_PER_FILE) {
+
+		if (StringUtils.isNotBlank(lastValue))
+		{
+			String lastValueFilter = makeFilterQuery(timeField, lastValue);
+			if (StringUtils.isNotBlank(lastValueFilter))
+			{
+				query.addFilterQuery(lastValueFilter);
+			}
+		}
+
+		Date exportStart = new Date();
+
+		for (int i = 0; i < totalRecords; i+= ROWS_PER_FILE)
+		{
 			query.setStart(i);
 			URL url = new URL(solrUrl + "/select?" + query.toString());
 
-			File file = new File(targetDir.getCanonicalPath(), makeExportFilename(indexName, totalRecords, i));
+			File file = new File(targetDir.getCanonicalPath(), makeExportFilename(indexName, exportStart, totalRecords, i));
 			if (file.createNewFile())
 			{
 				FileUtils.copyURLToFile(url, file);
@@ -400,7 +458,46 @@ public class SolrImportExport
 			}
 			else
 			{
-				log.error("Could not create file " + file.getCanonicalPath() + " while exporting index " + indexName + ", batch " + i);
+				throw new SolrImportExportException("Could not create file " + file.getCanonicalPath() + " while exporting index " + indexName + ", batch " + i);
+			}
+		}
+	}
+
+	/**
+	 * Return a filter query that represents the export date range passed in as lastValue
+	 * @param timeField the time field to use for the date range
+	 * @param lastValue the requested date range, see options for acceptable values
+	 * @return a filter query representing the date range, or null if no suitable date range can be created.
+	 */
+	private static String makeFilterQuery(String timeField, String lastValue) {
+		if ("d".equals(lastValue))
+		{
+			// export yesterday's data
+			return timeField + ":[NOW/DAY-1DAY TO " + SOLR_DATE_FORMAT.format(new Date()) + "]";
+		}
+		else if ("w".equals(lastValue))
+		{
+			// export data from the previous week
+			return timeField + ":[NOW/WEEK-1WEEK TO NOW/WEEK]";
+		}
+		else if ("m".equals(lastValue))
+		{
+			// export data from the previous month
+			return timeField + ":[NOW/MONTH-1MONTH TO NOW/MONTH]";
+		}
+		else
+		{
+			// other acceptable value: a number, specifying how many days back to export
+			Integer days;
+			try
+			{
+				days = Integer.valueOf(lastValue);
+				return timeField + ":[NOW/DAY-" + days + "DAYS TO " + SOLR_DATE_FORMAT.format(new Date()) + "]";
+			}
+			catch (NumberFormatException e)
+			{
+				log.info("Cannot parse last value " + lastValue + ", was expecting number of days but got " + lastValue);
+				return null;
 			}
 		}
 	}
@@ -420,7 +517,16 @@ public class SolrImportExport
 		return ConfigurationManager.getProperty("dspace.dir") + File.separator + "solr-export" + File.separator;
 	}
 
-	private static String makeExportFilename(String indexName, long totalRecords, int index)
+	/**
+	 * Creates a filename for the export batch.
+	 *
+	 * @param indexName The name of the index being exported.
+	 * @param exportStart The start timestamp of the export
+	 * @param totalRecords The total number of records in the export.
+	 * @param index The index of the current batch.
+	 * @return A file name that is appropriate to use for exporting the batch of data described by the parameters.
+	 */
+	private static String makeExportFilename(String indexName, Date exportStart, long totalRecords, int index)
 	{
         String exportFileNumber = "";
 		if (totalRecords > ROWS_PER_FILE) {
@@ -428,6 +534,8 @@ public class SolrImportExport
 		}
 		return indexName
 				       + "_export_"
+					   + EXPORT_DATE_FORMAT.format(exportStart)
+					   + "_"
 				       + exportFileNumber
 				       + ".csv";
 	}
