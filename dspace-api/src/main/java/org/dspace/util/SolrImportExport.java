@@ -152,7 +152,7 @@ public class SolrImportExport
 		options.addOption(ACTION_OPTION, "action", true, "The action to perform: import, export or reindex. Default: export.");
 		options.addOption(CLEAR_OPTION, "clear", false, "When importing, also clear the index first. Ignored when action is export or reindex.");
 		options.addOption(DIRECTORY_OPTION, "directory", true,
-				                 "The absolute path for the directory to use for import or export. If none is given, [dspace]/solr-export is used.");
+				                 "The absolute path for the directory to use for import or export. If omitted, [dspace]/solr-export is used.");
 		options.addOption(HELP_OPTION, "help", false, "Get help on options for this command.");
 		options.addOption(INDEX_NAME_OPTION, "index-name", true,
 				                 "The names of the indexes to process. At least one is required. Available indexes are: authority, statistics.");
@@ -160,9 +160,10 @@ public class SolrImportExport
 				                                              " By default, the contents of this directory will be deleted once the reindex has finished." +
 				                                              " Ignored when action is export or import.");
 		options.addOption(LAST_OPTION, "last", true, "When exporting, export records from the last [timeperiod] only." +
-				                                             " This can be one of: 'd' (previous day); 'w' (previous week); 'm' (previous month);" +
-				                                             " a number, in which case the last [number] of days are exported." +
-				                                             " By default, all documents are exported.");
+				                                             " This can be one of: 'd' (beginning of yesterday through to now);" +
+				                                             " 'm' (beginning of the previous month through to end of the previous month);" +
+				                                             " a number, in which case the last [number] of days are exported, through to now (use 0 for today's data)." +
+															 " Date calculation is done in UTC. If omitted, all documents are exported.");
 		return options;
 	}
 
@@ -424,6 +425,14 @@ public class SolrImportExport
 		}
 
 		SolrQuery query = new SolrQuery("*:*");
+		if (StringUtils.isNotBlank(lastValue))
+		{
+			String lastValueFilter = makeFilterQuery(timeField, lastValue);
+			if (StringUtils.isNotBlank(lastValueFilter))
+			{
+				query.addFilterQuery(lastValueFilter);
+			}
+		}
 
 		HttpSolrServer solr = new HttpSolrServer(solrUrl);
 		SolrDocumentList results = solr.query(query).getResults();
@@ -433,15 +442,6 @@ public class SolrImportExport
 		query.set("wt", "csv");
 		query.set("fl", "*");
 		query.setSort(timeField, SolrQuery.ORDER.asc);
-
-		if (StringUtils.isNotBlank(lastValue))
-		{
-			String lastValueFilter = makeFilterQuery(timeField, lastValue);
-			if (StringUtils.isNotBlank(lastValueFilter))
-			{
-				query.addFilterQuery(lastValueFilter);
-			}
-		}
 
 		Date exportStart = new Date();
 
@@ -470,36 +470,23 @@ public class SolrImportExport
 	 * @return a filter query representing the date range, or null if no suitable date range can be created.
 	 */
 	private static String makeFilterQuery(String timeField, String lastValue) {
-		if ("d".equals(lastValue))
-		{
-			// export yesterday's data
-			return timeField + ":[NOW/DAY-1DAY TO " + SOLR_DATE_FORMAT.format(new Date()) + "]";
-		}
-		else if ("w".equals(lastValue))
-		{
-			// export data from the previous week
-			return timeField + ":[NOW/WEEK-1WEEK TO NOW/WEEK]";
-		}
-		else if ("m".equals(lastValue))
+		if ("m".equals(lastValue))
 		{
 			// export data from the previous month
 			return timeField + ":[NOW/MONTH-1MONTH TO NOW/MONTH]";
 		}
+
+		int days;
+		if ("d".equals(lastValue))
+		{
+			days = 1;
+		}
 		else
 		{
 			// other acceptable value: a number, specifying how many days back to export
-			Integer days;
-			try
-			{
-				days = Integer.valueOf(lastValue);
-				return timeField + ":[NOW/DAY-" + days + "DAYS TO " + SOLR_DATE_FORMAT.format(new Date()) + "]";
-			}
-			catch (NumberFormatException e)
-			{
-				log.info("Cannot parse last value " + lastValue + ", was expecting number of days but got " + lastValue);
-				return null;
-			}
+			days = Integer.valueOf(lastValue); // TODO check value?
 		}
+		return timeField + ":[NOW/DAY-" + days + "DAYS TO " + SOLR_DATE_FORMAT.format(new Date()) + "]";
 	}
 
 	/**
