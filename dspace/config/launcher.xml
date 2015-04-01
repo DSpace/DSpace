@@ -246,6 +246,24 @@
         </step>
     </command>
     <command>
+        <name>solr-export</name>
+        <description>Export data from Solr</description>
+        <step passuserargs="true">
+            <class>org.dspace.util.SolrImportExport</class>
+	    <argument>-a</argument>
+	    <argument>export</argument>
+        </step>
+    </command>
+    <command>
+        <name>solr-import</name>
+        <description>Import data to Solr</description>
+        <step passuserargs="true">
+            <class>org.dspace.util.SolrImportExport</class>
+	    <argument>-a</argument>
+	    <argument>import</argument>
+        </step>
+    </command>
+    <command>
         <name>stat-general</name>
         <description>Compile the general statistics</description>
         <step passuserargs="false">
