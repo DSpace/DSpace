@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.xmlui.aspect.administrative.group;
+package org.dspace.app.xmlui.aspect.administrative.etd_departments;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -20,82 +20,79 @@ import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.eperson.Group;
+import org.dspace.content.EtdUnit;
 
 /**
- * Present the user with a list of soon-to-be-deleted Groups. If the user clicks
- * confirm deletition then they will be deleted otherwise they will be spared
- * the wrath of deletion.
+ * Present the user with a list of soon-to-be-deleted ETD Departments. If the
+ * user clicks confirm deletion then they will be deleted otherwise they will be
+ * spared the wrath of deletion.
  *
  * @author Scott Phillips
  */
-public class DeleteDepartmentsConfirm extends AbstractDSpaceTransformer
+public class DeleteETDDepartmentsConfirm extends AbstractDSpaceTransformer
 {
     /** Language Strings */
     private static final Message T_dspace_home = message("xmlui.general.dspace_home");
 
-    private static final Message T_group_trail = message("xmlui.administrative.group.general.group_trail");
+    private static final Message T_etd_department_trail = message("xmlui.administrative.etd_departments.general.etd_department_trail");
 
-    private static final Message T_title = message("xmlui.administrative.group.DeleteGroupsConfirm.title");
+    private static final Message T_title = message("xmlui.administrative.etd_departments.DeleteETDDepartmentsConfirm.title");
 
-    private static final Message T_trail = message("xmlui.administrative.group.DeleteGroupsConfirm.trail");
+    private static final Message T_trail = message("xmlui.administrative.etd_departments.DeleteETDDepartmentsConfirm.trail");
 
-    private static final Message T_head = message("xmlui.administrative.group.DeleteGroupsConfirm.head");
+    private static final Message T_head = message("xmlui.administrative.etd_departments.DeleteETDDepartmentsConfirm.head");
 
-    private static final Message T_para = message("xmlui.administrative.group.DeleteGroupsConfirm.para");
+    private static final Message T_para = message("xmlui.administrative.etd_departments.DeleteETDDepartmentsConfirm.para");
 
-    private static final Message T_column1 = message("xmlui.administrative.group.DeleteGroupsConfirm.column1");
+    private static final Message T_column1 = message("xmlui.administrative.etd_departments.DeleteETDDepartmentsConfirm.column1");
 
-    private static final Message T_column2 = message("xmlui.administrative.group.DeleteGroupsConfirm.column2");
-
-    private static final Message T_column3 = message("xmlui.administrative.group.DeleteGroupsConfirm.column3");
-
-    private static final Message T_column4 = message("xmlui.administrative.group.DeleteGroupsConfirm.column4");
+    private static final Message T_column2 = message("xmlui.administrative.etd_departments.DeleteETDDepartmentsConfirm.column2");
 
     private static final Message T_submit_confirm = message("xmlui.general.delete");
 
     private static final Message T_submit_cancel = message("xmlui.general.cancel");
 
+    @Override
     public void addPageMeta(PageMeta pageMeta) throws WingException
     {
         pageMeta.addMetadata("title").addContent(T_title);
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
-        pageMeta.addTrailLink(contextPath + "/admin/groups", T_group_trail);
+        pageMeta.addTrailLink(contextPath + "/admin/etd_departments",
+                T_etd_department_trail);
         pageMeta.addTrail().addContent(T_trail);
     }
 
+    @Override
     public void addBody(Body body) throws WingException, SQLException,
             AuthorizeException
     {
-        String idsString = parameters.getParameter("groupIDs", null);
+        String idsString = parameters.getParameter("etd_departmentIDs", null);
 
-        ArrayList<Group> groups = new ArrayList<Group>();
+        ArrayList<EtdUnit> etd_departments = new ArrayList<EtdUnit>();
         for (String id : idsString.split(","))
         {
-            Group group = Group.find(context, Integer.valueOf(id));
-            groups.add(group);
+            EtdUnit etd_department = EtdUnit.find(context, Integer.valueOf(id));
+            etd_departments.add(etd_department);
         }
 
-        Division deleted = body.addInteractiveDivision("group-confirm-delete",
-                contextPath + "/admin/epeople", Division.METHOD_POST,
-                "primary administrative groups");
+        Division deleted = body.addInteractiveDivision(
+                "etd_department-confirm-delete", contextPath
+                        + "/admin/etd_departments", Division.METHOD_POST,
+                "primary administrative etd_departments");
         deleted.setHead(T_head);
         deleted.addPara(T_para);
 
-        Table table = deleted.addTable("groups-list", groups.size() + 1, 3);
+        Table table = deleted.addTable("etd_departments-list",
+                etd_departments.size() + 1, 3);
         Row header = table.addRow(Row.ROLE_HEADER);
         header.addCell().addContent(T_column1);
         header.addCell().addContent(T_column2);
-        header.addCell().addContent(T_column3);
-        header.addCell().addContent(T_column4);
 
-        for (Group group : groups)
+        for (EtdUnit etd_department : etd_departments)
         {
             Row row = table.addRow();
-            row.addCell().addContent(group.getID());
-            row.addCell().addContent(group.getName());
-            row.addCell().addContent(group.getMembers().length);
-            row.addCell().addContent(group.getMemberGroups().length);
+            row.addCell().addContent(etd_department.getID());
+            row.addCell().addContent(etd_department.getName());
         }
 
         Para buttons = deleted.addPara();

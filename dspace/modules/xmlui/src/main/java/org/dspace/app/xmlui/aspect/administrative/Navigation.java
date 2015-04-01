@@ -210,6 +210,7 @@ public class Navigation extends AbstractDSpaceTransformer implements
         return this.validity;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public void setup(SourceResolver resolver, Map objectModel, String src,
             Parameters parameters) throws ProcessingException, SAXException,
@@ -365,7 +366,7 @@ public class Navigation extends AbstractDSpaceTransformer implements
             drum.addItemXref(contextPath + "/monthly-statistics",
                     T_DRUM_monthly_statistics);
             drum.addItemXref(contextPath + "/embargo-list", T_DRUM_embargo_list);
-            drum.addItemXref(contextPath + "/ETD-departments",
+            drum.addItemXref(contextPath + "/admin/etd_departments",
                     T_DRUM_ETD_departments);
             drum.addItemXref(contextPath + "/units", T_DRUM_units);
             // End DRUM Customizations

@@ -303,6 +303,207 @@ public class Collection extends DSpaceObject
     }
 
     /**
+     * Find the collections that match the search query
+     *
+     * @param context
+     *            DSpace context
+     * @param query
+     *            The search string
+     *
+     * @return search function with other parametersx
+     */
+    public static Collection[] search(Context context, String query)
+            throws SQLException
+    {
+        return search(context, query, -1, -1);
+    }
+
+    /**
+     * Find the collections that match the search query. This method also allows
+     * offsets and limits for pagination purposes.
+     *
+     * @param context
+     *            DSpace context
+     * @param query
+     *            The search string
+     * @param offset
+     *            Inclusive offset
+     * @param limit
+     *            Maximum number of matches returned
+     *
+     * @return array of Collection objects
+     */
+    public static Collection[] search(Context context, String query,
+            int offset, int limit) throws SQLException
+    {
+        String params = "%" + query.toLowerCase() + "%";
+        StringBuffer queryBuf = new StringBuffer();
+        queryBuf.append("SELECT * FROM collection WHERE collection_id = ? OR ");
+        queryBuf.append("LOWER(name) LIKE LOWER(?) ORDER BY name ASC ");
+
+        // Add offset and limit restrictions - Oracle requires special code
+        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+        {
+            // First prepare the query to generate row numbers
+            if (limit > 0 || offset > 0)
+            {
+                queryBuf.insert(0,
+                        "SELECT /*+ FIRST_ROWS(n) */ rec.*, ROWNUM rnum  FROM (");
+                queryBuf.append(") ");
+            }
+
+            // Restrict the number of rows returned based on the limit
+            if (limit > 0)
+            {
+                queryBuf.append("rec WHERE rownum<=? ");
+                // If we also have an offset, then convert the limit into the
+                // maximum row number
+                if (offset > 0)
+                {
+                    limit += offset;
+                }
+            }
+
+            // Return only the records after the specified offset (row number)
+            if (offset > 0)
+            {
+                queryBuf.insert(0, "SELECT * FROM (");
+                queryBuf.append(") WHERE rnum>?");
+            }
+        }
+        else
+        {
+            if (limit > 0)
+            {
+                queryBuf.append(" LIMIT ? ");
+            }
+
+            if (offset > 0)
+            {
+                queryBuf.append(" OFFSET ? ");
+            }
+        }
+
+        String dbquery = queryBuf.toString();
+
+        // When checking against the collection_id, make sure the query can be
+        // made
+        // into a number
+        Integer int_param;
+        try
+        {
+            int_param = Integer.valueOf(query);
+        }
+        catch (NumberFormatException e)
+        {
+            int_param = Integer.valueOf(-1);
+        }
+
+        // Create the parameter array, including limit and offset if part of the
+        // query
+        Object[] paramArr = new Object[] { int_param, params };
+        if (limit > 0 && offset > 0)
+        {
+            paramArr = new Object[] { int_param, params, limit, offset };
+        }
+        else if (limit > 0)
+        {
+            paramArr = new Object[] { int_param, params, limit };
+        }
+        else if (offset > 0)
+        {
+            paramArr = new Object[] { int_param, params, offset };
+        }
+
+        // Get all the collections that match the query
+        TableRowIterator rows = DatabaseManager.query(context, dbquery,
+                paramArr);
+        try
+        {
+            List<TableRow> collectionRows = rows.toList();
+            Collection[] collections = new Collection[collectionRows.size()];
+
+            for (int i = 0; i < collectionRows.size(); i++)
+            {
+                TableRow row = collectionRows.get(i);
+
+                // First check the cache
+                Collection fromCache = (Collection) context.fromCache(
+                        Collection.class, row.getIntColumn("collection_id"));
+
+                if (fromCache != null)
+                {
+                    collections[i] = fromCache;
+                }
+                else
+                {
+                    collections[i] = new Collection(context, row);
+                }
+            }
+
+            return collections;
+        }
+        finally
+        {
+            if (rows != null)
+            {
+                rows.close();
+            }
+        }
+    }
+
+    /**
+     * Returns the total number of collections returned by a specific query,
+     * without the overhead of creating the Collection objects to store the
+     * results.
+     *
+     * @param context
+     *            DSpace context
+     * @param query
+     *            The search string
+     *
+     * @return the number of collections matching the query
+     */
+    public static int searchResultCount(Context context, String query)
+            throws SQLException
+    {
+        String dbquery = "%" + query.toLowerCase() + "%";
+        Long count;
+
+        // When checking against the collection_id, make sure the query can be
+        // made
+        // into a number
+        Integer int_param;
+        try
+        {
+            int_param = Integer.valueOf(query);
+        }
+        catch (NumberFormatException e)
+        {
+            int_param = Integer.valueOf(-1);
+        }
+
+        // Get all the collection that match the query
+        TableRow row = DatabaseManager.querySingle(context,
+                "SELECT count(*) as clcount FROM collection WHERE collection_id = ? OR "
+                        + "LOWER(name) LIKE LOWER(?)", new Object[] {
+                int_param, dbquery });
+
+        // use getIntColumn for Oracle count data
+        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+        {
+            count = Long.valueOf(row.getIntColumn("clcount"));
+        }
+        else
+            // getLongColumn works for postgres
+        {
+            count = Long.valueOf(row.getLongColumn("clcount"));
+        }
+
+        return count.intValue();
+    }
+
+    /**
      * Get all collections in the system. These are alphabetically sorted by
      * collection name.
      *
@@ -497,7 +698,7 @@ public class Collection extends DSpaceObject
             catch (SQLException e)
             {
                 // TODO Auto-generated catch block
-                // e.printStackTrace();
+                e.printStackTrace();
             }
         }
         return handle;
@@ -1437,7 +1638,7 @@ public class Collection extends DSpaceObject
                                 getID());
 
         // Build a list of Community objects
-        List communities = new ArrayList();
+        List<Community> communities = new ArrayList<Community>();
 
         while (tri.hasNext())
         {
@@ -1458,7 +1659,7 @@ public class Collection extends DSpaceObject
         tri.close();
 
         Community[] communityArray = new Community[communities.size()];
-        communityArray = (Community[]) communities.toArray(communityArray);
+        communityArray = communities.toArray(communityArray);
 
         return communityArray;
     }
