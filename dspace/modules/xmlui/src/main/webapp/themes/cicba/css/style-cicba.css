@@ -317,7 +317,7 @@ li.ds-artifact-item.community {
 	line-height: 2;
 }
 
-.metadata-values>span:nth-child(2n-2):BEFORE {
+.metadata-values>span:nth-child(n+2):BEFORE {
 	/* 	background-color: red; */
 	content: ' | ';
 	font-weight: bold;
