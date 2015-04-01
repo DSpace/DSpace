@@ -28,13 +28,14 @@ public class DiscoverResult {
     private int searchTime;
     private Map<String, DSpaceObjectHighlightResult> highlightedResults;
     private String spellCheckQuery;
-
+    private Map<String, List<DSpaceObject>> collapsingResults;     
 
     public DiscoverResult() {
         dspaceObjects = new ArrayList<DSpaceObject>();
         facetResults = new LinkedHashMap<String, List<FacetResult>>();
         searchDocuments = new LinkedHashMap<String, List<SearchDocument>>();
         highlightedResults = new HashMap<String, DSpaceObjectHighlightResult>();
+        collapsingResults = new LinkedHashMap<String, List<DSpaceObject>>();
     }
 
 
@@ -169,11 +170,13 @@ public class DiscoverResult {
     {
         private DSpaceObject dso;
         private Map<String, List<String>> highlightResults;
-
-        public DSpaceObjectHighlightResult(DSpaceObject dso, Map<String, List<String>> highlightResults)
+        private Map<String, List<String[]>> highlightResultsWithAuthority;
+        
+        public DSpaceObjectHighlightResult(DSpaceObject dso, Map<String, List<String>> highlightResults, Map<String, List<String[]>> highlightResultsWithAuthority)
         {
             this.dso = dso;
             this.highlightResults = highlightResults;
+            this.highlightResultsWithAuthority = highlightResultsWithAuthority;
         }
 
         public DSpaceObject getDso()
@@ -184,6 +187,11 @@ public class DiscoverResult {
         public List<String> getHighlightResults(String metadataKey)
         {
             return highlightResults.get(metadataKey);
+        }
+        
+        public List<String[]> getHighlightResultsWithAuthority(String metadataKey)
+        {
+            return highlightResultsWithAuthority.get(metadataKey);
         }
     }
 
@@ -212,7 +220,16 @@ public class DiscoverResult {
         }
     }
 
-    /**
+    public Map<String, List<DSpaceObject>> getCollapsingResults() {
+		return collapsingResults;
+	}
+
+
+	public void setCollapsingResults(Map<String, List<DSpaceObject>> collapsingResults) {
+		this.collapsingResults = collapsingResults;
+	}
+
+	/**
      * This class contains values from the fields searched for in DiscoveryQuery.java
      */
     public static final class SearchDocument{
@@ -246,4 +263,13 @@ public class DiscoverResult {
             return dso.getType() + ":" + dso.getID();
         }
     }
+
+	public void addCollapsingResults(String name, DSpaceObject dso) {
+		if(!this.collapsingResults.containsKey(name)) {
+			this.collapsingResults.put(name, new ArrayList<DSpaceObject>());			
+		}            		
+		List<DSpaceObject> added = this.collapsingResults.get(name);
+		added.add(dso);
+		this.collapsingResults.put(name, added);
+	}
 }

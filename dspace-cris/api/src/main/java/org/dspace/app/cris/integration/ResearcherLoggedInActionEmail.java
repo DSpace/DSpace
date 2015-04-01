@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/CILEA/dspace-cris/wiki/License
+ */
 package org.dspace.app.cris.integration;
 
 import javax.servlet.http.HttpServletRequest;
@@ -58,15 +65,13 @@ public class ResearcherLoggedInActionEmail implements PostLoggedInAction
                     searcher = serviceManager.getServiceByName(
                             SearchService.class.getName(), SearchService.class);
                     SolrQuery query = new SolrQuery();
-                    query.setQuery("search.resourcetype:9");
+                    query.setQuery("*:*");
                     String orcid = (String) request.getAttribute("orcid");
                     String filterQuery = "";
-                    if(StringUtils.isNotBlank(eperson.getEmail())){
-                    	filterQuery= "crisrp.email:\""+eperson.getEmail()+"\"";
-                    }
-                    
                     if(StringUtils.isNotBlank(orcid)){
-                    	filterQuery += (StringUtils.isNotBlank(filterQuery)?" OR ":"")+"crisrp.orcid:\""+orcid+"\"";
+                    	filterQuery= "crisrp.orcid:\""+orcid+"\"";
+                    }else{
+                    	filterQuery= "crisrp.email:\""+eperson.getEmail()+"\"";
                     }
                     query.addFilterQuery(filterQuery);
                     QueryResponse qResp = searcher.search(query);
@@ -75,21 +80,19 @@ public class ResearcherLoggedInActionEmail implements PostLoggedInAction
                     	log.warn("Found two or more rp with filter query:" + filterQuery);
                     }else if(docList.size()==1){
                     	SolrDocument doc = docList.get(0);
-                    	String rpKey = (String)doc.getFirstValue("objectpeople_authority");
+                    	String rpKey = (String)doc.getFieldValue("objectpeople_authority");
                     	rp = applicationService.getResearcherByAuthorityKey(rpKey);
-                    	if(rp!=null){
-                    		if(rp.getEpersonID()!=null) {
-                    			if (rp.getEpersonID() != eperson.getID())
-                    			{
-                    				rp.setEpersonID(eperson.getID());
-                    				save = true;
-                    			}
-                    		}
-                    		else {
-                    			rp.setEpersonID(eperson.getID());
-                    			save = true;
-                    		}
-                    	}
+    	                if(rp.getEpersonID()!=null) {
+    	                    if (rp.getEpersonID() != eperson.getID())
+    	                    {
+    	                        rp.setEpersonID(eperson.getID());
+    	                        save = true;
+    	                    }
+    	                }
+    	                else {
+    	                    rp.setEpersonID(eperson.getID());
+    	                    save = true;
+    	                }                    	
                     }
             	}
             }

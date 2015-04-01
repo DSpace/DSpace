@@ -14,9 +14,13 @@ import java.util.StringTokenizer;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.apache.commons.lang.StringUtils;
+import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.ItemWrapperIntegration;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
 
 public final class CrisItemWrapper implements MethodInterceptor, ItemWrapperIntegration
@@ -25,6 +29,9 @@ public final class CrisItemWrapper implements MethodInterceptor, ItemWrapperInte
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable
     {
+    	if (invocation.getMethod().getName().equals("getTypeText")) {
+    		return getTypeText(invocation);
+    	}
 
         if (invocation.getMethod().getName().equals("getMetadata"))
         {
@@ -95,7 +102,31 @@ public final class CrisItemWrapper implements MethodInterceptor, ItemWrapperInte
         return invocation.proceed();
     }
 
-    private DCValue[] addCrisEnhancedMetadata(Item item, DCValue[] basic,
+    private String getTypeText(MethodInvocation invocation) {
+    	String metadata = ConfigurationManager.getProperty(
+				CrisConstants.CFG_MODULE, "global.item.typing");
+		if (StringUtils.isNotBlank(metadata)) {
+			Item item = (Item) invocation.getThis();
+			DCValue[] dcvalues = item.getMetadata(metadata);
+			if (dcvalues != null && dcvalues.length > 0) {
+				for (DCValue dcval : dcvalues) {
+					String value = dcval.value;					
+					if (StringUtils.isNotBlank(value)) {
+						 String valueWithoutWhitespace = StringUtils.deleteWhitespace(value);
+				    	 String isDefinedAsSystemEntity = ConfigurationManager.getProperty(
+				    			 CrisConstants.CFG_MODULE, "facet.type."
+										+ valueWithoutWhitespace.toLowerCase());
+				    	 if(StringUtils.isNotBlank(isDefinedAsSystemEntity)) {
+				    		 return value.toLowerCase();
+				    	 }
+					}
+				}
+			}
+		}
+        return Constants.typeText[Constants.ITEM].toLowerCase();
+	}
+
+	private DCValue[] addCrisEnhancedMetadata(Item item, DCValue[] basic,
             String schema, String element, String qualifier, String lang)
     {
         List<DCValue> extraMetadata = new ArrayList<DCValue>();

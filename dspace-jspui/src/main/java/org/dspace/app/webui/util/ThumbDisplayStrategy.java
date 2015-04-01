@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -28,9 +29,10 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
+import org.dspace.discovery.IGlobalSearchResult;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
 
-public class ThumbDisplayStrategy implements IDisplayMetadataValueStrategy
+public class ThumbDisplayStrategy extends ADiscoveryDisplayStrategy implements IDisplayMetadataValueStrategy
 {
     /** Config value of thumbnail view toggle */
     private boolean showThumbs;
@@ -230,4 +232,12 @@ public class ThumbDisplayStrategy implements IDisplayMetadataValueStrategy
             throw new JspException("Server does not support DSpace's default encoding. ", e);
         }
     }
+    
+    
+	@Override
+	public String getMetadataDisplay(HttpServletRequest hrq, int limit, boolean viewFull, String browseType,
+			int colIdx, String field, List<String> metadataArray, IGlobalSearchResult item, boolean disableCrossLinks,
+			boolean emph, PageContext pageContext) throws JspException {
+		return getThumbMarkup(hrq, item.getID(), item.getHandle());
+	}
 }

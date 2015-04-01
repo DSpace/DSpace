@@ -9,7 +9,9 @@ package org.dspace.discovery.configuration;
 
 import org.springframework.beans.factory.annotation.Required;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Class that contains all the configuration concerning the hit highlighting in search resutls
@@ -25,7 +27,8 @@ public class DiscoveryHitHighlightingConfiguration
     /* A list of metadata fields for which the hit highlighting is possible */
     private List<DiscoveryHitHighlightFieldConfiguration> metadataFields;
 
-
+    private Map<String, String> additionalParams;
+    
     @Required
     public void setMetadataFields(List<DiscoveryHitHighlightFieldConfiguration> metadataFields)
     {
@@ -34,6 +37,21 @@ public class DiscoveryHitHighlightingConfiguration
 
     public List<DiscoveryHitHighlightFieldConfiguration> getMetadataFields()
     {
+    	if(this.metadataFields==null) {
+    		this.metadataFields = new ArrayList<DiscoveryHitHighlightFieldConfiguration>();
+    	}
         return metadataFields;
     }
+    
+    public void addMetadataFields(DiscoveryHitHighlightFieldConfiguration discoveryHitHighlightFieldConfiguration) {
+    	getMetadataFields().add(discoveryHitHighlightFieldConfiguration);
+    }
+
+	public Map<String, String> getAdditionalParams() {
+		return additionalParams;
+	}
+
+	public void setAdditionalParams(Map<String, String> additionalParams) {
+		this.additionalParams = additionalParams;
+	}
 }

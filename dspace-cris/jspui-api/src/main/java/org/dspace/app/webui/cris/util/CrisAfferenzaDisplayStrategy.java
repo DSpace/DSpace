@@ -17,14 +17,16 @@ import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.jdyna.RPNestedObject;
 import org.dspace.app.cris.model.jdyna.RPNestedProperty;
 import org.dspace.app.cris.service.ApplicationService;
+import org.dspace.app.webui.util.ADiscoveryDisplayStrategy;
 import org.dspace.app.webui.util.IDisplayMetadataValueStrategy;
 import org.dspace.browse.BrowseDSpaceObject;
 import org.dspace.browse.BrowseItem;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.discovery.IGlobalSearchResult;
 import org.dspace.utils.DSpace;
 
-public class CrisAfferenzaDisplayStrategy implements
+public class CrisAfferenzaDisplayStrategy extends ADiscoveryDisplayStrategy implements
         IDisplayMetadataValueStrategy
 {
 
@@ -81,5 +83,28 @@ public class CrisAfferenzaDisplayStrategy implements
     {
         return null;
     }
+
+	@Override
+	public String getMetadataDisplay(HttpServletRequest hrq, int limit, boolean viewFull, String browseType,
+			int colIdx, String field, List<String> metadataArray, IGlobalSearchResult item, boolean disableCrossLinks,
+			boolean emph, PageContext pageContext) throws JspException {
+        ACrisObject crisObject = (ACrisObject)item;
+        String[] splitted = field.split("\\.");
+        //FIXME apply aspectjproxy???
+        ApplicationService applicationService = dspace.getServiceManager()
+                .getServiceByName("applicationService",
+                        ApplicationService.class);
+        List<RPNestedObject> anos = applicationService
+                .getNestedObjectsByParentIDAndShortname(crisObject.getId(),
+                        splitted[1], crisObject.getClassNested());
+        for (RPNestedObject ano : anos)
+        {
+            List<RPNestedProperty> props = ano.getAnagrafica4view().get(splitted[2]);
+            for(RPNestedProperty prop : props) {
+                return prop.toString();
+            }
+        }
+        return "";
+	}
 }
 

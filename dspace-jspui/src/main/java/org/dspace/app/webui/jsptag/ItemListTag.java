@@ -509,42 +509,10 @@ public class ItemListTag extends TagSupport {
                                 : authorLimit);
                     }
                     
-                    IDisplayMetadataValueStrategy strategy = (IDisplayMetadataValueStrategy) PluginManager
-                            .getNamedPlugin(
-                                    IDisplayMetadataValueStrategy.class,
-                                    useRender[colIdx]);
-                    
-                    // fallback compatibility
-					if (strategy == null) {
-						if (useRender[colIdx].equalsIgnoreCase("title")) {
-                            strategy = new TitleDisplayStrategy();
-						} else if (useRender[colIdx].equalsIgnoreCase("date")) {
-                            strategy = new DateDisplayStrategy();
-						} else if (useRender[colIdx]
-								.equalsIgnoreCase("thumbnail")) {
-                            strategy = new ThumbDisplayStrategy();
-						} else if (useRender[colIdx].equalsIgnoreCase("link")) {
-                            strategy = new LinkDisplayStrategy();
-						} else if (useRender[colIdx]
-								.equalsIgnoreCase("default")) {
-                            strategy = new DefaultDisplayStrategy();
-						} else {
-							// if the plugin instantiation fails try to use the
-							// resolver catch all strategy
-							strategy = new ResolverDisplayStrategy();
-                        }
-                    }
+                    IDisplayMetadataValueStrategy strategy = getMetadataDisplayStrategy(useRender, colIdx);
                             
-					String metadata = "";
-					try {
-						metadata = strategy.getMetadataDisplay(hrq, limit,
-								viewFull[colIdx], browseType[colIdx], colIdx,
-								field, metadataArray, items[i],
-								disableCrossLinks, emph[colIdx], pageContext);
-					} catch (Exception e) {
-						log.error("Error getMetadataDisplay on "
-								+ items[i].getHandle());
-					}
+					String metadata = getMetadataDisplayByStrategy(hrq, emph, viewFull, browseType, i, colIdx, field,
+							metadataArray, limit, strategy);
 
                     // prepare extra special layout requirements for dates
                     String extras = strategy.getExtraCssDisplay(hrq, limit,
@@ -612,6 +580,51 @@ public class ItemListTag extends TagSupport {
 
         return SKIP_BODY;
     }
+
+	private String getMetadataDisplayByStrategy(HttpServletRequest hrq, boolean[] emph, boolean[] viewFull,
+			String[] browseType, int i, int colIdx, String field, DCValue[] metadataArray, int limit,
+			IDisplayMetadataValueStrategy strategy) {
+		String metadata = "";
+		try {
+			metadata = strategy.getMetadataDisplay(hrq, limit,
+					viewFull[colIdx], browseType[colIdx], colIdx,
+					field, metadataArray, items[i],
+					disableCrossLinks, emph[colIdx], pageContext);
+		} catch (Exception e) {
+			log.error("Error getMetadataDisplay on "
+					+ items[i].getHandle());
+		}
+		return metadata;
+	}
+
+	private IDisplayMetadataValueStrategy getMetadataDisplayStrategy(String[] useRender, int colIdx) {
+		IDisplayMetadataValueStrategy strategy = (IDisplayMetadataValueStrategy) PluginManager
+		        .getNamedPlugin(
+		                IDisplayMetadataValueStrategy.class,
+		                useRender[colIdx]);
+		
+		// fallback compatibility
+		if (strategy == null) {
+			if (useRender[colIdx].equalsIgnoreCase("title")) {
+		        strategy = new TitleDisplayStrategy();
+			} else if (useRender[colIdx].equalsIgnoreCase("date")) {
+		        strategy = new DateDisplayStrategy();
+			} else if (useRender[colIdx]
+					.equalsIgnoreCase("thumbnail")) {
+		        strategy = new ThumbDisplayStrategy();
+			} else if (useRender[colIdx].equalsIgnoreCase("link")) {
+		        strategy = new LinkDisplayStrategy();
+			} else if (useRender[colIdx]
+					.equalsIgnoreCase("default")) {
+		        strategy = new DefaultDisplayStrategy();
+			} else {
+				// if the plugin instantiation fails try to use the
+				// resolver catch all strategy
+				strategy = new ResolverDisplayStrategy();
+		    }
+		}
+		return strategy;
+	}
 
 	public int getAuthorLimit() {
         return authorLimit;

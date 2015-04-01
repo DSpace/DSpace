@@ -65,7 +65,7 @@ public class IndexClient {
                         .create("c"));
 
         options.addOption(OptionBuilder.isRequired(false).withDescription(
-                "(re)build index, wiping out current one if it exists").create(
+                "(re)build index [incremental mode]").create(
                 "b"));
 
         options.addOption(OptionBuilder.isRequired(false).withDescription(
@@ -84,7 +84,7 @@ public class IndexClient {
                 .isRequired(false)
                 .hasArg(true)
                 .withDescription(
-                        "clean and update a specific class of objects based on its type")
+                        "update a specific class of objects based on its type")
                 .create("t"));
 
         options
@@ -92,7 +92,7 @@ public class IndexClient {
                 .isRequired(false)
                 .hasArg(true)
                 .withDescription(
-                "clean and update an Item, Collection or Community from index based on its handle")
+                "update an Item, Collection or Community from index based on its handle, use with -f to force clean")
                 .create("u"));
         
         options.addOption(OptionBuilder.isRequired(false).withDescription(

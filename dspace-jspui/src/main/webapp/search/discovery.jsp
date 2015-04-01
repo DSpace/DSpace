@@ -198,14 +198,13 @@
         // "all of DSpace" and the communities.
 %>
                                     <%-- <option selected value="/">All of DSpace</option> --%>
-                                    <option selected="selected" value="site"><fmt:message key="jsp.general.genericScope"/></option>
+                                    <option selected="selected" value="global"><fmt:message key="jsp.general.globalScope"/></option>
 <%  }
     else
     {
 %>
-                                    <option value="site"><fmt:message key="jsp.general.genericScope"/></option>
+									<option value="global"><fmt:message key="jsp.general.globalScope"/></option>
 							        <optgroup label="Repository">
-     							          <option value="dspacebasic" <%="dspacebasic".equals(searchScope)?"selected=\"selected\"":"" %>>All the repository</option>
 <%  }      
     for (DSpaceObject dso : scopes)
     {
@@ -271,7 +270,7 @@
 		%>
 		</div>
 <% } %>
-<a class="btn btn-default" href="<%= request.getContextPath()+"/simple-search" %>"><fmt:message key="jsp.search.general.new-search" /></a>	
+<a class="btn btn-default" href="<%= request.getContextPath()+"/global-search" %>"><fmt:message key="jsp.search.general.new-search" /></a>	
 		</form>
 		</div>
 <% if (availableFilters.size() > 0) { %>
@@ -664,6 +663,39 @@ else
 <% } %>
 <% } %>
 <dspace:sidebar>
+
+
+<h3 class="facets"><fmt:message key="jsp.search.facet.refine" /></h3>
+
+<%
+		DiscoverySearchFilterFacet facetGlobalConf = (DiscoverySearchFilterFacet) request.getAttribute("facetGlobalConfig");
+		if(facetGlobalConf!=null) {
+		    String fGlobal = facetGlobalConf.getIndexFieldName();
+			if(qResults!=null) {
+		    List<FacetResult> facetGlobal = qResults.getFacetResult(fGlobal);
+		    String fkeyGlobal = "jsp.search.facet.refine."+fGlobal;
+		    if (facetGlobal != null && facetGlobal.size() > 0) {
+		    %>
+		    <div id="globalFacet" class="facetsBox">
+		    <div id="facet_<%= fkeyGlobal %>" class="panel panel-primary">
+		    <div class="panel-heading"><fmt:message key="<%= fkeyGlobal %>" /></div>
+		    <ul class="list-group"><%
+		    for (FacetResult fvalue : facetGlobal)
+		    { 
+		        %><li class="list-group-item"><span class="badge"><%= fvalue.getCount() %></span> <a href="<%= request.getContextPath()
+	                + "/simple-search?query="
+	                + URLEncoder.encode(query,"UTF-8")                                
+	                + "&amp;location="+URLEncoder.encode(fvalue.getAuthorityKey(),"UTF-8") %>"
+	                title="<fmt:message key="jsp.search.facet.narrow"><fmt:param><%=fvalue.getDisplayedValue() %></fmt:param></fmt:message>">
+	                <%= StringUtils.abbreviate(fvalue.getDisplayedValue(),36) %></a></li><%
+		    }
+		    %></ul></div>
+		    </div><%
+			} 
+			}
+		}
+%>
+
 <%
 	boolean brefine = false;
 	
@@ -700,7 +732,6 @@ else
 	if (brefine) {
 %>
 
-<h3 class="facets"><fmt:message key="jsp.search.facet.refine" /></h3>
 <div id="facets" class="facetsBox">
 
 <%

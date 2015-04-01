@@ -19,6 +19,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -34,6 +35,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.authority.Choices;
 
 @MappedSuperclass
@@ -155,6 +157,10 @@ public abstract class ACrisObject<P extends Property<TP>, TP extends PropertiesD
         }
 
         return result;
+    }
+    
+    public List<String> getMetadataValue(String field) {
+    	return getMetadata(field);
     }
 
     @Override
@@ -361,4 +367,35 @@ public abstract class ACrisObject<P extends Property<TP>, TP extends PropertiesD
         this.sourceReference = sourceReference;
     }
 
+	@Override
+	public DCValue[] getMetadataValueInDCFormat(String mdString) {
+        StringTokenizer dcf = new StringTokenizer(mdString, ".");
+        
+        String[] tokens = { "", "", "" };
+        int i = 0;
+        while(dcf.hasMoreTokens())
+        {
+            tokens[i] = dcf.nextToken().trim();
+            i++;
+        }
+        String schema = tokens[0];
+        String element = tokens[1];
+        String qualifier = tokens[2];
+        
+        DCValue[] values;
+        if ("*".equals(qualifier))
+        {
+            values = getMetadata(schema, element, Item.ANY, Item.ANY);
+        }
+        else if ("".equals(qualifier))
+        {
+            values = getMetadata(schema, element, null, Item.ANY);
+        }
+        else
+        {
+            values = getMetadata(schema, element, qualifier, Item.ANY);
+        }
+        
+        return values;
+	}
 }

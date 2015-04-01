@@ -7,7 +7,10 @@
  */
 package org.dspace.discovery;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
@@ -49,12 +52,20 @@ import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.request.AbstractUpdateRequest;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.client.solrj.response.FacetField;
+import org.apache.solr.client.solrj.response.Group;
+import org.apache.solr.client.solrj.response.GroupCommand;
+import org.apache.solr.client.solrj.response.GroupResponse;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.params.*;
+import org.apache.solr.common.params.CommonParams;
+import org.apache.solr.common.params.FacetParams;
+import org.apache.solr.common.params.HighlightParams;
+import org.apache.solr.common.params.ModifiableSolrParams;
+import org.apache.solr.common.params.MoreLikeThisParams;
+import org.apache.solr.common.params.SpellingParams;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.handler.extraction.ExtractingParams;
 import org.dspace.app.util.Util;
@@ -87,6 +98,9 @@ import org.dspace.discovery.configuration.DiscoverySearchFilter;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
+import org.dspace.discovery.configuration.DiscoveryViewAndHighlightConfiguration;
+import org.dspace.discovery.configuration.DiscoveryViewConfiguration;
+import org.dspace.discovery.configuration.DiscoveryViewFieldConfiguration;
 import org.dspace.discovery.configuration.HierarchicalSidebarFacetConfiguration;
 import org.dspace.handle.HandleManager;
 import org.dspace.utils.DSpace;
@@ -1035,6 +1049,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     recentSubmissionsConfigurationMap.put(recentSubmissionConfiguration.getMetadataSortField(), recentSubmissionConfiguration);
                 }
 
+                
                 DiscoveryHitHighlightingConfiguration hitHighlightingConfiguration = discoveryConfiguration.getHitHighlightingConfiguration();
                 if(hitHighlightingConfiguration != null)
                 {
@@ -1200,7 +1215,16 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         }
                         doc.addField(searchFilter.getIndexFieldName(), value);
                         doc.addField(searchFilter.getIndexFieldName() + "_keyword", value);
+                        
+						if (searchFilter.isUsedForCollapsingFeature()) {
+							if (authority != null) {
+								doc.addField(searchFilter.getIndexFieldName() + "_group", authority);
+							} else {
+								doc.addField(searchFilter.getIndexFieldName() + "_group", value);
+							}
 
+						}
+						
                         if (authority != null && preferedLabel == null)
                         {
                             doc.addField(searchFilter.getIndexFieldName()
@@ -1381,7 +1405,13 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
                 if(hitHighlightingFields.contains(field) || hitHighlightingFields.contains("*") || hitHighlightingFields.contains(unqualifiedField + "." + Item.ANY))
                 {
-                    doc.addField(field + "_hl", value);
+                    if (authority != null)
+                    {
+                        doc.addField(field + "_hl", value+"###"+authority);
+                    }
+                    else {
+                    	doc.addField(field + "_hl", value);
+                    }
                 }
 
                 if(moreLikeThisFields.contains(field) || moreLikeThisFields.contains(unqualifiedField + "." + Item.ANY))
@@ -1785,7 +1815,12 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             for (DiscoverFacetField facetFieldConfig : facetFields)
             {
                 String field = transformFacetField(facetFieldConfig, facetFieldConfig.getField(), false);
-                solrQuery.addFacetField(field);
+                if(facetFieldConfig.isExclude()) {
+                	solrQuery.addFacetField("{!ex=dt}"+field);
+                }
+                else {
+                	solrQuery.addFacetField(field);
+                }
 
                 // Setting the facet limit in this fashion ensures that each facet can have its own max
                 solrQuery.add("f." + field + "." + FacetParams.FACET_LIMIT, String.valueOf(facetFieldConfig.getLimit()));
@@ -1820,7 +1855,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         if(0 < discoveryQuery.getHitHighlightingFields().size())
         {
             solrQuery.setHighlight(true);
-            solrQuery.add(HighlightParams.USE_PHRASE_HIGHLIGHTER, Boolean.TRUE.toString());
+            solrQuery.add(HighlightParams.USE_PHRASE_HIGHLIGHTER, Boolean.TRUE.toString());            
             for (DiscoverHitHighlightingField highlightingField : discoveryQuery.getHitHighlightingFields())
             {
                 solrQuery.addHighlightField(highlightingField.getField() + "_hl");
@@ -1893,11 +1928,33 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         {
             result.setSearchTime(solrQueryResponse.getQTime());
             result.setStart(query.getStart());
-            result.setMaxResults(query.getMaxResults());
-            result.setTotalSearchResults(solrQueryResponse.getResults().getNumFound());
+            
+            GroupResponse collapsing = solrQueryResponse.getGroupResponse();
+            SolrDocumentList results = new SolrDocumentList();
+            int groupTotal = 0;
+			if(collapsing != null) {
+            	for(GroupCommand groupCommand : collapsing.getValues()) {
+            		groupTotal += groupCommand.getMatches();           		
+
+            		for(Group group : groupCommand.getValues()) {          			
+                        for (SolrDocument doc : group.getResult())
+                        {
+                            DSpaceObject dso = findDSpaceObject(context, doc);
+                            result.addCollapsingResults(group.getGroupValue(),dso);
+                            results.add(doc);
+                        }
+            		}
+            	}
+            	result.setTotalSearchResults(groupTotal);
+            }
+            else {
+            	result.setMaxResults(query.getMaxResults());
+            	result.setTotalSearchResults(solrQueryResponse.getResults().getNumFound());
+            	results = solrQueryResponse.getResults();
+            }            
 
             List<String> searchFields = query.getSearchFields();
-            for (SolrDocument doc : solrQueryResponse.getResults())
+            for (SolrDocument doc : results)
             {
                 DSpaceObject dso = findDSpaceObject(context, doc);
 
@@ -1929,12 +1986,21 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     {
                         //We need to remove all the "_hl" appendix strings from our keys
                         Map<String, List<String>> resultMap = new HashMap<String, List<String>>();
+                        Map<String, List<String[]>> resultMapWithAuthority = new HashMap<String, List<String[]>>();
                         for(String key : highlightedFields.keySet())
                         {
+                        	List<String> highlightOriginalValue = highlightedFields.get(key);
+                        	List<String[]> resultHighlightOriginalValue = new ArrayList<String[]>(); 
+							for (String highlightValue : highlightOriginalValue) {
+								String[] splitted = highlightValue.split("###");
+								resultHighlightOriginalValue.add(splitted);
+
+							}
                             resultMap.put(key.substring(0, key.lastIndexOf("_hl")), highlightedFields.get(key));
+                            resultMapWithAuthority.put(key.substring(0, key.lastIndexOf("_hl")), resultHighlightOriginalValue);
                         }
 
-                        result.addHighlightedResult(dso, new DiscoverResult.DSpaceObjectHighlightResult(dso, resultMap));
+                        result.addHighlightedResult(dso, new DiscoverResult.DSpaceObjectHighlightResult(dso, resultMap, resultMapWithAuthority));
                     }
                 }
             }

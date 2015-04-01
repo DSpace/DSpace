@@ -151,14 +151,14 @@
 		<property name="clazz">
 			<value>org.dspace.app.cris.model.ResearcherPage</value>
 		</property>
-		<property name="alias" value="department" />
+		<property name="alias" value="affiliation" />
 		<property name="qualifiers2path">
 			<map>
 				<entry key="department">
-					<value>department</value>
+					<value>orgunit</value>
 				</entry>
 				<entry key="departmentrole">
-					<value>departmentrole</value>
+					<value>role</value>
 				</entry>
 			</map>
 		</property>

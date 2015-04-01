@@ -405,6 +405,11 @@
 	</servlet>
 
 	<servlet>
+		<servlet-name>global-search</servlet-name>
+		<servlet-class>org.dspace.app.webui.servlet.GlobalSearchServlet</servlet-class>
+	</servlet>
+	
+	<servlet>
 		<servlet-name>sitemap</servlet-name>
 		<servlet-class>org.dspace.app.webui.servlet.SitemapServlet</servlet-class>
 		<init-param>
@@ -717,6 +722,11 @@
 		<url-pattern>/simple-search</url-pattern>
 	</servlet-mapping>
 
+	<servlet-mapping>
+		<servlet-name>global-search</servlet-name>
+		<url-pattern>/global-search</url-pattern>
+	</servlet-mapping>
+	
 	<servlet-mapping>
 		<servlet-name>sitemap</servlet-name>
 		<url-pattern>/sitemap</url-pattern>

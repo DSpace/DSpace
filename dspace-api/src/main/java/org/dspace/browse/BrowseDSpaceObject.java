@@ -8,6 +8,7 @@
 package org.dspace.browse;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.content.DCValue;
 import org.dspace.core.Context;
@@ -27,6 +28,11 @@ public class BrowseDSpaceObject extends BrowseItem
             String qualifier, String lang) throws SQLException
     {
         return browseObject.getMetadata(schema, element, qualifier, lang);
+    }
+
+    public List<String> getMetadataValue(String mdString) throws SQLException
+    {
+        return browseObject.getMetadataValue(mdString);
     }
     
     public BrowsableDSpaceObject getBrowsableDSpaceObject()

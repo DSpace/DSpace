@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrDocument;
@@ -71,6 +72,7 @@ import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
@@ -79,10 +81,15 @@ import org.dspace.discovery.SolrServiceImpl;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.configuration.DiscoveryConfigurationService;
+import org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration;
+import org.dspace.discovery.configuration.DiscoveryHitHighlightingConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilter;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
+import org.dspace.discovery.configuration.DiscoveryViewAndHighlightConfiguration;
+import org.dspace.discovery.configuration.DiscoveryViewConfiguration;
+import org.dspace.discovery.configuration.DiscoveryViewFieldConfiguration;
 import org.dspace.discovery.configuration.HierarchicalSidebarFacetConfiguration;
 import org.dspace.utils.DSpace;
 
@@ -230,7 +237,7 @@ public class CrisSearchService extends SolrServiceImpl
         List<String> toProjectionFields = new ArrayList<String>();
 
         commonIndexerDiscovery(schema, toIgnoreFields, searchFilters,
-                toProjectionFields, sortFields);
+                toProjectionFields, sortFields, hitHighlightingFields);
 
         // add the special crisXX.this metadata
             indexProperty(doc, dso.getUuid(), schema + ".this", dso.getName(),
@@ -373,6 +380,16 @@ public class CrisSearchService extends SolrServiceImpl
                 doc.addField(searchFilter.getIndexFieldName(), svalue);
                 doc.addField(searchFilter.getIndexFieldName() + "_keyword",
                         svalue);
+
+				if (searchFilter.isUsedForCollapsingFeature()) {
+					if (authority != null) {
+						doc.addField(searchFilter.getIndexFieldName() + "_group", authority);
+					} else {
+						doc.addField(searchFilter.getIndexFieldName() + "_group", svalue);
+					}
+
+				}
+				
                 if (authority != null)
                 {
                     doc.addField(searchFilter.getIndexFieldName() + "_keyword",
@@ -383,7 +400,6 @@ public class CrisSearchService extends SolrServiceImpl
                             svalue.toLowerCase() + separator + svalue
                                     + AUTHORITY_SEPARATOR + authority);
                 }
-
                 // Add a dynamic fields for auto complete in search
                 doc.addField(searchFilter.getIndexFieldName() + "_ac",
                         svalue.toLowerCase() + separator + svalue);
@@ -636,7 +652,7 @@ public class CrisSearchService extends SolrServiceImpl
         List<String> toProjectionFields = new ArrayList<String>();
 
         commonIndexerDiscovery(confName, toIgnoreFields, searchFilters,
-                toProjectionFields, sortFields);
+                toProjectionFields, sortFields, hitHighlightingFields);
 
         commonsIndexerAnagrafica(dso, doc, schema, sortFieldsAdded,
                 hitHighlightingFields, uuid, toIgnoreFields, searchFilters,
@@ -807,7 +823,7 @@ public class CrisSearchService extends SolrServiceImpl
             List<String> toIgnoreFields,
             Map<String, List<DiscoverySearchFilter>> searchFilters,
             List<String> toProjectionFields,
-            Map<String, DiscoverySortFieldConfiguration> sortFields)
+            Map<String, DiscoverySortFieldConfiguration> sortFields, Set<String> hitHighlightingFields)
     {
         try
         {
@@ -818,11 +834,16 @@ public class CrisSearchService extends SolrServiceImpl
             {
                 discoveryConfigurations.add(generalConfiguration);
             }
-            DiscoveryConfigurationService configurationService = SearchUtils
-                    .getConfigurationService();
-            DiscoveryConfiguration crisConfiguration = configurationService
-                    .getMap().get(confName);
-            if (crisConfiguration != null)
+            DiscoveryConfiguration globalConfiguration = SearchUtils
+                    .getDiscoveryConfigurationByName(DiscoveryConfiguration.GLOBAL_CONFIGURATIONNAME);
+            if (globalConfiguration != null && globalConfiguration.getId().equals(DiscoveryConfiguration.GLOBAL_CONFIGURATIONNAME))
+            {
+                discoveryConfigurations.add(globalConfiguration);
+            }
+
+            DiscoveryConfiguration crisConfiguration = SearchUtils
+                    .getDiscoveryConfigurationByName(confName);
+            if (crisConfiguration != null && crisConfiguration.getId().equals(confName))
             {
                 discoveryConfigurations.add(crisConfiguration);
             }
@@ -866,7 +887,17 @@ public class CrisSearchService extends SolrServiceImpl
                                 discoverySortConfiguration);
                     }
                 }
-            }
+        
+				DiscoveryHitHighlightingConfiguration hitHighlightingConfiguration = discoveryConfiguration
+						.getHitHighlightingConfiguration();
+				if (hitHighlightingConfiguration != null) {
+					List<DiscoveryHitHighlightFieldConfiguration> fieldConfigurations = hitHighlightingConfiguration
+							.getMetadataFields();
+					for (DiscoveryHitHighlightFieldConfiguration fieldConfiguration : fieldConfigurations) {
+						hitHighlightingFields.add(fieldConfiguration.getField());
+					}
+				}
+			}
 
             String ignoreFieldsString = new DSpace().getConfigurationService()
                     .getProperty("discovery.index.ignore");

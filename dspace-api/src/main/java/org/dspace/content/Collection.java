@@ -7,6 +7,7 @@
  */
 package org.dspace.content;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
@@ -18,6 +19,7 @@ import org.dspace.browse.IndexBrowse;
 import org.dspace.browse.ItemCountException;
 import org.dspace.browse.ItemCounter;
 import org.dspace.core.*;
+import org.dspace.discovery.IGlobalSearchResult;
 import org.dspace.eperson.Group;
 import org.dspace.event.Event;
 import org.dspace.handle.HandleManager;
@@ -37,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.MissingResourceException;
+import java.util.StringTokenizer;
 
 /**
  * Class representing a collection.
@@ -52,7 +55,7 @@ import java.util.MissingResourceException;
  * @author Robert Tansley
  * @version $Revision$
  */
-public class Collection extends DSpaceObject
+public class Collection extends DSpaceObject implements IGlobalSearchResult
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(Collection.class);
@@ -487,6 +490,15 @@ public class Collection extends DSpaceObject
      */
     public String getMetadata(String field)
     {
+    	if (StringUtils.equals("dc.title", field)) {
+    		field = "name";
+    	}
+    	else if (StringUtils.equals("dc.description.abstract", field)) {
+    		field = "short_description";
+    	}
+    	else if (StringUtils.equals("dc.description", field)) {
+    		field = "introductory_text";
+    	}
     	String metadata = collectionRow.getStringColumn(field);
     	return (metadata == null) ? "" : metadata;
     }
@@ -1572,4 +1584,40 @@ public class Collection extends DSpaceObject
         //Also fire a modified event since the collection HAS been modified
         ourContext.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, getID(), null));
     }
+    
+	@Override
+	public List<String> getMetadataValue(String mdString) {
+		List<String> result = new ArrayList<String>();
+		result.add(getMetadata(mdString));
+		return result;
+	}
+
+	@Override
+	public boolean isWithdrawn() {
+		return false;
+	}
+
+	@Override
+	public DCValue[] getMetadataValueInDCFormat(String mdString) {
+		String dcval = getMetadata(mdString);
+		
+		StringTokenizer dcf = new StringTokenizer(mdString, ".");
+
+		String[] tokens = { "", "", "" };
+		int i = 0;
+		while (dcf.hasMoreTokens()) {
+			tokens[i] = dcf.nextToken().trim();
+			i++;
+		}
+		String schema = tokens[0];
+		String element = tokens[1];
+		String qualifier = tokens[2];
+		
+		DCValue vl = new DCValue();
+		vl.schema = schema;
+		vl.element = element;
+		vl.qualifier = qualifier;
+		vl.value = dcval;
+		return new DCValue[]{vl};
+	}
 }

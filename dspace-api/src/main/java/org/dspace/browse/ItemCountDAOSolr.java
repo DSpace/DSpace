@@ -157,10 +157,10 @@ public class ItemCountDAOSolr implements ItemCountDAO
         query.setFacetMinCount(1);
         query.addFacetField(new DiscoverFacetField("location.comm",
                             DiscoveryConfigurationParameters.TYPE_STANDARD, -1,
-                            DiscoveryConfigurationParameters.SORT.COUNT));
+                            DiscoveryConfigurationParameters.SORT.COUNT, false));
         query.addFacetField(new DiscoverFacetField("location.coll",
                             DiscoveryConfigurationParameters.TYPE_STANDARD, -1,
-                            DiscoveryConfigurationParameters.SORT.COUNT));
+                            DiscoveryConfigurationParameters.SORT.COUNT, false));
         query.addFilterQueries("search.resourcetype:2");    // count only items
         query.addFilterQueries("NOT(discoverable:false)");  // only discoverable
         query.setMaxResults(0);

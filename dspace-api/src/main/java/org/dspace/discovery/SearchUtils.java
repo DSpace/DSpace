@@ -7,10 +7,12 @@
  */
 package org.dspace.discovery;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationService;
+import org.dspace.discovery.configuration.DiscoveryViewAndHighlightConfiguration;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.utils.DSpace;
 
@@ -87,14 +89,16 @@ public class SearchUtils {
     public static List<DiscoveryConfiguration> getAllDiscoveryConfigurations(Item item) throws SQLException {
         Map<String, DiscoveryConfiguration> result = new HashMap<String, DiscoveryConfiguration>();
 
-        Collection[] collections = item.getCollections();
-        for (Collection collection : collections) {
-            DiscoveryConfiguration configuration = getDiscoveryConfiguration(collection);
-            if(!result.containsKey(configuration.getId())){
-                result.put(configuration.getId(), configuration);
-            }
-        }
-
+		if (item != null) {
+			Collection[] collections = item.getCollections();
+			for (Collection collection : collections) {
+				DiscoveryConfiguration configuration = getDiscoveryConfiguration(collection);
+				if (!result.containsKey(configuration.getId())) {
+					result.put(configuration.getId(), configuration);
+				}
+			}
+		}
+		
         //Also add one for the default
         DiscoveryConfiguration configuration = getDiscoveryConfiguration(null);
         if(!result.containsKey(configuration.getId())){
@@ -106,8 +110,36 @@ public class SearchUtils {
         if(!result.containsKey(configurationExtra.getId())){
             result.put(configurationExtra.getId(), configurationExtra);
         }
-        
+
+        //Add special global discoveryConfiguration
+        configurationExtra = getDiscoveryConfigurationByName(DiscoveryConfiguration.GLOBAL_CONFIGURATIONNAME);
+        if(!result.containsKey(configurationExtra.getId())){
+            result.put(configurationExtra.getId(), configurationExtra);
+        }
         return Arrays.asList(result.values().toArray(new DiscoveryConfiguration[result.size()]));
     }
+
+    
+    public static DiscoveryViewAndHighlightConfiguration getDiscoveryViewAndHighlightConfigurationByName(
+            String configurationName)
+    {
+        DSpace dspace  = new DSpace();
+        ServiceManager manager = dspace.getServiceManager();
+        return manager.getServiceByName(configurationName, DiscoveryViewAndHighlightConfiguration.class);
+    }
+    
+	public static DiscoveryConfiguration getGlobalConfiguration() {
+		boolean globalConfiguration = false;
+        DiscoveryConfiguration configuration = SearchUtils.getDiscoveryConfigurationByName(DiscoveryConfiguration.GLOBAL_CONFIGURATIONNAME);
+        
+        if(DiscoveryConfiguration.GLOBAL_CONFIGURATIONNAME.equals(configuration.getId())) {
+        	globalConfiguration = true;
+        }
+		return globalConfiguration?configuration:null;
+	}
+
+	public static boolean isGlobalConfiguration(DiscoveryConfiguration configuration) {
+		return StringUtils.equals(configuration.getId(), DiscoveryConfiguration.GLOBAL_CONFIGURATIONNAME);
+	}
 
 }
