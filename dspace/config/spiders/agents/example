@@ -1,5 +1,6 @@
-# example spider filter by agent string regular expressions courtesy of OSU Libraries
-# https://raw.github.com/osulibraries/DSpace/osukb/dspace/config/Spiders-UserAgent.txt
+Mozilla/5\.0 \(compatible; PRTG Network Monitor \(www\.paessler\.com\); Windows\)
+Mozilla/5\.0 \(compatible; monitis \- premium monitoring service; http://www\.monitis\.com\)
+Pingdom\.com_bot_version_1\.4_\(http://www\.pingdom\.com/\)
 Alexandria(\s|\+)prototype(\s|\+)project
 AllenTrack
 Arachmo
@@ -222,3 +223,13 @@ yodaobot
 zealbot
 zeus
 zyborg
+^$
+RePEc.link.checker
+HttpComponents\/1.1
+RPT\-HTTPClient\/0.3-3E
+URL2File\/1.981208
+parsijoo
+validator
+WWW\-Mechanize
+^IDA$
+MarcEdit.5.2.Web.Client
