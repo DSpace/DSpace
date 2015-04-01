@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 The University of Maryland. All Rights Reserved.
- * 
+ *
  */
 
 package org.dspace.content;
@@ -25,7 +25,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
 /**
  * Class representing an ETD department as seen in the Proquest metadata element
  * /DISS_submission/DISS_description/DISS_institution/DISS_inst_contact
- * 
+ *
  * @author Ben Wallberg
  */
 
@@ -60,7 +60,7 @@ public class EtdUnit extends DSpaceObject
 
     /**
      * Construct a EtdUnit from a given context and tablerow
-     * 
+     *
      * @param context
      * @param row
      */
@@ -78,7 +78,7 @@ public class EtdUnit extends DSpaceObject
                         "SELECT collection.* FROM collection, collection2etdunit WHERE "
                                 + "collection2etdunit.collection_id=collection.collection_id AND "
                                 + "collection2etdunit.etdunit_id= ? ",
-                        myRow.getIntColumn("etdunit_id"));
+                                myRow.getIntColumn("etdunit_id"));
 
         try
         {
@@ -116,12 +116,12 @@ public class EtdUnit extends DSpaceObject
 
     /**
      * Create a new etdunit
-     * 
+     *
      * @param context
      *            DSpace context object
      */
     public static EtdUnit create(Context context) throws SQLException,
-            AuthorizeException
+    AuthorizeException
     {
         // FIXME - authorization?
         if (!AuthorizeManager.isAdmin(context))
@@ -143,7 +143,7 @@ public class EtdUnit extends DSpaceObject
 
     /**
      * get the ID of the etdunit object
-     * 
+     *
      * @return id
      */
     @Override
@@ -154,7 +154,7 @@ public class EtdUnit extends DSpaceObject
 
     /**
      * get name of etdunit
-     * 
+     *
      * @return name
      */
     @Override
@@ -165,7 +165,7 @@ public class EtdUnit extends DSpaceObject
 
     /**
      * set name of etdunit
-     * 
+     *
      * @param name
      *            new etdunit name
      */
@@ -178,7 +178,7 @@ public class EtdUnit extends DSpaceObject
 
     /**
      * find the etdunit by its ID
-     * 
+     *
      * @param context
      * @param id
      */
@@ -206,10 +206,10 @@ public class EtdUnit extends DSpaceObject
 
     /**
      * Find the etdunit by its name - assumes name is unique
-     * 
+     *
      * @param context
      * @param name
-     * 
+     *
      * @return EtdUnit
      */
     public static EtdUnit findByName(Context context, String name)
@@ -241,12 +241,12 @@ public class EtdUnit extends DSpaceObject
 
     /**
      * Finds all etdunits in the site
-     * 
+     *
      * @param context
      *            DSpace context
      * @param sortField
      *            field to sort by -- EtdUnit.ID or EtdUnit.NAME
-     * 
+     *
      * @return array of all etdunits in the site
      */
     public static EtdUnit[] findAll(Context context, int sortField)
@@ -310,12 +310,12 @@ public class EtdUnit extends DSpaceObject
 
     /**
      * Find the etdunits that match the search query across etdunit_id or name
-     * 
+     *
      * @param context
      *            DSpace context
      * @param query
      *            The search string
-     * 
+     *
      * @return array of EtdUnit objects
      */
     public static EtdUnit[] search(Context context, String query)
@@ -326,7 +326,7 @@ public class EtdUnit extends DSpaceObject
 
     /**
      * Find the etdunits that match the search query across etdunit_id or name
-     * 
+     *
      * @param context
      *            DSpace context
      * @param query
@@ -335,7 +335,7 @@ public class EtdUnit extends DSpaceObject
      *            Inclusive offset
      * @param limit
      *            Maximum number of matches returned
-     * 
+     *
      * @return array of EtdUnit objects
      */
     public static EtdUnit[] search(Context context, String query, int offset,
@@ -444,12 +444,12 @@ public class EtdUnit extends DSpaceObject
      * Returns the total number of etdunits returned by a specific query,
      * without the overhead of creating the EtdUnit objects to store the
      * results.
-     * 
+     *
      * @param context
      *            DSpace context
      * @param query
      *            The search string
-     * 
+     *
      * @return the number of etdunits mathching the query
      */
     public static int searchResultCount(Context context, String query)
@@ -481,7 +481,7 @@ public class EtdUnit extends DSpaceObject
             count = new Long(row.getIntColumn("gcount"));
         }
         else
-        // getLongColumn works for postgres
+            // getLongColumn works for postgres
         {
             count = new Long(row.getLongColumn("gcount"));
         }
@@ -491,7 +491,7 @@ public class EtdUnit extends DSpaceObject
 
     /**
      * Delete a etdunit
-     * 
+     *
      */
     public void delete() throws SQLException
     {
@@ -538,10 +538,10 @@ public class EtdUnit extends DSpaceObject
     /**
      * Return <code>true</code> if <code>other</code> is the same EtdUnit as
      * this object, <code>false</code> otherwise
-     * 
+     *
      * @param other
      *            object to compare to
-     * 
+     *
      * @return <code>true</code> if object passed in represents the same etdunit
      *         as this object
      */
@@ -570,7 +570,7 @@ public class EtdUnit extends DSpaceObject
 
     /**
      * Get the collections this etdunit maps to
-     * 
+     *
      * @return array of <code>Collection</code> s this etdunit maps to
      * @throws SQLException
      */
@@ -584,7 +584,7 @@ public class EtdUnit extends DSpaceObject
                         "SELECT collection.* FROM collection, collection2etdunit WHERE "
                                 + "collection.collection_id=collection2etdunit.collection_id AND "
                                 + "collection2etdunit.etdunit_id= ? ORDER BY name",
-                        myRow.getIntColumn("etdunit_id"));
+                                myRow.getIntColumn("etdunit_id"));
 
         // Build a list of Collection objects
         List<Collection> collections = new ArrayList<Collection>();
@@ -623,7 +623,7 @@ public class EtdUnit extends DSpaceObject
 
     /**
      * Add an existing collection to this etdunit
-     * 
+     *
      * @param b
      *            the collection to add
      */
@@ -657,7 +657,7 @@ public class EtdUnit extends DSpaceObject
 
     /**
      * Remove a collection from this etdunit
-     * 
+     *
      * @param b
      *            the collection to remove
      */
@@ -689,7 +689,7 @@ public class EtdUnit extends DSpaceObject
 
     /**
      * Get the etdunits a collections maps to
-     * 
+     *
      * @return array of <code>EtdUnit</code>
      * @throws SQLException
      */
@@ -704,7 +704,7 @@ public class EtdUnit extends DSpaceObject
                         "SELECT etdunit.* FROM etdunit, collection2etdunit WHERE "
                                 + "etdunit.etdunit_id=collection2etdunit.etdunit_id AND "
                                 + "collection2etdunit.collection_id= ? ",
-                        g.getID());
+                                g.getID());
 
         // Build a list of EtdUnit objects
         List<EtdUnit> etdunits = new ArrayList<EtdUnit>();
