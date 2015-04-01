@@ -111,9 +111,11 @@
 	<message key="xmlui.Discovery.AbstractSearch.sort_by.dc.title_sort_desc">Título Desc</message>
 	<message
 		key="xmlui.Discovery.AbstractSearch.sort_by.dc.date.issued_dt_desc">Fecha Desc</message>
+	<message key="xmlui.Discovery.AbstractSearch.sort_by.dc.date.issued_dt_desc">Fecha de carga Desc</message>
 
 	<message key="xmlui.Discovery.AbstractSearch.sort_by.dc.title_sort_asc">Título Asc</message>
 	<message key="xmlui.Discovery.AbstractSearch.sort_by.dc.date.issued_dt_asc">Fecha Asc</message>
+	<message key="xmlui.Discovery.AbstractSearch.sort_by.dc.date.issued_dt_desc">Fecha de carga Asc</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dc.title_sort">Título</message>
 	<message
 		key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dc.date.issued_dt">Fecha</message>
