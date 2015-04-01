@@ -328,6 +328,10 @@
 						<xsl:with-param name="container" select="'li'" />
 					</xsl:call-template>
 					<xsl:call-template name="render-metadata">
+						<xsl:with-param name="field" select="'dcterms.subject.area'" />
+						<xsl:with-param name="container" select="'li'" />
+					</xsl:call-template>
+					<xsl:call-template name="render-metadata">
 						<xsl:with-param name="field" select="'dcterms.subject.materia'" />
 						<xsl:with-param name="container" select="'li'" />
 					</xsl:call-template>
@@ -356,10 +360,6 @@
 				<ul class="list-unstyled">
 					<xsl:call-template name="render-metadata">
 						<xsl:with-param name="field" select="'dcterms.title.investigacion'" />
-						<xsl:with-param name="container" select="'li'" />
-					</xsl:call-template>
-					<xsl:call-template name="render-metadata">
-						<xsl:with-param name="field" select="'dcterms.subject.areas'" />
 						<xsl:with-param name="container" select="'li'" />
 					</xsl:call-template>
 					<xsl:call-template name="render-metadata">
