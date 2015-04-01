@@ -298,6 +298,12 @@ public class SolrLogger
                 log.debug(e.getMessage(),e);
             }
 
+		    if(request.getHeader("User-Agent") != null)
+		    {
+		        doc1.addField("userAgent", request.getHeader("User-Agent"));
+		    }
+		    doc1.addField("isBot",isSpiderBot);
+
             // Save the location information if valid, save the event without
             // location information if not valid
             if(locationService != null)
@@ -321,12 +327,92 @@ public class SolrLogger
                     doc1.addField("city", location.city);
                     doc1.addField("latitude", location.latitude);
                     doc1.addField("longitude", location.longitude);
-                    doc1.addField("isBot",isSpiderBot);
+                    
 
-                    if(request.getHeader("User-Agent") != null)
+                }
+            }
+        }
+
+        if(dspaceObject != null){
+            doc1.addField("id", dspaceObject.getID());
+            doc1.addField("type", dspaceObject.getType());
+            storeParents(doc1, dspaceObject);
+        }
+        // Save the current time
+        doc1.addField("time", DateFormatUtils.format(new Date(), DATE_FORMAT_8601));
+        if (currentUser != null)
+        {
+            doc1.addField("epersonid", currentUser.getID());
+        }
+
+        return doc1;
+    }
+
+    private static SolrInputDocument getCommonSolrDoc(DSpaceObject dspaceObject, String ip, String userAgent, String xforwardedfor, EPerson currentUser) throws SQLException {
+        boolean isSpiderBot = SpiderDetector.isSpider(ip);
+        if(isSpiderBot &&
+                !ConfigurationManager.getBooleanProperty("usage-statistics", "logBots", true))
+        {
+            return null;
+        }
+
+        SolrInputDocument doc1 = new SolrInputDocument();
+        // Save our basic info that we already have
+
+
+            if (isUseProxies() && xforwardedfor != null) {
+                /* This header is a comma delimited list */
+                for (String xfip : xforwardedfor.split(",")) {
+                    /* proxy itself will sometime populate this header with the same value in
+                    remote address. ordering in spec is vague, we'll just take the last
+                    not equal to the proxy
+                    */
+                    if (!xforwardedfor.contains(ip)) {
+                        ip = xfip.trim();
+                    }
+                }
+
+            doc1.addField("ip", ip);
+
+            try
+            {
+                String dns = DnsLookup.reverseDns(ip);
+                doc1.addField("dns", dns.toLowerCase());
+            }
+            catch (Exception e)
+            {
+                log.error("Failed DNS Lookup for IP:" + ip);
+                log.debug(e.getMessage(),e);
+            }
+		    if(userAgent != null)
+		    {
+		        doc1.addField("userAgent", userAgent);
+		    }
+		    doc1.addField("isBot",isSpiderBot);
+            // Save the location information if valid, save the event without
+            // location information if not valid
+            if(locationService != null)
+            {
+                Location location = locationService.getLocation(ip);
+                if (location != null
+                        && !("--".equals(location.countryCode)
+                        && location.latitude == -180 && location.longitude == -180))
+                {
+                    try
+                    {
+                        doc1.addField("continent", LocationUtils
+                                .getContinentCode(location.countryCode));
+                    }
+                    catch (Exception e)
+
                     {
                         doc1.addField("userAgent", request.getHeader("User-Agent"));
                     }
+
+                    doc1.addField("countryCode", location.countryCode);
+                    doc1.addField("city", location.city);
+                    doc1.addField("latitude", location.latitude);
+                    doc1.addField("longitude", location.longitude);                    
                 }
             }
         }
