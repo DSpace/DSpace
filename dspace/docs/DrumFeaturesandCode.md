@@ -336,7 +336,27 @@ Maintain mapping from campus departments (from Proquest metadata) to DSpace coll
     * [etdunit-edit](../modules/jspui/src/main/webapp/tools/etdunit-edit.jsp) - edit single EtdUnit page
     * [etdunit-list](../modules/jspui/src/main/webapp/tools/etdunit-list.jsp) - list of all EtdUnit
 
+*XMLUI Webapp*
 
+* JAVA files
+    * [DeleteDepartmentsConfirm.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/administrative/etd_departments/DeleteDepartmentsConfirm.java) - loads the page for deleting a ETD Department.
+    * [EditDepartmentsForm.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/administrative/etd_departments/EditDepartmentsForm.java) - loads the page for editing a ETD Department.
+    * [ManageDepartmentsMain.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/administrative/etd_departments/ManageDepartmentsMain.java)  - loads the page for managing a ETD Department and its mapping to collections.
+    * [FlowDepartmentUtils.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/administrative/FlowDepartmentUtils.java) - contains utility functions for managing the ETD Department workflows.
+
+* Administrative Aspects
+    * [administrative.js](../modules/xmlui/src/main/resources/aspects/Administrative/administrative.js) - added new functions for creating new departments and deleting them, managing them, editing and managing them.
+    * [sitemap.xmap](../modules/xmlui/src/main/resources/aspects/Administrative/sitemap.xmap) - added administrative configurations for managing the ETD Department workflows.
+
+* Supporting files
+    * [Navigation.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/administrative/Navigation.java) - added code for linking ETD Department functionality to the Navigation bar menu.
+    * [Collection.java](../modules/additions/src/main/java/org/dspace/content/Collection.java) - added new "Search" and "Search Result Count" functionality in Collection.java
+    * [EtdUnit.java](../modules/additions/src/main/java/org/dspace/content/EtdUnit.java) - added new functionality to check whether given collection is mapped to a department. 
+    * [Constants.java](../modules/additions/src/main/java/org/dspace/core/Constants.java) - added support for ETDUNITs.
+
+* Labels
+    * [messages.xml](../modules/xmlui/src/main/webapp/i18n/messages.xml) - updated messages to include new labels for ETD Units.
+    
 <a name="item-collection-community"></a>
 ## Item/Community/Collection Display
 
