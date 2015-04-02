@@ -32,6 +32,8 @@ import org.dspace.utils.DSpace;
  * 
  * @author Andrea Bollini (CILEA)
  * @author Adán Román Ruiz at arvo.es (bugfix)
+ * @author Panagiotis Koutsourakis (National Documentation Centre) (bugfix)
+ * @author Kostas Stamatis (National Documentation Centre) (bugfix)
  * 
  */
 public class SolrBrowseDAO implements BrowseDAO
@@ -336,6 +338,22 @@ public class SolrBrowseDAO implements BrowseDAO
         addStatusFilter(query);
         query.setMaxResults(0);
         query.addFilterQueries("search.resourcetype:" + Constants.ITEM);
+
+        // We need to take into account the fact that we may be in a subset of the items
+        if (authority != null)
+        {
+            query.addFilterQueries("{!field f="+facetField + "_authority_filter}"
+                    + authority);
+        }
+        else if (this.value != null && !valuePartial)
+        {
+            query.addFilterQueries("{!field f="+facetField + "_value_filter}" + this.value);
+        }
+        else if (valuePartial)
+        {
+            query.addFilterQueries("{!field f="+facetField + "_partial}" + this.value);
+        }
+
         if (isAscending)
         {
             query.setQuery("bi_"+column + "_sort" + ": [* TO \"" + value + "\"}");
