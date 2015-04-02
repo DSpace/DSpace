@@ -157,7 +157,7 @@ public class FlowETDDepartmentUtils
      */
     public static FlowResult processSaveETDDepartment(Context context,
             int etd_departmentID, String newName, String[] newCollectionIDsArray)
-            throws SQLException, AuthorizeException, UIException
+                    throws SQLException, AuthorizeException, UIException
     {
         FlowResult result = new FlowResult();
 
@@ -319,5 +319,4 @@ public class FlowETDDepartmentUtils
 
         return result;
     }
-
 }

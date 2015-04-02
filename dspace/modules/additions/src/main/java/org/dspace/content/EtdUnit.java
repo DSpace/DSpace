@@ -752,7 +752,11 @@ public class EtdUnit extends DSpaceObject
 
     /**
      * Returns true or false based on whether a given collection is a member.
+<<<<<<< HEAD
      *
+=======
+     * 
+>>>>>>> adb9f3acc216dd65d0a35ea3bad5ee9c9358da00
      */
     public boolean isMember(Collection collection)
     {

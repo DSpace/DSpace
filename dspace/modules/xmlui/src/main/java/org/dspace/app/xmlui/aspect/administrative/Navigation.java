@@ -51,7 +51,7 @@ import org.xml.sax.SAXException;
  * @author Jay Paz
  */
 public class Navigation extends AbstractDSpaceTransformer implements
-        CacheableProcessingComponent
+CacheableProcessingComponent
 {
     private static final Message T_context_head = message("xmlui.administrative.Navigation.context_head");
 
@@ -235,7 +235,7 @@ public class Navigation extends AbstractDSpaceTransformer implements
 
     @Override
     public void addOptions(Options options) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException
+    UIException, SQLException, IOException, AuthorizeException
     {
         /*
          * Create skeleton menu structure to ensure consistent order between
@@ -297,7 +297,7 @@ public class Navigation extends AbstractDSpaceTransformer implements
                     context.addItem().addXref(
                             contextPath + "/admin/export?collectionID="
                                     + collection.getID(),
-                            T_context_export_collection);
+                                    T_context_export_collection);
                     context.addItem().addXref(
                             contextPath + "/csv/handle/" + dso.getHandle(),
                             T_context_export_metadata);
@@ -320,7 +320,7 @@ public class Navigation extends AbstractDSpaceTransformer implements
                     context.addItem().addXref(
                             contextPath + "/admin/export?communityID="
                                     + community.getID(),
-                            T_context_export_community);
+                                    T_context_export_community);
                 }
                 context.addItem().addXref(
                         contextPath + "/csv/handle/" + dso.getHandle(),
@@ -338,7 +338,7 @@ public class Navigation extends AbstractDSpaceTransformer implements
                 context.addItemXref(
                         contextPath + "/admin/community?createNew&communityID="
                                 + community.getID(),
-                        T_context_create_subcommunity);
+                                T_context_create_subcommunity);
             }
         }
 
@@ -351,7 +351,6 @@ public class Navigation extends AbstractDSpaceTransformer implements
             context.addItemXref(contextPath + "/admin/community?createNew",
                     T_context_create_community);
         }
-
         // System Administrator options!
         if (isSystemAdmin)
         {
@@ -402,7 +401,7 @@ public class Navigation extends AbstractDSpaceTransformer implements
     }
 
     public int addContextualOptions(List context) throws SQLException,
-            WingException
+    WingException
     {
         // How many options were added.
         int options = 0;
@@ -459,7 +458,7 @@ public class Navigation extends AbstractDSpaceTransformer implements
                 context.addItemXref(
                         contextPath + "/admin/community?createNew&communityID="
                                 + community.getID(),
-                        T_context_create_subcommunity);
+                                T_context_create_subcommunity);
                 options++;
             }
         }

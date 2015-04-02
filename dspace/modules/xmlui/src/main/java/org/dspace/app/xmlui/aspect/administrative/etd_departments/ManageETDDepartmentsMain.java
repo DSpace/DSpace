@@ -201,7 +201,7 @@ public class ManageETDDepartmentsMain extends AbstractDSpaceTransformer
         else
         {
             search.addPara().addButton("submit_delete")
-                    .setValue(T_submit_delete);
+            .setValue(T_submit_delete);
         }
 
         search.addHidden("administrative-continue").setValue(knot.getId());

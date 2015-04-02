@@ -219,7 +219,7 @@ public class Collection extends DSpaceObject
      * @throws AuthorizeException
      */
     static Collection create(Context context) throws SQLException,
-    AuthorizeException
+            AuthorizeException
     {
         return create(context, null);
     }
@@ -247,7 +247,7 @@ public class Collection extends DSpaceObject
         {
             c.handle = (handle == null) ? HandleManager
                     .createHandle(context, c) : HandleManager.createHandle(
-                            context, c, handle);
+                    context, c, handle);
         }
         catch (IllegalStateException ie)
         {
@@ -487,7 +487,7 @@ public class Collection extends DSpaceObject
         TableRow row = DatabaseManager.querySingle(context,
                 "SELECT count(*) as clcount FROM collection WHERE collection_id = ? OR "
                         + "LOWER(name) LIKE LOWER(?)", new Object[] {
-                int_param, dbquery });
+                        int_param, dbquery });
 
         // use getIntColumn for Oracle count data
         if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
@@ -495,7 +495,7 @@ public class Collection extends DSpaceObject
             count = Long.valueOf(row.getIntColumn("clcount"));
         }
         else
-            // getLongColumn works for postgres
+        // getLongColumn works for postgres
         {
             count = Long.valueOf(row.getLongColumn("clcount"));
         }
@@ -802,7 +802,7 @@ public class Collection extends DSpaceObject
      * @throws SQLException
      */
     public Bitstream setLogo(InputStream is) throws AuthorizeException,
-    IOException, SQLException
+            IOException, SQLException
     {
         // Check authorisation
         // authorized to remove the logo when DELETE rights
@@ -865,7 +865,7 @@ public class Collection extends DSpaceObject
      * @throws AuthorizeException
      */
     public Group createWorkflowGroup(int step) throws SQLException,
-    AuthorizeException
+            AuthorizeException
     {
         // Check authorisation - Must be an Admin to create Workflow Group
         AuthorizeUtil.authorizeManageWorkflowsGroup(ourContext, this);
@@ -1186,7 +1186,7 @@ public class Collection extends DSpaceObject
      * @throws IOException
      */
     public void removeTemplateItem() throws SQLException, AuthorizeException,
-    IOException
+            IOException
     {
         // Check authorisation
         AuthorizeUtil.authorizeManageTemplateItem(ourContext, this);
@@ -1254,7 +1254,7 @@ public class Collection extends DSpaceObject
      * @throws IOException
      */
     public void removeItem(Item item) throws SQLException, AuthorizeException,
-    IOException
+            IOException
     {
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
@@ -1344,7 +1344,7 @@ public class Collection extends DSpaceObject
     }
 
     public void canEdit(boolean useInheritance) throws AuthorizeException,
-    SQLException
+            SQLException
     {
         Community[] parents = getCommunities();
 
@@ -1575,7 +1575,7 @@ public class Collection extends DSpaceObject
                         "SELECT community.* FROM community, community2collection WHERE "
                                 + "community.community_id=community2collection.community_id "
                                 + "AND community2collection.collection_id= ? ",
-                                getID());
+                        getID());
 
         // Build a list of Community objects
         List<Community> communities = new ArrayList<Community>();
@@ -1635,8 +1635,7 @@ public class Collection extends DSpaceObject
                         "SELECT community.* FROM community, community2collection WHERE "
                                 + "community.community_id=community2collection.community_id "
                                 + "AND community2collection.collection_id=?",
-                                getID());
-
+                        getID());
         // Build a list of Community objects
         List<Community> communities = new ArrayList<Community>();
 

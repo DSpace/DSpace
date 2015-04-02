@@ -49,7 +49,7 @@ public class Constants
      * lets you look up type names from the type IDs
      */
     public static final String[] typeText = { "BITSTREAM", "BUNDLE", "ITEM",
-        "COLLECTION", "COMMUNITY", "SITE", "GROUP", "EPERSON", "ETDUNIT" };
+            "COLLECTION", "COMMUNITY", "SITE", "GROUP", "EPERSON", "ETDUNIT" };
 
     /**
      * Special Bundle and Bitstream Names:
@@ -142,9 +142,9 @@ public class Constants
      * lets you look up action names from the action IDs
      */
     public static final String[] actionText = { "READ", "WRITE",
-        "OBSOLETE (DELETE)", "ADD", "REMOVE", "WORKFLOW_STEP_1",
-        "WORKFLOW_STEP_2", "WORKFLOW_STEP_3", "WORKFLOW_ABORT",
-        "DEFAULT_BITSTREAM_READ", "DEFAULT_ITEM_READ", "ADMIN" };
+            "OBSOLETE (DELETE)", "ADD", "REMOVE", "WORKFLOW_STEP_1",
+            "WORKFLOW_STEP_2", "WORKFLOW_STEP_3", "WORKFLOW_ABORT",
+            "DEFAULT_BITSTREAM_READ", "DEFAULT_ITEM_READ", "ADMIN" };
 
     /**
      * generating constants for the relevance array dynamically is simple: just
@@ -168,19 +168,19 @@ public class Constants
      * test actionTypeRelevance[READ] | RCOMMUNITY, 0 = irrelevant)
      */
     public static final int[] actionTypeRelevance = {
-        RBITSTREAM | RBUNDLE | RITEM | RCOLLECTION | RCOMMUNITY, // 0 - READ
-        RBITSTREAM | RBUNDLE | RITEM | RCOLLECTION | RCOMMUNITY, // 1 -
-        // WRITE
-        0, // 2 - DELETE (obsolete)
-        RBUNDLE | RITEM | RCOLLECTION | RCOMMUNITY, // 3 - ADD
-        RBUNDLE | RITEM | RCOLLECTION | RCOMMUNITY, // 4 - REMOVE
-        0, // 5 - WORKFLOW_STEP_1
-        0, // 6 - WORKFLOW_STEP_2
-        0, // 7 - WORKFLOW_STEP_3
-        0, // 8 - WORKFLOW_ABORT
-        RCOLLECTION, // 9 - DEFAULT_BITSTREAM_READ
-        RCOLLECTION, // 10 - DEFAULT_ITEM_READ
-        RITEM | RCOLLECTION | RCOMMUNITY // 11 - ADMIN
+            RBITSTREAM | RBUNDLE | RITEM | RCOLLECTION | RCOMMUNITY, // 0 - READ
+            RBITSTREAM | RBUNDLE | RITEM | RCOLLECTION | RCOMMUNITY, // 1 -
+            // WRITE
+            0, // 2 - DELETE (obsolete)
+            RBUNDLE | RITEM | RCOLLECTION | RCOMMUNITY, // 3 - ADD
+            RBUNDLE | RITEM | RCOLLECTION | RCOMMUNITY, // 4 - REMOVE
+            0, // 5 - WORKFLOW_STEP_1
+            0, // 6 - WORKFLOW_STEP_2
+            0, // 7 - WORKFLOW_STEP_3
+            0, // 8 - WORKFLOW_ABORT
+            RCOLLECTION, // 9 - DEFAULT_BITSTREAM_READ
+            RCOLLECTION, // 10 - DEFAULT_ITEM_READ
+            RITEM | RCOLLECTION | RCOMMUNITY // 11 - ADMIN
     };
 
     public static final String DEFAULT_ENCODING = "UTF-8";

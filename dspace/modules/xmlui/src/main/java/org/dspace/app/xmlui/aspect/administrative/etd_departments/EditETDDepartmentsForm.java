@@ -226,7 +226,7 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
      */
     private void addCollectionsSearch(Division div, String query, int page,
             EtdUnit etd_department, List<Integer> memberCollectionIDs)
-            throws SQLException, WingException
+                    throws SQLException, WingException
     {
         Collection[] collections = Collection.search(context, query, page
                 * RESULTS_PER_PAGE, RESULTS_PER_PAGE);
@@ -286,14 +286,14 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
                 else
                 {
                     collectionData.addCell().addHighlight("warn")
-                            .addContent(T_pending);
+                    .addContent(T_pending);
                 }
             }
             else
             {
                 collectionData.addCell()
-                        .addButton("submit_add_collection_" + collectionID)
-                        .setValue(T_submit_add);
+                .addButton("submit_add_collection_" + collectionID)
+                .setValue(T_submit_add);
             }
         }
 
@@ -311,7 +311,7 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
      */
     private boolean addMemberList(Division div, EtdUnit parent,
             List<Integer> memberCollectionIDs, int highlightCollectionID)
-            throws WingException, SQLException
+                    throws WingException, SQLException
     {
         // Flag to remember if there are any pending changes.
         boolean changes = false;
@@ -381,9 +381,10 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
      */
     private void addMemberRow(Table table, Collection collection,
             boolean highlight, boolean pendingAddition, boolean pendingRemoval)
-            throws WingException, SQLException
+                    throws WingException, SQLException
     {
         String fullName = collection.getName();
+
         Row collectionData = table.addRow(null, null, highlight ? "highlight"
                 : null);
 
@@ -404,9 +405,9 @@ public class EditETDDepartmentsForm extends AbstractDSpaceTransformer
         else
         {
             collectionData
-                    .addCell()
-                    .addButton("submit_remove_collection_" + collection.getID())
-                    .setValue(T_submit_remove);
+            .addCell()
+            .addButton("submit_remove_collection_" + collection.getID())
+            .setValue(T_submit_remove);
         }
     }
 }

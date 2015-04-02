@@ -64,7 +64,7 @@ public class DeleteETDDepartmentsConfirm extends AbstractDSpaceTransformer
 
     @Override
     public void addBody(Body body) throws WingException, SQLException,
-            AuthorizeException
+    AuthorizeException
     {
         String idsString = parameters.getParameter("etd_departmentIDs", null);
 
@@ -77,7 +77,7 @@ public class DeleteETDDepartmentsConfirm extends AbstractDSpaceTransformer
 
         Division deleted = body.addInteractiveDivision(
                 "etd_department-confirm-delete", contextPath
-                        + "/admin/etd_departments", Division.METHOD_POST,
+                + "/admin/etd_departments", Division.METHOD_POST,
                 "primary administrative etd_departments");
         deleted.setHead(T_head);
         deleted.addPara(T_para);
