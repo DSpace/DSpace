@@ -690,14 +690,27 @@
 
     <!-- Like the header, the footer contains various miscellaneous text, links, and image placeholders -->
     <xsl:template name="buildFooter">
+
+        <!-- MOspace navigation bar and tag line, absolutely positioned, code goes here because it isn't semantically important -->
+        <xsl:variable name="app_path" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]" />
+
+        <div id="ms-navigation">
+            <ul id="ms-navigation-list">
+                <li class="ms-navigation-link"><a href="{$app_path}/discover">search</a> | </li>
+                <li class="ms-navigation-link"><a href="{$app_path}/community-list">browse</a> | </li>
+                <li class="ms-navigation-link"><a href="{$app_path}/pages/add">add to MOspace</a> | </li>
+                <li class="ms-navigation-link"><a href="{$app_path}/pages/about">about</a> | </li>
+                <li class="ms-navigation-link"><a href="{$app_path}/pages/help">help</a></li>
+            </ul>
+        </div>
+        
+        <div id="ms-tagline">Preserving the intellectual output and resources of the Universiyt of Missouri</div>
+
         <footer>
                 <div class="row">
                     <hr/>
                     <div class="col-xs-7 col-sm-8">
-                        <div>
-                            <a href="http://www.dspace.org/" target="_blank">DSpace software</a> copyright&#160;&#169;&#160;2002-2013&#160; <a href="http://www.duraspace.org/" target="_blank">Duraspace</a>
-                        </div>
-                        <div class="hidden-print">
+                       <div class="hidden-print">
                             <a>
                                 <xsl:attribute name="href">
                                     <xsl:value-of
@@ -719,11 +732,7 @@
                     </div>
                     <div class="col-xs-5 col-sm-4 hidden-print">
                         <div class="pull-right">
-                            <span class="theme-by">Theme by&#160;</span>
-                            <br/>
-                            <a title="@mire NV" target="_blank" href="http://atmire.com">
-                                <img alt="@mire NV" src="{concat($theme-path, '/images/@mirelogo-small.png')}"/>
-                            </a>
+                            hosted by <a href="http://lso.umsystem.edu/">University of Missouri Library Systems</a>
                         </div>
 
                     </div>
