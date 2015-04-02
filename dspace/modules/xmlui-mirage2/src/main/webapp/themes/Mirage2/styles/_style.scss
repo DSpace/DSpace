@@ -12,7 +12,7 @@
  */
 
 //example mixin to set the text-selection style
-@mixin selection {
+/*@mixin selection {
     ::-moz-selection { @content; }
     ::selection { @content; }
 }
@@ -20,4 +20,13 @@
 @include selection {
     color: white;
     background: hotpink;
+}
+*/
+
+.navbar {
+    height: 80px;
+}
+
+header .navbar-brand img {
+    height: 60px;
 }

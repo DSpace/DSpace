@@ -182,7 +182,7 @@
         <!-- <theme name="Test Theme 2" regex="community-list" path="theme2/"/> -->
 
 		<!-- MOspace theme, based on Mirage -->
-        <theme name="MOspace Mirage2 Theme" regex=".*" path="Mirage2/mospace/" />
+        <theme name="Mirage2 Theme" regex=".*" path="Mirage2/" />
 
         <!-- Mirage theme, @mire contributed theme, default since DSpace 3.0 -->
         <!-- <theme name="Atmire Mirage Theme" regex=".*" path="Mirage/" /> -->
