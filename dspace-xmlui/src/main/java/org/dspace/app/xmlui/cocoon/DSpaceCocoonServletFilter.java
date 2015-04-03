@@ -34,11 +34,13 @@ import org.dspace.harvest.OAIHarvester;
  * initializes DSpace / XML UI configuration parameters, and 2) it will perform interrupted 
  * request resumption.
  * 
- * @author Scott Phillips
+ * based on class by scott philips
+ * modified for LINDAT/CLARIN
  */
 public class DSpaceCocoonServletFilter implements Filter 
 {
-    private static final Logger LOG = Logger.getLogger(DSpaceCocoonServletFilter.class);
+    private static final Logger LOG = cz.cuni.mff.ufal.Logger.getLogger(
+    		DSpaceCocoonServletFilter.class);
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -273,21 +275,20 @@ public class DSpaceCocoonServletFilter implements Filter
                 {   // invoke the next filter
                     arg2.doFilter(realRequest, realResponse);
                 }
-    } catch (IOException e) {
+    } catch (SocketException e) {
         ContextUtil.abortContext(realRequest);
-        if (LOG.isDebugEnabled()) {
-              LOG.debug("The connection was reset", e);
-            }
-        else {
-            LOG.error("Client closed the connection before file download was complete");
-        }
+            LOG.warn("Socket Error Occurred Processing Request - " + e.toString());
     } catch (RuntimeException e) {
         ContextUtil.abortContext(realRequest);
         LOG.error("Serious Runtime Error Occurred Processing Request!", e);
         throw e;
 	} catch (Exception e) {
 	    ContextUtil.abortContext(realRequest);
+        if(e.getMessage().contains("ClientAbort")) {
+            LOG.warn("Client has aborted the connection." + e.getMessage());
+        } else {
             LOG.error("Serious Error Occurred Processing Request!", e);
+        }
 	} finally {
 	    // Close out the DSpace context no matter what.
 	    ContextUtil.completeContext(realRequest);

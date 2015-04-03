@@ -33,6 +33,8 @@ importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowAuthorizatio
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowContainerUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowCurationUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowMetadataImportUtils);
+importClass(Packages.cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.FlowHandleUtils);
+importClass(Packages.cz.cuni.mff.ufal.administrative.LicenseForm);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowBatchImportUtils);
 importClass(Packages.java.lang.System);
 importClass(Packages.org.dspace.core.ConfigurationManager);
@@ -369,6 +371,16 @@ function assertEditGroup(groupID)
 }
 
 /**
+ * Assert that the currently authenticated eperson can edit the given handle. If they can
+ * not then this method will never return.
+ */
+function assertEditHandle(handleID)
+{    
+    // only system admin can create or edit handles at the moment
+    assertAdministrator();    
+}
+
+/**
  * Return whether the currently authenticated eperson is an
  * administrator.
  */
@@ -389,7 +401,14 @@ function assertAdministrator() {
 	}
 }
 
-
+function assertCurator(){
+	if(! isAdministrator()){
+        if( ! FlowCurationUtils.isReviewer(getDSContext(), cocoon.request) ){
+                sendPage("admin/not-authorized");
+                cocoon.exit();
+		}
+	}
+}
 
 /*********************
  * Entry Point flows
@@ -630,7 +649,7 @@ function startEditCommunity()
  */
 function startCurate()
 {
-        assertAdministrator();
+        assertCurator();
 
         doCurate();
 
@@ -639,6 +658,34 @@ function startCurate()
         cocoon.exit();
 }
 
+
+/**
+ * Start (site-wide) licenses
+ */
+function startLicenses()
+{
+        assertAdministrator();
+
+        licenses();
+
+        cocoon.redirectTo(cocoon.request.getContextPath());
+        getDSContext().complete();
+        cocoon.exit();
+}
+
+/**
+ * Start (site-wide) handles
+ */
+function startManageHandles()
+{
+        assertAdministrator();
+
+        doManageHandles();
+
+        cocoon.redirectTo(cocoon.request.getContextPath());
+        getDSContext().complete();
+        cocoon.exit();
+}
 
 
 
@@ -1437,6 +1484,18 @@ function doEditItem(itemID)
                 {
                         doCurateItem(itemID, cocoon.request.get("curate_task"));
                 }
+        else if (cocoon.request.get("edit_license"))
+        {
+            doEditItemLicense(itemID);
+        }
+        else if (cocoon.request.get("edit_license_define"))
+        {
+            defineNewLicense(itemID);
+        }
+        else if (cocoon.request.get("embargo"))
+        {
+            editEmbargo(itemID);
+        }
                 else
 		{
 			// This case should never happen but to prevent an infinite loop
@@ -1444,6 +1503,27 @@ function doEditItem(itemID)
 			return null;
 		}
 	} while (true)
+}
+
+// should we stay in current edit item tab?
+function doEditNavigateAway(should_stay) {
+  if ( cocoon.request.get(should_stay) ) {
+    return false;
+  }
+  
+  if ( cocoon.request.get("submit_return") 
+    || cocoon.request.get("submit_status") 
+    || cocoon.request.get("submit_bitstreams") 
+    || cocoon.request.get("submit_metadata") 
+    || cocoon.request.get("view_item") 
+    || cocoon.request.get("submit_curate") 
+    || cocoon.request.get("edit_license") 
+    || cocoon.request.get("embargo") 
+    ) {
+      return true;
+    }
+    
+    return false;
 }
 
 /**
@@ -1462,6 +1542,57 @@ function doViewItem(itemID){
 }
 
 /**
+ *  Show/Edit Item License
+ */
+function doEditItemLicense(itemID) {
+    var result;
+    do{
+        sendPageAndWait("admin/item/edit_license",{"itemID":itemID}, result);
+        assertEditItem(itemID);
+        if (cocoon.request.get("update_item_license"))
+        {
+            var licenseID = cocoon.request.get("licenseSelect");
+            result = LicenseForm.updateLicense(getDSContext(), itemID, licenseID);
+        }
+        else if (cocoon.request.get("remove_license"))
+        {
+            result = LicenseForm.removeLicense(getDSContext(), itemID);
+        }
+        else
+        {
+            return null;
+        }
+    } while (true)
+}
+
+
+/**
+ * Define New License
+ */
+function defineNewLicense(itemID) {
+    var result;
+    do{
+        sendPageAndWait("admin/item/edit_license_define",{"itemID":itemID}, result);
+        assertEditItem(itemID);
+        if (cocoon.request.get("new_license_save"))
+        {   
+            var name = cocoon.request.get("license_name");
+            var url = cocoon.request.get("license_url");
+            var confirmation = cocoon.request.get("license_confirmation");
+            var required = cocoon.request.get("license_required");
+            var label = cocoon.request.get("license_label");
+            var exLabel = cocoon.request.get("license_label_extended");
+            result = LicenseForm.defineLicense(getDSContext(), name, url, confirmation, required, label, exLabel);            
+        } else if (cocoon.request.get("new_license_return")) {      
+            doEditItemLicense(itemID);
+            break;
+        } else {
+            return null;
+        }
+    } while (true)  
+}
+
+/**
  * Change the status of an item, withdraw or reinstate, or completely delete it.
  */
 function doEditItemStatus(itemID)
@@ -1474,7 +1605,7 @@ function doEditItemStatus(itemID)
 		assertEditItem(itemID);
 		result = null;
 
-		if (cocoon.request.get("submit_return")  || cocoon.request.get("submit_bitstreams") || cocoon.request.get("submit_metadata") || cocoon.request.get("view_item") || cocoon.request.get("submit_curate") )
+        if (doEditNavigateAway("submit_status"))
 		{
 			// go back to wherever we came from.
 			return null;
@@ -1542,7 +1673,7 @@ function doEditItemBitstreams(itemID)
 		result = null;
 
         var submitButton = Util.getSubmitButton(cocoon.request, "submit_return");
-		if (cocoon.request.get("submit_return") || cocoon.request.get("submit_status") || cocoon.request.get("submit_bitstreams") || cocoon.request.get("submit_metadata") || cocoon.request.get("view_item") || cocoon.request.get("submit_curate"))
+        if (doEditNavigateAway(""))
 		{
 			// go back to wherever we came from.
 			return null;
@@ -1588,9 +1719,7 @@ function doEditItemMetadata(itemID, templateCollectionID)
 		assertEditItem(itemID);
 		result = null;
 
-		if (cocoon.request.get("submit_return") || cocoon.request.get("submit_status") ||
-                    cocoon.request.get("submit_bitstreams") || cocoon.request.get("submit_metadata") ||
-                    cocoon.request.get("view_item") || cocoon.request.get("submit_curate"))
+        if (doEditNavigateAway(""))
 		{
 			// go back to wherever we came from.
 			return null;
@@ -1606,6 +1735,32 @@ function doEditItemMetadata(itemID, templateCollectionID)
 			result = FlowItemUtils.processEditItem(getDSContext(),itemID,cocoon.request);
 		}
 	} while (true)
+}
+
+/**
+ * Allow changing embargo.
+ */
+function editEmbargo(itemID)
+{
+    assertEditItem(itemID);
+
+    var result;
+    do {
+        sendPageAndWait("admin/item/embargo",{"itemID":itemID},result);
+        assertEditItem(itemID);
+        result = null;
+
+        if (doEditNavigateAway(""))
+        {
+            // go back to where ever we came from.
+            return null;
+        }
+        else if (cocoon.request.get("submit_update"))
+        {
+            // Update the item
+            result = FlowItemUtils.processEmbargoItem(getDSContext(),itemID,cocoon.request);
+        }
+    } while (true)
 }
 
 
@@ -1950,6 +2105,162 @@ function doMetadataImportConfirm()
     return null;
 }
 
+
+
+/********************
+ * Handle flows
+ ********************/
+
+/**
+ * Manage handles, allow users to create new, edit exiting,
+ * or remove handles. The user may also list handles
+ * and change prefixes of handles.
+ *
+ * The is typicaly used as an entry point flow.
+ */
+function doManageHandles()
+{
+	assertAdministrator();
+
+    var result = null;
+    
+    do {
+	    sendPageAndWait("admin/handle/main",{},result);
+	    assertAdministrator();
+	
+	    result = null;
+	
+	    if (cocoon.request.get("submit_add"))
+	    {
+	        // Just create a blank handle then pass it to the handle editor.
+	        result = doEditHandle(-1);
+	    }
+	    else if (cocoon.request.get("submit_edit") && cocoon.request.get("handle_id"))
+	    {
+	        // Edit a specific handle
+	        var handleID = cocoon.request.get("handle_id");
+	        result = doEditHandle(handleID);
+	    }
+	    else if (cocoon.request.get("submit_delete") && cocoon.request.get("handle_id"))
+	    {
+	        // Delete a specific handle
+	        var handleID = cocoon.request.get("handle_id");
+	        result = doDeleteHandle(handleID);
+	    }	 
+	    else if (cocoon.request.get("submit_change_prefix"))
+	    {
+	        // Change prefix	        
+	        result = doChangeHandlePrefix();
+	    }
+    } while (true);
+}
+
+
+/**
+ * This flow allows for the full editing of a handle.
+ */
+
+function doEditHandle(handleID)
+{
+    assertEditHandle();
+
+    var result = null;
+    do {
+        sendPageAndWait("admin/handle/edit",{"handle_id":handleID},result);
+        assertEditHandle();
+
+        result = null;
+
+        if (cocoon.request.get("submit_cancel"))
+        {
+            // Just return with out saving anything.
+            return null;
+        }
+        else if (cocoon.request.get("submit_save"))
+        {            
+
+            var handle = cocoon.request.get("handle");
+            var url = cocoon.request.get("url");
+
+            var resourceTypeID = cocoon.request.get("resource_type_id");
+            if(resourceTypeID == null) 
+                resourceTypeID = -1;
+
+            var resourceID = cocoon.request.get("resource_id");
+            if(resourceID == null) 
+                resourceID = -1;
+            
+            var archiveOldHandle = cocoon.request.get("archive_old_handle") == null ? false : true;
+
+            result = FlowHandleUtils.processSaveHandle(getDSContext(),handleID,handle,url,resourceTypeID,resourceID,archiveOldHandle);
+
+            // In case a handle was created, update our id.
+            if (result != null && result.getParameter("handle_id"))
+                handleID = result.getParameter("handle_id");
+        }
+
+    } while (result == null || !result.getContinue())
+
+    return result;
+}
+
+/**
+ * Confirm that the given handleID should be deleted, if confirmed it will be deleted.
+ */
+function doDeleteHandle(handleID)
+{
+	assertEditHandle();
+	
+    var result = null;
+    do {
+	    sendPageAndWait("admin/handle/delete",{"handle_id":handleID},result);
+	    assertEditHandle();	
+	    
+	    result = null;
+	    
+	    if (cocoon.request.get("submit_cancel"))
+        {
+            // Just return with out saving anything.
+            return null;
+        }
+	    else if (cocoon.request.get("submit_confirm"))
+	    {
+	        // The user has confirmed, actualy delete the handle	        
+	        result = FlowHandleUtils.processDeleteHandle(getDSContext(),handleID);	        
+	    }
+    } while (result == null || !result.getContinue())
+    return result;
+}
+
+/**
+ * Change handle prefix.
+ */
+function doChangeHandlePrefix()
+{
+	assertEditHandle();
+
+	var result = null;
+	do {
+	    sendPageAndWait("admin/handle/change-prefix",{},result);
+	    assertEditHandle();
+	    
+	    result = null;
+	    
+	    if (cocoon.request.get("submit_cancel")) {
+	    	// Just return with out saving anything.
+            return null;
+	    }
+	    if (cocoon.request.get("submit_change"))
+	    {   
+	        var oldPrefix = cocoon.request.get("old_prefix");
+	        var newPrefix = cocoon.request.get("new_prefix");
+	        var archiveOldHandles = cocoon.request.get("archive_old_handles") == null ? false : true;                
+	        
+	        result = FlowHandleUtils.changeHandlePrefix(getDSContext(),oldPrefix,newPrefix,archiveOldHandles);	        
+	    }
+	} while (result == null || !result.getContinue())
+    return result;
+}
 /**
  * Manage batch metadata import
  *
@@ -3167,6 +3478,117 @@ function doDeleteCommunityRole(communityID,role)
 }
 
 /**
+ * Edit Licenses / Add licenses
+ * (Can only be performed by a DSpace Administrator)
+ */
+
+function licenses()
+{
+    
+    listLicenses();
+    
+    do {
+        if(cocoon.request.get("license_list"))
+        {
+            listLicenses();
+        }
+        else if(cocoon.request.get("license_define"))
+        {
+            newLicense();
+        }
+        else if(cocoon.request.get("label_define"))
+        {
+            newLabel();
+        }
+        else
+        {
+            return null;
+        }
+    }
+    while (true);
+}
+
+function newLicense() {
+    var result;
+    do {
+        sendPageAndWait("admin/licenses/define", {}, result);
+        assertAdministrator();
+        if (cocoon.request.get("new_license_save")){    
+            var name = cocoon.request.get("license_name");
+            var url = cocoon.request.get("license_url");
+            var confirmation = cocoon.request.get("license_confirmation");
+            var required = cocoon.request.get("license_required");
+            var label = cocoon.request.get("license_label");
+            var exLabel = cocoon.request.get("license_label_extended");
+            result = LicenseForm.defineLicense(getDSContext(), name, url, confirmation, required, label, exLabel);            
+        } else if(cocoon.request.get("new_license_return")) {
+            listLicenses();
+            break;
+        } else {
+            return null;
+        }
+    } while (true);
+}
+
+function newLabel() {
+    var result;
+    do {
+        sendPageAndWait("admin/licenses/label", {}, result);
+        assertAdministrator();
+        if (cocoon.request.get("new_label_save")){  
+            var label = cocoon.request.get("label");
+            var title = cocoon.request.get("title");
+            var extended = cocoon.request.get("extended");
+            var icon = cocoon.request.get("icon");
+            result = LicenseForm.defineLabel(getDSContext(), cocoon.request);           
+        } else if(cocoon.request.get("new_label_return")) {
+            listLicenses();
+            break;
+        } else {
+            return null;
+        }
+    } while (true);
+}
+
+
+function listLicenses()
+{
+    assertAdministrator();
+    var result;
+    var licenseIDs;
+    var del = false;
+    do {
+        if(del) {
+            sendPageAndWait("admin/licenses/main", {"licenseIDs":licenseIDs, "delete":true}, result);
+            del = false;
+        } else {
+            sendPageAndWait("admin/licenses/main", {"licenseIDs":licenseIDs}, result);
+        }
+        
+        if(cocoon.request.get("edit")) {
+            result = null;
+            licenseIDs = cocoon.request.get("license_id");
+        } else if(cocoon.request.get("update")){
+            result = LicenseForm.updateLicense(getDSContext(), cocoon.request);
+            licenseIDs = result.getParameter("licenseIDs");
+        } else if(cocoon.request.get("delete")) {
+            result = null;
+            licenseIDs = cocoon.request.get("license_id");
+            del = true;
+        } else if(cocoon.request.get("confirm")) {
+            result = LicenseForm.deleteLicense(getDSContext(), cocoon.request);         
+            licenseIDs = "";
+        } else if(cocoon.request.get("cancel")) {
+            result = null;
+            licenseIDs = "";
+        } else {
+            return null;
+        }
+    } while (true)  
+}
+
+
+/**
  * Curate a DSpace Object, from site-wide Administrator tools
  * (Can only be performed by a DSpace Administrator)
  */
@@ -3174,7 +3596,7 @@ function doCurate()
 {
     var result;
     
-    assertAdministrator();
+    assertCurator();
 
     var identifier;
     var curateTask;
@@ -3198,6 +3620,9 @@ function doCurate()
         else if (cocoon.request.get("submit_queue_task"))
         {
             result = FlowCurationUtils.processQueueObject(getDSContext(), cocoon.request);
+        }
+        else if (cocoon.request.get("submit_run_all_tasks")){
+        	result = FlowCurationUtils.processRunAll(getDSContext(), cocoon.request);
         }
         
         //if 'identifier' parameter was set in result, pass it back to sendPageAndWait call (so it is prepopulated in Admin UI)

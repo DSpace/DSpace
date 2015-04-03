@@ -33,8 +33,8 @@ import org.dspace.eperson.Group;
  * may browse/search a the list of groups, they may also add new groups or select
  * existing groups to edit or delete.
  * 
- * @author Alexey Maslov
- * @author Scott Phillips
+ * based on class by Alexey Maslov and Scott Phillips
+ * modified for LINDAT/CLARIN
  */
 public class ManageGroupsMain
         extends AbstractDSpaceTransformer
@@ -86,6 +86,10 @@ public class ManageGroupsMain
             message("xmlui.administrative.group.ManageGroupsMain.submit_delete");
     private static final Message T_no_results =
             message("xmlui.administrative.group.ManageGroupsMain.no_results");
+
+    private static final Message T_head1_none =
+            message("xmlui.ArtifactBrowser.AbstractSearch.head1_none");
+    
     /** The number of results to show on one page. */
     private static final int PAGE_SIZE = 15;
     /** The maximum size of a collection or community name allowed */
@@ -106,11 +110,13 @@ public class ManageGroupsMain
         String baseURL = contextPath + "/admin/groups?administrative-continue="
                 + knot.getId();
         String query = decodeFromURL(parameters.getParameter("query", ""));
-        int page = parameters.getParameterAsInteger("page", 0);
+        int page = parameters.getParameterAsInteger("page", 1);
+        if(page <= 0)
+        	page = 1;
+
         int highlightID = parameters.getParameterAsInteger("highlightID", -1);
         int resultCount = Group.searchResultCount(context, query);
-        Group[] groups = Group.search(context, query, page * PAGE_SIZE,
-                PAGE_SIZE);
+        Group[] groups = Group.search(context, query, (page-1) * PAGE_SIZE, PAGE_SIZE);
 
 
 
@@ -151,29 +157,18 @@ public class ManageGroupsMain
         search.setHead(T_search_head);
 
 
-        if (resultCount > PAGE_SIZE)
-        {
-            // If there are enough results then paginate the results
-            int firstIndex = page * PAGE_SIZE + 1;
-            int lastIndex = page * PAGE_SIZE + groups.length;
+        int firstIndex = (page-1)*PAGE_SIZE+1; 
+        int lastIndex = (page-1)*PAGE_SIZE + PAGE_SIZE;
+        if(lastIndex > resultCount) lastIndex = resultCount;
+        int totalPages = (int)Math.ceil((double)resultCount / PAGE_SIZE); 
 
-            String nextURL = null, prevURL = null;
-            if (page < (resultCount / PAGE_SIZE))
-            {
-                nextURL = baseURL + "&page=" + (page + 1);
-            }
-            if (page > 0)
-            {
-                prevURL = baseURL + "&page=" + (page - 1);
-            }
+		search.setHead(T_head1_none.parameterize(firstIndex, lastIndex, resultCount));
+		search.setMaskedPagination(resultCount, firstIndex, lastIndex, page, totalPages, baseURL+"&page={pageNum}");
 
-            search.setSimplePagination(resultCount, firstIndex, lastIndex,
-                    prevURL, nextURL);
-        }
 
 
         Table table = search.addTable("groups-search-table", groups.length + 1,
-                1);
+				 5);
         Row header = table.addRow(Row.ROLE_HEADER);
         header.addCell().addContent(T_search_column1);
         header.addCell().addContent(T_search_column2);
@@ -203,7 +198,7 @@ public class ManageGroupsMain
             {
                 // Don't allow the user to remove the administrative (id:1) or 
                 // anonymous group (id:0) 
-                row.addCell();
+            	row.addCell().addHighlight("fa fa-ban text-error").addContent(" ");
             }
 
             row.addCell().addContent(group.getID());

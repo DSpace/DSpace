@@ -29,10 +29,13 @@ import java.sql.SQLException;
  * if the mean of this score is higher then the minimum score the
  * item will be sent to the next action/step else it will be rejected
  *
- * @author Bram De Schouwer (bram.deschouwer at dot com)
- * @author Kevin Van de Velde (kevin at atmire dot com)
- * @author Ben Bosman (ben at atmire dot com)
- * @author Mark Diggory (markd at atmire dot com)
+ * based on class by:
+ * Bram De Schouwer (bram.deschouwer at dot com)
+ * Kevin Van de Velde (kevin at atmire dot com)
+ * Ben Bosman (ben at atmire dot com)
+ * Mark Diggory (markd at atmire dot com)
+ *
+ * modified for LINDAT/CLARIN
  */
 public class ScoreEvaluationAction extends ProcessingAction{
 
@@ -60,7 +63,7 @@ public class ScoreEvaluationAction extends ProcessingAction{
             wfi.getItem().clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "score", null, Item.ANY);
 
             String provDescription = getProvenanceStartId() + " Approved for entry into archive with a score of: " + scoreMean;
-            wfi.getItem().addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
+            wfi.getItem().store_provenance_info(provDescription, c.getCurrentUser());
             wfi.getItem().update();
         }
         if(hasPassed){

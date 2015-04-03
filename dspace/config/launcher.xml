@@ -1,5 +1,14 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <commands>
+
+    <command>
+        <name>ufal-info</name>
+        <description>Create repository report</description>
+        <step>
+            <class>cz.cuni.mff.ufal.Report</class>
+        </step>
+    </command>
+
     <command>
         <name>checker</name>
         <description>Run the checksum checker</description>
@@ -100,7 +109,7 @@
         <name>generate-sitemaps</name>
         <description>Generate search engine and html sitemaps</description>
         <step>
-            <class>org.dspace.app.sitemap.GenerateSitemaps</class>
+            <class>cz.cuni.mff.ufal.dspace.app.sitemap.GenerateSitemaps</class>
         </step>
     </command>
     <command>
@@ -215,6 +224,13 @@
         <description>OAI script manager</description>
         <step>
             <class>org.dspace.xoai.app.XOAI</class>
+        </step>
+    </command>
+    <command>
+        <name>move-items</name>
+        <description>Move items from one collection to another</description>
+        <step>
+            <class>cz.cuni.mff.ufal.dspace.app.MoveItems</class>
         </step>
     </command>
     <command>

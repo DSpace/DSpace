@@ -25,8 +25,9 @@ import org.dspace.core.Utils;
 /**
  * Export the object's DSpace deposit license.
  *
- * @author  Larry Stone
+ * based on class by  Larry Stone
  * @version $Revision: 1.0 $
+ * modified for LINDAT/CLARIN
  */
 public class LicenseStreamDisseminationCrosswalk
     implements StreamDisseminationCrosswalk
@@ -57,7 +58,11 @@ public class LicenseStreamDisseminationCrosswalk
              
             if (licenseBs != null)
             {
-                Utils.copy(licenseBs.retrieve(), out);
+            	try { 
+            		Utils.copy(licenseBs.retrieve(), out);
+            	}catch( IOException e ) {
+            		log.error( "Failed getting Deposit license file", e );
+            	}
                 out.close();
             }
         }

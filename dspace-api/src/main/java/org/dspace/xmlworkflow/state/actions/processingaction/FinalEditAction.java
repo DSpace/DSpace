@@ -24,10 +24,13 @@ import java.sql.SQLException;
  * Processing class of an action that allows users to
  * accept/reject a workflow item
  *
- * @author Bram De Schouwer (bram.deschouwer at dot com)
- * @author Kevin Van de Velde (kevin at atmire dot com)
- * @author Ben Bosman (ben at atmire dot com)
- * @author Mark Diggory (markd at atmire dot com)
+ * based on class by:
+ * Bram De Schouwer (bram.deschouwer at dot com)
+ * Kevin Van de Velde (kevin at atmire dot com)
+ * Ben Bosman (ben at atmire dot com)
+ * Mark Diggory (markd at atmire dot com)
+ *
+ * modified for LINDAT/CLARIN
  */
 public class FinalEditAction extends ProcessingAction {
 
@@ -55,17 +58,9 @@ public class FinalEditAction extends ProcessingAction {
     }
 
     private void addApprovedProvenance(Context c, XmlWorkflowItem wfi) throws SQLException, AuthorizeException {
-        //Add the provenance for the accept
-        String now = DCDate.getCurrent().toString();
-
-        // Get user's name + email address
-        String usersName = XmlWorkflowManager.getEPersonName(c.getCurrentUser());
-
-        String provDescription = getProvenanceStartId() + " Approved for entry into archive by "
-                + usersName + " on " + now + " (GMT) ";
-
+        String provDescription = getProvenanceStartId() + " Approved for entry into archive";
         // Add to item as a DC field
-        wfi.getItem().addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
+        wfi.getItem().store_provenance_info(provDescription, c.getCurrentUser());
         wfi.getItem().update();
     }
 

@@ -86,7 +86,8 @@ import org.jdom.input.SAXBuilder;
  *  http://purl.org/dc/terms/ \
  *  http://dublincore.org/schemas/xmls/qdc/2003/04/02/qualifieddc.xsd</pre>
  *
- * @author Larry Stone
+ * based on class by Larry Stone
+ * modified for LINDAT/CLARIN
  * @version $Revision$
  */
 public class QDCCrosswalk extends SelfNamedPlugin
@@ -285,6 +286,11 @@ public class QDCCrosswalk extends SelfNamedPlugin
             prologb.append(namespaces[i].getURI());
             prologb.append("\"");
         }
+        prologb.append(" xmlns:");
+        prologb.append(DisseminationCrosswalk.XSI_NS.getPrefix());
+        prologb.append("=\"");
+        prologb.append(DisseminationCrosswalk.XSI_NS.getURI());
+        prologb.append("\"");
         prologb.append(">");
         String prolog = prologb.toString();
         pe = (Enumeration<String>)qdcProps.propertyNames();
@@ -302,6 +308,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
             }
             catch (org.jdom.JDOMException je)
             {
+            	log.error("Failed parsing XML fragment in properties file: \""+prolog+val+postlog+"\": "+je.toString(), je);
                 throw new CrosswalkInternalException("Failed parsing XML fragment in properties file: \""+prolog+val+postlog+"\": "+je.toString(), je);
             }
         }
@@ -380,9 +387,9 @@ public class QDCCrosswalk extends SelfNamedPlugin
                 {
                     qe.setAttribute("schemaLocation", schemaLocation, XSI_NS);
                 }
-                if (dc[i].language != null)
-                {
-                    qe.setAttribute("lang", dc[i].language, Namespace.XML_NAMESPACE);
+                if (dc[i].language != null && dc[i].language.length()>0 && !dc[i].language.equals("*"))
+                {                	
+                    qe.setAttribute("lang", dc[i].language.replace('_', '-'), Namespace.XML_NAMESPACE);
                 }
                 result.add(qe);
             }

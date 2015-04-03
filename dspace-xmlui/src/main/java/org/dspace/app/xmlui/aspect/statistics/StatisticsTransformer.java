@@ -7,6 +7,14 @@
  */
 package org.dspace.app.xmlui.aspect.statistics;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -14,21 +22,32 @@ import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.*;
+import org.dspace.app.xmlui.wing.element.Body;
+import org.dspace.app.xmlui.wing.element.Cell;
+import org.dspace.app.xmlui.wing.element.Division;
+import org.dspace.app.xmlui.wing.element.List;
+import org.dspace.app.xmlui.wing.element.PageMeta;
+import org.dspace.app.xmlui.wing.element.Row;
+import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Metadatum;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.statistics.Dataset;
-import org.dspace.statistics.content.*;
+import org.dspace.statistics.content.DatasetDSpaceObjectGenerator;
+import org.dspace.statistics.content.DatasetTimeGenerator;
+import org.dspace.statistics.content.DatasetTypeGenerator;
+import org.dspace.statistics.content.StatisticsDataVisits;
+import org.dspace.statistics.content.StatisticsListing;
+import org.dspace.statistics.content.StatisticsTable;
+import org.dspace.statistics.content.filter.StatisticsSolrDateFilter;
 import org.xml.sax.SAXException;
-
-import java.io.IOException;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
+/**
+ * modified for LINDAT/CLARIN
+*/
 public class StatisticsTransformer extends AbstractDSpaceTransformer {
 
 	private static Logger log = Logger.getLogger(StatisticsTransformer.class);
@@ -37,7 +56,7 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
     private static final Message T_head_title = message("xmlui.statistics.title");
     private static final Message T_statistics_trail = message("xmlui.statistics.trail");
     private static final String T_head_visits_total = "xmlui.statistics.visits.total";
-    private static final String T_head_visits_month = "xmlui.statistics.visits.month";
+    private static final String T_head_visits_year = "xmlui.statistics.visits.year";
     private static final String T_head_visits_views = "xmlui.statistics.visits.views";
     private static final String T_head_visits_countries = "xmlui.statistics.visits.countries";
     private static final String T_head_visits_cities = "xmlui.statistics.visits.cities";
@@ -78,10 +97,10 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 
         if(dso != null)
         {
-            HandleUtil.buildHandleTrail(dso, pageMeta, contextPath, true);
+        	HandleUtil.buildHandleTrailTerminal(dso, pageMeta, contextPath);
         }
-        pageMeta.addTrailLink(contextPath + "/handle" + (dso != null && dso.getHandle() != null ? "/" + dso.getHandle() : "/statistics"), T_statistics_trail);
 
+        pageMeta.addTrail().addContent(T_statistics_trail);
         // Add the page title
         pageMeta.addMetadata("title").addContent(T_head_title);
     }
@@ -118,34 +137,20 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 		
 		Division home = body.addDivision("home", "primary repository");
 		Division division = home.addDivision("stats", "secondary stats");
-		division.setHead(T_head_title);
-        /*
+		division.setHead("Most Viewed Items");
 		try {
 
-			StatisticsTable statisticsTable = new StatisticsTable(
-					new StatisticsDataVisits());
+			/** List of the top 10 items for the entire repository Last week **/
 
-			statisticsTable.setTitle(T_head_visits_month);
-			statisticsTable.setId("tab1");
-
-			DatasetTimeGenerator timeAxis = new DatasetTimeGenerator();
-			timeAxis.setDateInterval("month", "-6", "+1");
-			statisticsTable.addDatasetGenerator(timeAxis);
-
-			addDisplayTable(division, statisticsTable);
-
-		} catch (Exception e) {
-			log.error("Error occurred while creating statistics for home page",
-					e);
-		}
-		*/
-		try {
-            /** List of the top 10 items for the entire repository **/
-			StatisticsListing statListing = new StatisticsListing(
-					new StatisticsDataVisits());
-
-			statListing.setTitle(T_head_visits_total);
-			statListing.setId("list1");
+			StatisticsListing statListing = new StatisticsListing(new StatisticsDataVisits());
+			
+			StatisticsSolrDateFilter dateFilter = new StatisticsSolrDateFilter();
+			Calendar cal = new GregorianCalendar();
+			dateFilter.setEndDate(cal.getTime());			
+			cal.add(Calendar.WEEK_OF_MONTH, -1);
+			dateFilter.setStartDate(cal.getTime());
+			statListing.addFilter(dateFilter);			
+			statListing.setTitle("Top Last Week");
 
             //Adding a new generator for our top 10 items without a name length delimiter
             DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();
@@ -153,7 +158,23 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
             statListing.addDatasetGenerator(dsoAxis);
 
             //Render the list as a table
-			addDisplayListing(division, statListing);
+			addDisplayListing(division.addDivision("top-week"), statListing);
+
+            /** List of the top 10 items for the entire repository All Time 
+			
+			StatisticsListing statListing2 = new StatisticsListing(new StatisticsDataVisits());				
+			statListing2.setTitle("Top All Times");
+
+            //Adding a new generator for our top 10 items without a name length delimiter
+            DatasetDSpaceObjectGenerator dsoAxis2 = new DatasetDSpaceObjectGenerator();
+            dsoAxis2.addDsoChild(Constants.ITEM, 10, false, -1);
+            statListing2.addDatasetGenerator(dsoAxis);            
+
+            //Render the list as a table
+			addDisplayListing(division.addDivision("top-all"), statListing2);**/
+			
+			
+			
 
 		} catch (Exception e) {
 			log.error("Error occurred while creating statistics for home page", e);
@@ -171,6 +192,21 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 		Division division = home.addDivision("stats", "secondary stats");
 		division.setHead(T_head_title);
 
+		division = division.addDivision("item_visits");
+		
+		String sdate = null;
+
+		if(Constants.ITEM == dso.getType()) {				
+			org.dspace.content.Item item = (org.dspace.content.Item)dso;
+			Metadatum[] dates = item.getMetadata("dc", "date", "issued", org.dspace.content.Item.ANY);
+			if(dates!=null) {
+				sdate = dates[0].value;
+			}
+		}			
+		
+		if(sdate!=null) {
+			division.addPara(null, "label label-default").addContent("Showing statistics from " + sdate);
+		}
 		
 		try {
 			StatisticsListing statListing = new StatisticsListing(
@@ -198,11 +234,12 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 
 			StatisticsTable statisticsTable = new StatisticsTable(new StatisticsDataVisits(dso));
 
-			statisticsTable.setTitle(T_head_visits_month);
+			statisticsTable.setTitle(T_head_visits_year);
 			statisticsTable.setId("tab1");
 
 			DatasetTimeGenerator timeAxis = new DatasetTimeGenerator();
-			timeAxis.setDateInterval("month", "-6", "+1");
+			//Year wise breakup of last 12 years + this year
+			timeAxis.setDateInterval("year", "-12", "+1");
 			statisticsTable.addDatasetGenerator(timeAxis);
 
 			DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();
@@ -218,7 +255,7 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 							+ " and handle: " + dso.getHandle(), e);
 		}
 
-         if(dso instanceof org.dspace.content.Item){
+/*         if(dso instanceof org.dspace.content.Item){
              //Make sure our item has at least one bitstream
              org.dspace.content.Item item = (org.dspace.content.Item) dso;
             try {
@@ -240,7 +277,7 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
                                 + dso.getID() + " and type " + dso.getType()
                                 + " and handle: " + dso.getHandle(), e);
             }
-        }
+        }*/
 
         try {
             StatisticsListing statListing = new StatisticsListing(
@@ -288,6 +325,49 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
                             + " and handle: " + dso.getHandle(), e);
         }
 
+        
+        if(dso instanceof org.dspace.content.Item){
+            //Make sure our item has at least one bitstream
+            org.dspace.content.Item item = (org.dspace.content.Item) dso;
+           try {
+               if(item.hasUploadedFiles()){
+            	   
+            	   division = division.addDivision("file_visits");
+            	   division.setHead(message(T_head_visits_bitstream));
+
+                   StatisticsListing statsList = new StatisticsListing(new StatisticsDataVisits(dso));
+
+                   statsList.setTitle(T_head_visits_bitstream);
+                   statsList.setId("list-bit");
+
+                   DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();
+                   dsoAxis.addDsoChild(Constants.BITSTREAM, 10, false, -1);
+                   statsList.addDatasetGenerator(dsoAxis);
+                   addDisplayListing(division, statsList);
+            	   
+            	   for(Bundle bundle : item.getBundles("ORIGINAL")) {
+            		   for(Bitstream bitstream : bundle.getBitstreams()) {            			    
+            			    StatisticsListing bitstreamStats = new StatisticsListing(new StatisticsDataVisits(bitstream));
+            			    bitstreamStats.setTitle(bitstream.getName());
+            	            DatasetTypeGenerator typeAxis = new DatasetTypeGenerator();
+            	            typeAxis.setType("countryCode");
+            	            typeAxis.setMax(10);
+            	            bitstreamStats.addDatasetGenerator(typeAxis);
+
+            	            addDisplayListing(division, bitstreamStats);            			   
+            		   }
+            	   }
+            	                      
+               }
+           } catch (Exception e) {
+               log.error(
+                       "Error occurred while creating statistics for dso with ID: "
+                               + dso.getID() + " and type " + dso.getType()
+                               + " and handle: " + dso.getHandle(), e);
+           }
+       }
+        
+        
 	}
 
 	
@@ -394,11 +474,24 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 
 			/** Generate Table Body */
 			for (int col = 0; col < matrix[0].length; col++) {
-				Row valListRow = table.addRow();
+				String url = dataset.getColLabelsAttrs().get(col).get("url");
+				
+				String rend = "";
+
+				/* if(url==null) {
+					rend = "hidden";
+				}*/
+				
+				Row valListRow = table.addRow(null, null, rend);
 
 				Cell catCell = valListRow.addCell(col + "1", Cell.ROLE_DATA,
 						"labelcell");
+								
+				if(url != null && !url.equals("")) {
+					catCell.addXref(url, dataset.getColLabels().get(col));
+				} else {
 				catCell.addContent(dataset.getColLabels().get(col));
+				}				
 
 				Cell valCell = valListRow.addCell(col + "2", Cell.ROLE_DATA,
 						"datacell");

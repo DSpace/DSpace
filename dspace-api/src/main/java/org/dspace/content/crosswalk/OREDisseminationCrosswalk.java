@@ -27,6 +27,7 @@ import org.dspace.content.MetadataSchema;
 import org.dspace.core.Constants;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Utils;
+import org.dspace.storage.bitstore.BitstreamStorageManager;
 import org.jdom.Element;
 import org.jdom.Namespace;
 
@@ -35,8 +36,9 @@ import org.jdom.Namespace;
  * <p>
  * Produces an Atom-encoded ORE aggregation of a DSpace item.
  *
- * @author Alexey Maslov
- * @version $Revision: 1 $
+ * based on class by Alexey Maslov
+ * modified for LINDAT/CLARIN
+ * @version $Revision$
  */
 public class OREDisseminationCrosswalk
     implements DisseminationCrosswalk
@@ -89,7 +91,7 @@ public class OREDisseminationCrosswalk
         String remSource = ConfigurationManager.getProperty("oai", "ore.authoritative.source");
     	if (remSource == null || remSource.equalsIgnoreCase("oai"))
         {
-            oaiUrl = ConfigurationManager.getProperty("oai", "dspace.oai.url");
+            oaiUrl = ConfigurationManager.getProperty("lr", "lr.dspace.oai.url");
         }
     	else if (remSource.equalsIgnoreCase("xmlui") || remSource.equalsIgnoreCase("manakin"))
         {
@@ -196,7 +198,7 @@ public class OREDisseminationCrosswalk
         
         // metadata section
         Element arLink;
-        Element rdfDescription, rdfType, dcModified, dcDesc;
+        Element rdfDescription, rdfType, dcModified, dcDesc, dcIdentifier;
         Element triples = new Element("triples", ORE_ATOM);
         
         // metadata about the item
@@ -246,6 +248,21 @@ public class OREDisseminationCrosswalk
                 
                 rdfDescription.addContent(rdfType);
                 rdfDescription.addContent(dcDesc);
+                
+                triples.addContent(rdfDescription);
+                
+                rdfDescription = new Element("Description", RDF_NS);
+                rdfDescription.setAttribute("about", dsUrl + "/bitstream/handle/" + item.getHandle() + "/" + encodeForURL(bs.getName()) + "?sequence=" + bs.getSequenceID(), RDF_NS);
+                rdfType = new Element("type", RDF_NS);
+                rdfType.setAttribute("resource", DS_NS.getURI()+"DSpaceBitstream/assetstore", RDF_NS);
+                dcIdentifier = new Element("identifier", DCTERMS_NS);
+                String internalId = bs.get_internal_id();
+                String path = BitstreamStorageManager.getIntermediatePath(internalId);
+                dcIdentifier.addContent(path+internalId);                                                               
+	        	rdfDescription.addContent(rdfType);
+				rdfDescription.addContent(dcIdentifier);
+                
+                
                 triples.addContent(rdfDescription);
         	}
         }

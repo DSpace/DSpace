@@ -290,6 +290,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>cz.cuni.mff.ufal.lindat</groupId>
+            <artifactId>utilities</artifactId>
+        </dependency>
+            
+        <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>handle</artifactId>
         </dependency>
@@ -558,7 +563,7 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <scope>compile</scope>
+            <version>1.7.1</version>
         </dependency>
 
         <dependency>
@@ -630,6 +635,20 @@
             <artifactId>javax.inject</artifactId>
             <version>1</version>
             <type>jar</type>
+        </dependency>
+        <dependency>
+        	<groupId>com.googlecode.json-simple</groupId>
+        	<artifactId>json-simple</artifactId>
+        	<version>1.1.1</version>
+        </dependency>
+        <dependency>
+        	<groupId>org.piwik</groupId>
+        	<artifactId>piwik-java-tracking</artifactId>
+        	<version>1.1.0</version>
+        </dependency>
+        <dependency>
+        	<groupId>org.apache.commons</groupId>
+        	<artifactId>commons-compress</artifactId>
         </dependency>
     </dependencies>
 

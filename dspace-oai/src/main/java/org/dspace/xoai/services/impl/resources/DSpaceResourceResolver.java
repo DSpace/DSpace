@@ -10,7 +10,10 @@ package org.dspace.xoai.services.impl.resources;
 import com.lyncode.xoai.dataprovider.services.api.ResourceResolver;
 import org.dspace.core.ConfigurationManager;
 
+import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.URIResolver;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
@@ -21,7 +24,17 @@ import java.io.InputStream;
 
 public class DSpaceResourceResolver implements ResourceResolver {
     private static final TransformerFactory transformerFactory = TransformerFactory.newInstance();
-    private final String basePath = ConfigurationManager.getProperty("oai", "config.dir");
+    private static final String basePath = ConfigurationManager.getProperty("oai", "config.dir");
+    //includes in xslt (mainly for crosswalks)
+	static{
+    	transformerFactory.setURIResolver(new URIResolver(){
+    		@Override
+    		public Source resolve(String href, String base) throws TransformerException{
+    			String path = basePath.endsWith("/") ? basePath : basePath + "/";
+    			return new StreamSource(new File(path+href));
+    		}
+    	});
+    }
 
     @Override
     public InputStream getResource(String path) throws IOException {

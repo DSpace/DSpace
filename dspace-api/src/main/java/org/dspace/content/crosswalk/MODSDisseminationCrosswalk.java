@@ -74,8 +74,8 @@ import org.jdom.xpath.XPath;
  * name and simply reusing those instances.  The PluginManager does this
  * by default.
  *
- * @author Larry Stone
- * @author Scott Phillips
+ * based on class by Larry Stone and Scott Phillips
+ * modified for LINDAT/CLARIN
  * @version $Revision$
  */
 public class MODSDisseminationCrosswalk extends SelfNamedPlugin
@@ -129,10 +129,6 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     private static final String schemaLocation =
         MODS_NS.getURI()+" "+MODS_XSD;
 
-    private static XMLOutputter outputUgly = new XMLOutputter();
-    private static SAXBuilder builder = new SAXBuilder();
-
-    private Map<String, modsTriple> modsMap = null;
 
     /**
      * Container for crosswalk mapping: expressed as "triple" of:
@@ -151,7 +147,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
          * The DC stays a string; parse the XML with appropriate
          * namespaces; "compile" the XPath.
          */
-        public static modsTriple create(String qdc, String xml, String xpath)
+        public static modsTriple create(SAXBuilder builder, String qdc, String xml, String xpath)
         {
             modsTriple result = new modsTriple();
 
@@ -208,18 +204,20 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
      *  dc.description.abstract = <mods:abstract>%s</mods:abstract> | text()
      *
      */
-    private void initMap()
+    private Map<String, modsTriple> initMap()
         throws CrosswalkInternalException
     {
+        Map<String, modsTriple> modsMap = null;
+        SAXBuilder builder = new SAXBuilder();
         if (modsMap != null)
         {
-            return;
+            return modsMap;
         }
         String myAlias = getPluginInstanceName();
         if (myAlias == null)
         {
             log.error("Must use PluginManager to instantiate MODSDisseminationCrosswalk so the class knows its name.");
-            return;
+            return modsMap;
         }
         String cmPropName = CONFIG_PREFIX+myAlias;
         String propsFilename = ConfigurationManager.getProperty(cmPropName);
@@ -276,7 +274,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
                 }
                 else
                 {
-                    modsTriple trip = modsTriple.create(qdc, pair[0], pair[1]);
+                    modsTriple trip = modsTriple.create(builder, qdc, pair[0], pair[1]);
                     if (trip != null)
                     {
                         modsMap.put(qdc, trip);
@@ -284,6 +282,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
                 }
             }
         }
+        return modsMap;
     }
 
     /**
@@ -313,6 +312,21 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     }
 
     /**
+     * UFAL hack - we need to indicate one param but there is no
+     * sane and easy way.
+     */
+    public Element disseminateElement(DSpaceObject dso, boolean exportAll)
+        throws CrosswalkException,
+               IOException, SQLException, AuthorizeException
+    {
+        Element root = new Element("mods", MODS_NS);
+        root.setAttribute("schemaLocation", schemaLocation, XSI_NS);
+        root.addContent(disseminateListInternal(dso,false, exportAll));
+        return root;
+    }
+
+
+    /**
      * Disseminate an Item, Collection, or Community to MODS.
      */
     public Element disseminateElement(DSpaceObject dso)
@@ -326,8 +340,15 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     }
 
     private List<Element> disseminateListInternal(DSpaceObject dso, boolean addSchema)
+                    throws CrosswalkException, IOException, SQLException, AuthorizeException
+    {
+        return disseminateListInternal(dso, addSchema, false);
+    }
+
+    private List<Element> disseminateListInternal(DSpaceObject dso, boolean addSchema, boolean exportAll)
         throws CrosswalkException, IOException, SQLException, AuthorizeException
     {
+		XMLOutputter outputUgly = new XMLOutputter();
         Metadatum[] dcvs = null;
         if (dso.getType() == Constants.ITEM)
         {
@@ -350,7 +371,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
             throw new CrosswalkObjectNotSupported(
                     "MODSDisseminationCrosswalk can only crosswalk Items, Collections, or Communities");
         }
-        initMap();
+        Map<String, modsTriple> modsMap = initMap();
 
         List<Element> result = new ArrayList<Element>(dcvs.length);
 
@@ -364,6 +385,18 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
             String value = dcvs[i].value;
 
             modsTriple trip = modsMap.get(qdc);
+            // create the mapping e.g., for metashare schema in AIP
+            //
+            if ( exportAll && trip == null )
+            {
+                // use similar line to this
+                //   <mods:extension><mods:dateSubmitted encoding="iso8601">%s</mods:dateSubmitted></mods:extension>
+                //      | mods:dateSubmitted/text()
+                trip = modsTriple.create(new SAXBuilder(),
+                        qdc,
+                        "<mods:extension><mods:ufal_meta key=\"" + qdc + "\">%s</mods:ufal_meta></mods:extension>",
+                        "mods:ufal_meta/text()");
+            }
             if (trip == null)
             {
                 log.warn("WARNING: " + getPluginInstanceName() + ": No MODS mapping for \"" + qdc + "\"");

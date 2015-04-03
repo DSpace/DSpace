@@ -32,7 +32,8 @@ import java.util.List;
  * unfortunately no way around this until DAOs and an interface are provided 
  * for the Item class.
  * 
- * @author Richard Jones
+ * based on class by Richard Jones
+ * modified for LINDAT/CLARIN
  *
  */
 public class BrowseItem extends DSpaceObject
@@ -408,5 +409,14 @@ public class BrowseItem extends DSpaceObject
     
     public boolean isDiscoverable() {
     	return discoverable;
+	}
+
+	public boolean isHidden() {
+		Metadatum[] dcvs = this.getMetadata("local", "hidden", null, null);
+		if (dcvs != null && dcvs.length == 1
+				&& dcvs[0].value.equalsIgnoreCase("hidden")) {
+			return true;
+		}
+		return false;
 	}
 }

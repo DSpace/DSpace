@@ -36,6 +36,12 @@
     <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dc.type_filter">Content Type</message>
     <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dc.date.issued">Date Issued</message>
     <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dateIssued">Date Issued</message>
+    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_rights">Rights</message>
+    <!-- Discover menu -->
+    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_publisher">Publisher</message>
+    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_language">Language</message>
+    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_type">Type</message>
+    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_mediatype">Medium Type</message>
 
 
     <!-- Site Leve Recently Added Content -->
@@ -90,7 +96,13 @@
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.title">Title</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subject">Subject</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dateIssued">Date issued</message>
-
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.selected">Selected filters</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.rights">Rights</message>
+    <!-- listbox -->
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.publisher">Publisher</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.language">Language</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.type">Type</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.mediatype">Medium Type</message>
 
 
     <message key="xmlui.dri2xhtml.structural.pagination-info.nototal">Now showing items {0}-{1}</message>
@@ -102,11 +114,13 @@
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subject">Subject</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subject_filter">Subject</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dateIssued.year">Date Issued</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.rights_filter">Rights</message>
 
 
     <message key="xmlui.Discovery.AbstractSearch.startswith">Starts with</message>
     <message key="xmlui.Discovery.AbstractSearch.startswith.help">Or enter first few letters:</message>
 
+	<message key="xmlui.Discovery.AbstractSearch.sort_by.dc.title_sort_asc">Title Asc</message>
     <message key="xmlui.Discovery.AbstractSearch.sort_by.head">Sort Options:</message>
     <message key="xmlui.Discovery.AbstractSearch.sort_by.relevance">Relevance</message>
     <message key="xmlui.Discovery.AbstractSearch.sort_by.dc.title_sort_desc">Title Desc</message>
@@ -114,6 +128,7 @@
 
     <message key="xmlui.Discovery.AbstractSearch.sort_by.dc.title_sort_asc">Title Asc</message>
     <message key="xmlui.Discovery.AbstractSearch.sort_by.dc.date.issued_dt_asc">Issue Date Asc</message>
+	<message key="xmlui.Discovery.AbstractSearch.type_language">Filter by: Language</message>
 
     <message key="xmlui.Discovery.AbstractSearch.rpp">Results Per Page:</message>
 
@@ -124,7 +139,14 @@
     <message key="xmlui.Discovery.AbstractSearch.filters.controls.new-filters.head">New Filters:</message>
     <message key="xmlui.Discovery.AbstractSearch.filters.controls.current-filters.head">Current Filters:</message>
     <message key="xmlui.Discovery.AbstractSearch.filters.display">Add filters</message>
-
+<!--Selected filter -->
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.publisher_filter">Publisher</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.language_filter">Language</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.type_filter">Type</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.mediatype_filter">Medium Type</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.has_file_b">Has Files</message>
+    <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dc.title_sort">Title</message>
+    <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dc.date.issued_dt">Issue Date</message>
     <message key="xmlui.discovery.SearchFacetFilter.no-results">No filter values found</message>
 
     <message key="xmlui.discovery.AbstractFiltersTransformer.filters.head">Discover</message>
@@ -134,7 +156,11 @@
     <message key="xmlui.Discovery.SimpleSearch.search_scope">Search</message>
     <message key="xmlui.discovery.SimpleSearch.search_label">Search</message>
     <message key="xmlui.Discovery.SimpleSearch.filter_head">Filters</message>
+    <message key="xmlui.Discovery.SimpleSearch.filter_add">Add Filters</message>
     <message key="xmlui.Discovery.SimpleSearch.filter_help">Use filters to refine the search results.</message>
+    <message key="xmlui.Discovery.SimpleSearch.filter_apply">Update filters</message> 
+    <message key="xmlui.Discovery.SimpleSearch.sort_head">Sort options</message>
+    <message key="xmlui.Discovery.SimpleSearch.sort_apply">Apply</message>
 
     <message key="xmlui.Discovery.SimpleSearch.filter.contains">Contains</message>
     <message key="xmlui.Discovery.SimpleSearch.filter.equals">Equals</message>

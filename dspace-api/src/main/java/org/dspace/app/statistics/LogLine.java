@@ -16,7 +16,8 @@ import java.util.Date;
  * The components that it represents are: Date, Level, User, Action, and additional
  * Params
  * 
- * @author  Richard Jones
+ * based on class by  Richard Jones
+ * modified for LINDAT/CLARIN
  */
 public class LogLine
 {
@@ -35,6 +36,8 @@ public class LogLine
     /** the parameters associated with the line */
     private String params = null;
     
+    private String ip = null;
+
     /**
      * constructor to create new statistic
      */
@@ -171,5 +174,17 @@ public class LogLine
         }
         return false;
     }
- 
+
+    
+    // ufal
+    public String getIp()
+    {
+        return this.ip;
+    }
+    
+    public void setIp(String ip )
+    {
+        this.ip = ip;
+    }
+    
 }

@@ -52,7 +52,8 @@ import org.dspace.core.Context;
  *  # example: dc.description.provenance
  *  metadata.hide.dc.description.provenance = true
  *
- * @author Larry Stone
+ * based on class by Larry Stone
+ * modified for LINDAT/CLARIN
  * @version $Revision: 3734 $
  */
 public class MetadataExposure
@@ -63,6 +64,7 @@ public class MetadataExposure
     private static Map<String,Map<String,Set<String>>> hiddenElementMaps = null;
 
     private static final String CONFIG_PREFIX = "metadata.hide.";
+    private static final String CONFIG_WILDCARD = "*";
 
     /**
      * Returns whether the given metadata field should be exposed (visible). The metadata field is in the DSpace's DC notation: schema.element.qualifier
@@ -93,7 +95,7 @@ public class MetadataExposure
         if (qualifier == null)
         {
             Set<String> elts = hiddenElementSets.get(schema);
-            return elts == null ? false : elts.contains(element);
+            return elts == null ? false : smart_contains(elts, element);
         }
 
         // for schema.element.qualifier, just schema->eltMap->qualSet
@@ -105,9 +107,30 @@ public class MetadataExposure
                 return false;
             }
             Set<String> quals = elts.get(element);
-            return quals == null ? false : quals.contains(qualifier);
+            if ( quals == null) {
+                return elts.containsKey("*");
+            } else {
+                return smart_contains(quals, qualifier);
+            }
         }
     }
+    
+    
+    //
+    //
+    
+    private static boolean smart_contains(Set<String> where, String what) 
+    {
+        if ( where.contains(what) || where.contains(CONFIG_WILDCARD) ) {
+            return true;
+        }
+        return false;
+    }
+
+    
+    
+    //
+    //
 
     /**
      * Returns whether the maps from configuration have already been loaded

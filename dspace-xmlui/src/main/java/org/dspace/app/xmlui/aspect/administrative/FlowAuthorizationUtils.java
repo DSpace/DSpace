@@ -33,7 +33,8 @@ import org.dspace.core.Constants;
  * 
  * FIXME: add documentation
  * 
- * @author Alexey maslov
+ * based on class by Alexey maslov
+ * modified for LINDAT/CLARIN
  */
 public class FlowAuthorizationUtils {
 
@@ -353,14 +354,16 @@ public class FlowAuthorizationUtils {
 
         if(groupIDs==null){
             result.setContinue(false);
-            result.addError("groupIDs");
+			result.setOutcome(false);
+			result.setMessage(new Message("default", "Please select group(s)."));
             return result;
         }
 
         if(collectionIDs==null){
             result.setContinue(false);
-            result.addError("collectionIDs");
-            return result;
+			result.setOutcome(false);
+			result.setMessage(new Message("default", "Please select collection(s)."));
+			return result;
         }
 
          // check dates
@@ -444,6 +447,14 @@ public class FlowAuthorizationUtils {
 	{
 	    AuthorizeUtil.requireAdminRole(context);
 		FlowResult result = new FlowResult();
+		
+		if(collectionIDs==null) {
+			result.setContinue(false);
+			result.setOutcome(false);
+			result.setMessage(new Message("default", "Please select collection(s)."));
+			return result;
+		}
+
 		
 		for (String collectionID : collectionIDs) 
 		{

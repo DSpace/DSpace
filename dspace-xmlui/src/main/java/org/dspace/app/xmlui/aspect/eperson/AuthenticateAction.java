@@ -46,7 +46,8 @@ import org.dspace.eperson.EPerson;
  * </map:act>
  * <map:transform type="try-to-login-again-transformer">
  *
- * @author Scott Phillips
+ * based on class by Scott Phillips
+ * modified for LINDAT/CLARIN
  */
 
 public class AuthenticateAction extends AbstractAction
@@ -93,6 +94,12 @@ public class AuthenticateAction extends AbstractAction
             	{
             		// Otherwise direct the user to the specified 'loginredirect' page (or homepage by default)
             		String loginRedirect = ConfigurationManager.getProperty("xmlui.user.loginredirect");
+            		if(loginRedirect==null) {
+            			loginRedirect = (String)request.getSession().getAttribute("xmlui.user.loginredirect");
+            		}
+            		if(loginRedirect == null || loginRedirect.endsWith("login")) {
+            			loginRedirect = "/";
+            		}            		
             		redirectURL += (loginRedirect != null) ? loginRedirect.trim() : "/";	
             	}
             	

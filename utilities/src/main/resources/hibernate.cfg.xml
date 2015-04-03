@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+                                         "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+ <session-factory>
+  <property name="hibernate.bytecode.use_reflection_optimizer">false</property>
+  <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+  <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+  <property name="hibernate.search.autoregister_listeners">false</property>
+  <property name="current_session_context_class">thread</property>
+  <!-- should fix slow acquire of postgresql and invocation exception -->
+  <property name="hibernate.temp.use_jdbc_metadata_defaults">false</property>
+  <!-- configuration pool via c3p0 
+  Determines how many connections at a time c3p0 will try to acquire when the pool is exhausted. Hibernate default: 1 -->
+  <property name="hibernate.c3p0.acquire_increment">5</property>
+  <!-- If this is a number greater than 0, c3p0 will test all idle, pooled but unchecked-out connections, every this number of seconds. Hibernate default: 0 -->
+  <property name="hibernate.c3p0.idle_test_period">100</property>
+  <!-- Minimum number of JDBC connections in the pool. Hibernate default: 1 -->
+  <property name="hibernate.c3p0.min_size">20</property>
+  <!-- Maximum number of JDBC connections in the pool. Hibernate default: 100 -->
+  <property name="hibernate.c3p0.max_size">100</property>
+  <!-- Number of prepared statements will be cached. Increase performance. Hibernate default: 0 , caching is disable. -->
+  <property name="hibernate.c3p0.max_statements">0</property>
+  <!-- The seconds a Connection can remain pooled but unused before being discarded. Zero means idle connections never expire. Hibernate default: 0 -->
+  <property name="hibernate.c3p0.timeout">100</property>
+  <mapping resource="cz/cuni/mff/ufal/lindat/utilities/hibernate/LicenseLabel.hbm.xml"/>
+  <mapping resource="cz/cuni/mff/ufal/lindat/utilities/hibernate/LicenseFileDownloadStatistic.hbm.xml"/>
+  <mapping resource="cz/cuni/mff/ufal/lindat/utilities/hibernate/LicenseResourceUserAllowance.hbm.xml"/>
+  <mapping resource="cz/cuni/mff/ufal/lindat/utilities/hibernate/LicenseResourceMapping.hbm.xml"/>
+  <mapping resource="cz/cuni/mff/ufal/lindat/utilities/hibernate/UserRegistration.hbm.xml"/>
+  <mapping resource="cz/cuni/mff/ufal/lindat/utilities/hibernate/LicenseLabelExtendedMapping.hbm.xml"/>
+  <mapping resource="cz/cuni/mff/ufal/lindat/utilities/hibernate/LicenseDefinition.hbm.xml"/>
+  <mapping resource="cz/cuni/mff/ufal/lindat/utilities/hibernate/VerificationTokenEperson.hbm.xml"/>
+  <!-- eperson additional abstracted metadata -->
+  <mapping resource="cz/cuni/mff/ufal/lindat/utilities/hibernate/UserMetadata.hbm.xml"/>
+ </session-factory>
+</hibernate-configuration>
+
+

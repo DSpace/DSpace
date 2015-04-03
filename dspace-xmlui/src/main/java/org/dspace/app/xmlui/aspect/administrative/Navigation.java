@@ -10,6 +10,7 @@ package org.dspace.app.xmlui.aspect.administrative;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Map;
 
 import org.apache.avalon.framework.parameters.Parameters;
@@ -45,10 +46,12 @@ import org.xml.sax.SAXException;
  * Create the navigation options for everything in the administrative aspects. This includes 
  * Epeople, group, item, access control, and registry management.
  * 
- * @author Scott Phillips
- * @author Afonso Araujo Neto (internationalization)
- * @author Alexey Maslov
- * @author Jay Paz
+ * based on class by: 
+ * Scott Phillips
+ * Afonso Araujo Neto (internationalization)
+ * Alexey Maslov
+ * Jay Paz
+ * modified for LINDAT/CLARIN
  */
 public class Navigation extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
@@ -77,6 +80,9 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     private static final Message T_administrative_private  		= message("xmlui.administrative.Navigation.administrative_private");
     private static final Message T_administrative_control_panel 	= message("xmlui.administrative.Navigation.administrative_control_panel");
     private static final Message T_administrative_curation              = message("xmlui.administrative.Navigation.administrative_curation");
+    private static final Message T_administrative_licenses			= message("xmlui.administrative.Navigation.administrative_licenses");
+    private static final Message T_administrative_handles			= message("xmlui.administrative.Navigation.administrative_handles");
+  
     
     private static final Message T_statistics            	        = message("xmlui.administrative.Navigation.statistics");
 
@@ -210,6 +216,19 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         //Check if a system administrator
         boolean isSystemAdmin = AuthorizeManager.isAdmin(this.context);
 
+        //Check if user is an admin of some Community/Collection
+        boolean isAnyAdmin = false;
+        java.util.List<DSpaceObject> coms_and_cols = new java.util.ArrayList<DSpaceObject>();
+        coms_and_cols.addAll(Arrays.asList(Community.findAll(this.context)));
+        coms_and_cols.addAll(Arrays.asList(Collection.findAll(this.context)));
+        
+        for(DSpaceObject dso : coms_and_cols){
+        	isAnyAdmin = AuthorizeManager.isAdmin(this.context, dso);
+        	if(isAnyAdmin){
+        		break;
+        	}
+        }
+
         // Context Administrative options
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
     	if (dso instanceof Item)
@@ -294,7 +313,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             // Content Admin
             List content = admin.addList("content");
             content.setHead(T_administrative_content);
-            content.addItemXref(contextPath+"/admin/item", T_administrative_items);
+            content.addItemXref(contextPath+"/admin/item", T_administrative_items);			
             content.addItemXref(contextPath+"/admin/withdrawn", T_administrative_withdrawn);
             content.addItemXref(contextPath+"/admin/private", T_administrative_private);
             content.addItemXref(contextPath+"/admin/metadataimport", T_administrative_import_metadata);
@@ -306,8 +325,18 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             registries.addItemXref(contextPath+"/admin/metadata-registry",T_administrative_metadata);
             registries.addItemXref(contextPath+"/admin/format-registry",T_administrative_format);
 
+			admin.addItemXref(contextPath+"/community-list", "Collections & Communities");
             admin.addItemXref(contextPath+"/statistics", T_statistics);
             admin.addItemXref(contextPath+ "/admin/curate", T_administrative_curation);
+
+            admin.addItemXref(contextPath+ "/admin/licenses", T_administrative_licenses);
+            admin.addItemXref(contextPath+ "/admin/handles", T_administrative_handles);
+        }
+        else if (isAnyAdmin)
+        {
+            admin.setHead(T_administrative_head);
+            admin.addItemXref(contextPath + "/community-list",
+                    "Collections & Communities");
         }
     }
     

@@ -52,7 +52,7 @@ echo "Writing simple Handle server configuration"
 # Read parameters from DSpace config
 dshostname=`$BINDIR/dspace dsprop -property dspace.hostname`
 dsname=`$BINDIR/dspace dsprop -property dspace.name`
-handle=`$BINDIR/dspace dsprop -property handle.prefix`
+handle=`$BINDIR/dspace dsprop -property lr.pid.community.configurations | perl -e 'while(<>) { for my $l (split /[,;]/) { my ($k,$v) = split /=/, $l, 2; $v =~ s/^\s*//; $v =~ s/\s*$//; push @prefixes, split /\|/, $v if $k =~ /^\s*prefix\s*$/; }} print pop @prefixes'`
 handledir=`$BINDIR/dspace dsprop -property handle.dir`
 tempfile=/tmp/handleconfig$$
 contactemail=`$BINDIR/dspace dsprop -property mail.admin`

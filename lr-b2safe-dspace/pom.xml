@@ -1,0 +1,62 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>cz.cuni.mff.ufal.dspace</groupId>
+	<artifactId>b2safe-dspace</artifactId>
+	<name>Business to Safe Dspace Addon</name>
+
+	<parent>
+		<groupId>org.dspace</groupId>
+		<artifactId>dspace-parent</artifactId>
+		<version>5.2-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>3.3</version>
+			</plugin>
+		</plugins>
+	</build>
+	
+	<repositories>
+  		<repository>
+    		<id>project.local.repo</id>
+    		<name>b2safe-dspace-repo</name>
+    		<url>file:${project.basedir}/repo</url>
+  		</repository>
+	</repositories>	
+
+	<dependencies>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.14</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.7</version>
+		</dependency>
+		<dependency>
+			<groupId>org.irods</groupId>
+			<artifactId>jargon</artifactId>
+			<version>4.0.2-UFAL</version>
+		</dependency>
+		<dependency>
+			<groupId>cz.cuni.mff.ufal</groupId>
+			<artifactId>b2safe</artifactId>
+			<version>1.0</version>
+		</dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-api</artifactId>
+            <version>${project.version}</version>
+         </dependency>
+	</dependencies>
+
+</project>
+

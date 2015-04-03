@@ -12,7 +12,8 @@ import java.util.*;
 /**
  * This class represents a query which the discovery backend can use
  *
- * @author Kevin Van de Velde (kevin at atmire dot com)
+ * based on class by Kevin Van de Velde (kevin at atmire dot com)
+ * modified for LINDAT/CLARIN
  *
  */
 public class DiscoverQuery {
@@ -64,6 +65,10 @@ public class DiscoverQuery {
 
 
     public void setQuery(String query) {
+    	if(query!=null) {
+            query = query.replaceAll("://", "\\\\://");    	    
+    		if(query.equals("")) query = "*:*";
+    	}
         this.query = query;
     }
 

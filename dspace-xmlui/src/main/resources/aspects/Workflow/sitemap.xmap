@@ -23,6 +23,8 @@
       <map:transformer name="Submissions" src="org.dspace.app.xmlui.aspect.workflow.Submissions"/>
       <map:transformer name="RejectTaskStep" src="org.dspace.app.xmlui.aspect.workflow.RejectTaskStep"/>
       <map:transformer name="PerformTaskStep" src="org.dspace.app.xmlui.aspect.workflow.PerformTaskStep"/>
+      <!-- UFAL -->
+      <map:transformer name="MoveWorkflowItemForm" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.workflow.MoveWorkflowItemForm"/>
     </map:transformers>
 
     <map:selectors>
@@ -78,6 +80,16 @@
 
           <!--<map:transform type="Navigation"/>-->
 
+  			<!--
+				UFAL - Move the item to another collection
+			-->
+			<map:match pattern="workflow/item/move">
+				<map:transform type="MoveWorkflowItemForm">					
+					<map:parameter name="handle" value="{flow-attribute:handle}"/>
+					<map:parameter name="workflowID" value="{flow-attribute:workflowID}"/>	
+					<map:parameter name="collectionID" value="{flow-attribute:collectionID}"/>					                                             
+				</map:transform>
+			</map:match>
 
           <!--
               The submissions page provides a list of all submission

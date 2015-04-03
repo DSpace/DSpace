@@ -22,23 +22,24 @@ import org.dspace.app.sherpa.SHERPAJournal;
 import org.dspace.app.sherpa.SHERPAPublisher;
 import org.dspace.app.sherpa.SHERPAResponse;
 import org.dspace.app.sherpa.submit.SHERPASubmitService;
-import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.util.Util;
 import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
+import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Button;
 import org.dspace.app.xmlui.wing.element.Cell;
-import org.dspace.app.xmlui.wing.element.Radio;
 import org.dspace.app.xmlui.wing.element.CheckBox;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.File;
 import org.dspace.app.xmlui.wing.element.List;
+import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.app.xmlui.wing.element.Text;
-import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
@@ -47,6 +48,8 @@ import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
+
+import cz.cuni.mff.ufal.DSpaceApi;
 
 /**
  * This is a step of the item submission processes. The upload
@@ -60,8 +63,8 @@ import org.xml.sax.SAXException;
  * Part B: List previously uploaded files
  * Part C: The standard action bar
  *
- * @author Scott Phillips
- * @author Tim Donohue (updated for Configurable Submission)
+ * based on class by Scott Phillips and Tim Donohue (updated for Configurable Submission)
+ * modified for LINDAT/CLARIN
  */
 public class UploadStep extends AbstractSubmissionStep
 {
@@ -72,11 +75,16 @@ public class UploadStep extends AbstractSubmissionStep
             message("xmlui.Submission.submit.UploadStep.file");
     protected static final Message T_file_help =
             message("xmlui.Submission.submit.UploadStep.file_help");
+    protected static final Message T_file_local_head = 
+            message("xmlui.Submission.submit.UploadStep.file_local_head");    
+    protected static final Message T_file_local_help = 
+            message("xmlui.Submission.submit.UploadStep.file_local_help");    
     protected static final Message T_file_error =
             message("xmlui.Submission.submit.UploadStep.file_error");
     protected static final Message T_upload_error =
             message("xmlui.Submission.submit.UploadStep.upload_error");
-
+    protected static final Message T_file_not_found_error = 
+    	message("xmlui.Submission.submit.UploadStep.not_found_error");
     protected static final Message T_virus_checker_error =
             message("xmlui.Submission.submit.UploadStep.virus_checker_error");
     protected static final Message T_virus_error =
@@ -120,6 +128,8 @@ public class UploadStep extends AbstractSubmissionStep
             message("xmlui.Submission.submit.UploadStep.checksum");
     protected static final Message T_submit_remove =
             message("xmlui.Submission.submit.UploadStep.submit_remove");
+    protected static final Message T_inform_about_licences =
+        message("xmlui.Submission.submit.UploadStep.inform_about_licences");
 
 
     protected static final Message T_sherpa_consult =
@@ -155,6 +165,22 @@ public class UploadStep extends AbstractSubmissionStep
         this.requireStep = true;
     }
 
+
+    /**
+     * Add information that this page wants to use drag&drop
+     * if supported by browser simply by adding info to page metadata
+     * which can be accessed from xsl easily.
+     *
+     * @see structural.xsl
+     * jmisutka 2011/03/08
+     */
+    public void addPageMeta(PageMeta pageMeta) throws SAXException, WingException,
+    UIException, SQLException, IOException, AuthorizeException
+    {
+        super.addPageMeta(pageMeta);
+        pageMeta.addMetadata("include-library", "dragNdrop");
+        pageMeta.addMetadata("include-library", "jquery-ui");
+    }
 
     /**
      * Check if user has requested to edit information about an
@@ -216,7 +242,10 @@ public class UploadStep extends AbstractSubmissionStep
 
             File file = upload.addItem().addFile("file");
             file.setLabel(T_file);
-            file.setHelp(T_file_help);
+	        
+	        long maxFileSize = Long.parseLong(ConfigurationManager.getProperty("lr", "lr.upload.file.alert.max.file.size"));
+
+	        file.setHelp(T_file_help.parameterize(DSpaceApi.convertBytesToHumanReadableForm(maxFileSize)));
             file.setRequired();
 
             // if no files found error was thrown by processing class, display it!
@@ -243,32 +272,76 @@ public class UploadStep extends AbstractSubmissionStep
                 file.addError(T_virus_error);
             }
 
-            Text description = upload.addItem().addText("description");
+            if(this.errorFlag == org.dspace.submit.step.UploadStep.STATUS_NO_CMDI_FILE_ERROR){
+            	file.addError("No CMDI file was uploaded");
+            }
+	        	
+	        Text description = upload.addItem("description-field","description-field").addText("description");
             description.setLabel(T_description);
             description.setHelp(T_description_help);
 
+            // UFAL/jmisutka
+            upload.addItem(null, null).addHighlight("label label-warning").addContent(T_inform_about_licences);
+	        
             Button uploadSubmit = upload.addItem().addButton("submit_upload");
             uploadSubmit.setValue(T_submit_upload);
+	        
+    		// For administrator local file submission option for more than 2GB in size
+    		if (AuthorizeManager.isAdmin(context)) {
+	    		List uploadLocal = div.addList("submit-upload-local", List.TYPE_FORM, "alert alert-admin");
+	    		uploadLocal.setHead(T_file_local_head);
+	    		Text fileLocal = uploadLocal.addItem("file-local", "description-field").addText("fileLocal");
+	    		fileLocal.setLabel(T_file);
+	    		fileLocal.setHelp(T_file_local_help);
+	    		
+	    		// if file not found
+		        if (this.errorFlag==org.dspace.submit.step.UploadStep.STATUS_NOT_FOUND)
+		        {
+		        	fileLocal.addError(T_file_not_found_error);
         }
+
+		        // if virus checking was attempted and a virus found then let the user know
+	            if (this.errorFlag == org.dspace.submit.step.UploadStep.STATUS_SERVER_FILE_CONTAINS_VIRUS)
+	            {
+	            	fileLocal.addError(T_virus_error);
+	            }
+	    		
+		        Text desc = uploadLocal.addItem("description-field-local","description-field").addText("descriptionLocal");
+		        desc.setLabel(T_description);
+		        desc.setHelp(T_description_help);
+	    		
+		        Button submit = uploadLocal.addItem().addButton("submit_upload_local");
+		        submit.setValue(T_submit_upload);
+    		}
+	        
+    	}
 
         make_sherpaRomeo_submission(item, div);
 
         // Part B:
         //  If the user has already uploaded files provide a list for the user.
+    	
+    	Division summaryDiv = null; 
+    	
         if (bitstreams.length > 0 || disableFileEditing)
         {
-            Table summary = div.addTable("submit-upload-summary",(bitstreams.length * 2) + 2,7);
+        	summaryDiv = div.addDivision("summary", "well well-light");
+        	
+	        Table summary = summaryDiv.addTable("submit-upload-summary",(bitstreams.length * 2) + 2,7);
             summary.setHead(T_head2);
 
             Row header = summary.addRow(Row.ROLE_HEADER);
-            header.addCellContent(T_column0); // primary bitstream
+	        //header.addCellContent(T_column0); // primary bitstream
             header.addCellContent(T_column1); // select checkbox
             header.addCellContent(T_column2); // file name
             header.addCellContent(T_column3); // size
             header.addCellContent(T_column4); // description
-            header.addCellContent(T_column5); // format
-            header.addCellContent(T_column6); // edit button
+	        header.addCellContent("Checksum");
+	        header.addCellContent("Order");
+	       // header.addCellContent(T_column5); // format
+	       // header.addCellContent(T_column6); // edit button
 
+		    int index = 0;
             for (Bitstream bitstream : bitstreams)
             {
                 int id = bitstream.getID();
@@ -282,7 +355,7 @@ public class UploadStep extends AbstractSubmissionStep
 
                 Row row = summary.addRow();
 
-                // Add radio-button to select this as the primary bitstream
+	            /*// Add radio-button to select this as the primary bitstream
                 Radio primary = row.addCell().addRadio("primary_bitstream_id");
                 primary.addOption(String.valueOf(id));
 
@@ -290,13 +363,13 @@ public class UploadStep extends AbstractSubmissionStep
                 // mark it as such.
                 if(bundles[0].getPrimaryBitstreamID() == id) {
                     primary.setOptionSelected(String.valueOf(id));
-                }
+                }*/
 
                 if (!disableFileEditing)
                 {
                     // Workflow users can not remove files.
-                    CheckBox remove = row.addCell().addCheckBox("remove");
-                    remove.setLabel("remove");
+	        		Cell c = row.addCell();
+		            CheckBox remove = c.addHighlight("fa fa-minus-square text-error").addCheckBox("remove");
                     remove.addOption(id);
                 }
                 else
@@ -305,17 +378,18 @@ public class UploadStep extends AbstractSubmissionStep
                 }
 
                 row.addCell().addXref(url,name);
-                row.addCellContent(bytes + " bytes");
+	            row.addCellContent(DSpaceApi.convertBytesToHumanReadableForm(bytes));
+	            Text dscfield = row.addCell().addText("description_" + id, "desc-box");
                 if (desc == null || desc.length() == 0)
                 {
-                    row.addCellContent(T_unknown_name);
+                    dscfield.setValue(T_unknown_name);
                 }
                 else
                 {
-                    row.addCellContent(desc);
+                    dscfield.setValue(desc);
                 }
 
-                BitstreamFormat format = bitstream.getFormat();
+                /*BitstreamFormat format = bitstream.getFormat();
                 if (format == null)
                 {
                     row.addCellContent(T_unknown_format);
@@ -338,17 +412,19 @@ public class UploadStep extends AbstractSubmissionStep
                             cell.addContent(T_unsupported);
                             break;
                     }
-                }
+	            }*/
 
-                Button edit = row.addCell().addButton("submit_edit_"+id);
-                edit.setValue(T_submit_edit);
+	         //   Button edit = row.addCell().addButton("submit_edit_"+id);
+	         //   edit.setValue(T_submit_edit);  
 
-                Row checksumRow = summary.addRow();
-                checksumRow.addCell();
-                Cell checksumCell = checksumRow.addCell(null, null, 0, 6, null);
-                checksumCell.addHighlight("bold").addContent(T_checksum);
-                checksumCell.addContent(" ");
-                checksumCell.addContent(algorithm + ":" + checksum);
+	            //Row checksumRow = summary.addRow();
+	            //checksumRow.addCell();
+	            //Cell checksumCell = checksumRow.addCell(null, null, 0, 6, null);
+	            //checksumCell.addHighlight("bold").addContent(T_checksum);
+	           // checksumCell.addContent(" ");
+	            //checksumCell.addContent(algorithm + ":" + checksum);
+		      row.addCell("checksum_cell",null,"checksum_cell").addContent(algorithm + ":" + checksum);
+		      row.addCell().addText("order_"+id,"order-box").setValue(""+index++);
             }
 
             if (!disableFileEditing)
@@ -356,16 +432,21 @@ public class UploadStep extends AbstractSubmissionStep
                 // Workflow users can not remove files.
                 Row actionRow = summary.addRow();
                 actionRow.addCell();
-                Button removeSeleceted = actionRow.addCell(null, null, 0, 6, null).addButton("submit_remove_selected");
+		        Cell c = actionRow.addCell(null, null, 0, 6, null);
+		        Button removeSeleceted = c.addButton("submit_remove_selected");
                 removeSeleceted.setValue(T_submit_remove);
+		        Button removeAll = c.addButton("submit_remove_all");
+		        removeAll.setValue("Remove All Files");		        
             }
 
             upload = div.addList("submit-upload-new-part2", List.TYPE_FORM);
+		} else {
+			summaryDiv = div.addDivision("summary");
         }
 
         // Part C:
         // add standard control/paging buttons
-        addControlButtons(upload);
+        addControlButtons(summaryDiv.addList("buttons", List.TYPE_FORM));
     }
 
 
@@ -482,6 +563,10 @@ public class UploadStep extends AbstractSubmissionStep
 
         }
 
+        if(bitstreams.length==0){
+        	uploadSection.addItem("You didn't upload any file.");
+        }
+        
         // return this new "upload" section
         return uploadSection;
     }

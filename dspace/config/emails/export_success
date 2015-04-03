@@ -1,11 +1,11 @@
-# Email sent to DSpace users when they successfully export an item or collection.
+# Email sent to users when they successfully export an item or collection.
 #
 # Parameters: {0} is expanded to a special URL
 #             {1} configurable time (hours) an export file will be kept
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: DSpace - Item export requested is ready for download
+Subject: ${lr.dspace.name.short}: Item export requested is ready for download
 The item export you requested from the repository is now ready for download.
 
 You may download the compressed file using the following link:
@@ -14,5 +14,10 @@ You may download the compressed file using the following link:
 This file will remain available for at least {1} hours.  
 
 
-The DSpace Team
+${lr.dspace.name.short} Team
 
+_____________________________________
+${dspace.name},
+WWW: ${dspace.url}
+Email: ${lr.help.mail}
+Tel.: ${lr.help.phone}

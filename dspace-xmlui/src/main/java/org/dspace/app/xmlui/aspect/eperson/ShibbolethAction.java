@@ -46,7 +46,8 @@ import org.dspace.eperson.EPerson;
  * </map:act>
  * <map:transform type="try-to-login-again-transformer">
  *
- * @author <a href="mailto:bliong@melcoe.mq.edu.au">Bruc Liong, MELCOE</a>
+ * based on class by <a href="mailto:bliong@melcoe.mq.edu.au">Bruc Liong, MELCOE</a>
+ * modified for LINDAT/CLARIN
  */
 
 public class ShibbolethAction extends AbstractAction
@@ -85,11 +86,30 @@ public class ShibbolethAction extends AbstractAction
             	{
             		// Otherwise direct the user to the specified 'loginredirect' page (or homepage by default)
             		String loginRedirect = ConfigurationManager.getProperty("xmlui.user.loginredirect");
+            		if(loginRedirect==null) {
+            			loginRedirect = (String)request.getSession().getAttribute("xmlui.user.loginredirect");
+            		}
+            		if(loginRedirect != null && loginRedirect.endsWith("login")) {
+            			loginRedirect = "/";
+            		}
             		redirectURL += (loginRedirect != null) ? loginRedirect.trim() : "/";	
             	}
             	
                 // Authentication successful - send a redirect.
                 final HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+                
+            	String email = eperson.getEmail();
+            	if (email == null) {
+            		redirectURL = request.getContextPath() + "/set-email";
+
+            	}else if ( null == eperson.getWelcome() && 
+            	        ConfigurationManager.getBooleanProperty("lr", "lr.login.welcome.message", false) ) 
+            	{
+                    // tocheck: users without emails should not be authenticated unless
+                    // emails are provided
+                    redirectURL = request.getContextPath() + "/welcome-message";
+                    request.getSession().setAttribute("shib.welcome", request.getSession().getAttribute("shib.welcome"));
+            	}
                 
                 httpResponse.sendRedirect(redirectURL);
                 

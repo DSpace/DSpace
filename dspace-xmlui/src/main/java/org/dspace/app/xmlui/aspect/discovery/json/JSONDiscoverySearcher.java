@@ -37,6 +37,8 @@ import java.util.Map;
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
+ *
+ * modified for LINDAT/CLARIN
  */
 public class JSONDiscoverySearcher extends AbstractReader implements Recyclable {
 
@@ -65,7 +67,8 @@ public class JSONDiscoverySearcher extends AbstractReader implements Recyclable 
 
         DiscoverQuery queryArgs = new DiscoverQuery();
 
-        queryArgs.setQuery(request.getParameter("q"));
+        String q = request.getParameter("q");
+        queryArgs.setQuery(q==null?"*:*":q);
 
 
         //Retrieve all our filter queries

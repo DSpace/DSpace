@@ -108,6 +108,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
     
     /** The options for results per page */
     private static final int[] RESULTS_PER_PAGE_PROGRESSION = {5,10,20,40,60,80,100};
+    private static final int RESULTS_PER_PAGE_MAX = 100;
 
     /** Cached query arguments */
     private QueryArgs queryArgs;
@@ -270,8 +271,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
                 }
                 int currentPage = (queryResults.getStart() / queryResults
                         .getPageSize()) + 1;
-                int pagesTotal = ((queryResults.getHitCount() - 1) / queryResults
-                        .getPageSize()) + 1;
+                int pagesTotal = (int) Math.ceil((double)queryResults.getHitCount() / queryResults.getPageSize());
                 Map<String, String> parameters = new HashMap<String, String>();
                 parameters.put("page", "{pageNum}");
                 String pageURLMask = generateURL(parameters);
@@ -500,7 +500,8 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
     {
         try
         {
-            return Integer.parseInt(ObjectModelHelper.getRequest(objectModel).getParameter("rpp"));
+        	int rpp = Integer.parseInt(ObjectModelHelper.getRequest(objectModel).getParameter("rpp"));        	
+            return rpp<=RESULTS_PER_PAGE_MAX?rpp:RESULTS_PER_PAGE_MAX;
         }
         catch (Exception e)
         {

@@ -31,7 +31,8 @@ import org.xml.sax.SAXException;
  * 
  * forgot - A boolean value indicating whether this is part of the forgotten password workflow.
  * 
- * @author Scott Phillips
+ * based on class by Scott Phillips
+ * modified for LINDAT/CLARIN
  */
 
 public class VerifyEmail extends AbstractDSpaceTransformer
@@ -71,7 +72,7 @@ public class VerifyEmail extends AbstractDSpaceTransformer
         try
         {
             this.email = parameters.getParameter("email");
-            this.forgot = parameters.getParameterAsBoolean("forgot");
+            this.forgot = parameters.getParameterAsBoolean("forgot", false);
         }
         catch (ParameterException pe)
         {

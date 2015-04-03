@@ -29,7 +29,8 @@ import org.dspace.handle.HandleManager;
 /**
  * Simple utility class for extracting handles.
  * 
- * @author Scott Phillips
+ * based on class by Scott Phillips
+ * modified for LINDAT/CLARIN
  */
 
 public class HandleUtil
@@ -234,7 +235,7 @@ public class HandleUtil
             else
                 target = contextPath + "/handle/" + pop.getHandle();
 
-            if (pop instanceof Collection)
+           /* if (pop instanceof Collection)
             {
             	Collection collection = (Collection) pop;
             	String name = collection.getMetadata("name");
@@ -259,9 +260,62 @@ public class HandleUtil
                 {
                     pageMeta.addTrailLink(target, name);
                 }
-            }
+            }*/
 
         }
     }
+    
+	public static void buildHandleTrailTerminal(DSpaceObject dso, PageMeta pageMeta,
+            String contextPath) throws SQLException, WingException
+    {
+        // Add the trail back to the repository root.
+        Stack<DSpaceObject> stack = new Stack<DSpaceObject>();
+        
+        DSpaceObject aDso = dso;
+
+        if (aDso instanceof Bitstream)
+        {
+        	Bitstream bitstream = (Bitstream) aDso;
+        	Bundle[] bundles = bitstream.getBundles();
+
+        	aDso = bundles[0];
+        }
+
+        if (aDso instanceof Bundle)
+        {
+        	Bundle bundle = (Bundle) aDso;
+        	Item[] items = bundle.getItems();
+
+        	aDso = items[0];
+        }
+
+        if (aDso instanceof Item)
+        {
+            Item item = (Item) aDso;
+            stack.push(item);
+            Collection collection = item.getOwningCollection();
+            aDso = collection;
+        }
+    
+        while (!stack.empty())
+        {
+            DSpaceObject pop = stack.pop();
+
+            String target = contextPath + "/handle/" + pop.getHandle();
+
+            String name = pop.getName();
+            
+        	if (name == null || name.length() == 0)
+            {
+                pageMeta.addTrailLink(target, new Message("default", "xmlui.general.untitled"));
+            }
+        	else
+            {
+                pageMeta.addTrailLink(target, name);
+            }
+        }
+		
+    }
+
 
 }

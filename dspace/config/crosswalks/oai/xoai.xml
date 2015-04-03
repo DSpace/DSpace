@@ -15,74 +15,33 @@
 
     <Contexts>
         <Context baseurl="request" name="Default Context">
-            <!-- Restrict access to hidden items by default -->
-            <Filter red="defaultFilter" />
-
             <Format ref="oaidc"/>
             <Format ref="mets"/>
-            <Format ref="xoai"/>
-            <Format ref="didl"/>
             <Format ref="dim"/>
             <Format ref="ore"/>
-            <Format ref="rdf"/>
-            <Format ref="etdms"/>
             <Format ref="mods"/>
-            <Format ref="qdc"/>
-            <Format ref="marc"/>
-            <Format ref="uketd_dc"/>
-            <!--<Format ref="junii2" />-->
+			<!--Format ref="qdc" /-->
+			<Format ref="bibtex" />
+			<Format ref="oai_metasharev2" />
+			<Format ref="cmdi" />
+			<Format ref="olac" />
+			<Format ref="html" />
             <Description>
                 This is the default context of the DSpace data provider.
             </Description>
         </Context>
 
-        <!--
-            Driver Guidelines:
-
-            - http://www.driver-support.eu/documents/DRIVER_Guidelines_v2_Final_2008-11-13.pdf
-
-            Page 57 - 58
-         -->
-        <Context baseurl="driver" name="Driver Context">
-            <!-- Date format, field prefixes, etc are ensured by the transformer -->
-            <Transformer ref="driverTransformer"/>
-            <!-- The driver filter -->
-            <Filter red="driverFilter"/>
-            <!-- Just an alias, in fact it returns all items within the driver context -->
-            <Set ref="driverSet"/>
-            <!-- Metadata Formats -->
-            <Format ref="oaidc"/>
-            <Format ref="mets"/>
-            <Format ref="didl"/>
-            <Description>
-                This contexts complies with Driver rules.
-            </Description>
-        </Context>
-
-        <!--
-            OpenAIRE Guidelines 1.1:
-
-            - http://www.openaire.eu/en/component/attachments/download/79%E2%8C%A9=en
-
-            There is a limitation over the embargoedEndDate parameter:
-
-            - Predefined DSpace fields don't allow to set this up with a default.
-         -->
-        <Context baseurl="openaire" name="OpenAIRE Context">
-            <!-- Date format, field prefixes, etc are ensured by the transformer -->
-            <Transformer ref="openaireTransformer"/>
-            <!-- OpenAIRE filter -->
-            <Filter red="openAireFilter"/>
-            <!-- Just an alias, in fact it returns all items within the driver context -->
-            <Set ref="openaireSet"/>
-            <!-- Metadata Formats -->
-            <Format ref="oaidc"/>
-            <Format ref="mets"/>
-            <Description>
-                This contexts complies with OpenAIRE rules.
-            </Description>
-        </Context>
-    </Contexts>
+		<Context baseurl="openaire_data" name="OpenAIRE data Context">
+		  <!-- <Transformer ref="openaireDataTransformer"/> -->
+		  <Filter red="openaireFilter"/>
+		  <Set ref="openaireDataSet"/>
+		  <Format ref="oaidc"/>
+		  <Format ref="oai_datacite"/>
+		  <Description>
+		      This context exports items following the openaire data archive rules.
+		  </Description>
+		</Context>
+	</Contexts>
 
 
     <Formats>
@@ -109,8 +68,7 @@
             <Prefix>didl</Prefix>
             <XSLT>metadataFormats/didl.xsl</XSLT>
             <Namespace>urn:mpeg:mpeg21:2002:02-DIDL-NS</Namespace>
-            <SchemaLocation>http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/did/didl.xsd
-            </SchemaLocation>
+			<SchemaLocation>http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/did/didl.xsd</SchemaLocation>
         </Format>
         <Format id="dim">
             <Prefix>dim</Prefix>
@@ -161,12 +119,43 @@
             <SchemaLocation>http://naca.central.cranfield.ac.uk/ethos-oai/2.0/uketd_dc.xsd</SchemaLocation>
             <Filter ref="uketdDcFilter"/>
         </Format>
-        <Format id="junii2">
-            <Prefix>junii2</Prefix>
-            <XSLT>metadataFormats/junii2.xsl</XSLT>
-            <Namespace>http://irdb.nii.ac.jp/oai</Namespace>
-            <SchemaLocation>http://irdb.nii.ac.jp/oai/junii2-3-1.xsd</SchemaLocation>
+		<Format id="bibtex">
+		    <Prefix>bibtex</Prefix>
+		    <XSLT>metadataFormats/bibtex.xsl</XSLT>
+		    <Namespace>http://lindat.mff.cuni.cz/ns/experimental/bibtex</Namespace>
+		    <SchemaLocation>http://lindat.mff.cuni.cz/schemas/experimental/bibtex.xsd</SchemaLocation>
         </Format>
+		<Format id="oai_metasharev2">
+		    <Prefix>oai_metasharev2</Prefix>
+		    <XSLT>metadataFormats/metasharev2.xsl</XSLT>
+		    <Namespace>http://www.ilsp.gr/META-XMLSchema</Namespace>
+		    <SchemaLocation>http://metashare.ilsp.gr/META-XMLSchema/v2.0/META-SHARE-Resource.xsd</SchemaLocation>
+		</Format>
+		<Format id="cmdi">
+		    <Prefix>cmdi</Prefix>
+		    <XSLT>metadataFormats/lindat_cmdi.xsl</XSLT>
+		    <Namespace>http://www.clarin.eu/cmd/</Namespace>
+		    <SchemaLocation>http://catalog.clarin.eu/ds/ComponentRegistry/rest/registry/profiles/clarin.eu:cr1:p_1349361150622/xsd</SchemaLocation>
+		</Format>
+        <Format id="olac">
+               <Prefix>olac</Prefix>
+               <XSLT>metadataFormats/olac.xsl</XSLT>
+               <Namespace>http://www.language-archives.org/OLAC/1.1/olac.xsd</Namespace>
+               <SchemaLocation>http://www.language-archives.org/OLAC/1.1/</SchemaLocation>
+		</Format>
+		<!-- openaire data must use oai_datacite prefix & schema -->
+		<Format id="oai_datacite">
+		       <Prefix>oai_datacite</Prefix>
+		       <XSLT>metadataFormats/datacite_openaire.xsl</XSLT>
+		       <Namespace>http://schema.datacite.org/oai/oai-1.0/</Namespace>
+		       <SchemaLocation>http://schema.datacite.org/oai/oai-1.0/oai.xsd</SchemaLocation>
+		</Format>
+		<Format id="html">
+		    <Prefix>html</Prefix>
+		    <XSLT>metadataFormats/html.xsl</XSLT>
+		    <Namespace>http://lindat.mff.cuni.cz/ns/experimental/html</Namespace>
+		    <SchemaLocation>http://lindat.mff.cuni.cz/schemas/experimental/html.xsd</SchemaLocation>
+		</Format>
     </Formats>
 
     <Transformers>
@@ -180,143 +169,11 @@
 
 
     <Filters>
-        <Filter id="driverFilter">
+        <Filter id="openaireFilter">
             <Definition>
-                <And>
-                    <LeftCondition>
-                        <And>
-                            <LeftCondition>
-                                <Custom ref="titleExistsCondition"/>
-                            </LeftCondition>
-                            <RightCondition>
-                                <Custom ref="authorExistsCondition"/>
-                            </RightCondition>
-                        </And>
-                    </LeftCondition>
-                    <RightCondition>
-                        <And>
-                            <LeftCondition>
-                                <Custom ref="driverDocumentTypeCondition"/>
-                            </LeftCondition>
-                            <RightCondition>
-                                <And>
-                                    <LeftCondition>
-                                        <Custom ref="bitstreamAccessCondition"/>
-                                    </LeftCondition>
-                                    <RightCondition>
-                                        <Custom ref="driverAccessCondition"/>
-                                    </RightCondition>
-                                </And>
-                            </RightCondition>
-                        </And>
-                    </RightCondition>
-                </And>
-            </Definition>
-        </Filter>
-
-        <Filter id="openAireFilter">
-            <Definition>
-                <And>
-                    <LeftCondition>
-                        <And>
-                            <LeftCondition>
-                                <Custom ref="titleExistsCondition"/>
-                            </LeftCondition>
-                            <RightCondition>
-                                <Custom ref="authorExistsCondition"/>
-                            </RightCondition>
-                        </And>
-                    </LeftCondition>
-                    <RightCondition>
-                        <And>
-                            <LeftCondition>
-                                <Custom ref="driverDocumentTypeCondition"/>
-                            </LeftCondition>
-                            <RightCondition>
                                 <Custom ref="openaireRelationCondition"/>
-                            </RightCondition>
-                        </And>
-                    </RightCondition>
-                </And>
             </Definition>
         </Filter>
-
-        <Filter id="uketdDcFilter">
-            <Definition>
-                <Custom ref="thesisDocumentTypeCondition"/>
-            </Definition>
-        </Filter>
-
-        <Filter id="defaultFilter">
-            <Definition>
-                <Custom ref="bitstreamAccessCondition"/>
-            </Definition>
-        </Filter>
-
-        <CustomCondition id="thesisDocumentTypeCondition">
-            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
-            <Configuration>
-                <string name="field">dc.type</string>
-                <string name="operator">contains</string>
-                <string name="value">Thesis</string>
-            </Configuration>
-        </CustomCondition>
-
-        <CustomCondition id="authorExistsCondition">
-            <Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
-            <Configuration>
-                <string name="field">dc.contributor.author</string>
-            </Configuration>
-        </CustomCondition>
-
-        <CustomCondition id="titleExistsCondition">
-            <Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
-            <Configuration>
-                <string name="field">dc.title</string>
-            </Configuration>
-        </CustomCondition>
-
-        <CustomCondition id="driverDocumentTypeCondition">
-            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
-            <Configuration>
-                <string name="field">dc.type</string>
-                <string name="operator">ends_with</string>
-                <list name="values">
-                    <string>article</string>
-                    <string>bachelorThesis</string>
-                    <string>masterThesis</string>
-                    <string>doctoralThesis</string>
-                    <string>book</string>
-                    <string>bookPart</string>
-                    <string>review</string>
-                    <string>conferenceObject</string>
-                    <string>lecture</string>
-                    <string>workingPaper</string>
-                    <string>preprint</string>
-                    <string>report</string>
-                    <string>annotation</string>
-                    <string>contributionToPeriodical</string>
-                    <string>patent</string>
-                    <string>other</string>
-                </list>
-            </Configuration>
-        </CustomCondition>
-
-        <CustomCondition id="driverAccessCondition">
-            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
-            <Configuration>
-                <string name="field">dc.rights</string>
-                <string name="operator">contains</string>
-                <list>
-                    <string>open access</string>
-                    <string>openAccess</string>
-                </list>
-            </Configuration>
-        </CustomCondition>
-
-        <CustomCondition id="bitstreamAccessCondition">
-            <Class>org.dspace.xoai.filter.DSpaceAuthorizationFilter</Class>
-        </CustomCondition>
 
         <CustomCondition id="openaireRelationCondition">
             <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
@@ -338,6 +195,10 @@
             <Spec>ec_fundedresources</Spec>
             <Name>EC_fundedresources set</Name>
             <!-- Just an alias -->
+        </Set>
+        <Set id="openaireDataSet">
+            <Spec>openaire_data</Spec>
+            <Name>OpenAIRE_data</Name>
         </Set>
     </Sets>
 </Configuration>

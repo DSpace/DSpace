@@ -22,12 +22,18 @@ importClass(Packages.org.dspace.app.xmlui.utils.ContextUtil);
 
 importClass(Packages.java.lang.String);
 
+importClass(Packages.cz.cuni.mff.ufal.DSpaceApi);
+
+importClass(Packages.org.dspace.content.Item);
+importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowItemUtils);
+
 /**
  * This class defines the workflows for three flows within the EPerson aspect.
  * 
  * FIXME: add more documentation
  * 
- * @author Scott Phillips
+ * based on file by Scott Phillips
+ * modified for LINDAT/CLARIN
  */
  
 /** These functions should be common to all Manakin Flow scripts */
@@ -363,17 +369,20 @@ function updateInformation(eperson)
 	var firstName = cocoon.request.getParameter("first_name");
 	var phone = cocoon.request.getParameter("phone");
         var language = cocoon.request.getParameter("language");
+    var registering = cocoon.request.getParameter("registering");
+	var oldFirstName = eperson.getFirstName();
+	var oldLastName = eperson.getLastName();
 
     // first, check that each parameter is filled in before setting anything.
 	var idx = 0;
 	var errors = new Array();
 	
-	if (firstName == null || firstName.equals(""))
+	if ((registering || !stringsEqual(firstName, oldFirstName)) && stringsEqual(firstName, ""))
     {
         errors[idx++] = "first_name";
     }
     
-    if (lastName == null || lastName.equals(""))
+    if ((registering || !stringsEqual(lastName, oldLastName)) && stringsEqual(lastName, ""))
 	{
 	    errors[idx++] = "last_name";
 	}
@@ -394,6 +403,24 @@ function updateInformation(eperson)
     return new Array();
 }
   
+/**
+ * Helper function to check if two strings are equal
+ * treating null as empty string
+ *
+ * @param s1 First string
+ * @param s2 Second string
+ * @returns True is the strings equal, false otherwise
+ */
+function stringsEqual(s1, s2)
+{
+	var res = false;
+	if(((s1 == null || s1.equals("")) && (s2 == null || s2.equals(""))) ||
+		(s1 != null && s2 != null && s1.equals(s2)))
+	{
+		res = true;
+	}
+	return res;
+}
   
   
 /**
@@ -431,4 +458,205 @@ function updatePassword(eperson)
 	eperson.update();
 	
 	return new Array();
+}
+
+function askForMail(){
+	var ask = true;
+    var token = cocoon.request.get("token");
+    
+	var eperson = getEPerson();
+    if (token == null && (eperson == null || eperson.getEmail() != null))
+    {
+        // User should only have gotten here after shibboleth eperson was created without an email or with a token
+        throw new AuthorizeException("User not authorized to set an email");
+    }
+            
+    if (token == null) 
+    {
+        // We have no token, this is the initial form. First ask the user for their email address
+        // and then send them a token.
+        var eid = eperson.getID();
+        
+        //log the user out
+        AuthenticationUtil.logOut(getDSContext(), cocoon.request);
+        getDSContext().commit();
+        
+        var accountExists = false;
+        var errors = new Array();
+        do {
+            var email = cocoon.request.getParameter("email");
+        			
+            cocoon.sendPageAndWait("set-email/start",{"email" : email, "errors" : errors.join(','), "accountExists" : accountExists});
+            var errors = new Array();
+            accountExists = false;
+            
+            email = cocoon.request.getParameter("email");
+            email = email.toLowerCase(); // all emails should be lowercase
+            var epersonFound = (EPerson.findByEmail(getDSContext(),email) != null);
+            
+            if (epersonFound) 
+            {
+                accountExists = true;
+                errors = new Array("email_used");
+                cocoon.log.error("The email " + email +" is already in use.");
+                continue;
+            }
+            
+            try 
+            {
+                // May throw the AddressException or a varity of SMTP errors.
+                DSpaceApi.sendRegistrationInfo(getDSContext(),email,eid);              
+                getDSContext().commit();
+            } 
+            catch (error) 
+            {
+                // If any errors occure while trying to send the email set the field in error.
+                errors = new Array("email");
+                cocoon.log.error(error);
+                continue;
+            }
+            
+            cocoon.sendPage("set-email/verify", { "email":email});
+            return; 
+
+                
+
+        } while (accountExists || errors.length > 0)
+    } 
+    else 
+    {
+        // We have a token. Find out who the it's for
+    	//Also assigns the stored email to the eperson
+        eperson = DSpaceApi.getEPersonByToken(getDSContext(), token);
+        
+        if (eperson == null) 
+        {
+            cocoon.sendPage("set-email/invalid-token");
+            return;
+        }
+        
+        DSpaceApi.deleteToken(token);
+        // Log user in.
+        AuthenticationUtil.logIn(getObjectModel(),eperson);
+
+        getDSContext().commit();
+        
+        cocoon.sendPage("set-email/finished");
+        return;
+    }	
+}
+
+function sendPageAndWait(uri,bizData,result)
+{
+    if (bizData == null)
+        bizData = {};
+
+
+    if (result != null)
+    {
+        var outcome = result.getOutcome();
+        var header = result.getHeader();
+        var message = result.getMessage();
+        var characters = result.getCharacters();
+
+
+        if (message != null || characters != null)
+        {
+            bizData["notice"]     = "true";
+            bizData["outcome"]    = outcome;
+            bizData["header"]     = header;
+            bizData["message"]    = message;
+            bizData["characters"] = characters;
+        }
+
+        var errors = result.getErrorString();
+        if (errors != null)
+        {
+            bizData["errors"] = errors;
+        }
+    }
+
+    // just to remember where we came from.
+    bizData["flow"] = "true";
+    cocoon.sendPageAndWait(uri,bizData);
+}
+
+function sendPage(uri,bizData,result)
+{
+    if (bizData == null)
+        bizData = {};
+
+    if (result != null)
+    {
+        var outcome = result.getOutcome();
+        var header = result.getHeader();
+        var message = result.getMessage();
+        var characters = result.getCharacters();
+
+        if (message != null || characters != null)
+        {
+            bizData["notice"]     = "true";
+            bizData["outcome"]    = outcome;
+            bizData["header"]     = header;
+            bizData["message"]    = message;
+            bizData["characters"] = characters;
+        }
+
+        var errors = result.getErrorString();
+        if (errors != null)
+        {
+            bizData["errors"] = errors;
+        }
+    }
+
+    // just to remember where we came from.
+    bizData["flow"] = "true";
+    cocoon.sendPage(uri,bizData);
+}
+
+function assertEditMetadata(itemID){
+    var item = Item.find(getDSContext(),itemID);
+
+    if ( item == null || ! item.canEditMetadata()) {
+        sendPage("edit/item/not-authorized");
+        cocoon.exit();
+    }	
+}
+
+function startEditMetadata() {
+	var itemID = cocoon.request.get("itemID");
+	var templateCollectionID = -1;
+
+	assertEditMetadata(itemID);
+
+	var result;
+	do {
+		sendPageAndWait("edit/item/metadata", {
+			"itemID" : itemID,
+			"templateCollectionID" : templateCollectionID
+		}, result);
+		assertEditMetadata(itemID);
+		result = null;
+
+		if (cocoon.request.get("submit_add")) {
+			// Add a new metadata entry
+			result = FlowItemUtils.processAddMetadata(getDSContext(), itemID,
+					cocoon.request);
+		} else if (cocoon.request.get("submit_update")) {
+			// Update the item
+			result = FlowItemUtils.processEditItemMetadata(getDSContext(), itemID,
+					cocoon.request);
+		} else if (cocoon.request.get("submit_return"))
+        {
+            // go back to where ever we came from.
+            break;
+        }
+	} while (true)
+
+	var item = Item.find(getDSContext(), itemID);
+	cocoon.redirectTo(cocoon.request.getContextPath() + "/handle/"
+			+ item.getHandle(), true);
+	getDSContext().complete();
+	item = null;
+	cocoon.exit();
 }

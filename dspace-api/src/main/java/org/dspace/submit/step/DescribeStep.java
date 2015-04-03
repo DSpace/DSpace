@@ -9,8 +9,15 @@ package org.dspace.submit.step;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -18,10 +25,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-
+import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
-import org.dspace.app.util.DCInput;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
@@ -29,12 +35,12 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCPersonName;
 import org.dspace.content.DCSeriesNumber;
-import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
-import org.dspace.content.authority.MetadataAuthorityManager;
+import org.dspace.content.Metadatum;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.submit.AbstractProcessingStep;
@@ -53,16 +59,20 @@ import org.dspace.submit.AbstractProcessingStep;
  * @see org.dspace.app.util.SubmissionStepConfig
  * @see org.dspace.submit.AbstractProcessingStep
  *
- * @author Tim Donohue
+ * based on class by Tim Donohue
+ * modified for LINDAT/CLARIN
  * @version $Revision$
  */
 public class DescribeStep extends AbstractProcessingStep
 {
+    
+    public static final String REPEATABLE_SPLIT_REGEX = ",|;";
+    
     /** log4j logger */
     private static Logger log = Logger.getLogger(DescribeStep.class);
 
     /** hash of all submission forms details */
-    private static DCInputsReader inputsReader = null;
+    protected static DCInputsReader inputsReader = null;
 
     /***************************************************************************
      * STATUS / ERROR FLAGS (returned by doProcessing() if an error occurs or
@@ -77,9 +87,21 @@ public class DescribeStep extends AbstractProcessingStep
     // there were required fields that were not filled out
     public static final int STATUS_MISSING_REQUIRED_FIELDS = 2;
     
+    public static final int STATUS_REGEX_ERROR = 3;
+
+    private static final String REGEX_ERROR_ATTRIBUTE = "dspace.submit.regex_error";
+    
     // the metadata language qualifier
     public static final String LANGUAGE_QUALIFIER = getDefaultLanguageQualifier();
-
+    
+    // UFAL: the following metadata can have non-unique values (input-type: "onebox")
+    private static final String nonUniqueMd[] = new String[] {
+    	"metashare.ResourceInfo#ResourceCreationInfo#FundingInfo#ProjectInfo.projectName", 
+    	"metashare.ResourceInfo#ResourceCreationInfo#FundingInfo#ProjectInfo.fundingType"
+    }; 
+    private static final Set<String> nonUniqueMdSet = new HashSet<String>(Arrays.asList(nonUniqueMd));
+    
+    
     /** Constructor */
     public DescribeStep() throws ServletException
     {
@@ -87,6 +109,11 @@ public class DescribeStep extends AbstractProcessingStep
         getInputsReader();
     }
 
+    public DescribeStep(DCInputsReader inputs_reader) throws ServletException
+    {
+        //load the DCInputsReader
+        inputsReader = inputs_reader;
+    }
    
 
     /**
@@ -278,7 +305,9 @@ public class DescribeStep extends AbstractProcessingStep
                     || (inputType.equals("textarea")))
             {
                 readText(request, item, schema, element, qualifier, inputs[j]
-                        .getRepeatable(), LANGUAGE_QUALIFIER);
+                        .getRepeatable(), LANGUAGE_QUALIFIER, inputs[j].getRepeatableParse());
+            } else if(inputType.equals("complex")){
+                readComplex(request, item, schema, element, qualifier, inputs[j]);
             }
             else
             {
@@ -333,6 +362,14 @@ public class DescribeStep extends AbstractProcessingStep
                     // since this field is missing add to list of error fields
                     addErrorField(request, getFieldName(inputs[i]));
                 }
+                
+                // Check whether the value matches given regexp
+                //TODO: use regexp handling that was created for complex fields see addRegexError
+                for(Metadatum dcval:values){
+                    if(!inputs[i].isAllowedValue(dcval.value)){
+                        addErrorField(request, getFieldName(inputs[i]));
+                    }
+                }         
             }
         }
 
@@ -348,6 +385,9 @@ public class DescribeStep extends AbstractProcessingStep
         {
             return STATUS_MORE_INPUT_REQUESTED;
         }
+        else if(getBrokenValues(request) != null && getBrokenValues(request).size() > 0){
+        	return STATUS_REGEX_ERROR;
+        }
         // if one or more fields errored out, return
         else if (getErrorFields(request) != null && getErrorFields(request).size() > 0)
         {
@@ -360,7 +400,85 @@ public class DescribeStep extends AbstractProcessingStep
 
     
 
-    /**
+    private void readComplex(HttpServletRequest request, Item item,
+			String schema, String element, String qualifier, DCInput input) {
+
+        String metadataField = MetadataField
+                .formKey(schema, element, qualifier);
+        boolean repeated = input.getRepeatable();
+        
+        DCInput.ComplexDefinition definition = input.getComplexDefinition();
+        java.util.Map<String, java.util.List<String>> fieldsValues = new HashMap<String, java.util.List<String>>();
+        int valuesPerField = 0;
+
+        if (repeated)
+        {
+        	for(String name : definition.getInputNames()){
+        		List<String> list = getRepeatedParameter(request, metadataField, metadataField + "_" + name);
+                fieldsValues.put(name, list);
+                //assume the list are all the same size
+                valuesPerField = list.size();
+        	}
+
+        }
+        else
+        {
+        	for(String name : definition.getInputNames()){
+        		List<String> list = new ArrayList<String>();
+        		String value = request.getParameter(metadataField + "_" + name);
+        		if(value != null){
+        			list.add(value);
+        			fieldsValues.put(name, list);
+        		}
+        	}
+        	valuesPerField = 1;
+        }
+
+
+        boolean error = false;
+        //for all values
+        for(int i = 0; i < valuesPerField; i++){
+        	StringBuilder complexValue = new StringBuilder();
+        	int emptyFields = 0;
+        	//separator empty for first iter
+        	String separator = "";
+        	//in all fields
+        	for(String name : definition.getInputNames()){
+        		String value = fieldsValues.get(name).get(i);
+        		if(value != null){
+        			value = value.trim();
+        			value = value.replaceAll(DCInput.ComplexDefinition.SEPARATOR, DCInput.ComplexDefinition.SEPARATOR.replaceAll("(.)", "_$1_"));
+        		} else{
+        			value = "";
+        		}
+        		if("".equals(value)){
+        			++emptyFields;
+        		}
+                String regex = definition.getInput(name).get("regexp");
+                if(!value.isEmpty() && !DCInput.isAllowedValue(value, regex)){
+                	error = true;
+                }
+        		complexValue.append(separator).append(value);
+        		//non empty separator for the remaining iterations;
+        		separator = DCInput.ComplexDefinition.SEPARATOR;
+        	}
+        	//required and all empty handled by doProcessing
+        	//this checks whether one of the fields was empty
+        	String finalValue = complexValue.toString();
+        	if( emptyFields > 0 && emptyFields < definition.inputsCount()){
+        		error = true;
+        	}
+        	if(error){
+        		//incomplete as regex errors
+        		addRegexError(request,metadataField,finalValue);
+        	}else if(emptyFields != definition.inputsCount()){
+        		//add the final value only if it is not empty
+        		item.addMetadata(schema, element, qualifier, null, finalValue);
+        	}
+        }
+	}
+
+	/**
      * Retrieves the number of pages that this "step" extends over. This method
      * is used to build the progress bar.
      * <P>
@@ -677,7 +795,13 @@ public class DescribeStep extends AbstractProcessingStep
      *            language to set (ISO code)
      */
     protected void readText(HttpServletRequest request, Item item, String schema,
-            String element, String qualifier, boolean repeated, String lang)
+            String element, String qualifier, boolean repeated, String lang, boolean repeatable_parse) {
+      readText( request, item, schema, element, qualifier, repeated, lang, null, repeatable_parse);
+    }
+
+    protected void readText(HttpServletRequest request, Item item, String schema,
+            String element, String qualifier, boolean repeated, String lang, String repeatable_component,
+            boolean repeatable_parse)
     {
         // FIXME: Of course, language should be part of form, or determined
         // some other way
@@ -691,10 +815,41 @@ public class DescribeStep extends AbstractProcessingStep
         List<String> vals = null;
         List<String> auths = null;
         List<String> confs = null;
+        
+        String mdString;
+        if ((qualifier == null) || qualifier.equals("")) {
+        	mdString = schema + "." + element;
+        }
+        else {
+        	mdString = schema + "." + element + "." + qualifier;
+        }
 
         if (repeated)
         {
             vals = getRepeatedParameter(request, metadataField, metadataField);
+            
+            // if someone adds strings to repeatable with ;, split them if specified 
+            //   in input-forms.xml
+            if ( repeatable_parse ) 
+            {
+                split_strings(vals);
+            }
+
+            // only unique values are allowed except the ones 
+            // defined in nonUniqMdSet
+            if (!nonUniqueMdSet.contains(mdString)) {
+                Set<String> uniqueValues = new HashSet<String>();
+                List<String> uniqueVals = new LinkedList<String>();
+                for ( int i=0; i < vals.size(); i++ ) {
+                	if (!uniqueValues.contains(vals.get(i))) {
+                    	uniqueValues.add(vals.get(i));
+                    	uniqueVals.add(vals.get(i));
+                	}
+                }
+                vals = uniqueVals;            	
+            }
+
+                        
             if (isAuthorityControlled)
             {
                 auths = getRepeatedParameter(request, metadataField, metadataField+"_authority");
@@ -745,10 +900,25 @@ public class DescribeStep extends AbstractProcessingStep
         // item.clearMetadata(schema, element, qualifier, Item.ANY);
 
         // Put the names in the correct form
+        int max_num = 0;
         for (int i = 0; i < vals.size(); i++)
         {
             // Add to the database if non-empty
-            String s = vals.get(i);
+            String s = (String) vals.get(i);
+
+            // UFAL/jmisutka
+            if ( null != repeatable_component  &&
+                    Util.getSubmitButton(request,NEXT_BUTTON).startsWith("submit_component_"+repeatable_component) ) {
+              Pattern p = Pattern.compile( "#(\\d+)-.*" );
+              Matcher m = p.matcher(s);
+              if ( m.find() ) {
+                max_num = Math.max( max_num, Integer.parseInt(m.group(1)) );
+              }else {
+                ++max_num;
+                s = String.format("#%s-%s", String.valueOf(max_num),s );
+              }
+          }
+
             if ((s != null) && !s.equals(""))
             {
                 if (isAuthorityControlled)
@@ -1024,5 +1194,62 @@ public class DescribeStep extends AbstractProcessingStep
             return dcSchema + "_" + dcElement;
         }
 
+    }
+
+    
+    /**
+     * Split strings on separators.
+     * 
+     * @param vals
+     */
+    public static void split_strings( List<String> string_list )
+    {
+        for ( int i = 0; i < string_list.size(); ++i ) 
+        {
+            String[] splits = string_list.get(i).split(REPEATABLE_SPLIT_REGEX);
+            // replace the one value with multiple
+            if ( splits.length > 1 ) 
+            {
+                string_list.remove(i);
+                // preserve the order 
+                for ( int j = splits.length - 1; j >= 0; --j ) {
+                    string_list.add(i, splits[j].trim() );
+                }
+            }
+        }
+    }
+    
+    public static final List<String> getBrokenValues(HttpServletRequest request){
+        return (List<String>) request.getAttribute(REGEX_ERROR_ATTRIBUTE);
+    }
+    
+    protected static final void addRegexError(HttpServletRequest request, String fieldName, String value)
+    {
+        //get current list
+        List<String> errorFields = getBrokenValues(request);
+        
+        if (errorFields == null)
+        {
+            errorFields = new ArrayList<String>();
+        }
+
+        //add this field
+        errorFields.add(fieldName);
+	//XXX this is obscure, but the list essentially gets converted to a comma separated string in submission.js::saveRegexError. Commas in user input would break that, but they can't be just .replaced as we need the entered value
+        errorFields.add(javax.xml.bind.DatatypeConverter.printBase64Binary(value.getBytes()));
+        
+        //save updated list
+        setRegexError(request, errorFields);
+    }
+    private static final void setRegexError(HttpServletRequest request, List<String> errorFields)
+    {
+        if(errorFields==null)
+        {
+            request.removeAttribute(REGEX_ERROR_ATTRIBUTE);
+        }
+        else
+        {
+            request.setAttribute(REGEX_ERROR_ATTRIBUTE, errorFields);
+        }
     }
 }

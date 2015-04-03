@@ -455,10 +455,15 @@ public class AuthenticationUtil
         // FIXME: TEMPORARILY need to turn off authentication, as usually
         // only site admins can create e-people
         context.setIgnoreAuthorization(true);
-        EPerson eperson = EPerson.create(context);
+        EPerson eperson = EPerson.create(context, "New Local user.");
         eperson.setEmail(email);
         eperson.setCanLogIn(true);
         eperson.setSelfRegistered(true);
+        // set default language if present
+        String lang = ConfigurationManager.getProperty("lr", "lr.default.eperson.language");
+        if ( null != lang && 0 < lang.trim().length() ) {
+          eperson.setLanguage( lang );
+        }
         eperson.update();
         context.setIgnoreAuthorization(false);
         

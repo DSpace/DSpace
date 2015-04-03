@@ -28,13 +28,20 @@ registration, forgotten passwords, editing profiles, and changing passwords.
 			<map:transformer name="CannotRegister" src="org.dspace.app.xmlui.aspect.eperson.CannotRegister"/>
 			<map:transformer name="InvalidToken" src="org.dspace.app.xmlui.aspect.eperson.InvalidToken"/>
 			
+			<map:transformer name="OurInvalidToken" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.eperson.InvalidToken"/>
+			<map:transformer name="SetEmailStart" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.eperson.SetEmailStart"/>
+			
 			<map:transformer name="StartForgotPassword" src="org.dspace.app.xmlui.aspect.eperson.StartForgotPassword"/>
 			<map:transformer name="ResetPassword" src="org.dspace.app.xmlui.aspect.eperson.ResetPassword"/>
 			<map:transformer name="ForgotPasswordFinished" src="org.dspace.app.xmlui.aspect.eperson.ForgotPasswordFinished"/>
 			
+			<map:transformer name="WelcomeLogin" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.eperson.WelcomeLogin"/>
 			<map:transformer name="ProfileUpdated" src="org.dspace.app.xmlui.aspect.eperson.ProfileUpdated"/>
 			<map:transformer name="LoginChooser" src="org.dspace.app.xmlui.aspect.eperson.LoginChooser"/>
 			<map:transformer name="FailedAuthentication" src="org.dspace.app.xmlui.aspect.eperson.FailedAuthentication" />
+			
+			<map:transformer name="EditItemMetadataForm" src="cz.cuni.mff.ufal.administrative.EditItemMetadataForm"/>
+			<map:transformer name="NotAuthorized" src="org.dspace.app.xmlui.aspect.administrative.NotAuthorized"/>			
 			
 			</map:transformers>
 		
@@ -60,6 +67,22 @@ registration, forgotten passwords, editing profiles, and changing passwords.
 	<map:pipelines>
 		<map:pipeline>
 			
+	        <!-- -->
+	        <map:match pattern="set-email">
+	            <map:match type="request" pattern="eperson-continue">
+                    <map:call continuation="{1}"/>
+                </map:match>
+	           <map:call function="askForMail" />
+	        </map:match>
+
+		<map:match pattern="edit/item">
+			<map:match type="request" pattern="eperson-continue">
+				<map:call continuation="{1}"/>
+			</map:match>
+			<map:match type="request" pattern="itemID">
+				<map:call function="startEditMetadata"/>
+			</map:match>
+		</map:match>
 			
 			<!-- Start a new user registration flow -->
 			<map:match pattern="register">
@@ -298,6 +321,51 @@ registration, forgotten passwords, editing profiles, and changing passwords.
 
 			</map:match>
 			
+			<map:match pattern="set-email/**">
+                
+                <map:match pattern="set-email/start">
+                    <map:transform type="SetEmailStart">
+                        <map:parameter name="email" value="{flow-attribute:email}"/>
+                        <map:parameter name="errors" value="{flow-attribute:errors}"/>
+                        <map:parameter name="accountExists" value="{flow-attribute:accountExists}"/>
+                    </map:transform>
+                </map:match>
+                
+                <map:match pattern="set-email/verify">
+                    <map:transform type="VerifyEmail">
+                        <map:parameter name="email" value="{flow-attribute:email}"/>
+                    </map:transform>
+                </map:match>
+            
+                <map:match pattern="set-email/finished">
+                    <map:transform type="RegistrationFinished"/>
+                </map:match>
+            
+                <!-- Exception states -->
+                <map:match pattern="set-email/invalid-token">
+                    <map:transform type="OurInvalidToken"/>
+                </map:match>
+            </map:match>        
+            
+			
+	        
+
+      <!-- Show welcome message -->
+      <map:match pattern="welcome-message">
+				<map:transform type="WelcomeLogin"/>
+      </map:match>
+		
+      <!-- Edit metadata form -->
+        <map:match pattern="edit/item/metadata">
+              <map:transform type="EditItemMetadataForm">
+                      <map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+                      <map:parameter name="templateCollectionID" value="{flow-attribute:templateCollectionID}"/>
+                      <map:parameter name="errors" value="{flow-attribute:errors}"/>
+              </map:transform>
+        </map:match>
+        <map:match pattern="edit/item/not-authorized">
+                      <map:transform type="NotAuthorized"/>
+        </map:match>
 			
 			<map:serialize type="xml"/>
 		</map:pipeline>

@@ -85,7 +85,7 @@ public class DeleteEPeopleConfirm extends AbstractDSpaceTransformer
 		}
  
 		// DIVISION: epeople-confirm-delete
-    	Division deleted = body.addInteractiveDivision("epeople-confirm-delete",contextPath+"/admin/epeople",Division.METHOD_POST,"primary administrative eperson");
+    	Division deleted = body.addInteractiveDivision("epeople-confirm-delete",contextPath+"/admin/epeople",Division.METHOD_POST,"alert alert-danger");
     	deleted.setHead(T_confirm_head);
     	deleted.addPara(T_confirm_para);
     	

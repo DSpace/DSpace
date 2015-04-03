@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+targetNamespace="http://ufal-point.mff.cuni.cz/ns/experimental/bibtex"
+xmlns:tns="http://lindat.mff.cuni.cz/ns/experimental/bibtex" elementFormDefault="qualified">
+
+    <element name="bibtex" type="string"></element>
+</schema>

@@ -67,9 +67,10 @@ import org.xml.sax.SAXException;
 
 
 /**
- * This class handles OAI harvesting of externally located records into this repository.
- *
- * @author Alexey Maslov
+ * This class handles OAI harvesting of externally located records into this repository. 
+ * 
+ * based on class by Alexey Maslov
+ * modified for LINDAT/CLARIN
  */
 
 
@@ -353,6 +354,7 @@ public class OAIHarvester {
 
 						processRecord(record,OREPrefix);
 						ourContext.commit();
+						ourContext.clearCache();
 					}
 				}
 
@@ -389,7 +391,7 @@ public class OAIHarvester {
 			harvestRow.setHarvestMessage("Unknown error occurred while generating an OAI response");
 			harvestRow.setHarvestStatus(HarvestedCollection.STATUS_UNKNOWN_ERROR);
 			alertAdmin(HarvestedCollection.STATUS_UNKNOWN_ERROR, ex);
-			log.error("Error occurred while generating an OAI response: " + ex.getMessage() + " " + ex.getCause());
+			log.error("Error occurred while generating an OAI response: " + ex.getMessage() + " " + ex.getCause(), ex);
 			ex.printStackTrace();
 			return;
 		}
@@ -524,14 +526,15 @@ public class OAIHarvester {
     		scrubMetadata(item);
 
     		// see if a handle can be extracted for the item
-    		String handle = extractHandle(item);
+    		String handle = extractHandle(item, itemOaiID);
 
     		if (handle != null)
     		{
     			DSpaceObject dso = HandleManager.resolveToObject(ourContext, handle);
     			if (dso != null)
                 {
-                    throw new HarvestingException("Handle collision: attempted to re-assign handle '" + handle + "' to an incoming harvested item '" + hi.getOaiID() + "'.");
+    				handle += "!";
+                    //throw new HarvestingException("Handle collision: attempted to re-assign handle '" + handle + "' to an incoming harvested item '" + hi.getOaiID() + "'.");
                 }
     		}
 
@@ -589,14 +592,35 @@ public class OAIHarvester {
 		//item.setHarvestDate(new Date());
 		hi.setHarvestDate(new Date());
 
-                 // Add provenance that this item was harvested via OAI
-                String provenanceMsg = "Item created via OAI harvest from source: "
+        // Add provenance that this item was harvested via OAI
+		item.store_provenance_info("Item created via OAI harvest from source: "
                                         + this.harvestRow.getOaiSource() + " on " +  new DCDate(hi.getHarvestDate())
-                                        + " (GMT).  Item's OAI Record identifier: " + hi.getOaiID();
-                item.addMetadata("dc", "description", "provenance", "en", provenanceMsg);
-
+                                        + " (GMT).  Item's OAI Record identifier: " + hi.getOaiID(),
+                                        ourContext.getCurrentUser());
+				
 		item.update();
 		hi.update();
+		
+		/*
+		 * UFAL License Ingestion - start
+		 * If everything works fine and the item is created with bitstreams
+		 * update the license information
+		 *     			 
+		 */
+		try {
+			if(harvestRow.getHarvestType() == 3) {
+				IngestionCrosswalk ORElwalk = (IngestionCrosswalk)PluginManager.getNamedPlugin(IngestionCrosswalk.class, "ore_licenses");
+				ORElwalk.ingest(ourContext, item, oreREM);
+			}
+		} catch(Exception e) {
+			log.error(e.getMessage(), e);
+		}
+		/*
+		 * UFAL License Ingestion - end
+		 */
+
+		
+		
 		long timeTaken = new Date().getTime() - timeStart.getTime();
 		log.info("Item " + item.getHandle() + "(" + item.getID() + ")" + " has been ingested. The whole process took: " + timeTaken + " ms. ");
 
@@ -613,7 +637,7 @@ public class OAIHarvester {
      * @param item a newly created, but not yet installed, DSpace Item
      * @return null or the handle to be used.
      */
-    private String extractHandle(Item item)
+    private String extractHandle(Item item, String itemOaiID)
     {
     	String acceptedHandleServersString = ConfigurationManager.getProperty("oai", "harvester.acceptedHandleServer");
     	if (acceptedHandleServersString == null)
@@ -628,6 +652,18 @@ public class OAIHarvester {
         }
 
     	Metadatum[] values = item.getMetadata("dc", "identifier", Item.ANY, Item.ANY);
+
+    	// special case with identifier in header
+    	if ( values.length == 0 && itemOaiID != null ) {
+    		Metadatum[] tmpvalues = new Metadatum[1];
+    		tmpvalues[0] = new Metadatum();
+    		try {
+    			int start = itemOaiID.indexOf(':', itemOaiID.indexOf(':') + 1 );
+    			tmpvalues[0].value = itemOaiID.substring(start+1);
+    			values = tmpvalues;
+    		}catch(Exception e) {
+    		}
+    	}
 
     	if (values.length > 0 && !acceptedHandleServersString.equals(""))
     	{
@@ -724,6 +760,11 @@ public class OAIHarvester {
                         try {
                             mdField.create(ourContext);
                             mdField.update(ourContext);
+                            // item saves all metadata fields on the first run to
+                            // getMetadata (which has already happened)
+                            // in case we do not reset the fields an exception occurs
+                            // in update item as the value will not be found
+                            item.reset_metadata_fields();
                         } catch (NonUniqueMetadataException e) {
                             // This case should also not be possible
                             e.printStackTrace();

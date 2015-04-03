@@ -8,10 +8,22 @@
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: DSpace: Registration Notification
+Subject: ${lr.dspace.name.short}: Registration Notification
 
 A new user has registered on {0} at {1}:
 
 Name:                   {2}
 Email:                  {3}
+Netid (eppn/targeted-id): {6}
 Date:                   {4}
+Additional info:
+{5}
+
+
+${lr.dspace.name.short} Team
+
+_____________________________________
+${dspace.name},
+WWW: ${dspace.url}
+Email: ${lr.help.mail}
+Tel.: ${lr.help.phone}

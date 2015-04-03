@@ -16,18 +16,21 @@ import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
+import org.dspace.workflow.WorkflowItem;
 
 /**
  * AbstractCurationTask encapsulates a few common patterns of task use,
  * resources, and convenience methods.
  * 
- * @author richardrodgers
+ * based on class by richardrodgers
+ * modified for LINDAT/CLARIN
  */
 public abstract class AbstractCurationTask implements CurationTask
 {
@@ -162,7 +165,23 @@ public abstract class AbstractCurationTask implements CurationTask
     @Override
     public int perform(Context ctx, String id) throws IOException
     {
-        DSpaceObject dso = dereference(ctx, id);
+    	DSpaceObject dso = null;
+    	if ( id.contains("workflowID") ) {
+    		try {
+    			String[] parts = id.split("\\s+");
+    			id = parts[0];
+    			String idpart = parts[1].split("=")[1];
+    			idpart = idpart.replaceAll("[^\\d.]", "");
+    			Integer workflowID = Integer.valueOf(idpart);
+    			InProgressSubmission inp = WorkflowItem.find( ctx, workflowID );
+    			dso = inp.getItem();
+    		}catch( Exception ex ) {
+    			return Curator.CURATE_ERROR;
+    		}
+
+    	}else {
+    		dso = dereference(ctx, id);
+    	}
         return (dso != null) ? perform(dso) : Curator.CURATE_FAIL;
     }
     

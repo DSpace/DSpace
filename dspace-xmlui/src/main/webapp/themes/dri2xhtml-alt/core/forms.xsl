@@ -14,6 +14,7 @@
     Author: lieven.droogmans at atmire.com
     Author: ben at atmire.com
     Author: Alexey Maslov
+    modified for LINDAT/CLARIN
 
 -->
 
@@ -991,6 +992,13 @@
                             with the value 'submit'. No reset buttons for now...
                     -->
                     <xsl:otherwise>
+                                  <!-- ufal 
+                                    adding ISO 639-3 support
+                                    -->
+                                    <xsl:if test="@n = 'dc_language_iso'">
+                                        <script type="text/javascript" src="{$theme-path}/lib/js/languages.js">&#160;</script>
+                                        <br />
+                                    </xsl:if>
                         <input>
                             <xsl:call-template name="fieldAttributes"/>
                             <xsl:if test="@type='button'">
@@ -1053,6 +1061,13 @@
                                 </xsl:call-template>
                             </xsl:when>
                         </xsl:choose>
+                        <!-- UFAL - dragNdrop support if specified 
+                             for a file input button
+                        -->
+                        <xsl:call-template name="dragNdrop"/>
+
+
+
                     </xsl:otherwise>
         </xsl:choose>
     </xsl:template>

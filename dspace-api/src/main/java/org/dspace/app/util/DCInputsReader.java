@@ -35,7 +35,8 @@ import org.dspace.core.ConfigurationManager;
  * supply the value stored in the database if its sibling display value gets
  * selected from a choice list.
  *
- * @author  Brian S. Hughes
+ * based on class by  Brian S. Hughes
+ * modified for LINDAT/CLARIN
  * @version $Revision$
  */
 
@@ -52,6 +53,8 @@ public class DCInputsReader
 
     /** Keyname for storing dropdown value-pair set name */
     static final String PAIR_TYPE_NAME = "value-pairs-name";
+    
+    static final String COMPLEX_DEFINITION_REF = "complex-definition-ref";
 
     /** The fully qualified pathname of the form definition XML file */
     private String defsFile = ConfigurationManager.getProperty("dspace.dir")
@@ -68,6 +71,7 @@ public class DCInputsReader
      * definition file
      */
     private Map<String, List<List<Map<String, String>>>> formDefns  = null;
+    private Map<String, List<List<Map<String, String>>>> formDefnsExtra  = null;
 
     /**
      * Reference to the value-pairs map, computed from the forms definition file
@@ -79,6 +83,8 @@ public class DCInputsReader
      * form-interleaved, there will be a modest win.
      */
     private DCInputSet lastInputSet = null;
+    
+    private DCInput.ComplexDefinitions complexDefinitions = null;
 
     /**
      * Parse an XML encoded submission forms template file, and create a hashmap
@@ -107,7 +113,9 @@ public class DCInputsReader
     {
         whichForms = new HashMap<String, String>();
         formDefns  = new HashMap<String, List<List<Map<String, String>>>>();
+        formDefnsExtra  = new HashMap<String, List<List<Map<String, String>>>>();
         valuePairs = new HashMap<String, List<String>>();
+        complexDefinitions = new DCInput.ComplexDefinitions(valuePairs);
 
         String uri = "file:" + new File(fileName).getAbsolutePath();
 
@@ -121,7 +129,8 @@ public class DCInputsReader
                 DocumentBuilder db = factory.newDocumentBuilder();
                 Document doc = db.parse(uri);
                 doNodes(doc);
-                checkValues();
+                checkValues(formDefns);
+                checkValues(formDefnsExtra);
         }
         catch (FactoryConfigurationError fe)
         {
@@ -176,10 +185,36 @@ public class DCInputsReader
         {
                 throw new DCInputsReaderException("Missing the " + formName  + " form");
         }
-        lastInputSet = new DCInputSet(formName, pages, valuePairs);
+        lastInputSet = new DCInputSet(formName, pages, valuePairs, complexDefinitions);
         return lastInputSet;
     }
     
+
+    public DCInputSet getInputsExtra(String collectionHandle)
+                throws DCInputsReaderException
+    {
+        String formName = whichForms.get(collectionHandle);
+        if (formName == null) {
+            formName = whichForms.get(DEFAULT_COLLECTION);
+        }
+        if (formName == null) {
+            throw new DCInputsReaderException("No extra form designated as default");
+        }
+
+        // cache miss - construct new DCInputSet
+        List<List<Map<String, String>>> pages = formDefnsExtra.get(formName);
+        if ( pages == null ) {
+            throw new DCInputsReaderException("Missing the extra " + formName  + " form");
+        }
+        // no cache
+        return new DCInputSet(formName, new Vector( pages ), valuePairs, null);
+    }
+
+    public Map<String, List<List<Map<String, String>>>>
+    getInputsExtraDefinitions() {
+      return formDefnsExtra;
+    }
+
     /**
      * Return the number of pages the inputs span for a desginated collection
      * @param  collectionHandle   collection's unique Handle
@@ -224,12 +259,19 @@ public class DCInputsReader
                 }
                 else if (tagName.equals("form-definitions"))
                 {
-                        processDefinition(nd);
+                        processDefinition(nd, formDefns);
                         foundDefs = true;
+                }
+                else if (tagName.equals("form-definitions-extra"))
+                {
+                        processDefinition(nd, formDefnsExtra);
                 }
                 else if (tagName.equals("form-value-pairs"))
                 {
                         processValuePairs(nd);
+                }
+                else if (tagName.equals("form-complex-definitions")){
+                		processComplexDefinitions(nd);
                 }
                 // Ignore unknown nodes
         }
@@ -243,7 +285,59 @@ public class DCInputsReader
         }
     }
 
-    /**
+    private void processComplexDefinitions(Node e) throws SAXException {
+        NodeList nl = e.getChildNodes();
+        int len = nl.getLength();
+        for (int i = 0; i < len; i++)
+        {
+                	Node nd = nl.item(i);
+                    String tagName = nd.getNodeName();
+
+                    // process each value-pairs set
+                    if (tagName.equals("definition"))
+                    {
+                        String definitionName = getAttribute(nd, "name");
+                        if (definitionName == null)
+                        {
+                                String errString =
+                                        "Missing attribute name for complex definition ";
+                                throw new SAXException(errString);
+                        }
+                        DCInput.ComplexDefinition definition = new DCInput.ComplexDefinition(definitionName);
+                        complexDefinitions.addDefinition(definition);
+                        NodeList cl = nd.getChildNodes();
+                        int lench = cl.getLength();
+                        for (int j = 0; j < lench; j++)
+                        {
+                                Node nch = cl.item(j);
+                                String inputName = null;
+                                String inputType = null;
+
+                                if (nch.getNodeName().equals("input"))
+                                {
+                                	definition.addInput(attributes2Map(nch.getAttributes()));
+                                }
+                        }
+                    } 
+        }
+		
+	}
+
+
+	private Map<String, String> attributes2Map(NamedNodeMap attributes) {
+		HashMap<String, String> map = new HashMap<String, String>();
+		
+		int attrCount = attributes.getLength();
+		for(int i=0; i<attrCount; i++){
+			Node node = attributes.item(i);
+			map.put(node.getNodeName(), node.getNodeValue());
+		}
+		
+		return map;
+	}
+
+
+	/**
      * Process the form-map section of the XML file.
      * Each element looks like:
      *   <name-map collection-handle="hdl" form-name="name" />
@@ -286,8 +380,10 @@ public class DCInputsReader
      * subsection is formed: <page number="#"> ...fields... </page> Each field
      * is formed from: dc-element, dc-qualifier, label, hint, input-type name,
      * required text, and repeatable flag.
+     *
+     * @todo UFAL/jmisutka check for duplicities in forms-definition-extra
      */
-    private void processDefinition(Node e)
+    private void processDefinition(Node e, Map<String, List<List<Map<String, String>>>> formDefns)
         throws SAXException, DCInputsReaderException
     {
         int numForms = 0;
@@ -367,38 +463,40 @@ public class DCInputsReader
         int len = nl.getLength();
         for (int i = 0; i < len; i++)
         {
-                Node nd = nl.item(i);
-                if ( ! isEmptyTextNode(nd) )
-                {
-                        String tagName = nd.getNodeName();
-                        String value   = getValue(nd);
-                        field.put(tagName, value);
-                        if (tagName.equals("input-type"))
-                        {
-                    if (value.equals("dropdown")
-                            || value.equals("qualdrop_value")
-                            || value.equals("list"))
-                                {
-                                        String pairTypeName = getAttribute(nd, PAIR_TYPE_NAME);
-                                        if (pairTypeName == null)
-                                        {
-                                                throw new SAXException("Form " + formName + ", field " +
-                                                                                                field.get("dc-element") +
-                                                                                                        "." + field.get("dc-qualifier") +
-                                                                                                " has no name attribute");
-                                        }
-                                        else
-                                        {
-                                                field.put(PAIR_TYPE_NAME, pairTypeName);
-                                        }
-                                }
-                        }
-                        else if (tagName.equals("vocabulary"))
-                        {
-                                String closedVocabularyString = getAttribute(nd, "closed");
-                            field.put("closedVocabulary", closedVocabularyString);
-                        }
-                }
+			Node nd = nl.item(i);
+			if (!isEmptyTextNode(nd)) {
+				String tagName = nd.getNodeName();
+				String value = getValue(nd);
+				field.put(tagName, value);
+				if (tagName.equals("input-type")) {
+					if (value.equals("dropdown")
+							|| value.equals("qualdrop_value")
+							|| value.equals("list")) {
+						String pairTypeName = getAttribute(nd, PAIR_TYPE_NAME);
+						if (pairTypeName == null) {
+							throw new SAXException("Form " + formName
+									+ ", field " + field.get("dc-element")
+									+ "." + field.get("dc-qualifier")
+									+ " has no name attribute");
+						} else {
+							field.put(PAIR_TYPE_NAME, pairTypeName);
+						}
+					} else if(value.equals("complex")){
+						String definitionName = getAttribute(nd, COMPLEX_DEFINITION_REF);
+						if(definitionName == null){
+							throw new SAXException("Form " + formName
+									+ ", field " + field.get("dc-element")
+									+ "." + field.get("dc-qualifier")
+									+ " has no linked definition");
+						} else{
+							field.put(COMPLEX_DEFINITION_REF, definitionName);
+						}
+					}
+				} else if (tagName.equals("vocabulary")) {
+					String closedVocabularyString = getAttribute(nd, "closed");
+					field.put("closedVocabulary", closedVocabularyString);
+				}
+			}
         }
         String missing = null;
         if (field.get("dc-element") == null)
@@ -575,7 +673,7 @@ public class DCInputsReader
      * Throws DCInputsReaderException if detects a missing value-pair.
      */
 
-    private void checkValues()
+    private void checkValues(Map<String, List<List<Map<String, String>>>> formDefns)
                 throws DCInputsReaderException
     {
         // Step through every field of every page of every form

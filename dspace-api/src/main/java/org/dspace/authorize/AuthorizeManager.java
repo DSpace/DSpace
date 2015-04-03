@@ -12,7 +12,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.dspace.content.*;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
+import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -20,6 +23,8 @@ import org.dspace.eperson.Group;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+
+import cz.cuni.mff.ufal.DSpaceApi;
 
 /**
  * AuthorizeManager handles all authorization checks for DSpace. For better
@@ -35,6 +40,8 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * Note: If an eperson is a member of the administrator group (id 1), then they
  * are automatically given permission for all requests another special group is
  * group 0, which is anonymous - all EPeople are members of group 0.
+ *
+ * modified for LINDAT/CLARIN
  */
 public class AuthorizeManager
 {
@@ -182,6 +189,14 @@ public class AuthorizeManager
                     + actionText + " on " + Constants.typeText[otype] + ":"
                     + oid + " by user " + userid, o, action);
         }
+
+//<UFAL>
+        // This function throws exception if the authorization fails - if it is not reported, the license restrictions are OK
+		if (o.getType() == Constants.BITSTREAM && !isAdmin(c)) {
+			DSpaceApi.authorizeBitstream(c, o);
+		}
+//</UFAL>
+
     }
 
     /**

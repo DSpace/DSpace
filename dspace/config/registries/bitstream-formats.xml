@@ -733,5 +733,24 @@
       <extension>rdf</extension>
     </bitstream-type>
 
+  <!-- ufal mime types -->
+  <bitstream-type>
+      <mimetype>application/zip</mimetype>
+      <short_description>Zip</short_description>
+      <description>ZIP archive</description>
+      <support_level>1</support_level>
+      <internal>false</internal>
+      <extension>zip</extension>
+    </bitstream-type>
+
+  <bitstream-type>
+      <mimetype>application/gzip</mimetype>
+      <short_description>gzip</short_description>
+      <description>gzip archive</description>
+      <support_level>1</support_level>
+      <internal>false</internal>
+      <extension>gz</extension>
+    </bitstream-type>
+
 
 </dspace-bitstream-types>

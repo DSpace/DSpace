@@ -40,8 +40,8 @@ import org.dspace.handle.HandleManager;
  *   <br/># implementation of embargo lifter plugin
  *   <br/>plugin.single.org.dspace.embargo.EmbargoLifter = edu.my.Lifter
  *
- * @author Larry Stone
- * @author Richard Rodgers
+ * based on class by Larry Stone and Richard Rodgers
+ * modified for LINDAT/CLARIN
  */
 public class EmbargoManager
 {
@@ -61,9 +61,9 @@ public class EmbargoManager
 
     // Metadata field components for lift date, encoded as a DCDate
     // set from the DSpace configuration by init()
-    private static String lift_schema = null;
-    private static String lift_element = null;
-    private static String lift_qualifier = null;
+    public static String lift_schema = null;
+    public static String lift_element = null;
+    public static String lift_qualifier = null;
 
     // plugin implementations
     // set from the DSpace configuration by init()
@@ -76,13 +76,22 @@ public class EmbargoManager
      *
      * @param context the DSpace context
      * @param item the item to embargo
+     * @throws IOException 
+     * @throws AuthorizeException 
+     * @throws SQLException 
      */
-    public static void setEmbargo(Context context, Item item)
+	public static void setEmbargo(Context context, Item item)
+			throws SQLException, AuthorizeException, IOException {
+		init();
+		DCDate myLift = getEmbargoTermsAsDate(context, item);
+		setEmbargo(context, item, myLift);
+	}
+
+    public static void setEmbargo(Context context, Item item, DCDate myLift)
         throws SQLException, AuthorizeException, IOException
     {
         init();
         // if lift is null, we might be restoring an item from an AIP
-        DCDate myLift = getEmbargoTermsAsDate(context, item);
         if (myLift == null)
         {
              if ((myLift = recoverEmbargoDate(item)) == null)
@@ -100,7 +109,7 @@ public class EmbargoManager
             log.info("Set embargo on Item "+item.getHandle()+", expires on: "+slift);
 
             setter.setEmbargo(context, item);
-
+            item.store_provenance_info("Item was added embargo", context.getCurrentUser());
             item.update();
         }
         finally
@@ -238,6 +247,8 @@ public class EmbargoManager
                 "Function: Adjust bitstreams policies");
 
         options.addOption("h", "help", false, "help");
+        options.addOption("s", "set", true,
+                "Set embargo date on item, use -i option with this one.");
         CommandLine line = null;
         try
         {
@@ -340,9 +351,25 @@ public class EmbargoManager
         boolean status = false;
         Metadatum lift[] = item.getMetadata(lift_schema, lift_element, lift_qualifier, Item.ANY);
 
-        if (lift.length > 0)
+        if (line.hasOption('s'))
         {
-            DCDate liftDate = new DCDate(lift[0].value);
+        	if ( lift.length > 0 ) {
+        		System.err.println( "Creating new embargo" );
+        	}else {
+        		DCDate liftDate = new DCDate(lift[0].value);
+        		System.err.println( String.format(
+        				"Overriding embargo [%s]", liftDate.toString()) );
+        	}
+            if (!line.hasOption('n'))
+            {
+        		DCDate lift_date = new DCDate(line.getOptionValue('s'));
+                EmbargoManager.setEmbargo(context, item, lift_date);
+            }
+        	
+            
+        } else if (lift.length > 0)
+        {
+        	DCDate liftDate = new DCDate(lift[0].value);
             // need to survive any failure on a single item, go on to process the rest.
             try
             {
@@ -460,5 +487,18 @@ public class EmbargoManager
         }
         return liftDate;
     }
-
+    
+    
+	static public ItemIterator getEmbargoedItems(Context context) 
+			throws SQLException, AuthorizeException, IOException 
+	{
+		init();
+        ItemIterator ii = Item.findByMetadataField(context, 
+        		EmbargoManager.lift_schema, 
+        		EmbargoManager.lift_element, 
+        		EmbargoManager.lift_qualifier, 
+        		Item.ANY);
+        return ii;
+	}
+	
 }

@@ -344,7 +344,8 @@ public class IndexBrowse
         {
             boolean reqCommunityMappings = false;
             Map<Integer, String> sortMap = getSortValues(item, itemMDMap);
-            if (item.isArchived() && item.isDiscoverable())
+            //Update sort indexes in bi_item
+            if (item.isArchived() && !item.isWithdrawn())
             {
                 // Try to update an existing record in the item index
                 if (!dao.updateIndex(BrowseIndex.getItemBrowseIndex().getTableName(), item.getID(), sortMap))
@@ -382,6 +383,10 @@ public class IndexBrowse
                 dao.deleteByItemID(BrowseIndex.getItemBrowseIndex().getTableName(), item.getID());
                 dao.deleteByItemID(BrowseIndex.getWithdrawnBrowseIndex().getTableName(), item.getID());
                 dao.deleteByItemID(BrowseIndex.getPrivateBrowseIndex().getTableName(), item.getID());
+			}
+            
+            if(item.isHidden()){
+            	dao.deleteByItemID(BrowseIndex.getItemBrowseIndex().getTableName(), item.getID());
             }
 
             // Update the community mappings if they are required, or remove them if they aren't
@@ -429,6 +434,19 @@ public class IndexBrowse
                                     }
                                     else
                                     {
+                                    	if(bis[i].getDataType().equals("iso_lang")){
+                                    		//Normalize also the indexed value, using same normalization as for sort
+                                    		Metadatum val = new Metadatum();
+                                    		val.authority = value.authority;
+                                    		val.confidence = value.confidence;
+                                    		val.element = value.element;
+                                    		val.language = value.language;
+                                    		val.qualifier = value.qualifier;
+                                    		val.schema = value.schema;
+                                    		val.value = OrderFormat.makeSortString(value.value, value.language, bis[i].getDataType());
+                                    		value = val;
+                                    	}
+                                    	
                                         if (bis[i].isAuthorityIndex() &&
                                                 (value.authority == null || value.confidence < minConfidence))
                                         {
@@ -1281,6 +1299,12 @@ public class IndexBrowse
             return browseItem.isDiscoverable();
         }
         
-        
+          public boolean isHidden(){
+        	if(item != null){
+        		return item.isHidden();
+        	}
+        	
+        	return browseItem.isHidden();
+        }
 	}
 }

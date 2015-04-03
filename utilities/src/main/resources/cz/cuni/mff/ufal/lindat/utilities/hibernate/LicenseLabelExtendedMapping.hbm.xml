@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseLabelExtendedMapping" table="license_label_extended_mapping" schema="public">
+        <id name="mappingId" type="int">
+            <column name="mapping_id" />
+            <generator class="assigned" />
+        </id>
+        <many-to-one name="licenseLabel" class="cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseLabel" fetch="select">
+            <column name="label_id" not-null="true" />
+        </many-to-one>
+        <many-to-one name="licenseDefinition" class="cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseDefinition" fetch="select">
+            <column name="license_id" not-null="true" />
+        </many-to-one>
+    </class>
+</hibernate-mapping>
+

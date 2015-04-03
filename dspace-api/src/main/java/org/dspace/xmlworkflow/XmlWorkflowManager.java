@@ -39,10 +39,13 @@ import java.util.*;
  *
  * Once the item has completed the workflow it will be archived
  *
- * @author Bram De Schouwer (bram.deschouwer at dot com)
- * @author Kevin Van de Velde (kevin at atmire dot com)
- * @author Ben Bosman (ben at atmire dot com)
- * @author Mark Diggory (markd at atmire dot com)
+ * based on class by:
+ * Bram De Schouwer (bram.deschouwer at dot com)
+ * Kevin Van de Velde (kevin at atmire dot com)
+ * Ben Bosman (ben at atmire dot com)
+ * Mark Diggory (markd at atmire dot com)
+ *
+ * modified for LINDAT/CLARIN
  */
 public class XmlWorkflowManager {
 
@@ -692,11 +695,10 @@ public class XmlWorkflowManager {
         String usersName = getEPersonName(e);
 
         // Here's what happened
-        String provDescription = provenance + " Rejected by " + usersName + ", reason: "
-                + rejection_message + " on " + now + " (GMT) ";
+        String provDescription = provenance + " Rejected reason: " + rejection_message;
 
         // Add to item as a DC field
-        myitem.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
+        myitem.store_provenance_info(provDescription, e);
 
         //Clear any workflow schema related metadata
         myitem.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, Item.ANY, Item.ANY, Item.ANY);
@@ -823,22 +825,16 @@ public class XmlWorkflowManager {
 
         if (myitem.getSubmitter() != null)
         {
-            provmessage = "Submitted by " + myitem.getSubmitter().getFullName()
-                    + " (" + myitem.getSubmitter().getEmail() + ") on "
-                    + now.toString() + " workflow start=" + action.getProvenanceStartId() + "\n";
+            provmessage = "Submitted workflow start=" + action.getProvenanceStartId() + "\n";
         }
         else
         // null submitter
         {
-            provmessage = "Submitted by unknown (probably automated) on"
-                    + now.toString() + " workflow start=" + action.getProvenanceStartId() + "\n";
+            provmessage = "Submitted (probably automated) workflow start=" 
+                            + action.getProvenanceStartId() + "\n";
         }
 
-        // add sizes and checksums of bitstreams
-        provmessage += InstallItem.getBitstreamProvenanceMessage(myitem);
-
-        // Add message to the DC
-        myitem.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provmessage);
+        myitem.store_provenance_info(provmessage, myitem.getSubmitter());
         myitem.update();
     }
 

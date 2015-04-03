@@ -1,0 +1,24 @@
+#!/bin/bash
+#Put start commands here
+### Postgres ###
+echo "Starting postgres"
+/etc/init.d/postgresql start
+### Tomcat ###
+echo "Starting tomcat"
+/etc/init.d/tomcat7 start
+### Handle server ###
+HANDLE_SERVER=/etc/init.d/handle-server
+if [[ -r $HANDLE_SERVER ]]; then
+    echo "Starting handle server";
+    $HANDLE_SERVER start;
+else
+    echo "Handle server not present - ignoring start command";
+fi
+### Shibboleth ###
+echo "Starting shibboleth"
+SHIB=/etc/init.d/shibboleth
+mkdir -p /var/run/shibboleth
+if [[ -f $SHIB ]]; then $SHIB start; else echo "Shibboleth [$SHIB] not present!"; fi
+### Apache ###
+echo "Starting apache"
+/etc/init.d/apache2 start

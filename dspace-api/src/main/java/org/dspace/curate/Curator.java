@@ -31,7 +31,8 @@ import org.dspace.handle.HandleManager;
  * tasks to a DSpace object. It provides common services and runtime
  * environment to the tasks.
  * 
- * @author richardrodgers
+ * based on class by richardrodgers
+ * modified for LINDAT/CLARIN
  */
 public class Curator
 {
@@ -66,6 +67,12 @@ public class Curator
     private TaskResolver resolver = new TaskResolver();
     private int cacheLimit = Integer.MAX_VALUE;
     private TxScope txScope = TxScope.OPEN;
+    private int _curated_item_count = 0;
+    
+    
+    private Map<String, ArrayList<String>> overallResult = new HashMap<String, ArrayList<String>>();
+    private Map<String, Integer> overallStatus = new HashMap<String, Integer>(); 
+    
 
     /**
      * No-arg constructor
@@ -91,6 +98,7 @@ public class Curator
                 task.init(this);
                 trMap.put(taskName, new TaskRunner(task));
                 // performance order currently FIFO - to be revisited
+                overallStatus.put(taskName, CURATE_UNSET);
                 perfList.add(taskName);
             }
             catch (IOException ioE)
@@ -192,6 +200,7 @@ public class Curator
      */
     public void curate(Context c, String id) throws IOException
     {
+        _curated_item_count = 0;
         if (id == null)
         {
            throw new IOException("Cannot perform curation task(s) on a null object identifier!");            
@@ -337,15 +346,22 @@ public class Curator
     }
 
     /**
-     * Returns the result string for the latest performance of the named task.
+     * Returns the overall result string for the latest performance of the named task.
      * 
      * @param taskName the task name
      * @return the result string, or <code>null</code> if task has not set it.
      */
     public String getResult(String taskName)
     {
-        TaskRunner tr = trMap.get(taskName);
-        return (tr != null) ? tr.result : null;
+        //TaskRunner tr = trMap.get(taskName);
+        //return (tr != null) ? tr.result : null;
+    	
+    	ArrayList<String> results = overallResult.get(taskName);
+    	StringBuilder temp = new StringBuilder();
+    	for(String r : results) {
+    		temp.append(r).append("\n");
+    	}
+    	return (results != null) ? temp.toString() : null;
     }
 
     /**
@@ -360,7 +376,20 @@ public class Curator
         if (tr != null)
         {
             tr.setResult(result);
+            
+            ArrayList<String> results = overallResult.get(taskName);
+            if(results == null) {
+            	results = new ArrayList<String>();
+            	overallResult.put(taskName, results);
+            }
+            if(result!=null && !result.trim().equals("")) {
+            	results.add(result.trim());
+            }
         }
+    }
+    
+    public ArrayList<String> getOverallResult(String taskName) {
+    	return overallResult.get(taskName);
     }
     
     /**
@@ -501,6 +530,7 @@ public class Curator
             ItemIterator iter = coll.getItems();
             while (iter.hasNext())
             {
+                ++_curated_item_count;
                 if (! tr.run(iter.next()))
                 {
                     return false;
@@ -540,6 +570,38 @@ public class Curator
     		}
     	}
     }
+    
+    private void setOverallStatus(String tskName, int status) {
+    	Integer s = overallStatus.get(tskName);
+    	if(s != null) {
+    		int sval = s.intValue();
+    		//If any was error/fail then error overall
+			if(status==CURATE_FAIL || status==CURATE_ERROR) {
+    			overallStatus.put(tskName, CURATE_FAIL);
+			}else{
+				//If no errors then remember first unsuccessful
+				if(sval != CURATE_SUCCESS){
+					if(sval == CURATE_UNSET){
+						//We've run the task at least once, set some non artifical status
+						overallStatus.put(tskName, status);
+					}else{
+						overallStatus.put(tskName, sval);
+					}
+				}else{
+	    			overallStatus.put(tskName, status);
+				}
+			}
+    	}
+    }
+    
+    public int getOverallStatus(String tskName) {
+    	Integer s = overallStatus.get(tskName);
+    	return (s != null) ? s.intValue() : CURATE_NOTASK;
+    }
+    
+    public int getCuratedItemCount() {
+        return _curated_item_count;
+    }
 
     private class TaskRunner
     {
@@ -564,6 +626,7 @@ public class Curator
                 String id = (dso.getHandle() != null) ? dso.getHandle() : "workflow item: " + dso.getID();
                 log.info(logMessage(id));
                 visit(dso);
+                setOverallStatus(task.getName(), statusCode);
                 return ! suspend(statusCode);
             }
             catch(IOException ioe)
@@ -583,6 +646,7 @@ public class Curator
                     throw new IOException("Context or identifier is null");
                 }
                 statusCode = task.perform(c, id);
+                setOverallStatus(task.getName(), statusCode);
                 log.info(logMessage(id));
                 visit(null);
                 return ! suspend(statusCode);

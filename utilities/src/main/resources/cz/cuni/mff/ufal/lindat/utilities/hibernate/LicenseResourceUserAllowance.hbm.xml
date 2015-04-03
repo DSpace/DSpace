@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseResourceUserAllowance" table="license_resource_user_allowance" schema="public">
+        <id name="transactionId" type="int">
+            <column name="transaction_id" />
+            <generator class="identity" />
+        </id>
+        <many-to-one name="userRegistration" class="cz.cuni.mff.ufal.lindat.utilities.hibernate.UserRegistration" fetch="join" lazy="false">
+            <column name="eperson_id" not-null="true" />
+        </many-to-one>
+        <many-to-one name="licenseResourceMapping" class="cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseResourceMapping" fetch="join" lazy="false">
+            <column name="mapping_id" not-null="true" />
+        </many-to-one>
+        <property name="createdOn" type="timestamp" generated="insert">
+            <column name="created_on" length="29" not-null="true" />
+        </property>
+        <property name="token" type="string" >
+            <column name="token" length="32" not-null="false" />
+        </property>        
+    </class>
+</hibernate-mapping>

@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseDefinition" table="license_definition" schema="public">
+        <id name="licenseId" type="int">
+            <column name="license_id" />
+            <generator class="identity" />
+        </id>
+        <many-to-one name="userRegistration" class="cz.cuni.mff.ufal.lindat.utilities.hibernate.UserRegistration" fetch="join" lazy="false">
+            <column name="eperson_id" not-null="true" />
+        </many-to-one>
+        <many-to-one name="licenseLabel" class="cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseLabel" fetch="join" lazy="false">
+            <column name="label_id" not-null="true" />
+        </many-to-one>
+        <property name="name" type="string">
+            <column name="name" length="64" not-null="true" unique="true" />
+        </property>
+        <property name="definition" type="string">
+            <column name="definition" length="64" not-null="true" />
+        </property>
+        <property name="createdOn" type="timestamp" generated="insert">
+            <column name="created_on" length="29" not-null="true" />
+        </property>
+        <property name="confirmation" type="int">
+            <column name="confirmation" not-null="true" />
+        </property>
+        <property name="requiredInfo" type="string">
+            <column name="required_info" length="64" not-null="false" />
+        </property>
+        <set name="licenseResourceMappings" table="license_resource_mapping" inverse="true" lazy="true" fetch="select" cascade="all-delete-orphan">
+            <key>
+                <column name="license_id" not-null="true" />
+            </key>
+            <one-to-many class="cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseResourceMapping" />
+        </set>
+        <set name="licenseLabelExtendedMappings" table="license_label_extended_mapping" fetch="join" order-by="label_id" lazy="false">
+            <key>
+                <column name="license_id" not-null="true" />
+            </key>
+            <many-to-many column="label_id" class="cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseLabel" />
+        </set>
+    </class>
+</hibernate-mapping>
+

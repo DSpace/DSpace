@@ -134,6 +134,12 @@
   <dc-type>
 	<schema>dc</schema>
     <element>coverage</element>
+    <scope_note>General coverage info.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dc</schema>
+    <element>coverage</element>
     <qualifier>spatial</qualifier>
     <scope_note>Spatial characteristics of content.</scope_note>
   </dc-type>
@@ -143,6 +149,13 @@
     <element>coverage</element>
     <qualifier>temporal</qualifier>
     <scope_note>Temporal characteristics of content.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dc</schema>
+    <element>coverage</element>
+    <qualifier>placeName</qualifier>
+    <scope_note>Name of the place/state where the resource has been created.</scope_note>
   </dc-type>
 
   <dc-type>
@@ -492,6 +505,13 @@
     <element>rights</element>
     <qualifier>uri</qualifier>
     <scope_note>References terms governing use and reproduction.</scope_note>
+  </dc-type>
+
+  <dc-type>
+	<schema>dc</schema>
+    <element>rights</element>
+    <qualifier>label</qualifier>
+    <scope_note>Rights label should be one of PUB, RES, ACA.</scope_note>
   </dc-type>
 
   <dc-type>

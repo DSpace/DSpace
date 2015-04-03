@@ -34,7 +34,8 @@ import org.dspace.authorize.AuthorizeException;
  * condition when the email-address entered is already in use by 
  * another user.
  * 
- * @author Alexey Maslov
+ * based on class by Alexey Maslov
+ * modified for LINDAT/CLARIN
  */
 public class AddEPersonForm extends AbstractDSpaceTransformer   
 {
@@ -71,6 +72,12 @@ public class AddEPersonForm extends AbstractDSpaceTransformer
 
 	private static final Message T_error_lname =
 		message("xmlui.administrative.eperson.AddEPersonForm.error_lname");
+
+	private static final Message T_org =
+			message("xmlui.administrative.eperson.AddEPersonForm.org");
+	
+	private static final Message T_error_org =
+			message("xmlui.administrative.eperson.AddEPersonForm.error_org");
 
 	private static final Message T_req_certs =
 		message("xmlui.administrative.eperson.AddEPersonForm.req_certs");
@@ -128,6 +135,7 @@ public class AddEPersonForm extends AbstractDSpaceTransformer
 		String firstValue = request.getParameter("first_name");
 		String lastValue  = request.getParameter("last_name");
 		String phoneValue = request.getParameter("phone");
+		String orgValue = request.getParameter("organization");
 		boolean canLogInValue    = (request.getParameter("can_log_in") == null)  ? false : true;
 		boolean certificateValue = (request.getParameter("certificate") == null) ? false : true;
 	    		 
@@ -172,6 +180,14 @@ public class AddEPersonForm extends AbstractDSpaceTransformer
         lastName.setValue(lastValue);
         if (errors.contains("last_name")) {
         	lastName.addError(T_error_lname);
+        }
+        
+        Text org = identity.addItem().addText("org");
+        org.setRequired();
+        org.setLabel(T_org);
+        org.setValue(orgValue);
+        if (errors.contains("org")) {
+        	org.addError(T_error_org);
         }
         
         Text phone = identity.addItem().addText("phone");

@@ -44,8 +44,8 @@ import org.xml.sax.SAXException;
  * and a common setup.
  * 
  * 
- * @author Scott Phillips
- * @author Tim Donohue (updated for Configurable Submission)
+ * based on class by Scott Phillips and Tim Donohue (updated for Configurable Submission)
+ * modified for LINDAT/CLARIN
  */
 public abstract class AbstractStep extends AbstractDSpaceTransformer 
 {
@@ -251,6 +251,9 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
 			pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
 	        pageMeta.addTrail().addContent(T_default_trail);
 		}
+        // <UFAL> - include ufal-submission.js
+        pageMeta.addMetadata("include-library", "submission");
+        // </UFAL>
 	}
 
 
@@ -275,6 +278,12 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
 			// Since we are using XML-UI, we need to prepend the heading key with "xmlui.Submission."
 			String entryNameKey = "xmlui.Submission." + progBarEntry.getValue();
 			
+			// more page steps can have more titles
+			if ( !progBarEntry.getKey().endsWith(".1") ) {
+			    String[] splits = progBarEntry.getKey().split("\\.");
+			    entryNameKey += splits[splits.length - 1];
+			}
+
 			// the value of entryNum is current step & page 
 			// (e.g. 1.2 is page 2 of step 1) 
 			StepAndPage currentStepAndPage = new StepAndPage(progBarEntry.getKey());

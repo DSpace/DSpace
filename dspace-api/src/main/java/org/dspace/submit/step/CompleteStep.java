@@ -87,13 +87,17 @@ public class CompleteStep extends AbstractProcessingStep
         {
             if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){
                 try{
+                	log.info ( "GOT BEFORE WORKFLOWMANAGER START" ) ;
                     XmlWorkflowManager.start(context, (WorkspaceItem) subInfo.getSubmissionItem());
+                    log.info ( "GOT AFTER WORKFLOWMANAGER STOP" ) ;
                 }catch (Exception e){
                     log.error(LogManager.getHeader(context, "Error while starting xml workflow", "Item id: " + subInfo.getSubmissionItem().getItem().getID()), e);
                     throw new ServletException(e);
                 }
             }else{
+            	log.info ( "GOT BEFORE WORKFLOWMANAGER START" ) ;
                 WorkflowManager.start(context, (WorkspaceItem) subInfo.getSubmissionItem());
+                log.info ( "GOT AFTER WORKFLOWMANAGER STOP" ) ;
             }
             success = true;
         }
@@ -109,8 +113,8 @@ public class CompleteStep extends AbstractProcessingStep
             {
                 context.commit();
             }
-            else
-            {
+            else {
+                log.debug("doProcessing.CompleteStep.java: Commit was unsuccessful");
                 context.getDBConnection().rollback();
             }
         }

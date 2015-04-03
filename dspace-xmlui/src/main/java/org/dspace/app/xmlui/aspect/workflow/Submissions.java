@@ -13,6 +13,7 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
@@ -26,6 +27,7 @@ import java.util.List;
 
 /**
  * @author Scott Phillips
+ * modified for LINDAT/CLARIN
  */
 public class Submissions extends AbstractDSpaceTransformer
 {
@@ -144,8 +146,21 @@ public class Submissions extends AbstractDSpaceTransformer
     	List<WorkflowItem> ownedItems = WorkflowManager.getOwnedTasks(context, context
                 .getCurrentUser());
     	@SuppressWarnings("unchecked") // This cast is correct.
-    	List<WorkflowItem> pooledItems = WorkflowManager.getPooledTasks(context, context
+    	
+    	List<WorkflowItem> pooledItems = null;
+    	
+    	
+    	// <UFAL>
+    	if(AuthorizeManager.isAdmin(context))
+    	{    	    
+        	pooledItems = WorkflowManager.getAllPooledTasks(context);
+    	}
+    	else
+    	{
+    	    pooledItems = WorkflowManager.getPooledTasks(context, context
                 .getCurrentUser());
+    	}
+    	// </UFAL>
 
     	if (!(ownedItems.size() > 0 || pooledItems.size() > 0))
     		// No tasks, so don't show the table.
@@ -186,7 +201,6 @@ public class Submissions extends AbstractDSpaceTransformer
         		Row row = table.addRow();
 
         		CheckBox remove = row.addCell().addCheckBox("workflowID");
-	        	remove.setLabel("selected");
 	        	remove.addOption(workflowItemID);
 
         		// The task description
@@ -260,7 +274,6 @@ public class Submissions extends AbstractDSpaceTransformer
         		Row row = table.addRow();
 
         		CheckBox remove = row.addCell().addCheckBox("workflowID");
-	        	remove.setLabel("selected");
 	        	remove.addOption(workflowItemID);
 
         		// The task description

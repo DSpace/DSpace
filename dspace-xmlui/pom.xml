@@ -93,6 +93,22 @@
     </profiles>
 
     <dependencies>
+        <dependency>
+            <groupId>cz.cuni.mff.ufal.lindat</groupId>
+            <artifactId>utilities</artifactId>
+        </dependency>
+	 <dependency>
+	  	<groupId>cz.cuni.mff.ufal.dspace</groupId>
+	  	<artifactId>b2safe-dspace</artifactId>
+	 </dependency>
+
+     <!-- because of event listener that updates oai -->
+	 <dependency>
+	  	<groupId>org.dspace</groupId>
+	  	<artifactId>dspace-oai</artifactId>
+        <classifier>classes</classifier>
+	 </dependency>
+            
 
         <dependency>
             <groupId>org.dspace</groupId>
@@ -233,6 +249,15 @@
             <artifactId>servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
+
+      
+        
+        <dependency>
+          <groupId>com.google.http-client</groupId>
+          <artifactId>google-http-client-jackson</artifactId>
+          <version>1.12.0-beta</version>
+        </dependency>
+        
 
     </dependencies>
 

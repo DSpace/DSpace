@@ -14,7 +14,8 @@ import com.lyncode.xoai.dataprovider.core.Set;
 
 /**
  * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * based on class by Lyncode Development Team <dspace@lyncode.com>
+ * modified for LINDAT/CLARIN
  */
 public class DSpaceSet extends Set {
 	private static final String DefaultName = "undefined";
@@ -27,18 +28,22 @@ public class DSpaceSet extends Set {
 
 	public static Set newDSpaceCommunitySet(String handle, String name) {
 
-		return new Set("com_" + handle.replace('/', '_'), checkName(name));
+		return new Set("hdl_" + handle.replace('/', '_'), checkName(name));
+		//return new Set("com_" + handle.replace('/', '_'), checkName(name));
 	}
 
 	public static Set newDSpaceCollectionSet(String handle, String name) {
-		return new Set("col_" + handle.replace('/', '_'), checkName(name));
+		return new Set("hdl_" + handle.replace('/', '_'), checkName(name));
+		//return new Set("col_" + handle.replace('/', '_'), checkName(name));
 	}
 
 	public DSpaceSet(Community c) {
-		super("com_" + c.getHandle().replace('/', '_'), checkName(c.getName()));
+		super("hdl_" + c.getHandle().replace('/', '_'), checkName(c.getName()));
+		//super("com_" + c.getHandle().replace('/', '_'), checkName(c.getName()));
 	}
 
 	public DSpaceSet(Collection c) {
-		super("col_" + c.getHandle().replace('/', '_'), checkName(c.getName()));
+		super("hdl_" + c.getHandle().replace('/', '_'), checkName(c.getName()));
+		//super("col_" + c.getHandle().replace('/', '_'), checkName(c.getName()));
 	}
 }

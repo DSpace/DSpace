@@ -10,6 +10,7 @@
 -->
 <!--
     Author: Alexey Maslov
+    modified for LINDAT/CLARIN
     Description: This stylesheet contains templates to perform tasks associated with metadata visualization
         that are common to all handlers. This includes things like bitstream display and thumbnails.
     Version: Manakin-1.1 and up (basically, those version making use of the Virtual Object Store)
@@ -64,6 +65,9 @@
                 <xsl:if test="mets:file/mets:FLocat/@xlink:label != ''">
                     <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-description</i18n:text></th>
                 </xsl:if>
+                <xsl:if test="$context/mets:amdSec/mets:rightsMD/mets:mdWrap[@OTHERMDTYPE='UFAL_LICENSES']/mets:xmlData/licenses/license">
+                    <th>License</th>
+                </xsl:if>
 		    </tr>
             <xsl:choose>
                 <!-- If one exists and it's of text/html MIME type, only display the primary bitstream -->
@@ -86,6 +90,7 @@
     <!-- Build a single row in the bitstreams table of the item view page -->
     <xsl:template match="mets:file">
         <xsl:param name="context" select="."/>
+        <xsl:variable name="admid" select="@ADMID" />
         <tr>
             <xsl:attribute name="class">
                 <xsl:text>ds-table-row </xsl:text>
@@ -191,8 +196,48 @@
 	            <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label"/>
 	        </td>
 	    </xsl:if>
+		<xsl:if test="$context/mets:amdSec/mets:rightsMD/mets:mdWrap[@OTHERMDTYPE='UFAL_LICENSES']/mets:xmlData/licenses/license">
+            <td>
+                <xsl:choose>
+                    <xsl:when test="$context/mets:amdSec/mets:rightsMD[@ID=$admid]/mets:mdWrap[@OTHERMDTYPE='UFAL_LICENSES']/mets:xmlData/licenses/license">
+                        <xsl:apply-templates select="$context/mets:amdSec/mets:rightsMD[@ID=$admid]/mets:mdWrap[@OTHERMDTYPE='UFAL_LICENSES']/mets:xmlData" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:text>No license</xsl:text>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </td>
+        </xsl:if>
 
         </tr>
+    </xsl:template>
+
+    <xsl:template match="licenses">
+        <ul class="license_labels">
+            <xsl:apply-templates />
+        </ul>
+    </xsl:template>
+    
+    <xsl:template match="license">
+        <li class="{@label}" title="{concat(@label_title,' (',text(),')')}">
+            <a href="{@url}" class="target_blank"><xsl:value-of select="@label" /></a>
+            <xsl:if test="@label='CC'">
+                <img width="16" height="16" src="{$theme-path}/images/licenses/cc-by-16.png" alt="Attribution required" title="Attribution required" />
+            </xsl:if>
+            <xsl:if test="text()='allow non commercial sharing' or 
+                            text()='allow non commercial sharing and changing' or
+                            text()='allow non commercial sharing and changing with same license'">
+                <img width="16" height="16" src="{$theme-path}/images/licenses/cc-nc-16.png" alt="Noncommercial" title="Noncommercial" />
+            </xsl:if>
+            <xsl:if test="text()='allow commercial sharing' or
+                            text()='allow non commercial sharing'">
+                <img width="16" height="16" src="{$theme-path}/images/licenses/cc-nd-16.png" alt="No Derivative Works" title="No Derivative Works" />
+            </xsl:if>
+            <xsl:if test="text()='allow commercial sharing and changing with same license' or
+                            text()='allow non commercial sharing and changing with same license'">
+                <img width="16" height="16" src="{$theme-path}/images/licenses/cc-sa-16.png" alt="Share Alike" title="Share Alike" />                    
+            </xsl:if>
+        </li>
     </xsl:template>
     
     <xsl:template name="view-open">

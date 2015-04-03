@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -28,8 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * based on class by Lyncode Development Team <dspace@lyncode.com>
+ * modified for LINDAT/CLARIN
  */
 public class DSpaceSetRepository implements SetRepository
 {
@@ -194,37 +195,19 @@ public class DSpaceSetRepository implements SetRepository
     @Override
     public boolean exists(String setSpec)
     {
-        if (setSpec.startsWith("col_"))
-        {
-            try
-            {
-                DSpaceObject dso = HandleManager.resolveToObject(_context,
-                        setSpec.replace("col_", "").replace("_", "/"));
-                if (dso == null || !(dso instanceof Collection))
-                    return false;
-                return true;
-            }
-            catch (Exception ex)
-            {
-                log.error(ex.getMessage(), ex);
-            }
-        }
-        else if (setSpec.startsWith("com_"))
-        {
-            try
-            {
-                DSpaceObject dso = HandleManager.resolveToObject(_context,
-                        setSpec.replace("com_", "").replace("_", "/"));
-                if (dso == null || !(dso instanceof Community))
-                    return false;
-                return true;
-            }
-            catch (Exception ex)
-            {
-                log.error(ex.getMessage(), ex);
-            }
-        }
-        return false;
-    }
+		try {
+			DSpaceObject dso = HandleManager.resolveToObject(_context, setSpec
+					.replace("hdl_", "").replace("_", "/"));
+			if (dso == null
+					|| !(dso instanceof Collection || dso instanceof Community)) {
+				return false;
+			}
+			return true;
+		} catch (Exception ex)
+		{
+			log.error(ex.getMessage(), ex);
+		}
+		return false;
+	}
 
 }

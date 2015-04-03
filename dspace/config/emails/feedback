@@ -10,7 +10,7 @@
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: Feedback Form Information
+Subject: ${lr.dspace.name.short}: Feedback Form Information
 
 Comments:
 
@@ -24,3 +24,11 @@ Referring Page: {3}
 User Agent: {4}
 Session: {5}
 
+
+${lr.dspace.name.short} Team
+
+_____________________________________
+${dspace.name},
+WWW: ${dspace.url}
+Email: ${lr.help.mail}
+Tel.: ${lr.help.phone}

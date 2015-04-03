@@ -15,6 +15,7 @@ import java.util.Map;
  * Class representing all DC inputs required for a submission, organized into pages
  *
  * @author Brian S. Hughes, based on work by Jenny Toves, OCLC
+ * modified for LINDAT/CLARIN
  * @version $Revision$
  */
 
@@ -26,7 +27,7 @@ public class DCInputSet
 	private DCInput[][] inputPages = null;
 	
 	/** constructor */
-	public DCInputSet(String formName, List<List<Map<String, String>>> pages, Map<String, List<String>> listMap)
+	public DCInputSet(String formName, List<List<Map<String, String>>> pages, Map<String, List<String>> listMap, DCInput.ComplexDefinitions complexDefinitions)
 	{
 		this.formName = formName;
 		inputPages = new DCInput[pages.size()][];
@@ -36,7 +37,7 @@ public class DCInputSet
 			inputPages[i] = new DCInput[page.size()];
 			for ( int j = 0; j < inputPages[i].length; j++ )
 			{
-				inputPages[i][j] = new DCInput(page.get(j), listMap);
+				inputPages[i][j] = new DCInput(page.get(j), listMap, complexDefinitions);
 			}
 		}
 	}

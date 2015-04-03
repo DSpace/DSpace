@@ -70,6 +70,8 @@ import org.dspace.utils.DSpace;
  * to do this, but it isn't strictly necessary. (say public List
  * getStateEPeople( WorkflowItem wi, int state ) could return people affected by
  * the item's current state.
+ *
+ * modified for LINDAT/CLARIN
  */
 public class WorkflowManager
 {
@@ -113,7 +115,7 @@ public class WorkflowManager
     private static Map<Integer, Boolean> noEMail = new HashMap<Integer, Boolean>();
 
     /** log4j logger */
-    private static final Logger log = Logger.getLogger(WorkflowManager.class);
+    private static final Logger log = cz.cuni.mff.ufal.Logger.getLogger(WorkflowManager.class);
 
     /**
      * Translate symbolic name of workflow state into number.
@@ -153,7 +155,7 @@ public class WorkflowManager
         Collection collection = wsi.getCollection();
 
         log.info(LogManager.getHeader(c, "start_workflow", "workspace_item_id="
-                + wsi.getID() + "item_id=" + myitem.getID() + "collection_id="
+                + wsi.getID() + ", item_id=" + myitem.getID() + ", collection_id="
                 + collection.getID()));
 
         // record the start of the workflow w/provenance message
@@ -270,6 +272,39 @@ public class WorkflowManager
     }
 
     /**
+     * getAllPooledTasks() returns a List of all WorkflowItems that could be claimed
+     *
+     * @param c Context
+     */
+    public static List<WorkflowItem> getAllPooledTasks(Context c) throws SQLException
+    {
+        ArrayList<WorkflowItem> mylist = new ArrayList<WorkflowItem>();
+
+        String myquery = "SELECT distinct workflowitem.* FROM workflowitem, TaskListItem" +
+                " WHERE tasklistitem.workflow_id=workflowitem.workflow_id order by workflow_id";
+
+        TableRowIterator tri = DatabaseManager
+                .queryTable(c, "workflowitem", myquery);
+
+        try
+        {
+            while (tri.hasNext())
+            {
+                mylist.add(new WorkflowItem(c, tri.next()));
+            }
+        }
+        finally
+        {
+            if (tri != null)
+            {
+                tri.close();
+            }
+        }
+
+        return mylist;
+    }
+
+    /**
      * claim() claims a workflow task for an EPerson
      *
      * @param wi
@@ -310,10 +345,10 @@ public class WorkflowManager
         }
 
         log.info(LogManager.getHeader(c, "claim_task", "workflow_item_id="
-                + wi.getID() + "item_id=" + wi.getItem().getID()
-                + "collection_id=" + wi.getCollection().getID()
-                + "newowner_id=" + wi.getOwner().getID() + "old_state="
-                + taskstate + "new_state=" + wi.getState()));
+                + wi.getID() + ", item_id=" + wi.getItem().getID()
+                + ", collection_id=" + wi.getCollection().getID()
+                + ", newowner_id=" + (wi.getOwner() != null ? wi.getOwner().getID() : "") + ", old_state="
+                + taskstate + ", new_state=" + wi.getState()));
     }
 
     /**
@@ -369,10 +404,10 @@ public class WorkflowManager
             if (! WorkflowCurator.doCuration(c, wi)) {
                 // don't proceed - either curation tasks queued, or item rejected
                 log.info(LogManager.getHeader(c, "advance_workflow",
-                        "workflow_item_id=" + wi.getID() + ",item_id="
-                        + wi.getItem().getID() + ",collection_id="
-                        + wi.getCollection().getID() + ",old_state="
-                        + taskstate + ",doCuration=false"));
+                        "workflow_item_id=" + wi.getID() + ", item_id="
+                        + wi.getItem().getID() + ", collection_id="
+                        + wi.getCollection().getID() + ", old_state="
+                        + taskstate + ", doCuration=false"));
                 return archived;
             }
         }
@@ -421,10 +456,10 @@ public class WorkflowManager
         }
 
         log.info(LogManager.getHeader(c, "advance_workflow",
-                "workflow_item_id=" + wi.getID() + ",item_id="
-                        + wi.getItem().getID() + ",collection_id="
-                        + wi.getCollection().getID() + ",old_state="
-                        + taskstate + ",new_state=" + wi.getState()));
+                "workflow_item_id=" + wi.getID() + ", item_id="
+                        + wi.getItem().getID() + ", collection_id="
+                        + wi.getCollection().getID() + ", old_state="
+                        + taskstate + ", new_state=" + wi.getState()));
         return archived;
     }
 
@@ -471,10 +506,10 @@ public class WorkflowManager
         }
 
         log.info(LogManager.getHeader(c, "unclaim_workflow",
-                "workflow_item_id=" + wi.getID() + ",item_id="
-                        + wi.getItem().getID() + ",collection_id="
-                        + wi.getCollection().getID() + ",old_state="
-                        + taskstate + ",new_state=" + wi.getState()));
+                "workflow_item_id=" + wi.getID() + ", item_id="
+                        + wi.getItem().getID() + ", collection_id="
+                        + wi.getCollection().getID() + ", old_state="
+                        + taskstate + ", new_state=" + wi.getState()));
     }
 
     /**
@@ -503,8 +538,8 @@ public class WorkflowManager
         deleteTasks(c, wi);
 
         log.info(LogManager.getHeader(c, "abort_workflow", "workflow_item_id="
-                + wi.getID() + "item_id=" + wi.getItem().getID()
-                + "collection_id=" + wi.getCollection().getID() + "eperson_id="
+                + wi.getID() + ", item_id=" + wi.getItem().getID()
+                + ", collection_id=" + wi.getCollection().getID() + ", eperson_id="
                 + e.getID()));
 
         // convert into personal workspace
@@ -718,14 +753,14 @@ public class WorkflowManager
         Collection collection = wfi.getCollection();
 
         log.info(LogManager.getHeader(c, "archive_item", "workflow_item_id="
-                + wfi.getID() + "item_id=" + item.getID() + "collection_id="
+                + wfi.getID() + ", item_id=" + item.getID() + ", collection_id="
                 + collection.getID()));
 
         InstallItem.installItem(c, wfi);
 
         // Log the event
         log.info(LogManager.getHeader(c, "install_item", "workflow_id="
-                + wfi.getID() + ", item_id=" + item.getID() + "handle=FIXME"));
+                + wfi.getID() + ", item_id=" + item.getID() + ", handle=FIXME"));
 
         return item;
     }
@@ -772,9 +807,8 @@ public class WorkflowManager
         }
         catch (MessagingException e)
         {
-            log.warn(LogManager.getHeader(c, "notifyOfArchive",
-                    "cannot email user; item_id=" + i.getID()
-                    + ":  " + e.getMessage()));
+            log.error(LogManager.getHeader(c, "notifyOfArchive",
+                    "cannot email user" + ", item_id=" + i.getID()), e);
         }
     }
 
@@ -812,7 +846,7 @@ public class WorkflowManager
 
         //myitem.update();
         log.info(LogManager.getHeader(c, "return_to_workspace",
-                "workflow_item_id=" + wfi.getID() + "workspace_item_id="
+                "workflow_item_id=" + wfi.getID() + ", workspace_item_id="
                         + wi.getID()));
 
         // Now remove the workflow object manually from the database
@@ -856,11 +890,7 @@ public class WorkflowManager
         String usersName = getEPersonName(e);
 
         // Here's what happened
-        String provDescription = "Rejected by " + usersName + ", reason: "
-                + rejection_message + " on " + now + " (GMT) ";
-
-        // Add to item as a DC field
-        myitem.addDC("description", "provenance", "en", provDescription);
+        myitem.store_provenance_info("Rejected reason: " + rejection_message, e);
         myitem.update();
 
         // convert into personal workspace
@@ -870,8 +900,8 @@ public class WorkflowManager
         notifyOfReject(c, wi, e, rejection_message);
 
         log.info(LogManager.getHeader(c, "reject_workflow", "workflow_item_id="
-                + wi.getID() + "item_id=" + wi.getItem().getID()
-                + "collection_id=" + wi.getCollection().getID() + "eperson_id="
+                + wi.getID() + ", item_id=" + wi.getItem().getID()
+                + ", collection_id=" + wi.getCollection().getID() + ", eperson_id="
                 + e.getID()));
 
         logWorkflowEvent(c, wsi.getItem(), wi, e, WFSTATE_SUBMIT, null, wsi.getCollection(), oldState, null);
@@ -936,9 +966,8 @@ public class WorkflowManager
         }
         catch (MessagingException e)
         {
-            log.warn(LogManager.getHeader(c, "notifyOfCuration",
-                    "cannot email users of workflow_item_id " + wi.getID()
-                            + ":  " + e.getMessage()));
+            log.error(LogManager.getHeader(c, "notifyOfCuration", "cannot email users" +
+                                          ", workflow_item_id=" + wi.getID()), e);
         }
     }
 
@@ -1006,10 +1035,9 @@ public class WorkflowManager
             {
                 String gid = (mygroup != null) ?
                              String.valueOf(mygroup.getID()) : "none";
-                log.warn(LogManager.getHeader(c, "notifyGroupofTask",
-                        "cannot email user group_id=" + gid
-                                + " workflow_item_id=" + wi.getID()
-                                + ":  " + e.getMessage()));
+                log.error(LogManager.getHeader(c, "notifyGroupofTask",
+                        "cannot email user" + ", group_id=" + gid
+                                + ", workflow_item_id=" + wi.getID()), e);
             }
         }
     }
@@ -1047,22 +1075,20 @@ public class WorkflowManager
         catch (RuntimeException re)
         {
             // log this email error
-            log.warn(LogManager.getHeader(c, "notify_of_reject",
-                    "cannot email user eperson_id=" + e.getID()
-                            + " eperson_email=" + e.getEmail()
-                            + " workflow_item_id=" + wi.getID()
-                            + ":  " + re.getMessage()));
+            log.error(LogManager.getHeader(c, "notify_of_reject",
+                    "cannot email user" + ", eperson_id=" + e.getID()
+                            + ", eperson_email=" + e.getEmail()
+                            + ", workflow_item_id=" + wi.getID()), re);
 
             throw re;
         }
         catch (Exception ex)
         {
             // log this email error
-            log.warn(LogManager.getHeader(c, "notify_of_reject",
-                    "cannot email user eperson_id=" + e.getID()
-                            + " eperson_email=" + e.getEmail()
-                            + " workflow_item_id=" + wi.getID()
-                            + ":  " + ex.getMessage()));
+            log.error(LogManager.getHeader(c, "notify_of_reject",
+                    "cannot email user" + ", eperson_id=" + e.getID()
+                            + ", eperson_email=" + e.getEmail()
+                            + ", workflow_item_id=" + wi.getID()));
         }
     }
 
@@ -1130,14 +1156,7 @@ public class WorkflowManager
         String now = DCDate.getCurrent().toString();
 
         // Here's what happened
-        String provDescription = "Approved for entry into archive by "
-                + usersName + " on " + now + " (GMT) ";
-
-        // add bitstream descriptions (name, size, checksums)
-        provDescription += InstallItem.getBitstreamProvenanceMessage(item);
-
-        // Add to item as a DC field
-        item.addDC("description", "provenance", "en", provDescription);
+        item.store_provenance_info("Approved for entry into archive", e);
         item.update();
     }
 
@@ -1148,27 +1167,16 @@ public class WorkflowManager
         // get date
         DCDate now = DCDate.getCurrent();
 
-        // Create provenance description
-        String provmessage = "";
-
         if (myitem.getSubmitter() != null)
         {
-            provmessage = "Submitted by " + myitem.getSubmitter().getFullName()
-                    + " (" + myitem.getSubmitter().getEmail() + ") on "
-                    + now.toString() + "\n";
+            myitem.store_provenance_info("Submitted", myitem.getSubmitter());
         }
         else
         // null submitter
         {
-            provmessage = "Submitted by unknown (probably automated) on"
-                    + now.toString() + "\n";
+            myitem.store_provenance_info("Submitted (probably automated) ", myitem.getSubmitter());
         }
 
-        // add sizes and checksums of bitstreams
-        provmessage += InstallItem.getBitstreamProvenanceMessage(myitem);
-
-        // Add message to the DC
-        myitem.addDC("description", "provenance", "en", provmessage);
         myitem.update();
     }
 }

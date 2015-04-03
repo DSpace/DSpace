@@ -38,8 +38,8 @@ import org.xml.sax.SAXException;
  *  - Multiple titles
  *  - Published Before
  * 
- * @author Scott Phillips
- * @author Tim Donohue (updated for Configurable Submission)
+ * based on class by Scott Phillips and Tim Donohue (updated for Configurable Submission)
+ * modified for LINDAT/CLARIN
  */
 public class InitialQuestionsStep extends AbstractSubmissionStep
 {
@@ -137,14 +137,14 @@ public class InitialQuestionsStep extends AbstractSubmissionStep
 	        }
         }
         
-        CheckBox publishedBefore = form.addItem().addCheckBox("published_before");
+        /*CheckBox publishedBefore = form.addItem().addCheckBox("published_before");
         publishedBefore.setLabel(T_published_before);
         publishedBefore.setHelp(T_published_before_help);
         publishedBefore.addOption("true");
         if (submission.isPublishedBefore())
         {
         	publishedBefore.setOptionSelected("true");
-        }
+        }*/
         
         // If any metadata would be removed if the user unselected the box then warn 
         // the user about what will be removed.

@@ -13,6 +13,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.xoai.data.DSpaceItem;
 import org.dspace.xoai.filter.results.DatabaseFilterResult;
@@ -23,8 +24,8 @@ import org.dspace.xoai.services.api.database.HandleResolver;
 import java.util.List;
 
 /**
- *
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * based on class by Lyncode Development Team <dspace@lyncode.com>
+ * modified for LINDAT/CLARIN
  */
 public class DSpaceSetSpecFilter extends DSpaceFilter
 {
@@ -44,37 +45,28 @@ public class DSpaceSetSpecFilter extends DSpaceFilter
     @Override
     public DatabaseFilterResult buildDatabaseQuery(Context context)
     {
-        if (setSpec.startsWith("col_"))
-        {
-            try
-            {
-                DSpaceObject dso = handleResolver.resolve(setSpec.replace("col_", ""));
-                return new DatabaseFilterResult(
-                        "EXISTS (SELECT tmp.* FROM collection2item tmp WHERE tmp.resource_id=i.item_id AND collection_id = ?)",
-                        dso.getID());
-            }
-            catch (Exception ex)
-            {
-                log.error(ex.getMessage(), ex);
-            }
-        }
-        else if (setSpec.startsWith("com_"))
-        {
-            try
-            {
-                DSpaceObject dso = handleResolver.resolve(setSpec.replace("com_", ""));
-                List<Integer> list = collectionsService.getAllSubCollections(dso.getID());
-                String subCollections = StringUtils.join(list.iterator(), ",");
-                return new DatabaseFilterResult(
-                        "EXISTS (SELECT tmp.* FROM collection2item tmp WHERE tmp.resource_id=i.item_id AND collection_id IN ("
-                                + subCollections + "))");
-            }
-            catch (Exception e)
-            {
-                log.error(e.getMessage(), e);
-            }
-        }
-        return new DatabaseFilterResult();
+		try {
+			DSpaceObject dso = handleResolver.resolve(setSpec.replace("hdl_",
+					"").replace("_", "/"));
+			if (dso != null) {
+				if (dso.getType() == Constants.COLLECTION) {
+					return new DatabaseFilterResult(
+							"EXISTS (SELECT tmp.* FROM collection2item tmp WHERE tmp.resource_id=i.item_id AND collection_id = ?)",
+							dso.getID());
+				} else if (dso.getType() == Constants.COMMUNITY) {
+					List<Integer> list = collectionsService
+							.getAllSubCollections(dso.getID());
+					String subCollections = StringUtils.join(list.iterator(),
+							",");
+					return new DatabaseFilterResult(
+							"EXISTS (SELECT tmp.* FROM collection2item tmp WHERE tmp.resource_id=i.item_id AND collection_id IN ("
+									+ subCollections + "))");
+				}
+			}
+		} catch (Exception ex) {
+			log.error(ex.getMessage(), ex);
+		}
+		return new DatabaseFilterResult();
     }
 
     @Override
@@ -89,31 +81,22 @@ public class DSpaceSetSpecFilter extends DSpaceFilter
     @Override
     public SolrFilterResult buildSolrQuery()
     {
-        if (setSpec.startsWith("col_"))
-        {
-            try
-            {
-                return new SolrFilterResult("item.collections:"
-                        + ClientUtils.escapeQueryChars(setSpec));
-            }
-            catch (Exception ex)
-            {
-                log.error(ex.getMessage(), ex);
-            }
-        }
-        else if (setSpec.startsWith("com_"))
-        {
-            try
-            {
-                return new SolrFilterResult("item.communities:"
-                        + ClientUtils.escapeQueryChars(setSpec));
-            }
-            catch (Exception e)
-            {
-                log.error(e.getMessage(), e);
-            }
-        }
-        return new SolrFilterResult();
-    }
+		try {
+			DSpaceObject dso = handleResolver.resolve(setSpec.replace("hdl_",
+					"").replace("_", "/"));
+			if (dso != null) {
+				if (dso.getType() == Constants.COLLECTION) {
+					return new SolrFilterResult("item.collections:"
+							+ ClientUtils.escapeQueryChars(setSpec));
+				} else if (dso.getType() == Constants.COMMUNITY) {
+					return new SolrFilterResult("item.communities:"
+							+ ClientUtils.escapeQueryChars(setSpec));
+				}
+			}
+		} catch (Exception ex) {
+			log.error(ex.getMessage(), ex);
+		}
+		return new SolrFilterResult();
+	}
 
 }

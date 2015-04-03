@@ -41,7 +41,8 @@ import org.dspace.handle.HandleManager;
  *
  * Use the -help flag for more information
  *
- * @author  Richard Jones
+ * based on class by  Richard Jones
+ * modified for LINDAT/CLARIN
  */
 public class ReportGenerator 
 {
@@ -62,6 +63,7 @@ public class ReportGenerator
     
     /** aggregator for item views */
     private static Map<String, String> itemAggregator;
+    private static Map<String, String> itemBotlessAggregator;
     
     /** aggregator for current archive state statistics */
     private static Map<String, String> archiveStats;
@@ -109,6 +111,8 @@ public class ReportGenerator
     
     /** the number of warnings encountered */
     private static int warnings;
+    private static int exceptions;
+    
     
     /** the list of results to be displayed in the general summary */
     private static List<String> generalSummary;
@@ -118,7 +122,7 @@ public class ReportGenerator
     //////////////////
     
     /** pattern that matches an unqualified aggregator property */
-    private static Pattern real = Pattern.compile("^(.+)=(.+)");
+    private static Pattern real = Pattern.compile("^(.+)=(.+)$");
     
     //////////////////////////
    // Miscellaneous variables
@@ -247,6 +251,7 @@ public class ReportGenerator
         searchAggregator = new HashMap<String, String>();
         userAggregator = new HashMap<String, String>();
         itemAggregator = new HashMap<String, String>();
+        itemBotlessAggregator = new HashMap<String, String>();
         archiveStats = new HashMap<String, String>();
         actionMap = new HashMap<String, String>();
         
@@ -320,8 +325,10 @@ public class ReportGenerator
         {
             String key = keys.next();
             String link = url + "handle/" + key;
-            value = Integer.parseInt(itemAggregator.get(key));
+            value = Integer.parseInt(itemBotlessAggregator.get(key));
             items[i] = new Stat(key, value, link);
+            // this is abusing the units
+            items[i].setUnits(String.format(" [+bots: %s]", itemAggregator.get(key)));
             i++;
         }
         
@@ -411,10 +418,13 @@ public class ReportGenerator
         Statistics levels = new Statistics("Level", "Number of lines");
         levels.setSectionHeader("Log Level Information");
         
-        Stat[] level = new Stat[1];
-        level[0] = new Stat("Warnings", warnings);
+        Stat[] level1 = new Stat[1];
+        level1[0] = new Stat("Warnings", warnings);
+        levels.add(level1);
+        Stat[] level2 = new Stat[1];
+        level2[0] = new Stat("Exceptions", exceptions);
+        levels.add(level2);
         
-        levels.add(level);
         
         report.addBlock(levels);
         
@@ -695,7 +705,14 @@ public class ReportGenerator
             }
             else if ("item".equals(section))
             {
-                itemAggregator.put(key, value);
+            	if ( value.contains("|") ) {
+            		String[] values = value.split("\\|");
+            		itemBotlessAggregator.put(key, values[0]);
+            		itemAggregator.put(key, values[1]);
+            	}else {
+            		itemAggregator.put(key, value);
+            		itemBotlessAggregator.put(key, "-1");
+            	}
             }
             else if ("user_email".equals(section))
             {
@@ -759,6 +776,10 @@ public class ReportGenerator
             else if ("warnings".equals(section))
             {
                 warnings = Integer.parseInt(value);
+            }
+            else if ("exceptions".equals(section))
+            {
+                exceptions = Integer.parseInt(value);
             }
         }
 

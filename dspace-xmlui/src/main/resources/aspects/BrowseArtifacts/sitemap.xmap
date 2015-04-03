@@ -23,10 +23,9 @@ collections / items / and bitstreams.
             <map:transformer name="CommunityBrowser" src="org.dspace.app.xmlui.aspect.artifactbrowser.CommunityBrowser"/>
             <map:transformer name="CommunityRecentSubmissions" src="org.dspace.app.xmlui.aspect.artifactbrowser.CommunityRecentSubmissions"/>
             <map:transformer name="CollectionRecentSubmissions" src="org.dspace.app.xmlui.aspect.artifactbrowser.CollectionRecentSubmissions"/>
-            <map:transformer name="CommunityBrowse" src="org.dspace.app.xmlui.aspect.browseArtifacts.CommunityBrowse"/>
-            <map:transformer name="CollectionBrowse" src="org.dspace.app.xmlui.aspect.browseArtifacts.CollectionBrowse"/>
             <map:transformer name="ConfigurableBrowse" src="org.dspace.app.xmlui.aspect.artifactbrowser.ConfigurableBrowse"/>
-            <map:transformer name="StaticPage" src="org.dspace.app.xmlui.aspect.browseArtifacts.StaticPage"/>
+            <!-- map:transformer name="StaticPage" src="org.dspace.app.xmlui.aspect.browseArtifacts.StaticPage"/ -->
+            <map:transformer name="LicensePage" src="cz.cuni.mff.ufal.LicensePage"/>
         </map:transformers>
 
         <map:matchers default="wildcard">
@@ -46,12 +45,14 @@ collections / items / and bitstreams.
             -->
             <map:transform type="Navigation"/>
 
+            <!--
             <map:match pattern="">
                 <map:transform type="CommunityBrowser">
                         <map:parameter name="depth" value="1"/>
                 </map:transform>
                 <map:serialize type="xml"/>
             </map:match>
+            -->
 
             <!-- List all communities & collections in DSpace -->
             <map:match pattern="community-list">
@@ -61,14 +62,20 @@ collections / items / and bitstreams.
                     <map:serialize type="xml"/>
             </map:match>
 
-            <map:match pattern="page/*">
+            <!-- map:match pattern="page/*">
                 <map:transform type="StaticPage"/>
+                <map:serialize type="xml"/>
+            </map:match -->
+
+            <map:match pattern="page/licenses">
+                <map:transform type="LicensePage"/>
                 <map:serialize type="xml"/>
             </map:match>
 
             <!-- Browse (by anything) -->
             <map:match pattern="browse">
                     <map:transform type="ConfigurableBrowse"/>
+                    <map:transform type="IncludePageMeta" />
                     <map:serialize type="xml"/>
             </map:match>
 
@@ -81,23 +88,6 @@ collections / items / and bitstreams.
                             <map:transform type="ConfigurableBrowse"/>
                             <map:serialize type="xml"/>
                         </map:match>
-
-                        <map:match type="HandleTypeMatcher" pattern="community">
-                            <map:match pattern="handle/*/*">
-                                <map:transform type="CommunityBrowse"/>
-                                <map:transform type="CommunityRecentSubmissions"/>
-                            </map:match>
-                        </map:match>
-
-                        <map:match type="HandleTypeMatcher" pattern="collection">
-                            <map:match pattern="handle/*/*">
-                                <map:match type="ContainerHomePageSelector" pattern="metadata">
-                                    <map:transform type="CollectionBrowse"/>
-                                    <map:transform type="CollectionRecentSubmissions"/>
-                                </map:match>
-                            </map:match>
-                        </map:match>
-
                     </map:match>
 
                 </map:match>

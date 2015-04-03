@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseFileDownloadStatistic" table="license_file_download_statistic" schema="public">
+        <id name="transactionId" type="int">
+            <column name="transaction_id" />
+            <generator class="identity" />
+        </id>
+        <many-to-one name="userRegistration" class="cz.cuni.mff.ufal.lindat.utilities.hibernate.UserRegistration" fetch="select">
+            <column name="eperson_id" not-null="true" />
+        </many-to-one>
+        <property name="bitstreamId" type="int">
+            <column name="bitstream_id" not-null="true" />
+        </property>
+        <property name="createdOn" type="timestamp" generated="insert">
+            <column name="created_on" length="29" not-null="true" />
+        </property>
+    </class>
+</hibernate-mapping>

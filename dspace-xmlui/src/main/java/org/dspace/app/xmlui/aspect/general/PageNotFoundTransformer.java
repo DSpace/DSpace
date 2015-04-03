@@ -11,10 +11,14 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 
-import org.apache.cocoon.ResourceNotFoundException;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.cocoon.environment.Response;
+import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
@@ -25,21 +29,30 @@ import org.dspace.app.xmlui.wing.WingConstants;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
+import org.dspace.app.xmlui.wing.element.Item;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
+import org.dspace.core.ConfigurationManager;
+import org.apache.log4j.Logger;
+import org.dspace.app.xmlui.wing.element.Para;
+import org.dspace.app.xmlui.wing.element.List;
+
+import cz.cuni.mff.ufal.InvalidContinuationTransformer;
+
 /**
  * This special component checks to see if the body element is empty (has no sub elements) and if
  * it is then displays some page not found text.
  * 
- * @author Scott Phillips
- * @author Kim Shepherd
+ * based on class by Scott Phillips and Kim Shepherd
+ * modified for LINDAT/CLARIN
  */
 public class PageNotFoundTransformer extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
+    private static final org.apache.log4j.Logger log = Logger.getLogger(PageNotFoundTransformer.class);
     /** Language Strings */
     private static final Message T_title =
         message("xmlui.PageNotFound.title");
@@ -153,20 +166,71 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
     /** What to add at the end of the body */
     @Override
     public void addBody(Body body) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException, ResourceNotFoundException
+            UIException, SQLException, IOException, AuthorizeException, ProcessingException
     {
-        if (this.bodyEmpty)
+    	
+        Request request = ObjectModelHelper.getRequest(objectModel);
+    	
+        if ( this.eperson == null &&  this.sitemapURI.endsWith(".continue") ) {
+        	InvalidContinuationTransformer ic = new InvalidContinuationTransformer();
+        	ic.setup(null, objectModel, null, parameters);
+        	ic.addBody(body);
+        	return;
+        }
+    	
+	    final String ignore = ConfigurationManager.getProperty("lr", "lr.ignore.notFound");
+	    String[] ignorePaths = null;
+	    if(ignore != null && !ignore.equals("")){
+		ignorePaths = ignore.split(" ");
+	    }
+
+	    boolean found = false;
+	    for(String path : ignorePaths){
+		if(sitemapURI.contains(path)){
+			found = true;
+			break;
+		}
+	    }
+
+        if (this.bodyEmpty && !found)
         {
-            Division notFound = body.addDivision("page-not-found","primary");
+            Division notFound = body.addDivision("page-not-found","alert alert-error");
             
             notFound.setHead(T_head);
             
-            notFound.addPara(T_para1); 
+            String path = request.getRequestURI();
+            
+            Throwable t = new Throwable("Page cannot be found");
+            List list = notFound.addList("not-found", List.TYPE_FORM);
+            Item mess = list.addItem();
+            mess.addHighlight("").addContent("Sorry, we couldn't find the page you've requested ("+path+"), if you think it should exist please contact our ");
+            String support = ConfigurationManager.getProperty("lr.help.mail");
+            mess.addHighlight("").addXref("mailto:" + support, "Help Desk.", null, null);
+            list.addItem(null, "fa fa-warning fa-5x hangright").addContent(" ");
 
             notFound.addPara().addXref(contextPath + "/",T_go_home);
 
-            throw new ResourceNotFoundException("Page cannot be found");
+            Division stw = body.addDivision("stack-trace");
+            List stack = stw.addList("stack");
+            stack.addItemXref("#", "Stack trace");
+            List trace = stack.addList("trace");        
+            for(StackTraceElement ste : t.getStackTrace()){
+            	trace.addItem(ste.toString());
+            }
 
+            //This is here to generate 404 but doesn't work.
+            //check ./sources/dspace-xmlui/dspace-xmlui-webapp/src/main/webapp/sitemap.xmap and the relevant dspace bug referenced in our #421
+            // special case
+
+/*
+            if ( this.eperson == null &&  this.sitemapURI.endsWith(".continue") ) {
+            	throw new InvalidContinuationException( "Page " + this.sitemapURI + " needs authenticated user." );
+            }
+*/            
+            //throw new ResourceNotFoundException("Page cannot be found");
+
+			HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+			httpResponse.setStatus(Response.SC_NOT_FOUND);
 
         }
     }
@@ -177,7 +241,17 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
             WingException, UIException, SQLException, IOException,
             AuthorizeException
     {
-        if (this.bodyEmpty)
+    	if ( this.eperson == null &&  this.sitemapURI.endsWith(".continue") ) {
+        	InvalidContinuationTransformer ic = new InvalidContinuationTransformer();
+        	try {
+				ic.setup(null, objectModel, null, parameters);
+			} catch (ProcessingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        	ic.addPageMeta(pageMeta);
+    	}
+    	else if (this.bodyEmpty)
         {
             // Set the page title
             pageMeta.addMetadata("title").addContent(T_title);
@@ -186,38 +260,6 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
             pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
         }
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     /**
      * Send the given recorded sax event.

@@ -1,0 +1,341 @@
+#############################
+# Local config modification #
+#############################
+
+# PID service
+# type o service; for now only epic and epic2 are supported
+lr.pid.service.type =
+lr.pid.service.url = https://handle.gwdg.de/pidservice/
+lr.pid.service.user = 
+lr.pid.service.pass = 
+# test pid which should have been created with the above credentials
+lr.pid.service.testPid =
+# per community pid configurations for pid prefixes of the format:
+# community=<community ID>,prefix=<prefix>,alternative_prefixes=<pipeline separated list of alternative prefixes>,type=<local|epic>,canonical_prefix=<URL of handle>,subprefix=<subprefix>
+# multiple configurations can be given separated by semicolon
+# default configuration should have asterisk as the community ID
+# subprefix is only used for local handles
+lr.pid.community.configurations = community=*,prefix=99999,type=local,canonical_prefix=http://hdl.handle.net/
+
+
+# UFAL mounted assetstore for restricted item harvesting. Please mind the traling slash
+lr.harvestable.assetstore =
+
+
+# DSpace host name - should match base URL. Do not include protocol i.e. http or https and do not include port, this is only the name of server.
+# Also do not use localhost because using this property some external links will be generated.
+lr.dspace.hostname = ufal-point-dev.ms.mff.cuni.cz
+
+# DSpace base URL, the full url of the instance
+# !!! URL must NOT contain trailing slash !!!
+lr.dspace.baseUrl = https://ufal-point-dev.ms.mff.cuni.cz/repository
+
+# DSpace URL, usually ending with /xmlui
+# DSpace base URL.  Include port number etc., but NOT trailing slash
+lr.dspace.url = ${lr.dspace.baseUrl}/xmlui
+
+# Google analytics key
+lr.xmlui.google.analytics.key = 
+
+# Database settings ########################
+
+# This is not the name of the database you are using. Instead the name of the RDBMS used e.g. postgres or oracle.
+# This is required for database creation scripts.
+lr.db.name = postgres
+
+# The name of the database that you will use for your dspace instance.
+# If the database is not created yet, this name will be used to create the new database.
+# Be careful with the trailing spaces in the name!
+lr.database = XXX-LR-DATABASE
+lr.database.port = 5432
+
+# Connection URL of the database. Make sure you are using the correct port and if you are connecting to remote server,
+# verify that the port is accessible. Do not change the ${lr.database}, the database name will be substituted from above property.
+lr.db.url = jdbc:postgresql://localhost:${lr.database.port}/${lr.database}
+
+# The database driver you are using. Make sure that the required jars are available.
+lr.db.driver = org.postgresql.Driver
+
+# Credentials for the database user. The user should have read/write permissions on your database.
+lr.db.username = dspace
+lr.db.password =
+
+# UFAL Utilities database name.
+lr.utilities.database = XXX-UTILS-DATABASE
+
+# Conneciton URL for the Utilities database.
+lr.utilities.db.url = jdbc:postgresql://localhost:${lr.database.port}/${lr.utilities.database}
+
+# Functionality Manager facade for Utilites API
+lr.utilities.functionalityManager.class = cz.cuni.mff.ufal.lindat.utilities.HibernateFunctionalityManager
+
+############################################
+
+# Dpsace general settings ##################
+
+# You can use this value to append version with other values.
+lr.dspace.version = dspace-1.8.2
+
+# The installation directory of your instance.
+# THIS IS USED IN THE VARIABLES/MAKEFILE so don't use variables(${*}) here
+lr.dspace.dir = /installations/dspace/dspace-1.8.2
+
+# A description of your dspace instance. It will be used as a description of your dspace instance for other services
+lr.dspace.name = LINDAT/CLARIN digital library at Institute of Formal and Applied Linguistics, Charles University in Prague (v${dspace.version})
+# Used in email templates
+lr.dspace.name.short = LINDAT/CLARIN
+
+############################################
+
+# Mail settings ############################
+
+# Mail server address. you can use 127.0.0.1, if configured on localhost.
+lr.mail.server = 127.0.0.1
+
+# Mail server disabled?
+lr.mail.server.disabled = true
+
+# UFAL: Contact information
+lr.help.mail = dspace-help@ufal.mff.cuni.cz
+lr.help.phone = +420-22191-4366
+lr.mail.from.address = dspace-noreply@ufal.mff.cuni.cz
+lr.feedback.recipient = dspace-help@ufal.mff.cuni.cz
+lr.info.recipient = lindat-technical@ufal.mff.cuni.cz
+
+
+# solr server address that your instance is using.
+lr.solr.log.server = http://ufal-point-dev.ms.mff.cuni.cz:8080/repository/solr
+
+# Google Analytics
+# NOTE: Copy appropriate Google Analytics API key file to the location specified
+#       below upon first installation
+#       Be sure to choose location that is not deleted/overwritten upon deployment
+#       (the default value is safe)
+lr.ga.analytics.key.file = ${dspace.dir}/config/ga.api.key.p12 
+lr.ga.analytics.profile.id = 52779327
+lr.ga.analytics.account.email = 144418224547@developer.gserviceaccount.com
+
+# Path of the sources folder that is used for the compilation of this dspace instance.
+lr.dspace.source.dir = /sources/dspace-1.8.2
+
+# Backup Configurations ####################
+
+# which files/directories needs backup
+lr.backup.source = (/installations/dspace/dspace-1.8.2/ /installations/dspace/database/ /sources/dspace-1.8.2/ /etc/apache2 /etc/libapache2-mod-jk /opt/shibboleth-sp/etc/shibboleth /etc/tomcat6/ /etc/cron.d/dspace)
+
+# where the backup should be stored
+lr.backup.target = "/home/backup/"
+
+# the following settings are good to keep one month of restorable backup
+# with differential backup every day and full backup every week
+
+# max levels of differential backups
+backup2l.max.level = 1
+# how many differential backups per level before new level
+backup2l.max.per.level = 6
+# how many full backups to keep
+backup2l.max.full = 4
+# number of generations to keep per level
+backup2l.generations = 4
+
+############################################
+
+# irods specific for EUDAT
+lr.replication.eudat.on=false
+lr.replication.eudat.host=
+lr.replication.eudat.port=
+lr.replication.eudat.username=
+lr.replication.eudat.password=
+lr.replication.eudat.homedirectory=
+# directory in homedirectory where to put replicas for this instance
+lr.replication.eudat.replicadirectory=
+lr.replication.eudat.zone=
+lr.replication.eudat.defaultstorage=
+lr.replication.eudat.notification_email=${lr.info.recipient}
+# default is not set
+lr.replication.jargon.numThreads=
+# default 32 * 1024 * 1024
+lr.replication.jargon.MAX_SZ_FOR_SINGLE_BUF=
+# default 65535
+lr.replication.jargon.BUFFER_SIZE=
+# log progress after count of iterations (depends on buffer_size)
+lr.replication.jargon.PUT_LOG_AFTER=
+
+# Email where errors will be sent (from specific classes)
+lr.errors.email=
+
+
+# Selenium Testing #########################
+
+# URLs that are requried for test cases
+selenium.test.home.url = /xmlui
+selenium.test.browse.url = /xmlui/browse
+selenium.test.search.url = /xmlui/discover
+selenium.test.submission.url = /xmlui/submissions
+selenium.test.submit.url = /xmlui/submit
+selenium.test.local.login = /xmlui/password-login
+selenium.test.oai.url = /oai
+
+# default User for testing ... UserName should be the name that is supposed to appear on the home page after login.
+selenium.test.user.id =
+selenium.test.user.password =
+selenium.test.user.name =
+
+# admin User
+selenium.test.admin.id =
+selenium.test.admin.password =
+selenium.test.admin.name =
+
+# more users can be added by replacing *.user.* in the above credential settings
+# the user will be used in testng.xml file to refer that user.
+
+############################################
+
+# Location for common lindat theme
+# This location will be used to create a symlink in xmlui webapp to always point the latest common header and footer
+lr.common.theme = /opt/lindat-common
+
+
+# Metadata quality ########################
+
+# you should map the solr (if it is not public which it should not)
+# url (or any other) into publicly accessible e.g., in apache conf
+# using mod_rewrite:
+#
+#  RewriteRule ^/jm/repository/JSON/solr/(.*)$  http://localhost:8080/jm/solr/search/select/?q=*:*&rows=0&facet=on&wt=json&indent=true&facet.field=$1 [P,L]
+#
+# There are more ways in DSpace how to restrict metadata values (authority manager,
+# value pairs, specific js code and this)
+#
+lr.autocomplete.on=true
+lr.autocomplete.solr.url=${dspace.url}/JSON/solr/
+lr.autocomplete.json_static.url=${dspace.url}/static/json/
+
+############################################
+#
+# File download options
+#
+# minimum number of files for enabling zipped download:
+lr.download.all.limit.min.file.count = 1
+# maximum total size of files for enabling zipped download:
+lr.download.all.limit.max.file.size = 1073741824
+# minimum total size of files for enabling download alert:
+lr.download.all.alert.min.file.size = 10485760
+
+############################################
+#
+# File upload options
+#
+# maximum size of file for enabling upload alert
+lr.upload.file.alert.max.file.size = 2147483648
+
+#######
+#
+# Shibboleth
+#
+lr.shibboleth.log.path = /opt/shibboleth-sp/var/log/shibboleth
+lr.shibboleth.log.defaultName = shibd.log
+#the place where you run shibboleth's discoFeed handler ("https://"+hostname+"/Shibboleth.sso/DiscoFeed")
+lr.shibboleth.discofeed.url = https://ufal-point-dev.ms.mff.cuni.cz/Shibboleth.sso/DiscoFeed
+
+####
+#
+# discojuice/aai url, without trailing slash
+# don't change this on ufal-point-dev!
+lr.aai.url = https://lindat.mff.cuni.cz/aai
+
+# oai path including /request
+# if you want the URL to be extracted from HttpRequest then remove OAIHandler.baseURL=${oai.baseURL} from oaicat.properties
+lr.oai.baseUrl = ${lr.dspace.baseUrl}/oai/request
+
+# For reports
+harvesterInfo.url = http://catalog.clarin.eu/oai-harvester/LINDAT_CLARIN_digital_library_at_Institute_of_Formal_and_Applied_Linguistics_Charles_University_in_Prague_v1_8_2_.html
+harvesterInfo.anchorName = LINDAT_CLARIN_digital_library_at_Institute_of_Formal_and_Applied_Linguistics_Charles_University_in_Prague_v1_8_2_
+
+############################################
+#
+# User profile options
+#
+# whether to show language field in user profile
+lr.xmlui.user.showlanguage = false
+
+#mind the documentation for oai/cite and the respective apache rewrite
+lr.repository.identifier = lindat.mff.cuni.cz 
+
+############################################
+#
+# Tracker configuration
+#
+# Enable or disable tracker
+#lr.tracker.enabled = true
+#
+## Type of the tracker. Currently only the Piwik tracker is supported
+#lr.tracker.type = piwik
+#
+# Tracker API URL to which tracking information is being sent
+#lr.tracker.api.url = https://host/piwik/piwik.php
+#
+# Tracker API authentication token
+#lr.tracker.api.auth.token = 
+#
+# Site ID under which OAI requests are filed
+#lr.tracker.oai.site_id = 5
+#
+# Site ID under which Bitstream downloads are filed
+#lr.tracker.bitstream.site_id = 5
+#
+############################################
+lr.tracker.enabled = true
+lr.tracker.type = piwik
+lr.tracker.api.url = https://ufal.mff.cuni.cz/piwik/piwik.php
+lr.tracker.api.auth.token =
+lr.tracker.oai.site_id = 5
+lr.tracker.bitstream.site_id = 5
+
+############################################
+#
+# Curation
+#
+############################################
+
+# Space separated metadata patterns (regular expression)
+# that should be ignored while checking for required metadata.
+# Leave it empty if you want to check everything.
+lr.curation.metadata.checkrequired.ignore = metashare.*
+
+############################################
+#
+# Link checker
+#
+# User Agent string for link checker
+#lr.link.checker.user.agent = "DSpace Link Validator"
+#
+# Connection timeout for link checker (in milliseconds)
+#lr.link.checker.connect.timeout = 2000
+#
+# Read timeout for link checker (in milliseconds)
+#lr.link.checker.read.timeout = 3000
+#
+############################################
+lr.link.checker.user.agent = "DSpace Link Validator"
+lr.link.checker.connect.timeout = 2000
+lr.link.checker.read.timeout = 3000
+
+mail.server.username = 
+mail.server.password = 
+mail.server.port = 25
+default.language = en_US
+db.maxidle = -1
+db.schema = 
+db.maxwait = 5000
+db.maxconnections = 30
+db.statementpool = true
+db.poolname = dspacepool
+http.proxy.host =
+http.proxy.port =
+handle.canonical.prefix = http://hdl.handle.net/
+handle.prefix = 123456789
+loglevel.other=INFO
+loglevel.dspace=INFO
+
+lr.compile.time=

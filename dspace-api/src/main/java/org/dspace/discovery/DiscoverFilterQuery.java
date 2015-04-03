@@ -13,12 +13,14 @@ package org.dspace.discovery;
  * The query the query which the filter query is using
  * The displayed value
  *
- * @author Kevin Van de Velde (kevin at atmire dot com)
+ * based on class by Kevin Van de Velde (kevin at atmire dot com)
+ * modified for LINDAT/CLARIN
  *
  */
 public class DiscoverFilterQuery {
 
     private String field;
+    private String operator;
     private String filterQuery;
     private String displayedValue;
 
@@ -54,5 +56,13 @@ public class DiscoverFilterQuery {
 
     public String getDisplayedValue() {
         return displayedValue;
+    }
+    
+    public void setOperator(String operator) {
+    	this.operator = operator;
+    }
+    
+    public String getOperator() {
+    	return this.operator;
     }
 }

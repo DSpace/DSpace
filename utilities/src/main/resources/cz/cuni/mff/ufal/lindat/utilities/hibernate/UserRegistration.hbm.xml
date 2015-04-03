@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cz.cuni.mff.ufal.lindat.utilities.hibernate.UserRegistration" table="user_registration" schema="public">
+         <id name="epersonId" type="int">
+            <column name="eperson_id" not-null="true" unique="true" />
+        </id>
+	<property name="email" type="string">
+            <column name="email" length="256" not-null="true" unique="true" />
+        </property>
+        <property name="organization" type="string">
+            <column name="organization" length="256" not-null="true" />
+        </property>
+        <property name="confirmation" type="boolean">
+            <column name="confirmation" not-null="true" />
+        </property>
+        <set name="licenseFileDownloadStatistics" table="license_file_download_statistic" inverse="true" lazy="true" fetch="select" cascade="all-delete-orphan">
+            <key>
+                <column name="eperson_id" not-null="true" />
+            </key>
+            <one-to-many class="cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseFileDownloadStatistic" />
+        </set>
+        <set name="licenseResourceUserAllowances" table="license_resource_user_allowance" inverse="true" lazy="true" fetch="select" cascade="all-delete-orphan">
+            <key>
+                <column name="eperson_id" not-null="true" />
+            </key>
+            <one-to-many class="cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseResourceUserAllowance" />
+        </set>
+        <set name="licenseDefinitions" table="license_definition" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="eperson_id" not-null="true" />
+            </key>
+            <one-to-many class="cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseDefinition" />
+        </set>
+        <set name="userMetadata" table="user_metadata" fetch="join" lazy="false" cascade="all-delete-orphan">
+            <key>
+                <column name="eperson_id" not-null="true" />
+            </key>
+            <one-to-many class="cz.cuni.mff.ufal.lindat.utilities.hibernate.UserMetadata" />          
+        </set>        
+    </class>
+</hibernate-mapping>

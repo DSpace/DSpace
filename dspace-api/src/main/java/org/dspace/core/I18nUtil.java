@@ -109,7 +109,7 @@ public class I18nUtil
         
         if (StringUtils.isBlank(lang))
         {
-            log.error("No language specified for EPerson " + ep.getID());
+            log.warn("No language specified for EPerson " + ep.getID());
             return I18nUtil.getDefaultLocale();
         }
 

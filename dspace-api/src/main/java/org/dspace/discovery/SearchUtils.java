@@ -12,6 +12,7 @@ import org.dspace.content.Collection;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationService;
 import org.dspace.kernel.ServiceManager;
+import org.dspace.services.model.Request;
 import org.dspace.utils.DSpace;
 
 import java.sql.SQLException;
@@ -20,9 +21,12 @@ import java.util.*;
 /**
  * Util methods used by discovery
  *
- * @author Kevin Van de Velde (kevin at atmire dot com)
- * @author Mark Diggory (markd at atmire dot com)
- * @author Ben Bosman (ben at atmire dot com)
+ * based on class by:
+ * Kevin Van de Velde (kevin at atmire dot com)
+ * Mark Diggory (markd at atmire dot com)
+ * Ben Bosman (ben at atmire dot com)
+ *
+ * modified for LINDAT/CLARIN
  */
 public class SearchUtils {
     /** Cached search service **/
@@ -47,6 +51,17 @@ public class SearchUtils {
         DiscoveryConfigurationService configurationService = getConfigurationService();
 
         DiscoveryConfiguration result = null;
+        
+        DSpace dspace = new DSpace();
+        Request request = dspace.getRequestService().getCurrentRequest();
+        if(request!=null && request.getHttpServletRequest()!=null) {
+        	if(request.getHttpServletRequest().getRequestURI().contains("/discover")){
+        		result = configurationService.getMap().get("search");
+        		return result;
+        	}
+        }
+        
+        
         if(dso == null){
             result = configurationService.getMap().get("site");
         }else{
@@ -94,6 +109,15 @@ public class SearchUtils {
         if(!result.containsKey(configuration.getId())){
             result.put(configuration.getId(), configuration);
         }
+        
+        
+        /* configuration.getId is returning always null its a bug */
+        // forcefully adding our search configuration to display extra facets on search page
+        DiscoveryConfigurationService configurationService = getConfigurationService();
+        DiscoveryConfiguration search = configurationService.getMap().get("search");
+        if(!result.containsKey("search")){
+            result.put("search", search);
+        }        
 
         return Arrays.asList(result.values().toArray(new DiscoveryConfiguration[result.size()]));
     }

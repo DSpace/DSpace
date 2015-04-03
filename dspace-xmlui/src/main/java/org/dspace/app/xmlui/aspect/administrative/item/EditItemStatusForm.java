@@ -21,6 +21,7 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
+import org.dspace.content.DCDate;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
@@ -29,8 +30,8 @@ import org.dspace.core.Constants;
  * Display basic meta-meta information about the item and allow the user to change 
  * its state such as withdraw or reinstate, possibly even completely deleting the item!
  * 
- * @author Jay Paz
- * @author Scott Phillips
+ * based on class by Jay Paz and Scott Phillips
+ * modified for LINDAT/CLARIN
  */
 
 public class EditItemStatusForm extends AbstractDSpaceTransformer {
@@ -40,11 +41,6 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 	private static final Message T_submit_return = message("xmlui.general.return");
 	private static final Message T_item_trail = message("xmlui.administrative.item.general.item_trail");
 	private static final Message T_option_head = message("xmlui.administrative.item.general.option_head");
-	private static final Message T_option_status = message("xmlui.administrative.item.general.option_status");
-	private static final Message T_option_bitstreams = message("xmlui.administrative.item.general.option_bitstreams");
-	private static final Message T_option_metadata = message("xmlui.administrative.item.general.option_metadata");
-	private static final Message T_option_view = message("xmlui.administrative.item.general.option_view");
-        private static final Message T_option_curate = message("xmlui.administrative.item.general.option_curate");
 
 	
 	private static final Message T_title = message("xmlui.administrative.item.EditItemStatusForm.title");
@@ -55,6 +51,7 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 	private static final Message T_label_modified = message("xmlui.administrative.item.EditItemStatusForm.label_modified");
 	private static final Message T_label_in = message("xmlui.administrative.item.EditItemStatusForm.label_in");
 	private static final Message T_label_page = message("xmlui.administrative.item.EditItemStatusForm.label_page");
+	private static final Message T_label_embargo = message("xmlui.administrative.item.EditItemStatusForm.label_embargo");
 	private static final Message T_label_auth = message("xmlui.administrative.item.EditItemStatusForm.label_auth");
 	private static final Message T_label_withdraw = message("xmlui.administrative.item.EditItemStatusForm.label_withdraw");
 	private static final Message T_label_reinstate = message("xmlui.administrative.item.EditItemStatusForm.label_reinstate");
@@ -99,27 +96,20 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 		
 		
 		
+		String tabLink = baseURL + "&submit_status";
 		
 		// LIST: options
 		List options = main.addList("options",List.TYPE_SIMPLE,"horizontal");
-		options.addItem().addHighlight("bold").addXref(baseURL+"&submit_status",T_option_status);
-		options.addItem().addXref(baseURL+"&submit_bitstreams",T_option_bitstreams);
-		options.addItem().addXref(baseURL+"&submit_metadata",T_option_metadata);
-		options.addItem().addXref(baseURL + "&view_item", T_option_view);
-		options.addItem().addXref(baseURL + "&submit_curate", T_option_curate);
+		ViewItem.add_options(options, baseURL, ViewItem.T_option_status, tabLink);
 		
+		main = main.addDivision("item-status", "well well-light");
 		
-		
-		
-		// PARA: Helpful instructions
-		main.addPara(T_para1);
-		
-		
-		
+		// PARA: Helpfull instructions
+		main.addPara(null, "alert").addContent(T_para1);
 
 		
 		// LIST: Item meta-meta information
-		List itemInfo = main.addList("item-info");
+		List itemInfo = main.addList("item-info", null, "table");
 		
 		itemInfo.addLabel(T_label_id);
 		itemInfo.addItem(String.valueOf(item.getID()));
@@ -146,6 +136,23 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 		{
 			itemInfo.addItem().addXref(ConfigurationManager.getProperty("dspace.url") + "/handle/" + item.getHandle(),ConfigurationManager.getProperty("dspace.url") + "/handle/" + item.getHandle());		
 		}
+		
+		// embargoed
+		itemInfo.addLabel(T_label_embargo);
+		String embargo = null;
+		try {
+			DCDate edate = item.getEmbargo();
+			embargo = edate.toString();
+		}catch( IllegalArgumentException e ) {
+			embargo = "cannot be interpreted!";
+		}catch( Exception e ) {
+		}
+		if ( embargo != null ) {
+			itemInfo.addItem(embargo);
+		}else {
+			itemInfo.addItem(T_na);
+		}
+		
 		
 		itemInfo.addLabel(T_label_auth);
 		try

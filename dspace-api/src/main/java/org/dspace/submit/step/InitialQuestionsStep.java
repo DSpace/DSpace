@@ -40,7 +40,8 @@ import org.dspace.submit.AbstractProcessingStep;
  * @see org.dspace.app.util.SubmissionStepConfig
  * @see org.dspace.submit.AbstractProcessingStep
  * 
- * @author Tim Donohue
+ * based on class by Tim Donohue
+ * modified for LINDAT/CLARIN
  * @version $Revision$
  */
 public class InitialQuestionsStep extends AbstractProcessingStep
@@ -101,8 +102,9 @@ public class InitialQuestionsStep extends AbstractProcessingStep
         // Get the values from the initial questions form
         boolean multipleTitles = Util.getBoolParameter(request,
                 "multiple_titles");
+		//Expect publishedBefore unless stated otherwise
         boolean publishedBefore = Util.getBoolParameter(request,
-                "published_before");
+                "published_before", true);
         boolean multipleFiles = Util.getBoolParameter(request,
                 "multiple_files");
         boolean isThesis = ConfigurationManager

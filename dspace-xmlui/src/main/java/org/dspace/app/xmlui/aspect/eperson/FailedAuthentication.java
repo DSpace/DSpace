@@ -25,6 +25,9 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
 import org.xml.sax.SAXException;
 
+/**
+ * modified for LINDAT/CLARIN
+*/
 public class FailedAuthentication extends AbstractDSpaceTransformer {
 	private static final String SESSION_ATTRIBUTE_NAME = "xmlui.Eperson.FailedAuthentication.message";
 	
@@ -49,7 +52,12 @@ public class FailedAuthentication extends AbstractDSpaceTransformer {
 		Request request = ObjectModelHelper.getRequest(objectModel);
 		
 		Division div = body.addDivision("failed_auth");
-		div.setHead(T_h1);
+		//div.setHead(T_h1);
+
+        // <UFAL>
+        cz.cuni.mff.ufal.DSpaceXmluiApi.app_xmlui_aspect_eperson_postError(
+                context, T_h1, div);
+        // </UFAL>
 		div.addPara((Message)request.getSession().getAttribute(SESSION_ATTRIBUTE_NAME));
 		deRegisterErrorCode(request);
 	}

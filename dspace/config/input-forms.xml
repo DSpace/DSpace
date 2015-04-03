@@ -38,15 +38,27 @@
 
    <form name="traditional">
      <page number="1">
+      
+      <!-- Basic info
+      		+type for type binds
+      		title
+            projectUrl
+            demoUrl
+      		date
+      		+admin only fields-->
+
        <field>
          <dc-schema>dc</dc-schema>
-         <dc-element>contributor</dc-element>
-         <dc-qualifier>author</dc-qualifier>
-         <repeatable>true</repeatable>
-         <label>Authors</label>
-         <input-type>name</input-type>
-         <hint>Enter the names of the authors of this item.</hint>
-         <required></required>
+          <dc-element>type</dc-element>
+          <dc-qualifier></dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Select type of your resource</label>
+          <input-type value-pairs-name="common_types">dropdown</input-type>
+          <hint>Type of the resource: "Corpus" refers to text, speech and multimodal corpora.
+          "Lexical Conceptual Resource" includes lexica, ontologies, dictionaries, word lists etc.
+          "language Description" covers language models and grammars.
+          "Technology / Tool / Service" is used for tools, systems, system components etc.</hint>
+          <required>Please select a resource type for your submission.</required>
        </field>
 
        <field>
@@ -56,148 +68,284 @@
          <repeatable>false</repeatable>
          <label>Title</label>
          <input-type>onebox</input-type>
-         <hint>Enter the main title of the item.</hint>
+          <hint>Enter the main title of the item in English.</hint>
          <required>You must enter a main title for this item.</required>
        </field>
 
        <field>
          <dc-schema>dc</dc-schema>
-         <dc-element>title</dc-element>
-         <dc-qualifier>alternative</dc-qualifier>
-         <repeatable>true</repeatable>
-         <label>Other Titles</label>
+          <dc-element>source</dc-element>
+          <dc-qualifier>uri</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Project URL</label>
          <input-type>onebox</input-type>
-         <hint>If the item has any alternative titles, please enter them here.</hint>
+          <hint>Enter the project url.</hint>
          <required></required>
        </field>
 
        <field>
+          <dc-schema>local</dc-schema>
+          <dc-element>demo</dc-element>
+          <dc-qualifier>uri</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Demo URL</label>
+          <input-type>onebox</input-type>
+          <hint>A url with samples of the resource or, in the case of tools,
+            of samples of the output.</hint>
+          <required></required>
+        </field>
+
+        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>date</dc-element>
          <dc-qualifier>issued</dc-qualifier>
          <repeatable>false</repeatable>
-         <label>Date of Issue</label>
-         <input-type>date</input-type>
-         <hint>Please give the date of previous publication or public distribution.
-                        You can leave out the day and/or month if they aren't
-                        applicable.</hint>
-         <required>You must enter at least the year.</required>
+          <label>Date issued</label>
+          <input-type>onebox</input-type>
+          <hint>Please give the date when the submission data were issued if any e.g., 2014-01-21 or at least the year.</hint>
+          <required>You must enter the date or at least the year.</required>
+          <regexp>\d\d\d\d(-\d\d)?(-\d\d)?</regexp>
+          <regexp-warning>The supplied date does not follow our date pattern \d\d\d\d(-\d\d)?(-\d\d)? e.g., 2014-01-21 or 2014</regexp-warning>         
        </field>
 
        <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>publisher</dc-element>
+            <dc-schema>local</dc-schema>
+            <dc-element>hidden</dc-element>
          <dc-qualifier></dc-qualifier>
          <repeatable>false</repeatable>
-         <label>Publisher</label>
-         <input-type>onebox</input-type>
-         <hint>Enter the name of the publisher of the previously issued instance of this item.</hint>
+            <label>Should this item be hidden from browse/search? </label>
+            <input-type value-pairs-name="hidden_list">list</input-type>
+            <hint>Indicate whether you want to hide this item from browse and search. Combine with "Upload cmdi" for weblicht submissions.</hint>
          <required></required>
+            <acl>          	          	        	
+              	policy=deny,action=read,grantee-type=user,grantee-id=*
+            </acl>                    
+       </field>
+
+       <field>
+            <dc-schema>local</dc-schema>
+            <dc-element>hasMetadata</dc-element>
+            <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+            <label>Are you going to upload cmdi file?</label>
+            <input-type value-pairs-name="metashare_languageDependent">list</input-type> <!-- true/false value -->
+            <hint>Indicate whether you will upload cmdi file in the next step. Combine with "hide" for weblicht submissions.</hint>
+         <required></required>
+            <acl>          	          	        	
+              	policy=deny,action=read,grantee-type=user,grantee-id=*
+            </acl>                    
+       </field>
+
+      </page>
+
+      <page number="2">
+      
+      <!-- who's involved 
+      		authors
+      		publisher
+      		funding
+      		contact
+      -->
+      
+
+
+       <field>
+         <dc-schema>dc</dc-schema>
+          <dc-element>contributor</dc-element>
+          <dc-qualifier>author</dc-qualifier>
+         <repeatable>true</repeatable>
+          <label>Authors</label>
+          <input-type>name</input-type>
+          <hint>Enter the names of the authors of this item. Start typing the author's last name and use autocomplete form that will appear if applicable. End your input by pressing ESC if you don't want to use the preselected value.</hint>
+          <required>Please add author(s)</required>
+          <autocomplete>solr-author_ac-specific</autocomplete>
        </field>
 
        <field>
          <dc-schema>dc</dc-schema>
-         <dc-element>identifier</dc-element>
-         <dc-qualifier>citation</dc-qualifier>
-         <repeatable>false</repeatable>
-         <label>Citation</label>
-         <input-type>onebox</input-type>
-         <hint>Enter the standard citation for the previously issued instance of this item.</hint>
-         <required></required>
+          <dc-element>publisher</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>true</repeatable>
+          <autocomplete>solr-publisher_ac</autocomplete>
+          <label>Publisher</label>
+          <input-type>onebox</input-type>
+          <hint>Enter the name of the publisher of the previously issued instance of this item, or your home institution. Start typing the publisher and use autocomplete form that will appear if applicable. End your input by pressing ESC if you don't want to use the preselected value.</hint>
+          <required>You must enter the name of the publisher.</required>
        </field>
 
+       <field>
+        	<dc-schema>local</dc-schema>
+        	<dc-element>contact</dc-element>
+        	<dc-qualifier>person</dc-qualifier>
+        	<repeatable>true</repeatable>
+        	<label>Contact person</label>
+        	<input-type complex-definition-ref="contact_person">complex</input-type>
+        	<hint>Person to contact in case of any issues with this item.</hint>
+        	<required>Please fill all the fields for the contact person.</required>
+        </field>
+
+
+		<field>
+		<dc-schema>local</dc-schema>
+		<dc-element>sponsor</dc-element>
+		<repeatable>true</repeatable>
+		<label>Funding</label>
+		<input-type complex-definition-ref="funding">complex</input-type>
+		<hint>Sponsors and funding codes. For European projects ask admins about OpenAIRE</hint>
+		</field>
+		
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>relation</dc-element>
-         <dc-qualifier>ispartofseries</dc-qualifier>
-         <repeatable>true</repeatable>
-         <label>Series/Report No.</label>
-         <input-type>series</input-type>
-         <hint>Enter the series and number assigned to this item by your community.</hint>
-         <required></required>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>OpenAIRE Project Identifier</label>
+         <input-type>onebox</input-type>
+         <hint>Start typing the number, name or acronym of the European project (EC / ERC) and select the project from suggestions.</hint>
+         <acl>          	          	        	
+           	policy=deny,action=read,grantee-type=user,grantee-id=*
+         </acl>                    
        </field>
 
-       <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>identifier</dc-element>
-         <dc-qualifier></dc-qualifier>
-         <!-- An input-type of qualdrop_value MUST be marked as repeatable -->
-         <repeatable>true</repeatable>
-         <label>Identifiers</label>
-         <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
-         <hint>If the item has any identification numbers or codes associated with
-it, please enter the types and the actual numbers or codes.</hint>
-         <required></required>
-       </field>
 
-       <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>type</dc-element>
-         <dc-qualifier></dc-qualifier>
+	</page>
+	<page number="3">
+		<!-- describe the resource -->
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>description</dc-element>
+          <dc-qualifier></dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Description</label>
+          <input-type>textarea</input-type>
+          <hint>Enter a description of the submitted data.</hint>
+          <required>Please give us a description</required>
+        </field>
+
+
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>language</dc-element>
+          <dc-qualifier>iso</dc-qualifier>
          <repeatable>true</repeatable>
-         <label>Type</label>
-         <input-type value-pairs-name="common_types">dropdown</input-type>
-         <hint>Select the type(s) of content of the item. To select more than one value in the list, you may have to hold down the "CTRL" or "Shift" key.</hint>
-         <required></required>
+          <label>Language</label>
+          <type-bind>corpus,lexicalConceptualResource,languageDescription</type-bind>         
+          <input-type>onebox</input-type>
+          <hint>Select the language of the main content of the item. Multiple languages are possible. Start typing the language and use autocomplete form that will appear if applicable.</hint>
+          <required>Please choose a language for the resource.</required>
+          <autocomplete>json_static-iso_langs.json</autocomplete>
        </field>
 
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>language</dc-element>
          <dc-qualifier>iso</dc-qualifier>
-         <repeatable>false</repeatable>
+          <repeatable>true</repeatable>
          <label>Language</label>
-         <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
-         <hint>Select the language of the main content of the item.  If the language does not appear in the list, please select 'Other'.  If the content does not really have a language (for example, if it is a dataset or an image) please select 'N/A'.</hint>
+          <type-bind>toolService</type-bind>          
+          <input-type>onebox</input-type>
+          <hint>Select the spoken language of the main content of the item if applicable. Multiple languages are possible. Start typing the language and use autocomplete form that will appear.</hint>
          <required></required>
+          <autocomplete>json_static-iso_langs.json</autocomplete>
        </field>
-     </page>
 
-     <page number="2">
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>subject</dc-element>
          <dc-qualifier></dc-qualifier>
          <!-- An input-type of twobox MUST be marked as repeatable -->
          <repeatable>true</repeatable>
+          <repeatable-parse>true</repeatable-parse>
          <label>Subject Keywords</label>
          <input-type>twobox</input-type>
-         <hint>Enter appropriate subject keywords or phrases. </hint>
+          <hint>Enter appropriate subject keyword or phrase and press the Add button. You can repeat it for multiple keywords or use separators i.e., comma and semicolon, which will split it accordingly. Start typing the keyword and use autocomplete form that will appear. End your input by pressing ESC if you don't want to use the preselected value.</hint>
          <required></required>
-         <vocabulary>srsc</vocabulary>
+          <autocomplete>solr-subject_ac</autocomplete>
        </field>
 
        <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>description</dc-element>
-         <dc-qualifier>abstract</dc-qualifier>
+			<dc-schema>local</dc-schema>
+			<dc-element>size</dc-element>
+			<dc-qualifier>info</dc-qualifier>
+			<repeatable>true</repeatable>
+			<label>Size</label>
+			<input-type complex-definition-ref="sizeInfo">complex</input-type>
+			<type-bind>corpus,languageDescription,lexicalConceptualResource</type-bind>
+			<hint>You can state the extent of the submitted data, eg. the number of tokens.</hint>
+		</field>
+
+        <field>
+          <dc-schema>metashare</dc-schema>
+          <dc-element>ResourceInfo#ContentInfo</dc-element>
+          <dc-qualifier>mediaType</dc-qualifier>
          <repeatable>false</repeatable>
-         <label>Abstract</label>
-         <input-type>textarea</input-type>
-         <hint>Enter the abstract of the item. </hint>
-         <required></required>
+          <label>Media type</label>
+          <type-bind>corpus,lexicalConceptualResource</type-bind>
+          <input-type value-pairs-name="metashare_media_corpus_lcr">dropdown</input-type>
+          <hint>Media type of the main content of the item e.g., "text" for
+            textual corpora or "audio" for audio recordings.</hint>
+          <required>Media type is required</required>
+        </field>
+        <field>
+          <dc-schema>metashare</dc-schema>
+          <dc-element>ResourceInfo#ContentInfo</dc-element>
+          <dc-qualifier>mediaType</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Media type</label>
+          <type-bind>languageDescription</type-bind>
+          <input-type value-pairs-name="metashare_media_ld">dropdown</input-type>
+          <hint>Media type of the main content of the item e.g., "text" for
+            textual corpora or "audio" for audio recordings.</hint>
+          <required>Media type is required</required>
        </field>
 
+        <!-- Help field... different values based on resource type -->
        <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>description</dc-element>
-         <dc-qualifier>sponsorship</dc-qualifier>
+          <dc-schema>metashare</dc-schema>
+          <dc-element>ResourceInfo#ContentInfo</dc-element>
+          <dc-qualifier>detailedType</dc-qualifier>
          <repeatable>false</repeatable>
-         <label>Sponsors</label>
-         <input-type>textarea</input-type>
-         <hint>Enter the names of any sponsors and/or funding codes in the box. </hint>
-         <required></required>
+          <label>Detailed type</label>
+          <type-bind>toolService</type-bind>
+          <input-type value-pairs-name="metashare_detailed_toolService">dropdown</input-type>
+          <hint></hint>
+          <required>Choose one of the types</required>
        </field>
+        <field>
+          <dc-schema>metashare</dc-schema>
+          <dc-element>ResourceInfo#ContentInfo</dc-element>
+          <dc-qualifier>detailedType</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Detailed type</label>
+          <type-bind>languageDescription</type-bind>
+          <input-type value-pairs-name="metashare_detailed_languageDescription">dropdown</input-type>
+          <hint></hint>
+          <required>Choose one of the types</required>
+        </field>
+        <field>
+          <dc-schema>metashare</dc-schema>
+          <dc-element>ResourceInfo#ContentInfo</dc-element>
+          <dc-qualifier>detailedType</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Detailed type</label>
+          <type-bind>lexicalConceptualResource</type-bind>
+          <input-type value-pairs-name="metashare_detailed_lexicalConceptualResource">dropdown</input-type>
+          <hint></hint>
+          <required>Choose one of the types</required>
+        </field>
+        <!-- -->
 
        <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>description</dc-element>
-         <dc-qualifier></dc-qualifier>
+          <dc-schema>metashare</dc-schema>
+          <dc-element>ResourceInfo#ResourceComponentType#ToolServiceInfo</dc-element>
+          <dc-qualifier>languageDependent</dc-qualifier>
          <repeatable>false</repeatable>
-         <label>Description</label>
-         <input-type>textarea</input-type>
-         <hint>Enter any other description or comments in this box. </hint>
-         <required></required>
+          <label>Language Dependent</label>
+          <type-bind>toolService</type-bind>
+          <input-type value-pairs-name="metashare_languageDependent">list</input-type>
+          <hint>Indicate whether the operation of the tool or service is
+            language dependent or not</hint>
+          <required>Please indicate whether the tool is language dependent</required>
        </field>
      </page>
    </form>
@@ -211,12 +359,95 @@ it, please enter the types and the actual numbers or codes.</hint>
          <repeatable>true</repeatable>
          <label>One: Authors</label>
          <input-type>name</input-type>
-         <hint>Enter the names of the authors of this item.</hint>
+          <hint>Enter the names of the author(s) of this item.</hint>
          <required></required>
        </field>
       </page>
     </form>
  </form-definitions>
+
+
+  <!-- 
+  ====================================================== 
+  UFAL/jmisutka adding 
+    additional can be one or more of
+      - hidenonempty
+      
+      in the current implementation it is not possible  to use
+      all the possibilities of additional and extra attributes e.g.,
+      autocomplete with hidenonempty etc.  
+  -->
+
+  <form-definitions-extra>
+    <form name="traditional">
+      <page number="1">
+        <field>
+          <dc-schema>local</dc-schema>
+          <dc-element>submission</dc-element>
+          <dc-qualifier>note</dc-qualifier>
+          <repeatable>false</repeatable>
+          <label>Note</label>
+          <input-type>textarea</input-type>
+          <hint>Leave a note for the editors/reviewers</hint>
+          <required></required>
+        </field>      
+
+        <!-- DC.Relation.Replaces -->
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>relation</dc-element>
+          <dc-qualifier>replaces</dc-qualifier>
+          <component-label> </component-label>                            
+          <repeatable>true</repeatable>
+          <label>Replaces</label>
+          <input-type>onebox</input-type>
+          <hint>URL to a related resource that is supplanted, displaced, or superseded by the described resource.</hint>
+          <autocomplete>solr-handle</autocomplete>
+          <required></required>
+          <collapsible>Special fields</collapsible>
+          <acl>                   	          
+          	policy=deny,action=read,grantee-type=user,grantee-id=*
+          </acl>
+        </field>
+        
+        <!-- DC.Relation.IsReplacedBy -->
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>relation</dc-element>
+          <dc-qualifier>isreplacedby</dc-qualifier>
+          <component-label> </component-label>                   
+          <repeatable>true</repeatable>
+          <label>Is replaced by</label>
+          <input-type>onebox</input-type>
+          <hint>A related resource that supplants, displaces, or supersedes the described resource.</hint>
+          <autocomplete>solr-handle</autocomplete>
+          <required></required>
+          <acl>                     	 	         
+          	policy=deny,action=read,grantee-type=user,grantee-id=*
+          </acl>          
+        </field>
+        
+         <!-- Local.Embargo.TermsLift -->
+        <field>
+          <dc-schema>local</dc-schema>
+          <dc-element>embargo</dc-element>
+          <dc-qualifier>termslift</dc-qualifier>
+          <component-label> </component-label>                   
+          <repeatable>false</repeatable>
+          <label>Embargo lift date</label>
+          <input-type>onebox</input-type>
+          <hint>Date that the resource will become available e.g., 2014-01-21</hint>
+          <required></required>
+          <regexp>\d\d\d\d-\d\d-\d\d</regexp>
+          <regexp-warning>The supplied date does not follow our date pattern \d\d\d\d-\d\d-\d\d e.g., 2014-01-21</regexp-warning>
+          <acl>          	          	        	
+          	policy=deny,action=read,grantee-type=user,grantee-id=*
+          </acl>                    
+        </field>        
+
+      </page>
+    </form>
+  </form-definitions-extra>
 
 
  <!-- form-value-pairs populate dropdown and qualdrop-value lists.          -->
@@ -233,7 +464,8 @@ it, please enter the types and the actual numbers or codes.</hint>
  <!-- stores the associated stored-values in the database.                  -->
 
  <form-value-pairs>
-   <value-pairs value-pairs-name="common_identifiers" dc-term="identifier">
+    <value-pairs value-pairs-name="common_identifiers"
+      dc-term="identifier">
      <pair>
        <displayed-value>ISSN</displayed-value>
        <stored-value>issn</stored-value>
@@ -262,145 +494,517 @@ it, please enter the types and the actual numbers or codes.</hint>
 
    <value-pairs value-pairs-name="common_types" dc-term="type">
      <pair>
-       <displayed-value>Animation</displayed-value>
-       <stored-value>Animation</stored-value>
+        <displayed-value>N/A</displayed-value>
+        <stored-value></stored-value>
      </pair>
      <pair>
-       <displayed-value>Article</displayed-value>
-       <stored-value>Article</stored-value>
+        <displayed-value>Corpus</displayed-value>
+        <stored-value>corpus</stored-value>
      </pair>
      <pair>
-       <displayed-value>Book</displayed-value>
-       <stored-value>Book</stored-value>
+        <displayed-value>Lexical conceptual</displayed-value>
+        <stored-value>lexicalConceptualResource</stored-value>
      </pair>
      <pair>
-       <displayed-value>Book chapter</displayed-value>
-       <stored-value>Book chapter</stored-value>
+        <displayed-value>Language description</displayed-value>
+        <stored-value>languageDescription</stored-value>
      </pair>
      <pair>
-       <displayed-value>Dataset</displayed-value>
-       <stored-value>Dataset</stored-value>
+        <displayed-value>Technology / Tool / Service</displayed-value>
+        <stored-value>toolService</stored-value>
+     </pair>
+      <!--<pair> <displayed-value>Evaluation package</displayed-value> <stored-value>evaluationPackage</stored-value> 
+        </pair> -->
+
+    </value-pairs>
+
+    <!-- default language order: (from dspace 1.2.1) langauges are in languages.js 
+      because of performance <value-pairs value-pairs-name="common_iso_languages" 
+      dc-term="language_iso"> <pair> <displayed-value>Loading...</displayed-value> 
+      <stored-value></stored-value> </pair> </value-pairs> -->
+
+    <!-- the dc-term is taken from the new standard -->
+    <!-- taken from the metashare standard -->
+    <value-pairs value-pairs-name="metashare_mediums" dc-term="">
+     <pair>
+        <displayed-value>N/A</displayed-value>
+        <stored-value></stored-value>
      </pair>
      <pair>
-       <displayed-value>Learning Object</displayed-value>
-       <stored-value>Learning Object</stored-value>
+        <displayed-value>Web Executable</displayed-value>
+        <stored-value>webExecutable</stored-value>
      </pair>
      <pair>
-       <displayed-value>Image</displayed-value>
-       <stored-value>Image</stored-value>
+        <displayed-value>Paper copy</displayed-value>
+        <stored-value>paperCopy</stored-value>
      </pair>
      <pair>
-       <displayed-value>Image, 3-D</displayed-value>
-       <stored-value>Image, 3-D</stored-value>
+        <displayed-value>HardDisk</displayed-value>
+        <stored-value>hardDisk</stored-value>
      </pair>
      <pair>
-       <displayed-value>Map</displayed-value>
-       <stored-value>Map</stored-value>
+        <displayed-value>Blu Ray</displayed-value>
+        <stored-value>bluRay</stored-value>
      </pair>
      <pair>
-       <displayed-value>Musical Score</displayed-value>
-       <stored-value>Musical Score</stored-value>
+        <displayed-value>DVD-R</displayed-value>
+        <stored-value>DVD-R</stored-value>
      </pair>
      <pair>
-       <displayed-value>Plan or blueprint</displayed-value>
-       <stored-value>Plan or blueprint</stored-value>
+        <displayed-value>CD-ROM</displayed-value>
+        <stored-value>CD-ROM</stored-value>
      </pair>
      <pair>
-       <displayed-value>Preprint</displayed-value>
-       <stored-value>Preprint</stored-value>
+        <displayed-value>Download</displayed-value>
+        <stored-value>downloadable</stored-value>
      </pair>
      <pair>
-       <displayed-value>Presentation</displayed-value>
-       <stored-value>Presentation</stored-value>
+        <displayed-value>Accessible Through Interface</displayed-value>
+        <stored-value>accessibleThroughInterface</stored-value>
      </pair>
      <pair>
-       <displayed-value>Recording, acoustical</displayed-value>
-       <stored-value>Recording, acoustical</stored-value>
+        <displayed-value>other</displayed-value>
+        <stored-value>other</stored-value>
+     </pair>
+    </value-pairs>
+
+    <!-- taken from the metashare standard -->
+    <value-pairs value-pairs-name="metashare_validation"
+      dc-term="">
+     <pair>
+        <displayed-value>N/A</displayed-value>
+        <stored-value></stored-value>
      </pair>
      <pair>
-       <displayed-value>Recording, musical</displayed-value>
-       <stored-value>Recording, musical</stored-value>
+        <displayed-value>True</displayed-value>
+        <stored-value>True</stored-value>
      </pair>
      <pair>
-       <displayed-value>Recording, oral</displayed-value>
-       <stored-value>Recording, oral</stored-value>
+        <displayed-value>False</displayed-value>
+        <stored-value>False</stored-value>
+     </pair>
+    </value-pairs>
+
+    <!-- used for media types -->
+    <value-pairs value-pairs-name="metashare_media_corpus_lcr"
+      dc-term="">
+     <pair>
+        <displayed-value>N/A</displayed-value>
+        <stored-value></stored-value>
      </pair>
      <pair>
-       <displayed-value>Software</displayed-value>
-       <stored-value>Software</stored-value>
+        <displayed-value>text</displayed-value>
+        <stored-value>text</stored-value>
      </pair>
      <pair>
-       <displayed-value>Technical Report</displayed-value>
-       <stored-value>Technical Report</stored-value>
+        <displayed-value>audio</displayed-value>
+        <stored-value>audio</stored-value>
      </pair>
      <pair>
-       <displayed-value>Thesis</displayed-value>
-       <stored-value>Thesis</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Video</displayed-value>
-       <stored-value>Video</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Working Paper</displayed-value>
-       <stored-value>Working Paper</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Other</displayed-value>
+        <displayed-value>video</displayed-value>
+        <stored-value>video</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>image</displayed-value>
+        <stored-value>image</stored-value>
+      </pair>
+    </value-pairs>
+
+    <value-pairs value-pairs-name="metashare_media_ld"
+      dc-term="">
+      <pair>
+        <displayed-value>N/A</displayed-value>
+        <stored-value></stored-value>
+      </pair>
+      <pair>
+        <displayed-value>text</displayed-value>
+        <stored-value>text</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>video</displayed-value>
+        <stored-value>video</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>image</displayed-value>
+        <stored-value>image</stored-value>
+      </pair>
+    </value-pairs>
+
+    <!-- used for "detailed type" -->
+    <value-pairs value-pairs-name="metashare_detailed_toolService"
+      dc-term="">
+      <pair>
+        <displayed-value>N/A</displayed-value>
+        <stored-value></stored-value>
+      </pair>
+      <pair>
+        <displayed-value>tool</displayed-value>
+        <stored-value>tool</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>service</displayed-value>
+        <stored-value>service</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>platform</displayed-value>
+        <stored-value>platform</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>suiteOfTools</displayed-value>
+        <stored-value>suiteOfTools</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>infrastructure</displayed-value>
+        <stored-value>infrastructure</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>architecture</displayed-value>
+        <stored-value>architecture</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>nlpDevelopmentEnvironment</displayed-value>
+        <stored-value>nlpDevelopmentEnvironment</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>other</displayed-value>
+        <stored-value>other</stored-value>
+      </pair>
+    </value-pairs>
+    <value-pairs value-pairs-name="metashare_detailed_lexicalConceptualResource"
+      dc-term="">
+      <pair>
+        <displayed-value>N/A</displayed-value>
+        <stored-value></stored-value>
+      </pair>
+      <pair>
+        <displayed-value>wordList</displayed-value>
+        <stored-value>wordList</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>computationalLexicon</displayed-value>
+        <stored-value>computationalLexicon</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>ontology</displayed-value>
+        <stored-value>ontology</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>wordnet</displayed-value>
+        <stored-value>wordnet</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>thesaurus</displayed-value>
+        <stored-value>thesaurus</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>framenet</displayed-value>
+        <stored-value>framenet</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>terminilogicalResource</displayed-value>
+        <stored-value>terminilogicalResource</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>machineReadableDictionary</displayed-value>
+        <stored-value>machineReadableDictionary</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>lexicon</displayed-value>
+        <stored-value>lexicon</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>other</displayed-value>
+        <stored-value>other</stored-value>
+      </pair>
+    </value-pairs>
+    <value-pairs value-pairs-name="metashare_detailed_languageDescription"
+      dc-term="">
+      <pair>
+        <displayed-value>N/A</displayed-value>
+        <stored-value></stored-value>
+      </pair>
+      <pair>
+        <displayed-value>grammar</displayed-value>
+        <stored-value>grammar</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>other</displayed-value>
+        <stored-value>other</stored-value>
+      </pair>
+    </value-pairs>
+
+    <!-- taken from the metashare standard -->
+    <value-pairs value-pairs-name="metashare_funding" dc-term="">
+      <pair>
+        <displayed-value>N/A</displayed-value>
+        <stored-value></stored-value>
+      </pair>
+      <pair>
+        <displayed-value>EU</displayed-value>
+        <stored-value>euFunds</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Own funds</displayed-value>
+        <stored-value>ownFunds</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>National</displayed-value>
+        <stored-value>nationalFunds</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>other</displayed-value>
        <stored-value>Other</stored-value>
      </pair>
    </value-pairs>
 
-   <!-- default language order: (from dspace 1.2.1)
-        "en_US", "en", "es", "de", "fr", "it", "ja", "zh", "other", ""
-     -->
-   <value-pairs value-pairs-name="common_iso_languages" dc-term="language_iso">
+    <!-- taken from the metashare standard -->
+    <value-pairs value-pairs-name="metashare_sizeunit"
+      dc-term="">
      <pair>
        <displayed-value>N/A</displayed-value>
        <stored-value></stored-value>
      </pair>
-     <pair>
-       <displayed-value>English (United States)</displayed-value>
-       <stored-value>en_US</stored-value>
+
+      <pair>
+        <displayed-value>terms</displayed-value>
+        <stored-value>terms</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>entries</displayed-value>
+        <stored-value>entries</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>turns</displayed-value>
+        <stored-value>turns</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>utterances</displayed-value>
+        <stored-value>utterances</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>articles</displayed-value>
+        <stored-value>articles</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>files</displayed-value>
+        <stored-value>files</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>items</displayed-value>
+        <stored-value>items</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>seconds</displayed-value>
+        <stored-value>seconds</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>elements</displayed-value>
+        <stored-value>elements</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>units</displayed-value>
+        <stored-value>units</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>minutes</displayed-value>
+        <stored-value>minutes</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>hours</displayed-value>
+        <stored-value>hours</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>texts</displayed-value>
+        <stored-value>texts</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>sentences</displayed-value>
+        <stored-value>sentences</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>bytes</displayed-value>
+        <stored-value>bytes</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>tokens</displayed-value>
+        <stored-value>tokens</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>words</displayed-value>
+        <stored-value>words</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>keywords</displayed-value>
+        <stored-value>keywords</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>idiomaticExpressions</displayed-value>
+        <stored-value>idiomaticExpressions</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>neologisms</displayed-value>
+        <stored-value>neologisms</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>multiWordUnits</displayed-value>
+        <stored-value>multiWordUnits</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>expressions</displayed-value>
+        <stored-value>expressions</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>synsets</displayed-value>
+        <stored-value>synsets</stored-value>
       </pair>
      <pair>
-       <displayed-value>English</displayed-value>
-       <stored-value>en</stored-value>
+        <displayed-value>classes</displayed-value>
+        <stored-value>classes</stored-value>
+      </pair>
+     <pair>
+        <displayed-value>concepts</displayed-value>
+        <stored-value>concepts</stored-value>
      </pair>
      <pair>
-       <displayed-value>Spanish</displayed-value>
-       <stored-value>es</stored-value>
+        <displayed-value>lexicalTypes</displayed-value>
+        <stored-value>lexicalTypes</stored-value>
      </pair>
      <pair>
-       <displayed-value>German</displayed-value>
-       <stored-value>de</stored-value>
+        <displayed-value>phoneticUnits</displayed-value>
+        <stored-value>phoneticUnits</stored-value>
      </pair>
      <pair>
-       <displayed-value>French</displayed-value>
-       <stored-value>fr</stored-value>
+        <displayed-value>syntacticUnits</displayed-value>
+        <stored-value>syntacticUnits</stored-value>
      </pair>
      <pair>
-       <displayed-value>Italian</displayed-value>
-       <stored-value>it</stored-value>
+        <displayed-value>semanticUnits</displayed-value>
+        <stored-value>semanticUnits</stored-value>
      </pair>
      <pair>
-       <displayed-value>Japanese</displayed-value>
-       <stored-value>ja</stored-value>
+        <displayed-value>predicates</displayed-value>
+        <stored-value>predicates</stored-value>
      </pair>
      <pair>
-       <displayed-value>Chinese</displayed-value>
-       <stored-value>zh</stored-value>
+        <displayed-value>phonemes</displayed-value>
+        <stored-value>phonemes</stored-value>
      </pair>
      <pair>
-       <displayed-value>Turkish</displayed-value>
-       <stored-value>tr</stored-value>
+        <displayed-value>diphones</displayed-value>
+        <stored-value>diphones</stored-value>
      </pair>
      <pair>
-       <displayed-value>(Other)</displayed-value>
+        <displayed-value>T-HPairs</displayed-value>
+        <stored-value>T-HPairs</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>syllables</displayed-value>
+        <stored-value>syllables</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>frames</displayed-value>
+        <stored-value>frames</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>images</displayed-value>
+        <stored-value>images</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>kb</displayed-value>
+        <stored-value>kb</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>mb</displayed-value>
+        <stored-value>mb</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>gb</displayed-value>
+        <stored-value>gb</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>rb</displayed-value>
+        <stored-value>rb</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>shots</displayed-value>
+        <stored-value>shots</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>unigrams</displayed-value>
+        <stored-value>unigrams</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>bigrams</displayed-value>
+        <stored-value>bigrams</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>trigrams</displayed-value>
+        <stored-value>trigrams</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>4-grams</displayed-value>
+        <stored-value>4-grams</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>5-grams</displayed-value>
+        <stored-value>5-grams</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>rules</displayed-value>
+        <stored-value>rules</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>other</displayed-value>
        <stored-value>other</stored-value>
      </pair>
    </value-pairs>
 
+    <value-pairs value-pairs-name="metashare_languageDependent"
+      dc-term="">
+      <pair>
+        <displayed-value>Yes</displayed-value>
+        <stored-value>true</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>No</displayed-value>
+        <stored-value>false</stored-value>
+      </pair>
+    </value-pairs>
+    <value-pairs value-pairs-name="hidden_list"
+      dc-term="">
+      <pair>
+        <displayed-value>Yes</displayed-value>
+        <stored-value>hidden</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>No</displayed-value>
+        <stored-value>false</stored-value>
+      </pair>
+    </value-pairs>
+
  </form-value-pairs>
+
+  <form-complex-definitions>
+  <!-- currently only text and dropbox -->
+  	<definition name="contact_person">
+  		<input name="1_givenname" type="text" label="Contact person's given name"/>
+  		<input name="2_surname" type="text" label="Contact person's surname" help="Family name"/>
+  		<input name="3_email" type="text" label="Contact person's email" regexp="[^@]+@[^\.@]+\.[^@]+"/>
+  		<input name="4_affiliation" type="text" label="Contact person's institution name" autocomplete="solr-publisher_ac"/>
+  	</definition>
+
+  	<definition name="funding">
+  		<input name="1_orgname" type="text" label="Funding organization"/>
+  		<input name="2_code" type="text" label="Grant no. or funding project code" autocomplete="solr-local.sponsor_ac"/>
+  		<input name="3_projname" type="text" label="Funding project name" autocomplete="solr-local.sponsor_ac"/>
+  		<input name="4_type" type="dropdown" label="Funding type" pairs="metashare_funding"/>
+  	</definition>
+  	
+  <definition name="sizeInfo">
+  		<input name="1_size" type="text" regexp="\d+.?\d*"/>
+  		<input name="2_unit" type="dropdown" pairs="metashare_sizeunit" label="Unit"/>
+  </definition>
+  </form-complex-definitions>
+  
 
 </input-forms>

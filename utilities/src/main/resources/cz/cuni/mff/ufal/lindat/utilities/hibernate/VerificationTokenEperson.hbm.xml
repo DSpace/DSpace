@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cz.cuni.mff.ufal.lindat.utilities.hibernate.VerificationTokenEperson" table="verification_token" schema="public">
+	    <id name="token" type="string">
+	            <column name="token" length="48" not-null="true" unique="true" />
+	    </id>        
+     <property name="eid" type="int">
+        <column name="eperson_id" not-null="true" unique="true" />
+    </property>
+    <property name="email" type="string">
+        <column name="email" length="64" not-null="true" unique="true"></column>
+    </property>
+    </class>
+</hibernate-mapping>

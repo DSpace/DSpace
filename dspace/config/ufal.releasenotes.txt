@@ -1,0 +1,430 @@
+[LR] 
+ - Bug	#1014 - 	Mail sending option
+ - Task	#1016 - 	Add handle server scripts to production
+ - Task	#1013 - 	Logos for Lindat and LRT
+ - Bug	#1001 - 	Invalid facet hides other facets
+ - Bug	#993 - 	Update languages in metadata
+ - Bug	#992 - 	"Filters should have a button ""clear all filters"" with obvious functionality."
+ - Bug	#989 - 	Rights autocomplete in advanced search does not work as expected
+ - Feature	#945 - 	Improve search
+ - Bug	#941 - 	half of the button's background color disappears when focused by the tab key
+ - Bug	#913 - 	Logo of CC BY-NC-SA
+ - Bug	#903 - 	We should be able to search for items which do not contain particular field e.g. rights
+ - Task #1049 -     Move shibboleth log directory to local.conf.
+ - Feature  #1046 -     Let administrators see items in the task pool
+ - Bug  #1044 -     CMDI not working on LRT branch
+ - Task #1043 -     Relocate items
+ - Bug  #1038 -     ufal.dspace.dir cannot use variables as they are not substituted
+ - Bug  #1036 -     Errors during new install
+ - Bug  #849 -  Export to metashare not working
+ - Bug  #986 -  Browsing triggers hibernate problems
+ - Bug  #983 -  Missing apple-touch-icon.png
+ - Bug  #976 -  When omitting a required info from extra signed licences entered value disappear
+ - Bug  #969 -  Reconfigure logging to authentication.log.*
+ - Bug  #904 -  Type year in issue date browse mode not working
+ - Bug  #862 -  allzip (Download all) available only to autheneticated users
+ - Feature  #1046 -     Let administrators see items in the task pool
+ - Feature  #1033 -     Add support for per community handle prefixes
+ - Task #1029 -     Search bar on all pages
+ - Bug  #1028 -     "Add organisation into licence ""Additional required user info"""
+ - Bug  #1026 -     Unintuitive search results
+ - Bug  #1024 -     Do not allow rpp other than visible in UI (or limit up to a reasonable number)
+ - Feature  #1017 -     Additional information about withdrawn and permanently deleted items
+ - Bug  #990 -  Filters multiply
+ - Bug  #1064 -     Add a comment to workspace items -> Edit Metadata
+ - Bug  #1060 -     Populate dc.identifier
+ - Bug  #1058 -     Change Handle Prefix - empty old prefix
+ - Bug  #1053 -     Logout not working (sometimes)
+ - Task #1042 -     Update faq
+ - Bug  #1037 -     api.key.p12 hardcoded in makefile
+
+
+
+*********************************************************************
+
+
+[JM]
+ - Bug  #928, #910 -  Move workflowitem in curation from one collection to another
+ - Bug  #952, #973, #879 -  Leftovers from v2014.0
+
+[LR] 
+ - Bug	#957 - 	Missing license exception while resubmitting
+ - Bug	#951 - 	Diacritics in filenames in zip files from Download all action not displayed correctly
+ - Bug	#930 - 	Google Analytics shows text [loading] instead of number of visitors
+ - Bug	#901 - 	Make Authors use autocomplete in submission workflow - Describe item
+ - Task	#787 - 	Label images should have alt tags
+ - Bug	#953 - 	Clicking on Download all in Firefox results in opening an invalid page
+ - Bug	#948 - 	Zipping in download all doesn't handle entries with the same name
+ - Bug	#916 - 	Remove media type from facets (right panel)
+ - Bug	#947 - 	Equal signs not handled correctly when interpolating variables in interpolate-config.pl
+ - Bug	#946 - 	Current makefile refers cz.cuni.mff.ufal.lindat.utilities.units.Licenses which is no longer available
+ - Bug	#943 - 	Invalid hour in the cronjob entry in makefile
+ - Bug	#940 - 	Contents of lindat-common not restored from git in postinstall step in some cases
+ - Bug	#937 - 	Wrong interpolation of local.conf variables
+ - Bug	#934 - 	Missing version declarations in sources/pom.xml
+ - Task	#932 - 	Add size to Download all button
+ - Task	#931 - 	"Add size into label ""This item contains 1 file"" in browsing/searching mode"
+ - Bug	#927 - 	Editing license
+ - Bug	#919 - 	Missing title in CMDI export
+ - Task	#917 - 	Total file size into item view
+ - Bug	#906 - 	Edit licence throws error
+ - Bug	#902 - 	Problematic field dc.contributor.advisor
+ - Bug	#896 - 	Session expired clears metadata of submission
+ - Bug	#895 - 	Make language codes external
+ - Bug	#890 - 	Download all missing in new theme
+ - Bug	#843 - 	IDPs count in report
+ - Bug	#849 - 	Export to metashare not working
+
+
+
+*********************************************************************
+
+[LR]
+ - Bug	#902 - 	Problematic field dc.contributor.advisor
+ - Bug	#897 - 	Map metashare description from dc.description in export
+ - Bug	#895 - 	Make language codes external
+ - Bug	#887 - 	Two emails sent from IdPs
+ - Bug	#886 - 	Don't include idpdiscovery.js
+ - Task	#884 - 	Change hostname to lindat..
+ - Bug	#883 - 	Eperson pagination problem
+ - Bug	#881 - 	Make License step professional
+ - Bug	#880 - 	Clean up themes
+ - Bug	#877 - 	populate dc.subject
+ - Task	#875 - 	CP Activity tab
+ - Task	#870 - 	Load discojuice and css from local repo (AAI)
+ - Bug	#861 - 	Disable download all for big files
+ - Bug	#859 - 	"Store last login  show old logins"
+ - Task	#858 - 	Update metadata
+ - Task	#857 - 	Provide to the End User Privacy Policy
+ - Bug	#855 - 	Submission - project funding again
+ - Task	#850 - 	"Unify ""CLARIN-LINDAT"""
+ - Task	#829 - 	Changes needed for successful installation
+ - Task	#790 - 	shared location for lindat-common theme
+ - Bug	#778 - 	Confusing message for depositors
+ - Task	#775 - 	Make our institution always more visible in discojuice
+ - Task	#772 - 	SPF and Czech Identity federation
+ - Task	#740 - 	"Update these records to match Charles University in Prague  UFAL"
+ - Bug	#731 - 	null pointer exception on dev
+ - Task	#730 - 	item versioning in control panel
+ - Upgrade	#716 - 	Upgrade production 06.09.2013
+ - Feature	#711 - 	Version history of records
+ - Bug	#702 - 	Invalid email in submission makes CMDI break!
+ - Bug	#699 - 	Report java hardcoded shib
+ - Bug	#645 - 	Export to links do not work in admin item view
+ - Bug	#576 - 	Describe Page field's validation
+ - Task	#530 - 	make metadata+ step in submission more intuitive 
+ - Bug	#340 - 	Clean-up records of UFAL tools
+ - Task	#224 - 	Get the Data Seal of Approval Assesment
+ - Bug	#914 - 	License meta-data is out of sync
+ - Bug	#878 - 	Make repeatable components parsable
+ - Bug	#876 - 	Creating METS has a lot of warnings 
+ - Bug	#865 - 	Create signed licenses tab in CP
+ - Bug	#863 - 	When 2 same file names are present in a submission the zip fails
+ - Bug	#848 - 	Hide specific metada from item-view (full metadata view)
+ - Task	#847 - 	Refactor shibboleth auth. mess
+ - Bug	#843 - 	IDPs count in report
+ - Task	#841 - 	Update check link checker
+ - Bug	#889 - 	Image causes 500 error
+ - Bug	#838 - 	Shared login screen
+ - Task	#836 - 	EduGAIN Code of Conduct
+ - Task	#829 - 	Changes needed for successful installation
+
+
+*********************************************************************
+
+[JM]
+ - Task #700 - add info to wiki about connecting tomcat/apache
+
+[AK]
+ - Bug #786 - problem with page count in search
+ - Bug #770 - Create test case for it
+ - Bug #760 - Create a list of services on ufal-point
+ - Task #757 - Make control panel tabs addition easy and clean
+ - Bug #667 - Licence select in submission for additional uploaded file
+ - Bug #507 - Update metadata if license information changes
+ - Bug #783 - Two corrections in https://ufal-point.mff.cuni.cz/repository/xmlui/page/faq
+ - Bug #766 - Test filling out every metadata field in a submission
+ - Bug #732 - Exception on newly installed dspace because of missing community and collection
+ - Feature #466 - More license icons and facets
+ - Bug #572 - Empty repository home page is disconcerted
+ - Bug #781 - Exception after curating item
+ - Bug #769 - CMDI export incorrect
+ - Bug #763 - Make tomcat error more "nicer"
+ - Task #749 - Check database connection on deployment
+ - Task #752 - Add the database into Configuration
+
+[OK]
+
+ - Feature #456 - Print item button
+ - Bug #695 - Make shib. log configurable
+ - Task #756 - ufal-point mail redirects
+
+*********************************************************************
+
+[JM]
+ - Bug #720 - Add ignoreable errors to send error feature
+ - Bug #717 - IROds not working on production
+ - Bug #697 - Uploading file and selecting licence on newly installed system => exceptioni
+ - Task #638 - Add to Report.
+ - Feature #728 - local handle server to control panel
+ - Bug #646 - Improve Dspace Log(s) display in control panel
+ - Feature #738 - add selenium (automatic) tests to hudson
+ - Task #722 - Metadata documentation
+ - Bug #735 - No message at UFAL HOME - The system will be going down for regular maintenance. Please come back later.
+ - Bug #697 - Uploading file and selecting licence on newly installed system => exception
+ - Task #590 - Update shibboleth sp
+ - Task #742 - OAI-PMH oai_dc does not need? to use dc.identifier but it can be in <identifier
+ - Task #748 - Add info about idp to user registration
+ - Task #724 - Update set of known file types in default installation
+ - Task #710 - Testing for xml request mimetype
+ - Task #734 - Test for oai http/https
+
+[AK]
+ - Bug #514 - Link check failed on one item
+ - Feature #687 - Make handle server frontend configurable
+ - Feature #579 - Search without using accented characters
+ - Bug #624 - add license label fail
+ - Task #733 - remove hudson from sudoers
+ - Task #662 - Automated UI Testing
+ - Task #723 - Put utilities inside dspace
+ - Bug #721 - Searching not working
+ - Task #750 - Add info about workspace/workflow items into report
+ - Bug #754 - Automatic submission cause exceptions
+ - Bug #753 - Local admins created by ./dspace create-administrators cannot be seen in epeople
+ - Bug #692 - Comment variables in local.dist and dspace.cfg better
+
+[OK]
+ - Bug #686 - Logout does not redirect to home page?
+ - Bug #703 - Metashare component must require a full set of metadata otherwise CMDI export fails
+ - Bug #598 - Logins failed
+ - Bug #739 - Incorrect links in authors
+ - Feature #502 - File / No file search
+ - Bug #736 - Should not register new eperson if conflicting netid
+ - Bug #747 - polluted logs with idps info?
+ - Feature #755 - Add netid (eppn) to the registration notification emails
+ - Bug #701 - Export to not working http/https
+
+*********************************************************************
+
+[AK]
+- upgraded production, tag: upgrade_2013_08_25
+
+[JM]
+ - Task #720 - Ignoreable exception emails
+ - Task #675 - Automatic emails with exceptions
+
+[AK]
+ - Bug #660 - Cron does not inherit env when in cron.d
+ - Task #641 - What was changed in an item
+ - Bug #640 - The "Export to cmdi" from item view seems to be broken
+ - Task #627 - Update https://ufal-point.mff.cuni.cz/xmlui/page/deposit
+ - Bug #680 - Invalid user in licence table
+ - Task #668 - Incorrect z-index
+ - Task #520 - Change /xmlui to /repository
+ - Bug #693 - No pid defined => exception in control panel
+ - Bug #691 - dspace.cfg does not rely on config.dist assetstore
+
+[OK]
+ - Task #655 - Add attributes list to control panel
+ - Bug #606 - Metashare schema warnings
+ - Bug #612 - Invalid dc.lang
+ - Bug #673 - Add bytes or b after the number in upload dialog
+ - Bug #643 - xmlui.Discovery.AbstractSearch.type_language message not set
+ - Bug #616 - Discojuice config
+ - Bug #683 - Report - item counts
+ - Bug #639 - Suspicious info
+ - Feature #533 - CLARIN SPF: migration from SURFfederatie toSURFconext
+ - Bug #688 - Find out why the repository git clone https://svn.ms.mff.cuni.cz/repository/ufal_dl does not have master-dev in sync
+
+*********************************************************************
+
+[AK]
+- upgraded production, tag: upgrade_2013_08_01
+
+
+[JM]
+ - Task #675 - Automatic emails with exceptions
+
+[AK]
+ - Bug #660 - Cron does not inherit env when in cron.d
+ - Task #641 - What was changed in an item
+ - Bug #640 - The "Export to cmdi" from item view seems to be broken
+ - Task #627 - Update https://ufal-point.mff.cuni.cz/xmlui/page/deposit
+ - Bug #680 - Invalid user in licence table
+ - Task #668 - Incorrect z-index
+ - Task #520 - Change /xmlui to /repository
+ - Bug #693 - No pid defined => exception in control panel
+ - Bug #691 - dspace.cfg does not rely on config.dist assetstore
+
+[OK]
+ - Task #655 - Add attributes list to control panel
+ - Bug #606 - Metashare schema warnings
+ - Bug #612 - Invalid dc.lang
+ - Bug #673 - Add bytes or b after the number in upload dialog
+ - Bug #643 - xmlui.Discovery.AbstractSearch.type_language message not set
+ - Bug #616 - Discojuice config
+ - Bug #683 - Report - item counts
+ - Bug #639 - Suspicious info
+ - Feature #533 - CLARIN SPF: migration from SURFfederatie toSURFconext
+ - Bug #688 - Find out why the repository git clone https://svn.ms.mff.cuni.cz/repository/ufal_dl does not have master-dev in sync
+
+*********************************************************************
+
+[AK]
+- upgraded production, tag: upgrade_2013_08_01
+
+[JM]
+ - Task #631 - Make shibboleth tab in control panel
+ - Bug #625 - make control panel links clickable
+ - Bug #601 - Production inspect information - users
+ - Bug #600 - Production inspect information - bitstreams
+
+[AK]
+ - Task #577 - session expire warning formatting
+ - Task #619 - Add backup info to control panel
+ - Task #626 - Mention this during file upload
+ - Task #632 - update backup scripts and add wiki
+ - Task #635 - add cronjobs to control panel
+ - Bug #636 - permission issue on log files
+
+[OK]
+ - Bug #607 - Find out why dc.language.iso is required for tools?
+ - Bug #617 - If dummy pids are existing, creation fails
+ - Task #618 - Add list/update of dummy pids
+ - Task #594 - 1.4T on ufal-point
+ - Bug #515 - OAI does not validate
+
+*********************************************************************
+
+[JM] 2013/07/22
+- upgraded production, tag: upgrade_2013_07_22
+
+[JM]
+ - Task #621 - OAI stylesheet
+ - Bug #593 - Control panel PID server
+ - Task #563 - compile statistics from a reasonable date not 2006
+ - Bug #611 - added OAI-PMH validator into dspace
+ - Bug #585 - Backport DS-494
+ - Task #560 - Create proper sitemap
+
+[AK]
+ - Task #567 - proper error message for resource type selection
+ - Bug #537 - lucene errors
+ - Bug #553 - Add utilities logging to control panel
+ - Bug #552 - Utilities / dspace logging make more admin friendly
+ - Bug #608 - Find out how comes we have no author for a record
+
+[OK]
+ - Task #609 - Add to OAI-PMH to control panel
+ - Bug #535 - Messed up OAI metadata prefixes
+ - Bug #542 - Mets metadata returns null
+
+***********************************************************************
+
+[JM] 2013/07/12
+- upgraded production, tag: upgrade_2013_07_12
+
+[JM] 2013/07/02
+ - Task #568 - adding sitemap generation to cron jobs
+ - Task #551 - adding more programs to control panel,
+               need to update catalina.sh/tomcat{6,7}
+ - Bug #555 - session expired normal warning
+ - Bug #551 - running external programs from control panel
+ - Bug #548 - listing in browse mode was not working properly
+
+[AK]
+ - Bug #564 - Fresh install - receive licence database error problem
+ - Taks #562 - Not detailed desc of database creation on wiki
+ - Bug #547 - Create FAQ section
+ - Bug #540 - Allow for file download using (at least) http protocol
+ - Bug #539 - Remote upload (from ufal-dev)
+ - Bug #531 - changes in footer and remove subject categories
+ - Bug #527 - RES label missing in Browse -> Rights Label
+ - Bug #582 - Master-dev instance reports database problem when executing ./dspace cleanup
+ - Bug #583 - Change cleanup assetstore to display error if it encounters
+
+[OK] 2013/07/08
+ - Bug #559 - Improve batch upload
+     2013/07/11
+ - Bug #515 - OAI does not validate
+ - Bug #549 - OAI-PMH bibtex breaks standard
+ - Bug #542 - Mets metadata returns null
+ - Bug #535 - Messed up OAI metadata prefixes
+ - Bug #588 - File upload from users computer failed
+
+************************************************************************
+
+[Submission workflow]
+ 2013/03/02
+  - (jm) license under -> licensed (#495)
+ 2013/02/28
+  - (jm) added rights.label to browse
+  - (jm) changed OR operator in search to AND
+
+ 2013/03/14
+  - (bj) changed AND operator back to OR in search
+
+	- Bug #506 (closed): remove dc.description.abstract
+	- Bug #517 (resolved): duplicate result in search/browse results
+	- Bug #522 (resolved): Login info not visible on the home page again
+	- Bug #523 (resolved): Update banner
+	- Bug #525 (closed): Exception while looking at user details
+	- Bug #526 (resolved): Glitches in submission
+	- Bug #527 (resolved): RES label missing in Browse -> Rights Label
+	- Feature #487 (closed): Hide collection selection in submission for non-admins
+	- Feature #488 (closed): Merge both licenses page in submission
+	- Feature #489 (closed): formating of descriptions
+	- Feature #508 (closed): Upload step
+	- Task #464 (closed): In reviewer step, it is not possible to change licence
+	- Task #485 (closed): Search + Browse near each other
+	- Task #494 (closed): Update describe step
+	- Task #497 (closed): Submission Workflow and Search Page UI
+	- Task #499 (closed): Backport controlled voc, type based submission
+	- Task #503 (closed): Hide the Initial Question page in Submission
+	- Task #509 (closed): Update licence step
+	- Bug #528: Removing the bitstreams while submission for non admin users
+
+[Advanced features for new repository - +- finished on 28.2.2013]
+ 2013/02/26
+  - type based submissions
+  - controlled vocabularies
+  - enter in textareas
+ 2013/02/25
+  - #473 chosen value in browse not displayed
+ 2013/02/21
+  - #466 More Licenses and Icons
+  - #457 Different icons for different types of files in item view
+  - /browse - page links, sort options
+  - !! login (changes in ufal.js)
+ 2013/02/18
+  - #421
+ 2013/02/13
+  - advanced search changes
+ 2013/02/07
+  - increased Main Cache Size in cocoon/core.properties
+ 2013/02/05
+ - merged with master (moved to production)
+ 2013/02/04
+ - Bug #461 cmdi landing page
+ - Bug #410 logging shibboleth users with no email
+ - Updated item-view
+ 2013/02/01
+ - Task #458: New main page for the repository
+ - Bug #462 (Resolved): Bibtex formatting
+ - Feature #423 (Resolved): Have the option to use discojuice locally
+ - Bug #435 (Resolved): Put default language to an epserson
+ - Task #429 (Resolved): What about adding faq
+ - Task #460 (Resolved): limi # of displayed submissions in UI
+ - Bug #459 (Closed): Empty view
+ - Feature #454 (Closed): Display labels per Item, not per Bundle
+ - Task #449 (Closed): Remove or hide communities and collections
+ - Bug #441 (Closed): Should we make dc.publisher mandatory?
+ - Task #432 (Closed): Raw email addresses in web pages
+ - Feature #455 (Closed): Search filter facets for Language, Resource Type, and maybe more
+ - Bug #434 (Closed): Statistics GA for every item/user
+ - Task #442 (Resolved): Stop displaying activities from specific urls
+ - Task #420 (Closed): Add local tomcat manager with passwords to ufal-point
+ - Task #443 (Closed): Add info about licence database to control panel
+ - Task #448: Download all data at once
+ - Feature #425: Export to bibtex
+ - Feature #453: Generate QR Code for each item

@@ -148,7 +148,7 @@ public class MetadataRegistryMain extends AbstractDSpaceTransformer
             else
             {
                 // The DC schema can not be removed.
-                row.addCell();
+            	row.addCell().addHighlight("fa fa-ban text-error").addContent(" ");
             }
 
             row.addCell().addContent(schemaID);

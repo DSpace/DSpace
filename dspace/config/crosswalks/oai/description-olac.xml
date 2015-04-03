@@ -1,0 +1,16 @@
+<olac-archive type="institutional" currentAsOf="2014-11-20"
+         xmlns="http://www.language-archives.org/OLAC/1.1/olac-archive"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.language-archives.org/OLAC/1.1/olac-archive
+         http://www.language-archives.org/OLAC/1.1/olac-archive.xsd">
+      <archiveURL>http://lindat.cz/</archiveURL>
+      <participant name="Jozef Misutka" 
+         email="${lr.help.mail}" role="repository manager"/>
+      <institution>Institute of Formal and Applied Linguistics</institution>
+      <institutionURL>http://ufal.mff.cuni.cz</institutionURL>
+      <shortLocation>Prague, Czech Republic</shortLocation>
+      <location>Malostranské náměstí 25,118 00 Prague, Czech Republic</location>
+      <synopsis>http://lindat.cz</synopsis>
+      <access>https://lindat.mff.cuni.cz/repository/xmlui/page/about</access>
+      <archivalSubmissionPolicy>https://lindat.mff.cuni.cz/repository/xmlui/page/about</archivalSubmissionPolicy>
+</olac-archive>

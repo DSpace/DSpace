@@ -1,0 +1,7 @@
+# monitoring from ufal-point-dev
+ufal-point-dev.ms.mff.cuni.cz
+195.113.20.155
+# monitoring from GWDG
+134.76.10.179
+134.76.10.175
+134.76.4.132

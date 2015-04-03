@@ -46,9 +46,12 @@ import java.util.List;
 /**
  * Filter which displays facets on which a user can filter his discovery search
  *
- * @author Kevin Van de Velde (kevin at atmire dot com)
- * @author Mark Diggory (markd at atmire dot com)
- * @author Ben Bosman (ben at atmire dot com)
+ * based on class by:
+ * Kevin Van de Velde (kevin at atmire dot com)
+ * Mark Diggory (markd at atmire dot com)
+ * Ben Bosman (ben at atmire dot com)
+ *
+ * modified for LINDAT/CLARIN
  */
 public class SearchFacetFilter extends AbstractDSpaceTransformer implements CacheableProcessingComponent {
 
@@ -292,7 +295,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
                 String facetField = facetFields.keySet().toArray(new String[facetFields.size()])[0];
                 java.util.List<DiscoverResult.FacetResult> values = facetFields.get(facetField);
 
-                Division results = body.addDivision("browse-by-" + facetField + "-results", "primary");
+                Division results = div.addDivision("browse-by-" + facetField + "-results", "primary");
 
                 results.setHead(message("xmlui.Discovery.AbstractSearch.type_" + browseParams.getFacetField()));
                 if (values != null && 0 < values.size()) {
@@ -375,8 +378,11 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 
         //We cannot create a filter for dates
         if(!browseParams.getFacetField().endsWith(".year")){
+        	
+        	org.dspace.app.xmlui.wing.element.List jumpForm = jump.addList("jump-date", org.dspace.app.xmlui.wing.element.List.TYPE_FORM);
+        	
             // Create a clickable list of the alphabet
-            org.dspace.app.xmlui.wing.element.List jumpList = jump.addList("jump-list", org.dspace.app.xmlui.wing.element.List.TYPE_SIMPLE, "alphabet");
+            org.dspace.app.xmlui.wing.element.List jumpList = jumpForm.addList("jump-list", org.dspace.app.xmlui.wing.element.List.TYPE_SIMPLE, "alphabet");
 
             //Create our basic url
             String basicUrl = generateURL("search-filter", params);
@@ -393,11 +399,11 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
             }
 
             // Create a free text field for the initial characters
-            Para jumpForm = jump.addPara();
-            jumpForm.addContent(T_starts_with);
-            jumpForm.addText("starts_with").setHelp(T_starts_with_help);
+            Text startswith = jumpForm.addItem().addText(browseParams.STARTS_WITH);
+            startswith.setLabel(T_starts_with);
+            startswith.setHelp(T_starts_with_help);
 
-            jumpForm.addButton("submit").setValue(T_go);
+            jumpForm.addItem().addButton("submit").setValue(T_go);
         }
     }
 

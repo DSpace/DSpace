@@ -45,7 +45,15 @@ public class DiscoveryUIUtils {
         for (int i = 0; i < filterTypes.size(); i++) {
             String filterType = filterTypes.get(i);
             String filterValue = filterValues.get(i);
-            String filterOperator = filterOperators.get(i);
+            String filterOperator;
+            if(i < filterOperators.size()){
+                    filterOperator = filterOperators.get(i);
+            } else{
+                    filterOperator = null;
+            }
+            if(StringUtils.isBlank(filterOperator)){
+                filterOperator = "contains";
+            }
 
             fqs.put("filtertype_" + i, new String[]{filterType});
             fqs.put("filter_relational_operator_" + i, new String[]{filterOperator});
@@ -67,8 +75,17 @@ public class DiscoveryUIUtils {
 
             for (int i = 0; i < filterTypes.size(); i++) {
                 String filterType = filterTypes.get(i);
-                String filterOperator = filterOperators.get(i);
+                String filterOperator;
+                if(i < filterOperators.size()){
+                	filterOperator = filterOperators.get(i);
+                } else{
+                	filterOperator = null;
+                }
                 String filterValue = filterValues.get(i);
+                
+                if(StringUtils.isBlank(filterOperator)){
+                    filterOperator = "contains";
+                }
 
                 if(StringUtils.isNotBlank(filterValue)){
                     allFilterQueries.add(searchService.toFilterQuery(context, (filterType.equals("*") ? "" : filterType), filterOperator, filterValue).getFilterQuery());

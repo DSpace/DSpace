@@ -1,0 +1,33 @@
+# E-mail to admin about a download request
+#
+# Parameters: {0} is expanded to filename
+#             {1} to a download URL 
+#             {2} to license url
+#			  {3} user name
+#			  {4} user email
+#			  {5} extra metadata provided
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: ${lr.dspace.name.short}: New File Download Request
+
+User Details:
+	Name: {3}
+	Email: {4}
+	
+Link of the requested file:
+	{1}
+  
+The file is distributed under specific license:
+	{2}
+
+Extra MetaData Provided by user:
+	{5}
+
+${lr.dspace.name.short} Team
+
+_____________________________________
+${dspace.name},
+WWW: ${dspace.url}
+Email: ${lr.help.mail}
+Tel.: ${lr.help.phone}

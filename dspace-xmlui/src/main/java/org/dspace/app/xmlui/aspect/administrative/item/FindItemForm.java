@@ -7,8 +7,14 @@
  */
 package org.dspace.app.xmlui.aspect.administrative.item;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.cocoon.environment.ObjectModelHelper;
+import org.apache.cocoon.environment.Request;
+import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -22,7 +28,8 @@ import org.xml.sax.SAXException;
 /**
  * Query the user for an item's identifier.
  * 
- * @author Jay Paz
+ * based on class by Jay Paz
+ * modified for LINDAT/CLARIN
  */
 
 public class FindItemForm extends AbstractDSpaceTransformer {
@@ -49,6 +56,21 @@ public class FindItemForm extends AbstractDSpaceTransformer {
 	{
 		// Get our parameters and state;
 		String identifier = parameters.getParameter("identifier",null);
+		
+		
+		Request request = ObjectModelHelper.getRequest(objectModel);
+		if(request.getParameter("cp")!=null) {	// if the request is coming from control panel find the item and don't show the form
+			identifier = request.getParameter("identifier");
+			if(identifier!=null && !identifier.equals("")) {
+				HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+				try {
+					httpResponse.sendRedirect(contextPath + "/admin/item?identifier=" + identifier + "&submit_find=Find&administrative-continue=" + knot.getId());
+					return;
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 		
 		String errorString = parameters.getParameter("errors",null);
 		ArrayList<String> errors = new ArrayList<String>();

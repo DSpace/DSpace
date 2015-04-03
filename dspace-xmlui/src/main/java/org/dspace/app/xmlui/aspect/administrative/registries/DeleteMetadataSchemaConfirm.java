@@ -80,7 +80,7 @@ public class DeleteMetadataSchemaConfirm extends AbstractDSpaceTransformer
 		}
  
 		// DIVISION: metadata-schema-confirm-delete
-    	Division deleted = body.addInteractiveDivision("metadata-schema-confirm-delete",contextPath+"/admin/metadata-registry",Division.METHOD_POST,"primary administrative metadata-registry");
+    	Division deleted = body.addInteractiveDivision("metadata-schema-confirm-delete",contextPath+"/admin/metadata-registry",Division.METHOD_POST,"alert alert-danger");
     	deleted.setHead(T_head);
     	deleted.addPara(T_para1);
     	Para warning = deleted.addPara();

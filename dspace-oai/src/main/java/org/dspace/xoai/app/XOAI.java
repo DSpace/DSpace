@@ -62,7 +62,8 @@ import static org.dspace.content.Item.find;
 import static org.dspace.xoai.util.ItemUtils.retrieveMetadata;
 
 /**
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * based on class by Lyncode Development Team <dspace@lyncode.com>
+ * modified for LINDAT/CLARIN
  */
 @SuppressWarnings("deprecation")
 public class XOAI {
@@ -168,7 +169,7 @@ public class XOAI {
                 .println("Incremental import. Searching for documents modified after: "
                         + last.toString());
 
-        String sqlQuery = "SELECT item_id FROM item WHERE in_archive=TRUE AND discoverable=TRUE AND last_modified > ?";
+        String sqlQuery = "SELECT item_id FROM item WHERE (in_archive=TRUE OR withdrawn=TRUE) AND discoverable=TRUE AND last_modified > ?";
         if(DatabaseManager.isOracle()){
                 sqlQuery = "SELECT item_id FROM item WHERE in_archive=1 AND discoverable=1 AND last_modified > ?";
         }
@@ -188,7 +189,7 @@ public class XOAI {
         System.out.println("Full import");
         try {
 
-            String sqlQuery = "SELECT item_id FROM item WHERE in_archive=TRUE AND discoverable=TRUE";
+            String sqlQuery = "SELECT item_id FROM item WHERE (in_archive=TRUE OR withdrawn=TRUE) AND discoverable=TRUE";
             if(DatabaseManager.isOracle()){
                 sqlQuery = "SELECT item_id FROM item WHERE in_archive=1 AND discoverable=1";
             }
@@ -248,10 +249,10 @@ public class XOAI {
         doc.addField("item.deleted", item.isWithdrawn() ? "true" : "false");
         for (Collection col : item.getCollections())
             doc.addField("item.collections",
-                    "col_" + col.getHandle().replace("/", "_"));
+                    "hdl_" + col.getHandle().replace("/", "_"));
         for (Community com : collectionsService.flatParentCommunities(item))
             doc.addField("item.communities",
-                    "com_" + com.getHandle().replace("/", "_"));
+                    "hdl_" + com.getHandle().replace("/", "_"));
 
         Metadatum[] allData = item.getMetadata(Item.ANY, Item.ANY, Item.ANY,
                 Item.ANY);
@@ -499,5 +500,32 @@ public class XOAI {
             System.out.println("     -v Verbose output");
             System.out.println("     -h Shows this text");
         }
+    }
+    
+    public void indexItems(java.util.Collection<Item> items) throws Exception{
+    	 try {
+             SolrServer server = solrServerResolver.getServer();
+             for(Item item : items){
+                 try {
+                     server.add(this.index(item));
+                     context.clearCache();
+                 } catch (SQLException ex) {
+                     log.error(ex.getMessage(), ex);
+                 } catch (MetadataBindException e) {
+                     log.error(e.getMessage(), e);
+                 } catch (ParseException e) {
+                     log.error(e.getMessage(), e);
+                 } catch (XMLStreamException e) {
+                     log.error(e.getMessage(), e);
+                 } catch (WritingXmlException e) {
+                     log.error(e.getMessage(), e);
+                 }
+             }
+             server.commit();
+         } catch (SolrServerException ex) {
+             throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
+         } catch (IOException ex) {
+             throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
+         }    	
     }
 }

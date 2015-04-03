@@ -7,7 +7,7 @@
 # {4}  Task result
 # {5}  Workflow action taken
 #
-Subject: DSpace: Curation Task Report
+Subject: ${lr.dspace.name.short}: Curation Task Report
 
 Title:         {0}
 Collection:    {1}
@@ -20,4 +20,11 @@ with the following result:
 
 Action taken on the submission: {5}
 
-DSpace
+
+${lr.dspace.name.short} Team
+
+_____________________________________
+${dspace.name},
+WWW: ${dspace.url}
+Email: ${lr.help.mail}
+Tel.: ${lr.help.phone}

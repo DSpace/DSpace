@@ -29,3 +29,11 @@ META-INF/
 
 ##Mac noise
 .DS_Store
+
+#vim
+*~
+
+#.bak files
+*.bak
+
+.*.sw[pon]

@@ -10,7 +10,7 @@
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: DSpace: Internal Server Error
+Subject: ${lr.dspace.name.short}: Internal Server Error
 An internal server error occurred on {0}:
 
 Date:       {1}
@@ -22,3 +22,12 @@ IP address: {6}
 
 Exception:
 {4}
+
+
+${lr.dspace.name.short} Team
+
+_____________________________________
+${dspace.name},
+WWW: ${dspace.url}
+Email: ${lr.help.mail}
+Tel.: ${lr.help.phone}

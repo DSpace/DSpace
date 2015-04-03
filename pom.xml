@@ -124,12 +124,12 @@
              </plugin>
              <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.4.1</version>
+                <version>2.5.3</version>
              </plugin>
              <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.8</version>
+                <version>2.10</version>
              </plugin>
              <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -506,6 +506,7 @@
             </activation>
             <modules>
                 <module>dspace-api</module>
+		<module>utilities</module>
             </modules>
         </profile>
 
@@ -553,6 +554,33 @@
                 <module>dspace-jspui</module>
             </modules>
         </profile>
+
+        <!--
+           Builds UFAL Utilities
+        -->
+        <profile>
+            <id>utilities</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>utilities</module>
+            </modules>
+        </profile>
+
+        <!--
+           Builds lr-b2safe-dspace
+        -->
+	<profile>
+	  <id>lr-b2safe-dspace</id>
+	  <activation>
+	    <activeByDefault>true</activeByDefault>
+	  </activation>
+	  <modules>
+	    <module>lr-b2safe-dspace</module>
+	  </modules>
+	</profile>
+	
 
         <!--
              Builds RDF API and Data Provider WAR for DSpace
@@ -655,6 +683,7 @@
                 </file>
             </activation>
             <modules>
+		<module>lr-b2safe-dspace</module>
                 <module>dspace-xmlui</module>
             </modules>
         </profile>
@@ -700,6 +729,7 @@
              <module>dspace-swordv2</module>
              <module>dspace-xmlui-mirage2</module>
              <module>dspace-xmlui</module>
+	     <module>lr-b2safe-dspace</module>
          </modules>
       </profile>
 
@@ -714,6 +744,12 @@
    -->
    <dependencyManagement>
       <dependencies>
+         <dependency>
+            <groupId>cz.cuni.mff.ufal.lindat</groupId>
+            <artifactId>utilities</artifactId>
+            <version>5.2-SNAPSHOT</version>
+         </dependency>
+
          <!-- DSpace core and endorsed Addons -->
          <dependency>
             <groupId>org.dspace</groupId>
@@ -796,6 +832,11 @@
             <version>5.2-SNAPSHOT</version>
             <type>war</type>
          </dependency>
+	 <dependency>
+	  	<groupId>cz.cuni.mff.ufal.dspace</groupId>
+	  	<artifactId>b2safe-dspace</artifactId>
+		<version>${project.version}</version>
+	 </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui</artifactId>
@@ -1019,6 +1060,11 @@
               <artifactId>commons-validator</artifactId>
               <version>1.4.0</version>
           </dependency>
+		  <dependency>
+	          <groupId>org.apache.commons</groupId>
+	          <artifactId>commons-compress</artifactId>
+	          <version>1.6</version>
+	      </dependency>
          <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>

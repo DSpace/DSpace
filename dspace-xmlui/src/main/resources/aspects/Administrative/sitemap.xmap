@@ -49,6 +49,16 @@ to administer DSpace.
 			<map:transformer name="EditBitstreamForm" src="org.dspace.app.xmlui.aspect.administrative.item.EditBitstreamForm"/>
 			<map:transformer name="DeleteBitstreamsConfirm" src="org.dspace.app.xmlui.aspect.administrative.item.DeleteBitstreamsConfirm"/>
 			<map:transformer name="MoveItemForm" src="org.dspace.app.xmlui.aspect.administrative.item.MoveItemForm"/>
+			
+			<map:transformer name="EditItemLicenseForm" src="cz.cuni.mff.ufal.administrative.EditItemLicenseForm"/>
+			<map:transformer name="LicenseForm" src="cz.cuni.mff.ufal.administrative.LicenseForm"/>
+			<map:transformer name="EditItemEmbargoForm" src="cz.cuni.mff.ufal.administrative.UpdateEmbargoForm"/>
+    
+            <map:transformer name="ManageHandlesMain" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.handle.ManageHandlesMain"/>
+            <map:transformer name="EditHandleForm" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.handle.EditHandleForm"/>
+            <map:transformer name="DeleteHandleConfirm" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.handle.DeleteHandleConfirm"/>
+            <map:transformer name="ChangeHandlePrefixForm" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.handle.ChangeHandlePrefixForm"/>
+        
                         <map:transformer name="CurateItemForm" src="org.dspace.app.xmlui.aspect.administrative.item.CurateItemForm"/>
 			
 			<map:transformer name="MapperMain" src="org.dspace.app.xmlui.aspect.administrative.mapper.MapperMain"/>
@@ -90,7 +100,7 @@ to administer DSpace.
 			<map:transformer name="NotAuthorized" src="org.dspace.app.xmlui.aspect.administrative.NotAuthorized"/>			
 			<map:transformer name="Navigation" src="org.dspace.app.xmlui.aspect.administrative.Navigation"/>
 			<map:transformer name="SystemwideAlerts" src="org.dspace.app.xmlui.aspect.administrative.SystemwideAlerts"/>
-			<map:transformer name="ControlPanel" src="org.dspace.app.xmlui.aspect.administrative.ControlPanel" />
+			<map:transformer name="ControlPanel" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.ControlPanel" />
                         <map:transformer name="WithdrawnItems" src="org.dspace.app.xmlui.aspect.administrative.WithdrawnItems" />
                         <map:transformer name="ItemExport" src="org.dspace.app.xmlui.aspect.administrative.ItemExport"/>
                         <map:transformer name="CurateForm" src="org.dspace.app.xmlui.aspect.administrative.CurateForm"/>
@@ -290,6 +300,40 @@ to administer DSpace.
                                             </map:match>
                                             <map:call function="startCurate"/>
 					</map:match>
+
+
+                    <!--
+                        This is the general entry / resume point for the 
+                        site-wide licenses tasks.
+                    -->
+					<map:match pattern="admin/licenses">
+						<map:match type="request" pattern="administrative-continue">
+							<map:call continuation="{1}"/>
+						</map:match>
+						<map:call function="startLicenses"/>
+					</map:match>
+
+                    <!--
+                        This is the general entry / resume point for the 
+                        site-wide statistics.
+                    -->
+					<map:match pattern="statistics">
+						<map:match type="request" pattern="administrative-continue">
+							<map:call continuation="{1}"/>
+						</map:match>
+					</map:match>
+
+					<!--
+						This is the general entry / resume point for the 
+						management of all handles.
+						-->
+					<map:match pattern="admin/handles">
+						<map:match type="request" pattern="administrative-continue">
+							<map:call continuation="{1}"/>
+						</map:match>
+						<map:call function="startManageHandles"/>
+					</map:match>
+	
 				</map:when>
 			</map:select>
 						
@@ -551,6 +595,12 @@ to administer DSpace.
 		        			</map:transform>
 		        		</map:match>
 		        		
+		        		<map:match pattern="admin/item/embargo">
+		        			<map:transform type="EditItemEmbargoForm">
+		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
 		        		<map:match pattern="admin/item/metadata">
 		        			<map:transform type="EditItemMetadataForm">
 		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
@@ -573,6 +623,22 @@ to administer DSpace.
                             </map:transform>
                         </map:match>
 		        		
+                        <!-- Edit Item License (UFAL) -->
+                        <map:match pattern="admin/item/edit_license">
+		        			<map:transform type="EditItemLicenseForm">
+		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+		        				<map:parameter name="define" value="false"/>
+		        			</map:transform>
+		        		</map:match>
+
+						<!-- Define License Form (UFAL) -->
+						<map:match pattern="admin/item/edit_license_define">
+		        			<map:transform type="EditItemLicenseForm">
+		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+		        				<map:parameter name="define" value="true"/>
+		        			</map:transform>
+		        		</map:match>
+								        				        		
 		        		<!--
 		        			Upload a new bitstream
 		        			-->
@@ -938,6 +1004,77 @@ to administer DSpace.
                             </map:transform>
 		        		</map:match>
 
+                        <!-- Site-Wide Licenses page -->
+		        		<map:match pattern="admin/licenses/main">
+                            <map:transform type="LicenseForm">
+								<map:parameter name="option" value="license_list"/>
+								<map:parameter name="licenseIDs" value="{flow-attribute:licenseIDs}"/>
+								<map:parameter name="delete" value="{flow-attribute:delete}"/>
+                            </map:transform>
+		        		</map:match>
+		        		<map:match pattern="admin/licenses/define">
+                            <map:transform type="LicenseForm">
+								<map:parameter name="option" value="license_define"/>
+                            </map:transform>
+		        		</map:match>
+		        		<map:match pattern="admin/licenses/label">
+                            <map:transform type="LicenseForm">
+								<map:parameter name="option" value="label_define"/>
+                            </map:transform>
+		        		</map:match>
+
+
+		        	<!-- Handle management pages -->
+		        	
+		        		<!--
+		        			The main handle management page allows handles to be browsed, 
+		        			and selected to be edited or deleted and enables to change prefix
+		        			of handles.
+		        			-->
+		        		<map:match pattern="admin/handle/main">
+		        			<map:transform type="ManageHandlesMain" />		        						        			
+		        		</map:match>		        		
+		        		
+		        		<!--
+		        			The add handle page allows the user to enter metadata about 
+		        			a yet-to-be-created handle. Once completed then a handle is
+		        			created.
+		        			-->
+		        		<map:match pattern="admin/handle/add">
+		        			<map:transform type="EditHandleForm">
+		        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<!--
+		        			The edit handle page allows for an handle metadata be be edited.
+		        			-->
+		        		<map:match pattern="admin/handle/edit">
+		        			<map:transform type="EditHandleForm">
+		        				<map:parameter name="handle_id" value="{flow-attribute:handle_id}"/>
+		        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<!--
+		        			The delete handle page displays confirmation dialog
+		        			-->
+                        <map:match pattern="admin/handle/delete">
+		        			<map:transform type="DeleteHandleConfirm">
+		        				<map:parameter name="handle_id" value="{flow-attribute:handle_id}"/>
+		        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
+		        			</map:transform>
+                        </map:match>
+
+		        		<!--
+		        		    The change prefix page allows to change prefix of handles
+		        			-->
+                        <map:match pattern="admin/handle/change-prefix">
+		        			<map:transform type="ChangeHandlePrefixForm">
+                                <map:parameter name="errors" value="{flow-attribute:errors}"/>
+		        			</map:transform>
+		        		</map:match>
+			        		
 		        	</map:match> <!-- if flow -->
             	</map:when>
 		    	<map:otherwise>
@@ -980,6 +1117,18 @@ to administer DSpace.
                                 <map:match pattern="admin/curate">
                                     <map:act type="StartAuthentication"/>
 		    		</map:match>
+		    		
+					<map:match pattern="admin/licenses">
+						<map:act type="StartAuthentication"/>
+                    </map:match>
+
+                    <map:match pattern="admin/handles">
+						<map:act type="StartAuthentication"/>
+		    		</map:match>
+	
+					<map:match pattern="statistics">
+						<map:act type="StartAuthentication"/>
+                    </map:match>
 		    		
                 </map:otherwise>
             </map:select>

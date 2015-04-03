@@ -78,7 +78,7 @@ public class DeletePoliciesConfirm extends AbstractDSpaceTransformer
 		}
  
 		// DIVISION: policies-confirm-delete
-    	Division deleted = body.addInteractiveDivision("policies-confirm-delete",contextPath+"/admin/authorize",Division.METHOD_POST,"primary administrative authorization");
+    	Division deleted = body.addInteractiveDivision("policies-confirm-delete",contextPath+"/admin/authorize",Division.METHOD_POST,"alert alert-danger");
     	deleted.setHead(T_confirm_head);
     	deleted.addPara(T_confirm_para);
     	

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseResourceMapping" table="license_resource_mapping" schema="public">
+        <id name="mappingId" type="int">
+            <column name="mapping_id" />
+            <generator class="identity" />
+        </id>
+        <many-to-one name="licenseDefinition" class="cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseDefinition" fetch="join" lazy="false">
+            <column name="license_id" not-null="true" />
+        </many-to-one>
+        <property name="bitstreamId" type="int">
+            <column name="bitstream_id" not-null="true" />
+        </property>
+        <property name="active" type="boolean">
+            <column name="active" not-null="true" default="true" />
+        </property>
+        
+        <set name="licenseResourceUserAllowances" table="license_resource_user_allowance" inverse="true" lazy="true" fetch="select" cascade="all-delete-orphan">
+            <key>
+                <column name="mapping_id" not-null="true" />
+            </key>
+            <one-to-many class="cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseResourceUserAllowance" />
+        </set>
+    </class>
+</hibernate-mapping>

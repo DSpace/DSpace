@@ -1,0 +1,84 @@
+@charset 'UTF-8';
+
+.file_upload, .file_upload_small {
+  position: relative;
+  display: inline-block !important;
+  overflow: hidden;
+  direction: ltr;
+  cursor: pointer;
+  text-align: center;
+  color: #333;
+  font-weight: bold;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+  width: 180px;
+  background: #cfdfea;
+  border: 1px solid #ddd;
+}
+
+.file_upload_large {
+  height: 50px;
+  font-size: 130%;
+  vertical-align: middle;
+}
+
+.file_upload_highlight {
+  background: #5a9ed6;
+}
+
+.file_upload input {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  border: 300px solid transparent;
+  opacity: 0;
+  -ms-filter: 'alpha(opacity=0)';
+  filter: alpha(opacity=0);
+  -o-transform: translate(-300px, -300px) scale(10);
+  -moz-transform: translate(-800px, 0) scale(10);
+  cursor: pointer;
+  height: 100%;
+}
+
+:root .file_upload input {
+  height: auto;
+}
+
+.file_upload iframe, .file_upload button {
+  display: none;
+}
+
+td.file_upload_preview {
+  width: 60px;
+}
+
+.file_upload_preview img {
+  width: 40px;
+}
+
+.file_upload_progress .ui-progressbar-value {
+  background: url(../../images/pbar-ani.gif);
+}
+
+.file_upload_progress div {
+  width: 50px;
+  height: 10px;
+}
+
+.file_upload_cancel button {
+  cursor: pointer;
+}
+
+td.file_upload_name {
+    width: 100px;
+}
+
+#files {
+    width: 200px;
+}
+
+.alert .ui-dialog-titlebar-close {
+  display: none;
+}

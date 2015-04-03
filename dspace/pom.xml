@@ -157,6 +157,18 @@
     </profiles>
 
     <dependencies>
+      <dependency>
+            <groupId>cz.cuni.mff.ufal.lindat</groupId>
+            <artifactId>utilities</artifactId>
+      </dependency>
+
+      <!-- again, this ensures bin/dspace commands are working
+           there's an event consumer burried in the artifact -->
+      <dependency>
+                <groupId>cz.cuni.mff.ufal.dspace</groupId>
+                <artifactId>b2safe-dspace</artifactId>
+      </dependency>
+            
     	<!-- This dependency ensures DSpace OAI JAR is added to [dspace]/lib/,
              so that the 'dspace oai' launcher.xml command works.  -->
     	<dependency>

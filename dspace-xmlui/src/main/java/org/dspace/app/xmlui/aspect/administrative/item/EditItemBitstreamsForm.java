@@ -36,8 +36,8 @@ import org.dspace.core.Constants;
  * Show a list of the item's bitstreams allowing the user to delete them, 
  * edit them, or upload new bitstreams.
  * 
- * @author Jay Paz
- * @author Scott Phillips
+ * based on class by Jay Paz and Scott Phillips
+ * modified for LINDAT/CLARIN
  */
 
 public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
@@ -47,11 +47,6 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
 	private static final Message T_submit_return = message("xmlui.general.return");
 	private static final Message T_item_trail = message("xmlui.administrative.item.general.item_trail");
 	private static final Message T_option_head = message("xmlui.administrative.item.general.option_head");
-	private static final Message T_option_status = message("xmlui.administrative.item.general.option_status");
-	private static final Message T_option_bitstreams = message("xmlui.administrative.item.general.option_bitstreams");
-	private static final Message T_option_metadata = message("xmlui.administrative.item.general.option_metadata");
-	private static final Message T_option_view = message("xmlui.administrative.item.general.option_view");
-        private static final Message T_option_curate = message("xmlui.administrative.item.general.option_curate");
 
 	private static final Message T_title = message("xmlui.administrative.item.EditItemBitstreamsForm.title");
 	private static final Message T_trail = message("xmlui.administrative.item.EditItemBitstreamsForm.trail");
@@ -98,30 +93,31 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
 		main.setHead(T_option_head);
 
 		
-		
+		String tabLink = baseURL + "&submit_bitstreams";
 		// LIST: options
 		List options = main.addList("options",List.TYPE_SIMPLE,"horizontal");
-		options.addItem().addXref(baseURL+"&submit_status",T_option_status);
-		options.addItem().addHighlight("bold").addXref(baseURL+"&submit_bitstreams",T_option_bitstreams);
-		options.addItem().addXref(baseURL+"&submit_metadata",T_option_metadata);
-		options.addItem().addXref(baseURL + "&view_item", T_option_view);
-                options.addItem().addXref(baseURL + "&submit_curate", T_option_curate);
+		ViewItem.add_options(options, baseURL, ViewItem.T_option_bitstreams, tabLink);
 
 		
 		
 		// TABLE: Bitstream summary
-		Table files = main.addTable("editItemBitstreams", 1, 1);
+		
+		Division div = main.addDivision("bitstream-form", "well well-light");
+		
+		Table files = div.addTable("editItemBitstreams", 1, 6);
 
 		files.setHead(T_head1);
 
 		Row header = files.addRow(Row.ROLE_HEADER);
 		header.addCellContent(T_column1);
-		header.addCellContent(T_column2);
+		Cell hcell = header.addCell();
+		hcell.addContent(T_column2);
+		hcell.addContent( "/assetstore id");
 		header.addCellContent(T_column3);
 		header.addCellContent(T_column4);
 		header.addCellContent(T_column5);
 		header.addCellContent(T_column6);
-		header.addCellContent(T_column7);
+		//header.addCellContent(T_column7);
 
 		Bundle[] bundles = item.getBundles();
 
@@ -129,7 +125,7 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
 		for (Bundle bundle : bundles)
 		{
 
-			Cell bundleCell = files.addRow("bundle_head_" + bundle.getID(), Row.ROLE_DATA, "").addCell(1, 5);
+			Cell bundleCell = files.addRow("bundle_head_" + bundle.getID(), Row.ROLE_DATA, "").addCell(1, 6);
 			bundleCell.addContent(T_bundle_label.parameterize(bundle.getName()));
 
 			Bitstream[] bitstreams = bundle.getBitstreams();
@@ -142,6 +138,8 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
                 Bitstream bitstream = bitstreams[bitstreamIndex];
                 boolean primary = (bundle.getPrimaryBitstreamID() == bitstream.getID());
                 String name = bitstream.getName();
+                String assetstore_name = String.format(
+                		"\n%s\n", bitstream.get_internal_id());
 
                 if (name != null && name.length() > 50) {
                     // If the fiel name is too long the shorten it so that it will display nicely.
@@ -176,6 +174,7 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
                     if (primary) {
                         cell.addXref(editURL, T_primary_label);
                     }
+                    cell.addContent(assetstore_name);
 
                     row.addCell().addXref(editURL, description);
                     row.addCell().addXref(editURL, format);
@@ -186,6 +185,7 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
                     if (primary) {
                         cell.addContent(T_primary_label);
                     }
+                    cell.addContent(assetstore_name);
 
                     row.addCell().addContent(description);
                     row.addCell().addContent(format);
@@ -205,13 +205,13 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
                     if((bitstreamIndex == 0)){
                         upButton.setDisabled();
                     }
-                    upButton.setValue(T_order_up);
+                    upButton.setValue("▲");
                     upButton.setHelp(T_order_up);
                     Button downButton = cell.addButton("submit_order_" + bundle.getID() + "_" + bitstream.getID() + "_down", (bitstreamIndex == (bitstreams.length - 1) ? "disabled" : "") + " icon-button arrowDown ");
                     if(bitstreamIndex == (bitstreams.length - 1)){
                         downButton.setDisabled();
                     }
-                    downButton.setValue(T_order_down);
+                    downButton.setValue("▼");
                     downButton.setHelp(T_order_down);
 
                     //These values will only be used IF javascript is disabled or isn't working
@@ -225,19 +225,19 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
 
 		if (AuthorizeManager.authorizeActionBoolean(context, item, Constants.ADD))
 		{
-			Cell cell = files.addRow().addCell(1, 5);
+			Cell cell = files.addRow().addCell(1, 6);
 			cell.addXref(contextPath+"/admin/item?administrative-continue="+knot.getId()+"&submit_add",T_submit_add);
 		}
 		else
 		{
-			Cell cell = files.addRow().addCell(1, 5);
+			Cell cell = files.addRow().addCell(1, 6);
 			cell.addHighlight("fade").addContent(T_no_upload);
 		}
 
 		
 		
 		// PARA: actions
-		Para actions = main.addPara("editItemActionsP","editItemActionsP" );
+		Para actions = div.addPara("editItemActionsP","editItemActionsP" );
         if (showBitstreamUpdateOrderButton) {
             //Add a button to submit the new order (this button is hidden & will be displayed by the javascript)
             //Should javascript be disabled for some reason this button isn't used.
@@ -255,7 +255,7 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
 			button.setValue(T_submit_delete);
 			button.setDisabled();
 			
-			main.addPara().addHighlight("fade").addContent(T_no_remove);
+			div.addPara().addHighlight("fade").addContent(T_no_remove);
 		}
 		actions.addButton("submit_return").setValue(T_submit_return);
 

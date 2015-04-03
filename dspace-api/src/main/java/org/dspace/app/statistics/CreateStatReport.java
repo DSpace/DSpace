@@ -22,6 +22,8 @@ import org.apache.commons.cli.PosixParser;
 import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
 
+import cz.cuni.mff.ufal.DSpaceApi;
+
 /**
  * This class allows the running of the DSpace statistic tools
  * 
@@ -29,7 +31,8 @@ import org.dspace.core.ConfigurationManager;
  * Available: 	<stat-initial> <stat-general> <stat-monthly> <stat-report-initial> 
  * 				<stat-report-general> <stat-report-monthly>
  * 
- * @author Chris Yates
+ * based on class by Chris Yates
+ * modified for LINDAT/CLARIN
  *
  */
 
@@ -52,6 +55,10 @@ public class CreateStatReport {
 	
 	/**User context*/
 	private static Context context;
+	
+	static {
+		DSpaceApi.load_dspace();
+	}
 
     /** the config file from which to configure the analyser */
     private static String configFile = ConfigurationManager.getProperty("dspace.dir") +

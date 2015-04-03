@@ -144,6 +144,7 @@ public class ScriptLauncher
             catch (ClassNotFoundException e)
             {
                 System.err.println("Error in launcher.xml: Invalid class name: " + className);
+                System.err.println(e.toString());
                 return 1;
             }
 

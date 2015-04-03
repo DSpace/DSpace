@@ -30,9 +30,11 @@ import org.apache.cocoon.environment.http.HttpEnvironment;
 /**
  * Display an item restricted message.
  *
- * @author Scott Phillips
- * @author Mark Diggory  mdiggory at atmire dot com
- * @author Fabio Bolognisi fabio at atmire dot com
+ * based on class by:
+ * Scott Phillips
+ * Mark Diggory  mdiggory at atmire dot com
+ * Bolognisi fabio at atmire dot com
+ * modified for LINDAT/CLARIN
  */
 public class RestrictedItem extends AbstractDSpaceTransformer //implements CacheableProcessingComponent
 {
@@ -62,6 +64,14 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
     private static final Message T_head_item =
             message("xmlui.ArtifactBrowser.RestrictedItem.head_item");
     
+    // replaced by
+    private static final Message T_head_item_replaced =
+            message("xmlui.ArtifactBrowser.RestrictedItem.head_item_replaced");
+    private static final Message T_para_item_replacedby =
+            message("xmlui.ArtifactBrowser.RestrictedItem.para_item_replacedby");
+    
+
+    // withdrawn
     private static final Message T_head_item_withdrawn =
             message("xmlui.ArtifactBrowser.RestrictedItem.head_item_withdrawn");
 
@@ -120,92 +130,47 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
         Request request = ObjectModelHelper.getRequest(objectModel);
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
-        Division unauthorized = null;
+        List unauthorized = unauthorized = body.addDivision("unauthorized-resource", "alert alert-error").addList("error-message", List.TYPE_FORM);
         boolean isWithdrawn = false;
         
         if (dso == null) 
         {
-            unauthorized = body.addDivision("unauthorized-resource", "primary");
             unauthorized.setHead(T_head_resource);
-            unauthorized.addPara(T_para_resource);
+            unauthorized.addItem(T_para_resource);
         } 
         else if (dso instanceof Community) 
         {
             Community community = (Community) dso;
-            unauthorized = body.addDivision("unauthorized-resource", "primary");
             unauthorized.setHead(T_head_community);
-            unauthorized.addPara(T_para_community.parameterize(community.getMetadata("name")));
+            unauthorized.addItem(T_para_community.parameterize(community.getMetadata("name")));
         } 
         else if (dso instanceof Collection) 
         {
             Collection collection = (Collection) dso;
-            unauthorized = body.addDivision("unauthorized-resource", "primary");
             unauthorized.setHead(T_head_collection);
-            unauthorized.addPara(T_para_collection.parameterize(collection.getMetadata("name")));
+            unauthorized.addItem(T_para_collection.parameterize(collection.getMetadata("name")));
         } 
         else if (dso instanceof Item) 
         {
             // The dso may be an item but it could still be an item's bitstream. So let's check for the parameter.
             if (request.getParameter("bitstreamId") != null) {
-                String identifier = "unknown";
-                try {
-                    Bitstream bit = Bitstream.find(context, new Integer(request.getParameter("bitstreamId")));
-                    if (bit != null) {
-                        identifier = bit.getName();
-                    }
-                } catch (Exception e) {
-                    // just forget it - and display the restricted message.
-                    log.trace("Caught exception", e);
-                }
-                unauthorized = body.addDivision("unauthorized-resource", "primary");
-                unauthorized.setHead(T_head_bitstream);
-                unauthorized.addPara(T_para_bitstream.parameterize(identifier));
-
+            	handle_bitstream(request, unauthorized);
             } else {
-
-                String identifier = "unknown";
-                String handle = dso.getHandle();
-                if (handle == null || "".equals(handle)) {
-                    identifier = "internal ID: " + dso.getID();
-                } else {
-                    identifier = "hdl:" + handle;
-                }
-
-                // check why the item is restricted.
-                String divID = "restricted";
-                Message title = T_head_item;
-                Message status = T_para_item_restricted;
-                //if item is withdrawn, display withdrawn status info
-                if (((Item) dso).isWithdrawn()) 
-                {
-                    divID = "withdrawn";
-                    title = T_head_item_withdrawn;
-                    status = T_para_item_withdrawn;
-                    isWithdrawn = true;
-                }//if user is not authenticated, display info to authenticate
-                else if (context.getCurrentUser() == null) 
-                {
-                    status = T_para_item_restricted_auth;
-                }
-                unauthorized = body.addDivision(divID, "primary");
-                unauthorized.setHead(title);
-                unauthorized.addPara(T_para_item.parameterize(identifier));
-                unauthorized.addPara("item_status", status.getKey()).addContent(status);
-
+            	handle_item(((Item) dso), unauthorized);
+            	isWithdrawn = ((Item) dso).isWithdrawn(); 
             }
         } // end if Item 
         else 
         {
             // This case should not occur, but if it does just fall back to the resource message.
-            unauthorized = body.addDivision("unauthorized-resource", "primary");
             unauthorized.setHead(T_head_resource);
-            unauthorized.addPara(T_para_resource);
+            unauthorized.addItem(T_para_resource);
         }
 
         // add a login link if !loggedIn & not withdrawn
         if (!isWithdrawn && context.getCurrentUser() == null) 
         {
-            unauthorized.addPara().addXref(contextPath+"/login", T_para_login);
+            unauthorized.addItem().addXref(contextPath+"/login", T_para_login);
 
             // Interrupt request if the user is not authenticated, so they may come back to
             // the restricted resource afterwards.
@@ -217,9 +182,84 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
             AuthenticationUtil.interruptRequest(objectModel, header, message, characters);
         }
         
-        //Finally, set proper response. Return "404 Not Found" for all restricted/withdrawn items
-        HttpServletResponse response = (HttpServletResponse)objectModel
-		.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);   
-        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        unauthorized.addItem(null, "fa fa-warning fa-5x hangright").addContent(" ");
+        
+        //Finally, set proper response. Return "404 Not Found" for all withdrawn items 
+        //and "401 Unauthorized" for all restricted items
+        HttpServletResponse response = (HttpServletResponse)objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);   
+        if (isWithdrawn)
+        {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
+        else {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        }
+    }
+    
+    private void handle_bitstream(Request request, List unauthorized) throws WingException 
+    {
+                String identifier = "unknown";
+                try {
+                    Bitstream bit = Bitstream.find(context, new Integer(request.getParameter("bitstreamId")));
+                    if (bit != null) {
+                        identifier = bit.getName();
+                    }
+                } catch (Exception e) {
+                    // just forget it - and display the restricted message.
+                    log.trace("Caught exception", e);
+                }
+                unauthorized.setHead(T_head_bitstream);
+        		unauthorized.addItem(T_para_bitstream.parameterize(identifier));    	
+    }
+
+
+    private void handle_item(Item item, List unauthorized) throws WingException 
+    {
+                String identifier = "unknown";
+        String handle = item.getHandle();
+                if (handle == null || "".equals(handle)) {
+            		identifier = "internal ID: " + item.getID();
+                } else {
+                    identifier = "hdl:" + handle;
+                }
+
+                // check why the item is restricted.
+                Message title = T_head_item;
+                Message status = T_para_item_restricted;
+                //if item is withdrawn, display withdrawn status info
+        if (item.isWithdrawn()) 
+                {
+            if ( item.isReplacedBy() ) {
+
+            	// this one is replaced by #478
+                unauthorized.setHead(T_head_item_replaced);
+                unauthorized.addItem(T_para_item_replacedby.parameterize(identifier));
+            	
+				List l = unauthorized.addList("replacedby-info", List.TYPE_FORM, "replacedby-info");
+				l.addItem().addFigure(contextPath + "/themes/UFAL/images/replacedby.png", null, "replacedby-logo");
+				org.dspace.app.xmlui.wing.element.Item first = l.addItem();
+				first.addContent("Replaced by:");
+				for ( String r : item.getReplacedBy() ) {
+					l.addItem().addXref(r, r, "replacedby-link");
+            }
+				return;
+            	
+            }else {
+                unauthorized.setHead(T_head_item_withdrawn);            	
+            	unauthorized.addItem(T_para_item_withdrawn.parameterize(identifier));
+                unauthorized.addItem("item_status", T_para_item_withdrawn.getKey()).addContent(status);
+                return;
+        }
+            // 
+
+        }// if user is not authenticated, display info to authenticate
+        else if (context.getCurrentUser() == null) 
+        {
+            status = T_para_item_restricted_auth;
+        }
+        unauthorized.setHead(title);
+        unauthorized.addItem(T_para_item.parameterize(identifier));
+        unauthorized.addItem("item_status", status.getKey()).addContent(status);
+        
     }
 }

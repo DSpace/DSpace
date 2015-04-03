@@ -16,6 +16,7 @@ import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Cell;
 import org.dspace.app.xmlui.wing.element.CheckBox;
 import org.dspace.app.xmlui.wing.element.Division;
+import org.dspace.app.xmlui.wing.element.Highlight;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Row;
@@ -30,8 +31,8 @@ import org.dspace.eperson.EPerson;
  * the checkboxes and clicking delete or click their name to edit the 
  * eperson.
  * 
- * @author Alexey Maslov
- * @author Scott Phillips
+ * based on class by Alexey Maslov and Scott Phillips
+ * modified for LINDAT/CLARIN
  */
 public class ManageEPeopleMain extends AbstractDSpaceTransformer   
 {	
@@ -73,6 +74,9 @@ public class ManageEPeopleMain extends AbstractDSpaceTransformer
     private static final Message T_go =
 		message("xmlui.general.go");
 
+    private static final Message T_head1_none =
+            message("xmlui.ArtifactBrowser.AbstractSearch.head1_none");
+
     private static final Message T_search_head =
 		message("xmlui.administrative.eperson.ManageEPeopleMain.search_head");
 
@@ -97,7 +101,7 @@ public class ManageEPeopleMain extends AbstractDSpaceTransformer
     /**
      * The total number of entries to show on a page
      */
-    private static final int PAGE_SIZE = 15;
+    private static final int PAGE_SIZE = 30;
 
 
     public void addPageMeta(PageMeta pageMeta) throws WingException
@@ -111,12 +115,15 @@ public class ManageEPeopleMain extends AbstractDSpaceTransformer
     public void addBody(Body body) throws WingException, SQLException 
     {
         /* Get and setup our parameters */
-        int page          = parameters.getParameterAsInteger("page",0);
+        int page = parameters.getParameterAsInteger("page", 1);
+        if(page <= 0)
+        	page = 1;
+                
         int highlightID   = parameters.getParameterAsInteger("highlightID",-1);
         String query      = decodeFromURL(parameters.getParameter("query",null));
         String baseURL    = contextPath+"/admin/epeople?administrative-continue="+knot.getId();
         int resultCount   = EPerson.searchResultCount(context, query);	
-        EPerson[] epeople = EPerson.search(context, query, page*PAGE_SIZE, PAGE_SIZE);
+        EPerson[] epeople = EPerson.search(context, query, (page-1)*PAGE_SIZE, PAGE_SIZE, "eperson_id");
 
 
         // DIVISION: eperson-main
@@ -151,32 +158,21 @@ public class ManageEPeopleMain extends AbstractDSpaceTransformer
         Division search = main.addDivision("eperson-search");
 		search.setHead(T_search_head);
 
-        // If there are more than 10 results the paginate the division.
-        if (resultCount > PAGE_SIZE) 
-        {
-            // If there are enough results then paginate the results
-            int firstIndex = page*PAGE_SIZE+1; 
-            int lastIndex = page*PAGE_SIZE + epeople.length;
+        int firstIndex = (page-1)*PAGE_SIZE+1; 
+        int lastIndex = (page-1)*PAGE_SIZE + PAGE_SIZE;
+        if(lastIndex > resultCount) lastIndex = resultCount;
+        int totalPages = (int)Math.ceil((double)resultCount / PAGE_SIZE); 
 
-            String nextURL = null, prevURL = null;
-            if (page < (resultCount / PAGE_SIZE))
-            {
-                nextURL = baseURL + "&page=" + (page + 1);
-            }
-        	if (page > 0)
-            {
-                prevURL = baseURL + "&page=" + (page - 1);
-            }
+		search.setHead(T_head1_none.parameterize(firstIndex, lastIndex, resultCount));
+		search.setMaskedPagination(resultCount, firstIndex, lastIndex, page, totalPages, baseURL+"&page={pageNum}");
 
-            search.setSimplePagination(resultCount,firstIndex,lastIndex,prevURL, nextURL);
-        }
-
-        Table table = search.addTable("eperson-search-table", epeople.length + 1, 1);
+        Table table = search.addTable("eperson-search-table", epeople.length + 1, 5);
         Row header = table.addRow(Row.ROLE_HEADER);
         header.addCell().addContent(T_search_column1);
         header.addCell().addContent(T_search_column2);
         header.addCell().addContent(T_search_column3);
         header.addCell().addContent(T_search_column4);
+        header.addCell().addContent("More information");
 
         CheckBox selectEPerson; 
         for (EPerson person : epeople)
@@ -198,17 +194,63 @@ public class ManageEPeopleMain extends AbstractDSpaceTransformer
                 row = table.addRow();
             }
 
+            if (deleteConstraints != null && deleteConstraints.size() > 0)
+            {
+                row.addCell().addHighlight("fa fa-ban text-error").addContent(" ");
+            } else {
             selectEPerson = row.addCell().addCheckBox("select_eperson");
             selectEPerson.setLabel(epersonID);
             selectEPerson.addOption(epersonID);
-            if (deleteConstraints != null && deleteConstraints.size() > 0)
-            {
-                selectEPerson.setDisabled();
             }
 
             row.addCellContent(epersonID);
             row.addCell().addXref(url, fullName);
             row.addCell().addXref(url, email);
+
+            // more details
+        	Cell c = row.addCell();
+        	
+        	Highlight line1 = c.addHighlight("container-fluid");
+        	
+        	if(person.canLogIn()) {
+        		line1.addHighlight("label label-success").addContent("Can login");
+        	} else {
+        		line1.addHighlight("label label-important").addContent("Cannot login");
+        	}
+        	
+        	if(person.getPasswordHash()==null) {
+        		line1.addHighlight("label label-warning").addContent("Password not set");
+        	} else {
+        		line1.addHighlight("label label-success").addContent("Password set");
+        	}
+        	
+        	if(person.getLoggedIn()==null) {
+        		line1.addHighlight("label label-warning").addContent("Not logged in yet");
+        	} else {
+        		line1.addHighlight("label label-info").addContent("Last login: " + person.getLoggedIn());
+        	}
+        	
+        	if ( deleteConstraints != null && deleteConstraints.size() > 0 ) {
+        		Highlight line2 = c.addHighlight("container-fluid");
+        		line2.addHighlight("label label-important").addContent("Cannot Delete");        		
+            	for ( String s : deleteConstraints ) {
+            	    line2.addHighlight("label label-info").addContent(s);
+            	}
+        	}
+        	
+
+    		Highlight line3 = c.addHighlight("container-fluid");
+        	
+        	if(person.canEditSubmissionMetadata()){
+        		line3.addHighlight("label label-info").addContent("Edits metadata");
+        	}
+
+        	if(person.getNetid()==null) {
+        		line3.addHighlight("label label-warning").addContent("netid: " + person.getNetid());
+        	} else {
+        		line3.addHighlight("text-info").addContent("netid: " + person.getNetid());
+        	}
+        	
         }
 
         if (epeople.length <= 0) 

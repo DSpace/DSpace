@@ -8,7 +8,7 @@
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: DSpace: Harvesting Error
+Subject: ${lr.dspace.name.short}: Harvesting Error
 Collection {0} failed on harvest:
 
 Date:       	{1}
@@ -18,3 +18,12 @@ Status Flag: 	{2}
 
 Exception:
 {4}
+
+
+${lr.dspace.name.short} Team
+
+_____________________________________
+${dspace.name},
+WWW: ${dspace.url}
+Email: ${lr.help.mail}
+Tel.: ${lr.help.phone}

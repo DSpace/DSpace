@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>org.irods</groupId>
+  <artifactId>jargon</artifactId>
+  <versioning>
+    <release>4.0.2-UFAL</release>
+    <versions>
+      <version>4.0.2-UFAL</version>
+    </versions>
+    <lastUpdated>20140902015933</lastUpdated>
+  </versioning>
+</metadata>

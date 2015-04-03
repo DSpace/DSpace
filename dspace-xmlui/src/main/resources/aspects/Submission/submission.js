@@ -33,11 +33,16 @@ importClass(Packages.org.dspace.app.util.SubmissionConfigReader);
 importClass(Packages.org.dspace.app.util.SubmissionInfo);
 
 importClass(Packages.org.dspace.submit.AbstractProcessingStep);
+importClass(Packages.org.dspace.submit.step.DescribeStep);
+
+importClass(org.dspace.content.Collection);
 
 /* Global variable which stores a comma-separated list of all fields 
  * which errored out during processing of the last step.
  */
 var ERROR_FIELDS = null;
+
+var REGEX_ERROR = null;
 
 /**
  * Simple access method to access the current cocoon object model.
@@ -157,6 +162,13 @@ function doSubmission()
            handle = cocoon.request.get("handle");
        
        var collectionSelected = false;
+       //ufal
+       //if only one collection don't bother with selection
+//       var collections = Collection.findAll(getDSContext());
+//       if(collections.length == 1){
+//           handle = collections[0].getHandle();
+//           collectionSelected = true;
+//       }
        do {
            if (handle != null)
            {
@@ -433,7 +445,7 @@ function doNextPage(collectionHandle, workspaceID, stepConfig, stepAndPage, resp
  	if(stepHasUI(stepConfig))
  	{
  		//prepend URI with the handle of the collection, and go there!
- 		sendPageAndWait("handle/"+collectionHandle+ "/submit/continue",{"id":workspaceID,"step":String(stepAndPage),"transformer":stepConfig.getXMLUIClassName(),"error":String(response_flag),"error_fields":getErrorFields()});
+ 		sendPageAndWait("handle/"+collectionHandle+ "/submit/continue",{"id":workspaceID,"step":String(stepAndPage),"transformer":stepConfig.getXMLUIClassName(),"error":String(response_flag),"error_fields":getErrorFields(),"regex_error":getRegexError()});
     }
         
     //-------------------------------------
@@ -531,6 +543,9 @@ function processPage(workspaceID, stepConfig, page)
     }//else if there is a UI, but still there were errors!
     else if(response_flag!=AbstractProcessingStep.STATUS_COMPLETE)
 	{
+    	if(stepClass instanceof DescribeStep){
+    		saveRegexError(stepClass.getBrokenValues(getHttpRequest()));
+    	}
 		//save error fields to global ERROR_FIELDS variable,
 		//for step-specific post-processing
 		saveErrorFields(stepClass.getErrorFields(getHttpRequest()));
@@ -539,6 +554,7 @@ function processPage(workspaceID, stepConfig, page)
 	{
 		//clear any previously set error fields
 		saveErrorFields(null);
+		saveRegexError(null);
 	}
 	
     return response_flag;
@@ -587,6 +603,8 @@ function loadFileUploadInfo()
 		}	
 		
     }
+    getHttpRequest().setAttribute("fileLocal", cocoon.request.getParameter("fileLocal"));
+    getHttpRequest().setAttribute("descriptionLocal", cocoon.request.getParameter("descriptionLocal"));
 }
 
 /**
@@ -624,6 +642,35 @@ function saveErrorFields(errorFields)
 	}	
 }
 
+function saveRegexError(errorFields)
+{
+	if(errorFields==null || errorFields.size()==0)
+	{
+		REGEX_ERROR=null;
+	}
+	else
+	{	
+        REGEX_ERROR="";
+		//iterate through the fields
+		var i = errorFields.iterator();
+	
+		//build comma-separated list of error fields
+		while(i.hasNext())
+		{
+			var field = i.next();
+			
+			if(REGEX_ERROR==null || REGEX_ERROR.length==0)
+			{
+				REGEX_ERROR = field;
+			}
+			else
+			{
+				REGEX_ERROR = REGEX_ERROR + "," + field;
+			}	
+		}
+	}	
+}
+
 /**
  * Get the error fields returned by the last step processed.
  * 
@@ -632,6 +679,11 @@ function saveErrorFields(errorFields)
 function getErrorFields()
 {
 	return ERROR_FIELDS;
+}
+
+function getRegexError()
+{
+	return REGEX_ERROR;
 }
 
 

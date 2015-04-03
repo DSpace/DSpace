@@ -74,6 +74,7 @@ import org.xml.sax.SAXException;
  * render all structure types.
  * 
  * @author Scott Phillips
+ * modified for LINDAT/CLARIN
  */
 public class DSpaceMETSGenerator extends AbstractGenerator
 {
@@ -163,7 +164,7 @@ public class DSpaceMETSGenerator extends AbstractGenerator
                         // all non-repository types need integer IDs
                         if ("repository".equals(type))
                         {
-                                if (HandleManager.getPrefix().equals(strid))
+                                if (HandleManager.isSupportedPrefix(strid))
                                 {
                                     adapter = new RepositoryAdapter(context, contextPath);
                                 }

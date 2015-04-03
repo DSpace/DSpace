@@ -35,8 +35,8 @@ import org.dspace.content.Item;
  * There are three possible values, "delete", "withdraw", or
  * "reinstate"
  * 
- * @author Jay Paz
- * @author Scott Phillips
+ * based on class by Jay Paz and Scott Phillips
+ * modified for LINDAT/CLARIN
  */
 public class ConfirmItemForm extends AbstractDSpaceTransformer {
 
@@ -85,7 +85,7 @@ public class ConfirmItemForm extends AbstractDSpaceTransformer {
 
 
 		// DIVISION: Main
-		Division main = body.addInteractiveDivision("confirm-item", contextPath+"/admin/item", Division.METHOD_POST,"primary administrative item");
+		Division main = body.addInteractiveDivision("confirm-item", contextPath+"/admin/item", Division.METHOD_POST,"alert alert-danger");
 		main.setHead(T_head1.parameterize(item.getHandle()));
 
 		// PARA: descriptive instructions

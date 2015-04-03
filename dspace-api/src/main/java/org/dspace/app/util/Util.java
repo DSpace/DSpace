@@ -292,6 +292,14 @@ public class Util {
         return ((request.getParameter(param) != null) && request.getParameter(
                 param).equals("true"));
     }
+    
+    public static boolean getBoolParameter(HttpServletRequest request, String param, boolean def){
+    	if(request.getParameter(param) == null){
+    		return def;
+    	}else{
+    		return getBoolParameter(request, param);
+    	}
+    }
 
     /**
      * Get the button the user pressed on a submitted form. All buttons should

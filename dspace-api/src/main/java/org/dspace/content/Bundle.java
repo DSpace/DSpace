@@ -26,6 +26,10 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
+import cz.cuni.mff.ufal.DSpaceApi;
+import cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseDefinition;
+import cz.cuni.mff.ufal.lindat.utilities.interfaces.IFunctionalities;
+
 /**
  * Class representing bundles of bitstreams stored in the DSpace system
  * <P>
@@ -34,7 +38,8 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * the <code>update</code> method doesn't do much yet. Creating, adding or
  * removing bitstreams has instant effect in the database.
  * 
- * @author Robert Tansley
+ * based on class by Robert Tansley
+ * modified for LINDAT/CLARIN
  * @version $Revision$
  */
 public class Bundle extends DSpaceObject
@@ -465,6 +470,56 @@ public class Bundle extends DSpaceObject
         mappingRow.setColumn("bitstream_id", b.getID());
         mappingRow.setColumn("bitstream_order", bitstreamOrder);
         DatabaseManager.insert(ourContext, mappingRow);
+        
+        try {
+        	if(b.getBundles()[0].getName().equals("ORIGINAL")) {
+	        	Item item = (Item)b.getParentObject();
+	            Metadatum[] dc_rights = item.getMetadata("dc", "rights", null, Item.ANY);
+	            Metadatum[] dc_rights_uri = item.getMetadata("dc", "rights", "uri", Item.ANY);
+	            
+	            //String licenseName = null;
+	            String licenseURI = null;
+	            
+	            if(dc_rights!=null && dc_rights.length!=0) {
+	            	//licenseName = dc_rights[0].value;
+	            	if ( dc_rights_uri.length != dc_rights.length ) {
+	            		log.warn( String.format("Harvested bitstream [%s / %s] has different length of dc_rights and dc_rights_uri",
+	            				b.getName(), b.getHandle()));
+	            		licenseURI = "unknown";
+	            	}else {
+	            		licenseURI = dc_rights_uri[0].value;
+	            	}
+	            } 
+	                    
+	            IFunctionalities functionalityManager = DSpaceApi.getFunctionalityManager();
+	            functionalityManager.openSession();
+	            LicenseDefinition license = functionalityManager.getLicenseByDefinition(licenseURI);
+	            
+	            if(license != null) {
+	            	
+	            	log.info("License found - " + license.getName());
+	            	
+	    	        Bundle[] bundles = item.getBundles("ORIGINAL");              
+	    	        
+	    	        for(Bundle bundle : bundles){
+	    	        	Bitstream[] bitstreams = bundle.getBitstreams();
+	    				for (Bitstream bitstream : bitstreams) {
+	    					//in case bitstream ID exists in license table for some reason .. just remove it
+	    					functionalityManager.detachLicenses(bitstream.getID());
+	    					//add the license to bitstream
+						functionalityManager.attachLicense(license.getLicenseId(), bitstream.getID());
+	    				}        	
+	    	        }
+	            } else {	            	
+	            }
+	            
+	            functionalityManager.closeSession();
+        	}
+
+        } catch(Exception e) {
+        	log.error("Unable to attach license to bitstream", e);
+        }
+        
     }
 
     /**

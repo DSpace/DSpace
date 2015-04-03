@@ -58,7 +58,7 @@ public class DeleteCommunityConfirm extends AbstractDSpaceTransformer
 		
 		
 		// DIVISION: main
-	    Division main = body.addInteractiveDivision("community-confirm-delete",contextPath+"/admin/community",Division.METHOD_POST,"primary administrative community");
+	    Division main = body.addInteractiveDivision("community-confirm-delete",contextPath+"/admin/community",Division.METHOD_POST,"alert alert-danger");
 	    main.setHead(T_main_head.parameterize(communityID));
 	    main.addPara(T_main_para.parameterize(thisCommunity.getMetadata("name")));	    
 	    List deleteConfirmHelp = main.addList("consequences",List.TYPE_BULLETED);

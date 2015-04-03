@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# Get the DSPACE/bin directory
+BINDIR=`dirname $0`
+
+echo "Updating OpenAIRE Project list"
+echo "BINDIR=$BINDIR"
+
+# Read parameters from DSpace config
+FILE=`$BINDIR/dspace dsrun org.dspace.core.ConfigurationManager -module openaire -property projects.filename`
+ONLINE=`$BINDIR/dspace dsrun org.dspace.core.ConfigurationManager -module openaire -property projects.url`
+
+ONLINE=`echo $ONLINE | sed 's/\"//g'`
+
+echo "FILE=$FILE"
+echo "ONLINE=$ONLINE"
+
+wget -nv -O $FILE "$ONLINE" && $BINDIR/dspace dsrun org.dspace.content.authority.OpenAIREAuthority

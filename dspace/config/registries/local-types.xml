@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dspace-dc-types>
+    <dc-schema>
+        <name>local</name>
+        <namespace>http://lindat.mff.cuni.cz/repository/metadata-terms/</namespace>
+    </dc-schema>
+    <dc-type>
+        <schema>local</schema>
+        <element>embargo</element>
+        <qualifier>termslift</qualifier>
+        <scope_note>Used for storing embargo dates</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>local</schema>
+        <element>hidden</element>
+        <scope_note>Won't be indexed by solr if value == hidden</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>local</schema>
+        <element>hasMetadata</element>
+        <scope_note>Indicates uploaded cmdi file</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>local</schema>
+        <element>has</element>
+        <qualifier>files</qualifier>
+        <scope_note>True if the item contains any bitstreams</scope_note>
+    </dc-type>        
+    <dc-type>
+        <schema>local</schema>
+        <element>additional</element>
+        <qualifier>metadata</qualifier>
+        <scope_note>Not used metadata from an import</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>local</schema>
+        <element>branding</element>
+        <scope_note>LRT/LINDAT (Name of Community)</scope_note>
+    </dc-type>    
+    <dc-type>
+        <schema>local</schema>
+        <element>submission</element>
+	<qualifier>note</qualifier>
+        <scope_note>A submitter's note for editor/reviewer</scope_note>
+    </dc-type>    
+    <dc-type>
+        <schema>local</schema>
+        <element>demo</element>
+        <qualifier>uri</qualifier>
+        <scope_note>URL of the demo</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>local</schema>
+        <element>contact</element>
+        <qualifier>person</qualifier>
+        <scope_note>Contact person</scope_note>
+    </dc-type>   
+    <dc-type>
+    	<schema>local</schema>
+    	<element>sponsor</element>
+    	<scope_note>Sponsor</scope_note>
+    </dc-type>
+    <dc-type>
+    	<schema>local</schema>
+    	<element>size</element>
+    	<qualifier>info</qualifier>
+    </dc-type>
+    <dc-type>
+    	<schema>local</schema>
+    	<element>genre</element>
+    </dc-type>
+</dspace-dc-types>

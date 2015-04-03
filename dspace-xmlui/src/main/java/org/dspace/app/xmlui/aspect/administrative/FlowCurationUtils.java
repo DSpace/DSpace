@@ -10,27 +10,36 @@ package org.dspace.app.xmlui.aspect.administrative;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.cocoon.environment.Request;
-
+import org.apache.log4j.Logger;
+import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Site;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.curate.Curator;
-
+import org.dspace.handle.HandleManager;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Select;
 
 /**
  *
- * @author wbossons
+ * based on class by wbossons
+ * modified for LINDAT/CLARIN
  */
 public class FlowCurationUtils
 {
+    private static final Logger log = Logger.getLogger(FlowCurationUtils.class);
    /** Language Strings */
     private static final Message T_curate_success_notice =
             new Message("default","xmlui.administrative.FlowCurationUtils.curate_success_notice");
@@ -75,7 +84,8 @@ public class FlowCurationUtils
                 map.put(parts[0].trim(), parts[1].trim());
             }
         }
-        String status = map.get(String.valueOf(curator.getStatus(taskName)));
+        //Get the status "name" eg. Success/Error/Skip for this task (across all items)
+        String status = map.get(String.valueOf(curator.getOverallStatus(taskName)));
         if (status == null)
         {
             // invalid = use string for 'other
@@ -83,26 +93,32 @@ public class FlowCurationUtils
         }
         String result = curator.getResult(taskName);
         FlowResult flowResult = new FlowResult();
-        //set whether task succeeded or failed
-        flowResult.setOutcome(success); 
-        if(result==null)
+        if(result==null || result.isEmpty())
             result = "Nothing to do for this DSpace object.";
         //add in status message
-        if(success)
-        {   
             //@TODO: Ideally, all of this status information would be contained within a translatable I18N Message.
             // Unfortunately, there currently is no support for displaying Parameterized Messages in Notices
             // (See FlowResult.getMessage(), sitemap.xmap and NoticeTransformer)
             flowResult.setHeader(new Message("default", "Task: " + getUITaskName(taskName)));
-            flowResult.setMessage(T_curate_success_notice);
-            flowResult.setCharacters("STATUS: " + status + ", RESULT: " + result); 
+        flowResult.setCharacters(String.format("RESULT [curated %d items]:\n%s",
+                        curator.getCuratedItemCount(), result) ); 
+        //update the outcome according to status
+        if(status.equals(map.get("" + Curator.CURATE_SUCCESS)))
+        {   
+            flowResult.setOutcome(true);
+        }
+        else if(status.equals(map.get("" + Curator.CURATE_SKIP))){
+        	//noop - we've skipped the task, let's leave outcome neutral
         }
         else
         {
-            flowResult.setHeader(new Message("default", "Task: " + getUITaskName(taskName)));
+            flowResult.setOutcome(false);
+        }
+        //Report problems (Exception)
+        if(success) {
+            flowResult.setMessage(T_curate_success_notice);
+        } else {
             flowResult.setMessage(T_curate_fail_notice);
-            flowResult.setCharacters("STATUS: Failure, RESULT: " + result); 
-            
         }
         flowResult.setContinue(true);
         return flowResult;
@@ -170,6 +186,58 @@ public class FlowCurationUtils
             return taskID;
     }
     
+    public static FlowResult processRunAll(Context context, Request request){
+    	String objHandle = request.getParameter("identifier");
+    	if (objHandle == null || objHandle.equals("")) {
+    		objHandle = Site.getSiteHandle();	
+    	}    	
+    	setupCurationTasks();
+        Curator curator = new Curator();
+        List<String> taskNames = new ArrayList<String>();
+        Iterator<String> innerIterator = FlowCurationUtils.allTasks.keySet().iterator();
+        while (innerIterator.hasNext()){
+        	String taskName = innerIterator.next().trim();
+	        curator.addTask(taskName);
+	        taskNames.add(taskName);
+        }
+        curator.setInvoked(Curator.Invoked.INTERACTIVE);
+        FlowResult result = new FlowResult();
+        boolean finished = false;
+        
+        try{
+        	curator.curate(context,objHandle);
+        	finished = true;
+        }catch(IOException e){
+        }
+        
+        result.setHeader(new Message("default", "All tasks "));
+        StringBuffer allResults = new StringBuffer();
+        allResults.append("RESULTS:");
+        boolean allGood = true;
+        for(String taskName: taskNames){
+        	allResults.append('\n')
+        	.append(taskName)
+        	.append(": \n")
+        	.append(curator.getResult(taskName));
+        	int status = curator.getOverallStatus(taskName);
+        	if(allGood && (status == Curator.CURATE_SUCCESS || status == Curator.CURATE_SKIP)){
+        		result.setOutcome(true);
+        	}else{
+        		result.setOutcome(false);
+        		allGood = false;
+        	}
+        }
+        result.setCharacters(allResults.toString());
+        //Report problems (Exception)
+        if(finished) {
+            result.setMessage(T_curate_success_notice);
+        } else {
+        	result.setMessage(T_curate_fail_notice);
+        }
+        result.setParameter("identifier", objHandle);
+        result.setContinue(true);
+        return result;
+    }
     
     /**
      * Utility method to process curation tasks
@@ -369,6 +437,22 @@ public class FlowCurationUtils
     		}
         }
         return select;
+    }
+
+    public static boolean isReviewer(Context context, Request request){
+        String handle = request.getParameter("handle");
+        boolean result = false;
+        try{
+            DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+            if(dso.getType() == Constants.COLLECTION){
+                Collection col = (Collection)dso;
+                result = col.epersonIsReviewer();
+            }
+        }catch(SQLException e){
+            log.error(e);
+        }
+
+        return result;
     }
     
 }

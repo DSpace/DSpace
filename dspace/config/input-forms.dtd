@@ -1,7 +1,7 @@
 <!-- DSpace Custom Submit input form definition language -->
 
 
- <!ELEMENT input-forms (form-map, form-definitions, form-value-pairs) >
+ <!ELEMENT input-forms (form-map, form-definitions, form-definitions-extra, form-value-pairs) >
 
  <!ELEMENT form-map (name-map)* >
  <!ELEMENT name-map EMPTY >
@@ -10,18 +10,26 @@
            form-name NMTOKEN #REQUIRED>
 
  <!ELEMENT form-definitions (form)+ >
+ <!ELEMENT form-definitions-extra (form)+ >
  <!ELEMENT form (page)+ >
  <!ATTLIST form name NMTOKEN #REQUIRED>
  <!ELEMENT page (field)+ >
  <!ATTLIST page number NMTOKEN #REQUIRED>
- <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, repeatable?, label, type-bind?, input-type, hint, required?, vocabulary?, visibility?) >
+ <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, repeatable?, visibility?, repeatable-component?, repeatable-parse?, autocomplete?, mapped-to?, label, type-bind?, input-type, hint, required?, vocabulary?, regexp?, regexp-warning?, additional?, component-label?, collapsible?, acl?, class?) >
  <!ELEMENT dc-schema (#PCDATA) >
  <!ELEMENT dc-element (#PCDATA) >
  <!ELEMENT dc-qualifier (#PCDATA) >
  <!ELEMENT type-bind (#PCDATA) >
  
  <!ELEMENT repeatable (#PCDATA) >
+ <!ELEMENT repeatable-component (#PCDATA) >
+ <!ELEMENT repeatable-parse (#PCDATA) >
+ <!ELEMENT autocomplete (#PCDATA) >
+ <!ELEMENT mapped-to (#PCDATA) >
  <!ELEMENT label (#PCDATA) >
+ <!ELEMENT additional (#PCDATA) >
+ <!ELEMENT component-label (#PCDATA) >
+ <!ELEMENT collapsible (#PCDATA) >
  <!ELEMENT input-type (#PCDATA)>
   
  <!ELEMENT hint (#PCDATA) >
@@ -30,6 +38,18 @@
  <!ELEMENT form-value-pairs (value-pairs)* >
  <!ELEMENT value-pairs (pair)+ >
 
+ <!-- will be used in  String.matches, so mind proper escaping -->
+ <!ELEMENT regexp (#PCDATA) >
+ <!ELEMENT regexp-warning (#PCDATA) >
+ 
+ <!--
+      ACL element for fine-grained access control 
+      the content should be semicolon separated list of entries in format matching the following regexp:
+      policy=(allow|deny),action=(read|write),grantee-type=(user|group),grantee-id=(\d+,\*) 
+ -->
+ <!ELEMENT acl (#PCDATA)>
+ <!ELEMENT class (#PCDATA) >
+ 
  <!-- ***
         To assign a particular 'value-pairs' list to a particular dropdown 'input-type'
         field, as found on a particular form, put:

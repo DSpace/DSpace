@@ -14,6 +14,7 @@
     Author: lieven.droogmans at atmire.com
     Author: ben at atmire.com
     Author: Alexey Maslov
+    modified for LINDAT/CLARIN
 
 -->
 
@@ -259,7 +260,8 @@
           </xsl:when>
 
           <!-- identifier.uri row -->
-          <xsl:when test="$clause = 5 and (dim:field[@mdschema='dc' and @element='identifier' and @qualifier='uri'])">
+          <!-- UFAL source.uri row -->
+          <xsl:when test="$clause = 7 and (dim:field[@mdschema='dc' and @element='identifier' and @qualifier='uri'])">
                     <tr class="ds-table-row {$phase}">
 	                <td><span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-uri</i18n:text>:</span></td>
 	                <td>
@@ -367,6 +369,7 @@
             <xsl:attribute name="title">
                  <xsl:call-template name="renderCOinS"/>
             </xsl:attribute>
+            &#xFEFF; <!-- non-breaking space to force separating the end tag -->
         </span>
     </xsl:template>
 
@@ -413,6 +416,9 @@
                 <!-- Display header for 'Description' only if at least one bitstream contains a description -->
                 <xsl:if test="mets:file/mets:FLocat/@xlink:label != ''">
                     <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-description</i18n:text></th>
+                </xsl:if>
+                <xsl:if test="$context/mets:amdSec/mets:rightsMD/mets:mdWrap[@OTHERMDTYPE='UFAL_LICENSES']/mets:xmlData/licenses/license">
+                    <th>License</th>
                 </xsl:if>
 		    </tr>
             <xsl:choose>
@@ -544,6 +550,34 @@
 	    </xsl:if>
 
         </tr>
+    </xsl:template>
+    
+    <xsl:template match="licenses">
+        <ul class="license_labels">
+            <xsl:apply-templates />
+        </ul>
+    </xsl:template>
+    
+    <xsl:template match="license">
+        <li class="{@label}" title="{concat(@label_title,' (',text(),')')}">
+            <a href="{@url}" class="target_blank"><xsl:value-of select="@label" /></a>
+            <xsl:if test="@label='CC'">
+                <img width="16" height="16" src="{$theme-path}/images/licenses/cc-by-16.png" alt="Attribution required" title="Attribution required" />
+            </xsl:if>
+            <xsl:if test="text()='allow non commercial sharing' or 
+                            text()='allow non commercial sharing and changing' or
+                            text()='allow non commercial sharing and changing with same license'">
+                <img width="16" height="16" src="{$theme-path}/images/licenses/cc-nc-16.png" alt="Noncommercial" title="Noncommercial" />
+            </xsl:if>
+            <xsl:if test="text()='allow commercial sharing' or
+                            text()='allow non commercial sharing'">
+                <img width="16" height="16" src="{$theme-path}/images/licenses/cc-nd-16.png" alt="No Derivative Works" title="No Derivative Works" />
+            </xsl:if>
+            <xsl:if test="text()='allow commercial sharing and changing with same license' or
+                            text()='allow non commercial sharing and changing with same license'">
+                <img width="16" height="16" src="{$theme-path}/images/licenses/cc-sa-16.png" alt="Share Alike" title="Share Alike" />                    
+            </xsl:if>
+        </li>
     </xsl:template>
 
     <!--

@@ -8,15 +8,28 @@
 package org.dspace.app.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
+import org.apache.commons.lang.StringUtils;
 import org.dspace.content.MetadataSchema;
+import org.dspace.core.Context;
+import org.xml.sax.SAXException;
+
+import cz.cuni.mff.ufal.dspace.app.util.ACL;
 
 /**
  * Class representing a line in an input form.
- * 
- * @author Brian S. Hughes, based on work by Jenny Toves, OCLC
+ *
+ * based on class by Brian S. Hughes, based on work by Jenny Toves, OCLC
+ * modified for LINDAT/CLARIN
+ * @version
  */
 public class DCInput
 {
@@ -29,8 +42,38 @@ public class DCInput
     /** the DC namespace schema */
     private String dcSchema = null;
 
+    /** UFAL/jmisutka - */
+    private String extraMappedToElement = null;
+
+    /** UFAL/jmisutka - */
+    private String extraRepeatableComponent = null;
+
+    /** UFAL/jmisutka - */
+    private String autocomplete = null;
+
+    /** UFAL/jmisutka - */
+    private String extra = null;
+
+    /** UFAL/jmisutka - */
+    private String collapsible = null;
+
+    /** UFAL/okosarko - */
+    private String regexp = null;
+
+    /** UFAL/okosarko - */
+    private String regexpWarning = null;
+
+    /** UFAL/josifko - */
+    private ACL acl = null;
+
+    /** UFAL/josifko - */
+    private Set<String> rends = null;
+
     /** a label describing input */
     private String label = null;
+
+    /** a label describing input */
+    private String component_label = null;
 
     /** the input type */
     private String inputType = null;
@@ -43,6 +86,9 @@ public class DCInput
 
     /** is input repeatable? */
     private boolean repeatable = false;
+
+    /** should repeatable input be parsed? */
+    private boolean repeatable_parse = false;
 
     /** 'hint' text to display */
     private String hint = null;
@@ -68,7 +114,9 @@ public class DCInput
     /** allowed document types */
     private List<String> typeBind = null;
 
-    /** 
+	private ComplexDefinition complexDefinition = null;   
+ 	
+	/** 
      * The scope of the input sets, this restricts hidden metadata fields from 
      * view during workflow processing. 
      */
@@ -88,10 +136,29 @@ public class DCInput
      *            ???
      * @param listMap
      */
-    public DCInput(Map<String, String> fieldMap, Map<String, List<String>> listMap)
+    public DCInput(Map<String, String> fieldMap,
+            Map<String, List<String>> listMap, ComplexDefinitions complexDefinitions)
     {
         dcElement = fieldMap.get("dc-element");
         dcQualifier = fieldMap.get("dc-qualifier");
+
+        // UFAL / jmisutka
+        extraMappedToElement = fieldMap.get("mapped-to");
+        extraRepeatableComponent = fieldMap.get("repeatable-component");
+        autocomplete = fieldMap.get("autocomplete");
+        extra = fieldMap.get("extra");
+        collapsible = fieldMap.get("collapsible");
+        component_label = fieldMap.get("component-label");
+        regexp = fieldMap.get("regexp");
+        regexpWarning = fieldMap.get("regexp-warning");
+
+        // UFAL / josifko
+        acl = ACL.fromString(fieldMap.get("acl"));
+        rends = new HashSet<String>();
+        if(fieldMap.containsKey("class"))
+        {
+            rends.addAll(Arrays.asList(fieldMap.get("class").split(" ")));
+        }
 
         // Default the schema to dublin core
         dcSchema = fieldMap.get("dc-schema");
@@ -103,6 +170,11 @@ public class DCInput
         String repStr = fieldMap.get("repeatable");
         repeatable = "true".equalsIgnoreCase(repStr)
                 || "yes".equalsIgnoreCase(repStr);
+        //
+        String repParseStr = fieldMap.get("repeatable-parse");
+        repeatable_parse = "true".equalsIgnoreCase(repParseStr)
+                || "yes".equalsIgnoreCase(repParseStr);
+
         label = fieldMap.get("label");
         inputType = fieldMap.get("input-type");
         // these types are list-controlled
@@ -111,6 +183,10 @@ public class DCInput
         {
             valueListName = fieldMap.get("value-pairs-name");
             valueList = listMap.get(valueListName);
+        }
+
+        if ("complex".equals(inputType)){
+        	complexDefinition = complexDefinitions.getByName((fieldMap.get(DCInputsReader.COMPLEX_DEFINITION_REF)));
         }
         hint = fieldMap.get("hint");
         warning = fieldMap.get("required");
@@ -182,7 +258,26 @@ public class DCInput
      */
     public boolean isRepeatable()
     {
-        return repeatable;
+        return isRepeatable(true);
+    }
+
+    /**
+     * UFAL/jmisutka
+     *
+     * @param really_repeatable
+     *            - if true than it will simulate the original behaviour if
+     *            false it will include our extra component logic.
+     */
+    public boolean isRepeatable(boolean really_repeatable)
+    {
+        if (really_repeatable)
+        {
+            return repeatable;
+        }
+        else
+        {
+            return repeatable || null != extraRepeatableComponent;
+        }
     }
 
     /**
@@ -193,6 +288,11 @@ public class DCInput
     public boolean getRepeatable()
     {
         return isRepeatable();
+    }
+
+    public boolean getRepeatableParse()
+    {
+        return repeatable_parse;
     }
 
     /**
@@ -294,6 +394,24 @@ public class DCInput
     public List getPairs()
     {
         return valueList;
+    }
+
+    /**
+     * UFAL/jmisutka Return dc element which should be mapped to this Input in
+     * one string. Dots "." should be used for splitting.
+     */
+    public String getExtraMappedToElement()
+    {
+        return extraMappedToElement;
+    }
+
+    /**
+     * UFAL/jmisutka Return component name which should be repeatable - this is
+     * needed for hierarchical repeatable components.
+     */
+    public String getExtraRepeatableComponent()
+    {
+        return extraRepeatableComponent;
     }
 
     /**
@@ -402,4 +520,206 @@ public class DCInput
 		return typeBind.contains(typeName);
 	}
 	
+  /**
+     * Check whether the supplied values is allowed (matching supplied email)
+     * eg. email validity check
+     *
+     * @param value
+     * @return
+     */
+    public boolean isAllowedValue(String value){
+    	return isAllowedValue(value, regexp);
+    }
+
+    public static boolean isAllowedValue(String value, String regex)
+    {
+        if (regex == null || regex.isEmpty())
+        {
+            return true;
+        }
+        else if (value == null)
+        {
+            return false;
+        }
+        else
+        {
+            return value.matches(regex);
+        }
+    }
+
+    public String getRegexp()
+    {
+        return regexp;
+    }
+
+    public String getRegexpWarning()
+    {
+        return regexpWarning;
+    }
+
+    public String getAutocomplete()
+    {
+        return autocomplete;
+    }
+
+    public String getExtra()
+    {
+        return extra;
+    }
+
+    public boolean hasExtraAttribute(String extra_string)
+    {
+        return null != extra && extra.contains(extra_string);
+    }
+
+    public String getComponentLabel()
+    {
+        return component_label;
+    }
+
+    public String getCollapsible()
+    {
+        return collapsible;
+    }
+
+    /**
+     * Is user allowed for particular ACL action on this input field in given
+     * Context?
+     *
+     * @param c
+     *            Contex
+     * @param action
+     *            Action
+     * @return true if allowed, false otherwise
+     */
+    public boolean isAllowedAction(Context c, int action)
+    {
+        return acl.isAllowedAction(c, action);
+    }
+
+    /**
+     * Returns true if there is a ACL with at least one ACE bound to this input field
+     *
+     * @return
+     */
+    public boolean hasACL()
+    {
+        if(acl != null && !acl.isEmpty())
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Adds another rend to set of rends for further rendering in GUI
+     *
+     * @param rend
+     */
+    public void addRend(String rend)
+    {
+        rends.add(rend);
+    }
+
+    /**
+     * Returns set of rends for further rendering in GUI
+     *
+     * @return
+     */
+    public Set<String> getRends() {
+        return rends;
+    }
+
+    /**
+     * Returns rends as space separated String
+     *
+     * @return
+     */
+    public String getRendsAsString() {
+        return StringUtils.join(rends.toArray()," ");
+    }
+
+	public ComplexDefinition getComplexDefinition() {
+		if(getInputType().equals("complex")){
+			return complexDefinition;
+		} else{
+			throw new UnsupportedOperationException();
+		}
+	}
+
+	public static class ComplexDefinitions{
+		private Map<String, ComplexDefinition> definitions = null;
+		private Map<String, List<String>> valuePairs = null;
+
+		ComplexDefinitions(Map<String, List<String>> valuePairs){
+			definitions = new HashMap<String, ComplexDefinition>();
+			this.valuePairs = valuePairs;
+		}
+
+		public ComplexDefinition getByName(String name){
+			return definitions.get(name);
+		}
+
+		public void addDefinition(ComplexDefinition definition) {
+			definitions.put(definition.getName(), definition);
+			definition.setValuePairs(valuePairs);
+		}
+	}
+
+	public static class ComplexDefinition{
+		//use something that wont get replaced when entering into db
+		public static final String SEPARATOR = "@@";
+		private SortedMap<String, Map<String, String>> inputs;
+		private String name;
+		private Map<String, List<String>> valuePairs = null;
+
+		public ComplexDefinition(String definitionName) {
+			name = definitionName;
+			inputs = new TreeMap<String, Map<String, String>>();
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void addInput(Map<String, String> attributes) throws SAXException {
+			// these two are a must, check if present
+			String iName = attributes.get("name");
+			String iType = attributes.get("type");
+
+			if (iName == null || iType == null) {
+				throw new SAXException(
+						"Missing attributes (name or type) on complex definition input");
+			}
+
+			inputs.put(iName,attributes);
+
+		}
+
+		public Map<String, String> getInput(String name){
+			return inputs.get(name);
+		}
+
+		public Set<String> getInputNames() {
+			return inputs.keySet();
+		}
+
+		public int inputsCount() {
+			return getInputNames().size();
+		}
+
+		void setValuePairs(Map<String, List<String>> valuePairs){
+			this.valuePairs = valuePairs;
+		}
+
+		public java.util.List<String> getValuePairsForInput(String name) {
+			String pairsRef = getInput(name).get("pairs");
+			if(valuePairs != null && pairsRef != null){
+				return valuePairs.get(pairsRef);
+			}
+			return null;
+		}
+
+	}
+
 }

@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,19 +24,18 @@ import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
-import org.dspace.app.xmlui.utils.*;
+import org.dspace.app.xmlui.utils.ContextUtil;
+import org.dspace.app.xmlui.utils.DSpaceValidity;
+import org.dspace.app.xmlui.utils.HandleUtil;
+import org.dspace.app.xmlui.utils.RequestUtils;
+import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Cell;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.ReferenceSet;
-import org.dspace.app.xmlui.wing.element.Row;
-import org.dspace.app.xmlui.wing.element.Select;
-import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
@@ -45,14 +43,13 @@ import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseInfo;
 import org.dspace.browse.BrowseItem;
 import org.dspace.browse.BrowserScope;
-import org.dspace.sort.SortOption;
-import org.dspace.sort.SortException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.DCDate;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.sort.SortException;
+import org.dspace.sort.SortOption;
 import org.xml.sax.SAXException;
 
 /**
@@ -60,7 +57,8 @@ import org.xml.sax.SAXException;
  * etc.) The types of browse available are configurable by the implementor. See
  * dspace.cfg and documentation for instructions on how to configure.
  *
- * @author Graham Triggs
+ * based on class by Graham Triggs
+ * modified for LINDAT/CLARIN
  */
 public class WithdrawnItems extends AbstractDSpaceTransformer implements
         CacheableProcessingComponent
@@ -71,24 +69,6 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
      * Static Messages for common text
      */
     private static final Message T_dspace_home = message("xmlui.general.dspace_home");
-
-    private static final Message T_go = message("xmlui.general.go");
-
-    private static final Message T_update = message("xmlui.general.update");
-
-    private static final Message T_choose_month = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.choose_month");
-
-    private static final Message T_choose_year = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.choose_year");
-
-    private static final Message T_jump_year = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.jump_year");
-
-    private static final Message T_jump_year_help = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.jump_year_help");
-
-    private static final Message T_jump_select = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.jump_select");
-
-    private static final Message T_starts_with = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.starts_with");
-
-    private static final Message T_starts_with_help = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.starts_with_help");
 
     private static final Message T_sort_by = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.sort_by");
 
@@ -102,20 +82,13 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
 
     private static final Message T_order_desc = message("xmlui.ArtifactBrowser.ConfigurableBrowse.order.desc");
 
+    private static final Message T_head1_none = message("xmlui.ArtifactBrowser.AbstractSearch.head1_none");
+    
     private static final String WITHDRAWN_URL_BASE = "withdrawn";
 
     /**
-     * These variables dictate when the drop down list of years is to break from
-     * 1 year increments, to 5 year increments, to 10 year increments, and
-     * finally to stop.
+     * The options for results per page
      */
-    private static final int ONE_YEAR_LIMIT = 10;
-
-    private static final int FIVE_YEAR_LIMIT = 30;
-
-    private static final int TEN_YEAR_LIMIT = 100;
-
-    /** The options for results per page */
     private static final int[] RESULTS_PER_PAGE_PROGRESSION = {5,10,20,40,60,80,100};
 
     /** Cached validity object */
@@ -125,9 +98,6 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
     private BrowseParams userParams;
 
     private BrowseInfo browseInfo;
-
-    private Message titleMessage = null;
-    private Message trailMessage = null;
 
     @Override
     public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) throws ProcessingException, SAXException, IOException {
@@ -222,13 +192,13 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
     {
         BrowseInfo info = getBrowseInfo();
 
-        pageMeta.addMetadata("title").addContent(getTitleMessage(info));
+        pageMeta.addMetadata("title").addContent(message("xmlui.administrative.Navigation.administrative_withdrawn"));
 
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
 
-        pageMeta.addTrail().addContent(getTrailMessage(info));
+        pageMeta.addTrail().addContent(message("xmlui.administrative.Navigation.administrative_withdrawn"));
     }
 
     /**
@@ -248,10 +218,7 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
         // Build the DRI Body
         Division div = body.addDivision("browse-by-" + type, "primary");
 
-        div.setHead(getTitleMessage(info));
-
-        // Build the internal navigation (jump lists)
-        addBrowseJumpNavigation(div, info, params);
+        div.setHead(message("xmlui.administrative.Navigation.administrative_withdrawn"));
 
         // Build the sort and display controls
         addBrowseControls(div, info, params);
@@ -261,21 +228,27 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
 
         // If there are items to browse, add the pagination
         int itemsTotal = info.getTotal();
-        if (itemsTotal > 0)
-        {
-	        results.setSimplePagination(itemsTotal, browseInfo.getOverallPosition() + 1,
-			                                   browseInfo.getOverallPosition() + browseInfo.getResultCount(), getPreviousPageURL(
-					                           params, info), getNextPageURL(params, info));
+                
+        if (itemsTotal > 0) {
+        	int firstItemIndex = browseInfo.getOverallPosition()+1;
+        	int lastItemIndex = browseInfo.getOverallPosition()+browseInfo.getResultCount();        	
+            int currentPage = (int) (firstItemIndex/browseInfo.getResultsPerPage())+1;
+            int pagesTotal = (int) Math.ceil((double)itemsTotal / browseInfo.getResultsPerPage());
+            Map<String, String> parameters = new HashMap<String, String>();
+            parameters.put("page", "{pageNum}");
+            String pageURLMask = generateURL(parameters);
+        	results.setHead(T_head1_none.parameterize(firstItemIndex,lastItemIndex, itemsTotal));
+        	results.setMaskedPagination(itemsTotal,  firstItemIndex, lastItemIndex, currentPage, pagesTotal, pageURLMask);
 
-	        // Reference all the browsed items
+			// Reference all the browsed items
 	        ReferenceSet referenceSet = results.addReferenceSet("browse-by-" + type, ReferenceSet.TYPE_SUMMARY_LIST, type, null);
 
 	        // Add the items to the browse results
 	        for (BrowseItem item : (java.util.List<BrowseItem>) info.getResults())
 	        {
 		        referenceSet.addReference(item);
-	        }
-        }
+	        }        
+		}
         else
         {
             results.addPara(T_no_results);
@@ -290,127 +263,12 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
         this.validity = null;
         this.userParams = null;
         this.browseInfo = null;
-        this.titleMessage = null;
-        this.trailMessage = null;
         super.recycle();
     }
 
-    /**
-     * Makes the jump-list navigation for the results
-     *
-     * @param div
-     * @param info
-     * @param params
-     * @throws WingException
-     */
-    private void addBrowseJumpNavigation(Division div, BrowseInfo info, BrowseParams params)
-            throws WingException
-    {
-        // Prepare a Map of query parameters required for all links
-        Map<String, String> queryParamsGET = new HashMap<String, String>();
-        queryParamsGET.putAll(params.getCommonParametersEncoded());
-        queryParamsGET.putAll(params.getControlParameters());
 
-        Map<String, String> queryParamsPOST = new HashMap<String, String>();
-        queryParamsPOST.putAll(params.getCommonParameters());
-        queryParamsPOST.putAll(params.getControlParameters());
 
-        // Navigation aid (really this is a poor version of pagination)
-        Division jump = div.addInteractiveDivision("browse-navigation", WITHDRAWN_URL_BASE,
-                Division.METHOD_POST, "secondary navigation");
-
-        // Add all the query parameters as hidden fields on the form
-        for (Map.Entry<String, String> param : queryParamsPOST.entrySet())
-        {
-            jump.addHidden(param.getKey()).setValue(param.getValue());
-        }
-
-        // If this is a date based browse, render the date navigation
-        if (isSortedByDate(info))
-        {
-            Para jumpForm = jump.addPara();
-
-            // Create a select list to choose a month
-            jumpForm.addContent(T_jump_select);
-            Select month = jumpForm.addSelect(BrowseParams.MONTH);
-            month.addOption(false, "-1", T_choose_month);
-            for (int i = 1; i <= 12; i++)
-            {
-                month.addOption(false, String.valueOf(i), DCDate.getMonthName(i, Locale
-                        .getDefault()));
-            }
-
-            // Create a select list to choose a year
-            Select year = jumpForm.addSelect(BrowseParams.YEAR);
-            year.addOption(false, "-1", T_choose_year);
-            int currentYear = DCDate.getCurrent().getYear();
-            int i = currentYear;
-
-            // Calculate where to move from 1, 5 to 10 year jumps
-            int oneYearBreak = ((currentYear - ONE_YEAR_LIMIT) / 5) * 5;
-            int fiveYearBreak = ((currentYear - FIVE_YEAR_LIMIT) / 10) * 10;
-            int tenYearBreak = (currentYear - TEN_YEAR_LIMIT);
-            do
-            {
-                year.addOption(false, String.valueOf(i), String.valueOf(i));
-
-                if (i <= fiveYearBreak)
-                {
-                    i -= 10;
-                }
-                else if (i <= oneYearBreak)
-                {
-                    i -= 5;
-                }
-                else
-                {
-                    i--;
-                }
-            }
-            while (i > tenYearBreak);
-
-            // Create a free text entry box for the year
-            jumpForm = jump.addPara();
-            jumpForm.addContent(T_jump_year);
-            jumpForm.addText(BrowseParams.STARTS_WITH).setHelp(T_jump_year_help);
-
-            jumpForm.addButton("submit").setValue(T_go);
-        }
-        else
-        {
-            // Create a clickable list of the alphabet
-            List jumpList = jump.addList("jump-list", List.TYPE_SIMPLE, "alphabet");
-            
-            // browse params for each letter are all the query params
-            // WITHOUT the second-stage browse value, and add STARTS_WITH.
-            Map<String, String> letterQuery = new HashMap<String, String>(queryParamsGET);
-            for (String valueKey : BrowseParams.FILTER_VALUE)
-            {
-                letterQuery.remove(valueKey);
-            }
-            letterQuery.put(BrowseParams.STARTS_WITH, "0");
-            jumpList.addItemXref(super.generateURL(WITHDRAWN_URL_BASE, letterQuery), "0-9");
-            
-            for (char c = 'A'; c <= 'Z'; c++)
-            {
-                letterQuery.put(BrowseParams.STARTS_WITH, Character.toString(c));
-                jumpList.addItemXref(super.generateURL(WITHDRAWN_URL_BASE, letterQuery), Character
-                        .toString(c));
-            }
-
-            // Create a free text field for the initial characters
-            Para jumpForm = jump.addPara();
-            jumpForm.addContent(T_starts_with);
-            jumpForm.addText(BrowseParams.STARTS_WITH).setHelp(T_starts_with_help);
-
-            jumpForm.addButton("submit").setValue(T_go);
-        }
-    }
-
-    /**
-     * Add the controls to changing sorting and display options.
-     *
-     * @param div
+    /*
      * @param info
      * @param params
      * @throws WingException
@@ -419,21 +277,14 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
             throws WingException
     {
         // Prepare a Map of query parameters required for all links
-        Map<String, String> queryParams = new HashMap<String, String>();
+        Map<String, String> parameters = new HashMap<String, String>();
 
-        queryParams.putAll(params.getCommonParameters());
+        parameters.putAll(params.getCommonParameters());
 
-        Division controls = div.addInteractiveDivision("browse-controls", WITHDRAWN_URL_BASE,
-                Division.METHOD_POST, "browse controls");
+        Division searchControlsGear = div.addDivision("masked-page-control").addDivision("search-controls-gear", "controls-gear-wrapper");
+        List sortList = searchControlsGear.addList("sort-options", List.TYPE_SIMPLE, "gear-selection");
 
-        // Add all the query parameters as hidden fields on the form
-        for (Map.Entry<String, String> param : queryParams.entrySet())
-        {
-            controls.addHidden(param.getKey()).setValue(param.getValue());
-        }
-
-        Para controlsForm = controls.addPara();
-
+        boolean first = true;
         try
 	    {
 	        // Create a drop down of the different sort columns available
@@ -442,13 +293,18 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
 	        // Only generate the list if we have multiple columns
 	        if (sortOptions.size() > 1)
 	        {
-	            controlsForm.addContent(T_sort_by);
-	            Select sortSelect = controlsForm.addSelect(BrowseParams.SORT_BY);
+                	first = false;
+                    sortList.addItem("sort-head", "gear-head first").addContent(T_sort_by);
+			        List sortByOptions = sortList.addList("sort-selections");
 
 	            for (SortOption so : sortOptions)
 	            {
-	                sortSelect.addOption(so.equals(info.getSortOption()), so.getNumber(),
-	                        message("xmlui.ArtifactBrowser.ConfigurableBrowse.sort_by." + so.getName()));
+                        if (so.isVisible())
+                        {
+					        boolean selected = so.equals(info.getSortOption());
+					        parameters.put("sort_by",so.getNumber()+"");
+                            sortByOptions.addItem(null,null).addXref(generateURL(parameters), message("xmlui.ArtifactBrowser.ConfigurableBrowse.sort_by." + so.getName()),"gear-option" + (selected ? " gear-option-selected" : ""));					        
+                        }
 	            }
 	        }
 	    }
@@ -457,96 +313,111 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
 	        throw new WingException("Unable to get sort options", se);
 	    }
 
-	    // Create a control to changing ascending / descending order
-        controlsForm.addContent(T_order);
-        Select orderSelect = controlsForm.addSelect(BrowseParams.ORDER);
-        orderSelect.addOption("ASC".equals(params.scope.getOrder()), "ASC", T_order_asc);
-        orderSelect.addOption("DESC".equals(params.scope.getOrder()), "DESC", T_order_desc);
+        parameters.remove("sort_by");
 
-        // Create a control for the number of records to display
-        controlsForm.addContent(T_rpp);
-        Select rppSelect = controlsForm.addSelect(BrowseParams.RESULTS_PER_PAGE);
-        
+	    // Create a control to changing ascending / descending order
+        sortList.addItem("order-head", "gear-head" + (first? " first":"")).addContent(T_order);
+        List ordOptions = sortList.addList("order-selections");
+        boolean asc = SortOption.ASCENDING.equals(params.scope.getOrder());
+  
+    	parameters.put("order",SortOption.ASCENDING);
+        ordOptions.addItem(null,null).addXref(generateURL(parameters),T_order_asc, "gear-option" + (asc? " gear-option-selected":""));
+    	parameters.put("order",SortOption.DESCENDING);
+        ordOptions.addItem(null,null).addXref(generateURL(parameters),T_order_desc, "gear-option" + (!asc? " gear-option-selected":""));
+
+        parameters.remove("order");
+
+        //Add the rows per page
+        sortList.addItem("rpp-head", "gear-head").addContent(T_rpp);
+        List rppOptions = sortList.addList("rpp-selections");
         for (int i : RESULTS_PER_PAGE_PROGRESSION)
         {
-            rppSelect.addOption((i == info.getResultsPerPage()), i, Integer.toString(i));
+    		parameters.put("page", 1+"");
+        	parameters.put("rpp", Integer.toString(i));
+            rppOptions.addItem(null, null).addXref(generateURL(parameters), Integer.toString(i), "gear-option" + (i == browseInfo.getResultsPerPage() ? " gear-option-selected" : ""));
+        }    
         }
 
-        // Create a control for the number of authors per item to display
-        // FIXME This is currently disabled, as the supporting functionality
-        // is not currently present in xmlui
-        //if (isItemBrowse(info))
-        //{
-        //    controlsForm.addContent(T_etal);
-        //    Select etalSelect = controlsForm.addSelect(BrowseParams.ETAL);
-        //
-        //    etalSelect.addOption((info.getEtAl() < 0), 0, T_etal_all);
-        //    etalSelect.addOption(1 == info.getEtAl(), 1, Integer.toString(1));
-        //
-        //    for (int i = 5; i <= 50; i += 5)
-        //    {
-        //        etalSelect.addOption(i == info.getEtAl(), i, Integer.toString(i));
-        //    }
-        //}
 
-        controlsForm.addButton("update").setValue(T_update);
+    protected String getParameterSortBy() {
+        String s = ObjectModelHelper.getRequest(objectModel).getParameter("sort_by");
+        return s != null ? s : null;
+        }
+
+    protected String getParameterGroup() {
+        String s = ObjectModelHelper.getRequest(objectModel).getParameter("group_by");
+        return s != null ? s : "none";
     }
 
-    /**
-     * The URL query string of of the previous page.
-     *
-     * Note: the query string does not start with a "?" or "&" those need to be
-     * added as appropriate by the caller.
-     */
-    private String getPreviousPageURL(BrowseParams params, BrowseInfo info) throws SQLException,
-            UIException
-    {
-        // Don't create a previous page link if this is the first page
-        if (info.isFirst())
-        {
-            return null;
-        }
-
-        Map<String, String> parameters = new HashMap<String, String>();
-        parameters.putAll(params.getCommonParametersEncoded());
-        parameters.putAll(params.getControlParameters());
-
-        if (info.hasPrevPage())
-        {
-            parameters.put(BrowseParams.OFFSET, encodeForURL(String.valueOf(info.getPrevOffset())));
-        }
-
-        return super.generateURL(WITHDRAWN_URL_BASE, parameters);
-
+    protected String getParameterOrder() {
+        return ObjectModelHelper.getRequest(objectModel).getParameter("order");
     }
 
-    /**
-     * The URL query string of of the next page.
-     *
-     * Note: the query string does not start with a "?" or "&" those need to be
-     * added as appropriate by the caller.
-     */
-    private String getNextPageURL(BrowseParams params, BrowseInfo info) throws SQLException,
-            UIException
-    {
-        // Don't create a next page link if this is the last page
-        if (info.isLast())
-        {
-            return null;
+    protected String getParameterScope() {
+        return ObjectModelHelper.getRequest(objectModel).getParameter("scope");
         }
 
-        Map<String, String> parameters = new HashMap<String, String>();
-        parameters.putAll(params.getCommonParametersEncoded());
-        parameters.putAll(params.getControlParameters());
 
-        if (info.hasNextPage())
+    private String  generateURL(Map<String, String> parameters) throws UIException {
+    	if (parameters.get("page") == null)
         {
-            parameters.put(BrowseParams.OFFSET, encodeForURL(String.valueOf(info.getNextOffset())));
+            parameters.put("page", encodeForURL(String.valueOf(getParameterPage())));
         }
-
+    	if (parameters.get(BrowseParams.ORDER) == null){
+    			parameters.put(BrowseParams.ORDER, encodeForURL(getParameterOrder()));
+    	}
+    	if (parameters.get(BrowseParams.TYPE)==null){
+    		String type = getParameterType();
+    		if(type!=null)
+    			parameters.put(BrowseParams.TYPE, encodeForURL(type));
+    	}
+    	if (parameters.get("sort_by")==null){
+    		String sort = getParameterSort();
+    		if(sort!=null)
+    			parameters.put("sort_by", encodeForURL(sort));
+    	}
+    	if (parameters.get(BrowseParams.RESULTS_PER_PAGE)==null){
+    		parameters.put(BrowseParams.RESULTS_PER_PAGE, encodeForURL(String.valueOf(getParameterRpp())));
+    	}
+    	//??other defaults
         return super.generateURL(WITHDRAWN_URL_BASE, parameters);
     }
 
+    private int getParameterPage() {
+        try {
+            int ret = Integer.parseInt(ObjectModelHelper.getRequest(objectModel).getParameter("page"));
+            if(ret<=0){
+            	return 1;
+            }
+            else return ret;
+        }
+        catch (Exception e) {
+            return 1;
+        }
+    } 
+        
+    private String getParameterType(){
+    	String type = ObjectModelHelper.getRequest(objectModel).getParameter(BrowseParams.TYPE);
+    	return type;
+    }
+    private String getParameterSort(){
+    	String sort = ObjectModelHelper.getRequest(objectModel).getParameter("sort_by");
+    	return sort;
+    }
+    
+    private int getParameterRpp() {
+        try {
+            int ret = Integer.parseInt(ObjectModelHelper.getRequest(objectModel).getParameter(BrowseParams.RESULTS_PER_PAGE));
+            if(ret<=0){
+            	return 20;
+            }
+            else return ret;
+        }
+        catch (Exception e) {
+            return 20;
+        }
+    } 
+    
     /**
      * Get the query parameters supplied to the browse.
      *
@@ -605,11 +476,9 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
 
             params.scope.setJumpToItem(RequestUtils.getIntParameter(request, BrowseParams.JUMPTO_ITEM));
             params.scope.setOrder(request.getParameter(BrowseParams.ORDER));
-            int offset = RequestUtils.getIntParameter(request, BrowseParams.OFFSET);
-            params.scope.setOffset(offset > 0 ? offset : 0);
-            params.scope.setResultsPerPage(RequestUtils.getIntParameter(request,
-                    BrowseParams.RESULTS_PER_PAGE));
-            params.scope.setStartsWith(decodeFromURL(request.getParameter(BrowseParams.STARTS_WITH)));
+            params.scope.setResultsPerPage(RequestUtils.getIntParameter(request, BrowseParams.RESULTS_PER_PAGE));            
+            params.scope.setOffset((getParameterPage()-1)*params.scope.getResultsPerPage());
+            params.scope.setStartsWith(request.getParameter(BrowseParams.STARTS_WITH));
             String filterValue = request.getParameter(BrowseParams.FILTER_VALUE[0]);
             if (filterValue == null)
             {
@@ -741,51 +610,19 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
             (info.getBrowseIndex().isDate() && info.getSortOption().isDefault());
     }
 
-    private Message getTitleMessage(BrowseInfo info)
-    {
-        if (titleMessage == null)
-        {
-            BrowseIndex bix = info.getBrowseIndex();
-
-	        if (bix.isMetadataIndex())
-            {
-                titleMessage = message("xmlui.Administrative.WithdrawnItems.title.metadata." + bix.getName());
+    /**
+     * Returns a list of the filter queries for use in rendering pages, creating page more urls, ....
+     * @return an array containing the filter queries
+     */
+    protected String[] getParameterFilterQueries(){
+        try {
+            return ObjectModelHelper.getRequest(objectModel).getParameterValues("fq");
             }
-            else if (info.getSortOption() != null)
-            {
-                titleMessage = message("xmlui.Administrative.WithdrawnItems.title.item." + info.getSortOption().getName());
-            }
-            else
-            {
-                titleMessage = message("xmlui.Administrative.WithdrawnItems.title.item." + bix.getSortOption().getName());
+        catch (Exception e) {
+            return null;
             }
         }
 
-        return titleMessage;
-    }
-
-    private Message getTrailMessage(BrowseInfo info)
-    {
-        if (trailMessage == null)
-        {
-            BrowseIndex bix = info.getBrowseIndex();
-
-            if (bix.isMetadataIndex())
-            {
-                trailMessage = message("xmlui.Administrative.WithdrawnItems.trail.metadata." + bix.getName());
-            }
-            else if (info.getSortOption() != null)
-            {
-                trailMessage = message("xmlui.Administrative.WithdrawnItems.trail.item." + info.getSortOption().getName());
-            }
-            else
-            {
-                trailMessage = message("xmlui.Administrative.WithdrawnItems.trail.item." + bix.getSortOption().getName());
-            }
-        }
-
-        return trailMessage;
-    }
 }
 
 /*

@@ -38,9 +38,11 @@ import java.util.Map;
 /**
  * Navigation that adds code needed for the browse features from dspace
  *
- * @author Kevin Van de Velde (kevin at atmire dot com)
- * @author Mark Diggory (markd at atmire dot com)
- * @author Ben Bosman (ben at atmire dot com)
+ * based on class by:
+ * Kevin Van de Velde (kevin at atmire dot com)
+ * Mark Diggory (markd at atmire dot com)
+ * Ben Bosman (ben at atmire dot com)
+ * modified for LINDAT/CLARIN
  */
 public class Navigation extends AbstractDSpaceTransformer implements CacheableProcessingComponent {
 
@@ -124,11 +126,12 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
         browseGlobal.setHead(T_head_all_of_dspace);
 
-        browseGlobal.addItemXref(contextPath + "/community-list",T_communities_and_collections);
+        //browseGlobal.addItemXref(contextPath + "/community-list",T_communities_and_collections);
 
         // Add the configured browse lists for 'top level' browsing
         addBrowseOptions(browseGlobal, contextPath + "/browse");
 
+	/*
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (dso != null)
         {
@@ -151,7 +154,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             // Add the configured browse lists for scoped browsing
             String handle = dso.getHandle();
             addBrowseOptions(browseContext, contextPath + "/handle/" + handle + "/browse");
-        }
+        }*/
     }
 
     /**

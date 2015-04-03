@@ -351,7 +351,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 
         // Add Withdrawn Message if it is
         if(item.isWithdrawn()){
-            Division div = division.addDivision("notice", "notice");
+            Division div = division.addDivision("notice", "alert");
             Para p = div.addPara();
             p.addContent(T_withdrawn);
             //Set proper response. Return "404 Not Found"

@@ -22,23 +22,26 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
+
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 import javax.mail.Address;
+import javax.mail.Authenticator;
 import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
+import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+
 import org.apache.log4j.Logger;
-import org.dspace.services.EmailService;
-import org.dspace.utils.DSpace;
 
 /**
  * Class representing an e-mail message, also used to send e-mails.
@@ -237,9 +240,21 @@ public class Email
     public void send() throws MessagingException, IOException
     {
         // Get the mail configuration properties
+        String server = ConfigurationManager.getProperty("mail.server");
         String from = ConfigurationManager.getProperty("mail.from.address");
         boolean disabled = ConfigurationManager.getBooleanProperty("mail.server.disabled", false);
 
+		// Set up properties for mail session
+        Properties props = System.getProperties();
+        props.put("mail.smtp.host", server);
+
+        // Set the port number for the mail server
+        String portNo = ConfigurationManager.getProperty("mail.server.port");
+        if (portNo == null)
+        {
+        	portNo = "25";
+        }
+        props.put("mail.smtp.port", portNo.trim());
         // If no character set specified, attempt to retrieve a default
         if (charset == null)
         {
@@ -247,8 +262,37 @@ public class Email
         }
 
         // Get session
-        Session session = new DSpace().getServiceManager().
-                getServicesByType(EmailService.class).get(0).getSession();
+        Session session;
+        
+        // Get the SMTP server authentication information
+        String username = ConfigurationManager.getProperty("mail.server.username");
+        String password = ConfigurationManager.getProperty("mail.server.password");
+        
+        if (username != null)
+        {
+            props.put("mail.smtp.auth", "true");
+            SMTPAuthenticator smtpAuthenticator = new SMTPAuthenticator(
+                    username, password);
+            session = Session.getDefaultInstance(props, smtpAuthenticator);
+        }
+        else
+        {
+            session = Session.getDefaultInstance(props);
+        }
+
+        // Set extra configuration properties
+        String extras = ConfigurationManager.getProperty("mail.extraproperties");
+        if ((extras != null) && (!"".equals(extras.trim())))
+        {
+            String arguments[] = extras.split(",");
+            String key, value;
+            for (String argument : arguments)
+            {
+                key = argument.substring(0, argument.indexOf('=')).trim();
+                value = argument.substring(argument.indexOf('=') + 1).trim();
+                props.put(key, value);
+            }
+        }
 
         // Create message
         MimeMessage message = new MimeMessage(session);
@@ -355,8 +399,19 @@ public class Email
 
             log.info(text);
         }
-        else
-            Transport.send(message);
+        else{
+              try{
+	        	Transport.send(message);
+	        	StringBuffer mailTo = new StringBuffer();
+	        	for(Address address : message.getAllRecipients()){
+	        		mailTo.append(address).append(";");
+	            }
+        	    log.info(String.format("Email with subject %s successfully sent to the following people: %s", message.getSubject(),mailTo.toString()));
+        	  }catch(MessagingException e){
+        		log.error("Error while sending an email" + e.toString());
+        		throw e;
+        	  }  
+		}
     }
 
     /**
@@ -570,5 +625,28 @@ public class Email
            throw new IOException("Cannot write to this read-only resource");        
        }    
    }
+
+	/**
+     * Inner Class for SMTP authentication information
+     */
+    private static class SMTPAuthenticator extends Authenticator
+    {
+        // User name
+        private String name;
+        
+        // Password
+        private String password;
+        
+        public SMTPAuthenticator(String n, String p)
+        {
+            name = n;
+            password = p;
+        }
+        
+        protected PasswordAuthentication getPasswordAuthentication()
+        {
+            return new PasswordAuthentication(name, password);
+        }
+    }
 
 }

@@ -24,7 +24,10 @@
       
       <map:transformer name="StepTransformer" src="org.dspace.app.xmlui.aspect.submission.StepTransformer"/>
       
-      <map:transformer name="SelectCollectionStep" src="org.dspace.app.xmlui.aspect.submission.submit.SelectCollectionStep"/>
+      <!-- <UFAL> -->
+      <!-- <map:transformer name="SelectCollectionStep" src="org.dspace.app.xmlui.aspect.submission.submit.SelectCollectionStep"/> -->
+      <map:transformer name="SelectCollectionStep" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.submission.submit.SelectCollectionStep"/>
+      <!-- </UFAL> -->
       <map:transformer name="ResumeStep" src="org.dspace.app.xmlui.aspect.submission.submit.ResumeStep"/>
       <map:transformer name="SaveOrRemoveStep" src="org.dspace.app.xmlui.aspect.submission.submit.SaveOrRemoveStep"/>
       <map:transformer name="RemovedStep" src="org.dspace.app.xmlui.aspect.submission.submit.RemovedStep"/>
@@ -44,6 +47,7 @@
     
     <map:actions>
       <map:action name="RemoveSubmissionsAction" src="org.dspace.app.xmlui.aspect.submission.submit.RemoveSubmissionsAction"/>
+      <map:action name="AddNewVersionAction" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.submission.submit.AddNewVersionAction"/>
     </map:actions>
     
   </map:components>
@@ -84,7 +88,10 @@
           <!-- Start a new submission to specific collection -->
           <map:match pattern="handle/*/*/submit">
             <map:call function="doSubmission">
+              <!--
+              Commented out to enforce the "select collection" step
               <map:parameter name="handle" value="{1}/{2}"/>
+               -->
             </map:call>
           </map:match>
           
@@ -141,6 +148,10 @@
               <map:act type="RemoveSubmissionsAction"/>
             </map:match>
              
+            <map:match type="request" pattern="submit_submissions_add_new_version">
+              <map:act type="AddNewVersionAction"/>
+            </map:match>
+              
             <map:transform type="Submissions"/>
           </map:match>
           
@@ -184,6 +195,7 @@
                 <map:parameter name="transformer" value="{flow-attribute:transformer}"/>
                 <map:parameter name="error" value="{flow-attribute:error}"/>
                 <map:parameter name="error_fields" value="{flow-attribute:error_fields}"/>
+                <map:parameter name="regex_error" value="{flow-attribute:regex_error}"/>
                 <map:parameter name="handle" value="{1}/{2}"/>
               </map:transform>
             </map:match>

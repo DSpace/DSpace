@@ -4,13 +4,11 @@
 # {1}  Name of collection
 # {2}  handle 
 #
-Subject: DSpace: Submission Approved and Archived 
+Subject: ${lr.dspace.name.short}: Submission Approved and Archived 
 
 You submitted: {0}
 
-To collection: {1}
-
-Your submission has been accepted and archived in DSpace,
+Your submission has been accepted and archived in ${lr.dspace.name.short} repository,
 and it has been assigned the following identifier:
 {2}
 
@@ -18,4 +16,11 @@ Please use this identifier when citing your submission.
 
 Many thanks!
 
-DSpace
+
+${lr.dspace.name.short} Team
+
+_____________________________________
+${dspace.name},
+WWW: ${dspace.url}
+Email: ${lr.help.mail}
+Tel.: ${lr.help.phone}

@@ -45,8 +45,9 @@ import java.util.*;
  * database after calling <code>update</code>. The default group of
  * submitters is slightly different - creating or removing this has instant
  * effect.
- *
- * @author Robert Tansley
+ * 
+ * based on class by Robert Tansley
+ * modified for LINDAT/CLARIN
  * @version $Revision$
  */
 public class Collection extends DSpaceObject
@@ -1800,5 +1801,14 @@ public class Collection extends DSpaceObject
 
         }
         return collections.toArray(new Collection[0]);
+    }
+
+   public boolean epersonIsReviewer() throws SQLException{
+        Group reviewers = getWorkflowGroup(2); //get the review/edit group
+        boolean epersonIsReviewer = false;
+        if(reviewers != null && Group.isMember(this.ourContext, reviewers.getID())){
+            epersonIsReviewer = true;
+        }
+        return epersonIsReviewer;
     }
 }

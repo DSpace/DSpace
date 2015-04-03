@@ -15,13 +15,37 @@ import gr.ekt.bte.dataloader.FileDataLoader;
 import gr.ekt.bteio.generators.DSpaceOutputGenerator;
 import gr.ekt.bteio.loaders.OAIPMHDataLoader;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.zip.ZipFile;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.TreeMap;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import javax.mail.MessagingException;
 import javax.xml.parsers.DocumentBuilder;
@@ -45,8 +69,17 @@ import org.apache.xpath.XPathAPI;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
-import org.dspace.content.*;
+import org.dspace.content.Bitstream;
+import org.dspace.content.BitstreamFormat;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.FormatIdentifier;
+import org.dspace.content.InstallItem;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataSchema;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -58,6 +91,7 @@ import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
 import org.dspace.search.DSIndexer;
 import org.dspace.utils.DSpace;
+import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
 import org.dspace.xmlworkflow.XmlWorkflowManager;
 import org.w3c.dom.Document;
@@ -962,6 +996,14 @@ public class ItemImport
     {
         if (!isTest)
         {
+            // <UFAL>
+            WorkflowItem myWorflowItem = WorkflowItem.findByItem(c, myitem);
+            if (myWorflowItem != null)
+            {
+                myWorflowItem.deleteWrapper();
+            }
+            // </UFAL>
+            
             Collection[] collections = myitem.getCollections();
 
             // Remove item from all the collections it's in
@@ -969,6 +1011,11 @@ public class ItemImport
             {
                 collections[i].removeItem(myitem);
             }
+            
+            // <UFAL>
+            myitem.delete();
+            // </UFAL>
+            
         }
     }
 

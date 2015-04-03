@@ -80,7 +80,7 @@ public class DeleteBitstreamFormatsConfirm extends AbstractDSpaceTransformer
 		}
  
 		// DIVISION: bitstream-format-confirm-delete
-    	Division deleted = body.addInteractiveDivision("bitstream-format-confirm-delete",contextPath+"/admin/format-registry",Division.METHOD_POST,"primary administrative format-registry");
+    	Division deleted = body.addInteractiveDivision("bitstream-format-confirm-delete",contextPath+"/admin/format-registry",Division.METHOD_POST,"alert alert-danger");
     	deleted.setHead(T_head);
     	deleted.addPara(T_para1);
     	

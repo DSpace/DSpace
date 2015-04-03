@@ -82,6 +82,7 @@ public class Cleanup
         catch (Exception e)
         {
             log.fatal("Caught exception:", e);
+            System.err.println(e.getMessage());            
             System.exit(1);
         }
     }

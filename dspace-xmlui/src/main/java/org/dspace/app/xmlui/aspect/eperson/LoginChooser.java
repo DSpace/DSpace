@@ -20,7 +20,6 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.excalibur.source.SourceValidity;
-import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.wing.Message;
@@ -35,11 +34,14 @@ import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
 
+import cz.cuni.mff.ufal.dspace.authenticate.ShibAuthentication;
+
 /**
  * Displays a list of authentication methods. This page is displayed if more
  * than one AuthenticationMethod is defined in the dpace config file.
  * 
- * @author Jay Paz
+ * based on class by Jay Paz
+ * modified for LINDAT/CLARIN
  * 
  */
 public class LoginChooser extends AbstractDSpaceTransformer implements
@@ -78,7 +80,9 @@ public class LoginChooser extends AbstractDSpaceTransformer implements
 				&& previous_email == null)
         {
             // cacheable
-            return "1";
+
+			// never cache, there have been few problems with redirects?!
+			return "0";
         }
 		else
         {
@@ -107,10 +111,10 @@ public class LoginChooser extends AbstractDSpaceTransformer implements
 		// cachable
 		if (header == null && message == null && characters == null
 				&& previous_email == null)
-        {
-            // Always valid
-            return NOPValidity.SHARED_INSTANCE;
-        }
+		{
+			// invalid
+			return null;
+		}
 		else
         {
             // invalid
@@ -145,11 +149,12 @@ public class LoginChooser extends AbstractDSpaceTransformer implements
 				.getAttribute(AuthenticationUtil.REQUEST_INTERRUPTED_MESSAGE);
 		String characters = (String) session
 				.getAttribute(AuthenticationUtil.REQUEST_INTERRUPTED_CHARACTERS);
-
+		boolean embargo_err = false;
 		if ( (header != null && header.trim().length() > 0) || 
 			 (message != null && message.trim().length() > 0) ||
 			 (characters != null && characters.trim().length() > 0)) {
-			Division reason = body.addDivision("login-reason");
+			Division reason = body.addDivision("login-reason",
+					"alert alert-error");
 
 			if (header != null)
 			{
@@ -165,18 +170,40 @@ public class LoginChooser extends AbstractDSpaceTransformer implements
 			{
 				reason.addPara(message(message));
 			}
-			
+
 			if (characters != null)
 			{
-				reason.addPara(characters);
+				// specific handling of embargo - see
+				// BitstreamReader.set_authorised_error
+				if (characters.startsWith("embargo:")) {
+					List l = reason.addList("embargo-info", List.TYPE_FORM,
+							"embargo-info");
+					Item i = l.addItem(null, "label label-important");
+					i.addContent("Available after (year-month-day): ");
+					i.addContent(characters.split("embargo:")[1]);					
+					embargo_err = true;
+					l.addItem(null, "fa fa-clock-o fa-5x hangright").addContent(" ");
+				}
+				else
+				{
+					reason.addPara(characters);
+				}
+
 			}
 		}
 
-		Division loginChooser = body.addDivision("login-chooser");
-		loginChooser.setHead(T_head1);
-		loginChooser.addPara().addContent(T_para1);
+		if (!embargo_err)
+		{
+			Division loginChooser = body.addDivision("login-chooser", "alert alert-error");
+			loginChooser.setHead(T_head1);
+			List list = loginChooser.addList("login-options", List.TYPE_FORM);
+			list.addItem().addContent("You are trying to access a restricted resource / page.\nPlease choose a login method below to authenticate.");
+			// list.addItem().addFigure("./themes/UFAL/images/avatar.jpg", "#",
+			// "login-options-avatar signon");
+			//Item item = list.addItem("please-login", "explicit-login-form");
+			// item.addContent("Please ");
+			//item.addXref("#", "Unified Login", "login-page-anchor signon");
 
-		List list = loginChooser.addList("login-options", List.TYPE_SIMPLE);
 
 		while (authMethods.hasNext()) {
 			final AuthenticationMethod authMethod = (AuthenticationMethod) authMethods
@@ -208,11 +235,32 @@ public class LoginChooser extends AbstractDSpaceTransformer implements
                                             : ("?" + request.getQueryString()));
                     loginURL = location.toString();
                 }
+					if (ShibAuthentication.class.getName().equals(authMethod.getClass().getName())) {
+						Item item = list.addItem();
+						item.addXref("#", message("Unified Login"), "signon label label-important");
+						//item.addFigure("./themes/UFAL/images/discojuice-logo.png", "#", "signon"); // comment to the link
+						item = list.addItem();
+						//Message discoComment = message("xmlui.EPerson.LoginChooser.discojuiceComment");
+						//item.addContent(discoComment);
+	
+						// Eduid link item = list.addItem();
+						//item.addFigure("./themes/UFAL/images/eduid-logo.png", loginURL, null);
+						//item.addXref(loginURL, "eduID.cz Login", "label label-important");
+						//final Message eduidComment = message("xmlui.EPerson.LoginChooser.eduidComment");
+						//item.addContent(eduidComment);
+					} else { // Normal Render
+						//final Item item = list.addItem();
+						//final Message otherwiseComment = message("xmlui.EPerson.LoginChooser.otherwiseComment");
+						// XXX not flexible if more auth methods
+						//item.addContent(otherwiseComment);
+						//item.addXref(loginURL, message(authTitle));
+					}
+				}
 
-                final Item item = list.addItem();
-                item.addXref(loginURL, message(authTitle));
             }
 
+			list.addItem(null, "fa fa-lock fa-5x hangright").addContent(" ");
+		
 		}
 	}
 

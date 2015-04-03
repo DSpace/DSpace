@@ -1,0 +1,83 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>License Selector</title>
+
+    <!-- dependencies -->
+    <script type="text/javascript" src="jquery.min.js"></script>
+    <script type="text/javascript" src="lodash.min.js"></script>
+
+    <!-- implementation -->
+    <script type="text/javascript" src="license-selector.min.js"></script>
+    <script type="text/javascript">
+      $(function() {
+        $('<p><a href="#!">Click to open selector</a></p>')
+          .appendTo('body')
+          .licenseSelector({onLicenseSelected : function (license) {
+            $('body').append($('<pre></pre>').text(JSON.stringify(license, null, 4)))
+            console.log(license)
+          }
+        }).click();
+
+        $('<p><a href="#!">Click to open selector with modified options</a></p>')
+          .appendTo('body')
+          .licenseSelector({
+            licenses: {
+              'abc-license': {
+                name: 'ABC license',
+                priority: 1,
+                available: true,
+                url: 'http://www.example.com/abc-license',
+                description: 'This is ABC license inserted as a test',
+                template: function($el, license, selectFunction) {
+                  var h = $('<h4 />').text(license.name);
+                  h.append($('<a/>').attr({
+                    href: license.url,
+                    target: '_blank'
+                  }));
+                  //$el.click(selectFunction);
+                  $el.append(h);
+                  $el.append('<p>Custom template function</p>');
+                  $el.append($('<button/>').append('<span>Click here to select license</span>').click(selectFunction));
+                },
+                categories: ['data', 'abc']
+              },
+              'cc-by': {
+                description: 'Modified description ...',
+                cssClass: 'cc-by'
+              }
+            },
+            start: 'DataCopyrightable',
+            onLicenseSelected : function (license) {
+              $('body').append($('<pre></pre>').text(JSON.stringify(license, null, 4)))
+              console.log(license)
+            }
+          });
+      });
+    </script>
+
+    <link rel="stylesheet" href="license-selector.min.css">
+    <style>
+      pre {
+        display: block;
+        padding: 9.5px;
+        margin: 0 0 10px;
+        font-size: 13px;
+        line-height: 1.42857143;
+        color: #333;
+        word-break: break-all;
+        word-wrap: break-word;
+        background-color: #f5f5f5;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      .cc-by {
+        border-color: #c80000 !important;
+      }
+    </style>
+  </head>
+  <body>
+  <h1>License Selector</h1>
+  <p>If you see this without closing the License Selector please reload the page.</p>
+  </body>
+</html>

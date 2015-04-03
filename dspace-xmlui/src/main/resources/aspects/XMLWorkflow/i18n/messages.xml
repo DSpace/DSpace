@@ -25,7 +25,7 @@
     <message key="xmlui.XMLWorkflow.workflow.ClaimAction.info1">Actions you may perform on this task:</message>
     <message key="xmlui.XMLWorkflow.workflow.ClaimAction.take_help">Assign this task to yourself.</message>
     <message key="xmlui.XMLWorkflow.workflow.ClaimAction.take_submit">Take task</message>
-    <message key="xmlui.XMLWorkflow.workflow.ClaimAction.leave_help">Leave this task in the pool for another user to take.</message>
+    <message key="xmlui.XMLWorkflow.workflow.ClaimAction.leave_help">Leave this task in the pool for another to take.</message>
     <message key="xmlui.XMLWorkflow.workflow.ClaimAction.leave_submit">Leave task</message>
     <message key="xmlui.XMLWorkflow.workflow.ClaimAction.back">Back to overview</message>
     <message key="xmlui.XMLWorkflow.workflow.ClaimAction.title">Accept/Reject Task</message>
@@ -44,7 +44,7 @@
     <message key="xmlui.XMLWorkflow.workflow.EditMetadataAction.reject_submit">Reject item</message>
     <message key="xmlui.XMLWorkflow.workflow.EditMetadataAction.approve_help">If you have reviewed the item and it is suitable for inclusion in the collection, select "Approve".</message>
     <message key="xmlui.XMLWorkflow.workflow.EditMetadataAction.approve_submit">Approve item</message>
-    <message key="xmlui.XMLWorkflow.workflow.EditMetadataAction.edit_help">Select this option to change the item's metadata.</message>
+    <message key="xmlui.XMLWorkflow.workflow.EditMetadataAction.edit_help">Select this option to change the item's metadata. You'll be asked to add all the required fields.</message>
     <message key="xmlui.XMLWorkflow.workflow.EditMetadataAction.edit_submit">Edit metadata</message>
 
     <message key="xmlui.XMLWorkflow.step.unknown">Unknown state</message>

@@ -11,6 +11,7 @@
 <!--
     TODO: Describe this XSL file
     Author: Alexey Maslov
+    modified for LINDAT/CLARIN
     
 -->
 
@@ -177,6 +178,10 @@
                 </link>
             </xsl:for-each>
             
+            <!-- jmisutka adding css globally -->
+            <link rel="stylesheet" href="{$theme-path}/lib/css/jquery-ui.css" id="theme"> </link>
+            <link rel="stylesheet" href="{$theme-path}/lib/css/ui-lightness/jquery-ui.css" id="theme"> </link>
+            
             <!-- Add syndication feeds -->
             <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='feed']">
                 <link rel="alternate" type="application">
@@ -259,6 +264,9 @@
                         <xsl:value-of select="."/>
                     </xsl:attribute>&#160;</script>
             </xsl:for-each>
+           <!-- jmisutka adding js globally and jquery no conflict because of prototype and other older js stuff -->
+            <script type="text/javascript">jQuery.noConflict();</script>
+            <script type="text/javascript" src="{$theme-path}/lib/js/jquery-ui.js">&#160;</script>
 
             <!-- Add theme javascipt  -->
             <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][not(@qualifier)]">
@@ -272,6 +280,22 @@
                     </xsl:attribute>&#160;</script>
             </xsl:for-each>
             
+            <!-- jmisutka
+                Drag and drop support; a bit nasty because of double js import
+                but required.
+            -->
+            <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='dragNdrop']">
+                <link rel="stylesheet" href="{$theme-path}/lib/css/jquery.fileupload-ui.css"> </link>
+                <script type="text/javascript" src="{$theme-path}/lib/js/jquery.fileupload.js">&#160;</script>
+                <script type="text/javascript" src="{$theme-path}/lib/js/jquery.fileupload-ui.js">&#160;</script>
+                <script type="text/javascript" src="{$theme-path}/lib/js/fileupload.js">&#160;</script>
+            </xsl:if>
+            <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='extrametadata']">
+                <script type="text/javascript" src="{$theme-path}/lib/js/extrametadata.js">&#160;</script>
+            </xsl:if>
+            <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='licenseselect']">
+                <script type="text/javascript" src="{$theme-path}/lib/js/licenseselect.js">&#160;</script>
+            </xsl:if>
             
             <!-- Add a google analytics script if the key is present -->
             <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']">
@@ -2412,6 +2436,13 @@
                             with the value 'submit'. No reset buttons for now...
                     -->
                     <xsl:otherwise>
+                           <!-- UFAL
+                                adding ISO 639-3 support
+							    -->
+                        <xsl:if test="@n = 'dc_language_iso'">
+                            <script type="text/javascript" src="{$theme-path}/lib/js/languages.js">&#160;</script>
+                            <br />
+                        </xsl:if>
                         <input>
                             <xsl:call-template name="fieldAttributes"/>
                             <xsl:if test="@type='button'">
@@ -2468,8 +2499,59 @@
                             </xsl:call-template>
                           </xsl:when>
                         </xsl:choose>
+                        <!-- dragNdrop support if specified 
+                             for a file input button
+                        -->
+                        <xsl:call-template name="dragNdrop"/>
                     </xsl:otherwise>
         </xsl:choose>
+    </xsl:template>
+
+
+    <!--
+        If page metadata specify that they want to use drag and drop then
+        include it as a button. This relies on js/css added in buildHeader.
+    jmisutka 2011/04/07 -->
+    <xsl:template name="dragNdrop">
+        <xsl:if test="@type= 'file' and /dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='dragNdrop']">
+            <span id="file_upload">
+                <div id="file_upload_container" style="display:none">
+                    <input type="file" name="file">
+                        <xsl:call-template name="fieldAttributes"/>
+                        <xsl:if test="dri:value/i18n:text">
+                            <xsl:attribute name="i18n:attr">value</xsl:attribute>
+                        </xsl:if>
+                        <xsl:attribute name="value">
+                            <xsl:choose>
+                                <xsl:when test="./dri:value[@type='raw']">
+                                    <xsl:value-of select="./dri:value[@type='raw']"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="./dri:value[@type='default']"/>
+                    </xsl:otherwise>
+        </xsl:choose>
+                        </xsl:attribute>
+                        <xsl:if test="dri:value/i18n:text">
+                            <xsl:attribute name="i18n:attr">value</xsl:attribute>
+                        </xsl:if>
+                        <xsl:apply-templates />
+                    </input>
+                    <button><i18n:text>xmlui.UFAL.dragndrop.upload.button.text</i18n:text></button>
+                    <div><i18n:text>xmlui.UFAL.dragndrop.upload.label</i18n:text></div>
+                </div>
+            </span>
+
+          <!-- ui-dialog -->
+          <div id="file_upload_no_desc_dialog" style="display:none" i18n:attr="title" title="xmlui.UFAL.dragndrop.nodescription.title">
+
+              <label class="ds-from-label"><i18n:text>xmlui.UFAL.dragndrop.nodescription.label</i18n:text></label>
+              <input type="text" value=""> </input>
+              <div class="field-help"><i18n:text>xmlui.UFAL.dragndrop.nodescription.help</i18n:text></div>
+
+          </div>
+
+            <table id="files">&#160;</table>
+        </xsl:if>
     </xsl:template>
     
     <!-- A set of standard attributes common to all fields -->
@@ -3390,6 +3472,27 @@
          <xsl:value-of select="concat($theme-path,'/images/lookup-indicator.gif')"/>
         </xsl:attribute>
       </img>
+    </xsl:template>
+    
+    <xsl:template match="dri:list[@id='aspect.artifactbrowser.UFALLicenceItemViewer.list.license_labels']/dri:item" priority="1">
+        <ul>
+            <xsl:call-template name="standardAttributes">
+                <xsl:with-param name="class">ds-bulleted-list</xsl:with-param>
+            </xsl:call-template>
+            <xsl:apply-templates select="*[not(name()='head')]" mode="nested"/>
+        </ul>
+    </xsl:template>
+    
+    <xsl:template match="dri:list[@id='aspect.artifactbrowser.UFALLicenceItemViewer.list.license_labels']/dri:item" mode="nested" priority="1">
+        <li>
+            <xsl:attribute name="title">
+                <xsl:value-of select="@rend"/>
+            </xsl:attribute>
+            <xsl:attribute name="class">
+                <xsl:value-of select="@n"/>
+            </xsl:attribute>
+            <xsl:apply-templates />
+        </li>
     </xsl:template>
     
     <!-- This inline JS must be added to the popup page for choice lookups -->

@@ -7,6 +7,7 @@
  */
 package org.dspace.content.crosswalk;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -16,6 +17,7 @@ import java.util.List;
 import org.apache.commons.lang.ArrayUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.packager.AbstractMETSDisseminator;
 import org.dspace.content.packager.PackageDisseminator;
 import org.dspace.content.packager.PackageException;
 import org.dspace.content.packager.PackageParameters;
@@ -29,6 +31,8 @@ import org.jdom.JDOMException;
 import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 
+import edu.harvard.hul.ois.mets.helper.MetsException;
+
 /**
  * METS dissemination crosswalk
  * <p>
@@ -36,8 +40,9 @@ import org.jdom.input.SAXBuilder;
  * description -- intended to work within an application like the
  * OAI-PMH server.
  *
- * @author Larry Stone
+ * based on class by Larry Stone
  * @version $Revision$
+ * modified for LINDAT/CLARIN
  */
 public class METSDisseminationCrosswalk
     implements DisseminationCrosswalk
@@ -100,7 +105,7 @@ public class METSDisseminationCrosswalk
             throw new CrosswalkObjectNotSupported("METSDisseminationCrosswalk cannot disseminate a DSpaceObject of type: " + Constants.typeText[dso.getType()]);
         }
         
-        PackageDisseminator dip = (PackageDisseminator)
+        AbstractMETSDisseminator dip = (AbstractMETSDisseminator)
           PluginManager.getNamedPlugin(PackageDisseminator.class, METS_PACKAGER_PLUGIN);
         if (dip == null)
         {
@@ -112,24 +117,22 @@ public class METSDisseminationCrosswalk
             // Set the manifestOnly=true param so we just get METS document (and not content files, etc)
             PackageParameters pparams = new PackageParameters();
             pparams.put("manifestOnly", "true");
+            //UFAL
+            pparams.put("unauthorized", "skip");
+            //\UFAL
 
-            // Create a temporary file to disseminate into
-            String tempDirectory = (ConfigurationManager.getProperty("upload.temp.dir") != null)
-                ? ConfigurationManager.getProperty("upload.temp.dir") : System.getProperty("java.io.tmpdir"); 
-
-            File tempFile = File.createTempFile("METSDissemination" + dso.hashCode(), null, new File(tempDirectory));
-            tempFile.deleteOnExit();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
             // Disseminate METS to temp file
             Context context = new Context();
-            dip.disseminate(context, dso, pparams, tempFile);
+            dip.writeManifest(context, dso, pparams, baos);
             context.complete();
 
             try
             {
                 //Return just the root Element of the METS file
                 SAXBuilder builder = new SAXBuilder();
-                Document metsDocument = builder.build(tempFile);
+                Document metsDocument = builder.build(baos.toString());
                 return metsDocument.getRootElement();
             }
             catch (JDOMException je)
@@ -140,6 +143,10 @@ public class METSDisseminationCrosswalk
         catch (PackageException pe)
         {
             throw new CrosswalkInternalException("Failed making METS manifest in packager (see wrapped error message for more details) ",pe);
+        }
+        catch (MetsException e)
+        {
+            throw new CrosswalkInternalException("Failed making METS manifest in packager (see wrapped error message for more details) ",e);
         }
     }
 

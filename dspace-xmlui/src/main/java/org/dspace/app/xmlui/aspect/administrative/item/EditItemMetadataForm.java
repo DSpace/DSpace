@@ -46,8 +46,8 @@ import org.dspace.content.authority.Choices;
  * Display a list of all metadata available for this item and allow the user to
  * add, remove, or update it.
  *
- * @author Jay Paz
- * @author Scott Phillips
+ * based on class by Jay Paz and Scott Phillips
+ * modified for LINDAT/CLARIN
  */
 
 public class EditItemMetadataForm extends AbstractDSpaceTransformer {
@@ -59,11 +59,6 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
         private static final Message T_item_trail = message("xmlui.administrative.item.general.item_trail");
         private static final Message T_template_head = message("xmlui.administrative.item.general.template_head");
         private static final Message T_option_head = message("xmlui.administrative.item.general.option_head");
-        private static final Message T_option_status = message("xmlui.administrative.item.general.option_status");
-        private static final Message T_option_bitstreams = message("xmlui.administrative.item.general.option_bitstreams");
-        private static final Message T_option_metadata = message("xmlui.administrative.item.general.option_metadata");
-        private static final Message T_option_view = message("xmlui.administrative.item.general.option_view");
-        private static final Message T_option_curate = message("xmlui.administrative.item.general.option_curate");
 
         private static final Message T_title = message("xmlui.administrative.item.EditItemMetadataForm.title");
         private static final Message T_trail = message("xmlui.administrative.item.EditItemMetadataForm.trail");
@@ -89,7 +84,7 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
 
             pageMeta.addMetadata("choice", "collection").addContent(String.valueOf(collectionID));
             pageMeta.addMetadata("title").addContent(T_title);
-
+            pageMeta.addMetadata("include-library", "select2");
 
             pageMeta.addMetadata("stylesheet", "screen", "datatables", true).addContent("../../static/Datatables/DataTables-1.8.0/media/css/datatables.css");
             pageMeta.addMetadata("javascript", "static", "datatables", true).addContent("static/Datatables/DataTables-1.8.0/media/js/jquery.dataTables.min.js");
@@ -151,20 +146,18 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
         // LIST: options
         if (!editingTemplateItem)
         {
+    	  String tabLink = baseURL + "&submit_metadata";
           List options = main.addList("options",List.TYPE_SIMPLE,"horizontal");
-          options.addItem().addXref(baseURL+"&submit_status",T_option_status);
-          options.addItem().addXref(baseURL+"&submit_bitstreams",T_option_bitstreams);
-          options.addItem().addHighlight("bold").addXref(baseURL+"&submit_metadata",T_option_metadata);
-          options.addItem().addXref(baseURL + "&view_item", T_option_view);
-          options.addItem().addXref(baseURL + "&submit_curate", T_option_curate);
+          ViewItem.add_options(options, baseURL, ViewItem.T_option_metadata, tabLink);
         }
 
         // LIST: add new metadata
         List addForm = main.addList("addItemMetadata",List.TYPE_FORM);
         addForm.setHead(T_head1);
 
-                Select addName = addForm.addItem().addSelect("field");
+                Select addName = addForm.addItem().addSelect("field", "autocomplete");                
                 addName.setLabel(T_name_label);
+                main.addHidden("field-type").setValue("select2");
                 MetadataField[] fields = MetadataField.findAll(context);
                 for (MetadataField field : fields)
                 {
@@ -196,10 +189,10 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
                 addForm.addItem().addButton("submit_add").setValue(T_submit_add);
 
                 
-                
+                main = main.addDivision("edit-metadata-form", "well well-light");
 
                 // PARA: Disclaimer
-                main.addPara(T_para1);
+                main.addPara(null, "alert alert-error bold").addContent(T_para1);
 
                 
                 Para actions = main.addPara(null,"edit-metadata-actions top" );

@@ -19,6 +19,7 @@ public class DiscoverySearchFilter {
     protected String indexFieldName;
     protected List<String> metadataFields;
     protected String type = DiscoveryConfigurationParameters.TYPE_TEXT;
+    protected boolean fullAutoComplete;
     public static final String FILTER_TYPE_DEFAULT = "default";
 
     public String getIndexFieldName() {
@@ -58,6 +59,14 @@ public class DiscoverySearchFilter {
         }else{
             this.type = type;
         }
+    }
+    
+    public boolean isFullAutoComplete(){
+        return fullAutoComplete;
+    }
+    
+    public void setFullAutoComplete(boolean fullAutoComplete){
+        this.fullAutoComplete = fullAutoComplete;
     }
 
     public String getFilterType(){

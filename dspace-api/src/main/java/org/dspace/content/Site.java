@@ -19,6 +19,8 @@ import org.dspace.handle.HandleManager;
 /**
  * Represents the root of the DSpace Archive.
  * By default, the handle suffix "0" represents the Site, e.g. "1721.1/0"
+ * 
+ * modified for LINDAT/CLARIN
  */
 public class Site extends DSpaceObject
 {
@@ -69,7 +71,7 @@ public class Site extends DSpaceObject
     {
         if (handle == null)
         {
-            handle = HandleManager.getPrefix() + "/" + String.valueOf(SITE_ID);
+            handle = HandleManager.completeHandle(HandleManager.getPrefix(), String.valueOf(SITE_ID));
         }
         return handle;
     }

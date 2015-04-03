@@ -62,6 +62,7 @@
       </fileSet>
       <!-- Copy over all module configs & filter them -->
       <fileSet>
+	 <directory>${basedir}</directory>
          <outputDirectory>.</outputDirectory>
          <includes>
             <include>config/modules/**</include>
@@ -87,6 +88,11 @@
          <outputDirectory>config</outputDirectory>
          <filtered>true</filtered>
       </file>
+      <file>
+         <source>config/crosswalks/oai/description-olac.xml</source>
+         <outputDirectory>config</outputDirectory>
+         <filtered>true</filtered>
+      </file>
    </files>
 
    <!--
@@ -108,6 +114,7 @@
       [src]/dspace/modules/ dir and add them into 'lib' directory
       -->
       <moduleSet>
+	 <useAllReactorProjects>true</useAllReactorProjects>
          <includes>
             <include>org.dspace.modules:*:jar:*</include>
          </includes>
@@ -131,6 +138,7 @@
       'webapps' directory
       -->
       <moduleSet>
+	 <useAllReactorProjects>true</useAllReactorProjects>
          <includes>
             <include>org.dspace.modules:*:war:*</include>
          </includes>

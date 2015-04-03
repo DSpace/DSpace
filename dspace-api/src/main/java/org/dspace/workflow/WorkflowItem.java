@@ -27,7 +27,8 @@ import org.dspace.storage.rdbms.TableRowIterator;
 /**
  * Class representing an item going through the workflow process in DSpace
  * 
- * @author Robert Tansley
+ * based on class by Robert Tansley
+ * modified for LINDAT/CLARIN
  * @version $Revision$
  */
 public class WorkflowItem implements InProgressSubmission
@@ -429,4 +430,12 @@ public class WorkflowItem implements InProgressSubmission
     {
         wfRow.setColumn("published_before", b);
     }
+
+    // UFAL
+    public void setCollection(Collection collection)
+    {
+        this.collection = collection;
+        wfRow.setColumn("collection_id", collection.getID());
+    }
+    
 }

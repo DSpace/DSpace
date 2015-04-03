@@ -55,6 +55,8 @@ import java.util.List;
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
+ *
+ * modified for LINDAT/CLARIN
  */
 public abstract class AbstractSearch extends AbstractDSpaceTransformer implements CacheableProcessingComponent{
 
@@ -64,13 +66,16 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
      * Language strings
      */
     private static final Message T_head1_community =
-            message("xmlui.Discovery.AbstractSearch.head1_community");
+            message("xmlui.ArtifactBrowser.AbstractSearch.head1_community");
 
     private static final Message T_head1_collection =
-            message("xmlui.Discovery.AbstractSearch.head1_collection");
+            message("xmlui.ArtifactBrowser.AbstractSearch.head1_collection");
 
     private static final Message T_head1_none =
-            message("xmlui.Discovery.AbstractSearch.head1_none");
+            message("xmlui.ArtifactBrowser.AbstractSearch.head1_none");
+
+    private static final Message T_head2 =
+            message("xmlui.ArtifactBrowser.AbstractSearch.head2");
 
     private static final Message T_no_results =
             message("xmlui.ArtifactBrowser.AbstractSearch.no_results");
@@ -79,11 +84,17 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             message("xmlui.ArtifactBrowser.AbstractSearch.all_of_dspace");
 
     private static final Message T_sort_by_relevance =
-            message("xmlui.Discovery.AbstractSearch.sort_by.relevance");
+            message("xmlui.ArtifactBrowser.AbstractSearch.sort_by.relevance");
 
-    private static final Message T_sort_by = message("xmlui.Discovery.AbstractSearch.sort_by.head");
+    private static final Message T_sort_by = message("xmlui.ArtifactBrowser.AbstractSearch.sort_by");
 
-    private static final Message T_rpp = message("xmlui.Discovery.AbstractSearch.rpp");
+    private static final Message T_order = message("xmlui.ArtifactBrowser.AbstractSearch.order");
+    private static final Message T_order_asc = message("xmlui.ArtifactBrowser.AbstractSearch.order.asc");
+    private static final Message T_order_desc = message("xmlui.ArtifactBrowser.AbstractSearch.order.desc");
+
+    private static final Message T_rpp = message("xmlui.ArtifactBrowser.AbstractSearch.rpp");
+ private static final Message T_sort_head = message("xmlui.Discovery.SimpleSearch.sort_head");
+    private static final Message T_sort_button = message("xmlui.Discovery.SimpleSearch.sort_apply");
     private static final Message T_result_head_3 = message("xmlui.Discovery.AbstractSearch.head3");
     private static final Message T_result_head_2 = message("xmlui.Discovery.AbstractSearch.head2");
 
@@ -101,6 +112,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
      * The options for results per page
      */
     private static final int[] RESULTS_PER_PAGE_PROGRESSION = {5, 10, 20, 40, 60, 80, 100};
+    private static final int RESULTS_PER_PAGE_MAX = 100;
 
     /**
      * Cached validity object
@@ -324,10 +336,12 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             int firstItemIndex = (int) this.queryResults.getStart() + 1;
             int lastItemIndex = (int) this.queryResults.getStart() + queryResults.getDspaceObjects().size();
 
+            results.setHead(T_head1_none.parameterize(firstItemIndex,lastItemIndex, itemsTotal));
+
             //if (itemsTotal < lastItemIndex)
             //    lastItemIndex = itemsTotal;
             int currentPage = this.queryResults.getStart() / this.queryResults.getMaxResults() + 1;
-            int pagesTotal = (int) ((this.queryResults.getTotalSearchResults() - 1) / this.queryResults.getMaxResults()) + 1;
+            int pagesTotal = (int) Math.ceil((double)this.queryResults.getTotalSearchResults() / this.queryResults.getMaxResults());
             Map<String, String> parameters = new HashMap<String, String>();
             parameters.put("page", "{pageNum}");
             String pageURLMask = generateURL(parameters);
@@ -342,6 +356,10 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             // Put it on the top of level search result list
             dspaceObjectsList = results.addList("search-results-repository",
                     org.dspace.app.xmlui.wing.element.List.TYPE_DSO_LIST, "repository-search-results");
+            
+            ReferenceSet referenceSet = results.addReferenceSet("search-results-repository",
+                    ReferenceSet.TYPE_SUMMARY_LIST, null, "repository-search-results");
+
 
             List<DSpaceObject> commCollList = new ArrayList<DSpaceObject>();
             List<Item> itemList = new ArrayList<Item>();
@@ -393,10 +411,12 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
                 {
                     DiscoverResult.DSpaceObjectHighlightResult highlightedResults = queryResults.getHighlightedResults(resultDso);
                     renderItem(itemWingList, resultDso, highlightedResults);
+                    referenceSet.addReference(resultDso);
                 }
             }
 
         } else {
+			results.setHead("No items found");
             results.addPara(T_no_results);
         }
         //}// Empty query
@@ -881,7 +901,8 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
 
     protected int getParameterRpp() {
         try {
-            return Integer.parseInt(ObjectModelHelper.getRequest(objectModel).getParameter("rpp"));
+        	int rpp = Integer.parseInt(ObjectModelHelper.getRequest(objectModel).getParameter("rpp"));
+            return rpp<=RESULTS_PER_PAGE_MAX?rpp:RESULTS_PER_PAGE_MAX;
         }
         catch (Exception e) {
             return 10;
@@ -966,6 +987,8 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(dso);
 
         Division searchControlsGear = div.addDivision("masked-page-control").addDivision("search-controls-gear", "controls-gear-wrapper");
+        
+        String filterQueries = addFilterQueriesToUrl("discover?")+"&";
 
 
         /**
@@ -978,7 +1001,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
 
         org.dspace.app.xmlui.wing.element.List sortOptions = sortList.addList("sort-selections");
         boolean selected = ("score".equals(currentSort) || (currentSort == null && searchSortConfiguration.getDefaultSort() == null));
-        sortOptions.addItem("relevance", "gear-option" + (selected ? " gear-option-selected" : "")).addXref("sort_by=score&order=" + searchSortConfiguration.getDefaultSortOrder(), T_sort_by_relevance);
+        sortOptions.addItem("relevance", "gear-option" + (selected ? " gear-option-selected" : "")).addXref(filterQueries + "sort_by=score&order=" + searchSortConfiguration.getDefaultSortOrder(), T_sort_by_relevance);
 
         if (currentSort == null
                 && searchSortConfiguration.getDefaultSort() != null)
@@ -996,6 +1019,9 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             sortOrder = searchSortConfiguration.getDefaultSortOrder().name();
         }
 
+        //rpp always != null
+        int rpp = getParameterRpp();
+        
         if(searchSortConfiguration.getSortFields() != null)
         {
             for (DiscoverySortFieldConfiguration sortFieldConfiguration : searchSortConfiguration.getSortFields())
@@ -1006,7 +1032,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
                         && SORT_ORDER.asc.name().equals(sortOrder);
                 boolean selectedDesc = sortField.equals(currentSort)
                         && SORT_ORDER.desc.name().equals(sortOrder);
-                String sortFieldParam = "sort_by=" + sortField + "&order=";
+                String sortFieldParam = filterQueries + "rpp=" + rpp + "&sort_by=" + sortField + "&order=";
                 sortOptions.addItem(sortField, "gear-option" + (selectedAsc ? " gear-option-selected" : "")).addXref(sortFieldParam + "asc", message("xmlui.Discovery.AbstractSearch.sort_by." + sortField + "_asc"));
                 sortOptions.addItem(sortField, "gear-option" + (selectedDesc ? " gear-option-selected" : "")).addXref(sortFieldParam + "desc", message("xmlui.Discovery.AbstractSearch.sort_by." + sortField + "_desc"));
             }
@@ -1017,7 +1043,10 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         org.dspace.app.xmlui.wing.element.List rppOptions = sortList.addList("rpp-selections");
         for (int i : RESULTS_PER_PAGE_PROGRESSION)
         {
-            rppOptions.addItem("rpp-" + i, "gear-option" + (i == getParameterRpp() ? " gear-option-selected" : "")).addXref("rpp=" + i, Integer.toString(i));
+        	
+        	String withSortField = filterQueries + (currentSort != null? "sort_by=" + currentSort : "")
+        							+ (sortOrder != null? "&order=" + sortOrder : "");
+            rppOptions.addItem("rpp-" + i, "gear-option" + (i == getParameterRpp() ? " gear-option-selected" : "")).addXref(withSortField + "&rpp=" + i, Integer.toString(i));
         }
     }
 
@@ -1087,8 +1116,12 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             // Ignore, as we are only trying to get the scope to add detail to the log message
         }
 
+	//log empty searches as "<<BROWSING>>"
+	String query = (queryArgs == null ? "" :
+		       (queryArgs.getQuery() != null ? queryArgs.getQuery() :
+		       "<<BROWSING>>"));
         log.info(LogManager.getHeader(context, "search", logInfo + "query=\""
-                + (queryArgs == null ? "" : queryArgs.getQuery()) + "\",results=(" + countCommunities + ","
+                + query + "\",results=(" + countCommunities + ","
                 + countCollections + "," + countItems + ")"));
     }
 }

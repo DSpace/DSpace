@@ -34,7 +34,8 @@ import org.dspace.core.ConfigurationManager;
 
 /**
  *
- * @author wbossons
+ * based on class by wbossons
+ * modified for LINDAT/CLARIN
  */
 public class CurateItemForm extends AbstractDSpaceTransformer {
 
@@ -44,11 +45,7 @@ public class CurateItemForm extends AbstractDSpaceTransformer {
 	private static final Message T_submit_return = message("xmlui.general.return");
 	private static final Message T_item_trail = message("xmlui.administrative.item.general.item_trail");
 	private static final Message T_option_head = message("xmlui.administrative.item.general.option_head");
-	private static final Message T_option_status = message("xmlui.administrative.item.general.option_status");
-	private static final Message T_option_bitstreams = message("xmlui.administrative.item.general.option_bitstreams");
-	private static final Message T_option_metadata = message("xmlui.administrative.item.general.option_metadata");
-	private static final Message T_option_view = message("xmlui.administrative.item.general.option_view");
-        private static final Message T_option_curate = message("xmlui.administrative.item.general.option_curate");
+	
         private static final Message T_title = message("xmlui.administrative.item.CurateItemForm.title");
 	private static final Message T_trail = message("xmlui.administrative.item.CurateItemForm.trail");
         private static final Message T_label_name = message("xmlui.administrative.item.CurateItemForm.label_name");
@@ -93,18 +90,16 @@ public class CurateItemForm extends AbstractDSpaceTransformer {
 				+ knot.getId() ;
 
 		// DIVISION: main
-		Division main = body.addInteractiveDivision("edit-item-status", contextPath + "/admin/item", Division.METHOD_POST,"primary administrative edit-item-status");
+		Division main = body.addInteractiveDivision("edit-item-status",
+				contextPath + "/admin/item", Division.METHOD_POST,
+				"primary administrative edit-item-status");
 		main.setHead(T_option_head);
+
+		String tabLink = baseURL + "&submit_curate";
 
 		// LIST: options
 		List options = main.addList("options", List.TYPE_SIMPLE, "horizontal");
-		options.addItem().addXref(baseURL + "&submit_status", T_option_status);
-		options.addItem().addXref(baseURL + "&submit_bitstreams", T_option_bitstreams);
-		options.addItem().addXref(baseURL + "&submit_metadata", T_option_metadata);
-		options.addItem().addXref(baseURL + "&view_item", T_option_view);
-                options.addItem().addHighlight("bold").addXref(baseURL + "&submit_curate", T_option_curate);
-                
-
+		ViewItem.add_options(options, baseURL, ViewItem.T_option_curate, tabLink);
 
 	    List curationTaskList = main.addList("curationTaskList", "form");
         String curateGroup = "";

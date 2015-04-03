@@ -10,11 +10,14 @@ package org.dspace.content;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.embargo.EmbargoManager;
 import org.dspace.event.Event;
+import org.dspace.handle.HandleManager;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.IdentifierService;
 import org.dspace.utils.DSpace;
@@ -22,11 +25,14 @@ import org.dspace.utils.DSpace;
 /**
  * Support to install an Item in the archive.
  * 
- * @author dstuve
+ * based on class by dstuve
+ * modified for LINDAT/CLARIN
  * @version $Revision$
  */
 public class InstallItem
 {
+    private static final Logger log = Logger.getLogger(InstallItem.class);
+
     /**
      * Take an InProgressSubmission and turn it into a fully-archived Item,
      * creating a new Handle.
@@ -60,6 +66,11 @@ public class InstallItem
             IOException, AuthorizeException
     {
         Item item = is.getItem();
+        // <UFAL>
+        // Set owning collection prior to assigning handle so that we can use this information
+        // for community based handle generation
+        item.setOwningCollection(is.getCollection());
+        // </UFAL>
         IdentifierService identifierService = new DSpace().getSingletonService(IdentifierService.class);
         try {
             if(suppliedHandle == null)
@@ -143,8 +154,7 @@ public class InstallItem
         }
         
         // Record that the item was restored
-        String provDescription = "Restored into DSpace on "+ now + " (GMT).";
-        item.addDC("description", "provenance", "en", provDescription);
+		item.store_provenance_info("Restored into DSpace", c.getCurrentUser());
 
         return finishItem(c, item, is);
     }
@@ -184,9 +194,44 @@ public class InstallItem
                 item.addDC(dcv.element, dcv.qualifier, dcv.language, dcv.value);
             }
         }
+		// check replaced by
+        Metadatum[] replaces = item.getMetadata("dc", "relation", "replaces", Item.ANY );
+        if ( replaces.length == 1 ) {
+            String handle_prefix = ConfigurationManager.getProperty(
+                "handle.canonical.prefix" );
+            String url_of_replaced = replaces[0].value;
+            String handle_of_replaced = url_of_replaced.replaceAll( handle_prefix, "" );
+            Item replaced_item = (Item) HandleManager.resolveToObject( c, handle_of_replaced );
+            if ( null != replaced_item )
+            {
+                if (!item.isReplacedBy())
+                {
+                    String url_of_item = String.format(
+                        "%s%s", handle_prefix, item.getHandle());
+                    replaced_item.addMetadata(
+                            MetadataSchema.DC_SCHEMA, "relation", "isreplacedby", Item.ANY, url_of_item);
+                    replaced_item.update();
 
-         String provDescription = "Made available in DSpace on " + now
-                + " (GMT). " + getBitstreamProvenanceMessage(item);
+                    log.info(String.format("Adding isreplacedby to [%s] from [%s]",
+                        replaced_item.getHandle(), item.getHandle()));
+
+                } else {
+                    log.warn(String.format("Not adding isreplacedby to [%s] from [%s] " +
+                            "because a value already exists!",
+                        replaced_item.getHandle(), item.getHandle()));
+                }
+
+            }else {
+                log.warn(String.format("Not adding isreplacedby to [%s] from [%s] " +
+                        "because the replaced item could not be found!",
+                    handle_of_replaced, item.getHandle()));
+            }
+        }
+
+		// provenance
+        StringBuilder provDescription = new StringBuilder();
+        provDescription.append("Made available in DSpace ").append(
+                        item.get_provenance_header(c.getCurrentUser()));
 
         // If an issue date was passed in and it wasn't set to "today" (literal string)
         // then note this previous issue date in provenance message
@@ -196,13 +241,12 @@ public class InstallItem
             if(previousDateIssued!=null && !previousDateIssued.equalsIgnoreCase("today"))
             {
                 DCDate d = new DCDate(previousDateIssued);
-                provDescription = provDescription + "  Previous issue date: "
-                        + d.toString();
+                provDescription.append("  Previous issue date: ").append(d.toString());
             }
         }
 
         // Add provenance description
-        item.addDC("description", "provenance", "en", provDescription);
+        item.store_provenance_info(provDescription);
     }
 
     // final housekeeping when adding new Item to archive

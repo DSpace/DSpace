@@ -22,7 +22,8 @@ import java.util.Date;
  *
  * @version $Revision$
  *
- * @author Stuart Lewis
+ * based on class by Stuart Lewis
+ * modified for LINDAT/CLARIN
  */
 public class EPersonConsumer implements Consumer
 {
@@ -80,7 +81,20 @@ public class EPersonConsumer implements Consumer
                             adminEmail.addArgument(eperson.getFirstName() + " " + eperson.getLastName()); // Name
                             adminEmail.addArgument(eperson.getEmail());
                             adminEmail.addArgument(new Date());
-
+                        	
+                            String info = context.getExtraLogInfo();
+                        	if ( info == null || info.length() == 0 ) { 
+                        		info = "seems not through shibboleth";
+                        	}
+                            
+                            String detail = event.getDetail();
+                            if(detail != null && detail.length() != 0){
+                            	info = detail + "\n" + info;
+                            }
+                            	
+                            adminEmail.addArgument(info.replaceAll(",", " \n"));
+                            adminEmail.addArgument(eperson.getNetid());
+                                                
                             adminEmail.setReplyTo(eperson.getEmail());
 
                             adminEmail.send();

@@ -34,6 +34,7 @@ import org.dspace.utils.DSpace;
 
 /**
  * Abstract base class for DSpace objects
+ * modified for LINDAT/CLARIN
  */
 public abstract class DSpaceObject
 {
@@ -1383,5 +1384,51 @@ public abstract class DSpaceObject
                 return new String[]{null, null, null};
         }
     }
-    
+ /**
+     * 
+     * Returns the principal community for given object
+     * 
+     * @return Returns the principal community of the object or null if not defined/applicable 
+     * @throws SQLException
+     */
+    public Community getPrincipalCommunity() throws SQLException
+    {
+        Community principalCommunity = null;
+        int type = getType();
+        if (type == Constants.COMMUNITY)
+        {
+            principalCommunity = (Community) this;
+        }
+        else
+        {
+            Collection collection = null;            
+
+            if (type == Constants.COLLECTION)
+            {
+                collection = (Collection) this;
+            }
+            else if (type == Constants.ITEM)
+            {
+                collection = ((Item) this).getOwningCollection();
+            }
+
+            if (collection != null)                
+            {
+                Community[] communities = collection.getCommunities();
+                if(communities.length > 0)
+                {
+                    Arrays.sort(communities, new Comparator<Community>()                        
+                    {
+                        public int compare(Community c1, Community c2)
+                        {
+                            return c2.getID() - c2.getID();
+                        }
+                    });
+                    principalCommunity = communities[0];
+                }
+            }
+        }
+        return principalCommunity;
+
+    }   
 }

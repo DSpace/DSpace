@@ -7,7 +7,11 @@
  */
 package org.dspace.app.xmlui.cocoon;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.Map;
@@ -27,7 +31,7 @@ import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.environment.http.HttpResponse;
 import org.apache.cocoon.reading.AbstractReader;
 import org.apache.cocoon.util.ByteRange;
-import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
@@ -35,6 +39,7 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
+import org.dspace.content.DCDate;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
@@ -46,8 +51,10 @@ import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
-import org.apache.log4j.Logger;
-import org.dspace.core.LogManager;
+import cz.cuni.mff.ufal.DSpaceApi;
+import cz.cuni.mff.ufal.MissingLicenseAgreementException;
+import cz.cuni.mff.ufal.tracker.TrackerFactory;
+import cz.cuni.mff.ufal.tracker.TrackingSite;
 
 /**
  * The BitstreamReader will query DSpace for a particular bitstream and transmit
@@ -99,6 +106,7 @@ import org.dspace.core.LogManager;
  * 
  * @author Scott Phillips
  * @author Adán Román Ruiz at arvo.es (added request item support)
+ * modified for LINDAT/CLARIN
  */
 
 public class BitstreamReader extends AbstractReader implements Recyclable
@@ -112,6 +120,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
      */
     private static final String AUTH_REQUIRED_HEADER = "xmlui.BitstreamReader.auth_header";
     private static final String AUTH_REQUIRED_MESSAGE = "xmlui.BitstreamReader.auth_message";
+    private static final String AUTH_REQUIRED_EMBARGO_MESSAGE = "xmlui.BitstreamReader.auth_embargo_message";
         
     /**
      * How big a buffer should we use when reading from the bitstream before
@@ -147,6 +156,12 @@ public class BitstreamReader extends AbstractReader implements Recyclable
     /** The bitstream's name */
     protected String bitstreamName;
     
+    /** The bitstream's ID */
+    protected int bitstreamID;
+
+    /** The user ID */
+    protected int userID;
+
     /** True if bitstream is readable by anonymous users */
     protected boolean isAnonymouslyReadable;
 
@@ -187,6 +202,16 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             int itemID = par.getParameterAsInteger("itemID", -1);
             int bitstreamID = par.getParameterAsInteger("bitstreamID", -1);
             String handle = par.getParameter("handle", null);
+            
+            // community logo - bitstreamID
+            // file download - in par, bitstream, name, handle
+            //  see dspace-xmlui/dspace-xmlui-webapp/src/main/webapp/sitemap.xmap
+            boolean is_item_bitstream = (-1 == bitstreamID && handle != null);
+
+            if(is_item_bitstream && ConfigurationManager.getBooleanProperty("lr", "lr.tracker.enabled")) {
+                // Track the download for analytics platform
+                TrackerFactory.createInstance(TrackingSite.BITSTREAM).trackPage(request,"Bitstream Download / Single File");
+            }
             
             int sequence = par.getParameterAsInteger("sequence", -1);
             String name = par.getParameter("name", null);
@@ -273,51 +298,21 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             }
 
             // Is there a User logged in and does the user have access to read it?
-            boolean isAuthorized = AuthorizeManager.authorizeActionBoolean(context, bitstream, Constants.READ);
-            if (item != null && item.isWithdrawn() && !AuthorizeManager.isAdmin(context))
-            {
-                isAuthorized = false;
-                log.info(LogManager.getHeader(context, "view_bitstream", "handle=" + item.getHandle() + ",withdrawn=true"));
+
+            try {
+                AuthorizeManager.authorizeAction(context, bitstream, Constants.READ);
             }
-            // It item-request is enabled to all request we redirect to restricted-resource immediately without login request  
-            String requestItemType = ConfigurationManager.getProperty("request.item.type");
-            if (!isAuthorized)
+            catch (MissingLicenseAgreementException e)
             {
-                if(context.getCurrentUser() != null || StringUtils.equalsIgnoreCase("all", requestItemType)){
-                        // A user is logged in, but they are not authorized to read this bitstream,
-                        // instead of asking them to login again we'll point them to a friendly error
-                        // message that tells them the bitstream is restricted.
-                        String redictURL = request.getContextPath() + "/handle/";
-                        if (item!=null){
-                                redictURL += item.getHandle();
-                        }
-                        else if(dso!=null){
-                                redictURL += dso.getHandle();
-                        }
-                        redictURL += "/restricted-resource?bitstreamId=" + bitstream.getID();
-
-                        HttpServletResponse httpResponse = (HttpServletResponse)
-                        objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
-                        httpResponse.sendRedirect(redictURL);
-                        return;
-                }
-                else{
-                	if(ConfigurationManager.getProperty("request.item.type")==null||
-                			                			ConfigurationManager.getProperty("request.item.type").equalsIgnoreCase("logged")){
-                        // The user does not have read access to this bitstream. Interrupt this current request
-                        // and then forward them to the login page so that they can be authenticated. Once that is
-                        // successful, their request will be resumed.
-                        AuthenticationUtil.interruptRequest(objectModel, AUTH_REQUIRED_HEADER, AUTH_REQUIRED_MESSAGE, null);
-
-                        // Redirect
-                        String redictURL = request.getContextPath() + "/login";
-
-                        HttpServletResponse httpResponse = (HttpServletResponse)
-                        objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
-                        httpResponse.sendRedirect(redictURL);
-                        return;
-                	}
-                }
+                redirectToLicenseAgreement(context, request, dso, item,
+                        bitstream, objectModel, true);
+                return;
+            }
+            catch (AuthorizeException e)
+            {
+                redirectToRestrictionInfo(context, request, dso, item,
+                        bitstream, objectModel, true);
+                return;
             }
 
             // Success, bitstream found and the user has access to read it.
@@ -368,12 +363,15 @@ public class BitstreamReader extends AbstractReader implements Recyclable
 
             this.bitstreamMimeType = bitstream.getFormat().getMIMEType();
             this.bitstreamName = bitstream.getName();
+            this.bitstreamID = bitstream.getID();
             if (context.getCurrentUser() == null)
             {
+                this.userID = 0;
                 this.isAnonymouslyReadable = true;
             }
             else
             {
+                this.userID = context.getCurrentUser().getID();
                 this.isAnonymouslyReadable = false;
                 for (ResourcePolicy rp : AuthorizeManager.getPoliciesActionFilter(context, bitstream, Constants.READ))
                 {
@@ -431,9 +429,94 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         }
     }
 
+    //<UFAL>
+    public static void redirectToLicenseAgreement(
+            Context context,
+            Request request,
+            DSpaceObject dso,
+            Item item,
+            Bitstream bitstream,
+            Map objectModel,
+            boolean include_bistreamId) throws IOException
+    {
+          String redictURL = request.getContextPath() + "/handle/";
+          if ( item != null )
+              redictURL += item.getHandle();
+
+          if ( include_bistreamId ) {
+              redictURL += "/ufal-licence-agreement?bitstreamId="
+                      + bitstream.getID();
+          }
+          else {
+              redictURL += "/ufal-licence-agreement?allzip=true";
+          }
+
+          HttpServletResponse httpResponse = (HttpServletResponse)
+                  objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+                  httpResponse.sendRedirect(redictURL);
+    }
+
+    public static void redirectToRestrictionInfo(
+            Context context,
+            Request request,
+            DSpaceObject dso,
+            Item item,
+            Bitstream bitstream,
+            Map objectModel,
+            boolean include_bistreamId) throws IOException
+    {
+
+        if(context.getCurrentUser() != null)
+        {
+            // A user is logged in, but they are not authorized to read this bitstream,
+            // instead of asking them to login again we'll point them to a friendly error
+            // message that tells them the bitstream is restricted.
+            String redictURL = request.getContextPath() + "/handle/";
+            if (item!=null){
+                    redictURL += item.getHandle();
+            }
+            else if(dso!=null){
+                    redictURL += dso.getHandle();
+            }
+            redictURL += "/restricted-resource";
+            if ( include_bistreamId ) {
+                redictURL += "?bitstreamId=" + bitstream.getID();
+            }
+
+            HttpServletResponse httpResponse = (HttpServletResponse)
+            objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+            httpResponse.sendRedirect(redictURL);
+        }
+        else{
     
+                // The user does not have read access to this bitstream. Inturrupt this current request
+                // and then forward them to the login page so that they can be authenticated. Once that is
+                // successfull they will request will be resumed.
+                DCDate embargoed = null;
+                try {
+                    embargoed = item.getEmbargo();
+                } catch (Exception e) {
+                }
+                if ( null != embargoed ) {
+                    // indicate this item is embargoed
+                    String embargo_detail = String.format("embargo:%s", embargoed.toString());
+                    AuthenticationUtil.interruptRequest(
+                            objectModel, AUTH_REQUIRED_HEADER, AUTH_REQUIRED_EMBARGO_MESSAGE,
+                            embargo_detail);
+                }else {
+                    AuthenticationUtil.interruptRequest(
+                            objectModel, AUTH_REQUIRED_HEADER, AUTH_REQUIRED_MESSAGE, null);
+                }
     
+                // Redirect
+                String redictURL = request.getContextPath() + "/login";
     
+                HttpServletResponse httpResponse = (HttpServletResponse)
+                objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+                httpResponse.sendRedirect(redictURL);
+        }
+    }
+    //</UFAL>
     
     /**
      * Find the bitstream identified by a sequence number on this item.
@@ -579,6 +662,11 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                 response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
                 return;
             }
+        }
+
+        if(item!=null) { // item = null means special bitstream possibly a community logo
+        	// Log download statistics
+        	DSpaceApi.updateFileDownloadStatistics(userID, bitstreamID);
         }
 
         // Only set Last-Modified: header for spiders or anonymous
@@ -749,6 +837,8 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         this.bitstreamInputStream = null;
         this.bitstreamSize = 0;
         this.bitstreamMimeType = null;
+        this.bitstreamID = 0;
+        this.userID = 0;
     }
 
 

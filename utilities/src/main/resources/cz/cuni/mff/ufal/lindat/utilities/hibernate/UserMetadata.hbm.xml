@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cz.cuni.mff.ufal.lindat.utilities.hibernate.UserMetadata" table="user_metadata" schema="public">
+        <id name="userMetadataId" type="int">
+            <column name="user_metadata_id" />
+            <generator class="identity" />
+        </id>
+        <many-to-one name="userRegistration" class="cz.cuni.mff.ufal.lindat.utilities.hibernate.UserRegistration" fetch="join" lazy="false">
+            <column name="eperson_id" not-null="true" />
+        </many-to-one>
+        <many-to-one name="licenseResourceUserAllowance" class="cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseResourceUserAllowance" fetch="join" lazy="false">
+            <column name="transaction_id" />
+        </many-to-one>
+        <property name="metadataKey" type="string">
+            <column name="metadata_key" length="64" not-null="true" />
+        </property>
+        <property name="metadataValue" type="string">
+            <column name="metadata_value" length="256" not-null="true" />
+        </property>
+    </class>
+</hibernate-mapping>
+
+

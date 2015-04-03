@@ -11,6 +11,7 @@
 <!--
     TODO: Describe this XSL file    
     Author: Alexey Maslov
+    modified for LINDAT/CLARIN
     
 -->    
 
@@ -408,8 +409,7 @@
         <!-- Generate the Creative Commons license information from the file section (DSpace deposit license hidden by default)-->
         <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CC-LICENSE' or @USE='LICENSE']"/>
 
-    </xsl:template>
-    
+    </xsl:template>    
     
     <!-- Generate the info about the item from the metadata section -->
     <xsl:template match="dim:dim" mode="itemSummaryView-DIM">
@@ -596,7 +596,7 @@
           <!-- identifier.uri row -->
           <xsl:when test="$clause = 5 and (dim:field[@element='identifier' and @qualifier='uri'])">
                     <tr class="ds-table-row {$phase}">
-	                <td><span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-uri</i18n:text>:</span></td>
+	                <td><span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-handle</i18n:text>:</span></td>
 	                <td>
 	                	<xsl:for-each select="dim:field[@element='identifier' and @qualifier='uri']">
 		                    <a>
@@ -635,6 +635,32 @@
                 <xsl:with-param name="phase" select="$otherPhase"/>
               </xsl:call-template>
           </xsl:when>
+
+          <!-- UFAL source.uri row -->
+          <xsl:when test="$clause = 7 and (dim:field[@element='source' and @qualifier='uri'])">
+                    <tr class="ds-table-row {$phase}">
+	                <td><span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-uri</i18n:text>:</span></td>
+	                <td>
+	                	<xsl:for-each select="dim:field[@element='source' and @qualifier='uri']">
+		                    <a>
+		                        <xsl:attribute name="href">
+		                            <xsl:copy-of select="./node()"/>
+		                        </xsl:attribute>
+		                        <xsl:copy-of select="./node()"/>
+		                    </a>
+		                    <xsl:if test="count(following-sibling::dim:field[@element='source' and @qualifier='uri']) != 0">
+		                    	<br/>
+		                    </xsl:if>
+	                    </xsl:for-each>
+	                </td>
+	            </tr>
+              <xsl:call-template name="itemSummaryView-DIM-fields">
+                <xsl:with-param name="clause" select="($clause + 1)"/>
+                <xsl:with-param name="phase" select="$otherPhase"/>
+              </xsl:call-template>
+          </xsl:when>
+
+
 
           <!-- recurse without changing phase if we didn't output anything -->
           <xsl:otherwise>

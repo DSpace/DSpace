@@ -12,6 +12,7 @@
 	<map:components>
 		<map:transformers>
 			<map:transformer name="StatisticsTransformer" src="org.dspace.app.xmlui.aspect.statistics.StatisticsTransformer"/>
+			<map:transformer name="GAStatisticsTransformer" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.statistics.GAStatisticsTransformer"/>
 			<map:transformer name="Navigation" src="org.dspace.app.xmlui.aspect.statistics.Navigation"/>
             <map:transformer name="RestrictedItem" src="org.dspace.app.xmlui.aspect.artifactbrowser.RestrictedItem"/>
             <map:transformer name="StatisticsSearchResultTransformer" src="org.dspace.app.xmlui.aspect.statistics.StatisticsSearchResultTransformer"/>
@@ -38,6 +39,7 @@
 
             <!--Make sure that the home page also receives statistics-->
             <map:match pattern="">
+            	<map:transform type="StatisticsTransformer"/>
                 <map:match type="StatisticsAuthorizedMatcher" pattern="READ">
                     <map:parameter name="type" value="usage,search,workflow"/>
 
@@ -52,6 +54,18 @@
 
                     <map:transform type="StatisticsTransformer"/>
                     <map:transform type="Navigation"/>
+                </map:match>
+            </map:match>
+
+            <!--GA page statistics-->
+            <map:match pattern="statistics-google">
+                <map:match type="StatisticsAuthorizedMatcher" pattern="READ">
+                    <map:transform type="GAStatisticsTransformer">
+                    	<map:parameter name="start" value="{request-param:start}"/>
+                    	<map:parameter name="end" value="{request-param:end}"/>
+                    	<map:parameter name="filters" value="{request-param:filters}"/>
+                    	<map:parameter name="dim" value="{request-param:dim}"/>
+                    </map:transform>
                 </map:match>
             </map:match>
 
@@ -103,6 +117,34 @@
                 <map:match type="StatisticsAuthorizedMatcher" pattern="!READ">
                     <map:parameter name="type" value="usage"/>
 
+                    <map:select type="AuthenticatedSelector">
+                            <map:when test="eperson">
+                                    <map:transform type="RestrictedItem"/>
+                                    <map:serialize/>
+                            </map:when>
+                            <map:otherwise>
+                                    <map:act type="StartAuthentication">
+                                            <map:parameter name="header" value="xmlui.ArtifactBrowser.RestrictedItem.auth_header"/>
+                                            <map:parameter name="message" value="xmlui.ArtifactBrowser.RestrictedItem.auth_message"/>
+                                    </map:act>
+                                    <map:serialize/>
+                            </map:otherwise>
+                    </map:select>
+                </map:match>
+            </map:match>
+
+            <!--Match google statistics-->
+            <map:match pattern="handle/*/*/statistics-google">
+                <map:match type="StatisticsAuthorizedMatcher" pattern="READ">
+                    <map:transform type="GAStatisticsTransformer">
+                    	<map:parameter name="start" value="{request-param:start}"/>
+                    	<map:parameter name="end" value="{request-param:end}"/>
+                    	<map:parameter name="filters" value="{request-param:filters}"/>
+                    	<map:parameter name="dim" value="{request-param:dim}"/>
+                    </map:transform>
+                </map:match>
+
+                <map:match type="StatisticsAuthorizedMatcher" pattern="!READ">
                     <map:select type="AuthenticatedSelector">
                             <map:when test="eperson">
                                     <map:transform type="RestrictedItem"/>

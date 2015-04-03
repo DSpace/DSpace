@@ -17,6 +17,7 @@ import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
+import org.dspace.app.xmlui.wing.element.Button;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.app.xmlui.wing.element.Row;
@@ -24,6 +25,8 @@ import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.Metadatum;
+import org.dspace.core.Constants;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
 import org.xml.sax.SAXException;
@@ -37,7 +40,8 @@ import org.xml.sax.SAXException;
  * metadata before accepting or rejecting. The user is also given the option
  * of taking the task or returning it to the pool.
  * 
- * @author Scott Phillips
+ * based on class by Scott Phillips
+ * modified for LINDAT/CLARIN
  */
 public class PerformTaskStep extends AbstractStep
 {
@@ -75,7 +79,18 @@ public class PerformTaskStep extends AbstractStep
         message("xmlui.Submission.workflow.PerformTaskStep.return_submit");
     protected static final Message T_cancel_submit = 
         message("xmlui.general.cancel");
-	
+    protected static final Message T_curate_help =
+		message("xmlui.Submission.workflow.PerformTaskStep.curate_help");
+    protected static final Message T_approve_curate = 
+		message("xmlui.Submission.workflow.PerformTaskStep.curate_submit");	
+    protected static final Message T_record_format_help = 
+		message("xmlui.Submission.workflow.PerformTaskStep.record_format_help");
+    protected static final Message T_label_move = 
+		message("xmlui.administrative.item.EditItemStatusForm.label_move");
+    protected static final Message T_submit_move = 
+		message("xmlui.administrative.item.EditItemStatusForm.submit_move");
+    protected static final Message T_head_parent_collections = 
+		message("xmlui.ArtifactBrowser.ItemViewer.head_parent_collections");
 	
 	/** Copy the workflow manager's state values so that we can reference them easier. */
 	private static final int WFSTATE_STEP1POOL = WorkflowManager.WFSTATE_STEP1POOL;
@@ -107,34 +122,45 @@ public class PerformTaskStep extends AbstractStep
     	Request request = ObjectModelHelper.getRequest(objectModel);
 		String showfull = request.getParameter("showfull");
 		
+        // Generate a from asking the user two questions: multiple
+        // titles & published before.
+        Division div = body.addInteractiveDivision("perform-task", actionURL,
+                Division.METHOD_POST, "primary workflow");
+        div.setHead(T_workflow_head);
+        
+        Metadatum[] dcv = item.getMetadataByMetadataString("local.submission.note");
+        if(dcv != null && dcv.length>0){
+        	Division note = div.addDivision("note", "alert alert-info");
+        	note.setHead("User's note:");
+        	note.addPara().addContent(dcv[0].value);
+        }
+
+        ReferenceSet appearsInclude;
+
 		// if the user selected showsimple, remove showfull.
 		if (showfull != null && request.getParameter("showsimple") != null)
         {
             showfull = null;
         }
 		
-		
-        // Generate a from asking the user two questions: multiple 
-        // titles & published before.
-    	Division div = body.addInteractiveDivision("perform-task", actionURL, Division.METHOD_POST, "primary workflow");
-        div.setHead(T_workflow_head);
-    	
-    	
         if (showfull == null)
         {
-	        ReferenceSet referenceSet = div.addReferenceSet("narf",ReferenceSet.TYPE_SUMMARY_VIEW);
-	        referenceSet.addReference(item);
-	        div.addPara().addButton("showfull").setValue(T_showfull);
+            ReferenceSet referenceSet = div.addReferenceSet("narf",
+                    ReferenceSet.TYPE_SUMMARY_VIEW);
+            appearsInclude = referenceSet.addReference(item).addReferenceSet(
+                    ReferenceSet.TYPE_DETAIL_LIST, null, "hierarchy");
         } 
         else
         {
-            ReferenceSet referenceSet = div.addReferenceSet("narf",ReferenceSet.TYPE_DETAIL_VIEW);
-            referenceSet.addReference(item);
-            div.addPara().addButton("showsimple").setValue(T_showsimple);
-            
             div.addHidden("showfull").setValue("true");
+            ReferenceSet referenceSet = div.addReferenceSet("narf",
+                    ReferenceSet.TYPE_DETAIL_VIEW);
+            appearsInclude = referenceSet.addReference(item).addReferenceSet(
+                    ReferenceSet.TYPE_DETAIL_LIST, null, "hierarchy");
         }
       
+        appearsInclude.setHead(T_head_parent_collections);
+        appearsInclude.addReference(collection);
 		   
         // FIXME: set the correct table size.
         Table table = div.addTable("workflow-actions", 1, 1);
@@ -142,6 +168,21 @@ public class PerformTaskStep extends AbstractStep
         
         // Header
         Row row;
+
+        if (showfull == null)
+        {
+            // Show full item record
+            row = table.addRow();
+            row.addCellContent(T_record_format_help);
+            row.addCell().addButton("showfull").setValue(T_showfull);
+        }
+        else
+        {
+            // Show simple item record
+            row = table.addRow();
+            row.addCellContent(T_record_format_help);
+            row.addCell().addButton("showsimple").setValue(T_showsimple);
+        }
 
         if (state == WFSTATE_STEP1POOL ||
         	state == WFSTATE_STEP2POOL ||
@@ -165,6 +206,10 @@ public class PerformTaskStep extends AbstractStep
 	        row = table.addRow();
 	        row.addCellContent(T_approve_help);
 	        row.addCell().addButton("submit_approve").setValue(T_approve_submit);
+            // Check task
+            row = table.addRow();
+            row.addCellContent(T_curate_help);
+            row.addCell().addButton("submit_curate").setValue(T_approve_curate);
         }
         
         if (state == WFSTATE_STEP3)
@@ -191,6 +236,25 @@ public class PerformTaskStep extends AbstractStep
 	        row = table.addRow();
 	        row.addCellContent(T_edit_help);
 	        row.addCell().addButton("submit_edit").setValue(T_edit_submit);
+        }
+        
+		if (state == WFSTATE_STEP2 || 
+			state == WFSTATE_STEP3)
+        {
+            // Move workflow item
+            Collection[] collections = Collection.findAuthorized(context, null,
+                    Constants.ADD);
+            row = table.addRow();
+            row.addCellContent(T_label_move);
+            Button submitMove = row.addCell().addButton("submit_move");
+            submitMove.setValue(T_submit_move);
+            if (collections.length < 1
+                    || (collections.length == 1 && collections[0]
+                            .equals(collection)))
+            {
+                submitMove.setDisabled();
+            }
+
         }
         
         if (state == WFSTATE_STEP1 ||

@@ -147,6 +147,8 @@ public class FormatRegistryMain
                 CheckBox select = cell.addCheckBox("select_format");
                 select.setLabel(id);
                 select.addOption(id);
+            } else {
+            	cell.addHighlight("fa fa-ban text-error").addContent(" ");
             }
 
             // ID

@@ -7,31 +7,36 @@
  */
 package org.dspace.xoai.util;
 
-import com.lyncode.xoai.dataprovider.xml.xoai.Element;
-import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
-import com.lyncode.xoai.util.Base64Utils;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.List;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
+import org.dspace.content.Metadatum;
 import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Utils;
 import org.dspace.xoai.data.DSpaceItem;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.util.List;
+import com.lyncode.xoai.dataprovider.xml.xoai.Element;
+import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
+import com.lyncode.xoai.util.Base64Utils;
+
+import cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseDefinition;
+import cz.cuni.mff.ufal.lindat.utilities.interfaces.IFunctionalities;
 
 /**
- * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * based on class by Lyncode Development Team <dspace@lyncode.com>
+ * modified for LINDAT/CLARIN
  */
 @SuppressWarnings("deprecation")
 public class ItemUtils
@@ -143,6 +148,12 @@ public class ItemUtils
         Element bundles = create("bundles");
         metadata.getElement().add(bundles);
 
+		//indicate restricted bitstreams -> restricted access
+		boolean restricted = false;
+
+		IFunctionalities functionalityManager = cz.cuni.mff.ufal.DSpaceApi.getFunctionalityManager();
+		functionalityManager.openSession();
+
         Bundle[] bs;
         try
         {
@@ -224,6 +235,20 @@ public class ItemUtils
                     bitstream.getField().add(
                             createValue("sid", bit.getSequenceID()
                                     + ""));
+                    bitstream.getField().add(
+                    		createValue("id", bit.getID()+""));
+
+                    if(!restricted){
+                        List<LicenseDefinition> lds = functionalityManager.getLicenses(bit.getID());
+                        for(LicenseDefinition ld : lds){
+                             if(ld.getRequiredInfo() != null && ld.getRequiredInfo().length() > 0){
+                                     restricted = true;
+                             }
+                             if(restricted){
+                                     break;
+                             }
+                        }
+                    }
                 }
             }
         }
@@ -231,7 +256,9 @@ public class ItemUtils
         {
             e1.printStackTrace();
         }
-        
+
+
+		functionalityManager.close();
 
         // Other info
         Element other = create("others");
@@ -241,8 +268,23 @@ public class ItemUtils
         other.getField().add(
                 createValue("identifier", DSpaceItem.buildIdentifier(item.getHandle())));
         other.getField().add(
-                createValue("lastModifyDate", item
-                        .getLastModified().toString()));
+                createValue("lastModifyDate", new SimpleDateFormat("yyyy-MM-dd").format(item
+                        .getLastModified())));
+
+		if(restricted){
+			other.getField().add(createValue("restrictedAccess", "true"));
+		}
+
+
+        try{
+			other.getField().add(
+					createValue("owningCollection", item.getOwningCollection()
+							.getName()));
+			other.getField().add(
+					createValue("itemId", Integer.toString(item.getID())));
+        }catch(SQLException e){
+        	log.error(e);
+        }
         metadata.getElement().add(other);
 
         // Repository Info

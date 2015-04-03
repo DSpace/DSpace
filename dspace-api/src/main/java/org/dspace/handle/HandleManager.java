@@ -7,15 +7,19 @@
  */
 package org.dspace.handle;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Site;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
@@ -23,6 +27,11 @@ import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+
+import cz.cuni.mff.ufal.DSpaceApi;
+import cz.cuni.mff.ufal.dspace.content.Handle;
+import cz.cuni.mff.ufal.dspace.handle.PIDCommunityConfiguration;
+import cz.cuni.mff.ufal.dspace.handle.PIDConfiguration;
 
 /**
  * Interface to the <a href="http://www.handle.net" target=_new>CNRI Handle
@@ -33,8 +42,9 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * are owned by other sites (including other DSpaces) are treated as
  * non-existent.
  * </p>
- *
- * @author Peter Breton
+ * 
+ * based on class by Peter Breton
+ * modified for LINDAT/CLARIN
  * @version $Revision$
  */
 public class HandleManager
@@ -44,6 +54,14 @@ public class HandleManager
 
     /** Prefix registered to no one */
     static final String EXAMPLE_PREFIX = "123456789";
+
+    static final String PREFIX_DELIMITER = "/";
+    
+    static final String SUBPREFIX_DELIMITER = "-";
+
+    static final String PART_IDENTIFIER_DELIMITER = "@";
+    
+    static final String HDL_HANDLE_NET_PREFIX_REGEXP = "^(http[s]?://)?hdl.handle.net/";
 
     /** Private Constructor */
     private HandleManager()
@@ -67,15 +85,34 @@ public class HandleManager
     public static String resolveToURL(Context context, String handle)
             throws SQLException
     {
-        TableRow dbhandle = findHandleInternal(context, handle);
+
+        // <UFAL>
+        String baseHandle = stripPartIdentifier(handle);
+        
+        log.debug(String.format("Base handle [%s]", baseHandle));
+        
+        TableRow dbhandle = findHandleInternal(context, baseHandle);
 
         if (dbhandle == null)
         {
             return null;
         }
 
-        String url = ConfigurationManager.getProperty("dspace.url")
-                + "/handle/" + handle;
+        String url = null;
+
+        if (dbhandle.getStringColumn("url") != null)
+        {
+            url = dbhandle.getStringColumn("url");
+        }
+        else
+        {
+            url = ConfigurationManager.getProperty("dspace.url") + "/handle/"
+                    + baseHandle;
+        }
+        
+        String partIdentifier = extractPartIdentifier(handle);
+        url = appendPartIdentifierToUrl(url, partIdentifier);
+        // </UFAL>
 
         if (log.isDebugEnabled())
         {
@@ -85,6 +122,73 @@ public class HandleManager
         return url;
     }
     
+    /**
+     * Strips the part identifier from the handle
+     * 
+     * @param handle The handle with optional part identifier 
+     * @return The handle without the part identifier
+     */
+    private static String stripPartIdentifier(String handle) 
+    {
+        String baseHandle = null;
+        if (handle != null)
+        {            
+            int pos = handle.indexOf(PART_IDENTIFIER_DELIMITER);
+            if(pos >= 0)
+            {
+                baseHandle = handle.substring(0, pos);
+            }
+            else 
+            {
+                baseHandle = handle;
+            }
+        }
+        return baseHandle;
+    }
+    
+    /**
+     * Extracts the part identifier from the handle
+     * 
+     * @param handle The handle with optional part identifier
+     * @return part identifier or null
+     */
+    private static String extractPartIdentifier(String handle) 
+    {        
+        String partIdentifier = null;
+        if(handle != null)
+        {
+            int pos = handle.indexOf(PART_IDENTIFIER_DELIMITER);
+            if(pos >= 0)
+            {                            
+                partIdentifier = handle.substring(pos+1);
+            }            
+        }        
+        return partIdentifier;
+    }
+    
+    /**
+     * Appends the partIdentifier as parameters to the given URL
+     * 
+     * @param url The URL
+     * @param partIdentifier  Part identifier (can be null or empty)
+     * @return Final URL with part identifier appended as parameters to the given URL
+     */
+    private static String appendPartIdentifierToUrl(String url, String partIdentifier)
+    {
+        String finalUrl = url;
+        if(finalUrl != null && partIdentifier != null && !partIdentifier.isEmpty())
+        {        
+            if(finalUrl.contains("?"))
+            {
+                finalUrl += '&' + partIdentifier;
+            }
+            else 
+            {
+                finalUrl += '?' + partIdentifier;
+            }
+        }        
+        return finalUrl;
+    }
     /**
      * Try to detect a handle in a URL.
      * @param context DSpace context
@@ -178,10 +282,16 @@ public class HandleManager
      *                If a database error occurs
      */
     public static String createHandle(Context context, DSpaceObject dso)
-            throws SQLException
+            throws SQLException, IllegalStateException
     {
+        PIDCommunityConfiguration pidCommunityConfiguration = PIDConfiguration
+                .getPIDCommunityConfiguration(dso);
+
         TableRow handle = DatabaseManager.create(context, "Handle");
-        String handleId = createId(handle.getIntColumn("handle_id"));
+        String handleId = createHandleId(handle.getIntColumn("handle_id"),
+                pidCommunityConfiguration);
+
+        // </UFAL>
 
         handle.setColumn("handle", handleId);
         handle.setColumn("resource_type_id", dso.getType());
@@ -191,9 +301,131 @@ public class HandleManager
         if (log.isDebugEnabled())
         {
             log.debug("Created new handle for "
-                    + Constants.typeText[dso.getType()] + " (ID=" + dso.getID() + ") " + handleId );
+                    + Constants.typeText[dso.getType()] + " (ID=" + dso.getID()
+                    + ") " + handleId);
         }
 
+        return handleId;
+    }
+
+    /**
+     * Factory method for handle creation
+     * 
+     * @param id
+     * @param pidCommunityConfiguration
+     * @return
+     */
+    private static String createHandleId(int id,
+            PIDCommunityConfiguration pidCommunityConfiguration)
+    {
+        String handleId = null;
+        if (pidCommunityConfiguration.isEpic())
+        {
+            handleId = createEpicHandleId(id, pidCommunityConfiguration);
+        }
+        else if (pidCommunityConfiguration.isLocal())
+        {
+            handleId = createLocalHandleId(id, pidCommunityConfiguration);
+        }
+        else            
+        {
+            throw new IllegalStateException("Unsupported PID type: "
+                    + pidCommunityConfiguration.getType());
+        }
+        return handleId;
+    }
+
+    /**
+     * Formats handle suffix
+     *
+     * @param id Database handle ID (primary key in handle table)
+     * @param pidCommunityConfiguration PID Community Configuration
+     * @return formatted handle suffix
+     */
+    private static String formatSuffix(int id, PIDCommunityConfiguration pidCommunityConfiguration)
+    {
+        StringBuffer suffix = new StringBuffer();
+        String handleSubprefix = pidCommunityConfiguration.getSubprefix();
+        if(handleSubprefix != null && !handleSubprefix.isEmpty())
+        {
+            suffix.append(handleSubprefix + SUBPREFIX_DELIMITER);
+        }
+        suffix.append(id);
+        return suffix.toString();
+    }
+
+    /**
+     * Formats handle
+     * 
+     * @param id Database handle ID (primary key in handle table)
+     * @param pidCommunityConfiguration PID Community Configuration
+     * @return formatted handle
+     */
+    private static String formatHandleID(int id, PIDCommunityConfiguration pidCommunityConfiguration)
+    {
+        StringBuffer handleId = new StringBuffer();
+        String handlePrefix = pidCommunityConfiguration.getPrefix();
+        handleId.append(handlePrefix);
+
+        if(!handlePrefix.endsWith(PREFIX_DELIMITER))
+        {
+            handleId.append(PREFIX_DELIMITER);
+        }
+
+        String handleSuffix = formatSuffix(id, pidCommunityConfiguration);
+        handleId.append(handleSuffix);
+        return handleId.toString();
+    }
+
+    /**
+     * Creates new handle locally
+     *
+     * @param id
+     *            Database handle ID (primary key in handle table)
+     * @param pidCommunityConfiguration
+     *            PID Community Configuration
+     * @return
+     */
+    private static String createLocalHandleId(int id,
+            PIDCommunityConfiguration pidCommunityConfiguration)
+    {
+        return formatHandleID(id, pidCommunityConfiguration);
+    }
+
+    /**
+     * Creates new handle by calling EPIC service
+     * 
+     * @param id
+     *            Database handle ID (primary key in handle table)
+     * @param pidCommunityConfiguration
+     *            PIC Community Configuration
+     * @return
+     */
+    private static String createEpicHandleId(int id,
+            PIDCommunityConfiguration pidCommunityConfiguration)
+    {
+        String handleId;
+
+        String suffix = formatSuffix(id, pidCommunityConfiguration);
+        String prefix = pidCommunityConfiguration.getPrefix();
+
+        try
+        {
+            handleId = DSpaceApi.handle_HandleManager_createId(log, id, prefix, suffix);
+            // if the handle created successfully register the final handle
+            DSpaceApi
+                    .handle_HandleManager_registerFinalHandleURL(log, handleId);
+        }
+        catch (IOException e)
+        {
+            DSpaceApi
+                    .getFunctionalityManager()
+                    .setErrorMessage(
+                            "PID Service is not working. Please contact the administrator.");
+            throw new IllegalStateException(
+                    "External PID service is not working. Please contact the administrator. "
+                            + "Internal message: [" + e.toString() + "]");
+        }
         return handleId;
     }
 
@@ -478,11 +710,11 @@ public class HandleManager
      */
     public static String getPrefix()
     {
-        String prefix = ConfigurationManager.getProperty("handle.prefix");
+        String prefix = PIDConfiguration.getDefaultPrefix();                
         if (null == prefix)
         {
             prefix = EXAMPLE_PREFIX; // XXX no good way to exit cleanly
-            log.error("handle.prefix is not configured; using " + prefix);
+            log.error("default handle prefix is not configured; using " + prefix);
         }
         return prefix;
     }
@@ -548,7 +780,288 @@ public class HandleManager
     {
         String handlePrefix = getPrefix();
 
-        return new StringBuffer().append(handlePrefix).append(
-                handlePrefix.endsWith("/") ? "" : "/").append(id).toString();
+        return new StringBuffer()
+                .append(handlePrefix)
+                .append(handlePrefix.endsWith(PREFIX_DELIMITER) ? ""
+                        : PREFIX_DELIMITER).append(id).toString();
     }
+
+    /**
+     * List all distinct prefixes stored in Handle table.
+     * 
+     * @param context
+     *            DSpace context
+     * @return Alphabetically sorted list of handle prefixes
+     * @exception SQLException
+     *                If a database error occurs
+     */
+    public static List<String> getPrefixes(Context context) throws SQLException
+    {
+        List<String> prefixes = new ArrayList<String>();
+        String sql = "select distinct regexp_replace(handle,'^([^/]*).*$','\\\\1') as prefix from handle where handle	 like '%/%' order by prefix";
+
+        TableRowIterator iterator = DatabaseManager.query(context, sql);
+
+        try
+        {
+            while (iterator.hasNext())
+            {
+                TableRow row = (TableRow) iterator.next();
+                prefixes.add(row.getStringColumn("prefix"));
+            }
+        }
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (iterator != null)
+            {
+                iterator.close();
+            }
+        }
+
+        return prefixes;
+    }
+
+    /**
+     * Changes the specified handle
+     * 
+     * @param context
+     *            DSpace context
+     * @param oldHandle
+     *            Old handle
+     * @param newHandle
+     *            New handle
+     * @param archiveOldHandle
+     *            Flag indicating whether the old handle should be stored in
+     *            Item metadata
+     * @throws Exception
+     */
+    public static void changeHandle(Context context, String oldHandle,
+            String newHandle, boolean archiveOldHandle) throws SQLException,
+            AuthorizeException
+    {
+        // Ignore invalid handles
+        if(oldHandle == null)
+        {
+            return;
+        }
+
+        // Find handle
+        Handle h = Handle.findByHandle(context, oldHandle);
+
+        if (h == null)
+        {
+            throw new IllegalStateException("Handle " + oldHandle
+                    + "not found ");
+        }
+
+        Item item = null;
+
+        if (h.isInternalResource())
+        {
+            // Try resolving handle to Item
+            try
+            {
+                DSpaceObject dso = null;
+                dso = resolveToObject(context, oldHandle);
+                if (dso != null && dso.getType() == Constants.ITEM)
+                {
+                    item = (Item) dso;
+                }
+            }
+            catch (IllegalStateException e)
+            {
+                item = null;
+            }
+
+            if (item != null)
+            {
+                // Handle resolved to Item
+                if (archiveOldHandle)
+                {
+                    // Archive metadata
+                    Metadatum[] dcUri = item.getMetadata("dc", "identifier",
+                            "uri", Item.ANY);
+
+                    List<String> values = new ArrayList<String>();
+
+                    for (int i = 0; i < dcUri.length; i++)
+                    {
+                        values.add(dcUri[i].value);
+                    }
+
+                    item.addMetadata("dc", "identifier", "other", Item.ANY,
+                            values.toArray(new String[values.size()]));
+                }
+
+                item.clearMetadata("dc", "identifier", "uri", Item.ANY);
+
+                if (newHandle != null && !newHandle.isEmpty())
+                {
+                    // Update dc.identifier.uri
+                    String newUri = getCanonicalForm(newHandle);
+                    item.addMetadata("dc", "identifier", "uri", Item.ANY,
+                            newUri);
+                }
+
+                // Update the metadata
+                item.update();
+            }
+        }
+
+        // Update the handle itself
+        // - needs to be done before archiving handle to avoid unique constraint
+        // violation
+        h.setHandle(newHandle);
+        h.update();
+
+        if (archiveOldHandle)
+        {
+            if (!newHandle.equals(oldHandle))
+            {
+                // Archive handle
+                String newUrl = resolveToURL(context, newHandle);
+                Handle archiveHandle = Handle.create(context, null, oldHandle);
+                archiveHandle.setURL(newUrl);
+                archiveHandle.update();
+            }
+        }
+
+    }
+
+    /**
+     * Changes handle prefix
+     * 
+     * @param context
+     *            DSpace context
+     * @param oldPrefix
+     *            Old handle prefix
+     * @param newPrefix
+     *            New handle prefix
+     * @param archiveOldHandles
+     *            Flag indicating whether the old handle should be stored in
+     *            Item metadata
+     * @throws Exception
+     */
+    public static void changePrefix(Context context, String oldPrefix,
+            String newPrefix, boolean archiveOldHandles) throws Exception
+    {
+        // Iterates over the list of
+        String sql = "select handle as old_handle, regexp_replace(handle,'^([^/]*)(/.*)$', ? || '\\2') as new_handle from handle"
+                + " where handle like ? || '/%' order by handle_id";
+
+        TableRowIterator iterator = DatabaseManager.query(context, sql,
+                newPrefix, oldPrefix);
+
+        try
+        {
+            while (iterator.hasNext())
+            {
+                TableRow row = (TableRow) iterator.next();
+                String oldHandle = row.getStringColumn("old_handle");
+                String newHandle = row.getStringColumn("new_handle");
+                changeHandle(context, oldHandle, newHandle, archiveOldHandles);
+            }
+        }
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (iterator != null)
+            {
+                iterator.close();
+            }
+        }
+    }
+    
+    /**
+     * Returns prefix of a given handle
+     * 
+     * @param handle Prefix of the handle
+     */
+    public static String extractHandlePrefix(String handle)
+    {
+        String prefix = null;
+        if(handle != null)
+        {
+            int pos = handle.indexOf(PREFIX_DELIMITER);
+            if(pos >= 0)
+            {
+                prefix = handle.substring(0, pos);
+            }
+        }
+        return prefix;
+    }
+    
+    /**
+     * Returns suffix of a given handle
+     * 
+     * @param handle Suffix of the handle
+     */
+    public static String extractHandleSuffix(String handle)
+    {
+        String suffix = null;
+        if(handle != null)
+        {
+            int pos = handle.indexOf(PREFIX_DELIMITER);
+            if(pos >= 0)
+            {
+                suffix = handle.substring(pos+1);
+            }
+        }
+        return suffix;
+    }
+    
+    /**
+     * Returns complete handle made from prefix and suffix
+     * 
+     * @param handle Complete handle
+     */
+    public static String completeHandle(String prefix, String suffix)
+    {        
+        return prefix + PREFIX_DELIMITER + suffix;
+    }
+        
+    /**
+     * Returns true if the prefix of the given handle is supported by this repository
+     *  
+     * @return True if the prefix of the given handle is supported by this repository
+     */
+    public static boolean hasHandleSupportedPrefix(String handle)
+    {            
+        String prefix = extractHandlePrefix(handle); 
+        Set<String> supportedPrefixes = PIDConfiguration.getSupportedPrefixes();
+        return supportedPrefixes.contains(prefix);
+    }
+    
+    /**
+     * Returns true if the prefix is supported by this repository
+     *  
+     * @return True if the prefix is supported by this repository
+     */
+    public static boolean isSupportedPrefix(String prefix)
+    {                    
+        Set<String> supportedPrefixes = PIDConfiguration.getSupportedPrefixes();
+        return supportedPrefixes.contains(prefix);
+    }
+    
+    /**
+     * Strips hdl.handle.net prefix from a given URL
+     * @param url URL starting with something like http://hdl.handle.net/
+     * @return True if URL contains the hdl.handle.net prefix
+     */
+    public static String stripHdlHandleNetPrefixFromURL(String url) 
+    {
+        return url.replaceAll(HDL_HANDLE_NET_PREFIX_REGEXP,"");
+    }
+    
+    /**
+     * Returns true if URL contains hdl.handle.net prefix
+     * @param url URL starting with something like http://hdl.handle.net/
+     * @return Remaining string (possibly the handle)
+     */
+    public static boolean hasURLHdlHandleNetPrefix(String url) 
+    {
+        return url.matches(HDL_HANDLE_NET_PREFIX_REGEXP);
+    }
+
 }

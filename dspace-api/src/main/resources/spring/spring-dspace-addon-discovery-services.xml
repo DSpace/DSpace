@@ -29,4 +29,5 @@
     <alias name="org.dspace.discovery.SearchService" alias="org.dspace.discovery.IndexingService"/>
 
     <!--<bean class="org.dspace.discovery.SolrServiceIndexOutputPlugin" id="solrServiceIndexOutputPlugin"/>-->
+    <bean class="cz.cuni.mff.ufal.dspace.discovery.SolrServiceTweaksPlugin" id="solrServiceTweaksPlugin"/>
 </beans>

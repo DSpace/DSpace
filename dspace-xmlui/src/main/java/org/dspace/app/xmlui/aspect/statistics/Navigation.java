@@ -33,7 +33,8 @@ import java.sql.SQLException;
 /**
  * Navigation Elements for viewing statistics related to Items.
  *
- * @author kevinvandevelde (kevin at atmire.com)
+ * based on class by kevinvandevelde (kevin at atmire.com)
+ * modified for LINDAT/CLARIN
  * Date: 2-nov-2009
  * Time: 14:24:21
  */
@@ -43,6 +44,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     private static final Message T_statistics_usage_view = message("xmlui.statistics.Navigation.usage.view");
     private static final Message T_statistics_search_view = message("xmlui.statistics.Navigation.search.view");
     private static final Message T_statistics_workflow_view = message("xmlui.statistics.Navigation.workflow.view");
+	private static final Message T_statistics_ga_head = message("xmlui.statistics.Navigation.ga.title");
 
     public Serializable getKey() {
         //TODO: DO THIS
@@ -108,7 +110,12 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             }
         }
 
-
+        // ufal - this is called only for authorised with admin rights (e.g., admin rights to a community/collection)
+        if(dso != null && dso.getHandle() != null){
+            statistics.addItemXref(contextPath + "/handle/" + dso.getHandle() + "/statistics-google", T_statistics_ga_head);
+        }else {
+            statistics.addItemXref(contextPath + "/statistics-google", T_statistics_ga_head);
+		}
     }
 
     protected boolean displayStatsType(Context context, String type, DSpaceObject dso) throws SQLException {

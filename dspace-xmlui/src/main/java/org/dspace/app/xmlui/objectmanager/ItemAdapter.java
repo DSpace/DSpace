@@ -102,6 +102,11 @@ public class ItemAdapter extends AbstractAdapter
         super(contextPath);
         this.item = item;
         this.context = context;
+        
+        // <UFAL>
+        this.setRightsMDTypes("UFAL_LICENSES");
+        // </UFAL>
+        
     }
 
     /** Return the item */

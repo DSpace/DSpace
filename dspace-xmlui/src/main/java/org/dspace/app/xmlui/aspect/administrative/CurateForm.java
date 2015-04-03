@@ -15,6 +15,8 @@ import org.xml.sax.SAXException;
 
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
+import org.apache.cocoon.environment.ObjectModelHelper;
+import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -33,7 +35,8 @@ import org.dspace.authorize.AuthorizeException;
 /**
  * Generates the Administrative Curate Form, from which any DSpace object can
  * be curated. 
- * @author tdonohue
+ * based on class by tdonohue
+ * modified for LINDAT/CLARIN
  */
 public class CurateForm extends AbstractDSpaceTransformer 
 {
@@ -84,6 +87,12 @@ public class CurateForm extends AbstractDSpaceTransformer
                 // Get our parameters and state;
                 String objectID = parameters.getParameter("identifier", null);
                 String taskSelected = parameters.getParameter("curate_task", null);
+                Request r = ObjectModelHelper.getRequest(objectModel);
+                if ( null == objectID || objectID.isEmpty() ) {
+                	if ( null != r.getParameter( "handle" ) ) {
+                		objectID = r.getParameter( "handle" ) + " workflowID=" + r.getParameter( "workflowID" );
+                	}
+                }
                 
                 // DIVISION: curate
                 Division div = body.addInteractiveDivision("curate", contextPath + "/admin/curate", Division.METHOD_MULTIPART,"primary administrative curate");
@@ -142,5 +151,7 @@ public class CurateForm extends AbstractDSpaceTransformer
                 buttonList.addButton("submit_curate_task").setValue(T_submit_perform);
                 buttonList.addButton("submit_queue_task").setValue(T_submit_queue);
                 div.addHidden("administrative-continue").setValue(knot.getId());
+                
+                buttonList.addButton("submit_run_all_tasks").setValue("Run all curation tasks at once");
         }
 }

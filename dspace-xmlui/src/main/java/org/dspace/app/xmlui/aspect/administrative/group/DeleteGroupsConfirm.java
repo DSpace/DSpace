@@ -77,7 +77,7 @@ public class DeleteGroupsConfirm extends AbstractDSpaceTransformer
 		}
      
     	Division deleted = body.addInteractiveDivision("group-confirm-delete",
-    			contextPath+"/admin/epeople",Division.METHOD_POST,"primary administrative groups");
+    			contextPath+"/admin/epeople",Division.METHOD_POST,"alert alert-danger");
     	deleted.setHead(T_head);
     	deleted.addPara(T_para);
     	
