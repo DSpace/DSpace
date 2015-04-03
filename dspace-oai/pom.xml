@@ -8,7 +8,7 @@
     <parent>
         <artifactId>dspace-parent</artifactId>
         <groupId>org.dspace</groupId>
-        <version>5.0-rc3-SNAPSHOT</version>
+        <version>5.1</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -16,7 +16,7 @@
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/..</root.basedir>
         <spring.version>3.2.5.RELEASE</spring.version>
-        <xoai.version>3.2.7</xoai.version>
+        <xoai.version>3.2.9</xoai.version>
         <jtwig.version>2.0.1</jtwig.version>
     </properties>
 
@@ -215,6 +215,12 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.3.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.xmlmatchers</groupId>
+            <artifactId>xml-matchers</artifactId>
+            <version>0.10</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

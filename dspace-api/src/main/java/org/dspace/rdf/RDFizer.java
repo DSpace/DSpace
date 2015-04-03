@@ -585,7 +585,7 @@ public class RDFizer {
                 {
                     log.error(ex);
                     System.err.println("A problem with the database connection "
-                            + "occured. Canceled pending actions.");
+                            + "occurred. Canceled pending actions.");
                     System.err.println(ex.getMessage());
                     ex.printStackTrace(System.err);
                     System.exit(1);
@@ -626,7 +626,7 @@ public class RDFizer {
                 {
                     log.error(ex);
                     System.err.println("A problem with the database connection "
-                            + "occured. Canceled pending actions.");
+                            + "occurred. Canceled pending actions.");
                     System.err.println(ex.getMessage());
                     ex.printStackTrace(System.err);
                     System.exit(1);
@@ -645,7 +645,7 @@ public class RDFizer {
             {
                 log.error(ex);
                 System.err.println("A problem with the database connection "
-                        + "occured. Canceled pending actions.");
+                        + "occurred. Canceled pending actions.");
                 System.err.println(ex.getMessage());
                 ex.printStackTrace(System.err);
                 System.exit(1);
@@ -668,7 +668,7 @@ public class RDFizer {
         {
             log.error(ex);
             System.err.println("A problem with the database connection "
-                    + "occured. Canceled pending actions.");
+                    + "occurred. Canceled pending actions.");
             System.err.println(ex.getMessage());
             ex.printStackTrace(System.err);
             System.exit(1);
@@ -796,7 +796,7 @@ public class RDFizer {
         try {
             myself = new RDFizer();
         } catch (SQLException ex) {
-            System.err.println("A problem with the database occured: " 
+            System.err.println("A problem with the database occurred: " 
                     + ex.getMessage());
             ex.printStackTrace(System.err);
             log.error(ex);

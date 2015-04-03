@@ -873,8 +873,10 @@ public class DatabaseUtils
      * Get the Database Schema Name in use by this Connection, so that it can
      * be used to limit queries in other methods (e.g. tableExists()).
      * <P>
-     * For PostgreSQL, schema is simply what is configured in db.schema or "public"
-     * For Oracle, schema is actually the database *USER* or owner.
+     * NOTE: Once we upgrade to using Apache Commons DBCP / Pool version 2.0,
+     * this method WILL BE REMOVED in favor of java.sql.Connection's new
+     * "getSchema()" method.
+     * http://docs.oracle.com/javase/7/docs/api/java/sql/Connection.html#getSchema()
      * 
      * @param connection 
      *            Current Database Connection
@@ -886,27 +888,29 @@ public class DatabaseUtils
         String schema = null;
         DatabaseMetaData meta = connection.getMetaData();
         
-        // Determine our DB type
-        String dbType = DatabaseManager.findDbKeyword(meta);
+        // Check the configured "db.schema" FIRST for the value configured there
+        schema = DatabaseManager.canonicalize(ConfigurationManager.getProperty("db.schema"));
         
-        if(dbType.equals(DatabaseManager.DBMS_POSTGRES))
+        // If unspecified, determine "sane" defaults based on DB type
+        if(StringUtils.isBlank(schema))
         {
-            // Get the schema name from "db.schema"
-            schema = ConfigurationManager.getProperty("db.schema");
-            
-            // If unspecified, default schema is "public"
-            if(StringUtils.isBlank(schema)){
+            String dbType = DatabaseManager.findDbKeyword(meta);
+        
+            if(dbType.equals(DatabaseManager.DBMS_POSTGRES))
+            {
+                // For PostgreSQL, the default schema is named "public"
+                // See: http://www.postgresql.org/docs/9.0/static/ddl-schemas.html
                 schema = "public";
             }
+            else if (dbType.equals(DatabaseManager.DBMS_ORACLE))
+            {
+                // For Oracle, default schema is actually the user account
+                // See: http://stackoverflow.com/a/13341390
+                schema = meta.getUserName();
+            }
+            else
+                schema = null;
         }
-        else if (dbType.equals(DatabaseManager.DBMS_ORACLE))
-        {
-            // Schema is actually the user account
-            // See: http://stackoverflow.com/a/13341390
-            schema = meta.getUserName();
-        }
-        else
-            schema = null;
         
         return schema;
     }

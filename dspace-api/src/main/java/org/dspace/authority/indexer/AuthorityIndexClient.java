@@ -57,7 +57,7 @@ public class AuthorityIndexClient {
         for (AuthorityIndexerInterface indexerInterface : indexers) {
             log.info("Initialize " + indexerInterface.getClass().getName());
             System.out.println("Initialize " + indexerInterface.getClass().getName());
-            indexerInterface.init(context);
+            indexerInterface.init(context, true);
             while (indexerInterface.hasMore()) {
                 AuthorityValue authorityValue = indexerInterface.nextValue();
                 if(authorityValue != null){
@@ -76,6 +76,7 @@ public class AuthorityIndexClient {
         System.out.println("Writing new data");
         for(String id : toIndexValues.keySet()){
             indexingService.indexContent(toIndexValues.get(id), true);
+            indexingService.commit();
         }
 
         context.commit();

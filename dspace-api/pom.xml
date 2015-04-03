@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>5.0-rc3-SNAPSHOT</version>
+        <version>5.1</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -624,6 +624,12 @@
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
             <version>2.3</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>1</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
 

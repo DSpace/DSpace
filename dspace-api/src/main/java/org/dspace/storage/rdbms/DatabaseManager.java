@@ -15,7 +15,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -35,8 +34,6 @@ import javax.sql.DataSource;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.flywaydb.core.Flyway;
-import org.flywaydb.core.api.MigrationInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -881,22 +878,22 @@ public class DatabaseManager
     }
 
     /**
-     * Return the canonical name for a table.
+     * Return the canonical name for a database object.
      *
-     * @param table
-     *            The name of the table.
-     * @return The canonical name of the table.
+     * @param db_object
+     *            The name of the database object.
+     * @return The canonical name of the database object.
      */
-    static String canonicalize(String table)
+    static String canonicalize(String db_object)
     {
-        // Oracle expects upper-case table names
+        // Oracle expects upper-case table names, schemas, etc.
         if (isOracle)
         {
-            return (table == null) ? null : table.toUpperCase();
+            return (db_object == null) ? null : db_object.toUpperCase();
         }
 
         // default database postgres wants lower-case table names
-        return (table == null) ? null : table.toLowerCase();
+        return (db_object == null) ? null : db_object.toLowerCase();
     }
 
     ////////////////////////////////////////
@@ -1237,10 +1234,6 @@ public class DatabaseManager
 
         try
         {
-            String schema = ConfigurationManager.getProperty("db.schema");
-            if(StringUtils.isBlank(schema)){
-                schema = null;
-            }
             String catalog = null;
 
             int dotIndex = table.indexOf('.');
@@ -1254,6 +1247,9 @@ public class DatabaseManager
 
             connection = getConnection();
 
+            // Get current database schema name
+            String schema = DatabaseUtils.getSchemaName(connection);
+            
             DatabaseMetaData metadata = connection.getMetaData();
             Map<String, ColumnInfo> results = new HashMap<String, ColumnInfo>();
 

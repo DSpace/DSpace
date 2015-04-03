@@ -7,6 +7,8 @@
  */
 package org.dspace.checker;
 
+import org.dspace.core.Context;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Date;
@@ -110,6 +112,6 @@ public interface SimpleReporter
      *             if io error occurs
      * 
      */
-    public int getUncheckedBitstreamsReport(OutputStreamWriter osw)
+    public int getUncheckedBitstreamsReport(Context context, OutputStreamWriter osw)
             throws IOException;
 }

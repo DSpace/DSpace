@@ -92,7 +92,7 @@ public class ItemsResource extends Resource
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Item getItem(@PathParam("item_id") Integer itemId, @QueryParam("expand") String expand,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
 
@@ -105,7 +105,7 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.READ);
 
-            writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers, request, context);
+            writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request, context);
 
             item = new Item(dspaceItem, expand, context);
             context.complete();
@@ -152,7 +152,7 @@ public class ItemsResource extends Resource
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Item[] getItems(@QueryParam("expand") String expand, @QueryParam("limit") @DefaultValue("100") Integer limit,
             @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("userIP") String user_ip,
-            @QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
+            @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
     {
 
@@ -182,7 +182,7 @@ public class ItemsResource extends Resource
                     if (ItemService.isItemListedForUser(context, dspaceItem))
                     {
                         items.add(new Item(dspaceItem, expand, context));
-                        writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor,
+                        writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
                                 headers, request, context);
                     }
                 }
@@ -228,7 +228,7 @@ public class ItemsResource extends Resource
     @Path("/{item_id}/metadata")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public MetadataEntry[] getItemMetadata(@PathParam("item_id") Integer itemId, @QueryParam("userIP") String user_ip,
-            @QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
+            @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
     {
 
@@ -241,7 +241,7 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.READ);
 
-            writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers, request, context);
+            writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request, context);
 
             metadata = new org.dspace.rest.common.Item(dspaceItem, "metadata", context).getMetadata();
             context.complete();
@@ -288,7 +288,7 @@ public class ItemsResource extends Resource
     public Bitstream[] getItemBitstreams(@PathParam("item_id") Integer itemId,
             @QueryParam("limit") @DefaultValue("20") Integer limit, @QueryParam("offset") @DefaultValue("0") Integer offset,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
 
@@ -300,7 +300,7 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.READ);
 
-            writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers, request, context);
+            writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request, context);
 
             List<Bitstream> itemBitstreams = new Item(dspaceItem, "bitstreams", context).getBitstreams();
 
@@ -359,7 +359,7 @@ public class ItemsResource extends Resource
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Response addItemMetadata(@PathParam("item_id") Integer itemId, List<org.dspace.rest.common.MetadataEntry> metadata,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
 
@@ -371,7 +371,7 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
-            writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request, context);
+            writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers, request, context);
 
             for (MetadataEntry entry : metadata)
             {
@@ -431,14 +431,14 @@ public class ItemsResource extends Resource
      *             ContextException. When was problem with creating context of
      *             DSpace.
      */
-    // TODO Add option to add bitsream by URI.(for very big files)
+    // TODO Add option to add bitstream by URI.(for very big files)
     @POST
     @Path("/{item_id}/bitstreams")
     public Bitstream addItemBitstream(@PathParam("item_id") Integer itemId, InputStream inputStream,
             @QueryParam("name") String name, @QueryParam("description") String description,
             @QueryParam("groupId") Integer groupId, @QueryParam("year") Integer year, @QueryParam("month") Integer month,
             @QueryParam("day") Integer day, @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
 
@@ -451,7 +451,7 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
-            writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request, context);
+            writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers, request, context);
 
             // Is better to add bitstream to ORIGINAL bundle or to item own?
             log.trace("Creating bitstream in item.");
@@ -609,7 +609,7 @@ public class ItemsResource extends Resource
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Response updateItemMetadata(@PathParam("item_id") Integer itemId, MetadataEntry[] metadata,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
 
@@ -621,7 +621,7 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
-            writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request, context);
+            writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers, request, context);
 
             log.trace("Deleting original metadata from item.");
             for (MetadataEntry entry : metadata)
@@ -691,7 +691,7 @@ public class ItemsResource extends Resource
     @DELETE
     @Path("/{item_id}")
     public Response deleteItem(@PathParam("item_id") Integer itemId, @QueryParam("userIP") String user_ip,
-            @QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
+            @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
     {
 
@@ -703,7 +703,7 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.DELETE);
 
-            writeStats(dspaceItem, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwarderfor, headers, request, context);
+            writeStats(dspaceItem, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwardedfor, headers, request, context);
 
             log.trace("Deleting item.");
             org.dspace.content.Collection collection = org.dspace.content.Collection.find(context,
@@ -760,7 +760,7 @@ public class ItemsResource extends Resource
     @DELETE
     @Path("/{item_id}/metadata")
     public Response deleteItemMetadata(@PathParam("item_id") Integer itemId, @QueryParam("userIP") String user_ip,
-            @QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
+            @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
     {
 
@@ -772,7 +772,7 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
-            writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request, context);
+            writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers, request, context);
 
             log.trace("Deleting metadata.");
             // TODO Rewrite without deprecated object. Leave there only generated metadata.
@@ -841,7 +841,7 @@ public class ItemsResource extends Resource
     @Path("/{item_id}/bitstreams/{bitstream_id}")
     public Response deleteItemBitstream(@PathParam("item_id") Integer itemId, @PathParam("bitstream_id") Integer bitstreamId,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
 
@@ -867,8 +867,8 @@ public class ItemsResource extends Resource
                 return Response.status(Status.UNAUTHORIZED).build();
             }
 
-            writeStats(item, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwarderfor, headers, request, context);
-            writeStats(bitstream, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwarderfor, headers,
+            writeStats(item, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers, request, context);
+            writeStats(bitstream, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwardedfor, headers,
                     request, context);
 
             log.trace("Deleting bitstream...");
@@ -938,7 +938,7 @@ public class ItemsResource extends Resource
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Item[] findItemsByMetadataField(MetadataEntry metadataEntry, @QueryParam("expand") String expand,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
 
@@ -1009,7 +1009,7 @@ public class ItemsResource extends Resource
                 org.dspace.content.Item dspaceItem = this.findItem(context, row.getIntColumn("ITEM_ID"),
                         org.dspace.core.Constants.READ);
                 Item item = new Item(dspaceItem, "", context);
-                writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers,
+                writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers,
                         request, context);
                 items.add(item);
             }

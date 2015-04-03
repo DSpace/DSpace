@@ -794,8 +794,19 @@ public class BrowseDAOPostgres implements BrowseDAO
 
         //If we want frequencies and this is not a count query, enchance the query accordingly
         if (isEnableBrowseFrequencies() && countValues==null){
-            String before = "SELECT count(*) AS num, dvalues.value, dvalues.authority FROM (";
-            String after = ") dvalues , "+tableMap+" WHERE dvalues.id = "+tableMap+".distinct_id GROUP BY "+tableMap+
+            String before = "SELECT count(*) AS num, dvalues.value, dvalues.authority FROM ";
+            if(containerTable != null && containerIDField != null && containerID != -1)
+            {
+                before += containerTable + ",";
+            }
+            before += " (";
+            String after = ") dvalues , "+tableMap+" WHERE dvalues.id = "+tableMap+".distinct_id ";
+            if(containerTable != null && containerIDField != null && containerID != -1)
+            {
+                after +=  " AND " + tableMap + ".item_id=" + containerTable +".item_id AND " + containerTable +  "." + containerIDField + "=?";
+                params.add(containerID);
+            }
+            after += " GROUP BY "+tableMap+
                     ".distinct_id, dvalues.value, dvalues.authority, dvalues.sort_value";
 
             queryBuf.insert(0, before);

@@ -95,6 +95,7 @@ public class DSpaceOAIDataProvider
             OAIRequestParameters parameters = new OAIRequestParameters(buildParametersMap(request));
 
             response.setContentType("application/xml");
+            response.setCharacterEncoding("UTF-8");
 
             String identification = xoaiContext + parameters.requestID();
 
