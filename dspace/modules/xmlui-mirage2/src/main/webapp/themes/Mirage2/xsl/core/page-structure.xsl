@@ -339,6 +339,10 @@
                             <img src="{$theme-path}/images/mospace_mirage.gif" />
                         </a>
 
+                        <div id="ms-tagline" class="navbar-header pull-left hidden-sm hidden-xs">
+                             Preserving the intellectual output and resources of the University of Missouri
+                         </div>
+
 
                         <div class="navbar-header pull-right visible-xs hidden-sm hidden-md hidden-lg">
                         <ul class="nav nav-pills pull-left ">
@@ -704,8 +708,6 @@
             </ul>
         </div>
         
-        <div id="ms-tagline">Preserving the intellectual output and resources of the Universiyt of Missouri</div>
-
         <footer>
                 <div class="row">
                     <hr/>

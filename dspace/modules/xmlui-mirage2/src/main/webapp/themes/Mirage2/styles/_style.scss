@@ -44,6 +44,11 @@ h1,h2,h3,h4,h5,h6,h7,h8,h9, .community-browser-link  {
     font-family: Georgia,Times,"Times New Roman",serif; }
 
 // add in specific MOspace styles
+div#ms-tagline {
+    margin: 58px 0px 0px -78px;
+    text-align: left;
+    color: #AAB8C6;
+}
 div#ms-navigation {
     position: absolute;
     top: 86px;
