@@ -151,7 +151,17 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
 
     public String getLabel(String field, String key, String locale)
     {
-        init();
-        return labels[Integer.parseInt(key)];
+    	init();
+        int pos=-1;
+        for (int i = 0; i < values.length; i++) {
+            if (values[i].equals(key)){
+                 pos = i;
+                 break;
+            }
+        }
+        if (pos != -1)
+            return labels[pos];
+        else
+            return "UNKNOWN KEY "+key;
     }
 }
