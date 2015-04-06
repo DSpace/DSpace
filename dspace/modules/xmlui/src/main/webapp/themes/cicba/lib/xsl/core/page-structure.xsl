@@ -154,6 +154,14 @@
 			runAfterJSImports.execute();
 		</script>
 		
+		<script type="text/javascript">
+			<xsl:text disable-output-escaping="yes">
+				$(document).ready(function() {
+			    	$("#aspect_artifactbrowser_CommunityBrowser_div_comunity-browser > ul").sapling();
+			    });
+		    </xsl:text>
+		</script>
+		
 		<xsl:call-template name="google-analytic-tracking" />
 
 		<!-- Add a contextpath to a JS variable -->

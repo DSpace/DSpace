@@ -1,0 +1,34 @@
+/*!
+	jQuery Sapling 0.6.1 - http://tameraydin.github.io/jquery-sapling/
+*/
+
+/*
+*	Base CSS for jQuery Sapling.
+*/
+.sapling-list li {
+	display: block;
+	list-style: none;
+	position: relative;
+}
+.sapling-list ol,
+.sapling-list ul {
+	display: none;
+}
+.sapling-list .sapling-item {
+	cursor: pointer;
+}
+.sapling-list .sapling-item > .artifact-description > .artifact-title:before {
+	content: "\25B6";
+	display: inline-block;
+	font-size: .8em;
+	padding-right: 5px;
+	width: 14px;
+}
+.sapling-list .sapling-item.sapling-expanded > .artifact-description > .artifact-title:before  {
+	content: "\25BC";
+}
+.sapling-list .sapling-item.sapling-expanded > ol,
+.sapling-list .sapling-item.sapling-expanded > ul {
+	cursor: default;
+	display: block;
+}
