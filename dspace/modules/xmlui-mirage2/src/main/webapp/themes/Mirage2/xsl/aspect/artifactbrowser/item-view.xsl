@@ -108,6 +108,7 @@
             <xsl:call-template name="itemSummaryView-DIM-title"/>
             <div class="row">
                 <div class="col-sm-4">
+                    <!-- small column to the left, for short metadata -->
                     <div class="row">
                        <div class="col-xs-6 col-sm-12">
                             <xsl:call-template name="itemSummaryView-DIM-file-section"/>
@@ -115,6 +116,8 @@
                     </div>
                     <xsl:call-template name="itemSummaryView-DIM-date"/>
                     <xsl:call-template name="itemSummaryView-DIM-authors"/>
+                    <xsl:call-template name="itemSummaryView-DIM-contributors"/>
+                    <!-- <xsl:call-template name="itemSummaryView-DIM-format"/> is this even valid item metadata? -->
 
                     <!-- call more templates here to add more fields -->
 
@@ -125,8 +128,16 @@
                     </xsl:if>
                 </div>
                 <div class="col-sm-8">
+                    <!-- large column, for longer metadata -->
                     <xsl:call-template name="itemSummaryView-DIM-abstract"/>
+                    <xsl:call-template name="itemSummaryView-DIM-tableofContents"/>
                     <xsl:call-template name="itemSummaryView-DIM-URI"/>
+                    <xsl:call-template name="itemSummaryView-DIM-degree"/>
+                    <xsl:call-template name="itemSummaryView-DIM-discipline"/>
+                    <xsl:call-template name="itemSummaryView-DIM-isPartofSeries"/>
+                    <xsl:call-template name="itemSummaryView-DIM-isPartof"/>
+                    <xsl:call-template name="itemSummaryView-DIM-citation"/>
+                    <xsl:call-template name="itemSummaryView-DIM-rights"/>
                     <xsl:call-template name="itemSummaryView-collections"/>
                 </div>
             </div>
@@ -317,10 +328,35 @@
         </div>
     </xsl:template>
 
+    <xsl:template match="dim:field" mode="itemDetailView-DIM">
+            <tr>
+                <xsl:attribute name="class">
+                    <xsl:text>ds-table-row </xsl:text>
+                    <xsl:if test="(position() div 2 mod 2 = 0)">even </xsl:if>
+                    <xsl:if test="(position() div 2 mod 2 = 1)">odd </xsl:if>
+                </xsl:attribute>
+                <td class="label-cell">
+                    <xsl:value-of select="./@mdschema"/>
+                    <xsl:text>.</xsl:text>
+                    <xsl:value-of select="./@element"/>
+                    <xsl:if test="./@qualifier">
+                        <xsl:text>.</xsl:text>
+                        <xsl:value-of select="./@qualifier"/>
+                    </xsl:if>
+                </td>
+            <td class="word-break">
+              <xsl:copy-of select="./node()"/>
+            </td>
+                <td><xsl:value-of select="./@language"/></td>
+            </tr>
+    </xsl:template>
+
+
+
 
     <!-- additional fields for itemSummaryView, see #1381  -->
     
-    <xsl:template name="itemSummaryView-DIM-contributor">
+    <xsl:template name="itemSummaryView-DIM-contributors">
         <xsl:if test="dim:field[@element='contributor'][@qualifier='corporateName' and descendant::text()]">
             <div class="simple-item-view-authors item-page-field-wrapper table">
                 <h5>Contributor</h5>
@@ -350,7 +386,7 @@
         </xsl:if>
     </xsl:template>
 
-    <xsl:template name="itemSummaryView-DIM-relation-ispartofseries">
+    <xsl:template name="itemSummaryView-DIM-isPartofSeries">
         <xsl:if test="dim:field[@element='relation'][@qualifier='ispartofseries' and descendant::text()]">
             <div class="simple-item-view-show-full item-page-field-wrapper table">
                 <h5>Part of</h5>
@@ -365,7 +401,7 @@
         </xsl:if>
     </xsl:template>
 
-    <xsl:template name="itemSummaryView-DIM-relation-ispartof">
+    <xsl:template name="itemSummaryView-DIM-isPartof">
         <xsl:if test="dim:field[@element='relation'][@qualifier='ispartof' and descendant::text()]">
             <div class="simple-item-view-show-full item-page-field-wrapper table">
                 <h5>Part of</h5>
@@ -412,6 +448,36 @@
                         </xsl:if>
                     </xsl:for-each>
                 </span>
+            </div>
+        </xsl:if>
+    </xsl:template>
+
+    <xsl:template name="itemSummaryView-DIM-degree">
+        <xsl:if test="dim:field[@element='degree' and @qualifier='name' and descendant::text()]">
+            <div class="simple-item-view-show-full item-page-field-wrapper table">
+                <h5>Degree</h5>
+                <xsl:choose>
+                    <xsl:when test="dim:field[@element='degree']">
+                        <xsl:for-each select="dim:field[@element='name']">
+                            <xsl:call-template name="itemSummaryView-DIM-misc-entry" />
+                        </xsl:for-each>
+                    </xsl:when>
+                </xsl:choose>
+            </div>
+        </xsl:if>
+    </xsl:template>
+
+    <xsl:template name="itemSummaryView-DIM-discipline">
+        <xsl:if test="dim:field[@element='degree' and @qualifier='discipline' and descendant::text()]">
+            <div class="simple-item-view-show-full item-page-field-wrapper table">
+                <h5>Thesis Department</h5>
+                <xsl:choose>
+                    <xsl:when test="dim:field[@element='degree']">
+                        <xsl:for-each select="dim:field[@element='discipline']">
+                            <xsl:call-template name="itemSummaryView-DIM-misc-entry" />
+                        </xsl:for-each>
+                    </xsl:when>
+                </xsl:choose>
             </div>
         </xsl:if>
     </xsl:template>

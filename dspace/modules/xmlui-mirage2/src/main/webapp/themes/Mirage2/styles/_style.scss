@@ -32,16 +32,14 @@ header .navbar-brand img {
     height: 60px;
 }
 
-footer {
-    border-top: black solid 1px;
-}
-
 .simple-item-view-description {
     text-align: left;
 }
 
-h1,h2,h3,h4,h5,h6,h7,h8,h9, .community-browser-link  {
-    font-family: Georgia,Times,"Times New Roman",serif; }
+h1,h2,h3,h4,h5,h6,h7,h8,h9, .community-browser-row a  {
+    font-family: Georgia,Times,"Times New Roman",serif;
+    font-weight: bold;
+}
 
 // add in specific MOspace styles
 div#ms-tagline {
@@ -50,22 +48,17 @@ div#ms-tagline {
     color: #AAB8C6;
 }
 div#ms-navigation {
-    position: absolute;
-    top: 86px;
-    left: 50%;
-    margin: 0;
-    width: 466px;
     text-align: right;
-    z-index: 20;
+    width: 45%;
 }
 ul#ms-navigation-list li.ms-navigation-link {
     list-style: none;
     display: inline;
     margin-left:0px;
-    color: #333;
+    color: #fff;
 }
 ul#ms-navigation-list li.ms-navigation-link a:link, ul#ms-navigation-list li.ms-navigation-link a:visited {
-    color: #333;
+    color: #fff;
     /*text-decoration: none;*/
 }
 ul#ms-navigation-list li.ms-navigation-link a:hover, ul#ms-navigation-list li.ms-navigation-link a:active {

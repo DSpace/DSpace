@@ -568,7 +568,7 @@
                 <xsl:attribute name="autocomplete"><xsl:value-of select="@autocomplete"/></xsl:attribute>
             </xsl:if>
             <xsl:if test="@method='multipart'">
-                <xsl:attribute name="method">post</xsl:attribute>
+                <xsl:attribute name="method">get</xsl:attribute>
                 <xsl:attribute name="enctype">multipart/form-data</xsl:attribute>
             </xsl:if>
             <xsl:attribute name="onsubmit">javascript:tSubmit(this);</xsl:attribute>

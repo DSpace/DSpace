@@ -343,6 +343,20 @@
                              Preserving the intellectual output and resources of the University of Missouri
                          </div>
 
+                    <div class="navbar-header pull-right">
+                         <!-- MOspace navigation bar -->
+                    <xsl:variable name="app_path" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]" />
+
+                        <ul id="ms-navigation-list">
+                            <li class="ms-navigation-link"><a href="{$app_path}/discover">search</a> | </li>
+                            <li class="ms-navigation-link"><a href="{$app_path}/community-list">browse</a> | </li>
+                            <li class="ms-navigation-link"><a href="{$app_path}/pages/add">add to MOspace</a> | </li>
+                            <li class="ms-navigation-link"><a href="{$app_path}/pages/about">about</a> | </li>
+                            <li class="ms-navigation-link"><a href="{$app_path}/pages/help">help</a></li>
+                        </ul>
+
+                    </div>
+
 
                         <div class="navbar-header pull-right visible-xs hidden-sm hidden-md hidden-lg">
                         <ul class="nav nav-pills pull-left ">
@@ -414,6 +428,8 @@
                             </xsl:choose>
                         </ul>
                               </div>
+
+
                     </div>
 
                     <div class="navbar-header pull-right hidden-xs">
@@ -522,6 +538,8 @@
                                 </ul>
                             </xsl:otherwise>
                         </xsl:choose>
+     
+                    
                     </div>
                 </div>
             </div>
@@ -695,19 +713,7 @@
     <!-- Like the header, the footer contains various miscellaneous text, links, and image placeholders -->
     <xsl:template name="buildFooter">
 
-        <!-- MOspace navigation bar and tag line, absolutely positioned, code goes here because it isn't semantically important -->
-        <xsl:variable name="app_path" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]" />
-
-        <div id="ms-navigation">
-            <ul id="ms-navigation-list">
-                <li class="ms-navigation-link"><a href="{$app_path}/discover">search</a> | </li>
-                <li class="ms-navigation-link"><a href="{$app_path}/community-list">browse</a> | </li>
-                <li class="ms-navigation-link"><a href="{$app_path}/pages/add">add to MOspace</a> | </li>
-                <li class="ms-navigation-link"><a href="{$app_path}/pages/about">about</a> | </li>
-                <li class="ms-navigation-link"><a href="{$app_path}/pages/help">help</a></li>
-            </ul>
-        </div>
-        
+       
         <footer>
                 <div class="row">
                     <hr/>
@@ -732,7 +738,7 @@
                             </a>
                         </div>
                     </div>
-                    <div class="col-xs-5 col-sm-4 hidden-print">
+                    <div class="col-xs-4 col-sm-4 hidden-print">
                         <div class="pull-right">
                             hosted by <a href="http://lso.umsystem.edu/">University of Missouri Library Systems</a>
                         </div>
