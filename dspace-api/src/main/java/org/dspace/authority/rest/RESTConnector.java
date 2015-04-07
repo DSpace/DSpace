@@ -40,7 +40,7 @@ public class RESTConnector {
     public Document get(String path) {
         Document document = null;
 
-        InputStream result = null;
+//      InputStream result = null;
         path = trimSlashes(path);
 
         String fullPath = url + '/' + path;
@@ -48,7 +48,7 @@ public class RESTConnector {
         GetMethod httpGet = new GetMethod(fullPath);
 
         try {
-            boolean ignoreSSL = ConfigurationManager.getBooleanProperty("orcid", "httpclient.ignoressl");
+//          boolean ignoreSSL = ConfigurationManager.getBooleanProperty("orcid", "httpclient.ignoressl");
 
             HttpClient httpclient = new HttpClient();
 
