@@ -417,3 +417,11 @@ height: 33px;
 .searchTime{
 	display:none;
 }
+
+#aspect_submission_StepTransformer_field_dc_type,
+#aspect_submission_StepTransformer_field_dcterms_rights_embargoPeriod,
+#aspect_submission_StepTransformer_field_dcterms_subject_area,
+#aspect_submission_StepTransformer_field_dcterms_language,
+#aspect_submission_StepTransformer_field_dcterms_license {
+	background-image : url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjx0ZXh0IHg9Ijk2JSIgeT0iNzAlIiBmb250LXNpemU9IjIwIj7ilrw8L3RleHQ+PC9zdmc+");
+}

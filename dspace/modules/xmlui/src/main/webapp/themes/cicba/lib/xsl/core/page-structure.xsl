@@ -163,16 +163,6 @@
 		    </xsl:text>
 		</script>
 		
-		<!-- indicator for value-pair inputs -->
-		<script type="text/javascript">
-			<xsl:text disable-output-escaping="yes">
-				$(document).ready(function() {
-			    	$("#aspect_submission_StepTransformer_field_dcterms_rights_embargoPeriod, #aspect_submission_StepTransformer_field_dcterms_subject_area, #aspect_submission_StepTransformer_field_dcterms_language, #aspect_submission_StepTransformer_field_dcterms_license")
-						.after('\u25BC');
-			    });
-		    </xsl:text>
-		</script>
-		
 		<xsl:call-template name="google-analytic-tracking" />
 
 		<!-- Add a contextpath to a JS variable -->
