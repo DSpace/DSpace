@@ -7,20 +7,19 @@
  */
 package org.dspace.authority.orcid;
 
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.orcid.model.Bio;
 import org.dspace.authority.orcid.model.Work;
 import org.dspace.authority.orcid.xml.XMLtoBio;
 import org.dspace.authority.orcid.xml.XMLtoWork;
-import org.dspace.authority.rest.RESTConnector;
 import org.dspace.authority.rest.RestSource;
-import org.apache.log4j.Logger;
 import org.dspace.utils.DSpace;
 import org.w3c.dom.Document;
-
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -38,8 +37,7 @@ public class Orcid extends RestSource {
 
     private static Orcid orcid;
 
-    private RESTConnector memberConnector = null;
-
+    
     public static Orcid getOrcid() {
         if (orcid == null) {
             orcid = new DSpace().getServiceManager().getServiceByName("OrcidSource", Orcid.class);
@@ -47,15 +45,10 @@ public class Orcid extends RestSource {
         return orcid;
     }
 
-    private Orcid(String url) {
+    public Orcid(String url) {
         super(url);
     }
-
-    public Orcid(String s, String s2) {
-        super(s);
-        this.memberConnector = new RESTConnector(s2);
-    }
-
+    
     public Bio getBio(String id) {
         Document bioDocument = restConnector.get(id + "/orcid-bio");
         XMLtoBio converter = new XMLtoBio();
@@ -73,7 +66,7 @@ public class Orcid extends RestSource {
      */
     public Bio getBio(String id,String token) {
        // https://api.sandbox.orcid.org?access_token=d50eb967-555f-4671-9f35-8b413509b7f1
-        Document bioDocument = memberConnector.get(id  + "/orcid-bio?access_token="+token);
+        Document bioDocument = restConnector.get(id  + "/orcid-bio?access_token="+token);
         XMLtoBio converter = new XMLtoBio();
         Bio bio = converter.convert(bioDocument).get(0);
         bio.setOrcid(id);
@@ -107,4 +100,5 @@ public class Orcid extends RestSource {
         Bio bio = getBio(id);
         return OrcidAuthorityValue.create(bio);
     }
+
 }

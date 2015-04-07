@@ -19,9 +19,15 @@
 
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
 
+	<!--  resources  -->
+	<bean id="dspaceOAuthenticateConfiguration" class="org.dspace.authority.orcid.DSpaceORCIDConfiguration">
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+	</bean>
+	
+	<bean id="dspaceOrcidAPI" factory-bean="dspaceOAuthenticateConfiguration" factory-method="getORCIDApi" />
+	
 	 <bean name="OrcidSource" class="org.dspace.authority.orcid.Orcid">
-         <constructor-arg value="http://pub.orcid.org"/>
-         <constructor-arg value="http://api.sandbox.orcid.org/v1.1"/>
-     </bean>
+	 	<constructor-arg ref="dspaceOrcidAPI"/>
+	 </bean>      
 
 </beans>
