@@ -369,7 +369,7 @@ Maintain mapping from campus departments (from Proquest metadata) to DSpace coll
 
 * [messages.xml](../modules/xmlui/src/main/webapp/i18n/messages.xml) - Actual text for content that is linked to from the code.
 
-* [ItemAdapter.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/artifactbrowser/ItemAdapter.java) - Added the code to populate the mets file with the download count.
+* [ItemAdapter.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/objectmanager/ItemAdapter.java) - Added the code to populate the mets file with the download count.
 
 * [item-view.xsl](../modules/xmlui-mirage2/src/main/webapp/themes/Mirage2/xsl/aspect/artifactbrowser/item-view.xsl) - Added the text and formatting to display the "No. of  Downloads" for each item.
 
