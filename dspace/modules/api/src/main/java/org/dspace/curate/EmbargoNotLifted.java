@@ -51,7 +51,7 @@ public class DataPackagesPerJournal extends AbstractCurationTask {
     @Override
     public int perform(DSpaceObject dso) throws IOException {
 	try {
-	    report("Embargo Check);
+	    report("Embargo Check");
 	} catch (ParseException ex) {
 	    log.fatal("Unable to parse start or end date", ex);
 	    return Curator.CURATE_FAIL;
