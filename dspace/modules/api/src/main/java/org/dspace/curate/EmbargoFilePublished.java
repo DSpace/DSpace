@@ -99,13 +99,14 @@ public class EmbargoFilePublished extends AbstractCurationTask {
 					if (citations.length > 0) {
 						report("Object has citation but embargoes not lifted: " + item.getHandle());
 	    				return;
-	    			}
-				}			
-			}
-	    }
-	} else {
-	    return;
-	}
+                                        }
+                                }			
+                        }
+                }
+
+        }
+}
+
 
 
     
