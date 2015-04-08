@@ -56,20 +56,20 @@ public class OdinsHamr extends AbstractCurationTask {
     DocumentBuilder docb = null;
     static long total = 0;
     private Context context;
-    
+
     @Override 
     public void init(Curator curator, String taskId) throws IOException {
         super.init(curator, taskId);
 	
         identifierService = new DSpace().getSingletonService(IdentifierService.class);            
 	
-	// init xml processing
-	try {
-	    dbf = DocumentBuilderFactory.newInstance();
-	    docb = dbf.newDocumentBuilder();
-	} catch (ParserConfigurationException e) {
-	    throw new IOException("unable to initiate xml processor", e);
-	}
+	    // init xml processing
+        try {
+            dbf = DocumentBuilderFactory.newInstance();
+            docb = dbf.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            throw new IOException("unable to initiate xml processor", e);
+        }
     }
     
     /**
@@ -83,7 +83,7 @@ public class OdinsHamr extends AbstractCurationTask {
      */
     @Override
     public int perform(DSpaceObject dso) throws IOException {
-	log.info("performing ODIN's Hamr task " + total++ );
+        log.info("performing ODIN's Hamr task " + total++ );
 
 	String handle = "\"[no handle found]\"";
 	String itemDOI = "\"[no item DOI found]\"";
@@ -208,7 +208,7 @@ public class OdinsHamr extends AbstractCurationTask {
        Computes a minimum between three integers.
     **/
     private static int minimum(int a, int b, int c) {
-	return Math.min(Math.min(a, b), c);
+	    return Math.min(Math.min(a, b), c);
     }
 
     /**
@@ -311,7 +311,7 @@ public class OdinsHamr extends AbstractCurationTask {
 	}
 	return null;
     }
-    
+
     /**
        Retrieve a list of names associated with this DOI in ORCID.
        The DOI may represent a Dryad item, or any other work.
@@ -342,7 +342,7 @@ public class OdinsHamr extends AbstractCurationTask {
 	    log.error("error processing XML for aDOI="  + aDOI, e);
 	}
 
-	return orcidNames;
+        return orcidBios;
     }
 
     
@@ -367,5 +367,4 @@ public class OdinsHamr extends AbstractCurationTask {
 	    return name;
 	}
     }
-    
 }
