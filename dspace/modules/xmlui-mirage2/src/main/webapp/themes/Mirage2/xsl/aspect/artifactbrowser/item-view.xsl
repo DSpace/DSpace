@@ -209,7 +209,7 @@
     <xsl:template name="itemSummaryView-DIM-abstract">
         <xsl:if test="dim:field[@element='description' and @qualifier='abstract']">
             <div class="simple-item-view-description item-page-field-wrapper table">
-                <h5 class="visible-xs"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-abstract</i18n:text></h5>
+                <h5>Abstract</h5>
                 <div>
                     <xsl:for-each select="dim:field[@element='description' and @qualifier='abstract']">
                         <xsl:choose>
@@ -235,7 +235,7 @@
     <xsl:template name="itemSummaryView-DIM-tableofContents">
         <xsl:if test="dim:field[@element='description' and @qualifier='tableofcontents']">
             <div class="simple-item-view-description item-page-field-wrapper table">
-                <h5 class="visible-xs">Table of Contents</h5>
+                <h5>Table of Contents</h5>
                 <div>
                     <xsl:for-each select="dim:field[@element='description' and @qualifier='tableofcontents']">
                         <xsl:choose>
@@ -261,7 +261,7 @@
     <xsl:template name="itemSummaryView-DIM-citation">
         <xsl:if test="dim:field[@element='identifier' and @qualifier='citation']">
             <div class="simple-item-view-description item-page-field-wrapper table">
-                <h5 class="visible-xs">Citation</h5>
+                <h5>Citation</h5>
                 <div>
                     <xsl:for-each select="dim:field[@element='identifier' and @qualifier='citation']">
                         <xsl:choose>
