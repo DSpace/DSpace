@@ -1474,6 +1474,31 @@
                     <required></required>
                 </field>
                 
+                <!--ffceballos -->				
+				<field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>                    
+                    <label>Título *</label>
+                    <input-type>onebox</input-type>
+                    <hint>Ingrese el títlo pricipal del ítem.</hint>
+                    <required>Debe ingresar el título del item</required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier>alternative</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Título alternativo *</label>
+                    <input-type>onebox</input-type>
+                    <hint>Si el ítem tiene títulos alternativos, por favor escríbalos.</hint>
+                    <required></required>
+                </field>				
+                <!--fin ffceballos -->
+                
+                
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>type</dc-element>
