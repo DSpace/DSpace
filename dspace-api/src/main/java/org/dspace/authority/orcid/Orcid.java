@@ -80,19 +80,15 @@ public class Orcid extends RestSource {
     }
 
     public List<Bio> queryBio(String name, int start, int rows) {
-        Document bioDocument = restConnector.get("search/orcid-bio?q=" + URLEncoder.encode("\"" + name + "\"") + "&start=" + start + "&rows=" + rows);
+        String path = "search/orcid-bio?q=" + URLEncoder.encode("\"" + name + "\"") + (rows==0?"":"&start=" + start + "&rows=" + rows);
+		Document bioDocument = restConnector.get(path);
         XMLtoBio converter = new XMLtoBio();
         return converter.convert(bioDocument);
     }
 
     @Override
     public List<AuthorityValue> queryAuthorities(String text, int max) {
-        List<Bio> bios = queryBio(text, 0, max);
-        List<AuthorityValue> authorities = new ArrayList<AuthorityValue>();
-        for (Bio bio : bios) {
-            authorities.add(OrcidAuthorityValue.create(bio));
-        }
-        return authorities;
+    	return queryAuthorities(null, text, 0, max);
     }
 
     @Override
@@ -100,5 +96,15 @@ public class Orcid extends RestSource {
         Bio bio = getBio(id);
         return OrcidAuthorityValue.create(bio);
     }
+
+	@Override
+	public List<AuthorityValue> queryAuthorities(String field, String text, int start, int max) {
+        List<Bio> bios = queryBio(text, start, max);
+        List<AuthorityValue> authorities = new ArrayList<AuthorityValue>();
+        for (Bio bio : bios) {
+            authorities.add(OrcidAuthorityValue.create(bio));
+        }
+        return authorities;
+	}
 
 }

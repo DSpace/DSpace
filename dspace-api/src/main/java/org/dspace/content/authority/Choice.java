@@ -7,6 +7,9 @@
  */
 package org.dspace.content.authority;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Record class to hold the data describing one option, or choice, for an
  * authority-controlled metadata value.
@@ -25,6 +28,8 @@ public class Choice
     /**  The canonical text value to insert into MetadataValue's text field */
     public String value = null;
 
+    public Map<String, String> extras = new HashMap<String,String>();
+
     public Choice()
     {
     }
@@ -34,5 +39,12 @@ public class Choice
         this.authority = authority;
         this.value = value;
         this.label = label;
+    }
+
+    public Choice(String authority, String label, String value, Map<String, String> extras) {
+        this.authority = authority;
+        this.label = label;
+        this.value = value;
+        this.extras = extras;
     }
 }

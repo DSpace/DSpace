@@ -10,6 +10,8 @@ import java.util.List;
 public interface AuthoritySource {
 
     public List<AuthorityValue> queryAuthorities(String text, int max);
+    
+    public List<AuthorityValue> queryAuthorities(String field, String text, int start, int max);
 
     public AuthorityValue queryAuthorityID(String id);
 }

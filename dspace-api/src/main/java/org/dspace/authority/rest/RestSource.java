@@ -27,13 +27,9 @@ public abstract class RestSource implements AuthoritySource {
         this.restConnector = new RESTConnector(url);
     }
 
-    /**
-     * TODO
-     * com.atmire.org.dspace.authority.rest.RestSource#queryAuthorities -> add field, so the source can decide whether to query /users or something else.
-     * -> implement subclasses
-     * -> implement usages
-     */
     public abstract List<AuthorityValue> queryAuthorities(String text, int max);
+    
+    public abstract List<AuthorityValue> queryAuthorities(String field, String text, int start, int max);
 
     public abstract AuthorityValue queryAuthorityID(String id);
 }
