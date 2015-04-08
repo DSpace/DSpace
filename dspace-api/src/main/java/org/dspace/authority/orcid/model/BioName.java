@@ -28,7 +28,7 @@ public class BioName {
         otherNames = new ArrayList<String>();
     }
 
-    BioName(String givenNames, String familyName, String creditName, List<String> otherNames) {
+    public BioName(String givenNames, String familyName, String creditName, List<String> otherNames) {
         this.givenNames = givenNames;
         this.familyName = familyName;
         this.creditName = creditName;
