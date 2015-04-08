@@ -40,7 +40,7 @@ import org.apache.log4j.Logger;
  * @author Ryan Scherle
  */
 @Distributive
-public class DataPackagesPerJournal extends AbstractCurationTask {
+public class EmbargoNotLifted extends AbstractCurationTask {
 
 	private static final String EMBARGO_TYPE = "untilArticleAppears";
     private static Logger log = Logger.getLogger(EmbargoNotLifted.class);
