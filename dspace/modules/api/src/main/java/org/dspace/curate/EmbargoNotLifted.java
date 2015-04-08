@@ -30,14 +30,10 @@ import org.apache.log4j.Logger;
 /**
  * DataPackagesPerJournal generates a list of journals and the number of data packages associated with them. This
  * statistic can be calculated for any timeframe by adjusting the static dates in this class.
- *
- * The task succeeds if it was able to calculate the correct result.
- *
- * Originally adapted from the ProfileFormats curation task by Richard Rodgers.
- *
+ * /opt/dryad/bin/dspace curate -v -t embargonotlifted -i 10255/3 -r - >~/temp/embargonotlifted.csv
  * Input: a collection of data packages
  * Output: a CSV indicating journal names and the number of data packages associated with each
- * @author Ryan Scherle
+ * @author Debra Fagan
  */
 @Distributive
 public class EmbargoNotLifted extends AbstractCurationTask {
