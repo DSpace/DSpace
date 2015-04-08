@@ -74,7 +74,7 @@ public class DataPackagesPerJournal extends AbstractCurationTask {
 	if (eTypes.length > 0) {
 		eType = eTypes[0].value;
 
-		if eType.equals(EMBARGO_TYPE) {
+		if eType.equals("untilArticleAppears") {
 			String eDate = null;
 			DCValue[] eDates = item.getMetadata("dc.date.embargoedUntil");
 			if (eDates.length == 0) {
