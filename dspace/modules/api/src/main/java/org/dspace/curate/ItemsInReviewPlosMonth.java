@@ -189,3 +189,4 @@ public class ItemsInReviewPlosMonth extends AbstractCurationTask {
         return Curator.CURATE_SUCCESS;
     }
 }
+
