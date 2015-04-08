@@ -17,21 +17,23 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+<%@page import="org.dspace.core.ConfigurationManager"%>
 
-<dspace:layout navbar="off"
-		locbar="off"
-		titlekey="jsp.login.ldap.title">
-		
-    <table border="0" width="90%">
-        <tr>
-            <td align="left">
-                <h1><fmt:message key="jsp.login.ldap.heading"/></h1>
-            </td>
-            <td align="right" class="standard">
-                <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#login\"%>"><fmt:message key="jsp.help"/></dspace:popup>
-            </td>
-        </tr>
-    </table>
-
-    <dspace:include page="/components/ldap-form.jsp" />
+<dspace:layout navbar="default" locbar="off" titlekey="jsp.login.ldap.title" nocache="true">
+	<div class="panel panel-primary">
+        <div class="panel-heading"><fmt:message key="jsp.login.ldap.heading"/>
+        <span class="pull-right"><dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#login\"%>"><fmt:message key="jsp.help"/></dspace:popup></span>
+        </div>
+        <% Boolean oaAuthMode = (Boolean)ConfigurationManager.getBooleanProperty("authentication-oauth","orcid-embedded-login"); 
+           if(oaAuthMode==null || !oaAuthMode) {
+        %>
+			<dspace:include page="/components/ldap-form.jsp" />	
+	    <%
+           } else if(oaAuthMode) {
+	    %>
+	    <dspace:include page="/components/ldap-form-with-orcid.jsp" />
+	    <%
+           }
+	    %>
+    </div>
 </dspace:layout>
