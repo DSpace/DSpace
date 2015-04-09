@@ -56,8 +56,6 @@ public class OAuthAuthenticationMethod implements AuthenticationMethod{
         String email = null;
 
         String orcid = (String) request.getAttribute("orcid");
-        String token = (String) request.getAttribute("access_token");
-        String scope = (String) request.getAttribute("scope");
         //String refreshToken = (String) request.getAttribute("refresh_token");
         if (request == null||orcid==null)
         {
@@ -81,15 +79,9 @@ public class OAuthAuthenticationMethod implements AuthenticationMethod{
         Orcid orcidObject = Orcid.getOrcid();
         if(orcid!=null)
         {
-            if(token!=null && StringUtils.contains("/orcid-bio", scope)){
-            	// try to retrieve limited information
-                bio = orcidObject.getBio(orcid,token);
-            } 
-            else            
-            {
             	// try to retrieve public information
             	bio = orcidObject.getBio(orcid);
-            }
+            
         }
         //get the email from orcid
         if(bio!=null && email == null)
