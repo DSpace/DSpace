@@ -54,6 +54,7 @@ public class XMLtoBio extends Converter {
 
     protected String CONTACT_DETAILS = "contact-details";
     protected String COUNTRY = CONTACT_DETAILS + "/address/country";
+    protected String EMAIL = CONTACT_DETAILS + "/email[@primary='true'][@current='true']";
 
     protected String KEYWORDS = "keywords";
     protected String KEYWORD = KEYWORDS + "/keyword";
@@ -208,6 +209,16 @@ public class XMLtoBio extends Converter {
         } catch (XPathExpressionException e) {
             log.error("Error in finding the country in bio xml.", e);
         }
+
+        try {
+            String email = XMLUtils.getTextContent(xml, EMAIL);
+            bio.setEmail(email);
+        } catch (XPathExpressionException e) {
+            log.error("Error in finding the email in bio xml.", e);
+        }
+
+
+
     }
 
     protected void setPersonalDetails(Node xml, Bio bio) {
