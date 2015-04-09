@@ -84,84 +84,46 @@
     {
 %>
 <c:set var="dspace.layout.head.last" scope="request">
-    <script type="text/javascript"><!--
-
-               var j = jQuery.noConflict();
+    <script type="text/javascript">
+    <!--
+       var j = jQuery.noConflict();
        var myrpstatus = new Object();
        j(document).ready(function(){
-               j('#cris-rp-change-active').dialog({
-                       autoOpen: false, modal: true, width: 750, minHeight: 350,
-                               buttons: {
-                                       "<fmt:message key="jsp.mydspace.cris.rp-status-change.go"/>":
-                                               function(){
-                                                       j(window).attr('location','<%= request.getContextPath() %>'+myrpstatus.url);
-                                               },
-                                       "<fmt:message key="jsp.mydspace.cris.rp-status-change.inactive"/>":
-                                               function(){
-                                                       myRP('hide');
-                                               j(this).dialog("close");
-                                               },
-                                       "<fmt:message key="jsp.mydspace.cris.rp-status-change.remove"/>":
-                                               function(){
-                                                       myRP('remove');
-                                               j(this).dialog("close");
-                                               },
-                                       "<fmt:message key="jsp.mydspace.cris.rp-status-change.keep-active"/>":
-                                               function(){
-                                                       j(this).dialog("close");
-                                       }
-                               }
-               });
-               j('#cris-rp-change-inactive').dialog({
-                       autoOpen: false, modal: true, width: 750, minHeight: 350,
-                               buttons: {
-                                       "<fmt:message key="jsp.mydspace.cris.rp-status-change.go"/>":
-                                               function(){
-                                                       j(window).attr('location','<%= request.getContextPath() %>'+myrpstatus.url);
-                                               },
-                                       "<fmt:message key="jsp.mydspace.cris.rp-status-change.active"/>":
-                                               function(){
-                                                       myRP('activate');
-                                               j(this).dialog("close");
-                                       },
-                               "<fmt:message key="jsp.mydspace.cris.rp-status-change.remove"/>":
-                                       function(){
-                                               myRP('remove');
-                                               j(this).dialog("close");
-                                       },
-                               "<fmt:message key="jsp.mydspace.cris.rp-status-change.keep-inactive"/>":
-                                       function(){
-                                               j(this).dialog("close");
-                                       }
-                               }
-               });
-               j('#cris-rp-change-undefined').dialog({
-                       autoOpen: false, modal: true, width: 750, minHeight: 300,
-                               buttons: {
-                               "<fmt:message key="jsp.mydspace.cris.rp-status-change.create"/>":
-                                       function(){
-                                               myRP('create');
-                                               j(this).dialog("close");
-                                       },
-                               "<fmt:message key="jsp.mydspace.cris.rp-status-change.keep-undefined"/>":
-                                       function(){
-                                               j(this).dialog("close");
-                                       }
-                       }
-               });
-               j('#cris-rp-change-admin').dialog({
-                   autoOpen: false, modal: true, width: 750, minHeight: 300,
-                           buttons: {
-                               "<fmt:message key="jsp.mydspace.cris.rp-status-change.go"/>":
-                                   function(){
-                                           j(window).attr('location','<%= request.getContextPath() %>'+myrpstatus.url);
-                                   },
-                           	    "<fmt:message key="jsp.mydspace.cris.rp-status-change.keep-undefined"/>":
-                                   function(){
-                                           j(this).dialog("close");
-                                   }
-                   }
-           });
+			  j("#inactiveDialogChangeActive").on('click',function(event){
+					event.preventDefault();
+					j(".cris-rp-status").hide();
+					j("#h2-cris-rp-status").show();
+					myRP('activate');
+					j("#cris-rp-change-inactive").modal('hide');
+			  });
+			  j("#inactiveDialogChangeRemove").on('click',function(event){
+					event.preventDefault();
+					j(".cris-rp-status").hide();
+					j("#h2-cris-rp-status").show();
+					myRP('remove');
+					j("#cris-rp-change-inactive").modal('hide');
+			  });
+			  j("#activeDialogChangeInActive").on('click',function(event){
+					event.preventDefault();
+					j(".cris-rp-status").hide();
+					j("#h2-cris-rp-status").show();
+					myRP('hide');
+					j("#cris-rp-change-active").modal('hide');
+			  });
+			  j("#activeDialogChangeRemove").on('click',function(event){
+					event.preventDefault();
+					j(".cris-rp-status").hide();
+					j("#h2-cris-rp-status").show();
+					myRP('remove');
+					j("#cris-rp-change-active").modal('hide');
+			  });
+			  j("#undefinedDialogChangeCreate").on('click',function(event){
+					event.preventDefault();
+					j(".cris-rp-status").hide();
+					j("#h2-cris-rp-status").show();
+					myRP('create');
+					j("#cris-rp-change-undefined").modal('hide');
+			  });			  
                
 
                var myRP = function(myaction){
@@ -172,45 +134,35 @@
                                        },
                                        success : function(data) {
                                     	   	
-                                               myrpstatus = data.myrp;
+                                               myrpstatus = data.myrp;                                               
+                                               j('.myrpstatus-url').attr('href', dspaceContextPath + myrpstatus.url);
                                                if (data.myrp.url != null && data.myrp.active)
                                                {
-                                                       j('#cris-rp-status-value').html('<fmt:message key="jsp.mydspace.cris.rp-status-active" />');
-                                                       j('#cris-rp-status-value').addClass("cris-rp-status-active");
-                                                       j('#cris-rp-changestatus').off('click');
-                                                       j('#cris-rp-changestatus').on('click', function(){
-                                                    	   <% if(rpChangeStatusAdmin && !isAdmin){%>
-                                                    		   j('#cris-rp-change-admin').dialog("open");
-        	                                       	   		<%}else{
-		                                               	   %>
-		                                               			j('#cris-rp-change-active').dialog("open");
-		                                               		<%
-		                                               			}%>
+                                                   <% if(rpChangeStatusAdmin && !isAdmin){%>
+                                                   	   j('#h2-cris-rp-status').hide();
+                                                   	   j('#h2-cris-rp-status-active-admin').show();
+        	                                       <%}else{ %>
+        	                                       	   j('#h2-cris-rp-status').hide();
+		                                               j('#h2-cris-rp-status-active').show();
+		                                           <%}%>
                                                                
-                                                       });
                                                }
                                                else if (data.myrp.url != null && !data.myrp.active)
                                                {
-                                                       j('#cris-rp-status-value').html('<fmt:message key="jsp.mydspace.cris.rp-status-inactive" />');
-                                                       j('#cris-rp-status-value').addClass("cris-rp-status-inactive");
-                                                       j('#cris-rp-changestatus').off('click');
-                                                       j('#cris-rp-changestatus').on('click', function(){
-                                                    	   <% if(rpChangeStatusAdmin && !isAdmin){ %>
-                                                    		   j('#cris-rp-change-admin').dialog("open");
-        	                                       	   		<%}else{
-		                                               	   %>
-                                                               j('#cris-rp-change-inactive').dialog("open");
-                                                               <%}%>
-                                                       });
+                                                       
+													<% if(rpChangeStatusAdmin && !isAdmin){ %>
+                                                	   j('#h2-cris-rp-status').hide();
+                                                   	   j('#h2-cris-rp-status-inactive-admin').show();
+        	                                       	<%}else{%>
+                                             	   	   j('#h2-cris-rp-status').hide();
+                                               	   	   j('#h2-cris-rp-status-inactive').show();
+                                                    <%}%>
+                                                       
                                                }
                                                else
                                                {
-                                                       j('#cris-rp-status-value').html('<fmt:message key="jsp.mydspace.cris.rp-status-undefined" />');
-                                                       j('#cris-rp-status-value').addClass("cris-rp-status-undefined");
-                                                       j('#cris-rp-changestatus').off('click');
-                                                       j('#cris-rp-changestatus').on('click', function(){
-                                                               j('#cris-rp-change-undefined').dialog("open");
-                                                       });
+                                            	   j(".cris-rp-status").hide();
+                                            	   j('#h2-cris-rp-status-undefined').show();
                                                }
                                        }
                        });
@@ -222,7 +174,7 @@
     </script>
 </c:set>
 <% } %>                                               
-<dspace:layout style="submission" titlekey="jsp.mydspace" nocache="true">
+<dspace:layout titlekey="jsp.mydspace" nocache="true">
 	<div class="panel panel-primary">
         <div class="panel-heading">
                     <fmt:message key="jsp.mydspace"/>: <%= Utils.addEntities(user.getFullName()) %>
@@ -235,24 +187,37 @@
     {
         %>
         
-        <h2 class="cris-rp-status">
+        <h2 id="h2-cris-rp-status" class="cris-rp-status">
         	<fmt:message key="jsp.mydspace.cris.rp-status-label"/> 
-        	<a href="#" id="cris-rp-changestatus"><span id="cris-rp-status-value" class="cris-rp-status-value"><fmt:message key="jsp.mydspace.cris.rp-status-loading"/></span>
+        	<a href="#"><span class="cris-rp-status-value"><fmt:message key="jsp.mydspace.cris.rp-status-loading"/></span>
         	<span class="fa fa-edit"></span></a>
         </h2>
-
-        <div id="cris-rp-change-active" class="cris-rp-changestatus-dialog" title="<fmt:message key="jsp.mydspace.cris.rp-status-change.dialog-active.title"/>">
-        	<p><fmt:message key="jsp.mydspace.cris.rp-status-change.dialog-active.text"/></p>
-        </div>
-        <div id="cris-rp-change-inactive" class="cris-rp-changestatus-dialog" title="<fmt:message key="jsp.mydspace.cris.rp-status-change.dialog-inactive.title"/>">
-        	<p><fmt:message key="jsp.mydspace.cris.rp-status-change.dialog-inactive.text"/></p>
-        </div>
-        <div id="cris-rp-change-undefined" class="cris-rp-changestatus-dialog" title="<fmt:message key="jsp.mydspace.cris.rp-status-change.dialog-undefined.title"/>">
-        	<p><fmt:message key="jsp.mydspace.cris.rp-status-change.dialog-undefined.text"/></p>
-        </div>
-        <div id="cris-rp-change-admin" class="cris-rp-changestatus-dialog" title="<fmt:message key="jsp.mydspace.cris.rp-status-change.dialog-admin.title"/>">
-        	<p><fmt:message key="jsp.mydspace.cris.rp-status-change.dialog-admin.text"/></p>
-        </div>        
+        <h2 id="h2-cris-rp-status-active" class="cris-rp-status" style="display:none;">
+        	<fmt:message key="jsp.mydspace.cris.rp-status-label"/> 
+        	<a href="#" class="cris-rp-status-active" data-toggle="modal" data-target="#cris-rp-change-active"><span class="cris-rp-status-value"><fmt:message key="jsp.mydspace.cris.rp-status-active"/></span>
+        	<span class="fa fa-edit"></span></a>
+        </h2>
+		<h2 id="h2-cris-rp-status-active-admin" class="cris-rp-status" style="display:none;">
+        	<fmt:message key="jsp.mydspace.cris.rp-status-label"/> 
+        	<a href="#" class="cris-rp-status-active" data-toggle="modal" data-target="#cris-rp-change-admin"><span class="cris-rp-status-value"><fmt:message key="jsp.mydspace.cris.rp-status-active"/></span>
+        	<span class="fa fa-edit"></span></a>
+        </h2>                                
+        <h2 id="h2-cris-rp-status-inactive" class="cris-rp-status" style="display:none;">
+        	<fmt:message key="jsp.mydspace.cris.rp-status-label"/> 
+        	<a href="#" class="cris-rp-status-inactive" data-toggle="modal" data-target="#cris-rp-change-inactive"><span class="cris-rp-status-value"><fmt:message key="jsp.mydspace.cris.rp-status-inactive"/></span>
+        	<span class="fa fa-edit"></span></a>
+        </h2>
+		<h2 id="h2-cris-rp-status-inactive-admin" class="cris-rp-status" style="display:none;">
+        	<fmt:message key="jsp.mydspace.cris.rp-status-label"/> 
+        	<a href="#" class="cris-rp-status-inactive" data-toggle="modal" data-target="#cris-rp-change-admin"><span class="cris-rp-status-value"><fmt:message key="jsp.mydspace.cris.rp-status-inactive"/></span>
+        	<span class="fa fa-edit"></span></a>
+        </h2>
+        <h2 id="h2-cris-rp-status-undefined" class="cris-rp-status" style="display:none;">
+        	<fmt:message key="jsp.mydspace.cris.rp-status-label"/> 
+        	<a href="#" class="cris-rp-status-undefined" data-toggle="modal" data-target="#cris-rp-change-undefined"><span class="cris-rp-status-value"><fmt:message key="jsp.mydspace.cris.rp-status-undefined"/></span>
+        	<span class="fa fa-edit"></span></a>
+        </h2>                                                                
+     
 <%        
 	}
  %>
@@ -577,6 +542,95 @@
 	</ol>
 	<%} %>
 	</div>
-</div>	
-	
+</div>
+
+
+		<div class="modal fade" id="cris-rp-change-active" tabindex="-1" role="dialog" aria-labelledby="<fmt:message key="jsp.mydspace.cris.rp-status-change.dialog-active.title"/>" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title"><fmt:message key="jsp.mydspace.cris.rp-status-change.dialog-active.title"/></h4>
+						</div>
+						<div class="modal-body with-padding">
+							<p><fmt:message key="jsp.mydspace.cris.rp-status-change.dialog-active.text"/></p>
+						</div>
+						<div class="modal-footer">
+						<div class="btn-group btn-group-sm" role="group">
+							 <a href="#" class="btn btn-primary myrpstatus-url"><fmt:message key="jsp.mydspace.cris.rp-status-change.go"/></a>
+							 <button type="button" id="activeDialogChangeInActive" class="btn btn-warning" data-dismiss="modal"><fmt:message key="jsp.mydspace.cris.rp-status-change.inactive"/></button>
+							 <button type="button" id="activeDialogChangeRemove" class="btn btn-danger" data-dismiss="modal"><fmt:message key="jsp.mydspace.cris.rp-status-change.remove"/></button>
+							 <button type="button" class="btn btn-default" data-dismiss="modal"><fmt:message key="jsp.mydspace.cris.rp-status-change.keep-active"/></button>
+						</div>
+						</div>
+					</div>
+					<!-- /.modal-content -->
+				</div>
+				<!-- /.modal-dialog -->
+		</div>
+		
+		<div class="modal fade" id="cris-rp-change-inactive" tabindex="-1" role="dialog" aria-labelledby="<fmt:message key="jsp.mydspace.cris.rp-status-change.dialog-inactive.title"/>" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title"><fmt:message key="jsp.mydspace.cris.rp-status-change.dialog-inactive.title"/></h4>
+						</div>
+						<div class="modal-body with-padding">
+							<p><fmt:message key="jsp.mydspace.cris.rp-status-change.dialog-inactive.text"/></p>
+						</div>
+						<div class="modal-footer">
+						<div class="btn-group btn-group-sm" role="group">
+							 <a href="#" class="btn btn-primary myrpstatus-url"><fmt:message key="jsp.mydspace.cris.rp-status-change.go"/></a>
+							 <button type="button" id="inactiveDialogChangeActive" class="btn btn-success" data-dismiss="modal"><fmt:message key="jsp.mydspace.cris.rp-status-change.active"/></button>
+							 <button type="button" id="inactiveDialogChangeRemove" class="btn btn-danger" data-dismiss="modal"><fmt:message key="jsp.mydspace.cris.rp-status-change.remove"/></button>
+							 <button type="button" class="btn btn-default" data-dismiss="modal"><fmt:message key="jsp.mydspace.cris.rp-status-change.keep-inactive"/></button>
+						</div>
+						</div>
+					</div>
+					<!-- /.modal-content -->
+				</div>
+				<!-- /.modal-dialog -->
+		</div>
+		
+	    <div class="modal fade" id="cris-rp-change-undefined" tabindex="-1" role="dialog" aria-labelledby="<fmt:message key="jsp.mydspace.cris.rp-status-change.dialog-undefined.title"/>" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title"><fmt:message key="jsp.mydspace.cris.rp-status-change.dialog-undefined.title"/></h4>
+						</div>
+						<div class="modal-body with-padding">
+							<p><fmt:message key="jsp.mydspace.cris.rp-status-change.dialog-undefined.text"/></p>
+						</div>
+						<div class="modal-footer">
+							 <button type="button" id="undefinedDialogChangeCreate" class="btn btn-success" data-dismiss="modal"><fmt:message key="jsp.mydspace.cris.rp-status-change.create"/></button>
+							 <button type="button" class="btn btn-default" data-dismiss="modal"><fmt:message key="jsp.mydspace.cris.rp-status-change.keep-undefined"/></button>
+						</div>
+					</div>
+					<!-- /.modal-content -->
+				</div>
+				<!-- /.modal-dialog -->
+		</div>
+		
+		<div class="modal fade" id="cris-rp-change-admin" tabindex="-1" role="dialog" aria-labelledby="<fmt:message key="jsp.mydspace.cris.rp-status-change.dialog-admin.title"/>" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title"><fmt:message key="jsp.mydspace.cris.rp-status-change.dialog-admin.title"/></h4>
+						</div>
+						<div class="modal-body with-padding">
+							<p><fmt:message key="jsp.mydspace.cris.rp-status-change.dialog-admin.text"/></p>
+						</div>
+						<div class="modal-footer">
+							 <a href="#" class="btn btn-primary myrpstatus-url"><fmt:message key="jsp.mydspace.cris.rp-status-change.go"/></a>
+							 <button type="button" class="btn btn-default" data-dismiss="modal"><fmt:message key="jsp.mydspace.cris.rp-status-change.keep-undefined"/></button>
+						</div>
+					</div>
+					<!-- /.modal-content -->
+				</div>
+				<!-- /.modal-dialog -->
+		</div>
+		<!-- /.modal -->	
 </dspace:layout>
