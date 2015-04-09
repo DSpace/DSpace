@@ -133,7 +133,7 @@
     <%-- HACK: marginwidth, marginheight: for non-CSS compliant Netscape browser --%>
     <body class="undernavigation">
 <a class="sr-only" href="#content">Skip navigation</a>
-<header class="navbar navbar-inverse navbar-fixed-top eurocris-header">    
+<header class="navbar navbar-inverse navbar-fixed-top">    
     <%
     if (!navbar.equals("off"))
     {
