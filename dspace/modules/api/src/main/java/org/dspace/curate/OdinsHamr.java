@@ -301,7 +301,7 @@ public class OdinsHamr extends AbstractCurationTask {
         if (m.find()) {
             bio.setName(new BioName(m.group(2), m.group(1), "", null));
         } else {
-            System.out.println("NO MATCH");
+            log.error("Name " + dryadName + " is not in lastname, firstname format.");
         }
         return bio;
     }
