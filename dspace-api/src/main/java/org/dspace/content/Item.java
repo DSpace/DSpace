@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -29,12 +30,16 @@ import org.dspace.authorize.ResourcePolicy;
 import org.dspace.browse.BrowsableDSpaceObject;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.IndexBrowse;
+import org.dspace.content.authority.ChoiceAuthorityManager;
+import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.discovery.IGlobalSearchResult;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.event.Event;
 import org.dspace.handle.HandleManager;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.IdentifierService;
@@ -613,6 +618,11 @@ public class Item extends DSpaceObject implements BrowsableDSpaceObject, IGlobal
         }
         
         return values;
+    }
+    
+    public DCValue[] getMetadataByMetadataString(String mdString)
+    {
+    	return getMetadata(mdString);
     }
     
     public List<String> getMetadataValue(String mdString) {
@@ -2893,4 +2903,46 @@ public class Item extends DSpaceObject implements BrowsableDSpaceObject, IGlobal
 	public DCValue[] getMetadataValueInDCFormat(String mdString) {
 		return getMetadata(mdString);
 	}
+
+    public List<DCValue> getMetadata(String mdString, String authority) {
+        String[] elements = getElements(mdString);
+        return getMetadata(elements[0], elements[1], elements[2], elements[3], authority);
+    }	
+	
+    public List<DCValue> getMetadata(String schema, String element, String qualifier, String lang, String authority) {
+    	DCValue[] metadata = getMetadata(schema, element, qualifier, lang);
+        List<DCValue> dcValues = Arrays.asList(metadata);
+        if (!authority.equals(Item.ANY)) {
+            Iterator<DCValue> iterator = dcValues.iterator();
+            while (iterator.hasNext()) {
+            	DCValue dcValue = iterator.next();
+                if (!authority.equals(dcValue.authority)) {
+                    iterator.remove();
+                }
+            }
+        }
+        return dcValues;
+    }
+    
+    public void replaceMetadataValue(DCValue oldValue, DCValue newValue)
+    {
+        // check both dcvalues are for the same field
+        if (oldValue.hasSameFieldAs(newValue)) {
+
+            String schema = oldValue.schema;
+            String element = oldValue.element;
+            String qualifier = oldValue.qualifier;
+
+            // Save all metadata for this field
+            DCValue[] dcvalues = getMetadata(schema, element, qualifier, Item.ANY);
+            clearMetadata(schema, element, qualifier, Item.ANY);
+            for (DCValue dcvalue : dcvalues) {
+                if (dcvalue.equals(oldValue)) {
+                    addMetadata(schema, element, qualifier, newValue.language, newValue.value, newValue.authority, newValue.confidence);
+                } else {
+                    addMetadata(schema, element, qualifier, dcvalue.language, dcvalue.value, dcvalue.authority, dcvalue.confidence);
+                }
+            }
+        }
+    }
 }

@@ -8,11 +8,17 @@
 package org.dspace.content;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.StringTokenizer;
 
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.discovery.IGlobalSearchResult;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
@@ -171,5 +177,57 @@ public abstract class DSpaceObject
     public abstract void update() throws SQLException, AuthorizeException;
 
     public abstract void updateLastModified();
+
+    /**
+     * Retrieve metadata field values from a given metadata string
+     * of the form <schema prefix>.<element>[.<qualifier>|.*]
+     *
+     * @param mdString
+     *            The metadata string of the form
+     *            <schema prefix>.<element>[.<qualifier>|.*]
+     */
+    public DCValue[] getMetadataByMetadataString(String mdString) {
+    	//NOTHING NOW... porting from DSpace 5.x for contribution metadata for all
+    	return null;
+    }
+
+    /**
+     * Splits "schema.element.qualifier.language" into an array.
+     * <p/>
+     * The returned array will always have length >= 4
+     * <p/>
+     * Values in the returned array can be empty or null.
+     */
+    public static String[] getElements(String fieldName) {
+        String[] tokens = StringUtils.split(fieldName, ".");
+
+        int add = 4 - tokens.length;
+        if (add > 0) {
+            tokens = (String[]) ArrayUtils.addAll(tokens, new String[add]);
+        }
+
+        return tokens;
+    }
+
+    /**
+     * Splits "schema.element.qualifier.language" into an array.
+     * <p/>
+     * The returned array will always have length >= 4
+     * <p/>
+     * When @param fill is true, elements that would be empty or null are replaced by Item.ANY
+     */
+    public static String[] getElementsFilled(String fieldName) {
+        String[] elements = getElements(fieldName);
+        for (int i = 0; i < elements.length; i++) {
+            if (StringUtils.isBlank(elements[i])) {
+                elements[i] = Item.ANY;
+            }
+        }
+        return elements;
+    }
+
+    public void replaceMetadataValue(DCValue oldValue, DCValue newValue) {
+    	//NOTHING NOW... porting from DSpace 5.x for contribution metadata for all
+    }
 
 }

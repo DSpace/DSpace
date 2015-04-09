@@ -20,10 +20,15 @@
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
 
     <!-- Authority control -->
-    <bean class="org.dspace.authority.AuthoritySolrServiceImpl" id="org.dspace.authority.AuthoritySearchService"/>
+<!--     <bean class="org.dspace.authority.AuthoritySolrServiceImpl" id="org.dspace.authority.AuthoritySearchService"/>
     <alias name="org.dspace.authority.AuthoritySearchService" alias="org.dspace.authority.indexer.AuthorityIndexingService"/>
 
     <bean id="dspace.DSpaceAuthorityIndexer" class="org.dspace.authority.indexer.DSpaceAuthorityIndexer"/>
+
+    <alias name="OrcidSource" alias="AuthoritySource"/>
+    <bean name="OrcidSource" class="org.dspace.authority.orcid.Orcid">
+        <constructor-arg value="http://pub.orcid.org"/>
+    </bean> -->
 
     <bean name="AuthorityTypes" class="org.dspace.authority.AuthorityTypes">
         <property name="types">
@@ -40,11 +45,5 @@
             </map>
         </property>
     </bean>
-
-    <alias name="OrcidSource" alias="AuthoritySource"/>
-    <bean name="OrcidSource" class="org.dspace.authority.orcid.Orcid">
-        <constructor-arg value="http://pub.orcid.org"/>
-    </bean>
-
 
 </beans>
