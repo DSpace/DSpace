@@ -299,10 +299,6 @@ public class DryadDataPackage extends DryadObject {
         addSingleMetadataValue(Boolean.TRUE, PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER, publicationName);
     }
 
-    public String getPublicationName() throws SQLException {
-        return getSingleMetadataValue(PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER);
-    }
-
     /**
      * Generate a Dryad-formatted 'Submitted by ...' provenance string
      * @param date
