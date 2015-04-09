@@ -822,6 +822,18 @@ public class ApplicationService extends ExtendedTabService
         return null;
     }
 
+	public void clearCache()
+    {
+        try
+        {
+        	cache.removeAll();
+        }
+        catch (Exception ex)
+        {
+            log.error("clearCache", ex);
+        }	
+    }
+	
 	public <T extends Serializable, PK extends Serializable> void putToCache(Class<T> model,
             T object, PK objectId)
     {
