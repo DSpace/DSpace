@@ -115,6 +115,10 @@ public class RestIndex {
                   		"<li>DELETE /bitstreams/{bitstream id} - Delete the specified bitstream from DSpace.</li>" +
                   		"<li>DELETE /bitstreams/{bitstream id}/policy/{policy_id} - Delete the specified bitstream policy.</li>" +
                   	"</ul>" +
+                    "<h2>Metadata Registry</h2>" +
+                    "<ul>" +
+                      "<li>GET /metadataregistry - Return the metadata schema and field registry as JSON</li>" +
+                    "</ul>" +
                 "</body></html> ";
     }
     
