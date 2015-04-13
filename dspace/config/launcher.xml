@@ -10,6 +10,14 @@
     </command>
 
     <command>
+        <name>piwik-report-generator</name>
+        <description>Generate Piwik Statistics for Items</description>
+        <step>
+            <class>cz.cuni.mff.ufal.PiwikPDFExporter</class>
+        </step>
+    </command>
+
+    <command>
         <name>checker</name>
         <description>Run the checksum checker</description>
         <step>

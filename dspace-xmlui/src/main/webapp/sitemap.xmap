@@ -201,6 +201,7 @@
                     <map:reader name="ConcatenationReader" src="org.dspace.app.xmlui.cocoon.ConcatenationReader"/>
                     <map:reader name="JQueryLoaderReader" src="org.dspace.app.xmlui.utils.JQueryLoaderReader"/>
                     <map:reader name="JSONControlledVocabularyReader" src="org.dspace.app.xmlui.cocoon.JSONControlledVocabularyReader"/>
+                    <map:reader name="PiwikStatisticsReader" src="cz.cuni.mff.ufal.PiwikStatisticsReader"/>
                                         
                     <map:reader name="HandleResolverReader" src="org.dspace.app.xmlui.aspect.handle.HandleResolverReader"/>
                 </map:readers>
@@ -236,6 +237,29 @@
 
         <!-- =========================== Pipelines ================================= -->
         <map:pipelines>
+
+                <!-- piwik statistics reader -->
+                <map:pipeline type="noncaching">
+                    <map:match pattern="handle/*/*/piwik">
+                        <map:read type="PiwikStatisticsReader">
+                                <map:parameter name="handle" value="{1}/{2}"/>
+                                <map:parameter name="rest" value=""/>
+                        </map:read>                    
+                    </map:match>
+                </map:pipeline>
+                <!-- end piwik -->        
+        
+                <!-- piwik statistics reader -->
+                <map:pipeline type="noncaching">
+                    <map:match pattern="handle/*/*/piwik/**">
+                        <map:read type="PiwikStatisticsReader">
+                                <map:parameter name="handle" value="{1}/{2}"/>
+                                <map:parameter name="rest" value="{3}"/>
+                        </map:read>                    
+                    </map:match>
+                </map:pipeline>
+                <!-- end piwik -->        
+        
 
                 <!-- ufal dicojuice feeds -->
                 <map:pipeline type="noncaching">

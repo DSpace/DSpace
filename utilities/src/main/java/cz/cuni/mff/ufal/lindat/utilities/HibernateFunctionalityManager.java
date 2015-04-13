@@ -24,6 +24,7 @@ import cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseFileDownloadStatistic;
 import cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseLabel;
 import cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseResourceMapping;
 import cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseResourceUserAllowance;
+import cz.cuni.mff.ufal.lindat.utilities.hibernate.PiwikReport;
 import cz.cuni.mff.ufal.lindat.utilities.hibernate.UserMetadata;
 import cz.cuni.mff.ufal.lindat.utilities.hibernate.UserRegistration;
 import cz.cuni.mff.ufal.lindat.utilities.hibernate.VerificationTokenEperson;
@@ -729,6 +730,68 @@ public class HibernateFunctionalityManager implements IFunctionalities {
 	 */
 	public void close(){
 		this.closeSession();
+	}
+
+	@Override
+	public List<PiwikReport> getAllPiwikReports() {
+		List<PiwikReport> results = (List<PiwikReport>) hibernateUtil
+				.findAll(PiwikReport.class);
+		return results;
+	}
+
+	@Override
+	public List<PiwikReport> getAllUsersSubscribed(int itemId) {
+		List<PiwikReport> results = (List<PiwikReport>)hibernateUtil.findByCriterie(
+				PiwikReport.class,
+				Restrictions.eq("itemId", itemId));
+		return results;
+	}
+
+	@Override
+	public boolean isSubscribe(int epersonId, int itemId) {
+		List<PiwikReport> results = (List<PiwikReport>)hibernateUtil.findByCriterie(
+				PiwikReport.class,
+				Restrictions.eq("epersonId", epersonId),
+				Restrictions.eq("itemId", itemId));
+		if(results==null || results.isEmpty())
+			return false;
+		else
+			return true;
+	}
+
+	@Override
+	public boolean subscribe(int epersonId, int itemId) {
+		PiwikReport r = new PiwikReport();
+		r.setEpersonId(epersonId);
+		r.setItemId(itemId);
+		try {
+			hibernateUtil.persist(PiwikReport.class, r);
+		} catch (RuntimeException e) {
+			Variables.setErrorMessage(e.getLocalizedMessage());
+			log.error(e);
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public boolean unSubscribe(int epersonId, int itemId) {
+		List<PiwikReport> results = (List<PiwikReport>)hibernateUtil.findByCriterie(
+				PiwikReport.class,
+				Restrictions.eq("epersonId", epersonId),
+				Restrictions.eq("itemId", itemId));
+		try {
+			for(PiwikReport r : results) {
+				delete(PiwikReport.class, r);
+			}
+		} catch (RuntimeException e) {
+			Variables.setErrorMessage(e.getLocalizedMessage());
+			log.error(e);
+			return false;
+		}
+		
+		return true;
 	}
 }
 

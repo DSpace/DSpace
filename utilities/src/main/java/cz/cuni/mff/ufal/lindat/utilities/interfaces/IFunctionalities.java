@@ -7,7 +7,7 @@ package cz.cuni.mff.ufal.lindat.utilities.interfaces;
  * @author Karel Vandas
  * 
  */
-public interface IFunctionalities extends IShibbolethAuthentication, ILicenses, java.io.Closeable {
+public interface IFunctionalities extends IShibbolethAuthentication, ILicenses, IPiwikReport, java.io.Closeable {
 
 	/**
 	 * Function returns the information whether the functionality demanded by

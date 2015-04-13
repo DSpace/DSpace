@@ -1,0 +1,18 @@
+# E-mail item monthly statisitcs
+#
+# Parameters: {0} Item Title
+#             {1} User Name
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: Monthly Item Statistics for "{0}"
+
+Dear {1},
+
+Your montly statistics report is ready.
+
+_____________________________________
+${dspace.name},
+WWW: ${dspace.url}
+Email: ${lr.help.mail}
+Tel.: ${lr.help.phone}

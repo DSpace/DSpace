@@ -17,6 +17,7 @@ import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
@@ -25,6 +26,8 @@ import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
+
+import cz.cuni.mff.ufal.dspace.app.xmlui.aspect.statistics.PiwikStatisticsTransformer;
 
 import java.io.Serializable;
 import java.io.IOException;
@@ -44,7 +47,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     private static final Message T_statistics_usage_view = message("xmlui.statistics.Navigation.usage.view");
     private static final Message T_statistics_search_view = message("xmlui.statistics.Navigation.search.view");
     private static final Message T_statistics_workflow_view = message("xmlui.statistics.Navigation.workflow.view");
-	private static final Message T_statistics_ga_head = message("xmlui.statistics.Navigation.ga.title");
+    private static final Message T_statistics_ga_head = message("xmlui.statistics.Navigation.ga.title");
+    private static final Message T_statistics_piwik_head = message("xmlui.statistics.Navigation.piwik.title");
 
     public Serializable getKey() {
         //TODO: DO THIS
@@ -83,6 +87,13 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
         if(dso != null && dso.getHandle() != null){
             statistics.setHead(T_statistics_head);
+            // piwik statistics only for items when admin or owner
+            if(dso instanceof Item) {
+            	Item item = (Item)dso;
+            	if(PiwikStatisticsTransformer.isOwnerOrAdmin(context, eperson, item)) {
+            		statistics.addItemXref(contextPath + "/handle/" + dso.getHandle() + "/piwik-statistics", T_statistics_piwik_head);
+            	}
+            }
             if(displayUsageStats){
                 statistics.addItemXref(contextPath + "/handle/" + dso.getHandle() + "/statistics", T_statistics_usage_view);
             }

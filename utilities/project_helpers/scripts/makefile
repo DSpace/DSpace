@@ -370,7 +370,7 @@ substitute_backup_config:
 	    --substitute="$(DIR_CONF)/backup2l.conf.example" \
 	    --substitute-alternative="$(DIR_CONF)/backup2l.conf" \
 	    --with="$(LOCAL_CONF)" \
-	    --to="$(DIR_SUBST)/backup2l.conf.substituted"
+	    --to="$(DIR_SUBST)/backup2l.conf.substituted" 2>&1
 
 # This command makes backup for databases and put it into backuped directory $(DIR_DATABASE_BACKUP)
 backup_databases:
