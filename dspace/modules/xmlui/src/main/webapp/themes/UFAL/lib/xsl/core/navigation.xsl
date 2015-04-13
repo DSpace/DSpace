@@ -239,6 +239,9 @@
 			<xsl:when test="$key='xmlui.statistics.Navigation.ga.title'">
     			<i class="fa fa-google-plus-square fa-lg">&#160;</i>
     		</xsl:when>
+			<xsl:when test="$key='xmlui.statistics.Navigation.piwik.title'">
+    			<i class="fa fa-area-chart fa-lg">&#160;</i>
+    		</xsl:when>    		
 			<xsl:when test="$key='xmlui.ArtifactBrowser.Navigation.head_browse'">
     			<i class="fa fa-bullseye  fa-lg">&#160;</i>
     		</xsl:when>    		    		    		

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="cz.cuni.mff.ufal.lindat.utilities.hibernate.PiwikReport" table="piwik_report" schema="public">
+        <id name="reportId" type="int">
+            <column name="report_id" />
+            <generator class="identity" />
+        </id>
+        <property name="epersonId" type="int">
+            <column name="eperson_id" not-null="true" />
+        </property>
+        <property name="itemId" type="int">
+            <column name="item_id" not-null="true" />
+        </property>        
+    </class>
+</hibernate-mapping>
+

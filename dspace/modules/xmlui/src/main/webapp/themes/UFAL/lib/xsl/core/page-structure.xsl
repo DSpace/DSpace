@@ -156,6 +156,12 @@
                 <link rel="stylesheet" href="{$theme-path}/lib/css/authority-control.css"> </link>
             </xsl:if>
             
+            
+			<xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='jqplot']">
+				<link rel="stylesheet" href="{$theme-path}/lib/js/jqplot/jquery.jqplot.css"> </link>
+				<link rel="stylesheet" href="{$theme-path}/lib/css/jqplot.css"> </link>
+	        	</xsl:if>            
+            
             <!-- select2 -->
             <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='select2']">
                 <link rel="stylesheet" href="{$theme-path}/lib/select2/select2.css" />
@@ -541,6 +547,18 @@
 
         <!-- UFAL additional libraries
         -->
+        
+        <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='jqplot']">
+        	<script type="text/javascript" src="{$theme-path}/lib/js/jqplot/jquery.jqplot.min.js">&#160;</script>
+            <script type="text/javascript" src="{$theme-path}/lib/js/jqplot/plugins/jqplot.canvasTextRenderer.min.js">&#160;</script>
+            <script type="text/javascript" src="{$theme-path}/lib/js/jqplot/plugins/jqplot.canvasAxisLabelRenderer.min.js">&#160;</script>
+            <script type="text/javascript" src="{$theme-path}/lib/js/jqplot/plugins/jqplot.highlighter.min.js">&#160;</script>
+            <script type="text/javascript" src="{$theme-path}/lib/js/jqplot/plugins/jqplot.cursor.min.js">&#160;</script>
+            <script type="text/javascript" src="{$theme-path}/lib/js/jqplot/plugins/jqplot.dateAxisRenderer.min.js">&#160;</script>
+            <script type="text/javascript" src="{$theme-path}/lib/js/jqplot/plugins/jqplot.enhancedLegendRenderer.js">&#160;</script>
+            <script type="text/javascript" src="{$theme-path}/lib/js/piwik_charts.js">&#160;</script>
+        </xsl:if>        
+        
         <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='datepicker']">
             <script type="text/javascript" src="{$theme-path}/lib/bootstrap/js/bootstrap-datepicker.js">&#160;</script>
         </xsl:if>

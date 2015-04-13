@@ -274,7 +274,7 @@
 				<xsl:call-template name="top-banner" />
 				
 				<!-- A line with lindat branding colors -->
-				<div class="row hidden-xs" style="background: url('{$theme-path}/images/lindat_color_line.png'); height: 8px;">&#160;</div>
+				<div class="row hidden-xs" style="background: url('{$theme-path}/images/lindat_color_line.png'); height: 3px;">&#160;</div>
 
 		       	<div class="visible-xs text-center" style="margin-top: 5px; ">
 					<button id="showhidemenu" type="button" class="btn btn-default btn-sm" style="border-radius: 30px; width: 100%;">

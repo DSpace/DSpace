@@ -33,6 +33,7 @@
   <mapping resource="cz/cuni/mff/ufal/lindat/utilities/hibernate/VerificationTokenEperson.hbm.xml"/>
   <!-- eperson additional abstracted metadata -->
   <mapping resource="cz/cuni/mff/ufal/lindat/utilities/hibernate/UserMetadata.hbm.xml"/>
+  <mapping resource="cz/cuni/mff/ufal/lindat/utilities/hibernate/PiwikReport.hbm.xml"/>
  </session-factory>
 </hibernate-configuration>
 

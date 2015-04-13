@@ -1023,7 +1023,104 @@
       <!--Lookup the MIME Type's key in messages.xml language file.  If not found, just display MIME Type-->
       <i18n:text i18n:key="{$mimetype-key}"><xsl:value-of select="$mimetype"/></i18n:text>
     </xsl:template>
-	
+    
+	<xsl:template match="dri:div[@id='cz.cuni.mff.ufal.dspace.app.xmlui.aspect.statistics.PiwikStatisticsTransformer.div.report']" priority="10">
+        <xsl:call-template name="visits_over_time" />
+	</xsl:template>
+
+    <xsl:template name="visits_over_time">
+        <xsl:variable name="reportURL">
+            <xsl:value-of select="concat($context-path, '/', substring-before($request-uri, '/piwik-statistics'))"/>
+            <xsl:text disable-output-escaping="yes">/piwik?module=API&amp;method=API.get&amp;period=day</xsl:text>
+        </xsl:variable>
+
+                <div class="panel panel-default">
+                        <div class="panel-heading bold">Views Over Time 
+				<a class="jqplot-to-picture pull-right" href="#" target-div="#visits_over_time_chart">
+					<i class="fa fa-file-image-o">&#160;</i>
+				</a>
+
+                        	<div class="dropdown pull-right">
+				<a id="export-dropdown" class="jqplot-export pull-right dropdown-toggle" href="#" data-toggle="dropdown" aria-expanded="true">
+                                        <i class="fa fa-share">&#160;</i>
+                                </a>
+                                <ul class="dropdown-menu" role="menu" aria-labelledby="export-dropdown">
+                                        <li role="presentation">
+						<a role="menuitem" tabindex="-1" target="_blank">
+							<xsl:attribute name="href">
+							<xsl:value-of select="$reportURL" />
+                		                        <xsl:text disable-output-escaping="yes">&amp;format=CSV</xsl:text>
+							</xsl:attribute>
+							CSV
+						</a>
+					</li>
+                                        <li role="presentation">
+                                                <a role="menuitem" tabindex="-1" target="_blank">
+                                                        <xsl:attribute name="href">
+                                                        <xsl:value-of select="$reportURL" />
+                                                        <xsl:text disable-output-escaping="yes">&amp;format=TSV</xsl:text>
+                                                        </xsl:attribute>
+                                                        TSV (Excel)
+                                                </a>
+                                        </li>
+                                        <li role="presentation">
+                                                <a role="menuitem" tabindex="-1" target="_blank">
+                                                        <xsl:attribute name="href">
+                                                        <xsl:value-of select="$reportURL" />
+                                                        <xsl:text disable-output-escaping="yes">&amp;format=XML</xsl:text>
+                                                        </xsl:attribute>
+                                                        XML
+                                                </a>
+                                        </li>
+                                        <li role="presentation">
+                                                <a role="menuitem" tabindex="-1" target="_blank">
+                                                        <xsl:attribute name="href">
+                                                        <xsl:value-of select="$reportURL" />
+                                                        <xsl:text disable-output-escaping="yes">&amp;format=JSON</xsl:text>
+                                                        </xsl:attribute>
+                                                        JSON
+                                                </a>
+                                        </li>
+                                </ul>
+                        	</div>
+			</div>
+
+                        <div class="panel-body" style="padding: 20px;">
+                        <div id="visits_chart">
+                        <div id="visits_over_time_chart" class="jqplot-target">
+                                <xsl:attribute name="data-url">
+                                        <xsl:value-of select="$reportURL" />
+					<xsl:text disable-output-escaping="yes">&amp;format=JSON</xsl:text>
+                                </xsl:attribute>
+                                <div id="piwik-loading" style="width: 100%; height: 100%; z-index=1; display: none;"><i class="fa fa-pulse fa-3x" >&#xf110;</i></div>
+                        </div>
+                        </div>
+                        <div id="visits_summary_report" style="margin-top: 30px;">
+                                <h4>Report</h4>
+                                <div class="views">&#160;</div>
+                                <div class="visits">&#160;</div>
+                                <div class="downloads">&#160;</div>
+                        </div>
+                        </div>
+                </div>
+
+		<div id="jqplot-save-as-picture" class="modal fade">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><i class="fa fa-times">&#160;</i></span></button>
+						<h4 class="modal-title"><i class="fa fa-file-image-o">&#160;</i> Export as Image</h4>
+      					</div>
+      					<div class="modal-body">
+ 	     	 				<div class="alert alert-info" style="margin-top: 0px;">To save the image on your computer, right click on the image and select "Save Image As..."</div>
+						<div class="well well-white">
+							<img style="width: 100%;"/>
+						</div>
+      					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div><!-- /.modal -->
+        </xsl:template>
 </xsl:stylesheet>
 
 
