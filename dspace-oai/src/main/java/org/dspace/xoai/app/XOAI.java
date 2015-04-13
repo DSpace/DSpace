@@ -128,7 +128,7 @@ public class XOAI {
             if (clean) {
                 clearIndex();
                 System.out.println("Using full import.");
-                this.indexAll();
+                result = this.indexAll();
             } else {
                 SolrQuery solrParams = new SolrQuery("*:*")
                         .addField("item.lastmodified")
