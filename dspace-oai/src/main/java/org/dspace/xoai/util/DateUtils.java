@@ -36,6 +36,10 @@ public class DateUtils
     	if (!init) sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.'999Z'");
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         String ret = sdf.format(date);
+        if (!init && ret.substring(11, 19).equals("00:00:00"))
+        {
+            ret = ret.substring(0, 11) + "23:59:59" + ret.substring(19);
+        }
         return ret;
     }
 
