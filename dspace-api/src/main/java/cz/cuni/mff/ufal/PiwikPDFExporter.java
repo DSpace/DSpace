@@ -158,7 +158,7 @@ public class PiwikPDFExporter  {
 	    String itemTitle = item.getMetadata("dc", "title", null, Item.ANY)[0].value;
 	    String hdlURL = item.getMetadata("dc", "identifier", "uri", Item.ANY)[0].value;
         
-		Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, "piwik_report"));
+		Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "piwik_report"));
 		email.addArgument(itemTitle);
 		email.addArgument(to.getName());
 		email.addRecipient(to.getEmail());
