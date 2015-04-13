@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/ufal/lindat-repository.svg?branch=master)](https://travis-ci.org/ufal/lindat-repository)
+[![Build Status](https://travis-ci.org/ufal/lindat-dspace.svg?branch=lindat)](https://travis-ci.org/ufal/lindat-dspace)
 # LINDAT/CLARIN digital library based on DSpace
 
 * developed at: [Institute of Formal and Applied Linguistics, Charles University in Prague](http://ufal.mff.cuni.cz/)
