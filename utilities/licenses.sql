@@ -3,7 +3,7 @@
 --
 
 SET statement_timeout = 0;
-SET client_encoding = 'UTF8';
+SET client_encoding = 'SQL_ASCII';
 SET standard_conforming_strings = off;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
@@ -55,6 +55,13 @@ ALTER SEQUENCE license_definition_license_id_seq OWNED BY license_definition.lic
 
 
 --
+-- Name: license_definition_license_id_seq; Type: SEQUENCE SET; Schema: public; Owner: dspace
+--
+
+SELECT pg_catalog.setval('license_definition_license_id_seq', 32, true);
+
+
+--
 -- Name: license_file_download_statistic; Type: TABLE; Schema: public; Owner: dspace; Tablespace: 
 --
 
@@ -90,6 +97,13 @@ ALTER SEQUENCE license_file_download_statistic_transaction_id_seq OWNED BY licen
 
 
 --
+-- Name: license_file_download_statistic_transaction_id_seq; Type: SEQUENCE SET; Schema: public; Owner: dspace
+--
+
+SELECT pg_catalog.setval('license_file_download_statistic_transaction_id_seq', 55132, true);
+
+
+--
 -- Name: license_label; Type: TABLE; Schema: public; Owner: dspace; Tablespace: 
 --
 
@@ -102,6 +116,47 @@ CREATE TABLE license_label (
 
 
 ALTER TABLE public.license_label OWNER TO dspace;
+
+--
+-- Name: license_label_extended_mapping; Type: TABLE; Schema: public; Owner: dspace; Tablespace: 
+--
+
+CREATE TABLE license_label_extended_mapping (
+    mapping_id integer NOT NULL,
+    license_id integer NOT NULL,
+    label_id integer NOT NULL
+);
+
+
+ALTER TABLE public.license_label_extended_mapping OWNER TO dspace;
+
+--
+-- Name: license_label_extended_mapping_mapping_id_seq; Type: SEQUENCE; Schema: public; Owner: dspace
+--
+
+CREATE SEQUENCE license_label_extended_mapping_mapping_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.license_label_extended_mapping_mapping_id_seq OWNER TO dspace;
+
+--
+-- Name: license_label_extended_mapping_mapping_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dspace
+--
+
+ALTER SEQUENCE license_label_extended_mapping_mapping_id_seq OWNED BY license_label_extended_mapping.mapping_id;
+
+
+--
+-- Name: license_label_extended_mapping_mapping_id_seq; Type: SEQUENCE SET; Schema: public; Owner: dspace
+--
+
+SELECT pg_catalog.setval('license_label_extended_mapping_mapping_id_seq', 991137, true);
+
 
 --
 -- Name: license_label_label_id_seq; Type: SEQUENCE; Schema: public; Owner: dspace
@@ -122,6 +177,13 @@ ALTER TABLE public.license_label_label_id_seq OWNER TO dspace;
 --
 
 ALTER SEQUENCE license_label_label_id_seq OWNED BY license_label.label_id;
+
+
+--
+-- Name: license_label_label_id_seq; Type: SEQUENCE SET; Schema: public; Owner: dspace
+--
+
+SELECT pg_catalog.setval('license_label_label_id_seq', 19, true);
 
 
 --
@@ -160,6 +222,13 @@ ALTER SEQUENCE license_resource_mapping_mapping_id_seq OWNED BY license_resource
 
 
 --
+-- Name: license_resource_mapping_mapping_id_seq; Type: SEQUENCE SET; Schema: public; Owner: dspace
+--
+
+SELECT pg_catalog.setval('license_resource_mapping_mapping_id_seq', 1382, true);
+
+
+--
 -- Name: license_resource_user_allowance; Type: TABLE; Schema: public; Owner: dspace; Tablespace: 
 --
 
@@ -171,15 +240,8 @@ CREATE TABLE license_resource_user_allowance (
     token character(32)
 );
 
+
 ALTER TABLE public.license_resource_user_allowance OWNER TO dspace;
-
---
--- Name: license_resource_user_allowance_pkey; Type: CONSTRAINT; Schema: public; Owner: dspace; Tablespace: 
---
-
-ALTER TABLE ONLY license_resource_user_allowance
-    ADD CONSTRAINT license_resource_user_allowance_pkey PRIMARY KEY (transaction_id);
-
 
 --
 -- Name: license_resource_user_allowance_transaction_id_seq; Type: SEQUENCE; Schema: public; Owner: dspace
@@ -201,6 +263,180 @@ ALTER TABLE public.license_resource_user_allowance_transaction_id_seq OWNER TO d
 
 ALTER SEQUENCE license_resource_user_allowance_transaction_id_seq OWNED BY license_resource_user_allowance.transaction_id;
 
+
+--
+-- Name: license_resource_user_allowance_transaction_id_seq; Type: SEQUENCE SET; Schema: public; Owner: dspace
+--
+
+SELECT pg_catalog.setval('license_resource_user_allowance_transaction_id_seq', 241, true);
+
+
+--
+-- Name: organization; Type: TABLE; Schema: public; Owner: dspace; Tablespace: 
+--
+
+CREATE TABLE organization (
+    organization_id integer NOT NULL,
+    name character varying(256) NOT NULL
+);
+
+
+ALTER TABLE public.organization OWNER TO dspace;
+
+--
+-- Name: organization_organization_id_seq_1; Type: SEQUENCE; Schema: public; Owner: dspace
+--
+
+CREATE SEQUENCE organization_organization_id_seq_1
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.organization_organization_id_seq_1 OWNER TO dspace;
+
+--
+-- Name: organization_organization_id_seq_1; Type: SEQUENCE OWNED BY; Schema: public; Owner: dspace
+--
+
+ALTER SEQUENCE organization_organization_id_seq_1 OWNED BY organization.organization_id;
+
+
+--
+-- Name: organization_organization_id_seq_1; Type: SEQUENCE SET; Schema: public; Owner: dspace
+--
+
+SELECT pg_catalog.setval('organization_organization_id_seq_1', 1, false);
+
+
+--
+-- Name: piwik_report; Type: TABLE; Schema: public; Owner: dspace; Tablespace: 
+--
+
+CREATE TABLE piwik_report (
+    report_id integer NOT NULL,
+    eperson_id integer NOT NULL,
+    item_id integer NOT NULL
+);
+
+
+ALTER TABLE public.piwik_report OWNER TO dspace;
+
+--
+-- Name: piwik_report_report_id_seq; Type: SEQUENCE; Schema: public; Owner: dspace
+--
+
+CREATE SEQUENCE piwik_report_report_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.piwik_report_report_id_seq OWNER TO dspace;
+
+--
+-- Name: piwik_report_report_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dspace
+--
+
+ALTER SEQUENCE piwik_report_report_id_seq OWNED BY piwik_report.report_id;
+
+
+--
+-- Name: piwik_report_report_id_seq; Type: SEQUENCE SET; Schema: public; Owner: dspace
+--
+
+SELECT pg_catalog.setval('piwik_report_report_id_seq', 18, true);
+
+
+--
+-- Name: shibboleth_attribute_mapping; Type: TABLE; Schema: public; Owner: dspace; Tablespace: 
+--
+
+CREATE TABLE shibboleth_attribute_mapping (
+    mapping_id integer NOT NULL,
+    organization_id integer NOT NULL,
+    source_name character varying NOT NULL,
+    target_name character varying NOT NULL
+);
+
+
+ALTER TABLE public.shibboleth_attribute_mapping OWNER TO dspace;
+
+--
+-- Name: shibboleth_attribute_mapping_mapping_id_seq; Type: SEQUENCE; Schema: public; Owner: dspace
+--
+
+CREATE SEQUENCE shibboleth_attribute_mapping_mapping_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.shibboleth_attribute_mapping_mapping_id_seq OWNER TO dspace;
+
+--
+-- Name: shibboleth_attribute_mapping_mapping_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dspace
+--
+
+ALTER SEQUENCE shibboleth_attribute_mapping_mapping_id_seq OWNED BY shibboleth_attribute_mapping.mapping_id;
+
+
+--
+-- Name: shibboleth_attribute_mapping_mapping_id_seq; Type: SEQUENCE SET; Schema: public; Owner: dspace
+--
+
+SELECT pg_catalog.setval('shibboleth_attribute_mapping_mapping_id_seq', 1, true);
+
+
+--
+-- Name: user_metadata; Type: TABLE; Schema: public; Owner: dspace; Tablespace: 
+--
+
+CREATE TABLE user_metadata (
+    user_metadata_id integer NOT NULL,
+    eperson_id integer NOT NULL,
+    metadata_key character varying(64) NOT NULL,
+    metadata_value character varying(256) NOT NULL,
+    transaction_id integer
+);
+
+
+ALTER TABLE public.user_metadata OWNER TO dspace;
+
+--
+-- Name: user_metadata_user_metadata_id_seq; Type: SEQUENCE; Schema: public; Owner: dspace
+--
+
+CREATE SEQUENCE user_metadata_user_metadata_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.user_metadata_user_metadata_id_seq OWNER TO dspace;
+
+--
+-- Name: user_metadata_user_metadata_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dspace
+--
+
+ALTER SEQUENCE user_metadata_user_metadata_id_seq OWNED BY user_metadata.user_metadata_id;
+
+
+--
+-- Name: user_metadata_user_metadata_id_seq; Type: SEQUENCE SET; Schema: public; Owner: dspace
+--
+
+SELECT pg_catalog.setval('user_metadata_user_metadata_id_seq', 68, true);
+
+
 --
 -- Name: user_registration; Type: TABLE; Schema: public; Owner: dspace; Tablespace: 
 --
@@ -216,53 +452,18 @@ CREATE TABLE user_registration (
 ALTER TABLE public.user_registration OWNER TO dspace;
 
 --
--- Name: user_registration_pkey; Type: CONSTRAINT; Schema: public; Owner: dspace; Tablespace: 
---
-
-ALTER TABLE ONLY user_registration
-    ADD CONSTRAINT user_registration_pkey PRIMARY KEY (eperson_id);
-
-
-
-
---
 -- Name: verification_token; Type: TABLE; Schema: public; Owner: dspace; Tablespace: 
 --
 
 CREATE TABLE verification_token (
-    eperson_id integer UNIQUE NOT NULL,
-    token character varying(48) UNIQUE PRIMARY KEY NOT NULL,
-    email character varying(64) UNIQUE NOT NULL
+    eperson_id integer NOT NULL,
+    token character varying(48) NOT NULL,
+    email character varying(64) NOT NULL
 );
 
 
 ALTER TABLE public.verification_token OWNER TO dspace;
 
---
--- Name: user_metadata; Type: TABLE; Schema: public; Owner: dspace; Tablespace: 
---
-
-CREATE TABLE user_metadata
-(
-  user_metadata_id serial NOT NULL,
-  eperson_id integer NOT NULL,
-  metadata_key character varying(64) NOT NULL,
-  metadata_value character varying(256) NOT NULL,
-  transaction_id integer,
-  CONSTRAINT user_metadata_pkey PRIMARY KEY (user_metadata_id),
-  CONSTRAINT license_resource_user_allowance_user_metadata_fk FOREIGN KEY (transaction_id)
-      REFERENCES license_resource_user_allowance (transaction_id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT user_registration_user_metadata_fk FOREIGN KEY (eperson_id)
-      REFERENCES user_registration (eperson_id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION
-)
-WITH (
-  OIDS=FALSE
-);
-ALTER TABLE public.user_metadata
-  OWNER TO dspace;
-  
 --
 -- Name: license_id; Type: DEFAULT; Schema: public; Owner: dspace
 --
@@ -288,6 +489,13 @@ ALTER TABLE ONLY license_label ALTER COLUMN label_id SET DEFAULT nextval('licens
 -- Name: mapping_id; Type: DEFAULT; Schema: public; Owner: dspace
 --
 
+ALTER TABLE ONLY license_label_extended_mapping ALTER COLUMN mapping_id SET DEFAULT nextval('license_label_extended_mapping_mapping_id_seq'::regclass);
+
+
+--
+-- Name: mapping_id; Type: DEFAULT; Schema: public; Owner: dspace
+--
+
 ALTER TABLE ONLY license_resource_mapping ALTER COLUMN mapping_id SET DEFAULT nextval('license_resource_mapping_mapping_id_seq'::regclass);
 
 
@@ -297,33 +505,33 @@ ALTER TABLE ONLY license_resource_mapping ALTER COLUMN mapping_id SET DEFAULT ne
 
 ALTER TABLE ONLY license_resource_user_allowance ALTER COLUMN transaction_id SET DEFAULT nextval('license_resource_user_allowance_transaction_id_seq'::regclass);
 
---
--- Data for Name: license_definition; Type: TABLE DATA; Schema: public; Owner: dspace
---
-
-select setval('license_definition_license_id_seq', 10);
-
-COPY license_definition (license_id, name, definition, eperson_id, label_id, created_on, confirmation) FROM stdin;
-8	Creative Commons - Attribution 3.0 Unported (CC BY 3.0)	http://creativecommons.org/licenses/by/3.0/	1	4	2011-12-14 23:05:10.936108	0
-7	PDT 2.0 License	http://ufal.mff.cuni.cz/pdt2.0/doc/pdt-guide/en/html/ch07.html	1	2	2011-12-14 21:38:22.407755	2
-9	Super Cool License	http://www.google.com	1	2	2012-02-13 22:14:54.370206	2
-6	Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)	http://creativecommons.org/licenses/by-sa/3.0/	1	4	2011-12-14 21:33:12.100304	0
-5	Attribution-NoDerivs 3.0 Unported (CC BY-ND 3.0)	http://creativecommons.org/licenses/by-nd/3.0/	1	4	2011-12-14 21:32:39.21528	0
-4	Attribution-NonCommercial-NoDerivs 3.0 Unported (CC BY-NC-ND 3.0)	http://creativecommons.org/licenses/by-nc-nd/3.0/	1	4	2011-12-14 21:32:21.586806	0
-2	Attribution-NonCommercial-ShareAlike 3.0 Unported (CC BY-NC-SA 3.0)	http://creativecommons.org/licenses/by-nc-sa/3.0/	1	4	2011-12-14 21:30:29.776313	0
-1	Attribution-NonCommercial 3.0 Unported (CC BY-NC 3.0)	http://creativecommons.org/licenses/by-nc/3.0/	1	4	2011-12-14 21:29:38.719044	0
-\.
 
 --
--- Data for Name: license_label; Type: TABLE DATA; Schema: public; Owner: dspace
+-- Name: organization_id; Type: DEFAULT; Schema: public; Owner: dspace
 --
 
-COPY license_label (label_id, label, title) FROM stdin;
-1	PUB	Publicly Available
-4	CC	Distributed under Creative Commons
-2	ACA	Academic Use
-3	RES	Restricted Use
-\.
+ALTER TABLE ONLY organization ALTER COLUMN organization_id SET DEFAULT nextval('organization_organization_id_seq_1'::regclass);
+
+
+--
+-- Name: report_id; Type: DEFAULT; Schema: public; Owner: dspace
+--
+
+ALTER TABLE ONLY piwik_report ALTER COLUMN report_id SET DEFAULT nextval('piwik_report_report_id_seq'::regclass);
+
+
+--
+-- Name: mapping_id; Type: DEFAULT; Schema: public; Owner: dspace
+--
+
+ALTER TABLE ONLY shibboleth_attribute_mapping ALTER COLUMN mapping_id SET DEFAULT nextval('shibboleth_attribute_mapping_mapping_id_seq'::regclass);
+
+
+--
+-- Name: user_metadata_id; Type: DEFAULT; Schema: public; Owner: dspace
+--
+
+ALTER TABLE ONLY user_metadata ALTER COLUMN user_metadata_id SET DEFAULT nextval('user_metadata_user_metadata_id_seq'::regclass);
 
 --
 -- Data for Name: user_registration; Type: TABLE DATA; Schema: public; Owner: dspace
@@ -333,6 +541,94 @@ COPY user_registration (eperson_id, email, organization, confirmation) FROM stdi
 0	anonymous	anonymous	t
 1	administrator	administrator	t
 \.
+
+--
+-- Data for Name: license_definition; Type: TABLE DATA; Schema: public; Owner: dspace
+--
+
+COPY license_definition (license_id, name, definition, eperson_id, label_id, created_on, confirmation, required_info) FROM stdin;
+16	GNU General Public Licence, version 3	http://opensource.org/licenses/GPL-3.0	1	1	2013-02-27 18:54:59.103704	0	\N
+3	GNU General Public License, version 2	http://www.gnu.org/licenses/gpl-2.0.html	1	1	2012-09-27 05:39:47.271105	0	\N
+11	The MIT License (MIT)	http://opensource.org/licenses/mit-license.php	1	1	2012-09-27 05:50:45.861588	0	\N
+18	Artistic License 2.0	http://opensource.org/licenses/Artistic-2.0	1	1	2013-02-27 19:05:28.923843	0	\N
+17	Artistic License (Perl) 1.0	http://opensource.org/licenses/Artistic-Perl-1.0	1	1	2013-02-27 19:03:46.95784	0	\N
+4	Attribution-NonCommercial-NoDerivs 3.0 Unported (CC BY-NC-ND 3.0)	http://creativecommons.org/licenses/by-nc-nd/3.0/	1	1	2011-12-14 21:32:21.586806	0	\N
+15	BSD 2-Clause "Simplified" or "FreeBSD" license	http://opensource.org/licenses/BSD-2-Clause	1	1	2013-02-01 15:07:52.605509	0	\N
+14	BSD 3-Clause "New" or "Revised" license	http://opensource.org/licenses/BSD-3-Clause	1	1	2013-02-01 15:06:57.567966	0	\N
+1	Attribution-NonCommercial 3.0 Unported (CC BY-NC 3.0)	http://creativecommons.org/licenses/by-nc/3.0/	1	1	2011-12-14 21:29:38.719044	0	\N
+2	Attribution-NonCommercial-ShareAlike 3.0 Unported (CC BY-NC-SA 3.0)	http://creativecommons.org/licenses/by-nc-sa/3.0/	1	1	2011-12-14 21:30:29.776313	0	\N
+5	Attribution-NoDerivs 3.0 Unported (CC BY-ND 3.0)	http://creativecommons.org/licenses/by-nd/3.0/	1	1	2011-12-14 21:32:39.21528	0	\N
+6	Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)	http://creativecommons.org/licenses/by-sa/3.0/	1	1	2011-12-14 21:33:12.100304	0	\N
+8	Creative Commons - Attribution 3.0 Unported (CC BY 3.0)	http://creativecommons.org/licenses/by/3.0/	1	1	2011-12-14 23:05:10.936108	0	\N
+22	PDTSL	https://lindat.mff.cuni.cz/repository/xmlui/page/licence-pdtsl	1	3	2014-04-08 00:33:18.849529	2	SEND_TOKEN, NAME, ADDRESS, COUNTRY, EXTRA_EMAIL
+23	HamleDT 1.0  Licence Agreement	https://lindat.mff.cuni.cz/repository/xmlui/page/licence-hamledt	1	3	2014-04-14 10:23:38.307371	2	SEND_TOKEN, NAME, ADDRESS, COUNTRY, EXTRA_EMAIL
+27	HamleDT 2.0 Licence Agreement	https://lindat.mff.cuni.cz/repository/xmlui/page/licence-hamledt-2.0	1	2	2014-05-26 14:22:30.637637	0	\N
+21	Czech National Corpus (Shuffled Corpus Data)	https://lindat.mff.cuni.cz/repository/xmlui/page/license-cnc	1	2	2013-12-13 14:37:19.412474	1	\N
+19	CC-BY-NC-SA + LDC99T42	https://lindat.mff.cuni.cz/repository/xmlui/page/license-pcedt2	1	3	2013-03-28 14:56:42.948628	1	\N
+7	PDT 2.0 License	https://lindat.mff.cuni.cz/repository/xmlui/page/license-pdt2	1	2	2011-12-14 21:38:22.407755	1	\N
+12	CC0-No Rights Reserved	http://creativecommons.org/publicdomain/zero/1.0/	1	1	2012-10-01 17:16:47.863708	0	\N
+20	Apache License 2.0	http://opensource.org/licenses/Apache-2.0	1	1	2013-08-13 18:04:21.606801	0	\N
+\.
+
+
+--
+-- Data for Name: license_label; Type: TABLE DATA; Schema: public; Owner: dspace
+--
+
+COPY license_label (label_id, label, title, is_extended) FROM stdin;
+1	PUB	Publicly Available	f
+2	ACA	Academic Use	f
+3	RES	Restricted Use	f
+5	BY	Attribution Required	t
+6	SA	Share Alike	t
+7	NC	Noncommercial	t
+10	ReD	Redeposit Modified	t
+8	ND	No Derivative Works	t
+9	Inf	Inform Before Use	t
+4	CC	Distributed under Creative Commons	t
+11	ZERO	No Copyright	t
+12	GPLv3	GNU General Public License, version 3.0	t
+13	GPLv2	GNU General Public License, version 2.0	t
+14	BSD	BSD	t
+15	MIT	The MIT License	t
+18	OSI	The Open Source Initiative 	t
+\.
+
+
+--
+-- Data for Name: organization; Type: TABLE DATA; Schema: public; Owner: dspace
+--
+
+COPY organization (organization_id, name) FROM stdin;
+1	https://cas.cuni.cz/idp/shibboleth
+2	https://idp2.ics.muni.cz/idp/shibboleth
+3	https://shib.zcu.cz/idp/shibboleth
+0	default
+\.
+
+
+--
+-- Data for Name: shibboleth_attribute_mapping; Type: TABLE DATA; Schema: public; Owner: dspace
+--
+
+COPY shibboleth_attribute_mapping (mapping_id, organization_id, source_name, target_name) FROM stdin;
+1	1	user_id	mail
+2	1	shibboleth_user_id	persistent-id
+3	1	user_fname	givenName
+4	1	user_lname	sn
+5	2	user_id	eppn
+6	2	shibboleth_user_id	eppn
+7	2	user_lname	cn
+8	3	user_id	mail
+9	3	shibboleth_user_id	eppn
+10	3	user_fname	givenName
+11	3	user_lname	sn
+12	0	user_id	mail
+13	0	shibboleth_user_id	eppn
+14	0	user_fname	givenName
+15	0	user_lname	sn
+\.
+
 
 --
 -- Name: license_definition_pkey; Type: CONSTRAINT; Schema: public; Owner: dspace; Tablespace: 
@@ -351,6 +647,14 @@ ALTER TABLE ONLY license_file_download_statistic
 
 
 --
+-- Name: license_label_extended_mapping_pkey; Type: CONSTRAINT; Schema: public; Owner: dspace; Tablespace: 
+--
+
+ALTER TABLE ONLY license_label_extended_mapping
+    ADD CONSTRAINT license_label_extended_mapping_pkey PRIMARY KEY (mapping_id);
+
+
+--
 -- Name: license_label_pkey; Type: CONSTRAINT; Schema: public; Owner: dspace; Tablespace: 
 --
 
@@ -365,17 +669,99 @@ ALTER TABLE ONLY license_label
 ALTER TABLE ONLY license_resource_mapping
     ADD CONSTRAINT license_resource_mapping_pkey PRIMARY KEY (mapping_id);
 
+
+--
+-- Name: license_resource_user_allowance_pkey; Type: CONSTRAINT; Schema: public; Owner: dspace; Tablespace: 
+--
+
+ALTER TABLE ONLY license_resource_user_allowance
+    ADD CONSTRAINT license_resource_user_allowance_pkey PRIMARY KEY (transaction_id);
+
+
+--
+-- Name: organization_id; Type: CONSTRAINT; Schema: public; Owner: dspace; Tablespace: 
+--
+
+ALTER TABLE ONLY organization
+    ADD CONSTRAINT organization_id PRIMARY KEY (organization_id);
+
+
+--
+-- Name: piwik_report_pkey; Type: CONSTRAINT; Schema: public; Owner: dspace; Tablespace: 
+--
+
+ALTER TABLE ONLY piwik_report
+    ADD CONSTRAINT piwik_report_pkey PRIMARY KEY (report_id);
+
+
+--
+-- Name: shibboleth_attribute_mapping_pkey; Type: CONSTRAINT; Schema: public; Owner: dspace; Tablespace: 
+--
+
+ALTER TABLE ONLY shibboleth_attribute_mapping
+    ADD CONSTRAINT shibboleth_attribute_mapping_pkey PRIMARY KEY (mapping_id);
+
+
+--
+-- Name: user_metadata_pkey; Type: CONSTRAINT; Schema: public; Owner: dspace; Tablespace: 
+--
+
+ALTER TABLE ONLY user_metadata
+    ADD CONSTRAINT user_metadata_pkey PRIMARY KEY (user_metadata_id);
+
+
+--
+-- Name: user_registration_pkey; Type: CONSTRAINT; Schema: public; Owner: dspace; Tablespace: 
+--
+
+ALTER TABLE ONLY user_registration
+    ADD CONSTRAINT user_registration_pkey PRIMARY KEY (eperson_id);
+
+
+--
+-- Name: verification_token_email_key; Type: CONSTRAINT; Schema: public; Owner: dspace; Tablespace: 
+--
+
+ALTER TABLE ONLY verification_token
+    ADD CONSTRAINT verification_token_email_key UNIQUE (email);
+
+
+--
+-- Name: verification_token_eperson_id_key; Type: CONSTRAINT; Schema: public; Owner: dspace; Tablespace: 
+--
+
+ALTER TABLE ONLY verification_token
+    ADD CONSTRAINT verification_token_eperson_id_key UNIQUE (eperson_id);
+
+
+--
+-- Name: verification_token_pkey; Type: CONSTRAINT; Schema: public; Owner: dspace; Tablespace: 
+--
+
+ALTER TABLE ONLY verification_token
+    ADD CONSTRAINT verification_token_pkey PRIMARY KEY (token);
+
+
 --
 -- Name: license_definition_license_id_key; Type: INDEX; Schema: public; Owner: dspace; Tablespace: 
 --
 
 CREATE UNIQUE INDEX license_definition_license_id_key ON license_definition USING btree (name);
 
+
 --
--- Name: user_registration_idx; Type: INDEX; Schema: public; Owner: dspace; Tablespace: 
+-- Name: piwik_report_eperson_id_item_id_key; Type: INDEX; Schema: public; Owner: dspace; Tablespace: 
 --
--- Unique constraint turned off (BUG # 400)
--- CREATE UNIQUE INDEX user_registration_idx ON user_registration USING btree (email);
+
+CREATE UNIQUE INDEX piwik_report_eperson_id_item_id_key ON piwik_report USING btree (eperson_id, item_id);
+
+
+--
+-- Name: license_definition_license_label_extended_mapping_fk; Type: FK CONSTRAINT; Schema: public; Owner: dspace
+--
+
+ALTER TABLE ONLY license_label_extended_mapping
+    ADD CONSTRAINT license_definition_license_label_extended_mapping_fk FOREIGN KEY (license_id) REFERENCES license_definition(license_id) ON DELETE CASCADE;
 
 
 --
@@ -395,11 +781,36 @@ ALTER TABLE ONLY license_definition
 
 
 --
+-- Name: license_label_license_label_extended_mapping_fk; Type: FK CONSTRAINT; Schema: public; Owner: dspace
+--
+
+ALTER TABLE ONLY license_label_extended_mapping
+    ADD CONSTRAINT license_label_license_label_extended_mapping_fk FOREIGN KEY (label_id) REFERENCES license_label(label_id) ON DELETE CASCADE;
+
+
+--
 -- Name: license_resource_mapping_license_resource_user_allowance_fk; Type: FK CONSTRAINT; Schema: public; Owner: dspace
 --
 
 ALTER TABLE ONLY license_resource_user_allowance
     ADD CONSTRAINT license_resource_mapping_license_resource_user_allowance_fk FOREIGN KEY (mapping_id) REFERENCES license_resource_mapping(mapping_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: license_resource_user_allowance_user_metadata_fk; Type: FK CONSTRAINT; Schema: public; Owner: dspace
+--
+
+ALTER TABLE ONLY user_metadata
+    ADD CONSTRAINT license_resource_user_allowance_user_metadata_fk FOREIGN KEY (transaction_id) REFERENCES license_resource_user_allowance(transaction_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: organization_shibboleth_attribute_mapping_fk; Type: FK CONSTRAINT; Schema: public; Owner: dspace
+--
+
+ALTER TABLE ONLY shibboleth_attribute_mapping
+    ADD CONSTRAINT organization_shibboleth_attribute_mapping_fk FOREIGN KEY (organization_id) REFERENCES organization(organization_id);
+
 
 --
 -- Name: user_registration_license_definition_fk; Type: FK CONSTRAINT; Schema: public; Owner: dspace
@@ -426,77 +837,12 @@ ALTER TABLE ONLY license_resource_user_allowance
 
 
 --
--- Name: license_label_extended_mapping; Type: TABLE; Schema: public; Owner: dspace; Tablespace:
+-- Name: user_registration_user_metadata_fk; Type: FK CONSTRAINT; Schema: public; Owner: dspace
 --
 
-CREATE TABLE license_label_extended_mapping (
-    mapping_id integer NOT NULL,
-    license_id integer NOT NULL,
-    label_id integer NOT NULL
-);
+ALTER TABLE ONLY user_metadata
+    ADD CONSTRAINT user_registration_user_metadata_fk FOREIGN KEY (eperson_id) REFERENCES user_registration(eperson_id);
 
-
-ALTER TABLE public.license_label_extended_mapping OWNER TO dspace;
-
---
--- Name: license_label_extended_mapping_mapping_id_seq; Type: SEQUENCE; Schema: public; Owner: dspace
---
-
-CREATE SEQUENCE license_label_extended_mapping_mapping_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.license_label_extended_mapping_mapping_id_seq OWNER TO dspace;
-
---
--- Name: license_label_extended_mapping_mapping_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dspace
---
-
-ALTER SEQUENCE license_label_extended_mapping_mapping_id_seq OWNED BY license_label_extended_mapping.mapping_id;
-
-ALTER TABLE ONLY license_label_extended_mapping ALTER COLUMN mapping_id SET DEFAULT nextval('license_label_extended_mapping_mapping_id_seq'::regclass);
-
-ALTER TABLE ONLY license_label_extended_mapping
-    ADD CONSTRAINT license_label_extended_mapping_pkey PRIMARY KEY (mapping_id);
-
-ALTER TABLE ONLY license_label_extended_mapping
-    ADD CONSTRAINT license_definition_license_label_extended_mapping_fk FOREIGN KEY (license_id) REFERENCES license_definition(license_id) ON DELETE CASCADE;
-
-ALTER TABLE ONLY license_label_extended_mapping
-    ADD CONSTRAINT license_label_license_label_extended_mapping_fk FOREIGN KEY (label_id) REFERENCES license_label(label_id) ON DELETE CASCADE;
-
-INSERT INTO license_label values(5, 'BY', 'Attribution Required', true);
-INSERT INTO license_label values(6,'SA', 'Share Alike',true);
-INSERT INTO license_label values(7,'NC','Noncommercial',true);
-INSERT INTO license_label values(8,'ND','No Derivative Works',true);
-INSERT INTO license_label values(9,'Inf','Inform Before Use',true);
-INSERT INTO license_label values(10,'ReD','Redeposit Modified',true);
-
-select setval('license_label_label_id_seq ',11);
-
-
-select setval('license_label_extended_mapping_mapping_id_seq', 25);
-
-
-COPY license_label_extended_mapping (mapping_id, license_id, label_id) FROM stdin;
-12	1	7
-13	1	5
-14	2	6
-15	2	5
-16	2	7
-17	4	5
-18	4	8
-19	4	7
-20	5	8
-21	5	5
-22	6	5
-23	6	6
-24	8	5
-\.
 
 --
 -- Name: public; Type: ACL; Schema: -; Owner: postgres
@@ -513,19 +859,3 @@ GRANT ALL ON SCHEMA public TO PUBLIC;
 --
 
 
--- from licenses.2014.12.17.sql
--- See #74 in lindat-repository
-INSERT INTO license_definition (name, definition, eperson_id, label_id, created_on, confirmation) VALUES ('Affero General Public License 1 (AGPL-1.0)','http://www.affero.org/oagpl.html','1','1','2014-12-17 14:05:00','0');
-INSERT INTO license_definition (name, definition, eperson_id, label_id, created_on, confirmation) VALUES ('Affero General Public License 3 (AGPL-3.0)','http://opensource.org/licenses/AGPL-3.0','1','1','2014-12-17 14:05:00','0');
-INSERT INTO license_definition (name, definition, eperson_id, label_id, created_on, confirmation) VALUES ('Common Development and Distribution License (CDDL-1.0)','http://opensource.org/licenses/CDDL-1.0','1','1','2014-12-17 14:05:00','0');
-INSERT INTO license_definition (name, definition, eperson_id, label_id, created_on, confirmation) VALUES ('Eclipse Public License 1.0 (EPL-1.0)','http://opensource.org/licenses/EPL-1.0','1','1','2014-12-17 14:05:00','0');
-INSERT INTO license_definition (name, definition, eperson_id, label_id, created_on, confirmation) VALUES ('GNU General Public License 2 or later (GPL-2.0)','http://opensource.org/licenses/GPL-2.0','1','1','2014-12-17 14:05:00','0');
-INSERT INTO license_definition (name, definition, eperson_id, label_id, created_on, confirmation) VALUES ('GNU Library or "Lesser" General Public License 2.1 (LGPL-2.1)','http://opensource.org/licenses/LGPL-2.1','1','1','2014-12-17 14:05:00','0');
-INSERT INTO license_definition (name, definition, eperson_id, label_id, created_on, confirmation) VALUES ('GNU Library or "Lesser" General Public License 2.1 or later (LGPL-2.1)','http://opensource.org/licenses/LGPL-2.1','1','1','2014-12-17 14:05:00','0');
-INSERT INTO license_definition (name, definition, eperson_id, label_id, created_on, confirmation) VALUES ('GNU Library or "Lesser" General Public License 3.0 (LGPL-3.0)','http://opensource.org/licenses/LGPL-3.0','1','1','2014-12-17 14:05:00','0');
-INSERT INTO license_definition (name, definition, eperson_id, label_id, created_on, confirmation) VALUES ('Mozilla Public License 2.0','http://opensource.org/licenses/MPL-2.0','1','1','2014-12-17 14:05:00','0');
-INSERT INTO license_definition (name, definition, eperson_id, label_id, created_on, confirmation) VALUES ('Open Data Commons Attribution License (ODC-By)','http://opendatacommons.org/licenses/by/summary/','1','1','2014-12-17 14:05:00','0');
-INSERT INTO license_definition (name, definition, eperson_id, label_id, created_on, confirmation) VALUES ('Open Data Commons Open Database License (ODbL)','http://opendatacommons.org/licenses/odbl/summary/','1','1','2014-12-17 14:05:00','0');
-INSERT INTO license_definition (name, definition, eperson_id, label_id, created_on, confirmation) VALUES ('Open Data Commons Public Domain Dedication and License (PDDL)','http://opendatacommons.org/licenses/pddl/summary/','1','1','2014-12-17 14:05:00','0');
-INSERT INTO license_definition (name, definition, eperson_id, label_id, created_on, confirmation) VALUES ('Public Domain Mark (PD)','http://creativecommons.org/publicdomain/mark/1.0/','1','1','2014-12-17 14:05:00','0');
-UPDATE license_definition SET name='Public Domain Dedication (CC Zero)',definition='http://creativecommons.org/publicdomain/zero/1.0/' where name ='CC0-No Rights Reserved';
