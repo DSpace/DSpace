@@ -228,7 +228,7 @@ test_dspace_database:
 	@cd $(DIR_BUILD) && $(ANT_WITH_CONF) -logger org.apache.tools.ant.listener.AnsiColorLogger test_database | $(HIDE_PASSW)
 
 test_utilities_database: 
-	@cd $(DIR_SOURCE)/utilities && mvn exec:java -Dexec.mainClass="cz.cuni.mff.ufal.lindat.utilities.HibernateFunctionalityManager"
+	@cd $(DIR_INSTALLATION)/bin && ./dspace dsrun "cz.cuni.mff.ufal.lindat.utilities.HibernateFunctionalityManager" "$(DIR_INSTALLATION)"
 
 test_databases: test_utilities_database test_dspace_database
 
