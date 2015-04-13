@@ -172,8 +172,7 @@ clean_installation:
 compile: deploy_logs
 	@echo "COMPILING SOURCE ..."
 	@echo "Updating lr.compile.time..."
-	@if grep -q "lr\.compile\.time" $(LOCAL_CONF);then echo -e "/lr.compile.time/\n. s/=.*/=`date`/\nw" \
-      | sudo ed $(LOCAL_CONF) > /dev/null 2>&1; else echo -e "$(RED)Compile time not updated$(NORMAL)";fi
+	@if grep -q "lr\.compile\.time" $(LOCAL_CONF);then sed -i'' "s/^lr\.compile\.time=.*/lr.compile.time=`date`/"; else echo -e "$(RED)Compile time not updated$(NORMAL)";fi
 	@cd $(DIR_SOURCE) && mvn $(MVN_OPTS) package 2>&1 | $(HIDE_PASSW) | tee $(DIR_DEPLOY_LOGS)/$@.log
 	@echo ""
 	@if grep -q "BUILD FAILURE" $(DIR_DEPLOY_LOGS)/compile.log; then \
