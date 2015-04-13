@@ -223,7 +223,7 @@
 						title="<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.deletedynamicfield" />"
 						href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/deleteFieldDefinition.htm?pDId=${boxed.real.id}&boxId=${box.id}&tabId=${tabId}">
-					<span class="fa fa glyphicon-trash" id="remove_${boxed.id}" ></span> </a>
+					<span class="fa fa-trash" id="remove_${boxed.id}" ></span> </a>
 						<a class="jdynaeditbutton"
 						title="<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.editdynamicfield" />"
@@ -259,26 +259,12 @@
 						title="<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.deletedynamicfield" />"
 						href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/deleteNestedField.htm?pDId=${boxed.real.id}&boxId=${box.id}&tabId=${tabId}">
-					<img
-						src="<%=request.getContextPath()%>/image/authority/jdynadeletebutton.jpg"
-						border="0"
-						alt="<fmt:message
-					key="jsp.dspace-admin.hku.jdyna-configuration.deletedynamicfield" />"
-						title="<fmt:message
-					key="jsp.dspace-admin.hku.jdyna-configuration.deletedynamicfield" />"
-						name="remove" id="remove_${boxed.id}" /> </a>
+					<span class="fa fa-trash" id="remove_${boxed.id}" ></span> </a>
 					<a class="jdynaeditbutton"
 						title="<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.editdynamicfield" />"
 						href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/edit${controller}DynamicField.htm?pDId=${boxed.real.id}&boxId=${box.id}&tabId=${tabId}">
-					<img
-						src="<%=request.getContextPath()%>/image/authority/jdynaeditbutton.jpg"
-						border="0"
-						alt="<fmt:message
-					key="jsp.dspace-admin.hku.jdyna-configuration.editdynamicfield" />"
-						title="<fmt:message
-					key="jsp.dspace-admin.hku.jdyna-configuration.editdynamicfield" />"
-						name="edit" id="edit_${boxed.id}" /> </a>
+					<span class="fa fa-edit" id="edit_${boxed.id}" ></span> </a>
 					<spring:bind path="mask">
 						<input id="_${status.expression}" name="_${status.expression}"
 							value="true" type="hidden" />
@@ -339,26 +325,13 @@
 						title="<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.deletedynamicfield" />"
 						href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/deleteFieldDefinition.htm?pDId=${boxed.real.id}&boxId=${box.id}&tabId=${tabId}">
-					<img
-						src="<%=request.getContextPath()%>/image/authority/jdynadeletebutton.jpg"
-						border="0"
-						alt="<fmt:message
-					key="jsp.dspace-admin.hku.jdyna-configuration.deletedynamicfield" />"
-						title="<fmt:message
-					key="jsp.dspace-admin.hku.jdyna-configuration.deletedynamicfield" />"
-						name="remove" id="remove_${boxed.id}" /> </a>
+					<span class="fa fa-trash" id="remove_${boxed.id}" ></span> </a>
+					 </a>
 					<a class="jdynaeditbutton"
 						title="<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.editdynamicfield" />"
 						href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/edit${controller}DynamicField.htm?pDId=${boxed.real.id}&boxId=${box.id}&tabId=${tabId}">
-					<img
-						src="<%=request.getContextPath()%>/image/authority/jdynaeditbutton.jpg"
-						border="0"
-						alt="<fmt:message
-					key="jsp.dspace-admin.hku.jdyna-configuration.editdynamicfield" />"
-						title="<fmt:message
-					key="jsp.dspace-admin.hku.jdyna-configuration.editdynamicfield" />"
-						name="edit" id="edit_${boxed.id}" /> </a>
+					<span class="fa fa-edit" id="edit_${boxed.id}" ></span> </a>
 
 					<spring:bind path="mask">
 						<input id="_${status.expression}" name="_${status.expression}"
@@ -395,26 +368,12 @@
 						title="<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.deletedynamicfield" />"
 						href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/deleteNestedField.htm?pDId=${boxed.real.id}&boxId=${box.id}&tabId=${tabId}">
-					<img
-						src="<%=request.getContextPath()%>/image/authority/jdynadeletebutton.jpg"
-						border="0"
-						alt="<fmt:message
-					key="jsp.dspace-admin.hku.jdyna-configuration.deletedynamicfield" />"
-						title="<fmt:message
-					key="jsp.dspace-admin.hku.jdyna-configuration.deletedynamicfield" />"
-						name="remove" id="remove_${boxed.id}" /> </a>
+					<span class="fa fa-trash" id="remove_${boxed.id}" ></span> </a>
 					<a class="jdynaeditbutton"
 						title="<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.editdynamicfield" />"
 						href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/edit${controller}DynamicField.htm?pDId=${boxed.real.id}&boxId=${box.id}&tabId=${tabId}">
-					<img
-						src="<%=request.getContextPath()%>/image/authority/jdynaeditbutton.jpg"
-						border="0"
-						alt="<fmt:message
-					key="jsp.dspace-admin.hku.jdyna-configuration.editdynamicfield" />"
-						title="<fmt:message
-					key="jsp.dspace-admin.hku.jdyna-configuration.editdynamicfield" />"
-						name="edit" id="edit_${boxed.id}" /> </a>
+					<span class="fa fa-edit" id="edit_${boxed.id}" ></span> </a>
 
 					<spring:bind path="mask">
 						<input id="_${status.expression}" name="_${status.expression}"

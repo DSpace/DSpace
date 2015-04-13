@@ -7,20 +7,15 @@
  */
 package org.dspace.app.cris.model.dto;
 
-import it.cilea.osd.jdyna.dto.AnagraficaObjectAreaDTO;
-
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.collections.FactoryUtils;
 import org.apache.commons.collections.list.LazyList;
-import org.apache.commons.digester.SetRootRule;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.RestrictedField;
-import org.dspace.app.cris.model.RestrictedFieldFile;
-import org.dspace.app.cris.model.listener.RPListener;
 
 public class RPAnagraficaObjectDTO extends CrisAnagraficaObjectDTO
 {

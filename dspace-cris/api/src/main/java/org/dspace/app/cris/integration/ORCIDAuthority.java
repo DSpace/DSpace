@@ -39,7 +39,7 @@ public class ORCIDAuthority extends RPAuthority {
 					if (added < max) {						
 						Map<String, String> extras = ((OrcidAuthorityValue)val).choiceSelectMap();
 						extras.put("insolr", "false");
-						results.add(new Choice(val.generateString(), val.getValue(), val.getValue(), extras));
+						results.add(new Choice(val.generateString(), getLabel((OrcidAuthorityValue)val), val.getValue(), extras));
 						added++;
 					}
 				}
@@ -51,6 +51,10 @@ public class ORCIDAuthority extends RPAuthority {
 			log.warn("external source for authority not configured");
 		}	
 		return choices.values;
+	}
+
+	private String getLabel(OrcidAuthorityValue val) {
+		return val.getValue() + " (orcid.org/" + val.getOrcid_id() + ")";
 	}
 
 }

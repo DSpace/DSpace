@@ -557,7 +557,7 @@
 						</div>
 						<div class="modal-footer">
 						<div class="btn-group btn-group-sm" role="group">
-							 <a href="#" class="btn btn-primary myrpstatus-url"><fmt:message key="jsp.mydspace.cris.rp-status-change.go"/></a>
+							 <a href="#" class="btn btn-info myrpstatus-url"><fmt:message key="jsp.mydspace.cris.rp-status-change.go"/></a>
 							 <button type="button" id="activeDialogChangeInActive" class="btn btn-warning" data-dismiss="modal"><fmt:message key="jsp.mydspace.cris.rp-status-change.inactive"/></button>
 							 <button type="button" id="activeDialogChangeRemove" class="btn btn-danger" data-dismiss="modal"><fmt:message key="jsp.mydspace.cris.rp-status-change.remove"/></button>
 							 <button type="button" class="btn btn-default" data-dismiss="modal"><fmt:message key="jsp.mydspace.cris.rp-status-change.keep-active"/></button>
@@ -581,7 +581,7 @@
 						</div>
 						<div class="modal-footer">
 						<div class="btn-group btn-group-sm" role="group">
-							 <a href="#" class="btn btn-primary myrpstatus-url"><fmt:message key="jsp.mydspace.cris.rp-status-change.go"/></a>
+							 <a href="#" class="btn btn-info myrpstatus-url"><fmt:message key="jsp.mydspace.cris.rp-status-change.go"/></a>
 							 <button type="button" id="inactiveDialogChangeActive" class="btn btn-success" data-dismiss="modal"><fmt:message key="jsp.mydspace.cris.rp-status-change.active"/></button>
 							 <button type="button" id="inactiveDialogChangeRemove" class="btn btn-danger" data-dismiss="modal"><fmt:message key="jsp.mydspace.cris.rp-status-change.remove"/></button>
 							 <button type="button" class="btn btn-default" data-dismiss="modal"><fmt:message key="jsp.mydspace.cris.rp-status-change.keep-inactive"/></button>
@@ -624,7 +624,7 @@
 							<p><fmt:message key="jsp.mydspace.cris.rp-status-change.dialog-admin.text"/></p>
 						</div>
 						<div class="modal-footer">
-							 <a href="#" class="btn btn-primary myrpstatus-url"><fmt:message key="jsp.mydspace.cris.rp-status-change.go"/></a>
+							 <a href="#" class="btn btn-info myrpstatus-url"><fmt:message key="jsp.mydspace.cris.rp-status-change.go"/></a>
 							 <button type="button" class="btn btn-default" data-dismiss="modal"><fmt:message key="jsp.mydspace.cris.rp-status-change.keep-undefined"/></button>
 						</div>
 					</div>

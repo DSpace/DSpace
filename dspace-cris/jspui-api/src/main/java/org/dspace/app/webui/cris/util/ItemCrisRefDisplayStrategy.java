@@ -19,11 +19,14 @@ import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.app.cris.integration.CRISAuthority;
 import org.dspace.app.webui.util.ASimpleDisplayStrategy;
+import org.dspace.authority.AuthorityValue;
+import org.dspace.authority.AuthorityValueGenerator;
 import org.dspace.content.DCValue;
 import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.MetadataAuthorityManager;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.Utils;
 
@@ -121,11 +124,12 @@ public class ItemCrisRefDisplayStrategy extends ASimpleDisplayStrategy
         {
             String argument;
             String value;
-            if (metadataArray[j].authority != null &&
-                    metadataArray[j].confidence >= minConfidence)
+            String authority = metadataArray[j].authority;
+			if (authority != null &&
+                    metadataArray[j].confidence >= minConfidence && !(authority.startsWith(AuthorityValueGenerator.GENERATE)))
             {
                 argument = "authority";
-                value = metadataArray[j].authority;
+                value = authority;
             }
             else
             {
@@ -181,18 +185,41 @@ public class ItemCrisRefDisplayStrategy extends ASimpleDisplayStrategy
         String startLink = "";
         String endLink = "";
 
-        startLink = "&nbsp;<a href=\"" + hrq.getContextPath() + "/cris/"+publicPath+ "/"
-                + metadataArray[j].authority;
-        startLink += "\" class=\"authority\">";
-        endLink = "</a>";
-        sb.append(startLink);
-        String icon = "";
-		try {
-			icon = I18nUtil.getMessage("ItemCrisRefDisplayStrategy."+publicPath+".icon");
-		} catch (MissingResourceException e) {
-			icon = I18nUtil.getMessage("ItemCrisRefDisplayStrategy.default.icon");
+        String authority = metadataArray[j].authority;
+		if (StringUtils.isNotBlank(authority)) {
+			if (authority.startsWith(AuthorityValueGenerator.GENERATE)) {
+				String[] split = StringUtils.split(authority, AuthorityValueGenerator.SPLIT);
+				String type = null, info = null;
+				if (split.length > 0) {
+					type = split[1];
+					if (split.length > 1) {
+						info = split[2];
+					}
+				}
+				String externalContextPath = ConfigurationManager.getProperty("cris","external.domainname.authority.service."+type);
+				startLink = "<a target=\"_blank\" href=\"" + externalContextPath + info;
+				startLink += "\" class=\"authority\">&nbsp;<img style=\"width: 16px; height: 16px;\" src=\"images/mini-icon-orcid.png\" alt=\"\">";
+				endLink = "</a>";
+				sb.append(startLink);
+				sb.append(endLink);
+			}
+			else {
+		        startLink = "&nbsp;<a href=\"" + hrq.getContextPath() + "/cris/"+publicPath+ "/"
+		                + authority;
+		        startLink += "\" class=\"authority\">";
+		        endLink = "</a>";
+		        sb.append(startLink);
+		        String icon = "";
+				try {
+					icon = I18nUtil.getMessage("ItemCrisRefDisplayStrategy."+publicPath+".icon");
+				} catch (MissingResourceException e) {
+					icon = I18nUtil.getMessage("ItemCrisRefDisplayStrategy.default.icon");
+				}
+				sb.append(icon);
+		        sb.append(endLink);
+			}
 		}
-		sb.append(icon);
-        sb.append(endLink);
+		
+
     }
 }

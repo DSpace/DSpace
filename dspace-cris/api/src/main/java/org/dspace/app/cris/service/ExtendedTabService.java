@@ -7,17 +7,13 @@
  */
 package org.dspace.app.cris.service;
 
-import it.cilea.osd.jdyna.model.AType;
 import it.cilea.osd.jdyna.model.AccessLevelConstants;
 import it.cilea.osd.jdyna.model.Containable;
 import it.cilea.osd.jdyna.model.IContainable;
-import it.cilea.osd.jdyna.model.PropertiesDefinition;
 import it.cilea.osd.jdyna.web.AbstractEditTab;
 import it.cilea.osd.jdyna.web.AbstractTab;
 import it.cilea.osd.jdyna.web.Box;
-import it.cilea.osd.jdyna.web.IPropertyHolder;
 import it.cilea.osd.jdyna.web.TabService;
-import it.cilea.osd.jdyna.web.TypedBox;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;

@@ -8,8 +8,13 @@
 package org.dspace.app.cris.util;
 
 import it.cilea.osd.jdyna.model.ANestedObject;
-
+import it.cilea.osd.jdyna.model.ANestedPropertiesDefinition;
+import it.cilea.osd.jdyna.model.ANestedProperty;
+import it.cilea.osd.jdyna.model.ATypeNestedObject;
+import it.cilea.osd.jdyna.model.PropertiesDefinition;
 import it.cilea.osd.jdyna.model.Property;
+import it.cilea.osd.jdyna.value.LinkValue;
+import it.cilea.osd.jdyna.value.TextValue;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -30,6 +35,7 @@ import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.RestrictedField;
 import org.dspace.app.cris.model.VisibilityConstants;
+import org.dspace.app.cris.model.jdyna.ACrisNestedObject;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.content.DCPersonName;
 import org.dspace.content.DSpaceObject;
@@ -593,5 +599,13 @@ return decorator.generateDisplayValue(alternativeName, rp);
 			return dpList.get(0).toString();
 		}
 		return null;
-	}    
+	}
+	
+	public static <P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> void buildTextValue(ACrisObject<P, TP, NP, NTP, ACNO, ATNO> ro, String valueToSet, String pdefKey) {
+        TP pdef = applicationService.findPropertiesDefinitionByShortName(ro.getClassPropertiesDefinition(), pdefKey);        
+        TextValue text = new TextValue();
+        text.setOggetto(valueToSet);                 
+        P prop = ro.createProprieta(pdef);
+        prop.setValue(text);
+	}
 }

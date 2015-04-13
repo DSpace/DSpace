@@ -205,7 +205,11 @@
 					</div>			
 					<dyna:text visibility="false" propertyPath="real.rendering.regex"
 								labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.text.regex" helpKey="help.jdyna.message.rendering.text.regex"/>
-											
+					<div class="dynaClear">
+					&nbsp;
+					</div>			
+					<dyna:text visibility="false" propertyPath="real.rendering.displayFormat"
+								labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.text.displayFormat" helpKey="help.jdyna.message.rendering.text.displayFormat"/>											
 				</fieldset>
 			</c:when>
 			<c:otherwise>

@@ -910,36 +910,4 @@ public class ApplicationService extends ExtendedTabService
                 * maxResults, maxResults);
     }
     
-    public IContainable findContainableByDecorable(Class decoratorClass,
-            String decorable)
-    {
-        ContainableDao modelDao = (ContainableDao) getDaoByModel(decoratorClass);
-        IContainable result = modelDao.uniqueContainableByShortName(decorable);
-        return result;
-    }
-//    
-//    public <H extends IPropertyHolder<Containable>, T extends Tab<H>> List<H> findBoxesByContainable(
-//            Class<H> clazzH, IContainable containable)
-//    {
-//        PropertyHolderDao<H> modelDao = (PropertyHolderDao<H>) getDaoByModel(clazzH);
-//        return modelDao.findHolderByContainable(containable);
-//    }
-    
-    public <TP extends PropertiesDefinition, H extends IPropertyHolder<Containable>, T extends Tab<H>, ATTP extends ANestedPropertiesDefinition, TTP extends ATypeNestedObject<ATTP>> List<H> findBoxesByTTP(Class<H> clazzH, Class<TTP> clazzTTP, String decorable) {
-        List<TTP> ttps = getList(clazzTTP);
-
-        for (TTP ttp : ttps)
-        {
-            IContainable ic = findContainableByDecorable(
-                    ttp.getDecoratorClass(), decorable);
-            if (ic != null)
-            {
-              PropertyHolderDao<H> modelDao = (PropertyHolderDao<H>) getDaoByModel(clazzH);
-              return modelDao.findHolderByContainable(ic);
-            }
-        }
-        return null;
-    }
-    
-}
- 
+} 

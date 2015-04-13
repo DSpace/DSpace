@@ -31,7 +31,7 @@ public class ResearcherLoggedInAction implements PostLoggedInAction
         {
             ResearcherPage rp = applicationService.getResearcherPageByEPersonId(eperson.getID());
             if(rp==null && eperson.getNetid() != null) {
-				rp = applicationService.getEntityBySourceId(netidSourceRef,
+				rp = applicationService.getEntityBySourceId(netidSourceRef.toUpperCase(),
 						eperson.getNetid(), ResearcherPage.class);
                 if (rp != null) {
 					if(rp.getEpersonID()!=null) {

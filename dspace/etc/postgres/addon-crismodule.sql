@@ -89,7 +89,7 @@ create table jdyna_values (DTYPE varchar(31) not null, id int4 not null, sortVal
 create table jdyna_widget_date (id int4 not null, maxYear int4, minYear int4, time bool not null, primary key (id));
 create table jdyna_widget_link (id int4 not null, labelHeaderLabel varchar(255), labelHeaderURL varchar(255), widgetSize int4 not null, primary key (id));
 create table jdyna_widget_number (id int4 not null, max float8, min float8, precisionDef int4 not null, widgetSize int4, primary key (id));
-create table jdyna_widget_text (id int4 not null, collisioni bool, widgetcol int4, measurementUnitCol varchar(255), measurementUnitRow varchar(255), widgetrow int4, htmlToolbar varchar(255), multilinea bool not null, regex varchar(255), primary key (id));
+create table jdyna_widget_text (id int4 not null, collisioni bool, widgetcol int4, measurementUnitCol varchar(255), measurementUnitRow varchar(255), widgetrow int4, htmlToolbar varchar(255), multilinea bool not null, regex varchar(255), displayFormat varchar(255), primary key (id));
 alter table cris_do add constraint FK3D8EBCB124A63AA7 foreign key (typo_id) references cris_do_tp;
 alter table cris_do_box add constraint FK29BBA93D1ED73E00 foreign key (typeDef_id) references cris_do_tp;
 alter table cris_do_box2con add constraint FK2532FECD1C4ABF89 foreign key (jdyna_containable_id) references jdyna_containable;
