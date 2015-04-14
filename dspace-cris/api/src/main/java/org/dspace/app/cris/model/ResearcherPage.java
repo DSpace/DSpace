@@ -96,7 +96,9 @@ public class ResearcherPage extends
         ACrisObject<RPProperty, RPPropertiesDefinition, RPNestedProperty, RPNestedPropertiesDefinition, RPNestedObject, RPTypeNestedObject> implements Cloneable
 {
 
-    @Column(unique = true, nullable = true)
+    private static final String NAME = "fullName";
+
+	@Column(unique = true, nullable = true)
     private Integer epersonID;
 
     /** log4j logger */
@@ -179,7 +181,7 @@ public class ResearcherPage extends
     public String getFullName()
     {
         for (RPProperty property : this.getDynamicField().getAnagrafica4view()
-                .get("fullName"))
+                .get(NAME))
         {
             return property.getValue().getObject().toString();
         }
@@ -633,4 +635,10 @@ public class ResearcherPage extends
 	public boolean isDiscoverable() {
 		return true;
 	}
+	
+	@Override
+	public String getMetadataFieldTitle() {
+		return NAME;
+	}
+
 }

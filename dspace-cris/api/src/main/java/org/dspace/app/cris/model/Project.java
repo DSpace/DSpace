@@ -54,6 +54,8 @@ public class Project extends ACrisObject<ProjectProperty, ProjectPropertiesDefin
         Cloneable
 {
 
+	private static final String NAME = "title";
+	
     /** DB Primary key */
     @Id
     @GeneratedValue(generator = "CRIS_PROJECT_SEQ")
@@ -73,6 +75,7 @@ public class Project extends ACrisObject<ProjectProperty, ProjectPropertiesDefin
     public Project()
     {
         this.dynamicField = new ProjectAdditionalFieldStorage();
+        this.dynamicField.setProject(this);
     }
 
     /**
@@ -220,7 +223,7 @@ public class Project extends ACrisObject<ProjectProperty, ProjectPropertiesDefin
     @Override
     public String getName() {
         for (ProjectProperty title : this.getDynamicField()
-                .getAnagrafica4view().get("title"))
+                .getAnagrafica4view().get(NAME))
         {
             return title.toString();
         }
@@ -259,4 +262,10 @@ public class Project extends ACrisObject<ProjectProperty, ProjectPropertiesDefin
 	public boolean isDiscoverable() {
 		return true;
 	}
+	
+	@Override
+	public String getMetadataFieldTitle() {
+		return NAME;
+	}
+
 }

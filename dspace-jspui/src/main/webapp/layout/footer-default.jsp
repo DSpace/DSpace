@@ -39,7 +39,7 @@
 </main>
             <%-- Page footer --%>
              <footer class="navbar navbar-inverse navbar-bottom">
-             <div id="designedby" class="text-muted">
+             <div id="designedby" class="container text-muted">
              <fmt:message key="jsp.layout.footer-default.theme-by"/> <a href="http://www.cineca.it"><img
                                     src="<%= request.getContextPath() %>/image/logo-cineca-small.png"
                                     alt="Logo CINECA" /></a>

@@ -221,7 +221,14 @@ public class CrisSearchService extends SolrServiceImpl
         String schema = "cris" + dso.getPublicPath();
         String uuid = dso.getUuid();
         Boolean status = dso.getStatus();
-
+        String sourceref = dso.getSourceRef();
+        String sourceid = dso.getSourceID();
+        if(StringUtils.isNotBlank(sourceref)) {
+        	doc.addField("cris-sourceref", sourceref);
+        }
+        if(StringUtils.isNotBlank(sourceid)) {
+        	doc.addField("cris-sourceid", sourceid);
+        }
         commonIndexerHeader(status, uuid, doc);
 
         // Keep a list of our sort values which we added, sort values can only

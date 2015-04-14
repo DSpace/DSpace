@@ -65,23 +65,27 @@
     }
 %>
     <form action="<%= request.getContextPath() %>/feedback" method="post">
-        <center>
-            <table>
-                <tr>
-                    <td class="submitFormLabel"><label for="temail"><fmt:message key="jsp.feedback.form.email"/></label></td>
-                    <td><input type="text" name="email" id="temail" size="50" value="<%=StringEscapeUtils.escapeHtml(email)%>" /></td>
-                </tr>
-                <tr>
-                    <td class="submitFormLabel"><label for="tfeedback"><fmt:message key="jsp.feedback.form.comment"/></label></td>
-                    <td><textarea name="feedback" id="tfeedback" rows="6" cols="50"><%=StringEscapeUtils.escapeHtml(feedback)%></textarea></td>
-                </tr>
-                <tr>
-                    <td colspan="2" align="center">
-                    <input type="submit" name="submit" value="<fmt:message key="jsp.feedback.form.send"/>" />
-                    </td>
-                </tr>
-            </table>
-        </center>
+
+		<div class="form-group">
+			<div class="input-group-addon">
+				<span class="col-md-2"><label for="temail"><fmt:message
+							key="jsp.feedback.form.email" /></label></span> <span class="col-md-5"><input
+					class="form-control" type="text" name="email" id="temail" size="50"
+					value="<%=StringEscapeUtils.escapeHtml(email)%>" /></span>
+			</div>			
+		</div>
+		<div class="form-group">
+			<div class="input-group-addon">
+				<span class="col-md-2"><label for="tfeedback"><fmt:message
+							key="jsp.feedback.form.comment" /></label></span> <span class="col-md-5">
+				<textarea class="form-control" name="feedback" id="tfeedback" rows="6" cols="50"><%=StringEscapeUtils.escapeHtml(feedback)%></textarea>			
+				</span>
+			</div>			
+		</div>
+		
+		<div class="btn-group">        	 
+            <input class="btn btn-default" type="submit" name="submit" value="<fmt:message key="jsp.feedback.form.send"/>" />
+   		</div>
     </form>
 
 </dspace:layout>

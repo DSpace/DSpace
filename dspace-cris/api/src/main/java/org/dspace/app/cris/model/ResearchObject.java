@@ -58,7 +58,9 @@ import org.dspace.app.cris.model.jdyna.DynamicTypeNestedObject;
   })
 public class ResearchObject extends ACrisObjectWithTypeSupport<DynamicProperty, DynamicPropertiesDefinition, DynamicNestedProperty, DynamicNestedPropertiesDefinition, DynamicNestedObject, DynamicTypeNestedObject>
 {
-    
+	
+	private static final String NAME = "name";
+	
     /** DB Primary key */
     @Id
     @GeneratedValue(generator = "CRIS_DYNAOBJ_SEQ")
@@ -250,7 +252,7 @@ public class ResearchObject extends ACrisObjectWithTypeSupport<DynamicProperty, 
     @Override
     public String getName()
     {
-        for (DynamicProperty title : this.getAnagrafica4view().get(getTypo().getShortName() + "name"))
+        for (DynamicProperty title : this.getAnagrafica4view().get(getTypo().getShortName() + NAME))
         {
             return title.toString();
         }
@@ -271,6 +273,11 @@ public class ResearchObject extends ACrisObjectWithTypeSupport<DynamicProperty, 
 	@Override
 	public boolean isDiscoverable() {
 		return true;
+	}
+
+	@Override
+	public String getMetadataFieldTitle() {
+		return NAME;
 	}
 
 }

@@ -17,13 +17,13 @@ public class ProjectAuthority extends CRISAuthority
 {
 
     @Override
-    protected int getCRISTargetTypeID()
+    public int getCRISTargetTypeID()
     {
         return CrisConstants.PROJECT_TYPE_ID;
     }
 
     @Override
-    protected Class<Project> getCRISTargetClass()
+    public Class<Project> getCRISTargetClass()
     {
         return Project.class;
     }
@@ -61,6 +61,11 @@ public class ProjectAuthority extends CRISAuthority
 			}
 		}
 		return sb.toString();
+	}
+
+	@Override
+	public Project getNewCrisObject() {
+		return new Project();
 	}    
 
 }

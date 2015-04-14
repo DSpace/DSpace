@@ -14,6 +14,7 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.util.ClientUtils;
+import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.RestrictedField;
@@ -363,13 +364,13 @@ public class RPAuthority extends CRISAuthority implements
 
     
     @Override
-    protected int getCRISTargetTypeID()
+    public int getCRISTargetTypeID()
         {
         return CrisConstants.RP_TYPE_ID;
         }
 
     @Override
-    protected Class<ResearcherPage> getCRISTargetClass()
+    public Class<ResearcherPage> getCRISTargetClass()
     {
         return ResearcherPage.class;
     }
@@ -430,4 +431,9 @@ public class RPAuthority extends CRISAuthority implements
         }
         
     }
+
+	@Override
+	public ResearcherPage getNewCrisObject() {
+		return new ResearcherPage();
+	}
 }

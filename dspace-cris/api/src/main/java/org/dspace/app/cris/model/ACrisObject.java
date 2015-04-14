@@ -398,4 +398,6 @@ public abstract class ACrisObject<P extends Property<TP>, TP extends PropertiesD
         
         return values;
 	}
+	
+	public abstract String getMetadataFieldTitle();
 }

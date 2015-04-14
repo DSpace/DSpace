@@ -55,6 +55,8 @@ public class OrganizationUnit extends
 		Cloneable
 {
 
+	private static final String NAME = "name";
+	
     @Transient
     /**
      * Constant for resource type assigned to the Researcher Grants
@@ -80,6 +82,7 @@ public class OrganizationUnit extends
     public OrganizationUnit()
     {
         this.dynamicField = new OUAdditionalFieldStorage();
+        this.dynamicField.setOrganizationUnit(this);
     }
 
     /**
@@ -203,7 +206,7 @@ public class OrganizationUnit extends
 
     public String getName() {
         for (OUProperty title : this.getDynamicField()
-                .getAnagrafica4view().get("name"))
+                .getAnagrafica4view().get(NAME))
         {
             return title.toString();
         }
@@ -243,4 +246,10 @@ public class OrganizationUnit extends
 	public boolean isDiscoverable() {
 		return true;
 	}
+	
+	@Override
+	public String getMetadataFieldTitle() {
+		return NAME;
+	}
+
 }

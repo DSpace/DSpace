@@ -7,6 +7,7 @@
  */
 package org.dspace.app.cris.integration;
 
+import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.OrganizationUnit;
 
@@ -14,13 +15,13 @@ public class OUAuthority extends CRISAuthority
 {
 
     @Override
-    protected int getCRISTargetTypeID()
+    public int getCRISTargetTypeID()
     {
         return CrisConstants.OU_TYPE_ID;
     }
 
     @Override
-    protected Class<OrganizationUnit> getCRISTargetClass()
+    public Class<OrganizationUnit> getCRISTargetClass()
     {
         return OrganizationUnit.class;
     }
@@ -30,6 +31,11 @@ public class OUAuthority extends CRISAuthority
     public String getPublicPath() {
     	return "ou";
     }
+
+	@Override
+	public OrganizationUnit getNewCrisObject() {
+		return new OrganizationUnit();
+	}
     
 
 }

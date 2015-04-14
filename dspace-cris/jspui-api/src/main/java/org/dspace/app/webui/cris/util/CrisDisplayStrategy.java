@@ -166,7 +166,7 @@ public class CrisDisplayStrategy extends ADiscoveryDisplayStrategy implements ID
 				String externalContextPath = ConfigurationManager.getProperty("cris","external.domainname.authority.service."+type);
 				startLink = "<a target=\"_blank\" href=\"" + externalContextPath + info;
 				startLink += "\" class=\"authority\">";
-				startLink += "\" class=\"authority\">&nbsp;<img style=\"width: 16px; height: 16px;\" src=\"images/mini-icon-orcid.png\" alt=\"\">";
+				startLink += "\" class=\"authority\">&nbsp;<img style=\"width: 16px; height: 16px;\" src=\"" + hrq.getContextPath() + "/images/mini-icon-orcid.png\" alt=\"\">";
 				endLink = "</a>";
 				sb.append(startLink);				
 				sb.append(endLink);

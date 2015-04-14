@@ -138,13 +138,17 @@
     if (!navbar.equals("off"))
     {
 %>
+            <div class="container">
                 <dspace:include page="<%= navbar %>" />
+            </div>
 <%
     }
     else
     {
     	%>
+        <div class="container">
             <dspace:include page="/layout/navbar-minimal.jsp" />
+        </div>
 <%    	
     }
 %>

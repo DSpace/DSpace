@@ -478,7 +478,7 @@
               <filter class="solr.StopFilterFactory" ignoreCase="true"
                       words="stopwords.txt"/>
               <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
-              ￼￼￼￼￼  </analyzer>
+      </analyzer>
       </fieldType>
  </types>
 
@@ -540,6 +540,8 @@
 
    <!-- CRIS special fields -->
    <field name="cris-uuid" type="string" indexed="true" stored="true" omitNorms="true" />
+   <field name="cris-sourceid" type="string" indexed="true" stored="true" omitNorms="true" />
+   <field name="cris-sourceref" type="string" indexed="true" stored="true" omitNorms="true" />
    <dynamicField name="relationpreference.*" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
    <field name="crisauthoritylookup" type="text" indexed="true" stored="true" multiValued="true"/>
    <copyField source="crisrp.fullName" dest="crisauthoritylookup"/>
