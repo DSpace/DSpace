@@ -257,6 +257,16 @@ Custom messaging for unathorized access to Bitstream if the Bitstream is under e
 * [embargo-list-csv.jsp](../modules/jspui/src/main/webapp/dspace-admin/statistics/embargo-list-csv.jsp) - CSV export of embargo list
 
 * [embargo-list-sql.jspf](../modules/jspui/src/main/webapp/dspace-admin/statistics/embargo-list-sql.jspf) - SQL for embargo query
+
+*XMLUI webapp*
+
+* [BitstreamReader.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/cocoon/BitstreamReader.java) - query DSpace for a particular bitstream and transmit it to the user
+
+* [ItemAdapter.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/objectmanager/ItemAdapter.java) - check if bitstream has an embargo and display message accordingly.  
+
+* [item-view.xsl](../modules/xmlui-mirage2/src/main/webapp/themes/Mirage2/xsl/aspect/artifactbrowser/item-view.xsl) - attribute EMBARGO is added.
+
+
  
 ### Loader
         transform Proquest metadata to dublin core
