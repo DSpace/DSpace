@@ -1,0 +1,555 @@
+2014-06-24 16:01:08,009 INFO  org.dspace.app.xmlui.aspect.discovery.SidebarFacetsTransformer @ facets for scope, null: 3
+2014-06-24 16:01:26,806 INFO  cz.cuni.mff.ufal.DiscoJuiceFeeds @ The following entities were added from shibboleth disco feed.
+https://idp.uni-hannover.de
+https://mdir2.rz.tu-ilmenau.de/idp/shibboleth
+https://sso.idm.uni-hannover.de/idp/shibboleth
+https://idp.fh-jena.de/idp/shibboleth
+https://shibboleth3.tubit.tu-berlin.de/idp
+https://shibboleth.ba-mannheim.de/idp/shibboleth
+https://shibboleth-idptest.uni-wuerzburg.de/idp/shibboleth
+https://shibboleth-idp.uni-regensburg.de/idp/shibboleth
+https://shibidpvip.rz.tu-bs.de/idp/shibboleth
+https://idp1.gridlab.uni-hannover.de
+https://idp-spica.mpch-mainz.mpg.de
+https://shib-idp.ostfalia.de/idp/shibboleth
+https://idp-vw.hs-harz.de/idp/shibboleth
+https://login2.fh-jena.de/idp/shibboleth
+https://idpa.cz/idp/shibboleth
+https://idp-test.ph-freiburg.de/idp/shibboleth
+https://shib-idp.uni-goettingen.de/idp/shibboleth
+https://testshib2.fernuni-hagen.de/idp/shibboleth
+https://idp-test.rz.uni-ulm.de/idp/shibboleth
+https://idp.ub.hsu-hh.de/idptest/shibboleth
+https://idp-test.fh-muenster.de/idp/shibboleth
+https://lhisapp2.campusmv.de/idp/shibboleth
+https://idp.gsi.de/saml2/idp/metadata.php
+https://idp.rz.hs-mannheim.de/idp/shibboleth
+https://dev-idp.ph-ludwigsburg.de/idp/shibboleth
+https://whz-idp-00.zw.fh-zwickau.de/idp/shibboleth
+https://sidp.hs-bremen.de/idp/shibboleth
+https://elektra-idp.bsb-muenchen.de/shibboleth
+https://idp-uamr.zim.uni-duisburg-essen.de/idp/shibboleth
+https://idp-dev.ph-weingarten.de/idp/shibboleth
+https://idp-dev.europa-uni.de/idp/shibboleth
+https://idp.fh-bingen.de/idp/shibboleth
+https://192.129.26.226/idp/shibboleth
+https://idpc.cz/idp/shibboleth
+https://idp.ba-dresden.de/idp/shibboleth
+https://idp2.vhb.org/idp/shibboleth
+https://login2.hs-ulm.de/shibboleth-idp
+https://idp.rz.hs-offenburg.de/idp/shibboleth
+https://idp.vc.dfn.de/idp/shibboleth
+https://testidp2-dev.aai.dfn.de/idp/shibboleth
+https://idm1.rrzn.uni-hannover.de/idp/shibboleth
+https://shib1.cms.hu-berlin.de/idp/shibboleth
+https://idptest.scc.kit.edu/idp/shibboleth
+https://test-idp.desy.de/idp/shibboleth
+https://testidp.rz.unibw-muenchen.de/idp/shibboleth
+https://oflsd18.dwd.de/shibboleth-idp
+https://crust.hrz.tu-chemnitz.de/shibboleth/krb
+https://ent.ro.vutbr.cz/SSO/saml2/idp
+https://idp.hamburger-fh.de/idp/shibboleth
+https://idp.uni-duesseldorf.de/idp/shibboleth
+https://idp.rz.uni-augsburg.de/simplesaml/saml2/idp/metadata.php
+https://tomfroehle.dlinkddns.com/idp/shibboleth
+https://sso-dev.hochschule-rhein-waal.de/idp/shibboleth
+https://idp.osu.cz/simplesaml/saml2/idp/metadata.php
+https://crust.hrz.tu-chemnitz.de/shibboleth/bibo
+https://idp.biochem.mpg.de/idp
+https://testidp.lrz.de/idp/shibboleth
+https://textgridlab.org/idp/shibboleth
+https://idp.geomar.de/idp/shibboleth
+https://shib-idp.hbk-bs.de/idp/shibboleth
+https://idp-test.hs-ruhrwest.de/idp/shibboleth
+https://dev-idp1.zimt.uni-siegen.de/idp/shibboleth
+https://idp.fh-kl.de/idp/shibboleth
+https://sso-dev.rrze.uni-erlangen.de/simplesaml/saml2/idp/metadata.php
+https://marisa.uochb.cas.cz/simplesaml/shib13/idp/metadata.php
+https://shibb-idp-test.hs-weingarten.de/idp/shibboleth
+https://idp.fh-erfurt.de/idp/shibboleth
+https://idp2-test.tu-dresden.de/idp/shibboleth
+https://shibboleth2.uni-koblenz.de/idp/shibboleth
+https://shib2.zcu.cz/idp/shibboleth
+https://pbm12.uni-tuebingen.de/idp/shibboleth
+https://shib-idp.hs-osnabrueck.de/idp/shibboleth
+https://idp.hfbk-dresden.de/idp/shibboleth
+https://idp2-test.redi-bw.de/idp/shibboleth
+https://www.dbod.de/idp/shibboleth
+https://idp-dev.haw-landshut.de/idp/shibboleth
+https://shibb1.hrz.tu-freiberg.de/idp/shibboleth
+https://idp-dev.dfn.de/idp/shibboleth
+https://idp.bib-bvb.de/idp/shibboleth
+https://www.tu-cottbus.de/idp
+https://idp.daasi.de/idp/shibboleth
+https://idp-devel.uni-hohenheim.de/idp/shibboleth
+https://idp.gesis.org/idp/shibboleth
+https://sidp.uni-wuppertal.de/idp/shibboleth
+https://esx-115.gbv.de/idp/shibboleth
+https://testidp.aai.dfn.de/shibboleth-idp
+https://idp.hs-emden-leer.de/idp/shibboleth
+https://idp2.ufz.de/idp/shibboleth
+https://idptest.reutlingen-university.de/idp/shibboleth
+https://sso-test.uni-passau.de/idp/shibboleth
+https://idp.fernuni-hagen.de/idp/shibboleth
+https://login.ics.muni.cz/idp-medigrid/shibboleth
+https://shibboleth2.tubit.tu-berlin.de/test-idp
+https://idptest.rhrk.uni-kl.de/idp/shibboleth
+https://idp.rz.unibw-muenchen.de/testidp/shibboleth
+https://idp-test.rrz.uni-koeln.de/idp/shibboleth
+https://idptest.rz.hs-offenburg.de/idp/shibboleth
+https://idp-rz.uni-mannheim.de/idp/shibboleth
+https://aai-test.ruhr-uni-bochum.de/idp/shibboleth
+https://www.hs-owl.de/login/shibboleth
+https://kof07.gkss.de/shibboleth-idp
+https://idp.soc.cas.cz/idp/shibboleth
+https://idptest.htw-aalen.de/idp/shibboleth
+https://rz-shib-idp01.rrz.uni-hamburg.de/idp/shibboleth
+https://idp2.hostel.eduid.cz/idp/shibboleth
+https://test-idp.dfn-cert.de/idp/shibboleth
+https://idp-vw.hfmdd.de/idp/shibboleth
+https://idp2.hs-harz.de/shibboleth
+https://roamtest.inet.dkfz-heidelberg.de/idp/shibboleth
+https://am-idp.cit-vip.fh-koeln.de/nidp/saml2/metadata
+https://login.ics.muni.cz/idp/shibboleth
+https://login-test.rz.rwth-aachen.de/shibboleth
+https://idp.fh-hannover.de/idp/shibboleth
+https://pbm09.uni-tuebingen.de/shibboleth
+https://campus-it.fh-duesseldorf.de/idp/shibboleth
+https://idp-dev.reutlingen-university.de/idp/shibboleth
+https://idp-dev.uni-rostock.de/idp/shibboleth
+https://idp.bsb-muenchen.de/idp/shibboleth
+https://idpb.cz/idp/shibboleth
+https://next.bps-system.de/idp/shibboleth
+https://demonstrator.tubit.tu-berlin.de/idp/shibboleth
+https://idp.hrz.uni-marburg.de/idp/shibboleth
+https://idp.ub.uni-frankfurt.de/idp/shibboleth
+https://testidp3-dev.aai.dfn.de/idp/shibboleth
+https://x-shib-idp.gwdg.de/idp/shibboleth
+https://testidp2.aai.dfn.de/idp/shibboleth
+https://meso-vm2.dkrz.de/idp
+https://idp.hs-woe.de/idp/shibboleth
+https://idp-dev.helmholtz-muenchen.de/idp/shibboleth
+https://idp.bib-bvb.de/shibboleth
+https://idp.hgb-leipzig.de/idp/shibboleth
+https://identity.fu-berlin.de/idp-fub-qa
+https://ssostage.itmc.tu-dortmund.de/idp/shibboleth
+https://shib-idp2.awi.de/idp/shibboleth
+https://esx-165.gbv.de/idpvzg
+https://idp.hs-ludwigsburg.de/idp/shibboleth
+https://idp.fnusa.cz/idp/shibboleth
+https://idp.fh-swf.de/idp/shibboleth
+https://idp.bps-system.de/idp/shibboleth
+https://bwidm-idp.vm.uni-freiburg.de/idp/shibboleth
+https://test-idp.ph-ludwigsburg.de/idp/shibboleth
+https://sisyphos.dhbw-karlsruhe.de/idp/shibboleth
+https://idptest.bsb-muenchen.de/idp/shibboleth
+https://idp.helmholtz-muenchen.de/idp/shibboleth
+https://idp.vhb.org/shibboleth-idp
+https://uranus.dkrz.de/shibboleth
+https://login.hswt.de/saml2/idp/metadata.php
+https://idpstage.itmc.tu-dortmund.de/idp/shibboleth
+https://testidp.rz.uni-bamberg.de/idp/shibboleth
+https://shib-idp.blb-karlsruhe.de/idp/shibboleth
+https://iz.hs-offenburg.de/idp/shibboleth
+https://idp.hs-zigr.de/shibboleth
+https://fh-test.fh-kehl.de/idp/shibboleth
+https://shibboleth.uni-trier.de/idp/shibboleth
+https://shibbo.scc.uni-weimar.de/shibboleth-idp
+https://advvs01.gm.fh-koeln.de/simplesaml
+https://testidp-dev.aai.dfn.de/idp/shibboleth
+https://shib-idp.gwdg.de/idp
+https://idp.uni-landau.de/idp/shibboleth
+https://crux1.hrz.tu-freiberg.de/idp/shibboleth
+https://idp2.hs-esslingen.de/idp/shibboleth
+https://idp-dev-02.ub.uni-stuttgart.de/idp/shibboleth
+https://pasiphae.uni-erfurt.de/idp/shibboleth
+https://idp.hs-koblenz.de/idp/shibboleth
+https://dkfzshib.inet.dkfz-heidelberg.de/idp/shibboleth
+advvs01.gm.fh-koeln.de
+https://idp.isas.de/idp/shibboleth
+https://idp.isibrno.cas.cz/idp/shibboleth
+https://aai.dhv-speyer.de/idp/shibboleth
+https://shibboleth-sciencemag.highwire.org/idp/shibboleth
+https://weblogin.uni-marburg.de/idp/shibboleth
+https://shib-dev.hk24.de/idp/shibboleth
+https://idp-test.htwg-konstanz.de/idp/shibboleth
+https://idp.fh-schmalkalden.de/simplesaml
+https://idp.thi.de/idp/shibboleth
+https://trz-shib-idp01.rrz.uni-hamburg.de/idp/shibboleth
+https://whoami-dev.cesnet.cz/idp/shibboleth
+https://idp-test.urz.uni-heidelberg.de/idp/shibboleth
+https://shib-idp.kobv.de/idp/shibboleth
+https://idp.cs.uni-potsdam.de/idp/shibboleth
+https://shi-idp1.rz.fh-muenchen.de/shibboleth
+https://idp.mbu.cas.cz/idp/shibboleth
+https://idp-test.uni-duisburg-essen.de/idp/shibboleth
+https://idp-test.uni-konstanz.de/idp2/shibboleth
+https://idp.rfh-koeln.de/idp/shibboleth
+https://sso-testserver.fh-worms.de/idp/shibboleth
+https://idp.ba-glauchau.de/idp/shibboleth
+https://idp.helmholtz-berlin.de/idp/shibboleth
+https://idp2.rfh-koeln.de/idp/shibboleth
+https://mylogintest.uni-freiburg.de/shibboleth
+urn:mace:cesnet.cz:cztestfed:mnul.cz
+https://esx-165.gbv.de/idpnl
+https://mylogin-dev.uni-freiburg.de/shibboleth
+https://c3grid.pik-potsdam.de
+https://idmtest2.rrz.uni-hamburg.de/idp/shibboleth
+https://shi-idp3.rz.fh-muenchen.de/idp/shibboleth
+https://idp2.hrz.uni-kassel.de/idp/shibboleth
+https://auth.ub.uni-frankfurt.de
+https://unrz157.vpn.rrze.uni-erlangen.de/simplesaml/saml2/idp/metadata.php
+https://idp.hostel.eduid.cz/idp/shibboleth
+https://idp-devel01.fh-swf.de/idp/shibboleth
+https://shibboleth-test.rhrz.uni-bonn.de/idp/shibboleth
+https://idp2.uni-saarland.de/idp/shibboleth
+https://testidp.rz.uni-kiel.de/idp/shibboleth
+https://shib.rz.tu-harburg.de/idp/shibboleth
+https://zividptest.uni-muenster.de/idp/shibboleth
+https://idp2.ub.uni-frankfurt.de/idp/shibboleth
+
+2014-06-24 16:01:26,898 ERROR org.dspace.app.xmlui.cocoon.DSpaceCocoonServletFilter @ Serious Error Occurred Processing Request!
+ClientAbortException:  java.net.SocketException: Broken pipe
+	at org.apache.catalina.connector.OutputBuffer.realWriteBytes(OutputBuffer.java:413)
+	at org.apache.tomcat.util.buf.ByteChunk.flushBuffer(ByteChunk.java:480)
+	at org.apache.catalina.connector.OutputBuffer.doFlush(OutputBuffer.java:359)
+	at org.apache.catalina.connector.OutputBuffer.flush(OutputBuffer.java:333)
+	at org.apache.catalina.connector.Response.flushBuffer(Response.java:568)
+	at org.apache.catalina.connector.ResponseFacade.flushBuffer(ResponseFacade.java:306)
+	at javax.servlet.ServletResponseWrapper.flushBuffer(ServletResponseWrapper.java:160)
+	at org.apache.cocoon.servletservice.HttpServletResponseBufferingWrapper.flushBufferedResponse(HttpServletResponseBufferingWrapper.java:240)
+	at org.apache.cocoon.servletservice.ServletServiceContext$PathDispatcher.forward(ServletServiceContext.java:481)
+	at org.apache.cocoon.servletservice.ServletServiceContext$PathDispatcher.forward(ServletServiceContext.java:443)
+	at org.apache.cocoon.servletservice.spring.ServletFactoryBean$ServiceInterceptor.invoke(ServletFactoryBean.java:264)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:172)
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:204)
+	at com.sun.proxy.$Proxy18.service(Unknown Source)
+	at org.apache.cocoon.servletservice.DispatcherServlet.service(DispatcherServlet.java:106)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:727)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:303)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208)
+	at org.dspace.app.xmlui.cocoon.SetCharacterEncodingFilter.doFilter(SetCharacterEncodingFilter.java:111)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208)
+	at org.dspace.app.xmlui.cocoon.DSpaceCocoonServletFilter.doFilter(DSpaceCocoonServletFilter.java:271)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208)
+	at org.apache.cocoon.servlet.multipart.MultipartFilter.doFilter(MultipartFilter.java:131)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:52)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208)
+	at org.dspace.utils.servlet.DSpaceWebappServletFilter.doFilter(DSpaceWebappServletFilter.java:78)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:241)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:208)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:220)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:122)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:501)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:170)
+	at com.googlecode.psiprobe.Tomcat70AgentValve.invoke(Tomcat70AgentValve.java:38)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:98)
+	at org.apache.catalina.valves.AccessLogValve.invoke(AccessLogValve.java:950)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:116)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:408)
+	at org.apache.coyote.http11.AbstractHttp11Processor.process(AbstractHttp11Processor.java:1040)
+	at org.apache.coyote.AbstractProtocol$AbstractConnectionHandler.process(AbstractProtocol.java:607)
+	at org.apache.tomcat.util.net.JIoEndpoint$SocketProcessor.run(JIoEndpoint.java:315)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615)
+	at java.lang.Thread.run(Thread.java:744)
+Caused by: java.net.SocketException: Broken pipe
+	at java.net.SocketOutputStream.socketWrite0(Native Method)
+	at java.net.SocketOutputStream.socketWrite(SocketOutputStream.java:113)
+	at java.net.SocketOutputStream.write(SocketOutputStream.java:159)
+	at org.apache.coyote.http11.InternalOutputBuffer.realWriteBytes(InternalOutputBuffer.java:215)
+	at org.apache.tomcat.util.buf.ByteChunk.flushBuffer(ByteChunk.java:480)
+	at org.apache.tomcat.util.buf.ByteChunk.append(ByteChunk.java:366)
+	at org.apache.coyote.http11.InternalOutputBuffer$OutputStreamOutputBuffer.doWrite(InternalOutputBuffer.java:240)
+	at org.apache.coyote.http11.filters.IdentityOutputFilter.doWrite(IdentityOutputFilter.java:84)
+	at org.apache.coyote.http11.AbstractOutputBuffer.doWrite(AbstractOutputBuffer.java:192)
+	at org.apache.coyote.Response.doWrite(Response.java:520)
+	at org.apache.catalina.connector.OutputBuffer.realWriteBytes(OutputBuffer.java:408)
+	... 47 more
+2014-06-24 16:01:36,578 INFO  org.dspace.app.xmlui.utils.AuthenticationUtil @ admin:session_id=ABDCE4E4A5B6DC37396BA723F13DE779:ip_addr=195.113.18.216:login:type=explicit
+2014-06-24 16:01:38,213 INFO  org.dspace.app.xmlui.aspect.discovery.SidebarFacetsTransformer @ facets for scope, null: 3
+2014-06-24 16:48:52,660 INFO  org.dspace.app.xmlui.utils.AuthenticationUtil @ admin:session_id=9E1FB047DC93D22CD92B7FE1FDF593C1:ip_addr=195.113.18.216:login:type=explicit
+2014-06-24 17:30:41,025 INFO  org.dspace.app.xmlui.utils.AuthenticationUtil @ anonymous:session_id=7D19080230DC30D7A8AB11E6CD6CE4BF:ip_addr=195.113.18.216:failed_login:email=, realm=null, result=4
+2014-06-24 17:30:46,529 INFO  org.dspace.app.xmlui.utils.AuthenticationUtil @ admin:session_id=7D19080230DC30D7A8AB11E6CD6CE4BF:ip_addr=195.113.18.216:login:type=explicit
+2014-06-24 17:32:20,054 INFO  net.sf.ehcache.util.UpdateChecker @ New update(s) found: 2.4.7 [http://www.terracotta.org/confluence/display/release/Release+Notes+Ehcache+Core+2.4]
+2014-06-24 17:32:25,710 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-non_engines.txt
+2014-06-24 17:32:25,730 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-google.txt
+2014-06-24 17:32:25,741 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-altavista.txt
+2014-06-24 17:32:25,749 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-excite.txt
+2014-06-24 17:32:25,777 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-inktomi.txt
+2014-06-24 17:32:25,859 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-misc.txt
+2014-06-24 17:32:25,874 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-lycos.txt
+2014-06-24 17:32:25,885 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/ufal.ignore.txt
+2014-06-24 17:32:25,897 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-infoseek.txt
+2014-06-24 17:32:25,905 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/ufal.ignore.txt-20140415-110007.old
+2014-06-24 17:32:25,917 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/ufal.ignore.txt-20140424-175345.old
+2014-06-24 17:32:25,925 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/ufal.ignore.txt-20140512-145838.old
+2014-06-24 17:32:37,953 INFO  net.sf.ehcache.util.UpdateChecker @ New update(s) found: 2.4.7 [http://www.terracotta.org/confluence/display/release/Release+Notes+Ehcache+Core+2.4]
+2014-06-24 17:32:38,532 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-non_engines.txt
+2014-06-24 17:32:38,546 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-google.txt
+2014-06-24 17:32:38,553 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-altavista.txt
+2014-06-24 17:32:38,554 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-excite.txt
+2014-06-24 17:32:38,586 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-inktomi.txt
+2014-06-24 17:32:38,753 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-misc.txt
+2014-06-24 17:32:38,760 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-lycos.txt
+2014-06-24 17:32:38,762 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/ufal.ignore.txt
+2014-06-24 17:32:38,767 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-infoseek.txt
+2014-06-24 17:32:38,774 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/ufal.ignore.txt-20140415-110007.old
+2014-06-24 17:32:38,775 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/ufal.ignore.txt-20140424-175345.old
+2014-06-24 17:32:38,776 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/ufal.ignore.txt-20140512-145838.old
+2014-06-24 18:45:28,351 INFO  net.sf.ehcache.util.UpdateChecker @ New update(s) found: 2.4.7 [http://www.terracotta.org/confluence/display/release/Release+Notes+Ehcache+Core+2.4]
+2014-06-24 18:45:32,088 INFO  net.sf.ehcache.util.UpdateChecker @ New update(s) found: 2.4.7 [http://www.terracotta.org/confluence/display/release/Release+Notes+Ehcache+Core+2.4]
+2014-06-24 18:45:33,208 INFO  org.dspace.app.xmlui.configuration.XMLUIConfiguration @ Loading XMLUI configuration from: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/xmlui.xconf
+2014-06-24 18:45:33,376 INFO  org.dspace.app.xmlui.configuration.XMLUIConfiguration @ Aspect Installed: name='Displaying Artifacts', path='resource://aspects/ViewArtifacts/'.
+2014-06-24 18:45:33,376 INFO  org.dspace.app.xmlui.configuration.XMLUIConfiguration @ Aspect Installed: name='Browsing Artifacts', path='resource://aspects/BrowseArtifacts/'.
+2014-06-24 18:45:33,376 INFO  org.dspace.app.xmlui.configuration.XMLUIConfiguration @ Aspect Installed: name='Administration', path='resource://aspects/Administrative/'.
+2014-06-24 18:45:33,376 INFO  org.dspace.app.xmlui.configuration.XMLUIConfiguration @ Aspect Installed: name='E-Person', path='resource://aspects/EPerson/'.
+2014-06-24 18:45:33,376 INFO  org.dspace.app.xmlui.configuration.XMLUIConfiguration @ Aspect Installed: name='Submission and Workflow', path='resource://aspects/Submission/'.
+2014-06-24 18:45:33,376 INFO  org.dspace.app.xmlui.configuration.XMLUIConfiguration @ Aspect Installed: name='Statistics', path='resource://aspects/Statistics/'.
+2014-06-24 18:45:33,376 INFO  org.dspace.app.xmlui.configuration.XMLUIConfiguration @ Aspect Installed: name='Original Workflow', path='resource://aspects/Workflow/'.
+2014-06-24 18:45:33,376 INFO  org.dspace.app.xmlui.configuration.XMLUIConfiguration @ Aspect Installed: name='Discovery', path='resource://aspects/Discovery/'.
+2014-06-24 18:45:33,377 INFO  org.dspace.app.xmlui.configuration.XMLUIConfiguration @ Theme Installed: name='UFAL Homepage', path='UFALHome/', id='null', regex='^$', handle='null'.
+2014-06-24 18:45:33,377 INFO  org.dspace.app.xmlui.configuration.XMLUIConfiguration @ Theme Installed: name='UFAL Theme', path='UFAL/', id='null', regex='.*', handle='null'.
+2014-06-24 18:49:36,438 INFO  cz.cuni.mff.ufal.DiscoJuiceFeeds @ The following entities were added from shibboleth disco feed.
+https://idp.uni-hannover.de
+https://mdir2.rz.tu-ilmenau.de/idp/shibboleth
+https://sso.idm.uni-hannover.de/idp/shibboleth
+https://idp.fh-jena.de/idp/shibboleth
+https://shibboleth3.tubit.tu-berlin.de/idp
+https://shibboleth.ba-mannheim.de/idp/shibboleth
+https://shibboleth-idptest.uni-wuerzburg.de/idp/shibboleth
+https://shibboleth-idp.uni-regensburg.de/idp/shibboleth
+https://shibidpvip.rz.tu-bs.de/idp/shibboleth
+https://idp1.gridlab.uni-hannover.de
+https://idp-spica.mpch-mainz.mpg.de
+https://shib-idp.ostfalia.de/idp/shibboleth
+https://idp-vw.hs-harz.de/idp/shibboleth
+https://login2.fh-jena.de/idp/shibboleth
+https://idpa.cz/idp/shibboleth
+https://idp-test.ph-freiburg.de/idp/shibboleth
+https://shib-idp.uni-goettingen.de/idp/shibboleth
+https://testshib2.fernuni-hagen.de/idp/shibboleth
+https://idp-test.rz.uni-ulm.de/idp/shibboleth
+https://idp.ub.hsu-hh.de/idptest/shibboleth
+https://idp-test.fh-muenster.de/idp/shibboleth
+https://lhisapp2.campusmv.de/idp/shibboleth
+https://idp.gsi.de/saml2/idp/metadata.php
+https://idp.rz.hs-mannheim.de/idp/shibboleth
+https://dev-idp.ph-ludwigsburg.de/idp/shibboleth
+https://whz-idp-00.zw.fh-zwickau.de/idp/shibboleth
+https://sidp.hs-bremen.de/idp/shibboleth
+https://elektra-idp.bsb-muenchen.de/shibboleth
+https://idp-uamr.zim.uni-duisburg-essen.de/idp/shibboleth
+https://idp-dev.ph-weingarten.de/idp/shibboleth
+https://idp-dev.europa-uni.de/idp/shibboleth
+https://idp.fh-bingen.de/idp/shibboleth
+https://192.129.26.226/idp/shibboleth
+https://idpc.cz/idp/shibboleth
+https://idp.ba-dresden.de/idp/shibboleth
+https://idp2.vhb.org/idp/shibboleth
+https://login2.hs-ulm.de/shibboleth-idp
+https://idp.rz.hs-offenburg.de/idp/shibboleth
+https://idp.vc.dfn.de/idp/shibboleth
+https://testidp2-dev.aai.dfn.de/idp/shibboleth
+https://idm1.rrzn.uni-hannover.de/idp/shibboleth
+https://shib1.cms.hu-berlin.de/idp/shibboleth
+https://idptest.scc.kit.edu/idp/shibboleth
+https://test-idp.desy.de/idp/shibboleth
+https://testidp.rz.unibw-muenchen.de/idp/shibboleth
+https://oflsd18.dwd.de/shibboleth-idp
+https://crust.hrz.tu-chemnitz.de/shibboleth/krb
+https://ent.ro.vutbr.cz/SSO/saml2/idp
+https://idp.hamburger-fh.de/idp/shibboleth
+https://idp.uni-duesseldorf.de/idp/shibboleth
+https://idp.rz.uni-augsburg.de/simplesaml/saml2/idp/metadata.php
+https://tomfroehle.dlinkddns.com/idp/shibboleth
+https://sso-dev.hochschule-rhein-waal.de/idp/shibboleth
+https://idp.osu.cz/simplesaml/saml2/idp/metadata.php
+https://crust.hrz.tu-chemnitz.de/shibboleth/bibo
+https://idp.biochem.mpg.de/idp
+https://testidp.lrz.de/idp/shibboleth
+https://textgridlab.org/idp/shibboleth
+https://idp.geomar.de/idp/shibboleth
+https://shib-idp.hbk-bs.de/idp/shibboleth
+https://idp-test.hs-ruhrwest.de/idp/shibboleth
+https://dev-idp1.zimt.uni-siegen.de/idp/shibboleth
+https://idp.fh-kl.de/idp/shibboleth
+https://sso-dev.rrze.uni-erlangen.de/simplesaml/saml2/idp/metadata.php
+https://marisa.uochb.cas.cz/simplesaml/shib13/idp/metadata.php
+https://shibb-idp-test.hs-weingarten.de/idp/shibboleth
+https://idp.fh-erfurt.de/idp/shibboleth
+https://idp2-test.tu-dresden.de/idp/shibboleth
+https://shibboleth2.uni-koblenz.de/idp/shibboleth
+https://shib2.zcu.cz/idp/shibboleth
+https://pbm12.uni-tuebingen.de/idp/shibboleth
+https://shib-idp.hs-osnabrueck.de/idp/shibboleth
+https://idp.hfbk-dresden.de/idp/shibboleth
+https://idp2-test.redi-bw.de/idp/shibboleth
+https://www.dbod.de/idp/shibboleth
+https://idp-dev.haw-landshut.de/idp/shibboleth
+https://shibb1.hrz.tu-freiberg.de/idp/shibboleth
+https://idp-dev.dfn.de/idp/shibboleth
+https://idp.bib-bvb.de/idp/shibboleth
+https://www.tu-cottbus.de/idp
+https://idp.daasi.de/idp/shibboleth
+https://idp-devel.uni-hohenheim.de/idp/shibboleth
+https://idp.gesis.org/idp/shibboleth
+https://sidp.uni-wuppertal.de/idp/shibboleth
+https://esx-115.gbv.de/idp/shibboleth
+https://testidp.aai.dfn.de/shibboleth-idp
+https://idp.hs-emden-leer.de/idp/shibboleth
+https://idp2.ufz.de/idp/shibboleth
+https://idptest.reutlingen-university.de/idp/shibboleth
+https://sso-test.uni-passau.de/idp/shibboleth
+https://idp.fernuni-hagen.de/idp/shibboleth
+https://login.ics.muni.cz/idp-medigrid/shibboleth
+https://shibboleth2.tubit.tu-berlin.de/test-idp
+https://idptest.rhrk.uni-kl.de/idp/shibboleth
+https://idp.rz.unibw-muenchen.de/testidp/shibboleth
+https://idp-test.rrz.uni-koeln.de/idp/shibboleth
+https://idptest.rz.hs-offenburg.de/idp/shibboleth
+https://idp-rz.uni-mannheim.de/idp/shibboleth
+https://aai-test.ruhr-uni-bochum.de/idp/shibboleth
+https://www.hs-owl.de/login/shibboleth
+https://kof07.gkss.de/shibboleth-idp
+https://idp.soc.cas.cz/idp/shibboleth
+https://idptest.htw-aalen.de/idp/shibboleth
+https://rz-shib-idp01.rrz.uni-hamburg.de/idp/shibboleth
+https://idp2.hostel.eduid.cz/idp/shibboleth
+https://test-idp.dfn-cert.de/idp/shibboleth
+https://idp-vw.hfmdd.de/idp/shibboleth
+https://idp2.hs-harz.de/shibboleth
+https://roamtest.inet.dkfz-heidelberg.de/idp/shibboleth
+https://am-idp.cit-vip.fh-koeln.de/nidp/saml2/metadata
+https://login.ics.muni.cz/idp/shibboleth
+https://login-test.rz.rwth-aachen.de/shibboleth
+https://idp.fh-hannover.de/idp/shibboleth
+https://pbm09.uni-tuebingen.de/shibboleth
+https://campus-it.fh-duesseldorf.de/idp/shibboleth
+https://idp-dev.reutlingen-university.de/idp/shibboleth
+https://idp-dev.uni-rostock.de/idp/shibboleth
+https://idp.bsb-muenchen.de/idp/shibboleth
+https://idpb.cz/idp/shibboleth
+https://next.bps-system.de/idp/shibboleth
+https://demonstrator.tubit.tu-berlin.de/idp/shibboleth
+https://idp.hrz.uni-marburg.de/idp/shibboleth
+https://idp.ub.uni-frankfurt.de/idp/shibboleth
+https://testidp3-dev.aai.dfn.de/idp/shibboleth
+https://x-shib-idp.gwdg.de/idp/shibboleth
+https://testidp2.aai.dfn.de/idp/shibboleth
+https://meso-vm2.dkrz.de/idp
+https://idp.hs-woe.de/idp/shibboleth
+https://idp-dev.helmholtz-muenchen.de/idp/shibboleth
+https://idp.bib-bvb.de/shibboleth
+https://idp.hgb-leipzig.de/idp/shibboleth
+https://identity.fu-berlin.de/idp-fub-qa
+https://ssostage.itmc.tu-dortmund.de/idp/shibboleth
+https://shib-idp2.awi.de/idp/shibboleth
+https://esx-165.gbv.de/idpvzg
+https://idp.hs-ludwigsburg.de/idp/shibboleth
+https://idp.fnusa.cz/idp/shibboleth
+https://idp.fh-swf.de/idp/shibboleth
+https://idp.bps-system.de/idp/shibboleth
+https://bwidm-idp.vm.uni-freiburg.de/idp/shibboleth
+https://test-idp.ph-ludwigsburg.de/idp/shibboleth
+https://sisyphos.dhbw-karlsruhe.de/idp/shibboleth
+https://idptest.bsb-muenchen.de/idp/shibboleth
+https://idp.helmholtz-muenchen.de/idp/shibboleth
+https://idp.vhb.org/shibboleth-idp
+https://uranus.dkrz.de/shibboleth
+https://login.hswt.de/saml2/idp/metadata.php
+https://idpstage.itmc.tu-dortmund.de/idp/shibboleth
+https://testidp.rz.uni-bamberg.de/idp/shibboleth
+https://shib-idp.blb-karlsruhe.de/idp/shibboleth
+https://iz.hs-offenburg.de/idp/shibboleth
+https://idp.hs-zigr.de/shibboleth
+https://fh-test.fh-kehl.de/idp/shibboleth
+https://shibboleth.uni-trier.de/idp/shibboleth
+https://shibbo.scc.uni-weimar.de/shibboleth-idp
+https://advvs01.gm.fh-koeln.de/simplesaml
+https://testidp-dev.aai.dfn.de/idp/shibboleth
+https://shib-idp.gwdg.de/idp
+https://idp.uni-landau.de/idp/shibboleth
+https://crux1.hrz.tu-freiberg.de/idp/shibboleth
+https://idp2.hs-esslingen.de/idp/shibboleth
+https://idp-dev-02.ub.uni-stuttgart.de/idp/shibboleth
+https://pasiphae.uni-erfurt.de/idp/shibboleth
+https://idp.hs-koblenz.de/idp/shibboleth
+https://dkfzshib.inet.dkfz-heidelberg.de/idp/shibboleth
+advvs01.gm.fh-koeln.de
+https://idp.isas.de/idp/shibboleth
+https://idp.isibrno.cas.cz/idp/shibboleth
+https://aai.dhv-speyer.de/idp/shibboleth
+https://shibboleth-sciencemag.highwire.org/idp/shibboleth
+https://weblogin.uni-marburg.de/idp/shibboleth
+https://shib-dev.hk24.de/idp/shibboleth
+https://idp-test.htwg-konstanz.de/idp/shibboleth
+https://idp.fh-schmalkalden.de/simplesaml
+https://idp.thi.de/idp/shibboleth
+https://trz-shib-idp01.rrz.uni-hamburg.de/idp/shibboleth
+https://whoami-dev.cesnet.cz/idp/shibboleth
+https://idp-test.urz.uni-heidelberg.de/idp/shibboleth
+https://shib-idp.kobv.de/idp/shibboleth
+https://idp.cs.uni-potsdam.de/idp/shibboleth
+https://shi-idp1.rz.fh-muenchen.de/shibboleth
+https://idp.mbu.cas.cz/idp/shibboleth
+https://idp-test.uni-duisburg-essen.de/idp/shibboleth
+https://idp-test.uni-konstanz.de/idp2/shibboleth
+https://idp.rfh-koeln.de/idp/shibboleth
+https://sso-testserver.fh-worms.de/idp/shibboleth
+https://idp.ba-glauchau.de/idp/shibboleth
+https://idp.helmholtz-berlin.de/idp/shibboleth
+https://idp2.rfh-koeln.de/idp/shibboleth
+https://mylogintest.uni-freiburg.de/shibboleth
+urn:mace:cesnet.cz:cztestfed:mnul.cz
+https://esx-165.gbv.de/idpnl
+https://mylogin-dev.uni-freiburg.de/shibboleth
+https://c3grid.pik-potsdam.de
+https://idmtest2.rrz.uni-hamburg.de/idp/shibboleth
+https://shi-idp3.rz.fh-muenchen.de/idp/shibboleth
+https://idp2.hrz.uni-kassel.de/idp/shibboleth
+https://auth.ub.uni-frankfurt.de
+https://unrz157.vpn.rrze.uni-erlangen.de/simplesaml/saml2/idp/metadata.php
+https://idp.hostel.eduid.cz/idp/shibboleth
+https://idp-devel01.fh-swf.de/idp/shibboleth
+https://shibboleth-test.rhrz.uni-bonn.de/idp/shibboleth
+https://idp2.uni-saarland.de/idp/shibboleth
+https://testidp.rz.uni-kiel.de/idp/shibboleth
+https://shib.rz.tu-harburg.de/idp/shibboleth
+https://zividptest.uni-muenster.de/idp/shibboleth
+https://idp2.ub.uni-frankfurt.de/idp/shibboleth
+
+2014-06-24 18:49:50,524 INFO  org.dspace.app.xmlui.utils.AuthenticationUtil @ admin:session_id=90164979A706A6AD7587255540DD4B73:ip_addr=195.113.18.216:login:type=explicit
+2014-06-24 18:51:04,629 INFO  net.sf.ehcache.util.UpdateChecker @ New update(s) found: 2.4.7 [http://www.terracotta.org/confluence/display/release/Release+Notes+Ehcache+Core+2.4]
+2014-06-24 18:51:07,887 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-non_engines.txt
+2014-06-24 18:51:07,894 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-google.txt
+2014-06-24 18:51:07,899 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-altavista.txt
+2014-06-24 18:51:07,901 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-excite.txt
+2014-06-24 18:51:07,916 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-inktomi.txt
+2014-06-24 18:51:07,974 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-misc.txt
+2014-06-24 18:51:07,977 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-lycos.txt
+2014-06-24 18:51:07,980 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/ufal.ignore.txt
+2014-06-24 18:51:07,983 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-infoseek.txt
+2014-06-24 18:51:07,985 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/ufal.ignore.txt-20140415-110007.old
+2014-06-24 18:51:07,988 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/ufal.ignore.txt-20140424-175345.old
+2014-06-24 18:51:07,990 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/ufal.ignore.txt-20140512-145838.old
+2014-06-24 18:51:17,728 INFO  net.sf.ehcache.util.UpdateChecker @ New update(s) found: 2.4.7 [http://www.terracotta.org/confluence/display/release/Release+Notes+Ehcache+Core+2.4]
+2014-06-24 18:51:18,318 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-non_engines.txt
+2014-06-24 18:51:18,333 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-google.txt
+2014-06-24 18:51:18,342 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-altavista.txt
+2014-06-24 18:51:18,344 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-excite.txt
+2014-06-24 18:51:18,385 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-inktomi.txt
+2014-06-24 18:51:18,591 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-misc.txt
+2014-06-24 18:51:18,602 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-lycos.txt
+2014-06-24 18:51:18,605 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/ufal.ignore.txt
+2014-06-24 18:51:18,615 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/iplists.com-infoseek.txt
+2014-06-24 18:51:18,618 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/ufal.ignore.txt-20140415-110007.old
+2014-06-24 18:51:18,619 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/ufal.ignore.txt-20140424-175345.old
+2014-06-24 18:51:18,621 INFO  cz.cuni.mff.ufal.statistics.SimpleSpiderDetector @ Loaded Spider IP file: /home/josifko/work/opt/projects/lindat-repo/ufal/installations/dspace/dspace-1.8.2/config/spiders/ufal.ignore.txt-20140512-145838.old
+2014-06-24 18:59:18,557 INFO  org.dspace.content.MetadataField @ Loading MetadataField elements into cache.
+2014-06-24 18:59:18,575 INFO  org.dspace.content.MetadataSchema @ Loading schema cache for fast finds

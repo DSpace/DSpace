@@ -32,8 +32,8 @@ public class PIDLogMinerTest
         cal.add(Calendar.DATE, 2);
         Date endDate = cal.getTime();
 
-        String logDir = this.getClass().getResource("/dspaceFolder/log/")
-                .getPath();
+        String logDir = PIDLogMinerTest.class.getClassLoader().getResource("./")
+                .getPath()+"../testing/dspace/log";
         PIDLogMiner logMiner = new PIDLogMiner(logDir);
         int topN = 3;
         PIDLogStatistics statistics = logMiner.computeStatistics(startDate, endDate);

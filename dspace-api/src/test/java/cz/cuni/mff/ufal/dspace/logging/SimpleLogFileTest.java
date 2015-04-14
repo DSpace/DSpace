@@ -14,8 +14,8 @@ public class SimpleLogFileTest
     @Test
     public void testLogEntriesCount()
     {
-        URL url = this.getClass().getResource("/dspaceFolder/log/dspace.log");
-        File file = new File(url.getFile());
+        String filePath = SimpleLogFileTest.class.getClassLoader().getResource("./").getPath() + "../testing/dspace/log/dspace.log";
+        File file = new File(filePath);
         
         assertTrue("Test log file not found", file.exists());
         assertTrue("Test log file not readable", file.canRead());
