@@ -43,8 +43,7 @@ import org.dspace.usage.UsageEvent;
  * 
  */
 @Path("/metadataregistry")
-//public class MetadataRegistryResource extends Resource
-public class MetadataRegistryResource 
+public class MetadataRegistryResource extends Resource
 {
     private static Logger log = Logger.getLogger(MetadataRegistryResource.class);
 
