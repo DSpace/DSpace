@@ -33,7 +33,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.rest.common.MetadataSchema;
 import org.dspace.rest.common.MetadataField;
-//import org.dspace.rest.exceptions.ContextException;
+import org.dspace.rest.exceptions.ContextException;
 import org.dspace.usage.UsageEvent;
 
 /**
@@ -69,8 +69,7 @@ public class MetadataRegistryResource
 
         try
         {
-            //context = createContext(getUser(headers));
-            context = new org.dspace.core.Context();
+            context = createContext(getUser(headers));
 
             org.dspace.content.MetadataSchema[] schemas = org.dspace.content.MetadataSchema.findAll(context);
             metadataSchemas = new ArrayList<MetadataSchema>();
@@ -82,17 +81,15 @@ public class MetadataRegistryResource
         }
         catch (SQLException e)
         {
-            //processException("Could not read schemas, SQLException. Message:" + e, context);
-            log.error(e.getMessage());
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+            processException("Could not read schemas, SQLException. Message:" + e, context);
         }
-        //catch (ContextException e)
-        //{
-        //    processException("Could not read schemas, ContextException. Message:" + e.getMessage(), context);
-        //}
+        catch (ContextException e)
+        {
+            processException("Could not read schemas, ContextException. Message:" + e.getMessage(), context);
+        }
         finally
         {
-            //processFinally(context);
+            processFinally(context);
         }
 
         log.trace("All schemas successfully read.");
