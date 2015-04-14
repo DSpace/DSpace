@@ -42,5 +42,5 @@ script:
   - make print_message
   - make test_dspace_database
   - make test_utilities_database
-  - cd ../sources/dspace-api && mvn -Dmaven.test.skip=false -Dtest=cz.cuni.mff.ufal.dspace.**.*Test,cz.cuni.mff.ufal.*Test -DfailIfNoTests=false test && cd ../../
+  - cd ../sources/ && mvn -Dmaven.test.skip=false -Dtest=cz.cuni.mff.ufal.dspace.**.*Test,cz.cuni.mff.ufal.*Test -DfailIfNoTests=false test && cd ../
   - #make selenium_tests || echo "Tests failed"

@@ -106,7 +106,7 @@
                         <goals>
                             <goal>war</goal>
                         </goals>
-                        <phase>package</phase>
+                        <phase>compile</phase>
                     </execution>
                 </executions>
             </plugin>
