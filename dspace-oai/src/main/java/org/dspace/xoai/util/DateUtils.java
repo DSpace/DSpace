@@ -29,10 +29,13 @@ public class DateUtils
     {
         return format(date, true);
     }
+
     public static String format(Date date, boolean init)
     {
-    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.'000Z'");
-    	if (!init) sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.'999Z'");
+        SimpleDateFormat sdf = new SimpleDateFormat(
+                "yyyy-MM-dd'T'HH:mm:ss.'000Z'");
+        if (!init)
+            sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.'999Z'");
         // We indicate that the returned date is in Zulu time (UTC) so we have
         // to set the time zone of sdf correct.
         sdf.setTimeZone(TimeZone.getTimeZone("ZULU"));
@@ -42,50 +45,62 @@ public class DateUtils
 
     public static Date parse(String date)
     {
-        // 2008-01-01T00:00:00Z
+        // in org.dspace.xoai.util.DateUtils.format(Date, boolean) we format all
+        // dates with trailing milliseconds so we have to use them when parsing
         SimpleDateFormat format = new SimpleDateFormat(
-                "yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault());
-        // format.setTimeZone(TimeZone.getTimeZone("ZULU"));
+                "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        format.setTimeZone(TimeZone.getTimeZone("ZULU"));
         Date ret;
         try
         {
             ret = format.parse(date);
             return ret;
         }
-        catch (ParseException e)
+        catch (ParseException ex)
         {
-            format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",
+            // 2008-01-01T00:00:00Z
+            format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'",
                     Locale.getDefault());
             try
             {
                 return format.parse(date);
             }
-            catch (ParseException e1)
+            catch (ParseException e)
             {
-                format = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",
+                        Locale.getDefault());
                 try
                 {
                     return format.parse(date);
                 }
-                catch (ParseException e2)
+                catch (ParseException e1)
                 {
-                    format = new SimpleDateFormat("yyyy-MM",
+                    format = new SimpleDateFormat("yyyy-MM-dd",
                             Locale.getDefault());
                     try
                     {
                         return format.parse(date);
                     }
-                    catch (ParseException e3)
+                    catch (ParseException e2)
                     {
-                        format = new SimpleDateFormat("yyyy",
+                        format = new SimpleDateFormat("yyyy-MM",
                                 Locale.getDefault());
                         try
                         {
                             return format.parse(date);
                         }
-                        catch (ParseException e4)
+                        catch (ParseException e3)
                         {
-                            log.error(e4.getMessage(), e);
+                            format = new SimpleDateFormat("yyyy",
+                                    Locale.getDefault());
+                            try
+                            {
+                                return format.parse(date);
+                            }
+                            catch (ParseException e4)
+                            {
+                                log.error(e4.getMessage(), e);
+                            }
                         }
                     }
                 }
@@ -96,7 +111,8 @@ public class DateUtils
 
     public static Date parseFromSolrDate(String date)
     {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault());
+        SimpleDateFormat format = new SimpleDateFormat(
+                "yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault());
         Date ret;
         try
         {
