@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>dspace-cris-webservices</artifactId>
 		<groupId>org.dspace</groupId>
-		<version>CRIS-4.3.0</version>
+		<version>CRIS-4.3.1-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>dspace-cris-webservices-api</artifactId>
