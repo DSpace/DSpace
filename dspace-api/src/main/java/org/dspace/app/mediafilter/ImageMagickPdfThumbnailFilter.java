@@ -7,9 +7,10 @@
  */
 package org.dspace.app.mediafilter;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
 
 public class ImageMagickPdfThumbnailFilter extends ImageMagickThumbnailFilter {
    public InputStream getDestinationStream(InputStream source)
@@ -17,8 +18,12 @@ public class ImageMagickPdfThumbnailFilter extends ImageMagickThumbnailFilter {
     {
 		File f = inputStreamToTempFile(source, "impdfthumb", ".pdf");
 		File f2 = getImageFile(f, 0);
+	    f.delete();
     	File f3 = getThumbnailFile(f2);
-    	return new FileInputStream(f3);
+	    f2.delete();
+	    byte[] bytes = Files.readAllBytes(f3.toPath());
+	    f3.delete();
+	    return new ByteArrayInputStream(bytes);
     }
 
    public static final String[] PDF = {"Adobe PDF"};

@@ -7,9 +7,10 @@
  */
 package org.dspace.app.mediafilter;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
 
 
 /**
@@ -31,7 +32,10 @@ public class ImageMagickImageThumbnailFilter extends ImageMagickThumbnailFilter
     {
 		File f = inputStreamToTempFile(source, "imthumb", ".tmp");
     	File f2 = getThumbnailFile(f);
-		return new FileInputStream(f2);
+	    f.delete();
+	    byte[] bytes = Files.readAllBytes(f2.toPath());
+	    f2.delete();
+	    return new ByteArrayInputStream(bytes);
     }
 
 
