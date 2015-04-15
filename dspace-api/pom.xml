@@ -105,6 +105,7 @@
                         <exclude>**/src/test/data/**</exclude>
                         <exclude>**/.gitignore</exclude>
                         <exclude>src/test/data/dspaceFolder/config/spiders/**</exclude>
+                        <exclude>**/rebel.xml</exclude>
                     </excludes>
                 </configuration>
             </plugin>

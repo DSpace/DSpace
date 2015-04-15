@@ -3,9 +3,8 @@
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
  *
- * http://www.dspace.org/license/
+ * https://github.com/CILEA/dspace-cris/wiki/License
  */
-
 package org.dspace.app.cris.integration.authority;
 
 import it.cilea.osd.jdyna.utils.HashUtil;
@@ -190,6 +189,9 @@ public class CrisConsumer implements Consumer {
 							ResearcherPageUtils.buildTextValue(rp, authorityKey, typeAuthority.toLowerCase());	
 						}						
 
+						if(activateNewObject) {
+							rp.setStatus(true);
+						}
 						applicationService.saveOrUpdate(crisTargetClass, rp);
 						rpKey = rp.getCrisID();
 					}

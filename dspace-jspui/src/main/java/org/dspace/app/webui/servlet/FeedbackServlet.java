@@ -18,8 +18,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.validator.EmailValidator;
 import org.dspace.app.webui.util.JSPManager;
+import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -70,6 +72,12 @@ public class FeedbackServlet extends DSpaceServlet
             throw new AuthorizeException();
         }
 
+        //the feedback request is sent by DSpace-CRIS Claim Profile
+        String crisClaim = request.getParameter("claimProfile");
+        if(StringUtils.isNotBlank(crisClaim)) {
+        	request.setAttribute("feedback.crisclaim", crisClaim);
+        }
+        
         // The email address they provided
         String formEmail = request.getParameter("email");
 

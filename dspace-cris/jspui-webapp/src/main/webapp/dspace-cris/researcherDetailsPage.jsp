@@ -289,7 +289,7 @@
 				<div class="btn-group">				
 				<c:choose>				
 					<c:when test="${empty researcher.email.value}">
-						<a class="btn btn-primary" href="<%= request.getContextPath() %>/feedback"><i class="fa fa-user"></i>&nbsp;<fmt:message key="jsp.cris.detail.info.claimrp"/></a>
+						<a class="btn btn-primary" href="<%= request.getContextPath() %>/feedback?claimProfile=${researcher.crisID}"><i class="fa fa-user"></i>&nbsp;<fmt:message key="jsp.cris.detail.info.claimrp"/></a>
 					</c:when>
 					<c:otherwise>
 						<span id="claim-rp" class="btn btn-primary"><i class="fa fa-user"></i>&nbsp;<fmt:message key="jsp.cris.detail.info.claimrp"/></span>

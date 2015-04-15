@@ -45,16 +45,28 @@
     {
 		fromPage = "";
     }
+    
+    String crisClaimedProfile = (String)request.getAttribute("feedback.crisclaim");
 %>
 
 <dspace:layout titlekey="jsp.feedback.form.title">
     <%-- <h1>Feedback Form</h1> --%>
     <h1><fmt:message key="jsp.feedback.form.title"/></h1>
 
-    <%-- <p>Thanks for taking the time to share your feedback about the
-    DSpace system. Your comments are appreciated!</p> --%>
-    <p><fmt:message key="jsp.feedback.form.text1"/></p>
-
+<%
+    if (crisClaimedProfile!=null)
+    {
+%>
+        <p><fmt:message key="jsp.feedback.form.isaclaimprofile"><fmt:param><%= crisClaimedProfile %></fmt:param></fmt:message></p>
+<%
+    } else {
+%>
+    	<%-- <p>Thanks for taking the time to share your feedback about the
+    	DSpace system. Your comments are appreciated!</p> --%>
+    	<p><fmt:message key="jsp.feedback.form.text1"/></p>
+<%
+    }
+%>
 <%
     if (problem)
     {
@@ -78,7 +90,20 @@
 			<div class="input-group-addon">
 				<span class="col-md-2"><label for="tfeedback"><fmt:message
 							key="jsp.feedback.form.comment" /></label></span> <span class="col-md-5">
-				<textarea class="form-control" name="feedback" id="tfeedback" rows="6" cols="50"><%=StringEscapeUtils.escapeHtml(feedback)%></textarea>			
+							
+							<%
+    if (crisClaimedProfile!=null)
+    {
+%>
+            <textarea class="form-control" name="feedback" id="tfeedback" rows="6" cols="50"><fmt:message key="jsp.feedback.textclaim"><fmt:param><%= crisClaimedProfile %></fmt:param></fmt:message></textarea>
+<%
+    } else {
+%>
+			<textarea class="form-control" name="feedback" id="tfeedback" rows="6" cols="50"><%=StringEscapeUtils.escapeHtml(feedback)%></textarea>
+<%
+    }
+%>
+				
 				</span>
 			</div>			
 		</div>
