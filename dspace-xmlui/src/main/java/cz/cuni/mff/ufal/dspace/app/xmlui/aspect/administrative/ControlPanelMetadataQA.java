@@ -31,6 +31,7 @@ import org.dspace.content.ItemIterator;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
@@ -95,10 +96,11 @@ public class ControlPanelMetadataQA extends AbstractControlPanelTab {
                         "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
             }
 
-        String query = "SELECT DISTINCT(item.item_id) FROM metadatavalue,item WHERE "+
-                       "item.item_id = metadatavalue.resource_id AND metadata_field_id = ? AND item.in_archive='1'";
+        String query = "SELECT DISTINCT(item.item_id) " +
+                       "FROM metadatavalue JOIN item ON item.item_id = metadatavalue.resource_id " +
+                       "WHERE resource_type_id = ? AND metadata_field_id = ? AND item.in_archive='1'";
         java.util.List<Integer> itemids = new ArrayList<Integer>();
-        TableRowIterator rows = DatabaseManager.queryTable(context, "item", query, mdf.getFieldID());
+        TableRowIterator rows = DatabaseManager.query(context, query, Constants.ITEM, mdf.getFieldID());
         while ( rows.hasNext() ) {
             TableRow row = rows.next();
             itemids.add( row.getIntColumn("item_id"));
