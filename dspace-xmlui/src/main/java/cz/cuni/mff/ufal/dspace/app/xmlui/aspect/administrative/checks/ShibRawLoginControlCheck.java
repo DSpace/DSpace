@@ -46,6 +46,7 @@ public class ShibRawLoginControlCheck extends AbstractControlPanelTab {
 		String[] log_files = IOUtils.list_files( input_dir, default_log );
 		if(log_files == null || log_files.length == 0){
 			html.warning("No log files found, check your settings. Serching for "+default_log+" in "+input_dir);
+			return;
 		}
 
 		html.file_chooser( log_files );
