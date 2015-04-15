@@ -17,7 +17,7 @@
 SHELL=/bin/bash
 #export JAVA_HOME=/usr/lib/jvm/jdk1.7.0
 ifeq ("${MAVEN_OPTS}","")
-export MAVEN_OPTS=-Xmx6g -Xms6g -XX:+UseG1GC
+export MAVEN_OPTS=-Xmx6g -Xms1g -XX:+UseG1GC
 endif
 ifeq ("${MAVEN_OPTS}","")
 $(error MAVEN_OPTS not set)
