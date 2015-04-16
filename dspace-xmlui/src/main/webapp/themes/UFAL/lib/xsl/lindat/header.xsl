@@ -24,7 +24,15 @@
     <xsl:output indent="yes" />
 
     <xsl:template name="buildHeader">
-      <xsl:copy-of select="document('../../lindat/header.htm')" />
+      <xsl:variable name="active-locale" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='currentLocale']"/>
+      <xsl:choose>
+          <xsl:when test="$active-locale='cs'">
+              <xsl:copy-of select="document('../../lindat/cs/header.htm')" />
+          </xsl:when>
+          <xsl:otherwise>
+              <xsl:copy-of select="document('../../lindat/header.htm')" />
+          </xsl:otherwise>
+      </xsl:choose>
     </xsl:template>
 
 </xsl:stylesheet>

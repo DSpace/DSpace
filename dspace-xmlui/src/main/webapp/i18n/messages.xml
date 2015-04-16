@@ -2932,5 +2932,9 @@
   <message key="xmlui.aspect.submission.submit.DisplayShareLink.trail">Share link</message>
   <message key="xmlui.aspect.submission.submit.DisplayShareLink.head">Share link</message>
   <message key="xmlui.aspect.submission.submit.DisplayShareLink.para">To pass your submission to another user give them the following link: <span class="linkify">{0}</span></message>
+
+  <!-- homepage -->
+  <message key="homepage.most_viewed_items">Most Viewed Items</message>
+  <message key="homepage.top_week">Top Last Week</message>
 </catalogue>
 

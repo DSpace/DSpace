@@ -62,6 +62,9 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
     private static final String T_head_visits_countries = "xmlui.statistics.visits.countries";
     private static final String T_head_visits_cities = "xmlui.statistics.visits.cities";
     private static final String T_head_visits_bitstream = "xmlui.statistics.visits.bitstreams";
+    
+    private static final Message T_most_viewed = message("homepage.most_viewed_items");
+    private static final String T_top_week = "homepage.top_week";
 
     private Date dateStart = null;
     private Date dateEnd = null;
@@ -138,7 +141,7 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 		
 		Division home = body.addDivision("home", "primary repository");
 		Division division = home.addDivision("stats", "secondary stats");
-		division.setHead("Most Viewed Items");
+		division.setHead(T_most_viewed);
 		try {
 
 			/** List of the top 10 items for the entire repository Last week **/
@@ -151,7 +154,7 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 			cal.add(Calendar.WEEK_OF_MONTH, -1);
 			dateFilter.setStartDate(cal.getTime());
 			statListing.addFilter(dateFilter);			
-			statListing.setTitle("Top Last Week");
+			statListing.setTitle(T_top_week);
 
             //Adding a new generator for our top 10 items without a name length delimiter
             DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();

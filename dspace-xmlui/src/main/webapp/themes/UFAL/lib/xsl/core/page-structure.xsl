@@ -374,8 +374,8 @@
         templates of the body's child elements (which consists entirely of dri:div tags).
     -->
     <xsl:template match="dri:body">
-        
-        <xsl:call-template name="userbox" />
+
+        <xsl:call-template name="navbar" />
         
         <div class="container-fluid">
             
@@ -417,7 +417,6 @@
             </div>
         </div>
     </xsl:template>
-
 
     <!-- Currently the dri:meta element is not parsed directly. Instead, parts of it are referenced from inside
         other elements (like reference). The blank template below ends the execution of the meta branch -->

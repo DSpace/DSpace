@@ -262,8 +262,8 @@
 
 
 	<xsl:template match="dri:body">
-        
-        <xsl:call-template name="userbox" />
+
+        <xsl:call-template name="navbar" />
         
 		<div class="container-fluid">
 			<div class="container">
@@ -287,7 +287,7 @@
 
 		       	<div class="visible-xs text-center" style="margin-top: 5px; ">
 					<button id="showhidemenu" type="button" class="btn btn-default btn-sm" style="border-radius: 30px; width: 100%;">
-							<i class="fa fa-align-justify">&#160;</i> Show/Hide Menu
+							<i class="fa fa-align-justify">&#160;</i> <i18n:text i18n:key="homepage.show_hide_menu">Show/Hide Menu</i18n:text>
 					</button>        	        		
 		       	</div>        
 
@@ -304,7 +304,7 @@
 								<xsl:call-template name="recent-submission" />
 							</xsl:when>
 							<xsl:otherwise>
-										<div class="alert alert-warning">No Recent Items !</div>
+										<div class="alert alert-warning"><i18n:text i18n:key="homepage.norecent">No Recent Items !</i18n:text></div>
 							</xsl:otherwise>
 						</xsl:choose>
 
@@ -377,7 +377,7 @@
 		<xsl:for-each
 			select="/dri:document/dri:body/dri:div[@n='site-home']/dri:div[@n='site-recent-submission']">
 			<div class="well well-lg" id="recent-submissions">
-				<h3 class="recent-submissions-head">What's New</h3>
+				<h3 class="recent-submissions-head"><i18n:text i18n:key="homepage.whatsnew">What's New</i18n:text></h3>
 				<xsl:for-each select="dri:referenceSet">
 					<xsl:for-each select="dri:reference">
 						<xsl:if test="position() &lt; 4">
@@ -515,7 +515,7 @@
 		</div>
 		<div class="artifact-info">
 			<div class="author-head">
-				Author(s):
+				<i18n:text i18n:key="homepage.item.authors">Author(s):</i18n:text>
 			</div>
 			<div class="author">
 				<xsl:choose>
@@ -562,7 +562,7 @@
 				<xsl:variable name="abstract"
 					select="dim:field[@element = 'description' and @qualifier='abstract']/node()" />
 				<div class="artifact-abstract-head">
-					Description:
+					<i18n:text i18n:key="homepage.item.description">Description:</i18n:text>
 				</div>
 				<div class="artifact-abstract">
 					<xsl:value-of select="util:shortenString($abstract, 220, 10)" />
@@ -572,7 +572,7 @@
 				<xsl:variable name="description"
 					select="dim:field[@element = 'description' and not(@qualifier)]/node()" />
 				<div class="artifact-abstract-head">
-					Description:
+					<i18n:text i18n:key="homepage.item.description">Description:</i18n:text>
 				</div>
 				<div class="artifact-abstract">
 					<xsl:value-of select="util:shortenString($description, 220, 10)" />
@@ -838,17 +838,17 @@
 				<div class="item active">
 					<div style="position: relative; height: 180px;">
 						<img style="width: 100px; position: absolute; left: 22%; top: 20%" src="{$context-path}/themes/UFALHome/lib/images/glass.png" />
-						<h3 style="left: 34%; position: absolute; top: 25%;">Linguistic Data and NLP Tools</h3>
-						<h5 style="left: 40%; position: absolute; top: 15%;">Find</h5>
-						<h5 style="left: 54%; position: absolute; top: 45%;">Citation Support (with Persistent IDs)</h5>
+						<h3 style="left: 34%; position: absolute; top: 25%;"><i18n:text i18n:key="homepage.carousel.data_tools">Linguistic Data and NLP Tools</i18n:text></h3>
+						<h5 style="left: 40%; position: absolute; top: 15%;"><i18n:text i18n:key="homepage.carousel.find">Find</i18n:text></h5>
+						<h5 style="left: 54%; position: absolute; top: 45%;"><i18n:text i18n:key="homepage.carousel.citation_support">Citation Support (with Persistent IDs)</i18n:text></h5>
 					</div>
 				</div>
 				<div class="item">
 					<div style="position: relative; height: 180px;">
-						<h3 style="left: 40%; position: absolute; top: 10%;">Deposit Free and Safe</h3>
-						<h5 style="left: 28%; position: absolute; top: 30%;">License of your Choice (Open licenses encouraged)</h5>
-						<h5 style="left: 32%; position: absolute; top: 42%;">Easy to Find</h5>
-						<h5 style="left: 36%; position: absolute; top: 54%;">Easy to Cite</h5>
+						<h3 style="left: 40%; position: absolute; top: 10%;"><i18n:text i18n:key="homepage.carousel.deposit">Deposit Free and Safe</i18n:text></h3>
+						<h5 style="left: 28%; position: absolute; top: 30%;"><i18n:text i18n:key="homepage.carousel.license">License of your Choice (Open licenses encouraged)</i18n:text></h5>
+						<h5 style="left: 32%; position: absolute; top: 42%;"><i18n:text i18n:key="homepage.carousel.easy_find">Easy to Find</i18n:text></h5>
+						<h5 style="left: 36%; position: absolute; top: 54%;"><i18n:text i18n:key="homepage.carousel.easy_cite">Easy to Cite</i18n:text></h5>
 					</div>
 				</div>
 				<div class="item">
@@ -857,9 +857,9 @@
 							<blockquote>
 								<strong>
 									<i class="fa fa-quote-left fa-2x pull-left">&#160;</i>
-									“There ought to be only one grand dépôt of art in the world, to
+									<i18n:text i18n:key="homepage.carousel.quote">“There ought to be only one grand dépôt of art in the world, to
 									which the artist might repair with his works, and on presenting them
-									receive what he required... ”
+									receive what he required... ”</i18n:text>
 								</strong>
 								<small>Ludwig van Beethoven, 1801</small>
 							</blockquote>

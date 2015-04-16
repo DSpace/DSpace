@@ -32,7 +32,15 @@
                     <xsl:text>&#160;</xsl:text>
                 </a>
 
-      <xsl:copy-of select="document('../../lindat/footer.htm')" />
+      <xsl:variable name="active-locale" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='currentLocale']"/>
+      <xsl:choose>
+          <xsl:when test="$active-locale='cs'">
+              <xsl:copy-of select="document('../../lindat/cs/footer.htm')" />
+          </xsl:when>
+          <xsl:otherwise>
+              <xsl:copy-of select="document('../../lindat/footer.htm')" />
+          </xsl:otherwise>
+      </xsl:choose>
     </xsl:template>
 
 
