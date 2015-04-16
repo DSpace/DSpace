@@ -19,6 +19,7 @@ import org.apache.solr.client.solrj.request.AbstractUpdateRequest;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.client.solrj.request.LukeRequest;
+import org.apache.solr.client.solrj.response.FieldStatsInfo;
 import org.apache.solr.client.solrj.response.LukeResponse;
 import org.apache.solr.client.solrj.response.RangeFacet;
 import org.apache.solr.common.SolrDocumentList;
@@ -439,10 +440,10 @@ public class SolrImportExport
 			}
 		}
 
-		query.setRows(1);
-		query.setFields(timeField);
-		query.setSort(timeField, SolrQuery.ORDER.asc);
-		Date earliestTimestamp = (Date) solr.query(query).getResults().get(0).getFirstValue(timeField);
+		query.setRows(0);
+		query.setGetFieldStatistics(timeField);
+		Map<String, FieldStatsInfo> fieldInfo = solr.query(query).getFieldStatsInfo();
+		Date earliestTimestamp = (Date) fieldInfo.get(timeField).getMin();
 
 		query.clearSorts();
 		query.setRows(0);
