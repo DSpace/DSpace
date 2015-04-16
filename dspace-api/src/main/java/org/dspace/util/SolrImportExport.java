@@ -247,13 +247,17 @@ public class SolrImportExport
 			swapRequest.setAction(CoreAdminParams.CoreAdminAction.SWAP);
 			swapRequest.process(adminSolr);
 
-			// export all docs from now-temp core...
-			exportIndex(tempIndexName, exportDir, tempSolrUrl, timeField);
+			// export all docs from now-temp core into a temporary directory...
+			String tempExportDirName = ConfigurationManager.getProperty("dspace.dir") + File.separator + "temp" + File.separator + "solr-data-tmp";
+			exportIndex(tempIndexName, tempExportDirName, tempSolrUrl, timeField);
 			// ...and import them into the now-again-actual core *without* clearing
-			importIndex(tempIndexName, exportDir, false, origSolrUrl);
+			importIndex(tempIndexName, tempExportDirName, false, origSolrUrl);
 
 			// commit changes
 			origSolr.commit();
+
+			// delete temporary export dir
+			FileUtils.deleteDirectory(new File(tempExportDirName));
 
 			// unload now-temp core (temp core name)
 			CoreAdminRequest.unloadCore(tempIndexName, false, false, adminSolr);
@@ -330,6 +334,8 @@ public class SolrImportExport
 			log.warn("No export files found in directory " + fromDir + " for index " + indexName);
 			return;
 		}
+
+		Arrays.sort(files);
 
 		for (File file : files)
 		{
@@ -443,8 +449,18 @@ public class SolrImportExport
 		query.setRows(0);
 		query.setGetFieldStatistics(timeField);
 		Map<String, FieldStatsInfo> fieldInfo = solr.query(query).getFieldStatsInfo();
-		Date earliestTimestamp = (Date) fieldInfo.get(timeField).getMin();
+		if (fieldInfo == null || !fieldInfo.containsKey(timeField)) {
+			log.warn("Cannot get earliest date, not exporting index " + indexName + ", time field " + timeField + ", from " + fromWhen);
+			return;
+		}
+		FieldStatsInfo timeFieldInfo = fieldInfo.get(timeField);
+		if (timeFieldInfo == null || timeFieldInfo.getMin() == null) {
+			log.warn("Cannot get earliest date, not exporting index " + indexName + ", time field " + timeField + ", from " + fromWhen);
+			return;
+		}
+		Date earliestTimestamp = (Date) timeFieldInfo.getMin();
 
+		query.setGetFieldStatistics(false);
 		query.clearSorts();
 		query.setRows(0);
 		query.setFacet(true);
