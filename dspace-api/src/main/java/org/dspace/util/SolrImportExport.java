@@ -8,6 +8,7 @@
 package org.dspace.util;
 
 import org.apache.commons.cli.*;
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -19,17 +20,18 @@ import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.client.solrj.request.LukeRequest;
 import org.apache.solr.client.solrj.response.LukeResponse;
+import org.apache.solr.client.solrj.response.RangeFacet;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.luke.FieldFlag;
 import org.apache.solr.common.params.CoreAdminParams;
+import org.apache.solr.common.params.FacetParams;
 import org.dspace.core.ConfigurationManager;
 
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.text.*;
 import java.util.*;
 
 /**
@@ -40,7 +42,8 @@ public class SolrImportExport
 {
 
 	private static final DateFormat SOLR_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-	private static final DateFormat EXPORT_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
+	private static final DateFormat SOLR_DATE_FORMAT_NO_MS = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+	private static final DateFormat EXPORT_DATE_FORMAT = new SimpleDateFormat("yyyy-MM");
 
 	static
 	{
@@ -394,19 +397,19 @@ public class SolrImportExport
 	}
 
 	/**
-	 * Exports documents from the given index to the specified target directory in batches of #ROWS_PER_FILE, starting at lastValue (or all documents).
+	 * Exports documents from the given index to the specified target directory in batches of #ROWS_PER_FILE, starting at fromWhen (or all documents).
 	 * See #makeExportFilename for the file names that are generated.
 	 *
 	 * @param indexName The index to export.
 	 * @param toDir The target directory for the export. Will be created if it doesn't exist yet. The directory must be writeable.
 	 * @param solrUrl The solr URL for the index to export. Must not be null.
 	 * @param timeField The time field to use for sorting the export. Must not be null.
-	 * @param lastValue Optionally, from when to export. See options for allowed values. If null or empty, all documents will be exported.
+	 * @param fromWhen Optionally, from when to export. See options for allowed values. If null or empty, all documents will be exported.
 	 * @throws SolrServerException if there is a problem with exporting the index.
 	 * @throws IOException if there is a problem creating the files or communicating with Solr.
 	 * @throws SolrImportExportException if there is a problem in communicating with Solr.
 	 */
-	public static void exportIndex(String indexName, String toDir, String solrUrl, String timeField, String lastValue) throws SolrServerException, IOException, SolrImportExportException
+	public static void exportIndex(String indexName, String toDir, String solrUrl, String timeField, String fromWhen) throws SolrServerException, IOException, SolrImportExportException
 	{
 		if (StringUtils.isBlank(solrUrl))
 		{
@@ -424,41 +427,71 @@ public class SolrImportExport
 			throw new SolrImportExportException("Could not create target directory " + toDir + ", aborting export of index ");
 		}
 
+		HttpSolrServer solr = new HttpSolrServer(solrUrl);
+
 		SolrQuery query = new SolrQuery("*:*");
-		if (StringUtils.isNotBlank(lastValue))
+		if (StringUtils.isNotBlank(fromWhen))
 		{
-			String lastValueFilter = makeFilterQuery(timeField, lastValue);
+			String lastValueFilter = makeFilterQuery(timeField, fromWhen);
 			if (StringUtils.isNotBlank(lastValueFilter))
 			{
 				query.addFilterQuery(lastValueFilter);
 			}
 		}
 
-		HttpSolrServer solr = new HttpSolrServer(solrUrl);
-		SolrDocumentList results = solr.query(query).getResults();
-		long totalRecords = results.getNumFound();
-
-		query.setRows(ROWS_PER_FILE);
-		query.set("wt", "csv");
-		query.set("fl", "*");
+		query.setRows(1);
+		query.setFields(timeField);
 		query.setSort(timeField, SolrQuery.ORDER.asc);
+		Date earliestTimestamp = (Date) solr.query(query).getResults().get(0).getFirstValue(timeField);
 
-		Date exportStart = new Date();
+		query.clearSorts();
+		query.setRows(0);
+		query.setFacet(true);
+		query.add(FacetParams.FACET_RANGE, timeField);
+		query.add(FacetParams.FACET_RANGE_START, SOLR_DATE_FORMAT.format(earliestTimestamp) + "/MONTH");
+		query.add(FacetParams.FACET_RANGE_END, "NOW/MONTH+1MONTH");
+		query.add(FacetParams.FACET_RANGE_GAP, "+1MONTH");
+		query.setFacetMinCount(1);
 
-		for (int i = 0; i < totalRecords; i+= ROWS_PER_FILE)
-		{
-			query.setStart(i);
-			URL url = new URL(solrUrl + "/select?" + query.toString());
+		List<RangeFacet.Count> monthFacets = solr.query(query).getFacetRanges().get(0).getCounts();
 
-			File file = new File(targetDir.getCanonicalPath(), makeExportFilename(indexName, exportStart, totalRecords, i));
-			if (file.createNewFile())
+		for (RangeFacet.Count monthFacet : monthFacets) {
+			Date monthStartDate;
+			String monthStart = monthFacet.getValue();
+			try
 			{
-				FileUtils.copyURLToFile(url, file);
-				log.info("Exported batch " + i + " to " + file.getCanonicalPath());
+				monthStartDate = SOLR_DATE_FORMAT_NO_MS.parse(monthStart);
 			}
-			else
+			catch (java.text.ParseException e)
 			{
-				throw new SolrImportExportException("Could not create file " + file.getCanonicalPath() + " while exporting index " + indexName + ", batch " + i);
+				throw new SolrImportExportException("Could not read start of month batch as date: " + monthStart, e);
+			}
+			int docsThisMonth = monthFacet.getCount();
+
+			SolrQuery monthQuery = new SolrQuery("*:*");
+			monthQuery.setRows(ROWS_PER_FILE);
+			monthQuery.set("wt", "csv");
+			monthQuery.set("fl", "*");
+
+			monthQuery.addFilterQuery(timeField + ":[" +monthStart + " TO " + monthStart + "+1MONTH]");
+
+			for (int i = 0; i < docsThisMonth; i+= ROWS_PER_FILE)
+			{
+				monthQuery.setStart(i);
+				URL url = new URL(solrUrl + "/select?" + monthQuery.toString());
+
+				File file = new File(targetDir.getCanonicalPath(), makeExportFilename(indexName, monthStartDate, docsThisMonth, i));
+				if (file.createNewFile())
+				{
+					FileUtils.copyURLToFile(url, file);
+					log.info("Exported batch " + i + " to " + file.getCanonicalPath());
+				}
+				else
+				{
+					throw new SolrImportExportException("Could not create file " + file.getCanonicalPath() + " while exporting index " + indexName
+							                                    + ", month" + monthStart
+							                                    + ", batch " + i);
+				}
 			}
 		}
 	}
@@ -522,8 +555,7 @@ public class SolrImportExport
 		return indexName
 				       + "_export_"
 					   + EXPORT_DATE_FORMAT.format(exportStart)
-					   + "_"
-				       + exportFileNumber
+					   + (StringUtils.isNotBlank(exportFileNumber) ? "_" + exportFileNumber : "")
 				       + ".csv";
 	}
 
