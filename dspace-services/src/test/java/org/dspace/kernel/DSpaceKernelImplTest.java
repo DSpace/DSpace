@@ -5,16 +5,13 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.servicemanager;
+package org.dspace.kernel;
 
-import org.dspace.kernel.DSpaceKernelImpl;
 import static org.junit.Assert.*;
 
 import java.net.URL;
 import java.net.URLClassLoader;
 
-import org.dspace.kernel.DSpaceKernel;
-import org.dspace.kernel.DSpaceKernelManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
