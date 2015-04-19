@@ -2193,7 +2193,7 @@
 	<!-- DS-METS-1.0-QDC.xsl -->
 	<message key="xmlui.dri2xhtml.METS-1.0.no-preview">No preview available</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.no-title">Untitled</message>
-	<message key="xmlui.dri2xhtml.METS-1.0.no-author">Unknown author</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.no-author"></message>
 	<message key="xmlui.dri2xhtml.METS-1.0.non-conformant">
 		This is not a MOspace object conformant to the METS 1.0 profile and as such cannot be
         rendered effectively. You can override either the template that handles the general
