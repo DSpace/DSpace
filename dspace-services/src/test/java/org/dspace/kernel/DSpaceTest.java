@@ -5,13 +5,10 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.servicemanager;
+package org.dspace.kernel;
 
-import org.dspace.kernel.DSpaceKernelImpl;
 import static org.junit.Assert.*;
 
-import org.dspace.kernel.DSpaceKernel;
-import org.dspace.kernel.DSpaceKernelManager;
 import org.dspace.utils.DSpace;
 import org.junit.Test;
 
