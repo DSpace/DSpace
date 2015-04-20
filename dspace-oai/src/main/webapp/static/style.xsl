@@ -13,7 +13,8 @@
 	xmlns:lyn="http://www.lyncode.com/fakeNamespace" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
 	xmlns:dc="http://purl.org/dc/doc:elements/1.1/"
     xmlns:verb="http://informatik.hu-berlin.de/xmlverbatim"
-    exclude-result-prefixes="oai lyn oai_dc dc verb">
+    xmlns:oai_id="http://www.openarchives.org/OAI/2.0/oai-identifier"
+    exclude-result-prefixes="oai lyn oai_dc dc verb oai_id">
 
 	<xsl:output method="html" doctype-public="-//W3C//DTD HTML 4.01//EN" doctype-system="http://www.w3.org/TR/html4/strict.dtd" />
 
@@ -167,14 +168,14 @@
             <tr>
                 <td><b>Repository identifier</b></td>
                 <td>
-                    <xsl:value-of select="oai:description/oai:oai-identifier/oai:repositoryIdentifier/text()" />
+                    <xsl:value-of select="oai:description/oai_id:oai-identifier/oai_id:repositoryIdentifier/text()" />
                 </td>
             </tr>
             <tr>
                 <td><b>Sample identifier</b></td>
                 <td>
                     <xsl:value-of
-                            select="oai:description/oai:oai-identifier/oai:sampleIdentifier/text()" />
+                            select="oai:description/oai_id:oai-identifier/oai_id:sampleIdentifier/text()" />
                 </td>
             </tr>
             <tr>
