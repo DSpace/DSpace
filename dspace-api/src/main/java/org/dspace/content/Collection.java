@@ -28,6 +28,7 @@ import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
+import java.io.Serializable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.PreparedStatement;
@@ -350,8 +351,14 @@ public class Collection extends DSpaceObject
      */
     public static Collection[] findAll(Context context, Integer limit, Integer offset) throws SQLException
     {
-        TableRowIterator tri = DatabaseManager.queryTable(context, "collection",
-                "SELECT * FROM collection ORDER BY name limit ? offset ?", limit, offset);
+        StringBuffer query = new StringBuffer("SELECT * FROM collection ORDER BY name");
+        List<Serializable> params = new ArrayList<Serializable>();
+
+        DatabaseManager.applyOffsetAndLimit(query, params, offset, limit);
+
+        TableRowIterator tri = DatabaseManager.query(
+          context, query.toString(), params.toArray()
+        );
 
         List<Collection> collections = new ArrayList<Collection>();
 
