@@ -193,7 +193,7 @@
                         </img>
                     </xsl:when>
                     <xsl:otherwise>
-                        <img alt="xmlui.mirage2.item-list.thumbnail" i18n:attr="alt">
+                        <img class="img-thumbnail" alt="xmlui.mirage2.item-list.thumbnail" i18n:attr="alt">
                             <xsl:attribute name="data-src">
                                 <xsl:text>holder.js/100%x</xsl:text>
                                 <xsl:value-of select="$thumbnail.maxheight"/>
