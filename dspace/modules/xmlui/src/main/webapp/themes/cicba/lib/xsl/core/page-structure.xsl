@@ -362,6 +362,76 @@
 			}
 			</xsl:text>
 			</script>
+			
+			<script type="text/javascript">
+				<xsl:text disable-output-escaping="yes">
+				//Adds a group of radio buttons used for select an embargo period.				
+				var dateFieldHolder = '#aspect_submission_StepTransformer_field_embargo_until_date';
+				var fieldsetEmbargoDiv = '#aspect_submission_StepTransformer_list_submit-add-item-policy ol li:first-child div';
+				var embargoMessageField = '#embargoMessageOnSelect';
+				$(document).ready(function(){
+					var periods = new Array();
+					periods[0] = ["Sin embargo (Recomendado)",0];
+					periods[1] = ["3 meses",90];
+					periods[2] = ["6 meses",180];
+					periods[3] = ["1 año",365];
+					periods[4] = ["2 años",730];
+					periods[5] = ["Elija una fecha específica",''];
+					var radioButtonGenerator = getRadioButtonGenerator('periodos_embargo');
+					radioButtonGenerator.setRadioButtons(periods);
+					radioButtonGenerator.putRadioButtons(fieldsetEmbargoDiv,'div',true,true);
+					makeFieldReadonly(dateFieldHolder);
+					
+					actualizarFechaEmbargo = function cambiarValor(){
+												var daysToAdd = this.value;
+												if(daysToAdd > 0){
+													var embargoEndDate = calculateEmbargoEndDate(daysToAdd);
+													$(dateFieldHolder).val(embargoEndDate.getFullYear() + '-' + embargoEndDate.getMonth() + '-' + embargoEndDate.getDate());
+												}else{
+													$(dateFieldHolder).val('');
+												}
+												$(dateFieldHolder).change();
+											}
+					
+					radioButtonGenerator.addControllerToRadioButton([0,1,2,3,4],actualizarFechaEmbargo,'click');
+					var radio = radioButtonGenerator.getRadioButtonInDocument(5);
+					radio.datepicker({
+						altFormat: 'yy-mm-dd',
+						altField: dateFieldHolder,
+						minDate: new Date(),
+						onClose: function(){
+							$(dateFieldHolder).change();
+						}
+					});
+					mostrarDatePicker = function showCalendar(){
+											radio.datepicker("show");
+											radio.prop("checked",true)
+										}
+					//Add event Listener to the datepicker span text
+					radio.next().click(mostrarDatePicker);
+					//Add a calendar image and an event controller
+					radio.next().after('&lt;span class="datepickerImage"&gt;__&lt;/span&gt;');
+					$('span.datepickerImage').click(mostrarDatePicker);
+					
+					//Now format and delete some original messages/inputs
+					$(fieldsetEmbargoDiv + ' span[class="field-help"]').remove();
+					$(fieldsetEmbargoDiv + ' ' + dateFieldHolder).hide();
+					//Show the embargo message
+					var initialMessage= ($(dateFieldHolder).val() != '')?'El item será públicamente accesible a partir del día &lt;span class="embargoDate"&gt;'+ $(dateFieldHolder).val()+'&lt;/span&gt;':'';
+					$(fieldsetEmbargoDiv+':first-child').append('&lt;div id="'+ embargoMessageField.replace('#','') + '"&gt;'+ initialMessage + '&lt;/div&gt;');
+					//Add a change event handler to show a embargo message
+					$(dateFieldHolder).change(function(){
+						var embargoEndDate = $(this).val();
+						if( embargoEndDate != ''){
+							$(embargoMessageField).html('El item será públicamente accesible a partir del día &lt;span class="embargoDate"&gt;'+ embargoEndDate + '&lt;/span&gt;');
+						}else{
+							$(embargoMessageField).html("El item será publicamente accesible");
+						}
+					});
+					
+				});
+				</xsl:text>
+			</script>
 		</xsl:if>
 	</xsl:template>
 

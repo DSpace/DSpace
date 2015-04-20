@@ -280,12 +280,6 @@
         <workflow-editable>true</workflow-editable>
       </step>
 
-       	<!-- Automatic Pre-Embargo Step, wich generate a resourcePolicy if the 'dcterms.rights.embargoPeriod' is set
-			and its value is greater than 0 days. -->
-		<step>
-			<processing-class>ar.edu.unlp.sedici.dspace.submit.step.AutomaticEmbargoStepUtility</processing-class>
-		</step>
-       
        <!--Step 3 will be to Manage Item access. -->
        <step>
            <heading>submit.progressbar.access</heading>
@@ -306,11 +300,6 @@
 <!--       </step> -->
       
 	
-		<!-- Automatic Pre-Embargo Step, wich generate a resourcePolicy if the 'dcterms.rights.embargoPeriod' is set
-			and its value is greater than 0 days. -->
-		<step>
-			<processing-class>ar.edu.unlp.sedici.dspace.submit.step.PreEmbargoStepUtility</processing-class>
-		</step>
 
        <!-- Step 4 Upload Item with Embargo Features
             to enable this step, please make sure to comment-out the previous step "UploadStep"  -->

@@ -22,6 +22,25 @@ ul {
 	padding: 30px;
 }
 
+.datepickerImage{
+    background: url("../images/calendar.png") no-repeat scroll right center rgba(0, 0, 0, 0);
+}
+
+.datepickerImage:hover{
+    cursor: pointer
+}
+
+#embargoMessageOnSelect{
+   font-size: 15px;
+   font-style: italic;
+   color: #f2803a;
+   padding-top: 10px;
+}
+
+.embargoDate{
+  font-weight: bold;
+}
+
 .page-header {
 	border-bottom: none !important;
 	/* 	background-image: url('../images/logo_72.png'); */
