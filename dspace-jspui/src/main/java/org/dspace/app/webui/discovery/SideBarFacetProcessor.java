@@ -78,7 +78,7 @@ public class SideBarFacetProcessor implements CollectionHomeProcessor,
                     .getDiscoveryConfiguration(scope);
             List<DiscoverySearchFilterFacet> availableFacet = discoveryConfiguration
                     .getSidebarFacets();
-            
+            request.setAttribute("processorSidebar","sidebar");
             request.setAttribute("facetsConfig",
                     availableFacet != null ? availableFacet
                             : new ArrayList<DiscoverySearchFilterFacet>());

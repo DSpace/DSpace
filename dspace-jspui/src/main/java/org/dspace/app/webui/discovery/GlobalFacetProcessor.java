@@ -89,7 +89,7 @@ public class GlobalFacetProcessor implements SiteHomeProcessor
             List<DiscoverySearchFilterFacet> availableFacet = new ArrayList<DiscoverySearchFilterFacet>();            
             availableFacet.addAll(globalConfiguration.getSidebarFacets());
             availableFacet.add(facet);
-            request.setAttribute("processor","global");
+            request.setAttribute("processorGlobal","global");
             request.setAttribute("facetGlobalName", globalConfiguration.getCollapsingConfiguration().getGroupIndexFieldName());
             request.setAttribute("facetGlobalFirstLevel", mapsFirstLevel);
             request.setAttribute("facetGlobalSecondLevel", mapsSecondLevel);

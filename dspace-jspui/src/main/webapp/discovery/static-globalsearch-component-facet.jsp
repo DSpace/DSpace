@@ -87,13 +87,12 @@
 </script>
 <%
 
-	String processor = (String) request.getAttribute("processor");
 	String facetGlobalName = (String) request.getAttribute("facetGlobalName");
 	
 	Map<String, String> mapFacetFirstLevel = (Map<String, String>) request.getAttribute("facetGlobalFirstLevel");
 	Map<String, String> mapFacetSecondLevel = (Map<String, String>) request.getAttribute("facetGlobalSecondLevel");
 	
-	if("global".equals(processor)) { %>
+%>
 		
 		
 <hr/>
@@ -384,4 +383,3 @@
 
 </form>
 </div>
-<% } %>

@@ -230,8 +230,16 @@ if (communities != null && communities.length != 0)
     	int discovery_facet_cols = 4;
     	Map<String, List<FacetResult>> mapFacetes = (Map<String, List<FacetResult>>) request.getAttribute("discovery.fresults");
     	List<DiscoverySearchFilterFacet> facetsConf = (List<DiscoverySearchFilterFacet>) request.getAttribute("facetsConfig");
+    	String processorSidebar = (String) request.getAttribute("processorSidebar");
+    	String processorGlobal = (String) request.getAttribute("processorGlobal");
+    
+    if(processorGlobal!=null && processorGlobal.equals("global")) {
     %>
 	<%@ include file="discovery/static-globalsearch-component-facet.jsp" %>
-	<%@ include file="discovery/static-sidebar-facet.jsp" %>	
+	<% } 
+    if(processorSidebar!=null && processorSidebar.equals("sidebar")) {
+	%>
+	<%@ include file="discovery/static-sidebar-facet.jsp" %>
+	<% } %>	
 </div>
 </dspace:layout>
