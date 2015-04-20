@@ -228,7 +228,10 @@ if (communities != null && communities.length != 0)
 	<%
     	int discovery_panel_cols = 8;
     	int discovery_facet_cols = 4;
+    	Map<String, List<FacetResult>> mapFacetes = (Map<String, List<FacetResult>>) request.getAttribute("discovery.fresults");
+    	List<DiscoverySearchFilterFacet> facetsConf = (List<DiscoverySearchFilterFacet>) request.getAttribute("facetsConfig");
     %>
-	<%@ include file="discovery/static-sidebar-facet.jsp" %>
+	<%@ include file="discovery/static-globalsearch-component-facet.jsp" %>
+	<%@ include file="discovery/static-sidebar-facet.jsp" %>	
 </div>
 </dspace:layout>
