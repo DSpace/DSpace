@@ -268,8 +268,9 @@
 				</xsl:if>
 			</a>
 			<div class="media-body">
-				<h4 class="media-heading"><a href="{$file_url}">
-			<xsl:value-of select="mets:FLocat/@xlink:title" /></a></h4>
+<!-- 				<h4 class="media-heading"><a href="{$file_url}"> -->
+<!-- 			<xsl:value-of select="mets:FLocat/@xlink:title" /></a></h4> -->
+				<a href="{$file_url}">
 				<p>
 					<xsl:value-of select="mets:FLocat/@xlink:label" /> 
 					<span> 
@@ -294,6 +295,7 @@
 						</xsl:choose>)
 					</span>
 				</p>
+				</a>
 			</div>
 		</li>
 	</xsl:template>
