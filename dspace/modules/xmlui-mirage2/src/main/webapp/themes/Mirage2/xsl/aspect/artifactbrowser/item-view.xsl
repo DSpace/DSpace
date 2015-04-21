@@ -179,7 +179,7 @@
     </xsl:template>
 
     <xsl:template name="itemSummaryView-DIM-thumbnail">
-        <div class="thumbnail">
+        <div class="thumbnail pull-right">
             <xsl:choose>
                 <xsl:when test="//mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']">
                     <xsl:variable name="src">
@@ -200,6 +200,11 @@
                         </xsl:attribute>
                     </img>
                 </xsl:when>
+
+
+
+
+
                 <xsl:otherwise>
                </xsl:otherwise>
             </xsl:choose>
@@ -726,7 +731,7 @@
         <xsl:param name="context" select="."/>
         <div class="file-wrapper row">
             <div class="col-xs-6 col-sm-3">
-                <div class="thumbnail">
+                <div class="thumbnail pull-right">
                     <a class="image-link">
                         <xsl:attribute name="href">
                             <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
@@ -741,6 +746,57 @@
                                     </xsl:attribute>
                                 </img>
                             </xsl:when>
+
+                            <xsl:when test="@MIMETYPE = 'application/pdf'">
+                            <img alt="[PDF]" src="{concat($theme-path, '/images/mimes/pdf.png')}" style="height: 48px;" width="48" height="48" title="PDF file"/>
+                            </xsl:when>
+                            <xsl:when test="starts-with(@MIMETYPE, 'audio/')">
+                            <img alt="[Audio]" src="{concat($theme-path, '/images/mimes/audio.png')}" style="height: 48px;" width="48" height="48" title="Audio file"/>
+                            </xsl:when>
+                            <xsl:when test="starts-with(@MIMETYPE, 'video/')">
+                            <img alt="[Video]" src="{concat($theme-path, '/images/mimes/video.png')}" style="height: 48px;" width="48" height="48" title="Video file"/>
+                            </xsl:when>
+                            <xsl:when test="starts-with(@MIMETYPE, 'image/')">
+                            <img alt="[Image]" src="{concat($theme-path, '/images/mimes/image.png')}" style="height: 48px;" width="48" height="48" title="Image file"/>
+                            </xsl:when>
+                            <xsl:when test="@MIMETYPE = 'application/vnd.ms-powerpoint' or @MIMETYPE = 'application/vnd.openxmlformats-officedocument.presentationml.presentation'">
+                            <img alt="[PP]" src="{concat($theme-path, '/images/mimes/mspowerpoint.png')}" style="height: 48px;" width="48" height="48" title="MS Powerpoint file"/>
+                            </xsl:when>
+                            <xsl:when test="@MIMETYPE = 'application/vnd.oasis.opendocument.presentation' or @MIMETYPE = 'application/vnd.sun.xml.impress' or @MIMETYPE = 'application/vnd.stardivision.impress'">
+                            <img alt="[Presentation]" src="{concat($theme-path, '/images/mimes/oopresentation.png')}" style="height: 48px;" width="48" height="48" title="Presentation slide deck"/>
+                            </xsl:when>
+                            <xsl:when test="@MIMETYPE = 'application/msword' or @MIMETYPE = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'">
+                            <img alt="[Word]" src="{concat($theme-path, '/images/mimes/msword.png')}" style="height: 48px;" width="48" height="48" title="MS Word file"/>
+                            </xsl:when>
+                            <xsl:when test="@MIMETYPE = 'application/vnd.oasis.opendocument.text' or @MIMETYPE = 'application/vnd.sun.xml.writer' or @MIMETYPE = 'application/vnd.stardivision.writer'">
+                            <img alt="[Writer]" src="{concat($theme-path, '/images/mimes/ootext.png')}" style="height: 48px;" width="48" height="48" title="Word processor file"/>
+                            </xsl:when>
+                            <xsl:when test="@MIMETYPE = 'application/vnd.ms-excel' or @MIMETYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'">
+                            <img alt="[Excel]" src="{concat($theme-path, '/images/mimes/msexcel.png')}" style="height: 48px;" width="48" height="48" title="MS Excel file"/>
+                            </xsl:when>
+                            <xsl:when test="@MIMETYPE = 'application/vnd.oasis.opendocument.spreadsheet' or @MIMETYPE = 'application/vnd.sun.xml.calc' or @MIMETYPE = 'application/vnd.stardivision.calc'">
+                            <img alt="[Spreadsheet]" src="{concat($theme-path, '/images/mimes/oospreadsheet.png')}" style="height: 48px;" width="48" height="48" title="Spreadsheet"/>
+                            </xsl:when>
+                            <xsl:when test="@MIMETYPE = 'application/x-iso9660-image'">
+                            <img alt="[ISO]" src="{concat($theme-path, '/images/mimes/iso.png')}" style="height: 48px;" width="48" height="48" title="Disk image"/>
+                            </xsl:when>
+                            <xsl:when test="@MIMETYPE = 'application/zip'">
+                            <img alt="[ZIP]" src="{concat($theme-path, '/images/mimes/archive.png')}" style="height: 48px;" width="48" height="48" title="ZIP archive"/>
+                            </xsl:when>
+                            <xsl:when test="@MIMETYPE = 'text/richtext'">
+                            <img alt="[RTF]" src="{concat($theme-path, '/images/mimes/rtf.png')}" style="height: 48px;" width="48" height="48" title="RTF file"/>
+                            </xsl:when>
+                            <xsl:when test="@MIMETYPE = 'text/xml'">
+                            <img alt="[XML]" src="{concat($theme-path, '/images/mimes/html.png')}" style="height: 48px;" width="48" height="48" title="XML file"/>
+                            </xsl:when>
+                            <xsl:when test="@MIMETYPE = 'text/html'">
+                            <img alt="[HTML]" src="{concat($theme-path, '/images/mimes/html.png')}" style="height: 48px;" width="48" height="48" title="HTML file"/>
+                            </xsl:when>
+                            <xsl:when test="starts-with(@MIMETYPE, 'text/')">
+                            <img alt="[Text]" src="{concat($theme-path, '/images/mimes/text.png')}" style="height: 48px;" width="48" height="48" title="Text file"/>
+                            </xsl:when>
+
+                            
                             <xsl:otherwise>
                                 <img alt="Thumbnail">
                                     <xsl:attribute name="data-src">
@@ -750,8 +806,14 @@
                                     </xsl:attribute>
                                 </img>
                             </xsl:otherwise>
+
+
+                        
                         </xsl:choose>
                     </a>
+
+
+
                 </div>
             </div>
 
@@ -890,7 +952,59 @@
 
     <xsl:template name="getFileIcon">
         <xsl:param name="mimetype"/>
-            <i aria-hidden="true">
+
+        <xsl:when test="@MIMETYPE = 'application/pdf'">
+        <img alt="[PDF]" src="{concat($theme-path, '/images/mimes_sm/pdf.png')}" style="height: 16px;" width="16" height="16" title="PDF file"/>
+        </xsl:when>
+        <xsl:when test="starts-with(@MIMETYPE, 'audio/')">
+        <img alt="[Audio]" src="{concat($theme-path, '/images/mimes_sm/audio.png')}" style="height: 16px;" width="16" height="16" title="Audio file"/>
+        </xsl:when>
+        <xsl:when test="starts-with(@MIMETYPE, 'video/')">
+        <img alt="[Video]" src="{concat($theme-path, '/images/mimes_sm/video.png')}" style="height: 16px;" width="16" height="16" title="Video file"/>
+        </xsl:when>
+        <xsl:when test="starts-with(@MIMETYPE, 'image/')">
+        <img alt="[Image]" src="{concat($theme-path, '/images/mimes_sm/image.png')}" style="height: 16px;" width="16" height="16" title="Image file"/>
+        </xsl:when>
+        <xsl:when test="@MIMETYPE = 'application/vnd.ms-powerpoint' or @MIMETYPE = 'application/vnd.openxmlformats-officedocument.presentationml.presentation'">
+        <img alt="[PP]" src="{concat($theme-path, '/images/mimes_sm/mspowerpoint.png')}" style="height: 16px;" width="16" height="16" title="MS Powerpoint file"/>
+        </xsl:when>
+        <xsl:when test="@MIMETYPE = 'application/vnd.oasis.opendocument.presentation' or @MIMETYPE = 'application/vnd.sun.xml.impress' or @MIMETYPE = 'application/vnd.stardivision.impress'">
+        <img alt="[Presentation]" src="{concat($theme-path, '/images/mimes_sm/oopresentation.png')}" style="height: 16px;" width="16" height="16" title="Presentation slide deck"/>
+        </xsl:when>
+        <xsl:when test="@MIMETYPE = 'application/msword' or @MIMETYPE = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'">
+        <img alt="[Word]" src="{concat($theme-path, '/images/mimes_sm/msword.png')}" style="height: 16px;" width="16" height="16" title="MS Word file"/>
+        </xsl:when>
+        <xsl:when test="@MIMETYPE = 'application/vnd.oasis.opendocument.text' or @MIMETYPE = 'application/vnd.sun.xml.writer' or @MIMETYPE = 'application/vnd.stardivision.writer'">
+        <img alt="[Writer]" src="{concat($theme-path, '/images/mimes_sm/ootext.png')}" style="height: 16px;" width="16" height="16" title="Word processor file"/>
+        </xsl:when>
+        <xsl:when test="@MIMETYPE = 'application/vnd.ms-excel' or @MIMETYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'">
+        <img alt="[Excel]" src="{concat($theme-path, '/images/mimes_sm/msexcel.png')}" style="height: 16px;" width="16" height="16" title="MS Excel file"/>
+        </xsl:when>
+        <xsl:when test="@MIMETYPE = 'application/vnd.oasis.opendocument.spreadsheet' or @MIMETYPE = 'application/vnd.sun.xml.calc' or @MIMETYPE = 'application/vnd.stardivision.calc'">
+        <img alt="[Spreadsheet]" src="{concat($theme-path, '/images/mimes_sm/oospreadsheet.png')}" style="height: 16px;" width="16" height="16" title="Spreadsheet"/>
+        </xsl:when>
+        <xsl:when test="@MIMETYPE = 'application/x-iso9660-image'">
+        <img alt="[ISO]" src="{concat($theme-path, '/images/mimes_sm/iso.png')}" style="height: 16px;" width="16" height="16" title="Disk image"/>
+        </xsl:when>
+        <xsl:when test="@MIMETYPE = 'application/zip'">
+        <img alt="[ZIP]" src="{concat($theme-path, '/images/mimes_sm/archive.png')}" style="height: 16px;" width="16" height="16" title="ZIP archive"/>
+        </xsl:when>
+        <xsl:when test="@MIMETYPE = 'text/richtext'">
+        <img alt="[RTF]" src="{concat($theme-path, '/images/mimes_sm/rtf.png')}" style="height: 16px;" width="16" height="16" title="RTF file"/>
+        </xsl:when>
+        <xsl:when test="@MIMETYPE = 'text/xml'">
+        <img alt="[XML]" src="{concat($theme-path, '/images/mimes_sm/html.png')}" style="height: 16px;" width="16" height="16" title="XML file"/>
+        </xsl:when>
+        <xsl:when test="@MIMETYPE = 'text/html'">
+        <img alt="[HTML]" src="{concat($theme-path, '/images/mimes_sm/html.png')}" style="height: 16px;" width="16" height="16" title="HTML file"/>
+        </xsl:when>
+        <xsl:when test="starts-with(@MIMETYPE, 'text/')">
+        <img alt="[Text]" src="{concat($theme-path, '/images/mimes_sm/text.png')}" style="height: 16px;" width="16" height="16" title="Text file"/>
+        </xsl:when>
+
+
+
+<!--           <i aria-hidden="true">
                 <xsl:attribute name="class">
                 <xsl:text>glyphicon </xsl:text>
                 <xsl:choose>
@@ -902,7 +1016,7 @@
                     </xsl:otherwise>
                 </xsl:choose>
                 </xsl:attribute>
-            </i>
+            </i> -->
         <xsl:text> </xsl:text>
     </xsl:template>
 
