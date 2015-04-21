@@ -62,9 +62,9 @@ public class UpdateHandlePrefix
             {
                 // Print info text about changes
                 System.out.println(
-                  "All " + count + " handle" + ((count > 1) ? "s" : "") +
-                  " in your repository with prefix " + oldH +
-                  " will be updated to have handle prefix " + newH + "!"
+                  "In your repository will be updated " + count + " handle" +
+                  ((count > 1) ? "s" : "") + " to new prefix " + newH +
+                  " from original " + oldH + "!\n"
                 );
 
                 // Confirm with the user that this is what they want to do
@@ -79,8 +79,8 @@ public class UpdateHandlePrefix
                 if (choiceString.equalsIgnoreCase("y"))
                 {
                     try {
-                        log.info("Updating handle prefix");
-                        
+                        log.info("Updating handle prefix from " + oldH + " to " + newH);
+
                         // Make the changes
                         System.out.print("\nUpdating handle table... ");
                         sql = "UPDATE handle " +
@@ -97,9 +97,17 @@ public class UpdateHandlePrefix
                                 "(" +
                                   "SELECT 'http://hdl.handle.net/' || handle " +
                                   "FROM handle " +
-                                  "WHERE handle.resource_id = item_id AND handle.resource_type_id = 2" +
+                                  "WHERE handle.resource_id = metadatavalue.item_id " +
+                                    "AND handle.resource_type_id = 2" +
                                 ") " +
-                              "WHERE text_value LIKE 'http://hdl.handle.net/%'";
+                              "WHERE text_value LIKE 'http://hdl.handle.net/" + oldH + "/%'" +
+                                "AND EXISTS " +
+                                  "(" +
+                                    "SELECT 1 " +
+                                    "FROM handle " + 
+                                    "WHERE handle.resource_id = metadatavalue.item_id " +
+                                      "AND handle.resource_type_id = 2" +
+                                  ")";
                         int updMeta = DatabaseManager.updateQuery(context, sql, new Object[] {});
                         System.out.println(
                           updMeta + " metadata value" + ((updMeta > 1) ? "s" : "") + " updated"
@@ -108,8 +116,8 @@ public class UpdateHandlePrefix
                         // Commit the changes
                         context.complete();
 
-                        log.info("Done with updating handle prefix");
                         log.info(
+                          "Done with updating handle prefix. " +
                           "It was changed " + updHdl + " handle" + ((updHdl > 1) ? "s" : "") +
                           " and " + updMeta + " metadata record" + ((updMeta > 1) ? "s" : "")
                         );
