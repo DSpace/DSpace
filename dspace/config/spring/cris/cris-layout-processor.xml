@@ -38,7 +38,7 @@
 							<property name="name" value="crisevents"/>							
 						</bean>
 						<bean class="org.dspace.app.webui.discovery.GlobalFacetProcessorConfigurator.InnerGlobalFacetProcessorConfigurator">
-							<property name="name" value="crispj"/>							
+							<property name="name" value="crisproject"/>							
 						</bean>
 					</list>				
 				</entry>
