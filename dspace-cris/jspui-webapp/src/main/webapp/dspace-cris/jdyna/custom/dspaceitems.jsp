@@ -77,7 +77,7 @@ if (info.getPagefirst() != info.getPagecurrent()) {
 	  sb.append("<li><a class=\"\" href=\"");
 	  sb.append(prevURL);
 	  sb.append("\"><i class=\"fa fa-long-arrow-left\"> </i></a></li>");
-};
+}
 
 for( int q = info.getPagefirst(); q <= info.getPagelast(); q++ )
 {
