@@ -49,6 +49,10 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.SubscribeService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.identifier.DOI;
+import org.dspace.identifier.factory.IdentifierServiceFactory;
+import org.dspace.identifier.service.DOIService;
+import org.dspace.identifier.service.IdentifierService;
 import org.dspace.plugin.CollectionHomeProcessor;
 import org.dspace.plugin.CommunityHomeProcessor;
 import org.dspace.plugin.ItemHomeProcessor;
@@ -87,7 +91,7 @@ public class HandleServlet extends DSpaceServlet
     
     private final transient ItemService itemService
              = ContentServiceFactory.getInstance().getItemService();
-    
+
     private final transient CommunityService communityService
              = ContentServiceFactory.getInstance().getCommunityService();
     
@@ -102,6 +106,12 @@ public class HandleServlet extends DSpaceServlet
              = (DisseminationCrosswalk) pluginService
                 .getNamedPlugin(DisseminationCrosswalk.class, "XHTML_HEAD_ITEM");
 
+    private final transient IdentifierService identifierService
+            = IdentifierServiceFactory.getInstance().getIdentifierService();
+    
+    private final transient DOIService doiService
+            = IdentifierServiceFactory.getInstance().getDOIService();
+    
     @Override
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
@@ -443,6 +453,38 @@ public class HandleServlet extends DSpaceServlet
         {
             throw new ServletException(ce);
         }
+        
+        // lookup if we have a DOI
+        String doi = null;
+        if (identifierService != null)
+        {
+            doi = identifierService.lookup(UIUtil.obtainContext(request), item, DOI.class);
+        }
+        if (doi != null)
+        {
+            try
+            {
+                doi = doiService.DOIToExternalForm(doi);
+            }
+            catch (Exception ex)
+            {
+                doi = null;
+                log.error("Unable to convert DOI '" + doi + "' into external form.", ex);
+            }
+        }
+        
+        // use handle as preferred Identifier if not configured otherwise.    
+        String preferredIdentifier = null;
+        if (item.getHandle() != null) {
+            preferredIdentifier = handleService.getCanonicalForm(item.getHandle());
+        }
+        if ("doi".equalsIgnoreCase(ConfigurationManager.getProperty("webui.preferred.identifier")))
+        {
+            if (doi != null)
+            {
+                preferredIdentifier = doi;
+            }
+        }
 
         // Enable suggest link or not
         boolean suggestEnable = false;
@@ -481,6 +523,8 @@ public class HandleServlet extends DSpaceServlet
         request.setAttribute("item", item);
         request.setAttribute("collections", collections);
         request.setAttribute("dspace.layout.head", headMetadata);
+        request.setAttribute("doi", doi);
+        request.setAttribute("preferred_identifier", preferredIdentifier);
         JSPManager.showJSP(request, response, "/display-item.jsp");
     }
     
