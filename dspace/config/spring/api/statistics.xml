@@ -75,7 +75,7 @@
 		<property name="showMoreLength" value="20" />
 		<property name="yearsQuery" value="5" />
 		
-		<property name="crisComponentsService" ref="pjComponentsService"/>
+		<property name="crisComponentsService" ref="projectComponentsService"/>
 		<property name="selectedObject" ref="pjSelectedObject"/>
 	</bean>
 

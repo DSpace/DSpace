@@ -348,7 +348,7 @@
 	</bean>
 	
 	<!-- Project Components -->
-	<bean id="pjComponentsService" class="org.dspace.app.cris.integration.CrisComponentsService">
+	<bean id="projectComponentsService" class="org.dspace.app.cris.integration.CrisComponentsService">
 		<property name="components">
 			<map>
 				<entry key="dspaceitems" value-ref="publicationlistforproject" />				
