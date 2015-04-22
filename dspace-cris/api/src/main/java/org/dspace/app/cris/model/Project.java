@@ -22,6 +22,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.dspace.app.cris.model.jdyna.OUAdditionalFieldStorage;
 import org.dspace.app.cris.model.jdyna.ProjectAdditionalFieldStorage;
 import org.dspace.app.cris.model.jdyna.ProjectNestedObject;
 import org.dspace.app.cris.model.jdyna.ProjectNestedPropertiesDefinition;
@@ -92,9 +93,14 @@ public class Project extends ACrisObject<ProjectProperty, ProjectPropertiesDefin
         return timeStampInfo;
     }
     
-    public Object clone() throws CloneNotSupportedException
+    public Project clone() throws CloneNotSupportedException
     {
-        return super.clone();
+    	Project clone = (Project) super.clone();
+        ProjectAdditionalFieldStorage additionalTemp = new ProjectAdditionalFieldStorage();
+        clone.setDynamicField(additionalTemp);
+        additionalTemp.duplicaAnagrafica(this
+                    .getDynamicField());
+        return clone;
     }
 
 

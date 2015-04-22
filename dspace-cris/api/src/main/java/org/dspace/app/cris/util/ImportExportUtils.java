@@ -12,6 +12,10 @@ import it.cilea.osd.common.utils.XMLUtils;
 import it.cilea.osd.jdyna.dto.AnagraficaObjectDTO;
 import it.cilea.osd.jdyna.dto.AnagraficaObjectWithTypeDTO;
 import it.cilea.osd.jdyna.dto.ValoreDTO;
+import it.cilea.osd.jdyna.model.ADecoratorPropertiesDefinition;
+import it.cilea.osd.jdyna.model.ANestedPropertiesDefinition;
+import it.cilea.osd.jdyna.model.ANestedProperty;
+import it.cilea.osd.jdyna.model.ATypeNestedObject;
 import it.cilea.osd.jdyna.model.AnagraficaObject;
 import it.cilea.osd.jdyna.model.IContainable;
 import it.cilea.osd.jdyna.model.PropertiesDefinition;
@@ -25,6 +29,7 @@ import it.cilea.osd.jdyna.widget.WidgetTesto;
 
 import java.beans.PropertyEditor;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -52,18 +57,32 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import javax.xml.xpath.XPathExpressionException;
 
+import jxl.Cell;
 import jxl.Workbook;
 import jxl.write.Label;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.cris.importexport.IBulkChange;
+import org.dspace.app.cris.importexport.IBulkChangeField;
+import org.dspace.app.cris.importexport.IBulkChangeFieldLink;
+import org.dspace.app.cris.importexport.IBulkChangeFieldValue;
+import org.dspace.app.cris.importexport.IBulkChanges;
+import org.dspace.app.cris.importexport.IBulkChangesService;
+import org.dspace.app.cris.importexport.XmlBulkChanges;
+import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.IExportableDynamicObject;
+import org.dspace.app.cris.model.OrganizationUnit;
 import org.dspace.app.cris.model.Project;
+import org.dspace.app.cris.model.ResearchObject;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.RestrictedField;
 import org.dspace.app.cris.model.VisibilityConstants;
+import org.dspace.app.cris.model.export.ExportConstants;
+import org.dspace.app.cris.model.jdyna.ACrisNestedObject;
 import org.dspace.app.cris.model.jdyna.DecoratorRPPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.DecoratorRestrictedField;
 import org.dspace.app.cris.model.jdyna.ProjectAdditionalFieldStorage;
@@ -80,12 +99,14 @@ import org.dspace.content.DCPersonName;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.utils.DSpace;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * Static class that provides export functionalities from the RPs database to
@@ -110,10 +131,10 @@ public class ImportExportUtils
             + UtilsXML.NAMEATTRIBUTE_VISIBILITY;
 
     private static final String XPATH_ATTRIBUTE_RPID = "@"
-            + UtilsXML.NAMEATTRIBUTE_RPID;
+            + UtilsXML.NAMEATTRIBUTE_CRISID;
 
     private static final String XPATH_ATTRIBUTE_STAFFNO = "@"
-            + UtilsXML.NAMEATTRIBUTE_STAFF_NO;
+            + UtilsXML.NAMEATTRIBUTE_SOURCEID;
 
     private static final String XPATH_ELEMENT_ROOT = UtilsXML.ROOT_RESEARCHERS;
 
@@ -233,6 +254,54 @@ public class ImportExportUtils
         workbook.close();
     }
 
+	private static <P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, 
+	ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>, ACO extends ACrisObject<P, TP, NP, NTP, ACNO, ATNO>> ACO getCrisObject(
+		ApplicationService applicationService, Class<ACO> objectTypeClass, IBulkChange change) throws InstantiationException, IllegalAccessException {
+	String action = change.getAction();
+	String crisID = change.getCrisID();
+	String uuid = change.getUUID();
+	String sourceRef = change.getSourceRef();
+	String sourceId = change.getSourceID();
+	
+	ACO crisObject = null;
+	
+	if (StringUtils.isBlank(crisID) && StringUtils.isBlank(uuid) && StringUtils.isBlank(sourceRef) && StringUtils.isBlank(sourceId)) {
+		if (!StringUtils.equalsIgnoreCase("delete", action)) {
+			crisObject = objectTypeClass.newInstance();
+		}
+	}
+	else {
+		if (StringUtils.isNotBlank(crisID)) {
+			crisObject = applicationService.getEntityByCrisId(crisID, objectTypeClass);
+		}
+		
+		if (crisObject == null && StringUtils.isNotBlank(uuid)) {
+			crisObject = (ACO) applicationService.getEntityByUUID(uuid);
+		}
+		
+		if (crisObject == null && StringUtils.isNotBlank(sourceId)) {
+			crisObject = applicationService.getEntityBySourceId(sourceRef, sourceId, objectTypeClass);
+		}
+	}
+	
+	if (StringUtils.isNotBlank(crisID)) {
+		crisObject.setCrisID(crisID);
+	}
+	
+	if (StringUtils.isNotBlank(uuid)) {
+		crisObject.setUuid(uuid);
+	}
+	
+	if (StringUtils.isNotBlank(sourceRef)) {
+		crisObject.setSourceRef(sourceRef);
+	}
+	if (StringUtils.isNotBlank(sourceId)) {
+		crisObject.setSourceID(sourceId);
+	}
+	return crisObject;
+}
+
+    
     /**
      * 
      * Import xml files, matching validation with xsd builded at runtime
@@ -249,60 +318,44 @@ public class ImportExportUtils
      *            TODO
      * @throws Exception
      */
-    public static void importResearchersXML(InputStream input, File dir,
+    public static <ACO extends ACrisObject<P, TP, NP, NTP, ACNO, ATNO>, P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, 
+	ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> void process(String format, InputStream input, File dir,
             ApplicationService applicationService, Context dspaceContext,
-            boolean status) throws Exception
+            boolean status, Class<TP> propDefClazz, Class<ACO> crisObjectClazz) throws Exception
     {
 
-        File filexsd = null;
-        File filexml = null;
-
-        // build filexml
-        String nameXML = "xml-" + dateFormat.format(new Date()) + ".xml";
-        filexml = new File(dir, nameXML);
-        filexml.createNewFile();
-        FileOutputStream out = new FileOutputStream(filexml);
-        Utils.bufferedCopy(input, out);
-        out.close();
-
         List<IContainable> metadataALL = applicationService
-                .findAllContainables(RPPropertiesDefinition.class);
+                .findAllContainables(propDefClazz);
+        
+        DSpace dspace = new DSpace();
+        IBulkChangesService importer = dspace.getServiceManager().getServiceByName(format, IBulkChangesService.class);
+        IBulkChanges bulkChanges = importer.getBulkChanges(input, dir, crisObjectClazz, propDefClazz, metadataALL);
 
-        // create xsd and write up
-        String nameXSD = "xsd-" + dateFormat.format(new Date()) + ".xsd";
-        filexsd = new File(dir, nameXSD);
-        filexsd.createNewFile();
-        FileWriter writer = new FileWriter(filexsd);
-        filexsd = generateXSD(writer, dir, metadataALL, filexsd, null);
+        processBulkChanges(applicationService, propDefClazz, crisObjectClazz,
+				metadataALL, bulkChanges);
+    }
 
-        // create xsd validator
-        SchemaFactory factory = SchemaFactory
-                .newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Source schemaSource = new StreamSource(filexsd);
-
-        Schema schema = factory.newSchema(schemaSource);
-        // validate source xml to xsd
-        Validator validator = schema.newValidator();
-        validator.validate(new StreamSource(filexml));
-
-        // parse xml to dom
-        DocumentBuilder parser = DocumentBuilderFactory.newInstance()
-                .newDocumentBuilder();
-        Document document = parser.parse(filexml);
-
-        // get from list of metadata dynamic field vs structural field
-        List<RPPropertiesDefinition> realTPS = new LinkedList<RPPropertiesDefinition>();
+	private static <ACO extends ACrisObject<P, TP, NP, NTP, ACNO, ATNO>, P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, 
+	ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> void processBulkChanges(
+			ApplicationService applicationService, Class<TP> propDefClazz,
+			Class<ACO> crisObjectClazz, List<IContainable> metadataALL,
+			IBulkChanges bulkChanges) throws InstantiationException,
+			IllegalAccessException, CloneNotSupportedException,
+			XPathExpressionException, InvocationTargetException,
+			NoSuchMethodException {
+		// get from list of metadata dynamic field vs structural field
+        List<TP> realTPS = new LinkedList<TP>();
         List<IContainable> structuralField = new LinkedList<IContainable>();
         for (IContainable c : metadataALL)
         {
-            RPPropertiesDefinition rpPd = applicationService
+            TP rpPd = applicationService
                     .findPropertiesDefinitionByShortName(
-                            RPPropertiesDefinition.class, c.getShortName());
+                    		propDefClazz, c.getShortName());
             if (rpPd != null)
             {
-                realTPS.add(((DecoratorRPPropertiesDefinition) applicationService
+                realTPS.add((TP) ((ADecoratorPropertiesDefinition<TP>) applicationService
                         .findContainableByDecorable(
-                                RPPropertiesDefinition.class.newInstance()
+                        		propDefClazz.newInstance()
                                         .getDecoratorClass(), c.getId()))
                         .getReal());
             }
@@ -312,12 +365,10 @@ public class ImportExportUtils
             }
         }
 
-        List<RPPropertiesDefinition> realFillTPS = new LinkedList<RPPropertiesDefinition>();
-        for (RPPropertiesDefinition r : realTPS)
+        List<TP> realFillTPS = new LinkedList<TP>();
+        for (TP r : realTPS)
         {
-            NodeList e = document.getElementsByTagName(r.getShortName());
-            if (e != null && e.getLength() > 0)
-            {
+            if (bulkChanges.hasPropertyDefinition(r.getShortName())) {
                 realFillTPS.add(r);
             }
         }
@@ -325,9 +376,7 @@ public class ImportExportUtils
         List<IContainable> structuralFillField = new LinkedList<IContainable>();
         for (IContainable r : structuralField)
         {
-            NodeList e = document.getElementsByTagName(r.getShortName());
-            if (e != null && e.getLength() > 0)
-            {
+        	if (bulkChanges.hasPropertyDefinition(r.getShortName())) {
                 structuralFillField.add(r);
             }
         }
@@ -338,136 +387,56 @@ public class ImportExportUtils
         // NodeList researchers = (NodeList) xpath.evaluate(xpathExpression,
         // document, XPathConstants.NODESET);
 
-        List<Element> researchers = XMLUtils.getElementList(
-                document.getDocumentElement(), "researcher");
         int rows_discarded = 0;
         int rows_imported = 0;
         log.info("Start import " + new Date());
         // foreach researcher element in xml
-        for (int i = 0; i < researchers.size(); i++)
+        for (int i = 0; i < bulkChanges.size(); i++)
         {
-            log.info("Number " + i + " of " + researchers.size());
-            ResearcherPage researcher = null;
+            log.info("Number " + i + " of " + bulkChanges.size());
+            ACO researcher = null;
             try
             {
-                Element node = researchers.get(i);
+            	IBulkChange bulkChange = bulkChanges.getChanges(i);
 
-                // check if staffNo and rpid exists as attribute
-                // String nodeId = (String) xpath.evaluate(XPATH_RULES[1], node,
-                // XPathConstants.STRING);
-                // String rpId = (String) xpath.evaluate(XPATH_RULES[3], node,
-                // XPathConstants.STRING);
-                String nodeId = node
-                        .getAttribute(UtilsXML.NAMEATTRIBUTE_STAFF_NO);
-                String rpId = node.getAttribute(UtilsXML.NAMEATTRIBUTE_RPID);
-                ResearcherPage clone = null;
+                String sourceId = bulkChange.getSourceID();
+                String sourceRef = bulkChange.getSourceRef();
+                String crisID = bulkChange.getCrisID();
+                String uuid = bulkChange.getUUID();
+            	
+                ACrisObject<P, TP, NP, NTP, ACNO, ATNO> clone = null;
                 // use dto to fill dynamic metadata
                 AnagraficaObjectDTO dto = new AnagraficaObjectDTO();
                 AnagraficaObjectDTO clonedto = new AnagraficaObjectDTO();
                 boolean update = false; // if update a true then set field to
                                         // null
                                         // on case of empty element
-                if (nodeId == null || nodeId.isEmpty())
-                {
-                    log.error("Researcher discarded ( staffNo not founded) [position researcher: "
-                            + i + "]");
-                    throw new RuntimeException(
-                            "Researcher discarded (staffNo not founded whilst rpId is on xml) [position researcher: "
-                                    + i + "]");
 
-                }
-                else
-                {
-                    // if there is rpid then try to get researcher by staffNo
-                    // and
-                    // set to null all structural metadata lists
-                    log.info("Researcher staffNo : " + nodeId
-                            + " / rp identifier : " + rpId);
-                    if (rpId != null && !rpId.isEmpty())
-                    {
-                        researcher = applicationService
-                                .getResearcherPageByStaffNo(nodeId);
-                        if (researcher == null)
-                        {
-                            log.error("Researcher discarded (staffNo not founded whilst rpId is on xml) [position researcher: "
-                                    + i + "]");
-                            ;
-                            throw new RuntimeException(
-                                    "Researcher discarded (staffNo not founded whilst rpId is on xml) [position researcher: "
-                                            + i + "]");
-                        }
-                        else
-                        {
-                            if (!rpId.equals(ResearcherPageUtils
-                                    .getPersistentIdentifier(researcher)))
-                            {
-                                log.error("Researcher discarded (rpId don't match persistent identifier) [position researcher: "
-                                        + i + "]");
-                                throw new RuntimeException(
-                                        "Researcher discarded (staffNo not founded whilst rpId is on xml) [position researcher: "
-                                                + i + "]");
-                            }
-                        }
-                        // clone dynamic data and structural on dto
+                // if there is rpid then try to get researcher by staffNo
+                // and
+                // set to null all structural metadata lists
+                log.info("Researcher sourceRef: "+ sourceRef + " sourceID: " + sourceId
+                        + " / crisID : " + crisID + " uuid: "+uuid);
+                
+                ACrisObject<P, TP, NP, NTP, ACNO, ATNO> crisObject = getCrisObject(applicationService, crisObjectClazz, bulkChange);
 
-                        clone = (ResearcherPage) researcher.clone();
-                        RPAdditionalFieldStorage additionalTemp = new RPAdditionalFieldStorage();
-                        clone.setDynamicField(additionalTemp);
-                        additionalTemp.duplicaAnagrafica(researcher
-                                .getDynamicField());
-                        update = true;
+                clone = (ACrisObject<P, TP, NP, NTP, ACNO, ATNO>) researcher.clone();
 
-                    }
-                    else
-                    {
-                        // here there is perhaps a new researcher
-                        researcher = applicationService
-                                .getResearcherPageByStaffNo(nodeId);
-                        if (researcher == null)
-                        {
-                            researcher = new ResearcherPage();
-                            researcher.setSourceID(nodeId);
-                            // added by Allen: all newly added researchers are
-                            // inactive by default
-                            // use -active in command line to change default
-                            // status to active.
-                            researcher.setStatus(status);
-
-                            clone = (ResearcherPage) researcher.clone();
-                            RPAdditionalFieldStorage additionalTemp = new RPAdditionalFieldStorage();
-                            clone.setDynamicField(additionalTemp);
-                            additionalTemp.duplicaAnagrafica(researcher
-                                    .getDynamicField());
-                        }
-                        else
-                        {
-                            log.error("Researcher discarded (staffNo " + nodeId
-                                    + " already exist) [position researcher: "
-                                    + i + "]");
-                            throw new RuntimeException(
-                                    "Researcher discarded (staffNo "
-                                            + nodeId
-                                            + " already exist) [position researcher: "
-                                            + i + "]");
-                        }
-                    }
-                }
-
-                AnagraficaUtils.fillDTO(dto, researcher.getDynamicField(),
+                AnagraficaUtils.fillDTO(dto, researcher,
                         realFillTPS);
 
                 // one-shot fill and reverse to well-format clonedto and clean
                 // empty
                 // data
-                AnagraficaUtils.fillDTO(clonedto, clone.getDynamicField(),
+                AnagraficaUtils.fillDTO(clonedto, clone,
                         realFillTPS);
 
-                AnagraficaUtils.reverseDTO(clonedto, clone.getDynamicField(),
+                AnagraficaUtils.reverseDTO(clonedto, clone,
                         realFillTPS);
 
-                AnagraficaUtils.fillDTO(clonedto, clone.getDynamicField(),
+                AnagraficaUtils.fillDTO(clonedto, clone,
                         realFillTPS);
-                importDynAXML(applicationService, realFillTPS, node, dto,
+                importDynAXML(applicationService, realFillTPS, bulkChange, dto,
                         clonedto, update);
 
                 for (IContainable containable : structuralFillField)
@@ -500,26 +469,25 @@ public class ImportExportUtils
                             // NodeList nodeslist = (NodeList) xpath.evaluate(
                             // xpathExpression, node,
                             // XPathConstants.NODESET);
-                            List<Element> nodeslist = XMLUtils.getElementList(
-                                    node, shortName);
+                            IBulkChangeField changeField = bulkChange.getFieldChanges(shortName);
 
                             List<RestrictedField> object = (List<RestrictedField>) field;
                             List<RestrictedField> objectclone = new LinkedList<RestrictedField>();
                             objectclone.addAll(object);
 
-                            for (int y = 0; y < nodeslist.size(); y++)
+                            if (update == true)
                             {
-                                if (update == true && y == 0)
-                                {
-                                    object.clear();
-                                }
-                                Element nsublist = nodeslist.get(y);
-                                String value = nsublist.getTextContent();
+                                object.clear();
+                            }
+                            for (int y = 0; y < changeField.size(); y++)
+                            {
+                               
+                                IBulkChangeFieldValue nsublist = changeField.get(y);
+                                String value = nsublist.getValue();
 
                                 // String visibilityString = xpath.evaluate(
                                 // XPATH_RULES[2], nsublist);
-                                String visibilityString = nsublist
-                                        .getAttribute(UtilsXML.NAMEATTRIBUTE_VISIBILITY);
+                                String visibilityString = nsublist.getVisibility();
 
                                 if (value != null && !value.isEmpty())
                                 {
@@ -573,12 +541,11 @@ public class ImportExportUtils
                         }
                         else
                         {
-                            // Object control_value = xpath.evaluate(
-                            // xpathExpression, node, XPathConstants.NODE);
-                            Element control_value = XMLUtils.getSingleElement(
-                                    node, shortName);
-                            if (control_value != null)
+                        	IBulkChangeField changeField = bulkChange.getFieldChanges(shortName);
+                            if (changeField.size() == 1)
+                            	
                             {
+                            	IBulkChangeFieldValue changeFieldValue = changeField.get(0);
                                 // String value =
                                 // xpath.evaluate(xpathExpression,
                                 // node);
@@ -586,10 +553,8 @@ public class ImportExportUtils
                                 // xpathExpression + "/" + XPATH_RULES[2],
                                 // node);
 
-                                String value = XMLUtils.getElementValue(node,
-                                        shortName);
-                                String visibilityString = control_value
-                                        .getAttribute(UtilsXML.NAMEATTRIBUTE_VISIBILITY);
+                                String value = changeFieldValue.getValue();
+                                String visibilityString = changeFieldValue.getVisibility();
 
                                 if (!value.isEmpty())
                                 {
@@ -660,64 +625,10 @@ public class ImportExportUtils
 
                 }
 
-                AnagraficaUtils.reverseDTO(dto, researcher.getDynamicField(),
+                AnagraficaUtils.reverseDTO(dto, researcher,
                         realFillTPS);
 
-                EPerson dspaceUser = researcher.getDspaceUser();
-                if (dspaceUser == null)
-                {
-                    // no dspace user we need to create it
-                    try
-                    {
-                        EPerson emailUser = EPerson.findByEmail(dspaceContext,
-                                researcher.getEmail().getValue());
-                        if (emailUser != null)
-                        {
-                            throw new RuntimeException(
-                                    "XML Row discarded STAFFNO : "
-                                            + researcher.getSourceID()
-                                            + " Find an eperson with email/netId '"
-                                            + emailUser.getEmail()
-                                            + "/"
-                                            + emailUser.getNetid()
-                                            + "' that not referred to the staffNo '"
-                                            + researcher.getSourceID()
-                                            + "' of researcher. Perhaps is it the same person?");
-                        }
-                        else
-                        {
-                            dspaceUser = EPerson.create(dspaceContext);
-                            DCPersonName personalName = new DCPersonName(
-                                    researcher.getFullName());
-                            dspaceUser.setNetid(researcher.getSourceID());
-                            dspaceUser.setFirstName(personalName
-                                    .getFirstNames());
-                            dspaceUser.setLastName(personalName.getLastName());
-                            dspaceUser.setEmail(researcher.getEmail()
-                                    .getValue());
-                            dspaceUser.setLanguage("en");
-                            dspaceUser.setCanLogIn(true);
-                            dspaceUser.update();
-                        }
-                    }
-                    catch (SQLException e)
-                    {
-                        throw new RuntimeException(
-                                "XML Row discarded STAFFNO : "
-                                        + researcher.getSourceID()
-                                        + " Creation failure new eperson or researcher's mail has not been setted");
-                    }
-                    catch (AuthorizeException e)
-                    {
-                        throw new RuntimeException(
-                                "XML Row discarded STAFFNO : "
-                                        + researcher.getSourceID()
-                                        + " Authorize failure");
-                    }
-                    dspaceContext.commit();
-                }
-
-                applicationService.saveOrUpdate(ResearcherPage.class,
+                applicationService.saveOrUpdate(crisObjectClazz,
                         researcher);
 
                 log.info("Import researcher " + researcher.getSourceID()
@@ -736,13 +647,14 @@ public class ImportExportUtils
         log.info("Import researchers - end import additional files");
 
         log.info("Statistics: row ingested " + rows_imported + " on total of "
-                + (researchers.size()) + " (" + rows_discarded
+                + (bulkChanges.size()) + " (" + rows_discarded
                 + " row discarded)");
-    }
+	}
+
 
     private static <TP extends PropertiesDefinition> void importDynAXML(
             ApplicationService applicationService, List<TP> realFillTPS,
-            Element node, AnagraficaObjectDTO dto,
+            IBulkChange bulkChange, AnagraficaObjectDTO dto,
             AnagraficaObjectDTO clonedto, boolean update)
             throws XPathExpressionException
     {
@@ -756,6 +668,11 @@ public class ImportExportUtils
                     shortName);
             List<ValoreDTO> oldValues = clonedto.getAnagraficaProperties().get(
                     shortName);
+            if (update == true)
+            {
+                dto.getAnagraficaProperties().get(shortName)
+                        .clear();
+            }
             if (rpPD.getRendering() instanceof WidgetTesto)
             {
                 if (rpPD.isRepeatable())
@@ -765,18 +682,12 @@ public class ImportExportUtils
                     // xpathExpression, node,
                     // XPathConstants.NODESET);
 
-                    List<Element> nodeslist = XMLUtils.getElementList(node,
-                            shortName);
+                    IBulkChangeField nodeslist = bulkChange.getFieldChanges(shortName);
 
                     for (int y = 0; y < nodeslist.size(); y++)
                     {
-                        if (update == true && y == 0)
-                        {
-                            dto.getAnagraficaProperties().get(shortName)
-                                    .clear();
-                        }
-                        Element nodetext = nodeslist.get(y);
-                        String control_value = nodetext.getTextContent();
+                        IBulkChangeFieldValue nodetext = nodeslist.get(y);
+                        String control_value = nodetext.getValue();
                         if (control_value != null && !control_value.isEmpty())
                         {
                             workOnText(applicationService, nodetext, rpPD,
@@ -795,12 +706,12 @@ public class ImportExportUtils
                 {
                     // Node nodeText = (Node) xpath.evaluate(
                     // xpathExpression, node, XPathConstants.NODE);
-                    Element nodeText = XMLUtils.getSingleElement(node,
-                            shortName);
+                	IBulkChangeField nodeslist = bulkChange.getFieldChanges(shortName);
+                    IBulkChangeFieldValue nodeText = nodeslist.get(0);
                     String control_value = null;
                     try
                     {
-                        control_value = nodeText.getTextContent();
+                        control_value = nodeText.getValue();
                     }
                     catch (NullPointerException exc)
                     {
@@ -808,11 +719,6 @@ public class ImportExportUtils
                     }
                     if (control_value != null)
                     {
-                        if (update == true)
-                        {
-                            dto.getAnagraficaProperties().get(shortName)
-                                    .clear();
-                        }
                         workOnText(applicationService, nodeText, rpPD, values,
                                 oldValues);
                     }
@@ -825,8 +731,7 @@ public class ImportExportUtils
                     // NodeList nodeslist = (NodeList) xpath.evaluate(
                     // xpathExpression, node,
                     // XPathConstants.NODESET);
-                    List<Element> nodeslist = XMLUtils.getElementList(node,
-                            shortName);
+                	IBulkChangeField nodeslist = bulkChange.getFieldChanges(shortName);
 
                     for (int y = 0; y < nodeslist.size(); y++)
                     {
@@ -835,12 +740,12 @@ public class ImportExportUtils
                             dto.getAnagraficaProperties().get(shortName)
                                     .clear();
                         }
-                        Node nodeDate = nodeslist.get(y);
-                        String control_value = nodeDate.getTextContent();
-                        if (control_value != null && !control_value.isEmpty())
+                        IBulkChangeFieldValue nodeDate = nodeslist.get(y);
+                        String control_value = nodeDate.getValue();
+                        if (StringUtils.isNotBlank(control_value))
                         {
-                            workOnDate(applicationService, node, rpPD, values,
-                                    oldValues, nodeDate);
+                            workOnDate(applicationService, nodeDate, rpPD, values,
+                                    oldValues);
                         }
                         // else {
                         // if (update == true
@@ -855,27 +760,21 @@ public class ImportExportUtils
                 {
                     // Node nodeDate = (Node) xpath.evaluate(
                     // xpathExpression, node, XPathConstants.NODE);
-                    Element nodeDate = XMLUtils.getSingleElement(node,
-                            shortName);
+                	IBulkChangeField nodeslist = bulkChange.getFieldChanges(shortName);
+                	IBulkChangeFieldValue nodeDate = nodeslist.get(0);
+                	
                     String control_value = null;
                     try
                     {
-                        control_value = nodeDate.getTextContent();
+                        control_value = nodeDate.getValue();
                     }
                     catch (NullPointerException exc)
                     {
                         // nothing
                     }
-                    if (control_value != null)
-                    {
-                        if (update == true)
-                        {
-                            dto.getAnagraficaProperties().get(shortName)
-                                    .clear();
-                        }
-                        workOnDate(applicationService, node, rpPD, values,
-                                oldValues, nodeDate);
-                    }
+
+                    workOnDate(applicationService, nodeDate, rpPD, values,
+                    		oldValues);
                 }
             }
             if (rpPD.getRendering() instanceof WidgetLink)
@@ -886,8 +785,7 @@ public class ImportExportUtils
                     // NodeList nodeslist = (NodeList) xpath.evaluate(
                     // xpathExpression, node,
                     // XPathConstants.NODESET);
-                    List<Element> nodeslist = XMLUtils.getElementList(node,
-                            shortName);
+                	IBulkChangeFieldLink nodeslist = bulkChange.getFieldLinkChanges(shortName);
 
                     for (int y = 0; y < nodeslist.size(); y++)
                     {
@@ -896,46 +794,26 @@ public class ImportExportUtils
                             dto.getAnagraficaProperties().get(shortName)
                                     .clear();
                         }
-                        Element nodeLink = nodeslist.get(y);
-                        String control_value = nodeLink.getTextContent();
-                        if (control_value != null && !control_value.isEmpty())
+                        IBulkChangeFieldLinkValue nodeLink = nodeslist.get(y);
+                        String control_value = nodeLink.getValue();
+                        if (StringUtils.isNotBlank(control_value))
                         {
                             workOnLink(applicationService, rpPD, values,
                                     oldValues, nodeLink);
                         }
-                        // else {
-                        // if (update == true
-                        // && nodeslist.getLength() == 1) {
-                        // dto.getAnagraficaProperties()
-                        // .get(shortName).clear();
-                        // }
-                        // }
                     }
                 }
                 else
                 {
                     // Node nodeLink = (Node) xpath.evaluate(
                     // xpathExpression, node, XPathConstants.NODE);
-                    Element nodeLink = XMLUtils.getSingleElement(node,
-                            shortName);
-                    String control_value = null;
-                    try
+                	IBulkChangeFieldLink nodeslist = bulkChange.getFieldLinkChanges(shortName);
+                	IBulkChangeFieldLinkValue nodeLink = nodeslist.get(0);
+                    String control_value = nodeLink.getValue();
+                    if (StringUtils.isNotBlank(control_value))
                     {
-                        control_value = nodeLink.getTextContent();
-                    }
-                    catch (NullPointerException exc)
-                    {
-                        // nothing
-                    }
-                    if (control_value != null)
-                    {
-                        if (update == true)
-                        {
-                            dto.getAnagraficaProperties().get(shortName)
-                                    .clear();
-                        }
-                        workOnLink(applicationService, rpPD, values, oldValues,
-                                nodeLink);
+                        workOnLink(applicationService, rpPD, values,
+                                oldValues, nodeLink);
                     }
                 }
             }
@@ -945,43 +823,6 @@ public class ImportExportUtils
                 // TODO
             }
         }
-    }
-
-    @Deprecated
-    public static File generateGrantXSD(Writer writer, File dir,
-            List<IContainable> metadata, File filexsd, String[] elementsRoot)
-            throws IOException, NoSuchFieldException, SecurityException,
-            InstantiationException, IllegalAccessException
-    {
-
-        UtilsXSD xsd = new UtilsXSD(writer);
-        xsd.createGrantXSD(metadata, elementsRoot, null, null);
-        return filexsd;
-    }
-
-    public static File newGenerateGrantXSD(Writer writer, File dir,
-            List<IContainable> metadata, File filexsd, String[] elementsRoot,
-            String[] attributeMainRow, boolean[] attributeMainRowRequired)
-            throws IOException, NoSuchFieldException, SecurityException,
-            InstantiationException, IllegalAccessException
-    {
-
-        UtilsXSD xsd = new UtilsXSD(writer);
-        xsd.createGrantXSD(metadata, elementsRoot, attributeMainRow,
-                attributeMainRowRequired);
-        return filexsd;
-    }
-
-    @Deprecated
-    public static File generateXSD(Writer writer, File dir,
-            List<IContainable> metadata, File filexsd, String[] elementsRoot)
-            throws IOException, NoSuchFieldException, SecurityException,
-            InstantiationException, IllegalAccessException
-    {
-
-        UtilsXSD xsd = new UtilsXSD(writer);
-        xsd.createXSD(metadata, elementsRoot);
-        return filexsd;
     }
 
     public static File generateSimpleTypeWithListOfAllMetadata(Writer writer,
@@ -994,22 +835,8 @@ public class ImportExportUtils
         return filexsd;
     }
 
-    public static File newGenerateXSD(Writer writer, File dir,
-            List<IContainable> metadata, File filexsd, String[] elementsRoot,
-            String namespace, String namespaceValue, String namespaceTarget,
-            String[] attributeMainRow, boolean[] attributeMainRowRequired)
-            throws IOException, NoSuchFieldException, SecurityException,
-            InstantiationException, IllegalAccessException
-    {
-
-        UtilsXSD xsd = new UtilsXSD(writer);
-        xsd.createXSD(metadata, elementsRoot, namespace, namespaceValue,
-                namespaceTarget, attributeMainRow, attributeMainRowRequired);
-        return filexsd;
-    }
-
     private static <TP extends PropertiesDefinition> void workOnText(
-            ApplicationService applicationService, Element node, TP rpPD,
+            ApplicationService applicationService, IBulkChangeFieldValue node, TP rpPD,
             List<ValoreDTO> values, List<ValoreDTO> old)
             throws XPathExpressionException
     {
@@ -1018,8 +845,8 @@ public class ImportExportUtils
 
             // String nodetext = node.getTextContent();
             // String vis = xpath.evaluate(XPATH_RULES[2], node);
-            String nodetext = node.getTextContent();
-            String vis = node.getAttribute(UtilsXML.NAMEATTRIBUTE_VISIBILITY);
+            String nodetext = node.getValue();
+            String vis = node.getVisibility();
 
             if (nodetext != null && !nodetext.isEmpty())
             {
@@ -1051,26 +878,24 @@ public class ImportExportUtils
 
     private static <TP extends PropertiesDefinition> void workOnLink(
             ApplicationService applicationService, TP rpPD,
-            List<ValoreDTO> values, List<ValoreDTO> old, Element nodeLink)
+            List<ValoreDTO> values, List<ValoreDTO> old, IBulkChangeFieldLinkValue nodeLink)
             throws XPathExpressionException
     {
         if (nodeLink != null)
         {
 
             // String nodetext = nodeLink.getTextContent();
-            String nodetext = nodeLink.getTextContent();
+            String nodetext = nodeLink.getValue();
 
             if (nodetext != null && !nodetext.isEmpty())
             {
                 // String vis = xpath.evaluate(XPATH_RULES[2], node);
-                String vis = nodeLink
-                        .getAttribute(UtilsXML.NAMEATTRIBUTE_VISIBILITY);
+                String vis = nodeLink.getVisibility();
                 // if (vis != null && vis.isEmpty()) {
                 // vis = xpath.evaluate(XPATH_RULES[2], nodeLink);
                 // }
                 // String src = xpath.evaluate(XPATH_RULES[4], node);
-                String src = nodeLink
-                        .getAttribute(UtilsXML.NAMEATTRIBUTE_SRC_LINK);
+                String src = nodeLink.getLinkURL();
                 // if (src != null && src.isEmpty()) {
                 // src = xpath.evaluate(XPATH_RULES[4], nodeLink);
                 // }
@@ -1105,20 +930,19 @@ public class ImportExportUtils
     }
 
     private static <TP extends PropertiesDefinition> void workOnDate(
-            ApplicationService applicationService, Element node, TP rpPD,
-            List<ValoreDTO> values, List<ValoreDTO> old, Node nodeDate)
+            ApplicationService applicationService, IBulkChangeFieldValue node, TP rpPD,
+            List<ValoreDTO> values, List<ValoreDTO> old)
             throws XPathExpressionException
     {
-        if (nodeDate != null)
+        if (node != null)
         {
             // String nodetext = nodeDate.getTextContent();
-            String nodetext = nodeDate.getTextContent();
+            String nodetext = node.getValue();
 
             if (nodetext != null && !nodetext.isEmpty())
             {
                 // String vis = xpath.evaluate(XPATH_RULES[2], node);
-                String vis = node
-                        .getAttribute(UtilsXML.NAMEATTRIBUTE_VISIBILITY);
+                String vis = node.getVisibility();
                 // if (vis != null) {
                 // if (vis.isEmpty()) {
                 // vis = xpath.evaluate(XPATH_RULES[2], nodeDate);
@@ -1238,8 +1062,8 @@ public class ImportExportUtils
     {
 
         UtilsXML xml = new UtilsXML(writer, applicationService);
-        org.jdom.Document xmldoc = xml.createRoot(null, null,
-                "http://www.cilea.it/researcherpage/schemas");
+        org.jdom.Document xmldoc = xml.createRoot(UtilsXSD.RP_DEFAULT_ELEMENT[0], UtilsXSD.NAMESPACE_PREFIX_RP,
+        		UtilsXSD.NAMESPACE_RP);
         if (researchers != null)
         {
             for (ResearcherPage rp : researchers)
@@ -1277,407 +1101,5 @@ public class ImportExportUtils
         }
     }
 
-    /**
-     * 
-     * TODO 
-     * 
-     * Import RGs from RPs finded on database
-     * 
-     * @param applicationService
-     * @param dspaceContext
-     * @param status
-     *            get only active or all rps
-     * @param active
-     *            set status true to newly rg
-     * @param newly
-     *            add only new project
-     */
-    public static void importGrants(ApplicationService applicationService,
-            Context dspaceContext, boolean status, boolean active, boolean newly)
-            throws Exception
-    {
-
-        List<ResearcherPage> rps = new LinkedList<ResearcherPage>();
-        if (status)
-        {
-            rps = applicationService.getAllResearcherPageByStatus(status);
-        }
-        else
-        {
-            rps.addAll(applicationService.getList(ResearcherPage.class));
-        }
-
-        // extract grants from rps
-        int newImported = 0;
-        int editImported = 0;
-        int discardImported = 0;
-        int skipImported = 0;
-        log.info("Start import " + new Date() + " mode(status/active/newly): "
-                + status + "/" + active + "/" + newly);
-        for (ResearcherPage rp : rps)
-        {
-
-            List<RPNestedObject> nestedObjects = ((ExtendedTabService) applicationService)
-                    .getNestedObjectsByParentIDAndShortname(rp.getId(),
-                            UtilsXML.GRANT_TAG_PROJECTS, RPNestedObject.class);
-
-            if (nestedObjects != null)
-            {
-                for (RPNestedObject nestedObject : nestedObjects)
-                {
-
-                    List<RPNestedProperty> rpProperties = nestedObject
-                            .getAnagrafica4view().get(
-                                    UtilsXML.GRANT_TAG_PROJECTS);
-                    for (RPNestedProperty rpp : rpProperties)
-                    {
-
-                        String projectcode = (String) (rpp.getValue()
-                                .getObject());
-
-                        Project rg = null;
-                        // use dto to fill dynamic metadata
-                        AnagraficaObjectDTO dtoRG = new AnagraficaObjectDTO();
-                        AnagraficaObjectWithTypeDTO dtoNested = new AnagraficaObjectWithTypeDTO();
-                        if (projectcode != null && !projectcode.isEmpty())
-                        {
-                            rg = applicationService
-                                    .getResearcherGrantByCode(projectcode
-                                            .trim());
-                        }
-                        else
-                        {
-                            log.error("Grant discarded ( projectCode not founded) [researcher: "
-                                    + ResearcherPageUtils
-                                            .getPersistentIdentifier(rp) + "]");
-                            discardImported++;
-                            continue;
-                        }
-
-                        // skip if only new grants mode and rg is found
-                        if (newly && rg != null)
-                        {
-                            skipImported++;
-                            continue;
-                        }
-
-                        // create new grants
-                        if (rg == null)
-                        {
-                            log.info("Create new GRANT with code "
-                                    + projectcode);
-                            rg = new Project();
-                            rg.setSourceID(projectcode);
-                            rg.setStatus(active);
-                            newImported++;
-                        }
-                        else
-                        {
-                            log.info("Edit GRANT with code " + projectcode);
-                            editImported++;
-                        }
-
-                        List<RPNestedPropertiesDefinition> subTps = nestedObject.getTypo().getMask();
-                        AnagraficaUtils
-                                .fillDTO(dtoNested, nestedObject, subTps);
-
-                        List<ProjectPropertiesDefinition> rgTps = applicationService
-                                .getList(ProjectPropertiesDefinition.class);
-
-                        for (String key : dtoNested.getAnagraficaProperties()
-                                .keySet())
-                        {
-                            dtoRG.getAnagraficaProperties().put(
-                                    key,
-                                    dtoNested.getAnagraficaProperties()
-                                            .get(key));
-                        }
-
-                        // get investigators/coninvestigator
-                        List<ValoreDTO> investigatorDTO = dtoRG
-                                .getAnagraficaProperties().get(
-                                        UtilsXML.GRANT_TAG_INVESTIGATOR);
-                        for (ValoreDTO vv : investigatorDTO)
-                        {
-
-                            EmbeddedLinkValue link = (EmbeddedLinkValue) vv
-                                    .getObject();
-                            if (link != null)
-                            {
-                                if (link.getValueLink() != null
-                                        && !link.getValueLink().isEmpty())
-                                {
-                                    dtoRG.getAnagraficaProperties()
-                                            .put("principalinvestigator",
-                                                    dtoNested
-                                                            .getAnagraficaProperties()
-                                                            .get("principalinvestigator")
-                                                            );
-
-                                }
-                                else
-                                {
-                                    dtoRG.getAnagraficaProperties()
-                                    .put("extprincipalinvestigator",
-                                            dtoNested
-                                                    .getAnagraficaProperties()
-                                                    .get("extprincipalinvestigator")
-                                                    );
-                                }
-                            }
-                            
-                        }
-                        List<ValoreDTO> coinvestigatorDTO = dtoRG
-                                .getAnagraficaProperties().get(
-                                        UtilsXML.GRANT_TAG_COINVESTIGATOR);
-                        
-                        for (ValoreDTO vv : coinvestigatorDTO)
-                        {
-                            
-                            EmbeddedLinkValue link = (EmbeddedLinkValue) vv
-                                    .getObject();
-                            if (link != null)
-                            {
-                                if (link.getValueLink() != null
-                                        && !link.getValueLink().isEmpty())
-                                {
-                                    dtoRG.getAnagraficaProperties()
-                                    .put("coinvestigator",
-                                            dtoNested
-                                                    .getAnagraficaProperties()
-                                                    .get("coinvestigator")
-                                                    );
-                                }
-                                else
-                                {
-                                    dtoRG.getAnagraficaProperties()
-                                    .put("extcoinvestigator",
-                                            dtoNested
-                                                    .getAnagraficaProperties()
-                                                    .get("extcoinvestigator")
-                                                    );
-
-                                }
-                            }
-                            
-                        }
-                        
-                        AnagraficaUtils.reverseDTO(dtoRG, rg, rgTps);
-                        applicationService.saveOrUpdate(Project.class, rg);
-                    }
-                }
-            }
-        }
-        log.info("Stats: total grants imported " + (newImported + editImported)
-                + " new/edit:" + newImported + "/" + editImported
-                + " discarded:" + discardImported + " "
-                + (newly ? " skipped:" + skipImported : ""));
-        log.info("### END IMPORT " + new Date());
-
-    }
-
-    /**
-     * TODO
-     * 
-     * Import grant from xml file, matching validation with xsd builded at
-     * runtime execution associate to list of dynamic fields
-     * 
-     * @param input
-     *            - XML file stream
-     * @param dir
-     *            - directory to write temporaries xsd and xml (this xsd
-     *            validate actual xml)
-     * @param applicationService
-     *            - service
-     * @throws Exception
-     */
-    public static void importGrantsXML(InputStream input, File dir,
-            ApplicationService applicationService, Context dspaceContext,
-            boolean status) throws Exception
-    {
-
-        File filexsd = null;
-        File filexml = null;
-
-        // build filexml
-        String nameXML = "xml-" + dateFormat.format(new Date()) + ".xml";
-        filexml = new File(dir, nameXML);
-        filexml.createNewFile();
-        FileOutputStream out = new FileOutputStream(filexml);
-        Utils.bufferedCopy(input, out);
-        out.close();
-
-        List<IContainable> metadataALL = applicationService
-                .findAllContainables(ProjectPropertiesDefinition.class);
-
-        // create xsd and write up
-        String nameXSD = "xsd-" + dateFormat.format(new Date()) + ".xsd";
-        filexsd = new File(dir, nameXSD);
-        filexsd.createNewFile();
-        FileWriter writer = new FileWriter(filexsd);
-        filexsd = generateGrantXSD(writer, dir, metadataALL, filexsd,
-                new String[] { "grants", "grant" });
-
-        // create xsd validator
-        SchemaFactory factory = SchemaFactory
-                .newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Source schemaSource = new StreamSource(filexsd);
-
-        Schema schema = factory.newSchema(schemaSource);
-        // validate source xml to xsd
-        Validator validator = schema.newValidator();
-        validator.validate(new StreamSource(filexml));
-
-        // parse xml to dom
-        DocumentBuilder parser = DocumentBuilderFactory.newInstance()
-                .newDocumentBuilder();
-        Document document = parser.parse(filexml);
-
-        List<ProjectPropertiesDefinition> realFillTPS = applicationService
-                .getList(ProjectPropertiesDefinition.class);
-
-        List<Element> grantxml = XMLUtils.getElementList(
-                document.getDocumentElement(), "grant");
-        int rows_discarded = 0;
-        int rows_imported = 0;
-        log.info("Start import " + new Date());
-        // foreach researcher element in xml
-        for (int i = 0; i < grantxml.size(); i++)
-        {
-            log.info("Number " + i + " of " + grantxml.size());
-            Project grant = null;
-            try
-            {
-                Element node = grantxml.get(i);
-
-                // check if staffNo and rpid exists as attribute
-                // String nodeId = (String) xpath.evaluate(XPATH_RULES[1], node,
-                // XPathConstants.STRING);
-                // String rpId = (String) xpath.evaluate(XPATH_RULES[3], node,
-                // XPathConstants.STRING);
-                String nodeId = node
-                        .getAttribute(UtilsXML.GRANT_NAMEATTRIBUTE_CODE);
-                String rgId = node
-                        .getAttribute(UtilsXML.GRANT_NAMEATTRIBUTE_RGID);
-                Project clone = null;
-                // use dto to fill dynamic metadata
-                AnagraficaObjectDTO dto = new AnagraficaObjectDTO();
-                AnagraficaObjectDTO clonedto = new AnagraficaObjectDTO();
-                boolean update = false; // if update a true then set field to
-                                        // null
-                                        // on case of empty element
-                if (nodeId == null || nodeId.isEmpty())
-                {
-                    log.error("Grant discarded ( code not founded) [position grant: "
-                            + i + "]");
-                    throw new RuntimeException(
-                            "Grant discarded (code not founded whilst rgId is on xml) [position grant: "
-                                    + i + "]");
-
-                }
-                else
-                {
-                    // if there is rgid then try to get grant by code
-                    // and
-                    // set to null all structural metadata lists
-                    log.info("Grant staffNo : " + nodeId
-                            + " / rg identifier : " + rgId);
-                    if (rgId != null && !rgId.isEmpty())
-                    {
-                        grant = applicationService
-                                .getResearcherGrantByCode(nodeId);
-                        if (grant == null)
-                        {
-                            log.error("Grant discarded (code not founded whilst rgId is on xml) [position grant: "
-                                    + i + "]");
-                            ;
-                            throw new RuntimeException(
-                                    "Grant discarded (code not founded whilst rgId is on xml) [position grant: "
-                                            + i + "]");
-                        }
-                        else
-                        {
-                            if (!rgId.equals(grant.getId().toString()))
-                            {
-                                log.error("Grant discarded (rgId don't match persistent identifier) [position grant: "
-                                        + i + "]");
-                                throw new RuntimeException(
-                                        "Grant discarded (rgId don't match persistent identifier) [position grant: "
-                                                + i + "]");
-                            }
-                        }
-                        // clone dynamic data and structural on dto
-
-                        clone = (Project) grant.clone();
-                        ProjectAdditionalFieldStorage additionalTemp = new ProjectAdditionalFieldStorage();
-                        clone.setDynamicField(additionalTemp);
-                        additionalTemp.duplicaAnagrafica(grant
-                                .getDynamicField());
-                        update = true;
-                    }
-                    else
-                    {
-                        // here there is perhaps a new grant
-                        grant = applicationService
-                                .getResearcherGrantByCode(nodeId);
-                        if (grant == null)
-                        {
-                            grant = new Project();
-                            grant.setSourceID(nodeId);
-                            // use -active in command line to change default
-                            // status to active.
-                            grant.setStatus(status);
-
-                            clone = (Project) grant.clone();
-                            ProjectAdditionalFieldStorage additionalTemp = new ProjectAdditionalFieldStorage();
-                            clone.setDynamicField(additionalTemp);
-                            additionalTemp.duplicaAnagrafica(grant
-                                    .getDynamicField());
-
-                        }
-                        else
-                        {
-                            log.error("Grant discarded (code " + nodeId
-                                    + " already exist) [position grant: " + i
-                                    + "]");
-                            throw new RuntimeException("Grant discarded (code "
-                                    + nodeId
-                                    + " already exist) [position grant: " + i
-                                    + "]");
-                        }
-                    }
-                }
-
-                AnagraficaUtils.fillDTO(dto, grant, realFillTPS);
-
-                // one-shot fill and reverse to well-format clonedto and clean
-                // empty
-                // data
-                AnagraficaUtils.fillDTO(clonedto, clone, realFillTPS);
-                AnagraficaUtils.reverseDTO(clonedto, clone, realFillTPS);
-                AnagraficaUtils.fillDTO(clonedto, clone, realFillTPS);
-
-                importDynAXML(applicationService, realFillTPS, node, dto,
-                        clonedto, update);
-       
-                AnagraficaUtils.reverseDTO(dto, grant, realFillTPS);
-
-                applicationService.saveOrUpdate(Project.class, grant);
-
-                log.info("Import grant " + grant.getSourceID() + " (code) / "
-                        + grant.getId() + " (id) - SUCCESS");
-                rows_imported++;
-            }
-            catch (RuntimeException e)
-            {
-                log.error("Import grant - FAILED " + e.getMessage(), e);
-                rows_discarded++;
-            }
-
-        }
-
-        log.info("Statistics: row ingested " + rows_imported + " on total of "
-                + (grantxml.size()) + " (" + rows_discarded + " row discarded)");
-    }
-
 }
+

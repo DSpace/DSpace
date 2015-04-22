@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.cris.importexport.IBulkChangesService;
 import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.export.ExportConstants;
 import org.dspace.app.cris.model.jdyna.OUPropertiesDefinition;
@@ -24,8 +25,8 @@ import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.ImportExportUtils;
 import org.dspace.app.cris.util.UtilsXSD;
-import org.dspace.app.cris.ws.WSConstants;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.utils.DSpace;
 import org.springframework.core.io.Resource;
 import org.springframework.ws.soap.server.endpoint.interceptor.PayloadValidatingInterceptor;
 
@@ -117,58 +118,26 @@ public class CustomRequestPayloadValidatingInterceptor extends
             {
                 try
                 {
-
-                    if (clazz.isAssignableFrom(ProjectPropertiesDefinition.class))
-                    {
-                        filexsd = ImportExportUtils.newGenerateGrantXSD(writer,
-                                dir, metadataALL, filexsd, elementsRoot, new String[] {
-                                ExportConstants.NAME_PUBLICID_ATTRIBUTE,
-                                ExportConstants.NAME_BUSINESSID_ATTRIBUTE,
-                                ExportConstants.NAME_ID_ATTRIBUTE,
-                                ExportConstants.NAME_TYPE_ATTRIBUTE },
-                        new boolean[] { true, false, false,
-                                true });
-                    }
-                    else if (clazz.isAssignableFrom(RPPropertiesDefinition.class))
-                    {
-                        filexsd = ImportExportUtils
-                                .newGenerateXSD(
-                                        writer,
-                                        dir,
-                                        metadataALL,
-                                        filexsd,
-                                        elementsRoot,
-                                        WSConstants.NAMESPACE_PREFIX_RP+":",
-                                        WSConstants.NAMESPACE_RP,
-                                        WSConstants.NAMESPACE_RP,
-                                        new String[] {
-                                                ExportConstants.NAME_PUBLICID_ATTRIBUTE,
-                                                ExportConstants.NAME_BUSINESSID_ATTRIBUTE,
-                                                ExportConstants.NAME_ID_ATTRIBUTE,
-                                                ExportConstants.NAME_TYPE_ATTRIBUTE },
-                                        new boolean[] { true, false, false,
-                                                true });
-                    }
-                    else if (clazz.isAssignableFrom(OUPropertiesDefinition.class))
-                    {
-                        filexsd = ImportExportUtils
-                                .newGenerateXSD(
-                                        writer,
-                                        dir,
-                                        metadataALL,
-                                        filexsd,
-                                        elementsRoot,
-                                        WSConstants.NAMESPACE_PREFIX_OU+":",
-                                        WSConstants.NAMESPACE_OU,
-                                        WSConstants.NAMESPACE_OU,
-                                        new String[] {
-                                                ExportConstants.NAME_PUBLICID_ATTRIBUTE,
-                                                ExportConstants.NAME_BUSINESSID_ATTRIBUTE,
-                                                ExportConstants.NAME_ID_ATTRIBUTE,
-                                                ExportConstants.NAME_TYPE_ATTRIBUTE },
-                                        new boolean[] { true, false, false,
-                                                true });
-                    }
+                	DSpace dspace = new DSpace();
+                    IBulkChangesService importer = dspace.getServiceManager().getServiceByName("XMLBulkChangesService", IBulkChangesService.class);
+                    
+                	String[] namespace = UtilsXSD.getNamespace(clazz);
+                    filexsd = importer.generateTemplate(
+                            writer,
+                            dir,
+                            metadataALL,
+                            filexsd,
+                            elementsRoot,
+                            namespace[0]+":",
+                            namespace[1],
+                            namespace[1],
+                            new String[] {
+                                    ExportConstants.NAME_PUBLICID_ATTRIBUTE,
+                                    ExportConstants.NAME_BUSINESSID_ATTRIBUTE,
+                                    ExportConstants.NAME_ID_ATTRIBUTE,
+                                    ExportConstants.NAME_TYPE_ATTRIBUTE },
+                            new boolean[] { true, false, false,
+                                    true });
 
                 }
                 

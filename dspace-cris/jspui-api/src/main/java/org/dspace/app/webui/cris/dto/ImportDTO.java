@@ -7,13 +7,19 @@
  */
 package org.dspace.app.webui.cris.dto;
 
+import java.io.InputStream;
+
 import org.springframework.web.multipart.MultipartFile;
 
 public class ImportDTO {
 	
+	private String targetEntity;
+	
 	private MultipartFile file;
 	
-	private String modeXSD;
+	private boolean template;
+	
+	private String format;
 	
 	public void setFile(MultipartFile file) {
 		this.file = file;
@@ -23,13 +29,27 @@ public class ImportDTO {
 		return file;
 	}
 
-	public void setModeXSD(String modeXSD) {
-		this.modeXSD = modeXSD;
+	public String getTargetEntity() {
+		return targetEntity;
 	}
 
-	public String getModeXSD() {
-		return modeXSD;
+	public void setTargetEntity(String targetEntity) {
+		this.targetEntity = targetEntity;
 	}
 
-	
+	public boolean isTemplate() {
+		return template;
+	}
+
+	public void setTemplate(boolean template) {
+		this.template = template;
+	}
+
+	public String getFormat() {
+		return format;
+	}
+
+	public void setFormat(String format) {
+		this.format = format;
+	}
 }
