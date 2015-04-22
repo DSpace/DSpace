@@ -31,12 +31,24 @@ public class ImageMagickImageThumbnailFilter extends ImageMagickThumbnailFilter
             throws Exception
     {
 		File f = inputStreamToTempFile(source, "imthumb", ".tmp");
-    	File f2 = getThumbnailFile(f);
-	    f.delete();
-	    byte[] bytes = Files.readAllBytes(f2.toPath());
-	    f2.delete();
-	    return new ByteArrayInputStream(bytes);
-    }
+    	File f2 = null;
+	    try
+	    {
+		    f2 = getThumbnailFile(f);
+		    byte[] bytes = Files.readAllBytes(f2.toPath());
+		    return new ByteArrayInputStream(bytes);
+	    }
+	    finally
+	    {
+		    //noinspection ResultOfMethodCallIgnored
+		    f.delete();
+		    if (f2 != null)
+		    {
+			    //noinspection ResultOfMethodCallIgnored
+			    f2.delete();
+		    }
+	    }
+	}
 
 
 }
