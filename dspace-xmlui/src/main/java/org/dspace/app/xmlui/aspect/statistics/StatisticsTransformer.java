@@ -239,9 +239,22 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 			statisticsTable.setId("tab1");
 
 			DatasetTimeGenerator timeAxis = new DatasetTimeGenerator();
-			int lastNYears = 0 - ConfigurationManager.getIntProperty("usage-statistics", "last.n.years", 12);
+			int lastNYears = ConfigurationManager.getIntProperty("usage-statistics", "last.n.years", 12);
+			String accessioned = dso.getMetadata("dc.date.accessioned");
+			if(accessioned != null && !accessioned.isEmpty()){
+                SimpleDateFormat format = new SimpleDateFormat("yyyy");
+                Date date = format.parse(accessioned);
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(date);
+                Calendar now = Calendar.getInstance();
+                now.setTime(new Date());
+                int yearsAvail = now.get(Calendar.YEAR)-cal.get(Calendar.YEAR);
+                if(yearsAvail < lastNYears){
+                        lastNYears = yearsAvail;
+                }
+			}
 			//Year wise breakup of last 12 years + this year
-			timeAxis.setDateInterval("year", Integer.toString(lastNYears), "+1");
+			timeAxis.setDateInterval("year", Integer.toString(0 - lastNYears), "+1");
 			statisticsTable.addDatasetGenerator(timeAxis);
 
 			DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();
