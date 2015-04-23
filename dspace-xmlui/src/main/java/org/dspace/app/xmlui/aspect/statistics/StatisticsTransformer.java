@@ -34,6 +34,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Metadatum;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.statistics.Dataset;
@@ -238,8 +239,9 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 			statisticsTable.setId("tab1");
 
 			DatasetTimeGenerator timeAxis = new DatasetTimeGenerator();
+			int lastNYears = 0 - ConfigurationManager.getIntProperty("usage-statistics", "last.n.years", 12);
 			//Year wise breakup of last 12 years + this year
-			timeAxis.setDateInterval("year", "-12", "+1");
+			timeAxis.setDateInterval("year", Integer.toString(lastNYears), "+1");
 			statisticsTable.addDatasetGenerator(timeAxis);
 
 			DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();
