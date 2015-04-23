@@ -19,6 +19,7 @@ import org.apache.solr.client.solrj.request.AbstractUpdateRequest;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.client.solrj.request.LukeRequest;
+import org.apache.solr.client.solrj.response.CoreAdminResponse;
 import org.apache.solr.client.solrj.response.FieldStatsInfo;
 import org.apache.solr.client.solrj.response.LukeResponse;
 import org.apache.solr.client.solrj.response.RangeFacet;
@@ -31,6 +32,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.FileStore;
 import java.text.*;
 import java.util.*;
 
@@ -88,18 +90,26 @@ public class SolrImportExport
 			}
 			String[] indexNames = line.getOptionValues(INDEX_NAME_OPTION);
 
-			String exportDir = makeDirectoryName(line.getOptionValue(DIRECTORY_OPTION));
+			String directoryName = makeDirectoryName(line.getOptionValue(DIRECTORY_OPTION));
 
 			String action = line.getOptionValue(ACTION_OPTION, "export");
 			if ("import".equals(action))
 			{
 				for (String indexName : indexNames)
 				{
+					File importDir = new File(directoryName);
+					if (!importDir.exists() || !importDir.canRead())
+					{
+						System.err.println("Import directory " + directoryName
+								                   + " doesn't exist or is not readable by the current user. Not importing index "
+								                   + indexName);
+						continue; // skip this index
+					}
 					try
 					{
 						String solrUrl = makeSolrUrl(indexName);
 						boolean clear = line.hasOption(CLEAR_OPTION);
-						importIndex(indexName, exportDir, solrUrl, clear, clear);
+						importIndex(indexName, importDir, solrUrl, clear, clear);
 					}
 					catch (IOException | SolrServerException | SolrImportExportException e)
 					{
@@ -113,6 +123,26 @@ public class SolrImportExport
 				for (String indexName : indexNames)
 				{
 					String lastValue = line.getOptionValue(LAST_OPTION);
+					File exportDir = new File(directoryName);
+					if (exportDir.exists() && !exportDir.canWrite())
+					{
+						System.err.println("Export directory " + directoryName
+								                   + " is not writable by the current user. Not exporting index "
+								                   + indexName);
+						continue;
+					}
+
+					if (!exportDir.exists())
+					{
+						boolean created = exportDir.mkdirs();
+						if (!created)
+						{
+							System.err.println("Export directory " + directoryName
+									                   + " could not be created. Not exporting index " + indexName);
+						}
+						continue;
+					}
+
 					try
 					{
 						String solrUrl = makeSolrUrl(indexName);
@@ -132,7 +162,7 @@ public class SolrImportExport
 				{
 					try {
 						boolean keepExport = line.hasOption(KEEP_OPTION);
-						reindex(indexName, exportDir, keepExport);
+						reindex(indexName, directoryName, keepExport);
 					} catch (IOException | SolrServerException | SolrImportExportException e) {
 						e.printStackTrace();
 					}
@@ -175,10 +205,12 @@ public class SolrImportExport
 	 * Reindexes the specified core
 	 *
 	 * @param indexName the name of the core to reindex
-	 * @param exportDir the directory to use for export
-	 * @param keepExport whether to keep the contents of the exportDir after the reindex. If false, this directory will be deleted at the end of the reimport.
+	 * @param exportDirName the name of the directory to use for export. If this directory doesn't exist, it will be created.
+	 * @param keepExport whether to keep the contents of the exportDir after the reindex. If keepExport is false and the
+	 *                      export directory was created by this method, the export directory will be deleted at the end of the reimport.
 	 */
-	private static void reindex(String indexName, String exportDir, boolean keepExport) throws IOException, SolrServerException, SolrImportExportException {
+	private static void reindex(String indexName, String exportDirName, boolean keepExport)
+			throws IOException, SolrServerException, SolrImportExportException {
 		String tempIndexName = indexName + "-temp";
 
 		String origSolrUrl = makeSolrUrl(indexName);
@@ -193,34 +225,72 @@ public class SolrImportExport
 		if (!solrInstance.exists() || !solrInstance.canRead() || !solrInstance.isDirectory())
 		{
 			throw new SolrImportExportException("Directory " + solrInstanceDir + "/conf/ doesn't exist or isn't readable." +
-					                   " The reindexing process requires the solr configuration directory for this index to be present on the local machine" +
-					                   " even if the Solr is running on a different host. Not reindexing index " + indexName);
+					                   " The reindexing process requires the Solr configuration directory for this index to be present on the local machine" +
+					                   " even if Solr is running on a different host. Not reindexing index " + indexName);
 		}
 
 		String timeField = makeTimeField(indexName);
 
-		// Create a temp directory to store temporary core data
-		File tempDataDir = new File(ConfigurationManager.getProperty("dspace.dir") + File.separator + "temp" + File.separator + "solr-data");
-		boolean tempDirCreated = tempDataDir.mkdirs();
-		if (!tempDirCreated)
+		// Ensure the export directory exists and is writable
+		File exportDir = new File(exportDirName);
+		boolean createdExportDir = exportDir.mkdirs();
+		if (!createdExportDir && !exportDir.exists())
 		{
-			throw new SolrImportExportException("Could not create temporary data directory " + tempDataDir.getCanonicalPath());
+			throw new SolrImportExportException("Could not create export directory " + exportDirName);
+		}
+		if (!exportDir.canWrite())
+		{
+			throw new SolrImportExportException("Can't write to export directory " + exportDirName);
 		}
 
 		try
 		{
-			// create a temporary core to hold documents coming in during the reindex
 			HttpSolrServer adminSolr = new HttpSolrServer(baseSolrUrl);
-			CoreAdminRequest.Create createRequest = new CoreAdminRequest.Create();
-			createRequest.setInstanceDir(solrInstanceDir);
-			createRequest.setDataDir(tempDataDir.getCanonicalPath());
-			createRequest.setCoreName(tempIndexName);
 
-			int responseCode = createRequest.process(adminSolr).getStatus();
-			if (responseCode != 0)
+			// try to find out size of core and compare with free space in export directory
+			CoreAdminResponse status = CoreAdminRequest.getStatus(indexName, adminSolr);
+			Object coreSizeObj = status.getCoreStatus(indexName).get("sizeInBytes");
+			long coreSize = coreSizeObj != null ? Long.valueOf(coreSizeObj.toString()) : -1;
+			long usableExportSpace = exportDir.getUsableSpace();
+			if (coreSize >= 0 && usableExportSpace < coreSize)
 			{
-				// the "process" call has probably thrown an exception already -- throw this just in case
-				throw new SolrImportExportException("Could not create temporary core on Solr server " + baseSolrUrl + ", code was: " + responseCode);
+				System.err.println("Not enough space in export directory " + exportDirName
+						                   + "; need at least as much space as the index ("
+						                   + FileUtils.byteCountToDisplaySize(coreSize)
+						                   + ") but usable space in export directory is only "
+						                   + FileUtils.byteCountToDisplaySize(usableExportSpace)
+						                   + ". Not continuing with reindex, please use the " + DIRECTORY_OPTION
+						                   + " option to specify an alternative export directy with sufficient space.");
+				return;
+			}
+
+			// Create a temp directory to store temporary core data
+			File tempDataDir = new File(ConfigurationManager.getProperty("dspace.dir") + File.separator + "temp" + File.separator + "solr-data");
+			boolean createdTempDataDir = tempDataDir.mkdirs();
+			if (!createdTempDataDir && !tempDataDir.exists())
+			{
+				throw new SolrImportExportException("Could not create temporary data directory " + tempDataDir.getCanonicalPath());
+			}
+			if (!tempDataDir.canWrite())
+			{
+				throw new SolrImportExportException("Can't write to temporary data directory " + tempDataDir.getCanonicalPath());
+			}
+
+			try
+			{
+				// create a temporary core to hold documents coming in during the reindex
+				CoreAdminRequest.Create createRequest = new CoreAdminRequest.Create();
+				createRequest.setInstanceDir(solrInstanceDir);
+				createRequest.setDataDir(tempDataDir.getCanonicalPath());
+				createRequest.setCoreName(tempIndexName);
+
+				createRequest.process(adminSolr).getStatus();
+			}
+			catch (SolrServerException e)
+			{
+				// try to continue -- it may just be that the core already existed from a previous, failed attempt
+				System.err.println("Caught exception when trying to create temporary core: " + e.getMessage() + "; trying to recover.");
+				e.printStackTrace(System.err);
 			}
 
 			// swap actual core with temporary one
@@ -230,11 +300,20 @@ public class SolrImportExport
 			swapRequest.setAction(CoreAdminParams.CoreAdminAction.SWAP);
 			swapRequest.process(adminSolr);
 
-			// export from the actual core (from temp core name, actual data dir)
-			exportIndex(indexName, exportDir, tempSolrUrl, timeField);
+			try
+			{
+				// export from the actual core (from temp core name, actual data dir)
+				exportIndex(indexName, exportDir, tempSolrUrl, timeField);
 
-			// clear actual core (temp core name, clearing actual data dir) & import
-			importIndex(indexName, exportDir, tempSolrUrl, true, true);
+				// clear actual core (temp core name, clearing actual data dir) & import
+				importIndex(indexName, exportDir, tempSolrUrl, true, true);
+			}
+			catch (Exception e)
+			{
+				// we ran into some problems with the export/import -- keep going to try and restore the solr cores
+				System.err.println("Encountered problem during reindex: " + e.getMessage() + ", will attempt to restore Solr cores");
+				e.printStackTrace(System.err);
+			}
 
 			// commit changes
 			HttpSolrServer origSolr = new HttpSolrServer(origSolrUrl);
@@ -247,30 +326,31 @@ public class SolrImportExport
 			swapRequest.setAction(CoreAdminParams.CoreAdminAction.SWAP);
 			swapRequest.process(adminSolr);
 
-			// export all docs from now-temp core into a temporary directory...
-			String tempExportDirName = ConfigurationManager.getProperty("dspace.dir") + File.separator + "temp" + File.separator + "solr-data-tmp";
-			exportIndex(tempIndexName, tempExportDirName, tempSolrUrl, timeField);
+			// export all docs from now-temp core into export directory -- this won't cause name collisions with the actual export
+			// because the core name for the temporary export has -temp in it while the actual core doesn't
+			exportIndex(tempIndexName, exportDir, tempSolrUrl, timeField);
 			// ...and import them into the now-again-actual core *without* clearing
-			importIndex(tempIndexName, tempExportDirName, origSolrUrl, false, true);
+			importIndex(tempIndexName, exportDir, origSolrUrl, false, true);
 
 			// commit changes
 			origSolr.commit();
 
-			// delete temporary export dir
-			FileUtils.deleteDirectory(new File(tempExportDirName));
-
 			// unload now-temp core (temp core name)
 			CoreAdminRequest.unloadCore(tempIndexName, false, false, adminSolr);
 
-			if (!keepExport)
+			// clean up temporary data dir if this method created it
+			if (createdTempDataDir && tempDataDir.exists())
 			{
-				FileUtils.deleteDirectory(new File(exportDir));
+				FileUtils.deleteDirectory(tempDataDir);
 			}
 		}
 		finally
 		{
-			// clean up
-			FileUtils.deleteDirectory(tempDataDir);
+			// clean up export dir if appropriate
+			if (!keepExport && createdExportDir && exportDir.exists())
+			{
+				FileUtils.deleteDirectory(exportDir);
+			}
 		}
 	}
 
@@ -286,28 +366,37 @@ public class SolrImportExport
 	 * @throws IOException if there is a problem creating the files or communicating with Solr.
 	 * @throws SolrImportExportException if there is a problem in communicating with Solr.
 	 */
-	public static void exportIndex(String indexName, String toDir, String solrUrl, String timeField) throws SolrServerException, SolrImportExportException, IOException {
+	public static void exportIndex(String indexName, File toDir, String solrUrl, String timeField)
+			throws SolrServerException, SolrImportExportException, IOException {
 		exportIndex(indexName, toDir, solrUrl, timeField, null);
 	}
 
 	/**
 	 * Import previously exported documents (or externally created CSV files that have the appropriate structure) into the specified index.
 	 * @param indexName the index to import.
-	 * @param fromDir the source directory.
+	 * @param fromDir the source directory. Must exist and be readable.
 	 *                   The importer will look for files whose name starts with <pre>indexName</pre>
 	 *                   and ends with .csv (to match what is generated by #makeExportFilename).
 	 * @param solrUrl The solr URL for the index to export. Must not be null.
 	 * @param clear if true, clear the index before importing.
-	 * @param overwrite
+	 * @param overwrite if true, skip _version_ field on import to disable Solr's optimistic concurrency functionality
 	 * @throws IOException if there is a problem reading the files or communicating with Solr.
 	 * @throws SolrServerException if there is a problem reading the files or communicating with Solr.
 	 * @throws SolrImportExportException if there is a problem communicating with Solr.
 	 */
-	public static void importIndex(final String indexName, String fromDir, String solrUrl, boolean clear, boolean overwrite) throws IOException, SolrServerException, SolrImportExportException
+	public static void importIndex(final String indexName, File fromDir, String solrUrl, boolean clear, boolean overwrite)
+			throws IOException, SolrServerException, SolrImportExportException
 	{
 		if (StringUtils.isBlank(solrUrl))
 		{
 			throw new SolrImportExportException("Could not construct solr URL for index" + indexName + ", aborting export.");
+		}
+
+		if (!fromDir.exists() || !fromDir.canRead())
+		{
+			throw new SolrImportExportException("Source directory " + fromDir
+					                                    + " doesn't exist or isn't readable, aborting export of index "
+					                                    + indexName);
 		}
 
 		HttpSolrServer solr = new HttpSolrServer(solrUrl);
@@ -320,8 +409,7 @@ public class SolrImportExport
 			clearIndex(solrUrl);
 		}
 
-		File sourceDir = new File(fromDir);
-		File[] files = sourceDir.listFiles(new FilenameFilter()
+		File[] files = fromDir.listFiles(new FilenameFilter()
 		{
 			@Override
 			public boolean accept(File dir, String name)
@@ -332,7 +420,7 @@ public class SolrImportExport
 
 		if (files == null || files.length == 0)
 		{
-			log.warn("No export files found in directory " + fromDir + " for index " + indexName);
+			log.warn("No export files found in directory " + fromDir.getCanonicalPath() + " for index " + indexName);
 			return;
 		}
 
@@ -417,22 +505,19 @@ public class SolrImportExport
 	 * @throws IOException if there is a problem creating the files or communicating with Solr.
 	 * @throws SolrImportExportException if there is a problem in communicating with Solr.
 	 */
-	public static void exportIndex(String indexName, String toDir, String solrUrl, String timeField, String fromWhen) throws SolrServerException, IOException, SolrImportExportException
+	public static void exportIndex(String indexName, File toDir, String solrUrl, String timeField, String fromWhen)
+			throws SolrServerException, IOException, SolrImportExportException
 	{
 		if (StringUtils.isBlank(solrUrl))
 		{
 			throw new SolrImportExportException("Could not construct solr URL for index" + indexName + ", aborting export.");
 		}
 
-		File targetDir = new File(toDir);
-		if (!targetDir.exists())
+		if (!toDir.exists() || !toDir.canWrite())
 		{
-			//noinspection ResultOfMethodCallIgnored
-			targetDir.mkdirs();
-		}
-		if (!targetDir.exists())
-		{
-			throw new SolrImportExportException("Could not create target directory " + toDir + ", aborting export of index ");
+			throw new SolrImportExportException("Target directory " + toDir
+					                                    + " doesn't exist or is not writable, aborting export of index "
+					                                    + indexName);
 		}
 
 		HttpSolrServer solr = new HttpSolrServer(solrUrl);
@@ -498,7 +583,7 @@ public class SolrImportExport
 				monthQuery.setStart(i);
 				URL url = new URL(solrUrl + "/select?" + monthQuery.toString());
 
-				File file = new File(targetDir.getCanonicalPath(), makeExportFilename(indexName, monthStartDate, docsThisMonth, i));
+				File file = new File(toDir.getCanonicalPath(), makeExportFilename(indexName, monthStartDate, docsThisMonth, i));
 				if (file.createNewFile())
 				{
 					FileUtils.copyURLToFile(url, file);
@@ -506,7 +591,8 @@ public class SolrImportExport
 				}
 				else
 				{
-					throw new SolrImportExportException("Could not create file " + file.getCanonicalPath() + " while exporting index " + indexName
+					throw new SolrImportExportException("Could not create file " + file.getCanonicalPath()
+							                                    + " while exporting index " + indexName
 							                                    + ", month" + monthStart
 							                                    + ", batch " + i);
 				}
