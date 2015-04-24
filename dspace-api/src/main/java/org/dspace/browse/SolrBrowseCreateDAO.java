@@ -292,12 +292,16 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
                                                         values[x].value,
                                                         values[x].language,
                                                         bi.getDataType());
+                                        String val = values[x].value;
+                                        if(bi.getDataType().equals("iso_lang")){  
+                                            val = nVal;
+                                        }
                                         distFValues
                                                 .add(nVal
                                                         + SolrServiceImpl.FILTER_SEPARATOR
-                                                        + values[x].value);
-                                        distFVal.add(values[x].value);
-                                        distValuesForAC.add(values[x].value);
+                                                        + val);
+                                        distFVal.add(val);
+                                        distValuesForAC.add(val);
                                     }
                                 }
                             }
