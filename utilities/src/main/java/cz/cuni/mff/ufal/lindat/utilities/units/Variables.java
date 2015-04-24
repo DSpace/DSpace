@@ -85,7 +85,7 @@ public class Variables {
           }
           // last nasty try
           if ( url == null ) {
-        	  log.error("Failed to find lr.cfg. The class loader search is from " + Variables.class.getClassLoader().getResource("./"));
+        	  log.debug("Failed to find lr.cfg.\nUsing nasty trick.\nThe class loader search was from " + Variables.class.getClassLoader().getResource("./"));
         	  System.err.println("Failed to find lr.cfg. The class loader search is from " + Variables.class.getClassLoader().getResource("./"));
               url = Variables.class.getClassLoader().getResource(Variables.class.getName().replace('.', '/') + ".class");
               url = new URL(  new URL(url.getPath().split("utilities-")[0]),
