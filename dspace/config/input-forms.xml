@@ -101,11 +101,9 @@
          <dc-qualifier>issued</dc-qualifier>
          <repeatable>false</repeatable>
           <label>Date issued</label>
-          <input-type>onebox</input-type>
+          <input-type>FormattedDate</input-type>
           <hint>Please give the date when the submission data were issued if any e.g., 2014-01-21 or at least the year.</hint>
           <required>You must enter the date or at least the year.</required>
-          <regexp>\d\d\d\d(-\d\d)?(-\d\d)?</regexp>
-          <regexp-warning>The supplied date does not follow our date pattern \d\d\d\d(-\d\d)?(-\d\d)? e.g., 2014-01-21 or 2014</regexp-warning>         
        </field>
 
        <field>

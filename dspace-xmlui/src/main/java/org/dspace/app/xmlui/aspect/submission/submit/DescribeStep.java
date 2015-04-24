@@ -310,6 +310,10 @@ public class DescribeStep extends AbstractSubmissionStep
                         {
                                 renderDateField(form, fieldName, dcInput, dcValues, readonly);
                         }
+                        else if (inputType.equals("FormattedDate"))
+                        {
+                                renderFormattedDateField(form, fieldName, dcInput, dcValues, readonly);
+                        }
                         else if (inputType.equals("series"))
                         {
                                 renderSeriesField(form, fieldName, dcInput, dcValues, readonly);
@@ -368,7 +372,13 @@ public class DescribeStep extends AbstractSubmissionStep
         addControlButtons(form);
         }
 
-    /**
+    private void renderFormattedDateField(List form, String fieldName,
+				DCInput dcInput, Metadatum[] dcValues, boolean readonly) throws WingException {
+    		//onebox field expecting date in preset format eg. yyyy-mm-dd
+    		renderOneboxField(form, fieldName, dcInput, dcValues, readonly);
+		}
+
+	/**
      * Each submission step must define its own information to be reviewed
      * during the final Review/Verify Step in the submission process.
      * <P>

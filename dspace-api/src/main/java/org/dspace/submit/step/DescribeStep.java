@@ -9,8 +9,11 @@ package org.dspace.submit.step;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -100,7 +103,6 @@ public class DescribeStep extends AbstractProcessingStep
     	"metashare.ResourceInfo#ResourceCreationInfo#FundingInfo#ProjectInfo.fundingType"
     }; 
     private static final Set<String> nonUniqueMdSet = new HashSet<String>(Arrays.asList(nonUniqueMd));
-    
     
     /** Constructor */
     public DescribeStep() throws ServletException
@@ -253,6 +255,10 @@ public class DescribeStep extends AbstractProcessingStep
             {
                 readDate(request, item, schema, element, qualifier);
             }
+            else if (inputType.equals("FormattedDate"))
+            {
+                readFormattedDate(request, item, schema, element, qualifier);
+            }
             // choice-controlled input with "select" presentation type is
             // always rendered as a dropdown menu
             else if (inputType.equals("dropdown") || inputType.equals("list") ||
@@ -400,7 +406,62 @@ public class DescribeStep extends AbstractProcessingStep
 
     
 
-    private void readComplex(HttpServletRequest request, Item item,
+    private void readFormattedDate(HttpServletRequest request, Item item,
+			String schema, String element, String qualifier) {
+        String metadataField = MetadataField
+                .formKey(schema, element, qualifier);
+
+        String dateParam = request.getParameter(metadataField);
+        Date date = null;
+        SimpleDateFormat ymd = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat ym = new SimpleDateFormat("yyyy-MM");
+        SimpleDateFormat y = new SimpleDateFormat("yyyy");
+        SimpleDateFormat mm = new SimpleDateFormat("MM");
+        SimpleDateFormat dd = new SimpleDateFormat("dd");
+        SimpleDateFormat[] acceptedFormats = new SimpleDateFormat[]{ymd, ym, y};
+
+        int attempt = 0;
+        for(SimpleDateFormat format : acceptedFormats){
+        	format.setLenient(false);
+        	if(date == null){
+        		try{
+        			date = format.parse(dateParam);
+        			break;
+        		}catch(ParseException e){
+                    attempt++;
+        		}
+        	}
+        }
+        
+        if(date == null){
+        	addErrorField(request, metadataField);
+        	return;
+        }
+        SimpleDateFormat format = acceptedFormats[attempt];
+        //We don't want to trim 2011-13-41 to 2011
+        if(!format.format(date).equals(dateParam)){
+        	addErrorField(request, metadataField);
+        	return;
+        }
+        int year = Integer.parseInt(y.format(date));
+        int month = Integer.parseInt(mm.format(date));
+        int day = Integer.parseInt(dd.format(date));
+        if(attempt > 0){
+        	day = -1;
+        }
+        if(attempt > 1){
+        	month = -1;
+        }
+        DCDate d = new DCDate(year, month, day, -1, -1, -1);
+
+        if (year > 0)
+        {
+            // Only put in date if there is one!
+            item.addMetadata(schema, element, qualifier, null, d.toString());
+        }
+	}
+
+	private void readComplex(HttpServletRequest request, Item item,
 			String schema, String element, String qualifier, DCInput input) {
 
         String metadataField = MetadataField
