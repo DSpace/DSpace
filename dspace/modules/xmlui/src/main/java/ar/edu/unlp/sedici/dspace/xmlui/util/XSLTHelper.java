@@ -1,6 +1,10 @@
 package ar.edu.unlp.sedici.dspace.xmlui.util;
 
+import org.apache.log4j.Logger;
+
 public class XSLTHelper {
+	
+	private final static Logger log = Logger.getLogger(XSLTHelper.class);
 	
 	public static String replaceAll(String source, String regex, String replacement) {
 		return source.replaceAll(regex, replacement);
@@ -22,6 +26,25 @@ public class XSLTHelper {
 		} else {
 			return source;
 		}
+	}
+	
+	public static String escapeURL(String url){
+		if (url == null){
+			try{
+				throw new NullPointerException();
+			}catch (Exception e) {
+				log.error("escapeURL: Se recibe null como url", e);
+			}
+			return "";
+		}
+		char[] reservados={'!','#','$','%','&','(',')','*','+',',','/',':',';','=','?','@','[',']',']', ' '};
+		for (char caracter: reservados) {
+			url=url.replace(caracter, '_');
+		}
+		//remplazo la comilla simple
+		url=url.replace("'", "_"); 	
+ 
+		return url;
 	}
 }
 

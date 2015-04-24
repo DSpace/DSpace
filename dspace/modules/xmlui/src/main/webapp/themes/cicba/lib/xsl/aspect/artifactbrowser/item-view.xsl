@@ -239,7 +239,16 @@
 	
 	<xsl:template match="mets:file" priority="10">
 		<li class="media">
-			<xsl:variable name="file_url" select="mets:FLocat[@LOCTYPE='URL']/@xlink:href" />
+			<xsl:variable name="documentTitle">
+				<xsl:value-of select="xmlui:replaceAll(substring-after(/mets:METS/@ID,':'), '\/', '_')"/>
+			</xsl:variable>
+			
+			<xsl:variable name="extension" select="substring-after(mets:FLocat[@LOCTYPE='URL']/@xlink:title, '.')"/>
+			<xsl:variable name="sequence" select="substring-after(mets:FLocat[@LOCTYPE='URL']/@xlink:href, '?')"/>
+			
+			<xsl:variable name="file_url">
+				<xsl:value-of select="substring-before(mets:FLocat[@LOCTYPE='URL']/@xlink:href, substring-after(/mets:METS/@ID, ':'))"/><xsl:value-of select="substring-after(/mets:METS/@ID, ':')"/>/<xsl:value-of select="$documentTitle"/>.<xsl:value-of select="$extension"/>?<xsl:value-of select="$sequence"/>
+			</xsl:variable>
 			<a class="media-left thumbnail_file" href="{$file_url}">
 				<xsl:variable name="thumbnail_file" select="../../mets:fileGrp[@USE='THUMBNAIL']/mets:file[@GROUPID=current()/@GROUPID]"/>
 				<xsl:choose>
