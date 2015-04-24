@@ -73,7 +73,7 @@ public class ControlPanelConfigurationTab extends AbstractControlPanelTab {
 
 		// ufal
 		dspace.addLabel("License database URL");
-		final String licDBurl = DSpaceApi.getFunctionalityManager().get("lr.utilities.db.password");
+		final String licDBurl = DSpaceApi.getFunctionalityManager().get("lr.utilities.db.url");
 		if (licDBurl != null && !licDBurl.equals("")) {
 			dspace.addItem(licDBurl);
 		} else {

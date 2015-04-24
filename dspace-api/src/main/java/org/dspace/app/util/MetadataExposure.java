@@ -16,8 +16,10 @@ import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 
 /**
  * Static utility class to manage configuration for exposure (hiding) of
@@ -62,9 +64,12 @@ public class MetadataExposure
 
     private static Map<String,Set<String>> hiddenElementSets = null;
     private static Map<String,Map<String,Set<String>>> hiddenElementMaps = null;
+    private static Map<String, Map<String, Map<String,String>>> hiddenConditions = null;
 
     private static final String CONFIG_PREFIX = "metadata.hide.";
     private static final String CONFIG_WILDCARD = "*";
+    
+    private static final String FILLER_QUALIFIER = "_FILLER_QUAL_";
 
     /**
      * Returns whether the given metadata field should be exposed (visible). The metadata field is in the DSpace's DC notation: schema.element.qualifier
@@ -80,18 +85,46 @@ public class MetadataExposure
     public static boolean isHidden(Context context, String schema, String element, String qualifier)
         throws SQLException
     {
+    	return isHidden(context, schema, element, qualifier, null);
+    }
+    public static boolean isHidden(Context context, String schema, String element, String qualifier, Item item)
+        throws SQLException
+    {
         // the administrator's override
         if (context != null && AuthorizeManager.isAdmin(context))
         {
             return false;
         }
 
-        // for schema.element, just check schema->elementSet
         if (!isInitialized())
         {
             init();
         }
+        
+        //not hidden
+        //if current user is submitter and metadata.hide.schema.element.qualifier=submitter
+        if(item != null && context != null && hiddenConditions.containsKey(schema)){        	
+        	Map<String, Map<String, String>> elements = hiddenConditions.get(schema);
+        	if(elements.containsKey(element)){
+        		Map<String, String> qualifiers = elements.get(element);
+        		String value = null;
+        		if(qualifier != null && qualifiers.containsKey(qualifier)){
+        			value = qualifiers.get(qualifier);
+        		}else if(qualifier == null && qualifiers.containsKey(FILLER_QUALIFIER)){
+        			value = qualifiers.get(FILLER_QUALIFIER);
+        		}
+        		if("submitter".equals(value)){
+        			EPerson ep = context.getCurrentUser();
+        			if(ep != null && ep.getID() > 1){
+        				if(ep.equals(item.getSubmitter())){
+        					return false;
+        				}
+        			}
+        		}
+        	}
+        }
 
+        // for schema.element, just check schema->elementSet
         if (qualifier == null)
         {
             Set<String> elts = hiddenElementSets.get(schema);
@@ -156,6 +189,7 @@ public class MetadataExposure
         {
             hiddenElementSets = new HashMap<String,Set<String>>();
             hiddenElementMaps = new HashMap<String,Map<String,Set<String>>>();
+            hiddenConditions = new HashMap<String, Map<String, Map<String,String>>>(); //schema->element->qualifier->value
 
             Enumeration pne = ConfigurationManager.propertyNames();
             while (pne.hasMoreElements())
@@ -165,6 +199,8 @@ public class MetadataExposure
                 {
                     String mdField = key.substring(CONFIG_PREFIX.length());
                     String segment[] = mdField.split("\\.", 3);
+                    String value = ConfigurationManager.getProperty(key).trim();
+                    String qualifier = FILLER_QUALIFIER;
 
                     // got schema.element.qualifier
                     if (segment.length == 3)
@@ -180,6 +216,7 @@ public class MetadataExposure
                             eltMap.put(segment[1], new HashSet<String>());
                         }
                         eltMap.get(segment[1]).add(segment[2]);
+                        qualifier = segment[2];
                     }
 
                     // got schema.element
@@ -190,6 +227,22 @@ public class MetadataExposure
                             hiddenElementSets.put(segment[0], new HashSet<String>());
                         }
                         hiddenElementSets.get(segment[0]).add(segment[1]);
+                    }
+                    
+                    if(value != null && !value.equals("") && !"true".equals(value)){
+                    	//select schema
+                    	Map<String, Map<String,String>> elements = hiddenConditions.get(segment[0]);
+                    	if(elements == null){
+                    		elements = new HashMap<String, Map<String,String>>();
+                    		hiddenConditions.put(segment[0], elements);
+                    	}
+                    	//select element
+                    	Map<String,String> qualifiers = elements.get(segment[1]);
+                    	if(qualifiers == null){
+                    		qualifiers = new HashMap<String,String>();
+                    		elements.put(segment[1], qualifiers);
+                    	}
+                    	qualifiers.put(qualifier, value);
                     }
 
                     // oops..

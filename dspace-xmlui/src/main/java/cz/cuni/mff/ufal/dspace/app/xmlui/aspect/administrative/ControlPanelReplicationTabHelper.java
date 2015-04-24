@@ -220,7 +220,7 @@ public class ControlPanelReplicationTabHelper {
 			action = "repl_tobe";
 		}
 				
-		if (!ReplicationManager.isReplicationOn()) return;
+		//if (!ReplicationManager.isReplicationOn()) return;
 				
 		if(action.equals("show_info")) {
 			showConfiguration(div, request, context);

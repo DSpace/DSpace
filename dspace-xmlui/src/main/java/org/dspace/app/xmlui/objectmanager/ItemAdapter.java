@@ -272,7 +272,7 @@ public class ItemAdapter extends AbstractAdapter
                 Metadatum[] dcvs = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
                 for (Metadatum dcv : dcvs)
                 {
-                        if (!MetadataExposure.isHidden(context, dcv.schema, dcv.element, dcv.qualifier))
+                        if (!MetadataExposure.isHidden(context, dcv.schema, dcv.element, dcv.qualifier, item))
                         {
                         // ///////////////////////////////
                         // Field element for each metadata field.
