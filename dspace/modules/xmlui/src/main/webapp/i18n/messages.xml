@@ -255,8 +255,8 @@
 	<!-- org.dspace.app.xmlui.artifactbrowser.ItemViewer.java -->
 	<message key="xmlui.ArtifactBrowser.ItemViewer.trail">View Item</message>
 	<message key="xmlui.ArtifactBrowser.ItemViewer.head_parent_collections">This item appears in the following Collection(s)</message>
-	<message key="xmlui.ArtifactBrowser.ItemViewer.show_simple">Show simple item record</message>
-	<message key="xmlui.ArtifactBrowser.ItemViewer.show_full">Show full item record</message>
+	<message key="xmlui.ArtifactBrowser.ItemViewer.show_simple">[-] Show simple item record</message>
+	<message key="xmlui.ArtifactBrowser.ItemViewer.show_full">[+] Show full item record</message>
 
         <message key="xmlui.ArtifactBrowser.ItemViewer.withdrawn">This item has been withdrawn and is no longer available.</message>
 
@@ -635,8 +635,8 @@
 	<message key="xmlui.Submission.general.workflow.title">Item submission</message>
 	<message key="xmlui.Submission.general.workflow.trail">Item submission</message>
 	<message key="xmlui.Submission.general.workflow.head">Item submission</message>
-	<message key="xmlui.Submission.general.showfull">Show full item record</message>
-	<message key="xmlui.Submission.general.showsimple">Show simple item record</message>
+	<message key="xmlui.Submission.general.showfull">[+] Show full item record</message>
+	<message key="xmlui.Submission.general.showsimple">[-] Show simple item record</message>
 	<message key="xmlui.Submission.general.default.title">Submission</message>
 	<message key="xmlui.Submission.general.default.trail">Submission</message>
 
