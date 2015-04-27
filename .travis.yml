@@ -3,15 +3,11 @@ language: java
 addons:
   postgresql: "9.4"
 
-python:
-  - "2.7"
-
 before_install:
   - sudo rm /etc/mavenrc
-  - export MAVEN_OPTS=-Dmaven.repo.local=/home/travis/.m2/repository -Xmx1024M -XX:MaxPermSize=192m --quiet
+  - export MAVEN_OPTS="-Dmaven.repo.local=/home/travis/.m2/repository -Xmx1024M -XX:MaxPermSize=192m --quiet"
   - whoami
   - java -version
-  - python --version
   - pwd
   - mvn help:system
   - sudo apt-get install -qq cloc
