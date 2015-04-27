@@ -10,7 +10,7 @@ package org.dspace.app.cris.ws.marshaller;
 
 import java.util.List;
 
-import org.dspace.app.cris.ws.WSConstants;
+import org.dspace.app.cris.util.UtilsXSD;
 import org.dspace.app.cris.ws.marshaller.bean.WSItem;
 import org.dspace.app.cris.ws.marshaller.bean.WSMetadata;
 import org.dspace.app.cris.ws.marshaller.bean.WSMetadataValue;
@@ -25,7 +25,7 @@ public class MarshallerPublications implements Marshaller<WSItem>
     {
         
         Namespace echoNamespaceRoot = Namespace.getNamespace("cris",
-                WSConstants.NAMESPACE_CRIS);
+        		UtilsXSD.NAMESPACE_CRIS);
         Element root = new Element(nameRoot, echoNamespaceRoot);
         root.setAttribute("hit", "" + hit);
         root.setAttribute("start", "" + start);
@@ -33,8 +33,8 @@ public class MarshallerPublications implements Marshaller<WSItem>
         root.setAttribute("type", "" + type);
         
         // build the response XML with JDOM
-        Namespace echoNamespace = Namespace.getNamespace(WSConstants.NAMESPACE_PREFIX_ITEM,
-                WSConstants.NAMESPACE_ITEM);
+        Namespace echoNamespace = Namespace.getNamespace(UtilsXSD.NAMESPACE_PREFIX_ITEM,
+        		UtilsXSD.NAMESPACE_ITEM);
 
         Element child = new Element("crisobjects", echoNamespace);     
                     

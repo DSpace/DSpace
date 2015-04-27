@@ -16,7 +16,10 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.cris.importexport.IBulkChangesService;
+import org.dspace.app.cris.importexport.XMLBulkChangesService;
 import org.dspace.app.cris.model.CrisConstants;
+import org.dspace.app.cris.model.export.ExportConstants;
 import org.dspace.app.cris.model.jdyna.OUPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
@@ -24,6 +27,7 @@ import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.ImportExportUtils;
 import org.dspace.app.cris.util.UtilsXSD;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.utils.DSpace;
 import org.springframework.core.io.Resource;
 import org.springframework.ws.soap.server.endpoint.interceptor.PayloadValidatingInterceptor;
 
@@ -38,7 +42,7 @@ public class CustomResponsePayloadValidatingInterceptor extends PayloadValidatin
      * Default absolute path where find the contact data excel file to import
      */
     public static final String PATH_DIR = ConfigurationManager.getProperty(CrisConstants.CFG_MODULE, "webservices.xsd.path");
-    
+
     @Override
     public void setSchema(Resource schema)
     {
@@ -49,8 +53,10 @@ public class CustomResponsePayloadValidatingInterceptor extends PayloadValidatin
     }
 
 
-    private <T extends PropertiesDefinition> void buildXML(String name, Class<T> clazz, String[] elementsRoot)
+	private <T extends PropertiesDefinition> void buildXML(String name,
+			Class<T> clazz, String[] elementsRoot)
     {
+		String[] namespace = UtilsXSD.getNamespace(clazz);
         File dir = new File(PATH_DIR);
         File filexsd = null;
         String nameXSD = name;
@@ -97,13 +103,21 @@ public class CustomResponsePayloadValidatingInterceptor extends PayloadValidatin
         }
         try
         {
-            
-            if(clazz.isAssignableFrom(ProjectPropertiesDefinition.class)) {
-                filexsd = ImportExportUtils.generateGrantXSD(writer, dir, metadataALL, filexsd, elementsRoot);
-            }
-            else {
-                filexsd = ImportExportUtils.generateXSD(writer, dir, metadataALL, filexsd, elementsRoot);
-            }
+        	DSpace dspace = new DSpace();
+            IBulkChangesService importer = dspace.getServiceManager().getServiceByName(XMLBulkChangesService.SERVICE_NAME, IBulkChangesService.class);
+			filexsd = importer.generateTemplate(writer, dir, metadataALL,
+					filexsd, elementsRoot,
+	        		namespace[0]+":",
+	                namespace[1],
+	                namespace[1],
+	                new String[] {
+	                        ExportConstants.NAME_PUBLICID_ATTRIBUTE,
+	                        ExportConstants.NAME_BUSINESSID_ATTRIBUTE,
+	                        ExportConstants.NAME_ID_ATTRIBUTE,
+	                        ExportConstants.NAME_TYPE_ATTRIBUTE },
+	                new boolean[] { true, false, false,
+	                        true });
+
         }
         catch (SecurityException e)
         {

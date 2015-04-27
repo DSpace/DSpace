@@ -20,16 +20,19 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
+import org.dspace.app.cris.importexport.XMLBulkChangesService;
 import org.dspace.app.cris.model.CrisConstants;
+import org.dspace.app.cris.model.ResearcherPage;
+import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.ImportExportUtils;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.utils.DSpace;
 
-public class ScriptHKURP {
+public class ScriptCrisBulkChanges {
 	/** log4j logger */
-	private static Logger log = Logger.getLogger(ScriptHKURP.class);
+	private static Logger log = Logger.getLogger(ScriptCrisBulkChanges.class);
 
 	/**
 	 * Batch script to load the contact data in the RPs database from XML. See
@@ -44,7 +47,7 @@ public class ScriptHKURP {
         ApplicationService applicationService = dspace.getServiceManager().getServiceByName(
                 "applicationService", ApplicationService.class);
         
-		String excelFilePath = null;
+		String filePath = null;
 
 		CommandLineParser parser = new PosixParser();
 
@@ -52,7 +55,8 @@ public class ScriptHKURP {
 		options.addOption("h", "help", false, "help");
 
 		options.addOption("f", "file", true, "File xml to import");
-
+		options.addOption("t", "format", false, "The format input (XMLBulkChangesService, CSVBulkChangesService)");
+		
 		// allen's added argument
 		options.addOption("active", "active", false,
 				"Set newly created epersons active");
@@ -66,9 +70,9 @@ public class ScriptHKURP {
 
 		if (line.hasOption('h')) {
 			HelpFormatter myhelp = new HelpFormatter();
-			myhelp.printHelp("ScriptHRURP \n", options);
+			myhelp.printHelp("ScriptCrisBulkChanges \n", options);
 			System.out
-					.println("\n\nUSAGE:\n ScriptHKURP <-f path_file_xml> \n");
+					.println("\n\nUSAGE:\n ScriptCrisBulkChanges <-f path_file_xml> \n");
 			System.out
 					.println("Please note: -f is not mandatory, if -f is not specified then default path_file_xml is : "
 							+ ImportExportUtils.PATH_DEFAULT_XML);
@@ -76,13 +80,19 @@ public class ScriptHKURP {
 		}
 
 		if (!line.hasOption("f")) {
-			excelFilePath = ImportExportUtils.PATH_DEFAULT_XML;
+			filePath = ImportExportUtils.PATH_DEFAULT_XML;
 		} else {
-			excelFilePath = line.getOptionValue("f");
+			filePath = line.getOptionValue("f");
+		}
+		
+		String format;
+		if (!line.hasOption("t")) {
+			format = XMLBulkChangesService.SERVICE_NAME;
+		}
+		else {
+			format = line.getOptionValue("t");
 		}
 
-		// allen: use -active to make newly created eperson active.
-		// allen: -inactive is optional. Default is already inactive.
 		if (line.hasOption("active")) {
 			status = true;
 		} else {
@@ -90,11 +100,11 @@ public class ScriptHKURP {
 		}
 		
 		String path = ConfigurationManager
-				.getProperty(CrisConstants.CFG_MODULE, "researcherpage.file.import.path");
+				.getProperty(CrisConstants.CFG_MODULE, "file.import.path");
 		File dir = new File(path);
 		try {
-			ImportExportUtils.importResearchersXML(new FileInputStream(excelFilePath),
-					dir, applicationService, dspaceContext, status);
+			ImportExportUtils.process(format, new FileInputStream(filePath),
+					dir, applicationService, dspaceContext, status, RPPropertiesDefinition.class, ResearcherPage.class);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 		} 

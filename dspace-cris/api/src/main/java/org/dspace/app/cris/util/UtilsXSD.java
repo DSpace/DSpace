@@ -23,6 +23,9 @@ import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.jdyna.DecoratorProjectPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.DecoratorRPPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.DecoratorRestrictedField;
+import org.dspace.app.cris.model.jdyna.OUPropertiesDefinition;
+import org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition;
+import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
 import org.dspace.core.ConfigurationManager;
 
 /**
@@ -33,6 +36,24 @@ import org.dspace.core.ConfigurationManager;
  */
 public class UtilsXSD
 {
+    public static final String NAMESPACE_TARGET = "http://cineca.github.io/dspace-cris/definitions";
+    public static final String NAMESPACE_CRIS = "http://cineca.github.io/dspace-cris/schemas";
+    public static final String NAMESPACE_PREFIX_CRIS = "cris";
+    
+    public static final String NAMESPACE_RP = "http://cineca.github.io/dspace-cris/researcherpage/schemas";
+    public static final String NAMESPACE_PREFIX_RP = "rp";
+    
+    public static final String NAMESPACE_PJ = "http://cineca.github.io/dspace-cris/grant/schemas";
+    public static final String NAMESPACE_PREFIX_PJ = "grant";
+    
+    public static final String NAMESPACE_OU = "http://cineca.github.io/dspace-cris/orgunit/schemas";
+    public static final String NAMESPACE_PREFIX_OU = "orgunit";
+    
+    public static final String NAMESPACE_DO = "http://cineca.github.io/dspace-cris/orgunit/schemas";
+    public static final String NAMESPACE_PREFIX_DO = "researchobject";
+    
+    public static final String NAMESPACE_ITEM = "http://cineca.github.io/dspace-cris/publications/schemas";
+    public static final String NAMESPACE_PREFIX_ITEM = "item";
 
     public static final String[] RP_DEFAULT_ELEMENT = new String[] {
             "researchers", "researcher" };
@@ -41,6 +62,8 @@ public class UtilsXSD
             "grants", "grant" };
 
     public static final String[] OU_DEFAULT_ELEMENT = new String[] {"orgunits", "orgunit"};
+
+    public static final String[] DO_DEFAULT_ELEMENT = new String[] {"researchobjects", "researchobject"};
 
     public final String TYPE_STRINGDATE = "stringdate";
 
@@ -61,166 +84,43 @@ public class UtilsXSD
         this.writer = writer;
     }
 
+    public static <PD extends PropertiesDefinition> String[] getElementRoot(Class<PD> clazz) {
+    	String[] defaultRootElements = DO_DEFAULT_ELEMENT;
+    	if (clazz.isAssignableFrom(ProjectPropertiesDefinition.class))
+        {
+    		defaultRootElements = GRANT_DEFAULT_ELEMENT;
+        }
+        else if (clazz.isAssignableFrom(RPPropertiesDefinition.class))
+        {
+        	defaultRootElements = RP_DEFAULT_ELEMENT;
+        }
+        else if (clazz.isAssignableFrom(OUPropertiesDefinition.class))
+        {
+        	defaultRootElements = OU_DEFAULT_ELEMENT;
+        }
+    	return defaultRootElements;
+    }
     
-    /**TODO
-     * @param <I>
-     * @param metadata
-     * @param elements
-     * @param attributeStringMainRows
-     * @param attributeStringMainRowsRequired
-     * @throws IOException
-     * @throws SecurityException
-     * @throws NoSuchFieldException
-     * @throws InstantiationException
-     * @throws IllegalAccessException
-     */
-    public <I extends IContainable> void createGrantXSD(List<I> metadata,
-            String[] elements, String[] attributeStringMainRows, boolean[] attributeStringMainRowsRequired) throws IOException, SecurityException,
-            NoSuchFieldException, InstantiationException,
-            IllegalAccessException
-    {
-
-        String namespace = "grant:";
-
-        if (elements == null)
+    public static <PD extends PropertiesDefinition> String[] getNamespace(Class<PD> clazz) {
+    	String namespacePrefix = NAMESPACE_PREFIX_PJ+":";
+	 	String namespace = NAMESPACE_PJ;
+    	if (clazz.isAssignableFrom(ProjectPropertiesDefinition.class))
         {
-
-            elements = GRANT_DEFAULT_ELEMENT;
-
+            namespacePrefix = NAMESPACE_PREFIX_PJ+":";
+    	 	namespace = NAMESPACE_PJ;
         }
-
-        writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        // writer.write("<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" elementFormDefault=\"unqualified\" attributeFormDefault=\"unqualified\">\n");
-
-        writer.write("<xs:schema xmlns:grant=\"http://www.cilea.it/grant/schemas\" elementFormDefault=\"qualified\" targetNamespace=\"http://www.cilea.it/grant/schemas\" xmlns:xs=\"http://www.w3.org/2001/XMLSchema\">\n");
-
-        writer.write("<xs:element name=\"" + elements[0] + "\" type=\""
-                + namespace + "GrantsValueList\">\n");
-        writer.write("</xs:element>\n");
-
-        writer.write("  <xs:complexType name=\"GrantsValueList\">\n");
-        writer.write("      <xs:sequence>\n");
-        writer.write("          <xs:element ref=\"" + namespace + elements[1]
-                + "\" maxOccurs=\"unbounded\"/>\n");
-        writer.write("      </xs:sequence>\n");
-        writer.write("  </xs:complexType>\n");
-
-        writer.write("<xs:element name=\"" + elements[1] + "\">\n");
-        writer.write("	<xs:complexType>\n");
-        writer.write("		<xs:group ref=\"" + namespace
-                + "group\" minOccurs=\"0\" maxOccurs=\"unbounded\"/>\n");        
-        if (attributeStringMainRows != null)
+        else if (clazz.isAssignableFrom(RPPropertiesDefinition.class))
         {
-            int counter = 0;
-            for (String attributeMainRow : attributeStringMainRows)
-            {
-                writer.write("      <xs:attribute name=\""
-                        + attributeMainRow
-                        + "\" type=\"xs:string\" "
-                        + (attributeStringMainRowsRequired[counter] == true ? "use=\"required\""
-                                : "") + "/>\n");
-                counter++;
-            }
-        }
-        else
+            namespacePrefix = NAMESPACE_PREFIX_RP+":";
+            namespace = NAMESPACE_RP;
+    	}
+        else if (clazz.isAssignableFrom(OUPropertiesDefinition.class))
         {
-            writer.write("		<xs:attribute name=\"rgid\" type=\"xs:string\"/>\n");
-            writer.write("		<xs:attribute name=\"code\" type=\"xs:string\" use=\"required\"/>\n");
+            namespacePrefix = NAMESPACE_PREFIX_OU+":";
+            namespace = NAMESPACE_OU;
         }
-        writer.write("	</xs:complexType>\n");
-        writer.write("</xs:element>\n");
-
-        writer.write("<xs:group name=\"group\">\n");
-        writer.write("	<xs:choice>\n");
-
-        for (I containable : metadata)
-        {
-            if (containable instanceof DecoratorProjectPropertiesDefinition)
-            {
-                this.createRefElement(
-                        (DecoratorProjectPropertiesDefinition) containable,
-                        namespace);
-            }
-        }
-        
-        writer.write("	</xs:choice>\n");
-        writer.write("</xs:group>\n");
-
-        //TODO add nested manage
-
-        writer.write("<xs:complexType name=\"" + TYPE_STRUCTURALMETADATA
-                + "\">\n");
-        writer.write("	<xs:simpleContent>\n");
-        writer.write("		<xs:extension base=\"xs:string\">\n");
-        writer.write("			<xs:attribute name=\"visibility\" type=\"" + namespace
-                + "visibility\" />\n");
-        writer.write("			<xs:attribute name=\"mime\" type=\"xs:string\" />\n");
-        writer.write("			<xs:attribute name=\"remotesrc\" type=\"xs:anyURI\" />\n");
-        writer.write("		</xs:extension>\n");
-        writer.write("	</xs:simpleContent>\n");
-        writer.write("</xs:complexType>\n");
-
-        writer.write("<xs:complexType name=\"" + TYPE_STRING + "\">\n");
-        writer.write("	<xs:simpleContent>\n");
-        writer.write("		<xs:extension base=\"xs:string\">\n");
-        writer.write("			<xs:attribute name=\"visibility\" type=\"" + namespace
-                + "visibility\" />\n");
-        writer.write("		</xs:extension>\n");
-        writer.write("	</xs:simpleContent>\n");
-        writer.write("</xs:complexType>\n");
-
-        writer.write("<xs:simpleType name=\"" + TYPE_STRINGDATE + "\">\n");
-        writer.write("		<xs:restriction base=\"xs:string\">\n");
-        writer.write("			<xs:maxLength value=\"10\"></xs:maxLength>\n");
-        writer.write("			<xs:pattern value=\"((0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[012])-(19|20)\\d\\d)?\"/>\n");
-        writer.write("		</xs:restriction>\n");
-        writer.write("</xs:simpleType>\n");
-
-        writer.write("<xs:complexType name=\"" + TYPE_DATE + "\">\n");
-        writer.write("	<xs:simpleContent>\n");
-        writer.write("		<xs:extension base=\"" + namespace + TYPE_STRINGDATE
-                + "\">\n");
-        writer.write("			<xs:attribute name=\"visibility\" type=\"" + namespace
-                + "visibility\"/>\n");
-        writer.write("		</xs:extension>\n");
-        writer.write("	</xs:simpleContent>\n");
-        writer.write("</xs:complexType>\n");
-
-        writer.write("<xs:complexType name=\"" + TYPE_ANYURI + "\">\n");
-        writer.write("	<xs:simpleContent>\n");
-        writer.write("		<xs:extension base=\"xs:string\">\n");
-        writer.write("			<xs:attribute name=\"src\" type=\"xs:anyURI\"/>\n");
-        writer.write("			<xs:attribute name=\"visibility\" type=\"" + namespace
-                + "visibility\"/>\n");
-        writer.write("		</xs:extension>\n");
-        writer.write("	</xs:simpleContent>\n");
-        writer.write("</xs:complexType>\n");
-
-
-        writer.write("<xs:simpleType name=\"visibility\">\n");
-        writer.write("	<xs:restriction base=\"xs:integer\">\n");
-        writer.write("		<xs:enumeration value=\"0\"/>\n");
-        writer.write("		<xs:enumeration value=\"1\"/>\n");
-        writer.write("	</xs:restriction>\n");
-        writer.write("</xs:simpleType>\n");
-
-        writer.write("</xs:schema>");
-
-        writer.flush();
-        writer.close();
-
+    	return new String[]{namespacePrefix, namespace};
     }
-
-    @Deprecated
-    public <I extends IContainable> void createXSD(List<I> metadata,
-            String[] elements) throws IOException, SecurityException,
-            NoSuchFieldException, InstantiationException,
-            IllegalAccessException
-    {
-        createXSD(metadata, elements, "rp:", null, null, new String[] { "rpid",
-                "staffNo" }, new boolean[] { false, true });
-    }
-
     
     /**
      * TODO 

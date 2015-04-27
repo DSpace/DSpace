@@ -32,6 +32,7 @@ import org.dspace.app.cris.model.jdyna.DynamicObjectType;
 import org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.DynamicProperty;
 import org.dspace.app.cris.model.jdyna.DynamicTypeNestedObject;
+import org.dspace.app.cris.model.jdyna.ProjectAdditionalFieldStorage;
 
 
 @Entity
@@ -280,4 +281,14 @@ public class ResearchObject extends ACrisObjectWithTypeSupport<DynamicProperty, 
 		return NAME;
 	}
 
+	@Override
+	public ResearchObject clone()
+			throws CloneNotSupportedException {
+		ResearchObject clone = (ResearchObject) super.clone();
+        DynamicAdditionalFieldStorage additionalTemp = new DynamicAdditionalFieldStorage();
+        clone.setDynamicField(additionalTemp);
+        additionalTemp.duplicaAnagrafica(this
+                    .getDynamicField());
+        return clone;
+	}
 }

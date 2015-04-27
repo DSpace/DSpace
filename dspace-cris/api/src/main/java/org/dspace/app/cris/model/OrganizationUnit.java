@@ -100,9 +100,14 @@ public class OrganizationUnit extends
         return timeStampInfo;
     }
 
-    public Object clone() throws CloneNotSupportedException
+    public OrganizationUnit clone() throws CloneNotSupportedException
     {
-        return super.clone();
+    	OrganizationUnit clone = (OrganizationUnit) super.clone();
+        OUAdditionalFieldStorage additionalTemp = new OUAdditionalFieldStorage();
+        clone.setDynamicField(additionalTemp);
+        additionalTemp.duplicaAnagrafica(this
+                    .getDynamicField());
+        return clone;
     }
 
     public OUAdditionalFieldStorage getDynamicField()
