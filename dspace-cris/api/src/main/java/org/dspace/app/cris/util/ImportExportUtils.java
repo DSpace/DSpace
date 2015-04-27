@@ -69,6 +69,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.cris.importexport.IBulkChange;
 import org.dspace.app.cris.importexport.IBulkChangeField;
 import org.dspace.app.cris.importexport.IBulkChangeFieldLink;
+import org.dspace.app.cris.importexport.IBulkChangeFieldLinkValue;
 import org.dspace.app.cris.importexport.IBulkChangeFieldValue;
 import org.dspace.app.cris.importexport.IBulkChanges;
 import org.dspace.app.cris.importexport.IBulkChangesService;
@@ -340,8 +341,7 @@ public class ImportExportUtils
 			ApplicationService applicationService, Class<TP> propDefClazz,
 			Class<ACO> crisObjectClazz, List<IContainable> metadataALL,
 			IBulkChanges bulkChanges) throws InstantiationException,
-			IllegalAccessException, CloneNotSupportedException,
-			XPathExpressionException, InvocationTargetException,
+			IllegalAccessException, CloneNotSupportedException, InvocationTargetException,
 			NoSuchMethodException {
 		// get from list of metadata dynamic field vs structural field
         List<TP> realTPS = new LinkedList<TP>();
@@ -436,7 +436,7 @@ public class ImportExportUtils
 
                 AnagraficaUtils.fillDTO(clonedto, clone,
                         realFillTPS);
-                importDynAXML(applicationService, realFillTPS, bulkChange, dto,
+                importDynA(applicationService, realFillTPS, bulkChange, dto,
                         clonedto, update);
 
                 for (IContainable containable : structuralFillField)
@@ -652,11 +652,10 @@ public class ImportExportUtils
 	}
 
 
-    private static <TP extends PropertiesDefinition> void importDynAXML(
+    private static <TP extends PropertiesDefinition> void importDynA(
             ApplicationService applicationService, List<TP> realFillTPS,
             IBulkChange bulkChange, AnagraficaObjectDTO dto,
-            AnagraficaObjectDTO clonedto, boolean update)
-            throws XPathExpressionException
+            AnagraficaObjectDTO clonedto, boolean update)            
     {
         // foreach dynamic field read xml and fill on dto
         for (TP rpPD : realFillTPS)
@@ -837,8 +836,7 @@ public class ImportExportUtils
 
     private static <TP extends PropertiesDefinition> void workOnText(
             ApplicationService applicationService, IBulkChangeFieldValue node, TP rpPD,
-            List<ValoreDTO> values, List<ValoreDTO> old)
-            throws XPathExpressionException
+            List<ValoreDTO> values, List<ValoreDTO> old)            
     {
         if (node != null)
         {
@@ -879,7 +877,6 @@ public class ImportExportUtils
     private static <TP extends PropertiesDefinition> void workOnLink(
             ApplicationService applicationService, TP rpPD,
             List<ValoreDTO> values, List<ValoreDTO> old, IBulkChangeFieldLinkValue nodeLink)
-            throws XPathExpressionException
     {
         if (nodeLink != null)
         {
@@ -932,7 +929,6 @@ public class ImportExportUtils
     private static <TP extends PropertiesDefinition> void workOnDate(
             ApplicationService applicationService, IBulkChangeFieldValue node, TP rpPD,
             List<ValoreDTO> values, List<ValoreDTO> old)
-            throws XPathExpressionException
     {
         if (node != null)
         {

@@ -1,6 +1,5 @@
-package org.dspace.app.cris.util;
+package org.dspace.app.cris.importexport;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,8 +8,6 @@ import jxl.Sheet;
 import jxl.Workbook;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.cris.importexport.IBulkChange;
-import org.dspace.app.cris.importexport.IBulkChanges;
 
 public class CSVBulkChanges implements IBulkChanges {
 	static final String HEADER_SOURCEID = "SOURCEID";
@@ -93,10 +90,10 @@ public class CSVBulkChanges implements IBulkChanges {
 	@Override
 	public IBulkChange getChanges(int i) {
 		if (i < mainObjects.getRows() -1) {
-			return new CSVBulkChange(mainObjects.getRow(i));
+			return new CSVBulkChange(mainObjects.getRow(i), mainHeaders);
 		}
 		else {
-			return new CSVBulkChange(nestedObjects.getRow(i - (mainObjects.getRows() -1)));	
+			return new CSVBulkChange(nestedObjects.getRow(i - (mainObjects.getRows() -1)),nestedHeaders);	
 		}
 	}
 

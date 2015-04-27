@@ -1,18 +1,19 @@
-package org.dspace.app.cris.util;
+package org.dspace.app.cris.importexport;
+
+import java.util.List;
 
 import jxl.Cell;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.cris.importexport.IBulkChange;
-import org.dspace.app.cris.importexport.IBulkChangeField;
-import org.dspace.app.cris.importexport.IBulkChangeFieldLink;
 
 public class CSVBulkChange implements IBulkChange {
 	private Cell[] row;
+	private List<String> header;
 	
-	public CSVBulkChange(Cell[] row) {
+	public CSVBulkChange(Cell[] row, List<String> mainHeaders) {
 		this.row = row;
+		this.header = mainHeaders;
 	}
 
 	@Override
@@ -47,13 +48,16 @@ public class CSVBulkChange implements IBulkChange {
 
 	@Override
 	public IBulkChangeField getFieldChanges(String field) {
-		// TODO Auto-generated method stub
-		return null;
+		int index = -1;
+		if(this.header.contains(field)) {
+			index = this.header.indexOf(field);
+		}
+		return new CSVBulkField(row[index]);
 	}
 
 	@Override
 	public IBulkChangeFieldLink getFieldLinkChanges(String shortName) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 

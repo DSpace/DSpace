@@ -24,16 +24,19 @@ import javax.xml.parsers.ParserConfigurationException;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
 import jxl.read.biff.BiffException;
+import jxl.write.Label;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
+import jxl.write.WriteException;
 
 import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.jdyna.ACrisNestedObject;
-import org.dspace.app.cris.util.CSVBulkChanges;
 import org.xml.sax.SAXException;
 
 public class CSVBulkChangesService implements IBulkChangesService {
 	private String encoding = "Cp1252";
 	
-	public static final String SERVICE_NAME = "XMLBulkChangesService";
+	public static final String SERVICE_NAME = "CSVBulkChangesService";
 	
     private static final DateFormat dateFormat = new SimpleDateFormat(
             "dd-MM-yyyy_HH-mm-ss");
@@ -55,7 +58,7 @@ public class CSVBulkChangesService implements IBulkChangesService {
         File fileXls = null;
 
         // build filexml
-        String nameXML = "xml-" + dateFormat.format(new Date()) + ".xml";
+        String nameXML = "csv-" + dateFormat.format(new Date()) + ".csv";
         fileXls = new File(dir, nameXML);
         fileXls.createNewFile();
         FileOutputStream out = new FileOutputStream(fileXls);
@@ -81,7 +84,33 @@ public class CSVBulkChangesService implements IBulkChangesService {
             throws IOException, NoSuchFieldException, SecurityException,
             InstantiationException, IllegalAccessException
     {
-        return null;
+        WritableWorkbook workbook = Workbook.createWorkbook(filexsd);
+
+        //TODO now the template is the same...        
+    	WritableSheet sheetEntities = workbook.createSheet("main_entities", 0);
+    	WritableSheet sheetNested = workbook.createSheet("main_nested", 0);
+    	int xEntities = 0;
+    	int xNested = 0;
+	    for(String headerColumn : CSVBulkChanges.HEADER_COLUMNS) {
+	    	try {
+				sheetEntities.addCell(new Label(xEntities++, 0, headerColumn));
+				sheetNested.addCell(new Label(xNested++, 0, headerColumn));
+			} catch (WriteException e) {
+				throw new IOException("Error to create template from fixed header columns: "+e.getMessage());
+			}
+	    	
+	    }
+        
+	    for(IContainable cont : metadata) {	    	
+	    	try {
+	    		sheetEntities.addCell(new Label(xEntities++, 0, cont.getShortName()));
+				sheetNested.addCell(new Label(xNested++, 0, cont.getShortName()));
+			} catch (WriteException e) {
+				throw new IOException("Error to create template from dynamic metadata: "+e.getMessage());
+			}
+	    }
+
+    	return filexsd;
     }
 
 }

@@ -47,7 +47,7 @@ public class ScriptCrisBulkChanges {
         ApplicationService applicationService = dspace.getServiceManager().getServiceByName(
                 "applicationService", ApplicationService.class);
         
-		String excelFilePath = null;
+		String filePath = null;
 
 		CommandLineParser parser = new PosixParser();
 
@@ -55,7 +55,8 @@ public class ScriptCrisBulkChanges {
 		options.addOption("h", "help", false, "help");
 
 		options.addOption("f", "file", true, "File xml to import");
-
+		options.addOption("t", "format", false, "The format input (XMLBulkChangesService, CSVBulkChangesService)");
+		
 		// allen's added argument
 		options.addOption("active", "active", false,
 				"Set newly created epersons active");
@@ -69,9 +70,9 @@ public class ScriptCrisBulkChanges {
 
 		if (line.hasOption('h')) {
 			HelpFormatter myhelp = new HelpFormatter();
-			myhelp.printHelp("ScriptHRURP \n", options);
+			myhelp.printHelp("ScriptCrisBulkChanges \n", options);
 			System.out
-					.println("\n\nUSAGE:\n ScriptHKURP <-f path_file_xml> \n");
+					.println("\n\nUSAGE:\n ScriptCrisBulkChanges <-f path_file_xml> \n");
 			System.out
 					.println("Please note: -f is not mandatory, if -f is not specified then default path_file_xml is : "
 							+ ImportExportUtils.PATH_DEFAULT_XML);
@@ -79,9 +80,9 @@ public class ScriptCrisBulkChanges {
 		}
 
 		if (!line.hasOption("f")) {
-			excelFilePath = ImportExportUtils.PATH_DEFAULT_XML;
+			filePath = ImportExportUtils.PATH_DEFAULT_XML;
 		} else {
-			excelFilePath = line.getOptionValue("f");
+			filePath = line.getOptionValue("f");
 		}
 		
 		String format;
@@ -92,8 +93,6 @@ public class ScriptCrisBulkChanges {
 			format = line.getOptionValue("t");
 		}
 
-		// allen: use -active to make newly created eperson active.
-		// allen: -inactive is optional. Default is already inactive.
 		if (line.hasOption("active")) {
 			status = true;
 		} else {
@@ -104,7 +103,7 @@ public class ScriptCrisBulkChanges {
 				.getProperty(CrisConstants.CFG_MODULE, "file.import.path");
 		File dir = new File(path);
 		try {
-			ImportExportUtils.process(format, new FileInputStream(excelFilePath),
+			ImportExportUtils.process(format, new FileInputStream(filePath),
 					dir, applicationService, dspaceContext, status, RPPropertiesDefinition.class, ResearcherPage.class);
 		} catch (Exception e) {
 			log.error(e.getMessage());

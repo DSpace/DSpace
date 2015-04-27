@@ -1,6 +1,5 @@
-package org.dspace.app.cris.util;
+package org.dspace.app.cris.importexport;
 
-import org.dspace.app.cris.importexport.IBulkChangeFieldValue;
 
 public interface IBulkChangeFieldLinkValue extends IBulkChangeFieldValue {
 	public String getLinkURL();

@@ -132,7 +132,7 @@ public class CRISBatchCSV
         if (line.hasOption('h'))
         {
             HelpFormatter myhelp = new HelpFormatter();
-            myhelp.printHelp("StartupMetadataConfiguratorTool\n", options);
+            myhelp.printHelp("CRISBatchCSV\n", options);
             System.exit(0);
         }
 
@@ -153,46 +153,13 @@ public class CRISBatchCSV
                 .getServiceByName("applicationService",
                         ApplicationService.class);
 
-        // leggo tutte le righe e mi creo una struttura dati ad hoc per
-        // accogliere definizioni dei metadati di primo livello e inizializzo la
-        // struttura per i nested
         WorkbookSettings ws = new WorkbookSettings();
         ws.setEncoding(encoding);
 
         Workbook workbook = Workbook.getWorkbook(new File(fileExcel), ws);
 
-        // target , lista altri metadati
-        Map<String, List<List<String>>> widgetMap = new HashMap<String, List<List<String>>>();
-        Map<String, List<List<String>>> nestedMap = new HashMap<String, List<List<String>>>();
-
-        PlatformTransactionManager transactionManager = (PlatformTransactionManager) dspace
-                .getServiceManager().getServiceByName("transactionManager",
-                        HibernateTransactionManager.class);
-        DefaultTransactionAttribute transactionAttribute = new DefaultTransactionAttribute(
-                TransactionDefinition.PROPAGATION_REQUIRED);
-        //
-        // transactionAttribute
-        // .setIsolationLevel(TransactionDefinition.ISOLATION_SERIALIZABLE);
-        TransactionStatus status = transactionManager
-                .getTransaction(transactionAttribute);
-        boolean success = false;
-        try
-        {
-            workTopObjects(workbook, "top_objects");
-            workNestedObjects(workbook, "nested_objects");
-            success = true;
-        }
-        finally
-        {
-            if (success)
-            {
-                transactionManager.commit(status);
-            }
-            else
-            {
-                transactionManager.rollback(status);
-            }
-        }
+        workTopObjects(workbook, "main_entities");
+        workNestedObjects(workbook, "nested_entities");
 
     }
 
@@ -238,8 +205,6 @@ public class CRISBatchCSV
             for (int columnIndex = fixHeaderTopObject.length; columnIndex < row.length; columnIndex++) {
             	String cellContent = StringUtils.trim(row[rowIndex].getContents());
             	String shortName = headers.get(columnIndex);
-            	
-            	
             	
             }
         }

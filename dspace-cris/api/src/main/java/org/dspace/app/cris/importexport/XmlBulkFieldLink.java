@@ -2,7 +2,6 @@ package org.dspace.app.cris.importexport;
 
 import java.util.List;
 
-import org.dspace.app.cris.util.IBulkChangeFieldLinkValue;
 import org.w3c.dom.Element;
 
 public class XmlBulkFieldLink implements IBulkChangeFieldLink {
