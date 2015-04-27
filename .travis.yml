@@ -5,7 +5,8 @@ addons:
 
 before_install:
   - sudo rm /etc/mavenrc
-  - export MAVEN_OPTS="-Dmaven.repo.local=/home/travis/.m2/repository -Xmx1024M -XX:MaxPermSize=192m --quiet"
+  - export MAVEN_OPTS="-Dmaven.repo.local=/home/travis/.m2/repository -Xmx1024M -XX:MaxPermSize=192m"
+  - alias mvn='mvn --quiet'
   - whoami
   - java -version
   - pwd
