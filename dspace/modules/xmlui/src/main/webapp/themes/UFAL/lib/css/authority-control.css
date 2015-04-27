@@ -9,7 +9,7 @@
 /* this magic gets the 16x16 icon to show up.. setting height/width didn't
    do it, but adding padding actually made it show up. */
 img.ds-authority-confidence
-{ width: 16px; height: 16px; margin: 0px 2px; padding: 0px; display: inline-block;}
+{ width: 16px; height: 16px; margin: 0px 2px; padding: 0px; display: none;}
 
 img.ds-authority-confidence.cf-unset
   { background: transparent url(../../images/authority_control/confidence/bug.png); }
@@ -52,3 +52,4 @@ input.ds-authority-lock.is-unlocked
 span.ds-dc_contributor_author-authority { color: #982521; }
 
 #aspect_general_ChoiceLookupTransformer_div_lookup select {height: auto;}
+#aspect_submission_StepTransformer_field_dc_relation_authority {display: none !important;}
