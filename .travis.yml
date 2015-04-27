@@ -16,6 +16,7 @@ before_install:
   - java -version
   - python --version
   - pwd
+  - mvn help:system
   - sudo apt-get install -qq cloc
   - echo "Initialising default settings"
   - cd utilities/project_helpers
