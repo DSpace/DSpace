@@ -260,7 +260,17 @@
 	                            </img>
 	                        </xsl:when>
 					<xsl:otherwise>
-						<img alt="Icon" src="{concat($theme-path, '/images/mime.png')}" />
+						<xsl:variable name="file_type" select="substring-before(@MIMETYPE, '/')" />
+						<xsl:variable name="file_subtype" select="substring-after(@MIMETYPE, '/')" />
+						<xsl:variable name="img_path">
+							<xsl:choose>
+								<xsl:when test="$file_type = 'image'">mime_img.png</xsl:when>
+								<xsl:when test="$file_subtype = 'pdf'">mime_pdf.png</xsl:when>
+								<xsl:when test="$file_subtype = 'msword'">mime_msword.png</xsl:when>
+								<xsl:otherwise>mime.png</xsl:otherwise>
+							</xsl:choose>
+						</xsl:variable>
+						<img alt="Icon" src="{concat($theme-path, '/images/', $img_path)}" />
 					</xsl:otherwise>
 				</xsl:choose>
 				<xsl:if
@@ -279,10 +289,18 @@
 			<div class="media-body">
 <!-- 				<h4 class="media-heading"><a href="{$file_url}"> -->
 <!-- 			<xsl:value-of select="mets:FLocat/@xlink:title" /></a></h4> -->
-				<a href="{$file_url}">
 				<p>
-					<xsl:value-of select="mets:FLocat/@xlink:label" /> 
-					<span> 
+					<a href="{$file_url}">
+						<xsl:value-of select="mets:FLocat/@xlink:label" />
+					</a>
+				</p>
+				<p>
+					<xsl:variable name="extension" select="substring-after(mets:FLocat[@LOCTYPE='URL']/@xlink:title, '.')"/>
+					Archivo 
+					<span>
+						<xsl:value-of select="$extension" /> 
+					</span>
+					<span>
 						(<xsl:choose>
 							<xsl:when test="@SIZE &lt; 1024">
 								<xsl:value-of select="@SIZE" />
@@ -304,7 +322,6 @@
 						</xsl:choose>)
 					</span>
 				</p>
-				</a>
 			</div>
 		</li>
 	</xsl:template>
