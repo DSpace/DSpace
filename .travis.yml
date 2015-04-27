@@ -9,7 +9,7 @@ python:
 
 env: 
   # Give Maven 1GB of memory to work with
-  - MAVEN_OPTS=-Xmx1024M
+  - MAVEN_OPTS="-Xmx1024M --quiet"
 
 before_install:
   - whoami
