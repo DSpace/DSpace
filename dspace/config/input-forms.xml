@@ -199,7 +199,7 @@
          <repeatable>false</repeatable>
          <label>OpenAIRE Project Identifier</label>
          <input-type>onebox</input-type>
-         <hint>Start typing the number, name or acronym of the European project (EC / ERC) and select the project from suggestions.</hint>
+         <hint>Start typing the number, name or acronym of the European project (EC / ERC). Select the project from suggestions; you need to enter at least 4 characters; only the first 10 matches are shown.</hint>
          <acl>          	          	        	
            	policy=deny,action=read,grantee-type=user,grantee-id=*
          </acl>                    
