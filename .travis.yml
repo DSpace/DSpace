@@ -6,12 +6,9 @@ addons:
 python:
   - "2.7"
 
-
-env: 
-  # Give Maven 1GB of memory to work with
-  - MAVEN_OPTS="-Xmx1024M --quiet"
-
 before_install:
+  - sudo rm /etc/mavenrc
+  - export MAVEN_OPTS=-Dmaven.repo.local=/home/travis/.m2/repository -Xmx1024M -XX:MaxPermSize=192m --quiet
   - whoami
   - java -version
   - python --version
