@@ -275,6 +275,7 @@
 	<message key="xmlui.ArtifactBrowser.ItemViewer.general_info">General Information</message>
 	<message key="xmlui.ArtifactBrowser.ItemViewer.specific_info">Specific Information</message>
 	<message key="xmlui.ArtifactBrowser.ItemViewer.other_info">Another data</message>
+	<message key="xmlui.ArtifactBrowser.ItemViewer.file">{0} file</message>
 
         <message key="xmlui.ArtifactBrowser.ItemViewer.withdrawn">This item has been withdrawn and is no longer available.</message>
 

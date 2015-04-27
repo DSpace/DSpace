@@ -278,6 +278,7 @@
 <message key="xmlui.ArtifactBrowser.ItemViewer.general_info">Información General</message>
 <message key="xmlui.ArtifactBrowser.ItemViewer.specific_info">Información Específica</message>
 <message key="xmlui.ArtifactBrowser.ItemViewer.other_info">Otros datos</message>
+<message key="xmlui.ArtifactBrowser.ItemViewer.file">Archivo {0}</message>
 
 <message key="xmlui.ArtifactBrowser.ItemViewer.withdrawn">Este ítem ha sido retirado y no está disponible</message>
 

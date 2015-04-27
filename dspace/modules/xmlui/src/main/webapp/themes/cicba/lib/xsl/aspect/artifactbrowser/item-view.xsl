@@ -296,10 +296,10 @@
 				</p>
 				<p>
 					<xsl:variable name="extension" select="substring-after(mets:FLocat[@LOCTYPE='URL']/@xlink:title, '.')"/>
-					Archivo 
-					<span>
-						<xsl:value-of select="$extension" /> 
-					</span>
+					<i18n:translate>
+						<i18n:text>xmlui.ArtifactBrowser.ItemViewer.file</i18n:text>
+						<i18n:param><xsl:value-of select="$extension" /></i18n:param>
+					</i18n:translate>
 					<span>
 						(<xsl:choose>
 							<xsl:when test="@SIZE &lt; 1024">
