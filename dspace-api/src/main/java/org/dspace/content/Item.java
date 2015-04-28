@@ -386,7 +386,7 @@ public class Item extends DSpaceObject
      */
     public boolean isDiscoverable()
     {
-        return itemRow.getBooleanColumn("discoverable");
+        return itemRow.getBooleanColumn("discoverable") && !this.isHidden();
     }
 
     /**
