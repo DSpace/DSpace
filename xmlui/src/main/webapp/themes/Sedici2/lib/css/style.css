@@ -3550,11 +3550,16 @@ h1.communities_header {
 #icono_rea a {
 	background-image: url(../../images/icono_rea.png);
 }
+
+#icono_redmuseos a{
+	background-image: url(../../images/icono_redmuseos.png);
+}
+
 #icono_ehidrica a {
 	background-image: url(../../images/icono_ehidrica.png);
 }
 
-#icono_tesis, #icono_eventos, #icono_libros, #icono_revistas, #icono_redunci, #icono_radio, #icono_rea, #icono_ehidrica{
+#icono_tesis, #icono_eventos, #icono_libros, #icono_revistas, #icono_redunci, #icono_radio, #icono_rea, #icono_ehidrica, #icono_redmuseos{
 padding-left:5px;
 }
 

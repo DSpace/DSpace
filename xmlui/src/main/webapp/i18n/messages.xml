@@ -2464,6 +2464,8 @@
 <message key="sedici.comunidades.bdigital.info">Historical documents and other external digital resources</message>
 <message key="sedici.comunidades.rea.nombre">Open Eduational Resources</message>
 <message key="sedici.comunidades.rea.info">Learning objects and others</message>
+<message key="sedici.comunidades.redmuseos.nombre">Museum network</message>
+<message key="sedici.comunidades.redmuseos.info">Material belonging to the UNLP museum network</message>
 <message key="sedici.comunidades.ehidrica.nombre">Hydric emergency</message>
 <message key="sedici.comunidades.ehidrica.info">Jobs within the Plan of Integrated Management of Disaster's Risk</message>
 
