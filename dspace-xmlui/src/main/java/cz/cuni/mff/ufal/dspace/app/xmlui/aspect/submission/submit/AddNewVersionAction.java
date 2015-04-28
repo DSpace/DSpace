@@ -95,7 +95,8 @@ public class AddNewVersionAction extends AbstractAction
     /**
      * Fixes metadata of the newly created workspace item based on existing item
      * I.e. appends distinguishing mark to the title (date), 
-     * clears dc.identifier.uri, adds note about the base item  
+     * clears dc.identifier.uri and automatically added metadata ({@link org.dspace.content.InstallItem#populateMetadata})
+     * adds note about the base item  
      * 
      * @param workspaceItem New workspace item
      * @param baseItem The base item for this workspace item 
@@ -125,6 +126,14 @@ public class AddNewVersionAction extends AbstractAction
         // add note about the base item         
         String note = String.format("This item was created as a new version of '%s' (%s)", baseItem.getName(), baseItem.getHandle());        
         item.addMetadata("local", "submission", "note", Item.ANY, note);
+        
+        //clear dc.date.accessioned & other
+        //these values are generated automatically and should not be repeated
+        item.clearMetadata("dc", "date", "accessioned", Item.ANY);
+        item.clearMetadata("dc", "date", "available", Item.ANY);
+        //item.clearMetadata("local", "branding", Item.ANY, Item.ANY);
+        //this is a new item; discard old provenance records
+        item.clearMetadata("dc", "description", "provenance", Item.ANY);
         
         item.update();        
         workspaceItem.update();    

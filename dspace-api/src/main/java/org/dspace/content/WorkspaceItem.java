@@ -286,6 +286,8 @@ public class WorkspaceItem implements InProgressSubmission
         Collection coll = item.getOwningCollection();               
         WorkspaceItem workspaceItem = WorkspaceItem.create(context, coll, false);        
         Item newItem = workspaceItem.getItem();
+        //clear branding from create(), and use the one from item
+        item.clearMetadata("local", "branding", Item.ANY, Item.ANY);
         
         Metadatum[] md = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
         for (int n = 0; n < md.length; n++)
