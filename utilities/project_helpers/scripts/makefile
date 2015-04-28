@@ -120,6 +120,9 @@ mvn_help:
 # setup related
 #
 
+install_libs:
+	./setup.prerequisites.sh
+
 add_cronjobs:
 	(crontab -l ; echo "00 04     * * 1     cd $(BASE); sudo make send_info") | crontab -
 	(crontab -l ; echo "00 03     * * *     cd $(BASE); sudo make update_oai") | crontab -

@@ -22,7 +22,7 @@ before_install:
   - sudo -u postgres createuser --superuser dspace
   - make create_databases
   - echo "Installing prerequisites"
-  - ./setup.prerequisites.sh
+  - make install_libs
 
 # Skip install stage, as we'll do it below
 install: "echo 'Skipping install stage, dependencies will be downloaded during build and test stages.'"
