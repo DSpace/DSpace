@@ -101,9 +101,6 @@ public class SelectCollectionStep extends AbstractSubmissionStep
             WingException, SQLException, IOException, AuthorizeException
     {
         super.addPageMeta(pageMeta);
-        pageMeta.addMetadata("title").addContent(T_submission_title);
-        pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
-        pageMeta.addTrail().addContent(T_submission_trail);
         pageMeta.addMetadata("include-library", "select-collection");
     }
 
