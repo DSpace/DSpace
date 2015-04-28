@@ -85,8 +85,9 @@
                 <map:parameter name="javascript#2" value="js/jquery-1.11.1.min.js"/>
                 <map:parameter name="javascript#3" value="js/jquery-ui-1.11.2.min.js"/>
                 <map:parameter name="javascript#4" value="js/bootstrap.min.js"/>
-                <map:parameter name="javascript#5" value="../../static/js/discovery/search-controls.js"/>
-                <map:parameter name="javascript#6" value="js/jquery.sapling.js"/>
+                <map:parameter name="javascript#5" value="js/embargo-utility.js"/>
+                <map:parameter name="javascript#6" value="../../static/js/discovery/search-controls.js"/>
+                <map:parameter name="javascript#7" value="js/jquery.sapling.js"/>
                 
                 <map:parameter name="theme.path" value="{global:theme-path}"/>
                 <map:parameter name="theme.name" value="{global:theme-path}"/>
