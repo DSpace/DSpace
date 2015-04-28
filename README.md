@@ -1,9 +1,9 @@
 [![Build Status](https://travis-ci.org/ufal/lindat-dspace.svg?branch=lindat)](https://travis-ci.org/ufal/lindat-dspace)
-# LINDAT/CLARIN repository based on DSpace
+# LINDAT/CLARIN repository
 
 * developed at: [Institute of Formal and Applied Linguistics, Charles University in Prague](http://ufal.mff.cuni.cz/)
 * deployed at: [https://lindat.mff.cuni.cz/repository/xmlui/]
-* contact: [http://lindat.mff.cuni.cz/lindat/contact]
+* contact: [https://lindat.mff.cuni.cz/en/about-lindat-clarin]
 * wiki: [https://github.com/ufal/lindat-dspace/wiki]
 * original wiki: [https://svn.ms.mff.cuni.cz/redmine/projects/dspace-modifications/wiki]
 
@@ -11,12 +11,12 @@
 
 ## Installation instructions
 
+First, ensure that all of the [requirements](https://github.com/ufal/lindat-dspace/wiki/Installation----Prerequisites) are met.
+Afterwards, [install LINDAT/CLARIN repository](https://github.com/ufal/lindat-dspace/wiki/Installation)
+
 If you are familiar with vagrant and puppet then go directly to
 [shell script executed by Vagrant](https://github.com/ufal/lindat-repository-vagrant/blob/master/Projects/setup.lindat.sh).
 Optionally, you can also inspect our [travis integration](https://github.com/ufal/lindat-dspace/blob/lindat/.travis.yml).
-
-First, ensure that all of the [requirements](https://github.com/ufal/lindat-dspace/wiki/Installation----Prerequisites) are met.
-Afterwards, [install LINDAT/CLARIN repository](https://github.com/ufal/lindat-dspace/wiki/Installation)
 
 
 ## Projects connected with LINDAT/CLARIN repository
