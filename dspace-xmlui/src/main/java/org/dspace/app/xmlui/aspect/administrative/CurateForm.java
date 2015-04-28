@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.Map;
+
+import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
 
 import org.apache.avalon.framework.parameters.Parameters;
@@ -38,6 +40,7 @@ import org.dspace.authorize.AuthorizeException;
 public class CurateForm extends AbstractDSpaceTransformer 
 {
         private static final Message T_dspace_home = message("xmlui.general.dspace_home");
+	private static final Message T_overall_help = message("xmlui.administrative.CurateForm.overall_help");
         private static final Message T_submit_perform = message("xmlui.general.perform");
         private static final Message T_submit_queue = message("xmlui.general.queue");
         private static final Message T_title = message("xmlui.administrative.CurateForm.title");
@@ -46,6 +49,9 @@ public class CurateForm extends AbstractDSpaceTransformer
         private static final Message T_taskgroup_label_name = message("xmlui.administrative.CurateForm.taskgroup_label_name");
         private static final Message T_object_label_name = message("xmlui.administrative.CurateForm.object_label_name");
         private static final Message T_object_hint = message("xmlui.administrative.CurateForm.object_hint");
+	private static final Message T_curation_mode_help = message("xmlui.administrative.CurateForm.curation_mode_help");
+	private static final Message T_curation_mode_perform_help = message("xmlui.administrative.CurateForm.curation_mode_perform_help");
+	private static final Message T_curation_mode_queue_help = message("xmlui.administrative.CurateForm.curation_mode_queue_help");
         
         public void setup(SourceResolver resolver, Map objectModel, String src,
 		          Parameters parameters) throws ProcessingException, SAXException, IOException
@@ -88,10 +94,12 @@ public class CurateForm extends AbstractDSpaceTransformer
                 // DIVISION: curate
                 Division div = body.addInteractiveDivision("curate", contextPath + "/admin/curate", Division.METHOD_MULTIPART,"primary administrative curate");
                 div.setHead(T_title);
-                
+
+	        div.addPara(T_overall_help);
+
                 // Curate Form
                 List form = div.addList("curate-form", List.TYPE_FORM);
-		
+
                 // Object ID Textbox (required)
                 Text id = form.addItem().addText("identifier");
                 id.setAutofocus("autofocus");
@@ -101,7 +109,9 @@ public class CurateForm extends AbstractDSpaceTransformer
                     id.setValue(objectID);
                 }
                 id.setRequired();
-                id.setHelp(T_object_hint);
+
+	        String prefix = ConfigurationManager.getProperty("handle.prefix");
+	        id.setHelp(T_object_hint.parameterize(prefix));
                 
                 // Selectbox of Curation Task options (required)
                 String curateGroup = "";
@@ -136,7 +146,11 @@ public class CurateForm extends AbstractDSpaceTransformer
                 {    
                     taskSelect.setOptionSelected(taskSelected);
                 }
-                
+
+	        div.addPara(T_curation_mode_help);
+	        div.addPara(T_curation_mode_perform_help);
+	        div.addPara(T_curation_mode_queue_help);
+
                 // Buttons: 'curate' and 'queue'
                 Para buttonList = div.addPara();
                 buttonList.addButton("submit_curate_task").setValue(T_submit_perform);

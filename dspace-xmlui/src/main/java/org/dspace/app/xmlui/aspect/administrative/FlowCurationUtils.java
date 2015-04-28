@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.apache.cocoon.environment.Request;
 
+import org.apache.commons.lang.StringUtils;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.curate.Curator;
@@ -40,6 +41,8 @@ public class FlowCurationUtils
             new Message("default","xmlui.administrative.FlowCurationUtils.queue_success_notice");
     private static final Message T_queue_fail_notice =
             new Message("default","xmlui.administrative.FlowCurationUtils.queue_failed_notice");
+	private static final Message T_no_identifier =
+			new Message("default", "xmlui.administrative.FlowCurationUtils.no_identifier_notice");
     
     
     private static final Map<String, String> map = new HashMap<String, String>();
@@ -188,6 +191,27 @@ public class FlowCurationUtils
         Curator curator = FlowCurationUtils.getCurator(task);
 
         FlowResult result = null;
+
+	    if (StringUtils.isBlank(objHandle))
+	    {
+		    result = new FlowResult();
+
+		    result.addError("identifier");
+		    result.setContinue(false);
+		    result.setOutcome(false);
+		    result.setHeader(new Message("default", "Task: " + getUITaskName(task)));
+		    result.setMessage(T_no_identifier);
+
+		    result.setParameter("curate_task", task);
+		    result.setParameter("identifier", objHandle);
+		    if (StringUtils.isNotBlank(request.getParameter("select_curate_group")))
+		    {
+			    result.setParameter("select_curate_group", request.getParameter("select_curate_group"));
+		    }
+
+		    return result;
+	    }
+
         try
         {
             // Curate this object & return result
@@ -202,6 +226,10 @@ public class FlowCurationUtils
         //pass curation task name & identifier back in FlowResult (so it can be pre-populated on UI)
         result.setParameter("curate_task", task);
         result.setParameter("identifier", objHandle);
+	    if (StringUtils.isNotBlank(request.getParameter("select_curate_group")))
+	    {
+		    result.setParameter("select_curate_group", request.getParameter("select_curate_group"));
+	    }
         return result;
     }
     
@@ -225,19 +253,36 @@ public class FlowCurationUtils
         String taskQueueName = ConfigurationManager.getProperty("curate", "ui.queuename");
         boolean status = false;
        
-        if (objHandle != null)
+        if (StringUtils.isBlank(objHandle))
         {
-            try
-            {
-                //queue the task for later processing of this object
-                curator.queue(context, objHandle, taskQueueName);
-                status = true;
-            }
-            catch (IOException ioe)
-            {
-                // no-op (any error should be logged by the Curator itself)
-            }
+	        FlowResult result = new FlowResult();
+
+	        result.addError("identifier");
+		    result.setContinue(false);
+	        result.setOutcome(false);
+	        result.setHeader(new Message("default", "Task: " + getUITaskName(task)));
+	        result.setMessage(T_no_identifier);
+
+	        result.setParameter("curate_task", task);
+	        result.setParameter("identifier", objHandle);
+	        if (StringUtils.isNotBlank(request.getParameter("select_curate_group")))
+	        {
+		        result.setParameter("select_curate_group", request.getParameter("select_curate_group"));
+	        }
+
+	        return result;
         }
+
+	    try
+	    {
+            //queue the task for later processing of this object
+		    curator.queue(context, objHandle, taskQueueName);
+		    status = true;
+	    }
+	    catch (IOException ioe)
+	    {
+            // no-op (any error should be logged by the Curator itself)
+	    }
         return FlowCurationUtils.getQueueFlowResult(task, status, objHandle, taskQueueName);
     }
     

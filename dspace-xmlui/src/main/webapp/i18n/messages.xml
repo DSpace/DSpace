@@ -979,6 +979,7 @@
         <message key="xmlui.administrative.FlowCurationUtils.curate_failed_notice">The task exited unexpectedly or failed. For more information, please contact the site administrator or check your system logs.</message>
         <message key="xmlui.administrative.FlowCurationUtils.queue_success_notice">The task was queued successfully.</message>
         <message key="xmlui.administrative.FlowCurationUtils.queue_failed_notice">The task could not be queued. An error occurred. For more information, please contact the site administrator or check your system logs.</message>
+        <message key="xmlui.administrative.FlowCurationUtils.no_identifier_notice">No handle was given for the object to curate. A handle is required to run or queue a curation task. Please enter a handle and try again.</message>
         <message key="xmlui.administrative.FlowEPersonUtils.add_eperson_success_notice">The user was added successfully.</message>
 	<message key="xmlui.administrative.FlowEPersonUtils.edit_eperson_success_notice">The user was edited successfully.</message>
 	<message key="xmlui.administrative.FlowEPersonUtils.reset_password_success_notice">An email message has been sent to the user containing a token that may be used to choose a new password.</message>
@@ -2056,8 +2057,12 @@
         <message key="xmlui.administrative.CurateForm.title">System Curation Tasks</message>
         <message key="xmlui.administrative.CurateForm.trail">Curation Tasks</message>
         <message key="xmlui.administrative.CurateForm.object_label_name">Handle of DSpace Object</message>
-        <message key="xmlui.administrative.CurateForm.object_hint">Hint: Enter [your-handle-prefix]/0 to run a task across entire site (not all tasks may support this capability)</message>
+        <message key="xmlui.administrative.CurateForm.object_hint">Hint: Enter {0}/0 to run a task across the entire site (not all tasks may support this capability)</message>
         <message key="xmlui.administrative.CurateForm.task_label_name">Task</message>
+        <message key="xmlui.administrative.CurateForm.overall_help">The curation system lets you run routine content operations on a repository object - this may be the entire site or a specific community, collection or item.</message>
+        <message key="xmlui.administrative.CurateForm.curation_mode_help">There are two modes for executing curation tasks: you can perform the task immediately, or you can queue it for deferred execution.</message>
+        <message key="xmlui.administrative.CurateForm.curation_mode_perform_help">If you perform the task immediately, its output will be shown on this page. This is useful when you're interested in the task's output and the task will run for a relatively short time.</message>
+        <message key="xmlui.administrative.CurateForm.curation_mode_queue_help">If you queue the task, it will be added to a list of tasks to be worked off in the background. Its output will not be shown on this page and your system administrator must have set up a scheduled task to work off the administrative curation task queue. This is useful for a longer-running task that notifies the relevant people about its outcome in other ways or whose output is not important.</message>
     <!-- Used by Curate<DSO>Form classes also -->
         <message key="xmlui.administrative.CurateForm.taskgroup_label_name">Choose from the following groups</message>
 
