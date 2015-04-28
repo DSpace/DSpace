@@ -46,5 +46,9 @@ public class XSLTHelper {
  
 		return url;
 	}
+	
+	public static String getFileExtension(String filename) {
+		return filename.substring(filename.lastIndexOf(".") + 1).toUpperCase();
+	}
 }
 

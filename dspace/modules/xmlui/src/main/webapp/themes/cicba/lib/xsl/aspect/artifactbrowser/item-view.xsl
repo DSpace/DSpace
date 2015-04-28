@@ -185,7 +185,12 @@
 				
 				<div class="item-preview">
 				    <a href="#" class="thumbnail">
-				      <img alt="Preview" />
+				   	  <xsl:variable name="thumbnail_file" select="./mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/mets:file[1]"/>
+				      <img alt="Preview">
+                          <xsl:attribute name="src">
+                              <xsl:value-of select="$thumbnail_file/mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
+                          </xsl:attribute>
+                      </img>
 				    </a>
 				</div>
 
@@ -250,29 +255,17 @@
 				<xsl:value-of select="substring-before(mets:FLocat[@LOCTYPE='URL']/@xlink:href, substring-after(/mets:METS/@ID, ':'))"/><xsl:value-of select="substring-after(/mets:METS/@ID, ':')"/>/<xsl:value-of select="$documentTitle"/>.<xsl:value-of select="$extension"/>?<xsl:value-of select="$sequence"/>
 			</xsl:variable>
 			<a class="media-left thumbnail_file" href="{$file_url}">
-				<xsl:variable name="thumbnail_file" select="../../mets:fileGrp[@USE='THUMBNAIL']/mets:file[@GROUPID=current()/@GROUPID]"/>
-				<xsl:choose>
-					  <xsl:when test="$thumbnail_file">
-	                           <img alt="Thumbnail">
-	                                <xsl:attribute name="src">
-	                                    <xsl:value-of select="$thumbnail_file/mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
-	                                </xsl:attribute>
-	                            </img>
-	                        </xsl:when>
-					<xsl:otherwise>
-						<xsl:variable name="file_type" select="substring-before(@MIMETYPE, '/')" />
-						<xsl:variable name="file_subtype" select="substring-after(@MIMETYPE, '/')" />
-						<xsl:variable name="img_path">
-							<xsl:choose>
-								<xsl:when test="$file_type = 'image'">mime_img.png</xsl:when>
-								<xsl:when test="$file_subtype = 'pdf'">mime_pdf.png</xsl:when>
-								<xsl:when test="$file_subtype = 'msword'">mime_msword.png</xsl:when>
-								<xsl:otherwise>mime.png</xsl:otherwise>
-							</xsl:choose>
-						</xsl:variable>
-						<img alt="Icon" src="{concat($theme-path, '/images/', $img_path)}" />
-					</xsl:otherwise>
-				</xsl:choose>
+				<xsl:variable name="file_type" select="substring-before(@MIMETYPE, '/')" />
+				<xsl:variable name="file_subtype" select="substring-after(@MIMETYPE, '/')" />
+				<xsl:variable name="img_path">
+					<xsl:choose>
+						<xsl:when test="$file_type = 'image'">mime_img.png</xsl:when>
+						<xsl:when test="$file_subtype = 'pdf'">mime_pdf.png</xsl:when>
+						<xsl:when test="$file_subtype = 'msword'">mime_msword.png</xsl:when>
+						<xsl:otherwise>mime.png</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>
+				<img alt="Icon" src="{concat($theme-path, '/images/', $img_path)}" />
 				<xsl:if
 					test="contains(mets:FLocat[@LOCTYPE='URL']/@xlink:href,'isAllowed=n')">
 					<img>
@@ -287,15 +280,13 @@
 				</xsl:if>
 			</a>
 			<div class="media-body">
-<!-- 				<h4 class="media-heading"><a href="{$file_url}"> -->
-<!-- 			<xsl:value-of select="mets:FLocat/@xlink:title" /></a></h4> -->
 				<p>
 					<a href="{$file_url}">
 						<xsl:value-of select="mets:FLocat/@xlink:label" />
 					</a>
 				</p>
 				<p>
-					<xsl:variable name="extension" select="substring-after(mets:FLocat[@LOCTYPE='URL']/@xlink:title, '.')"/>
+					<xsl:variable name="extension" select="xmlui:getFileExtension(mets:FLocat[@LOCTYPE='URL']/@xlink:title)" />
 					<i18n:translate>
 						<i18n:text>xmlui.ArtifactBrowser.ItemViewer.file</i18n:text>
 						<i18n:param><xsl:value-of select="$extension" /></i18n:param>
