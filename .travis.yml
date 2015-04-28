@@ -6,7 +6,6 @@ addons:
 before_install:
   - sudo rm /etc/mavenrc
   - export MAVEN_OPTS="-Dmaven.repo.local=/home/travis/.m2/repository -Xmx1024M -XX:MaxPermSize=192m"
-  - alias mvn='mvn --quiet'
   - whoami
   - java -version
   - pwd
@@ -32,7 +31,7 @@ install: "echo 'Skipping install stage, dependencies will be downloaded during b
 # 1. Install & Unit Test APIs
 # 2. Assemble DSpace
 script:
-  - make new_deploy
+  - make new_deploy > /dev/null
   - cloc ../
   - make print_message
   - make test_dspace_database
