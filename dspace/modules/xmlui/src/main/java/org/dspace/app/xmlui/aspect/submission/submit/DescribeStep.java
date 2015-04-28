@@ -137,8 +137,8 @@ public class DescribeStep extends AbstractSubmissionStep
 
     @Override
     public void addPageMeta(PageMeta pageMeta) throws SAXException,
-            WingException, UIException, SQLException, IOException,
-            AuthorizeException
+    WingException, UIException, SQLException, IOException,
+    AuthorizeException
     {
         super.addPageMeta(pageMeta);
         int collectionID = submission.getCollection().getID();
@@ -154,7 +154,7 @@ public class DescribeStep extends AbstractSubmissionStep
 
     @Override
     public void addBody(Body body) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException
+    UIException, SQLException, IOException, AuthorizeException
     {
         // Obtain the inputs (i.e. metadata fields we are going to display)
         Item item = submission.getItem();
@@ -324,8 +324,8 @@ public class DescribeStep extends AbstractSubmissionStep
      */
     @Override
     public List addReviewSection(List reviewList) throws SAXException,
-            WingException, UIException, SQLException, IOException,
-            AuthorizeException
+    WingException, UIException, SQLException, IOException,
+    AuthorizeException
     {
         // Create a new list section for this step (and set its heading)
         List describeSection = reviewList.addList("submit-review-"
@@ -414,13 +414,13 @@ public class DescribeStep extends AbstractSubmissionStep
                         {
                             String confidence = (value.authority != null && value.authority
                                     .length() > 0) ? Choices.getConfidenceText(
-                                    value.confidence).toLowerCase() : "blank";
-                                    org.dspace.app.xmlui.wing.element.Item authItem = describeSection
-                                    .addItem(
-                                            "submit-review-field-with-authority",
-                                            "ds-authority-confidence cf-"
-                                                    + confidence);
-                                    authItem.addContent(displayValue);
+                                            value.confidence).toLowerCase() : "blank";
+                            org.dspace.app.xmlui.wing.element.Item authItem = describeSection
+                                                    .addItem(
+                                                            "submit-review-field-with-authority",
+                                                            "ds-authority-confidence cf-"
+                                                                    + confidence);
+                            authItem.addContent(displayValue);
                         }
                         else
                         {
@@ -660,8 +660,13 @@ public class DescribeStep extends AbstractSubmissionStep
         }
         else if (dcValues.length == 1)
         {
+            // LIBDRUM-378 - Resolves null pointer error when none of the
+            // options are selected on the initial quesitons step.
+            if (dcValues[0].value.equals("today"))
+            {
+                return;
+            }
             DCDate dcDate = new DCDate(dcValues[0].value);
-
             year.setValue(String.valueOf(dcDate.getYear()));
             month.setOptionSelected(dcDate.getMonth());
 
@@ -675,6 +680,7 @@ public class DescribeStep extends AbstractSubmissionStep
             {
                 day.setValue(String.valueOf(dcDate.getDay()));
             }
+
         }
     }
 
@@ -697,7 +703,7 @@ public class DescribeStep extends AbstractSubmissionStep
      */
     private void renderSeriesField(List form, String fieldName,
             DCInput dcInput, DCValue[] dcValues, boolean readonly)
-            throws WingException
+                    throws WingException
     {
         // The series field consists of two parts, a series name (text field)
         // and report or paper number (also a text field).
@@ -787,7 +793,7 @@ public class DescribeStep extends AbstractSubmissionStep
      */
     private void renderQualdropField(List form, String fieldName,
             DCInput dcInput, DCValue[] dcValues, boolean readonly)
-            throws WingException
+                    throws WingException
     {
         Composite qualdrop = form.addItem().addComposite(fieldName,
                 "submit-qualdrop");
@@ -1074,7 +1080,7 @@ public class DescribeStep extends AbstractSubmissionStep
      */
     private void renderDropdownField(List form, String fieldName,
             DCInput dcInput, DCValue[] dcValues, boolean readonly)
-            throws WingException
+                    throws WingException
     {
         // Plain old select list.
         Select select = form.addItem().addSelect(fieldName, "submit-select");
@@ -1149,7 +1155,7 @@ public class DescribeStep extends AbstractSubmissionStep
      */
     private void renderSelectFromListField(List form, String fieldName,
             DCInput dcInput, DCValue[] dcValues, boolean readonly)
-            throws WingException
+                    throws WingException
     {
         Field listField = null;
 
@@ -1159,7 +1165,7 @@ public class DescribeStep extends AbstractSubmissionStep
             listField = form.addItem().addCheckBox(fieldName);
         }
         else
-        // otherwise this is a list of radio buttons
+            // otherwise this is a list of radio buttons
         {
             listField = form.addItem().addRadio(fieldName);
         }
@@ -1234,7 +1240,7 @@ public class DescribeStep extends AbstractSubmissionStep
      */
     private void renderOneboxField(List form, String fieldName,
             DCInput dcInput, DCValue[] dcValues, boolean readonly)
-            throws WingException
+                    throws WingException
     {
         // Both onebox and twobox consist a free form text field
         // that the user may enter any value. The difference between
