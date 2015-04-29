@@ -21,7 +21,7 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
@@ -82,8 +82,8 @@ public class ItemUtils
         // read all metadata into Metadata Object
         ObjectFactory factory = new ObjectFactory();
         metadata = factory.createMetadata();
-        DCValue[] vals = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-        for (DCValue val : vals)
+        Metadatum[] vals = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        for (Metadatum val : vals)
         {
             Element valueElem = null;
             Element schema = getElement(metadata.getElement(), val.schema);

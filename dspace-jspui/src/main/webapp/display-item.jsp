@@ -32,9 +32,15 @@
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.Metadatum" %>
 <%@ page import="org.dspace.content.Item" %>
+<%@ page import="org.dspace.content.DSpaceShareItem" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.handle.HandleManager" %>
 <%@ page import="org.dspace.license.CreativeCommons" %>
+<%@ page import="org.dspace.share.DSpaceSharingManager" %>
+<%@ page import="org.dspace.services.share.ShareProvider" %>
+<%@ page import="org.dspace.share.ShareItemWrapper" %>
+<%@ page import="org.dspace.export.api.ExportItemProvider" %>
+<%@ page import="org.dspace.export.impl.ExportItemManager" %>
 <%@page import="javax.servlet.jsp.jstl.fmt.LocaleSupport"%>
 <%@page import="org.dspace.versioning.Version"%>
 <%@page import="org.dspace.core.Context"%>
@@ -52,6 +58,12 @@
     Boolean suggest = (Boolean)request.getAttribute("suggest.enable");
     boolean suggestLink = (suggest == null ? false : suggest.booleanValue());
     Item item = (Item) request.getAttribute("item");
+
+    DSpaceShareItem sitem = new DSpaceShareItem(item);
+    ShareItemWrapper shareItem = new ShareItemWrapper(sitem);
+    DSpaceSharingManager sharingManager = new DSpaceSharingManager();
+    ExportItemManager exportManager = new ExportItemManager();
+
     Collection[] collections = (Collection[]) request.getAttribute("collections");
     Boolean admin_b = (Boolean)request.getAttribute("admin_button");
     boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
@@ -106,6 +118,41 @@
 
 <%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
 <dspace:layout title="<%= title %>">
+
+<% if (sharingManager.getProviders() != null && exportManager.getProviders() != null && (!sharingManager.getProviders().isEmpty() || !exportManager.getProviders().isEmpty())) { %>
+    <div class="sharingbar">
+        <div class="left">
+            <% for (ShareProvider p : sharingManager.getProviders()) { %>
+                <% if (shareItem.getUrl() == null) { %>OLA<% } %>
+                <% if (p.isAvailable(shareItem)) { %>
+                    <a target="_blank" href="<%=p.generateUrl(shareItem)%>">
+                        <% String altLabel = "sharingbar."+p.getId()+".alt";
+                           String titleLabel = "sharingbar."+p.getId()+".title"; %>
+                        <img alt="<fmt:message key="<%= altLabel %>"/>" title="<fmt:message key="<%=titleLabel%>"/>" src="<%= request.getContextPath() %>/image/sharing/<%=p.getImage()%>" />
+                    </a>
+                <% } %>
+            <% } %>
+        </div>
+
+        <div class="right">
+            <% for (ExportItemProvider p : exportManager.getProviders()) { %>
+            <a target="_blank" href="<%= request.getContextPath() %>/item-export/<%=item.getHandle()%>/<%=p.getId()%>">
+                    <%
+                        String altText = "export."+p.getId()+".alt";
+                        String titleText = "export."+p.getId()+".title";
+                    %>
+                    <img alt="<fmt:message key="<%= altText %>" />" title="<fmt:message key="<%= titleText %>"/>" src="<%= request.getContextPath() %>/image/sharing/<%=p.getImage()%>" />
+                </a>
+            <% } %>
+            <!-- Mendeley -->
+            <!--<a onclick="javascript:document.getElementsByTagName('body')[0].appendChild(document.createElement('script')).setAttribute('src','http://www.mendeley.com/min.php/bookmarklet');" href="#">
+                <img src="<%= request.getContextPath() %>/image/sharing/mendeley.png" title="<fmt:message key="export.mendeley.title" />" alt="<fmt:message key="export.mendeley.alt" />">
+            </a>-->
+        </div>
+        <div class="clear"></div>
+    </div>
+<% } %>
+
 <%
     if (handle != null)
     {
