@@ -195,7 +195,7 @@ jQuery(document).ready(function (){
 			 "<div class='modal-dialog modal-sm'>" +
 			 	"<div class='modal-content'>" +
 		        "<div class='modal-header'>" +
-		          "<button type='button' class='close' data-dismiss='modal'><span aria-hidden='true'>×</span><span class='sr-only'>Close</span></button>" +
+		          "<button type='button' class='close' data-dismiss='modal'><span aria-hidden='true'>&#215;</span><span class='sr-only'>Close</span></button>" +
 		          "<h4 class='modal-title'>Press <kbd class='label label-default'><kbd>ctrl</kbd> + <kbd>c</kbd></kbd> to copy</h4>" +
 		        "</div>" + 
 		        "<div class='modal-body'>" +
