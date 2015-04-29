@@ -147,7 +147,7 @@
                         <xsl:value-of select="$newline"></xsl:value-of>
                         <xsl:value-of select="$tab"></xsl:value-of>
                         <xsl:text>abstract = {</xsl:text>
-                        <xsl:value-of select="./doc:element/doc:element/doc:field[@name='value']/text()">
+                        <xsl:value-of select="./doc:element/doc:element/doc:field[@name='value']/text()" />
                         <xsl:text>},</xsl:text>
                     </xsl:for-each>
 
