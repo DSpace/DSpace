@@ -11,13 +11,13 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.cocoon.environment.Request;
 import org.apache.commons.lang.StringUtils;
 
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Context;
 import org.dspace.curate.Curator;
@@ -45,7 +45,7 @@ public class FlowCurationUtils
 			new Message("default", "xmlui.administrative.FlowCurationUtils.no_identifier_notice");
     
     
-    private static final Map<String, String> map = new HashMap<String, String>();
+    private static final Map<String, String> map = new HashMap<>();
     
     protected static Curator getCurator(String taskName)
     {
@@ -162,7 +162,7 @@ public class FlowCurationUtils
                 //retrieve keyValuePair (format [taskID]=[UI Task Name])
                 String[] keyValuePair = task.split("=");
                 
-                if(keyValuePair!=null && keyValuePair.length==2)
+                if(keyValuePair.length == 2)
                 {    
                     if(taskID.equals(keyValuePair[0].trim()))
                         return keyValuePair[1];
@@ -295,9 +295,9 @@ public class FlowCurationUtils
     public static final String CURATE_GROUP_PREFIX = "ui.taskgroup";
     public static final String UNGROUPED_TASKS    = "ungrouped";
     
-    public static Map<String, String> allTasks = new LinkedHashMap<String, String>();
-    public static Map<String, String[]> groupedTasks = new LinkedHashMap<String, String[]>();
-    public static Map<String, String> groups = new LinkedHashMap<String, String>();
+    public static Map<String, String> allTasks = new LinkedHashMap<>();
+    public static Map<String, String[]> groupedTasks = new LinkedHashMap<>();
+    public static Map<String, String> groups = new LinkedHashMap<>();
     
     public static void setupCurationTasks()
     {
@@ -347,11 +347,11 @@ public class FlowCurationUtils
     	}
     	if (!groups.isEmpty())
     	{
-    		Iterator<String> iterator = groups.keySet().iterator();
-    		while (iterator.hasNext())
-    		{
-                String key = iterator.next();
-                String[] properties = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("curate." + CURATE_GROUP_PREFIX + "." + key);
+            ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+            for (String key : groups.keySet())
+            {
+                String[] properties = configurationService.getArrayProperty("curate." + CURATE_GROUP_PREFIX + "." + key);
                 groupedTasks.put(URLDecoder.decode(key, "UTF-8"), properties);
             }
         }
@@ -359,10 +359,8 @@ public class FlowCurationUtils
 
     public static Select getGroupSelectOptions(Select select) throws WingException
     {
-    	Iterator<String> iterator = groups.keySet().iterator();
-        while (iterator.hasNext())
+        for (String key : groups.keySet())
         {
-        	String key = iterator.next();
             select.addOption(key, groups.get(key));
         }
         return select;
@@ -370,40 +368,29 @@ public class FlowCurationUtils
     
     public static Select getTaskSelectOptions(Select select, String curateGroup) throws WingException
     {
-    	String key;
-    	String[] values = null;
-        Iterator<String> iterator = null;
         if (groupedTasks.isEmpty())
         {
-        	iterator = allTasks.keySet().iterator();
-            while (iterator.hasNext())
+            for (String key : allTasks.keySet())
             {
-            	key = iterator.next();
                 select.addOption(key, allTasks.get(key));
             }
             return select;
         }
-        else
+
+        for (String key : groupedTasks.keySet())
         {
-        	iterator = groupedTasks.keySet().iterator();
-        }
-        while (iterator.hasNext())
-        {
-        	key = iterator.next();
-            values = groupedTasks.get(key);
+            String[] values = groupedTasks.get(key);
             if (key.equals(curateGroup))
             {
             	for (String value : values)
                 {
-                    Iterator<String> innerIterator = allTasks.keySet().iterator();
-                    while (innerIterator.hasNext())
+                    for (String s : allTasks.keySet())
                     {
-                    	String optionValue = innerIterator.next().trim();
-                    	String optionText;
-                    	// out.print("Value: " + value + ": OptionValue: " + optionValue + ". Does value.trim().equals(optionValue)? " + value.equals(opti$
-                    	if (optionValue.equals(value.trim()))
-                    	{	
-                    		optionText  = (String) allTasks.get(optionValue);
+                        String optionValue = s.trim();
+                        String optionText;
+                        if (optionValue.equals(value.trim()))
+                        {
+                            optionText = allTasks.get(optionValue);
                             select.addOption(optionValue, optionText);
                         }
                     }

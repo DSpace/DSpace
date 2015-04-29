@@ -12,7 +12,6 @@ import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.Map;
 
-import org.dspace.core.ConfigurationManager;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
@@ -140,14 +139,14 @@ public class CurateForm extends AbstractDSpaceTransformer
             groupSelect.setEvtBehavior("submitOnChange");
             if (curateGroup.equals(""))
             {
-                curateGroup = (String) (FlowCurationUtils.groups.keySet().iterator().next());
+                curateGroup = FlowCurationUtils.groups.keySet().iterator().next();
             }
             groupSelect.setOptionSelected(curateGroup);
         }
         Select taskSelect = form.addItem().addSelect("curate_task");
         taskSelect = FlowCurationUtils.getTaskSelectOptions(taskSelect, curateGroup);
         taskSelect.setLabel(T_task_label_name);
-        taskSelect.setSize(1);
+        taskSelect.setMultiple(false);
         taskSelect.setRequired();
         if(taskSelected!=null)
         {    
