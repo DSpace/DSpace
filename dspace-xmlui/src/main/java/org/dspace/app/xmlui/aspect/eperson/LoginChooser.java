@@ -176,13 +176,10 @@ public class LoginChooser extends AbstractDSpaceTransformer implements
 				// specific handling of embargo - see
 				// BitstreamReader.set_authorised_error
 				if (characters.startsWith("embargo:")) {
-					List l = reason.addList("embargo-info", List.TYPE_FORM,
-							"embargo-info");
-					Item i = l.addItem(null, "label label-important");
-					i.addContent("Available after (year-month-day): ");
-					i.addContent(characters.split("embargo:")[1]);					
+					Division d = reason.addDivision("embargo-info", "alert alert-warning");
+					d.setHead("Available after (year-month-day): " + characters.split("embargo:")[1]);
+					d.addPara("embargo-clock", "fa fa-clock-o fa-5x hangright").addContent(" ");
 					embargo_err = true;
-					l.addItem(null, "fa fa-clock-o fa-5x hangright").addContent(" ");
 				}
 				else
 				{
