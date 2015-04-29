@@ -138,7 +138,7 @@ public class CurateItemForm extends AbstractDSpaceTransformer {
         Select taskSelect = curationTaskList.addItem().addSelect("curate_task");
         taskSelect.setAutofocus("autofocus");
         taskSelect = FlowCurationUtils.getTaskSelectOptions(taskSelect, curateGroup);
-        taskSelect.setSize(1);
+		taskSelect.setMultiple(false);
         taskSelect.setRequired();
 
 		main.addPara(T_curation_mode_help);
@@ -153,8 +153,4 @@ public class CurateItemForm extends AbstractDSpaceTransformer {
         main.addHidden("administrative-continue").setValue(knot.getId());
 
     }
-
-        // Add a method here to build it into the dspace.cfg ... ui.curation_tasks = estimate = "Estate"
-        // Mapping the task name to either the description or the mapping key
-
 }

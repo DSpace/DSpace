@@ -134,7 +134,7 @@ public class CurateCollectionForm extends AbstractDSpaceTransformer {
         curationTaskList.addLabel(T_label_name);
         Select taskSelect = curationTaskList.addItem().addSelect("curate_task");
         taskSelect = FlowCurationUtils.getTaskSelectOptions(taskSelect, curateGroup);
-        taskSelect.setSize(1);
+		taskSelect.setMultiple(false);
         taskSelect.setRequired();
 
 		main.addPara(T_curation_mode_help);
