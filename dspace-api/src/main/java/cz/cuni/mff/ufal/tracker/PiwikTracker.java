@@ -106,6 +106,19 @@ public class PiwikTracker implements Tracker
     protected void preTrack(HttpServletRequest request)
     {
         tracker.setIp(getIpAddress(request));
+        // referrer
+        try {
+            tracker.setUrlReferrer(request.getHeader("referer"));
+        } catch (PiwikException e) {
+        }
+        // user agent
+        if ( null != request.getHeader("user-agent") ) {
+            tracker.setUserAgent(request.getHeader("user-agent"));
+        }
+        // accept language
+        if ( null != request.getHeader("accept-language") ) {
+            tracker.setAcceptLanguage(request.getHeader("accept-language"));
+        }
     }
 
     protected String getIpAddress(HttpServletRequest request)
