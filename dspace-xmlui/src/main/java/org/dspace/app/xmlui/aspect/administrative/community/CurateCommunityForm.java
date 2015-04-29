@@ -56,7 +56,11 @@ public class CurateCommunityForm extends AbstractDSpaceTransformer   {
 
     private static final Message T_label_name = message("xmlui.administrative.community.CurateCommunityForm.label_name");
     private static final Message T_taskgroup_label_name = message("xmlui.administrative.CurateForm.taskgroup_label_name");
-    
+
+	private static final Message T_curation_mode_help = message("xmlui.administrative.CurateForm.curation_mode_help");
+	private static final Message T_curation_mode_perform_help = message("xmlui.administrative.CurateForm.curation_mode_perform_help");
+	private static final Message T_curation_mode_queue_help = message("xmlui.administrative.CurateForm.curation_mode_queue_help");
+
     public void setup(SourceResolver resolver, Map objectModel, String src,
     		          Parameters parameters) throws ProcessingException, SAXException, IOException
     {
@@ -133,7 +137,11 @@ public class CurateCommunityForm extends AbstractDSpaceTransformer   {
         taskSelect = FlowCurationUtils.getTaskSelectOptions(taskSelect, curateGroup);
         taskSelect.setSize(1);
         taskSelect.setRequired();
-        
+
+		main.addPara(T_curation_mode_help);
+		main.addPara(T_curation_mode_perform_help);
+		main.addPara(T_curation_mode_queue_help);
+
         // need submit_curate_task and submit_return
 	    Para buttonList = main.addPara();
         buttonList.addButton("submit_curate_task").setValue(T_submit_perform);
