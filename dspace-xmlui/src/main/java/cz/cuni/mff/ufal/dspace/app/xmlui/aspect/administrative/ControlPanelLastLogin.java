@@ -92,7 +92,12 @@ public class ControlPanelLastLogin extends AbstractControlPanelTab
                 r.addCellContent(String.format("%d.", i + 1));
                 // user/email
                 r.addCell().addXref(baseURL + e.getID(), e.getFullName());
-                r.addCellContent(e.getEmail());
+				// can happen for older users #20
+				if ( null == e.getEmail() || 0 == e.getEmail().length() ) {
+					r.addCellContent(e.getNetid());
+				}else {
+					r.addCellContent(e.getEmail());
+				}
                 // logged in
                 r.addCellContent(e.getLoggedIn());
 			}
