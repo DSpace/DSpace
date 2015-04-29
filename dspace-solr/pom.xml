@@ -242,6 +242,18 @@
             </exclusions>
         </dependency>
 
+	<!-- just for the dspace/log4j appender -->
+       <dependency>
+           <groupId>org.dspace</groupId>
+           <artifactId>dspace-api</artifactId>
+	   <exclusions>
+		<exclusion>
+                    	<artifactId>*</artifactId>
+			<groupId>*</groupId>
+		</exclusion>
+	   </exclusions>
+       </dependency>
+
         <!-- Replace J.U.L. logging with log4j -->
         <dependency>
             <groupId>org.slf4j</groupId>
