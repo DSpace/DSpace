@@ -103,7 +103,7 @@
             </list>
         </property>
         <!-- Set TagCloud configuration per discovery configuration -->
-<!--         <property name="tagCloudFacetConfiguration" ref="defaultTagCloudFacetConfiguration"/> -->
+        <property name="tagCloudFacetConfiguration" ref="defaultTagCloudFacetConfiguration"/>
         <!--The search filters which can be used on the discovery search page-->
         <property name="searchFilters">
             <list>
@@ -204,7 +204,7 @@
             </list>
         </property>
 <!--         Set TagCloud configuration per discovery configuration -->
-<!--         <property name="tagCloudFacetConfiguration" ref="homepageTagCloudFacetConfiguration"/> -->
+        <property name="tagCloudFacetConfiguration" ref="homepageTagCloudFacetConfiguration"/>
 <!--         The search filters which can be used on the discovery search page (same as defaultConfiguration above) -->
         <property name="searchFilters">
             <list>
@@ -269,30 +269,30 @@
     
 
     <!--TagCloud configuration bean for homepage discovery configuration-->
-<!--     <bean id="homepageTagCloudFacetConfiguration" class="org.dspace.discovery.configuration.TagCloudFacetConfiguration"> -->
+    <bean id="homepageTagCloudFacetConfiguration" class="org.dspace.discovery.configuration.TagCloudFacetConfiguration">
 <!--         Actual configuration of the tagcloud (colors, sorting, etc.) -->
-<!--         <property name="tagCloudConfiguration" ref="tagCloudConfiguration"/> -->
+        <property name="tagCloudConfiguration" ref="tagCloudConfiguration"/>
 <!--         List of tagclouds to appear, one for every search filter, one after the other -->
-<!--         <property name="tagCloudFacets"> -->
-<!--             <list> -->
-<!--                 <ref bean="searchFilterSubject" /> -->
-<!--             </list> -->
-<!--         </property> -->
-<!--     </bean> -->
+        <property name="tagCloudFacets">
+            <list>
+                <ref bean="searchFilterSubject" />
+            </list>
+        </property>
+    </bean>
     
      <!--TagCloud configuration bean for default discovery configuration-->
-<!--     <bean id="defaultTagCloudFacetConfiguration" class="org.dspace.discovery.configuration.TagCloudFacetConfiguration"> -->
+    <bean id="defaultTagCloudFacetConfiguration" class="org.dspace.discovery.configuration.TagCloudFacetConfiguration">
 <!--         Actual configuration of the tagcloud (colors, sorting, etc.) -->
-<!--         <property name="tagCloudConfiguration" ref="tagCloudConfiguration"/> -->
+        <property name="tagCloudConfiguration" ref="tagCloudConfiguration"/>
 <!--         List of tagclouds to appear, one for every search filter, one after the other -->
-<!--         <property name="tagCloudFacets"> -->
-<!--             <list> -->
-<!--                 <ref bean="searchFilterSubject" /> -->
-<!--             </list> -->
-<!--         </property> -->
-<!--     </bean> -->
+        <property name="tagCloudFacets">
+            <list>
+                <ref bean="searchFilterSubject" />
+            </list>
+        </property>
+    </bean>
     
-<!--     <bean id="tagCloudConfiguration" class="org.dspace.discovery.configuration.TagCloudConfiguration"> -->
+    <bean id="tagCloudConfiguration" class="org.dspace.discovery.configuration.TagCloudConfiguration">
 		<!-- Should display the score of each tag next to it? Default: false -->
 		<!-- <property name="displayScore" value="true"/> -->
 		
@@ -323,10 +323,10 @@
 			 Possible values: Tag.NameComparatorAsc | Tag.NameComparatorDesc | Tag.ScoreComparatorAsc | Tag.ScoreComparatorDesc
 			 Default: Tag.NameComparatorAsc  -->
 		<!-- <property name="ordering" value="Tag.NameComparatorAsc"/>-->	
-<!--     </bean> -->
+    </bean>
     
     <!-- The tag cloud parameters for the tag clouds that appear in the browse pages -->
-<!--     <bean id="browseTagCloudConfiguration" class="org.dspace.discovery.configuration.TagCloudConfiguration"> -->
+    <bean id="browseTagCloudConfiguration" class="org.dspace.discovery.configuration.TagCloudConfiguration">
 		<!-- Should display the score of each tag next to it? Default: false -->
 		<!-- <property name="displayScore" value="true"/> -->
 		
@@ -357,7 +357,7 @@
 			 Possible values: Tag.NameComparatorAsc | Tag.NameComparatorDesc | Tag.ScoreComparatorAsc | Tag.ScoreComparatorDesc
 			 Default: Tag.NameComparatorAsc  -->
 		<!-- <property name="ordering" value="Tag.NameComparatorAsc"/>-->	
-<!--     </bean> -->
+    </bean>
     
     <!--Search filter configuration beans-->
     <bean id="searchFilterTitle" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
