@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.wing.WingException;
@@ -63,8 +64,12 @@ public class IsLoggingControlCheck extends  AbstractControlPanelTab {
 		}
 		
 		for(Logger log : loggers){
+			//ensure we don't supress the logging
+			Level level = log.getLevel();
+			log.setLevel(Level.INFO);
 			//Log INFO with all loggers we've found
 			log.info(test);
+			log.setLevel(level);
 		}
 		
 		for(Object ap : appenders){
