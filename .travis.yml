@@ -6,35 +6,36 @@ addons:
 before_install:
   - sudo rm /etc/mavenrc
   - export MAVEN_OPTS="-Dmaven.repo.local=/home/travis/.m2/repository -Xmx1024M -XX:MaxPermSize=192m"
+  -     echo "########################"
   - whoami
   - java -version
   - pwd
   - mvn help:system
+  - export FS=`pwd`
   - sudo apt-get install -qq cloc
-  - echo "Initialising default settings"
-  - cd utilities/project_helpers
+  -     echo "########################"
+  - cloc ../
+  -     echo "########################"
+
+install:
+  - echo "Update settings"
+  - cd $FS/utilities/project_helpers
   - sed -i'' 's/tomcat.(TOMCAT_VERSION)/travis/' ./config/variable.makefile.example
   - sed -i'' 's/lr.common.theme = /lr.common.theme = \/tmp\/dspace/' ./config/local.conf.dist
   - sed -i'' 's/lr.dspace.dir = /lr.dspace.dir = \/tmp\/dspace/' ./config/local.conf.dist
-  - "cd config && cp local.conf.dist ../sources/local.properties && cd .."
-  - "cd scripts"
-  - echo "Creating dspace DB user and databases"
+  - cd $FS/utilities/project_helpers/config
+  - cp local.conf.dist ../sources/local.properties
+  - cd $FS/utilities/project_helpers/scripts
+  - echo "Creating dspace DB user and initialising databases"
   - sudo -u postgres createuser --superuser dspace
   - make create_databases
   - echo "Installing prerequisites"
   - make install_libs
-
-# Skip install stage, as we'll do it below
-install: "echo 'Skipping install stage, dependencies will be downloaded during build and test stages.'"
-
-# Two stage Build and Test
-# 1. Install & Unit Test APIs
-# 2. Assemble DSpace
-script:
   - make new_deploy > /dev/null
-  - cloc ../
   - make print_message
+
+script:
   - make test_dspace_database
   - make test_utilities_database
-  - cd ../sources/ && mvn -Dmaven.test.skip=false -Dtest=cz.cuni.mff.ufal.dspace.**.*Test,cz.cuni.mff.ufal.*Test -DfailIfNoTests=false test && cd ../
+  - cd $FS/ && mvn -Dmaven.test.skip=false -Dtest=cz.cuni.mff.ufal.dspace.**.*Test,cz.cuni.mff.ufal.*Test -DfailIfNoTests=false test
   - #make selenium_tests || echo "Tests failed"
