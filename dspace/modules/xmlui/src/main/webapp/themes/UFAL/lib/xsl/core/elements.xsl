@@ -46,7 +46,6 @@
 			<xsl:variable name="xrefTarget">
 				<xsl:value-of select="./dri:p/dri:xref/@target" />
 			</xsl:variable>
-		
 			<xsl:apply-templates select="@pagination" />
 			
 		</div>
@@ -78,7 +77,7 @@
     </xsl:template>
     
 	<xsl:template match="dri:body/dri:div/dri:div" priority="2">		
-		<div>		
+		<div>
 			<xsl:call-template name="standardAttributes">
 				<xsl:with-param name="class">well well-light</xsl:with-param>
 			</xsl:call-template>								
@@ -101,9 +100,12 @@
 			<xsl:variable name="xrefTarget">
 				<xsl:value-of select="./dri:p/dri:xref/@target" />
 			</xsl:variable>
-					
-			<xsl:apply-templates select="@pagination" />
-						
+
+            <xsl:choose>
+                <xsl:when test="count(current()//dri:xref) &gt; 10">
+                    <xsl:apply-templates select="@pagination" />
+                </xsl:when>
+            </xsl:choose>
 		</div>
     </xsl:template>
     
