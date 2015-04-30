@@ -17,6 +17,7 @@ importClass(Packages.org.dspace.content.Community);
 importClass(Packages.org.dspace.harvest.HarvestedCollection);
 importClass(Packages.org.dspace.eperson.EPerson);
 importClass(Packages.org.dspace.eperson.Group);
+importClass(Packages.org.dspace.eperson.Unit);
 importClass(Packages.org.dspace.app.util.Util);
 
 importClass(Packages.org.dspace.xmlworkflow.WorkflowFactory);
@@ -27,6 +28,7 @@ importClass(Packages.org.dspace.app.xmlui.utils.ContextUtil);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowEPersonUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowGroupUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowETDDepartmentUtils);
+importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowUnitsUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowRegistryUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowItemUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowMapperUtils);
@@ -186,6 +188,9 @@ function isAuthorized(objectType, objectID, action) {
 		break;
 	case Constants.ETDUNIT:
 		object = EtdUnit.find(getDSContext(), objectID);
+		break;
+	case Constants.UNIT:
+		object = Unit.find(getDSContext(), objectID);
 		break;
 	case Constants.EPERSON:
 		object = EPerson.find(getDSContext(), objectID);
@@ -367,6 +372,20 @@ function assertEditETDDepartment(etd_departmentID) {
 }
 
 /**
+ * Assert that the currently authenticated eperson can edit the given unit. If
+ * they cannot then this method will never return.
+ */
+function assertEditUnits(unitID) {
+	// Check authorizations
+	if (unitID == -1) {
+		// only system admin can create "top level" group
+		assertAdministrator();
+	} else {
+		assertAuthorized(Constants.UNIT, unitID, Constants.WRITE);
+	}
+}
+
+/**
  * Return whether the currently authenticated eperson is an administrator.
  */
 function isAdministrator() {
@@ -426,6 +445,21 @@ function startManageETDDepartments() {
 	assertAdministrator();
 
 	doManageETDDepartments();
+
+	// This should never return, but just in case it does then point
+	// the user to the home page.
+	cocoon.redirectTo(cocoon.request.getContextPath());
+	getDSContext().complete();
+	cocoon.exit();
+}
+
+/**
+ * Start managing units
+ */
+function startManageUnits() {
+	assertAdministrator();
+
+	doManageUnits();
 
 	// This should never return, but just in case it does then point
 	// the user to the home page.
@@ -1218,6 +1252,185 @@ function doDeleteETDDepartments(etd_departmentIDs) {
 	}
 	return null;
 }
+
+/*******************************************************************************
+ * Unit flows
+ ******************************************************************************/
+
+/**
+ * Manage Units, allow users to create new, edit existing, or remove
+ * Units. The user may also search or browse for Units.
+ *
+ * The is typically used as an entry point flow.
+ */
+function doManageUnits() {
+	assertAdministrator();
+
+	var highlightID = -1
+	var query = "";
+	var page = 0;
+	var result;
+	do {
+
+		sendPageAndWait("admin/units/main", {
+			"query" : query,
+			"page" : page,
+			"highlightID" : highlightID
+		}, result);
+		assertAdministrator();
+		result = null;
+
+		// Update the page parameter if supplied.
+		if (cocoon.request.get("page"))
+			page = cocoon.request.get("page");
+
+		if (cocoon.request.get("submit_search")) {
+			// Grab the new query and reset the page parameter
+			query = cocoon.request.get("query");
+			page = 0
+			highlightID = -1
+		} else if (cocoon.request.get("submit_add")) {
+			// Just create a blank unit then pass it to the group
+			// editor.
+			result = doEditUnits(-1);
+
+			if (result != null && result.getParameter("unitID"))
+				highlightID = result.getParameter("unitID");
+		} else if (cocoon.request.get("submit_edit")
+				&& cocoon.request.get("unitID")) {
+			// Edit a specific unit
+			var unitID = cocoon.request.get("unitID");
+			result = doEditUnits(unitID);
+			highlightID = unitID;
+		} else if (cocoon.request.get("submit_delete")
+				&& cocoon.request.get("select_unit")) {
+			// Delete a set of units
+			var unitIDs = cocoon.request
+					.getParameterValues("select_unit");
+			result = doDeleteUnits(unitIDs);
+			highlightID = -1;
+		} else if (cocoon.request.get("submit_return")) {
+			// Not implemented in the UI, but should be in case someone links to
+			// us.
+			return;
+		}
+
+	} while (true) // only way to exit is to hit the submit_back button.
+}
+
+/**
+ * This flow allows for the full editing of a unit, changing the
+ * unit's name or removing members. Users may search for groups
+ * to add as members to this unit.
+ */
+function doEditUnits(unitID) {
+	var unitName = FlowUnitsUtils.getName(getDSContext(),
+			unitID);
+	var memberGroupIDs = FlowUnitsUtils.getGroupMembers(
+			getDSContext(), unitID);
+
+	assertEditUnits(unitID);
+
+	var highlightGroupID;
+
+	var type = "";
+	var query = "";
+	var page = 0;
+	var result = null;
+
+	do {
+		sendPageAndWait("admin/units/edit", {
+			"unitID" : unitID,
+			"unitName" : unitName,
+			"memberGroupIDs" : memberGroupIDs.join(','),
+			"highlightGroupID" : highlightGroupID,
+			"query" : query,
+			"page" : page,
+			"type" : type
+		}, result);
+		assertEditUnits(unitID);
+
+		result = null;
+		highlightGroupID = null;
+
+		// Update the unitName
+		if (cocoon.request.get("unit_name"))
+			unitName = cocoon.request.get("unit_name");
+
+		if (cocoon.request.get("page"))
+			page = cocoon.request.get("page");
+
+		if (cocoon.request.get("submit_cancel")) {
+			// Just return without saving anything.
+			return null;
+		} else if (cocoon.request.get("submit_save")) {
+			result = FlowUnitsUtils.processSaveUnits(
+					getDSContext(), unitID, unitName,
+					memberGroupIDs);
+
+			// In case a unit was created, update our id.
+			if (result != null && result.getParameter("unitID"))
+				unitID = result.getParameter("unitID");
+		} else if (cocoon.request.get("submit_search_group")
+				&& cocoon.request.get("query")) {
+			// Perform a new search for collections.
+			query = cocoon.request.get("query");
+			page = 0;
+			type = "collection";
+		} else if (cocoon.request.get("submit_clear")) {
+			// Perform a new search for collections.
+			query = "";
+			page = 0;
+			type = "";
+		}
+
+		// Check if there were any add or delete operations.
+		var names = cocoon.request.getParameterNames();
+		while (names.hasMoreElements()) {
+			var name = names.nextElement();
+			var match = null;
+
+			if ((match = name.match(/submit_add_group_(\d+)/)) != null) {
+				// Add a group
+				var groupID = match[1];
+				memberGroupIDs = FlowUnitsUtils.addMember(
+						memberGroupIDs, groupID);
+				highlightGroupID = groupID;
+			}
+			if ((match = name.match(/submit_remove_collection_(\d+)/)) != null) {
+				// remove a collection
+				var groupID = match[1];
+				memberGroupIDs = FlowUnitsUtils.removeMember(
+						memberGroupIDs, groupID);
+				highlightGroupID = groupID;
+			}
+		}
+	} while (result == null || !result.getContinue())
+
+	return result;
+}
+
+/**
+ * Confirm that the given unitIDs should be deleted, if confirmed they
+ * will be deleted.
+ */
+function doDeleteUnits(unitIDs) {
+	assertAdministrator();
+
+	sendPageAndWait("admin/units/delete", {
+		"unitIDs" : unitIDs.join(',')
+	});
+
+	if (cocoon.request.get("submit_confirm")) {
+		// The user has confirmed, actually delete these units
+		assertAdministrator();
+		var result = FlowUnitsUtils.processDeleteUnits(
+				getDSContext(), unitIDs);
+		return result;
+	}
+	return null;
+}
+
 
 /*******************************************************************************
  * Registries: Metadata flows

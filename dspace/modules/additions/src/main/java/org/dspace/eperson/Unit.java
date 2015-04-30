@@ -18,6 +18,8 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.event.Event;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
@@ -698,6 +700,7 @@ public class Unit extends DSpaceObject
 
     }
 
+    
     /**
      * Get the units a groups maps to
      * 
@@ -754,4 +757,28 @@ public class Unit extends DSpaceObject
 
     }
 
+    /**
+     * Returns true or false based on whether a given group is a member.
+     */
+    public boolean isMember(Group group)
+    {
+        try
+        {
+            Group[] groups = getGroups();
+            int verifyID = group.getID();
+            for (Group g : groups)
+            {
+                if (g.getID() == verifyID)
+                {
+                    return true;
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

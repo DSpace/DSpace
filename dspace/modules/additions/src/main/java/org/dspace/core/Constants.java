@@ -49,7 +49,7 @@ public class Constants
      * lets you look up type names from the type IDs
      */
     public static final String[] typeText = { "BITSTREAM", "BUNDLE", "ITEM",
-            "COLLECTION", "COMMUNITY", "SITE", "GROUP", "EPERSON", "ETDUNIT" };
+            "COLLECTION", "COMMUNITY", "SITE", "GROUP", "EPERSON", "ETDUNIT", "UNIT" };
 
     /**
      * Special Bundle and Bitstream Names:
