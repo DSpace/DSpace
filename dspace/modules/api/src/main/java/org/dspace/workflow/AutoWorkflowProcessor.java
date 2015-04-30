@@ -47,10 +47,10 @@ public abstract class AutoWorkflowProcessor {
     static EPerson getSystemCurator(Context c)  throws AutoWorkflowProcessorException, SQLException {
         try {
             String email = ConfigurationManager.getProperty("workflow", "system.curator.account");
-            if(email == null) {
-                throw new AutoWorkflowProcessorException("system.curator.email is not present in config/workflow.cfg, cannot process batches");
-            }
             EPerson systemCurator = EPerson.findByEmail(c, email);
+            if(systemCurator == null) {
+                throw new AutoWorkflowProcessorException("system.curator.email is not present in config/workflow.cfg or does not refer to an existing user.");
+            }
             return systemCurator;
         } catch (AuthorizeException ex) {
             throw new AutoWorkflowProcessorException("Authorize exception finding system curator", ex);
