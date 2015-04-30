@@ -91,7 +91,7 @@ public class PiwikPDFExporter  {
 	private static SimpleDateFormat outputDateFormat = new SimpleDateFormat("MMM-dd");
 	
 	
-	private static Logger log = Logger.getLogger(PiwikPDFExporter.class);
+	private static Logger log = cz.cuni.mff.ufal.Logger.getLogger(PiwikPDFExporter.class);
 	
 	public static void main(String args[]) throws Exception {
 		log.info("Generating PIWIK pdf reports ....");
@@ -135,6 +135,7 @@ public class PiwikPDFExporter  {
 							done.add(item);
 						} catch(Exception e) {
 							log.error("Unable to generate report.", e);
+							continue;
 						}
 					} else {
 						log.info("Item handle not found : item_id=" + item.getID());
