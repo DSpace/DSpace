@@ -134,9 +134,7 @@ public class S3BitStore implements BitStore
      * If this method returns successfully, the bits have been stored.
      * If an exception is thrown, the bits have not been stored.
      * </p>
-     * 
-     * @param context
-     *            The current context
+     *
      * @param in
      *            The stream of bits to store
      * @exception IOException
@@ -156,9 +154,9 @@ public class S3BitStore implements BitStore
 		{
         	throw new IOException("S3ServiceException: " + s3se.getS3ErrorMessage());
 		}
-     
+
         Map attrs = new HashMap();
-	    attrs.put(Bitstream.SIZE_BYTES, String.valueOf(object.getContentLength()));
+	    attrs.put(Bitstream.SIZE_BYTES, object.getContentLength());
 	    attrs.put(Bitstream.CHECKSUM, object.getETag());
 	    attrs.put(Bitstream.CHECKSUM_ALGORITHM, CSA);
 	    attrs.put("modified", 
@@ -168,9 +166,7 @@ public class S3BitStore implements BitStore
 	
     /**
      * Obtain technical metadata about an asset in the asset store.
-     * 
-     * @param context
-     *            The current context
+     *
      * @param id
      *            The ID of the asset to describe
      * @param attrs
@@ -192,7 +188,7 @@ public class S3BitStore implements BitStore
 			{
 			    if (attrs.containsKey(Bitstream.SIZE_BYTES))
 			    {
-			        attrs.put(Bitstream.SIZE_BYTES, String.valueOf(object.getContentLength()));
+			        attrs.put(Bitstream.SIZE_BYTES, object.getContentLength());
 			    }
 			    if (attrs.containsKey(Bitstream.CHECKSUM))
 			    {
@@ -218,9 +214,7 @@ public class S3BitStore implements BitStore
 	
     /**
      * Remove an asset from the asset store. An irreversible operation.
-     * 
-     * @param context
-     *            The current context
+     *
      * @param id
      *            The ID of the asset to delete
      * @exception IOException

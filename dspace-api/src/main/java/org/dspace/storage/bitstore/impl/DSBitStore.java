@@ -107,9 +107,7 @@ public class DSBitStore implements BitStore
      * If this method returns successfully, the bits have been stored.
      * If an exception is thrown, the bits have not been stored.
      * </p>
-     * 
-     * @param context
-     *            The current context
+     *
      * @param in
      *            The stream of bits to store
      * @exception IOException
@@ -150,7 +148,7 @@ public class DSBitStore implements BitStore
         in.close();
      
         Map attrs = new HashMap();
-        attrs.put(Bitstream.SIZE_BYTES, String.valueOf(file.length()));
+        attrs.put(Bitstream.SIZE_BYTES, file.length());
         attrs.put(Bitstream.CHECKSUM, Utils.toHex(dis.getMessageDigest().digest()));
         attrs.put(Bitstream.CHECKSUM_ALGORITHM, CSA);
         return attrs;
@@ -158,9 +156,7 @@ public class DSBitStore implements BitStore
 	
     /**
      * Obtain technical metadata about an asset in the asset store.
-     * 
-     * @param context
-     *            The current context
+     *
      * @param id
      *            The ID of the asset to describe
      * @param attrs
@@ -179,7 +175,7 @@ public class DSBitStore implements BitStore
 		{
 		    if (attrs.containsKey(Bitstream.SIZE_BYTES))
 		    {
-		        attrs.put(Bitstream.SIZE_BYTES, String.valueOf(file.length()));
+		        attrs.put(Bitstream.SIZE_BYTES, file.length());
 		    }
 		    if (attrs.containsKey(Bitstream.CHECKSUM))
 		    {
@@ -220,9 +216,7 @@ public class DSBitStore implements BitStore
 	
     /**
      * Remove an asset from the asset store. An irreversible operation.
-     * 
-     * @param context
-     *            The current context
+     *
      * @param id
      *            The ID of the asset to delete
      * @exception IOException
