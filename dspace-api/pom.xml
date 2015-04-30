@@ -631,6 +631,11 @@
             <version>1</version>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>net.java.dev.jets3t</groupId>
+            <artifactId>jets3t</artifactId>
+            <version>0.9.3</version>
+        </dependency>
     </dependencies>
 
 </project>
