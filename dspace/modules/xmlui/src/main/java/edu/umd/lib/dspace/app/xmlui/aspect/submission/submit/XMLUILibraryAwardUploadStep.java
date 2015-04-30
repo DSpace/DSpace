@@ -40,8 +40,9 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.workflow.WorkflowItem;
 import org.xml.sax.SAXException;
+
+import edu.umd.lib.dspace.submit.step.LibraryAwardUploadStep;
 
 /**
  * This is a step of the item submission processes. The upload stages allow the
@@ -55,6 +56,7 @@ import org.xml.sax.SAXException;
  *
  * @author Scott Phillips
  * @author Tim Donohue (updated for Configurable Submission)
+ * @author Rohit Arora (customizations for handling library awards)
  */
 public class XMLUILibraryAwardUploadStep extends AbstractSubmissionStep
 {
@@ -198,15 +200,22 @@ public class XMLUILibraryAwardUploadStep extends AbstractSubmissionStep
 
             // if no files found error was thrown by processing class, display
             // it!
-            if (this.errorFlag == org.dspace.submit.step.UploadStep.STATUS_NO_FILES_ERROR)
+            if (this.errorFlag == LibraryAwardUploadStep.STATUS_NO_FILES_ERROR)
             {
                 file.addError(T_file_error);
             }
 
             // if an upload error was thrown by processing class, display it!
-            if (this.errorFlag == org.dspace.submit.step.UploadStep.STATUS_UPLOAD_ERROR)
+            if (this.errorFlag == LibraryAwardUploadStep.STATUS_UPLOAD_ERROR)
             {
                 file.addError(T_upload_error);
+            }
+
+            // if an upload error was thrown by processing class, display it!
+            if (this.errorFlag == LibraryAwardUploadStep.STATUS_INTEGRITY_ERROR)
+            {
+                // file.addError(T_integrity_error);
+                file.addError("INTEGRITY ERROR");
             }
 
             // if virus checking was attempted and failed in error then let the
@@ -223,9 +232,30 @@ public class XMLUILibraryAwardUploadStep extends AbstractSubmissionStep
                 file.addError(T_virus_error);
             }
 
+            if (this.errorFlag == LibraryAwardUploadStep.STATUS_UNKNOWN_FORMAT)
+            {
+                // user uploaded a file where the format is unknown to DSpace
+
+                // forward user to page to request the file format
+                // file.addError(T_unknown_format_error);
+                file.addError("UNKNOWN FORMAT");
+            }
+            if (this.errorFlag == LibraryAwardUploadStep.STATUS_MISSING_BITSTREAMS)
+            {
+                // file.addError(T_missing_bitstreams_error);
+                file.addError("MISSING BITSTREAMS");
+
+            }
+            if (this.errorFlag == LibraryAwardUploadStep.STATUS_NOT_PDF)
+            {
+                // file.addError(T_not_pdf_error);
+                file.addError("NOT PDF");
+            }
+
             Text description = upload.addItem().addText("description");
             description.setLabel(T_description);
             description.setHelp(T_description_help);
+            description.setRequired();
 
             Button uploadSubmit = upload.addItem().addButton("submit_upload");
             uploadSubmit.setValue(T_submit_upload);
