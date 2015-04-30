@@ -406,3 +406,10 @@ restore_backup: substitute_backup_config
 #selenium_tests:
 #	@cd $(BASE)/../sources/tests; export DISPLAY=:99; /etc/init.d/xvfb start; ant
 #	@/etc/init.d/xvfb stop
+
+# migrate database to new version
+# this assumes old version runs on default port 5432 and new on 5433
+migrate_databases:
+	./migrate_db.sh $(DATABASE_NAME)
+	./migrate_db.sh $(UTILITIES_DATABASE_NAME)
+
