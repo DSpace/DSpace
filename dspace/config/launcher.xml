@@ -246,6 +246,39 @@
         </step>
     </command>
     <command>
+        <name>solr-export-statistics</name>
+        <description>Export usage statistics data from Solr for back-up purposes</description>
+        <step passuserargs="true">
+            <class>org.dspace.util.SolrImportExport</class>
+	    <argument>-a</argument>
+	    <argument>export</argument>
+	    <argument>-i</argument>
+	    <argument>statistics</argument>
+        </step>
+    </command>
+    <command>
+        <name>solr-import-statistics</name>
+        <description>Import usage statistics data (as previously exported using solr-export-statistics) into Solr</description>
+        <step passuserargs="true">
+            <class>org.dspace.util.SolrImportExport</class>
+	    <argument>-a</argument>
+	    <argument>import</argument>
+	    <argument>-i</argument>
+	    <argument>statistics</argument>
+        </step>
+    </command>
+    <command>
+        <name>solr-reindex-statistics</name>
+        <description>Reindex the Solr-based usage statistics, for example after an upgrade that changes the schema</description>
+        <step passuserargs="true">
+            <class>org.dspace.util.SolrImportExport</class>
+	    <argument>-a</argument>
+	    <argument>reindex</argument>
+	    <argument>-i</argument>
+	    <argument>statistics</argument>
+        </step>
+    </command>
+    <command>
         <name>stat-general</name>
         <description>Compile the general statistics</description>
         <step passuserargs="false">
