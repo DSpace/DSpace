@@ -157,13 +157,39 @@ public class BitstreamStorageManager
 	{
     	Iterator iter = attrs.keySet().iterator();
     	while (iter.hasNext())
-    	{
+        {
     		String column = (String)iter.next();
-    		String value = (String)attrs.get(column);
-    		if (value != null)
-    		{
-    	        bitstream.setColumn(column, value);
-    		}
+            Object value = attrs.get(column);
+            if(value == null)
+            {
+                continue;
+            }
+            
+            switch (column) {
+                //int's
+                case Bitstream.BITSTREAM_ID:
+                case Bitstream.STORE_NUMBER:
+                case Bitstream.SEQUENCE_ID:
+                    bitstream.setColumn(column, (int) value);
+                    break;
+                //long's
+                case Bitstream.SIZE_BYTES:
+                    bitstream.setColumn(column, (long) value);
+                    break;
+                //String's
+                case Bitstream.CHECKSUM:
+                case Bitstream.CHECKSUM_ALGORITHM:
+                case Bitstream.INTERNAL_ID:
+                    bitstream.setColumn(column, (String) value);
+                    break;
+                //boolean's
+                case Bitstream.DELETED:
+                    bitstream.setColumn(column, (boolean) value);
+                    break;
+                default:
+                    log.info("update bitstream didn't have a switch for col:" + column + " val:" + value);
+                    break;
+            }
     	}
 	}
 
