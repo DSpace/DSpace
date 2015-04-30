@@ -60,7 +60,7 @@ public class ReviewStep extends AbstractSubmissionStep
 
     protected static final Message T_no_metadata = message("xmlui.Submission.submit.ReviewStep.no_metadata");
 
-    protected static final Message T_unknown = message("xmlui.Submission.submit.ReviewStep.unknown");
+    public static final Message T_unknown = message("xmlui.Submission.submit.ReviewStep.unknown");
 
     protected static final Message T_known = message("xmlui.Submission.submit.ReviewStep.known");
 
