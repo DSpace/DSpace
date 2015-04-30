@@ -1100,6 +1100,8 @@
 		                        		<xsl:when test="$file_type = 'audio'">mime_audio.png</xsl:when>
 		                        		<xsl:when test="$file_subtype = 'pdf'">mime_pdf.png</xsl:when>
 		                        		<xsl:when test="$file_subtype = 'msword'">mime_msword.png</xsl:when>
+		                        		<xsl:when test="$file_subtype = 'epub+zip'">mime_epub.png</xsl:when>
+		                        		<xsl:when test="$file_subtype = 'x-mobipocket-ebook'">mime_mobi.png</xsl:when>
 		                        		<xsl:otherwise>mime.png</xsl:otherwise>
 		                        	</xsl:choose>
 	                        	</xsl:variable>
