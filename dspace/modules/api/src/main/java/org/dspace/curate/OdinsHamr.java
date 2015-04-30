@@ -170,6 +170,8 @@ public class OdinsHamr extends AbstractCurationTask {
 
                 // output the resultant mappings
                 Iterator nameIt = mappedNames.entrySet().iterator();
+                List<DCValue> authors = new ArrayList<DCValue>();
+
                 while(nameIt.hasNext()) {
                     Map.Entry pairs = (Map.Entry)nameIt.next();
                     Bio mappedOrcidEntry = (Bio)pairs.getValue();
@@ -178,9 +180,22 @@ public class OdinsHamr extends AbstractCurationTask {
                     report(itemDOI + ", " + articleDOI + ", " + mappedOrcidEntry.getOrcid() + ", \"" + getName(mappedOrcidEntry) + "\", " +
                        mappedDSpaceEntry.getOrcid() + ", \"" + getName(mappedDSpaceEntry) + "\", " + hamrScore(mappedDSpaceEntry,mappedOrcidEntry));
 
+                    // if hamrScore is greater or = to 0.7, then add this to new metadata:
+
+                    DCValue authorMetadata = mappedDSpaceDCVal.copy();
+                    if (hamrScore(mappedDSpaceEntry,mappedOrcidEntry) >= 0.7) {
+                        authorMetadata.authority = mappedOrcidEntry.getOrcid();
+                        authorMetadata.confidence = 500;
+                    }
+                    authors.add(authorMetadata);
                     setResult("Last processed item = " + handle + " -- " + itemDOI);
                 }
 
+                item.clearMetadata("dc","contributor","author",null);
+                for (DCValue auth : authors) {
+                    item.addMetadata("dc", "contributor", "author", null, auth.value, auth.authority, auth.confidence);
+                }
+                item.update();
                 log.info(handle + " done.");
             } catch (Exception e) {
                 log.fatal("Skipping -- Exception in processing " + handle, e);
