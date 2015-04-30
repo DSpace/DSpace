@@ -50,7 +50,7 @@ public class ControlPanelShibbolethTab extends AbstractControlPanelTab {
 				ConfigurationManager.getProperty("authentication-shibboleth", "lazysession.loginurl");
 		
 		List l = div.addList("control_panel-shibboleth");
-		l.addLabel("Clarin Shibboleth test");
+		l.addLabel("CLARIN Shibboleth test");
 		l.addItemXref(clarin_test, clarin_test);
 
 		l.addLabel("Shibboleth session");
@@ -166,10 +166,10 @@ public class ControlPanelShibbolethTab extends AbstractControlPanelTab {
 				ret += String.format(
 						"Exception while reading %s: [%s]", 
 						shib_status, e.toString());
-			} 
-        }
-	    
-        div.addDivision("shibboleth-result", "result").addPara(ret);
+			}
+
+			div.addDivision("shibboleth-result", "result").addPara(ret);
+		}
 	}
 
 }

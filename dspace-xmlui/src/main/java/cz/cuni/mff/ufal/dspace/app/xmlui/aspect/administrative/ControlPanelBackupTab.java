@@ -50,7 +50,12 @@ public class ControlPanelBackupTab extends AbstractControlPanelTab {
 
 		List info = div.addList("backup-config");
 		info.setHead("Backup Configuration");
-		addBackupFileSection(info, backup_config_file);
+		// in case of failure, backoff
+		try {
+			addBackupFileSection(info, backup_config_file);
+		} catch (FileNotFoundException e) {
+			return;
+		}
 
 		Division available = div.addDivision("available-backups");
 		available.setHead("Available Backups");
@@ -114,7 +119,7 @@ public class ControlPanelBackupTab extends AbstractControlPanelTab {
 	}
 
 	private void addBackupFileSection(List info, String filename)
-			throws WingException {
+		throws WingException, FileNotFoundException {
 		Properties source_config = new Properties();
 		try {
 			source_config.load(new FileReader(filename));
@@ -138,7 +143,9 @@ public class ControlPanelBackupTab extends AbstractControlPanelTab {
 			info.addItem(source_config.getProperty("GENERATIONS"));
 
 		} catch (FileNotFoundException e) {
-			info.addItem(filename + " file not found!", "alert alert-error");
+			info.addItem("backup-error", "alert alert-error").addContent(
+				filename + " file not found!");
+			throw e;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
