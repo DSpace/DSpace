@@ -1321,9 +1321,9 @@
                         <xsl:text> btn-default</xsl:text>
                     </xsl:if>
                 </xsl:when>
-                <xsl:otherwise>
+                <xsl:when test="not(@type='file')">
                     <xsl:text>form-control </xsl:text>
-                </xsl:otherwise>
+                </xsl:when>
             </xsl:choose>
 
                 <xsl:if test="@rend">
