@@ -7,7 +7,6 @@
  */
 package org.dspace.app.cris.batch;
 
-
 import it.cilea.osd.jdyna.model.ANestedPropertiesDefinition;
 import it.cilea.osd.jdyna.model.ANestedProperty;
 import it.cilea.osd.jdyna.model.ATypeNestedObject;
@@ -32,8 +31,11 @@ import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.OrganizationUnit;
 import org.dspace.app.cris.model.Project;
+import org.dspace.app.cris.model.ResearchObject;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.jdyna.ACrisNestedObject;
+import org.dspace.app.cris.model.jdyna.DynamicNestedObject;
+import org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.OUPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
@@ -51,16 +53,16 @@ public class ScriptCrisBulkChanges {
 	 * Batch script to load the contact data in the RPs database from XML. See
 	 * the technical documentation for further details.
 	 */
-	public static <ACO extends ACrisObject<P, TP, NP, NTP, ACNO, ATNO>, P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, 
-	ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> void main(String[] args) throws ParseException, SQLException {
+	public static <ACO extends ACrisObject<P, TP, NP, NTP, ACNO, ATNO>, P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> void main(
+			String[] args) throws ParseException, SQLException {
 		// TODO move logic in ImportExportUtils
 		log.info("#### START IMPORT: -----" + new Date() + " ----- ####");
 		Context dspaceContext = new Context();
 		dspaceContext.setIgnoreAuthorization(true);
 		DSpace dspace = new DSpace();
-        ApplicationService applicationService = dspace.getServiceManager().getServiceByName(
-                "applicationService", ApplicationService.class);
-        
+		ApplicationService applicationService = dspace.getServiceManager().getServiceByName("applicationService",
+				ApplicationService.class);
+
 		String filePath = null;
 
 		CommandLineParser parser = new PosixParser();
@@ -70,17 +72,19 @@ public class ScriptCrisBulkChanges {
 
 		options.addOption("f", "file", true, "File to import");
 		options.addOption("t", "format", true, "The format input (XMLBulkChangesService, CSVBulkChangesService)");
-		options.addOption("a", "active", false,
-				"Set newly created objects as active");
+		options.addOption("a", "active", false, "Set newly created objects as active");
 		options.addOption("e", "entity", false, "The entity type to import (rp, ou, pj, do)");
-		
+
 		// active or inactive for newly created epersons. Default is inactive.
 		boolean status = false;
 
 		CommandLine line = parser.parse(options, args);
 
-		String entityType = line.getOptionValue("e");
-		
+		String entityType = "rp";
+		if (line.hasOption("e")) {
+			entityType = line.getOptionValue("e");
+		}
+
 		if (line.hasOption('h') || StringUtils.isEmpty(entityType)) {
 			HelpFormatter myhelp = new HelpFormatter();
 			myhelp.printHelp("ScriptCrisBulkChanges \n", options);
@@ -97,12 +101,11 @@ public class ScriptCrisBulkChanges {
 		} else {
 			filePath = line.getOptionValue("f");
 		}
-		
+
 		String format;
 		if (!line.hasOption("t")) {
 			format = XMLBulkChangesService.SERVICE_NAME;
-		}
-		else {
+		} else {
 			format = line.getOptionValue("t");
 		}
 
@@ -111,30 +114,31 @@ public class ScriptCrisBulkChanges {
 		} else {
 			status = false;
 		}
-		
-		Class<TP> clazzTP = (Class<TP>) RPPropertiesDefinition.class;
-		Class<ACO> clazzObj = (Class<ACO>) ResearcherPage.class;
-		
-		if (StringUtils.equalsIgnoreCase("rp", entityType)) {
-			clazzTP = (Class<TP>) RPPropertiesDefinition.class;
-			clazzObj = (Class<ACO>) ResearcherPage.class;
-		} else if (StringUtils.equalsIgnoreCase("ou", entityType)) {
-			clazzTP = (Class<TP>) OUPropertiesDefinition.class;
-			clazzObj = (Class<ACO>) OrganizationUnit.class;
-		} else if (StringUtils.equalsIgnoreCase("pj", entityType)) {
-			clazzTP = (Class<TP>)ProjectPropertiesDefinition.class;
-			clazzObj = (Class<ACO>) Project.class;
+
+		ACO tmpCrisObject = null;
+		try {
+			tmpCrisObject = (ACO) ResearchObject.class.newInstance();
+			if (StringUtils.equalsIgnoreCase("rp", entityType)) {
+				tmpCrisObject = (ACO) ResearcherPage.class.newInstance();
+			} else if (StringUtils.equalsIgnoreCase("ou", entityType)) {
+				tmpCrisObject = (ACO) OrganizationUnit.class.newInstance();
+			} else if (StringUtils.equalsIgnoreCase("pj", entityType)) {
+				tmpCrisObject = (ACO) Project.class.newInstance();
+			}
+		} catch (InstantiationException | IllegalAccessException e1) {
+			System.out.println(e1.getMessage());
+			System.exit(1);
 		}
-		
-		String path = ConfigurationManager
-				.getProperty(CrisConstants.CFG_MODULE, "file.import.path");
+
+		String path = ConfigurationManager.getProperty(CrisConstants.CFG_MODULE, "file.import.path");
 		File dir = new File(path);
 		try {
-			ImportExportUtils.process(format, new FileInputStream(filePath),
-					dir, applicationService, dspaceContext, status, clazzTP, clazzObj);
+			ImportExportUtils.process(format, new FileInputStream(filePath), dir, applicationService, dspaceContext,
+					status, tmpCrisObject.getClassPropertiesDefinition(), tmpCrisObject.getClass(),
+					tmpCrisObject.getClassNested(), tmpCrisObject.getClassTypeNested());
 		} catch (Exception e) {
 			log.error(e.getMessage());
-		} 
+		}
 		log.info("#### END IMPORT: -----" + new Date() + " ----- ####");
 		dspaceContext.complete();
 	}

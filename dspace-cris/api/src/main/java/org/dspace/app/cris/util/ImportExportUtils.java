@@ -116,986 +116,822 @@ import org.xml.sax.SAXException;
  * @author cilea
  * 
  */
-public class ImportExportUtils
-{
+public class ImportExportUtils {
 
-    private static final DateFormat dateFormat = new SimpleDateFormat(
-            "dd-MM-yyyy_HH-mm-ss");
+	private static final DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy_HH-mm-ss");
 
-    /** log4j logger */
-    private static Logger log = Logger.getLogger(ImportExportUtils.class);
+	/** log4j logger */
+	private static Logger log = Logger.getLogger(ImportExportUtils.class);
 
-    private static final String XPATH_ATTRIBUTE_SRC = "@"
-            + UtilsXML.NAMEATTRIBUTE_SRC_LINK;
+	private static final String XPATH_ATTRIBUTE_SRC = "@" + UtilsXML.NAMEATTRIBUTE_SRC_LINK;
 
-    private static final String XPATH_ATTRIBUTE_VIS = "@"
-            + UtilsXML.NAMEATTRIBUTE_VISIBILITY;
+	private static final String XPATH_ATTRIBUTE_VIS = "@" + UtilsXML.NAMEATTRIBUTE_VISIBILITY;
 
-    private static final String XPATH_ATTRIBUTE_RPID = "@"
-            + UtilsXML.NAMEATTRIBUTE_CRISID;
+	private static final String XPATH_ATTRIBUTE_RPID = "@" + UtilsXML.NAMEATTRIBUTE_CRISID;
 
-    private static final String XPATH_ATTRIBUTE_STAFFNO = "@"
-            + UtilsXML.NAMEATTRIBUTE_SOURCEID;
+	private static final String XPATH_ATTRIBUTE_STAFFNO = "@" + UtilsXML.NAMEATTRIBUTE_SOURCEID;
 
-    private static final String XPATH_ELEMENT_ROOT = UtilsXML.ROOT_RESEARCHERS;
+	private static final String XPATH_ELEMENT_ROOT = UtilsXML.ROOT_RESEARCHERS;
 
-    private static final String XPATH_ELEMENT_RESEARCHER = UtilsXML.ELEMENT_RESEARCHER;
+	private static final String XPATH_ELEMENT_RESEARCHER = UtilsXML.ELEMENT_RESEARCHER;
 
-    private static final String XPATH_ATTRIBUTE_REMOTESRC = "@"
-            + UtilsXML.NAMEATTRIBUTE_REMOTEURL;
+	private static final String XPATH_ATTRIBUTE_REMOTESRC = "@" + UtilsXML.NAMEATTRIBUTE_REMOTEURL;
 
-    private static final String XPATH_ATTRIBUTE_MIME = "@"
-            + UtilsXML.NAMEATTRIBUTE_MIMETYPE;
+	private static final String XPATH_ATTRIBUTE_MIME = "@" + UtilsXML.NAMEATTRIBUTE_MIMETYPE;
 
-    public static final String[] XPATH_RULES = {
-            "/" + XPATH_ELEMENT_ROOT + "/" + XPATH_ELEMENT_RESEARCHER,
-            XPATH_ATTRIBUTE_STAFFNO, XPATH_ATTRIBUTE_VIS, XPATH_ATTRIBUTE_RPID,
-            XPATH_ATTRIBUTE_SRC, XPATH_ATTRIBUTE_REMOTESRC,
-            XPATH_ATTRIBUTE_MIME };
+	public static final String[] XPATH_RULES = { "/" + XPATH_ELEMENT_ROOT + "/" + XPATH_ELEMENT_RESEARCHER,
+			XPATH_ATTRIBUTE_STAFFNO, XPATH_ATTRIBUTE_VIS, XPATH_ATTRIBUTE_RPID, XPATH_ATTRIBUTE_SRC,
+			XPATH_ATTRIBUTE_REMOTESRC, XPATH_ATTRIBUTE_MIME };
 
-    /**
-     * Defaul visibility, it is used when no visibility attribute and old value
-     * founded
-     */
-    public static final String DEFAULT_VISIBILITY = "1";
+	/**
+	 * Defaul visibility, it is used when no visibility attribute and old value
+	 * founded
+	 */
+	public static final String DEFAULT_VISIBILITY = "1";
 
-    public static final String LABELCAPTION_VISIBILITY_SUFFIX = " visibility";
+	public static final String LABELCAPTION_VISIBILITY_SUFFIX = " visibility";
 
-    public static final String IMAGE_SUBFOLDER = "image";
+	public static final String IMAGE_SUBFOLDER = "image";
 
-    public static final String CV_SUBFOLDER = "cv";
+	public static final String CV_SUBFOLDER = "cv";
 
-    /**
-     * Default absolute path where find the contact data excel file to import
-     */
-    public static final String PATH_DEFAULT_XML = ConfigurationManager
-            .getProperty("dspace.dir")
-            + File.separatorChar
-            + "rp-import/rpdata.xml";
+	/**
+	 * Default absolute path where find the contact data excel file to import
+	 */
+	public static final String PATH_DEFAULT_XML = ConfigurationManager.getProperty("dspace.dir") + File.separatorChar
+			+ "rp-import/rpdata.xml";
 
-    /**
-     * Default absolute path where find the contact data excel file to import
-     */
-    public static final String GRANT_PATH_DEFAULT_XML = ConfigurationManager
-            .getProperty("dspace.dir")
-            + File.separatorChar
-            + "rg-import/rpdata.xml";
+	/**
+	 * Default absolute path where find the contact data excel file to import
+	 */
+	public static final String GRANT_PATH_DEFAULT_XML = ConfigurationManager.getProperty("dspace.dir")
+			+ File.separatorChar + "rg-import/rpdata.xml";
 
-    /**
-     * Write in the output stream the researcher pages contact data as an excel
-     * file. The format of the exported Excel file is suitable for re-import in
-     * the system.
-     * 
-     * @param rps
-     *            the researcher pages list to export
-     * @param applicationService
-     *            the applicationService
-     * @param os
-     *            the output stream, it will close directly when the method exit
-     * @throws IOException
-     * @throws WriteException
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
-     * @throws IllegalArgumentException
-     */
-    public static void exportData(List<ResearcherPage> rps,
-            ApplicationService applicationService, OutputStream os,
-            List<IContainable> metadata) throws IOException, WriteException,
-            IllegalArgumentException, IllegalAccessException,
-            InvocationTargetException
-    {
+	/**
+	 * Write in the output stream the researcher pages contact data as an excel
+	 * file. The format of the exported Excel file is suitable for re-import in
+	 * the system.
+	 * 
+	 * @param rps
+	 *            the researcher pages list to export
+	 * @param applicationService
+	 *            the applicationService
+	 * @param os
+	 *            the output stream, it will close directly when the method exit
+	 * @throws IOException
+	 * @throws WriteException
+	 * @throws InvocationTargetException
+	 * @throws IllegalAccessException
+	 * @throws IllegalArgumentException
+	 */
+	public static void exportData(List<ResearcherPage> rps, ApplicationService applicationService, OutputStream os,
+			List<IContainable> metadata) throws IOException, WriteException, IllegalArgumentException,
+			IllegalAccessException, InvocationTargetException {
 
-        WritableWorkbook workbook = Workbook.createWorkbook(os);
-        WritableSheet sheet = workbook.createSheet("Sheet", 0);
+		WritableWorkbook workbook = Workbook.createWorkbook(os);
+		WritableSheet sheet = workbook.createSheet("Sheet", 0);
 
-        // create initial caption (other caption could be write field together)
-        int x = 0;
-        sheet.addCell(new Label(x++, 0, "staffNo"));
-        sheet.addCell(new Label(x++, 0, "rp"));
-        sheet.addCell(new Label(x++, 0, "rp url"));
+		// create initial caption (other caption could be write field together)
+		int x = 0;
+		sheet.addCell(new Label(x++, 0, "staffNo"));
+		sheet.addCell(new Label(x++, 0, "rp"));
+		sheet.addCell(new Label(x++, 0, "rp url"));
 
-        // row index
-        int i = 1;
-        for (ResearcherPage rp : rps)
-        {
-            int y = 0;
-            sheet.addCell(new Label(0, i, ""));
-            Label label = (Label) sheet.getCell(0, i);
-            label.setString(rp.getSourceID());
-            y++;
-            sheet.addCell(new Label(1, i, ""));
-            label = (Label) sheet.getCell(1, i);
-            label.setString(ResearcherPageUtils.getPersistentIdentifier(rp));
-            y++;
-            sheet.addCell(new Label(2, i, ""));
-            label = (Label) sheet.getCell(2, i);
-            label.setString(ConfigurationManager.getProperty("dspace.url")
-                    + "/cris/" + rp.getPublicPath() + "/"
-                    + ResearcherPageUtils.getPersistentIdentifier(rp));
+		// row index
+		int i = 1;
+		for (ResearcherPage rp : rps) {
+			int y = 0;
+			sheet.addCell(new Label(0, i, ""));
+			Label label = (Label) sheet.getCell(0, i);
+			label.setString(rp.getSourceID());
+			y++;
+			sheet.addCell(new Label(1, i, ""));
+			label = (Label) sheet.getCell(1, i);
+			label.setString(ResearcherPageUtils.getPersistentIdentifier(rp));
+			y++;
+			sheet.addCell(new Label(2, i, ""));
+			label = (Label) sheet.getCell(2, i);
+			label.setString(ConfigurationManager.getProperty("dspace.url") + "/cris/" + rp.getPublicPath() + "/"
+					+ ResearcherPageUtils.getPersistentIdentifier(rp));
 
-            for (IContainable containable : metadata)
-            {
-                if (containable instanceof DecoratorRPPropertiesDefinition)
-                {
-                    y = UtilsXLS.createCell(applicationService, y, i,
-                            (DecoratorRPPropertiesDefinition) containable, rp,
-                            sheet);
-                }
-                if (containable instanceof DecoratorRestrictedField)
-                {
-                    y = UtilsXLS.createCell(applicationService, y, i,
-                            (DecoratorRestrictedField) containable, rp, sheet);
-                }
-            }
+			for (IContainable containable : metadata) {
+				if (containable instanceof DecoratorRPPropertiesDefinition) {
+					y = UtilsXLS.createCell(applicationService, y, i, (DecoratorRPPropertiesDefinition) containable,
+							rp, sheet);
+				}
+				if (containable instanceof DecoratorRestrictedField) {
+					y = UtilsXLS
+							.createCell(applicationService, y, i, (DecoratorRestrictedField) containable, rp, sheet);
+				}
+			}
 
-            i++;
-        }
-        // All sheets and cells added. Now write out the workbook
-        workbook.write();
-        workbook.close();
-    }
-
-	private static <P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, 
-	ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>, ACO extends ACrisObject<P, TP, NP, NTP, ACNO, ATNO>> ACO getCrisObject(
-		ApplicationService applicationService, Class<ACO> objectTypeClass, IBulkChange change) throws InstantiationException, IllegalAccessException {
-	String action = change.getAction();
-	String crisID = change.getCrisID();
-	String uuid = change.getUUID();
-	String sourceRef = change.getSourceRef();
-	String sourceId = change.getSourceID();
-	
-	ACO crisObject = null;
-	
-	if (StringUtils.isBlank(crisID) && StringUtils.isBlank(uuid) && StringUtils.isBlank(sourceRef) && StringUtils.isBlank(sourceId)) {
-		if (!StringUtils.equalsIgnoreCase("delete", action)) {
-			crisObject = objectTypeClass.newInstance();
+			i++;
 		}
+		// All sheets and cells added. Now write out the workbook
+		workbook.write();
+		workbook.close();
 	}
-	else {
+
+	private static <P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>, ACO extends ACrisObject<P, TP, NP, NTP, ACNO, ATNO>> ACO getCrisObject(
+			ApplicationService applicationService, Class<ACO> objectTypeClass, IBulkChange change)
+			throws InstantiationException, IllegalAccessException {
+		String action = change.getAction();
+		String crisID = change.getCrisID();
+		String uuid = change.getUUID();
+		String sourceRef = change.getSourceRef();
+		String sourceId = change.getSourceID();
+
+		ACO crisObject = null;
+		
+		//check if entity exist
 		if (StringUtils.isNotBlank(crisID)) {
 			crisObject = applicationService.getEntityByCrisId(crisID, objectTypeClass);
-		}
-		
-		if (crisObject == null && StringUtils.isNotBlank(uuid)) {
+		} else if (crisObject == null && StringUtils.isNotBlank(uuid)) {
 			crisObject = (ACO) applicationService.getEntityByUUID(uuid);
-		}
-		
-		if (crisObject == null && StringUtils.isNotBlank(sourceId)) {
+		} else if (crisObject == null && StringUtils.isNotBlank(sourceId)) {
 			crisObject = applicationService.getEntityBySourceId(sourceRef, sourceId, objectTypeClass);
 		}
-	}
-	
-	if (StringUtils.isNotBlank(crisID)) {
-		crisObject.setCrisID(crisID);
-	}
-	
-	if (StringUtils.isNotBlank(uuid)) {
-		crisObject.setUuid(uuid);
-	}
-	
-	if (StringUtils.isNotBlank(sourceRef)) {
-		crisObject.setSourceRef(sourceRef);
-	}
-	if (StringUtils.isNotBlank(sourceId)) {
-		crisObject.setSourceID(sourceId);
-	}
-	return crisObject;
-}
 
-    
-    /**
-     * 
-     * Import xml files, matching validation with xsd builded at runtime
-     * execution associate to list of dynamic fields and structural fields
-     * 
-     * @param input
-     *            - XML file stream
-     * @param dir
-     *            - directory from read image/cv and write temporaries xsd and
-     *            xml (this xsd validate actual xml)
-     * @param applicationService
-     *            - service
-     * @param appendMode
-     *            TODO
-     * @throws Exception
-     */
-    public static <ACO extends ACrisObject<P, TP, NP, NTP, ACNO, ATNO>, P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, 
-	ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> void process(String format, InputStream input, File dir,
-            ApplicationService applicationService, Context dspaceContext,
-            boolean status, Class<TP> propDefClazz, Class<ACO> crisObjectClazz) throws Exception
-    {
+		//if action=create then we build the object, notify if already exist 
+		if (StringUtils.equalsIgnoreCase(IBulkChange.ACTION_CREATE, action)) {
+			if (crisObject != null) {
+				log.info("the object is already on database... found a CREATE action on entity, maybe should be skip it?");
+			} else {
+				crisObject = objectTypeClass.newInstance();
+			}
+		}
 
-        List<IContainable> metadataALL = applicationService
-                .findAllContainables(propDefClazz);
-        
-        DSpace dspace = new DSpace();
-        IBulkChangesService importer = dspace.getServiceManager().getServiceByName(format, IBulkChangesService.class);
-        IBulkChanges bulkChanges = importer.getBulkChanges(input, dir, crisObjectClazz, propDefClazz, metadataALL);
+		//we create the new entity also in case of the main field are empty (except the delete and create signal)
+		if (StringUtils.isBlank(crisID) && StringUtils.isBlank(uuid) && StringUtils.isBlank(sourceRef)
+				&& StringUtils.isBlank(sourceId)) {
+			if (!StringUtils.equalsIgnoreCase(IBulkChange.ACTION_DELETE, action) && !StringUtils.equalsIgnoreCase(IBulkChange.ACTION_CREATE, action)) {
+				crisObject = objectTypeClass.newInstance();
+			}
+		}
 
-        processBulkChanges(applicationService, propDefClazz, crisObjectClazz,
-				metadataALL, bulkChanges);
-    }
+		if (StringUtils.isNotBlank(crisID)) {
+			crisObject.setCrisID(crisID);
+		}
 
-	private static <ACO extends ACrisObject<P, TP, NP, NTP, ACNO, ATNO>, P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, 
-	ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> void processBulkChanges(
-			ApplicationService applicationService, Class<TP> propDefClazz,
-			Class<ACO> crisObjectClazz, List<IContainable> metadataALL,
-			IBulkChanges bulkChanges) throws InstantiationException,
-			IllegalAccessException, CloneNotSupportedException, InvocationTargetException,
-			NoSuchMethodException {
+		if (StringUtils.isNotBlank(uuid)) {
+			crisObject.setUuid(uuid);
+		}
+
+		if (StringUtils.isNotBlank(sourceRef)) {
+			crisObject.setSourceRef(sourceRef);
+		}
+		if (StringUtils.isNotBlank(sourceId)) {
+			crisObject.setSourceID(sourceId);
+		}
+		if (StringUtils.isNotBlank(action)) {
+			if (action.equalsIgnoreCase("HIDE")) {
+				crisObject.setStatus(false);
+			}
+			if (action.equalsIgnoreCase("SHOW")) {
+				crisObject.setStatus(true);
+			}
+		}
+		return crisObject;
+	}
+
+	/**
+	 * 
+	 * Import xml files, matching validation with xsd builded at runtime
+	 * execution associate to list of dynamic fields and structural fields
+	 * 
+	 * @param input
+	 *            - XML file stream
+	 * @param dir
+	 *            - directory from read image/cv and write temporaries xsd and
+	 *            xml (this xsd validate actual xml)
+	 * @param applicationService
+	 *            - service
+	 * @param appendMode
+	 *            TODO
+	 * @throws Exception
+	 */
+	public static <ACO extends ACrisObject<P, TP, NP, NTP, ACNO, ATNO>, P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> void process(
+			String format, InputStream input, File dir, ApplicationService applicationService, Context dspaceContext,
+			boolean status, Class<TP> propDefClazz, Class<ACO> crisObjectClazz, Class<ACNO> crisNestedObjectClazz,
+			Class<ATNO> ttpClass) throws Exception {
+
+		List<IContainable> metadataFirstLevel = applicationService.findAllContainables(propDefClazz);
+
+		// TODO manage nested
+		List<ATNO> ttps = applicationService.getList(ttpClass);
+		List<IContainable> metadataNestedLevel = new LinkedList<IContainable>();
+		for (ATNO ttp : ttps) {
+			IContainable ic = applicationService.findContainableByDecorable(ttp.getDecoratorClass(), ttp.getId());
+			if (ic != null) {
+				metadataNestedLevel.add(ic);
+			}
+		}
+
+		DSpace dspace = new DSpace();
+		IBulkChangesService importer = dspace.getServiceManager().getServiceByName(format, IBulkChangesService.class);
+		IBulkChanges bulkChanges = importer.getBulkChanges(input, dir, crisObjectClazz, propDefClazz,
+				metadataFirstLevel);
+
+		processBulkChanges(applicationService, propDefClazz, crisObjectClazz, metadataFirstLevel, metadataNestedLevel,
+				bulkChanges);
+	}
+
+	// TODO manage nested
+	private static <ACO extends ACrisObject<P, TP, NP, NTP, ACNO, ATNO>, P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> void processBulkChanges(
+			ApplicationService applicationService, Class<TP> propDefClazz, Class<ACO> crisObjectClazz,
+			List<IContainable> metadataFirstLevel, List<IContainable> metadataNestedLevel, IBulkChanges bulkChanges)
+			throws InstantiationException, IllegalAccessException, CloneNotSupportedException,
+			InvocationTargetException, NoSuchMethodException {
 		// get from list of metadata dynamic field vs structural field
-        List<TP> realTPS = new LinkedList<TP>();
-        List<IContainable> structuralField = new LinkedList<IContainable>();
-        for (IContainable c : metadataALL)
-        {
-            TP rpPd = applicationService
-                    .findPropertiesDefinitionByShortName(
-                    		propDefClazz, c.getShortName());
-            if (rpPd != null)
-            {
-                realTPS.add((TP) ((ADecoratorPropertiesDefinition<TP>) applicationService
-                        .findContainableByDecorable(
-                        		propDefClazz.newInstance()
-                                        .getDecoratorClass(), c.getId()))
-                        .getReal());
-            }
-            else
-            {
-                structuralField.add(c);
-            }
-        }
+		List<TP> realTPS = new LinkedList<TP>();
+		List<IContainable> structuralField = new LinkedList<IContainable>();
+		for (IContainable c : metadataFirstLevel) {
+			TP rpPd = applicationService.findPropertiesDefinitionByShortName(propDefClazz, c.getShortName());
+			if (rpPd != null) {
+				realTPS.add((TP) ((ADecoratorPropertiesDefinition<TP>) applicationService.findContainableByDecorable(
+						propDefClazz.newInstance().getDecoratorClass(), c.getId())).getReal());
+			} else {
+				structuralField.add(c);
+			}
+		}
 
-        List<TP> realFillTPS = new LinkedList<TP>();
-        for (TP r : realTPS)
-        {
-            if (bulkChanges.hasPropertyDefinition(r.getShortName())) {
-                realFillTPS.add(r);
-            }
-        }
+		List<TP> realFillTPS = new LinkedList<TP>();
+		for (TP r : realTPS) {
+			if (bulkChanges.hasPropertyDefinition(r.getShortName())) {
+				realFillTPS.add(r);
+			}
+		}
 
-        List<IContainable> structuralFillField = new LinkedList<IContainable>();
-        for (IContainable r : structuralField)
-        {
-        	if (bulkChanges.hasPropertyDefinition(r.getShortName())) {
-                structuralFillField.add(r);
-            }
-        }
+		List<IContainable> structuralFillField = new LinkedList<IContainable>();
+		for (IContainable r : structuralField) {
+			if (bulkChanges.hasPropertyDefinition(r.getShortName())) {
+				structuralFillField.add(r);
+			}
+		}
 
-        // import xml
-        // XPath xpath = XPathFactory.newInstance().newXPath();
-        // String xpathExpression = XPATH_RULES[0];
-        // NodeList researchers = (NodeList) xpath.evaluate(xpathExpression,
-        // document, XPathConstants.NODESET);
+		// import xml
+		// XPath xpath = XPathFactory.newInstance().newXPath();
+		// String xpathExpression = XPATH_RULES[0];
+		// NodeList researchers = (NodeList) xpath.evaluate(xpathExpression,
+		// document, XPathConstants.NODESET);
 
-        int rows_discarded = 0;
-        int rows_imported = 0;
-        log.info("Start import " + new Date());
-        // foreach researcher element in xml
-        for (int i = 0; i < bulkChanges.size(); i++)
-        {
-            log.info("Number " + i + " of " + bulkChanges.size());
-            ACO researcher = null;
-            try
-            {
-            	IBulkChange bulkChange = bulkChanges.getChanges(i);
+		int rows_discarded = 0;
+		int rows_imported = 0;
+		log.info("Start import " + new Date());
+		// foreach researcher element in xml
+		for (int i = 0; i < bulkChanges.size(); i++) {
+			log.info("Number " + i + " of " + bulkChanges.size());
+			ACO crisObject = null;
+			try {
+				IBulkChange bulkChange = bulkChanges.getChanges(i);
 
-                String sourceId = bulkChange.getSourceID();
-                String sourceRef = bulkChange.getSourceRef();
-                String crisID = bulkChange.getCrisID();
-                String uuid = bulkChange.getUUID();
-            	
-                ACrisObject<P, TP, NP, NTP, ACNO, ATNO> clone = null;
-                // use dto to fill dynamic metadata
-                AnagraficaObjectDTO dto = new AnagraficaObjectDTO();
-                AnagraficaObjectDTO clonedto = new AnagraficaObjectDTO();
-                boolean update = false; // if update a true then set field to
-                                        // null
-                                        // on case of empty element
+				String sourceId = bulkChange.getSourceID();
+				String sourceRef = bulkChange.getSourceRef();
+				String crisID = bulkChange.getCrisID();
+				String uuid = bulkChange.getUUID();
 
-                // if there is rpid then try to get researcher by staffNo
-                // and
-                // set to null all structural metadata lists
-                log.info("Researcher sourceRef: "+ sourceRef + " sourceID: " + sourceId
-                        + " / crisID : " + crisID + " uuid: "+uuid);
-                
-                ACrisObject<P, TP, NP, NTP, ACNO, ATNO> crisObject = getCrisObject(applicationService, crisObjectClazz, bulkChange);
+				ACrisObject<P, TP, NP, NTP, ACNO, ATNO> clone = null;
+				// use dto to fill dynamic metadata
+				AnagraficaObjectDTO dto = new AnagraficaObjectDTO();
+				AnagraficaObjectDTO clonedto = new AnagraficaObjectDTO();
+				boolean update = false; // if update a true then set field to
+										// null
+										// on case of empty element
 
-                clone = (ACrisObject<P, TP, NP, NTP, ACNO, ATNO>) researcher.clone();
+				// if there is rpid then try to get researcher by staffNo
+				// and
+				// set to null all structural metadata lists
+				log.info("Researcher sourceRef: " + sourceRef + " sourceID: " + sourceId + " / crisID : " + crisID
+						+ " uuid: " + uuid);
 
-                AnagraficaUtils.fillDTO(dto, researcher,
-                        realFillTPS);
+				crisObject = getCrisObject(applicationService, crisObjectClazz, bulkChange);
+				if (bulkChange.getAction().equals("DELETE")) {
+					applicationService.delete(crisObjectClazz, crisObject);
+				} else {
 
-                // one-shot fill and reverse to well-format clonedto and clean
-                // empty
-                // data
-                AnagraficaUtils.fillDTO(clonedto, clone,
-                        realFillTPS);
+					clone = (ACrisObject<P, TP, NP, NTP, ACNO, ATNO>) crisObject.clone();
 
-                AnagraficaUtils.reverseDTO(clonedto, clone,
-                        realFillTPS);
+					AnagraficaUtils.fillDTO(dto, crisObject, realFillTPS);
 
-                AnagraficaUtils.fillDTO(clonedto, clone,
-                        realFillTPS);
-                importDynA(applicationService, realFillTPS, bulkChange, dto,
-                        clonedto, update);
+					// one-shot fill and reverse to well-format clonedto and
+					// clean
+					// empty
+					// data
+					AnagraficaUtils.fillDTO(clonedto, clone, realFillTPS);
 
-                for (IContainable containable : structuralFillField)
-                {
-                    String shortName = containable.getShortName();
-                    // xpathExpression = containable.getShortName();
-                    if (containable instanceof DecoratorRestrictedField)
-                    {
-                        Method[] methods = researcher.getClass().getMethods();
-                        Object field = null;
-                        Method method = null;
-                        Method setter = null;
-                        for (Method m : methods)
-                        {
-                            if (m.getName().toLowerCase()
-                                    .equals("get" + shortName.toLowerCase()))
-                            {
-                                field = m.invoke(researcher, null);
-                                method = m;
-                                String nameSetter = m.getName().replaceFirst(
-                                        "g", "s");
-                                setter = researcher.getClass().getMethod(
-                                        nameSetter, method.getReturnType());
-                                break;
-                            }
-                        }
-                        if (method.getReturnType().isAssignableFrom(List.class))
-                        {
+					AnagraficaUtils.reverseDTO(clonedto, clone, realFillTPS);
 
-                            // NodeList nodeslist = (NodeList) xpath.evaluate(
-                            // xpathExpression, node,
-                            // XPathConstants.NODESET);
-                            IBulkChangeField changeField = bulkChange.getFieldChanges(shortName);
+					AnagraficaUtils.fillDTO(clonedto, clone, realFillTPS);
+					importDynA(applicationService, realFillTPS, bulkChange, dto, clonedto, update);
 
-                            List<RestrictedField> object = (List<RestrictedField>) field;
-                            List<RestrictedField> objectclone = new LinkedList<RestrictedField>();
-                            objectclone.addAll(object);
+					for (IContainable containable : structuralFillField) {
+						String shortName = containable.getShortName();
+						// xpathExpression = containable.getShortName();
+						if (containable instanceof DecoratorRestrictedField) {
+							Method[] methods = crisObject.getClass().getMethods();
+							Object field = null;
+							Method method = null;
+							Method setter = null;
+							for (Method m : methods) {
+								if (m.getName().toLowerCase().equals("get" + shortName.toLowerCase())) {
+									field = m.invoke(crisObject, null);
+									method = m;
+									String nameSetter = m.getName().replaceFirst("g", "s");
+									setter = crisObject.getClass().getMethod(nameSetter, method.getReturnType());
+									break;
+								}
+							}
+							if (method.getReturnType().isAssignableFrom(List.class)) {
 
-                            if (update == true)
-                            {
-                                object.clear();
-                            }
-                            for (int y = 0; y < changeField.size(); y++)
-                            {
-                               
-                                IBulkChangeFieldValue nsublist = changeField.get(y);
-                                String value = nsublist.getValue();
+								// NodeList nodeslist = (NodeList)
+								// xpath.evaluate(
+								// xpathExpression, node,
+								// XPathConstants.NODESET);
+								IBulkChangeField changeField = bulkChange.getFieldChanges(shortName);
 
-                                // String visibilityString = xpath.evaluate(
-                                // XPATH_RULES[2], nsublist);
-                                String visibilityString = nsublist.getVisibility();
+								List<RestrictedField> object = (List<RestrictedField>) field;
+								List<RestrictedField> objectclone = new LinkedList<RestrictedField>();
+								objectclone.addAll(object);
 
-                                if (value != null && !value.isEmpty())
-                                {
+								if (update == true) {
+									object.clear();
+								}
+								for (int y = 0; y < changeField.size(); y++) {
 
-                                    RestrictedField itemInCollection = new RestrictedField();
+									IBulkChangeFieldValue nsublist = changeField.get(y);
+									String value = nsublist.getValue();
 
-                                    Integer visibility = null;
-                                    if (visibilityString != null
-                                            && !visibilityString.isEmpty())
-                                    {
-                                        visibility = Integer
-                                                .parseInt(visibilityString);
-                                    }
-                                    else if (update == false)
-                                    {
-                                        visibility = VisibilityConstants.PUBLIC;
+									// String visibilityString = xpath.evaluate(
+									// XPATH_RULES[2], nsublist);
+									String visibilityString = nsublist.getVisibility();
 
-                                    }
-                                    else
-                                    {
-                                        visibility = checkOldVisibility(
-                                                applicationService, value,
-                                                objectclone, visibility);
+									if (value != null && !value.isEmpty()) {
 
-                                    }
+										RestrictedField itemInCollection = new RestrictedField();
 
-                                    // RestrictedField old = checkOldValue(
-                                    // applicationService, value, object,
-                                    // visibility);
-                                    // if (old == null) {
-                                    itemInCollection.setValue(value);
-                                    if (visibility != null)
-                                    {
-                                        itemInCollection
-                                                .setVisibility(visibility);
-                                    }
-                                    object.add(itemInCollection);
-                                    setter.invoke(researcher, object);
-                                    // }
-                                }
-                                // else {
-                                // if (update == true
-                                // && nodeslist.getLength() == 1) {
-                                // setter.invoke(researcher,
-                                // (List<RestrictedField>) null);
-                                // }
-                                // }
+										Integer visibility = null;
+										if (visibilityString != null && !visibilityString.isEmpty()) {
+											visibility = Integer.parseInt(visibilityString);
+										} else if (update == false) {
+											visibility = VisibilityConstants.PUBLIC;
 
-                            }
+										} else {
+											visibility = checkOldVisibility(applicationService, value, objectclone,
+													visibility);
 
-                        }
-                        else
-                        {
-                        	IBulkChangeField changeField = bulkChange.getFieldChanges(shortName);
-                            if (changeField.size() == 1)
-                            	
-                            {
-                            	IBulkChangeFieldValue changeFieldValue = changeField.get(0);
-                                // String value =
-                                // xpath.evaluate(xpathExpression,
-                                // node);
-                                // String visibilityString = xpath.evaluate(
-                                // xpathExpression + "/" + XPATH_RULES[2],
-                                // node);
+										}
 
-                                String value = changeFieldValue.getValue();
-                                String visibilityString = changeFieldValue.getVisibility();
+										// RestrictedField old = checkOldValue(
+										// applicationService, value, object,
+										// visibility);
+										// if (old == null) {
+										itemInCollection.setValue(value);
+										if (visibility != null) {
+											itemInCollection.setVisibility(visibility);
+										}
+										object.add(itemInCollection);
+										setter.invoke(crisObject, object);
+										// }
+									}
+									// else {
+									// if (update == true
+									// && nodeslist.getLength() == 1) {
+									// setter.invoke(researcher,
+									// (List<RestrictedField>) null);
+									// }
+									// }
 
-                                if (!value.isEmpty())
-                                {
+								}
 
-                                    if (method.getReturnType().equals(
-                                            String.class))
-                                    {
+							} else {
+								IBulkChangeField changeField = bulkChange.getFieldChanges(shortName);
+								if (changeField.size() == 1)
 
-                                        setter.invoke(researcher, value);
-                                    }
-                                    else
-                                    {
+								{
+									IBulkChangeFieldValue changeFieldValue = changeField.get(0);
+									// String value =
+									// xpath.evaluate(xpathExpression,
+									// node);
+									// String visibilityString = xpath.evaluate(
+									// xpathExpression + "/" + XPATH_RULES[2],
+									// node);
 
-                                        Integer visibility = null;
-                                        if (visibilityString != null
-                                                && !visibilityString.isEmpty())
-                                        {
-                                            visibility = Integer
-                                                    .parseInt(visibilityString);
-                                        }
-                                        else if (!update)
-                                        {
-                                            visibility = VisibilityConstants.PUBLIC;
+									String value = changeFieldValue.getValue();
+									String visibilityString = changeFieldValue.getVisibility();
 
-                                        }
-                                        else
-                                        {
-                                            visibility = checkOldVisibility(
-                                                    applicationService, value,
-                                                    (RestrictedField) field,
-                                                    visibility);
+									if (!value.isEmpty()) {
 
-                                        }
+										if (method.getReturnType().equals(String.class)) {
 
-                                        if (RestrictedField.class.equals(method
-                                                .getReturnType()))
-                                        {
+											setter.invoke(crisObject, value);
+										} else {
 
-                                            RestrictedField object = (RestrictedField) field;
-                                            object.setValue(value);
-                                            if (visibility != null)
-                                            {
-                                                object.setVisibility(visibility);
-                                            }
-                                            setter.invoke(researcher, object);
-                                        }
-                                    }
+											Integer visibility = null;
+											if (visibilityString != null && !visibilityString.isEmpty()) {
+												visibility = Integer.parseInt(visibilityString);
+											} else if (!update) {
+												visibility = VisibilityConstants.PUBLIC;
 
-                                }
-                                else
-                                {
-                                    if (update)
-                                    {
+											} else {
+												visibility = checkOldVisibility(applicationService, value,
+														(RestrictedField) field, visibility);
 
-                                        if (RestrictedField.class.equals(method
-                                                .getReturnType()))
-                                        {
-                                            setter.invoke(researcher,
-                                                    (RestrictedField) null);
-                                        }
+											}
 
-                                    }
-                                }
-                            }
+											if (RestrictedField.class.equals(method.getReturnType())) {
 
-                        }
-                    }
+												RestrictedField object = (RestrictedField) field;
+												object.setValue(value);
+												if (visibility != null) {
+													object.setVisibility(visibility);
+												}
+												setter.invoke(crisObject, object);
+											}
+										}
 
-                }
+									} else {
+										if (update) {
 
-                AnagraficaUtils.reverseDTO(dto, researcher,
-                        realFillTPS);
+											if (RestrictedField.class.equals(method.getReturnType())) {
+												setter.invoke(crisObject, (RestrictedField) null);
+											}
 
-                applicationService.saveOrUpdate(crisObjectClazz,
-                        researcher);
+										}
+									}
+								}
 
-                log.info("Import researcher " + researcher.getSourceID()
-                        + " (staffNo) / " + researcher.getId()
-                        + " (id) - SUCCESS");
-                rows_imported++;
-            }
-            catch (RuntimeException e)
-            {
-                log.error("Import researcher - FAILED " + e.getMessage(), e);
-                rows_discarded++;
-            }
+							}
+						}
 
-        }
+					}
 
-        log.info("Import researchers - end import additional files");
+					AnagraficaUtils.reverseDTO(dto, crisObject, realFillTPS);
 
-        log.info("Statistics: row ingested " + rows_imported + " on total of "
-                + (bulkChanges.size()) + " (" + rows_discarded
-                + " row discarded)");
+					applicationService.saveOrUpdate(crisObjectClazz, crisObject);
+
+				}
+
+				log.info("Import entity: CRISID: " + crisObject.getCrisID() + " SOURCEID/SOURCEREF: "
+						+ crisObject.getSourceID() + "/" + crisObject.getSourceID() + " ACTION "
+						+ bulkChange.getAction() + " -- " + crisObject.getId() + " (id) - SUCCESS");
+				rows_imported++;
+			} catch (RuntimeException e) {
+				log.error("Import entity - FAILED " + e.getMessage(), e);
+				rows_discarded++;
+			}
+
+		}
+
+		log.info("Import researchers - end import additional files");
+
+		log.info("Statistics: row ingested " + rows_imported + " on total of " + (bulkChanges.size()) + " ("
+				+ rows_discarded + " row discarded)");
 	}
 
+	private static <TP extends PropertiesDefinition> void importDynA(ApplicationService applicationService,
+			List<TP> realFillTPS, IBulkChange bulkChange, AnagraficaObjectDTO dto, AnagraficaObjectDTO clonedto,
+			boolean update) {
+		// foreach dynamic field read xml and fill on dto
+		for (TP rpPD : realFillTPS) {
 
-    private static <TP extends PropertiesDefinition> void importDynA(
-            ApplicationService applicationService, List<TP> realFillTPS,
-            IBulkChange bulkChange, AnagraficaObjectDTO dto,
-            AnagraficaObjectDTO clonedto, boolean update)            
-    {
-        // foreach dynamic field read xml and fill on dto
-        for (TP rpPD : realFillTPS)
-        {
+			// xpathExpression = rpPD.getShortName();
+			String shortName = rpPD.getShortName();
+			List<ValoreDTO> values = dto.getAnagraficaProperties().get(shortName);
+			List<ValoreDTO> oldValues = clonedto.getAnagraficaProperties().get(shortName);
+			if (update == true) {
+				dto.getAnagraficaProperties().get(shortName).clear();
+			}
+			if (rpPD.getRendering() instanceof WidgetTesto) {
+				if (rpPD.isRepeatable()) {
 
-            // xpathExpression = rpPD.getShortName();
-            String shortName = rpPD.getShortName();
-            List<ValoreDTO> values = dto.getAnagraficaProperties().get(
-                    shortName);
-            List<ValoreDTO> oldValues = clonedto.getAnagraficaProperties().get(
-                    shortName);
-            if (update == true)
-            {
-                dto.getAnagraficaProperties().get(shortName)
-                        .clear();
-            }
-            if (rpPD.getRendering() instanceof WidgetTesto)
-            {
-                if (rpPD.isRepeatable())
-                {
+					// NodeList nodeslist = (NodeList) xpath.evaluate(
+					// xpathExpression, node,
+					// XPathConstants.NODESET);
 
-                    // NodeList nodeslist = (NodeList) xpath.evaluate(
-                    // xpathExpression, node,
-                    // XPathConstants.NODESET);
+					IBulkChangeField nodeslist = bulkChange.getFieldChanges(shortName);
 
-                    IBulkChangeField nodeslist = bulkChange.getFieldChanges(shortName);
+					for (int y = 0; y < nodeslist.size(); y++) {
+						IBulkChangeFieldValue nodetext = nodeslist.get(y);
+						String control_value = nodetext.getValue();
+						if (control_value != null && !control_value.isEmpty()) {
+							workOnText(applicationService, nodetext, rpPD, values, oldValues);
+						}
+						// else {
+						// if (update == true
+						// && nodeslist.getLength() == 1) {
+						// dto.getAnagraficaProperties()
+						// .get(shortName).clear();
+						// }
+						// }
+					}
+				} else {
+					// Node nodeText = (Node) xpath.evaluate(
+					// xpathExpression, node, XPathConstants.NODE);
+					IBulkChangeField nodeslist = bulkChange.getFieldChanges(shortName);
+					IBulkChangeFieldValue nodeText = nodeslist.get(0);
+					String control_value = null;
+					try {
+						control_value = nodeText.getValue();
+					} catch (NullPointerException exc) {
+						// nothing
+					}
+					if (control_value != null) {
+						workOnText(applicationService, nodeText, rpPD, values, oldValues);
+					}
+				}
+			}
+			if (rpPD.getRendering() instanceof WidgetDate) {
+				if (rpPD.isRepeatable()) {
+					// NodeList nodeslist = (NodeList) xpath.evaluate(
+					// xpathExpression, node,
+					// XPathConstants.NODESET);
+					IBulkChangeField nodeslist = bulkChange.getFieldChanges(shortName);
 
-                    for (int y = 0; y < nodeslist.size(); y++)
-                    {
-                        IBulkChangeFieldValue nodetext = nodeslist.get(y);
-                        String control_value = nodetext.getValue();
-                        if (control_value != null && !control_value.isEmpty())
-                        {
-                            workOnText(applicationService, nodetext, rpPD,
-                                    values, oldValues);
-                        }
-                        // else {
-                        // if (update == true
-                        // && nodeslist.getLength() == 1) {
-                        // dto.getAnagraficaProperties()
-                        // .get(shortName).clear();
-                        // }
-                        // }
-                    }
-                }
-                else
-                {
-                    // Node nodeText = (Node) xpath.evaluate(
-                    // xpathExpression, node, XPathConstants.NODE);
-                	IBulkChangeField nodeslist = bulkChange.getFieldChanges(shortName);
-                    IBulkChangeFieldValue nodeText = nodeslist.get(0);
-                    String control_value = null;
-                    try
-                    {
-                        control_value = nodeText.getValue();
-                    }
-                    catch (NullPointerException exc)
-                    {
-                        // nothing
-                    }
-                    if (control_value != null)
-                    {
-                        workOnText(applicationService, nodeText, rpPD, values,
-                                oldValues);
-                    }
-                }
-            }
-            if (rpPD.getRendering() instanceof WidgetDate)
-            {
-                if (rpPD.isRepeatable())
-                {
-                    // NodeList nodeslist = (NodeList) xpath.evaluate(
-                    // xpathExpression, node,
-                    // XPathConstants.NODESET);
-                	IBulkChangeField nodeslist = bulkChange.getFieldChanges(shortName);
+					for (int y = 0; y < nodeslist.size(); y++) {
+						if (update == true && y == 0) {
+							dto.getAnagraficaProperties().get(shortName).clear();
+						}
+						IBulkChangeFieldValue nodeDate = nodeslist.get(y);
+						String control_value = nodeDate.getValue();
+						if (StringUtils.isNotBlank(control_value)) {
+							workOnDate(applicationService, nodeDate, rpPD, values, oldValues);
+						}
+						// else {
+						// if (update == true
+						// && nodeslist.getLength() == 1) {
+						// dto.getAnagraficaProperties()
+						// .get(shortName).clear();
+						// }
+						// }
+					}
+				} else {
+					// Node nodeDate = (Node) xpath.evaluate(
+					// xpathExpression, node, XPathConstants.NODE);
+					IBulkChangeField nodeslist = bulkChange.getFieldChanges(shortName);
+					IBulkChangeFieldValue nodeDate = nodeslist.get(0);
 
-                    for (int y = 0; y < nodeslist.size(); y++)
-                    {
-                        if (update == true && y == 0)
-                        {
-                            dto.getAnagraficaProperties().get(shortName)
-                                    .clear();
-                        }
-                        IBulkChangeFieldValue nodeDate = nodeslist.get(y);
-                        String control_value = nodeDate.getValue();
-                        if (StringUtils.isNotBlank(control_value))
-                        {
-                            workOnDate(applicationService, nodeDate, rpPD, values,
-                                    oldValues);
-                        }
-                        // else {
-                        // if (update == true
-                        // && nodeslist.getLength() == 1) {
-                        // dto.getAnagraficaProperties()
-                        // .get(shortName).clear();
-                        // }
-                        // }
-                    }
-                }
-                else
-                {
-                    // Node nodeDate = (Node) xpath.evaluate(
-                    // xpathExpression, node, XPathConstants.NODE);
-                	IBulkChangeField nodeslist = bulkChange.getFieldChanges(shortName);
-                	IBulkChangeFieldValue nodeDate = nodeslist.get(0);
-                	
-                    String control_value = null;
-                    try
-                    {
-                        control_value = nodeDate.getValue();
-                    }
-                    catch (NullPointerException exc)
-                    {
-                        // nothing
-                    }
+					String control_value = null;
+					try {
+						control_value = nodeDate.getValue();
+					} catch (NullPointerException exc) {
+						// nothing
+					}
 
-                    workOnDate(applicationService, nodeDate, rpPD, values,
-                    		oldValues);
-                }
-            }
-            if (rpPD.getRendering() instanceof WidgetLink)
-            {
+					workOnDate(applicationService, nodeDate, rpPD, values, oldValues);
+				}
+			}
+			if (rpPD.getRendering() instanceof WidgetLink) {
 
-                if (rpPD.isRepeatable())
-                {
-                    // NodeList nodeslist = (NodeList) xpath.evaluate(
-                    // xpathExpression, node,
-                    // XPathConstants.NODESET);
-                	IBulkChangeFieldLink nodeslist = bulkChange.getFieldLinkChanges(shortName);
+				if (rpPD.isRepeatable()) {
+					// NodeList nodeslist = (NodeList) xpath.evaluate(
+					// xpathExpression, node,
+					// XPathConstants.NODESET);
+					IBulkChangeFieldLink nodeslist = bulkChange.getFieldLinkChanges(shortName);
 
-                    for (int y = 0; y < nodeslist.size(); y++)
-                    {
-                        if (update == true && y == 0)
-                        {
-                            dto.getAnagraficaProperties().get(shortName)
-                                    .clear();
-                        }
-                        IBulkChangeFieldLinkValue nodeLink = nodeslist.get(y);
-                        String control_value = nodeLink.getValue();
-                        if (StringUtils.isNotBlank(control_value))
-                        {
-                            workOnLink(applicationService, rpPD, values,
-                                    oldValues, nodeLink);
-                        }
-                    }
-                }
-                else
-                {
-                    // Node nodeLink = (Node) xpath.evaluate(
-                    // xpathExpression, node, XPathConstants.NODE);
-                	IBulkChangeFieldLink nodeslist = bulkChange.getFieldLinkChanges(shortName);
-                	IBulkChangeFieldLinkValue nodeLink = nodeslist.get(0);
-                    String control_value = nodeLink.getValue();
-                    if (StringUtils.isNotBlank(control_value))
-                    {
-                        workOnLink(applicationService, rpPD, values,
-                                oldValues, nodeLink);
-                    }
-                }
-            }
+					for (int y = 0; y < nodeslist.size(); y++) {
+						if (update == true && y == 0) {
+							dto.getAnagraficaProperties().get(shortName).clear();
+						}
+						IBulkChangeFieldLinkValue nodeLink = nodeslist.get(y);
+						String control_value = nodeLink.getValue();
+						if (StringUtils.isNotBlank(control_value)) {
+							workOnLink(applicationService, rpPD, values, oldValues, nodeLink);
+						}
+					}
+				} else {
+					// Node nodeLink = (Node) xpath.evaluate(
+					// xpathExpression, node, XPathConstants.NODE);
+					IBulkChangeFieldLink nodeslist = bulkChange.getFieldLinkChanges(shortName);
+					IBulkChangeFieldLinkValue nodeLink = nodeslist.get(0);
+					String control_value = nodeLink.getValue();
+					if (StringUtils.isNotBlank(control_value)) {
+						workOnLink(applicationService, rpPD, values, oldValues, nodeLink);
+					}
+				}
+			}
 
-            if (rpPD.getRendering() instanceof WidgetFile)
-            {
-                // TODO
-            }
-        }
-    }
+			if (rpPD.getRendering() instanceof WidgetFile) {
+				// TODO
+			}
+		}
+	}
 
-    public static File generateSimpleTypeWithListOfAllMetadata(Writer writer,
-            List<IContainable> metadata, File filexsd, String namespace,
-            String fullNamespace, String name) throws IOException,
-            SecurityException, NoSuchFieldException
-    {
-        UtilsXSD xsd = new UtilsXSD(writer);
-        xsd.createSimpleTypeFor(metadata, namespace, fullNamespace, name);
-        return filexsd;
-    }
+	public static File generateSimpleTypeWithListOfAllMetadata(Writer writer, List<IContainable> metadata,
+			File filexsd, String namespace, String fullNamespace, String name) throws IOException, SecurityException,
+			NoSuchFieldException {
+		UtilsXSD xsd = new UtilsXSD(writer);
+		xsd.createSimpleTypeFor(metadata, namespace, fullNamespace, name);
+		return filexsd;
+	}
 
-    private static <TP extends PropertiesDefinition> void workOnText(
-            ApplicationService applicationService, IBulkChangeFieldValue node, TP rpPD,
-            List<ValoreDTO> values, List<ValoreDTO> old)            
-    {
-        if (node != null)
-        {
+	private static <TP extends PropertiesDefinition> void workOnText(ApplicationService applicationService,
+			IBulkChangeFieldValue node, TP rpPD, List<ValoreDTO> values, List<ValoreDTO> old) {
+		if (node != null) {
 
-            // String nodetext = node.getTextContent();
-            // String vis = xpath.evaluate(XPATH_RULES[2], node);
-            String nodetext = node.getValue();
-            String vis = node.getVisibility();
+			// String nodetext = node.getTextContent();
+			// String vis = xpath.evaluate(XPATH_RULES[2], node);
+			String nodetext = node.getValue();
+			String vis = node.getVisibility();
 
-            if (nodetext != null && !nodetext.isEmpty())
-            {
-                ValoreDTO valueDTO = new ValoreDTO(nodetext);
-                if (vis == null || vis.isEmpty())
-                {
-                    // check old value
-                    vis = checkOldVisibility(applicationService, rpPD, old,
-                            nodetext, vis);
-                }
+			if (nodetext != null && !nodetext.isEmpty()) {
+				ValoreDTO valueDTO = new ValoreDTO(nodetext);
+				if (vis == null || vis.isEmpty()) {
+					// check old value
+					vis = checkOldVisibility(applicationService, rpPD, old, nodetext, vis);
+				}
 
-                if (vis != null && !vis.isEmpty())
-                {
-                    valueDTO.setVisibility((Integer.parseInt(vis) == 1 ? true
-                            : false));
-                }
+				if (vis != null && !vis.isEmpty()) {
+					valueDTO.setVisibility((Integer.parseInt(vis) == 1 ? true : false));
+				}
 
-                // ValoreDTO oldValue = checkOldValue(applicationService, rpPD,
-                // old, nodetext, valueDTO.getVisibility());
-                // if(oldValue==null) {
-                values.add(valueDTO);
-                log.debug("Write text field " + rpPD.getShortName()
-                        + " with value: " + nodetext + " visibility: "
-                        + valueDTO.getVisibility());
-                // }
-            }
-        }
-    }
+				// ValoreDTO oldValue = checkOldValue(applicationService, rpPD,
+				// old, nodetext, valueDTO.getVisibility());
+				// if(oldValue==null) {
+				values.add(valueDTO);
+				log.debug("Write text field " + rpPD.getShortName() + " with value: " + nodetext + " visibility: "
+						+ valueDTO.getVisibility());
+				// }
+			}
+		}
+	}
 
-    private static <TP extends PropertiesDefinition> void workOnLink(
-            ApplicationService applicationService, TP rpPD,
-            List<ValoreDTO> values, List<ValoreDTO> old, IBulkChangeFieldLinkValue nodeLink)
-    {
-        if (nodeLink != null)
-        {
+	private static <TP extends PropertiesDefinition> void workOnLink(ApplicationService applicationService, TP rpPD,
+			List<ValoreDTO> values, List<ValoreDTO> old, IBulkChangeFieldLinkValue nodeLink) {
+		if (nodeLink != null) {
 
-            // String nodetext = nodeLink.getTextContent();
-            String nodetext = nodeLink.getValue();
+			// String nodetext = nodeLink.getTextContent();
+			String nodetext = nodeLink.getValue();
 
-            if (nodetext != null && !nodetext.isEmpty())
-            {
-                // String vis = xpath.evaluate(XPATH_RULES[2], node);
-                String vis = nodeLink.getVisibility();
-                // if (vis != null && vis.isEmpty()) {
-                // vis = xpath.evaluate(XPATH_RULES[2], nodeLink);
-                // }
-                // String src = xpath.evaluate(XPATH_RULES[4], node);
-                String src = nodeLink.getLinkURL();
-                // if (src != null && src.isEmpty()) {
-                // src = xpath.evaluate(XPATH_RULES[4], nodeLink);
-                // }
+			if (nodetext != null && !nodetext.isEmpty()) {
+				// String vis = xpath.evaluate(XPATH_RULES[2], node);
+				String vis = nodeLink.getVisibility();
+				// if (vis != null && vis.isEmpty()) {
+				// vis = xpath.evaluate(XPATH_RULES[2], nodeLink);
+				// }
+				// String src = xpath.evaluate(XPATH_RULES[4], node);
+				String src = nodeLink.getLinkURL();
+				// if (src != null && src.isEmpty()) {
+				// src = xpath.evaluate(XPATH_RULES[4], nodeLink);
+				// }
 
-                nodetext += "|||" + src;
+				nodetext += "|||" + src;
 
-                if (vis == null || vis.isEmpty())
-                {
-                    // check old value
-                    vis = checkOldVisibility(applicationService, rpPD, old,
-                            nodetext, vis);
-                }
-                PropertyEditor pe = rpPD.getRendering().getPropertyEditor(
-                        applicationService);
-                pe.setAsText(nodetext);
-                ValoreDTO valueDTO = new ValoreDTO(pe.getValue());
-                if (vis != null && !vis.isEmpty())
-                {
-                    valueDTO.setVisibility((Integer.parseInt(vis) == 1 ? true
-                            : false));
-                }
-                // ValoreDTO oldValue = checkOldValue(applicationService, rpPD,
-                // old, nodetext, valueDTO.getVisibility());
-                // if(oldValue==null) {
-                values.add(valueDTO);
-                log.debug("Write link field " + rpPD.getShortName()
-                        + " with value" + nodetext + " visibility: "
-                        + valueDTO.getVisibility());
-                // }
-            }
-        }
-    }
+				if (vis == null || vis.isEmpty()) {
+					// check old value
+					vis = checkOldVisibility(applicationService, rpPD, old, nodetext, vis);
+				}
+				PropertyEditor pe = rpPD.getRendering().getPropertyEditor(applicationService);
+				pe.setAsText(nodetext);
+				ValoreDTO valueDTO = new ValoreDTO(pe.getValue());
+				if (vis != null && !vis.isEmpty()) {
+					valueDTO.setVisibility((Integer.parseInt(vis) == 1 ? true : false));
+				}
+				// ValoreDTO oldValue = checkOldValue(applicationService, rpPD,
+				// old, nodetext, valueDTO.getVisibility());
+				// if(oldValue==null) {
+				values.add(valueDTO);
+				log.debug("Write link field " + rpPD.getShortName() + " with value" + nodetext + " visibility: "
+						+ valueDTO.getVisibility());
+				// }
+			}
+		}
+	}
 
-    private static <TP extends PropertiesDefinition> void workOnDate(
-            ApplicationService applicationService, IBulkChangeFieldValue node, TP rpPD,
-            List<ValoreDTO> values, List<ValoreDTO> old)
-    {
-        if (node != null)
-        {
-            // String nodetext = nodeDate.getTextContent();
-            String nodetext = node.getValue();
+	private static <TP extends PropertiesDefinition> void workOnDate(ApplicationService applicationService,
+			IBulkChangeFieldValue node, TP rpPD, List<ValoreDTO> values, List<ValoreDTO> old) {
+		if (node != null) {
+			// String nodetext = nodeDate.getTextContent();
+			String nodetext = node.getValue();
 
-            if (nodetext != null && !nodetext.isEmpty())
-            {
-                // String vis = xpath.evaluate(XPATH_RULES[2], node);
-                String vis = node.getVisibility();
-                // if (vis != null) {
-                // if (vis.isEmpty()) {
-                // vis = xpath.evaluate(XPATH_RULES[2], nodeDate);
-                // }
-                // }
+			if (nodetext != null && !nodetext.isEmpty()) {
+				// String vis = xpath.evaluate(XPATH_RULES[2], node);
+				String vis = node.getVisibility();
+				// if (vis != null) {
+				// if (vis.isEmpty()) {
+				// vis = xpath.evaluate(XPATH_RULES[2], nodeDate);
+				// }
+				// }
 
-                if (vis == null || vis.isEmpty())
-                {
-                    // check old value
-                    vis = checkOldVisibility(applicationService, rpPD, old,
-                            nodetext, vis);
-                }
+				if (vis == null || vis.isEmpty()) {
+					// check old value
+					vis = checkOldVisibility(applicationService, rpPD, old, nodetext, vis);
+				}
 
-                PropertyEditor pe = rpPD.getRendering().getPropertyEditor(
-                        applicationService);
-                pe.setAsText(nodetext);
-                ValoreDTO valueDTO = new ValoreDTO(pe.getValue());
-                if (vis != null && !vis.isEmpty())
-                {
-                    valueDTO.setVisibility((Integer.parseInt(vis) == 1 ? true
-                            : false));
-                }
-                // ValoreDTO oldValue = checkOldValue(applicationService, rpPD,
-                // old, nodetext, valueDTO.getVisibility());
-                // if(oldValue==null) {
-                values.add(valueDTO);
-                log.debug("Write date field " + rpPD.getShortName()
-                        + " with value: " + nodetext + " visibility: "
-                        + valueDTO.getVisibility());
-                // }
-            }
-        }
-    }
+				PropertyEditor pe = rpPD.getRendering().getPropertyEditor(applicationService);
+				pe.setAsText(nodetext);
+				ValoreDTO valueDTO = new ValoreDTO(pe.getValue());
+				if (vis != null && !vis.isEmpty()) {
+					valueDTO.setVisibility((Integer.parseInt(vis) == 1 ? true : false));
+				}
+				// ValoreDTO oldValue = checkOldValue(applicationService, rpPD,
+				// old, nodetext, valueDTO.getVisibility());
+				// if(oldValue==null) {
+				values.add(valueDTO);
+				log.debug("Write date field " + rpPD.getShortName() + " with value: " + nodetext + " visibility: "
+						+ valueDTO.getVisibility());
+				// }
+			}
+		}
+	}
 
-    /**
-     * 
-     * Check old visibility on dynamic field
-     * 
-     * @param applicationService
-     * @param rpPD
-     * @param old
-     * @param nodetext
-     * @param vis
-     * @return
-     */
-    private static <TP extends PropertiesDefinition> String checkOldVisibility(
-            ApplicationService applicationService, TP rpPD,
-            List<ValoreDTO> old, String nodetext, String vis)
-    {
-        PropertyEditor pe = rpPD.getRendering().getPropertyEditor(
-                applicationService);
+	/**
+	 * 
+	 * Check old visibility on dynamic field
+	 * 
+	 * @param applicationService
+	 * @param rpPD
+	 * @param old
+	 * @param nodetext
+	 * @param vis
+	 * @return
+	 */
+	private static <TP extends PropertiesDefinition> String checkOldVisibility(ApplicationService applicationService,
+			TP rpPD, List<ValoreDTO> old, String nodetext, String vis) {
+		PropertyEditor pe = rpPD.getRendering().getPropertyEditor(applicationService);
 
-        boolean founded = false;
-        for (ValoreDTO temp : old)
-        {
-            pe.setValue(temp.getObject());
-            if (pe.getAsText().equals(nodetext))
-            {
-                vis = temp.getVisibility() ? "1" : "0";
-                founded = true;
-                break;
-            }
-        }
-        return founded == true ? vis : DEFAULT_VISIBILITY;
-    }
+		boolean founded = false;
+		for (ValoreDTO temp : old) {
+			pe.setValue(temp.getObject());
+			if (pe.getAsText().equals(nodetext)) {
+				vis = temp.getVisibility() ? "1" : "0";
+				founded = true;
+				break;
+			}
+		}
+		return founded == true ? vis : DEFAULT_VISIBILITY;
+	}
 
-    private static Integer checkOldVisibility(
-            ApplicationService applicationService, String value,
-            List<RestrictedField> object, Integer vis)
-    {
-        boolean founded = false;
-        for (RestrictedField f : object)
-        {
-            if (f.getValue().equals(value))
-            {
-                vis = f.getVisibility();
-                founded = true;
-                break;
-            }
-        }
-        return founded == true ? vis : VisibilityConstants.PUBLIC;
-    }
+	private static Integer checkOldVisibility(ApplicationService applicationService, String value,
+			List<RestrictedField> object, Integer vis) {
+		boolean founded = false;
+		for (RestrictedField f : object) {
+			if (f.getValue().equals(value)) {
+				vis = f.getVisibility();
+				founded = true;
+				break;
+			}
+		}
+		return founded == true ? vis : VisibilityConstants.PUBLIC;
+	}
 
-    private static Integer checkOldVisibility(
-            ApplicationService applicationService, String value,
-            RestrictedField field, Integer visibility)
-    {
+	private static Integer checkOldVisibility(ApplicationService applicationService, String value,
+			RestrictedField field, Integer visibility) {
 
-        return field.getValue().equals(value) ? field.getVisibility()
-                : VisibilityConstants.PUBLIC;
-    }
+		return field.getValue().equals(value) ? field.getVisibility() : VisibilityConstants.PUBLIC;
+	}
 
-    /**
-     * Export xml, it don't close or flush writer, format with
-     * {@link XMLOutputter}, use use jdom for it.
-     * 
-     * @param writer
-     * @param applicationService
-     * @param metadata
-     * @param researchers
-     * @throws IOException
-     * @throws SecurityException
-     * @throws IllegalArgumentException
-     * @throws NoSuchFieldException
-     * @throws IllegalAccessException
-     * @throws InvocationTargetException
-     * @throws ParserConfigurationException
-     * @throws TransformerException
-     */
-    @Deprecated
-    public static void exportXML(Writer writer,
-            ApplicationService applicationService, List<IContainable> metadata,
-            List<ResearcherPage> researchers) throws IOException,
-            SecurityException, IllegalArgumentException, NoSuchFieldException,
-            IllegalAccessException, InvocationTargetException,
-            ParserConfigurationException, TransformerException
-    {
+	/**
+	 * Export xml, it don't close or flush writer, format with
+	 * {@link XMLOutputter}, use use jdom for it.
+	 * 
+	 * @param writer
+	 * @param applicationService
+	 * @param metadata
+	 * @param researchers
+	 * @throws IOException
+	 * @throws SecurityException
+	 * @throws IllegalArgumentException
+	 * @throws NoSuchFieldException
+	 * @throws IllegalAccessException
+	 * @throws InvocationTargetException
+	 * @throws ParserConfigurationException
+	 * @throws TransformerException
+	 */
+	@Deprecated
+	public static void exportXML(Writer writer, ApplicationService applicationService, List<IContainable> metadata,
+			List<ResearcherPage> researchers) throws IOException, SecurityException, IllegalArgumentException,
+			NoSuchFieldException, IllegalAccessException, InvocationTargetException, ParserConfigurationException,
+			TransformerException {
 
-        UtilsXML xml = new UtilsXML(writer, applicationService);
-        org.jdom.Document xmldoc = xml.createRoot(UtilsXSD.RP_DEFAULT_ELEMENT[0], UtilsXSD.NAMESPACE_PREFIX_RP,
-        		UtilsXSD.NAMESPACE_RP);
-        if (researchers != null)
-        {
-            for (ResearcherPage rp : researchers)
-            {
-                xml.writeRP(rp, metadata, xmldoc.getRootElement());
-            }
-            // Serialisation through XMLOutputter
-            XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
-            out.output(xmldoc, writer);
-        }
-    }
+		UtilsXML xml = new UtilsXML(writer, applicationService);
+		org.jdom.Document xmldoc = xml.createRoot(UtilsXSD.RP_DEFAULT_ELEMENT[0], UtilsXSD.NAMESPACE_PREFIX_RP,
+				UtilsXSD.NAMESPACE_RP);
+		if (researchers != null) {
+			for (ResearcherPage rp : researchers) {
+				xml.writeRP(rp, metadata, xmldoc.getRootElement());
+			}
+			// Serialisation through XMLOutputter
+			XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
+			out.output(xmldoc, writer);
+		}
+	}
 
-    public static <TP extends PropertiesDefinition, P extends Property<TP>, AO extends AnagraficaObject<P, TP>, I extends IExportableDynamicObject<TP, P, AO>> void newExportXML(
-            Writer writer, ApplicationService applicationService,
-            List<IContainable> metadata, List<I> objects,
-            String prefixNamespace, String namespace, String rootName)
-            throws IOException, SecurityException, IllegalArgumentException,
-            NoSuchFieldException, IllegalAccessException,
-            InvocationTargetException, ParserConfigurationException,
-            TransformerException
-    {
+	public static <TP extends PropertiesDefinition, P extends Property<TP>, AO extends AnagraficaObject<P, TP>, I extends IExportableDynamicObject<TP, P, AO>> void newExportXML(
+			Writer writer, ApplicationService applicationService, List<IContainable> metadata, List<I> objects,
+			String prefixNamespace, String namespace, String rootName) throws IOException, SecurityException,
+			IllegalArgumentException, NoSuchFieldException, IllegalAccessException, InvocationTargetException,
+			ParserConfigurationException, TransformerException {
 
-        UtilsXML xml = new UtilsXML(writer, applicationService);
-        org.jdom.Document xmldoc = xml.createRoot(rootName, prefixNamespace,
-                namespace);
-        if (objects != null)
-        {
-            for (I rp : objects)
-            {
-                xml.write(rp, metadata, xmldoc.getRootElement());
-            }
-            // Serialisation through XMLOutputter
-            XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
-            out.output(xmldoc, writer);
-        }
-    }
+		UtilsXML xml = new UtilsXML(writer, applicationService);
+		org.jdom.Document xmldoc = xml.createRoot(rootName, prefixNamespace, namespace);
+		if (objects != null) {
+			for (I rp : objects) {
+				xml.write(rp, metadata, xmldoc.getRootElement());
+			}
+			// Serialisation through XMLOutputter
+			XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
+			out.output(xmldoc, writer);
+		}
+	}
 
 }
-

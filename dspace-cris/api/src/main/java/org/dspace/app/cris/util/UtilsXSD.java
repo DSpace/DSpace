@@ -102,8 +102,8 @@ public class UtilsXSD
     }
     
     public static <PD extends PropertiesDefinition> String[] getNamespace(Class<PD> clazz) {
-    	String namespacePrefix = NAMESPACE_PREFIX_PJ+":";
-	 	String namespace = NAMESPACE_PJ;
+    	String namespacePrefix = NAMESPACE_PREFIX_DO+":";
+	 	String namespace = NAMESPACE_DO;
     	if (clazz.isAssignableFrom(ProjectPropertiesDefinition.class))
         {
             namespacePrefix = NAMESPACE_PREFIX_PJ+":";

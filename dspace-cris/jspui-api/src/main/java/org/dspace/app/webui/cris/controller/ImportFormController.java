@@ -8,6 +8,7 @@
 package org.dspace.app.webui.cris.controller;
 
 import it.cilea.osd.common.controller.BaseFormController;
+import it.cilea.osd.jdyna.model.ATypeNestedObject;
 import it.cilea.osd.jdyna.model.PropertiesDefinition;
 
 import java.io.File;
@@ -21,6 +22,7 @@ import org.dspace.app.cris.importexport.XMLBulkChangesService;
 import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.export.ExportConstants;
+import org.dspace.app.cris.model.jdyna.ACrisNestedObject;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.ImportExportUtils;
 import org.dspace.app.cris.util.UtilsXSD;
@@ -40,10 +42,12 @@ import org.springframework.web.servlet.ModelAndView;
  * @author cilea
  * 
  */
-public class NewImportFormController extends BaseFormController {
+public class ImportFormController extends BaseFormController {
 
 	private Map<String, Class<? extends PropertiesDefinition>> objectType2PD;
 	private Map<String, Class<? extends ACrisObject>> objectType2Object;
+	private Map<String, Class<? extends ATypeNestedObject>> objectType2ATNO;
+	private Map<String, Class<? extends ACrisNestedObject>> objectType2ACNO;
 	
 	private ApplicationService applicationService;
 
@@ -68,6 +72,8 @@ public class NewImportFormController extends BaseFormController {
 		try {
 			Class<? extends PropertiesDefinition> clazz = objectType2PD.get(object.getTargetEntity());
 			Class<? extends ACrisObject> objectClazz = objectType2Object.get(object.getTargetEntity());
+			Class<? extends ATypeNestedObject> objectATNOClazz = objectType2ATNO.get(object.getTargetEntity());
+			Class<? extends ACrisNestedObject> objectACNOClazz = objectType2ACNO.get(object.getTargetEntity());
 			if (object.isTemplate()) {
 				response.setContentType("application/xml;charset=UTF-8");
 				response.addHeader("Content-Disposition",
@@ -103,7 +109,7 @@ public class NewImportFormController extends BaseFormController {
 						dspaceContext.turnOffAuthorisationSystem();
 					}
 					ImportExportUtils.process(object.getFormat(), fileDTO.getInputStream(), dir,
-							applicationService, dspaceContext, defaultStatus, clazz, objectClazz);
+							applicationService, dspaceContext, defaultStatus, clazz, objectClazz, objectACNOClazz, objectATNOClazz);
 					saveMessage(
 							request,
 							getText("action.import.with.success",
