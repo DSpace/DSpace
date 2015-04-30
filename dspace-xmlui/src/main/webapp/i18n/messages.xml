@@ -1089,19 +1089,19 @@
 
 	<!-- org.dspace.app.xmlui.Submission.submit.LicenseStep -->
     <message key="xmlui.Submission.submit.LicenseStep.head">Licensing</message>
-    <message key="xmlui.Submission.submit.LicenseStep.info1">In order for Repository to reproduce, translate and distribute your submission worldwide, you must agree to the following terms.</message>
-    <message key="xmlui.Submission.submit.LicenseStep.info2">Grant the standard distribution license by selecting 'I Grant the License'.</message>
+    <message key="xmlui.Submission.submit.LicenseStep.info1">In order for Repository to reproduce, translate and distribute your submission worldwide, you must agree to the following terms by selecting 'I Grant the License'.</message>
+    <message key="xmlui.Submission.submit.LicenseStep.info2"></message>
     <message key="xmlui.Submission.submit.LicenseStep.info3">If you have questions regarding this licence please contact the <a class="helpdesk-tolink">Help Desk</a>.</message>
     <message key="xmlui.Submission.submit.LicenseStep.decision_label">Distribution agreement</message>
 	<message key="xmlui.Submission.submit.LicenseStep.decision_checkbox">I Grant the License</message>
 	<message key="xmlui.Submission.submit.LicenseStep.decision_error">You must grant this license to complete your submission. If you are unable to grant this license at this time you may save your work and return later or remove the submission by clicking the 'Save &amp; Exit' button below.</message>
 
-    <message key="xmlui.Submission.submit.LicenseStep.morelicense_head">None of these licenses suit my needs</message>
+    <message key="xmlui.Submission.submit.LicenseStep.morelicense_head">None of these licenses suits your needs</message>
     <message key="xmlui.Submission.submit.LicenseStep.morelicense_line1">If you need to use a license we currently do not offer, proceed as follows:</message>
-    <message key="xmlui.Submission.submit.LicenseStep.morelicense_line2">Locate the license.</message>
-    <message key="xmlui.Submission.submit.LicenseStep.morelicense_line3">Send an email to <a class="helpdesk-tolink">Help Desk</a> and either attach the license text, or provide a link to a license that is available on the web.</message>
+    <message key="xmlui.Submission.submit.LicenseStep.morelicense_line2">Obtain a link (or a copy) to the license.</message>
+    <message key="xmlui.Submission.submit.LicenseStep.morelicense_line3">Send an email to <a class="helpdesk-tolink">Help Desk</a> with the license details.</message>
     <message key="xmlui.Submission.submit.LicenseStep.morelicense_line4">Save the unfinished submission and wait. We will add the license to the selection list and contact you.</message>
-    <message key="xmlui.Submission.submit.LicenseStep.morelicense_line5">Finish the submission.</message>
+    <message key="xmlui.Submission.submit.LicenseStep.morelicense_line5">You will be able to continue the submission afterwards.</message>
     
 
 	<!-- org.dspace.app.xmlui.Submission.submit.RemovedStep -->

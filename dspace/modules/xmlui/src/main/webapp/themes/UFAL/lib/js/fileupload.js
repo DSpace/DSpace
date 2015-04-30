@@ -56,6 +56,10 @@ function createFileUploadDialog(files) {
 	var filesToUploadDiv = jQuery("<div id=\"uploaded_files\" class=\"well well-light\"><p>Please fill in the description(s) and hit the \"Start Upload\" button.\n Then wait till the file(s) are uploaded.</p></div>");
 	filesToUploadDiv.attr('class', 'modal-body');
 
+	var dialog_classes = "modal well well-light";
+	if ( 3 < files.length ) {
+		dialog_classes += " modal-scrollbar";
+	}
 	for ( var i = 0; i < files.length; i++) {
 		var file = files[i];
 		filesToUploadDiv.append("<div id='fileName" + i + "'><b>Filename: </b>"
@@ -78,11 +82,11 @@ function createFileUploadDialog(files) {
 			.dialog({
 				modal : true,
 				title : "File upload",
-				resizable : true,
+				resizable : false,
 				closeOnEscape : false,
 				autoOpen : false,
 				width : 600,
-				dialogClass : "modal well well-light",
+				dialogClass : dialog_classes,
 				buttons : [
 						{
 							text : "OK",

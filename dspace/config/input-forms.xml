@@ -178,7 +178,7 @@
         	<repeatable>true</repeatable>
         	<label>Contact person</label>
         	<input-type complex-definition-ref="contact_person">complex</input-type>
-        	<hint>Person to contact in case of any issues with this item.</hint>
+        	<hint>Person to contact in case of any issues with this submission.</hint>
         	<required>Please fill all the fields for the contact person.</required>
         </field>
 
@@ -189,7 +189,7 @@
 		<repeatable>true</repeatable>
 		<label>Funding</label>
 		<input-type complex-definition-ref="funding">complex</input-type>
-		<hint>Sponsors and funding codes. For European projects ask admins about OpenAIRE</hint>
+		<hint>Acknowledge sponsors and funding that supported work described by this submission. In case your submission is suitable for OpenAIRE, describe it in the "Note" step of this submission.</hint>
 		</field>
 		
        <field>

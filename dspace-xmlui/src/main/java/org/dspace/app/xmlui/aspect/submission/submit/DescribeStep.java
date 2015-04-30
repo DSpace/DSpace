@@ -1290,7 +1290,7 @@ public class DescribeStep extends AbstractSubmissionStep
 
                         String rend = dcInput.getRendsAsString();
 
-                        org.dspace.app.xmlui.wing.element.Item item = form.addItem(null, rend);
+                        org.dspace.app.xmlui.wing.element.Item item = form.addItem(null, rend + " list-complex-field");
 
                         rend += "submit-complex";
 

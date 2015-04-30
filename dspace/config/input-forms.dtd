@@ -69,6 +69,8 @@
 
  <!ATTLIST input-type value-pairs-name CDATA  #IMPLIED>
 
+ <!ATTLIST input-type complex-definition-ref CDATA  #IMPLIED>
+
  <!ELEMENT vocabulary (#PCDATA) >
 
  <!ATTLIST vocabulary closed (true|false) "false"> 
