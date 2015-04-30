@@ -607,7 +607,7 @@
 							</xsl:if>
 						</xsl:for-each>						
 					</xsl:if>
-					</xsl:for-each>
+					</xsl:for-each>&#160;
 					</div>
 					</div>		
 					</div>			
