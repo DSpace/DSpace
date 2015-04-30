@@ -937,7 +937,8 @@
     <message key="xmlui.ufal.UFALLicenceAgreementAgreed.signer_message">By following this link I, SIGNER with above ID, agree with the <b>LICENSE</b> restricting the usage of the this BISTREAM.</message>
     <message key="xmlui.ufal.UFALLicenceAgreementAgreed.user_login_error">User not logged in: UFALLicenceAgreement cannot continue!</message>
     <message key="xmlui.ufal.UFALLicenceAgreementAgreed.successful_signed_message">{0} License for bitstream {1} successfully signed by {2}.</message>
-    <message key="xmlui.ufal.UFALLicenceAgreementAgreed.continue_message">If your download doesn't start automatically, please click here.</message>
+	<message key="xmlui.ufal.UFALLicenceAgreementAgreed.continue_message">If your download doesn't start automatically, please click here.</message>
+	<message key="xmlui.ufal.UFALLicenceAgreementAgreed.technical_problem">A technical problem was encountered. Please contact the Help Desk</message>
 
     <!-- org.dspace.app.xmlui.Submission.submit.AccessStep -->
     <message key="xmlui.Submission.submit.AccessStep.head">Access Settings</message>

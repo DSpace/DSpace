@@ -85,14 +85,16 @@ public class UFALLicenceAgreementAgreed extends AbstractDSpaceTransformer {
 
 			// First check the availibility of the plugin
 			if (functionalityManager.isFunctionalityEnabled("lr.license.agreement") == false) {
-				functionalityManager.setErrorMessage(message("xmlui.ufal.UFALLicenceAgreement.functionality_blocked").toString());
+				functionalityManager.setErrorMessage("xmlui.ufal.UFALLicenceAgreement.functionality_blocked", false);
 				DSpaceXmluiApi.app_xmlui_aspect_eperson_postError(licenceAgreementAgreed);
 				return;
 			}
 
 			// If we have the user that is not logged in, we terminate
 			if (context.getCurrentUser() == null) {
-				functionalityManager.setErrorMessage(message("xmlui.ufal.UFALLicenceAgreementAgreed.user_login_error").toString());
+				functionalityManager.setErrorMessage(
+					"xmlui.ufal.UFALLicenceAgreementAgreed.user_login_error", false
+				);
 				DSpaceXmluiApi.app_xmlui_aspect_eperson_postError(licenceAgreementAgreed);
 				return;
 			}
@@ -280,6 +282,8 @@ public class UFALLicenceAgreementAgreed extends AbstractDSpaceTransformer {
 
 		} catch (Exception e) {
 			try {
+				functionalityManager.setErrorMessage(
+					"xmlui.ufal.UFALLicenceAgreementAgreed.technical_problem", false);
 				DSpaceXmluiApi
 						.app_xmlui_aspect_eperson_postError(licenceAgreementAgreed);
 			} catch (Exception f) {

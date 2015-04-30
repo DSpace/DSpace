@@ -41,10 +41,15 @@ public class HibernateFunctionalityManager implements IFunctionalities {
 	public HibernateFunctionalityManager() {
 		init();
 	}
-	
+
 	@Override
 	public void setErrorMessage(String message) {
 		Variables.setErrorMessage(message);
+	}
+
+	@Override
+	public void setErrorMessage(String message, boolean append_default_msg) {
+		Variables.setErrorMessage(message, append_default_msg);
 	}
 
 	@Override
@@ -99,6 +104,14 @@ public class HibernateFunctionalityManager implements IFunctionalities {
 				result = null;
 				break;
 			case 1:
+
+				// we want licenses that *should* be agreed to - see #66
+				// otherwise if a user already approved a one time approve license
+				// we would never get it here
+				if ( userID == -1 ) {
+					result.add(license);
+					break;
+				}
 
 				String query = "FROM LicenseResourceMapping mp"
 						+ " LEFT JOIN mp.licenseResourceUserAllowances al"

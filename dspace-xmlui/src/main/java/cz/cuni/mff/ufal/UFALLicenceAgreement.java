@@ -86,7 +86,7 @@ public class UFALLicenceAgreement extends AbstractDSpaceTransformer {
 
 			// First check the availibility of the plugin
 			if (functionalityManager.isFunctionalityEnabled("lr.license.agreement") == false) {
-				functionalityManager.setErrorMessage(message("xmlui.ufal.UFALLicenceAgreement.functionality_blocked").toString());
+				functionalityManager.setErrorMessage("xmlui.ufal.UFALLicenceAgreement.functionality_blocked", false);
 				DSpaceXmluiApi.app_xmlui_aspect_eperson_postError(licenceAgreement);
 				return;
 			}			
@@ -103,7 +103,9 @@ public class UFALLicenceAgreement extends AbstractDSpaceTransformer {
 				for(String error : temp) {
 					ExtraLicenseField errField = ExtraLicenseField.valueOf(error);
 					errors.add(errField);
-					licenceAgreement.addPara("errors", "alert alert-danger").addContent(errField.getErrorMessage());
+					licenceAgreement.addPara("errors", "alert alert-danger").addContent(
+						message(errField.getErrorMessage())
+					);
 				}
 			} else {
 				err = "";

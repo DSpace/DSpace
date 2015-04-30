@@ -177,7 +177,7 @@ class SendEmailAction implements Action {
         	email2User.addArgument(bitstream.getName());
         }
 		email2User.addArgument(link.toString() + "dtoken=" + token);
-        List<LicenseDefinition> licenses = manager.getLicensesToAgree(eperson.getID(), bitstream.getID());
+        List<LicenseDefinition> licenses = manager.getLicensesToAgree(-1, bitstream.getID());
 		for(LicenseDefinition license : licenses) {
 			email2User.addArgument(license.getDefinition());
 		}		

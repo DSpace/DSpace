@@ -107,15 +107,19 @@ public class Variables {
 	 * 
 	 * @param object
 	 */
-	public static void setErrorMessage(String message) {
+	public static void setErrorMessage(String message, boolean append_default_msg) {
 		_errorMessage = message;
-		if(message!=null && !message.equals(""))
-			log.log(Level.ERROR,"Message '" + message + "' has been set up!");
-		if (null != message) {
+		if(message!=null && !message.equals("")) {
+			log.log(Level.ERROR, "Message '" + message + "' has been set up!");
+		}
+		if (null != message && append_default_msg) {
 			_errorMessage += " For more information please contact our Help Desk.";
 		}
 	}
 
+	public static void setErrorMessage(String message) {
+		setErrorMessage( message, true );
+	}
 	/**
 	 * Function gets actual error message.
 	 * 

@@ -35,6 +35,7 @@ public interface IFunctionalities extends IShibbolethAuthentication, ILicenses, 
 	 * @param message
 	 */
 	void setErrorMessage(String message);
+	void setErrorMessage(String message, boolean append_default_msg);
 
 	/**
 	 * Function gets the error to be viewed if something goes wrong.
