@@ -399,6 +399,8 @@ public class WorkflowManager {
             addPolicyToItem(context, item, Constants.WRITE, epa);
         if(!userHasPolicies.contains(Constants.DELETE))
             addPolicyToItem(context, item, Constants.DELETE, epa);
+        if(!userHasPolicies.contains(Constants.REMOVE))
+            addPolicyToItem(context, item, Constants.REMOVE, epa);
         if(!userHasPolicies.contains(Constants.ADD))
             addPolicyToItem(context, item, Constants.ADD, epa);
     }
