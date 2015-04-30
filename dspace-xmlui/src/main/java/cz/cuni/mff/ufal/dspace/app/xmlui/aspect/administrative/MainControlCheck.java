@@ -56,11 +56,8 @@ public class MainControlCheck extends AbstractControlPanelTab {
 				HtmlHelper.header_class.THIS_IS_CHECK );
         }
 		
-        
 		html.button( "run-checks btn btn-repository", "Run all checks" );
-	
 	}
-	
 }
 
 

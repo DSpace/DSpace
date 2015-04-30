@@ -18,17 +18,18 @@ public class Info {
         String uptime = "unknown";
         try {
             uptime = new Scanner(new FileInputStream("/proc/uptime")).next();
+			float fuptime = Float.parseFloat( uptime );
+			int seconds = (int) (fuptime % 60);
+			int minutes = (int) ((fuptime / 60) % 60);
+			int hours   = (int) ((fuptime / (60*60)) % 24);
+			int days   = (int) ((fuptime / (60*60*24)) );
+			return Integer.toString( days ) + "d " +
+				Integer.toString( hours ) + "h:" +
+				Integer.toString( minutes ) + "m." +
+				Integer.toString( seconds );
         }catch(Exception e){
+			return uptime;
         }
-		float fuptime = Float.parseFloat( uptime );
-		int seconds = (int) (fuptime % 60);
-		int minutes = (int) ((fuptime / 60) % 60);
-		int hours   = (int) ((fuptime / (60*60)) % 24);
-		int days   = (int) ((fuptime / (60*60*24)) );
-	    return Integer.toString( days ) + "d " +
-				Integer.toString( hours ) + "h:" + 
-				 Integer.toString( minutes ) + "m." + 
-				  Integer.toString( seconds );
 	}
 	
 	final static public String get_jvm_uptime()

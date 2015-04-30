@@ -42,7 +42,7 @@ public class HtmlHelper {
 
 	public void file_chooser( final String[] files, String header ) throws WingException {
 		header1( header, "clickable" );
-		List l = main_div.addList( "files", null, "well well-small nav nav-pills nav-stacked" );
+		List l = main_div.addList( "files", null, "file-chooser-list well well-small nav nav-pills nav-stacked" );
 		for ( String file : files ) {
 			l.addItemXref( link + "&extra=" + file, file );
 		}
@@ -112,8 +112,8 @@ public class HtmlHelper {
 		main_div.addPara( msg );
 	}
 	
-	public void button( String name, String value ) throws WingException {
-		main_div.addDivision("control-button", name).addSimpleHTMLFragment(true, value);
+	public void button( String cls, String value ) throws WingException {
+		main_div.addDivision("control-button", cls).addPara(value);
 	}
 	
 

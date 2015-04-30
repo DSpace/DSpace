@@ -120,7 +120,7 @@ ufal.controlpanel = {
     }, // start_checking
 
     make_list_files_clickable : function () {
-        var but = jQuery('ul#aspect_administrative_ControlPanel_list_files').prev();
+        var but = jQuery('ul.file-chooser-list').prev();
         if (but) {
             but.attr('btn btn-default');
             but.append(' <span class="caret"></span>');

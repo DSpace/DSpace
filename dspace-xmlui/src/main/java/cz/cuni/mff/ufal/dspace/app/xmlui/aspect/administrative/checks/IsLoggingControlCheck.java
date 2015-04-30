@@ -100,7 +100,7 @@ public class IsLoggingControlCheck extends  AbstractControlPanelTab {
 					html.ok( "Logging to " + filename + " OK." );
 				}
 				else{
-					html.exception( "Logging to" + filename + " failed.", null );
+					html.exception( "Logging to " + filename + " failed.", null );
 					html.failed();
 				}
 				
