@@ -1,6 +1,6 @@
 package cz.cuni.mff.ufal.lindat.utilities.units;
 
-import java.io.FileReader;
+import java.io.*;
 import java.net.URL;
 import java.util.Properties;
 
@@ -73,26 +73,29 @@ public class Variables {
   public static void init(String dspace_cfg_path) {
 		if (initialized)
 			return;
-		try { 			
-          URL url = null;
+		try {
+			Reader reader = null;
           if ( null == dspace_cfg_path ) {
-        	url = Variables.class.getClassLoader().getResource("modules/lr.cfg");
-        	if(url == null){
-        		url = Variables.class.getClassLoader().getResource("config/modules/lr.cfg");
-        	}
+			  InputStream is = Variables.class.getClassLoader().getResourceAsStream("modules/lr.cfg");
+			  if (null == is) {
+				  is = Variables.class.getClassLoader().getResourceAsStream("config/modules/lr.cfg");
+			  }
+			  if ( null != is ) {
+				  reader = new BufferedReader(new InputStreamReader(is));
+			  }
           }else {
-            url = new URL(dspace_cfg_path);
+			  reader = new FileReader( dspace_cfg_path );
           }
           // last nasty try
-          if ( url == null ) {
-        	  log.debug("Failed to find lr.cfg.\nUsing nasty trick.\nThe class loader search was from " + Variables.class.getClassLoader().getResource("./"));
-        	  System.err.println("Failed to find lr.cfg. The class loader search is from " + Variables.class.getClassLoader().getResource("./"));
-              url = Variables.class.getClassLoader().getResource(Variables.class.getName().replace('.', '/') + ".class");
-              url = new URL(  new URL(url.getPath().split("utilities-")[0]),
-                              "../../../../config/modules/lr.cfg");
-          }
+			if (reader == null) {
+				log.debug("Failed to find lr.cfg.\nUsing nasty trick.\nThe class loader search was from " + Variables.class.getClassLoader().getResource("./"));
+				System.err.println("Failed to find lr.cfg. The class loader search is from " + Variables.class.getClassLoader().getResource("./"));
+				URL url = Variables.class.getClassLoader().getResource(Variables.class.getName().replace('.', '/') + ".class");
+				url = new URL(  new URL(url.getPath().split("utilities-")[0]), "../../../../config/modules/lr.cfg");
+				reader = new FileReader( url.getFile() );
+		  }
 
-			properties.load(new FileReader(url.getPath()));
+			properties.load(reader);
 			databaseURL = get("lr.utilities.db.url");
 			databaseUser = get("lr.utilities.db.username");
 			databasePassword = get("lr.utilities.db.password");

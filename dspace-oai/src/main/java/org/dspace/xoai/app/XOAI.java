@@ -49,6 +49,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -277,7 +278,11 @@ public class XOAI {
         retrieveMetadata(item).write(context);
         context.getWriter().flush();
         context.getWriter().close();
-        doc.addField("item.compile", out.toString());
+        try {
+            doc.addField("item.compile", out.toString("UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            doc.addField("item.compile", out.toString());
+        }
 
         if (verbose) {
             println("Item with handle " + handle + " indexed");
