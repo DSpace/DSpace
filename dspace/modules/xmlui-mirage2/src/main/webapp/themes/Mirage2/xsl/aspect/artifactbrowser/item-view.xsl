@@ -823,12 +823,12 @@
                         <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-name</i18n:text>
                         <xsl:text>:</xsl:text>
                     </dt>
-                    <dd class="word-break">
+                    <dd class="word-break"><strong>
                         <xsl:attribute name="title">
                             <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:title"/>
                         </xsl:attribute>
                         <xsl:value-of select="util:shortenString(mets:FLocat[@LOCTYPE='URL']/@xlink:title, 30, 5)"/>
-                    </dd>
+                    </strong></dd>
                 <!-- File size always comes in bytes and thus needs conversion -->
                     <dt>
                         <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-size</i18n:text>
