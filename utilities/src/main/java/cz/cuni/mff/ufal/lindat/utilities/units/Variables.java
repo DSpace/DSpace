@@ -91,10 +91,10 @@ public class Variables {
 					if(url == null){
 						url = Variables.class.getClassLoader().getResource("config/modules/lr.cfg");
 					}
-					reader = new FileReader( url.getFile() );
+					reader = new FileReader( url.getPath() );
 				}
 			}else {
-				reader = new FileReader( dspace_cfg_path );
+				reader = new FileReader(  new URL(dspace_cfg_path).getPath() );
 			}
 
 			// last nasty try
@@ -103,7 +103,7 @@ public class Variables {
 				System.err.println("Failed to find lr.cfg. The class loader search is from " + Variables.class.getClassLoader().getResource("./"));
 				URL url = Variables.class.getClassLoader().getResource(Variables.class.getName().replace('.', '/') + ".class");
 				url = new URL(  new URL(url.getPath().split("utilities-")[0]), "../../../../config/modules/lr.cfg");
-				reader = new FileReader( url.getFile() );
+				reader = new FileReader( url.getPath() );
 			}
 
 			properties.load(reader);
