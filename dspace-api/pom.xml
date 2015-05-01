@@ -61,9 +61,8 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>com.google.code.maven-license-plugin</groupId>
+                <groupId>com.mycila.maven-license-plugin</groupId>
                 <artifactId>maven-license-plugin</artifactId>
-                <version>1.4.0</version>
                 <configuration>
                     <header>http://scm.dspace.org/svn/repo/licenses/LICENSE_HEADER</header>
                     <includes>

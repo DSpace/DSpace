@@ -143,13 +143,13 @@ public class OdinsHamr extends AbstractCurationTask {
 
 
                 // DSpace names
-                List<Bio> dspaceBios = new ArrayList<Bio>();
+                List<DCValue> dspaceBios = new ArrayList<DCValue>();
                 vals = item.getMetadata("dc.contributor.author");
                 if (vals.length == 0) {
                     log.error("Object has no dc.contributor.author available in DSpace" + handle);
                 } else {
                     for(int i = 0; i < vals.length; i++) {
-                        dspaceBios.add(createBio("", vals[i].value));
+                        dspaceBios.add(vals[i]);
                     }
                 }
 
@@ -166,20 +166,36 @@ public class OdinsHamr extends AbstractCurationTask {
                 }
 
                 // reconcile names between DSpace and ORCID
-                HashMap<Bio,Bio> mappedNames = doHamrMatch(dspaceBios, orcidBios);
+                HashMap<DCValue,Bio> mappedNames = doHamrMatch(dspaceBios, orcidBios);
 
                 // output the resultant mappings
                 Iterator nameIt = mappedNames.entrySet().iterator();
+                List<DCValue> authors = new ArrayList<DCValue>();
+
                 while(nameIt.hasNext()) {
                     Map.Entry pairs = (Map.Entry)nameIt.next();
                     Bio mappedOrcidEntry = (Bio)pairs.getValue();
-                    Bio mappedDSpaceEntry = (Bio)pairs.getKey();
+                    DCValue mappedDSpaceDCVal = (DCValue)pairs.getKey();
+                    Bio mappedDSpaceEntry = createBio("", mappedDSpaceDCVal.value);
                     report(itemDOI + ", " + articleDOI + ", " + mappedOrcidEntry.getOrcid() + ", \"" + getName(mappedOrcidEntry) + "\", " +
                        mappedDSpaceEntry.getOrcid() + ", \"" + getName(mappedDSpaceEntry) + "\", " + hamrScore(mappedDSpaceEntry,mappedOrcidEntry));
 
+                    // if hamrScore is greater or = to 0.7, then add this to new metadata:
+
+                    DCValue authorMetadata = mappedDSpaceDCVal.copy();
+                    if (hamrScore(mappedDSpaceEntry,mappedOrcidEntry) >= 0.7) {
+                        authorMetadata.authority = mappedOrcidEntry.getOrcid();
+                        authorMetadata.confidence = 500;
+                    }
+                    authors.add(authorMetadata);
                     setResult("Last processed item = " + handle + " -- " + itemDOI);
                 }
 
+                item.clearMetadata("dc","contributor","author",null);
+                for (DCValue auth : authors) {
+                    item.addMetadata("dc", "contributor", "author", null, auth.value, auth.authority, auth.confidence);
+                }
+                item.update();
                 log.info(handle + " done.");
             } catch (Exception e) {
                 log.fatal("Skipping -- Exception in processing " + handle, e);
@@ -253,11 +269,12 @@ public class OdinsHamr extends AbstractCurationTask {
     /**
        Matches two lists of Orcid names using the Hamr algorithm.
     **/
-    private HashMap<Bio,Bio> doHamrMatch(List<Bio>dspaceBios, List<Bio>orcidBios) {
-	HashMap<Bio,Bio> matchedNames = new HashMap<Bio,Bio>();
+    private HashMap<DCValue,Bio> doHamrMatch(List<DCValue>dspaceBios, List<Bio>orcidBios) {
+	HashMap<DCValue,Bio> matchedNames = new HashMap<DCValue,Bio>();
 
 	// for each dspaceName, find the best possible match in the orcidBios list, provided the score is over the threshhold
-	for(Bio dspaceBio:dspaceBios) {
+	for(DCValue dspaceData:dspaceBios) {
+        Bio dspaceBio = createBio("",dspaceData.value);
 	    double currentScore = 0.0;
 	    Bio currentMatch = null;
 	    for(Bio orcidBio:orcidBios) {
@@ -268,7 +285,7 @@ public class OdinsHamr extends AbstractCurationTask {
             }
 	    }
 	    if(currentScore > 0.0) {
-		    matchedNames.put(dspaceBio, currentMatch);
+		    matchedNames.put(dspaceData, currentMatch);
 	    }
 	}
 
