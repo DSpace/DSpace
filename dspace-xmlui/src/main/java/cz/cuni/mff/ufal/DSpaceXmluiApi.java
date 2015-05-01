@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.log4j.Logger;
+import org.dspace.app.xmlui.wing.AbstractWingTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Cell;
@@ -48,8 +49,11 @@ public class DSpaceXmluiApi {
 		if (DSpaceApi.getFunctionalityManager().isFunctionalityEnabled("lr.post.error") == false) {
 			return;
 		}
-		
-		div.addPara("errors", "alert alert-danger").addContent(err);
+		if ( err.startsWith("xmlui.") ) {
+			div.addPara("errors", "alert alert-danger").addContent(AbstractWingTransformer.message(err));
+		}else {
+			div.addPara("errors", "alert alert-danger").addContent(err);
+		}
 	}
 	
 	public static void app_xmlui_aspect_eperson_postError(Context context, Message head, Division div)
