@@ -24,6 +24,7 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Button;
 import org.dspace.app.xmlui.wing.element.Cell;
+import org.dspace.app.xmlui.wing.element.Hidden;
 import org.dspace.app.xmlui.wing.element.Radio;
 import org.dspace.app.xmlui.wing.element.CheckBox;
 import org.dspace.app.xmlui.wing.element.Division;
@@ -153,7 +154,7 @@ public class XMLUILibraryAwardUploadStep extends AbstractSubmissionStep
 
     @Override
     public void addBody(Body body) throws SAXException, WingException,
-    UIException, SQLException, IOException, AuthorizeException
+            UIException, SQLException, IOException, AuthorizeException
     {
         // If we are actually editing information of an uploaded file,
         // then display that body instead!
@@ -252,13 +253,39 @@ public class XMLUILibraryAwardUploadStep extends AbstractSubmissionStep
                 file.addError("NOT PDF");
             }
 
-            Text description = upload.addItem().addText("description");
-            description.setLabel(T_description);
-            description.setHelp(T_description_help);
-            description.setRequired();
+            Table uploader = div.addTable("upload-summary", 5, 2);
+            uploader.setHead("Required Uploads:");
 
-            Button uploadSubmit = upload.addItem().addButton("submit_upload");
-            uploadSubmit.setValue(T_submit_upload);
+            Row header = uploader.addRow(Row.ROLE_HEADER);
+            header.addCellContent("Description"); // description
+            header.addCellContent("Upload"); // upload button
+
+            // Hidden hidden = upload.addItem().addHidden("description");
+            // hidden.setValue("Essay");
+
+            for (String neededBitstream : LibraryAwardUploadStep.requiredBitstreams)
+            {
+                Row row = uploader.addRow();
+                row.addCell().addContent(neededBitstream);
+
+                Hidden hidden = upload.addItem().addHidden("description");
+                hidden.setValue(neededBitstream);
+
+                Button uploadButton = row.addCell().addButton("submit_upload");
+                uploadButton.setValue("Upload");
+                uploadButton.setRequired();
+            }
+
+            //
+            // Text description = upload.addItem().addText("description");
+            // description.setLabel(T_description);
+            // description.setHelp(T_description_help);
+            // description.setRequired();
+            // description.setValue("cat");
+            //
+            // Button uploadSubmit =
+            // upload.addItem().addButton("submit_upload");
+            // uploadSubmit.setValue(T_submit_upload);
         }
 
         // Part B:
@@ -398,8 +425,8 @@ public class XMLUILibraryAwardUploadStep extends AbstractSubmissionStep
      */
     @Override
     public List addReviewSection(List reviewList) throws SAXException,
-            WingException, UIException, SQLException, IOException,
-            AuthorizeException
+    WingException, UIException, SQLException, IOException,
+    AuthorizeException
     {
         // Create a new list section for this step (and set its heading)
         List uploadSection = reviewList.addList("submit-review-"
