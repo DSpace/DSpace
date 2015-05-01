@@ -434,7 +434,7 @@
 					<xsl:attribute name="class">
 						<xsl:text>badge</xsl:text>
 	                        <xsl:choose>
-	                                <xsl:when test="$filteroperator='notequals' or @filteroperator='notcontains'">
+	                                <xsl:when test="$filteroperator='notequals' or $filteroperator='notcontains' or $filteroperator='notavailable'">
 	                                        <xsl:text> badge-important</xsl:text>
 	                                </xsl:when>
 	                                <xsl:otherwise>
@@ -443,14 +443,25 @@
 	                        </xsl:choose>
 						</xsl:attribute>
 					<xsl:choose>
-						<xsl:when test="$filteroperator='notequals' or @filteroperator='notcontains'">
+						<xsl:when test="$filteroperator='notequals' or $filteroperator='notcontains'">
 							<i class="fa fa-search-minus fa-lg">&#160;</i>
 						</xsl:when>
+						<xsl:when test="$filteroperator='notavailable'">
+							<i class="fa fa-ban fa-lg">&#160;</i>
+						</xsl:when>						
 						<xsl:otherwise>
 							<i class="fa fa-search-plus fa-lg">&#160;</i>
 						</xsl:otherwise>
 					</xsl:choose>
-					<xsl:value-of select="$filtertype" />: <xsl:value-of select="$filtervalue" />
+					<xsl:value-of select="$filtertype" />
+					<xsl:choose>
+						<xsl:when test="$filteroperator='notavailable'">
+							&#160;							
+						</xsl:when>
+						<xsl:otherwise>
+							: <xsl:value-of select="$filtervalue" />
+						</xsl:otherwise>
+					</xsl:choose>
 					&#160;
 					<i class="selected-filter-close-icon fa fa-times-circle"
 						style="cursor: pointer; top: 2px; position: absolute; right: 2px;">
