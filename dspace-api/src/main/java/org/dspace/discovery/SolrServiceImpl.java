@@ -93,6 +93,7 @@ import org.dspace.storage.rdbms.DatabaseUtils;
 import org.dspace.utils.DSpace;
 import org.springframework.stereotype.Service;
 
+import cz.cuni.mff.ufal.IsoLangCodes;
 /**
  * SolrIndexer contains the methods that index Items and their metadata,
  * collections, communities, etc. It is meant to either be invoked from the
@@ -109,12 +110,9 @@ import org.springframework.stereotype.Service;
  *
  * Its configuration is Autowired by the ApplicationContext
  *
- * based on class by:
- * Kevin Van de Velde (kevin at atmire dot com)
- * Mark Diggory (markd at atmire dot com)
- * Ben Bosman (ben at atmire dot com)
- *
- * modified for LINDAT/CLARIN
+ * @author Kevin Van de Velde (kevin at atmire dot com)
+ * @author Mark Diggory (markd at atmire dot com)
+ * @author Ben Bosman (ben at atmire dot com)
  */
 @Service
 public class SolrServiceImpl implements SearchService, IndexingService {
@@ -216,7 +214,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             {
                 case Constants.ITEM:
                     Item item = (Item) dso;
-                    if (item.isArchived() || item.isWithdrawn())
+                    if ((item.isArchived() || item.isWithdrawn()) && !item.isHidden())
                     {
                         /**
                          * If the item is in the repository now, add it to the index
@@ -1010,6 +1008,17 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 {
                     continue;
                 }
+                
+                //Add human readable name with dc.language.iso
+                if(field.equals("dc.language.iso")){
+                	    String langName = IsoLangCodes.getLangForCode(value);
+                	    if(langName != null){
+                                doc.addField("dc.language.iso_name", langName.toLowerCase());
+                	    } else{
+                	    	log.error(String.format("No language found for iso code %s", value));
+                	    }
+                }
+                
 
                 String authority = null;
                 String preferedLabel = null;
@@ -1154,30 +1163,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         }
 
                         //Add a dynamic fields for auto complete in search
-                        if (searchFilter.isFullAutoComplete())
-                        {
-                            doc.addField(searchFilter.getIndexFieldName()
-                                    + "_ac", value);
-                        }
-                        else
-                        {
-                            //Should this use a solr tokenizer and/or different dynamic field?
-                            String[] values = value.split(" ");
-                            for (String val : values)
-                            {
-                                val = val.replaceAll("[\\W]", "");
-                                if (val.isEmpty())
-                                {
-                                    continue;
-                                }
-                                else
-                                {
-                                    doc.addField(
-                                            searchFilter.getIndexFieldName()
-                                                    + "_ac", val);
-                                }
-                            }
-                        }
+                        doc.addField(searchFilter.getIndexFieldName() + "_ac",
+                                value.toLowerCase() + separator + value);
                         if (preferedLabel != null)
                         {
                             doc.addField(searchFilter.getIndexFieldName()
@@ -1281,7 +1268,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                                         doc.addField(searchFilter.getIndexFieldName() + "_keyword", indexValue);
                                     }
                                 }
-                            } 
+                            }
                         }
                     }
                 }
@@ -1345,6 +1332,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                                     + STORE_SEPARATOR + authority
                                     + STORE_SEPARATOR + meta.language);
                 }
+                
+                if (meta.schema.equals("local")){
+                	doc.addField(field + "_comp", value);
+                }
+                
 
                 if (meta.language != null && !meta.language.trim().equals(""))
                 {
@@ -1763,6 +1755,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         {
             searchPlugin.additionalSearchParameters(context, discoveryQuery, solrQuery);
         }
+        
+        String q = solrQuery.getQuery() + " OR title:(" + query + ")^5";
+        q = q + " OR ((" + q + ") AND -dc.relation.isreplacedby:*)^5 OR ((" + q + ") AND dc.relation.replaces:*)^15";               
+        solrQuery.setQuery(q);
+        
         return solrQuery;
     }
 
@@ -2050,7 +2047,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         if(StringUtils.isNotBlank(field))
         {
             filterQuery.append(field);
-            result.setField(field);
             if("equals".equals(operator))
             {
                 //Query the keyword indexed field !
@@ -2063,11 +2059,17 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             }
             else if ("notequals".equals(operator)
                     || "notcontains".equals(operator)
-                    || "notauthority".equals(operator))
+                    || "notauthority".equals(operator)
+                    || "notavailable".equals(operator))
             {
                 filterQuery.insert(0, "-");
             }
             filterQuery.append(":");
+            
+            if("notavailable".equals(operator)) {
+            	value = "[* TO *]";
+            }             
+            
             if("equals".equals(operator) || "notequals".equals(operator))
             {
                 //DO NOT ESCAPE RANGE QUERIES !
@@ -2220,13 +2222,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         }else if(facetFieldConfig.getType().equals(DiscoveryConfigurationParameters.TYPE_STANDARD))
         {
             return field;
-	}else if(facetFieldConfig.getType().equals(DiscoveryConfigurationParameters.TYPE_ISO_LANG)){
-            if(removePostfix)
-            {
-                return field.substring(0, field.lastIndexOf("_filter"));
-            }else{
-                return field + "_filter";
-            }
         }else{
             return field;
         }

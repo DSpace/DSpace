@@ -10,8 +10,6 @@ package org.dspace.app.xmlui.aspect.discovery;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
@@ -42,7 +40,6 @@ import org.xml.sax.SAXException;
  * @author Mark Diggory (markd at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
  * @author Adán Román Ruiz <aroman@arvo.es> (Bugfix)
- * modified for LINDAT/CLARIN
  */
 public class SimpleSearch extends AbstractSearch implements CacheableProcessingComponent {
     /**
@@ -58,7 +55,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
             message("xmlui.ArtifactBrowser.SimpleSearch.trail");
 
     private static final Message T_search_scope =
-        message("xmlui.ArtifactBrowser.SimpleSearch.search_scope");
+        message("xmlui.Discovery.SimpleSearch.search_scope");
 
     private static final Message T_head =
             message("xmlui.ArtifactBrowser.SimpleSearch.head");
@@ -82,11 +79,6 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
     private static final Message T_filter_authority = message("xmlui.Discovery.SimpleSearch.filter.authority");
     private static final Message T_filter_notauthority = message("xmlui.Discovery.SimpleSearch.filter.notauthority");
     private static final Message T_did_you_mean = message("xmlui.Discovery.SimpleSearch.did_you_mean");
-    private static final Message T_add_filter = message("xmlui.Discovery.SimpleSearch.filter_add");
-    private static final Message T_filter_apply = message("xmlui.Discovery.SimpleSearch.filter_apply");
-    private static final Message T_FILTERS_SELECTED = message("xmlui.ArtifactBrowser.SimpleSearch.filter.selected");
-    private static final Message T_search_label =
-            message("xmlui.discovery.SimpleSearch.search_label");
 
     private SearchService searchService = null;
 
@@ -124,7 +116,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
 
         // Build the DRI Body
         Division search = body.addDivision("search", "primary");
-        //search.setHead(T_head);
+        search.setHead(T_head);
         String searchUrl = ConfigurationManager.getProperty("dspace.url") + "/JSON/discovery/search";
 
         search.addHidden("discovery-json-search-url").setValue(searchUrl);
@@ -143,25 +135,24 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
 
         List searchList = mainSearchDiv.addList("primary-search", List.TYPE_FORM);
 
-        /*searchList.setHead(T_search_label);
+//        searchList.setHead(T_search_label);
         if (variableScope())
         {
             Select scope = searchList.addItem().addSelect("scope");
             scope.setLabel(T_search_scope);
             buildScopeList(scope);
-        }*/
+        }
 
         Item searchBoxItem = searchList.addItem();
-        Text text = searchBoxItem.addText("query", "home-search");
+        Text text = searchBoxItem.addText("query");
         text.setValue(queryString);
-        searchBoxItem.addButton("submit", "home-search-button").setValue(T_search_label);
+        searchBoxItem.addButton("submit", "search-icon").setValue(T_go);
         if(queryResults != null && StringUtils.isNotBlank(queryResults.getSpellCheckQuery()))
         {
             Item didYouMeanItem = searchList.addItem("did-you-mean", "didYouMean");
             didYouMeanItem.addContent(T_did_you_mean);
             didYouMeanItem.addXref(getSuggestUrl(queryResults.getSpellCheckQuery()), queryResults.getSpellCheckQuery(), "didYouMean");
         }
-		searchList.addItem().addXref("#", "Add filters", null, "show-filters");	
 
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(dso);
@@ -169,102 +160,60 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         java.util.List<String> filterTypes = DiscoveryUIUtils.getRepeatableParameters(request, "filtertype");
         java.util.List<String> filterOperators = DiscoveryUIUtils.getRepeatableParameters(request, "filter_relational_operator");
         java.util.List<String> filterValues = DiscoveryUIUtils.getRepeatableParameters(request,  "filter");
-if(0 < filterTypes.size() || 0 < filterFields.size()){
-            Division searchFiltersDiv = search.addInteractiveDivision("search-filters",
-                    "discover", Division.METHOD_GET, "discover-search-box search");
 
-            List secondarySearchList = searchFiltersDiv.addList("secondary-search", List.TYPE_FORM);
-            //secondarySearchList.setHead(T_filter_label);
-
-            if(0 < filterFields.size()){
-            	
-                Item item = secondarySearchList.addItem("search-filter-list", "search-filter-list");
-                Composite filterComp = item.addComposite("search-filter-controls");
-                filterComp.setLabel(T_add_filter);
-                filterComp.setHelp(T_filter_help);
-
-    //            filterComp.setLabel("");
-
-                Select select = filterComp.addSelect("filtertype", "widthauto");
-
-                //For each field found (at least one) add options
-                for (DiscoverySearchFilter searchFilter : filterFields) {
-                    select.addOption(searchFilter.getIndexFieldName(), message("xmlui.ArtifactBrowser.SimpleSearch.filter." + searchFilter.getIndexFieldName()));
-                }
-
-                Select operator = filterComp.addSelect("filter_relational_operator", "widthauto");
-                operator.addOption("contains", "contains");
-                operator.addOption("equals", "equals");
-                operator.addOption("notcontains", "not contains");
-                operator.addOption("notequals", "not equals");
-                operator.addOption("notavailable", "not available");
-                
-                //Add a box so we can search for our value
-                filterComp.addText("filter", "widthauto");
-
-                //And last add an add button
-                filterComp.enableAddOperation();
-
-            }
-
-
-    //        queryList.addItem().addContent("Filters");
-            //If we have any filters, show them
-            if(filterTypes.size() > 0){
-                //if(filters != null && filters.size() > 0){
-                List item = secondarySearchList.addList("used-filters", List.TYPE_GLOSS, "used-filters-list");
-
-                item.setHead(T_FILTERS_SELECTED);
-
-                for (int i = 0; i <  filterTypes.size(); i++) {
-                    String filterType = filterTypes.get(i);
-                    String filterOperator;
-                    if(i < filterOperators.size()){
-                    	filterOperator = filterOperators.get(i);
-                    } else{
-                    	filterOperator = null;
-                    }
-                    String filterValue = filterValues.get(i);
-                    
-                    if(StringUtils.isBlank(filterOperator)){
-                        filterOperator = "contains";
-                    } 
-                    else if ("notavailable".equals(filterOperator))
-                    {
-                        filterValue = "[* TO *]";
-                    }
-
-                    if(StringUtils.isNotBlank(filterValue)){
-                            DiscoverFilterQuery fq = searchService.toFilterQuery(context, filterType,filterOperator,filterValue);
-                            
-                            CheckBox box = item.addItem(null, fq.getOperator()).addCheckBox("fq");
-                            Option option = box.addOption(true, fq.getFilterQuery());
-                            String field = fq.getField();
-                            option.addContent(message("xmlui.ArtifactBrowser.SimpleSearch.filter." + field));
-
-                            //We have a filter query get the display value
-                            //Check for a range query
-                            Pattern pattern = Pattern.compile("\\[(.*? TO .*?)\\]");
-                            Matcher matcher = pattern.matcher(fq.getDisplayedValue());
-                            boolean hasPattern = matcher.find();
-                            if (hasPattern) {
-                                String[] years = matcher.group(0).replace("[", "").replace("]", "").split(" TO ");
-                                option.addContent(": " + years[0] + " - " + years[1]);
-                                continue;
-                            }
-                            option.addContent(": " + fq.getDisplayedValue());
-                    }
-
-                }
-                secondarySearchList.addItem().addButton("submit_update_filters", "update-filters").setValue(T_filter_apply);
-            }
-            addHiddenFormFields("filter", request, fqs, searchFiltersDiv);
+        if(0 < filterFields.size() && filterTypes.size() == 0)
+        {
+            //Display the add filters url ONLY if we have no filters selected & filters can be added
+            searchList.addItem().addXref("display-filters", T_filters_show);
         }
+        addHiddenFormFields("search", request, fqs, mainSearchDiv);
 
-        Division searchControlsDiv = search.addDivision("search-controls", "discover-sort-box search");
-        buildSearchControls(searchControlsDiv);
 
-        
+        if(0 < filterFields.size())
+        {
+            Division searchFiltersDiv = searchBoxDivision.addInteractiveDivision("search-filters",
+                    "discover", Division.METHOD_GET, "discover-filters-box " + (0 < filterTypes.size() ? "" : "hidden"));
+
+            Division filtersWrapper = searchFiltersDiv.addDivision("discovery-filters-wrapper");
+            filtersWrapper.setHead(T_filter_label);
+            filtersWrapper.addPara(T_filter_help);
+            Table filtersTable = filtersWrapper.addTable("discovery-filters", 1, 4, "discovery-filters");
+
+
+            //If we have any filters, show them
+            if(filterTypes.size() > 0)
+            {
+
+                filtersTable.addRow(Row.ROLE_HEADER).addCell("", Cell.ROLE_HEADER, 1, 4, "new-filter-header hidden").addContent(T_filter_current_filters);
+                for (int i = 0; i <  filterTypes.size(); i++)
+                {
+                    String filterType = filterTypes.get(i);
+                    String filterValue = filterValues.get(i);
+                    String filterOperator = filterOperators.get(i);
+
+                    if(StringUtils.isNotBlank(filterValue))
+                    {
+                        Row row = filtersTable.addRow("used-filters-" + i+1, Row.ROLE_DATA, "search-filter used-filter hidden");
+                        addFilterRow(filterFields, i+1, row, filterType, filterOperator, filterValue);
+                    }
+                }
+                //filtersTable.addRow("filler-row", Row.ROLE_DATA, "search-filter filler").addCell(1, 4).addContent("");
+                filtersTable.addRow(Row.ROLE_HEADER).addCell("", Cell.ROLE_HEADER, 1, 4, "new-filter-header").addContent(T_filter_new_filters);
+            }
+
+
+            int index = filterTypes.size() + 1;
+            Row row = filtersTable.addRow("filter-new-" + index, Row.ROLE_DATA, "search-filter");
+
+            addFilterRow(filterFields, index, row, null, null, null);
+
+            Row filterControlsItem = filtersTable.addRow("filter-controls", Row.ROLE_DATA, "apply-filter");
+//            filterControlsItem.addCell(1, 3).addContent("");
+            filterControlsItem.addCell(1, 4).addButton("submit_apply_filter", "discovery-apply-filter-button").setValue(T_filter_controls_apply);
+
+            addHiddenFormFields("filter", request, fqs, searchFiltersDiv);
+
+        }
 
 
 //        query.addPara(null, "button-list").addButton("submit").setValue(T_go);
@@ -272,6 +221,7 @@ if(0 < filterTypes.size() || 0 < filterFields.size()){
         // Build the DRI Body
         //Division results = body.addDivision("results", "primary");
         //results.setHead(T_head);
+        buildMainForm(search);
 
         // Add the result division
         try {
@@ -293,10 +243,11 @@ if(0 < filterTypes.size() || 0 < filterFields.size()){
         Select typeSelect = row.addCell("", Cell.ROLE_DATA, "selection").addSelect("filter_relational_operator_" + index);
         typeSelect.addOption(StringUtils.equals(relationalOperator, "contains"), "contains", T_filter_contain);
         typeSelect.addOption(StringUtils.equals(relationalOperator, "equals"), "equals", T_filter_equals);
-        typeSelect.addOption(StringUtils.equals(relationalOperator, "authority"), "authority", T_filter_authority);
+        //typeSelect.addOption(StringUtils.equals(relationalOperator, "authority"), "authority", T_filter_authority);
         typeSelect.addOption(StringUtils.equals(relationalOperator, "notcontains"), "notcontains", T_filter_notcontain);
         typeSelect.addOption(StringUtils.equals(relationalOperator, "notequals"), "notequals", T_filter_notequals);
-        typeSelect.addOption(StringUtils.equals(relationalOperator, "notauthority"), "notauthority", T_filter_notauthority);
+        //typeSelect.addOption(StringUtils.equals(relationalOperator, "notauthority"), "notauthority", T_filter_notauthority);
+        typeSelect.addOption(StringUtils.equals(relationalOperator, "notavailable"), "notavailable", "Not Available");
          
 
 
@@ -305,9 +256,9 @@ if(0 < filterTypes.size() || 0 < filterFields.size()){
         row.addCell("", Cell.ROLE_DATA, "discovery-filter-input-cell").addText("filter_" + index, "discovery-filter-input").setValue(value == null ? "" : value);
 
         //And last add an add button
-        Cell buttonsCell = row.addCell("filter-controls_" + index, Cell.ROLE_DATA, "filter-controls");
-        buttonsCell.addButton("add-filter_" + index, "filter-control filter-add").setValue(T_filter_controls_add);
-        buttonsCell.addButton("remove-filter_" + index, "filter-control filter-remove").setValue(T_filter_controls_remove);
+        //Cell buttonsCell = row.addCell("filter-controls_" + index, Cell.ROLE_DATA, "filter-controls");
+        //buttonsCell.addButton("add-filter_" + index, "filter-control filter-add").setValue(T_filter_controls_add);
+        //buttonsCell.addButton("remove-filter_" + index, "filter-control filter-remove").setValue(T_filter_controls_remove);
 
     }
 

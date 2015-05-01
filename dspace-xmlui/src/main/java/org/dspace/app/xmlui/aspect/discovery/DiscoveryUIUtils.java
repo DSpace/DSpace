@@ -55,9 +55,11 @@ public class DiscoveryUIUtils {
                 filterOperator = "contains";
             }
 
-            fqs.put("filtertype_" + i, new String[]{filterType});
-            fqs.put("filter_relational_operator_" + i, new String[]{filterOperator});
-            fqs.put("filter_" + i, new String[]{filterValue});
+            if(!StringUtils.isBlank(filterValue)) {
+            	fqs.put("filtertype_" + i, new String[]{filterType});
+            	fqs.put("filter_relational_operator_" + i, new String[]{filterOperator});
+            	fqs.put("filter_" + i, new String[]{filterValue});
+        	}
         }
         return fqs;
     }
@@ -114,3 +116,4 @@ public class DiscoveryUIUtils {
         return new ArrayList<String>(result.values());
     }
 }
+

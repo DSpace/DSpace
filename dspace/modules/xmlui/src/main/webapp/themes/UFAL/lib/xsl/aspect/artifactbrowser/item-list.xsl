@@ -360,7 +360,7 @@
     </xsl:template>
     
     <xsl:template match="dri:list[@n='primary-search']" priority="10">
-        <div class="accordion well" id="filters">
+        <div class="accordion" id="filters">
             <div class="accordion-group">
                 <div class="row" style="margin-top: 20px;"> 
                     <div class="input-group input-group-lg col-sm-10 col-sm-offset-1">
@@ -381,7 +381,7 @@
 						</span>
                     </div>            
                 </div>
-                <xsl:if test="/dri:document//dri:list[@n='used-filters']">
+                <xsl:if test="/dri:document//dri:div[@n='general-query']/dri:p[@n='hidden-fields']/dri:field[starts-with(@n,'filtertype')]">
                 	<xsl:call-template name="selected-filters" />
                 </xsl:if>
                 <div class="bold accordion-heading">
@@ -409,7 +409,7 @@
         
     <xsl:template match="dri:div[@id='aspect.discovery.SimpleSearch.div.search-filters']" />
     
-    <xsl:template match="dri:list[@n='used-filters']" />
+    <xsl:template match="/dri:document//dri:div[@n='general-query']/dri:p[@n='hidden-fields']/dri:field" />
         
     <xsl:template match="dri:div[@n='browse-navigation']/dri:p" priority="10">
         <div>
@@ -423,14 +423,18 @@
     <xsl:template name="selected-filters">
         <div class="filters well well-light">
         	<h5>
-               <xsl:apply-templates select="/dri:document//dri:list[@n='used-filters']/dri:head/node()" />
+               Selected Filters
 			</h5>               
-	        <xsl:for-each select="/dri:document//dri:list[@n='used-filters']/dri:item">
+	        <xsl:for-each select="/dri:document//dri:div[@n='general-query']/dri:p[@n='hidden-fields']/dri:field[starts-with(@n,'filtertype')]">
+	        	<xsl:variable name="filter_number" select="substring-after(@n, 'filtertype_')" />
+	        	<xsl:variable name="filtertype" select="dri:value/node()" />
+	        	<xsl:variable name="filteroperator" select="../dri:field[@n=concat('filter_relational_operator_', $filter_number)]/dri:value/node()" />
+	        	<xsl:variable name="filtervalue" select="../dri:field[@n=concat('filter_', $filter_number)]/dri:value/node()" />
 				<span style="padding: 5px 20px 5px 10px; margin: 2px; position: relative;">
 					<xsl:attribute name="class">
 						<xsl:text>badge</xsl:text>
 	                        <xsl:choose>
-	                                <xsl:when test="@rend='notequals' or @rend='notcontains'">
+	                                <xsl:when test="$filteroperator='notequals' or $filteroperator='notcontains' or $filteroperator='notavailable'">
 	                                        <xsl:text> badge-important</xsl:text>
 	                                </xsl:when>
 	                                <xsl:otherwise>
@@ -439,20 +443,30 @@
 	                        </xsl:choose>
 						</xsl:attribute>
 					<xsl:choose>
-						<xsl:when test="@rend='notequals' or @rend='notcontains'">
+						<xsl:when test="$filteroperator='notequals' or $filteroperator='notcontains'">
 							<i class="fa fa-search-minus fa-lg">&#160;</i>
 						</xsl:when>
+						<xsl:when test="$filteroperator='notavailable'">
+							<i class="fa fa-ban fa-lg">&#160;</i>
+						</xsl:when>						
 						<xsl:otherwise>
 							<i class="fa fa-search-plus fa-lg">&#160;</i>
 						</xsl:otherwise>
 					</xsl:choose>
-					<xsl:apply-templates select="dri:field/dri:option/node()" />
+					<xsl:value-of select="$filtertype" />
+					<xsl:choose>
+						<xsl:when test="$filteroperator='notavailable'">
+							&#160;							
+						</xsl:when>
+						<xsl:otherwise>
+							: <xsl:value-of select="$filtervalue" />
+						</xsl:otherwise>
+					</xsl:choose>
 					&#160;
 					<i class="selected-filter-close-icon fa fa-times-circle"
 						style="cursor: pointer; top: 2px; position: absolute; right: 2px;">
-						<div class="hidden">
-							<xsl:apply-templates select="dri:field" />
-						</div>
+						<xsl:attribute name="filter_number"><xsl:value-of select="$filter_number" /></xsl:attribute>
+						<span style="display:none;">&#160;</span>
 					</i>
 				</span>
 			</xsl:for-each>
@@ -483,3 +497,4 @@
     </xsl:template>    
             
 </xsl:stylesheet>
+
