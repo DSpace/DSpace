@@ -326,14 +326,18 @@ public class UFALLicenseStep extends LicenseStep {
 	license_text.setHead(T_decision_label);
 
 	license_text.addItem().addContent(T_info1);
-	license_text.addItem().addContent(T_info2);	
-	
-	Item dist_license = license_text.addItem("dist_license", "dist-license");
-	
+	license_text.addItem().addContent(T_info2);
+
+	// Default license settings from LicenseStep.java
+	String licenseText = LicenseUtils.getLicenseText(context.getCurrentLocale(), collection, submission.getItem(), submission.getSubmitter());
+	license_text.addItem("distributionlicense", "hidden").addContent(licenseText);
+
+	Item dist_license = license_text.addItem("dist_license", "dist-license alert alert-info");
+
 	CheckBox decision = dist_license.addCheckBox("decision", "bold");
 	//decision.setLabel(T_decision_label);
-	
-	// get the maximum page reached 
+
+	// get the maximum page reached
 	int maxStepReached = getMaxStepAndPageReached().getStep();
 	int currentStep  = getStep();
 	
@@ -345,11 +349,7 @@ public class UFALLicenseStep extends LicenseStep {
 		decision.addOption("accept",T_decision_checkbox);	
 	}
 	
-	// Default license settings from LicenseStep.java    
-    String licenseText = LicenseUtils.getLicenseText(context.getCurrentLocale(), collection, submission.getItem(), submission.getSubmitter());
 
-    license_text.addItem("distributionlicense", "hidden").addContent(licenseText);
-    
     Item info3 = license_text.addItem(null, "alert bold");
     info3.addHighlight("fa fa-warning fa-lg").addContent(" ");
     info3.addHighlight("").addContent(T_info3);
@@ -364,20 +364,23 @@ public class UFALLicenseStep extends LicenseStep {
 	  	form = controls.addList("submit-ufal-license", List.TYPE_FORM, "");
 	  	form.setHead("Resource License");
 	  	
-	    List ls = form.addList("license-selecotr", List.TYPE_GLOSS);	    
+	    List ls = form.addList("license-selector", List.TYPE_GLOSS);
 	    Item helpText = ls.addItem();
 	    //helpText.addHighlight("fa fa-legal fa-2x pull-left").addContent(" ");
 	    helpText.addHighlight("").addContent("If you know under which license you want to distribute your work, please select from the list. If you need help please use the license selector:");
-	    ls.addItem().addXref("#!", "OPEN License Selector", "btn btn-link licenseselector bold");
-  		
-	  	Select license_select = ls.addItem().addSelect("license", "input-xxlarge");
+
+		Item selectorLink = ls.addItem();
+		selectorLink.addHighlight("fa fa-lg fa-filter licenseselector").addContent(" ");
+		selectorLink.addXref("#!", "OPEN License Selector", "btn btn-link licenseselector bold");
+
+		Select license_select = ls.addItem().addSelect("license", "input-xxlarge");
   		license_select.setLabel(T_license_select);
 	  	license_select.setHelp(T_license_select_help);
 	  	
 	  	Item detailLicenseLink = form.addItem(null, "alert");
 	  	detailLicenseLink.addHighlight("fa fa-lg fa-question-circle").addContent(" ");
-	  	detailLicenseLink.addHighlight("bold").addContent("To view more details about the licenses ");
-	  	detailLicenseLink.addHighlight("bold").addXref(contextPath + "/page/licenses", "Click here", "target_blank");
+	  	detailLicenseLink.addHighlight("bold").addContent("List of all supported licenses and their details is  ");
+	  	detailLicenseLink.addHighlight("bold").addXref(contextPath + "/page/licenses", "here", "target_blank");
 	  	detailLicenseLink.addHighlight("bold").addContent(".");
 
   		// add not available

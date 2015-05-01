@@ -1338,7 +1338,9 @@
         </xsl:template>
         
         <xsl:template match="dri:item[@n='distributionlicense']" priority="10">
-        	<div class='bold'><button class="btn btn-link bold" data-toggle="modal" data-target="#distributionagreement_modal">Show the distribution agreement</button></div>
+        	<div class='bold text-center'>
+				<button class="btn btn-link bold" data-toggle="modal" data-target="#distributionagreement_modal"><i class="fa fa-2x fa-file-text-o">&#160;</i> Read the distribution agreement</button>
+			</div>
 			<div class="modal fade" id="distributionagreement_modal" aria-hidden="true">
   				<div class="modal-dialog">
     				<div class="modal-content">

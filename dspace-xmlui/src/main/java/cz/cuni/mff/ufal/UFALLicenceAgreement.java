@@ -146,7 +146,8 @@ public class UFALLicenceAgreement extends AbstractDSpaceTransformer {
 				List i = licences_div.addList("licenses-url", List.TYPE_FORM);
 				
 				for (LicenseDefinition license : licenses) {
-				    i.addItem().addXref(license.getDefinition(), " " + license.getName(), "target_blank btn licence_to_sign fa fa-search fa-1x");
+				    i.addItem( "license-to-sign", "alert text-center" ).addXref(
+						license.getDefinition(), " " + license.getName(), "target_blank label-big btn licence_to_sign fa fa-search fa-1x");
 				    //XXX cumulate the extra requirements from all(?) licenses
 					String lr = license.getRequiredInfo();
 					if(lr!=null) {

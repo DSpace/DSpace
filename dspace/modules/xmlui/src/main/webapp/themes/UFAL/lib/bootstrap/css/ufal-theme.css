@@ -1289,3 +1289,52 @@ dl {
 .modal-open {
 	margin-right: 0px !important;
 }
+
+li.list-complex-field > label {
+	font-size: 110%;
+	border-bottom: solid 1px #cdcdcd;
+}
+li.list-complex-field > div {
+	padding-left: 15px;
+}
+
+.ui-widget-header {
+	border: 1px solid #7479b8 !important;
+	background: #7479b8 !important;
+}
+
+div.modal-scrollbar {
+	overflow-y: scroll !important;
+}
+
+.label-big {
+	font-size: 110% !important;
+}
+
+.dist-license div {
+	font-size: 120%;
+	margin-bottom: 0;
+}
+.dist-license input {
+	margin: 11px;
+	padding: 10px;
+	transform: scale(1.5);
+	/* Webkit browsers*/
+	-webkit-transform: scale(1.5);
+}
+
+.licenseselector {
+	color: #428bca;
+}
+
+.licence_to_sign:before  {
+	font-family: FontAwesome;
+	content: "\f0e3";
+	display: inline-block;
+	padding-right: 3px;
+	vertical-align: middle;
+}
+
+.licence_to_sign  {
+	font-family: Arial;
+}
