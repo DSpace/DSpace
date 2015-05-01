@@ -91,7 +91,9 @@ public class Variables {
 					if(url == null){
 						url = Variables.class.getClassLoader().getResource("config/modules/lr.cfg");
 					}
-					reader = new FileReader( url.getPath() );
+					if ( null != url ) {
+						reader = new FileReader(url.getPath());
+					}
 				}
 			}else {
 				reader = new FileReader(  new URL(dspace_cfg_path).getPath() );
