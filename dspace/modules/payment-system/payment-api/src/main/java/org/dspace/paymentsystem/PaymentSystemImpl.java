@@ -206,6 +206,15 @@ public class PaymentSystemImpl implements PaymentSystemService {
             if(shoppingCarts.size()>0)
             {
                 return shoppingCarts.get(0);
+            } else {
+                // if the original item doesn't have a shopping cart,
+                // this item must've been created before the payment system was in place.
+                // We should create a completed placeholder cart for the original item, but make sure it is marked
+                // that it was created for versioning and should not be re-charged.
+                ShoppingCart versionCart = createNewShoppingCart(context,itemId,context.getCurrentUser().getID(),"",ShoppingCart.CURRENCY_US,ShoppingCart.STATUS_COMPLETED);
+                versionCart.setNote("cart created for versioning; do not charge");
+                versionCart.update();
+                return versionCart;
             }
 
         }
