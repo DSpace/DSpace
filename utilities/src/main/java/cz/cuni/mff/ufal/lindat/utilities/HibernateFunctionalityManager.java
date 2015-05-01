@@ -419,7 +419,6 @@ public class HibernateFunctionalityManager implements IFunctionalities {
 			sessionFactory.close();
 		} catch (Exception e) {
 			System.err.println("\nCould NOT connect to utilities database!\n");
-			e.printStackTrace();
 			throw new RuntimeException("Could not connect to database - "
 					+ e.toString());
 		}

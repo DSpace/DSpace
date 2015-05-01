@@ -74,26 +74,37 @@ public class Variables {
 		if (initialized)
 			return;
 		try {
+
 			Reader reader = null;
-          if ( null == dspace_cfg_path ) {
-			  InputStream is = Variables.class.getClassLoader().getResourceAsStream("modules/lr.cfg");
-			  if (null == is) {
-				  is = Variables.class.getClassLoader().getResourceAsStream("config/modules/lr.cfg");
-			  }
-			  if ( null != is ) {
-				  reader = new BufferedReader(new InputStreamReader(is));
-			  }
-          }else {
-			  reader = new FileReader( dspace_cfg_path );
-          }
-          // last nasty try
+			if ( null == dspace_cfg_path ) {
+				// try to search inside the archive (jm)
+				InputStream is = Variables.class.getClassLoader().getResourceAsStream("modules/lr.cfg");
+				if (null == is) {
+					is = Variables.class.getClassLoader().getResourceAsStream("config/modules/lr.cfg");
+				}
+				if ( null != is ) {
+					reader = new BufferedReader(new InputStreamReader(is));
+				}
+				// try to search the original way
+				if (null == reader ) {
+					URL url = Variables.class.getClassLoader().getResource("modules/lr.cfg");
+					if(url == null){
+						url = Variables.class.getClassLoader().getResource("config/modules/lr.cfg");
+					}
+					reader = new FileReader( url.getFile() );
+				}
+			}else {
+				reader = new FileReader( dspace_cfg_path );
+			}
+
+			// last nasty try
 			if (reader == null) {
 				log.debug("Failed to find lr.cfg.\nUsing nasty trick.\nThe class loader search was from " + Variables.class.getClassLoader().getResource("./"));
 				System.err.println("Failed to find lr.cfg. The class loader search is from " + Variables.class.getClassLoader().getResource("./"));
 				URL url = Variables.class.getClassLoader().getResource(Variables.class.getName().replace('.', '/') + ".class");
 				url = new URL(  new URL(url.getPath().split("utilities-")[0]), "../../../../config/modules/lr.cfg");
 				reader = new FileReader( url.getFile() );
-		  }
+			}
 
 			properties.load(reader);
 			databaseURL = get("lr.utilities.db.url");
