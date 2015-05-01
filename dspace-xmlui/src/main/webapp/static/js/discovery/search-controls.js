@@ -100,12 +100,20 @@
             return false;
         });
         //Disable the enter key !
-        $('input[name^=filter_][type=text]').keypress(function(event){
+        /*$('input[name^=filter_][type=text]').keypress(function(event){
             if(event.which == 13){
                 //Entered pressed, do NOT submit the form, add a new filter instead !
                 addFilterRow();
                 event.preventDefault();
             }
+        });*/
+        
+        $('select[name^=filter_relational_operator]').change(function() {
+        	if(this.value=="notavailable") {
+        		$('input[name^=filter_][type=text]', $(this).parent().parent()).css("visibility", "hidden");
+        	} else {
+        		$('input[name^=filter_][type=text]', $(this).parent().parent()).css("visibility", "visible");
+        	}
         });
 
     }

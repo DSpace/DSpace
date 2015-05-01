@@ -45,12 +45,9 @@ import java.util.regex.Pattern;
 /**
  * Renders the sidebar filters in Discovery
  *
- * based on class by:
- * Kevin Van de Velde (kevin at atmire dot com)
- * Mark Diggory (markd at atmire dot com)
- * Ben Bosman (ben at atmire dot com)
- *
- * modified for LINDAT/CLARIN
+ * @author Kevin Van de Velde (kevin at atmire dot com)
+ * @author Mark Diggory (markd at atmire dot com)
+ * @author Ben Bosman (ben at atmire dot com)
  */
 public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implements CacheableProcessingComponent {
 
@@ -234,9 +231,6 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                             if (i < shownFacets - 1) {
                                 String displayedValue = value.getDisplayedValue();
                                 String filterQuery = value.getAsFilterQuery();
-
-                                // add discovery filter only if it can narrow down the search
-                                if(value.getCount() < queryResults.getTotalSearchResults()) {
                                 String filterType = value.getFilterType();
                                 if (fqs.contains(getSearchService().toFilterQuery(context, field.getIndexFieldName(), value.getFilterType(), value.getAsFilterQuery()).getFilterQuery())) {
                                     filterValsList.addItem(Math.random() + "", "selected").addContent(displayedValue + " (" + value.getCount() + ")");
@@ -254,7 +248,6 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                                             displayedValue + " (" + value.getCount() + ")"
                                     );
                                 }
-                            }
                             }
                             //Show a "view more" url should there be more values, unless we have a date
                             if (i == shownFacets - 1 && !field.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)/*&& facetField.getGap() == null*/) {
