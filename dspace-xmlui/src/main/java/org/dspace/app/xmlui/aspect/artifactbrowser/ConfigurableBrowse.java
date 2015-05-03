@@ -10,12 +10,7 @@ package org.dspace.app.xmlui.aspect.artifactbrowser;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletResponse;
+import java.util.*;
 
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
@@ -26,15 +21,11 @@ import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.util.HashUtil;
+import org.apache.commons.lang.StringUtils;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
-import org.dspace.app.xmlui.utils.BadRequestException;
-import org.dspace.app.xmlui.utils.ContextUtil;
-import org.dspace.app.xmlui.utils.DSpaceValidity;
-import org.dspace.app.xmlui.utils.HandleUtil;
-import org.dspace.app.xmlui.utils.RequestUtils;
-import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.utils.*;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -55,6 +46,8 @@ import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseInfo;
 import org.dspace.browse.BrowseItem;
 import org.dspace.browse.BrowserScope;
+import org.dspace.sort.SortOption;
+import org.dspace.sort.SortException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DCDate;
@@ -63,9 +56,9 @@ import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.sort.SortException;
-import org.dspace.sort.SortOption;
 import org.xml.sax.SAXException;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Implements all the browse functionality (browse by title, subject, authors,
@@ -117,6 +110,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
     private static final String BROWSE_URL_BASE = "browse";
     private static final String SEARCH_URL_BASE = "discover";
+
 
     private static final Message T_head1_none =
             message("xmlui.ArtifactBrowser.AbstractSearch.head1_none");
@@ -193,7 +187,6 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         return "0";
     }
 
-    @Override
     public SourceValidity getValidity()
     {
         if (validity == null)
@@ -253,7 +246,6 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
     /**
      * Add Page metadata.
      */
-    @Override
     public void addPageMeta(PageMeta pageMeta) throws SAXException, WingException, UIException,
             SQLException, IOException, AuthorizeException
     {
@@ -275,7 +267,6 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
     /**
      * Add the browse-title division.
      */
-    @Override
     public void addBody(Body body) throws SAXException, WingException, UIException, SQLException,
             IOException, AuthorizeException
     {
@@ -297,9 +288,6 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         Division div = body.addDivision("browse-by-" + type, "primary");
 
         div.setHead(getTitleMessage(info));
-    	if(params.scope.getFilterValue()!=null){
-    		div.addPara("browse-selected-value", "browse-selected-value").addContent("Browse limited to \""+params.scope.getFilterValue()+"\"");
-    	}
 
         // Build the internal navigation (jump lists)
         addBrowseJumpNavigation(div, info, params);
@@ -315,6 +303,11 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         if (itemsTotal > 0) 
         {
             //results.setSimplePagination(itemsTotal, firstItemIndex, lastItemIndex, previousPage, nextPage)
+            //results.setSimplePagination(itemsTotal, browseInfo.getOverallPosition() + 1,
+            //        browseInfo.getOverallPosition() + browseInfo.getResultCount(), getPreviousPageURL(
+            //                params, info), getNextPageURL(params, info));
+
+            
         	int firstItemIndex = browseInfo.getOverallPosition()+1;
         	int lastItemIndex = browseInfo.getOverallPosition()+browseInfo.getResultCount();
             int currentPage = firstItemIndex/browseInfo.getResultsPerPage()+1;
@@ -324,7 +317,8 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             String pageURLMask = generateURL(parameters);
         	results.setHead(T_head1_none.parameterize(firstItemIndex,lastItemIndex, itemsTotal));
         	results.setMaskedPagination(itemsTotal,  firstItemIndex, lastItemIndex, currentPage, pagesTotal, pageURLMask);
-
+            
+            
             // Reference all the browsed items
             ReferenceSet referenceSet = results.addReferenceSet("browse-by-" + type,
                     ReferenceSet.TYPE_SUMMARY_LIST, type, null);
@@ -353,7 +347,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                 {
                     // Create a Map of the query parameters for the link
                     Map<String, String> queryParams = new HashMap<String, String>();
-                    queryParams.put(BrowseParams.TYPE, encodeForURL(type));
+                    /*queryParams.put(BrowseParams.TYPE, encodeForURL(type));
                     if (singleEntry[1] != null)
                     {
                         queryParams.put(BrowseParams.FILTER_VALUE[1], encodeForURL(
@@ -363,24 +357,22 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                     {
                         queryParams.put(BrowseParams.FILTER_VALUE[0], encodeForURL(
                             singleEntry[0]));
-                    }
+                    }*/
+                    
+                    queryParams.put("filtertype", encodeForURL(type));
+                    queryParams.put("filter_relational_operator", encodeForURL("equals"));
+                    queryParams.put("filter", encodeForURL(singleEntry[0]));
 
                     // Create an entry in the table, and a linked entry
                     Cell cell = singleTable.addRow().addCell();
-                    // ufal jump to discover
-                    if ( queryParams.containsKey("value") ) {
-                    	queryParams.put( "filter", queryParams.get("value"));
-                    	queryParams.remove("value");
-                    }
-                    if ( queryParams.containsKey("type") ) {
-                    	queryParams.put( "filtertype", queryParams.get("type"));
-                    	queryParams.remove("type");
-                    }
+                    //cell.addXref(super.generateURL(BROWSE_URL_BASE, queryParams), singleEntry[0]);
+                    
+                    cell.addXref(super.generateURL(SEARCH_URL_BASE, queryParams), singleEntry[0]);
 
-                    cell.addXref(super.generateURL(SEARCH_URL_BASE, queryParams),
-                          singleEntry[0]);
-                    //cell.addXref(super.generateURL(BROWSE_URL_BASE, queryParams),
-                    //      singleEntry[0]);
+                    if (StringUtils.isNotEmpty(singleEntry[2]))
+                    {
+                        cell.addHighlight("label label-primary pull-right").addContent(singleEntry[2]);
+                    }
                 }  
             }
         }
@@ -393,7 +385,6 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
     /**
      * Recycle
      */
-    @Override
     public void recycle()
     {
         this.validity = null;
@@ -437,10 +428,9 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         // If this is a date based browse, render the date navigation
         if (isSortedByDate(info))
         {
-            List jumpForm = jump.addList("jump-date", List.TYPE_FORM);
+        	List jumpForm = jump.addList("jump-date", List.TYPE_FORM);
 
             // Create a select list to choose a month
-
             Composite my = jumpForm.addItem().addComposite("month-year");
             my.setLabel(T_jump_select);
 
@@ -451,9 +441,6 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                 month.addOption(false, String.valueOf(i), DCDate.getMonthName(i, Locale
                         .getDefault()));
             }
-            try{
-            	month.setOptionSelected(Integer.parseInt(params.month));
-            }catch(Exception e){}
 
             // Create a select list to choose a year
             Select year = my.addSelect(BrowseParams.YEAR);
@@ -483,21 +470,20 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                 }
             }
             while (i > tenYearBreak);
-            year.setOptionSelected(params.year);
 
             // Create a free text entry box for the year
-            //jumpForm.addContent(T_jump_year);
             Text startswith = jumpForm.addItem().addText(BrowseParams.STARTS_WITH);
             startswith.setLabel(T_jump_year);
-            
             startswith.setValue(params.scope.getStartsWith());
-
+            startswith.setHelp(T_jump_year_help);
+            
             jumpForm.addItem().addButton("submit").setValue(T_go);
         }
         else
         {
-            List jumpForm = jump.addList("starts-with", List.TYPE_FORM);
-
+        	
+        	List jumpForm = jump.addList("starts-with", List.TYPE_FORM);
+        	
             // Create a clickable list of the alphabet
             List jumpList = jumpForm.addList("jump-list", List.TYPE_SIMPLE, "alphabet");
             
@@ -521,8 +507,10 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             // Create a free text field for the initial characters
             Text startswith = jumpForm.addItem().addText(BrowseParams.STARTS_WITH);
             startswith.setLabel(T_starts_with);
-            
+            startswith.setHelp(T_starts_with_help);
             jumpForm.addItem().addButton("submit").setValue(T_go);
+            
+            
         }
     }
 
@@ -553,7 +541,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             {
                 // Create a drop down of the different sort columns available
                 Set<SortOption> sortOptions = SortOption.getSortOptions();
-                
+
                 // Only generate the list if we have multiple columns
                 if (sortOptions.size() > 1)
                 {
@@ -562,7 +550,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 			        org.dspace.app.xmlui.wing.element.List sortByOptions = sortList.addList("sort-selections");
 
 
-    
+
                     for (SortOption so : sortOptions)
                     {
                         if (so.isVisible())
@@ -581,7 +569,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         }
 
         parameters.remove("sort_by");
-        
+
         // Create a control to changing ascending / descending order
         sortList.addItem("order-head", "gear-head" + (first? " first":"")).addContent(T_order);
         org.dspace.app.xmlui.wing.element.List ordOptions = sortList.addList("order-selections");
@@ -622,7 +610,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         //}
 
     }
-
+    
     /**
      * Generate a url to the simple search url.
      */
@@ -692,7 +680,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         catch (Exception e) {
             return 20;
         }
-    }
+    }    
 
     /**
      * The URL query string of of the previous page.
@@ -878,6 +866,13 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                 String startsWith = params.year;
                 if ((params.month != null) && !"-1".equals(params.month) && !"".equals(params.month))
                 {
+                    // subtract 1 from the month, so the match works
+                    // appropriately
+                    if ("ASC".equals(params.scope.getOrder()))
+                    {
+                        params.month = Integer.toString((Integer.parseInt(params.month) - 1));
+                    }
+
                     // They've selected a month as well
                     if (params.month.length() == 1)
                     {
@@ -889,7 +884,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
                     if ("ASC".equals(params.scope.getOrder()))
                     {
-                        startsWith = startsWith + "-01";
+                        startsWith = startsWith + "-32";
                     }
                 }
 

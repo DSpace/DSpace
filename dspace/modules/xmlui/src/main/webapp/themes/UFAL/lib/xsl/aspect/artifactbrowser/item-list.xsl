@@ -216,7 +216,7 @@
 					<a>
 					<xsl:attribute name="href">
 						<xsl:copy-of select="$context-path"/>
-						<xsl:value-of select="concat('/discover?fq=branding_filter:',encoder:encode(solrClientUtils:escapeQueryChars(dim:field[@mdschema='local' and @element='branding'][1]/node()),'UTF-8'))"/>
+						<xsl:value-of select="concat('/discover?filtertype=branding&amp;filter_relational_operator=equals&amp;filter=',encoder:encode(dim:field[@mdschema='local' and @element='branding'][1]/node()))"/>
 					</xsl:attribute>
 					<xsl:value-of select="dim:field[@mdschema='local' and @element='branding'][1]/node()"/>
 					</a>
@@ -453,7 +453,7 @@
 							<i class="fa fa-search-plus fa-lg">&#160;</i>
 						</xsl:otherwise>
 					</xsl:choose>
-					<xsl:value-of select="$filtertype" />
+					<i18n:text>xmlui.ArtifactBrowser.SimpleSearch.filter.<xsl:value-of select="$filtertype"/></i18n:text>					
 					<xsl:choose>
 						<xsl:when test="$filteroperator='notavailable'">
 							&#160;							
@@ -488,7 +488,7 @@
     	
     </xsl:template>
     
-    <xsl:template match="dri:item[dri:field[@id='aspect.artifactbrowser.ConfigurableBrowse.field.submit']]">
+    <xsl:template match="dri:p[dri:field[@id='aspect.artifactbrowser.ConfigurableBrowse.field.submit']]">
         <div class="alert">
                 Using the jump menu or typing a value will move the pointer to the best matched point in the following list.<BR/>
                 e.g. If you are typing a year 2000 and there is no record with this year, the pointer will be moved to the next possible record after the year 2000.
@@ -497,4 +497,5 @@
     </xsl:template>    
             
 </xsl:stylesheet>
+
 

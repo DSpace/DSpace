@@ -473,7 +473,7 @@
 				<a>
 					<xsl:attribute name="href">
 						<xsl:copy-of select="$context-path"/>
-						<xsl:value-of select="concat('/discover?fq=branding_filter:',encoder:encode(solrClientUtils:escapeQueryChars(dim:field[@mdschema='local' and @element='branding'][1]/node()),'UTF-8'))"/>
+						<xsl:value-of select="concat('/discover?filtertype=branding&amp;filter_relational_operator=equals&amp;filter=',encoder:encode(dim:field[@mdschema='local' and @element='branding'][1]/node()))"/>
 					</xsl:attribute>
 					<xsl:value-of select="dim:field[@mdschema='local' and @element='branding'][1]/node()"/>
 				</a>
@@ -883,4 +883,5 @@
 	</div>	
 	</xsl:template>
 </xsl:stylesheet>
+
 

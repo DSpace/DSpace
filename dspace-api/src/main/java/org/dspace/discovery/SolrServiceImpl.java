@@ -1268,6 +1268,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                                         doc.addField(searchFilter.getIndexFieldName() + "_keyword", indexValue);
                                     }
                                 }
+                            }else
+                            if(searchFilter.getType().equals(DiscoveryConfigurationParameters.TYPE_RAW)){
+                            	doc.addField(searchFilter.getIndexFieldName() + "_filter", value.toLowerCase() + separator + value);
+                            	doc.addField(searchFilter.getIndexFieldName() + "_keyword", value);
                             }
                         }
                     }
@@ -2349,3 +2353,4 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 		}
 	}
 }
+

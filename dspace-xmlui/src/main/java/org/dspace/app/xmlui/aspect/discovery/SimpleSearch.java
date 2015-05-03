@@ -116,7 +116,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
 
         // Build the DRI Body
         Division search = body.addDivision("search", "primary");
-        search.setHead(T_head);
+        //search.setHead(T_head);
         String searchUrl = ConfigurationManager.getProperty("dspace.url") + "/JSON/discovery/search";
 
         search.addHidden("discovery-json-search-url").setValue(searchUrl);
