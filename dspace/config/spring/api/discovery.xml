@@ -623,7 +623,7 @@
             </list>
         </property>
         <property name="sortOrder" value="COUNT"/>
-        <property name="type" value="raw_values"/>
+        <!--property name="type" value="raw_values"/-->
     </bean>
 
     <!--Sort properties-->
