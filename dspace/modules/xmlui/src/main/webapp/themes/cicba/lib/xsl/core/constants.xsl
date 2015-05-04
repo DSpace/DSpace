@@ -42,4 +42,12 @@
 			select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]" />
 		<xsl:text>/</xsl:text>
 	</xsl:variable>
+	
+	
+	<!-- Esta variable sirve para obtener desde cualquier parte del sistema el metadato que contiene los parametros que van por URL  -->
+	<xsl:variable name="query-string">
+		<xsl:value-of
+			select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='queryString']/text()"	>		
+		</xsl:value-of>
+	</xsl:variable>
 </xsl:stylesheet>

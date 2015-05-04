@@ -24,10 +24,32 @@
 <!-- 		 Shhhh -->
 <!-- 	</xsl:template> -->
 	
+	
+	<!-- Esta template se usa para parsear la fecha que entra como parametro -->
+	<xsl:template name="cambiarFecha" match="dim:field/text()">
+		<xsl:param name="isDate"></xsl:param>
+		<xsl:if test="$isDate">
+		<!--  El choose se usa para saber en que idioma mostrar la fecha -->
+			<xsl:choose>
+				<xsl:when test="$query-string='locale-attribute=en'">
+				<!--  ingles -->
+					<xsl:value-of select="xmlui:formatearFecha(.,'en')" />			
+				</xsl:when>
+				<xsl:otherwise>
+				<!--  español -->
+					<xsl:value-of select="xmlui:formatearFecha(.,'es')" />
+				</xsl:otherwise>				
+			</xsl:choose>
+		</xsl:if>
+		
+	</xsl:template>	
+
+	
 	<xsl:template name="render-metadata-values">
 		<xsl:param name="separator">;</xsl:param>
 		<xsl:param name="nodes"></xsl:param>
 		<xsl:param name="anchor"></xsl:param>
+		<xsl:param name="isDate"></xsl:param>
 
 		<xsl:for-each select="$nodes">
 			<span>
@@ -40,6 +62,11 @@
 							<xsl:with-param name="a.href" select="@authority"/>
 							<xsl:with-param name="a.value" select="text()"/>
 						</xsl:call-template>
+					</xsl:when>
+					<xsl:when test="$isDate">
+							<xsl:call-template name="cambiarFecha" >
+									<xsl:with-param name="isDate" select="$isDate"></xsl:with-param>									
+							</xsl:call-template>
 					</xsl:when>
 					<xsl:otherwise>
 						<xsl:copy-of select="text()"/>
@@ -88,6 +115,7 @@
 		<xsl:param name="show_label">true</xsl:param>
 		<xsl:param name="container">div</xsl:param>
 		<xsl:param name="null_message"></xsl:param>
+		<xsl:param name="isDate"></xsl:param>
 		
 		<xsl:variable name="mp" select="str:split($field,'.')" />
 		<xsl:variable name="schema" select="$mp[1]"/>
@@ -116,6 +144,7 @@
 							<xsl:call-template name="render-metadata-values">
 								<xsl:with-param name="separator" select="$separator"/>
 								<xsl:with-param name="nodes" select="$nodes"/>
+								<xsl:with-param name="isDate" select="$isDate"/>
 								<xsl:with-param name="anchor" select="$is_linked_authority"/>
 							</xsl:call-template>
 						</xsl:when>
@@ -444,12 +473,15 @@
 							<xsl:with-param name="container" select="'li'" />
 						</xsl:call-template>
 						<xsl:call-template name="render-metadata">
-							<xsl:with-param name="field" select="'dc.date.available'" />
+							<xsl:with-param name="field" select="'dc.date.available'"/>							 
 							<xsl:with-param name="container" select="'li'" />
+							<!-- Esta parametro sirve para que el template declarado arriba sepa que esta campo es una fecha -->
+							<xsl:with-param name="isDate">True</xsl:with-param>
 						</xsl:call-template>
 						<xsl:call-template name="render-metadata">
 							<xsl:with-param name="field" select="'dc.date.accessioned'" />
 							<xsl:with-param name="container" select="'li'" />
+							<xsl:with-param name="isDate">True</xsl:with-param>
 						</xsl:call-template>
 						<xsl:call-template name="render-metadata">
 							<xsl:with-param name="field" select="'dcterms.identifier.other'" />

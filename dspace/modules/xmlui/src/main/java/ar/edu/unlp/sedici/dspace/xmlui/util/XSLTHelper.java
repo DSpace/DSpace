@@ -1,6 +1,11 @@
 package ar.edu.unlp.sedici.dspace.xmlui.util;
 
+import java.util.Locale;
+
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 public class XSLTHelper {
 	
@@ -47,8 +52,34 @@ public class XSLTHelper {
 		return url;
 	}
 	
+
 	public static String getFileExtension(String filename) {
 		return filename.substring(filename.lastIndexOf(".") + 1).toUpperCase();
+	}
+		
+
+	public static String formatearFecha(String fecha,String idioma){
+		String fechaParseada=fecha.split("T")[0];
+		DateTime dt = new DateTime();		
+		DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy-MM-dd");
+		String mes=fmt.parseDateTime(fechaParseada).monthOfYear().getAsText();
+		String fechaFinal=fechaParseada.split("-")[2]+"-"+mes+"-"+fechaParseada.split("-")[0];
+		DateTimeFormatter fmt2 = DateTimeFormat.forPattern("dd-MMMM-yyyy");
+		String resul;
+		switch (idioma){
+		case "en":
+				resul= fmt2.parseDateTime(fechaFinal).toString("dd-MMMM-yyyy",Locale.US);
+				resul=resul.replace("-", " of ");
+				break;
+		
+		default:
+			resul= fmt2.parseDateTime(fechaFinal).toString("dd-MMMM-yyyy",Locale.getDefault());
+			resul=resul.replace("-", " de ");
+			break;
+		}
+		return resul;
+
+
 	}
 }
 
