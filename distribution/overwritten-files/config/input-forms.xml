@@ -1169,6 +1169,10 @@
 				<displayed-value>Artículo</displayed-value>
 				<stored-value>Articulo</stored-value>
 			</pair>
+			<pair>
+				<displayed-value>Resumen</displayed-value>
+				<stored-value>Resumen</stored-value>
+			</pair>
 		</value-pairs>
 		
 		<value-pairs value-pairs-name="common_subtypes_tesis" dc-term="type">
