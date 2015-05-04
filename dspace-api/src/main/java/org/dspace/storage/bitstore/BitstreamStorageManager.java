@@ -72,8 +72,7 @@ public class BitstreamStorageManager
 	
 	/** default asset store implementation */
 	private static final String DEFAULT_STORE_PREFIX = "ds:";
-	private static final String DEFAULT_STORE_IMPL =
-		                 "org.dspace.storage.bitstore.impl.DSAssetStore";
+	private static final String DEFAULT_STORE_IMPL = "org.dspace.storage.bitstore.impl.DSBitStore";
 
     /* Read in the asset stores from the config. */
     static
@@ -90,6 +89,7 @@ public class BitstreamStorageManager
 		}
 		else
 		{
+
 			initStore(DEFAULT_STORE_PREFIX + storeDir, list);
 			// read any further ones
 			for (int i = 1;; i++)
@@ -108,12 +108,13 @@ public class BitstreamStorageManager
 		for (int j = 0; j < 100; j++)
 		{
 			String assetCfg = ConfigurationManager.getProperty("assetstore." + j);
+            log.info("Looking for config for assetstore." + j);
 			if (assetCfg == null)
 			{
 				// no more stores configured - assumes sequential assignment
 				break;
 			}
-			if (list.get(j) == null)
+			if (!list.contains(j))
 			{
 				initStore(assetCfg, list);
 			}
@@ -127,6 +128,7 @@ public class BitstreamStorageManager
     
     private static void initStore(String storeConfig, List list)
     {
+        log.info("Init BitStore:" + storeConfig);
 		// create and initialize an asset store
     	int split = storeConfig.indexOf(":");
     	if (split != -1)
@@ -139,6 +141,8 @@ public class BitstreamStorageManager
     			// use default implementation class if none explicitly defined
     			className = DEFAULT_STORE_IMPL;
     		}
+
+            log.info("BitStore name: " + className);
     	    try
 		    {
     		    BitStore store = (BitStore)Class.forName(className).newInstance();
@@ -147,7 +151,7 @@ public class BitstreamStorageManager
 		    }
     	    catch (Exception e)
 		    {
-    	    	log.error("Cannot instantiate store class: " + className );
+    	    	log.error("Cannot instantiate store class: " + className + ", exception: " + e.getMessage(), e);
 		    }
     	}
     }
@@ -164,7 +168,7 @@ public class BitstreamStorageManager
             {
                 continue;
             }
-            
+
             switch (column) {
                 //int's
                 case Bitstream.BITSTREAM_ID:
