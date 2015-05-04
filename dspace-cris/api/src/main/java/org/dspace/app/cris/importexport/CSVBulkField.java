@@ -30,7 +30,11 @@ public class CSVBulkField implements IBulkChangeField {
 		while (tagmatch.find()) {
 			return tagmatch.group(match);
 		}
-		return "";
+		return value;
+	}
+
+	public Cell getElement() {
+		return element;
 	}
 
 }

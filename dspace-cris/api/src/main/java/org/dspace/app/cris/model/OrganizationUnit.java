@@ -30,6 +30,7 @@ import org.dspace.app.cris.model.jdyna.OUNestedProperty;
 import org.dspace.app.cris.model.jdyna.OUPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.OUProperty;
 import org.dspace.app.cris.model.jdyna.OUTypeNestedObject;
+import org.dspace.app.cris.model.jdyna.ProjectAdditionalFieldStorage;
 
 @Entity
 @Table(name = "cris_orgunit", uniqueConstraints = @UniqueConstraint(columnNames={"sourceID","sourceRef"}))
@@ -102,11 +103,12 @@ public class OrganizationUnit extends
 
     public OrganizationUnit clone() throws CloneNotSupportedException
     {
-    	OrganizationUnit clone = (OrganizationUnit) super.clone();
+        OrganizationUnit clone = (OrganizationUnit) super.clone();
         OUAdditionalFieldStorage additionalTemp = new OUAdditionalFieldStorage();
-        clone.setDynamicField(additionalTemp);
+        additionalTemp.setOrganizationUnit(clone);
         additionalTemp.duplicaAnagrafica(this
                     .getDynamicField());
+        clone.setDynamicField(additionalTemp);
         return clone;
     }
 

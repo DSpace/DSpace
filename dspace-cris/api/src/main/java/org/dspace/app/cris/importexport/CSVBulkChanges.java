@@ -8,6 +8,7 @@ import jxl.Sheet;
 import jxl.Workbook;
 
 import org.apache.commons.lang3.StringUtils;
+import org.mortbay.log.Log;
 
 public class CSVBulkChanges implements IBulkChanges {
 	static final String HEADER_SOURCEID = "SOURCEID";
@@ -30,11 +31,11 @@ public class CSVBulkChanges implements IBulkChanges {
 
 	public CSVBulkChanges(Workbook workbook) {
         Cell[] row;
-        Sheet mainObjects = workbook.getSheet("main_entities");
-        Sheet nestedObjects = workbook.getSheet("nested_entities");
+        this.mainObjects = workbook.getSheet("main_entities");
+        this.nestedObjects = workbook.getSheet("nested_entities");
         int column = 0;
         row = mainObjects.getRow(0);
-        while (true)
+        while (column<row.length)
         {
         	String cellContent = StringUtils.trim(row[column].getContents());
         	if (StringUtils.isNotBlank(cellContent)) {
@@ -43,10 +44,7 @@ public class CSVBulkChanges implements IBulkChanges {
         			throw new IllegalArgumentException("Invalid excel file[main_entities sheet] - unexpected header column " + column+ " -> " + cellContent + " expected "+HEADER_COLUMNS[column]);		
         		}
         		column++;
-        	}
-        	else {
-        		break;
-        	}
+        	}        	
         }
         
         if (mainHeaders.size() < HEADER_COLUMNS.length) {
@@ -55,8 +53,8 @@ public class CSVBulkChanges implements IBulkChanges {
         
         if (nestedObjects != null) {
 	        column = 0;
-	        row = mainObjects.getRow(0);
-	        while (true)
+	        row = nestedObjects.getRow(0);
+	        while (column<row.length)
 	        {
 	        	String cellContent = StringUtils.trim(row[column].getContents());
 	        	if (StringUtils.isNotBlank(cellContent)) {
@@ -65,10 +63,7 @@ public class CSVBulkChanges implements IBulkChanges {
 	        			throw new IllegalArgumentException("Invalid excel file[nested_entities sheet] - unexpected header column " + column+ " -> " + cellContent + " expected "+HEADER_COLUMNS[column]);		
 	        		}
 	        		column++;
-	        	}
-	        	else {
-	        		break;
-	        	}
+	        	}	        	
 	        }
 	        
 	        if (nestedHeaders.size() < HEADER_COLUMNS.length) {
@@ -89,11 +84,13 @@ public class CSVBulkChanges implements IBulkChanges {
 
 	@Override
 	public IBulkChange getChanges(int i) {
-		if (i < mainObjects.getRows() -1) {
+		if (i < mainObjects.getRows()) {
+			Log.info("Retrieve in entity sheet row #"+i);
 			return new CSVBulkChange(mainObjects.getRow(i), mainHeaders);
 		}
 		else {
-			return new CSVBulkChange(nestedObjects.getRow(i - (mainObjects.getRows() -1)),nestedHeaders);	
+			Log.info("Retrieve in nested sheet row #"+ (i+1));
+			return new CSVBulkChange(nestedObjects.getRow((i - (mainObjects.getRows() -1))+1),nestedHeaders);	
 		}
 	}
 

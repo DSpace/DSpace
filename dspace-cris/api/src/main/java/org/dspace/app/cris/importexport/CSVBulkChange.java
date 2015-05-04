@@ -56,9 +56,12 @@ public class CSVBulkChange implements IBulkChange {
 	}
 
 	@Override
-	public IBulkChangeFieldLink getFieldLinkChanges(String shortName) {
-		
-		return null;
+	public IBulkChangeFieldLink getFieldLinkChanges(String field) {
+		int index = -1;
+		if(this.header.contains(field)) {
+			index = this.header.indexOf(field);
+		}
+		return new CSVBulkFieldLink(row[index]); 
 	}
 
 }

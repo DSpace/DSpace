@@ -7,10 +7,7 @@
  */
 package org.dspace.app.cris.util;
 
-import it.cilea.osd.common.util.Utils;
-import it.cilea.osd.common.utils.XMLUtils;
 import it.cilea.osd.jdyna.dto.AnagraficaObjectDTO;
-import it.cilea.osd.jdyna.dto.AnagraficaObjectWithTypeDTO;
 import it.cilea.osd.jdyna.dto.ValoreDTO;
 import it.cilea.osd.jdyna.model.ADecoratorPropertiesDefinition;
 import it.cilea.osd.jdyna.model.ANestedPropertiesDefinition;
@@ -21,7 +18,6 @@ import it.cilea.osd.jdyna.model.IContainable;
 import it.cilea.osd.jdyna.model.PropertiesDefinition;
 import it.cilea.osd.jdyna.model.Property;
 import it.cilea.osd.jdyna.util.AnagraficaUtils;
-import it.cilea.osd.jdyna.value.EmbeddedLinkValue;
 import it.cilea.osd.jdyna.widget.WidgetDate;
 import it.cilea.osd.jdyna.widget.WidgetFile;
 import it.cilea.osd.jdyna.widget.WidgetLink;
@@ -29,35 +25,21 @@ import it.cilea.osd.jdyna.widget.WidgetTesto;
 
 import java.beans.PropertyEditor;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
-import javax.xml.xpath.XPathExpressionException;
 
-import jxl.Cell;
 import jxl.Workbook;
 import jxl.write.Label;
 import jxl.write.WritableSheet;
@@ -73,41 +55,20 @@ import org.dspace.app.cris.importexport.IBulkChangeFieldLinkValue;
 import org.dspace.app.cris.importexport.IBulkChangeFieldValue;
 import org.dspace.app.cris.importexport.IBulkChanges;
 import org.dspace.app.cris.importexport.IBulkChangesService;
-import org.dspace.app.cris.importexport.XmlBulkChanges;
 import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.IExportableDynamicObject;
-import org.dspace.app.cris.model.OrganizationUnit;
-import org.dspace.app.cris.model.Project;
-import org.dspace.app.cris.model.ResearchObject;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.RestrictedField;
 import org.dspace.app.cris.model.VisibilityConstants;
-import org.dspace.app.cris.model.export.ExportConstants;
 import org.dspace.app.cris.model.jdyna.ACrisNestedObject;
 import org.dspace.app.cris.model.jdyna.DecoratorRPPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.DecoratorRestrictedField;
-import org.dspace.app.cris.model.jdyna.ProjectAdditionalFieldStorage;
-import org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition;
-import org.dspace.app.cris.model.jdyna.RPAdditionalFieldStorage;
-import org.dspace.app.cris.model.jdyna.RPNestedObject;
-import org.dspace.app.cris.model.jdyna.RPNestedPropertiesDefinition;
-import org.dspace.app.cris.model.jdyna.RPNestedProperty;
-import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
 import org.dspace.app.cris.service.ApplicationService;
-import org.dspace.app.cris.service.ExtendedTabService;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DCPersonName;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
 import org.dspace.utils.DSpace;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 /**
  * Static class that provides export functionalities from the RPs database to
@@ -242,8 +203,8 @@ public class ImportExportUtils {
 		String sourceId = change.getSourceID();
 
 		ACO crisObject = null;
-		
-		//check if entity exist
+
+		// check if entity exist
 		if (StringUtils.isNotBlank(crisID)) {
 			crisObject = applicationService.getEntityByCrisId(crisID, objectTypeClass);
 		} else if (crisObject == null && StringUtils.isNotBlank(uuid)) {
@@ -252,20 +213,27 @@ public class ImportExportUtils {
 			crisObject = applicationService.getEntityBySourceId(sourceRef, sourceId, objectTypeClass);
 		}
 
-		//if action=create then we build the object, notify if already exist 
+		// if action=create then we build the object, notify if already exist
 		if (StringUtils.equalsIgnoreCase(IBulkChange.ACTION_CREATE, action)) {
 			if (crisObject != null) {
 				log.info("the object is already on database... found a CREATE action on entity, maybe should be skip it?");
 			} else {
 				crisObject = objectTypeClass.newInstance();
 			}
-		}
+		} else if (!StringUtils.equalsIgnoreCase(IBulkChange.ACTION_DELETE, action)) {
+			// we create the new entity also in case of the main field are empty
+			// (except the delete and create signal)
 
-		//we create the new entity also in case of the main field are empty (except the delete and create signal)
-		if (StringUtils.isBlank(crisID) && StringUtils.isBlank(uuid) && StringUtils.isBlank(sourceRef)
-				&& StringUtils.isBlank(sourceId)) {
-			if (!StringUtils.equalsIgnoreCase(IBulkChange.ACTION_DELETE, action) && !StringUtils.equalsIgnoreCase(IBulkChange.ACTION_CREATE, action)) {
+			if (StringUtils.isBlank(crisID) && StringUtils.isBlank(uuid) && StringUtils.isBlank(sourceRef)
+					&& StringUtils.isBlank(sourceId)) {
 				crisObject = objectTypeClass.newInstance();
+			} else {
+				if (crisObject != null) {
+					log.info("found a "+ action +" action on entity");
+				} else {
+					log.info("the object is not found on database... found a "+ action +" action on entity, maybe should be skip it?");
+					crisObject = objectTypeClass.newInstance();
+				}
 			}
 		}
 
@@ -349,7 +317,7 @@ public class ImportExportUtils {
 			TP rpPd = applicationService.findPropertiesDefinitionByShortName(propDefClazz, c.getShortName());
 			if (rpPd != null) {
 				realTPS.add((TP) ((ADecoratorPropertiesDefinition<TP>) applicationService.findContainableByDecorable(
-						propDefClazz.newInstance().getDecoratorClass(), c.getId())).getReal());
+						propDefClazz.newInstance().getDecoratorClass(), c.getShortName())).getReal());
 			} else {
 				structuralField.add(c);
 			}
@@ -379,7 +347,7 @@ public class ImportExportUtils {
 		int rows_imported = 0;
 		log.info("Start import " + new Date());
 		// foreach researcher element in xml
-		for (int i = 0; i < bulkChanges.size(); i++) {
+		for (int i = 1; i < bulkChanges.size(); i++) {
 			log.info("Number " + i + " of " + bulkChanges.size());
 			ACO crisObject = null;
 			try {
@@ -405,10 +373,12 @@ public class ImportExportUtils {
 						+ " uuid: " + uuid);
 
 				crisObject = getCrisObject(applicationService, crisObjectClazz, bulkChange);
-				if (bulkChange.getAction().equals("DELETE")) {
+				if (bulkChange.getAction().equalsIgnoreCase(IBulkChange.ACTION_DELETE)) {
 					applicationService.delete(crisObjectClazz, crisObject);
 				} else {
-
+					if (bulkChange.getAction().equalsIgnoreCase(IBulkChange.ACTION_UPDATE)) {
+						update = true;
+					}
 					clone = (ACrisObject<P, TP, NP, NTP, ACNO, ATNO>) crisObject.clone();
 
 					AnagraficaUtils.fillDTO(dto, crisObject, realFillTPS);
@@ -584,7 +554,7 @@ public class ImportExportUtils {
 
 		log.info("Import researchers - end import additional files");
 
-		log.info("Statistics: row ingested " + rows_imported + " on total of " + (bulkChanges.size()) + " ("
+		log.info("Statistics: row ingested " + rows_imported + " on total of " + (bulkChanges.size() - 1) + " ("
 				+ rows_discarded + " row discarded)");
 	}
 
@@ -740,8 +710,8 @@ public class ImportExportUtils {
 					vis = checkOldVisibility(applicationService, rpPD, old, nodetext, vis);
 				}
 
-				if (vis != null && !vis.isEmpty()) {
-					valueDTO.setVisibility((Integer.parseInt(vis) == 1 ? true : false));
+				if (StringUtils.isNotBlank(vis)) {
+					valueDTO.setVisibility(Boolean.parseBoolean(vis));
 				}
 
 				// ValoreDTO oldValue = checkOldValue(applicationService, rpPD,
@@ -783,9 +753,10 @@ public class ImportExportUtils {
 				PropertyEditor pe = rpPD.getRendering().getPropertyEditor(applicationService);
 				pe.setAsText(nodetext);
 				ValoreDTO valueDTO = new ValoreDTO(pe.getValue());
-				if (vis != null && !vis.isEmpty()) {
-					valueDTO.setVisibility((Integer.parseInt(vis) == 1 ? true : false));
+				if (StringUtils.isNotBlank(vis)) {
+					valueDTO.setVisibility(Boolean.parseBoolean(vis));
 				}
+
 				// ValoreDTO oldValue = checkOldValue(applicationService, rpPD,
 				// old, nodetext, valueDTO.getVisibility());
 				// if(oldValue==null) {
@@ -820,9 +791,10 @@ public class ImportExportUtils {
 				PropertyEditor pe = rpPD.getRendering().getPropertyEditor(applicationService);
 				pe.setAsText(nodetext);
 				ValoreDTO valueDTO = new ValoreDTO(pe.getValue());
-				if (vis != null && !vis.isEmpty()) {
-					valueDTO.setVisibility((Integer.parseInt(vis) == 1 ? true : false));
+				if (StringUtils.isNotBlank(vis)) {
+					valueDTO.setVisibility(Boolean.parseBoolean(vis));
 				}
+
 				// ValoreDTO oldValue = checkOldValue(applicationService, rpPD,
 				// old, nodetext, valueDTO.getVisibility());
 				// if(oldValue==null) {

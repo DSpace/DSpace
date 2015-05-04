@@ -30,6 +30,7 @@ import org.dspace.app.cris.model.jdyna.ProjectNestedProperty;
 import org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.ProjectProperty;
 import org.dspace.app.cris.model.jdyna.ProjectTypeNestedObject;
+import org.dspace.app.cris.model.jdyna.RPAdditionalFieldStorage;
 
 @Entity
 @Table(name = "cris_project", uniqueConstraints = @UniqueConstraint(columnNames={"sourceID","sourceRef"}))
@@ -96,10 +97,11 @@ public class Project extends ACrisObject<ProjectProperty, ProjectPropertiesDefin
     public Project clone() throws CloneNotSupportedException
     {
     	Project clone = (Project) super.clone();
-        ProjectAdditionalFieldStorage additionalTemp = new ProjectAdditionalFieldStorage();
-        clone.setDynamicField(additionalTemp);
+    	ProjectAdditionalFieldStorage additionalTemp = new ProjectAdditionalFieldStorage();
+        additionalTemp.setProject(clone);
         additionalTemp.duplicaAnagrafica(this
                     .getDynamicField());
+        clone.setDynamicField(additionalTemp);
         return clone;
     }
 

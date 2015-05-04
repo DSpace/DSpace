@@ -396,9 +396,10 @@ public class ResearcherPage extends
     {
         ResearcherPage clone = (ResearcherPage) super.clone();
         RPAdditionalFieldStorage additionalTemp = new RPAdditionalFieldStorage();
-        clone.setDynamicField(additionalTemp);
+        additionalTemp.setResearcherPage(clone);
         additionalTemp.duplicaAnagrafica(this
                     .getDynamicField());
+        clone.setDynamicField(additionalTemp);
         return clone;
     }
 

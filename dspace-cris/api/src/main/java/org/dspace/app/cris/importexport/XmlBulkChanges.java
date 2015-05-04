@@ -5,6 +5,7 @@ import it.cilea.osd.common.utils.XMLUtils;
 import java.util.List;
 
 import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
+import org.mortbay.log.Log;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
