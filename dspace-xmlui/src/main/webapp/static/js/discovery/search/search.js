@@ -17,7 +17,7 @@ var defaultFacets = new Array();
         });
 
         //Retrieve our filterSelect, which contains all the types to be sorted on
-        var filterSelect = $("select[id='aspect_discovery_SimpleSearch_field_filtertype']");
+        var filterSelect = $("select[id^='aspect_discovery_SimpleSearch_field_filtertype']");
         //Get our filters
         /*
         var filterOptions = filterSelect.find('option');
@@ -32,7 +32,7 @@ var defaultFacets = new Array();
         
         var widget = Manager.addWidget(new AjaxSolr.AutocompleteWidget({
             id: 'text',
-            target: 'li#aspect_discovery_SimpleSearch_item_search-filter-list',
+            target: '#aspect_discovery_SimpleSearch_table_discovery-filters',
             field: 'allText',
             fields: defaultFacets
         }));
@@ -74,7 +74,7 @@ var defaultFacets = new Array();
 
         filterSelect.change(function() {
 //            TODO: this is dirty, but with lack of time the best I could do
-            var oldInput = $('input#aspect_discovery_SimpleSearch_field_filter');
+            var oldInput = $('input[id^="aspect_discovery_SimpleSearch_field_filter"]');
             var newInput = oldInput.clone(false);
             
 //            newInput.val(oldInput.val());
