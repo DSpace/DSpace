@@ -42,10 +42,17 @@ solr.server =
 # Default language for metadata values
 default.language = en_US
 
+# primary assetstore
+assetstore.dir = ${dspace.install.dir}/assetstore
+
 # additional asset stores
 assetstore.dir.1 = 
 assetstore.dir.2 = 
 assetstore.dir.3 =
+
+# Specify the number of the store to use for new bitstreams with this property
+# The default is 0 (zero) which corresponds to the 'assetstore.dir'
+assetstore.incoming = 0
 
 #### Stackable Authentication Methods #####
 security.plugins.stack = \
