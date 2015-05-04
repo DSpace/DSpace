@@ -1,11 +1,11 @@
 #!/bin/bash
 #Put stop commands and cleanup here
-### Postgres ###
-echo "Stopping postgres"
-/etc/init.d/postgresql-9.4 stop
 ### Tomcat ###
 echo "Stopping tomcat"
 /etc/init.d/tomcat8 stop
+### Postgres ###
+echo "Stopping postgres"
+/etc/init.d/postgresql-9.4 stop
 ### Handle server ###
 HANDLE_SERVER=/etc/init.d/handle-server
 if [[ -r $HANDLE_SERVER ]]; then
