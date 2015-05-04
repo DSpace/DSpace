@@ -73,7 +73,7 @@ public class ScriptCrisBulkChanges {
 		options.addOption("f", "file", true, "File to import");
 		options.addOption("t", "format", true, "The format input (XMLBulkChangesService, CSVBulkChangesService)");
 		options.addOption("a", "active", false, "Set newly created objects as active");
-		options.addOption("e", "entity", false, "The entity type to import (rp, ou, pj, do)");
+		options.addOption("e", "entity", true, "The entity type to import (rp, ou, pj, do)");
 
 		// active or inactive for newly created epersons. Default is inactive.
 		boolean status = false;
@@ -130,8 +130,11 @@ public class ScriptCrisBulkChanges {
 			System.exit(1);
 		}
 
-		String path = ConfigurationManager.getProperty(CrisConstants.CFG_MODULE, "file.import.path");
+		String path = ConfigurationManager.getProperty(CrisConstants.CFG_MODULE, "file.import.path");		
 		File dir = new File(path);
+		if(!dir.exists()) {
+			dir.mkdir();
+		}
 		try {
 			ImportExportUtils.process(format, new FileInputStream(filePath), dir, applicationService, dspaceContext,
 					status, tmpCrisObject.getClassPropertiesDefinition(), tmpCrisObject.getClass(),
