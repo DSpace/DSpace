@@ -51,7 +51,7 @@ import org.dspace.storage.rdbms.TableRow;
  * It would be worth re-considering a Listener pattern if another package needs to 
  * be notified of BitstreamStorageManager actions.</p> 
  *
- * @author Peter Breton, Robert Tansley, David Little, Nathan Sarr, Richard Rodgers
+ * @author Peter Breton, Robert Tansley, David Little, Nathan Sarr, Richard Rodgers, Peter Dietz
  * @version $Revision: 1.17 $
  */
 public class BitstreamStorageManager
