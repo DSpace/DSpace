@@ -110,6 +110,27 @@ public class HibernateUtil {
 		}
 	}
 
+	public static long getGlobalConnectionsCount() {
+		if ( getSessionFactory().getStatistics().isStatisticsEnabled() ) {
+			return getSessionFactory().getStatistics().getConnectCount();
+		}
+		return -1;
+	}
+
+	public static long getSessionOpenCount() {
+		if ( getSessionFactory().getStatistics().isStatisticsEnabled() ) {
+			return getSessionFactory().getStatistics().getSessionOpenCount();
+		}
+		return -1;
+	}
+
+	public static long getSessionCloseCount() {
+		if ( getSessionFactory().getStatistics().isStatisticsEnabled() ) {
+			return getSessionFactory().getStatistics().getSessionCloseCount();
+		}
+		return -1;
+	}
+
 	// public
 	//
 	//

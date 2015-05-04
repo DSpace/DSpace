@@ -7,7 +7,7 @@ package cz.cuni.mff.ufal.lindat.utilities.interfaces;
  * @author Karel Vandas
  * 
  */
-public interface IFunctionalities extends IShibbolethAuthentication, ILicenses, IPiwikReport, java.io.Closeable {
+public interface IFunctionalities extends IShibbolethAuthentication, IDatabase, ILicenses, IPiwikReport {
 
 	/**
 	 * Function returns the information whether the functionality demanded by
@@ -43,13 +43,5 @@ public interface IFunctionalities extends IShibbolethAuthentication, ILicenses, 
 	 * @param message
 	 */
 	String getErrorMessage();
-	
-	void openSession();
 
-	void closeSession();
-	
-	/**
-	 * Allows IDE to track unclosed resources, implement as this.closeSession();
-	 */
-	public void close();
 }

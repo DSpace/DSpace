@@ -81,13 +81,13 @@ public class ControlPanelJavaTab extends AbstractControlPanelTab {
         addCocoonInformation(div);
 
         // ufal
-        List ufaladd = div.addList("UFAL_additional");
-        ufaladd.setHead("UFAL additional");
+        List ufaladd = div.addList("LINDAT_Utilities");
+        ufaladd.setHead("LINDAT Utilities");
                 
     	ufaladd.addLabel("Server uptime");
         String uptime = 
         		cz.cuni.mff.ufal.Info.get_proc_uptime();
-    	ufaladd.addItem( uptime );
+    	ufaladd.addItem(uptime);
 
     	ufaladd.addLabel("JVM uptime");
         String jvm_uptime = 
@@ -103,8 +103,21 @@ public class ControlPanelJavaTab extends AbstractControlPanelTab {
     	
     	ufaladd.addLabel("Build time");
 		ufaladd.addItem(
-				cz.cuni.mff.ufal.Info.get_ufal_build_time() );		
-	}
+				cz.cuni.mff.ufal.Info.get_ufal_build_time() );
+
+        ufaladd.addLabel("Hibernate #connections (global)");
+        ufaladd.addItem(
+            cz.cuni.mff.ufal.Info.get_global_connections_count() );
+
+        ufaladd.addLabel("Hibernate #sessions opened (so far)");
+        ufaladd.addItem(
+            cz.cuni.mff.ufal.Info.get_session_open_count() );
+
+        ufaladd.addLabel("Hibernate #sessions closed (so far)");
+        ufaladd.addItem(
+            cz.cuni.mff.ufal.Info.get_session_close_count() );
+
+    }
 	
     /**
      * Add specific Cocoon information, especially related to the Cocoon Cache.

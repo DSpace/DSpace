@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.Scanner;
 
 import org.dspace.core.ConfigurationManager;
+import org.dspace.utils.DSpace;
 
 public class Info {
 	
@@ -66,6 +67,18 @@ public class Info {
     		return buildTime;
     	}
 		return "unknown";
+	}
+
+	final static public String get_global_connections_count() {
+		return String.valueOf(DSpaceApi.getFunctionalityManager().getGlobalConnectionsCount());
+	}
+
+	final static public String get_session_open_count() {
+		return String.valueOf(DSpaceApi.getFunctionalityManager().getSessionOpenCount());
+	}
+
+	final static public String get_session_close_count() {
+		return String.valueOf(DSpaceApi.getFunctionalityManager().getSessionCloseCount());
 	}
 
 }
