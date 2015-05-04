@@ -7,22 +7,26 @@
  */
 package org.dspace.storage.bitstore.impl;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.*;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import org.dspace.content.Bitstream;
-import org.jets3t.service.S3Service;
-import org.jets3t.service.S3ServiceException;
-import org.jets3t.service.model.S3Bucket;
-import org.jets3t.service.model.S3Object;
-import org.jets3t.service.security.AWSCredentials;
-import org.jets3t.service.impl.rest.httpclient.RestS3Service;
 
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Utils;
@@ -46,10 +50,10 @@ public class S3BitStore implements BitStore
     private static final String CSA = "MD5";
     
     /** container for all the assets */
-	private S3Bucket bucket = null;
+	private String bucketName = null;
 	
 	/** S3 service */
-	private S3Service service = null;
+	private AmazonS3 s3Service = null;
 		
 	public S3BitStore()
 	{
@@ -65,7 +69,12 @@ public class S3BitStore implements BitStore
 	public void init(String config) throws IOException
 	{
 		// use DSpace host name as bucket name - probably should be more unique
-		String bucketName = ConfigurationManager.getProperty("dspace.host");
+        // Also, bucketname must be lowercase
+		bucketName = "dspace-asset-" + ConfigurationManager.getProperty("dspace.hostname");
+        if(StringUtils.isEmpty(bucketName)) {
+            log.warn("BucketName is not configured, setting default.");
+            bucketName = "dspace";
+        }
 		
 		//  params string contains just the filename of the AWT account data
 		Properties props = new Properties();
@@ -77,18 +86,33 @@ public class S3BitStore implements BitStore
 		{
 			throw new IOException("Exception loading properties: " + e.getMessage());
 		}
-        String awsAccessKey = props.getProperty("access.key");
-        String awsSecretKey = props.getProperty("secret.key");
-        AWSCredentials creds = new AWSCredentials(awsAccessKey, awsSecretKey);
-        try
-		{
-            service = new RestS3Service(creds);
-            // verify that we have a bucket to use
-            bucket = service.createBucket(bucketName);
+        String awsAccessKey = props.getProperty("aws_access_key_id");
+        String awsSecretKey = props.getProperty("aws_secret_access_key");
+        if(StringUtils.isBlank(awsAccessKey) || StringUtils.isBlank(awsSecretKey)) {
+            log.warn("Empty S3 access or secret");
+        }
+
+        AWSCredentials awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretKey);
+
+        s3Service = new AmazonS3Client(awsCredentials);
+
+        //Todo configurable region
+        Region usEast1 = Region.getRegion(Regions.US_EAST_1);
+        s3Service.setRegion(usEast1);
+
+        try {
+
+            if(! s3Service.doesBucketExist(bucketName)) {
+                s3Service.createBucket(bucketName);
+                log.info("Creating S3 Bucket: " + bucketName);
+            } else {
+                log.info("S3 Bucket already in existence, " + bucketName);
+            }
+
 		}
-        catch (S3ServiceException s3se)
+        catch (Exception e)
 		{
-        	throw new IOException("S3ServiceException: " + s3se.getS3ErrorMessage());
+        	throw new IOException("Amazon S3 Exception: " + e.getMessage());
 		}
 	}
 	
@@ -115,15 +139,16 @@ public class S3BitStore implements BitStore
      */
 	public InputStream get(String id) throws IOException
 	{
-		S3Object object = null;
+        S3Object object = null;
+
 		try
 		{
-			object = service.getObject(bucket, id);
-			return (object != null) ? object.getDataInputStream() : null;
+            object = s3Service.getObject(new GetObjectRequest(bucketName, id));
+			return (object != null) ? object.getObjectContent() : null;
 		}
-        catch (org.jets3t.service.ServiceException s3se)
+        catch (Exception e)
 		{
-        	throw new IOException("S3ServiceException: " + s3se.getMessage());
+        	throw new IOException("S3 get Exception: " + e.getMessage());
 		}
 	}
 	
@@ -144,24 +169,31 @@ public class S3BitStore implements BitStore
      */
 	public Map put(InputStream in, String id) throws IOException
 	{
-		S3Object object = new S3Object(id);
-		object.setDataInputStream(in);
-		try
-		{
-			object = service.putObject(bucket, object);
-		}
-        catch (S3ServiceException s3se)
-		{
-        	throw new IOException("S3ServiceException: " + s3se.getS3ErrorMessage());
-		}
+        //Copy istream to temp file, and send the file, with some metadata
+        File scratchFile = File.createTempFile(id, "s3bs");
+        try {
+            FileUtils.copyInputStreamToFile(in, scratchFile);
+            Long contentLength = Long.valueOf(scratchFile.length());
 
-        Map attrs = new HashMap();
-	    attrs.put(Bitstream.SIZE_BYTES, object.getContentLength());
-	    attrs.put(Bitstream.CHECKSUM, object.getETag());
-	    attrs.put(Bitstream.CHECKSUM_ALGORITHM, CSA);
-	    attrs.put("modified", 
-	    	      String.valueOf(object.getLastModifiedDate().getTime()));
-        return attrs;
+            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, id, scratchFile);
+            PutObjectResult putObjectResult = s3Service.putObject(putObjectRequest);
+
+            Map attrs = new HashMap();
+            attrs.put(Bitstream.SIZE_BYTES, contentLength);
+            attrs.put(Bitstream.CHECKSUM, putObjectResult.getContentMd5());
+            attrs.put(Bitstream.CHECKSUM_ALGORITHM, CSA);
+            //attrs.put("modified",
+            //	      String.valueOf(object.getLastModifiedDate().getTime()));
+
+            scratchFile.delete();
+            return attrs;
+
+        } finally {
+            if(scratchFile.exists()) {
+                scratchFile.delete();
+            }
+        }
+
 	}
 	
     /**
@@ -179,37 +211,29 @@ public class S3BitStore implements BitStore
      */
 	public Map about(String id, Map attrs) throws IOException
 	{
-		S3Object object = null;
-		try
-		{
-			// NB: this invocation only retrieves metadata
-			object = service.getObjectDetails(bucket, id);
-			if (object != null)
-			{
-			    if (attrs.containsKey(Bitstream.SIZE_BYTES))
-			    {
-			        attrs.put(Bitstream.SIZE_BYTES, object.getContentLength());
-			    }
-			    if (attrs.containsKey(Bitstream.CHECKSUM))
-			    {
-			    	// WARNING! Amazon docs indicate that ETag value
-			    	// may not always contain the MD-5 checksum
-				    attrs.put(Bitstream.CHECKSUM, object.getETag());
-				    attrs.put(Bitstream.CHECKSUM_ALGORITHM, CSA);
-			    }
-				if (attrs.containsKey("modified"))
-				{
-				    attrs.put("modified", 
-				    	      String.valueOf(object.getLastModifiedDate().getTime()));
-				}			
-				return attrs;
-			}
-			return null;
-		}
-        catch (S3ServiceException s3se)
-		{
-        	throw new IOException("S3ServiceException: " + s3se.getS3ErrorMessage());
-		}
+        ObjectMetadata objectMetadata = s3Service.getObjectMetadata(bucketName, id);
+
+        if (objectMetadata != null)
+        {
+            if (attrs.containsKey(Bitstream.SIZE_BYTES))
+            {
+                attrs.put(Bitstream.SIZE_BYTES, objectMetadata.getContentLength());
+            }
+            if (attrs.containsKey(Bitstream.CHECKSUM))
+            {
+                // WARNING! Amazon docs indicate that ETag value
+                // may not always contain the MD-5 checksum
+                //attrs.put(Bitstream.CHECKSUM, objectMetadata.getETag());
+                attrs.put(Bitstream.CHECKSUM, objectMetadata.getContentMD5());
+                attrs.put(Bitstream.CHECKSUM_ALGORITHM, CSA);
+            }
+            if (attrs.containsKey("modified"))
+            {
+                attrs.put("modified", String.valueOf(objectMetadata.getLastModified().getTime()));
+            }
+            return attrs;
+        }
+        return null;
 	}
 	
     /**
@@ -222,14 +246,7 @@ public class S3BitStore implements BitStore
      */
 	public void remove(String id) throws IOException
 	{
-		try
-		{
-			service.deleteObject(bucket, id);
-		}
-        catch (S3ServiceException s3se)
-		{
-        	throw new IOException("S3ServiceException: " + s3se.getS3ErrorMessage());
-		}
+        s3Service.deleteObject(bucketName, id);
 	}
 	
 	/**
@@ -268,18 +285,20 @@ public class S3BitStore implements BitStore
 			return;
 		}
 		S3BitStore store = new S3BitStore();
-        AWSCredentials creds = new AWSCredentials(accessKey, secretKey);
-        try
-		{
-            store.service = new RestS3Service(creds);
-            // verify/make a bucket to use
-            store.bucket = store.service.createBucket(accessKey + ".s3test");
-		}
-        catch (S3ServiceException s3se)
-		{
-        	throw new IOException("S3ServiceException: " + s3se.getS3ErrorMessage());
-		}
-        // time everything
+
+        AWSCredentials awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
+
+        store.s3Service = new AmazonS3Client(awsCredentials);
+
+        //Todo configurable region
+        Region usEast1 = Region.getRegion(Regions.US_EAST_1);
+        store.s3Service.setRegion(usEast1);
+
+        //Bucketname should be lowercase
+        store.bucketName = "dspace-asset-" + ConfigurationManager.getProperty("dspace.hostname") + ".s3test";
+        store.s3Service.createBucket(store.bucketName);
+
+        // time everything, todo, swtich to caliper
         long start = System.currentTimeMillis();
         // Case 1: store a file
         String id = store.generateId();
