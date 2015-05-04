@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * A low-level asset store interface
  * 
- * @author Richard Rodgers
+ * @author Richard Rodgers, Peter Dietz
  */
 
 public interface BitStore
@@ -55,9 +55,7 @@ public interface BitStore
      * If this method returns successfully, the bits have been stored.
      * If an exception is thrown, the bits have not been stored.
      * </p>
-     * 
-     * @param context
-     *            The current context
+     *
      * @param in
      *            The stream of bits to store
      * @param id
@@ -71,9 +69,7 @@ public interface BitStore
 	
     /**
      * Obtain technical metadata about an asset in the asset store.
-     * 
-     * @param context
-     *            The current context
+     *
      * @param id
      *            The ID of the asset to describe
      * @param attrs
@@ -88,9 +84,7 @@ public interface BitStore
 	
     /**
      * Remove an asset from the asset store.
-     * 
-     * @param context
-     *            The current context
+     *
      * @param id
      *            The ID of the asset to delete
      * @exception IOException

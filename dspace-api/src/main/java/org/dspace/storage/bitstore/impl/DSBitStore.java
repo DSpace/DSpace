@@ -29,7 +29,7 @@ import org.dspace.storage.bitstore.BitStore;
  * Implements a directory 'scatter' algorithm to avoid OS limits on
  * files per directory.
  * 
- * @author Peter Breton, Robert Tansley, Richard Rodgers
+ * @author Peter Breton, Robert Tansley, Richard Rodgers, Peter Dietz
  */
 
 public class DSBitStore implements BitStore

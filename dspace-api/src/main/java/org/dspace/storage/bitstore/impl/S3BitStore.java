@@ -13,7 +13,6 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.util.*;
 
-import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Region;
@@ -22,7 +21,6 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.*;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -35,10 +33,9 @@ import org.dspace.storage.bitstore.BitStore;
 /**
  * Asset store using Amazon's Simple Storage Service (S3).
  * S3 is a commercial, web-service accessible, remote storage facility.
- * This implementation uses jetS3t (a java client library) with S3's RESTful interface
  * NB: you must have obtained an account with Amazon to use this store
  * 
- * @author Richard Rodgers
+ * @author Richard Rodgers, Peter Dietz
  */ 
 
 public class S3BitStore implements BitStore
