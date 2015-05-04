@@ -17,7 +17,7 @@ var defaultFacets = new Array();
         });
 
         //Retrieve our filterSelect, which contains all the types to be sorted on
-        var filterSelect = $("select[id^='aspect_discovery_SimpleSearch_field_filtertype']");
+        var filterSelect = $("tr[class=' search-filter'] select[id^='aspect_discovery_SimpleSearch_field_filtertype']");
         //Get our filters
         /*
         var filterOptions = filterSelect.find('option');
@@ -32,7 +32,7 @@ var defaultFacets = new Array();
         
         var widget = Manager.addWidget(new AjaxSolr.AutocompleteWidget({
             id: 'text',
-            target: '#aspect_discovery_SimpleSearch_table_discovery-filters',
+            target: 'tr[class=" search-filter"]',
             field: 'allText',
             fields: defaultFacets
         }));
@@ -45,9 +45,15 @@ var defaultFacets = new Array();
 
         Manager.store.addByValue('q', query);
         //Retrieve our filter queries
-        var fqs = $("input[name='fq']");
+        var fqs = $("tr[class=' search-filter used-filter hidden']");
         for(var j = 0; j < fqs.length; j ++){
-            Manager.store.addByValue('fq', $(fqs[j]).val());
+        	var selectedRow = fqs[j];
+        	var filterType = $("select[name^='filtertype_']", selectedRow);
+        	var filterOpr = $("select[name^='filter_relational_operator_']", selectedRow);
+        	var filterVal = $("input[name^='filter_']", selectedRow);
+            Manager.store.addByValue(filterType.attr('name'), filterType.val());
+            Manager.store.addByValue(filterOpr.attr('name'), filterOpr.val());
+            Manager.store.addByValue(filterVal.attr('name'), filterVal.val());
         }
         Manager.store.addByValue('facet.sort', 'count');
 
@@ -74,7 +80,7 @@ var defaultFacets = new Array();
 
         filterSelect.change(function() {
 //            TODO: this is dirty, but with lack of time the best I could do
-            var oldInput = $('input[id^="aspect_discovery_SimpleSearch_field_filter"]');
+            var oldInput = $('tr[class=" search-filter"] input[id^="aspect_discovery_SimpleSearch_field_filter"]');
             var newInput = oldInput.clone(false);
             
 //            newInput.val(oldInput.val());
@@ -104,9 +110,15 @@ var defaultFacets = new Array();
 //TODO: does this need to happen twice ?
             Manager.store.addByValue('q', query);
             //Retrieve our filter queries
-            var fqs = $("input[name='fq']");
+            var fqs = $("tr[class=' search-filter used-filter hidden']");
             for(var j = 0; j < fqs.length; j ++){
-                Manager.store.addByValue('fq', $(fqs[j]).val());
+            	var selectedRow = fqs[j];
+            	var filterType = $("select[name^='filtertype_']", selectedRow);
+            	var filterOpr = $("select[name^='filter_relational_operator_']", selectedRow);
+            	var filterVal = $("input[name^='filter_']", selectedRow);
+                Manager.store.addByValue(filterType.attr('name'), filterType.val());
+                Manager.store.addByValue(filterOpr.attr('name'), filterOpr.val());
+                Manager.store.addByValue(filterVal.attr('name'), filterVal.val());
             }
             Manager.store.addByValue('facet.sort', 'count');
 

@@ -56,10 +56,16 @@ AjaxSolr.AutocompleteWidget = AjaxSolr.AbstractFacetWidget.extend({
     for (var i = 0; i < this.fields.length; i++) {
       params.push('facet.field=' + this.fields[i]);
     }
-    var fqs = $("input[name='fq']");
+    var fqs = $("tr[class=' search-filter used-filter hidden']");
     for(var j = 0; j < fqs.length; j ++){
-        params.push('fq=' + encodeURIComponent($(fqs[j]).val()));
-    }
+    	var selectedRow = fqs[j];
+    	var filterType = $("select[name^='filtertype_']", selectedRow);
+    	var filterOpr = $("select[name^='filter_relational_operator_']", selectedRow);
+    	var filterVal = $("input[name^='filter_']", selectedRow);
+    	params.push(filterType.attr('name') + '=' + encodeURIComponent(filterType.val()));
+    	params.push(filterOpr.attr('name') + '=' +  encodeURIComponent(filterOpr.val()));
+    	params.push(filterVal.attr('name') + '=' +  encodeURIComponent(filterVal.val()));
+    }    
     //Attempt to add our scope !
     var scope = $("input[name='discovery-json-scope']").val();
     if(scope != undefined){

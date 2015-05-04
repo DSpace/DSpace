@@ -7,6 +7,11 @@
  */
 package org.dspace.app.xmlui.aspect.discovery.json;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.Map;
+
 import org.apache.avalon.excalibur.pool.Recyclable;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
@@ -16,20 +21,18 @@ import org.apache.cocoon.environment.Response;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.reading.AbstractReader;
 import org.apache.log4j.Logger;
+import org.dspace.app.xmlui.aspect.discovery.DiscoveryUIUtils;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
-import org.dspace.discovery.*;
+import org.dspace.discovery.DiscoverFacetField;
+import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.SearchService;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.handle.HandleManager;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.util.Map;
 
 /**
  * Class used to search in the discovery backend and return a json formatted string
@@ -62,16 +65,20 @@ public class JSONDiscoverySearcher extends AbstractReader implements Recyclable 
         //Retrieve all the given parameters
         Request request = ObjectModelHelper.getRequest(objectModel);
         this.response = ObjectModelHelper.getResponse(objectModel);
+        
+        Context context = null;
+		try {
+			context = ContextUtil.obtainContext(objectModel);
+		} catch (SQLException e) {
+			log.error(e);
+		}
 
         DiscoverQuery queryArgs = new DiscoverQuery();
-
         queryArgs.setQuery(request.getParameter("q"));
 
-
-        //Retrieve all our filter queries
-        if(request.getParameterValues("fq") != null)
-            queryArgs.addFilterQueries(request.getParameterValues("fq"));
-
+        String filters[] = DiscoveryUIUtils.getFilterQueries(request, context);
+        queryArgs.addFilterQueries(filters);
+                
         //Retrieve our facet limit (if any)
         int facetLimit;
         if(request.getParameter("facet.limit") != null){
@@ -116,7 +123,6 @@ public class JSONDiscoverySearcher extends AbstractReader implements Recyclable 
         String jsonWrf = request.getParameter("json.wrf");
 
         try {
-            Context context = ContextUtil.obtainContext(objectModel);
             JSONStream = getSearchService().searchJSON(context, queryArgs, getScope(context, objectModel), jsonWrf);
         } catch (Exception e) {
             log.error("Error while retrieving JSON string for Discovery auto complete", e);
