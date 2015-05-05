@@ -124,8 +124,11 @@ public class DiscoJuiceFeeds extends AbstractAction {
 
         Map<String,JSONObject> shibDiscoEntities = new HashMap<String,JSONObject>();
         URL shibDiscoFeedUrl = new URL(url);
+        String old_value = "false";
         //Obtain shibboleths discofeed
         try{
+            old_value = System.getProperty("jsse.enableSNIExtension");
+            System.setProperty("jsse.enableSNIExtension", "false");
             URLConnection conn = shibDiscoFeedUrl.openConnection();
             conn.setConnectTimeout(5000);
             conn.setReadTimeout(10000);
@@ -140,6 +143,8 @@ public class DiscoJuiceFeeds extends AbstractAction {
         }catch(Exception e){
             log.error("Failed to obtain/parse "+shibDiscoFeedUrl.toString() + "\nCheck timeouts, redirects, shibboleth config.\n" + e);
             throw e; //Don't continue
+        }finally {
+            System.setProperty("jsse.enableSNIExtension", old_value);
         }
 
         //String[] feeds = {"edugain", "cesnet"};
