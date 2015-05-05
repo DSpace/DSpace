@@ -353,7 +353,7 @@
 					<input-type>onebox</input-type>
 					<hint>Zona geográfica a la que se hace referencia en la obra</hint>
 					<visibility-on-group>SeDiCIAdmin,RadioAdmin</visibility-on-group>
-					<type-bind>!Objeto Fisico,Publicacion seriada</type-bind>
+					<type-bind>!Objeto Fisico</type-bind>
 				</field>
 
 				<!-- Alcance Temporal -->
@@ -366,7 +366,7 @@
 					<input-type>onebox</input-type>
 					<hint>Período temporal al que se hace referencia en el texto</hint>
 					<visibility-on-group>SeDiCIAdmin,RadioAdmin</visibility-on-group>
-					<type-bind>!Objeto Fisico,Publicacion seriada</type-bind>
+					<type-bind>!Objeto Fisico</type-bind>
 				</field>
 
 				<!-- Descripción Física / Inscipcion y Enumeración de partes-->
@@ -378,7 +378,7 @@
 					<label>Descripción física</label>
 					<input-type>textarea</input-type>
 					<hint>Inscripciones existentes en el objeto, observaciones  sobre las piezas, etc.</hint>
-					<type-bind>Objeto Fisico</type-bind>
+					<type-bind>Objeto Fisico,Publicacion seriada</type-bind>
 				</field>
 
 				<!-- Descripción Física / Extension -->
@@ -403,7 +403,7 @@
 					<input-type>textarea</input-type>
 					<hint>Material en que está hecho el objeto, técnica usada para fabricarlo. Ejemplo: madera, bronce, plástico</hint>
 					<visibility>workflow</visibility>
-					<type-bind>Objeto Fisico</type-bind>
+					<type-bind>Objeto Fisico,Publicacion seriada</type-bind>
 				</field>
 
 				<!-- Fulltext -->
@@ -474,7 +474,7 @@
 					<input-type value-pairs-name="embargo_periods">dropdown</input-type>
 					<hint>Seleccione el período de embargo que se aplicará sobre la obra</hint>
 				    <visibility>workflow</visibility>
-				    <type-bind>!Objeto Fisico,Publicacion seriada</type-bind>
+				    <type-bind>!Objeto Fisico</type-bind>
 				</field>
 
 				<!-- Localización electrónica -->
@@ -521,7 +521,7 @@
 <!-- 					<hint>Area temática del recurso extraida del tesauro de la Library of Congress</hint> -->
 <!-- 					<vocabulary>srsc</vocabulary> -->
 <!-- 					<visibility>workflow</visibility> -->
-<!-- 					<type-bind>!Objeto Fisico,Publicacion seriada</type-bind> -->
+<!-- 					<type-bind>!Objeto Fisico</type-bind> -->
 <!-- 				</field> -->
 
 				<!-- Descriptores DECS -->
@@ -533,7 +533,6 @@
 					<label>Descriptores DECS</label>
 					<input-type>onebox</input-type>
 					<hint>Descriptores del recurso a partir del tesauro DECS</hint>
-					<type-bind>!Publicacion seriada</type-bind>
 					<visibility>workflow</visibility>
 				</field>
 
@@ -547,7 +546,7 @@
 					<input-type>onebox</input-type>
 					<hint>Descriptores del recurso a partir del tesauro Eurovoc</hint>
 					<visibility>workflow</visibility>
-					<type-bind>!Objeto Fisico,Publicacion seriada</type-bind>
+					<type-bind>!Objeto Fisico</type-bind>
 				</field>
 
 				<!-- Descriptores acmcss98 -->
@@ -560,7 +559,7 @@
 					<input-type>onebox</input-type>
 					<hint>Descriptores del recurso a partir del Sist de clasificacion ACM98</hint>
 					<visibility>workflow</visibility>
-					<type-bind>!Objeto Fisico,Publicacion seriada</type-bind>
+					<type-bind>!Objeto Fisico</type-bind>
 				</field>
 
 				<!-- Descriptores libres -->
@@ -572,7 +571,6 @@
 					<label>Otros descriptores</label>
 					<input-type>onebox</input-type>
 					<hint>Descriptores del recurso. Texto libre</hint>
-					<type-bind>!Publicacion seriada</type-bind>
 					<visibility>workflow</visibility>
 					<i18n>true</i18n>
 				</field>
@@ -587,7 +585,7 @@
 					<input-type>onebox</input-type>
 					<hint>Términos de los tesauros SeDiCI y Unesco que ya no se usan. Este campo existe solo a los efectos de editar los valores cargados en el pasado</hint>
 					<visibility>workflow</visibility>
-					<type-bind>!Objeto Fisico,Publicacion seriada</type-bind>
+					<type-bind>!Objeto Fisico</type-bind>
 				</field>
 
 				<!-- ISSN -->
@@ -645,7 +643,7 @@
 					<input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
 					<hint>Otros códigos de identificación de la obra</hint>
 					<visibility>workflow</visibility>
-					<type-bind>!Objeto Fisico,Publicacion seriada</type-bind>
+					<type-bind>!Objeto Fisico</type-bind>
 				</field>
 				
 				<!-- Otros identificadores - Solo Objeto Físico y Publicacion seriada - Es para acotar las opciones brindadas por el value-pairs 'common_identifiers' -->
@@ -657,19 +655,7 @@
 					<label>Otros identificadores</label>
 					<input-type>onebox</input-type>
 					<hint>Identificadores del objeto, como ser museo y número u otros identificadores internos. Indicar código con letras, números, dos puntos y guiones sin espacios. Ejemplos: MF:1234, F:14, MK:123</hint>
-					<type-bind>Objeto Fisico,Publicacion seriada</type-bind>
-				</field>
-				
-				<!-- Handle - Solo Publicación periódica - Es para acotar las opciones brindadas por el value-pairs 'common_identifiers' -->
-				<field>
-					<dc-schema>sedici</dc-schema>
-					<dc-element>identifier</dc-element>
-					<dc-qualifier>handle</dc-qualifier>
-					<repeatable>true</repeatable>
-					<label>Handle</label>
-					<input-type>onebox</input-type>
-					<hint>Handle del objeto. Ejemplos: http://hdl.handle.net/123456789/1234</hint>
-					<type-bind>Publicacion seriada</type-bind>
+					<type-bind>Objeto Fisico</type-bind>
 				</field>
 
 				<!-- Nombre del Ciclo para los audios -->
@@ -713,7 +699,7 @@
 					<label>Titulo y número de la serie</label>
 					<input-type>onebox</input-type>
 					<hint>Titulo y número de la serie en la que el libro fué publicado</hint>
-					<type-bind>Libro</type-bind>
+					<type-bind>Libro,Publicacion seriada</type-bind>
 				</field>
 
 
@@ -764,9 +750,8 @@
 					<type-bind>Objeto de conferencia</type-bind>
 					<required>Debe ingresar el nombre del evento al que este objeto pertenece</required>
 				</field>
-				
 
-				<!-- Nombre del evento (Opcional para articulos) -->
+				<!-- Nombre del evento (Opcional para articulos y Publicacion Seriada) -->
 				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>relation</dc-element>
@@ -774,7 +759,7 @@
 					<label>Nombre del evento</label>
 					<input-type>onebox</input-type>
 					<hint>Nombre del congreso o conferencia en el que este documento fue presentado</hint>
-					<type-bind>Articulo</type-bind>
+					<type-bind>Articulo,Publicacion seriada</type-bind>
 				</field>
 
 				<!-- Director de tesis -->
@@ -873,7 +858,7 @@
 					<input-type>onebox</input-type>
 					<hint>Otros colaboradores de la obra</hint>
 					<visibility>workflow</visibility>
-					<type-bind>!Objeto Fisico,Publicacion seriada</type-bind>
+					<type-bind>!Objeto Fisico</type-bind>
 				</field>
 
 				<!-- Otros colaboradores de un libro -->
@@ -994,7 +979,6 @@
 					<repeatable>true</repeatable>
 					<label>Se relaciona con</label>
 					<input-type>onebox</input-type>
-					<type-bind>!Publicacion seriada</type-bind>
 					<hint>Link a un documento (puede ser externo a SeDiCI) con el cual este documento está relacionado</hint>
 					<visibility>workflow</visibility>
 				</field>
