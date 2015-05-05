@@ -7,6 +7,7 @@
   <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
   <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
   <property name="hibernate.search.autoregister_listeners">false</property>
+  <!-- <property name="hibernate.generate_statistics">true</property> -->
   <property name="current_session_context_class">thread</property>
   <!-- should fix slow acquire of postgresql and invocation exception -->
   <property name="hibernate.temp.use_jdbc_metadata_defaults">false</property>

@@ -117,8 +117,8 @@ public class ControlPanelConfigurationTab extends AbstractControlPanelTab {
 		String oai_solr = notnull(ConfigurationManager.getProperty("solr.log.server"));
 		dspace.addItemXref(oai_solr, oai_solr);
 
-		List ufaladd = div.addList("UFAL_additional");
-		ufaladd.setHead("UFAL additional");
+		List ufaladd = div.addList("LINDAT_Utilities");
+		ufaladd.setHead("LINDAT Utilities");
 
 		ufaladd.addLabel("Help mail");
 		ufaladd.addItem(notnull(ConfigurationManager.getProperty("lr.help.mail")));

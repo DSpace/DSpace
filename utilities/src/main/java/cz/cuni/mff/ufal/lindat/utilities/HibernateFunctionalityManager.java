@@ -640,6 +640,26 @@ public class HibernateFunctionalityManager implements IFunctionalities {
 		return ShibbolethScopeAffiliation.scopeRecognition(affiliation);
 	}
 
+
+	//
+	// IDatabase
+	//
+
+	@Override
+	public long getGlobalConnectionsCount()	{
+		return HibernateUtil.getGlobalConnectionsCount();
+	}
+
+	@Override
+	public long getSessionOpenCount(){
+		return HibernateUtil.getSessionOpenCount();
+	}
+
+	@Override
+	public long getSessionCloseCount(){
+		return HibernateUtil.getSessionCloseCount();
+	}
+
 	@Override
 	public void openSession() {
 		hibernateUtil.openSession();
@@ -649,6 +669,10 @@ public class HibernateFunctionalityManager implements IFunctionalities {
 	public void closeSession() {
 		hibernateUtil.closeSession();		
 	}
+
+	//
+	//
+	//
 
 	@Override
 	public List findByCriterie(Class c, Object... criterion) {
@@ -805,6 +829,7 @@ public class HibernateFunctionalityManager implements IFunctionalities {
 		
 		return true;
 	}
+
 }
 
 
