@@ -106,6 +106,7 @@
     <xsl:template match="dim:dim" mode="itemSummaryView-DIM">
         <div class="item-summary-view-metadata">
             <xsl:call-template name="itemSummaryView-DIM-title"/>
+            <xsl:call-template name="itemSummaryView-DIM-authors"/>
             <div class="row">
                 <div class="col-sm-4">
                     <!-- small column to the left, for short metadata -->
@@ -115,9 +116,8 @@
                         </div>
                     </div>
                     <xsl:call-template name="itemSummaryView-DIM-date"/>
-                    <xsl:call-template name="itemSummaryView-DIM-authors"/>
                     <xsl:call-template name="itemSummaryView-DIM-contributors"/>
-                    <!-- <xsl:call-template name="itemSummaryView-DIM-format"/> is this even valid item metadata? -->
+                    <xsl:call-template name="itemSummaryView-DIM-type"/>
 
                     <!-- call more templates here to add more fields -->
 
@@ -293,7 +293,6 @@
     <xsl:template name="itemSummaryView-DIM-authors">
         <xsl:if test="dim:field[@element='contributor'][@qualifier='author' and descendant::text()] or dim:field[@element='creator' and descendant::text()] or dim:field[@element='contributor' and descendant::text()]">
             <div class="simple-item-view-authors item-page-field-wrapper table">
-                <h5><i18n:text>xmlui.dri2xhtml.METS-1.0.item-author</i18n:text></h5>
                 <xsl:choose>
                     <xsl:when test="dim:field[@element='contributor'][@qualifier='author']">
                         <xsl:for-each select="dim:field[@element='contributor'][@qualifier='author']">
@@ -383,7 +382,7 @@
                 <xsl:choose>
                     <xsl:when test="dim:field[@element='type']">
                         <xsl:for-each select="dim:field[@element='type']">
-                            <xsl:call-template name="itemSummaryView-DIM-misc-entry" />
+              			<div><xsl:copy-of select="./node()"/></div>
                         </xsl:for-each>
                     </xsl:when>
                 </xsl:choose>
@@ -398,7 +397,7 @@
                 <xsl:choose>
                     <xsl:when test="dim:field[@element='relation'][@qualifier='ispartofseries']">
                         <xsl:for-each select="dim:field[@element='relation'][@qualifier='ispartofseries']">
-                            <xsl:call-template name="itemSummaryView-DIM-misc-entry" />
+              				<div><xsl:copy-of select="./node()"/></div>
                         </xsl:for-each>
                     </xsl:when>
                 </xsl:choose>
@@ -413,7 +412,7 @@
                 <xsl:choose>
                     <xsl:when test="dim:field[@element='relation'][@qualifier='ispartof']">
                         <xsl:for-each select="dim:field[@element='relation'][@qualifier='ispartof']">
-                            <xsl:call-template name="itemSummaryView-DIM-misc-entry" />
+              				<div><xsl:copy-of select="./node()"/></div>
                         </xsl:for-each>
                     </xsl:when>
                 </xsl:choose>
@@ -428,7 +427,7 @@
                 <xsl:choose>
                     <xsl:when test="dim:field[@element='rights']">
                         <xsl:for-each select="dim:field[@element='rights']">
-                            <xsl:call-template name="itemSummaryView-DIM-misc-entry" />
+              				<div><xsl:copy-of select="./node()"/></div>
                         </xsl:for-each>
                     </xsl:when>
                 </xsl:choose>
@@ -461,13 +460,24 @@
         <xsl:if test="dim:field[@element='degree' and @qualifier='name' and descendant::text()]">
             <div class="simple-item-view-show-full item-page-field-wrapper table">
                 <h5>Degree</h5>
-                <xsl:choose>
-                    <xsl:when test="dim:field[@element='degree']">
-                        <xsl:for-each select="dim:field[@element='name']">
-                            <xsl:call-template name="itemSummaryView-DIM-misc-entry" />
-                        </xsl:for-each>
-                    </xsl:when>
-                </xsl:choose>
+                <div>
+                    <xsl:for-each select="dim:field[@element='degree' and @qualifier='name']">
+                        <xsl:choose>
+                            <xsl:when test="node()">
+                                <xsl:copy-of select="node()"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:text>&#160;</xsl:text>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <xsl:if test="count(following-sibling::dim:field[@element='degree' and @qualifier='name']) != 0">
+                            <div class="spacer">&#160;</div>
+                        </xsl:if>
+                    </xsl:for-each>
+                    <xsl:if test="count(dim:field[@element='degree' and @qualifier='name']) &gt; 1">
+                        <div class="spacer">&#160;</div>
+                    </xsl:if>
+                </div>
             </div>
         </xsl:if>
     </xsl:template>
@@ -476,13 +486,24 @@
         <xsl:if test="dim:field[@element='degree' and @qualifier='discipline' and descendant::text()]">
             <div class="simple-item-view-show-full item-page-field-wrapper table">
                 <h5>Thesis Department</h5>
-                <xsl:choose>
-                    <xsl:when test="dim:field[@element='degree']">
-                        <xsl:for-each select="dim:field[@element='discipline']">
-                            <xsl:call-template name="itemSummaryView-DIM-misc-entry" />
-                        </xsl:for-each>
-                    </xsl:when>
-                </xsl:choose>
+                <div>
+                    <xsl:for-each select="dim:field[@element='degree' and @qualifier='discipline']">
+                        <xsl:choose>
+                            <xsl:when test="node()">
+                                <xsl:copy-of select="node()"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:text>&#160;</xsl:text>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <xsl:if test="count(following-sibling::dim:field[@element='degree' and @qualifier='discipline']) != 0">
+                            <div class="spacer">&#160;</div>
+                        </xsl:if>
+                    </xsl:for-each>
+                    <xsl:if test="count(dim:field[@element='degree' and @qualifier='discipline']) &gt; 1">
+                        <div class="spacer">&#160;</div>
+                    </xsl:if>
+                </div>
             </div>
         </xsl:if>
     </xsl:template>
