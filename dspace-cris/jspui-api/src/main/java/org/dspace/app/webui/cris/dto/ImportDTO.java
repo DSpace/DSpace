@@ -21,6 +21,8 @@ public class ImportDTO {
 	
 	private String format;
 	
+	private String type;
+	
 	public void setFile(MultipartFile file) {
 		this.file = file;
 	}
@@ -51,5 +53,13 @@ public class ImportDTO {
 
 	public void setFormat(String format) {
 		this.format = format;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+	
+	public String getType() {
+		return type;
 	}
 }

@@ -34,11 +34,7 @@ import org.dspace.app.cris.model.Project;
 import org.dspace.app.cris.model.ResearchObject;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.jdyna.ACrisNestedObject;
-import org.dspace.app.cris.model.jdyna.DynamicNestedObject;
-import org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition;
-import org.dspace.app.cris.model.jdyna.OUPropertiesDefinition;
-import org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition;
-import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
+import org.dspace.app.cris.model.jdyna.DynamicObjectType;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.ImportExportUtils;
 import org.dspace.core.ConfigurationManager;
@@ -117,13 +113,16 @@ public class ScriptCrisBulkChanges {
 
 		ACO tmpCrisObject = null;
 		try {
-			tmpCrisObject = (ACO) ResearchObject.class.newInstance();
 			if (StringUtils.equalsIgnoreCase("rp", entityType)) {
 				tmpCrisObject = (ACO) ResearcherPage.class.newInstance();
 			} else if (StringUtils.equalsIgnoreCase("ou", entityType)) {
 				tmpCrisObject = (ACO) OrganizationUnit.class.newInstance();
 			} else if (StringUtils.equalsIgnoreCase("pj", entityType)) {
 				tmpCrisObject = (ACO) Project.class.newInstance();
+			} else {
+				ResearchObject tmp = ResearchObject.class.newInstance();
+				tmp.setTypo(applicationService.findTypoByShortName(DynamicObjectType.class, entityType));
+				tmpCrisObject = (ACO) tmp;
 			}
 		} catch (InstantiationException | IllegalAccessException e1) {
 			System.out.println(e1.getMessage());
@@ -137,7 +136,7 @@ public class ScriptCrisBulkChanges {
 		}
 		try {
 			ImportExportUtils.process(format, new FileInputStream(filePath), dir, applicationService, dspaceContext,
-					status, tmpCrisObject.getClassPropertiesDefinition(), tmpCrisObject.getClass(),
+					status, tmpCrisObject.getClassPropertiesDefinition(), (Class<ACO>) tmpCrisObject.getClass(), tmpCrisObject,
 					tmpCrisObject.getClassNested(), tmpCrisObject.getClassTypeNested());
 		} catch (Exception e) {
 			log.error(e.getMessage());

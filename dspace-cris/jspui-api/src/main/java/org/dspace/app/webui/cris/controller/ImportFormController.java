@@ -8,8 +8,11 @@
 package org.dspace.app.webui.cris.controller;
 
 import it.cilea.osd.common.controller.BaseFormController;
+import it.cilea.osd.jdyna.model.ANestedPropertiesDefinition;
+import it.cilea.osd.jdyna.model.ANestedProperty;
 import it.cilea.osd.jdyna.model.ATypeNestedObject;
 import it.cilea.osd.jdyna.model.PropertiesDefinition;
+import it.cilea.osd.jdyna.model.Property;
 
 import java.io.File;
 import java.util.Map;
@@ -21,8 +24,10 @@ import org.dspace.app.cris.importexport.IBulkChangesService;
 import org.dspace.app.cris.importexport.XMLBulkChangesService;
 import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.CrisConstants;
+import org.dspace.app.cris.model.ResearchObject;
 import org.dspace.app.cris.model.export.ExportConstants;
 import org.dspace.app.cris.model.jdyna.ACrisNestedObject;
+import org.dspace.app.cris.model.jdyna.DynamicObjectType;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.ImportExportUtils;
 import org.dspace.app.cris.util.UtilsXSD;
@@ -42,7 +47,7 @@ import org.springframework.web.servlet.ModelAndView;
  * @author cilea
  * 
  */
-public class ImportFormController extends BaseFormController {
+public class ImportFormController  <ACO extends ACrisObject<P, TP, NP, NTP, ACNO, ATNO>, P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> extends BaseFormController {
 
 	private Map<String, Class<? extends PropertiesDefinition>> objectType2PD;
 	private Map<String, Class<? extends ACrisObject>> objectType2Object;
@@ -70,10 +75,10 @@ public class ImportFormController extends BaseFormController {
 		File dir = new File(path);
 		dir.mkdir();
 		try {
-			Class<? extends PropertiesDefinition> clazz = objectType2PD.get(object.getTargetEntity());
-			Class<? extends ACrisObject> objectClazz = objectType2Object.get(object.getTargetEntity());
-			Class<? extends ATypeNestedObject> objectATNOClazz = objectType2ATNO.get(object.getTargetEntity());
-			Class<? extends ACrisNestedObject> objectACNOClazz = objectType2ACNO.get(object.getTargetEntity());
+			Class<TP> clazz = (Class<TP>) objectType2PD.get(object.getTargetEntity());
+			Class<ACO> objectClazz = (Class<ACO>) objectType2Object.get(object.getTargetEntity());
+			Class<ATNO> objectATNOClazz = (Class<ATNO>) objectType2ATNO.get(object.getTargetEntity());
+			Class<ACNO> objectACNOClazz = (Class<ACNO>) objectType2ACNO.get(object.getTargetEntity());
 			if (object.isTemplate()) {
 				response.setContentType("application/xml;charset=UTF-8");
 				response.addHeader("Content-Disposition",
@@ -108,8 +113,13 @@ public class ImportFormController extends BaseFormController {
 					if (AuthorizeManager.isAdmin(dspaceContext)) {
 						dspaceContext.turnOffAuthorisationSystem();
 					}
+					ACO cris = objectClazz.newInstance();
+					if (cris instanceof ResearchObject) {
+						ResearchObject tmp = (ResearchObject) cris;
+						tmp.setTypo(applicationService.findTypoByShortName(DynamicObjectType.class, object.getType()));
+					}
 					ImportExportUtils.process(object.getFormat(), fileDTO.getInputStream(), dir,
-							applicationService, dspaceContext, defaultStatus, clazz, objectClazz, objectACNOClazz, objectATNOClazz);
+							applicationService, dspaceContext, defaultStatus, clazz, objectClazz, cris, objectACNOClazz, objectATNOClazz);
 					saveMessage(
 							request,
 							getText("action.import.with.success",

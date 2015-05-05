@@ -57,6 +57,7 @@ import org.dspace.app.cris.importexport.IBulkChanges;
 import org.dspace.app.cris.importexport.IBulkChangesService;
 import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.IExportableDynamicObject;
+import org.dspace.app.cris.model.ResearchObject;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.RestrictedField;
 import org.dspace.app.cris.model.VisibilityConstants;
@@ -194,7 +195,7 @@ public class ImportExportUtils {
 	}
 
 	private static <P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>, ACO extends ACrisObject<P, TP, NP, NTP, ACNO, ATNO>> ACO getCrisObject(
-			ApplicationService applicationService, Class<ACO> objectTypeClass, IBulkChange change)
+			ApplicationService applicationService, Class<ACO> objectTypeClass, ACO template, IBulkChange change)
 			throws InstantiationException, IllegalAccessException {
 		String action = change.getAction();
 		String crisID = change.getCrisID();
@@ -216,9 +217,12 @@ public class ImportExportUtils {
 		// if action=create then we build the object, notify if already exist
 		if (StringUtils.equalsIgnoreCase(IBulkChange.ACTION_CREATE, action)) {
 			if (crisObject != null) {
-				log.info("the object is already on database... found a CREATE action on entity, maybe should be skip it?");
+				log.warn("the object is already here... found a CREATE action on an existent entity, should we skip it?");
 			} else {
 				crisObject = objectTypeClass.newInstance();
+				if (crisObject instanceof ResearchObject) {
+					((ResearchObject) crisObject).setTypo(((ResearchObject) template).getTypo());
+				}
 			}
 		} else if (!StringUtils.equalsIgnoreCase(IBulkChange.ACTION_DELETE, action)) {
 			// we create the new entity also in case of the main field are empty
@@ -231,8 +235,11 @@ public class ImportExportUtils {
 				if (crisObject != null) {
 					log.info("found a "+ action +" action on entity");
 				} else {
-					log.info("the object is not found on database... found a "+ action +" action on entity, maybe should be skip it?");
+					log.warn("the object is not found on database... found a "+ action +" action on an unexistent entity, should we skip it?");
 					crisObject = objectTypeClass.newInstance();
+					if (crisObject instanceof ResearchObject) {
+						((ResearchObject) crisObject).setTypo(((ResearchObject) template).getTypo());
+					}
 				}
 			}
 		}
@@ -280,7 +287,7 @@ public class ImportExportUtils {
 	 */
 	public static <ACO extends ACrisObject<P, TP, NP, NTP, ACNO, ATNO>, P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> void process(
 			String format, InputStream input, File dir, ApplicationService applicationService, Context dspaceContext,
-			boolean status, Class<TP> propDefClazz, Class<ACO> crisObjectClazz, Class<ACNO> crisNestedObjectClazz,
+			boolean status, Class<TP> propDefClazz, Class<ACO> crisObjectClazz, ACO template, Class<ACNO> crisNestedObjectClazz,
 			Class<ATNO> ttpClass) throws Exception {
 
 		List<IContainable> metadataFirstLevel = applicationService.findAllContainables(propDefClazz);
@@ -300,13 +307,13 @@ public class ImportExportUtils {
 		IBulkChanges bulkChanges = importer.getBulkChanges(input, dir, crisObjectClazz, propDefClazz,
 				metadataFirstLevel);
 
-		processBulkChanges(applicationService, propDefClazz, crisObjectClazz, metadataFirstLevel, metadataNestedLevel,
+		processBulkChanges(applicationService, propDefClazz, crisObjectClazz, template, metadataFirstLevel, metadataNestedLevel,
 				bulkChanges);
 	}
 
 	// TODO manage nested
 	private static <ACO extends ACrisObject<P, TP, NP, NTP, ACNO, ATNO>, P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> void processBulkChanges(
-			ApplicationService applicationService, Class<TP> propDefClazz, Class<ACO> crisObjectClazz,
+			ApplicationService applicationService, Class<TP> propDefClazz, Class<ACO> crisObjectClazz, ACO template,
 			List<IContainable> metadataFirstLevel, List<IContainable> metadataNestedLevel, IBulkChanges bulkChanges)
 			throws InstantiationException, IllegalAccessException, CloneNotSupportedException,
 			InvocationTargetException, NoSuchMethodException {
@@ -347,7 +354,7 @@ public class ImportExportUtils {
 		int rows_imported = 0;
 		log.info("Start import " + new Date());
 		// foreach researcher element in xml
-		for (int i = 1; i < bulkChanges.size(); i++) {
+		for (int i = 1; i <= bulkChanges.size(); i++) {
 			log.info("Number " + i + " of " + bulkChanges.size());
 			ACO crisObject = null;
 			try {
@@ -372,9 +379,9 @@ public class ImportExportUtils {
 				log.info("Researcher sourceRef: " + sourceRef + " sourceID: " + sourceId + " / crisID : " + crisID
 						+ " uuid: " + uuid);
 
-				crisObject = getCrisObject(applicationService, crisObjectClazz, bulkChange);
+				crisObject = getCrisObject(applicationService, crisObjectClazz, template, bulkChange);
 				if (bulkChange.getAction().equalsIgnoreCase(IBulkChange.ACTION_DELETE)) {
-					applicationService.delete(crisObjectClazz, crisObject);
+					applicationService.delete(crisObjectClazz, crisObject.getId());
 				} else {
 					if (bulkChange.getAction().equalsIgnoreCase(IBulkChange.ACTION_UPDATE)) {
 						update = true;
