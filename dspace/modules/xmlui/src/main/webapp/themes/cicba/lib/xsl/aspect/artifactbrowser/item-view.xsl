@@ -31,7 +31,7 @@
 		<xsl:if test="$isDate">
 		<!--  El choose se usa para saber en que idioma mostrar la fecha -->
 			<xsl:choose>
-				<xsl:when test="$query-string='locale-attribute=en'">
+				<xsl:when test="contains($query-string,'locale-attribute=en')">
 				<!--  ingles -->
 					<xsl:value-of select="xmlui:formatearFecha(.,'en')" />			
 				</xsl:when>
