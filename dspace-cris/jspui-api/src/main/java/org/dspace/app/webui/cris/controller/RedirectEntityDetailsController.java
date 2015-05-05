@@ -44,8 +44,8 @@ public class RedirectEntityDetailsController<T extends ACrisObject> extends
         if (id == null || id.isEmpty())
         {
 
-            String modeCode = request.getParameter("code");
-            String modeRef = request.getParameter("ref");
+            String modeCode = request.getParameter("sourceid");
+            String modeRef = request.getParameter("sourceref");
             if (modeCode != null && !modeCode.isEmpty())
             {
                 entity = ((ApplicationService) applicationService)
@@ -75,7 +75,7 @@ public class RedirectEntityDetailsController<T extends ACrisObject> extends
             }
         }
 
-        return new ModelAndView("redirect:"+ ResearcherPageUtils.getPersistentIdentifier(entity));     
+        return new ModelAndView("redirect:/cris/"+ entity.getPublicPath() + "/" + ResearcherPageUtils.getPersistentIdentifier(entity));
     }
 
  
