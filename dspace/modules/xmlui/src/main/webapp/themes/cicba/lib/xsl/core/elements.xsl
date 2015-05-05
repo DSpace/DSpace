@@ -22,7 +22,11 @@
 						</xsl:when>
 						<xsl:otherwise>
 							<xsl:call-template name="print-path">
-								<xsl:with-param name="path" select="'/handle/123456789/2/submit'"/>
+								<xsl:with-param name="path">
+									<xsl:text>/handle/</xsl:text>
+									<xsl:value-of select="$handle-autoarchive"/>
+									<xsl:text>/submit</xsl:text>
+								</xsl:with-param>
 							</xsl:call-template>
 						</xsl:otherwise>
 					</xsl:choose>

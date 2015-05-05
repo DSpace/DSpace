@@ -50,4 +50,9 @@
 			select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='queryString']/text()"	>		
 		</xsl:value-of>
 	</xsl:variable>
+	
+	<xsl:variable name="handle-autoarchive">
+		<xsl:value-of select="/dri:document/dri:meta/dri:repositoryMeta/dri:repository/@repositoryID"/>
+		<xsl:text>/2</xsl:text>
+	</xsl:variable>
 </xsl:stylesheet>
