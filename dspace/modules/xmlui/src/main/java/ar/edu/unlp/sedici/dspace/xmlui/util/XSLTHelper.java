@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.dspace.app.util.Util;
 
 public class XSLTHelper {
 	
@@ -33,23 +34,21 @@ public class XSLTHelper {
 		}
 	}
 	
-	public static String escapeURL(String url){
+	public static String escapeURL(String url) throws NullPointerException{
 		if (url == null){
 			try{
 				throw new NullPointerException();
 			}catch (Exception e) {
 				log.error("escapeURL: Se recibe null como url", e);
 			}
-			return "";
+		}else{
+			try{
+				return Util.encodeBitstreamName(url);
+			}catch (Exception e){
+				log.error("Cannot escape the url specified: " + url);
+			}
 		}
-		char[] reservados={'!','#','$','%','&','(',')','*','+',',','/',':',';','=','?','@','[',']',']', ' '};
-		for (char caracter: reservados) {
-			url=url.replace(caracter, '_');
-		}
-		//remplazo la comilla simple
-		url=url.replace("'", "_"); 	
- 
-		return url;
+		return "";
 	}
 	
 

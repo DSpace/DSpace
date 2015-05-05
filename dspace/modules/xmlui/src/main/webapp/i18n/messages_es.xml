@@ -350,6 +350,9 @@
 <message key="xmlui.ItemExportDownloadReader.auth_header">Este archivo de exportación está restringido.</message>
 <message key="xmlui.ItemExportDownloadReader.auth_message">El archivo de exportación al que intenta acceder es un recurso restringido y requiere permisos para ser visualizado. Autentíquese abajo para acceder al archivo de exportación.</message>
 
+<!-- Download file item-view messages -->
+<message key="xmlui.Download.defaultName">documento</message>
+
 	<!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 		                EPerson Aspect
