@@ -54,6 +54,10 @@ ul {
 	padding-right: 15px;
 }
 
+.static-page ol{
+	list-style-type: decimal;
+}
+
 #cic-body {
 	min-height: 50%;
 }
