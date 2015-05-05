@@ -337,9 +337,6 @@
         </div>
         <div class="row">
             <div class="col-sm-offset-3 col-sm-9" id="filters-overview-wrapper-squared"/>
-            <xsl:if test="dri:xref[@rend='didYouMean']">
-                <div class="didYouMean">Did you mean:<a href="{dri:xref[@rend='didYouMean']/@target}"><xsl:value-of select="dri:xref[@rend='didYouMean']"/></a> ?</div>
-            </xsl:if>
         </div>
     </xsl:template>
 
@@ -361,9 +358,6 @@
             </div>
         </div>
         <div id="filters-overview-wrapper-squared"/>
-        <xsl:if test="dri:xref[@rend='didYouMean']">
-            <div class="didYouMean">Did you mean:<a href="{dri:xref[@rend='didYouMean']/@target}"><xsl:value-of select="dri:xref[@rend='didYouMean']"/></a> ?</div>
-        </xsl:if>
     </xsl:template>
 
     <xsl:template match="dri:div[@id='aspect.discovery.SimpleSearch.div.search-results']/dri:head">
