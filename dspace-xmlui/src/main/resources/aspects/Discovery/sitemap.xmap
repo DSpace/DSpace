@@ -61,7 +61,7 @@ and searching the repository.
 
     </map:components>
     <map:pipelines>
-        <map:pipeline>
+        <map:pipeline type="noncaching">
 
 
             <map:generate/>
