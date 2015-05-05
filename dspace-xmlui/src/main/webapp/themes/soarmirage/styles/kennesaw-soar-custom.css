@@ -1,0 +1,117 @@
+header .navbar {
+  background-color: #231f20;
+}
+header .navbar .container {
+  background: #242021;
+  height: 80px;
+  min-height: 80px;
+}
+div.trail-wrapper {
+  background-color: #f5b23e;
+  border-bottom: 1px solid #f5b23e;
+}
+.btn-primary, .list-group-item.active, .list-group-item.active:hover, .list-group-item.active:focus {
+  background-color: #711d0c;
+  border-color: #711d0c;
+  color: #FFFFFF;
+}
+#main-container #sidebar {
+  background-color: #FFF8EC;
+}
+
+#file_news_div_news .thumbs>img {
+    width:230px;
+    padding: 0px 5px 10px 5px;
+}
+
+.custom-nav {
+    background-color: #f5b23e;
+    border-bottom: 1px solid #f5b23e;
+    border: 0;
+    border-radius: 0;
+}
+
+.custom-nav .navbar-nav>li>a {
+    color: #000;
+}
+
+.soar-submit {
+    color:#fff;
+    background-color:#711d0c;
+    border-color:#711d0c;
+}
+
+footer {
+    color:white;
+    background-color:black;
+}
+
+.footer-logo {
+    height:55px;
+}
+
+/*Rollovers */
+.main_categories{
+    border-color: #ccc;
+    -webkit-border-radius: 7px;
+    -moz-border-radius: 7px;
+    border-radius: 7px;
+    border-style:solid;
+    border-width:1px;
+    margin: 10px auto 20px auto;
+    padding-bottom: 10px;
+    position:relative;
+    width: 675px;
+}
+
+
+.main_categories > a {
+    -webkit-border-top-left-radius: 7px;
+    -webkit-border-top-right-radius: 7px;
+    -moz-border-radius-topleft: 7px;
+    -moz-border-radius-topright: 7px;
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
+    border:0;
+    text-decoration:none;
+
+}
+
+div.main-content a, div.trail-wrapper a {
+    color: #711d0c;
+}
+
+#sidebar .ds-option a {
+    color:#555;
+}
+
+footer a {
+    color: #f5b23e;
+}
+
+a.rollover_blair {
+    display: block;
+    width: 675px;
+    height: 100px;
+    text-decoration: none;
+    text-indent: -99999px;
+    background: url('http://discoverarchive.vanderbilt.edu/xmlui/themes/VU/images/bwblair.jpg');
+}
+
+a.rollover_blair:hover {
+    background-position: 0 -100px;
+}
+
+
+a.rollover_artsscience {
+    display: block;
+    width: 675px;
+    height: 100px;
+    text-decoration: none;
+    text-indent: -99999px;
+    background: url('http://discoverarchive.vanderbilt.edu/xmlui/themes/VU/images/bwarts_science.jpg');
+}
+
+a.rollover_artsscience:hover {
+    background-position: 0 -100px;
+}

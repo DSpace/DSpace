@@ -1,0 +1,85 @@
+/*a, a:active, a:visited { color:#555588; border-bottom: 1px dotted; text-decoration: none; }
+a:hover { color:#036; border-bottom-style: solid; }*/
+
+h2 {
+    color: #555588;
+}
+
+body {
+    background: url(../images/brick_background.jpg) repeat;
+    color: #192C4D;
+}
+
+header .navbar-default {
+    background-color: #0D1A37;
+    color: white;
+    height: 83px;
+}
+
+header a.navbar-brand {
+    border-bottom: none;
+}
+header .navbar-brand img {
+    /*width: 300px;*/
+    height: 75px;
+    position: absolute;
+    top:8px;
+}
+
+#ds-user-box {
+    right: 20px;
+    top: 10px;
+    position: absolute;
+    color: white;
+}
+
+
+.trail-wrapper {
+    background: url(../images/menu_bg.gif);
+    background-size: cover;
+    margin: 0;
+    padding: 0 0 0 20px;
+    border-top: 1px solid #9cacba;
+    border-bottom: 1px solid #9cacba;
+    min-width: 990px;
+    min-height: 27px;
+}
+
+.trail-wrapper li {
+    display: inline;
+    color: #fff;
+    margin-right: 5px;
+}
+
+.trail-wrapper a {
+    color: #fff;
+}
+
+.trail-wrapper .breadcrumb {
+    padding-left: 0px;
+    padding-top: 4px;
+    font-size:11px;
+    font-family: Verdana, Geneva, sans-serif;
+}
+
+.trail-wrapper .breadcrumb > .active {
+    color: #eee;
+    font-weight: bold;
+}
+
+.trail-wrapper .breadcrumb > li + li:before {
+    color: #ccc;
+}
+
+footer {
+    background-color: #0D1A37;
+    color: #DAE2ED;
+}
+
+#aspect_administrative_authorization_EditPolicyForm_field_group_id {
+    height: 300px;
+}
+.thumbnail-wrapper a.image-link, .thumbnail-wrapper a:active, .thumbnail-wrapper a:visited {
+    display: block;
+    border: 1px dotted #ccc;
+}

@@ -1,0 +1,55 @@
+IIPMooViewer - HTML5 Ajax Viewer for IIPImage - Version 2.0
+
+You first must have a working version of the IIPImage server running. 
+See http://iipimage.sourceforge.net for details.
+
+Create a pyramidal tiled TIFF image using VIPS (http://vips.sf.net) or 
+imagemagick.
+
+Then use and modify the path and image names in the example HTML page 
+provided - index.html to create a working client :-)
+
+You must include the mootools and iipmooviewer header files, as well as 
+the iip.css stylesheet. For Internet Explorer, there is a separate ie.css 
+file and ie7.js is used to fix alpha transparency in IE6. For further 
+details see the HTML file included. You will find included both 
+uncompressed and compressed versions of the javascript and css files made 
+using Closure.
+
+
+Options to the IIPMooViewer class constructor: (The only obligatory 
+option is the "image" variable)
+
+image: The full path to the image. On Windows as on other systems this 
+       should be a UNIX style path such as "/path/to/image.tif"
+
+server: The address of the IIPImage server. [default : "/fcgi-bin/iipsrv.fcgi"]
+
+credit: a credit, copyright or information to be shown on the image itself
+
+zoom: the initial zoom level on start-up
+
+render: the way in which tiles are rendered. Either `random' where the 
+        tiles are fetched and rendered randomly or 'spiral' where the 
+        tiles are rendered from the center outwards [default : 'random']
+
+showNavWindow: whether to show the navigation window. [default : true]
+
+showNavButtons: whether to show the navigation buttons on start up: true 
+        or false [default : true]
+
+scale: pixels per mm
+
+prefix: path prefix if images or javascript subdirectory moved (default 'images/')
+
+enableFullscreen: allow full screen mode. Default true
+
+winResize: whether view is reflowed on window resize. Default true
+
+viewport: object containing x, y, resolution of initial view
+
+protocol: iip (default), zoomify or deepzoom
+
+annotations: An array of annotations containing struct with parameters x, y, w, h, title, text
+	where x, y, w and h are the position and size of the annotation in relative [0-1] values,
+	title is an optional title for the annotation and text is the HTML body of the annotation.

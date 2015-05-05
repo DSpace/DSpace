@@ -1,0 +1,112 @@
+/**
+ Colors: Find and Replace for a quick scheme.
+      mirage2      this-site
+ 1st: #53cdec      #53cdec          Top header          light blue
+ 2nd: #444      #444          Breadcrumb          dark blue
+ 3rd: #fb5617      #fb5617          side-nav/h1..h7     red
+*/
+
+
+/* Override dspace-bootstrap-tweaks */
+header .navbar-brand img {height: 56px; margin-top: -6px;}
+.navbar {min-height: 77px;}
+
+/* Override classic-mirage-style */
+header .navbar-default {background-color: transparent;}
+
+.trail-wrapper {background-color: transparent;}
+.trail-wrapper .breadcrumb > li + li:before {color: transparent;}
+.trail-wrapper .breadcrumb > .active {color: #888; float: right;}
+.trail-wrapper .sidebar-toggle .icon-bar {background-color: #fb5617;}
+.trail-wrapper .sidebar-toggle:hover, .trail-wrapper .sidebar-toggle:focus {background-color: #fb5617;}
+.breadcrumb, .breadcrumb a {color: #00acda; float: right; border-right: 1px solid #ccc; padding: 0 10px;}
+.breadcrumb li.active, .breadcrumb li.active a {border-right: none;}
+.breadcrumb > li + li:before {padding: 0; margin-left: -5px;}
+.trail-wrapper {border: none;}
+.trail-wrapper .breadcrumb {border-right: none; padding: 0 20px;}
+
+/* Submission form progress buttons */
+.btn-success {background-color: #444; border: 1px solid #8b9eb2;}
+.btn-success[disabled], .btn-success.disabled {background-color: #53cdec; border: 1px solid #8b9eb2;}
+.btn-success:hover {background-color: #3a658e;}
+
+/* Header Person dropdown */
+header .navbar-default .navbar-toggle > .open > a, header .navbar-default .navbar-toggle > .open > a:hover, header .navbar-default .navbar-toggle > .open > a:focus, header .navbar-default .navbar-nav > .open > a, header .navbar-default .navbar-nav > .open > a:hover, header .navbar-default .navbar-nav > .open > a:focus {background-color: #444; color: #eaf1f7;}
+header .navbar-default .navbar-toggle > li > a:hover, header .navbar-default .navbar-toggle > li > a:focus, header .navbar-default .navbar-nav > li > a:hover, header .navbar-default .navbar-nav > li > a:focus {background-color: #444; color: #eaf1f7;}
+header .navbar-default .navbar-toggle > .active > a, header .navbar-default .navbar-toggle > .active > a:hover, header .navbar-default .navbar-toggle > .active > a:focus, header .navbar-default .navbar-nav > .active > a, header .navbar-default .navbar-nav > .active > a:hover, header .navbar-default .navbar-nav > .active > a:focus {background-color: #444; color: #eaf1f7;}
+header .navbar-default .navbar-toggle > .open > a, header .navbar-default .navbar-toggle > .open > a:hover, header .navbar-default .navbar-toggle > .open > a:focus, header .navbar-default .navbar-nav > .open > a, header .navbar-default .navbar-nav > .open > a:hover, header .navbar-default .navbar-nav > .open > a:focus {background-color: #444; color: #eaf1f7;}
+    
+/* Header overrides */
+.navbar-nav > li > a {padding-top: 27px;}
+button.navbar-toggle {margin-top: 21px;}
+.container>.navbar-header, .container>.navbar-collapse, .container-fluid>.navbar-header, .container-fluid>.navbar-collapse {margin-right: -15px; margin-left: -15px;}
+header .navbar-default .navbar-toggle:hover, header .navbar-default .navbar-toggle:focus, header .navbar-default .navbar-nav:hover, header .navbar-default .navbar-nav:focus, ul.nav.navbar-nav.pull-left li a:hover, ul.nav.navbar-nav.pull-left li a:focus {background-color: transparent; color: #fb5617;}
+header .navbar-default .navbar-toggle:hover {background-color: #fb5617; color: #eeeeee;}
+
+/* Registration Buttons */
+.label-success {background-color: #444; color: #eaf1f7;}
+
+/* Search Icon */
+.btn-primary {color: #fff; background-color: #fb5617; border-color: #fb5617;}
+div#ds-options.word-break div#ds-search-option.ds-option-set {display: none;}
+form#ds-search-form {position: relative; float: left; margin-top: 20px; max-width: 205px;}
+form#ds-search-form fieldset {
+    width: 300px;
+}
+form#ds-search-form .input-group {
+    width: 200px;
+}
+.search-scope-all {
+    float: left;
+    width: 138px;
+    clear: both;
+    top: -10px;
+    position: relative;
+}
+.search-scope-container {
+    float: left;
+    width: 162px;
+    top: 4px;
+    position: relative;
+}
+form#ds-search-form li {
+    position: absolute;
+    top: 0px;
+    right: 75px;
+}
+
+/* bootstrap-classic-mirage-colors */
+a {color: #00acda;}
+.text-primary {color: #444;}
+.bg-primary {background-color: #fb5617;}
+.btn-primary {background-color: #fb5617;}
+.btn-primary.disabled, .btn-primary.disabled:hover, .btn-primary.disabled:focus, .btn-primary.disabled:active, .btn-primary.disabled.active, .btn-primary[disabled], .btn-primary[disabled]:hover, .btn-primary[disabled]:focus, .btn-primary[disabled]:active, .btn-primary[disabled].active, fieldset[disabled] .btn-primary, fieldset[disabled] .btn-primary:hover, fieldset[disabled] .btn-primary:focus, fieldset[disabled] .btn-primary:active, fieldset[disabled] .btn-primary.active {background-color: #fb5617;}
+.btn-primary .badge {color: #fb5617;}
+.btn-link {color: #fb5617;}
+.dropdown-menu > .active > a, .dropdown-menu > .active > a:hover, .dropdown-menu > .active > a:focus {background-color: #fb5617;}
+.nav .open > a, .nav .open > a:hover, .nav .open > a:focus {border-color: #fb5617;}
+.nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {background-color: #fb5617;}
+.navbar-inverse {background-color: #53cdec;}
+.pagination > li > a, .pagination > li > span {color: #fb5617;}
+.pagination > .active > a, .pagination > .active > a:hover, .pagination > .active > a:focus, .pagination > .active > span, .pagination > .active > span:hover, .pagination > .active > span:focus {background-color: #fb5617; border-color: #fb5617;}
+.label-primary {background-color: #fb5617;}
+a.list-group-item.active > .badge, .nav-pills > .active > a > .badge {color: #fb5617;}
+a.thumbnail:hover, a.thumbnail:focus, a.thumbnail.active {border-color: #fb5617;}
+.progress-bar {background-color: #fb5617;}
+.list-group-item.active, .list-group-item.active:hover, .list-group-item.active:focus {background-color: #fb5617; border-color: #fb5617;}
+.panel-primary {border-color: #fb5617;}
+.panel-primary > .panel-heading {background-color: #fb5617; border-color: #fb5617;}
+.panel-primary > .panel-heading + .panel-collapse > .panel-body {border-top-color: #fb5617;}
+.panel-primary > .panel-footer + .panel-collapse > .panel-body {border-bottom-color: #fb5617;}
+body {font-family: "Gotham SSm A","Gotham SSm B","Arial","Verdana",sans-serif; font-weight: 300;}
+.page-header {font-weight: 300;}
+footer {background: #444; color: #EAF1F7;}
+header .navbar {height: 75px; background-color:#444; border-bottom-color: #35912a; border-bottom-style: solid; border-bottom-width: 3px;}
+.full-width-holder {width: 100%; background-image: url("../images/clouds.png");}
+
+/* Media overrides */
+@media (max-width: 980px) {.trail-wrapper .breadcrumb {position: absolute; right: -175px;}}
+@media (max-width: 767px) {
+.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {background-color: #fb5617; border: 1px solid #fb5617;}
+}
+@media (max-width: 600px) {.breadcrumb, .breadcrumb a {display: none;}}

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en" >
+
+ <head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta http-equiv="X-UA-Compatible" content="IE=9" />
+
+  <link rel="stylesheet" type="text/css" media="all" href="css/iip.css" />
+<!--[if lt IE 9]>
+  <link rel="stylesheet" type="text/css" media="all" href="css/ie.css" />
+<![endif]-->
+
+  <link rel="shortcut icon" href="images/iip-favicon.png" />
+  <link rel="apple-touch-icon" href="images/iip.png" />
+
+  <title>IIPMooViewer 2.0 :: IIPImage High Resolution HTML5 Ajax Image Streaming Viewer</title>
+  <script type="text/javascript" src="javascript/mootools-core-1.3.2-full-nocompat.js"></script>
+  <script type="text/javascript" src="javascript/mootools-more-1.3.2.1.js"></script>
+  <script type="text/javascript" src="javascript/protocols.js"></script>
+  <script type="text/javascript" src="javascript/iipmooviewer-2.0.js"></script>
+
+<!--[if lt IE 7]>
+  <script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE7.js">IE7_PNG_SUFFIX = ".png";</script>
+<![endif]-->
+
+
+  <script type="text/javascript">
+
+    // The iipsrv server path (/fcgi-bin/iipsrv.fcgi by default)
+    var server = 'http://iip.longsight.com/fcgi-bin/iipsrv.fcgi';
+
+    // The *full* image path on the server. This path does *not* need to be in the web
+    // server root directory. On Windows, use Unix style forward slash paths without
+    // the "c:" prefix
+    var images = '/home/iipsrv/PalaisDuLouvre.tif';
+
+    // Copyright or information message
+    var credit = '&copy; copyright or information message';
+
+    // Create our viewer object
+    // See documentation for more details of options
+    var iipmooviewer = new IIPMooViewer( "viewer", {
+		image: images,
+		server: server,
+		credit: credit, 
+		scale: 20.0,
+		showNavWindow: true,
+		showNavButtons: true,
+		winResize: true,
+		protocol: 'iip'
+    });
+
+  </script>
+
+  <style type="text/css">
+    body{ height: 100%; }
+    div#viewer{ width: 100%; height: 100%; }
+  </style>
+
+ </head>
+
+ <body>
+
+   <div id="viewer"></div>
+
+  </body>
+</html>

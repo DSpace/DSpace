@@ -1,0 +1,34 @@
+div.navbar {
+  min-height: 90px;
+  background: url('../images/escholarshare_bg.png') repeat-x;
+  color: #18477B;
+}
+img#drakelogo {
+  width: 352px;
+  height: 70px;
+}
+div.trail-wrapper {
+  background-color: #9FADBD;
+  border-bottom: 1px solid #18477B;
+  border-top: 1px solid #ddd;
+}
+a {
+  color: #18477B;
+  text-decoration: none;
+}
+#main-container #sidebar,
+#main-container .row-offcanvas
+{
+  background-color: #DEDEDE;
+}
+header .navbar-default .navbar-toggle > li > a, header .navbar-default .navbar-nav > li > a {
+  color: #18477B;
+}
+.list-group-item.active, .list-group-item.active:hover, .list-group-item.active:focus {
+  background-color: #9FADBD;
+  border-color: #9FADBD;
+}
+.btn-primary {
+  background-color: #9FADBD;
+  border-color: #9FADBD;
+}

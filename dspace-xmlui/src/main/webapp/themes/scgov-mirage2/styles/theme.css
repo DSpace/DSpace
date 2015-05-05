@@ -1,0 +1,224 @@
+/**
+ Colors: Find and Replace for a quick scheme.
+      mirage2      this-site
+ 1st: #ffffff      #ffffff          Top header
+ 2nd: #0161AD      #0161AD          Breadcrumb
+ 3rd: #0161ad      #0161ad          side-nav/h1..h7
+*/
+
+
+/* Override dspace-bootstrap-tweaks */
+header .navbar-brand img {
+    height: 56px;
+    margin-top: -6px;
+}
+
+.navbar {
+    min-height: 77px;
+}
+
+/* Override classic-mirage-style */
+header .navbar-default {
+    background-color: #ffffff;
+}
+
+.trail-wrapper {
+    background-color: #0161AD;
+}
+.trail-wrapper .breadcrumb > li + li:before {
+    color: #eaf1f7;
+}
+.trail-wrapper .breadcrumb > .active {
+    color: #eee;
+}
+.trail-wrapper .sidebar-toggle .icon-bar {
+    background-color: #0161ad;
+}
+.trail-wrapper .sidebar-toggle:hover, .trail-wrapper .sidebar-toggle:focus {
+    background-color: #0161ad;
+}
+
+@media (max-width: 767px) {
+    .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+        background-color: #0161ad;
+        border: 1px solid #0161ad;
+    }
+}
+
+/* Submission form progress buttons */
+.btn-success {
+    background-color: #0161AD;
+    border: 1px solid #8b9eb2;
+}
+.btn-success[disabled], .btn-success.disabled {
+    background-color: #ffffff;
+    border: 1px solid #8b9eb2;
+}
+.btn-success:hover {
+    background-color: #3a658e;
+}
+
+/* Header Person dropdown */
+header .navbar-default .navbar-toggle > .open > a, header .navbar-default .navbar-toggle > .open > a:hover, header .navbar-default .navbar-toggle > .open > a:focus, header .navbar-default .navbar-nav > .open > a, header .navbar-default .navbar-nav > .open > a:hover, header .navbar-default .navbar-nav > .open > a:focus {
+    background-color: #0161AD;
+    color: #eaf1f7;
+}
+
+/* header unfocused login/menu*/
+header .navbar-default .navbar-toggle > li > a, header .navbar-default .navbar-toggle > li > a, header .navbar-default .navbar-nav > li > a, header .navbar-default .navbar-nav > li > a {
+    background-color: #0161AD;
+    color: #eaf1f7;
+    opacity: 0.5;
+}
+
+/* header focused login/menu */
+header .navbar-default .navbar-toggle > li > a:hover, header .navbar-default .navbar-toggle > li > a:focus, header .navbar-default .navbar-nav > li > a:hover, header .navbar-default .navbar-nav > li > a:focus {
+    background-color: #0161AD;
+    color: #eaf1f7;
+    opacity: 1;
+}
+header .navbar-default .navbar-toggle > .active > a, header .navbar-default .navbar-toggle > .active > a:hover, header .navbar-default .navbar-toggle > .active > a:focus, header .navbar-default .navbar-nav > .active > a, header .navbar-default .navbar-nav > .active > a:hover, header .navbar-default .navbar-nav > .active > a:focus {
+    background-color: #0161AD;
+    color: #eaf1f7;
+}
+header .navbar-default .navbar-toggle > .open > a, header .navbar-default .navbar-toggle > .open > a:hover, header .navbar-default .navbar-toggle > .open > a:focus, header .navbar-default .navbar-nav > .open > a, header .navbar-default .navbar-nav > .open > a:hover, header .navbar-default .navbar-nav > .open > a:focus {
+    background-color: #0161AD;
+    color: #eaf1f7;
+}
+
+/* header mobile */
+header .navbar-default .navbar-toggle, header .navbar-default .navbar-nav {
+    color: #0161AD;
+}
+
+header .navbar-default .navbar-toggle .icon-bar, header .navbar-default .navbar-nav .icon-bar {
+    background-color: #0161AD;
+}
+
+/* Registration Buttons */
+.label-success {
+    background-color: #0161AD;
+    color: #eaf1f7;
+}
+
+/* Search Icon */
+.btn-primary {
+    color: #fff;
+    background-color: #0161ad;
+    border-color: #0161ad;
+}
+
+
+/* bootstrap-classic-mirage-colors */
+a {
+    color: #0161ad;
+}
+.text-primary {
+    color: #0161ad
+}
+.bg-primary {
+    background-color: #0161ad
+}
+.btn-primary {
+    background-color: #0161ad;
+}
+.btn-primary.disabled, .btn-primary.disabled:hover, .btn-primary.disabled:focus, .btn-primary.disabled:active, .btn-primary.disabled.active, .btn-primary[disabled], .btn-primary[disabled]:hover, .btn-primary[disabled]:focus, .btn-primary[disabled]:active, .btn-primary[disabled].active, fieldset[disabled] .btn-primary, fieldset[disabled] .btn-primary:hover, fieldset[disabled] .btn-primary:focus, fieldset[disabled] .btn-primary:active, fieldset[disabled] .btn-primary.active {
+    background-color: #0161ad;
+}
+.btn-primary .badge {
+    color: #0161ad;
+}
+.btn-link {
+    color: #0161ad;
+}
+.dropdown-menu > .active > a, .dropdown-menu > .active > a:hover, .dropdown-menu > .active > a:focus {
+    background-color: #0161ad
+}
+.nav .open > a, .nav .open > a:hover, .nav .open > a:focus {
+    border-color: #0161ad
+}
+.nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+    background-color: #0161ad
+}
+
+.navbar-inverse {
+    background-color: #ffffff;
+}
+.pagination > li > a, .pagination > li > span {
+    color: #0161ad;
+}
+.pagination > .active > a, .pagination > .active > a:hover, .pagination > .active > a:focus, .pagination > .active > span, .pagination > .active > span:hover, .pagination > .active > span:focus {
+    background-color: #0161ad;
+    border-color: #0161ad;
+}
+.label-primary {
+    background-color: #0161ad
+}
+a.list-group-item.active > .badge, .nav-pills > .active > a > .badge {
+    color: #0161ad;
+}
+a.thumbnail:hover, a.thumbnail:focus, a.thumbnail.active {
+    border-color: #0161ad
+}
+.progress-bar {
+    background-color: #0161ad;
+}
+.list-group-item.active, .list-group-item.active:hover, .list-group-item.active:focus {
+    background-color: #0161ad;
+    border-color: #0161ad
+}
+.panel-primary {
+    border-color: #0161ad
+}
+.panel-primary > .panel-heading {
+    background-color: #0161ad;
+    border-color: #0161ad
+}
+.panel-primary > .panel-heading + .panel-collapse > .panel-body {
+    border-top-color: #0161ad
+}
+.panel-primary > .panel-footer + .panel-collapse > .panel-body {
+    border-bottom-color: #0161ad
+}
+
+/* Completely Local Customizations */
+#sc-banner-holder {
+    border: 1px solid #ccc;
+    max-width: 670px;
+    max-height: 150px;
+}
+
+.full-width-holder {
+    width: 100%;
+    background-image: url("../images/bg_linen.png");
+}
+
+footer {
+    background-image: url("../images/bg_foot2.png");
+}
+
+footer h3 {
+    box-sizing: border-box;
+    color: rgb(255, 255, 255);
+    display: block;
+    font-family: Oswald, Impact, sans-serif;
+    font-size: 28px;
+    font-weight: 500;
+    height: 30px;
+    line-height: 30.7999992370605px;
+    margin-bottom: 11px;
+    margin-top: 22px;
+    width: 910px;
+}
+
+/* Swap main-content to right side, and sidebar to left side */
+.main-content {
+    float:right;
+}
+.sidebar-offcanvas {
+    float:left;
+}
+
+.metadata-language {
+    display:none;
+}

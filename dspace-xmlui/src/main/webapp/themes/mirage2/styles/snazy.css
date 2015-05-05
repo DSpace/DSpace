@@ -1,0 +1,119 @@
+/* SNAZY */
+/* Snazy Stylesheet built with compass */
+
+
+/* Constansts read from computed CSS. These should not be modified. */
+/* Some custom variables */
+ul.snazy {
+    font-size: 1em;
+    line-height: 1em;
+    padding-left: 0;
+}
+ul.snazy li.file-entry {
+    /* Generic file-entry styling */
+    position: relative;
+    display: block;
+    background-color: #f6f4f4;
+    padding: 8px;
+    border: 1px solid #ebe6e6;
+    margin: 0 0 8px;
+    overflow: hidden;
+    *zoom: 1;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    -ms-border-radius: 4px;
+    -o-border-radius: 4px;
+    border-radius: 4px;
+    /* Styling for views */ }
+ul.snazy li.file-entry .file-item {
+    line-height: 1.2em;
+    margin: 0 0 0.4em; }
+ul.snazy li.file-entry .file-item.last {
+    float: left;
+    clear: left; }
+ul.snazy li.file-entry .file-item .label {
+    color: #8c8c8c;
+    width: 120px;
+    display: block;
+    float: left; }
+ul.snazy li.file-entry .file-size {
+    color: #4d0000; }
+ul.snazy li.file-entry .slide-arrow {
+    float: right;
+    font-size: 0.8em;
+    cursor: pointer;
+    border: 1px solid #dddddd;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    -ms-border-radius: 6px;
+    -o-border-radius: 6px;
+    border-radius: 6px;
+    height: 16px;
+    padding: 4px;
+    line-height: 16px;
+    background-color: #fbfafa;
+    margin-top: -0.4em; }
+ul.snazy li.file-entry .slide-arrow div.showhide {
+    height: 16px;
+    line-height: 16px;
+    padding-right: 20px; }
+ul.snazy li.file-entry .slide-arrow.show div.showhide {
+    background: url(../images/arrow-down.png) 100% 50% no-repeat; }
+ul.snazy li.file-entry .slide-arrow.hide div.showhide {
+    background: url(../images/arrow-up.png) 100% 50% no-repeat; }
+ul.snazy li.file-entry.even {
+    border: 1px solid #ededed;
+    background-color: #fafafa; }
+ul.snazy li.file-entry.even .slide-arrow {
+    background-color: white; }
+ul.snazy li.file-entry .file-view {
+    clear: both;
+    text-align: center; }
+ul.snazy li.file-entry .file-view object, ul.snazy li.file-entry .file-view embed, ul.snazy li.file-entry .file-view video, ul.snazy li.file-entry .file-view audio {
+    max-width: 570px; }
+ul.snazy li.file-entry .embedwithfallback {
+    width: 570px;
+    height: 500px;
+    background: transparent url(../images/loading.gif) no-repeat center;
+}
+
+/* Embed large when inside modal */
+@media (min-width: 992px) {
+    ul.snazy li.file-entry .embedwithfallback {
+        width: 900px;
+    }
+
+    ul.snazy li.file-entry .file-view object, ul.snazy li.file-entry .file-view embed, ul.snazy li.file-entry .file-view video, ul.snazy li.file-entry .file-view audio {
+        max-width: 850px;
+    }
+}
+
+ul.snazy li.file-entry .flashvideo {
+    width: 100%;
+    min-height: 411.75px; }
+ul.snazy li.file-entry .googleplayer {
+    overflow: hidden;
+    *zoom: 1; }
+ul.snazy li.file-entry .googleplayer .file-mimetype {
+    float: left; }
+ul.snazy li.file-entry .googleplayer .file-view {
+    float: right; }
+ul.snazy.js li.file-entry .slide-arrow {
+    height: 25px;
+    display: block; }
+
+/*ul.snazy.js li.file-entry .file-view {
+    display: none; }*/
+
+ul.snazy.no-js li.file-entry .slide-arrow {
+    display: none; }
+ul.snazy.no-js li.file-entry .file-view {
+    display: block; }
+.html5video {
+    width: 100%;
+}
+
+/* Snazy Overrides */
+img.smalldisplay {
+    width:100%;
+}

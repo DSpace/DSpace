@@ -1,0 +1,349 @@
+.iipmooviewer {
+  font-family: Verdana, sans-serif;
+  left: 0;
+  top: 0;
+  background: #000;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+.iipmooviewer:focus, .iipmooviewer.active {
+  outline: none;
+}
+
+.iipmooviewer .navcontainer {
+  position: absolute;
+  z-index: 2;
+  text-align: center;
+  background: transparent;
+  top: 10px;
+  right: 10px;  
+}
+.iipmooviewer .navcontainer .toolbar {
+  height: 8px;
+  cursor: move;
+  width: 100%;
+  opacity: 0.8;
+  /* Cross browser CSS gradients from http://www.colorzilla.com/gradient-editor/ */
+  background: #a9aba6; /* Old browsers */
+  background: -moz-linear-gradient(top, #a9aba6 0%, #c0c2be 22%, #d5d5d2 33%, #e2e1dd 44%, #ededed 56%, #bebec1 67%, #c3c3c2 78%, #a1a4a0 89%, #878686 100%) repeat-x; /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#a9aba6), color-stop(22%,#c0c2be), color-stop(33%,#d5d5d2), color-stop(44%,#e2e1dd), color-stop(56%,#ededed), color-stop(67%,#bebec1), color-stop(78%,#c3c3c2), color-stop(89%,#a1a4a0), color-stop(100%,#878686)) repeat-x; /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, #a9aba6 0%,#c0c2be 22%,#d5d5d2 33%,#e2e1dd 44%,#ededed 56%,#bebec1 67%,#c3c3c2 78%,#a1a4a0 89%,#878686 100%) repeat-x; /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top, #a9aba6 0%,#c0c2be 22%,#d5d5d2 33%,#e2e1dd 44%,#ededed 56%,#bebec1 67%,#c3c3c2 78%,#a1a4a0 89%,#878686 100%) repeat-x; /* Opera11.10+ */
+  background: -ms-linear-gradient(top, #a9aba6 0%,#c0c2be 22%,#d5d5d2 33%,#e2e1dd 44%,#ededed 56%,#bebec1 67%,#c3c3c2 78%,#a1a4a0 89%,#878686 100%) repeat-x; /* IE10+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ededed', endColorstr='#6f706d',GradientType=0 ); /* IE6-9 */
+  background: linear-gradient(top, #a9aba6 0%,#c0c2be 22%,#d5d5d2 33%,#e2e1dd 44%,#ededed 56%,#bebec1 67%,#c3c3c2 78%,#a1a4a0 89%,#878686 100%) repeat-x; /* W3C */
+}
+
+.iipmooviewer .navcontainer .toolbar:hover { opacity: 1.0 }
+
+.navwin {
+  font-size: 90%;
+  left: 0;
+  font-weight: bold;
+  text-align: left;
+  border: 1px outset red;
+  border: none;
+  top: 10px;
+  z-index: 2;
+  opacity: 0.9;
+  width: 100%;
+}
+
+.navwin img { border: 0; width: 100%; height: 100% }
+
+.navwin .zone {
+  background: #888;
+  border: 2px solid yellow;
+  cursor: move;
+  z-index: 3;
+  opacity: 0.4;
+}
+.iipmooviewer .canvas{
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top:  0;
+  z-index: 0;
+  cursor: wait;
+  position: absolute;
+  background: transparent;
+  -webkit-transition: -webkit-transform 0.5s ease-in-out;
+  -moz-transition: -moz-transform 0.5s ease-in-out;
+  -o-transition: -o-transform 0.5s ease-in-out;
+  -ms-transition: -ms-transform 0.5s ease-in-out;
+  transition: transform 0.5s ease-in-out;
+}
+.iipmooviewer .canvas img{
+  padding: 0;
+  border: 0;
+  position: absolute;
+  -webkit-transition: opacity 0.33s ease-in-out;
+  -moz-transition: opacity 0.33s ease-in-out;
+  -o-transition: opacity 0.33s ease-in-out;
+  -ms-transition: opacity 0.33s ease-in-out;	
+  transition: opacity 0.33s ease-in-out;
+  -webkit-transition: -webkit-transform 0.5s ease-in-out;
+  -moz-transition: -moz-transform 0.5s ease-in-out;
+  -o-transition: -o-transform 0.5s ease-in-out;
+  -ms-transition: -ms-transform 0.5s ease-in-out;
+  transition: transform 0.5s ease-in-out;
+}
+
+a.logo:link, a.logo:visited {
+  text-decoration: none;
+  border: none;
+}
+.iipmooviewer .credit {
+  position: absolute;
+  margin: 10px;
+  right: 0;
+  bottom: 0;
+  border: 1px outset #333;
+  color: #fff;
+  background: #222;
+  opacity: 0.65;
+  font-weight: normal;
+  padding: 5px;
+  font-size: 80%;
+  -moz-border-radius: 0.3em;
+  -webkit-border-radius: 0.3em;
+  border-radius: 0.3em;
+  -moz-box-shadow: 4px 4px 4px rgba(0,0,0,0.75);
+  -webkit-box-shadow: 4px 4px 4px rgba(0,0,0,0.75);
+  -o-box-shadow: 4px 4px 4px rgba(0,0,0,0.75);
+  box-shadow: 4px 4px 4px rgba(0,0,0,0.75);
+  text-shadow: 0.5px 0.5px 0 grey;
+}
+.tip {
+  color: #ccc;
+  background: #222;
+  padding: 3px;
+  font-family: Verdana, sans-serif;
+  font-size: 8pt;
+  line-height: 1.2em;
+  z-index: 2;
+  position: relative;
+  -moz-border-radius: 0.5em;
+  -webkit-border-radius: 0.5em;
+  border-radius: 0.5em;
+  -moz-box-shadow: 5px 5px 8px rgba(0,0,0,0.5);
+  -webkit-box-shadow: 5px 5px 5px rgba(0,0,0,0.5);
+  -o-box-shadow: 5px 5px 5px rgba(0,0,0,0.5);
+  box-shadow: 5px 5px 5px rgba(0,0,0,0.5);
+}
+.tip h1 {
+  font-size: 150%;
+  font-style: italic;
+  margin-bottom: 1em;
+}
+.tip blockquote{
+  font-style: italic;
+  margin-left: 2em;
+  margin-right: 2em;
+}
+
+/* Progress Bar
+ */
+.loadBarContainer {
+  height: 10px;
+  border: 1px solid #fff;
+  background: #000;
+  opacity: 0.66;
+  text-align: left;
+}
+.loadBar {
+  left: 0;
+  font-size: 9px;
+  font-family: sans-serif;
+  font-weight: bold;
+  letter-spacing: 0.25em;
+  color: #000;
+  border: 0;
+  background: #fff;
+  height: 10px;
+}
+
+/* Scale Widget Styles
+ */
+.iipmooviewer .scale {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  height: 1.5em;
+  width: auto;
+  padding: 3px;
+  background: #222;
+  opacity: 0.65;
+  cursor: default;
+  color: #bbb;
+  text-align: center;
+  font-weight: bold;
+  font-size: 65%;
+  text-align: center;
+  font-weight: normal;
+  text-shadow: 0.5px 0.5px 0 grey;
+  -moz-border-radius: 0.2em;
+  -webkit-border-radius: 0.2em;
+  border-radius: 0.2em;
+}
+.iipmooviewer .scale:hover{
+  opacity: 0.9;
+}
+.iipmooviewer .scale .ruler {
+  margin-left: auto;
+  margin-right: auto;
+  border: 2px solid #bbb;
+  border-top: none;
+  background: transparent;
+  width: auto;
+  height: 2px;
+}
+.iipmooviewer .scale .label { width: auto; }
+
+/* Navigation Windows Styles
+ */
+.iipmooviewer .navcontainer .navbuttons {
+  font-size: 50%;
+  line-height: 0;
+  background: #222;
+  opacity: 0.6;
+  width: auto;
+  padding: 5px;
+  z-index: 0;
+  overflow: hidden;
+  -moz-border-radius-bottomleft: 5px;
+  -moz-border-radius-bottomright: 5px;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+.iipmooviewer .navcontainer .navbuttons img {
+  margin-top: 2px;
+  margin-left: 2px;
+  cursor: pointer;
+  position: relative;
+  padding: 1px;
+}
+.iipmooviewer .canvas .annotation {
+  position: absolute;
+  overflow: visible;
+  z-index: 2;
+  border: 1px solid #888;
+  background-color: transparent;
+}
+.iipmooviewer .canvas .annotation:hover{ border-color: #fff; }
+
+/* Info Window
+ */
+.iipmooviewer img.logo {
+  position: absolute;
+  margin: 5px;
+  left: 0;
+  top: 0;
+  border: none;
+  cursor: help;
+  width: 32px;
+  height: 32px;
+  opacity: 0.65;
+}
+.iipmooviewer .info {
+  position: absolute;
+  z-index: 10;
+  padding: 2em;
+  opacity: 0;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  font-family: Verdana, sans-serif;
+  font-size: 9pt;
+  color: #ccc;
+  background: #111;
+  display: table;
+  overflow: hidden;
+}
+.iipmooviewer .info div {
+  margin-left: auto;
+  margin-right: auto;
+  display: table-cell;
+  vertical-align: middle;
+  width: 100%;
+  height: auto;
+}
+
+.iipmooviewer .info div div {
+  text-align: left;
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+  width: 75%;
+  height: auto;
+  display: block;
+}
+.iipmooviewer .info div a {
+  color: #aaf;
+  text-decoration: none;
+}
+.iipmooviewer .info div a:hover {
+  text-decoration: underline;
+  text-shadow: 1px 0 0 #66a;
+}
+.iipmooviewer .info div a img{
+  position: relative;
+  top: 8px;
+  margin-right: 8px;
+  margin-left: 0;
+  border: none;
+}
+.iipmooviewer .info div h2 {
+  margin-bottom: 2em;
+  text-align: left;
+  letter-spacing: 0.1em;
+  font-size: 150%;
+  font-weight: bold;
+  text-shadow: 1px 1px 0 #444;
+}
+.iipmooviewer .info div ul {
+  width: 75%;
+  margin: 2em;
+  font-size: 8pt;
+}
+
+.iipmooviewer .message {
+  background: black;
+  text-align: center;
+  color: white;
+  width: 18em;
+  margin-top: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  z-index: 5;
+  padding: 0.5em;
+  opacity: 0.7;
+  -moz-border-radius: 0.4em;
+  -webkit-border-radius: 0.4em;
+  border-radius: 0.4em; 
+}
+
+/* iPhone, iPad and Android Devices
+ */
+@media screen and (max-device-width: 480px){
+  .iipmooviewer { -webkit-text-size-adjust: 80%; }
+  .iipmooviewer .info div div { width: 100%; }
+  .iipmooviewer .info div div ul { padding: 1em; }
+  .iipmooviewer .info div div, .info div div ul li { font-size: 8pt; }
+  .iipmooviewer .navcontainer .navbuttons img {
+    width: 24px;
+    height: 24px;
+  }
+}
+@media only screen and (min-device-width: 481px) and (max-device-width: 1024px) {
+  .iipmooviewer { -webkit-text-size-adjust: 120%; }
+  .iipmooviewer .info div div { width: 90%; }
+  .iipmooviewer .navcontainer .navbuttons img {
+    width: 32px;
+    height: 32px;
+  }
+}
