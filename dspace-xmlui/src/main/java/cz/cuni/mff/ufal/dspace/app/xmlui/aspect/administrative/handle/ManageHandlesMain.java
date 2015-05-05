@@ -162,7 +162,7 @@ public class ManageHandlesMain extends AbstractDSpaceTransformer {
 			page = totalPages;
 
 		// Compute offsets for current page
-		int firstIndex = (page - 1) * resultsPerPage + 1;
+		int firstIndex = Math.max(0, (page - 1) * resultsPerPage + 1);
 		int lastIndex = (page - 1) * resultsPerPage + resultsPerPage;
 
 		// Sanitize lastIndex
@@ -220,8 +220,11 @@ public class ManageHandlesMain extends AbstractDSpaceTransformer {
 
 		// Table rows
 		for (int i = firstIndex - 1; i < lastIndex && i < handles.size(); i++) {
+			if ( i < 0 ) {
+				break;
+			}
 			Handle h = handles.get(i);
-			Row hrow = htable.addRow(null, Row.ROLE_DATA, null);			
+			Row hrow = htable.addRow(null, Row.ROLE_DATA, null);
 			hrow.addCell().addRadio("handle_id")
 					.addOption(false, "" + h.getID());
             if (h.getHandle() != null && !h.getHandle().isEmpty())
