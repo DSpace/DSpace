@@ -253,8 +253,14 @@
     <%
     	int discovery_panel_cols = 12;
     	int discovery_facet_cols = 4;
-    %>
+    	Map<String, List<FacetResult>> mapFacetes = (Map<String, List<FacetResult>>) request.getAttribute("discovery.fresults");
+    	List<DiscoverySearchFilterFacet> facetsConf = (List<DiscoverySearchFilterFacet>) request.getAttribute("facetsConfig");
+    	String processorSidebar = (String) request.getAttribute("processorSidebar");
+    
+    if(processorSidebar!=null && processorSidebar.equals("sidebar")) {
+	%>
 	<%@ include file="discovery/static-sidebar-facet.jsp" %>
+	<% } %>	
 </div>
 <div class="row">
 <%
@@ -349,7 +355,7 @@
 <%
             }
 			if(isAdmin || !ConfigurationManager.getBooleanProperty("solr-statistics","authorization.admin")) { %>
-					<a href="<%= request.getContextPath() %>/cris/stats/collection.html?handle=<%= collections[i].getHandle() %>"><img src="<%= request.getContextPath() %>/images/chart_curve.png" border="0" title="usage statistics"/></a>
+					<a href="<%= request.getContextPath() %>/cris/stats/collection.html?handle=<%= collections[i].getHandle() %>"><img src="<%= request.getContextPath() %>/image/stats/chart_curve.png" border="0" title="usage statistics"/></a>
 				&nbsp;
 		 <% } %>
         

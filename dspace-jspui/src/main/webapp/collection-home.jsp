@@ -388,8 +388,14 @@
     <%
     	int discovery_panel_cols = 12;
     	int discovery_facet_cols = 12;
-    %>
-    <%@ include file="discovery/static-sidebar-facet.jsp" %>
+    	Map<String, List<FacetResult>> mapFacetes = (Map<String, List<FacetResult>>) request.getAttribute("discovery.fresults");
+    	List<DiscoverySearchFilterFacet> facetsConf = (List<DiscoverySearchFilterFacet>) request.getAttribute("facetsConfig");
+    	String processorSidebar = (String) request.getAttribute("processorSidebar");
+    
+    if(processorSidebar!=null && processorSidebar.equals("sidebar")) {
+	%>
+	<%@ include file="discovery/static-sidebar-facet.jsp" %>
+	<% } %>	
   </dspace:sidebar>
 
 </dspace:layout>
