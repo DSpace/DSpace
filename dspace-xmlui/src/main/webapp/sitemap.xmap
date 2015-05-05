@@ -265,7 +265,7 @@
                 <map:pipeline type="noncaching">
                     <map:match pattern="discojuice/feeds">
                         <map:act type="DiscoJuiceFeeds">
-                        	<map:read type="resource" src="discojuice/feeds/feeds.jsonp" mime-type="text/javascript"/>
+                        	<map:read type="resource" src="discojuice/feeds/feeds.jsonp" mime-type="text/javascript; charset=utf-8"/>
                         </map:act>
                     </map:match>
                 </map:pipeline>
