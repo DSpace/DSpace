@@ -36,8 +36,9 @@ AjaxSolr.AutocompleteWidget = AjaxSolr.AbstractFacetWidget.extend({
       $(self.target).find("input[type='text']").typeahead({
 		source: source,
 		updater: function(item){
-		  console.log("Processing " + item);
-		  return "\"" + list[item].value + "\"";
+		  //console.log("Processing " + item);
+		  //return "\"" + list[item].value + "\"";
+		  return list[item].value;
 		},
 		matcher: function(item){
 			var value = item.substring(0,item.lastIndexOf("(") - 1); //-1 for space in front of '('
