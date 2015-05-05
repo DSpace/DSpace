@@ -2023,6 +2023,9 @@ Para más infomación, visite
 <!-- CIC-Digital -->
 <message key="xmlui.dri2xhtml.structural.cc-item-view-text">Exceptuando que se explicite de otra forma, esta obra se publica con la licencia Creative Commons </message>
 
+<message key="mxlui.dri2xhtml.structural.cc-phone">Telefono</message>
+<message key="mxlui.dri2xhtml.structural.cc-street">Calle</message>
+<message key="mxlui.dri2xhtml.structural.cc-between">entre</message>
 
 	<!-- DS-METS-1.0-MODS.xsl -->
 	<!-- DS-METS-1.0-DIM.xsl -->

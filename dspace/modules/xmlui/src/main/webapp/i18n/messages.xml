@@ -2225,7 +2225,9 @@
 	<message key="xmlui.dri2xhtml.structural.cc-by-nc-sa-2.5-ar">Attribution-NonCommercial-ShareAlike 2.5 (BY-NC-SA 2.5 Argentina)</message>
 	<message key="xmlui.dri2xhtml.structural.cc-by-nc-nd-2.5-ar">Attribution-NonCommercial-NoDerivs  2.5 (BY-NC-ND 2.5 Argentina)</message>
 	
-	
+	<message key="mxlui.dri2xhtml.structural.cc-phone">Phone</message>
+	<message key="mxlui.dri2xhtml.structural.cc-street">Street</message>
+	<message key="mxlui.dri2xhtml.structural.cc-between">between</message>
 	<!-- DS-METS-1.0-MODS.xsl -->
 	<!-- DS-METS-1.0-DIM.xsl -->
 	<!-- DS-METS-1.0-QDC.xsl -->

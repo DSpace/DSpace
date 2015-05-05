@@ -94,16 +94,17 @@
 				<address>
 					<strong>Comisión de Investigaciones Científicas</strong>
 					<br />
-					Calle 526 entre 10 y 11
+					<i18n:text>mxlui.dri2xhtml.structural.cc-street</i18n:text> 526 <i18n:text>mxlui.dri2xhtml.structural.cc-between</i18n:text> 10 y 11
 					<br />
 					CP: 1900 - La Plata - Buenos Aires - Argentina
 					<br />
 					<a href="mailto:#">cic-digital@sedici.unlp.edu.ar</a>
 					<br />
-					<abbr title="Phone">Tel:</abbr>
+					
+					<abbr title="Phone"><i18n:text>mxlui.dri2xhtml.structural.cc-phone</i18n:text></abbr>
 					+54 (0221) 423 6696/6677 (int. 141) (CIC-DIGITAL)
 					<br />
-					<abbr title="Phone">Tel:</abbr>
+					<abbr title="Phone"><i18n:text>mxlui.dri2xhtml.structural.cc-phone</i18n:text></abbr>
 					+54 (0221) 421-7374 / 482-3795 (CIC-Central)
 				</address>
 			</div>
