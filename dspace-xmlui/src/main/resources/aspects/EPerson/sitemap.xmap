@@ -65,7 +65,7 @@ registration, forgotten passwords, editing profiles, and changing passwords.
 	</map:flow>
 	
 	<map:pipelines>
-		<map:pipeline>
+		<map:pipeline type="noncaching">
 			
 	        <!-- -->
 	        <map:match pattern="set-email">
