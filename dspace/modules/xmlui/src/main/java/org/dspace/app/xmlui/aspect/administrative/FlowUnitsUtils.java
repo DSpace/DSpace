@@ -43,7 +43,7 @@ public class FlowUnitsUtils
 
     /**
      * Return the current name for the given group ID.
-     * 
+     *
      * @param context
      *            The current DSpace context.
      * @param groupID
@@ -58,41 +58,41 @@ public class FlowUnitsUtils
             return "New Unit";
         }
 
-        Group group = Group.find(context, unitID);
+        Unit unit = Unit.find(context, unitID);
 
-        if (group == null)
+        if (unit == null)
         {
             return "New Unit";
         }
 
-        return group.getName();
+        return unit.getName();
     }
 
     /**
      * Return the list of current group id's that are a member of this unit.
-     * 
+     *
      * @param context
      *            The current DSpace context
      * @param groupID
      *            The group's id.
      * @return An array of ids.
      */
-    public static String[] getGroupMembers(Context context, int groupID)
+    public static String[] getUnitMembers(Context context, int unitID)
             throws SQLException
     {
-        if (groupID < 0)
+        if (unitID < 0)
         {
             return new String[0];
         }
 
-        Group group = Group.find(context, groupID);
+        Unit unit = Unit.find(context, unitID);
 
-        if (group == null)
+        if (unit == null)
         {
             return new String[0];
         }
 
-        Group[] groups = group.getMemberGroups();
+        Group[] groups = unit.getGroups();
 
         String[] groupIDs = new String[groups.length];
         for (int i = 0; i < groups.length; i++)
@@ -105,7 +105,7 @@ public class FlowUnitsUtils
 
     /**
      * Add the given id to the list and return a new list.
-     * 
+     *
      * @param list
      *            The current array
      * @param id
@@ -122,7 +122,7 @@ public class FlowUnitsUtils
 
     /**
      * Remove all instances of the given id from the member list.
-     * 
+     *
      * @param list
      *            The current array
      * @param id
@@ -140,9 +140,9 @@ public class FlowUnitsUtils
     /**
      * Save the group. If the name has been changed then it will be updated, if
      * any members have been added or removed then they are updated.
-     * 
+     *
      * If the groupID is -1 then a new group is created.
-     * 
+     *
      * @param context
      *            The current dspace context
      * @param groupID
@@ -292,7 +292,7 @@ public class FlowUnitsUtils
     /**
      * Remove the specified units. It is assumed that the user has already
      * confirmed this selection.
-     * 
+     *
      * @param context
      *            The current DSpace context
      * @param unitIDs
@@ -328,16 +328,16 @@ public class FlowUnitsUtils
      * These are the possible collection suffixes, all groups which are specific
      * to a collection will end with one of these. The collection id should be
      * in between the prefix and the suffix.
-     * 
+     *
      * Note: the order of these suffixes are important, see getCollectionRole()
      */
     private static final String[] COLLECTION_SUFFIXES = { "_SUBMIT", "_ADMIN",
-            "_WFSTEP_1", "_WORKFLOW_STEP_1", "_WFSTEP_2", "_WORKFLOW_STEP_2",
-            "_WFSTEP_3", "_WORKFLOW_STEP_3", "_DEFAULT_ITEM_READ" };
+        "_WFSTEP_1", "_WORKFLOW_STEP_1", "_WFSTEP_2", "_WORKFLOW_STEP_2",
+        "_WFSTEP_3", "_WORKFLOW_STEP_3", "_DEFAULT_ITEM_READ" };
 
     /**
      * Extracts the collection id that may be immbedded in the given group name.
-     * 
+     *
      * @param groupName
      *            - the name of a group (ie group.getName())
      * @return the integer collection id or -1 if the group is not that of a

@@ -1326,7 +1326,7 @@ function doManageUnits() {
 function doEditUnits(unitID) {
 	var unitName = FlowUnitsUtils.getName(getDSContext(),
 			unitID);
-	var memberGroupIDs = FlowUnitsUtils.getGroupMembers(
+	var memberGroupIDs = FlowUnitsUtils.getUnitMembers(
 			getDSContext(), unitID);
 
 	assertEditUnits(unitID);
