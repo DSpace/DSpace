@@ -106,7 +106,7 @@
     <message key="xmlui.Discovery.AbstractSearch.type_contentType">Filter by: Content Type</message>
     <message key="xmlui.Discovery.AbstractSearch.type_advisor">Filter by: Advisor</message>
     <message key="xmlui.Discovery.AbstractSearch.type_thesisSemester">Filter by: Thesis Semester</message>
-    <message key="xmlui.Discovery.AbstractSearch.type_discipline">Filter by: Thesis Discipline</message>
+    <message key="xmlui.Discovery.AbstractSearch.type_discipline">Filter by: Thesis Department</message>
     <message key="xmlui.Discovery.AbstractSearch.type_thesisDegreeLevel">Filter by: Thesis Degree Level</message>
 
     <message key="xmlui.Discovery.AbstractSearch.startswith">Starts with</message>
