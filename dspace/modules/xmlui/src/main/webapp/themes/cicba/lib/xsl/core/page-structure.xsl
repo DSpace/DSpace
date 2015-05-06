@@ -180,6 +180,13 @@
 			<xsl:text>';</xsl:text>
 		</script>
 		
+		<script type="text/javascript">
+			$(document).ready(function(){			
+			var a=$('a[href$="<xsl:value-of select="$handle-autoarchive"/>"]');
+			a.parent().hide();
+			});
+		</script>
+		
 	    <script type="text/javascript">
 	        <xsl:text disable-output-escaping="yes">
 	        (function ($) {
