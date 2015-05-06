@@ -79,20 +79,25 @@ public class BaseDSpaceFilterResolver implements DSpaceFilterResolver {
 
     @Override
     public Filter getFilter(Class<? extends Filter> filterClass, ParameterMap configuration) {
-        if (filterClass.isAssignableFrom(DSpaceAtLeastOneMetadataFilter.class)) {
-            return new DSpaceAtLeastOneMetadataFilter(configuration);
-        } else if (filterClass.isAssignableFrom(DSpaceAuthorizationFilter.class)) {
-            try {
-                return new DSpaceAuthorizationFilter(contextService.getContext());
-            } catch (ContextServiceException e) {
-                LOGGER.error(e.getMessage(), e);
-                return null;
+        Filter result = null;
+        try
+        {
+            result = filterClass.newInstance();
+            if (result instanceof DSpaceFilter)
+            {
+                // add the DSpace filter specific objects
+                ((DSpaceFilter) result).setConfiguration(configuration);
+                ((DSpaceFilter) result).setContext(contextService.getContext());
+                ((DSpaceFilter) result).setFieldResolver(fieldResolver);
             }
-        } else if (filterClass.isAssignableFrom(DSpaceMetadataExistsFilter.class)) {
-            return new DSpaceMetadataExistsFilter(fieldResolver, configuration);
         }
-        LOGGER.error("Filter "+filterClass.getName()+" unknown instantiation");
-        return null;
+        catch (InstantiationException | IllegalAccessException
+                | ContextServiceException e)
+        {
+            LOGGER.error("Filter " + filterClass.getName()
+                    + " could not be instantiated", e);
+        }
+        return result;
     }
 
     @Override
