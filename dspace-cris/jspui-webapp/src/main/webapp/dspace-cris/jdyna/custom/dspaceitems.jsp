@@ -126,7 +126,7 @@ if (info.getPagetotal() > 1)
 	   <input type="hidden" name="open" value="<%= info.getType() %>" />
 </form>
 
-<dspace:itemlist items="<%= (Item[])info.getItems() %>" sortOption="<%= info.getSo() %>" authorLimit="<%= info.getEtAl() %>" order="<%= info.getOrder() %>"/>
+<dspace:itemlist itemStart=<%=info.getStart()+1%> items="<%= (Item[])info.getItems() %>" sortOption="<%= info.getSo() %>" authorLimit="<%= info.getEtAl() %>" order="<%= info.getOrder() %>"/>
 
 <script type="text/javascript"><!--
     function sortBy(sort_by, order) {
