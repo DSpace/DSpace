@@ -107,8 +107,6 @@ public class ScriptCrisBulkChanges {
 
 		if (line.hasOption("active")) {
 			status = true;
-		} else {
-			status = false;
 		}
 
 		ACO tmpCrisObject = null;

@@ -195,7 +195,7 @@ public class ImportExportUtils {
 	}
 
 	private static <P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>, ACO extends ACrisObject<P, TP, NP, NTP, ACNO, ATNO>> ACO getCrisObject(
-			ApplicationService applicationService, Class<ACO> objectTypeClass, ACO template, IBulkChange change)
+			ApplicationService applicationService, Class<ACO> objectTypeClass, ACO template, IBulkChange change, boolean status)
 			throws InstantiationException, IllegalAccessException {
 		String action = change.getAction();
 		String crisID = change.getCrisID();
@@ -261,9 +261,10 @@ public class ImportExportUtils {
 		if (StringUtils.isNotBlank(action)) {
 			if (action.equalsIgnoreCase("HIDE")) {
 				crisObject.setStatus(false);
-			}
-			if (action.equalsIgnoreCase("SHOW")) {
+			} else if (action.equalsIgnoreCase("SHOW")) {
 				crisObject.setStatus(true);
+			} else {
+				crisObject.setStatus(status);
 			}
 		}
 		return crisObject;
@@ -308,13 +309,13 @@ public class ImportExportUtils {
 				metadataFirstLevel);
 
 		processBulkChanges(applicationService, propDefClazz, crisObjectClazz, template, metadataFirstLevel, metadataNestedLevel,
-				bulkChanges);
+				bulkChanges, status);
 	}
 
 	// TODO manage nested
 	private static <ACO extends ACrisObject<P, TP, NP, NTP, ACNO, ATNO>, P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> void processBulkChanges(
 			ApplicationService applicationService, Class<TP> propDefClazz, Class<ACO> crisObjectClazz, ACO template,
-			List<IContainable> metadataFirstLevel, List<IContainable> metadataNestedLevel, IBulkChanges bulkChanges)
+			List<IContainable> metadataFirstLevel, List<IContainable> metadataNestedLevel, IBulkChanges bulkChanges, boolean status)
 			throws InstantiationException, IllegalAccessException, CloneNotSupportedException,
 			InvocationTargetException, NoSuchMethodException {
 		// get from list of metadata dynamic field vs structural field
@@ -376,10 +377,10 @@ public class ImportExportUtils {
 				// if there is rpid then try to get researcher by staffNo
 				// and
 				// set to null all structural metadata lists
-				log.info("Researcher sourceRef: " + sourceRef + " sourceID: " + sourceId + " / crisID : " + crisID
+				log.info("Entity sourceRef: " + sourceRef + " sourceID: " + sourceId + " / crisID : " + crisID
 						+ " uuid: " + uuid);
 
-				crisObject = getCrisObject(applicationService, crisObjectClazz, template, bulkChange);
+				crisObject = getCrisObject(applicationService, crisObjectClazz, template, bulkChange, status);
 				if (bulkChange.getAction().equalsIgnoreCase(IBulkChange.ACTION_DELETE)) {
 					applicationService.delete(crisObjectClazz, crisObject.getId());
 				} else {
@@ -549,7 +550,7 @@ public class ImportExportUtils {
 				}
 
 				log.info("Import entity: CRISID: " + crisObject.getCrisID() + " SOURCEID/SOURCEREF: "
-						+ crisObject.getSourceID() + "/" + crisObject.getSourceID() + " ACTION "
+						+ crisObject.getSourceID() + "/" + crisObject.getSourceRef() + " ACTION "
 						+ bulkChange.getAction() + " -- " + crisObject.getId() + " (id) - SUCCESS");
 				rows_imported++;
 			} catch (RuntimeException e) {
@@ -561,7 +562,7 @@ public class ImportExportUtils {
 
 		log.info("Import researchers - end import additional files");
 
-		log.info("Statistics: row ingested " + rows_imported + " on total of " + (bulkChanges.size() - 1) + " ("
+		log.info("Statistics: row ingested " + rows_imported + " on total of " + (bulkChanges.size()) + " ("
 				+ rows_discarded + " row discarded)");
 	}
 
