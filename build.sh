@@ -6,7 +6,8 @@ set -e
 
 #ANT_OPTS="-q"
 #MVN_OPTS="-q"
-MVN_PROFILES=\!dspace-jspui,\!dspace-rdf,\!dspace-sword,\!dspace-swordv2,\!dspace-rest
+MVN_PROFILES=\!dspace-jspui,\!dspace-rdf,\!dspace-sword,\!dspace-swordv2
+#,\!dspace-rest
 # -Dhttp.proxyHost=10.1.0.27 -Dhttp.proxyPort=3128 -Dhttps.proxyHost=10.1.0.27 -Dhttps.proxyPort=3128"
 
 cwd=`pwd`
@@ -30,12 +31,12 @@ install() {
         fi
         mkdir $DSPACE_DIR
 
-#si ya existe una instalacion vieja
-#if db exists
+	#si ya existe una instalacion vieja
+	#if db exists
 
-#test: 
-psql -h data.sedici.unlp.edu.ar -Udspace_cic -W
-dropdb --username=pg_root --host=data.sedici.unlp.edu.ar dspace_cic --if-exists -i
+	#test: 
+	psql -h data.sedici.unlp.edu.ar -Udspace_cic -W
+	dropdb --username=pg_root --host=data.sedici.unlp.edu.ar dspace_cic --if-exists -i
 #endif
 createdb --username=pg_root --encoding=UNICODE --owner=dspace_cic --host=data.sedici.unlp.edu.ar dspace_cic
 
