@@ -137,12 +137,22 @@ public class PiwikStatisticsReader extends AbstractReader {
 	private String readFromURL(String url) throws IOException {
 		StringBuilder output = new StringBuilder();		
 		URL widget = new URL(url);
-		BufferedReader in = new BufferedReader(new InputStreamReader(widget.openStream()));
-		String inputLine;
-		while ((inputLine = in.readLine()) != null) {
-			output.append(inputLine).append("\n");
-		}
-		in.close();
+        String old_value = "false";
+        try{
+            old_value = System.getProperty("jsse.enableSNIExtension");
+            System.setProperty("jsse.enableSNIExtension", "false");
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(widget.openStream()));
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                output.append(inputLine).append("\n");
+            }
+            in.close();
+        }finally {
+        	//true is the default http://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/JSSERefGuide.html
+        	old_value = (old_value == null) ? "true" : old_value;
+            System.setProperty("jsse.enableSNIExtension", old_value);
+        }
 		return output.toString();
 	}
 

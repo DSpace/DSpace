@@ -71,14 +71,11 @@ public class ORELicenseIngestionCrosswalk implements IngestionCrosswalk{
         	return;
         }
        
-        Metadatum[] dc_rights = item.getMetadata("dc", "rights", null, Item.ANY);
         Metadatum[] dc_rights_uri = item.getMetadata("dc", "rights", "uri", Item.ANY);
         
-        String licenseName = null;
         String licenseURI = null;
         
-        if(dc_rights!=null && dc_rights.length!=0) {
-        	licenseName = dc_rights[0].value;
+        if(dc_rights_uri!=null && dc_rights_uri.length!=0) {
         	licenseURI = dc_rights_uri[0].value;
         } 
                 
