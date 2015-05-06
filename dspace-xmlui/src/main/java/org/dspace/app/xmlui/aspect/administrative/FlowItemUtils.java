@@ -7,6 +7,7 @@
  */
 package org.dspace.app.xmlui.aspect.administrative;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -656,10 +657,12 @@ public class FlowItemUtils
 	        	if(filePath.startsWith("/")) {
 	        		filePath = "file://" + filePath;
 	         	}
-	        	URL url = new URI(filePath).toURL();
-	        	is = url.openStream();
+				if ( null != filePath && 0 < filePath.length() ) {
+					URL url = new URI(filePath).toURL();
+					is = url.openStream();
+				}
 	        	upload_name = filePath;
-			} catch (URISyntaxException e) {
+			} catch (URISyntaxException | FileNotFoundException e) {
 			}
 		}
 		
@@ -712,8 +715,8 @@ public class FlowItemUtils
 	        item.store_provenance_info("Item was added a bitstream", context.getCurrentUser());
 			item.update();
 
-            processAccessFields(context, request, item.getOwningCollection(), bitstream);
-			
+			processAccessFields(context, request, item.getOwningCollection(), bitstream);
+
 			context.commit();
 			
 			result.setContinue(true);
@@ -731,7 +734,14 @@ public class FlowItemUtils
 
     private static void processAccessFields(Context context, HttpServletRequest request, Collection collection, Bitstream b) throws SQLException, AuthorizeException {
 
-        // if it is a simple form we should create the policy for Anonymous
+		if ( null == collection && AuthorizeManager.isAdmin(context) ) {
+			// if an object does not have handle and owning collection is null => in workflow
+			// if a user is admin, allow the action, see #123
+			return;
+		}
+
+
+			// if it is a simple form we should create the policy for Anonymous
         // if Anonymous does not have right on this collection, create policies for any other groups with
         // DEFAULT_ITEM_READ specified.
         Date startDate = null;
