@@ -79,7 +79,7 @@ update()
 	
 	show_message "Actualizamos el código fuente de github"
 	cd $DSPACE_SRC
-	git stash && git pull && git rebase && git stash pop
+	git stash && git pull --rebase && git stash pop
 	
 	show_message "Empaquetamos dspace"
 	cd dspace 
