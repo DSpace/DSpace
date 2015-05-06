@@ -68,7 +68,7 @@
                                                 <xsl:value-of select="$contextPath" />
                                                 <xsl:text>/login</xsl:text>
                                             </xsl:attribute>
-                                            <i18n:text>loggin in</i18n:text>
+                                            <i18n:text>log in</i18n:text>
                                         </a>
                                         again.
                                     </h4>
