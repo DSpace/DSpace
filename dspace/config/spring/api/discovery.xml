@@ -154,7 +154,7 @@
             </bean>
         </property>
         <!--Default result per page  -->
-        <property name="defaultRpp" value="10" />
+        <property name="defaultRpp" value="20" />
         <property name="hitHighlightingConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightingConfiguration">
                 <property name="metadataFields">
