@@ -386,6 +386,9 @@
 				<Value>Trabajo practico</Value>
 				<Value>Material complementario</Value>
 				<Value>Programa</Value>
+				<Value>Resumen</Value>
+				<Value>Edicion de Revista</Value>
+				<Value>Boletin</Value>
 			</Parameter>
 		</Filter>
 		
@@ -427,6 +430,9 @@
 				<Value>Libro</Value>
 				<Value>Capitulo de libro</Value>
 				<Value>Objeto de conferencia</Value>
+				<Value>Resumen</Value>
+				<Value>Edicion de revista</Value>
+				<Value>Boletin</Value>
 			</Parameter>
 		</Filter>
 		

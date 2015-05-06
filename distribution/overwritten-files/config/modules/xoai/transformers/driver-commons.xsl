@@ -131,6 +131,9 @@
 			<xsl:when test="$subtype='Comunicacion'">
 				info:eu-repo/semantics/article
 			</xsl:when>
+			<xsl:when test="$subtype='Resumen'">
+				info:eu-repo/semantics/article
+			</xsl:when>
 			<xsl:when test="$subtype='Revision'">
 				info:eu-repo/semantics/review
 			</xsl:when>
