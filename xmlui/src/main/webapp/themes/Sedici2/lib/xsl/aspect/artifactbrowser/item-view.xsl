@@ -56,6 +56,20 @@
     	<xsl:value-of select="exts:replace($normalizedValue,' ','\ ')"/>
     </xsl:template>
     
+    <xsl:template name="showSocialBar">
+    	<div class="share-bar">
+		        <div id="fb-root">
+		        	<xsl:comment>&#160;</xsl:comment>
+		        </div>
+		        <div id="share_fb">
+		        	<xsl:text>&#160;</xsl:text>
+		        </div>
+		    	<div id="share_tw">
+		    		<xsl:text>&#160;</xsl:text>
+		    	</div>
+		</div>
+    </xsl:template>
+    
     <xsl:template name="itemSummaryView-DIM">
         <!-- Generate the info about the item from the metadata section -->
         <xsl:apply-templates select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim" mode="itemSummaryView-DIM"/>
@@ -136,45 +150,50 @@
 			<xsl:with-param name="elements" select="dim:field[@element='relation' and @qualifier='bookTitle'] "/>
 		</xsl:call-template>
 
+	<div id="simple-author-date-view">
 		<!-- Author(s) row -->	
-		<div class="simple-item-view-authors">
-			<xsl:call-template name="show-common-authors"/>
-		</div>
-
-		<!-- embargo rows -->
-		<xsl:if test="(dim:field[@element='embargo' and @qualifier='liftDate'])">
-			<div id="embargo-info">
-				<span class="embargo_msg"><i18n:text>xmlui.dri2xhtml.METS-1.0.embargoed-document-description</i18n:text></span>
-				<span class="embargo_date">
-					<xsl:call-template name="render-date">
-						<xsl:with-param name="dateString" select="dim:field[@element='embargo' and @qualifier='liftDate'] "/>
-					</xsl:call-template>
-				</span>
+			<div class="simple-item-view-authors">
+				<xsl:call-template name="show-common-authors"/>
 			</div>
-		</xsl:if>
-
-		<!-- date.issued row -->
-		<!-- date.exposure/date.issued : extraemos el año solamente -->
-		<xsl:choose>
-			<xsl:when test="dim:field[@element='date' and @qualifier='exposure']">
-				<xsl:call-template name="render-date-year">
-					<xsl:with-param name="typeDate" select="dim:field[@element='date' and @qualifier='exposure']/@qualifier"/>
-					<xsl:with-param name="dateString">
-						<xsl:value-of select="dim:field[@element='date' and @qualifier='exposure']"/>
-					</xsl:with-param>
-				</xsl:call-template>
-			</xsl:when>
-			<xsl:when test="dim:field[@element='date' and @qualifier='issued']">
-				<xsl:call-template name="render-date-year">
-					<xsl:with-param name="typeDate" select="dim:field[@element='date' and @qualifier='issued']/@qualifier"/>
-					<xsl:with-param name="dateString">
-						<xsl:value-of select="dim:field[@element='date' and @qualifier='issued']"/>
-					</xsl:with-param>
-				</xsl:call-template>
-			</xsl:when>
-		</xsl:choose>
-		<xsl:text>&#160;</xsl:text>
+	
+			<!-- embargo rows -->
+			<xsl:if test="(dim:field[@element='embargo' and @qualifier='liftDate'])">
+				<div id="embargo-info">
+					<span class="embargo_msg"><i18n:text>xmlui.dri2xhtml.METS-1.0.embargoed-document-description</i18n:text></span>
+					<span class="embargo_date">
+						<xsl:call-template name="render-date">
+							<xsl:with-param name="dateString" select="dim:field[@element='embargo' and @qualifier='liftDate'] "/>
+						</xsl:call-template>
+					</span>
+				</div>
+			</xsl:if>
+	
+			<!-- date.issued row -->
+			<!-- date.exposure/date.issued : extraemos el año solamente -->
+			<xsl:choose>
+				<xsl:when test="dim:field[@element='date' and @qualifier='exposure']">
+					<xsl:call-template name="render-date-year">
+						<xsl:with-param name="typeDate" select="dim:field[@element='date' and @qualifier='exposure']/@qualifier"/>
+						<xsl:with-param name="dateString">
+							<xsl:value-of select="dim:field[@element='date' and @qualifier='exposure']"/>
+						</xsl:with-param>
+					</xsl:call-template>
+				</xsl:when>
+				<xsl:when test="dim:field[@element='date' and @qualifier='issued']">
+					<xsl:call-template name="render-date-year">
+						<xsl:with-param name="typeDate" select="dim:field[@element='date' and @qualifier='issued']/@qualifier"/>
+						<xsl:with-param name="dateString">
+							<xsl:value-of select="dim:field[@element='date' and @qualifier='issued']"/>
+						</xsl:with-param>
+					</xsl:call-template>
+				</xsl:when>
+			</xsl:choose>
+			<xsl:text>&#160;</xsl:text>
+        </div>
         
+		<!-- Mostramos la Social Bar -->
+		<xsl:call-template name="showSocialBar"/>
+		
 		<!-- Para el Tipo de Documento mostramos el sedici.subtype porque es mas especifico -->
 		<!-- Si no hay subtype, mostramos el dc.type -->
 		<xsl:choose>
@@ -194,6 +213,7 @@
 			</xsl:when>
 			<!-- No hay otherwise -->
 		</xsl:choose>
+		
 		<!-- relation.ciclo row -->
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'relation-ciclo'"/>
@@ -201,7 +221,7 @@
 		</xsl:call-template>
 		<!-- title.alternative row -->
 		<xsl:call-template name="showAlternativeTitles"/>
-
+		
 		<!-- Abstract row -->
 		<xsl:if test="(dim:field[@element='description' and @qualifier='abstract'])">
 			<div class="simple-item-view-description">

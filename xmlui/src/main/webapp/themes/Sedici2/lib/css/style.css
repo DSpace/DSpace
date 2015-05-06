@@ -3205,14 +3205,14 @@ div.item-summary-view-metadata {
 }
 
 div.simple-item-view-authors {
-    font-size: 100%;
-    font-weight: normal;
+    float: left;
+}
+
+div#simple-author-date-view {
     border-bottom:1px solid #D8E8EB;
     padding-bottom: 2px;
     margin-bottom: 5px;
     margin-top: 10px;
-    text-align: justify;
-    width: 600px;
 }
 
 .metadata-label {
@@ -3883,6 +3883,7 @@ margin-left:10px;}
 
 .simple-metadata-view-date{
 	float:right;
+	font-weight: bold;
 }
 
 /* ATENCION: dejar siempre al final del css esta linea, es para detectar errores de sintaxis*/
@@ -3910,3 +3911,13 @@ table.dropdown-table.ui-accordion tr:hover td{
     padding-right: 4px;
     font-size: 11px;
 }
+
+/*Social bar styles*/
+ .share-bar>div {
+       display:inline-block;
+       vertical-align:top 
+     } 
+   .share-bar { 
+       float: right; 
+       clear: right;
+    }

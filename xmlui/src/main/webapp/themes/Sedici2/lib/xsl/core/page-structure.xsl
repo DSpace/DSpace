@@ -764,6 +764,32 @@ placeholders for header images -->
     			$('table').accordion({autoHeight: false , collapsible: true, active: false, header: '.collection-title' });
 			});
 		</script>
+		
+		<script text="text/javascript">
+			<xsl:text disable-output-escaping="yes">
+				 /** twitter share **/    
+			    !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+			
+			    /** facebook share **/
+			    (function(d, s, id) {
+			      var js, fjs = d.getElementsByTagName(s)[0];
+			      if (d.getElementById(id)) return;
+			      js = d.createElement(s); js.id = id;
+			      js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&amp;version=v2.3&amp;appId=79106916048";
+			      fjs.parentNode.insertBefore(js, fjs);
+			    }(document, 'script', 'facebook-jssdk'));
+			
+			    $(document).ready(function() {
+			        var share_fb = "#share_fb"; 
+			        var share_tw = "#share_tw"; 
+			        url = window.location.href;
+			
+			        $(share_tw).append('&lt;a href="https://twitter.com/share" class="twitter-share-button" data-via="sedici_unlp" data-lang="es"   data-count="none"&gt;Twittear&lt;/a&gt;');
+			        $(share_fb).append('&lt;div class="fb-like" data-href="'+url+'" data-width="25" data-layout="button" data-action="like" data-show-faces="true" data-share="true"&gt;&lt;/div&gt;');
+			    });
+			</xsl:text>
+		</script>
+		
     </xsl:template>
 
     <!--
