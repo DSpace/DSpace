@@ -103,7 +103,7 @@
           <label>Date issued</label>
           <input-type>FormattedDate</input-type>
           <hint>Please give the date when the submission data were issued if any e.g., 2014-01-21 or at least the year.</hint>
-          <required>You must enter the date or at least the year.</required>
+          <required>You must enter the date or at least the year in a valid format.</required>
        </field>
 
        <field>
