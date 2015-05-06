@@ -14,9 +14,18 @@ if [[ -r $HANDLE_SERVER ]]; then
 else
     echo "Handle server not present - ignoring start command";
 fi
+
 ### nginx ###
 #echo "Starting nginx"
 #/etc/init.d/nginx start
+
 ### supervisor (shibboleth + fastcgi) ###
 #echo "Starting all supervised programs"
 #supervisorctl start all
+
+### apache ###
+#echo "Starting apache"
+#apache2ctl start
+### shibboleth ###
+#echo "Starting shibboleth"
+#/etc/init.d/shibboleth start

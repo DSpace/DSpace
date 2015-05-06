@@ -20,3 +20,8 @@ fi
 ### supervisor (shibboleth + fastcgi) ###
 #echo "Stopping all supervised programs"
 #supervisorctl stop all
+### apache ####
+#echo "Stop apache"
+#apache2ctl stop
+### Shibboleth ###
+#sh stop.shibboleth.sh
