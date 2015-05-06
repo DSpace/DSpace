@@ -144,7 +144,9 @@ public class DiscoJuiceFeeds extends AbstractAction {
             log.error("Failed to obtain/parse "+shibDiscoFeedUrl.toString() + "\nCheck timeouts, redirects, shibboleth config.\n" + e);
             throw e; //Don't continue
         }finally {
-            System.setProperty("jsse.enableSNIExtension", old_value);
+        	//true is the default http://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/JSSERefGuide.html
+        	old_value = (old_value == null) ? "true" : old_value;
+        	System.setProperty("jsse.enableSNIExtension", old_value);
         }
 
         //String[] feeds = {"edugain", "cesnet"};

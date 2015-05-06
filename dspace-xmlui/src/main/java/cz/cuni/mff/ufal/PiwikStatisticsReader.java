@@ -149,6 +149,8 @@ public class PiwikStatisticsReader extends AbstractReader {
             }
             in.close();
         }finally {
+        	//true is the default http://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/JSSERefGuide.html
+        	old_value = (old_value == null) ? "true" : old_value;
             System.setProperty("jsse.enableSNIExtension", old_value);
         }
 		return output.toString();
