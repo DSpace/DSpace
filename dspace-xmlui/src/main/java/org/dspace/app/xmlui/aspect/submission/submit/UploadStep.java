@@ -89,6 +89,10 @@ public class UploadStep extends AbstractSubmissionStep
             message("xmlui.Submission.submit.UploadStep.virus_checker_error");
     protected static final Message T_virus_error =
             message("xmlui.Submission.submit.UploadStep.virus_error");
+    protected static final Message T_no_cmdi =
+        message("xmlui.Submission.submit.UploadStep.no_cmdi");
+    protected static final Message T_order_mayham =
+        message("xmlui.Submission.submit.UploadStep.order_mayham");
 
     protected static final Message T_description =
             message("xmlui.Submission.submit.UploadStep.description");
@@ -273,9 +277,9 @@ public class UploadStep extends AbstractSubmissionStep
             }
 
             if(this.errorFlag == org.dspace.submit.step.UploadStep.STATUS_NO_CMDI_FILE_ERROR){
-            	file.addError("No CMDI file was uploaded");
+                file.addError(T_no_cmdi);
             }
-	        	
+
 	        Text description = upload.addItem("description-field","description-field").addText("description");
             description.setLabel(T_description);
             description.setHelp(T_description_help);
@@ -298,7 +302,7 @@ public class UploadStep extends AbstractSubmissionStep
 		        if (this.errorFlag==org.dspace.submit.step.UploadStep.STATUS_NOT_FOUND)
 		        {
 		        	fileLocal.addError(T_file_not_found_error);
-        }
+                }
 
 		        // if virus checking was attempted and a virus found then let the user know
 	            if (this.errorFlag == org.dspace.submit.step.UploadStep.STATUS_SERVER_FILE_CONTAINS_VIRUS)
@@ -326,8 +330,12 @@ public class UploadStep extends AbstractSubmissionStep
         if (bitstreams.length > 0 || disableFileEditing)
         {
         	summaryDiv = div.addDivision("summary", "well well-light");
-        	
-	        Table summary = summaryDiv.addTable("submit-upload-summary",(bitstreams.length * 2) + 2,7);
+
+            if(this.errorFlag == org.dspace.submit.step.UploadStep.STATUS_ORDER_MAYHAM){
+                summaryDiv.addPara("error-para", "alert alert-danger").addContent(T_order_mayham);
+            }
+
+            Table summary = summaryDiv.addTable("submit-upload-summary",(bitstreams.length * 2) + 2,7);
             summary.setHead(T_head2);
 
             Row header = summary.addRow(Row.ROLE_HEADER);

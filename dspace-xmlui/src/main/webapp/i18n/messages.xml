@@ -991,7 +991,9 @@
 	<message key="xmlui.Submission.submit.UploadStep.upload_error">There was a problem uploading your file.  Either the filename you entered was incorrect, there was a network problem which prevented the file from reaching us correctly, or you have attempted to upload a file format marked for internal system use only.  Please try again.</message>
     <message key="xmlui.Submission.submit.UploadStep.not_found_error">The filename you entered is not found or you don't have read rights on the file.</message>
     <message key="xmlui.Submission.submit.UploadStep.virus_error">The file has not been uploaded as it appears to contain a virus. Please contact the <a class="helpdesk-tolink">Help Desk</a>.</message>
-    <message key="xmlui.Submission.submit.UploadStep.virus_checker_error">A technical problem was encountered whilst attempting to scan the file for viruses. Please contact the <a class="helpdesk-tolink">Help Desk</a>.</message>
+	<message key="xmlui.Submission.submit.UploadStep.virus_checker_error">A technical problem was encountered whilst attempting to scan the file for viruses. Please contact the <a class="helpdesk-tolink">Help Desk</a>.</message>
+	<message key="xmlui.Submission.submit.UploadStep.no_cmdi">No CMDI file was uploaded</message>
+	<message key="xmlui.Submission.submit.UploadStep.order_mayham">Invalid order specified</message>
     <message key="xmlui.Submission.submit.UploadStep.description">File Description</message>
 	<message key="xmlui.Submission.submit.UploadStep.description_help">Optionally, provide a brief description of the file, for example "<i>Main article</i>", or "<i>Experiment data readings</i>".</message>
 	<message key="xmlui.Submission.submit.UploadStep.submit_upload">Upload file &amp; add another</message>
