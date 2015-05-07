@@ -98,9 +98,41 @@
     <message key="xmlui.Discovery.AbstractSearch.type_author">Filter by: Author</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.author">Author</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.author_filter">Author</message>
+
+
+    <message key="xmlui.Discovery.AbstractSearch.type_keyword">Filter by: Keyword</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.keyword">Keyword</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.keyword_filter">Keyword</message>
+
+    <message key="xmlui.Discovery.AbstractSearch.type_abstract">Filter by: Abstract</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.abstract">Abstract</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.abstract_filter">Abstract</message>
+
+    <message key="xmlui.Discovery.AbstractSearch.type_series">Filter by: Series</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.series">Series</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.series_filter">Series</message>
+
+    <message key="xmlui.Discovery.AbstractSearch.type_mime">Filter by: Mimetype</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.mime">Mimetype</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.mime_filter">Mimetype</message>
+
+    <message key="xmlui.Discovery.AbstractSearch.type_sponsor">Filter by: Sponsor</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.sponsor">Sponsor</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.sponsor_filter">Sponsor</message>
+
+    <message key="xmlui.Discovery.AbstractSearch.type_identifier">Filter by: Idenfitier</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.identifier">Identifier</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.identifier_filter">Identifier</message>
+
+    <message key="xmlui.Discovery.AbstractSearch.type_language">Filter by: Language</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.language">Language</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.language_filter">Language</message>
+
+
     <message key="xmlui.Discovery.AbstractSearch.type_subject">Filter by: Subject</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subject">Subject</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subject_filter">Subject</message>
+
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dateIssued.year">Date Issued</message>
 
     <message key="xmlui.Discovery.AbstractSearch.type_contentType">Filter by: Content Type</message>
