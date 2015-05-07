@@ -10,6 +10,8 @@ package edu.umd.lib.dspace.app.xmlui.aspect.submission.submit;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 
 import org.apache.avalon.framework.parameters.Parameters;
@@ -24,6 +26,7 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Button;
 import org.dspace.app.xmlui.wing.element.Cell;
+import org.dspace.app.xmlui.wing.element.Composite;
 import org.dspace.app.xmlui.wing.element.Hidden;
 import org.dspace.app.xmlui.wing.element.Radio;
 import org.dspace.app.xmlui.wing.element.CheckBox;
@@ -31,6 +34,7 @@ import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.File;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Row;
+import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.app.util.Util;
@@ -154,7 +158,7 @@ public class XMLUILibraryAwardUploadStep extends AbstractSubmissionStep
 
     @Override
     public void addBody(Body body) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException
+    UIException, SQLException, IOException, AuthorizeException
     {
         // If we are actually editing information of an uploaded file,
         // then display that body instead!
@@ -194,53 +198,78 @@ public class XMLUILibraryAwardUploadStep extends AbstractSubmissionStep
             upload = div.addList("submit-upload-new", List.TYPE_FORM);
             upload.setHead(T_head);
 
+            // dropdown
+            Select selectDesc = upload.addItem().addSelect("description");
+            ArrayList<String> requiredBitstreams = (ArrayList<String>) LibraryAwardUploadStep.requiredBitstreams;
+
+            for (Bitstream bitstream : bitstreams)
+            {
+                requiredBitstreams.remove(requiredBitstreams.indexOf(bitstream
+                        .getDescription()));
+
+            }
+
+            for (String desc : requiredBitstreams)
+            {
+                selectDesc.addOption(desc).addContent(desc);
+            }
+            selectDesc.setRequired();
+
             File file = upload.addItem().addFile("file");
-            file.setLabel(T_file);
-            file.setHelp(T_file_help);
             file.setRequired();
 
-            // if no files found error was thrown by processing class, display
-            // it!
-            if (this.errorFlag == LibraryAwardUploadStep.STATUS_NO_FILES_ERROR)
+            // if no files found error was thrown by processing class,
+            // display it!
+            if (this.errorFlag != LibraryAwardUploadStep.STATUS_COMPLETE)
             {
-                file.addError(T_file_error);
+                if (this.errorFlag == LibraryAwardUploadStep.STATUS_NO_FILES_ERROR)
+                {
+                    file.addError(T_file_error);
+                }
+
+                // if an upload error was thrown by processing class, display
+                // it!
+                else if (this.errorFlag == LibraryAwardUploadStep.STATUS_UPLOAD_ERROR)
+                {
+                    file.addError(T_upload_error);
+                }
+
+                // if an upload error was thrown by processing class, display
+                // it!
+                else if (this.errorFlag == LibraryAwardUploadStep.STATUS_INTEGRITY_ERROR)
+                {
+                    // file.addError(T_integrity_error);
+                    file.addError("INTEGRITY ERROR");
+                }
+
+                // if virus checking was attempted and failed in error then let
+                // the
+                // user know
+                else if (this.errorFlag == org.dspace.submit.step.UploadStep.STATUS_VIRUS_CHECKER_UNAVAILABLE)
+                {
+                    file.addError(T_virus_checker_error);
+                }
+
+                // if virus checking was attempted and a virus found then let
+                // the
+                // user know
+                else if (this.errorFlag == org.dspace.submit.step.UploadStep.STATUS_CONTAINS_VIRUS)
+                {
+                    file.addError(T_virus_error);
+                }
+
+                else if (this.errorFlag == LibraryAwardUploadStep.STATUS_UNKNOWN_FORMAT)
+                {
+                    // user uploaded a file where the format is unknown to
+                    // DSpace
+
+                    // forward user to page to request the file format
+                    // file.addError(T_unknown_format_error);
+                    file.addError("UNKNOWN FORMAT");
+                }
+
             }
 
-            // if an upload error was thrown by processing class, display it!
-            if (this.errorFlag == LibraryAwardUploadStep.STATUS_UPLOAD_ERROR)
-            {
-                file.addError(T_upload_error);
-            }
-
-            // if an upload error was thrown by processing class, display it!
-            if (this.errorFlag == LibraryAwardUploadStep.STATUS_INTEGRITY_ERROR)
-            {
-                // file.addError(T_integrity_error);
-                file.addError("INTEGRITY ERROR");
-            }
-
-            // if virus checking was attempted and failed in error then let the
-            // user know
-            if (this.errorFlag == org.dspace.submit.step.UploadStep.STATUS_VIRUS_CHECKER_UNAVAILABLE)
-            {
-                file.addError(T_virus_checker_error);
-            }
-
-            // if virus checking was attempted and a virus found then let the
-            // user know
-            if (this.errorFlag == org.dspace.submit.step.UploadStep.STATUS_CONTAINS_VIRUS)
-            {
-                file.addError(T_virus_error);
-            }
-
-            if (this.errorFlag == LibraryAwardUploadStep.STATUS_UNKNOWN_FORMAT)
-            {
-                // user uploaded a file where the format is unknown to DSpace
-
-                // forward user to page to request the file format
-                // file.addError(T_unknown_format_error);
-                file.addError("UNKNOWN FORMAT");
-            }
             if (this.errorFlag == LibraryAwardUploadStep.STATUS_MISSING_BITSTREAMS)
             {
                 // file.addError(T_missing_bitstreams_error);
@@ -253,28 +282,9 @@ public class XMLUILibraryAwardUploadStep extends AbstractSubmissionStep
                 file.addError("NOT PDF");
             }
 
-            Table uploader = div.addTable("upload-summary", 5, 2);
-            uploader.setHead("Required Uploads:");
-
-            Row header = uploader.addRow(Row.ROLE_HEADER);
-            header.addCellContent("Description"); // description
-            header.addCellContent("Upload"); // upload button
-
-            // Hidden hidden = upload.addItem().addHidden("description");
-            // hidden.setValue("Essay");
-
-            for (String neededBitstream : LibraryAwardUploadStep.requiredBitstreams)
-            {
-                Row row = uploader.addRow();
-                row.addCell().addContent(neededBitstream);
-
-                Hidden hidden = upload.addItem().addHidden("description");
-                hidden.setValue(neededBitstream);
-
-                Button uploadButton = row.addCell().addButton("submit_upload");
-                uploadButton.setValue("Upload");
-                uploadButton.setRequired();
-            }
+            Button uploadButton = upload.addItem().addButton("submit_upload");
+            uploadButton.setValue("Upload");
+            uploadButton.setRequired();
 
             //
             // Text description = upload.addItem().addText("description");
