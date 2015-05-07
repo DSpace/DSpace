@@ -67,7 +67,7 @@
 	<xsl:template name="buildHome">
 
 		<div class="row">
-			<div class="col-md-8" id="welcome-panel">
+			<div class="col-md-6" id="welcome-panel">
 				<xsl:for-each select="dri:div[@n='news']">
 					<h1>
 						<xsl:copy-of select="dri:head" />
@@ -75,17 +75,17 @@
 					<xsl:copy-of select="dri:p" />
 				</xsl:for-each>
 			</div>
-			<div class="col-md-4">
+			<div class="col-md-4 col-md-offset-2">
 				<xsl:call-template name="build-img">
 					<xsl:with-param name="img.src">images/provincia.png</xsl:with-param>
 				</xsl:call-template>
 			</div>
 		</div>
 		<div id="home-highlight" class="row">
-			<div id="home-highlight-img">
-				<xsl:text> </xsl:text>
-			</div>
-			<div id="home-highlight-content">
+<!-- 			<div id="home-highlight-img"> -->
+<!-- 				<xsl:text> </xsl:text> -->
+<!-- 			</div> -->
+			<div id="home-highlight-content" class="col-md-6">
 				<form class="form-inline" role="form">
 					<xsl:attribute name="action"><xsl:value-of select="$search-url" /></xsl:attribute>
 				   <label for="q">
@@ -95,20 +95,49 @@
 				    <button type="submit" name="lr" class="btn btn-link"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
 				  </div>
 				</form>
-			</div>
-		</div>
-		<div class="row" id="home-autoarchivo">
-			<div class="col-md-3" >
-				<xsl:call-template name="build-anchor">
-					<xsl:with-param name="a.href">/submissions</xsl:with-param>
-					<xsl:with-param name="a.value">
-						 <xsl:text> </xsl:text><i18n:text>xmlui.cicdigital.home.subir-material</i18n:text>
-					</xsl:with-param>
-					<xsl:with-param name="img.src">images/flecha_subir.png</xsl:with-param>
-				</xsl:call-template>
-			</div>
-			<div class="col-md-9" >
-				<i18n:text>xmlui.cicdigital.home.subir-material-descripcion</i18n:text>
+				<div id="home-browse-bar">
+					
+					<div class="btn-group btn-group-justified" role="group"  aria-label="...">
+						<a class="btn" role="button">
+							<xsl:attribute name="href">
+								<xsl:call-template name="print-path">
+									<xsl:with-param name="path">/browse?type=author</xsl:with-param>
+								</xsl:call-template>
+							</xsl:attribute>
+							<i18n:text>xmlui.ArtifactBrowser.Navigation.head_browse</i18n:text><xsl:text> </xsl:text><i18n:text>xmlui.ArtifactBrowser.CollectionViewer.browse_authors</i18n:text>
+						</a>
+						<a class="btn" role="button">
+							<xsl:attribute name="href">
+								<xsl:call-template name="print-path">
+									<xsl:with-param name="path">/handle/123456789/3</xsl:with-param>
+								</xsl:call-template>
+							</xsl:attribute>
+							<i18n:text>xmlui.ArtifactBrowser.Navigation.head_browse</i18n:text><xsl:text> </xsl:text><i18n:text>xmlui.cicdigital.home.centros</i18n:text>
+						</a>
+						<a class="btn" role="button">
+							<xsl:attribute name="href">
+								<xsl:call-template name="print-path">
+									<xsl:with-param name="path">/discover</xsl:with-param>
+								</xsl:call-template>
+							</xsl:attribute>
+							<i18n:text>xmlui.ArtifactBrowser.Navigation.head_all_of_dspace</i18n:text>
+						</a>
+					</div>
+				</div>
+			</div><!--
+    		--><div id="home-autoarchivo" class="col-md-6">
+<!-- 				<h3> -->
+					<xsl:call-template name="build-anchor">
+						<xsl:with-param name="a.href">/submissions</xsl:with-param>
+						<xsl:with-param name="a.value">
+							 <xsl:text> </xsl:text><i18n:text>xmlui.cicdigital.home.subir-material</i18n:text>
+						</xsl:with-param>
+						<xsl:with-param name="img.src">images/flecha_subir.png</xsl:with-param>
+					</xsl:call-template>
+<!-- 				</h3> -->
+				<p>
+					<i18n:text>xmlui.cicdigital.home.subir-material-descripcion</i18n:text>
+				</p>
 			</div>
 		</div>
 		<div class="row">

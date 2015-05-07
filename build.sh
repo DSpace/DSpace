@@ -12,8 +12,8 @@ MVN_PROFILES=\!dspace-jspui,\!dspace-rdf,\!dspace-sword,\!dspace-swordv2
 
 cwd=`pwd`
 DSPACE_SRC=$(dirname $(readlink -f $0))
-DSPACE_DIR=/var/dspace/install
-DSPACE_USER=dspace
+DSPACE_DIR=$DSPACE_SRC/install
+DSPACE_USER=`whoami`
 TOMCAT="tomcat7"
 
 #/var/dspace/source

@@ -27,6 +27,7 @@
     <xsl:template name="build-anchor">
 		<xsl:param name="a.href">/</xsl:param>
 		<xsl:param name="a.value" select="$a.href"/>
+		<xsl:param name="a.class"></xsl:param>
 		<xsl:param name="img.src"></xsl:param>
 		<xsl:param name="img.alt"></xsl:param>
 		<a>
@@ -40,6 +41,11 @@
 					</xsl:call-template>
 				</xsl:if>
 			</xsl:attribute>
+			<xsl:if test="$a.class">
+				<xsl:attribute name="class">
+					<xsl:copy-of select="$a.class"/>
+				</xsl:attribute>
+			</xsl:if>
 			<xsl:if test="$img.src">
 				<xsl:call-template name="build-img">	
 					<xsl:with-param name="img.src" select="$img.src"/>

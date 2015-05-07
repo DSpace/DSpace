@@ -17,6 +17,14 @@ ul {
 	text-transform: uppercase;
 }
 
+#welcome-panel p {
+	line-height:1.7;
+	text-align:justify;
+}
+
+
+
+
 #cic-header {
 	background-image: url('../images/header_72.png');
 	padding: 30px;
@@ -90,6 +98,8 @@ ul {
 #home-highlight {
 	height: 270px;
 	margin-bottom: 20px;
+	
+  margin-top: 20px;
 }
 
 #home-highlight-img {
@@ -103,15 +113,15 @@ ul {
 	position: absolute;
 	left: 0;
 	width: 100%;
+    opacity: 0.1;
 }
 
 #home-highlight-content {
-	opacity: 0.99;
+	/*opacity: 0.99;*/
 	/* fix for stacking context issue of self and home-highlight-img */
-	display: inline-block;
-	max-width: 550px;
-	margin: 20px auto;
-	padding: 10px;
+	/*display: inline-block;*/
+	/*max-width: 550px;*/
+	/*padding: 10px;*/
 }
 
 #home-highlight-content form {
@@ -124,6 +134,7 @@ ul {
 	display: block;
 	padding: 6px;
 	margin-bottom: 5px;
+	width:100%;
 }
 
 #home-highlight-content form input {
@@ -131,6 +142,7 @@ ul {
 	box-shadow: none;
 	border-radius: 0px;
 	font-size: 15pt;
+    width: 89%;
 }
 
 #home-highlight-content .glyphicon-search {
@@ -138,6 +150,7 @@ ul {
 	font-weight: bold;
 	font-size: 22pt;
 	vertical-align: middle;
+	width: 10%;
 }
 
 #home-highlight-content label {
@@ -157,15 +170,32 @@ ul {
 	color: black;
 }
 
-#home-autoarchivo {
-	border-top: 2px solid #efefef;
-	padding: 25px;
-	border-bottom: 2px solid #efefef;
+#home-highlight-content > #home-browse-bar {
+	margin-top:10px;
+}
+#home-highlight-content > #home-browse-bar a{
+	background-color:#4d4d4d;
+	font-size:14px;
+	text-transform:uppercase;
+	color:white;
+	border-right:1px solid white;
 }
 
-#home-autoarchivo a {
-	font-size: 25pt;
+
+#home-autoarchivo {
+	background-color: #6C9399;
+	padding: 40px;
+	color:white;
+}
+#home-autoarchivo > a{
+	color:white !important;
 	text-decoration: none;
+	font-size: 25pt;
+}
+
+#home-autoarchivo > a > img{
+	margin-right:20px;
+	margin-bottom:20px;
 }
 
 #cic-sidebar .list-group-item {

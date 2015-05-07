@@ -79,16 +79,21 @@
 <message key="xmlui.cicdigital.trail.como-aportar-material">¿Cómo aportar material?</message>
 <message key="xmlui.cicdigital.trail.que-es-cic-digital">¿Qué es CIC-Digital?</message>
 <message key="xmlui.cicdigital.trail.politicas-del-repositorio">Políticas del repositorio</message>
+
 	<!-- Home messages -->
 <message key="xmlui.cicdigital.home.subir-material">Subir Material</message>
 <message key="xmlui.cicdigital.home.subir-material-descripcion">A través del proceso de autoarchivo usted podrá contribuir con sus investigaciones y desarrollos científicos propios, al contenido dentro del Repositorio Institucional de la Comisión de Investigaciones Científicas de la Provincia de Buenos Aires.</message>
-<message key="xmlui.cicdigital.home.explore">Explore el repositorio</message>
+<message key="xmlui.cicdigital.home.explore">Buscar en el repositorio</message>
 <message key="xmlui.cicdigital.home.aportar-material">Aportar Material</message>
 <message key="xmlui.cicdigital.home.mas-informacion">Mas información</message>
 <message key="xmlui.cicdigital.home.sobre-repositorio">Sobre el repositorio</message>
 <message key="xmlui.cicdigital.home.informacion-autores">Información para autores</message>
 <message key="xmlui.cicdigital.home.bienvenido">Bienvenido a CIC-Digital</message>
 <message key="xmlui.cicdigital.home.bienvenido-descripcion">CIC-Digital es el Repositorio Institucional de la  Comisión de Investigaciones Científicas de la Provincia de Buenos Aires, creado con el fin de preservar y dejar accesible en abierto toda la producción científico-tecnológica generada en el ámbito de las instituciones CIC.</message>
+
+<message key="xmlui.cicdigital.home.centros">Centros</message>
+
+
 
 <!-- Discovery messages -->
 <message key="xmlui.cicdigital.discoveryList.no-value">Sin valor asignado</message>
@@ -118,7 +123,7 @@
 <message key="xmlui.ArtifactBrowser.AbstractSearch.head2">Comunidades o colecciones que coinciden con la petición</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.head3">Ítems que coinciden con la petición</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.no_results">La búsqueda no produjo resultados</message>
-<message key="xmlui.ArtifactBrowser.AbstractSearch.all_of_dspace">Todo DSpace</message>
+<message key="xmlui.ArtifactBrowser.AbstractSearch.all_of_dspace">Todo el repositorio</message>
 
 <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.title">título</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dateissued">fecha de publicación</message>
@@ -211,7 +216,7 @@
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.CollectionViewer.java -->
 <message key="xmlui.ArtifactBrowser.CollectionViewer.search_scope">Ámbito de búsqueda</message>
-<message key="xmlui.ArtifactBrowser.CollectionViewer.all_of_dspace">Todo DSpace</message>
+<message key="xmlui.ArtifactBrowser.CollectionViewer.all_of_dspace">Todo el repositorio</message>
 <message key="xmlui.ArtifactBrowser.CollectionViewer.full_text_search">Búsqueda en esta colección:</message>
 <message key="xmlui.ArtifactBrowser.CollectionViewer.head_browse">Listar por</message>
 <message key="xmlui.ArtifactBrowser.CollectionViewer.browse_titles">Títulos</message>
@@ -228,7 +233,7 @@
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.CommunityViewer.java -->
 <message key="xmlui.ArtifactBrowser.CommunityViewer.search_scope">Ámbito de búsqueda</message>
-<message key="xmlui.ArtifactBrowser.CommunityViewer.all_of_dspace">Todo DSpace</message>
+<message key="xmlui.ArtifactBrowser.CommunityViewer.all_of_dspace">Todo el repositorio</message>
 <message key="xmlui.ArtifactBrowser.CommunityViewer.full_text_search">Buscar en esta comunidad y sus colecciones:</message>
 <message key="xmlui.ArtifactBrowser.CommunityViewer.head_browse">Listar por</message>
 <message key="xmlui.ArtifactBrowser.CommunityViewer.browse_titles">Títulos</message>
@@ -284,7 +289,7 @@
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.Navigation.java -->
 <message key="xmlui.ArtifactBrowser.Navigation.head_browse">Explorar</message>
-<message key="xmlui.ArtifactBrowser.Navigation.head_all_of_dspace">Todo CIC-Digital</message>
+<message key="xmlui.ArtifactBrowser.Navigation.head_all_of_dspace">Todo el repositorio</message>
 <message key="xmlui.ArtifactBrowser.Navigation.communities_and_collections">Comunidades &amp; colecciones</message>
 <message key="xmlui.ArtifactBrowser.Navigation.browse_title">Títulos</message>
 <message key="xmlui.ArtifactBrowser.Navigation.browse_author">Autores</message>
