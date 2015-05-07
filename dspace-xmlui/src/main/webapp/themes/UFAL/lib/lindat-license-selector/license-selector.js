@@ -33,7 +33,7 @@
       name: 'Creative Commons Attribution (CC-BY)',
       priority: 1,
       available: true,
-      url: 'http://creativecommons.org/licenses/by/3.0/',
+      url: 'http://creativecommons.org/licenses/by/4.0/',
       description: 'This is the standard creative commons license that gives others maximum freedom to do what they want with your work.',
       categories: ['data', 'by']
     },
@@ -49,7 +49,7 @@
       name: 'Creative Commons Attribution-ShareAlike (CC-BY-SA)',
       priority: 1,
       available: true,
-      url: 'http://creativecommons.org/licenses/by-sa/3.0/',
+      url: 'http://creativecommons.org/licenses/by-sa/4.0/',
       description: 'This creative commons license is very similar to the regular Attribution license, but requires you to release all derivative works under this same license.',
       categories: ['data', 'by', 'sa']
     },
@@ -65,7 +65,7 @@
       name: 'Creative Commons Attribution-NoDerivs (CC-BY-ND)',
       priority: 1,
       available: true,
-      url: 'http://creativecommons.org/licenses/by-nd/3.0/',
+      url: 'http://creativecommons.org/licenses/by-nd/4.0/',
       description: 'The no derivatives creative commons license is straightforward; you can take a work released under this license and re-distribute it but you cannot change it.',
       categories: ['data', 'by', 'nd']
     },
@@ -73,7 +73,7 @@
       name: 'Creative Commons Attribution-NonCommercial (CC-BY-NC)',
       priority: 1,
       available: true,
-      url: 'http://creativecommons.org/licenses/by-nc/3.0/',
+      url: 'http://creativecommons.org/licenses/by-nc/4.0/',
       description: 'A creative commons license that bans commercial use.',
       categories: ['data', 'by', 'nc']
     },
@@ -81,7 +81,7 @@
       name: 'Creative Commons Attribution-NonCommercial-ShareAlike (CC-BY-NC-SA)',
       priority: 1,
       available: true,
-      url: 'http://creativecommons.org/licenses/by-nc-sa/3.0/',
+      url: 'http://creativecommons.org/licenses/by-nc-sa/4.0/',
       description: 'A creative commons license that bans commercial use and requires you to release any modified works under this license.',
       categories: ['data', 'by', 'nc', 'sa']
     },
@@ -89,7 +89,7 @@
       name: 'Creative Commons Attribution-NonCommercial-NoDerivs (CC-BY-NC-ND)',
       priority: 1,
       available: true,
-      url: 'http://creativecommons.org/licenses/by-nc-nd/3.0/',
+      url: 'http://creativecommons.org/licenses/by-nc-nd/4.0/',
       description: 'The most restrictive creative commons license. This only allows people to download and share your work for no commercial gain and for no other purposes.',
       categories: ['data', 'by', 'nc', 'nd']
     },
