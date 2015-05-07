@@ -10,8 +10,8 @@ package org.dspace.app.launcher;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.Comparator;
 import java.util.List;
+import java.util.TreeMap;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
@@ -276,28 +276,24 @@ public class ScriptLauncher
      */
     private static void display()
     {
+        // List all command elements
         List<Element> commands = commandConfigs.getRootElement().getChildren("command");
-        commands.sort(new CommandComparator());
-        System.out.println("Usage: dspace [command-name] {parameters}");
+
+        // Sort the commands by name.
+        // We cannot just use commands.sort() because it tries to remove and
+        // reinsert Elements within other Elements, and that doesn't work.
+        TreeMap<String, Element> sortedCommands = new TreeMap<>();
         for (Element command : commands)
+        {
+            sortedCommands.put(command.getChild("name").getValue(), command);
+        }
+
+        // Display the sorted list
+        System.out.println("Usage: dspace [command-name] {parameters}");
+        for (Element command : sortedCommands.values())
         {
             System.out.println(" - " + command.getChild("name").getValue() +
                                ": " + command.getChild("description").getValue());
-        }
-    }
-
-    /** Compare two command Elements by their contained name Elements. */
-    private static class CommandComparator
-            implements Comparator
-    {
-        public CommandComparator() { }
-
-        @Override
-        public int compare(Object t, Object t1)
-        {
-            Element e = (Element) t;
-            Element e1 = (Element) t1;
-            return e.getChild("name").getValue().compareTo(e1.getChild("name").getValue());
         }
     }
 }
