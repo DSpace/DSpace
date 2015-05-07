@@ -1203,6 +1203,8 @@ class report_pid_service implements simple_report {
 			} else {
 				ret += "Testing PID server not done! Test pid not in dspace.cfg!";
 			}
+		} catch(IllegalArgumentException e) {
+			System.out.println("Warning: PID service type is not defined or wrong");
 		} catch (org.apache.commons.lang.NotImplementedException e) {
 			ret += String
 					.format("Testing PID server - method who_am_i not implemented");
