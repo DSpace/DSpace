@@ -347,8 +347,8 @@
 	</xsl:template>
 	
 	 <xsl:template match="dim:dim" mode="itemSummaryView-DIM">
-		
-       	<xsl:if test="dcterms.abstract != ''">
+		<xsl:variable name="abstract" select="./dim:field[@mdschema='dcterms' and @element='abstract']"/>
+       	<xsl:if test="$abstract != ''">
 	       	<div class="row">
 	       		<div class="col-md-12">
 	       		<xsl:call-template name="render-metadata">
