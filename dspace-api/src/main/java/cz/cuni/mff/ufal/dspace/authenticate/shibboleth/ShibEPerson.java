@@ -75,11 +75,12 @@ public class ShibEPerson
         if ( !fallback ) {
             return get_last_name(default_value);
         }else {
-            if ( get_last_name(default_value) == null ) {
+            String lname = get_last_name(default_value);
+            if ( lname == null || lname.isEmpty() ) {
                 String tmp = shib_headers_.get_single(lnameHeader_fallback);
                 return null != tmp ? tmp : default_value;
             }else {
-                return get_last_name(default_value);
+                return lname;
             }
         }
         
