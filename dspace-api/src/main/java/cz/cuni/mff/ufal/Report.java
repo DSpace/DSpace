@@ -1483,7 +1483,7 @@ class db {
 				.sql("SELECT "
 						+ "(SELECT text_value FROM metadatavalue "
 						+ "WHERE metadata_field_id=64 AND resource_type_id=3 AND resource_id=col.collection_id) AS name, "
-						+ "SUM(bit.size_bytes) AS size "
+						+ "SUM(bit.size_bytes) AS sum "
 						+ "FROM collection2item col, item2bundle item, bundle2bitstream bun, bitstream bit "
 						+ "WHERE col.item_id=item.item_id AND item.bundle_id=bun.bundle_id AND bun.bitstream_id=bit.bitstream_id "
 						+ "GROUP BY col.collection_id;");
