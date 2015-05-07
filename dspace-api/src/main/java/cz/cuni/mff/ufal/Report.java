@@ -1267,7 +1267,7 @@ class report_discojuice_info implements simple_report {
 /**
  * This class provides basic report about handles in current DSpace instance
  * 
- * @author Michal Josífko
+ * @author Michal Jos√≠fko
  * 
  */
 class report_handle_info implements simple_report {
@@ -1319,7 +1319,7 @@ class report_handle_info implements simple_report {
  * This class provides basic statistics about handle resolution gathered from
  * HandlePlugin logs
  * 
- * @author Michal Josífko
+ * @author Michal Jos√≠fko
  * 
  */
 class report_handle_resolution_statistics implements simple_report {
@@ -1644,76 +1644,4 @@ class db {
 	}
 
 } // db
-    static int bitstreams_deleted() throws SQLException
-    {
-        return sql("SELECT * from bitstream where deleted=true").size();
-    }
-    
-    static List<TableRow> bitstream_orphans() throws SQLException
-    {
-        return sql("SELECT bitstream_id FROM bitstream WHERE deleted<>true AND bitstream_id "
-                + "NOT IN (" +
-                 "select bitstream_id from bundle2bitstream " +
-                 "UNION select logo_bitstream_id from community WHERE logo_bitstream_id is not NULL " +
-                 "UNION select primary_bitstream_id from bundle WHERE primary_bitstream_id is not NULL order by bitstream_id " +
-                         ")");
-        
-    }
-    
-    static int bitstreams_without_policy() throws SQLException
-    {
-        return sql(
-        "SELECT bitstream_id FROM bitstream WHERE deleted<>true AND bitstream_id NOT IN (SELECT "
-            + "resource_id FROM resourcepolicy WHERE resource_type_id=0)").size();
-    }
-    
-    static int items_withdrawn() throws SQLException
-    {
-        return sql("select * from item where withdrawn=true").size();
-    }
-    
-    static int items_not_archived() throws SQLException
-    {
-        return sql("select * from item where in_archive=false and withdrawn=false").size();
-    }
-    
-    
-    static List<TableRow> subscribers() throws SQLException
-    {
-        return sql("SELECT DISTINCT ON (eperson_id) eperson_id FROM subscription");
-    }
-    
-    static List<TableRow> subscribed_collections() throws SQLException
-    {
-        return sql("SELECT DISTINCT ON (collection_id) collection_id FROM subscription");
-    }
-    
-    static List<TableRow> workspaceitems() throws SQLException
-    {
-        return sql("SELECT stage_reached, count(1) as cnt FROM workspaceitem GROUP BY stage_reached ORDER BY stage_reached;");
-    }            
 
-    static int workflowitems() throws SQLException
-    {
-        return sql("SELECT * FROM workflowitem;").size();
-    }
-    
-    static long get_handles_total_count() throws SQLException
-    {        
-        List<TableRow> rows = sql("SELECT count(1) as cnt FROM handle");     
-        return rows.get(0).getLongColumn("cnt");
-    }
-
-    static List<TableRow> get_handles_invalid_handles() throws SQLException
-    {
-        List<TableRow> rows = sql("SELECT * FROM handle "
-                + " WHERE NOT ("
-                + "     (handle IS NOT NULL AND resource_type_id IS NOT NULL AND resource_id IS NOT NULL)"
-                + " OR "
-                + "     (handle IS NOT NULL AND url IS NOT NULL)"
-                + " ) ");
-        return rows;
-    }
-
-
-} // db
