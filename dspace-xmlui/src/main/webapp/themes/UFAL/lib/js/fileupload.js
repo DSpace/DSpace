@@ -53,57 +53,45 @@ function createFileUploadDialog(files) {
 	fileFieldO.parents("form:first").attr("action", action + "#fl");
 
 	jQuery('#uploaded_files').remove();
-	var filesToUploadDiv = jQuery("<div id=\"uploaded_files\" class=\"well well-light\"><p>Please fill in the description(s) and hit the \"Start Upload\" button.\n Then wait till the file(s) are uploaded.</p></div>");
-	filesToUploadDiv.attr('class', 'modal-body');
+	var modal_str = '<div class="modal fade" id="uploaded_files" tabindex="-1" role="dialog">\
+<div class="modal-dialog">\
+<div class="modal-content">\
+<div class="modal-header">\
+<button type="button" class="close" data-dismiss="modal">&times;</button>\
+<h4 class="modal-title">File Upload</h4>\
+</div>\
+<div class="modal-body" id="files_modal_body"><p>Please fill in the description(s) and hit the \"Start Upload\" button.\n Then wait till the file(s) are uploaded.</p>\
+</div>\
+<div class="modal-footer">\
+<button type="button" class="btn btn-primary" id="js-su-button">Start Upload</button>\
+<button type="button" class="btn btn-primary hidden" id="js-ok-button">OK</button>\
+</div>\
+</div>\
+</div>';
+	var jModal = jQuery(modal_str);
+	var modal_body = jModal.find("#files_modal_body");
 
-	var dialog_classes = "modal well well-light";
 	if ( 3 < files.length ) {
-		dialog_classes += " modal-scrollbar";
+		jModal.addClass("modal-scrollbar");
 	}
 	for ( var i = 0; i < files.length; i++) {
 		var file = files[i];
-		filesToUploadDiv.append("<div id='fileName" + i + "'><b>Filename: </b>"
+		modal_body.append("<div id='fileName" + i + "'><b>Filename: </b>"
 				+ file.name + "</div>");
-		filesToUploadDiv.append("<div id='fileType" + i + "'><b>Type: </b>"
+		modal_body.append("<div id='fileType" + i + "'><b>Type: </b>"
 				+ file.type + "</div>");
-		filesToUploadDiv.append("<div id='fileDescDiv" + i
+		modal_body.append("<div id='fileDescDiv" + i
 				+ "'><b>Describe the file: </b><input id='fileDesc" + i
 				+ "' type=\"text\"/></div>");
-		filesToUploadDiv.append("<div id='fileSizeProgress" + i
+		modal_body.append("<div id='fileSizeProgress" + i
 				+ "'><b>Progress: </b><span id='fileSize" + i + "'>0 bytes / "
 				+ convertBytesToHumanReadableForm(file.size) + "</span></div>");
-		filesToUploadDiv.append("<div id='fileProgress" + i
+		modal_body.append("<div id='fileProgress" + i
 				+ "'><progress id='progressBar" + i
 				+ "' value='0' max='100' /></div>");
-		filesToUploadDiv.append("<br />");
+		modal_body.append("<br />");
 	}
-
-	return filesToUploadDiv
-			.dialog({
-				modal : true,
-				title : "File upload",
-				resizable : false,
-				closeOnEscape : false,
-				autoOpen : false,
-				width : 600,
-				dialogClass : dialog_classes,
-				buttons : [
-						{
-							text : "OK",
-							class : "btn btn-repository",
-							click : function() {
-								jQuery(this).dialog("close");
-								// location.reload(true);
-								jQuery("input[type='submit'][value='Upload']")
-										.click();
-							},
-							id : "js-ok-button"
-						},
-						{
-							text : "Start Upload",
-							class : "btn btn-repository",
-							id : "js-su-button",
-							click : function() {
+	jModal.find("#js-su-button").click(function() {
 								jQuery('#js-su-button').button('disable');
 								xhrs = [];
 								for ( var i = 0; i < files.length; i++) {
@@ -220,20 +208,22 @@ function createFileUploadDialog(files) {
 									jQuery('#js-su-button').hide();
 									jQuery('#js-ok-button').show();
 								});
-							}
-						} ],
-				beforeClose : function() {
+							});
+	jModal.find("#js-ok-button").click(function() {
+								jModal.modal('toggle');
+								// location.reload(true);
+								jQuery("input[type='submit'][value='Upload']")
+										.click();
+							});
+	jModal.on('hidden.bs.modal',function() {
 					xhrs.forEach(function(xhr) {
 						xhr.abort();
 					});
 					// remove the selection so the files are not submitted again
 					jQuery("#aspect_submission_StepTransformer_field_file")
 							.val("");
-				},
-				open : function() {
-					jQuery("#js-ok-button").hide();
-				}
-			});
+				});
+	return jModal;
 }
 
 function filterFiles(files, callback) {
@@ -272,7 +262,7 @@ function processFiles(files) {
 	if (rejectedFilesDialog != undefined) {
 		rejectedFilesDialog.dialog("open");
 	} else if (fileUploadDialog != undefined) {
-		fileUploadDialog.dialog("open");
+		fileUploadDialog.modal();
 	}
 
 }
