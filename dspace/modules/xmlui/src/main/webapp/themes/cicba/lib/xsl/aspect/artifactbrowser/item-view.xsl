@@ -347,16 +347,17 @@
 	</xsl:template>
 	
 	 <xsl:template match="dim:dim" mode="itemSummaryView-DIM">
-       	
-       	<div class="row">
-       		<div class="col-md-12">
-       		<xsl:call-template name="render-metadata">
-				<xsl:with-param name="field" select="'dcterms.abstract'" />
-				<xsl:with-param name="separator" select="''" />
-			</xsl:call-template>
-      		</div>
-      	</div>
-      	
+		
+       	<xsl:if test="dcterms.abstract != ''">
+	       	<div class="row">
+	       		<div class="col-md-12">
+	       		<xsl:call-template name="render-metadata">
+					<xsl:with-param name="field" select="'dcterms.abstract'" />
+					<xsl:with-param name="separator" select="''" />
+				</xsl:call-template>
+	      		</div>
+	      	</div>
+      	</xsl:if>
 	    <div class="row">
 	    
 	
