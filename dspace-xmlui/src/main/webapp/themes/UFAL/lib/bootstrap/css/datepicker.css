@@ -289,3 +289,12 @@
   width: 16px;
   height: 16px;
 }
+
+.datepicker i.icon-arrow-left::before {
+  content: "<";
+}
+
+.datepicker i.icon-arrow-right::before {
+  content: ">";
+}
+
