@@ -55,11 +55,15 @@ ul {
 	/* 	background-repeat: no-repeat; */
 }
 
-#cic-body>div, #cic-trail>ol {
-	max-width: 1280px;
-	margin: 0 auto;
-	padding-left: 15px;
-	padding-right: 15px;
+#cic-body>div {
+	padding-left: 25px;
+	padding-right: 25px;
+}
+
+#cic-trail>ol.breadcrumb{
+	padding-left: 25px;
+	padding-right: 25px;
+	margin-bottom:0px;
 }
 
 .static-page ol{
@@ -96,7 +100,7 @@ ul {
 }
 
 #home-highlight {
-	height: 270px;
+/*	height: 270px;*/
 	margin-bottom: 20px;
 	
   margin-top: 20px;

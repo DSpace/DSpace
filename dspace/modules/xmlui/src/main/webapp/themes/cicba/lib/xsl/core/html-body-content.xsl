@@ -11,7 +11,7 @@
 		entirely of dri:div tags). -->
 	<xsl:template match="dri:body">
 		<div id="cic-body" class="row">
-			<div>
+<!--			<div>-->
 			<xsl:if
 				test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='alert'][@qualifier='message']">
 				<div id="ds-system-wide-alert">
@@ -59,7 +59,7 @@
 				</xsl:otherwise>
 			</xsl:choose>
 
-		</div>
+<!--		</div>-->
 		</div>
 	</xsl:template>
 	
@@ -67,7 +67,7 @@
 	<xsl:template name="buildHome">
 
 		<div class="row">
-			<div class="col-md-6" id="welcome-panel">
+			<div class="col-md-7" id="welcome-panel">
 				<xsl:for-each select="dri:div[@n='news']">
 					<h1>
 						<xsl:copy-of select="dri:head" />
@@ -75,7 +75,7 @@
 					<xsl:copy-of select="dri:p" />
 				</xsl:for-each>
 			</div>
-			<div class="col-md-4 col-md-offset-2">
+			<div class="col-md-5">
 				<xsl:call-template name="build-img">
 					<xsl:with-param name="img.src">images/provincia.png</xsl:with-param>
 				</xsl:call-template>
@@ -85,7 +85,7 @@
 <!-- 			<div id="home-highlight-img"> -->
 <!-- 				<xsl:text> </xsl:text> -->
 <!-- 			</div> -->
-			<div id="home-highlight-content" class="col-md-6">
+			<div id="home-highlight-content" class="col-md-7">
 				<form class="form-inline" role="form">
 					<xsl:attribute name="action"><xsl:value-of select="$search-url" /></xsl:attribute>
 				   <label for="q">
@@ -125,7 +125,7 @@
 					</div>
 				</div>
 			</div><!--
-    		--><div id="home-autoarchivo" class="col-md-6">
+    		--><div id="home-autoarchivo" class="col-md-5">
 <!-- 				<h3> -->
 					<xsl:call-template name="build-anchor">
 						<xsl:with-param name="a.href">/submissions</xsl:with-param>
