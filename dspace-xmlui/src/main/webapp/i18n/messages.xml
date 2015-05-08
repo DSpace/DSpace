@@ -129,14 +129,19 @@
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_keyword">Keyword</message>
 
    <!--  some common other possibilities for Advanced Search Fields -->
+   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_advisor">Advisor</message>
+   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_composer">Composer</message>
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_contributor">Contributor</message>
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_creator">Creator</message>
+   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_department">Department</message>
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_description">Description</message>
-   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_relation">Relation</message>
+   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_firstLineOfChorus">First Line of Chorus</message>
+   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_firstLineOfText">First Line Of Text</message>
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_mime">Mime-Type</message>
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_other">Other Contributor</message>
-   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_advisor">Advisor</message>
-   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_department">Department</message>
+   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_publisher">Publisher</message>
+   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_relation">Relation</message>
+   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_subject">Subject</message>
 
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_ANY">Full Text</message>
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.and">AND</message>
@@ -169,6 +174,11 @@
 
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.author.column_heading">Authors Name</message>
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.subject.column_heading">Subject</message>
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.composer.column_heading">Composer</message>
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.corporateAuthor.column_heading">Corporate Author</message>
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.publisher.column_heading">Publisher</message>
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.firstLineOfText.column_heading">First Line of Text</message>
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.firstLineOfChorus.column_heading">First Line of Chorus</message>
 
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.metadata.author">Browsing {0} by Author {1}</message>
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.trail.metadata.author">Browsing {0} by Author</message>
@@ -185,6 +195,20 @@
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.item.dateaccessioned">Browsing {0} by Submit Date {1}</message>
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.trail.item.dateaccessioned">Browsing {0} by Submit Date</message>
 
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.metadata.composer">Browsing {0} by Composer {1}</message>
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.trail.metadata.composer">Browsing {0} by Composer</message>
+
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.metadata.corporateAuthor">Browsing {0} by Corporate Author {1}</message>
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.trail.metadata.corporateAuthor">Browsing {0} by Corporate Author</message>
+
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.metadata.publisher">Browsing {0} by Publisher {1}</message>
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.trail.metadata.publisher">Browsing {0} by Publisher</message>
+
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.metadata.firstLineOfText">Browsing {0} by First Line of Text {1}</message>
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.trail.metadata.firstLineOfText">Browsing {0} by First Line of Text</message>
+
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.metadata.firstLineOfChorus">Browsing {0} by First Line of Chorus {1}</message>
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.trail.metadata.firstLineOfChorus">Browsing {0} by First Line of Chorus</message>
 
 	<!-- org.dspace.app.xmlui.administrative.WithdrawnItems.java -->
 	<message key="xmlui.Administrative.WithdrawnItems.title.item.title">Withdrawn Items by Title</message>
@@ -279,6 +303,11 @@
 	<message key="xmlui.ArtifactBrowser.Navigation.browse_subject">Subjects</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.browse_dateissued">By Issue Date</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.browse_dateaccessioned">By Submit Date</message>
+    <message key="xmlui.ArtifactBrowser.Navigation.browse_composer">Composer</message>
+    <message key="xmlui.ArtifactBrowser.Navigation.browse_corporateAuthor">Corporate Author</message>
+    <message key="xmlui.ArtifactBrowser.Navigation.browse_publisher">Publisher</message>
+    <message key="xmlui.ArtifactBrowser.Navigation.browse_firstLineOfText">First Line of Text</message>
+    <message key="xmlui.ArtifactBrowser.Navigation.browse_firstLineOfChorus">First Line of Chorus</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.head_this_collection">This Collection</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.head_this_community">This Community</message>
 
@@ -378,6 +407,7 @@
 	<message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.para1">This is the text to be sent to the applicant.</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.message">Message</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.subject">Subject</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.toEmail">To</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.mail">Send</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.back">Back</message>
 
@@ -388,6 +418,7 @@
 	<message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.para1">This is the text to be sent to the applicant (together with the document).</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.message">Message</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.subject">Subject</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.toEmail">To</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.mail">Send</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.back">Back</message>
 	
@@ -519,6 +550,7 @@
 	<message key="xmlui.EPerson.PasswordLogin.title">Sign in</message>
 	<message key="xmlui.EPerson.PasswordLogin.trail">Sign in</message>
 	<message key="xmlui.EPerson.PasswordLogin.head1">Sign in to DSpace</message>
+	<message key="xmlui.EPerson.PasswordLogin.title">Sign in</message>
 	<message key="xmlui.EPerson.PasswordLogin.email_address">E-Mail Address</message>
 	<message key="xmlui.EPerson.PasswordLogin.error_bad_login">The email address and/or password supplied were not valid.</message>
 	<message key="xmlui.EPerson.PasswordLogin.password">Password</message>
@@ -532,6 +564,7 @@
 	<message key="xmlui.EPerson.LDAPLogin.title">Sign in</message>
 	<message key="xmlui.EPerson.LDAPLogin.trail">Sign in</message>
 	<message key="xmlui.EPerson.LDAPLogin.head1">Sign in to DSpace</message>
+	<message key="xmlui.EPerson.LDAPLogin.title">Sign in</message>
 	<message key="xmlui.EPerson.LDAPLogin.username">User Name</message>
 	<message key="xmlui.EPerson.LDAPLogin.error_bad_login">The user name and/or password supplied were not valid.</message>
 	<message key="xmlui.EPerson.LDAPLogin.password">Password</message>
@@ -1848,6 +1881,7 @@
 	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.help_oaisetid">The persistent identifier used by the OAI provider to designate the target collection</message>
 	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.error_oaisetid">You must provide a set id of the target collection.</message>
 	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.label_harvest_level">Content being harvested</message>
+	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.label_harvest_level">Content being harvested</message>
 	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.option_md_only">Harvest metadata only.</message>
 	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.option_md_and_ref">Harvest metadata and references to bitstreams (requires ORE support).</message>
 	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.option_md_and_bs">Harvest metadata and bitstreams (requires ORE support).</message>
@@ -2121,6 +2155,7 @@
     <message key="xmlui.statistics.display.table.workflow.step.default.editstep.editaction">Accept/Reject/Edit Metadata Step</message>
     <message key="xmlui.statistics.display.table.workflow.step.default.finaleditstep.claimaction">Edit Metadata Step Pool</message>
     <message key="xmlui.statistics.display.table.workflow.step.default.finaleditstep.finaleditaction">Edit Metadata Step</message>
+    <message key="xmlui.statistics.display.table.workflow.step.default.finaleditstep.finaleditaction">Edit Metadata Step</message>
     <message key="xmlui.statistics.display.table.workflow.step.scoreReview.scoreReviewStep.claimaction">Score Review Pool</message>
     <message key="xmlui.statistics.display.table.workflow.step.scoreReview.scoreReviewStep.scorereviewaction">Score Review</message>
     <message key="xmlui.statistics.display.table.workflow.step.scoreReview.evaluationStep.evaluationaction">Score Review Evaluation</message>
@@ -2210,12 +2245,51 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-preview">Preview</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-title">Title</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-author">Author</message>
+    <message key="xmlui.dri2xhtml.METS-1.0.item-author-corporate">Corporate Author</message>
+    <message key="xmlui.dri2xhtml.METS-1.0.item-author-of-text">Author of Text</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-abstract">Abstract</message>
+    <message key="xmlui.dri2xhtml.METS-1.0.item-composer">Composer</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-description">Description</message>
+    <message key="xmlui.dri2xhtml.METS-1.0.item-first-line-of-chorus">First Line of Chorus</message>
+    <message key="xmlui.dri2xhtml.METS-1.0.item-first-line-of-text">First Line of Text</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-uri">URI</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-date">Date</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-publisher">Publisher</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-subject">Subject</message>
+    <!-- Mirage 2 - Use schema.element.qualifer -->
+    <!-- dc - Dublin Core -->
+    <message key="xmlui.metadata.dc.abstract">Abstract</message>
+    <message key="xmlui.metadata.dc.author">Author</message>
+    <message key="xmlui.metadata.dc.author-corporate">Corporate Author</message>
+    <message key="xmlui.metadata.dc.author-of-text">Author of Text</message>
+    <message key="xmlui.metadata.dc.composer">Composer</message>
+    <message key="xmlui.metadata.dc.contributor">Contributor</message>
+    <message key="xmlui.metadata.dc.contributor.author">Author</message>
+    <message key="xmlui.metadata.dc.creator">Creator</message>
+    <message key="xmlui.metadata.dc.date">Date</message>
+    <message key="xmlui.metadata.dc.date.accessioned">Date Accessioned</message>
+    <message key="xmlui.metadata.dc.date.available">Date Available</message>
+    <message key="xmlui.metadata.dc.date.created">Date Created</message>
+    <message key="xmlui.metadata.dc.date.issued">Date of Issue</message>
+    <message key="xmlui.metadata.dc.description">Description</message>
+    <message key="xmlui.metadata.dc.description.abstract">Description</message>
+    <message key="xmlui.metadata.dc.description.provenance">Provenance</message>
+    <message key="xmlui.metadata.dc.first-line-of-chorus">First Line of Chorus</message>
+    <message key="xmlui.metadata.dc.first-line-of-text">First Line of Text</message>
+    <message key="xmlui.metadata.dc.format">Item Format</message>
+    <message key="xmlui.metadata.dc.format.mimetype">Mimetype</message>
+    <message key="xmlui.metadata.dc.identifier.uri">Identifier</message>
+    <message key="xmlui.metadata.dc.language">Item Language</message>
+    <message key="xmlui.metadata.dc.language.iso">Language</message>
+    <message key="xmlui.metadata.dc.publisher">Publisher</message>
+    <message key="xmlui.metadata.dc.relation.ispartof">Digital Collection</message>
+    <message key="xmlui.metadata.dc.rights">Rights</message>
+    <message key="xmlui.metadata.dc.source">Source</message>
+    <message key="xmlui.metadata.dc.subject">Subject</message>
+    <message key="xmlui.metadata.dc.title">Title</message>
+    <message key="xmlui.metadata.dc.title.alternative">Alternative Title</message>
+    <message key="xmlui.metadata.dc.type">Type</message>
+    <message key="xmlui.metadata.dc.uri">URI</message>
 
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-head">Files in this item</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-file">Files</message>
