@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>valid.tjp.hu - TJPzoom 3 - JavaScript / CSS / DOM image magnifier - Tutorial</title>
+<style type="text/css">
+code {background-color: #cccccc;}
+.long {display:block;margin:1em;padding: 1em;}
+</style>
+<script type="text/javascript" src="tjpzoom.js"></script>
+</head>
+<body>
+
+<h1>Installing <a href="http://valid.tjp.hu/tjpzoom">TJPzoom</a> on your site</h1>
+<h2>Turning your zoom script on / off</h2>
+<p>It's pretty easy. After you've put your zoom script into your header...</p>
+<code class="long">
+&lt;script type="text/javascript" src="tjpzoom.js"&gt;&lt;/script&gt;<br />
+&lt/head&gt;
+</code>
+
+<p>... you slightly modify your <code>&lt;img&gt;</code> tag:</p>
+<p><a href="#" onclick="if(TJPzoomswitch(document.getElementById('unique113'))) {this.innerHTML='it\'s on, switch it OFF'} else {this.innerHTML='it\'s off, switch it ON'}; return false;">it's off, switch it ON</a></p>
+<div>
+<img src="test.jpg" style="width:640px; height: 480px;" onmouseover="TJPzoomif(this);" id="unique113">
+</div>
+<p>And now take a look at the source of this file. We've changed the TJPzoom() function to TJPzoomif(), which always checks a variable and only activates the zoom script when the value is 1. And we added a switcher, which changes that variable.</p>
+
+<hr />
+<p><a href="index.html">Basics</a> * <a href="behavior.html">Behavior / look</a> * <a href="onoff.html">Turning it on/off</a></p>
+
+</body>
+</html>

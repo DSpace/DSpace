@@ -1,0 +1,157 @@
+a, a:active, a:visited {
+  color: #004C93;
+}
+
+a:hover {
+  color: #009EE0;
+}
+
+h1 {
+  color: #003366;
+}
+
+#ds-header-wrapper {
+  background: #1E3C84 url(/xmlui/themes/suny/images/right_header.png) no-repeat top right;
+  width: 100%;
+}
+
+#ds-header-wrapper {
+  z-index: 999999;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+#ds-trail-wrapper {
+  background-color: #039;
+  z-index: 9999;
+  position: absolute;
+  width: 100%;
+  top: 94px;
+  left: 0;
+  text-indent: 9px;
+}
+
+#ds-trail a, #ds-trail li {
+  color: #fff;
+}
+
+#ds-header-logo {
+  background: url(/xmlui/themes/suny/images/dspacetop.png) no-repeat 8px bottom;
+  height: 94px;
+  width: 386px;
+  margin: 0;
+}
+
+#ds-header-logo-text {
+  display: none;
+}
+
+#ds-user-box {
+  position: absolute;
+  top: 99px;
+  right: 18px;
+  z-index: 9999999;
+}
+
+#ds-header, #ds-trail, #ds-content, #ds-footer {
+  width: 100%;
+}
+
+#ds-footer-wrapper {
+  margin-left: 268px;
+}
+
+#ds-footer-left, #ds-footer-links {
+}
+
+#ds-footer-right {
+  display: none;
+}
+
+#ds-body {
+  margin-left: 268px;
+  float: none;
+  margin-top: 120px;
+}
+#ds-options {
+  background-color: transparent;
+  position: absolute;
+  top: 15px;
+  left: 9px;
+  max-width: 249px;
+}
+.ds-option-set-head, .ds-option-set {
+  border-color: #0097FE;
+}
+#ds-search-form label {
+  display: block;
+  line-height: 12px;
+}
+#ds-search-form input[type="radio"] {
+  margin: 0 3px;
+}
+
+#ds-footer {
+  border: 0px;
+  padding-bottom: 2em;
+}
+
+#ds-footer-left {
+  display: none;
+}
+
+.file-list {
+  line-height: 128px;
+}
+.mimeicon {
+  float: left;
+  padding-right: 18px;
+}
+
+
+.ds-table-header-row {
+  border: none;
+  text-align: left;
+}
+
+/* submit button on collection page */
+#aspect_artifactbrowser_CollectionViewer_div_collection-view p { 
+  text-align: center; 
+}
+#aspect_artifactbrowser_CollectionViewer_div_collection-view a {
+  background-color: #004C93;
+  display: inline-block;
+  padding: 5px 10px 6px;
+  color: #fff;
+  text-decoration: none;
+  font-family: "Arial", sans-serif;
+  font-weight: bold;
+  font-size: 1.4em;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
+  border-bottom: 1px solid rgba(0,0,0,0.25);
+  position: relative;
+  cursor: pointer;
+}
+#aspect_artifactbrowser_CollectionViewer_div_collection-view a:hover { 
+  background-color: #009EE0; 
+  color: #fff; 
+}
+
+#aspect_artifactbrowser_CollectionViewer_div_collection-view a:active { 
+  top: 1px; 
+}
+
+#file_news_div_news { 
+  width: 100%; 
+}
+
+#file_news_div_news div { 
+  width: 540px; 
+  margin: 0 auto; 
+}

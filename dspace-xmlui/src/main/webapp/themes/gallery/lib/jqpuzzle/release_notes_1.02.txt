@@ -1,0 +1,21 @@
+jqPuzzle - Customizable Sliding Puzzles with jQuery
+
+Version 1.02
+2008-03-07
+
+Change Log:
+
+- The puzzle can now be triggered after the image is already loaded (e.g. as a result of a button click).
+
+- Fixed some browser inconsistencies with the load event of cached images. The puzzle will now be triggered based on image.complete as well.
+
+- Converted all plugin files to utf-8.
+
+- Fixed a check for the success callback.
+
+- Renamed "packed" to "min" (minified) version
+
+- Added real "packed" version.
+
+Copyright (c) 2008 Ralf Stoltze, http://www.2meter3.de/jqPuzzle/
+Dual-licensed under the MIT and GPL licenses.

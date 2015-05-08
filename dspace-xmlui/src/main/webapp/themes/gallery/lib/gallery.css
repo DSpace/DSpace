@@ -1,0 +1,137 @@
+/* ** OVERRIDES FOR STANDARD MANAKIN STYLES ** */
+/*
+   These set the display properties for the gallery itself, controllng size, font, etc to allow for
+  a grid display
+ */
+.ds-artifact-list li {
+	display: inline;
+	list-style-type: none;
+	float:left;
+/* border:1px #ccc solid; */
+	margin:5px;
+	padding:5px;
+	height:155px;
+}
+.ds-artifact-list li img {
+	width:100px;
+}
+.ds-artifact-list li h4 {
+	padding:0px;
+	margin-top:8px;
+}
+.ds-artifact-item {
+	font-size:85%;
+	width:140px;
+	text-align:center;
+}
+.ds-artifact-item p {
+	padding:0px;
+	margin-top:4px;
+	margin-bottom:8px;
+}
+/* Make smaller and surround with a border */
+.intro-text {
+	border:1px solid #ccc;
+	background-color:#eee;
+	padding:2px;
+	font-style:italic;
+	margin:2px;
+}
+div#about-notice {
+	background-color:#ddd;
+	margin-left:50px;
+	margin-right:50px;
+	border:1px solid #666;
+	padding:5px;
+	margin-top:10px;
+	font-size:85%;
+}
+
+/* Make the search box smaller and less prominent */
+div.search-browse {
+	padding:2px 2px 2px 10px;
+	margin:2px;
+	font-size:75%
+}
+
+/* ** NEW CLASSES ** */
+/* classes for the detail popup window */
+img.detail {
+	width:250px;
+	border:1px solid #ccc;
+	margin-right:5px;
+	margin-left:5px;
+}
+img.thumbnail {
+	padding:5px;
+	border:1px solid #999;
+}
+a.detail-link {
+	font-weight: bold;
+	color: #333;
+	text-decoration: none;
+	background-color: #ccc;
+	padding-top: 2px;
+	padding-right: 6px;
+	padding-bottom: 2px;
+	padding-left: 6px;
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	border-top-color: #fff;
+	border-right-color: #666;
+	border-bottom-color: #666;
+	border-left-color: #fff;
+	background-image: none;
+}
+a.detail-link:hover {
+	background-color: #ddd;
+	border-top-width: 1px;
+	border-right-width: 2px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	border-top-color: #666;
+	border-right-color: #fff;
+	border-bottom-color: #fff;
+	border-left-color: #666;
+	background-image: none;
+}
+
+.detail-title {
+	font-size:140%;
+	color:#69c;
+	padding-left:5px;
+	padding-top:5px;
+}
+.detail-author {
+	padding-left:5px;
+}
+.detail-date {
+	padding-left:5px;
+}
+.detail-desc {
+	padding-left:5px;
+}
+.detail-link {
+	padding-left:5px;
+	text-align:center;
+}
+.detail-link a {
+	color:#69c;
+	font-size:120%;
+	text-decoration:none;
+}
+.detail-link a:hover {
+	text-decoration:underline;
+}
+#puzzle {
+}

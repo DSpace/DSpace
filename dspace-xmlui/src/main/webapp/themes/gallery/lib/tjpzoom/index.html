@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>valid.tjp.hu - TJPzoom 3 - JavaScript / CSS / DOM image magnifier - Tutorial</title>
+<style type="text/css">
+code {background-color: #cccccc;}
+.long {display:block;margin:1em;padding: 1em;}
+</style>
+<script type="text/javascript" src="tjpzoom.js"></script>
+</head>
+<body>
+
+<h1>Installing <a href="http://valid.tjp.hu/tjpzoom">TJPzoom</a> on your site</h1>
+<h2>Table of contents</h2>
+<ol>
+<li>The basics, your <strong>hello world</strong> magnifier, low res pic + high res pic, aligning your picture (this file)</li>
+<li><strong>Changing the look</strong> / behavior of your zoom script (<a href="behavior.html">behavior.html</a>)</li>
+<li>Turning your zoom script <strong>on / off</strong> (<a href="onoff.html">onoff.html</a>)</li>
+</ol>
+
+<div style="margin:20px">
+<img src="http://valid.tjp.hu/zoom/collage.jpg" onmouseover="TJPzoom(this,'http://valid.tjp.hu/zoom/collage_2.jpg?adsfg')" alt="" />
+</div>
+
+<h2>The basics</h2>
+<p>First, you'll need to upload a few files to your site.</p>
+<ul>
+<li>The script itself: <em>tjpzoom.js</em></li>
+<li>The drop shadow files: the <em>dropshadow/</em> directory</li>
+<li>If you need it, a test picture. I've attached one, <em>test.jpg</em></li>
+</ul>
+<p>By default, the <em>dropshadow/</em> directory is in the same directory as your html file. (Like in this tutorial.)</p>
+<h2>Your hello world magnifier</h2>
+<p>First, you have to put the following line just before your <code>&lt/head&gt;</code> tag:</p>
+<code class="long">
+&lt;script type="text/javascript" src="tjpzoom.js"&gt;&lt;/script&gt;
+</code>
+<p>Next, you put in your magnifier tag into your body tag where it belongs:</p>
+<code class="long">
+&lt;div&gt;<br />
+&lt;img src="<em>test.jpg</em>" style="width:<em>640px</em>; height: <em>480px</em>;" onmouseover="TJPzoom(this);"&gt;<br />
+&lt;/div&gt;
+</code>
+It's <strong>important</strong> that you have to put your image tag into a <code>&lt;div&gt;</code> tag.</p>
+<p>Okay, let's copy that code here - I've already included the script before the <code>&lt;head&gt;</code> tag.</p>
+<div>
+<img src="test.jpg" style="width:640px; height: 480px;" onmouseover="TJPzoom(this);" />
+</div>
+
+<p>Amazing, isn't it? (DRAG UP to zoom in, DRAG RIGHT to increase zoom window!)</p>
+
+<h2>Low res pic + high res pic</h2>
+<p>You may also find the TJPzoom tool useful if you you have a low resolution and a high resolution version of the same picture and it's only the lowres one that fits in your page but you want to show the little details of the highres one. In fact, that's the case with me too, I've got this http://valid.tjp.hu/zoom/collage.jpg, thats 580x580px, but I have a bigger one http://valid.tjp.hu/zoom/collage_2.jpg (with the same proportions). Don't worry, there is a solution for this:</p>
+<code class="long">
+&lt;div&gt;<br />
+&lt;img src="<em>http://valid.tjp.hu/zoom/collage.jpg</em>" style="width:<em>640px</em>; height: <em>480px</em>;" onmouseover="TJPzoom(this, 'http://valid.tjp.hu/zoom/collage_2.jpg');"&gt;<br />
+&lt;/div&gt;
+</code>
+
+<h2>Aligning your picture</h2>
+<p>Since it's just a picture - only a bit twisted up - you can easily align it to left or right, even to the center! The trick is to align the container div, not the image.</p>
+<code class="long">
+&lt;div style="float:right"&gt;<br />
+&lt;img src="<em>test.jpg</em>" style="width:<em>640px</em>; height: <em>480px</em>;" onmouseover="TJPzoom(this);"&gt;<br />
+&lt;/div&gt;<br />
+&lt;div style="clear:both"&gt;&lt;/div&gt;
+</code>
+<div style="float:right">
+<img src="test.jpg" style="width:640px; height: 480px;" onmouseover="TJPzoom(this);">
+</div>
+<div style="clear:both"></div>
+
+<code class="long">
+&lt;div style="float:left"&gt;<br />
+&lt;img src="<em>test.jpg</em>" style="width:<em>640px</em>; height: <em>480px</em>;" onmouseover="TJPzoom(this);"&gt;<br />
+&lt;/div&gt;<br />
+&lt;div style="clear:both"&gt;&lt;/div&gt;
+</code>
+<div style="float:left">
+<img src="test.jpg" style="width:640px; height: 480px;" onmouseover="TJPzoom(this);">
+</div>
+<div style="clear:both"></div>
+<p>Centering is bit trickier. Since one of the major browsers (IE6) doesn't support <code>margin:auto</code> correctly, I advise you to use this workaround. It's nasty, but browsers like it:</p>
+<code class="long">
+&lt;table cellspacing="0" cellpadding="0" border="0"&gt;&lt;tr&gt;&lt;td width="50%"&gt;&lt;/td&gt;&lt;td&gt;<br />
+&lt;img src="&lt;em&gt;test.jpg&lt;/em&gt;" style="width:<em>640px</em>; height: <em>480px</em>;" onmouseover="TJPzoom(this);"&gt;<br />
+&lt;/td&gt;&lt;td width="50%"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+</code>
+<table cellspacing="0" cellpadding="0" border="0"><tr><td width="50%"></td><td>
+<img src="test.jpg" style="width:640px; height: 480px;" onmouseover="TJPzoom(this);">
+</td><td width="50%"></td></tr></table>
+
+<h2>I want to change the behavior / look of the magnifier!</h2>
+That's the best part. So we opened a new page for it. <a href="behavior.html">Continue...</a>
+
+<hr />
+<p><a href="index.html">Basics</a> * <a href="behavior.html">Behavior / look</a> * <a href="onoff.html">Turning it on/off</a></p>
+</body>
+</html>

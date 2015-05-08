@@ -1,0 +1,68 @@
+/* background-image-based CSS3 example */
+
+/*ul.graphic {
+ list-style-type:none;
+ margin:0px;
+ padding:0px;
+}
+
+ul.graphic li {
+ margin-bottom:2px;
+} */
+
+td.standard a.sm2_link {
+ /* assume all items will be sounds rather than wait for onload etc. in this example.. may differ for your uses. */
+ display:inline-block;
+ padding-left:22px;
+ min-height:16px;
+ border:3px solid #666;
+ background-color:#666;
+ -moz-border-radius:3px;
+ -webkit-border-radius:3px;
+ border-radius:3px;
+ padding:0px 3px 0px 20px;
+/* min-width:19em;
+ _width:19em; */
+ text-decoration:none;
+ font-weight:bold;
+ color:#fff;
+}
+
+td.standard a.sm2_link {
+ /* safari 3.1+ fun (or, proprietary crap. TBD.) */
+ -webkit-transition-property: hover;
+ -webkit-transition: all 0.15s ease-in-out;
+}
+
+td.standard a.sm2_link,
+td.standard a.sm2_paused:hover,
+td.standard a.sm2_link:hover {
+ background:#333 url(../image/icon_play.png) no-repeat 0px 50%;
+ _background-image:url(../image/icon_play.gif); /* IE 6 */
+ border-color:#333;
+}
+
+td.standard a.sm2_paused {
+ background-color:#999;
+ border-color:#999;
+}
+
+td.standard a.sm2_paused:hover {
+ background:#999 url(../image/icon_play.png) no-repeat 0px 50%;
+ _background-image:url(../image/icon_play.gif);
+ border-color:#999;
+}
+
+td.standard a.sm2_playing,
+td.standard a.sm2_playing:hover {
+ background:#336699 url(../image/icon_pause.png) no-repeat 0px 50%;
+ _background-image:url(../image/icon_pause.gif);
+ border-color:#336699;
+ text-decoration:none;
+}
+
+/* hide button while playing?
+td.standard a.sm2_playing {
+ background-image:none;
+}
+*/

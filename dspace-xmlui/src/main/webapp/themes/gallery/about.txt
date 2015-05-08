@@ -1,0 +1,61 @@
+<div id="about-notice">
+
+    <h2>About the Gallery Theme</h2>
+
+    <p>This Manakin theme provides a gallery display for image collections. It assumes DSpace items
+        in the collection have a DSpace-generated thumbnail, and it displays details and the
+        thumbail in embedded popups in the gallery interface. </p>
+
+    <p> In addition, it implements a Javascript-based zoom and pan interface on the DSpace item
+        detail view. See instructions. </p>
+
+    <h3>Instructions</h3>
+
+    <p><strong>Installation</strong></p>
+
+    <p>Install as any other Manakin theme. This theme contains no aspects, so can be added without
+        recompiling/building DSpace</p>
+
+    <p>All configuration paramaters are set in the file "config.xml" located at the root of the
+       theme when unpacked. Locating them there is intended ease migration 
+       to new versions of this theme.</p>
+
+	<p>Larger thumbnail images are
+        recommended, as they will display in the popup interface at a larger size.</p>
+
+    <p><strong>Zoom and pan interface</strong></p>
+
+    <p>
+        The Javascript-based zoom and pan interface is implemented using TJP Zoom (see Credits and
+        License Info). This interface will appear if the DSpace item in this collection has a
+        bitstream of MIMETYPE JPEG that is less than the value set in <em>config-maxServiceImageSize</em>.
+        If the item has multiple JPEGs that qualify, the LARGEST will be discplayed in the zoom tool.</p>
+
+
+    <h3>Credits and License Info</h3>
+    
+    <p> 
+        This Manakin theme includes these Javascript libraries: <ul>
+        	<li>FancyBox JQuery Plugin: <a href="http://fancybox.net" target="_blank">http://fancybox.net</a>
+            </li>
+            <li>TJP Zoom: <a href="http://valid.tjp.hu/tjpzoom/" target="_blank">http://valid.tjp.hu/tjpzoom/</a>
+            </li>
+        </ul>
+    </p>
+    
+    <p>
+        <em> Please ensure that your use of this code is in accordance with the licensing of those
+            code libraries.</em>
+    </p>
+
+    <p>This theme was written by Eric Jansson 
+(<a href="mailto:ejansson@nitle.org">ejansson@nitle.org</a>) of the <a href="http://nitle.org" target="_blank">National Institute for Technology in Liberal 
+       Education - NITLE</a>. The theme was produced as part of a project to determine how Manakin
+can serve the needs of DSpace repositories at liberal arts institutions, and to understand better the resources
+necessary to develop Manakin themes.</p>
+    
+    <p> To remove the link to this page from the theme, please edit the file: gallery.xsl and change
+        the theme setting <strong>$config-showAboutLink</strong> at the top of the file:
+            <xsl:value-of select="$themePath"/>gallery.xsl 
+    </p>
+</div>
