@@ -753,8 +753,6 @@
         <script src="{$theme-path}/scripts/jquery.lazyload.min.js"></script>
         <script src="{$theme-path}/scripts/snazy.js"></script>
 
-        <script src="https://www.google.com/recaptcha/api.js" async="true" defer="true"></script>
-
         <!-- add "shared" javascript from static, path is relative to webapp root -->
         <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][@qualifier='url']">
             <script type="text/javascript">

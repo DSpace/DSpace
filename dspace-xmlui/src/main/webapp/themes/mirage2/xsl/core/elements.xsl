@@ -46,9 +46,6 @@
                 <xsl:attribute name="onkeydown">javascript:return disableEnterKey(event);</xsl:attribute>
             </xsl:if>
 
-            <div class="g-recaptcha" data-sitekey="6LeH6wQTAAAAAIvqOUgFpREbUd5EMTVUgCstTA33"></div>
-            <br/>
-
             <xsl:apply-templates select="dri:head"/>
             <xsl:apply-templates select="*[not(name()='head')]"/>
 
