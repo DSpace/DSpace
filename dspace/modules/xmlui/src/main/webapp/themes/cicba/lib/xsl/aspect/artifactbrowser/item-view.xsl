@@ -214,12 +214,22 @@
 				
 				<div class="item-preview">
 				    <a href="#" class="thumbnail">
-				   	  <xsl:variable name="thumbnail_file" select="./mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/mets:file[1]"/>
-				      <img alt="Preview">
-                          <xsl:attribute name="src">
-                              <xsl:value-of select="$thumbnail_file/mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
-                          </xsl:attribute>
-                      </img>
+				   	  <xsl:variable name="thumbnail_file" select="./mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/mets:file[1]"/>			  
+				         <img  alt="Preview">
+	                          <xsl:attribute name="src">
+	                          	<xsl:choose>
+	                          		<xsl:when test="$thumbnail_file/mets:FLocat[@LOCTYPE='URL']/@xlink:href != ''">
+	                          			<xsl:value-of select="$thumbnail_file/mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
+	                          		</xsl:when>
+	                          		<xsl:otherwise>
+	                          			<xsl:call-template name="print-theme-path">
+	                          				<xsl:with-param name="path" select="'/dspace/themes/cicba/images/preview_no_disponible.png'"/>
+	                          			</xsl:call-template>
+	                          		</xsl:otherwise>
+	                          	</xsl:choose>
+	                              
+	                          </xsl:attribute>                          
+	                      </img>
 				    </a>
 				</div>
 
