@@ -48,6 +48,12 @@ h1,h2,h3,h4,h5,h6,h7,h8,h9, .community-browser-row a  {
 // yeah, we're not so hot on the whole authority confidence display, let's hide it until it does something meaningful for our users
 img.ds-authority-confidence { display: none;}
 
+// make pagination larger
+
+.pagination {
+	font-size: larger;
+}
+
 // add in specific MOspace styles
 div#ms-tagline {
     margin: 58px 0px 0px -78px;
