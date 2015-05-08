@@ -276,15 +276,15 @@
  	</page>
  	<page number="2">
 
-	   <field>
-         <dc-schema>dcterms</dc-schema>
-         <dc-element>rights</dc-element>
-         <dc-qualifier>embargoPeriod</dc-qualifier>
-         <repeatable>false</repeatable>
-         <label>Período de embargo</label>
-         <input-type>onebox</input-type>
-         <hint>Período de tiempo en el que el archivo de un item estará oculto por razones de confidencialidad o similares.</hint>
-       </field>
+<!-- 	   <field> -->
+<!--          <dc-schema>dcterms</dc-schema> -->
+<!--          <dc-element>rights</dc-element> -->
+<!--          <dc-qualifier>embargoPeriod</dc-qualifier> -->
+<!--          <repeatable>false</repeatable> -->
+<!--          <label>Período de embargo</label> -->
+<!--          <input-type>onebox</input-type> -->
+<!--          <hint>Período de tiempo en el que el archivo de un item estará oculto por razones de confidencialidad o similares.</hint> -->
+<!--        </field> -->
 	   
        <field>
          <dc-schema>dcterms</dc-schema>
@@ -543,15 +543,15 @@
  	</page>
  	<page number="2">
 
-       <field>
-         <dc-schema>dcterms</dc-schema>
-         <dc-element>rights</dc-element>
-         <dc-qualifier>embargoPeriod</dc-qualifier>
-         <repeatable>false</repeatable>
-         <label>Período de embargo</label>
-         <input-type>onebox</input-type>
-         <hint>Período de tiempo en el que el archivo de un item estará oculto por razones de confidencialidad o similares.</hint>
-       </field>
+<!--        <field> -->
+<!--          <dc-schema>dcterms</dc-schema> -->
+<!--          <dc-element>rights</dc-element> -->
+<!--          <dc-qualifier>embargoPeriod</dc-qualifier> -->
+<!--          <repeatable>false</repeatable> -->
+<!--          <label>Período de embargo</label> -->
+<!--          <input-type>onebox</input-type> -->
+<!--          <hint>Período de tiempo en el que el archivo de un item estará oculto por razones de confidencialidad o similares.</hint> -->
+<!--        </field> -->
        
        <field>
          <dc-schema>dcterms</dc-schema>
