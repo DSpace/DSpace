@@ -186,7 +186,7 @@
                                     <xsl:attribute name="href">
                                         <xsl:value-of select="$prev-page"/>
                                     </xsl:attribute>
-                                    <xsl:text>&#11013;</xsl:text>
+                                	<span class="glyphicon glyphicon-arrow-left"></span>
                                 </a>
                             </li>
                             <li>
@@ -201,7 +201,7 @@
                                     <xsl:attribute name="href">
                                         <xsl:value-of select="$next-page"/>
                                     </xsl:attribute>
-                                    <xsl:text>&#10145;</xsl:text>
+                                	<span class="glyphicon glyphicon-arrow-right"></span>
                                 </a>
                             </li>
                         </ul>
