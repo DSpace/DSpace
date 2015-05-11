@@ -49,4 +49,6 @@
 	</c:if>
 	
 </c:forEach>
+
 </div>
+<div class="clearfix">&nbsp;</div>
