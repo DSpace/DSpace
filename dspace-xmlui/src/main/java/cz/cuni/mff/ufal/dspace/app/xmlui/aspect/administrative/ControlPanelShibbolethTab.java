@@ -92,15 +92,17 @@ public class ControlPanelShibbolethTab extends AbstractControlPanelTab {
 		final String shib_status = "https://127.0.0.1/Shibboleth.sso/Status";
 		l.addItemXref(shib_status, shib_status);
         
-        l = div.addList("shib-attributes");
-        l.setHead("Shibboleth attributes history/listing (production only)");
-        final String shib_atts = "https://lindat.mff.cuni.cz/secure/attributes.xml";
-        l.addItemXref(shib_atts, shib_atts);
+        if ( host.contains("lindat.mff") ) {
+			l = div.addList("shib-attributes");
+			l.setHead("Shibboleth attributes history/listing");
+		    final String shib_atts = "https://lindat.mff.cuni.cz/secure/attributes.xml";
+			l.addItemXref(shib_atts, shib_atts);
+		}
         
         l = div.addList("shib-privacy");
-        l.setHead("Privacy because of CoC (production only)");
+        l.setHead("Privacy policy CoCo");
         
-	final String shib_privacy = "http://lindat.mff.cuni.cz/privacypolicy.html";
+		final String shib_privacy = "http://" + host + "/privacypolicy.html";
         l.addItemXref(shib_privacy, shib_privacy);
 		
 		
