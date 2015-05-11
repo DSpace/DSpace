@@ -361,6 +361,7 @@ public class SolrBrowseDAO implements BrowseDAO
         else
         {
             query.setQuery("bi_" + column + "_sort" + ": {\"" + value + "\" TO *]");
+	        query.addFilterQueries("-(bi_" + column + "_sort" + ":" + value + "*)");
         }
 	    boolean includeUnDiscoverable = itemsWithdrawn || !itemsDiscoverable;
         DiscoverResult resp = null;
