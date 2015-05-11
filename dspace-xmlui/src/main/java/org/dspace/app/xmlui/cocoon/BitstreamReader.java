@@ -623,28 +623,31 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         
         // If this is a large bitstream then tell the browser it should treat it as a download.
         int threshold = ConfigurationManager.getIntProperty("xmlui.content_disposition_threshold");
+        String contentDispositionMode = "inline";
+        String name  = bitstreamName;
+        // Try and make the download file name formatted for each browser.
+        try {
+                String agent = request.getHeader("USER-AGENT");
+                if (agent != null && agent.contains("MSIE"))
+                {
+                    name = URLEncoder.encode(name, "UTF8");
+                }
+                else if (agent != null && agent.contains("Mozilla"))
+                {
+                    name = MimeUtility.encodeText(name, "UTF8", "B");
+                }
+        }
+        catch (UnsupportedEncodingException see)
+        {
+                // do nothing
+        }
         if (bitstreamSize > threshold && threshold != 0)
         {
-                String name  = bitstreamName;
-                
-                // Try and make the download file name formatted for each browser.
-                try {
-                        String agent = request.getHeader("USER-AGENT");
-                        if (agent != null && agent.contains("MSIE"))
-                        {
-                            name = URLEncoder.encode(name, "UTF8");
-                        }
-                        else if (agent != null && agent.contains("Mozilla"))
-                        {
-                            name = MimeUtility.encodeText(name, "UTF8", "B");
-                        }
-                }
-                catch (UnsupportedEncodingException see)
-                {
-                        // do nothing
-                }
-                response.setHeader("Content-Disposition", "attachment;filename=" + '"' + name + '"');
+                contentDispositionMode = "attachment";
         }
+        
+        //Content-Disposition setting
+        response.setHeader("Content-Disposition", contentDispositionMode + ";filename=" + '"' + name + '"');
 
         ByteRange byteRange = null;
 
