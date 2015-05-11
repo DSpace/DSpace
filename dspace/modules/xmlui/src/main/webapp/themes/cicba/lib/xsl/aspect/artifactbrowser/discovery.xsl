@@ -246,17 +246,24 @@
                 </xsl:call-template>
                 </div></div>
                 <!-- dcterms.abstract -->
-<!-- 	        	<div class="row"><div class="col-md-12"> -->
-<!--                 	<xsl:call-template name="renderDiscoveryField"> -->
-<!-- 	            		<xsl:with-param name="value"> -->
-<!-- 	                        <xsl:if test="dri:list[@n=(concat($handle, ':dcterms.abstract')) and descendant::text()]"> -->
-<!-- 	                            <xsl:value-of select="dri:list[@n=(concat($handle, ':dcterms.abstract'))]/dri:item[position()=1]/text()" /> -->
-<!-- 	                        </xsl:if> -->
-<!-- 	            		</xsl:with-param> -->
-<!-- 	            		<xsl:with-param name="classname" select="dcterms-abstract"></xsl:with-param> -->
-<!-- 	            	</xsl:call-template> -->
-<!-- 	        	</div> -->
-<!-- 	        	</div> -->
+                <xsl:if test="dri:list[@n=(concat($handle, ':dcterms.abstract'))]/dri:item/dri:hi">
+                	<div class="row"><div class="col-md-12">
+                        <xsl:for-each select="dri:list[@n=(concat($handle, ':dcterms.abstract'))]/dri:item[string-length(dri:hi) > 0]">
+                            <xsl:apply-templates select="."/>
+                            <xsl:text>...</xsl:text>
+                            <br/>
+                        </xsl:for-each>
+                    </div></div>
+                </xsl:if>
+                <xsl:if test="dri:list[@n=(concat($handle, ':fulltext'))]">
+                    <div class="row"><div class="col-md-12">
+                        <xsl:for-each select="dri:list[@n=(concat($handle, ':fulltext'))]/dri:item">
+                            <xsl:apply-templates select="."/>
+                            <xsl:text>...</xsl:text>
+                            <br/>
+                        </xsl:for-each>
+                    </div></div>
+                </xsl:if>
                 <!-- Generate COinS with empty content per spec but force Cocoon to not create a minified tag  -->
                 <span class="Z3988">
                     <xsl:attribute name="title">
