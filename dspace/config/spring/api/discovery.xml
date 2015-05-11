@@ -589,7 +589,15 @@
 			<property name="indexFieldName" value="identifier"/>
 			<property name="metadataFields">
 				<list>
-					<value>dc.identifier.*</value>
+					<value>dc.identifier</value>
+					<value>dc.identifier.issn</value>
+					<value>dc.identifier.merlin</value>
+					<value>dc.identifier.oclc</value>
+					<value>dc.identifier.other</value>
+					<value>dc.identifier.patentappnumber</value>
+					<value>dc.identifier.sici</value>
+					<value>dc.identifier.slug</value>
+					<value>dc.identifier.uri</value>
 				</list>
 			</property>
 	</bean>
