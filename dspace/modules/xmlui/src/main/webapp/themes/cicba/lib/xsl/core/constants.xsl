@@ -51,6 +51,18 @@
 		</xsl:value-of>
 	</xsl:variable>
 	
+	<xsl:variable name="global-theme-path">
+		<xsl:value-of 
+			select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme' and @qualifier='path']">
+		</xsl:value-of>
+	</xsl:variable>
+	
+	<xsl:variable name="global-context-path">
+		<xsl:value-of 
+			select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath']">
+		</xsl:value-of>
+	</xsl:variable>
+	
 	<xsl:variable name="handle-autoarchive">
 		<xsl:value-of select="/dri:document/dri:meta/dri:repositoryMeta/dri:repository/@repositoryID"/>
 		<xsl:text>/2</xsl:text>
