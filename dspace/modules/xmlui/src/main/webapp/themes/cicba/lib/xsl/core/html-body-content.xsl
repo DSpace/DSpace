@@ -86,14 +86,15 @@
 <!-- 				<xsl:text> </xsl:text> -->
 <!-- 			</div> -->
 			<div id="home-highlight-content" class="col-md-7">
-				<form class="form-inline" role="form">
+				<form id="home-search-form" class="form-inline" role="form">
 					<xsl:attribute name="action"><xsl:value-of select="$search-url" /></xsl:attribute>
 				   <label for="q">
 				   		<i18n:text>xmlui.cicdigital.home.explore</i18n:text>
 				   </label>
-				    <div><input type="text" name="query" class="form-control" autofocus="true" size="30" placeholder="Ingrese su búsqueda ..."/>
-				    <button type="submit" name="lr" class="btn btn-link"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
-				  </div>
+				    <div>
+				    	<input type="text" name="query" class="form-control" autofocus="true" size="30" placeholder="Ingrese su búsqueda ..."/>
+					    <button type="submit" name="lr" class="btn btn-link"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+					</div>
 				</form>
 				<div id="home-browse-bar">
 					

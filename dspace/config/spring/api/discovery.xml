@@ -185,7 +185,7 @@
                         <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
                             <property name="field" value="fulltext"/>
                             <property name="maxSize" value="250"/>
-                            <property name="snippets" value="3"/>
+                            <property name="snippets" value="2"/>
                         </bean>
                     </list>
                 </property>

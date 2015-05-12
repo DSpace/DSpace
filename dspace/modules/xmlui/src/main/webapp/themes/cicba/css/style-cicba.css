@@ -85,7 +85,7 @@ ul {
 	/* 	background-repeat: no-repeat; */
 }
 body > .container-fluid {
-	padding:0px;
+/* 	padding:0px; */
 }
 
 #cic-body>div {
@@ -175,7 +175,7 @@ body > .container-fluid {
 
 #home-highlight-content form>div {
 	background-color: white;
-	display: block;
+/* 	display: block; */
 	padding: 6px;
 	margin-bottom: 5px;
 	width:100%;
@@ -189,6 +189,7 @@ body > .container-fluid {
     width: 89%;
 }
 
+
 #home-highlight-content .glyphicon-search {
 	color: rgba(245, 128, 45, 0.6);
 	font-weight: bold;
@@ -196,6 +197,16 @@ body > .container-fluid {
 	vertical-align: middle;
 	width: 10%;
 }
+
+#home-search-form  button[type=submit]{
+  position: absolute;
+  right: 40px;
+  top: 63px;
+}
+
+
+
+
 
 #home-highlight-content label {
 	font-size: 25pt;
@@ -395,6 +406,11 @@ li.ds-artifact-item.community {
 	font-size: 120%;
 	font-style: italic;
 	font-weight: bold;
+}
+
+.dcterms_creators {
+	font-style: italic;
+	
 }
 
 .metadata-dc_type {
