@@ -72,9 +72,6 @@ public class DSpaceApi {
 	public static boolean authorizeBitstream(Context context,
 			DSpaceObject dspaceObject) throws AuthorizeException {
 
-		IFunctionalities manager = DSpaceApi.getFunctionalityManager();
-		manager.openSession();
-
 		EPerson currentUser = context.getCurrentUser();
 		boolean userExists = currentUser != null;
 
@@ -96,7 +93,6 @@ public class DSpaceApi {
                     // The submitter is always authorized to access his own
                     // bitstreams
                     if (userID != 0 && submitter.getID() == userID) {
-                    	manager.close();
                         return true;
                     }
                 }
@@ -121,6 +117,9 @@ public class DSpaceApi {
 			}
 
 
+			
+			IFunctionalities manager = DSpaceApi.getFunctionalityManager();			
+
 			// if the bitstream is already authorized for current session
 			
 			// We are not using this at the moment
@@ -139,10 +138,11 @@ public class DSpaceApi {
 				}
 			} */
 
-			if (dtoken != null && !dtoken.isEmpty()) {				
+			if (dtoken != null && !dtoken.isEmpty()) {		
+				manager.openSession();
 				boolean tokenFound = manager.verifyToken(resourceID, dtoken);				
-	            // Check token				
 				manager.close();
+	            // Check token				
 			    if(tokenFound) { // database token match with url token 
 			        return true;
 			    } else {
@@ -152,14 +152,14 @@ public class DSpaceApi {
 			}			
 
 			// Check licenses
-		    if (manager.isUserAllowedToAccessTheResource(userID, resourceID)) {
-		        return true;
-		    } else {			    
+			manager.openSession();
+			boolean allowed = manager.isUserAllowedToAccessTheResource(userID, resourceID);
+			manager.close();					
+		    if (!allowed) {
 		        throw new MissingLicenseAgreementException("Missing license agreement!");
 		    }
  
 		}
-		manager.close();
 		return true;
 	}
 	
@@ -355,9 +355,9 @@ public class DSpaceApi {
 		int eid = 0;
 		String email = null;
 		String organization = null;
+		IFunctionalities manager = DSpaceApi.getFunctionalityManager();
+		manager.openSession();
 		try{
-			IFunctionalities manager = DSpaceApi.getFunctionalityManager();
-			manager.openSession();
 			final VerificationTokenEperson vte = manager.getVerificationToken(token);
 			eid = vte.getEid();
 			email = vte.getEmail();
@@ -387,6 +387,9 @@ public class DSpaceApi {
 			log.info(String.format("token = %s, eid = %d, email = %s, organization = %s", token, eid, email, organization));
 			e = null;
 		}
+		finally {
+			manager.close();
+		}
 		return e;
 	}
 	
@@ -404,16 +407,16 @@ public class DSpaceApi {
 		}
 	}
 	
-	public static boolean addToken(String token, int epersonID, String email){
-		
+	public static boolean addToken(String token, int epersonID, String email){	
+		IFunctionalities manager = DSpaceApi.getFunctionalityManager();
 		try{
-			VerificationTokenEperson vte = new VerificationTokenEperson(token, epersonID, email);
-			IFunctionalities manager = DSpaceApi.getFunctionalityManager();
+			VerificationTokenEperson vte = new VerificationTokenEperson(token, epersonID, email);			
 			manager.openSession();
 			manager.persist(VerificationTokenEperson.class, vte);
 			manager.close();
 			return true;
 		}catch(RuntimeException e) {
+			manager.close();
 			return false;
 		}		
 	}

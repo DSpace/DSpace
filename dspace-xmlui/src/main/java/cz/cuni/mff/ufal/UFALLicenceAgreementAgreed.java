@@ -288,7 +288,7 @@ public class UFALLicenceAgreementAgreed extends AbstractDSpaceTransformer {
 						.app_xmlui_aspect_eperson_postError(licenceAgreementAgreed);
 			} catch (Exception f) {
 			}
-
+			functionalityManager.close();
 		}
 	}
 

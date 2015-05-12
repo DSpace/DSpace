@@ -547,12 +547,12 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
             throws WingException
     {
 
+        IFunctionalities functionalityManager = DSpaceApi.getFunctionalityManager();
+        functionalityManager.openSession();
+
         try
         {
 
-            IFunctionalities functionalityManager = DSpaceApi
-                    .getFunctionalityManager();
-            functionalityManager.openSession();
             java.util.List<LicenseResourceUserAllowance> licenses = functionalityManager
                     .getSignedLicensesByUser(edited_eperson.getID());
 
@@ -653,9 +653,7 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
             {
                 profile.addPara(null, "alert").addContent(
                         "Not signed any licenses yet.");
-            }
-
-            functionalityManager.closeSession();
+            }            
 
         }
         catch (IllegalArgumentException e1)
@@ -667,6 +665,10 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
         {
             profile.addPara(null, "alert alert-error").addContent(
                     "Exception - " + e2.toString());
+        }
+        finally
+        {
+        	functionalityManager.closeSession();
         }
 
     }

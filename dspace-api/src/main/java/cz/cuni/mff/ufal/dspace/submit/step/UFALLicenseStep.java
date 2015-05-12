@@ -63,7 +63,6 @@ public class UFALLicenseStep extends org.dspace.submit.step.LicenseStep {
 		int current_page = AbstractProcessingStep.getCurrentPage(request);
 
 		IFunctionalities iface = cz.cuni.mff.ufal.DSpaceApi.getFunctionalityManager();
-		iface.openSession();
 		// we want our page
 		//
 		if (1 == current_page) {
@@ -103,7 +102,9 @@ public class UFALLicenseStep extends org.dspace.submit.step.LicenseStep {
 				
 				int userID = submitter.getID();
 
+				iface.openSession();
 				boolean result = iface.defineLicense(license_name, userID, license_url, license_confirmation, license_required, license_label);
+				iface.close();
 				
 				if (result)
 					return STATUS_COMPLETE;
@@ -126,16 +127,21 @@ public class UFALLicenseStep extends org.dspace.submit.step.LicenseStep {
 				EPerson submitter = subInfo.getSubmissionItem().getSubmitter();
 				int userID = submitter.getID();
 				
+				iface.openSession();
 				List<LicenseDefinition> licenses = iface.getAllLicenses();
 
 				for (LicenseDefinition license_def : licenses) {
 					if (license_def.getName().equals(license_name) && license_def.getUserRegistration().getEpersonId()==userID) {
 						boolean status = iface.delete(LicenseDefinition.class, license_def);
-						if (!status)
+						if (!status) {
+							iface.close();
 							return STATUS_LICENSE_DELETE_ERROR;
+						}
 						break;
 					}
 				}
+				
+				iface.close();
 
 				// go to next step
 				//
@@ -163,6 +169,8 @@ public class UFALLicenseStep extends org.dspace.submit.step.LicenseStep {
 					// a license was rejected
 					log.info(LogManager.getHeader(context, "accept_license",
 							subInfo.getSubmissionLogInfo()));
+					
+					iface.openSession();
 	
 					assert 0 < item.getBundles().length;
 					for (Bundle bundle : item.getBundles()) {
@@ -239,6 +247,7 @@ public class UFALLicenseStep extends org.dspace.submit.step.LicenseStep {
 	
 					// commit changes
 					context.commit();
+					iface.close();
 				}
 			}
 
@@ -252,7 +261,6 @@ public class UFALLicenseStep extends org.dspace.submit.step.LicenseStep {
 			return res;
 		}
 	
-		iface.closeSession();
 		return STATUS_COMPLETE;
 	}
 
