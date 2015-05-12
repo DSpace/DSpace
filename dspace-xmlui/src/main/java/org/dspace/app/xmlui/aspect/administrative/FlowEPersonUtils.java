@@ -48,7 +48,10 @@ public class FlowEPersonUtils {
 	
 	private static final Message T_reset_password_success_notice =
 		new Message("default","xmlui.administrative.FlowEPersonUtils.reset_password_success_notice");
-	
+
+	private static final Message T_reset_netid_success_notice =
+		new Message("default", "xmlui.administrative.FlowEPersonUtils.reset_netid_success_notice");
+
 	private static final Message t_delete_eperson_success_notice =
 		new Message("default","xmlui.administrative.FlowEPersonUtils.delete_eperson_success_notice");
 	
@@ -70,7 +73,7 @@ public class FlowEPersonUtils {
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(false); // default to no continue
-		
+
 		// Get all our request parameters
 		String email = request.getParameter("email_address").trim();
 		String first = request.getParameter("first_name").trim();
@@ -278,8 +281,22 @@ public class FlowEPersonUtils {
     	result.setMessage(T_reset_password_success_notice);
     	return result;
 	}
-	
-	
+
+	public static FlowResult processResetNetid(Context context, int epersonID)
+		throws IOException, MessagingException, SQLException, AuthorizeException
+	{
+		EPerson eperson = EPerson.find(context, epersonID);
+		FlowResult result = null;
+		if ( null != eperson ) {
+			eperson.setNetid(null);
+			result = new FlowResult();
+			result.setContinue(true);
+			result.setOutcome(true);
+			result.setMessage(T_reset_netid_success_notice);
+		}
+		return result;
+	}
+
 	/**
 	 * Log this user in as another user. If the operation failed then the flow result
 	 * will be set to failure with it's message set correctly. Note that after logging out

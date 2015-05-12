@@ -1164,6 +1164,7 @@
         <message key="xmlui.administrative.FlowEPersonUtils.add_eperson_success_notice">The user was added successfully.</message>
 	<message key="xmlui.administrative.FlowEPersonUtils.edit_eperson_success_notice">The user was edited successfully.</message>
 	<message key="xmlui.administrative.FlowEPersonUtils.reset_password_success_notice">An email message has been sent to the user containing a token that may be used to choose a new password.</message>
+	<message key="xmlui.administrative.FlowEPersonUtils.reset_netid_success_notice">Netid was successfully reset.</message>
 	<message key="xmlui.administrative.FlowEPersonUtils.delete_eperson_success_notice">The user(s) were deleted successfully.</message>
 	<message key="xmlui.administrative.FlowEPersonUtils.delete_eperson_failed_notice">The user(s) listed were not deleted because there are constraints preventing them from being deleted, see the eperson detail page for more information.</message>
 	<message key="xmlui.administrative.FlowGroupUtils.edit_group_success_notice">The group was edited successfully.</message>
@@ -1298,6 +1299,7 @@
 	<message key="xmlui.administrative.eperson.EditEPersonForm.req_certs">Require Certificate</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.can_log_in">Can Log In</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.submit_reset_password">Reset Password</message>
+	<message key="xmlui.administrative.eperson.EditEPersonForm.submit_reset_netid">Reset NETID</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.special_help">You may also permanently remove this E-Person from the system or reset his/her password. When resetting a password the user will be sent an email containing a special link they can follow to choose a new password.</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.submit_delete">Delete E-Person</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.submit_login_as">Login as E-Person</message>

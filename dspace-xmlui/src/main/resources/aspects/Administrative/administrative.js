@@ -840,15 +840,25 @@ function doEditEPerson(epersonID)
             // No matter what just bail out to the group list.
             return null;
         }
-        else if (cocoon.request.get("submit_reset_password"))
-        {
-            // Reset the user's password by sending them the forgot password email.
-            assertAdministrator();
-            result = FlowEPersonUtils.processResetPassword(getDSContext(),epersonID);
+		else if (cocoon.request.get("submit_reset_password"))
+		{
+			// Reset the user's password by sending them the forgot password email.
+			assertAdministrator();
+			result = FlowEPersonUtils.processResetPassword(getDSContext(),epersonID);
 
-            if (result != null)
-                result.setContinue(false);
-        }
+			if (result != null)
+				result.setContinue(false);
+		}
+		else if (cocoon.request.get("submit_reset_netid"))
+		{
+			// Reset the user's password by sending them the forgot password email.
+			assertAdministrator();
+
+			result = FlowEPersonUtils.processResetNetidEPerson(getDSContext(), epersonID);
+
+			if (result != null)
+				result.setContinue(false);
+		}
         else if (cocoon.request.get("submit_login_as"))
         {
         	// Login as this user.
