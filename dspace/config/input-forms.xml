@@ -242,7 +242,7 @@
          <label>Language</label>
           <type-bind>toolService</type-bind>          
           <input-type>onebox</input-type>
-          <hint>Select the spoken language of the main content of the item if applicable. Multiple languages are possible. Start typing the language and use autocomplete form that will appear.</hint>
+          <hint>Select the spoken language (in ISO 639-3 format) of the main content of the item (use "N/A" if not applicable). Multiple languages are possible. Start typing the language and use autocomplete form that will appear.</hint>
          <required></required>
           <autocomplete>json_static-iso_langs.json</autocomplete>
        </field>
