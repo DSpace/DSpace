@@ -329,8 +329,9 @@ public class UFALLicenseStep extends LicenseStep {
 	license_text.addItem().addContent(T_info2);
 
 	// Default license settings from LicenseStep.java
-	String licenseText = LicenseUtils.getLicenseText(context.getCurrentLocale(), collection, submission.getItem(), submission.getSubmitter());
-	license_text.addItem("distributionlicense", "hidden").addContent(licenseText);
+	license_text.addItem(null, "distribution-license text-center")
+		.addHighlight("bold")
+		.addXref(contextPath + "/page/contract", " Read the distribution license", "target_blank fa fa-2x fa-file-text-o");
 
 	Item dist_license = license_text.addItem("dist_license", "dist-license alert alert-info");
 

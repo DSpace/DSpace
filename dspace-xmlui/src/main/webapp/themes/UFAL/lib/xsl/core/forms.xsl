@@ -1336,26 +1336,5 @@
                         </div>
                 </div>
         </xsl:template>
-        
-        <xsl:template match="dri:item[@n='distributionlicense']" priority="10">
-        	<div class='bold text-center'>
-				<button class="btn btn-link bold" data-toggle="modal" data-target="#distributionagreement_modal"><i class="fa fa-2x fa-file-text-o">&#160;</i> Read the distribution agreement</button>
-			</div>
-			<div class="modal fade" id="distributionagreement_modal" aria-hidden="true">
-  				<div class="modal-dialog">
-    				<div class="modal-content">
-	      				<div class="modal-header">
-	        				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">x</span><span class="sr-only">Close</span></button>
-	        				<h4 class="modal-title">Distribution Agreement</h4>
-	      				</div>
-	      				<div class="modal-body">
-	        				<p class="wordbreak linebreak"><xsl:value-of select="./node()" /></p>
-	      				</div>
-    				</div><!-- /.modal-content -->
-				</div><!-- /.modal-dialog -->
-			</div><!-- /.modal -->        	
-        </xsl:template>		
-		
+
 </xsl:stylesheet>
-
-
