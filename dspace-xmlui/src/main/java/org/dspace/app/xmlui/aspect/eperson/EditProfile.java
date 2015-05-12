@@ -434,11 +434,12 @@ public class EditProfile extends AbstractDSpaceTransformer
        
        
 	private void add_signed_licenses(Division profile) throws WingException {
-           
+
+		IFunctionalities functionalityManager = DSpaceApi.getFunctionalityManager();
+		functionalityManager.openSession();
+
 		try {
 
-			IFunctionalities functionalityManager = DSpaceApi.getFunctionalityManager();
-			functionalityManager.openSession();
 			java.util.List<LicenseResourceUserAllowance> licenses = functionalityManager.getSignedLicensesByUser(eperson.getID());
 
 			// hack for group by /////////
@@ -518,15 +519,17 @@ public class EditProfile extends AbstractDSpaceTransformer
            
 			} else {
 				profile.addPara(null, "alert").addContent("Not signed any licenses yet.");
-           }
-			functionalityManager.closeSession();
+           }			
 
 		}catch( IllegalArgumentException e1 ) {
 			profile.addPara(null, "alert alert-error").addContent( "No items - " + e1.getMessage() );
 		}catch( Exception e2 ) {
 			profile.addPara(null, "alert alert-error").addContent( "Exception - " + e2.toString() );
-           }
-       }
+		}
+		finally {
+			functionalityManager.closeSession();
+	    }
+	} 
        
 	//
 	//

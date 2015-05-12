@@ -658,8 +658,9 @@ public class ShibAuthentication implements AuthenticationMethod
                 eperson.update();
             }catch(Exception e){
                 throw new AuthorizeException("User has not been added among registred users!") ;
+            } finally {
+            	functionalityManger.closeSession();
             }
-            functionalityManger.closeSession();
         }                
 
         /* </UFAL> */

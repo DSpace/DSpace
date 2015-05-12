@@ -54,7 +54,10 @@ public class ControlPanelSignedLicenses extends AbstractControlPanelTab
 	    String baseURL = contextPath+"/admin/epeople?";
 		// table
 		Table wftable = div.addTable("workspace_items", 1, 4, "table-condensed");
-		
+
+		IFunctionalities functionalityManager = DSpaceApi.getFunctionalityManager();
+		functionalityManager.openSession();
+
 		try {
 			Row wfhead = wftable.addRow("", Row.ROLE_HEADER, "font_smaller");
 
@@ -67,8 +70,6 @@ public class ControlPanelSignedLicenses extends AbstractControlPanelTab
 			wfhead.addCellContent("BITSTREAM");
 			wfhead.addCellContent("EXTRA METADATA");
 			
-			IFunctionalities functionalityManager = DSpaceApi.getFunctionalityManager();
-			functionalityManager.openSession();
 			java.util.List<LicenseResourceUserAllowance> licenses = functionalityManager.getSignedLicensesByDate();
 			
 			// hack for group by /////////
@@ -142,14 +143,14 @@ public class ControlPanelSignedLicenses extends AbstractControlPanelTab
                 if(++cnt > MAX_TO_SHOW) {
                 	break;
                 }
-			}
-			
-			functionalityManager.closeSession();
+			}						
 			
 		}catch( IllegalArgumentException e1 ) {
 			wftable.setHead( "No items - " + e1.getMessage() );
 		}catch( Exception e2 ) {
 			wftable.setHead( "Exception - " + e2.toString() );
+		}finally{
+			functionalityManager.closeSession();
 		}
 		
 		return wftable;
