@@ -180,12 +180,12 @@
                         <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
                             <property name="field" value="dcterms.abstract"/>
                             <property name="maxSize" value="250"/>
-                            <property name="snippets" value="5"/>
+                            <property name="snippets" value="3"/>
                         </bean>
                         <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
                             <property name="field" value="fulltext"/>
                             <property name="maxSize" value="250"/>
-                            <property name="snippets" value="5"/>
+                            <property name="snippets" value="3"/>
                         </bean>
                     </list>
                 </property>
