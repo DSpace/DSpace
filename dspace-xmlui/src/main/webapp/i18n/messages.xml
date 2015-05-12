@@ -1283,8 +1283,9 @@
 	<message key="xmlui.administrative.eperson.AddEPersonForm.submit_create">Create E-Person</message>
     <message key="xmlui.administrative.eperson.AddEPersonForm.org">Organization</message>
     <message key="xmlui.administrative.eperson.AddEPersonForm.error_org">Organization is required</message>
-    <message key="xmlui.administrative.eperson.AddEPersonForm.welcome_message">Welcome message</message>
-    
+	<message key="xmlui.administrative.eperson.AddEPersonForm.welcome_message">Welcome message</message>
+	<message key="xmlui.administrative.eperson.AddEPersonForm.error_item_deleted">Item is not available any longer!</message>
+
 
 	<!-- org.dspace.app.xmlui.administrative.eperson.EditEPersonForm -->
 	<message key="xmlui.administrative.eperson.EditEPersonForm.title">Edit E-Person</message>
