@@ -23,7 +23,7 @@
   <!-- Number of prepared statements will be cached. Increase performance. Hibernate default: 0 , caching is disable. -->
   <property name="hibernate.c3p0.max_statements">0</property>
   <!-- The seconds a Connection can remain pooled but unused before being discarded. Zero means idle connections never expire. Hibernate default: 0 -->
-  <property name="hibernate.c3p0.timeout"300</property>
+  <property name="hibernate.c3p0.timeout">300</property>
   <property name="hibernate.c3p0.numHelperThreads">20</property>
   <property name="hibernate.c3p0.testConnectionOnCheckout">false</property>
   <property name="hibernate.c3p0.testConnectionOnCheckin">true</property>
