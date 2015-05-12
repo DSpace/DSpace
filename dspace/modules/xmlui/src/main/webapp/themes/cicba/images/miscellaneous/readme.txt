@@ -1,1 +1,0 @@
-Colocar aquí todas las imágenes de cicba

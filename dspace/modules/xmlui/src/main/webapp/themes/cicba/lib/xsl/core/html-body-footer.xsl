@@ -11,62 +11,8 @@
 		and image placeholders -->
 	<xsl:template name="buildFooter">
 		<div class="row" id="cic-footer">
-			<div class="col-md-2">
-				<xsl:call-template name="build-anchor">
-					<xsl:with-param name="a.href">
-						http://www.gba.gob.ar
-					</xsl:with-param>
-					<xsl:with-param name="img.src">
-						images/marca_para_footer.png
-					</xsl:with-param>
-					<xsl:with-param name="img.alt">
-						BA
-					</xsl:with-param>
-				</xsl:call-template>
-			</div>
-			<div class="col-md-2 ">
-				<ul>
-					<li>
-						<xsl:call-template name="build-anchor">
-							<xsl:with-param name="a.href">/</xsl:with-param>
-							<xsl:with-param name="a.value">
-								<i18n:text>xmlui.general.dspace_home</i18n:text>
-							</xsl:with-param>
-						</xsl:call-template>
-					</li>
-					<li>
-						<xsl:call-template name="build-anchor">
-							<xsl:with-param name="a.href">/community-list</xsl:with-param>
-							<xsl:with-param name="a.value">
-								<i18n:text catalogue="default">xmlui.ArtifactBrowser.Navigation.head_browse</i18n:text>
-							</xsl:with-param>
-						</xsl:call-template>
-					</li>
-					<li>
-						<xsl:call-template name="build-anchor">
-							<xsl:with-param name="a.href">/feedback</xsl:with-param>
-							<xsl:with-param name="a.value">
-								<i18n:text>xmlui.dri2xhtml.structural.contact-link</i18n:text>
-							</xsl:with-param>
-						</xsl:call-template>
-					</li>
-				</ul>
-			</div>
-			<ul class="col-md-2 cic-banners">
-				
-				<li><xsl:call-template name="build-anchor">
-					<xsl:with-param name="a.href">
-						<xsl:text>http://www.cic.gba.gob.ar</xsl:text>
-					</xsl:with-param>
-					<xsl:with-param name="img.src">
-						images/logo_cic_footer.png
-					</xsl:with-param>
-					<xsl:with-param name="img.alt">
-						CIC
-					</xsl:with-param>
-				</xsl:call-template></li>
-				
-				<li><xsl:call-template name="build-anchor">
+			<div class="col-md-2 col-md-offset-2">
+			<xsl:call-template name="build-anchor">
 					<xsl:with-param name="a.href">
 						<xsl:text>http://sedici.unlp.edu.ar</xsl:text>
 					</xsl:with-param>
@@ -76,20 +22,74 @@
 					<xsl:with-param name="img.alt">
 						SEDICI
 					</xsl:with-param>
-				</xsl:call-template></li>
-				
-				<li><xsl:call-template name="build-anchor">
+				</xsl:call-template>
+			</div>
+<!-- 			<div class="col-md-2"> -->
+<!-- 				<xsl:call-template name="build-anchor"> -->
+<!-- 					<xsl:with-param name="a.href"> -->
+<!-- 						<xsl:text>http://www.dspace.org</xsl:text> -->
+<!-- 					</xsl:with-param> -->
+<!-- 					<xsl:with-param name="img.src"> -->
+<!-- 						images/logo_dspace_footer.png -->
+<!-- 					</xsl:with-param> -->
+<!-- 					<xsl:with-param name="img.alt"> -->
+<!-- 						DSpace -->
+<!-- 					</xsl:with-param> -->
+<!-- 				</xsl:call-template> -->
+<!-- 			</div> -->
+			<div class="col-md-2">
+				<xsl:call-template name="build-anchor">
 					<xsl:with-param name="a.href">
-						<xsl:text>http://www.dspace.org</xsl:text>
+						<xsl:text>http://www.cic.gba.gob.ar</xsl:text>
 					</xsl:with-param>
 					<xsl:with-param name="img.src">
-						images/logo_dspace_footer.png
+						images/logo_cic_footer.png
 					</xsl:with-param>
 					<xsl:with-param name="img.alt">
-						DSpace
+						CIC
 					</xsl:with-param>
-				</xsl:call-template></li>
-			</ul>
+				</xsl:call-template>
+			</div>
+<!-- 				<xsl:call-template name="build-anchor"> -->
+<!-- 					<xsl:with-param name="a.href"> -->
+<!-- 						http://www.gba.gob.ar -->
+<!-- 					</xsl:with-param> -->
+<!-- 					<xsl:with-param name="img.src"> -->
+<!-- 						images/marca_para_footer.png -->
+<!-- 					</xsl:with-param> -->
+<!-- 					<xsl:with-param name="img.alt"> -->
+<!-- 						BA -->
+<!-- 					</xsl:with-param> -->
+<!-- 				</xsl:call-template> -->
+<!-- 			<div class="col-md-2 "> -->
+<!-- 				<ul> -->
+<!-- 					<li> -->
+<!-- 						<xsl:call-template name="build-anchor"> -->
+<!-- 							<xsl:with-param name="a.href">/</xsl:with-param> -->
+<!-- 							<xsl:with-param name="a.value"> -->
+<!-- 								<i18n:text>xmlui.general.dspace_home</i18n:text> -->
+<!-- 							</xsl:with-param> -->
+<!-- 						</xsl:call-template> -->
+<!-- 					</li> -->
+<!-- 					<li> -->
+<!-- 						<xsl:call-template name="build-anchor"> -->
+<!-- 							<xsl:with-param name="a.href">/community-list</xsl:with-param> -->
+<!-- 							<xsl:with-param name="a.value"> -->
+<!-- 								<i18n:text catalogue="default">xmlui.ArtifactBrowser.Navigation.head_browse</i18n:text> -->
+<!-- 							</xsl:with-param> -->
+<!-- 						</xsl:call-template> -->
+<!-- 					</li> -->
+<!-- 					<li> -->
+<!-- 						<xsl:call-template name="build-anchor"> -->
+<!-- 							<xsl:with-param name="a.href">/feedback</xsl:with-param> -->
+<!-- 							<xsl:with-param name="a.value"> -->
+<!-- 								<i18n:text>xmlui.dri2xhtml.structural.contact-link</i18n:text> -->
+<!-- 							</xsl:with-param> -->
+<!-- 						</xsl:call-template> -->
+<!-- 					</li> -->
+<!-- 				</ul> -->
+<!-- 			</div> -->
+			
 			<div class="col-md-5 col-md-offset-1">
 				<address>
 					<strong>Comisión de Investigaciones Científicas</strong>

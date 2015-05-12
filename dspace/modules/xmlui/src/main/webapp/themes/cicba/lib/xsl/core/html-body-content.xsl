@@ -68,14 +68,14 @@
 
 		<div class="row">
 			<div class="col-md-7" id="welcome-panel">
+			<div class= "bs-callout bs-callout-info">
 				<xsl:for-each select="dri:div[@n='news']">
-					<h1>
-						<xsl:copy-of select="dri:head" />
-					</h1>
+<!-- 					<h1><xsl:copy-of select="dri:head" /></h1> -->
 					<xsl:copy-of select="dri:p" />
 				</xsl:for-each>
+				</div>
 			</div>
-			<div class="col-md-5">
+			<div class="col-md-5 hidden-xs">
 				<xsl:call-template name="build-img">
 					<xsl:with-param name="img.src">images/provincia.png</xsl:with-param>
 				</xsl:call-template>

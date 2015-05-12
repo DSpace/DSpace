@@ -44,21 +44,20 @@
 	<!-- The header (distinct from the HTML head element) contains the title, 
 		subtitle, login box and various placeholders for header images -->
 	<xsl:template name="buildTopSidebar">
-		<div class="row">
+		<div class="row" id="cic-menu">
 			<nav class="navbar navbar-inverse" role="navigation">
 				<div class="container-fluid">
 					<div class="navbar-header" id="navbar-brand-dspace">
 				      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
 				        <span class="sr-only">Toggle navigation</span>
-				        <span class="icon-bar"></span>
-				        <span class="icon-bar"></span>
-				        <span class="icon-bar"></span>
-				      </button>
-				      <a class="navbar-brand" href="#">
+				        
 					      <xsl:call-template name="build-img">
 					      	<xsl:with-param name="img.src">images/dspace-logo-only.png</xsl:with-param>
 					      	<xsl:with-param name="img.alt">DSpace</xsl:with-param>
 					      </xsl:call-template>
+				      </button>
+				      <a class="navbar-brand visible-xs" href="#">
+				      	Repositorio CIC-DIGITAL
 					  </a>
 				    </div>
 					<!-- Collect the nav links, forms, and other content for toggling -->
@@ -292,21 +291,28 @@
 	<!-- The header (distinct from the HTML head element) contains the title, 
 		subtitle, login box and various placeholders for header images -->
 	<xsl:template name="buildHeader">
-		<xsl:call-template name="buildTopSidebar" />
 		<div id="cic-header" class="row">
-			<div class="pull-left">
+		
+			
+			<div id="logo-cic-digital" class="col-xs-12 col-md-3">
 				<xsl:call-template name="build-anchor">
-					<xsl:with-param name="img.src">images/Marca_de_cic.png</xsl:with-param>
+					<xsl:with-param name="img.src">images/logo_CIC_DIGITAL.png</xsl:with-param>
 					<xsl:with-param name="img.alt">CIC-DIGITAL</xsl:with-param>
 				</xsl:call-template>
-			</div>
-			<div class="pull-right hidden-xs">
+			</div><!-- 
+			 --><div id="banner-cic-digital"  class="hidden-xs col-md-6">
+				<div class="">Repositorio de la Comisión de Investigaciones Científicas</div>
+				<small>Ministerio de Producción, Ciencia y Tecnología</small>
+			</div><!-- 
+			 --><div id="logo-ba" class="hidden-xs col-md-3">
 				<xsl:call-template name="build-img">
-					<xsl:with-param name="img.src">images/marca_de_ba.png</xsl:with-param>
+					<xsl:with-param name="img.src">images/logo_BA.png</xsl:with-param>
 					<xsl:with-param name="img.alt">Buenos Aires</xsl:with-param>
 				</xsl:call-template>
 			</div>
 		</div>
+		
+			<xsl:call-template name="buildTopSidebar" />
 		<!--The trail is built by applying a template over pageMeta's trail children. -->
 		<xsl:call-template name="buildTrail" />
 	</xsl:template>
