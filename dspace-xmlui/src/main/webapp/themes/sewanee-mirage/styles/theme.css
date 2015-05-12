@@ -39,6 +39,9 @@ header .navbar-default .navbar-toggle > li > a, header .navbar-default .navbar-n
     color: #ACC0D9;
 }
 
+header .navbar-brand img {
+    height: auto;
+}
 
 /* Override dspace-bootstrap-tweaks */
 header .navbar-default {
