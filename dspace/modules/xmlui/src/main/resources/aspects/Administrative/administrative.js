@@ -1373,12 +1373,12 @@ function doEditUnits(unitID) {
 				unitID = result.getParameter("unitID");
 		} else if (cocoon.request.get("submit_search_group")
 				&& cocoon.request.get("query")) {
-			// Perform a new search for collections.
+			// Perform a new search for groups.
 			query = cocoon.request.get("query");
 			page = 0;
 			type = "collection";
 		} else if (cocoon.request.get("submit_clear")) {
-			// Perform a new search for collections.
+			// Perform a new search for groups.
 			query = "";
 			page = 0;
 			type = "";
@@ -1397,8 +1397,8 @@ function doEditUnits(unitID) {
 						memberGroupIDs, groupID);
 				highlightGroupID = groupID;
 			}
-			if ((match = name.match(/submit_remove_collection_(\d+)/)) != null) {
-				// remove a collection
+			if ((match = name.match(/submit_remove_group_(\d+)/)) != null) {
+				// remove a group
 				var groupID = match[1];
 				memberGroupIDs = FlowUnitsUtils.removeMember(
 						memberGroupIDs, groupID);

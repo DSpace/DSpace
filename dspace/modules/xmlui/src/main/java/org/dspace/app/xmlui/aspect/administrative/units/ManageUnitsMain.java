@@ -9,7 +9,6 @@ package org.dspace.app.xmlui.aspect.administrative.units;
 
 import java.sql.SQLException;
 
-import org.dspace.app.xmlui.aspect.administrative.FlowUnitsUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -17,15 +16,11 @@ import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Cell;
 import org.dspace.app.xmlui.wing.element.CheckBox;
 import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.Highlight;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.app.xmlui.wing.element.Text;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DSpaceObject;
 import org.dspace.eperson.Unit;
 
 /**
@@ -74,17 +69,12 @@ public class ManageUnitsMain extends AbstractDSpaceTransformer
 
     private static final Message T_search_column4 = message("xmlui.administrative.units.ManageUnitsMain.search_column4");
 
-    private static final Message T_collection_link = message("xmlui.administrative.units.ManageUnitsMain.collection_link");
-
     private static final Message T_submit_delete = message("xmlui.administrative.units.ManageUnitsMain.submit_delete");
 
     private static final Message T_no_results = message("xmlui.administrative.units.ManageUnitsMain.no_results");
 
     /** The number of results to show on one page. */
     private static final int PAGE_SIZE = 15;
-
-    /** The maximum size of a collection or community name allowed */
-    private static final int MAX_COLLECTION_OR_COMMUNITY_NAME = 30;
 
     @Override
     public void addPageMeta(PageMeta pageMeta) throws WingException
@@ -180,7 +170,7 @@ public class ManageUnitsMain extends AbstractDSpaceTransformer
                 row = table.addRow();
             }
 
-            if (unit.getID() > 1)
+            if (unit.getID() > 0)
             {
                 CheckBox select = row.addCell().addCheckBox("select_unit");
                 select.setLabel(Integer.valueOf(unit.getID()).toString());
@@ -202,58 +192,6 @@ public class ManageUnitsMain extends AbstractDSpaceTransformer
             // + unit.getMemberUnits().length;
             row.addCell().addContent(
                     memberCount == 0 ? "-" : String.valueOf(memberCount));
-
-            Cell cell = row.addCell();
-            String unitName = unit.getName();
-            DSpaceObject collectionOrCommunity = null;
-            String collectionOrCommunityName = null;
-            int id;
-            id = FlowUnitsUtils.getCollectionId(unitName);
-            if (id > -1)
-            {
-                Collection collection = Collection.find(context, id);
-                if (collection != null)
-                {
-                    collectionOrCommunityName = collection.getMetadata("name");
-                    collectionOrCommunity = collection;
-                }
-            }
-            else
-            {
-                id = FlowUnitsUtils.getCommunityId(unitName);
-                if (id > -1)
-                {
-                    Community community = Community.find(context, id);
-                    if (community != null)
-                    {
-                        collectionOrCommunityName = community
-                                .getMetadata("name");
-                        collectionOrCommunity = community;
-                    }
-                }
-            }
-            if (collectionOrCommunity != null)
-            {
-                if (collectionOrCommunityName == null)
-                {
-                    collectionOrCommunityName = "";
-                }
-                else if (collectionOrCommunityName.length() > MAX_COLLECTION_OR_COMMUNITY_NAME)
-                {
-                    collectionOrCommunityName = collectionOrCommunityName
-                            .substring(0, MAX_COLLECTION_OR_COMMUNITY_NAME - 3)
-                            + "...";
-                }
-
-                cell.addContent(collectionOrCommunityName + " ");
-
-                Highlight highlight = cell.addHighlight("fade");
-
-                highlight.addContent("[");
-                highlight.addXref(contextPath + "/handle/"
-                        + collectionOrCommunity.getHandle(), T_collection_link);
-                highlight.addContent("]");
-            }
 
         }
 

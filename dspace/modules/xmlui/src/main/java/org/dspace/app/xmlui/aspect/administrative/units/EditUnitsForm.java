@@ -48,13 +48,7 @@ public class EditUnitsForm extends AbstractDSpaceTransformer
 
     private static final Message T_main_head = message("xmlui.administrative.units.EditUnitsForm.main_head");
 
-    private static final Message T_collection_para = message("xmlui.administrative.units.EditUnitsForm.collection_para");
-
-    private static final Message T_community_para = message("xmlui.administrative.units.EditUnitsForm.community_para");
-
     private static final Message T_label_name = message("xmlui.administrative.units.EditUnitsForm.label_name");
-
-    private static final Message T_label_instructions = message("xmlui.administrative.units.EditUnitsForm.label_instructions");
 
     private static final Message T_label_search = message("xmlui.administrative.units.EditUnitsForm.label_search");
 
@@ -75,8 +69,6 @@ public class EditUnitsForm extends AbstractDSpaceTransformer
 
     private static final Message T_member = message("xmlui.administrative.units.EditUnitsForm.member");
 
-    private static final Message T_cycle = message("xmlui.administrative.units.EditUnitsForm.cycle");
-
     private static final Message T_pending = message("xmlui.administrative.units.EditUnitsForm.pending");
 
     private static final Message T_pending_warn = message("xmlui.administrative.units.EditUnitsForm.pending_warn");
@@ -85,21 +77,10 @@ public class EditUnitsForm extends AbstractDSpaceTransformer
 
     private static final Message T_submit_remove = message("xmlui.administrative.units.EditUnitsForm.submit_remove");
 
-    // EPeople Search
-    private static final Message T_epeople_column1 = message("xmlui.administrative.units.EditUnitsForm.epeople_column1");
-
-    private static final Message T_epeople_column2 = message("xmlui.administrative.units.EditUnitsForm.epeople_column2");
-
-    private static final Message T_epeople_column3 = message("xmlui.administrative.units.EditUnitsForm.epeople_column3");
-
-    private static final Message T_epeople_column4 = message("xmlui.administrative.units.EditUnitsForm.epeople_column4");
-
     // Group Search
     private static final Message T_groups_column1 = message("xmlui.administrative.units.EditUnitsForm.units_column1");
 
     private static final Message T_groups_column2 = message("xmlui.administrative.units.EditUnitsForm.units_column2");
-
-    private static final Message T_units_collection_link = message("xmlui.administrative.units.ManageUnitsMain.units_collection_link");
 
     // Members
     private static final Message T_members_head = message("xmlui.administrative.units.EditUnitsForm.members_head");
@@ -107,12 +88,6 @@ public class EditUnitsForm extends AbstractDSpaceTransformer
     private static final Message T_members_column1 = message("xmlui.administrative.units.EditUnitsForm.members_column1");
 
     private static final Message T_members_column2 = message("xmlui.administrative.units.EditUnitsForm.members_column2");
-
-    private static final Message T_members_column3 = message("xmlui.administrative.units.EditUnitsForm.members_column3");
-
-    private static final Message T_members_column4 = message("xmlui.administrative.units.EditUnitsForm.members_column4");
-
-    private static final Message T_members_unit_name = message("xmlui.administrative.units.EditUnitsForm.members_unit_name");
 
     private static final Message T_members_pending = message("xmlui.administrative.units.EditUnitsForm.members_pending");
 
@@ -384,18 +359,18 @@ public class EditUnitsForm extends AbstractDSpaceTransformer
     }
 
     /**
-     * Add a single member row for collections.
+     * Add a single member row for groups.
      *
      * @param table
      *            The table to add a row too.
-     * @param collection
-     *            The collection being displayed
+     * @param group
+     *            The group being displayed
      * @param highlight
-     *            Should this collection be highlighted?
+     *            Should this group be highlighted?
      * @param pendingAddition
-     *            Is this collection pending addition?
+     *            Is this group pending addition?
      * @param pendingRemoval
-     *            Is this collection pending removal?
+     *            Is this group pending removal?
      */
     private void addMemberRow(Table table, Group group, boolean highlight,
             boolean pendingAddition, boolean pendingRemoval)
