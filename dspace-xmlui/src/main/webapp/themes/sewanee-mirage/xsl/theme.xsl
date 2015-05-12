@@ -18,30 +18,8 @@
 	xmlns="http://www.w3.org/1999/xhtml"
 	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc">
 
-    <!--<xsl:import href="../dri2xhtml-alt/dri2xhtml.xsl"/>-->
-    <xsl:import href="inherited_from_dri2xhtml-alt/core/elements.xsl"/>
-    <xsl:import href="inherited_from_dri2xhtml-alt/core/forms.xsl"/>
-    <xsl:import href="inherited_from_dri2xhtml-alt/core/utils.xsl"/>
-    <xsl:import href="inherited_from_dri2xhtml-alt/core/attribute-handlers.xsl"/>
-    <xsl:import href="inherited_from_dri2xhtml-alt/aspect/artifactbrowser/artifactbrowser.xsl"/>
-    <xsl:import href="core/global-variables.xsl"/>
-    <xsl:import href="core/elements.xsl"/>
-    <xsl:import href="core/forms.xsl"/>
+    <xsl:import href="../../mirage2/xsl/theme.xsl"/>
     <xsl:import href="core/page-structure.xsl"/>
-    <xsl:import href="core/navigation.xsl"/>
-    <xsl:import href="core/attribute-handlers.xsl"/>
-    <xsl:import href="core/utils.xsl"/>
-    <xsl:import href="aspect/general/choice-authority-control.xsl"/>
-    <xsl:import href="aspect/general/vocabulary-support.xsl"/>
-    <!--<xsl:import href="xsl/aspect/administrative/administrative.xsl"/>-->
-    <xsl:import href="aspect/artifactbrowser/common.xsl"/>
-    <xsl:import href="aspect/artifactbrowser/item-list.xsl"/>
-    <xsl:import href="aspect/artifactbrowser/item-view.xsl"/>
-    <xsl:import href="aspect/artifactbrowser/community-list.xsl"/>
-    <xsl:import href="aspect/artifactbrowser/collection-list.xsl"/>
-    <xsl:import href="aspect/artifactbrowser/browse.xsl"/>
-    <xsl:import href="aspect/discovery/discovery.xsl"/>
-    <xsl:import href="aspect/artifactbrowser/one-offs.xsl"/>
     <xsl:output indent="yes"/>
 
 
