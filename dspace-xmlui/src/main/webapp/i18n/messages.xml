@@ -2274,6 +2274,7 @@
     <message key="xmlui.metadata.dc.description">Description</message>
     <message key="xmlui.metadata.dc.description.abstract">Description</message>
     <message key="xmlui.metadata.dc.description.provenance">Provenance</message>
+    <message key="xmlui.metadata.dc.description.sponsorship">Sponsorship</message>
     <message key="xmlui.metadata.dc.first-line-of-chorus">First Line of Chorus</message>
     <message key="xmlui.metadata.dc.first-line-of-text">First Line of Text</message>
     <message key="xmlui.metadata.dc.format">Item Format</message>
