@@ -124,6 +124,8 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 
     private static final Message T_error_org = message("xmlui.administrative.eperson.AddEPersonForm.error_org");
 
+    private static final Message T_error_deleted_item = message("xmlui.administrative.eperson.AddEPersonForm.error_item_deleted");
+
     /** Language string used: */
 
     private static final Message T_email_address = message("xmlui.EPerson.EditProfile.email_address");
@@ -621,24 +623,30 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
                             .getParentObject();
 
                     String base = ConfigurationManager
-                            .getProperty("dspace.url");
-                    StringBuffer itemLink = new StringBuffer().append(base)
+                        .getProperty("dspace.url");
+                    if ( null != item ) {
+                        StringBuffer itemLink = new StringBuffer().append(base)
                             .append(base.endsWith("/") ? "" : "/")
                             .append("/handle/").append(item.getHandle());
 
-                    r.addCell().addXref(itemLink.toString(), "" + item.getID());
+                        r.addCell().addXref(itemLink.toString(), "" + item.getID());
 
-                    StringBuffer bitstreamLink = new StringBuffer()
+                        StringBuffer bitstreamLink = new StringBuffer()
                             .append(base)
                             .append(base.endsWith("/") ? "" : "/")
                             .append("bitstream/handle/")
                             .append(item.getHandle())
                             .append("/")
                             .append(URLEncoder.encode(bitstream.getName(),
-                                    "UTF8")).append("?sequence=")
+                                "UTF8")).append("?sequence=")
                             .append(bitstream.getSequenceID());
-                    r.addCell().addXref(bitstreamLink.toString(),
+                        r.addCell().addXref(bitstreamLink.toString(),
                             "" + bitstream.getID());
+                    }else {
+                        r.addCell().addContent(T_error_deleted_item );
+                        r.addCell().addContent(T_error_deleted_item );
+                    }
+
 
                     Cell c = r.addCell();
                     java.util.List<UserMetadata> extraMetaData = functionalityManager

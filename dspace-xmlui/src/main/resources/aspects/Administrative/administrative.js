@@ -854,7 +854,7 @@ function doEditEPerson(epersonID)
 			// Reset the user's password by sending them the forgot password email.
 			assertAdministrator();
 
-			result = FlowEPersonUtils.processResetNetidEPerson(getDSContext(), epersonID);
+			result = FlowEPersonUtils.processResetNetid(getDSContext(), epersonID);
 
 			if (result != null)
 				result.setContinue(false);
