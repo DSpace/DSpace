@@ -21,6 +21,13 @@
           autowire="byType"
           scope="singleton"/>
 
+     <!--provider for using the versioned handle identifier instead of the default one. -->
+    <bean id="org.dspace.identifier.HandleIdentifierProvider"
+          class="cz.cuni.mff.ufal.dspace.handle.ConfigurableHandleIdentifierProvider"
+          scope="singleton">
+        <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
+    </bean>
+
    <!-- provider for using the versioned handle identifier instead of the default one. -->
     <!--<bean id="org.dspace.identifier.HandleIdentifierProvider" class="org.dspace.identifier.VersionedHandleIdentifierProvider"-->
           <!--scope="singleton">-->

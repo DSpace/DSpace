@@ -10,6 +10,7 @@ package org.dspace.content;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import cz.cuni.mff.ufal.dspace.handle.ConfigurableHandleIdentifierProvider;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
@@ -71,7 +72,8 @@ public class Site extends DSpaceObject
     {
         if (handle == null)
         {
-            handle = HandleManager.completeHandle(HandleManager.getPrefix(), String.valueOf(SITE_ID));
+            handle = ConfigurableHandleIdentifierProvider.completeHandle(
+                HandleManager.getPrefix(), String.valueOf(SITE_ID));
         }
         return handle;
     }

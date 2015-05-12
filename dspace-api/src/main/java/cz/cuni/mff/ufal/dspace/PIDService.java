@@ -24,10 +24,8 @@ public class PIDService {
 	private static void initialize() throws Exception {
 		if(pidService==null) {
 			String serviceType = getServiceType();
-			String pidServiceClass = "cz.cuni.mff.ufal.dspace.PIDServiceEPICv1";
-			if(serviceType.equals(PIDService.SERVICE_TYPE_EPIC)) {
-				pidServiceClass = "cz.cuni.mff.ufal.dspace.PIDServiceEPICv1";
-			} else if(serviceType.equals(PIDService.SERVICE_TYPE_EPIC2)) {
+			String pidServiceClass = null;
+			if(serviceType.equals(PIDService.SERVICE_TYPE_EPIC2)) {
 				pidServiceClass = "cz.cuni.mff.ufal.dspace.PIDServiceEPICv2";
 			}
 			else {

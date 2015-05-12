@@ -106,9 +106,11 @@ public class IdentifierServiceImpl implements IdentifierService {
             throw new IdentifierException("Cannot register identifier: Didn't "
                 + "find a provider that supports this identifier.");
         }
-        object.resetIdentifiersCache();
-        //Update our item
-        object.update();
+        if ( null != object ) {
+            object.resetIdentifiersCache();
+            //Update our item
+            object.update();
+        }
     }
 
     @Override

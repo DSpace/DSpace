@@ -11,6 +11,7 @@ package cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.handle;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import cz.cuni.mff.ufal.dspace.handle.ConfigurableHandleIdentifierProvider;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -98,7 +99,8 @@ public class ChangeHandlePrefixForm extends AbstractDSpaceTransformer
 		List form = main.addList("change-handle-prefix-form",List.TYPE_FORM);			
 				
 		// Old handle prefix		
-		java.util.List<String> prefixes = HandleManager.getPrefixes(context);
+		java.util.List<String> prefixes = ConfigurableHandleIdentifierProvider.getPrefixes(
+			context);
 		Select oldPrefixSelect = form.addItem().addSelect("old_prefix");			
 		oldPrefixSelect.setRequired();			
 		oldPrefixSelect.setLabel(T_old_prefix);

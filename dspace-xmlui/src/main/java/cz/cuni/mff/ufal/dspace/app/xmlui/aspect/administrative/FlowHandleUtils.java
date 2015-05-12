@@ -20,9 +20,11 @@ import org.dspace.browse.IndexBrowse;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
+import org.dspace.identifier.IdentifierService;
 import org.dspace.storage.rdbms.DatabaseManager;
 
-import cz.cuni.mff.ufal.dspace.content.Handle;
+import cz.cuni.mff.ufal.dspace.handle.ConfigurableHandleIdentifierProvider;
+import org.dspace.utils.DSpace;
 
 /**
  * Utility methods to processes actions on Handles. These methods are used
@@ -88,25 +90,26 @@ public class FlowHandleUtils {
 		if(result.getErrors() == null) {
 			
 			try {
-					
-				Handle h = null;
+
+				IdentifierService pid_service =
+					new DSpace().getSingletonService(IdentifierService.class);
+				DSpaceObject dso = ConfigurableHandleIdentifierProvider.resolveToObject(
+					context, handleID);
+
 				if (handleID == -1) {
-					h = Handle.create(context, null, handle);			
+					pid_service.register(context, null, handle);
 				}
-				else {				
-					h = Handle.find(context, handleID);		
-					if(h.getHandle() != handle) {
-						HandleManager.changeHandle(context, h.getHandle(), handle, archiveOldHandle);
+				else {
+					if ( dso != null && dso.getHandle() != null
+							&& !dso.getHandle().equals(handle) )
+					{
+						ConfigurableHandleIdentifierProvider.changeHandle(
+							context, dso.getHandle(), handle, archiveOldHandle);
 					}
-					
-				}			
-						
-				h.setHandle(handle);		
-				h.setURL(url);
-				h.setResourceTypeID(resourceTypeID);
-				h.setResourceID(resourceID);
-				h.update();
-						
+				}
+
+				ConfigurableHandleIdentifierProvider.modifyHandleRecord(
+					context, null, handle, resourceTypeID, resourceID);
 				context.commit();
 							
 				result.setContinue(true);
@@ -116,7 +119,6 @@ public class FlowHandleUtils {
 			catch(Exception e) {
 				result.setMessage(T_handle_saving_failed);
 				log.error(e.getMessage());
-				context.abort();
 			}
 		}
 		
@@ -153,7 +155,8 @@ public class FlowHandleUtils {
 		if(result.getErrors() == null) {		
 			try {
 				// change prefixes
-				HandleManager.changePrefix(context, oldPrefix, newPrefix, archiveOldHandles);
+				ConfigurableHandleIdentifierProvider.changePrefix(
+					context, oldPrefix, newPrefix, archiveOldHandles );
 				context.commit();
 				
 				// reindex
@@ -189,13 +192,16 @@ public class FlowHandleUtils {
 		result.setMessage(T_handle_deletion_failed);
 		
 		try {
-			
-			Handle handleDeleted = Handle.find(context, handleID);
-			
-			HandleManager.changeHandle(context, handleDeleted.getHandle(), null, false);
-				   		   		
-	   		handleDeleted.delete();    		
-	   		
+
+			IdentifierService pid_service =
+				new DSpace().getSingletonService(IdentifierService.class);
+			DSpaceObject dso = ConfigurableHandleIdentifierProvider.resolveToObject(
+				context, handleID);
+
+			if ( null != dso ) {
+				pid_service.delete(context, dso);
+			}
+
 	   		context.commit();
  
 	   		result.setContinue(true);

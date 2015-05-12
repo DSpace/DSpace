@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import cz.cuni.mff.ufal.dspace.handle.ConfigurableHandleIdentifierProvider;
 import net.handle.hdllib.Encoder;
 import net.handle.hdllib.HandleException;
 import net.handle.hdllib.HandleStorage;
@@ -234,14 +235,15 @@ public class HandlePlugin implements HandleStorage
             {
                 // try with old prefix
                 
-                String prefix = HandleManager.extractHandlePrefix(handle);
-                String suffix = HandleManager.extractHandleSuffix(handle);
+                String prefix = ConfigurableHandleIdentifierProvider.extractHandlePrefix(handle);
+                String suffix = ConfigurableHandleIdentifierProvider.extractHandleSuffix(handle);
                                 
                 String[] alternativePrefixes = PIDConfiguration.getAlternativePrefixes(prefix);
                 
                 for ( String alternativePrefix : alternativePrefixes )
                 {
-                    String alternativeHandle = HandleManager.completeHandle(alternativePrefix, suffix);
+                    String alternativeHandle = ConfigurableHandleIdentifierProvider.completeHandle(
+                        alternativePrefix, suffix);
                     url = HandleManager.resolveToURL(context, alternativeHandle);
                     if ( null != url ) {
                         break;
