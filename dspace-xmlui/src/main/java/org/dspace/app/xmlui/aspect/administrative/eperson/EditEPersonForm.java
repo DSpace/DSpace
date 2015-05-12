@@ -92,6 +92,8 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 
     private static final Message T_submit_reset_password = message("xmlui.administrative.eperson.EditEPersonForm.submit_reset_password");
 
+    private static final Message T_submit_reset_netid = message("xmlui.administrative.eperson.EditEPersonForm.submit_reset_netid");
+
     private static final Message T_special_help = message("xmlui.administrative.eperson.EditEPersonForm.special_help");
 
     private static final Message T_submit_delete = message("xmlui.administrative.eperson.EditEPersonForm.submit_delete");
@@ -367,6 +369,9 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
             Item special = identity.addItem();
             special.addButton("submit_reset_password").setValue(
                     T_submit_reset_password);
+
+            special.addButton("submit_reset_netid").setValue(
+                T_submit_reset_netid);
 
             Button submitDelete = special.addButton("submit_delete");
             submitDelete.setValue(T_submit_delete);
