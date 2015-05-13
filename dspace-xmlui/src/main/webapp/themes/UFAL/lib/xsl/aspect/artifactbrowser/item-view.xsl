@@ -124,7 +124,7 @@
 			<!-- Title row -->
 			<xsl:when test="$clause = 1">
 				<!-- printer icon -->
-				<a href="javascript:window.print();" class="pull-right" style="position: relative; top: 10px;">
+				<a href="javascript:window.print();" class="print-link pull-right" style="position: relative; top: 10px;">
 					<i class="fa fa-print">&#160;</i>
 				</a>
 
