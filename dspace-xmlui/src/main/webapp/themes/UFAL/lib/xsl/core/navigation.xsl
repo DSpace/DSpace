@@ -332,8 +332,8 @@
                         </a>
                         </li>
                         <li>
-                                <a href="{$context-path}/page/citate" style="border-top: none; padding: 7px 0px 8px 18px;">
-                                <img src="{$context-path}/themes/UFALHome/lib/images/citate.png" align="right" class="citate" />
+                                <a href="{$context-path}/page/cite" style="border-top: none; padding: 7px 0px 8px 18px;">
+                                <img src="{$context-path}/themes/UFALHome/lib/images/cite.png" align="right" class="cite" />
                                 </a>
                         </li>
                 </ul>
