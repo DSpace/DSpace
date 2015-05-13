@@ -93,7 +93,7 @@ header .navbar-default .navbar-toggle > .open > a, header .navbar-default .navba
 
 /* bootstrap-classic-mirage-colors */
 a {
-    color: #3EB1C8;
+    color: #003d4c;
 }
 .text-primary {
     color: #3EB1C8
@@ -181,4 +181,8 @@ footer {
 }
 footer a {
     color: #000000;
+}
+
+.community-browser-row p {
+    color: #53565d;
 }
