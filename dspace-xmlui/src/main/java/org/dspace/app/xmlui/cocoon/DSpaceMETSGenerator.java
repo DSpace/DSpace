@@ -10,6 +10,7 @@ package org.dspace.app.xmlui.cocoon;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import cz.cuni.mff.ufal.dspace.handle.ConfigurableHandleIdentifierProvider;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.ResourceNotFoundException;
 import org.apache.cocoon.environment.ObjectModelHelper;
@@ -164,7 +165,7 @@ public class DSpaceMETSGenerator extends AbstractGenerator
                         // all non-repository types need integer IDs
                         if ("repository".equals(type))
                         {
-                                if (HandleManager.isSupportedPrefix(strid))
+                                if (ConfigurableHandleIdentifierProvider.isSupportedPrefix(strid))
                                 {
                                     adapter = new RepositoryAdapter(context, contextPath);
                                 }

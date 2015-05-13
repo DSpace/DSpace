@@ -15,6 +15,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import cz.cuni.mff.ufal.dspace.content.Handle;
+import cz.cuni.mff.ufal.dspace.content.HandleComparatorFactory;
+import cz.cuni.mff.ufal.dspace.handle.ConfigurableHandleIdentifierProvider;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.log4j.Logger;
@@ -31,9 +34,6 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 import org.dspace.sort.SortOption;
-
-import cz.cuni.mff.ufal.dspace.content.Handle;
-import cz.cuni.mff.ufal.dspace.content.HandleComparatorFactory;
 
 /**
  * Manage handles page is the entry point for handle management. From here the
@@ -148,7 +148,7 @@ public class ManageHandlesMain extends AbstractDSpaceTransformer {
 				: Integer.parseInt(resultsPerPageParam);
 
 		// Retrieve records
-		java.util.List<Handle> handles = Handle.findAll(context);
+		java.util.List<Handle> handles = ConfigurableHandleIdentifierProvider.findAll(context);
 		sortHandles(handles, sort, order);
 
 		// Calculate

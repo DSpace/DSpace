@@ -4,6 +4,7 @@ package cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative;
 import java.util.Iterator;
 import java.util.Map;
 
+import cz.cuni.mff.ufal.dspace.handle.ConfigurableHandleIdentifierProvider;
 import org.dspace.app.xmlui.aspect.administrative.FlowCurationUtils;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Division;
@@ -23,7 +24,8 @@ public class MainControlCheck extends AbstractControlPanelTab {
 	public void addBody(Map objectModel, Division div) throws WingException {
 
 		div = div.addDivision( this.getClass().getSimpleName(), "control_check well well-light" );
-		String siteHandle = HandleManager.completeHandle(PIDConfiguration.getDefaultPrefix(), "0");
+		String siteHandle = ConfigurableHandleIdentifierProvider.completeHandle(
+			PIDConfiguration.getDefaultPrefix(), "0");
 		div.addHidden("site_handle").setValue(siteHandle);
 		
 		html = new HtmlHelper( div, web_link );		

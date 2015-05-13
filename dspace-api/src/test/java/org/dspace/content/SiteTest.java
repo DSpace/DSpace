@@ -7,6 +7,7 @@
  */
 package org.dspace.content;
 
+import cz.cuni.mff.ufal.dspace.handle.ConfigurableHandleIdentifierProvider;
 import org.dspace.AbstractUnitTest;
 import org.dspace.core.ConfigurationManager;
 import java.sql.SQLException;
@@ -102,7 +103,9 @@ public class SiteTest extends AbstractUnitTest
     @Test
     public void testGetHandle()
     {
-        assertThat("testGetHandle 0", s.getHandle(), equalTo(HandleManager.completeHandle(PIDConfiguration.getDefaultPrefix(), String.valueOf(Site.SITE_ID))));
+        assertThat("testGetHandle 0", s.getHandle(), equalTo(
+            ConfigurableHandleIdentifierProvider.completeHandle(
+                PIDConfiguration.getDefaultPrefix(), String.valueOf(Site.SITE_ID))));
     }
 
     /**
@@ -111,7 +114,9 @@ public class SiteTest extends AbstractUnitTest
     @Test
     public void testGetSiteHandle()
     {
-        assertThat("testGetSiteHandle 0", s.getHandle(), equalTo(HandleManager.completeHandle(PIDConfiguration.getDefaultPrefix(), String.valueOf(Site.SITE_ID))));
+        assertThat("testGetSiteHandle 0", s.getHandle(), equalTo(
+            ConfigurableHandleIdentifierProvider.completeHandle(
+                PIDConfiguration.getDefaultPrefix(), String.valueOf(Site.SITE_ID))));
     }
 
     /**

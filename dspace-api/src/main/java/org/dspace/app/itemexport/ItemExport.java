@@ -485,9 +485,7 @@ public class ItemExport
                      ("date".equals(dcv.element) && "issued".equals(qualifier)) ||
                      ("date".equals(dcv.element) && "accessioned".equals(qualifier)) ||
                      ("date".equals(dcv.element) && "available".equals(qualifier)) ||
-                     ("identifier".equals(dcv.element) && "uri".equals(qualifier) &&
-                      (dcv.value != null && HandleManager.hasURLHdlHandleNetPrefix(dcv.value) && 
-                      HandleManager.hasHandleSupportedPrefix(HandleManager.stripHdlHandleNetPrefixFromURL(dcv.value))))  ||
+                     ("identifier".equals(dcv.element) && "uri".equals(qualifier))  ||
                      ("description".equals(dcv.element) && "provenance".equals(qualifier)) ||
                      ("format".equals(dcv.element) && "extent".equals(qualifier)) ||
                      ("format".equals(dcv.element) && "mimetype".equals(qualifier)))))

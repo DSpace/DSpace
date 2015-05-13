@@ -13,6 +13,18 @@ import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
+import org.dspace.core.Context;
+import org.dspace.identifier.IdentifierException;
+import org.dspace.identifier.IdentifierService;
+import org.dspace.utils.DSpace;
+
+import java.io.IOException;
+import java.sql.SQLException;
+
+
 /**
  *
  *

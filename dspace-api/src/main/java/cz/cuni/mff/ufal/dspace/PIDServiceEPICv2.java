@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import cz.cuni.mff.ufal.dspace.handle.ConfigurableHandleIdentifierProvider;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -100,7 +101,8 @@ public class PIDServiceEPICv2 extends AbstractPIDService {
 	public String createCustomPID(Map<String, String> handleFields, String prefix, String suffix) throws Exception {
 		JsonArray data = getEPICJsonRepresentation(handleFields);
 		HashMap<String, Object> params = new HashMap<String, Object>();
-		params.put(PARAMS.PID.toString(), HandleManager.completeHandle(prefix, suffix));
+		params.put(PARAMS.PID.toString(), ConfigurableHandleIdentifierProvider.completeHandle(
+			prefix, suffix));
 		params.put(PARAMS.DATA.toString(), data.toString());
 		
 		HashMap<String, String> headers = new HashMap<String, String>();
