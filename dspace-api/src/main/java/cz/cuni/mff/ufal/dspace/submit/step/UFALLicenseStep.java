@@ -69,83 +69,7 @@ public class UFALLicenseStep extends org.dspace.submit.step.LicenseStep {
 
 			String buttonPressed = Util.getSubmitButton(request, CANCEL_BUTTON);
 
-			// go to new screen with license definition
-			//
-			if (buttonPressed.equals(DEFINELICENSE_BUTTON)) {
-				return STATUS_LICENSE_DEFINE;
-
-				// return from license definition / deletion
-				//
-			} else if (buttonPressed.equals(DEFINELICENSE_CANCEL_BUTTON)) {
-				// process normal;y
-				return STATUS_COMPLETE;
-
-				// define new license
-				//
-			} else if (buttonPressed.equals(DEFINELICENSE_ADD_BUTTON)) {
-				// add the license
-				
-				String license_name = request.getParameter("license_name");
-				if (null == license_name || license_name.trim().isEmpty())
-					return STATUS_LICENSE_DEFINE_NO_NAME;
-				String license_url = request.getParameter("license_url");
-				if (null == license_url || license_url.trim().isEmpty())
-					return STATUS_LICENSE_DEFINE_NO_URL;
-				
-                int license_confirmation = Integer.parseInt(request.getParameter("license_confirmation"));
-                String license_required = request.getParameter("license_required");
-
-                int license_label = Integer.parseInt(request.getParameter("license_label"));
-
-				// create new license
-				EPerson submitter = subInfo.getSubmissionItem().getSubmitter();
-				
-				int userID = submitter.getID();
-
-				iface.openSession();
-				boolean result = iface.defineLicense(license_name, userID, license_url, license_confirmation, license_required, license_label);
-				iface.close();
-				
-				if (result)
-					return STATUS_COMPLETE;
-				else
-					return STATUS_LICENSE_DEFINE_ERROR;
-
-				// go to delete licence screen
-				//
-			} else if (buttonPressed.equals(DELETELICENSE_BUTTON)) {
-				return STATUS_LICENSE_DELETE;
-
-				// do the licence deletion
-				//
-			} else if (buttonPressed.equals(DELETELICENSE_DELETE_BUTTON)) {				
-				// add the license
-				String license_name = request.getParameter("license_name");
-				if (null == license_name || license_name.trim().isEmpty())
-					return STATUS_LICENSE_DEFINE_NO_NAME;
-
-				EPerson submitter = subInfo.getSubmissionItem().getSubmitter();
-				int userID = submitter.getID();
-				
-				iface.openSession();
-				List<LicenseDefinition> licenses = iface.getAllLicenses();
-
-				for (LicenseDefinition license_def : licenses) {
-					if (license_def.getName().equals(license_name) && license_def.getUserRegistration().getEpersonId()==userID) {
-						boolean status = iface.delete(LicenseDefinition.class, license_def);
-						if (!status) {
-							iface.close();
-							return STATUS_LICENSE_DELETE_ERROR;
-						}
-						break;
-					}
-				}
-				
-				iface.close();
-
-				// go to next step
-				//
-			} else if (buttonPressed.equals(NEXT_BUTTON)) {
+			if (buttonPressed.equals(NEXT_BUTTON)) {
 				
 				String decision = request.getParameter("decision");
 				if (decision == null || !decision.equalsIgnoreCase("accept")) {
@@ -276,5 +200,6 @@ public class UFALLicenseStep extends org.dspace.submit.step.LicenseStep {
 	}
 
 }
+
 
 

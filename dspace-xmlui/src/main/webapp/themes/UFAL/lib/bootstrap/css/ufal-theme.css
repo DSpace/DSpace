@@ -1338,3 +1338,35 @@ div.modal-scrollbar {
 .licence_to_sign  {
 	font-family: Arial;
 }
+
+
+.distribution_licnese_head {
+	font-size: 24px;
+	font-weight: 500;
+}
+
+.license-decision-div  {
+	display: table;
+}
+
+.license-decision-checkbox {
+	display: table-cell;
+	vertical-align: middle;
+}
+
+.license-decision-message {
+  	display: table-cell;
+  	vertical-align: middle;
+  	padding-left: 10px;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.4em;
+    color: #525558;	
+} 
+
+.license-resource-text {
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.4em;
+    color: #525558;	
+}

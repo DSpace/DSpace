@@ -167,6 +167,10 @@
                 <link rel="stylesheet" href="{$theme-path}/lib/select2/select2.css" />
                 <link rel="stylesheet" href="{$theme-path}/lib/select2/select2-bootstrap.css" />
             </xsl:if>
+            
+            <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='bootstrap-toggle']">
+                <link rel="stylesheet" href="{$theme-path}/lib/bootstrap/css/bootstrap2-toggle.min.css" />
+            </xsl:if>            
 
             <!-- Add syndication feeds -->
             <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='feed']">
@@ -599,7 +603,11 @@
             <script type="text/javascript" src="{$theme-path}/lib/lindat-license-selector/lodash.min.js">&#160;</script>
             <script type="text/javascript" src="{$theme-path}/lib/lindat-license-selector/license-selector.min.js">&#160;</script>
         </xsl:if>
-
+        
+        <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='bootstrap-toggle']">
+            <script type="text/javascript" src="{$theme-path}/lib/bootstrap/js/bootstrap2-toggle.min.js">&#160;</script>
+        </xsl:if>            
+        
         <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='submission']">
             <script type="text/javascript" src="{$theme-path}/lib/js/ufal-submission.js">&#160;</script>
         </xsl:if>
@@ -625,6 +633,7 @@
     </xsl:template>
 
 </xsl:stylesheet>
+
 
 
 
