@@ -81,7 +81,7 @@ lr.dspace.version = dspace-1.8.2
 lr.dspace.dir = /installations/dspace/dspace-1.8.2
 
 # A description of your dspace instance. It will be used as a description of your dspace instance for other services
-lr.dspace.name = LINDAT/CLARIN digital library at Institute of Formal and Applied Linguistics, Charles University in Prague (v${dspace.version})
+lr.dspace.name = LINDAT/CLARIN digital library at Institute of Formal and Applied Linguistics, Charles University in Prague
 # Used in email templates
 lr.dspace.name.short = LINDAT/CLARIN
 
