@@ -1520,6 +1520,22 @@ public class DescribeStep extends AbstractSubmissionStep
                 {
                     text.setRequired();
                 }
+
+                boolean regexp_warning_issued = false;
+                // regexp checking - should rather be in dspace-api
+                for(Metadatum dcv : dcValues)
+                {
+                    if( !dcInput.isAllowedValue(dcv.value) ) {
+                        regexp_warning_issued = true;
+                        if (dcInput.getRegexpWarning() != null && dcInput.getRegexpWarning().length() > 0) {
+                            text.addError(dcInput.getRegexpWarning());
+                        }else {
+                            text.addError(String.format(
+                                "This value must match the given regular expression [%s].", dcInput.getRegexp()) );
+                        }
+                    }
+                }
+
                 if (isFieldInError(fieldName))
                 {
                     if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
@@ -1528,24 +1544,13 @@ public class DescribeStep extends AbstractSubmissionStep
                     }
                     else
                     {
-                        text.addError(T_required_field);
-                    }
-                }
-                
-                // regexp checking - should rather be in dspace-api
-                for(Metadatum dcv : dcValues) 
-                {
-                    if( !dcInput.isAllowedValue(dcv.value) ) {
-                        if (dcInput.getRegexpWarning() != null 
-                                        && dcInput.getRegexpWarning().length() > 0) {
-                            text.addError(dcInput.getRegexpWarning());
-                        }else {
-                            text.addError(String.format(
-                                "This value must match the given regular expression [%s].", dcInput.getRegexp()) );
+                        if ( !regexp_warning_issued || dcInput.isRequired() ) {
+                            text.addError(T_required_field);
                         }
                     }
-                }                
-                
+                }
+
+
                 if (dcInput.isRepeatable() && !readonly)
                 {
                     text.enableAddOperation();
