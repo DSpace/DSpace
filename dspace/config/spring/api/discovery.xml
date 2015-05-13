@@ -119,11 +119,11 @@
                 <ref bean="searchFilterDiscipline" />
                 <ref bean="searchFilterThesisDegreeLevel" />
                 <ref bean="searchFilterIssued" />
-                <ref bean="searchFilterKeyword">
-                <ref bean="searchFilterSeries">
-                <ref bean="searchFilterIdentifier">
-                <ref bean="searchFilterSponsor">
-                <ref bean="searchFilterAbstract">
+                <ref bean="searchFilterKeyword" />
+                <ref bean="searchFilterSeries" />
+                <ref bean="searchFilterIdentifier" />
+                <ref bean="searchFilterSponsor" />
+                <ref bean="searchFilterAbstract" />
             </list>
         </property>
         <!--The sort filters for the discovery search-->

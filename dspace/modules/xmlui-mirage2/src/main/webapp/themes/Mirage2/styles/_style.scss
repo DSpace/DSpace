@@ -87,3 +87,9 @@ ul#ms-navigation-list li.ms-navigation-link a:hover, ul#ms-navigation-list li.ms
 dt, td.label-cell, .detailtable .label-cell {
     font-weight: normal;
 }
+
+// let's make the search results a little easier to read with a bit of added white space
+.artifact-title {
+	font-size: 17px;
+	padding-top: 1em;
+}
