@@ -80,6 +80,8 @@
           <label>Project URL</label>
          <input-type>onebox</input-type>
           <hint>Enter the project url.</hint>
+          <regexp>http.*</regexp>
+          <regexp-warning>The supplied url must start with http/https</regexp-warning>
          <required></required>
        </field>
 
@@ -92,6 +94,8 @@
           <input-type>onebox</input-type>
           <hint>A url with samples of the resource or, in the case of tools,
             of samples of the output.</hint>
+          <regexp>http.*</regexp>
+          <regexp-warning>The supplied url must start with http/https</regexp-warning>
           <required></required>
         </field>
 
@@ -257,7 +261,7 @@
          <label>Subject Keywords</label>
          <input-type>twobox</input-type>
           <hint>Enter appropriate subject keyword or phrase and press the Add button. You can repeat it for multiple keywords or use separators i.e., comma and semicolon, which will split it accordingly. Start typing the keyword and use autocomplete form that will appear. End your input by pressing ESC if you don't want to use the preselected value.</hint>
-         <required></required>
+         <required>Please enter at least one subject related to your submission</required>
           <autocomplete>solr-subject_ac</autocomplete>
        </field>
 
