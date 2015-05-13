@@ -228,7 +228,7 @@
 			 */
 			//globals variables
 			var fieldIDPrefix = 'aspect_submission_StepTransformer_field_';
-			var fields = ['dc_type','dcterms_language','dcterms_license','dcterms_rights_embargoPeriod'];
+			var fields = ['dc_type','dcterms_language','dcterms_license','dcterms_rights_embargoPeriod','dcterms_subject_area'];
 			var oldTypeValue = $('#aspect_submission_StepTransformer_field_dc_type').val();
 			var oldLicenseValue = $('#aspect_submission_StepTransformer_field_dcterms_license').val();
 			//For each input field can put a function name, having as prefix the input field name. P.e. for the field "dcterms_abstract" we can add the function "dcterms_abstract_make_shorter". 

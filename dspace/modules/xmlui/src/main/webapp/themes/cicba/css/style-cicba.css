@@ -543,7 +543,8 @@ height: 33px;
 #aspect_submission_StepTransformer_field_dc_type,
 #aspect_submission_StepTransformer_field_dcterms_rights_embargoPeriod,
 #aspect_submission_StepTransformer_field_dcterms_language,
-#aspect_submission_StepTransformer_field_dcterms_license {
+#aspect_submission_StepTransformer_field_dcterms_license,
+#aspect_submission_StepTransformer_field_dcterms_subject_area {
 	background-image : url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjx0ZXh0IHg9Ijk2JSIgeT0iNzAlIiBmb250LXNpemU9IjIwIj7ilrw8L3RleHQ+PC9zdmc+");
 }
 

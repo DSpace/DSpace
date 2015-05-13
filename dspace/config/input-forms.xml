@@ -221,7 +221,7 @@
          <repeatable>true</repeatable>
          <label>Area temática</label>
 		 <type-bind>Informe cientifico</type-bind>
-         <input-type value-pairs-name="cic_areas">dropdown</input-type>
+		 <input-type>onebox</input-type>
          <hint>Area de investigación dentro de CIC.</hint>
          <required>Debe indicar el área de investigación en la que se desarrolla el trabajo.</required>
        </field>
