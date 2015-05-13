@@ -59,8 +59,8 @@ public class DateUtils
         catch (ParseException ex)
         {
             // 2008-01-01T00:00:00Z
-            format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'",
-                    Locale.getDefault());
+            format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            format.setTimeZone(TimeZone.getTimeZone("ZULU"));
             try
             {
                 return format.parse(date);
@@ -112,7 +112,8 @@ public class DateUtils
     public static Date parseFromSolrDate(String date)
     {
         SimpleDateFormat format = new SimpleDateFormat(
-                "yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault());
+                "yyyy-MM-dd'T'HH:mm:ss'Z'");
+        format.setTimeZone(TimeZone.getTimeZone("ZULU"));
         Date ret;
         try
         {
