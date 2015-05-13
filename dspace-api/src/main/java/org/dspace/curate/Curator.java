@@ -358,10 +358,13 @@ public class Curator
     	
     	ArrayList<String> results = overallResult.get(taskName);
     	StringBuilder temp = new StringBuilder();
+        if ( null == results ) {
+            return null;
+        }
     	for(String r : results) {
     		temp.append(r).append("\n");
     	}
-    	return (results != null) ? temp.toString() : null;
+    	return temp.toString();
     }
 
     /**
