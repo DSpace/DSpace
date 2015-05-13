@@ -1336,5 +1336,26 @@
                         </div>
                 </div>
         </xsl:template>
-
+        
+        <xsl:template match="dri:item[@id='aspect.submission.StepTransformer.item.license-decision']" priority="10">
+        	<xsl:if test=".//dri:error">
+        		<div class="alert alert-danger">
+        			<xsl:apply-templates select=".//dri:error" mode="error" />
+        		</div>
+        	</xsl:if>
+        	<xsl:apply-templates select="./*" />
+        </xsl:template>
+        
+        <xsl:template match="dri:field[@id='aspect.submission.StepTransformer.field.decision']" priority="10">        	
+                <input type="checkbox" data-toggle="toggle" data-on="Accepted" data-off="Click to accept" data-onstyle="success" data-offstyle="danger" data-width="130" data-height="30">
+                        <xsl:call-template name="standardAttributes" />
+                        <xsl:attribute name="name"><xsl:value-of select="@n"/></xsl:attribute>
+                        <xsl:attribute name="value"><xsl:value-of select="dri:option/@returnValue"/></xsl:attribute>
+                        <xsl:if test="dri:value[@option='accept']">
+                                <xsl:attribute name="checked" />
+                        </xsl:if>
+                </input>
+        </xsl:template>
+        
+        
 </xsl:stylesheet>

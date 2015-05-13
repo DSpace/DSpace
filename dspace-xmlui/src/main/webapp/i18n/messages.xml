@@ -914,6 +914,8 @@
     <message key="xmlui.Submission.submit.UFALLicenseStep.define.error">There was a problem while adding your license. Probably, you do not have appropriate access rights. Please, go back and/or contact the administrator.</message>
     <message key="xmlui.Submission.submit.UFALLicenseStep.delete.error">There was a problem while deleting a license. Probably, you do not have appropriate access rights. Please, go back and/or contact the administrator.</message>        
     <message key="xmlui.Submission.submit.UFALLicenseStep.define.empty_label">Empty label</message>
+    <message key="xmlui.Submission.submit.UFALLicenseStep.license_not_supported">The selected license is not supported at the moment. Please follow the procedure described under section "None of these licenses suits your needs".</message>    
+    
     
     <!-- cz.cuni.mff.ufal.UFALLicenceAgreement -->
     <message key="xmlui.ufal.UFALLicenceAgreement.title">Licence Agreement</message>
@@ -1096,8 +1098,9 @@
     <message key="xmlui.Submission.submit.LicenseStep.info2"></message>
     <message key="xmlui.Submission.submit.LicenseStep.info3">If you have questions regarding this licence please contact the <a class="helpdesk-tolink">Help Desk</a>.</message>
     <message key="xmlui.Submission.submit.LicenseStep.decision_label">Distribution agreement</message>
-	<message key="xmlui.Submission.submit.LicenseStep.decision_checkbox">I Grant the License</message>
+	<message key="xmlui.Submission.submit.LicenseStep.decision_checkbox">By checking this box, you agree to the Distribution License Agreement for this repository to reproduce, translate and distribute your submissions worldwide.</message>
 	<message key="xmlui.Submission.submit.LicenseStep.decision_error">You must grant this license to complete your submission. If you are unable to grant this license at this time you may save your work and return later or remove the submission by clicking the 'Save &amp; Exit' button below.</message>
+	
 
     <message key="xmlui.Submission.submit.LicenseStep.morelicense_head">None of these licenses suits your needs</message>
     <message key="xmlui.Submission.submit.LicenseStep.morelicense_line1">If you need to use a license we currently do not offer, proceed as follows:</message>
@@ -1105,6 +1108,13 @@
     <message key="xmlui.Submission.submit.LicenseStep.morelicense_line3">Send an email to <a class="helpdesk-tolink">Help Desk</a> with the license details.</message>
     <message key="xmlui.Submission.submit.LicenseStep.morelicense_line4">Save the unfinished submission and wait. We will add the license to the selection list and contact you.</message>
     <message key="xmlui.Submission.submit.LicenseStep.morelicense_line5">You will be able to continue the submission afterwards.</message>
+    
+    <message key="xmlui.Submission.submit.LicenseStep.distribution_license_head">Read and accept the </message>
+    <message key="xmlui.Submission.submit.LicenseStep.distribution_license_head_link">Distribution License Agreement</message>
+    <message key="xmlui.Submission.submit.LicenseStep.license_list_alert">For the list of all supported licenses and their details visit </message>
+    <message key="xmlui.Submission.submit.LicenseStep.license_list_alert_link">License List Page</message>    
+    <message key="xmlui.Submission.submit.LicenseStep.resource_license_text">If you know under which license you want to distribute your work, please select from the list or click the license selector button for help.</message>
+    <message key="xmlui.Submission.submit.LicenseStep.license_selector_button">OPEN License Selector</message>
     
 
 	<!-- org.dspace.app.xmlui.Submission.submit.RemovedStep -->
@@ -2849,3 +2859,4 @@
   <message key="xmlui.UFAL.artifactbrowser.item-download-all-files">Download all files in item ({0})</message>
   <message key="xmlui.UFAL.artifactbrowser.item-download-file">Download file</message>
 </catalogue>
+
