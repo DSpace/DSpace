@@ -12,7 +12,12 @@
  */
 * { background: transparent !important; color: #444 !important; text-shadow: none;}
 
-.lindat-header, .lindat-footer, .sidebar, .breadcrumb, .btn, .thumbnail, .modal-dialog,  #printer-icon-image {display: none !important;}
+.lindat-header, .lindat-footer,
+.sidebar, .breadcrumb, .btn, .thumbnail, .modal-dialog,  #printer-icon-image,
+.print-link, #repository_path
+{
+    display: none !important;
+}
 
 /* export to line */
 div.item-summary-view-metadata > dl:last-of-type {display: none !important;}
