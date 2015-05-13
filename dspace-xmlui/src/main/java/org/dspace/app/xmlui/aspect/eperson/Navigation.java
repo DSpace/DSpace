@@ -251,7 +251,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         // about
         about.setHead( T_about_head );
         about.addItemXref( contextPath + "/page/deposit", T_deposit );
-        about.addItemXref( contextPath + "/page/citate", T_cite);
+        about.addItemXref( contextPath + "/page/cite", T_cite);
         about.addItemXref( contextPath + "/page/item-lifecycle", T_lifecycle );
         about.addItemXref( contextPath + "/page/faq", T_faq);
         about.addItemXref( contextPath + "/page/about", T_about );
