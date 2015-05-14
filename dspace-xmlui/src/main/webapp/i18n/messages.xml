@@ -620,7 +620,7 @@
 	<message key="xmlui.EPerson.LoginChooser.trail">Choose Login</message>
     <message key="xmlui.EPerson.LoginChooser.head1">Login Methods Available</message>
 	<message key="xmlui.EPerson.LoginChooser.para1">Log in via:</message>
-    <message key="xmlui.EPerson.LoginChooser.discojuiceComment">Use this to login with credentials of your "home" institution (e.g. eduGAIN institutions, members of CESNET, accounts at clarin.eu, ...). A window where you can select the institution should appear.</message>
+    <message key="xmlui.EPerson.LoginChooser.discojuiceComment">Use this to login with credentials of your "home" institution (e.g. eduGAIN institutions, members of eduID.cz, accounts at clarin.eu, ...). A window where you can select the institution should appear.</message>
     <message key="xmlui.EPerson.LoginChooser.eduidComment">If you have an account at one of the Czech universities (e.g. CUNI, MUNI, ZCU, ...)</message>
     <message key="xmlui.EPerson.LoginChooser.otherwiseComment">If you have registered manually use the following link </message>
     <message key="org.dspace.authenticate.ShibAuthentication.title">Shibboleth Authentication - login from CUNI, MUNI, ZCU</message>
