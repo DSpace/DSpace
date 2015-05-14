@@ -916,7 +916,7 @@
     <message key="xmlui.Submission.submit.UFALLicenseStep.define.empty_label">Empty label</message>
     <message key="xmlui.Submission.submit.UFALLicenseStep.license_not_supported">The selected license is not supported at the moment. Please follow the procedure described under section "None of these licenses suits your needs".</message>
     <message key="xmlui.Submission.submit.UFALLicenseStep.review_no_file">No file was uploaded in the upload step. There is no restriction on the metadata.</message>    
-    <message key="xmlui.Submission.submit.UFALLicenseStep.review_license_error">License specified by you was not found in the databse. This is most likely due to an error please contact administrators.</message>    
+    <message key="xmlui.Submission.submit.UFALLicenseStep.review_license_error">License specified by you was not found in the database. This is most likely due to an error please contact administrators.</message>    
     
     
     <!-- cz.cuni.mff.ufal.UFALLicenceAgreement -->
