@@ -285,7 +285,7 @@ public class UFALLicenseStep extends LicenseStep {
 			// assert 0 < item.getBundles().length; //XXX: we allow submissions
 			// with no items, not sure if this should hold
 			if (item.getBundles("ORIGINAL").length > 0) {
-				Bundle bundle = item.getBundles()[0];
+				Bundle bundle = item.getBundles("ORIGINAL")[0];
 				if (bundle.getBitstreams().length > 0) {
 					Bitstream bitstream = bundle.getBitstreams()[0];
 					java.util.List<LicenseDefinition> present_licenses = licenseManager
