@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package cz.cuni.mff.ufal.dspace.content;
+package cz.cuni.mff.ufal.dspace.handle;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -21,6 +21,7 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
 import org.dspace.event.Event;
 import org.dspace.handle.HandleManager;
+import org.dspace.identifier.Identifier;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
@@ -31,7 +32,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * 
  * @author Michal Josífko 
  */
-public class Handle extends DSpaceObject
+public class Handle extends DSpaceObject implements Identifier
 {
 	
 	public static final int HANDLE = -1;
@@ -275,8 +276,7 @@ public class Handle extends DSpaceObject
 	                "handle_id=" + getID()));
 	
 	        DatabaseManager.update(ourContext, handleRow);
-	        
-        }        
+        }
     }       
     
     /**

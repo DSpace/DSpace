@@ -2202,7 +2202,7 @@ function doEditHandle(handleID)
             
             var archiveOldHandle = cocoon.request.get("archive_old_handle") == null ? false : true;
 
-            result = FlowHandleUtils.processSaveHandle(getDSContext(),handleID,handle,url,resourceTypeID,resourceID,archiveOldHandle);
+            result = FlowHandleUtils.processSave(getDSContext(),handleID,handle,url,resourceTypeID,resourceID,archiveOldHandle);
 
             // In case a handle was created, update our id.
             if (result != null && result.getParameter("handle_id"))
@@ -2236,7 +2236,7 @@ function doDeleteHandle(handleID)
 	    else if (cocoon.request.get("submit_confirm"))
 	    {
 	        // The user has confirmed, actualy delete the handle	        
-	        result = FlowHandleUtils.processDeleteHandle(getDSContext(),handleID);	        
+	        result = FlowHandleUtils.processDelete(getDSContext(),handleID);
 	    }
     } while (result == null || !result.getContinue())
     return result;
@@ -2266,7 +2266,7 @@ function doChangeHandlePrefix()
 	        var newPrefix = cocoon.request.get("new_prefix");
 	        var archiveOldHandles = cocoon.request.get("archive_old_handles") == null ? false : true;                
 	        
-	        result = FlowHandleUtils.changeHandlePrefix(getDSContext(),oldPrefix,newPrefix,archiveOldHandles);	        
+	        result = FlowHandleUtils.changePrefix(getDSContext(),oldPrefix,newPrefix,archiveOldHandles);
 	    }
 	} while (result == null || !result.getContinue())
     return result;

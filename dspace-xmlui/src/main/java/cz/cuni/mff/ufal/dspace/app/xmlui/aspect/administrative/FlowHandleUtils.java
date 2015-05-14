@@ -7,9 +7,8 @@
  */
 package cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
+import cz.cuni.mff.ufal.dspace.handle.Handle;
+import cz.cuni.mff.ufal.dspace.handle.ConfigurableHandleIdentifierProvider;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.aspect.administrative.FlowResult;
@@ -17,14 +16,11 @@ import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.browse.IndexBrowse;
-import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
-import org.dspace.identifier.IdentifierService;
-import org.dspace.storage.rdbms.DatabaseManager;
 
-import cz.cuni.mff.ufal.dspace.handle.ConfigurableHandleIdentifierProvider;
-import org.dspace.utils.DSpace;
+import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * Utility methods to processes actions on Handles. These methods are used
@@ -41,13 +37,13 @@ public class FlowHandleUtils {
     private static final Message T_handle_successfully_deleted =
     		new Message("default","xmlui.administrative.handle.FlowHandleUtils.handle_successfully_deleted");
     private static final Message T_handle_successfully_saved =
-    		new Message("default","xmlui.administrative.handle.FlowHandleUtils.handle_successfully_saved"); 
+    		new Message("default","xmlui.administrative.handle.FlowHandleUtils.handle_successfully_saved");
     private static final Message T_prefix_successfully_changed =
-    		new Message("default","xmlui.administrative.handle.FlowHandleUtils.prefix_successfully_changed"); 
+    		new Message("default","xmlui.administrative.handle.FlowHandleUtils.prefix_successfully_changed");
     private static final Message T_handle_deletion_failed =
     		new Message("default","xmlui.administrative.handle.FlowHandleUtils.handle_deletion_failed");
     private static final Message T_handle_saving_failed =
-    		new Message("default","xmlui.administrative.handle.FlowHandleUtils.handle_saving_failed"); 
+    		new Message("default","xmlui.administrative.handle.FlowHandleUtils.handle_saving_failed");
     private static final Message T_prefix_change_failed =
     		new Message("default","xmlui.administrative.handle.FlowHandleUtils.prefix_change_failed");
 	
@@ -61,18 +57,25 @@ public class FlowHandleUtils {
 	 * @param url The handle URL 
 	 * @param resourceTypeID The type of referenced resource
 	 * @param resourceID ID of referenced resource
+	 * @param archiveOldHandle whether to store the current handle in metadata
 	 * @return A result
 	 */
-	public static FlowResult processSaveHandle(Context context, int handleID, String handle, String url, int resourceTypeID, int resourceID,  boolean archiveOldHandle) throws SQLException, AuthorizeException, UIException
+	public static FlowResult processSave(Context context,
+                                         int handleID,
+                                         String handle_str,
+                                         String url,
+                                         int resourceTypeID,
+                                         int resourceID,
+                                         boolean archiveOldHandle)
+		throws SQLException, AuthorizeException, UIException
 	{
 		FlowResult result = new FlowResult();
 		result.setParameter("handle_id", handleID);		
-		
 		result.setContinue(false);
 		result.setOutcome(false);
 
 		// If we have errors, the form needs to be resubmitted to fix those problems
-	    if (StringUtils.isEmpty(handle)) {
+	    if (StringUtils.isEmpty(handle_str)) {
             result.addError("handle_empty");
         }
 		if (resourceTypeID == -1 && resourceID == -1 && StringUtils.isEmpty(url)) {
@@ -85,43 +88,51 @@ public class FlowHandleUtils {
 			if (resourceID == -1) {		        
 				result.addError("resource_id_empty");
 			}
-		}		
-		
-		if(result.getErrors() == null) {
-			
-			try {
-
-				IdentifierService pid_service =
-					new DSpace().getSingletonService(IdentifierService.class);
-				DSpaceObject dso = ConfigurableHandleIdentifierProvider.resolveToObject(
-					context, handleID);
-
-				if (handleID == -1) {
-					pid_service.register(context, null, handle);
-				}
-				else {
-					if ( dso != null && dso.getHandle() != null
-							&& !dso.getHandle().equals(handle) )
-					{
-						ConfigurableHandleIdentifierProvider.changeHandle(
-							context, dso.getHandle(), handle, archiveOldHandle);
-					}
-				}
-
-				ConfigurableHandleIdentifierProvider.modifyHandleRecord(
-					context, null, handle, resourceTypeID, resourceID);
-				context.commit();
-							
-				result.setContinue(true);
-				result.setOutcome(true);
-				result.setMessage(T_handle_successfully_saved);
-			}
-			catch(Exception e) {
-				result.setMessage(T_handle_saving_failed);
-				log.error(e.getMessage());
-			}
 		}
-		
+
+		if (result.getErrors() != null) {
+			return result;
+		}
+
+		// this is meant for handles only
+		Handle handle_inst = null;
+		try {
+
+			if (handleID == -1) {
+				handle_inst = ConfigurableHandleIdentifierProvider.resolveToHandle(
+                    context, handle_str);
+				if ( null == handle_inst ) {
+					new ConfigurableHandleIdentifierProvider().register(
+                        context, null, handle_str);
+					handle_inst = ConfigurableHandleIdentifierProvider.resolveToHandle(
+                        context, handle_str);
+				}
+
+			}else {
+				handle_inst = ConfigurableHandleIdentifierProvider.resolveToHandle(
+					context, handleID);
+			}
+			if ( null == handle_inst ) {
+				log.error( "Could not find the handle which should be changed, handle_id="
+					+ String.valueOf(handleID) );
+				result.setMessage(T_handle_saving_failed);
+				return result;
+			}
+
+			ConfigurableHandleIdentifierProvider.modifyHandle(
+				context, handle_inst, handle_str, resourceTypeID, resourceID, url, archiveOldHandle);
+
+			context.commit();
+
+			result.setContinue(true);
+			result.setOutcome(true);
+			result.setMessage(T_handle_successfully_saved);
+		}
+		catch(Exception e) {
+			result.setMessage(T_handle_saving_failed);
+			log.error(e.getMessage());
+		}
+
 		return result;
 	}
 	
@@ -134,10 +145,9 @@ public class FlowHandleUtils {
 	 * @param archiveOldHandles Should the former handles be archived?
 	 * @return A results object.
 	 */
-	public static FlowResult changeHandlePrefix(Context context, String oldPrefix, String newPrefix, boolean archiveOldHandles) throws SQLException, AuthorizeException, IOException
+	public static FlowResult changePrefix(Context context, String oldPrefix, String newPrefix, boolean archiveOldHandles) throws SQLException, AuthorizeException, IOException
 	{
 		FlowResult result = new FlowResult();		
-
    		result.setContinue(false);
     	result.setOutcome(false);		
 		
@@ -183,34 +193,23 @@ public class FlowHandleUtils {
 	 * @param handleID ID of handle to be removed.
 	 * @return A results object.
 	 */
-	public static FlowResult processDeleteHandle(Context context, int handleID) throws SQLException, AuthorizeException, IOException
+	public static FlowResult processDelete(Context context, int handleID) throws SQLException, AuthorizeException, IOException
 	{
-		FlowResult result = new FlowResult();	
-		
+		FlowResult result = new FlowResult();
 		result.setContinue(true);
-    	result.setOutcome(true);
+		result.setOutcome(true);
 		result.setMessage(T_handle_deletion_failed);
-		
+
+
 		try {
+			ConfigurableHandleIdentifierProvider.permanent_remove(context, handleID);
 
-			IdentifierService pid_service =
-				new DSpace().getSingletonService(IdentifierService.class);
-			DSpaceObject dso = ConfigurableHandleIdentifierProvider.resolveToObject(
-				context, handleID);
-
-			if ( null != dso ) {
-				pid_service.delete(context, dso);
-			}
-
-	   		context.commit();
- 
 	   		result.setContinue(true);
 	    	result.setOutcome(true);
 			result.setMessage(T_handle_successfully_deleted);
 		}
 		catch(Exception e) {
 			log.error(e.getMessage());
-			context.abort();
 		}
     	
     	return result;

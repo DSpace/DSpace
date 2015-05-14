@@ -8,27 +8,16 @@
 
 package cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.handle;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-
 import cz.cuni.mff.ufal.dspace.handle.ConfigurableHandleIdentifierProvider;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.CheckBox;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.Item;
-import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Select;
-import org.dspace.app.xmlui.wing.element.Text;
-import org.dspace.core.Constants;
-import org.dspace.handle.HandleManager;
+import org.dspace.app.xmlui.wing.element.*;
 
-import cz.cuni.mff.ufal.dspace.content.Handle;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  * Enable administrator to change handle prefix  

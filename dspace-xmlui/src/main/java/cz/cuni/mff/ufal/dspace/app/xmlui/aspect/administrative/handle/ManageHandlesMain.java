@@ -15,9 +15,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import cz.cuni.mff.ufal.dspace.content.Handle;
-import cz.cuni.mff.ufal.dspace.content.HandleComparatorFactory;
-import cz.cuni.mff.ufal.dspace.handle.ConfigurableHandleIdentifierProvider;
+import cz.cuni.mff.ufal.dspace.handle.Handle;
+import cz.cuni.mff.ufal.dspace.handle.HandleComparatorFactory;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.log4j.Logger;
@@ -148,7 +147,8 @@ public class ManageHandlesMain extends AbstractDSpaceTransformer {
 				: Integer.parseInt(resultsPerPageParam);
 
 		// Retrieve records
-		java.util.List<Handle> handles = ConfigurableHandleIdentifierProvider.findAll(context);
+		java.util.List<Handle> handles = Handle.findAll(
+			context);
 		sortHandles(handles, sort, order);
 
 		// Calculate

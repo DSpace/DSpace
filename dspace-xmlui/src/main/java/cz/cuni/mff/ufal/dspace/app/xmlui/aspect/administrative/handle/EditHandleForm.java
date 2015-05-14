@@ -30,7 +30,7 @@ import org.dspace.core.Constants;
 //use apache.commons instead
 import org.apache.commons.lang3.StringUtils;
 
-import cz.cuni.mff.ufal.dspace.content.Handle;
+import cz.cuni.mff.ufal.dspace.handle.Handle;
 
 /**
  * Enable administrator to edit handle  

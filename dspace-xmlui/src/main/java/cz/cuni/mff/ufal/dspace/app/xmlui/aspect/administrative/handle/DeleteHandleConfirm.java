@@ -23,7 +23,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Constants;
 import org.dspace.handle.HandleManager;
 
-import cz.cuni.mff.ufal.dspace.content.Handle;
+import cz.cuni.mff.ufal.dspace.handle.Handle;
 
 /**
  * Present the user with a soon-to-be-deleted Handle. 
@@ -91,7 +91,7 @@ public class DeleteHandleConfirm extends AbstractDSpaceTransformer
             }
         }
 		
-		Handle h = Handle.find(context,id);
+		Handle h = Handle.find(context, id);
      
     	Division deleted = body.addInteractiveDivision("handle-confirm-delete",
     			contextPath+"/admin/handles",Division.METHOD_POST,"alert alert-danger");
