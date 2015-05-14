@@ -207,8 +207,8 @@ fresh_install: update_lindat_common
 
 # Grant rights to installation
 grant_rights:
-	sudo chown -R $(TOMCAT_USER):$(TOMCAT_GROUP) $(DIR_INSTALLATION)
-	sudo chmod -R g+w $(DIR_INSTALLATION)
+	sudo chown -R $(TOMCAT_USER):$(TOMCAT_GROUP) $(DIR_INSTALLATION)/
+	sudo chmod -R g+w $(DIR_INSTALLATION)/
 	
 # maven uses prerequisites to check for mvn version
 # keep this here for non _guru builds
