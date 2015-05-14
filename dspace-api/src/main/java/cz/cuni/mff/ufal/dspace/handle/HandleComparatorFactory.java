@@ -1,5 +1,5 @@
 /* Created for LINDAT/CLARIN */
-package cz.cuni.mff.ufal.dspace.content;
+package cz.cuni.mff.ufal.dspace.handle;
 
 import java.util.Comparator;
 
@@ -10,7 +10,7 @@ import org.dspace.sort.SortOption;
  * 
  * @author Michal Josífko 
  */
-public class HandleComparatorFactory {	
+public class HandleComparatorFactory {
 	
 	public static Comparator<Handle> createComparatorByID(final String order) {
 		return new Comparator<Handle>() {

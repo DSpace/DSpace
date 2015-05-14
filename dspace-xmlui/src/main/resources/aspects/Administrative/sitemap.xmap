@@ -1027,16 +1027,16 @@ to administer DSpace.
 		        	<!-- Handle management pages -->
 		        	
 		        		<!--
-		        			The main handle management page allows handles to be browsed, 
+		        			The main handle management page allows handles to be browsed,
 		        			and selected to be edited or deleted and enables to change prefix
 		        			of handles.
 		        			-->
 		        		<map:match pattern="admin/handle/main">
-		        			<map:transform type="ManageHandlesMain" />		        						        			
+		        			<map:transform type="ManageHandlesMain" />
 		        		</map:match>		        		
 		        		
 		        		<!--
-		        			The add handle page allows the user to enter metadata about 
+		        			The add handle page allows the user to enter metadata about
 		        			a yet-to-be-created handle. Once completed then a handle is
 		        			created.
 		        			-->

@@ -235,15 +235,14 @@ public class HandlePlugin implements HandleStorage
             {
                 // try with old prefix
                 
-                String prefix = ConfigurableHandleIdentifierProvider.extractHandlePrefix(handle);
-                String suffix = ConfigurableHandleIdentifierProvider.extractHandleSuffix(handle);
-                                
-                String[] alternativePrefixes = PIDConfiguration.getAlternativePrefixes(prefix);
+                String[] handle_parts = ConfigurableHandleIdentifierProvider.splitHandle(handle);
+
+                String[] alternativePrefixes = PIDConfiguration.getAlternativePrefixes(handle_parts[0]);
                 
                 for ( String alternativePrefix : alternativePrefixes )
                 {
                     String alternativeHandle = ConfigurableHandleIdentifierProvider.completeHandle(
-                        alternativePrefix, suffix);
+                        alternativePrefix, handle_parts[1]);
                     url = HandleManager.resolveToURL(context, alternativeHandle);
                     if ( null != url ) {
                         break;
