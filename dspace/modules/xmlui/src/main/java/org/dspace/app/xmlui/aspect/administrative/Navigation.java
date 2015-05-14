@@ -367,7 +367,7 @@ CacheableProcessingComponent
             drum.addItemXref(contextPath + "/embargo-list", T_DRUM_embargo_list);
             drum.addItemXref(contextPath + "/admin/etd_departments",
                     T_DRUM_ETD_departments);
-            drum.addItemXref(contextPath + "/units", T_DRUM_units);
+            drum.addItemXref(contextPath + "/admin/units", T_DRUM_units);
             // End DRUM Customizations
 
             epeople.setHead(T_administrative_access_control);

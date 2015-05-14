@@ -912,6 +912,8 @@
     <message key="xmlui.administrative.FlowEPersonUtils.delete_eperson_failed_notice">The user(s) listed were not deleted because there are constraints preventing them from being deleted, see the eperson detail page for more information.</message>
     <message key="xmlui.administrative.FlowGroupUtils.edit_group_success_notice">The group was edited successfully.</message>
     <message key="xmlui.administrative.FlowGroupUtils.delete_group_success_notice">The selected groups were deleted successfully.</message>
+    <message key="xmlui.administrative.FlowUnitsUtils.edit_unit_success_notice">The unit was edited successfully.</message>
+    <message key="xmlui.administrative.FlowUnitsUtils.delete_unit_success_notice">The selected units were deleted successfully.</message>
     <message key="xmlui.administrative.FlowETDDepartmentUtils.edit_etd_department_success_notice">The ETD Department was edited successfully.</message>
     <message key="xmlui.administrative.FlowETDDepartmentUtils.delete_etd_department_success_notice">The selected ETD Departments were deleted successfully.</message>
     <message key="xmlui.administrative.FlowRegistryUtils.add_metadata_schema_success_notice">New schema has been successfully created.</message>
@@ -1139,6 +1141,75 @@
     <message key="xmlui.administrative.group.DeleteGroupsConfirm.column2">Name</message>
     <message key="xmlui.administrative.group.DeleteGroupsConfirm.column3">E-People</message>
     <message key="xmlui.administrative.group.DeleteGroupsConfirm.column4">Groups</message>
+
+    <!-- general items for all of the unit classes -->
+    <message key="xmlui.administrative.units.general.unit_trail">Manage Units</message>
+
+    <!-- org.dspace.app.xmlui.administrative.units.ManageUnitsMain -->
+    <message key="xmlui.administrative.units.ManageUnitsMain.title">Manage Units</message>
+    <message key="xmlui.administrative.units.ManageUnitsMain.main_head">Unit management</message>
+    <message key="xmlui.administrative.units.ManageUnitsMain.actions_head">Actions</message>
+    <message key="xmlui.administrative.units.ManageUnitsMain.actions_create">Create a new unit</message>
+    <message key="xmlui.administrative.units.ManageUnitsMain.actions_create_link">Click here to add a new Unit.</message>
+    <message key="xmlui.administrative.units.ManageUnitsMain.actions_browse">Browse units</message>
+    <message key="xmlui.administrative.units.ManageUnitsMain.actions_browse_link">Click here to browse all Units.</message>
+    <message key="xmlui.administrative.units.ManageUnitsMain.actions_search">Search for units</message>
+    <message key="xmlui.administrative.units.ManageUnitsMain.search_help">Units are searched by any partial match on their name</message>
+    <message key="xmlui.administrative.units.ManageUnitsMain.search_head">Search results</message>
+    <message key="xmlui.administrative.units.ManageUnitsMain.search_column1"></message>
+    <message key="xmlui.administrative.units.ManageUnitsMain.search_column2">ID</message>
+    <message key="xmlui.administrative.units.ManageUnitsMain.search_column3">Name</message>
+    <message key="xmlui.administrative.units.ManageUnitsMain.search_column4">Members</message>
+    <message key="xmlui.administrative.units.ManageUnitsMain.search_column5">Community / Collection</message>
+    <message key="xmlui.administrative.units.ManageUnitsMain.collection_link">View</message>
+    <message key="xmlui.administrative.units.ManageUnitsMain.submit_delete">Delete units</message>
+    <message key="xmlui.administrative.units.ManageUnitsMain.no_results">Your search found no results...</message>
+
+    <!-- org.dspace.app.xmlui.administrative.units.EditUnitsForm -->
+    <message key="xmlui.administrative.units.EditUnitsForm.title">Unit Editor</message>
+    <message key="xmlui.administrative.units.EditUnitsForm.trail">Edit unit</message>
+    <message key="xmlui.administrative.units.EditUnitsForm.main_head">Unit Editor: {0} (id: {1})</message>
+    <message key="xmlui.administrative.units.EditUnitsForm.main_head_new">Unit Editor: new unit</message>
+    <message key="xmlui.administrative.units.EditUnitsForm.submit_clear">Clear search</message>
+    <message key="xmlui.administrative.units.EditUnitsForm.member">Member</message>
+    <message key="xmlui.administrative.units.EditUnitsForm.cycle">Cycle</message>
+    <message key="xmlui.administrative.units.EditUnitsForm.pending">Pending</message>
+    <message key="xmlui.administrative.units.EditUnitsForm.pending_warn">Note, pending changes are not saved until you click the save button.</message>
+    <message key="xmlui.administrative.units.EditUnitsForm.submit_add">Add</message>
+    <message key="xmlui.administrative.units.EditUnitsForm.submit_remove">Remove</message>
+    <message key="xmlui.administrative.units.EditUnitsForm.collection_para">This unit is associated with collection: </message>
+    <message key="xmlui.administrative.units.EditUnitsForm.community_para">This unit is associated with community: </message>
+    <message key="xmlui.administrative.units.EditUnitsForm.label_name">Change unit name: </message>
+    <message key="xmlui.administrative.units.EditUnitsForm.label_instructions">This unit is associated with a specific collection or community and the name cannot be modified.</message>
+    <message key="xmlui.administrative.units.EditUnitsForm.label_search">Search members to add: </message>
+    <message key="xmlui.administrative.units.EditUnitsForm.submit_search_groups">Groups...</message>
+    <message key="xmlui.administrative.units.EditUnitsForm.no_results">Your search found no results...</message>
+    <message key="xmlui.administrative.units.EditUnitsForm.units_column1">ID</message>
+    <message key="xmlui.administrative.units.EditUnitsForm.units_column2">Name</message>
+    <message key="xmlui.administrative.units.EditUnitsForm.units_column3">Members</message>
+    <message key="xmlui.administrative.units.EditUnitsForm.units_column4">Collection</message>
+    <message key="xmlui.administrative.units.EditUnitsForm.units_column5"></message>
+    <message key="xmlui.administrative.units.ManageUnitsMain.units_collection_link">view</message>
+    <message key="xmlui.administrative.units.EditUnitsForm.members_head">Members</message>
+    <message key="xmlui.administrative.units.EditUnitsForm.members_column1">ID</message>
+    <message key="xmlui.administrative.units.EditUnitsForm.members_column2">Name</message>
+    <message key="xmlui.administrative.units.EditUnitsForm.members_column3">Email</message>
+    <message key="xmlui.administrative.units.EditUnitsForm.members_column4"></message>
+    <message key="xmlui.administrative.units.EditUnitsForm.members_group_name">unit: {0}</message>
+    <message key="xmlui.administrative.units.EditUnitsForm.members_none">This unit has no members.</message>
+    <message key="xmlui.administrative.units.EditUnitsForm.members_pending">[pending]</message>
+    <message key="xmlui.administrative.units.EditUnitsForm.instructions_para">Remove members</message>
+    <message key="xmlui.administrative.units.EditUnitsForm.collection_link_para">Remove members</message>
+
+    <!-- org.dspace.app.xmlui.administrative.units.DeleteUnitsConfirm -->
+    <message key="xmlui.administrative.units.DeleteUnitsConfirm.title">Confirm Unit Deletion</message>
+    <message key="xmlui.administrative.units.DeleteUnitsConfirm.trail">Confirm Delete</message>
+    <message key="xmlui.administrative.units.DeleteUnitsConfirm.head">Confirm Deletion</message>
+    <message key="xmlui.administrative.units.DeleteUnitsConfirm.para">The following Units will be deleted:</message>
+    <message key="xmlui.administrative.units.DeleteUnitsConfirm.column1">ID</message>
+    <message key="xmlui.administrative.units.DeleteUnitsConfirm.column2">Name</message>
+    <message key="xmlui.administrative.units.DeleteUnitsConfirm.column3">Units</message>
+    <message key="xmlui.administrative.units.DeleteUnitsConfirm.column4">Units</message>
 
     <!-- general items for all of the etd_department classes -->
     <message key="xmlui.administrative.etd_departments.general.etd_department_trail">Manage ETD Departments</message>
