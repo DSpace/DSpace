@@ -914,14 +914,14 @@
     <message key="xmlui.Submission.submit.UFALLicenseStep.define.error">There was a problem while adding your license. Probably, you do not have appropriate access rights. Please, go back and/or contact the administrator.</message>
     <message key="xmlui.Submission.submit.UFALLicenseStep.delete.error">There was a problem while deleting a license. Probably, you do not have appropriate access rights. Please, go back and/or contact the administrator.</message>        
     <message key="xmlui.Submission.submit.UFALLicenseStep.define.empty_label">Empty label</message>
-    <message key="xmlui.Submission.submit.UFALLicenseStep.license_not_supported">The selected license is not supported at the moment. Please follow the procedure described under section "None of these licenses suits your needs".</message>    
-    
-    
+    <message key="xmlui.Submission.submit.UFALLicenseStep.license_not_supported">The selected license is not supported at the moment. Please follow the procedure described under section "None of these licenses suits your needs".</message>
+
+
     <!-- cz.cuni.mff.ufal.UFALLicenceAgreement -->
     <message key="xmlui.ufal.UFALLicenceAgreement.title">Licence Agreement</message>
     <message key="xmlui.ufal.UFALLicenceAgreement.head">Licence Agreement</message>
     <message key="xmlui.ufal.UFALLicenceAgreement.trail_item">Item</message>
-    <message key="xmlui.ufal.UFALLicenceAgreement.trail_license_agreement">Licence Agreement</message>      
+    <message key="xmlui.ufal.UFALLicenceAgreement.trail_license_agreement">Licence Agreement</message>
     <message key="xmlui.ufal.UFALLicenceAgreement.agree_message">The requested content is distributed under one or more licence(s). You have to agree to the licence(s) below before you can obtain the content. Please, read the licence(s) by clicking on the button(s) carefully.</message>
     <message key="xmlui.ufal.UFALLicenceAgreement.functionality_blocked">UFALLicenceAgreement functionality has been blocked at configuration file.</message>
     <message key="xmlui.ufal.UFALLicenceAgreement.signer_message">By clicking on the button below I, SIGNER with the above ID, agree to the <b>LICENCE(s)</b> restricting the usage of requested BITSTREAM(s).</message>
@@ -930,10 +930,10 @@
     <message key="xmlui.ufal.UFALLicenceAgreement.signer_agree">I AGREE</message>
 
     <!-- cz.cuni.mff.ufal.UFALLicenceAgreementAgreed -->
-    <message key="xmlui.ufal.UFALLicenceAgreementAgreed.title">UFAL Licence Agreement</message>
-    <message key="xmlui.ufal.UFALLicenceAgreementAgreed.head">UFAL Licence Agreed</message>
+    <message key="xmlui.ufal.UFALLicenceAgreementAgreed.title">Repository Licence Agreement</message>
+    <message key="xmlui.ufal.UFALLicenceAgreementAgreed.head">Repository Licence Agreed</message>
     <message key="xmlui.ufal.UFALLicenceAgreementAgreed.trail_item">Item</message>
-    <message key="xmlui.ufal.UFALLicenceAgreementAgreed.trail_license_agreed">Licence Agreement</message>       
+    <message key="xmlui.ufal.UFALLicenceAgreementAgreed.trail_license_agreed">Licence Agreement</message>
     <message key="xmlui.ufal.UFALLicenceAgreementAgreed.agree_message">If you want to see the content you have to agree the licence(s) below:</message>
     <message key="xmlui.ufal.UFALLicenceAgreementAgreed.functionality_blocked">UFALLicenceAgreement functionality has been blocked at configuration file.</message>
     <message key="xmlui.ufal.UFALLicenceAgreementAgreed.signer_message">By following this link I, SIGNER with above ID, agree with the <b>LICENSE</b> restricting the usage of the this BISTREAM.</message>
@@ -1100,7 +1100,7 @@
     <message key="xmlui.Submission.submit.LicenseStep.decision_label">Distribution agreement</message>
 	<message key="xmlui.Submission.submit.LicenseStep.decision_checkbox">By checking this box, you agree to the Distribution License Agreement for this repository to reproduce, translate and distribute your submissions worldwide.</message>
 	<message key="xmlui.Submission.submit.LicenseStep.decision_error">You must grant this license to complete your submission. If you are unable to grant this license at this time you may save your work and return later or remove the submission by clicking the 'Save &amp; Exit' button below.</message>
-	
+
 
     <message key="xmlui.Submission.submit.LicenseStep.morelicense_head">None of these licenses suits your needs</message>
     <message key="xmlui.Submission.submit.LicenseStep.morelicense_line1">If you need to use a license we currently do not offer, proceed as follows:</message>
@@ -1108,14 +1108,14 @@
     <message key="xmlui.Submission.submit.LicenseStep.morelicense_line3">Send an email to <a class="helpdesk-tolink">Help Desk</a> with the license details.</message>
     <message key="xmlui.Submission.submit.LicenseStep.morelicense_line4">Save the unfinished submission and wait. We will add the license to the selection list and contact you.</message>
     <message key="xmlui.Submission.submit.LicenseStep.morelicense_line5">You will be able to continue the submission afterwards.</message>
-    
+
     <message key="xmlui.Submission.submit.LicenseStep.distribution_license_head">Read and accept the </message>
     <message key="xmlui.Submission.submit.LicenseStep.distribution_license_head_link">Distribution License Agreement</message>
     <message key="xmlui.Submission.submit.LicenseStep.license_list_alert">For the list of all supported licenses and their details visit </message>
-    <message key="xmlui.Submission.submit.LicenseStep.license_list_alert_link">License List Page</message>    
+    <message key="xmlui.Submission.submit.LicenseStep.license_list_alert_link">License List Page</message>
     <message key="xmlui.Submission.submit.LicenseStep.resource_license_text">If you know under which license you want to distribute your work, please select from the list or click the license selector button for help.</message>
     <message key="xmlui.Submission.submit.LicenseStep.license_selector_button">OPEN License Selector</message>
-    
+
 
 	<!-- org.dspace.app.xmlui.Submission.submit.RemovedStep -->
 	<message key="xmlui.Submission.submit.RemovedStep.head">Submission removed</message>
@@ -1740,10 +1740,10 @@
 	<message key="xmlui.administrative.item.ConfirmItemForm.trail">Confirm</message>
 	<message key="xmlui.administrative.item.ConfirmItemForm.head1">Modify item: {0}</message>
     <message key="xmlui.administrative.item.ConfirmItemForm.para_delete"><p><b>Are you sure this item should be permanently deleted?</b></p>
-    <p>In most cases the item should <b>NOT</b> be permanently deleted. Once the item has been published it should remain available.</p>    
+    <p>In most cases the item should <b>NOT</b> be permanently deleted. Once the item has been published it should remain available.</p>
     <p>In rare situations it might be necessary to <b>WITHDRAW</b> an item by Withdraw Item operation which will retain all the data, but will
     make the item publicly unavailable. In case of withdrawing an item due to being a duplicate of an existing item, it would be also appropriate
-    to redirect the handle to the original item, so that the user gets a meaningful response when trying to access the withdrawn item.</p>    
+    to redirect the handle to the original item, so that the user gets a meaningful response when trying to access the withdrawn item.</p>
     <p>In case you have any doubts please contact the <a class="helpdesk-tolink">Help Desk</a>.</p></message>
 	<message key="xmlui.administrative.item.ConfirmItemForm.para_withdraw">Are you sure this item should be withdrawn from the archive?</message>
 	<message key="xmlui.administrative.item.ConfirmItemForm.para_reinstate">Are you sure this item should be reinstated to the archive?</message>
@@ -1880,10 +1880,10 @@
     <message key="xmlui.administrative.item.DefineLicenseForm.unknown_error">Unable to add the license.</message>
 
     <!-- cz.cuni.mff.ufal.administrative.LicenseForm -->
-    <message key="xmlui.administrative.LicenseForm.title">UFAL Licenses</message>
+    <message key="xmlui.administrative.LicenseForm.title">Repository Licenses</message>
     <message key="xmlui.administrative.LicenseForm.trail">Licenses</message>
     <message key="xmlui.administrative.LicenseForm.head1">Manage Licenses</message>
-    
+
     <!-- These keys will map to the labels for extra license fields in LicenseForm -->
     <message key="xmlui.ExtraLicenseField.LicenseForm.SEND_TOKEN">The user will receive an email with download instructions.</message>
     <message key="xmlui.ExtraLicenseField.LicenseForm.NAME">User Name</message>
@@ -1891,8 +1891,8 @@
     <message key="xmlui.ExtraLicenseField.LicenseForm.ADDRESS">Address</message>
     <message key="xmlui.ExtraLicenseField.LicenseForm.COUNTRY">Country</message>
     <message key="xmlui.ExtraLicenseField.LicenseForm.EXTRA_EMAIL">Ask user for another email address</message>
-    <message key="xmlui.ExtraLicenseField.LicenseForm.ORGANIZATION">Ask user for organization.</message>    
-    
+    <message key="xmlui.ExtraLicenseField.LicenseForm.ORGANIZATION">Ask user for organization.</message>
+
     <!-- These keys will map to the labels for extra license fields during LicenseStep in submission -->
     <message key="xmlui.ExtraLicenseField.submission.SEND_TOKEN">You will receive an email with download instructions.</message>
     <message key="xmlui.ExtraLicenseField.submission.NAME">Name (given name and surname)</message>
@@ -1900,7 +1900,7 @@
     <message key="xmlui.ExtraLicenseField.submission.ADDRESS">Address</message>
     <message key="xmlui.ExtraLicenseField.submission.COUNTRY">Country</message>
     <message key="xmlui.ExtraLicenseField.submission.EXTRA_EMAIL">Email</message>
-    <message key="xmlui.ExtraLicenseField.submission.ORGANIZATION">Organization</message>    
+    <message key="xmlui.ExtraLicenseField.submission.ORGANIZATION">Organization</message>
 
 	<!-- org.dspace.app.xmlui.administrative.item.FindItemForm -->
 	<message key="xmlui.administrative.item.FindItemForm.title">Find Item</message>
@@ -2148,8 +2148,8 @@
     <message key="xmlui.administrative.ControlPanel.option_dspace_check_exceptions">Dspace Log(s)</message>
     <message key="xmlui.administrative.ControlPanel.option_shibSession">Shibboleth Session</message>
     <message key="xmlui.administrative.ControlPanel.option_clarinTest">CLARIN SPF Test</message>
-  <message key="xmlui.administrative.ControlPanel.option_check_is_logging">Verify Logging</message>
-  <message key="xmlui.administrative.ControlPanel.option_ufal_main">Ufal summary</message>
+    <message key="xmlui.administrative.ControlPanel.option_check_is_logging">Verify Logging</message>
+    <message key="xmlui.administrative.ControlPanel.option_ufal_main">Repository summary</message>
     <message key="xmlui.administrative.ControlPanel.option_releasenotes">Release notes</message>
     <message key="xmlui.administrative.ControlPanel.handle_list">Handle List</message>
     <message key="xmlui.administrative.ControlPanel.option_statistics">Statistics</message>
@@ -2158,8 +2158,8 @@
 	<message key="xmlui.administrative.community.general.community_trail">Communities</message>
 	<message key="xmlui.administrative.community.general.options_metadata">Edit Metadata</message>
 	<message key="xmlui.administrative.community.general.options_roles">Assign Roles</message>
-        <message key="xmlui.administrative.community.general.options_curate">Curate</message>
-        <message key="xmlui.administrative.community.general.options_queue">Queue</message>
+    <message key="xmlui.administrative.community.general.options_curate">Curate</message>
+    <message key="xmlui.administrative.community.general.options_queue">Queue</message>
 
 	<!-- org.dspace.app.xmlui.administrative.community.AssignCommunityRoles.java -->
 	<message key="xmlui.administrative.community.AssignCommunityRoles.title">Edit Community Roles</message>
@@ -2314,9 +2314,9 @@
     <message key="xmlui.administrative.handle.general.resource_id">Resource ID</message>
     <message key="xmlui.administrative.handle.general.yes">Yes</message>
     <message key="xmlui.administrative.handle.general.no">No</message>
-    <message key="xmlui.administrative.handle.general.required_field">This field is required</message>            
-    
-    <!-- cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.handle.ManageHandlesMain -->    
+    <message key="xmlui.administrative.handle.general.required_field">This field is required</message>
+
+    <!-- cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.handle.ManageHandlesMain -->
     <message key="xmlui.administrative.handle.ManageHandlesMain.title">Handles</message>
     <message key="xmlui.administrative.handle.ManageHandlesMain.head">Handles</message>
     <message key="xmlui.administrative.handle.ManageHandlesMain.trail">Handles</message>
@@ -2328,40 +2328,40 @@
 	<message key="xmlui.administrative.handle.ManageHandlesMain.delete_handle">Delete handle</message>
 	<message key="xmlui.administrative.handle.ManageHandlesMain.edit_handle">Edit handle</message>
 	<message key="xmlui.administrative.handle.ManageHandlesMain.change_handle_prefix">Change handle prefix</message>
-	
-	<!-- cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.handle.EditHandleForm -->	
+
+	<!-- cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.handle.EditHandleForm -->
 	<message key="xmlui.administrative.handle.EditHandleForm.edit_handle_trail">Edit Handle</message>
-	<message key="xmlui.administrative.handle.EditHandleForm.edit_handle_title">Edit Handle</message>		
+	<message key="xmlui.administrative.handle.EditHandleForm.edit_handle_title">Edit Handle</message>
 	<message key="xmlui.administrative.handle.EditHandleForm.edit_handle_head">Edit Handle</message>
 	<message key="xmlui.administrative.handle.EditHandleForm.new_handle_trail">New Handle</message>
-	<message key="xmlui.administrative.handle.EditHandleForm.new_handle_title">New Handle</message>		
+	<message key="xmlui.administrative.handle.EditHandleForm.new_handle_title">New Handle</message>
 	<message key="xmlui.administrative.handle.EditHandleForm.new_handle_head">New Handle</message>
 	<message key="xmlui.administrative.handle.EditHandleForm.archive_old_handle">Archive old handle?</message>
-	
-	<!-- cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.handle.DeleteHandleConfirm -->	
+
+	<!-- cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.handle.DeleteHandleConfirm -->
 	<message key="xmlui.administrative.handle.DeleteHandleConfirm.title">Confirm Handle Deletion</message>
-	<message key="xmlui.administrative.handle.DeleteHandleConfirm.trail">Confirm Handle Deletion</message>	
+	<message key="xmlui.administrative.handle.DeleteHandleConfirm.trail">Confirm Handle Deletion</message>
 	<message key="xmlui.administrative.handle.DeleteHandleConfirm.head">Confirm Handle Deletion</message>
 	<message key="xmlui.administrative.handle.DeleteHandleConfirm.help">Are you sure you want to delete this handle? This action cannot be undone.</message>
-	
+
 	<!-- cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.handle.ChangeHandlePrefixForm -->
 	<message key="xmlui.administrative.handle.ChangeHandlePrefixForm.title">Change Handle Prefix</message>
-	<message key="xmlui.administrative.handle.ChangeHandlePrefixForm.trail">Change Handle Prefix</message>	
+	<message key="xmlui.administrative.handle.ChangeHandlePrefixForm.trail">Change Handle Prefix</message>
 	<message key="xmlui.administrative.handle.ChangeHandlePrefixForm.head">Change Handle Prefix</message>
 	<message key="xmlui.administrative.handle.ChangeHandlePrefixForm.old_prefix">Old prefix</message>
 	<message key="xmlui.administrative.handle.ChangeHandlePrefixForm.new_prefix">New prefix</message>
 	<message key="xmlui.administrative.handle.ChangeHandlePrefixForm.archive_old_handles">Archive old handles?</message>
-	<message key="xmlui.administrative.handle.ChangeHandlePrefixForm.change">Change</message>	
+	<message key="xmlui.administrative.handle.ChangeHandlePrefixForm.change">Change</message>
     <message key="xmlui.administrative.handle.ChangeHandlePrefixForm.old_prefix_and_new_prefix_must_differ">Old prefix and new prefix must differ.</message>
-    
-	
+
+
 	<!--  cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.FlowHandleUtils -->
-	<message key="xmlui.administrative.handle.FlowHandleUtils.handle_successfully_deleted">Handle successfully deleted</message>    
-   	<message key="xmlui.administrative.handle.FlowHandleUtils.handle_successfully_saved">Handle successfully saved</message>
-	<message key="xmlui.administrative.handle.FlowHandleUtils.prefix_successfully_changed">Handle prefix successfully changed</message>
-	<message key="xmlui.administrative.handle.FlowHandleUtils.handle_deletion_failed">Handle deletion failed</message>
-	<message key="xmlui.administrative.handle.FlowHandleUtils.handle_saving_failed">Handle saving failed</message>
-	<message key="xmlui.administrative.handle.FlowHandleUtils.prefix_change_failed">Handle prefix change failed</message>
+	<message key="xmlui.administrative.handle.FlowHandleUtils.handle_successfully_deleted">Deleted successfully</message>
+   	<message key="xmlui.administrative.handle.FlowHandleUtils.handle_successfully_saved">Updated successfully</message>
+	<message key="xmlui.administrative.handle.FlowHandleUtils.prefix_successfully_changed">Prefix changed successfully</message>
+	<message key="xmlui.administrative.handle.FlowHandleUtils.handle_deletion_failed">Deletion failed</message>
+	<message key="xmlui.administrative.handle.FlowHandleUtils.handle_saving_failed">Update failed</message>
+	<message key="xmlui.administrative.handle.FlowHandleUtils.prefix_change_failed">Prefix change failed</message>
     <!-- </UFAL> -->
 
 	<!-- org.dspace.app.xmlui.administrative.SystemwideAlerts -->
@@ -2375,7 +2375,7 @@
 	<message key="xmlui.administrative.NotAuthorized.para1b">system administrators</message>
 	<message key="xmlui.administrative.NotAuthorized.para1c">.</message>
 	<message key="xmlui.administrative.NotAuthorized.para2">Login as another user</message>
-        
+
         <!-- System-wide Curation Tasks form (org.dspace.app.xmlui.aspect.administrative.CurateForm) -->
         <message key="xmlui.administrative.CurateForm.title">System Curation Tasks</message>
         <message key="xmlui.administrative.CurateForm.trail">Curation Tasks</message>
@@ -2400,13 +2400,13 @@
     <message key="xmlui.statistics.workflow.title">Workflow Statistics</message>
     <message key="xmlui.statistics.visits.total">Total Visits</message>
     <message key="xmlui.statistics.visits.month">Total Visits Per Month</message>
-	<message key="xmlui.statistics.visits.year">Total Visits Per Year</message>    
+	<message key="xmlui.statistics.visits.year">Total Visits Per Year</message>
     <message key="xmlui.statistics.visits.views">Views</message>
     <message key="xmlui.statistics.visits.countries">Top country views</message>
     <message key="xmlui.statistics.visits.cities">Top cities views</message>
     <message key="xmlui.statistics.visits.bitstreams">File Visits</message>
     <message key="xmlui.statistics.Navigation.title">Statistics</message>
-    <message key="xmlui.statistics.Navigation.view">View Statistics</message>    
+    <message key="xmlui.statistics.Navigation.view">View Statistics</message>
     <message key="xmlui.statistics.Navigation.usage.view">View Usage Statistics</message>
     <message key="xmlui.statistics.Navigation.usage-Elasticsearch.view">View Usage Statistics</message>
     <message key="xmlui.statistics.Navigation.search.view">View Search Statistics</message>
