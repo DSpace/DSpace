@@ -110,6 +110,7 @@
         <!--The search filters which can be used on the discovery search page-->
         <property name="searchFilters">
             <list>
+                <ref bean="searchFilterAuthorContributor" />
                 <ref bean="searchFilterContentType" />
                 <ref bean="searchFilterTitle" />
                 <ref bean="searchFilterAuthor" />
@@ -419,6 +420,26 @@
         <property name="metadataFields">
             <list>
                 <value>dc.type</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrder" value="COUNT"/>
+    </bean>
+
+    <bean id="searchFilterAdvisor" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="authorcontributor"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.contributor</value>
+                <value>dc.contributor.advisor</value>
+                <value>dc.contributor.author</value>
+                <value>dc.contributor.corporatename</value>
+                <value>dc.contributor.editor</value>
+                <value>dc.contributor.illustrator</value>
+                <value>dc.contributor.meetingname</value>
+                <value>dc.contributor.other</value>
+                <value>dc.contributor.sponsor</value>
+                <value>dc.creator</value>
             </list>
         </property>
         <property name="facetLimit" value="5"/>
