@@ -289,6 +289,7 @@ public class FlowEPersonUtils {
 		FlowResult result = null;
 		if ( null != eperson ) {
 			eperson.setNetid(null);
+			eperson.update();
 			result = new FlowResult();
 			result.setContinue(true);
 			result.setOutcome(true);
