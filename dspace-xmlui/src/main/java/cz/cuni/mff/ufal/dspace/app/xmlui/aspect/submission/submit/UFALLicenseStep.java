@@ -64,6 +64,8 @@ public class UFALLicenseStep extends LicenseStep {
 	protected static final Message T_more_licenses_line5 = message("xmlui.Submission.submit.LicenseStep.morelicense_line5");
 	protected static final Message T_license_detail = message("xmlui.Submission.submit.UFALLicenseStep.license_detail");
 	protected static final Message T_license_not_supported = message("xmlui.Submission.submit.UFALLicenseStep.license_not_supported");
+	protected static final Message T_review_msg= message("xmlui.Submission.submit.UFALLicenseStep.review_no_file");
+	protected static final Message T_review_license_error= message("xmlui.Submission.submit.UFALLicenseStep.review_license_error");
 
 	
 	//
@@ -269,6 +271,11 @@ public class UFALLicenseStep extends LicenseStep {
 			AuthorizeException {
 		// Create a new list section for this step (and set its heading)
 		if (this.getPage() == 1) {
+			List licenseSection = reviewList.addList("submit-review-"
+                + this.stepAndPage, List.TYPE_FORM);
+
+			licenseSection.setHead(T_head);
+			
 			IFunctionalities licenseManager = DSpaceApi
 					.getFunctionalityManager();
 			licenseManager.openSession();
@@ -277,15 +284,9 @@ public class UFALLicenseStep extends LicenseStep {
 					.getItem();
 			// assert 0 < item.getBundles().length; //XXX: we allow submissions
 			// with no items, not sure if this should hold
-			if (item.getBundles().length > 0) {
+			if (item.getBundles("ORIGINAL").length > 0) {
 				Bundle bundle = item.getBundles()[0];
 				if (bundle.getBitstreams().length > 0) {
-
-					List licenseSection = reviewList.addList("submit-review-"
-							+ this.stepAndPage, List.TYPE_FORM);
-
-					licenseSection.setHead(T_head);
-
 					Bitstream bitstream = bundle.getBitstreams()[0];
 					java.util.List<LicenseDefinition> present_licenses = licenseManager
 							.getLicenses(bitstream.getID());
@@ -298,10 +299,17 @@ public class UFALLicenseStep extends LicenseStep {
 						}
 						licenseManager.closeSession();
 						return licenseSection;
+					}else{
+						Item errorMsg = licenseSection.addItem(null, "alert alert-danger");
+						errorMsg.addContent(T_review_license_error);
+						licenseManager.closeSession();
+						return licenseSection;
 					}
 				}
-				licenseManager.closeSession();
 			}
+			licenseManager.closeSession();
+			licenseSection.addItem(T_review_msg);
+			return licenseSection;
 		}
 		return null;
 	}
