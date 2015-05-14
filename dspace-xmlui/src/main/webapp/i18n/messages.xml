@@ -69,7 +69,7 @@
 
 
 	<!--
-		This section is for feed syndications (RSS, atom, etc)
+		This section is for feed syndication (RSS, atom, etc)
 	-->
     <message key="xmlui.feed.general_description">The UFAL digital repository system captures, stores, indexes, preserves, and distributes digital research material.</message>
     <message key="xmlui.feed.header">RSS Feeds</message>
@@ -157,7 +157,7 @@
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.not">NOT</message>
 
 
-	<!-- org.dspace.app.xmlui.artifactbrowser.ConfigureableBrowse.java -->
+	<!-- org.dspace.app.xmlui.artifactbrowser.ConfigurableBrowse.java -->
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.starts_with">Or enter first few letters:</message>
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.starts_with_help">Browse for items that begin with these letters</message>
     <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.jump_select">Jump to a point in the index</message>
@@ -621,10 +621,10 @@
     <message key="xmlui.EPerson.LoginChooser.head1">Login Methods Available</message>
 	<message key="xmlui.EPerson.LoginChooser.para1">Log in via:</message>
     <message key="xmlui.EPerson.LoginChooser.discojuiceComment">Use this to login with credentials of your "home" institution (e.g. eduGAIN institutions, members of CESNET, accounts at clarin.eu, ...). A window where you can select the institution should appear.</message>
-    <message key="xmlui.EPerson.LoginChooser.eduidComment">If you have an account at one of the czech universities (e.g. CUNI, MUNI, ZCU, ...)</message>
+    <message key="xmlui.EPerson.LoginChooser.eduidComment">If you have an account at one of the Czech universities (e.g. CUNI, MUNI, ZCU, ...)</message>
     <message key="xmlui.EPerson.LoginChooser.otherwiseComment">If you have registered manually use the following link </message>
     <message key="org.dspace.authenticate.ShibAuthentication.title">Shibboleth Authentication - login from CUNI, MUNI, ZCU</message>
-    <message key="org.dspace.authenticate.ShibAuthenticationEduid.title">Shibboleth Authentication (login via eduid federation - czech users)</message>
+    <message key="org.dspace.authenticate.ShibAuthenticationEduid.title">Shibboleth Authentication (login via eduID.cz federation - Czech users)</message>
 	<message key="org.dspace.eperson.LDAPAuthentication.title">LDAP Authentication</message>
 	<message key="org.dspace.eperson.PasswordAuthentication.title">Password Authentication</message>
 	<message key="org.dspace.eperson.X509Authentication.title">Web Certificate Authentication</message>
@@ -727,7 +727,7 @@
 	<message key="xmlui.Submission.general.default.title">Submission</message>
 	<message key="xmlui.Submission.general.default.trail">Submission</message>
 
-	<!-- org.dspace.app.xmlui.submission.CollectiovViewer -->
+	<!-- org.dspace.app.xmlui.submission.CollectionViewer -->
 	<message key="xmlui.Submission.CollectionViewer.link1">Submit a new item to this collection</message>
 
 	<!-- org.dspace.app.xmlui.submission.Navigation -->
@@ -838,7 +838,7 @@
 	<message key="xmlui.Submission.submit.SaveOrRemoveStep.submit_remove">Remove the submission</message>
 
 
-	<!-- org.dpspace.app.xmlui.Submission.submit.InitialQuestionsStep -->
+	<!-- org.dspace.app.xmlui.Submission.submit.InitialQuestionsStep -->
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.head">Initial Questions</message>
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.important_note">Important Note: </message>
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.and"> and </message>
@@ -916,7 +916,7 @@
     <message key="xmlui.Submission.submit.UFALLicenseStep.define.empty_label">Empty label</message>
     <message key="xmlui.Submission.submit.UFALLicenseStep.license_not_supported">The selected license is not supported at the moment. Please follow the procedure described under section "None of these licenses suits your needs".</message>
     <message key="xmlui.Submission.submit.UFALLicenseStep.review_no_file">No file was uploaded in the upload step. There is no restriction on the metadata.</message>    
-    <message key="xmlui.Submission.submit.UFALLicenseStep.review_license_error">License specified by you was not found in the databse. This is most likely due to an error please contact administrators.</message>    
+    <message key="xmlui.Submission.submit.UFALLicenseStep.review_license_error">License specified by you was not found in the database. This is most likely due to an error please contact administrators.</message>
     
     
     <!-- cz.cuni.mff.ufal.UFALLicenceAgreement -->
@@ -938,7 +938,7 @@
     <message key="xmlui.ufal.UFALLicenceAgreementAgreed.trail_license_agreed">Licence Agreement</message>
     <message key="xmlui.ufal.UFALLicenceAgreementAgreed.agree_message">If you want to see the content you have to agree the licence(s) below:</message>
     <message key="xmlui.ufal.UFALLicenceAgreementAgreed.functionality_blocked">UFALLicenceAgreement functionality has been blocked at configuration file.</message>
-    <message key="xmlui.ufal.UFALLicenceAgreementAgreed.signer_message">By following this link I, SIGNER with above ID, agree with the <b>LICENSE</b> restricting the usage of the this BISTREAM.</message>
+    <message key="xmlui.ufal.UFALLicenceAgreementAgreed.signer_message">By following this link I, SIGNER with above ID, agree with the <b>LICENSE</b> restricting the usage of the this BITSTREAM.</message>
     <message key="xmlui.ufal.UFALLicenceAgreementAgreed.user_login_error">User not logged in: UFALLicenceAgreement cannot continue!</message>
     <message key="xmlui.ufal.UFALLicenceAgreementAgreed.successful_signed_message">{0} License for bitstream {1} successfully signed by {2}.</message>
 	<message key="xmlui.ufal.UFALLicenceAgreementAgreed.continue_message">If your download doesn't start automatically, please click here.</message>
@@ -1216,9 +1216,9 @@
 	<message key="xmlui.administrative.Navigation.context_create_subcommunity">Create Sub-community</message>
 	<message key="xmlui.administrative.Navigation.context_create_community">Create Community</message>
 	<message key="xmlui.administrative.Navigation.context_export_item">Export Item</message>
-        <message key="xmlui.administrative.Navigation.context_export_collection">Export Collection</message>
-        <message key="xmlui.administrative.Navigation.context_export_community">Export Community</message>
-        <message key="xmlui.administrative.Navigation.context_export_metadata">Export Metadata</message>
+    <message key="xmlui.administrative.Navigation.context_export_collection">Export Collection</message>
+    <message key="xmlui.administrative.Navigation.context_export_community">Export Community</message>
+    <message key="xmlui.administrative.Navigation.context_export_metadata">Export Metadata</message>
 
 	<!-- Site administrator options -->
 	<message key="xmlui.administrative.Navigation.administrative_head">Administrative</message>
@@ -1236,8 +1236,8 @@
     <message key="xmlui.administrative.Navigation.administrative_control_panel">Control Panel</message>
     <message key="xmlui.administrative.Navigation.statistics">Statistics</message>
     <message key="xmlui.administrative.Navigation.administrative_batch_import">Batch Import (ZIP)</message>
-        <message key="xmlui.administrative.Navigation.administrative_import_metadata">Import Metadata</message>
-        <message key="xmlui.administrative.Navigation.administrative_curation">Curation Tasks</message>
+    <message key="xmlui.administrative.Navigation.administrative_import_metadata">Import Metadata</message>
+    <message key="xmlui.administrative.Navigation.administrative_curation">Curation Tasks</message>
     <message key="xmlui.administrative.Navigation.administrative_licenses">Licenses</message>
     <message key="xmlui.administrative.Navigation.administrative_handles">Handles</message>
 
