@@ -123,6 +123,10 @@
                                 <xsl:call-template name="itemSummaryView-DIM-description"/>
                                 <xsl:call-template name="itemSummaryView-DIM-URI"/>
                                 <xsl:call-template name="itemSummaryView-collections"/>
+                                <xsl:call-template name="itemSummaryView-DIM-publisher"/>
+                                <xsl:call-template name="itemSummaryView-DIM-first-line-of-text"/>
+                                <xsl:call-template name="itemSummaryView-DIM-first-line-of-chorus"/>
+
 
                                 <div class="row">
                                     <div class="col-xs-6 col-sm-12">
@@ -169,6 +173,9 @@
                             <xsl:call-template name="itemSummaryView-DIM-description"/>
                             <xsl:call-template name="itemSummaryView-DIM-URI"/>
                             <xsl:call-template name="itemSummaryView-collections"/>
+                            <xsl:call-template name="itemSummaryView-DIM-publisher"/>
+                            <xsl:call-template name="itemSummaryView-DIM-first-line-of-text"/>
+                            <xsl:call-template name="itemSummaryView-DIM-first-line-of-chorus"/>
                         </div>
                     </div>
                 </xsl:otherwise>
@@ -300,6 +307,47 @@
             <div class="simple-item-view-authors item-page-field-wrapper table">
                 <h5><i18n:text>xmlui.dri2xhtml.METS-1.0.item-author</i18n:text></h5>
                 <xsl:choose>
+                    <!-- contributor.composer row (Fredonia) -->
+                    <xsl:when test="dim:field[@element='contributor'][@qualifier='composer' and descendant::text()]">
+                        <span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-composer</i18n:text>:</span>
+                        <span>
+                            <xsl:for-each select="dim:field[@element='contributor' and @qualifier='composer']">
+                                <xsl:copy-of select="node()"/>
+                                <xsl:if test="count(following-sibling::dim:field[@element='contributor' and @qualifier='composer']) != 0">
+                                    <xsl:text>; </xsl:text>
+                                </xsl:if>
+                            </xsl:for-each>
+                        </span>
+
+                        <!-- Display the author as author-of-text -->
+                        <xsl:if test="dim:field[@element='contributor'][@qualifier='author']">
+                            <br/>
+                            <span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-author-of-text</i18n:text>:</span>
+                            <span>
+                                <xsl:for-each select="dim:field[@element='contributor' and @qualifier='author']">
+                                    <xsl:copy-of select="node()"/>
+                                    <xsl:if test="count(following-sibling::dim:field[@element='contributor' and @qualifier='author']) != 0">
+                                        <xsl:text>; </xsl:text>
+                                    </xsl:if>
+                                </xsl:for-each>
+                            </span>
+                        </xsl:if>
+
+                        <!-- Display a Corporate Author -->
+                        <xsl:if test="dim:field[@element='contributor'][@qualifier='corporate-author']">
+                            <br/>
+                            <span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-author-corporate</i18n:text>:</span>
+                            <span>
+                                <xsl:for-each select="dim:field[@element='contributor' and @qualifier='corporate-author']">
+                                    <xsl:copy-of select="node()"/>
+                                    <xsl:if test="count(following-sibling::dim:field[@element='contributor' and @qualifier='corporate-author']) != 0">
+                                        <xsl:text>; </xsl:text>
+                                    </xsl:if>
+                                </xsl:for-each>
+                            </span>
+                        </xsl:if>
+                    </xsl:when>
+
                     <xsl:when test="dim:field[@element='contributor'][@qualifier='author']">
                         <xsl:for-each select="dim:field[@element='contributor'][@qualifier='author']">
                             <div>
@@ -404,6 +452,61 @@
             </div>
         </xsl:if>
     </xsl:template>
+
+    <xsl:template name="itemSummaryView-DIM-publisher">
+        <xsl:if test="dim:field[@element='publisher' and not(@qualifier) and descendant::text()]">
+            <div class="simple-item-view-date word-break item-page-field-wrapper table">
+                <h5>
+                    <i18n:text>xmlui.metadata.dc.publisher</i18n:text>
+                </h5>
+                <span>
+                    <xsl:for-each select="dim:field[@element='publisher']">
+                        <xsl:copy-of select="node()"/>
+                        <xsl:if test="count(following-sibling::dim:field[@element='publisher']) != 0">
+                            <xsl:text>; </xsl:text>
+                        </xsl:if>
+                    </xsl:for-each>
+                </span>
+            </div>
+        </xsl:if>
+    </xsl:template>
+
+    <xsl:template name="itemSummaryView-DIM-first-line-of-text">
+        <xsl:if test="dim:field[@element='title' and @qualifier='first-line-of-text' and descendant::text()]">
+            <div class="simple-item-view-date word-break item-page-field-wrapper table">
+                <h5>
+                    <i18n:text>xmlui.metadata.dc.title.first-line-of-text</i18n:text>
+                </h5>
+                <span>
+                    <xsl:for-each select="dim:field[@element='title' and @qualifier='first-line-of-text']">
+                        <xsl:copy-of select="node()"/>
+                        <xsl:if test="count(following-sibling::dim:field[@element='title' and @qualifier='first-line-of-text']) != 0">
+                            <xsl:text>; </xsl:text>
+                        </xsl:if>
+                    </xsl:for-each>
+                </span>
+            </div>
+        </xsl:if>
+    </xsl:template>
+
+    <xsl:template name="itemSummaryView-DIM-first-line-of-chorus">
+        <xsl:if test="dim:field[@element='title' and @qualifier='first-line-of-chorus' and descendant::text()]">
+            <div class="simple-item-view-date word-break item-page-field-wrapper table">
+                <h5>
+                    <i18n:text>xmlui.metadata.dc.title.first-line-of-chorus</i18n:text>
+                </h5>
+                <span>
+                    <xsl:for-each select="dim:field[@element='title' and @qualifier='first-line-of-chorus']">
+                        <xsl:copy-of select="node()"/>
+                        <xsl:if test="count(following-sibling::dim:field[@element='title' and @qualifier='first-line-of-chorus']) != 0">
+                            <xsl:text>; </xsl:text>
+                        </xsl:if>
+                    </xsl:for-each>
+                </span>
+            </div>
+        </xsl:if>
+    </xsl:template>
+
 <xsl:template name="itemSummaryView-show-full">
         <div class="simple-item-view-show-full item-page-field-wrapper table">
             <h5>Metadata</h5> <!-- TODO i18n -->
