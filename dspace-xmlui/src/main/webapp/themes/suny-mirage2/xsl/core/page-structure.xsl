@@ -332,7 +332,7 @@
                         </button>
 
                         <a href="{$context-path}/" class="navbar-brand">
-                            <img src="{$theme-path}/images/logo.png" />
+                            <img class="img-responsive" src="{$theme-path}/images/dspacetop.png" />
                         </a>
 
 
