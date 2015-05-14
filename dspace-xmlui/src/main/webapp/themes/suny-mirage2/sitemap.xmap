@@ -42,8 +42,8 @@
         -->
         <map:component-configurations>
             <global-variables>
-                <theme-path>_template-mirage2</theme-path>
-                <theme-name>Template - Mirage 2</theme-name>
+                <theme-path>suny-mirage2</theme-path>
+                <theme-name>SUNY - Mirage 2</theme-name>
             </global-variables>
         </map:component-configurations>
 
