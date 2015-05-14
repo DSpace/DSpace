@@ -805,6 +805,10 @@
     <message key="xmlui.Submission.submit.UploadWithEmbargoStep.submit_remove">Remove selected files</message>
     <message key="xmlui.Submission.submit.UploadWithEmbargoStep.submit_policy">Policies</message>
 
+    <!-- org.dspace.app.xmlui.Submission.submit.XMLUILibraryAwardUploadStep -->
+    <message key="xmlui.Submission.submit.XMLUILibraryAwardUploadStep.missing_bitstreams">You must upload all required files before moving to the next step in the submission process.</message>
+    <message key="xmlui.Submission.submit.XMLUILibraryAwardUploadStep.not_pdf">All files must be in PDF format. Please remove any non-PDF files and re-upload as PDF.</message>
+    
 
     <!-- org.dspace.app.xmlui.Submission.submit.EditFileStep -->
     <message key="xmlui.Submission.submit.EditFileStep.head">Edit File</message>
