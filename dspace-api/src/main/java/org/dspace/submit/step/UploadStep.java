@@ -521,15 +521,15 @@ public class UploadStep extends AbstractProcessingStep
         // delete bundle if it's now empty
         Bundle[] bundles = bitstream.getBundles();
 
-        bundles[0].removeBitstream(bitstream);
+        if ( 0 < bundles.length ) {
+            bundles[0].removeBitstream(bitstream);
+            Bitstream[] bitstreams = bundles[0].getBitstreams();
 
-        Bitstream[] bitstreams = bundles[0].getBitstreams();
-
-        // remove bundle if it's now empty
-        if (bitstreams.length < 1)
-        {
-            item.removeBundle(bundles[0]);
-            item.update();
+            // remove bundle if it's now empty
+            if (bitstreams.length < 1) {
+                item.removeBundle(bundles[0]);
+                item.update();
+            }
         }
 
         // no errors occurred

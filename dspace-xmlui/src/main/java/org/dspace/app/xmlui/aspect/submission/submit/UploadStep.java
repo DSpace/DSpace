@@ -249,7 +249,7 @@ public class UploadStep extends AbstractSubmissionStep
 	        
 	        long maxFileSize = Long.parseLong(ConfigurationManager.getProperty("lr", "lr.upload.file.alert.max.file.size"));
 
-	        file.setHelp(T_file_help.parameterize(DSpaceApi.convertBytesToHumanReadableForm(maxFileSize)));
+	        file.setHelp(T_file_help);
             file.setRequired();
 
             // if no files found error was thrown by processing class, display it!
