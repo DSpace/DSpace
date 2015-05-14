@@ -31,7 +31,7 @@ function createRejectedFilesDialog(files, fileUploadDialog) {
 				if (fileUploadDialog != undefined) {
 					fileUploadDialog.dialog("open");
 				} else {
-					jQuery("#aspect_submission_StepTransformer_field_file")
+					jQuery("#file_upload #aspect_submission_StepTransformer_field_file")
 							.val("");
 				}
 			}
@@ -48,7 +48,7 @@ function convertBytesToHumanReadableForm(b) {
 function createFileUploadDialog(files) {
 	var xhrs = [];
 
-	var fileFieldO = jQuery("#aspect_submission_StepTransformer_field_file");
+	var fileFieldO = jQuery("#file_upload #aspect_submission_StepTransformer_field_file");
 	var action = fileFieldO.parents("form:first").attr("action");
 	fileFieldO.parents("form:first").attr("action", action + "#fl");
 
@@ -220,7 +220,7 @@ function createFileUploadDialog(files) {
 						xhr.abort();
 					});
 					// remove the selection so the files are not submitted again
-					jQuery("#aspect_submission_StepTransformer_field_file")
+					jQuery("#file_upload #aspect_submission_StepTransformer_field_file")
 							.val("");
 				});
 	return jModal;
@@ -273,7 +273,7 @@ jQuery(document)
 		.ready(
 				function() {
 					
-					var fileFieldO = jQuery("#aspect_submission_StepTransformer_field_file");
+					var fileFieldO = jQuery("#file_upload #aspect_submission_StepTransformer_field_file");
 
 					if (!!FileReader && 'draggable' in document.createElement('span')
 							&& !!window.FormData && "upload" in new XMLHttpRequest) {
@@ -288,7 +288,7 @@ jQuery(document)
 								.change(
 										function() {
 											var files = document
-													.getElementById("aspect_submission_StepTransformer_field_file").files;
+													.getElementById("#file_upload aspect_submission_StepTransformer_field_file").files;
 											processFiles(files);
 										});
 					}
