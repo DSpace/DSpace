@@ -44,7 +44,8 @@ public abstract class ACrisObject<P extends Property<TP>, TP extends PropertiesD
         implements
         ICrisObject<P, TP>,
         BrowsableDSpaceObject,
-        IExportableDynamicObject<TP, P, ACrisObject<P, TP, NP, NTP, ACNO, ATNO>>
+        IExportableDynamicObject<TP, P, ACrisObject<P, TP, NP, NTP, ACNO, ATNO>>,
+        Cloneable
 {
 
     @Embedded    
@@ -400,4 +401,8 @@ public abstract class ACrisObject<P extends Property<TP>, TP extends PropertiesD
 	}
 	
 	public abstract String getMetadataFieldTitle();
+	
+	public ACrisObject<P, TP, NP, NTP, ACNO, ATNO> clone() throws CloneNotSupportedException {
+		return ( ACrisObject<P, TP, NP, NTP, ACNO, ATNO> ) super.clone();
+	}
 }

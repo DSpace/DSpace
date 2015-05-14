@@ -28,7 +28,7 @@ import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.jdyna.ACrisNestedObject;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.UtilsXML;
-import org.dspace.app.cris.ws.WSConstants;
+import org.dspace.app.cris.util.UtilsXSD;
 import org.jdom.Element;
 import org.jdom.Namespace;
 
@@ -82,9 +82,9 @@ public class MarshallerDynamicObject<T extends ACrisObject<P, TP, NP, NTP, ACNO,
     {
         StringWriter writer = new StringWriter();
 
-        String namespaceRoot = WSConstants.NAMESPACE_CRIS;
+        String namespaceRoot = UtilsXSD.NAMESPACE_CRIS;
         
-        Namespace echoNamespaceRoot = Namespace.getNamespace(WSConstants.NAMESPACE_PREFIX_CRIS,
+        Namespace echoNamespaceRoot = Namespace.getNamespace(UtilsXSD.NAMESPACE_PREFIX_CRIS,
                 namespaceRoot);
         UtilsXML xml = new UtilsXML(writer, applicationService);
         xml.createPagination(hit, start, docList.size());

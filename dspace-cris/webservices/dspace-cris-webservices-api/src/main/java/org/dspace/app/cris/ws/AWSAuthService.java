@@ -15,6 +15,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.dspace.app.cris.discovery.CrisSearchService;
 import org.dspace.app.cris.model.ws.User;
+import org.dspace.app.cris.util.UtilsXSD;
 import org.dspace.discovery.SearchServiceException;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -48,7 +49,7 @@ public abstract class AWSAuthService extends AbstractJDomPayloadEndpoint
     public AWSAuthService() throws JDOMException
     {
         Namespace namespace = Namespace.getNamespace(
-                WSConstants.NAMESPACE_PREFIX_CRIS, WSConstants.NAMESPACE_CRIS);
+                UtilsXSD.NAMESPACE_PREFIX_CRIS, UtilsXSD.NAMESPACE_CRIS);
         queryExpression = XPath.newInstance("//cris:Query");
         queryExpression.addNamespace(namespace);
         projectionExpression = XPath.newInstance("//cris:Projection");

@@ -11,9 +11,8 @@ package org.dspace.app.cris.ws;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.soap.SOAPException;
 
-import org.dspace.app.cris.discovery.CrisSearchService;
 import org.dspace.app.cris.model.ws.User;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.app.cris.util.UtilsXSD;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
@@ -30,8 +29,8 @@ public class WSTokenAuthService extends AWSAuthService
     public WSTokenAuthService()
             throws JDOMException
     {
-        Namespace namespace = Namespace.getNamespace(WSConstants.NAMESPACE_PREFIX_CRIS, 
-                WSConstants.NAMESPACE_CRIS);
+        Namespace namespace = Namespace.getNamespace(UtilsXSD.NAMESPACE_PREFIX_CRIS, 
+        		UtilsXSD.NAMESPACE_CRIS);
         tokenExpression = XPath.newInstance("//cris:Token");
         tokenExpression.addNamespace(namespace);
     }

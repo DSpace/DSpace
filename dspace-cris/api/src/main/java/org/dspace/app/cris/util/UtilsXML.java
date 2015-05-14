@@ -71,9 +71,13 @@ public class UtilsXML
 
     public static final String NAMEATTRIBUTE_VISIBILITY = "visibility";
 
-    public static final String NAMEATTRIBUTE_RPID = "rpid";
+    public static final String NAMEATTRIBUTE_CRISID = "crisID";
 
-    public static final String NAMEATTRIBUTE_STAFF_NO = "staffNo";
+    public static final String NAMEATTRIBUTE_SOURCEID = "sourceID";
+    
+    public static final String NAMEATTRIBUTE_SOURCEREF = "sourceRef";
+    
+    public static final String NAMEATTRIBUTE_UUID = "uuid";
 
     public static final String NAMEATTRIBUTE_MIMETYPE = "mime";
 
@@ -157,7 +161,7 @@ public class UtilsXML
         {
             root = new Element(rootName);
         }
-        else if (prefixNamespace == null)
+        else if (prefixNamespace != null)
         {
             root = new Element(rootName, prefixNamespace, namespace);
         }
@@ -189,10 +193,14 @@ public class UtilsXML
     {
         List<String> attributes = new LinkedList<String>();
         List<String> valuesAttributes = new LinkedList<String>();
-        attributes.add(NAMEATTRIBUTE_STAFF_NO);
+        attributes.add(NAMEATTRIBUTE_SOURCEID);
         valuesAttributes.add(rp.getSourceID());
-        attributes.add(NAMEATTRIBUTE_RPID);
+        attributes.add(NAMEATTRIBUTE_SOURCEREF);
+        valuesAttributes.add(rp.getSourceRef());
+        attributes.add(NAMEATTRIBUTE_CRISID);
         valuesAttributes.add(ResearcherPageUtils.getPersistentIdentifier(rp));
+        attributes.add(NAMEATTRIBUTE_UUID);
+        valuesAttributes.add(rp.getUuid());
         Element element = ExportUtils.createCustomPropertyWithCustomAttributes(
                 root, ELEMENT_RESEARCHER, attributes, valuesAttributes);
 
@@ -221,13 +229,6 @@ public class UtilsXML
         createElement(decorator.getReal(), decorator.getRendering(), rp,
                 element);
     }
-
-    // private void createElement(DecoratorRPPropertiesDefinition decorator,
-    // ResearcherPage rp, Element element) throws IOException
-    // {
-    // createElement(decorator.getReal(), decorator.getRendering(), rp,
-    // element);
-    // }
 
     private <TP extends PropertiesDefinition, P extends Property<TP>, AS extends AnagraficaSupport<P, TP>> void createElement(
             DecoratorRestrictedField decorator,

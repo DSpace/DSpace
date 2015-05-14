@@ -93,7 +93,7 @@ import org.dspace.eperson.EPerson;
         @NamedQuery(name = "ResearcherPage.uniqueByEPersonId", query = "from ResearcherPage where epersonID = ?"),
         @NamedQuery(name = "ResearcherPage.uniqueByUUID", query = "from ResearcherPage where uuid = ?") })
 public class ResearcherPage extends
-        ACrisObject<RPProperty, RPPropertiesDefinition, RPNestedProperty, RPNestedPropertiesDefinition, RPNestedObject, RPTypeNestedObject> implements Cloneable
+        ACrisObject<RPProperty, RPPropertiesDefinition, RPNestedProperty, RPNestedPropertiesDefinition, RPNestedObject, RPTypeNestedObject>
 {
 
     private static final String NAME = "fullName";
@@ -392,9 +392,15 @@ public class ResearcherPage extends
         return results;
     }
 
-    public Object clone() throws CloneNotSupportedException
+    public ResearcherPage clone() throws CloneNotSupportedException
     {
-        return super.clone();
+        ResearcherPage clone = (ResearcherPage) super.clone();
+        RPAdditionalFieldStorage additionalTemp = new RPAdditionalFieldStorage();
+        additionalTemp.setResearcherPage(clone);
+        additionalTemp.duplicaAnagrafica(this
+                    .getDynamicField());
+        clone.setDynamicField(additionalTemp);
+        return clone;
     }
 
     public void setInternalRP(boolean internalRP)

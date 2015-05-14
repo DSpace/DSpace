@@ -522,8 +522,10 @@ public final class DSpaceConfigurationService implements ConfigurationService {
      * configuration and updates any replaced values.
      */
     protected void replaceVariables(Map<String, DSpaceConfig> dsConfiguration) {
-        for (Entry<String, DSpaceConfig> entry : dsConfiguration.entrySet()) {
-            if (entry.getValue().getValue().contains("${")) {
+    	Iterator<Map.Entry<String, DSpaceConfig>> iterators = dsConfiguration.entrySet().iterator();
+    	while (iterators.hasNext()) {
+    		Map.Entry<String, DSpaceConfig> entry = iterators.next();
+            if (entry.getValue().getValue().contains("${")) {            	
                 String value = entry.getValue().getValue();
                 int start = -1;
                 while ((start = value.indexOf("${")) > -1) {
