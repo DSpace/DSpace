@@ -35,7 +35,9 @@ public class DateUtils
         SimpleDateFormat sdf = new SimpleDateFormat(
                 "yyyy-MM-dd'T'HH:mm:ss.'000Z'");
         if (!init)
+        {
             sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.'999Z'");
+        }
         // We indicate that the returned date is in Zulu time (UTC) so we have
         // to set the time zone of sdf correct.
         sdf.setTimeZone(TimeZone.getTimeZone("ZULU"));
