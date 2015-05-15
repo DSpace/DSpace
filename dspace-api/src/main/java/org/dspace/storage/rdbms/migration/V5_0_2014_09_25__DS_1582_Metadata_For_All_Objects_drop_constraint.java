@@ -13,8 +13,6 @@ import java.sql.SQLException;
 import org.dspace.storage.rdbms.MigrationUtils;
 import org.flywaydb.core.api.migration.MigrationChecksumProvider;
 import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class is in support of the DS-1582 Metadata for All Objects feature.
@@ -37,30 +35,27 @@ import org.slf4j.LoggerFactory;
  * <P>
  * This class represents a Flyway DB Java Migration
  * http://flywaydb.org/documentation/migration/java.html
- * 
+ *
  * @author Tim Donohue
  */
 public class V5_0_2014_09_25__DS_1582_Metadata_For_All_Objects_drop_constraint
     implements JdbcMigration, MigrationChecksumProvider
 {
-    /** logging category */
-    private static final Logger log = LoggerFactory.getLogger(V5_0_2014_09_25__DS_1582_Metadata_For_All_Objects_drop_constraint.class);
-    
     /* The checksum to report for this migration (when successful) */
     private int checksum = -1;
-    
+
     /**
      * Actually migrate the existing database
-     * @param connection 
+     * @param connection
      */
     @Override
     public void migrate(Connection connection)
             throws IOException, SQLException
     {
         // Drop the constraint associated with "item_id" column of "metadatavalue"
-        checksum = MigrationUtils.dropDBConstraint(connection, "metadatavalue", "item_id", "fkey");
+        checksum = MigrationUtils.dropDBConstraint(connection, "metadatavalue", "item_id");
     }
-    
+
     /**
      * Return the checksum to be associated with this Migration
      * in the Flyway database table (schema_version).
