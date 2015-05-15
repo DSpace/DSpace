@@ -757,6 +757,8 @@ Common usage:
         <mkdir dir="${report.dir}" />
 
     	<mkdir dir="${dspace.dir}/solr" />
+    	
+    	<mkdir dir="${dspace.dir}/piwik_reports"/>
 
     	<!-- Runtime files (Could be erased - just for performing purposes) -->
     	<mkdir dir="${dspace.dir}/var" />
