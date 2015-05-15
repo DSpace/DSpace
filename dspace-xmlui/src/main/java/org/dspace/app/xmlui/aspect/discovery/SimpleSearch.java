@@ -189,7 +189,10 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
                 {
                     String filterType = filterTypes.get(i);
                     String filterValue = filterValues.get(i);
-                    String filterOperator = filterOperators.get(i);
+                    String filterOperator = null;
+                    if (i < filterOperators.size()) {
+                        filterOperator = filterOperators.get(i);
+                    }
 
                     if(StringUtils.isNotBlank(filterValue))
                     {
