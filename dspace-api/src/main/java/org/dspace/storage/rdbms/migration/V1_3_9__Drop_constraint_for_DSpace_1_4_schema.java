@@ -13,8 +13,6 @@ import java.sql.SQLException;
 import org.dspace.storage.rdbms.MigrationUtils;
 import org.flywaydb.core.api.migration.MigrationChecksumProvider;
 import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class is in support of the "V1.4__Upgrade_to_DSpace_1.4_schema.sql"
@@ -42,9 +40,6 @@ import org.slf4j.LoggerFactory;
 public class V1_3_9__Drop_constraint_for_DSpace_1_4_schema
     implements JdbcMigration, MigrationChecksumProvider
 {
-    /** logging category */
-    private static final Logger log = LoggerFactory.getLogger(V1_3_9__Drop_constraint_for_DSpace_1_4_schema.class);
-
     /* The checksum to report for this migration (when successful) */
     private int checksum = -1;
 
@@ -57,7 +52,7 @@ public class V1_3_9__Drop_constraint_for_DSpace_1_4_schema
             throws IOException, SQLException
     {
         // Drop the constraint associated with "name" column of "community"
-        checksum = MigrationUtils.dropDBConstraint(connection, "community", "name", "key");
+        checksum = MigrationUtils.dropDBConstraint(connection, "community", "name");
     }
 
     /**
