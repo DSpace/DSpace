@@ -71,7 +71,7 @@ a:hover {
 }
 
 #ds-header {
-    background: url(../../images/dryadlab-image-ribbon.png) repeat-x -105px 10px;
+    background: url(../../images/dryadlab-image-ribbon.jpg) repeat-x 251px 10px;
     border-bottom: 3px solid #bdb;
 }
 
@@ -1057,7 +1057,7 @@ img.ds-authority-confidence.cf-blank {
 
 #recently-published-data .odd
 {
-    background-color: #EEEEEE;
+    background-color: #f9fff9;
 }
 
 .italics {
