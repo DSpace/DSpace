@@ -158,11 +158,15 @@ public class EditProfile extends AbstractDSpaceTransformer
 
     private static final Message T_select_collection =
         message("xmlui.EPerson.EditProfile.select_collection");
- 
-    private static final Message T_head_auth =
-        message("xmlui.EPerson.EditProfile.head_auth");
-    
-    //private static final Message T_head_identify =
+
+	private static final Message T_head_auth =
+		message("xmlui.EPerson.EditProfile.head_auth");
+
+	private static final Message T_invalid_item =
+		message("xmlui.EPerson.EditProfile.invalid_item");
+
+
+	//private static final Message T_head_identify =
     //    message("xmlui.EPerson.EditProfile.head_identify");
     
     private static final Message T_head_security =
@@ -492,29 +496,37 @@ public class EditProfile extends AbstractDSpaceTransformer
 
 	                Bitstream bitstream = Bitstream.find(context, bitstreamID);
 	                org.dspace.content.Item item = (org.dspace.content.Item)bitstream.getParentObject();
+					String base = ConfigurationManager.getProperty("dspace.url");
 
-	                String base = ConfigurationManager.getProperty("dspace.url");
-	    			StringBuffer itemLink = new StringBuffer().append(base)
-							  .append(base.endsWith("/") ? "" : "/")
-							  .append("/handle/")
-							  .append(item.getHandle());
+					if ( null != item ) {
+						StringBuffer itemLink = new StringBuffer().append(base)
+							.append(base.endsWith("/") ? "" : "/")
+							.append("/handle/")
+							.append(item.getHandle());
 
-	                r.addCell().addXref(itemLink.toString(), "" + item.getID());
+						r.addCell().addXref(itemLink.toString(), "" + item.getID());
 
-	    			StringBuffer bitstreamLink = new StringBuffer().append(base)
-								  .append(base.endsWith("/") ? "" : "/")
-								  .append("bitstream/handle/")
-								  .append(item.getHandle())
-								  .append("/")
-								  .append(URLEncoder.encode(bitstream.getName(), "UTF8"))
-								  .append("?sequence=").append(bitstream.getSequenceID());
-	                r.addCell().addXref(bitstreamLink.toString(), "" + bitstream.getID());
+						StringBuffer bitstreamLink = new StringBuffer().append(base)
+							.append(base.endsWith("/") ? "" : "/")
+							.append("bitstream/handle/")
+							.append(item.getHandle())
+							.append("/")
+							.append(URLEncoder.encode(bitstream.getName(), "UTF8"))
+							.append("?sequence=").append(bitstream.getSequenceID());
+						r.addCell().addXref(bitstreamLink.toString(), "" + bitstream.getID());
+
+					}else {
+						// something can go wrong
+						r.addCell().addContent( T_invalid_item );
+						r.addCell().addContent( T_invalid_item );
+					}
+
 
 	                Cell c = r.addCell();
 	                java.util.List<UserMetadata> extraMetaData = functionalityManager.getUserMetadata_License(ur.getEpersonId(), license.getTransactionId());
 	                for(UserMetadata metadata : extraMetaData) {
 	                	c.addHighlight("label label-info font_smaller").addContent(metadata.getMetadataKey() + ": " +metadata.getMetadataValue());
-           }
+           			}
            }
            
 			} else {
