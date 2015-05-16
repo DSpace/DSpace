@@ -85,7 +85,7 @@ public class PiwikStatisticsTransformer extends AbstractDSpaceTransformer {
 				Division subscribe = division.addDivision("subscribe", "alert alert-success");
 				Para para = subscribe.addPara(null, "bold");
 				para.addHighlight("fa fa-envelope").addContent(" ");			
-				para.addContent("  You are subscribed to recieve a monthly report of this item via email ");
+				para.addContent("  You are subscribed to receive a monthly report of this item via email ");
 				para.addXref("?subscribe=no", "Unsubscribe", "btn btn-xs btn-success pull-right bold", "");				
 			} else {
 				Division subscribe = division.addDivision("subscribe", "alert alert-warning");

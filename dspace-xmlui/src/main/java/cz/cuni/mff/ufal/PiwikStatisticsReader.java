@@ -91,14 +91,10 @@ public class PiwikStatisticsReader extends AbstractReader {
             	throw new AuthorizeException();
             }
             
-        } catch (AuthorizeException e) {
-            throw new ProcessingException("Unable to read piwik statisitcs", e);
-        } catch (IllegalStateException e) {
-            throw new ProcessingException("Unable to read piwik statisitcs", e);
-        } catch (SQLException e) {
-            throw new ProcessingException("Unable to read piwik statisitcs", e);
-		}
-        
+        } catch (AuthorizeException | SQLException | IllegalStateException e) {
+            throw new ProcessingException("Unable to read piwik statistics", e);
+        }
+
     }
 
 
