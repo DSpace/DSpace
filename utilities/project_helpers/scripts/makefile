@@ -73,7 +73,7 @@ DIR_INSTALLATION        :=$(shell cd $(BASE) && python setup.lindat.py --get="lr
 DIR_LINDAT_COMMON_THEME :=$(shell cd $(BASE) && python setup.lindat.py --get="lr.common.theme" --from="$(LOCAL_CONF)")
 
 DIR_LINDAT_THEME_IN_WEBAPPS :=$(DIR_INSTALLATION)/webapps/xmlui/themes/UFAL/lib/lindat
-DIR_DATABASE_BACKUP         :=$(DIR_INSTALLATION)/../database
+DIR_DATABASE_BACKUP         :=$(DIR_INSTALLATION)/../database_backup
 
 
 # Dspace Configuration
@@ -256,7 +256,7 @@ update_metadata_scheme:
 
 restore_database:
 	@echo "RESTORING DATABASE $(DATABASE_NAME) FROM $(RESTORE_FROM_DATABASE) ..."
-	@sudo -u postgres pg_dump -p $(DB_PORT) --clean "$(RESTORE_FROM_DATABASE)" | sudo -u postgres psql -p $(DB_PORT) "$(DATABASE_NAME)" > $(DIR_DEPLOY_LOGS)/$@.log
+	@sudo -u postgres $(pg_dump) -p $(DB_PORT) --clean "$(RESTORE_FROM_DATABASE)" | sudo -u postgres psql -p $(DB_PORT) "$(DATABASE_NAME)" > $(DIR_DEPLOY_LOGS)/$@.log
 	@echo "DONE"
 
 
@@ -376,9 +376,9 @@ substitute_backup_config:
 
 # This command makes backup for databases and put it into backuped directory $(DIR_DATABASE_BACKUP)
 backup_databases:
-	su postgres -l -c 'pg_dump -p $(DB_PORT) $(DATABASE_NAME) > $(DIRECTORY_POSTGRESQL)/$(DATABASE_NAME)'
-	su postgres -l -c 'pg_dump -p $(DB_PORT) $(UTILITIES_DATABASE_NAME) > $(DIRECTORY_POSTGRESQL)/$(UTILITIES_DATABASE_NAME)'
-	# with timestapm
+	su postgres -l -c '$(pg_dump) -p $(DB_PORT) $(DATABASE_NAME) > $(DIRECTORY_POSTGRESQL)/$(DATABASE_NAME)'
+	su postgres -l -c '$(pg_dump) -p $(DB_PORT) $(UTILITIES_DATABASE_NAME) > $(DIRECTORY_POSTGRESQL)/$(UTILITIES_DATABASE_NAME)'
+	# with timestamp
 	cp $(DIRECTORY_POSTGRESQL)/$(DATABASE_NAME) $(DIR_DATABASE_BACKUP)/$(DATABASE_NAME).dumped.`date +"%d-%m-%y.at.%T"`
 	cp $(DIRECTORY_POSTGRESQL)/$(UTILITIES_DATABASE_NAME) $(DIR_DATABASE_BACKUP)/$(UTILITIES_DATABASE_NAME).dumped.`date +"%d-%m-%y.at.%T"`
 	# latest one

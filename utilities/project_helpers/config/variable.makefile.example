@@ -23,3 +23,7 @@ BACKUP2l:=/usr/sbin/backup2l
 # database settings - mostly for recovering 
 #RESTORE_FROM_DATABASE=prod-dspace-1.8
 RESTORE_FROM_DATABASE=lrt-dspace-1.8
+
+
+# you can use different versions e.g., export pg_dump=pg_dump --cluster 9.4/main
+export pg_dump=pg_dump
