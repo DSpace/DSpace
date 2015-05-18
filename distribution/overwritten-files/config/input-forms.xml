@@ -877,7 +877,7 @@
 				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>contributor</dc-element>
-					<dc-schema>editor</dc-schema>
+					<dc-qualifier>editor</dc-qualifier>
 					<repeatable>true</repeatable>
 					<label>Editor de la publicación</label>
 					<input-type>onebox</input-type>
