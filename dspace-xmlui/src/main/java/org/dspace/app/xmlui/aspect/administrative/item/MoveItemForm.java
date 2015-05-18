@@ -22,6 +22,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 
+import org.dspace.app.util.CollectionDropDown;
 
 /**
  * This page displays collections to which the user can move an item.
@@ -66,7 +67,7 @@ public class MoveItemForm extends AbstractDSpaceTransformer {
         Division main = body.addInteractiveDivision("move-item", contextPath+"/admin/item", Division.METHOD_POST, "primary administrative item");
         main.setHead(T_head1.parameterize(item.getHandle()));
 
-        Collection[] collections = Collection.findAuthorized(context, null, Constants.ADD);
+        Collection[] collections = Collection.findAuthorizedOptimized(context, Constants.ADD);
 
         List list = main.addList("select-collection", List.TYPE_FORM);
         Select select = list.addItem().addSelect("collectionID");
@@ -89,7 +90,7 @@ public class MoveItemForm extends AbstractDSpaceTransformer {
             // Only add the item if it isn't already the owner
             if (!item.isOwningCollection(collection))
             {
-                select.addOption(collection.equals(owningCollection), collection.getID(), name);
+                select.addOption(collection.equals(owningCollection), collection.getID(), CollectionDropDown.collectionPath(collection));
             }
         }
         

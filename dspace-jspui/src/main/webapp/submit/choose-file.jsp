@@ -41,17 +41,19 @@
 
 	//get submission information object
     SubmissionInfo subInfo = SubmissionController.getSubmissionInfo(context, request);
+    request.setAttribute("submission.info", subInfo);
 
     boolean withEmbargo = ((Boolean)request.getAttribute("with_embargo")).booleanValue();
 
- 	// Determine whether a file is REQUIRED to be uploaded (default to true)
- 	boolean fileRequired = ConfigurationManager.getBooleanProperty("webui.submit.upload.required", true);
+    // Determine whether a file is REQUIRED to be uploaded (default to true)
+    boolean fileRequired = ConfigurationManager.getBooleanProperty("webui.submit.upload.required", true);
     boolean ajaxProgress = ConfigurationManager.getBooleanProperty("webui.submit.upload.ajax", true);
+    boolean html5Upload = ConfigurationManager.getBooleanProperty("webui.submit.upload.html5", true);
 
  	Boolean sherpa = (Boolean) request.getAttribute("sherpa");
     boolean bSherpa = sherpa != null?sherpa:false;
 
-    if (ajaxProgress || bSherpa)
+    if (ajaxProgress || bSherpa || html5Upload)
     {
 %>
 <c:set var="dspace.layout.head.last" scope="request">
@@ -289,6 +291,10 @@
 		}});
 	});
     </script>
+    <% }
+    if (html5Upload) {%>
+      <link rel="stylesheet" href="<%=request.getContextPath()%>/static/css/resumable-upload.css" type="text/css" />
+      <script src="<%=request.getContextPath()%>/static/js/resumable.js"></script>
     <% } %>
 </c:set>
 <%  } %>
@@ -359,9 +365,132 @@
 	   <div class="row container">
     		<div class="row">
                     <%-- Document File: --%>
-					<label class="col-md-<%= bSherpa?"3":"2" %>" for="tfile"><fmt:message key="jsp.submit.choose-file.document"/></label>
-                    <input type="file" size="40" name="file" id="tfile" />
+                    <div id="simple-upload">
+                        <label class="col-md-<%= bSherpa?"3":"2" %>" for="tfile"><fmt:message key="jsp.submit.choose-file.document"/></label>
+                        <input type="file" size="40" name="file" id="tfile" />
+                    </div>
             </div><br/>
+            
+            
+<%if (html5Upload) {%>
+      <div class="resumable-error">
+          <fmt:message key="jsp.submit.choose-file.upload-resumable.unsupported"/>
+      </div>
+      <div id="resumable-upload">
+          <div class="resumable-drop col-md-12" ondragenter="jQuery(this).addClass('resumable-dragover');" ondragend="jQuery(this).removeClass('resumable-dragover');" ondrop="jQuery(this).removeClass('resumable-dragover');">
+              <span class="glyphicon glyphicon-upload"></span>
+              <a class="resumable-browse"><fmt:message key="jsp.submit.choose-file.upload-resumable.button.select-file"/></a>         	
+          </div>
+      </div>
+            
+      <div class="resumable-progress">
+        <table>
+          <tr>
+            <td width="100%"><div class="progress-container"><div class="progress-bar"></div></div></td>
+            <td class="progress-text" nowrap="nowrap"></td>
+            <td class="progress-pause" nowrap="nowrap">
+              <a href="#" onclick="resume(); return(false);" class="progress-resume-link"><img src="image/submit/resume.png" title="Resume upload" /></a>
+              <a href="#" onclick="r.pause(); return(false);" class="progress-pause-link"><img src="image/submit/pause.png" title="Pause upload" /></a>
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="resumable-files">
+          <div class="panel panel-default">
+              <div class="panel-heading">
+                  Files To Upload
+              </div>
+
+              <table class="table resumable-list">
+                  <thead>
+                      <th>#</th>
+                      <th>Name</th>
+                      <th>Status</th>
+                  </thead>
+                  <tbody></tbody>
+              </table>
+          </div>
+      </div>
+      
+      <script>
+        var r = new Resumable({
+            target:'submit',
+            chunkSize:1024*1024,
+            simultaneousUploads:1,
+            testChunks: true,
+            throttleProgressCallbacks:1,
+            method: "multipart",
+            query:{workspace_item_id:'<%= subInfo.getSubmissionItem().getID()%>'}
+          });
+        // Resumable.js isn't supported, fall back on a different method
+
+        if(r.support) {
+          // Show a place for dropping/selecting files
+          $('.resumable-error').hide();
+          $('#simple-upload').hide();
+          $('.resumable-drop').show();
+          $('#resumable-upload').show(); // done
+          r.assignDrop($('.resumable-drop')[0]);
+          r.assignBrowse($('.resumable-browse')[0]);
+
+          // Handle file add event
+          r.on('fileAdded', function(file){
+              // Show progress pabr
+              $('.resumable-progress, .resumable-files, .resumable-list').show();
+              // Show pause, hide resume
+              $('.resumable-progress .progress-resume-link').hide();
+              $('.resumable-progress .progress-pause-link').show();
+              // Add the file to the list
+              $('.resumable-list tbody')
+                    .append('<tr>')
+                    .append('<td class="resumable-file-'+file.uniqueIdentifier+'">Uploading</td>')
+                    .append('<td class="resumable-file-name"></td>')
+                    //.append('<td class="resumable-file-description"><input type="text" name="description[]" id="tdescription"/></td>')            
+                    .append('<td class="resumable-file-progress"></td>')
+                    .append('</tr>');
+              $('.resumable-file-'+file.uniqueIdentifier+' + .resumable-file-name').html(file.fileName);
+              // Actually start the upload
+              r.upload();
+            });
+          r.on('pause', function(){
+              // Show resume, hide pause
+              $('.resumable-progress .progress-resume-link').show();
+              $('.resumable-progress .progress-pause-link').hide();
+            });
+          r.on('complete', function(){
+              // Hide pause/resume when the upload has completed
+              $('.resumable-progress .progress-resume-link, .resumable-progress .progress-pause-link').hide();
+            });
+          r.on('fileSuccess', function(file,message){
+              // Reflect that the file upload has completed
+              $('.resumable-file-'+file.uniqueIdentifier).html('');
+              //$('.resumable-file-'+file.uniqueIdentifier+' + .resumable-file-name + .resumable-file-description + .resumable-file-progress').html('<span class="glyphicon glyphicon-ok-sign"></span>');
+              $('.resumable-file-'+file.uniqueIdentifier+' + .resumable-file-name + .resumable-file-progress').html('<span class="glyphicon glyphicon-ok-sign"></span>');
+            });
+          r.on('fileError', function(file, message){
+              // Reflect that the file upload has resulted in error
+              $('.resumable-file-'+file.uniqueIdentifier+' + .resumable-file-name + .resumable-file-progress').html('<span class="glyphicon glyphicon-exclamation-sign"></span>');              
+              //'+message+')');
+              r.removeFile(file);
+              r.upload();
+            });
+          r.on('fileProgress', function(file){
+              // Handle progress for both the file and the overall upload
+              $('.resumable-file-'+file.uniqueIdentifier+' + .resumable-file-name + .resumable-file-progress').html(Math.floor(file.progress()*100) + '%');
+              $('.progress-bar').css({width:Math.floor(r.progress()*100) + '%'});
+            });
+            
+          function resume() {
+              // Show pause, hide resume
+              $('.resumable-progress .progress-resume-link').hide();
+              $('.resumable-progress .progress-pause-link').show();
+              r.upload();
+          }
+        }
+      </script>
+<%}%>
+            
 <% if (ajaxProgress)
 {
 %>

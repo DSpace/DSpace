@@ -36,6 +36,7 @@
 <%@page import="org.dspace.browse.BrowseInfo"%>
 <%@page import="org.dspace.browse.BrowseDSpaceObject"%>
 <%@page import="org.dspace.core.Utils"%>
+<%@page import="org.dspace.core.Utils"%>
 <%@page import="org.dspace.discovery.configuration.DiscoverySearchFilterFacet"%>
 <%@page import="org.dspace.app.webui.util.UIUtil"%>
 <%@page import="java.util.HashMap"%>
@@ -459,6 +460,7 @@ else if( qResults != null)
     
     // create the URLs accessing the previous and next search result pages
     String baseURL =  request.getContextPath()
+                    + (searchScope != "" ? "/handle/" + searchScope : "")
                     + "/simple-search?query="
                     + URLEncoder.encode(query,"UTF-8")
                     + "&amp;location="+ searchScope

@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <schema name="xoai" version="1.2">
   <types>
+    <fieldtype name="lengthfilter" class="solr.TextField">
+      <analyzer>
+        <tokenizer class="solr.KeywordTokenizerFactory"/>
+        <!-- ignore fields with more than 10000 chars because lucene doesn't swallow 
+        the MaxBytesLengthExceededException any longer. 
+        See https://issues.apache.org/jira/browse/LUCENE-5710  
+        This leads to an error if the content of a metadata field exceeds 32766 Bytes. -->
+        <filter class="solr.LengthFilterFactory" min="0" max="10000" />
+      </analyzer>
+    </fieldtype>
     <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
     <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true" omitNorms="true"/>
     <fieldtype name="binary" class="solr.BinaryField"/>
@@ -158,7 +168,7 @@
    <field name="item.compile" type="string" indexed="false" stored="true" multiValued="false" />
 
    <!-- Item metadata -->
-   <dynamicField name="metadata.*" type="string" indexed="true" stored="true" multiValued="true" />
+   <dynamicField name="metadata.*" type="lengthfilter" indexed="true" stored="true" multiValued="true" />
  
    <!-- Dynamic fields (not used by default) -->
    <dynamicField name="*_i"  type="int"    indexed="true"  stored="true"/>

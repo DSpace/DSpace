@@ -37,8 +37,11 @@ and searching the repository.
 			<map:transformer name="RestrictedItem" src="org.dspace.app.xmlui.aspect.artifactbrowser.RestrictedItem" />
 			<map:transformer name="ItemRequestResponseDecisionForm" src="org.dspace.app.xmlui.aspect.artifactbrowser.ItemRequestResponseDecisionForm" />
 			<map:transformer name="ItemRequestChangeStatusForm" src="org.dspace.app.xmlui.aspect.artifactbrowser.ItemRequestChangeStatusForm" />
+            <map:transformer name="ItemRequestContactAuthor" src="org.dspace.app.xmlui.aspect.artifactbrowser.ItemRequestContactAuthor" />
+            <map:transformer name="ItemRequestContactRequester" src="org.dspace.app.xmlui.aspect.artifactbrowser.ItemRequestContactRequester" />
 			<map:transformer name="ItemRequestResponseFalseForm" src="org.dspace.app.xmlui.aspect.artifactbrowser.ItemRequestResponseFalseForm" />
 			<map:transformer name="ItemRequestResponseTrueForm" src="org.dspace.app.xmlui.aspect.artifactbrowser.ItemRequestResponseTrueForm" />
+            <map:transformer name="ItemRequestResponseSent" src="org.dspace.app.xmlui.aspect.artifactbrowser.ItemRequestResponseSent" />
 			<map:transformer name="ItemRequestStatusChanged" src="org.dspace.app.xmlui.aspect.artifactbrowser.ItemRequestStatusChanged" />
 
             <map:transformer name="Statistics" src="org.dspace.app.xmlui.aspect.artifactbrowser.StatisticsViewer"/>
@@ -291,7 +294,8 @@ and searching the repository.
 					<map:parameter name="token" value="{1}" />
 					<map:parameter name="decision" value="{decision}" />
 					<map:parameter name="isSent" value="{isSent}" />
-					
+                    <map:parameter name="contactPerson" value="{contactPerson}"/>
+
 					<map:select type="parameter">
 					<map:parameter name="parameter-selector-test" value="{isSent}" />
 						<map:when test="true">
@@ -301,6 +305,9 @@ and searching the repository.
 								<map:parameter name="email" value="{email}" />
 							</map:transform>
 						</map:when>
+                        <map:when test="notify">
+                            <map:transform type="ItemRequestResponseSent"/>
+                        </map:when>
 						<map:otherwise>
 							<map:select type="parameter">
 							<map:parameter name="parameter-selector-test" value="{decision}" />
@@ -315,10 +322,22 @@ and searching the repository.
 									</map:transform>
 								</map:when>
 								<map:otherwise>
-									<map:transform type="ItemRequestResponseDecisionForm">
-										<map:parameter name="decision" value="{decision}" />
-										<map:parameter name="title" value="{title}" />
-									</map:transform>
+                                    <map:select type="parameter">
+                                        <!-- Initial Message to either Requester, or Author -->
+                                        <map:parameter name="parameter-selector-test" value="{contactPerson}" />
+                                        <map:when test="requester">
+                                            <map:transform type="ItemRequestContactRequester"></map:transform>
+                                        </map:when>
+                                        <map:when test="author">
+                                            <map:transform type="ItemRequestContactAuthor"></map:transform>
+                                        </map:when>
+                                        <map:otherwise>
+                                            <map:transform type="ItemRequestResponseDecisionForm">
+                                                <map:parameter name="decision" value="{decision}" />
+                                                <map:parameter name="title" value="{title}" />
+                                            </map:transform>
+                                        </map:otherwise>
+                                    </map:select>
 								</map:otherwise>
 							</map:select>
 						</map:otherwise>

@@ -21,9 +21,9 @@ import org.dspace.sort.OrderFormat;
  * Compare two Items by their DCValues.
  * 
  * The DCValues to be compared are specified by the element, qualifier and
- * language parameters to the constructor. If the Item has more than one
- * matching DCValue, then the max parameter to the constructor specifies whether
- * the maximum or minimum lexicographic value will be used.
+ language parameters to the constructor. If the Item has more than one
+ matching Metadatum, then the max parameter to the constructor specifies whether
+ the maximum or minimum lexicographic value will be used.
  * 
  * @author Peter Breton
  * @version $Revision$
@@ -52,9 +52,9 @@ public class ItemComparator implements Comparator, Serializable
      * @param language
      *            The language for the DCValues
      * @param max
-     *            If true, and there is more than one DCValue for element,
-     *            qualifier and language, then use the maximum value
-     *            lexicographically; otherwise use the minimum value.
+     *            If true, and there is more than one Metadatum for element,
+            qualifier and language, then use the maximum value
+            lexicographically; otherwise use the minimum value.
      */
     public ItemComparator(String element, String qualifier, String language,
             boolean max)
@@ -176,7 +176,7 @@ public class ItemComparator implements Comparator, Serializable
     private String getValue(Item item)
     {
         // The overall array and each element are guaranteed non-null
-        DCValue[] dcvalues = item.getDC(element, qualifier, language);
+        Metadatum[] dcvalues = item.getDC(element, qualifier, language);
 
         if (dcvalues.length == 0)
         {
@@ -189,7 +189,7 @@ public class ItemComparator implements Comparator, Serializable
         }
 
         // We want to sort using Strings, but also keep track of
-        // which DCValue the value came from.
+        // which Metadatum the value came from.
         Map<String, Integer> values = new HashMap<String, Integer>();
 
         for (int i = 0; i < dcvalues.length; i++)
@@ -217,9 +217,9 @@ public class ItemComparator implements Comparator, Serializable
     }
 
     /**
-     * Normalize the title of a DCValue.
+     * Normalize the title of a Metadatum.
      */
-    private String normalizeTitle(DCValue value)
+    private String normalizeTitle(Metadatum value)
     {
         if (!"title".equals(element))
         {

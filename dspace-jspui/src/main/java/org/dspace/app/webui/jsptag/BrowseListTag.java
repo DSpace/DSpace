@@ -33,12 +33,13 @@ import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseInfo;
 import org.dspace.browse.BrowseItem;
 import org.dspace.browse.CrossLinks;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.PluginManager;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
+import org.dspace.utils.DSpace;
 
 /**
  * Tag for display a list of items
@@ -622,7 +623,7 @@ public class BrowseListTag extends TagSupport
                     String qualifier = tokens[2];
 
                     // first get hold of the relevant metadata for this column
-                    DCValue[] metadataArray;
+                    Metadatum[] metadataArray;
                     if (qualifier.equals("*"))
                     {
                         metadataArray = items[i].getMetadata(schema, element,
@@ -642,7 +643,7 @@ public class BrowseListTag extends TagSupport
                     // save on a null check which would make the code untidy
                     if (metadataArray == null)
                     {
-                        metadataArray = new DCValue[0];
+                    	metadataArray = new Metadatum[0];
                     }
 
                     // now prepare the content of the table division
@@ -694,6 +695,12 @@ public class BrowseListTag extends TagSupport
                             viewFull[colIdx], browseType[colIdx], colIdx,
                             field, metadataArray, items[i], disableCrossLinks,
                             emph[colIdx], pageContext);
+                    
+                    String markClass = "";
+                    if (field.startsWith("mark_"))
+                    {
+                    	markClass = " "+field+"_tr";
+                    }
 
                     String id = "t" + Integer.toString(colIdx + 1);
                     out.print("<td headers=\"" + id + "\" class=\""
@@ -733,8 +740,7 @@ public class BrowseListTag extends TagSupport
         catch (IOException ie)
         {
             throw new JspException(ie);
-        }
-        catch (SQLException e)
+        } catch (SQLException e)
         {
             throw new JspException(e);
         }

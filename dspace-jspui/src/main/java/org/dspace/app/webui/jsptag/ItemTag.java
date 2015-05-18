@@ -38,7 +38,7 @@ import org.dspace.browse.BrowseIndex;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
@@ -451,7 +451,7 @@ public class ItemTag extends TagSupport
             }
 
             // FIXME: Still need to fix for metadata language?
-            DCValue[] values = item.getMetadata(schema, element, qualifier, Item.ANY);
+            Metadatum[] values = item.getMetadata(schema, element, qualifier, Item.ANY);
             
             if (values.length > 0)
             {
@@ -532,7 +532,7 @@ public class ItemTag extends TagSupport
         Context context = UIUtil.obtainContext(request);
 
         // Get all the metadata
-        DCValue[] values = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        Metadatum[] values = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
 
         // Three column table - DC field, value, language
 		out.println("<table class=\"table itemDisplayTable\">");

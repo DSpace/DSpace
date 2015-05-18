@@ -1,0 +1,41 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>DSpace EPerson</title>
+        <contributor.author>Kevin Van de Velde</contributor.author>
+        <contributor.author>Bert Vanderhallen</contributor.author>
+        <contributor.author>Ben Bosman</contributor.author>
+        <contributor.author>Mark Diggory</contributor.author>
+    </dspace-header>
+
+    <dc-schema>
+        <name>eperson</name>
+        <namespace>http://dspace.org/eperson</namespace>
+    </dc-schema>
+
+
+    <dc-type>
+        <schema>eperson</schema>
+        <element>firstname</element>
+        <scope_note>Metadata field used for the first name</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>eperson</schema>
+        <element>lastname</element>
+        <scope_note>Metadata field used for the last name</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>eperson</schema>
+        <element>phone</element>
+        <scope_note>Metadata field used for the phone number</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>eperson</schema>
+        <element>language</element>
+        <scope_note>Metadata field used for the language</scope_note>
+    </dc-type>
+
+</dspace-dc-types>

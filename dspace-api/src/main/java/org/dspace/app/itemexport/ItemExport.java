@@ -45,7 +45,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
@@ -403,8 +403,8 @@ public class ItemExport
             throws Exception
     {
         Set<String> schemas = new HashSet<String>();
-        DCValue[] dcValues = i.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-        for (DCValue dcValue : dcValues)
+        Metadatum[] dcValues = i.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        for (Metadatum dcValue : dcValues)
         {
             schemas.add(dcValue.schema);
         }
@@ -439,7 +439,7 @@ public class ItemExport
             BufferedOutputStream out = new BufferedOutputStream(
                     new FileOutputStream(outFile));
 
-            DCValue[] dcorevalues = i.getMetadata(schema, Item.ANY, Item.ANY,
+            Metadatum[] dcorevalues = i.getMetadata(schema, Item.ANY, Item.ANY,
                     Item.ANY);
 
             // XML preamble
@@ -454,7 +454,7 @@ public class ItemExport
             String dateIssued = null;
             String dateAccessioned = null;
 
-            for (DCValue dcv : dcorevalues)
+            for (Metadatum dcv : dcorevalues)
             {
                 String qualifier = dcv.qualifier;
 
@@ -1405,7 +1405,7 @@ public class ItemExport
     public static void emailErrorMessage(EPerson eperson, String error)
             throws MessagingException
     {
-        log.warn("An error occured during item export, the user will be notified. " + error);
+        log.warn("An error occurred during item export, the user will be notified. " + error);
         try
         {
             Locale supportedLocale = I18nUtil.getEPersonLocale(eperson);

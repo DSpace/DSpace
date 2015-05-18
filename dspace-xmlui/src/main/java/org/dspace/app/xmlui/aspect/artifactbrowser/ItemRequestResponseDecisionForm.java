@@ -31,9 +31,10 @@ import org.dspace.app.xmlui.wing.element.Radio;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.app.xmlui.wing.element.TextArea;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -60,7 +61,11 @@ public class ItemRequestResponseDecisionForm extends AbstractDSpaceTransformer
 
 	private static final Message T_para2 = message("xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.para2");
 
-	private static final Message T_send = message("xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.send");
+    private static final Message T_contactRequester = message("xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.contactRequester");
+
+    private static final Message T_contactAuthor = message("xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.contactAuthor");
+
+    private static final Message T_send = message("xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.send");
 
 	private static final Message T_dontSend = message("xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.dontSend");
 
@@ -104,6 +109,12 @@ public class ItemRequestResponseDecisionForm extends AbstractDSpaceTransformer
 		itemRequest.addPara(T_para2);
 
 		List form = itemRequest.addList("form", List.TYPE_FORM);
+
+        boolean helpdeskOverridesSubmitter = ConfigurationManager.getBooleanProperty("request.item.helpdesk.override", false);
+        if(helpdeskOverridesSubmitter) {
+            form.addItem().addButton("contactRequester").setValue(T_contactRequester);
+            form.addItem().addButton("contactAuthor").setValue(T_contactAuthor);
+        }
 
 		form.addItem().addButton("send").setValue(T_send);
 		form.addItem().addButton("dontSend").setValue(T_dontSend);

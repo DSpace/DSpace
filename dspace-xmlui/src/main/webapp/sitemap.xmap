@@ -646,6 +646,14 @@
                         <map:read src="static/{1}/{2}"/>
                     </map:match>
 
+                    <!-- DSpace does not have any paths beginning with numbers (0-9). If one is accessed,
+                         assume that it is an identifier & redirect it. This also avoids an internal
+                         error, where the XMLUI AspectMatcher wrongly assumes numbers at beginning
+                         of path are direct references to individual Aspects in the aspect chain.-->
+                    <map:match type="regexp" pattern="(^[0-9]+\/?.*$)">
+                        <map:redirect-to uri="{request:contextPath}/handle/{1}" permanent="yes"/>
+                    </map:match>
+
                 </map:pipeline>
                 
                 <!-- pipline to run external handle server -->

@@ -56,20 +56,6 @@ public class MetadataSchemaTest extends AbstractUnitTest
     }
 
     /**
-     * This method will be run after every test as per @After. It will
-     * clean resources initialized by the @Before methods.
-     *
-     * Other methods can be annotated with @After here or in subclasses
-     * but no execution order is guaranteed
-     */
-    @After
-    @Override
-    public void destroy()
-    {
-        super.destroy();
-    }
-
-    /**
      * Test of getNamespace method, of class MetadataSchema.
      */
     @Test
@@ -92,7 +78,7 @@ public class MetadataSchemaTest extends AbstractUnitTest
         assertThat("testSetNamespace 1",ms.getNamespace(),not(equalTo("")));
         assertThat("testSetNamespace 2",ms.getNamespace(),equalTo(namespace));
 
-        //we restore the old namespace to avoid issues
+        //we restore the old namespace to avoid issues in other tests
         ms.setNamespace(oldnamespace);
     }
 
@@ -110,7 +96,7 @@ public class MetadataSchemaTest extends AbstractUnitTest
      * Test of setName method, of class MetadataSchema.
      */
     @Test
-    public void testSetName() 
+    public void testSetName()
     {
         String oldname = ms.getName();
         String name = "new name";
@@ -138,13 +124,11 @@ public class MetadataSchemaTest extends AbstractUnitTest
     @Test
     public void testCreateAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.isAdmin(context); result = true;
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow full admin permissions
+            AuthorizeManager.isAdmin(context); result = true;
+        }};
 
         String namespace = "namespace";
         String name = "name";
@@ -163,13 +147,11 @@ public class MetadataSchemaTest extends AbstractUnitTest
     @Test(expected=AuthorizeException.class)
     public void testCreateNoAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.isAdmin(context); result = false;
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow full admin permissions
+            AuthorizeManager.isAdmin(context); result = false;
+        }};
 
         String namespace = "namespace";
         String name = "name";
@@ -186,13 +168,11 @@ public class MetadataSchemaTest extends AbstractUnitTest
     @Test(expected=NonUniqueMetadataException.class)
     public void testCreateRepeated() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.isAdmin(context); result = true;
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow full admin permissions
+            AuthorizeManager.isAdmin(context); result = true;
+        }};
 
         String namespace = ms.getNamespace();
         String name = ms.getName();
@@ -221,13 +201,11 @@ public class MetadataSchemaTest extends AbstractUnitTest
     @Test
     public void testUpdateAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.isAdmin(context); result = true;
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow full admin permissions
+            AuthorizeManager.isAdmin(context); result = true;
+        }};
 
         String namespace = "namespace2";
         String name = "name2";
@@ -248,13 +226,11 @@ public class MetadataSchemaTest extends AbstractUnitTest
     @Test(expected=AuthorizeException.class)
     public void testUpdateNoAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.isAdmin(context); result = false;
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow full admin permissions
+            AuthorizeManager.isAdmin(context); result = false;
+        }};
 
         String namespace = "namespace2";
         String name = "name2";
@@ -271,13 +247,11 @@ public class MetadataSchemaTest extends AbstractUnitTest
     @Test(expected=NonUniqueMetadataException.class)
     public void testUpdateRepeated() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.isAdmin(context); result = true;
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow full admin permissions
+            AuthorizeManager.isAdmin(context); result = true;
+        }};
 
         String namespace = ms.getNamespace();
         String name = ms.getName();
@@ -296,13 +270,11 @@ public class MetadataSchemaTest extends AbstractUnitTest
     @Test
     public void testDeleteAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.isAdmin(context); result = true;
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow full admin permissions
+            AuthorizeManager.isAdmin(context); result = true;
+        }};
 
         String namespace = "namespace3";
         String name = "name3";
@@ -324,13 +296,11 @@ public class MetadataSchemaTest extends AbstractUnitTest
     @Test(expected=AuthorizeException.class)
     public void testDeleteNoAuth() throws Exception
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.isAdmin(context); result = false;
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow full admin permissions
+            AuthorizeManager.isAdmin(context); result = false;
+        }};
 
         String namespace = "namespace3";
         String name = "name3";

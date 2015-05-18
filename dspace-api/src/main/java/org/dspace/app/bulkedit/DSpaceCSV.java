@@ -7,6 +7,7 @@
  */
 package org.dspace.app.bulkedit;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.app.bulkedit.DSpaceCSVLine;
 import org.dspace.app.bulkedit.MetadataImport;
@@ -14,6 +15,7 @@ import org.dspace.app.bulkedit.MetadataImportInvalidHeadingException;
 import org.dspace.content.Collection;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
+import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 
@@ -185,7 +187,7 @@ public class DSpaceCSV implements Serializable
             StringBuilder lineBuilder = new StringBuilder();
             String lineRead;
 
-            while ((lineRead = input.readLine()) != null)
+            while (StringUtils.isNotBlank(lineRead = input.readLine()))
             {
                 if (lineBuilder.length() > 0) {
                     // Already have a previously read value - add this line
@@ -423,8 +425,8 @@ public class DSpaceCSV implements Serializable
         }
 
         // Populate it
-        DCValue md[] = i.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-        for (DCValue value : md)
+        Metadatum md[] = i.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        for (Metadatum value : md)
         {
             // Get the key (schema.element)
             String key = value.schema + "." + value.element;
@@ -449,7 +451,7 @@ public class DSpaceCSV implements Serializable
                 String mdValue = value.value;
                 if (value.authority != null && !"".equals(value.authority))
                 {
-                    mdValue += authoritySeparator + value.authority + authoritySeparator + value.confidence;
+                    mdValue += authoritySeparator + value.authority + authoritySeparator +  (value.confidence != -1 ? value.confidence : Choices.CF_ACCEPTED);
                 }
                 line.add(key, mdValue);
                 if (!headings.contains(key))
@@ -610,8 +612,9 @@ public class DSpaceCSV implements Serializable
         // Create the headings line
         String[] csvLines = new String[counter + 1];
         csvLines[0] = "id" + fieldSeparator + "collection";
-        Collections.sort(headings);
-        for (String value : headings)
+        List<String> headingsCopy = new ArrayList<String>(headings);
+        Collections.sort(headingsCopy);
+        for (String value : headingsCopy)
         {
             csvLines[0] = csvLines[0] + fieldSeparator + value;
         }
@@ -620,7 +623,7 @@ public class DSpaceCSV implements Serializable
         int c = 1;
         while (i.hasNext())
         {
-            csvLines[c++] = i.next().toCSV(headings);
+            csvLines[c++] = i.next().toCSV(headingsCopy);
         }
 
         return csvLines;
@@ -652,10 +655,10 @@ public class DSpaceCSV implements Serializable
      *
      * The list can be configured via the key ignore-on-export in bulkedit.cfg
      *
-     * @param md The DCValue to examine
+     * @param md The Metadatum to examine
      * @return Whether or not it is OK to export this element
      */
-    private final boolean okToExport(DCValue md)
+    private final boolean okToExport(Metadatum md)
     {
         // Now compare with the list to ignore
         String key = md.schema + "." + md.element;

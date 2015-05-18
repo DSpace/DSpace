@@ -9,8 +9,6 @@ package org.dspace.utils.servicemanager;
 
 import static org.junit.Assert.*;
 
-import org.dspace.utils.servicemanager.ProviderHolder;
-import org.dspace.utils.servicemanager.ProviderNotFoundException;
 import org.junit.Test;
 
 /**
@@ -35,6 +33,9 @@ public class ProviderHolderTest {
         Thing t2 = holder.getProvider();
         assertNotNull(t2);
         assertEquals(t, t2);
+        
+        //trash the references
+        t = t2 = null;
     }
 
     @Test
@@ -55,6 +56,8 @@ public class ProviderHolderTest {
 
         Thing t3 = holder.getProvider();
         assertNull(t3);
+        
+        t3 = null;
     }
 
     @Test
@@ -73,6 +76,9 @@ public class ProviderHolderTest {
         Thing t2 = holder.getProviderOrFail();
         assertNotNull(t2);
         assertEquals(t, t2);
+        
+        //trash the references
+        t = t2 = null;
     }
 
     @Test
@@ -86,6 +92,8 @@ public class ProviderHolderTest {
         assertNotNull( holder.hashCode() );
         assertFalse( holder.equals(null) );
         assertNotNull( holder.toString() );
+        
+        holder = null;
     }
     
 }

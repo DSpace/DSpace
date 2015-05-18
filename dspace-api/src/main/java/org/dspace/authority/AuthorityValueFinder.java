@@ -38,15 +38,25 @@ public class AuthorityValueFinder {
      * Item.ANY does not work here.
      */
     public AuthorityValue findByUID(Context context, String authorityID) {
-        String queryString = "id:" + authorityID;
+        //Ensure that if we use the full identifier to match on
+        String queryString = "id:\"" + authorityID + "\"";
         List<AuthorityValue> findings = find(context, queryString);
         return findings.size() > 0 ? findings.get(0) : null;
     }
 
-    public List<AuthorityValue> findByValue(Context context, String schema, String element, String qualifier, String value) {
-        String field = fieldParameter(schema, element, qualifier);
+    public List<AuthorityValue> findByExactValue(Context context, String field, String value) {
+        String queryString = "value:\"" + value + "\" AND field:" + field;
+        return find(context, queryString);
+    }
+
+    public List<AuthorityValue> findByValue(Context context, String field, String value) {
         String queryString = "value:" + value + " AND field:" + field;
         return find(context, queryString);
+    }
+
+    public List<AuthorityValue> findByValue(Context context, String schema, String element, String qualifier, String value) {
+        String field = fieldParameter(schema, element, qualifier);
+        return findByValue(context, field, qualifier);
     }
 
     public AuthorityValue findByOrcidID(Context context, String orcid_id) {

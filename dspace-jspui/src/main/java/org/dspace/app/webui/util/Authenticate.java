@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Level;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -165,6 +166,17 @@ public class Authenticate
         if (AuthenticationManager.authenticateImplicit(context, null, null,
                 null, request) == AuthenticationMethod.SUCCESS)
         {
+            try {
+                // the AuthenticationManager updates the last_active field of the
+                // eperson that logged in. We need to commit the context, to store
+                // the updated field in the database.
+                context.commit();
+            } catch (SQLException ex) {
+                // We can log the SQLException, but we should not interrupt the 
+                // users interaction here.
+                log.error("Failed to write an updated last_active field of an "
+                        + "EPerson into the databse.", ex);
+            }
             loggedIn(context, request, context.getCurrentUser());
             log.info(LogManager.getHeader(context, "login", "type=implicit"));
             if(context.getCurrentUser() != null){

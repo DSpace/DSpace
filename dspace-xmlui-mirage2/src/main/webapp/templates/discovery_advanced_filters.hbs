@@ -1,0 +1,61 @@
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+{{#filters}}
+<div id="aspect_discovery_SimpleSearch_row_filter-new-{{index}}"
+     class="ds-form-item row advanced-filter-row search-filter">
+    <div class="col-xs-4 col-sm-2">
+        <p>
+            <select id="aspect_discovery_SimpleSearch_field_filtertype_{{index}}" class="ds-select-field form-control"
+                    name="filtertype_{{index}}">
+                {{#set_selected type}}
+                {{#each ../../i18n.filtertype}}
+                <option value="{{@key}}">{{this}}</option>
+                {{/each}}
+                {{/set_selected}}
+            </select>
+        </p>
+    </div>
+    <div class="col-xs-4 col-sm-2">
+        <p>
+            <select id="aspect_discovery_SimpleSearch_field_filter_relational_operator_{{index}}"
+                    class="ds-select-field form-control" name="filter_relational_operator_{{index}}">
+                {{#set_selected relational_operator}}
+                {{#each ../../i18n.filter_relational_operator}}
+                <option value="{{@key}}">{{this}}</option>
+                {{/each}}
+                {{/set_selected}}
+            </select>
+        </p>
+    </div>
+    <div class="col-xs-4 col-sm-6">
+        <p>
+            <input id="aspect_discovery_SimpleSearch_field_filter_{{index}}"
+                   class="ds-text-field form-control discovery-filter-input discovery-filter-input"
+                   name="filter_{{index}}" type="text" value="{{query}}">
+        </p>
+    </div>
+    <div class="hidden-xs col-sm-2">
+        <div class="btn-group btn-group-justified">
+                <p class="btn-group">
+                    <button id="aspect_discovery_SimpleSearch_field_add-filter_{{index}}"
+                            class="ds-button-field btn btn-default filter-control filter-add filter-control filter-add"
+                            name="add-filter_{{index}}" type="submit" title="Add Filter"><span
+                            class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span></button>
+                </p>
+                <p class="btn-group">
+                    <button id="aspect_discovery_SimpleSearch_field_remove-filter_{{index}}"
+                            class="ds-button-field btn btn-default filter-control filter-remove filter-control filter-remove"
+                            name="remove-filter_{{index}}" type="submit" title="Remove"><span
+                            class="glyphicon glyphicon-minus-sign" aria-hidden="true"></span></button>
+                </p>
+        </div>
+    </div>
+</div>
+{{/filters}}

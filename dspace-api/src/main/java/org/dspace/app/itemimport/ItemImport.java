@@ -16,6 +16,7 @@ import gr.ekt.bteio.generators.DSpaceOutputGenerator;
 import gr.ekt.bteio.loaders.OAIPMHDataLoader;
 
 import java.io.*;
+import java.net.URL;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -33,27 +34,19 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
+import org.apache.commons.collections.ComparatorUtils;
+import org.apache.commons.io.FileDeleteStrategy;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.apache.xpath.XPathAPI;
-import org.dspace.app.itemexport.ItemExportException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
+import org.dspace.content.*;
 import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.FormatIdentifier;
-import org.dspace.content.InstallItem;
-import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
-import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
-import org.dspace.content.WorkspaceItem;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -107,6 +100,21 @@ public class ItemImport
     private static boolean template = false;
 
     private static PrintWriter mapOut = null;
+
+    private static final String tempWorkDir = ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir");
+
+    static {
+        //Ensure tempWorkDir exists
+        File tempWorkDirFile = new File(tempWorkDir);
+        if (!tempWorkDirFile.exists()){
+            boolean success = tempWorkDirFile.mkdir();
+            if (success) {
+                log.info("Created org.dspace.app.batchitemimport.work.dir of: " + tempWorkDir);
+            } else {
+                log.error("Cannot create batch import directory! " + tempWorkDir);
+            }
+        }
+    }
 
     // File listing filter to look for metadata files
     private static FilenameFilter metadataFileFilter = new FilenameFilter()
@@ -208,12 +216,12 @@ public class ItemImport
             {
                 command = "delete";
             }
-            
+
             if (line.hasOption('b'))
             {
                 command = "add-bte";
             }
-            
+
             if (line.hasOption('i'))
             {
                 bteInputType = line.getOptionValue('i');
@@ -273,13 +281,14 @@ public class ItemImport
 
             boolean zip = false;
             String zipfilename = "";
-            String ziptempdir = ConfigurationManager.getProperty("org.dspace.app.itemexport.work.dir");
             if (line.hasOption('z'))
             {
                 zip = true;
                 zipfilename = sourcedir + System.getProperty("file.separator") + line.getOptionValue('z');
             }
 
+            //By default assume collections will be given on the command line
+            boolean commandLineCollections = true;
             // now validate
             // must have a command set
             if (command == null)
@@ -316,16 +325,14 @@ public class ItemImport
 
                 if (collections == null)
                 {
-                    System.out
-                            .println("Error - at least one destination collection must be specified");
-                    System.out.println(" (run with -h flag for details)");
-                    System.exit(1);
+                    System.out.println("No collections given. Assuming 'collections' file inside item directory");
+                    commandLineCollections = false;
                 }
             }
             else if ("add-bte".equals(command))
             {
             	//Source dir can be null, the user can specify the parameters for his loader in the Spring XML configuration file
-            	
+
                 if (mapfile == null)
                 {
                     System.out
@@ -344,12 +351,10 @@ public class ItemImport
 
                 if (collections == null)
                 {
-                    System.out
-                            .println("Error - at least one destination collection must be specified");
-                    System.out.println(" (run with -h flag for details)");
-                    System.exit(1);
+                    System.out.println("No collections given. Assuming 'collections' file inside item directory");
+                    commandLineCollections = false;
                 }
-                
+
                 if (bteInputType == null)
                 {
                     System.out
@@ -375,10 +380,10 @@ public class ItemImport
             }
 
             // can only resume for adds
-            if (isResume && !"add".equals(command))
+            if (isResume && !"add".equals(command) && !"add-bte".equals(command))
             {
                 System.out
-                        .println("Error - resume option only works with --add command");
+                        .println("Error - resume option only works with the --add or the --add-bte commands");
                 System.exit(1);
             }
 
@@ -393,39 +398,6 @@ public class ItemImport
                 System.out
                         .println("Either delete it or use --resume if attempting to resume an aborted import.");
                 System.exit(1);
-            }
-
-            // does the zip file exist and can we write to the temp directory
-            if (zip)
-            {
-                File zipfile = new File(sourcedir);
-                if (!zipfile.canRead())
-                {
-                    System.out.println("Zip file '" + sourcedir + "' does not exist, or is not readable.");
-                    System.exit(1);
-                }
-
-                if (ziptempdir == null)
-                {
-                    System.out.println("Unable to unzip import file as the key 'org.dspace.app.itemexport.work.dir' is not set in dspace.cfg");
-                    System.exit(1);
-                }
-                zipfile = new File(ziptempdir);
-                if (!zipfile.isDirectory())
-                {
-                    System.out.println("'" + ConfigurationManager.getProperty("org.dspace.app.itemexport.work.dir") +
-                                       "' as defined by the key 'org.dspace.app.itemexport.work.dir' in dspace.cfg " +
-                                       "is not a valid directory");
-                    System.exit(1);
-                }
-                File tempdir = new File(ziptempdir);
-                if (!tempdir.exists() && !tempdir.mkdirs())
-                {
-                    log.error("Unable to create temporary directory");
-                }
-                sourcedir = ziptempdir + System.getProperty("file.separator") + line.getOptionValue("z");
-                ziptempdir = ziptempdir + System.getProperty("file.separator") +
-                             line.getOptionValue("z") + System.getProperty("file.separator");
             }
 
             ItemImport myloader = new ItemImport();
@@ -458,7 +430,8 @@ public class ItemImport
             Collection[] mycollections = null;
 
             // don't need to validate collections set if command is "delete"
-            if (!"delete".equals(command))
+            // also if no collections are given in the command line
+            if (!"delete".equals(command) && commandLineCollections)
             {
                 System.out.println("Destination collections:");
 
@@ -513,52 +486,10 @@ public class ItemImport
             try
             {
                 // If this is a zip archive, unzip it first
-                if (zip)
-                {
-                    ZipFile zf = new ZipFile(zipfilename);
-                    ZipEntry entry;
-                    Enumeration<? extends ZipEntry> entries = zf.entries();
-                    while (entries.hasMoreElements())
-                    {
-                        entry = entries.nextElement();
-                        if (entry.isDirectory())
-                        {
-                            if (!new File(ziptempdir + entry.getName()).mkdir())
-                            {
-                                log.error("Unable to create contents directory");
-                            }
-                        }
-                        else
-                        {
-                            System.out.println("Extracting file: " + entry.getName());
-                            int index = entry.getName().lastIndexOf('/');
-                            if (index == -1)
-                            {
-                                // Was it created on Windows instead?
-                                index = entry.getName().lastIndexOf('\\');
-                            }
-                            if (index > 0)
-                            {
-                                File dir = new File(ziptempdir + entry.getName().substring(0, index));
-                                if (!dir.mkdirs())
-                                {
-                                    log.error("Unable to create directory");
-                                }
-                            }
-                            byte[] buffer = new byte[1024];
-                            int len;
-                            InputStream in = zf.getInputStream(entry);
-                            BufferedOutputStream out = new BufferedOutputStream(
-                                new FileOutputStream(ziptempdir + entry.getName()));
-                            while((len = in.read(buffer)) >= 0)
-                            {
-                                out.write(buffer, 0, len);
-                            }
-                            in.close();
-                            out.close();
-                        }
-                    }
+                if (zip) {
+                    sourcedir = unzip(sourcedir, zipfilename);
                 }
+
 
                 c.turnOffAuthorisationSystem();
 
@@ -584,14 +515,6 @@ public class ItemImport
             }
             catch (Exception e)
             {
-                // abort all operations
-                if (mapOut != null)
-                {
-                    mapOut.close();
-                }
-
-                mapOut = null;
-
                 c.abort();
                 e.printStackTrace();
                 System.out.println(e);
@@ -604,19 +527,16 @@ public class ItemImport
                 if (zip)
                 {
                     System.gc();
-                    System.out.println("Deleting temporary zip directory: " + ziptempdir);
-                    ItemImport.deleteDirectory(new File(ziptempdir));
+                    System.out.println("Deleting temporary zip directory: " + tempWorkDir);
+                    ItemImport.deleteDirectory(new File(tempWorkDir));
                 }
             }
             catch (Exception ex)
             {
-                System.out.println("Unable to delete temporary zip archive location: " + ziptempdir);
+                System.out.println("Unable to delete temporary zip archive location: " + tempWorkDir);
             }
 
-            if (mapOut != null)
-            {
-                mapOut.close();
-            }
+
 
             if (isTest)
             {
@@ -665,14 +585,14 @@ public class ItemImport
     		outputFolder = importDir + File.separator + generateRandomFilename(true);
     	}
     	else { //This indicates a UI import, working dir is preconfigured
-    		outputFolder = workingDir + File.separator + ".bte_output_dspace";
+    		outputFolder = workingDir;
     	}
-    	
+
         BTEBatchImportService dls  = new DSpace().getSingletonService(BTEBatchImportService.class);
         DataLoader dataLoader = dls.getDataLoaders().get(inputType);
         Map<String, String> outputMap = dls.getOutputMap();
         TransformationEngine te = dls.getTransformationEngine();
-        
+
         if (dataLoader==null){
             System.out.println("ERROR: The key used in -i parameter must match a valid DataLoader in the BTE Spring XML configuration file!");
             return;
@@ -702,10 +622,10 @@ public class ItemImport
             System.out.println("INFO: Dataloader " + dataLoader.toString()+" will be used for the import!");
 
         	te.setDataLoader(dataLoader);
-        	
+
         	DSpaceOutputGenerator outputGenerator = new DSpaceOutputGenerator(outputMap);
         	outputGenerator.setOutputDirectory(outputFolder);
-        	
+
         	te.setOutputGenerator(outputGenerator);
 
         	try {
@@ -717,26 +637,41 @@ public class ItemImport
         		e.printStackTrace();
         		throw e;
         	}
-
         	ItemImport myloader = new ItemImport();
         	myloader.addItems(c, mycollections, outputFolder, mapFile, template);
-
-        	//remove files from output generator
-        	deleteDirectory(new File(outputFolder));
         }
     }
 
-    private void addItems(Context c, Collection[] mycollections,
+    public void addItemsAtomic(Context c, Collection[] mycollections, String sourceDir, String mapFile, boolean template) throws Exception {
+        try {
+            addItems(c, mycollections, sourceDir, mapFile, template);
+        } catch (Exception addException) {
+            log.error("AddItems encountered an error, will try to revert. Error: " + addException.getMessage());
+            deleteItems(c, mapFile);
+            c.commit();
+            log.info("Attempted to delete partial (errored) import");
+            throw addException;
+        }
+    }
+
+    public void addItems(Context c, Collection[] mycollections,
             String sourceDir, String mapFile, boolean template) throws Exception
     {
-        Map<String, String> skipItems = new HashMap<String, String>(); // set of items to skip if in 'resume'
-        // mode
-
-        System.out.println("Adding items from directory: " + sourceDir);
-        System.out.println("Generating mapfile: " + mapFile);
-
         // create the mapfile
         File outFile = null;
+
+        try {
+            Map<String, String> skipItems = new HashMap<String, String>(); // set of items to skip if in 'resume'
+            // mode
+
+            System.out.println("Adding items from directory: " + sourceDir);
+            System.out.println("Generating mapfile: " + mapFile);
+
+        boolean directoryFileCollections = false;
+        if (mycollections == null)
+        {
+            directoryFileCollections = true;
+        }
 
         if (!isTest)
         {
@@ -747,27 +682,27 @@ public class ItemImport
                 skipItems = readMapFile(mapFile);
             }
 
-            // sneaky isResume == true means open file in append mode
-            outFile = new File(mapFile);
-            mapOut = new PrintWriter(new FileWriter(outFile, isResume));
+                // sneaky isResume == true means open file in append mode
+                outFile = new File(mapFile);
+                mapOut = new PrintWriter(new FileWriter(outFile, isResume));
 
-            if (mapOut == null)
-            {
-                throw new Exception("can't open mapfile: " + mapFile);
+                if (mapOut == null)
+                {
+                    throw new Exception("can't open mapfile: " + mapFile);
+                }
             }
-        }
 
-        // open and process the source directory
-        File d = new java.io.File(sourceDir);
+            // open and process the source directory
+            File d = new java.io.File(sourceDir);
 
-        if (d == null || !d.isDirectory())
-        {
-            throw new Exception("Error, cannot open source directory " + sourceDir);
-        }
+            if (d == null || !d.isDirectory())
+            {
+                throw new Exception("Error, cannot open source directory " + sourceDir);
+            }
 
-        String[] dircontents = d.list(directoryFilter);
-        
-        Arrays.sort(dircontents);
+            String[] dircontents = d.list(directoryFilter);
+
+            Arrays.sort(dircontents, ComparatorUtils.naturalComparator());
 
         for (int i = 0; i < dircontents.length; i++)
         {
@@ -777,9 +712,37 @@ public class ItemImport
             }
             else
             {
+                Collection [] clist;
+                if (directoryFileCollections) {
+                    String path = sourceDir + File.separatorChar + dircontents[i];
+                    try {
+                        Collection[] cols = processCollectionFile(c, path, "collections");
+                        if (cols == null) {
+                            System.out.println("No collections specified for item " + dircontents[i] + ". Skipping.");
+                            continue;
+                        }
+                        clist = cols;
+                    }
+                    catch (IllegalArgumentException e)
+                    {
+                        System.out.println(e.getMessage() + " Skipping." );
+                        continue;
+                    }
+                }
+                else
+                {
+                    clist = mycollections;
+                }
                 addItem(c, mycollections, sourceDir, dircontents[i], mapOut, template);
                 System.out.println(i + " " + dircontents[i]);
                 c.clearCache();
+            }
+        }
+
+        } finally {
+            if(mapOut!=null) {
+                mapOut.flush();
+                mapOut.close();
             }
         }
     }
@@ -883,13 +846,13 @@ public class ItemImport
      * item? try and add it to the archive.
      * @param mycollections - add item to these Collections.
      * @param path - directory containing the item directories.
-     * @param itemname handle - non-null means we have a pre-defined handle already 
+     * @param itemname handle - non-null means we have a pre-defined handle already
      * @param mapOut - mapfile we're writing
      */
     private Item addItem(Context c, Collection[] mycollections, String path,
             String itemname, PrintWriter mapOut, boolean template) throws Exception
     {
-        String mapOutput = null;
+        String mapOutputString = null;
 
         System.out.println("Adding item from directory " + itemname);
 
@@ -937,7 +900,7 @@ public class ItemImport
                 }
 
                 // send ID to the mapfile
-                mapOutput = itemname + " " + myitem.getID();
+                mapOutputString = itemname + " " + myitem.getID();
             }
         }
         else
@@ -949,12 +912,18 @@ public class ItemImport
             // put item in system
             if (!isTest)
             {
-                InstallItem.installItem(c, wi, myhandle);
+                try {
+                    InstallItem.installItem(c, wi, myhandle);
+                } catch (Exception e) {
+                    wi.deleteAll();
+                    log.error("Exception after install item, try to revert...", e);
+                    throw e;
+                }
 
                 // find the handle, and output to map file
                 myhandle = HandleManager.findHandle(c, myitem);
 
-                mapOutput = itemname + " " + myhandle;
+                mapOutputString = itemname + " " + myhandle;
             }
 
             // set permissions if specified in contents file
@@ -980,7 +949,7 @@ public class ItemImport
         // made it this far, everything is fine, commit transaction
         if (mapOut != null)
         {
-            mapOut.println(mapOutput);
+            mapOut.println(mapOutputString);
         }
 
         c.commit();
@@ -1113,7 +1082,7 @@ public class ItemImport
         {
             schema = schemaAttr.getNodeValue();
         }
-         
+
         // Get the nodes corresponding to formats
         NodeList dcNodes = XPathAPI.selectNodeList(document,
                 "/dublin_core/dcvalue");
@@ -1161,18 +1130,6 @@ public class ItemImport
             qualifier = null;
         }
 
-        // if language isn't set, use the system's default value
-        if (StringUtils.isEmpty(language))
-        {
-            language = ConfigurationManager.getProperty("default.language");
-        }
-
-        // a goofy default, but there it is
-        if (language == null)
-        {
-            language = "en";
-        }
-
         if (!isTest)
         {
             i.addMetadata(schema, element, qualifier, language, value);
@@ -1181,22 +1138,96 @@ public class ItemImport
         {
             // If we're just test the import, let's check that the actual metadata field exists.
         	MetadataSchema foundSchema = MetadataSchema.find(c,schema);
-        	
+
         	if (foundSchema == null)
         	{
         		System.out.println("ERROR: schema '"+schema+"' was not found in the registry.");
         		return;
         	}
-        	
+
         	int schemaID = foundSchema.getSchemaID();
         	MetadataField foundField = MetadataField.findByElement(c, schemaID, element, qualifier);
-        	
+
         	if (foundField == null)
         	{
         		System.out.println("ERROR: Metadata field: '"+schema+"."+element+"."+qualifier+"' was not found in the registry.");
         		return;
-            }		
+            }
         }
+    }
+
+    /**
+     * Read the collections file inside the item directory. If there
+     * is one and it is not empty return a list of collections in
+     * which the item should be inserted. If it does not exist or it
+     * is empty return null.
+     *
+     * @param c The context
+     * @param path The path to the data directory for this item
+     * @param filename The collections file filename. Should be "collections"
+     * @return A list of collections in which to insert the item or null
+     */
+
+    private Collection[] processCollectionFile(Context c, String path, String filename) throws IOException, SQLException
+    {
+        File file = new File(path + File.separatorChar + filename);
+        ArrayList<Collection> collections = new ArrayList<Collection>();
+        Collection[] result = null;
+        System.out.println("Processing collections file: " + filename);
+
+        if(file.exists())
+        {
+            BufferedReader br = null;
+            try
+            {
+                br = new BufferedReader(new FileReader(file));
+                String line = null;
+                while ((line = br.readLine()) != null)
+                {
+                    DSpaceObject obj = null;
+                    if (line.indexOf('/') != -1)
+                    {
+                        obj = HandleManager.resolveToObject(c, line);
+                        if (obj == null || obj.getType() != Constants.COLLECTION)
+                        {
+                            obj = null;
+                        }
+                    }
+                    else
+                    {
+                        obj = Collection.find(c, Integer.parseInt(line));
+                    }
+
+                    if (obj == null) {
+                        throw new IllegalArgumentException("Cannot resolve " + line + " to a collection.");
+                    }
+                    collections.add((Collection)obj);
+
+                }
+
+                result = new Collection[collections.size()];
+                for (int i = 0; i < result.length; i++) {
+                    result[i] = collections.get(i);
+                }
+            }
+            catch (FileNotFoundException e)
+            {
+                System.out.println("No collections file found.");
+            }
+            finally
+            {
+                if (br != null)
+                {
+                    try {
+                        br.close();
+                    } catch (IOException e) {
+                        System.out.println("Non-critical problem releasing resources.");
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -1339,7 +1370,7 @@ public class ItemImport
                                     + sRegistrationLine);
                             continue;
                         }
-                        
+
                         // look for descriptions
                         boolean descriptionExists = false;
                         String descriptionMarker = "\tdescription:";
@@ -1496,7 +1527,7 @@ public class ItemImport
 
             System.out.println("No contents file found - but only metadata files found. Assuming metadata only.");
         }
-        
+
         return options;
     }
 
@@ -1537,7 +1568,7 @@ public class ItemImport
                 newBundleName = "ORIGINAL";
             }
         }
-        
+
         if (!isTest)
         {
             // find the bundle
@@ -1581,7 +1612,7 @@ public class ItemImport
 
     /**
      * Register the bitstream file into DSpace
-     * 
+     *
      * @param c
      * @param i
      * @param assetstore
@@ -1591,7 +1622,7 @@ public class ItemImport
      * @throws IOException
      * @throws AuthorizeException
      */
-    private void registerBitstream(Context c, Item i, int assetstore, 
+    private void registerBitstream(Context c, Item i, int assetstore,
             String bitstreamPath, String bundleName, String description )
         	throws SQLException, IOException, AuthorizeException
     {
@@ -1600,7 +1631,7 @@ public class ItemImport
 
         Bitstream bs = null;
         String newBundleName = bundleName;
-        
+
         if (bundleName == null)
         {
             // is it license.txt?
@@ -1650,18 +1681,18 @@ public class ItemImport
     }
 
     /**
-     * 
+     *
      * Process the Options to apply to the Item. The options are tab delimited
-     * 
+     *
      * Options:
      *      48217870-MIT.pdf        permissions: -r 'MIT Users'     description: Full printable version (MIT only)
      *      permissions:[r|w]-['group name']
      *      description: 'the description of the file'
-     *      
+     *
      *      where:
      *          [r|w] (meaning: read|write)
      *          ['MIT Users'] (the group name)
-     *          
+     *
      * @param c
      * @param myItem
      * @param options
@@ -1819,7 +1850,7 @@ public class ItemImport
 
     /**
      * Set the Permission on a Bitstream.
-     * 
+     *
      * @param c
      * @param g
      * @param actionID
@@ -1882,7 +1913,7 @@ public class ItemImport
         return "";
     }
 
-    
+
     /**
      * Return the String value of a Node.
      * @param node
@@ -1907,10 +1938,10 @@ public class ItemImport
 
     /**
      * Load in the XML from file.
-     * 
+     *
      * @param filename
      *            the filename to load from
-     * 
+     *
      * @return the DOM representation of the XML file
      */
     private static Document loadXML(String filename) throws IOException,
@@ -1951,6 +1982,121 @@ public class ItemImport
         boolean pathDeleted = path.delete();
         return (pathDeleted);
     }
+
+    public static String unzip(File zipfile) throws IOException {
+    	return unzip(zipfile, null);
+    }
+    
+    public static String unzip(File zipfile, String destDir) throws IOException {
+        // 2
+        // does the zip file exist and can we write to the temp directory
+        if (!zipfile.canRead())
+        {
+            log.error("Zip file '" + zipfile.getAbsolutePath() + "' does not exist, or is not readable.");
+        }
+
+        String destinationDir = destDir;
+        if (destinationDir == null){
+        	destinationDir = tempWorkDir;
+        }
+
+        File tempdir = new File(destinationDir);
+        if (!tempdir.isDirectory())
+        {
+            log.error("'" + ConfigurationManager.getProperty("org.dspace.app.itemexport.work.dir") +
+                    "' as defined by the key 'org.dspace.app.itemexport.work.dir' in dspace.cfg " +
+                    "is not a valid directory");
+        }
+
+        if (!tempdir.exists() && !tempdir.mkdirs())
+        {
+            log.error("Unable to create temporary directory: " + tempdir.getAbsolutePath());
+        }
+        String sourcedir = destinationDir + System.getProperty("file.separator") + zipfile.getName();
+        String zipDir = destinationDir + System.getProperty("file.separator") + zipfile.getName() + System.getProperty("file.separator");
+
+
+        // 3
+        String sourceDirForZip = sourcedir;
+        ZipFile zf = new ZipFile(zipfile);
+        ZipEntry entry;
+        Enumeration<? extends ZipEntry> entries = zf.entries();
+        while (entries.hasMoreElements())
+        {
+            entry = entries.nextElement();
+            if (entry.isDirectory())
+            {
+                if (!new File(zipDir + entry.getName()).mkdir())
+                {
+                    log.error("Unable to create contents directory: " + zipDir + entry.getName());
+                }
+            }
+            else
+            {
+                System.out.println("Extracting file: " + entry.getName());
+                log.info("Extracting file: " + entry.getName());
+
+                int index = entry.getName().lastIndexOf('/');
+                if (index == -1)
+                {
+                    // Was it created on Windows instead?
+                    index = entry.getName().lastIndexOf('\\');
+                }
+                if (index > 0)
+                {
+                    File dir = new File(zipDir + entry.getName().substring(0, index));
+                    if (!dir.exists() && !dir.mkdirs())
+                    {
+                        log.error("Unable to create directory: " + dir.getAbsolutePath());
+                    }
+
+                    //Entries could have too many directories, and we need to adjust the sourcedir
+                    // file1.zip (SimpleArchiveFormat / item1 / contents|dublin_core|...
+                    //            SimpleArchiveFormat / item2 / contents|dublin_core|...
+                    // or
+                    // file2.zip (item1 / contents|dublin_core|...
+                    //            item2 / contents|dublin_core|...
+
+                    //regex supports either windows or *nix file paths
+                    String[] entryChunks = entry.getName().split("/|\\\\");
+                    if(entryChunks.length > 2) {
+                        if(sourceDirForZip == sourcedir) {
+                            sourceDirForZip = sourcedir + "/" + entryChunks[0];
+                        }
+                    }
+
+
+                }
+                byte[] buffer = new byte[1024];
+                int len;
+                InputStream in = zf.getInputStream(entry);
+                BufferedOutputStream out = new BufferedOutputStream(
+                        new FileOutputStream(zipDir + entry.getName()));
+                while((len = in.read(buffer)) >= 0)
+                {
+                    out.write(buffer, 0, len);
+                }
+                in.close();
+                out.close();
+            }
+        }
+
+        //Close zip file
+        zf.close();
+        
+        if(sourceDirForZip != sourcedir) {
+            sourcedir = sourceDirForZip;
+            System.out.println("Set sourceDir using path inside of Zip: " + sourcedir);
+            log.info("Set sourceDir using path inside of Zip: " + sourcedir);
+        }
+
+        return sourcedir;
+    }
+
+    public static String unzip(String sourcedir, String zipfilename) throws IOException {
+        File zipfile = new File(sourcedir + File.separator + zipfilename);
+        return unzip(zipfile);
+    }
     
     /**
      * Generate a random filename based on current time
@@ -1959,124 +2105,216 @@ public class ItemImport
      */
     private static String generateRandomFilename(boolean hidden)
     {
-    	String filename = String.format("%s", RandomStringUtils.randomAlphanumeric(8));                        
+    	String filename = String.format("%s", RandomStringUtils.randomAlphanumeric(8));
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmm");
         String datePart = sdf.format(new Date());
         filename = datePart+"_"+filename;
-        
+
         return filename;
     }
-    
+
     /**
-     * Given an uploaded file, this method calls the method to instantiate a BTE instance to 
-     * transform the input data and batch import them to DSpace
-     * @param file The input file to read data from
-     * @param collections The collections the created items will be inserted to
-     * @param bteInputType The input type of the data (bibtex, csv, etc.)
+     * 
+     * Given a local file or public URL to a zip file that has the Simple Archive Format, this method imports the contents to DSpace
+     * @param filepath The filepath to local file or the public URL of the zip file
+     * @param owningCollection The owning collection the items will belong to
+     * @param otherCollections The collections the created items will be inserted to, apart from the owning one
+     * @param resumeDir In case of a resume request, the directory that containsthe old mapfile and data 
+     * @param inputType The input type of the data (bibtex, csv, etc.), in case of local file
      * @param context The context
      * @throws Exception
      */
-    public static void processUploadableImport(File file, Collection[] collections, 
-    		String bteInputType, Context context) throws Exception
-    {
-        final EPerson eperson = context.getCurrentUser();
-        final File myFile = file;
-        final Collection[] mycollections = collections;
-        final String myBteInputType = bteInputType;
-        
-        // if the file exists
-        if (file.exists())
-        {
-            Thread go = new Thread()
-            {
-                public void run()
-                {
-                    Context context = null;
-                    ItemIterator iitems = null;
-                    try
-                    {
-                        // create a new dspace context
-                        context = new Context();
-                        context.setCurrentUser(eperson);
-                        context.setIgnoreAuthorization(true);
-                        
-                        File importDir = new File(ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir"));
-                        if (!importDir.exists()){
-                        	boolean success = importDir.mkdir();
-                        	if (!success) {
-                        		log.info("Cannot create batch import directory!");
-                        		throw new Exception();
-                        	}
-                        }
-                        //Generate a random filename for the subdirectory of the specific import in case
-                        //more that one batch imports take place at the same time
-                        String subDirName = generateRandomFilename(false);
-                        String workingDir = importDir.getAbsolutePath() + File.separator + subDirName;
-                        
-                        //Create the import working directory
-                        boolean success = (new File(workingDir)).mkdir();
-                    	if (!success) {
-                    		log.info("Cannot create batch import working directory!");
-                    		throw new Exception();
-                    	}
-                    	
-                        //Create random mapfile;
-                        String mapfile = workingDir + File.separator+ "mapfile";
-                        
-                        ItemImport myloader = new ItemImport();
-                        myloader.addBTEItems(context, mycollections, myFile.getAbsolutePath(), mapfile, template, myBteInputType, workingDir);
-                        
-                        // email message letting user know the file is ready for
-                        // download
-                        emailSuccessMessage(context, eperson, mapfile);
-                        
-                        // return to enforcing auths
-                        context.setIgnoreAuthorization(false);
-                    }
-                    catch (Exception e1)
-                    {
-                        try
-                        {
-                            emailErrorMessage(eperson, e1.getMessage());
-                        }
-                        catch (Exception e)
-                        {
-                            // wont throw here
-                        }
-                        throw new IllegalStateException(e1);
-                    }
-                    finally
-                    {
-                        if (iitems != null)
-                        {
-                            iitems.close();
-                        }
-                        
-                        // close the mapfile writer
-                        if (mapOut != null)
-                        {
-                            mapOut.close();
-                        }
+    public static void processUIImport(String filepath, Collection owningCollection, String[] otherCollections, String resumeDir, String inputType, Context context) throws Exception
+	{
+		final EPerson oldEPerson = context.getCurrentUser();
+		final String[] theOtherCollections = otherCollections;
+		final Collection theOwningCollection = owningCollection;
+		final String theFilePath = filepath;
+		final String theInputType = inputType;
+		final String theResumeDir = resumeDir;
+		
+		Thread go = new Thread()
+		{
+			public void run()
+			{
+				Context context = null;
 
-                        // Make sure the database connection gets closed in all conditions.
-                    	try {
-							context.complete();
-						} catch (SQLException sqle) {
-							context.abort();
+				String importDir = null;
+				EPerson eperson = null;
+				
+				try {
+					
+					// create a new dspace context
+					context = new Context();
+					eperson = EPerson.find(context, oldEPerson.getID());
+					context.setCurrentUser(eperson);
+					context.setIgnoreAuthorization(true);
+					
+					boolean isResume = theResumeDir!=null;
+					
+					List<Collection> collectionList = new ArrayList<Collection>();
+	    			if (theOtherCollections != null){
+	    				for (String colID : theOtherCollections){
+	    					int colId = Integer.parseInt(colID);
+	    					if (colId != theOwningCollection.getID()){
+	    						Collection col = Collection.find(context, colId);
+	    						if (col != null){
+	    							collectionList.add(col);
+	    						}
+	    					}
+	    				}
+	    			}
+	    			Collection[] otherCollections = collectionList.toArray(new Collection[collectionList.size()]);
+	    			
+					importDir = ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir") + File.separator + "batchuploads" + File.separator + context.getCurrentUser().getID() + File.separator + (isResume?theResumeDir:(new GregorianCalendar()).getTimeInMillis());
+					File importDirFile = new File(importDir);
+					if (!importDirFile.exists()){
+						boolean success = importDirFile.mkdirs();
+						if (!success) {
+							log.info("Cannot create batch import directory!");
+							throw new Exception("Cannot create batch import directory!");
 						}
+					}
+					
+					String dataPath = null;
+					String dataDir = null;
+					
+					if (theInputType.equals("saf")){ //In case of Simple Archive Format import (from remote url)
+						dataPath = importDirFile + File.separator + "data.zip";
+						dataDir = importDirFile + File.separator + "data_unzipped2" + File.separator;
+					}
+					else if (theInputType.equals("safupload")){ //In case of Simple Archive Format import (from upload file)
+						FileUtils.copyFileToDirectory(new File(theFilePath), importDirFile);
+						dataPath = importDirFile + File.separator + (new File(theFilePath)).getName();
+						dataDir = importDirFile + File.separator + "data_unzipped2" + File.separator;
+					}
+					else { // For all other imports
+						dataPath = importDirFile + File.separator + (new File(theFilePath)).getName();
+    	    			dataDir = importDirFile + File.separator + "data" + File.separator;
+					}
+					
+					//Clear these files, if a resume
+					if (isResume){
+						if (!theInputType.equals("safupload")) {
+							(new File(dataPath)).delete();
+						}
+						(new File(importDirFile + File.separator + "error.txt")).delete();
+						FileDeleteStrategy.FORCE.delete(new File(dataDir));
+						FileDeleteStrategy.FORCE.delete(new File(importDirFile + File.separator + "data_unzipped" + File.separator));
+					}
+
+					//In case of Simple Archive Format import we need an extra effort to download the zip file and unzip it
+					String sourcePath = null;
+					if (theInputType.equals("saf")){ 
+						OutputStream os = new FileOutputStream(dataPath);
+
+						byte[] b = new byte[2048];
+						int length;
+
+						InputStream is = new URL(theFilePath).openStream();
+						while ((length = is.read(b)) != -1) {
+							os.write(b, 0, length);
+						}
+
+						is.close();
+						os.close();
+
+						sourcePath = unzip(new File(dataPath), dataDir);
+						
+						//Move files to the required folder
+						FileUtils.moveDirectory(new File(sourcePath), new File(importDirFile + File.separator + "data_unzipped" + File.separator));
+						FileDeleteStrategy.FORCE.delete(new File(dataDir));
+						dataDir = importDirFile + File.separator + "data_unzipped" + File.separator;
+					}
+					else if (theInputType.equals("safupload")){ 
+						sourcePath = unzip(new File(dataPath), dataDir);
+						//Move files to the required folder
+						FileUtils.moveDirectory(new File(sourcePath), new File(importDirFile + File.separator + "data_unzipped" + File.separator));
+						FileDeleteStrategy.FORCE.delete(new File(dataDir));
+						dataDir = importDirFile + File.separator + "data_unzipped" + File.separator;
+					}
+					
+					//Create mapfile path
+					String mapFilePath = importDirFile + File.separator + "mapfile";
+					
+					Collection[] finalCollections = null;
+					if (theOwningCollection != null){
+						finalCollections = new Collection[otherCollections.length + 1];
+						finalCollections[0] = theOwningCollection;
+						for (int i=0; i<otherCollections.length; i++){
+							finalCollections[i+1] = otherCollections[i];
+						}
+					}
+					
+					ItemImport myloader = new ItemImport();
+					myloader.isResume = isResume;
+					
+					if (theInputType.equals("saf") || theInputType.equals("safupload")){ //In case of Simple Archive Format import
+						myloader.addItems(context, finalCollections, dataDir, mapFilePath, template);
+					}
+					else { // For all other imports (via BTE)
+						myloader.addBTEItems(context, finalCollections, theFilePath, mapFilePath, template, theInputType, dataDir);
+					}
+					
+					// email message letting user know the file is ready for
+                    // download
+                    emailSuccessMessage(context, eperson, mapFilePath);
+                    
+					context.complete();
+
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					String exceptionString = ExceptionUtils.getStackTrace(e);
+					
+					// abort all operations
+	                if (mapOut != null)
+	                {
+	                    mapOut.close();
+	                }
+
+	                mapOut = null;
+	                
+					try
+                    {
+						File importDirFile = new File(importDir+File.separator+"error.txt");
+						PrintWriter errorWriter = new PrintWriter(importDirFile);
+						errorWriter.print(exceptionString);
+						errorWriter.close();
+						
+                        emailErrorMessage(eperson, exceptionString);
+                        throw new Exception(e.getMessage());
                     }
+                    catch (Exception e2)
+                    {
+                        // wont throw here
+                    }
+				}
+				
+				finally
+                {
+                    // close the mapfile writer
+                    if (mapOut != null)
+                    {
+                        mapOut.close();
+                    }
+
+                    // Make sure the database connection gets closed in all conditions.
+                	try {
+						context.complete();
+					} catch (SQLException sqle) {
+						context.abort();
+					}
                 }
+			}
 
-            };
+		};
 
-            go.isDaemon();
-            go.start();
-        }
-        else {
-        	log.error("Unable to find the uploadable file");
-        }
-    }
-    
+		go.isDaemon();
+		go.start();
+		
+	}
+
     /**
      * Since the BTE batch import is done in a new thread we are unable to communicate
      * with calling method about success or failure. We accomplish this
@@ -2100,12 +2338,12 @@ public class ItemImport
             Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "bte_batch_import_success"));
             email.addRecipient(eperson.getEmail());
             email.addArgument(fileName);
-           
+
             email.send();
         }
         catch (Exception e)
         {
-            log.warn(LogManager.getHeader(context, "emailSuccessMessage", "cannot notify user of export"), e);
+            log.warn(LogManager.getHeader(context, "emailSuccessMessage", "cannot notify user of import"), e);
         }
     }
 
@@ -2124,7 +2362,7 @@ public class ItemImport
     public static void emailErrorMessage(EPerson eperson, String error)
             throws MessagingException
     {
-        log.warn("An error occured during item export, the user will be notified. " + error);
+        log.warn("An error occurred during item import, the user will be notified. " + error);
         try
         {
             Locale supportedLocale = I18nUtil.getEPersonLocale(eperson);
@@ -2137,7 +2375,84 @@ public class ItemImport
         }
         catch (Exception e)
         {
-            log.warn("error during item export error notification", e);
+            log.warn("error during item import error notification", e);
         }
+    }
+    
+    
+    public static List<BatchUpload> getImportsAvailable(EPerson eperson)
+            throws Exception
+    {
+        File uploadDir = new File(getImportUploadableDirectory(eperson.getID()));
+        if (!uploadDir.exists() || !uploadDir.isDirectory())
+        {
+            return null;
+        }
+
+        Map<String, BatchUpload> fileNames = new TreeMap<String, BatchUpload>();
+
+        for (String fileName : uploadDir.list())
+        {
+            File file = new File(uploadDir + File.separator + fileName);
+            if (file.isDirectory()){
+            	
+            	BatchUpload upload = new BatchUpload(file);
+            	
+            	fileNames.put(upload.getDir().getName(), upload);
+            }
+        }
+
+        if (fileNames.size() > 0)
+        {
+            return new ArrayList<BatchUpload>(fileNames.values());
+        }
+
+        return null;
+    }
+    
+    public static String getImportUploadableDirectory(int ePersonID)
+            throws Exception
+    {
+        String uploadDir = ConfigurationManager.getProperty("org.dspace.app.batchitemimport.work.dir");
+        if (uploadDir == null)
+        {
+            throw new Exception(
+                    "A dspace.cfg entry for 'org.dspace.app.batchitemimport.work.dir' does not exist.");
+        }
+
+        return uploadDir + File.separator + "batchuploads" + File.separator + ePersonID;
+
+    }
+    
+    public void deleteBatchUpload(Context c, String uploadId) throws Exception
+    {
+    	String uploadDir = null;
+    	String mapFilePath = null;
+
+		uploadDir = ItemImport.getImportUploadableDirectory(c.getCurrentUser().getID()) + File.separator + uploadId;
+		mapFilePath = uploadDir + File.separator + "mapfile";
+	
+		this.deleteItems(c, mapFilePath);
+		// complete all transactions
+        c.commit();
+        
+		FileDeleteStrategy.FORCE.delete(new File(uploadDir));
+    }
+
+    public static String getTempWorkDir() {
+        return tempWorkDir;
+    }
+
+    public static File getTempWorkDirFile() {
+        File tempDirFile = new File(getTempWorkDir());
+        if(!tempDirFile.exists()) {
+            tempDirFile.mkdirs();
+        }
+        return tempDirFile;
+    }
+
+    public static void cleanupZipTemp() {
+        System.out.println("Deleting temporary zip directory: " + tempWorkDir);
+        ItemImport.deleteDirectory(new File(tempWorkDir));
     }
 }

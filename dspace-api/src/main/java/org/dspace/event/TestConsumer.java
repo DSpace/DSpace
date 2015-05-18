@@ -10,6 +10,7 @@ package org.dspace.event;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import org.apache.commons.lang3.ArrayUtils;
 
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
@@ -66,6 +67,8 @@ public class TestConsumer implements Consumer
                 + event.getObjectTypeAsString()
                 + ", ObjectID="
                 + String.valueOf(event.getObjectID())
+                + ", Identifiers="
+                + ArrayUtils.toString(event.getIdentifiers())
                 + ", TimeStamp="
                 + applyDateFormat(new Date(event.getTimeStamp()))
                 + ", user=\""

@@ -37,7 +37,7 @@ import java.util.Map;
  * @author Ben Bosman (ben at atmire dot com)
  *
  */
-public class UploadWithEmbargoStep extends AbstractSubmissionStep
+public class UploadWithEmbargoStep extends UploadStep
 {
 	/** Language Strings for Uploading **/
     protected static final Message T_head = 
@@ -255,6 +255,8 @@ public class UploadWithEmbargoStep extends AbstractSubmissionStep
 	        uploadSubmit.setValue(T_submit_upload);
 
     	}
+
+        make_sherpaRomeo_submission(item, div);
         
         // Part B:
         //  If the user has already uploaded files provide a list for the user.

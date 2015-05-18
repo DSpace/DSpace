@@ -29,7 +29,7 @@
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
 <%@ page import="org.dspace.app.webui.util.CurateTaskResult" %>
 <%@ page import="org.dspace.content.Item" %>
-<%@ page import="org.dspace.content.DCValue" %>
+<%@ page import="org.dspace.content.Metadatum" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%!
     private static final String TASK_QUEUE_NAME = ConfigurationManager.getProperty("curate", "ui.queuename");
@@ -40,7 +40,7 @@
     String title = "Unknown Item";
     if (item != null)
     {
-        DCValue[] dcvs = item.getMetadata("dc.title");
+        Metadatum[] dcvs = item.getMetadataByMetadataString("dc.title");
         if (dcvs != null && dcvs.length > 0)
         {
             title = dcvs[0].value;

@@ -15,8 +15,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.http.HttpException;
 
-import org.apache.commons.httpclient.HttpException;
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -31,7 +31,7 @@ public class PubmedOnlineDataLoader extends NetworkSubmissionLookupDataLoader
 {
     private boolean searchProvider = true;
 
-    private static Logger log = Logger.getLogger(PubmedOnlineDataLoader.class);
+    private static final Logger log = Logger.getLogger(PubmedOnlineDataLoader.class);
 
     private PubmedService pubmedService = new PubmedService();
 

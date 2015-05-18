@@ -29,31 +29,6 @@
             <!-- Filter using the properties file defined by dspace-parent POM -->
             <filter>${filters.file}</filter>
         </filters>
-    
-        <plugins>
-            <!--  Default project assembly. Calls 'assembly.xml', which
-                  generates the DSpace build directory. -->
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <!-- Don't "attach" the assembly results to this project. As
-                         this assembly builds a directory, setting this to "true"
-                         (default value) will just result in a WARNING message.-->
-                    <attach>false</attach>
-                    <descriptors>
-                        <descriptor>src/main/assembly/assembly.xml</descriptor>
-                    </descriptors>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
     </build>
 
     <profiles>
@@ -67,9 +42,7 @@
                     <name>!distributions</name>
                 </property>
             </activation>
-            <!--
-                Builds Overlay Modules for DSpace
-            -->
+            <!-- Build all Overlay submodules -->
             <modules>
                 <module>modules</module>
             </modules> 
@@ -137,6 +110,7 @@
                 <distributions>false</distributions>
             </properties>
         </profile> 
+
 
         <!--
             Run this profile (e.g. 'mvn package -Ddistributions=true') to create

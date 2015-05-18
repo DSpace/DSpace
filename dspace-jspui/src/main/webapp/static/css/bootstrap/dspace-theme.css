@@ -63,7 +63,6 @@ input.ds-authority-lock.is-unlocked
   { background-image: url(../../../image/unlock24.png); }
 
 /* field required in submission */
-.label-required:after { content:" *"; }
 
 .tab-content{
 		border: 1px solid #ddd;
@@ -73,4 +72,47 @@ input.ds-authority-lock.is-unlocked
 
 .menu-global-processor{
 		z-index: 1001;
+}
+.label-required:after { content:" *"; }
+.browse_range { text-align: center; }
+.prev-next-links { text-align: center; }
+
+div.tagcloud {
+	width:100%;
+	text-align:center
+}
+
+div.tagcloud .tagcloud_1{
+	color: rgb(217, 108, 39); 
+	font-weight: normal; 
+	margin-right: 5px;
+}
+
+div.tagcloud .tagcloud_2{
+	color: rgb(66, 66, 66); 
+	font-weight: normal; 
+	margin-right: 5px;
+}
+
+div.tagcloud .tagcloud_3{
+	color: rgb(129, 129, 131); 
+	font-weight: normal; 
+	margin-right: 5px;
+}
+
+div.batchimport-info {
+	color: gray;
+}
+
+div.batchimport-info  a {
+	color:#47a447; 
+	font-weight: bold;
+}
+
+span.batchimport-error-tab {
+	padding-left:10px;
+}
+
+span.batchimport-error-caused {
+	font-weight:bold;
 }

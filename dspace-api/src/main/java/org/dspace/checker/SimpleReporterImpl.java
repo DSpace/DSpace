@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 
 /**
@@ -240,11 +241,11 @@ public class SimpleReporterImpl implements SimpleReporter
      * @throws IOException
      *             if io error occurs
      */
-    public int getUncheckedBitstreamsReport(OutputStreamWriter osw)
+    public int getUncheckedBitstreamsReport(Context context, OutputStreamWriter osw)
             throws IOException
     {
         // get all the bitstreams marked deleted for today
-        List<DSpaceBitstreamInfo> bitstreams = reporter.getUnknownBitstreams();
+        List<DSpaceBitstreamInfo> bitstreams = reporter.getUnknownBitstreams(context);
 
         osw.write("\n");
         osw.write(msg("unchecked-bitstream-report"));

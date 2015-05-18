@@ -7,6 +7,7 @@
  */
 package org.dspace.discovery;
 
+import org.dspace.util.MultiFormatDateParser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -45,6 +46,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -73,7 +75,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
@@ -103,6 +105,7 @@ import org.dspace.discovery.configuration.DiscoveryViewConfiguration;
 import org.dspace.discovery.configuration.DiscoveryViewFieldConfiguration;
 import org.dspace.discovery.configuration.HierarchicalSidebarFacetConfiguration;
 import org.dspace.handle.HandleManager;
+import org.dspace.storage.rdbms.DatabaseUtils;
 import org.dspace.utils.DSpace;
 import org.springframework.stereotype.Service;
 
@@ -116,8 +119,8 @@ import org.springframework.stereotype.Service;
  * regularly, a failed attempt to index from the UI will be "caught" up on in
  * that cron.
  *
- * The SolrServiceImple is registered as a Service in the ServiceManager via
- * A spring configuration file located under
+ * The SolrServiceImpl is registered as a Service in the ServiceManager via
+ * a spring configuration file located under
  * classpath://spring/spring-dspace-applicationContext.xml
  *
  * Its configuration is Autowired by the ApplicationContext
@@ -154,7 +157,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             String solrService = new DSpace().getConfigurationService().getProperty("discovery.search.server");
 
             UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS);
-            if (urlValidator.isValid(solrService))
+            if (urlValidator.isValid(solrService)||ConfigurationManager.getBooleanProperty("discovery","solr.url.validation.enabled",true))
             {
                 try {
                     log.debug("Solr URL: " + solrService);
@@ -165,9 +168,13 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     SolrQuery solrQuery = new SolrQuery()
                             .setQuery("search.resourcetype:2 AND search.resourceid:1");
 
-                    solr.query(solrQuery);                
+                    solr.query(solrQuery);
+
+                    // As long as Solr initialized, check with DatabaseUtils to see
+                    // if a reindex is in order. If so, reindex everything
+                    DatabaseUtils.checkReindexDiscovery(this);
                 } catch (SolrServerException e) {
-                    log.error("Error while initialinging solr server", e);
+                    log.error("Error while initializing solr server", e);
                 }
             }
             else
@@ -189,6 +196,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * @throws SQLException
      * @throws IOException
      */
+    @Override
     public void indexContent(Context context, DSpaceObject dso)
             throws SQLException {
         indexContent(context, dso, false);
@@ -205,6 +213,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * @throws SQLException
      * @throws IOException
      */
+    @Override
     public void indexContent(Context context, DSpaceObject dso,
                              boolean force) throws SQLException {
 
@@ -271,6 +280,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * @throws SQLException
      * @throws IOException
      */
+    @Override
     public void unIndexContent(Context context, DSpaceObject dso)
             throws SQLException, IOException {
         unIndexContent(context, dso, false);
@@ -285,6 +295,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * @throws SQLException
      * @throws IOException
      */
+    @Override
     public void unIndexContent(Context context, DSpaceObject dso, boolean commit)
             throws SQLException, IOException {
         try {
@@ -311,6 +322,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * @throws IOException
      * @throws SQLException
      */
+    @Override
     public void unIndexContent(Context context, String handle) throws IOException, SQLException {
         unIndexContent(context, handle, false);
     }
@@ -322,6 +334,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * @throws SQLException
      * @throws IOException
      */
+    @Override
     public void unIndexContent(Context context, String handle, boolean commit)
             throws SQLException, IOException {
 
@@ -345,6 +358,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * @param context context object
      * @param dso     object to re-index
      */
+    @Override
     public void reIndexContent(Context context, DSpaceObject dso)
             throws SQLException, IOException {
         try {
@@ -361,6 +375,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      *
      * @param c context to use
      */
+    @Override
     public void createIndex(Context c) throws SQLException, IOException {
 
         /* Reindex all content preemptively. */
@@ -376,6 +391,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      *
      * @param context the dspace context
      */
+    @Override
     public void updateIndex(Context context)
     {
         updateIndex(context, false);
@@ -396,6 +412,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * @param force
      *            whether or not to force the reindexing
      */
+    @Override
     public void updateIndex(Context context, boolean force)
     {
         updateIndex(context, force, Constants.ITEM);
@@ -499,6 +516,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * @throws SQLException sql exception
      * @throws SearchServiceException occurs when something went wrong with querying the solr server
      */
+    @Override
     public void cleanIndex(boolean force) throws IOException,
             SQLException, SearchServiceException {
     	if (force)
@@ -586,6 +604,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * Maintenance to keep a SOLR index efficient.
      * Note: This might take a long time.
      */
+    @Override
     public void optimize()
     {
         try {
@@ -608,6 +627,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         }
     }
 
+    @Override
     public void buildSpellCheck() throws SearchServiceException {
         try {
             if (getSolr() == null) {
@@ -1082,8 +1102,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 }
             }
 
-            DCValue[] mydc = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-            for (DCValue meta : mydc)
+            List<String> toIgnoreMetadataFields = SearchUtils.getIgnoredMetadataFields(item.getType());
+            Metadatum[] mydc = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+            for (Metadatum meta : mydc)
             {
                 String field = meta.schema + "." + meta.element;
                 String unqualifiedField = field;
@@ -1100,7 +1121,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     field += "." + meta.qualifier;
                 }
 
-                List<String> toIgnoreMetadataFields = SearchUtils.getIgnoredMetadataFields(item.getType());
                 //We are not indexing provenance, this is useless
                 if (toIgnoreMetadataFields != null && (toIgnoreMetadataFields.contains(field) || toIgnoreMetadataFields.contains(unqualifiedField + "." + Item.ANY)))
                 {
@@ -1206,7 +1226,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         if(searchFilter.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE))
                         {
                             //For our search filters that are dates we format them properly
-                            date = toDate(value);
+                            date = MultiFormatDateParser.parse(value);
                             if(date != null)
                             {
                                 //TODO: make this date format configurable !
@@ -1312,7 +1332,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 										// add the year to the autocomplete index
 										doc.addField(searchFilter.getIndexFieldName() + "_ac", yearUTC);
 										doc.addField(indexField, yearUTC);
-                                    	
+
                                     	if (yearUTC.startsWith("0"))
                                         {
         									doc.addField(
@@ -1333,7 +1353,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         													+ "_keyword",
         													value.replaceFirst("0*", ""));
                                         }
-                                    	
+
                                     	//Also save a sort value of this year, this is required for determining the upper & lower bound year of our facet
                                         if(doc.getField(indexField + "_sort") == null)
                                         {
@@ -1390,7 +1410,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
                     if(type.equals(DiscoveryConfigurationParameters.TYPE_DATE))
                     {
-                        Date date = toDate(value);
+                        Date date = MultiFormatDateParser.parse(value);
                         if(date != null)
                         {
                             doc.addField(field + "_dt", date);
@@ -1465,7 +1485,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         try {
 
-            DCValue[] values = item.getMetadata("dc.relation.ispartof");
+            Metadatum[] values = item.getMetadataByMetadataString("dc.relation.ispartof");
 
             if(values != null && values.length > 0 && values[0] != null && values[0].value != null)
             {
@@ -1745,6 +1765,14 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         if(discoveryQuery.getQuery() != null)
         {
         	query = discoveryQuery.getQuery();
+            if (query.contains(": "))
+            {
+                query = StringUtils.replace(query, ": ", "\\: ");
+            }
+            else if (query.endsWith(":"))
+            {
+                query = StringUtils.removeEnd(query, ":") + "\\:";
+            }
 		}
 
         solrQuery.setQuery(query);
@@ -1910,9 +1938,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         urlBuilder.append(solrQuery.toString());
 
         try {
-            GetMethod get = new GetMethod(urlBuilder.toString());
-            new HttpClient().executeMethod(get);
-            return get.getResponseBodyAsStream();
+            HttpGet get = new HttpGet(urlBuilder.toString());
+            HttpResponse response = new DefaultHttpClient().execute(get);
+            return response.getEntity().getContent();
 
         } catch (Exception e)
         {
@@ -2045,20 +2073,16 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     //TODO: do not assume this, people may want to use it for other ends, use a regex to make sure
                     //We have a facet query, the values looks something like: dateissued.year:[1990 TO 2000] AND -2000
                     //Prepare the string from {facet.field.name}:[startyear TO endyear] to startyear - endyear
-					String facetField = query.getNamedFacetQuery(facetQuery);
-					String filter = facetQuery;
-					String name = facetQuery;
-					if (facetField == null) {
-						facetField = facetQuery.substring(0,
-								facetQuery.indexOf(":"));
-						name = facetQuery
-								.substring(facetQuery.indexOf('[') + 1);
-						name = name.substring(0, name.lastIndexOf(']'))
-								.replaceAll("TO", "-");
-						filter = facetQuery.substring(facetQuery.indexOf('['));
-						filter = filter.substring(0,
-								filter.lastIndexOf(']') + 1);
-					}
+                    String facetField = facetQuery.substring(0, facetQuery.indexOf(":"));
+                    String name = "";
+                    String filter = "";
+                    if (facetQuery.indexOf('[') > -1 && facetQuery.lastIndexOf(']') > -1)
+                    {
+                        name = facetQuery.substring(facetQuery.indexOf('[') + 1);
+                        name = name.substring(0, name.lastIndexOf(']')).replaceAll("TO", "-");
+                        filter = facetQuery.substring(facetQuery.indexOf('['));
+                        filter = filter.substring(0, filter.lastIndexOf(']') + 1);
+                    }
 
                     Integer count = sortedFacetQueries.get(facetQuery);
 
@@ -2125,7 +2149,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             return null;
         }
         HttpHost hostURL = (HttpHost)(getSolr().getHttpClient().getParams().getParameter(ClientPNames.DEFAULT_HOST));
-        
+
         HttpGet method = new HttpGet(hostURL.toHostString() + "");
         try
         {

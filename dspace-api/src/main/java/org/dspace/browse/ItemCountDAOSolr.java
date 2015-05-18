@@ -67,7 +67,7 @@ public class ItemCountDAOSolr implements ItemCountDAO
      */
     public void collectionCount(Collection collection, int count) throws ItemCountException
     {
-        throw new ItemCountException("Caching is not supported by the ItemCountDAOSolr as it is not really needed, Solr is faster!");
+        log.error("Caching is not supported by the ItemCountDAOSolr as it is not really needed, Solr is faster!");
     }
 
     /**
@@ -79,7 +79,7 @@ public class ItemCountDAOSolr implements ItemCountDAO
      */
     public void communityCount(Community community, int count) throws ItemCountException
     {
-        throw new ItemCountException("Caching is not supported by the ItemCountDAOSolr as it is not really needed, Solr is faster!");
+        log.error("Caching is not supported by the ItemCountDAOSolr as it is not really needed, Solr is faster!");
     }
 
     /**

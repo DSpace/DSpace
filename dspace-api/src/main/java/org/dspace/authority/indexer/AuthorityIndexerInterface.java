@@ -23,6 +23,8 @@ public interface AuthorityIndexerInterface {
 
     public void init(Context context, Item item);
 
+    public void init(Context context, boolean useCache);
+
     public void init(Context context);
 
     public AuthorityValue nextValue();
@@ -30,4 +32,6 @@ public interface AuthorityIndexerInterface {
     public boolean hasMore();
 
     public void close();
+
+    public boolean isConfiguredProperly();
 }

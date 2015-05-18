@@ -55,7 +55,12 @@ public class OAIDCIngestionCrosswalk
         
         List<Element> metadata = root.getChildren();
         for (Element element : metadata) {
-        	item.addMetadata("dc", element.getName(), null, null, element.getText());
+		// get language - prefer xml:lang, accept lang.
+		String lang = element.getAttributeValue("lang", Namespace.XML_NAMESPACE);
+		if (lang == null) {
+			lang = element.getAttributeValue("lang");
+		}
+		item.addMetadata("dc", element.getName(), null, lang, element.getText());
         }
         
 	}

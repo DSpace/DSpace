@@ -23,7 +23,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
@@ -265,7 +265,7 @@ public class SyndicationFeed
                         df = df.replaceAll("\\(date\\)", "");
                     }
              
-                    DCValue dcv[] = item.getMetadata(df);
+                    Metadatum dcv[] = item.getMetadataByMetadataString(df);
                     if (dcv.length > 0)
                     {
                         String fieldLabel = labels.get(MSG_METADATA + df);
@@ -274,7 +274,7 @@ public class SyndicationFeed
                             db.append(fieldLabel).append(": ");
                         }
                         boolean first = true;
-                        for (DCValue v : dcv)
+                        for (Metadatum v : dcv)
                         {
                             if (first)
                             {
@@ -298,11 +298,11 @@ public class SyndicationFeed
                 }
 
                 // This gets the authors into an ATOM feed
-                DCValue authors[] = item.getMetadata(authorField);
+                Metadatum authors[] = item.getMetadataByMetadataString(authorField);
                 if (authors.length > 0)
                 {
                     List<SyndPerson> creators = new ArrayList<SyndPerson>();
-                    for (DCValue author : authors)
+                    for (Metadatum author : authors)
                     {
                         SyndPerson sp = new SyndPersonImpl();
                         sp.setName(author.value);
@@ -318,11 +318,11 @@ public class SyndicationFeed
                     DCModule dc = new DCModuleImpl();
                     if (dcCreatorField != null)
                     {
-                        DCValue dcAuthors[] = item.getMetadata(dcCreatorField);
+                        Metadatum dcAuthors[] = item.getMetadataByMetadataString(dcCreatorField);
                         if (dcAuthors.length > 0)
                         {
                             List<String> creators = new ArrayList<String>();
-                            for (DCValue author : dcAuthors)
+                            for (Metadatum author : dcAuthors)
                             {
                                 creators.add(author.value);
                             }
@@ -331,7 +331,7 @@ public class SyndicationFeed
                     }
                     if (dcDateField != null && !hasDate)
                     {
-                        DCValue v[] = item.getMetadata(dcDateField);
+                        Metadatum v[] = item.getMetadataByMetadataString(dcDateField);
                         if (v.length > 0)
                         {
                             dc.setDate((new DCDate(v[0].value)).toDate());
@@ -339,11 +339,11 @@ public class SyndicationFeed
                     }
                     if (dcDescriptionField != null)
                     {
-                        DCValue v[] = item.getMetadata(dcDescriptionField);
+                        Metadatum v[] = item.getMetadataByMetadataString(dcDescriptionField);
                         if (v.length > 0)
                         {
                             StringBuffer descs = new StringBuffer();
-                            for (DCValue d : v)
+                            for (Metadatum d : v)
                             {
                                 if (descs.length() > 0)
                                 {
@@ -381,7 +381,7 @@ public class SyndicationFeed
                         }
                         //Also try to add an external value from dc.identifier.other
                         // We are assuming that if this is set, then it is a media file
-                        DCValue[] externalMedia = item.getMetadata(externalSourceField);
+                        Metadatum[] externalMedia = item.getMetadataByMetadataString(externalSourceField);
                         if(externalMedia.length > 0)
                         {
                             for(int i = 0; i< externalMedia.length; i++)
@@ -567,7 +567,7 @@ public class SyndicationFeed
     // spoonful of syntactic sugar when we only need first value
     private String getOneDC(Item item, String field)
     {
-        DCValue dcv[] = item.getMetadata(field);
+        Metadatum dcv[] = item.getMetadataByMetadataString(field);
         return (dcv.length > 0) ? dcv[0].value : null;
     }
 }

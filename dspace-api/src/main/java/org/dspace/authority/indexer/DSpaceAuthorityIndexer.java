@@ -7,20 +7,25 @@
  */
 package org.dspace.authority.indexer;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.AuthorityValueFinder;
 import org.dspace.authority.AuthorityValueGenerator;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import java.net.MalformedURLException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * DSpaceAuthorityIndexer is used in IndexClient, which is called by the AuthorityConsumer and the indexing-script.
@@ -39,7 +44,7 @@ import java.util.List;
  * @author Ben Bosman (ben at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  */
-public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface {
+public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, InitializingBean {
 
     private static final Logger log = Logger.getLogger(DSpaceAuthorityIndexer.class);
 
@@ -51,9 +56,25 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface {
     private List<String> metadataFields;
     private int currentFieldIndex;
     private int currentMetadataIndex;
+    private boolean useCache;
+    private Map<String, AuthorityValue> cache;
     private AuthorityValue nextValue;
     private Context context;
     private AuthorityValueFinder authorityValueFinder;
+
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        int counter = 1;
+        String field;
+        metadataFields = new ArrayList<String>();
+        while ((field = configurationService.getProperty("authority.author.indexer.field." + counter)) != null) {
+            metadataFields.add(field);
+            counter++;
+        }
+    }
 
 
     public void init(Context context, Item item) {
@@ -69,6 +90,10 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface {
     }
 
     public void init(Context context) {
+        init(context, false);
+    }
+
+    public void init(Context context, boolean useCache) {
         try {
             this.itemIterator = Item.findAll(context);
             currentItem = this.itemIterator.next();
@@ -76,6 +101,7 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface {
             log.error("Error while retrieving all items in the metadata indexer");
         }
         initialize(context);
+        this.useCache = useCache;
     }
 
     private void initialize(Context context) {
@@ -84,14 +110,8 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface {
 
         currentFieldIndex = 0;
         currentMetadataIndex = 0;
-
-        int counter = 1;
-        String field;
-        metadataFields = new ArrayList<String>();
-        while ((field = ConfigurationManager.getProperty("authority.author.indexer.field." + counter)) != null) {
-            metadataFields.add(field);
-            counter++;
-        }
+        useCache = false;
+        cache = new HashMap<>();
     }
 
     public AuthorityValue nextValue() {
@@ -107,7 +127,7 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface {
         // 1. iterate over the metadata values
 
         String metadataField = metadataFields.get(currentFieldIndex);
-        DCValue[] values = currentItem.getMetadataByMetadataString(metadataField);
+        Metadatum[] values = currentItem.getMetadataByMetadataString(metadataField);
         if (currentMetadataIndex < values.length) {
             prepareNextValue(metadataField, values[currentMetadataIndex]);
 
@@ -156,34 +176,55 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface {
      * @param metadataField Is one of the fields defined in dspace.cfg to be indexed.
      * @param value         Is one of the values of the given metadataField in one of the items being indexed.
      */
-    private void prepareNextValue(String metadataField, DCValue value) {
+    private void prepareNextValue(String metadataField, Metadatum value) {
 
         nextValue = null;
 
         String content = value.value;
-        String uid = value.authority;
+        String authorityKey = value.authority;
+        //We only want to update our item IF our UUID is not present or if we need to generate one.
+        boolean requiresItemUpdate = StringUtils.isBlank(authorityKey) || StringUtils.startsWith(authorityKey, AuthorityValueGenerator.GENERATE);
 
-        if (StringUtils.isNotBlank(uid) && !uid.startsWith(AuthorityValueGenerator.GENERATE)) {
+        if (StringUtils.isNotBlank(authorityKey) && !authorityKey.startsWith(AuthorityValueGenerator.GENERATE)) {
             // !uid.startsWith(AuthorityValueGenerator.GENERATE) is not strictly necessary here but it prevents exceptions in solr
-            nextValue = authorityValueFinder.findByUID(context, uid);
+            nextValue = authorityValueFinder.findByUID(context, authorityKey);
+        }
+        if (nextValue == null && StringUtils.isBlank(authorityKey) && useCache) {
+            // A metadata without authority is being indexed
+            // If there is an exact match in the cache, reuse it rather than adding a new one.
+            AuthorityValue cachedAuthorityValue = cache.get(content);
+            if (cachedAuthorityValue != null) {
+                nextValue = cachedAuthorityValue;
+            }
         }
         if (nextValue == null) {
-            nextValue = AuthorityValueGenerator.generate(uid, content, metadataField.replaceAll("\\.", "_"));
+            nextValue = AuthorityValueGenerator.generate(context, authorityKey, content, metadataField.replaceAll("\\.", "_"));
         }
-        if (nextValue != null) {
+        if (nextValue != null && requiresItemUpdate) {
             nextValue.updateItem(currentItem, value);
+            try {
+                currentItem.update();
+            } catch (Exception e) {
+                log.error("Error creating a metadatavalue's authority", e);
+            }
         }
-
-        try {
-            currentItem.update();
-        } catch (Exception e) {
-            log.error("Error creating a metadatavalue's authority", e);
+        if (useCache) {
+            cache.put(content, nextValue);
         }
-
     }
 
     public void close() {
         itemIterator.close();
         itemIterator = null;
+        cache.clear();
+    }
+
+    public boolean isConfiguredProperly() {
+        boolean isConfiguredProperly = true;
+        if(CollectionUtils.isEmpty(metadataFields)){
+            log.warn("Authority indexer not properly configured, no metadata fields configured for indexing. Check the \"authority.author.indexer.field\" properties.");
+            isConfiguredProperly = false;
+        }
+        return isConfiguredProperly;
     }
 }

@@ -48,6 +48,9 @@ public class DiscoverUtility
     /** log4j category */
     private static Logger log = Logger.getLogger(DiscoverUtility.class);
 
+    public static final int TYPE_FACETS = 1;
+    public static final int TYPE_TAGCLOUD = 2;
+    
     /**
      * Get the scope of the search using the parameter found in the request.
      * 
@@ -110,7 +113,8 @@ public class DiscoverUtility
                         request, "submit")))
         {
             setFacet(context, request, scope, queryArgs,
-                    discoveryConfiguration, userFilters);
+                    discoveryConfiguration, userFilters, discoveryConfiguration
+                    .getSidebarFacets(), TYPE_FACETS);
         }
 
         setCollapsing(context, request, queryArgs, discoveryConfiguration);
@@ -165,6 +169,37 @@ public class DiscoverUtility
 	}
 
 	/**
+     * Build a DiscoverQuery object using the tag cloud parameter in the request
+     * 
+     * @param request
+     * @return the query.
+     * @throws SearchServiceException
+     */
+    public static DiscoverQuery getTagCloudDiscoverQuery(Context context,
+            HttpServletRequest request, DSpaceObject scope, boolean enableFacet)
+    {
+        DiscoverQuery queryArgs = new DiscoverQuery();
+        DiscoveryConfiguration discoveryConfiguration = SearchUtils
+                .getDiscoveryConfiguration(scope);
+
+        List<String> userFilters = setupBasicQuery(context,
+                discoveryConfiguration, request, queryArgs);
+
+        setPagination(request, queryArgs, discoveryConfiguration);
+
+        if (enableFacet
+                && !"submit_export_metadata".equals(UIUtil.getSubmitButton(
+                        request, "submit")))
+        {
+            setFacet(context, request, scope, queryArgs,
+                    discoveryConfiguration, userFilters, discoveryConfiguration
+                    .getTagCloudFacetConfiguration().getTagCloudFacets(), TYPE_TAGCLOUD);
+        }
+
+        return queryArgs;
+    }
+    
+    /**
      * Build the DiscoverQuery object for an autocomplete search using
      * parameters in the request
      * 
@@ -431,7 +466,7 @@ public class DiscoverUtility
     private static void setFacet(Context context, HttpServletRequest request,
             DSpaceObject scope, DiscoverQuery queryArgs,
             DiscoveryConfiguration discoveryConfiguration,
-            List<String> userFilters)
+            List<String> userFilters, List<DiscoverySearchFilterFacet> facets, int type)
     {
         List<DiscoverySearchFilterFacet> facets = new ArrayList<DiscoverySearchFilterFacet>();
         DiscoveryConfiguration globalConfiguration = null;
@@ -692,7 +727,7 @@ public class DiscoverUtility
                 }
                 else
                 {
-                    int facetLimit = facet.getFacetLimit();
+                    int facetLimit = type==TYPE_FACETS?facet.getFacetLimit():-1;
 
                     int facetPage = UIUtil.getIntParameter(request,
                             facet.getIndexFieldName() + "_page");

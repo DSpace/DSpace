@@ -817,4 +817,10 @@ public final class BrowseIndex
     {
         return "bi_" + Integer.toString(number);
     }
+
+	public boolean isTagCloudEnabled() {
+		
+		return ConfigurationManager.getBooleanProperty("webui.browse.index.tagcloud." + number);
+		 
+	}
 }

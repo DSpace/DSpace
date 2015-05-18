@@ -10,9 +10,7 @@
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
         <version>CRIS-4.3.1-SNAPSHOT</version>
-        <relativePath>..</relativePath>
     </parent>
-
     <properties>
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/..</root.basedir>
@@ -52,6 +50,11 @@
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
         </dependency>
+        <dependency> <!-- Keep jmockit before junit -->
+            <groupId>org.jmockit</groupId>
+            <artifactId>jmockit</artifactId>
+            <scope>test</scope>
+        </dependency>
         <!-- SPECIAL CASE - need JUNIT at build time and testing time -->
         <dependency>
             <groupId>junit</groupId>
@@ -69,11 +72,6 @@
             <groupId>org.mortbay.jetty</groupId>
             <artifactId>jetty-servlet-tester</artifactId>
             <version>6.1.14</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.dspace.dependencies.jmockit</groupId>
-            <artifactId>dspace-jmockit</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

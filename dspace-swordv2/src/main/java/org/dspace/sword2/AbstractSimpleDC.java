@@ -8,7 +8,7 @@
 
 package org.dspace.sword2;
 
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 
@@ -61,9 +61,9 @@ public class AbstractSimpleDC
         this.loadMetadataMaps();
 
         SimpleDCMetadata md = new SimpleDCMetadata();
-        DCValue[] all = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        Metadatum[] all = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
 
-        for (DCValue dcv : all)
+        for (Metadatum dcv : all)
         {
             String valueMatch = dcv.schema + "." + dcv.element;
             if (dcv.qualifier != null)

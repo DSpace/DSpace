@@ -88,7 +88,7 @@ public class BitstreamTest extends AbstractDSpaceObjectTest
     @Test
     public void testBSFind() throws SQLException
     {
-        int id = 1;
+        int id = this.bs.getID();
         Bitstream found =  Bitstream.find(context, id);
         assertThat("testBSFind 0", found, notNullValue());
         //the item created by default has no name nor type set
@@ -291,7 +291,7 @@ public class BitstreamTest extends AbstractDSpaceObjectTest
     @Test
     public void testGetSize()
     {
-        long size = 238413;
+        long size = 238413;  // yuck, hardcoded!
         assertThat("testGetSize 0", bs.getSize(), equalTo(size));
     }
 
@@ -367,15 +367,13 @@ public class BitstreamTest extends AbstractDSpaceObjectTest
     @Test(expected=AuthorizeException.class)
     public void testUpdateNotAdmin() throws SQLException, AuthorizeException
     {
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow Bitstream WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Bitstream) any,
+                    Constants.WRITE); result = new AuthorizeException();
 
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeAction((Context) any, (Bitstream) any,
-                        Constants.WRITE); result = new AuthorizeException();
-            }
-        };
+        }};
         //TODO: we need to verify the update, how?
         bs.update();
     }
@@ -386,15 +384,14 @@ public class BitstreamTest extends AbstractDSpaceObjectTest
     @Test
     public void testUpdateAdmin() throws SQLException, AuthorizeException
     {
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow Bitstream WRITE perms
+            AuthorizeManager.authorizeAction((Context) any, (Bitstream) any,
+                    Constants.WRITE); result = null;
 
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeAction((Context) any, (Bitstream) any,
-                        Constants.WRITE); result = null;
-            }
-        };
+        }};
+        
         //TODO: we need to verify the update, how?
         bs.update();
     }
@@ -403,23 +400,17 @@ public class BitstreamTest extends AbstractDSpaceObjectTest
      * Test of delete method, of class Bitstream.
      */
     @Test
-    public void testDelete() throws SQLException, AuthorizeException
+    public void testDelete() throws IOException, SQLException
     {      
-        bs.delete();
-        assertTrue("testDelete 0", bs.isDeleted());
+        // Create a new bitstream, which we can delete. As ordering of these 
+        // tests is unpredictable we don't want to delete the global bitstream
+        File f = new File(testProps.get("test.bitstream").toString());
+        Bitstream delBS = Bitstream.create(context, new FileInputStream(f));
+        
+        assertFalse("testIsDeleted 0", delBS.isDeleted());
+        delBS.delete();
+        assertTrue("testDelete 0", delBS.isDeleted());
     }
-
-    /**
-     * Test of isDeleted method, of class Bitstream.
-     */
-    @Test
-    public void testIsDeleted() throws SQLException, AuthorizeException
-    {
-        assertFalse("testIsDeleted 0", bs.isDeleted());
-        bs.delete();        
-        assertTrue("testIsDeleted 1", bs.isDeleted());
-    }
-
 
     /**
      * Test of retrieve method, of class Bitstream.
@@ -428,14 +419,12 @@ public class BitstreamTest extends AbstractDSpaceObjectTest
     public void testRetrieveCanRead() throws IOException, SQLException,
             AuthorizeException
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeAction((Context) any, (Bitstream) any,
-                        Constants.READ); result = null;
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow Bitstream READ perms
+            AuthorizeManager.authorizeAction((Context) any, (Bitstream) any,
+                    Constants.READ); result = null;
+        }};
 
         assertThat("testRetrieveCanRead 0", bs.retrieve(), notNullValue());
     }
@@ -447,14 +436,12 @@ public class BitstreamTest extends AbstractDSpaceObjectTest
     public void testRetrieveNoRead() throws IOException, SQLException,
             AuthorizeException
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeAction((Context) any, (Bitstream) any,
-                        Constants.READ); result = new AuthorizeException();
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow Bitstream READ perms
+            AuthorizeManager.authorizeAction((Context) any, (Bitstream) any,
+                    Constants.READ); result = new AuthorizeException();
+        }};
 
         assertThat("testRetrieveNoRead 0", bs.retrieve(), notNullValue());
     }

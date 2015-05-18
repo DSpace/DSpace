@@ -39,7 +39,7 @@ import java.util.*;
 public class Harvest
 {
     /** log4j logger */
-    private static Logger log = Logger.getLogger(Harvest.class);
+    private static final Logger log = Logger.getLogger(Harvest.class);
 
     /**
      * Obtain information about items that have been created, modified or
@@ -173,7 +173,7 @@ public class Harvest
         if (!withdrawn)
         {
             // Exclude withdrawn items
-            if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+            if (DatabaseManager.isOracle())
             {
                 query += " AND withdrawn=0 ";
             }
@@ -394,7 +394,7 @@ public class Harvest
 
         for (Group authorizedGroup : authorizedGroups)
         {
-            if (authorizedGroup.getID() == 0)
+            if (authorizedGroup.getID() == Group.ANONYMOUS_ID)
             {
                 return true;
             }

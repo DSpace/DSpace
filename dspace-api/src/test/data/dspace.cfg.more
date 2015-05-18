@@ -1,8 +1,13 @@
-#Configure authority control for testing
-
+# Configure authority control for Unit Testing
+# (This overrides default, commented out settings in dspace.cfg)
 plugin.selfnamed.org.dspace.content.authority.ChoiceAuthority = \
-	org.dspace.content.authority.DCInputAuthority
+	org.dspace.content.authority.DCInputAuthority, \
+    org.dspace.content.authority.DSpaceControlledVocabulary
 
+# Enable a test authority control on dc.language.iso field
 choices.plugin.dc.language.iso = common_iso_languages
 choices.presentation.dc.language.iso = select
 authority.controlled.dc.language.iso = true
+
+# use the testing assetstore.dir
+assetstore.dir = ${dspace.dir}/assetstore
