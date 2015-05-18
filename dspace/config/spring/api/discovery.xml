@@ -426,7 +426,7 @@
         <property name="sortOrder" value="COUNT"/>
     </bean>
 
-    <bean id="searchFilterAdvisor" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+    <bean id="searchFilterAuthorContributor" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
         <property name="indexFieldName" value="authorcontributor"/>
         <property name="metadataFields">
             <list>
