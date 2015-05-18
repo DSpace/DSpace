@@ -36,7 +36,7 @@ public class DiscoveryConfiguration implements InitializingBean{
 
     private DiscoverySortConfiguration searchSortConfiguration;
 
-    private int defaultRpp = 10;
+    private int defaultRpp = 20;
     
     private String id;
     private DiscoveryHitHighlightingConfiguration hitHighlightingConfiguration;
