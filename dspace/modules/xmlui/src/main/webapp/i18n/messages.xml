@@ -485,8 +485,8 @@
     <message key="xmlui.EPerson.LoginChooser.para1">Log in via:</message>
     <message key="org.dspace.authenticate.ShibAuthentication.title">Shibboleth Authentication</message>
     <message key="org.dspace.eperson.LDAPAuthentication.title">LDAP Authentication</message>
-    <message key="org.dspace.eperson.PasswordAuthentication.title">Password Authentication</message>
-    <message key="org.dspace.eperson.CASAuthentication.title">UM campus community (you will need your UM Directory ID and Password)</message>
+    <message key="org.dspace.eperson.PasswordAuthentication.title">Others</message>
+    <message key="org.dspace.eperson.CASAuthentication.title">UMD Campus Community (using Directory ID)</message>
     <message key="org.dspace.eperson.X509Authentication.title">Web Certificate Authentication</message>
 
     <!-- org.dspace.app.xmlui.eperson.FailedAuthentication -->
