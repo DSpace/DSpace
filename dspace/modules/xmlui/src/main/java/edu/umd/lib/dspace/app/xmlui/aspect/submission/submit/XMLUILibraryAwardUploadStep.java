@@ -143,7 +143,7 @@ public class XMLUILibraryAwardUploadStep extends AbstractSubmissionStep
 
     @Override
     public void addBody(Body body) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException
+    UIException, SQLException, IOException, AuthorizeException
     {
         // Get a list of all files in the original bundle
         Item item = submission.getItem();
@@ -213,9 +213,11 @@ public class XMLUILibraryAwardUploadStep extends AbstractSubmissionStep
             uploadButton.setValue("Upload");
             if (requiredBitstreams.isEmpty())
             {
+                file.setDisabled();
                 uploadButton.setDisabled();
             }
 
+            // Error Handling and Displaying the error messages.
             if (this.errorFlag == LibraryAwardUploadStep.STATUS_NOT_PDF
                     || this.errorFlag == LibraryAwardUploadStep.STATUS_UNKNOWN_FORMAT)
             {
@@ -223,9 +225,9 @@ public class XMLUILibraryAwardUploadStep extends AbstractSubmissionStep
             }
             else if (buttonPressed.equals(LibraryAwardUploadStep.NEXT_BUTTON)
                     || buttonPressed
-                            .startsWith(LibraryAwardUploadStep.PROGRESS_BAR_PREFIX)
+                    .startsWith(LibraryAwardUploadStep.PROGRESS_BAR_PREFIX)
                     || buttonPressed
-                            .equals(LibraryAwardUploadStep.PREVIOUS_BUTTON))
+                    .equals(LibraryAwardUploadStep.PREVIOUS_BUTTON))
             {
                 if (this.errorFlag == LibraryAwardUploadStep.STATUS_MISSING_BITSTREAMS
                         || this.errorFlag == LibraryAwardUploadStep.STATUS_INTEGRITY_ERROR
@@ -235,88 +237,9 @@ public class XMLUILibraryAwardUploadStep extends AbstractSubmissionStep
                 }
                 else if (this.errorFlag == LibraryAwardUploadStep.STATUS_NOT_PDF)
                 {
-                    // file.addError(T_not_pdf_error);
                     file.addError(T_not_pdf);
                 }
             }
-            // if no files found error was thrown by processing class,
-            // display it!
-            // if (this.errorFlag != LibraryAwardUploadStep.STATUS_COMPLETE)
-            // {
-            // if (this.errorFlag ==
-            // LibraryAwardUploadStep.STATUS_NO_FILES_ERROR)
-            // {
-            // file.addError(T_file_error);
-            // }
-            //
-            // // if an upload error was thrown by processing class, display
-            // // it!
-            // else if (this.errorFlag ==
-            // LibraryAwardUploadStep.STATUS_UPLOAD_ERROR)
-            // {
-            // file.addError(T_upload_error);
-            // }
-            //
-            // // if an upload error was thrown by processing class, display
-            // // it!
-            // else if (this.errorFlag ==
-            // LibraryAwardUploadStep.STATUS_INTEGRITY_ERROR)
-            // {
-            // // file.addError(T_integrity_error);
-            // file.addError("INTEGRITY ERROR");
-            // }
-            //
-            // // if virus checking was attempted and failed in error then let
-            // // the user know
-            // else if (this.errorFlag ==
-            // org.dspace.submit.step.UploadStep.STATUS_VIRUS_CHECKER_UNAVAILABLE)
-            // {
-            // file.addError(T_virus_checker_error);
-            // }
-            //
-            // // if virus checking was attempted and a virus found then let
-            // // the user know
-            // else if (this.errorFlag ==
-            // org.dspace.submit.step.UploadStep.STATUS_CONTAINS_VIRUS)
-            // {
-            // file.addError(T_virus_error);
-            // }
-            //
-            // else if (this.errorFlag ==
-            // LibraryAwardUploadStep.STATUS_UNKNOWN_FORMAT)
-            // {
-            // // user uploaded a file where the format is unknown to
-            // // DSpace
-            //
-            // // forward user to page to request the file format
-            // // file.addError(T_unknown_format_error);
-            // file.addError("UNKNOWN FORMAT");
-            // }
-            // }
-            //
-            // if (this.errorFlag ==
-            // LibraryAwardUploadStep.STATUS_MISSING_BITSTREAMS)
-            // {
-            // // file.addError(T_missing_bitstreams_error);
-            // file.addError("MISSING BITSTREAMS");
-            //
-            // }
-            // if (this.errorFlag == LibraryAwardUploadStep.STATUS_NOT_PDF)
-            // {
-            // // file.addError(T_not_pdf_error);
-            // file.addError("NOT PDF");
-            // }
-
-            //
-            // Text description = upload.addItem().addText("description");
-            // description.setLabel(T_description);
-            // description.setHelp(T_description_help);
-            // description.setRequired();
-            // description.setValue("cat");
-            //
-            // Button uploadSubmit =
-            // upload.addItem().addButton("submit_upload");
-            // uploadSubmit.setValue(T_submit_upload);
         }
 
         // Part B:
@@ -453,8 +376,8 @@ public class XMLUILibraryAwardUploadStep extends AbstractSubmissionStep
      */
     @Override
     public List addReviewSection(List reviewList) throws SAXException,
-    WingException, UIException, SQLException, IOException,
-    AuthorizeException
+            WingException, UIException, SQLException, IOException,
+            AuthorizeException
     {
         // Create a new list section for this step (and set its heading)
         List uploadSection = reviewList.addList("submit-review-"
