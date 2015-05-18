@@ -710,7 +710,7 @@
                 <module>dspace-lni/dspace-lni-client</module>
             </modules>
         </profile>
-	-->
+	
 
     <!--
            Builds CRIS Module for DSpace
