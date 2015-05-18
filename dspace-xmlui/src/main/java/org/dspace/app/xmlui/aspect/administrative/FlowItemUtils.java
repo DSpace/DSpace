@@ -22,6 +22,7 @@ import java.util.Enumeration;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.servlet.multipart.Part;
 import org.apache.log4j.Logger;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.dspace.app.util.Util;
 import org.dspace.app.xmlui.utils.UIException;
@@ -394,12 +395,20 @@ public class FlowItemUtils
 	 * @param itemID The id of the to-be-withdrawn item.
 	 * @return A result object
 	 */
-	public static FlowResult processWithdrawItem(Context context, int itemID) throws SQLException, AuthorizeException, IOException
+	public static FlowResult processWithdrawItem(Context context, int itemID, Request request) throws SQLException, AuthorizeException, IOException
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(false);
 		
 		Item item = Item.find(context, itemID);
+		String handle = request.getParameter("extra_handle");
+		String reason = request.getParameter("extra_reason");
+		if(!StringUtils.isEmpty(handle)){
+			item.setClaimedBySomeoneElse(handle);
+		}
+		if(!StringUtils.isEmpty(reason)){
+			item.store_provenance_info(String.format("The item was withdrawn with the following reason: \"%s\"", reason), context.getCurrentUser());
+		}
 		item.withdraw();
 		context.commit();
 

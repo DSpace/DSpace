@@ -69,6 +69,11 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
             message("xmlui.ArtifactBrowser.RestrictedItem.head_item_replaced");
     private static final Message T_para_item_replacedby =
             message("xmlui.ArtifactBrowser.RestrictedItem.para_item_replacedby");
+    // claimed
+    private static final Message T_head_item_claimed =
+            message("xmlui.ArtifactBrowser.RestrictedItem.head_item_claimed");
+    private static final Message T_para_item_claimed =
+            message("xmlui.ArtifactBrowser.RestrictedItem.para_item_claimed");
     
 
     // withdrawn
@@ -216,7 +221,7 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
     private void handle_item(Item item, List unauthorized) throws WingException 
     {
                 String identifier = "unknown";
-        String handle = item.getHandle();
+                String handle = item.getHandle();
                 if (handle == null || "".equals(handle)) {
             		identifier = "internal ID: " + item.getID();
                 } else {
@@ -244,7 +249,11 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
             }
 				return;
             	
-            }else {
+            }else if(item.isClaimedBySomeoneElse()){
+            	unauthorized.setHead(T_head_item_claimed);
+            	String otherIdentifier = item.getClaimedBySomeoneElse();
+            	unauthorized.addItem(T_para_item_claimed.parameterize(otherIdentifier));
+            }else{
                 unauthorized.setHead(T_head_item_withdrawn);            	
             	unauthorized.addItem(T_para_item_withdrawn.parameterize(identifier));
                 unauthorized.addItem("item_status", T_para_item_withdrawn.getKey()).addContent(status);

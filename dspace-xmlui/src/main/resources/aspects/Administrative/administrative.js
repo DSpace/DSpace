@@ -1848,7 +1848,7 @@ function doWithdrawItem(itemID)
 		// Actually withdraw the item
 		// authorization check performed directly by the dspace-api
 		// assertAdministrator();
-		var result = FlowItemUtils.processWithdrawItem(getDSContext(),itemID);
+		var result = FlowItemUtils.processWithdrawItem(getDSContext(),itemID, cocoon.request);
 		return result;
 	}
 	return null;

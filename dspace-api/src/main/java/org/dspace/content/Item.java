@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
@@ -2144,5 +2145,22 @@ public class Item extends DSpaceObject
 			return true;
 		}
 		return false;
+	}
+
+
+	public boolean isClaimedBySomeoneElse() {
+		Metadatum[] md = this.getMetadataByMetadataString("dcterms.isReplacedBy");
+		return md.length == 1 && !StringUtils.isEmpty(md[0].value);
+	}
+
+
+	public String getClaimedBySomeoneElse() {
+			return this.getMetadata("dcterms.isReplacedBy");
+	}
+
+
+	public void setClaimedBySomeoneElse(String pid) {
+		this.clearMetadata("dcterms", "isReplacedBy", Item.ANY, Item.ANY);
+		this.addMetadata("dcterms", "isReplacedBy", null, null, pid);
 	}
 }
