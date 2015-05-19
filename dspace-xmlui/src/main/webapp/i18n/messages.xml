@@ -2279,11 +2279,15 @@
     <message key="xmlui.metadata.dc.first-line-of-text">First Line of Text</message>
     <message key="xmlui.metadata.dc.format">Item Format</message>
     <message key="xmlui.metadata.dc.format.mimetype">Mimetype</message>
-    <message key="xmlui.metadata.dc.identifier.uri">Identifier</message>
+    <message key="xmlui.metadata.dc.identifier">Identifier</message>
+    <message key="xmlui.metadata.dc.identifier.citation">Identifier (Citation)</message>
+    <message key="xmlui.metadata.dc.identifier.other">Identifier (Other)</message>
+    <message key="xmlui.metadata.dc.identifier.uri">Identifier (URI)</message>
     <message key="xmlui.metadata.dc.language">Item Language</message>
     <message key="xmlui.metadata.dc.language.iso">Language</message>
     <message key="xmlui.metadata.dc.publisher">Publisher</message>
     <message key="xmlui.metadata.dc.relation.ispartof">Digital Collection</message>
+    <message key="xmlui.metadata.dc.relation.ispartofseries">Part of Series</message>
     <message key="xmlui.metadata.dc.rights">Rights</message>
     <message key="xmlui.metadata.dc.source">Source</message>
     <message key="xmlui.metadata.dc.subject">Subject</message>
