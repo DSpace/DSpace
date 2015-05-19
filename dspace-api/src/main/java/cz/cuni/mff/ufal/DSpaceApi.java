@@ -261,6 +261,16 @@ public class DSpaceApi {
 
 	}
 
+	public static void main(String[] t) {
+		try {
+			load_dspace();
+			handle_HandleManager_createId(null, 9999, "11372/LRT-", "TEST-1");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
 	/**
 	 * Create a new handle PID. This is modified implementation for UFAL, using
 	 * the PID service pidconsortium.eu as wrapped in the PIDService class.
@@ -339,7 +349,8 @@ public class DSpaceApi {
 		try {
 			PIDService.modifyPID(pid, url);
 		} catch (Exception e) {
-			throw new IOException("Failed to map PID " + pid + " to " + url);
+			throw new IOException("Failed to map PID " + pid + " to " + url
+				+ " (" + e.toString() + ")");
 		}
 		
 	}
