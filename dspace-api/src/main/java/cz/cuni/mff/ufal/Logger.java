@@ -1,7 +1,9 @@
 /* Created for LINDAT/CLARIN */
 package cz.cuni.mff.ufal;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -37,7 +39,7 @@ public static class own_logger extends org.apache.log4j.Logger
 {
     // variables
     org.apache.log4j.Logger impl_;
-    static String[] ignores = new String[0];
+    static List<String> ignores = null;
 
 
     // ctor
@@ -50,7 +52,7 @@ public static class own_logger extends org.apache.log4j.Logger
     boolean ignore_exception(String msg) {
         if ( null != get_ignores() ) {
             for ( String i : get_ignores() ) {
-                if ( msg.trim().startsWith( i.trim() ) )
+                if ( msg.matches(i) )
                     return true;
             }
         }
@@ -94,13 +96,14 @@ public static class own_logger extends org.apache.log4j.Logger
     //
     //
 
-    // implemented like here because of local debugging
-    String[] get_ignores() {
-        if ( null != ignores && ignores.length == 0 ) {
-            ignores = null;
+    List<String> get_ignores() {
+        if ( null == ignores ) {
+            ignores = new ArrayList<>();
             String toignore = ConfigurationManager.getProperty("lr", "lr.errors.ignore");
             if ( toignore != null ) {
-                ignores = toignore.split(",");
+                for (String s : toignore.split(",") ) {
+                    ignores.add( s.trim() );
+                }
             }
         }
         return ignores;
