@@ -1808,7 +1808,7 @@
 			                        </xsl:otherwise>
 			                    </xsl:choose>
 			                </xsl:attribute>
-			                <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/ecologyNEW.png"
+			                <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/ecology.png"
 			                     alt="Ecology cover"/>
 			            </a>
 			        </xsl:when>
@@ -1947,7 +1947,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/fe_new.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/FEcover.png"
                          alt="Functional Ecology cover"/>
                 </a>
             </xsl:when>
@@ -2140,7 +2140,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/jae_new.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/JAEcover.png"
                          alt="Journal of Animal Ecology cover"/>
                 </a>
             </xsl:when>
@@ -2157,7 +2157,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/jappl_new.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/JAPPLcover.png"
                          alt="Journal of Applied Ecology cover"/>
                 </a>
             </xsl:when>
@@ -2192,7 +2192,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/jeco_new.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/JECOLcover.png"
                          alt="Journal of Ecology cover"/>
                 </a>
             </xsl:when>
@@ -2312,7 +2312,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/mee_new.png"
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/MEEcover.png"
                          alt="Methods in Ecology and Evolution cover"/>
                 </a>
             </xsl:when>
