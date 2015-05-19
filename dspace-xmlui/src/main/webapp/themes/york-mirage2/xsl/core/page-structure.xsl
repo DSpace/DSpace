@@ -328,145 +328,159 @@
                             <span class="icon-bar"></span>
                         </button>
 
-                        <a href="{$context-path}/" class="navbar-brand">
-                            <img src="{$theme-path}/images/logo.png" />
-                        </a>
-
-
-                        <div class="navbar-header pull-right visible-xs hidden-sm hidden-md hidden-lg">
-                        <ul class="nav nav-pills pull-left ">
-
-                            <xsl:if test="count(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='supportedLocale']) &gt; 1">
-                                <li id="ds-language-selection-xs" class="dropdown">
-                                    <xsl:variable name="active-locale" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='currentLocale']"/>
-                                    <button id="language-dropdown-toggle-xs" href="#" role="button" class="dropdown-toggle navbar-toggle navbar-link" data-toggle="dropdown">
-                                        <b class="visible-xs glyphicon glyphicon-globe" aria-hidden="true"/>
-                                    </button>
-                                    <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="language-dropdown-toggle-xs" data-no-collapse="true">
-                                        <xsl:for-each
-                                                select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='supportedLocale']">
-                                            <xsl:variable name="locale" select="."/>
-                                            <li role="presentation">
-                                                <xsl:if test="$locale = $active-locale">
-                                                    <xsl:attribute name="class">
-                                                        <xsl:text>disabled</xsl:text>
-                                                    </xsl:attribute>
-                                                </xsl:if>
-                                                <a>
-                                                    <xsl:attribute name="href">
-                                                        <xsl:value-of select="$current-uri"/>
-                                                        <xsl:text>?locale-attribute=</xsl:text>
-                                                        <xsl:value-of select="$locale"/>
-                                                    </xsl:attribute>
-                                                    <xsl:value-of
-                                                            select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='supportedLocale'][@qualifier=$locale]"/>
-                                                </a>
-                                            </li>
-                                        </xsl:for-each>
-                                    </ul>
-                                </li>
-                            </xsl:if>
-
-                            <xsl:choose>
-                                <xsl:when test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
-                                    <li class="dropdown">
-                                        <button class="dropdown-toggle navbar-toggle navbar-link" id="user-dropdown-toggle-xs" href="#" role="button"  data-toggle="dropdown">
-                                            <b class="visible-xs glyphicon glyphicon-user" aria-hidden="true"/>
-                                        </button>
-                                        <ul class="dropdown-menu pull-right" role="menu"
-                                            aria-labelledby="user-dropdown-toggle-xs" data-no-collapse="true">
-                                            <li>
-                                                <a href="{/dri:document/dri:meta/dri:userMeta/
-                            dri:metadata[@element='identifier' and @qualifier='url']}">
-                                                    <i18n:text>xmlui.EPerson.Navigation.profile</i18n:text>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="{/dri:document/dri:meta/dri:userMeta/
-                            dri:metadata[@element='identifier' and @qualifier='logoutURL']}">
-                                                    <i18n:text>xmlui.dri2xhtml.structural.logout</i18n:text>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <li>
-                                        <form style="display: inline" action="{/dri:document/dri:meta/dri:userMeta/
-                            dri:metadata[@element='identifier' and @qualifier='loginURL']}" method="get">
-                                            <button class="navbar-toggle navbar-link">
-                                            <b class="visible-xs glyphicon glyphicon-user" aria-hidden="true"/>
-                                            </button>
-                                        </form>
-                                    </li>
-                                </xsl:otherwise>
-                            </xsl:choose>
-                        </ul>
-                              </div>
-                    </div>
-
-                    <div class="navbar-header pull-right hidden-xs">
-                        <ul class="nav navbar-nav pull-left">
-                              <xsl:call-template name="languageSelection"/>
-                        </ul>
-                        <ul class="nav navbar-nav pull-left">
-                            <xsl:choose>
-                                <xsl:when test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
-                                    <li class="dropdown">
-                                        <a id="user-dropdown-toggle" href="#" role="button" class="dropdown-toggle"
-                                           data-toggle="dropdown">
-                                            <span class="hidden-xs">
-                                                <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
-                            dri:metadata[@element='identifier' and @qualifier='firstName']"/>
-                                                <xsl:text> </xsl:text>
-                                                <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
-                            dri:metadata[@element='identifier' and @qualifier='lastName']"/>
-                                                &#160;
-                                                <b class="caret"/>
-                                            </span>
-                                        </a>
-                                        <ul class="dropdown-menu pull-right" role="menu"
-                                            aria-labelledby="user-dropdown-toggle" data-no-collapse="true">
-                                            <li>
-                                                <a href="{/dri:document/dri:meta/dri:userMeta/
-                            dri:metadata[@element='identifier' and @qualifier='url']}">
-                                                    <i18n:text>xmlui.EPerson.Navigation.profile</i18n:text>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="{/dri:document/dri:meta/dri:userMeta/
-                            dri:metadata[@element='identifier' and @qualifier='logoutURL']}">
-                                                    <i18n:text>xmlui.dri2xhtml.structural.logout</i18n:text>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <li>
-                                        <a href="{/dri:document/dri:meta/dri:userMeta/
-                            dri:metadata[@element='identifier' and @qualifier='loginURL']}">
-                                            <span class="hidden-xs">
-                                                <i18n:text>xmlui.dri2xhtml.structural.login</i18n:text>
-                                            </span>
-                                        </a>
-                                    </li>
-                                </xsl:otherwise>
-                            </xsl:choose>
-                        </ul>
-
-                        <button data-toggle="offcanvas" class="navbar-toggle visible-sm" type="button">
-                            <span class="sr-only">Toggle navigation</span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                        </button>
+                        <div class="container">
+                            <div class="row">
+                                <a href="http://ychistory.org">
+                                    <img src="{$theme-path}/images/yc1.gif"/>
+                                </a>
+                                <xsl:call-template name="headerContext"/>
+                                <!-- add context -->
+                            </div>
+                            <div class="row">
+                                <a href="{$context-path}/">
+                                    <img src="{$theme-path}/images/yc2.gif" />
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-
         </header>
+    </xsl:template>
 
+    <xsl:template name="headerContext">
+        <div class="navbar-header pull-right visible-xs hidden-sm hidden-md hidden-lg">
+            <ul class="nav nav-pills pull-left ">
+
+                <xsl:if test="count(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='supportedLocale']) &gt; 1">
+                    <li id="ds-language-selection-xs" class="dropdown">
+                        <xsl:variable name="active-locale"
+                                      select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='currentLocale']"/>
+                        <button id="language-dropdown-toggle-xs" href="#" role="button"
+                                class="dropdown-toggle navbar-toggle navbar-link" data-toggle="dropdown">
+                            <b class="visible-xs glyphicon glyphicon-globe" aria-hidden="true"/>
+                        </button>
+                        <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="language-dropdown-toggle-xs"
+                            data-no-collapse="true">
+                            <xsl:for-each
+                                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='supportedLocale']">
+                                <xsl:variable name="locale" select="."/>
+                                <li role="presentation">
+                                    <xsl:if test="$locale = $active-locale">
+                                        <xsl:attribute name="class">
+                                            <xsl:text>disabled</xsl:text>
+                                        </xsl:attribute>
+                                    </xsl:if>
+                                    <a>
+                                        <xsl:attribute name="href">
+                                            <xsl:value-of select="$current-uri"/>
+                                            <xsl:text>?locale-attribute=</xsl:text>
+                                            <xsl:value-of select="$locale"/>
+                                        </xsl:attribute>
+                                        <xsl:value-of
+                                                select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='supportedLocale'][@qualifier=$locale]"/>
+                                    </a>
+                                </li>
+                            </xsl:for-each>
+                        </ul>
+                    </li>
+                </xsl:if>
+
+                <xsl:choose>
+                    <xsl:when test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
+                        <li class="dropdown">
+                            <button class="dropdown-toggle navbar-toggle navbar-link" id="user-dropdown-toggle-xs"
+                                    href="#" role="button" data-toggle="dropdown">
+                                <b class="visible-xs glyphicon glyphicon-user" aria-hidden="true"/>
+                            </button>
+                            <ul class="dropdown-menu pull-right" role="menu"
+                                aria-labelledby="user-dropdown-toggle-xs" data-no-collapse="true">
+                                <li>
+                                    <a href="{/dri:document/dri:meta/dri:userMeta/
+                            dri:metadata[@element='identifier' and @qualifier='url']}">
+                                        <i18n:text>xmlui.EPerson.Navigation.profile</i18n:text>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{/dri:document/dri:meta/dri:userMeta/
+                            dri:metadata[@element='identifier' and @qualifier='logoutURL']}">
+                                        <i18n:text>xmlui.dri2xhtml.structural.logout</i18n:text>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <li>
+                            <form style="display: inline" action="{/dri:document/dri:meta/dri:userMeta/
+                            dri:metadata[@element='identifier' and @qualifier='loginURL']}" method="get">
+                                <button class="navbar-toggle navbar-link">
+                                    <b class="visible-xs glyphicon glyphicon-user" aria-hidden="true"/>
+                                </button>
+                            </form>
+                        </li>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </ul>
+        </div>
+
+        <div class="navbar-header pull-right hidden-xs">
+            <ul class="nav navbar-nav pull-left">
+                <xsl:call-template name="languageSelection"/>
+            </ul>
+            <ul class="nav navbar-nav pull-left">
+                <xsl:choose>
+                    <xsl:when test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
+                        <li class="dropdown">
+                            <a id="user-dropdown-toggle" href="#" role="button" class="dropdown-toggle"
+                               data-toggle="dropdown">
+                                <span class="hidden-xs">
+                                    <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
+                            dri:metadata[@element='identifier' and @qualifier='firstName']"/>
+                                    <xsl:text></xsl:text>
+                                    <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
+                            dri:metadata[@element='identifier' and @qualifier='lastName']"/>
+                                    &#160;
+                                    <b class="caret"/>
+                                </span>
+                            </a>
+                            <ul class="dropdown-menu pull-right" role="menu"
+                                aria-labelledby="user-dropdown-toggle" data-no-collapse="true">
+                                <li>
+                                    <a href="{/dri:document/dri:meta/dri:userMeta/
+                            dri:metadata[@element='identifier' and @qualifier='url']}">
+                                        <i18n:text>xmlui.EPerson.Navigation.profile</i18n:text>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{/dri:document/dri:meta/dri:userMeta/
+                            dri:metadata[@element='identifier' and @qualifier='logoutURL']}">
+                                        <i18n:text>xmlui.dri2xhtml.structural.logout</i18n:text>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <li>
+                            <a href="{/dri:document/dri:meta/dri:userMeta/
+                            dri:metadata[@element='identifier' and @qualifier='loginURL']}">
+                                <span class="hidden-xs">
+                                    <i18n:text>xmlui.dri2xhtml.structural.login</i18n:text>
+                                </span>
+                            </a>
+                        </li>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </ul>
+
+            <button data-toggle="offcanvas" class="navbar-toggle visible-sm" type="button">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
     </xsl:template>
 
 
@@ -640,7 +654,7 @@
         <footer>
             <div class="container-fluid">
                 <div class="row">
-                    <a href="http://www.dspace.org/" target="_blank">DSpace software</a> Copyright&#160;&#169;&#160;&2015#160; <a href="http://www.duraspace.org/" target="_blank">Duraspace</a>
+                    <a href="http://www.dspace.org/" target="_blank">DSpace software</a> Copyright&#160;&#169;&#160;2015&#160; <a href="http://www.longsight.com/" target="_blank">Longsight</a>
                 </div>
                 <div class="row">
                     <a>
