@@ -17,7 +17,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 /**
- * 
+ *
  * @author Lyncode Development Team <dspace@lyncode.com>
  */
 public class DateUtils
@@ -25,32 +25,38 @@ public class DateUtils
 
     private static Logger log = LogManager.getLogger(DateUtils.class);
 
+
+    /**
+     * Format a Date object as a valid UTC Date String, per OAI-PMH guidelines
+     * http://www.openarchives.org/OAI/openarchivesprotocol.html#DatestampsResponses
+     *
+     * @param date Date object
+     * @return UTC date string
+     */
     public static String format(Date date)
     {
-        return format(date, true);
-    }
-
-    public static String format(Date date, boolean init)
-    {
+        // NOTE: OAI-PMH REQUIRES that all dates be expressed in UTC format
+        // as YYYY-MM-DDThh:mm:ssZ  For more details, see
+        // http://www.openarchives.org/OAI/openarchivesprotocol.html#DatestampsResponses
         SimpleDateFormat sdf = new SimpleDateFormat(
-                "yyyy-MM-dd'T'HH:mm:ss.'000Z'");
-        if (!init)
-        {
-            sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.'999Z'");
-        }
+                "yyyy-MM-dd'T'HH:mm:ss'Z'");
         // We indicate that the returned date is in Zulu time (UTC) so we have
-        // to set the time zone of sdf correct.
+        // to set the time zone of sdf correctly
         sdf.setTimeZone(TimeZone.getTimeZone("ZULU"));
         String ret = sdf.format(date);
         return ret;
     }
 
+    /**
+     * Parse a string into a Date object
+     * @param date string to parse
+     * @return Date
+     */
     public static Date parse(String date)
     {
-        // in org.dspace.xoai.util.DateUtils.format(Date, boolean) we format all
-        // dates with trailing milliseconds so we have to use them when parsing
+        // First try to parse as a full UTC date/time, e.g. 2008-01-01T00:00:00Z
         SimpleDateFormat format = new SimpleDateFormat(
-                "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+                "yyyy-MM-dd'T'HH:mm:ss'Z'");
         format.setTimeZone(TimeZone.getTimeZone("ZULU"));
         Date ret;
         try
@@ -60,49 +66,41 @@ public class DateUtils
         }
         catch (ParseException ex)
         {
-            // 2008-01-01T00:00:00Z
-            format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-            format.setTimeZone(TimeZone.getTimeZone("ZULU"));
+            // If a parse exception, try other logical date/time formats
+            // based on the local timezone
+            format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",
+                    Locale.getDefault());
             try
             {
                 return format.parse(date);
             }
-            catch (ParseException e)
+            catch (ParseException e1)
             {
-                format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",
+                format = new SimpleDateFormat("yyyy-MM-dd",
                         Locale.getDefault());
                 try
                 {
                     return format.parse(date);
                 }
-                catch (ParseException e1)
+                catch (ParseException e2)
                 {
-                    format = new SimpleDateFormat("yyyy-MM-dd",
+                    format = new SimpleDateFormat("yyyy-MM",
                             Locale.getDefault());
                     try
                     {
                         return format.parse(date);
                     }
-                    catch (ParseException e2)
+                    catch (ParseException e3)
                     {
-                        format = new SimpleDateFormat("yyyy-MM",
+                        format = new SimpleDateFormat("yyyy",
                                 Locale.getDefault());
                         try
                         {
                             return format.parse(date);
                         }
-                        catch (ParseException e3)
+                        catch (ParseException e4)
                         {
-                            format = new SimpleDateFormat("yyyy",
-                                    Locale.getDefault());
-                            try
-                            {
-                                return format.parse(date);
-                            }
-                            catch (ParseException e4)
-                            {
-                                log.error(e4.getMessage(), e);
-                            }
+                            log.error(e4.getMessage(), e4);
                         }
                     }
                 }
