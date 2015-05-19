@@ -78,6 +78,7 @@
                 <map:parameter name="stylesheet.screen#8" value="css/bootstrap-theme.min.css"/>
                 <map:parameter name="stylesheet.screen#9" value="css/style-cicba.css"/>
                 <map:parameter name="stylesheet.screen#10" value="css/jquery.sapling.css"/>
+                <map:parameter name="stylesheet.screen#11" value="css/statistics.css"/>
                 <map:parameter name="stylesheet.handheld" value="../Mirage/lib/css/handheld.css"/>
                 <map:parameter name="stylesheet.print" value="../Mirage/lib/css/print.css"/>
                 <map:parameter name="stylesheet.all" value="../Mirage/lib/css/media.css"/>

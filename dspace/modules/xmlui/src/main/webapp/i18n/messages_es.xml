@@ -47,7 +47,8 @@
 <message key="xmlui.PageNotFound.title">Página no encontrada</message>
 <message key="xmlui.PageNotFound.head">Página no encontrada</message>
 <message key="xmlui.PageNotFound.para1">La página a la que está intentando acceder no se ha encontrado en el servidor</message>
-
+<message key="xmlui.PageNotFound.fichero_sin_descarga">Los ficheros todavia no han sido descargados</message>
+<message key="xmlui.PageNotFound.item_sin_visitas">El item todavía no fue visitado</message>
 
 	<!--
 	   The "utils" non-aspect
@@ -1933,11 +1934,11 @@
 <message key="xmlui.statistics.search.no-results">No se dispone de estadísticas de búsquedas para el período seleccionado.</message>
 <message key="xmlui.statistics.workflow.title">Estadísticas del flujo de trabajo</message>
 <message key="xmlui.statistics.visits.total">Número total de visitas</message>
-<message key="xmlui.statistics.visits.month">Visitas al mes</message>
-<message key="xmlui.statistics.visits.views">Visualizaciones</message>
-<message key="xmlui.statistics.visits.countries">Países con más visualizaciones</message>
+<message key="xmlui.statistics.visits.month">Accesos por mes (ultimos 6 meses)</message>
+<message key="xmlui.statistics.visits.views">Accesos</message>
+<message key="xmlui.statistics.visits.countries">Accesos por país de origen</message>
 <message key="xmlui.statistics.visits.cities">Ciudades con más visualizaciones</message>
-<message key="xmlui.statistics.visits.bitstreams">Visitas al fichero</message>
+<message key="xmlui.statistics.visits.bitstreams">Descargas por archivo</message>
 <message key="xmlui.statistics.Navigation.title">Estadísticas</message>
 <message key="xmlui.statistics.Navigation.usage.view">Ver Estadísticas de uso</message>
 <message key="xmlui.statistics.Navigation.search.view">Ver Estadísticas de Búsquedas</message>

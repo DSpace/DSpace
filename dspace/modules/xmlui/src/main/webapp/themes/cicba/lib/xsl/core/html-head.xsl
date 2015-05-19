@@ -74,7 +74,15 @@
 				</link>
 			</xsl:for-each>
 			
-            
+             <link rel="stylesheet" href="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.css" />
+      		 <script src="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
+      		 <link rel="stylesheet" type="text/css">
+      		 		<xsl:attribute name="href">
+		                <xsl:call-template name="print-theme-path" >
+		                	<xsl:with-param name="path"><xsl:value-of select="css/statistics.css"/></xsl:with-param>
+		                </xsl:call-template>
+		            </xsl:attribute>
+      		 </link>
 
             <!-- Add syndication feeds -->
             <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='feed']">

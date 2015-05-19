@@ -52,7 +52,8 @@
 	<message key="xmlui.PageNotFound.title">Page not found</message>
 	<message key="xmlui.PageNotFound.head">Page not found</message>
 	<message key="xmlui.PageNotFound.para1">We can't find the page you asked for.</message>
-
+	<message key="xmlui.PageNotFound.fichero_sin_descarga">The files have not yet been downloaded</message>
+	<message key="xmlui.PageNotFound.item_sin_visitas">The item was not visited</message>
 
 	<!--
 	   The "utils" non-aspect
@@ -2088,11 +2089,11 @@
     <message key="xmlui.statistics.search.no-results">No search statistics available for the selected period.</message>
     <message key="xmlui.statistics.workflow.title">Workflow Statistics</message>
     <message key="xmlui.statistics.visits.total">Total Visits</message>
-    <message key="xmlui.statistics.visits.month">Total Visits Per Month</message>
+    <message key="xmlui.statistics.visits.month">Total Visits Per Month (last 6 months)</message>
     <message key="xmlui.statistics.visits.views">Views</message>
     <message key="xmlui.statistics.visits.countries">Top country views</message>
     <message key="xmlui.statistics.visits.cities">Top cities views</message>
-    <message key="xmlui.statistics.visits.bitstreams">File Visits</message>
+    <message key="xmlui.statistics.visits.bitstreams">Downloads per file</message>
     <message key="xmlui.statistics.Navigation.title">Statistics</message>
     <message key="xmlui.statistics.Navigation.usage.view">View Usage Statistics</message>
     <message key="xmlui.statistics.Navigation.search.view">View Search Statistics</message>

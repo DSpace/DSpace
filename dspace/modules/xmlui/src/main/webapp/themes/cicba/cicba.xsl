@@ -36,6 +36,7 @@
     <xsl:import href="lib/xsl/aspect/artifactbrowser/item-view.xsl"/>
     <xsl:import href="lib/xsl/aspect/artifactbrowser/discovery.xsl"/>
     <xsl:import href="lib/xsl/core/elements.xsl"/>
+    <xsl:import href="lib/xsl/core/statistics.xsl"/>
     <xsl:output indent="yes"/>
     
 
