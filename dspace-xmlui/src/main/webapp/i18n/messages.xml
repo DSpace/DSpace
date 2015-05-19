@@ -350,6 +350,15 @@
     
     <message key="xmlui.ArtifactBrowser.RestrictedItem.head_item_replaced">This item is replaced by a newer version</message>
     <message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_replacedby">The requested item <b>{0}</b> is replaced by a new version which should be used instead. If you require this particular version, request it through our <a class="helpdesk-tolink">Help Desk</a>.</message>
+
+    <message key="xmlui.ArtifactBrowser.RestrictedItem.head_item_claimed">This item is managed by another repository</message>
+    <message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_claimed">The authors asked us to hide this submission. We still keep all the data and metadata of the original submission but the submission is now located at <span class="linkify">{0}</span>. Please contact us at our <a class="helpdesk-tolink">Help Desk</a> if you really need the original version.</message>
+    
+    <message key="xmlui.administrative.item.ConfirmItemForm.withdraw_para_extraInfo">You may wish to provide some extra information; a handle in case the item was moved someplace else and/or reason for the removal.</message>
+    <message key="xmlui.administrative.item.ConfirmItemForm.withdraw_help_extra_handle">If you fill this, users wanting to view the item will get special message. With a link created from the new PID.</message>
+    <message key="xmlui.administrative.item.ConfirmItemForm.withdraw_label_extra_handle">The new PID:</message>
+    <message key="xmlui.administrative.item.ConfirmItemForm.withdraw_help_extra_reason">The reason why the item was withdrawn will be added to the dc.description.provenance</message>
+    <message key="xmlui.administrative.item.ConfirmItemForm.withdraw_label_extra_reason">Reason:</message>
     
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.para_bitstream">You do not have the credentials to access the restricted bitstream <b>{0}</b>.</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.type_collection">collection</message>
