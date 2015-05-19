@@ -232,8 +232,8 @@
                     	<xsl:choose>
                     		<xsl:when test="dri:list[(@n=(concat($handle, ':dcterms.creator.corporate')) or @n=(concat($handle, ':dcterms.creator.author')) or @n=(concat($handle, ':dcterms.creator.compilator')) or @n=(concat($handle, ':dcterms.creator.editor'))) and descendant::text()]">
 								<xsl:for-each select="dri:list[(@n=(concat($handle, ':dcterms.creator.corporate')) or @n=(concat($handle, ':dcterms.creator.author')) or @n=(concat($handle, ':dcterms.creator.compilator')) or @n=(concat($handle, ':dcterms.creator.editor'))) and descendant::text()]">	
-		                            <xsl:for-each select="./dri:item">
-		                            	<xsl:value-of select="concat(./text(), $separador)" />
+		                            <xsl:for-each select="dri:item">
+		                            	<xsl:apply-templates select="." />; 
 		                            </xsl:for-each>
 				                </xsl:for-each>                    		
                     		</xsl:when>
