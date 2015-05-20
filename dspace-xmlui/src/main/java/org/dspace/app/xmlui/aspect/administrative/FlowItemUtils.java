@@ -404,7 +404,7 @@ public class FlowItemUtils
 		String handle = request.getParameter("extra_handle");
 		String reason = request.getParameter("extra_reason");
 		if(!StringUtils.isEmpty(handle)){
-			item.setClaimedBySomeoneElse(handle);
+			item.setReplacedBy(handle);
 		}
 		if(!StringUtils.isEmpty(reason)){
 			item.store_provenance_info(String.format("The item was withdrawn with the following reason: \"%s\"", reason), context.getCurrentUser());
