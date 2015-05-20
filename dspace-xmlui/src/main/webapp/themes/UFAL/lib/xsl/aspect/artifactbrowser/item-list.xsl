@@ -252,17 +252,15 @@
              <xsl:text>(</xsl:text>
              <xsl:if test="dim:field[@element='publisher']">
              	<xsl:for-each select="dim:field[@element='publisher']">
-	             	<span class="publisher">
-		             	<a>
-							<xsl:attribute name="href">
-								<xsl:copy-of select="$context-path"/>
-								/browse?value=
-								<xsl:copy-of select="./node()"/>
-								&amp;type=publisher
-							</xsl:attribute>
-							<xsl:copy-of select="./node()"/>
-						</a>                 
-					</span>
+                    <a class="publisher">
+                        <xsl:attribute name="href">
+                            <xsl:copy-of select="$context-path"/>
+                            /browse?value=
+                            <xsl:copy-of select="./node()"/>
+                            &amp;type=publisher
+                        </xsl:attribute>
+                        <xsl:copy-of select="./node()"/>
+                    </a>
 					<xsl:if
                         test="count(following-sibling::dim:field[@element='publisher']) != 0">
                         <xsl:text>; </xsl:text>
