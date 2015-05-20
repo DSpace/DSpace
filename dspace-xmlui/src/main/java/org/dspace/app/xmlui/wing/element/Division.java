@@ -951,4 +951,8 @@ public class Division extends AbstractWingElement implements StructuralElement, 
         }
         super.dispose();
     }
+    
+    public void setRend(String rend){
+    	this.rend = rend;
+    }
 }

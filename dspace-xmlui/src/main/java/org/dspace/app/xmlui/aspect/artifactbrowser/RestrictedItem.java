@@ -64,14 +64,11 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
     private static final Message T_head_item =
             message("xmlui.ArtifactBrowser.RestrictedItem.head_item");
     
-    // replaced by
-    private static final Message T_head_item_replaced =
-            message("xmlui.ArtifactBrowser.RestrictedItem.head_item_replaced");
-    private static final Message T_para_item_replacedby =
-            message("xmlui.ArtifactBrowser.RestrictedItem.para_item_replacedby");
-    // claimed
+    // replaced & withdrawn
     private static final Message T_head_item_claimed =
             message("xmlui.ArtifactBrowser.RestrictedItem.head_item_claimed");
+    private static final Message T_head2_item_claimed =
+            message("xmlui.ArtifactBrowser.RestrictedItem.head2_item_claimed");
     private static final Message T_para_item_claimed =
             message("xmlui.ArtifactBrowser.RestrictedItem.para_item_claimed");
     
@@ -135,8 +132,11 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
         Request request = ObjectModelHelper.getRequest(objectModel);
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
-        List unauthorized = unauthorized = body.addDivision("unauthorized-resource", "alert alert-error").addList("error-message", List.TYPE_FORM);
+        Division unauthorizedResource = body.addDivision("unauthorized-resource", "alert alert-error");
+        List unauthorized = unauthorizedResource.addList("error-message", List.TYPE_FORM);
         boolean isWithdrawn = false;
+        boolean isReplaced = false;
+        boolean addFaWarning = true;
         
         if (dso == null) 
         {
@@ -163,6 +163,11 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
             } else {
             	handle_item(((Item) dso), unauthorized);
             	isWithdrawn = ((Item) dso).isWithdrawn(); 
+            	isReplaced = ((Item)dso).isReplacedBy();
+            	if(isWithdrawn && isReplaced){
+            		unauthorizedResource.setRend("alert alert-warning");
+            	}
+            	addFaWarning = !(isWithdrawn && isReplaced);
             }
         } // end if Item 
         else 
@@ -187,12 +192,17 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
             AuthenticationUtil.interruptRequest(objectModel, header, message, characters);
         }
         
-        unauthorized.addItem(null, "fa fa-warning fa-5x hangright").addContent(" ");
+        if(addFaWarning){
+        	unauthorized.addItem(null, "fa fa-warning fa-5x hangright").addContent(" ");
+        }
         
         //Finally, set proper response. Return "404 Not Found" for all withdrawn items 
         //and "401 Unauthorized" for all restricted items
         HttpServletResponse response = (HttpServletResponse)objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);   
-        if (isWithdrawn)
+        if(isWithdrawn && isReplaced){
+        	response.setStatus(HttpServletResponse.SC_OK);
+        }
+        else if (isWithdrawn)
         {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
@@ -235,24 +245,11 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
         if (item.isWithdrawn()) 
                 {
             if ( item.isReplacedBy() ) {
-
-            	// this one is replaced by #478
-                unauthorized.setHead(T_head_item_replaced);
-                unauthorized.addItem(T_para_item_replacedby.parameterize(identifier));
-            	
-				List l = unauthorized.addList("replacedby-info", List.TYPE_FORM, "replacedby-info");
-				l.addItem().addFigure(contextPath + "/themes/UFAL/images/replacedby.png", null, "replacedby-logo");
-				org.dspace.app.xmlui.wing.element.Item first = l.addItem();
-				first.addContent("Replaced by:");
-				for ( String r : item.getReplacedBy() ) {
-					l.addItem().addXref(r, r, "replacedby-link");
-            }
-				return;
-            	
-            }else if(item.isClaimedBySomeoneElse()){
             	unauthorized.setHead(T_head_item_claimed);
-            	String otherIdentifier = item.getClaimedBySomeoneElse();
+            	String otherIdentifier = item.getReplacedBy().get(0);
+            	unauthorized.addItem(T_head2_item_claimed.parameterize(otherIdentifier));
             	unauthorized.addItem(T_para_item_claimed.parameterize(otherIdentifier));
+            	return;
             }else{
                 unauthorized.setHead(T_head_item_withdrawn);            	
             	unauthorized.addItem(T_para_item_withdrawn.parameterize(identifier));

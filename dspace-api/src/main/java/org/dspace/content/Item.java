@@ -2148,19 +2148,22 @@ public class Item extends DSpaceObject
 	}
 
 
-	public boolean isClaimedBySomeoneElse() {
-		Metadatum[] md = this.getMetadataByMetadataString("dcterms.isReplacedBy");
-		return md.length == 1 && !StringUtils.isEmpty(md[0].value);
+	/**
+	 * Use the schema, element, qualifier, language and value in addMetadata
+	 * @param md
+	 */
+	public void addMetadatum(Metadatum md){
+		this.addMetadata(md.schema, md.element, md.qualifier, md.language, md.value);
 	}
+	
 
-
-	public String getClaimedBySomeoneElse() {
-			return this.getMetadata("dcterms.isReplacedBy");
-	}
-
-
-	public void setClaimedBySomeoneElse(String pid) {
-		this.clearMetadata("dcterms", "isReplacedBy", Item.ANY, Item.ANY);
-		this.addMetadata("dcterms", "isReplacedBy", null, null, pid);
+	public void setReplacedBy(String pid) {
+		Metadatum[] mds = this.getMetadataByMetadataString(metadata_isreplacedby);
+		this.clearMetadata("dc", "relation", "isreplacedby", Item.ANY);
+		//ensure this goes first
+		this.addMetadata("dc", "relation", "isreplacedby", null, pid);
+		for(Metadatum md : mds){
+			this.addMetadatum(md);
+		}
 	}
 }
