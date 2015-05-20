@@ -211,6 +211,8 @@ lr.autocomplete.on=true
 lr.autocomplete.solr.url=${dspace.url}/JSON/solr/
 lr.autocomplete.json_static.url=${dspace.url}/static/json/
 
+lr.allow.edit.metadata = LINDAT / CLARIN Data & Tools, LRT + Open Submissions Data & Tools
+
 ############################################
 #
 # File download options
