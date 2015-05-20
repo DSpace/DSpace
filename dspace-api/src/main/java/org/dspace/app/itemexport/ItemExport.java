@@ -403,10 +403,10 @@ public class ItemExport
             throws Exception
     {
         Set<String> schemas = new HashSet<String>();
-        Metadatum[] dcValues = i.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-        for (Metadatum dcValue : dcValues)
+        Metadatum[] Metadatums = i.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        for (Metadatum Metadatum : Metadatums)
         {
-            schemas.add(dcValue.schema);
+            schemas.add(Metadatum.schema);
         }
 
         // Save each of the schemas into it's own metadata file
@@ -474,10 +474,10 @@ public class ItemExport
                     language = "";
                 }
 
-                utf8 = ("  <dcvalue element=\"" + dcv.element + "\" "
+                utf8 = ("  <Metadatum element=\"" + dcv.element + "\" "
                         + "qualifier=\"" + qualifier + "\""
                         + language + ">"
-                        + Utils.addEntities(dcv.value) + "</dcvalue>\n")
+                        + Utils.addEntities(dcv.value) + "</Metadatum>\n")
                         .getBytes("UTF-8");
 
                 if ((!migrate) ||
@@ -513,9 +513,9 @@ public class ItemExport
                 (dateAccessioned != null) &&
                 (!dateIssued.equals(dateAccessioned)))
             {
-                utf8 = ("  <dcvalue element=\"date\" "
+                utf8 = ("  <Metadatum element=\"date\" "
                         + "qualifier=\"issued\">"
-                        + Utils.addEntities(dateIssued) + "</dcvalue>\n")
+                        + Utils.addEntities(dateIssued) + "</Metadatum>\n")
                         .getBytes("UTF-8");
                 out.write(utf8, 0, utf8.length);
             }

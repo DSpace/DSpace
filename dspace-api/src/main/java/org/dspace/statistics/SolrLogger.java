@@ -7,17 +7,35 @@
  */
 package org.dspace.statistics;
 
-import au.com.bytecode.opencsv.CSVReader;
-import au.com.bytecode.opencsv.CSVWriter;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import java.io.*;
+import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -35,9 +53,15 @@ import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.params.FacetParams;
 import org.apache.solr.common.params.MapSolrParams;
+import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.ShardParams;
-import org.dspace.content.*;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.DCDate;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -48,13 +72,8 @@ import org.dspace.statistics.util.SpiderDetector;
 import org.dspace.usage.UsageWorkflowEvent;
 import org.dspace.utils.DSpace;
 
-import javax.servlet.http.HttpServletRequest;
-
-import java.net.URLEncoder;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import au.com.bytecode.opencsv.CSVReader;
+import au.com.bytecode.opencsv.CSVWriter;
 
 /**
  * Static holder for a HttpSolrClient connection pool to issue
@@ -1316,9 +1335,9 @@ public class SolrLogger
                 String solrRequestUrl = solr.getBaseURL() + "/select";
                 solrRequestUrl = generateURL(solrRequestUrl, yearQueryParams);
 
-                GetMethod get = new GetMethod(solrRequestUrl);
-                new HttpClient().executeMethod(get);
-                InputStream csvInputstream = get.getResponseBodyAsStream();
+                HttpGet get = new HttpGet(solrRequestUrl);
+                HttpResponse response = new DefaultHttpClient().execute(get);
+                InputStream csvInputstream = response.getEntity().getContent();
                 //Write the csv ouput to a file !
                 File csvFile = new File(tempDirectory.getPath() + File.separatorChar + "temp." + dcStart.getYear() + "." + i + ".csv");
                 FileUtils.copyInputStreamToFile(csvInputstream, csvFile);
@@ -1392,10 +1411,10 @@ public class SolrLogger
                 String solrRequestUrl = getSolr().getBaseURL() + "/select";
                 solrRequestUrl = generateURL(solrRequestUrl, params);
 
-                GetMethod get = new GetMethod(solrRequestUrl);
-                new HttpClient().executeMethod(get);
+                HttpGet get = new HttpGet(solrRequestUrl);
+                HttpResponse response = new DefaultHttpClient().execute(get);
 
-                InputStream  csvOutput = get.getResponseBodyAsStream();
+                InputStream  csvOutput = response.getEntity().getContent();
                 Reader csvReader = new InputStreamReader(csvOutput);
                 List<String[]> rows = new CSVReader(csvReader).readAll();
                 String[][] csvParsed = rows.toArray(new String[rows.size()][]);
@@ -1487,6 +1506,83 @@ public class SolrLogger
             throw e;
         } finally {
             context.abort();
+        }
+    }
+
+    /**
+     * Export all SOLR usage statistics for viewing/downloading content to a flat text file.
+     * The file goes to a series
+     *
+     * @throws Exception
+     */
+    public void exportHits() throws Exception {
+        Context context = new Context();
+
+        File tempDirectory = new File(ConfigurationManager.getProperty("dspace.dir") + File.separator + "temp" + File.separator);
+        tempDirectory.mkdirs();
+
+        try {
+            //First of all retrieve the total number of records to be updated
+            SolrQuery query = new SolrQuery();
+            query.setQuery("*:*");
+
+            ModifiableSolrParams solrParams = new ModifiableSolrParams();
+            solrParams.set(CommonParams.Q, "statistics_type:view OR (*:* AND -statistics_type:*)");
+            solrParams.set(CommonParams.WT, "javabin");
+            solrParams.set(CommonParams.ROWS, String.valueOf(10000));
+
+            addAdditionalSolrYearCores(query);
+            long totalRecords = solr.query(query).getResults().getNumFound();
+            System.out.println("There are " + totalRecords + " usage events in SOLR for download/view.");
+
+            for(int i = 0; i < totalRecords; i+=10000){
+                solrParams.set(CommonParams.START, String.valueOf(i));
+                QueryResponse queryResponse = solr.query(solrParams);
+                SolrDocumentList docs = queryResponse.getResults();
+
+                File exportOutput = new File(tempDirectory.getPath() + File.separatorChar + "usagestats_" + i + ".csv");
+                exportOutput.delete();
+
+                //export docs
+                addDocumentsToFile(context, docs, exportOutput);
+                System.out.println("Export hits [" + i + " - " + String.valueOf(i+9999) + "] to " + exportOutput.getCanonicalPath());
+            }
+        } catch (Exception e) {
+            log.error("Error while exporting SOLR data", e);
+            throw e;
+        } finally {
+            context.abort();
+        }
+    }
+
+    private static void addDocumentsToFile(Context context, SolrDocumentList docs, File exportOutput) throws SQLException, ParseException, IOException {
+        for(SolrDocument doc : docs) {
+            String ip = doc.get("ip").toString();
+            if(ip.equals("::1")) {
+                ip = "127.0.0.1";
+            }
+
+            String id = doc.get("id").toString();
+            String type = doc.get("type").toString();
+            String time = doc.get("time").toString();
+
+            //20140527162409835,view_bitstream,1292,2014-05-27T16:24:09,anonymous,127.0.0.1
+            DSpaceObject dso = DSpaceObject.find(context, Integer.parseInt(type), Integer.parseInt(id));
+            if(dso == null) {
+                log.debug("Document no longer exists in DB. type:" + type + " id:" + id);
+                continue;
+            }
+
+            //InputFormat: Mon May 19 07:21:27 EDT 2014
+            DateFormat inputDateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
+            Date solrDate = inputDateFormat.parse(time);
+
+            //OutputFormat: 2014-05-27T16:24:09
+            DateFormat outputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
+            String out = time + "," + "view_" + dso.getTypeText().toLowerCase() + "," + id + ","  + outputDateFormat.format(solrDate) + ",anonymous," + ip + "\n";
+            FileUtils.writeStringToFile(exportOutput, out, true);
+
         }
     }
 

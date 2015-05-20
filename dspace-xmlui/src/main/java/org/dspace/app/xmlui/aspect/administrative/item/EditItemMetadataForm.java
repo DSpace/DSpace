@@ -115,7 +115,7 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
                 int itemID = parameters.getParameterAsInteger("itemID",-1);
                 Item item = Item.find(context, itemID);
                 Metadatum[] values = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-                Arrays.sort(values, new DCValueComparator());
+                Arrays.sort(values, new MetadatumComparator());
                 String baseURL = contextPath+"/admin/item?administrative-continue="+knot.getId();
 
                 Request request = ObjectModelHelper.getRequest(objectModel);
@@ -310,7 +310,7 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
         /**
          * Compare two metadata element's name so that they may be sorted.
          */
-        static class DCValueComparator implements Comparator, Serializable {
+        static class MetadatumComparator implements Comparator, Serializable {
                 public int compare(Object arg0, Object arg1) {
                         final Metadatum o1 = (Metadatum)arg0;
                         final Metadatum o2 = (Metadatum)arg1;

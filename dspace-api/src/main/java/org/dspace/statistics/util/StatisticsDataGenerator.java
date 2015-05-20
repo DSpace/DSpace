@@ -16,7 +16,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Bitstream;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
 import org.dspace.statistics.SolrLogger;

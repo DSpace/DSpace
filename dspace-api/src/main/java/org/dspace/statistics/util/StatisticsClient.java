@@ -109,7 +109,7 @@ public class StatisticsClient
         }
         else if(line.hasOption('e'))
         {
-            SolrLogger.exportHits();
+        	statsService.exportHits();
         }
         else if(line.hasOption('s'))
         {

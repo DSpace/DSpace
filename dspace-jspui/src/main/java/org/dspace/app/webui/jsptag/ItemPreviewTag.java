@@ -98,22 +98,22 @@ public class ItemPreviewTag extends TagSupport
             String s = ConfigurationManager.getProperty("webui.preview.dc");
             if (s != null)
             {
-            	Metadatum[] dcValue;
+            	Metadatum[] Metadatum;
             	
             	int i = s.indexOf('.');
             	
             	if (i == -1)
             	{
-            		dcValue = item.getDC(s, Item.ANY, Item.ANY);
+            		Metadatum = item.getDC(s, Item.ANY, Item.ANY);
             	}
             	else
             	{
-            		dcValue = item.getDC(s.substring(0,1), s.substring(i + 1), Item.ANY);
+            		Metadatum = item.getDC(s.substring(0,1), s.substring(i + 1), Item.ANY);
             	}
             	
-            	if (dcValue.length > 0)
+            	if (Metadatum.length > 0)
             	{
-            		out.println("<br/>" + dcValue[0].value);
+            		out.println("<br/>" + Metadatum[0].value);
             	}
             }
             

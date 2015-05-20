@@ -490,13 +490,13 @@ public class CreativeCommons
     	 */
     	public String ccItemValue(Item item)
     	{
-            Metadatum[] dcvalues = item.getMetadata(params[0], params[1], params[2], params[3]);
-            for (Metadatum dcvalue : dcvalues)
+            Metadatum[] Metadatums = item.getMetadata(params[0], params[1], params[2], params[3]);
+            for (Metadatum Metadatum : Metadatums)
             {
-                if ((dcvalue.value).indexOf(ccShib) != -1) 
+                if ((Metadatum.value).indexOf(ccShib) != -1) 
                 {
                 	// return first value that matches the shib
-                	return dcvalue.value;
+                	return Metadatum.value;
                 }
             }
             return null;
@@ -516,12 +516,12 @@ public class CreativeCommons
     		 CCLookup ccLookup = new CCLookup();
              ccLookup.issue(key);
              String matchValue = ccLookup.getLicenseName();
-             Metadatum[] dcvalues = item.getMetadata(params[0], params[1], params[2], params[3]);
-             for (Metadatum dcvalue : dcvalues)
+             Metadatum[] Metadatums = item.getMetadata(params[0], params[1], params[2], params[3]);
+             for (Metadatum Metadatum : Metadatums)
              {
-            	 if (dcvalue.value.equals(matchValue))
+            	 if (Metadatum.value.equals(matchValue))
             	 {
-            		 return dcvalue.value;
+            		 return Metadatum.value;
             	 }
              }
     		return null;
@@ -538,13 +538,13 @@ public class CreativeCommons
     	{
     		if (value != null)
     		{
-    			 Metadatum[] dcvalues  = item.getMetadata(params[0], params[1], params[2], params[3]);
+    			 Metadatum[] Metadatums  = item.getMetadata(params[0], params[1], params[2], params[3]);
                  ArrayList<String> arrayList = new ArrayList<String>();
-                 for (Metadatum dcvalue : dcvalues)
+                 for (Metadatum Metadatum : Metadatums)
                  {
-                     if (! dcvalue.value.equals(value))
+                     if (! Metadatum.value.equals(value))
                      {
-                         arrayList.add(dcvalue.value);
+                         arrayList.add(Metadatum.value);
                      }
                   }
                   String[] values = (String[])arrayList.toArray(new String[arrayList.size()]);

@@ -21,7 +21,7 @@ import org.dspace.app.cris.integration.CRISAuthority;
 import org.dspace.app.webui.util.ASimpleDisplayStrategy;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.AuthorityValueGenerator;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
@@ -36,7 +36,7 @@ public class ItemCrisRefDisplayStrategy extends ASimpleDisplayStrategy
 	@Override
 	public String getMetadataDisplay(HttpServletRequest hrq, int limit,
 			boolean viewFull, String browseType, int colIdx, int itemId,
-			String field, DCValue[] metadataArray, boolean disableCrossLinks,
+			String field, Metadatum[] metadataArray, boolean disableCrossLinks,
 			boolean emph, PageContext pageContext) throws JspException {
     	String publicPath = null;
     	int minConfidence = -1;
@@ -115,7 +115,7 @@ public class ItemCrisRefDisplayStrategy extends ASimpleDisplayStrategy
     }
 
     private void buildBrowseLink(HttpServletRequest hrq, boolean viewFull,
-            String browseType, DCValue[] metadataArray, int minConfidence,
+            String browseType, Metadatum[] metadataArray, int minConfidence,
             boolean disableCrossLinks, StringBuffer sb, int j)
     {
         String startLink = "";
@@ -180,7 +180,7 @@ public class ItemCrisRefDisplayStrategy extends ASimpleDisplayStrategy
     }
 
     private void buildAuthority(HttpServletRequest hrq,
-            DCValue[] metadataArray, String publicPath, StringBuffer sb, int j)
+            Metadatum[] metadataArray, String publicPath, StringBuffer sb, int j)
     {
         String startLink = "";
         String endLink = "";

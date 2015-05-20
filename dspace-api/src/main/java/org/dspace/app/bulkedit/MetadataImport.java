@@ -474,17 +474,17 @@ public class MetadataImport
                                        ",looking_for_element=" + element +
                                        ",looking_for_qualifier=" + qualifier +
                                        ",looking_for_language=" + language));
-        String[] dcvalues = new String[0];
+        String[] Metadatums = new String[0];
         if(fromAuthority==null) {
             Metadatum[] current = item.getMetadata(schema, element, qualifier, language);
-            dcvalues = new String[current.length];
+            Metadatums = new String[current.length];
             int i = 0;
             for (Metadatum dcv : current) {
                 if (dcv.authority == null || !isAuthorityControlledField(md)) {
-                    dcvalues[i] = dcv.value;
+                    Metadatums[i] = dcv.value;
                 } else {
-                    dcvalues[i] = dcv.value + DSpaceCSV.authoritySeparator + dcv.authority;
-                    dcvalues[i] += DSpaceCSV.authoritySeparator + (dcv.confidence != -1 ? dcv.confidence : Choices.CF_ACCEPTED);
+                    Metadatums[i] = dcv.value + DSpaceCSV.authoritySeparator + dcv.authority;
+                    Metadatums[i] += DSpaceCSV.authoritySeparator + (dcv.confidence != -1 ? dcv.confidence : Choices.CF_ACCEPTED);
                 }
                 i++;
                 log.debug(LogManager.getHeader(c, "metadata_import",
@@ -492,19 +492,19 @@ public class MetadataImport
                                 ",found=" + dcv.value));
             }
         }else{
-            dcvalues = line.get(md).toArray(new String[line.get(md).size()]);
+            Metadatums = line.get(md).toArray(new String[line.get(md).size()]);
         }
 
         // Compare from current->csv
         for (int v = 0; v < fromCSV.length; v++) {
             String value = fromCSV[v];
-            Metadatum dcv = getDcValueFromCSV(language, schema, element, qualifier, value, fromAuthority);
+            Metadatum dcv = getMetadatumFromCSV(language, schema, element, qualifier, value, fromAuthority);
             if (fromAuthority!=null) {
                 value = dcv.value + DSpaceCSV.authoritySeparator + dcv.authority + DSpaceCSV.authoritySeparator + dcv.confidence;
                 fromCSV[v] = value;
             }
 
-            if ((value != null) && (!"".equals(value)) && (!contains(value, dcvalues))) {
+            if ((value != null) && (!"".equals(value)) && (!contains(value, Metadatums))) {
                 changes.registerAdd(dcv);
             } else {
                 // Keep it
@@ -513,7 +513,7 @@ public class MetadataImport
         }
 
         // Compare from csv->current
-        for (String value : dcvalues)
+        for (String value : Metadatums)
         {
             // Look to see if it should be removed
             Metadatum dcv = new Metadatum();
@@ -828,7 +828,7 @@ public class MetadataImport
         // Add all the values
         for (String value : fromCSV)
         {
-            Metadatum dcv = getDcValueFromCSV(language, schema, element, qualifier, value, fromAuthority);
+            Metadatum dcv = getMetadatumFromCSV(language, schema, element, qualifier, value, fromAuthority);
             if(fromAuthority!=null){
                 value = dcv.value + DSpaceCSV.authoritySeparator + dcv.authority + DSpaceCSV.authoritySeparator + dcv.confidence;
             }
@@ -852,7 +852,7 @@ public class MetadataImport
         return fromAuthority;
     }
 
-    private Metadatum getDcValueFromCSV(String language, String schema, String element, String qualifier, String value, AuthorityValue fromAuthority) {
+    private Metadatum getMetadatumFromCSV(String language, String schema, String element, String qualifier, String value, AuthorityValue fromAuthority) {
         // Look to see if it should be removed
         Metadatum dcv = new Metadatum();
         dcv.schema = schema;

@@ -29,7 +29,7 @@ import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.AuthorityValueGenerator;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.authority.Choice;
@@ -69,7 +69,7 @@ public class CrisConsumer implements Consumer {
 
 			Set<String> listAuthoritiesManager = ChoiceAuthorityManager.getManager().getAuthorities();
 
-			Map<String, List<DCValue>> toBuild = new HashMap<String, List<DCValue>>();
+			Map<String, List<Metadatum>> toBuild = new HashMap<String, List<Metadatum>>();
 			Map<String, String> toBuildType = new HashMap<String, String>();
 			Map<String, CRISAuthority> toBuildChoice = new HashMap<String, CRISAuthority>();
 			
@@ -78,11 +78,11 @@ public class CrisConsumer implements Consumer {
 						crisAuthority);
 
 				for (String metadata : listMetadata) {
-					DCValue[] dcvalues = item.getMetadata(metadata);
+					Metadatum[] Metadatums = item.getMetadataByMetadataString(metadata);
 					ChoiceAuthority choiceAuthority = ChoiceAuthorityManager.getManager().getChoiceAuthority(metadata);
 					if (CRISAuthority.class.isAssignableFrom(choiceAuthority.getClass())) {
 
-						for (DCValue dcval : dcvalues) {
+						for (Metadatum dcval : Metadatums) {
 							String authority = dcval.authority;
 							if (StringUtils.isNotBlank(authority)) {
 								if (authority.startsWith(AuthorityValueGenerator.GENERATE)) {
@@ -98,7 +98,7 @@ public class CrisConsumer implements Consumer {
 
 									toBuildType.put(info, type);
 
-									List<DCValue> list = new ArrayList<DCValue>();
+									List<Metadatum> list = new ArrayList<Metadatum>();
 									if (toBuild.containsKey(info)) {
 										list = toBuild.get(info);
 										list.add(dcval);
@@ -111,7 +111,7 @@ public class CrisConsumer implements Consumer {
 							}
 							else {
 								String valueHashed = HashUtil.hashMD5(dcval.value);
-								List<DCValue> list = new ArrayList<DCValue>();
+								List<Metadatum> list = new ArrayList<Metadatum>();
 								if (toBuild.containsKey(valueHashed)) {
 									list = toBuild.get(valueHashed);
 									list.add(dcval);
@@ -180,9 +180,9 @@ public class CrisConsumer implements Consumer {
 						rp.setSourceID(authorityKey);
 						rp.setSourceRef(typeAuthority.toUpperCase());
 						
-						List<DCValue> dcvalueAuthority = toBuild.get(authorityKey);
+						List<Metadatum> MetadatumAuthority = toBuild.get(authorityKey);
 						
-						ResearcherPageUtils.buildTextValue(rp, dcvalueAuthority.get(0).value, rp.getMetadataFieldTitle());
+						ResearcherPageUtils.buildTextValue(rp, MetadatumAuthority.get(0).value, rp.getMetadataFieldTitle());
 						// ResearcherPageUtils.buildTextValue(rp, email,
 						// "email");
 						if(!(typeAuthority.equalsIgnoreCase(SOURCE_INTERNAL))) {
@@ -204,11 +204,11 @@ public class CrisConsumer implements Consumer {
 			}		
 			
 			for (String orcid : toBuildAuthority.keySet()) {
-				for (DCValue dcvalue : toBuild.get(orcid)) {
-					DCValue newValue = dcvalue.copy();
+				for (Metadatum Metadatum : toBuild.get(orcid)) {
+					Metadatum newValue = Metadatum.copy();
 					newValue.authority = toBuildAuthority.get(orcid);
 					newValue.confidence = Choices.CF_ACCEPTED;
-					item.replaceMetadataValue(dcvalue, newValue);
+					item.replaceMetadataValue(Metadatum, newValue);
 					item.update();
 				}
 			}

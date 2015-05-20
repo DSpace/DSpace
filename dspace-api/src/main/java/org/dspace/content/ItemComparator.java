@@ -18,9 +18,9 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.dspace.sort.OrderFormat;
 
 /**
- * Compare two Items by their DCValues.
+ * Compare two Items by their Metadatums.
  * 
- * The DCValues to be compared are specified by the element, qualifier and
+ * The Metadatums to be compared are specified by the element, qualifier and
  language parameters to the constructor. If the Item has more than one
  matching Metadatum, then the max parameter to the constructor specifies whether
  the maximum or minimum lexicographic value will be used.
@@ -50,7 +50,7 @@ public class ItemComparator implements Comparator, Serializable
      * @param qualifier
      *            The Dublin Core qualifier
      * @param language
-     *            The language for the DCValues
+     *            The language for the Metadatums
      * @param max
      *            If true, and there is more than one Metadatum for element,
             qualifier and language, then use the maximum value
@@ -66,7 +66,7 @@ public class ItemComparator implements Comparator, Serializable
     }
 
     /**
-     * Compare two Items by checking their DCValues for element, qualifier, and
+     * Compare two Items by checking their Metadatums for element, qualifier, and
      * language.
      * 
      * <p>
@@ -176,25 +176,25 @@ public class ItemComparator implements Comparator, Serializable
     private String getValue(Item item)
     {
         // The overall array and each element are guaranteed non-null
-        Metadatum[] dcvalues = item.getDC(element, qualifier, language);
+        Metadatum[] Metadatums = item.getDC(element, qualifier, language);
 
-        if (dcvalues.length == 0)
+        if (Metadatums.length == 0)
         {
             return null;
         }
 
-        if (dcvalues.length == 1)
+        if (Metadatums.length == 1)
         {
-            return normalizeTitle(dcvalues[0]);
+            return normalizeTitle(Metadatums[0]);
         }
 
         // We want to sort using Strings, but also keep track of
         // which Metadatum the value came from.
         Map<String, Integer> values = new HashMap<String, Integer>();
 
-        for (int i = 0; i < dcvalues.length; i++)
+        for (int i = 0; i < Metadatums.length; i++)
         {
-            String value = dcvalues[i].value;
+            String value = Metadatums[i].value;
 
             if (value != null)
             {
@@ -213,7 +213,7 @@ public class ItemComparator implements Comparator, Serializable
 
         int index = (values.get(chosen)).intValue();
 
-        return normalizeTitle(dcvalues[index]);
+        return normalizeTitle(Metadatums[index]);
     }
 
     /**

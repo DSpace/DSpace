@@ -115,7 +115,7 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC implements SwordEntr
         String[] parts = raw.split(",");
         for (String part : parts)
         {
-            Metadatum dcv = this.makeDCValue(part.trim(), null);
+            Metadatum dcv = this.makeMetadatum(part.trim(), null);
             item.clearMetadata(dcv.schema, dcv.element, dcv.qualifier, Item.ANY);
         }
     }
@@ -134,12 +134,12 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC implements SwordEntr
             lang = Item.ANY;
         }
         Metadatum[] existing = item.getMetadata(dcv.schema, dcv.element, qual, lang);
-        for (Metadatum dcValue : existing)
+        for (Metadatum Metadatum : existing)
         {
             // FIXME: probably we want to be slightly more careful about qualifiers and languages
             //
             // if the submitted value is already attached to the item, just skip it
-            if (dcValue.value.equals(dcv.value))
+            if (Metadatum.value.equals(dcv.value))
             {
                 return;
             }
@@ -163,7 +163,7 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC implements SwordEntr
 			String titleField = this.dcMap.get("title");
 			if (titleField != null)
 			{
-				Metadatum dcv = this.makeDCValue(titleField, title);
+				Metadatum dcv = this.makeMetadatum(titleField, title);
                 this.addUniqueMetadata(dcv, item);
 			}
 		}
@@ -172,7 +172,7 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC implements SwordEntr
 			String abstractField = this.dcMap.get("abstract");
 			if (abstractField != null)
 			{
-				Metadatum dcv = this.makeDCValue(abstractField, summary);
+				Metadatum dcv = this.makeMetadatum(abstractField, summary);
                 this.addUniqueMetadata(dcv, item);
 			}
 		}
@@ -188,7 +188,7 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC implements SwordEntr
 			}
 
 			// now add all the metadata terms
-            Metadatum dcv = this.makeDCValue(dsTerm, null);
+            Metadatum dcv = this.makeMetadatum(dsTerm, null);
 			for (String value : dc.get(term))
 			{
                 dcv.value = value;
@@ -262,7 +262,7 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC implements SwordEntr
 		}
     }
 
-    public Metadatum makeDCValue(String field, String value)
+    public Metadatum makeMetadatum(String field, String value)
             throws DSpaceSwordException
     {
         Metadatum dcv = new Metadatum();
@@ -298,7 +298,7 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC implements SwordEntr
 			throw new DSpaceSwordException("No configuration, or configuration is invalid for: sword.updated.field");
 		}
 
-		Metadatum dc = this.makeDCValue(field, null);
+		Metadatum dc = this.makeMetadatum(field, null);
 		item.clearMetadata(dc.schema, dc.element, dc.qualifier, Item.ANY);
 		DCDate date = new DCDate(new Date());
 		item.addMetadata(dc.schema, dc.element, dc.qualifier, null, date.toString());
@@ -331,7 +331,7 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC implements SwordEntr
 			throw new DSpaceSwordException("No configuration, or configuration is invalid for: sword.slug.field");
 		}
 
-		Metadatum dc = this.makeDCValue(field, null);
+		Metadatum dc = this.makeMetadatum(field, null);
 		item.clearMetadata(dc.schema, dc.element, dc.qualifier, Item.ANY);
 		item.addMetadata(dc.schema, dc.element, dc.qualifier, null, slugVal);
 

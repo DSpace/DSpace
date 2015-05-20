@@ -153,16 +153,20 @@ public class DiscoveryConfiguration implements InitializingBean{
     @Override
 	public void afterPropertiesSet() throws Exception {
 
-		StringBuilder error = new StringBuilder();
-		if (getSearchFilters() != null && getSidebarFacets() != null) {
+		
+		if (getSearchFilters() != null && getSidebarFacets() != null) {			
 			Collection missingSearchFilters = CollectionUtils.subtract(getSidebarFacets(), getSearchFilters());
 			if (CollectionUtils.isNotEmpty(missingSearchFilters)) {
-
+				StringBuilder error = new StringBuilder();
 				error.append("The following sidebar facet configurations are not present in the search filters list: ");
 				for (Object missingSearchFilter : missingSearchFilters) {
 					DiscoverySearchFilter searchFilter = (DiscoverySearchFilter) missingSearchFilter;
 					error.append(searchFilter.getIndexFieldName()).append(" ");
-        
+				}
+				
+				throw new DiscoveryConfigurationException(error.toString());
+			}
+		}
         Collection missingTagCloudSearchFilters = CollectionUtils.subtract(getTagCloudFacetConfiguration().getTagCloudFacets(), getSearchFilters());
         if(CollectionUtils.isNotEmpty(missingTagCloudSearchFilters))
         {
@@ -173,11 +177,10 @@ public class DiscoveryConfiguration implements InitializingBean{
                 DiscoverySearchFilter searchFilter = (DiscoverySearchFilter) missingSearchFilter;
                 error.append(searchFilter.getIndexFieldName()).append(" ");
 
-				}
-				error.append("all the tagCloud facets MUST be a part of the search filters list.");
+            }
+            error.append("all the tagCloud facets MUST be a part of the search filters list.");
 
-				throw new DiscoveryConfigurationException(error.toString());
-			}
+			throw new DiscoveryConfigurationException(error.toString());			
 		}
 	}
     

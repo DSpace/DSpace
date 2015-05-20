@@ -61,8 +61,8 @@ public class MetadataUtilities {
      * 
      *  Working around Item API to delete a value-specific Metadatum
   For a given element/qualifier/lang:
-      get all DCValues
-      clear (i.e. delete) all of these DCValues
+      get all Metadatums
+      clear (i.e. delete) all of these Metadatums
      *      add them back, minus the one to actually delete
      *  
      * 
@@ -216,7 +216,7 @@ public class MetadataUtilities {
 		}
 
 		// Get the nodes corresponding to formats
-		NodeList dcNodes = XPathAPI.selectNodeList(document, "/dublin_core/dcvalue");
+		NodeList dcNodes = XPathAPI.selectNodeList(document, "/dublin_core/Metadatum");
 		
 		for (int i = 0; i < dcNodes.getLength(); i++)
 		{
@@ -284,7 +284,7 @@ public class MetadataUtilities {
     
         for (DtoMetadata dtom : dtomList)
         {
-        	Element mel = doc.createElement("dcvalue");
+        	Element mel = doc.createElement("Metadatum");
         	mel.setAttribute("element", dtom.element);
         	if (dtom.qualifier == null)
         	{
@@ -477,7 +477,7 @@ public class MetadataUtilities {
      * @param dcv
      * @return string displaying elements of the Metadatum
      */
-    public static String getDCValueString(Metadatum dcv)
+    public static String getMetadatumString(Metadatum dcv)
     {
     	return "schema: " + dcv.schema + "; element: " + dcv.element + "; qualifier: " + dcv.qualifier +
     	       "; language: " + dcv.language + "; value: " + dcv.value;

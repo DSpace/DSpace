@@ -14,7 +14,7 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
 
 import org.dspace.browse.BrowseItem;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.core.Utils;
 import org.dspace.discovery.IGlobalSearchResult;
@@ -24,20 +24,20 @@ public class TitleDisplayStrategy extends ADiscoveryDisplayStrategy implements I
 
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
             boolean viewFull, String browseType, int colIdx, String field,
-            DCValue[] metadataArray, BrowseItem item, boolean disableCrossLinks, boolean emph, PageContext pageContext)
+            Metadatum[] metadataArray, BrowseItem item, boolean disableCrossLinks, boolean emph, PageContext pageContext)
     {
         return getDisplay(hrq, metadataArray, item.isWithdrawn(), item.getHandle(), emph);
     }
 
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
             boolean viewFull, String browseType, int colIdx, String field,
-            DCValue[] metadataArray, Item item, boolean disableCrossLinks, boolean emph, PageContext pageContext)
+            Metadatum[] metadataArray, Item item, boolean disableCrossLinks, boolean emph, PageContext pageContext)
     {
         return getDisplay(hrq, metadataArray, item.isWithdrawn(), item.getHandle(), emph);
     }
     
 
-    private String getDisplay(HttpServletRequest hrq, DCValue[] metadataArray,
+    private String getDisplay(HttpServletRequest hrq, Metadatum[] metadataArray,
             boolean isWithdrawn, String handle, boolean emph)
     {
         String metadata = "-";
@@ -61,7 +61,7 @@ public class TitleDisplayStrategy extends ADiscoveryDisplayStrategy implements I
 
     public String getExtraCssDisplay(HttpServletRequest hrq, int limit,
             boolean b, String string, int colIdx, String field,
-            DCValue[] metadataArray, BrowseItem browseItem,
+            Metadatum[] metadataArray, BrowseItem browseItem,
             boolean disableCrossLinks, boolean emph, PageContext pageContext)
     {
         return null;
@@ -69,7 +69,7 @@ public class TitleDisplayStrategy extends ADiscoveryDisplayStrategy implements I
 
     public String getExtraCssDisplay(HttpServletRequest hrq, int limit,
             boolean b, String browseType, int colIdx, String field,
-            DCValue[] metadataArray, Item item, boolean disableCrossLinks,
+            Metadatum[] metadataArray, Item item, boolean disableCrossLinks,
             boolean emph, PageContext pageContext) throws JspException
     {
         return null;

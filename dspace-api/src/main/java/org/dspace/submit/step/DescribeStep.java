@@ -490,7 +490,7 @@ public class DescribeStep extends AbstractProcessingStep
      *
      * dc_contributor_author_last dc_contributor_author_first
      *
-     * The values will be put in separate DCValues, in the form "last name,
+     * The values will be put in separate Metadatums, in the form "last name,
      * first name(s)", ordered as they appear in the list. These will replace
      * any existing values.
      *
@@ -658,7 +658,7 @@ public class DescribeStep extends AbstractProcessingStep
      *
      * dc_title_alternative dc_title_alternative_1
      *
-     * The values will be put in separate DCValues, ordered as they appear in
+     * The values will be put in separate Metadatums, ordered as they appear in
      * the list. These will replace any existing values.
      *
      * @param request
@@ -838,7 +838,7 @@ public class DescribeStep extends AbstractProcessingStep
      *
      * dc_relation_ispartof_series dc_relation_ispartof_number
      *
-     * The values will be put in separate DCValues, in the form "last name,
+     * The values will be put in separate Metadatums, in the form "last name,
      * first name(s)", ordered as they appear in the list. These will replace
      * any existing values.
      *

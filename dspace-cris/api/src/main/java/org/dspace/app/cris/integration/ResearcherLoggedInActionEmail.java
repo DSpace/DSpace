@@ -23,7 +23,6 @@ import org.dspace.discovery.SearchService;
 import org.dspace.eperson.EPerson;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.utils.DSpace;
-import org.mortbay.log.Log;
 
 public class ResearcherLoggedInActionEmail implements PostLoggedInAction
 {

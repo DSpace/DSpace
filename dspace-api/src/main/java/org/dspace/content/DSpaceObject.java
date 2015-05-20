@@ -12,7 +12,6 @@ import java.util.*;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -22,6 +21,7 @@ import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.discovery.IGlobalSearchResult;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.event.Event;
@@ -35,7 +35,7 @@ import org.dspace.utils.DSpace;
 /**
  * Abstract base class for DSpace objects
  */
-public abstract class DSpaceObject
+public abstract class DSpaceObject implements IGlobalSearchResult
 {
     /** Our context */
     protected Context ourContext;
@@ -645,9 +645,9 @@ public abstract class DSpaceObject
      * Retrieve first metadata field value
      */
     protected String getMetadataFirstValue(String schema, String element, String qualifier, String language){
-        Metadatum[] dcvalues = getMetadata(schema, element, qualifier, Item.ANY);
-        if(dcvalues.length>0){
-            return dcvalues[0].value;
+        Metadatum[] Metadatums = getMetadata(schema, element, qualifier, Item.ANY);
+        if(Metadatums.length>0){
+            return Metadatums[0].value;
         }
         return null;
     }
@@ -690,10 +690,10 @@ public abstract class DSpaceObject
      *                if the requested metadata field doesn't exist
      */
     public String getMetadata(String value){
-        Metadatum[] dcvalues = getMetadataByMetadataString(value);
-
+    	Metadatum[] dcvalues = getMetadataByMetadataString(value);
+        
         if(dcvalues.length>0) {
-            return dcvalues[0].value;
+           	return dcvalues[0].value;
         }
         return null;
     }
@@ -705,17 +705,17 @@ public abstract class DSpaceObject
 
     public List<Metadatum> getMetadata(String schema, String element, String qualifier, String lang, String authority) {
         Metadatum[] metadata = getMetadata(schema, element, qualifier, lang);
-        List<Metadatum> dcValues = Arrays.asList(metadata);
+        List<Metadatum> Metadatums = Arrays.asList(metadata);
         if (!authority.equals(Item.ANY)) {
-            Iterator<Metadatum> iterator = dcValues.iterator();
+            Iterator<Metadatum> iterator = Metadatums.iterator();
             while (iterator.hasNext()) {
-                Metadatum dcValue = iterator.next();
-                if (!authority.equals(dcValue.authority)) {
+                Metadatum Metadatum = iterator.next();
+                if (!authority.equals(Metadatum.authority)) {
                     iterator.remove();
                 }
             }
         }
-        return dcValues;
+        return Metadatums;
     }
 
 
@@ -756,7 +756,7 @@ public abstract class DSpaceObject
 
     public void replaceMetadataValue(Metadatum oldValue, Metadatum newValue)
     {
-        // check both dcvalues are for the same field
+        // check both Metadatums are for the same field
         if (oldValue.hasSameFieldAs(newValue)) {
 
             String schema = oldValue.schema;
@@ -764,13 +764,13 @@ public abstract class DSpaceObject
             String qualifier = oldValue.qualifier;
 
             // Save all metadata for this field
-            Metadatum[] dcvalues = getMetadata(schema, element, qualifier, Item.ANY);
+            Metadatum[] Metadatums = getMetadata(schema, element, qualifier, Item.ANY);
             clearMetadata(schema, element, qualifier, Item.ANY);
-            for (Metadatum dcvalue : dcvalues) {
-                if (dcvalue.equals(oldValue)) {
+            for (Metadatum Metadatum : Metadatums) {
+                if (Metadatum.equals(oldValue)) {
                     addMetadata(schema, element, qualifier, newValue.language, newValue.value, newValue.authority, newValue.confidence);
                 } else {
-                    addMetadata(schema, element, qualifier, dcvalue.language, dcvalue.value, dcvalue.authority, dcvalue.confidence);
+                    addMetadata(schema, element, qualifier, Metadatum.language, Metadatum.value, Metadatum.authority, Metadatum.confidence);
                 }
             }
         }
@@ -946,18 +946,18 @@ public abstract class DSpaceObject
             {
                 // remove control unicode char
                 String temp = values[i].trim();
-                char[] dcvalue = temp.toCharArray();
-                for (int charPos = 0; charPos < dcvalue.length; charPos++)
+                char[] Metadatum = temp.toCharArray();
+                for (int charPos = 0; charPos < Metadatum.length; charPos++)
                 {
-                    if (Character.isISOControl(dcvalue[charPos]) &&
-                            !String.valueOf(dcvalue[charPos]).equals("\u0009") &&
-                            !String.valueOf(dcvalue[charPos]).equals("\n") &&
-                            !String.valueOf(dcvalue[charPos]).equals("\r"))
+                    if (Character.isISOControl(Metadatum[charPos]) &&
+                            !String.valueOf(Metadatum[charPos]).equals("\u0009") &&
+                            !String.valueOf(Metadatum[charPos]).equals("\n") &&
+                            !String.valueOf(Metadatum[charPos]).equals("\r"))
                     {
-                        dcvalue[charPos] = ' ';
+                        Metadatum[charPos] = ' ';
                     }
                 }
-                dcv.value = String.valueOf(dcvalue);
+                dcv.value = String.valueOf(Metadatum);
             }
             else
             {
@@ -1379,4 +1379,22 @@ public abstract class DSpaceObject
         }
     }
     
+    
+	@Override
+	public Metadatum[] getMetadataValueInDCFormat(String mdString) {
+		return getMetadataByMetadataString(mdString);
+	}
+	
+    public List<String> getMetadataValue(String mdString) {
+    	List<String> results = new ArrayList<String>();
+    	for(Metadatum dcValue : getMetadataByMetadataString(mdString)) {
+    		results.add(dcValue.value);
+    	}
+    	return results;
+    }
+    
+	@Override
+	public boolean isWithdrawn() {	
+		return false;
+	}
 }

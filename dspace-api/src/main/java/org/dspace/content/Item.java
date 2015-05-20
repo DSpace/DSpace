@@ -59,7 +59,7 @@ import org.dspace.versioning.VersioningService;
  * @author Martin Hald
  * @version $Revision$
  */
-public class Item extends DSpaceObject implements BrowsableDSpaceObject, IGlobalSearchResult
+public class Item extends DSpaceObject implements BrowsableDSpaceObject
 {
     /**
      * Wild card for Dublin Core metadata qualifiers/languages
@@ -70,7 +70,7 @@ public class Item extends DSpaceObject implements BrowsableDSpaceObject, IGlobal
     private static final Logger log = Logger.getLogger(Item.class);
 
     /** The table row corresponding to this item */
-    private final TableRow itemRow;
+    private TableRow itemRow;
 
     /** The e-person who submitted this item */
     private EPerson submitter;
@@ -376,6 +376,7 @@ public class Item extends DSpaceObject implements BrowsableDSpaceObject, IGlobal
      *
      * @return true if the item has been withdrawn
      */
+    @Override
     public boolean isWithdrawn()
     {
         return itemRow.getBooleanColumn("withdrawn");
@@ -2004,50 +2005,4 @@ public class Item extends DSpaceObject implements BrowsableDSpaceObject, IGlobal
         return wrapperService.getWrapper(this);    
     }
 
-	@Override
-	public Metadatum[] getMetadataValueInDCFormat(String mdString) {
-		return getMetadata(mdString);
-	}
-
-    public List<Metadatum> getMetadata(String mdString, String authority) {
-        String[] elements = getElements(mdString);
-        return getMetadata(elements[0], elements[1], elements[2], elements[3], authority);
-    }	
-	
-    public List<Metadatum> getMetadata(String schema, String element, String qualifier, String lang, String authority) {
-    	Metadatum[] metadata = getMetadata(schema, element, qualifier, lang);
-        List<Metadatum> dcValues = Arrays.asList(metadata);
-        if (!authority.equals(Item.ANY)) {
-            Iterator<Metadatum> iterator = dcValues.iterator();
-            while (iterator.hasNext()) {
-            	Metadatum dcValue = iterator.next();
-                if (!authority.equals(dcValue.authority)) {
-                    iterator.remove();
-                }
-            }
-        }
-        return dcValues;
-    }
-    
-    public void replaceMetadataValue(Metadatum oldValue, Metadatum newValue)
-    {
-        // check both dcvalues are for the same field
-        if (oldValue.hasSameFieldAs(newValue)) {
-
-            String schema = oldValue.schema;
-            String element = oldValue.element;
-            String qualifier = oldValue.qualifier;
-
-            // Save all metadata for this field
-            Metadatum[] dcvalues = getMetadata(schema, element, qualifier, Item.ANY);
-            clearMetadata(schema, element, qualifier, Item.ANY);
-            for (Metadatum dcvalue : dcvalues) {
-                if (dcvalue.equals(oldValue)) {
-                    addMetadata(schema, element, qualifier, newValue.language, newValue.value, newValue.authority, newValue.confidence);
-                } else {
-                    addMetadata(schema, element, qualifier, dcvalue.language, dcvalue.value, dcvalue.authority, dcvalue.confidence);
-                }
-            }
-        }
-    }
 }

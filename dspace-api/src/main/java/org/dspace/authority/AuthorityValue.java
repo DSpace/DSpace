@@ -165,7 +165,7 @@ public class AuthorityValue {
     }
 
     /**
-     * Replace an item's DCValue with this authority
+     * Replace an item's Metadatum with this authority
      */
     public void updateItem(Item currentItem, Metadatum value) {
         Metadatum newValue = value.copy();

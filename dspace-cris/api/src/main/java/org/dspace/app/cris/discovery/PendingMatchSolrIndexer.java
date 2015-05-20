@@ -11,7 +11,7 @@ import java.util.List;
 
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.app.cris.integration.RPAuthority;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.authority.ChoiceAuthorityManager;
@@ -37,8 +37,8 @@ public class PendingMatchSolrIndexer implements SolrServiceIndexPlugin
 
             for (String metadata : listMetadata)
             {
-                DCValue[] values = item.getMetadata(metadata);
-                for (DCValue val : values)
+                Metadatum[] values = item.getMetadataByMetadataString(metadata);
+                for (Metadatum val : values)
                 {
                     if (val != null)
                     {

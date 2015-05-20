@@ -8,9 +8,12 @@ import jxl.Sheet;
 import jxl.Workbook;
 
 import org.apache.commons.lang3.StringUtils;
-import org.mortbay.log.Log;
+import org.apache.log4j.Logger;
 
 public class CSVBulkChanges implements IBulkChanges {
+	
+    private static Logger log = Logger.getLogger(CSVBulkChanges.class);
+	
 	static final String HEADER_SOURCEID = "SOURCEID";
 
 	static final String HEADER_SOURCEREF = "SOURCEREF";
@@ -85,11 +88,11 @@ public class CSVBulkChanges implements IBulkChanges {
 	@Override
 	public IBulkChange getChanges(int i) {
 		if (i < mainObjects.getRows()) {
-			Log.info("Retrieve in entity sheet row #"+i);
+			log.debug("Retrieve in entity sheet row #"+i);
 			return new CSVBulkChange(mainObjects.getRow(i), mainHeaders);
 		}
 		else {
-			Log.info("Retrieve in nested sheet row #"+ (i+1));
+			log.debug("Retrieve in nested sheet row #"+ (i+1));
 			return new CSVBulkChange(nestedObjects.getRow((i - (mainObjects.getRows() -1))+1),nestedHeaders);	
 		}
 	}

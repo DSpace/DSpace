@@ -16,7 +16,7 @@ import javax.servlet.jsp.PageContext;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.dspace.browse.BrowseItem;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.core.SelfNamedPlugin;
 import org.dspace.discovery.IGlobalSearchResult;
@@ -30,11 +30,11 @@ public abstract class ADiscoveryDisplayStrategy extends SelfNamedPlugin implemen
 			boolean emph, PageContext pageContext) throws JspException; 
 	
 	public String getMetadataDisplay(HttpServletRequest hrq, int limit, boolean viewFull, String browseType,
-			int colIdx, String field, DCValue[] metadataArray, IGlobalSearchResult item, boolean disableCrossLinks,
+			int colIdx, String field, Metadatum[] metadataArray, IGlobalSearchResult item, boolean disableCrossLinks,
 			boolean emph, PageContext pageContext) throws JspException 
 	{		
 		List<String> metadataList = new ArrayList<String>();
-		for(DCValue mdc : metadataArray) {
+		for(Metadatum mdc : metadataArray) {
 			metadataList.add(mdc.value);
 		}
 		return getMetadataDisplay(hrq, limit, viewFull, browseType, colIdx, field, metadataList, item, disableCrossLinks, emph, pageContext);

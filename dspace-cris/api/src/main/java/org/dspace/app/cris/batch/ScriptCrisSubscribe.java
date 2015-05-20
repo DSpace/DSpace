@@ -76,7 +76,7 @@ import org.dspace.app.cris.model.CrisSubscription;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.Researcher;
 import org.dspace.app.cris.util.ResearcherPageUtils;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
@@ -268,7 +268,7 @@ public class ScriptCrisSubscribe
                     Item item = Item.find(context, (Integer) solrDoc
                             .getFieldValue("search.resourceid"));
 
-                    DCValue[] titles = item.getDC("title", null, Item.ANY);
+                    Metadatum[] titles = item.getDC("title", null, Item.ANY);
                     emailText
                             .append("      ")
                             .append(I18nUtil.getMessage(
@@ -286,7 +286,7 @@ public class ScriptCrisSubscribe
                                 supportedLocale));
                     }
 
-                    DCValue[] authors = item.getDC("contributor", Item.ANY,
+                    Metadatum[] authors = item.getDC("contributor", Item.ANY,
                             Item.ANY);
 
                     if (authors.length > 0)

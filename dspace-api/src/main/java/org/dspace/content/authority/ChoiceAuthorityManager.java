@@ -314,19 +314,6 @@ public final class ChoiceAuthorityManager
         return ma.getMatches(fieldKey, query, collection, start, limit, locale);
     }
 
-    public Choices getMatches(String fieldKey, String query, int collection, int start, int limit, String locale, boolean externalInput) {
-        ChoiceAuthority ma = controller.get(fieldKey);
-        if (ma == null) {
-            throw new IllegalArgumentException(
-                    "No choices plugin was configured for  field \"" + fieldKey
-                            + "\".");
-        }
-        if (externalInput && ma instanceof SolrAuthority) {
-            ((SolrAuthority)ma).addExternalResultsInNextMatches();
-        }
-        return ma.getMatches(fieldKey, query, collection, start, limit, locale);
-    }
-
     /**
      * Wrapper that calls getBestMatch method of the plugin corresponding to the
      * metadata field defined by single field key.

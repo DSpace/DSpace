@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.PageContext;
 
 import org.apache.log4j.Logger;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 
 public abstract class AUniformDisplayStrategy extends ASimpleDisplayStrategy
 {
@@ -20,7 +20,7 @@ public abstract class AUniformDisplayStrategy extends ASimpleDisplayStrategy
     
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
             boolean viewFull, String browseType, int colIdx, int itemid, String field,
-            DCValue[] metadataArray, boolean disableCrossLinks, boolean emph,
+            Metadatum[] metadataArray, boolean disableCrossLinks, boolean emph,
             PageContext pageContext)
     {
         String metadata;

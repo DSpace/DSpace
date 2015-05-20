@@ -590,7 +590,7 @@ public class ItemListTag extends TagSupport {
     }
 
 	private String getMetadataDisplayByStrategy(HttpServletRequest hrq, boolean[] emph, boolean[] viewFull,
-			String[] browseType, int i, int colIdx, String field, DCValue[] metadataArray, int limit,
+			String[] browseType, int i, int colIdx, String field, Metadatum[] metadataArray, int limit,
 			IDisplayMetadataValueStrategy strategy) {
 		String metadata = "";
 		try {

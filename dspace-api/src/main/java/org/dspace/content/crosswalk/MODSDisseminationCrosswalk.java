@@ -457,18 +457,18 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
 
         if (identifier_uri != null)
         {
-            metadata.add(createDCValue("identifier.uri", null, identifier_uri));
+            metadata.add(createMetadatum("identifier.uri", null, identifier_uri));
         }
 
         //FIXME: adding two URIs for now (site handle and URL), in case site isn't using handles
         if (url != null)
         {
-            metadata.add(createDCValue("identifier.uri", null, url));
+            metadata.add(createMetadatum("identifier.uri", null, url));
         }
 
         if (title != null)
         {
-            metadata.add(createDCValue("title", null, title));
+            metadata.add(createMetadatum("title", null, title));
         }
 
         return (Metadatum[]) metadata.toArray(new Metadatum[metadata.size()]);
@@ -495,32 +495,32 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
 
         if (description != null)
         {
-            metadata.add(createDCValue("description", null, description));
+            metadata.add(createMetadatum("description", null, description));
         }
 
         if (description_abstract != null)
         {
-            metadata.add(createDCValue("description", "abstract", description_abstract));
+            metadata.add(createMetadatum("description", "abstract", description_abstract));
         }
 
         if (description_table != null)
         {
-            metadata.add(createDCValue("description", "tableofcontents", description_table));
+            metadata.add(createMetadatum("description", "tableofcontents", description_table));
         }
 
         if (identifier_uri != null)
         {
-            metadata.add(createDCValue("identifier.uri", null, identifier_uri));
+            metadata.add(createMetadatum("identifier.uri", null, identifier_uri));
         }
 
         if (rights != null)
         {
-            metadata.add(createDCValue("rights", null, rights));
+            metadata.add(createMetadatum("rights", null, rights));
         }
 
         if (title != null)
         {
-            metadata.add(createDCValue("title", null, title));
+            metadata.add(createMetadatum("title", null, title));
         }
 
         return (Metadatum[]) metadata.toArray(new Metadatum[metadata.size()]);
@@ -550,42 +550,42 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
 
         if (description != null)
         {
-            metadata.add(createDCValue("description", null, description));
+            metadata.add(createMetadatum("description", null, description));
         }
 
         if (description_abstract != null)
         {
-            metadata.add(createDCValue("description", "abstract", description_abstract));
+            metadata.add(createMetadatum("description", "abstract", description_abstract));
         }
 
         if (description_table != null)
         {
-            metadata.add(createDCValue("description", "tableofcontents", description_table));
+            metadata.add(createMetadatum("description", "tableofcontents", description_table));
         }
 
         if (identifier_uri != null)
         {
-            metadata.add(createDCValue("identifier", "uri", identifier_uri));
+            metadata.add(createMetadatum("identifier", "uri", identifier_uri));
         }
 
         if (provenance != null)
         {
-            metadata.add(createDCValue("provenance", null, provenance));
+            metadata.add(createMetadatum("provenance", null, provenance));
         }
 
         if (rights != null)
         {
-            metadata.add(createDCValue("rights", null, rights));
+            metadata.add(createMetadatum("rights", null, rights));
         }
 
         if (rights_license != null)
         {
-            metadata.add(createDCValue("rights.license", null, rights_license));
+            metadata.add(createMetadatum("rights.license", null, rights_license));
         }
 
         if (title != null)
         {
-            metadata.add(createDCValue("title", null, title));
+            metadata.add(createMetadatum("title", null, title));
         }
 
         return (Metadatum[]) metadata.toArray(new Metadatum[metadata.size()]);
@@ -605,7 +605,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
         return dcvs;
     }
 
-    private Metadatum createDCValue(String element, String qualifier, String value) {
+    private Metadatum createMetadatum(String element, String qualifier, String value) {
         Metadatum dcv = new Metadatum();
         dcv.schema = "dc";
         dcv.element = element;

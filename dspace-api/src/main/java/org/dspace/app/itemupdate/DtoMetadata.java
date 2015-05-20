@@ -11,7 +11,7 @@ import java.text.ParseException;
 import org.dspace.content.Item;
 
 /**
- *   A data transfer object class enhancement of org.dspace.content.DCValue, which is deprecated
+ *   A data transfer object class enhancement of org.dspace.content.Metadatum, which is deprecated
  *   Name intended to not conflict with DSpace API classes for similar concepts but not usable in this context
  *   
  *   Adds some utility methods

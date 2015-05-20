@@ -37,7 +37,7 @@ public class DCLanguage
     /**
      * Write the language out to the database
      * 
-     * @return the language in a form for writing to the DCValue table
+     * @return the language in a form for writing to the Metadatum table
      */
     public String toString()
     {

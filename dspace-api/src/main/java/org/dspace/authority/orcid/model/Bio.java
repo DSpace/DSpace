@@ -33,6 +33,8 @@ public class Bio {
     protected Set<BioResearcherUrl> researcherUrls;
 
     protected String biography;
+    
+    protected String email;
 
     public Bio() {
         this.name = new BioName();
@@ -65,6 +67,15 @@ public class Bio {
         this.country = country;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    
     public Set<String> getKeywords() {
         return keywords;
     }

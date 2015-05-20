@@ -1085,7 +1085,7 @@ public class ItemImport
 
         // Get the nodes corresponding to formats
         NodeList dcNodes = XPathAPI.selectNodeList(document,
-                "/dublin_core/dcvalue");
+                "/dublin_core/Metadatum");
 
         if (!isQuiet)
         {
@@ -1096,11 +1096,11 @@ public class ItemImport
         for (int i = 0; i < dcNodes.getLength(); i++)
         {
             Node n = dcNodes.item(i);
-            addDCValue(c, myitem, schema, n);
+            addMetadatum(c, myitem, schema, n);
         }
     }
 
-    private void addDCValue(Context c, Item i, String schema, Node n) throws TransformerException, SQLException, AuthorizeException
+    private void addMetadatum(Context c, Item i, String schema, Node n) throws TransformerException, SQLException, AuthorizeException
     {
         String value = getStringValue(n); //n.getNodeValue();
         // compensate for empty value getting read as "null", which won't display

@@ -207,13 +207,13 @@ public class SFXFileReader {
                         }
                         if (finish == 4)
                         {
-                        Metadatum[] dcvalue = item.getMetadata(schema, element, qualifier, Item.ANY);
-                        if (dcvalue.length > 0)
+                        Metadatum[] Metadatum = item.getMetadata(schema, element, qualifier, Item.ANY);
+                        if (Metadatum.length > 0)
                             {
                             // Issued Date
                                 if (element.equals("date") && qualifier.equals("issued"))
                             {
-                            String fullDate = dcvalue[0].value;
+                            String fullDate = Metadatum[0].value;
                             // Remove the time if there is one - day is greatest granularity for SFX
                                 if (fullDate.length() > 10)
                                 {
@@ -229,8 +229,8 @@ public class SFXFileReader {
                                 // Contributor Author
                                 if (element.equals("contributor") && qualifier.equals("author"))
                                     {
-                                    DCPersonName dpn = new DCPersonName(dcvalue[0].value);
-                                        String dpnName = dcvalue[0].value;
+                                    DCPersonName dpn = new DCPersonName(Metadatum[0].value);
+                                        String dpnName = Metadatum[0].value;
 
                                         if (querystring.endsWith("aulast="))  { dpnName = dpn.getLastName(); }
                                         else { if (querystring.endsWith("aufirst=")) { dpnName = dpn.getFirstNames(); }}
@@ -243,9 +243,9 @@ public class SFXFileReader {
                                 else
                                 {
                                     if (myquery.equals(""))
-                                    { myquery =  querystring + URLEncoder.encode(dcvalue[0].value, Constants.DEFAULT_ENCODING);}
+                                    { myquery =  querystring + URLEncoder.encode(Metadatum[0].value, Constants.DEFAULT_ENCODING);}
                                     else
-                                        { myquery =  myquery + "&" + querystring + URLEncoder.encode(dcvalue[0].value, Constants.DEFAULT_ENCODING);}
+                                        { myquery =  myquery + "&" + querystring + URLEncoder.encode(Metadatum[0].value, Constants.DEFAULT_ENCODING);}
                                     }
                                 }
                             } // if dc.length > 0

@@ -335,12 +335,12 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
         {
             for (SortOption so : SortOption.getSortOptions())
             {
-                Metadatum[] dcvalue = item.getMetadataByMetadataString(so.getMetadata());
-                if (dcvalue != null && dcvalue.length > 0)
+                Metadatum[] Metadatum = item.getMetadataByMetadataString(so.getMetadata());
+                if (Metadatum != null && Metadatum.length > 0)
                 {
                     String nValue = OrderFormat
-                            .makeSortString(dcvalue[0].value,
-                                    dcvalue[0].language, so.getType());
+                            .makeSortString(Metadatum[0].value,
+                                    Metadatum[0].language, so.getType());
                     doc.addField("bi_sort_" + so.getNumber() + "_sort", nValue);
                 }
             }

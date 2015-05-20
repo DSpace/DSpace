@@ -322,10 +322,7 @@ public class AuthorityDAOOracle implements AuthorityDAO {
             // the metadata field is not defined
             throw new IllegalArgumentException("Error retriving metadata field for input the supplied string: " + md, npe);
         } 
-        catch (AuthorizeException ex) {
-            // mmmm... we should not go here
-            throw new IllegalArgumentException("Error retriving metadata field for input the supplied string: " + md, ex);
-        }
+        
         return fieldId;
     }
     

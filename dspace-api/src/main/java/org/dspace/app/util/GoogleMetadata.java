@@ -319,7 +319,7 @@ public class GoogleMetadata
     }
 
     /**
-     * Aggregate an array of DCValues present on the current item that pass the
+     * Aggregate an array of Metadatums present on the current item that pass the
      * configuration filter.
      * 
      * @param configFilter

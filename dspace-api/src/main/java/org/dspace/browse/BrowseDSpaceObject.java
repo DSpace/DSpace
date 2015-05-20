@@ -10,7 +10,7 @@ package org.dspace.browse;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.core.Context;
 
 public class BrowseDSpaceObject extends BrowseItem
@@ -24,13 +24,13 @@ public class BrowseDSpaceObject extends BrowseItem
     }
     
     @Override
-    public DCValue[] getMetadata(String schema, String element,
-            String qualifier, String lang) throws SQLException
+    public Metadatum[] getMetadata(String schema, String element,
+            String qualifier, String lang)
     {
         return browseObject.getMetadata(schema, element, qualifier, lang);
     }
 
-    public List<String> getMetadataValue(String mdString) throws SQLException
+    public List<String> getMetadataValue(String mdString)
     {
         return browseObject.getMetadataValue(mdString);
     }

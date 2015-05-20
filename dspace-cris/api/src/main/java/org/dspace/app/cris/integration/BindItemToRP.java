@@ -28,7 +28,7 @@ import org.dspace.app.cris.service.RelationPreferenceService;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.browse.BrowseException;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.MetadataField;
@@ -105,11 +105,11 @@ public class BindItemToRP
                             mf.getSchemaID()).getName();
                     String element = mf.getElement();
                     String qualifier = mf.getQualifier();
-                    DCValue[] values = item.getMetadata(schema, element,
+                    Metadatum[] values = item.getMetadata(schema, element,
                             qualifier, Item.ANY);
                     item.clearMetadata(schema, element, qualifier, Item.ANY);
 
-                    for (DCValue val : values)
+                    for (Metadatum val : values)
                     {
                         if (val.authority == null
                                 && val.value != null
@@ -435,7 +435,7 @@ public class BindItemToRP
             {
                 boolean modified = false;
 
-                DCValue[] values = null;
+                Metadatum[] values = null;
                 for (MetadataField md : fieldsWithAuthoritySupport)
                 {
                     String schema = (MetadataSchema.find(context,
@@ -445,7 +445,7 @@ public class BindItemToRP
                             md.getQualifier(), Item.ANY);
                     item.clearMetadata(schema, md.getElement(),
                             md.getQualifier(), Item.ANY);
-                    for (DCValue value : values)
+                    for (Metadatum value : values)
                     {
 
                         int matches = 0;

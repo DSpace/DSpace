@@ -13,7 +13,7 @@ import java.util.List;
 import org.dspace.app.cris.integration.RPAuthority;
 import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.RelationPreference;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
@@ -106,12 +106,12 @@ public class ItemExtraAction implements RelationPreferenceExtraAction
             for (String issued : metadata)
             {
                 String[] metadata = issued.split("\\.");
-                DCValue[] original = item.getMetadata(issued);
+                Metadatum[] original = item.getMetadataByMetadataString(issued);
                 String schema = metadata[0];
                 String element = metadata[1];
                 String qualifier = metadata.length > 2 ? metadata[2] : null;
                 item.clearMetadata(schema, element, qualifier, Item.ANY);
-                for (DCValue md : original)
+                for (Metadatum md : original)
                 {
                     if (rpKey.equals(md.authority))
                     {
@@ -169,13 +169,13 @@ public class ItemExtraAction implements RelationPreferenceExtraAction
             for (String issued : metadata)
             {
                 String[] metadata = issued.split("\\.");
-                DCValue[] original = item.getMetadata(issued);
+                Metadatum[] original = item.getMetadataByMetadataString(issued);
                 String schema = metadata[0];
                 String element = metadata[1];
                 String qualifier = metadata.length > 2 ? metadata[2] : null;
                 item.clearMetadata(schema, element, qualifier, Item.ANY);
 
-                for (DCValue md : original)
+                for (Metadatum md : original)
                 {
                     for (String tempName : names)
                     {

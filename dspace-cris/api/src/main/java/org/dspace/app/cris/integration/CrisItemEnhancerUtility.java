@@ -27,7 +27,7 @@ import org.dspace.app.cris.model.ResearchObject;
 import org.dspace.app.cris.model.jdyna.ACrisNestedObject;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.ResearcherPageUtils;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.MetadataAuthorityManager;
@@ -57,7 +57,7 @@ public class CrisItemEnhancerUtility
         return result;
     }
 
-    public static List<DCValue> getCrisMetadata(Item item, String metadata)
+    public static List<Metadatum> getCrisMetadata(Item item, String metadata)
     {
         StringTokenizer dcf = new StringTokenizer(metadata, ".");
 
@@ -82,7 +82,7 @@ public class CrisItemEnhancerUtility
         }
 
         List<CrisItemEnhancer> enhancers = getEnhancers(element);
-        List<DCValue> result = new ArrayList<DCValue>();
+        List<Metadatum> result = new ArrayList<Metadatum>();
         if (Item.ANY.equals(qualifier))
         {
             for (CrisItemEnhancer enh : enhancers)
@@ -93,7 +93,7 @@ public class CrisItemEnhancerUtility
                     List<String[]> vals = getCrisMetadata(item, enh, qual); 
                     for (String[] e : vals)
                     {
-                        DCValue dc = new DCValue();
+                        Metadatum dc = new Metadatum();
                         dc.schema = "crisitem";
                         dc.element = enh.getAlias();
                         dc.qualifier = qual;
@@ -125,7 +125,7 @@ public class CrisItemEnhancerUtility
                 List<String[]> vals = getCrisMetadata(item, enh, qualifier); 
                 for (String[] e : vals)
                 {
-                    DCValue dc = new DCValue();
+                    Metadatum dc = new Metadatum();
                     dc.schema = "crisitem";
                     dc.element = enh.getAlias();
                     dc.qualifier = qualifier;
@@ -150,8 +150,8 @@ public class CrisItemEnhancerUtility
 
         for (String md : mdList)
         {
-            DCValue[] dcvalues = item.getMetadata(md);
-            for (DCValue dc : dcvalues)
+            Metadatum[] Metadatums = item.getMetadataByMetadataString(md);
+            for (Metadatum dc : Metadatums)
             {
                 try
                 {

@@ -31,7 +31,7 @@ import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.StringConfigurationComparator;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.authority.AuthorityDAO;
@@ -142,10 +142,10 @@ public class AuthorityManagementServlet extends DSpaceServlet
                     for (String issued : metadataList)
                     {
                         String[] metadata = issued.split("\\.");
-                        DCValue[] original = item.getMetadata(issued);
+                        Metadatum[] original = item.getMetadataByMetadataString(issued);
                         item.clearMetadata(metadata[0], metadata[1],
                                 metadata.length > 2 ? metadata[2] : null, Item.ANY);
-                        for (DCValue md : original)
+                        for (Metadatum md : original)
                         {
                             if (key.equals(md.authority))
                             {

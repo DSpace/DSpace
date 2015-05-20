@@ -16,7 +16,7 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.ItemEnhancer;
 import org.dspace.content.authority.Choices;
@@ -28,7 +28,7 @@ public class ItemEnhancerUtility
     private static final Logger log = Logger
             .getLogger(ItemEnhancerUtility.class);
 
-    public static List<DCValue> getMetadata(Item item, String metadata)
+    public static List<Metadatum> getMetadata(Item item, String metadata)
     {
         StringTokenizer dcf = new StringTokenizer(metadata, ".");
 
@@ -53,7 +53,7 @@ public class ItemEnhancerUtility
         }
 
         List<ItemEnhancer> enhancers = getEnhancers(element);
-        List<DCValue> result = new ArrayList<DCValue>();
+        List<Metadatum> result = new ArrayList<Metadatum>();
 
         for (ItemEnhancer enh : enhancers)
         {
@@ -62,7 +62,7 @@ public class ItemEnhancerUtility
             {
 				if (e.getValues() != null) {
 					for (int idx = 0; idx < e.getValues().length; idx++) {
-						DCValue dc = new DCValue();
+						Metadatum dc = new Metadatum();
 						dc.schema = "item";
 						dc.element = enh.getAlias();
 						dc.qualifier = Item.ANY.equalsIgnoreCase(qualifier) || StringUtils.isBlank(qualifier) ? null
@@ -99,7 +99,7 @@ public class ItemEnhancerUtility
 
             for (String md : mdList)
             {
-                DCValue[] dcvalues = item.getMetadata(md);
+                Metadatum[] Metadatums = item.getMetadataByMetadataString(md);
 				if ("placeholder.placeholder.placeholder".equalsIgnoreCase(md)) {
 					DefaultValuesBean valueGenerated = null;
 					String schema = "placeholder";
@@ -113,7 +113,7 @@ public class ItemEnhancerUtility
 						}
 					}
 				} else {
-					for (DCValue dc : dcvalues) {
+					for (Metadatum dc : Metadatums) {
 						DefaultValuesBean valueGenerated = null;
 						String schema = dc.schema;
 						String element = dc.element;

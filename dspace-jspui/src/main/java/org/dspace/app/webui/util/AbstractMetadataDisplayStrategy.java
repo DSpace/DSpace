@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.PageContext;
 
 import org.apache.commons.lang.StringUtils;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.core.I18nUtil;
 
 
@@ -22,13 +22,13 @@ public class AbstractMetadataDisplayStrategy extends ASimpleDisplayStrategy
 {
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
             boolean viewFull, String browseType,int itemid, int colIdx, String field,
-            DCValue[] metadataArray, boolean disableCrossLinks, boolean emph,
+            Metadatum[] metadataArray, boolean disableCrossLinks, boolean emph,
             PageContext pageContext)
     {	
         String metadataDisplay = "-";
         boolean found = false;
         
-        for (DCValue descrMetadata : metadataArray) {
+        for (Metadatum descrMetadata : metadataArray) {
         	if (StringUtils.startsWith(descrMetadata.qualifier, "abstract")) {
         		found = true; 
         		break;
@@ -70,7 +70,7 @@ public class AbstractMetadataDisplayStrategy extends ASimpleDisplayStrategy
 
     public String getExtraCssDisplay(HttpServletRequest hrq, int limit,
             boolean b, String string, int colIdx, String field,
-            DCValue[] metadataArray, boolean disableCrossLinks, boolean emph,
+            Metadatum[] metadataArray, boolean disableCrossLinks, boolean emph,
             PageContext pageContext)
     {
         return "nowrap=\"nowrap\" align=\"center\"";

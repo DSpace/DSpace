@@ -31,7 +31,7 @@ import org.dspace.app.webui.util.ResolverDisplayStrategy;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.authority.Choices;
 import org.dspace.core.Constants;
@@ -207,7 +207,7 @@ public class DiscoveryArtifactTag extends TagSupport {
 		}
 		boolean unescapeHtml = false;
 		List<String> metadataValue = new ArrayList<String>();
-		List<DCValue> dcMetadataValue = new ArrayList<DCValue>();
+		List<Metadatum> dcMetadataValue = new ArrayList<Metadatum>();
 		String metadata = "";
 		if (hls != null) {
 			for (String[] hl : hls) {
@@ -216,16 +216,16 @@ public class DiscoveryArtifactTag extends TagSupport {
 					metadata = hl[0];
 				} else {
 					unescapeHtml = true;
-					DCValue dcvalue = new DCValue();
-					dcvalue.value = hl[0];
+					Metadatum Metadatum = new Metadatum();
+					Metadatum.value = hl[0];
 					if (hl.length > 1) {
-						dcvalue.authority = hl[1];
+						Metadatum.authority = hl[1];
 					}
-					dcvalue.schema = schema;
-					dcvalue.element = element;
-					dcvalue.qualifier = qualifier;
-					dcvalue.confidence = Choices.CF_ACCEPTED;
-					dcMetadataValue.add(dcvalue);
+					Metadatum.schema = schema;
+					Metadatum.element = element;
+					Metadatum.qualifier = qualifier;
+					Metadatum.confidence = Choices.CF_ACCEPTED;
+					dcMetadataValue.add(Metadatum);
 				}
 			}
 		}
@@ -255,7 +255,7 @@ public class DiscoveryArtifactTag extends TagSupport {
 					metadata = strategy.getMetadataDisplay(request, -1, viewFull, browseIndex, 0, field,
 							metadataValue, artifact, false, false, pageContext);
 				} else {
-					DCValue[] arrayDcMetadataValue = new DCValue[dcMetadataValue.size() - 1];
+					Metadatum[] arrayDcMetadataValue = new Metadatum[dcMetadataValue.size() - 1];
 					metadata = strategy.getMetadataDisplay(request, -1, viewFull, browseIndex, 0, field,
 							dcMetadataValue.toArray(arrayDcMetadataValue), artifact, false, false, pageContext);
 				}
@@ -269,7 +269,7 @@ public class DiscoveryArtifactTag extends TagSupport {
 						}
 					}
 				} else {
-					for (DCValue vl : dcMetadataValue) {
+					for (Metadatum vl : dcMetadataValue) {
 						metadata += vl.value;
 						if (dcMetadataValue.size() > 1) {
 							metadata +=  dvfc.getSeparator();

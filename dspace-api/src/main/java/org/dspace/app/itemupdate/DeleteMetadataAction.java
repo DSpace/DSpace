@@ -43,7 +43,7 @@ public class DeleteMetadataAction extends UpdateMetadataAction {
 			ItemUpdate.pr("Metadata to be deleted: ");
 			for (Metadatum dcv : ardcv)
 			{
-				ItemUpdate.pr("  " + MetadataUtilities.getDCValueString(dcv));
+				ItemUpdate.pr("  " + MetadataUtilities.getMetadatumString(dcv));
 			}
 
 			if (!isTest)

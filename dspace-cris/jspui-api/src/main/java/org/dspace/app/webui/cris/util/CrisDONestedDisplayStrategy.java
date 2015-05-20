@@ -28,7 +28,7 @@ import org.dspace.app.webui.util.ADiscoveryDisplayStrategy;
 import org.dspace.app.webui.util.IDisplayMetadataValueStrategy;
 import org.dspace.browse.BrowseDSpaceObject;
 import org.dspace.browse.BrowseItem;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.discovery.IGlobalSearchResult;
@@ -42,7 +42,7 @@ public class CrisDONestedDisplayStrategy extends ADiscoveryDisplayStrategy imple
 
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
             boolean viewFull, String browseType, int colIdx, String field,
-            DCValue[] metadataArray, BrowseItem item,
+            Metadatum[] metadataArray, BrowseItem item,
             boolean disableCrossLinks, boolean emph, PageContext pageContext)
     {
     	return null;
@@ -50,7 +50,7 @@ public class CrisDONestedDisplayStrategy extends ADiscoveryDisplayStrategy imple
 
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
             boolean viewFull, String browseType, int colIdx, String field,
-            DCValue[] metadataArray, Item item, boolean disableCrossLinks,
+            Metadatum[] metadataArray, Item item, boolean disableCrossLinks,
             boolean emph, PageContext pageContext)
     {
         // not used
@@ -59,7 +59,7 @@ public class CrisDONestedDisplayStrategy extends ADiscoveryDisplayStrategy imple
 
     public String getExtraCssDisplay(HttpServletRequest hrq, int limit,
             boolean b, String browseType, int colIdx, String field,
-            DCValue[] metadataArray, Item item, boolean disableCrossLinks,
+            Metadatum[] metadataArray, Item item, boolean disableCrossLinks,
             boolean emph, PageContext pageContext) throws JspException
     {
         return null;
@@ -68,7 +68,7 @@ public class CrisDONestedDisplayStrategy extends ADiscoveryDisplayStrategy imple
     @Override
     public String getExtraCssDisplay(HttpServletRequest hrq, int limit,
             boolean b, String browseType, int colIdx, String field,
-            DCValue[] metadataArray, BrowseItem browseItem,
+            Metadatum[] metadataArray, BrowseItem browseItem,
             boolean disableCrossLinks, boolean emph, PageContext pageContext)
             throws JspException
     {

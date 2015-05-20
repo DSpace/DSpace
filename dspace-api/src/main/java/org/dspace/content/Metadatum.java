@@ -63,17 +63,17 @@ public class Metadatum
         return schema + "." + element + (qualifier==null?"":("." + qualifier));
     }
 
-    public boolean hasSameFieldAs(Metadatum dcValue) {
-        if (dcValue == this) {
+    public boolean hasSameFieldAs(Metadatum Metadatum) {
+        if (Metadatum == this) {
             return true;
         }
-        if (dcValue.element != null ? !dcValue.element.equals(this.element) : this.element != null) {
+        if (Metadatum.element != null ? !Metadatum.element.equals(this.element) : this.element != null) {
             return false;
         }
-        if (dcValue.qualifier != null ? !dcValue.qualifier.equals(this.qualifier) : this.qualifier != null) {
+        if (Metadatum.qualifier != null ? !Metadatum.qualifier.equals(this.qualifier) : this.qualifier != null) {
             return false;
         }
-        if (dcValue.schema != null ? !dcValue.schema.equals(this.schema) : this.schema != null) {
+        if (Metadatum.schema != null ? !Metadatum.schema.equals(this.schema) : this.schema != null) {
             return false;
         }
         return true;
@@ -88,27 +88,27 @@ public class Metadatum
             return false;
         }
 
-        Metadatum dcValue = (Metadatum) o;
+        Metadatum Metadatum = (Metadatum) o;
 
-        if (confidence != dcValue.confidence) {
+        if (confidence != Metadatum.confidence) {
             return false;
         }
-        if (authority != null ? !authority.equals(dcValue.authority) : dcValue.authority != null) {
+        if (authority != null ? !authority.equals(Metadatum.authority) : Metadatum.authority != null) {
             return false;
         }
-        if (element != null ? !element.equals(dcValue.element) : dcValue.element != null) {
+        if (element != null ? !element.equals(Metadatum.element) : Metadatum.element != null) {
             return false;
         }
-        if (language != null ? !language.equals(dcValue.language) : dcValue.language != null) {
+        if (language != null ? !language.equals(Metadatum.language) : Metadatum.language != null) {
             return false;
         }
-        if (qualifier != null ? !qualifier.equals(dcValue.qualifier) : dcValue.qualifier != null) {
+        if (qualifier != null ? !qualifier.equals(Metadatum.qualifier) : Metadatum.qualifier != null) {
             return false;
         }
-        if (schema != null ? !schema.equals(dcValue.schema) : dcValue.schema != null) {
+        if (schema != null ? !schema.equals(Metadatum.schema) : Metadatum.schema != null) {
             return false;
         }
-        if (value != null ? !value.equals(dcValue.value) : dcValue.value != null) {
+        if (value != null ? !value.equals(Metadatum.value) : Metadatum.value != null) {
             return false;
         }
 

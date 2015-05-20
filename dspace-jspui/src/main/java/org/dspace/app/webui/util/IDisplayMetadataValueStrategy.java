@@ -14,7 +14,7 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
 
 import org.dspace.browse.BrowseItem;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.discovery.IGlobalSearchResult;
 
@@ -22,24 +22,24 @@ public interface IDisplayMetadataValueStrategy
 {
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
             boolean viewFull, String browseType, int colIdx, String field,
-            DCValue[] metadataArray, BrowseItem item,
+            Metadatum[] metadataArray, BrowseItem item,
             boolean disableCrossLinks, boolean emph, PageContext pageContext)
             throws JspException;
 
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
             boolean viewFull, String browseType, int colIdx, String field,
-            DCValue[] metadataArray, Item item, boolean disableCrossLinks,
+            Metadatum[] metadataArray, Item item, boolean disableCrossLinks,
             boolean emph, PageContext pageContext) throws JspException;
 
     public String getExtraCssDisplay(HttpServletRequest hrq, int limit,
             boolean b, String browseType, int colIdx, String field,
-            DCValue[] metadataArray, BrowseItem browseItem,
+            Metadatum[] metadataArray, BrowseItem browseItem,
             boolean disableCrossLinks, boolean emph, PageContext pageContext)
             throws JspException;
 
     public String getExtraCssDisplay(HttpServletRequest hrq, int limit,
             boolean b, String browseType, int colIdx, String field,
-            DCValue[] metadataArray, Item item, boolean disableCrossLinks,
+            Metadatum[] metadataArray, Item item, boolean disableCrossLinks,
             boolean emph, PageContext pageContext) throws JspException;
     
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
@@ -50,7 +50,7 @@ public interface IDisplayMetadataValueStrategy
 
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
             boolean viewFull, String browseType, int colIdx, String field,
-            DCValue[] metadataArray, IGlobalSearchResult item,
+            Metadatum[] metadataArray, IGlobalSearchResult item,
             boolean disableCrossLinks, boolean emph, PageContext pageContext)
             throws JspException;
 }

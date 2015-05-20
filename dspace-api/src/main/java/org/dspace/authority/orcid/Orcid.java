@@ -83,4 +83,14 @@ public class Orcid extends RestSource {
         Bio bio = getBio(id);
         return OrcidAuthorityValue.create(bio);
     }
+
+	@Override
+	public List<AuthorityValue> queryAuthorities(String field, String text, int start, int max) {
+        List<Bio> bios = queryBio(text, start, max);
+        List<AuthorityValue> authorities = new ArrayList<AuthorityValue>();
+        for (Bio bio : bios) {
+            authorities.add(OrcidAuthorityValue.create(bio));
+        }
+        return authorities;
+	}
 }

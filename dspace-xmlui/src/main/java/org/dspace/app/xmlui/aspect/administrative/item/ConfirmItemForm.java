@@ -79,7 +79,7 @@ public class ConfirmItemForm extends AbstractDSpaceTransformer {
 		int itemID = parameters.getParameterAsInteger("itemID",-1);
 		Item item = Item.find(context, itemID);
 		final Metadatum[] values = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-		Arrays.sort(values, new DCValueComparator());
+		Arrays.sort(values, new MetadatumComparator());
 
 		String confirm = parameters.getParameter("confirm",null);
 
@@ -110,9 +110,9 @@ public class ConfirmItemForm extends AbstractDSpaceTransformer {
 		header.addCell().addContent(T_column2);
 		header.addCell().addContent(T_column3);
 		for(final Metadatum value:values){
-			final String dcValue = value.schema + ". " + value.element + (value.qualifier==null?"":(". " + value.qualifier));
+			final String Metadatum = value.schema + ". " + value.element + (value.qualifier==null?"":(". " + value.qualifier));
 			final Row row = table.addRow();
-			row.addCell().addContent(dcValue);
+			row.addCell().addContent(Metadatum);
 			row.addCell().addContent(value.value);
 			row.addCell().addContent(value.language);
 		}
@@ -151,7 +151,7 @@ public class ConfirmItemForm extends AbstractDSpaceTransformer {
 	/**
 	 * Compare names of two metadata elements so that they may be sorted.
 	 */
-	static class DCValueComparator implements Comparator, Serializable {
+	static class MetadatumComparator implements Comparator, Serializable {
 		public int compare(Object arg0, Object arg1) {
 			final Metadatum o1 = (Metadatum)arg0;
 			final Metadatum o2 = (Metadatum)arg1;

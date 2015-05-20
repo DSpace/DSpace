@@ -1490,7 +1490,7 @@ public class Community extends DSpaceObject implements IGlobalSearchResult
 	}
 
 	@Override
-	public DCValue[] getMetadataValueInDCFormat(String mdString) {
+	public Metadatum[] getMetadataValueInDCFormat(String mdString) {
 		String dcval = getMetadata(mdString);
 		
 		StringTokenizer dcf = new StringTokenizer(mdString, ".");
@@ -1505,11 +1505,11 @@ public class Community extends DSpaceObject implements IGlobalSearchResult
 		String element = tokens[1];
 		String qualifier = tokens[2];
 		
-		DCValue vl = new DCValue();
+		Metadatum vl = new Metadatum();
 		vl.schema = schema;
 		vl.element = element;
 		vl.qualifier = qualifier;
 		vl.value = dcval;
-		return new DCValue[]{vl};
+		return new Metadatum[]{vl};
 	}
 }

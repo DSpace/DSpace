@@ -28,26 +28,26 @@ public class SolrServiceSpellIndexingPlugin implements SolrServiceIndexPlugin {
     public void additionalIndex(Context context, DSpaceObject dso, SolrInputDocument document) {
         if(dso instanceof Item){
             Item item = (Item) dso;
-            Metadatum[] dcValues = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+            Metadatum[] Metadatums = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
             List<String> toIgnoreMetadataFields = SearchUtils.getIgnoredMetadataFields(item.getType());
-            for (Metadatum dcValue : dcValues) {
-                String field = dcValue.schema + "." + dcValue.element;
+            for (Metadatum Metadatum : Metadatums) {
+                String field = Metadatum.schema + "." + Metadatum.element;
                 String unqualifiedField = field;
 
-                String value = dcValue.value;
+                String value = Metadatum.value;
 
                 if (value == null)
                 {
                     continue;
                 }
 
-                if (dcValue.qualifier != null && !dcValue.qualifier.trim().equals(""))
+                if (Metadatum.qualifier != null && !Metadatum.qualifier.trim().equals(""))
                 {
-                    field += "." + dcValue.qualifier;
+                    field += "." + Metadatum.qualifier;
                 }
 
                 if(!toIgnoreMetadataFields.contains(field)){
-                    document.addField("a_spell", dcValue.value);
+                    document.addField("a_spell", Metadatum.value);
                 }
             }
         }

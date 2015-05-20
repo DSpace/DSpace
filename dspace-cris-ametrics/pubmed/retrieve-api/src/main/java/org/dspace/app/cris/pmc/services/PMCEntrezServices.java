@@ -23,10 +23,17 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.StatusLine;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
 import org.dspace.app.cris.pmc.model.PMCRecord;
 import org.springframework.util.StringUtils;
@@ -80,33 +87,41 @@ public class PMCEntrezServices
     public List<PMCRecord> getMultiPMCRecord(Integer... pmcID)
             throws PMCEntrezException
     {
-        GetMethod method = null;
+    	HttpPost httpPost = null;
         if (pmcID == null || pmcID.length == 0)
         {
             return new ArrayList<PMCRecord>();
         }
         try
         {
-            HttpClient client = new HttpClient();
-            method = new GetMethod(ENTREZ_FETCH_ENDPOINT);
-
-            NameValuePair view = new NameValuePair("retmode", "text");
-            NameValuePair ids = new NameValuePair("id",
+        	HttpClient client = new DefaultHttpClient();
+        	
+            NameValuePair view = new BasicNameValuePair("retmode", "text");
+            NameValuePair ids = new BasicNameValuePair("id",
                     StringUtils.arrayToCommaDelimitedString(pmcID));
-            NameValuePair rettype = new NameValuePair("rettype", "docsum");
-            NameValuePair db = new NameValuePair("db", "pmc");
-            method.setQueryString(new NameValuePair[] { view, ids, rettype, db });
+            NameValuePair rettype = new BasicNameValuePair("rettype", "docsum");
+            NameValuePair db = new BasicNameValuePair("db", "pmc");
+
+            httpPost = new HttpPost(ENTREZ_FETCH_ENDPOINT);
+            List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+            nvps.add(view);
+            nvps.add(ids);
+            nvps.add(rettype);
+            nvps.add(db);
+            httpPost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
 
             // Execute the method.
-            int statusCode = client.executeMethod(method);
+            HttpResponse httpResponse = client.execute(httpPost);
 
-            if (statusCode != HttpStatus.SC_OK)
+            StatusLine statusCode = httpResponse.getStatusLine();
+
+            if (statusCode !=null && statusCode.getStatusCode() != HttpStatus.SC_OK)
             {
                 throw new PMCEntrezException("Entrez webservice failure: "
-                        + method.getStatusLine());
+                        + statusCode);
             }
             String response = it.cilea.osd.common.utils.StringUtils
-                    .convertStreamToString(method.getResponseBodyAsStream(),
+                    .convertStreamToString(httpResponse.getEntity().getContent(),
                             "UTF-8");
 
             log.debug("Entrez response for PMC IDs: "
@@ -121,18 +136,20 @@ public class PMCEntrezServices
                         "Failed to parse the Entrez response, found "
                                 + result.size() + " PMC records were expected "
                                 + pmcID.length);
-            }
+            }            
             return result;
         }
         catch (Exception e)
         {
             throw new PMCEntrezException("Entrez webservice failure: "
                     + e.getMessage() + " query string: "
-                    + method.getQueryString(), e);
+                    + httpPost.getParams(), e);
         }
         finally
         {
-            method.releaseConnection();
+        	if(httpPost != null) {
+        		httpPost.releaseConnection();
+        	}
         }
     }
 
@@ -267,27 +284,34 @@ public class PMCEntrezServices
             throws PMCEntrezException
     {
 
-        GetMethod method = null;
+        HttpPost httpPost = null;
 
         try
         {
-            HttpClient client = new HttpClient();
-            method = new GetMethod(endpoint);
+        	HttpClient client = new DefaultHttpClient();
+        	
+            NameValuePair view = new BasicNameValuePair("view", "xml");
+            NameValuePair ids = new BasicNameValuePair("id",
+            		StringUtils.arrayToCommaDelimitedString(lookupIDs));
 
-            NameValuePair view = new NameValuePair("view", "xml");
-            NameValuePair ids = new NameValuePair("id",
-                    StringUtils.arrayToCommaDelimitedString(lookupIDs));
-            method.setQueryString(new NameValuePair[] { view, ids });
+            httpPost = new HttpPost(endpoint);
+            List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+            nvps.add(view);
+            nvps.add(ids);
+            httpPost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+
             // Execute the method.
-            int statusCode = client.executeMethod(method);
+            HttpResponse httpResponse = client.execute(httpPost);
 
-            if (statusCode != HttpStatus.SC_OK)
+            StatusLine statusCode = httpResponse.getStatusLine();
+
+            if (statusCode !=null && statusCode.getStatusCode() != HttpStatus.SC_OK)
             {
                 throw new PMCEntrezException("Entrez webservice failure: "
-                        + method.getStatusLine());
+                        + statusCode);
             }
-
-            InputStream xmlResponse = method.getResponseBodyAsStream();
+            
+            InputStream xmlResponse = httpResponse.getEntity().getContent();
             DocumentBuilderFactory factory = DocumentBuilderFactory
                     .newInstance();
             factory.setValidating(false);
@@ -324,7 +348,9 @@ public class PMCEntrezServices
         }
         finally
         {
-            method.releaseConnection();
+        	if(httpPost != null) {
+        		httpPost.releaseConnection();
+        	}
         }
     }
 
@@ -342,29 +368,38 @@ public class PMCEntrezServices
 
     public List<Integer> getPubmedIDs(String doi) throws PMCEntrezException
     {
-        GetMethod method = null;
 
+    	HttpPost httpPost = null;
+    	
         try
         {
-            String lookupdoi = "\"" + doi.replaceFirst("doi:", "") + "\"";
-            HttpClient client = new HttpClient();
-            method = new GetMethod(ENTREZ_SEARCH_ENDPOINT);
+        	
+        	HttpClient client = new DefaultHttpClient();
 
-            NameValuePair term = new NameValuePair("term", doi);
-            NameValuePair db = new NameValuePair("db", "pubmed");
-            NameValuePair field = new NameValuePair("field", "doi");
-            method.setQueryString(new NameValuePair[] { term, db, field });
+        	String lookupdoi = "\"" + doi.replaceFirst("doi:", "") + "\"";
+            NameValuePair term = new BasicNameValuePair("term", doi);
+            NameValuePair db = new BasicNameValuePair("db", "pubmed");
+            NameValuePair field = new BasicNameValuePair("field", "doi");
 
+            httpPost = new HttpPost(ENTREZ_SEARCH_ENDPOINT);
+            List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+            nvps.add(term);
+            nvps.add(db);
+            nvps.add(field);
+            httpPost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+            
             // Execute the method.
-            int statusCode = client.executeMethod(method);
+            HttpResponse httpResponse = client.execute(httpPost);
 
-            if (statusCode != HttpStatus.SC_OK)
+            StatusLine statusCode = httpResponse.getStatusLine();
+
+            if (statusCode !=null && statusCode.getStatusCode() != HttpStatus.SC_OK)
             {
                 throw new PMCEntrezException("Entrez webservice failure: "
-                        + method.getStatusLine());
+                        + statusCode);
             }
-
-            InputStream xmlResponse = method.getResponseBodyAsStream();
+            
+            InputStream xmlResponse = httpResponse.getEntity().getContent();
 
             DocumentBuilderFactory factory = DocumentBuilderFactory
                     .newInstance();
@@ -406,7 +441,9 @@ public class PMCEntrezServices
         }
         finally
         {
-            method.releaseConnection();
+        	if(httpPost != null) {
+        		httpPost.releaseConnection();
+        	}
         }
     }
 

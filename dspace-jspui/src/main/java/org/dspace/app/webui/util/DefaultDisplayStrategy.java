@@ -17,7 +17,7 @@ import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.Utils;
 
@@ -29,7 +29,7 @@ public class DefaultDisplayStrategy extends ASimpleDisplayStrategy
     @Override
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
             boolean viewFull, String browseType, int colIdx, int itemid, String field,
-            DCValue[] metadataArray, boolean disableCrossLinks, boolean emph,
+            Metadatum[] metadataArray, boolean disableCrossLinks, boolean emph,
             PageContext pageContext) throws JspException
     {
         String metadata;

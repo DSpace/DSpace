@@ -468,7 +468,6 @@ public class DiscoverUtility
             DiscoveryConfiguration discoveryConfiguration,
             List<String> userFilters, List<DiscoverySearchFilterFacet> facets, int type)
     {
-        List<DiscoverySearchFilterFacet> facets = new ArrayList<DiscoverySearchFilterFacet>();
         DiscoveryConfiguration globalConfiguration = null;
         
         if (SearchUtils.isGlobalConfiguration(discoveryConfiguration) 
