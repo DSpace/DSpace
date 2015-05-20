@@ -329,7 +329,7 @@
                         </button>
 
                         <a href="{$context-path}/" class="navbar-brand">
-                            <img src="{$theme-path}/images/logo.png" />
+                            <img src="{$theme-path}/images/logo.svg" />
                         </a>
 
 
@@ -637,41 +637,85 @@
 
     <!-- Like the header, the footer contains various miscellaneous text, links, and image placeholders -->
     <xsl:template name="buildFooter">
-        <footer>
-            <div class="container-fluid">
-                <div class="row">
-                    <a href="http://www.dspace.org/" target="_blank">DSpace software</a> Copyright&#160;&#169;&#160;2015&#160; <a href="http://www.duraspace.org/" target="_blank">Duraspace</a>
+        <footer id="page-footer">
+            <div class="container">
+
+                <div class="col-lg-4">
+                    <div align="center" class="footer-logo">
+                        <a class="footer-logo" style="background-image: url('https://learn.saylor.org/theme/image.php/saylor/theme/1431977323/logo2');" href="/"></a>
+                    </div>
                 </div>
-                <div class="row">
-                    <a>
-                        <xsl:attribute name="href">
-                            <xsl:value-of
-                                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                            <xsl:text>/contact</xsl:text>
-                        </xsl:attribute>
-                        <i18n:text>xmlui.dri2xhtml.structural.contact-link</i18n:text>
-                    </a>
-                    <xsl:text> | </xsl:text>
-                    <a>
-                        <xsl:attribute name="href">
-                            <xsl:value-of
-                                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                            <xsl:text>/feedback</xsl:text>
-                        </xsl:attribute>
-                        <i18n:text>xmlui.dri2xhtml.structural.feedback-link</i18n:text>
-                    </a>
+
+                <div class="col-lg-4">
+                    <div class="row">
+
+                    </div>
+
+                    <div class="textwidget">
+                        <p>
+                            <a href="http://creativecommons.org/licenses/by/3.0/" rel="license">
+                                <img src="https://learn.saylor.org/theme/image.php/saylor/theme/1431977323/ccby"
+                                     style="border-width:0" alt="Creative Commons License"/>
+                            </a>
+                            <br/>&#169; Saylor Academy 2015. Except where otherwise noted, content on this site is
+                            licensed under a<a href="http://creativecommons.org/licenses/by/3.0/" rel="license">Creative
+                            Commons Attribution 3.0 Unported License</a>.
+                        </p>
+                        <p>Saylor Academy and Saylor.org&#174; are trade names of the Constitution Foundation, a
+                            501(c)(3) organization through which our educational activities are conducted.
+                        </p>
+                        <p>
+                            <a href="http://www.saylor.org/sitemap">Sitemap</a>
+                            |
+                            <a href="http://www.saylor.org/terms-of-use">Terms of Use</a>
+                            |
+                            <a href="http://www.saylor.org/privacy-policy">Privacy Policy</a>
+                        </p>
+                        <p>
+                            <a>
+                                <xsl:attribute name="href">
+                                    <xsl:value-of
+                                            select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                                    <xsl:text>/contact</xsl:text>
+                                </xsl:attribute>
+                                <i18n:text>xmlui.dri2xhtml.structural.contact-link</i18n:text>
+                            </a>
+                            <xsl:text> | </xsl:text>
+                            <a>
+                                <xsl:attribute name="href">
+                                    <xsl:value-of
+                                            select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                                    <xsl:text>/feedback</xsl:text>
+                                </xsl:attribute>
+                                <i18n:text>xmlui.dri2xhtml.structural.feedback-link</i18n:text>
+                            </a>
+                            <!--Invisible link to HTML sitemap (for search engines) -->
+                            <a class="hidden">
+                                <xsl:attribute name="href">
+                                    <xsl:value-of
+                                            select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                                    <xsl:text>/htmlmap</xsl:text>
+                                </xsl:attribute>
+                                <xsl:text>&#160;</xsl:text>
+                            </a>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-lg-3">
+
+                    <ul class="footer-nav">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="http://saylor.org/pathways">Courses</a></li>
+                        <li><a href="http://saylor.org/saylor-difference">Saylor Difference</a></li>
+                        <li><a href="http://saylor.org/about">About</a></li>
+                        <li><a href="http://saylor.org/donate">Donate</a></li>
+                        <li><a href="http://saylor.org/frequently-asked-questions">FAQ</a></li>
+                        <li><a href="http://saylor.org/contact">Contact</a></li>
+                    </ul>
+
                 </div>
             </div>
-            <!--Invisible link to HTML sitemap (for search engines) -->
-            <a class="hidden">
-                <xsl:attribute name="href">
-                    <xsl:value-of
-                            select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                    <xsl:text>/htmlmap</xsl:text>
-                </xsl:attribute>
-                <xsl:text>&#160;</xsl:text>
-            </a>
-            <p>&#160;</p>
         </footer>
     </xsl:template>
 
