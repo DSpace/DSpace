@@ -9,13 +9,16 @@ package org.dspace.app.cris.model.listener;
 
 import javax.persistence.Transient;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.hibernate.event.spi.PreInsertEvent;
 import org.hibernate.event.spi.PreInsertEventListener;
+import org.hibernate.event.spi.PreUpdateEvent;
+import org.hibernate.event.spi.PreUpdateEventListener;
 
-public class CrisIDListener implements PreInsertEventListener 
+public class CrisIDListener implements PreInsertEventListener, PreUpdateEventListener 
 {
     
     @Transient
@@ -49,5 +52,36 @@ public class CrisIDListener implements PreInsertEventListener
         }
         return false;
     }
+
+	@Override
+	public boolean onPreUpdate(PreUpdateEvent event) {
+        Object object = event.getEntity();
+        if (object instanceof ACrisObject)
+        {
+            int idx = 0;
+            boolean found = false;
+            for (String propName : event.getPersister().getPropertyNames())
+            {
+                if ("crisID".equals(propName))
+                {
+                    found = true;
+                    break;
+                }
+                idx++;
+            }
+            if (found)
+            {
+				ACrisObject crisObj = (ACrisObject) object;
+				String crisID = crisObj.getCrisID();
+				if(StringUtils.isBlank(crisID)) {
+					crisID = ResearcherPageUtils
+							.getPersistentIdentifier((ACrisObject) object);
+					event.getState()[idx] = crisID;					
+				}
+				crisObj.setCrisID(crisID);
+            }
+        }
+        return false;
+	}
 
 }
