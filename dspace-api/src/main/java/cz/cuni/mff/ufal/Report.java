@@ -83,7 +83,7 @@ public class Report {
 
 	/** log4j logger. */
 	private static Logger log = Logger.getLogger(Report.class);
-	public static final String EMAIL_PATH = "config/emails/ufal_statistics";
+	public static final String EMAIL_PATH = "config/emails/repository_statistics";
 
 	// generate info (logs) from before 7 days
 	private static final int FROM_LAST_DAYS = -7;
