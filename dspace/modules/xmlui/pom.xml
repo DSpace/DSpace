@@ -291,7 +291,7 @@
 			<artifactId>jargon</artifactId>
 		</dependency>
 
-   </dependencies>
+   
         <!-- DSpace XMLUI API -->
         <dependency>
             <groupId>org.dspace</groupId>
