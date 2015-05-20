@@ -57,42 +57,49 @@ public class XSLTHelper {
 	}
 		
 
-	public static String formatearFecha(String fecha,String language){
-		 String fechaParseada=fecha.split("T")[0];
+	public static String formatearFecha(String date,String language){
+		//Si la fecha viene con el formato aaaa-mm-ddTminutos:segundos:milesimasZ me quedo solo con la fecha
+		 String parsedDate=date.split("T")[0];
+		 Locale locale=null;
+		 String toReplace="";
 		 DateTime dt = new DateTime();
-		 DateTimeFormatter fmt,fmt2; 
+		 DateTimeFormatter fmt; 
 		 String resul,finalDate;
 		 String day="";
 		 String month="";
 		 String[] formats = {"yyyy-MM-dd","yyyy-MM","yyyy"};
-		 String[] secondFormats = {"dd-MMMM-yyyy","MMMM-yyyy","yyyy"};
-		 for(int i=0;i<formats.length;i++){
-			 try{
+		 String[] finalFormats = {"dd-MMMM-yyyy","MMMM-yyyy","yyyy"};
+		 for(int i=0;i<formats.length;i++)
+		 {
+			 try
+			 {
 				 fmt = DateTimeFormat.forPattern(formats[i]);
-				 fmt.parseDateTime(fechaParseada);
+				 fmt.parseDateTime(parsedDate);
 				 if(formats[i]!="yyyy")
 				 {
-					 month=fmt.parseDateTime(fechaParseada).monthOfYear().getAsText()+"-";
+					 month=fmt.parseDateTime(parsedDate).monthOfYear().getAsText()+"-";
 				 }
 				 if(formats[i]=="yyyy-MM-dd")
 				 {
-					 day=fmt.parseDateTime(fechaParseada).getDayOfMonth()+"-";
+					 day=fmt.parseDateTime(parsedDate).getDayOfMonth()+"-";
 				 }				 
-				 finalDate=day+month+fechaParseada.split("-")[0];
-			  	 fmt2 = DateTimeFormat.forPattern(secondFormats[i]);
-			 	 resul= fmt2.parseDateTime(finalDate).toString(secondFormats[i],Locale.getDefault());
-			 	 switch (language){
+				 finalDate=day+month+parsedDate.split("-")[0];
+			  	 fmt = DateTimeFormat.forPattern(finalFormats[i]);			  
+			 	 switch (language)
+			 	 {
 				 case "en":
-						resul= fmt2.parseDateTime(finalDate).toString(secondFormats[i],Locale.US);
-						resul=resul.replace("-", " of ");
+					 	locale=Locale.US;
+						toReplace=" of ";
 						break;
 				
 		 		 default:
-					resul= fmt2.parseDateTime(finalDate).toString(secondFormats[i],Locale.getDefault());
-					resul=resul.replace("-", " de ");
+		 			locale=Locale.getDefault();
+					toReplace=" de ";
 					break;
 				 }
-			 	 return resul;
+			 	resul= fmt.parseDateTime(finalDate).toString(finalFormats[i],locale);
+				resul=resul.replace("-",toReplace);
+			 	return resul;
 				 
 			 }
 			 catch (java.lang.IllegalArgumentException e)
