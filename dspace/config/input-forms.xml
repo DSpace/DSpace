@@ -187,7 +187,7 @@
          <dc-element>lugarDesarrollo</dc-element>
          <repeatable>true</repeatable>
          <label>Lugar de desarrollo</label>
-         <input-type>textarea</input-type>
+         <input-type>onebox</input-type>
          <hint>Institución, departamento y/o unidad en la cual se desarrolló el trabajo. En el caso de informes de investigación, corresponde al punto 4.</hint>
          <required>Debe indicar el lugar o lugares donde se desarrolló el trabajo.</required>
        </field>
@@ -261,7 +261,7 @@
          <dc-element>extent</dc-element>
          <repeatable>false</repeatable>
          <label>Extensión</label>
-         <input-type>textarea</input-type>
+         <input-type>onebox</input-type>
          <hint>Tamaño, duración o cantidad de páginas del recurso.</hint>
        </field>
        
@@ -270,7 +270,7 @@
          <dc-element>publisher</dc-element>
          <repeatable>false</repeatable>
          <label>Editorial</label>
-         <input-type>textarea</input-type>
+         <input-type>onebox</input-type>
          <hint>Entidad responsable de la publicación de un item (editorial).</hint>
        </field>
  	</page>
@@ -516,7 +516,7 @@
          <dc-element>lugarDesarrollo</dc-element>
          <repeatable>true</repeatable>
          <label>Lugar de desarrollo</label>
-         <input-type>textarea</input-type>
+         <input-type>onebox</input-type>
          <hint>Institución, departamento y/o unidad en la cual se desarrolló el trabajo. En el caso de informes de investigación, corresponde al punto 4.</hint>
          <required>Debe indicar el lugar o lugares donde se desarrolló el trabajo.</required>
        </field>
