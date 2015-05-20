@@ -387,7 +387,7 @@ public class ControlPanelReplicationTabHelper {
 	}
 
 	public static void listReplicas(Division div, Request request, Context context) throws WingException {
-		java.util.List<String> list = null;
+		java.util.List<String> list = new ArrayList<>();
 		try {
 			list = ReplicationManager.list(true);
 		} catch (Exception e) {
