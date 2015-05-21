@@ -495,6 +495,11 @@
 							<xsl:with-param name="isDate">True</xsl:with-param>
 						</xsl:call-template>
 						<xsl:call-template name="render-metadata">
+							<xsl:with-param name="field" select="'dcterms.issued'" />
+							<xsl:with-param name="container" select="'li'" />
+							<xsl:with-param name="isDate">True</xsl:with-param>
+						</xsl:call-template>
+						<xsl:call-template name="render-metadata">
 							<xsl:with-param name="field" select="'dcterms.identifier.other'" />
 							<xsl:with-param name="container" select="'li'" />
 						</xsl:call-template>
