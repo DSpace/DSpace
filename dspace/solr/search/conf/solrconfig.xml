@@ -812,7 +812,27 @@
      <lst name="defaults">
        <str name="echoParams">explicit</str>
        <int name="rows">10</int>
-       <str name="df">search_text</str>
+	   <str name="q.alt">*:*</str>
+	   <str name="q.op">OR</str>
+       <str name="defType">edismax</str>
+       <str name="qf">
+          dc.title^10.0 dcterms.title.subtitle^10.0 dcterms.alternative^10.0 dcterms.title.investigacion^9.5
+          dcterms.creator.author^8.0 dcterms.creator.compilator^8.0 dcterms.creator.editor^8.0 dcterms.contributor.director^7.0 dcterms.creator.corporate^7.0 cic.lugarDesarrollo^7.0 
+          dcterms.abstract^6.0 dcterms.abstract.trabajoRealizado^6.0 dcterms.description^6.0
+          dcterms.subject^4.0 dcterms.subject.materia^4.0 dcterms.spatial^4.0 dcterms.subject.area^4.0 dc.type^4.0
+          fulltext^3.5
+          dcterms.publisher^3.0 cic.thesis.degree^3.0 cic.thesis.grantor^2.5
+          dc.identifier.uri^2.0 dcterms.identifier.url^1.5 dcterms.identifier.isbn^1.5 dcterms.identifier.other^1.0
+       </str>
+       <str name="pf">
+          dc.title^10.0 dcterms.title.subtitle^10.0 dcterms.alternative^10.0 dcterms.title.investigacion^9.5
+          dcterms.creator.author^3.0 dcterms.creator.compilator^3.0 dcterms.creator.editor^3.0 dcterms.contributor.director^3.0 dcterms.creator.corporate^3.0 cic.lugarDesarrollo^3.0 
+          dcterms.abstract^2.0 dcterms.abstract.trabajoRealizado^2.0 dcterms.description^2.0
+          dcterms.subject^1.5 dcterms.subject.materia^1.5 dcterms.spatial^1.5 dcterms.subject.area^1.5 dc.type^1.5
+          fulltext^1
+          dcterms.publisher^0.5 cic.thesis.degree^0.5 cic.thesis.grantor^0.2
+       </str>
+		<str name="mm">75%</str>
      </lst>
       <arr name="last-components">
           <str>spellcheck</str>
