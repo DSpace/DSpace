@@ -8,6 +8,10 @@
 
 package org.dspace.xoai.filter;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -21,10 +25,6 @@ import org.dspace.xoai.data.DSpaceItem;
 import org.dspace.xoai.filter.results.DatabaseFilterResult;
 import org.dspace.xoai.filter.results.SolrFilterResult;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * 
  * @author Lyncode Development Team <dspace@lyncode.com>
@@ -32,11 +32,6 @@ import java.util.List;
 public class DSpaceAuthorizationFilter extends DSpaceFilter
 {
     private static Logger log = LogManager.getLogger(DSpaceAuthorizationFilter.class);
-    private Context context;
-
-    public DSpaceAuthorizationFilter (Context context) {
-        this.context = context;
-    }
 
     @Override
     public DatabaseFilterResult buildDatabaseQuery(Context context)

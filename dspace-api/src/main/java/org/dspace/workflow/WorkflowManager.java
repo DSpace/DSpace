@@ -212,7 +212,7 @@ public class WorkflowManager
     {
         ArrayList<WorkflowItem> mylist = new ArrayList<WorkflowItem>();
 
-        String myquery = "SELECT * FROM WorkflowItem WHERE owner= ? ";
+        String myquery = "SELECT * FROM WorkflowItem WHERE owner= ? ORDER BY workflow_id";
 
         TableRowIterator tri = DatabaseManager.queryTable(c,
         		"workflowitem", myquery,e.getID());
@@ -248,7 +248,7 @@ public class WorkflowManager
 
         String myquery = "SELECT workflowitem.* FROM workflowitem, TaskListItem" +
         		" WHERE tasklistitem.eperson_id= ? " +
-        		" AND tasklistitem.workflow_id=workflowitem.workflow_id";
+        		" AND tasklistitem.workflow_id=workflowitem.workflow_id ORDER BY workflowitem.workflow_id";
 
         TableRowIterator tri = DatabaseManager
                 .queryTable(c, "workflowitem", myquery, e.getID());
