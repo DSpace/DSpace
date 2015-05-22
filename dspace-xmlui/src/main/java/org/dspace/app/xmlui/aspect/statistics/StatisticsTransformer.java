@@ -7,6 +7,9 @@
  */
 package org.dspace.app.xmlui.aspect.statistics;
 
+import org.apache.cocoon.ResourceNotFoundException;
+import org.apache.cocoon.environment.ObjectModelHelper;
+import org.apache.cocoon.environment.Request;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -42,6 +45,7 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
     private static final String T_head_visits_countries = "xmlui.statistics.visits.countries";
     private static final String T_head_visits_cities = "xmlui.statistics.visits.cities";
     private static final String T_head_visits_bitstream = "xmlui.statistics.visits.bitstreams";
+    private static final String HANDLE_PREFIX = "handle/";
 
     private Date dateStart = null;
     private Date dateEnd = null;
@@ -103,7 +107,18 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 			}
 			else
 			{
-				renderHome(body);
+				 Request request = ObjectModelHelper.getRequest(objectModel);
+				 String uri = request.getSitemapURI();
+				 if (!uri.startsWith(HANDLE_PREFIX))
+		            {
+		                // Doesn't start with the prefix then no match
+					 	renderHome(body);
+		            }
+				 else
+				 {
+					 throw new ResourceNotFoundException("Unable to locate item");
+				 }
+				
 			}
 
         } catch (RuntimeException e) {
