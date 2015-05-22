@@ -1,0 +1,1 @@
+ALTER TABLE jdyna_widget_text ADD displayFormat varchar2(255);

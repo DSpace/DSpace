@@ -11,17 +11,22 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
 import javax.sql.DataSource;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.Utils;
 import org.dspace.discovery.IndexingService;
 import org.dspace.discovery.SearchServiceException;
 import org.flywaydb.core.Flyway;
@@ -31,6 +36,7 @@ import org.flywaydb.core.internal.dbsupport.DbSupport;
 import org.flywaydb.core.internal.dbsupport.DbSupportFactory;
 import org.flywaydb.core.internal.dbsupport.SqlScript;
 import org.flywaydb.core.internal.info.MigrationInfoDumper;
+import org.flywaydb.core.internal.util.scanner.classpath.ClassPathResource;
 
 /**
  * Utility class used to manage the Database. This class is used by the
@@ -60,6 +66,16 @@ public class DatabaseUtils
                             File.separator + "conf" +
                             File.separator + "reindex.flag";
 
+    private static final String baseConfigurationPostgresFilePath = ConfigurationManager.getProperty("dspace.dir") +
+            File.separator + "etc" +
+            File.separator + "postgres" +
+            File.separator + "base-configuration-crismodule.sql";
+    
+    private static final String baseConfigurationOracleFilePath = ConfigurationManager.getProperty("dspace.dir") +
+            File.separator + "etc" +            
+            File.separator + "oracle" +
+            File.separator + "base-configuration-crismodule.sql";
+    
     /**
      * Commandline tools for managing database changes, etc.
      * @param argv
@@ -219,6 +235,23 @@ public class DatabaseUtils
                     System.out.println("Done.");
                 }
             }
+            // "install-cris-base" = Run Flyway cris-base-configuration
+            else if(argv[0].equalsIgnoreCase("install-cris-base"))
+            {
+                System.out.println("\nDatabase URL: " + url);
+                System.out.println("Attempting to install-cris-base...");                
+                Connection connection = dataSource.getConnection();
+                try {
+                	setupBaseCrisConfiguration(connection);
+                }
+                catch(Exception ex) {
+                	System.out.println(ex.getMessage());                	
+                }
+                finally {
+                	connection.close();
+                }
+                System.out.println("Done.");
+            }
             else
             {
                 System.out.println("\nUsage: database [action]");
@@ -229,6 +262,7 @@ public class DatabaseUtils
                 System.out.println("             Optionally, specify \"ignored\" to also run \"Ignored\" migrations");
                 System.out.println(" - repair  = Attempt to repair any previously failed database migrations");
                 System.out.println(" - clean   = DESTROY all data and tables in Database (WARNING there is no going back!)");
+                System.out.println(" - install-cris-base  = Install base cris configuration");                
                 System.out.println("");
             }
 
@@ -244,7 +278,25 @@ public class DatabaseUtils
 
 
 
-    /**
+    private static void setupBaseCrisConfiguration(Connection connection) throws SQLException, IOException {
+    	DatabaseMetaData meta = connection.getMetaData();
+        String dbKeyword = DatabaseManager.findDbKeyword(meta);
+        String dataMigrateSQL = "";
+        if(dbKeyword.equals(DatabaseManager.DBMS_ORACLE)) {
+        	dataMigrateSQL = Utils.readFile(baseConfigurationOracleFilePath, StandardCharsets.UTF_8);
+        }
+        else if(dbKeyword.equals(DatabaseManager.DBMS_POSTGRES)) {
+        	dataMigrateSQL = Utils.readFile(baseConfigurationPostgresFilePath, StandardCharsets.UTF_8);
+        } else {
+        	System.out.println("\nWARNING---DATABASE NOT SUPPORTED---WARNING");
+        }
+        executeSql(connection, dataMigrateSQL);  
+        connection.commit();
+	}
+
+
+
+	/**
      * Setup/Initialize the Flyway API to run against our DSpace database
      * and point at our migration scripts.
      *

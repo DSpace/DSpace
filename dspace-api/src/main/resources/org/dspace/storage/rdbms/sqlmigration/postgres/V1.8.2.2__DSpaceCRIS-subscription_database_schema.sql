@@ -1,0 +1,2 @@
+ALTER TABLE subscription ADD COLUMN community_id integer;
+ALTER TABLE subscription ADD CONSTRAINT subscription_community_id FOREIGN KEY (community_id) REFERENCES community (community_id) ON UPDATE NO ACTION ON DELETE NO ACTION;
