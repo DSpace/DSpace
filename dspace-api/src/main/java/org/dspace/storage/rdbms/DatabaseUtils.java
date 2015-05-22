@@ -531,22 +531,38 @@ public class DatabaseUtils
         {
             return "5.0.2014.08.08"; // This version matches the version in the SQL migration for this feature
         }
-
+        
         // Is this DSpace 4.x? Look for the "Webapp" table created in that version.
         if(tableExists(connection, "Webapp"))
         {
+            if(tableColumnExists(connection, "jdyna_widget_text", "displayFormat"))
+            {
+                return "4.3.0-DSpaceCRIS";
+            }
+            if(tableColumnExists(connection, "cris_rpage", "sourceRef"))
+            {
+                return "4.1.0-DSpaceCRIS";
+            }
             return "4.0";
         }
 
         // Is this DSpace 3.x? Look for the "versionitem" table created in that version.
         if(tableExists(connection, "versionitem"))
         {
+            if(tableColumnExists(connection, "cris_rp_wpointer", "urlPath"))
+            {
+                return "3.2.1-DSpaceCRIS";
+            }
             return "3.0";
         }
 
         // Is this DSpace 1.8.x? Look for the "bitstream_order" column in the "bundle2bitstream" table
         if(tableColumnExists(connection, "bundle2bitstream", "bitstream_order"))
         {
+            if(tableExists(connection, "cris_rpage"))
+            {
+                return "1.8.2-DSpaceCRIS";
+            }
             return "1.8";
         }
 
