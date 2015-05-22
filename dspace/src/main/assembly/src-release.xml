@@ -33,8 +33,33 @@
          <excludes>
             <exclude>**/target/**</exclude>
             <exclude>.*</exclude>
+            <exclude>**/*.zip</exclude>
          </excludes>
          <!-- Ensure line endings in all files are Unix (LF) line endings-->
+         <lineEnding>unix</lineEnding>
+      </fileSet>
+      <!-- Do not destroy ZIP archives by changing "line" endings! -->
+      <fileSet>
+         <directory>..</directory>
+         <useDefaultExcludes>true</useDefaultExcludes>
+         <includes>
+            <include>**/*.zip</include>
+         </includes>
+         <excludes>
+            <exclude>**/target/**</exclude>
+         </excludes>
+      </fileSet>
+      <!-- Ensure the presence of "empty" directories for build steps
+           that need them. -->
+      <fileSet>
+         <directory>..</directory>
+         <useDefaultExcludes>false</useDefaultExcludes>
+         <includes>
+            <include>dspace/modules/**/.gitignore</include>
+         </includes>
+         <excludes>
+            <exclude>**/target/**</exclude>
+         </excludes>
          <lineEnding>unix</lineEnding>
       </fileSet>
    </fileSets>
