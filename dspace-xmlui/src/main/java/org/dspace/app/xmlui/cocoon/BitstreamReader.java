@@ -11,7 +11,10 @@ import java.io.*;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.mail.internet.MimeUtility;
 import javax.servlet.http.HttpServletResponse;
@@ -29,6 +32,7 @@ import org.apache.cocoon.environment.http.HttpResponse;
 import org.apache.cocoon.reading.AbstractReader;
 import org.apache.cocoon.util.ByteRange;
 import org.apache.commons.lang.StringUtils;
+import org.dspace.app.util.Util;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
@@ -50,7 +54,6 @@ import org.dspace.handle.service.HandleService;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
-
 import org.apache.log4j.Logger;
 import org.dspace.core.LogManager;
 
@@ -378,7 +381,6 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             }
 
             this.bitstreamMimeType = bitstream.getFormat(context).getMIMEType();
-            this.bitstreamName = bitstream.getName();
             if (context.getCurrentUser() == null)
             {
                 this.isAnonymouslyReadable = true;
@@ -395,29 +397,100 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                 }
             }
 
-            // Trim any path information from the bitstream
-            if (bitstreamName != null && bitstreamName.length() >0 )
+            // Set the filename of the requested bitstream depending of 'xmlui.content_disposition_filename' configuration.
+            // Calculate file extension
+            String bitstreamExtension = "";
+		    int finalDotIndex = -1;
+		    if(bitstream.getName() != null)
+		    {
+		    	finalDotIndex = bitstream.getName().lastIndexOf('.');
+		    }
+            if(finalDotIndex > -1)
+		    { 
+			    bitstreamExtension = bitstream.getName().substring(finalDotIndex);
+		    }
+            String bitstreamNameSource = ConfigurationManager.getProperty("xmlui.content_disposition_filename");
+            // If no configuration is specified, defaults to 'handle'.
+            if(bitstreamNameSource == null)
             {
-                        int finalSlashIndex = bitstreamName.lastIndexOf('/');
-                        if (finalSlashIndex > 0)
+            	bitstreamNameSource = "handle";
+            }else if(!bitstreamNameSource.equals("title") && !bitstreamNameSource.equals("description") && !bitstreamNameSource.equals("parameter") && !bitstreamNameSource.equals("handle"))
+            {
+            	log.error("xmlui.content_disposition_filenameSource property in dspace.cfg is misconfigured.");
+            }
+            
+            bitstreamName = null;
+            // Generate the fileName without extension. Subsequently, the extension is concatenated.
+            // Checks if at least least one of the previous options can be executed.
+            if((name != null && name.length() > 0) || (bitstream.getName() != null && bitstream.getName().length() > 0) || (bitstream.getDescription() != null && bitstream.getDescription().length() > 0) || (item != null && item.getHandle() != null))
+            {
+            	if(bitstreamNameSource.equals("title"))
+            	{
+            		if(bitstream.getName() != null && bitstream.getName().length() > 0)
+                    {
+                    	// filename is taken from the Bitstream instance (if exists).
+                		bitstreamName = bitstream.getName();
+                        // Trim any path information from the bitstream
+                		int finalSlashIndex = bitstreamName.lastIndexOf('/');
+                        if(finalSlashIndex > 0)
                         {
-                                bitstreamName = bitstreamName.substring(finalSlashIndex+1);
+                        	bitstreamName = bitstreamName.substring(finalSlashIndex+1);
                         }
-            }
-            else
-            {
-                // In-case there is no bitstream name...
-                if(name != null && name.length() > 0) {
-                    bitstreamName = name;
-                    if(name.endsWith(".jpg")) {
-                        bitstreamMimeType = "image/jpeg";
-                    } else if(name.endsWith(".png")) {
-                        bitstreamMimeType = "image/png";
+                        // Trim the file extension.
+                        if(finalDotIndex > -1)
+                        {
+                        	bitstreamName = bitstreamName.substring(0,finalDotIndex);
+                        }
+                    }else{
+                    	log.warn("The bitstream with ID "+ bitstream.getID() +" hasn't no 'name' attribute, or is empty.");
                     }
-                } else {
-                    bitstreamName = "bitstream";
-                }
+            	}
+            	if(bitstreamNameSource.equals("description"))
+            	{
+            		if(bitstream.getDescription() != null && bitstream.getDescription().length() > 0)
+            		{
+            			bitstreamName = bitstream.getDescription();
+            		}else
+            		{
+            			log.warn("The bitstream with ID "+ bitstream.getID() +" hasn't no 'description' attribute, or is empty.");
+            		}
+            	}
+            	if(bitstreamNameSource.equals("parameter"))
+            	{
+            		if(name != null && name.length() > 0)
+                    {
+                    	// filename is taken from the cocoon parameter called "name" (if exists). 
+            			int nameExtensionIndex = name.lastIndexOf('.');
+            			String parameterName = name; 
+            			if (nameExtensionIndex > -1)
+            			{
+            				parameterName = parameterName.substring(0, nameExtensionIndex); 
+            			}
+            			bitstreamName = parameterName;
+                    }else
+                    {
+                    	log.warn("The URL "+ request.getRequestURI() +" has no 'name' as a parameter, or is empty.");
+                    }
+            		
+            	}
+            	if(bitstreamNameSource.equals("handle"))
+            	{
+            		if(item != null && item.getHandle() != null)
+                    {
+                    	bitstreamName = item.getHandle().replace("/", "_") + "_" + bitstream.getSequenceID();
+                    }else
+                    {
+                    	log.warn("The bitstream with ID "+bitstream.getID()+" has no associated item, or the item doesn't have a 'handle' configured.");
+                    }
+            	}
             }
+            // if the configuration specified cannot be applied, then a generic filename is set.
+            if(bitstreamName == null)
+            {
+            	bitstreamName = "bitstream";
+            }
+            // escape the 'unsafe' chars in the bitstreamName
+            bitstreamName = escapeAsFilename(bitstreamName,"_") + bitstreamExtension;
             
             // Log that the bitstream has been viewed, this is non-cached and the complexity
             // of adding it to the sitemap for every possible bitstream uri is not very tractable
@@ -753,6 +826,54 @@ public class BitstreamReader extends AbstractReader implements Recyclable
     {
         return this.bitstreamMimeType;
     }
+    
+    
+    /**
+     * 	Makes a replacement of a group of reserved chars. This allows to download a filename suitable for its use in many filesystems.
+     *	@param filename - the string to escape
+     *	@param replacement - the string used to replace the reserved chars
+     *  @return a escaped string using the replacement specified, the original string if replacement is null, or null if filename is not specified.
+     */
+    private String escapeAsFilename(String filename, String replacement)
+    {
+    	if(filename == null)
+    	{
+    		return null;
+    	}
+    	if(replacement == null)
+    	{
+    		return filename;
+    	}
+    	ArrayList<Pattern> patternList = new ArrayList<Pattern>();
+    	// Pattern that applies in many OS (Unix, Windows, etc). Represents the characters that will be escaped.
+    	patternList.add(Pattern.compile("[%\\.\"\\*/:<>\\?\\\\\\|\\+,\\.;=\\[\\]]"));
+		// Pattern to delete consecutive existences of the replacement character. P.e: replace "_____a_____b__c" to "_a_b_c".
+    	patternList.add(Pattern.compile(replacement+"+"));
+		
+		// Size restriction (127 characters) for filenames in Android. 123 + 4 --> filename_123.ext
+		int max_length = 123;
+		String encoded = filename; 
+	    for(int i = 0; i < patternList.size(); i++)
+	    {
+	    	StringBuffer sb = new StringBuffer();
+		    
+	    	// Apply the regex.
+		    Matcher m = patternList.get(i).matcher(encoded);
+	
+		    while (m.find())
+		    {		    	
+		        m.appendReplacement(sb,replacement);
+		    }
+		    m.appendTail(sb);
+		    encoded = sb.toString();
+	    }
+	    // Trim the string.
+	    encoded = encoded.trim();
+
+	    // Truncate the string.
+	    int end = Math.min(encoded.length(),max_length);
+	    return encoded.substring(0,end);
+	}
     
     /**
          * Recycle
