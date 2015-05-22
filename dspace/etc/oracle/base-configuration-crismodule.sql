@@ -231,6 +231,7 @@ INSERT INTO cris_rp_pdef VALUES ('1251', '3', '0', '70', '%', 'em', '0', null, '
 INSERT INTO cris_rp_pdef VALUES ('1300', '3', '0', '15','em', 'em', '0', null, null, '0', 'em',  '0', '0', '0', '1000', '0', 'personalpicture', '0', '0', '1300');
 INSERT INTO cris_rp_pdef VALUES ('1400', '3', '0', '0','em', 'em', '0', null, 'Working groups', '0', 'em', '0', '0', '0', '0', '1', 'workgroups', '0', '0', '1400');
 INSERT INTO cris_rp_pdef VALUES ('1800', '3', '0' ,'0','em', 'em', '5', null, 'Interests', '10', 'em',  '0', '1', '0', '50', '1', 'interests', '0', '0', '1800');
+INSERT INTO cris_rp_pdef VALUES ('1900', '3', '0' ,'0','em', 'em', '5', null, 'Orcid', '10', 'em',  '0', '1', '0', '50', '1', 'orcid', '0', '0', '1900');
 
 -- ----------------------------
 -- Records of cris_rp_tab
@@ -363,6 +364,7 @@ INSERT INTO jdyna_widget_text VALUES ('1600', '0', '100', 'em', 'em', '1', null,
 INSERT INTO jdyna_widget_text VALUES ('1601', '0', '30', 'em', 'em', '1', null, '0', null);
 INSERT INTO jdyna_widget_text VALUES ('1700', '0', '100', 'em', 'em', '1', null, '0', null);
 INSERT INTO jdyna_widget_text VALUES ('1800', '0', '30', 'em', 'em', '1', null, '0', null);
+INSERT INTO jdyna_widget_text VALUES ('1900', '0', '30', 'em', 'em', '1', null, '0', null);
 INSERT INTO jdyna_widget_text VALUES ('90050', '0', '30', 'em', 'em', '1', null, '0', null);
 INSERT INTO jdyna_widget_text VALUES ('90051', '0', '30', 'em', 'em', '1', null, '0', null);
 INSERT INTO jdyna_widget_text VALUES ('90052', '0', '30', 'em', 'em', '1', null, '0', null);

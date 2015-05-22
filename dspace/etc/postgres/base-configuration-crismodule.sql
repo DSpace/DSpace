@@ -242,6 +242,7 @@ INSERT INTO "public"."cris_rp_pdef" VALUES ('1251', '3', 'f', '70', '%', 'em', '
 INSERT INTO "public"."cris_rp_pdef" VALUES ('1300', '3', 'f', '15','em', 'em', '0', null, null, '0', 'em',  'f', 'f', 'f', '1000', 'f', 'personalpicture', 'f', 'f', '1300');
 INSERT INTO "public"."cris_rp_pdef" VALUES ('1400', '3', 'f', '0','em', 'em', '0', null, 'Working groups', '0', 'em', 'f', 'f', 'f', '0', 't', 'workgroups', 'f', 'f', '1400');
 INSERT INTO "public"."cris_rp_pdef" VALUES ('1800', '3', 'f' ,'0','em', 'em', '5', null, 'Interests', '10', 'em',  'f', 't', 'f', '50', 't', 'interests', 'f', 'f', '1800');
+INSERT INTO "public"."cris_rp_pdef" VALUES ('1900', '3', 'f' ,'0','em', 'em', '5', null, 'Orcid', '10', 'em',  'f', 't', 'f', '50', 't', 'orcid', 'f', 'f', '1900');
 
 -- ----------------------------
 -- Records of cris_rp_tab
@@ -369,6 +370,7 @@ INSERT INTO "public"."jdyna_widget_text" VALUES ('1600', 'f', '100', 'em', 'em',
 INSERT INTO "public"."jdyna_widget_text" VALUES ('1601', 'f', '30', 'em', 'em', '1', null, 'f', null);
 INSERT INTO "public"."jdyna_widget_text" VALUES ('1700', 'f', '100', 'em', 'em', '1', null, 'f', null);
 INSERT INTO "public"."jdyna_widget_text" VALUES ('1800', 'f', '30', 'em', 'em', '1', null, 'f', null);
+INSERT INTO "public"."jdyna_widget_text" VALUES ('1900', 'f', '30', 'em', 'em', '1', null, 'f', null);
 INSERT INTO "public"."jdyna_widget_text" VALUES ('90050', 'f', '30', 'em', 'em', '1', null, 'f', null);
 INSERT INTO "public"."jdyna_widget_text" VALUES ('90051', 'f', '30', 'em', 'em', '1', null, 'f', null);
 INSERT INTO "public"."jdyna_widget_text" VALUES ('90052', 'f', '30', 'em', 'em', '1', null, 'f', null);
