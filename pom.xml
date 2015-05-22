@@ -672,6 +672,7 @@
         <profile>
            <id>dspace-xmlui-mirage2</id>
            <activation>
+           	   <activeByDefault>false</activeByDefault>
                <file>
                    <exists>dspace-xmlui-mirage2/pom.xml</exists>
                </file>
@@ -687,6 +688,7 @@
          <profile>
             <id>dspace-xmlui</id>
             <activation>
+            	<activeByDefault>false</activeByDefault>
                 <file>
                     <exists>dspace-xmlui/pom.xml</exists>
                 </file>
