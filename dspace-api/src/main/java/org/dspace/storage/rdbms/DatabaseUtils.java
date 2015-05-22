@@ -537,11 +537,11 @@ public class DatabaseUtils
         {
             if(tableColumnExists(connection, "jdyna_widget_text", "displayFormat"))
             {
-                return "4.3.0-DSpaceCRIS";
+                return "4.3.0.0";
             }
             if(tableColumnExists(connection, "cris_rpage", "sourceRef"))
             {
-                return "4.1.0-DSpaceCRIS";
+                return "4.1.0.0";
             }
             return "4.0";
         }
@@ -551,7 +551,7 @@ public class DatabaseUtils
         {
             if(tableColumnExists(connection, "cris_rp_wpointer", "urlPath"))
             {
-                return "3.2.1-DSpaceCRIS";
+                return "3.2.1.0";
             }
             return "3.0";
         }
@@ -561,7 +561,7 @@ public class DatabaseUtils
         {
             if(tableExists(connection, "cris_rpage"))
             {
-                return "1.8.2-DSpaceCRIS";
+                return "1.8.2.0";
             }
             return "1.8";
         }
