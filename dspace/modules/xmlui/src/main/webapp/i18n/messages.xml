@@ -533,7 +533,7 @@
 	<message key="xmlui.EPerson.Navigation.profile">Profile</message>
 	<message key="xmlui.EPerson.Navigation.logout">Logout</message>
 	<message key="xmlui.EPerson.Navigation.login">Login</message>
-	<message key="xmlui.EPerson.Navigation.register">Register</message>
+	<message key="xmlui.EPerson.Navigation.register">Register (non-UM only)</message>
 
 	<!-- org.dspace.app.xmlui.eperson.PasswordLogin.java -->
 	<message key="xmlui.EPerson.PasswordLogin.title">Sign in</message>
@@ -613,13 +613,13 @@
 	<message key="xmlui.EPerson.StartForgotPassword.submit">Send info</message>
 
 	<!-- org.dspace.app.xmlui.eperson.StartRegistration.java -->
-	<message key="xmlui.EPerson.StartRegistration.title">New user registration</message>
+	<message key="xmlui.EPerson.StartRegistration.title">New user registration for non-UM users</message>
 	<message key="xmlui.EPerson.StartRegistration.head1">Email already in use</message>
 	<message key="xmlui.EPerson.StartRegistration.para1">That email address is already in use by another account. If you want to reset the password for this account, click the reset password button below.</message>
 	<message key="xmlui.EPerson.StartRegistration.reset_password_for">Reset password for</message>
 	<message key="xmlui.EPerson.StartRegistration.submit_reset">Reset password</message>
 	<message key="xmlui.EPerson.StartRegistration.head2">New user registration</message>
-	<message key="xmlui.EPerson.StartRegistration.para2">Register an account to subscribe to collections for email updates, and submit new items to MOspace.</message>
+	<message key="xmlui.EPerson.StartRegistration.para2">Non-UM users may register an account to subscribe to collections for email updates.</message>
 	<message key="xmlui.EPerson.StartRegistration.email_address">Email Address</message>
 	<message key="xmlui.EPerson.StartRegistration.email_address_help">This address will be verified and used as your login name. If your e-mail address is in a UM domain (for example: @umsystem.edu, @missouri.edu, @umkc.edu, etc.), you will not be allowed to register. Use <a href="shibboleth-login">UM Single Sign-on (Shibboleth)</a> instead.</message>
 	<message key="xmlui.EPerson.StartRegistration.error_bad_email">Unable to send email to this address.</message>
