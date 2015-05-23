@@ -472,7 +472,7 @@
 
 
 	<!-- General keys used by the EPerson aspect -->
-	<message key="xmlui.EPerson.trail_new_registration">New user registration</message>
+	<message key="xmlui.EPerson.trail_new_registration">New user registration for non-UM users</message>
 	<message key="xmlui.EPerson.trail_forgot_password">Forgot Password</message>
 
 	<!-- org.dspace.app.xmlui.eperson.CannotRegister.java -->
@@ -618,7 +618,7 @@
 	<message key="xmlui.EPerson.StartRegistration.para1">That email address is already in use by another account. If you want to reset the password for this account, click the reset password button below.</message>
 	<message key="xmlui.EPerson.StartRegistration.reset_password_for">Reset password for</message>
 	<message key="xmlui.EPerson.StartRegistration.submit_reset">Reset password</message>
-	<message key="xmlui.EPerson.StartRegistration.head2">New user registration</message>
+	<message key="xmlui.EPerson.StartRegistration.head2">New user registration for non-UM users</message>
 	<message key="xmlui.EPerson.StartRegistration.para2">Non-UM users may register an account to subscribe to collections for email updates.</message>
 	<message key="xmlui.EPerson.StartRegistration.email_address">Email Address</message>
 	<message key="xmlui.EPerson.StartRegistration.email_address_help">This address will be verified and used as your login name. If your e-mail address is in a UM domain (for example: @umsystem.edu, @missouri.edu, @umkc.edu, etc.), you will not be allowed to register. Use <a href="shibboleth-login">UM Single Sign-on (Shibboleth)</a> instead.</message>
