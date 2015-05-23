@@ -146,11 +146,13 @@
 
     <message key="xmlui.Discovery.AbstractSearch.sort_by.head">Sort Options:</message>
     <message key="xmlui.Discovery.AbstractSearch.sort_by.relevance">Relevance</message>
-    <message key="xmlui.Discovery.AbstractSearch.sort_by.dc.title_sort_desc">Title Desc</message>
-    <message key="xmlui.Discovery.AbstractSearch.sort_by.dc.date.issued_dt_desc">Issue Date Desc</message>
+    <message key="xmlui.Discovery.AbstractSearch.sort_by.dc.title_sort_desc">Title (descending order: Z-A)</message>
+    <message key="xmlui.Discovery.AbstractSearch.sort_by.dc.date.issued_dt_desc">Date Issued (recent first)</message>
 
-    <message key="xmlui.Discovery.AbstractSearch.sort_by.dc.title_sort_asc">Title Asc</message>
-    <message key="xmlui.Discovery.AbstractSearch.sort_by.dc.date.issued_dt_asc">Issue Date Asc</message>
+    <message key="xmlui.Discovery.AbstractSearch.sort_by.dc.title_sort_asc">Title (ascending order: A-Z)</message>
+    <message key="xmlui.Discovery.AbstractSearch.sort_by.dc.date.issued_dt_asc">Date Issued (oldest first)</message>
+    <message key="xmlui.Discovery.AbstractSearch.sort_by.dc.date.submitted_dt_asc">Date Added (oldest first)</message>
+    <message key="xmlui.Discovery.AbstractSearch.sort_by.dc.date.submitted_dt_desc">Date Added (recent first)</message>
 
     <message key="xmlui.Discovery.AbstractSearch.rpp">Results Per Page:</message>
 
