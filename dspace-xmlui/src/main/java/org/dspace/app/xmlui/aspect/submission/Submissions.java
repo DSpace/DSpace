@@ -170,7 +170,8 @@ public class Submissions extends AbstractDSpaceTransformer
     	WorkspaceItem[] unfinishedItems = WorkspaceItem.findByEPerson(context,context.getCurrentUser());
     	SupervisedItem[] supervisedItems = SupervisedItem.findbyEPerson(context, context.getCurrentUser());
 
-    	if (unfinishedItems.length <= 0 && supervisedItems.length <= 0)
+        // RE LSO #1386, if this user is an admin, show the start submission link, otherwise skip it
+        if (unfinishedItems.length <= 0 && supervisedItems.length <= 0)
     	{
             Collection[] collections = Collection.findAuthorizedOptimized(context, Constants.ADD);
 
