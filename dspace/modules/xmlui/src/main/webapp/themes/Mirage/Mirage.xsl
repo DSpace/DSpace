@@ -422,12 +422,12 @@
               <h1 class="ds-div-head">Recently integrated journals</h1>
               <div id="recently_integrated_journals" class="ds-static-div primary">
                 <div class="container">
+					<!-- Ecography -->
+							  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aecography%5C%7C%5C%7C%5C%7CEcography"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-Ecog.png" alt="Ecography" /></a>
 					<!-- Ecology -->
-							  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aecology%5C%7C%5C%7C%5C%7CEcology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ecology_cover.png" alt="Ecology" /></a>
+							  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aecology%5C%7C%5C%7C%5C%7CEcology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ecology.png" alt="Ecology" /></a>
                   <!-- Oikos -->
                   <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aoikos%5C%7C%5C%7C%5C%7COikos"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-Oikos.png" alt="Oikos" /></a>
-                  <!-- Systematic Botany -->
-                  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Asystematic%5C+botany%5C%7C%5C%7C%5C%7CSystematic%5C+Botany"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-sysbot.png" alt="Systematic Botany" /></a>
                   <!-- PLOS -->
                   <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aplos%2A"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-plos.png" alt="PLOS" /></a>
                 </div>
