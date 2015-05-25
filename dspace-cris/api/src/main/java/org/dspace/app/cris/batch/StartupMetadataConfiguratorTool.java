@@ -123,8 +123,11 @@ public class StartupMetadataConfiguratorTool
 			fileExcel = line.getOptionValue('f');
 		}
 
-		Context dspaceContext = new Context();
-		dspaceContext.setIgnoreAuthorization(true);
+		Context dspaceContext = null;
+				
+		try {
+		dspaceContext = new Context();
+		dspaceContext.turnOffAuthorisationSystem();
 		DSpace dspace = new DSpace();
 		ApplicationService applicationService = dspace.getServiceManager().getServiceByName("applicationService",
 				ApplicationService.class);
@@ -505,7 +508,15 @@ public class StartupMetadataConfiguratorTool
 				transactionManager.rollback(status);
 			}
 		}
-
+		}catch(Exception ex) {
+			log.error(ex.getMessage());
+		}
+		finally {
+			if(dspaceContext!=null && dspaceContext.isValid()) {
+				dspaceContext.abort();
+			}
+		}
+		
 	}
 
 	private static void buildResearchObject(Workbook workbook, String sheetName,
