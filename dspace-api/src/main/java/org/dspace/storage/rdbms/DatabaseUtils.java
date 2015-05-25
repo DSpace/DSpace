@@ -86,7 +86,7 @@ public class DatabaseUtils
         if (argv.length < 1)
         {
             System.out.println("\nDatabase action argument is missing.");
-            System.out.println("Valid actions: 'test', 'info', 'migrate', 'repair' or 'clean'");
+            System.out.println("Valid actions: 'test', 'info', 'migrate', 'repair', 'clean', 'install-example-cris-base'");
             System.out.println("\nOr, type 'database help' for more information.\n");
             System.exit(1);
         }
@@ -235,11 +235,11 @@ public class DatabaseUtils
                     System.out.println("Done.");
                 }
             }
-            // "install-cris-base" = Run Flyway cris-base-configuration
-            else if(argv[0].equalsIgnoreCase("install-cris-base"))
+            // "install-example-cris-base" = Run Flyway cris-base-configuration
+            else if(argv[0].equalsIgnoreCase("install-example-cris-base"))
             {
                 System.out.println("\nDatabase URL: " + url);
-                System.out.println("Attempting to install-cris-base...");                
+                System.out.println("Attempting to install-example-cris-base...");                
                 Connection connection = dataSource.getConnection();
                 try {
                 	setupBaseCrisConfiguration(connection);
@@ -262,7 +262,7 @@ public class DatabaseUtils
                 System.out.println("             Optionally, specify \"ignored\" to also run \"Ignored\" migrations");
                 System.out.println(" - repair  = Attempt to repair any previously failed database migrations");
                 System.out.println(" - clean   = DESTROY all data and tables in Database (WARNING there is no going back!)");
-                System.out.println(" - install-cris-base  = Install base cris configuration");                
+                System.out.println(" - install-example-cris-base  = Install base cris configuration");                
                 System.out.println("");
             }
 
