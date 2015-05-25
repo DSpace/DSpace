@@ -109,7 +109,7 @@ public class StartupMetadataConfiguratorTool
 		Options options = new Options();
 		options.addOption("f", "excel", true,
 				"Excel file that you can use to create/update DSpace-CRIS properties definitions (metadata for all CRIS software entities; NOTE the script doesn't delete anything but works only in append mode so you can use this option many times)");
-		options.addOption("t", "tabs", false,
+		options.addOption("t", "tabs", true,
 				"Build the base configuration for CRIS entities; Run this only one time to create a Tab that contain one Box with title/name metadata; If runs this script with \"-t advanced\" only for Researcher profile and Journals entity will create the box with the related publications and the \"Details\" box show other metadata e.g. fullName, preferredName, variants, academicName for RP and journalname, journalissn, journaleissn, journalpublisher for Journal entity");
 
 		CommandLine line = parser.parse(options, args);
