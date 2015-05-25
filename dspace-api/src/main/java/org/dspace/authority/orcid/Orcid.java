@@ -13,7 +13,10 @@ import org.dspace.authority.orcid.model.Work;
 import org.dspace.authority.orcid.xml.XMLtoBio;
 import org.dspace.authority.orcid.xml.XMLtoWork;
 import org.dspace.authority.rest.RestSource;
+import org.dspace.content.DCPersonName;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.utils.DSpace;
 import org.w3c.dom.Document;
 
@@ -68,6 +71,12 @@ public class Orcid extends RestSource {
         return converter.convert(bioDocument);
     }
 
+    public List<Bio> queryBio(String field, String name, int start, int rows) {
+        Document bioDocument = restConnector.get("search/orcid-bio?q=" + field +":" + URLEncoder.encode(name) + "&start=" + start + "&rows=" + rows);
+        XMLtoBio converter = new XMLtoBio();
+        return converter.convert(bioDocument);
+    }
+    
     @Override
     public List<AuthorityValue> queryAuthorities(String text, int max) {
         List<Bio> bios = queryBio(text, 0, max);
@@ -86,8 +95,45 @@ public class Orcid extends RestSource {
 
 	@Override
 	public List<AuthorityValue> queryAuthorities(String field, String text, int start, int max) {
-        List<Bio> bios = queryBio(text, start, max);
+        List<Bio> bios = null;
+        if(StringUtils.isNotBlank(field)) {
+        	bios = queryBio(field, text, start, max);
+        }
+        else {
+        	bios = queryBio(text, start, max);
+        }
         List<AuthorityValue> authorities = new ArrayList<AuthorityValue>();
+        for (Bio bio : bios) {
+            authorities.add(OrcidAuthorityValue.create(bio));
+        }
+        return authorities;
+	}
+
+	public List<AuthorityValue> queryOrcidBioByFamilyNameAndGivenName(String text, int start, int max) {
+		DCPersonName tmpPersonName = new DCPersonName(
+	            text);
+
+	    String query = "";
+	    if (StringUtils.isNotBlank(tmpPersonName.getLastName()))
+	    {
+	        query += "family-name:"+tmpPersonName
+	                .getLastName().trim()
+	                + (StringUtils.isNotBlank(tmpPersonName
+	                        .getFirstNames()) ? "" : "*");
+	    }
+
+	    if (StringUtils.isNotBlank(tmpPersonName.getFirstNames()))
+	    {
+	        query += (query.length() > 0 ? " AND given-names:" : "given-names:")
+	                + tmpPersonName
+	                        .getFirstNames().trim() + "*";
+	    }
+	    	    
+	    Document bioDocument = restConnector.get("search/orcid-bio?q=" + URLEncoder.encode(query) + "&start=" + start + "&rows=" + max);
+	    XMLtoBio converter = new XMLtoBio();
+	    List<Bio> bios = converter.convert(bioDocument);
+        
+		List<AuthorityValue> authorities = new ArrayList<AuthorityValue>();
         for (Bio bio : bios) {
             authorities.add(OrcidAuthorityValue.create(bio));
         }
