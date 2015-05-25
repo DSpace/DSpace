@@ -39,7 +39,7 @@ public class ORCIDAuthority extends RPAuthority {
 		if (source != null) {
 			try {
 				List<Choice> results = new ArrayList<Choice>();
-				List<AuthorityValue> values = source.queryAuthorities(field, text, start, max);
+				List<AuthorityValue> values = source.queryOrcidBioByFamilyNameAndGivenName(text, start, max);
 				// adding choices loop
 				int added = 0;
 				for (AuthorityValue val : values) {
