@@ -353,7 +353,7 @@
 
     <message key="xmlui.ArtifactBrowser.RestrictedItem.head_item_claimed">This item is managed by another repository</message>
     <message key="xmlui.ArtifactBrowser.RestrictedItem.head2_item_claimed"><h4>You will find this item at <strong><span class="linkify">{0}</span></strong></h4></message>
-    <message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_claimed">The authors asked us to hide this submission. <strong>We still keep all the data and metadata of the original submission</strong> but the submission is now located at <span class="linkify">{0}</span>. Please contact us at our <a class="helpdesk-tolink">Help Desk</a> if you really need the original submission.</message>
+    <message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_claimed">The authors asked us to hide this submission. <strong>We still keep all the data and metadata of the original submission</strong> but the submission is now located at <span class="linkify">{0}</span>. Please contact us at our <a class="helpdesk-tolink">Help Desk</a> if you need the original submission.</message>
     
     <message key="xmlui.administrative.item.ConfirmItemForm.withdraw_para_extraInfo">You may wish to provide some extra information; a handle in case the item was moved someplace else and/or reason for the removal.</message>
     <message key="xmlui.administrative.item.ConfirmItemForm.withdraw_help_extra_handle">If you fill this, users wanting to view the item will get special message. With a link created from the new PID.</message>
