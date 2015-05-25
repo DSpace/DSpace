@@ -1,3 +1,11 @@
+--
+-- The contents of this file are subject to the license and copyright
+-- detailed in the LICENSE and NOTICE files at the root of the source
+-- tree and available online at
+--
+-- http://www.dspace.org/license/
+--
+
 create table cris_pmc_citation (pubmedID int4 not null, numCitations int4 not null, timestampCreated timestamp, timestampLastModified timestamp, primary key (pubmedID));
 create table cris_pmc_citation2record (cris_pmc_citation_pubmedID int4 not null, pmcRecords_pmcID int4 not null);
 create table cris_pmc_citation_itemIDs (cris_pmc_citation_pubmedID int4 not null, element int4);

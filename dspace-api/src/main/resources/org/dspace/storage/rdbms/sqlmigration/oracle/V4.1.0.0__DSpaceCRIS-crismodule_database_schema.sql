@@ -1,14 +1,11 @@
---   The contents of this file are subject to the license and copyright
---   detailed in the LICENSE and NOTICE files at the root of the source
---   tree and available online at
---   
---   https://github.com/CILEA/dspace-cris/wiki/License
 --
--- SQL commands to upgrade the database schema to a live DSpace-CRIS
+-- The contents of this file are subject to the license and copyright
+-- detailed in the LICENSE and NOTICE files at the root of the source
+-- tree and available online at
 --
--- DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST.
--- DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST.
--- DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST. DUMP YOUR DATABASE FIRST.
+-- http://www.dspace.org/license/
+--
+
 create table cris_do (id number(10,0) not null, crisID varchar2(255 char) unique, sourceID varchar2(255 char), sourceRef varchar2(255 char), status number(1,0), uuid varchar2(255 char) not null unique, timestampCreated timestamp, timestampLastModified timestamp, typo_id number(10,0), primary key (id), unique (sourceID, sourceRef));
 create table cris_do_box (id number(10,0) not null, collapsed number(1,0) not null, externalJSP varchar2(255 char), priority number(10,0) not null, shortName varchar2(255 char) unique, title varchar2(255 char), unrelevant number(1,0) not null, visibility number(10,0), typeDef_id number(10,0), primary key (id));
 create table cris_do_box2con (cris_do_box_id number(10,0) not null, jdyna_containable_id number(10,0) not null);
