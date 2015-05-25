@@ -23,7 +23,7 @@
 
     <xsl:variable name="handle" select="/doc:metadata/doc:element[@name='others']/doc:field[@name='handle']/text()"/>
     <xsl:variable name="dc_identifier_uri" select="/doc:metadata/doc:element[@name='dc']/doc:element[@name='identifier']/doc:element[@name='uri']/doc:element/doc:field[@name='value']"/>
-    <xsl:variable name="modifyDate" select="substring-before(/doc:metadata/doc:element[@name='others']/doc:field[@name='lastModifyDate']/text(),' ')"/>
+    <xsl:variable name="modifyDate" select="/doc:metadata/doc:element[@name='others']/doc:field[@name='lastModifyDate']/text()"/>
     <xsl:variable name="dsURL" select="configuration:getProperty('dspace.url')"/>
     <xsl:variable name="newProfile" select="'clarin.eu:cr1:p_1403526079380'"/>
     <xsl:variable name="oldProfile" select="'clarin.eu:cr1:p_1349361150622'"/>
