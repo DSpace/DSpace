@@ -1724,7 +1724,7 @@
       <connection>scm:git:https://github.com/Cineca/DSpace.git</connection>
       <developerConnection>scm:git:https://github.com/Cineca/DSpace.git</developerConnection>
       <url>https://github.com/Cineca/DSpace.git</url>
-      <tag>dspace-cris-5.2.0</tag>
+      <tag>dspace-cris-master</tag>
    </scm>
 
    <repositories>
