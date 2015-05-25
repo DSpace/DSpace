@@ -89,7 +89,7 @@ create table jdyna_values (DTYPE varchar2(31 char) not null, id number(10,0) not
 create table jdyna_widget_date (id number(10,0) not null, maxYear number(10,0), minYear number(10,0), time number(1,0) not null, primary key (id));
 create table jdyna_widget_link (id number(10,0) not null, labelHeaderLabel varchar2(255 char), labelHeaderURL varchar2(255 char), widgetSize number(10,0) not null, primary key (id));
 create table jdyna_widget_number (id number(10,0) not null, max double precision, min double precision, precisionDef number(10,0) not null, widgetSize number(10,0), primary key (id));
-create table jdyna_widget_text (id number(10,0) not null, collisioni number(1,0), widgetcol number(10,0), measurementUnitCol varchar2(255 char), measurementUnitRow varchar2(255 char), widgetrow number(10,0), htmlToolbar varchar2(255 char), multilinea number(1,0) not null, regex varchar2(255 char), displayFormat varchar2(255 char), primary key (id));
+create table jdyna_widget_text (id number(10,0) not null, collisioni number(1,0), widgetcol number(10,0), measurementUnitCol varchar2(255 char), measurementUnitRow varchar2(255 char), widgetrow number(10,0), htmlToolbar varchar2(255 char), multilinea number(1,0) not null, regex varchar2(255 char), primary key (id));
 alter table cris_do add constraint FK3D8EBCB124A63AA7 foreign key (typo_id) references cris_do_tp;
 alter table cris_do_box add constraint FK29BBA93D1ED73E00 foreign key (typeDef_id) references cris_do_tp;
 alter table cris_do_box2con add constraint FK2532FECD1C4ABF89 foreign key (jdyna_containable_id) references jdyna_containable;
