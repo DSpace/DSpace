@@ -58,6 +58,11 @@ public class S3BitStore implements BitStore
 	
 	/**
      * Initialize the asset store
+     * S3 Requires:
+     *  - access key
+     *  - secret key
+     *  - bucket name
+     *  - Region (optional)
      * 
      * @param config
      *        String used to characterize configuration - may be a configuration
@@ -65,15 +70,7 @@ public class S3BitStore implements BitStore
      */
 	public void init(String config) throws IOException
 	{
-		// use DSpace host name as bucket name - probably should be more unique
-        // Also, bucketname must be lowercase
-		bucketName = "dspace-asset-" + ConfigurationManager.getProperty("dspace.hostname");
-        if(StringUtils.isEmpty(bucketName)) {
-            log.warn("BucketName is not configured, setting default.");
-            bucketName = "dspace";
-        }
-		
-		//  params string contains just the filename of the AWT account data
+        // load configs
 		Properties props = new Properties();
 		try
 		{
@@ -81,40 +78,58 @@ public class S3BitStore implements BitStore
 		}
 		catch(Exception e)
 		{
-			throw new IOException("Exception loading properties: " + e.getMessage());
+			throw new IOException("Exception loading properties. Config: " + config + ", exception: " + e.getMessage());
 		}
+
+        // access / secret
         String awsAccessKey = props.getProperty("aws_access_key_id");
         String awsSecretKey = props.getProperty("aws_secret_access_key");
         if(StringUtils.isBlank(awsAccessKey) || StringUtils.isBlank(awsSecretKey)) {
             log.warn("Empty S3 access or secret");
         }
 
+        // init client
         AWSCredentials awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretKey);
-
         s3Service = new AmazonS3Client(awsCredentials);
 
-        //Todo configurable region
-        Region usEast1 = Region.getRegion(Regions.US_EAST_1);
-        s3Service.setRegion(usEast1);
+        // bucket name
+        bucketName = props.getProperty("bucketName");
+        if(StringUtils.isEmpty(bucketName)) {
+            bucketName = "dspace-asset-" + ConfigurationManager.getProperty("dspace.hostname");
+            log.warn("S3 BucketName is not configured, setting default: " + bucketName);
+        }
 
         try {
-
             if(! s3Service.doesBucketExist(bucketName)) {
                 s3Service.createBucket(bucketName);
-                log.info("Creating S3 Bucket: " + bucketName);
+                log.info("Creating new S3 Bucket: " + bucketName);
             } else {
-                log.info("S3 Bucket already in existence, " + bucketName);
+                log.info("Using existing S3 Bucket: " + bucketName);
             }
-
-		}
+        }
         catch (Exception e)
-		{
-        	throw new IOException("Amazon S3 Exception: " + e.getMessage());
-		}
+        {
+            throw new IOException("Amazon S3 bucket Exception: " + e.getMessage());
+        }
+
+        // region
+        String regionName = props.getProperty("aws_region");
+        if(StringUtils.isNotBlank(regionName)) {
+            try {
+                Regions regions = Regions.fromName(regionName);
+                Region region = Region.getRegion(regions);
+                s3Service.setRegion(region);
+                log.info("S3 Region set to: " + region.getName());
+            } catch (IllegalArgumentException e) {
+                log.warn("Invalid aws_region");
+            }
+        }
+
+        log.debug("AWS S3 Assetstore ready to go!");
 	}
 	
 	/**
-     * Return an identifier unique to this asset store instnace
+     * Return an identifier unique to this asset store instance
      * 
      * @return a unique ID
      */
@@ -218,9 +233,6 @@ public class S3BitStore implements BitStore
             }
             if (attrs.containsKey(Bitstream.CHECKSUM))
             {
-                // WARNING! Amazon docs indicate that ETag value
-                // may not always contain the MD-5 checksum
-                //attrs.put(Bitstream.CHECKSUM, objectMetadata.getETag());
                 attrs.put(Bitstream.CHECKSUM, objectMetadata.getContentMD5());
                 attrs.put(Bitstream.CHECKSUM_ALGORITHM, CSA);
             }
@@ -255,6 +267,8 @@ public class S3BitStore implements BitStore
 	 */
 	public static void main(String[] args) throws Exception
 	{
+        //TODO use proper CLI, or refactor to be a unit test. Can't mock this without keys though.
+
 		// parse command line
 		String assetFile = null;
 		String accessKey = null;
