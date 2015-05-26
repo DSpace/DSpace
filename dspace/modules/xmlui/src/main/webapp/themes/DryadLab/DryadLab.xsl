@@ -44,6 +44,8 @@
     <xsl:import href="DryadItemSummary.xsl"/>
     <xsl:import href="DryadUtils.xsl"/>
     <xsl:import href="DryadSearch.xsl"/>
+    <!-- jimA: overriding the usual collection view -->
+    <xsl:import href="./collection-view.xsl"/>
     <xsl:output indent="yes"/>
     <xsl:variable name="iframe.maxheight" select="confman:getIntProperty('iframe.maxheight', 300)"/>
     <xsl:variable name="iframe.maxwidth" select="confman:getIntProperty('iframe.maxwidth', 600)"/>
@@ -931,6 +933,7 @@ parameter that is being used (see variable defined above) -->
                                                  mode="summaryNonArchivedList" />
                         </xsl:when>
                         <xsl:otherwise>
+			    <!-- This is the template used for the 'DryadLab Activities' collection -->
                             <xsl:apply-templates select="*[not(name()='head')]"
                                                  mode="summaryList" />
                         </xsl:otherwise>

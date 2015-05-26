@@ -40,7 +40,11 @@
     <xsl:import href="lib/xsl/aspect/artifactbrowser/item-view.xsl"/>
     <xsl:import href="lib/xsl/aspect/artifactbrowser/community-list.xsl"/>
     <xsl:import href="lib/xsl/aspect/artifactbrowser/collection-list.xsl"/>
+    <!-- jimA: overriding dri2xhtml-alt templates below
+	 N.B. that this might be better done in 
+	 dspace/modules/xmlui/src/main/webapp/themes/DryadLab/DryadLab.xsl
+    <xsl:import href="./collection-view.xsl"/>
+    -->
     <xsl:output indent="yes"/>
-    
 
 </xsl:stylesheet>
