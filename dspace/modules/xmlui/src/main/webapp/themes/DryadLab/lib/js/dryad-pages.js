@@ -27,6 +27,11 @@ jQuery(document).ready(function() {
         jQuery(buttonId).val(showButton.val());
     }
 
+    if (jQuery('#dryadlab-module-list').length > 0) {
+        // we're on the DryadLab home page (/pages/dryadlab)
+        // loadDryadLabModuleFeed();
+    }
+
 
 
 /* If the page has separate sidebar boxes, try to align the topmost
@@ -672,4 +677,152 @@ function updateCountry(){
     }).done(function ( data ) {
             obj = jQuery.parseJSON(data);
         });
+}
+
+
+/* Client-side behavior for DryadLab home page */
+
+/*
+function loadDryadLabModuleFeed() {
+    console.log('START of loadDryadLabModuleFeed...');
+    var moduleInfo = null;
+    $.get(
+        '/feed/atom_1.0/10255/dryad.7871',  // url (TODO: use root-relative URL instead of production!)
+        function(data) {
+            // 'data' should be an XML root element
+            console.log("Got this feed data:");
+            console.log(data);
+            var howManyEntries = $('entry', data).length;
+            console.log(howManyEntries +' entries found');
+
+            // convert to HTML? or render and style as-is?
+            var $listHolder = $('#dryadlab-module-list');
+            $listHolder.empty();  // clear any stale junk or placeholders
+
+            $('feed entry', data).each( function(i, entry) {
+                // add an entry to our list (filters will apply later)
+                var $entry = $(entry);
+                var oddOrEven =  (i % 2) ? 'even' : 'odd';  // 0 is odd, 1 is even...
+                // gather interesting bits from this entry's info
+                var moduleDOI = $entry.find('id').text().split('/').slice(-2).join('/');
+                    // eg, 'http://datadryad.org/resource/doi:10.5061/dryad.4gk47' ==> 'doi:10.5061/dryad.4gk47'
+                var moduleID = 'module-'+ moduleDOI;
+                var moduleURL = $entry.find('link').attr('href');
+                var moduleTitle = $entry.find('title').html();
+                var moduleAuthor = $entry.find('author name').html();
+                    // TODO: allow for multiple authors here?
+                var modulePublished = $entry.find('published').html(); // ISO dates?
+                var moduleLastModified = $entry.find('updated').html();
+                var moduleSummary = $entry.find('summary').html();
+                // create formatted HTML for this entry
+                var $entryListItem = $('<div id="'+ moduleID +'" class="ds-artifact-item '+ oddOrEven +'">');
+                var $entryBlock = $('<div xmlns:xlink="http://www.w3.org/TR/xlink/" \
+                                          xmlns:mods="http://www.loc.gov/mods/v3" \
+                                          xmlns:dim="http://www.dspace.org/xmlns/dspace/dim" \
+                                          xmlns:dc="http://purl.org/dc/elements/1.1/" \
+                                          xmlns:mets="http://www.loc.gov/METS/" \
+                                          xmlns:dri="http://di.tamu.edu/DRI/1.0/" \
+                                          style="padding: 6px;" class="artifact-description">');
+                $entryListItem.append($entryBlock);
+                var $entryLink = $('<a href="'+ moduleURL +'">');
+                $entryBlock.append($entryLink);
+                $entryLink.append('<span class="author">'+ moduleAuthor +'</span>');
+                $entryLink.append('<span class="pub-date">'+ modulePublished +'</span>');
+                $entryLink.append('<span class="artifact-title">'+ moduleTitle +'</span>');
+                // build a formatted(?) summary and add it
+                $entrySummary = $('<div class="dryadlab-module-summary">');
+                $entrySummary.append( moduleSummary );
+                $entryBlock.append($entrySummary);
+                var moduleDOIasURL = 'http://dx.doi.org/'+ moduleDOI.split(':').slice(-1);  // trim 'doi:' if found
+                $entryBlock.append('<a href="'+ moduleDOIasURL +'" target="_blank">'+ moduleDOI +'</a>');
+                // place the complete HTML for this entry
+                $listHolder.append($entryListItem);
+            });
+        }
+    );
+    console.log('END of loadDryadLabModuleFeed');
+}
+*/
+
+function updatedFilteredModuleList() {
+    // apply any active filters to show only appropriate DryadLab modules
+    var $moduleList = $('#dryadlab-module-list');
+    // read the value for each filter (just once)
+    var $standardsFilter = $('#filter-by-standard');
+    var chosenStandard = $standardsFilter.val();
+    var $gradeLevelFilter = $('#filter-by-grade-level');
+    var chosenGradeLevel = $gradeLevelFilter.val();
+    var $textFilter = $('#filter-by-text');
+    // convert search text to LOWER CASE
+    var searchText = $textFilter.val().toLowerCase();
+    // walk the list and hide/show each module
+    var oddOrEven = 'odd';
+    $moduleList.find('li.ds-artifact-item').each(function(i) {
+        var $module = $(this);
+        // test against each filter in turn; must match all to appear!
+        var matchesAllFilters = true;
+        // convert searchable "fields" in each module's block to LOWER CASE
+        var overview = $module.find('strong:contains(Overview)').parent().text().toLowerCase();
+        var keywords = $module.find('strong:contains(Keywords)').parent().text().toLowerCase();
+        var gradeLevels = $module.find('strong:contains(Level)').parent().text().toLowerCase();
+        var standards = $module.find('strong:contains(Standards)').parent().text().toLowerCase();
+        var duration = $module.find('strong:contains(Duration)').parent().text().toLowerCase();
+        // combine all searchable text as LOWER CASE
+        var searchableText = $module.find('span.title').text().toLowerCase();
+        searchableText += $module.find('ul.text-list').text().toLowerCase();
+
+        if (chosenStandard === 'CHOOSE ONE') {
+            // everything matches
+        } else if (standards.indexOf(chosenStandard.toLowerCase()) === -1) {
+            // no matching standard found
+            matchesAllFilters = false;
+        }
+
+        if (chosenGradeLevel === 'CHOOSE ONE') {
+            // everything matches
+        } else if (gradeLevels.indexOf(chosenGradeLevel.toLowerCase()) === -1) {
+            // no matching grade level found
+            matchesAllFilters = false;
+        }
+
+        if ($.trim(searchText) === '') {
+            // everything matches
+        } else {
+            // search separately for each word, e.g. "bird", "population"
+            var searchWords = searchText.split(' ');
+            $.each(searchWords, function(i, word) {
+                if (searchableText.indexOf(word) === -1) {
+                    // text not found anywhere in this module's description or metadata
+                    matchesAllFilters = false;
+                }
+            });
+        }
+        
+        if (matchesAllFilters) {
+            // update odd/even class for best display
+            if (oddOrEven === 'even') {
+                $module.removeClass('odd');
+                $module.addClass('even');
+                oddOrEven = 'odd';
+            } else {
+                $module.removeClass('even');
+                $module.addClass('odd');
+                oddOrEven = 'even';
+            }
+            $module.show();
+        } else {
+            $module.hide();
+        }
+
+    });
+}
+function resetAllModuleFilters() {
+    // clear all filters and refresh the module list
+    var $standardsFilter = $('#filter-by-standard');
+    var $gradeLevelFilter = $('#filter-by-grade-level');
+    var $textFilter = $('#filter-by-text');
+    $standardsFilter.val('CHOOSE ONE');
+    $gradeLevelFilter.val('CHOOSE ONE');
+    $textFilter.val('');
+    updatedFilteredModuleList();
 }

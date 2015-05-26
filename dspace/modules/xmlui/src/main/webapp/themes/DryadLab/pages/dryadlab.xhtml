@@ -5,48 +5,208 @@
 <html >
   <head> <title>DryadLab</title> </head> <body> <div id="ds-body">
     
-    <p><strong>DryadLab</strong> is an educational complement to the <a href="/">Dryad repository</a>. Here you will find 
-      classroom activities that make use of research data archived in Dryad.</p>
+    <div class="video-placeholder" style="float: right; width: 45%; height: 200px;">
+	<br/>
+	<br/>
+	<br/>
+	{DryadLab video 
+	<br/>
+	goes here}
+    </div>
+    <div class="promotional-block" style="float: left; width: 48%;">
+	<p><strong>DryadLab</strong> is an educational complement to the <a href="/">Dryad data repository</a>. Here you will find 
+	  classroom activities that make use of research data archived in Dryad.</p>
+    </div>
+    <!-- add space, regardless of which element above is tallest -->
+    <div style="clear: both; height: 1em;">&#160;</div>
 
-<div id="ds-system-wide-alert">
-<p>DryadLab is still in development. Please <a href="/feedback">let us know</a> if you find any errors in this content.</p>
-</div>
+    <div class="ds-static-div primary">
+	<h2>DryadLab Activities
+<!-- TODO: add RSS feed and icon?
+	    &#160;&#160;
+	    <a xmlns="http://di.tamu.edu/DRI/1.0/" 
+	       href="/feed/atom_1.0/10255/3" 
+	       class="single-image-link" 
+	       title="Web feed of DryadLab activities">
+		<img src="/themes/Dryad/images/rss.jpg" 
+		     style="border: 0px;" 
+		     alt="RSS feed - DryadLab activities"/>
+	    </a>
+-->
+	</h2>
+	<div style="margin: 0.25em 0 0.5em;">
+        <div style="position: absolute;">
+            <button onclick="resetAllModuleFilters(); return false;">Show all</button> 
+            or filter by
+        </div>
+	    <select id="filter-by-standard"
+                style="margin-left: 140px; width: 320px; margin-bottom: 3px;"
+                onchange="updatedFilteredModuleList(); return false;">
+            <option value="CHOOSE ONE">Filter by standard...</option>
+<!-- TODO: Provide a real/sensible list of standards! -->
+            <option>Next Generation Science Standards (NGSS 2013)</option>
+            <option>Common Core State Standards for Mathematics (NGA 2010)</option>
+            <option>TODO: use actual standards, named verbatim in modules</option>
+	    </select>
+        <br/>
+	    <select id="filter-by-grade-level"
+                style="margin-left: 140px; width: 320px; margin-bottom: 3px;"
+                onchange="updatedFilteredModuleList(); return false;">
+            <option value="CHOOSE ONE">Filter by grade level...</option>
+<!-- TODO: Provide a real/sensible list of grade levels! -->
+            <option value="high school">High school</option>
+            <option value="ap high school">AP high school</option>
+            <option value="undergrad">Undergraduate</option>
+            <option>TODO: use actual grade levels; named verbatim in modules</option>
+	    </select>
+        <br/>
+	    <input id="filter-by-text" type="text" 
+               style="margin-left: 140px; width: 360px; padding: 2px;"
+               placeholder="Search title, description or keywords"
+               onchange="updatedFilteredModuleList(); return false;"
+               onkeyup="updatedFilteredModuleList(); return false;"/>
+	</div>
 
-    <h2>Current Activities</h2>
+<!-- START static module list -->
+	<ul id="dryadlab-module-list" class="ds-artifact-list">
 
-    <p><a href="http://datadryad.org/handle/10255/dryad.40383">A walk through the woods: data analysis of structural adaptations in wood</a></p> 
-    <ul class="text-list">
-      <li>Overview: Students will 1) form hypotheses about the influence of environmental variables on wood structure, 2) test their hypotheses using wood structure data, 3) interpret their results in light of environmental pressures and physiological function and 4) revise hypotheses as necessary.</li>
-      <li>Keywords: hypothesis formulation, hypothesis testing, data visualization, graphing, adaptation, environmental pressures, wood structure and function, ecology, botany, forestry, climate change</li>
-      <li>Instruction Level: Introductory and advanced undergraduate biology courses, high school AP biology</li>
-      <li>Duration: 30 minutes + homework</li>
-    </ul>
+	    <li class="ds-artifact-item odd">
+		<a href="http://datadryad.org/handle/10255/dryad.40383">
+		    <span class="title">
+A walk through the woods: data analysis of structural adaptations in wood
+		    </span>
+<img class="thumb" src="" />
+<img class="thumb" src="" />
+		</a>
+		<ul class="text-list">
+		  <li><strong>Overview:</strong>
+Students will 1) form hypotheses about the influence of environmental variables
+on wood structure, 2) test their hypotheses using wood structure data, 3)
+interpret their results in light of environmental pressures and physiological
+function and 4) revise hypotheses as necessary.
+		  </li>
+		  <li><strong>Keywords:</strong>
+hypothesis formulation, hypothesis testing, data visualization, graphing, adaptation, environmental pressures, wood structure and function, ecology, botany, forestry, climate change
+		  </li>
+		  <li><strong>Instruction Level:</strong>
+Introductory and advanced undergraduate biology courses, AP high school biology
+		  </li>
+		  <li><strong>Academic Standards:</strong><!-- TODO: replace with actual data! -->
+None
+		  </li>
+		  <li><strong>Duration:</strong>
+30 minutes + homework
+		  </li>
+		</ul>
+	    </li>
 
-    <p><a href="http://datadryad.org/handle/10255/dryad.40382">Survivorship in the natural world</a></p> 
-    <ul class="text-list">
-      <li>Overview: Real-life data from seven wild primate populations provide examples of real survivorship curves.</li>
-      <li>Keywords: survivorship, life history, population ecology, demography, life tables, age structure</li>
-      <li>Instruction Level: Undergraduate (Intro Biology or Intro Ecology), AP Biology</li>
-      <li>Duration: Flexible: 20 minutes - 2.5 hours</li>
-    </ul>
+<!--
+-->
+	    <li class="ds-artifact-item even">
+		<a href="http://datadryad.org/handle/10255/dryad.40382">
+		    <span class="title">
+Survivorship in the natural world
+		    </span>
+<img class="thumb" src="" />
+		</a>
+		<ul class="text-list">
+		  <li><strong>Overview:</strong>
+Real-life data from seven wild primate populations provide examples of real survivorship curves.
+		  </li>
+		  <li><strong>Keywords:</strong>
+survivorship, life history, population ecology, demography, life tables, age structure
+		  </li>
+		  <li><strong>Instruction Level:</strong>
+Undergraduate (Intro Biology or Intro Ecology), AP Biology
+		  </li>
+		  <li><strong>Academic Standards:</strong><!-- TODO: replace with actual data! -->
+Next Generation Science Standards (NGSS 2013)
+		  </li>
+		  <li><strong>Duration:</strong>
+Flexible: 20 minutes - 2.5 hours
+		  </li>
+		</ul>
+	    </li>
 
-    <p><a href="http://datadryad.org/handle/10255/dryad.40384">Introduction to extinctions and extinction bias</a></p> 
-    <ul class="text-list">
-      <li>Overview: Students will be introduced to different factors that might affect extinction risk and will work with data on artiodactyls (even-toed, hoofed mammals, such as cows, sheep, deer, antelope, and giraffes) to investigate some of these hypotheses.</li>
-      <li>Keywords: extinction, data analysis, graphing, macroevolution, ecology, conservation</li>
-      <li>Instruction Level: high school, AP high school, intro level undergrad biology</li>
-      <li>Duration: 1.5 hours OR 15 minutes + homework</li>
-    </ul>
+	    <li class="ds-artifact-item odd">
+		<a href="http://datadryad.org/handle/10255/dryad.40384">
+		    <span class="title">
+Introduction to extinctions and extinction bias
+		    </span>
+<img class="thumb" src="" />
+		</a>
+		<ul class="text-list">
+		  <li><strong>Overview:</strong>
+Students will be introduced to different factors that might affect extinction risk and will work with data on artiodactyls (even-toed, hoofed mammals, such as cows, sheep, deer, antelope, and giraffes) to investigate some of these hypotheses.
+		  </li>
+		  <li><strong>Keywords:</strong>
+extinction, data analysis, graphing, macroevolution, ecology, conservation
+		  </li>
+		  <li><strong>Instruction Level:</strong>
+high school, AP high school, intro level undergrad biology
+		  </li>
+		  <li><strong>Academic Standards:</strong><!-- TODO: replace with actual data! -->
+Next Generation Science Standards (NGSS 2013),
+Common Core State Standards for Mathematics (NGA 2010)
+		  </li>
+		  <li><strong>Duration:</strong>
+1.5 hours OR 15 minutes + homework
+		  </li>
+		</ul>
+	    </li>
 
-    <p><a href="http://datadryad.org/handle/10255/dryad.40381">BIRDD: Molecular Evolution</a></p> 
-    <ul>
-      <li>Overview:</li>
-      <li>Keywords:</li>
-      <li>Instruction Level:</li>
-      <li>Duration:</li>
-    </ul>
+	    <li class="ds-artifact-item even">
+		<a href="http://datadryad.org/handle/10255/dryad.40381">
+		    <span class="title">
+BIRDD: Molecular Evolution
+		    </span>
+<img class="thumb" src="" />
+		</a>
+		<ul class="text-list">
+		  <li><strong>Overview:</strong>
+TODO
+		  </li>
+		  <li><strong>Keywords:</strong>
+TODO
+		  </li>
+		  <li><strong>Instruction Level:</strong>
+TODO
+		  </li>
+		  <li><strong>Academic Standards:</strong><!-- TODO: replace with actual data! -->
+Common Core State Standards for Mathematics (NGA 2010)
+		  </li>
+		  <li><strong>Duration:</strong>
+TODO
+		  </li>
+		</ul>
+	    </li>
+
+	</ul>
+
+<!-- END static module list -->
+
+    </div>
     
     <p style="font-size:xx-small;"><a href="/handle/10255/dryad.7872">DryadLab collection page</a></p>
   </div>
+
+<!-- TODO: move into proper #ds-options-wrapper? -->
+    <div id="dryadlab-home-sidebar">
+
+	<h2 class="ds-option-set-head">Testmonials</h2>
+
+	<p class="testimonial">This material is awesome! My kids were completely engaged.</p>
+	<p class="testimonial-byline">&#8212; K.L., high school teacher</p>
+
+	<p class="testimonial">The DryadLab team took the time to really understand my work and make it accessible to young students. I didn't think it could be done!</p>
+	<p class="testimonial-byline">&#8212;  S.J., research biologist</p>
+		
+	<h2 class="ds-option-set-head" style="margin-top: 1.5em;">Work with DryadLab</h2>
+	<p>
+	    Do you have an interesting dataset published on Dryad? We're looking for our next set of modules. Let's talk about how <a href="/pages/workWithDryadLab">we can help meet your outreach needs</a> and teach the next generation of researchers and informed laypeople.
+	</p>
+
+    </div>
+
   </body>
 </html>

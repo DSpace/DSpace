@@ -1055,9 +1055,52 @@ img.ds-authority-confidence.cf-blank {
     font-size: 100%;
 }
 
-#recently-published-data .odd
+#recently-published-data .odd,
+#dryadlab-module-list li.odd
 {
     background-color: #f9fff9;
+}
+#dryadlab-module-list li {
+    list-style: none;
+}
+#dryadlab-module-list li.ds-artifact-item {
+    padding: 12px 18px !important;
+    overflow: hidden;
+}
+#dryadlab-module-list .thumb {
+    width: 200px;
+    height: 150px;
+    background-color: #000;
+    float: left;
+    clear: left;
+    text-indent: 0;
+    margin: 6px 0;
+}
+#dryadlab-module-list span.title {
+    display: block;
+    font-weight: bold;
+    font-size: 1.1em;
+    margin: 0 0 5px 20px;
+}
+#dryadlab-module-list ul {
+    margin-left: 240px;
+}
+#dryadlab-home-sidebar {
+    position: absolute;
+    top: 12px;
+    left: 700px;
+}
+#dryadlab-home-sidebar h2 {
+    margin-bottom: 0.5em;
+}
+#dryadlab-home-sidebar .testimonial {
+    font-style: italic;
+    margin-bottom: 0.25em;
+}
+#dryadlab-home-sidebar .testimonial-byline {
+    text-align: right;
+    font-size: 0.9em;
+    color: #555;
 }
 
 .italics {
@@ -2570,4 +2613,29 @@ td.ds-author-input-col {
 }
 td.ds-author-input-col input {
     width: 45%;
+}
+.promotional-block {
+    line-height: 1.25em; 
+    padding: 6px 20px;
+    font-size: 1.1em;
+/*
+    border: 1px #eee solid;
+    background-color: #f5f5f5;
+*/
+    margin-bottom: 1em;
+}
+.promotional-block p {
+    line-height: 1.25em !important; 
+}
+/*
+.promotional-block p:last-child {
+    margin-bottom: 0 !important;
+}
+*/
+.video-placeholder {
+    background-color: #000;
+    font-size: 18px;
+    color: #eee;
+    font-weight: bold;
+    text-align: center;
 }
