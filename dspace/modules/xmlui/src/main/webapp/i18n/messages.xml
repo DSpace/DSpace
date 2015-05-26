@@ -105,8 +105,8 @@
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.relevance">relevance</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by">Sort items by</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.order">in order</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.order.asc">ascending</message>
-	<message key="xmlui.ArtifactBrowser.AbstractSearch.order.desc">descending</message>
+	<message key="xmlui.ArtifactBrowser.AbstractSearch.order.asc">ascending (A-Z)</message>
+	<message key="xmlui.ArtifactBrowser.AbstractSearch.order.desc">descending (Z-A)</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.rpp">Results/page</message>
 
     <!-- org.dspace.app.xmlui.artifactbrowser.AdvancedSearch.java -->
@@ -174,8 +174,8 @@
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.sort_by.dateissued">date issued</message>
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.sort_by.dateaccessioned">submit date</message>
 
-	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.order.asc">ascending</message>
-	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.order.desc">descending</message>
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.order.asc">ascending (A-Z)</message>
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.order.desc">descending (Z-A)</message>
 
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.author.column_heading">Authors Name</message>
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.dateissued.column_heading">Date Issued</message>

@@ -24,6 +24,12 @@
 */
 
 // override DSpace default styling
+
+// links should be underlined all the time
+a {
+	text-decoration: underline;
+}
+
 .navbar {
     height: 80px;
 }
