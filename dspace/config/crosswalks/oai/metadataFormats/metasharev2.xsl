@@ -7,8 +7,9 @@
     xmlns:isocodes="cz.cuni.mff.ufal.IsoLangCodes"
     xmlns:license="cz.cuni.mff.ufal.utils.LicenseUtil"
     xmlns:xalan="http://xml.apache.org/xslt"
+    xmlns:str="http://exslt.org/strings"
     xmlns:ms="http://www.ilsp.gr/META-XMLSchema"
-    exclude-result-prefixes="doc logUtil isocodes license xalan"
+    exclude-result-prefixes="doc logUtil isocodes license xalan str"
     version="1.0">
     
     <xsl:output omit-xml-declaration="yes" method="xml" indent="yes" xalan:indent-amount="4"/>
@@ -142,6 +143,10 @@
 					<xsl:value-of
 						select="doc:metadata/doc:element[@name='metashare']/doc:element[@name='ResourceInfo#ContactInfo#PersonInfo']/doc:element[@name='surname']/doc:element/doc:field[@name='value']" />
 				</xsl:when>
+                <xsl:when
+                    test="doc:metadata/doc:element[@name='local']/doc:element[@name='contact']/doc:element[@name='person']/doc:element/doc:field[@name='value']">
+                    <xsl:value-of select="str:split(doc:metadata/doc:element[@name='local']/doc:element[@name='contact']/doc:element[@name='person']/doc:element/doc:field[@name='value'], '@@')[2]"/>
+                </xsl:when>
 				<xsl:otherwise>
 					<xsl:value-of select="logUtil:logMissing('surname',$handle)" />
 				</xsl:otherwise>
@@ -153,6 +158,10 @@
                     test="doc:metadata/doc:element[@name='metashare']/doc:element[@name='ResourceInfo#ContactInfo#PersonInfo']/doc:element[@name='givenName']/doc:element/doc:field[@name='value']">
                     <xsl:value-of
                         select="doc:metadata/doc:element[@name='metashare']/doc:element[@name='ResourceInfo#ContactInfo#PersonInfo']/doc:element[@name='givenName']/doc:element/doc:field[@name='value']" />
+                </xsl:when>
+                <xsl:when
+                    test="doc:metadata/doc:element[@name='local']/doc:element[@name='contact']/doc:element[@name='person']/doc:element/doc:field[@name='value']">
+                    <xsl:value-of select="str:split(doc:metadata/doc:element[@name='local']/doc:element[@name='contact']/doc:element[@name='person']/doc:element/doc:field[@name='value'], '@@')[1]"/>
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:value-of select="logUtil:logMissing('givenName',$handle)" />
@@ -171,6 +180,16 @@
 					<xsl:call-template name="CommunicationInfo" />
 				</ms:affiliation>
 			</xsl:when>
+			<xsl:when 
+                test="doc:metadata/doc:element[@name='local']/doc:element[@name='contact']/doc:element[@name='person']/doc:element/doc:field[@name='value']">
+				<ms:affiliation>
+				    <ms:organizationName>
+					   <xsl:value-of select="str:split(doc:metadata/doc:element[@name='local']/doc:element[@name='contact']/doc:element[@name='person']/doc:element/doc:field[@name='value'], '@@')[4]" />
+					</ms:organizationName>
+					<!--another communicationInfo needed -->
+					<xsl:call-template name="CommunicationInfo" />
+				</ms:affiliation>
+			</xsl:when>
 		</xsl:choose>
 	</ms:contactPerson>
     </xsl:template>
@@ -183,6 +202,10 @@
                             test="doc:metadata/doc:element[@name='metashare']/doc:element[@name='ResourceInfo#ContactInfo#PersonInfo#OrganizationInfo#CommunicationInfo']/doc:element[@name='email']/doc:element/doc:field[@name='value']">
                             <xsl:value-of
                                 select="doc:metadata/doc:element[@name='metashare']/doc:element[@name='ResourceInfo#ContactInfo#PersonInfo#OrganizationInfo#CommunicationInfo']/doc:element[@name='email']/doc:element/doc:field[@name='value']" />
+                        </xsl:when>
+                        <xsl:when
+                            test="doc:metadata/doc:element[@name='local']/doc:element[@name='contact']/doc:element[@name='person']/doc:element/doc:field[@name='value']">
+                            <xsl:value-of select="str:split(doc:metadata/doc:element[@name='local']/doc:element[@name='contact']/doc:element[@name='person']/doc:element/doc:field[@name='value'], '@@')[3]"/>
                         </xsl:when>
                         <xsl:otherwise>
                             <xsl:value-of select="logUtil:logMissing('email',$handle)" />
@@ -262,6 +285,20 @@
                             </xsl:otherwise>
                         </xsl:choose>                    
                 </ms:resourceCreationInfo>
+            </xsl:when>
+            <xsl:when test="doc:metadata/doc:element[@name='local']/doc:element[@name='sponsor']/doc:element/doc:field[@name='value']">
+                                <xsl:for-each select="doc:metadata/doc:element[@name='local']/doc:element[@name='sponsor']/doc:element/doc:field[@name='value']">
+                                    <ms:resourceCreationInfo>
+                                                <ms:fundingProject>
+                                                    <ms:projectName>
+                                                            <xsl:value-of select="str:split(., '@@')[3]"/>
+                                                    </ms:projectName>
+                                                    <ms:fundingType>
+                                                            <xsl:value-of select="str:split(., '@@')[4]"/>
+                                                    </ms:fundingType>
+                                                </ms:fundingProject>
+                                    </ms:resourceCreationInfo>
+                                </xsl:for-each>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:choose>
@@ -408,8 +445,13 @@
 						test="/doc:metadata/doc:element[@name='metashare']/doc:element[@name='ResourceInfo#TextInfo#SizeInfo']/doc:element[@name='size']/doc:element/doc:field[@name='value']">
 						<xsl:apply-templates select="/doc:metadata/doc:element[@name='metashare']/doc:element[@name='ResourceInfo#TextInfo#SizeInfo']/doc:element[@name='size']"/>
 					</xsl:when>
+                    <xsl:when
+                        test="doc:metadata/doc:element[@name='local']/doc:element[@name='size']/doc:element[@name='info']/doc:element/doc:field[@name='value']">
+                        <xsl:value-of select="str:split(doc:metadata/doc:element[@name='local']/doc:element[@name='size']/doc:element[@name='info']/doc:element/doc:field[@name='value'], '@@')[1]"/>
+                    </xsl:when>
 					<xsl:otherwise>
-						<xsl:value-of select="logUtil:logMissing('size',$handle)" />
+                        			<xsl:variable name="iJustWantToLog" select="logUtil:logMissing('size',$handle)" />
+						<xsl:value-of select="count(/doc:metadata/doc:element[@name='bundles']/doc:element[@name='bundle']/doc:field[@name='name'][text()='ORIGINAL']/../doc:element[@name='bitstreams']/doc:element[@name='bitstream'])"/>
 					</xsl:otherwise>
 				</xsl:choose>
 			</ms:size>
@@ -420,8 +462,13 @@
 						<xsl:value-of
 							select="/doc:metadata/doc:element[@name='metashare']/doc:element[@name='ResourceInfo#TextInfo#SizeInfo']/doc:element[@name='sizeUnit']/doc:element/doc:field[@name='value']" />
 					</xsl:when>
+                    <xsl:when
+                        test="doc:metadata/doc:element[@name='local']/doc:element[@name='size']/doc:element[@name='info']/doc:element/doc:field[@name='value']">
+                        <xsl:value-of select="str:split(doc:metadata/doc:element[@name='local']/doc:element[@name='size']/doc:element[@name='info']/doc:element/doc:field[@name='value'], '@@')[2]"/>
+                    </xsl:when>
 					<xsl:otherwise>
-						<xsl:value-of select="logUtil:logMissing('sizeUnit',$handle)" />
+                        			<xsl:variable name="iJustWantToLog" select="logUtil:logMissing('size',$handle)" />
+						<xsl:text>files</xsl:text>
 					</xsl:otherwise>
 				</xsl:choose>
 			</ms:sizeUnit>

@@ -19,6 +19,7 @@ public class XslLogUtil {
 		defaults = new HashMap<String,String>();
 		defaults.put("type", "corpus");
 		defaults.put("mediaType", "text");
+		defaults.put("distributionAccessMedium", "downloadable");
 	}
 	
 	public static String logMissing(String key, String handle){
