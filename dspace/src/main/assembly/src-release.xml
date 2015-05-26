@@ -38,7 +38,8 @@
          <!-- Ensure line endings in all files are Unix (LF) line endings-->
          <lineEnding>unix</lineEnding>
       </fileSet>
-      <!-- Do not destroy ZIP archives by changing "line" endings! -->
+      <!-- Do not destroy ZIP archives by changing "line" endings!
+           (e.g. SWORD's example.zip) -->
       <fileSet>
          <directory>..</directory>
          <useDefaultExcludes>true</useDefaultExcludes>
@@ -49,8 +50,10 @@
             <exclude>**/target/**</exclude>
          </excludes>
       </fileSet>
-      <!-- Ensure the presence of "empty" directories for build steps
-           that need them. -->
+      <!-- Ensure the presence of "empty" overlay directories for build
+           steps that need them.
+           By default our ".gitignore" files are excluded by
+           "useDefaultExcludes=true". -->
       <fileSet>
          <directory>..</directory>
          <useDefaultExcludes>false</useDefaultExcludes>
