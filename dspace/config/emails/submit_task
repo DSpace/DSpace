@@ -4,9 +4,9 @@
 # {1}  Name of collection
 # {2}  submitter's name
 # {3}  Description of task
-# {4}  link to 'my DSpace' page 
+# {4}  link to 'my MOspace' page 
 #
-Subject: DSpace: You have a new task
+Subject: MOspace: You have a new task
 
 A new item has been submitted:
 
@@ -16,9 +16,9 @@ Submitted by: {2}
 
 {3}
 
-To claim this task, please visit your "My DSpace"
-page:  {4}
+To claim this task, please log in to MOspace
+https://mospace.umsystem.edu/xmlui/login
 
 Many thanks!
 
-DSpace
+MOspace

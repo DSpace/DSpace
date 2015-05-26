@@ -4,13 +4,13 @@
 # {1}  Name of collection
 # {2}  handle 
 #
-Subject: DSpace: Submission Approved and Archived 
+Subject: MOspace: Submission Approved and Archived 
 
 You submitted: {0}
 
 To collection: {1}
 
-Your submission has been accepted and archived in DSpace,
+Your submission has been accepted and archived in MOspace,
 and it has been assigned the following identifier:
 {2}
 
@@ -18,4 +18,4 @@ Please use this identifier when citing your submission.
 
 Many thanks!
 
-DSpace
+MOspace

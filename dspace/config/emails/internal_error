@@ -1,6 +1,6 @@
 # E-mail sent to designated address when an internal server error occurs
 #
-# Parameters: {0} DSpace server URL
+# Parameters: {0} MOspace server URL
 #             {1} Date & time
 #             {2} Session ID
 #             {3} URL + HTTP parameters, if any
@@ -10,7 +10,7 @@
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: DSpace: Internal Server Error
+Subject: MOspace: Internal Server Error
 An internal server error occurred on {0}:
 
 Date:       {1}

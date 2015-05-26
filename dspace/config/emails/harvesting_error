@@ -8,7 +8,7 @@
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: DSpace: Harvesting Error
+Subject: MOspace: Harvesting Error
 Collection {0} failed on harvest:
 
 Date:       	{1}

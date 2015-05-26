@@ -10,7 +10,7 @@
 #             {7} sender message 
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: An item of interest from DSpace
+Subject: An item of interest from MOspace
 
 Hello {0}:
 
@@ -21,6 +21,6 @@ Location: {5}
 In Collection: {6}
 Personal Message: {7}
 
-The DSpace digital repository system captures, stores, indexes, preserves, and distributes digital material.
-For more information, visit www.dspace.org
+The MOspace digital repository system captures, stores, indexes, preserves, and distributes digital material.
+For more information, visit https://mospace.umsystem.edu/xmlui
 

@@ -1,14 +1,14 @@
 # Registration notification email
 #
-# Parameters: {0} The name of the DSpace instance
-#             {1} The URL of the DSpace instance 
+# Parameters: {0} The name of the MOspace instance
+#             {1} The URL of the MOspace instance 
 #             {2} Name:
 #             {3} Email:
 #             {4} Registration Date:
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: DSpace: Registration Notification
+Subject: MOspace: Registration Notification
 
 A new user has registered on {0} at {1}:
 
