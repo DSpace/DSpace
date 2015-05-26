@@ -53,6 +53,7 @@
                 <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='ORE']"/>
             </xsl:when>
             <xsl:otherwise>
+<h1>TEST from themes/DryadLab/lib/xsl/aspect/artifactbrowser/item-view.xsl</h1>
                 <h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text></h2>
                 <table class="ds-table file-list">
                     <tr class="ds-table-header-row">

@@ -23,6 +23,7 @@
 
 
     <xsl:template match="dri:referenceSet[@type = 'embeddedView']" priority="2">
+<h1>TEST from themes/DryadLab/integrated-view.xsl</h1>
       <h2 class="ds-list-head">Files in this package</h2>
         <div class="file-list">
 	   <!-- TODO: need to test if we have one of the specially-licensed items -->
