@@ -1,42 +1,41 @@
 function createRejectedFilesDialog(files, fileUploadDialog) {
 	jQuery('#rejected_files').remove();
-	var filesToRejectDiv = jQuery("<div id=\"rejected_files\" class=\"well well-light \"><p>The following files are too large for conventional upload (limit is "
-			+ convertBytesToHumanReadableForm(lindat_upload_file_alert_max_file_size)
-			+ "). Please contact <a href=\"mailto:"
-			+ ufal_help_mail
-			+ "\">Help Desk</a> about how to upload these files.</p></div>");
-	filesToRejectDiv.attr('class', 'modal-body');
-
+	var modal_str = '<div class="modal fade" id="rejected_files" tabindex="-1" role="dialog">\
+<div class="modal-dialog">\
+<div class="modal-content">\
+<div class="modal-header">\
+<button type="button" class="close" data-dismiss="modal">&times;</button>\
+<h4 class="modal-title">Rejected files</h4>\
+</div>\
+<div class="modal-body" id="rejected_modal_body"><p>The following files are too large for conventional upload (limit is '
++ convertBytesToHumanReadableForm(lindat_upload_file_alert_max_file_size)
++ '). Please contact <a href="mailto:' + ufal_help_mail + '">Help Desk</a> about how to upload these files.</p>\
+</div>\
+<div class="modal-footer">\
+<button type="button" class="btn btn-primary" id="js-ok-button">OK</button>\
+</div>\
+</div>\
+</div>';
+	var jModal = jQuery(modal_str);
+	var modal_body = jModal.find("#rejected_modal_body");
 	for ( var i = 0; i < files.length; i++) {
 		var file = files[i];
-		filesToRejectDiv.append("<div id='fileName" + i + "'><b>Filename: </b>"
+		modal_body.append("<div id='fileName" + i + "'><b>Filename: </b>"
 				+ file.name + "</div>");
-		filesToRejectDiv.append("<div id='fileSize" + i + "'><b>Size: </b>"
+		modal_body.append("<div id='fileSize" + i + "'><b>Size: </b>"
 				+ convertBytesToHumanReadableForm(file.size) + "</span></div>");
-		filesToRejectDiv.append("<br />");
+		modal_body.append("<br />");
 	}
-
-	return filesToRejectDiv.dialog({
-		modal : true,
-		title : "Rejected files",
-		resizable : true,
-		autoOpen : false,
-		width : 600,
-		dialogClass : "modal well well-light",
-		buttons : [ {
-			text : "OK",
-			class : "btn btn-repository",
-			click : function() {
-				jQuery(this).dialog("close");
+	jModal.find("#js-ok-button").click(function() {
+				jModal.modal("toggle");
 				if (fileUploadDialog != undefined) {
-					fileUploadDialog.dialog("open");
+					fileUploadDialog.modal();
 				} else {
 					jQuery("#file_upload #aspect_submission_StepTransformer_field_file")
 							.val("");
 				}
-			}
-		} ],
-	});
+			});
+	return jModal;
 }
 
 function convertBytesToHumanReadableForm(b) {
@@ -260,7 +259,7 @@ function processFiles(files) {
 	}
 
 	if (rejectedFilesDialog != undefined) {
-		rejectedFilesDialog.dialog("open");
+		rejectedFilesDialog.modal();
 	} else if (fileUploadDialog != undefined) {
 		fileUploadDialog.modal();
 	}
