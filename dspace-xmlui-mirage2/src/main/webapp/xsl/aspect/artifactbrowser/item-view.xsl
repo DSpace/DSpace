@@ -326,7 +326,7 @@
     <xsl:template name="itemSummaryView-DIM-file-section">
         <xsl:choose>
             <xsl:when test="//mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL' or @USE='LICENSE']/mets:file">
-                <div class="item-page-field-wrapper table">
+                <div class="item-page-field-wrapper table word-break">
                     <h5>
                         <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-viewOpen</i18n:text>
                     </h5>
