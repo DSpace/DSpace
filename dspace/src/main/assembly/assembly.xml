@@ -76,6 +76,11 @@
          <outputDirectory>config</outputDirectory>
          <filtered>true</filtered>
       </file>
+	  <file>
+         <source>config/hibernate.properties</source>
+         <outputDirectory>config</outputDirectory>
+         <filtered>true</filtered>
+      </file>
       <file>
          <source>config/log4j.properties</source>
          <outputDirectory>config</outputDirectory>
