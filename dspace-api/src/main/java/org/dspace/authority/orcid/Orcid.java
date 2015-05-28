@@ -7,6 +7,12 @@
  */
 package org.dspace.authority.orcid;
 
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.orcid.model.Bio;
 import org.dspace.authority.orcid.model.Work;
@@ -14,15 +20,8 @@ import org.dspace.authority.orcid.xml.XMLtoBio;
 import org.dspace.authority.orcid.xml.XMLtoWork;
 import org.dspace.authority.rest.RestSource;
 import org.dspace.content.DCPersonName;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.utils.DSpace;
 import org.w3c.dom.Document;
-
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
