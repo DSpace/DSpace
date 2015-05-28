@@ -189,6 +189,9 @@
             <link rel="stylesheet" href="{concat($theme-path, '../mirage2/styles/dspace-bootstrap-tweaks.css')}"/>
             <link rel="stylesheet" href="{concat($theme-path, '../mirage2/styles/jquery-ui-1.10.3.custom.css')}"/>
 
+            <link rel="stylesheet" href="{concat($theme-path, '../mirage2/vendor/BookReader/BookReader.css')}"/>
+            <link rel="stylesheet" href="{concat($theme-path, '../mirage2/styles/snazy.css')}"/>
+
             <!-- Local css -->
             <link rel="stylesheet" href="{concat($theme-path, 'styles/theme.css')}"/>
 
@@ -292,6 +295,15 @@
             <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[substring(@element, 1, 9) = 'citation_']">
                 <meta name="{@element}" content="{.}"></meta>
             </xsl:for-each>
+
+            <script src="//jwpsrv.com/library/tdG5srbdEeSqzQp+lcGdIw.js"></script>
+	    <link rel="sitemap">
+                <xsl:attribute name="href">
+                    <xsl:value-of
+                            select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                    <xsl:text>/sitemap</xsl:text>
+                </xsl:attribute>
+            </link>
 
         </head>
     </xsl:template>
@@ -731,6 +743,21 @@
 
         <script src="{$theme-path}../mirage2/scripts/theme.js">&#160;</script>
 
+	<script src="//code.jquery.com/jquery-migrate-1.2.1.js"></script>
+        <script src="{$theme-path}../mirage2/scripts/holder.js">&#160;</script>
+
+        <script src="{$theme-path}../mirage2/vendor/BookReader/jquery-ui-1.8.5.custom.min.js"></script>
+        <script src="{$theme-path}../mirage2/vendor/BookReader/dragscrollable.js"></script>
+        <script src="{$theme-path}../mirage2/vendor/BookReader/jquery.colorbox-min.js"></script>
+        <script src="{$theme-path}../mirage2/vendor/BookReader/jquery.ui.ipad.js"></script>
+        <script src="{$theme-path}../mirage2/vendor/BookReader/jquery.bt.min.js"></script>
+        <script src="{$theme-path}../mirage2/vendor/BookReader/BookReader.js"></script>
+        <script src="{$theme-path}../mirage2/vendor/BookReader/BookReaderJSSimple.js"></script>
+
+        <!-- Snazy -->
+        <script src="{$theme-path}../mirage2/scripts/jquery.lazyload.min.js"></script>
+        <script src="{$theme-path}../mirage2/scripts/snazy.js"></script>
+
         <!-- add "shared" javascript from static, path is relative to webapp root -->
         <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][@qualifier='url']">
             <script type="text/javascript">
@@ -787,7 +814,7 @@
                   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
                   })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-                  ga('create', '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']"/><xsl:text>', '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='serverName']"/><xsl:text>');
+                  ga('create', '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']"/><xsl:text>', 'auto');
                   ga('send', 'pageview');
            </xsl:text></script>
         </xsl:if>
