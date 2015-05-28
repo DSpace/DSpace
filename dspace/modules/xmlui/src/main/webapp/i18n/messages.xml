@@ -185,9 +185,13 @@
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.advisor.column_heading">Theses Advisor</message>
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.authorcontributor.column_heading">Author/Contriubtor</message>
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.identifier.column_heading">Identifier</message>
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.column_heading">Title</message>
 
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.metadata.author">Browsing {0} by Author {1}</message>
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.trail.metadata.author">Browsing {0} by Author</message>
+
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.metadata.title">Browsing {0} by Title {1}</message>
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.trail.metadata.author">Browsing {0} by Title</message>
 
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.metadata.dateissued">Browsing {0} by Date Issued {1}</message>
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.trail.metadata.dateissued">Browsing {0} by Date Issued</message>
