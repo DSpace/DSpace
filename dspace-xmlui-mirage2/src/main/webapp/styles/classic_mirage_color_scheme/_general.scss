@@ -456,10 +456,11 @@ header {
   color: $text-color;
   border: 1px solid $text-color;
 }
-.didYouMean a{
-  font-weight: bold;
-}
-span.didYouMean{
-  display:block;
-  margin-bottom:10px;
+
+.didYouMean {
+    margin-bottom: $line-height-computed / 2;
+
+    a {
+        font-weight: bold;
+    }
 }
