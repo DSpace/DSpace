@@ -557,3 +557,8 @@ height: 33px;
   border-radius: 3px;
     margin-top: 30px;
 }
+
+#aspect_artifactbrowser_CommunityBrowser_div_comunity-browser .short-description,
+#aspect_discovery_SiteRecentSubmissions_div_site-home .short-description {
+	display: block;
+}
