@@ -244,7 +244,7 @@ public class EditProfile extends AbstractDSpaceTransformer
        log.info(LogManager.getHeader(context, "view_profile", ""));
 
        Request request = ObjectModelHelper.getRequest(objectModel);
-       
+
        String defaultFirstName="",defaultLastName="",defaultPhone="";
        String defaultLanguage=null;
        String defaultOrcidId=null;
@@ -267,7 +267,7 @@ public class EditProfile extends AbstractDSpaceTransformer
                context.commit();
            }catch (Exception e)
            {
-               log.error("error when remove orcid id on eperson",e);
+               log.error("error when remove orcid id on eperson:"+eperson.getID(),e);
            }
 
        }
@@ -483,6 +483,17 @@ public class EditProfile extends AbstractDSpaceTransformer
        /* temporarily disable ORCID linking
           
        List orcid = form.addList("orcid",List.TYPE_FORM);
+       Item orcidDiv = orcid.addItem("orcid-error","orcid-error");
+
+       List orcid = form.addList("orcid",List.TYPE_FORM);
+       if(request.getParameter("exist_orcid")!=null){
+
+           Item orcidDiv = orcid.addItem("orcid-error","orcid-error");
+           orcidDiv.addContent("There is already a eperson linked to this orcid id:");
+           orcidDiv.addContent(request.getParameter("exist_orcid"));
+       }
+
+
        orcid.setHead("Associate Account with ORCID");
        if(defaultOrcidId!=null&&defaultOrcidId.length()>0){
            orcid.addItem().addContent("Your account is now associated with the following ORCID ID. You may now authenticate with this DSpace exclusively with your ORCID login. If this ORCID account is incorrect, it may be disconnected by selecting the \"Disconnect from ORCID\" button.\n");
@@ -493,8 +504,10 @@ public class EditProfile extends AbstractDSpaceTransformer
        }
        else
        {
+
            orcid.addItem().addContent("Select the following button to connect to ORCID and associate this profile with your ORCID account.");
            orcid.addItem().addButton("link").setValue("Link to Orcid");
+
        }
        */
        List tl = form.addList("terms",List.TYPE_FORM);
