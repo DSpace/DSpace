@@ -87,7 +87,7 @@ public class Orcid extends RestSource {
     }
 
     public List<Bio> queryBio(String name, int start, int rows) {
-        Document bioDocument = restConnector.get("search/orcid-bio?q=" + URLEncoder.encode("\"" + name + "\"") + "&start=" + start + "&rows=" + rows);
+        Document bioDocument = restConnector.get("search/orcid-bio?q=" + URLEncoder.encode(name) + "&start=" + start + "&rows=" + rows);
         XMLtoBio converter = new XMLtoBio();
         return converter.convert(bioDocument);
     }
