@@ -657,7 +657,9 @@
 					</ul>
 				</div>
 			</form>
-			<xsl:call-template name="facet-box" />
+                        <xsl:if test="/dri:document/dri:options/dri:list[@n='discovery']/dri:list">
+                                <xsl:call-template name="facet-box" />
+                        </xsl:if>			
 		</div>
 	</xsl:template>
 
