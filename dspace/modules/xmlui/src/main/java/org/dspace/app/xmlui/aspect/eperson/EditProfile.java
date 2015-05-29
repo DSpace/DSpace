@@ -480,7 +480,6 @@ public class EditProfile extends AbstractDSpaceTransformer
                passwordConfirm.addError(T_error_unconfirmed_password);
            }
        }
-       /* temporarily disable ORCID linking
           
        List orcid = form.addList("orcid",List.TYPE_FORM);
        Item orcidDiv = orcid.addItem("orcid-error","orcid-error");
@@ -509,7 +508,7 @@ public class EditProfile extends AbstractDSpaceTransformer
            orcid.addItem().addButton("link").setValue("Link to Orcid");
 
        }
-       */
+
        List tl = form.addList("terms",List.TYPE_FORM);
        tl.setHead(T_terms);
        tl.addItem(T_terms_help);
