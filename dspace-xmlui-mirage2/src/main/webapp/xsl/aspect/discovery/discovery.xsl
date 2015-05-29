@@ -335,11 +335,17 @@
                 </p>
             </div>
         </div>
+
+        <xsl:if test="dri:item[@id='aspect.discovery.SimpleSearch.item.did-you-mean']">
+            <div class="row">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <xsl:apply-templates select="dri:item[@id='aspect.discovery.SimpleSearch.item.did-you-mean']"/>
+                </div>
+            </div>
+        </xsl:if>
+
         <div class="row">
             <div class="col-sm-offset-3 col-sm-9" id="filters-overview-wrapper-squared"/>
-            <xsl:if test="dri:xref[@rend='didYouMean']">
-                <div class="didYouMean">Did you mean:<a href="{dri:xref[@rend='didYouMean']/@target}"><xsl:value-of select="dri:xref[@rend='didYouMean']"/></a> ?</div>
-            </xsl:if>
         </div>
     </xsl:template>
 
@@ -360,10 +366,10 @@
                 </p>
             </div>
         </div>
-        <div id="filters-overview-wrapper-squared"/>
-        <xsl:if test="dri:xref[@rend='didYouMean']">
-            <div class="didYouMean">Did you mean:<a href="{dri:xref[@rend='didYouMean']/@target}"><xsl:value-of select="dri:xref[@rend='didYouMean']"/></a> ?</div>
+        <xsl:if test="dri:item[@id='aspect.discovery.SimpleSearch.item.did-you-mean']">
+            <xsl:apply-templates select="dri:item[@id='aspect.discovery.SimpleSearch.item.did-you-mean']"/>
         </xsl:if>
+        <div id="filters-overview-wrapper-squared"/>
     </xsl:template>
 
     <xsl:template match="dri:div[@id='aspect.discovery.SimpleSearch.div.search-results']/dri:head">
