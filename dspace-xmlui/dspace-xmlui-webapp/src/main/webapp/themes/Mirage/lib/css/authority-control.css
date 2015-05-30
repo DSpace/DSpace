@@ -60,7 +60,7 @@ img.ds-authority-confidence.cf-ambiguous
 img.ds-authority-confidence.cf-uncertain
   { background: transparent url(../../images/authority_control/confidence/5-pinion.gif); }
 img.ds-authority-confidence.cf-accepted
-  { background: transparent url(../../images/authority_control/confidence/6-thumb2.gif); }
+  { background: transparent url(../../images/authority_control/confidence/orcid_16x16.gif); }
 
 /* hide authority-value inputs in forms */
 input.ds-authority-value { display:none; }
