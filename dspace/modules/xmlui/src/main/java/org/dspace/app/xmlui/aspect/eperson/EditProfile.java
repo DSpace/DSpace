@@ -482,9 +482,6 @@ public class EditProfile extends AbstractDSpaceTransformer
        }
           
        List orcid = form.addList("orcid",List.TYPE_FORM);
-       Item orcidDiv = orcid.addItem("orcid-error","orcid-error");
-
-       List orcid = form.addList("orcid",List.TYPE_FORM);
        if(request.getParameter("exist_orcid")!=null){
 
            Item orcidDiv = orcid.addItem("orcid-error","orcid-error");
