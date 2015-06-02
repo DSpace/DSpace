@@ -9,7 +9,6 @@ package org.dspace.app.xmlui.aspect.statistics;
 
 import org.apache.cocoon.ResourceNotFoundException;
 import org.apache.cocoon.environment.ObjectModelHelper;
-import org.apache.cocoon.environment.Request;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -84,8 +83,7 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
         {
             HandleUtil.buildHandleTrail(dso, pageMeta, contextPath, true);
         }
-        pageMeta.addTrailLink(contextPath + "/handle" + (dso != null && dso.getHandle() != null ? "/" + dso.getHandle() : "/statistics"), T_statistics_trail);
-
+        pageMeta.addTrail().addContent(T_statistics_trail);
         // Add the page title
         pageMeta.addMetadata("title").addContent(T_head_title);
     }
@@ -98,7 +96,7 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 
         //Try to find our dspace object
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-
+        
 		try
 		{
 			if(dso != null)
@@ -107,11 +105,11 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 			}
 			else
 			{
-				 Request request = ObjectModelHelper.getRequest(objectModel);
-				 String uri = request.getSitemapURI();
-				 if (!uri.startsWith(HANDLE_PREFIX))
-		            {
-		                // Doesn't start with the prefix then no match
+
+
+				 String uri = ObjectModelHelper.getRequest(objectModel).getSitemapURI();
+				 if (uri.startsWith("statistics-home"))
+		            {		              
 					 	renderHome(body);
 		            }
 				 else
@@ -119,6 +117,7 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 					 throw new ResourceNotFoundException("Unable to locate item");
 				 }
 				
+
 			}
 
         } catch (RuntimeException e) {

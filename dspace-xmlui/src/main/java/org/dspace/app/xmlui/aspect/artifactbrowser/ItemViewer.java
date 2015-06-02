@@ -188,7 +188,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
         HandleUtil.buildHandleTrail(item,pageMeta,contextPath);
-        pageMeta.addTrail().addContent(T_trail);
+        
 
         // Add SFX link
         String sfxserverUrl = ConfigurationManager.getProperty("sfx.server.url");
