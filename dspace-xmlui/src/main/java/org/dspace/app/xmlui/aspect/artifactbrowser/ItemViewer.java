@@ -188,6 +188,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         }
 
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
+
         HandleUtil.buildHandleTrail(context, item,pageMeta,contextPath);
         pageMeta.addTrail().addContent(T_trail);
 
