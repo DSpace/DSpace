@@ -213,7 +213,10 @@
 				</xsl:if>
 				
 				<div class="item-preview">
-				    <a href="#" class="thumbnail">
+				    <a class="thumbnail">
+					    <xsl:attribute name="href">
+					    	<xsl:value-of select="./mets:fileSec/mets:fileGrp[@USE='CONTENT']/mets:file[position()=1]/mets:FLocat/@xlink:href"/>
+					    </xsl:attribute>
 				   	  <xsl:variable name="thumbnail_file" select="./mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/mets:file[1]"/>			  
 				         <img  alt="Preview">
 	                          <xsl:attribute name="src">
