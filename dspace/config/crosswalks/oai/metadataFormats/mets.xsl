@@ -67,7 +67,7 @@
 							<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name='available']">
 							<mods:extension>
 								<mods:dateAvailable encoding="iso8601">
-									<xsl:value-of select="doc:field[@name='value']/text()" />
+									<xsl:value-of select="doc:element/doc:field[@name='value']/text()" />
 								</mods:dateAvailable>
 							</mods:extension>
 							</xsl:for-each>
