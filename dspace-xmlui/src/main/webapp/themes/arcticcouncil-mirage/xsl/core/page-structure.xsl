@@ -326,7 +326,7 @@
                             <span class="icon-bar"></span>
                         </button>
 
-                        <a href="{$context-path}/" class="navbar-brand">
+                        <a href="http://www.arctic-council.org/" class="navbar-brand" title="Arctic Council Secretariat">
                             <img src="{$theme-path}/images/logo.png" />
                         </a>
 
