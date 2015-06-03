@@ -78,7 +78,6 @@ public class OAuthAuthenticateAction extends AbstractAction
         Request request = ObjectModelHelper.getRequest(objectModel);
         Response response = ObjectModelHelper.getResponse(objectModel);
 
-        HttpServletRequest request1 = (HttpServletRequest)objectModel.get("httprequest");
         HttpServletResponse response1 =  (HttpServletResponse)objectModel.get("httpresponse");
 
         try
@@ -169,39 +168,65 @@ public class OAuthAuthenticateAction extends AbstractAction
         try
         {
             Context context = AuthenticationUtil.authenticate(objectModel, null, null, null);
-
             EPerson eperson = context.getCurrentUser();
+            String orcidStatue= "";
 
-            if (eperson != null)
+            if(request.getSession().getAttribute("exist_orcid")!=null)
             {
-            	// The user has successfully logged in
-            	String redirectURL = request.getContextPath();
+                orcidStatue="?exist_orcid="+request.getSession().getAttribute("exist_orcid");
+            }
+            if(request.getSession().getAttribute("set_orcid")!=null)
+            {
+                orcidStatue="?set_orcid="+request.getSession().getAttribute("set_orcid");
+            }
 
-            	if (AuthenticationUtil.isInterupptedRequest(objectModel))
-            	{
-            		// Resume the request and set the redirect target URL to
-            		// that of the originaly interrupted request.
-            		redirectURL += AuthenticationUtil.resumeInterruptedRequest(objectModel);
-            	}
-            	else
-            	{
-            		// Otherwise direct the user to the login page
-            		String loginRedirect = "/profile";
-            		redirectURL += (loginRedirect != null) ? loginRedirect.trim() : "";
-            	}
 
-                // Authentication successfull send a redirect.
+            if(orcidStatue.length()>0)
+            {
+                String redirectLink = "/password-login";
+                if(eperson!=null)
+                {
+                    redirectLink = "/profile";
+                }
+                // Authentication failed send a redirect.
                 final HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
 
-                httpResponse.sendRedirect(redirectURL);
+                httpResponse.sendRedirect(redirectLink+orcidStatue);
 
-                // log the user out for the rest of this current request, however they will be reauthenticated
-                // fully when they come back from the redirect. This prevents caching problems where part of the
-                // request is preformed fore the user was authenticated and the other half after it succedded. This
-                // way the user is fully authenticated from the start of the request.
-                context.setCurrentUser(null);
+                return null;
+            }
+            else {
+                if (eperson != null)
+                {
+                    // The user has successfully logged in
+                    String redirectURL = request.getContextPath();
 
-                return new HashMap();
+                    if (AuthenticationUtil.isInterupptedRequest(objectModel))
+                    {
+                        // Resume the request and set the redirect target URL to
+                        // that of the originaly interrupted request.
+                        redirectURL += AuthenticationUtil.resumeInterruptedRequest(objectModel);
+                    }
+                    else
+                    {
+                        // Otherwise direct the user to the login page
+                        String loginRedirect = "/profile";
+                        redirectURL += (loginRedirect != null) ? loginRedirect.trim() : "";
+                    }
+
+                    // Authentication successfull send a redirect.
+                    final HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+
+                    httpResponse.sendRedirect(redirectURL);
+
+                    // log the user out for the rest of this current request, however they will be reauthenticated
+                    // fully when they come back from the redirect. This prevents caching problems where part of the
+                    // request is preformed fore the user was authenticated and the other half after it succedded. This
+                    // way the user is fully authenticated from the start of the request.
+                    context.setCurrentUser(null);
+
+                    return new HashMap();
+                }
             }
         }
         catch (SQLException e)

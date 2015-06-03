@@ -700,6 +700,7 @@
 	<message key="xmlui.EPerson.StartRegistration.error_bad_email">Unable to send email to this
 		address.</message>
 	<message key="xmlui.EPerson.StartRegistration.submit_register">Register</message>
+    <message key="xmlui.EPerson.StartRegistration.no_orcid_found">This ORCID is not associated with an existing Dryad account. Please create a Dryad user account, then on the Profile page link your ORCID account.</message>
 
 	<!-- org.dspace.app.xmlui.eperson.VerifyEmail.java -->
 	<message key="xmlui.EPerson.VerifyEmail.title">Verification email sent</message>
