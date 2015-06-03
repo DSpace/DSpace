@@ -600,7 +600,7 @@ public class CrisSearchService extends SolrServiceImpl
     	long tot = getApplicationService().count(classCrisObject);
     	final int MAX_RESULT = 10;
     	long numpages = (tot / MAX_RESULT) + 1;
-        for (int page = 0; page < numpages; page++)
+        for (int page = 1; page <= numpages; page++)
         {
 			List<T> rpObjects = getApplicationService().getPaginateList(
 					classCrisObject, "id", false, page, MAX_RESULT);
