@@ -156,18 +156,6 @@
 				<xsl:call-template name="show-common-authors"/>
 			</div>
 	
-			<!-- embargo rows -->
-			<xsl:if test="(dim:field[@element='embargo' and @qualifier='liftDate'])">
-				<div id="embargo-info">
-					<span class="embargo_msg"><i18n:text>xmlui.dri2xhtml.METS-1.0.embargoed-document-description</i18n:text></span>
-					<span class="embargo_date">
-						<xsl:call-template name="render-date">
-							<xsl:with-param name="dateString" select="dim:field[@element='embargo' and @qualifier='liftDate'] "/>
-						</xsl:call-template>
-					</span>
-				</div>
-			</xsl:if>
-	
 			<!-- date.issued row -->
 			<!-- date.exposure/date.issued : extraemos el año solamente -->
 			<xsl:choose>
@@ -188,6 +176,18 @@
 					</xsl:call-template>
 				</xsl:when>
 			</xsl:choose>
+	
+			<!-- embargo rows -->
+			<xsl:if test="(dim:field[@element='embargo' and @qualifier='liftDate'])">
+				<div id="embargo-info">
+					<span class="embargo_msg"><i18n:text>xmlui.dri2xhtml.METS-1.0.embargoed-document-description</i18n:text></span>
+					<span class="embargo_date">
+						<xsl:call-template name="render-date">
+							<xsl:with-param name="dateString" select="dim:field[@element='embargo' and @qualifier='liftDate'] "/>
+						</xsl:call-template>
+					</span>
+				</div>
+			</xsl:if>
 			<xsl:text>&#160;</xsl:text>
         </div>
         
