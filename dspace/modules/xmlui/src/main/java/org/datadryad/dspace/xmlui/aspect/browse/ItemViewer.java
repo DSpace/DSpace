@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
@@ -267,6 +269,8 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
                 }
             }
         }
+                    pageMeta.addMetadata("authors", "package").addContent(
+                            getAuthors(pkg));
 
         // Data package metadata included on data file items
         for (DCValue metadata : item.getMetadata("dc.relation.ispartof")) {
@@ -319,6 +323,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
                 author = buffer.toString().trim();
                 author = author.endsWith(",") ? author.substring(0, author
                         .length() - 1) : author;
+            pageMeta.addMetadata("authors", "package").addContent(getAuthors(item));
 
                 pageMeta.addMetadata("authors", "package").addContent(
                         author + " ");
@@ -642,6 +647,24 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
         return title;
     }
 
+    public static String getAuthors(Item item) {
+        ArrayList<DCValue> mdlist = new ArrayList<DCValue>();
+        for (DCValue i : item.getMetadata("dc.contributor.author")) {
+            mdlist.add(i);
+        }
+        for (DCValue i : item.getMetadata("dc.creator")) {
+            mdlist.add(i);
+        }
+        for (DCValue i : item.getMetadata("dc.contributor")) {
+            mdlist.add(i);
+        }
+        StringBuilder buffer = new StringBuilder();
+        buffer.append(parseName((DCValue[]) mdlist.toArray(new DCValue[1])));
+
+        String author = buffer.toString().trim() + " ";
+        return author;
+    }
+
     /**
      * Recycle
      */
@@ -651,22 +674,23 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
         super.recycle();
     }
 
-    private String parseName(DCValue[] aMetadata) {
+    private static String parseName(DCValue[] aMetadata) {
         StringBuilder buffer = new StringBuilder();
         int position = 0;
 
         for (DCValue metadata : aMetadata) {
-
+            StringBuilder authorString = new StringBuilder();
+            authorString.append("@");
             if (metadata.value.indexOf(",") != -1) {
                 String[] parts = metadata.value.split(",");
 
                 if (parts.length > 1) {
                     StringTokenizer tokenizer = new StringTokenizer(parts[1], ". ");
 
-                    buffer.append(parts[0]).append(" ");
+                    authorString.append(parts[0]).append(" ");
 
                     while (tokenizer.hasMoreTokens()) {
-                        buffer.append(tokenizer.nextToken().charAt(0));
+                        authorString.append(tokenizer.nextToken().charAt(0));
                     }
                 }
             } else {
@@ -675,15 +699,27 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
                 String author = parts[parts.length - 1].replace("\\s+|\\.", "");
                 char ch;
 
-                buffer.append(author).append(" ");
+                authorString.append(author).append(" ");
 
                 for (int index = 0; index < parts.length - 1; index++) {
                     if (parts[index].length() > 0) {
                         ch = parts[index].replace("\\s+|\\.", "").charAt(0);
-                        buffer.append(ch);
+                        authorString.append(ch);
                     }
                 }
             }
+            authorString.append("@");
+
+            // check for orcid:
+            if (metadata.authority != null) {
+                Pattern p = Pattern.compile(".+orcid::(.+)");
+                Matcher m = p.matcher(metadata.authority);
+                if (m.matches()) {
+                    authorString.append("#").append(m.group(1)).append("#");
+                }
+            }
+
+            buffer.append(authorString.toString());
 
             if (++position < aMetadata.length) {
                 if (aMetadata.length > 2) {
