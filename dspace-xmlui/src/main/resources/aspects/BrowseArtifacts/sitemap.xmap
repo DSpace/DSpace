@@ -24,7 +24,7 @@ collections / items / and bitstreams.
             <map:transformer name="CommunityRecentSubmissions" src="org.dspace.app.xmlui.aspect.artifactbrowser.CommunityRecentSubmissions"/>
             <map:transformer name="CollectionRecentSubmissions" src="org.dspace.app.xmlui.aspect.artifactbrowser.CollectionRecentSubmissions"/>
             <map:transformer name="ConfigurableBrowse" src="org.dspace.app.xmlui.aspect.artifactbrowser.ConfigurableBrowse"/>
-            <!-- map:transformer name="StaticPage" src="org.dspace.app.xmlui.aspect.browseArtifacts.StaticPage"/ -->
+            <map:transformer name="StaticPage" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.browseArtifacts.StaticPage"/>
             <map:transformer name="LicensePage" src="cz.cuni.mff.ufal.LicensePage"/>
         </map:transformers>
 
@@ -62,13 +62,13 @@ collections / items / and bitstreams.
                     <map:serialize type="xml"/>
             </map:match>
 
-            <!-- map:match pattern="page/*">
-                <map:transform type="StaticPage"/>
-                <map:serialize type="xml"/>
-            </map:match -->
-
             <map:match pattern="page/licenses">
                 <map:transform type="LicensePage"/>
+                <map:serialize type="xml"/>
+            </map:match>
+
+            <map:match pattern="page/*">
+                <map:transform type="StaticPage"/>
                 <map:serialize type="xml"/>
             </map:match>
 
