@@ -827,6 +827,10 @@ public class ApplicationService extends ExtendedTabService
         try
         {
         	cache.removeAll();
+			cacheRpByEPerson.removeAll();
+			cacheBySource.removeAll();
+			cacheByCrisID.removeAll();
+			cacheByUUID.removeAll();
         }
         catch (Exception ex)
         {
