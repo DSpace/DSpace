@@ -97,8 +97,6 @@
         </xsl:if>
 
 
-        <xsl:variable name="article_doi"
-              select=".//dim:field[@element='relation'][@qualifier='isreferencedby'][starts-with(., 'doi:')]"/>
         <xsl:variable name="title"
                       select=".//dim:field[@element='title']/node()"/>
 
@@ -140,123 +138,27 @@
 				and $meta[@element='request'][@qualifier='queryString'][not(contains(., 'show=full'))]
 				and $meta[@element='authors'][@qualifier='package']">
 
-            <xsl:variable name="article_doi"
-                          select="$meta[@element='identifier'][@qualifier='article'][. != '']"/>
-
-            <xsl:variable name="journal"
-                          select="$meta[@element='publicationName']"/>
             <div class="ds-static-div primary">
                     <div class="secondary">
                     <p class="ds-paragraph">
                         <i18n:text>xmlui.DryadItemSummary.whenUsing</i18n:text>
                     </p>
                     <div class="citation-sample">
-                        <xsl:variable name="citation"
-                                      select="$meta[@element='citation'][@qualifier='article']"/>
-                          <xsl:choose>
-                              <xsl:when test="$citation != ''">
-                                  <xsl:choose>
-                                      <xsl:when
-                                              test="$article_doi and not(contains($citation, $article_doi))">
-                                          <xsl:value-of select="$citation"/>
-					  <xsl:text> </xsl:text>
-                                          <a>
-                                              <xsl:attribute name="href">
-                                                  <xsl:choose>
-                                                      <xsl:when test="starts-with($article_doi, 'http')">
-                                                          <xsl:value-of select="$article_doi"/>
-                                                      </xsl:when>
-                                                      <xsl:when test="starts-with($article_doi, 'doi:')">
-                                                          <xsl:value-of
-                                                                  select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
-                                                      </xsl:when>
-                                                  </xsl:choose>
-                                              </xsl:attribute>
-                                                  <xsl:choose>
-                                                      <xsl:when test="starts-with($article_doi, 'http')">
-                                                          <xsl:value-of select="$article_doi"/>
-                                                      </xsl:when>
-                                                      <xsl:when test="starts-with($article_doi, 'doi:')">
-                                                          <xsl:value-of
-                                                                  select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
-                                                      </xsl:when>
-                                                  </xsl:choose>
-                                          </a>
-                                      </xsl:when>
-                                      <xsl:when test="$article_doi">
-                                          <xsl:copy-of select="substring-before($citation, $article_doi)"/>
-                                          <a>
-                                              <xsl:attribute name="href">
-                                                  <xsl:value-of
-                                                          select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
-                                              </xsl:attribute>
-                                                  <xsl:choose>
-                                                      <xsl:when test="starts-with($article_doi, 'http')">
-                                                          <xsl:value-of select="$article_doi"/>
-                                                      </xsl:when>
-                                                      <xsl:when test="starts-with($article_doi, 'doi:')">
-                                                          <xsl:value-of
-                                                                  select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
-                                                      </xsl:when>
-                                                  </xsl:choose>
-                                          </a>
-                                      </xsl:when>
-                                      <xsl:otherwise>
-                                          <xsl:value-of select="$citation"/>
-                                      </xsl:otherwise>
-                                  </xsl:choose>
-                              </xsl:when>
-                              <xsl:otherwise>
-                                  <xsl:choose>
-                                      <xsl:when test="$journal">
-                                          <span style="font-style: italic;">
-                                              <i18n:text>xmlui.DryadItemSummary.citationNotYet1</i18n:text>
-                                              <xsl:value-of select="$journal"/>
-                                              <xsl:text>. </xsl:text>
-                                              <i18n:text>xmlui.DryadItemSummary.citationNotYet2</i18n:text>
-					      <xsl:text> </xsl:text>
-                                              <xsl:if test="$article_doi">
-                                                  <a>
-                                                      <xsl:attribute name="href">
-                                                          <xsl:choose>
-                                                              <xsl:when
-                                                                      test="starts-with($article_doi, 'http')">
-                                                                  <xsl:value-of select="$article_doi"/>
-                                                              </xsl:when>
-                                                              <xsl:when
-                                                                      test="starts-with($article_doi, 'doi:')">
-                                                                  <xsl:value-of
-                                                                          select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
-                                                              </xsl:when>
-                                                          </xsl:choose>
-                                                      </xsl:attribute>
-                                                  <xsl:choose>
-                                                      <xsl:when test="starts-with($article_doi, 'http')">
-                                                          <xsl:value-of select="$article_doi"/>
-                                                      </xsl:when>
-                                                      <xsl:when test="starts-with($article_doi, 'doi:')">
-                                                          <xsl:value-of
-                                                                  select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
-                                                      </xsl:when>
-                                                  </xsl:choose>
-                                                  </a>
-                                              </xsl:if>
-                                          </span>
-                                      </xsl:when>
-                                      <xsl:otherwise>
-                                          <span style="font-style: italic;">
-                                              <i18n:text>xmlui.DryadItemSummary.citationNotYet</i18n:text>
-                                          </span>
-                                      </xsl:otherwise>
-                                  </xsl:choose>
-                              </xsl:otherwise>
-                          </xsl:choose>
+                        <xsl:call-template name="publication-citation">
+                            <xsl:with-param name="citation" select="$meta[@element='citation'][@qualifier='article']"/>
+                            <xsl:with-param name="article_doi" select="$meta[@element='identifier'][@qualifier='article'][. != '']"/>
+                            <xsl:with-param name="article_pmid"/>
+                            <xsl:with-param name="article_id"/>
+                            <xsl:with-param name="journal" select="$meta[@element='publicationName']"/>
+                        </xsl:call-template>
                     </div>
                     <p class="ds-paragraph">
                         <i18n:text>xmlui.DryadItemSummary.pleaseCite</i18n:text>
                     </p>
                     <div class="citation-sample">
-                        <xsl:value-of select="$meta[@element='authors'][@qualifier='package']"/>
+                        <xsl:call-template name="author-orcid">
+                            <xsl:with-param name="InputString" select="$meta[@element='authors'][@qualifier='package']"/>
+                        </xsl:call-template>
                         <xsl:choose>
                             <xsl:when test="$meta[@element='date'][@qualifier='issued']">
                                 <xsl:value-of select="$meta[@element='date'][@qualifier='issued']"/>
@@ -519,156 +421,26 @@
                 test="not($meta[@element='xhtml_head_item'][contains(., 'DCTERMS.isPartOf')]) and .//dim:field[@element='relation'][@qualifier='haspart']">
             <div class="ds-static-div primary">
                     <div class="secondary">
-                    <xsl:variable name="citation"
-                                  select=".//dim:field[@element='identifier'][@qualifier='citation'][position() = 1]"/>
-                    <xsl:variable name="article_doi"
-                                  select=".//dim:field[@element='relation'][@qualifier='isreferencedby'][starts-with(., 'doi:')]"/>
-                    <xsl:variable name="article_pmid"
-                                  select=".//dim:field[@element='relation'][@qualifier='isreferencedby'][starts-with(., 'PMID:')]"/>
-                    <xsl:variable name="article_id"
-                                  select=".//dim:field[@element='relation'][@qualifier='isreferencedby'][not(starts-with(., 'doi:')) and not(starts-with(.,'PMID:'))]"/>
                     <p class="ds-paragraph">
                         <i18n:text>xmlui.DryadItemSummary.whenUsing</i18n:text>
                     </p>
                     <div class="citation-sample">
-                        <xsl:choose>
-                            <xsl:when test="$citation!=''">
-                                <xsl:choose>
-                                    <xsl:when test="$article_id">
-                                        <xsl:value-of select="$citation"/>
-                                        <xsl:text> </xsl:text>
-                                        <xsl:value-of select="$article_id"/>
-                                    </xsl:when>
-                                    <xsl:when
-                                            test="$article_doi and not(contains($citation, $article_doi))">
-                                        <xsl:value-of select="$citation"/>
-					<xsl:text> </xsl:text>
-                                        <a>
-                                            <xsl:attribute name="href">
-                                                <xsl:value-of
-                                                        select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
-                                            </xsl:attribute>
-                                            <xsl:value-of
-                                                        select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
-                                        </a>
-                                    </xsl:when>
-                                    <xsl:when test="$article_doi">
-                                        <xsl:value-of select="substring-before($citation, $article_doi)"/>
-                                        <a>
-                                            <xsl:attribute name="href">
-                                                <xsl:value-of
-                                                        select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
-                                            </xsl:attribute>
-                                            <xsl:value-of
-                                                        select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
-                                        </a>
-                                    </xsl:when>
-                                    <xsl:when test="$article_pmid">
-                                        <xsl:value-of select="$citation"/>
-                                        <xsl:text> </xsl:text>
-                                        <xsl:value-of select="$article_pmid"/>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xsl:value-of select="$citation"/>
-                                    </xsl:otherwise>
-                                </xsl:choose>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:variable name="journal"
-                                              select=".//dim:field[@element='publicationName']"/>
-                                <xsl:choose>
-                                    <xsl:when test="$journal">
-                                        <span style="font-style: italic;">
-                                            <i18n:text>xmlui.DryadItemSummary.citationNotYet1</i18n:text>
-                                            <xsl:value-of select="$journal"/>
-                                            <xsl:text>. </xsl:text>
-                                            <i18n:text>xmlui.DryadItemSummary.citationNotYet2</i18n:text>
-                                            <xsl:if test="$article_doi">
-                                                <a>
-                                                    <xsl:attribute name="href">
-                                                        <xsl:value-of
-                                                                select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
-                                                    </xsl:attribute>
-                                                    <xsl:value-of 
-                                                                select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
-                                                </a>
-                                            </xsl:if>
-                                        </span>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <span style="font-style: italic;">
-                                            <i18n:text>xmlui.DryadItemSummary.citationNotYet</i18n:text>
-                                        </span>
-                                    </xsl:otherwise>
-                                </xsl:choose>
-                            </xsl:otherwise>
-                        </xsl:choose>
+                        <xsl:call-template name="publication-citation">
+                            <xsl:with-param name="citation" select=".//dim:field[@element='identifier'][@qualifier='citation'][position() = 1]"/>
+                            <xsl:with-param name="article_doi" select=".//dim:field[@element='relation'][@qualifier='isreferencedby'][starts-with(., 'doi:')]"/>
+                            <xsl:with-param name="article_pmid" select=".//dim:field[@element='relation'][@qualifier='isreferencedby'][starts-with(., 'PMID:')]"/>
+                            <xsl:with-param name="article_id" select=".//dim:field[@element='relation'][@qualifier='isreferencedby'][not(starts-with(., 'doi:')) and not(starts-with(.,'PMID:'))]"/>
+                            <xsl:with-param name="journal" select=".//dim:field[@element='publicationName']"/>
+                        </xsl:call-template>
                     </div>
                     <xsl:if test="$datafiles">
                         <p class="ds-paragraph">
                             <i18n:text>xmlui.DryadItemSummary.pleaseCite</i18n:text>
                         </p>
                         <div class="citation-sample">
-                            <xsl:choose>
-                                <xsl:when
-                                        test=".//dim:field[@element='contributor'][@qualifier='author']">
-                                    <xsl:for-each
-                                            select=".//dim:field[@element='contributor'][@qualifier='author']">
-                                        <xsl:choose>
-                                            <xsl:when test="contains(., ',')">
-                                                <xsl:call-template name="name-parse-reverse">
-                                                    <xsl:with-param name="name" select="node()"/>
-                                                </xsl:call-template>
-                                            </xsl:when>
-                                            <xsl:otherwise>
-                                                <xsl:call-template name="name-parse">
-                                                    <xsl:with-param name="name" select="node()"/>
-                                                </xsl:call-template>
-                                            </xsl:otherwise>
-                                        </xsl:choose>
-                                        <xsl:if
-                                                test="count(following-sibling::dim:field[@element='contributor'][@qualifier='author']) != 0">
-                                            <xsl:text>, </xsl:text>
-                                        </xsl:if>
-                                    </xsl:for-each>
-                                </xsl:when>
-                                <xsl:when test=".//dim:field[@element='creator']">
-                                    <xsl:for-each select=".//dim:field[@element='creator']">
-                                        <xsl:choose>
-                                            <xsl:when test="contains(., ',')">
-                                                <xsl:value-of select="."/>
-                                            </xsl:when>
-                                            <xsl:otherwise>
-                                                <xsl:call-template name="name-parse">
-                                                    <xsl:with-param name="name" select="node()"/>
-                                                </xsl:call-template>
-                                            </xsl:otherwise>
-                                        </xsl:choose>
-                                        <xsl:if
-                                                test="count(following-sibling::dim:field[@element='creator']) != 0">
-                                            <xsl:text>, </xsl:text>
-                                        </xsl:if>
-                                    </xsl:for-each>
-                                </xsl:when>
-                                <xsl:when test=".//dim:field[@element='contributor']">
-                                    <xsl:for-each select=".//dim:field[@element='contributor']">
-                                        <xsl:choose>
-                                            <xsl:when test="contains(., ',')">
-                                                <xsl:value-of select="."/>
-                                            </xsl:when>
-                                            <xsl:otherwise>
-                                                <xsl:call-template name="name-parse">
-                                                    <xsl:with-param name="name" select="node()"/>
-                                                </xsl:call-template>
-                                            </xsl:otherwise>
-                                        </xsl:choose>
-                                        <xsl:if
-                                                test="count(following-sibling::dim:field[@element='contributor']) != 0">
-                                            <xsl:text>, </xsl:text>
-                                        </xsl:if>
-                                    </xsl:for-each>
-                                </xsl:when>
-                            </xsl:choose>
+                            <xsl:call-template name="author-orcid">
+                                <xsl:with-param name="InputString" select="$meta[@element='authors'][@qualifier='package']"/>
+                            </xsl:call-template>
                             <xsl:if test=".//dim:field[@element='date'][@qualifier='issued']">
                                 <xsl:text> </xsl:text>
                                 <xsl:value-of
@@ -2856,5 +2628,122 @@
                 <td><xsl:value-of select="./@language"/></td>
             </tr>
         </xsl:if>
+    </xsl:template>
+    <xsl:template name="author-orcid">
+        <!--@Huang D@#0000-0002-1497-1284#, @Lapp H@#0000-0001-9107-0714#, @Smith J@, @Smith J@, @Doe J@-->
+        <xsl:param name="InputString"/>
+        <xsl:choose>
+            <xsl:when test="contains($InputString, ',')">
+                <!-- There are more than one name -->
+                <xsl:call-template name="format-name">
+                    <xsl:with-param name="nameString" select="substring-before($InputString,',')"/>
+                </xsl:call-template>
+                <xsl:text>, </xsl:text>
+                <xsl:call-template name="author-orcid">
+                    <xsl:with-param name="InputString" select="substring-after($InputString,',')"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:call-template name="format-name">
+                    <xsl:with-param name="nameString" select="$InputString"/>
+                </xsl:call-template>
+                <xsl:text> </xsl:text>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    <xsl:template name="format-name">
+        <xsl:param name="nameString"/>
+        <xsl:choose>
+            <xsl:when test="contains($nameString,'#')">
+                <!-- name contains an Orcid: make it a hyperlink. -->
+                <xsl:variable name="orcid" select="substring-before(substring-after($nameString,'#'),'#')"/>
+                <xsl:variable name="author" select="substring-before(substring-after($nameString,'@'),'@')"/>
+                <a href="http://orcid.org/{$orcid}">
+                    <xsl:value-of select="$author"/>
+                </a>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="substring-before(substring-after($nameString,'@'),'@')"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    <xsl:template name="publication-citation">
+        <xsl:param name="article_doi"/>
+        <xsl:param name="citation"/>
+        <xsl:param name="article_id"/>
+        <xsl:param name="article_pmid"/>
+        <xsl:param name="journal"/>
+
+        <xsl:choose>
+            <xsl:when test="$citation!=''">
+                <xsl:choose>
+                    <xsl:when test="$article_id">
+                        <xsl:value-of select="$citation"/>
+                        <xsl:text> </xsl:text>
+                        <xsl:value-of select="$article_id"/>
+                    </xsl:when>
+                    <xsl:when
+                            test="$article_doi and not(contains($citation, $article_doi))">
+                        <xsl:value-of select="$citation"/>
+                        <xsl:text> </xsl:text>
+                        <a>
+                            <xsl:attribute name="href">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
+                            </xsl:attribute>
+                            <xsl:value-of
+                                    select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
+                        </a>
+                    </xsl:when>
+                    <xsl:when test="$article_doi">
+                        <xsl:value-of select="substring-before($citation, $article_doi)"/>
+                        <a>
+                            <xsl:attribute name="href">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
+                            </xsl:attribute>
+                            <xsl:value-of
+                                    select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
+                        </a>
+                    </xsl:when>
+                    <xsl:when test="$article_pmid">
+                        <xsl:value-of select="$citation"/>
+                        <xsl:text> </xsl:text>
+                        <xsl:value-of select="$article_pmid"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="$citation"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:choose>
+                    <xsl:when test="$journal">
+                        <span style="font-style: italic;">
+                            <i18n:text>xmlui.DryadItemSummary.citationNotYet1</i18n:text>
+                            <xsl:value-of select="$journal"/>
+                            <xsl:text>. </xsl:text>
+                            <i18n:text>xmlui.DryadItemSummary.citationNotYet2</i18n:text>
+                            <xsl:if test="$article_doi">
+                                <a>
+                                    <xsl:attribute name="href">
+                                        <xsl:value-of
+                                                select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
+                                    </xsl:attribute>
+                                    <xsl:value-of
+                                            select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
+                                </a>
+                            </xsl:if>
+                        </span>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <span style="font-style: italic;">
+                            <i18n:text>xmlui.DryadItemSummary.citationNotYet</i18n:text>
+                        </span>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 </xsl:stylesheet>
