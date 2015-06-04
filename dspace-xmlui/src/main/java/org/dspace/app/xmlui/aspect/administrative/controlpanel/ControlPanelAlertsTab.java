@@ -1,5 +1,11 @@
-/* Created for LINDAT/CLARIN */
-package cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative;
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+package org.dspace.app.xmlui.aspect.administrative.controlpanel;
 
 import java.util.Map;
 
@@ -12,6 +18,11 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.TextArea;
 
+/**
+ * Control panel tab that handles system wide alerts.
+ * Based on the original ControlPanel class by Jay Paz and Scott Phillips
+ * @author LINDAT/CLARIN dev team (http://lindat.cz)
+ */
 public class ControlPanelAlertsTab extends AbstractControlPanelTab {
 
 	private static final Message T_alerts_head = message("xmlui.administrative.ControlPanel.alerts_head");
@@ -41,6 +52,7 @@ public class ControlPanelAlertsTab extends AbstractControlPanelTab {
 		form.addItem(T_alerts_warning);
 
 		TextArea message = form.addItem().addTextArea("message");
+		message.setAutofocus("autofocus");
 		message.setLabel(T_alerts_message_label);
 		message.setSize(5, 45);
 		if (SystemwideAlerts.getMessage() == null) {

@@ -16,7 +16,7 @@ import org.dspace.core.ConfigurationManager;
 import cz.cuni.mff.ufal.checks.ShibUserLogin;
 import cz.cuni.mff.ufal.checks.ShibUserLogins;
 import cz.cuni.mff.ufal.dspace.IOUtils;
-import cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.AbstractControlPanelTab;
+import org.dspace.app.xmlui.aspect.administrative.controlpanel.AbstractControlPanelTab;
 import cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.HtmlHelper;
 
 

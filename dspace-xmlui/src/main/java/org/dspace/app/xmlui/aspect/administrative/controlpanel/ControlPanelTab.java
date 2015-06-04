@@ -1,5 +1,11 @@
-/* Created for LINDAT/CLARIN */
-package cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative;
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+package org.dspace.app.xmlui.aspect.administrative.controlpanel;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -14,6 +20,7 @@ import org.xml.sax.SAXException;
 /**
  * Public interface for admin ControlPanel tabs. This interface should be implemented by any class
  * which defines a "tab" in the ControlPanel
+ * @author LINDAT/CLARIN dev team (http://lindat.cz)
  */
 public interface ControlPanelTab {
 	

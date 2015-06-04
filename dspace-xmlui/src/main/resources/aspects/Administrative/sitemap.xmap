@@ -100,7 +100,7 @@ to administer DSpace.
 			<map:transformer name="NotAuthorized" src="org.dspace.app.xmlui.aspect.administrative.NotAuthorized"/>			
 			<map:transformer name="Navigation" src="org.dspace.app.xmlui.aspect.administrative.Navigation"/>
 			<map:transformer name="SystemwideAlerts" src="org.dspace.app.xmlui.aspect.administrative.SystemwideAlerts"/>
-			<map:transformer name="ControlPanel" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.ControlPanel" />
+			<map:transformer name="ControlPanel" src="org.dspace.app.xmlui.aspect.administrative.ControlPanel" />
                         <map:transformer name="WithdrawnItems" src="org.dspace.app.xmlui.aspect.administrative.WithdrawnItems" />
                         <map:transformer name="ItemExport" src="org.dspace.app.xmlui.aspect.administrative.ItemExport"/>
                         <map:transformer name="CurateForm" src="org.dspace.app.xmlui.aspect.administrative.CurateForm"/>
@@ -1135,6 +1135,9 @@ to administer DSpace.
             
             <!-- Access to Control Panel (limited to Administrators) -->
             <map:match pattern="admin/panel">
+                <map:transform type="IncludePageMeta">
+                    <map:parameter name="javascript#1" value="../../static/js/controlpanel.js"/>
+                </map:transform>
                 <map:select type="AuthenticatedSelector">
                     <map:when test="administrator">
                         <!-- If the 'clearcache' request parameter is specified, first clear

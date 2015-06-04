@@ -19,7 +19,7 @@ import org.dspace.app.xmlui.wing.element.Division;
 
 import com.ibm.icu.text.SimpleDateFormat;
 
-import cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.AbstractControlPanelTab;
+import org.dspace.app.xmlui.aspect.administrative.controlpanel.AbstractControlPanelTab;
 import cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.HtmlHelper;
 
 
