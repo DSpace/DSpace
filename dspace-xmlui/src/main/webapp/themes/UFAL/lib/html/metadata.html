@@ -1,0 +1,162 @@
+<div id="faq-like">
+
+	<h2 id="ufal-point-faq">About metadata</h2>
+	<p>This page provides information about what metadata we require and how we disseminate it. Metadata are freely accessible and are distributed in the public domain (under <a href="http://creativecommons.org/about/cc0">CC0</a>). However, we reserve the right to be informed about commercial usage of metadata from LINDAT/CLARIN repository including a description of your use case at <a class="helpdesk-tolink" href="#">Help Desk</a>.</p>
+
+    <hr />
+	<ul id="faqs-list">
+		<li><a href="#formats">Metadata formats</a></li>	
+		<li><a href="#metadata">Submitted metadata</a></li>	
+		<li><a href="#mapping">Metadata mapping</a></li>	
+	</ul>
+    <hr />
+	<div>
+		<h3 id="formats">Metadata formats</h3>
+		<p>
+			We are able to disseminate the submission metadata in various formats including but not limited to CMDI and oai_dc. See the <a href="https://lindat.mff.cuni.cz/repository/oai/request?verb=ListMetadataFormats">full list of supported formats</a> but note that some of the formats might not be applicable to all items. The various formats help us promote the submitted content in number of aggregators (and/or search engines).	
+		</p>
+		<h4>CMDI</h4>
+		<p>
+			See the CLARIN introduction to <a href="http://clarin.eu/cmdi">component metadata</a> in order to get more information about this topic. Despite we can support submissions with attached cmdi file to a degree, we prefer guiding the user through our submission process. Thus ensuring metadata in reasonable quality.
+		</p>
+		<p>
+			Our current submissions are adhering to the <a href="http://catalog.clarin.eu/ds/ComponentRegistry/rest/registry/profiles/clarin.eu:cr1:p_1403526079380/xsd">clarin.eu:cr1:p_1403526079380</a> profile/schema. Portion of older submissions is using different profile <a href="http://catalog.clarin.eu/ds/ComponentRegistry/rest/registry/profiles/clarin.eu:cr1:p_1349361150622/xsd">clarin.eu:cr1:p_1349361150622</a>
+		</p>
+		<p>
+			Both profiles are fairly covered with links to a concept registry.
+		</p>
+		<h4>oai_dc</h4>
+		<p>oai_dc is the format required by <a href="http://www.openarchives.org/OAI/2.0/oai_dc.xsd">OAI-PMH</a>. See the <a href="#mapping">mapping section</a> in order to understand how we map our submission to this format.</p>
+	</div>	
+	<br/>
+	<div>
+		<h3 id="metadata">Submitted metadata</h3>
+		<p>Following list enumerates the fields we ask in the submission. It's very likely to change. The metadata are submitted in English. Different formats contain different generated metadata (eg. human readable language names acompanying the iso codes, identifiers, other dates).</p>
+		<table class="table-bordered">
+			<thead>
+				<tr><th>Field name</th><th>Description</th><th>Status</th></tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><strong>Type</strong></td>
+					<td>Type of the resource: "Corpus" refers to text, speech and multimodal corpora.
+          "Lexical Conceptual Resource" includes lexica, ontologies, dictionaries, word lists etc.
+          "language Description" covers language models and grammars.
+          "Technology / Tool / Service" is used for tools, systems, system components etc.</td>
+					<td><span class="label label-info">required</span></td>
+				</tr>
+				<tr>
+					<td><strong>Title</strong></td>
+					<td>The main title of the item.</td>
+					<td><span class="label label-info">required</span></td>
+				</tr>
+				<tr>
+					<td><strong>Project URL</strong></td>
+					<td>URL of resource/project related to the submitted item (eg. project webpage). Regexp controlled (starts with http/https)</td>
+					<td><span class="label label-info">regexp controlled</span></td>
+				</tr>
+				<tr>
+					<td><strong>Demo URL</strong></td>
+					<td>Demonstration, samples or in case of tools sample output URL. Regexp controlled (starts with http/https)</td>
+					<td><span class="label label-info">regexp controlled</span></td>
+				</tr>
+				<tr>
+					<td><strong>Date issued</strong></td>
+					<td>The date when the submission data were issued if any e.g., 2014-01-21 or at least the year.</td>
+					<td><span class="label label-info">required</span></td>
+				</tr>
+				<tr>
+					<td><strong>Author</strong></td>
+					<td>Names of authors of the item. In case of collections (eg. corpora or other large database of text) you usually want to provide the name of people involved in compiling the collection, not the authors of individual pieces. A person name is stored as surname comma any other name (eg. "Smith, John Jr.").</td>
+					<td><span class="label label-info">required</span><span class="label label-info">repeatable</span></td>
+				</tr>
+				<tr>
+					<td><strong>Publisher</strong></td>
+					<td>Name of the organization/entity which published any previous instance of the item, or your home institution.</td>
+					<td><span class="label label-info">required</span><span class="label label-info">repeatable</span></td>
+				</tr>
+				<tr>
+					<td><strong>Contact person</strong></td>
+					<td>Person to contact in case of issues with the submission. Someone able to provide information about the resource, eg. one of the authors, or the submitter. Stored as structured string containing given name, surname, email and home organization.</td>
+					<td><span class="label label-info">required</span><span class="label label-info">repeatable</span></td>
+				</tr>
+				<tr>
+					<td><strong>Funding</strong></td>
+					<td>Sponsors and funding that supported work described by the submission. Stored as structured string containing project name, project code, the funding organization and the type of funds (own/national/eu).</td>
+					<td><span class="label label-info">repeatable</span></td>
+				</tr>
+				<tr>
+					<td><strong>Description</strong></td>
+					<td>Textual description of the submission.</td>
+					<td><span class="label label-info">required</span></td>
+				</tr>
+				<tr>
+					<td><strong>Language</strong></td>
+					<td>The language(s) of the  main contenten of the item. Stored as ISO 639-3  code. Required for corpora, lexical conceptual resources and language descriptions.</td>
+					<td><span class="label label-info">repeatable</span><span class="label label-info">type-bind required</span></td>
+				</tr>
+				<tr>
+					<td><strong>Subject Keywords</strong></td>
+					<td>Keywords or phrases related to the subject of the item.</td>
+					<td><span class="label label-info">repeatable</span><span class="label label-info">required</span></td>
+				</tr>
+				<tr>
+					<td><strong>Size</strong></td>
+					<td>Extent of the submitted data, eg. the number of token, or number of files.</td>
+					<td><span class="label label-info">repeatable</span></td>
+				</tr>
+				<tr>
+					<td><strong>Media type</strong></td>
+					<td>Media type of the main content of the item, eg. text or audio. Dropdown selection, required for corpora, language descriptions and lexical conceptual resources.</td>
+					<td><span class="label label-info">dropdown selection</span><span class="label label-info">type-bind required</span></td>
+				</tr>
+				<tr>
+					<td><strong>Detailed type</strong></td>
+					<td>Further classification of the resource type. Dropdown selection, required for tools, language descriptions and lexical conceptual resources.</td>
+					<td><span class="label label-info">dropdown selection</span><span class="label label-info">type-bind required</span></td>
+				</tr>
+				<tr>
+					<td><strong>Language Dependent</strong></td>
+					<td>Boolean value indicating whether the described tool/service is language dependent or not. Required for tools</td>
+					<td><span class="label label-info">type-bind required</span></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<br/>
+	<div>
+		<h3 id="mapping">Metadata mapping</h3>
+		<p>The following tables contains the submission - oai_dc mapping, it also lists some of the important automatically generated fields.</p>
+		<table class="table-bordered">
+			<thead>
+				<tr><th>Submission field</th><th>Mapped field</th></tr>
+			</thead>
+			<tbody>
+				<tr><td>Type</td><td>dc.type</td></tr>
+				<tr><td>Title</td><td>dc.title</td></tr>
+				<tr><td>Project URL</td><td>dc.source</td></tr>
+				<tr><td>Demo URL</td><td>not mapped</td></tr>
+				<tr><td>Date Issued</td><td>dc.date</td></tr>
+				<tr><td>Author</td><td>dc.creator</td></tr>
+				<tr><td>Publisher</td><td>dc.publisher</td></tr>
+				<tr><td>Contact person</td><td>not mapped</td></tr>
+				<tr><td>Funding</td><td>not mapped</td></tr>
+				<tr><td>Description</td><td>dc.description</td></tr>
+				<tr><td>Language</td><td>dc.language</td></tr>
+				<tr><td>Subject Keywords</td><td>dc.subject</td></tr>
+				<tr><td>Size</td><td>not mapped</td></tr>
+				<tr><td>Media Type</td><td>not mapped</td></tr>
+				<tr><td>Detailed Type</td><td>not mapped</td></tr>
+			</tbody>
+		</table>
+		<table class="table-bordered">
+			<thead>
+				<tr><th>Generated field</th><th>Description</th></tr>
+			</thead>
+			<tbody>
+				<tr><td>dc.identifier</td><td>PID (currently handle) of the resource.</td></tr>
+				<tr><td>dc.rights</td><td>Repeatable field can contain the name of the license under which the resource is distributed, the URL to the full text of the license and so called label (PUB, ACA, RES)</td></tr>
+			</tbody>
+		</table>
+	</div>
+</div>
