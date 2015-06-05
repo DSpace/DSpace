@@ -78,31 +78,9 @@ public class BitstreamStorageManager
     static
     {
     	ArrayList list = new ArrayList();
-    	// Begin block of code preserving backward compatibility with current
-    	// configuration syntax. Remove when superceded.
 
-		// 'assetstore.dir' is always store number 0
-		String storeDir = ConfigurationManager.getProperty("assetstore.dir");
-		if (storeDir == null)
-		{
-			log.error("No default assetstore");
-		}
-		else
-		{
-
-			initStore(DEFAULT_STORE_PREFIX + storeDir, list);
-			// read any further ones
-			for (int i = 1;; i++)
-			{
-			    storeDir = ConfigurationManager.getProperty("assetstore.dir." + i);
-				if (storeDir == null)
-				{
-					break;
-				}
-				initStore(DEFAULT_STORE_PREFIX + storeDir, list);
-			}
-		}
-        // End compatibility block
+        // Load the backwards compatible assetstore.dir's
+		list = initLegacyAssetstore(list);
 		
 		// if not already configured, configure asset stores
 		for (int j = 0; j < 100; j++)
@@ -125,7 +103,43 @@ public class BitstreamStorageManager
         // Read asset store to put new files in. Default is 0.
         incoming = ConfigurationManager.getIntProperty("assetstore.incoming");
     }
-    
+
+    /**
+     * Backwards compatibility for legacy assetstore.dir and assetstore.dir.#
+     * @param list
+     * @return
+     */
+    private static ArrayList initLegacyAssetstore(ArrayList list) {
+        String storeDir = ConfigurationManager.getProperty("assetstore.dir");
+        if (storeDir == null)
+        {
+            log.info("No default assetstore.dir");
+        }
+        else
+        {
+            initStore(DEFAULT_STORE_PREFIX + storeDir, list);
+            // read any further ones, starting at 1, since assetstore.dir is 0
+            for (int i = 1;; i++)
+            {
+                storeDir = ConfigurationManager.getProperty("assetstore.dir." + i);
+                if (storeDir == null)
+                {
+                    break;
+                }
+                initStore(DEFAULT_STORE_PREFIX + storeDir, list);
+            }
+        }
+
+        return list;
+    }
+
+    /**
+     *
+     * assetstore.<#>=<short-name>:<param>
+     * bitstore.<short-name>.class=<implementation-class-canonical-name>
+     * @param storeConfig
+     * @param list
+     */
     private static void initStore(String storeConfig, List list)
     {
         log.info("Init BitStore:" + storeConfig);
