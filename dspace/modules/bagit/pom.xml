@@ -5,7 +5,6 @@
 	<packaging>pom</packaging>
 	<name>DSpace BagIt</name>
 	<description>Parent for DSpace BagIt Module</description>
-	<version>0.0.1</version>
 	
 	<!-- 
 		Parent POM from which Maven inherits DSpace Default POM atrributes

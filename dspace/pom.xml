@@ -843,7 +843,7 @@
 	<dependency>
 	  <groupId>org.dspace.modules</groupId>
 	  <artifactId>bagit-api</artifactId>
-	  <version>0.0.1</version>
+      <version>${pom.version}</version>
 	</dependency>
 	<dependency>
 	  <groupId>org.dspace.modules</groupId>

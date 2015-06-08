@@ -201,7 +201,7 @@
       <dependency>
          <groupId>org.dspace.modules</groupId>
          <artifactId>bagit-api</artifactId>
-         <version>0.0.1</version>
+          <version>${project.version}</version>
       </dependency>
 
        <dependency>
