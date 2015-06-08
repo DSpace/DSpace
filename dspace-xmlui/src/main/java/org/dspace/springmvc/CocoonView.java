@@ -40,6 +40,8 @@ public class CocoonView implements View
      */
     Map blockServletCollector;
 
+    private static org.apache.log4j.Logger log = cz.cuni.mff.ufal.Logger.getLogger(CocoonView.class);
+
     public CocoonView()
     {
     }
@@ -110,7 +112,20 @@ public class CocoonView implements View
                 getInterfaces(request.getClass()),
                 new DynamicProxyRequestHandler(request, path));
 
-        servlet.service(prequest, response);
+        try
+        {
+            servlet.service(prequest, response);
+        }
+        catch (Exception e)
+        {
+            log.error(
+                    String.format(
+                            "Error: url=\"%s\", query_string=\"%s\", ip=\"%s\", host=\"%s\", user-agent=\"%s\"",
+                            request.getRequestURL(), request.getQueryString(),
+                            request.getRemoteAddr(), request.getRemoteHost(),
+                            request.getHeader("User-Agent")), e);
+            throw e;
+        }
 
     }
 
