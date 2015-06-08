@@ -23,6 +23,7 @@ public class CrisAnagraficaObjectDTO extends AnagraficaObjectAreaDTO
     {
         super();
         setSourceID(object.getSourceID());
+        setSourceRef(object.getSourceRef());
         setStatus(object.getStatus());
 
     }
