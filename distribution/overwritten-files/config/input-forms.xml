@@ -327,7 +327,7 @@
 					<label>Fecha de Creación</label>
 					<hint>Se puede indicar el año, año y mes, o año,mes y día. En caso de incertidumbre, indicar el año más próximo considerado y aclarar luego en las notas acerca de esta situación con c (circa), década o siglo. Ejemplo: c. 1910, Siglo XX</hint>
 					<input-type>date</input-type>
-					<type-bind>Objeto Fisico,Publicacion seriada</type-bind>
+					<type-bind>Objeto Fisico</type-bind>
 					<visibility>workflow</visibility>
 				</field>
 
@@ -378,7 +378,7 @@
 					<label>Descripción física</label>
 					<input-type>textarea</input-type>
 					<hint>Inscripciones existentes en el objeto, observaciones  sobre las piezas, etc.</hint>
-					<type-bind>Objeto Fisico,Publicacion seriada</type-bind>
+					<type-bind>Objeto Fisico</type-bind>
 				</field>
 
 				<!-- Descripción Física / Extension -->
@@ -403,7 +403,7 @@
 					<input-type>textarea</input-type>
 					<hint>Material en que está hecho el objeto, técnica usada para fabricarlo. Ejemplo: madera, bronce, plástico</hint>
 					<visibility>workflow</visibility>
-					<type-bind>Objeto Fisico,Publicacion seriada</type-bind>
+					<type-bind>Objeto Fisico</type-bind>
 				</field>
 
 				<!-- Fulltext -->
@@ -677,7 +677,7 @@
 					<label>Título de la serie</label>
 					<input-type>onebox</input-type>
 					<hint>Título de la serie en la que el documento fué publicado</hint>
-					<type-bind>Articulo,Publicacion seriada,Objeto de conferencia</type-bind>
+					<type-bind>Articulo,Objeto de conferencia</type-bind>
 				</field>
 				
 				<!-- Volumen y numero de la revista -->
@@ -688,7 +688,7 @@
 					<label>Volúmen y número de la serie</label>
 					<input-type>onebox</input-type>
 					<hint>Volúmen y número de la serie en la que el documento fué publicado</hint>
-					<type-bind>Articulo,Publicacion seriada</type-bind>
+					<type-bind>Articulo</type-bind>
 				</field>
 
 				<!-- Serie de Libro -->
@@ -699,7 +699,7 @@
 					<label>Titulo y número de la serie</label>
 					<input-type>onebox</input-type>
 					<hint>Titulo y número de la serie en la que el libro fué publicado</hint>
-					<type-bind>Libro,Publicacion seriada</type-bind>
+					<type-bind>Libro</type-bind>
 				</field>
 
 
