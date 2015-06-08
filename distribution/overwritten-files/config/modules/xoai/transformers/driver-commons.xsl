@@ -132,7 +132,7 @@
 				info:eu-repo/semantics/article
 			</xsl:when>
 			<xsl:when test="$subtype='Resumen'">
-				info:eu-repo/semantics/article
+				info:eu-repo/semantics/conferenceObject
 			</xsl:when>
 			<xsl:when test="$subtype='Revision'">
 				info:eu-repo/semantics/review

@@ -77,7 +77,7 @@
 				artículo
 			</xsl:when>
 			<xsl:when test="$subtype='Resumen'">
-				artículo
+				documento de conferencia
 			</xsl:when>
 			<!-- No se exporta
 			<xsl:when test="$subtype='Comunicacion'">

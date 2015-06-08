@@ -677,7 +677,7 @@
 					<label>Título de la serie</label>
 					<input-type>onebox</input-type>
 					<hint>Título de la serie en la que el documento fué publicado</hint>
-					<type-bind>Articulo,Publicacion seriada</type-bind>
+					<type-bind>Articulo,Publicacion seriada,Objeto de conferencia</type-bind>
 				</field>
 				
 				<!-- Volumen y numero de la revista -->
@@ -1153,10 +1153,6 @@
 				<displayed-value>Artículo</displayed-value>
 				<stored-value>Articulo</stored-value>
 			</pair>
-			<pair>
-				<displayed-value>Resumen</displayed-value>
-				<stored-value>Resumen</stored-value>
-			</pair>
 		</value-pairs>
 		
 		<value-pairs value-pairs-name="common_subtypes_tesis" dc-term="type">
@@ -1251,6 +1247,10 @@
             <pair>
 				<displayed-value>Objeto de conferencia</displayed-value>
 				<stored-value>Objeto de conferencia</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Resumen</displayed-value>
+				<stored-value>Resumen</stored-value>
 			</pair>
 		</value-pairs>
 
