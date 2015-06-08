@@ -558,7 +558,21 @@ public class ConfigurableHandleIdentifierProvider extends IdentifierProvider {
             if ( null == handle_str ) {
                 PIDCommunityConfiguration pidCommunityConfiguration = PIDConfiguration
                     .getPIDCommunityConfiguration(dso);
-                handle_str = createHandleId(handle.getID(), pidCommunityConfiguration);
+                try{
+                    handle_str = createHandleId(handle.getID(), pidCommunityConfiguration);
+                }catch(IllegalStateException e){
+                    try
+                    {
+                        //Failed to register the handle (eg with epic), clean up
+                        handle.delete();
+                        handle = null;
+                    }
+                    catch (AuthorizeException|IOException|SQLException  e1)
+                    {
+                        log.error("Failed handle cleanup." + e);
+                    }
+                    throw e;
+                }
             }
         }
 
