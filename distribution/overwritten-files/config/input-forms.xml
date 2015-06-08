@@ -677,7 +677,7 @@
 					<label>Título de la serie</label>
 					<input-type>onebox</input-type>
 					<hint>Título de la serie en la que el documento fué publicado</hint>
-					<type-bind>Articulo,Objeto de conferencia</type-bind>
+					<type-bind>Articulo,Objeto de conferencia,Publicacion seriada</type-bind>
 				</field>
 				
 				<!-- Volumen y numero de la revista -->
@@ -688,7 +688,7 @@
 					<label>Volúmen y número de la serie</label>
 					<input-type>onebox</input-type>
 					<hint>Volúmen y número de la serie en la que el documento fué publicado</hint>
-					<type-bind>Articulo</type-bind>
+					<type-bind>Articulo,Publicacion seriada</type-bind>
 				</field>
 
 				<!-- Serie de Libro -->
