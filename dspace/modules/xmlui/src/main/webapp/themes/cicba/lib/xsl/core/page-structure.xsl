@@ -186,68 +186,7 @@
 			a.parent().hide();
 			});
 		</script>
-		<!-- El java script de abajo genera el grafico de barras para las estadisticas de los items -->
-		<script type="text/javascript">
-		  $(document).ready(function(){			 
-			var data = {
-			  labels: [<xsl:for-each select="/dri:document/dri:body/dri:div[@n='item-home']/dri:div[@n='stats']/dri:div[@id='aspect.statistics.StatisticsTransformer.div.tablewrapper']/dri:table/dri:row/dri:cell[text()!='' and @role='header']">'<xsl:value-of select="." />',</xsl:for-each>],
-			  series: [
-			    [<xsl:for-each select="/dri:document/dri:body/dri:div[@n='item-home']/dri:div[@n='stats']/dri:div[@id='aspect.statistics.StatisticsTransformer.div.tablewrapper']/dri:table/dri:row/dri:cell[text()!='' and @rend='datacell']"><xsl:value-of select="." />,</xsl:for-each>]
-			  ],
-			  colors:['#9ec4cd']
-			};
-			var options = {
-			  seriesBarDistance: 10
-			};
-			
-			
-			
-		new Chartist.Bar('.ct-chart', data, options);
-			});
-		</script>
-		<!-- Este script genera el grafico de tortas para las estadisticas del item -->
-		<script>
-		 $(document).ready(function(){	
-					var data = {
-		  labels: [<xsl:for-each select="/dri:document/dri:body/dri:div[@n='item-home']/dri:div[@n='stats']/dri:table[last()-1]/dri:row/dri:cell[text()!='' and @role='data' and @rend='labelcell']">'<xsl:value-of select="." />',</xsl:for-each>],
-		  series: [<xsl:for-each select="/dri:document/dri:body/dri:div[@n='item-home']/dri:div[@n='stats']/dri:table[last()-1]/dri:row/dri:cell[text()!='' and @role='data' and @rend='datacell']">'<xsl:value-of select="." />',</xsl:for-each>]
-		};
 		
-		var options = {
-		  labelInterpolationFnc: function(value) {
-		    return value;
-		  },
-		
-	    labelOffset: 100,
-	    labelDirection: 'explode',
-	     width: 600,
-    	height: 300
-		};
-		
-		var responsiveOptions = [
-			['screen and (min-width: 1024px)', {
-		    labelOffset: 80,
-		    chartPadding: 50
-		  }]
-		];
-		var responsiveOptions2 = [
-		  ['screen and (min-width: 640px)', {
-		    chartPadding: 30,
-		    labelOffset: 100,
-		    labelDirection: 'explode',
-		    labelInterpolationFnc: function(value) {
-		      return value;
-		    }
-		  }],
-		  ['screen and (min-width: 1024px)', {
-		    labelOffset: 80,
-		    chartPadding: 20
-		  }]
-		];
-			new Chartist.Pie('#chart2', data, options, responsiveOptions);
-			});
-		</script>
-	
 		
 	    <script type="text/javascript">
 	        <xsl:text disable-output-escaping="yes">
@@ -502,6 +441,73 @@
 				</xsl:text>
 			</script>
 		</xsl:if>
+		<!-- El java script de abajo genera el grafico de barras para las estadisticas de los items -->
+		<script type="text/javascript">
+		  $(document).ready(function(){	
+		  if($( "#aspect_statistics_StatisticsTransformer_div_item-home" ).length )
+		  {
+		  	var data = {
+			  labels: [<xsl:for-each select="/dri:document/dri:body/dri:div[@n='item-home']/dri:div[@n='stats']/dri:div[@id='aspect.statistics.StatisticsTransformer.div.tablewrapper']/dri:table/dri:row/dri:cell[text()!='' and @role='header']">'<xsl:value-of select="." />',</xsl:for-each>],
+			  series: [
+			    [<xsl:for-each select="/dri:document/dri:body/dri:div[@n='item-home']/dri:div[@n='stats']/dri:div[@id='aspect.statistics.StatisticsTransformer.div.tablewrapper']/dri:table/dri:row/dri:cell[text()!='' and @rend='datacell']"><xsl:value-of select="." />,</xsl:for-each>]
+			  ],
+			  colors:['#9ec4cd']
+			};
+			var options = {
+			  seriesBarDistance: 10
+			};		
+			new Chartist.Bar('.ct-chart', data, options);
+		  }		 
+			
+			});
+		</script>
+		<!-- Este script genera el grafico de tortas para las estadisticas del item -->
+		<script>
+		 $(document).ready(function(){	
+		 if($( "#aspect_statistics_StatisticsTransformer_div_item-home" ).length )
+		 {
+		 		var data = {
+			  labels: [<xsl:for-each select="/dri:document/dri:body/dri:div[@n='item-home']/dri:div[@n='stats']/dri:table[last()-1]/dri:row/dri:cell[text()!='' and @role='data' and @rend='labelcell']">'<xsl:value-of select="." />',</xsl:for-each>],
+			  series: [<xsl:for-each select="/dri:document/dri:body/dri:div[@n='item-home']/dri:div[@n='stats']/dri:table[last()-1]/dri:row/dri:cell[text()!='' and @role='data' and @rend='datacell']">'<xsl:value-of select="." />',</xsl:for-each>]
+			};
+			
+			var options = {
+			  labelInterpolationFnc: function(value) {
+			    return value;
+			  },
+			
+		    labelOffset: 100,
+		    labelDirection: 'explode',
+		     width: 600,
+	    	height: 300
+			};
+			
+			var responsiveOptions = [
+				['screen and (min-width: 1024px)', {
+			    labelOffset: 80,
+			    chartPadding: 50
+			  }]
+			];
+			var responsiveOptions2 = [
+			  ['screen and (min-width: 640px)', {
+			    chartPadding: 30,
+			    labelOffset: 100,
+			    labelDirection: 'explode',
+			    labelInterpolationFnc: function(value) {
+			      return value;
+			    }
+			  }],
+			  ['screen and (min-width: 1024px)', {
+			    labelOffset: 80,
+			    chartPadding: 20
+			  }]
+			];
+				new Chartist.Pie('#chart2', data, options, responsiveOptions);
+		 }
+				
+			});
+		</script>
+	
 	</xsl:template>
 
 
