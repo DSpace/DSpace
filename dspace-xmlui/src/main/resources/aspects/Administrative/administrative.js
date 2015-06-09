@@ -2135,34 +2135,136 @@ function doManageHandles()
     var result = null;
     
     do {
-	    sendPageAndWait("admin/handle/main",{},result);
-	    assertAdministrator();
-	
-	    result = null;
-	
-	    if (cocoon.request.get("submit_add"))
-	    {
-	        // Just create a blank handle then pass it to the handle editor.
-	        result = doEditHandle(-1);
-	    }
-	    else if (cocoon.request.get("submit_edit") && cocoon.request.get("handle_id"))
-	    {
-	        // Edit a specific handle
-	        var handleID = cocoon.request.get("handle_id");
-	        result = doEditHandle(handleID);
-	    }
-	    else if (cocoon.request.get("submit_delete") && cocoon.request.get("handle_id"))
-	    {
-	        // Delete a specific handle
-	        var handleID = cocoon.request.get("handle_id");
-	        result = doDeleteHandle(handleID);
-	    }	 
-	    else if (cocoon.request.get("submit_change_prefix"))
-	    {
-	        // Change prefix	        
-	        result = doChangeHandlePrefix();
-	    }
+    	if(cocoon.request.get("edit_external")){
+			sendPageAndWait("admin/handle/external_prefix", {}, result);
+			assertAdministrator();
+			result = null;
+			if(cocoon.request.get("submit_confirm")){
+				var prefix = cocoon.request.get("prefix");
+				result = doManageExternalPrefix(prefix);
+			}
+    	} else{
+            sendPageAndWait("admin/handle/main",{},result);
+            assertAdministrator();
+        
+            result = null;
+        
+            if (cocoon.request.get("submit_add"))
+            {
+                // Just create a blank handle then pass it to the handle editor.
+                result = doEditHandle(-1);
+            }
+            else if (cocoon.request.get("submit_edit") && cocoon.request.get("handle_id"))
+            {
+                // Edit a specific handle
+                var handleID = cocoon.request.get("handle_id");
+                result = doEditHandle(handleID);
+            }
+            else if (cocoon.request.get("submit_delete") && cocoon.request.get("handle_id"))
+            {
+                // Delete a specific handle
+                var handleID = cocoon.request.get("handle_id");
+                result = doDeleteHandle(handleID);
+            }	 
+            else if (cocoon.request.get("submit_change_prefix"))
+            {
+                // Change prefix	        
+                result = doChangeHandlePrefix();
+            }
+    	}
     } while (true);
+}
+
+function doManageExternalPrefix(prefix){
+	assertAdministrator();
+
+	var result = null;
+
+	do{
+		sendPageAndWait("admin/handle/external",{"prefix":prefix, "filter":null}, result);
+		result = doManageExternalButtons(prefix);
+
+	}while(true)
+	return result;
+}
+
+function doManageExternalButtons(prefix){
+	assertAdministrator();
+	var result = null;
+	if(cocoon.request.get("submit_add")){
+		result = doExternalAdd(prefix);
+
+	} else if(cocoon.request.get("submit_edit") && cocoon.request.get("handle_id")){
+		var handleID = cocoon.request.get("handle_id");
+		result = doExternalEdit(handleID, false);
+
+	} else if(cocoon.request.get("submit_delete") && cocoon.request.get("handle_id")){
+		var handleID = cocoon.request.get("handle_id");
+		result = doExternalEdit(handleID, true);
+	} else if(cocoon.request.get("submit_search_url") && cocoon.request.get("text_search")){
+		var url = cocoon.request.get("text_search");
+		result = doSearchHandle(prefix, url);
+
+	} else if(cocoon.request.get("submit_search_pid") && cocoon.request.get("text_search")){
+		var handleID = prefix + "/" + cocoon.request.get("text_search");
+		result = doExternalEdit(handleID, false);
+	} else if(cocoon.request.get("submit_cancel")){
+		return FlowHandleUtils.createEmptyResult();
+	}
+	return result;
+}
+
+function doSearchHandle(prefix, url){
+	assertAdministrator();
+	var result = null;
+	do{
+		sendPageAndWait("admin/handle/external", {"prefix":prefix, "filter":url},result);
+		result = doManageExternalButtons(prefix);
+
+	}while(result == null || !result.getContinue())
+
+	return result;
+}
+
+function doExternalEdit(handleID, isDelete){
+	assertAdministrator();
+
+	var result = null;
+
+	do{
+		sendPageAndWait("admin/handle/external_edit",{"handle_id":handleID, "isDelete":isDelete}, result);
+		assertAdministrator();
+		result = null;
+
+		if(cocoon.request.get("submit_cancel")){
+			return null;
+		} else if(cocoon.request.get("submit_confirm")) {
+			var url = cocoon.request.get("url");
+			result = FlowHandleUtils.processExternalEdit(handleID, url, isDelete);
+		}
+	}while(result == null || !result.getContinue())
+	return result;
+
+}
+
+function doExternalAdd(prefix){
+	assertAdministrator();
+	var result = null;
+	do{
+		sendPageAndWait("admin/handle/external_add",{}, result);
+		assertAdministrator();
+		result = null;
+
+		if(cocoon.request.get("submit_cancel")){
+			return null;
+		} else if(cocoon.request.get("submit_confirm")) {
+			var url = cocoon.request.get("url");
+			var handleID = cocoon.request.get("handle_id");
+			result = FlowHandleUtils.processExternalAdd(handleID, url, prefix);
+		}
+	}while(result == null || !result.getContinue())
+	return result;
+
 }
 
 

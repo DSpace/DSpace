@@ -115,6 +115,7 @@ public class CocoonView implements View
         try
         {
             servlet.service(prequest, response);
+            //throw new Exception("test");
         }
         catch (Exception e)
         {

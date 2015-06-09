@@ -43,6 +43,12 @@ public class PIDService {
 	    return ConfigurationManager.getProperty("lr", "lr.pid.service.type");
 	}
 
+	/**
+	 * 
+	 * @param PID
+	 * @return URL assigned to the PID
+	 * @throws Exception
+	 */
 	public static String resolvePID(String PID) throws Exception {
 		initialize();
 		return pidService.resolvePID(PID);
@@ -84,6 +90,11 @@ public class PIDService {
 	public static String who_am_i(String encoding) throws Exception {
 		initialize();
 		return pidService.whoAmI(encoding);
+	}
+
+	public static String deletePID(String PID) throws Exception{
+		initialize();
+		return pidService.deletePID(PID);
 	}
 	
 	public static String test_pid(String PID) throws Exception {
