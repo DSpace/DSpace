@@ -201,6 +201,42 @@ public class DryadDataFile extends DryadObject {
         }
     }
 
+    /**
+       Retrieves the first bitstream in an item. The bitstream must be in a bundle
+       marked "ORIGINAL". Bitstreams for "readme" files are ignored.
+    **/
+    public Bitstream getFirstBitstream() throws SQLException, IOException {
+        Bitstream result = null;
+        Item item = getItem();
+
+        Bundle[] bundles = item.getBundles("ORIGINAL");
+        if (bundles.length == 0) {
+            log.error("Didn't find any original bundles for " + item.getHandle());
+            throw new IOException("data bundle for " + item.getHandle() + " not found");
+        }
+        log.debug("This object has " + bundles.length + " bundles");
+
+        Bitstream[] bitstreams = bundles[0].getBitstreams();
+        boolean found = false;
+        for(int i = 0; i < bitstreams.length && !found; i++) {
+            result = bitstreams[i];
+            String name = result.getName();
+
+            if (!name.equalsIgnoreCase("readme.txt")
+                && !name.equalsIgnoreCase("readme.txt.txt")) {
+                log.debug("Retrieving bitstream " + name);
+                found = true;
+            }
+        }
+        if (!found) {
+            log.error("unable to locate a valid bitstream within the first bundle of " + item.getHandle());
+            throw new IOException(item.getHandle() + " -- first bitstream wasn't found");
+        }
+
+        return result;
+    }
+
+    
     public Long getTotalStorageSize() throws SQLException {
         // bundles and bitstreams
         Long size = 0L;
