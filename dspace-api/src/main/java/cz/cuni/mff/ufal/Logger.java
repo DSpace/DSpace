@@ -63,6 +63,10 @@ public static class own_logger extends org.apache.log4j.Logger
    public void send_error(Throwable t) {
         send_error(ExceptionUtils.getStackTrace(t));
     }
+   
+   public void send_error(Object message, Throwable t){
+       send_error(String.format("%s\n%s", message.toString(), ExceptionUtils.getStackTrace(t)));
+   }
 
     void send_error(String msg) {
 
@@ -119,7 +123,7 @@ public static class own_logger extends org.apache.log4j.Logger
     public
     void error(Object message, Throwable t) {
         impl_.error(message, t);
-      send_error(t);
+      send_error(message, t);
     }
 
     // better be reflection / mocks
