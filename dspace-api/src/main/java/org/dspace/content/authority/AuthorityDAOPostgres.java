@@ -37,30 +37,30 @@ public class AuthorityDAOPostgres implements AuthorityDAO {
 
     private Context context;
 
-//    private static final String SQL_NUM_METADATA_GROUP_BY_AUTHKEY_CONFIDENCE = "select authority, confidence, count(*) as num from item left join metadatavalue on item.item_id = metadatavalue.item_id where in_archive = true and metadata_field_id in (QUESTION_ARRAY_PLACE_HOLDER) group by authority, confidence";
-    private static final String SQL_NUM_METADATA_AUTH_GROUP_BY_CONFIDENCE = "select confidence, count(*) as num from item left join metadatavalue on item.item_id = metadatavalue.item_id where in_archive = true and metadata_field_id in (QUESTION_ARRAY_PLACE_HOLDER) and authority is not null group by confidence";
+//    private static final String SQL_NUM_METADATA_GROUP_BY_AUTHKEY_CONFIDENCE = "select authority, confidence, count(*) as num from item left join metadatavalue on (item.item_id = metadatavalue.resource_id and metadatavalue.resource_type_id=2) where in_archive = true and metadata_field_id in (QUESTION_ARRAY_PLACE_HOLDER) group by authority, confidence";
+    private static final String SQL_NUM_METADATA_AUTH_GROUP_BY_CONFIDENCE = "select confidence, count(*) as num from item left join metadatavalue on (item.item_id = metadatavalue.resource_id and metadatavalue.resource_type_id=2) where in_archive = true and metadata_field_id in (QUESTION_ARRAY_PLACE_HOLDER) and authority is not null group by confidence";
 
-    private static final String SQL_NUM_AUTHORED_ITEMS = "select count(distinct item.item_id) as num from item left join metadatavalue on item.item_id = metadatavalue.item_id where in_archive = true and metadata_field_id in (QUESTION_ARRAY_PLACE_HOLDER) and authority is not null";
+    private static final String SQL_NUM_AUTHORED_ITEMS = "select count(distinct item.item_id) as num from item left join metadatavalue on (item.item_id = metadatavalue.resource_id and metadatavalue.resource_type_id=2) where in_archive = true and metadata_field_id in (QUESTION_ARRAY_PLACE_HOLDER) and authority is not null";
   
-    private static final String SQL_NUM_ISSUED_ITEMS = "select count(distinct item.item_id) as num from item left join metadatavalue on item.item_id = metadatavalue.item_id where in_archive = true and metadata_field_id in (QUESTION_ARRAY_PLACE_HOLDER) and authority is not null and confidence <> "+ Choices.CF_ACCEPTED;
+    private static final String SQL_NUM_ISSUED_ITEMS = "select count(distinct item.item_id) as num from item left join metadatavalue on (item.item_id = metadatavalue.resource_id and metadatavalue.resource_type_id=2) where in_archive = true and metadata_field_id in (QUESTION_ARRAY_PLACE_HOLDER) and authority is not null and confidence <> "+ Choices.CF_ACCEPTED;
 
-//    private static final String SQL_NUM_METADATA_GROUP_BY_AUTH_ISSUED = "select authority is not null as hasauthority, confidence <> "+ Choices.CF_ACCEPTED +" as bissued, count(*) as num from tem ileft join metadatavalue on item.item_id = metadatavalue.item_id where in_archive = true and metadata_field_id in (QUESTION_ARRAY_PLACE_HOLDER) group by hasauthority, bissued";
+//    private static final String SQL_NUM_METADATA_GROUP_BY_AUTH_ISSUED = "select authority is not null as hasauthority, confidence <> "+ Choices.CF_ACCEPTED +" as bissued, count(*) as num from tem ileft join metadatavalue on (item.item_id = metadatavalue.resource_id and metadatavalue.resource_type_id=2) where in_archive = true and metadata_field_id in (QUESTION_ARRAY_PLACE_HOLDER) group by hasauthority, bissued";
 
     private static final String SQL_NUM_METADATA = "select count(*) as num from metadatavalue where metadata_field_id in (QUESTION_ARRAY_PLACE_HOLDER)";
 
-    private static final String SQL_NUM_AUTHKEY = "select count (distinct authority) as num from item left join metadatavalue on item.item_id = metadatavalue.item_id where in_archive = true and metadata_field_id in (QUESTION_ARRAY_PLACE_HOLDER) and authority is not null";
+    private static final String SQL_NUM_AUTHKEY = "select count (distinct authority) as num from item left join metadatavalue on (item.item_id = metadatavalue.resource_id and metadatavalue.resource_type_id=2) where in_archive = true and metadata_field_id in (QUESTION_ARRAY_PLACE_HOLDER) and authority is not null";
 
-    private static final String SQL_NUM_AUTHKEY_ISSUED = "select count (distinct authority) as num from item left join metadatavalue on item.item_id = metadatavalue.item_id where in_archive = true and metadata_field_id in (QUESTION_ARRAY_PLACE_HOLDER) and confidence <> "+ Choices.CF_ACCEPTED + " and authority is not null";
+    private static final String SQL_NUM_AUTHKEY_ISSUED = "select count (distinct authority) as num from item left join metadatavalue on (item.item_id = metadatavalue.resource_id and metadatavalue.resource_type_id=2) where in_archive = true and metadata_field_id in (QUESTION_ARRAY_PLACE_HOLDER) and confidence <> "+ Choices.CF_ACCEPTED + " and authority is not null";
 
-    private static final String SQL_AUTHKEY_ISSUED = "select distinct authority from item left join metadatavalue on item.item_id = metadatavalue.item_id where in_archive = true and metadata_field_id in (QUESTION_ARRAY_PLACE_HOLDER) and authority is not null and confidence <> "+ Choices.CF_ACCEPTED+" order by authority asc limit ? offset ?";
+    private static final String SQL_AUTHKEY_ISSUED = "select distinct authority from item left join metadatavalue on (item.item_id = metadatavalue.resource_id and metadatavalue.resource_type_id=2) where in_archive = true and metadata_field_id in (QUESTION_ARRAY_PLACE_HOLDER) and authority is not null and confidence <> "+ Choices.CF_ACCEPTED+" order by authority asc limit ? offset ?";
 
-    private static final String SQL_NUM_ITEMSISSUED_BYKEY = "select count (distinct item.item_id) as num from item left join metadatavalue on item.item_id = metadatavalue.item_id where in_archive = true and metadata_field_id in (QUESTION_ARRAY_PLACE_HOLDER) and confidence <> "+ Choices.CF_ACCEPTED+" and authority = ?";
+    private static final String SQL_NUM_ITEMSISSUED_BYKEY = "select count (distinct item.item_id) as num from item left join metadatavalue on (item.item_id = metadatavalue.resource_id and metadatavalue.resource_type_id=2) where in_archive = true and metadata_field_id in (QUESTION_ARRAY_PLACE_HOLDER) and confidence <> "+ Choices.CF_ACCEPTED+" and authority = ?";
 
-    private static final String SQL_NEXT_ISSUED_AUTHKEY = "select min(authority) as key from item left join metadatavalue on item.item_id = metadatavalue.item_id where in_archive = true and metadata_field_id in (QUESTION_ARRAY_PLACE_HOLDER) and authority is not null and authority > ? and confidence <> "+ Choices.CF_ACCEPTED;
+    private static final String SQL_NEXT_ISSUED_AUTHKEY = "select min(authority) as key from item left join metadatavalue on (item.item_id = metadatavalue.resource_id and metadatavalue.resource_type_id=2) where in_archive = true and metadata_field_id in (QUESTION_ARRAY_PLACE_HOLDER) and authority is not null and authority > ? and confidence <> "+ Choices.CF_ACCEPTED;
 
-    private static final String SQL_PREV_ISSUED_AUTHKEY = "select max(authority) as key from item left join metadatavalue on item.item_id = metadatavalue.item_id where in_archive = true and  metadata_field_id in (QUESTION_ARRAY_PLACE_HOLDER) and authority is not null and authority < ? and confidence <> "+ Choices.CF_ACCEPTED;
+    private static final String SQL_PREV_ISSUED_AUTHKEY = "select max(authority) as key from item left join metadatavalue on (item.item_id = metadatavalue.resource_id and metadatavalue.resource_type_id=2) where in_archive = true and  metadata_field_id in (QUESTION_ARRAY_PLACE_HOLDER) and authority is not null and authority < ? and confidence <> "+ Choices.CF_ACCEPTED;
 
-    private static final String SQL_ITEMSISSUED_BYKEY_AND_CONFIDENCE = "SELECT item.* FROM item left join metadatavalue on item.item_id = metadatavalue.item_id WHERE in_archive=true AND metadata_field_id in (QUESTION_ARRAY_PLACE_HOLDER) AND authority = ? AND confidence = ?";
+    private static final String SQL_ITEMSISSUED_BYKEY_AND_CONFIDENCE = "SELECT item.* FROM item left join metadatavalue on (item.item_id = metadatavalue.resource_id and metadatavalue.resource_type_id=2) WHERE in_archive=true AND metadata_field_id in (QUESTION_ARRAY_PLACE_HOLDER) AND authority = ? AND confidence = ?";
     
     public AuthorityDAOPostgres(Context context) {
         this.context = context;
@@ -195,7 +195,7 @@ public class AuthorityDAOPostgres implements AuthorityDAO {
             int[] fieldId) throws SQLException
     {
         String query = "SELECT item.* FROM item left join metadatavalue " +
-                "on item.item_id = metadatavalue.item_id " +
+                "on (item.item_id = metadatavalue.resource_id and metadatavalue.resource_type_id=2) " +
                 "WHERE in_archive=true AND metadata_field_id in (QUESTION_ARRAY_PLACE_HOLDER) AND authority = ? AND confidence <> "+ Choices.CF_ACCEPTED;
         TableRowIterator rows = DatabaseManager.queryTable(context, "item",
             query, fieldId, authority);
