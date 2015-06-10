@@ -1539,18 +1539,19 @@
 		<property name="password" ref="dspaceDBPassword" />
 		
 		<!-- these are C3P0 properties -->
-        <property name="acquireIncrement" value="5" />
-        <property name="minPoolSize" value="20" />
-        <property name="maxPoolSize" value="100" />
-        <property name="maxIdleTime" value="100" />
-		<property name="maxStatements" value="50" />
-  		<property name="idleConnectionTestPeriod" value="3000" />
-  		<property name="loginTimeout" value="300" />
+        <property name="acquireIncrement" ref="hibernateAcquireIncrement" />
+        <property name="initialPoolSize" ref="hibernateInitialPoolSize" />
+        <property name="minPoolSize" ref="hibernateMinPoolSize" />
+        <property name="maxPoolSize" ref="hibernateMaxPoolSize" />
+        <property name="maxIdleTime" ref="hibernateMaxIdleTime" />
+		<property name="maxStatements" ref="hibernateMaxStatements" />
+  		<property name="idleConnectionTestPeriod" ref="hibernateIdleConnectionTestPeriod" />
+  		<property name="loginTimeout" ref="hibernateLoginTimeout" />
   
 	</bean>
 	
 	<!--
-			event listenter for indexing with Hibernate Seach and naming RP change
+			event listener for indexing with Hibernate Seach and naming RP change
 		-->
 	<bean id="eventIntegrator" class="org.dspace.app.cris.util.HibernateEventRegistry" init-method="init">
 		<property name="sessionFactory" ref="sessionFactory" />
