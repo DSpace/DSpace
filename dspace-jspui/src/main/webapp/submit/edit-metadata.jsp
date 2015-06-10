@@ -235,7 +235,7 @@
             {
                 if (inputBlock != null)
                     sb.insert(0, inputBlock);
-                sb.append("<button class=\"btn btn-default col-md-1\" name=\"").append(fieldInput).append("_lookup\" ")
+                sb.append("<button class=\"btn btn-default\" name=\"").append(fieldInput).append("_lookup\" ")
                   .append("onclick=\"javascript: return DSpaceChoiceLookup('")
                   .append(contextPath).append("/tools/lookup.jsp','")
                   .append(fieldName).append("','edit_metadata','")
