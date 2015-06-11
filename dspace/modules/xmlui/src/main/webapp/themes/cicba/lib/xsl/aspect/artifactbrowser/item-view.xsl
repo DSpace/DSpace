@@ -57,7 +57,7 @@
 					<xsl:attribute name="xml:lang" ><xsl:value-of select="@language"/></xsl:attribute>
 				</xsl:if>
 				<xsl:choose>
-					<xsl:when test="$anchor">
+					<xsl:when test="$anchor and @authority!=''">
 						<xsl:call-template name="build-anchor">
 							<xsl:with-param name="a.href" select="@authority"/>
 							<xsl:with-param name="a.value" select="text()"/>
