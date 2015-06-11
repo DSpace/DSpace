@@ -291,6 +291,7 @@
 							case "by": licenseText += "Attribution "; break;
 							case "nd": licenseText += "NoDerivatives "; break;
 							case "nc": licenseText += "NonCommercial "; break;
+							case "sa": licenseText += "ShareAlike "; break;
 						}
 					});
 					//process numberOfLicense
@@ -335,7 +336,7 @@
 			function setAutocompleteParams(inputFieldName, index, array){
 				$('#'+ fieldIDPrefix + inputFieldName).click(function(){
 					($(this).autocomplete("option","minLength") != 0)? $(this).autocomplete( "option", "minLength" , 0) : null; 
-					 $('#'+ fieldIDPrefix + inputFieldName).autocomplete( "search", "BY-ND" );
+					 $('#'+ fieldIDPrefix + inputFieldName).autocomplete( "search", " " );
 				});
 			}
 			
@@ -394,7 +395,9 @@
 												var daysToAdd = this.value;
 												if(daysToAdd > 0){
 													var embargoEndDate = calculateEmbargoEndDate(daysToAdd);
-													$(dateFieldHolder).val(embargoEndDate.getFullYear() + '-' + embargoEndDate.getMonth() + '-' + embargoEndDate.getDate());
+													//The method getMonth() in Date object returns a number as a zero-based value. P.e.: "0" correspond to January.
+													var monthNumber = embargoEndDate.getMonth() + 1;
+													$(dateFieldHolder).val(embargoEndDate.getFullYear() + '-' + monthNumber + '-' + embargoEndDate.getDate());
 												}else{
 													$(dateFieldHolder).val('');
 												}
@@ -431,7 +434,7 @@
 					$(dateFieldHolder).change(function(){
 						var embargoEndDate = $(this).val();
 						if( embargoEndDate != ''){
-							$(embargoMessageField).html('El item será públicamente accesible a partir del día &lt;span class="embargoDate"&gt;'+ embargoEndDate + '&lt;/span&gt;');
+							$(embargoMessageField).html('El item será públicamente accesible a partir del día &lt;span class="embargoDate"&gt;'+ embargoEndDate + '&lt;/span&gt; (año-mes-día)');
 						}else{
 							$(embargoMessageField).html("El item será publicamente accesible");
 						}
