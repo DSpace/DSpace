@@ -7,17 +7,16 @@
 	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc">
 	
 	<!--  este template machea con el div que trae los autores a listar -->
-	<xsl:template match="dri:div[@id='aspect.artifactbrowser.ConfigurableBrowse.div.browse-by-author-results' and @n='browse-by-author-results'] | dri:div[@id='aspect.artifactbrowser.ConfigurableBrowse.div.browse-by-subject-results' and @n='browse-by-subject-results']">
+	<xsl:template match="dri:div[@id='aspect.artifactbrowser.ConfigurableBrowse.div.browse-by-author-results' and @n='browse-by-author-results']/dri:table[@id='aspect.artifactbrowser.ConfigurableBrowse.table.browse-by-author-results'] | dri:div[@id='aspect.artifactbrowser.ConfigurableBrowse.div.browse-by-subject-results' and @n='browse-by-subject-results']/dri:table[@id='aspect.artifactbrowser.ConfigurableBrowse.table.browse-by-subject-results']">
 		
 		<!-- La variable rows contiene la cantidad de autores que se van a mostar -->
 		<xsl:variable name="rows"> 
-			<xsl:value-of select="dri:table/@rows" />
+			<xsl:value-of select="@rows" />
 		</xsl:variable>
 		<!--  la variable cantColumns contiene la cantidad de columnas que yo debo crear -->
 		<xsl:variable name="cantColums">
 				 	<xsl:value-of select="ceiling(($rows -1) div 25)"/>
 		</xsl:variable>
-		<xsl:call-template name="pager"/>
 		<div class="container">
 			<div class="row item-head">
 				<xsl:choose>
@@ -81,14 +80,14 @@
 	<xsl:template name="loop">
 	  <xsl:param name="count-left"></xsl:param>
 	  <xsl:param name="pos"></xsl:param>
-	    <xsl:if test="$count-left &gt; 0 and dri:table/dri:row[position()=$pos]/dri:cell/dri:xref/@target !=''">
+	    <xsl:if test="$count-left &gt; 0 and dri:row[position()=$pos]/dri:cell/dri:xref/@target !=''">
 	     <a>
 	     	<xsl:attribute name="href">
-	     		<xsl:value-of select="dri:table/dri:row[position()=$pos]/dri:cell/dri:xref/@target"/>
+	     		<xsl:value-of select="dri:row[position()=$pos]/dri:cell/dri:xref/@target"/>
 	     	</xsl:attribute>
-	     	<xsl:value-of select="dri:table/dri:row[position()=$pos]/dri:cell/dri:xref"/>
+	     	<xsl:value-of select="dri:row[position()=$pos]/dri:cell/dri:xref"/>
 	     </a>
-	     <xsl:value-of select="dri:table/dri:row[position()=$pos]/dri:cell/text()"/>
+	     <xsl:value-of select="dri:row[position()=$pos]/dri:cell/text()"/>
 	     <br></br>
 	     <xsl:call-template name="loop">
 	        <xsl:with-param name="count-left">
@@ -102,39 +101,6 @@
 	</xsl:template>
 	
 	
-	<xsl:template name="pager">
-		<div class="pagination clearfix top">
-			<p class="pagination-info">
-				<i18n:translate>
-					<i18n:text>xmlui.dri2xhtml.structural.pagination-info</i18n:text>
-					<i18n:param type="number"><xsl:value-of select="./@firstItemIndex"/></i18n:param>
-					<i18n:param type="number"><xsl:value-of select="./@lastItemIndex"/></i18n:param>
-					<i18n:param type="number"><xsl:value-of select="./@itemsTotal"/></i18n:param>
-				</i18n:translate>
-			</p> 
-			<ul class="pagination-links">				
-				<li>
-					<xsl:if test="./@nextPage!=''">
-						<a class="next-page-link">
-						<xsl:attribute name="href">
-							<xsl:value-of select="./@nextPage"/>
-						</xsl:attribute>
-						<i18n:text>xmlui.dri2xhtml.structural.pagination-next</i18n:text>			
-						</a>
-					</xsl:if>
-				</li>
-				<li>
-					<xsl:if test="./@previousPage">
-						<a class="next-page-link">
-						<xsl:attribute name="href">
-							<xsl:value-of select="./@previousPage"/>
-						</xsl:attribute>
-						<i18n:text>xmlui.dri2xhtml.structural.pagination-previous</i18n:text>			
-						</a>
-					</xsl:if>
-				</li>
-			</ul>
-		</div>	
-	</xsl:template>
+	
 	
 </xsl:stylesheet>
