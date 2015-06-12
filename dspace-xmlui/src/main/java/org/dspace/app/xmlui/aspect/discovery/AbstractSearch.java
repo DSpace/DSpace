@@ -492,6 +492,10 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
     		}
     		genericAddMetadata(all,dso,highlightedResults,dsoMetadata);    		
             String identifier_uri = "http://hdl.handle.net/" + dso.getHandle();
+            if(StringUtils.isNotBlank(parent))
+            {
+                addMetadataField(highlightedResults, "dc.other", dsoMetadata.addList(dso.getHandle() + ":dc.other"), parent);
+            }
             if(StringUtils.isNotBlank(identifier_uri))
             {
                 addMetadataField(highlightedResults, "dc.identifier.uri", dsoMetadata.addList(dso.getHandle() + ":dc.identifier.uri"), identifier_uri);
