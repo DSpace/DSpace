@@ -173,7 +173,14 @@ function doWorkflow()
         else if (cocoon.request.get("submit_approve"))
         {
             // Approve this task and exit the workflow
-            var archived = FlowUtils.processApproveTask(getDSContext(),workflowID);
+            try {
+                var archived = FlowUtils.processApproveTask(getDSContext(), workflowID);
+            } catch (e if e.javaException instanceof java.lang.RuntimeException) {
+                sendPageAndWait("workflow/approveError",{"id":workflowID});
+                if(cocoon.request.get("submit_force")){
+                    FlowWorkflowUtils.registerLocally(getDSContext(), workflowID);
+                }
+            }
 
             var contextPath = cocoon.request.getContextPath();
             cocoon.redirectTo(contextPath+"/submissions",true);

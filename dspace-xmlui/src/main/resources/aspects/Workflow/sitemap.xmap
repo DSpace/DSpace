@@ -25,6 +25,7 @@
       <map:transformer name="PerformTaskStep" src="org.dspace.app.xmlui.aspect.workflow.PerformTaskStep"/>
       <!-- UFAL -->
       <map:transformer name="MoveWorkflowItemForm" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.workflow.MoveWorkflowItemForm"/>
+      <map:transformer name="ApproveError" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.workflow.ApproveError"/>
     </map:transformers>
 
     <map:selectors>
@@ -91,6 +92,12 @@
 				</map:transform>
 			</map:match>
 
+			<map:match pattern="workflow/approveError">
+		        <map:transform type="ApproveError">
+		        	<map:parameter name="id" value="{flow-attribute:id}"/>
+                </map:transform>
+            </map:match>
+
           <!--
               The submissions page provides a list of all submission
               related tasks/items/thingys. It is used by both those
@@ -143,6 +150,12 @@
               <map:transform type="RejectTaskStep">
                 <map:parameter name="id" value="{flow-attribute:id}"/>
                 <map:parameter name="step" value="{flow-attribute:step}"/>
+              </map:transform>
+            </map:match>
+
+            <map:match pattern="handle/*/*/workflow/approveError">
+              <map:transform type="PerformTaskStep">
+                <map:parameter name="id" value="{flow-attribute:id}"/>
               </map:transform>
             </map:match>
 
