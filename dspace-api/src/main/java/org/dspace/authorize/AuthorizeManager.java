@@ -1171,7 +1171,7 @@ public class AuthorizeManager
             } else
             {
                 // add policy just for anonymous
-                ResourcePolicy rp = AuthorizeManager.createOrModifyPolicy(null, context, null, 0, null, embargoDate, Constants.READ, reason, dso);
+                ResourcePolicy rp = AuthorizeManager.createOrModifyPolicy(null, context, null, Group.ANONYMOUS_ID, null, embargoDate, Constants.READ, reason, dso);
                 if (rp != null)
                     rp.update();
             }
