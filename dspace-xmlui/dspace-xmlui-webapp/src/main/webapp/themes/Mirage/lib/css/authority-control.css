@@ -62,6 +62,8 @@ img.ds-authority-confidence.cf-uncertain
 img.ds-authority-confidence.cf-accepted
   { background: transparent url(../../images/authority_control/confidence/6-thumb2.gif); }
 
+img.ds-authority-confidence.cf-accepted.orcid
+  { background: transparent url(../../images/authority_control/confidence/orcid_16x16.gif); }
 /* hide authority-value inputs in forms */
 input.ds-authority-value { display:none; }
 /** XXX Change to this to get the authority value to show up for debugging:

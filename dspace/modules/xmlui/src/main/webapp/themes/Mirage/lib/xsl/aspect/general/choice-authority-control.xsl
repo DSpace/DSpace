@@ -138,10 +138,13 @@
       -->
     <xsl:template name="authorityConfidenceIcon">
       <!-- default confidence value won't show any image. -->
-      <xsl:param name="confidence" select="'blank'"/>
-      <xsl:param name="id" select="''"/>
+        <xsl:param name="confidence" select="'blank'"/>
+        <xsl:param name="id" select="''"/>
+        <xsl:param name="authType" select="''"/>
+
       <xsl:variable name="lcConfidence" select="translate($confidence,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')"/>
-      <img i18n:attr="title">
+
+        <img i18n:attr="title">
         <xsl:if test="string-length($id) > 0">
           <xsl:attribute name="id">
              <xsl:value-of select="$id"/>
@@ -154,7 +157,7 @@
           <xsl:text>ds-authority-confidence </xsl:text>
           <xsl:choose>
             <xsl:when test="string-length($lcConfidence) > 0">
-              <xsl:value-of select="concat('cf-',$lcConfidence,' ')"/>
+              <xsl:value-of select="concat('cf-',$lcConfidence,' ',$authType,' ')"/>
             </xsl:when>
             <xsl:otherwise>
               <xsl:text>cf-blank </xsl:text>
