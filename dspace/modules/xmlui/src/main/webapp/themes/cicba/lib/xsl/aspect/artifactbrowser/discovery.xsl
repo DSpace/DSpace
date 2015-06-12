@@ -157,6 +157,10 @@
                     select="$metsDoc/mets:METS/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='format'][@qualifier='extent'][1]"/>
             <xsl:text>]</xsl:text>
         </xsl:if>
+        <br/>
+        <xsl:if test="dri:list[@id='aspect.discovery.SimpleSearch.list.123456789/11:dc.other']">
+        	<xsl:value-of select="dri:list[@id='aspect.discovery.SimpleSearch.list.123456789/11:dc.other']/dri:item"/>
+        </xsl:if>
         </div>
 
 
