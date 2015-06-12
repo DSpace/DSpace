@@ -114,7 +114,7 @@
         </div>
     </xsl:template>
 
-    <!-- The hadling of the special case of instanced composite fields under "form" lists -->
+    <!-- The handling of the special case of instanced composite fields under "form" lists, such as author lookup -->
     <xsl:template match="dri:field[@type='composite'][dri:field/dri:instance | dri:params/@operations]" mode="formComposite" priority="2">
         <div class="ds-form-content">
             <xsl:apply-templates select="dri:help" mode="compositeComponent"/>
@@ -138,8 +138,10 @@
                 <xsl:apply-templates select="dri:field/dri:error" mode="compositeComponent"/>
                 <xsl:apply-templates select="dri:error" mode="compositeComponent"/>
             </xsl:if>
+        </div>
 
-            <!-- handle previous entries -->
+        <!-- This div handles previous entries. -->
+        <div class="ds-form-content">
             <xsl:choose>
                 <!-- handle author list as a special case to enable reordering/editing -->
                 <xsl:when test="@n = 'dc_contributor_author'">
@@ -162,7 +164,7 @@
         </div>
     </xsl:template>
 
-    <!-- The hadling of the special case of instanced composite fields under "form" lists -->
+    <!-- The handling of the special case of instanced text fields under "form" lists -->
     <xsl:template match="dri:field[@type='text'][dri:field/dri:instance | dri:params/@operations]" mode="formText" priority="2">
         <xsl:variable name="confidenceIndicatorID" select="concat(translate(@id,'.','_'),'_confidence_indicator')"/>
         <div class="ds-form-content">
@@ -188,7 +190,6 @@
 
             <!-- handle previous entries -->
             <xsl:choose>
-                <!-- handle author list as a special case to enable reordering/editing -->
                 <xsl:when test="@n = 'dc_coverage_spatial'
                              or @n = 'dc_coverage_temporal'
                              or @n = 'dc_subject'
@@ -258,33 +259,19 @@
                             <xsl:with-param name="id" select="concat(translate(@id,'.','_'),'_confidence_indicator')"/>
                         </xsl:call-template>
                     </xsl:if>
-                    <xsl:choose>
-                        <xsl:when test="@type='composite'">
-                            <xsl:apply-templates select="dri:field/dri:instance[$position]" mode="hiddenInterpreter"/>
-                            <xsl:apply-templates select="dri:instance[$position]" mode="hiddenInterpreter"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <xsl:apply-templates select="dri:instance[$position]" mode="hiddenInterpreter"/>
-                        </xsl:otherwise>
-                    </xsl:choose>
+                    <xsl:if test="@type='composite'">
+                        <xsl:apply-templates select="dri:field/dri:instance[$position]" mode="hiddenInterpreter"/>
+                    </xsl:if>
+                    <xsl:apply-templates select="dri:instance[$position]" mode="hiddenInterpreter"/>
                 </td>
                 <!-- EDIT -->
                 <td class="ds-edit-button">
                     <xsl:if test="contains(dri:params/@operations,'add')">
                         <input type="submit" i18n:attr="value" value="xmlui.Submission.submit.DescribeStep.edit" name="{concat('submit_',@n,'_',$position,'_edit')}" class="ds-button-field ds-edit-button" >
                             <xsl:if test="dri:params/@authorityControlled = 'yes'">
-                                <xsl:choose>
-                                    <xsl:when test="@type='composite'">
-                                        <xsl:if test="dri:instance[$position]/dri:value[@type='authority']/@confidence='ACCEPTED'">
-                                            <xsl:attribute name="disabled">disabled</xsl:attribute>
-                                        </xsl:if>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xsl:if test="dri:instance[$position]/dri:value[@type='authority']/@confidence='ACCEPTED'">
-                                            <xsl:attribute name="disabled">disabled</xsl:attribute>
-                                        </xsl:if>
-                                    </xsl:otherwise>
-                                </xsl:choose>
+                                <xsl:if test="dri:instance[$position]/dri:value[@type='authority']/@confidence='ACCEPTED'">
+                                    <xsl:attribute name="disabled">disabled</xsl:attribute>
+                                </xsl:if>
                             </xsl:if>
                         </input>
                     </xsl:if>
@@ -321,11 +308,6 @@
             <input type="submit" i18n:attr="value" value="xmlui.Submission.submit.DescribeStep.add" name="{concat('submit_',@n,'_add')}" class="ds-button-field ds-add-button">
                 <!-- Make invisible if we have choice-lookup popup that provides its own Add. -->
                 <xsl:if test="dri:params/@choicesPresentation = 'lookup'">
-                    <xsl:attribute name="style">
-                        <xsl:text>display:none;</xsl:text>
-                    </xsl:attribute>
-                </xsl:if>
-                <xsl:if test="dri:params/@choicesPresentation = 'authorLookup'">
                     <xsl:attribute name="style">
                         <xsl:text>display:none;</xsl:text>
                     </xsl:attribute>
