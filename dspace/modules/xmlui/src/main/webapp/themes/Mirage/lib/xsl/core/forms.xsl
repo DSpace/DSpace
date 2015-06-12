@@ -153,7 +153,9 @@
                 <xsl:when test="@n = 'dc_contributor_author'">
                     <xsl:if test="dri:field and dri:field/dri:instance">
                         <div class="ds-previous-values">
-                            <xsl:call-template name="ds-previous-values-edit-reorder"/>
+                            <xsl:call-template name="ds-previous-values-edit-reorder">
+                                <xsl:with-param name="type" select="'orcid'"/>
+                            </xsl:call-template>
                         </div>
                     </xsl:if>
                 </xsl:when>
@@ -221,11 +223,13 @@
     </xsl:template>
 
     <xsl:template name="ds-previous-values-edit-reorder">
+        <xsl:param name="type" select="''"/>
         <table>
             <!-- Iterate over the dri:instance elements contained in this field. The instances contain
                     stored values as either "interpreted", "raw", or "default" values. -->
             <xsl:call-template name="fieldIterator-edit-reorder">
                 <xsl:with-param name="position" select="1"/>
+                <xsl:with-param name="type" select="$type"/>
             </xsl:call-template>
         </table>
     </xsl:template>
@@ -238,6 +242,7 @@
         components rather than a single field, which requires it to consider several sets of instances. -->
     <xsl:template name="fieldIterator-edit-reorder">
         <xsl:param name="position"/>
+        <xsl:param name="type" select="''"/>
         <xsl:variable name="this-instance" select="dri:instance[position()=$position]"/>
         <xsl:if test="$this-instance">
             <tr class="ds-edit-reorder-input-row">
@@ -263,6 +268,7 @@
                         <xsl:call-template name="authorityConfidenceIcon">
                             <xsl:with-param name="confidence" select="dri:instance[$position]/dri:value[@type='authority']/@confidence"/>
                             <xsl:with-param name="id" select="concat(translate(@id,'.','_'),'_confidence_indicator')"/>
+                            <xsl:with-param name="authType" select="$type"/>
                         </xsl:call-template>
                     </xsl:if>
                     <xsl:if test="@type='composite'">
@@ -294,6 +300,7 @@
             <!-- recurse to handle subsequent authors -->
             <xsl:call-template name="fieldIterator-edit-reorder">
                 <xsl:with-param name="position" select="$position + 1"/>
+                <xsl:with-param name="type" select="$type"/>
             </xsl:call-template>
         </xsl:if>
     </xsl:template>
