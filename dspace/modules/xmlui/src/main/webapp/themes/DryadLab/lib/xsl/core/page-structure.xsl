@@ -424,22 +424,10 @@ references to stylesheets pulled directly from the pageMeta element. -->
                     </xsl:if>
                     <ul class="sf-menu">
                         <li>
-				<a href="/pages/dryadlab">Home</a>
+				<a href="/pages/dryadlab">DryadLab Home</a>
                         </li>
                         <li>
-				<a href="/pages/aboutDryadLab">About</a>
-                        </li>
-                        <li>
-				<a href="/pages/dryadLabFAQ">FAQ</a>
-                        </li>
-                        <li>
-				<a href="/pages/dryadLabProcess">Developing learning modules</a>
-                        </li>
-                        <li>
-				<a href="/pages/workWithDryadLab">Working with DryadLab</a>
-                        </li>
-                        <li>
-				<a href="/pages/introToDryad">Introduction to Dryad</a>
+				<a href="/pages/dryadLabFAQ">Frequently Asked Questions</a>
                         </li>
                         <li>
                             <a href="/feedback">Contact us</a>
