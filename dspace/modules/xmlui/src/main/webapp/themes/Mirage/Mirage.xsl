@@ -245,7 +245,7 @@
                             <a href="/pages/dryadlab">
                                 <img alt="" src="/themes/Mirage/images/dryadlab-promo.png" />
                                 <p style="width: 580px; color: #444; font-size: 80%; top: 75px; right: 10px; line-height: 1.2em; position: absolute; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);"> 
-                                    Use Dryad research data in the classroom! Our educational modules are hand-picked and carefully designed for secondary and undergraduate students.
+                                    DryadLab is a collection of free, openly-licensed, high-quality, hands-on, educational modules for students to engage in scientific inquiry using real data.
                                 </p>
                                 <p style="drop-shadow: 4px 4px; position: absolute; right: 40px; bottom: 6px; font-size: 70%; text-align: right; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);">Learn More &#187;</p>
                             </a>
