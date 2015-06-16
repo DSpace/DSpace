@@ -32,6 +32,10 @@
             <map:transformer name="ManageETDDepartmentsMain" src="org.dspace.app.xmlui.aspect.administrative.etd_departments.ManageETDDepartmentsMain"/>
             <map:transformer name="EditETDDepartmentsForm" src="org.dspace.app.xmlui.aspect.administrative.etd_departments.EditETDDepartmentsForm"/>
             <map:transformer name="DeleteETDDepartmentsConfirm" src="org.dspace.app.xmlui.aspect.administrative.etd_departments.DeleteETDDepartmentsConfirm"/>
+            
+            <map:transformer name="ManageUnitsMain" src="org.dspace.app.xmlui.aspect.administrative.units.ManageUnitsMain"/>
+            <map:transformer name="EditUnitsForm" src="org.dspace.app.xmlui.aspect.administrative.units.EditUnitsForm"/>
+            <map:transformer name="DeleteUnitsConfirm" src="org.dspace.app.xmlui.aspect.administrative.units.DeleteUnitsConfirm"/>
 
             <map:transformer name="MetadataRegistryMain" src="org.dspace.app.xmlui.aspect.administrative.registries.MetadataRegistryMain"/>
             <map:transformer name="EditMetadataSchema" src="org.dspace.app.xmlui.aspect.administrative.registries.EditMetadataSchema"/>
@@ -158,6 +162,17 @@
                             <map:call continuation="{1}"/>
                         </map:match>
                         <map:call function="startManageETDDepartments"/>
+                    </map:match>
+                    
+                    <!--
+                     This is the general entry / resume point for the
+                     management of all Units.
+                     -->
+                    <map:match pattern="admin/units">
+                        <map:match type="request" pattern="administrative-continue">
+                            <map:call continuation="{1}"/>
+                        </map:match>
+                        <map:call function="startManageUnits"/>
                     </map:match>
 
                     <!--
@@ -473,7 +488,49 @@
                                 <map:parameter name="etd_departmentIDs" value="{flow-attribute:etd_departmentIDs}"/>
                             </map:transform>
                         </map:match>
+	
+						<!-- Unit management pages -->
 
+
+                        <!--
+                         The main unit management page allows for groups to be searched, browsed,
+                         and selected for editing or deletion.
+                         -->
+                        <map:match pattern="admin/units/main">
+                            <map:transform type="ManageUnitsMain">
+                                <map:parameter name="query" value="{flow-attribute:query}"/>
+                                <map:parameter name="page" value="{flow-attribute:page}"/>
+                                <map:parameter name="highlightID" value="{flow-attribute:highlightID}"/>
+                            </map:transform>
+                        </map:match>
+
+                        <!--
+                         The edit units form shows a unit's data and allows the user to
+                         edit the unit's membership, edit it's name, search for new groups
+                         to add as members. It also serves as the new unit page.
+                         -->
+                        <map:match pattern="admin/units/edit">
+                            <map:transform type="EditUnitsForm">
+                                <map:parameter name="unitID" value="{flow-attribute:unitID}"/>
+                                <map:parameter name="unitName" value="{flow-attribute:unitName}"/>
+                                <map:parameter name="memberGroupIDs" value="{flow-attribute:memberGroupIDs}"/>
+                                <map:parameter name="highlightGroupID" value="{flow-attribute:highlightGroupID}"/>
+                                <map:parameter name="query" value="{flow-attribute:query}"/>
+                                <map:parameter name="page" value="{flow-attribute:page}"/>
+                                <map:parameter name="type" value="{flow-attribute:type}"/>
+                                <map:parameter name="errors" value="{flow-attribute:errors}"/>
+                            </map:transform>
+                        </map:match>
+
+                        <!--
+                         The delete units page lists all the yet-to-be-deleted pages, if the user
+                         clicks confirm deletion then the units are removed.
+                         -->
+                        <map:match pattern="admin/units/delete">
+                            <map:transform type="DeleteUnitsConfirm">
+                                <map:parameter name="unitIDs" value="{flow-attribute:unitIDs}"/>
+                            </map:transform>
+                        </map:match>
 
                         <!-- Metadata Registry pages -->
 
@@ -973,6 +1030,9 @@
                         <map:act type="StartAuthentication"/>
                     </map:match>
                     <map:match pattern="admin/etd_departments">
+                        <map:act type="StartAuthentication"/>
+                    </map:match>
+                    <map:match pattern="admin/units">
                         <map:act type="StartAuthentication"/>
                     </map:match>
                     <map:match pattern="admin/metadata-registry">
