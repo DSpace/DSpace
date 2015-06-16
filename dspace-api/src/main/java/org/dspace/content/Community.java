@@ -656,7 +656,6 @@ public class Community extends DSpaceObject
                 "item.item_id=communities2item.item_id AND " +
                 "communities2item.community_id= ? " +
                 "AND item.in_archive='1'";
-        System.out.println(myQuery);
         TableRowIterator rows = DatabaseManager.queryTable(ourContext, "item", myQuery, getID());
 
         return new ItemIterator(ourContext, rows);
