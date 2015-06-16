@@ -1160,6 +1160,7 @@
 	<message key="xmlui.Submission.workflow.PerformTaskStep.return_submit">Return task to pool</message>
     <!-- <UFAL> -->
     <message key="xmlui.Submission.workflow.PerformTaskStep.record_format_help">Show item record in simple / full format</message>
+	<message key="xmlui.Submission.workflow.ApproveError.note">There was an error while registering the item with external handle service. The server might have temporary issues. You may try to approve the submission another time, or make it available locally and create appropriate handle record later.</message>
     <!--  </UFAL> -->
 
 	<!-- org.dspace.app.xmlui.Submission.workflow.RejectTaskStep -->

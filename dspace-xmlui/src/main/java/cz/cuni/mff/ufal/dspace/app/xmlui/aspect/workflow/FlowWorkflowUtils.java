@@ -84,4 +84,19 @@ public class FlowWorkflowUtils {
 
         return reclaimed;
     }
+
+    public static boolean registerLocally(Context context, String workflowID) throws SQLException, IOException, AuthorizeException, ServletException, UIException {
+        WorkflowItem wfi = FlowUtils.findWorkflow(context, workflowID);
+        Item item = wfi.getItem();
+        /*
+         XXX: This is sick...
+         1) call to Handle.create calls HandleManager.createHandle which uses the handle.prefix from configuration
+         2) when there is a handle assigned to the item ConfigurableHandleIdentifierProvider register/mint method
+         uses that, ie. it does not try to register with epic. Meaning "local" handle is created.
+         3) The call to processApproveTask apart from calling the service.register from 2) also manages other stuff
+         such as provenance and sending emails
+         */
+        cz.cuni.mff.ufal.dspace.handle.Handle handle = cz.cuni.mff.ufal.dspace.handle.Handle.create(context, item);
+        return FlowUtils.processApproveTask(context, workflowID);
+    }
 }
