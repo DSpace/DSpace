@@ -44,3 +44,6 @@ script:
   #        -Dmirage2.deps.included=false => Don't include Mirage2 build dependencies (We installed them in before_install)
   #        -P !assembly => SKIP the actual building of [src]/dspace/dspace-installer (as it can be memory intensive)
   - "cd dspace && mvn package -Dmirage2.on=true -Dmirage2.deps.included=false -P !assembly -B -V"
+
+notifications:
+      slack: umlso:71g7T3bFPtCyzcXpiLYyw9wY
