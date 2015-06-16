@@ -652,10 +652,17 @@ public class Community extends DSpaceObject
      * @throws SQLException
      */
     public ItemIterator getItems() throws SQLException {
+        String in_archive = "";
+        if (DatabaseManager.isOracle() {
+            in_archive = "item.in_archive='1'"; 
+        } else  { 
+            in_archive = "item.in_archive IS TRUE"; 
+        }
+
         String myQuery ="SELECT item.* FROM item, communities2item WHERE " +
                 "item.item_id=communities2item.item_id AND " +
                 "communities2item.community_id= ? " +
-                "AND item.in_archive='1'";
+                "AND " + in_archive;
         TableRowIterator rows = DatabaseManager.queryTable(ourContext, "item", myQuery, getID());
 
         return new ItemIterator(ourContext, rows);
