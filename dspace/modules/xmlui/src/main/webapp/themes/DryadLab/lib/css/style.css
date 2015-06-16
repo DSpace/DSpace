@@ -2616,13 +2616,7 @@ td.ds-author-input-col input {
 }
 .promotional-block {
     line-height: 1.25em; 
-    padding: 6px 20px;
-    font-size: 1.1em;
-/*
-    border: 1px #eee solid;
-    background-color: #f5f5f5;
-*/
-    margin-bottom: 1em;
+    padding: 0px 20px; 
 }
 .promotional-block p {
     line-height: 1.25em !important; 
@@ -2638,4 +2632,5 @@ td.ds-author-input-col input {
     color: #eee;
     font-weight: bold;
     text-align: center;
+    margin: 0 -120px 20px 30px;
 }
