@@ -439,7 +439,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                     <a href="http://blog.datadryad.org" target="_blank">Blog: News and views</a>
                                 </li>
                                 <li>
-                                    <a href="/pages/aboutDryadLab" target="_blank">DryadLab: Research data for educators</a>
+                                    <a href="/pages/dryadlab" target="_blank">DryadLab: Research data for educators</a>
                                 </li>
                                 <li>
                                     <a href="/pages/employment">Employment opportunities</a>
