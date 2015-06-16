@@ -53,6 +53,11 @@
 
     <!-- TAMU Customization - proxy license step -->
     <script src="scripts/license-step.js">&#160;</script>
+    <!-- TAMU Custom item submission -->
+    <script src="scripts/item-submission.js">&#160;</script>
+    <!-- TAMU metadata tree browser -->
+    <script src="scripts/metadata-browser.js">&#160;</script>
+    
 
     <!-- endbuild -->
 
