@@ -17,7 +17,7 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Division;
 
 import cz.cuni.mff.ufal.dspace.IOUtils;
-import cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.AbstractControlPanelTab;
+import org.dspace.app.xmlui.aspect.administrative.controlpanel.AbstractControlPanelTab;
 import cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.HtmlHelper;
 
 

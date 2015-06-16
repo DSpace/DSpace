@@ -1,5 +1,11 @@
-/* Created for LINDAT/CLARIN */
-package cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative;
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+package org.dspace.app.xmlui.aspect.administrative.controlpanel;
 
 import java.io.Serializable;
 import java.sql.SQLException;
@@ -18,6 +24,12 @@ import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.eperson.EPerson;
 
+/**
+ * Control panel tab that displays current activity.
+ * Based on the original ControlPanel class by Jay Paz and Scott Phillips
+ * @author LINDAT/CLARIN dev team (http://lindat.cz)
+ *
+ */
 public class ControlPanelCurrentActivityTab extends AbstractControlPanelTab {
 
 	private static final Message T_activity_head = message("xmlui.administrative.ControlPanel.activity_head");
@@ -35,6 +47,12 @@ public class ControlPanelCurrentActivityTab extends AbstractControlPanelTab {
 	private static final Message T_seconds = message("xmlui.administrative.ControlPanel.seconds");
 	private static final Message T_hours = message("xmlui.administrative.ControlPanel.hours");
 	private static final Message T_minutes = message("xmlui.administrative.ControlPanel.minutes");
+	private static final Message T_detail = message("xmlui.administrative.ControlPanel.detail");
+	private static final Message T_show_hide = message("xmlui.administrative.ControlPanel.show_hide");
+	private static final Message T_host = message("xmlui.administrative.ControlPanel.host");
+	private static final Message T_puser = message("xmlui.administrative.ControlPanel.puser");
+	private static final Message T_headers = message("xmlui.administrative.ControlPanel.headers");
+	private static final Message T_cookies = message("xmlui.administrative.ControlPanel.cookies");
 
 	@Override
 	public void addBody(Map objectModel, Division div) throws WingException,
@@ -142,7 +160,7 @@ public class ControlPanelCurrentActivityTab extends AbstractControlPanelTab {
 		}
 
 		// add +
-		row.addCellContent("Detail");
+		row.addCellContent(T_detail);
 
 		// Keep track of how many individual anonymous users there are, each
 		// unique anonymous
@@ -193,37 +211,33 @@ public class ControlPanelCurrentActivityTab extends AbstractControlPanelTab {
 			eventRow.addCellContent(event.getDectectedBrowser());
 			eventRow.addCell(null, null,
 					"toggle-onclick-parent-next4 bold btn-link")
-					.addContent("show/hide");
+					.addContent(T_show_hide);
 			final String not_present = "not present";
 
 			String host = event.host != null ? (String) (event.host)
 					: not_present;
-			String details = "Host: " + host + "\n";
 			activeUsers.addRow(null, null, "hidden font_smaller").addCell(1, 6)
-					.addContent(details);
+					.addContent(T_host.parameterize(host));
 
 			String puser = event.puser != null ? event.puser : not_present;
-			details = "Principal user: " + puser + "\n";
 			activeUsers.addRow(null, null, "hidden font_smaller").addCell(1, 6)
-					.addContent(details);
+					.addContent(T_puser.parameterize(puser));
 
 			//
 			String headers = "";
 			for (Map.Entry<String, String> o : event.headers.entrySet())
 				headers += o.getKey() + ":[" + o.getValue() + "];";
 			headers = headers != "" ? headers : not_present;
-			details = "Headers: " + headers + "\n";
 			activeUsers.addRow(null, null, "hidden").addCell(1, 6)
-					.addContent(details);
+					.addContent(T_headers.parameterize(headers));
 
 			//
 			String cookies = "";
 			for (Map.Entry<String, String> o : event.cookieMap.entrySet())
 				cookies += o.getKey() + ":[" + o.getValue() + "];";
 			cookies = cookies != "" ? cookies : not_present;
-			details = "Cookies: " + cookies + "\n";
 			activeUsers.addRow(null, null, "hidden font_smaller").addCell(1, 6)
-					.addContent(details);
+					.addContent(T_cookies.parameterize(cookies));
 		}
 
 		if (shown == 0) {

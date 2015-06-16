@@ -5,12 +5,16 @@ import java.util.Iterator;
 import java.util.Map;
 
 import cz.cuni.mff.ufal.dspace.handle.ConfigurableHandleIdentifierProvider;
+
 import org.dspace.app.xmlui.aspect.administrative.FlowCurationUtils;
+import org.dspace.app.xmlui.aspect.administrative.controlpanel.AbstractControlPanelTab;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.content.Site;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.handle.HandleManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.utils.DSpace;
 
 import cz.cuni.mff.ufal.dspace.handle.PIDConfiguration;
 
@@ -34,7 +38,9 @@ public class MainControlCheck extends AbstractControlPanelTab {
 		html.table( "checks" );
 		html.table_header( new String[] { "Checks", null } );
 
-		String checks[] = ConfigurationManager.getProperty("controlpanel", "controlpanel.checks").split(",");
+		String checks[] = (new DSpace()).getSingletonService(
+			ConfigurationService.class).getPropertyAsType(
+			"controlpanel.controlpanel.checks", new String[] {});
 		
 		for ( String check : checks ) {
 			check = check.trim();

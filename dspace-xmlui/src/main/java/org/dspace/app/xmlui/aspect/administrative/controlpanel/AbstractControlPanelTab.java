@@ -1,5 +1,11 @@
-/* Created for LINDAT/CLARIN */
-package cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative;
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+package org.dspace.app.xmlui.aspect.administrative.controlpanel;
 
 import org.apache.avalon.framework.activity.Disposable;
 import org.apache.avalon.framework.service.ServiceException;
@@ -10,6 +16,11 @@ import org.apache.excalibur.store.Store;
 import org.apache.excalibur.store.StoreJanitor;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 
+/**
+ * Abstract tab, implementations of tabs should extend this class.
+ * Based on the original ControlPanel class by Jay Paz and Scott Phillips
+ * @author LINDAT/CLARIN dev team (http://lindat.cz)
+ */
 public abstract class AbstractControlPanelTab extends AbstractDSpaceTransformer implements Serviceable, Disposable, ControlPanelTab {
 
     /** 

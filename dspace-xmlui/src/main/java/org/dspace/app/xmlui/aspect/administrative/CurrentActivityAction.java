@@ -27,6 +27,9 @@ import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.services.ConfigurationService;
+import org.dspace.utils.DSpace;
+
 import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
 
 /**
@@ -36,8 +39,7 @@ import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
  * viewer can access this data to get a realtime snap shot of current activity
  * of the repository.
  *
- * based on class by Scott Phillips
- * modified for LINDAT/CLARIN
+ * @author Scott Phillips
  */
 
 public class CurrentActivityAction extends AbstractAction
@@ -52,11 +54,18 @@ public class CurrentActivityAction extends AbstractAction
 	/** The ordered list of events, by access time */
 	private static Queue<Event> events = new LinkedList<Event>();
 	
-	/** record events that are from anynmous users */
+	/** record events that are from anonymous users */
 	private static boolean recordAnonymousEvents = true;
 	
-	/** record events from automatic bots */
-	private static boolean recordBotEvents = true;
+    /** record events from automatic bots */
+    private static boolean recordBotEvents = ConfigurationManager
+            .getBooleanProperty("currentActivityAction.recordBotEvents", false);
+
+    private static String[] botStrings = (new DSpace()).getSingletonService(
+            ConfigurationService.class).getPropertyAsType(
+            "currentActivityAction.botStrings",
+            new String[] { "google/", "msnbot/", "googlebot/", "webcrawler/",
+                    "inktomi", "teoma", "baiduspider", "bot" });
 	
 	/**
 	 * Allow the DSpace.cfg to override our activity max and ip header.
@@ -290,16 +299,13 @@ public class CurrentActivityAction extends AbstractAction
             }
 	    String ua = userAgent.toLowerCase();
 
-	    return (ua.contains("google/") ||
-		    ua.contains("msnbot/") ||
-		    ua.contains("googlebot/") || 
-		    ua.contains("webcrawler/") ||
-		    ua.contains("inktomi") ||
-		    ua.contains("teoma") ||
-   			ua.contains("ufal-dev") ||
-   			ua.contains("baiduspider") ||
-		    ua.contains("bot"));
-    	}
+	    for(String botString : botStrings){
+	        if (ua.contains(botString)){
+	            return true;
+	        }
+	    }
+	    return false;
+    }
     	
     	/**
     	 * Return the activity viewer's best guess as to what browser or bot

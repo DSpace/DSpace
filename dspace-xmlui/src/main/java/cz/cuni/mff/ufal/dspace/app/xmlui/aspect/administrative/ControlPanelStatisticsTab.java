@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.dspace.app.statistics.LogAnalyser;
+import org.dspace.app.xmlui.aspect.administrative.controlpanel.AbstractControlPanelTab;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.List;
