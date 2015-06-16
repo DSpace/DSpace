@@ -168,9 +168,9 @@ public class CASAuthentication implements AuthenticationMethod
                                 context,
                                 "authenticate",
                                 CASUSER
-                                + "="
-                                + request.getSession().getAttribute(
-                                        CASUSER)));
+                                        + "="
+                                        + request.getSession().getAttribute(
+                                                CASUSER)));
 
                         // Logged in OK.
                         context.setCurrentUser(eperson);
@@ -353,7 +353,7 @@ public class CASAuthentication implements AuthenticationMethod
      */
 
     public void registerUser(String netid) throws ClassNotFoundException,
-    SQLException
+            SQLException
     {
         // add your code here
     }
@@ -361,15 +361,15 @@ public class CASAuthentication implements AuthenticationMethod
     /*
      * Returns URL to which to redirect to obtain credentials (either password
      * prompt or e.g. HTTPS port for client cert.); null means no redirect.
-     *
+     * 
      * @param context DSpace context, will be modified (ePerson set) upon
      * success.
-     *
+     * 
      * @param request The HTTP request that started this operation, or null if
      * not applicable.
-     *
+     * 
      * @param response The HTTP response from the servlet method.
-     *
+     * 
      * @return fully-qualified URL
      */
     @Override
@@ -381,22 +381,23 @@ public class CASAuthentication implements AuthenticationMethod
                 .getProperty("cas.server.url");
         final String origUrl = (String) request.getSession().getAttribute(
                 "interrupted.request.url");
+        // final String service = (origUrl != null ? origUrl : request
+        // .getRequestURL().toString());
         final String service = (origUrl != null ? origUrl : request
-                .getRequestURL().toString());
-        final String tempUrl = "http://localhost:8080/xmlui/cas-login/";
+                .getRequestURL().toString()).replace("login", "cas-login");
         log.info("CAS server:  " + authServer);
 
         // Redirect to CAS server
-        return response.encodeRedirectURL(authServer + "?service=" + tempUrl);
+        return response.encodeRedirectURL(authServer + "?service=" + service);
     }
 
     /*
      * Returns message key for title of the "login" page, to use in a menu
      * showing the choice of multiple login methods.
-     *
+     * 
      * @param context DSpace context, will be modified (ePerson set) upon
      * success.
-     *
+     * 
      * @return Message key to look up in i18n message catalog.
      */
     @Override
