@@ -58,7 +58,11 @@ to administer DSpace.
             <map:transformer name="EditHandleForm" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.handle.EditHandleForm"/>
             <map:transformer name="DeleteHandleConfirm" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.handle.DeleteHandleConfirm"/>
             <map:transformer name="ChangeHandlePrefixForm" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.handle.ChangeHandlePrefixForm"/>
-        
+            <map:transformer name="ManageExternalHandles" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.handle.ManageExternalHandles"/>
+            <map:transformer name="ManagePrefixForm" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.handle.ManagePrefixForm"/>
+            <map:transformer name="ExternalHandleAddForm" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.handle.ExternalHandleAddForm"/>
+            <map:transformer name="ExternalHandleEditForm" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.handle.ExternalHandleEditForm"/>
+
                         <map:transformer name="CurateItemForm" src="org.dspace.app.xmlui.aspect.administrative.item.CurateItemForm"/>
 			
 			<map:transformer name="MapperMain" src="org.dspace.app.xmlui.aspect.administrative.mapper.MapperMain"/>
@@ -1072,6 +1076,25 @@ to administer DSpace.
                         <map:match pattern="admin/handle/change-prefix">
 		        			<map:transform type="ChangeHandlePrefixForm">
                                 <map:parameter name="errors" value="{flow-attribute:errors}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<map:match pattern="admin/handle/external_prefix">
+		        			<map:transform type="ManagePrefixForm"/>
+		        		</map:match>
+		        		<map:match pattern="admin/handle/external_add">
+		        			<map:transform type="ExternalHandleAddForm"/>
+		        		</map:match>
+		        		<map:match pattern="admin/handle/external_edit">
+		        			<map:transform type="ExternalHandleEditForm">
+		        				<map:parameter name="handle_id" value="{flow-attribute:handle_id}"/>
+		        				<map:parameter name="isDelete" value="{flow-attribute:isDelete}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		<map:match pattern="admin/handle/external">
+		        			<map:transform type="ManageExternalHandles">
+		        				<map:parameter name="prefix" value="{flow-attribute:prefix}"/>
+		        				<map:parameter name="filter" value="{flow-attribute:filter}"/>
 		        			</map:transform>
 		        		</map:match>
 			        		

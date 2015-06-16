@@ -1251,6 +1251,7 @@
     <message key="xmlui.administrative.Navigation.administrative_curation">Curation Tasks</message>
     <message key="xmlui.administrative.Navigation.administrative_licenses">Licenses</message>
     <message key="xmlui.administrative.Navigation.administrative_handles">Handles</message>
+	<message key="xmlui.administrative.Navigation.administrative_external_handles">External Handles</message>
 
     <!-- my account items -->
 	<message key="xmlui.administrative.Navigation.account_export">My Exports</message>
@@ -2373,7 +2374,6 @@
 	<message key="xmlui.administrative.handle.ChangeHandlePrefixForm.change">Change</message>
     <message key="xmlui.administrative.handle.ChangeHandlePrefixForm.old_prefix_and_new_prefix_must_differ">Old prefix and new prefix must differ.</message>
 
-
 	<!--  cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.FlowHandleUtils -->
 	<message key="xmlui.administrative.handle.FlowHandleUtils.handle_successfully_deleted">Deleted successfully</message>
    	<message key="xmlui.administrative.handle.FlowHandleUtils.handle_successfully_saved">Updated successfully</message>
@@ -2381,6 +2381,42 @@
 	<message key="xmlui.administrative.handle.FlowHandleUtils.handle_deletion_failed">Deletion failed</message>
 	<message key="xmlui.administrative.handle.FlowHandleUtils.handle_saving_failed">Update failed</message>
 	<message key="xmlui.administrative.handle.FlowHandleUtils.prefix_change_failed">Prefix change failed</message>
+
+	<message key="xmlui.administrative.handle.PrefixForm.title">Enter prefix</message>
+	<message key="xmlui.administrative.handle.PrefixForm.trail">Prefix</message>
+	<message key="xmlui.administrative.handle.PrefixForm.head">Enter Prefix</message>
+	<message key="xmlui.administrative.handle.PrefixForm.help">Enter epic prefix to edit.</message>
+
+	<message key="xmlui.administrative.handle.HandeAddForm.title">Add handle</message>
+	<message key="xmlui.administrative.handle.HandeAddForm.trail">Add handle</message>
+	<message key="xmlui.administrative.handle.HandeAddForm.head">Add handle</message>
+	<message key="xmlui.administrative.handle.HandeAddForm.help">You can create a new handle here</message>
+	<message key="xmlui.administrative.handle.HandeAddForm.url_help">Type the url to which the handle will resolve</message>
+	<message key="xmlui.administrative.handle.HandeAddForm.url_label">URL: </message>
+	<message key="xmlui.administrative.handle.HandeAddForm.handle_help">Type the "suffix" of the handle, ie. the part after prefix/</message>
+	<message key="xmlui.administrative.handle.HandeAddForm.handle_label">Handle: </message>
+
+	<message key="xmlui.administrative.handle.HandleEditForm.title">Edit handle</message>
+	<message key="xmlui.administrative.handle.HandleEditForm.trail">Edit handle</message>
+	<message key="xmlui.administrative.handle.HandleEditForm.head">Edit handle</message>
+	<message key="xmlui.administrative.handle.HandleEditForm.help_delete">Are you sure you want to delete this handle?</message>
+	<message key="xmlui.administrative.handle.HandleEditForm.help_edit">Change the url of the following handle</message>
+	<message key="xmlui.administrative.handle.HandleEditForm.handle_label">Handle:</message>
+	<message key="xmlui.administrative.handle.HandleEditForm.url_label">URL:</message>
+
+	<message key="xmlui.administrative.handle.ManageExternalHandles.title">Handles</message>
+	<message key="xmlui.administrative.handle.ManageExternalHandles.head">Handles</message>
+	<message key="xmlui.administrative.handle.ManageExternalHandles.trail">Handles</message>
+	<message key="xmlui.administrative.handle.ManageExternalHandles.list_head">Handle List</message>
+	<message key="xmlui.administrative.handle.ManageExternalHandles.list_help">This is the list of all handles under prefix {0}.</message>
+	<message key="xmlui.administrative.handle.ManageExternalHandles.list_filtered_help">These are the result for search of term <strong>{0}</strong> under prefix {1}.</message>
+	<message key="xmlui.administrative.handle.ManageExternalHandles.new_external_handle">New handle</message>
+	<message key="xmlui.administrative.handle.ManageExternalHandles.delete_handle">Delete handle</message>
+	<message key="xmlui.administrative.handle.ManageExternalHandles.edit_handle">Edit handle</message>
+	<message key="xmlui.administrative.handle.ManageExternalHandles.para_no_results">Unfortunately, no results were found.</message>
+	<message key="xmlui.administrative.handle.ManageExternalHandles.button_search_url">Search in urls</message>
+	<message key="xmlui.administrative.handle.ManageExternalHandles.button_search_pid">Goto PID</message>
+
     <!-- </UFAL> -->
 
 	<!-- org.dspace.app.xmlui.administrative.SystemwideAlerts -->

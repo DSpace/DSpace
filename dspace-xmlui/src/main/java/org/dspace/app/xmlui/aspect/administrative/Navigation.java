@@ -82,7 +82,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     private static final Message T_administrative_curation              = message("xmlui.administrative.Navigation.administrative_curation");
     private static final Message T_administrative_licenses			= message("xmlui.administrative.Navigation.administrative_licenses");
     private static final Message T_administrative_handles			= message("xmlui.administrative.Navigation.administrative_handles");
-  
+    private static final Message T_administrative_external_handles			= message("xmlui.administrative.Navigation.administrative_external_handles");
+
     
     private static final Message T_statistics            	        = message("xmlui.administrative.Navigation.statistics");
 
@@ -331,6 +332,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
             admin.addItemXref(contextPath+ "/admin/licenses", T_administrative_licenses);
             admin.addItemXref(contextPath+ "/admin/handles", T_administrative_handles);
+            admin.addItemXref(contextPath+ "/admin/handles?edit_external", T_administrative_external_handles);
         }
         else if (isAnyAdmin)
         {

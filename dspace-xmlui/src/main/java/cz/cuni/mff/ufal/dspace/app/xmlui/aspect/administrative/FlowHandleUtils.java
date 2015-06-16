@@ -7,6 +7,7 @@
  */
 package cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative;
 
+import cz.cuni.mff.ufal.dspace.PIDService;
 import cz.cuni.mff.ufal.dspace.handle.Handle;
 import cz.cuni.mff.ufal.dspace.handle.ConfigurableHandleIdentifierProvider;
 import org.apache.commons.lang.StringUtils;
@@ -17,7 +18,6 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.browse.IndexBrowse;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -213,6 +213,62 @@ public class FlowHandleUtils {
 		}
     	
     	return result;
+	}
+
+	public static FlowResult processExternalEdit(String pid, String url, boolean isDelete){
+		FlowResult result = new FlowResult();
+		result.setContinue(false);
+		result.setOutcome(false);
+
+		if(isDelete){
+			try {
+				PIDService.deletePID(pid);
+				result.setContinue(true);
+				result.setOutcome(true);
+				result.setMessage(T_handle_successfully_deleted);
+			} catch (Exception e) {
+				log.error(e);
+				result.setMessage(T_handle_deletion_failed);
+			}
+		} else{
+			try {
+				PIDService.modifyPID(pid,url);
+				result.setContinue(true);
+				result.setOutcome(true);
+				result.setMessage(T_handle_successfully_saved);
+			} catch (Exception e) {
+				log.error(e);
+				result.setMessage(T_handle_saving_failed);
+			}
+		}
+
+
+		return result;
+	}
+
+	public static FlowResult processExternalAdd(String suffix, String url, String prefix){
+		FlowResult result = new FlowResult();
+		result.setContinue(false);
+		result.setOutcome(false);
+		result.setMessage(T_handle_saving_failed);
+
+		try {
+			PIDService.createCustomPID(url,prefix, suffix);
+			result.setContinue(true);
+			result.setOutcome(true);
+			result.setMessage(T_handle_successfully_saved);
+		} catch (Exception e) {
+			log.error(e);
+		}
+
+		return result;
+
+	}
+
+	public static FlowResult createEmptyResult(){
+		FlowResult result = new FlowResult();
+		result.setContinue(true);
+		return result;
 	}
 		
 }
