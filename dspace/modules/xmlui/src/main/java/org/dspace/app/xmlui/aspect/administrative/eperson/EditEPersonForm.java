@@ -9,6 +9,7 @@ package org.dspace.app.xmlui.aspect.administrative.eperson;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
@@ -31,6 +32,9 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.Unit;
+
+import edu.umd.lib.dspace.authenticate.Ldap;
 
 /**
  * Edit an existing EPerson, display all the eperson's metadata along with two
@@ -118,7 +122,7 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 
     @Override
     public void addBody(Body body) throws WingException, SQLException,
-            AuthorizeException
+    AuthorizeException
     {
         // Get all our parameters
         boolean admin = AuthorizeManager.isAdmin(context);
@@ -268,7 +272,7 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 
             // Buttons to reset, delete or login as
             identity.addItem().addHighlight("italic")
-                    .addContent(T_special_help);
+            .addContent(T_special_help);
             Item special = identity.addItem();
             special.addButton("submit_reset_password").setValue(
                     T_submit_reset_password);
@@ -365,7 +369,66 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
             if (groups.length <= 0)
             {
                 member.addItem().addHighlight("italic")
-                        .addContent(T_member_none);
+                .addContent(T_member_none);
+            }
+        }
+
+        Ldap ldap = null;
+        try
+        {
+            ldap = new Ldap(context);
+            if (ldap.checkUid(eperson.getNetid()))
+            {
+                request.setAttribute("eperson.ldap", ldap);
+            }
+        }
+        catch (Exception ex)
+        {
+            // log.error("Error opening Ldap connection: " + ex.getMessage());
+        }
+        finally
+        {
+            if (ldap != null)
+                ldap.close();
+        }
+
+        // String email = eperson.getEmail();
+        // String firstName = eperson.getFirstName();
+        // String lastName = eperson.getLastName();
+        // String phone = eperson.getMetadata("phone");
+        // String netid = eperson.getNetid();
+        // String language = eperson.getMetadata("language");
+
+        if (admin && ldap != null)
+        {
+            List ldapInfo = edit.addList("eperson-ldap-info");
+            ldapInfo.setHead(T_ldap_info_head);
+            try
+            {
+                ldapInfo.addItem().addContent(
+                        "Name: " + ldap.getLastName() + ", "
+                                + ldap.getFirstName());
+                ldapInfo.addItem().addContent("Email: " + ldap.getEmail());
+                ldapInfo.addItem().addContent("Phone: " + ldap.getPhone());
+                ldapInfo.addItem().addContent("Faculty: " + ldap.isFaculty());
+                ldapInfo.addItem().addContent(
+                        "UM Appt: " + ldap.getAttributeAll("umappointment"));
+                for (Iterator i = ldap.getUnits().iterator(); i.hasNext();)
+                {
+                    String strUnit = (String) i.next();
+                    Unit unit = Unit.findByName(context, strUnit);
+                    ldapInfo.addItem().addContent("Unit: " + strUnit);
+                }
+                for (Iterator i = ldap.getGroups().iterator(); i.hasNext();)
+                {
+                    Group group = (Group) i.next();
+                    ldapInfo.addItem().addContent("Group: " + group.getName());
+                }
+            }
+            catch (Exception e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
         }
 
