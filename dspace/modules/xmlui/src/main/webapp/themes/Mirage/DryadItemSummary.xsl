@@ -2654,17 +2654,17 @@
 
     <xsl:template name="format-name">
         <xsl:param name="nameString"/>
+        <xsl:variable name="author" select="substring-before(substring-after($nameString,'@'),'@')"/>
         <xsl:choose>
             <xsl:when test="contains($nameString,'#')">
                 <!-- name contains an Orcid: make it a hyperlink. -->
                 <xsl:variable name="orcid" select="substring-before(substring-after($nameString,'#'),'#')"/>
-                <xsl:variable name="author" select="substring-before(substring-after($nameString,'@'),'@')"/>
-                <a href="http://orcid.org/{$orcid}">
+                <!--<a href="http://orcid.org/{$orcid}">-->
                     <xsl:value-of select="$author"/>
-                </a>
+                <!--</a>-->
             </xsl:when>
             <xsl:otherwise>
-                <xsl:value-of select="substring-before(substring-after($nameString,'@'),'@')"/>
+                <xsl:value-of select="$author"/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
