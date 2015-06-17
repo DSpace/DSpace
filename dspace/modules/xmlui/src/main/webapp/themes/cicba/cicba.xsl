@@ -38,6 +38,7 @@
     <xsl:import href="lib/xsl/core/elements.xsl"/>
     <xsl:import href="lib/xsl/core/statistics.xsl"/>
     <xsl:import href="lib/xsl/core/browsing.xsl"/>
+    <xsl:import href="lib/xsl/core/workflow.xsl"/>
     <xsl:output indent="yes"/>
     
 
