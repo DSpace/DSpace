@@ -186,7 +186,7 @@ public class StatisticsDataWorkflow extends StatisticsData {
                 } catch (ConfigurationException e) {
                     log.error("Error while storing workflow start date", e);
                 }
-                //ALso store it in our local config !
+                //Also store it in our local config !
                 configurationService.setProperty("usage-statistics.workflow-start-date", new DCDate(oldestDate).toString());
 
                 //Write to file
