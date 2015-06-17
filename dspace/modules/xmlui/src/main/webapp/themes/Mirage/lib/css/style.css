@@ -777,6 +777,11 @@ li.ds-form-item .ds-form-label{
     font-size: 123.1%;
 }
 
+.ds-form-label.help{
+    font-weight: bold;
+    font-size: 123.1%;
+}
+
 li.ds-form-item label.ds-composite-component{
     display: block;
     float: left;
@@ -2420,12 +2425,11 @@ div.step-link{
     color:green;
 }
 .label-mark{
-
+    margin-left: 5px;
+    vertical-align: middle;
     width:20px;
     display:inline;
 }
-
-
 
 #aspect_eperson_TermsOfService_div_background{
     display: none;
