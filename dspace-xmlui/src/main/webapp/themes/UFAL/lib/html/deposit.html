@@ -1,4 +1,20 @@
 <div style="width: 100%">
+	<style scoped="scoped">
+		.print_screen_figure{
+			text-align: center;
+			padding-bottom: 15px;
+			padding-top: 15px;
+		}
+		.print_screen_figure figcaption{
+			padding-top: 5px;
+		}
+
+		.print_screen_img{
+			  box-shadow: 3px 3px 1px #ccc;
+			  -webkit-box-shadow: 3px 3px 1px #ccc;
+			  -moz-box-shadow: 3px 3px 1px #ccc;
+		}
+	</style>
 
         <h2>How to Deposit</h2>
         <div class="alert">Only authenticated users can deposit items. If you cannot find your home organisation in the
@@ -9,30 +25,48 @@
         <div id="step1" style="margin-bottom: 20px;">
                 <h3>Step 1: Login</h3>
                 <p style="margin-top: 10px; margin-bottom: 10px;">To start a new submission you have to login first. Click Login under My Account in the right menu panel.</p>
-                <img src="../themes/UFAL/images/deposit/step1.png" style="display: inline-block;" />
+                <figure class="print_screen_figure">
+			<img src="../themes/UFAL/images/deposit/step1.png" class="print_screen_img" />
+			<figcaption>Fig1. Menu Login</figcaption>
+		</figure>
         </div>
 
         <div id="step2" style="margin-bottom: 0;">
                 <h3>Step 2: Starting a new submission</h3>
                 <p style="margin-top: 10px; margin-bottom: 10px;">Now you have a new menu item 'Submissions' under My Account. Click on Submissions to go to the Submissions screen.</p>
-                <img src="../themes/UFAL/images/deposit/step2.png" style="display: inline-block;"/>
+                <figure class="print_screen_figure">
+			<img src="../themes/UFAL/images/deposit/step2.png" class="print_screen_img"/>
+			<figcaption>Fig2. Menu Submissions</figcaption>
+		</figure>
                 <p style="margin-top: 10px; margin-bottom: 10px;">Now you should be on the main Submission and Workflow tasks page where you can view your incomplete/archive submissions. Click on the 'Start another submission' link to start a new Submission.</p>
-                <img src="../themes/UFAL/images/deposit/step2_1.png" style="display: inline-block;" width="600px" />
+                <figure class="print_screen_figure">
+			<img src="../themes/UFAL/images/deposit/step2_1.png" class="print_screen_img" width="600px" />
+			<figcaption>Fig3. Starting a submission</figcaption>
+		</figure>
         </div>
 
         <div id="step3" style="margin-bottom: 20px;">
                 <h3>Step 3: Select type of your submission</h3>
                 <p style="margin-top: 10px; margin-bottom: 10px;">You have initiated a new workflow item. In the next few steps you will provide the details about the item and upload content files. First select the type of the resource you are about to submit.</p>
-                <img src="../themes/UFAL/images/deposit/step3.png" style="display: inline-block;" width="600px" />
+                <figure class="print_screen_figure">
+			<img src="../themes/UFAL/images/deposit/step3.png" class="print_screen_img" width="600px" />
+			<figcaption>Fig4. Submission info</figcaption>
+		</figure>
                 <p style="margin-top: 10px; margin-bottom: 10px;">Click on one of the type buttons e.g. Corpus. Proceed with filling the basic information such as the title. Click Next to continue the following step.</p>
         </div>
 
         <div id="step4" style="margin-bottom: 20px;">
                 <h3>Step 4: Describe your item</h3>
                 <p style="margin-top: 10px; margin-bottom: 10px;">In the following two steps you will provide more details for your item. First describe the people, organization and projects involved with the item.</p>
-                <img src="../themes/UFAL/images/deposit/step4.png" style="display: inline-block;" width="600px" />
+                <figure class="print_screen_figure">
+			<img src="../themes/UFAL/images/deposit/step4.png" class="print_screen_img" width="600px" />
+			<figcaption>Fig5. Describing item - people and organizations</figcaption>
+		</figure>
                 <p style="margin-top: 10px; margin-bottom: 10px;">Next add your description, fill the language, etc.</p>
-                <img src="../themes/UFAL/images/deposit/step4_1.png" style="display: inline-block;" width="600px" />
+                <figure class="print_screen_figure">
+			<img src="../themes/UFAL/images/deposit/step4_1.png" class="print_screen_img" width="600px" />
+			<figcaption>Fig6. Describing item - resource details</figcaption>
+		</figure>
                 <p style="margin-top: 10px; margin-bottom: 10px;">Once you filled the necessary information, click Next to upload the content files.</p>
         </div>
 
@@ -40,7 +74,10 @@
                 <h3>Step 5: Upload files</h3>
                 <p style="margin-top: 10px; margin-bottom: 10px;">In this step you will upload the content files of your submission. If there are no files, you can skip this step by clicking
                         Next. The files can be added by clicking the browse button or you can drag and drop files in the gray area with text 'Drag and Drop file(s) here'.</p>
-                <img src="../themes/UFAL/images/deposit/step5.png" style="display: inline-block;" width="600px" />
+                <figure class="print_screen_figure">
+			<img src="../themes/UFAL/images/deposit/step5.png" class="print_screen_img" width="600px" />
+			<figcaption>Fig7. Uploading file</figcaption>
+		</figure>
                 <p style="margin-top: 10px; margin-bottom: 10px;">Selecting files will open a dialog box, where you can enter the description of each file. To begin the file upload
 click 'Start Upload'.</p>
                 <p style="margin-top: 10px; margin-bottom: 10px;">Once the file(s) upload is done, press OK to close the dialog box. You can add more files or delete/modify the already uploaded ones,
@@ -54,12 +91,21 @@ click 'Start Upload'.</p>
                         license is unusable because a user does not know how can he/she use it!).
                         Please read the <a href="./contract">Distribution agreement carefully</a>
                         and click the red box to indicate your agreement (it will turn green).
-                        <img src="../themes/UFAL/images/deposit/step6_1.png" style="display: inline-block;" width="600px" />
-                </p><p style="margin-top: 10px; margin-bottom: 10px;">Select the appropriate license from the dropdown list, if you already have decided on the license;
-                        <img src="../themes/UFAL/images/deposit/step6_2.png" style="display: inline-block;" width="600px" />
-                </p><p style="margin-top: 10px; margin-bottom: 10px;">or use the OPEN License Selector, which will help you choose by asking few questions about the submission and your requirements
-                        <img src="../themes/UFAL/images/deposit/step6_3.png" style="display: inline-block;" width="600px" />
-                        </p><p style="margin-top: 10px; margin-bottom: 10px;">If none of the licenses suits your needs contact our
+                        <figure class="print_screen_figure">
+				<img src="../themes/UFAL/images/deposit/step6_1.png" class="print_screen_img" width="600px" />
+				<figcaption>Fig8. Distribution license agreement</figcaption>
+			</figure>
+                Select the appropriate license from the dropdown list, if you already have decided on the license;
+                        <figure class="print_screen_figure">
+				<img src="../themes/UFAL/images/deposit/step6_2.png" class="print_screen_img" width="600px" />
+				<figcaption>Fig9. Selecting license</figcaption>
+			</figure>
+                or use the OPEN License Selector, which will help you choose by asking few questions about the submission and your requirements
+                        <figure class="print_screen_figure">
+				<img src="../themes/UFAL/images/deposit/step6_3.png" class="print_screen_img" width="600px" />
+				<figcaption>Fig10. OPEN License Selector</figcaption>
+			</figure>
+                        If none of the licenses suits your needs contact our
                         <a class="helpdesk-tolink" href="#">Help Desk</a>.</p>
 
                 <div class="alert alert-warning">
