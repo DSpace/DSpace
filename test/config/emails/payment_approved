@@ -1,0 +1,26 @@
+# Approved email message
+#
+# {0}  Title of submission
+# {1}  Submitter
+# {2}  Shopping Cart Contents
+#
+Subject: Dryad: Payment Receipt
+
+Receipt for Data Publishing Charges
+Dryad Digital Repository
+datadryad.org
+
+Thank you for your online payment of the Dryad Data Publishing Charge for the data submission described below:
+
+Received from: {1}
+
+Dryad submission: {0}
+
+Payment details:
+
+{2}
+
+Your data are now securely and permanently archived at datadryad.org.  
+
+The Dryad Team
+datadryad.org

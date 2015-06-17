@@ -1,0 +1,30 @@
+# Data package confirmation email message
+# This message is a confirmation sent to a submitter to indicate that a data package has 
+# been received by Dryad. The message is sent when a submission is moved to the DSpace workflow
+# without going through the review stage. Submissions that go to the review stage receive 
+# a similar message, submit_datapackage_review.
+#
+#
+# {0}  Title of data package
+# {1}  The doi identifier of the data package
+# {2}  The title(s) of the data file(s)
+#
+Subject: Dryad submission now in curation
+
+Your submission to the Dryad repository titled "{0}" is now being processed by the curatorial team. They will contact you with an update within two business days.
+
+YOUR DRYAD DOI
+
+Your data package has been assigned a unique identifier, called a DOI. This DOI is provisional for now, but may be included in the article manuscript. It will be fully registered with the DOI system when your submission has been approved by Dryad curation staff.
+
+Data package title: {0}
+Provisional DOI: {1}
+Data files: {2}
+
+PAYMENT
+
+If you were asked to enter a credit card number, your card has been verified, but will be not be charged until the curatorial team accepts your submission. You will receive a confirmation and a receipt when your card is charged.
+
+Please email us at help@datadryad.org if you have any questions or concerns.
+
+The Dryad Team

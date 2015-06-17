@@ -1,0 +1,27 @@
+# Workflow task email message for a data package
+# This is sent to curators when a new submission enters the 
+# workflow stage (i.e., it is ready for curation)
+# NOTE: This submission may have come through the 
+#       review stage, or the article may have been 
+#	accepted at the time of data submission.
+#
+# {0}  Title of submission
+# {1}  Title of the data file(s)
+# {2}  submitter's name
+# {3}  Description of task
+# {4}  link to 'my DSpace' page
+#
+Subject: Dryad: New data package ready for curation
+
+A new data package has been submitted to Dryad:
+Package title:        {0}
+Data file(s):
+{1}
+
+Submitted by: {2}
+
+{3}
+
+To claim this task, please visit your "My Dryad"
+page:  {4}
+

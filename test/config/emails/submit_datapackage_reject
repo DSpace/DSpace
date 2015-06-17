@@ -1,0 +1,27 @@
+# Rejection email message
+# This message is sent to a submitter when the Dryad curator
+# has rejected a data package. The data package is placed back
+# in the submitter's workspace.
+#
+# {0}  Title of submission
+# {2}  Name(s) of the data file(s)
+# {2}  Name of the rejector
+# {3}  Reason for the rejection
+# {4}  Link to 'My DSpace' page
+#
+Subject: Your submission to Dryad 
+
+You previously submitted a data package to Dryad titled: {0}
+
+This data package contained the following data files:
+{1}
+
+This submission has been returned to your working space by Dryad curator {2}
+with the following explanation:
+
+{3}
+
+You can view, modify, and resubmit the data from your
+"My Submissions" page at http://datadryad.org/submissions
+
+The Dryad Team
