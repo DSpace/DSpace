@@ -97,10 +97,7 @@
     <xsl:template name="addLookupButtonAuthor">
         <input type="button" name="{concat('lookup_',@n)}" class="ds-button-field ds-add-button" >
             <xsl:attribute name="value">
-                <xsl:text>Lookup</xsl:text>
-                <xsl:if test="contains(dri:params/@operations,'add')">
-                    <xsl:text> &amp; Add</xsl:text>
-                </xsl:if>
+                <xsl:text>Look up author in the ORCID&#174; registry</xsl:text>
             </xsl:attribute>
             <xsl:attribute name="onClick">
                 <xsl:text>javascript:AuthorLookup('</xsl:text>
