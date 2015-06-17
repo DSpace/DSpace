@@ -116,9 +116,9 @@
 
     <!-- The handling of the special case of instanced composite fields under "form" lists, such as author lookup -->
     <xsl:template match="dri:field[@type='composite'][dri:field/dri:instance | dri:params/@operations]" mode="formComposite" priority="2">
+        <xsl:variable name="confidenceIndicatorID" select="concat(translate(@id,'.','_'),'_confidence_indicator')"/>
         <div class="ds-form-content">
             <xsl:apply-templates select="dri:help" mode="compositeComponent"/>
-            <xsl:variable name="confidenceIndicatorID" select="concat(translate(@id,'.','_'),'_confidence_indicator')"/>
             <xsl:apply-templates select="dri:field" mode="compositeComponent"/>
             <xsl:if test="contains(dri:params/@operations,'add')">
                 <!-- Add buttons should be named "submit_[field]_add" so that we can ignore errors from required fields when simply adding new values-->
@@ -174,7 +174,7 @@
             <xsl:apply-templates select="." mode="normalField"/>
             <xsl:if test="contains(dri:params/@operations,'add')">
                 <!-- Add buttons should be named "submit_[field]_add" so that we can ignore errors from required fields when simply adding new values-->
-                <input type="submit" i18n:attr="value" value="xmlui.Submission.submit.DescribeStep.add" name="{concat('submit_',@n,'_add')}" class="ds-button-field ds-add-button"></input>
+                <input type="submit" i18n:attr="value" value="xmlui.Submission.submit.DescribeStep.add" name="{concat('submit_',@n,'_add')}" class="ds-button-field ds-add-button"/>
             </xsl:if>
             <xsl:call-template name="create-choices-presentation">
                 <xsl:with-param name="confidenceIndicatorID" select="$confidenceIndicatorID"/>
@@ -412,8 +412,8 @@
             <xsl:when test="$presentationType = 'lookup'">
                 <!-- lookup popup includes its own Add button if necessary. -->
                 <xsl:call-template name="addLookupButton">
-                <xsl:with-param name="isName" select="'true'"/>
-                <xsl:with-param name="confIndicator" select="$confidenceIndicatorID"/>
+                    <xsl:with-param name="isName" select="'true'"/>
+                    <xsl:with-param name="confIndicator" select="$confidenceIndicatorID"/>
                 </xsl:call-template>
             </xsl:when>
             <xsl:when test="$presentationType = 'authorLookup'">
