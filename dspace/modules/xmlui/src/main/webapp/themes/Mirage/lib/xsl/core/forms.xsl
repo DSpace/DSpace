@@ -439,4 +439,134 @@
         </xsl:if>
     </xsl:template>
 
+    <xsl:template name="pick-label">
+        <xsl:choose>
+            <xsl:when test="dri:field/dri:label">
+                <xsl:variable name="help" select="./dri:field/dri:help"/>
+                <label class="ds-form-label">
+                    <xsl:if test="./dri:field/@id">
+                        <xsl:attribute name="for">
+                            <xsl:value-of select="translate(./dri:field/@id,'.','_')"/>
+                        </xsl:attribute>
+                    </xsl:if>
+                    <xsl:apply-templates select="dri:field/dri:label" mode="formComposite"/>
+
+                    <!-- display appropriate help text-->
+                    <xsl:if test="string-length($help)>0">
+                        <xsl:variable name="n" select="string(./dri:field/@n)"/>
+                        <xsl:choose>
+                            <!-- skip the first help on the forgot-email page -->
+                            <xsl:when test="./dri:field[@id='aspect.eperson.StartForgotPassword.field.email']"/>
+
+                            <!-- skip the first help for author lookup form-->
+                            <xsl:when test="./dri:field[@id='aspect.submission.StepTransformer.field.dc_contributor_author']"/>
+
+                            <!-- handle helptext on submission forms -->
+                            <xsl:when test="ancestor::dri:div[contains(@id,'aspect.submission')]">
+                                <xsl:choose>
+                                    <!-- put all help text in the hover-over field for these items -->
+                                    <xsl:when test="$n = 'dc_subject'
+                                                 or $n = 'dwc_ScientificName'
+                                                 or $n = 'dc_coverage_spatial'
+                                                 or $n = 'dc_coverage_temporal'
+                                    ">
+                                        <xsl:call-template name="help-hover">
+                                            <xsl:with-param name="hover" select="$help"/>
+                                        </xsl:call-template>
+                                    </xsl:when>
+                                    <!-- for other fields, display subsequent sentences in hover text -->
+                                    <xsl:otherwise>
+                                        <div class="help-title">
+                                            <xsl:value-of select="concat(substring-before($help,'.'),'.')"/>
+                                        </div>
+                                        <xsl:call-template name="help-hover">
+                                            <xsl:with-param name="hover" select="substring-after($help,'.')"/>
+                                        </xsl:call-template>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:when>
+
+                            <!-- all other cases -->
+                            <xsl:otherwise>
+                                <xsl:choose>
+                                    <xsl:when test="$help/i18n:text">
+                                        <xsl:call-template name="help-hover">
+                                            <xsl:with-param name="hover" select="$help/i18n:text"/>
+                                        </xsl:call-template>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:call-template name="help-hover">
+                                            <xsl:with-param name="hover" select="$help"/>
+                                        </xsl:call-template>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:if>
+                </label>
+            </xsl:when>
+            <xsl:when test="string-length(string(preceding-sibling::*[1][local-name()='label'])) > 0">
+                <xsl:choose>
+                    <xsl:when test="./dri:field/@id">
+                        <label>
+                            <xsl:apply-templates select="preceding-sibling::*[1][local-name()='label']"/>
+                            <xsl:text>:</xsl:text>
+                        </label>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <span>
+                            <xsl:apply-templates select="preceding-sibling::*[1][local-name()='label']"/>
+                            <xsl:text>:</xsl:text>
+                        </span>
+                    </xsl:otherwise>
+                </xsl:choose>
+
+            </xsl:when>
+            <xsl:when test="dri:field">
+                <xsl:variable name="help" select="dri:help/text()"/>
+                <xsl:choose>
+                    <xsl:when test="preceding-sibling::*[1][local-name()='label']">
+                        <label class="ds-form-label">
+                            <xsl:choose>
+                                <xsl:when test="./dri:field/@id">
+                                    <xsl:attribute name="for">
+                                        <xsl:value-of select="translate(./dri:field/@id,'.','_')"/>
+                                    </xsl:attribute>
+                                </xsl:when>
+                            </xsl:choose>
+                            <xsl:apply-templates select="preceding-sibling::*[1][local-name()='label']"/>&#160;
+                            <xsl:if test="string-length($help)>0">
+                                <div class="help-title">
+                                    <xsl:value-of select="concat(substring-before($help,'.'),'.')"/>
+                                </div>
+                                <xsl:call-template name="help-hover">
+                                    <xsl:with-param name="hover" select="substring-after($help,'.')"/>
+                                </xsl:call-template>
+                            </xsl:if>
+                        </label>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:apply-templates select="preceding-sibling::*[1][local-name()='label']"/>&#160;
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+                <!-- If the label is empty and the item contains no field, omit the label. This is to
+                    make the text inside the item (since what else but text can be there?) stretch across
+                    both columns of the list. -->
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    <xsl:template name="help-hover">
+        <xsl:param name="hover" select="''"/>
+        <xsl:if test="string-length($hover) > 0">
+            <img class="label-mark" src="/themes/Mirage/images/help.jpg">
+                <xsl:attribute name="title">
+                    <xsl:value-of select="$hover"/>
+                </xsl:attribute>
+            </img>
+        </xsl:if>
+    </xsl:template>
+
 </xsl:stylesheet>
