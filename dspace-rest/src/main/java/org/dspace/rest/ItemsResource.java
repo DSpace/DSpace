@@ -261,7 +261,7 @@ public class ItemsResource extends Resource
     }
 
     /**
-     * Return array of bitstreams in item. It can be pagged.
+     * Return array of bitstreams in item. It can be paged.
      * 
      * @param itemId
      *            Id of item in DSpace.
@@ -273,7 +273,7 @@ public class ItemsResource extends Resource
      *            If you want to access to item under logged user into context.
      *            In headers must be set header "rest-dspace-token" with passed
      *            token from login method.
-     * @return Return pagged array of bitstreams in item.
+     * @return Return paged array of bitstreams in item.
      * @throws WebApplicationException
      *             It can be throw by NOT_FOUND, UNAUTHORIZED, SQLException if
      *             was problem with reading from database and ContextException
@@ -884,7 +884,7 @@ public class ItemsResource extends Resource
     }
 
     /**
-     * Find items by one metadada field.
+     * Find items by one metadata field.
      * 
      * @param metadataEntry
      *            Metadata field to search by.
