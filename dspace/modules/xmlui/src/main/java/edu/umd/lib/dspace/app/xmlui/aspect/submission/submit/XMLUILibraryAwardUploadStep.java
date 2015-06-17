@@ -9,6 +9,7 @@ package edu.umd.lib.dspace.app.xmlui.aspect.submission.submit;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
@@ -18,6 +19,7 @@ import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
+import org.apache.commons.lang.ArrayUtils;
 import org.dspace.app.util.Util;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
@@ -56,7 +58,7 @@ import edu.umd.lib.dspace.submit.step.LibraryAwardUploadStep;
  * <P>
  * Part A: Ask the user to upload a file Part B: List previously uploaded files
  * Part C: The standard action bar
- *
+ * 
  * @author Scott Phillips
  * @author Tim Donohue (updated for Configurable Submission)
  * @author Rohit Arora (customizations for handling library awards)
@@ -143,7 +145,7 @@ public class XMLUILibraryAwardUploadStep extends AbstractSubmissionStep
 
     @Override
     public void addBody(Body body) throws SAXException, WingException,
-    UIException, SQLException, IOException, AuthorizeException
+            UIException, SQLException, IOException, AuthorizeException
     {
         // Get a list of all files in the original bundle
         Item item = submission.getItem();
@@ -153,11 +155,12 @@ public class XMLUILibraryAwardUploadStep extends AbstractSubmissionStep
         boolean disableFileEditing = (submissionInfo.isInWorkflow())
                 && !ConfigurationManager.getBooleanProperty("workflow",
                         "reviewer.file-edit");
-        Bundle[] bundles = item.getBundles("ORIGINAL");
+        Bundle[] bundles = item.getBundles();
         Bitstream[] bitstreams = new Bitstream[0];
-        if (bundles.length > 0)
+        for (int index = 0; index < bundles.length; index++)
         {
-            bitstreams = bundles[0].getBitstreams();
+            bitstreams = (Bitstream[]) ArrayUtils.addAll(bitstreams,
+                    bundles[index].getBitstreams());
         }
 
         // Part A:
@@ -225,9 +228,9 @@ public class XMLUILibraryAwardUploadStep extends AbstractSubmissionStep
             }
             else if (buttonPressed.equals(LibraryAwardUploadStep.NEXT_BUTTON)
                     || buttonPressed
-                    .startsWith(LibraryAwardUploadStep.PROGRESS_BAR_PREFIX)
+                            .startsWith(LibraryAwardUploadStep.PROGRESS_BAR_PREFIX)
                     || buttonPressed
-                    .equals(LibraryAwardUploadStep.PREVIOUS_BUTTON))
+                            .equals(LibraryAwardUploadStep.PREVIOUS_BUTTON))
             {
                 if (this.errorFlag == LibraryAwardUploadStep.STATUS_MISSING_BITSTREAMS
                         || this.errorFlag == LibraryAwardUploadStep.STATUS_INTEGRITY_ERROR
@@ -367,7 +370,7 @@ public class XMLUILibraryAwardUploadStep extends AbstractSubmissionStep
      * sub-List object (with this step's name as the heading), by using a call
      * to reviewList.addList(). This sublist is the list you return from this
      * method!
-     *
+     * 
      * @param reviewList
      *            The List to which all reviewable information should be added
      * @return The new sub-List object created by this step, which contains all
@@ -385,11 +388,12 @@ public class XMLUILibraryAwardUploadStep extends AbstractSubmissionStep
         uploadSection.setHead(T_head);
         // Review all uploaded files
         Item item = submission.getItem();
-        Bundle[] bundles = item.getBundles("ORIGINAL");
+        Bundle[] bundles = item.getBundles();
         Bitstream[] bitstreams = new Bitstream[0];
-        if (bundles.length > 0)
+        for (int index = 0; index < bundles.length; index++)
         {
-            bitstreams = bundles[0].getBitstreams();
+            bitstreams = (Bitstream[]) ArrayUtils.addAll(bitstreams,
+                    bundles[index].getBitstreams());
         }
 
         for (Bitstream bitstream : bitstreams)
@@ -423,7 +427,7 @@ public class XMLUILibraryAwardUploadStep extends AbstractSubmissionStep
 
     /**
      * Returns canonical link to a bitstream in the item.
-     *
+     * 
      * @param item
      *            The DSpace Item that the bitstream is part of
      * @param bitstream
