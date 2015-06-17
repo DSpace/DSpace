@@ -292,16 +292,16 @@
              <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.DescribeStep</xmlui-binding>
              <workflow-editable>true</workflow-editable>
          </step>
-         
+
          <!--Step 3 will be to Upload the item-->
          <step>
              <heading>submit.progressbar.upload</heading>
              <processing-class>edu.umd.lib.dspace.submit.step.LibraryAwardUploadStep</processing-class>
              <jspui-binding>edu.umd.lib.dspace.app.webui.submit.step.JSPLibraryAwardUploadStep</jspui-binding>
-             <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.UploadStep</xmlui-binding>
+             <xmlui-binding>edu.umd.lib.dspace.app.xmlui.aspect.submission.submit.XMLUILibraryAwardUploadStep</xmlui-binding>
              <workflow-editable>true</workflow-editable>
          </step>
-         
+
          <!--Step 4 will be to Verify/Review everything -->
          <step>
              <heading>submit.progressbar.verify</heading>
