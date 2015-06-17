@@ -3,12 +3,14 @@ package cz.cuni.mff.ufal;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.log4j.Logger;
+import org.dspace.app.xmlui.aspect.administrative.FlowResult;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.wing.Message;
@@ -54,6 +56,8 @@ public class UFALLicenceAgreement extends AbstractDSpaceTransformer {
     private static final Message T_signer_agree = message("xmlui.ufal.UFALLicenceAgreement.signer_agree");
     private static final Message T_signer_head = message("xmlui.ufal.UFALLicenceAgreement.signer_head");
 
+	public static final String SessionAttrName = "cz.cuni.mff.ufal.LicenceAgreement.requireAgreement";
+
 	public void addPageMeta(PageMeta pageMeta) throws WingException, SQLException {
 
 		// Set the page title
@@ -95,9 +99,9 @@ public class UFALLicenceAgreement extends AbstractDSpaceTransformer {
 			Request request = ObjectModelHelper.getRequest(objectModel);
 
 			HttpSession session = request.getSession();
-			
+
 			ArrayList<ExtraLicenseField> errors = new ArrayList<ExtraLicenseField>();
-			String err = request.getParameter("err");
+			String err = parameters.getParameter("errors");
 			if(err!=null && !err.isEmpty()) {
 				String temp[] = err.split(",");
 				for(String error : temp) {
@@ -115,20 +119,14 @@ public class UFALLicenceAgreement extends AbstractDSpaceTransformer {
 			list.addItem().addContent(T_para1);
 
 
-			boolean allzip = Boolean.parseBoolean(request.getParameter("allzip"));
-			int bitstreamID = -1;
-			String redirectURL = contextPath + "/handle/" + dso.getHandle();
-			
+			boolean allzip = parameters.getParameterAsBoolean("allzip", false);
+			int bitstreamID = parameters.getParameterAsInteger("bitstreamId", -1);
+
 			ArrayList<String> licenseRequiresExtra = new ArrayList<String>();
-						
+
 			if (allzip) {
 
-				// this is probably not enough
-				Item item = (Item)dso;
-				Metadatum[] lic = item.getMetadata("dc", "rights", "uri", Item.ANY);
-				String licURL = lic[0].value;
-
-				LicenseDefinition license = functionalityManager.getLicenseByDefinition(licURL);
+				LicenseDefinition license = getLicenseDefinitionFromMetadata(functionalityManager, dso);
 				list.addItem().addXref(license.getDefinition(), license.getName(), "target_blank");
 				String lr = license.getRequiredInfo();
 				if(lr!=null) {
@@ -136,12 +134,17 @@ public class UFALLicenceAgreement extends AbstractDSpaceTransformer {
 						licenseRequiresExtra.add(r.trim());
 					}
 				}
-				redirectURL += "/ufal-licence-agreement-agreed?handle=" + dso.getHandle() + "&allzip=true";
 			} else {
 			
-				bitstreamID = Integer.parseInt(request.getParameter("bitstreamId"));
-				int userID = context.getCurrentUser().getID();		
+				int userID = context.getCurrentUser().getID();
 				java.util.List<LicenseDefinition> licenses = functionalityManager.getLicensesToAgree(userID, bitstreamID);
+
+				//if there are no licenses to agree, display what allzip would (but we shouldn't get here in that case)
+				if(licenses.isEmpty()){
+					LicenseDefinition license = getLicenseDefinitionFromMetadata(functionalityManager, dso);
+					licenses = new ArrayList<>();
+					licenses.add(license);
+				}
 
 				Division licences_div = licenceAgreement.addDivision("licences-definition", "");
 				
@@ -160,12 +163,16 @@ public class UFALLicenceAgreement extends AbstractDSpaceTransformer {
 						}
 					}
 				}
-				redirectURL += "/ufal-licence-agreement-agreed?handle=" + dso.getHandle() + "&bitstreamId=" + bitstreamID;
 			}
 			
 			licenceAgreement.addPara(" ");
 			licenceAgreement.addPara(T_signer_head);
-			Division form = licenceAgreement.addInteractiveDivision("license-form", redirectURL, Division.METHOD_POST);
+			String action = contextPath + "/handle/" + dso.getHandle() + "/license/agree";
+			Division form = licenceAgreement.addInteractiveDivision("license-form", action, Division.METHOD_POST);
+
+			form.addHidden("license-continue").setValue(knot.getId());
+			form.addHidden("allzip").setValue(String.valueOf(allzip));
+			form.addHidden("bitstreamId").setValue(bitstreamID);
 			
 			String personCredentials = context.getCurrentUser().getFirstName() + " " + context.getCurrentUser().getLastName();
 			String personId = context.getCurrentUser().getEmail();
@@ -268,4 +275,64 @@ public class UFALLicenceAgreement extends AbstractDSpaceTransformer {
 		
 		functionalityManager.closeSession();
 	}
+
+	private LicenseDefinition getLicenseDefinitionFromMetadata(IFunctionalities functionalityManager, DSpaceObject dso){
+		// this is probably not enough
+		Item item = (Item)dso;
+		Metadatum[] lic = item.getMetadata("dc", "rights", "uri", Item.ANY);
+		String licURL = lic[0].value;
+		return functionalityManager.getLicenseByDefinition(licURL);
+	}
+
+	public static FlowResult validate(Map objectModel){
+
+		Request request = ObjectModelHelper.getRequest(objectModel);
+		HttpSession session = request.getSession();
+		FlowResult result = new FlowResult();
+		result.setContinue(true);
+		result.setOutcome(true);
+
+		java.util.List<String> errors = new ArrayList<>();
+
+		for (Object extra : request.getParameters().keySet()) {
+			String ext = extra.toString();
+			if (!ext.startsWith("extra_")) {
+				continue;
+			}
+			ExtraLicenseField exField = ExtraLicenseField.valueOf(ext.substring(6)); // ext.substring(6) will remove the prefix extra_
+			if (exField.isMetadata()) {
+				String val = request.getParameter(ext);
+				if (!exField.validate(val)) {
+					errors.add(exField.toString());
+				}
+				if (val != null && !val.isEmpty()) {
+					session.setAttribute("extra_" + exField.name(), val);
+				}
+			}
+		}
+		if(!errors.isEmpty()){
+			result.setContinue(false);
+			result.setOutcome(false);
+			result.setErrors(errors);
+		}
+		return result;
+	}
+
+	/**
+	 * Unless we come from BitstreamReader ignore
+	 * @param objectModel
+	 * @return
+	 */
+	public static boolean signatureNeeded(Map objectModel){
+		Request request = ObjectModelHelper.getRequest(objectModel);
+		boolean ret = false;
+		HttpSession session = request.getSession();
+		Object requireAgreement = session.getAttribute(SessionAttrName);
+		if(requireAgreement != null){
+			ret = (Boolean)requireAgreement;
+			session.removeAttribute(SessionAttrName);
+		}
+		return ret;
+	}
+
 }
