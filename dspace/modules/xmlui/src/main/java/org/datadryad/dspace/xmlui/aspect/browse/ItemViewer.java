@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
@@ -211,180 +213,180 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
             pageMeta.addMetadata("dryad", "localize").addContent("true");
         }
 
-        // Data file metadata included on data package items (integrated view)
-        for (DCValue metadata : item.getMetadata("dc.relation.haspart")) {
-            int skip = 0;
-            String id;
+        // if this item has ispartof metadata, it is a file. Otherwise, it's a package.
+        // NOTE: this might not be the best check for package vs file?
+        if (item.getMetadata("dc.relation.ispartof").length > 0) {
+            // THIS IS A FILE ITEM
 
-            if (metadata.value.startsWith("http://hdl.")) {
-                skip = 22;
-            } else if (metadata.value.indexOf("/handle/") != -1) {
-                skip = metadata.value.indexOf("/handle/") + 8;
-            }
-            // else DOI, stick with skip == 0
+            // Data package metadata included on data file items
+            for (DCValue metadata : item.getMetadata("dc.relation.ispartof")) {
+                int skip = 0;
 
-            id = metadata.value.substring(skip); // skip host name
+                if (metadata.value.startsWith("http://hdl.")) {
+                    skip = 22;
+                } else if (metadata.value.indexOf("/handle/") != -1) {
+                    skip = metadata.value.indexOf("/handle/") + 8;
+                } else {
+                    // if doi, leave as is and we'll process differently below
+                }
 
-            if (id.startsWith("doi:") || id.startsWith("http://dx.doi.org/")) {
-                if (id.startsWith("http://dx.doi.org/")) {
-                    id = id.substring("http://dx.doi.org/".length());
+                String id = metadata.value.substring(skip); // skip host name
+                Item pkg = null;
 
-                    // service with resolve with or without the "doi:" prepended
-                    if (!id.startsWith("doi:")) {
-                        id = "doi:" + id;
+                if (id.startsWith("doi:")) {
+                    DOIIdentifierProvider doiService = new DSpace().getSingletonService(DOIIdentifierProvider.class);
+                    try {
+                        pkg = (Item) doiService.resolve(context, id, new String[]{});
+                    } catch (IdentifierNotFoundException e) {
+                        // just keep going
+                    } catch (IdentifierNotResolvableException e) {
+                        // just keep going
+                    }
+                } else {
+                    pkg = (Item) HandleManager.resolveToObject(context, id);
+                }
+
+                boolean identifierSet = false;
+                DCValue[] values;
+                String date;
+
+                if (pkg != null) {
+                    String pkgTitle = getItemTitle(pkg).trim();
+
+                    for (DCValue pkgMeta : pkg
+                            .getMetadata("dc.identifier.citation")) {
+                        pageMeta.addMetadata("citation", "article").addContent(
+                                pkgMeta.value);
+                    }
+
+                    pageMeta.addMetadata("authors", "package").addContent(
+                            getAuthors(pkg));
+                    pageMeta.addMetadata("title", "package").addContent(
+                            pkgTitle.endsWith(".") ? pkgTitle + " " : pkgTitle
+                                    + ". ");
+
+                    if ((values = pkg.getMetadata("dc.date.issued")).length > 0) {
+                        pageMeta.addMetadata("dateIssued", "package").addContent(
+                                "(" + values[0].value.substring(0, 4) + ")");
+                    }
+
+                    if ((values = pkg.getMetadata("dc.relation.isreferencedby")).length != 0) {
+                        pageMeta.addMetadata("identifier", "article").addContent(
+                                values[0].value);
+                    }
+
+                    if ((values = pkg.getMetadata("prism.publicationName")).length != 0) {
+                        pageMeta.addMetadata("publicationName").addContent(
+                                values[0].value);
+                    }
+
+                    if ((values = pkg.getMetadata("dc.identifier")).length != 0) {
+                        for (DCValue value : values) {
+                            if (value.value.startsWith("doi:")) {
+                                pageMeta.addMetadata("identifier", "package")
+                                        .addContent(value.value);
+                            }
+                        }
+                    } else if ((values = pkg.getMetadata("dc.identifier.uri")).length != 0) {
+                        for (DCValue value : values) {
+                            if (value.value.startsWith("doi:")) {
+                                pageMeta.addMetadata("identifier", "package")
+                                        .addContent(value.value);
+                                identifierSet = true;
+                            }
+                        }
+
+                        if (!identifierSet) {
+                            for (DCValue value : values) {
+                                if (value.value.startsWith("http://dx.doi.org/")) {
+                                    pageMeta.addMetadata("identifier", "package")
+                                            .addContent(value.value.substring(18));
+                                    identifierSet = true;
+                                }
+                            }
+                        }
+
+                        if (!identifierSet) {
+                            for (DCValue value : values) {
+                                if (value.value.startsWith("hdl:")) {
+                                    pageMeta.addMetadata("identifier", "package")
+                                            .addContent(value.value);
+                                    identifierSet = true;
+                                }
+                            }
+                        }
+
+                        if (!identifierSet) {
+                            for (DCValue value : values) {
+                                if (value.value
+                                        .startsWith("http://hdl.handle.net/")) {
+                                    pageMeta.addMetadata("identifier", "package")
+                                            .addContent(value.value.substring(22));
+                                }
+                            }
+                        }
                     }
                 }
+            }
 
-                DOIIdentifierProvider doiService = new DSpace().getSingletonService(DOIIdentifierProvider.class);
-                Item file = null;
-                try {
-                    file = (Item) doiService.resolve(context, id, new String[]{});
-                } catch (IdentifierNotFoundException e) {
-                    // just keep going
-                } catch (IdentifierNotResolvableException e) {
-                    // just keep going
+        } else {
+            // THIS IS A PACKAGE ITEM
+
+            pageMeta.addMetadata("authors", "package").addContent(getAuthors(item));
+
+            // Data file metadata included on data package items (integrated view)
+            for (DCValue metadata : item.getMetadata("dc.relation.haspart")) {
+                int skip = 0;
+                String id;
+
+                if (metadata.value.startsWith("http://hdl.")) {
+                    skip = 22;
+                } else if (metadata.value.indexOf("/handle/") != -1) {
+                    skip = metadata.value.indexOf("/handle/") + 8;
                 }
+                // else DOI, stick with skip == 0
 
-                if (file != null) {
+                id = metadata.value.substring(skip); // skip host name
+
+                if (id.startsWith("doi:") || id.startsWith("http://dx.doi.org/")) {
+                    if (id.startsWith("http://dx.doi.org/")) {
+                        id = id.substring("http://dx.doi.org/".length());
+
+                        // service with resolve with or without the "doi:" prepended
+                        if (!id.startsWith("doi:")) {
+                            id = "doi:" + id;
+                        }
+                    }
+
+                    DOIIdentifierProvider doiService = new DSpace().getSingletonService(DOIIdentifierProvider.class);
+                    Item file = null;
+                    try {
+                        file = (Item) doiService.resolve(context, id, new String[]{});
+                    } catch (IdentifierNotFoundException e) {
+                        // just keep going
+                    } catch (IdentifierNotResolvableException e) {
+                        // just keep going
+                    }
+
+                    if (file != null) {
+                        String fileTitle = getItemTitle(file);
+
+                        if (fileTitle != null) {
+                            pageMeta.addMetadata("dryad", "fileTitle").addContent(metadata.value + "|" + fileTitle);
+                        } else {
+                            pageMeta.addMetadata("dryad", "fileTitle").addContent(metadata.value);
+                        }
+                    } else {
+                        log.warn("Didn't find a DOI from internal db for: " + id);
+                    }
+                } else {
+                    Item file = (Item) HandleManager.resolveToObject(context, id);
                     String fileTitle = getItemTitle(file);
 
                     if (fileTitle != null) {
                         pageMeta.addMetadata("dryad", "fileTitle").addContent(metadata.value + "|" + fileTitle);
                     } else {
                         pageMeta.addMetadata("dryad", "fileTitle").addContent(metadata.value);
-                    }
-                } else {
-                    log.warn("Didn't find a DOI from internal db for: " + id);
-                }
-            } else {
-                Item file = (Item) HandleManager.resolveToObject(context, id);
-                String fileTitle = getItemTitle(file);
-
-                if (fileTitle != null) {
-                    pageMeta.addMetadata("dryad", "fileTitle").addContent(metadata.value + "|" + fileTitle);
-                } else {
-                    pageMeta.addMetadata("dryad", "fileTitle").addContent(metadata.value);
-                }
-            }
-        }
-
-        // Data package metadata included on data file items
-        for (DCValue metadata : item.getMetadata("dc.relation.ispartof")) {
-            int skip = 0;
-
-            if (metadata.value.startsWith("http://hdl.")) {
-                skip = 22;
-            } else if (metadata.value.indexOf("/handle/") != -1) {
-                skip = metadata.value.indexOf("/handle/") + 8;
-            } else {
-                // if doi, leave as is and we'll process differently below
-            }
-
-            String id = metadata.value.substring(skip); // skip host name
-            Item pkg = null;
-
-            if (id.startsWith("doi:")) {
-                DOIIdentifierProvider doiService = new DSpace().getSingletonService(DOIIdentifierProvider.class);
-                try {
-                    pkg = (Item) doiService.resolve(context, id, new String[]{});
-                } catch (IdentifierNotFoundException e) {
-                    // just keep going
-                } catch (IdentifierNotResolvableException e) {
-                    // just keep going
-                }
-            } else {
-                pkg = (Item) HandleManager.resolveToObject(context, id);
-            }
-
-            StringBuilder buffer = new StringBuilder();
-            boolean identifierSet = false;
-            DCValue[] values;
-            String date;
-
-            if (pkg != null) {
-                String pkgTitle = getItemTitle(pkg).trim();
-                String author;
-
-                for (DCValue pkgMeta : pkg
-                        .getMetadata("dc.identifier.citation")) {
-                    pageMeta.addMetadata("citation", "article").addContent(
-                            pkgMeta.value);
-                }
-
-                buffer.append(parseName(pkg
-                        .getMetadata("dc.contributor.author")));
-                buffer.append(parseName(pkg.getMetadata("dc.creator")));
-                buffer.append(parseName(pkg.getMetadata("dc.contributor")));
-
-                author = buffer.toString().trim();
-                author = author.endsWith(",") ? author.substring(0, author
-                        .length() - 1) : author;
-
-                pageMeta.addMetadata("authors", "package").addContent(
-                        author + " ");
-                pageMeta.addMetadata("title", "package").addContent(
-                        pkgTitle.endsWith(".") ? pkgTitle + " " : pkgTitle
-                                + ". ");
-
-                if ((values = pkg.getMetadata("dc.date.issued")).length > 0) {
-                    pageMeta.addMetadata("dateIssued", "package").addContent(
-                            "(" + values[0].value.substring(0, 4) + ")");
-                }
-
-                if ((values = pkg.getMetadata("dc.relation.isreferencedby")).length != 0) {
-                    pageMeta.addMetadata("identifier", "article").addContent(
-                            values[0].value);
-                }
-
-                if ((values = pkg.getMetadata("prism.publicationName")).length != 0) {
-                    pageMeta.addMetadata("publicationName").addContent(
-                            values[0].value);
-                }
-
-                if ((values = pkg.getMetadata("dc.identifier")).length != 0) {
-                    for (DCValue value : values) {
-                        if (value.value.startsWith("doi:")) {
-                            pageMeta.addMetadata("identifier", "package")
-                                    .addContent(value.value);
-                        }
-                    }
-                } else if ((values = pkg.getMetadata("dc.identifier.uri")).length != 0) {
-                    for (DCValue value : values) {
-                        if (value.value.startsWith("doi:")) {
-                            pageMeta.addMetadata("identifier", "package")
-                                    .addContent(value.value);
-                            identifierSet = true;
-                        }
-                    }
-
-                    if (!identifierSet) {
-                        for (DCValue value : values) {
-                            if (value.value.startsWith("http://dx.doi.org/")) {
-                                pageMeta.addMetadata("identifier", "package")
-                                        .addContent(value.value.substring(18));
-                                identifierSet = true;
-                            }
-                        }
-                    }
-
-                    if (!identifierSet) {
-                        for (DCValue value : values) {
-                            if (value.value.startsWith("hdl:")) {
-                                pageMeta.addMetadata("identifier", "package")
-                                        .addContent(value.value);
-                                identifierSet = true;
-                            }
-                        }
-                    }
-
-                    if (!identifierSet) {
-                        for (DCValue value : values) {
-                            if (value.value
-                                    .startsWith("http://hdl.handle.net/")) {
-                                pageMeta.addMetadata("identifier", "package")
-                                        .addContent(value.value.substring(22));
-                            }
-                        }
                     }
                 }
             }
@@ -642,6 +644,24 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
         return title;
     }
 
+    public static String getAuthors(Item item) {
+        ArrayList<DCValue> mdlist = new ArrayList<DCValue>();
+        for (DCValue i : item.getMetadata("dc.contributor.author")) {
+            mdlist.add(i);
+        }
+        for (DCValue i : item.getMetadata("dc.creator")) {
+            mdlist.add(i);
+        }
+        for (DCValue i : item.getMetadata("dc.contributor")) {
+            mdlist.add(i);
+        }
+        StringBuilder buffer = new StringBuilder();
+        buffer.append(parseName((DCValue[]) mdlist.toArray(new DCValue[1])));
+
+        String author = buffer.toString().trim() + " ";
+        return author;
+    }
+
     /**
      * Recycle
      */
@@ -651,22 +671,23 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
         super.recycle();
     }
 
-    private String parseName(DCValue[] aMetadata) {
+    private static String parseName(DCValue[] aMetadata) {
         StringBuilder buffer = new StringBuilder();
         int position = 0;
 
         for (DCValue metadata : aMetadata) {
-
+            StringBuilder authorString = new StringBuilder();
+            authorString.append("@");
             if (metadata.value.indexOf(",") != -1) {
                 String[] parts = metadata.value.split(",");
 
                 if (parts.length > 1) {
                     StringTokenizer tokenizer = new StringTokenizer(parts[1], ". ");
 
-                    buffer.append(parts[0]).append(" ");
+                    authorString.append(parts[0]).append(" ");
 
                     while (tokenizer.hasMoreTokens()) {
-                        buffer.append(tokenizer.nextToken().charAt(0));
+                        authorString.append(tokenizer.nextToken().charAt(0));
                     }
                 }
             } else {
@@ -675,15 +696,27 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
                 String author = parts[parts.length - 1].replace("\\s+|\\.", "");
                 char ch;
 
-                buffer.append(author).append(" ");
+                authorString.append(author).append(" ");
 
                 for (int index = 0; index < parts.length - 1; index++) {
                     if (parts[index].length() > 0) {
                         ch = parts[index].replace("\\s+|\\.", "").charAt(0);
-                        buffer.append(ch);
+                        authorString.append(ch);
                     }
                 }
             }
+            authorString.append("@");
+
+            // check for orcid:
+            if (metadata.authority != null) {
+                Pattern p = Pattern.compile(".+orcid::(.+)");
+                Matcher m = p.matcher(metadata.authority);
+                if (m.matches()) {
+                    authorString.append("#").append(m.group(1)).append("#");
+                }
+            }
+
+            buffer.append(authorString.toString());
 
             if (++position < aMetadata.length) {
                 if (aMetadata.length > 2) {
