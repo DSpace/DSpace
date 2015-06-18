@@ -240,7 +240,6 @@
 			$(document).ready(function(){
 				fields.forEach(executePreprocessors);
 				fields.forEach(makeReadonly);
-				fields.forEach(setAutocompleteParams);
 			});
 			
 			/**
@@ -327,17 +326,6 @@
 			 */
 			function makeReadonly(inputFieldName, index, array){
 				$('#'+ fieldIDPrefix + inputFieldName).prop("readonly",true);
-			}
-			
-			/**
-			 * Set the autocomplete params on an autocomplete
-			 * @returns
-			 */
-			function setAutocompleteParams(inputFieldName, index, array){
-				$('#'+ fieldIDPrefix + inputFieldName).click(function(){
-					($(this).autocomplete("option","minLength") != 0)? $(this).autocomplete( "option", "minLength" , 0) : null; 
-					 $('#'+ fieldIDPrefix + inputFieldName).autocomplete( "search", " " );
-				});
 			}
 			
 			//Evaluates the value of the dc.type field. If it changes, then submits the form and reload.
