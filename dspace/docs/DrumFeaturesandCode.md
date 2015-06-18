@@ -162,6 +162,13 @@ XMLUI comes with dual authentication capability. No customization needed.
 	
 * [dspace.cfg](../config/dspace.cfg) 
 
+*XMLUI Webapp*
+
+* [CASAuthentication.java](../modules/additions/src/main/java/org/dspace/authenticate/CASAuthentication.java) - made minor edit to CAS URL for redirect request.
+* [EditProfile.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/eperson/EditProfile.java) - don't allow password changes for CAS logins
+* [EPerson/sitemap.xmap](../modules/xmlui/src/main/resources/aspects/EPerson/sitemap.xmap) - Added location for CAS login.
+* [CASAuthenticateAction.java](..//modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/eperson/CASAuthenticateAction.java) - Attempts to log the user in using CAS.
+
 
 ### LDAP Authorization
 
