@@ -17,3 +17,42 @@
 .navbar-static-top {
      z-index: auto;
 }
+
+header .navbar-default {
+    background-color: white;
+}
+header .navbar-brand img {
+    height: 50px;
+}
+.navbar-brand {
+    padding: 5px 15px;
+    height: 60px;
+}
+.trail-wrapper {
+    background-color: #555;
+    border-bottom: 1px solid #555;
+    color: #fff;
+}
+.list-group-item.active, .list-group-item.active:hover, .list-group-item.active:focus {
+    background-color: #777;
+    border-color: #555;
+}
+.btn-primary {
+    background-color: #777;
+    border-color: #555;
+}
+.trail-wrapper .breadcrumb > .active {
+    color: #fff;
+}
+.breadcrumb a {
+    color: #fff7af;
+}
+header .navbar-default .navbar-toggle > li > a, header .navbar-default .navbar-nav > li > a {
+    background: #555 none repeat scroll 0 0;
+}
+
+header .navbar-default .navbar-toggle, header .navbar-default .navbar-nav {
+    background: #555 none repeat scroll 0 0;
+    border-color: transparent;
+    color: #fff;
+}
