@@ -16,6 +16,8 @@
 
 	<form-map>
 		<name-map collection-handle="default" form-name="traditional" />
+		<!--10915/46286: Autarchivo de Tesis de Grado -->
+		<name-map collection-handle="10915/46286" form-name="tesisDeGrado" />
 	</form-map>
 
 
@@ -1013,6 +1015,70 @@
 
 			</page>
 
+		</form>
+		
+		
+		<!-- FORMULARIO TESIS DE GRADO FACULTADES UNLP -->
+		<form name="tesisDeGrado">
+			<page number="1">
+
+				<!-- Autor (persona) -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>creator</dc-element>
+					<dc-qualifier>person</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Autor (*)</label>
+					<input-type>onebox</input-type>
+					<hint>Autores de la obra</hint>
+					<required>Debe indicar al menos un autor</required>
+					<required-on-group>!SeDiCIAdmin</required-on-group>
+				</field>
+				
+				<!-- Director de tesis -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>contributor</dc-element>
+					<dc-qualifier>director</dc-qualifier>
+					<label>Director de la Tesis</label>
+					<input-type>onebox</input-type>
+					<hint>Nombre del director de la Tesis</hint>
+				</field>
+				
+				<!-- Jurado de tesis -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>contributor</dc-element>
+					<dc-qualifier>juror</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Miembros del Jurado</label>
+					<input-type>onebox</input-type>
+					<hint>Nombre de los miembros del jurado que evaluaron el trabajo</hint>
+				</field>
+				
+				<!-- Fecha de exposición de tesis -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>date</dc-element>
+					<dc-qualifier>exposure</dc-qualifier>
+					<label>Fecha de presentación (*)</label>
+					<input-type>date</input-type>
+					<hint>Fecha en la que se expuso el trabajo para su aprobación</hint>
+					<required>Debe especificarse la fecha de presentación</required>
+				</field>
+				
+				<!-- Nro de Acta - TESIS (opcional) -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>acta</dc-element>
+					<label>Nro de acta (*)</label>
+					<input-type>onebox</input-type>
+					<hint>Número de acta de aprobación de la Tesis</hint>
+					<required>Debe especificarse el nro. de acta</required>
+				</field>			
+				
+			</page>
+		
 		</form>
 
 	</form-definitions>
