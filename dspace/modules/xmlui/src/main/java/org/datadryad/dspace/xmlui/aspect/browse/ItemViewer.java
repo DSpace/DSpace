@@ -18,9 +18,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
@@ -260,7 +257,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
                     }
 
                     pageMeta.addMetadata("authors", "package").addContent(
-                            getAuthors(pkg));
+                            DryadWorkflowUtils.getAuthors(pkg));
                     pageMeta.addMetadata("title", "package").addContent(
                             pkgTitle.endsWith(".") ? pkgTitle + " " : pkgTitle
                                     + ". ");
@@ -332,7 +329,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
         } else {
             // THIS IS A PACKAGE ITEM
 
-            pageMeta.addMetadata("authors", "package").addContent(getAuthors(item));
+            pageMeta.addMetadata("authors", "package").addContent(DryadWorkflowUtils.getAuthors(item));
 
             // Data file metadata included on data package items (integrated view)
             for (DCValue metadata : item.getMetadata("dc.relation.haspart")) {
@@ -644,24 +641,6 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
         return title;
     }
 
-    public static String getAuthors(Item item) {
-        ArrayList<DCValue> mdlist = new ArrayList<DCValue>();
-        for (DCValue i : item.getMetadata("dc.contributor.author")) {
-            mdlist.add(i);
-        }
-        for (DCValue i : item.getMetadata("dc.creator")) {
-            mdlist.add(i);
-        }
-        for (DCValue i : item.getMetadata("dc.contributor")) {
-            mdlist.add(i);
-        }
-        StringBuilder buffer = new StringBuilder();
-        buffer.append(parseName((DCValue[]) mdlist.toArray(new DCValue[1])));
-
-        String author = buffer.toString().trim() + " ";
-        return author;
-    }
-
     /**
      * Recycle
      */
@@ -670,66 +649,6 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
         dataFiles.clear();
         super.recycle();
     }
-
-    private static String parseName(DCValue[] aMetadata) {
-        StringBuilder buffer = new StringBuilder();
-        int position = 0;
-
-        for (DCValue metadata : aMetadata) {
-            StringBuilder authorString = new StringBuilder();
-            authorString.append("@");
-            if (metadata.value.indexOf(",") != -1) {
-                String[] parts = metadata.value.split(",");
-
-                if (parts.length > 1) {
-                    StringTokenizer tokenizer = new StringTokenizer(parts[1], ". ");
-
-                    authorString.append(parts[0]).append(" ");
-
-                    while (tokenizer.hasMoreTokens()) {
-                        authorString.append(tokenizer.nextToken().charAt(0));
-                    }
-                }
-            } else {
-                // now the minority case (as we clean up the data)
-                String[] parts = metadata.value.split("\\s+|\\.");
-                String author = parts[parts.length - 1].replace("\\s+|\\.", "");
-                char ch;
-
-                authorString.append(author).append(" ");
-
-                for (int index = 0; index < parts.length - 1; index++) {
-                    if (parts[index].length() > 0) {
-                        ch = parts[index].replace("\\s+|\\.", "").charAt(0);
-                        authorString.append(ch);
-                    }
-                }
-            }
-            authorString.append("@");
-
-            // check for orcid:
-            if (metadata.authority != null) {
-                Pattern p = Pattern.compile(".+orcid::(.+)");
-                Matcher m = p.matcher(metadata.authority);
-                if (m.matches()) {
-                    authorString.append("#").append(m.group(1)).append("#");
-                }
-            }
-
-            buffer.append(authorString.toString());
-
-            if (++position < aMetadata.length) {
-                if (aMetadata.length > 2) {
-                    buffer.append(", ");
-                } else {
-                    buffer.append(" and ");
-                }
-            }
-        }
-
-        return buffer.length() > 0 ? buffer.toString() : "";
-    }
-
 
     private String getItemURL(Item item) throws WingException {
         DCValue[] identifiers = item.getMetadata("dc", "identifier", null, Item.ANY);
