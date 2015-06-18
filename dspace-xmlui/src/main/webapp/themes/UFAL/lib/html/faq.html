@@ -19,6 +19,7 @@
 		<li><a href="#what-license-should-i-pick-for-my-datatool">What license should I pick for my data/tool?</a></li>
 		<li><a href="#list-of-licenses">Where can I find more information about supported licenses?</a></li>
 		<li><a href="#real-authors">Why we strongly prefer real authors to institutions?</a></li>
+		<li><a href="#searching">How do I get the most of my searches</a></li>
 	</ul>
     <hr />
 
@@ -207,5 +208,30 @@
 		</p>
 	</div>
 
+	<div>
+		<h3 id="searching">How do I get the most of my searches</h3>
+		<p>
+			If you are not satisfied with the results of your searches, you might wish to go beyond plain text searches.
+			You may search only in certain fields, use negation, add score (emphasis) to some parts of the query and match
+			more. The search engine is SOLR so use it's syntax if you know it or check it in <a href="https://cwiki.apache.org/confluence/display/solr/The+Standard+Query+Parser">the documentation</a>.
+		</p>
+		<h4>Examples</h4>
+		<p>
+		<dl>
+			<style scoped="scoped">
+				dt{
+					padding-top:5px;
+					padding-bottom:5px;
+				}
+			</style>
+			<dt><a href="../discover?query=dc.title%3AP%3FT+%26%26+-dc.title%3AWordNet">dc.title:P?T &amp;&amp; -dc.title:WordNet</a></dt>
+			<dd>Returns all items having P?T in title - ? stands for any character (eg. PDT) - and not having WordNet in the title</dd>
+			<dt><a href="../discover?query=dc.title%3A%22Czech+WordNet%22">dc.title:"Czech WordNet"</a></dt>
+			<dd>Use double quotes (&quot;) for exact matches and multiword expressions</dd>
+			<dt><a href="../discover?query=author%3A%28Bojar+-Tamchyna%29+%26%26+%28dc.language.iso%3A%28ces+AND+eng%29+OR+language%3A%28czech+AND+english%29%29">author:(Bojar -Tamchyna) &amp;&amp; (dc.language.iso:(ces AND eng) OR language:(czech AND english))</a></dt>
+			<dd>Search for items by one author and not the other; interesting are only items about both czech and english languages.</dd>
+		</dl>
+		</p>
+	</div>
 </div>
 
