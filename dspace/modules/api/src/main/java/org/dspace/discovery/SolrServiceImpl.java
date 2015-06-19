@@ -54,6 +54,8 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * SolrIndexer contains the methods that index Items and their metadata,
@@ -964,6 +966,17 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         //We are not indexing provenance, this is useless
         if (field.equals("dc.description.provenance")) {
             return;
+        }
+
+        if (field.equals("dc.contributor.author") && (meta.authority != null)) {
+            Pattern orcidPat = Pattern.compile("\\d{4}-\\d{4}-\\d{4}-\\d{4}");
+            log.debug("orcidPat is " + orcidPat.toString());
+            Matcher m = orcidPat.matcher(meta.authority);
+            if (m.find()) {
+                String orcid = m.group();
+                log.debug("processing " + orcid);
+                doc.addField("dc.contributor.author.authority", orcid);
+            }
         }
 
         //Add the field to all for autocomplete so our autocomplete works for all fields

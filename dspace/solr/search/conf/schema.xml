@@ -542,6 +542,8 @@
    <copyField source="dc.creator" dest="dc.contributor.author_ac"/>
    <copyField source="dc.creator" dest="dc.contributor.author_filter"/>
 
+     <field name="dc.contributor.author.authority" type="string" indexed="true" stored="true" multiValued="true"/>
+
    <!-- dc.creator is only used in our harvested records -->
    <!-- we don't allow browse for them (what I think sort is used for) -->
    <!-- commenting out OR dc.contributor.author_sort needs to be multivalued -->
