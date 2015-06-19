@@ -72,6 +72,7 @@
         revista_indizada_en: {label: "Revista indizada en"},
         localizacion_fisica: {label: "Localización física"},
         localizacion_electronica: {label: "Localización electrónica", type: "link", linkLabel: "Acceder al sitio web"},
+        empty: {label: ""},
     };
 
     // Array con los codigos de los metadatos (para determinar la posicion de inserción)
@@ -80,6 +81,13 @@
     // Array con los codigos de los metadatos ordenados alfabeticamente (para la combo)
     var sortedMetadataKeys = $.map(metadataList, function(value, key) { return key; });
     sortedMetadataKeys.sort();
+    //Se agrega como primera opción el campo de metadato "empty" (vacío), eliminando la instancia existente.
+    var posEmptyElement = sortedMetadataKeys.indexOf("empty");
+    if(posEmptyElement > -1) {
+    	sortedMetadataKeys.splice(posEmptyElement, 1);
+    	// Agregar elemento "empty" en primera posición.
+    	sortedMetadataKeys.splice(0, 0, "empty");
+    }
     
     
     //////////////////////////////////////////////////////////////////
@@ -153,6 +161,10 @@
         if(textarea.val().trim() == "")
             return false;
 
+        // Intentamos agregar un metadato cuyo 'nombre de metadato' es vacío?
+        if(metadataList[combo.val()].label.length == 0)
+        	return false;
+        
         addMetadata(combo.val(), textarea.val());
         textarea.val("");
         combo.focus();
@@ -213,9 +225,17 @@
         var key = target.parent().attr('class');
         var value = target.html().replace(/&amp;/g, '&');
 
-        // Si tiene un tipo especial definido, hacemos el procesamiento de decodificacion
-        if(metadataList[key].type && metadataList[key].type != "text") {
-        	value = typeHandlers[ metadataList[key].type ].decode(key, value);
+        if(metadataList[key] != null) {
+	        // Si tiene un tipo especial definido, hacemos el procesamiento de decodificacion
+	        if(metadataList[key].type && metadataList[key].type != "text") {
+	        	value = typeHandlers[ metadataList[key].type ].decode(key, value);
+	        }
+        } else {
+        	// Si el metadato a eliminar no está disponible en la lista de metadatos, entonces "vaciamos" el nombre del metadato.
+        	var posEmptyElement = metadataKeys.indexOf("empty");
+        	if (posEmptyElement > -1){
+        		key = "empty";
+        	}
         }
 
         textarea.val(value);
