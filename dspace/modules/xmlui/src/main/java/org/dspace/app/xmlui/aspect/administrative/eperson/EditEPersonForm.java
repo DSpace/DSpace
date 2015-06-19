@@ -402,7 +402,7 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
         if (admin && ldap != null)
         {
             List ldapInfo = edit.addList("eperson-ldap-info");
-            ldapInfo.setHead(T_ldap_info_head);
+            ldapInfo.setHead("UM Directory Information");
             try
             {
                 ldapInfo.addItem().addContent(
@@ -417,12 +417,28 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
                 {
                     String strUnit = (String) i.next();
                     Unit unit = Unit.findByName(context, strUnit);
-                    ldapInfo.addItem().addContent("Unit: " + strUnit);
+                    if (unit == null)
+                    {
+                        ldapInfo.addItem().addContent("Unit: " + strUnit);
+                    }
+                    else
+                    {
+                        String target = (request.getContextPath()
+                                + "/admin/units?administrative-continue="
+                                + knot.getId() + "&submit_edit&unitID=" + unit
+                                .getID());
+                        ldapInfo.addItemXref(target, "Unit: " + strUnit);
+                    }
                 }
                 for (Iterator i = ldap.getGroups().iterator(); i.hasNext();)
                 {
                     Group group = (Group) i.next();
-                    ldapInfo.addItem().addContent("Group: " + group.getName());
+                    String target = (request.getContextPath()
+                            + "/admin/groups?administrative-continue="
+                            + knot.getId() + "&submit_edit&groupID=" + group
+                            .getID());
+                    ldapInfo.addItemXref(target, "Group: " + group.getName());
+
                 }
             }
             catch (Exception e)
@@ -440,8 +456,8 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
      * are not the return the group that membership is implied through (the via
      * group!). This will only find one possible relation path, there may be
      * multiple.
-     * 
-     * 
+     *
+     *
      * @param eperson
      *            The source group to search from
      * @param group
