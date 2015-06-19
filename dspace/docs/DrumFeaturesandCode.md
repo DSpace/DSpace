@@ -122,21 +122,8 @@ Add custom preservation bundle.
 
 ### Dual authentication: password/CAS
 
-Add capability to login with the university directory id using CAS autentication or user id/passsword.
+XMLUI comes with dual authentication capability. No customization needed.
 
-*Java Source*
-  
- * [CASAuthentication.java](../modules/additions/src/main/java/org/dspace/authenticate/CASAuthentication.java) - setup mechanics of dual authentication
- 
-*JSPUI webapp*
-
- * [chooser.jsp](../modules/jspui/src/main/webapp/login/chooser.jsp) - setup mechanics of dual authentication
-
-*Configuration*
-
-* [Messages.properties](../modules/additions/src/main/resources/Messages.properties) - login messages for JSP
-
-* [dspace.cfg](../config/dspace.cfg) - CAS section for login, login preference section
 
 ### CAS Authentication
 
