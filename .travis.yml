@@ -24,6 +24,12 @@ before_install:
   - gem install compass
   - compass version
 
+# whitelist
+branches:
+    only:
+        - master
+        - mospace-5_x
+
 # Skip install stage, as we'll do it below
 install: "echo 'Skipping install stage, dependencies will be downloaded during build and test stages.'"
 
@@ -44,6 +50,7 @@ script:
   #        -Dmirage2.deps.included=false => Don't include Mirage2 build dependencies (We installed them in before_install)
   #        -P !assembly => SKIP the actual building of [src]/dspace/dspace-installer (as it can be memory intensive)
   - "cd dspace && mvn package -Dmirage2.on=true -Dmirage2.deps.included=false -P !assembly -B -V"
-
 notifications:
-      slack: umlso:71g7T3bFPtCyzcXpiLYyw9wY
+  hipchat:
+    rooms:
+      secure: IJ/e7tbe7xZeC3BAMrQUgKOe9ZoayqhQRLgeCONw1KlcW7Vncq3SXVHyP5p5kssPEgt+7rbRbtoFqwa3seoIxXdW2E4NpOoo6TNYsrJLL1GC3GQAZ6Tqawbw+vnbsjRpBkDFNV9cQQFZaVBkQzRMO6BHVQmOiJ8dLJMxLbmFrgk=
