@@ -71,8 +71,10 @@ div#ms-tagline {
     color: #AAB8C6;
 }
 div#ms-navigation {
+    position: relative;
+    top: -20px;
     text-align: right;
-    width: 45%;
+    width: 100%;
 }
 ul#ms-navigation-list li.ms-navigation-link {
     list-style: none;

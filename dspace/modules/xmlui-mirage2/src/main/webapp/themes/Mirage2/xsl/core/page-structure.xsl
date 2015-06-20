@@ -343,23 +343,18 @@
                              Preserving the intellectual output and resources of the University of Missouri
                          </div>
 
-                    <div class="navbar-header pull-right">
-                         <!-- MOspace navigation bar -->
-                    <xsl:variable name="app_path" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]" />
-
-                        <ul id="ms-navigation-list">
-                            <li class="ms-navigation-link"><a href="{$app_path}/discover">search</a> | </li>
-                            <li class="ms-navigation-link"><a href="{$app_path}/community-list">browse</a> | </li>
-                            <li class="ms-navigation-link"><a href="{$app_path}/pages/add">add to MOspace</a> | </li>
-                            <li class="ms-navigation-link"><a href="{$app_path}/pages/about">about</a> | </li>
-                            <li class="ms-navigation-link"><a href="{$app_path}/pages/help">help</a></li>
-                        </ul>
-
-                    </div>
-
-
                         <div class="navbar-header pull-right visible-xs hidden-sm hidden-md hidden-lg">
                         <ul class="nav nav-pills pull-left ">
+
+                            <!-- MOspace navigation bar -->
+                            <xsl:variable name="app_path" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]" />
+
+                                    <li role="presentation"><a href="{$app_path}/discover">search</a></li>
+                                    <li role="presentation"><a href="{$app_path}/community-list">browse</a></li>
+                                    <li role="presentation"><a href="{$app_path}/pages/add">add to MOspace</a></li>
+                                    <li role="presentation"><a href="{$app_path}/pages/about">about</a></li>
+                                    <li role="presentation"><a href="{$app_path}/pages/help">help</a></li>
+
 
                             <xsl:if test="count(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='supportedLocale']) &gt; 1">
                                 <li id="ds-language-selection-xs" class="dropdown">
