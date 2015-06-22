@@ -192,7 +192,8 @@
 							value="<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.addoupointernesteddynamicfield" />" />
 						<input type="submit" name="pointerdo"
 							value="<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.adddopointernesteddynamicfield" />" />
-							
+						<input type="submit" name="link"
+							value="<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.addbooleannesteddynamicfield" />" />	
 						<c:forEach
 							items="${propertiesdefinition.real.mask}"
 							var="subtypo" varStatus="i">
@@ -352,8 +353,38 @@
 													labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.pointer.path" helpKey="help.jdyna.message.rendering.pointer.path"/>						
 											</fieldset>											
 										</c:if>
+										<c:if test="${subtypo.rendering.triview eq 'boolean'}">
+											<fieldset>
+											<dyna:boolean propertyPath="real.mask[${i.count - 1}].rendering.checked"
+												labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.boolean.checked" helpKey="help.jdyna.message.rendering.boolean.checked"/>
+											<div class="dynaClear">
+											&nbsp;
+											</div>
+											<dyna:boolean propertyPath="real.mask[${i.count - 1}].rendering.hideWhenFalse"
+												labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.boolean.hideWhenFalse" helpKey="help.jdyna.message.rendering.boolean.hideWhenFalse"/>
+											</fieldset>											
+										</c:if>
+										<c:if test="${subtypo.rendering.triview eq 'checkradio'}">
+										<fieldset>
+										<legend><fmt:message key="jsp.dspace-admin.cris.jdyna.pointer.${propertiesdefinition.rendering.valoreClass.simpleName}" /></legend>
+										<dyna:text propertyPath="real.mask[${i.count - 1}].rendering.option4row"  visibility="false"
+											labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.checkradio.option4row" helpKey="help.jdyna.message.rendering.checkradio.option4row"/>
+										<div class="dynaClear">
+										&nbsp;
+										</div>
+										<dyna:text propertyPath="real.mask[${i.count - 1}].rendering.staticValues"  visibility="false"
+											labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.checkradio.staticValues" helpKey="help.jdyna.message.rendering.checkradio.staticValues"/>
+<%-- 										<div class="dynaClear">
+										&nbsp;
+										</div>							
+										<dyna:text propertyPath="real.mask[${i.count - 1}].rendering.query"  visibility="false"
+											labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.checkradio.query" helpKey="help.jdyna.message.rendering.checkradio.query"/> --%>
+										</fieldset>											
+										</c:if>					
+								
 								<dyna:text propertyPath="real.mask[${i.count - 1}].priority"  helpKey="help.jdyna.message.priority"
-				labelKey="jsp.layout.hku.label.propertiesdefinition.priority" size="5" visibility="false"/>
+								labelKey="jsp.layout.hku.label.propertiesdefinition.priority" size="5" visibility="false"/>
+		
 		<div class="dynaClear">
 			&nbsp;
 		</div>

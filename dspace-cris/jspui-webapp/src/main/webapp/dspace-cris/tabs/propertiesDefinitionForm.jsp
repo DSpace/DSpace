@@ -309,7 +309,46 @@
 						</fieldset>											
 					</c:when>
 					<c:otherwise>
+					<c:choose>
+					<c:when test="${propertiesdefinition.rendering.triview eq 'boolean'}">
+						<fieldset>
+						<legend><fmt:message key="jsp.dspace-admin.cris.jdyna.pointer.${propertiesdefinition.rendering.valoreClass.simpleName}" /></legend>
+
+						<dyna:boolean propertyPath="real.rendering.checked"
+							labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.boolean.checked" helpKey="help.jdyna.message.rendering.boolean.checked"/>
+						<div class="dynaClear">
+						&nbsp;
+						</div>
+						<dyna:boolean propertyPath="real.rendering.hideWhenFalse"
+							labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.boolean.hideWhenFalse" helpKey="help.jdyna.message.rendering.boolean.hideWhenFalse"/>
+						</fieldset>											
+					</c:when>
+					<c:otherwise>
+					<c:choose>
+					<c:when test="${propertiesdefinition.rendering.triview eq 'checkradio'}">
+						<fieldset>
+						<legend><fmt:message key="jsp.dspace-admin.cris.jdyna.pointer.${propertiesdefinition.rendering.valoreClass.simpleName}" /></legend>
+						<dyna:text propertyPath="real.rendering.option4row"  visibility="false"
+							labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.checkradio.option4row" helpKey="help.jdyna.message.rendering.checkradio.option4row"/>
+						<div class="dynaClear">
+						&nbsp;
+						</div>
+
+						<dyna:text propertyPath="real.rendering.staticValues"  visibility="false"
+							labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.checkradio.staticValues" helpKey="help.jdyna.message.rendering.checkradio.staticValues"/>
+<%-- 						<div class="dynaClear">
+						&nbsp;
+						</div>							
+						<dyna:text propertyPath="real.rendering.query"  visibility="false"
+							labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.checkradio.query" helpKey="help.jdyna.message.rendering.checkradio.query"/> --%>
+						</fieldset>											
+					</c:when>
+					<c:otherwise>
 					<%-- nothing --%>
+					</c:otherwise>
+					</c:choose>
+					</c:otherwise>
+					</c:choose>
 					</c:otherwise>
 					</c:choose>
 					</c:otherwise>

@@ -140,6 +140,7 @@
 		<mapping class="it.cilea.osd.jdyna.value.LinkValue" />
 		<mapping class="it.cilea.osd.jdyna.value.FileValue" />
 		<mapping class="it.cilea.osd.jdyna.value.NumberValue" />
+		<mapping class="it.cilea.osd.jdyna.value.BooleanValue" />
 
 		<mapping class="org.dspace.app.cris.model.jdyna.value.RPPointer" />
 
@@ -149,7 +150,6 @@
 		
 		<mapping class="org.dspace.app.cris.model.jdyna.value.DOPointer" />
 
-
 		<mapping class="it.cilea.osd.jdyna.model.AWidget" />
 		<mapping class="it.cilea.osd.jdyna.widget.WidgetTesto" />
 		<mapping class="it.cilea.osd.jdyna.widget.WidgetLink" />
@@ -157,6 +157,8 @@
 		<mapping class="it.cilea.osd.jdyna.widget.WidgetFile" />
 		<mapping class="it.cilea.osd.jdyna.widget.WidgetPointer" />
 		<mapping class="it.cilea.osd.jdyna.widget.WidgetNumero" />
+		<mapping class="it.cilea.osd.jdyna.widget.WidgetBoolean" />
+		<mapping class="it.cilea.osd.jdyna.widget.WidgetCheckRadio" />
 
 		<mapping class="it.cilea.osd.jdyna.widget.Size" />
 		<mapping class="it.cilea.osd.jdyna.web.Box" />
