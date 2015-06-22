@@ -24,7 +24,8 @@ import javax.persistence.Transient;
     @NamedQuery(name = "ProjectPropertiesDefinition.findAdvancedSearch", query = "from ProjectPropertiesDefinition where advancedSearch=true"),
     @NamedQuery(name = "ProjectPropertiesDefinition.uniqueIdByShortName", query = "select id from ProjectPropertiesDefinition where shortName = ?"),
     @NamedQuery(name = "ProjectPropertiesDefinition.uniqueByShortName", query = "from ProjectPropertiesDefinition where shortName = ?"),
-    @NamedQuery(name = "ProjectPropertiesDefinition.findValoriDaMostrare", query = "from ProjectPropertiesDefinition where showInList = true")    
+    @NamedQuery(name = "ProjectPropertiesDefinition.findValoriDaMostrare", query = "from ProjectPropertiesDefinition where showInList = true"),
+    @NamedQuery(name = "ProjectPropertiesDefinition.likeByShortName", query = "from ProjectPropertiesDefinition where shortName LIKE :par0", hints = { @javax.persistence.QueryHint(name = "org.hibernate.cacheable", value = "true") })
     
 })
 public class ProjectPropertiesDefinition extends PropertiesDefinition {

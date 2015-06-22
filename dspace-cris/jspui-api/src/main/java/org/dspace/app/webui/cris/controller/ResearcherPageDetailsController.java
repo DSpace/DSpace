@@ -29,6 +29,7 @@ import org.dspace.app.cris.model.jdyna.RPAdditionalFieldStorage;
 import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.RPProperty;
 import org.dspace.app.cris.model.jdyna.TabResearcherPage;
+import org.dspace.app.cris.model.jdyna.VisibilityTabConstant;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.service.CrisSubscribeService;
 import org.dspace.app.cris.statistics.util.StatsConfig;
@@ -236,12 +237,15 @@ public class ResearcherPageDetailsController
         {
             isAdmin = true; // admin
         }
-        else if ((currUser != null && researcher.getId() == currUser.getID()))
+        else if ((currUser != null && researcher.getEpersonID()!=null && (researcher.getEpersonID() == currUser.getID())))
         {
             isAdmin = false; // owner
         }
         List<TabResearcherPage> tabs = applicationService.getTabsByVisibility(
                 TabResearcherPage.class, isAdmin);
+        if(isAdmin=true && (researcher.getEpersonID()!=null && (researcher.getEpersonID() == currUser.getID()))) {
+            tabs.addAll(((ApplicationService)applicationService).getTabsByVisibility(TabResearcherPage.class, VisibilityTabConstant.LOW));
+        }
         return tabs;
 
     }
