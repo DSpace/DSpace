@@ -510,7 +510,16 @@
 				
 			});
 		</script>
-	
+		
+		 <script type="text/javascript">                	 
+		         CKEDITOR.replace( 'introductory_text', {
+					toolbar : [
+						 ['Bold', 'Italic', 'Underline'], ['Link', 'Unlink' ],[ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent'],['Source']
+					] 
+				});
+		  </script>
+		
+		
 	</xsl:template>
 
 

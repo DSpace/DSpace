@@ -204,7 +204,7 @@
 
                         var runAfterJSImports = new FnArray();
             </script>
-            
+            <script type="text/javascript" src="//cdn.ckeditor.com/4.4.7/standard/ckeditor.js">&#160;</script>
 	</xsl:template>
 	
 	<xsl:template name="addPageTitle">
