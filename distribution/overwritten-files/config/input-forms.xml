@@ -876,13 +876,26 @@
 				</field>
 				
 				<!-- Editor de publicación - Solo publicacion periódica -->
+<!-- TO-DO : deshabilitado temporalmente. Habilitar una vez solucionado el ticket #3329 e incluido el commit en rama master de sedici/DSpace-SEDICI-svn	 -->
+<!-- 				<field> -->
+<!-- 					<dc-schema>sedici</dc-schema> -->
+<!-- 					<dc-element>contributor</dc-element> -->
+<!-- 					<dc-qualifier>editor</dc-qualifier> -->
+<!-- 					<repeatable>true</repeatable> -->
+<!-- 					<label>Editor de la publicación</label> -->
+<!-- 					<input-type>onebox</input-type> -->
+<!-- 					<hint>Editores de la publicación</hint> -->
+<!-- 					<type-bind>Publicacion seriada</type-bind> -->
+<!-- 					<visibility>workflow</visibility> -->
+<!-- 				</field> -->
+
+				<!-- Editor de publicación - Solo publicacion periódica -->
 				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>contributor</dc-element>
-					<dc-qualifier>editor</dc-qualifier>
 					<repeatable>true</repeatable>
 					<label>Editor de la publicación</label>
-					<input-type>onebox</input-type>
+					<input-type value-pairs-name="common_publicacion_seriada_contributors">qualdrop_value</input-type>
 					<hint>Editores de la publicación</hint>
 					<type-bind>Publicacion seriada</type-bind>
 					<visibility>workflow</visibility>
@@ -1132,6 +1145,13 @@
 			<pair>
 				<displayed-value>Traductor</displayed-value>
 				<stored-value>translator</stored-value>
+			</pair>
+		</value-pairs>
+		
+		<value-pairs value-pairs-name="common_publicacion_seriada_contributors" dc-term="identifier">
+			<pair>
+				<displayed-value>Editor</displayed-value>
+				<stored-value>editor</stored-value>
 			</pair>
 		</value-pairs>
 
