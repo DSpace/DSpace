@@ -1,8 +1,18 @@
 language: java
 
+# Use container build env
+sudo: false
+
 env: 
   # Give Maven 1GB of memory to work with
   - MAVEN_OPTS=-Xmx1024M
+
+cache:
+  directories:
+    # Cache the local Maven repo
+    - '$HOME/.m2/repository'
+    # Cache Node.js modules (for Mirage2)
+    - node_modules
 
 # Install prerequisites for building Mirage2 more rapidly
 before_install:
