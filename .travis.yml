@@ -12,7 +12,7 @@ cache:
     # Cache the local Maven repo
     - '$HOME/.m2/repository'
     # Cache Node.js modules (for Mirage2)
-    - node_modules
+    - '$HOME/.nvm'
 
 # Install prerequisites for building Mirage2 more rapidly
 before_install:
