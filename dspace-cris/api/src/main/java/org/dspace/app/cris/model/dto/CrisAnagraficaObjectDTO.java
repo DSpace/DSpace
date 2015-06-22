@@ -17,7 +17,7 @@ public class CrisAnagraficaObjectDTO extends AnagraficaObjectAreaDTO
     private Boolean status;
     private String sourceID;
     private String sourceRef;
-
+    private String uuid;
     
     public CrisAnagraficaObjectDTO(ACrisObject object)
     {
@@ -25,6 +25,7 @@ public class CrisAnagraficaObjectDTO extends AnagraficaObjectAreaDTO
         setSourceID(object.getSourceID());
         setSourceRef(object.getSourceRef());
         setStatus(object.getStatus());
+        setUuid(object.getUuid());
 
     }
 
@@ -54,6 +55,14 @@ public class CrisAnagraficaObjectDTO extends AnagraficaObjectAreaDTO
 
 	public void setSourceRef(String sourceRef) {
 		this.sourceRef = sourceRef;
+	}
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
     
 
