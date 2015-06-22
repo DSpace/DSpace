@@ -59,7 +59,17 @@
 
 			<!-- Javascript at the bottom for fast page loading -->
 			<xsl:call-template name="addJavascript" />
-				
+
+			<!--Invisible link to HTML sitemap (for search engines) -->
+			<a class="hidden">
+				<xsl:attribute name="href">
+					<xsl:value-of
+							select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+					<xsl:text>/htmlmap</xsl:text>
+				</xsl:attribute>
+				<xsl:text>&#160;</xsl:text>
+			</a>
+
             <xsl:text disable-output-escaping="yes">&lt;/body&gt;</xsl:text>				
 					
 		</html>
