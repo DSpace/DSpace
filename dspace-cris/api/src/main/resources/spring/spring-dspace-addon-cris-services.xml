@@ -206,6 +206,9 @@
 				<entry
 					key="org.dspace.app.cris.model.jdyna.EditTabOrganizationUnit">
 					<ref bean="ouEditTabDao" />
+				</entry>
+				<entry key="it.cilea.osd.jdyna.widget.WidgetBoolen">
+					<ref bean="widgetBooleanDao" />
 				</entry>						
 				<entry key="it.cilea.osd.jdyna.widget.WidgetTesto">
 					<ref bean="widgetTextDao" />
@@ -481,6 +484,22 @@
 		</property>
 	</bean>
 
+	<bean id="widgetBooleanDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				it.cilea.osd.jdyna.dao.WidgetBooleanDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						it.cilea.osd.jdyna.widget.WidgetBoolean
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
 
 	<bean id="widgetTextDao" parent="abstractDao">
 		<property name="proxyInterfaces">
