@@ -19,6 +19,7 @@ import java.util.Map;
 import javax.mail.internet.MimeUtility;
 import javax.servlet.http.HttpServletResponse;
 
+import cz.cuni.mff.ufal.UFALLicenceAgreement;
 import org.apache.avalon.excalibur.pool.Recyclable;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
@@ -444,12 +445,14 @@ public class BitstreamReader extends AbstractReader implements Recyclable
               redictURL += item.getHandle();
 
           if ( include_bistreamId ) {
-              redictURL += "/ufal-licence-agreement?bitstreamId="
+              redictURL += "/license/agree?bitstreamId="
                       + bitstream.getID();
           }
           else {
-              redictURL += "/ufal-licence-agreement?allzip=true";
+              redictURL += "/license/agree?allzip=true";
           }
+
+          request.getSession().setAttribute(UFALLicenceAgreement.SessionAttrName, true);
 
           HttpServletResponse httpResponse = (HttpServletResponse)
                   objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
