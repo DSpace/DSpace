@@ -61,12 +61,19 @@ function DSpaceSetupAutocomplete(formID, args) {
         var ac = $('#' + inputID);
         ac.autocomplete({
         	minLength: args.minLength,
+        	delay: 200,
             source: function(request, response) {
+            	// abort previous request
+            	var previous_request = $(this.element).data("jqXHR");
+                if (previous_request) {
+                	previous_request.abort();
+                }
+            	
                 var reqUrl = choiceURL;
                 if(request && request.term) {
                     reqUrl += "&query=" + request.term;
                         }
-                $.get(reqUrl, function(xmldata) {
+                $(this.element).data("jqXHR", $.get(reqUrl, function(xmldata) {
                     var options = [];
                     var authorities = [];
                     $(xmldata).find('Choice').each(function() {
@@ -89,7 +96,7 @@ function DSpaceSetupAutocomplete(formID, args) {
                     });
                     ac.data('authorities',authorities);
                     response(options);
-                });
+                }));
                 },
             select: function(event, ui) {
                     // NOTE: lookup element late because it might not be in DOM
