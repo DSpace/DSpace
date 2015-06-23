@@ -39,7 +39,7 @@
         Specifically, adding a static page will need to override the DRI, to directly add content.
     -->
     <xsl:variable name="request-uri" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI']"/>
-
+    <xsl:variable name="app_path" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]" />
     <!--
         The starting point of any XSL processing is matching the root element. In DRI the root element is document,
         which contains a version attribute and three top level elements: body, options, meta (in that order).
@@ -339,22 +339,20 @@
                             <img src="{$theme-path}/images/mospace_mirage.gif" />
                         </a>
 
-                        <div id="ms-tagline" class="navbar-header pull-left hidden-sm hidden-xs">
-                             Preserving the intellectual output and resources of the University of Missouri
+                        <div id="ms-tagline" class="navbar-header pull-left hidden-sm hidden-xs hidden-md">
+                             Preserving the intellectual output &amp; resources of the University of Missouri
                          </div>
+
+
 
                         <div class="navbar-header pull-right visible-xs hidden-sm hidden-md hidden-lg">
                         <ul class="nav nav-pills pull-left ">
 
-                            <!-- MOspace navigation bar -->
-                            <xsl:variable name="app_path" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]" />
-
-                                    <li role="presentation"><a href="{$app_path}/discover">search</a></li>
-                                    <li role="presentation"><a href="{$app_path}/community-list">browse</a></li>
-                                    <li role="presentation"><a href="{$app_path}/pages/add">add to MOspace</a></li>
-                                    <li role="presentation"><a href="{$app_path}/pages/about">about</a></li>
-                                    <li role="presentation"><a href="{$app_path}/pages/help">help</a></li>
-
+                            <li role="presentation"><a href="{$app_path}/discover">search</a></li>
+                            <li role="presentation"><a href="{$app_path}/community-list">browse</a></li>
+                            <li role="presentation"><a href="{$app_path}/pages/add">add to MOspace</a></li>
+                            <li role="presentation"><a href="{$app_path}/pages/about">about</a></li>
+                            <li role="presentation"><a href="{$app_path}/pages/help">help</a></li>
 
                             <xsl:if test="count(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='supportedLocale']) &gt; 1">
                                 <li id="ds-language-selection-xs" class="dropdown">
@@ -431,6 +429,25 @@
                         <ul class="nav navbar-nav pull-left">
                               <xsl:call-template name="languageSelection"/>
                         </ul>
+
+                            <!-- MOspace navigation bar -->
+
+                        <ul class="nav navbar-nav  pull-left">
+                            <li role="presentation"><a href="{$app_path}/discover">search</a></li>
+                        </ul>
+                        <ul class="nav navbar-nav  pull-left">
+                            <li role="presentation"><a href="{$app_path}/community-list">browse</a></li>
+                        </ul>
+                        <ul class="nav navbar-nav  pull-left">
+                            <li role="presentation"><a href="{$app_path}/pages/add">add to MOspace</a></li>
+                        </ul>
+                        <ul class="nav navbar-nav  pull-left">
+                            <li role="presentation"><a href="{$app_path}/pages/about">about</a></li>
+                        </ul>
+                        <ul class="nav navbar-nav  pull-left">
+                            <li role="presentation"><a href="{$app_path}/pages/help">help</a></li>
+                        </ul>
+
                         <ul class="nav navbar-nav pull-left">
                             <xsl:choose>
                                 <xsl:when test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
