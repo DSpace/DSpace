@@ -182,6 +182,8 @@
             -->
             <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;"/>
 
+			<link rel="search" type="application/opensearchdescription+xml" title="SEDICI para Firefox" href="http://sedici.unlp.edu.ar/moz-search-plugin.xml"/>
+			
             <link rel="shortcut icon">
                 <xsl:attribute name="href">
                     <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
