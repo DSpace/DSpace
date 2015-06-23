@@ -208,7 +208,11 @@
                     <xsl:for-each select="dim:field[@element='description' and @qualifier='abstract']">
                         <xsl:choose>
                             <xsl:when test="node()">
-                                <xsl:copy-of select="node()"/>
+                                <xsl:call-template name="hyperlink">
+				                    <xsl:with-param name="text">
+				                        <xsl:copy-of select="./node()"/>
+				                    </xsl:with-param>
+				                </xsl:call-template>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:text>&#160;</xsl:text>
@@ -809,7 +813,11 @@
                             <hr class="metadata-separator"/>
                         </xsl:if>
                         <xsl:for-each select="dim:field[@mdschema='dc' and @element='description' and @qualifier='abstract']">
-                            <xsl:copy-of select="./node()"/>
+                            <xsl:call-template name="hyperlink">
+			                    <xsl:with-param name="text">
+			                        <xsl:copy-of select="./node()"/>
+			                    </xsl:with-param>
+			                </xsl:call-template>
                             <xsl:if test="count(following-sibling::dim:field[@mdschema='dc' and @element='description' and @qualifier='abstract']) != 0">
                                 <hr class="metadata-separator"/>
                             </xsl:if>
@@ -834,7 +842,11 @@
                             <hr class="metadata-separator"/>
                         </xsl:if>
                         <xsl:for-each select="dim:field[@mdschema='dc' and @element='description' and not(@qualifier)]">
-                            <xsl:copy-of select="./node()"/>
+                            <xsl:call-template name="hyperlink">
+			                    <xsl:with-param name="text">
+			                        <xsl:copy-of select="./node()"/>
+			                    </xsl:with-param>
+			                </xsl:call-template>
                             <xsl:if test="count(following-sibling::dim:field[@mdschema='dc' and @element='description' and not(@qualifier)]) != 0">
                                 <hr class="metadata-separator"/>
                             </xsl:if>
@@ -924,7 +936,11 @@
                 </xsl:if>
             </td>
             <td>
-                <xsl:copy-of select="./node()"/>
+                <xsl:call-template name="hyperlink">
+                    <xsl:with-param name="text">
+                        <xsl:copy-of select="./node()"/>
+                    </xsl:with-param>
+                </xsl:call-template>
                 <xsl:if test="./@authority and ./@confidence">
                     <xsl:call-template name="authorityConfidenceIcon">
                         <xsl:with-param name="confidence" select="./@confidence"/>
@@ -958,5 +974,46 @@
         <i18n:text i18n:key="{$mimetype-key}"><xsl:value-of select="$mimetype"/></i18n:text>
     </xsl:template>
 
+    <xsl:template name="hyperlink">
+		<xsl:param name="text"/>
+		<xsl:choose>
+			<xsl:when test="(contains($text,'http://') or contains($text,'https://'))">
+				<xsl:choose>
+					<xsl:when test="contains($text,' ')">
+						<xsl:call-template name="hyperlinkword">
+							<xsl:with-param name="text" select="substring-before($text,' ')"/>
+						</xsl:call-template>
+						<xsl:text> </xsl:text>
+						<xsl:call-template name="hyperlink">
+							<xsl:with-param name="text" select="substring-after($text,' ')"/>
+						</xsl:call-template>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:call-template name="hyperlinkword">
+							<xsl:with-param name="text" select="$text"/>
+						</xsl:call-template>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$text" />
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
+	<xsl:template name="hyperlinkword">
+		<xsl:param name="text"/>
+		<xsl:choose>
+			<xsl:when test="(contains($text,'http://') and string-length($text)>7)">
+				<a href="http://{normalize-space(substring-after($text, 'http://'))}">http://<xsl:value-of select="normalize-space(substring-after($text, 'http://'))" /></a>
+			</xsl:when>
+			<xsl:when test="(contains($text,'https://') and string-length($text)>8)">
+				<a href="https://{normalize-space(substring-after($text, 'https://'))}">https://<xsl:value-of select="normalize-space(substring-after($text, 'https://'))" /></a>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$text" />
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
 
 </xsl:stylesheet>
