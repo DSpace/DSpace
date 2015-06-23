@@ -60,6 +60,7 @@ function DSpaceSetupAutocomplete(formID, args) {
 
         var ac = $('#' + inputID);
         ac.autocomplete({
+        	minLength: args.minLength,
             source: function(request, response) {
                 var reqUrl = choiceURL;
                 if(request && request.term) {
@@ -118,6 +119,13 @@ function DSpaceSetupAutocomplete(formID, args) {
                             authValue == null || authValue == '' ? 'blank' : 'accepted');
                 }
 		});
+        
+        // if minLength is set to 0, then make a search with a single space when the user clicks
+        if (args.minLength == 0) {
+        	ac.click(function() { 
+        		ac.autocomplete("search", " ");
+    		});
+        }
 	});
 }
 

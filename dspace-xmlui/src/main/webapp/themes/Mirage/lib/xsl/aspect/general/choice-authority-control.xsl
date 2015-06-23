@@ -224,6 +224,14 @@
         <xsl:with-param name="containerID"   select="concat(translate(@id,'.','_'),'_container')"/>
         <xsl:with-param name="indicatorID"   select="concat(translate(@id,'.','_'),'_indicator')"/>
         <xsl:with-param name="isClosed"      select="contains(dri:params/@choicesClosed,'true')"/>
+        <xsl:with-param name="minLength">
+        	<xsl:choose>
+		        <xsl:when test="string-length(dri:params/@choicesMinLength) > 0">
+		        	<xsl:value-of select="dri:params/@choicesMinLength"></xsl:value-of>
+		        </xsl:when>
+		        <xsl:otherwise>1</xsl:otherwise>
+	    	</xsl:choose>
+        </xsl:with-param>
         <xsl:with-param name="confidenceIndicatorID" select="$confidenceIndicatorID"/>
         <xsl:with-param name="confidenceName" select="$confidenceName"/>
         <xsl:with-param name="collectionID">
@@ -251,6 +259,7 @@
       <xsl:param name="indicatorID" select="'missing value'"/>
       <xsl:param name="confidenceIndicatorID" select="''"/>
       <xsl:param name="confidenceName" select="''"/>
+      <xsl:param name="minLength" select="'1'"/>
       <xsl:param name="isClosed" select="'false'"/>
       <script type="text/javascript">
         <xsl:text>runAfterJSImports.add(function() {</xsl:text>
@@ -259,6 +268,8 @@
                     <xsl:value-of select="$formID"/>
                     <xsl:text>', { metadataField: '</xsl:text>
                     <xsl:value-of select="$metadataField"/>
+                    <xsl:text>', minLength: '</xsl:text>
+                    <xsl:value-of select="$minLength"/>
                     <xsl:text>', isClosed: '</xsl:text>
                     <xsl:value-of select="$isClosed"/>
                     <xsl:text>', inputName: '</xsl:text>
