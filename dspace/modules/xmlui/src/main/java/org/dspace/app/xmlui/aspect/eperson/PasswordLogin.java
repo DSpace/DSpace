@@ -308,10 +308,12 @@ public class PasswordLogin extends AbstractDSpaceTransformer implements
                 loginSubmitButton.setValue(T_submit_login);
         Para p=login.addPara();
         /*
+          // Removing ORCID link until the oauth registration works.
         p.addXref("/oauth-login","Oauth login");
+        */
                 p.addXref("/forgot", T_forgot_link);
                 EventLogger.log(context, "login-form", "previous-email=" + (previousEmail != null ? previousEmail : ""));
-        */
+
 	}
 
 	// HttpServletRequest  httpRequest  = (HttpServletRequest)  objectModel.get(HttpEnvironment.HTTP_REQUEST_OBJECT);
