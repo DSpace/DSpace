@@ -152,7 +152,7 @@ public class ShibAuthentication implements AuthenticationMethod
         // sword. This allows this compatability without installing the password-based
         // authentication method which has side effects such as allowing users to login
         // with a username and password from the webui.
-        boolean swordCompatability = ConfigurationManager.getBooleanProperty("authentication-shibboleth","sword.compatability", true);
+        boolean swordCompatability = ConfigurationManager.getBooleanProperty("authentication-shibboleth","sword.compatibility", true);
         if ( swordCompatability &&
                 username != null && username.length() > 0 &&
                 password != null && password.length() > 0 ) {
