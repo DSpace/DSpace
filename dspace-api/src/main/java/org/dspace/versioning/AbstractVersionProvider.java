@@ -13,7 +13,10 @@ import org.dspace.core.Context;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Set;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.ResourcePolicy;
 
 /**
  *
@@ -46,11 +49,24 @@ public abstract class AbstractVersionProvider {
         for(Bundle nativeBundle : nativeItem.getBundles())
         {
             Bundle bundleNew = itemNew.createBundle(nativeBundle.getName());
-
+            // DSpace knows several types of resource policies (see the class
+            // org.dspace.authorize.ResourcePolicy): Submission, Workflow, Custom
+            // and inherited. Submission, Workflow and Inherited policies will be
+            // set automatically as neccessary. We need to copy the custom policies
+            // only to preserve customly set policies and embargos (which are
+            // realized by custom policies with a start date).
+            List<ResourcePolicy> bundlePolicies = 
+                    AuthorizeManager.findPoliciesByDSOAndType(c, nativeBundle, ResourcePolicy.TYPE_CUSTOM);
+            AuthorizeManager.addPolicies(c, bundlePolicies, bundleNew);
+            
             for(Bitstream nativeBitstream : nativeBundle.getBitstreams())
             {
-
                 Bitstream bitstreamNew = createBitstream(c, nativeBitstream);
+                // we need to copy the custom ressource policy rules for the 
+                // bitstream as well, like we did above for bundles
+                List<ResourcePolicy> bitstreamPolicies = 
+                        AuthorizeManager.findPoliciesByDSOAndType(c, nativeBitstream, ResourcePolicy.TYPE_CUSTOM);
+                AuthorizeManager.addPolicies(c, bitstreamPolicies, bitstreamNew);
                 bundleNew.addBitstream(bitstreamNew);
 
                 if(nativeBundle.getPrimaryBitstreamID() == nativeBitstream.getID())
