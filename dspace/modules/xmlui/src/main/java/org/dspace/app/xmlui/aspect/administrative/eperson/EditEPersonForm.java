@@ -122,7 +122,7 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 
     @Override
     public void addBody(Body body) throws WingException, SQLException,
-    AuthorizeException
+            AuthorizeException
     {
         // Get all our parameters
         boolean admin = AuthorizeManager.isAdmin(context);
@@ -272,7 +272,7 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 
             // Buttons to reset, delete or login as
             identity.addItem().addHighlight("italic")
-            .addContent(T_special_help);
+                    .addContent(T_special_help);
             Item special = identity.addItem();
             special.addButton("submit_reset_password").setValue(
                     T_submit_reset_password);
@@ -369,7 +369,7 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
             if (groups.length <= 0)
             {
                 member.addItem().addHighlight("italic")
-                .addContent(T_member_none);
+                        .addContent(T_member_none);
             }
         }
 
@@ -425,7 +425,7 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
                     {
                         String target = (request.getContextPath()
                                 + "/admin/units?administrative-continue="
-                                + knot.getId() + "&submit_edit&unitID=" + unit
+                                + knot.getId() + "&submit_edit_unit&unitID=" + unit
                                 .getID());
                         ldapInfo.addItemXref(target, "Unit: " + strUnit);
                     }
@@ -435,7 +435,7 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
                     Group group = (Group) i.next();
                     String target = (request.getContextPath()
                             + "/admin/groups?administrative-continue="
-                            + knot.getId() + "&submit_edit&groupID=" + group
+                            + knot.getId() + "&submit_edit_group&groupID=" + group
                             .getID());
                     ldapInfo.addItemXref(target, "Group: " + group.getName());
 

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.cocoon.environment.Request;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
@@ -156,11 +157,12 @@ public class FlowUnitsUtils
      * @return A result
      */
     public static FlowResult processSaveUnits(Context context, int unitID,
-            String newName, String[] newGroupIDsArray) throws SQLException,
-            AuthorizeException, UIException
+            String newName, String[] newGroupIDsArray, Request request)
+            throws SQLException, AuthorizeException, UIException
     {
         FlowResult result = new FlowResult();
-
+        boolean facultyOnly = (request.getParameter("faculty_only") != null) ? true
+                : false;
         // Decode the name in case it uses non-ascii characters.
         try
         {
@@ -196,6 +198,7 @@ public class FlowUnitsUtils
                 unit = Unit.create(context);
                 unit.setName(newName);
             }
+
             else
             {
                 // The name is already in use, return an error.
@@ -275,6 +278,9 @@ public class FlowUnitsUtils
 
             unit.addGroup(group);
         }
+
+        // Fifth, update the faculty_only flag for the Unit.
+        unit.setFacultyOnly(facultyOnly);
 
         // Last, create the result flow
         unit.update();

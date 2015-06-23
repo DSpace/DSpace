@@ -1205,7 +1205,8 @@
     <message key="xmlui.administrative.units.EditUnitsForm.members_pending">[pending]</message>
     <message key="xmlui.administrative.units.EditUnitsForm.instructions_para">Remove members</message>
     <message key="xmlui.administrative.units.EditUnitsForm.collection_link_para">Remove members</message>
-
+    <message key="xmlui.administrative.units.EditUnitsForm.faculty_only">Faculty Only</message>
+    
     <!-- org.dspace.app.xmlui.administrative.units.DeleteUnitsConfirm -->
     <message key="xmlui.administrative.units.DeleteUnitsConfirm.title">Confirm Unit Deletion</message>
     <message key="xmlui.administrative.units.DeleteUnitsConfirm.trail">Confirm Delete</message>
