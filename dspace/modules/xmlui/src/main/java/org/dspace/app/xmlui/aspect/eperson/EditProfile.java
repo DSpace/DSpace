@@ -489,7 +489,8 @@ public class EditProfile extends AbstractDSpaceTransformer
            orcidDiv.addContent(request.getParameter("exist_orcid"));
        }
 
-
+       /*
+         // Removing ORCID link until the oauth registration works.
        orcid.setHead("Associate Account with ORCID");
        if(defaultOrcidId!=null&&defaultOrcidId.length()>0){
            orcid.addItem().addContent("Your account is now associated with the following ORCID ID. You may now authenticate with this DSpace exclusively with your ORCID login. If this ORCID account is incorrect, it may be disconnected by selecting the \"Disconnect from ORCID\" button.\n");
@@ -505,7 +506,8 @@ public class EditProfile extends AbstractDSpaceTransformer
            orcid.addItem().addButton("link").setValue("Link to Orcid");
 
        }
-
+       */
+       
        List tl = form.addList("terms",List.TYPE_FORM);
        tl.setHead(T_terms);
        tl.addItem(T_terms_help);
