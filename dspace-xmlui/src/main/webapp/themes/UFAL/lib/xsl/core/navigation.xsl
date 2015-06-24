@@ -347,9 +347,7 @@
 						<xsl:value-of select="/dri:document/dri:meta/dri:userMeta/dri:metadata[@element='identifier' and @qualifier='url']" />
 					</xsl:attribute>
 					<i18n:text>xmlui.dri2xhtml.structural.profile</i18n:text>
-					<xsl:value-of select="/dri:document/dri:meta/dri:userMeta/dri:metadata[@element='identifier' and @qualifier='firstName']" />
-					<xsl:text> </xsl:text>
-					<xsl:value-of select="/dri:document/dri:meta/dri:userMeta/dri:metadata[@element='identifier' and @qualifier='lastName']" />
+					<xsl:value-of select="/dri:document/dri:meta/dri:userMeta/dri:metadata[@element='identifier' and @qualifier='displayName']" />
 				</a>
 				<xsl:text> | </xsl:text>
 				<a style="color: #FFF;">
