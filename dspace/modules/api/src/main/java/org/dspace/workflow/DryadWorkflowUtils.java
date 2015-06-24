@@ -172,19 +172,8 @@ public class DryadWorkflowUtils {
         for (DCValue i : item.getMetadata("dc.contributor")) {
             mdlist.add(i);
         }
-        StringBuilder buffer = new StringBuilder();
-        buffer.append(parseName((DCValue[]) mdlist.toArray(new DCValue[1])));
-
-        String author = buffer.toString().trim() + " ";
-        return author;
-    }
-
-    private static String parseName(DCValue[] aMetadata) {
-        StringBuilder buffer = new StringBuilder();
-        int position = 0;
-
-        for (DCValue metadata : aMetadata) {
-            StringBuilder authorString = new StringBuilder();
+        StringBuilder authorString = new StringBuilder();
+        for (DCValue metadata : mdlist) {
             authorString.append("@");
             if (metadata.value.indexOf(",") != -1) {
                 String[] parts = metadata.value.split(",");
@@ -224,20 +213,9 @@ public class DryadWorkflowUtils {
                 }
             }
 
-            buffer.append(authorString.toString());
-
-            if (++position < aMetadata.length) {
-                if (aMetadata.length > 2) {
-                    buffer.append(", ");
-                } else {
-                    buffer.append(" and ");
-                }
-            }
+            authorString.append(",");
         }
 
-        return buffer.length() > 0 ? buffer.toString() : "";
+        return authorString.length() > 0 ? authorString.toString() : "";
     }
-
-
-
 }
