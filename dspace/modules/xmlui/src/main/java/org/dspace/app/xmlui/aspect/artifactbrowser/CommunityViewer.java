@@ -264,6 +264,15 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements
             home.setHead(name);
         }
 
+        // Add handle display for Community/Collection
+        String handle = HandleManager.getCanonicalForm(community.getHandle());
+        Division handleDiv = home.addDivision("handle", "citation-handle");
+        Message handleLabel = message("xmlui.ArtifactBrowser.CommunityViewer.cite_handle");
+        handleDiv.addPara("handle-label", "citation-handle-label").addContent(
+                handleLabel);
+        handleDiv.addPara("handle-value", "citation-handle-value").addContent(
+                handle);
+
         // The search / browse box placeholder, this division will be populated
         // either in the browse or discovery aspect
         {
