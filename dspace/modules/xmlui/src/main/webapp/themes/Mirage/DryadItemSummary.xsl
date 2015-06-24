@@ -438,14 +438,17 @@
                             <i18n:text>xmlui.DryadItemSummary.pleaseCite</i18n:text>
                         </p>
                         <div class="citation-sample">
-                            <xsl:call-template name="author-orcid">
-                                <xsl:with-param name="InputString" select="$meta[@element='authors'][@qualifier='package']"/>
-                            </xsl:call-template>
-                            <xsl:if test=".//dim:field[@element='date'][@qualifier='issued']">
-                                <xsl:text> </xsl:text>
-                                <xsl:value-of
-                                        select="concat('(', substring(.//dim:field[@element='date'][@qualifier='issued'], 1, 4), ') ')"/>
-                            </xsl:if>
+                            <xsl:call-template name="make-author-string"/>
+                            <xsl:choose>
+                                <xsl:when test=".//dim:field[@element='date'][@qualifier='issued']">
+                                    <xsl:text> </xsl:text>
+                                    <xsl:value-of
+                                            select="concat('(', substring(.//dim:field[@element='date'][@qualifier='issued'], 1, 4), ') ')"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:text>. </xsl:text>
+                                </xsl:otherwise>
+                            </xsl:choose>
                             <xsl:choose>
                                 <xsl:when test="not(.//dim:field[@element='title'])">
                                     <xsl:text> </xsl:text>
