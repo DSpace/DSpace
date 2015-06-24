@@ -20,6 +20,7 @@ import org.dspace.eperson.Group;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.workflow.WorkflowItem;
 
 /**
  * AuthorizeManager handles all authorization checks for DSpace. For better
@@ -295,8 +296,43 @@ public class AuthorizeManager
             }
         }
 
+        // In case the dso is an bundle or bitstream we must ignore custom 
+        // policies if it does not belong to at least one installed item (see 
+        // DS-2614).
+        // In case the dso is an item and a corresponding workspace or workflow
+        // item exist, we have to ignore custom policies (see DS-2614).
+        boolean ignoreCustomPolicies = false;
+        if (o instanceof Bitstream)
+        {
+            Bitstream b = (Bitstream) o;
+
+            // Ensure that this is not a collection or community logo
+            DSpaceObject parent = b.getParentObject();
+            if (!(parent instanceof Collection) && !(parent instanceof Community))
+            {
+                ignoreCustomPolicies = !isAnyItemInstalled(c, b.getBundles());
+            }
+        }
+        if (o instanceof Bundle)
+        {
+            ignoreCustomPolicies = !isAnyItemInstalled(c, new Bundle[] {(Bundle) o});
+        }
+        if (o instanceof Item)
+        {
+            if (WorkspaceItem.findByItem(c, (Item) o) != null ||
+                    WorkflowItem.findByItem(c, (Item) o) != null)
+            {
+                ignoreCustomPolicies = true;
+            }
+        }
+        
         for (ResourcePolicy rp : getPoliciesActionFilter(c, o, action))
         {
+            if (ignoreCustomPolicies 
+                    && ResourcePolicy.TYPE_CUSTOM.equals(rp.getRpType()))
+            {
+                continue;
+            }
             // check policies for date validity
             if (rp.isDateValid())
             {
@@ -318,7 +354,26 @@ public class AuthorizeManager
         // default authorization is denial
         return false;
     }
-
+    
+    // check whether any bundle belongs to any item that passed submission 
+    // and workflow process
+    protected static boolean isAnyItemInstalled(Context ctx, Bundle[] bundles)
+            throws SQLException
+    {
+        for (Bundle bundle : bundles)
+        {
+            for (Item item : bundle.getItems())
+            {
+                if (WorkspaceItem.findByItem(ctx, item) == null
+                        && WorkflowItem.findByItem(ctx, item) == null)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
     ///////////////////////////////////////////////
     // admin check methods
     ///////////////////////////////////////////////
