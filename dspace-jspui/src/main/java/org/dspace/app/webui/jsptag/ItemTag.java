@@ -471,7 +471,7 @@ public class ItemTag extends TagSupport
 		// We use underscore as separator and no wildcard qualifier
 		// because dots and asterisks are forbidden as CSS class names.
 		String metadataNameClass = "";
-		if (qualifier == null || qualifier == Item.ANY
+		if (qualifier == null || Item.ANY.equals(qualifier)
 				|| qualifier.isEmpty()) {
 			metadataNameClass = schema + "_" + element;
 		} else {
