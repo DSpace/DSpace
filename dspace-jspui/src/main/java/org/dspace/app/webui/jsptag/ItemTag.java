@@ -467,7 +467,19 @@ public class ItemTag extends TagSupport
             
             if (values.length > 0)
             {
-                out.print("<tr><td class=\"metadataFieldLabel\">");
+                // Create CSS class to identify fields by their metadata name.
+		// We use underscore as separator and no wildcard qualifier
+		// because dots and asterisks are forbidden as CSS class names.
+		String metadataNameClass = "";
+		if (qualifier == null || Item.ANY.equals(qualifier)
+				|| qualifier.isEmpty()) {
+			metadataNameClass = schema + "_" + element;
+		} else {
+			metadataNameClass = schema + "_" + element + "_"
+					+ qualifier;
+		}   
+            	
+                out.print("<tr><td class=\"metadataFieldLabel " + metadataNameClass + "\">");
 
                 String label = null;
                 try
@@ -485,7 +497,7 @@ public class ItemTag extends TagSupport
                 }
                 
                 out.print(label);
-                out.print(":&nbsp;</td><td class=\"metadataFieldValue\">");
+                out.print(":&nbsp;</td><td class=\"metadataFieldValue " + metadataNameClass + "\">");
                 
                 //If the values are in controlled vocabulary and the display value should be shown
                 if (isDisplay){
