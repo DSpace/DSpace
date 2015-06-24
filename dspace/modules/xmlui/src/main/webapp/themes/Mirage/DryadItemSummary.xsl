@@ -156,9 +156,7 @@
                         <i18n:text>xmlui.DryadItemSummary.pleaseCite</i18n:text>
                     </p>
                     <div class="citation-sample">
-                        <xsl:call-template name="author-orcid">
-                            <xsl:with-param name="InputString" select="$meta[@element='authors'][@qualifier='package']"/>
-                        </xsl:call-template>
+                        <xsl:call-template name="make-author-string"/>
                         <xsl:choose>
                             <xsl:when test="$meta[@element='date'][@qualifier='issued']">
                                 <xsl:value-of select="$meta[@element='date'][@qualifier='issued']"/>
@@ -438,14 +436,17 @@
                             <i18n:text>xmlui.DryadItemSummary.pleaseCite</i18n:text>
                         </p>
                         <div class="citation-sample">
-                            <xsl:call-template name="author-orcid">
-                                <xsl:with-param name="InputString" select="$meta[@element='authors'][@qualifier='package']"/>
-                            </xsl:call-template>
-                            <xsl:if test=".//dim:field[@element='date'][@qualifier='issued']">
-                                <xsl:text> </xsl:text>
-                                <xsl:value-of
-                                        select="concat('(', substring(.//dim:field[@element='date'][@qualifier='issued'], 1, 4), ') ')"/>
-                            </xsl:if>
+                            <xsl:call-template name="make-author-string"/>
+                            <xsl:choose>
+                                <xsl:when test=".//dim:field[@element='date'][@qualifier='issued']">
+                                    <xsl:text> </xsl:text>
+                                    <xsl:value-of
+                                            select="concat('(', substring(.//dim:field[@element='date'][@qualifier='issued'], 1, 4), ') ')"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:text>. </xsl:text>
+                                </xsl:otherwise>
+                            </xsl:choose>
                             <xsl:choose>
                                 <xsl:when test="not(.//dim:field[@element='title'])">
                                     <xsl:text> </xsl:text>
@@ -2629,30 +2630,40 @@
             </tr>
         </xsl:if>
     </xsl:template>
-    <xsl:template name="author-orcid">
+
+    <xsl:template name="format-author-names">
         <!--@Huang D@#0000-0002-1497-1284#, @Lapp H@#0000-0001-9107-0714#, @Smith J@, @Smith J@, @Doe J@-->
         <xsl:param name="InputString"/>
         <xsl:choose>
             <xsl:when test="contains($InputString, ',')">
-                <!-- There are more than one name -->
-                <xsl:call-template name="format-name">
-                    <xsl:with-param name="nameString" select="substring-before($InputString,',')"/>
-                </xsl:call-template>
-                <xsl:text>, </xsl:text>
-                <xsl:call-template name="author-orcid">
-                    <xsl:with-param name="InputString" select="substring-after($InputString,',')"/>
-                </xsl:call-template>
+                <xsl:choose>
+                    <!-- There is only one name, but there's still a comma after-->
+                    <xsl:when test="substring-after($InputString,',') = ''">
+                        <xsl:call-template name="format-author-names">
+                            <xsl:with-param name="InputString" select="substring-before($InputString,',')"/>
+                        </xsl:call-template>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <!-- There are multiple names -->
+                        <xsl:call-template name="format-single-name">
+                            <xsl:with-param name="nameString" select="substring-before($InputString,',')"/>
+                        </xsl:call-template>
+                        <xsl:text>, </xsl:text>
+                        <xsl:call-template name="format-author-names">
+                            <xsl:with-param name="InputString" select="substring-after($InputString,',')"/>
+                        </xsl:call-template>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:call-template name="format-name">
+                <xsl:call-template name="format-single-name">
                     <xsl:with-param name="nameString" select="$InputString"/>
                 </xsl:call-template>
-                <xsl:text> </xsl:text>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template name="format-name">
+    <xsl:template name="format-single-name">
         <xsl:param name="nameString"/>
         <xsl:variable name="author" select="substring-before(substring-after($nameString,'@'),'@')"/>
         <xsl:choose>
@@ -2668,6 +2679,70 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
+
+    <xsl:template name="make-author-string">
+        <xsl:variable name="authors">
+            <!-- the authors@packages node is packed by DryadWorkflowUtils.getAuthors()-->
+            <!-- format is @Doe J@#0000-0000-0000-0000#,@Smith L@#0000-0000-0000-0000#,-->
+            <!-- comma-delimited, with each name offset by @ and orcid offset by #, tailing comma-->
+            <!-- if this metadata is not available, construct it from the component dc metadata fields.-->
+            <xsl:choose>
+                <xsl:when test="$meta[@element='authors'][@qualifier='package']">
+                    <xsl:value-of select="$meta[@element='authors'][@qualifier='package']"/>
+                </xsl:when>
+                <xsl:when test=".//dim:field[@element='contributor'][@qualifier='author']">
+                    <xsl:for-each select=".//dim:field[@element='contributor'][@qualifier='author']">
+                        <xsl:call-template name="parse-author-node">
+                            <xsl:with-param name="author" select="."/>
+                        </xsl:call-template>
+                    </xsl:for-each>
+                </xsl:when>
+                <xsl:when test=".//dim:field[@element='creator']">
+                    <xsl:for-each select=".//dim:field[@element='creator']">
+                        <xsl:call-template name="parse-author-node">
+                            <xsl:with-param name="author" select="."/>
+                        </xsl:call-template>
+                    </xsl:for-each>
+                </xsl:when>
+                <xsl:when test=".//dim:field[@element='contributor']">
+                    <xsl:for-each select=".//dim:field[@element='contributor']">
+                        <xsl:call-template name="parse-author-node">
+                            <xsl:with-param name="author" select="."/>
+                        </xsl:call-template>
+                    </xsl:for-each>
+                </xsl:when>
+            </xsl:choose>
+        </xsl:variable>
+        <xsl:call-template name="format-author-names">
+            <xsl:with-param name="InputString" select="$authors"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <xsl:template name="parse-author-node">
+        <xsl:param name="author"/>
+        <xsl:text>@</xsl:text>
+        <xsl:choose>
+            <xsl:when test="contains($author, ',')">
+                <xsl:call-template name="name-parse-reverse">
+                    <xsl:with-param name="name" select="$author"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:call-template name="name-parse">
+                    <xsl:with-param name="name" select="$author"/>
+                </xsl:call-template>
+            </xsl:otherwise>
+        </xsl:choose>
+        <xsl:text>@</xsl:text>
+        <xsl:if test="$author/@authority">
+            <!-- will be generated::orcid::0000-0002-1497-1284-->
+            <xsl:text>#</xsl:text>
+            <xsl:value-of select="substring-after($author/@authority,'orcid::')"/>
+            <xsl:text>#</xsl:text>
+        </xsl:if>
+        <xsl:text>,</xsl:text>
+    </xsl:template>
+
     <xsl:template name="publication-citation">
         <xsl:param name="article_doi"/>
         <xsl:param name="citation"/>
