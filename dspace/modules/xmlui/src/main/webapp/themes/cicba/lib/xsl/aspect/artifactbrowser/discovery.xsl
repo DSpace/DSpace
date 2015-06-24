@@ -158,8 +158,9 @@
             <xsl:text>]</xsl:text>
         </xsl:if>
         <br/>
-        <xsl:if test="dri:list[@id='aspect.discovery.SimpleSearch.list.123456789/11:dc.other']">
-        	<xsl:value-of select="dri:list[@id='aspect.discovery.SimpleSearch.list.123456789/11:dc.other']/dri:item"/>
+        <!-- Show parent of community/collection -->
+        <xsl:if test="dri:list[@n=(concat($handle, ':dc.other')) and descendant::text()]">
+        	<xsl:value-of select="dri:list[@n=(concat($handle, ':dc.other'))]/dri:item"/>
         </xsl:if>
         </div>
 
