@@ -227,7 +227,23 @@ public class DatabaseManager
         PreparedStatement statement = null;
         try
         {
-            statement = context.getDBConnection().prepareStatement(query);
+            Connection connection = null;
+            try {
+                connection = context.getDBConnection();
+                statement = connection.prepareStatement(query);
+            }catch(NullPointerException e){
+                StringBuilder sb = new StringBuilder("Running query \"").append(query).append("\"  with parameters: ");
+                for (int i = 0; i < parameters.length; i++)
+                {
+                    if (i > 0)
+                    {
+                        sb.append(",");
+                    }
+                    sb.append(parameters[i].toString());
+                }
+                log.error(String.format("%s\ncontext=%s;dbConnection=%s", sb.toString(), context, connection));
+                throw e;
+            }
 
             loadParameters(statement, parameters);
 
