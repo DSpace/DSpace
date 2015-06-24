@@ -2460,6 +2460,9 @@
   <message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.title">Look up Publisher</message>
   <message key="xmlui.ChoiceLookupTransformer.field.dcterms_subject_materia.help">Name of Subject</message>
   <message key="xmlui.ChoiceLookupTransformer.field.dcterms_subject_materia.title">Look up Subject</message>
+  <message key="xmlui.ChoiceLookupTransformer.field.dcterms_subject.help">Keyword</message>
+  <message key="xmlui.ChoiceLookupTransformer.field.dcterms_subject.title">Look up Keyword</message>
+
   <!-- Params are: search-value -->
   <message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.nonauthority">Non-authority value: @1@</message>
 
