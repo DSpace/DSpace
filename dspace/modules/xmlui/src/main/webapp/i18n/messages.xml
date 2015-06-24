@@ -368,7 +368,7 @@
 	<message key="xmlui.ArtifactBrowser.ItemRequestForm.trail">Request a copy of the document</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestForm.head">Request a copy of the document</message>
     <message key="xmlui.ArtifactBrowser.ItemRequestForm.login_para">Users of this system, can login to view this document.</message>
-    <message key="xmlui.ArtifactBrowser.ItemRequestForm.login">Login</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestForm.login">login</message>
     <message key="xmlui.ArtifactBrowser.ItemRequestForm.para1">Enter the following information to request a copy of the document from the responsible person.</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestForm.requesterEmail">Your e-mail address</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestForm.requesterEmail_help">This email address is used for sending the document.</message>
@@ -537,11 +537,11 @@
 	<message key="xmlui.EPerson.InvalidToken.para2">If so, copy and paste the entire URL directly into your browser's address bar, rather than simply clicking on the link. The address bar should then contain something like:</message>
 
 	<!-- org.dspace.app.xmlui.eperson.Navigation.java -->
-	<message key="xmlui.EPerson.Navigation.my_account">My Account</message>
-	<message key="xmlui.EPerson.Navigation.profile">Profile</message>
-	<message key="xmlui.EPerson.Navigation.logout">Logout</message>
-	<message key="xmlui.EPerson.Navigation.login">Login</message>
-	<message key="xmlui.EPerson.Navigation.register">Register (non-UM only)</message>
+	<message key="xmlui.EPerson.Navigation.my_account">my account</message>
+	<message key="xmlui.EPerson.Navigation.profile">profile</message>
+	<message key="xmlui.EPerson.Navigation.logout">logout</message>
+	<message key="xmlui.EPerson.Navigation.login">login</message>
+	<message key="xmlui.EPerson.Navigation.register">register (non-UM only)</message>
 
 	<!-- org.dspace.app.xmlui.eperson.PasswordLogin.java -->
 	<message key="xmlui.EPerson.PasswordLogin.title">Sign in</message>
@@ -2204,9 +2204,9 @@
 
 	<message key="xmlui.dri2xhtml.structural.head-subtitle">Preserving the intellectual output &amp; resources of the University of Missouri.</message>
 
-	<message key="xmlui.dri2xhtml.structural.profile">Profile: </message>
-	<message key="xmlui.dri2xhtml.structural.logout">Logout</message>
-	<message key="xmlui.dri2xhtml.structural.login">Login</message>
+	<message key="xmlui.dri2xhtml.structural.profile">profile: </message>
+	<message key="xmlui.dri2xhtml.structural.logout">logout</message>
+	<message key="xmlui.dri2xhtml.structural.login">login</message>
 
 	<message key="xmlui.dri2xhtml.structural.search">Search MOspace</message>
 	<message key="xmlui.dri2xhtml.structural.search-advanced">Advanced Search</message>
