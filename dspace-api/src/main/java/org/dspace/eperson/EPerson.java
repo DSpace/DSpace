@@ -28,6 +28,7 @@ import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.codec.DecoderException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
@@ -824,11 +825,11 @@ public class EPerson extends DSpaceObject
         String f = getFirstName();
         String l= getLastName();
 
-        if ((l == null) && (f == null))
+        if (StringUtils.isBlank(l) && StringUtils.isBlank(f))
         {
             return getEmail();
         }
-        else if (f == null)
+        else if (StringUtils.isBlank(f))
         {
             return l;
         }
