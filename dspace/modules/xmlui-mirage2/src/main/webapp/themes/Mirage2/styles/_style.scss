@@ -17,3 +17,22 @@
 .navbar-static-top {
      z-index: auto;
 }
+
+.citation-handle {
+	text-align: center;
+}
+
+.citation-handle-label {
+	background: #dddddd;
+	display: inline;
+	font-weight: bold;
+}
+
+.citation-handle-value {
+	padding: 2px 4px;
+	font-size: 90%;
+	color: #c7254e;
+	white-space: nowrap;
+	background-color: #f9f2f4;
+	display: inline;
+}
