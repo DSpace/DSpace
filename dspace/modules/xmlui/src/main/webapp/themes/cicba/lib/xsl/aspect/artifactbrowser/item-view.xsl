@@ -213,27 +213,24 @@
 				</xsl:if>
 				
 				<div class="item-preview">
-				    <a class="thumbnail">
-					    <xsl:attribute name="href">
-					    	<xsl:value-of select="./mets:fileSec/mets:fileGrp[@USE='CONTENT']/mets:file[position()=1]/mets:FLocat/@xlink:href"/>
-					    </xsl:attribute>
-				   	  <xsl:variable name="thumbnail_file" select="./mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/mets:file[1]"/>			  
-				         <img  alt="Preview">
-	                          <xsl:attribute name="src">
-	                          	<xsl:choose>
-	                          		<xsl:when test="$thumbnail_file/mets:FLocat[@LOCTYPE='URL']/@xlink:href != ''">
-	                          			<xsl:value-of select="$thumbnail_file/mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
-	                          		</xsl:when>
-	                          		<xsl:otherwise>
-	                          			<xsl:call-template name="print-theme-path">
-	                          				<xsl:with-param name="path" select="'/dspace/themes/cicba/images/preview_no_disponible.png'"/>
-	                          			</xsl:call-template>
-	                          		</xsl:otherwise>
-	                          	</xsl:choose>
-	                              
-	                          </xsl:attribute>                          
-	                      </img>
-				    </a>
+					 <xsl:variable name="thumbnail_file" select="./mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/mets:file[1]"/>
+					 <xsl:call-template name="build-anchor">
+						<xsl:with-param name="a.href"><xsl:value-of select="./mets:fileSec/mets:fileGrp[@USE='CONTENT']/mets:file[position()=1]/mets:FLocat/@xlink:href"/></xsl:with-param>
+						<xsl:with-param name="a.class">thumbnail</xsl:with-param>
+						<xsl:with-param name="img.src">
+							<xsl:choose>
+                          		<xsl:when test="$thumbnail_file/mets:FLocat[@LOCTYPE='URL']/@xlink:href != ''">
+                          			<xsl:value-of select="$thumbnail_file/mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
+                          		</xsl:when>
+                          		<xsl:otherwise>
+                          			<xsl:call-template name="print-theme-path">
+                          				<xsl:with-param name="path" select="'images/preview_no_disponible.png'"/>
+                          			</xsl:call-template>
+                          		</xsl:otherwise>
+	                         </xsl:choose>
+						</xsl:with-param>
+						<xsl:with-param name="img.alt">Preview</xsl:with-param>
+					</xsl:call-template>
 				</div>
 
 		        <!-- Generate the bitstream information from the file section -->
