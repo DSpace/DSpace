@@ -41,48 +41,73 @@ public class ControlPanelProgramsTab extends AbstractControlPanelTab {
 		form.setHead("Standalone programs to run");
 
 		form.addLabel(null, "bold").addContent("SOLR backend (browse/search) (index-discovery)");
-		form.addItem().addButton("submit_update_solr").setValue("Clean then reindex solr (-f)");
+		Item item = form.addItem();
+		item.addButton("submit_update_solr").setValue("Clean then reindex solr");
+		item.addContent("./dspace index-discovery -f");
 		
 		form.addLabel();
-		form.addItem().addButton("submit_rebuild_solr").setValue("Update solr (without clean!) (-b)");
+		item = form.addItem();
+		item.addButton("submit_rebuild_solr").setValue("Update solr (without clean!)");
+		item.addContent("./dspace index-discovery -b");
+
+		form.addLabel();
+		item = form.addItem();
+		item.addButton("submit_clean_solr").setValue("Clean (force) solr");
+		item.addContent("./dspace index-discovery -c -f");
 		
 		form.addLabel();
-		form.addItem().addButton("submit_clean_solr").setValue("Clean (force) solr (-c -f)");
-		
-		form.addLabel();
-		form.addItem().addButton("submit_opt_solr").setValue("Optimise solr (you sure?) (-o)");
+		item = form.addItem();
+		item.addButton("submit_opt_solr").setValue("Optimise solr (you sure?)");
+		item.addContent("./dspace index-discovery -o");
+
+		form.addLabel(null, "bold").addContent("OAI");
+		item = form.addItem();
+		item.addButton("submit_rebuild_oai").setValue("Rebuild OAI");
+		item.addContent("./dspace oai import -c");
 
 		form.addLabel();
 		form.addItem().addContent(" ");
 		form.addLabel(null, "bold").addContent("Assetstore");
-		form.addItem().addButton("submit_verify_assetstore").setValue("Verify assetstore (can take long)");
+		item = form.addItem();
+		item.addButton("submit_verify_assetstore").setValue("Verify assetstore (can take long)");
+		item.addContent("python bin/validators/assetstore/main.py --dir=$assetstore_dir");
 		
 		form.addLabel();
 		form.addItem().addContent(" ");
 		form.addLabel(null, "bold").addContent("Other");
-		Item item = form.addItem();
+		item = form.addItem();
 		Button tmp = item.addButton("submit_cleanup");
 		tmp.setValue("Cleanup assetstore");
 		item.addHighlight("container-fluid text-error").addContent("Will remove files from disk AND from bitstream table.");
 		item.addHighlight("container-fluid text-error").addContent("If not done with delete files, checksum curation can express discontent!");
+		item.addContent("./dspace cleanup");
 		
 		form.addLabel();
-		form.addItem().addButton("submit_test_email").setValue("Test email");
+		item = form.addItem();
+		item.addButton("submit_test_email").setValue("Test email");
+		item.addContent("./dspace test-email");
 		form.addLabel();
-		form.addItem().addButton("submit_sitemaps").setValue("Generate sitemaps");
+		item = form.addItem();
+		item.addButton("submit_sitemaps").setValue("Generate sitemaps");
+		item.addContent("./dspace generate-sitemaps");
 
 		form.addLabel();
-		Item it = form.addItem();
-		it.addText("submit_ufal_stats_email").setValue("default");
+		item = form.addItem();
+		item.addText("submit_ufal_stats_email").setValue("default");
 
 		form.addLabel();		
 		form.addItem().addContent(" ");
 		
 		form.addLabel(null, "bold").addContent("Statistics");
-		it.addButton("submit_ufal_stats").setValue("Send UFAL stats");
-		form.addItem().addButton("submit_general_statistics").setValue("Compile stats (stat-initial/stat-general)");
+		item.addButton("submit_ufal_stats").setValue("Send UFAL stats");
+		item.addContent("./dspace ufal-info [--email $email]");
+		item = form.addItem();
+		item.addButton("submit_general_statistics").setValue("Compile stats");
+		item.addContent("./dspace stat-initital; ./dspace stat-general");
         form.addLabel();
-        form.addItem().addButton("submit_update_bot_flag").setValue("Update isBot flag (limit one run to 100.000?!)");
+		item = form.addItem();
+        item.addButton("submit_update_bot_flag").setValue("Update isBot flag (limit one run to 100.000?!)");
+		item.addContent("./dspace stats-util -m");
 		
 
 		//
@@ -102,6 +127,10 @@ public class ControlPanelProgramsTab extends AbstractControlPanelTab {
 		} else if (request.getParameter("submit_clean_solr") != null) {
 			message = IOUtils.run(new File(dspace_dir + "/bin/"), new String[] {
 					"./dspace", "index-discovery", "-c", "-f" });
+		} else if (request.getParameter("submit_rebuild_oai") != null){
+			message = IOUtils.run(new File(dspace_dir + "/bin/"), new String[]{
+					"./dspace", "oai", "import", "-c"
+			});
 		}
 		// assetstore
 		//
