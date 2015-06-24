@@ -25,9 +25,6 @@ and searching the repository.
 
 
 		<map:transformers>
-
-            <map:transformer name="UFALLicenceItemViewer" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.artifactbrowser.UFALLicenceItemViewer"/>
-
 			<map:transformer name="Navigation" src="org.dspace.app.xmlui.aspect.viewArtifacts.Navigation" />
 			<map:transformer name="CommunityViewer" src="org.dspace.app.xmlui.aspect.artifactbrowser.CommunityViewer" />
 			<map:transformer name="CollectionViewer" src="org.dspace.app.xmlui.aspect.artifactbrowser.CollectionViewer" />
@@ -277,13 +274,13 @@ and searching the repository.
 											<map:serialize />
 										</map:when>
 										<map:otherwise>
-                                            <map:transform type="UFALLicenceItemViewer"/>
+                                            <map:transform type="ItemViewer"/>
 											<map:serialize type="xml" />
 										</map:otherwise>
 									</map:select>
 								</map:when>
 								<map:otherwise>
-                                    <map:transform type="UFALLicenceItemViewer"/>
+                                    <map:transform type="ItemViewer"/>
 									<map:serialize type="xml" />
 								</map:otherwise>
 							</map:select>

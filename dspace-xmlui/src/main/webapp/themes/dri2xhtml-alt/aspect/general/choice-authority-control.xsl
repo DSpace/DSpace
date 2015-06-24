@@ -333,27 +333,6 @@
       </img>
     </xsl:template>
 
-    <xsl:template match="dri:list[@id='aspect.artifactbrowser.UFALLicenceItemViewer.list.license_labels']/dri:item" priority="1">
-        <ul>
-            <xsl:call-template name="standardAttributes">
-                <xsl:with-param name="class">ds-bulleted-list</xsl:with-param>
-            </xsl:call-template>
-            <xsl:apply-templates select="*[not(name()='head')]" mode="nested"/>
-        </ul>
-    </xsl:template>
-    
-    <xsl:template match="dri:list[@id='aspect.artifactbrowser.UFALLicenceItemViewer.list.license_labels']/dri:item" mode="nested" priority="1">
-        <li>
-            <xsl:attribute name="title">
-                <xsl:value-of select="@rend"/>
-            </xsl:attribute>
-            <xsl:attribute name="class">
-                <xsl:value-of select="@n"/>
-            </xsl:attribute>
-            <xsl:apply-templates />
-        </li>
-    </xsl:template>
-    
     <!-- This inline JS must be added to the popup page for choice lookups -->
     <xsl:template name="choiceLookupPopUpSetup">
       <script type="text/javascript">
