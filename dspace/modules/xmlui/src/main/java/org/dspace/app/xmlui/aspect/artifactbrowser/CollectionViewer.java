@@ -28,6 +28,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.handle.HandleManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -39,24 +40,23 @@ import org.xml.sax.SAXException;
  * @author Mark Diggory (markd at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
  */
-public class CollectionViewer extends AbstractDSpaceTransformer implements CacheableProcessingComponent
+public class CollectionViewer extends AbstractDSpaceTransformer implements
+        CacheableProcessingComponent
 {
 
     /** Language Strings */
-    private static final Message T_dspace_home =
-        message("xmlui.general.dspace_home");
-    
+    private static final Message T_dspace_home = message("xmlui.general.dspace_home");
 
-    public static final Message T_untitled = 
-    	message("xmlui.general.untitled");
-    
+    public static final Message T_untitled = message("xmlui.general.untitled");
+
     /** Cached validity object */
     private SourceValidity validity;
-    
+
     /**
-     * Generate the unique caching key.
-     * This key must be unique inside the space of this component.
+     * Generate the unique caching key. This key must be unique inside the space
+     * of this component.
      */
+    @Override
     public Serializable getKey()
     {
         try
@@ -67,7 +67,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
             {
                 return "0";
             }
-                
+
             return HashUtil.hash(dso.getHandle());
         }
         catch (SQLException sqle)
@@ -81,51 +81,53 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
     /**
      * Generate the cache validity object.
      * 
-     * The validity object will include the collection being viewed and 
-     * all recently submitted items. This does not include the community / collection
-     * hierarchy, when this changes they will not be reflected in the cache.
+     * The validity object will include the collection being viewed and all
+     * recently submitted items. This does not include the community /
+     * collection hierarchy, when this changes they will not be reflected in the
+     * cache.
      */
+    @Override
     public SourceValidity getValidity()
     {
-    	if (this.validity == null)
-    	{
+        if (this.validity == null)
+        {
             Collection collection = null;
-	        try
-	        {
-	            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-	
-	            if (dso == null)
-                {
-                    return null;
-                }
-	
-	            if (!(dso instanceof Collection))
-                {
-                    return null;
-                }
-	
-	            collection = (Collection) dso;
-	
-	            DSpaceValidity validity = new DSpaceValidity();
-	            
-	            // Add the actual collection;
-	            validity.add(collection);
-	
-	            this.validity = validity.complete();
-	        }
-	        catch (Exception e)
-	        {
-	            // Just ignore all errors and return an invalid cache.
-	        }
+            try
+            {
+                DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
-    	}
-    	return this.validity;
+                if (dso == null)
+                {
+                    return null;
+                }
+
+                if (!(dso instanceof Collection))
+                {
+                    return null;
+                }
+
+                collection = (Collection) dso;
+
+                DSpaceValidity validity = new DSpaceValidity();
+
+                // Add the actual collection;
+                validity.add(collection);
+
+                this.validity = validity.complete();
+            }
+            catch (Exception e)
+            {
+                // Just ignore all errors and return an invalid cache.
+            }
+
+        }
+        return this.validity;
     }
-    
-    
+
     /**
      * Add a page title and trail links.
      */
+    @Override
     public void addPageMeta(PageMeta pageMeta) throws SAXException,
             WingException, UIException, SQLException, IOException,
             AuthorizeException
@@ -149,33 +151,35 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
             pageMeta.addMetadata("title").addContent(name);
         }
 
-        pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
-        HandleUtil.buildHandleTrail(collection,pageMeta,contextPath);
-        
+        pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
+        HandleUtil.buildHandleTrail(collection, pageMeta, contextPath);
+
         // Add RSS links if available
         String formats = ConfigurationManager.getProperty("webui.feed.formats");
-		if ( formats != null )
-		{
-			for (String format : formats.split(","))
-			{
-				// Remove the protocol number, i.e. just list 'rss' or' atom'
-				String[] parts = format.split("_");
-				if (parts.length < 1)
+        if (formats != null)
+        {
+            for (String format : formats.split(","))
+            {
+                // Remove the protocol number, i.e. just list 'rss' or' atom'
+                String[] parts = format.split("_");
+                if (parts.length < 1)
                 {
                     continue;
                 }
-				
-				String feedFormat = parts[0].trim()+"+xml";
-					
-				String feedURL = contextPath+"/feed/"+format.trim()+"/"+collection.getHandle();
-				pageMeta.addMetadata("feed", feedFormat).addContent(feedURL);
-			}
-		}
+
+                String feedFormat = parts[0].trim() + "+xml";
+
+                String feedURL = contextPath + "/feed/" + format.trim() + "/"
+                        + collection.getHandle();
+                pageMeta.addMetadata("feed", feedFormat).addContent(feedURL);
+            }
+        }
     }
 
     /**
      * Display a single collection
      */
+    @Override
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
@@ -189,7 +193,8 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
         Collection collection = (Collection) dso;
 
         // Build the collection viewer division.
-        Division home = body.addDivision("collection-home", "primary repository collection");
+        Division home = body.addDivision("collection-home",
+                "primary repository collection");
         String name = collection.getMetadata("name");
         if (name == null || name.length() == 0)
         {
@@ -200,7 +205,8 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
             home.setHead(name);
         }
 
-        // The search / browse box placeholder, this division will be populated either in the browse or discovery aspect
+        // The search / browse box placeholder, this division will be populated
+        // either in the browse or discovery aspect
         {
             home.addDivision("collection-search-browse",
                     "secondary search-browse");
@@ -208,19 +214,20 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 
         // Add the reference
         {
-        	Division viewer = home.addDivision("collection-view","secondary");
-            ReferenceSet mainInclude = viewer.addReferenceSet("collection-view",
-                    ReferenceSet.TYPE_DETAIL_VIEW);
+            Division viewer = home.addDivision("collection-view", "secondary");
+            ReferenceSet mainInclude = viewer.addReferenceSet(
+                    "collection-view", ReferenceSet.TYPE_DETAIL_VIEW);
             mainInclude.addReference(collection);
         }
 
     }
-    
+
     /**
      * Recycle
      */
-    public void recycle() 
-    {   
+    @Override
+    public void recycle()
+    {
         // Clear out our item's cache.
         this.validity = null;
         super.recycle();
