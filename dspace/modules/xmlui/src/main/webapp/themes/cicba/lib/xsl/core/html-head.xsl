@@ -75,7 +75,7 @@
 			</xsl:for-each>
 			
              <link rel="stylesheet" href="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.css" />
-      		 <script src="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
+      		 <script src="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.js">&#160;</script>
       		 <link rel="stylesheet" type="text/css">
       		 		<xsl:attribute name="href">
 		                <xsl:call-template name="print-theme-path" >
