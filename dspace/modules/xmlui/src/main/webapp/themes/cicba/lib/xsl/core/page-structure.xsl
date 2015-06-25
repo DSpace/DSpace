@@ -499,14 +499,15 @@
 			});
 		</script>
 		
-		 <script type="text/javascript">                	 
-		         CKEDITOR.replace( 'introductory_text', {
-					toolbar : [
-						 ['Bold', 'Italic', 'Underline'], ['Link', 'Unlink' ],[ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent'],['Source']
-					] 
-				});
-		  </script>
-		
+		<xsl:if test="dri:body/dri:div[@n='community-metadata-edit' or @n='collection-metadata-edit']">
+			 <script type="text/javascript">                	 
+			         CKEDITOR.replace( 'introductory_text', {
+						toolbar : [
+							 ['Bold', 'Italic', 'Underline'], ['Link', 'Unlink' ],[ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent'],['Source']
+						] 
+					});
+			  </script>
+		</xsl:if>
 		
 	</xsl:template>
 
