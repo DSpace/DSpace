@@ -57,6 +57,12 @@ header .navbar-default .navbar-toggle, header .navbar-default .navbar-nav {
     color: #fff;
 }
 
+@media (max-width: 991px) {
+	.clear-float-xs-sm {
+		float:none;
+	}
+}
+
 .citation-handle {
 	text-align: center;
 }
