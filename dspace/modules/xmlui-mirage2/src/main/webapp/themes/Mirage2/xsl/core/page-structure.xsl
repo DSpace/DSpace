@@ -307,9 +307,9 @@
         <header>
             <div class="navbar navbar-default navbar-static-top" role="navigation">
                 <div class="container">
-                    <div class="navbar-header">
+                    <div class="navbar-header clear-float-xs-sm">
 
-                        <button type="button" class="navbar-toggle" data-toggle="offcanvas">
+                        <button type="button" class="navbar-toggle visible-xs visible-sm" data-toggle="offcanvas">
                             <span class="sr-only">
                                 <i18n:text>xmlui.mirage2.page-structure.toggleNavigation</i18n:text>
                             </span>
@@ -318,19 +318,23 @@
                             <span class="icon-bar"></span>
                         </button>
 
+                        <a href="http://www.lib.umd.edu" class="navbar-brand">
+                           <img alt="University of Maryland Libraries" src="{$theme-path}/images/liblogo.png" />
+                        </a>
+
                         <a href="{$context-path}/" class="navbar-brand">
-                            <img src="{$theme-path}/images/DSpace-logo-line.svg" />
+                            <img alt="Digital Repository at the University of Maryland" src="{$theme-path}/images/drum-logo.png" />
                         </a>
 
 
-                        <div class="navbar-header pull-right visible-xs hidden-sm hidden-md hidden-lg">
+                        <div class="navbar-header pull-right visible-xs visible-sm hidden-md hidden-lg">
                         <ul class="nav nav-pills pull-left ">
 
                             <xsl:if test="count(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='supportedLocale']) &gt; 1">
                                 <li id="ds-language-selection-xs" class="dropdown">
                                     <xsl:variable name="active-locale" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='currentLocale']"/>
-                                    <button id="language-dropdown-toggle-xs" href="#" role="button" class="dropdown-toggle navbar-toggle navbar-link" data-toggle="dropdown">
-                                        <b class="visible-xs glyphicon glyphicon-globe" aria-hidden="true"/>
+                                    <button id="language-dropdown-toggle-xs" href="#" role="button" class="dropdown-toggle navbar-toggle navbar-link visible-xs visible-sm" data-toggle="dropdown">
+                                        <b class="visible-xs visible-sm glyphicon glyphicon-globe" aria-hidden="true"/>
                                     </button>
                                     <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="language-dropdown-toggle-xs" data-no-collapse="true">
                                         <xsl:for-each
@@ -360,8 +364,8 @@
                             <xsl:choose>
                                 <xsl:when test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
                                     <li class="dropdown">
-                                        <button class="dropdown-toggle navbar-toggle navbar-link" id="user-dropdown-toggle-xs" href="#" role="button"  data-toggle="dropdown">
-                                            <b class="visible-xs glyphicon glyphicon-user" aria-hidden="true"/>
+                                        <button class="dropdown-toggle navbar-toggle navbar-link visible-xs visible-sm" id="user-dropdown-toggle-xs" href="#" role="button"  data-toggle="dropdown">
+                                            <b class="visible-xs visible-sm glyphicon glyphicon-user" aria-hidden="true"/>
                                         </button>
                                         <ul class="dropdown-menu pull-right" role="menu"
                                             aria-labelledby="user-dropdown-toggle-xs" data-no-collapse="true">
@@ -384,8 +388,8 @@
                                     <li>
                                         <form style="display: inline" action="{/dri:document/dri:meta/dri:userMeta/
                             dri:metadata[@element='identifier' and @qualifier='loginURL']}" method="get">
-                                            <button class="navbar-toggle navbar-link">
-                                            <b class="visible-xs glyphicon glyphicon-user" aria-hidden="true"/>
+                                            <button class="navbar-toggle navbar-link visible-xs visible-sm">
+                                            <b class="visible-xs visible-sm glyphicon glyphicon-user" aria-hidden="true"/>
                                             </button>
                                         </form>
                                     </li>
@@ -395,7 +399,7 @@
                               </div>
                     </div>
 
-                    <div class="navbar-header pull-right hidden-xs">
+                    <div class="navbar-header pull-right hidden-xs hidden-sm">
                         <ul class="nav navbar-nav pull-left">
                               <xsl:call-template name="languageSelection"/>
                         </ul>
@@ -405,7 +409,7 @@
                                     <li class="dropdown">
                                         <a id="user-dropdown-toggle" href="#" role="button" class="dropdown-toggle"
                                            data-toggle="dropdown">
-                                            <span class="hidden-xs">
+                                            <span class="hidden-xs hidden-sm">
                                                 <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
                             dri:metadata[@element='identifier' and @qualifier='firstName']"/>
                                                 <xsl:text> </xsl:text>
@@ -445,7 +449,7 @@
                             </xsl:choose>
                         </ul>
 
-                        <button data-toggle="offcanvas" class="navbar-toggle visible-sm" type="button">
+                        <button data-toggle="offcanvas" class="navbar-toggle" type="button">
                             <span class="sr-only"><i18n:text>xmlui.mirage2.page-structure.toggleNavigation</i18n:text></span>
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
