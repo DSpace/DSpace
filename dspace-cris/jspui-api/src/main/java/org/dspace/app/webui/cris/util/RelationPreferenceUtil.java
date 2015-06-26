@@ -40,12 +40,12 @@ public class RelationPreferenceUtil
 {
 
     private static final String UNLINKED_FILTER = "({2}) OR "
-            + RelationPreference.PREFIX_RELATIONPREFERENCES + "{1}" + "."
-            + RelationPreference.UNLINKED.toLowerCase() + ":\"" + "{0}" + "\"";
+            + RelationPreference.PREFIX_RELATIONPREFERENCES + "{0}" + "."
+            + RelationPreference.UNLINKED.toLowerCase() + ":\"" + "{1}" + "\"";
 
     private static final String SELECTED_FILTER = "-"
-            + RelationPreference.PREFIX_RELATIONPREFERENCES + "{1}" + "."
-            + RelationPreference.SELECTED.toLowerCase() + ":\"" + "{0}" + "\"";
+            + RelationPreference.PREFIX_RELATIONPREFERENCES + "{0}" + "."
+            + RelationPreference.SELECTED.toLowerCase() + ":\"" + "{1}" + "\"";
 
     public static String HIDDEN_FILTER = "-"
             + RelationPreference.PREFIX_RELATIONPREFERENCES + "{0}" + "."

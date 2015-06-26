@@ -77,8 +77,6 @@
 	
     <script type="text/javascript"><!--
 
-		var j = jQuery;
-
 	    var activeTab = function(){
     		var ajaxurlrelations = "<%=request.getContextPath()%>/cris/${specificPartPath}/viewNested.htm";
 		   	j('.nestedinfo').each(function(){

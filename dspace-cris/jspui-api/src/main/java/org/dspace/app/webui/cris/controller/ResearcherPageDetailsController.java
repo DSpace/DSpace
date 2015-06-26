@@ -243,7 +243,7 @@ public class ResearcherPageDetailsController
         }
         List<TabResearcherPage> tabs = applicationService.getTabsByVisibility(
                 TabResearcherPage.class, isAdmin);
-        if(isAdmin=true && (researcher.getEpersonID()!=null && (researcher.getEpersonID() == currUser.getID()))) {
+        if(isAdmin=true && (currUser != null && researcher.getEpersonID()!=null && (researcher.getEpersonID() == currUser.getID()))) {
             tabs.addAll(((ApplicationService)applicationService).getTabsByVisibility(TabResearcherPage.class, VisibilityTabConstant.LOW));
         }
         return tabs;

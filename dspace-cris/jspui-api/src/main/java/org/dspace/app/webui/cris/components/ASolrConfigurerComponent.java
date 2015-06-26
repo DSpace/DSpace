@@ -112,7 +112,8 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
         int etAl = -1;
         String orderfield = "";
         boolean ascending = false;
-
+        int searchTime = 0;
+        
         Context context = UIUtil.obtainContext(request);
         DiscoverResult docs = null;
         long docsNumFound = 0;
@@ -140,6 +141,7 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
             if (docs != null)
             {
                 docsNumFound = docs.getTotalSearchResults();
+                searchTime = docs.getSearchTime();
             }
         }
 
@@ -157,6 +159,7 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
             if (docs != null)
             {
                 docsNumFound = docs.getTotalSearchResults();
+                searchTime = docs.getSearchTime();
             }
         }
 
@@ -203,7 +206,7 @@ public abstract class ASolrConfigurerComponent<T extends DSpaceObject, IBC exten
         ComponentInfoDTO<T> componentInfo = buildComponentInfo(docs, context,
                 type, start, order, rpp, etAl, docsNumFound, pageTotal,
 				pageCurrent, pageLast, pageFirst, sortOption,
-				docs.getSearchTime());
+				searchTime);
 
         componentInfoMap.put(getShortName(), componentInfo);
         request.setAttribute("componentinfomap", componentInfoMap);

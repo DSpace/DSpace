@@ -213,7 +213,7 @@ else
 <h3 class="mydspace-subscriptions"><fmt:message key="jsp.mydspace.subscriptions.rp-head"/></h3>
 <p><fmt:message key="jsp.mydspace.subscriptions.info2-rp"/></p>
 <%
-if (rpSubscriptions.size() > 0)
+if (rpSubscriptions!=null && rpSubscriptions.size() > 0)
 {
 %>
 <p><fmt:message key="jsp.mydspace.subscriptions.info3-rp"/></p>

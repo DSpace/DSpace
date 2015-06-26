@@ -229,3 +229,17 @@ create sequence JDYNA_TAB_SEQ;
 create sequence JDYNA_TYPONESTEDOBJECT_SEQ;
 create sequence JDYNA_VALUES_SEQ;
 create sequence JDYNA_WIDGET_SEQ;
+
+-- Table to mantain the potential match between item and rp --
+CREATE TABLE potentialmatches
+(
+   potentialmatches_id integer, 
+   item_id integer, 
+   rp VARCHAR2(20 BYTE),
+   pending number(1),
+    PRIMARY KEY (potentialmatches_id)
+);
+CREATE SEQUENCE potentialmatches_seq;
+CREATE INDEX rp_idx ON potentialmatches (rp);
+CREATE INDEX pending_idx ON potentialmatches (pending);
+-- END potential matches --
