@@ -71,6 +71,8 @@ public class OrcidMetadata {
 	public static final String TYPE = "work_type";
 
 	public static final String CITATION = "citation";
+	
+	public static final String LANGUAGE = "language";
 
 	public static final String ISSUE = "publication_date";
 
