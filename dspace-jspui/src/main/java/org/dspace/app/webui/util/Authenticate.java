@@ -22,6 +22,7 @@ import javax.servlet.jsp.jstl.core.Config;
 import org.apache.log4j.Logger;
 import org.dspace.authenticate.AuthenticationManager;
 import org.dspace.authenticate.AuthenticationMethod;
+import org.dspace.authenticate.ExtraLoggedInAction;
 import org.dspace.authenticate.PostLoggedInAction;
 import org.dspace.authenticate.PostLoggedOutAction;
 import org.dspace.authorize.AuthorizeManager;
@@ -284,7 +285,7 @@ public class Authenticate
 
 			}
         }
-
+		
         context.setCurrentUser(eperson);
         
         boolean isAdmin = false;
@@ -313,7 +314,11 @@ public class Authenticate
         session.setAttribute("dspace.current.remote.addr",
                              request.getRemoteAddr());
 
+        ExtraLoggedInAction extraLoggedInActions = new DSpace().getSingletonService(ExtraLoggedInAction.class);
 
+		if (extraLoggedInActions != null) {				
+			extraLoggedInActions.loggedIn(context, request, context.getCurrentUser());
+		}
 
     }
 

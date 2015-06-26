@@ -7,16 +7,6 @@
  */
 package org.dspace.app.cris.batch;
 
-import it.cilea.osd.jdyna.model.ADecoratorPropertiesDefinition;
-import it.cilea.osd.jdyna.model.ADecoratorTypeDefinition;
-import it.cilea.osd.jdyna.model.ANestedPropertiesDefinition;
-import it.cilea.osd.jdyna.model.ATypeNestedObject;
-import it.cilea.osd.jdyna.model.AccessLevelConstants;
-import it.cilea.osd.jdyna.model.PropertiesDefinition;
-import it.cilea.osd.jdyna.widget.WidgetDate;
-import it.cilea.osd.jdyna.widget.WidgetLink;
-import it.cilea.osd.jdyna.widget.WidgetTesto;
-
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -24,12 +14,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import jxl.Cell;
-import jxl.Sheet;
-import jxl.Workbook;
-import jxl.WorkbookSettings;
-import jxl.read.biff.BiffException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -96,14 +80,27 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 
-public class StartupMetadataConfiguratorTool
-{
-    private static Logger log = Logger
-            .getLogger(StartupMetadataConfiguratorTool.class);
+import it.cilea.osd.jdyna.model.ADecoratorPropertiesDefinition;
+import it.cilea.osd.jdyna.model.ADecoratorTypeDefinition;
+import it.cilea.osd.jdyna.model.ANestedPropertiesDefinition;
+import it.cilea.osd.jdyna.model.ATypeNestedObject;
+import it.cilea.osd.jdyna.model.AccessLevelConstants;
+import it.cilea.osd.jdyna.model.PropertiesDefinition;
+import it.cilea.osd.jdyna.widget.WidgetBoolean;
+import it.cilea.osd.jdyna.widget.WidgetCheckRadio;
+import it.cilea.osd.jdyna.widget.WidgetDate;
+import it.cilea.osd.jdyna.widget.WidgetLink;
+import it.cilea.osd.jdyna.widget.WidgetTesto;
+import jxl.Cell;
+import jxl.Sheet;
+import jxl.Workbook;
+import jxl.WorkbookSettings;
+import jxl.read.biff.BiffException;
 
-    public static void main(String[] args) throws ParseException, SQLException,
-            BiffException, IOException
-    {
+public class StartupMetadataConfiguratorTool {
+	private static Logger log = Logger.getLogger(StartupMetadataConfiguratorTool.class);
+
+	public static void main(String[] args) throws ParseException, SQLException, BiffException, IOException {
 		String fileExcel = null;
 		CommandLineParser parser = new PosixParser();
 		Options options = new Options();
@@ -111,6 +108,8 @@ public class StartupMetadataConfiguratorTool
 				"Excel file that you can use to create/update DSpace-CRIS properties definitions (metadata for all CRIS software entities; NOTE the script doesn't delete anything but works only in append mode so you can use this option many times)");
 		options.addOption("t", "tabs", true,
 				"Build the base configuration for CRIS entities; Run this only one time to create a Tab that contain one Box with title/name metadata; If runs this script with \"-t advanced\" only for Researcher profile and Journals entity will create the box with the related publications and the \"Details\" box show other metadata e.g. fullName, preferredName, variants, academicName for RP and journalname, journalissn, journaleissn, journalpublisher for Journal entity");
+		options.addOption("o", "orcid", false,
+				"Build tabs to show the ORCID information on token authorization and settings preference, also build the edit tab to fill the settings preferences");
 
 		CommandLine line = parser.parse(options, args);
 		if (line.hasOption('h')) {
@@ -140,6 +139,7 @@ public class StartupMetadataConfiguratorTool
 		// target , lista altri metadati
 		Map<String, List<List<String>>> widgetMap = new HashMap<String, List<List<String>>>();
 		Map<String, List<List<String>>> nestedMap = new HashMap<String, List<List<String>>>();
+		Map<String, List<String>> controlledListMap = new HashMap<String, List<String>>();
 
 		PlatformTransactionManager transactionManager = (PlatformTransactionManager) dspace.getServiceManager()
 				.getServiceByName("transactionManager", HibernateTransactionManager.class);
@@ -153,6 +153,8 @@ public class StartupMetadataConfiguratorTool
 		try {
 			buildMap(workbook, "propertiesdefinition", widgetMap, 0);
 			buildMap(workbook, "nesteddefinition", nestedMap, 10);
+			buildControlledList(workbook, "controlledlist", controlledListMap);
+
 			buildResearchObject(workbook, "utilsdata", applicationService);
 
 			// per ogni target chiama il metodo con i corretti parametri
@@ -162,23 +164,23 @@ public class StartupMetadataConfiguratorTool
 					build(applicationService, meta, nestedMap, RPPropertiesDefinition.class,
 							DecoratorRPPropertiesDefinition.class, RPNestedPropertiesDefinition.class,
 							DecoratorRPNestedPropertiesDefinition.class, RPTypeNestedObject.class,
-							DecoratorRPTypeNested.class);
+							DecoratorRPTypeNested.class, controlledListMap);
 				} else if (key.equals("pj")) {
 					build(applicationService, meta, nestedMap, ProjectPropertiesDefinition.class,
 							DecoratorProjectPropertiesDefinition.class, ProjectNestedPropertiesDefinition.class,
 							DecoratorProjectNestedPropertiesDefinition.class, ProjectTypeNestedObject.class,
-							DecoratorProjectTypeNested.class);
+							DecoratorProjectTypeNested.class, controlledListMap);
 				} else if (key.equals("ou")) {
 					build(applicationService, meta, nestedMap, OUPropertiesDefinition.class,
 							DecoratorOUPropertiesDefinition.class, OUNestedPropertiesDefinition.class,
 							DecoratorOUNestedPropertiesDefinition.class, OUTypeNestedObject.class,
-							DecoratorOUTypeNested.class);
+							DecoratorOUTypeNested.class, controlledListMap);
 				} else {
 					ResultObject<DynamicPropertiesDefinition, DynamicNestedPropertiesDefinition, DynamicTypeNestedObject> result = build(
 							applicationService, meta, nestedMap, DynamicPropertiesDefinition.class,
 							DecoratorDynamicPropertiesDefinition.class, DynamicNestedPropertiesDefinition.class,
 							DecoratorDynamicNestedPropertiesDefinition.class, DynamicTypeNestedObject.class,
-							DecoratorDynamicTypeNested.class);
+							DecoratorDynamicTypeNested.class, controlledListMap);
 					DynamicObjectType dtp = applicationService.findTypoByShortName(DynamicObjectType.class, key);
 					if (dtp == null) {
 						throw new RuntimeException("DynamicObjectType with shortname:" + key + " not found");
@@ -459,8 +461,7 @@ public class StartupMetadataConfiguratorTool
 					saveTab = false;
 					if (boxJournal != null) {
 
-						String[] journalProps = { "journalname", "journalissn", "journaleissn",
-								"journalpublisher" };
+						String[] journalProps = { "journalname", "journalissn", "journaleissn", "journalpublisher" };
 
 						boxJournal.getMask().clear();
 						boxJournal.setMask(null);
@@ -497,6 +498,119 @@ public class StartupMetadataConfiguratorTool
 
 			}
 
+			if (line.hasOption("o")) {
+				boolean saveTab = false;
+
+				TabResearcherPage tabORCID = applicationService.getTabByShortName(TabResearcherPage.class, "orcid");
+				EditTabResearcherPage editTabORCID = applicationService.getTabByShortName(EditTabResearcherPage.class,
+						"eorcid");
+
+				BoxResearcherPage boxAuthorizationORCID = applicationService.getBoxByShortName(BoxResearcherPage.class,
+						"orcidauthorizations");
+				BoxResearcherPage boxSettingsORCID = applicationService.getBoxByShortName(BoxResearcherPage.class,
+						"orcidsyncsettings");
+
+				if (tabORCID == null) {
+					tabORCID = new TabResearcherPage();
+					tabORCID.setVisibility(VisibilityTabConstant.LOW);
+					tabORCID.setTitle("ORCID");
+					tabORCID.setShortName("orcid");
+
+					editTabORCID = new EditTabResearcherPage();
+					editTabORCID.setVisibility(VisibilityTabConstant.LOW);
+					editTabORCID.setTitle("ORCID");
+					editTabORCID.setShortName("eorcid");
+
+					boxAuthorizationORCID = new BoxResearcherPage();
+					boxAuthorizationORCID.setVisibility(VisibilityTabConstant.LOW);
+					boxAuthorizationORCID.setTitle("ORCID Authorizations");
+					boxAuthorizationORCID.setShortName("orcidauthorizations");
+					boxAuthorizationORCID.setExternalJSP("orcidauthorizations");
+
+					boxSettingsORCID = new BoxResearcherPage();
+					boxSettingsORCID.setVisibility(VisibilityTabConstant.LOW);
+					boxSettingsORCID.setTitle("ORCID Synchronization settings");
+					boxSettingsORCID.setShortName("orcidsyncsettings");
+					boxSettingsORCID.setExternalJSP("orcidsyncsettings");
+
+					applicationService.saveOrUpdate(BoxResearcherPage.class, boxAuthorizationORCID);
+					applicationService.saveOrUpdate(BoxResearcherPage.class, boxSettingsORCID);
+
+					tabORCID.getMask().add(boxAuthorizationORCID);
+					tabORCID.getMask().add(boxSettingsORCID);
+					applicationService.saveOrUpdate(TabResearcherPage.class, tabORCID);
+
+					editTabORCID.getMask().add(boxSettingsORCID);
+					applicationService.saveOrUpdate(EditTabResearcherPage.class, editTabORCID);
+
+				}
+
+				// orcid configuration for RP box
+				if (boxAuthorizationORCID != null) {
+					String[] rpProps = { "system-orcid-token-authenticate",
+							"system-orcid-token-orcid-profile-read-limited", "system-orcid-token-orcid-bio-update",
+							"system-orcid-token-orcid-works-create", "system-orcid-token-orcid-works-update",
+							"system-orcid-token-funding-create", "system-orcid-token-funding-update" };
+
+					boxAuthorizationORCID.getMask().clear();
+					boxAuthorizationORCID.setMask(null);
+
+					for (String prop : rpProps) {
+						RPPropertiesDefinition pdef = applicationService
+								.findPropertiesDefinitionByShortName(RPPropertiesDefinition.class, prop);
+						if (pdef != null) {
+							DecoratorRPPropertiesDefinition containable = (DecoratorRPPropertiesDefinition) applicationService
+									.findContainableByDecorable(DecoratorRPPropertiesDefinition.class, pdef.getId());
+
+							boxAuthorizationORCID.getMask().add(containable);
+						}
+					}
+					applicationService.saveOrUpdate(BoxResearcherPage.class, boxAuthorizationORCID);
+
+					if (!(tabORCID.getMask().contains(boxAuthorizationORCID))) {
+						tabORCID.getMask().add(boxAuthorizationORCID);
+						saveTab = true;
+					}
+
+				} else {
+					log.warn("No box configured for RP - orcidauthorizations");
+				}
+
+				if (boxSettingsORCID != null) {
+					String[] rpProps = { "orcid-publications-prefs", "orcid-projects-prefs", "orcid-profile-pref-email",
+							"orcid-profile-pref-fullName", "orcid-profile-pref-preferredName" };
+
+					boxSettingsORCID.getMask().clear();
+					boxSettingsORCID.setMask(null);
+
+					for (String prop : rpProps) {
+						RPPropertiesDefinition pdef = applicationService
+								.findPropertiesDefinitionByShortName(RPPropertiesDefinition.class, prop);
+						if (pdef != null) {
+							DecoratorRPPropertiesDefinition containable = (DecoratorRPPropertiesDefinition) applicationService
+									.findContainableByDecorable(DecoratorRPPropertiesDefinition.class, pdef.getId());
+
+							boxSettingsORCID.getMask().add(containable);
+						}
+					}
+					applicationService.saveOrUpdate(BoxResearcherPage.class, boxSettingsORCID);
+
+					if (!(tabORCID.getMask().contains(boxSettingsORCID))) {
+						tabORCID.getMask().add(boxSettingsORCID);
+						editTabORCID.getMask().add(boxSettingsORCID);
+						saveTab = true;
+					}
+
+				} else {
+					log.warn("No box configured for RP - orcidsyncsettings");
+				}
+
+				if (saveTab) {
+					applicationService.saveOrUpdate(TabResearcherPage.class, tabORCID);
+					applicationService.saveOrUpdate(EditTabResearcherPage.class, editTabORCID);
+				}
+
+			}
 			success = true;
 		} finally {
 			if (success) {
@@ -541,7 +655,7 @@ public class StartupMetadataConfiguratorTool
 	private static <PD extends PropertiesDefinition, DPD extends ADecoratorPropertiesDefinition<PD>, NPD extends ANestedPropertiesDefinition, DNPD extends ADecoratorPropertiesDefinition<NPD>, ATNO extends ATypeNestedObject<NPD>, DATNO extends ADecoratorTypeDefinition<ATNO, NPD>> ResultObject build(
 			ApplicationService applicationService, List<List<String>> meta, Map<String, List<List<String>>> nestedMap,
 			Class<PD> classPD, Class<DPD> classDPD, Class<NPD> classNPD, Class<DNPD> classDNPD, Class<ATNO> classATNO,
-			Class<DATNO> classDATNO) {
+			Class<DATNO> classDATNO, Map<String, List<String>> controlledListMap) {
 
 		ResultObject<PD, NPD, ATNO> result = new ResultObject<PD, NPD, ATNO>();
 		for (List<String> list : meta) {
@@ -599,7 +713,6 @@ public class StartupMetadataConfiguratorTool
 				builderNTP.addPropertyValue("shortName", shortName);
 				builderNTP.addPropertyValue("label", label);
 				builderNTP.addPropertyValue("repeatable", repeatable);
-				builderNTP.addPropertyValue("repeatable", repeatable);
 				builderNTP.addPropertyValue("mandatory", mandatory);
 				builderNTP.addPropertyValue("priority", priority);
 				builderNTP.addPropertyValue("help", help);
@@ -617,12 +730,13 @@ public class StartupMetadataConfiguratorTool
 
 				List<List<String>> nestedPropertiesDefinition = nestedMap.get(shortName);
 				for (List<String> nestedSingleRow : nestedPropertiesDefinition) {
-					DNPD decorator = createDecorator(applicationService, nestedSingleRow, ctx, classNPD, classDNPD);
+					DNPD decorator = createDecorator(applicationService, nestedSingleRow, ctx, classNPD, classDNPD,
+							controlledListMap);
 					dntp.getReal().getMask().add(decorator.getReal());
 					result.getTPtoNOTP().add(dntp.getReal());
 				}
 			} else {
-				DPD decorator = createDecorator(applicationService, list, ctx, classPD, classDPD);
+				DPD decorator = createDecorator(applicationService, list, ctx, classPD, classDPD, controlledListMap);
 				result.getTPtoPDEF().add(decorator.getReal());
 			}
 			System.out.println("End write  " + target + "/" + shortName);
@@ -634,7 +748,7 @@ public class StartupMetadataConfiguratorTool
 
 	private static <PD extends PropertiesDefinition, DPD extends ADecoratorPropertiesDefinition<PD>> DPD createDecorator(
 			ApplicationService applicationService, List<String> metadata, GenericXmlApplicationContext ctx,
-			Class<PD> classPD, Class<DPD> classDPD) {
+			Class<PD> classPD, Class<DPD> classDPD, Map<String, List<String>> controlledListMap) {
 		String target = metadata.get(0);
 		String shortName = metadata.get(1);
 		String label = metadata.get(2);
@@ -662,6 +776,24 @@ public class StartupMetadataConfiguratorTool
 
 		if (widget.equals("text")) {
 			builderW = BeanDefinitionBuilder.genericBeanDefinition(WidgetTesto.class);
+		} else if (widget.equals("boolean")) {
+			builderW = BeanDefinitionBuilder.genericBeanDefinition(WidgetBoolean.class);
+		} else if (widget.equals("radio")) {
+			builderW = BeanDefinitionBuilder.genericBeanDefinition(WidgetCheckRadio.class);
+			String staticValues = "";
+			for(String ss : controlledListMap.get(shortName)) {
+				staticValues += ss+"|||";
+			}
+			builderW.addPropertyValue("staticValues", staticValues.substring(0, staticValues.length()-3));
+			builderW.addPropertyValue("option4row", 1);
+		} else if (widget.equals("checkbox")) {
+			builderW = BeanDefinitionBuilder.genericBeanDefinition(WidgetCheckRadio.class);
+			String staticValues = "";
+			for(String ss : controlledListMap.get(shortName)) {
+				staticValues += ss+"|||";
+			}
+			builderW.addPropertyValue("staticValues", staticValues.substring(0, staticValues.length()-3));
+			builderW.addPropertyValue("option4row", 1);
 		} else if (widget.equals("link")) {
 			builderW = BeanDefinitionBuilder.genericBeanDefinition(WidgetLink.class);
 		} else if (widget.equals("date")) {
@@ -762,11 +894,40 @@ public class StartupMetadataConfiguratorTool
 		}
 	}
 
+	private static void buildControlledList(Workbook workbook, String sheetName,
+			Map<String, List<String>> controlledListMap) {
+		Cell row;
+		Sheet sheet = workbook.getSheet(sheetName);		
+		int indexColumn = 0;
+		int rows = sheet.getColumn(0).length;
+		int columns = sheet.getRow(0).length;
+		while (indexColumn < columns) {
+			int indexRiga = 1;
+			String header = sheet.getRow(0)[indexColumn].getContents().trim();
+			while (indexRiga < rows) {
+				row = sheet.getRow(indexRiga)[indexColumn];				
+				insertInList(controlledListMap, header, row.getContents().trim());
+				indexRiga++;
+			}
+			indexColumn++;
+		}
+	}
+
 	private static void insertInMap(Map<String, List<List<String>>> map, String target, List<String> metadata) {
 		if (map.containsKey(target)) {
 			map.get(target).add(metadata);
 		} else {
 			List<List<String>> singleRows = new ArrayList<List<String>>();
+			singleRows.add(metadata);
+			map.put(target, singleRows);
+		}
+	}
+
+	private static void insertInList(Map<String, List<String>> map, String target, String metadata) {
+		if (map.containsKey(target)) {
+			map.get(target).add(metadata);
+		} else {
+			List<String> singleRows = new ArrayList<String>();
 			singleRows.add(metadata);
 			map.put(target, singleRows);
 		}

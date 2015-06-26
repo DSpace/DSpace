@@ -14,8 +14,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.authority.orcid.Orcid;
-import org.dspace.authority.orcid.model.Bio;
+import org.dspace.authority.orcid.OrcidService;
+import org.dspace.authority.orcid.jaxb.OrcidBio;
+import org.dspace.authority.orcid.jaxb.OrcidProfile;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -63,7 +64,8 @@ public class OAuthAuthenticationMethod implements AuthenticationMethod{
         String email = null;
 
         String orcid = (String) request.getAttribute("orcid");
-        //String refreshToken = (String) request.getAttribute("refresh_token");
+        String token = (String) request.getAttribute("access_token");
+//        String refreshToken = (String) request.getAttribute("refresh_token");
         if (request == null||orcid==null)
         {
             return BAD_ARGS;
@@ -82,18 +84,29 @@ public class OAuthAuthenticationMethod implements AuthenticationMethod{
             }
         }
         //get the orcid profile
-        Bio bio = null;
-        Orcid orcidObject = Orcid.getOrcid();
+        OrcidProfile profile = null;
+        OrcidService orcidObject = OrcidService.getOrcid();
         if(orcid!=null)
-        {
-            	// try to retrieve public information
-            	bio = orcidObject.getBio(orcid);
-            
+        {            	
+        	if(StringUtils.isNotBlank(token)) {
+        		profile = orcidObject.getProfile(orcid,token);	
+        	}
+        	else {
+               	// try to retrieve public information
+        		profile = orcidObject.getProfile(orcid);
+        	}
+           	
         }
         //get the email from orcid
-        if(bio!=null && email == null)
+        if(profile!=null && email == null)
         {
-            email = bio.getEmail();
+        	if(profile.getOrcidBio()!=null) {
+        		if(profile.getOrcidBio().getContactDetails()!=null) {
+        			if(profile.getOrcidBio().getContactDetails().getEmail()!=null && !profile.getOrcidBio().getContactDetails().getEmail().isEmpty()) {
+        				email = profile.getOrcidBio().getContactDetails().getEmail().get(0).getValue();
+        			}
+        		}
+        	}
         }
 
 //        //If Eperson does not exist follow steps similar to Shib....
@@ -109,13 +122,15 @@ public class OAuthAuthenticationMethod implements AuthenticationMethod{
         
         String fname = "";
         String lname = "";
-        if (bio != null && bio.getName() != null)
+        if (profile != null && profile.getOrcidBio() != null)
         {
-            // try to grab name from the orcid profile
-            fname = bio.getName().getGivenNames();
-        
-            // try to grab name from the orcid profile
-            lname = bio.getName().getFamilyName();
+			if (profile.getOrcidBio().getPersonalDetails() != null) {
+				// try to grab name from the orcid profile
+				fname = profile.getOrcidBio().getPersonalDetails().getGivenNames();
+
+				// try to grab name from the orcid profile
+				lname = profile.getOrcidBio().getPersonalDetails().getFamilyName();
+			}
         }
 
         if (eperson == null && email != null) {

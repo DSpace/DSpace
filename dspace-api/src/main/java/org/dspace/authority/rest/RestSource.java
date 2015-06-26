@@ -9,6 +9,7 @@ package org.dspace.authority.rest;
 
 import org.dspace.authority.AuthorityValue;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -26,8 +27,8 @@ public abstract class RestSource {
         this.restConnector = new RESTConnector(url);
     }
 
-    public abstract List<AuthorityValue> queryAuthorities(String field, String text, int start, int max);
-    public abstract List<AuthorityValue> queryAuthorities(String text, int max);
+    public abstract List<AuthorityValue> queryAuthorities(String field, String text, int start, int max) throws IOException;
+    public abstract List<AuthorityValue> queryAuthorities(String text, int max) throws IOException;
 
     public abstract AuthorityValue queryAuthorityID(String id);
 }

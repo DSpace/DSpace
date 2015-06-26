@@ -1586,7 +1586,10 @@
 					</list>
 				</entry>				
 				<entry key="pre-update">					
-					<ref local="RPListener" />											
+					<list>		
+						<ref local="RPListener" />											
+						<ref local="CRISIDListener" />
+					</list>					
 				</entry>				
 				<entry key="post-load">
 					<list>

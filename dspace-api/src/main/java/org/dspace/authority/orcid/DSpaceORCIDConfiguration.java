@@ -17,6 +17,28 @@ public class DSpaceORCIDConfiguration {
 	{
 		return configurationService.getProperty("authentication-oauth.orcid-api-url");
 	}
+
+	public String getORCIDClientID()
+	{
+		return configurationService.getProperty("authentication-oauth.application-client-id");
+	}
+	
+	
+	public String getORCIDClientSecretKey()
+	{
+		return configurationService.getProperty("authentication-oauth.application-client-secret");
+	}
+	
+	
+	public String getORCIDTokenURL()
+	{
+		return configurationService.getProperty("authentication-oauth.application-token-url");
+	}
+
+	public String getORCIDBaseURL()
+	{
+		return configurationService.getProperty("cris.external.domainname.authority.service.orcid");
+	}
 	
 	public ConfigurationService getConfigurationService() {
 		return configurationService;

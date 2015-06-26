@@ -7,22 +7,20 @@
  */
 package org.dspace.authority.rest;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.dspace.authority.util.XMLUtils;
-import org.apache.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
-import org.w3c.dom.Document;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
 
-import java.io.InputStream;
-import java.util.Scanner;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.dspace.services.ConfigurationService;
+import org.dspace.utils.DSpace;
+import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.client.ClientProperties;
 
 /**
- *
- * @author Antoine Snyers (antoine at atmire.com)
- * @author Kevin Van de Velde (kevin at atmire dot com)
- * @author Ben Bosman (ben at atmire dot com)
- * @author Mark Diggory (markd at atmire dot com)
+ * @author l.pascarelli
  */
 public class RESTConnector {
 
@@ -33,59 +31,32 @@ public class RESTConnector {
 
     private String url;
 
+    private ClientConfig clientConfig = null;
+    
     public RESTConnector(String url) {
         this.url = url;
     }
 
-    public Document get(String path) {
-        Document document = null;
-
-//      InputStream result = null;
-        path = trimSlashes(path);
-
-        String fullPath = url + '/' + path;
-        //HttpGet httpGet = new HttpGet(fullPath);
-        GetMethod httpGet = new GetMethod(fullPath);
-
-        try {
-//          boolean ignoreSSL = ConfigurationManager.getBooleanProperty("orcid", "httpclient.ignoressl");
-
-            HttpClient httpclient = new HttpClient();
-
-            //HttpClient httpClient = HttpClientFactory.getNewHttpClient(ignoreSSL);
-            //HttpResponse getResponse = httpClient.execute(httpGet);
-
-            httpclient.executeMethod(httpGet);
-            //do not close this httpClient
-            //result = getResponse.getEntity().getContent();
-            document = XMLUtils.convertStreamToXML(httpGet.getResponseBodyAsStream());
-
-        } catch (Exception e) {
-            httpGet.releaseConnection();
-            getGotError(e, fullPath);
-        }
-
-        return document;
+    public WebTarget getClientRest(String path) {
+    	Client client = ClientBuilder.newClient(getClientConfig());
+    	WebTarget target = client.target(url).path(path);
+    	return target;
     }
 
-    protected void getGotError(Exception e, String fullPath) {
-        log.error("Error in rest connector for path: "+fullPath, e);
-    }
-
-    public static String trimSlashes(String path) {
-        while (path.endsWith("/")) {
-            path = path.substring(0, path.length() - 1);
-        }
-        while (path.startsWith("/")) {
-            path = path.substring(1);
-        }
-        return path;
-    }
-
-    public static String convertStreamToString(InputStream is) {
-        Scanner s = new Scanner(is).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
-    }
+	public ClientConfig getClientConfig() {
+		if(this.clientConfig == null) {
+	        ConfigurationService configurationService = new DSpace().getConfigurationService();
+	        String proxyHost =  configurationService.getProperty("http.proxy.host");
+	        int proxyPort = configurationService.getPropertyAsType("http.proxy.port", 80);
+	        
+	        this.clientConfig = new ClientConfig();
+	        if(StringUtils.isNotBlank(proxyHost)){
+	        	this.clientConfig.connectorProvider(new ApacheConnectorProvider());
+	            this.clientConfig.property(ClientProperties.PROXY_URI, proxyHost + ":" + proxyPort);
+	        }
+		}
+		return clientConfig;
+	}
 
 
 }
