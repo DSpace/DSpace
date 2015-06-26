@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.authority;
 
 import java.io.ByteArrayOutputStream;
@@ -8,7 +15,7 @@ import java.sql.SQLException;
 import javax.xml.bind.JAXBException;
 
 import org.apache.log4j.Logger;
-import org.dspace.authority.orcid.Orcid;
+import org.dspace.authority.orcid.OrcidService;
 import org.dspace.authority.orcid.jaxb.Citation;
 import org.dspace.authority.orcid.jaxb.CitationType;
 import org.dspace.authority.orcid.jaxb.OrcidWork;
@@ -32,7 +39,7 @@ public class OrcidTest {
 
 		Context context = new Context();
 
-		Orcid orcid = Orcid.getOrcid();
+		OrcidService orcid = OrcidService.getOrcid();
 		OrcidWork work = new OrcidWork();
 
 		Item item = Item.find(context, 211);
