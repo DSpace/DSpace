@@ -312,7 +312,7 @@
 					<c:choose>
 					<c:when test="${propertiesdefinition.rendering.triview eq 'boolean'}">
 						<fieldset>
-						<legend><fmt:message key="jsp.dspace-admin.cris.jdyna.pointer.${propertiesdefinition.rendering.valoreClass.simpleName}" /></legend>
+						<legend><fmt:message key="jsp.dspace-admin.cris.jdyna.boolean.${propertiesdefinition.rendering.valoreClass.simpleName}" /></legend>
 
 						<dyna:boolean propertyPath="real.rendering.checked"
 							labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.boolean.checked" helpKey="help.jdyna.message.rendering.boolean.checked"/>
@@ -327,7 +327,7 @@
 					<c:choose>
 					<c:when test="${propertiesdefinition.rendering.triview eq 'checkradio'}">
 						<fieldset>
-						<legend><fmt:message key="jsp.dspace-admin.cris.jdyna.pointer.${propertiesdefinition.rendering.valoreClass.simpleName}" /></legend>
+						<legend><fmt:message key="jsp.dspace-admin.cris.jdyna.checkradio.${propertiesdefinition.rendering.valoreClass.simpleName}" /></legend>
 						<dyna:text propertyPath="real.rendering.option4row"  visibility="false"
 							labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.checkradio.option4row" helpKey="help.jdyna.message.rendering.checkradio.option4row"/>
 						<div class="dynaClear">
