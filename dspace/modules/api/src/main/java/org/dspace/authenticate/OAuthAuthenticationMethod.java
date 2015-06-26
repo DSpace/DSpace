@@ -65,7 +65,11 @@ public class OAuthAuthenticationMethod implements AuthenticationMethod{
 
         //get the orcid profile
         Bio bio = null;
-        Orcid orcidObject = Orcid.getOrcid();
+
+        String orcid_api_url = ConfigurationManager.getProperty("authentication-oauth","orcid-api-url");
+
+        Orcid orcidObject = new Orcid(orcid_api_url);
+
         if(orcid!=null)
         {
             if(token==null||test){

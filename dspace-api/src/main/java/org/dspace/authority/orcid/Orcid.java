@@ -38,8 +38,6 @@ public class Orcid extends RestSource {
 
     private static Orcid orcid;
 
-    private RESTConnector memberConnector = null;
-
     public static Orcid getOrcid() {
         if (orcid == null) {
             orcid = new DSpace().getServiceManager().getServiceByName("OrcidSource", Orcid.class);
@@ -47,13 +45,8 @@ public class Orcid extends RestSource {
         return orcid;
     }
 
-    private Orcid(String url) {
+    public Orcid(String url) {
         super(url);
-    }
-
-    public Orcid(String s, String s2) {
-        super(s);
-        this.memberConnector = new RESTConnector(s2);
     }
 
     public Bio getBio(String id) {
@@ -73,7 +66,7 @@ public class Orcid extends RestSource {
      */
     public Bio getBio(String id,String token) {
        // https://api.sandbox.orcid.org?access_token=d50eb967-555f-4671-9f35-8b413509b7f1
-        Document bioDocument = memberConnector.get(id  + "/orcid-bio?access_token="+token);
+        Document bioDocument = restConnector.get(id  + "/orcid-bio?access_token="+token);
         XMLtoBio converter = new XMLtoBio();
         Bio bio = converter.convert(bioDocument).get(0);
         bio.setOrcid(id);
