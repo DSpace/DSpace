@@ -149,7 +149,6 @@ public class MyRPJSONController extends MultiActionController
         if (rp != null)
         {
             applicationService.delete(ResearcherPage.class, rp.getId());
-            applicationService.clearCache();
         }
         returnStatusJSON(response, null);
         return null;

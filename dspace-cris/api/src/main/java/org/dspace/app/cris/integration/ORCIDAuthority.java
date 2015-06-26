@@ -8,15 +8,14 @@
 package org.dspace.app.cris.integration;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authority.AuthorityValue;
-import org.dspace.authority.orcid.Orcid;
 import org.dspace.authority.orcid.OrcidAuthorityValue;
+import org.dspace.authority.orcid.OrcidService;
 import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.Choices;
 import org.dspace.utils.DSpace;
@@ -27,7 +26,7 @@ public class ORCIDAuthority extends RPAuthority {
 
 	private static Logger log = Logger.getLogger(ORCIDAuthority.class);
 
-	private Orcid source = new DSpace().getServiceManager().getServiceByName("OrcidSource", Orcid.class);
+	private OrcidService source = new DSpace().getServiceManager().getServiceByName("OrcidSource", OrcidService.class);
 
 	@Override
 	public Choices getMatches(String field, String query, int collection, int start, int limit, String locale) {
@@ -61,7 +60,7 @@ public class ORCIDAuthority extends RPAuthority {
 	}
 
 	private String getLabel(OrcidAuthorityValue val) {
-		return val.getValue() + " (orcid.org/" + val.getOrcid_id() + ")";
+		return val.getValue() + " ("+source.getBaseURL() + val.getOrcid_id() + ")";
 	}
 
 }

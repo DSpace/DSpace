@@ -117,6 +117,14 @@
 		</dependency>
 		<dependency>
 			<groupId>org.jdyna</groupId>
+			<artifactId>jdyna-boolean</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jdyna</groupId>
+			<artifactId>jdyna-checkradio</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jdyna</groupId>
 			<artifactId>jdyna-web-api</artifactId>
 		</dependency>
 		<dependency>

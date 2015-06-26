@@ -471,8 +471,29 @@
 
 	}
 		
-       
-		 
+
+/* 		var activeRadioButton = function() {			
+			 j(".radiobuttoninfo").each(function(){
+				 var id = j(this).html();	
+				 jQuery.ajax({
+					  url: "searchRadioButton.html",
+					  dataType: "html",
+					  data : {																			
+						"elementID" : id,
+						"objectID" : ${anagraficadto.objectId}
+					  },
+		          success: function( data ) {
+		          	response( j.map( data.checkradio, function( item ) {
+		            	return {
+		                	label: item.display,
+		                    value: item.id
+						}
+			        }));
+		          }
+				 });
+			});
+		}; */
+
 		var activeEperson = function(id) {
 			j.ajax({
                 url: "eperson.json",

@@ -10,6 +10,7 @@ package org.dspace.app.cris.service;
 import it.cilea.osd.common.model.Identifiable;
 import it.cilea.osd.jdyna.dao.ContainableDao;
 import it.cilea.osd.jdyna.dao.PropertyHolderDao;
+import it.cilea.osd.jdyna.dao.TabDao;
 import it.cilea.osd.jdyna.model.ANestedPropertiesDefinition;
 import it.cilea.osd.jdyna.model.ATypeNestedObject;
 import it.cilea.osd.jdyna.model.Containable;
@@ -20,9 +21,11 @@ import it.cilea.osd.jdyna.web.Tab;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -47,7 +50,9 @@ import org.dspace.app.cris.model.ResearchObject;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.StatSubscription;
 import org.dspace.app.cris.model.jdyna.DynamicObjectType;
+import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.RPProperty;
+import org.dspace.app.cris.model.jdyna.TabResearcherPage;
 import org.dspace.app.cris.model.ws.User;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.core.ConfigurationManager;
@@ -827,6 +832,10 @@ public class ApplicationService extends ExtendedTabService
         try
         {
         	cache.removeAll();
+			cacheRpByEPerson.removeAll();
+			cacheBySource.removeAll();
+			cacheByCrisID.removeAll();
+			cacheByUUID.removeAll();
         }
         catch (Exception ex)
         {
@@ -909,5 +918,16 @@ public class ApplicationService extends ExtendedTabService
         return researchDao.paginateByType(typo, sort, inverse, (page - 1)
                 * maxResults, maxResults);
     }
-    
+  
+    @Override
+    public <P, PK extends Serializable> void delete(Class<P> model, PK pkey) {    	
+    	super.delete(model, pkey);
+    	clearCache();
+    }
+
+	public <H extends IPropertyHolder<Containable>, T extends Tab<H>> List<T> getTabsByVisibility(Class<T> modelClass, Integer level) {	
+		TabDao<H, T> dao = (TabDao<H, T>) getDaoByModel(modelClass);
+		return dao.findByAccessLevel(level);
+	}
+	
 } 

@@ -25,9 +25,17 @@
 	</bean>
 	
 	<bean id="dspaceOrcidAPI" factory-bean="dspaceOAuthenticateConfiguration" factory-method="getORCIDApi" />
+	<bean id="dspaceOrcidCID" factory-bean="dspaceOAuthenticateConfiguration" factory-method="getORCIDClientID" />
+	<bean id="dspaceOrcidCKey" factory-bean="dspaceOAuthenticateConfiguration" factory-method="getORCIDClientSecretKey" />
+	<bean id="dspaceOrcidTokenURL" factory-bean="dspaceOAuthenticateConfiguration" factory-method="getORCIDTokenURL" />
+	<bean id="dspaceOrcidBaseURL" factory-bean="dspaceOAuthenticateConfiguration" factory-method="getORCIDBaseURL" />
 	
-	 <bean name="OrcidSource" class="org.dspace.authority.orcid.Orcid">
+	 <bean name="OrcidSource" class="org.dspace.authority.orcid.OrcidService" depends-on="dspaceOAuthenticateConfiguration">
 	 	<constructor-arg ref="dspaceOrcidAPI"/>
-	 </bean>      
+	 	<constructor-arg ref="dspaceOrcidCID"/>
+	 	<constructor-arg ref="dspaceOrcidCKey"/>
+	 	<constructor-arg ref="dspaceOrcidTokenURL"/>
+	 	<property name="baseURL" ref="dspaceOrcidBaseURL"/>
+	 </bean>           
 
 </beans>

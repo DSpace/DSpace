@@ -207,6 +207,9 @@
 					<c:if test="${boxed.real.rendering.triview == 'testo'}">
 						<c:set var="controller" value="Text" />
 					</c:if>
+				    <c:if test="${boxed.real.rendering.triview == 'boolean'}">
+						<c:set var="controller" value="Boolean" />
+					</c:if>
 					<c:if test="${boxed.real.rendering.triview == 'calendar'}">
 						<c:set var="controller" value="Date" />
 					</c:if>					
@@ -308,6 +311,9 @@
 					<div class="mask">
 					<c:if test="${boxed.real.rendering.triview == 'testo'}">
 						<c:set var="controller" value="Text" />
+					</c:if>
+					<c:if test="${boxed.real.rendering.triview == 'boolean'}">
+						<c:set var="controller" value="Boolean" />
 					</c:if>
 					<c:if test="${boxed.real.rendering.triview == 'calendar'}">
 						<c:set var="controller" value="Date" />
@@ -445,6 +451,16 @@
 				href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createDOPointerDynamicField.htm?boxId=${box.id}&tabId=${tabId}">
 			<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.newdopointerdynamicfield" />
+			</a>
+			<a class="btn btn-default"
+				href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createBooleanDynamicField.htm?boxId=${box.id}&tabId=${tabId}">
+			<fmt:message
+				key="jsp.dspace-admin.hku.jdyna-configuration.newbooleandynamicfield" />
+			</a>
+			<a class="btn btn-default"
+				href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createCheckRadioDynamicField.htm?boxId=${box.id}&tabId=${tabId}">
+			<fmt:message
+				key="jsp.dspace-admin.hku.jdyna-configuration.newcheckradiodynamicfield" />
 			</a>
 		</c:if>
 

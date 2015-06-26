@@ -24,7 +24,8 @@ import javax.persistence.Transient;
     @NamedQuery(name = "OUPropertiesDefinition.findAdvancedSearch", query = "from OUPropertiesDefinition where advancedSearch=true"),
     @NamedQuery(name = "OUPropertiesDefinition.uniqueIdByShortName", query = "select id from OUPropertiesDefinition where shortName = ?"),
     @NamedQuery(name = "OUPropertiesDefinition.uniqueByShortName", query = "from OUPropertiesDefinition where shortName = ?"),
-    @NamedQuery(name = "OUPropertiesDefinition.findValoriDaMostrare", query = "from OUPropertiesDefinition where showInList = true")
+    @NamedQuery(name = "OUPropertiesDefinition.findValoriDaMostrare", query = "from OUPropertiesDefinition where showInList = true"),
+    @NamedQuery(name = "OUPropertiesDefinition.likeByShortName", query = "from OUPropertiesDefinition where shortName LIKE :par0", hints = { @javax.persistence.QueryHint(name = "org.hibernate.cacheable", value = "true") })
 })
 public class OUPropertiesDefinition extends PropertiesDefinition {
 	

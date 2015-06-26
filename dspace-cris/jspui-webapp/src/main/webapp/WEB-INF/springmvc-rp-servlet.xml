@@ -666,6 +666,78 @@
 		<property name="validator" ref="rpDynamicFieldValidator" />
 	</bean>
 
+	<bean id="editRPBooleanDynamicFieldController" parent="baseFormController"
+		class="it.cilea.osd.jdyna.controller.FormDecoratorPropertiesDefinitionController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.RPPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>it.cilea.osd.jdyna.widget.WidgetBoolean
+			</value>
+		</constructor-arg>
+		<constructor-arg index="2">
+			<value>org.dspace.app.cris.model.jdyna.BoxResearcherPage
+			</value>
+		</constructor-arg>
+		<property name="successView">
+			<value>redirect:/cris/administrator/rp/editBox.htm</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorRPPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>
+		<property name="specificPartPath">
+			<value>rp</value>
+		</property>
+		<property name="validator" ref="rpDynamicFieldValidator" />
+	</bean>
+	
+	<bean id="editRPCheckRadioDynamicFieldController" parent="baseFormController"
+		class="it.cilea.osd.jdyna.controller.FormDecoratorPropertiesDefinitionController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.RPPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>it.cilea.osd.jdyna.widget.WidgetCheckRadio
+			</value>
+		</constructor-arg>
+		<constructor-arg index="2">
+			<value>org.dspace.app.cris.model.jdyna.BoxResearcherPage
+			</value>
+		</constructor-arg>
+		<property name="successView">
+			<value>redirect:/cris/administrator/rp/editBox.htm</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorRPPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>
+		<property name="specificPartPath">
+			<value>rp</value>
+		</property>
+		<property name="validator" ref="rpDynamicFieldValidator" />
+	</bean>
+	
 	<bean id="editRPNestedDynamicFieldController" parent="baseFormController"
 		class="org.dspace.app.webui.cris.controller.admin.FormExtendedNestedObjectDefinitionController">
 		<property name="applicationService">
@@ -1851,6 +1923,80 @@
 		<property name="validator" ref="grantDynamicFieldValidator" />
 	</bean>
 
+	<bean id="editProjectBooleanDynamicFieldController" parent="baseFormController"
+		class="it.cilea.osd.jdyna.controller.FormDecoratorPropertiesDefinitionController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>it.cilea.osd.jdyna.widget.WidgetBoolean
+			</value>
+		</constructor-arg>
+		<constructor-arg index="2">
+			<value>
+				org.dspace.app.cris.model.jdyna.BoxProject
+			</value>
+		</constructor-arg>
+		<property name="successView">
+			<value>redirect:/cris/administrator/project/editBox.htm</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorProjectPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="specificPartPath">
+			<value>project</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>
+		<property name="validator" ref="grantDynamicFieldValidator" />
+	</bean>
+
+	<bean id="editProjectCheckRadioDynamicFieldController" parent="baseFormController"
+		class="it.cilea.osd.jdyna.controller.FormDecoratorPropertiesDefinitionController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>it.cilea.osd.jdyna.widget.WidgetCheckRadio
+			</value>
+		</constructor-arg>
+		<constructor-arg index="2">
+			<value>
+				org.dspace.app.cris.model.jdyna.BoxProject
+			</value>
+		</constructor-arg>
+		<property name="successView">
+			<value>redirect:/cris/administrator/project/editBox.htm</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorProjectPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="specificPartPath">
+			<value>project</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>
+		<property name="validator" ref="grantDynamicFieldValidator" />
+	</bean>
+	
 	<bean id="editProjectPointerRPDynamicFieldController" parent="baseFormController"
 		class="org.dspace.app.webui.cris.controller.admin.FormWidgetPointerDODecoratorPDController">
 		<property name="applicationService">
@@ -3080,6 +3226,80 @@
 		<property name="validator" ref="ouDynamicFieldValidator" />
 	</bean>
 
+	<bean id="editOUBooleanDynamicFieldController" parent="baseFormController"
+		class="it.cilea.osd.jdyna.controller.FormDecoratorPropertiesDefinitionController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.OUPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>it.cilea.osd.jdyna.widget.WidgetBoolean
+			</value>
+		</constructor-arg>
+		<constructor-arg index="2">
+			<value>
+				org.dspace.app.cris.model.jdyna.BoxOrganizationUnit
+			</value>
+		</constructor-arg>
+		<property name="successView">
+			<value>redirect:/cris/administrator/ou/editBox.htm</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorOUPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="specificPartPath">
+			<value>ou</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>
+		<property name="validator" ref="ouDynamicFieldValidator" />
+	</bean>
+	
+	<bean id="editOUCheckRadioDynamicFieldController" parent="baseFormController"
+		class="it.cilea.osd.jdyna.controller.FormDecoratorPropertiesDefinitionController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.OUPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>it.cilea.osd.jdyna.widget.WidgetCheckRadio
+			</value>
+		</constructor-arg>
+		<constructor-arg index="2">
+			<value>
+				org.dspace.app.cris.model.jdyna.BoxOrganizationUnit
+			</value>
+		</constructor-arg>
+		<property name="successView">
+			<value>redirect:/cris/administrator/ou/editBox.htm</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorOUPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="specificPartPath">
+			<value>ou</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>
+		<property name="validator" ref="ouDynamicFieldValidator" />
+	</bean>
+	
 	<bean id="editOUPointerRPDynamicFieldController" parent="baseFormController"
 		class="org.dspace.app.webui.cris.controller.admin.FormWidgetPointerDODecoratorPDController">
 		<property name="applicationService">
@@ -4062,6 +4282,23 @@
 		</property>		
 	</bean>
 	
+	<bean id="searchRPRadioButton"
+		class="org.dspace.app.webui.cris.controller.jdyna.CrisCheckRadioController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<property name="searchService">
+			<ref bean="crisSearchService" />
+		</property>
+		<property name="clazzPD">
+			<value>org.dspace.app.cris.model.jdyna.RPPropertiesDefinition</value>
+		</property>
+		<property name="viewName">
+			<value>resultRadioButton</value>
+		</property>		
+	</bean>
+	
+	
 	<bean id="searchProjectPointer"
 		class="org.dspace.app.webui.cris.controller.jdyna.CrisSearchPointerController">
 		<property name="applicationService">
@@ -4076,6 +4313,23 @@
 		</property>				
 		<property name="viewName">
 			<value>resultSearchPointer</value>
+		</property>		
+	</bean>
+
+
+	<bean id="searchProjectRadioButton"
+		class="org.dspace.app.webui.cris.controller.jdyna.CrisCheckRadioController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<property name="searchService">
+			<ref bean="crisSearchService" />
+		</property>
+		<property name="clazzPD">
+			<value>org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition</value>
+		</property>
+		<property name="viewName">
+			<value>resultRadioButton</value>
 		</property>		
 	</bean>
 	
@@ -4095,6 +4349,22 @@
 		</property>		
 	</bean>
 	
+	<bean id="searchOURadioButton"
+		class="org.dspace.app.webui.cris.controller.jdyna.CrisCheckRadioController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<property name="searchService">
+			<ref bean="crisSearchService" />
+		</property>
+		<property name="clazzPD">
+			<value>org.dspace.app.cris.model.jdyna.OUPropertiesDefinition</value>
+		</property>
+		<property name="viewName">
+			<value>resultRadioButton</value>
+		</property>		
+	</bean>
+	
 	<bean id="searchDOPointer"
 		class="org.dspace.app.webui.cris.controller.jdyna.CrisSearchPointerController">
 		<property name="applicationService">
@@ -4110,6 +4380,22 @@
 			<value>resultSearchPointer</value>
 		</property>		
 	</bean>
+	
+	<bean id="searchDORadioButton"
+		class="org.dspace.app.webui.cris.controller.jdyna.CrisCheckRadioController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<property name="searchService">
+			<ref bean="crisSearchService" />
+		</property>
+		<property name="clazzPD">
+			<value>org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition</value>
+		</property>
+		<property name="viewName">
+			<value>resultRadioButton</value>
+		</property>		
+	</bean>	
 	
 	<bean id="rpDeleteController"
 		class="org.dspace.app.webui.cris.controller.ResearcherPageDetailsController">
@@ -4568,7 +4854,79 @@
 		</property>		
 		<property name="validator" ref="doDynamicFieldValidator" />
 	</bean>
-	
+
+	<bean id="editDOBooleanDynamicFieldController" parent="baseFormController"
+		class="org.dspace.app.webui.cris.controller.admin.FormDynamicDecoratorPropertiesDefinition">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>it.cilea.osd.jdyna.widget.WidgetBoolean
+			</value>
+		</constructor-arg>
+		<constructor-arg index="2">
+			<value>org.dspace.app.cris.model.jdyna.BoxDynamicObject
+			</value>
+		</constructor-arg>		
+		<property name="typoModel">
+			<value>org.dspace.app.cris.model.jdyna.DynamicObjectType</value>
+		</property>
+		<property name="successView">
+			<value>redirect:/cris/administrator/other/2ndlevel/editBox.htm</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorDynamicPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>		
+		<property name="validator" ref="doDynamicFieldValidator" />
+	</bean>
+
+	<bean id="editDOCheckRadioDynamicFieldController" parent="baseFormController"
+		class="org.dspace.app.webui.cris.controller.admin.FormDynamicDecoratorPropertiesDefinition">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>it.cilea.osd.jdyna.widget.WidgetCheckRadio
+			</value>
+		</constructor-arg>
+		<constructor-arg index="2">
+			<value>org.dspace.app.cris.model.jdyna.BoxDynamicObject
+			</value>
+		</constructor-arg>		
+		<property name="typoModel">
+			<value>org.dspace.app.cris.model.jdyna.DynamicObjectType</value>
+		</property>
+		<property name="successView">
+			<value>redirect:/cris/administrator/other/2ndlevel/editBox.htm</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorDynamicPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>		
+		<property name="validator" ref="doDynamicFieldValidator" />
+	</bean>
+			
 	<bean id="deleteDONestedFieldController"
 		class="it.cilea.osd.jdyna.controller.DecoratorATypeNestedController">
 		<constructor-arg index="0">			
@@ -5570,6 +5928,11 @@
 				<prop key="/tools/ou/searchPointer.htm">searchOUPointer</prop>
 				<prop key="/tools/*/searchPointer.htm">searchDOPointer</prop>
 				
+				<prop key="/tools/rp/searchRadioButton.htm">searchRPRadioButton</prop>
+				<prop key="/tools/project/searchRadioButton.htm">searchProjectRadioButton</prop>
+				<prop key="/tools/ou/searchRadioButton.htm">searchOURadioButton</prop>
+				<prop key="/tools/*/searchRadioButton.htm">searchDORadioButton</prop>
+				
 				<!-- Management of nested objects -->				
 				<prop key="/rp/viewNested.htm">viewRPNestedDetailsController</prop>
 				<prop key="/tools/rp/addNested.htm">editRPNestedDetailsController</prop>
@@ -5633,8 +5996,12 @@
 				<prop key="/administrator/rp/editDOPointerDynamicField.htm">editRPPointerDODynamicFieldController</prop>
 				<prop key="/administrator/rp/createDateDynamicField.htm">editRPDateDynamicFieldController</prop>
 				<prop key="/administrator/rp/editDateDynamicField.htm">editRPDateDynamicFieldController</prop>
-				<prop key="/administrator/rp/createTextDynamicField.htm">editRPTextDynamicFieldController</prop>
+				<prop key="/administrator/rp/createTextDynamicField.htm">editRPTextDynamicFieldController</prop>				
 				<prop key="/administrator/rp/editTextDynamicField.htm">editRPTextDynamicFieldController</prop>
+				<prop key="/administrator/rp/createBooleanDynamicField.htm">editRPBooleanDynamicFieldController</prop>
+				<prop key="/administrator/rp/editBooleanDynamicField.htm">editRPBooleanDynamicFieldController</prop>
+				<prop key="/administrator/rp/createCheckRadioDynamicField.htm">editRPCheckRadioDynamicFieldController</prop>
+				<prop key="/administrator/rp/editCheckRadioDynamicField.htm">editRPCheckRadioDynamicFieldController</prop>
 				<prop key="/administrator/rp/createLinkDynamicField.htm">editRPLinkDynamicFieldController</prop>
 				<prop key="/administrator/rp/editLinkDynamicField.htm">editRPLinkDynamicFieldController</prop>
 				<prop key="/administrator/rp/createFileDynamicField.htm">editRPFileDynamicFieldController</prop>
@@ -5697,6 +6064,10 @@
 				<prop key="/administrator/project/editDateDynamicField.htm">editProjectDateDynamicFieldController</prop>
 				<prop key="/administrator/project/createTextDynamicField.htm">editProjectTextDynamicFieldController</prop>
 				<prop key="/administrator/project/editTextDynamicField.htm">editProjectTextDynamicFieldController</prop>
+				<prop key="/administrator/project/createBooleanDynamicField.htm">editProjectBooleanDynamicFieldController</prop>
+				<prop key="/administrator/project/editBooleanDynamicField.htm">editProjectBooleanDynamicFieldController</prop>
+				<prop key="/administrator/project/createCheckRadioDynamicField.htm">editProjectCheckRadioDynamicFieldController</prop>
+				<prop key="/administrator/project/editCheckRadioDynamicField.htm">editProjectCheckRadioDynamicFieldController</prop>
 				<prop key="/administrator/project/createLinkDynamicField.htm">editProjectLinkDynamicFieldController</prop>
 				<prop key="/administrator/project/editLinkDynamicField.htm">editProjectLinkDynamicFieldController</prop>
 				<prop key="/administrator/project/createFileDynamicField.htm">editProjectFileDynamicFieldController</prop>
@@ -5752,6 +6123,10 @@
 				<prop key="/administrator/ou/editDateDynamicField.htm">editOUDateDynamicFieldController</prop>
 				<prop key="/administrator/ou/createTextDynamicField.htm">editOUTextDynamicFieldController</prop>
 				<prop key="/administrator/ou/editTextDynamicField.htm">editOUTextDynamicFieldController</prop>
+				<prop key="/administrator/ou/createBooleanDynamicField.htm">editOUBooleanDynamicFieldController</prop>
+				<prop key="/administrator/ou/editBooleanDynamicField.htm">editOUBooleanDynamicFieldController</prop>
+				<prop key="/administrator/ou/createCheckRadioDynamicField.htm">editOUCheckRadioDynamicFieldController</prop>
+				<prop key="/administrator/ou/editCheckRadioDynamicField.htm">editOUCheckRadioDynamicFieldController</prop>
 				<prop key="/administrator/ou/createLinkDynamicField.htm">editOULinkDynamicFieldController</prop>
 				<prop key="/administrator/ou/editLinkDynamicField.htm">editOULinkDynamicFieldController</prop>
 				<prop key="/administrator/ou/createFileDynamicField.htm">editOUFileDynamicFieldController</prop>
@@ -5814,6 +6189,10 @@
 				<prop key="/administrator/*/editDateDynamicField.htm">editDODateDynamicFieldController</prop>
 				<prop key="/administrator/*/createTextDynamicField.htm">editDOTextDynamicFieldController</prop>
 				<prop key="/administrator/*/editTextDynamicField.htm">editDOTextDynamicFieldController</prop>
+				<prop key="/administrator/*/createBooleanDynamicField.htm">editDOBooleanDynamicFieldController</prop>
+				<prop key="/administrator/*/editBooleanDynamicField.htm">editDOBooleanDynamicFieldController</prop>
+				<prop key="/administrator/*/createCheckRadioDynamicField.htm">editDOCheckRadioDynamicFieldController</prop>
+				<prop key="/administrator/*/editCheckRadioDynamicField.htm">editDOCheckRadioDynamicFieldController</prop>
 				<prop key="/administrator/*/createLinkDynamicField.htm">editDOLinkDynamicFieldController</prop>
 				<prop key="/administrator/*/editLinkDynamicField.htm">editDOLinkDynamicFieldController</prop>
 				<prop key="/administrator/*/createFileDynamicField.htm">editDOFileDynamicFieldController</prop>

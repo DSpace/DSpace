@@ -137,6 +137,24 @@
 
 		<dependency>
 			<groupId>org.jdyna</groupId>
+			<artifactId>jdyna-pointer</artifactId>
+			<version>${org.jdyna.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.jdyna</groupId>
+			<artifactId>jdyna-boolean</artifactId>
+			<version>${org.jdyna.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jdyna</groupId>
+			<artifactId>jdyna-checkradio</artifactId>
+			<version>${org.jdyna.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.jdyna</groupId>
 			<artifactId>jdyna-web-api</artifactId>
 			<version>${org.jdyna.version}</version>
 		</dependency>      

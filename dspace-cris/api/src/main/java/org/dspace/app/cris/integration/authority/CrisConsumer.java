@@ -192,7 +192,13 @@ public class CrisConsumer implements Consumer {
 						if(activateNewObject) {
 							rp.setStatus(true);
 						}
-						applicationService.saveOrUpdate(crisTargetClass, rp);
+						try {
+							applicationService.saveOrUpdate(crisTargetClass, rp);
+							log.info("Build new ResearcherProfile sourceId/sourceRef:" + authorityKey+"/"+typeAuthority.toUpperCase());
+						}
+						catch(Exception ex) {
+							log.error(ex.getMessage(), ex);
+						}
 						rpKey = rp.getCrisID();
 					}
 

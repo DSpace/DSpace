@@ -85,10 +85,12 @@ create table cris_ws_user2crit (cris_ws_user_id int4 not null, criteria_id int4 
 create table jdyna_box_message (id int4 not null, body varchar(4000), showInEdit bool not null, showInPublicView bool not null, useBodyAsKeyMessageBundle bool not null, elementAfter_id int4, parent_id int4, primary key (id));
 create table jdyna_containable (DTYPE varchar(31) not null, id int4 not null, externalJSP varchar(255), cris_rp_pdef_fk int4, cris_pj_pdef_fk int4, cris_ou_pdef_fk int4, cris_rp_no_pdef_fk int4, cris_pj_no_pdef_fk int4, cris_ou_no_pdef_fk int4, cris_rp_no_tp int4, cris_pj_no_tp int4, cris_ou_no_tp_fk int4, cris_do_no_tp_fk int4, cris_do_no_pdef_fk int4, cris_do_pdef_fk int4, primary key (id));
 create table jdyna_scopedefinition (id int4 not null, label varchar(255), primary key (id));
-create table jdyna_values (DTYPE varchar(31) not null, id int4 not null, sortValue varchar(255), dateValue timestamp, textValue text, linkdescription varchar(255), linkvalue varchar(255), fileextension varchar(255), filefolder varchar(255), filemime varchar(255), filename varchar(255), doubleValue float8, rpvalue int4, projectvalue int4, ouvalue int4, dovalue int4, primary key (id));
+create table jdyna_values (DTYPE varchar(31) not null, id int4 not null, sortValue varchar(255), dateValue timestamp, textValue text, linkdescription varchar(255), linkvalue varchar(255), fileextension varchar(255), filefolder varchar(255), filemime varchar(255), filename varchar(255), doubleValue float8, rpvalue int4, projectvalue int4, ouvalue int4, dovalue int4, booleanValue bool primary key (id));
 create table jdyna_widget_date (id int4 not null, maxYear int4, minYear int4, time bool not null, primary key (id));
 create table jdyna_widget_link (id int4 not null, labelHeaderLabel varchar(255), labelHeaderURL varchar(255), widgetSize int4 not null, primary key (id));
 create table jdyna_widget_number (id int4 not null, max float8, min float8, precisionDef int4 not null, widgetSize int4, primary key (id));
+create table jdyna_widget_boolean (id int4 not null, showAsType varchar(255), checked bool, hideWhenFalse bool, primary key (id));
+create table jdyna_widget_checkradio (id int4 not null, option4row integer, staticValues text, query varchar(255), primary key (id));
 create table jdyna_widget_text (id int4 not null, collisioni bool, widgetcol int4, measurementUnitCol varchar(255), measurementUnitRow varchar(255), widgetrow int4, htmlToolbar varchar(255), multilinea bool not null, regex varchar(255), displayFormat varchar(255), primary key (id));
 alter table cris_do add constraint FK3D8EBCB124A63AA7 foreign key (typo_id) references cris_do_tp;
 alter table cris_do_box add constraint FK29BBA93D1ED73E00 foreign key (typeDef_id) references cris_do_tp;
@@ -227,3 +229,19 @@ create sequence JDYNA_TAB_SEQ;
 create sequence JDYNA_TYPONESTEDOBJECT_SEQ;
 create sequence JDYNA_VALUES_SEQ;
 create sequence JDYNA_WIDGET_SEQ;
+   
+-- Table to mantain the potential match between item and rp --
+CREATE TABLE potentialmatches
+(
+   potentialmatches_id integer, 
+   item_id integer, 
+   rp character varying(20), 
+   pending integer,
+    PRIMARY KEY (potentialmatches_id)
+);
+CREATE SEQUENCE potentialmatches_seq;
+CREATE INDEX rp_idx
+   ON potentialmatches (rp ASC NULLS LAST);
+CREATE INDEX pending_idx
+   ON potentialmatches (pending);
+-- END potential matches --

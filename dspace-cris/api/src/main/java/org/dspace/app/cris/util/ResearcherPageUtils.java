@@ -607,5 +607,6 @@ return decorator.generateDisplayValue(alternativeName, rp);
         text.setOggetto(valueToSet);                 
         P prop = ro.createProprieta(pdef);
         prop.setValue(text);
+        prop.setVisibility(VisibilityConstants.PUBLIC);
 	}
 }
