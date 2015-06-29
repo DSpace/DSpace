@@ -470,5 +470,13 @@
     		<xsl:copy-of select="java:ar.edu.unlp.sedici.xmlui.xsl.XslExtensions.replace($textNode,'&lt;/?(i|sub|sup)&gt;','')"/>
     	</xsl:if>
     </xsl:template>
+    
+    <!-- Encode the Discovery filters to generate a valid URL for its use by Discovery Simple-Search -->
+    <xsl:template name="encodeDiscoveryFilter">
+    	<xsl:param name="filterValue"/>
+    	<xsl:if test="$filterValue">
+    		<xsl:value-of select="ex:replace(ex:encodeURL($filterValue),'\+','\\+')"/>
+    	</xsl:if>
+    </xsl:template>
 	
 </xsl:stylesheet>

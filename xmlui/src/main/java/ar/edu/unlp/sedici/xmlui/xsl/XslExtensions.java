@@ -1,6 +1,8 @@
 package ar.edu.unlp.sedici.xmlui.xsl;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -153,6 +155,17 @@ public class XslExtensions {
 	//replace for a regular expresion
 	public static String replace(String target, String regex, String replacement) {
 		return target.replaceAll(regex, replacement);
+	}
+	
+	//Encode an URL replacing some reserved chars
+	public static String encodeURL(String urlToEncode) throws UnsupportedEncodingException{
+		
+		try {
+			urlToEncode = URLEncoder.encode(urlToEncode, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return urlToEncode;
 	}
 	
 }

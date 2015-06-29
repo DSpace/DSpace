@@ -50,10 +50,18 @@
     	<xsl:value-of select="$linkFilter"/>
     	<xsl:text>?fq=</xsl:text>
     	<xsl:value-of select="$filter"/>
-    	<xsl:text>:</xsl:text>
-    	<xsl:value-of select="exts:replace(str:toLowerCase($normalizedValue),' ','\ ')"/>
+    	<xsl:text>%3A</xsl:text>
+    	<xsl:call-template name="encodeDiscoveryFilter">	
+    		<xsl:with-param name="filterValue">
+    			<xsl:value-of select="str:toLowerCase($normalizedValue)"/>
+    		</xsl:with-param>
+    	</xsl:call-template>
     	<xsl:text>\|\|\|</xsl:text>
-    	<xsl:value-of select="exts:replace($normalizedValue,' ','\ ')"/>
+    	<xsl:call-template name="encodeDiscoveryFilter">	
+    		<xsl:with-param name="filterValue">
+    			<xsl:value-of select="$normalizedValue"/>
+    		</xsl:with-param>
+    	</xsl:call-template>    			
     </xsl:template>
     
     <xsl:template name="showSocialBar">
