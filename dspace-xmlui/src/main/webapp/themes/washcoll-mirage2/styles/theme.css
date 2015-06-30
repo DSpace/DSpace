@@ -170,3 +170,22 @@ footer {
     background: url(../images/footer-bg-repeat.gif) repeat top left transparent;
     color: #fff;
 }
+
+#photobanner {
+    width: 100%;
+    max-width: 850px;
+    max-height: 219px;
+}
+
+#photobanner .transparent {
+    width: 100%;
+    position: relative;
+    top: -20px;
+    height: 20px;
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 0px 5px 0px 5px;
+}
+
+#photobanner a {
+    color: white;
+}
