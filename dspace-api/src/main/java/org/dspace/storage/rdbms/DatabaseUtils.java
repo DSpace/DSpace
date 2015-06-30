@@ -571,7 +571,25 @@ public class DatabaseUtils
 
         // We will now check prior versions in reverse chronological order, looking
         // for specific tables or columns that were newly created in each version.
+        if(tableExists(connection, "jdyna_widget_boolean"))
+        {
+        	
+        	//WARNING!!! DOUBLE CHECK BECAUSE JDYNA_WIDGET_BOOLEAN COMES ALSO WITH DSPACECRIS_4.3.1 (no flyway in version prior the 5_x_x)  
+        	        	
+            // Is this pre-DSpace 5.0 (with Metadata 4 All changes)? Look for the "resource_id" column in the "metadatavalue" table
+            if(tableColumnExists(connection, "metadatavalue", "resource_id"))
+            {
+                return "5.0.2014.09.26"; // This version matches the version in the SQL migration for this feature
+            }
 
+            // Is this pre-DSpace 5.0 (with Helpdesk plugin)? Look for the "request_message" column in the "requestitem" table
+            if(tableColumnExists(connection, "requestitem", "request_message"))
+            {
+                return "5.0.2014.08.08"; // This version matches the version in the SQL migration for this feature
+            }        	
+            return "5.3.0.0";
+        }
+        
         // Is this pre-DSpace 5.0 (with Metadata 4 All changes)? Look for the "resource_id" column in the "metadatavalue" table
         if(tableColumnExists(connection, "metadatavalue", "resource_id"))
         {
