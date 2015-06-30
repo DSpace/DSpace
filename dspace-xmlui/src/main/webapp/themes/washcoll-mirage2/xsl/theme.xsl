@@ -20,7 +20,6 @@
 
     <xsl:import href="../../mirage2/xsl/theme.xsl"/>
     <xsl:import href="core/page-structure.xsl"/>
-
     <xsl:output indent="yes"/>
 
 

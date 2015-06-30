@@ -122,6 +122,7 @@
                                 <xsl:call-template name="itemSummaryView-DIM-abstract"/>
                                 <xsl:call-template name="itemSummaryView-DIM-description"/>
                                 <xsl:call-template name="itemSummaryView-DIM-URI"/>
+                                <xsl:call-template name="itemSummaryView-DIM-tombstone"/>
                                 <xsl:call-template name="itemSummaryView-collections"/>
 
                                 <div class="row">
@@ -168,6 +169,7 @@
                             <xsl:call-template name="itemSummaryView-DIM-abstract"/>
                             <xsl:call-template name="itemSummaryView-DIM-description"/>
                             <xsl:call-template name="itemSummaryView-DIM-URI"/>
+                            <xsl:call-template name="itemSummaryView-DIM-tombstone"/>
                             <xsl:call-template name="itemSummaryView-collections"/>
                         </div>
                     </div>
@@ -404,6 +406,119 @@
             </div>
         </xsl:if>
     </xsl:template>
+
+    <!-- Used for SCSL -->
+    <xsl:template name="itemSummaryView-DIM-tombstone">
+        <!-- ts.plotid, ts.firstname, ts.middlename, ts.lastname, ts.birthday, ts.deathday, ts.cemetery, ts.text, *.notes -->
+        <xsl:if test="dim:field[@mdschema='ts' and @element='plotid' and descendant::text()]">
+            <div class="simple-item-view-date word-break item-page-field-wrapper table">
+                <h5>
+                    <i18n:text>xmlui.dri2xhtml.METS-1.0.item-plotid</i18n:text>
+                </h5>
+                <xsl:for-each select="dim:field[@mdschema='ts' and @element='plotid' and descendant::text()]">
+                    <xsl:copy-of select="./node()"/>
+                </xsl:for-each>
+            </div>
+        </xsl:if>
+
+        <xsl:if test="dim:field[@mdschema='ts' and @element='firstname' and descendant::text()]">
+            <div class="simple-item-view-date word-break item-page-field-wrapper table">
+                <h5>
+                    <i18n:text>xmlui.dri2xhtml.METS-1.0.item-firstname</i18n:text>
+                </h5>
+                <xsl:for-each select="dim:field[@mdschema='ts' and @element='firstname' and descendant::text()]">
+                    <xsl:copy-of select="./node()"/>
+                </xsl:for-each>
+            </div>
+        </xsl:if>
+
+        <xsl:if test="dim:field[@mdschema='ts' and @element='middlename' and descendant::text()]">
+            <div class="simple-item-view-date word-break item-page-field-wrapper table">
+                <h5>
+                    <i18n:text>xmlui.dri2xhtml.METS-1.0.item-middlename</i18n:text>
+                </h5>
+                <xsl:for-each select="dim:field[@mdschema='ts' and @element='middlename' and descendant::text()]">
+                    <xsl:copy-of select="./node()"/>
+                </xsl:for-each>
+            </div>
+        </xsl:if>
+
+        <xsl:if test="dim:field[@mdschema='ts' and @element='lastname' and descendant::text()]">
+            <div class="simple-item-view-date word-break item-page-field-wrapper table">
+                <h5>
+                    <i18n:text>xmlui.dri2xhtml.METS-1.0.item-lastname</i18n:text>
+                </h5>
+                <xsl:for-each select="dim:field[@mdschema='ts' and @element='lastname' and descendant::text()]">
+                    <xsl:copy-of select="./node()"/>
+                </xsl:for-each>
+            </div>
+        </xsl:if>
+
+        <xsl:if test="dim:field[@mdschema='ts' and @element='birthday' and descendant::text()]">
+            <div class="simple-item-view-date word-break item-page-field-wrapper table">
+                <h5>
+                    <i18n:text>xmlui.dri2xhtml.METS-1.0.item-birthday</i18n:text>
+                </h5>
+                <xsl:for-each select="dim:field[@mdschema='ts' and @element='birthday' and descendant::text()]">
+                    <xsl:copy-of select="./node()"/>
+                </xsl:for-each>
+            </div>
+        </xsl:if>
+
+        <xsl:if test="dim:field[@mdschema='ts' and @element='deathday' and descendant::text()]">
+            <div class="simple-item-view-date word-break item-page-field-wrapper table">
+                <h5>
+                    <i18n:text>xmlui.dri2xhtml.METS-1.0.item-deathday</i18n:text>
+                </h5>
+                <xsl:for-each select="dim:field[@mdschema='ts' and @element='deathday' and descendant::text()]">
+                    <xsl:copy-of select="./node()"/>
+                </xsl:for-each>
+            </div>
+        </xsl:if>
+
+        <xsl:if test="dim:field[@mdschema='ts' and @element='cemetery' and descendant::text()]">
+            <div class="simple-item-view-date word-break item-page-field-wrapper table">
+                <h5>
+                    <i18n:text>xmlui.dri2xhtml.METS-1.0.item-cemetery</i18n:text>
+                </h5>
+                <xsl:for-each select="dim:field[@mdschema='ts' and @element='cemetery' and descendant::text()]">
+                    <xsl:copy-of select="./node()"/>
+                </xsl:for-each>
+            </div>
+        </xsl:if>
+
+        <xsl:if test="dim:field[@mdschema='ts' and @element='text' and descendant::text()]">
+            <div class="simple-item-view-date word-break item-page-field-wrapper table">
+                <h5>
+                    <i18n:text>xmlui.dri2xhtml.METS-1.0.item-text</i18n:text>
+                </h5>
+                <xsl:for-each select="dim:field[@mdschema='ts' and @element='text' and descendant::text()]">
+                    <xsl:copy-of select="./node()"/>
+                </xsl:for-each>
+            </div>
+        </xsl:if>
+
+        <xsl:if test="dim:field[@element='notes' and not(@qualifier) and descendant::text()]">
+            <div class="simple-item-view-date word-break item-page-field-wrapper table">
+                <h5>
+                    Notes:
+                </h5>
+                <xsl:if test="count(dim:field[@element='notes' and not(@qualifier) and descendant::text()]) &gt; 1 and not(count(dim:field[@element='notes' and @qualifier='abstract' and descendant::text()]) &gt; 1)">
+                    <div class="spacer">&#160;</div>
+                </xsl:if>
+                <xsl:for-each select="dim:field[@element='notes' and not(@qualifier) and descendant::text()]">
+                    <xsl:copy-of select="./node()"/>
+                    <xsl:if test="count(following-sibling::dim:field[@element='notes' and not(@qualifier) and descendant::text()]) != 0">
+                        <div class="spacer">&#160;</div>
+                    </xsl:if>
+                </xsl:for-each>
+                <xsl:if test="count(dim:field[@element='notes' and not(@qualifier) and descendant::text()]) &gt; 1">
+                    <div class="spacer">&#160;</div>
+                </xsl:if>
+            </div>
+        </xsl:if>
+    </xsl:template>
+
 <xsl:template name="itemSummaryView-show-full">
         <div class="simple-item-view-show-full item-page-field-wrapper table">
             <h5>Metadata</h5> <!-- TODO i18n -->
@@ -488,6 +603,9 @@
                             <xsl:attribute name="href">
                                 <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
                             </xsl:attribute>
+                            <xsl:attribute name="title">
+                                <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:title"/>
+                            </xsl:attribute>
                             <xsl:if test="mets:FLocat[@LOCTYPE='URL']/@xlink:label and not(mets:FLocat[@LOCTYPE='URL']/@xlink:label = '')">
                                 <xsl:attribute name="title">
                                     <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label"/>
@@ -509,16 +627,52 @@
                             </xsl:call-template>
                             <xsl:choose>
                                 <xsl:when test="contains($label-1, 'label') and mets:FLocat[@LOCTYPE='URL']/@xlink:label and not(mets:FLocat[@LOCTYPE='URL']/@xlink:label = '')">
-                                    <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label"/>
+                                    <xsl:choose>
+                                        <xsl:when test="string-length(mets:FLocat[@LOCTYPE='URL']/@xlink:label) &gt; 30 ">
+                                            <!-- print out the truncated value followed by "..." -->
+                                            <xsl:value-of select="substring(mets:FLocat[@LOCTYPE='URL']/@xlink:label ,0, 30)"/>...
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <!-- otherwise print out the whole, un-truncated string -->
+                                            <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label"/>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
                                 </xsl:when>
                                 <xsl:when test="contains($label-1, 'title') and mets:FLocat[@LOCTYPE='URL']/@xlink:title and not(mets:FLocat[@LOCTYPE='URL']/@xlink:title = '')">
-                                    <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:title"/>
+                                    <xsl:choose>
+                                        <xsl:when test="string-length(mets:FLocat[@LOCTYPE='URL']/@xlink:title) &gt; 30 ">
+                                            <!-- print out the truncated value followed by "..." -->
+                                            <xsl:value-of select="substring(mets:FLocat[@LOCTYPE='URL']/@xlink:title ,0, 30)"/>...
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <!-- otherwise print out the whole, un-truncated string -->
+                                            <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:title"/>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
                                 </xsl:when>
                                 <xsl:when test="contains($label-2, 'label') and mets:FLocat[@LOCTYPE='URL']/@xlink:label and not(mets:FLocat[@LOCTYPE='URL']/@xlink:label = '')">
-                                    <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label"/>
+                                    <xsl:choose>
+                                        <xsl:when test="string-length(mets:FLocat[@LOCTYPE='URL']/@xlink:label) &gt; 30 ">
+                                            <!-- print out the truncated value followed by "..." -->
+                                            <xsl:value-of select="substring(mets:FLocat[@LOCTYPE='URL']/@xlink:label ,0, 30)"/>...
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <!-- otherwise print out the whole, un-truncated string -->
+                                            <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label"/>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
                                 </xsl:when>
                                 <xsl:when test="contains($label-2, 'title') and mets:FLocat[@LOCTYPE='URL']/@xlink:title and not(mets:FLocat[@LOCTYPE='URL']/@xlink:title = '')">
-                                    <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:title"/>
+                                    <xsl:choose>
+                                        <xsl:when test="string-length(mets:FLocat[@LOCTYPE='URL']/@xlink:title) &gt; 30 ">
+                                            <!-- print out the truncated value followed by "..." -->
+                                            <xsl:value-of select="substring(mets:FLocat[@LOCTYPE='URL']/@xlink:title ,0, 30)"/>...
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <!-- otherwise print out the whole, un-truncated string -->
+                                            <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:title"/>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
                                 </xsl:when>
                                 <xsl:otherwise>
                                     <xsl:call-template name="getFileTypeDesc">

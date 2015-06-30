@@ -342,7 +342,7 @@
                         </button>
 
                         <a href="{$context-path}/" class="navbar-brand">
-                            <img src="{$theme-path}/images/logo.png" />
+                            <img src="{$theme-path}/images/Black_sig_SM.png" />
                         </a>
 
 
