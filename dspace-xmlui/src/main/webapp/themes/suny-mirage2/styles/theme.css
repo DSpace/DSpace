@@ -23,7 +23,9 @@ header .navbar-default {
 }
 
 .trail-wrapper {
-    background-color: #838687;
+    background-color: #02a06d;
+    border-bottom: 1px solid #333;
+    border-top: 2px solid #333;
 }
 .trail-wrapper .breadcrumb > li + li:before {
     color: #eaf1f7;
@@ -163,5 +165,44 @@ a.thumbnail:hover, a.thumbnail:focus, a.thumbnail.active {
 }
 
 footer {
-    background-color: #27318B;
+    background-color: #444645;
+}
+
+/* new from Victoria */
+footer a:hover {
+    color: #02a06d;
+}
+
+header .navbar-default .navbar-toggle > .open > a, header .navbar-default .navbar-toggle > .open > a:hover, header .navbar-default .navbar-toggle > .open > a:focus, header .navbar-default .navbar-nav > .open > a, header .navbar-default .navbar-nav > .open > a:hover, header .navbar-default .navbar-nav > .open > a:focus {
+    background-color: #02a06d;
+    color: #eaf1f7;
+}
+header .navbar-default .navbar-toggle > li > a:hover, header .navbar-default .navbar-toggle > li > a:focus, header .navbar-default .navbar-nav > li > a:hover, header .navbar-default .navbar-nav > li > a:focus {
+    background-color: #02a06d;
+    color: #eaf1f7;
+}
+header .navbar-default .navbar-toggle > .active > a, header .navbar-default .navbar-toggle > .active > a:hover, header .navbar-default .navbar-toggle > .active > a:focus, header .navbar-default .navbar-nav > .active > a, header .navbar-default .navbar-nav > .active > a:hover, header .navbar-default .navbar-nav > .active > a:focus {
+    background-color: #02a06d;
+    color: #eaf1f7;
+}
+header .navbar-default .navbar-toggle > .open > a, header .navbar-default .navbar-toggle > .open > a:hover, header .navbar-default .navbar-toggle > .open > a:focus, header .navbar-default .navbar-nav > .open > a, header .navbar-default .navbar-nav > .open > a:hover, header .navbar-default .navbar-nav > .open > a:focus {
+    background-color: #02a06d;
+    color: #eaf1f7;
+}
+.label-success {
+    background-color: #02a06d;
+    color: #eaf1f7;
+}
+
+#ds-options .ds-option-set-head {
+    color: #02a06d;
+    margin-bottom: 4px;
+    margin-top: 4px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+}
+
+#ds-options h1, #ds-options h2, #ds-options h3, #ds-options h4, #ds-options h5, #ds-options h6 {
+    font-size: 15px;
+    margin: 16px;
 }
