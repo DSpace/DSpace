@@ -1083,11 +1083,6 @@ img.ds-authority-confidence.cf-blank {
     cursor: pointer;
     padding: 4px 0;
     margin: 6px 0px 6px -20px;;
-    /* 
-    width: 196px;
-    float: left; 
-    clear: left;
-    */
     width: 300px;
     color: #fff;
     font-weight: 900;
@@ -1100,7 +1095,7 @@ img.ds-authority-confidence.cf-blank {
     background-image: -moz-linear-gradient(top, #ee7755, #993300);
     background-image: -ms-linear-gradient(top, #ee7755, #993300);
     background-image: -o-linear-gradient(top, #ee7755, #993300);
-    background-image: linear-gradient(to bottom, #c03f09, #ee7755, #c03f09, #993300);
+    background-image: linear-gradient(to bottom, #c03009, #ee6955, #c03009, #993300);
     text-shadow: 1px 1px 1px #000000;
     -moz-box-shadow: 3px 3px 13px rgba(33, 33, 33, 1.0);
     -webkit-box-shadow: 3px 3px 13px rgba(33, 33, 33, 1.0);
