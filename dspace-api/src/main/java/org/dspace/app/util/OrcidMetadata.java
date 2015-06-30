@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
@@ -198,7 +198,7 @@ public class OrcidMetadata {
 			}
 		}
 
-		DCValue v = resolveMetadataField(config);
+		Metadatum v = resolveMetadataField(config);
 
 		if (null != v && (null != v.value) && !v.value.trim().equals("")) {
 			metadataMappings.put(fieldName, v.value);
@@ -216,9 +216,9 @@ public class OrcidMetadata {
 	 * @param configFilter
 	 * @return The first configured match of metadata field for the item.
 	 */
-	private DCValue resolveMetadataField(String configFilter) {
+	private Metadatum resolveMetadataField(String configFilter) {
 
-		ArrayList<DCValue> fields = resolveMetadata(configFilter, SINGLE);
+		ArrayList<Metadatum> fields = resolveMetadata(configFilter, SINGLE);
 		if (null != fields && fields.size() > 0) {
 			return fields.get(0);
 		}
@@ -233,9 +233,9 @@ public class OrcidMetadata {
 	 * @return Aggregate of all matching metadata fields configured in the first
 	 *         option field-set to return any number of filter matches.
 	 */
-	private ArrayList<DCValue> resolveMetadataFields(String configFilter) {
+	private ArrayList<Metadatum> resolveMetadataFields(String configFilter) {
 
-		ArrayList<DCValue> fields = resolveMetadata(configFilter, MULTI);
+		ArrayList<Metadatum> fields = resolveMetadata(configFilter, MULTI);
 		if (null != fields && fields.size() > 0) {
 			return fields;
 		}
@@ -243,13 +243,13 @@ public class OrcidMetadata {
 	}
 
 	/**
-	 * Aggregate an array of DCValues present on the current item that pass the
+	 * Aggregate an array of Metadatums present on the current item that pass the
 	 * configuration filter.
 	 * 
 	 * @param configValue
 	 * @return Array of configuration -> item-field matches
 	 */
-	private ArrayList<DCValue> resolveMetadata(String configFilter, int returnType) {
+	private ArrayList<Metadatum> resolveMetadata(String configFilter, int returnType) {
 
 		if (null == configFilter || configFilter.trim().equals("") || !configFilter.contains(".")) {
 			log.error("The configuration string [" + configFilter + "] is invalid.");
@@ -278,8 +278,8 @@ public class OrcidMetadata {
 
 			int optionMatches = 0;
 			String[] components;
-			DCValue[] values;
-			ArrayList<DCValue> resolvedFields = new ArrayList<DCValue>();
+			Metadatum[] values;
+			ArrayList<Metadatum> resolvedFields = new ArrayList<Metadatum>();
 
 			for (String field : optionFields) {
 
@@ -287,7 +287,7 @@ public class OrcidMetadata {
 				values = item.getMetadata(components[0], components[1], components[2], Item.ANY);
 
 				if (values.length > 0) {
-					for (DCValue v : values) {
+					for (Metadatum v : values) {
 
 						resolvedFields.add(v);
 
@@ -295,7 +295,7 @@ public class OrcidMetadata {
 							if (!resolvedFields.isEmpty()) {
 								if (log.isDebugEnabled()) {
 									log.debug("Resolved Field Value For This Item:");
-									for (DCValue r : resolvedFields) {
+									for (Metadatum r : resolvedFields) {
 										log.debug("{" + r.value + "}");
 									}
 								}
@@ -311,7 +311,7 @@ public class OrcidMetadata {
 			if (!resolvedFields.isEmpty()) {
 				if (log.isDebugEnabled()) {
 					log.debug("Resolved Field Values For This Item:");
-					for (DCValue v : resolvedFields) {
+					for (Metadatum v : resolvedFields) {
 						log.debug("{" + v.value + "}");
 					}
 				}
@@ -460,10 +460,10 @@ public class OrcidMetadata {
 				}
 			}
 
-			DCValue[] allMD = item.getMetadata(components[0], components[1], components[2], Item.ANY);
+			Metadatum[] allMD = item.getMetadata(components[0], components[1], components[2], Item.ANY);
 
 			ArrayList<String> expandedDC = new ArrayList<String>();
-			for (DCValue v : allMD) {
+			for (Metadatum v : allMD) {
 
 				// De-dup multiple occurrences of field names in item
 				if (!expandedDC.contains(buildFieldName(v))) {
@@ -483,13 +483,13 @@ public class OrcidMetadata {
 	}
 
 	/**
-	 * Construct metadata field name out of DCValue components
+	 * Construct metadata field name out of Metadatum components
 	 * 
 	 * @param v
-	 *            The DCValue to construct a name for.
+	 *            The Metadatum to construct a name for.
 	 * @return The complete metadata field name.
 	 */
-	private String buildFieldName(DCValue v) {
+	private String buildFieldName(Metadatum v) {
 
 		StringBuilder name = new StringBuilder();
 
@@ -686,14 +686,14 @@ public class OrcidMetadata {
 	private void addAggregateValues(String FIELD, String delim) {
 
 		String authorConfig = configuredFields.get(FIELD);
-		ArrayList<DCValue> fields = resolveMetadataFields(authorConfig);
+		ArrayList<Metadatum> fields = resolveMetadataFields(authorConfig);
 
 		if (null != fields && !fields.isEmpty()) {
 
 			StringBuilder fieldMetadata = new StringBuilder();
 			int count = 0;
 
-			for (DCValue field : fields) {
+			for (Metadatum field : fields) {
 				fieldMetadata.append(field.value);
 				if (count < fields.size() - 1) {
 					fieldMetadata.append(delim + " ");

@@ -9,7 +9,7 @@ package it.cineca.surplus.ir.crosswalks;
 
 import java.util.Map;
 
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 
@@ -28,7 +28,7 @@ public class VirtualFieldKeywords implements VirtualFieldDisseminator, VirtualFi
         if(ConfigurationManager.getProperty("crosswalk.virtualkeywords.value") != null) 
         	keywordsDC = ConfigurationManager.getProperty("crosswalk.virtualkeywords.value");
         
-        DCValue[] dcvs = item.getMetadata(keywordsDC);
+        Metadatum[] dcvs = item.getMetadataValueInDCFormat(keywordsDC);
         
 		String[] virtualFieldName = fieldName.split("\\.");
 

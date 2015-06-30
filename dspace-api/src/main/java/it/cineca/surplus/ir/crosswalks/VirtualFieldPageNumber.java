@@ -9,8 +9,8 @@ package it.cineca.surplus.ir.crosswalks;
 
 import java.util.Map;
 
-import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.content.Metadatum;
 
 /**
  * Implements virtual field processing for split pagenumber range information.
@@ -33,8 +33,8 @@ public class VirtualFieldPageNumber implements VirtualFieldDisseminator, Virtual
 			separator = "--";
 		}
 		// Get the citation from the item
-		DCValue[] dcvs = item.getMetadata("dc.relation.firstpage");
-		DCValue[] dcvs2 = item.getMetadata("dc.relation.lastpage");
+		Metadatum[] dcvs = item.getMetadataValueInDCFormat("dc.relation.firstpage");
+		Metadatum[] dcvs2 = item.getMetadataValueInDCFormat("dc.relation.lastpage");
 
 		if ((dcvs != null && dcvs.length > 0) && (dcvs2 != null && dcvs2.length > 0)) {
 			String value = dcvs[0].value + separator + dcvs2[0].value;

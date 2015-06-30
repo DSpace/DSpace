@@ -34,7 +34,7 @@ import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
@@ -186,11 +186,11 @@ public class ReferCrosswalk extends SelfNamedPlugin
                 }
                 else
                 {
-                    DCValue[] dcvs = item.getMetadata(line.mdField);
+                    Metadatum[] dcvs = item.getMetadataValueInDCFormat(line.mdField);
                     
                     if (dcvs != null)
                     {
-                        for (DCValue dc : dcvs)
+                        for (Metadatum dc : dcvs)
                         {
                             
                             String dcValue = null;

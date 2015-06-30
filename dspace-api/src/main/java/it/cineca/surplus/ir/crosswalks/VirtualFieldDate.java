@@ -9,7 +9,7 @@ package it.cineca.surplus.ir.crosswalks;
 
 import java.util.Map;
 
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 
 /**
@@ -33,7 +33,7 @@ public class VirtualFieldDate implements VirtualFieldDisseminator, VirtualFieldI
         if(qualifier.equals("date")){
         
 	        // Get the citation from the item
-	        DCValue[] dcvs = item.getMetadata("dc.date.issued");
+	        Metadatum[] dcvs = item.getMetadataValueInDCFormat("dc.date.issued");
 	        
 	        if (dcvs != null && dcvs.length > 0) 
 	        {   

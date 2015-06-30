@@ -11,7 +11,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 
 /**
@@ -27,11 +27,11 @@ public class VirtualFieldBibtexAuthors implements VirtualFieldDisseminator, Virt
 		String metadata = "dc.contributor.author";
 
 		// Get the citation from the item
-		DCValue[] dcvs = item.getMetadata(metadata);
+		Metadatum[] dcvs = item.getMetadataValueInDCFormat(metadata);
 
 		if (dcvs != null && dcvs.length > 0) {
 			StringBuffer sb = new StringBuffer();
-			for (DCValue a : dcvs) {
+			for (Metadatum a : dcvs) {
 				String[] split = a.value.split(", ");
 				int splitLength = split.length;
 				String str = (splitLength > 1) ? split[1] : "";
