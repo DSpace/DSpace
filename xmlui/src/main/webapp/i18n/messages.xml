@@ -1956,7 +1956,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-publisher">Publisher</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-subject">Subject</message>
 
-	<message key="xmlui.dri2xhtml.METS-1.0.item-files-head">Files in this item</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-files-head">Download Files</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-file">Files</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-name">Name</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-size">Size</message>
@@ -2354,6 +2354,7 @@
 <message key="xmlui.administrative.Navigation.context_in_edit_item_workflow">In edition by {0}</message>
 
 <message key="xmlui.bitstream.downloadName">document</message>
+<message key="xmlui.bitstream.download">Download file</message>
 
 <message key="xmlui.forms.remove">Remove</message>
 

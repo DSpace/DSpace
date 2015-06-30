@@ -599,6 +599,8 @@
 			</div>
 		</xsl:if>
 
+		<xsl:apply-templates select="/mets:METS" mode="generate-bitstream"/>
+
 		<!-- date.available row -->
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'date-accessioned'" />
@@ -611,9 +613,6 @@
 			<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='available']" />
 			<xsl:with-param name="type" select="'date'"/>
 		</xsl:call-template>
-
-
-		<xsl:apply-templates select="/mets:METS" mode="generate-bitstream"/>
 
 		<!-- peer_review row -->
 		<!-- fulltext row -->
@@ -1147,54 +1146,62 @@
 						<xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label" disable-output-escaping="yes"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<xsl:if test="mets:FLocat[@LOCTYPE='URL']/@xlink:label != ''">
-							<div>
-								<a class="image-link" target="_blank">
-									<xsl:attribute name="href">
-				                        <xsl:value-of select="$link"/>
-				                    </xsl:attribute>
-									<span><xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label" disable-output-escaping="yes"/></span>
-								</a>
-							</div>
-						</xsl:if>
+						<span>
+							<a class="image-link" target="_blank">
+								<xsl:attribute name="href">
+						        	<xsl:value-of select="$link"/>
+				         		</xsl:attribute>
+								<xsl:choose>
+									<xsl:when test="mets:FLocat[@LOCTYPE='URL']/@xlink:label != ''">
+										
+											<xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label" disable-output-escaping="yes"/>
+										
+									</xsl:when>
+									<xsl:otherwise>
+										<i18n:text>xmlui.bitstream.downloadName</i18n:text>
+									</xsl:otherwise>
+								</xsl:choose>
+								<br/>
+								<i18n:text>xmlui.bitstream.download</i18n:text>
+							</a>
+						</span>
 					</xsl:otherwise>
 				</xsl:choose>
-				<div>
-					<span>
-						<xsl:choose>
-							<xsl:when test="@SIZE &lt; 1024">
-								<xsl:value-of select="@SIZE"/>
-								<i18n:text>xmlui.dri2xhtml.METS-1.0.size-bytes</i18n:text>
-							</xsl:when>
-							<xsl:when test="@SIZE &lt; 1024 * 1024">
-								<xsl:value-of select="substring(string(@SIZE div 1024),1,5)"/>
-								<i18n:text>xmlui.dri2xhtml.METS-1.0.size-kilobytes</i18n:text>
-							</xsl:when>
-							<xsl:when test="@SIZE &lt; 1024 * 1024 * 1024">
-								<xsl:value-of select="substring(string(@SIZE div (1024 * 1024)),1,5)"/>
-								<i18n:text>xmlui.dri2xhtml.METS-1.0.size-megabytes</i18n:text>
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:value-of select="substring(string(@SIZE div (1024 * 1024 * 1024)),1,5)"/>
-								<i18n:text>xmlui.dri2xhtml.METS-1.0.size-gigabytes</i18n:text>
-							</xsl:otherwise>
-						</xsl:choose>
-					</span>
-					<xsl:text> - </xsl:text>
-	                <!-- Lookup File Type description in local messages.xml based on MIME Type.
-			         In the original DSpace, this would get resolved to an application via
-			         the Bitstream Registry, but we are constrained by the capabilities of METS
-			         and can't really pass that info through. -->
-                    <span>
-						<xsl:call-template name="getFileTypeDesc">
-							<xsl:with-param name="mimetype">
-								<xsl:value-of select="substring-before(@MIMETYPE,'/')"/>
-								<xsl:text>/</xsl:text>
-								<xsl:value-of select="substring-after(@MIMETYPE,'/')"/>
-							</xsl:with-param>
-						</xsl:call-template>
-					</span>
-				</div>
+				<xsl:text> (</xsl:text>
+				<span>
+					<xsl:choose>
+						<xsl:when test="@SIZE &lt; 1024">
+							<xsl:value-of select="@SIZE"/>
+							<i18n:text>xmlui.dri2xhtml.METS-1.0.size-bytes</i18n:text>
+						</xsl:when>
+						<xsl:when test="@SIZE &lt; 1024 * 1024">
+							<xsl:value-of select="substring(string(@SIZE div 1024),1,5)"/>
+							<i18n:text>xmlui.dri2xhtml.METS-1.0.size-kilobytes</i18n:text>
+						</xsl:when>
+						<xsl:when test="@SIZE &lt; 1024 * 1024 * 1024">
+							<xsl:value-of select="substring(string(@SIZE div (1024 * 1024)),1,5)"/>
+							<i18n:text>xmlui.dri2xhtml.METS-1.0.size-megabytes</i18n:text>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="substring(string(@SIZE div (1024 * 1024 * 1024)),1,5)"/>
+							<i18n:text>xmlui.dri2xhtml.METS-1.0.size-gigabytes</i18n:text>
+						</xsl:otherwise>
+					</xsl:choose>
+				</span>
+				<xsl:text>) - </xsl:text>
+                <!-- Lookup File Type description in local messages.xml based on MIME Type.
+		         In the original DSpace, this would get resolved to an application via
+		         the Bitstream Registry, but we are constrained by the capabilities of METS
+		         and can't really pass that info through. -->
+                   <span>
+					<xsl:call-template name="getFileTypeDesc">
+						<xsl:with-param name="mimetype">
+							<xsl:value-of select="substring-before(@MIMETYPE,'/')"/>
+							<xsl:text>/</xsl:text>
+							<xsl:value-of select="substring-after(@MIMETYPE,'/')"/>
+						</xsl:with-param>
+					</xsl:call-template>
+				</span>
 			</div>
 
 		</div>

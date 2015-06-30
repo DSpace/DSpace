@@ -3288,7 +3288,7 @@ margin-right:9px;
 	border: dashed 1px #CFCFCF;
 	padding: 10px 15px 10px 15px;
 	margin-bottom:15px;
-	margin-top: 75px;
+	margin-top: 20px;
 	overflow:hidden;
 }
 
@@ -3911,6 +3911,11 @@ table.dropdown-table.ui-accordion tr:hover td{
     padding-left: 2px;
     padding-right: 4px;
     font-size: 11px;
+}
+
+#item-URI-suggestion {
+    clear: both;
+    padding-top: 10px;
 }
 
 /*Social bar styles*/

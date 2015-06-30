@@ -1898,7 +1898,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-publisher">Editor</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-subject">Assunto</message>
 	
-	<message key="xmlui.dri2xhtml.METS-1.0.item-files-head">Arquivos neste Item</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-files-head">Baixar arquivos</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-file">Arquivos</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-size">Tamanho</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-format">Formato</message>
@@ -2227,6 +2227,7 @@
   
 	<message key="xmlui.general.perform">Realizar</message>
 	<message key="xmlui.bitstream.downloadName">documento</message>
+	<message key="xmlui.bitstream.download">Baixar arquivo</message>
 	
 	
 	<message key="xmlui.dri2xhtml.structural.footer.developers.address">Rua 49 e 115 - Prédio Ex Liceo. 1 Andar</message>
