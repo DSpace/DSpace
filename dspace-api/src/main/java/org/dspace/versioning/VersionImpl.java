@@ -67,8 +67,19 @@ public class VersionImpl implements Version {
     }
 
     public void setEperson(EPerson ePerson) {
-        this.eperson = ePerson;
-        myRow.setColumn(VersionDAO.EPERSON_ID, ePerson.getID());
+        
+        if (null != ePerson)
+        {
+            this.eperson = ePerson;
+            myRow.setColumn(VersionDAO.EPERSON_ID, ePerson.getID());
+        }
+        else
+        {
+            this.eperson = null;
+            String a = null;
+            myRow.setColumn(VersionDAO.EPERSON_ID, (String) null);
+        }
+            
     }
 
     public int getItemID() {

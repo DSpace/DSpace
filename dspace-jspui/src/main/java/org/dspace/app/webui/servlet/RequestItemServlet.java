@@ -155,9 +155,9 @@ public class RequestItemServlet extends DSpaceServlet
             title = titleDC[0].value;
         }
         else
-		{
-			title = I18nUtil.getMessage("jsp.general.untitled", context);
-		}
+        {
+                title = I18nUtil.getMessage("jsp.general.untitled", context);
+        }
           
         // User email from context
         String requesterEmail = request.getParameter("email");
@@ -198,19 +198,23 @@ public class RequestItemServlet extends DSpaceServlet
             try
             {
                 // All data is there, send the email
-				Email email = Email.getEmail(I18nUtil.getEmailFilename(
-						context.getCurrentLocale(), "request_item.author"));
+        		Email email = null;
 				
-				RequestItemAuthor author = new DSpace()
-						.getServiceManager()
-						.getServiceByName(
-								RequestItemAuthorExtractor.class.getName(),
-								RequestItemAuthorExtractor.class)
-						.getRequestItemAuthor(context, item);
-				
-				String authorEmail = author.getEmail();
-				String authorName = author.getFullName();
-				
+                RequestItemAuthor author = new DSpace()
+					.getServiceManager()
+					.getServiceByName(
+    					RequestItemAuthorExtractor.class.getName(),
+	    				RequestItemAuthorExtractor.class)
+					.getRequestItemAuthor(context, item);
+                
+                if(null != author && null != author.getEmail())
+                {
+                    email = Email.getEmail(I18nUtil.getEmailFilename(
+		    		context.getCurrentLocale(), "request_item.author"));
+                                    
+                    String authorEmail = author.getEmail();
+                    String authorName = author.getFullName();
+                    String emailRequest;
 				email.addRecipient(authorEmail);
 
 				email.addArgument(reqname);
@@ -225,15 +229,47 @@ public class RequestItemServlet extends DSpaceServlet
 				email.addArgument(RequestItemManager.getLinkTokenEmail(context,
 						bitstream_id, item.getID(), requesterEmail, reqname,
 						allfiles));
-				
+                                
+				if(null == authorName) authorName = "DSpace User";
 				email.addArgument(authorName); // corresponding author name
+                                
 				email.addArgument(authorEmail); // corresponding author email
 				email.addArgument(ConfigurationManager
 						.getProperty("dspace.name"));
 				email.addArgument(ConfigurationManager
 						.getProperty("mail.helpdesk"));
-				email.setReplyTo(requesterEmail);
-				email.send();
+                    email.setReplyTo(requesterEmail);
+                    email.send();
+                } else {
+                    email = Email.getEmail(I18nUtil.getEmailFilename(
+				context.getCurrentLocale(), "request_item.to_admin"));
+                    
+                    String emailRequest = ConfigurationManager
+							.getProperty("mail.helpdesk");
+				
+                    if (emailRequest == null)
+                    {
+                            emailRequest = ConfigurationManager.getProperty("mail.admin");
+                    }
+                    email.addRecipient(emailRequest);
+
+                    email.addArgument(reqname);
+                    email.addArgument(requesterEmail);
+                    email.addArgument(allfiles ? I18nUtil
+                                    .getMessage("itemRequest.all") : Bitstream.find(
+                                    context, Integer.parseInt(bitstream_id)).getName());
+                    email.addArgument(HandleManager.getCanonicalForm(item
+                                    .getHandle()));
+                    email.addArgument(title); // request item title
+                    email.addArgument(coment); // message
+                    email.addArgument(RequestItemManager.getLinkTokenEmail(context,
+                                    bitstream_id, item.getID(), requesterEmail, reqname,
+                                    allfiles));
+
+                    email.addArgument(ConfigurationManager.getProperty("dspace.name"));
+                    email.setReplyTo(requesterEmail);
+                    email.send();
+                 }
 
                 log.info(LogManager.getHeader(context,
                     "sent_email_requestItem",
@@ -333,20 +369,53 @@ public class RequestItemServlet extends DSpaceServlet
 			
 
 			EPerson submiter = item.getSubmitter();
-
+                        
+                        String name = null;
+                        String email = null;
+                        boolean submitterIsNull = false;
+                        
+                        if(null != submiter)
+                        {
+                            name = submiter.getFullName();
+                            email = submiter.getEmail();
+                        }
+                        else
+                        {
+                            name = ConfigurationManager
+                                    .getProperty("mail.helpdesk");
+                            
+                            if (null == name) 
+                            {
+                                name = ConfigurationManager
+                                        .getProperty("mail.admin");
+                                email = name;
+                            }
+                            submitterIsNull = true;
+                                   
+                        }
+                        
 			Object[] args = new String[]{
 						requestItem.getStringColumn("request_name"),
 						HandleManager.getCanonicalForm(item.getHandle()), // User
 						title, // request item title
-						submiter.getFullName(), // # submmiter name
-						submiter.getEmail() // # submmiter email
+						name, // # submmiter name or admin email
+						email // # submmiter email or admin email
 					};
 			
 			String subject = I18nUtil.getMessage("itemRequest.response.subject."
 					+ (yes ? "approve" : "reject"), context);
-			String message = MessageFormat.format(I18nUtil.getMessage("itemRequest.response.body."
+                        
+                        String message;
+                        
+			if(submitterIsNull){
+                            message = MessageFormat.format(I18nUtil.getMessage("itemRequest.admin.response.body."
 					+ (yes ? "approve" : "reject"), context), args);
-			
+                        }
+                        else{
+                            message = MessageFormat.format(I18nUtil.getMessage("itemRequest.response.body."
+					+ (yes ? "approve" : "reject"), context), args);
+                        }
+                        
 			// page
 			request.setAttribute("response", yes);
 			request.setAttribute("subject", subject);

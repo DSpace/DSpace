@@ -62,18 +62,22 @@ public class AssignOriginalSubmitterAction extends UserSelectionAction{
 
     @Override
     public void alertUsersOnActivation(Context c, XmlWorkflowItem wfi, RoleMembers roleMembers) throws IOException, SQLException {
-        try{
-            XmlWorkflowManager.alertUsersOnTaskActivation(c, wfi, "submit_task", Arrays.asList(wfi.getSubmitter()),
-                    //The arguments
-                    wfi.getItem().getName(),
-                    wfi.getCollection().getName(),
-                    wfi.getSubmitter().getFullName(),
-                    //TODO: message
-                    "New task available.",
-                    XmlWorkflowManager.getMyDSpaceLink()
-            );
-        } catch (MessagingException e) {
-            log.info(LogManager.getHeader(c, "error emailing user(s) for claimed task", "step: " + getParent().getStep().getId() + " workflowitem: " + wfi.getID()));
+        if (wfi.getSubmitter() != null)
+        {
+
+            try{
+                XmlWorkflowManager.alertUsersOnTaskActivation(c, wfi, "submit_task", Arrays.asList(wfi.getSubmitter()),
+                        //The arguments
+                        wfi.getItem().getName(),
+                        wfi.getCollection().getName(),
+                        wfi.getSubmitter().getFullName(),
+                        //TODO: message
+                        "New task available.",
+                        XmlWorkflowManager.getMyDSpaceLink()
+                );
+            } catch (MessagingException e) {
+                log.info(LogManager.getHeader(c, "error emailing user(s) for claimed task", "step: " + getParent().getStep().getId() + " workflowitem: " + wfi.getID()));
+            }
         }
     }
 

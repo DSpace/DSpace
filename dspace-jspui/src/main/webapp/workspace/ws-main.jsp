@@ -64,7 +64,13 @@
 	        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#mydspace\"%>"><fmt:message key="jsp.help"/></dspace:popup>
 
 		</h2>
-    <p><a href="mailto:<%= submitter.getEmail() %>"><%= Utils.addEntities(submitter.getFullName()) %></a></p>
+    <p>
+        <% if (submitter != null) {%>
+        <a href="mailto:<%= submitter.getEmail() %>"><%= Utils.addEntities(submitter.getFullName()) %></a>
+        <% } else { %>
+        <fmt:message key="org.dspace.workflow.WorkflowManager.deleted-submitter"/>
+        <% } %>
+    </p>
 
 	<p><fmt:message key="jsp.workspace.ws-main.submitmsg"/> 
     <%= workspaceItem.getCollection().getMetadata("name") %></p>

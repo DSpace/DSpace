@@ -8,6 +8,7 @@
 
 package org.dspace.eperson;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.util.Calendar;
@@ -33,7 +34,7 @@ public class Groomer
      * Command line tool for "grooming" the EPerson collection.
      */
     static public void main(String[] argv)
-            throws SQLException
+            throws SQLException, IOException
     {
         final String USAGE = "Groomer -verb [option...]";
 
@@ -90,7 +91,7 @@ public class Groomer
      * @param command a parsed command line.
      * @throws SQLException from callees.
      */
-    private static void aging(CommandLine command) throws SQLException
+    private static void aging(CommandLine command) throws SQLException, IOException
     {
             if (!command.hasOption('b'))
             {

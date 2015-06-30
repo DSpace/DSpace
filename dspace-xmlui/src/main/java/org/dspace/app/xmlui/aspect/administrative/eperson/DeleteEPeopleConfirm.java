@@ -13,14 +13,13 @@ import java.util.ArrayList;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Para;
-import org.dspace.app.xmlui.wing.element.Row;
-import org.dspace.app.xmlui.wing.element.Table;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.*;
+import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRowIterator;
 
 /**
  * Present the user with a list of not-yet-but-soon-to-be-deleted-epeople.
@@ -56,15 +55,37 @@ public class DeleteEPeopleConfirm extends AbstractDSpaceTransformer
 	
 	private static final Message T_head_email =
 		message("xmlui.administrative.eperson.DeleteEPeopleConfirm.head_email");
+
+    private static final Message T_head_constraints =
+        message("xmlui.administative.eperson.DeleteEPeopleConfirm.constraints");
 	
 	private static final Message T_submit_confirm =
 		message("xmlui.administrative.eperson.DeleteEPeopleConfirm.submit_confirm");
 	
 	private static final Message T_submit_cancel =
 		message("xmlui.general.cancel");
-	
-	
-	public void addPageMeta(PageMeta pageMeta) throws WingException
+
+
+    private static final Message T_delete_constraint =
+            message("xmlui.administrative.eperson.DeleteEPeopleConfirm.delete_constraint");
+
+    private static final Message T_constraint_last_conjunction =
+            message("xmlui.administrative.eperson.DeleteEPeopleConfirm.delete_constraint.last_conjunction");
+
+    private static final Message T_constraint_item =
+            message("xmlui.administrative.eperson.DeleteEPeopleConfirm.delete_constraint.item");
+
+    private static final Message T_constraint_workspaceitem =
+            message("xmlui.administrative.eperson.DeleteEPeopleConfirm.delete_constraint.workspaceitem");
+
+    private static final Message T_constraint_workflowitem =
+            message("xmlui.administrative.eperson.DeleteEPeopleConfirm.delete_constraint.workflowitem");
+
+    private static final Message T_constraint_unknown =
+            message("xmlui.administrative.eperson.DeleteEPeopleConfirm.delete_constraint.unknown");
+
+
+    public void addPageMeta(PageMeta pageMeta) throws WingException
     {
         pageMeta.addMetadata("title").addContent(T_title);
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
@@ -94,6 +115,7 @@ public class DeleteEPeopleConfirm extends AbstractDSpaceTransformer
         header.addCell().addContent(T_head_id);
         header.addCell().addContent(T_head_name);
         header.addCell().addContent(T_head_email);
+        header.addCell().addContent(T_head_constraints);
     	
     	for (EPerson eperson : epeople) 
     	{
@@ -101,6 +123,85 @@ public class DeleteEPeopleConfirm extends AbstractDSpaceTransformer
     		row.addCell().addContent(eperson.getID());
         	row.addCell().addContent(eperson.getFullName());
         	row.addCell().addContent(eperson.getEmail());
+            Cell constraints = row.addCell();
+
+            java.util.List<String> deleteConstraints = eperson.getDeleteConstraints();
+            if (deleteConstraints != null && deleteConstraints.size() > 0)
+            {
+                // differ between items and workspace items
+                if (deleteConstraints.contains("item"))
+                {
+                    ItemIterator itemIter = null;
+                    try
+                    {
+                        itemIter = Item.findBySubmitter(context, eperson, false);
+                        boolean foundWsi = false;
+                        boolean foundItem = false;
+
+                        while (itemIter.hasNext())
+                        {
+                            Item item = itemIter.next();
+                            WorkspaceItem wsi = WorkspaceItem.findByItem(context, item);
+                            if (null != wsi)
+                            {
+                                foundWsi = true;
+                            }
+                            else
+                            {
+                                foundItem = true;
+                            }
+                        }
+                        if (!foundItem)
+                        {
+                            deleteConstraints.remove("item");
+                        }
+                        if (foundWsi)
+                        {
+                            deleteConstraints.add("workspaceitem");
+                        }
+                    }
+                    finally
+                    {
+                        if (itemIter != null)
+                        {
+                            itemIter.close();
+                        }
+                    }
+                }
+                for (String constraint : deleteConstraints)
+                {
+                    int idx = deleteConstraints.indexOf(constraint);
+                    if (idx > 0 && idx == deleteConstraints.size() -1 )
+                    {
+                        constraints.addContent(", ");
+                        constraints.addContent(T_constraint_last_conjunction);
+                        constraints.addContent(" ");
+                    }
+                    else if (idx > 0)
+                    {
+                        constraints.addContent(", ");
+                    }
+
+                    if ("item".equals(constraint))
+                    {
+                        constraints.addContent(T_constraint_item);
+                    }
+                    else if ("workspaceitem".equals(constraint))
+                    {
+                        constraints.addContent(T_constraint_workspaceitem);
+                    }
+                    else if ("workflowitem".equals(constraint))
+                    {
+                        constraints.addContent(T_constraint_workflowitem);
+                    }
+                    else
+                    {
+                        constraints.addContent(T_constraint_unknown);
+                    }
+
+                }
+                constraints.addContent(".");
+            }
 	    }
     	Para buttons = deleted.addPara();
     	buttons.addButton("submit_confirm").setValue(T_submit_confirm);

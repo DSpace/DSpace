@@ -740,35 +740,40 @@ public class WorkflowManager
         {
             // Get submitter
             EPerson ep = i.getSubmitter();
-            // Get the Locale
-            Locale supportedLocale = I18nUtil.getEPersonLocale(ep);
-            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_archive"));
 
-            // Get the item handle to email to user
-            String handle = HandleManager.findHandle(c, i);
-
-            // Get title
-            Metadatum[] titles = i.getDC("title", null, Item.ANY);
-            String title = "";
-            try
+            // send the notification only if the person was not deleted in the
+            // meantime between submission and archiving.
+            if(null != ep)
             {
-                title = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
-            }
-            catch (MissingResourceException e)
-            {
-                title = "Untitled";
-            }
-            if (titles.length > 0)
-            {
-                title = titles[0].value;
-            }
+                // Get the Locale
+                Locale supportedLocale = I18nUtil.getEPersonLocale(ep);
+                Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_archive"));
 
-            email.addRecipient(ep.getEmail());
-            email.addArgument(title);
-            email.addArgument(coll.getMetadata("name"));
-            email.addArgument(HandleManager.getCanonicalForm(handle));
+                // Get the item handle to email to user
+                String handle = HandleManager.findHandle(c, i);
 
-            email.send();
+                // Get title
+                Metadatum[] titles = i.getDC("title", null, Item.ANY);
+                String title = "";
+                try
+                {
+                    title = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
+                }
+                catch (MissingResourceException e)
+                {
+                    title = "Untitled";
+                }
+                if (titles.length > 0)
+                {
+                    title = titles[0].value;
+                }
+                email.addRecipient(ep.getEmail());
+                email.addArgument(title);
+                email.addArgument(coll.getMetadata("name"));
+                email.addArgument(HandleManager.getCanonicalForm(handle));
+
+                email.send();
+            }
         }
         catch (MessagingException e)
         {
@@ -1100,10 +1105,15 @@ public class WorkflowManager
      * get the name of the eperson who started this workflow
      *
      * @param wi  the workflow item
+     * @return The submitter name or null if the submitter was deleted.
      */
     public static String getSubmitterName(WorkflowItem wi) throws SQLException
     {
         EPerson e = wi.getSubmitter();
+        if (e == null)
+        {
+            return null;
+        }
 
         return getEPersonName(e);
     }

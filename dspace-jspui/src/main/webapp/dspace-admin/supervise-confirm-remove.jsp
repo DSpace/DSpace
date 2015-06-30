@@ -75,7 +75,11 @@
 <div class="row">
 <label class="col-md-2"><fmt:message key="jsp.dspace-admin.supervise-confirm-remove.authorheader"/>:</label>
 <span>
+    <% if (submitter != null) { %>
 <a href="mailto:<%= submitter.getEmail() %>"><%= Utils.addEntities(submitter.getFullName()) %></a>
+    <% } else { %>
+<fmt:message key="org.dspace.workflow.WorkflowManager.deleted-submitter"/>
+    <%}%>
 </span>
 </div>
 <div class="row">

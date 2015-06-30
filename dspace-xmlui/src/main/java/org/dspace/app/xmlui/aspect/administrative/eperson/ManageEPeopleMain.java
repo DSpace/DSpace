@@ -185,7 +185,6 @@ public class ManageEPeopleMain extends AbstractDSpaceTransformer
             String fullName = person.getFullName();
             String email = person.getEmail();
             String url = baseURL+"&submit_edit&epersonID="+epersonID;
-            java.util.List<String> deleteConstraints = person.getDeleteConstraints();
 
             Row row;
             if (person.getID() == highlightID)
@@ -201,10 +200,6 @@ public class ManageEPeopleMain extends AbstractDSpaceTransformer
             selectEPerson = row.addCell().addCheckBox("select_eperson");
             selectEPerson.setLabel(epersonID);
             selectEPerson.addOption(epersonID);
-            if (deleteConstraints != null && deleteConstraints.size() > 0)
-            {
-                selectEPerson.setDisabled();
-            }
 
             row.addCellContent(epersonID);
             row.addCell().addXref(url, fullName);

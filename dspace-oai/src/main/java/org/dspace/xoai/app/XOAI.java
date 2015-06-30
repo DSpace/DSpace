@@ -244,7 +244,10 @@ public class XOAI {
         String handle = item.getHandle();
         doc.addField("item.handle", handle);
         doc.addField("item.lastmodified", item.getLastModified());
-        doc.addField("item.submitter", item.getSubmitter().getEmail());
+        if(null != item.getSubmitter())
+        {
+            doc.addField("item.submitter", item.getSubmitter().getEmail());
+        }
         doc.addField("item.deleted", item.isWithdrawn() ? "true" : "false");
         for (Collection col : item.getCollections())
             doc.addField("item.collections",

@@ -99,24 +99,6 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 	private static final Message T_submit_login_as =
 		message("xmlui.administrative.eperson.EditEPersonForm.submit_login_as");
 	
-	private static final Message T_delete_constraint =
-		message("xmlui.administrative.eperson.EditEPersonForm.delete_constraint");
-
-	private static final Message T_constraint_last_conjunction =
-		message("xmlui.administrative.eperson.EditEPersonForm.delete_constraint.last_conjunction");
-	
-	private static final Message T_constraint_item =
-		message("xmlui.administrative.eperson.EditEPersonForm.delete_constraint.item");
-	
-	private static final Message T_constraint_workflowitem =
-		message("xmlui.administrative.eperson.EditEPersonForm.delete_constraint.workflowitem");
-	
-	private static final Message T_constraint_tasklistitem =
-		message("xmlui.administrative.eperson.EditEPersonForm.delete_constraint.tasklistitem");
-
-	private static final Message T_constraint_unknown = 
-		message("xmlui.administrative.eperson.EditEPersonForm.delete_constraint.unknown");
-	
 	private static final Message T_member_head =
 		message("xmlui.administrative.eperson.EditEPersonForm.member_head");
 	
@@ -186,8 +168,7 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 		String phoneValue = eperson.getMetadata("phone");
 		boolean canLogInValue = eperson.canLogIn();
 		boolean certificatValue = eperson.getRequireCertificate();
-		java.util.List<String> deleteConstraints = eperson.getDeleteConstraints();
-		
+
 		if (request.getParameter("email_address") != null)
         {
             emailValue = request.getParameter("email_address");
@@ -314,52 +295,8 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
             {
                 submitLoginAs.setDisabled();
             }
-	       
-	        if (deleteConstraints != null && deleteConstraints.size() > 0)
-	        {
-	        	submitDelete.setDisabled();
-	        	
-	        	Highlight hi = identity.addItem("eperson-delete-constraint","eperson-delete-constraint").addHighlight("error");
-	        	hi.addContent(T_delete_constraint);
-	        	hi.addContent(" ");
-	        	
-	        	for (String constraint : deleteConstraints)
-        		{
-	        		int idx = deleteConstraints.indexOf(constraint);
-	        		if (idx > 0 && idx == deleteConstraints.size() -1 )
-	        		{
-	        			hi.addContent(", ");
-	        			hi.addContent(T_constraint_last_conjunction);
-	        			hi.addContent(" ");
-	        		}
-	        		else if (idx > 0)
-                    {
-                        hi.addContent(", ");
-                    }
-	        		
-	        		if ("item".equals(constraint))
-                    {
-                        hi.addContent(T_constraint_item);
-                    }
-	        		else if ("workflowitem".equals(constraint))
-                    {
-                        hi.addContent(T_constraint_workflowitem);
-                    }
-	        		else if ("tasklistitem".equals(constraint))
-                    {
-                        hi.addContent(T_constraint_tasklistitem);
-                    }
-	        		else
-                    {
-                        hi.addContent(T_constraint_unknown);
-                    }
-        			
-        		}
-	        	hi.addContent(".");
-	        }
         }
-        
-        
+
         Item buttons = identity.addItem();
         if (admin)
         {

@@ -212,6 +212,50 @@ public class WorkflowItem implements InProgressSubmission
 
         return wfItems.toArray(new WorkflowItem[wfItems.size()]);
     }
+    
+    /**
+     * Find all WorkflowItems owend by a specified EPerson.
+     * @param context
+     * @param owner
+     * @return
+     * @throws SQLException 
+     */
+    public static WorkflowItem[] findByOwner(Context context, EPerson owner)
+            throws SQLException
+    {
+        List<WorkflowItem> wfItems = new ArrayList<WorkflowItem>();
+
+        TableRowIterator tri = DatabaseManager.queryTable(context, "workflowitem",
+                "SELECT workflowitem.* FROM workflowitem WHERE owner = ? ",
+                    owner.getID());
+        try
+        {
+            while (tri.hasNext())
+            {
+                TableRow row = tri.next();
+
+                // Check the cache
+                WorkflowItem wi = (WorkflowItem) context.fromCache(
+                        WorkflowItem.class, row.getIntColumn("workflow_id"));
+
+                if (wi == null)
+                {
+                    wi = new WorkflowItem(context, row);
+                }
+
+                wfItems.add(wi);
+            }
+        }
+        finally
+        {
+            if (tri != null)
+            {
+                tri.close();
+            }
+        }
+
+        return wfItems.toArray(new WorkflowItem[wfItems.size()]);
+    }
 
     /**
      * Get all workflow items for a particular collection.

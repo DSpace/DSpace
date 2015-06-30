@@ -224,7 +224,10 @@ public class Submissions extends AbstractDSpaceTransformer
             for (WorkspaceItem workspaceItem : unfinishedItems) 
             {
                 Metadatum[] titles = workspaceItem.getItem().getDC("title", null, Item.ANY);
+                // this can never be null as workspaceItems gets deleted if the submitter is deleted.
                 EPerson submitterEPerson = workspaceItem.getItem().getSubmitter();
+                assert (submitterEPerson != null) : "Found a workspaceitem without submitter. " +
+                        "If a eperson was deleted all unsubmitted workspaceitems should have been delete too.";
 
                 int workspaceItemID = workspaceItem.getID();
                 String url = contextPath+"/submit?workspaceID="+workspaceItemID;
@@ -268,7 +271,11 @@ public class Submissions extends AbstractDSpaceTransformer
         {
 
             Metadatum[] titles = workspaceItem.getItem().getDC("title", null, Item.ANY);
+            // this can never be null as workspaceItems gets deleted if the submitter is deleted.
             EPerson submitterEPerson = workspaceItem.getItem().getSubmitter();
+            assert (submitterEPerson != null) : "Found a workspaceitem without submitter. " +
+                    "If a eperson was deleted all unsubmitted workspaceitems should have been delete too.";
+
 
             int workspaceItemID = workspaceItem.getID();
             String url = contextPath+"/submit?workspaceID="+workspaceItemID;

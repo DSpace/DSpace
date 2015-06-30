@@ -679,6 +679,44 @@ public class AuthorizeManager
 
         return policies;
     }
+    
+    public static List<ResourcePolicy> getPoliciesForEperson(Context c, EPerson e)
+            throws SQLException
+    {
+        TableRowIterator tri = DatabaseManager.queryTable(c, "resourcepolicy",
+                "SELECT * FROM resourcepolicy WHERE eperson_id = ? ",
+                e.getID());
+
+        List<ResourcePolicy> policies = new ArrayList<ResourcePolicy>();
+
+        try
+        {
+            while (tri.hasNext())
+            {
+                TableRow row = tri.next();
+
+                // first check the cache (FIXME: is this right?)
+                ResourcePolicy cachepolicy = (ResourcePolicy) c.fromCache(
+                        ResourcePolicy.class, row.getIntColumn("policy_id"));
+
+                if (cachepolicy != null)
+                {
+                    policies.add(cachepolicy);
+                } else
+                {
+                    policies.add(new ResourcePolicy(c, row));
+                }
+            }
+        } finally
+        {
+            if (tri != null)
+            {
+                tri.close();
+            }
+        }
+
+        return policies;
+    }
 
     /**
      * Return a list of policies for an object that match the action
