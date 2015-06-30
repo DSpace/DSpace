@@ -1076,7 +1076,8 @@ img.ds-authority-confidence.cf-blank {
     float: left;
     clear: left;
     text-indent: 0;
-    margin: 6px 0;
+    margin: 5px -1px;
+    border: 1px solid #cdc;
 }
 #dryadlab-module-list .download-button {
     display: block;
