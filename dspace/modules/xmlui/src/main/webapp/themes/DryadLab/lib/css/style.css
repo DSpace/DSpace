@@ -1062,6 +1062,8 @@ img.ds-authority-confidence.cf-blank {
 }
 #dryadlab-module-list li {
     list-style: none;
+    line-height: 1.3em;
+    margin: 4px 0;
 }
 #dryadlab-module-list li.ds-artifact-item {
     padding: 12px 18px !important;
@@ -1076,11 +1078,59 @@ img.ds-authority-confidence.cf-blank {
     text-indent: 0;
     margin: 6px 0;
 }
+#dryadlab-module-list .download-button {
+    display: block;
+    cursor: pointer;
+    padding: 4px 0;
+    margin: 6px 0px 6px -20px;;
+    /* 
+    width: 196px;
+    float: left; 
+    clear: left;
+    */
+    width: 300px;
+    color: #fff;
+    font-weight: 900;
+    text-align: center;
+    text-indent: 0;
+    background-color: #c03f09;
+    border-radius: 6px;
+    border: 1px solid #930;
+    background-image: -webkit-linear-gradient(top, #ee7755, #993300);
+    background-image: -moz-linear-gradient(top, #ee7755, #993300);
+    background-image: -ms-linear-gradient(top, #ee7755, #993300);
+    background-image: -o-linear-gradient(top, #ee7755, #993300);
+    background-image: linear-gradient(to bottom, #c03f09, #ee7755, #c03f09, #993300);
+    text-shadow: 1px 1px 1px #000000;
+    -moz-box-shadow: 3px 3px 13px rgba(33, 33, 33, 1.0);
+    -webkit-box-shadow: 3px 3px 13px rgba(33, 33, 33, 1.0);
+    box-shadow: 3px 3px 13px rgba(33, 33, 33, 1.0);
+}
+#dryadlab-module-list .discreet {
+    font-weight: normal;
+    font-size: 0.8em;
+}
+#dryadlab-module-list .full-meta-link {
+    margin: 0px 0px 0px -20px;
+    font-size: 0.8em;
+}
+#dryadlab-module-list .download-button:hover {
+    text-shadow: 2px 2px 3px #000000;
+    -moz-box-shadow: 2px 2px 9px rgba(0, 0, 0, 1.0);
+    -webkit-box-shadow: 2px 2px 9px rgba(0, 0, 0, 1.0);
+    box-shadow: 2px 2px 9px rgba(0, 0, 0, 1.0);
+    text-decoration: none;
+}
 #dryadlab-module-list span.title {
     display: block;
     font-weight: bold;
     font-size: 1.1em;
     margin: 0 0 5px 20px;
+}
+#dryadlab-module-list .indented-overview {
+    text-indent: 0;
+    line-height: 1.35em;
+    margin-left: 220px;
 }
 #dryadlab-module-list ul {
     margin-left: 240px;

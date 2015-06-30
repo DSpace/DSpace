@@ -30,6 +30,7 @@ jQuery(document).ready(function() {
     if (jQuery('#dryadlab-module-list').length > 0) {
         // we're on the DryadLab home page (/pages/dryadlab)
         // loadDryadLabModuleFeed();
+        activateModuleKeywords();
     }
 
 
@@ -825,4 +826,34 @@ function resetAllModuleFilters() {
     $gradeLevelFilter.val('CHOOSE ONE');
     $textFilter.val('');
     updatedFilteredModuleList();
+}
+function searchModulesForKeyword(kwLink) {
+    // clear module filter, then search for the text of this link
+    var $standardsFilter = $('#filter-by-standard');
+    var $gradeLevelFilter = $('#filter-by-grade-level');
+    var $textFilter = $('#filter-by-text');
+    $standardsFilter.val('CHOOSE ONE');
+    $gradeLevelFilter.val('CHOOSE ONE');
+    var newSearchKeyword = $(kwLink).text();
+    $textFilter.val( newSearchKeyword );
+    updatedFilteredModuleList();
+}
+function activateModuleKeywords() {
+    // Turn each bare (comma-separated) keyword into a links that will search for
+    // modules using its text.
+    var $keywordLists = $('#dryadlab-module-list .keyword-list');
+    $keywordLists.each(function(i, listHolder) {
+        var $listHolder = $(listHolder);
+        var kwHTML = $listHolder.html();
+        var newHTML = '';
+        $listHolder.empty();
+        var kwList = kwHTML.split(',');
+        $.each(kwList, function(i, kw) {
+           newHTML += '<a href="#" onclick="searchModulesForKeyword(this); return false;">'+ $.trim(kw) +'</a>';
+           if (i < (kwList.length - 1)) {
+               newHTML += ', ';
+           }
+        });
+        $listHolder.html(newHTML);
+    });
 }
