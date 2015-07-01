@@ -466,10 +466,11 @@ public class DiscoverUtility
     private static void setFacet(Context context, HttpServletRequest request,
             DSpaceObject scope, DiscoverQuery queryArgs,
             DiscoveryConfiguration discoveryConfiguration,
-            List<String> userFilters, List<DiscoverySearchFilterFacet> facets, int type)
+            List<String> userFilters, List<DiscoverySearchFilterFacet> currentFacets, int type)
     {
         DiscoveryConfiguration globalConfiguration = null;
         
+        List<DiscoverySearchFilterFacet> facets = new ArrayList<DiscoverySearchFilterFacet>();
         if (SearchUtils.isGlobalConfiguration(discoveryConfiguration) 
         		|| discoveryConfiguration.isGlobalConfigurationEnabled())
         {
@@ -478,8 +479,7 @@ public class DiscoverUtility
         	facet.setIndexFieldName(globalConfiguration.getCollapsingConfiguration().getGroupIndexFieldName());
         	facets.add(facet);
         }
-        
-        facets.addAll(discoveryConfiguration.getSidebarFacets());
+        facets.addAll(currentFacets);
         
         log.info("facets for scope, " + scope + ": "
                 + (facets != null ? facets.size() : null));
