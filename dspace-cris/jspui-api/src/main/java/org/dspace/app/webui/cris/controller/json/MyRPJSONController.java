@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.RestrictedField;
+import org.dspace.app.cris.model.VisibilityConstants;
 import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.RPProperty;
 import org.dspace.app.cris.model.jdyna.VisibilityTabConstant;
@@ -67,7 +68,17 @@ public class MyRPJSONController extends MultiActionController
             val.setOggetto(getCurrentUser(request).getFullName());
             RPProperty prop = rp.createProprieta(fN);
             prop.setValue(val);
-            prop.setVisibility(1);
+            prop.setVisibility(VisibilityConstants.PUBLIC);
+            
+            RPPropertiesDefinition email = applicationService
+                    .findPropertiesDefinitionByShortName(
+                            RPPropertiesDefinition.class, "email");
+            TextValue valE = new TextValue();
+            valE.setOggetto(getCurrentUser(request).getEmail());
+            RPProperty propE = rp.createProprieta(email);
+            propE.setValue(valE);
+            propE.setVisibility(VisibilityConstants.HIDE);
+            
             applicationService.saveOrUpdate(ResearcherPage.class, rp);
         }
         returnStatusJSON(response, rp);
