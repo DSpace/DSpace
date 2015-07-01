@@ -87,9 +87,16 @@
   						<div class="panel-body">
     						<div class="container">	
 									<c:forEach items="${propertiesDefinitionsInHolder[holder.shortName]}" var="tipologiaDaVisualizzare" varStatus="status">
-										<c:if test="${fn:startsWith(tipologiaDaVisualizzare.shortName, 'orcid-profile-pref-')}">										
-											<dyna:display tipologia="${tipologiaDaVisualizzare.real}" hideLabel="true" values="${anagraficaObject.anagrafica4view[tipologiaDaVisualizzare.shortName]}" />
-										</c:if>	
+										<c:if test="${fn:startsWith(tipologiaDaVisualizzare.shortName, 'orcid-profile-pref-')}">
+										<c:choose>
+											<c:when test="${!empty anagraficaObject.anagrafica4view[tipologiaDaVisualizzare.shortName]}">										
+												<dyna:display tipologia="${tipologiaDaVisualizzare.real}" hideLabel="true" values="${anagraficaObject.anagrafica4view[tipologiaDaVisualizzare.shortName]}" />
+											</c:when>
+											<c:otherwise>
+												<div class="label label-default">${tipologiaDaVisualizzare.label}</div>
+											</c:otherwise>
+										</c:choose>
+										</c:if>
 									</c:forEach>
 							</div>							
 						</div>   

@@ -547,7 +547,7 @@ public class StartupMetadataConfiguratorTool {
 
 				// orcid configuration for RP box
 				if (boxAuthorizationORCID != null) {
-					String[] rpProps = { "system-orcid-token-authenticate",
+					String[] rpProps = { "fullName", "email", "orcid", "system-orcid-token-authenticate",
 							"system-orcid-token-orcid-profile-read-limited", "system-orcid-token-orcid-bio-update",
 							"system-orcid-token-orcid-works-create", "system-orcid-token-orcid-works-update",
 							"system-orcid-token-funding-create", "system-orcid-token-funding-update" };
@@ -577,8 +577,8 @@ public class StartupMetadataConfiguratorTool {
 				}
 
 				if (boxSettingsORCID != null) {
-					String[] rpProps = { "orcid-publications-prefs", "orcid-projects-prefs", "orcid-profile-pref-email",
-							"orcid-profile-pref-fullName", "orcid-profile-pref-preferredName" };
+					String[] rpProps = { "fullName", "email", "orcid", "orcid-publications-prefs", "orcid-projects-prefs", "orcid-profile-pref-email",
+							"orcid-profile-pref-fullName", "orcid-profile-pref-preferredName", "orcid-profile-pref-other-emails", "orcid-profile-pref-iso-3166-country", "orcid-profile-pref-keywords", "orcid-profile-pref-biography", "orcid-profile-pref-credit-name" };
 
 					boxSettingsORCID.getMask().clear();
 					boxSettingsORCID.setMask(null);
