@@ -302,8 +302,9 @@
 				<property name="applicationDao" ref="applicationDao" />
 				<property name="listenerOnPostUpdate">
 					<list>
+						<ref local="CRISIDListener" />
 						<ref local="crisIndexerListener" />
-						<ref local="nestedIndexerListener" />		
+						<ref local="nestedIndexerListener" />								
 					</list>
 				</property>
 				<property name="listenerOnPostDelete">
@@ -1577,19 +1578,13 @@
 		<property name="eventListeners">
 			<map>
 				<entry key="save-update">					
-					<ref local="UUIDListener" />											
+					<ref local="UUIDListener" />	
 				</entry>
 				<entry key="pre-insert">		
-					<list>		
-						<ref local="RPListener" />	
-						<ref local="CRISIDListener" />
-					</list>
+					<ref local="RPListener" />	
 				</entry>				
 				<entry key="pre-update">					
-					<list>		
-						<ref local="RPListener" />											
-						<ref local="CRISIDListener" />
-					</list>					
+					<ref local="RPListener" />											
 				</entry>				
 				<entry key="post-load">
 					<list>
@@ -1599,7 +1594,7 @@
 				</entry>
 				<entry key="post-insert">
 					<list>
-						<ref local="rpResourcePolicyListener" />											
+						<ref local="rpResourcePolicyListener" />
 					</list>
 				</entry>
 				<entry key="post-update">	

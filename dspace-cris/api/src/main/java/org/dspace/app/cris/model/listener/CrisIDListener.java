@@ -13,75 +13,94 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.util.ResearcherPageUtils;
-import org.hibernate.event.spi.PreInsertEvent;
-import org.hibernate.event.spi.PreInsertEventListener;
-import org.hibernate.event.spi.PreUpdateEvent;
-import org.hibernate.event.spi.PreUpdateEventListener;
 
-public class CrisIDListener implements PreInsertEventListener, PreUpdateEventListener 
-{
-    
-    @Transient
-    private static Logger log = Logger.getLogger(CrisIDListener.class);
+import it.cilea.osd.common.listener.NativePostUpdateEventListener;
+import it.cilea.osd.common.model.Identifiable;
 
-    @Override
-    public boolean onPreInsert(PreInsertEvent event)
-    {
-        Object object = event.getEntity();
-        if (object instanceof ACrisObject)
-        {
-            int idx = 0;
-            boolean found = false;
-            for (String propName : event.getPersister().getPropertyNames())
-            {
-                if ("crisID".equals(propName))
-                {
-                    found = true;
-                    break;
-                }
-                idx++;
-            }
-            if (found)
-            {
-				String crisID = ResearcherPageUtils
-						.getPersistentIdentifier((ACrisObject) object);
-				event.getState()[idx] = crisID;
-				ACrisObject crisObj = (ACrisObject) object;
-				crisObj.setCrisID(crisID);
-            }
-        }
-        return false;
-    }
+public class CrisIDListener implements NativePostUpdateEventListener {
+
+	@Transient
+	private static Logger log = Logger.getLogger(CrisIDListener.class);
 
 	@Override
-	public boolean onPreUpdate(PreUpdateEvent event) {
-        Object object = event.getEntity();
-        if (object instanceof ACrisObject)
-        {
-            int idx = 0;
-            boolean found = false;
-            for (String propName : event.getPersister().getPropertyNames())
-            {
-                if ("crisID".equals(propName))
-                {
-                    found = true;
-                    break;
-                }
-                idx++;
-            }
-            if (found)
-            {
-				ACrisObject crisObj = (ACrisObject) object;
-				String crisID = crisObj.getCrisID();
-				if(StringUtils.isBlank(crisID)) {
-					crisID = ResearcherPageUtils
-							.getPersistentIdentifier((ACrisObject) object);
-					event.getState()[idx] = crisID;					
-				}
+	public <T extends Identifiable> void onPostUpdate(T entity) {
+		Object object = entity;
+		if (!(object instanceof ACrisObject)) {
+			// nothing to do
+			return;
+		}
+
+		ACrisObject crisObj = (ACrisObject) object;
+
+		try {
+			if (StringUtils.isBlank(crisObj.getCrisID())) {
+				String crisID = ResearcherPageUtils.getPersistentIdentifier(crisObj);
 				crisObj.setCrisID(crisID);
-            }
-        }
-        return false;
+			}
+		} catch (Exception e) {
+			log.error("Failed to build CRISID for entity " + crisObj.getTypeText() + "/" + crisObj.getCrisID());
+		}
 	}
+
+	//
+	// @Override
+	// public boolean onPreInsert(PreInsertEvent event)
+	// {
+	// Object object = event.getEntity();
+	// if (object instanceof ACrisObject)
+	// {
+	// int idx = 0;
+	// boolean found = false;
+	// for (String propName : event.getPersister().getPropertyNames())
+	// {
+	// if ("crisID".equals(propName))
+	// {
+	// found = true;
+	// break;
+	// }
+	// idx++;
+	// }
+	// if (found)
+	// {
+	// String crisID = ResearcherPageUtils
+	// .getPersistentIdentifier((ACrisObject) object);
+	// event.getState()[idx] = crisID;
+	// ACrisObject crisObj = (ACrisObject) object;
+	// crisObj.setCrisID(crisID);
+	// }
+	// }
+	// return false;
+	// }
+	//
+	// @Override
+	// public boolean onPreUpdate(PreUpdateEvent event) {
+	// Object object = event.getEntity();
+	// if (object instanceof ACrisObject)
+	// {
+	// int idx = 0;
+	// boolean found = false;
+	// for (String propName : event.getPersister().getPropertyNames())
+	// {
+	// if ("crisID".equals(propName))
+	// {
+	// found = true;
+	// break;
+	// }
+	// idx++;
+	// }
+	// if (found)
+	// {
+	// ACrisObject crisObj = (ACrisObject) object;
+	// String crisID = crisObj.getCrisID();
+	// if(StringUtils.isBlank(crisID)) {
+	// crisID = ResearcherPageUtils
+	// .getPersistentIdentifier((ACrisObject) object);
+	// event.getState()[idx] = crisID;
+	// }
+	// crisObj.setCrisID(crisID);
+	// }
+	// }
+	// return false;
+	// }
 
 }
