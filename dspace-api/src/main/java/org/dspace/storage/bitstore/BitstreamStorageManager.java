@@ -83,19 +83,18 @@ public class BitstreamStorageManager
 		list = initLegacyAssetstore(list);
 		
 		// if not already configured, configure asset stores
-		for (int j = 0; j < 100; j++)
+        int storeNumber = 0;
+        while(ConfigurationManager.getProperty("assetstore." + storeNumber) != null)
 		{
-			String assetCfg = ConfigurationManager.getProperty("assetstore." + j);
-            log.info("Looking for config for assetstore." + j);
-			if (assetCfg == null)
-			{
-				// no more stores configured - assumes sequential assignment
-				break;
-			}
-			if (!list.contains(j))
+			String assetCfg = ConfigurationManager.getProperty("assetstore." + storeNumber);
+            log.info("Looking for config for assetstore." + storeNumber);
+
+			if (!list.contains(storeNumber))
 			{
 				initStore(assetCfg, list);
 			}
+
+            storeNumber++;
 		}
 
         log.info("LIST: " + ArrayUtils.toString(list));
