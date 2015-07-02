@@ -96,4 +96,20 @@ public class DiscoveryUIUtils {
         }
         return new ArrayList<String>(result.values());
     }
+
+    /**
+     * Escape special characters in a user-entered query, based on the
+     * underlying search service.
+     * <P>
+     * WARNING: This likely shouldn't be used in field-based queries
+     * (e.g. search/browse by title) as it may unintentionally escape the
+     * special characters used to denote fields (e.g. ":").
+     *
+     * @param query
+     * @return query with special characters escaped
+     */
+    public static String escapeQueryChars(String query)
+    {
+        return searchService.escapeQueryChars(query);
+    }
 }
