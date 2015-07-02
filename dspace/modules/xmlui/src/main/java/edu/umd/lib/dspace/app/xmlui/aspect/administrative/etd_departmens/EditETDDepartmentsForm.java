@@ -1,18 +1,14 @@
-/**
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE and NOTICE files at the root of the source
- * tree and available online at
+/*
+ * Copyright (c) 2009 The University of Maryland. All Rights Reserved.
  *
- * http://www.dspace.org/license/
  */
-package org.dspace.app.xmlui.aspect.administrative.etd_departments;
+package edu.umd.lib.dspace.app.xmlui.aspect.administrative.etd_departmens;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.dspace.app.xmlui.aspect.administrative.FlowETDDepartmentUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -26,6 +22,8 @@ import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.content.Collection;
 import org.dspace.content.EtdUnit;
+
+import edu.umd.lib.dspace.app.xmlui.aspect.administrative.FlowETDDepartmentUtils;
 
 /**
  * Present the user with the etd_department's current state. The user may select

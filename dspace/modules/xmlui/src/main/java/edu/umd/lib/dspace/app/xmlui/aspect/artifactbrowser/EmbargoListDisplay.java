@@ -1,21 +1,15 @@
-/**
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE and NOTICE files at the root of the source
- * tree and available online at
+/*
+ * Copyright (c) 2009 The University of Maryland. All Rights Reserved.
  *
- * http://www.dspace.org/license/
  */
-package org.dspace.app.xmlui.aspect.artifactbrowser;
+package edu.umd.lib.dspace.app.xmlui.aspect.artifactbrowser;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.ArrayList;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
@@ -23,6 +17,7 @@ import org.apache.cocoon.environment.Request;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
 import org.dspace.app.statistics.StatisticsLoader;
+import org.dspace.app.xmlui.aspect.artifactbrowser.StatisticsViewer;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.UIException;
@@ -31,21 +26,19 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.app.xmlui.wing.element.PageMeta;
+import org.dspace.app.xmlui.wing.element.Row;
+import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.storage.rdbms.TableRow;
 import org.xml.sax.SAXException;
 
 /**
- * Transformer to display statistics data in XML UI.
- *
- * Unlike the JSP interface that pre-generates HTML and stores in the reports
- * folder, this class transforms the raw analysis data into a Wing
- * representation.
+ * Transformer to display Embargo List data in XML UI.
  */
-public class MonthlyStatistics extends AbstractDSpaceTransformer implements
+public class EmbargoListDisplay extends AbstractDSpaceTransformer implements
 CacheableProcessingComponent
 {
     private static final Logger log = Logger.getLogger(StatisticsViewer.class);
@@ -54,11 +47,7 @@ CacheableProcessingComponent
 
     private static final Message T_choose_report = message("xmlui.ArtifactBrowser.StatisticsViewer.choose_month");
 
-    private static final Message T_page_title = message("xmlui.ArtifactBrowser.StatisticsViewer.report.title");
-
-    private static final Message T_empty_title = message("xmlui.ArtifactBrowser.StatisticsViewer.no_report.title");
-
-    private static final Message T_empty_text = message("xmlui.ArtifactBrowser.StatisticsViewer.no_report.text");
+    private static final Message T_page_title = message("xmlui.ArtifactBrowser.EmbargoList.title");
 
     private static final SimpleDateFormat sdfDisplay = new SimpleDateFormat(
             "MM'/'yyyy");
@@ -71,14 +60,6 @@ CacheableProcessingComponent
     private String reportDate = null;
 
     private SourceValidity validity;
-
-    /**
-     * DRUM Customizations for Monthly Statistics
-     */
-    private static final String strDspace = ConfigurationManager
-            .getProperty("dspace.dir");
-
-    private static final File dir = new File(strDspace + "/stats/monthly");
 
     /**
      * Get the caching key for this report.
@@ -174,26 +155,27 @@ CacheableProcessingComponent
      * @throws IOException
      * @throws AuthorizeException
      */
-    @Override
-    public void addOptions(Options options) throws SAXException, WingException,
-    UIException, SQLException, IOException, AuthorizeException
-    {
-        Date[] monthlyDates = StatisticsLoader.getMonthlyAnalysisDates();
-
-        if (monthlyDates != null && monthlyDates.length > 0)
-        {
-            List statList = options.addList("statsreports");
-            statList.setHead(T_choose_report);
-
-            HashMap<String, String> params = new HashMap<String, String>();
-            for (Date date : monthlyDates)
-            {
-                params.put("date", sdfLink.format(date));
-                statList.addItemXref(super.generateURL("statistics", params),
-                        sdfDisplay.format(date));
-            }
-        }
-    }
+    // @Override
+    // public void addOptions(Options options) throws SAXException,
+    // WingException,
+    // UIException, SQLException, IOException, AuthorizeException
+    // {
+    // Date[] monthlyDates = StatisticsLoader.getMonthlyAnalysisDates();
+    //
+    // if (monthlyDates != null && monthlyDates.length > 0)
+    // {
+    // List statList = options.addList("statsreports");
+    // statList.setHead(T_choose_report);
+    //
+    // HashMap<String, String> params = new HashMap<String, String>();
+    // for (Date date : monthlyDates)
+    // {
+    // params.put("date", sdfLink.format(date));
+    // statList.addItemXref(super.generateURL("statistics", params),
+    // sdfDisplay.format(date));
+    // }
+    // }
+    // }
 
     /**
      * Add title, etc. metadata
@@ -244,51 +226,59 @@ CacheableProcessingComponent
         }
 
         // Create the renderer for the results
-        Division div = body.addDivision("statistics", "primary");
+        Division div = body.addDivision("embargo-list", "primary");
+
+        List download = div.addList("download");
+        download.addItemXref(contextPath + "/embargo-list/csv", "Download CSV");
 
         Request request = ObjectModelHelper.getRequest(objectModel);
 
-        List monthlyReports = div.addList("Monthly Reports");
-        // List the available stat files
-        File aFiles[] = dir.listFiles(new FilenameFilter()
-        {
-            @Override
-            public boolean accept(File dir, String name)
-            {
-                return (name.endsWith("_stats.txt") && !name
-                        .endsWith("current_stats.txt"));
-            }
-        });
+        ArrayList<TableRow> rowList = (ArrayList<TableRow>) EmbargoListHelper
+                .getEmbargoList(request);
+        Table table = div.addTable("list-of-embargoes", 22, 9);
 
-        if (aFiles.length == 0)
+        Row header = table.addRow(Row.ROLE_HEADER);
+
+        header.addCell().addContent("Handle");
+        header.addCell().addContent("Item ID");
+        header.addCell().addContent("Bitstream ID");
+        header.addCell().addContent("Title");
+        header.addCell().addContent("Advisor");
+        header.addCell().addContent("Author");
+        header.addCell().addContent("Department");
+        header.addCell().addContent("Type");
+        header.addCell().addContent("End Date");
+
+        for (TableRow row : rowList)
+            // for (int i = 0; i < 20; i++)
         {
-            div.setHead(T_empty_title);
-            div.addPara(T_empty_text);
+            // TableRow row = rowList.get(i);
+
+            Row tableRow = table.addRow();
+
+            tableRow.addCell().addXref(
+                    contextPath + "/handle/" + row.getStringColumn("handle"),
+                    row.getStringColumn("handle"));
+            tableRow.addCell().addContent(row.getIntColumn("item_id"));
+            tableRow.addCell().addContent(row.getIntColumn("bitstream_id"));
+            tableRow.addCell().addContent(row.getStringColumn("title"));
+            tableRow.addCell().addContent(row.getStringColumn("advisor"));
+            tableRow.addCell().addContent(row.getStringColumn("author"));
+            tableRow.addCell().addContent(row.getStringColumn("department"));
+            tableRow.addCell().addContent(row.getStringColumn("type"));
+            try
+            {
+                tableRow.addCell().addContent(
+                        row.getDateColumn("end_date").toString());
+            }
+            catch (NullPointerException e)
+            {
+                tableRow.addCell().addContent("null");
+            }
+
         }
+        // tri.close();
 
-        java.util.Arrays.sort(aFiles, new Comparator()
-        {
-            @Override
-            public int compare(Object o1, Object o2)
-            {
-                String s1 = ((File) o1).getName();
-                String s2 = ((File) o2).getName();
-                return s1.compareTo(s2) * -1;
-            }
-
-            @Override
-            public boolean equals(Object o)
-            {
-                return this.equals(o);
-            }
-        });
-
-        for (File f : aFiles)
-        {
-            monthlyReports.addItemXref(contextPath + "/monthly-statistics/"
-                    + (f.getName().substring(0, 6)),
-                    (f.getName().substring(0, 6)));
-        }
     }
 
     /**
@@ -316,4 +306,5 @@ CacheableProcessingComponent
         validity = null;
         super.recycle();
     }
+
 }

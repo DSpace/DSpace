@@ -1,15 +1,11 @@
-/**
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE and NOTICE files at the root of the source
- * tree and available online at
+/*
+ * Copyright (c) 2009 The University of Maryland. All Rights Reserved.
  *
- * http://www.dspace.org/license/
  */
-package org.dspace.app.xmlui.aspect.artifactbrowser;
+package edu.umd.lib.dspace.app.xmlui.aspect.artifactbrowser;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -31,7 +27,7 @@ import org.xml.sax.SAXException;
 import au.com.bytecode.opencsv.CSVWriter;
 
 /**
- * Provides the usage statistics in CSV form
+ * Provides the Embargo List data in CSV form
  *
  * @author Peter Dietz (pdietz84@gmail.com)
  */
@@ -39,9 +35,6 @@ public class EmbargoListDownloader extends AbstractReader implements Recyclable
 {
     protected static final Logger log = Logger
             .getLogger(EmbargoListDownloader.class);
-
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat(
-            "yyyy-MM-dd");
 
     protected Response response;
 
@@ -121,7 +114,7 @@ public class EmbargoListDownloader extends AbstractReader implements Recyclable
     @Override
     public void generate() throws IOException
     {
-        log.info("CSV Writer generator for stats");
+        log.info("CSV Writer generator for Embargo List");
         out.flush();
         out.close();
     }

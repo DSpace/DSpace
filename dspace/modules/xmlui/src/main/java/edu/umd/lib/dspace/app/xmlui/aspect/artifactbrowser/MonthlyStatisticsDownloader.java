@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.xmlui.aspect.artifactbrowser;
+package edu.umd.lib.dspace.app.xmlui.aspect.artifactbrowser;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -37,7 +37,7 @@ import org.xml.sax.SAXException;
  * @author Peter Dietz (pdietz84@gmail.com)
  */
 public class MonthlyStatisticsDownloader extends AbstractReader implements
-        Recyclable
+Recyclable
 {
     protected static final Logger log = Logger
             .getLogger(MonthlyStatisticsDownloader.class);
@@ -66,7 +66,7 @@ public class MonthlyStatisticsDownloader extends AbstractReader implements
             String src, Parameters parameters) throws IOException,
             SAXException, ProcessingException
     {
-        log.info("CSV Writer for embargo-list");
+        log.info("Statistics File Downloader");
         super.setup(sourceResolver, objectModel, src, parameters);
 
         this.response = ObjectModelHelper.getResponse(objectModel);

@@ -1,4 +1,8 @@
-package org.dspace.app.xmlui.aspect.artifactbrowser;
+/*
+ * Copyright (c) 2009 The University of Maryland. All Rights Reserved.
+ *
+ */
+package edu.umd.lib.dspace.app.xmlui.aspect.artifactbrowser;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -10,6 +14,12 @@ import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+
+/*
+ * A Class to organize the SQL request to query for the embargoed items.
+ *
+ * @author Vivian Thayil
+ */
 
 public class EmbargoListHelper
 {

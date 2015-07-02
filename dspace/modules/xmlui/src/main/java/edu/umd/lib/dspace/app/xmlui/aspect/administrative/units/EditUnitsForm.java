@@ -1,18 +1,15 @@
-/**
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE and NOTICE files at the root of the source
- * tree and available online at
+/*
+ * Copyright (c) 2009 The University of Maryland. All Rights Reserved.
  *
- * http://www.dspace.org/license/
  */
-package org.dspace.app.xmlui.aspect.administrative.units;
+
+package edu.umd.lib.dspace.app.xmlui.aspect.administrative.units;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.dspace.app.xmlui.aspect.administrative.FlowUnitsUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -26,6 +23,8 @@ import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.Unit;
+
+import edu.umd.lib.dspace.app.xmlui.aspect.administrative.FlowUnitsUtils;
 
 /**
  * Present the user with the unit's current state. The user may select to change
@@ -281,13 +280,13 @@ public class EditUnitsForm extends AbstractDSpaceTransformer
                 else
                 {
                     groupData.addCell().addHighlight("warn")
-                            .addContent(T_pending);
+                    .addContent(T_pending);
                 }
             }
             else
             {
                 groupData.addCell().addButton("submit_add_group_" + groupID)
-                        .setValue(T_submit_add);
+                .setValue(T_submit_add);
             }
         }
 
@@ -306,7 +305,7 @@ public class EditUnitsForm extends AbstractDSpaceTransformer
 
     private boolean addMemberList(Division div, Unit parent,
             List<Integer> memberGroupIDs, int highlightGroupID)
-                    throws WingException, SQLException
+            throws WingException, SQLException
     {
         // Flag to remember if there are any pending changes.
         boolean changes = false;
@@ -374,7 +373,7 @@ public class EditUnitsForm extends AbstractDSpaceTransformer
      */
     private void addMemberRow(Table table, Group group, boolean highlight,
             boolean pendingAddition, boolean pendingRemoval)
-            throws WingException, SQLException
+                    throws WingException, SQLException
     {
         String fullName = group.getName();
 
@@ -398,8 +397,8 @@ public class EditUnitsForm extends AbstractDSpaceTransformer
         else
         {
             groupData.addCell()
-                    .addButton("submit_remove_group_" + group.getID())
-                    .setValue(T_submit_remove);
+            .addButton("submit_remove_group_" + group.getID())
+            .setValue(T_submit_remove);
         }
     }
 }

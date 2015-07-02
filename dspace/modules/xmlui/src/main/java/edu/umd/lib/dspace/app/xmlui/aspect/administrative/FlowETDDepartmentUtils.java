@@ -1,11 +1,9 @@
-/**
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE and NOTICE files at the root of the source
- * tree and available online at
+/*
+ * Copyright (c) 2009 The University of Maryland. All Rights Reserved.
  *
- * http://www.dspace.org/license/
  */
-package org.dspace.app.xmlui.aspect.administrative;
+
+package edu.umd.lib.dspace.app.xmlui.aspect.administrative;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -15,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.dspace.app.xmlui.aspect.administrative.FlowResult;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
@@ -24,8 +23,8 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 
 /**
- * Utility methods to processes actions on Groups. These methods are used
- * exclusively from the administrative flow scripts.
+ * Utility methods to processes actions on ETDDepartments. These methods are
+ * used exclusively from the administrative flow scripts.
  *
  * @author Scott Phillips
  */
