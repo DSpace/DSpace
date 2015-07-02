@@ -24,6 +24,8 @@ header .navbar-default {
 
 .trail-wrapper {
     background-color: #02a06d;
+    border-bottom: 1px solid #333;
+    border-top: 2px solid #333;
 }
 .trail-wrapper .breadcrumb > li + li:before {
     color: #eaf1f7;
