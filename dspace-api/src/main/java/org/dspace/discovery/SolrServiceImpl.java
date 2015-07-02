@@ -2320,4 +2320,13 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 			throw new SearchServiceException(e.getMessage(), e);
 		}
 	}
+
+    @Override
+    public String escapeQueryChars(String query) {
+        // Use Solr's built in query escape tool
+        // WARNING: You should only escape characters from user entered queries,
+        // otherwise you may accidentally BREAK field-based queries (which often
+        // rely on special characters to separate the field from the query value)
+        return ClientUtils.escapeQueryChars(query);
+    }
 }
