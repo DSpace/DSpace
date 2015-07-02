@@ -499,15 +499,25 @@
 			});
 		</script>
 		
-		<xsl:if test="dri:body/dri:div[@n='community-metadata-edit' or @n='collection-metadata-edit']">
-			 <script type="text/javascript">                	 
-			         CKEDITOR.replace( 'introductory_text', {
-						toolbar : [
-							 ['Bold', 'Italic', 'Underline'], ['Link', 'Unlink' ],[ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent'],['Source']
-						] 
-					});
-			  </script>
-		</xsl:if>
+		 <script type="text/javascript">
+		        $(document).ready(function(){
+		        	if($('textarea[name=introductory_text]').length){
+		        		var path= "<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath']"/>";
+		        		path=path.concat("/themes/cicba/js/eqneditor/");
+				        CKEDITOR.plugins.addExternal( 'eqneditor', path, 'plugin.js' );
+						CKEDITOR.config.extraPlugins = 'eqneditor';
+						CKEDITOR.config.entities=false;
+						CKEDITOR.config.language= "<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page' and @qualifier='currentLocale']"/>";
+						CKEDITOR.replace( 'introductory_text', {
+							toolbar : [
+								 ['Bold', 'Italic', 'Underline', 'SpecialChar'], ['Link', 'Unlink' ],[ 'NumberedList', 'BulletedList', '-',
+								 'Outdent', 'Indent', 'EqnEditor'], ['Source']
+							] 
+						});
+					};
+				});
+		  </script>
+		
 		
 	</xsl:template>
 
