@@ -3918,6 +3918,17 @@ table.dropdown-table.ui-accordion tr:hover td{
     padding-top: 10px;
 }
 
+
+.intro-text a {
+    background-color: #b9cdff;
+}
+
+.intro-text .localizacion_electronica, .intro-text .localizacion_fisica {
+    background-color: #b9cdff;
+    margin-top: 10px;
+    padding-right: 5px;
+}
+
 /*Social bar styles*/
  .share-bar>div {
        display:inline-block;
