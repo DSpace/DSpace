@@ -49,29 +49,33 @@ public class DSpaceAuthorizationFilter extends DSpaceFilter
     @Override
     public boolean isShown(DSpaceItem item)
     {
+        boolean pub = false;
         try
         {
+            // For DSpace, if an Item is withdrawn, "isDeleted()" will be true.
+            // In this scenario, we want a withdrawn item to be *shown* so that
+            // we can properly respond with a "deleted" status via OAI-PMH.
+            // Don't worry, this does NOT make the metadata public for withdrawn items,
+            // it merely provides an item "tombstone" via OAI-PMH.
+            if (item.isDeleted())
+                return true;
+
+            // If Handle or Item are not found, return false
             String handle = DSpaceItem.parseHandle(item.getIdentifier());
-            if (handle == null) return false;
+            if (handle == null)
+                return false;
             Item dspaceItem = (Item) HandleManager.resolveToObject(context, handle);
-            AuthorizeManager.authorizeAction(context, dspaceItem, Constants.READ);
-            for (Bundle b : dspaceItem.getBundles())
-                AuthorizeManager.authorizeAction(context, b, Constants.READ);
-            return true;
-        }
-        catch (AuthorizeException ex)
-        {
-            log.error(ex.getMessage(), ex);
+            if (dspaceItem == null)
+                return false;
+
+            // Check if READ access allowed on Item
+            pub = AuthorizeManager.authorizeActionBoolean(context, dspaceItem, Constants.READ);
         }
         catch (SQLException ex)
         {
             log.error(ex.getMessage(), ex);
         }
-        catch (Exception ex)
-        {
-            log.error(ex.getMessage(), ex);
-        }
-        return false;
+        return pub;
     }
 
     @Override
