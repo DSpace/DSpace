@@ -3920,13 +3920,20 @@ table.dropdown-table.ui-accordion tr:hover td{
 
 
 .intro-text a {
-    background-color: #b9cdff;
+    background-position: left 3px;
+    background-repeat: no-repeat;
+    color: #607890;
+    font-weight: bold;
+    height: 25px;
+    text-decoration: underline;
 }
 
-.intro-text .localizacion_electronica, .intro-text .localizacion_fisica {
-    background-color: #b9cdff;
-    margin-top: 10px;
-    padding-right: 5px;
+.intro-text .localizacion_electronica {
+    background-image: url("../../images/acceso_web.png");
+}
+
+.intro-text .localizacion_electronica a {
+    padding-left: 15px !important; 
 }
 
 .file-wrapper .file-embargo-message {
