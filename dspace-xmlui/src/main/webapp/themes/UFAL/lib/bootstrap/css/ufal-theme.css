@@ -1370,3 +1370,20 @@ div.modal-scrollbar {
     line-height: 1.4em;
     color: #525558;	
 }
+
+#cz_cuni_mff_ufal_dspace_app_xmlui_aspect_statistics_PiwikStatisticsTransformer_div_stats:before{
+  content: "beta";
+  position: absolute;
+  width: 60px;
+  height: 20px;
+  background: #d9534f;
+  top: 15px;
+  left: 15px;
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: bold;
+  color: #fff;
+  -webkit-border-radius: 8px 0 8px 0;
+  -moz-border-radius: 8px 0 8px 0;
+  border-radius: 8px 0 8px 0;
+}

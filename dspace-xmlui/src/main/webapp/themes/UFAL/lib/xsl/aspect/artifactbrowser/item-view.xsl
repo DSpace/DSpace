@@ -1046,24 +1046,6 @@
                                 </a>
                                 <ul class="dropdown-menu" role="menu" aria-labelledby="export-dropdown">
                                         <li role="presentation">
-						<a role="menuitem" tabindex="-1" target="_blank">
-							<xsl:attribute name="href">
-							<xsl:value-of select="$reportURL" />
-                		                        <xsl:text disable-output-escaping="yes">&amp;format=CSV</xsl:text>
-							</xsl:attribute>
-							CSV
-						</a>
-					</li>
-                                        <li role="presentation">
-                                                <a role="menuitem" tabindex="-1" target="_blank">
-                                                        <xsl:attribute name="href">
-                                                        <xsl:value-of select="$reportURL" />
-                                                        <xsl:text disable-output-escaping="yes">&amp;format=TSV</xsl:text>
-                                                        </xsl:attribute>
-                                                        TSV (Excel)
-                                                </a>
-                                        </li>
-                                        <li role="presentation">
                                                 <a role="menuitem" tabindex="-1" target="_blank">
                                                         <xsl:attribute name="href">
                                                         <xsl:value-of select="$reportURL" />
