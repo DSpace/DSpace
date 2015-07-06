@@ -1076,8 +1076,6 @@
 			<div class="thumbnail-wrapper">
 				<xsl:choose>
              	<xsl:when test="$context/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='embargo' and @qualifier='liftDate']">
-	              <i18n:text>sedici.comunidades.tesis.embargo</i18n:text>
-						<br />
 						<span>
 							<xsl:choose>
 	                        <xsl:when test="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/mets:file[@GROUPID=current()/@GROUPID]">
@@ -1203,7 +1201,11 @@
 					</xsl:call-template>
 				</span>
 			</div>
-
+			<xsl:if test="$context/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='embargo' and @qualifier='liftDate']">
+	              <span class="file-embargo-message">
+	              	<i18n:text>sedici.comunidades.tesis.embargo</i18n:text>
+	              </span>
+	        </xsl:if>
 		</div>
 
 

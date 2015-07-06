@@ -3929,6 +3929,12 @@ table.dropdown-table.ui-accordion tr:hover td{
     padding-right: 5px;
 }
 
+.file-wrapper .file-embargo-message {
+  float:left; 
+  clear:both;
+  font-style:italic;
+}
+
 /*Social bar styles*/
  .share-bar>div {
        display:inline-block;
