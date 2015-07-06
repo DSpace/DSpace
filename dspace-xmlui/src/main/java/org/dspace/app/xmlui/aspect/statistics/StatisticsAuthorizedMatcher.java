@@ -17,6 +17,7 @@ import org.dspace.core.Constants;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.content.DSpaceObject;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.authorize.AuthorizeManager;
 
@@ -76,7 +77,7 @@ public class StatisticsAuthorizedMatcher extends AbstractLogEnabled implements M
             if(authorized
             		&& specialGroup!=null 
             		&& ConfigurationManager.getBooleanProperty("solr-statistics", "authorization.special")
-            		&& specialGroup.isMember(context.getCurrentUser())) {
+            		&& isMemberOfGroup(specialGroup, context.getCurrentUser())) {
 	            	authorized = true;
             } else
             //If we are authorized check for any other authorization actions present
@@ -115,5 +116,20 @@ public class StatisticsAuthorizedMatcher extends AbstractLogEnabled implements M
         {
             throw new PatternException("Unable to obtain DSpace Context", sqle);
         }
+    }
+    
+    public boolean isMemberOfGroup(Group g, EPerson e) {
+    	if(g.isMember(e)) return true;
+    	for(Group sg : g.getMemberGroups()) {
+    		// this is a hack .. default Authenticated group needs to be 
+    		if(sg.getName().equalsIgnoreCase("Authenticated")) {
+    			return true;
+    		}
+    		else
+    		if(sg.isMember(e)) {
+    			return true;
+    		}
+    	}
+    	return false;
     }
 }

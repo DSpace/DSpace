@@ -22,6 +22,7 @@ jQuery(document).ready(function (){
 						var nb_views = [];
 						var nb_downloads = [];
 						var dates = Object.keys(data);
+						dates.sort(dateSorter);
 						var total_views = 0;
 						var total_unique_views = 0;
 						var total_downloads = 0;
@@ -111,6 +112,16 @@ jQuery(document).ready(function (){
 			);
 
 	});
+	
+	var dateRE = /^(\d{2})[\/\- ](\d{2})[\/\- ](\d{4})/;
+
+    function dateSorter(a, b) {
+        a = a.replace(dateRE, "$3$2$1");
+        b = b.replace(dateRE, "$3$2$1");
+        if (a > b) return 1;
+        if (a < b) return -1;
+        return 0;
+    };
 
 	jQuery(".jqplot-to-picture").click(function() {
 		var a = jQuery(this);

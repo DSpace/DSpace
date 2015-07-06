@@ -413,3 +413,5 @@ migrate_databases:
 	./migrate_db.sh $(DATABASE_NAME)
 	./migrate_db.sh $(UTILITIES_DATABASE_NAME)
 
+generate_piwik_reports:
+	$(DSPACE_BIN) piwik-report-generator

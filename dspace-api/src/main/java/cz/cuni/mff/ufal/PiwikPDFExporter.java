@@ -3,6 +3,7 @@ package cz.cuni.mff.ufal;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
+import java.awt.BasicStroke;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 import java.io.BufferedReader;
@@ -55,6 +56,7 @@ import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.ui.RectangleEdge;
 import org.jfree.ui.RectangleInsets;
+import org.jfree.util.ShapeUtilities;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -81,11 +83,15 @@ import cz.cuni.mff.ufal.lindat.utilities.interfaces.IFunctionalities;
 public class PiwikPDFExporter  {
 
     /** Piwik configurations */
+    private static String PIWIK_REPORTS_OUTPUT_PATH;
+
+    /** Piwik configurations */
     private static String PIWIK_API_URL;
     private static String PIWIK_AUTH_TOKEN;
     private static String PIWIK_SITE_ID;
-    private static String PIWIK_REPORTS_OUTPUT_PATH;
+    private static String PIWIK_DOWNLOAD_SITE_ID;
 
+    private static String LINDAT_LOGO;
     
 	private static SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	private static SimpleDateFormat outputDateFormat = new SimpleDateFormat("MMM-dd");
@@ -102,10 +108,12 @@ public class PiwikPDFExporter  {
 		
 	public static void initialize() {
         DSpaceApi.load_dspace();        
+        PIWIK_REPORTS_OUTPUT_PATH = ConfigurationManager.getProperty("lr", "lr.statistics.report.path");
         PIWIK_API_URL = ConfigurationManager.getProperty("lr", "lr.statistics.api.url");
         PIWIK_AUTH_TOKEN = ConfigurationManager.getProperty("lr", "lr.statistics.api.auth.token");
         PIWIK_SITE_ID = ConfigurationManager.getProperty("lr", "lr.statistics.api.site_id");
-        PIWIK_REPORTS_OUTPUT_PATH = ConfigurationManager.getProperty("lr", "lr.statistics.report.path");
+        PIWIK_DOWNLOAD_SITE_ID = ConfigurationManager.getProperty("lr", "lr.tracker.bitstream.site_id");
+        LINDAT_LOGO = ConfigurationManager.getProperty("lr", "lr.lindat.logo.mono");
 	}
 	
 	public static void generateReports() throws SQLException {
@@ -116,6 +124,11 @@ public class PiwikPDFExporter  {
 		functionalityManager.openSession();			
 		List<PiwikReport> piwikReports = functionalityManager.getAllPiwikReports();
 		functionalityManager.closeSession();
+		
+		File outputDir = new File(PIWIK_REPORTS_OUTPUT_PATH);
+		if(!outputDir.exists()) {
+			outputDir.mkdirs();
+		}
 		
 		HashSet<Item> done = new HashSet<Item>();
 		
@@ -176,31 +189,45 @@ public class PiwikPDFExporter  {
 		cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
 		Date lastDay = cal.getTime();
 		
+		
 		String viewsReportURL = PIWIK_API_URL + "index.php"
-											+ "?module=API"
-											+ "&method=API.get"
-											+ "&idSite=" + PIWIK_SITE_ID
-											+ "&period=day"
-											+ "&date=" + inputDateFormat.format(firstDay) + "," + inputDateFormat.format(lastDay)
-											+ "&token_auth=" + PIWIK_AUTH_TOKEN
-											+ "&format=xml"
-											+ "&segment=pageUrl=@" + item.getHandle();
-		
+				+ "?module=API"
+				+ "&method=API.get"
+				+ "&idSite=" + PIWIK_SITE_ID
+				+ "&period=day"
+				+ "&date=" + inputDateFormat.format(firstDay) + "," + inputDateFormat.format(lastDay)
+				+ "&token_auth=" + PIWIK_AUTH_TOKEN
+				+ "&format=xml"
+				+ "&segment=pageUrl=@" + item.getHandle();
+
+		String downloadReportURL = PIWIK_API_URL + "index.php"
+				+ "?module=API"
+				+ "&method=API.get"
+				+ "&idSite=" + PIWIK_DOWNLOAD_SITE_ID
+				+ "&period=day"
+				+ "&date=" + inputDateFormat.format(firstDay) + "," + inputDateFormat.format(lastDay)
+				+ "&token_auth=" + PIWIK_AUTH_TOKEN
+				+ "&format=xml"
+				+ "&segment=pageUrl=@" + item.getHandle();
+				
 		String countryReportURL = PIWIK_API_URL + "index.php"
-												+ "?module=API"
-												+ "&method=UserCountry.getCountry"
-												+ "&idSite=" + PIWIK_SITE_ID
-												+ "&period=month"
-												+ "&date=" + inputDateFormat.format(firstDay)												
-												+ "&expanded=1"
-												+ "&token_auth=" + PIWIK_AUTH_TOKEN
-												+ "&filter_limit=10"
-												+ "&format=xml"
-												+ "&segment=pageUrl=@" + item.getHandle();
-												
+					+ "?module=API"
+					+ "&method=UserCountry.getCountry"
+					+ "&idSite=" + PIWIK_SITE_ID
+					+ "&period=month"
+					+ "&date=" + inputDateFormat.format(firstDay)												
+					+ "&expanded=1"
+					+ "&token_auth=" + PIWIK_AUTH_TOKEN
+					+ "&filter_limit=10"
+					+ "&format=xml"
+					+ "&segment=pageUrl=@" + item.getHandle();
+							
 		
-		String viewsXML = readFromURL(viewsReportURL);
-		String countriesXML = readFromURL(countryReportURL);
+		String viewsXML = PiwikHelper.readFromURL(viewsReportURL);
+		String downloadXML = PiwikHelper.readFromURL(viewsReportURL);
+		
+		viewsXML = PiwikHelper.mergeXML(viewsXML, downloadXML);
+		String countriesXML = PiwikHelper.readFromURL(countryReportURL);
 		
 		Map<String, Integer> summary = new HashMap<String, Integer>();
 		
@@ -322,6 +349,8 @@ public class PiwikPDFExporter  {
         	renderer.setSeriesShape(1, circle);
         	renderer.setSeriesPaint(0, new Color(212, 40, 30));
         	renderer.setSeriesPaint(1, new Color(30, 120, 180));
+        	renderer.setSeriesStroke(0, new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER));
+        	renderer.setSeriesStroke(1, new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER));
         }
         DateAxis xAxis = (DateAxis) plot.getDomainAxis();
         xAxis.setDateFormatOverride(outputDateFormat);
@@ -363,7 +392,7 @@ public class PiwikPDFExporter  {
 	    FONT[7] = new Font(FontFamily.HELVETICA, 10, Font.BOLD);
 
 	    
-	    Image logo = Image.getInstance(new URL("https://lindat.mff.cuni.cz/images/lindat-common/public/img/lindat-logo-mono.png"));
+	    Image logo = Image.getInstance(LINDAT_LOGO);
 	    logo.scaleAbsolute(82, 48);
 	    logo.setAlignment(Image.RIGHT);
 
