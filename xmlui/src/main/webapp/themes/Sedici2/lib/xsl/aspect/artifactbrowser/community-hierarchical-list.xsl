@@ -51,11 +51,14 @@
 		<xsl:variable name="externalMetadataURL">
 			<xsl:text>cocoon:/</xsl:text>
 			<xsl:value-of select="@url" />
-			<!-- Since this is a summary only grab the descriptive metadata, and 
-				the thumbnails -->
+ 			<!-- Since this is a summary only grab the descriptive metadata, and 
+ 				the thumbnails --> 
 			<xsl:text>?sections=dmdSec,fileSec&amp;fileGrpTypes=THUMBNAIL</xsl:text>
 		</xsl:variable>
-		<xsl:apply-templates select="document($externalMetadataURL)" mode="accordionHeader"/>
+	
+		<xsl:variable name="externalDocumentRoot" select="document($externalMetadataURL)"/>
+		
+		<xsl:apply-templates select="$externalDocumentRoot" mode="accordionHeader"/>
 			<div>
 <!-- 				<xsl:apply-templates select="document($externalMetadataURL)" mode="communityLink"/> -->
 				<xsl:if test="$currentLevel &lt; $maxHierarchyLevel">
@@ -91,19 +94,23 @@
 		<!-- $communityId is the ID of the current community, enclosed by '|' character. -->
 		<xsl:variable name="communityId"
 			select="concat('|',substring-after(substring-before(substring-after(@url,'/metadata/handle/'),'/mets.xml'),'/'), '|')" />
-		<xsl:if test="not($communityId = $autoarchiveId)">
-			<xsl:variable name="externalMetadataURL">
-				<xsl:text>cocoon:/</xsl:text>
-				<xsl:value-of select="@url" />
-				<!-- Since this is a summary only grab the descriptive metadata, and 
+		<xsl:variable name="externalMetadataURL">
+			<xsl:text>cocoon:/</xsl:text>
+			<xsl:value-of select="@url" />
+			<!-- Since this is a summary only grab the descriptive metadata, and 
 					the thumbnails -->
-				<xsl:text>?sections=dmdSec,fileSec&amp;fileGrpTypes=THUMBNAIL</xsl:text>
-			</xsl:variable>
+			<xsl:text>?sections=dmdSec,fileSec&amp;fileGrpTypes=THUMBNAIL</xsl:text>
+		</xsl:variable>
+
+		<xsl:variable name="externalDocumentRoot" select="document($externalMetadataURL)"/>
+		
+		<xsl:variable name="collection-title" select="$externalDocumentRoot/mets:METS/mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='dc'][@element='title']/text()"/>
+		<xsl:if test="not(starts-with($collection-title,'Autoarchivo'))">
 			<xsl:choose>
 				<xsl:when test="not(contains($topCommunitiesId,$communityId))">
 					<li>
 						<xsl:call-template name="classStandardAttributes"/>
-						<xsl:apply-templates select="document($externalMetadataURL)" mode="summaryList" />
+						<xsl:apply-templates select="$externalDocumentRoot" mode="summaryList" />
 						<xsl:apply-templates select="dri:referenceSet" mode="render-flat-communities">
 							<xsl:with-param name="currentLevel">
 								<xsl:value-of select="number($currentLevel + 1)" />
