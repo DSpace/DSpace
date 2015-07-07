@@ -17,9 +17,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-/**
- * Created by monikam on 4/11/14.
- */
+
 class ActionTarget {
 
     private Context context;
@@ -145,8 +143,8 @@ class ActionTarget {
 
     private String[] getMetadateValue(String field) {
         if (obj.getType() == Constants.ITEM) {
-            DCValue[] values =  ((Item) obj).getMetadataByMetadataString(field);
-            return DCValue.valuesFor(values);
+            Metadatum[] values =  ((Item) obj).getMetadataByMetadataString(field);
+            return Metadatum.valuesFor(values);
         }
         return null;
     }
@@ -265,42 +263,21 @@ class ItemActionTarget extends ActionTarget {
 class BundleActionTarget extends ActionTarget {
     Bundle bdl;
 
-    static String[] theAvailableKeys = {"name"};
+    static String[] theAvailableKeys = {"isEmbargoed", "name"};
 
     BundleActionTarget(Context context, ActionTarget up, DSpaceObject o) {
         super(context, up, o);
         bdl = (Bundle) o;
     }
 
+    // TODO - figure out how to determine embargo state
     protected boolean toHashMap() {
         boolean create = super.toHashMap();
         if (create) {
+            put("isEmbargoed", "we have no idea");
             put("name", bdl.getName());
         }
         return create;
     }
 }
 
-class BitstreamActionTarget extends ActionTarget {
-    Bitstream bit;
-
-    static String[] theAvailableKeys = {"mimeType", "name", "size", "internalId", "checksum", "checksumAlgo"};
-
-    BitstreamActionTarget(Context context, ActionTarget up, DSpaceObject o) {
-        super(context, up, o);
-        bit = (Bitstream) o;
-    }
-
-    protected boolean toHashMap() {
-        boolean create = super.toHashMap();
-        if (create) {
-            put("mimeType", bit.getFormat().getMIMEType());
-            put("name", bit.getName());
-            put("internalId", bit.getInternalId());
-            put("size", bit.getSize());
-            put("checksum", bit.getChecksum());
-            put("checksumAlgo", bit.getChecksumAlgorithm());
-        }
-        return create;
-    }
-}
