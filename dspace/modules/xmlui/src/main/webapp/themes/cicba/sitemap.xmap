@@ -151,14 +151,7 @@
                     <map:read type="ConcatenationReader" src="js/{1}.js">
                         <map:parameter name="requestQueryString" value="{request:queryString}"/>
                     </map:read>
-            </map:match>
-            
-            <map:match pattern="themes/cicba/js/eqneditor/*">
-                    <map:read type="ConcatenationReader" src="js/eqneditor/{1}">
-                        <map:parameter name="requestQueryString" value="{request:queryString}"/>
-                    </map:read>
-            </map:match>
-            
+            </map:match>            
             
             <!-- Redirigimos las solicitudes a js de Mirage -->
 			<map:match pattern="themes/cicba/lib/images/*">

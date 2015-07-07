@@ -503,7 +503,7 @@
 		        $(document).ready(function(){
 		        	if($('textarea[name=introductory_text]').length){
 		        		var path= "<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath']"/>";
-		        		path=path.concat("/themes/cicba/js/eqneditor/");
+		        		path=path.concat("/static/js/eqneditor/");
 				        CKEDITOR.plugins.addExternal( 'eqneditor', path, 'plugin.js' );
 						CKEDITOR.config.extraPlugins = 'eqneditor';
 						CKEDITOR.config.entities=false;
