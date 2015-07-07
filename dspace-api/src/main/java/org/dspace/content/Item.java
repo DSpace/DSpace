@@ -1093,21 +1093,31 @@ public class Item extends DSpaceObject
             }
         }
         
+        int totalNumberOfFiles = 0;
+        long totalSizeofFiles = 0;
+        
         /* Add local.has.files metadata */
         boolean hasFiles = false;
         Bundle[] origs = getBundles("ORIGINAL");
         for(Bundle orig : origs) {
         	if(orig.getBitstreams().length > 0) {
         		hasFiles = true;
-        		break;
+        	}        	
+        	for(Bitstream bit : orig.getBitstreams()) {
+        		totalNumberOfFiles ++;
+        		totalSizeofFiles += bit.getSize();
         	}
         }
         clearMetadata("local", "has", "files", Item.ANY);
+        clearMetadata("local", "files", "count", Item.ANY);
+        clearMetadata("local", "files", "size", Item.ANY);
         if(hasFiles) {
         	addMetadata("local", "has", "files", Item.ANY, "yes");
         } else {
         	addMetadata("local", "has", "files", Item.ANY, "no");
         }
+        addMetadata("local", "files", "count", Item.ANY, "" + totalNumberOfFiles);
+        addMetadata("local", "files", "size", Item.ANY, "" + totalSizeofFiles);
 
         if (modifiedMetadata || modified)
         {
@@ -2167,3 +2177,4 @@ public class Item extends DSpaceObject
 		}
 	}
 }
+
