@@ -12,7 +12,7 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 
@@ -52,8 +52,8 @@ public class MetaData {
         ArrayList<ActionTarget> targets = lister.getTargets(args.getType(), args.getWorkflowItemsOnly());
         for (ActionTarget at : targets) {
             Item item = (Item) at.getObject();
-            DCValue[] vals = item.getMetadata(args.schema, args.element, args.qualifier, Item.ANY);
-            at.put(beforeKey, DCValue.valuesFor(vals));
+            Metadatum[] vals = item.getMetadata(args.schema, args.element, args.qualifier, Item.ANY);
+            at.put(beforeKey, Metadatum.valuesFor(vals));
             at.put(changedKey, false);
             switch (args.getAction()) {
                 case Arguments.DO_ADD:

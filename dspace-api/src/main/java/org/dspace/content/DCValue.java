@@ -71,7 +71,7 @@ public class DCValue
         return str + "=" + value;
     }
 
-    public static String[] valuesFor(DCValue[] values) {
+    public static String[] valuesFor(Metadatum[] values) {
         String vals[] = new String[values.length];
         for (int i = 0; i < values.length; i++) {
             vals[i] = values[i].value;
