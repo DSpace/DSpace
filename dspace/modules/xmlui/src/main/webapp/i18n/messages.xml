@@ -187,6 +187,7 @@
     <message key="xmlui.ArtifactBrowser.CollectionViewer.browse_dates">Dates</message>
     <message key="xmlui.ArtifactBrowser.CollectionViewer.advanced_search_link">Advanced Search</message>
     <message key="xmlui.ArtifactBrowser.CollectionViewer.head_recent_submissions">Recent Submissions</message>
+    <message key="xmlui.ArtifactBrowser.CollectionViewer.cite_handle">Please use this identifier to cite or link to this collection: </message>
 
     <!-- org.dspace.app.xmlui.artifactbrowser.CommunityBrowser.java -->
     <message key="xmlui.ArtifactBrowser.CommunityBrowser.title">Community List</message>
@@ -208,6 +209,7 @@
     <message key="xmlui.ArtifactBrowser.CommunityViewer.head_sub_communities">Sub-communities within this community</message>
     <message key="xmlui.ArtifactBrowser.CommunityViewer.head_sub_collections">Collections in this community</message>
     <message key="xmlui.ArtifactBrowser.CommunityViewer.head_recent_submissions">Recent Submissions</message>
+    <message key="xmlui.ArtifactBrowser.CommunityViewer.cite_handle">Please use this identifier to cite or link to this community: </message>
 
 
     <!-- org.dspace.app.xmlui.artifactbrowser.Contact.java -->
