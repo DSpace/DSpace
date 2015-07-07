@@ -128,7 +128,7 @@ public class XOAI {
             if (clean) {
                 clearIndex();
                 System.out.println("Using full import.");
-                this.indexAll();
+                result = this.indexAll();
             } else {
                 SolrQuery solrParams = new SolrQuery("*:*")
                         .addField("item.lastmodified")
@@ -244,7 +244,9 @@ public class XOAI {
         String handle = item.getHandle();
         doc.addField("item.handle", handle);
         doc.addField("item.lastmodified", item.getLastModified());
-        doc.addField("item.submitter", item.getSubmitter().getEmail());
+        if (item.getSubmitter() != null) {
+            doc.addField("item.submitter", item.getSubmitter().getEmail());
+        }
         doc.addField("item.deleted", item.isWithdrawn() ? "true" : "false");
         for (Collection col : item.getCollections())
             doc.addField("item.collections",
