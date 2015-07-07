@@ -18,7 +18,8 @@
  <!-- for handle "default".                                                -->
  <submission-map>
    <name-map collection-handle="default" submission-name="traditional" />
-   <name-map collection-handle="123456789/16245" submission-name="autoarchiveSubmission" />
+   <name-map collection-handle="10915/50" submission-name="autoarchiveSubmission" />
+
    <!--10915/46286: Autarchivo de Tesis de Grado -->
    <name-map collection-handle="10915/46286" submission-name="tesisDeGrado" />
  </submission-map>
@@ -308,20 +309,20 @@
     
    </submission-process>
 
-	<submission-process name="tesisDeGrado">
-		<step>
-			<processing-class>org.dspace.submit.step.SkipInitialQuestionsStep</processing-class>
-		</step>
-      
-	    <!--Step 2 will be to Describe the item.-->
-	    <step id="sediciDescribeItem"/>
-	      
-	    <!--Step 3 will be to Upload the item-->
-      	<step id="sediciUploadItem"/>
-      	
-      	<!--Step 4 Setea el flag indicando que se completo el proceso de edición desde el workflow. No tiene interface-->
-      	<step id="sediciWorkflowEditedControl"/>
-	</submission-process>
+       <submission-process name="tesisDeGrado">
+               <step>
+                       <processing-class>org.dspace.submit.step.SkipInitialQuestionsStep</processing-class>
+               </step>
+       
+           <!--Step 2 will be to Describe the item.-->
+           <step id="sediciDescribeItem"/>
+             
+           <!--Step 3 will be to Upload the item-->
+               <step id="sediciUploadItem"/>
+       
+               <!--Step 4 Setea el flag indicando que se completo el proceso de edición desde el workflow. No tiene interface-->
+               <step id="sediciWorkflowEditedControl"/>
+       </submission-process>
 
  </submission-definitions>
 

@@ -222,8 +222,11 @@ do_update(){
 	fi
 	
 	ant -Ddspace.dir=$INSTALL_DIR -Ddspace.configuration=$INSTALL_DIR/config/dspace.cfg -Doverwrite=false update
-		
-    print_sec "Felicitaciones! se actualizo correctamente Dspace@SeDiCI en \n\t $INSTALL_DIR"
+
+	echo -e "\n=========A revisar los siguientes archivos de configuracion"
+	diff -r $INSTALL_DIR/config $BASE_DIR/distribution/overwritten-files/config -y --suppress-common-lines --width=180 | grep -v Only | grep -v '\${.*}'
+
+        print_sec "Felicitaciones! se actualizo correctamente Dspace@SeDiCI en \n\t $INSTALL_DIR"
 }
 
 #=============================================================================
