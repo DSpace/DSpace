@@ -57,8 +57,8 @@ class Arguments {
     public static String ROOT = "r";
     public static String ROOT_LONG = "root";
 
-    public static String TYPE = "t";
-    public static String TYPE_LONG = "type";
+    public static String TYPE = "c";
+    public static String TYPE_LONG = "class";
 
     public static String VERBOSE = "v";
     public static String VERBOSE_LONG = "verbose";

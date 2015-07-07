@@ -36,7 +36,7 @@ that includes the cover page.
 ** list all items  under collection given by its handle **
 
 ~~~~
-> dspace bulk-list -r 88435/1100 -t ITEM
+> dspace bulk-list -r 88435/1100 -c ITEM
 # org.dspace.app.bulkdo.Lister: Found 1 collections
 # org.dspace.app.bulkdo.Lister: Found 15 items
 # org.dspace.app.bulkdo.Lister: # 15 type=2
@@ -59,13 +59,13 @@ that includes the cover page.
 
 you get the same result for
 ~~~~
-> dspace bulk-list -r COLLECTION.296 -t ITEM
+> dspace bulk-list -r COLLECTION.296 -c ITEM
 ~~~~
 
 ** again list all items  under 88435/1100 and  tweak list with the properties to print **
 
 ~~~~
-> dspace bulk-list -r 88435/1100 -t ITEM --include 'handle,COLLECTION.name,dc.contributor.author'
+> dspace bulk-list -r 88435/1100 -c ITEM --include 'handle,COLLECTION.name,dc.contributor.author'
 # org.dspace.app.bulkdo.Lister: Found 1 collections
 # org.dspace.app.bulkdo.Lister: Found 15 items
 # org.dspace.app.bulkdo.Lister: # 15 type=2
@@ -89,7 +89,7 @@ handle=88435/dsp014x51hj109 COLLECTION.name=History dc.contributor.author=Li, Ma
 ** list items in the workflow of collection **
 
 ~~~
-> dspace bulk-list --root 88435/1100 -t ITEM  --doWorkFlowItems
+> dspace bulk-list --root 88435/1100 -c ITEM  --doWorkFlowItems
                    --include 'object,handle,COLLECTION.name,dc.contributor.*,dc.title' --format tsv
 # org.dspace.app.bulkdo.Lister: Found 1 collections
 # org.dspace.app.bulkdo.Lister: Found 1 items
@@ -104,7 +104,7 @@ Note that you may use the \* notation for metadata value selection in the --incl
 
 **list all bitstreams in a given collection, show related bundle names and mimeTypes**
 ~~~~
-> dspace bulk-list -r $RROOT -t BITSTREAM --include 'object,ITEM.object,BUNDLE.name,mimeType' --format TSV
+> dspace bulk-list -r $RROOT -c BITSTREAM --include 'object,ITEM.object,BUNDLE.name,mimeType' --format TSV
 # org.dspace.app.bulkdo.Lister: Found 1 collections
 # org.dspace.app.bulkdo.Lister: Found 2 items
 # org.dspace.app.bulkdo.Lister: Found 4 bundles
@@ -120,7 +120,7 @@ BITSTREAM.2278	ITEM.1967	LICENSE	"text/plain; charset=utf-8"
 ** include  dc.language.iso metadata value of enclosing ITEM and
 print  in TSV format **
 ~~~~
-> dspace bulk-list -r handle/1398695916393 -t BITSTREAM --include 'object,ITEM.object,BUNDLE.name,ITEM.dc.language.iso' --format TSV
+> dspace bulk-list -r handle/1398695916393 -c BITSTREAM --include 'object,ITEM.object,BUNDLE.name,ITEM.dc.language.iso' --format TSV
 # org.dspace.app.bulkdo.Lister: Found 1 collections
 # org.dspace.app.bulkdo.Lister: Found 2 items
 # org.dspace.app.bulkdo.Lister: Found 4 bundles
@@ -135,7 +135,7 @@ BITSTREAM.2278	ITEM.1967	LICENSE	en_US
 
 ** include policy information for READ, WRITE, ADD, REMOVE actions **
 ~~~~
-> dspace bulk-list -r handle/1398695916393 -t BITSTREAM --include 'object,ITEM.object,POLICY.READ,POLICY.WRITE,POLICY.ADD,POLICY.REMOVE' --format TSV
+> dspace bulk-list -r handle/1398695916393 -c BITSTREAM --include 'object,ITEM.object,POLICY.READ,POLICY.WRITE,POLICY.ADD,POLICY.REMOVE' --format TSV
 # org.dspace.app.bulkdo.Lister: Found 1 collections
 # org.dspace.app.bulkdo.Lister: Found 2 items
 # org.dspace.app.bulkdo.Lister: Found 4 bundles
@@ -153,7 +153,7 @@ BITSTREAM.2278	ITEM.1967	[POLICY(GROUP.Anonymous)]	[POLICY(EPERSON.monikam)]	[]	
 
 ** delete the Anonymous group's read authorization  **
 ~~~~
-> dspace bulk-pols -r $RROOT -t BITSTREAM --format TSV -a DEL -w GROUP.Anonymous -d REMOVE
+> dspace bulk-pols -r $RROOT -c BITSTREAM --format TSV -a DEL -w GROUP.Anonymous -d REMOVE
 # D policy.REMOVE for 4 DSPaceObjects
 object	parent	POLICY.REMOVE
 BITSTREAM.2393	ITEM.1968	[]
@@ -164,7 +164,7 @@ BITSTREAM.2278	ITEM.1967	[]
 
 ** the list command shows that the policies were removed **
 ~~~~
-> dspace bulk-list -r handle/1398695916393 -t BITSTREAM
+> dspace bulk-list -r handle/1398695916393 -c BITSTREAM
                  --include 'object,ITEM.object,POLICY.READ,POLICY.WRITE,POLICY.ADD,POLICY.REMOVE'
                  --format TSV
 # org.dspace.app.bulkdo.Lister: Found 1 collections
@@ -182,7 +182,7 @@ BITSTREAM.2278  ITEM.1967   [POLICY(GROUP.Anonymous)]   [POLICY(EPERSON.monikam)
 
 ** to give WRITE, ADD and REMOVE authorization to the EPerson monikam, for  all BITSTREAM under handle/1398695916393 run the following commands **
 ~~~~
-> dspace bulk-pols -r handle/1398695916393 -t BITSTREAM
+> dspace bulk-pols -r handle/1398695916393 -c BITSTREAM
                  -a ADD -d WRITE -w EPERSON.monikam --format TSV
 # A policy.WRITE for 4 DSPaceObjects
 object	parent	POLICY.WRITE
@@ -192,7 +192,7 @@ BITSTREAM.2338	ITEM.1967	[POLICY(EPERSON.monikam)]
 BITSTREAM.2278	ITEM.1967	[POLICY(EPERSON.monikam)]
 ~~~~
 ~~~~
-dspace bulk-pols -r handle/1398695916393 -t BITSTREAM
+dspace bulk-pols -r handle/1398695916393 -c BITSTREAM
                  -a ADD -d ADD  -w EPERSON.monikam --format TSV
 # A policy.ADD for 4 DSPaceObjects
 object	parent	POLICY.ADD
@@ -202,7 +202,7 @@ BITSTREAM.2338	ITEM.1967	[POLICY(EPERSON.monikam)]
 BITSTREAM.2278	ITEM.1967	[POLICY(EPERSON.monikam)]
 ~~~~
 ~~~~
-dspace bulk-pols -r handle/1398695916393 -t BITSTREAM
+dspace bulk-pols -r handle/1398695916393 -c BITSTREAM
                  -a ADD -d REMOVE  -w EPERSON.monikam --format TSV
 # A policy.REMOVE for 4 DSPaceObjects
 object	parent	POLICY.REMOVE
@@ -215,7 +215,7 @@ BITSTREAM.2278	ITEM.1967	[POLICY(EPERSON.monikam)]
 
 ** repeating the list command shows the new settings **
 ~~~~
-> dspace bulk-list -r handle/1398695916393 -t BITSTREAM
+> dspace bulk-list -r handle/1398695916393 -c BITSTREAM
                    --include 'object,ITEM.object,POLICY.READ,POLICY.WRITE,POLICY.ADD,POLICY.REMOVE'
                    --format TSV
 # org.dspace.app.bulkdo.Lister: Found 1 collections
@@ -313,7 +313,7 @@ list and note the BITSTREAM that needs to be replaced
 
 ** list bitstreams in a given item   **
 ~~~~
-> dspace bulk-list -r 88435/dsp01s4655g69q -t BITSTREAM --include 'object,BUNDLE.name,name'
+> dspace bulk-list -r 88435/dsp01s4655g69q -c BITSTREAM --include 'object,BUNDLE.name,name'
 # org.dspace.app.bulkdo.Lister: Found 0 collections
 # org.dspace.app.bulkdo.Lister: Found 1 items
 # org.dspace.app.bulkdo.Lister: Found 1 bundles
@@ -325,7 +325,7 @@ list and note the BITSTREAM that needs to be replaced
 ** replace with bitstream with a new version **
 
 ~~~~
-> dspace bulk-bitstream -r BITSTREAM.1133 -t BITSTREAM -b minkin_daniel_fixed.pdf -e monikam
+> dspace bulk-bitstream -r BITSTREAM.1133 -c BITSTREAM -b minkin_daniel_fixed.pdf -e monikam
 # org.dspace.app.bulkdo.Bitstreams: minkin_daniel_fixed.pdf(application/pdf) --> BITSTREAM.1133
  object=BITSTREAM.1133 parent= BUNDLE.name= replace=minkin_daniel_fixed.pdf replace.mimeType=application/pdf success= SUCCESS bundles=[BUNDLE.1111]
 ~~~~
@@ -336,7 +336,7 @@ list and note the BITSTREAM that needs to be replaced
 ** list all items  under handle collection **
 
 ~~~~
-> dspace bulk-list -r 88435/1100 -t ITEM
+> dspace bulk-list -r 88435/1100 -c ITEM
 # org.dspace.app.bulkdo.Lister: Found 1 collections
 # org.dspace.app.bulkdo.Lister: Found 15 items
 # org.dspace.app.bulkdo.Lister: # 15 type=2
@@ -359,13 +359,13 @@ list and note the BITSTREAM that needs to be replaced
 
 you get the same result for
 ~~~~
-> dspace bulk-list -r COLLECTION.296 -t ITEM
+> dspace bulk-list -r COLLECTION.296 -c ITEM
 ~~~~
 
 ** again list all items  under 88435/1100 and  tweak list with the properties to print **
 
 ~~~~
-> dspace bulk-list -r 88435/1100 -t ITEM --include 'handle,COLLECTION.name,dc.contributor.author'
+> dspace bulk-list -r 88435/1100 -c ITEM --include 'handle,COLLECTION.name,dc.contributor.author'
 # org.dspace.app.bulkdo.Lister: Found 1 collections
 # org.dspace.app.bulkdo.Lister: Found 15 items
 # org.dspace.app.bulkdo.Lister: # 15 type=2
@@ -388,7 +388,7 @@ handle=88435/dsp014x51hj109 COLLECTION.name=History dc.contributor.author=Li, Ma
 
 **list all bitstreams in a given collection, show related bundle names and mimeTypes**
 ~~~~
-> dspace bulk-list -r $RROOT -t BITSTREAM --include 'object,ITEM.object,BUNDLE.name,mimeType' --format TSV
+> dspace bulk-list -r $RROOT -c BITSTREAM --include 'object,ITEM.object,BUNDLE.name,mimeType' --format TSV
 # org.dspace.app.bulkdo.Lister: Found 1 collections
 # org.dspace.app.bulkdo.Lister: Found 2 items
 # org.dspace.app.bulkdo.Lister: Found 4 bundles
@@ -404,7 +404,7 @@ BITSTREAM.2278	ITEM.1967	LICENSE	"text/plain; charset=utf-8"
 ** include  dc.language.iso metadata value of enclosing ITEM and
 print  in TSV format **
 ~~~~
-> dspace bulk-list -r handle/1398695916393 -t BITSTREAM --include 'object,ITEM.object,BUNDLE.name,ITEM.dc.language.iso' --format TSV
+> dspace bulk-list -r handle/1398695916393 -c BITSTREAM --include 'object,ITEM.object,BUNDLE.name,ITEM.dc.language.iso' --format TSV
 # org.dspace.app.bulkdo.Lister: Found 1 collections
 # org.dspace.app.bulkdo.Lister: Found 2 items
 # org.dspace.app.bulkdo.Lister: Found 4 bundles
@@ -419,7 +419,7 @@ BITSTREAM.2278	ITEM.1967	LICENSE	en_US
 
 ** include policy information for READ, WRITE, ADD, REMOVE actions **
 ~~~~
-> dspace bulk-list -r handle/1398695916393 -t BITSTREAM --include 'object,ITEM.object,POLICY.READ,POLICY.WRITE,POLICY.ADD,POLICY.REMOVE' --format TSV
+> dspace bulk-list -r handle/1398695916393 -c BITSTREAM --include 'object,ITEM.object,POLICY.READ,POLICY.WRITE,POLICY.ADD,POLICY.REMOVE' --format TSV
 # org.dspace.app.bulkdo.Lister: Found 1 collections
 # org.dspace.app.bulkdo.Lister: Found 2 items
 # org.dspace.app.bulkdo.Lister: Found 4 bundles
@@ -437,7 +437,7 @@ BITSTREAM.2278	ITEM.1967	[POLICY(GROUP.Anonymous)]	[POLICY(EPERSON.monikam)]	[]	
 
 ** delete the Anonymous group's read authorization  **
 ~~~~
-> dspace bulk-pols -r $RROOT -t BITSTREAM --format TSV -a DEL -w GROUP.Anonymous -d REMOVE
+> dspace bulk-pols -r $RROOT -c BITSTREAM --format TSV -a DEL -w GROUP.Anonymous -d REMOVE
 # D policy.REMOVE for 4 DSPaceObjects
 object	parent	POLICY.REMOVE
 BITSTREAM.2393	ITEM.1968	[]
@@ -448,7 +448,7 @@ BITSTREAM.2278	ITEM.1967	[]
 
 ** the list command shows that the policies were removed **
 ~~~~
-> dspace bulk-list -r handle/1398695916393 -t BITSTREAM
+> dspace bulk-list -r handle/1398695916393 -c BITSTREAM
                  --include 'object,ITEM.object,POLICY.READ,POLICY.WRITE,POLICY.ADD,POLICY.REMOVE'
                  --format TSV
 # org.dspace.app.bulkdo.Lister: Found 1 collections
@@ -466,7 +466,7 @@ BITSTREAM.2278  ITEM.1967   [POLICY(GROUP.Anonymous)]   [POLICY(EPERSON.monikam)
 
 ** to give WRITE, ADD and REMOVE authorization to the EPerson monikam, for  all BITSTREAM under handle/1398695916393 run the following commands **
 ~~~~
-> dspace bulk-pols -r handle/1398695916393 -t BITSTREAM
+> dspace bulk-pols -r handle/1398695916393 -c BITSTREAM
                  -a ADD -d WRITE -w EPERSON.monikam --format TSV
 # A policy.WRITE for 4 DSPaceObjects
 object	parent	POLICY.WRITE
@@ -476,7 +476,7 @@ BITSTREAM.2338	ITEM.1967	[POLICY(EPERSON.monikam)]
 BITSTREAM.2278	ITEM.1967	[POLICY(EPERSON.monikam)]
 ~~~~
 ~~~~
-dspace bulk-pols -r handle/1398695916393 -t BITSTREAM
+dspace bulk-pols -r handle/1398695916393 -c BITSTREAM
                  -a ADD -d ADD  -w EPERSON.monikam --format TSV
 # A policy.ADD for 4 DSPaceObjects
 object	parent	POLICY.ADD
@@ -486,7 +486,7 @@ BITSTREAM.2338	ITEM.1967	[POLICY(EPERSON.monikam)]
 BITSTREAM.2278	ITEM.1967	[POLICY(EPERSON.monikam)]
 ~~~~
 ~~~~
-dspace bulk-pols -r handle/1398695916393 -t BITSTREAM
+dspace bulk-pols -r handle/1398695916393 -c BITSTREAM
                  -a ADD -d REMOVE  -w EPERSON.monikam --format TSV
 # A policy.REMOVE for 4 DSPaceObjects
 object	parent	POLICY.REMOVE
@@ -499,7 +499,7 @@ BITSTREAM.2278	ITEM.1967	[POLICY(EPERSON.monikam)]
 
 ** repeating the list command shows the new settings **
 ~~~~
-> dspace bulk-list -r handle/1398695916393 -t BITSTREAM
+> dspace bulk-list -r handle/1398695916393 -c BITSTREAM
                    --include 'object,ITEM.object,POLICY.READ,POLICY.WRITE,POLICY.ADD,POLICY.REMOVE'
                    --format TSV
 # org.dspace.app.bulkdo.Lister: Found 1 collections
@@ -597,7 +597,7 @@ list and note the BITSTREAM that needs to be replaced
 
 ** list bitstreams in a given item   **
 ~~~~
-> dspace bulk-list -r 88435/dsp01s4655g69q -t BITSTREAM --include 'object,BUNDLE.name,name'
+> dspace bulk-list -r 88435/dsp01s4655g69q -c BITSTREAM --include 'object,BUNDLE.name,name'
 # org.dspace.app.bulkdo.Lister: Found 0 collections
 # org.dspace.app.bulkdo.Lister: Found 1 items
 # org.dspace.app.bulkdo.Lister: Found 1 bundles
@@ -609,7 +609,7 @@ list and note the BITSTREAM that needs to be replaced
 ** replace with bitstream with a new version **
 
 ~~~~
-> dspace bulk-bitstream -r BITSTREAM.1133 -t BITSTREAM -b minkin_daniel_fixed.pdf -e monikam
+> dspace bulk-bitstream -r BITSTREAM.1133 -c BITSTREAM -b minkin_daniel_fixed.pdf -e monikam
 # org.dspace.app.bulkdo.Bitstreams: minkin_daniel_fixed.pdf(application/pdf) --> BITSTREAM.1133
  object=BITSTREAM.1133 parent= BUNDLE.name= replace=minkin_daniel_fixed.pdf replace.mimeType=application/pdf success= SUCCESS bundles=[BUNDLE.1111]
 ~~~~
@@ -620,7 +620,7 @@ list and note the BITSTREAM that needs to be replaced
 
  usage: org.dspace.app.bulkdo.Lister
 
- -y,--dryrun            dryrun - do not actually change anything; default
+ -t,--test              dryrun - do not actually change anything; default
                         is false
  -W,--doWorkFlowItems   list items in workflow
  -e,--eperson           dspace user account (email or netid) used for
@@ -630,7 +630,7 @@ list and note the BITSTREAM that needs to be replaced
  -i,--include           include listed object keys/properties in output;
                         give as comma separated list
  -r,--root              handle / type.ID
- -t,--type              type: collection, item, bundle, or bitstream
+ -c, --class              type: collection, item, bundle, or bitstream
  -v,--verbose           verbose
 
 List dspaceObjects of given type contained in root, printing properties
@@ -657,7 +657,7 @@ OPTION include:
 ```
 usage: org.dspace.app.bulkdo.Policies
 
- -y,--dryrun            dryrun - do not actually change anything; default
+ -t,--test              dryrun - do not actually change anything; default
                         is false
  -W,--doWorkFlowItems   list items in workflow
  -a,--action            what to do, available ADD, DEL
@@ -673,7 +673,7 @@ usage: org.dspace.app.bulkdo.Policies
  -i,--include           include listed object keys/properties in output;
                         give as comma separated list
  -r,--root              handle / type.ID
- -t,--type              type: collection, item, bundle, or bitstream
+ -c,--class             class: collection, item, bundle, or bitstream
  -v,--verbose           verbose
  -w,--who               group/eperson used in policies, give as
                         GROUP.<name>, EPERSON.<netid>, or EPERSON.<email>
@@ -699,7 +699,7 @@ OPTION include:
 ```
 usage: org.dspace.app.bulkdo.MetaData
 
- -y,--dryrun            dryrun - do not actually change anything; default
+ -t,--test              dryrun - do not actually change anything; default
                         is false
  -W,--doWorkFlowItems   list items in workflow
  -a,--action            what to do, available ADD, DEL
@@ -712,7 +712,7 @@ usage: org.dspace.app.bulkdo.MetaData
  -m,--meta_data         metadata setting of the form
                         'schema.ualifier.name=value'
  -r,--root              handle / type.ID
- -t,--type              type: collection, item, bundle, or bitstream
+ -c,--class             class: collection, item, bundle, or bitstream
  -v,--verbose           verbose
 
 OPTION include:
@@ -733,7 +733,7 @@ OPTION include:
 ```
 usage: org.dspace.app.bulkdo.Bitstreams
 
- -y,--dryrun            dryrun - do not actually change anything; default
+ -t,--test                  dryrun - do not actually change anything; default
                         is false
  -g,--GO-GO-GO          ignore file format incompatibilities
  -W,--doWorkFlowItems   list items in workflow
@@ -745,7 +745,7 @@ usage: org.dspace.app.bulkdo.Bitstreams
  -i,--include           include listed object keys/properties in output;
                         give as comma separated list
  -r,--root              handle / type.ID
- -t,--type              type: collection, item, bundle, or bitstream
+ -c,--class             class: collection, item, bundle, or bitstream
  -v,--verbose           verbose
 
 Replace bitstream file in BITSTREAM object defined by root
