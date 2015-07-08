@@ -198,7 +198,7 @@ public class UFALLicenseStep extends LicenseStep {
 				
 		  		List help_licenses = help_list.addList("accordion-group.lic.1", List.TYPE_FORM, "hidden");
 		  		help_licenses.addItem("accordion-heading.lic.1", null).addHighlight("bold").addContent(T_license_detail);
-		  		List licenses = help_licenses.addList("accordion-body.lic.1").addList("bulleted-list", List.TYPE_BULLETED);				
+		  		List licenses = help_licenses.addList("accordion-body.lic.1").addList("license-list", List.TYPE_BULLETED);				
 
 				// get one bundle (all should have the same licenses)
 				// - select those ones which are already present
@@ -213,7 +213,7 @@ public class UFALLicenseStep extends LicenseStep {
 					license_select.addOption(selected, license_def.getLicenseId(), license_def.getName());
 					Item li = licenses.addItem();
 					li.addHighlight(license_def.getLicenseLabel().getLabel()).addContent(license_def.getLicenseLabel().getTitle());
-					li.addXref(license_def.getDefinition(), license_def.getName(), "target_blank", "_" + license_def.getID());
+					li.addXref(license_def.getDefinition(), license_def.getName(), "target_blank", "license_" + license_def.getID());
 				}
 
 				java.util.List<LicenseDefinition> present_licenses = licenseManager
