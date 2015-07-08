@@ -681,21 +681,34 @@
 
 			<xsl:when test="$clause = 15 and $ds_item_view_toggle_url != ''">
 
-				<!-- replacedby info -->
-				<xsl:if test="count(dim:field[@element='relation' and @qualifier='isreplacedby' and @mdschema='dc']) = 1">
-					<div class="alert" id="replaced_by_alert">											
-						<span><i class="fa fa-info-circle fa-3x pull-left">&#160;</i>						
-							<xsl:text>This item is replaced by a newer submission:</xsl:text><br/>						
-							<a>
-								<xsl:attribute name="href">
-			                            <xsl:value-of select="dim:field[@element='relation' and @qualifier='isreplacedby' and @mdschema='dc']" />
-			                    </xsl:attribute>
-			                    <xsl:value-of select="dim:field[@element='relation' and @qualifier='isreplacedby' and @mdschema='dc']" />
-							</a>									
-						</span>																													
-				   </div>				   
-				</xsl:if>				
-				
+                <!-- replacedby info -->
+                <xsl:if test="count(dim:field[@element='relation' and @qualifier='isreplacedby' and @mdschema='dc']) &gt;= 1">
+	                <div class="alert" id="replaced_by_alert">
+                        <span style="dispaly: table-cell">
+	                        <i class="fa fa-info-circle fa-3x pull-left">&#160;</i>
+                        </span>
+                        <span style="display: table-cell">
+	                         <xsl:choose>
+                                 <xsl:when test="count(dim:field[@element='relation' and @qualifier='isreplacedby' and @mdschema='dc']) = 1">
+                                         <xsl:text>This item is replaced by a newer submission:</xsl:text><br/>
+                                 </xsl:when>
+                                 <xsl:otherwise>
+                                         <xsl:text>This item is replaced by newer submissions:</xsl:text><br/>
+                                 </xsl:otherwise>
+	                         </xsl:choose>
+	                         <xsl:for-each select="dim:field[@element='relation' and @qualifier='isreplacedby' and @mdschema='dc']">
+                                 <div>
+	                                 <a>
+	                                     <xsl:attribute name="href">
+	                                             <xsl:value-of select="." />
+	                                     </xsl:attribute>
+	                                     <xsl:value-of select="." />
+	                                 </a>
+                                 </div>
+	                         </xsl:for-each>
+	                     </span>
+	                </div>
+                </xsl:if>				
 				<dl class="dl-horizontal">
 					<dt style="text-align: left">
 						<a class="btn btn-link" style="padding-left:0">
