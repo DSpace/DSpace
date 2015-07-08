@@ -3,12 +3,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cz.cuni.mff.ufal.dspace</groupId>
 	<artifactId>b2safe-dspace</artifactId>
-	<name>Business to Safe Dspace Addon</name>
+	<name>b2safe DSpace Addon</name>
 
 	<parent>
 		<groupId>org.dspace</groupId>
 		<artifactId>dspace-parent</artifactId>
-		<version>5.3-SNAPSHOT</version>
+		<version>XXX-TODO-SOMETHING-LIKE-5.2-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
@@ -22,14 +22,6 @@
 		</plugins>
 	</build>
 	
-	<repositories>
-  		<repository>
-    		<id>project.local.repo</id>
-    		<name>b2safe-dspace-repo</name>
-    		<url>file:${project.basedir}/repo</url>
-  		</repository>
-	</repositories>	
-
 	<dependencies>
 		<dependency>
 			<groupId>log4j</groupId>
@@ -42,14 +34,9 @@
 			<version>1.7.7</version>
 		</dependency>
 		<dependency>
-			<groupId>org.irods</groupId>
-			<artifactId>jargon</artifactId>
-			<version>4.0.2-UFAL</version>
-		</dependency>
-		<dependency>
-			<groupId>cz.cuni.mff.ufal</groupId>
-			<artifactId>b2safe</artifactId>
-			<version>1.0</version>
+			<groupId>B2SAFE-repository-package</groupId>
+			<artifactId>b2safe_rp_pilot</artifactId>
+			<version>1.0.5</version>
 		</dependency>
          <dependency>
             <groupId>org.dspace</groupId>
