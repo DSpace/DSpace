@@ -263,9 +263,9 @@
 
 
 	<xsl:template match="dri:body">
-    	<xsl:if test="/dri:document/dri:meta/dri:userMeta[@authenticated = 'yes']">
-    		<xsl:call-template name="userbox" />
-    	</xsl:if>	
+        
+        <xsl:call-template name="userbox" />
+        
 		<div class="container-fluid">
 			<div class="container">
 			

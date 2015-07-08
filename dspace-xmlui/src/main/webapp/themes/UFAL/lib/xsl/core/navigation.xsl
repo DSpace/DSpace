@@ -340,24 +340,55 @@
     </xsl:template>
 
 	<xsl:template name="userbox">
-		<div id="userbox" class="navbar-fixed-top text-right">
-			<div class="badge" style="margin: 2px;">
-				<a style="color: #FFF;">
-					<xsl:attribute name="href">
-						<xsl:value-of select="/dri:document/dri:meta/dri:userMeta/dri:metadata[@element='identifier' and @qualifier='url']" />
-					</xsl:attribute>
-					<i18n:text>xmlui.dri2xhtml.structural.profile</i18n:text>
-					<xsl:value-of select="/dri:document/dri:meta/dri:userMeta/dri:metadata[@element='identifier' and @qualifier='displayName']" />
-				</a>
-				<xsl:text> | </xsl:text>
-				<a style="color: #FFF;">
-					<xsl:attribute name="href">
-						<xsl:value-of select="/dri:document/dri:meta/dri:userMeta/dri:metadata[@element='identifier' and @qualifier='logoutURL']" />
-					</xsl:attribute>
-					<i18n:text>xmlui.dri2xhtml.structural.logout</i18n:text>
-				</a>
-			</div>
-		</div>
-	</xsl:template>    
+		<xsl:choose>
+			<xsl:when
+				test="/dri:document/dri:meta/dri:userMeta[@authenticated = 'yes']">
+				<div id="userbox" class="navbar-fixed-top text-right">
+					<div class="label label-primary"
+						style="margin: 5px 15px 5px 5px; padding: 5px 10px 5px 10px; font-size: 14px;">
 
+						<a style="color: #FFF;">
+							<xsl:attribute name="href">
+                                                        <xsl:value-of
+								select="/dri:document/dri:meta/dri:userMeta/dri:metadata[@element='identifier' and @qualifier='url']" />
+                                                </xsl:attribute>
+							<i class="fa fa-user fa-lg">&#160;</i>
+							<xsl:value-of
+								select="/dri:document/dri:meta/dri:userMeta/dri:metadata[@element='identifier' and @qualifier='displayName']" />
+						</a>
+						<span style="margin-left: 5px; margin-right: 5px;">
+							<xsl:text> | </xsl:text>
+						</span>
+						<a style="color: #FFF;">
+							<xsl:attribute name="href">
+                                                        <xsl:value-of
+								select="/dri:document/dri:meta/dri:userMeta/dri:metadata[@element='identifier' and @qualifier='logoutURL']" />
+                                                </xsl:attribute>
+							<i class="fa fa-sign-out fa-lg">&#160;</i>
+							<i18n:text>xmlui.dri2xhtml.structural.logout</i18n:text>
+						</a>
+					</div>
+				</div>
+
+			</xsl:when>
+			<xsl:otherwise>
+				<div id="userbox" class="navbar-fixed-top text-right">
+					<div class="label label-important"
+						style="margin: 5px 15px 5px 5px; padding: 5px 10px 5px 10px; font-size: 14px;">
+
+						<a style="color: #FFF;" class="signon">
+							<xsl:attribute name="href">
+                                                        <xsl:value-of
+								select="/dri:document/dri:meta/dri:userMeta/dri:metadata[@element='identifier' and @qualifier='loginURL']" />
+                                                </xsl:attribute>
+							<i class="fa fa-sign-in fa-lg">&#160;</i>
+							<i18n:text>xmlui.dri2xhtml.structural.login</i18n:text>
+						</a>
+					</div>
+				</div>
+
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
 </xsl:stylesheet>
