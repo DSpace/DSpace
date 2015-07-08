@@ -9,12 +9,7 @@ package org.dspace.app.webui.jsptag;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
@@ -86,14 +81,21 @@ public class SelectCollectionTag extends TagSupport
             if (collection == -1) sb.append(" selected=\"selected\"");
             sb.append(">").append(firstOption).append("</option>\n");
 
-            for (Collection coll : collections)
-            {
-                sb.append("<option value=\"").append(coll.getID()).append("\"");
-                if (collection == coll.getID())
+            SortedMap<String,Integer> options = new TreeMap<String,Integer>();
+            for (Collection coll : collections) {
+                if (coll.getName() != "") {
+                    options.put(CollectionDropDown.collectionPath(coll), coll.getID());
+                }
+            }
+
+            for(Map.Entry<String,Integer> entry : options.entrySet()) {
+                System.out.println(entry.getKey() + " => " + entry.getValue());
+                sb.append("<option value=\"").append(entry.getValue()).append("\"");
+                if (collection == entry.getValue())
                 {
                     sb.append(" selected=\"selected\"");
                 }
-                sb.append(">").append(CollectionDropDown.collectionPath(coll)).append("</option>\n");
+                sb.append(">").append(entry.getKey()).append("</option>\n");
             }
 
             sb.append("</select>\n");
