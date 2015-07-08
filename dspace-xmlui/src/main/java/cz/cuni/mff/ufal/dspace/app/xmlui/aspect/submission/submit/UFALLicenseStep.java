@@ -211,7 +211,9 @@ public class UFALLicenseStep extends LicenseStep {
 				for (LicenseDefinition license_def : license_defs) {
 					boolean selected = license_def.getLicenseId() == selectedId;
 					license_select.addOption(selected, license_def.getLicenseId(), license_def.getName());
-					licenses.addItem().addXref(license_def.getDefinition(), license_def.getName(), "target_blank", "_" + license_def.getID());
+					Item li = licenses.addItem();
+					li.addHighlight(license_def.getLicenseLabel().getLabel()).addContent(license_def.getLicenseLabel().getTitle());
+					li.addXref(license_def.getDefinition(), license_def.getName(), "target_blank", "_" + license_def.getID());
 				}
 
 				java.util.List<LicenseDefinition> present_licenses = licenseManager
