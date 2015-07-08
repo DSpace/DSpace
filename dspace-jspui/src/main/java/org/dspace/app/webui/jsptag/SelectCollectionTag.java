@@ -9,18 +9,19 @@ package org.dspace.app.webui.jsptag;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 
 import org.dspace.app.util.CollectionDropDown;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.content.Collection;
-import org.dspace.content.Community;
 import org.dspace.core.Context;
 
 /**
