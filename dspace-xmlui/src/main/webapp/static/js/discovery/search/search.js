@@ -105,6 +105,12 @@ var defaultFacets = new Array();
 
             Manager.widgets.text.fields = facetFields;
             Manager.initialized = false;
+            
+			var opr = $('tr[class=" search-filter"] select[id^="aspect_discovery_SimpleSearch_field_filter_relational_operator"]').val();
+			if(opr=='notavailable') {
+				newInput.value = "[* TO *]";
+				return;
+			}            
 
             Manager.init();
 //TODO: does this need to happen twice ?
