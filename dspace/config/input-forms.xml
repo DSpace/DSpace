@@ -824,6 +824,10 @@
         <stored-value>sentences</stored-value>
       </pair>
       <pair>
+        <displayed-value>pages</displayed-value>
+        <stored-value>pages</stored-value>
+      </pair>
+      <pair>
         <displayed-value>bytes</displayed-value>
         <stored-value>bytes</stored-value>
       </pair>
@@ -950,6 +954,10 @@
       <pair>
         <displayed-value>5-grams</displayed-value>
         <stored-value>5-grams</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>n-grams</displayed-value>
+        <stored-value>n-grams</stored-value>
       </pair>
       <pair>
         <displayed-value>rules</displayed-value>
