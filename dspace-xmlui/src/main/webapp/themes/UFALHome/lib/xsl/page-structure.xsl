@@ -385,7 +385,8 @@
 							<xsl:variable name="externalMetadataURL">
 								<xsl:text>cocoon:/</xsl:text>
 								<xsl:value-of select="@url" />
-								<!-- No options selected, render the full METS document -->
+								<!-- only grab the descriptive metadata, no files section -->
+								<xsl:text>?sections=dmdSec,amdSec</xsl:text>
 							</xsl:variable>
 							<xsl:apply-templates select="document($externalMetadataURL)" mode="recentList" />
 						</xsl:if>
@@ -418,15 +419,13 @@
 				</xsl:when>
 			</xsl:choose>
 			<div class="label label-info" style="margin-bottom: 20px;">
-                <xsl:variable name="file-size"
-                    select="sum(mets:fileSec/mets:fileGrp[@USE='CONTENT']/mets:file/@SIZE)" />
+                <xsl:variable name="file-size" select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='local' and @element='files' and @qualifier='count']/node()" />
                 <xsl:variable name="formatted-file-size">
                     <xsl:call-template name="format-size">                   
                         <xsl:with-param name="size" select="$file-size" />
                     </xsl:call-template>
                 </xsl:variable>
-                <xsl:variable name="file-count"
-                    select="count(mets:fileSec/mets:fileGrp[@USE='CONTENT']/mets:file)" />
+                <xsl:variable name="file-count" select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='local' and @element='files' and @qualifier='count']/node()" />
                 <i class="fa fa-paperclip">&#160;</i>
                 <i18n:translate>
                     <xsl:choose>
@@ -610,7 +609,8 @@
 									<xsl:text>cocoon://metadata</xsl:text>
 									<xsl:value-of select="substring-after(dri:xref/@target, $context-path)" />
 									<xsl:text>/mets.xml</xsl:text>
-									<!-- No options selected, render the full METS document -->
+									<!-- only grab the descriptive metadata, no files section -->
+									<xsl:text>?sections=dmdSec,amdSec</xsl:text>
 								</xsl:variable>
 								<xsl:apply-templates select="document($externalMetadataURL)"
 									mode="recentList" />
@@ -895,5 +895,6 @@
 	</div>	
 	</xsl:template>
 </xsl:stylesheet>
+
 
 
