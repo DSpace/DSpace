@@ -1357,5 +1357,22 @@
                 </input>
         </xsl:template>
         
+        <xsl:template match="dri:list[@id='aspect.submission.StepTransformer.list.license-list']" priority="10">
+        	<ul>
+        		<xsl:call-template name="standardAttributes" />
+        		<xsl:for-each select="dri:item">
+		        	<li>
+		        		<a>
+		        			<xsl:attribute name="name"><xsl:value-of select="dri:xref/@n"/></xsl:attribute>
+		        			<xsl:attribute name="target"><xsl:value-of select="_blank"/></xsl:attribute>
+		        			<xsl:attribute name="href"><xsl:value-of select="dri:xref/@target"/></xsl:attribute>
+		        			<xsl:attribute name="license-label"><xsl:value-of select="dri:hi/@rend"/></xsl:attribute>
+		        			<xsl:attribute name="license-label-text"><xsl:value-of select="dri:hi/node()"/></xsl:attribute>
+		        			<xsl:value-of select="dri:xref/node()" />
+		        		</a>
+		        	</li>
+	        	</xsl:for-each>
+        	</ul>
+        </xsl:template>
         
 </xsl:stylesheet>

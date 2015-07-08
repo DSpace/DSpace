@@ -189,7 +189,7 @@ public class HibernateFunctionalityManager implements IFunctionalities {
 	@Override
 	public List<LicenseDefinition> getAllLicenses() {
 		List<LicenseDefinition> results = (List<LicenseDefinition>) hibernateUtil
-				.findAll(LicenseDefinition.class);
+				.findByCriterie(LicenseDefinition.class, Order.asc("licenseLabel.labelId"), Order.desc("licenseId"));		
 		return results;
 	}
 
