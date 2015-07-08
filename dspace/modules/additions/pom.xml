@@ -97,6 +97,14 @@
          </exclusions>
       </dependency>
 
+      <!-- DATASHARE start  -->
+      <dependency>
+        <groupId>org.edu.umich</groupId>
+        <artifactId>jcosign</artifactId>
+        <version>3.0.1</version>
+      </dependency>
+      <!-- DATASHARE end  -->
+
    </dependencies>
 
 </project>
