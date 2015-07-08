@@ -59,14 +59,14 @@ index 0000000..66714ca
 +			try {
 +				serverInfo = ReplicationManager.getServerInformation();
 +			} catch(Exception e) {
-+
++				
 +			}
 +           if ( null != serverInfo ) {
-+			for ( Map.Entry<String, String> entry : serverInfo.entrySet() ) {
-+			    row_tmp = table.addRow(Row.ROLE_DATA);
-+			    row_tmp.addCellContent(entry.getKey());
-+			    row_tmp.addCellContent(entry.getValue());
-+           }
++	  	        for ( Map.Entry<String, String> entry : serverInfo.entrySet() ) {
++	  		        row_tmp = table.addRow(Row.ROLE_DATA);
++			        row_tmp.addCellContent(entry.getKey());
++			        row_tmp.addCellContent(entry.getValue());
++                }
 +           }
 +			Properties config = ReplicationManager.getConfiguration();
 +	
@@ -75,7 +75,7 @@ index 0000000..66714ca
 +            while (e.hasMoreElements()) {
 +                  String key = (String) e.nextElement();
 +                  if ( key.toLowerCase().contains("password") ) {
-+					continue;
++                      continue;
 +                  }
 +				Row row = table.addRow(Row.ROLE_DATA);
 +				row.addCellContent(key);
@@ -139,7 +139,7 @@ index 0000000..66714ca
 +		String message = null;
 +
 +		if (request.getParameter("submit_repl_list_home") != null) {
-+			message = "Files in home directory:\n\n";
++			message = "Files in home directory:                     \n\n";
 +			try {
 +				for (DataObject one_do : ReplicationManager.list()) {
 +                    String name = one_do.getFileName();
@@ -347,13 +347,13 @@ index 0000000..66714ca
 +
 +			Row row = table.addRow(Row.ROLE_DATA);
 +			row.addCellContent(String.valueOf(pos + 1));
-+							
++			
 +            // eudat stores the file path here
 +            String name = one_do.getFileName();
 +            if ( null == name ) {
 +                name = one_do.getRemoteDirPath();
 +            }
-+			
++
 +			Map<String, String> metadata = ReplicationManager.getMetadataMap(one_do);
 +			String adminStatus = metadata.get("ADMIN_Status");
 +			
@@ -377,7 +377,7 @@ index 0000000..66714ca
 +			row.addCell().addXref(eudatPID, name);
 +			
 +			// check md5 too
-+			String original_md5 = metadata.get("OTHER_original_checksum");
++            String original_md5 = metadata.get("OTHER_original_checksum");
 +			String md5 = one_do.getChecksum();
 +            if ( null == md5 ) {
 +                md5 = metadata.get("INFO_Checksum");
@@ -387,12 +387,12 @@ index 0000000..66714ca
 +                itemHandle = metadata.get("EUDAT_ROR");
 +            }
 +
-+			long orig_file_size = -1;
-+			try {
-+			 orig_file_size = Long.valueOf(metadata.get("OTHER_original_filesize"));
-+			} catch(NumberFormatException e) {
-+			}
-+			
++            long orig_file_size = -1;
++            try {
++                orig_file_size = Long.valueOf(metadata.get("OTHER_original_filesize"));
++            } catch(NumberFormatException e) {
++            }
++
 +			String sizes = orig_file_size < 0 ? "N/A" : FileUtils.byteCountToDisplaySize(orig_file_size);
 +			all_file_size += orig_file_size;
 +
@@ -407,12 +407,12 @@ index 0000000..66714ca
 +			row.addCellContent(sizes);
 +			
 +			// are md5 ok?
-+			if (rend_status.equals("ok") && (original_md5 == null || md5 == null)) {
-+				rend_status = "notok";
-+			} else if (original_md5 != null && md5 != null && !original_md5.equals(md5)) {
-+				rend_status = "notok";
-+			}
-+			
++            if (rend_status.equals("ok") && (original_md5 == null || md5 == null)) {
++                rend_status = "notok";
++            } else if (original_md5 != null && md5 != null && !original_md5.equals(md5)) {
++                rend_status = "notok";
++            }
++
 +            Cell c = row.addCell();
 +            c.addHighlight(rend_status).addContent("MD5: " + md5);
 +			
@@ -431,11 +431,11 @@ index 0000000..66714ca
 +}
 +
 diff --git a/dspace-xmlui/src/main/java/org/dspace/app/xmlui/aspect/administrative/ControlPanel.java b/dspace-xmlui/src/main/java/org/dspace/app/xmlui/aspect/administrative/ControlPanel.java
-index 434dc39..e3f750d 100644
+index 6e29999..f8323ca 100644
 --- a/dspace-xmlui/src/main/java/org/dspace/app/xmlui/aspect/administrative/ControlPanel.java
 +++ b/dspace-xmlui/src/main/java/org/dspace/app/xmlui/aspect/administrative/ControlPanel.java
-@@ -48,6 +48,9 @@ import org.dspace.core.ConfigurationManager;
- import org.dspace.eperson.EPerson;
+@@ -48,6 +48,9 @@ import org.dspace.harvest.OAIHarvester.HarvestScheduler;
+ import org.dspace.storage.rdbms.DatabaseManager;
  import org.xml.sax.SAXException;
  
 +import cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.ControlPanelReplicationTabHelper;
@@ -494,7 +494,7 @@ index 434dc39..e3f750d 100644
          else
          {
              div.addPara(T_select_panel);
-@@ -1004,6 +1026,54 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
+@@ -1014,6 +1036,56 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
              }
          }
      }
@@ -513,7 +513,9 @@ index 434dc39..e3f750d 100644
 +				ReplicationManager.initialize();
 +			} catch (Exception e) {
 +				List info = div.addList("replication-config");
++				info.addItem().addContent("Replication not initialised!");
 +				info.addItem().addContent(e.getLocalizedMessage());
++				info.addItem().addContent(e.toString());
 +				return;
 +			}
 +		}		
@@ -549,7 +551,7 @@ index 434dc39..e3f750d 100644
  	
      
      /**
-@@ -1027,3 +1097,4 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
+@@ -1037,3 +1109,4 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
          super.dispose();
      }
  }
