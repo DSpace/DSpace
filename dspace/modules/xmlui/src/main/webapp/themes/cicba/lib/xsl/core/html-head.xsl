@@ -41,7 +41,7 @@
                     <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
                     <xsl:text>/themes/</xsl:text>
                     <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-                    <xsl:text>/images/apple-touch-icon.png</xsl:text>
+                    <xsl:text>/images/favicon.ico</xsl:text>
                 </xsl:attribute>
             </link>
 
