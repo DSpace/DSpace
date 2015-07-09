@@ -31,7 +31,7 @@ install:
   - make create_databases
   - echo "Installing prerequisites"
   - make install_libs
-  - make new_deploy > /dev/null
+  - make new_deploy
   - make print_message
 
 script:
