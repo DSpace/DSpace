@@ -653,7 +653,9 @@
         <footer>
             <div class="container-fluid">
                 <div class="row">
-                    <a href="http://www.dspace.org/" target="_blank">DSpace software</a> Copyright&#160;&#169;&#160;2015&#160; <a href="http://www.duraspace.org/" target="_blank">Duraspace</a>
+                    <h3><a href="https://washcoll.edu/" target="_blank">Washington College</a></h3>
+                    <p>Library and Academic Technology</p>
+                    <p>&#160;&#169;&#160;2015&#160;</p>
                 </div>
                 <div class="row">
                     <a>
