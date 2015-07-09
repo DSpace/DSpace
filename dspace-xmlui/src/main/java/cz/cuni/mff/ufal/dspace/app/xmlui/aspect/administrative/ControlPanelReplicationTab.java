@@ -22,9 +22,10 @@ public class ControlPanelReplicationTab extends AbstractControlPanelTab {
 		
 		div.setHead("Replication Service");
 		
-		ControlPanelReplicationTabHelper.showTabs(div, request, context);		
+		ControlPanelReplicationTabHelper.addForm(div);		
 
 	}			
 	
 }
+
 
