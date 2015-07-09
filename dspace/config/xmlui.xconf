@@ -184,8 +184,8 @@
         <!-- Mirage theme, @mire contributed theme, default since DSpace 3.0 -->
         <!-- <theme name="Atmire Mirage Theme" regex=".*" path="Mirage/" /> -->
 
-        <!-- Mirage2 theme from @mire. An adaptive theme based on bootstrap -->
-        <theme name="Atmire Mirage2 Theme" regex=".*" path="Mirage2/" />
+        <!-- @mire adaptive theme based on bootstrap changed to VT colors -->
+        <theme name="Atmire Mirage2 Theme" regex=".*" path="vtmirage2/" />
 
         <!-- Reference theme, the default Manakin XMLUI layout up to DSpace 1.8 -->
         <!-- <theme name="Default Reference Theme" regex=".*" path="Reference/" /> -->
