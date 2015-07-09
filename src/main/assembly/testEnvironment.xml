@@ -29,26 +29,28 @@
          of a <moduleSet> so that we don't have to first build the "dspace" module. -->
     <fileSets>
         <fileSet>
+            <directory>${basedir}/dspace</directory>
             <!-- Copy necessary DSpace subdirectories into Test environment -->
             <includes>
-                <include>dspace/bin/**</include>
-                <include>dspace/config/**</include>
-                <include>dspace/etc/**</include>
-                <include>dspace/solr/**</include>
+                <include>bin/**</include>
+                <include>config/**</include>
+                <include>etc/**</include>
+                <include>solr/**</include>
             </includes>
             <!-- But, exclude specific configs (which require filtering) -->
             <excludes>
-                <exclude>dspace/config/dspace.cfg</exclude>
-                <exclude>dspace/config/log4j.properties</exclude>
-                <exclude>dspace/config/modules/**</exclude>
+                <exclude>config/dspace.cfg</exclude>
+                <exclude>config/log4j.properties</exclude>
+                <exclude>config/modules/**</exclude>
             </excludes>
         </fileSet>
-        <fileSet> 
+        <fileSet>
+            <directory>${basedir}/dspace</directory>
             <!-- Copy specific configs (filtering their content) also into Test environment -->
             <includes>
-                <include>dspace/config/modules/**</include>
-                <include>dspace/config/dspace.cfg</include>
-                <include>dspace/config/log4j.properties</include>
+                <include>config/modules/**</include>
+                <include>config/dspace.cfg</include>
+                <include>config/log4j.properties</include>
             </includes>
             <filtered>true</filtered>
         </fileSet>        
