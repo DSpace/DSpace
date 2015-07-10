@@ -4281,24 +4281,7 @@
 			<value>resultSearchPointer</value>
 		</property>		
 	</bean>
-	
-	<bean id="searchRPRadioButton"
-		class="org.dspace.app.webui.cris.controller.jdyna.CrisCheckRadioController">
-		<property name="applicationService">
-			<ref bean="applicationService" />
-		</property>
-		<property name="searchService">
-			<ref bean="crisSearchService" />
-		</property>
-		<property name="clazzPD">
-			<value>org.dspace.app.cris.model.jdyna.RPPropertiesDefinition</value>
-		</property>
-		<property name="viewName">
-			<value>resultRadioButton</value>
-		</property>		
-	</bean>
-	
-	
+		
 	<bean id="searchProjectPointer"
 		class="org.dspace.app.webui.cris.controller.jdyna.CrisSearchPointerController">
 		<property name="applicationService">
@@ -4313,23 +4296,6 @@
 		</property>				
 		<property name="viewName">
 			<value>resultSearchPointer</value>
-		</property>		
-	</bean>
-
-
-	<bean id="searchProjectRadioButton"
-		class="org.dspace.app.webui.cris.controller.jdyna.CrisCheckRadioController">
-		<property name="applicationService">
-			<ref bean="applicationService" />
-		</property>
-		<property name="searchService">
-			<ref bean="crisSearchService" />
-		</property>
-		<property name="clazzPD">
-			<value>org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition</value>
-		</property>
-		<property name="viewName">
-			<value>resultRadioButton</value>
 		</property>		
 	</bean>
 	
@@ -4349,22 +4315,6 @@
 		</property>		
 	</bean>
 	
-	<bean id="searchOURadioButton"
-		class="org.dspace.app.webui.cris.controller.jdyna.CrisCheckRadioController">
-		<property name="applicationService">
-			<ref bean="applicationService" />
-		</property>
-		<property name="searchService">
-			<ref bean="crisSearchService" />
-		</property>
-		<property name="clazzPD">
-			<value>org.dspace.app.cris.model.jdyna.OUPropertiesDefinition</value>
-		</property>
-		<property name="viewName">
-			<value>resultRadioButton</value>
-		</property>		
-	</bean>
-	
 	<bean id="searchDOPointer"
 		class="org.dspace.app.webui.cris.controller.jdyna.CrisSearchPointerController">
 		<property name="applicationService">
@@ -4380,22 +4330,6 @@
 			<value>resultSearchPointer</value>
 		</property>		
 	</bean>
-	
-	<bean id="searchDORadioButton"
-		class="org.dspace.app.webui.cris.controller.jdyna.CrisCheckRadioController">
-		<property name="applicationService">
-			<ref bean="applicationService" />
-		</property>
-		<property name="searchService">
-			<ref bean="crisSearchService" />
-		</property>
-		<property name="clazzPD">
-			<value>org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition</value>
-		</property>
-		<property name="viewName">
-			<value>resultRadioButton</value>
-		</property>		
-	</bean>	
 	
 	<bean id="rpDeleteController"
 		class="org.dspace.app.webui.cris.controller.ResearcherPageDetailsController">
@@ -5927,11 +5861,6 @@
 				<prop key="/tools/project/searchPointer.htm">searchProjectPointer</prop>
 				<prop key="/tools/ou/searchPointer.htm">searchOUPointer</prop>
 				<prop key="/tools/*/searchPointer.htm">searchDOPointer</prop>
-				
-				<prop key="/tools/rp/searchRadioButton.htm">searchRPRadioButton</prop>
-				<prop key="/tools/project/searchRadioButton.htm">searchProjectRadioButton</prop>
-				<prop key="/tools/ou/searchRadioButton.htm">searchOURadioButton</prop>
-				<prop key="/tools/*/searchRadioButton.htm">searchDORadioButton</prop>
 				
 				<!-- Management of nested objects -->				
 				<prop key="/rp/viewNested.htm">viewRPNestedDetailsController</prop>

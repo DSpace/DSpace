@@ -374,11 +374,11 @@
 										</div>
 										<dyna:text propertyPath="real.mask[${i.count - 1}].rendering.staticValues"  visibility="false"
 											labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.checkradio.staticValues" helpKey="help.jdyna.message.rendering.checkradio.staticValues"/>
-<%-- 										<div class="dynaClear">
+ 										<div class="dynaClear">
 										&nbsp;
 										</div>							
-										<dyna:text propertyPath="real.mask[${i.count - 1}].rendering.query"  visibility="false"
-											labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.checkradio.query" helpKey="help.jdyna.message.rendering.checkradio.query"/> --%>
+										<dyna:text propertyPath="real.mask[${i.count - 1}].rendering.dropdown"  visibility="false"
+											labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.checkradio.dropdown" helpKey="help.jdyna.message.rendering.checkradio.dropdown"/>
 										</fieldset>											
 										</c:if>					
 								

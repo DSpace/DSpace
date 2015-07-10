@@ -67,11 +67,14 @@
     <link href="<%=request.getContextPath()%>/js/jscalendar/calendar-blue.css" type="text/css" rel="stylesheet" />
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/commons-edit-jquery-for-cris.css" type="text/css" />
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/researcher.css" type="text/css" />
-    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/jdyna.css" type="text/css" />               
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/jdyna.css" type="text/css" />     
+    <link href="<%= request.getContextPath() %>/css/select2/select2.css" type="text/css" rel="stylesheet" />
+    <link href="<%= request.getContextPath() %>/css/select2/select2-bootstrap.css" type="text/css" rel="stylesheet" />          
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/jscalendar/calendar.js"> </script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/jscalendar/lang/calendar-en.js"> </script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/jscalendar/calendar-setup.js"> </script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery.form.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/js/select2/select2.min.js"></script>
   	<style>
     .ui-autocomplete-loading {
         background: white url('../../../image/jdyna/indicator.gif') right center no-repeat;
@@ -281,6 +284,8 @@
     	
 		j(document).ready(function()
 		{
+			j(".jdynadropdown").select2();
+			
 			j("#alert_eperson_dialog").dialog({ autoOpen: false });
 				
 			 j("#eperson").autocomplete({
@@ -471,29 +476,6 @@
 
 	}
 		
-
-/* 		var activeRadioButton = function() {			
-			 j(".radiobuttoninfo").each(function(){
-				 var id = j(this).html();	
-				 jQuery.ajax({
-					  url: "searchRadioButton.html",
-					  dataType: "html",
-					  data : {																			
-						"elementID" : id,
-						"objectID" : ${anagraficadto.objectId}
-					  },
-		          success: function( data ) {
-		          	response( j.map( data.checkradio, function( item ) {
-		            	return {
-		                	label: item.display,
-		                    value: item.id
-						}
-			        }));
-		          }
-				 });
-			});
-		}; */
-
 		var activeEperson = function(id) {
 			j.ajax({
                 url: "eperson.json",

@@ -67,10 +67,13 @@
 	<link rel="stylesheet" href="<%= request.getContextPath() %>/css/commons-edit-jquery-for-cris.css" type="text/css" />    
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/researcher.css" type="text/css" />
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/jdyna.css" type="text/css" />
+    <link href="<%= request.getContextPath() %>/css/select2/select2.css" type="text/css" rel="stylesheet" />
+    <link href="<%= request.getContextPath() %>/css/select2/select2-bootstrap.css" type="text/css" rel="stylesheet" />
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/jscalendar/calendar.js"> </script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/jscalendar/lang/calendar-en.js"> </script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/jscalendar/calendar-setup.js"> </script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery.form.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/js/select2/select2.min.js"></script>
 		
 	<style>
     .ui-autocomplete-loading {
@@ -282,6 +285,8 @@
 	
 	j(document).ready(function()
 	{
+		j('.jdynadropdown').select2();
+		
 		j('#nested_edit_dialog').dialog({
 			autoOpen: false,
 			modal: true,
