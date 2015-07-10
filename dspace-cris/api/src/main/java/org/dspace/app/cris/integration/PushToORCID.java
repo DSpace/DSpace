@@ -14,6 +14,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -30,32 +33,59 @@ import org.dspace.app.cris.model.jdyna.RPProperty;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.service.RelationPreferenceService;
 import org.dspace.app.cris.util.ResearcherPageUtils;
-import org.dspace.app.util.OrcidMetadata;
+import org.dspace.app.util.OrcidFundingMetadata;
+import org.dspace.app.util.OrcidWorkMetadata;
 import org.dspace.authority.orcid.OrcidService;
 import org.dspace.authority.orcid.jaxb.Address;
+import org.dspace.authority.orcid.jaxb.Amount;
+import org.dspace.authority.orcid.jaxb.Citation;
+import org.dspace.authority.orcid.jaxb.CitationType;
 import org.dspace.authority.orcid.jaxb.ContactDetails;
+import org.dspace.authority.orcid.jaxb.Contributor;
+import org.dspace.authority.orcid.jaxb.ContributorAttributes;
+import org.dspace.authority.orcid.jaxb.ContributorEmail;
 import org.dspace.authority.orcid.jaxb.Country;
 import org.dspace.authority.orcid.jaxb.CreditName;
+import org.dspace.authority.orcid.jaxb.CurrencyCode;
+import org.dspace.authority.orcid.jaxb.Day;
 import org.dspace.authority.orcid.jaxb.Email;
 import org.dspace.authority.orcid.jaxb.ExternalIdCommonName;
 import org.dspace.authority.orcid.jaxb.ExternalIdReference;
 import org.dspace.authority.orcid.jaxb.ExternalIdUrl;
 import org.dspace.authority.orcid.jaxb.ExternalIdentifier;
 import org.dspace.authority.orcid.jaxb.ExternalIdentifiers;
+import org.dspace.authority.orcid.jaxb.Funding;
+import org.dspace.authority.orcid.jaxb.FundingContributor;
+import org.dspace.authority.orcid.jaxb.FundingContributorAttributes;
+import org.dspace.authority.orcid.jaxb.FundingContributors;
+import org.dspace.authority.orcid.jaxb.FundingExternalIdentifier;
+import org.dspace.authority.orcid.jaxb.FundingExternalIdentifiers;
 import org.dspace.authority.orcid.jaxb.FundingList;
+import org.dspace.authority.orcid.jaxb.FundingTitle;
+import org.dspace.authority.orcid.jaxb.FuzzyDate;
 import org.dspace.authority.orcid.jaxb.JournalTitle;
 import org.dspace.authority.orcid.jaxb.Keyword;
 import org.dspace.authority.orcid.jaxb.Keywords;
+import org.dspace.authority.orcid.jaxb.LanguageCode;
+import org.dspace.authority.orcid.jaxb.Month;
 import org.dspace.authority.orcid.jaxb.OrcidBio;
+import org.dspace.authority.orcid.jaxb.OrcidId;
 import org.dspace.authority.orcid.jaxb.OrcidProfile;
 import org.dspace.authority.orcid.jaxb.OrcidWork;
 import org.dspace.authority.orcid.jaxb.OrcidWorks;
 import org.dspace.authority.orcid.jaxb.OtherNames;
 import org.dspace.authority.orcid.jaxb.PersonalDetails;
+import org.dspace.authority.orcid.jaxb.PublicationDate;
 import org.dspace.authority.orcid.jaxb.ResearcherUrl;
 import org.dspace.authority.orcid.jaxb.ResearcherUrls;
+import org.dspace.authority.orcid.jaxb.Subtitle;
+import org.dspace.authority.orcid.jaxb.TranslatedTitle;
 import org.dspace.authority.orcid.jaxb.Url;
+import org.dspace.authority.orcid.jaxb.WorkContributors;
+import org.dspace.authority.orcid.jaxb.WorkExternalIdentifier;
+import org.dspace.authority.orcid.jaxb.WorkExternalIdentifiers;
 import org.dspace.authority.orcid.jaxb.WorkTitle;
+import org.dspace.authority.orcid.jaxb.Year;
 import org.dspace.content.DCPersonName;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
@@ -200,7 +230,8 @@ public class PushToORCID {
 						OrcidProfile profile = buildOrcidProfile(applicationService, crisId,
 								mapResearcherMetadataToSend, orcidConfigurationMapping);
 						OrcidWorks works = buildOrcidWorks(context, crisId, mapPublicationsToSend);
-						FundingList fundings = buildOrcidFundings(applicationService, crisId, mapProjectsToSend);
+						FundingList fundings = buildOrcidFundings(context, applicationService, crisId,
+								mapProjectsToSend);
 
 						profile.getOrcidActivities().setOrcidWorks(works);
 						profile.getOrcidActivities().setFundingList(fundings);
@@ -250,7 +281,8 @@ public class PushToORCID {
 						String tokenCreateFundings = mapResearcherTokenCreateFundings.get(crisId);
 						if (StringUtils.isNotBlank(tokenCreateFundings)) {
 							log.info("(Q3)Prepare FundingList for ResearcherPage crisID:" + crisId);
-							FundingList fundings = buildOrcidFundings(applicationService, crisId, mapProjectsToSend);
+							FundingList fundings = buildOrcidFundings(context, applicationService, crisId,
+									mapProjectsToSend);
 							if (fundings != null) {
 								orcidService.appendFundings(orcid, tokenCreateWorks, fundings);
 								log.info("(A3) FundingList for ResearcherPage crisID:" + crisId);
@@ -408,34 +440,282 @@ public class PushToORCID {
 		}
 	}
 
-	private static FundingList buildOrcidFundings(ApplicationService applicationService, String crisId, Map<String, List<Integer>> mapProjectsToSend) {
+	private static FundingList buildOrcidFundings(Context context, ApplicationService applicationService, String crisId,
+			Map<String, List<Integer>> mapProjectsToSend) throws SQLException {
 		FundingList fundingList = new FundingList();
 		List<Integer> listOfItems = mapProjectsToSend.get(crisId);
-		for(Integer ii : listOfItems) {
+		for (Integer ii : listOfItems) {
 			Project project = applicationService.get(Project.class, ii);
+			OrcidFundingMetadata itemMetadata = new OrcidFundingMetadata(context, project);
+
+			Funding funding = new Funding();
+			if (StringUtils.isNotBlank(itemMetadata.getAmount())) {
+				Amount amount = new Amount();
+				CurrencyCode currencyCode = CurrencyCode.fromValue(itemMetadata.getCurrencyCode());
+				amount.setValue(itemMetadata.getAmount());
+				amount.setCurrencyCode(currencyCode);
+				funding.setAmount(amount);
+			}
+
+			if (StringUtils.isNotBlank(itemMetadata.getStartYear())
+					|| StringUtils.isNotBlank(itemMetadata.getStartMonth())
+					|| StringUtils.isNotBlank(itemMetadata.getStartDay())) {
+				FuzzyDate fuzzyDate = new FuzzyDate();
+				if (StringUtils.isNotBlank(itemMetadata.getStartYear())) {
+					Year year = new Year();
+					year.setValue(itemMetadata.getStartYear());
+					fuzzyDate.setYear(year);
+				}
+				if (StringUtils.isNotBlank(itemMetadata.getStartMonth())) {
+					Month month = new Month();
+					month.setValue(itemMetadata.getStartMonth());
+					fuzzyDate.setMonth(month);
+				}
+				if (StringUtils.isNotBlank(itemMetadata.getStartDay())) {
+					Day day = new Day();
+					day.setValue(itemMetadata.getStartDay());
+					fuzzyDate.setDay(day);
+				}
+				funding.setStartDate(fuzzyDate);
+			}
+			if (StringUtils.isNotBlank(itemMetadata.getEndYear()) || StringUtils.isNotBlank(itemMetadata.getEndMonth())
+					|| StringUtils.isNotBlank(itemMetadata.getEndDay())) {
+				FuzzyDate fuzzyDate = new FuzzyDate();
+				if (StringUtils.isNotBlank(itemMetadata.getEndYear())) {
+					Year year = new Year();
+					year.setValue(itemMetadata.getEndYear());
+					fuzzyDate.setYear(year);
+				}
+				if (StringUtils.isNotBlank(itemMetadata.getEndMonth())) {
+					Month month = new Month();
+					month.setValue(itemMetadata.getEndMonth());
+					fuzzyDate.setMonth(month);
+				}
+				if (StringUtils.isNotBlank(itemMetadata.getEndDay())) {
+					Day day = new Day();
+					day.setValue(itemMetadata.getEndDay());
+					fuzzyDate.setDay(day);
+				}
+				funding.setEndDate(fuzzyDate);
+			}
+
+			FundingContributors fundingContributors = new FundingContributors();
+			for (String valContributor : itemMetadata.getContributorsLead()) {
+				addFundingContributor(fundingContributors, valContributor, "lead");
+			}
+
+			for (String valContributor : itemMetadata.getContributorsCoLead()) {
+				addFundingContributor(fundingContributors, valContributor, "colead");
+			}
+			funding.setFundingContributors(fundingContributors);
+
+			FundingExternalIdentifiers fundingExternalIdentifiers = new FundingExternalIdentifiers();
+			for (String valIdentifier : itemMetadata.getExternalIdentifier()) {
+				FundingExternalIdentifier fundingExternalIdentifier = new FundingExternalIdentifier();
+				fundingExternalIdentifier
+						.setFundingExternalIdentifierType(itemMetadata.getExternalIdentifierType(valIdentifier));
+				fundingExternalIdentifier.setFundingExternalIdentifierValue(valIdentifier);
+				fundingExternalIdentifiers.getFundingExternalIdentifier().add(fundingExternalIdentifier);
+			}
+			funding.setFundingExternalIdentifiers(fundingExternalIdentifiers);
+
+			if (StringUtils.isNotBlank(itemMetadata.getTitle())) {
+				FundingTitle fundingTitle = new FundingTitle();
+				fundingTitle.setTitle(itemMetadata.getTitle());
+				funding.setFundingTitle(fundingTitle);
+			}
 			
+			if(StringUtils.isNotBlank(itemMetadata.getType())) {
+				funding.setFundingType(itemMetadata.getType());
+			}
+			
+			if(StringUtils.isNotBlank(itemMetadata.getAbstract())) {
+				funding.setShortDescription(itemMetadata.getAbstract());
+			}
+			if(StringUtils.isNotBlank(itemMetadata.getURL())) {
+				Url url = new Url();
+				url.setValue(itemMetadata.getURL());
+				funding.setUrl(url);
+			}
+			fundingList.getFunding().add(funding);
 		}
 		return fundingList;
 	}
 
-	private static OrcidWorks buildOrcidWorks(Context context, String crisId, Map<String, List<Integer>> mapPublicationsToSend) throws SQLException {
+	private static void addFundingContributor(FundingContributors fundingContributors, String valContributor,
+			String type) {
+		FundingContributor contributor = new FundingContributor();
+
+		Integer id = ResearcherPageUtils.getRealPersistentIdentifier(valContributor, ResearcherPage.class);
+		String name = valContributor;
+		String email = "";
+		String orcid = "";
+		if (null != id) {
+			ResearcherPage ro = ResearcherPageUtils.getCrisObject(id, ResearcherPage.class);
+			name = ResearcherPageUtils.getStringValue(ro, "fullName");
+			email = ResearcherPageUtils.getStringValue(ro, "email");
+			orcid = ResearcherPageUtils.getStringValue(ro, "orcid");
+
+			if (StringUtils.isNotBlank(email)) {
+				ContributorEmail contributorEmail = new ContributorEmail();
+				contributorEmail.setValue(email);
+				contributor.setContributorEmail(contributorEmail);
+			}
+			if (StringUtils.isNotBlank(orcid)) {
+				String domainOrcid = ConfigurationManager.getProperty("cris",
+						"external.domainname.authority.service.orcid");
+				OrcidId orcidID = new OrcidId();
+				JAXBElement<String> jaxBOrcid = new JAXBElement<String>(new QName("uri"), String.class,
+						domainOrcid + orcid);
+				orcidID.getContent().add(jaxBOrcid);
+				contributor.setContributorOrcid(orcidID);
+			}
+		}
+
+		CreditName creditName = new CreditName();
+		creditName.setValue(name);
+		contributor.setCreditName(creditName);
+
+		FundingContributorAttributes attributes = new FundingContributorAttributes();
+		attributes.setFundingContributorRole(type);
+		fundingContributors.getFundingContributor().add(contributor);
+	}
+
+	private static OrcidWorks buildOrcidWorks(Context context, String crisId,
+			Map<String, List<Integer>> mapPublicationsToSend) throws SQLException {
 		OrcidWorks orcidWorks = new OrcidWorks();
 		List<Integer> listOfItems = mapPublicationsToSend.get(crisId);
-		for(Integer ii : listOfItems) {
+		for (Integer ii : listOfItems) {
 			OrcidWork orcidWork = new OrcidWork();
-			
+
 			Item item = Item.find(context, ii);
-						
-			OrcidMetadata itemMetadata = new OrcidMetadata(context, item);
-			
+
+			OrcidWorkMetadata itemMetadata = new OrcidWorkMetadata(context, item);
+
 			WorkTitle worktitle = new WorkTitle();
 			worktitle.setTitle(itemMetadata.getTitle());
+
+			if (StringUtils.isNotBlank(itemMetadata.getSubTitle())) {
+				Subtitle subtitle = new Subtitle();
+				subtitle.setContent(itemMetadata.getSubTitle());
+				worktitle.setSubtitle(subtitle);
+			}
+
+			if (StringUtils.isNotBlank(itemMetadata.getTranslatedTitle())) {
+				TranslatedTitle translatedTitle = new TranslatedTitle();
+				translatedTitle.setValue(itemMetadata.getTranslatedTitle());
+				String translatedLanguageCode = itemMetadata.getTranslatedTitleLanguage();
+
+				try {
+					LanguageCode langCode = LanguageCode.fromValue(translatedLanguageCode);
+					translatedTitle.setLanguageCode(langCode);
+				} catch (Exception ex) {
+					translatedTitle.setLanguageCode(LanguageCode.EN);
+				}
+				worktitle.setTranslatedTitle(translatedTitle);
+			}
+
+			String citationVal = itemMetadata.getCitation();
+			if (StringUtils.isNotBlank(citationVal)) {
+				Citation citation = new Citation();
+				citation.setWorkCitationType(CitationType.fromValue(itemMetadata.getCitationType()));
+				citation.setCitation(citationVal);
+				orcidWork.setWorkCitation(citation);
+			}
+
 			orcidWork.setWorkTitle(worktitle);
-			
-			JournalTitle journalTitle = new JournalTitle();
-			journalTitle.setContent(itemMetadata.getJournalTitle());
-			orcidWork.setJournalTitle(journalTitle);
-			
+
+			if (StringUtils.isNotBlank(itemMetadata.getJournalTitle())) {
+				JournalTitle journalTitle = new JournalTitle();
+				journalTitle.setContent(itemMetadata.getJournalTitle());
+				orcidWork.setJournalTitle(journalTitle);
+			}
+
+			if (StringUtils.isNotBlank(itemMetadata.getYear()) || StringUtils.isNotBlank(itemMetadata.getMonth())
+					|| StringUtils.isNotBlank(itemMetadata.getDay())) {
+				PublicationDate publicationDate = new PublicationDate();
+				if (StringUtils.isNotBlank(itemMetadata.getYear())) {
+					Year year = new Year();
+					year.setValue(itemMetadata.getYear());
+					publicationDate.setYear(year);
+				}
+				if (StringUtils.isNotBlank(itemMetadata.getMonth())) {
+					Month month = new Month();
+					month.setValue(itemMetadata.getMonth());
+					publicationDate.setMonth(month);
+				}
+				if (StringUtils.isNotBlank(itemMetadata.getDay())) {
+					Day day = new Day();
+					day.setValue(itemMetadata.getDay());
+					publicationDate.setDay(day);
+				}
+				orcidWork.setPublicationDate(publicationDate);
+			}
+
+			if (StringUtils.isNotBlank(itemMetadata.getURL())) {
+				Url url = new Url();
+				url.setValue(itemMetadata.getURL());
+				orcidWork.setUrl(url);
+			}
+
+			WorkExternalIdentifiers workExternalIdentifiers = new WorkExternalIdentifiers();
+
+			for (String valIdentifier : itemMetadata.getExternalIdentifier()) {
+				WorkExternalIdentifier workExternalIdentifier = new WorkExternalIdentifier();
+				workExternalIdentifier.setWorkExternalIdentifierId(valIdentifier);
+				workExternalIdentifier
+						.setWorkExternalIdentifierType(itemMetadata.getExternalIdentifierType(valIdentifier));
+				workExternalIdentifiers.getWorkExternalIdentifier().add(workExternalIdentifier);
+			}
+
+			orcidWork.setWorkExternalIdentifiers(workExternalIdentifiers);
+
+			// export if have an authority value
+			WorkContributors workContributors = new WorkContributors();
+			for (String valContributor : itemMetadata.getAuthors()) {
+				Contributor contributor = new Contributor();
+
+				Integer id = ResearcherPageUtils.getRealPersistentIdentifier(valContributor, ResearcherPage.class);
+				String name = valContributor;
+				String email = "";
+				String orcid = "";
+				if (null != id) {
+					ResearcherPage ro = ResearcherPageUtils.getCrisObject(id, ResearcherPage.class);
+					name = ResearcherPageUtils.getStringValue(ro, "fullName");
+					email = ResearcherPageUtils.getStringValue(ro, "email");
+					orcid = ResearcherPageUtils.getStringValue(ro, "orcid");
+
+					if (StringUtils.isNotBlank(email)) {
+						ContributorEmail contributorEmail = new ContributorEmail();
+						contributorEmail.setValue(email);
+						contributor.setContributorEmail(contributorEmail);
+					}
+					if (StringUtils.isNotBlank(orcid)) {
+						String domainOrcid = ConfigurationManager.getProperty("cris",
+								"external.domainname.authority.service.orcid");
+						OrcidId orcidID = new OrcidId();
+						JAXBElement<String> jaxBOrcid = new JAXBElement<String>(new QName("uri"), String.class,
+								domainOrcid + orcid);
+						orcidID.getContent().add(jaxBOrcid);
+						contributor.setContributorOrcid(orcidID);
+					}
+				}
+
+				CreditName creditName = new CreditName();
+				creditName.setValue(name);
+				contributor.setCreditName(creditName);
+
+				ContributorAttributes attributes = new ContributorAttributes();
+				// TODO now supported only author/additional
+				attributes.setContributorRole("author");
+				attributes.setContributorSequence("additional");
+				contributor.setContributorAttributes(attributes);
+				workContributors.getContributor().add(contributor);
+			}
+			orcidWork.setWorkContributors(workContributors);
+
+			LanguageCode language = LanguageCode.fromValue(itemMetadata.getLanguage());
+			orcidWork.setLanguageCode(language);
 		}
 		return orcidWorks;
 	}
@@ -524,7 +804,7 @@ public class PushToORCID {
 		}
 		bioJAXB.setResearcherUrls(researcherUrls);
 		bioJAXB.setExternalIdentifiers(externalIdentifiers);
-		
+
 		// start contact details
 		ContactDetails contactDetailsJAXB = new ContactDetails();
 

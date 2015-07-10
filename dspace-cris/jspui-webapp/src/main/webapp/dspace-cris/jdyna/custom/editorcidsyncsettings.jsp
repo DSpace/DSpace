@@ -22,7 +22,41 @@
         		</a></h4>
     	</div>
 		<div id="collapseOne${holder.shortName}" class="panel-collapse collapse in">
-			<div class="panel-body">	
+			<div class="panel-body">
+				<div class="col-md-12">	
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								<fmt:message
+									key="jsp.orcid.custom.box.label.preferences.pushmode.title" />
+							</h3>
+						</div>
+						<div class="panel-body">
+							<div class="container">
+								<div class="alert alert-info" role="alert">
+									<fmt:message
+										key="jsp.orcid.custom.box.label.preferences.pushmode" />
+								</div>
+								<div class="col-md-12">
+									<c:forEach
+										items="${propertiesDefinitionsInHolder[holder.shortName]}"
+										var="tipologiaDaVisualizzare">
+										<c:if
+											test="${tipologiaDaVisualizzare.shortName eq 'orcid-push-manual'}">
+											<dyna:edit tipologia="${tipologiaDaVisualizzare.object}"
+												disabled="${disabled}"
+												propertyPath="anagraficadto.anagraficaProperties[${tipologiaDaVisualizzare.shortName}]"
+												ajaxValidation="validateAnagraficaProperties"
+												hideLabel="${hideLabel}" validationParams="${parameters}"
+												visibility="${visibility}" lock="true" />
+										</c:if>
+									</c:forEach>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			<div class="clearfix">&nbsp;</div>
 			<div class="dynaClear">&nbsp;</div>
             <div class="dynaClear">&nbsp;</div>
             <div class="dynaClear">&nbsp;</div>
@@ -34,7 +68,8 @@
   						</div>
   						<div class="panel-body">
     						<div class="container">
-    							 <div class="col-md-12">
+    							<div class="label label-info"><fmt:message key="jsp.orcid.custom.box.label.preferences.publications.tips"/></div>
+    							<div class="clearfix"></div>
 								<c:forEach
 									items="${propertiesDefinitionsInHolder[holder.shortName]}"
 									var="tipologiaDaVisualizzare">									
@@ -45,7 +80,6 @@
 											validationParams="${parameters}" visibility="${visibility}" lock="true"/>																
 									</c:if>
 								</c:forEach>
-								  </div>    						
 							</div>
 						</div>   
 					</div></div>
@@ -55,8 +89,9 @@
     						<h3 class="panel-title"><fmt:message key="jsp.orcid.custom.box.label.preferences.grant"/></h3>
   						</div>
   						<div class="panel-body">
-    						<div class="container">	
-								<div class="col-md-12">
+    						<div class="container">
+    							<div class="label label-info"><fmt:message key="jsp.orcid.custom.box.label.preferences.projects.tips"/></div>
+    							<div class="clearfix"></div>
 								<c:forEach
 									items="${propertiesDefinitionsInHolder[holder.shortName]}"
 									var="tipologiaDaVisualizzare">
@@ -70,7 +105,7 @@
 								  </div>  
     						</div>
 						</div>   
-					</div></div>
+					</div>
 
 
 					<div class="col-md-4"><div class="panel panel-default">
@@ -78,7 +113,9 @@
     						<h3 class="panel-title"><fmt:message key="jsp.orcid.custom.box.label.preferences.profile"/></h3>
   						</div>
   						<div class="panel-body">
-    						<div class="container">	
+    						<div class="container">
+    							<div class="label label-info"><fmt:message key="jsp.orcid.custom.box.label.preferences.profile.tips"/></div>
+    							<div class="clearfix"></div>		
 								<c:forEach
 									items="${propertiesDefinitionsInHolder[holder.shortName]}"
 									var="tipologiaDaVisualizzare">
@@ -91,11 +128,10 @@
 									</c:if>
 		
 								</c:forEach>
-
+								</div>
 							</div>
 		
    						 </div>							
 						</div>   
-					</div></div>
-		</div></div></div>
+					</div></div></div>
 </div>

@@ -35,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.cris.dao.CrisObjectDao;
 import org.dspace.app.cris.dao.CrisSubscriptionDao;
 import org.dspace.app.cris.dao.DynamicObjectDao;
+import org.dspace.app.cris.dao.OrcidQueueDao;
 import org.dspace.app.cris.dao.OrganizationUnitDao;
 import org.dspace.app.cris.dao.ProjectDao;
 import org.dspace.app.cris.dao.RelationPreferenceDao;
@@ -53,6 +54,7 @@ import org.dspace.app.cris.model.jdyna.DynamicObjectType;
 import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.RPProperty;
 import org.dspace.app.cris.model.jdyna.TabResearcherPage;
+import org.dspace.app.cris.model.orcid.OrcidQueue;
 import org.dspace.app.cris.model.ws.User;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.core.ConfigurationManager;
@@ -83,6 +85,8 @@ public class ApplicationService extends ExtendedTabService
 
     private UserWSDao userWSDao;
 
+    private OrcidQueueDao orcidQueueDao;
+    
     private ConfigurationService configurationService;
     
     private CacheManager cacheManager;
@@ -108,6 +112,7 @@ public class ApplicationService extends ExtendedTabService
         userWSDao = (UserWSDao) getDaoByModel(User.class);
         relationPreferenceDao = (RelationPreferenceDao) getDaoByModel(RelationPreference.class);
         researchDao = (DynamicObjectDao) getDaoByModel(ResearchObject.class);
+        orcidQueueDao = (OrcidQueueDao) getDaoByModel(OrcidQueue.class);
         
 		if (configurationService.getPropertyAsType("cris.applicationServiceCache.enabled", true, true)
         		&& cache == null)
@@ -930,4 +935,7 @@ public class ApplicationService extends ExtendedTabService
 		return dao.findByAccessLevel(level);
 	}
 	
+	public List<OrcidQueue> findOrcidQueueByResearcherId(Integer researcherID) {
+		return orcidQueueDao.findOrcidQueueByResearcherId(researcherID);
+	}
 } 

@@ -23,3 +23,8 @@ CREATE SEQUENCE potentialmatches_seq;
 CREATE INDEX rp_idx ON potentialmatches (rp);
 CREATE INDEX pending_idx ON potentialmatches (pending);
 -- END potential matches --
+
+create table cris_orcid_history (id number(10,0) not null, itemId number(10,0), projectId number(10,0), researcherId number(10,0), responseMessage clob, lastAttempt timestamp, lastSuccess timestamp, primary key (id));
+create table cris_orcid_queue (id number(10,0) not null, itemId number(10,0), mode varchar2(255), projectId number(10,0), researcherId number(10,0), send number(1,0) not null, primary key (id));
+create sequence CRIS_ORCIDHISTORY_SEQ;
+create sequence CRIS_ORCIDQUEUE_SEQ;

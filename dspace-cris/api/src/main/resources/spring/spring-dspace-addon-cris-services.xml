@@ -31,7 +31,13 @@
 	<bean id="baseService" class="it.cilea.osd.common.service.PersistenceService"
 		abstract="true">		
 		<property name="modelDaos">
-			<map>			
+			<map>
+				<entry key="org.dspace.app.cris.model.orcid.OrcidHistory">
+					<ref bean="orcidHistoryDao" />
+				</entry>
+				<entry key="org.dspace.app.cris.model.orcid.OrcidQueue">
+					<ref bean="orcidQueueDao" />
+				</entry>			
 				<entry key="org.dspace.app.cris.model.RelationPreference">
 					<ref bean="relationPreferenceDao" />
 				</entry>
@@ -724,6 +730,40 @@
 		</property>
 	</bean>
 	
+	<bean id="orcidQueueDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.OrcidQueueDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.orcid.OrcidQueue
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="orcidHistoryDao" parent="abstractDao">
+		<property name="proxyInterfaces">
+			<value>
+				org.dspace.app.cris.dao.OrcidHistoryDao
+			</value>
+		</property>
+		<property name="target">
+			<bean parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>
+						org.dspace.app.cris.model.orcid.OrcidHistory
+					</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+		
 	<bean id="nestedObjectDao" parent="abstractDao">
 		<property name="proxyInterfaces">
 			<value>

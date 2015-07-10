@@ -35,6 +35,8 @@
   						</div>
   						<div class="panel-body">
     						<div class="container">
+							<div class="label label-info"><fmt:message key="jsp.orcid.custom.box.label.preferences.publications.details.tips"/></div>
+							<div class="clearfix">&nbsp;</div>
     						<c:choose>	
 								<c:when test="${!empty anagraficaObject.anagrafica4view['orcid-publications-prefs'] && anagraficaObject.anagrafica4view['orcid-publications-prefs'][0].value.object==1}">
 									<span class="label label-success"><fmt:message key="jsp.orcid.custom.box.label.preferences.publications.sendall"/></span>
@@ -59,7 +61,9 @@
     						<h3 class="panel-title"><fmt:message key="jsp.orcid.custom.box.label.preferences.grant"/></h3>
   						</div>
   						<div class="panel-body">
-    						<div class="container">	
+    						<div class="container">
+							<div class="label label-info"><fmt:message key="jsp.orcid.custom.box.label.preferences.projects.details.tips"/></div>
+							<div class="clearfix">&nbsp;</div>	
     						<c:choose>	
 								<c:when test="${!empty anagraficaObject.anagrafica4view['orcid-projects-prefs'] && anagraficaObject.anagrafica4view['orcid-projects-prefs'][0].value.object==1}">
 									<span class="label label-success"><fmt:message key="jsp.orcid.custom.box.label.preferences.projects.sendall"/></span>
@@ -85,7 +89,9 @@
     						<h3 class="panel-title"><fmt:message key="jsp.orcid.custom.box.label.preferences.profile"/></h3>
   						</div>
   						<div class="panel-body">
-    						<div class="container">	
+    						<div class="container">
+									<div class="label label-info"><fmt:message key="jsp.orcid.custom.box.label.preferences.profile.details.tips"/></div>
+									<div class="clearfix">&nbsp;</div>
 									<c:forEach items="${propertiesDefinitionsInHolder[holder.shortName]}" var="tipologiaDaVisualizzare" varStatus="status">
 										<c:if test="${fn:startsWith(tipologiaDaVisualizzare.shortName, 'orcid-profile-pref-')}">
 										<c:choose>
@@ -99,8 +105,10 @@
 										</c:if>
 									</c:forEach>
 							</div>							
-						</div>   
 					</div></div>
-
-</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>	
 </c:if>

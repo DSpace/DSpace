@@ -26,3 +26,9 @@ CREATE INDEX rp_idx
 CREATE INDEX pending_idx
    ON potentialmatches (pending);
 -- END potential matches --
+
+   
+create table cris_orcid_history (id int4 not null, itemId int4, projectId int4, researcherId int4, responseMessage text, lastAttempt timestamp, lastSuccess timestamp, primary key (id));
+create table cris_orcid_queue (id int4 not null, itemId int4, mode varchar(255), projectId int4, researcherId int4, send boolean not null, primary key (id));
+create sequence CRIS_ORCIDHISTORY_SEQ;
+create sequence CRIS_ORCIDQUEUE_SEQ;

@@ -509,6 +509,8 @@ public class StartupMetadataConfiguratorTool {
 						"orcidauthorizations");
 				BoxResearcherPage boxSettingsORCID = applicationService.getBoxByShortName(BoxResearcherPage.class,
 						"orcidsyncsettings");
+				BoxResearcherPage boxQueueORCID = applicationService.getBoxByShortName(BoxResearcherPage.class,
+						"orcidsyncqueue");
 
 				if (tabORCID == null) {
 					tabORCID = new TabResearcherPage();
@@ -533,11 +535,19 @@ public class StartupMetadataConfiguratorTool {
 					boxSettingsORCID.setShortName("orcidsyncsettings");
 					boxSettingsORCID.setExternalJSP("orcidsyncsettings");
 
+					boxQueueORCID = new BoxResearcherPage();
+					boxQueueORCID.setVisibility(VisibilityTabConstant.LOW);
+					boxQueueORCID.setTitle("ORCID Registry Queue");
+					boxQueueORCID.setShortName("orcidsyncqueue");
+					boxQueueORCID.setExternalJSP("orcidsyncqueue");
+					
 					applicationService.saveOrUpdate(BoxResearcherPage.class, boxAuthorizationORCID);
 					applicationService.saveOrUpdate(BoxResearcherPage.class, boxSettingsORCID);
+					applicationService.saveOrUpdate(BoxResearcherPage.class, boxQueueORCID);
 
 					tabORCID.getMask().add(boxAuthorizationORCID);
 					tabORCID.getMask().add(boxSettingsORCID);
+					tabORCID.getMask().add(boxQueueORCID);
 					applicationService.saveOrUpdate(TabResearcherPage.class, tabORCID);
 
 					editTabORCID.getMask().add(boxSettingsORCID);
@@ -577,7 +587,7 @@ public class StartupMetadataConfiguratorTool {
 				}
 
 				if (boxSettingsORCID != null) {
-					String[] rpProps = { "fullName", "email", "orcid", "orcid-publications-prefs", "orcid-projects-prefs", "orcid-profile-pref-email",
+					String[] rpProps = { "fullName", "email", "orcid", "orcid-push-manual", "orcid-publications-prefs", "orcid-projects-prefs", "orcid-profile-pref-email",
 							"orcid-profile-pref-fullName", "orcid-profile-pref-preferredName", "orcid-profile-pref-other-emails", "orcid-profile-pref-iso-3166-country", "orcid-profile-pref-keywords", "orcid-profile-pref-biography", "orcid-profile-pref-credit-name" };
 
 					boxSettingsORCID.getMask().clear();
@@ -605,6 +615,33 @@ public class StartupMetadataConfiguratorTool {
 					log.warn("No box configured for RP - orcidsyncsettings");
 				}
 
+				if (boxQueueORCID != null) {
+					String[] rpProps = { "fullName", "email", "orcid", "orcid-push-manual"};
+
+					boxQueueORCID.getMask().clear();
+					boxQueueORCID.setMask(null);
+
+					for (String prop : rpProps) {
+						RPPropertiesDefinition pdef = applicationService
+								.findPropertiesDefinitionByShortName(RPPropertiesDefinition.class, prop);
+						if (pdef != null) {
+							DecoratorRPPropertiesDefinition containable = (DecoratorRPPropertiesDefinition) applicationService
+									.findContainableByDecorable(DecoratorRPPropertiesDefinition.class, pdef.getId());
+
+							boxQueueORCID.getMask().add(containable);
+						}
+					}
+					applicationService.saveOrUpdate(BoxResearcherPage.class, boxQueueORCID);
+
+					if (!(tabORCID.getMask().contains(boxQueueORCID))) {
+						tabORCID.getMask().add(boxQueueORCID);
+						saveTab = true;
+					}
+
+				} else {
+					log.warn("No box configured for RP - orcidsyncsettings");
+				}
+				
 				if (saveTab) {
 					applicationService.saveOrUpdate(TabResearcherPage.class, tabORCID);
 					applicationService.saveOrUpdate(EditTabResearcherPage.class, editTabORCID);
@@ -778,22 +815,28 @@ public class StartupMetadataConfiguratorTool {
 			builderW = BeanDefinitionBuilder.genericBeanDefinition(WidgetTesto.class);
 		} else if (widget.equals("boolean")) {
 			builderW = BeanDefinitionBuilder.genericBeanDefinition(WidgetBoolean.class);
-		} else if (widget.equals("radio")) {
+		} else if (widget.equals("radio") || widget.equals("checkbox") || widget.equals("dropdown")) {
 			builderW = BeanDefinitionBuilder.genericBeanDefinition(WidgetCheckRadio.class);
 			String staticValues = "";
+			if(!controlledListMap.containsKey(shortName)) {
+				log.error("controlledlist not defined: "+shortName);
+			}
 			for(String ss : controlledListMap.get(shortName)) {
 				staticValues += ss+"|||";
 			}
 			builderW.addPropertyValue("staticValues", staticValues.substring(0, staticValues.length()-3));
-			builderW.addPropertyValue("option4row", 1);
-		} else if (widget.equals("checkbox")) {
-			builderW = BeanDefinitionBuilder.genericBeanDefinition(WidgetCheckRadio.class);
-			String staticValues = "";
-			for(String ss : controlledListMap.get(shortName)) {
-				staticValues += ss+"|||";
+			if (widget.equals("radio") || widget.equals("checkbox")) {
+				builderW.addPropertyValue("option4row", 1);
+				if(widget.equals("checkbox")) {
+					repeatable = true;
+				}
+				else {
+					repeatable = false;
+				}
 			}
-			builderW.addPropertyValue("staticValues", staticValues.substring(0, staticValues.length()-3));
-			builderW.addPropertyValue("option4row", 1);
+			if (widget.equals("dropdown")) {
+				builderW.addPropertyValue("dropdown", true);
+			}
 		} else if (widget.equals("link")) {
 			builderW = BeanDefinitionBuilder.genericBeanDefinition(WidgetLink.class);
 		} else if (widget.equals("date")) {
@@ -898,10 +941,10 @@ public class StartupMetadataConfiguratorTool {
 			Map<String, List<String>> controlledListMap) {
 		Cell row;
 		Sheet sheet = workbook.getSheet(sheetName);		
-		int indexColumn = 0;
-		int rows = sheet.getColumn(0).length;
+		int indexColumn = 0;		
 		int columns = sheet.getRow(0).length;
 		while (indexColumn < columns) {
+			int rows = sheet.getColumn(indexColumn).length;
 			int indexRiga = 1;
 			String header = sheet.getRow(0)[indexColumn].getContents().trim();
 			while (indexRiga < rows) {

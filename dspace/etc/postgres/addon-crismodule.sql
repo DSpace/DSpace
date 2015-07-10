@@ -28,6 +28,8 @@ create table cris_do_tp2notp (cris_do_tp_id int4 not null, cris_do_no_tp_id int4
 create table cris_do_tp2pdef (cris_do_tp_id int4 not null, cris_do_pdef_id int4 not null);
 create table cris_do_wfile (id int4 not null, fileDescription text, labelAnchor varchar(255), showPreview bool not null, widgetSize int4, useInStatistics bool not null, primary key (id));
 create table cris_do_wpointer (id int4 not null, display text, filtro text, indexName varchar(255), widgetSize int4, target varchar(255), urlPath varchar(255), filterExtended text, primary key (id));
+create table cris_orcid_history (id int4 not null, itemId int4, projectId int4, researcherId int4, responseMessage text, lastAttempt timestamp, lastSuccess timestamp, primary key (id));
+create table cris_orcid_queue (id int4 not null, itemId int4, mode varchar(255), projectId int4, researcherId int4, send boolean not null, primary key (id));
 create table cris_orgunit (id int4 not null, crisID varchar(255) unique, sourceID varchar(255), sourceRef varchar(255), status bool, uuid varchar(255) not null unique, timestampCreated timestamp, timestampLastModified timestamp, primary key (id), unique (sourceID, sourceRef));
 create table cris_ou_box (id int4 not null, collapsed bool not null, externalJSP varchar(255), priority int4 not null, shortName varchar(255) unique, title varchar(255), unrelevant bool not null, visibility int4, primary key (id));
 create table cris_ou_box2con (cris_ou_box_id int4 not null, jdyna_containable_id int4 not null);
@@ -209,6 +211,8 @@ alter table jdyna_values add constraint FK51AA118FA46E05CD foreign key (ouvalue)
 alter table jdyna_values add constraint FK51AA118F15A13386 foreign key (projectvalue) references cris_project;
 alter table jdyna_values add constraint FK51AA118F92120815 foreign key (rpvalue) references cris_rpage;
 create sequence CRIS_DYNAOBJ_SEQ;
+create sequence CRIS_ORCIDHISTORY_SEQ;
+create sequence CRIS_ORCIDQUEUE_SEQ;
 create sequence CRIS_OU_SEQ;
 create sequence CRIS_PROJECT_SEQ;
 create sequence CRIS_RELPREF_SEQ;

@@ -51,6 +51,8 @@
 		<mapping class="org.dspace.app.cris.model.CrisSubscription" />
 		<mapping class="org.dspace.app.cris.model.RelationPreference" />
 		<mapping class="org.dspace.app.cris.model.SourceReference" />
+		<mapping class="org.dspace.app.cris.model.orcid.OrcidQueue" />
+		<mapping class="org.dspace.app.cris.model.orcid.OrcidHistory" />
 
 		<!-- Dynamic field -->
 
