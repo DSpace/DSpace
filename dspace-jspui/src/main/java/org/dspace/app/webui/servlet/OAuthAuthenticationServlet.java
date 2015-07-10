@@ -17,10 +17,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.jstl.core.Config;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.oltu.oauth2.client.OAuthClient;
 import org.apache.oltu.oauth2.client.URLConnectionClient;
 import org.apache.oltu.oauth2.client.request.OAuthClientRequest;
+import org.apache.oltu.oauth2.client.request.OAuthClientRequest.AuthenticationRequestBuilder;
 import org.apache.oltu.oauth2.client.response.OAuthAuthzResponse;
 import org.apache.oltu.oauth2.client.response.OAuthJSONAccessTokenResponse;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
@@ -93,15 +95,27 @@ public class OAuthAuthenticationServlet extends DSpaceServlet {
 
 			if (oar == null || oar.getCode() == null) {
 				// Step 1. there is no code and we need to request one.
-				OAuthClientRequest oAuthClientRequest = OAuthClientRequest
-						.authorizationLocation(
-								ConfigurationManager.getProperty("authentication-oauth", "application-authorize-url"))
-						.setClientId(ConfigurationManager.getProperty("authentication-oauth", "application-client-id"))
-						.setRedirectURI(
-								ConfigurationManager.getProperty("authentication-oauth", "application-redirect-uri"))
-						.setResponseType("code")
-						.setScope(ConfigurationManager.getProperty("authentication-oauth", "application-client-scope"))
-						.buildQueryMessage();
+				AuthenticationRequestBuilder builder = OAuthClientRequest
+				.authorizationLocation(
+						ConfigurationManager.getProperty("authentication-oauth", "application-authorize-url"))
+				.setClientId(ConfigurationManager.getProperty("authentication-oauth", "application-client-id"))
+				.setRedirectURI(
+						ConfigurationManager.getProperty("authentication-oauth", "application-redirect-uri"))
+				.setResponseType("code")
+				.setScope(ConfigurationManager.getProperty("authentication-oauth", "application-client-scope"));
+
+				String showLogin = request.getParameter("show-login");
+				if (StringUtils.isNotBlank(showLogin)) {
+					boolean showLoginB = Boolean.parseBoolean(showLogin);
+					builder.setParameter("email", context.getCurrentUser().getEmail());
+					if (showLoginB) {
+						builder.setParameter("show_login", "true");
+					} else {
+						builder.setParameter("family_names", context.getCurrentUser().getLastName());
+						builder.setParameter("given_names", context.getCurrentUser().getFirstName());				
+					}
+				}	
+				OAuthClientRequest oAuthClientRequest = builder.buildQueryMessage();
 
 				// Issue a Redirect to the OAuth site to request authorization
 				// code.

@@ -288,11 +288,11 @@ j(document).ready(function() {
 						<div class="dynaField">
 							<div class="dynaFieldValue">
 								<div class="btn-group" role="group">
-								  <a href="<%= request.getContextPath() %>/oauth-login">
+								  <a href="<%= request.getContextPath() %>/oauth-login?show-login=false">
 			      						<button class="btn btn-default"><fmt:message key="jsp.orcid.custom.box.button.create"/></button>
 			      				  </a>								  
 								  <span>&nbsp;&nbsp;&nbsp;<img src="<%= request.getContextPath() %>/image/orcid_64x64.png" title="ORCID Authentication">&nbsp;&nbsp;&nbsp;</span>
-								  <a href="<%= request.getContextPath() %>/oauth-login">
+								  <a href="<%= request.getContextPath() %>/oauth-login?show-login=true">
 			      						<button class="btn btn-default"><fmt:message key="jsp.orcid.custom.box.button.connect"/></button>
 			      				  </a>
 								</div>
