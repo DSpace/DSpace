@@ -424,28 +424,25 @@ public class Context
         // Commit any changes made as part of the transaction
         Dispatcher dispatcher = null;
 
-        try
-        {
-            if (events != null)
-            {
+		try {
+			if (events != null) {
 
-                if (dispName == null)
-                {
-                    dispName = EventManager.DEFAULT_DISPATCHER;
-                }
+				if (dispName == null) {
+					dispName = EventManager.DEFAULT_DISPATCHER;
+				}
 
-                dispatcher = EventManager.getDispatcher(dispName);
-		if (!isAutoCommit)
-                connection.commit();
-                dispatcher.dispatch(this);
-            }
-            else
-            {
-		if (!isAutoCommit)
-                connection.commit();
-            }
+				dispatcher = EventManager.getDispatcher(dispName);
+				if (!isAutoCommit) {
+					connection.commit();
+				}
+				dispatcher.dispatch(this);
+			} else {
+				if (!isAutoCommit) {
+					connection.commit();
+				}
+			}
 
-        }
+		}
         finally
         {
             events = null;
