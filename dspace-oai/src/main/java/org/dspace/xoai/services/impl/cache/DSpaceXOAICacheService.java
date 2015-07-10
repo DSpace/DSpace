@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.Date;
 
 import static com.lyncode.xoai.dataprovider.core.Granularity.Second;
@@ -106,7 +107,7 @@ public class DSpaceXOAICacheService implements XOAICacheService {
             if (pos > 0)
                 xoaiResponse = xoaiResponse.substring(pos + (end.length()));
 
-            FileUtils.write(this.getCacheFile(requestID), xoaiResponse);
+            FileUtils.write(this.getCacheFile(requestID), xoaiResponse, "UTF-8");
         } catch (XMLStreamException e) {
             throw new IOException(e);
         } catch (WritingXmlException e) {
