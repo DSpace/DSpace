@@ -14,8 +14,12 @@ if [ ! -d "$working_dir" ]; then
 	mkdir -p $working_dir
 fi
 
-dirs="bits config logs scripts sources"
+dirs="bits config logs scripts"
 
 for dir in $dirs; do
 	ln -s $(pwd)/$dir $working_dir/$dir
 done
+
+if [ ! -d $working_dir/sources ]; then
+	ln -s $(pwd)/sources $working_dir/sources
+fi
