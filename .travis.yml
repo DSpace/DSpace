@@ -37,5 +37,5 @@ install:
 script:
   - make test_dspace_database
   - make test_utilities_database
-  - cd $FS/ && mvn -Dmaven.test.skip=false -Dtest=cz.cuni.mff.ufal.dspace.**.*Test,cz.cuni.mff.ufal.*Test -DfailIfNoTests=false test
+  - cd $FS/ && mvn -Dmaven.test.skip=false -Dtest=cz.cuni.mff.ufal.dspace.**.*Test,cz.cuni.mff.ufal.*Test -DfailIfNoTests=false test | grep -v "Download"
   - #make selenium_tests || echo "Tests failed"
