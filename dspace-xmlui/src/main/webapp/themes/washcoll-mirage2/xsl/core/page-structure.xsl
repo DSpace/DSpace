@@ -713,14 +713,12 @@
 
             <!-- Check for the custom pages -->
             <xsl:choose>
-                <xsl:when test="starts-with($request-uri, 'page/about')">
+                <xsl:when test="starts-with($request-uri, 'page/bond')">
                     <div class="hero-unit">
-                        <h1>About This Repository</h1>
-                        <p>To add your own content to this page, edit webapps/xmlui/themes/Mirage/lib/xsl/core/page-structure.xsl and
-                            add your own content to the title, trail, and body. If you wish to add additional pages, you
-                            will need to create an additional xsl:when block and match the request-uri to whatever page
-                            you are adding. Currently, static pages created through altering XSL are only available
-                            under the URI prefix of page/.</p>
+                        <h1>Rev. Dr. William Smith bond to Washington College in 1784</h1>
+                        <img src="/themes/washcoll-mirage2/images/wash-doc.png" class="img-responsive"/>
+                        <p>Bond, signed by Rev. Dr. William Smith, first principal of Washington College, June 18, 1784</p>
+                        <p>Smith donated three hundred and three pounds and ten shillings to the Board of Visitors and Governors in 1784 to help support the college.</p>
                     </div>
                 </xsl:when>
                 <!-- Otherwise use default handling of body -->
