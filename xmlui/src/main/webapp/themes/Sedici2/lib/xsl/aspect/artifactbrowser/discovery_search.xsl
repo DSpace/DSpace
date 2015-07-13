@@ -189,10 +189,13 @@
 	    		<xsl:with-param name="queryString" select="$queryString"/>
 	    		<xsl:with-param name="element" select="dri:p/dri:field[@n='rpp']"/>
 	    	</xsl:call-template>
-	    	<xsl:call-template name="searchResultControls">
-	    		<xsl:with-param name="queryString" select="$queryString"/>
-	    		<xsl:with-param name="element" select="dri:p/dri:field[@n='order']"/>
-	    	</xsl:call-template>
+	    	<!-- Oculto el criterio de ordenación (asc o desc) de la lista de resultados si se ha seleccionado un término del BROWSE-->
+	    	<xsl:if test="count(../dri:div[@n='browse-by-author-results' or @n='browse-by-subject-results']/dri:referenceSet) = 0">
+		    	<xsl:call-template name="searchResultControls">
+		    		<xsl:with-param name="queryString" select="$queryString"/>
+		    		<xsl:with-param name="element" select="dri:p/dri:field[@n='order']"/>
+		    	</xsl:call-template>
+		    </xsl:if>
     	</div>
     	
     </xsl:template>
