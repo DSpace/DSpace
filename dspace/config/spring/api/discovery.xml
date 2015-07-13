@@ -31,6 +31,9 @@
     <bean id="solrBrowseIndexer" scope="prototype"
           class="org.dspace.browse.SolrBrowseCreateDAO">
     </bean>
+    
+    <!-- Additional indexing plugin make filtering by full text exists posible via SOLR -->
+    <bean id="fullTextFilter" class="org.dspace.discovery.SolrServiceFullTextFilterPlugin"/>
 
     <!--Bean that is used for mapping communities/collections to certain discovery configurations.-->
     <bean id="org.dspace.discovery.configuration.DiscoveryConfigurationService" class="org.dspace.discovery.configuration.DiscoveryConfigurationService">
@@ -98,6 +101,7 @@
                 <ref bean="searchFilterAuthor" />
                 <ref bean="searchFilterSubject" />
                 <ref bean="searchFilterIssued" />
+		<ref bean="searchFilterFulltext"/>
             </list>
         </property>
         <!-- Set TagCloud configuration per discovery configuration -->
@@ -109,6 +113,7 @@
                 <ref bean="searchFilterAuthor" />
                 <ref bean="searchFilterSubject" />
                 <ref bean="searchFilterIssued" />
+		<ref bean="searchFilterFulltext"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -203,6 +208,7 @@
                 <ref bean="searchFilterAuthor" />
                 <ref bean="searchFilterSubject" />
                 <ref bean="searchFilterIssued" />
+		<ref bean="searchFilterFulltext"/>
             </list>
         </property>
         <!-- Set TagCloud configuration per discovery configuration -->
@@ -214,6 +220,7 @@
                 <ref bean="searchFilterAuthor" />
                 <ref bean="searchFilterSubject" />
                 <ref bean="searchFilterIssued" />
+		<ref bean="searchFilterFulltext"/>
             </list>
         </property>
         <!--The sort filters for the discovery search (same as defaultConfiguration above)-->
@@ -402,6 +409,16 @@
             </list>
         </property>
         <property name="type" value="date"/>
+        <property name="sortOrder" value="VALUE"/>
+    </bean>
+    
+    <bean id="searchFilterFulltext" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="has_full_text"/>
+        <property name="metadataFields">
+            <list/>
+        </property>
+        <property name="facetLimit" value="2"/>
+        <property name="type" value="standard"/>
         <property name="sortOrder" value="VALUE"/>
     </bean>
 
