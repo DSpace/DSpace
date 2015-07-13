@@ -5,7 +5,7 @@ addons:
 
 before_install:
   - sudo rm /etc/mavenrc
-  - export MAVEN_OPTS="-Dmaven.repo.local=/home/travis/.m2/repository -Xmx1024M -XX:MaxPermSize=192m"
+  - export MAVEN_OPTS="-Dmaven.repo.local=/home/travis/.m2/repository -Xmx2048M -XX:MaxPermSize=256m"
   -     echo "########################"
   - whoami
   - java -version
@@ -31,7 +31,7 @@ install:
   - make create_databases
   - echo "Installing prerequisites"
   - make install_libs
-  - make new_deploy
+  - make new_deploy | grep -v "Download"
   - make print_message
 
 script:

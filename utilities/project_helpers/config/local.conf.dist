@@ -18,7 +18,7 @@ lr.pid.service.testPid =
 lr.pid.community.configurations = community=*,prefix=99999,type=local,canonical_prefix=http://hdl.handle.net/
 
 
-# UFAL mounted assetstore for restricted item harvesting. Please mind the traling slash
+# UFAL mounted assetstore for restricted item harvesting. Please mind the trailing slash
 lr.harvestable.assetstore =
 
 
@@ -63,22 +63,22 @@ lr.db.password =
 # UFAL Utilities database name.
 lr.utilities.database = XXX-UTILS-DATABASE
 
-# Conneciton URL for the Utilities database.
+# Connection URL for the Utilities database.
 lr.utilities.db.url = jdbc:postgresql://localhost:${lr.database.port}/${lr.utilities.database}
 
-# Functionality Manager facade for Utilites API
+# Functionality Manager facade for Utilities API
 lr.utilities.functionalityManager.class = cz.cuni.mff.ufal.lindat.utilities.HibernateFunctionalityManager
 
 ############################################
 
-# Dpsace general settings ##################
+# DSpace general settings ##################
 
 # You can use this value to append version with other values.
-lr.dspace.version = dspace-1.8.2
+lr.dspace.version = lindat-dspace5
 
 # The installation directory of your instance.
 # THIS IS USED IN THE VARIABLES/MAKEFILE so don't use variables(${*}) here
-lr.dspace.dir = /installations/dspace/dspace-1.8.2
+lr.dspace.dir = /opt/lindat-dspace/sources
 
 # A description of your dspace instance. It will be used as a description of your dspace instance for other services
 lr.dspace.name = LINDAT/CLARIN digital library at Institute of Formal and Applied Linguistics, Charles University in Prague
@@ -116,12 +116,12 @@ lr.ga.analytics.profile.id = 52779327
 lr.ga.analytics.account.email = 144418224547@developer.gserviceaccount.com
 
 # Path of the sources folder that is used for the compilation of this dspace instance.
-lr.dspace.source.dir = /sources/dspace-1.8.2
+lr.dspace.source.dir = /opt/lindat-dspace/sources/
 
 # Backup Configurations ####################
 
 # which files/directories needs backup
-lr.backup.source = (/installations/dspace/dspace-1.8.2/ /installations/dspace/database/ /sources/dspace-1.8.2/ /etc/apache2 /etc/libapache2-mod-jk /opt/shibboleth-sp/etc/shibboleth /etc/tomcat6/ /etc/cron.d/dspace)
+lr.backup.source = (/opt/lindat-dspace/installation/ /opt/lindat-dspace/database/ /opt/lindat-dspace/sources/ /etc/apache2 /etc/libapache2-mod-jk /opt/shibboleth-sp/etc/shibboleth /etc/tomcat6/ /etc/cron.d/dspace)
 
 # where the backup should be stored
 lr.backup.target = "/home/backup/"
@@ -140,7 +140,7 @@ backup2l.generations = 4
 
 ############################################
 
-# irods specific for EUDAT
+# iRods specific for EUDAT
 lr.replication.eudat.on=false
 lr.replication.eudat.host=
 lr.replication.eudat.port=
@@ -167,7 +167,7 @@ lr.errors.email=
 
 # Selenium Testing #########################
 
-# URLs that are requried for test cases
+# URLs that are required for test cases
 selenium.test.home.url = /xmlui
 selenium.test.browse.url = /xmlui/browse
 selenium.test.search.url = /xmlui/discover

@@ -231,7 +231,7 @@ test_dspace_database:
 	@cd $(DIR_BUILD) && $(ANT_WITH_CONF) -logger org.apache.tools.ant.listener.AnsiColorLogger test_database | $(HIDE_PASSW)
 
 test_utilities_database: 
-	@cd $(DIR_INSTALLATION)/bin && JAVA_OPTS="-Dlog4j.configuration=file:/$(DIR_INSTALLATION)/config/log4j-console.properties -Xmx1024m -Dfile.encoding=UTF-8" ./dspace dsrun "cz.cuni.mff.ufal.lindat.utilities.HibernateFunctionalityManager" "$(DIR_INSTALLATION)"
+	@cd $(DIR_INSTALLATION)/bin && JAVA_OPTS="-Dlog4j.configuration=file:$(DIR_INSTALLATION)/config/log4j-console.properties -Xmx1024m -Dfile.encoding=UTF-8" ./dspace dsrun "cz.cuni.mff.ufal.lindat.utilities.HibernateFunctionalityManager" "$(DIR_INSTALLATION)"
 
 test_databases: test_utilities_database test_dspace_database
 
