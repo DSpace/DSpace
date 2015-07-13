@@ -367,8 +367,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                 
             // Success, bitstream found and the user has access to read it.
             // Store these for later retrieval:
-            
-                 
+            this.bitstreamInputStream = bitstream.retrieve();
             this.bitstreamSize = bitstream.getSize();
             this.bitstreamMimeType = bitstream.getFormat().getMIMEType();
             this.bitstreamName = bitstream.getName();
