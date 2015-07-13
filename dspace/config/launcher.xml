@@ -2,10 +2,10 @@
 <commands>
 
     <command>
-        <name>ufal-info</name>
-        <description>Create repository report</description>
+        <name>healthcheck</name>
+        <description>Create health check report</description>
         <step>
-            <class>cz.cuni.mff.ufal.Report</class>
+            <class>org.dspace.health.Report</class>
         </step>
     </command>
 

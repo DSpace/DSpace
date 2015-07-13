@@ -29,7 +29,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.ibm.icu.text.SimpleDateFormat;
+import java.text.SimpleDateFormat;
 
 import cz.cuni.mff.ufal.dspace.PIDService;
 import cz.cuni.mff.ufal.dspace.handle.PIDCommunityConfiguration;

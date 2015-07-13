@@ -2,6 +2,7 @@
 package cz.cuni.mff.ufal;
 
 import org.dspace.core.ConfigurationManager;
+import org.dspace.health.Report;
 import org.junit.Test;
 
 import javax.security.auth.login.Configuration;
@@ -12,7 +13,8 @@ public class ReportTest
 {
     @Test
     public void testReportHandleResolutionStatistics() throws IllegalAccessException {
-        String args[] = {"-s", "1"};
+        //String args[] = {"-c", "0"};
+        String args[] = {};
         try {
             DSpaceApi.load_dspace("../dspace/");
         }catch(Exception e) {

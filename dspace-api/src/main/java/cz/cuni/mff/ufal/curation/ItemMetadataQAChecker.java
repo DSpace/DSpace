@@ -32,6 +32,7 @@ import org.dspace.handle.HandleManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import static cz.cuni.mff.ufal.curation.RequiredMetadata.addMagicString;
 
 
 /**
@@ -53,7 +54,7 @@ public class ItemMetadataQAChecker extends AbstractCurationTask {
     private Map<String, String> _language_name_code_map;
     private Map<String, String> _code_language_name_map;
     private Map<String, Integer> _complex_inputs;
-    
+
     // The log4j logger for this class
     private static Logger log = Logger.getLogger(Curator.class);
 
@@ -131,7 +132,11 @@ public class ItemMetadataQAChecker extends AbstractCurationTask {
 	}
 
 	private String get_handle(Item item) {
-        return _handle_prefix + item.getHandle();
+        if ( null != item.getHandle() ) {
+            return _handle_prefix + item.getHandle();
+        }else {
+            return "item id: " +item.getHandle();
+        }
     }
 
 
@@ -154,8 +159,7 @@ public class ItemMetadataQAChecker extends AbstractCurationTask {
                 
                 // no metadata?
                 if ( dcs == null || dcs.length == 0) {
-                    err_str = String.format("Item [%s] does not have any metadata", 
-                                    get_handle(item));
+                    err_str = "Does not have any metadata";
                     status = Curator.CURATE_FAIL;
                 }else 
                 {
@@ -193,8 +197,7 @@ public class ItemMetadataQAChecker extends AbstractCurationTask {
 
             // no handle!
             } else {
-                err_str = String.format("Item [%d] does not have a handle", 
-                                item.getID());
+                err_str = "Does not have a handle";
                 status = Curator.CURATE_FAIL;
             }
             
@@ -204,12 +207,14 @@ public class ItemMetadataQAChecker extends AbstractCurationTask {
                 case Curator.CURATE_SUCCESS:
                     break;
                 case CURATE_WARNING:
-                    results.append( String.format("Warning: [%s] reason: %s",
-                        get_handle(item), err_str) );
+                    results.append( String.format("Warning: %s %s",
+                            err_str, addMagicString(get_handle(item)))
+                    );
                     break;
                 default:
-                    results.append( String.format("ERROR! [%s] reason: %s",
-                        get_handle(item), err_str) );
+                    results.append( String.format("ERROR! %s %s",
+                        err_str, addMagicString(get_handle(item)))
+                    );
                     break;
             }
         }
@@ -229,8 +234,7 @@ public class ItemMetadataQAChecker extends AbstractCurationTask {
         Metadatum[] dcs_type = item.getMetadataByMetadataString("dc.type");
         // no metadata?
         if ( dcs_type == null || dcs_type.length == 0) {
-            throw new CurateException(
-                String.format("Item [%s] does not dc.type metadata", get_handle(item)),
+            throw new CurateException("Does not dc.type metadata",
                 Curator.CURATE_FAIL );
         }
         
@@ -241,20 +245,20 @@ public class ItemMetadataQAChecker extends AbstractCurationTask {
             
             // check if original and trimmed versions match
             if (!typeVal.equals(dcsEntry.value)) {
-                throw new CurateException("leading or trailing spaces", 
-                                Curator.CURATE_FAIL);
+                throw new CurateException("leading or trailing spaces",
+                    Curator.CURATE_FAIL);
             }
             
             // check if the dc.type field is empty
             if (Pattern.matches("^\\s*$", typeVal)) {
-                throw new CurateException("empty value", 
-                                Curator.CURATE_FAIL);
+                throw new CurateException("empty value",
+                    Curator.CURATE_FAIL);
             }
 
             // check if the value is valid
             if (!DCTYPE_VALUES_SET.contains(typeVal)) {
-                throw new CurateException("invalid type" + "(" + typeVal + ")", 
-                                Curator.CURATE_FAIL);
+                throw new CurateException("invalid type" + "(" + typeVal + ")",
+                    Curator.CURATE_FAIL);
             }
         }
     }
@@ -276,7 +280,7 @@ public class ItemMetadataQAChecker extends AbstractCurationTask {
         		String langCode = langCodeDC.value;
         		if (!_code_language_name_map.containsKey(langCode)) {
                     throw new CurateException(
-                            String.format("Item [%s] has invalid language code - %s", get_handle(item), langCode),
+                            String.format("Invalid language code - %s", langCode),
                             Curator.CURATE_FAIL );        			
         		}
         	}
@@ -293,8 +297,8 @@ public class ItemMetadataQAChecker extends AbstractCurationTask {
     {
         String title = item.getName();
         if ( _item_titles.containsKey(title)) {
-            String msg = String.format("Title [%s] [%s] duplicate in [%s]", 
-                            title, get_handle(item), _item_titles.get(title));
+            String msg = String.format("Title [%s] duplicate in [%s]",
+                            title, _item_titles.get(title));
             throw new CurateException(msg, Curator.CURATE_FAIL);
         }
         _item_titles.put(title, get_handle(item));
@@ -352,13 +356,15 @@ public class ItemMetadataQAChecker extends AbstractCurationTask {
                     throw new CurateException(
                         String.format("contains %s but the referenced object " +
                             "does not contain %s or does not point to the item itself!\n",
-                            lhs_relation, rhs_relation, get_handle(item)),
+                            lhs_relation, rhs_relation),
                         status);
                 }
             }
-        
-            context.complete();
-            
+
+            if (context != null) {
+                context.complete();
+            }
+
         } catch (Exception e) {
             if ( context != null ) {
                 context.abort();
@@ -499,7 +505,7 @@ public class ItemMetadataQAChecker extends AbstractCurationTask {
 						.getValue()) {
 					throw new CurateException(
 							String.format(
-									"%s is a componet with %s values but is not stored as such. [%s]",
+									"%s is a component with %s values but is not stored as such. [%s]",
 									entry.getKey(), entry.getValue(), val),
 							Curator.CURATE_FAIL);
 				}
