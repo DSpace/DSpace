@@ -68,7 +68,8 @@ public class PiwikStatisticsTransformer extends AbstractDSpaceTransformer {
 		Division home = body.addDivision("home", "primary repository");
 		Division division = home.addDivision("stats", "secondary stats");
 		
-		if(isOwnerOrAdmin(context, eperson, item)) {
+		//if(isOwnerOrAdmin(context, eperson, item))
+		{
 
 			String sub = request.getParameter("subscribe");
 			

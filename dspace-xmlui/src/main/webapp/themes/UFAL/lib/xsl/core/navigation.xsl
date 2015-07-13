@@ -343,9 +343,9 @@
 		<xsl:choose>
 			<xsl:when
 				test="/dri:document/dri:meta/dri:userMeta[@authenticated = 'yes']">
-				<div id="userbox" class="navbar-fixed-top text-right">
+				<div id="userbox" class="navbar-fixed-top text-right" style="position: absolute !important; opacity: 1 !important;">
 					<div class="label label-primary"
-						style="margin: 5px 15px 5px 5px; padding: 5px 10px 5px 10px; font-size: 14px;">
+						style="margin: 5px 15px 5px 5px; padding: 5px 10px 5px 10px; font-size: 12px;">
 
 						<a style="color: #FFF;">
 							<xsl:attribute name="href">
@@ -372,9 +372,9 @@
 
 			</xsl:when>
 			<xsl:otherwise>
-				<div id="userbox" class="navbar-fixed-top text-right">
+				<div id="userbox" class="navbar-fixed-top text-right" style="position: absolute !important; opacity: 1 !important;">
 					<div class="label label-important"
-						style="margin: 5px 15px 5px 5px; padding: 5px 10px 5px 10px; font-size: 14px;">
+						style="margin: 5px 15px 5px 5px; padding: 5px 10px 5px 10px; font-size: 16px;">
 
 						<a style="color: #FFF;" class="signon">
 							<xsl:attribute name="href">

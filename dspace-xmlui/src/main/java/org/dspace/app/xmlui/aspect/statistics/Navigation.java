@@ -48,7 +48,6 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     private static final Message T_statistics_search_view = message("xmlui.statistics.Navigation.search.view");
     private static final Message T_statistics_workflow_view = message("xmlui.statistics.Navigation.workflow.view");
     private static final Message T_statistics_ga_head = message("xmlui.statistics.Navigation.ga.title");
-    private static final Message T_statistics_piwik_head = message("xmlui.statistics.Navigation.piwik.title");
 
     public Serializable getKey() {
         //TODO: DO THIS
@@ -87,13 +86,6 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
         if(dso != null && dso.getHandle() != null){
             statistics.setHead(T_statistics_head);
-            // piwik statistics only for items when admin or owner
-            if(dso instanceof Item) {
-            	Item item = (Item)dso;
-            	if(PiwikStatisticsTransformer.isOwnerOrAdmin(context, eperson, item)) {
-            		statistics.addItemXref(contextPath + "/handle/" + dso.getHandle() + "/piwik-statistics", T_statistics_piwik_head);
-            	}
-            }
             if(displayUsageStats){
                 statistics.addItemXref(contextPath + "/handle/" + dso.getHandle() + "/statistics", T_statistics_usage_view);
             }

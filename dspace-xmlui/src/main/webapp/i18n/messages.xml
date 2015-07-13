@@ -1125,7 +1125,7 @@
     <message key="xmlui.Submission.submit.LicenseStep.distribution_license_head_link">Distribution License Agreement</message>
     <message key="xmlui.Submission.submit.LicenseStep.license_list_alert">For the list of all supported licenses and their details visit </message>
     <message key="xmlui.Submission.submit.LicenseStep.license_list_alert_link">License List Page</message>
-    <message key="xmlui.Submission.submit.LicenseStep.resource_license_text">If you know under which license you want to distribute your work, please select from the list or click the license selector button for help.</message>
+    <message key="xmlui.Submission.submit.LicenseStep.resource_license_text"> If you know under which license you want to distribute your work, please select from the dropdown or <b class='text-primary'>Click the License Selector button for visual assistance.</b></message>
     <message key="xmlui.Submission.submit.LicenseStep.license_selector_button">OPEN License Selector</message>
 
 
@@ -2514,7 +2514,7 @@
     <message key="xmlui.statistics.display.table.workflow.step.selectSingleReviewer.singleUserReviewStep.singleuserreviewaction">Single User Review Action</message>
 
     <message key="xmlui.statistics.piwik.title">Piwik Statistics</message>
-    <message key="xmlui.statistics.Navigation.piwik.title">Piwik Statistics<span class='label label-important'>beta</span></message>
+    <message key="xmlui.statistics.Navigation.piwik.title">Piwik Statistics<span class='label label-important' style='font-size: 14px;'>BETA</span></message>
     <message key="xmlui.statistics.piwik.trail">Piwik Statistics</message>
 
     <!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
