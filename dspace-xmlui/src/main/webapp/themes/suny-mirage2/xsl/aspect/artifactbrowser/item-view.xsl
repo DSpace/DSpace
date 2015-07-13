@@ -178,6 +178,24 @@
                             <xsl:call-template name="itemSummaryView-DIM-first-line-of-chorus"/>
                         </div>
                     </div>
+
+                    <!-- Show the files-in-this-item Thumbnails for SUNY... when multiple images -->
+                    <!-- Generate the bitstream information from the file section -->
+                    <xsl:choose>
+                        <xsl:when test="(count(//mets:fileGrp[@USE='THUMBNAIL']/mets:file) &gt; 1) and //mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL' or @USE='LICENSE']/mets:file">
+                            <div class="row">
+                            <h3><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text></h3>
+                            <div class="file-list">
+                                <xsl:apply-templates select="//mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL' or @USE='LICENSE' or @USE='CC-LICENSE']">
+                                    <xsl:with-param name="context" select="//mets:METS"/>
+                                    <xsl:with-param name="primaryBitstream" select="//mets:structMap[@TYPE='LOGICAL']/mets:div[@TYPE='DSpace Item']/mets:fptr/@FILEID"/>
+                                </xsl:apply-templates>
+                            </div>
+                        </div>
+                        </xsl:when>
+                    </xsl:choose>
+                    <!-- End show thumbnails for SUNY -->
+
                 </xsl:otherwise>
             </xsl:choose>
         </div>
