@@ -1,0 +1,7 @@
+Subject: ${lr.dspace.name.short}: Repository healthcheck
+{0}
+
+
+_____________________________________
+${dspace.name},
+WWW: ${dspace.url}

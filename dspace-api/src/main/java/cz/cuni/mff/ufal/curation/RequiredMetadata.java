@@ -61,6 +61,8 @@ public class RequiredMetadata extends AbstractCurationTask
     // ignore certain metadata from required checks
     private boolean ignoreMdPattern = false;    
     private String[] mdPatterns;
+
+    public static final String magicSplitWord = " Item: ";
     
     //
     private Map<String, List<RepeatableComponent>> rcMap = new HashMap<String, List<RepeatableComponent>>();
@@ -104,6 +106,10 @@ public class RequiredMetadata extends AbstractCurationTask
         }
     }
 
+    static public String addMagicString(String handle) {
+        return magicSplitWord + handle + "\n";
+    }
+
     /**
      * Perform the curation task upon passed DSO
      *
@@ -126,7 +132,7 @@ public class RequiredMetadata extends AbstractCurationTask
             
             boolean checkExtra = false;
             
-            int count = 0;
+            int warnings_issued = 0;
             try
             {
                 StringBuilder sb = new StringBuilder();
@@ -136,7 +142,6 @@ public class RequiredMetadata extends AbstractCurationTask
                     // we are still in workflow - no handle assigned
                     handle = "in workflow";
                 }
-                sb.append("Item: ").append(handle);
                 String colhandle = null;
                 if ( null != item.getOwningCollection() ){
                 	colhandle = item.getOwningCollection().getHandle();
@@ -174,57 +179,56 @@ public class RequiredMetadata extends AbstractCurationTask
                         Metadatum[] vals = item.getMetadataByMetadataString(req);
                         if ((itemType == null || input.isAllowedFor(itemType)) && vals.length == 0)
                         {
+                            boolean issue_warning = true;
                         	if (mdEquivalenceMap.containsKey(req)) {
                         		Metadatum[] valsAlt = item.getMetadataByMetadataString(mdEquivalenceMap.get(req));
-                        		if (valsAlt == null || valsAlt.length == 0) {
-                                	sb.append(" missing required field: ").append(req);
-                                    count++;                    			
+                        		if ( valsAlt != null && valsAlt.length != 0 ) {
+                                    issue_warning = false;
                         		}
                         	}
-                        	else {
-                            	sb.append(" missing required field: ").append(req);
-                                count++;                    		
+
+                            if ( issue_warning ) {
+                            	sb.append("Missing required field: ").append(
+                                    req).append(addMagicString(handle));
+                                warnings_issued++;
                         	}
-                        }                    	
+                        }
                     }
                 }
                 
-                if(checkExtra){
-                        //If we have one field in repeatable component we need all the others
-                        for (RepeatableComponent rc : getRepeatableComponents(colhandle)){
-                                if(rc.getFieldCount()>1){
-                                        Iterator<String> i = rc.iterateFields();
-                                        int valuesCount = getCount(item.getMetadataByMetadataString(i.next()));
-                                        while(i.hasNext()){
-                                    int nextValuesCount = getCount(item.getMetadataByMetadataString(i.next()));
-                                                if(valuesCount != nextValuesCount){
-                                                        sb.append(" missing field in repeatable component ").append(rc.getName());
-                                                        count++;
-                                                        break;
-                                                }
-                                                valuesCount = nextValuesCount;
-                                        }
+                if(checkExtra) {
+                    //If we have one field in repeatable component we need all the others
+                    for (RepeatableComponent rc : getRepeatableComponents(colhandle)){
+                        if(rc.getFieldCount()>1) {
+                            Iterator<String> i = rc.iterateFields();
+                            int valuesCount = getCount(item.getMetadataByMetadataString(i.next()));
+                            while(i.hasNext()){
+                                int nextValuesCount = getCount(item.getMetadataByMetadataString(i.next()));
+                                if(valuesCount != nextValuesCount){
+                                    sb.append("Missing field in repeatable component: ").append(
+                                        rc.getName()).append(addMagicString(handle));
+                                    warnings_issued++;
+                                    break;
                                 }
+                                valuesCount = nextValuesCount;
+                            }
                         }
+                    }
                 }
-                
-                if (count == 0)
-                {
+
+                // no warnings issued
+                if (warnings_issued == 0) {
                     sb = new StringBuilder();
                 }
 
                 report(sb.toString());
                 setResult(sb.toString());
             }
-            catch (DCInputsReaderException dcrE)
+            catch (DCInputsReaderException | SQLException dcrE)
             {
                 throw new IOException(dcrE.getMessage(), dcrE);
             }
-            catch (SQLException sqlE)
-            {
-                throw new IOException(sqlE.getMessage(), sqlE);
-            }
-            return (count == 0) ? Curator.CURATE_SUCCESS : Curator.CURATE_FAIL;
+            return (warnings_issued == 0) ? Curator.CURATE_SUCCESS : Curator.CURATE_FAIL;
         }
         else
         {

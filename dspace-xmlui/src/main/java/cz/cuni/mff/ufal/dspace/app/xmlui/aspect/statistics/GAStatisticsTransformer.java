@@ -46,8 +46,8 @@ import com.google.api.services.analytics.Analytics.Data.Ga.Get;
 import com.google.api.services.analytics.AnalyticsScopes;
 import com.google.api.services.analytics.model.GaData;
 import com.google.api.services.analytics.model.GaData.ColumnHeaders;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;   
-import com.ibm.icu.text.SimpleDateFormat;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import java.text.SimpleDateFormat;
 
 
 /**

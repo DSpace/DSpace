@@ -16,8 +16,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Division;
-
-import com.ibm.icu.text.SimpleDateFormat;
+import java.text.SimpleDateFormat;
 
 import org.dspace.app.xmlui.aspect.administrative.controlpanel.AbstractControlPanelTab;
 import cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.HtmlHelper;
