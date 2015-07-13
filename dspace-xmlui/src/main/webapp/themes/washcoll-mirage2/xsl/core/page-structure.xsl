@@ -716,7 +716,7 @@
                 <xsl:when test="starts-with($request-uri, 'page/bond')">
                     <div class="hero-unit">
                         <h1>Rev. Dr. William Smith bond to Washington College in 1784</h1>
-                        <img src="/themes/washcoll-mirage2/images/wash-doc.png" class="img-responsive"/>
+                        <img src="/themes/washcoll-mirage2/images/IMG_7768.jpg" class="img-responsive"/>
                         <p>Bond, signed by Rev. Dr. William Smith, first principal of Washington College, June 18, 1784</p>
                         <p>Smith donated three hundred and three pounds and ten shillings to the Board of Visitors and Governors in 1784 to help support the college.</p>
                     </div>
