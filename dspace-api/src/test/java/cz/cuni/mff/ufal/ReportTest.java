@@ -13,8 +13,8 @@ public class ReportTest
 {
     @Test
     public void testReportHandleResolutionStatistics() throws IllegalAccessException {
-        //String args[] = {"-c", "0"};
-        String args[] = {};
+        String args[] = {"-c", "0"};
+        //String args[] = {};
         try {
             DSpaceApi.load_dspace("../dspace/");
         }catch(Exception e) {
