@@ -119,6 +119,7 @@ public class StatisticsAuthorizedMatcher extends AbstractLogEnabled implements M
     }
     
     public boolean isMemberOfGroup(Group g, EPerson e) {
+    	if(e==null) return false;
     	if(g.isMember(e)) return true;
     	for(Group sg : g.getMemberGroups()) {
     		// this is a hack .. default Authenticated group needs to be 
@@ -133,3 +134,4 @@ public class StatisticsAuthorizedMatcher extends AbstractLogEnabled implements M
     	return false;
     }
 }
+

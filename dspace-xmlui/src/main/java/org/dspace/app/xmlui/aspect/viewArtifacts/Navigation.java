@@ -17,7 +17,9 @@ import org.dspace.app.util.Util;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
+import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
@@ -49,6 +51,10 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.
      */
+	
+    private static final Message T_statistics_head = message("xmlui.statistics.Navigation.title");
+    private static final Message T_statistics_piwik_head = message("xmlui.statistics.Navigation.piwik.title");
+	
     public Serializable getKey() {
         try {
             Request request = ObjectModelHelper.getRequest(objectModel);
@@ -88,6 +94,14 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         options.addList("account");
         options.addList("context");
         options.addList("administrative");
+        
+        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+        if(dso != null && dso.getHandle() != null && dso instanceof Item){
+	        List statistics = options.addList("statistics");
+	        statistics.setHead(T_statistics_head);
+	        statistics.addItemXref(contextPath + "/handle/" + dso.getHandle() + "/piwik-statistics", T_statistics_piwik_head);
+        }
+        
     }
 
     /**

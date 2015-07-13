@@ -21,8 +21,13 @@ public class ControlPanelReplicationTab extends AbstractControlPanelTab {
 		Division div = mainDiv.addDivision("replication_div");
 		
 		div.setHead("Replication Service");
+
+		try {
 		
-		ControlPanelReplicationTabHelper.addForm(div);		
+			ControlPanelReplicationTabHelper.showTabs(div, request, context);
+		} catch(Exception e) {
+			throw new WingException(e);
+		}
 
 	}			
 	

@@ -160,6 +160,7 @@ public class UFALLicenseStep extends LicenseStep {
 		info3.addHighlight("").addContent(T_info3);
 
 		List form = null;
+		Select license_select = null;
 
 		if (file_uploaded) {
 
@@ -167,9 +168,8 @@ public class UFALLicenseStep extends LicenseStep {
 			form.setHead("Select the resource license");
 			
 			Item selectorLink = form.addItem();
-			selectorLink.addXref("#!", T_license_selector_button, "btn btn-default btn-sm licenseselector bold pull-right");
-			
-			
+			selectorLink.addXref("#!", T_license_selector_button, "btn btn-repository licenseselector bold pull-right");
+						
 			Item helpText = form.addItem();
 						
 			helpText.addHighlight("license-resource-text").addContent(T_resource_license_text);
@@ -177,7 +177,7 @@ public class UFALLicenseStep extends LicenseStep {
 			Item notsupported = form.addItem("license-not-supported-message", "alert alert-danger alert-dismissible fade in hidden");
 			notsupported.addContent(T_license_not_supported);
 			
-			Select license_select = form.addItem().addSelect("license");
+			license_select = form.addItem().addSelect("license");
 			Item detailLicenseLink = form.addItem(null, "alert alert-info");
 			detailLicenseLink.addHighlight("fa fa-lg fa-question-circle").addContent(" ");
 			detailLicenseLink.addHighlight("").addContent(T_license_list_alert);
@@ -206,8 +206,11 @@ public class UFALLicenseStep extends LicenseStep {
 
 				final HttpServletRequest request = (HttpServletRequest) objectModel.get(HttpEnvironment.HTTP_REQUEST_OBJECT);
 				String[] selected_license = request.getParameterValues("license");
+				if(selected_license!=null && selected_license[0].equals("")) selected_license = null;
 				int selectedId = (selected_license != null && selected_license.length > 0) ? Integer.parseInt(selected_license[0]) : -1;
 
+				license_select.addOption(true, "", "Select a License ...");
+				
 				for (LicenseDefinition license_def : license_defs) {
 					boolean selected = license_def.getLicenseId() == selectedId;
 					license_select.addOption(selected, license_def.getLicenseId(), license_def.getName());
@@ -250,6 +253,7 @@ public class UFALLicenseStep extends LicenseStep {
 		// If user did not select any license
 		if (this.errorFlag == cz.cuni.mff.ufal.dspace.submit.step.UFALLicenseStep.STATUS_LICENSE_NOT_SELECTED) {
 			controls.addItem().addHighlight("error").addContent(T_select_error);
+			license_select.addError(T_select_error);
 			log.info(LogManager.getHeader(context, "notselect_license",
 					submissionInfo.getSubmissionLogInfo()));
 		}
@@ -344,4 +348,5 @@ public class UFALLicenseStep extends LicenseStep {
 	}
 
 }
+
 

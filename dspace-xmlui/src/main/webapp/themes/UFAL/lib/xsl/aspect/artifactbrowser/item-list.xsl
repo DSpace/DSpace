@@ -156,7 +156,7 @@
             </xsl:choose>
             <div class="label label-info" style="margin-bottom: 20px;">
                 <xsl:variable name="file-size"
-                    select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='local' and @element='files' and @qualifier='count']/node()" />
+                    select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='local' and @element='files' and @qualifier='size']/node()" />
                 <xsl:variable name="formatted-file-size">
                     <xsl:call-template name="format-size">                   
                         <xsl:with-param name="size" select="$file-size" />

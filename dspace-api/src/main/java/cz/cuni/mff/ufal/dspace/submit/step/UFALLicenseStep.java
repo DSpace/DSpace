@@ -84,7 +84,7 @@ public class UFALLicenseStep extends org.dspace.submit.step.LicenseStep {
 				if ( file_uploaded ) {
 					String[] selected_license = request.getParameterValues("license");
 					
-					if (null == selected_license ) {
+					if (null == selected_license || selected_license[0].equals("")) {
 						// no decision made (this will cause Manakin to display an
 						// error)
 						return STATUS_LICENSE_NOT_SELECTED;
