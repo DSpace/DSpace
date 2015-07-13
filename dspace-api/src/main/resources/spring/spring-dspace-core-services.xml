@@ -22,7 +22,16 @@
           autowire="byType"
           scope="singleton"/>
 
-   <!-- provider for exposing default Handle services implementaion. -->
+    <!-- Identifier Service Application Interface.  Will be autowired with
+         any Identifier Providers present in Spring context.
+    -->
+    <bean id="org.dspace.identifier.HandleIdentifierProvider"
+          class="cz.cuni.mff.ufal.dspace.handle.ConfigurableHandleIdentifierProvider"
+          scope="singleton">
+        <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
+    </bean>
+
+    <!-- provider for exposing default Handle services implementaion. -->
     <!--bean id="org.dspace.identifier.HandleIdentifierProvider" class="org.dspace.identifier.HandleIdentifierProvider"
           scope="singleton">
         <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
