@@ -22,6 +22,7 @@ import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
+import org.dspace.app.xmlui.cocoon.BitstreamReader;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -30,6 +31,7 @@ import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.Item;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.PageMeta;
+import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.authenticate.AuthenticationManager;
 import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.core.ConfigurationManager;
@@ -171,14 +173,31 @@ public class LoginChooser extends AbstractDSpaceTransformer implements
                 reason.setHead("Authentication Required");
             }
 
-            if (message != null)
+            if (header.equals(BitstreamReader.EMBARGO_HEADER))
             {
-                reason.addPara(message(message));
-            }
+                Para para = reason.addPara();
+                if (message != null)
+                {
+                    para.addContent(message(message));
+                }
 
-            if (characters != null)
+                if (characters != null)
+                {
+                    para.addContent(characters);
+                }
+            }
+            else
             {
-                reason.addPara(characters);
+
+                if (message != null)
+                {
+                    reason.addPara(message(message));
+                }
+
+                if (characters != null)
+                {
+                    reason.addPara(characters);
+                }
             }
         }
 

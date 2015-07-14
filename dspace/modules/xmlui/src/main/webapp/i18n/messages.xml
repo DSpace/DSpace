@@ -307,7 +307,9 @@
     <message key="xmlui.BitstreamReader.auth_message">The file you are attempting to access is a restricted file and requires credentials to view. Please login below to access the file.</message>
 
     <!--Restricted Access for Embargoed bitstreams-->
-    <message key="xmlui.BitstreamReader.res_header">Restricted Access</message>
+    <message key="xmlui.BitstreamReader.embargo_header">Restricted Access</message>
+    <message key="xmlui.BitstreamReader.embargo_until_message">At the request of the author, this document is not available until </message>
+    <message key="xmlui.BitstreamReader.embargo_notavailable_message">At the request of the author, this document is not available.</message>
 
     <!-- Export Archive download messages -->
     <message key="xmlui.ItemExportDownloadReader.auth_header">This export archive is restricted.</message>

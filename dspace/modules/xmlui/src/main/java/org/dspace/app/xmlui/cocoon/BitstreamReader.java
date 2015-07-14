@@ -34,6 +34,7 @@ import org.apache.cocoon.util.ByteRange;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
+import org.dspace.app.xmlui.wing.AbstractWingTransformer;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
@@ -48,7 +49,6 @@ import org.dspace.handle.HandleManager;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
-
 import org.apache.log4j.Logger;
 import org.dspace.core.LogManager;
 
@@ -108,9 +108,15 @@ public class BitstreamReader extends AbstractReader implements Recyclable
      * bitstream. They will be redirected to the login where this message will
      * be displayed.
      */
-    private static final String AUTH_REQUIRED_HEADER = "xmlui.BitstreamReader.res_header";
+    private static final String AUTH_REQUIRED_HEADER = "xmlui.BitstreamReader.auth_header";
 
     private static final String AUTH_REQUIRED_MESSAGE = "xmlui.BitstreamReader.auth_message";
+
+    public static final String EMBARGO_HEADER = "xmlui.BitstreamReader.embargo_header";
+
+    private static final String EMBARGO_UNTIL_MESSAGE = "xmlui.BitstreamReader.embargo_until_message";
+
+    private static final String EMBARGO_NOTAVAILABLE_MESSAGE = "xmlui.BitstreamReader.embargo_notavailable_message";
 
     /**
      * How big a buffer should we use when reading from the bitstream before
@@ -156,14 +162,6 @@ public class BitstreamReader extends AbstractReader implements Recyclable
 
     /** True if user agent making this request was identified as spider. */
     private boolean isSpider = false;
-
-    private String mydate;
-
-    private final String res_message = "At the request of the author, this document is not available until ";
-
-    private final String res_message_notavailable = "At the request of the author, this document is not available.";
-
-    private String restricted_message;
 
     /**
      * Set up the bitstream reader.
@@ -342,60 +340,38 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                         // can be authenticated. Once that is
                         // successful, their request will be resumed.
 
-                        /*
-                         * Restricted access to embargoed items. Displays date
-                         * until when access is restricted.
-                         */
-                        try
-                        {
-                            this.bitstreamInputStream = bitstream.retrieve();
-                        }
-                        catch (AuthorizeException e)
-                        {
-                            // Clear the response, including headers (eg,
-                            // Content-Length)
-                            response.reset();
+                        String responseMessage = AUTH_REQUIRED_MESSAGE;
+                        String responseHeader = AUTH_REQUIRED_HEADER;
+                        String responseCharecters = "";
 
-                            if (bitstream.isETDEmbargo())
+                        if (bitstream.isETDEmbargo())
+                        {
+                            responseHeader = EMBARGO_HEADER;
+                            Date date = bitstream.getETDEmbargo().getEndDate();
+                            if (date != null)
                             {
-                                restricted_message = null;
-                                request.setAttribute("date", bitstream
-                                        .getETDEmbargo().getEndDate());
-                                java.util.Date date = (java.util.Date) request
-                                        .getAttribute("date");
-                                if (date != null)
-                                {
-                                    SimpleDateFormat sdf = new SimpleDateFormat(
-                                            "MMMM dd, yyyy");
+                                SimpleDateFormat sdf = new SimpleDateFormat(
+                                        "MMMM dd, yyyy");
 
-                                    String dateUntil = sdf.format(date)
-                                            .toString();
-                                    restricted_message = res_message
-                                            + dateUntil;
-                                }
-                                else
-                                {
-                                    restricted_message = res_message_notavailable;
-                                }
-
-                                AuthenticationUtil.interruptRequest(
-                                        objectModel, AUTH_REQUIRED_HEADER,
-                                        restricted_message, null);
-                                String redictURL = request.getContextPath()
-                                        + "/login";
-
-                                HttpServletResponse httpResponse = (HttpServletResponse) objectModel
-                                        .get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
-                                httpResponse.sendRedirect(redictURL);
-                                return;
+                                String dateUntil = sdf.format(date).toString();
+                                responseMessage = EMBARGO_UNTIL_MESSAGE;
+                                responseCharecters = dateUntil;
                             }
-
                             else
                             {
-                                throw e;
+                                responseMessage = EMBARGO_NOTAVAILABLE_MESSAGE;
                             }
-                        }
 
+                        }
+                        AuthenticationUtil.interruptRequest(objectModel,
+                                responseHeader, responseMessage,
+                                responseCharecters);
+                        String redictURL = request.getContextPath() + "/login";
+
+                        HttpServletResponse httpResponse = (HttpServletResponse) objectModel
+                                .get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+                        httpResponse.sendRedirect(redictURL);
+                        return;
                     }
                 }
             }
