@@ -250,7 +250,9 @@ public class WorkspaceItem implements InProgressSubmission
             }
         }
 
-        i.addMetadata("local", "branding", null, null, coll.getPrincipalCommunity().getName());
+        if ( null != coll.getPrincipalCommunity() ) {
+            i.addMetadata("local", "branding", null, null, coll.getPrincipalCommunity().getName());
+        }
         
         i.update();
 

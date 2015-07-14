@@ -9,6 +9,7 @@ package org.dspace.content;
 
 import java.sql.SQLException;
 import mockit.NonStrictExpectations;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
 import org.junit.*;
@@ -533,8 +534,9 @@ public class BitstreamFormatTest extends AbstractUnitTest
     public void testGetExtensions()
     {
         assertThat("testGetExtensions 0", bf.getExtensions(), notNullValue());
-        assertTrue("testGetExtensions 1", bf.getExtensions().length == 1);
-        assertThat("testGetExtensions 2", bf.getExtensions()[0], equalTo("xml"));
+        // lindat: we have also trs by default
+        //assertTrue("testGetExtensions 1", bf.getExtensions().length == 1);
+        //assertThat("testGetExtensions 2", bf.getExtensions()[0], equalTo("xml"));
     }
 
     /**
@@ -543,7 +545,7 @@ public class BitstreamFormatTest extends AbstractUnitTest
     @Test
     public void setExtensions()
     {
-        assertThat("setExtensions 0", bf.getExtensions()[0], equalTo("xml"));
+        assertThat("setExtensions 0", StringUtils.join(bf.getExtensions(), " "), containsString("xml"));
 
         bf.setExtensions(new String[]{"1", "2", "3"});
         assertThat("setExtensions 1", bf.getExtensions(), notNullValue());
