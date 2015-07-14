@@ -7,29 +7,32 @@
  */
 package org.dspace.servicemanager.config;
 
-import java.io.*;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.*;
+import java.io.File;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
-
-import org.dspace.constants.Constants;
-import org.dspace.servicemanager.ServiceConfig;
+import java.util.Properties;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationConverter;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.DefaultConfigurationBuilder;
 import org.dspace.services.ConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.SimpleTypeConverter;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 /**
- * The central DSpace configuration service.
- * This is effectively immutable once the config has loaded.
+ * The central DSpace configuration service. Uses Apache Commons Configuration
+ * to provide the ability to reload Property files.
  *
- * @author Aaron Zeckoski (azeckoski @ gmail.com)
- * @author Kevin Van de Velde (kevin at atmire dot com)
- * @author Mark Diggory (mdiggory at atmire dot com)
+ * @author Tim Donohue (rewrote to use Apache Commons Config
+ * @author Aaron Zeckoski
+ * @author Kevin Van de Velde
+ * @author Mark Diggory
  */
 public final class DSpaceConfigurationService implements ConfigurationService {
 
@@ -40,17 +43,18 @@ public final class DSpaceConfigurationService implements ConfigurationService {
     public static final String EXT_CONFIG = "cfg";
     public static final String DOT_CONFIG = "." + EXT_CONFIG;
 
-    public static final String DSPACE_PREFIX = "dspace.";
     public static final String DSPACE_HOME = DSPACE + ".dir";
-    public static final String DEFAULT_CONFIGURATION_FILE_NAME = "dspace-defaults" + DOT_CONFIG;
-    public static final String DEFAULT_DSPACE_CONFIG_PATH = "config/" + DEFAULT_CONFIGURATION_FILE_NAME;
+    public static final String DEFAULT_CONFIG_DIR = "config";
+    public static final String DEFAULT_CONFIG_DEFINITION_FILE = "config-definition.xml";
+    public static final String DSPACE_CONFIG_DEFINITION_PATH = DEFAULT_CONFIG_DIR + File.separatorChar + DEFAULT_CONFIG_DEFINITION_FILE;
 
-    public static final String DSPACE_CONFIG_PATH = "config/" + DSPACE + DOT_CONFIG;
+    public static final String DSPACE_CONFIG_PATH = DEFAULT_CONFIG_DIR + File.separatorChar + DSPACE + DOT_CONFIG;
 
-    public static final String DSPACE_MODULES_CONFIG_PATH = "config" + File.separator + "modules";
+    // Current ConfigurationBuilder
+    DefaultConfigurationBuilder configurationBuilder = null;
 
-    protected transient Map<String, Map<String, ServiceConfig>> serviceNameConfigs;
-    public static final String DSPACE_CONFIG_ADDON = "dspace/config-*";
+    // Current Configuration
+    protected Configuration configuration = null;
 
     public DSpaceConfigurationService() {
         // init and load up current config settings
@@ -62,31 +66,60 @@ public final class DSpaceConfigurationService implements ConfigurationService {
 	}
 
     /* (non-Javadoc)
-     * @see org.dspace.services.ConfigurationService#getAllProperties()
-     */
-    @Override
-    public Map<String, String> getAllProperties() {
-        Map<String, String> props = new LinkedHashMap<String, String>();
-//        for (Entry<String, DSpaceConfig> config : configuration.entrySet()) {
-//            props.put(config.getKey(), config.getValue().getValue());
-//        }
-
-        for (DSpaceConfig config : configuration.values()) {
-            props.put(config.getKey(), config.getValue());
-        }
-        return props;
-    }
-
-    /* (non-Javadoc)
      * @see org.dspace.services.ConfigurationService#getProperties()
      */
     @Override
     public Properties getProperties() {
-        Properties props = new Properties();
-        for (DSpaceConfig config : configuration.values()) {
-            props.put(config.getKey(), config.getValue());
+        // Return our configuration as a set of Properties
+        return ConfigurationConverter.getProperties(configuration);
+    }
+
+    /* (non-Javadoc)
+     * @see org.dspace.services.ConfigurationService#getPropertyKeys()
+     */
+    @Override
+    public List<String> getPropertyKeys() {
+
+        Iterator<String> keys = configuration.getKeys();
+
+        List<String> keyList = new ArrayList<>();
+        while(keys.hasNext())
+        {
+            keyList.add(keys.next());
         }
-        return props;
+        return keyList;
+    }
+
+    /* (non-Javadoc)
+     * @see org.dspace.services.ConfigurationService#getPropertyKeys(java.lang.String)
+     */
+    @Override
+    public List<String> getPropertyKeys(String prefix) {
+
+        Iterator<String> keys = configuration.getKeys(prefix);
+
+        List<String> keyList = new ArrayList<>();
+        while(keys.hasNext())
+        {
+            keyList.add(keys.next());
+        }
+        return keyList;
+    }
+
+    /* (non-Javadoc)
+     * @see org.dspace.services.ConfigurationService#getConfiguration()
+     */
+    @Override
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+
+    /* (non-Javadoc)
+     * @see org.dspace.services.ConfigurationService#getPropertyValue(java.lang.Object)
+     */
+    @Override
+    public Object getPropertyValue(String name) {
+        return configuration.getProperty(name);
     }
 
     /* (non-Javadoc)
@@ -94,12 +127,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
      */
     @Override
     public String getProperty(String name) {
-        DSpaceConfig config = configuration.get(name);
-        String value = null;
-        if (config != null) {
-            value = config.getValue();
-        }
-        return value;
+        return configuration.getString(name);
     }
 
     /* (non-Javadoc)
@@ -107,8 +135,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
      */
     @Override
     public <T> T getPropertyAsType(String name, Class<T> type) {
-        String value = getProperty(name);
-        return convert(value, type);
+        return convert(name, type);
     }
 
     /* (non-Javadoc)
@@ -122,24 +149,26 @@ public final class DSpaceConfigurationService implements ConfigurationService {
     /* (non-Javadoc)
      * @see org.dspace.services.ConfigurationService#getPropertyAsType(java.lang.String, java.lang.Object, boolean)
      */
-    @SuppressWarnings("unchecked")
     @Override
     public <T> T getPropertyAsType(String name, T defaultValue, boolean setDefaultIfNotFound) {
-        String value = getProperty(name);
-        T property = null;
-        if (defaultValue == null) {
-            property = null; // just return null when default value is null
-        } else if (value == null) {
-            property = defaultValue; // just return the default value if nothing is currently set
-            // also set the default value as the current stored value
-            if (setDefaultIfNotFound) {
+
+        // If this key doesn't exist, immediately return a value
+        if(!configuration.containsKey(name))
+        {
+            // if flag is set, save the default value as the new value for this property
+            if(setDefaultIfNotFound)
+            {
                 setProperty(name, defaultValue);
             }
-        } else {
-            // something is already set so we convert the stored value to match the type
-            property = (T)convert(value, defaultValue.getClass());
+            
+            // Either way, return our default value as if it was the setting
+            return defaultValue;
         }
-        return property;
+
+        // Get the class associated with our default value
+        Class type = defaultValue.getClass();
+
+        return (T) convert(name, type);
     }
 
     // config loading methods
@@ -148,492 +177,197 @@ public final class DSpaceConfigurationService implements ConfigurationService {
      * @see org.dspace.services.ConfigurationService#setProperty(java.lang.String, java.lang.Object)
      */
     @Override
-    public boolean setProperty(String name, Object value) {
+    public synchronized boolean setProperty(String name, Object value)
+    {
+        boolean changed = false;
         if (name == null) {
             throw new IllegalArgumentException("name cannot be null for setting configuration");
         }
-        boolean changed = false;
-        if (value == null) {
-            changed = this.configuration.remove(name) != null;
-            log.info("Cleared the configuration setting for name ("+name+")");
-        } else {
-            SimpleTypeConverter converter = new SimpleTypeConverter();
-            String sVal = (String)converter.convertIfNecessary(value, String.class);
-            changed = loadConfig(name, sVal);
-        }
-        return changed;
-    }
+        else
+        {
+            Object oldValue = configuration.getProperty(name);
 
-    // INTERNAL loading methods
-    public List<DSpaceConfig> getConfiguration() {
-        return new ArrayList<DSpaceConfig>( configuration.values() );
-    }
-
-    /**
-     * Get all configs that start with the given value.
-     * @param prefix a string which the configs to return must start with
-     * @return the list of all configs that start with the given string
-     */
-    public List<DSpaceConfig> getConfigsByPrefix(String prefix) {
-        List<DSpaceConfig> configs = new ArrayList<DSpaceConfig>();
-        if (prefix != null && prefix.length() > 0) {
-            for (DSpaceConfig config : configuration.values()) {
-                if (config.getKey().startsWith(prefix)) {
-                    configs.add(config);
-                }
+            if (value == null && oldValue!=null)
+            {
+                changed = true;
+                configuration.clearProperty(name);
+                log.info("Cleared the configuration setting for name ("+name+")");
+            }
+            else if(!value.equals(oldValue))
+            {
+               changed = true;
+               configuration.setProperty(name, value);
             }
         }
-        return configs;
-    }
-
-    protected Map<String, DSpaceConfig> configuration = Collections.synchronizedMap(new LinkedHashMap<String, DSpaceConfig>());
-
-    /**
-     * @return a map of the service name configurations that are known for fast resolution
-     */
-    public Map<String, Map<String, ServiceConfig>> getServiceNameConfigs() {
-        return serviceNameConfigs;
-    }
-
-    public void setConfiguration(Map<String, DSpaceConfig> configuration) {
-        if (configuration == null) {
-            throw new IllegalArgumentException("configuration cannot be null");
-        }
-        this.configuration = configuration;
-        replaceVariables(this.configuration);
-        // refresh the configs
-        serviceNameConfigs = makeServiceNameConfigs();
+        return changed;
     }
 
     /**
      * Load a series of properties into the configuration.
      * Checks to see if the settings exist or are changed and only loads
-     * changes.  Clears out existing ones depending on the setting.
+     * changes.
+     * <P>
+     * This only adds/updates configurations, if you wish to first clear all
+     * existing configurations, see clear() method.
      *
-     * @param properties a map of key -> value strings
-     * @param clear if true then clears the existing configuration settings first
-     * @return the list of changed configuration names
+     * @param properties a map of key -> value settings
+     * @return the list of changed configuration keys
      */
-    public String[] loadConfiguration(Map<String, String> properties, boolean clear) {
+    public String[] loadConfiguration(Map<String, Object> properties) {
         if (properties == null) {
             throw new IllegalArgumentException("properties cannot be null");
         }
-        // transform to configs and call load
-        ArrayList<DSpaceConfig> dspaceConfigs = new ArrayList<DSpaceConfig>();
-        for (Entry<String, String> entry : properties.entrySet()) {
-            String key = entry.getKey();
-            if (key != null &&  ! "".equals(key)) {
-                String val = entry.getValue();
-                if (val != null &&  ! "".equals(val)) {
-                    dspaceConfigs.add( new DSpaceConfig(entry.getKey(), entry.getValue()) );
-                }
-            }
-        }
-        return loadConfiguration(dspaceConfigs, clear);
-    }
 
-    /**
-     * Load up a bunch of {@link DSpaceConfig}s into the configuration.
-     * Checks to see if the settings exist or are changed and only
-     * loads changes.  Clears out existing ones depending on the setting.
-     *
-     * @param dspaceConfigs a list of {@link DSpaceConfig} objects
-     * @param clear if true then clears the existing configuration settings first
-     * @return the list of changed configuration names
-     */
-    public String[] loadConfiguration(List<DSpaceConfig> dspaceConfigs, boolean clear) {
         ArrayList<String> changed = new ArrayList<String>();
-        if (clear) {
-            this.configuration.clear();
-        }
-        for (DSpaceConfig config : dspaceConfigs) {
-            String key = config.getKey();
-            boolean same = true;
-            if (clear) {
-                // all are new
-                same = false;
-            } else {
-                if (this.configuration.containsKey(key)) {
-                    if (this.configuration.get(key).equals(config)) {
-                        // this one has changed
-                        same = false;
-                    }
-                } else {
-                    // this one is new
-                    same = false;
-                }
-            }
-            if (!same) {
+
+        // loop through each new property entry
+        for (Entry<String, Object> entry : properties.entrySet())
+        {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+
+            // Load this new individual key
+            boolean updated = loadConfig(key, value);
+
+            // If it was updated, add to our list of changed settings
+            if(updated)
+            {
                 changed.add(key);
-                this.configuration.put(key, config);
             }
         }
-        if (changed.size() > 0) {
-            replaceVariables(this.configuration);
-            // refresh the configs
-            serviceNameConfigs = makeServiceNameConfigs();
-        }
+
+        // Return an array of updated keys
         return changed.toArray(new String[changed.size()]);
     }
 
     /**
-     * Loads an additional config setting into the system.
+     * Loads a single additional config setting into the system.
      * @param key
      * @param value
      * @return true if the config is new or changed
      */
-    public boolean loadConfig(String key, String value) {
+    public boolean loadConfig(String key, Object value) {
         if (key == null) {
             throw new IllegalArgumentException("key cannot be null");
         }
-        // update replacements and add
-        boolean changed = replaceAndAddConfig( new DSpaceConfig(key, value) );
-        if (changed) {
-            // refresh the configs
-            serviceNameConfigs = makeServiceNameConfigs();
+
+        // Check if the value has changed
+        if (this.configuration.containsKey(key) &&
+            this.configuration.getProperty(key).equals(value))
+        {
+            // no change to the value
+            return false;
         }
-        return changed;
+        else
+        {
+            // Either this config doesn't exist, or it is not the same value,
+            // so we'll update it.
+            this.configuration.setProperty(key, value);
+            return true;
+        }
     }
 
     /**
-     * Clears the configuration settings.
+     * Clears all the configuration settings.
      */
     public void clear() {
         this.configuration.clear();
-        this.serviceNameConfigs.clear();
         log.info("Cleared all configuration settings");
+    }
+
+    /**
+     * Clears a single configuration
+     * @param key key of the configuration
+     */
+    public void clearConfig(String key) {
+        this.configuration.clearProperty(key);
     }
 
     // loading from files code
 
     /**
-     * Loads up the default initial configuration from the DSpace configuration
-     * files in the file home and on the classpath.  Order:
-     * <ol>
-     *  <li>Create {@code serverId} from local host name if available.</li>
-     *  <li>Create {@code dspace.testing = false}.
-     *  <li>Determine the value of {@code dspace.dir} and add to configuration.</li>
-     *  <li>Load {@code classpath:config/dspace_defaults.cfg}.</li>
-     *  <li>Copy system properties with names beginning "dspace." <em>except</em>
-     *      {@code dspace.dir}, removing the "dspace." prefix from the name.</li>
-     *  <li>Load all {@code classpath:dspace/config-*.cfg} using whatever
-     *      matched "*" as module prefix.</li>
-     *  <li>Load all {@code ${dspace.dir}/config/modules/*.cfg} using whatever
-     *      matched "*" as module prefix.</li>
-     *  <li>Load {@code classpath:dspace.cfg}.</li>
-     *  <li>Load from the path in the system property {@code dspace.configuration}
-     *      if defined, or {@code ${dspace.dir}/config/dspace.cfg}.</li>
-     *  <li>Perform variable substitutions throughout the assembled configuration.</li>
-     * </ol>
-     *
-     * <p>The initial value of {@code dspace.dir} will be:</p>
-     * <ol>
-     *  <li>the value of the system property {@code dspace.dir} if defined;</li>
-     *  <li>else the value of {@code providedHome} if not null;</li>
-     *  <li>else the servlet container's home + "/dspace/" if defined (see {@link getCatalina()});</li>
-     *  <li>else the user's home directory if defined;</li>
-     *  <li>else "/".
-     * </ol>
-     *
+     * Loads up the configuration from the DSpace configuration files.
+     * <P>
+     * Determines the home directory of DSpace, and then loads the configurations
+     * based on the configuration definition file in that location
+     * (using Apache Commons Configuration).
      * @param providedHome DSpace home directory, or null.
      */
-    public void loadInitialConfig(String providedHome) {
-        Map<String, String> configMap = new LinkedHashMap<String, String>();
-        // load default settings
-        try {
-            String defaultServerId = InetAddress.getLocalHost().getHostName();
-            configMap.put("serverId", defaultServerId);
-        } catch (UnknownHostException e) {
-            // oh well
-        }
-        // default is testing mode off
-        configMap.put(Constants.DSPACE_TESTING_MODE, "false");
-
-        // now we load the settings from properties files
+    public void loadInitialConfig(String providedHome)
+    {
+        // See if homePath is specified as a System Property
         String homePath = System.getProperty(DSPACE_HOME);
 
-        // now we load from the provided parameter if its not null
+        // If a provided home was passed in & no system property, use provided home
         if (providedHome != null && homePath == null) {
             homePath = providedHome;
         }
-
+        // If still null, check Catalina
         if (homePath == null) {
             String catalina = getCatalina();
             if (catalina != null) {
                 homePath = catalina + File.separatorChar + DSPACE + File.separatorChar;
             }
         }
+        // If still null, check "user.home" system property
         if (homePath == null) {
             homePath = System.getProperty("user.home");
         }
+        // Finally, no other option but to assume root path ("/")
         if (homePath == null) {
             homePath = "/";
         }
 
-        // make sure it's set properly
-        //System.setProperty(DSPACE_HOME, homePath);
-        configMap.put(DSPACE_HOME, homePath);
+        // Based on homePath get full path to the configuration definition
+        String configDefinition = homePath + File.separatorChar + DSPACE_CONFIG_DEFINITION_PATH;
 
-        // LOAD the internal defaults
-        Properties defaultProps = readPropertyResource(DEFAULT_DSPACE_CONFIG_PATH);
-        if (defaultProps.size() <= 0) {
-            // failed to load defaults!
-            throw new RuntimeException("Failed to load default dspace config properties: " + DEFAULT_DSPACE_CONFIG_PATH);
-        }
-        pushPropsToMap(configMap, defaultProps);
-
-        // load all properties from the system which begin with the prefix
-        Properties systemProps = System.getProperties();
-        for (Object o : systemProps.keySet()) {
-            String key = (String) o;
-            if (key != null
-                    && ! key.equals(DSPACE_HOME)) {
-                try {
-                    if (key.startsWith(DSPACE_PREFIX)) {
-                        String propName = key.substring(DSPACE_PREFIX.length());
-                        String propVal = systemProps.getProperty(key);
-                        log.info("Loading system property as config: "+propName+"=>"+propVal);
-                        configMap.put(propName, propVal);
-                    }
-                } catch (RuntimeException e) {
-                    log.error("Failed to properly get config value from system property: " + o, e);
-                }
-            }
-        }
-
-        // Collect values from all the properties files: the later ones loaded override settings from prior.
-
-
-        //Find any addon config files found in the config dir in our jars
-        try {
-            PathMatchingResourcePatternResolver patchMatcher = new PathMatchingResourcePatternResolver();
-            Resource[] resources = patchMatcher.getResources("classpath*:" + DSPACE_CONFIG_ADDON + DOT_CONFIG);
-            for (Resource resource : resources) {
-                String prefix = resource.getFilename().substring(0, resource.getFilename().lastIndexOf(".")).replaceFirst("config-", "");
-                pushPropsToMap(configMap, prefix, readPropertyStream(resource.getInputStream()));
-            }
-        }catch (Exception e){
-            log.error("Failed to retrieve properties from classpath: " + e.getMessage(), e);
-
-        }
-        //Attempt to load up all the config files in the modules directory
-        try{
-            File modulesDirectory = new File(homePath + File.separator + DSPACE_MODULES_CONFIG_PATH + File.separator);
-            if(modulesDirectory.exists()){
-                try{
-                    Resource[] resources = new PathMatchingResourcePatternResolver().getResources(modulesDirectory.toURI().toURL().toString() + "*" + DOT_CONFIG);
-                    if(resources != null){
-                        for(Resource resource : resources){
-                            String prefix = resource.getFilename().substring(0, resource.getFilename().lastIndexOf("."));
-                            pushPropsToMap(configMap, prefix, readPropertyStream(resource.getInputStream()));
-                        }
-                    }
-                }catch (IOException e){
-                    log.error("Error while loading the modules properties from:" + modulesDirectory.getAbsolutePath());
-                }
-            }else{
-                log.info("Failed to load the modules properties since (" + homePath + File.separator + DSPACE_MODULES_CONFIG_PATH + "): Does not exist");
-            }
-
-        }catch (IllegalArgumentException e){
-            //This happens if we don't have a modules directory
-            log.error("Error while loading the module properties since (" +  homePath + File.separator + DSPACE_MODULES_CONFIG_PATH + "): is not a valid directory", e);
-        }
-
-        // attempt to load from the current classloader also (works for commandline config sitting on classpath
-        pushPropsToMap(configMap, readPropertyResource(DSPACE + DOT_CONFIG));
-
-        // read all the known files from the home path that are properties files
-        String configPath = System.getProperty("dspace.configuration");
-        if (null == configPath)
+        try
         {
-            configPath = homePath + File.separatorChar + DSPACE_CONFIG_PATH;
+            // Load our configuration definition, which in turn loads all our config files/settings
+            // See: http://commons.apache.org/proper/commons-configuration/userguide_v1.10/howto_configurationbuilder.html
+            configurationBuilder = new DefaultConfigurationBuilder(configDefinition);
+
+            // Actually parser our configuration definition & return the resulting Configuration
+            configuration = configurationBuilder.getConfiguration();
         }
-        pushPropsToMap(configMap, readPropertyFile(configPath));
-
-//      TODO: still use this local file loading?
-//        pushPropsToMap(configMap, readPropertyFile(homePath + File.separatorChar + "local" + DOT_PROPERTIES));
-
-
-//        pushPropsToMap(configMap, readPropertyResource(DSPACE + DOT_PROPERTIES));
-//        pushPropsToMap(configMap, readPropertyResource("local" + DOT_PROPERTIES));
-//        pushPropsToMap(configMap, readPropertyResource("webapp" + DOT_PROPERTIES));
-
-
-
-
-        // now push all of these into the config service store
-        loadConfiguration(configMap, true);
-        log.info("Started up configuration service and loaded "+configMap.size()+" settings");
-    }
-
-
-    /**
-     * Adds in this DSConfig and then updates the config by checking for
-     * replacements everywhere else.
-     * @param dsConfig a DSConfig to update the value of and then add in to the main config
-     * @return true if the config changed or is new
-     */
-    protected boolean replaceAndAddConfig(DSpaceConfig dsConfig) {
-        DSpaceConfig newConfig = null;
-        String key = dsConfig.getKey();
-        if (dsConfig.getValue().contains("${")) {
-            String value = dsConfig.getValue();
-            int start = -1;
-            while ((start = value.indexOf("${")) > -1) {
-                int end = value.indexOf('}', start);
-                if (end > -1) {
-                    String newKey = value.substring(start+2, end);
-                    if (newKey.equals(key)) {
-                        log.warn("Found circular reference for key ("+newKey+") in config value: " + value);
-                        break;
-                    }
-                    DSpaceConfig dsc = this.configuration.get(newKey);
-                    if (dsc == null) {
-                        log.warn("Could not find key ("+newKey+") for replacement in value: " + value);
-                        break;
-                    }
-                    String newVal = dsc.getValue();
-                    value = value.replace("${"+newKey+"}", newVal);
-                    newConfig = new DSpaceConfig(key, value);
-                } else {
-                    log.warn("Found '${' but could not find a closing '}' in the value: " + value);
-                    break;
-                }
-            }
+        catch(ConfigurationException ce)
+        {
+            log.error("Unable to load configurations based on definition at " + configDefinition);
+            System.err.println("Unable to load configurations based on definition at " + configDefinition);
+            throw new RuntimeException(ce);
         }
 
-        // add the config
-        if (this.configuration.containsKey(key) && this.configuration.get(key).equals(dsConfig)) {
-            return false; // SHORT CIRCUIT
-        }
-
-        // config changed or new
-        this.configuration.put(key, newConfig != null ? newConfig : dsConfig);
-        // update replacements
-        replaceVariables(this.configuration);
-        return true;
+        log.info("Started up configuration service and loaded settings: " + toString());
     }
 
     /**
-     * This will replace the ${key} with the value from the matching key
-     * if it exists.  Logs a warning if the key does not exist.
-     * Goes through and updates the replacements for the the entire
-     * configuration and updates any replaced values.
+     * Reload the configuration from the DSpace configuration files.
+     * <P>
+     * Uses the initialized ConfigurationBuilder to reload all configurations.
      */
-    protected void replaceVariables(Map<String, DSpaceConfig> dsConfiguration) {
-        for (Entry<String, DSpaceConfig> entry : dsConfiguration.entrySet()) {
-            if (entry.getValue().getValue().contains("${")) {
-                String value = entry.getValue().getValue();
-                int start = -1;
-                while ((start = value.indexOf("${")) > -1) {
-                    int end = value.indexOf('}', start);
-                    if (end > -1) {
-                        String newKey = value.substring(start+2, end);
-                        DSpaceConfig dsc = dsConfiguration.get(newKey);
-                        if (dsc == null) {
-                            log.warn("Could not find key ("+newKey+") for replacement in value: " + value);
-                            break;
-                        }
-                        String newVal = dsc.getValue();
-                        String oldValue = value;
-                        value = value.replace("${"+newKey+"}", newVal);
-                        if (value.equals(oldValue)) {
-                            log.warn("No change after variable replacement -- is "
-                                    + newKey + " = " + newVal +
-                                    " a circular reference?");
-                            break;
-                        }
-                        entry.setValue( new DSpaceConfig(entry.getValue().getKey(), value) );
-                    } else {
-                        log.warn("Found '${' but could not find a closing '}' in the value: " + value);
-                        break;
-                    }
-                }
-            }
+    @Override
+    public void reloadConfig()
+    {
+        try
+        {
+            configurationBuilder.reload();
+            this.configuration = configurationBuilder.getConfiguration();
         }
+        catch(ConfigurationException ce)
+        {
+            log.error("Unable to reload configurations based on definition at " + configurationBuilder.getFile().getAbsolutePath(), ce);
+        }
+        log.info("Reloaded configuration service: " + toString());
     }
 
-    protected Properties readPropertyFile(String filePathName) {
-        Properties props = new Properties();
-        InputStream is = null;
-        try {
-            File f = new File(filePathName);
-            if (f.exists()) {
-                is = new FileInputStream(f);
-                props.load(is);
-                log.info("Loaded "+props.size()+" config properties from file: " + f);
-            }
-            else
-            {
-            	log.info("Failed to load config properties from file ("+filePathName+"): Does not exist");
+    @Override
+    public String toString() {
+        // Get the size of the generated Properties
+        Properties props = getProperties();
+        int size = props!=null ? props.size() : 0;
 
-            }
-        } catch (Exception e) {
-            log.warn("Failed to load config properties from file ("+filePathName+"): " + e.getMessage(), e);
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException ioe) {
-                    // Ignore exception on close
-                }
-            }
-        }
-        return props;
-    }
-
-    protected Properties readPropertyResource(String resourcePathName) {
-        Properties props = new Properties();
-        try {
-            ClassPathResource resource = new ClassPathResource(resourcePathName);
-            if (resource.exists()) {
-                props.load(resource.getInputStream());
-                log.info("Loaded "+props.size()+" config properties from resource: " + resource);
-            }
-        } catch (Exception e) {
-            log.warn("Failed to load config properties from resource ("+resourcePathName+"): " + e.getMessage(), e);
-        }
-        return props;
-    }
-
-    protected Properties readPropertyFile(File propertyFile) {
-        Properties props = new Properties();
-        try{
-            if(propertyFile.exists()){
-                props.load(new FileInputStream(propertyFile));
-                log.info("Loaded"+props.size() + " config properties from file: " + propertyFile.getName());
-            }
-
-        } catch (Exception e){
-            log.warn("Failed to load config properties from file (" + propertyFile.getName() + ": "+ e.getMessage(), e);
-        }
-        return props;
-    }
-
-    protected Properties readPropertyStream(InputStream propertyStream){
-        Properties props = new Properties();
-        try{
-            props.load(propertyStream);
-            log.info("Loaded"+props.size() + " config properties from stream");
-        } catch (Exception e){
-            log.warn("Failed to load config properties from stream: " + e.getMessage(), e);
-        }
-        return props;
-    }
-
-    protected void pushPropsToMap(Map<String, String> map, Properties props) {
-        pushPropsToMap(map, null, props);
-
-    }
-    protected void pushPropsToMap(Map<String, String> map, String prefix, Properties props) {
-        for (Entry<Object, Object> entry : props.entrySet()) {
-            String key = entry.getKey().toString();
-            if(prefix != null){
-                key = prefix + "." + key;
-            }
-            map.put(key, entry.getValue() == null ? "" : entry.getValue().toString());
-        }
+        // Return the configuration directory and number of configs loaded
+        return "ConfigDir=" + configuration.getString(DSPACE_HOME) + File.separatorChar + DEFAULT_CONFIG_DIR + ", Size=" + size;
     }
 
     /**
@@ -648,55 +382,58 @@ public final class DSpaceConfigurationService implements ConfigurationService {
         return catalina;
     }
 
-    @Override
-    public String toString() {
-        return "Config:" + DSPACE_HOME + ":size=" + configuration.size();
-    }
-
-
     /**
-     * Constructs service name configs map for fast lookup of service
-     * configurations.
-     * @return the map of config service settings
+     * Convert the value of a given property to a specific object type.
+     * <P>
+     * Note: in most cases we can just use Configuration get*() methods.
+     *
+     * @param name Key of the property to convert
+     * @param <T> object type
+     * @return converted value
      */
-    public Map<String, Map<String, ServiceConfig>> makeServiceNameConfigs() {
-        Map<String, Map<String, ServiceConfig>> serviceNameConfigs = new HashMap<String, Map<String,ServiceConfig>>();
-        for (DSpaceConfig dsConfig : getConfiguration()) {
-            String beanName = dsConfig.getBeanName();
-            if (beanName != null) {
-                Map<String, ServiceConfig> map = null;
-                if (serviceNameConfigs.containsKey(beanName)) {
-                    map = serviceNameConfigs.get(beanName);
-                } else {
-                    map = new HashMap<String, ServiceConfig>();
-                    serviceNameConfigs.put(beanName, map);
-                }
-                map.put(beanName, new ServiceConfig(dsConfig));
-            }
-        }
-        return serviceNameConfigs;
-    }
+    private <T> T convert(String name, Class<T> type) {
 
-    private <T> T convert(String value, Class<T> type) {
-        SimpleTypeConverter converter = new SimpleTypeConverter();
-
-        if (value != null) {
-            if (type.isArray()) {
-                String[] values = value.split(",");
-                return (T)converter.convertIfNecessary(values, type);
-            }
-
-            if (type.isAssignableFrom(String.class)) {
-                return (T)value;
-            }
-        } else {
-            if (boolean.class.equals(type)) {
-                return (T)Boolean.FALSE;
-            } else if (int.class.equals(type) || long.class.equals(type)) {
-                return (T)converter.convertIfNecessary(0, type);
-            }
+        // If this key doesn't exist, just return null
+        if(!configuration.containsKey(name))
+        {
+            // Special case. For booleans, return false if key doesn't exist
+            if(Boolean.class.equals(type) || boolean.class.equals(type))
+                return (T) Boolean.FALSE;
+            else
+                return null;
         }
 
-        return (T)converter.convertIfNecessary(value, type);
+        // Based on the type of class, call the appropriate
+        // method of the Configuration object
+        if(type.isArray())
+            return (T) configuration.getStringArray(name);
+        else if(String.class.equals(type) || type.isAssignableFrom(String.class))
+            return (T) configuration.getString(name);
+        else if(BigDecimal.class.equals(type))
+            return (T) configuration.getBigDecimal(name);
+        else if(BigInteger.class.equals(type))
+            return (T) configuration.getBigInteger(name);
+        else if(Boolean.class.equals(type) || boolean.class.equals(type))
+            return (T) Boolean.valueOf(configuration.getBoolean(name));
+        else if(Byte.class.equals(type) || byte.class.equals(type))
+            return (T) Byte.valueOf(configuration.getByte(name));
+        else if(Double.class.equals(type) || double.class.equals(type))
+            return (T) Double.valueOf(configuration.getDouble(name));
+        else if(Float.class.equals(type) || float.class.equals(type))
+            return (T) Float.valueOf(configuration.getFloat(name));
+        else if(Integer.class.equals(type) || int.class.equals(type))
+            return (T) Integer.valueOf(configuration.getInt(name));
+        else if(List.class.equals(type))
+            return (T) configuration.getList(name);
+        else if(Long.class.equals(type) || long.class.equals(type))
+            return (T) Long.valueOf(configuration.getLong(name));
+        else if(Short.class.equals(type) || short.class.equals(type))
+            return (T) Short.valueOf(configuration.getShort(name));
+        else
+        {
+            // If none of the above works, try to convert the value to the required type
+            SimpleTypeConverter converter = new SimpleTypeConverter();
+            return (T) converter.convertIfNecessary(configuration.getProperty(name), type);
+        }
     }
 }

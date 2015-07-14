@@ -319,7 +319,7 @@ public final class SpringServiceManager implements ServiceManagerSystem {
         return services;
     }
 
-    public void pushConfig(Map<String, String> settings) {
+    public void pushConfig(Map<String, Object> settings) {
         throw new UnsupportedOperationException("Not implemented for individual service manager systems");
     }
 

@@ -7,8 +7,9 @@
  */
 package org.dspace.services;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Properties;
+import org.apache.commons.configuration.Configuration;
 
 
 /**
@@ -90,28 +91,56 @@ public interface ConfigurationService {
     public <T> T getPropertyAsType(String name, T defaultValue, boolean setDefaultIfNotFound);
 
     /**
-     * Get all currently known configuration settings
+     * Get keys all currently known configuration settings
      * 
-     * @return all the configuration properties as a map of name -> value
+     * @return all the configuration keys as a List
      */
-    public Map<String, String> getAllProperties();
+    public List<String> getPropertyKeys();
+
+    /**
+     * Get keys all currently known configuration settings, which
+     * begin with a given prefix.
+     * <P>
+     * For example, passing in "db" would return the keys "db.url", "db.username", etc.
+     *
+     * @param prefix prefix of key
+     * @return all the configuration keys as a List
+     */
+    public List<String> getPropertyKeys(String prefix);
 
     /**
      * Convenience method - get a configuration property (setting) from 
-     * the system.
+     * the system as a String.
      * 
      * @param name the property name
      * @return the property value OR null if none is found
      */
     public String getProperty(String name);
+    
+    /**
+     * Convenience method - get a configuration property (setting) from
+     * the system as its stored object
+     * 
+     * @param name the property name
+     * @return the property value OR null if none is found
+     */
+    public Object getPropertyValue(String name);
 
     /**
      * Convenience method - get all configuration properties (settings)
      * from the system.
-     * 
+     *
      * @return all the configuration properties in a properties object (name -> value)
      */
     public Properties getProperties();
+
+    /**
+     * Convenience method - get entire configuration (settings)
+     * from the system.
+     * 
+     * @return Configuration object representing the system configuration
+     */
+    public Configuration getConfiguration();
 
     /**
      * Set a configuration property (setting) in the system.
@@ -125,5 +154,12 @@ public interface ConfigurationService {
      * @throws UnsupportedOperationException if the type cannot be converted to something that is understandable by the system as a configuration property value
      */
     public boolean setProperty(String name, Object value);
+
+    /**
+     * Reload the configuration from the DSpace configuration files.
+     * <P>
+     * Uses the initialized ConfigurationService to reload all configurations.
+     */
+    public void reloadConfig();
 
 }

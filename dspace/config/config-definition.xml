@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!-- 
+     DSpace Configuration Definition
+     This file defines the ordering of configuration files loaded by DSpace.
+
+     For more information and examples of valid configuration definition files, see:
+     http://commons.apache.org/proper/commons-configuration/userguide_v1.10/howto_configurationbuilder.html 
+-->
+<configuration>
+    <header>
+        <!-- Necessary for CombinedConfiguration to detect & reload individual config files.
+             See JavaDocs for org.apache.commons.configuration.CombinedConfiguration setForceReloadCheck() method -->
+        <result forceReloadCheck="true"/>
+    </header>
+    <!-- Configurations in this section override one another. 
+         Earlier values take precedence, and override any values in later config files -->
+    <override>
+        <!-- NOTE: Optionally, you could just use Variable Interpolation instead 
+             of directly loading these System/Env properties: 
+             http://commons.apache.org/proper/commons-configuration/userguide_v1.10/howto_basicfeatures.html#Variable_Interpolation -->
+        <!-- Load System properties -->
+        <system/>
+        <!-- Load Environment variables -->
+        <env/>
+
+        <!-- Load our dspace.cfg-->
+        <properties fileName="dspace.cfg" throwExceptionOnMissing="true">
+            <!-- Reload this file if it has changed, and at least 1 minute (60,000 ms) has passed -->
+            <reloadingStrategy refreshDelay="60000"
+                config-class="org.apache.commons.configuration.reloading.FileChangedReloadingStrategy"/>
+        </properties>
+        
+        <!-- Load dspace-defaults.cfg (defines default settings for dspace-services) -->
+        <properties fileName="dspace-defaults.cfg" config-optional="true"/>
+    </override>
+    
+</configuration>
