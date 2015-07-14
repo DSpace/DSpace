@@ -562,3 +562,10 @@ height: 33px;
 #aspect_discovery_SiteRecentSubmissions_div_site-home .short-description {
 	display: block;
 }
+
+/* jQuery UI autocomplete max-height */
+.ui-autocomplete {
+	max-height: 300px;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
