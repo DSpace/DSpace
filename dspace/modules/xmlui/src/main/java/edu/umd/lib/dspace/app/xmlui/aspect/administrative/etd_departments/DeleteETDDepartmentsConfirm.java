@@ -1,11 +1,8 @@
-/**
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE and NOTICE files at the root of the source
- * tree and available online at
+/*
+ * Copyright (c) 2009 The University of Maryland. All Rights Reserved.
  *
- * http://www.dspace.org/license/
  */
-package org.dspace.app.xmlui.aspect.administrative.etd_departments;
+package edu.umd.lib.dspace.app.xmlui.aspect.administrative.etd_departments;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -64,7 +61,7 @@ public class DeleteETDDepartmentsConfirm extends AbstractDSpaceTransformer
 
     @Override
     public void addBody(Body body) throws WingException, SQLException,
-    AuthorizeException
+            AuthorizeException
     {
         String idsString = parameters.getParameter("etd_departmentIDs", null);
 
@@ -77,7 +74,7 @@ public class DeleteETDDepartmentsConfirm extends AbstractDSpaceTransformer
 
         Division deleted = body.addInteractiveDivision(
                 "etd_department-confirm-delete", contextPath
-                + "/admin/etd_departments", Division.METHOD_POST,
+                        + "/admin/etd_departments", Division.METHOD_POST,
                 "primary administrative etd_departments");
         deleted.setHead(T_head);
         deleted.addPara(T_para);
