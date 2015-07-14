@@ -86,7 +86,9 @@ DSPACE_MVN_PROJECTS     :=-P 'xpdf-mediafilter-support,!dspace-jspui,!dspace-swo
 
 MVN_ENV			:=local
 
-MVN_OPTS		:=-Dassembly.recompressZippedFiles=false -Dmaven.test.skip=true -Dassembly.ignorePermissions=true -Denforcer.skip=true -Dfork=true -Denv=$(MVN_ENV) $(DSPACE_MVN_PROJECTS) -P '!generate-test-env'
+MVN_OPTS_BASE	:=-Dassembly.recompressZippedFiles=false -Dassembly.ignorePermissions=true -Denforcer.skip=true -Dfork=true -Denv=$(MVN_ENV)
+MVN_OPTS		:=$(MVN_OPTS_BASE) -Dmaven.test.skip=true $(DSPACE_MVN_PROJECTS) -P '!generate-test-env'
+MVN_OPTS_TEST	:=$(MVN_OPTS_BASE) -Dmaven.test.skip=false $(DSPACE_MVN_PROJECTS)
 
 # makefile specific
 
@@ -180,6 +182,10 @@ compile: deploy_logs
 	@echo ""
 	@if grep -q "BUILD FAILURE" $(DIR_DEPLOY_LOGS)/compile.log; then \
 	        echo -e "$(RED)compile.log contains BUILD FAILURE, exiting$(NORMAL)" && exit -1; fi
+
+tests:
+	@echo "UNIT TESTING ..."
+	@cd $(DIR_SOURCE) && mvn $(MVN_OPTS_TEST) -Dlog4j.configuration=file:$(DIR_INSTALLATION)/config/log4j-console.properties test
 
 install:        print_message \
                 test_databases \
