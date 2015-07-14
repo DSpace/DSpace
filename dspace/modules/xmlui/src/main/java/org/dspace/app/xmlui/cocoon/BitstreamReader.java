@@ -57,48 +57,43 @@ import org.dspace.core.LogManager;
  * it to the user. There are several methods of specifing the bitstream to be
  * delivered. You may reference a bitstream by either it's id or attempt to
  * resolve the bitstream's name.
- *
- *  /bitstream/{handle}/{sequence}/{name}
- *
- *  &lt;map:read type="BitstreamReader">
- *    &lt;map:parameter name="handle" value="{1}/{2}"/&gt;
- *    &lt;map:parameter name="sequence" value="{3}"/&gt;
- *    &lt;map:parameter name="name" value="{4}"/&gt;
- *  &lt;/map:read&gt;
- *
- *  When no handle is assigned yet you can access a bitstream
- *  using it's internal ID.
- *
- *  /bitstream/id/{bitstreamID}/{sequence}/{name}
- *
- *  &lt;map:read type="BitstreamReader">
- *    &lt;map:parameter name="bitstreamID" value="{1}"/&gt;
- *    &lt;map:parameter name="sequence" value="{2}"/&gt;
- *  &lt;/map:read&gt;
- *
- *  Alternatively, you can access the bitstream via a name instead
- *  of directly through it's sequence.
- *
- *  /html/{handle}/{name}
- *
- *  &lt;map:read type="BitstreamReader"&gt;
- *    &lt;map:parameter name="handle" value="{1}/{2}"/&gt;
- *    &lt;map:parameter name="name" value="{3}"/&gt;
- *  &lt;/map:read&gt;
- *
- *  Again when no handle is available you can also access it
- *  via an internal itemID & name.
- *
- *  /html/id/{itemID}/{name}
- *
- *  &lt;map:read type="BitstreamReader"&gt;
- *    &lt;map:parameter name="itemID" value="{1}"/&gt;
- *    &lt;map:parameter name="name" value="{2}"/&gt;
- *  &lt;/map:read&gt;
- *
- * Added request-item support. 
- * Original Concept, JSPUI version:    Universidade do Minho   at www.uminho.pt
- * Sponsorship of XMLUI version:    Instituto Oceanográfico de España at www.ieo.es
+ * 
+ * /bitstream/{handle}/{sequence}/{name}
+ * 
+ * &lt;map:read type="BitstreamReader"> &lt;map:parameter name="handle"
+ * value="{1}/{2}"/&gt; &lt;map:parameter name="sequence" value="{3}"/&gt;
+ * &lt;map:parameter name="name" value="{4}"/&gt; &lt;/map:read&gt;
+ * 
+ * When no handle is assigned yet you can access a bitstream using it's internal
+ * ID.
+ * 
+ * /bitstream/id/{bitstreamID}/{sequence}/{name}
+ * 
+ * &lt;map:read type="BitstreamReader"> &lt;map:parameter name="bitstreamID"
+ * value="{1}"/&gt; &lt;map:parameter name="sequence" value="{2}"/&gt;
+ * &lt;/map:read&gt;
+ * 
+ * Alternatively, you can access the bitstream via a name instead of directly
+ * through it's sequence.
+ * 
+ * /html/{handle}/{name}
+ * 
+ * &lt;map:read type="BitstreamReader"&gt; &lt;map:parameter name="handle"
+ * value="{1}/{2}"/&gt; &lt;map:parameter name="name" value="{3}"/&gt;
+ * &lt;/map:read&gt;
+ * 
+ * Again when no handle is available you can also access it via an internal
+ * itemID & name.
+ * 
+ * /html/id/{itemID}/{name}
+ * 
+ * &lt;map:read type="BitstreamReader"&gt; &lt;map:parameter name="itemID"
+ * value="{1}"/&gt; &lt;map:parameter name="name" value="{2}"/&gt;
+ * &lt;/map:read&gt;
+ * 
+ * Added request-item support. Original Concept, JSPUI version: Universidade do
+ * Minho at www.uminho.pt Sponsorship of XMLUI version: Instituto Oceanográfico
+ * de España at www.ieo.es
  * 
  * @author Scott Phillips
  * @author Adán Román Ruiz at arvo.es (added request item support)
@@ -107,15 +102,16 @@ import org.dspace.core.LogManager;
 public class BitstreamReader extends AbstractReader implements Recyclable
 {
     private static Logger log = Logger.getLogger(BitstreamReader.class);
-        
+
     /**
-     * Messages to be sent when the user is not authorized to view
-     * a particular bitstream. They will be redirected to the login
-     * where this message will be displayed.
+     * Messages to be sent when the user is not authorized to view a particular
+     * bitstream. They will be redirected to the login where this message will
+     * be displayed.
      */
     private static final String AUTH_REQUIRED_HEADER = "xmlui.BitstreamReader.res_header";
+
     private static final String AUTH_REQUIRED_MESSAGE = "xmlui.BitstreamReader.auth_message";
-        
+
     /**
      * How big a buffer should we use when reading from the bitstream before
      * writing to the HTTP response?
@@ -126,9 +122,8 @@ public class BitstreamReader extends AbstractReader implements Recyclable
      * When should a bitstream expire in milliseconds. This should be set to
      * some low value just to prevent someone hiting DSpace repeatedy from
      * killing the server. Note: there are 1000 milliseconds in a second.
-     *
-     * Format: minutes * seconds * milliseconds
-     *  60 * 60 * 1000 == 1 hour
+     * 
+     * Format: minutes * seconds * milliseconds 60 * 60 * 1000 == 1 hour
      */
     protected static final int expires = 60 * 60 * 1000;
 
@@ -140,19 +135,19 @@ public class BitstreamReader extends AbstractReader implements Recyclable
 
     /** The bitstream file */
     protected InputStream bitstreamInputStream;
-    
+
     /** The bitstream's reported size */
     protected long bitstreamSize;
-    
+
     /** The bitstream's mime-type */
     protected String bitstreamMimeType;
-    
+
     /** The bitstream's name */
     protected String bitstreamName;
-    
+
     /** The bitstream's name */
     protected boolean isEmbargo;
-    
+
     /** True if bitstream is readable by anonymous users */
     protected boolean isAnonymouslyReadable;
 
@@ -163,15 +158,19 @@ public class BitstreamReader extends AbstractReader implements Recyclable
     private boolean isSpider = false;
 
     private String mydate;
-    private String res_message="At the request of the author, this document is not available until ";
-    private String res_message_notavailable="At the request of the author, this document is not available.";
+
+    private final String res_message = "At the request of the author, this document is not available until ";
+
+    private final String res_message_notavailable = "At the request of the author, this document is not available.";
+
     private String restricted_message;
 
     /**
      * Set up the bitstream reader.
-     *
+     * 
      * See the class description for information on configuration options.
      */
+    @Override
     public void setup(SourceResolver resolver, Map objectModel, String src,
             Parameters par) throws ProcessingException, SAXException,
             IOException
@@ -182,29 +181,30 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         {
             this.request = ObjectModelHelper.getRequest(objectModel);
             this.response = ObjectModelHelper.getResponse(objectModel);
-            
+
             // Check to see if a context already exists or not. We may
             // have been aggregated into an http request by the XSL document
             // pulling in an XML-based bitstream. In this case the context has
             // already been created and we should leave it open because the
             // normal processes will close it.
-            boolean BitstreamReaderOpenedContext = !ContextUtil.isContextAvailable(objectModel);
+            boolean BitstreamReaderOpenedContext = !ContextUtil
+                    .isContextAvailable(objectModel);
             Context context = ContextUtil.obtainContext(objectModel);
-            
+
             // Get our parameters that identify the bitstream
             int itemID = par.getParameterAsInteger("itemID", -1);
             int bitstreamID = par.getParameterAsInteger("bitstreamID", -1);
             String handle = par.getParameter("handle", null);
-            
+
             int sequence = par.getParameterAsInteger("sequence", -1);
             String name = par.getParameter("name", null);
-        
+
             this.isSpider = par.getParameter("userAgent", "").equals("spider");
 
             // Resolve the bitstream
             Bitstream bitstream = null;
             DSpaceObject dso = null;
-            
+
             if (bitstreamID > -1)
             {
                 // Direct reference to the individual bitstream ID.
@@ -214,157 +214,192 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             {
                 // Referenced by internal itemID
                 item = Item.find(context, itemID);
-                
+
                 if (sequence > -1)
                 {
-                        bitstream = findBitstreamBySequence(item, sequence);
+                    bitstream = findBitstreamBySequence(item, sequence);
                 }
                 else if (name != null)
                 {
-                        bitstream = findBitstreamByName(item, name);
+                    bitstream = findBitstreamByName(item, name);
                 }
             }
             else if (handle != null)
             {
                 // Reference by an item's handle.
-                dso = HandleManager.resolveToObject(context,handle);
+                dso = HandleManager.resolveToObject(context, handle);
 
                 if (dso instanceof Item)
                 {
-                    item = (Item)dso;
+                    item = (Item) dso;
 
                     if (sequence > -1)
                     {
-                        bitstream = findBitstreamBySequence(item,sequence);
+                        bitstream = findBitstreamBySequence(item, sequence);
                     }
                     else if (name != null)
                     {
-                        bitstream = findBitstreamByName(item,name);
+                        bitstream = findBitstreamByName(item, name);
                     }
                 }
             }
 
             // if initial search was by sequence number and found nothing,
             // then try to find bitstream by name (assuming we have a file name)
-            if((sequence > -1 && bitstream==null) && name!=null)
+            if ((sequence > -1 && bitstream == null) && name != null)
             {
-                bitstream = findBitstreamByName(item,name);
+                bitstream = findBitstreamByName(item, name);
 
-                // if we found bitstream by name, send a redirect to its new sequence number location
-                if(bitstream!=null)
+                // if we found bitstream by name, send a redirect to its new
+                // sequence number location
+                if (bitstream != null)
                 {
                     String redirectURL = "";
 
-                    // build redirect URL based on whether item has a handle assigned yet
-                    if(item.getHandle()!=null && item.getHandle().length()>0)
+                    // build redirect URL based on whether item has a handle
+                    // assigned yet
+                    if (item.getHandle() != null
+                            && item.getHandle().length() > 0)
                     {
-                        redirectURL = request.getContextPath() + "/bitstream/handle/" + item.getHandle();
+                        redirectURL = request.getContextPath()
+                                + "/bitstream/handle/" + item.getHandle();
                     }
                     else
                     {
-                        redirectURL = request.getContextPath() + "/bitstream/item/" + item.getID();
+                        redirectURL = request.getContextPath()
+                                + "/bitstream/item/" + item.getID();
                     }
 
-                        redirectURL += "/" + name + "?sequence=" + bitstream.getSequenceID();
+                    redirectURL += "/" + name + "?sequence="
+                            + bitstream.getSequenceID();
 
-                        HttpServletResponse httpResponse = (HttpServletResponse)
-                        objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
-                        httpResponse.sendRedirect(redirectURL);
-                        return;
+                    HttpServletResponse httpResponse = (HttpServletResponse) objectModel
+                            .get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+                    httpResponse.sendRedirect(redirectURL);
+                    return;
                 }
             }
 
             // Was a bitstream found?
             if (bitstream == null)
             {
-                throw new ResourceNotFoundException("Unable to locate bitstream");
+                throw new ResourceNotFoundException(
+                        "Unable to locate bitstream");
             }
-            isEmbargo=bitstream.isETDEmbargo();
-            // Is there a User logged in and does the user have access to read it?
-            boolean isAuthorized = AuthorizeManager.authorizeActionBoolean(context, bitstream, Constants.READ);
-            if (item != null && item.isWithdrawn() && !AuthorizeManager.isAdmin(context))
+            isEmbargo = bitstream.isETDEmbargo();
+            // Is there a User logged in and does the user have access to read
+            // it?
+            boolean isAuthorized = AuthorizeManager.authorizeActionBoolean(
+                    context, bitstream, Constants.READ);
+            if (item != null && item.isWithdrawn()
+                    && !AuthorizeManager.isAdmin(context))
             {
                 isAuthorized = false;
-                log.info(LogManager.getHeader(context, "view_bitstream", "handle=" + item.getHandle() + ",withdrawn=true"));
+                log.info(LogManager.getHeader(context, "view_bitstream",
+                        "handle=" + item.getHandle() + ",withdrawn=true"));
             }
-            // It item-request is enabled to all request we redirect to restricted-resource immediately without login request  
-            String requestItemType = ConfigurationManager.getProperty("request.item.type");
+            // It item-request is enabled to all request we redirect to
+            // restricted-resource immediately without login request
+            String requestItemType = ConfigurationManager
+                    .getProperty("request.item.type");
             if (!isAuthorized)
             {
-                if(context.getCurrentUser() != null || StringUtils.equalsIgnoreCase("all", requestItemType)){
-                        // A user is logged in, but they are not authorized to read this bitstream,
-                        // instead of asking them to login again we'll point them to a friendly error
-                        // message that tells them the bitstream is restricted.
-                        String redictURL = request.getContextPath() + "/handle/";
-                        if (item!=null){
-                                redictURL += item.getHandle();
-                        }
-                        else if(dso!=null){
-                                redictURL += dso.getHandle();
-                        }
-                        redictURL += "/restricted-resource?bitstreamId=" + bitstream.getID();
+                if (context.getCurrentUser() != null
+                        || StringUtils.equalsIgnoreCase("all", requestItemType))
+                {
+                    // A user is logged in, but they are not authorized to read
+                    // this bitstream,
+                    // instead of asking them to login again we'll point them to
+                    // a friendly error
+                    // message that tells them the bitstream is restricted.
+                    String redictURL = request.getContextPath() + "/handle/";
+                    if (item != null)
+                    {
+                        redictURL += item.getHandle();
+                    }
+                    else if (dso != null)
+                    {
+                        redictURL += dso.getHandle();
+                    }
+                    redictURL += "/restricted-resource?bitstreamId="
+                            + bitstream.getID();
 
-                        HttpServletResponse httpResponse = (HttpServletResponse)
-                        objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
-                        httpResponse.sendRedirect(redictURL);
-                        return;
+                    HttpServletResponse httpResponse = (HttpServletResponse) objectModel
+                            .get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+                    httpResponse.sendRedirect(redictURL);
+                    return;
                 }
-                else{
-                	if(ConfigurationManager.getProperty("request.item.type")==null||
-                			                			ConfigurationManager.getProperty("request.item.type").equalsIgnoreCase("logged")){
-                        // The user does not have read access to this bitstream. Interrupt this current request
-                        // and then forward them to the login page so that they can be authenticated. Once that is
+                else
+                {
+                    if (ConfigurationManager.getProperty("request.item.type") == null
+                            || ConfigurationManager.getProperty(
+                                    "request.item.type").equalsIgnoreCase(
+                                    "logged"))
+                    {
+                        // The user does not have read access to this bitstream.
+                        // Interrupt this current request
+                        // and then forward them to the login page so that they
+                        // can be authenticated. Once that is
                         // successful, their request will be resumed.
-                	    
-                	    /*
-                	     * Restricted access to embargoed items. Displays date until when access is restricted.
-                	     * 
-                	     */
-                	    try{
-                            this.bitstreamInputStream = bitstream.retrieve();    
+
+                        /*
+                         * Restricted access to embargoed items. Displays date
+                         * until when access is restricted.
+                         */
+                        try
+                        {
+                            this.bitstreamInputStream = bitstream.retrieve();
                         }
                         catch (AuthorizeException e)
                         {
-                        // Clear the response, including headers (eg, Content-Length)
+                            // Clear the response, including headers (eg,
+                            // Content-Length)
                             response.reset();
 
                             if (bitstream.isETDEmbargo())
                             {
-                                restricted_message=null;
-                                request.setAttribute("date", bitstream.getETDEmbargo()
-                                    .getEndDate());
-                                java.util.Date date = (java.util.Date)request.getAttribute("date");
-                                if(date!=null)
+                                restricted_message = null;
+                                request.setAttribute("date", bitstream
+                                        .getETDEmbargo().getEndDate());
+                                java.util.Date date = (java.util.Date) request
+                                        .getAttribute("date");
+                                if (date != null)
                                 {
-                                    SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy");
+                                    SimpleDateFormat sdf = new SimpleDateFormat(
+                                            "MMMM dd, yyyy");
 
-                                    String dateUntil = sdf.format(date).toString();
-                                restricted_message=res_message+dateUntil;
+                                    String dateUntil = sdf.format(date)
+                                            .toString();
+                                    restricted_message = res_message
+                                            + dateUntil;
                                 }
                                 else
                                 {
-                                    restricted_message=res_message_notavailable;
+                                    restricted_message = res_message_notavailable;
                                 }
 
-                                AuthenticationUtil.interruptRequest(objectModel, AUTH_REQUIRED_HEADER, restricted_message, null);
-                                String redictURL = request.getContextPath() + "/login";
+                                AuthenticationUtil.interruptRequest(
+                                        objectModel, AUTH_REQUIRED_HEADER,
+                                        restricted_message, null);
+                                String redictURL = request.getContextPath()
+                                        + "/login";
 
-                                    HttpServletResponse httpResponse = (HttpServletResponse)
-                                    objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
-                                    httpResponse.sendRedirect(redictURL);
+                                HttpServletResponse httpResponse = (HttpServletResponse) objectModel
+                                        .get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+                                httpResponse.sendRedirect(redictURL);
                                 return;
                             }
 
                             else
                             {
-                             throw e;
+                                throw e;
                             }
                         }
-                       
-                	}
+
+                    }
                 }
             }
-                
+
             // Success, bitstream found and the user has access to read it.
             // Store these for later retrieval:
             this.bitstreamInputStream = bitstream.retrieve();
@@ -378,7 +413,9 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             else
             {
                 this.isAnonymouslyReadable = false;
-                for (ResourcePolicy rp : AuthorizeManager.getPoliciesActionFilter(context, bitstream, Constants.READ))
+                for (ResourcePolicy rp : AuthorizeManager
+                        .getPoliciesActionFilter(context, bitstream,
+                                Constants.READ))
                 {
                     if (rp.getGroupID() == 0)
                     {
@@ -388,61 +425,63 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             }
 
             // Trim any path information from the bitstream
-            if (bitstreamName != null && bitstreamName.length() >0 )
+            if (bitstreamName != null && bitstreamName.length() > 0)
             {
-                        int finalSlashIndex = bitstreamName.lastIndexOf('/');
-                        if (finalSlashIndex > 0)
-                        {
-                                bitstreamName = bitstreamName.substring(finalSlashIndex+1);
-                        }
+                int finalSlashIndex = bitstreamName.lastIndexOf('/');
+                if (finalSlashIndex > 0)
+                {
+                    bitstreamName = bitstreamName
+                            .substring(finalSlashIndex + 1);
+                }
             }
             else
             {
                 // In case there is no bitstream name...
                 bitstreamName = "bitstream";
             }
-            
-            // Log that the bitstream has been viewed, this is non-cached and the complexity
-            // of adding it to the sitemap for every possible bitstream uri is not very tractable
+
+            // Log that the bitstream has been viewed, this is non-cached and
+            // the complexity
+            // of adding it to the sitemap for every possible bitstream uri is
+            // not very tractable
             new DSpace().getEventService().fireEvent(
-                                new UsageEvent(
-                                                UsageEvent.Action.VIEW,
-                                                ObjectModelHelper.getRequest(objectModel),
-                                                ContextUtil.obtainContext(ObjectModelHelper.getRequest(objectModel)),
-                                                bitstream));
-            
-            // If we created the database connection close it, otherwise leave it open.
+                    new UsageEvent(UsageEvent.Action.VIEW, ObjectModelHelper
+                            .getRequest(objectModel), ContextUtil
+                            .obtainContext(ObjectModelHelper
+                                    .getRequest(objectModel)), bitstream));
+
+            // If we created the database connection close it, otherwise leave
+            // it open.
             if (BitstreamReaderOpenedContext)
-            	context.complete();
+                context.complete();
         }
         catch (SQLException sqle)
         {
-            throw new ProcessingException("Unable to read bitstream.",sqle);
+            throw new ProcessingException("Unable to read bitstream.", sqle);
         }
         catch (AuthorizeException ae)
         {
-            throw new ProcessingException("Unable to read bitstream.",ae);
+            throw new ProcessingException("Unable to read bitstream.", ae);
         }
     }
 
-    
-    
-    
-    
     /**
      * Find the bitstream identified by a sequence number on this item.
-     *
-     * @param item A DSpace item
-     * @param sequence The sequence of the bitstream
+     * 
+     * @param item
+     *            A DSpace item
+     * @param sequence
+     *            The sequence of the bitstream
      * @return The bitstream or null if none found.
      */
-    private Bitstream findBitstreamBySequence(Item item, int sequence) throws SQLException
+    private Bitstream findBitstreamBySequence(Item item, int sequence)
+            throws SQLException
     {
         if (item == null)
         {
             return null;
         }
-        
+
         Bundle[] bundles = item.getBundles();
         for (Bundle bundle : bundles)
         {
@@ -452,105 +491,116 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             {
                 if (bitstream.getSequenceID() == sequence)
                 {
-                        return bitstream;
+                    return bitstream;
                 }
             }
         }
         return null;
     }
-    
+
     /**
-     * Return the bitstream from the given item that is identified by the
-     * given name. If the name has prepended directories they will be removed
-     * one at a time until a bitstream is found. Note that if two bitstreams
-     * have the same name then the first bitstream will be returned.
-     *
-     * @param item A DSpace item
-     * @param name The name of the bitstream
+     * Return the bitstream from the given item that is identified by the given
+     * name. If the name has prepended directories they will be removed one at a
+     * time until a bitstream is found. Note that if two bitstreams have the
+     * same name then the first bitstream will be returned.
+     * 
+     * @param item
+     *            A DSpace item
+     * @param name
+     *            The name of the bitstream
      * @return The bitstream or null if none found.
      */
-    private Bitstream findBitstreamByName(Item item, String name) throws SQLException
+    private Bitstream findBitstreamByName(Item item, String name)
+            throws SQLException
     {
         if (name == null || item == null)
         {
             return null;
         }
-    
-        // Determine our the maximum number of directories that will be removed for a path.
+
+        // Determine our the maximum number of directories that will be removed
+        // for a path.
         int maxDepthPathSearch = 3;
         if (ConfigurationManager.getProperty("xmlui.html.max-depth-guess") != null)
         {
-            maxDepthPathSearch = ConfigurationManager.getIntProperty("xmlui.html.max-depth-guess");
+            maxDepthPathSearch = ConfigurationManager
+                    .getIntProperty("xmlui.html.max-depth-guess");
         }
-        
-        // Search for the named bitstream on this item. Each time through the loop
-        // a directory is removed from the name until either our maximum depth is
-        // reached or the bitstream is found. Note: an extra pass is added on to the
-        // loop for a last ditch effort where all directory paths will be removed.
-        for (int i = 0; i < maxDepthPathSearch+1; i++)
+
+        // Search for the named bitstream on this item. Each time through the
+        // loop
+        // a directory is removed from the name until either our maximum depth
+        // is
+        // reached or the bitstream is found. Note: an extra pass is added on to
+        // the
+        // loop for a last ditch effort where all directory paths will be
+        // removed.
+        for (int i = 0; i < maxDepthPathSearch + 1; i++)
         {
-                // Search through all the bitstreams and see
-                // if the name can be found
-                Bundle[] bundles = item.getBundles();
-                for (Bundle bundle : bundles)
+            // Search through all the bitstreams and see
+            // if the name can be found
+            Bundle[] bundles = item.getBundles();
+            for (Bundle bundle : bundles)
+            {
+                Bitstream[] bitstreams = bundle.getBitstreams();
+
+                for (Bitstream bitstream : bitstreams)
                 {
-                    Bitstream[] bitstreams = bundle.getBitstreams();
-        
-                    for (Bitstream bitstream : bitstreams)
+                    if (name.equals(bitstream.getName()))
                     {
-                        if (name.equals(bitstream.getName()))
-                        {
-                                return bitstream;
-                        }
+                        return bitstream;
                     }
                 }
-                
-                // The bitstream was not found, so try removing a directory
-                // off of the name and see if we lost some path information.
-                int indexOfSlash = name.indexOf('/');
-                
-                if (indexOfSlash < 0)
+            }
+
+            // The bitstream was not found, so try removing a directory
+            // off of the name and see if we lost some path information.
+            int indexOfSlash = name.indexOf('/');
+
+            if (indexOfSlash < 0)
+            {
+                // No more directories to remove from the path, so return null
+                // for no
+                // bitstream found.
+                return null;
+            }
+
+            name = name.substring(indexOfSlash + 1);
+
+            // If this is our next to last time through the loop then
+            // trim everything and only use the trailing filename.
+            if (i == maxDepthPathSearch - 1)
+            {
+                int indexOfLastSlash = name.lastIndexOf('/');
+                if (indexOfLastSlash > -1)
                 {
-                    // No more directories to remove from the path, so return null for no
-                    // bitstream found.
-                    return null;
+                    name = name.substring(indexOfLastSlash + 1);
                 }
-               
-                name = name.substring(indexOfSlash+1);
-                
-                // If this is our next to last time through the loop then
-                // trim everything and only use the trailing filename.
-                if (i == maxDepthPathSearch-1)
-                {
-                        int indexOfLastSlash = name.lastIndexOf('/');
-                        if (indexOfLastSlash > -1)
-                        {
-                            name = name.substring(indexOfLastSlash + 1);
-                        }
-                }
-                
+            }
+
         }
-        
-        // The named bitstream was not found and we exhausted the maximum path depth that
+
+        // The named bitstream was not found and we exhausted the maximum path
+        // depth that
         // we search.
         return null;
     }
-    
-    
+
     /**
-         * Write the actual data out to the response.
-         *
-         * Some implementation notes:
-         *
-         * 1) We set a short expiration time just in the hopes of preventing someone
-         * from overloading the server by clicking reload a bunch of times. I
-         * Realize that this is nowhere near 100% effective but it may help in some
-         * cases and shouldn't hurt anything.
-         *
-         * 2) We accept partial downloads, thus if you lose a connection halfway
-         * through most web browser will enable you to resume downloading the
-         * bitstream.
-         */
+     * Write the actual data out to the response.
+     * 
+     * Some implementation notes:
+     * 
+     * 1) We set a short expiration time just in the hopes of preventing someone
+     * from overloading the server by clicking reload a bunch of times. I
+     * Realize that this is nowhere near 100% effective but it may help in some
+     * cases and shouldn't hurt anything.
+     * 
+     * 2) We accept partial downloads, thus if you lose a connection halfway
+     * through most web browser will enable you to resume downloading the
+     * bitstream.
+     */
+    @Override
     public void generate() throws IOException, SAXException,
             ProcessingException
     {
@@ -558,7 +608,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         {
             return;
         }
-        
+
         // Only allow If-Modified-Since protocol if request is from a spider
         // since response headers would encourage a browser to cache results
         // that might change with different authentication.
@@ -566,7 +616,8 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         {
             // Check for if-modified-since header -- ONLY if not authenticated
             long modSince = request.getDateHeader("If-Modified-Since");
-            if (modSince != -1 && item != null && item.getLastModified().getTime() < modSince)
+            if (modSince != -1 && item != null
+                    && item.getLastModified().getTime() < modSince)
             {
                 // Item has not been modified since requested date,
                 // hence bitstream has not been, either; return 304
@@ -581,9 +632,11 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         // users in the cache for a response later to anonymous user.
         try
         {
-            if (item != null && (isSpider || ContextUtil.obtainContext(request).getCurrentUser() == null))
+            if (item != null
+                    && (isSpider || ContextUtil.obtainContext(request)
+                            .getCurrentUser() == null))
             {
-                // TODO:  Currently just borrow the date of the item, since
+                // TODO: Currently just borrow the date of the item, since
                 // we don't have last-mod dates for Bitstreams
                 response.setDateHeader("Last-Modified", item.getLastModified()
                         .getTime());
@@ -601,32 +654,37 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         // if it is accessed anonymously or is readable by Anonymous:
         if (isAnonymouslyReadable)
         {
-            response.setDateHeader("Expires", System.currentTimeMillis() + expires);
+            response.setDateHeader("Expires", System.currentTimeMillis()
+                    + expires);
         }
-        
-        // If this is a large bitstream then tell the browser it should treat it as a download.
-        int threshold = ConfigurationManager.getIntProperty("xmlui.content_disposition_threshold");
+
+        // If this is a large bitstream then tell the browser it should treat it
+        // as a download.
+        int threshold = ConfigurationManager
+                .getIntProperty("xmlui.content_disposition_threshold");
         if (bitstreamSize > threshold && threshold != 0)
         {
-                String name  = bitstreamName;
-                
-                // Try and make the download file name formatted for each browser.
-                try {
-                        String agent = request.getHeader("USER-AGENT");
-                        if (agent != null && agent.contains("MSIE"))
-                        {
-                            name = URLEncoder.encode(name, "UTF8");
-                        }
-                        else if (agent != null && agent.contains("Mozilla"))
-                        {
-                            name = MimeUtility.encodeText(name, "UTF8", "B");
-                        }
-                }
-                catch (UnsupportedEncodingException see)
+            String name = bitstreamName;
+
+            // Try and make the download file name formatted for each browser.
+            try
+            {
+                String agent = request.getHeader("USER-AGENT");
+                if (agent != null && agent.contains("MSIE"))
                 {
-                        // do nothing
+                    name = URLEncoder.encode(name, "UTF8");
                 }
-                response.setHeader("Content-Disposition", "attachment;filename=" + '"' + name + '"');
+                else if (agent != null && agent.contains("Mozilla"))
+                {
+                    name = MimeUtility.encodeText(name, "UTF8", "B");
+                }
+            }
+            catch (UnsupportedEncodingException see)
+            {
+                // do nothing
+            }
+            response.setHeader("Content-Disposition", "attachment;filename="
+                    + '"' + name + '"');
         }
 
         ByteRange byteRange = null;
@@ -636,26 +694,26 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         // viewers are incapable of handling this request. You can
         // uncomment the following lines to turn this feature back on.
 
-//        response.setHeader("Accept-Ranges", "bytes");
-//        String ranges = request.getHeader("Range");
-//        if (ranges != null)
-//        {
-//            try
-//            {
-//                ranges = ranges.substring(ranges.indexOf('=') + 1);
-//                byteRange = new ByteRange(ranges);
-//            }
-//            catch (NumberFormatException e)
-//            {
-//                byteRange = null;
-//                if (response instanceof HttpResponse)
-//                {
-//                    // Respond with status 416 (Request range not
-//                    // satisfiable)
-//                    response.setStatus(416);
-//                }
-//            }
-//        }
+        // response.setHeader("Accept-Ranges", "bytes");
+        // String ranges = request.getHeader("Range");
+        // if (ranges != null)
+        // {
+        // try
+        // {
+        // ranges = ranges.substring(ranges.indexOf('=') + 1);
+        // byteRange = new ByteRange(ranges);
+        // }
+        // catch (NumberFormatException e)
+        // {
+        // byteRange = null;
+        // if (response instanceof HttpResponse)
+        // {
+        // // Respond with status 416 (Request range not
+        // // satisfiable)
+        // response.setStatus(416);
+        // }
+        // }
+        // }
 
         try
         {
@@ -675,7 +733,8 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                     entityRange = byteRange.toString();
                 }
 
-                response.setHeader("Content-Range", entityRange + "/" + entityLength);
+                response.setHeader("Content-Range", entityRange + "/"
+                        + entityLength);
                 if (response instanceof HttpResponse)
                 {
                     // Response with status 206 (Partial content)
@@ -687,17 +746,20 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                 while ((length = this.bitstreamInputStream.read(buffer)) > -1)
                 {
                     posEnd = pos + length - 1;
-                    ByteRange intersection = byteRange.intersection(new ByteRange(pos, posEnd));
+                    ByteRange intersection = byteRange
+                            .intersection(new ByteRange(pos, posEnd));
                     if (intersection != null)
                     {
-                        out.write(buffer, (int) intersection.getStart() - pos, (int) intersection.length());
+                        out.write(buffer, (int) intersection.getStart() - pos,
+                                (int) intersection.length());
                     }
                     pos += length;
                 }
             }
             else
             {
-                response.setHeader("Content-Length", String.valueOf(this.bitstreamSize));
+                response.setHeader("Content-Length",
+                        String.valueOf(this.bitstreamSize));
 
                 while ((length = this.bitstreamInputStream.read(buffer)) > -1)
                 {
@@ -710,17 +772,22 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         {
             try
             {
-                // Close the bitstream input stream so that we don't leak a file descriptor
+                // Close the bitstream input stream so that we don't leak a file
+                // descriptor
                 this.bitstreamInputStream.close();
-                
-                // Close the output stream as per Cocoon docs: http://cocoon.apache.org/2.2/core-modules/core/2.2/681_1_1.html
+
+                // Close the output stream as per Cocoon docs:
+                // http://cocoon.apache.org/2.2/core-modules/core/2.2/681_1_1.html
                 out.close();
-            } 
+            }
             catch (IOException ioe)
             {
-                // Closing the stream threw an IOException but do we want this to propagate up to Cocoon?
-                // No point since the user has already got the bitstream contents.
-                log.warn("Caught IO exception when closing a stream: " + ioe.getMessage());
+                // Closing the stream threw an IOException but do we want this
+                // to propagate up to Cocoon?
+                // No point since the user has already got the bitstream
+                // contents.
+                log.warn("Caught IO exception when closing a stream: "
+                        + ioe.getMessage());
             }
         }
 
@@ -729,21 +796,23 @@ public class BitstreamReader extends AbstractReader implements Recyclable
     /**
      * Returns the mime-type of the bitstream.
      */
+    @Override
     public String getMimeType()
     {
         return this.bitstreamMimeType;
     }
-    
+
     /**
-         * Recycle
-         */
-    public void recycle() {
+     * Recycle
+     */
+    @Override
+    public void recycle()
+    {
         this.response = null;
         this.request = null;
         this.bitstreamInputStream = null;
         this.bitstreamSize = 0;
         this.bitstreamMimeType = null;
     }
-
 
 }
