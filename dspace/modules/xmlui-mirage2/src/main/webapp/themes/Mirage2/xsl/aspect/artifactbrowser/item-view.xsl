@@ -372,7 +372,7 @@
                         </xsl:with-param>
                     </xsl:call-template>
                     <xsl:choose>
-                        <xsl:when test="contains($label-1, 'label') and mets:FLocat[@LOCTYPE='URL']/@xlink:label">
+                        <xsl:when test="contains($label-1, 'label') and mets:FLocat[@LOCTYPE='URL']/@xlink:label!=''">
                             <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label"/>
                         </xsl:when>
                         <xsl:when test="contains($label-1, 'title') and mets:FLocat[@LOCTYPE='URL']/@xlink:title">
