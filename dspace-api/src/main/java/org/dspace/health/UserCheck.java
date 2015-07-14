@@ -78,7 +78,7 @@ public class UserCheck extends Check {
             // empty group
             List<String> egs = Core.getEmptyGroups();
             ret += String.format(
-                "  Empty groups: #%d\n    %s\n",
+                "Empty groups: #%d\n    %s\n",
                 egs.size(), StringUtils.join(egs, ",\n    "));
 
             List<Integer> subs = Core.getSubscribers();
