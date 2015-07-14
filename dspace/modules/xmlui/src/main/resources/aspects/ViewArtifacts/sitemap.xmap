@@ -44,8 +44,8 @@ and searching the repository.
             <map:transformer name="Statistics" src="org.dspace.app.xmlui.aspect.artifactbrowser.StatisticsViewer"/>
 
             <!-- DRUM Customization - Monthly Statistics, Embargo List -->
-            <map:transformer name="MonthlyStatistics" src="org.dspace.app.xmlui.aspect.artifactbrowser.MonthlyStatistics"/>	
-            <map:transformer name="EmbargoListDisplay" src="org.dspace.app.xmlui.aspect.artifactbrowser.EmbargoListDisplay"/>
+            <map:transformer name="MonthlyStatistics" src="edu.umd.lib.dspace.app.xmlui.aspect.artifactbrowser.MonthlyStatistics"/>	
+            <map:transformer name="EmbargoListDisplay" src="edu.umd.lib.dspace.app.xmlui.aspect.artifactbrowser.EmbargoListDisplay"/>
 
         </map:transformers>
 

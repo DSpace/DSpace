@@ -2,7 +2,7 @@
  * Copyright (c) 2009 The University of Maryland. All Rights Reserved.
  *
  */
-package edu.umd.lib.dspace.app.xmlui.aspect.administrative.etd_departmens;
+package edu.umd.lib.dspace.app.xmlui.aspect.administrative.etd_departments;
 
 import java.sql.SQLException;
 

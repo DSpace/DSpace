@@ -202,8 +202,8 @@
                                         
                     <map:reader name="HandleResolverReader" src="org.dspace.app.xmlui.aspect.handle.HandleResolverReader"/>
 
-                    <map:reader name="EmbargoListDownloader" src="org.dspace.app.xmlui.aspect.artifactbrowser.EmbargoListDownloader"/>
-                    <map:reader name="MonthlyStatisticsDownloader" src="org.dspace.app.xmlui.aspect.artifactbrowser.MonthlyStatisticsDownloader"/>
+                    <map:reader name="EmbargoListDownloader" src="edu.umd.lib.dspace.app.xmlui.aspect.artifactbrowser.EmbargoListDownloader"/>
+                    <map:reader name="MonthlyStatisticsDownloader" src="edu.umd.lib.dspace.app.xmlui.aspect.artifactbrowser.MonthlyStatisticsDownloader"/>
                 </map:readers>
                 <map:actions>
                         <map:action name="locale" src="org.dspace.app.xmlui.cocoon.DSpaceLocaleAction"/>
