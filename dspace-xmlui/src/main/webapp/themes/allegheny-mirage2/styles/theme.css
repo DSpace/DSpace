@@ -1,35 +1,39 @@
 /**
  Colors: Find and Replace for a quick scheme.
       mirage2      this-site
- 1st: #1f3f5e      #1f3f5e          Top header
- 2nd: #aab8c6      #aab8c6          Breadcrumb
+ 1st: #002144      #002144          Top header
+ 2nd: #feda48      #feda48          Breadcrumb
  3rd: #607890      #607890          side-nav/h1..h7
 */
 
 
 /* Override dspace-bootstrap-tweaks */
 header .navbar-brand img {
-    height: 56px;
+    height: 124px;
     margin-top: -6px;
 }
 
 .navbar {
-    min-height: 77px;
+    min-height: 143px;
 }
 
 /* Override classic-mirage-style */
 header .navbar-default {
-    background-color: #1f3f5e;
+    background-color: #002144;
 }
 
 .trail-wrapper {
-    background-color: #aab8c6;
+    background-color: #feda48;
+}
+
+.breadcrumb, .breadcrumb a {
+    color: #777777;
 }
 .trail-wrapper .breadcrumb > li + li:before {
-    color: #eaf1f7;
+    color: #777777;
 }
 .trail-wrapper .breadcrumb > .active {
-    color: #eee;
+    color: #777777;
 }
 .trail-wrapper .sidebar-toggle .icon-bar {
     background-color: #607890;
@@ -45,13 +49,17 @@ header .navbar-default {
     }
 }
 
+.full-width-holder, #main-container, .main-content, #main-container #sidebar {
+    background-color: #f5f9ff;
+}
+
 /* Submission form progress buttons */
 .btn-success {
-    background-color: #aab8c6;
+    background-color: #feda48;
     border: 1px solid #8b9eb2;
 }
 .btn-success[disabled], .btn-success.disabled {
-    background-color: #1f3f5e;
+    background-color: #002144;
     border: 1px solid #8b9eb2;
 }
 .btn-success:hover {
@@ -60,25 +68,25 @@ header .navbar-default {
 
 /* Header Person dropdown */
 header .navbar-default .navbar-toggle > .open > a, header .navbar-default .navbar-toggle > .open > a:hover, header .navbar-default .navbar-toggle > .open > a:focus, header .navbar-default .navbar-nav > .open > a, header .navbar-default .navbar-nav > .open > a:hover, header .navbar-default .navbar-nav > .open > a:focus {
-    background-color: #aab8c6;
+    background-color: #003D80;
     color: #eaf1f7;
 }
 header .navbar-default .navbar-toggle > li > a:hover, header .navbar-default .navbar-toggle > li > a:focus, header .navbar-default .navbar-nav > li > a:hover, header .navbar-default .navbar-nav > li > a:focus {
-    background-color: #aab8c6;
+    background-color: #003D80;
     color: #eaf1f7;
 }
 header .navbar-default .navbar-toggle > .active > a, header .navbar-default .navbar-toggle > .active > a:hover, header .navbar-default .navbar-toggle > .active > a:focus, header .navbar-default .navbar-nav > .active > a, header .navbar-default .navbar-nav > .active > a:hover, header .navbar-default .navbar-nav > .active > a:focus {
-    background-color: #aab8c6;
+    background-color: #003D80;
     color: #eaf1f7;
 }
 header .navbar-default .navbar-toggle > .open > a, header .navbar-default .navbar-toggle > .open > a:hover, header .navbar-default .navbar-toggle > .open > a:focus, header .navbar-default .navbar-nav > .open > a, header .navbar-default .navbar-nav > .open > a:hover, header .navbar-default .navbar-nav > .open > a:focus {
-    background-color: #aab8c6;
+    background-color: #003D80;
     color: #eaf1f7;
 }
 
 /* Registration Buttons */
 .label-success {
-    background-color: #aab8c6;
+    background-color: #feda48;
     color: #eaf1f7;
 }
 
@@ -123,7 +131,7 @@ a {
 }
 
 .navbar-inverse {
-    background-color: #1f3f5e;
+    background-color: #002144;
 }
 .pagination > li > a, .pagination > li > span {
     color: #607890;

@@ -95,11 +95,12 @@
                             <div id="main-container" class="container">
                                 <div class="row row-offcanvas row-offcanvas-right">
                                     <div class="horizontal-slider clearfix">
-                                        <div class="col-xs-12 col-sm-12 col-md-9 main-content">
-                                            <xsl:apply-templates select="*[not(self::dri:options)]"/>
-                                        </div>
+                                        <!-- options on left -->
                                         <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
                                             <xsl:apply-templates select="dri:options"/>
+                                        </div>
+                                        <div class="col-xs-12 col-sm-12 col-md-9 main-content">
+                                            <xsl:apply-templates select="*[not(self::dri:options)]"/>
                                         </div>
                                     </div>
                                 </div>
@@ -342,7 +343,7 @@
                         </button>
 
                         <a href="{$context-path}/" class="navbar-brand">
-                            <img src="{$theme-path}/images/logo.png" />
+                            <img src="{$theme-path}/images/ac-logo-white.png" />
                         </a>
 
 
