@@ -7,8 +7,6 @@
  */
 package org.dspace.app.cris.integration.authority;
 
-import it.cilea.osd.jdyna.utils.HashUtil;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,17 +20,13 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.dspace.app.cris.integration.CRISAuthority;
-import org.dspace.app.cris.integration.RPAuthority;
 import org.dspace.app.cris.model.ACrisObject;
-import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.ResearcherPageUtils;
-import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.AuthorityValueGenerator;
-import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.authority.Choice;
+import org.dspace.content.Metadatum;
 import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
@@ -42,6 +36,8 @@ import org.dspace.discovery.SearchService;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
 import org.dspace.utils.DSpace;
+
+import it.cilea.osd.jdyna.utils.HashUtil;
 
 /**
  */

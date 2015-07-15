@@ -143,6 +143,13 @@ public class ResearcherPage extends
     @Transient
     private Integer oldEpersonID;
 
+    @Transient
+    private String oldOrcidPublicationsPreference;
+    @Transient
+    private String oldOrcidProjectsPreference;
+    @Transient
+    private List<String> oldOrcidProfilePreference;
+    
     /**
      * Constructor method, create new ResearcherPage setting status to true.
      */
@@ -645,6 +652,33 @@ public class ResearcherPage extends
 	@Override
 	public String getMetadataFieldTitle() {
 		return NAME;
+	}
+
+	public String getOldOrcidPublicationsPreference() {
+		return oldOrcidPublicationsPreference;
+	}
+
+	public void setOldOrcidPublicationsPreference(String oldOrcidPublicationsPreference) {
+		this.oldOrcidPublicationsPreference = oldOrcidPublicationsPreference;
+	}
+
+	public String getOldOrcidProjectsPreference() {
+		return oldOrcidProjectsPreference;
+	}
+
+	public void setOldOrcidProjectsPreference(String oldOrcidProjectsPreference) {
+		this.oldOrcidProjectsPreference = oldOrcidProjectsPreference;
+	}
+
+	public List<String> getOldOrcidProfilePreference() {
+		if(this.oldOrcidProfilePreference == null) {
+			this.oldOrcidProfilePreference = new ArrayList<String>();
+		}
+		return oldOrcidProfilePreference;
+	}
+
+	public void setOldOrcidProfilePreference(List<String> oldOrcidProfilePreference) {
+		this.oldOrcidProfilePreference = oldOrcidProfilePreference;
 	}
 
 }

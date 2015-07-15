@@ -10,48 +10,31 @@ package org.dspace.app.webui.cris.servlet;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
+import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.Project;
-import org.dspace.app.cris.model.ResearchObject;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.orcid.OrcidQueue;
 import org.dspace.app.cris.service.ApplicationService;
-import org.dspace.app.cris.util.Researcher;
 import org.dspace.app.webui.json.JSONRequest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
-import org.dspace.discovery.SearchService;
-import org.dspace.discovery.SearchServiceException;
-import org.dspace.eperson.AccountManager;
-import org.dspace.eperson.EPerson;
-import org.dspace.eperson.PasswordHash;
-import org.dspace.kernel.ServiceManager;
-import org.dspace.submit.lookup.SubmissionLookupUtils;
-import org.dspace.submit.util.ItemSubmissionLookupDTO;
 import org.dspace.utils.DSpace;
-import org.apache.commons.lang.StringUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
-import gr.ekt.bte.core.Record;
 
 
 /**
@@ -72,12 +55,12 @@ public class JSONOrcidQueueServlet extends JSONRequest{
 			HttpServletResponse resp) throws AuthorizeException, IOException {
 
 		Gson json = new Gson();
-		String id = req.getParameter("id");
+		String crisId = req.getParameter("id");
 		
 		ApplicationService applicationService = new DSpace().getServiceManager().getServiceByName("applicationService", ApplicationService.class);
 		List<OrcidQueue> queue = new ArrayList<OrcidQueue>(); 
-		if(StringUtils.isNotBlank(id)){			
-			queue = applicationService.findOrcidQueueByResearcherId(Integer.parseInt(id));
+		if(StringUtils.isNotBlank(crisId)){			
+			queue = applicationService.findOrcidQueueByResearcherId(crisId);
 		}
 		List<Map<String, Object>> dto = null;
 		try {
@@ -110,17 +93,17 @@ public class JSONOrcidQueueServlet extends JSONRequest{
         {
             for (OrcidQueue record : records)
             {
-                Integer itemId = record.getItemId();
-                Integer projectId = record.getProjectId();
-                Integer rpId = record.getResearcherId();
+                Integer entityId = record.getEntityId();
+                Integer typeId = record.getTypeId();
                 DSpaceObject dso = null;
-                if(itemId != null) {
-                	dso = Item.find(context, itemId);
+                if(Constants.ITEM == typeId) {
+                	dso = Item.find(context, entityId);
                 } else {
-                    if(projectId != null) {
-                    	dso = applicationService.get(Project.class, projectId);
-                    } else {
-                    	dso = applicationService.get(ResearcherPage.class, rpId);
+                    if(CrisConstants.PROJECT_TYPE_ID == typeId) {
+                    	dso = applicationService.get(Project.class, entityId);
+                    }
+                    else {
+                    	dso = applicationService.get(ResearcherPage.class, entityId);
                     }
                 }
                  

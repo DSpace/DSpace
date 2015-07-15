@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/CILEA/dspace-cris/wiki/License
+ */
 package org.dspace.app.cris.model.orcid;
 
 import javax.persistence.Entity;
@@ -14,7 +21,13 @@ import it.cilea.osd.common.model.IdentifiableObject;
 @Table(name = "cris_orcid_queue")
 @NamedQueries({
     @NamedQuery(name = "OrcidQueue.findAll", query = "from OrcidQueue order by id"),
-    @NamedQuery(name = "OrcidQueue.findOrcidQueueByResearcherId", query = "from OrcidQueue where researcherId = ? order by id")
+    @NamedQuery(name = "OrcidQueue.findOrcidQueueByOwner", query = "from OrcidQueue where owner = ? order by id"),
+    @NamedQuery(name = "OrcidQueue.findOrcidQueueByProjectId", query = "from OrcidQueue where entityId = ? and typeId = 10 order by id"),
+    @NamedQuery(name = "OrcidQueue.findOrcidQueueByProjectIdAndOwner", query = "from OrcidQueue where entityId = ? and typeId = 10 and owner = ? order by id"),
+    @NamedQuery(name = "OrcidQueue.findOrcidQueueByPublicationId", query = "from OrcidQueue where entityId = ? and typeId = 2 order by id"),
+    @NamedQuery(name = "OrcidQueue.findOrcidQueueByPublicationIdAndOwner", query = "from OrcidQueue where entityId = ? and typeId = 2 and owner = ? order by id"),
+    @NamedQuery(name = "OrcidQueue.findOrcidQueueByEntityIdAndTypeId", query = "from OrcidQueue where entityId = ? and typeId = ? order by id"),
+    @NamedQuery(name = "OrcidQueue.findOrcidQueueByEntityIdAndTypeIdAndOwner", query = "from OrcidQueue where entityId = ? and typeId = ? and owner = ? order by id")
 })
 public class OrcidQueue extends IdentifiableObject {
 
@@ -24,13 +37,11 @@ public class OrcidQueue extends IdentifiableObject {
     @SequenceGenerator(name = "CRIS_ORCIDQUEUE_SEQ", sequenceName = "CRIS_ORCIDQUEUE_SEQ", allocationSize = 1)
     private Integer id;
     
-    private Integer itemId;
+    private String owner;
     
-    private Integer projectId;
+    private Integer entityId;
     
-    private Integer researcherId;
-    
-    private boolean send;
+    private Integer typeId;
     
     private String mode;
     
@@ -44,44 +55,36 @@ public class OrcidQueue extends IdentifiableObject {
         this.id = id;
     }
 
-	public Integer getItemId() {
-		return itemId;
-	}
-
-	public void setItemId(Integer itemId) {
-		this.itemId = itemId;
-	}
-
-	public Integer getProjectId() {
-		return projectId;
-	}
-
-	public void setProjectId(Integer projectId) {
-		this.projectId = projectId;
-	}
-
-	public Integer getResearcherId() {
-		return researcherId;
-	}
-
-	public void setResearcherId(Integer researcherId) {
-		this.researcherId = researcherId;
-	}
-
-	public boolean isSend() {
-		return send;
-	}
-
-	public void setSend(boolean send) {
-		this.send = send;
-	}
-
 	public String getMode() {
 		return mode;
 	}
 
 	public void setMode(String mode) {
 		this.mode = mode;
+	}
+
+	public Integer getEntityId() {
+		return entityId;
+	}
+
+	public void setEntityId(Integer entityId) {
+		this.entityId = entityId;
+	}
+
+	public Integer getTypeId() {
+		return typeId;
+	}
+
+	public void setTypeId(Integer typeId) {
+		this.typeId = typeId;
+	}
+
+	public String getOwner() {
+		return owner;
+	}
+
+	public void setOwner(String owner) {
+		this.owner = owner;
 	}
 
 }

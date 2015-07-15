@@ -35,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.cris.dao.CrisObjectDao;
 import org.dspace.app.cris.dao.CrisSubscriptionDao;
 import org.dspace.app.cris.dao.DynamicObjectDao;
+import org.dspace.app.cris.dao.OrcidHistoryDao;
 import org.dspace.app.cris.dao.OrcidQueueDao;
 import org.dspace.app.cris.dao.OrganizationUnitDao;
 import org.dspace.app.cris.dao.ProjectDao;
@@ -54,6 +55,7 @@ import org.dspace.app.cris.model.jdyna.DynamicObjectType;
 import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.RPProperty;
 import org.dspace.app.cris.model.jdyna.TabResearcherPage;
+import org.dspace.app.cris.model.orcid.OrcidHistory;
 import org.dspace.app.cris.model.orcid.OrcidQueue;
 import org.dspace.app.cris.model.ws.User;
 import org.dspace.app.cris.util.ResearcherPageUtils;
@@ -87,6 +89,8 @@ public class ApplicationService extends ExtendedTabService
 
     private OrcidQueueDao orcidQueueDao;
     
+    private OrcidHistoryDao orcidHistoryDao;
+    
     private ConfigurationService configurationService;
     
     private CacheManager cacheManager;
@@ -104,6 +108,7 @@ public class ApplicationService extends ExtendedTabService
      */
     public void init()
     {
+    	super.init();
         researcherPageDao = (ResearcherPageDao) getDaoByModel(ResearcherPage.class);
         projectDao = (ProjectDao) getDaoByModel(Project.class);
         organizationUnitDao = (OrganizationUnitDao) getDaoByModel(OrganizationUnit.class);
@@ -113,6 +118,7 @@ public class ApplicationService extends ExtendedTabService
         relationPreferenceDao = (RelationPreferenceDao) getDaoByModel(RelationPreference.class);
         researchDao = (DynamicObjectDao) getDaoByModel(ResearchObject.class);
         orcidQueueDao = (OrcidQueueDao) getDaoByModel(OrcidQueue.class);
+        orcidHistoryDao = (OrcidHistoryDao) getDaoByModel(OrcidHistory.class);
         
 		if (configurationService.getPropertyAsType("cris.applicationServiceCache.enabled", true, true)
         		&& cache == null)
@@ -935,7 +941,13 @@ public class ApplicationService extends ExtendedTabService
 		return dao.findByAccessLevel(level);
 	}
 	
-	public List<OrcidQueue> findOrcidQueueByResearcherId(Integer researcherID) {
-		return orcidQueueDao.findOrcidQueueByResearcherId(researcherID);
+	public List<OrcidQueue> findOrcidQueueByResearcherId(String crisId) {
+		return orcidQueueDao.findOrcidQueueByOwner(crisId);
+	}
+	public OrcidQueue uniqueOrcidQueueByEntityIdAndTypeIdAndOwnerId(Integer entityID, Integer typeId, String ownerId) {
+		return orcidQueueDao.uniqueOrcidQueueByEntityIdAndTypeIdAndOwner(entityID, typeId, ownerId);
+	}
+	public List<OrcidHistory> findOrcidHistoryByEntityIdAndTypeId(Integer entityId, Integer typeId) {	
+		return orcidHistoryDao.findOrcidHistoryByEntityIdAndTypeId(entityId, typeId);
 	}
 } 

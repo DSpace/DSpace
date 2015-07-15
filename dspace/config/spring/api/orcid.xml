@@ -38,4 +38,6 @@
 	 	<property name="baseURL" ref="dspaceOrcidBaseURL"/>
 	 </bean>           
 
+	 <bean name="orcidPreferencesUtils" class="org.dspace.app.cris.model.orcid.OrcidPreferencesUtils"/>
+
 </beans>

@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/CILEA/dspace-cris/wiki/License
+ */
 package org.dspace.app.cris.model.orcid;
 
 import javax.persistence.AttributeOverride;
@@ -19,7 +26,13 @@ import it.cilea.osd.common.model.IdentifiableObject;
 @Entity
 @Table(name = "cris_orcid_history")
 @NamedQueries({
-    @NamedQuery(name = "OrcidHistory.findAll", query = "from OrcidHistory order by id") 
+    @NamedQuery(name = "OrcidHistory.findAll", query = "from OrcidHistory order by id"),
+    @NamedQuery(name = "OrcidHistory.findOrcidHistoryByResearcherId", query = "from OrcidHistory where entityId = ? and typeId = 9 order by id"),
+    @NamedQuery(name = "OrcidHistory.findOrcidHistoryByProjectId", query = "from OrcidHistory where entityId = ? and typeId = 10 order by id"),
+    @NamedQuery(name = "OrcidHistory.findOrcidHistoryByPublicationId", query = "from OrcidHistory where entityId = ? and typeId = 2 order by id"),
+    @NamedQuery(name = "OrcidHistory.findOrcidHistoryByEntityIdAndTypeId", query = "from OrcidHistory where entityId = ? and typeId = ? order by id"),
+    @NamedQuery(name = "OrcidHistory.findOrcidHistoryInSuccess", query = "from OrcidHistory where timestampLastAttempt.timestamp = timestampSuccessAttempt.timestamp order by id"),
+    @NamedQuery(name = "OrcidHistory.findOrcidHistoryInError", query = "from OrcidHistory where timestampLastAttempt.timestamp > timestampSuccessAttempt.timestamp order by id")
 })
 public class OrcidHistory extends IdentifiableObject {
     
@@ -29,11 +42,9 @@ public class OrcidHistory extends IdentifiableObject {
     @SequenceGenerator(name = "CRIS_ORCIDHISTORY_SEQ", sequenceName = "CRIS_ORCIDHISTORY_SEQ", allocationSize = 1)
     private Integer id;
     
-    private Integer itemId;
+    private Integer entityId;
     
-    private Integer projectId;
-    
-    private Integer researcherId;
+    private Integer typeId;
     
     @Embedded
     @AttributeOverride(name = "timestamp", column = @Column(name = "lastAttempt"))
@@ -55,30 +66,6 @@ public class OrcidHistory extends IdentifiableObject {
     {
         this.id = id;
     }
-
-	public Integer getItemId() {
-		return itemId;
-	}
-
-	public void setItemId(Integer itemId) {
-		this.itemId = itemId;
-	}
-
-	public Integer getProjectId() {
-		return projectId;
-	}
-
-	public void setProjectId(Integer projectId) {
-		this.projectId = projectId;
-	}
-
-	public Integer getResearcherId() {
-		return researcherId;
-	}
-
-	public void setResearcherId(Integer researcherId) {
-		this.researcherId = researcherId;
-	}
 
 	public SingleTimeStampInfo getTimestampLastAttempt() {
 		return timestampLastAttempt;
@@ -102,5 +89,21 @@ public class OrcidHistory extends IdentifiableObject {
 
 	public void setResponseMessage(String responseMessage) {
 		this.responseMessage = responseMessage;
+	}
+
+	public Integer getEntityId() {
+		return entityId;
+	}
+
+	public void setEntityId(Integer entityId) {
+		this.entityId = entityId;
+	}
+
+	public Integer getTypeId() {
+		return typeId;
+	}
+
+	public void setTypeId(Integer typeId) {
+		this.typeId = typeId;
 	}
 }

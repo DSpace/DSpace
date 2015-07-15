@@ -129,7 +129,7 @@ public class PushToORCID {
 		// prepare configuration mapping ORCID->DSPACE-CRIS
 		Map<String, String> orcidConfigurationMapping = new HashMap<String, String>();
 		List<RPPropertiesDefinition> metadataDefinitions = applicationService
-				.likePropertiesDefinitionsByShortName(RPPropertiesDefinition.class, "orcid-profile-prefs");
+				.likePropertiesDefinitionsByShortName(RPPropertiesDefinition.class, "orcid-profile-pref");
 		for (RPPropertiesDefinition rppd : metadataDefinitions) {
 			String metadataShortnameINTERNAL = rppd.getShortName().replaceFirst("orcid-profile-pref-", "");
 			String metadataShortnameORCID = rppd.getLabel();

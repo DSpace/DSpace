@@ -21,5 +21,12 @@ import it.cilea.osd.common.dao.PaginableObjectDao;
  */
 public interface OrcidQueueDao extends PaginableObjectDao<OrcidQueue, Integer> {
 	
-	public List<OrcidQueue> findOrcidQueueByResearcherId(Integer researcherID); 
+	public List<OrcidQueue> findOrcidQueueByOwner(String crisId);
+	public List<OrcidQueue> findOrcidQueueByProjectId(Integer pjId);
+	public OrcidQueue uniqueOrcidQueueByProjectIdAndOwner(Integer pjId, String crisId); 
+	public List<OrcidQueue> findOrcidQueueByPublicationId(Integer owner); 
+	public OrcidQueue uniqueOrcidQueueByPublicationIdAndOwner(Integer pId, String crisId); 
+	public List<OrcidQueue> findOrcidQueueByEntityIdAndTypeId(Integer entityID, Integer typeId); 
+	public OrcidQueue uniqueOrcidQueueByEntityIdAndTypeIdAndOwner(Integer entityID, Integer typeId, String crisId);
+	 
 }

@@ -310,7 +310,8 @@
 					<list>
 						<ref local="CRISIDListener" />
 						<ref local="crisIndexerListener" />
-						<ref local="nestedIndexerListener" />								
+						<ref local="nestedIndexerListener" />
+						<ref local="ORCIDListener" />								
 					</list>
 				</property>
 				<property name="listenerOnPostDelete">
@@ -1628,8 +1629,9 @@
 				</entry>				
 				<entry key="post-load">
 					<list>
-					<ref local="RPListener" />
-						<ref local="rpResourcePolicyListener" />																	
+						<ref local="RPListener" />
+						<ref local="rpResourcePolicyListener" />
+						<ref local="ORCIDListener" />																							
 					</list>
 				</entry>
 				<entry key="post-insert">
@@ -1674,6 +1676,10 @@
 	<bean id="UUIDListener" class="org.dspace.app.cris.model.listener.UUIDListener"/>
 	
 	<bean id="CRISIDListener" class="org.dspace.app.cris.model.listener.CrisIDListener"/>
+	
+	<bean id="ORCIDListener" class="org.dspace.app.cris.model.listener.ORCIDListener">
+		<property name="orcidPreferencesUtils" ref="orcidPreferencesUtils" />	
+	</bean>
 	
 	<bean id="nestedPositionListener" class="org.dspace.app.cris.model.listener.NestedPositionListener"/>
 

@@ -27,6 +27,8 @@
     <!-- Acquires reference to RelationPreferenceService relationPreferenceService --> 
     <bean id="relationPreferenceService" factory-bean="researcher" factory-method="getRelationPreferenceService" />
     
+    <bean id="orcidPreferencesUtils" factory-bean="researcher" factory-method="getOrcidPreferencesUtils" />
+    
     <bean id="rpComponents" factory-bean="researcher" factory-method="getRPComponents" />
     <bean id="pjComponents" factory-bean="researcher" factory-method="getProjectComponents" />
     <bean id="ouComponents" factory-bean="researcher" factory-method="getOUComponents" />

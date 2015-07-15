@@ -16,6 +16,7 @@ import org.dspace.app.cris.integration.ICRISComponent;
 import org.dspace.app.cris.integration.statistics.CrisStatComponentsService;
 import org.dspace.app.cris.integration.statistics.StatComponentsService;
 import org.dspace.app.cris.model.ResearcherPage;
+import org.dspace.app.cris.model.orcid.OrcidPreferencesUtils;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.service.CrisSubscribeService;
 import org.dspace.app.cris.service.RelationPreferenceService;
@@ -184,5 +185,11 @@ public class Researcher implements EPersonCRISIntegration
             return null;
         }
         return ResearcherPageUtils.getPersistentIdentifier(result);
-    }    
+    }
+    
+    public OrcidPreferencesUtils getOrcidPreferencesUtils() {
+        return dspace.getServiceManager().getServiceByName(
+                "orcidPreferencesUtils", OrcidPreferencesUtils.class);
+    }
+    
 }
