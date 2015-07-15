@@ -11,6 +11,7 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
+import org.dspace.app.xmlui.cocoon.BitstreamReader;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
@@ -24,7 +25,10 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.sql.SQLException;
+
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.apache.cocoon.ResourceNotFoundException;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 
@@ -104,16 +108,43 @@ public class RestrictedItem extends AbstractDSpaceTransformer // implements
             ResourceNotFoundException
     {
         Request request = ObjectModelHelper.getRequest(objectModel);
+        HttpSession session = request.getSession();
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
         Division unauthorized = null;
         boolean isWithdrawn = false;
 
+        String interrruptedHeader = (String) session
+                .getAttribute(AuthenticationUtil.REQUEST_INTERRUPTED_HEADER);
+        boolean isEmbargo = interrruptedHeader
+                .equals(BitstreamReader.EMBARGO_HEADER);
         if (dso == null)
         {
+
             unauthorized = body.addDivision("unauthorized-resource", "primary");
-            unauthorized.setHead(T_head_resource);
-            unauthorized.addPara(T_para_resource);
+            if (isEmbargo)
+            {
+                unauthorized.setHead(message(interrruptedHeader));
+                String message = (String) session
+                        .getAttribute(AuthenticationUtil.REQUEST_INTERRUPTED_MESSAGE);
+                String characters = (String) session
+                        .getAttribute(AuthenticationUtil.REQUEST_INTERRUPTED_CHARACTERS);
+                Para para = unauthorized.addPara();
+                if (message != null)
+                {
+                    para.addContent(AbstractDSpaceTransformer.message(message));
+                }
+
+                if (characters != null)
+                {
+                    para.addContent(characters);
+                }
+            }
+            else
+            {
+                unauthorized.setHead(T_head_resource);
+                unauthorized.addPara(T_para_resource);
+            }
         }
         else if (dso instanceof Community)
         {
@@ -154,6 +185,7 @@ public class RestrictedItem extends AbstractDSpaceTransformer // implements
                 }
                 unauthorized = body.addDivision("unauthorized-resource",
                         "primary");
+
                 unauthorized.setHead(T_head_bitstream);
                 unauthorized.addPara(T_para_bitstream.parameterize(identifier));
 
@@ -206,7 +238,8 @@ public class RestrictedItem extends AbstractDSpaceTransformer // implements
         }
 
         // add a login link if !loggedIn & not withdrawn
-        if (!isWithdrawn && context.getCurrentUser() == null)
+        if (!isWithdrawn && context.getCurrentUser() == null
+                && isEmbargo == false)
         {
             unauthorized.addPara()
                     .addXref(contextPath + "/login", T_para_login);

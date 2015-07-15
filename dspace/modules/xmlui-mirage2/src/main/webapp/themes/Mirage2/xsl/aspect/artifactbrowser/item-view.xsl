@@ -364,6 +364,11 @@
                     <xsl:attribute name="href">
                         <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
                     </xsl:attribute>
+                    <xsl:if test="@EMBARGO='true'">
+	                    <xsl:attribute name="target">
+	                        <xsl:value-of select="'_blank'"/>
+	                    </xsl:attribute>
+	                </xsl:if>
                     <xsl:call-template name="getFileIcon">
                         <xsl:with-param name="mimetype">
                             <xsl:value-of select="substring-before(@MIMETYPE,'/')"/>
@@ -644,8 +649,18 @@
             <xsl:attribute name="href">
                 <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
             </xsl:attribute>
+            <xsl:if test="@EMBARGO='true'">
+	                    <xsl:attribute name="target">
+	                        <xsl:value-of select="'_blank'"/>
+	                    </xsl:attribute>
+	                </xsl:if>
             <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-viewOpen</i18n:text>
         </a>
+        <br/>
+        <xsl:if test="@EMBARGO='true'">
+            <i18n:text>xmlui.dri2xhtml.METS-1.0.item-restricted</i18n:text>
+            <br/>
+        </xsl:if>
     </xsl:template>
 
     <xsl:template name="display-rights">
