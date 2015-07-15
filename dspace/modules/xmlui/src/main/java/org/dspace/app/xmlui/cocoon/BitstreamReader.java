@@ -343,10 +343,13 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                         String responseMessage = AUTH_REQUIRED_MESSAGE;
                         String responseHeader = AUTH_REQUIRED_HEADER;
                         String responseCharecters = "";
+                        String redictURL = request.getContextPath() + "/login";
 
                         if (bitstream.isETDEmbargo())
                         {
                             responseHeader = EMBARGO_HEADER;
+                            redictURL = request.getContextPath()
+                                    + "/restricted-resource";
                             Date date = bitstream.getETDEmbargo().getEndDate();
                             if (date != null)
                             {
@@ -355,7 +358,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
 
                                 String dateUntil = sdf.format(date).toString();
                                 responseMessage = EMBARGO_UNTIL_MESSAGE;
-                                responseCharecters = dateUntil;
+                                responseCharecters = dateUntil + ".";
                             }
                             else
                             {
@@ -366,7 +369,6 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                         AuthenticationUtil.interruptRequest(objectModel,
                                 responseHeader, responseMessage,
                                 responseCharecters);
-                        String redictURL = request.getContextPath() + "/login";
 
                         HttpServletResponse httpResponse = (HttpServletResponse) objectModel
                                 .get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
