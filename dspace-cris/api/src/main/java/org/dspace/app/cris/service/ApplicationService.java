@@ -950,4 +950,8 @@ public class ApplicationService extends ExtendedTabService
 	public List<OrcidHistory> findOrcidHistoryByEntityIdAndTypeId(Integer entityId, Integer typeId) {	
 		return orcidHistoryDao.findOrcidHistoryByEntityIdAndTypeId(entityId, typeId);
 	}
+
+	public void deleteOrcidQueueByOwnerAndTypeId(String crisID, int typeId) {
+		orcidQueueDao.deleteByOwnerAndTypeId(crisID, typeId);
+	}
 } 

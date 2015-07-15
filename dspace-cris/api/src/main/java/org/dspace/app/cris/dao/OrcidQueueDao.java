@@ -28,5 +28,6 @@ public interface OrcidQueueDao extends PaginableObjectDao<OrcidQueue, Integer> {
 	public OrcidQueue uniqueOrcidQueueByPublicationIdAndOwner(Integer pId, String crisId); 
 	public List<OrcidQueue> findOrcidQueueByEntityIdAndTypeId(Integer entityID, Integer typeId); 
 	public OrcidQueue uniqueOrcidQueueByEntityIdAndTypeIdAndOwner(Integer entityID, Integer typeId, String crisId);
+	public void deleteByOwnerAndTypeId(String crisID, int typeId);
 	 
 }

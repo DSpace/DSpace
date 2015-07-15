@@ -73,8 +73,7 @@ public class OrcidPreferencesUtils {
 					rpP.setValue(value);
 				}
 				getApplicationService().saveOrUpdate(ResearcherPage.class, rp, false);
-			}
-			else {
+			} else {
 				log.warn("Metadata Properties definition not found: orcid-push-" + obj.getTypeText() + "-activate-put");
 			}
 		} else {
@@ -93,8 +92,28 @@ public class OrcidPreferencesUtils {
 	}
 
 	public boolean isProfileSelectedToShare(ResearcherPage researcher) {
-		String isEnableBioUpdate = ResearcherPageUtils.getStringValue(researcher,
-				"system-orcid-token-orcid-bio-update");
+		if (isTokenReleasedForSync(researcher, "system-orcid-token-orcid-bio-update")) {
+			//if metadata set to go on Orcid Registry have modifications return true
+			List<RPPropertiesDefinition> metadataDefinitions = getApplicationService()
+					.likePropertiesDefinitionsByShortName(RPPropertiesDefinition.class, "orcid-profile-pref");
+			for (RPPropertiesDefinition rppd : metadataDefinitions) {
+				String metadataShortnameINTERNAL = rppd.getShortName().replaceFirst("orcid-profile-pref-", "");
+				List<RPProperty> propsRps = researcher.getAnagrafica4view().get(rppd.getShortName());
+				for (RPProperty prop : propsRps) {
+					BooleanValue booleanValue = (BooleanValue) (prop.getValue());
+					if (booleanValue.getObject()) {
+						if (!researcher.getOldOrcidProfilePreference().contains(metadataShortnameINTERNAL)) {
+							return true;
+						}
+					}
+				}
+			}
+		}
+		return true;
+	}
+
+	private boolean isTokenReleasedForSync(ResearcherPage researcher, String tokenName) {
+		String isEnableBioUpdate = ResearcherPageUtils.getStringValue(researcher, tokenName);
 		// this Researcher Profile have enabled the token for update bio on
 		// Orcid Registry?
 		if (StringUtils.isNotBlank(isEnableBioUpdate)) {
@@ -262,10 +281,10 @@ public class OrcidPreferencesUtils {
 						for (RelationPreferenceConfiguration configuration : getRelationPreferenceService()
 								.getConfigurationService().getList()) {
 							if (configuration.getRelationConfiguration().getRelationClass().equals(Item.class)) {
-								selected = getRelationPreferenceService().findRelationsPreferencesByUUIDByRelTypeAndStatus(
-										researcher.getUuid(),
-										configuration.getRelationConfiguration().getRelationName(),
-										RelationPreference.SELECTED);
+								selected = getRelationPreferenceService()
+										.findRelationsPreferencesByUUIDByRelTypeAndStatus(researcher.getUuid(),
+												configuration.getRelationConfiguration().getRelationName(),
+												RelationPreference.SELECTED);
 							}
 							for (RelationPreference sel : selected) {
 								if (sel.getItemID() == dso.getID()) {
@@ -281,10 +300,10 @@ public class OrcidPreferencesUtils {
 							for (RelationPreferenceConfiguration configuration : getRelationPreferenceService()
 									.getConfigurationService().getList()) {
 								if (configuration.getRelationConfiguration().getRelationClass().equals(Item.class)) {
-									hided = getRelationPreferenceService().findRelationsPreferencesByUUIDByRelTypeAndStatus(
-											researcher.getUuid(),
-											configuration.getRelationConfiguration().getRelationName(),
-											RelationPreference.HIDED);
+									hided = getRelationPreferenceService()
+											.findRelationsPreferencesByUUIDByRelTypeAndStatus(researcher.getUuid(),
+													configuration.getRelationConfiguration().getRelationName(),
+													RelationPreference.HIDED);
 								}
 
 								for (RelationPreference hid : hided) {
@@ -410,22 +429,22 @@ public class OrcidPreferencesUtils {
 		return projectsIDsToSend;
 	}
 
-	
-	public CrisSearchService getSearchService()
-    {
-        return new DSpace().getServiceManager().getServiceByName(
-                "org.dspace.discovery.SearchService", CrisSearchService.class);
-    }
-	public RelationPreferenceService getRelationPreferenceService() {
-        return new DSpace().getServiceManager().getServiceByName(
-        		"org.dspace.app.cris.service.RelationPreferenceService",
-                RelationPreferenceService.class);
+	public CrisSearchService getSearchService() {
+		return new DSpace().getServiceManager().getServiceByName("org.dspace.discovery.SearchService",
+				CrisSearchService.class);
 	}
-	
-	public ApplicationService getApplicationService()
-    {
-        return new DSpace().getServiceManager().getServiceByName(
-                "applicationService", ApplicationService.class);
-    }
+
+	public RelationPreferenceService getRelationPreferenceService() {
+		return new DSpace().getServiceManager().getServiceByName(
+				"org.dspace.app.cris.service.RelationPreferenceService", RelationPreferenceService.class);
+	}
+
+	public ApplicationService getApplicationService() {
+		return new DSpace().getServiceManager().getServiceByName("applicationService", ApplicationService.class);
+	}
+
+	public void deleteOrcidQueueByOwnerAndType(String crisID, int typeId) {
+		getApplicationService().deleteOrcidQueueByOwnerAndTypeId(crisID, typeId);
+	}
 
 }

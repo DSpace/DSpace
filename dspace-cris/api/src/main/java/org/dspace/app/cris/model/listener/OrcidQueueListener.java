@@ -14,6 +14,7 @@ import javax.persistence.Transient;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.cris.model.ACrisObject;
+import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.Project;
 import org.dspace.app.cris.model.RelationPreference;
 import org.dspace.app.cris.model.ResearcherPage;
@@ -23,6 +24,7 @@ import org.dspace.app.cris.model.jdyna.RPProperty;
 import org.dspace.app.cris.model.jdyna.value.RPPointer;
 import org.dspace.app.cris.model.orcid.OrcidPreferencesUtils;
 import org.dspace.content.Item;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.hibernate.event.spi.PostLoadEvent;
 import org.hibernate.event.spi.PostLoadEventListener;
@@ -31,7 +33,7 @@ import it.cilea.osd.common.listener.NativePostUpdateEventListener;
 import it.cilea.osd.common.model.Identifiable;
 import it.cilea.osd.jdyna.value.BooleanValue;
 
-public class ORCIDListener implements NativePostUpdateEventListener, PostLoadEventListener {
+public class OrcidQueueListener implements NativePostUpdateEventListener, PostLoadEventListener {
 
 	private static final String RELATION_CRISPJ_PROJECTS = "crispj.projects";
 
@@ -42,7 +44,7 @@ public class ORCIDListener implements NativePostUpdateEventListener, PostLoadEve
 	private static final String ORCID_PROJECTS_PREFS = "orcid-projects-prefs";
 
 	@Transient
-	private static Logger log = Logger.getLogger(ORCIDListener.class);
+	private static Logger log = Logger.getLogger(OrcidQueueListener.class);
 
 	private OrcidPreferencesUtils orcidPreferencesUtils;
 
@@ -56,12 +58,12 @@ public class ORCIDListener implements NativePostUpdateEventListener, PostLoadEve
 		try {
 			if (object instanceof ACrisObject) {
 				ACrisObject crisObj = (ACrisObject) object;
-				if (crisObj.getType() == 9 || crisObj.getType() == 10) {
+				if (crisObj.getType() == CrisConstants.RP_TYPE_ID || crisObj.getType() == CrisConstants.PROJECT_TYPE_ID) {
 					String crisID = crisObj.getCrisID();
 					if (StringUtils.isNotBlank(crisID)) {
 						try {
 
-							if (crisObj.getType() == 9) {
+							if (crisObj.getType() == CrisConstants.RP_TYPE_ID) {
 
 								ResearcherPage rp = (ResearcherPage) crisObj;
 								// check if profile will be send to Orcid
@@ -76,8 +78,11 @@ public class ORCIDListener implements NativePostUpdateEventListener, PostLoadEve
 								List<RPProperty> rpPropsPJ = rp.getAnagrafica4view().get(ORCID_PROJECTS_PREFS);
 								for (RPProperty rpProp : rpPropsPJ) {
 									if (StringUtils.isNotBlank(oldPrefProject)) {
+										// project preference is changed?
 										if (!(oldPrefProject.equals(rpProp.getValue().toString()))) {
-											// project preference change
+											//remove the queue
+											orcidPreferencesUtils.deleteOrcidQueueByOwnerAndType(crisID,CrisConstants.PROJECT_TYPE_ID);
+											//add the preferite
 											List<Integer> projectsIDs = orcidPreferencesUtils
 													.getPreferiteFundingToSendToOrcid(crisID);
 											for (Integer pjId : projectsIDs) {
@@ -94,8 +99,11 @@ public class ORCIDListener implements NativePostUpdateEventListener, PostLoadEve
 								List<RPProperty> rpPropsItem = rp.getAnagrafica4view().get(ORCID_PUBLICATIONS_PREFS);
 								for (RPProperty rpProp : rpPropsItem) {
 									if (StringUtils.isNotBlank(oldPrefPublications)) {
+										// publications preference change
 										if (!(oldPrefPublications.equals(rpProp.getValue().toString()))) {
-											// publications preference change
+											//delete first all publication queued
+											orcidPreferencesUtils.deleteOrcidQueueByOwnerAndType(crisID,Constants.ITEM);
+											//retrieve the preferite
 											List<Integer> itemIDs = orcidPreferencesUtils
 													.getPreferiteWorksToSendToOrcid(crisID);
 											Context context = null;
@@ -201,7 +209,6 @@ public class ORCIDListener implements NativePostUpdateEventListener, PostLoadEve
 
 	@Override
 	public void onPostLoad(PostLoadEvent event) {
-		// TODO Auto-generated method stub
 		Object object = event.getEntity();
 		if (object instanceof ResearcherPage) {
 			ResearcherPage rp = (ResearcherPage) object;
