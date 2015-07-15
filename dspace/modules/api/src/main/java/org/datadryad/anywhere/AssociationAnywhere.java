@@ -73,10 +73,10 @@ public class AssociationAnywhere {
 
         }
         else if(line.hasOption("d")){
-            deductCredit(line.getOptionValue("i"));
+            deductCredit(line.getOptionValue("d"));
         }
         else if(line.hasOption("l")){
-            System.out.print(printDocument(loadCustomerInfo(line.getOptionValue("i"))));
+            System.out.print(printDocument(loadCustomerInfo(line.getOptionValue("l"))));
         }
         else if(line.hasOption("i")){
             //load credit
