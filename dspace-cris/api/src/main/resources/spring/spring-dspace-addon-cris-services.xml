@@ -1677,7 +1677,7 @@
 	
 	<bean id="CRISIDListener" class="org.dspace.app.cris.model.listener.CrisIDListener"/>
 	
-	<bean id="ORCIDListener" class="org.dspace.app.cris.model.listener.ORCIDListener">
+	<bean id="ORCIDListener" class="org.dspace.app.cris.model.listener.OrcidQueueListener">
 		<property name="orcidPreferencesUtils" ref="orcidPreferencesUtils" />	
 	</bean>
 	
