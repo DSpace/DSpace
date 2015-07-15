@@ -795,7 +795,17 @@ function doEditEPerson(epersonID) {
 			// Don't continue after returning from editing a group.
 			if (result != null)
 				result.setContinue(false);
-		} else if (cocoon.request.get("submit_delete")) {
+		} else if (cocoon.request.get("submit_edit_unit") && cocoon.request.get("unitID")){
+			assertAdministrator();
+			var unitID = cocoon.request.get("unitID");
+			result = doEditUnits(unitID);
+
+			// Don't continue after returning from editing a group.
+			if (result != null)
+				result.setContinue(false);
+		}
+		else if (cocoon.request.get("submit_delete")) {
+		
 			// Delete this user
 			assertAdministrator();
 			var epeopleIDs = new Array();
@@ -1366,7 +1376,7 @@ function doEditUnits(unitID) {
 		} else if (cocoon.request.get("submit_save")) {
 			result = FlowUnitsUtils.processSaveUnits(
 					getDSContext(), unitID, unitName,
-					memberGroupIDs);
+					memberGroupIDs, cocoon.request);
 
 			// In case a unit was created, update our id.
 			if (result != null && result.getParameter("unitID"))

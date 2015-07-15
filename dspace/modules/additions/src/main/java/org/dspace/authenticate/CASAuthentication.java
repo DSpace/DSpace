@@ -100,7 +100,8 @@ public class CASAuthentication implements AuthenticationMethod
     {
         try
         {
-            Ldap ldap = (Ldap) request.getSession().getAttribute(CASUSER);
+            Ldap ldap = new Ldap(context);
+            ldap.checkUid(context.getCurrentUser().getNetid());
 
             if (ldap != null)
             {

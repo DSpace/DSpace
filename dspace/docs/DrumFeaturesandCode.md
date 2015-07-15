@@ -192,6 +192,14 @@ XMLUI comes with dual authentication capability. No customization needed.
 
 * [eperson-edit.jsp](../modules/jspui/src/main/webapp/dspace-admin/eperson-edit.jsp) - add faculty_only editing in admin interface for Units
 
+*XMLUI webapp*
+
+* [EditEPersonForm.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/administrative/eperson/EditEPersonForm.java) - Added UM Directory Information
+* [EditUnitsForm.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/administrative/units/EditUnitsForm.java) - Added "Faculty Only" checkbox
+* [FlowUnitsUtils.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/administrative/FlowUnitsUtils.java) - Code to update "faculty_only" field based on EditUnitsForm checkbox.
+* [administrative.js](../modules/xmlui/src/main/resources/aspects/Administrative/administrative.js) - Updated one method of FlowUnitsUtils
+* [messages.xml](../modules/xmlui/src/main/webapp/i18n/messages.xml)
+
 *Scripts*
 
 * [loadunits_faculty_only.groovy](../bin/loadunits_faculty_only.groovy) - cant'find
