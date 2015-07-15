@@ -22,12 +22,13 @@ import it.cilea.osd.common.model.IdentifiableObject;
 @NamedQueries({
     @NamedQuery(name = "OrcidQueue.findAll", query = "from OrcidQueue order by id"),
     @NamedQuery(name = "OrcidQueue.findOrcidQueueByOwner", query = "from OrcidQueue where owner = ? order by id"),
+    @NamedQuery(name = "OrcidQueue.findOrcidQueueByOwnerAndTypeId", query = "from OrcidQueue where owner = ? and typeId = ? order by id"),
     @NamedQuery(name = "OrcidQueue.findOrcidQueueByProjectId", query = "from OrcidQueue where entityId = ? and typeId = 10 order by id"),
-    @NamedQuery(name = "OrcidQueue.findOrcidQueueByProjectIdAndOwner", query = "from OrcidQueue where entityId = ? and typeId = 10 and owner = ? order by id"),
+    @NamedQuery(name = "OrcidQueue.uniqueOrcidQueueByProjectIdAndOwner", query = "from OrcidQueue where entityId = ? and typeId = 10 and owner = ? order by id"),
     @NamedQuery(name = "OrcidQueue.findOrcidQueueByPublicationId", query = "from OrcidQueue where entityId = ? and typeId = 2 order by id"),
-    @NamedQuery(name = "OrcidQueue.findOrcidQueueByPublicationIdAndOwner", query = "from OrcidQueue where entityId = ? and typeId = 2 and owner = ? order by id"),
+    @NamedQuery(name = "OrcidQueue.uniqueOrcidQueueByPublicationIdAndOwner", query = "from OrcidQueue where entityId = ? and typeId = 2 and owner = ? order by id"),
     @NamedQuery(name = "OrcidQueue.findOrcidQueueByEntityIdAndTypeId", query = "from OrcidQueue where entityId = ? and typeId = ? order by id"),
-    @NamedQuery(name = "OrcidQueue.findOrcidQueueByEntityIdAndTypeIdAndOwner", query = "from OrcidQueue where entityId = ? and typeId = ? and owner = ? order by id"),
+    @NamedQuery(name = "OrcidQueue.uniqueOrcidQueueByEntityIdAndTypeIdAndOwner", query = "from OrcidQueue where entityId = ? and typeId = ? and owner = ? order by id"),    
     @NamedQuery(name = "OrcidQueue.deleteByOwnerAndTypeId", query = "delete from OrcidQueue where owner = ? and typeId = ?")
 })
 public class OrcidQueue extends IdentifiableObject {
