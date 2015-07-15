@@ -15,6 +15,7 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Cell;
+import org.dspace.app.xmlui.wing.element.CheckBox;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Para;
@@ -92,6 +93,8 @@ public class EditUnitsForm extends AbstractDSpaceTransformer
 
     private static final Message T_members_none = message("xmlui.administrative.units.EditUnitsForm.members_none");
 
+    private static final Message T_faculty_only = message("xmlui.administrative.units.EditUnitsForm.faculty_only");
+
     // How many results to show on a page.
     private static final int RESULTS_PER_PAGE = 5;
 
@@ -124,6 +127,7 @@ public class EditUnitsForm extends AbstractDSpaceTransformer
         {
             unit = Unit.find(context, unitID);
         }
+        boolean facultyOnlyValue = unit.getFacultyOnly();
 
         // Get list of member groups from url
         List<Integer> memberGroupIDs = new ArrayList<Integer>();
@@ -183,6 +187,13 @@ public class EditUnitsForm extends AbstractDSpaceTransformer
         {
             unitText.addError("");
         }
+        org.dspace.app.xmlui.wing.element.List facultyOnlyList = actions
+                .addList("form",
+                        org.dspace.app.xmlui.wing.element.List.TYPE_FORM);
+        CheckBox facultyOnlyField = facultyOnlyList.addItem().addCheckBox(
+                "faculty_only");
+        facultyOnlyField.setLabel(T_faculty_only);
+        facultyOnlyField.addOption(facultyOnlyValue, "true");
 
         Para searchBoxes = actions.addPara();
         searchBoxes.addContent(T_label_search);
