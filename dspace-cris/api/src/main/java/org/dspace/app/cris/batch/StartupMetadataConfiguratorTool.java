@@ -616,7 +616,7 @@ public class StartupMetadataConfiguratorTool {
 				}
 
 				if (boxQueueORCID != null) {
-					String[] rpProps = { "fullName", "email", "orcid", "orcid-push-manual"};
+					String[] rpProps = { "fullName", "email", "orcid", "orcid-push-manual", "orcid-push-item-activate-put", "orcid-push-pj-activate-put", "orcid-push-rp-activate-put"};
 
 					boxQueueORCID.getMask().clear();
 					boxQueueORCID.setMask(null);
