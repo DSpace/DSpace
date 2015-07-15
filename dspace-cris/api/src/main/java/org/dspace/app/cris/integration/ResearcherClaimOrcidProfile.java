@@ -40,7 +40,7 @@ public class ResearcherClaimOrcidProfile implements PostLoggedInAction, ExtraLog
 
 				// check Researcher Profile existence
 				if (rp == null && eperson.getNetid() != null) {
-					rp = applicationService.getEntityBySourceId(netidSourceRef.toUpperCase(), eperson.getNetid(),
+					rp = applicationService.getEntityBySourceId(netidSourceRef, eperson.getNetid(),
 							ResearcherPage.class);
 					if (rp == null) {
 						// build a simple RP

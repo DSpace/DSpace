@@ -44,7 +44,7 @@ public class ResearcherLoggedInActionEmail implements PostLoggedInAction
             
             if(rp==null) {
             	if(eperson.getNetid()!=null && 
-            			(rp = applicationService.getEntityBySourceId(netidSourceRef.toUpperCase(),eperson.getNetid(), ResearcherPage.class))!=null){
+            			(rp = applicationService.getEntityBySourceId(netidSourceRef,eperson.getNetid(), ResearcherPage.class))!=null){
 	                if(rp.getEpersonID()!=null) {
 	                    if (rp.getEpersonID() != eperson.getID())
 	                    {

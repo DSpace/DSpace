@@ -134,7 +134,7 @@ public class CrisConsumer implements Consumer {
 				String typeAuthority = toBuildType.get(authorityKey);
 				
 				Class<ACrisObject> crisTargetClass = choiceAuthorityObject.getCRISTargetClass();				
-				ACrisObject rp = applicationService.getEntityBySourceId(typeAuthority.toUpperCase(), authorityKey,
+				ACrisObject rp = applicationService.getEntityBySourceId(typeAuthority, authorityKey,
 						crisTargetClass);
 
 				if (rp != null) {
@@ -154,7 +154,7 @@ public class CrisConsumer implements Consumer {
 					
 					if (StringUtils.isNotBlank(authorityKey)) {						
 						if ((typeAuthority.equalsIgnoreCase(SOURCE_INTERNAL))) {							
-							query.addFilterQuery("cris-sourceref:"+ typeAuthority.toLowerCase());
+							query.addFilterQuery("cris-sourceref:"+ typeAuthority);
 							query.addFilterQuery("cris-sourceid:"+ authorityKey);
 						}
 						else {
@@ -174,7 +174,7 @@ public class CrisConsumer implements Consumer {
 					if (rpKey == null) {
 
 						rp.setSourceID(authorityKey);
-						rp.setSourceRef(typeAuthority.toUpperCase());
+						rp.setSourceRef(typeAuthority);
 						
 						List<Metadatum> MetadatumAuthority = toBuild.get(authorityKey);
 						
@@ -182,7 +182,7 @@ public class CrisConsumer implements Consumer {
 						// ResearcherPageUtils.buildTextValue(rp, email,
 						// "email");
 						if(!(typeAuthority.equalsIgnoreCase(SOURCE_INTERNAL))) {
-							ResearcherPageUtils.buildTextValue(rp, authorityKey, typeAuthority.toLowerCase());	
+							ResearcherPageUtils.buildTextValue(rp, authorityKey, typeAuthority);	
 						}						
 
 						if(activateNewObject) {
@@ -190,7 +190,7 @@ public class CrisConsumer implements Consumer {
 						}
 						try {
 							applicationService.saveOrUpdate(crisTargetClass, rp);
-							log.info("Build new ResearcherProfile sourceId/sourceRef:" + authorityKey+"/"+typeAuthority.toUpperCase());
+							log.info("Build new ResearcherProfile sourceId/sourceRef:" + authorityKey+"/"+typeAuthority);
 						}
 						catch(Exception ex) {
 							log.error(ex.getMessage(), ex);
@@ -210,8 +210,10 @@ public class CrisConsumer implements Consumer {
 					Metadatum newValue = Metadatum.copy();
 					newValue.authority = toBuildAuthority.get(orcid);
 					newValue.confidence = Choices.CF_ACCEPTED;
+					ctx.turnOffAuthorisationSystem();
 					item.replaceMetadataValue(Metadatum, newValue);
 					item.update();
+					ctx.restoreAuthSystemState();
 				}
 			}
 		}
