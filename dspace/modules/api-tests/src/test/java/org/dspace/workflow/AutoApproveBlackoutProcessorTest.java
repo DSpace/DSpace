@@ -46,6 +46,7 @@ public class AutoApproveBlackoutProcessorTest extends ContextUnitTest {
         PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
         ShoppingCart shoppingCart = paymentSystemService.getShoppingCartByItemId(context,dataPackage.getItem().getID());
         shoppingCart.setJournalSub(true);
+        shoppingCart.setJournal("Dryad Testing Blackout Journal");
         shoppingCart.update();
     }
 

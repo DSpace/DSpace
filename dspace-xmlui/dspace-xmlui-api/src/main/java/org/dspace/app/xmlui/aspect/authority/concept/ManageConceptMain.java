@@ -149,7 +149,7 @@ public class ManageConceptMain extends AbstractDSpaceTransformer
             query= URLDecoder.decode(query_1, Constants.DEFAULT_ENCODING);
         }catch (UnsupportedEncodingException e)
         {
-            log.error("decode error:"+e);
+            log.error("decode error:"+ e.getMessage(), e);
         }
         String schemeId = parameters.getParameter("scheme",null);
         Scheme scheme = null;

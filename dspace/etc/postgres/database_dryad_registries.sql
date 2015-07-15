@@ -19,7 +19,7 @@ INSERT INTO metadataschemaregistry (metadata_schema_id, namespace, short_id) VAL
 INSERT INTO metadataschemaregistry (metadata_schema_id, namespace, short_id) VALUES (7, 'http://www.dspace.org/system', 'internal');
 INSERT INTO metadataschemaregistry (metadata_schema_id, namespace, short_id) VALUES (3, 'http://rs.tdwg.org/dwc/dwcore/', 'dwc');
 INSERT INTO metadataschemaregistry (metadata_schema_id, namespace, short_id) VALUES (8, 'http://purl.org/dspace/models/person', 'person');
-
+INSERT INTO metadataschemaregistry (metadata_schema_id, namespace, short_id) VALUES (9, 'http://purl.org/dspace/models/journal', 'journal');
 --
 -- Data for Name: metadatafieldregistry
 --
@@ -153,6 +153,26 @@ INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, elemen
 INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (118, 8, 'institution', NULL, NULL);
 INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (119, 1, 'date', 'blackoutUntil', 'Date on which submission should be released from blackout');
 INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (120, 4, 'curatorNotePublic', NULL, NULL);
+
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (121, 9, 'journalID', NULL, NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (122, 9, 'fullname', NULL, NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (123, 9, 'metadataDir', NULL, NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (124, 9, 'parsingScheme', NULL, NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (125, 9, 'integrated', NULL, NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (126, 9, 'allowReviewWorkflow', NULL, NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (127, 9, 'embargoAllowed', NULL, NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (128, 9, 'publicationBlackout', NULL, NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (129, 9, 'subscriptionPaid', NULL, NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (130, 9, 'sponsorName', NULL, NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (131, 9, 'notifyOnReview', NULL, NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (132, 9, 'notifyOnArchive', NULL, NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (133, 9, 'notifyWeekly', NULL, NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (134, 9, 'paymentPlanType', NULL, NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (135, 9, 'customerId', NULL, NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (136, 9, 'manuscriptNumberIgnorePattern', NULL, NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (137, 9, 'description', NULL, NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (138, 9, 'memberName', NULL, NULL);
+
 
 --
 -- Data for Name: bitstreamformatregistry
