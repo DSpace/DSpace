@@ -5,6 +5,7 @@
 --
 -- http://www.dspace.org/license/
 --
+
 create table IF NOT EXISTS cris_orcid_history (id number(10,0) not null, entityId number(10,0), typeId number(10,0), responseMessage clob, lastAttempt timestamp, lastSuccess timestamp, primary key (id));
 create table IF NOT EXISTS cris_orcid_queue (id number(10,0) not null, owner varchar2(255), entityId number(10,0), typeId number(10,0), mode varchar2(255), primary key (id));
 
