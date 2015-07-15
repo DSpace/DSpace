@@ -225,6 +225,8 @@ public class DiscoverUtility
         String query = request.getParameter("query");
         if (StringUtils.isNotBlank(query))
         {
+            // Escape any special characters in this user-entered query
+            query = SearchUtils.getSearchService().escapeQueryChars(query);
             queryArgs.setQuery(query);
         }
 
