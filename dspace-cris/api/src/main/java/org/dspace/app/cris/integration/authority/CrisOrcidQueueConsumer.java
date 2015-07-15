@@ -25,10 +25,12 @@ import org.dspace.event.Event;
 import org.dspace.utils.DSpace;
 
 /**
+ * @author l.pascarelli
+ *
  */
-public class CrisPushOrcidConsumer implements Consumer {
+public class CrisOrcidQueueConsumer implements Consumer {
 
-	private static final Logger log = Logger.getLogger(CrisPushOrcidConsumer.class);
+	private static final Logger log = Logger.getLogger(CrisOrcidQueueConsumer.class);
 
 	private OrcidPreferencesUtils orcidPreferencesUtils = new DSpace().getSingletonService(OrcidPreferencesUtils.class);
 
