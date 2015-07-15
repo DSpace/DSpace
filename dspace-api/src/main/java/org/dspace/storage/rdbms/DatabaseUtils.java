@@ -569,6 +569,14 @@ public class DatabaseUtils
             return null;
         }
 
+        if(tableExists(connection, "cris_orcid_queue")) {
+        	if(tableColumnExists(connection, "cris_orcid_queue", "itemid")) {
+        		return "5.3.0.0";
+        	} else {
+        		return "5.3.0.2";
+        	}
+        }
+        	
         // We will now check prior versions in reverse chronological order, looking
         // for specific tables or columns that were newly created in each version.
         if(tableExists(connection, "jdyna_widget_boolean"))
