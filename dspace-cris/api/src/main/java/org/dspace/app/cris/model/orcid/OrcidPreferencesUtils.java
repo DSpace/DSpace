@@ -60,7 +60,7 @@ public class OrcidPreferencesUtils {
 
 		List<OrcidHistory> orcidHistory = getApplicationService().findOrcidHistoryByEntityIdAndTypeId(obj.getID(),
 				obj.getType());
-		if (orcidHistory != null) {
+		if (orcidHistory != null && !orcidHistory.isEmpty()) {
 			// PUT mode
 			ResearcherPage rp = getApplicationService().getEntityByCrisId(crisId, ResearcherPage.class);
 			RPPropertiesDefinition rpPDef = getApplicationService().findPropertiesDefinitionByShortName(
@@ -109,7 +109,7 @@ public class OrcidPreferencesUtils {
 				}
 			}
 		}
-		return true;
+		return false;
 	}
 
 	private boolean isTokenReleasedForSync(ResearcherPage researcher, String tokenName) {
