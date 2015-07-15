@@ -427,6 +427,9 @@ references to stylesheets pulled directly from the pageMeta element. -->
 				<a href="/pages/dryadlab">DryadLab Home</a>
                         </li>
                         <li>
+				<a href="/pages/dryadLabTips">Using DryadLab Modules</a>
+                        </li>
+                        <li>
 				<a href="/pages/dryadLabFAQ">Frequently Asked Questions</a>
                         </li>
                         <li>
