@@ -10,6 +10,8 @@ package org.dspace.servicemanager.config;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -50,11 +52,17 @@ public final class DSpaceConfigurationService implements ConfigurationService {
 
     public static final String DSPACE_CONFIG_PATH = DEFAULT_CONFIG_DIR + File.separatorChar + DSPACE + DOT_CONFIG;
 
+    // The DSpace Server ID configuration
+    public static final String DSPACE_SERVER_ID = "serverId";
+
     // Current ConfigurationBuilder
-    DefaultConfigurationBuilder configurationBuilder = null;
+    private DefaultConfigurationBuilder configurationBuilder = null;
 
     // Current Configuration
-    protected Configuration configuration = null;
+    private Configuration configuration = null;
+
+    // Current Home directory
+    private String homePath = null;
 
     public DSpaceConfigurationService() {
         // init and load up current config settings
@@ -293,10 +301,10 @@ public final class DSpaceConfigurationService implements ConfigurationService {
      * (using Apache Commons Configuration).
      * @param providedHome DSpace home directory, or null.
      */
-    public void loadInitialConfig(String providedHome)
+    private void loadInitialConfig(String providedHome)
     {
         // See if homePath is specified as a System Property
-        String homePath = System.getProperty(DSPACE_HOME);
+        homePath = System.getProperty(DSPACE_HOME);
 
         // If a provided home was passed in & no system property, use provided home
         if (providedHome != null && homePath == null) {
@@ -337,6 +345,9 @@ public final class DSpaceConfigurationService implements ConfigurationService {
             throw new RuntimeException(ce);
         }
 
+        // Finally, set any dynamic, default properties
+        setDynamicProperties();
+
         log.info("Started up configuration service and loaded settings: " + toString());
     }
 
@@ -346,18 +357,39 @@ public final class DSpaceConfigurationService implements ConfigurationService {
      * Uses the initialized ConfigurationBuilder to reload all configurations.
      */
     @Override
-    public void reloadConfig()
+    public synchronized void reloadConfig()
     {
         try
         {
             configurationBuilder.reload();
             this.configuration = configurationBuilder.getConfiguration();
+
+            // Finally, (re)set any dynamic, default properties
+            setDynamicProperties();
         }
         catch(ConfigurationException ce)
         {
             log.error("Unable to reload configurations based on definition at " + configurationBuilder.getFile().getAbsolutePath(), ce);
         }
         log.info("Reloaded configuration service: " + toString());
+    }
+
+     /**
+     * Sets properties which are determined dynamically rather than
+     * loaded via configuration.
+     */
+    private void setDynamicProperties()
+    {
+        // Ensure our DSPACE_HOME property is set to the determined homePath
+        setProperty(DSPACE_HOME, homePath);
+
+        try {
+            // Attempt to set a default "serverId" property to value of hostname
+            String defaultServerId = InetAddress.getLocalHost().getHostName();
+            setProperty(DSPACE_SERVER_ID, defaultServerId);
+        } catch (UnknownHostException e) {
+            // oh well
+        }
     }
 
     @Override
