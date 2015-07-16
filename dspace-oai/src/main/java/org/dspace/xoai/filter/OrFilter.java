@@ -36,7 +36,7 @@ public class OrFilter extends DSpaceFilter {
 
     @Override
     public SolrFilterResult buildSolrQuery() {
-        return new SolrFilterResult("("+left.buildSolrQuery()+") OR ("+right.buildSolrQuery()+")");
+        return new SolrFilterResult("("+left.buildSolrQuery().getQuery()+") OR ("+right.buildSolrQuery().getQuery()+")");
     }
 
     @Override

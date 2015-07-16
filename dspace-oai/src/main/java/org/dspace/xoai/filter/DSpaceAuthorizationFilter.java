@@ -14,9 +14,7 @@ import java.util.List;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -52,14 +50,6 @@ public class DSpaceAuthorizationFilter extends DSpaceFilter
         boolean pub = false;
         try
         {
-            // For DSpace, if an Item is withdrawn, "isDeleted()" will be true.
-            // In this scenario, we want a withdrawn item to be *shown* so that
-            // we can properly respond with a "deleted" status via OAI-PMH.
-            // Don't worry, this does NOT make the metadata public for withdrawn items,
-            // it merely provides an item "tombstone" via OAI-PMH.
-            if (item.isDeleted())
-                return true;
-
             // If Handle or Item are not found, return false
             String handle = DSpaceItem.parseHandle(item.getIdentifier());
             if (handle == null)

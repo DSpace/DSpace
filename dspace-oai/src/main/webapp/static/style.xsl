@@ -290,6 +290,10 @@
                     </div>
                 </div>
                 <div class="panel-body">
+                    <!-- If this record has a "status", display it as a warning -->
+                    <xsl:if test="oai:header/@status">
+                      <div class="alert alert-warning">Record Status: <xsl:value-of select="oai:header/@status"/></div>
+                    </xsl:if>
                     <div class="panel panel-success">
                         <a data-toggle="collapse">
                             <xsl:attribute name="href">#sets<xsl:value-of select="translate(oai:header/oai:identifier/text(), ':/.', '')"></xsl:value-of></xsl:attribute>
@@ -427,6 +431,10 @@
                     </div>
                 </div>
                 <div class="panel-body">
+                    <!-- If this record has a "status", display it as a warning -->
+                    <xsl:if test="@status">
+                      <div class="alert alert-warning">Record Status: <xsl:value-of select="@status"/></div>
+                    </xsl:if>
                     <div class="panel panel-success">
                         <a data-toggle="collapse">
                             <xsl:attribute name="href">#sets<xsl:value-of select="translate(oai:identifier/text(), ':/.', '')"></xsl:value-of></xsl:attribute>

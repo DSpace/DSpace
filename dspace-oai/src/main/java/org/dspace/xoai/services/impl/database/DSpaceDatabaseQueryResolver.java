@@ -52,12 +52,18 @@ public class DSpaceDatabaseQueryResolver implements DatabaseQueryResolver {
         }
         countParameters.addAll(parameters);
 
+        String whereInArchive = "WHERE i.in_archive=true";
+        if(DatabaseManager.isOracle())
+        {
+            whereInArchive = "WHERE i.in_archive=1";
+        }
+
         if (!where.equals("")) {
-            query += " WHERE i.in_archive=true AND " + where;
-            countQuery += " WHERE i.in_archive=true AND " + where;
+            query += " " + whereInArchive + " AND " + where;
+            countQuery += " " + whereInArchive + " AND " + where;
         } else {
-            query += " WHERE i.in_archive=true";
-            countQuery += " WHERE i.in_archive=true";
+            query += " " + whereInArchive;
+            countQuery += " " + whereInArchive;
         }
 
         query += " ORDER BY i.item_id";
