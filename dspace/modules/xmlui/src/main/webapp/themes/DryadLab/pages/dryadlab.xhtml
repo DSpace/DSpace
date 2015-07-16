@@ -49,16 +49,6 @@
             <button onclick="resetAllModuleFilters(); return false;">Show all</button> 
             or filter by
         </div>
-        <select id="filter-by-standard"
-                style="margin-left: 140px; width: 320px; margin-bottom: 3px;"
-                onchange="updatedFilteredModuleList(); return false;">
-            <option value="CHOOSE ONE">Filter by standard...</option>
-<!-- TODO: Provide a real/sensible list of standards! -->
-            <option>Next Generation Science Standards (NGSS 2013)</option>
-            <option>Common Core State Standards for Mathematics (NGA 2010)</option>
-            <option>TODO: use actual standards, named verbatim in modules</option>
-        </select>
-        <br/>
         <select id="filter-by-grade-level"
                 style="margin-left: 140px; width: 320px; margin-bottom: 3px;"
                 onchange="updatedFilteredModuleList(); return false;">
@@ -68,6 +58,16 @@
             <option value="ap high school">AP high school</option>
             <option value="undergrad">Undergraduate</option>
             <option>TODO: use actual grade levels; named verbatim in modules</option>
+        </select>
+        <br/>
+        <select id="filter-by-standard"
+                style="margin-left: 140px; width: 320px; margin-bottom: 3px;"
+                onchange="updatedFilteredModuleList(); return false;">
+            <option value="CHOOSE ONE">Filter by standard...</option>
+<!-- TODO: Provide a real/sensible list of standards! -->
+            <option>Next Generation Science Standards (NGSS 2013)</option>
+            <option>Common Core State Standards for Mathematics (NGA 2010)</option>
+            <option>TODO: use actual standards, named verbatim in modules</option>
         </select>
         <br/>
         <input id="filter-by-text" type="text" 
@@ -92,10 +92,10 @@ Students will 1) form hypotheses about the influence of environmental variables 
           <li><strong>Instruction Level:</strong>
 Introductory and advanced undergraduate biology courses, AP high school biology
           </li>
-          <li><strong>Academic Standards:</strong><!-- TODO: replace with actual data! -->
+          <li style="display:none;"><strong>Academic Standards:</strong><!-- TODO: replace with actual data! -->
 None
           </li>
-          <li><strong>Duration:</strong>
+          <li style="display:none;"><strong>Duration:</strong>
 30 minutes + homework
           </li>
           <li><strong>Keywords:</strong>
@@ -111,8 +111,6 @@ hypothesis formulation, hypothesis testing, data visualization, graphing, adapta
         </ul>
         </li>
 
-<!--
--->
         <li class="ds-artifact-item even">
             <span class="title">
 Survivorship in the natural world
@@ -127,10 +125,10 @@ Real-life data from seven wild primate populations provide examples of real surv
           <li><strong>Instruction Level:</strong>
 Undergraduate (Intro Biology or Intro Ecology), AP Biology
           </li>
-          <li><strong>Academic Standards:</strong><!-- TODO: replace with actual data! -->
+          <li style="display:none;"><strong>Academic Standards:</strong><!-- TODO: replace with actual data! -->
 Next Generation Science Standards (NGSS 2013)
           </li>
-          <li><strong>Duration:</strong>
+          <li style="display:none;"><strong>Duration:</strong>
 Flexible: 20 minutes - 2.5 hours
           </li>
           <li><strong>Keywords:</strong>
@@ -158,13 +156,13 @@ Students will be introduced to different factors that might affect extinction ri
         </p>
         <ul class="text-list">
           <li><strong>Instruction Level:</strong>
-high school, AP high school, intro level undergrad biology
+Intro level undergrad biology, AP high school, high school 
           </li>
-          <li><strong>Academic Standards:</strong><!-- TODO: replace with actual data! -->
+          <li style="display:none;"><strong>Academic Standards:</strong><!-- TODO: replace with actual data! -->
 Next Generation Science Standards (NGSS 2013),
 Common Core State Standards for Mathematics (NGA 2010)
           </li>
-          <li><strong>Duration:</strong>
+          <li style="display:none;"><strong>Duration:</strong>
 1.5 hours OR 15 minutes + homework
           </li>
           <li><strong>Keywords:</strong>
@@ -192,10 +190,10 @@ TODO
           <li><strong>Instruction Level:</strong>
 TODO
           </li>
-          <li><strong>Academic Standards:</strong><!-- TODO: replace with actual data! -->
+          <li style="display:none;"><strong>Academic Standards:</strong><!-- TODO: replace with actual data! -->
 Common Core State Standards for Mathematics (NGA 2010)
           </li>
-          <li><strong>Duration:</strong>
+          <li style="display:none;"><strong>Duration:</strong>
 TODO
           </li>
           <li><strong>Keywords:</strong>
