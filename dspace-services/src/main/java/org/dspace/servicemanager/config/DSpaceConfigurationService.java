@@ -8,6 +8,7 @@
 package org.dspace.servicemanager.config;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.InetAddress;
@@ -26,6 +27,7 @@ import org.dspace.services.ConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.SimpleTypeConverter;
+import org.springframework.core.io.ClassPathResource;
 
 /**
  * The central DSpace configuration service. Uses Apache Commons Configuration
@@ -328,6 +330,23 @@ public final class DSpaceConfigurationService implements ConfigurationService {
 
         // Based on homePath get full path to the configuration definition
         String configDefinition = homePath + File.separatorChar + DSPACE_CONFIG_DEFINITION_PATH;
+
+        // Check if our configuration definition exists in the homePath
+        File configDefFile = new File(configDefinition);
+        if(!configDefFile.exists())
+        {
+            try
+            {
+                //If it doesn't exist, check for a configuration definition on Classpath
+                // (NOTE: This is mostly for Unit Testing to find the test config-definition.xml)
+                ClassPathResource resource = new ClassPathResource(DSPACE_CONFIG_DEFINITION_PATH);
+                configDefinition = resource.getFile().getAbsolutePath();
+            }
+            catch(IOException ioe)
+            {
+                log.error("Error attempting to load configuration definition from classpath", ioe);
+            }
+        }
 
         try
         {

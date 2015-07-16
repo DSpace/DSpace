@@ -29,9 +29,6 @@ public class DSpaceConfigurationServiceTest {
 
     @Before
     public void init() {
-        // Give a default setting to DSPACE_HOME
-        System.setProperty(DSpaceConfigurationService.DSPACE_HOME, "src/test/resources");
-
         configurationService = new DSpaceConfigurationService();
 
         // clear out default configs
