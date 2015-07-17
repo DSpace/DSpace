@@ -116,6 +116,73 @@ public interface ConfigurationService {
      * @return the property value OR null if none is found
      */
     public String getProperty(String name);
+
+    /**
+     * Convenience method - get a configuration property (setting) from
+     * the system as a String.
+     *
+     * @param name the property name
+     * @param defaultValue default value if property not found
+     * @return the property value OR default value if not found
+     */
+    public String getProperty(String name, String defaultValue);
+
+    /**
+     * Convenience method - get a configuration property (setting) from
+     * the system as a boolean value.
+     *
+     * @param name the property name
+     * @return the boolean property value (true/false)
+     */
+    public boolean getBooleanProperty(String name);
+
+    /**
+     * Convenience method - get a configuration property (setting) from
+     * the system as a boolean value.
+     *
+     * @param name the property name
+     * @param defaultValue the default value if property not found
+     * @return the boolean property value (true/false) or default value if not found
+     */
+    public boolean getBooleanProperty(String name, boolean defaultValue);
+
+    /**
+     * Convenience method - get a configuration property (setting) from
+     * the system as an int value.
+     *
+     * @param name the property name
+     * @return the integer property value
+     */
+    public int getIntProperty(String name);
+
+    /**
+     * Convenience method - get a configuration property (setting) from
+     * the system as an int value.
+     *
+     * @param name the property name
+     * @param defaultValue the default value if property not found
+     * @return the integer property value or default value if not found
+     */
+    public int getIntProperty(String name, int defaultValue);
+
+    /**
+     * Convenience method - get a configuration property (setting) from
+     * the system as a long value.
+     *
+     * @param name the property name
+     * @return the long property value
+     */
+    public long getLongProperty(String name);
+
+    /**
+     * Convenience method - get a configuration property (setting) from
+     * the system as a long value.
+     *
+     * @param name the property name
+     * @param defaultValue the default value if property not found
+     * @return the long property value or default value if not found
+     */
+    public long getLongProperty(String name, long defaultValue);
     
     /**
      * Convenience method - get a configuration property (setting) from
