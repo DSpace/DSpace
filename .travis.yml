@@ -1,5 +1,5 @@
 language: java
-sudo: false
+sudo: required
 
 addons:
   postgresql: "9.4"
