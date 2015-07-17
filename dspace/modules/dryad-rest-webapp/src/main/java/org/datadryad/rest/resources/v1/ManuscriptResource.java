@@ -10,6 +10,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -45,12 +46,12 @@ public class ManuscriptResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getManuscripts(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode) {
+    public Response getManuscripts(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode, @QueryParam("results") Integer resultParam) {
         try {
             // Returning a list requires POJO turned on
             StoragePath path = new StoragePath();
             path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
-            return Response.ok(manuscriptStorage.getAll(path)).build();
+            return Response.ok(manuscriptStorage.getResults(path, resultParam)).build();
         } catch (StorageException ex) {
             log.error("Exception getting manuscripts", ex);
             ErrorsResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to list manuscripts", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());

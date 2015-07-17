@@ -101,6 +101,24 @@ public class OrganizationJSONStorageImpl extends AbstractOrganizationStorage {
     }
 
     @Override
+    protected void addResults(StoragePath path, List<Organization> organizations, Integer limit) throws StorageException {
+        File[] files = this.storageDirectory.listFiles(new FilenameFilter() {
+
+            @Override
+            public boolean accept(File file, String string) {
+                return string.endsWith(FILE_EXTENSION);
+            }
+        });
+        try {
+            for(File file : files) {
+                organizations.add((Organization)reader.readValue(file));
+            }
+        } catch (IOException ex) {
+            throw new StorageException("IO Exception reading files", ex);
+        }
+    }
+
+    @Override
     protected void createObject(StoragePath path, Organization organization) throws StorageException {
         String baseFileName = getBaseFileName(organization);
         File outputFile = buildFile(this.storageDirectory, baseFileName);

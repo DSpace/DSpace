@@ -99,6 +99,25 @@ public class ManuscriptJSONStorageImpl extends AbstractManuscriptStorage {
     }
 
     @Override
+    protected void addResults(StoragePath path, List<Manuscript> manuscripts, Integer limit) throws StorageException {
+        File subdirectory = getSubdirectory(path);
+        File[] files = subdirectory.listFiles(new FilenameFilter() {
+
+            @Override
+            public boolean accept(File file, String string) {
+                return string.endsWith(FILE_EXTENSION);
+            }
+        });
+        try {
+            for(File file : files) {
+                manuscripts.add((Manuscript)reader.readValue(file));
+            }
+        } catch (IOException ex) {
+            throw new StorageException("IO Exception reading files", ex);
+        }
+    }
+
+    @Override
     protected void createObject(StoragePath path, Manuscript manuscript) throws StorageException {
         File subdirectory = getSubdirectory(path);
         String baseFileName = getBaseFileName(manuscript);

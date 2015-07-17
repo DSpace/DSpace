@@ -4,6 +4,7 @@ package org.datadryad.rest.storage.rdbms;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.Integer;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,6 +44,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     // active is stored as String because DatabaseManager doesn't support Boolean
     static final String COLUMN_ACTIVE = "active";
     static final String COLUMN_JSON_DATA = "json_data";
+    static final int DEFAULT_LIMIT = 1000;
 
     static final List<String> MANUSCRIPT_COLUMNS = Arrays.asList(
             COLUMN_ID,
@@ -180,14 +182,16 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         }
     }
 
-    private static List<Manuscript> getManuscripts(Context context, String organizationCode) throws SQLException, IOException {
+    private static List<Manuscript> getManuscripts(Context context, String organizationCode, int limit) throws SQLException, IOException {
         List<Manuscript> manuscripts = new ArrayList<Manuscript>();
         Integer organizationId = getOrganizationInternalId(context, organizationCode);
+
         if(organizationId == NOT_FOUND) {
             return manuscripts;
         } else {
-            String query = "SELECT * FROM MANUSCRIPT WHERE organization_id = ? AND active = ?";
-            TableRowIterator rows = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, organizationId, ACTIVE_TRUE);
+            log.info ("returning "+limit+ " results");
+            String query = "SELECT * FROM MANUSCRIPT WHERE organization_id = ? AND active = ? ORDER BY manuscript_id DESC LIMIT ? ";
+            TableRowIterator rows = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, organizationId, ACTIVE_TRUE, limit);
             while(rows.hasNext()) {
                 TableRow row = rows.next();
                 manuscripts.add(manuscriptFromTableRow(row));
@@ -257,7 +261,25 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         String organizationCode = getOrganizationCode(path);
         try {
             Context context = getContext();
-            manuscripts.addAll(getManuscripts(context, organizationCode));
+            manuscripts.addAll(getManuscripts(context, organizationCode, DEFAULT_LIMIT));
+            completeContext(context);
+        } catch (SQLException ex) {
+            throw new StorageException("Exception finding manuscripts", ex);
+        } catch (IOException ex) {
+            throw new StorageException("Exception reading manuscripts", ex);
+        }
+    }
+
+    @Override
+    protected void addResults(StoragePath path, List<Manuscript> manuscripts, Integer limit) throws StorageException {
+        String organizationCode = getOrganizationCode(path);
+        int limitInt = DEFAULT_LIMIT;
+        if (limit != null) {
+            limitInt = limit.intValue();
+        }
+        try {
+            Context context = getContext();
+            manuscripts.addAll(getManuscripts(context, organizationCode, limitInt));
             completeContext(context);
         } catch (SQLException ex) {
             throw new StorageException("Exception finding manuscripts", ex);
