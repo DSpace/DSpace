@@ -52,7 +52,7 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  * create or remove a workflow group, the change is only reflected in the
  * database after calling <code>update</code>. The default group of submitters
  * is slightly different - creating or removing this has instant effect.
- *
+ * 
  * @author Robert Tansley
  * @version $Revision$
  */
@@ -62,10 +62,10 @@ public class Collection extends DSpaceObject
     private static Logger log = Logger.getLogger(Collection.class);
 
     /** Our context */
-    private Context ourContext;
+    private final Context ourContext;
 
     /** The table row corresponding to this item */
-    private TableRow collectionRow;
+    private final TableRow collectionRow;
 
     /** The logo bitstream */
     private Bitstream logo;
@@ -86,7 +86,7 @@ public class Collection extends DSpaceObject
      * Groups corresponding to workflow steps - NOTE these start from one, so
      * workflowGroups[0] corresponds to workflow_step_1.
      */
-    private Group[] workflowGroup;
+    private final Group[] workflowGroup;
 
     /** The default group of submitters */
     private Group submitters;
@@ -107,7 +107,7 @@ public class Collection extends DSpaceObject
 
     /**
      * Construct a collection with the given table row
-     *
+     * 
      * @param context
      *            the context this object exists in
      * @param row
@@ -164,12 +164,12 @@ public class Collection extends DSpaceObject
 
     /**
      * Get a collection from the database. Loads in the metadata
-     *
+     * 
      * @param context
      *            DSpace context object
      * @param id
      *            ID of the collection
-     *
+     * 
      * @return the collection, or null if the ID is invalid.
      * @throws SQLException
      */
@@ -210,10 +210,10 @@ public class Collection extends DSpaceObject
     /**
      * Create a new collection, with a new ID. This method is not public, and
      * does not check authorisation.
-     *
+     * 
      * @param context
      *            DSpace context object
-     *
+     * 
      * @return the newly created collection
      * @throws SQLException
      * @throws AuthorizeException
@@ -227,10 +227,10 @@ public class Collection extends DSpaceObject
     /**
      * Create a new collection, with a new ID. This method is not public, and
      * does not check authorisation.
-     *
+     * 
      * @param context
      *            DSpace context object
-     *
+     * 
      * @param handle
      *            the pre-determined Handle to assign to the new community
      * @return the newly created collection
@@ -304,12 +304,12 @@ public class Collection extends DSpaceObject
 
     /**
      * Find the collections that match the search query
-     *
+     * 
      * @param context
      *            DSpace context
      * @param query
      *            The search string
-     *
+     * 
      * @return search function with other parametersx
      */
     public static Collection[] search(Context context, String query)
@@ -321,7 +321,7 @@ public class Collection extends DSpaceObject
     /**
      * Find the collections that match the search query. This method also allows
      * offsets and limits for pagination purposes.
-     *
+     * 
      * @param context
      *            DSpace context
      * @param query
@@ -330,7 +330,7 @@ public class Collection extends DSpaceObject
      *            Inclusive offset
      * @param limit
      *            Maximum number of matches returned
-     *
+     * 
      * @return array of Collection objects
      */
     public static Collection[] search(Context context, String query,
@@ -456,12 +456,12 @@ public class Collection extends DSpaceObject
      * Returns the total number of collections returned by a specific query,
      * without the overhead of creating the Collection objects to store the
      * results.
-     *
+     * 
      * @param context
      *            DSpace context
      * @param query
      *            The search string
-     *
+     * 
      * @return the number of collections matching the query
      */
     public static int searchResultCount(Context context, String query)
@@ -506,10 +506,10 @@ public class Collection extends DSpaceObject
     /**
      * Get all collections in the system. These are alphabetically sorted by
      * collection name.
-     *
+     * 
      * @param context
      *            DSpace context object
-     *
+     * 
      * @return the collections in the system
      * @throws SQLException
      */
@@ -557,7 +557,7 @@ public class Collection extends DSpaceObject
 
     /**
      * Get all collections in the system. Adds support for limit and offset.
-     *
+     * 
      * @param context
      * @param limit
      * @param offset
@@ -611,7 +611,7 @@ public class Collection extends DSpaceObject
 
     /**
      * Get the in_archive items in this collection. The order is indeterminate.
-     *
+     * 
      * @return an iterator over the items in the collection.
      * @throws SQLException
      */
@@ -631,7 +631,7 @@ public class Collection extends DSpaceObject
     /**
      * Get the in_archive items in this collection. The order is indeterminate.
      * Provides the ability to use limit and offset, for efficient paging.
-     *
+     * 
      * @param limit
      *            Max number of results in set
      * @param offset
@@ -656,7 +656,7 @@ public class Collection extends DSpaceObject
 
     /**
      * Get all the items in this collection. The order is indeterminate.
-     *
+     * 
      * @return an iterator over the items in the collection.
      * @throws SQLException
      */
@@ -674,7 +674,7 @@ public class Collection extends DSpaceObject
 
     /**
      * Get the internal ID of this collection
-     *
+     * 
      * @return the internal identifier
      */
     @Override
@@ -706,12 +706,12 @@ public class Collection extends DSpaceObject
 
     /**
      * Get the value of a metadata field
-     *
+     * 
      * @param field
      *            the name of the metadata field to get
-     *
+     * 
      * @return the value of the metadata field
-     *
+     * 
      * @exception IllegalArgumentException
      *                if the requested metadata field doesn't exist
      */
@@ -723,12 +723,12 @@ public class Collection extends DSpaceObject
 
     /**
      * Set a metadata value
-     *
+     * 
      * @param field
      *            the name of the metadata field to get
      * @param value
      *            value to set the field to
-     *
+     * 
      * @exception IllegalArgumentException
      *                if the requested metadata field doesn't exist
      * @exception MissingResourceException
@@ -776,7 +776,7 @@ public class Collection extends DSpaceObject
     /**
      * Get the logo for the collection. <code>null</code> is returned if the
      * collection does not have a logo.
-     *
+     * 
      * @return the logo of the collection, or <code>null</code>
      */
     public Bitstream getLogo()
@@ -791,10 +791,10 @@ public class Collection extends DSpaceObject
      * will need to be called for the change to take effect. Setting a logo and
      * not calling <code>update</code> later may result in a previous logo lying
      * around as an "orphaned" bitstream.
-     *
+     * 
      * @param is
      *            the stream to use as the new logo
-     *
+     * 
      * @return the new logo bitstream, or <code>null</code> if there is no logo
      *         (<code>null</code> was passed in)
      * @throws AuthorizeException
@@ -856,10 +856,10 @@ public class Collection extends DSpaceObject
      * Note that while the new group is created in the database, the association
      * between the group and the collection is not written until
      * <code>update</code> is called.
-     *
+     * 
      * @param step
      *            the step (1-3) of the workflow to create or get the group for
-     *
+     * 
      * @return the workflow group associated with this collection
      * @throws SQLException
      * @throws AuthorizeException
@@ -892,7 +892,7 @@ public class Collection extends DSpaceObject
      * Set the workflow group corresponding to a particular workflow step.
      * <code>null</code> can be passed in if there should be no associated group
      * for that workflow step; any existing group is NOT deleted.
-     *
+     * 
      * @param step
      *            the workflow step (1-3)
      * @param g
@@ -917,10 +917,10 @@ public class Collection extends DSpaceObject
      * Get the the workflow group corresponding to a particular workflow step.
      * This returns <code>null</code> if there is no group associated with this
      * collection for the given step.
-     *
+     * 
      * @param step
      *            the workflow step (1-3)
-     *
+     * 
      * @return the group of reviewers or <code>null</code>
      */
     public Group getWorkflowGroup(int step)
@@ -933,7 +933,7 @@ public class Collection extends DSpaceObject
      * either the newly created group or the previously existing one. Note that
      * other groups may also be allowed to submit to this collection by the
      * authorization system.
-     *
+     * 
      * @return the default group of submitters associated with this collection
      * @throws SQLException
      * @throws AuthorizeException
@@ -995,7 +995,7 @@ public class Collection extends DSpaceObject
      * <P>
      * The default group of submitters for collection 100 is the one called
      * <code>collection_100_submit</code>.
-     *
+     * 
      * @return the default group of submitters, or <code>null</code> if there is
      *         no default group.
      */
@@ -1008,7 +1008,7 @@ public class Collection extends DSpaceObject
      * Create a default administrators group if one does not already exist.
      * Returns either the newly created group or the previously existing one.
      * Note that other groups may also be administrators.
-     *
+     * 
      * @return the default group of editors associated with this collection
      * @throws SQLException
      * @throws AuthorizeException
@@ -1071,7 +1071,7 @@ public class Collection extends DSpaceObject
      * <P>
      * The default group of administrators for collection 100 is the one called
      * <code>collection_100_admin</code>.
-     *
+     * 
      * @return group of administrators, or <code>null</code> if there is no
      *         default group.
      */
@@ -1084,7 +1084,7 @@ public class Collection extends DSpaceObject
      * Get the license that users must grant before submitting to this
      * collection. If the collection does not have a specific license, the
      * site-wide default is returned.
-     *
+     * 
      * @return the license for this collection
      */
     public String getLicense()
@@ -1103,7 +1103,7 @@ public class Collection extends DSpaceObject
     /**
      * Get the license that users must grant before submitting to this
      * collection.
-     *
+     * 
      * @return the license for this collection
      */
     public String getLicenseCollection()
@@ -1113,7 +1113,7 @@ public class Collection extends DSpaceObject
 
     /**
      * Find out if the collection has a custom license
-     *
+     * 
      * @return <code>true</code> if the collection has a custom license
      */
     public boolean hasCustomLicense()
@@ -1126,7 +1126,7 @@ public class Collection extends DSpaceObject
     /**
      * Set the license for this collection. Passing in <code>null</code> means
      * that the site-wide default will be used.
-     *
+     * 
      * @param license
      *            the license, or <code>null</code>
      */
@@ -1140,7 +1140,7 @@ public class Collection extends DSpaceObject
      * if the collection does not have a template. Submission mechanisms may
      * copy this template to provide a convenient starting point for a
      * submission.
-     *
+     * 
      * @return the item template, or <code>null</code>
      */
     public Item getTemplateItem() throws SQLException
@@ -1153,7 +1153,7 @@ public class Collection extends DSpaceObject
      * no action is taken. Caution: Make sure you call <code>update</code> on
      * the collection after doing this, or the item will have been created but
      * the collection record will not refer to it.
-     *
+     * 
      * @throws SQLException
      * @throws AuthorizeException
      */
@@ -1180,7 +1180,7 @@ public class Collection extends DSpaceObject
      * record in the database, the collection record will be changed, including
      * any other changes made; in other words, this method does an
      * <code>update</code>.
-     *
+     * 
      * @throws SQLException
      * @throws AuthorizeException
      * @throws IOException
@@ -1218,7 +1218,7 @@ public class Collection extends DSpaceObject
      * the item and the collection - it does nothing like set an issue date,
      * remove a personal workspace item etc. This has instant effect;
      * <code>update</code> need not be called.
-     *
+     * 
      * @param item
      *            item to add
      * @throws SQLException
@@ -1246,7 +1246,7 @@ public class Collection extends DSpaceObject
 
     /**
      * Remove an item. If the item is then orphaned, it is deleted.
-     *
+     * 
      * @param item
      *            item to remove
      * @throws SQLException
@@ -1266,7 +1266,11 @@ public class Collection extends DSpaceObject
                         "SELECT COUNT(DISTINCT collection_id) AS num FROM collection2item WHERE item_id= ? ",
                         item.getID());
 
-        DatabaseManager.setConstraintDeferred(ourContext, "coll2item_item_fk");
+        // First, remove its association with this collection
+        DatabaseManager.updateQuery(ourContext,
+                "DELETE FROM collection2item WHERE collection_id= ? "
+                        + "AND item_id= ? ", getID(), item.getID());
+
         if (row.getLongColumn("num") == 1)
         {
             // Orphan; delete it
@@ -1287,7 +1291,7 @@ public class Collection extends DSpaceObject
     /**
      * Update the collection metadata (including logo and workflow groups) to
      * the database. Inserts if this is a new collection.
-     *
+     * 
      * @throws SQLException
      * @throws IOException
      * @throws AuthorizeException
@@ -1371,7 +1375,7 @@ public class Collection extends DSpaceObject
      * Delete the collection, including the metadata and logo. Items that are
      * then orphans are deleted. Groups associated with this collection
      * (workflow participants and submitters) are NOT deleted.
-     *
+     * 
      * @throws SQLException
      * @throws AuthorizeException
      * @throws IOException
@@ -1561,7 +1565,7 @@ public class Collection extends DSpaceObject
 
     /**
      * Get the communities this collection appears in
-     *
+     * 
      * @return array of <code>Community</code> objects
      * @throws SQLException
      */
@@ -1621,7 +1625,7 @@ public class Collection extends DSpaceObject
      * Get the communities this collection appears in. Gets only the immediate
      * parent communities, not all ancestors, which is unlike
      * Community.getParents()
-     *
+     * 
      * @return array of <code>Community</code> objects
      * @throws SQLException
      */
@@ -1666,10 +1670,10 @@ public class Collection extends DSpaceObject
     /**
      * Return <code>true</code> if <code>other</code> is the same Collection as
      * this object, <code>false</code> otherwise
-     *
+     * 
      * @param other
      *            object to compare to
-     *
+     * 
      * @return <code>true</code> if object passed in represents the same
      *         collection as this object
      */
@@ -1707,7 +1711,7 @@ public class Collection extends DSpaceObject
     /**
      * Utility method for reading in a group from a group ID in a column. If the
      * column is null, null is returned.
-     *
+     * 
      * @param col
      *            the column name to read
      * @return the group referred to by that column, or null
@@ -1725,7 +1729,7 @@ public class Collection extends DSpaceObject
 
     /**
      * return type found in Constants
-     *
+     * 
      * @return int Constants.COLLECTION
      */
     @Override
@@ -1738,13 +1742,13 @@ public class Collection extends DSpaceObject
      * return an array of collections that user has a given permission on
      * (useful for trimming 'select to collection' list) or figuring out which
      * collections a person is an editor for.
-     *
+     * 
      * @param context
      * @param comm
      *            (optional) restrict search to a community, else null
      * @param actionID
      *            of the action
-     *
+     * 
      * @return Collection [] of collections with matching permissions
      * @throws SQLException
      */
@@ -1782,7 +1786,7 @@ public class Collection extends DSpaceObject
 
     /**
      * counts items in this collection
-     *
+     * 
      * @return total items
      */
     public int countItems() throws SQLException
