@@ -1,4 +1,4 @@
-/*Desde acá van los estilos para la pagina de statistics */
+/* Estilos de las páginas "Statistics"*/
 
 .contenedor-cuadrado{
 	width:20%;
@@ -46,25 +46,35 @@
 .tamanio{
 	height:300px;
 }
+
+/* chartist-js - "Pie" chart styles*/
 .tamanio .ct-chart-pie{
 	height:500px;
+	overflow: visible;
 }
 
 .tamanio svg g foreignObject .ct-label{
 	font-size:10px ;
 }
-.tamanio svg g  .ct-label{
-	font-size:16px ;
+
+.tamanio .ct-chart-pie g.ct-series:hover{
+  stroke: #585858;
+  stroke-width: 1px;
 }
-/*.ct-chart .ct-series.ct-series-a .ct-area, .ct-chart .ct-series.ct-series-a .ct-slice:not(.ct-donut){
-	fill:#758fbc !important;
+
+.tamanio .ct-chart-pie g.ct-series:active{
+  stroke: #FF4000; 
+  stroke-width: 1px;
 }
-.ct-chart .ct-series.ct-series-b .ct-area, .ct-chart .ct-series.ct-series-b .ct-slice:not(.ct-donut){
-	fill:#436f93 !important;
+
+@media screen and (max-width: 320px){  .tamanio .ct-chart-pie g.ct-series text {
+      font-size: 13px; }
 }
-.ct-chart .ct-series.ct-series-c .ct-area, .ct-chart .ct-series.ct-series-c .ct-slice:not(.ct-donut){
-	fill:#43968a !important;
+@media screen and (min-width: 321px) and (max-width: 767px){ .tamanio .ct-chart-pie g.ct-series text {
+      font-size: 14px; }
 }
-.ct-chart .ct-series.ct-series-d .ct-area, .ct-chart .ct-series.ct-series-d .ct-slice:not(.ct-donut){
-	fill:#80bfbc !important;
-}*/
+
+@media screen and (min-width: 768px){ .tamanio .ct-chart-pie g.ct-series text {
+      font-size: 16px; }
+}
+

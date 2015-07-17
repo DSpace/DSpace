@@ -453,50 +453,73 @@
 			});
 		</script>
 		<!-- Este script genera el grafico de tortas para las estadisticas del item -->
-		<script>
+		<script type="text/javascript">
 		 $(document).ready(function(){	
 		 if($( "#aspect_statistics_StatisticsTransformer_div_item-home" ).length )
 		 {
-		 		var data = {
+		 	// Configure data for "Pie" chart.
+		 	var data = {
 			  labels: [<xsl:for-each select="/dri:document/dri:body/dri:div[@n='item-home']/dri:div[@n='stats']/dri:table[last()-1]/dri:row/dri:cell[text()!='' and @role='data' and @rend='labelcell']">'<xsl:value-of select="." />',</xsl:for-each>],
 			  series: [<xsl:for-each select="/dri:document/dri:body/dri:div[@n='item-home']/dri:div[@n='stats']/dri:table[last()-1]/dri:row/dri:cell[text()!='' and @role='data' and @rend='datacell']">'<xsl:value-of select="." />',</xsl:for-each>]
 			};
 			
-			var options = {
-			  labelInterpolationFnc: function(value) {
-			    return value;
-			  },
+			/*Calculate: what series are under the 'minimumUmbralProportion' of the statistics values? 
+			  Group them in a group 'others' to prevent a label overlay. */
+			var minimumUmbralProportion = 0.04;
+			var total = data.series.reduce(function sum(prev, curr) { return parseInt(prev) + parseInt(curr); });
+			var totalAccessUnderUmbral = 0; 
+			<xsl:text disable-output-escaping="yes">
+			data.series = data.series.filter(function(element, index){
+				if (parseInt(element) / total &lt; minimumUmbralProportion){
+					//If element is under the umbral, mark the corresponding label as to delete.
+					data.labels.splice(index,1,'-1');
+					totalAccessUnderUmbral += parseInt(element);
+					return false;
+				}
+				return true;
+			});
+			</xsl:text>
+			data.labels = data.labels.filter(function(element, index){
+				if (element == '-1'){
+					return false;
+				}
+				return true;
+			});
+			data.labels.push('<i18n:text>xmlui.statistics.display.chartist.country.others</i18n:text>');
+			data.series.push(totalAccessUnderUmbral.toString());
 			
-		    labelOffset: 100,
-		    labelDirection: 'explode',
-		     width: 600,
-	    	height: 300
+			// Configure options for "Pie" chart.
+			var options = {
+			  labelInterpolationFnc: function(value, index) {
+			    var pertentage = (parseInt(data.series[index]) / total * 100).toFixed(1);
+			    return value + ' (' + pertentage.toString() + '%)';
+			  },
+			  labelOffset: 100,
+			  labelDirection: 'explode',
+			  chartPadding: {top: 40, right: 5, bottom: 40, left: 5}
 			};
 			
 			var responsiveOptions = [
-				['screen and (min-width: 1024px)', {
-			    labelOffset: 80,
-			    chartPadding: 50
-			  }]
-			];
-			var responsiveOptions2 = [
-			  ['screen and (min-width: 640px)', {
-			    chartPadding: 30,
-			    labelOffset: 100,
-			    labelDirection: 'explode',
-			    labelInterpolationFnc: function(value) {
-			      return value;
-			    }
+			  ['screen and (max-width: 767px)', {
+			    labelOffset: 5,
+			    labelPosition: 'outside',
 			  }],
-			  ['screen and (min-width: 1024px)', {
+			  //Rule to disable the percentage when the device be in 'portrait' orientation. 
+			  //Otherwise, on this width (less than 768px), the text will be displayed 'out' of the screen. 
+			  ['screen and (max-width: 767px) and (orientation: portrait)', {
+			  	labelInterpolationFnc: function(value) {
+			  		return value;
+			  	},
+			  }],
+			  ['screen and (min-width: 768px)', {
 			    labelOffset: 80,
-			    chartPadding: 20
 			  }]
 			];
-				new Chartist.Pie('#chart2', data, options, responsiveOptions);
-		 }
-				
-			});
+			
+			// Create the "Pie" chart.
+			new Chartist.Pie('#chart2', data, options, responsiveOptions);
+		 	}
+		});
 		</script>
 		
 		 <script type="text/javascript">

@@ -1985,6 +1985,7 @@
     <message key="xmlui.statistics.display.table.workflow.step.selectSingleReviewer.singleUserReviewStep.autoassignAction">Acción de autoasignar por usuario</message>
     <message key="xmlui.statistics.display.table.workflow.step.selectSingleReviewer.singleUserReviewStep.singleuserreviewaction">Acción de revisión por usario</message>
 
+	<message key="xmlui.statistics.display.chartist.country.others">Otros países</message>
 
 	<!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

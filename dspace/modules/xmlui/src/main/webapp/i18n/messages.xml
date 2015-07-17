@@ -2142,6 +2142,7 @@
     <message key="xmlui.statistics.display.table.workflow.step.selectSingleReviewer.singleUserReviewStep.autoassignAction">Single User Auto Assign Action</message>
     <message key="xmlui.statistics.display.table.workflow.step.selectSingleReviewer.singleUserReviewStep.singleuserreviewaction">Single User Review Action</message>
 
+	<message key="xmlui.statistics.display.chartist.country.others">Another countries</message>
 
     <!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
