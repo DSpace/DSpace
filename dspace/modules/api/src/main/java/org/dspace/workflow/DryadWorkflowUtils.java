@@ -188,19 +188,7 @@ public class DryadWorkflowUtils {
                     }
                 }
             } else {
-                // now the minority case (as we clean up the data)
-                String[] parts = metadata.value.split("\\s+|\\.");
-                String author = parts[parts.length - 1].replace("\\s+|\\.", "");
-                char ch;
-
-                authorString.append(author).append(" ");
-
-                for (int index = 0; index < parts.length - 1; index++) {
-                    if (parts[index].length() > 0) {
-                        ch = parts[index].replace("\\s+|\\.", "").charAt(0);
-                        authorString.append(ch);
-                    }
-                }
+                authorString.append(metadata.value);
             }
             authorString.append("@");
 
