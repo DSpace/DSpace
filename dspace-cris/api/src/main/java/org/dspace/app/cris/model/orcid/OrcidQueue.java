@@ -15,6 +15,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Type;
+
 import it.cilea.osd.common.model.IdentifiableObject;
 
 @Entity
@@ -46,6 +48,11 @@ public class OrcidQueue extends IdentifiableObject {
     private Integer typeId;
     
     private String mode;
+    
+    @Type(type="org.hibernate.type.StringClobType")
+    private String fastlookupObjectName;
+    
+    private String fastlookupUuid;
     
 	@Override
 	public Integer getId() {
@@ -87,6 +94,22 @@ public class OrcidQueue extends IdentifiableObject {
 
 	public void setOwner(String owner) {
 		this.owner = owner;
+	}
+
+	public String getFastlookupObjectName() {
+		return fastlookupObjectName;
+	}
+
+	public void setFastlookupObjectName(String fastlookupObjectName) {
+		this.fastlookupObjectName = fastlookupObjectName;
+	}
+
+	public String getFastlookupUuid() {
+		return fastlookupUuid;
+	}
+
+	public void setFastlookupUuid(String fastlookupUuid) {
+		this.fastlookupUuid = fastlookupUuid;
 	}
 
 }

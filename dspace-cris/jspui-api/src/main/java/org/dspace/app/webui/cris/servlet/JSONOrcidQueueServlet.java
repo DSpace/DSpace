@@ -78,7 +78,9 @@ public class JSONOrcidQueueServlet extends JSONRequest{
         	JsonElement tree = json.toJsonTree(dto);
         	jo.add("result", tree);
         }        
-        resp.setContentType("text/plain");
+        jo.addProperty("iTotalRecords", queue.size());
+        jo.addProperty("iTotalDisplayRecords", queue.size());
+        resp.setContentType("application/json");
 //        if you works in localhost mode and use IE10 to debug the feature uncomment the follow line
 //        resp.setHeader("Access-Control-Allow-Origin","*");
         resp.getWriter().write(jo.toString());
@@ -93,26 +95,13 @@ public class JSONOrcidQueueServlet extends JSONRequest{
         {
             for (OrcidQueue record : records)
             {
-                Integer entityId = record.getEntityId();
-                Integer typeId = record.getTypeId();
-                DSpaceObject dso = null;
-                if(Constants.ITEM == typeId) {
-                	dso = Item.find(context, entityId);
-                } else {
-                    if(CrisConstants.PROJECT_TYPE_ID == typeId) {
-                    	dso = applicationService.get(Project.class, entityId);
-                    }
-                    else {
-                    	dso = applicationService.get(ResearcherPage.class, entityId);
-                    }
-                }
-                 
                 Map<String, Object> data = new HashMap<String, Object>();
                 data.put("id", record.getId());
-                data.put("uuid", dso.getHandle());
-                data.put("eId", dso.getID());
-                data.put("tText", dso.getTypeText());
-                data.put("name", dso.getName());
+                data.put("uuid", record.getFastlookupUuid());
+                data.put("eId", record.getEntityId());
+                data.put("tText", CrisConstants.getEntityTypeText(record.getTypeId()));
+                data.put("name", record.getFastlookupObjectName());
+                data.put("owner", record.getOwner());
                 data.put("mode", record.getMode());
                 results.add(data);
             }

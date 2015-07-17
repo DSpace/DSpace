@@ -84,6 +84,8 @@ public class OrcidPreferencesUtils {
 				orcidQueue.setEntityId(obj.getID());
 				orcidQueue.setOwner(crisId);
 				orcidQueue.setTypeId(obj.getType());
+				orcidQueue.setFastlookupObjectName(obj.getName());
+				orcidQueue.setFastlookupUuid(obj.getHandle());
 				// POST mode
 				orcidQueue.setMode(ORCID_MODE_APPEND);
 				getApplicationService().saveOrUpdate(OrcidQueue.class, orcidQueue);

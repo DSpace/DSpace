@@ -7,7 +7,7 @@
 --
 
 create table IF NOT EXISTS cris_orcid_history (id number(10,0) not null, entityId number(10,0), typeId number(10,0), responseMessage clob, lastAttempt timestamp, lastSuccess timestamp, primary key (id));
-create table IF NOT EXISTS cris_orcid_queue (id number(10,0) not null, owner varchar2(255), entityId number(10,0), typeId number(10,0), mode varchar2(255), primary key (id));
+create table IF NOT EXISTS cris_orcid_queue (id number(10,0) not null, owner varchar2(255), entityId number(10,0), typeId number(10,0), mode varchar2(255), fastlookupobjectname clob, fastlookupuuid varchar2(255), primary key (id));
 
 create table IF NOT EXISTS jdyna_widget_checkradio (id number(10,0) not null, option4row number(10,0), staticValues text, dropdown number(1,0), primary key (id));
 alter table jdyna_widget_checkradio drop column IF EXISTS query;
