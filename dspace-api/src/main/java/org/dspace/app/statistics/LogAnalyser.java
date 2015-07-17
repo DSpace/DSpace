@@ -71,6 +71,9 @@ public class LogAnalyser
     
     /** warning counter */
     private static int warnCount = 0;
+
+    /** exception counter */
+    private static int excCount = 0;
     
     /** log line counter */
     private static int lineCount = 0;
@@ -289,7 +292,7 @@ public class LogAnalyser
      * @param   myEndDate       the desired end of the analysis.  Goes to the end otherwise
      * @param   myLookUp        force a lookup of the database
      */
-    public static void processLogs(Context context, String myLogDir, 
+    public static String processLogs(Context context, String myLogDir, 
                                     String myFileTemplate, String myConfigFile, 
                                     String myOutFile, Date myStartDate, 
                                     Date myEndDate, boolean myLookUp)
@@ -428,7 +431,12 @@ public class LogAnalyser
                             // aggregator
                             warnCount++;
                         }
-
+                        // count the exceptions
+                        if (logLine.isLevel("ERROR"))
+                        {
+                        	excCount++;
+                        }
+                        
                         // is the action a search?
                         if (logLine.isAction("search"))
                         {
@@ -513,9 +521,7 @@ public class LogAnalyser
         }
         
         // finally, write the output
-        createOutput();
-
-        return;
+        return createOutput();
     }
    
     
@@ -575,7 +581,7 @@ public class LogAnalyser
     /**
      * generate the analyser's output to the specified out file
      */
-    public static void createOutput()
+    public static String createOutput()
     {
         // start a string buffer to hold the final output
         StringBuffer summary = new StringBuffer();
@@ -588,6 +594,7 @@ public class LogAnalyser
         
         // output the number of warnings encountered
         summary.append("warnings=" + Integer.toString(warnCount) + "\n");
+        summary.append("exceptions=" + Integer.toString(excCount) + "\n");
         
         // set the general summary config up in the aggregator file
         for (int i = 0; i < generalSummary.size(); i++)
@@ -725,7 +732,7 @@ public class LogAnalyser
             System.exit(0);
         }
         
-        return;
+        return summary.toString();
     }
     
     

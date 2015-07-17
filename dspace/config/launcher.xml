@@ -8,6 +8,13 @@
         </step>
     </command>
     <command>
+        <name>healthcheck</name>
+        <description>Create health check report</description>
+        <step>
+            <class>org.dspace.health.Report</class>
+        </step>
+    </command>
+    <command>
         <name>checker</name>
         <description>Run the checksum checker</description>
         <step>
