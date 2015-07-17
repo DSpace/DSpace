@@ -139,6 +139,14 @@ public class RestrictedItem extends AbstractDSpaceTransformer // implements
                 {
                     para.addContent(characters);
                 }
+
+                // Clear interrupted session values.
+                session.setAttribute(
+                        AuthenticationUtil.REQUEST_INTERRUPTED_HEADER, null);
+                session.setAttribute(
+                        AuthenticationUtil.REQUEST_INTERRUPTED_MESSAGE, null);
+                session.setAttribute(
+                        AuthenticationUtil.REQUEST_INTERRUPTED_CHARACTERS, null);
             }
             else
             {
