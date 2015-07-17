@@ -256,6 +256,11 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         }
     }
 
+    protected void addAll(StoragePath path, List<Manuscript> manuscripts) throws StorageException {
+        addResults(path, manuscripts, null);
+    }
+
+    // This call is always limited to the default limit of entries, so as not to tie up the connection pool.
     @Override
     protected void addResults(StoragePath path, List<Manuscript> manuscripts, Integer limit) throws StorageException {
         String organizationCode = getOrganizationCode(path);
