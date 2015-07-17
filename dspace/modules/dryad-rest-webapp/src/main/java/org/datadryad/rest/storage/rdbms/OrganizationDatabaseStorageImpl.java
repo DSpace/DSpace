@@ -158,17 +158,6 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
     }
 
     @Override
-    protected void addAll(StoragePath path, List<Organization> organizations) throws StorageException {
-        try {
-            Context context = getContext();
-            organizations.addAll(getOrganizations(context));
-            completeContext(context);
-        } catch (SQLException ex) {
-            throw new StorageException("Exception reading organizations", ex);
-        }
-    }
-
-    @Override
     protected void addResults(StoragePath path, List<Organization> organizations, Integer limit) throws StorageException {
         try {
             Context context = getContext();

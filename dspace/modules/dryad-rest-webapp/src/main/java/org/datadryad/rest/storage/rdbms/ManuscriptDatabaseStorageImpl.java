@@ -257,20 +257,6 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     }
 
     @Override
-    protected void addAll(StoragePath path, List<Manuscript> manuscripts) throws StorageException {
-        String organizationCode = getOrganizationCode(path);
-        try {
-            Context context = getContext();
-            manuscripts.addAll(getManuscripts(context, organizationCode, DEFAULT_LIMIT));
-            completeContext(context);
-        } catch (SQLException ex) {
-            throw new StorageException("Exception finding manuscripts", ex);
-        } catch (IOException ex) {
-            throw new StorageException("Exception reading manuscripts", ex);
-        }
-    }
-
-    @Override
     protected void addResults(StoragePath path, List<Manuscript> manuscripts, Integer limit) throws StorageException {
         String organizationCode = getOrganizationCode(path);
         int limitInt = DEFAULT_LIMIT;
