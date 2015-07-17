@@ -137,7 +137,62 @@ public final class DSpaceConfigurationService implements ConfigurationService {
      */
     @Override
     public String getProperty(String name) {
-        return configuration.getString(name);
+        return getProperty(name, null);
+    }
+
+    /* (non-Javadoc)
+     * @see org.dspace.services.ConfigurationService#getProperty(java.lang.String, java.lang.String)
+     */
+    @Override
+    public String getProperty(String name, String defaultValue) {
+        return (String) getPropertyAsType(name, defaultValue);
+    }
+
+    /* (non-Javadoc)
+     * @see org.dspace.services.ConfigurationService#getBooleanProperty(java.lang.String)
+     */
+    @Override
+    public boolean getBooleanProperty(String name) {
+        return getBooleanProperty(name, false);
+    }
+    /* (non-Javadoc)
+     * @see org.dspace.services.ConfigurationService#getBooleanProperty(java.lang.String, boolean)
+     */
+    @Override
+    public boolean getBooleanProperty(String name, boolean defaultValue) {
+        return getPropertyAsType(name, defaultValue);
+    }
+
+    /* (non-Javadoc)
+     * @see org.dspace.services.ConfigurationService#getIntProperty(java.lang.String)
+     */
+    @Override
+    public int getIntProperty(String name) {
+        return getIntProperty(name, 0);
+    }
+
+    /* (non-Javadoc)
+     * @see org.dspace.services.ConfigurationService#getIntProperty(java.lang.String, int)
+     */
+    @Override
+    public int getIntProperty(String name, int defaultValue) {
+        return getPropertyAsType(name, defaultValue);
+    }
+
+    /* (non-Javadoc)
+     * @see org.dspace.services.ConfigurationService#getLongProperty(java.lang.String)
+     */
+    @Override
+    public long getLongProperty(String name) {
+        return getLongProperty(name, 0);
+    }
+
+    /* (non-Javadoc)
+     * @see org.dspace.services.ConfigurationService#getLongProperty(java.lang.String,long)
+     */
+    @Override
+    public long getLongProperty(String name, long defaultValue) {
+        return getPropertyAsType(name, defaultValue);
     }
 
     /* (non-Javadoc)
@@ -175,8 +230,13 @@ public final class DSpaceConfigurationService implements ConfigurationService {
             return defaultValue;
         }
 
-        // Get the class associated with our default value
-        Class type = defaultValue.getClass();
+        // Avoid NPE. If null defaultValue passed in, assume Object class
+        Class type = Object.class;
+        if(defaultValue!=null)
+        {
+            // Get the class associated with our default value
+            type = defaultValue.getClass();
+        }
 
         return (T) convert(name, type);
     }

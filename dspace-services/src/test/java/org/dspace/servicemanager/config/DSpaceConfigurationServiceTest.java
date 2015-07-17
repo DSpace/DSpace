@@ -26,24 +26,30 @@ import org.junit.Test;
 public class DSpaceConfigurationServiceTest {
 
     DSpaceConfigurationService configurationService;
+    int numPropsLoaded;
 
     @Before
     public void init() {
         configurationService = new DSpaceConfigurationService();
 
-        // clear out default configs
+        // clear out default configs (leaves us with an empty Configuration)
         configurationService.clear();
 
-        // Start fresh with out own set of 8 configs
+        // Start fresh with out own set of configs
         Map<String,Object> l = new HashMap<String,Object>();
         l.put("service.name", "DSpace");
         l.put("sample.array", "itemA,itemB,itemC");
         l.put("sample.number", "123");
         l.put("sample.boolean", "true");
+        // 3 Billion cannot be stored as an "int" (max value 2^31-1)
+        l.put("sample.long", "3000000000");
         l.put("aaronz", "Aaron Zeckoski");
         l.put("current.user", "${aaronz}");
         l.put("test.key1", "This is a value");
         l.put("test.key2", "This is key1=${test.key1}");
+
+        // Record how many properties we initialized with (for below unit tests)
+        numPropsLoaded=9;
 
         configurationService.loadConfiguration(l);
         l = null;
@@ -109,7 +115,7 @@ public class DSpaceConfigurationServiceTest {
     public void testGetProperties() {
         Properties props = configurationService.getProperties();
         assertNotNull(props);
-        assertEquals(8, props.size());
+        assertEquals(numPropsLoaded, props.size());
         assertNotNull(props.get("service.name"));
         assertEquals("DSpace", props.get("service.name"));
         
@@ -129,6 +135,67 @@ public class DSpaceConfigurationServiceTest {
         prop = configurationService.getProperty("XXXXX");
         assertNull(prop);
         prop = null;
+    }
+
+    /**
+     * Test method for {@link org.dspace.servicemanager.config.DSpaceConfigurationService#getBooleanProperty(java.lang.String)}.
+     */
+    @Test
+    public void testGetBooleanProperty() {
+        boolean b = configurationService.getBooleanProperty("sample.boolean");
+        assertEquals(true, b);
+
+        // Pass in default value
+        b = configurationService.getBooleanProperty("sample.boolean", false);
+        assertEquals(true, b);
+
+        b = configurationService.getBooleanProperty("XXXXX");
+        assertEquals(false, b);
+
+        // Pass in default value
+        b = configurationService.getBooleanProperty("XXXXX", true);
+        assertEquals(true, b);
+    }
+
+    /**
+     * Test method for {@link org.dspace.servicemanager.config.DSpaceConfigurationService#getIntProperty(java.lang.String)}.
+     */
+    @Test
+    public void testGetIntProperty() {
+        int i = configurationService.getIntProperty("sample.number");
+        assertEquals(123, i);
+
+        // Pass in default value
+        i = configurationService.getIntProperty("sample.number", -1);
+        assertEquals(123, i);
+
+        i = configurationService.getIntProperty("XXXXX");
+        assertEquals(0, i);
+
+        // Pass in default value
+        i = configurationService.getIntProperty("XXXXX", 345);
+        assertEquals(345, i);
+    }
+
+    /**
+     * Test method for {@link org.dspace.servicemanager.config.DSpaceConfigurationService#getLongProperty(java.lang.String)}.
+     */
+    @Test
+    public void testGetLongProperty() {
+        long l = configurationService.getLongProperty("sample.long");
+        //NOTE: "L" suffix ensures number is treated as a long
+        assertEquals(3000000000L, l);
+
+        // Pass in default value
+        l = configurationService.getLongProperty("sample.long", -1);
+        assertEquals(3000000000L, l);
+
+        l = configurationService.getLongProperty("XXXXX");
+        assertEquals(0, l);
+
+        // Pass in default value
+        l = configurationService.getLongProperty("XXXXX", 3000000001L);
+        assertEquals(3000000001L, l);
     }
 
     /**
@@ -261,7 +328,7 @@ public class DSpaceConfigurationServiceTest {
     @Test
     public void testGetConfiguration() {
         assertNotNull( configurationService.getConfiguration() );
-        assertEquals(8, configurationService.getProperties().size() );
+        assertEquals(numPropsLoaded, configurationService.getProperties().size() );
     }
 
     /**
@@ -269,18 +336,22 @@ public class DSpaceConfigurationServiceTest {
      */
     @Test
     public void testLoadConfig() {
-        assertEquals(8, configurationService.getProperties().size());
+        assertEquals(numPropsLoaded, configurationService.getProperties().size());
         configurationService.loadConfig("newA", "A");
-        assertEquals(9, configurationService.getProperties().size());
+        assertEquals(numPropsLoaded+1, configurationService.getProperties().size());
         assertEquals("A", configurationService.getProperty("newA"));
         configurationService.loadConfig("newB", "service is ${service.name}");
-        assertEquals(10, configurationService.getProperties().size());
+        assertEquals(numPropsLoaded+2, configurationService.getProperties().size());
         assertEquals("service is DSpace", configurationService.getProperty("newB"));
 
         configurationService.loadConfig("newA", "aaronz");
-        assertEquals(10, configurationService.getProperties().size());
+        assertEquals(numPropsLoaded+2, configurationService.getProperties().size());
         assertEquals("aaronz", configurationService.getProperty("newA"));
 
+        // Clear out newly added props
+        configurationService.clearConfig("newA");
+        configurationService.clearConfig("newB");
+        assertEquals(numPropsLoaded, configurationService.getProperties().size());
     }
 
     /**
