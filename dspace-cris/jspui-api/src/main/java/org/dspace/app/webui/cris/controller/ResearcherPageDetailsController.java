@@ -13,6 +13,7 @@ import it.cilea.osd.jdyna.web.controller.SimpleDynaController;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -229,25 +230,31 @@ public class ResearcherPageDetailsController
         {
             return null;
         }
-        // check admin authorization
-        Boolean isAdmin = null; // anonymous access
         Context context = UIUtil.obtainContext(request);
         EPerson currUser = context.getCurrentUser();
-        if (AuthorizeManager.isAdmin(context))
+        // check owner authorization
+        boolean isOwner = currUser != null && researcher.getEpersonID()!=null && (researcher.getEpersonID() == currUser.getID());
+        List<TabResearcherPage> tabs = new LinkedList<TabResearcherPage>();
+        // check admin authorization
+		if (AuthorizeManager.isAdmin(context))
         {
-            isAdmin = true; // admin
+			tabs = applicationService.getTabsByVisibility(
+	                TabResearcherPage.class, true);
+			if(isOwner) {
+		        //admin authorization for LOW tab visibility (LOW are the tab show only to RP owner)
+				tabs.addAll(((ApplicationService)applicationService).getTabsByVisibility(TabResearcherPage.class, VisibilityTabConstant.LOW));
+			}
         }
-        else if ((currUser != null && researcher.getEpersonID()!=null && (researcher.getEpersonID() == currUser.getID())))
+        else if (isOwner)
         {
-            isAdmin = false; // owner
-        }
-        List<TabResearcherPage> tabs = applicationService.getTabsByVisibility(
-                TabResearcherPage.class, isAdmin);
-        if(isAdmin==true && (currUser != null && researcher.getEpersonID()!=null && (researcher.getEpersonID() == currUser.getID()))) {
-            tabs.addAll(((ApplicationService)applicationService).getTabsByVisibility(TabResearcherPage.class, VisibilityTabConstant.LOW));
+        	tabs = applicationService.getTabsByVisibility(
+                    TabResearcherPage.class, false);
+        } else {
+        	//anonymous access
+        	tabs = applicationService.getTabsByVisibility(
+                    TabResearcherPage.class, null);
         }
         return tabs;
-
     }
 
     @Override
