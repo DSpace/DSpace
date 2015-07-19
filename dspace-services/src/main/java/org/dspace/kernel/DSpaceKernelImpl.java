@@ -33,9 +33,9 @@ import org.slf4j.LoggerFactory;
 /**
  * This is the kernel implementation which starts up the core of DSpace,
  * registers the mbean, and initializes the DSpace object.
- * It also loads up the configuration.  Sets a JRE shutdown hook.
+ * It also loads up the configuration and sets a JRE shutdown hook.
  * <p>
- * Note that this does not start itself and calling the constuctor does
+ * Note that this does not start itself and calling the constructor does
  * not actually start it up either. It has to be explicitly started by
  * calling the start method so something in the system needs to do that.
  * If the bean is already started then calling start on it again has no
@@ -45,7 +45,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
-public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, CommonLifecycle<DSpaceKernel> {
+public final class DSpaceKernelImpl
+        implements DSpaceKernel, DynamicMBean, CommonLifecycle<DSpaceKernel> {
 
     private static final Logger log = LoggerFactory.getLogger(DSpaceKernelImpl.class);
 
@@ -161,7 +162,8 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, Commo
             // add in the shutdown hook
             registerShutdownHook();
         }
-        log.info("DSpace kernel startup completed in "+loadTime+" ms and registered as MBean: " + mBeanName);
+        log.info("DSpace kernel startup completed in {} ms and registered as MBean: {}",
+                loadTime, mBeanName);
     }
 
     /* (non-Javadoc)
@@ -185,7 +187,7 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, Commo
             configurationService = null;
         }
         // log completion (logger may be gone at this point so we cannot really use it)
-        log.info("DSpace kernel shutdown completed and unregistered MBean: " + mBeanName);
+        log.info("DSpace kernel shutdown completed and unregistered MBean: {}", mBeanName);
     }
 
     /* (non-Javadoc)
@@ -244,19 +246,40 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, Commo
 
     @Override
     public String toString() {
-        return "DSpaceKernel:" + mBeanName + ":lastLoad=" + lastLoadDate + ":loadTime=" + loadTime + ":running=" + running + ":kernel=" + (kernel == null ? null : kernel.getClass().getName() +"@"+kernel.getClass().getClassLoader() + ":" + super.toString());
+        StringBuilder rv = new StringBuilder(256);
+
+        rv.append("DSpaceKernel:").append(mBeanName)
+                .append(":lastLoad=").append(lastLoadDate)
+                .append(":loadTime=").append(loadTime)
+                .append(":running=").append(running)
+                .append(":kernel=");
+
+        if (kernel == null)
+            rv.append("null");
+        else
+            rv.append(kernel.getClass().getName())
+                    .append('@').append(kernel.getClass().getClassLoader())
+                    .append(':').append(super.toString());
+
+        return rv.toString();
     }
 
     // MBEAN methods
 
     private Date lastLoadDate;
-    /** Time that this kernel was started, as a java.util.Date. */
+    /**
+     * Time that this kernel was started, as a java.util.Date.
+     * @see getLoadTime().
+     */
     public Date getLastLoadDate() {
         return new Date(lastLoadDate.getTime());
     }
 
     private long loadTime;
-    /** Time that this kernel was started, as seconds since the epoch. */
+    /**
+     * Time that this kernel was started, as seconds since the epoch.
+     * @see getLastLoadDate().
+     */
     public long getLoadTime() {
         return loadTime;
     }
@@ -296,7 +319,8 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, Commo
     }
 
     @Override
-    public Object getAttribute(String attribute) throws AttributeNotFoundException, MBeanException, ReflectionException {
+    public Object getAttribute(String attribute)
+            throws AttributeNotFoundException, MBeanException, ReflectionException {
         if ("LastLoadDate".equals(attribute)) {
             return getLastLoadDate();
         } else if ("LastLoadTime".equals(attribute)) {
