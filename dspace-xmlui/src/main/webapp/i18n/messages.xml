@@ -2502,4 +2502,8 @@
     <message key="xmlui.mirage2.choice-authority-control.loading">Loading...</message>
 
     <message key="xmlui.mirage2.item-list.thumbnail">Thumbnail</message>
+
+    <!-- @EC JB Ratings-->
+    <message key="xmlui.ArtifactBrowser.ItemViewer.addrating">Add Rating</message>
+    <message key="xmlui.ArtifactBrowser.ItemViewer.recommendations">Recommendations</message>
 </catalogue>

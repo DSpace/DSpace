@@ -62,6 +62,9 @@ and searching the repository.
 			<map:action name="UsageLoggerAction" src="org.dspace.app.xmlui.cocoon.UsageLoggerAction" />
 			<map:action name="NotModifiedAction" src="org.dspace.app.xmlui.aspect.general.NotModifiedAction" />
 			<map:action name="ItemRequestResponseAction" src="org.dspace.app.xmlui.aspect.artifactbrowser.ItemRequestResponseAction" />
+            <!-- @EC JB -->
+            <map:action name="AddRatingsAction" src="org.dspace.app.xmlui.aspect.viewArtifacts.AddRatingsAction"/>
+            <!-- @EC JB : END -->
 		</map:actions>
 
 
@@ -109,7 +112,19 @@ and searching the repository.
                                 <map:serialize type="xml"/>
                         </map:match>
 
-
+            <!-- @EC JB -->
+            <map:select type="AuthenticatedSelector">
+                <map:when test="eperson">
+                    <map:match pattern="add-rating">
+                        <map:act type="AddRatingsAction">
+                            <map:parameter name="userid" value="{userid}"/>
+                            <map:parameter name="itemid" value="{itemid}"/>
+                            <map:parameter name="rating" value="{rating}"/>
+                        </map:act>
+                    </map:match>
+                </map:when>
+            </map:select>
+            <!-- @EC JB : END -->
 
 			<!-- Display statistics -->
 			<map:match pattern="statistics">

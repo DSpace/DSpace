@@ -36,7 +36,6 @@ and searching the repository.
                         <map:transformer name="Contact" src="org.dspace.app.xmlui.aspect.artifactbrowser.Contact"/>
                         <map:transformer name="RestrictedItem" src="org.dspace.app.xmlui.aspect.artifactbrowser.RestrictedItem"/>
                         <map:transformer name="FrontPageFeeds" src="org.dspace.app.xmlui.aspect.artifactbrowser.FrontPageFeeds"/>
-
             <map:transformer name="Statistics" src="org.dspace.app.xmlui.aspect.artifactbrowser.StatisticsViewer"/>
         </map:transformers>
 
