@@ -77,10 +77,8 @@ public final class DSpaceKernelServletContextListener implements ServletContextL
     {
         // start the kernel when the webapp starts
         try {
-            this.kernelImpl = (DSpaceKernelImpl) DSpaceKernelManager.getKernel();
-            if (! this.kernelImpl.isRunning()) {
-            	this.kernelImpl.start(getProvidedHome(arg0)); // init the kernel
-            }
+            this.kernelImpl = (DSpaceKernelImpl) DSpaceKernelManager.getKernel(
+            getProvidedHome(arg0));
         } catch (Exception e) {
             // failed to start so destroy it and log and throw an exception
             try {

@@ -31,21 +31,30 @@ public final class DSpaceKernelManager {
      * the method will retrieve the same instance regardless of this
      * object instance.
      *
+     * @param dspaceDir path to the DSpace home directory.
      * @return the DSpace kernel
      * @throws IllegalStateException if the kernel is not available
      */
-    public static DSpaceKernel getKernel() {
+    public static DSpaceKernel getKernel(String dspaceDir) {
         if (null == theKernel)
         {
             theKernel = new DSpaceKernelImpl();
             log.info("Created new kernel: " + theKernel);
-        }
-        if (!theKernel.isRunning()) {
-            throw new IllegalStateException("The DSpace kernel is not started yet.  Please start it before attempting to use it.");
+            ((DSpaceKernelImpl)theKernel).start(dspaceDir);
         }
 
         return theKernel;
     }
+
+    /**
+     * Get the kernel.  This will be a single instance for the JVM, but
+     * the method will retrieve the same instance regardless of this
+     * object instance.
+     *
+     * @return the DSpace kernel
+     * @throws IllegalStateException if the kernel is not available
+     */
+    public static DSpaceKernel getKernel() { return getKernel(null); }
 
     /**
      * Static initialized random Kernel name.

@@ -40,8 +40,6 @@ import org.slf4j.LoggerFactory;
  * calling the start method so something in the system needs to do that.
  * If the bean is already started then calling start on it again has no
  * effect.
- * <p>
- * The name of this instance can be specified if desired.
  *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */

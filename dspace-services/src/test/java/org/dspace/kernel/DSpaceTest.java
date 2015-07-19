@@ -54,7 +54,7 @@ public class DSpaceTest {
         assertEquals(dspace.getServiceManager(), dspace2.getServiceManager());
 
         // REPEAT
-        kernel = new DSpaceKernelManager().getKernel();
+        kernel = DSpaceKernelManager.getKernel();
 
         o = dspace.getServiceManager();
         assertNotNull(o);
