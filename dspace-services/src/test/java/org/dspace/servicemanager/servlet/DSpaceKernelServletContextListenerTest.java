@@ -31,14 +31,6 @@ public class DSpaceKernelServletContextListenerTest {
     @Test
     @SuppressWarnings("UnusedAssignment")
     public void testSampleRequest() {
-        // make sure no kernel yet
-        try {
-            DSpaceKernelManager.getKernel();
-            fail("Should have thrown exception");
-        } catch (IllegalStateException e) {
-            assertNotNull(e.getMessage());
-        }
-
         ServletTester tester = new ServletTester();
         tester.setContextPath("/");
         tester.getContext().addEventListener(new DSpaceKernelServletContextListener());
