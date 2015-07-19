@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Test servlet for trying out the jetty server
- * 
+ *
  * @author Aaron Zeckoski (aaron@caret.cam.ac.uk)
  */
 public class SampleServlet extends HttpServlet {
@@ -41,7 +41,7 @@ public class SampleServlet extends HttpServlet {
     public void init() throws ServletException {
         super.init();
         try {
-            DSpaceKernel kernel = new DSpaceKernelManager().getKernel();
+            DSpaceKernel kernel = DSpaceKernelManager.getKernel();
             if (kernel == null) {
                 throw new IllegalStateException("Could not get the DSpace Kernel");
             }

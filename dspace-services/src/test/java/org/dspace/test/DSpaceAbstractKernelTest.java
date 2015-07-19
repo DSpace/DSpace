@@ -20,9 +20,9 @@ import org.junit.Test;
 
 /**
  * This is an abstract class which makes it easier to test things that use the DSpace Kernel,
- * this will start and stop the kernel at the beginning of the group of tests that are 
+ * this will start and stop the kernel at the beginning of the group of tests that are
  * in the junit test class which extends this
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public abstract class DSpaceAbstractKernelTest extends DSpaceAbstractTest {
@@ -47,7 +47,7 @@ public abstract class DSpaceAbstractKernelTest extends DSpaceAbstractTest {
     public void testKernelIsInitializedAndWorking() {
         assertNotNull(kernel);
         assertTrue(kernel.isRunning());
-        DSpaceKernel k2 = new DSpaceKernelManager().getKernel();
+        DSpaceKernel k2 = DSpaceKernelManager.getKernel();
         assertNotNull(k2);
         assertEquals(kernel, k2);
     }

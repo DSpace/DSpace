@@ -52,11 +52,8 @@ public class ScriptLauncher
 
         // Initialise the service manager kernel
         try {
-            kernelImpl = (DSpaceKernelImpl) DSpaceKernelManager.getKernel();
-            if (!kernelImpl.isRunning())
-            {
-                kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
-            }
+            kernelImpl = (DSpaceKernelImpl) DSpaceKernelManager.getKernel(
+                    ConfigurationManager.getProperty("dspace.dir"));
         } catch (Exception e)
         {
             // Failed to start so destroy it and log and throw an exception

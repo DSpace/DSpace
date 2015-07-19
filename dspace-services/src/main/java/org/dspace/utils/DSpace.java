@@ -32,7 +32,7 @@ import org.dspace.services.SessionService;
  */
 public final class DSpace {
 
-    private DSpaceKernel kernel;
+    private final DSpaceKernel kernel;
     public DSpaceKernel getKernel() {
         return kernel;
     }
@@ -43,18 +43,7 @@ public final class DSpace {
      * @throws IllegalStateException if the kernel is not already running
      */
     public DSpace() {
-        this(null);
-    }
-
-    /**
-     * Construct a DSpace helper object which uses the a specific named
-     * instance of the kernel.
-     *
-     * @param kernelName the name of the kernel to use (null to use the default kernel)
-     * @throws IllegalStateException if the kernel is not already running or no kernel exists with this name
-     */
-    public DSpace(String kernelName) {
-        DSpaceKernel aKernel = new DSpaceKernelManager().getKernel();
+        DSpaceKernel aKernel = DSpaceKernelManager.getKernel();
         this.kernel = aKernel;
     }
 
