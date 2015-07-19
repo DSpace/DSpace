@@ -21,14 +21,6 @@ public class DSpaceTest {
 
     @Test
     public void testDSpaceObject() {
-        try {
-            DSpace dspace = new DSpace();
-            dspace.getServiceManager();
-            fail("should have thrown exception");
-        } catch (IllegalStateException e) {
-            assertNotNull(e.getMessage());
-        }
-
         DSpaceKernelImpl kernelImpl = (DSpaceKernelImpl) DSpaceKernelManager.getKernel();
         kernelImpl.start(); // triggers the init
         DSpaceKernel kernel = DSpaceKernelManager.getKernel();

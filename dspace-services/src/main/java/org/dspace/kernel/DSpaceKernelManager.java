@@ -84,8 +84,8 @@ public final class DSpaceKernelManager {
                 if (! mbs.isRegistered(name)) {
                     // register the MBean
                     mbs.registerMBean(kernel, name);
-                    log.info("Registered new Kernel MBEAN: " + checkedMBeanName
-                            + " ["+kernel+"]");
+                    log.info("Registered new Kernel MBEAN: {} [{}]",
+                            checkedMBeanName, kernel);
                 }
             } catch (MalformedObjectNameException
                     | InstanceAlreadyExistsException

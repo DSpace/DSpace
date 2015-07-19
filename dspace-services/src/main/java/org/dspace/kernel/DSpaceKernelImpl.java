@@ -143,7 +143,7 @@ public final class DSpaceKernelImpl
             long startTime = System.currentTimeMillis();
 
             // Register the MBean.
-            DSpaceKernelManager.registerMBean(mBeanName, kernel);
+            DSpaceKernelManager.registerMBean(mBeanName, this);
 
             // create the configuration service and get the configuration
             DSpaceConfigurationService dsConfigService = new DSpaceConfigurationService(dspaceHome);
