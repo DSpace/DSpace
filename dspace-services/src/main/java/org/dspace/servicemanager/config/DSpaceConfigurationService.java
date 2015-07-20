@@ -148,6 +148,21 @@ public final class DSpaceConfigurationService implements ConfigurationService {
     }
 
     /* (non-Javadoc)
+     * @see org.dspace.services.ConfigurationService#getArrayProperty(java.lang.String)
+     */
+    @Override
+    public String[] getArrayProperty(String name) {
+        return getArrayProperty(name, new String[0]);
+    }
+    /* (non-Javadoc)
+     * @see org.dspace.services.ConfigurationService#getArrayProperty(java.lang.String, java.lang.String[])
+     */
+    @Override
+    public String[] getArrayProperty(String name, String[] defaultValue) {
+        return getPropertyAsType(name, defaultValue);
+    }
+
+    /* (non-Javadoc)
      * @see org.dspace.services.ConfigurationService#getBooleanProperty(java.lang.String)
      */
     @Override
@@ -217,7 +232,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
     public <T> T getPropertyAsType(String name, T defaultValue, boolean setDefaultIfNotFound) {
 
         // If this key doesn't exist, immediately return a value
-        if(!configuration.containsKey(name))
+        if(!hasProperty(name))
         {
             // if flag is set, save the default value as the new value for this property
             if(setDefaultIfNotFound)
@@ -240,7 +255,18 @@ public final class DSpaceConfigurationService implements ConfigurationService {
         return (T) convert(name, type);
     }
 
-    // config loading methods
+
+    /* (non-Javadoc)
+     * @see org.dspace.services.ConfigurationService#hasProperty(java.lang.String)
+     */
+    @Override
+    public boolean hasProperty(String name)
+    {
+        if(configuration.containsKey(name))
+            return true;
+        else
+            return false;
+    }
 
     /* (non-Javadoc)
      * @see org.dspace.services.ConfigurationService#setProperty(java.lang.String, java.lang.Object)

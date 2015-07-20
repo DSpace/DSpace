@@ -138,6 +138,39 @@ public class DSpaceConfigurationServiceTest {
     }
 
     /**
+     * Test method for {@link org.dspace.servicemanager.config.DSpaceConfigurationService#getArrayProperty(java.lang.String)}.
+     */
+    @Test
+    public void testGetArrayProperty() {
+        String[] array = configurationService.getArrayProperty("sample.array");
+        assertNotNull(array);
+        assertEquals(3, array.length);
+        assertEquals("itemA", array[0]);
+        assertEquals("itemB", array[1]);
+        assertEquals("itemC", array[2]);
+
+        // Pass in default value
+        array = configurationService.getArrayProperty("sample.array", new String[]{"Hey"});
+        // Assert default value not used, since property exists
+        assertEquals(3, array.length);
+
+        array = configurationService.getArrayProperty("XXXXX");
+        assertEquals(0, array.length);
+
+        // Test default value
+        array = configurationService.getArrayProperty("XXXXX", new String[]{"Hey"});
+        assertEquals(1, array.length);
+        assertEquals("Hey", array[0]);
+
+        // Test escaping commas (with \,)
+        configurationService.loadConfig("new.array", "A\\,B\\,C");
+        array = configurationService.getArrayProperty("new.array");
+        assertEquals(1, array.length);
+        assertEquals("A,B,C", array[0]);
+        configurationService.clearConfig("new.array");
+    }
+
+    /**
      * Test method for {@link org.dspace.servicemanager.config.DSpaceConfigurationService#getBooleanProperty(java.lang.String)}.
      */
     @Test
@@ -196,6 +229,17 @@ public class DSpaceConfigurationServiceTest {
         // Pass in default value
         l = configurationService.getLongProperty("XXXXX", 3000000001L);
         assertEquals(3000000001L, l);
+    }
+
+    /**
+     * Test method for {@link org.dspace.servicemanager.config.DSpaceConfigurationService#getHasProperty(java.lang.String)}.
+     */
+    @Test
+    public void testHasProperty() {
+        assertEquals(true, configurationService.hasProperty("sample.array"));
+        assertEquals(true, configurationService.hasProperty("sample.number"));
+        assertEquals(false, configurationService.hasProperty("XXXXX"));
+        assertEquals(false, configurationService.hasProperty("samplearray"));
     }
 
     /**
