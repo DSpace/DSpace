@@ -93,7 +93,7 @@ public class DOIIdentifierProviderTest
             //we need to commit the changes so we don't block the table for testing
             context.restoreAuthSystemState();
 
-            config = kernelImpl.getConfigurationService();
+            config = new DSpace().getConfigurationService();
             // Configure the service under test.
             config.setProperty(DOIIdentifierProvider.CFG_PREFIX, PREFIX);
             config.setProperty(DOIIdentifierProvider.CFG_NAMESPACE_SEPARATOR, 

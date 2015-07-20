@@ -42,7 +42,6 @@ public final class DSpaceConfigurationService implements ConfigurationService {
 
     private static final Logger log = LoggerFactory.getLogger(DSpaceConfigurationService.class);
 
-    //public static final String DSPACE_WEB_CONTEXT_PARAM = "dspace-config";
     public static final String DSPACE = "dspace";
     public static final String EXT_CONFIG = "cfg";
     public static final String DOT_CONFIG = "." + EXT_CONFIG;

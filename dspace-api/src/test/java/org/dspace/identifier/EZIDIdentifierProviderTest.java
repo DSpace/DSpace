@@ -126,8 +126,8 @@ public class EZIDIdentifierProviderTest
     public static void setUpClass()
             throws Exception
     {
-        // Find the usual kernel services
-        config = kernelImpl.getConfigurationService();
+        // Find the configuration service
+        config = new DSpace().getConfigurationService();
 
         // Configure the service under test.
         config.setProperty(EZIDIdentifierProvider.CFG_SHOULDER, TEST_SHOULDER);

@@ -20,7 +20,6 @@ import org.dspace.app.util.MockUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.discovery.MockIndexEventConsumer;
@@ -100,14 +99,11 @@ public class AbstractUnitTest
                     .getResource("test-config.properties");
             testProps.load(properties.openStream());
 
-            //load the test configuration file
-            ConfigurationManager.loadConfig(null);
-
             // Initialise the service manager kernel
             kernelImpl = DSpaceKernelInit.getKernel(null);
             if (!kernelImpl.isRunning())
             {
-                kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
+                kernelImpl.start(System.getProperty("dspace.dir")); // init the kernel
             }
             // Clear our old flyway object. Because this DB is in-memory, its
             // data is lost when the last connection is closed. So, we need

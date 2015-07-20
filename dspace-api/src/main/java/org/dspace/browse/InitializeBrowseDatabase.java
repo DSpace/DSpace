@@ -8,7 +8,6 @@
 package org.dspace.browse;
 
 import org.apache.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
 
 /**
  * Command-line executed class for initializing the Browse tables of the DSpace database.
@@ -31,7 +30,6 @@ public class InitializeBrowseDatabase
             System.exit(1);
         }
 
-        ConfigurationManager.loadConfig(null);
         log.info("Initializing Browse Database");
 
         try

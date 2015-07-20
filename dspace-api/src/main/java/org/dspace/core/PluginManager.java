@@ -8,21 +8,20 @@
 package org.dspace.core;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
+import org.dspace.utils.DSpace;
 
 /**
  * The Plugin Manager is a very simple component container.  It creates and
@@ -742,118 +741,34 @@ public class PluginManager
         Map<String, String> reusableKey = new HashMap<String, String>();
         HashMap<String, String> keyMap = new HashMap<String, String>();
 
-        // 1. First pass -- grovel the actual config file to check for
-        //    duplicate keys, since Properties class hides them from us.
-        //    Also build lists of each type of key, check for misspellings.
-        File config = ConfigurationManager.getConfigurationFile();
-        try
-        {
-            fr = new FileReader(config);
-            cr = new BufferedReader(fr);
-            String line = null;
-            boolean continued = false;
-            Pattern keyPattern = Pattern.compile("([^\\s\\=\\:]+)");
-            while ((line = cr.readLine()) != null)
-            {
-                line = line.trim();
-                if (line.startsWith("!") || line.startsWith("#"))
-                {
-                    continued = false;
-                }
-                else
-                {
-                    if (!continued && line.startsWith("plugin."))
-                    {
-                        Matcher km = keyPattern.matcher(line);
-                        if (km.find())
-                        {
-                            String key = line.substring(0, km.end(1));
-                            if (keyMap.containsKey(key))
-                            {
-                                log.error("Duplicate key \"" + key + "\" in DSpace configuration file=" + config.toString());
-                            }
-                            else
-                            {
-                                keyMap.put(key, key);
-                            }
+        // Find all property keys starting with "plugin."
+        List<String> keys = new DSpace().getConfigurationService().getPropertyKeys("plugin.");
 
-                            if (key.startsWith(SINGLE_PREFIX))
-                            {
-                                singleKey.put(key.substring(SINGLE_PREFIX.length()), key);
-                            }
-                            else if (key.startsWith(SEQUENCE_PREFIX))
-                            {
-                                sequenceKey.put(key.substring(SEQUENCE_PREFIX.length()), key);
-                            }
-                            else if (key.startsWith(NAMED_PREFIX))
-                            {
-                                namedKey.put(key.substring(NAMED_PREFIX.length()), key);
-                            }
-                            else if (key.startsWith(SELFNAMED_PREFIX))
-                            {
-                                selfnamedKey.put(key.substring(SELFNAMED_PREFIX.length()), key);
-                            }
-                            else if (key.startsWith(REUSABLE_PREFIX))
-                            {
-                                reusableKey.put(key.substring(REUSABLE_PREFIX.length()), key);
-                            }
-                            else
-                            {
-                                log.error("Key with unknown prefix \"" + key + "\" in DSpace configuration file=" + config.toString());
-                            }
-                        }
-                    }
-                    continued = line.length() > 0 && line.charAt(line.length()-1) == '\\';
-                }
-            }
-        }
-        finally
+        for(String key : keys)
         {
-            if (cr != null)
+            if (key.startsWith(SINGLE_PREFIX))
             {
-                try
-                {
-                    cr.close();
-                }
-                catch (IOException ioe)
-                {
-                }
+                singleKey.put(key.substring(SINGLE_PREFIX.length()), key);
             }
-
-            if (fr != null)
+            else if (key.startsWith(SEQUENCE_PREFIX))
             {
-                try
-                {
-                    fr.close();
-                }
-                catch (IOException ioe)
-                {
-                }
+                sequenceKey.put(key.substring(SEQUENCE_PREFIX.length()), key);
             }
-        }
-
-        // 1.1 Sanity check, make sure keyMap == set of keys from Configuration
-        Enumeration<String> pne = (Enumeration<String>)ConfigurationManager.propertyNames();
-        HashSet<String> pn = new HashSet<String>();
-        while (pne.hasMoreElements())
-        {
-            String nk = pne.nextElement();
-            if (nk.startsWith("plugin."))
+            else if (key.startsWith(NAMED_PREFIX))
             {
-                pn.add(nk);
-                if (!keyMap.containsKey(nk))
-                {
-                    log.error("Key is in ConfigurationManager.propertyNames() but NOT text crawl: \"" + nk + "\"");
-                }
+                namedKey.put(key.substring(NAMED_PREFIX.length()), key);
             }
-        }
-        Iterator<String> pi = keyMap.keySet().iterator();
-        while (pi.hasNext())
-        {
-            String key = pi.next();
-            if (!pn.contains(key))
+            else if (key.startsWith(SELFNAMED_PREFIX))
             {
-                log.error("Key is in text crawl but NOT ConfigurationManager.propertyNames(): \"" + key + "\"");
+                selfnamedKey.put(key.substring(SELFNAMED_PREFIX.length()), key);
+            }
+            else if (key.startsWith(REUSABLE_PREFIX))
+            {
+                reusableKey.put(key.substring(REUSABLE_PREFIX.length()), key);
+            }
+            else
+            {
+                log.error("Key with unknown prefix \"" + key + "\" in DSpace configuration");
             }
         }
 
