@@ -100,7 +100,7 @@ public class ControlPanelProgramsTab extends AbstractControlPanelTab {
 		
 		form.addLabel(null, "bold").addContent("Statistics");
 		item.addButton("submit_ufal_stats").setValue("Send UFAL stats");
-		item.addContent("./dspace ufal-info [--email $email]");
+		item.addContent("./dspace healthcheck [--email $email]");
 		item = form.addItem();
 		item.addButton("submit_general_statistics").setValue("Compile stats");
 		item.addContent("./dspace stat-initital; ./dspace stat-general");
@@ -172,10 +172,10 @@ public class ControlPanelProgramsTab extends AbstractControlPanelTab {
 			}
 			if (email == null || email.length() == 0) {
 				message = IOUtils.run(new File(dspace_dir + "/bin/"),
-						new String[] { "./dspace", "ufal-info" });
+						new String[] { "./dspace", "healthcheck" });
 			} else {
 				message = IOUtils.run(new File(dspace_dir + "/bin/"),
-						new String[] { "./dspace", "ufal-info", "--email",
+						new String[] { "./dspace", "healthcheck", "--email",
 								email });
 			}
 		}
