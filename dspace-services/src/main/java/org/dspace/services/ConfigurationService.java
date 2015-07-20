@@ -129,6 +129,25 @@ public interface ConfigurationService {
 
     /**
      * Convenience method - get a configuration property (setting) from
+     * the system as a String Array.
+     *
+     * @param name the property name
+     * @return the String Array value
+     */
+    public String[] getArrayProperty(String name);
+
+    /**
+     * Convenience method - get a configuration property (setting) from
+     * the system as a String Array.
+     *
+     * @param name the property name
+     * @param defaultValue the default value if property not found
+     * @return the String Array value or default value if not found
+     */
+    public String[] getArrayProperty(String name, String[] defaultValue);
+
+    /**
+     * Convenience method - get a configuration property (setting) from
      * the system as a boolean value.
      *
      * @param name the property name
@@ -183,7 +202,7 @@ public interface ConfigurationService {
      * @return the long property value or default value if not found
      */
     public long getLongProperty(String name, long defaultValue);
-    
+
     /**
      * Convenience method - get a configuration property (setting) from
      * the system as its stored object
@@ -208,6 +227,14 @@ public interface ConfigurationService {
      * @return Configuration object representing the system configuration
      */
     public Configuration getConfiguration();
+
+    /**
+     * Return whether a property exists within the configuration
+     *
+     * @param name the property name
+     * @return true if property exists, false if not
+     */
+    public boolean hasProperty(String name);
 
     /**
      * Set a configuration property (setting) in the system.
