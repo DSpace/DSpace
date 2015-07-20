@@ -42,7 +42,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
 
     private static final Logger log = LoggerFactory.getLogger(DSpaceConfigurationService.class);
 
-    public static final String DSPACE_WEB_CONTEXT_PARAM = "dspace-config";
+    //public static final String DSPACE_WEB_CONTEXT_PARAM = "dspace-config";
     public static final String DSPACE = "dspace";
     public static final String EXT_CONFIG = "cfg";
     public static final String DOT_CONFIG = "." + EXT_CONFIG;
@@ -249,6 +249,12 @@ public final class DSpaceConfigurationService implements ConfigurationService {
     @Override
     public synchronized boolean setProperty(String name, Object value)
     {
+        // If the value is a type of String, trim any leading/trailing spaces before saving it.
+        if(value!=null && String.class.isInstance(value))
+        {
+            value = ((String) value).trim();
+        }
+
         boolean changed = false;
         if (name == null) {
             throw new IllegalArgumentException("name cannot be null for setting configuration");

@@ -291,6 +291,8 @@ public class DSpaceConfigurationServiceTest {
 
     @Test
     public void testSetProperty() {
+
+        // TEST setting a new Integer & retrieving using various methods
         Object prop = configurationService.getPropertyValue("newOne");
         assertNull(prop);
 
@@ -301,6 +303,10 @@ public class DSpaceConfigurationServiceTest {
         assertNotNull(prop);
         assertEquals("1111111", prop);
 
+        int i = configurationService.getIntProperty("newOne");
+        assertEquals(1111111, i);
+
+        // Test Setting a new Boolean and retrieving through various methods
         prop = configurationService.getPropertyValue("newBool");
         assertNull(prop);
 
@@ -311,6 +317,9 @@ public class DSpaceConfigurationServiceTest {
         assertNotNull(prop);
         assertEquals(Boolean.TRUE, prop);
 
+        boolean b = configurationService.getBooleanProperty("newBool");
+        assertEquals(true, b);
+
         changed = configurationService.setProperty("newBool", true);
         assertFalse(changed);
 
@@ -319,7 +328,25 @@ public class DSpaceConfigurationServiceTest {
 
         prop = configurationService.getPropertyValue("newBool");
         assertNull(prop);
+
+        // Test Setting a new String and retrieving through various methods
+        prop = configurationService.getPropertyValue("newString");
+        assertNull(prop);
+
+        changed = configurationService.setProperty("newString", "  Hi There      ");
+        assertTrue(changed);
+
+        // Assert strings are trimmed
+        String s = configurationService.getProperty("newString");
+        assertNotNull(s);
+        assertEquals("Hi There", s);
+
+        // Clear out our new props
+        configurationService.clearConfig("newOne");
+        configurationService.clearConfig("newBool");
+        configurationService.clearConfig("newString");
         prop = null;
+
     }
 
     /**
@@ -431,6 +458,23 @@ public class DSpaceConfigurationServiceTest {
 
         System.clearProperty("dspace.system.config");
         System.clearProperty("another.property");
+        dscs.clear();
+        dscs = null;
+    }
+
+    /**
+     * Tests the ability of the system to properly extract properties from files
+     * (NOTE: The local.properties test file is specified in the test "config-definition.xml")
+     */
+    @Test
+    public void testGetPropertiesFromFile() {
+
+        DSpaceConfigurationService dscs = new DSpaceConfigurationService();
+
+        // Test that property values are automatically trimmed of leading/trailing spaces
+        // In local.properties, this value is something like "   test    "
+        assertEquals("test", dscs.getProperty("prop.needing.trimmed"));
+
         dscs.clear();
         dscs = null;
     }
