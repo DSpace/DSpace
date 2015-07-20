@@ -16,7 +16,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -50,6 +49,16 @@ public class Bitstream extends DSpaceObject
 
     /** Flag set when data is modified, for events */
     private boolean modified;
+
+    // Field names for ORM
+    public static final String BITSTREAM_ID = "bitstream_id";
+    public static final String CHECKSUM = "checksum";
+    public static final String CHECKSUM_ALGORITHM = "checksum_algorithm";
+    public static final String DELETED = "deleted";
+    public static final String INTERNAL_ID = "internal_id";
+    public static final String SEQUENCE_ID = "sequence_id";
+    public static final String SIZE_BYTES = "size_bytes";
+    public static final String STORE_NUMBER = "store_number";
 
     /**
      * Private constructor for creating a Bitstream object based on the contents
@@ -361,7 +370,7 @@ public class Bitstream extends DSpaceObject
      */
     public String getChecksum()
     {
-        return bRow.getStringColumn("checksum");
+        return bRow.getStringColumn(Bitstream.CHECKSUM);
     }
 
     /**
@@ -371,7 +380,7 @@ public class Bitstream extends DSpaceObject
      */
     public String getChecksumAlgorithm()
     {
-        return bRow.getStringColumn("checksum_algorithm");
+        return bRow.getStringColumn(Bitstream.CHECKSUM_ALGORITHM);
     }
 
     /**
@@ -381,7 +390,7 @@ public class Bitstream extends DSpaceObject
      */
     public long getSize()
     {
-        return bRow.getLongColumn("size_bytes");
+        return bRow.getLongColumn(Bitstream.SIZE_BYTES);
     }
 
     /**
