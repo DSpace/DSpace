@@ -13,17 +13,14 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.UUID;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.core.Context;
 import org.dspace.identifier.ezid.DateToYear;
 import org.dspace.identifier.ezid.Transform;
-import org.dspace.kernel.ServiceManager;
 import org.dspace.services.ConfigurationService;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.WorkflowManager;
+import org.dspace.utils.DSpace;
 import org.junit.*;
 
 import static org.junit.Assert.*;
@@ -114,8 +111,8 @@ public class EZIDIdentifierProviderTest
     public static void setUpClass()
             throws Exception
     {
-        // Find the usual kernel services
-        config = kernelImpl.getConfigurationService();
+        // Find the configuration service
+        config = new DSpace().getConfigurationService();
 
         // Configure the service under test.
         config.setProperty(EZIDIdentifierProvider.CFG_SHOULDER, TEST_SHOULDER);

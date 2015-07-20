@@ -797,7 +797,7 @@ Common usage:
         <java classname="org.dspace.storage.rdbms.DatabaseUtils" classpathref="class.path" fork="yes" failonerror="yes">
             <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
             <sysproperty key="dspace.log.init.disable" value="true" />
-            <sysproperty key="dspace.configuration" value="${config}" />
+            <sysproperty key="dspace.dir" value="${dspace.dir}" />
             <arg value="test" />
         </java>
     </target>
