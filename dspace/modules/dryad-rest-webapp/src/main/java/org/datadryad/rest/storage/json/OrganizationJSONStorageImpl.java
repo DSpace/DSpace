@@ -83,7 +83,7 @@ public class OrganizationJSONStorageImpl extends AbstractOrganizationStorage {
     }
 
     @Override
-    protected void addResults(StoragePath path, List<Organization> organizations, Integer limit) throws StorageException {
+    protected void addResults(StoragePath path, List<Organization> organizations, String searchParam, Integer limit) throws StorageException {
         File[] files = this.storageDirectory.listFiles(new FilenameFilter() {
 
             @Override

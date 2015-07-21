@@ -159,11 +159,11 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
 
     protected void addAll(StoragePath path, List<Organization> organizations) throws StorageException {
         // passing in a limit of null to addResults should return all records
-        addResults(path, organizations, null);
+        addResults(path, organizations, null, null);
     }
 
     @Override
-    protected void addResults(StoragePath path, List<Organization> organizations, Integer limit) throws StorageException {
+    protected void addResults(StoragePath path, List<Organization> organizations, String searchParam, Integer limit) throws StorageException {
         try {
             Context context = getContext();
             organizations.addAll(getOrganizations(context));

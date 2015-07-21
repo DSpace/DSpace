@@ -189,7 +189,6 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         if(organizationId == NOT_FOUND) {
             return manuscripts;
         } else {
-            log.info ("returning "+limit+ " results");
             String query = "SELECT * FROM MANUSCRIPT WHERE organization_id = ? AND active = ? ORDER BY manuscript_id DESC LIMIT ? ";
             TableRowIterator rows = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, organizationId, ACTIVE_TRUE, limit);
             while(rows.hasNext()) {
@@ -276,12 +275,12 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     }
 
     protected void addAll(StoragePath path, List<Manuscript> manuscripts) throws StorageException {
-        addResults(path, manuscripts, null);
+        addResults(path, manuscripts, null, null);
     }
 
     // This call is always limited to the default limit of entries, so as not to tie up the connection pool.
     @Override
-    protected void addResults(StoragePath path, List<Manuscript> manuscripts, Integer limit) throws StorageException {
+    protected void addResults(StoragePath path, List<Manuscript> manuscripts, String searchParam, Integer limit) throws StorageException {
         String organizationCode = getOrganizationCode(path);
         int limitInt = DEFAULT_LIMIT;
         if (limit != null) {
@@ -289,7 +288,11 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         }
         try {
             Context context = getContext();
-            manuscripts.addAll(getManuscripts(context, organizationCode, limitInt));
+            if (searchParam == null) {
+                manuscripts.addAll(getManuscripts(context, organizationCode, limitInt));
+            } else {
+                manuscripts.addAll(getManuscriptsMatchingQuery(context, organizationCode, searchParam, limitInt));
+            }
             completeContext(context);
         } catch (SQLException ex) {
             throw new StorageException("Exception finding manuscripts", ex);
