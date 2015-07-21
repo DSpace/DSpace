@@ -296,7 +296,7 @@ lr.tracker.bitstream.site_id = 5
 
 lr.statistics.api.url = https://ufal.mff.cuni.cz/piwik/
 lr.statistics.api.auth.token =
-lr.statistics.api.site_id = 2
+lr.statistics.api.site_id = 5
 lr.statistics.report.path = ${lr.dspace.dir}/piwik_reports
 lr.lindat.logo.mono = ${lr.dspace.dir}/webapps/xmlui/themes/UFAL/images/lindat/lindat-logo-mono.png
 
