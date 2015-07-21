@@ -19,7 +19,7 @@ function init_dragNdrop() {
 					dragLeave);
 
 	if (!!FileReader && 'draggable' in document.createElement('span') && !!window.FormData && "upload" in new XMLHttpRequest) {
-		jQuery("#file_upload #aspect_submission_StepTransformer_field_file").parents(
+		jQuery("#aspect_submission_StepTransformer_field_file").parents(
 				"li:first").after(dropZone);
 	}
 } // function init_dragNdrop

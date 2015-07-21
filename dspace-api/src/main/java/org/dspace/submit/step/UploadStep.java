@@ -745,6 +745,8 @@ public class UploadStep extends AbstractProcessingStep
         	file = new URI(filePath);
         	URL url = file.toURL();
         	fileInputStream = url.openStream();
+        }catch(IllegalArgumentException e) {
+        	return STATUS_NOT_FOUND;
         }catch(MalformedURLException e) {
         	return STATUS_NOT_FOUND;
         }catch(URISyntaxException e) {

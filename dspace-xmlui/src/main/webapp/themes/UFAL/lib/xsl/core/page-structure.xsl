@@ -135,10 +135,6 @@
                 <link rel="stylesheet" href="{$theme-path}/lib/bootstrap/css/datepicker.css" />
             </xsl:if>
 
-            <!-- dragNdrop -->
-            <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='dragNdrop']">
-                <link rel="stylesheet" href="{$theme-path}/lib/css/jquery.fileupload-ui.css"> </link>
-	    </xsl:if>
 	    
 	    <!-- license selector -->
         <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='licenseselect']">
@@ -568,10 +564,8 @@
         </xsl:if>
 
         <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='dragNdrop']">
-            <script type="text/javascript" src="{$theme-path}/lib/js/jquery.fileupload.js">&#160;</script>
-            <script type="text/javascript" src="{$theme-path}/lib/js/jquery.fileupload-ui.js">&#160;</script>
             <script type="text/javascript" src="{$theme-path}/lib/js/dragndrop.js">&#160;</script>
-			<script type="text/javascript" src="{$theme-path}/lib/js/fileupload.js">&#160;</script>
+            <script type="text/javascript" src="{$theme-path}/lib/js/fileupload.js">&#160;</script>
         </xsl:if>
 
         <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='extrametadata']">

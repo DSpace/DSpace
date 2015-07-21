@@ -12,7 +12,7 @@ function createRejectedFilesDialog(files, fileUploadDialog) {
 + '). Please contact <a href="mailto:' + ufal_help_mail + '">Help Desk</a> about how to upload these files.</p>\
 </div>\
 <div class="modal-footer">\
-<button type="button" class="btn btn-primary" id="js-ok-button">OK</button>\
+<button type="button" class="btn btn-primary" id="rejected-ok-button">OK</button>\
 </div>\
 </div>\
 </div>';
@@ -26,12 +26,12 @@ function createRejectedFilesDialog(files, fileUploadDialog) {
 				+ convertBytesToHumanReadableForm(file.size) + "</span></div>");
 		modal_body.append("<br />");
 	}
-	jModal.find("#js-ok-button").click(function() {
+	jModal.find("#rejected-ok-button").click(function() {
 				jModal.modal("toggle");
 				if (fileUploadDialog != undefined) {
 					fileUploadDialog.modal();
 				} else {
-					jQuery("#file_upload #aspect_submission_StepTransformer_field_file")
+					jQuery("#aspect_submission_StepTransformer_field_file")
 							.val("");
 				}
 			});
@@ -47,7 +47,7 @@ function convertBytesToHumanReadableForm(b) {
 function createFileUploadDialog(files) {
 	var xhrs = [];
 
-	var fileFieldO = jQuery("#file_upload #aspect_submission_StepTransformer_field_file");
+	var fileFieldO = jQuery("#aspect_submission_StepTransformer_field_file");
 	var action = fileFieldO.parents("form:first").attr("action");
 	fileFieldO.parents("form:first").attr("action", action + "#fl");
 
@@ -214,12 +214,12 @@ function createFileUploadDialog(files) {
 								jQuery("input[type='submit'][value='Upload']")
 										.click();
 							});
-	jModal.on('hidden.bs.modal',function() {
+	jModal.on('hide.bs.modal',function() {
 					xhrs.forEach(function(xhr) {
 						xhr.abort();
 					});
 					// remove the selection so the files are not submitted again
-					jQuery("#file_upload #aspect_submission_StepTransformer_field_file")
+					jQuery("#aspect_submission_StepTransformer_field_file")
 							.val("");
 				});
 	return jModal;
@@ -272,7 +272,7 @@ jQuery(document)
 		.ready(
 				function() {
 					
-					var fileFieldO = jQuery("#file_upload #aspect_submission_StepTransformer_field_file");
+					var fileFieldO = jQuery("#aspect_submission_StepTransformer_field_file");
 
 					if (!!FileReader && 'draggable' in document.createElement('span')
 							&& !!window.FormData && "upload" in new XMLHttpRequest) {
@@ -287,7 +287,7 @@ jQuery(document)
 								.change(
 										function() {
 											var files = document
-													.getElementById("#file_upload aspect_submission_StepTransformer_field_file").files;
+													.getElementById("aspect_submission_StepTransformer_field_file").files;
 											processFiles(files);
 										});
 					}
