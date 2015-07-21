@@ -1130,13 +1130,17 @@ public abstract class DSpaceObject implements IGlobalSearchResult
     private boolean match(String schema, String element, String qualifier,
                           String language, Metadatum dcv)
     {
-        // We will attempt to disprove a match - if we can't we have a match
-        if (!element.equals(Item.ANY) && !element.equals(dcv.element))
-        {
-            // Elements do not match, no wildcard
-            return false;
-        }
 
+		if (StringUtils.isBlank(element) || StringUtils.isBlank(schema)) {
+			return false;
+		}
+
+		// We will attempt to disprove a match - if we can't we have a match
+		if (!element.equals(Item.ANY) && !element.equals(dcv.element)) {
+			// Elements do not match, no wildcard
+			return false;
+		}
+		
         if (qualifier == null)
         {
             // Value must be unqualified
