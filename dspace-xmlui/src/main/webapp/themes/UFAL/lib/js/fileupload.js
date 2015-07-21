@@ -12,7 +12,7 @@ function createRejectedFilesDialog(files, fileUploadDialog) {
 + '). Please contact <a href="mailto:' + ufal_help_mail + '">Help Desk</a> about how to upload these files.</p>\
 </div>\
 <div class="modal-footer">\
-<button type="button" class="btn btn-primary" id="js-ok-button">OK</button>\
+<button type="button" class="btn btn-primary" id="rejected-ok-button">OK</button>\
 </div>\
 </div>\
 </div>';
@@ -26,7 +26,7 @@ function createRejectedFilesDialog(files, fileUploadDialog) {
 				+ convertBytesToHumanReadableForm(file.size) + "</span></div>");
 		modal_body.append("<br />");
 	}
-	jModal.find("#js-ok-button").click(function() {
+	jModal.find("#rejected-ok-button").click(function() {
 				jModal.modal("toggle");
 				if (fileUploadDialog != undefined) {
 					fileUploadDialog.modal();
