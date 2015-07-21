@@ -130,13 +130,13 @@ public class EditProfile extends AbstractDSpaceTransformer
     static
     {
         Arrays.sort(supportedLocales, new Comparator<Locale>()
-                {
+        {
             @Override
             public int compare(Locale a, Locale b)
             {
                 return a.getDisplayName().compareTo(b.getDisplayName());
             }
-                });
+        });
     }
 
     /** The email address of the user registering for the first time. */
@@ -230,10 +230,13 @@ public class EditProfile extends AbstractDSpaceTransformer
             defaultLanguage = eperson.getLanguage();
         }
 
-        if ((eperson.getNetid() != null)
-                && (eperson.getNetid().equals("") == false))
+        if (eperson != null)
         {
-            this.allowSetPassword = false;
+            if ((eperson.getNetid() != null)
+                    && (eperson.getNetid().equals("") == false))
+            {
+                this.allowSetPassword = false;
+            }
         }
 
         String action = contextPath;
@@ -338,7 +341,7 @@ public class EditProfile extends AbstractDSpaceTransformer
         }
         lang.setOptionSelected((defaultLanguage == null || defaultLanguage
                 .equals("")) ? I18nUtil.DEFAULTLOCALE.toString()
-                        : defaultLanguage);
+                : defaultLanguage);
         if (!registering
                 && !ConfigurationManager.getBooleanProperty(
                         "xmlui.user.editmetadata", true))
