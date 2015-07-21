@@ -200,6 +200,25 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         }
     }
 
+    private static List<Manuscript> getManuscriptsMatchingQuery(Context context, String organizationCode, String searchParam, int limit) throws SQLException, IOException {
+        List<Manuscript> manuscripts = new ArrayList<Manuscript>();
+        Integer organizationId = getOrganizationInternalId(context, organizationCode);
+
+        if(organizationId == NOT_FOUND) {
+            return manuscripts;
+        } else {
+            String searchWords[] = searchParam.split("\\s", 2);
+            String queryParam = "%" + searchWords[0] + "%";
+            String query = "SELECT * FROM MANUSCRIPT WHERE organization_id = ? AND active = ? AND json_data like ? ORDER BY manuscript_id DESC LIMIT ? ";
+            TableRowIterator rows = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, organizationId, ACTIVE_TRUE, queryParam, limit);
+            while(rows.hasNext()) {
+                TableRow row = rows.next();
+                manuscripts.add(manuscriptFromTableRow(row));
+            }
+            return manuscripts;
+        }
+    }
+
     private static void insertManuscript(Context context, Manuscript manuscript, String organizationCode) throws SQLException, IOException {
         Integer organizationId = getOrganizationInternalId(context, organizationCode);
         TableRow row = tableRowFromManuscript(manuscript, organizationId);
