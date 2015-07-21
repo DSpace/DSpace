@@ -9,7 +9,6 @@
  */
 package org.dspace.health;
 
-import cz.cuni.mff.ufal.DSpaceApi;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
@@ -142,9 +141,6 @@ public class Report {
             System.exit(1);
         }
 
-        // try loading dspace
-        DSpaceApi.load_dspace();
-
         if ( cmdline.hasOption(option_help) ) {
             String checks_summary = "";
             int pos = 0;
@@ -187,7 +183,7 @@ public class Report {
             if (cmdline.hasOption(option_email)) {
                 String to = cmdline.getOptionValue(option_email);
                 if ( !to.contains("@") ) {
-                    to = ConfigurationManager.getProperty("info.recipient");
+                    to = ConfigurationManager.getProperty(to);
                 }
                 try {
                     String dspace_dir = ConfigurationManager.getProperty("dspace.dir");

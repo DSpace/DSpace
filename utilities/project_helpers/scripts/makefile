@@ -348,7 +348,7 @@ lift_embargos:
 
 # This command creates and sends repository report
 send_info:
-	$(DSPACE_BIN) healthcheck -e default
+	$(DSPACE_BIN) healthcheck -e info.recipient
 
 update_oai:
 	LC_ALL=en_US.UTF-8 $(DSPACE_BIN) oai import
