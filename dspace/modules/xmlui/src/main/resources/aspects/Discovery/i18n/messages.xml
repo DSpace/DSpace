@@ -30,7 +30,7 @@
 
 
     <!-- org.dspace.app.xmlui.artifactbrowser.AdvancedSearch.java -->
-    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dc.contributor.author_filter">Author</message>
+    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dc.contributor.author_filter">Author/Contributor</message>
 
     <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dc.subject_filter">Subject</message>
     <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dc.type_filter">Content Type</message>
@@ -64,7 +64,7 @@
 
     <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dc.relation.ispartofseries_filter">Series</message>
 
-    <message key="xmlui.ArtifactBrowser.AbstractSearch.type_dc.contributor.author_browse">Browsing by: Author</message>
+    <message key="xmlui.ArtifactBrowser.AbstractSearch.type_dc.contributor.author_browse">Browsing by: Author/Contributor</message>
     <message key="xmlui.ArtifactBrowser.AbstractSearch.type_dc.title_browse">Browsing by: Title</message>
     <message key="xmlui.ArtifactBrowser.AbstractSearch.type_dc.subject_browse">Browsing by: Subject</message>
         
@@ -86,7 +86,7 @@
     <message key="xmlui.ArtifactBrowser.AbstractSearch.type_department_browse">Browsing by: Department</message>
     <message key="xmlui.ArtifactBrowser.AbstractSearch.type_dateissued_dt_browse">Browsing by: Date Issued</message>
 
-    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.author">Author</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.author">Author/Contributor</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.title">Title</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subject">Subject</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dateIssued">Date Issued</message>
@@ -95,9 +95,9 @@
 
     <message key="xmlui.dri2xhtml.structural.pagination-info.nototal">Now showing items {0}-{1}</message>
 
-    <message key="xmlui.Discovery.AbstractSearch.type_author">Filter by: Author</message>
-    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.author">Author</message>
-    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.author_filter">Author</message>
+    <message key="xmlui.Discovery.AbstractSearch.type_author">Filter by: Author/Contributor</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.author">Author/Contributor</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.author_filter">Author/Contributor</message>
 
 
     <message key="xmlui.Discovery.AbstractSearch.type_keyword">Filter by: Keyword</message>
@@ -183,7 +183,7 @@
     <message key="xmlui.Discovery.SimpleSearch.filter.notauthority">Not ID</message>
     
     <message key="xmlui.Discovery.RelatedItems.head">Related items</message>
-    <message key="xmlui.Discovery.RelatedItems.help">Showing items related by title, author, creator and subject.</message>
+    <message key="xmlui.Discovery.RelatedItems.help">Showing items related by title, author/contributor, creator and subject.</message>
 
     <message key="xmlui.Discovery.AbstractSearch.head1_community">Showing {0} out of a total of {1} results for community: {2}. <span class="searchTime">({3} seconds)</span></message>
    	<message key="xmlui.Discovery.AbstractSearch.head1_collection">Showing {0} out of a total of {1} results for collection: {2}. <span class="searchTime">({3} seconds)</span></message>
