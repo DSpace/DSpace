@@ -1204,54 +1204,8 @@
 						var ufal_help_mail = "]]><xsl:value-of select="$lr.help.mail" /><![CDATA[";
 					]]>
 					</script>
-					<input type="file" name="file">
-						<xsl:call-template name="fieldAttributes" />
-						<xsl:if test="dri:value/i18n:text">
-							<xsl:attribute name="i18n:attr">value</xsl:attribute>
-						</xsl:if>
-						<xsl:attribute name="value">
-                            <xsl:choose>
-                                <xsl:when test="./dri:value[@type='raw']">
-                                    <xsl:value-of
-							select="./dri:value[@type='raw']" />
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <xsl:value-of
-							select="./dri:value[@type='default']" />
-                                </xsl:otherwise>
-                            </xsl:choose>
-                        </xsl:attribute>
-						<xsl:if test="dri:value/i18n:text">
-							<xsl:attribute name="i18n:attr">value</xsl:attribute>
-						</xsl:if>
-						<xsl:apply-templates />
-					</input>
-					<button>
-						<i18n:text>xmlui.UFAL.dragndrop.upload.button.text</i18n:text>
-					</button>
-					<div>
-						<i18n:text>xmlui.UFAL.dragndrop.upload.label</i18n:text>
-					</div>
 				</div>
 			</span>
-
-			<!-- ui-dialog -->
-			<div id="file_upload_no_desc_dialog" style="display:none"
-				i18n:attr="title" title="xmlui.UFAL.dragndrop.nodescription.title">
-
-				<label>
-					<i18n:text>xmlui.UFAL.dragndrop.nodescription.label</i18n:text>
-					<span id="fileNameDesc" />
-				</label>
-				<input type="text" value="" style="margin-top:10px; margin-bottom:10px;">
-				</input>
-				<div class="field-help">
-					<i18n:text>xmlui.UFAL.dragndrop.nodescription.help</i18n:text>
-				</div>
-
-			</div>
-
-			<table id="files">&#160;</table>
 		</xsl:if>
 	</xsl:template>
 

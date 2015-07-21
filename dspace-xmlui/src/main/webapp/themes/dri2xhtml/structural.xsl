@@ -285,9 +285,6 @@
                 but required.
             -->
             <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='dragNdrop']">
-                <link rel="stylesheet" href="{$theme-path}/lib/css/jquery.fileupload-ui.css"> </link>
-                <script type="text/javascript" src="{$theme-path}/lib/js/jquery.fileupload.js">&#160;</script>
-                <script type="text/javascript" src="{$theme-path}/lib/js/jquery.fileupload-ui.js">&#160;</script>
                 <script type="text/javascript" src="{$theme-path}/lib/js/fileupload.js">&#160;</script>
             </xsl:if>
             <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='extrametadata']">
@@ -2513,45 +2510,6 @@
         include it as a button. This relies on js/css added in buildHeader.
     jmisutka 2011/04/07 -->
     <xsl:template name="dragNdrop">
-        <xsl:if test="@type= 'file' and /dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='dragNdrop']">
-            <span id="file_upload">
-                <div id="file_upload_container" style="display:none">
-                    <input type="file" name="file">
-                        <xsl:call-template name="fieldAttributes"/>
-                        <xsl:if test="dri:value/i18n:text">
-                            <xsl:attribute name="i18n:attr">value</xsl:attribute>
-                        </xsl:if>
-                        <xsl:attribute name="value">
-                            <xsl:choose>
-                                <xsl:when test="./dri:value[@type='raw']">
-                                    <xsl:value-of select="./dri:value[@type='raw']"/>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <xsl:value-of select="./dri:value[@type='default']"/>
-                    </xsl:otherwise>
-        </xsl:choose>
-                        </xsl:attribute>
-                        <xsl:if test="dri:value/i18n:text">
-                            <xsl:attribute name="i18n:attr">value</xsl:attribute>
-                        </xsl:if>
-                        <xsl:apply-templates />
-                    </input>
-                    <button><i18n:text>xmlui.UFAL.dragndrop.upload.button.text</i18n:text></button>
-                    <div><i18n:text>xmlui.UFAL.dragndrop.upload.label</i18n:text></div>
-                </div>
-            </span>
-
-          <!-- ui-dialog -->
-          <div id="file_upload_no_desc_dialog" style="display:none" i18n:attr="title" title="xmlui.UFAL.dragndrop.nodescription.title">
-
-              <label class="ds-from-label"><i18n:text>xmlui.UFAL.dragndrop.nodescription.label</i18n:text></label>
-              <input type="text" value=""> </input>
-              <div class="field-help"><i18n:text>xmlui.UFAL.dragndrop.nodescription.help</i18n:text></div>
-
-          </div>
-
-            <table id="files">&#160;</table>
-        </xsl:if>
     </xsl:template>
     
     <!-- A set of standard attributes common to all fields -->
