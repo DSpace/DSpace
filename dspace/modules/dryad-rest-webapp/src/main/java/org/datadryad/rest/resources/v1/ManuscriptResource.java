@@ -46,12 +46,12 @@ public class ManuscriptResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getManuscripts(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode, @QueryParam("results") Integer resultParam) {
+    public Response getManuscripts(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode, @QueryParam("search") String searchParam, @QueryParam("results") Integer resultParam) {
         try {
             // Returning a list requires POJO turned on
             StoragePath path = new StoragePath();
             path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
-            return Response.ok(manuscriptStorage.getResults(path, resultParam)).build();
+            return Response.ok(manuscriptStorage.getResults(path, searchParam, resultParam)).build();
         } catch (StorageException ex) {
             log.error("Exception getting manuscripts", ex);
             ErrorsResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to list manuscripts", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
