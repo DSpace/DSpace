@@ -420,4 +420,4 @@ migrate_databases:
 	./migrate_db.sh $(UTILITIES_DATABASE_NAME)
 
 generate_piwik_reports:
-	$(DSPACE_BIN) piwik-report-generator
+	LC_ALL=en_US.UTF-8 $(DSPACE_BIN) piwik-report-generator
