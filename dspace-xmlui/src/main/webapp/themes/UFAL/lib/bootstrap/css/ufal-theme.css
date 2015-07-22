@@ -1387,3 +1387,7 @@ div.modal-scrollbar {
   -moz-border-radius: 8px 0 8px 0;
   border-radius: 8px 0 8px 0;
 }
+
+#aspect_submission_StepTransformer_list_controls .licenseselector {
+	margin: 10px 0px 10px 0px;
+}
