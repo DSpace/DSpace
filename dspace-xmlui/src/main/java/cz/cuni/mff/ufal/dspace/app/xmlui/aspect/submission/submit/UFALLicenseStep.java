@@ -53,6 +53,7 @@ public class UFALLicenseStep extends LicenseStep {
 	protected static final Message T_distribution_license_head = message("xmlui.Submission.submit.LicenseStep.distribution_license_head");
 	protected static final Message T_distribution_license_head_link = message("xmlui.Submission.submit.LicenseStep.distribution_license_head_link");
 	protected static final Message T_resource_license_text = message("xmlui.Submission.submit.LicenseStep.resource_license_text");
+	protected static final Message T_resource_license_text2 = message("xmlui.Submission.submit.LicenseStep.resource_license_text2");	
 	protected static final Message T_license_selector_button = message("xmlui.Submission.submit.LicenseStep.license_selector_button");
 	protected static final Message T_license_list_alert = message("xmlui.Submission.submit.LicenseStep.license_list_alert");
 	protected static final Message T_license_list_alert_link = message("xmlui.Submission.submit.LicenseStep.license_list_alert_link");
@@ -167,22 +168,23 @@ public class UFALLicenseStep extends LicenseStep {
 			form = controls.addList("submit-ufal-license", List.TYPE_FORM, "");
 			form.setHead("Select the resource license");
 			
-			Item selectorLink = form.addItem();
-			selectorLink.addXref("#!", T_license_selector_button, "btn btn-repository licenseselector bold pull-right");
-						
-			Item helpText = form.addItem();
-						
-			helpText.addHighlight("license-resource-text").addContent(T_resource_license_text);
+			Item selectorLink = form.addItem("", "alert alert-info");
+			selectorLink.addHighlight("").addContent(T_resource_license_text);
+			selectorLink.addHighlight("").addContent(T_license_list_alert);
+			selectorLink.addHighlight("").addXref(contextPath + "/page/licenses", T_license_list_alert_link, "target_blank alert-link");
+			selectorLink.addHighlight("").addContent(".");			
+			selectorLink.addXref("#!", T_license_selector_button, "btn btn-repository licenseselector bold btn-block btn-lg");
+			
+			Item orLbl = form.addItem(null, "text-center");
+			orLbl.addContent("- OR -");
 
+			Item helpText2 = form.addItem();
+			helpText2.addHighlight("license-resource-text").addContent(T_resource_license_text2);			
+						
 			Item notsupported = form.addItem("license-not-supported-message", "alert alert-danger alert-dismissible fade in hidden");
 			notsupported.addContent(T_license_not_supported);
 			
 			license_select = form.addItem().addSelect("license");
-			Item detailLicenseLink = form.addItem(null, "alert alert-info");
-			detailLicenseLink.addHighlight("fa fa-lg fa-question-circle").addContent(" ");
-			detailLicenseLink.addHighlight("").addContent(T_license_list_alert);
-			detailLicenseLink.addHighlight("").addXref(contextPath + "/page/licenses", T_license_list_alert_link, "target_blank alert-link");
-			detailLicenseLink.addHighlight("").addContent(".");
 
 			// add not available
 			license_select.setMultiple(false);

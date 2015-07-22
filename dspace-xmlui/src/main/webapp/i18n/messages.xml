@@ -1126,7 +1126,8 @@
     <message key="xmlui.Submission.submit.LicenseStep.distribution_license_head_link">Distribution License Agreement</message>
     <message key="xmlui.Submission.submit.LicenseStep.license_list_alert">For the list of all supported licenses and their details visit </message>
     <message key="xmlui.Submission.submit.LicenseStep.license_list_alert_link">License List Page</message>
-    <message key="xmlui.Submission.submit.LicenseStep.resource_license_text"> If you know under which license you want to distribute your work, please select from the dropdown or <b class='text-primary'>Click the License Selector button for visual assistance.</b></message>
+    <message key="xmlui.Submission.submit.LicenseStep.resource_license_text"><i class='fa fa-3x fa-crosshairs  pull-left'> </i>The License Selector will provide you visual assistance to select the most appropriate license for your data or software.</message>
+    <message key="xmlui.Submission.submit.LicenseStep.resource_license_text2">If you already know under which license you want to distribute your work, please select from the dropdown below.</message>    
     <message key="xmlui.Submission.submit.LicenseStep.license_selector_button">OPEN License Selector</message>
 
 
