@@ -82,18 +82,34 @@ ufal.citation = {
 		},
 
 		extract_metadata_bibtex : function(xml_content) {
-			try {
-				var xml = jQuery.parseXML(xml_content);
-				var metadata = jQuery(xml.getElementsByTagNameNS(
-						"http://lindat.mff.cuni.cz/ns/experimental/bibtex",
-						"bibtex")[0]);
-				if (!metadata) {
-					throw "Not found."
-				}
-				return metadata.text();
-			} catch (err) {
-				return xml_content;
-			}
+            try {
+                    var xml = jQuery.parseXML(xml_content);
+                    var metadata = jQuery(xml.getElementsByTagNameNS(
+                                    "http://lindat.mff.cuni.cz/ns/experimental/bibtex",
+                                    "bibtex")[0]);
+                    if (!metadata) {
+                            throw "Not found."
+                    }
+                    var bt = metadata.text().trim();
+                    bt = bt.replace(/  +/g, " ");
+                    var res = [];
+                    var intend = 0;
+                    for(var i=0;i<bt.length;i++) {
+                       if(bt[i] == '{') intend++;
+                       else
+                       if(bt[i] == '}') intend--;
+                       else
+                       if(bt[i] == '\n') {
+                          for(var j=0;j<intend;j++) {
+                              res.push("\t");
+                          }
+                       }
+                       res.push(bt[i]);
+                    }
+                    return res.join("");
+            } catch (err) {
+                    return xml_content;
+            }
 		},
 
 		extract_metadata_cmdi : function(xml_content) {
