@@ -55,13 +55,6 @@ ALTER SEQUENCE license_definition_license_id_seq OWNED BY license_definition.lic
 
 
 --
--- Name: license_definition_license_id_seq; Type: SEQUENCE SET; Schema: public; Owner: dspace
---
-
-SELECT pg_catalog.setval('license_definition_license_id_seq', 32, true);
-
-
---
 -- Name: license_file_download_statistic; Type: TABLE; Schema: public; Owner: dspace; Tablespace: 
 --
 
@@ -546,30 +539,8 @@ COPY user_registration (eperson_id, email, organization, confirmation) FROM stdi
 -- Data for Name: license_definition; Type: TABLE DATA; Schema: public; Owner: dspace
 --
 
-COPY license_definition (license_id, name, definition, eperson_id, label_id, created_on, confirmation, required_info) FROM stdin;
-16	GNU General Public Licence, version 3	http://opensource.org/licenses/GPL-3.0	1	1	2013-02-27 18:54:59.103704	0	\N
-3	GNU General Public License, version 2	http://www.gnu.org/licenses/gpl-2.0.html	1	1	2012-09-27 05:39:47.271105	0	\N
-11	The MIT License (MIT)	http://opensource.org/licenses/mit-license.php	1	1	2012-09-27 05:50:45.861588	0	\N
-18	Artistic License 2.0	http://opensource.org/licenses/Artistic-2.0	1	1	2013-02-27 19:05:28.923843	0	\N
-17	Artistic License (Perl) 1.0	http://opensource.org/licenses/Artistic-Perl-1.0	1	1	2013-02-27 19:03:46.95784	0	\N
-4	Attribution-NonCommercial-NoDerivs 3.0 Unported (CC BY-NC-ND 3.0)	http://creativecommons.org/licenses/by-nc-nd/3.0/	1	1	2011-12-14 21:32:21.586806	0	\N
-15	BSD 2-Clause "Simplified" or "FreeBSD" license	http://opensource.org/licenses/BSD-2-Clause	1	1	2013-02-01 15:07:52.605509	0	\N
-14	BSD 3-Clause "New" or "Revised" license	http://opensource.org/licenses/BSD-3-Clause	1	1	2013-02-01 15:06:57.567966	0	\N
-1	Attribution-NonCommercial 3.0 Unported (CC BY-NC 3.0)	http://creativecommons.org/licenses/by-nc/3.0/	1	1	2011-12-14 21:29:38.719044	0	\N
-2	Attribution-NonCommercial-ShareAlike 3.0 Unported (CC BY-NC-SA 3.0)	http://creativecommons.org/licenses/by-nc-sa/3.0/	1	1	2011-12-14 21:30:29.776313	0	\N
-5	Attribution-NoDerivs 3.0 Unported (CC BY-ND 3.0)	http://creativecommons.org/licenses/by-nd/3.0/	1	1	2011-12-14 21:32:39.21528	0	\N
-6	Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)	http://creativecommons.org/licenses/by-sa/3.0/	1	1	2011-12-14 21:33:12.100304	0	\N
-8	Creative Commons - Attribution 3.0 Unported (CC BY 3.0)	http://creativecommons.org/licenses/by/3.0/	1	1	2011-12-14 23:05:10.936108	0	\N
-22	PDTSL	https://lindat.mff.cuni.cz/repository/xmlui/page/licence-pdtsl	1	3	2014-04-08 00:33:18.849529	2	SEND_TOKEN, NAME, ADDRESS, COUNTRY, EXTRA_EMAIL
-23	HamleDT 1.0  Licence Agreement	https://lindat.mff.cuni.cz/repository/xmlui/page/licence-hamledt	1	3	2014-04-14 10:23:38.307371	2	SEND_TOKEN, NAME, ADDRESS, COUNTRY, EXTRA_EMAIL
-27	HamleDT 2.0 Licence Agreement	https://lindat.mff.cuni.cz/repository/xmlui/page/licence-hamledt-2.0	1	2	2014-05-26 14:22:30.637637	0	\N
-21	Czech National Corpus (Shuffled Corpus Data)	https://lindat.mff.cuni.cz/repository/xmlui/page/license-cnc	1	2	2013-12-13 14:37:19.412474	1	\N
-19	CC-BY-NC-SA + LDC99T42	https://lindat.mff.cuni.cz/repository/xmlui/page/license-pcedt2	1	3	2013-03-28 14:56:42.948628	1	\N
-7	PDT 2.0 License	https://lindat.mff.cuni.cz/repository/xmlui/page/license-pdt2	1	2	2011-12-14 21:38:22.407755	1	\N
-12	CC0-No Rights Reserved	http://creativecommons.org/publicdomain/zero/1.0/	1	1	2012-10-01 17:16:47.863708	0	\N
-20	Apache License 2.0	http://opensource.org/licenses/Apache-2.0	1	1	2013-08-13 18:04:21.606801	0	\N
-\.
-
+\set afile :utildir '/license_definition.txt'
+copy license_definition(name, definition,eperson_id, label_id, created_on, confirmation, required_info) from :'afile';
 
 --
 -- Data for Name: license_label; Type: TABLE DATA; Schema: public; Owner: dspace
