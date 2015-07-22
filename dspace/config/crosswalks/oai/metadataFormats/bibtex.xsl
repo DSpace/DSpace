@@ -5,9 +5,13 @@
     xmlns:doc="http://www.lyncode.com/xoai" 
     xmlns:bib="http://lindat.mff.cuni.cz/ns/experimental/bibtex"
     xmlns:util="cz.cuni.mff.ufal.utils.BibtexUtil"
-    exclude-result-prefixes="doc util"
+    xmlns:confman="org.dspace.core.ConfigurationManager"
+    exclude-result-prefixes="doc util confman"
     version="1.0">
     
+    <!-- repository name -->
+    <xsl:variable name="dspace.name" select="confman:getProperty('dspace.name')"/>
+
     <xsl:output omit-xml-declaration="yes" method="xml" indent="yes" cdata-section-elements="bib:bibtex"/>
     
     <xsl:template match="/">
@@ -34,7 +38,7 @@
             <xsl:if test="$url != ''">
                     <xsl:value-of select="util:format($url)"/>
             </xsl:if>
-            <xsl:if test="institution != ''">
+            <xsl:if test="$institution != ''">
                     <xsl:value-of select="util:format($institution)"/>
             </xsl:if>
             <xsl:if test="$copyright != ''">
@@ -89,9 +93,7 @@
     </xsl:template>
     
     <xsl:template name="institution">
-        <xsl:if test="doc:metadata/doc:element[@name='metashare']/doc:element[@name='ResourceInfo#ContactInfo#PersonInfo#OrganizationInfo']/doc:element[@name='organizationName']/doc:element/doc:field[@name='value']">
-                institution = {<xsl:value-of select="util:bibtexify(doc:metadata/doc:element[@name='metashare']/doc:element[@name='ResourceInfo#ContactInfo#PersonInfo#OrganizationInfo']/doc:element[@name='organizationName']/doc:element/doc:field[@name='value'])"/>},
-        </xsl:if>
+	institution = {<xsl:value-of select="util:bibtexify($dspace.name)"/>},
     </xsl:template>
     
     <!-- was mapped to dc.keywords but that does not exist -->
