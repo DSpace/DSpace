@@ -617,13 +617,13 @@ public class CDLDataCiteService {
     }
 
     public void emailException(String error, String item, String operation) throws IOException {
-        String admin = ConfigurationManager.getProperty("mail.admin");
+        String recipient = ConfigurationManager.getProperty("curator_errors.recipient");
         Locale locale = I18nUtil.getDefaultLocale();
         String emailFile = I18nUtil.getEmailFilename(locale, "datacite_error");
         Email email = ConfigurationManager.getEmail(emailFile);
 
         // Write our stack trace to a string for output
-        email.addRecipient(admin);
+        email.addRecipient(recipient);
 
         // Add details to display in the email message
         email.addArgument(operation);
