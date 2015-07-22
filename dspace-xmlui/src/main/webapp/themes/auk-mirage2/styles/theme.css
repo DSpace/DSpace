@@ -2,7 +2,7 @@
  Colors: Find and Replace for a quick scheme.
       mirage2      this-site
  1st: #EBC78C      #EBC78C          Top header
- 2nd: #9A182B      #9A182B          Breadcrumb
+ 2nd: #D69400      #D69400          Breadcrumb
  3rd: #D69400      #D69400          side-nav/h1..h7
 */
 
@@ -23,11 +23,11 @@ header .navbar-brand img {
 
 /* Override classic-mirage-style */
 header .navbar-default {
-    background-color: #EBC78C;
+    background-color: #fff;
 }
 
 .trail-wrapper {
-    background-color: #9A182B;
+    background-color: #D69400;
 }
 .trail-wrapper .breadcrumb > li + li:before {
     color: #eaf1f7;
@@ -51,7 +51,7 @@ header .navbar-default {
 
 /* Submission form progress buttons */
 .btn-success {
-    background-color: #9A182B;
+    background-color: #D69400;
     border: 1px solid #8b9eb2;
 }
 .btn-success[disabled], .btn-success.disabled {
@@ -64,25 +64,25 @@ header .navbar-default {
 
 /* Header Person dropdown */
 header .navbar-default .navbar-toggle > .open > a, header .navbar-default .navbar-toggle > .open > a:hover, header .navbar-default .navbar-toggle > .open > a:focus, header .navbar-default .navbar-nav > .open > a, header .navbar-default .navbar-nav > .open > a:hover, header .navbar-default .navbar-nav > .open > a:focus {
-    background-color: #9A182B;
+    background-color: #D69400;
     color: #eaf1f7;
 }
 header .navbar-default .navbar-toggle > li > a:hover, header .navbar-default .navbar-toggle > li > a:focus, header .navbar-default .navbar-nav > li > a:hover, header .navbar-default .navbar-nav > li > a:focus {
-    background-color: #9A182B;
+    background-color: #D69400;
     color: #eaf1f7;
 }
 header .navbar-default .navbar-toggle > .active > a, header .navbar-default .navbar-toggle > .active > a:hover, header .navbar-default .navbar-toggle > .active > a:focus, header .navbar-default .navbar-nav > .active > a, header .navbar-default .navbar-nav > .active > a:hover, header .navbar-default .navbar-nav > .active > a:focus {
-    background-color: #9A182B;
+    background-color: #D69400;
     color: #eaf1f7;
 }
 header .navbar-default .navbar-toggle > .open > a, header .navbar-default .navbar-toggle > .open > a:hover, header .navbar-default .navbar-toggle > .open > a:focus, header .navbar-default .navbar-nav > .open > a, header .navbar-default .navbar-nav > .open > a:hover, header .navbar-default .navbar-nav > .open > a:focus {
-    background-color: #9A182B;
+    background-color: #D69400;
     color: #eaf1f7;
 }
 
 /* Registration Buttons */
 .label-success {
-    background-color: #9A182B;
+    background-color: #D69400;
     color: #eaf1f7;
 }
 

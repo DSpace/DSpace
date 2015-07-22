@@ -342,7 +342,7 @@
                         </button>
 
                         <a href="{$context-path}/" class="navbar-brand">
-                            <img class="img-responsive" src="{$theme-path}/images/auk-header-resize.png" />
+                            <img class="img-responsive" src="{$theme-path}/images/AUK-Repository-Banner.png" />
                         </a>
 
 
