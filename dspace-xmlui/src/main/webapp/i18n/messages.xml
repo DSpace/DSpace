@@ -110,6 +110,9 @@
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.rpp">Results/page</message>
 
     <!-- org.dspace.app.xmlui.artifactbrowser.AdvancedSearch.java -->
+	<!-- Note: As of DSpace 6.0, org.dspace.app.xmlui.aspect.artifactbrowser.AdvancedSearch has been removed.
+         The following i18n keys will be left as is as they're referenced by the Discovery SidebarFacetsTransformer
+         but in future, they should be refactored to a more relevant key prefix -->
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.title">Advanced Search</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.trail">Advanced Search</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.head">Advanced Search</message>

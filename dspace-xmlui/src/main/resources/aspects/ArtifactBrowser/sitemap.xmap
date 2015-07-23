@@ -30,7 +30,6 @@ and searching the repository.
                         <map:transformer name="ItemViewer" src="org.dspace.app.xmlui.aspect.artifactbrowser.ItemViewer"/>
                         <map:transformer name="ConfigurableBrowse" src="org.dspace.app.xmlui.aspect.artifactbrowser.ConfigurableBrowse"/>
                         <map:transformer name="SimpleSearch" src="org.dspace.app.xmlui.aspect.artifactbrowser.SimpleSearch"/>
-                        <map:transformer name="AdvancedSearch" src="org.dspace.app.xmlui.aspect.artifactbrowser.AdvancedSearch"/>
                         <map:transformer name="FeedbackForm" src="org.dspace.app.xmlui.aspect.artifactbrowser.FeedbackForm"/>
                         <map:transformer name="FeedbackSent" src="org.dspace.app.xmlui.aspect.artifactbrowser.FeedbackSent"/>
                         <map:transformer name="Contact" src="org.dspace.app.xmlui.aspect.artifactbrowser.Contact"/>
@@ -112,6 +111,8 @@ and searching the repository.
         
                         
                         <!-- Search -->
+                        <!-- As of DSpace 6.0, mappings to transformers using the legacy Lucene search index
+                             (AdvancedSearch, SimpleSearch: deprecated in DSpace 4.0) have been removed -->
                         <map:match pattern="search">
                                 <map:transform type="SimpleSearch"/>
                                 <map:serialize type="xml"/>
@@ -120,11 +121,6 @@ and searching the repository.
                                 <map:transform type="SimpleSearch"/>
                                 <map:serialize type="xml"/>
                         </map:match>
-                        <map:match pattern="advanced-search">
-                                <map:transform type="AdvancedSearch"/>
-                                <map:serialize type="xml"/>
-                        </map:match>
-                        
                         
                         <!-- Browse (by anything) -->
                         <map:match pattern="browse">
@@ -164,7 +160,10 @@ and searching the repository.
                                                         <map:transform type="ConfigurableBrowse"/>
                                                         <map:serialize type="xml"/>
                                                 </map:match>
-                                                                                        
+
+                                                <!-- As of DSpace 6.0, mappings to transformers using the legacy Lucene
+                                                     search index (AdvancedSearch, SimpleSearch: deprecated in
+                                                     DSpace 4.0) have been removed -->
                                                 <!-- Simple search -->
                                                 <map:match pattern="handle/*/*/search">
                                                         <map:transform type="SimpleSearch"/>
@@ -174,12 +173,6 @@ and searching the repository.
                                                 <!-- Simple search again, but this time they said it -->
                                                 <map:match pattern="handle/*/*/simple-search">
                                                         <map:transform type="SimpleSearch"/>
-                                                        <map:serialize type="xml"/>
-                                                </map:match>
-                                                
-                                                <!-- Advanced search -->
-                                                <map:match pattern="handle/*/*/advanced-search">
-                                                        <map:transform type="AdvancedSearch"/>
                                                         <map:serialize type="xml"/>
                                                 </map:match>
                                         

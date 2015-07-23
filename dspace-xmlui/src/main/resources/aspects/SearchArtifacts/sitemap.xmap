@@ -23,7 +23,6 @@ and searching the repository.
         <map:transformers>
             <map:transformer name="Navigation" src="org.dspace.app.xmlui.aspect.searchArtifacts.Navigation"/>
             <map:transformer name="SimpleSearch" src="org.dspace.app.xmlui.aspect.artifactbrowser.SimpleSearch"/>
-            <map:transformer name="AdvancedSearch" src="org.dspace.app.xmlui.aspect.artifactbrowser.AdvancedSearch"/>
             <map:transformer name="FrontPageFeeds" src="org.dspace.app.xmlui.aspect.artifactbrowser.FrontPageFeeds"/>
             <map:transformer name="CommunitySearch" src="org.dspace.app.xmlui.aspect.artifactbrowser.CommunitySearch"/>
             <map:transformer name="CollectionSearch" src="org.dspace.app.xmlui.aspect.artifactbrowser.CollectionSearch"/>
@@ -53,7 +52,6 @@ and searching the repository.
         </map:selectors>
         <map:actions>
             <map:action name="SimpleSearchLoggerAction" src="org.dspace.app.xmlui.aspect.artifactbrowser.SimpleSearchLoggerAction" />
-            <map:action name="AdvancedSearchLoggerAction" src="org.dspace.app.xmlui.aspect.artifactbrowser.AdvancedSearchLoggerAction" />
         </map:actions>
 
     </map:components>
@@ -86,6 +84,8 @@ and searching the repository.
 
 
                         <!-- Search -->
+                        <!-- As of DSpace 6.0, mappings to transformers using the legacy Lucene search index
+                        (AdvancedSearch, SimpleSearch: deprecated in DSpace 4.0) have been removed -->
                         <map:match pattern="search">
                             <map:act type="SimpleSearchLoggerAction"/>
                             <map:transform type="SimpleSearch"/>
@@ -96,12 +96,6 @@ and searching the repository.
                             <map:transform type="SimpleSearch"/>
                             <map:serialize type="xml"/>
                         </map:match>
-                        <map:match pattern="advanced-search">
-                            <map:act type="AdvancedSearchLoggerAction"/>
-                            <map:transform type="AdvancedSearch"/>
-                            <map:serialize type="xml"/>
-                        </map:match>
-
 
             <!-- Handle specific features -->
                         <map:match pattern="handle/*/**">
@@ -124,6 +118,9 @@ and searching the repository.
                                 <map:match type="HandleAuthorizedMatcher" pattern="READ">
                                         <map:match type="HandleTypeMatcher" pattern="community,collection">
 
+                                                <!-- As of DSpace 6.0, mappings to transformers using the legacy Lucene
+                                                     search index (AdvancedSearch, SimpleSearch: deprecated in
+                                                     DSpace 4.0) have been removed -->
                                                 <!-- Simple search -->
                                                 <map:match pattern="handle/*/*/search">
                                                     <map:act type="SimpleSearchLoggerAction"/>
@@ -135,13 +132,6 @@ and searching the repository.
                                                 <map:match pattern="handle/*/*/simple-search">
                                                     <map:act type="SimpleSearchLoggerAction"/>
                                                     <map:transform type="SimpleSearch"/>
-                                                    <map:serialize type="xml"/>
-                                                </map:match>
-
-                                                <!-- Advanced search -->
-                                                <map:match pattern="handle/*/*/advanced-search">
-                                                    <map:act type="AdvancedSearchLoggerAction"/>
-                                                    <map:transform type="AdvancedSearch"/>
                                                     <map:serialize type="xml"/>
                                                 </map:match>
 
