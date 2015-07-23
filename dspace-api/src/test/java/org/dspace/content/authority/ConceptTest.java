@@ -27,7 +27,7 @@ public class ConceptTest extends AbstractDSpaceObjectTest
     private static final Logger log = Logger.getLogger(ConceptTest.class);
 
     /**
-     * Community instance for the tests
+     * Instance for the tests
      */
     private Concept c;
 
@@ -46,7 +46,7 @@ public class ConceptTest extends AbstractDSpaceObjectTest
         super.init();
         try
         {
-            //we have to create a new community in the database
+            //we have to create a new concept in the database
             context.turnOffAuthorisationSystem();
             this.c = Concept.create(context);
             this.dspaceObject = c;
@@ -82,7 +82,7 @@ public class ConceptTest extends AbstractDSpaceObjectTest
     }
 
     /**
-     * Test of getID method, of class Community.
+     * Test of getID method
      */
     @Test
     @Override
@@ -92,18 +92,17 @@ public class ConceptTest extends AbstractDSpaceObjectTest
     }
 
     /**
-     * Test of getHandle method, of class Community.
+     * Test of getHandle method
      */
     @Test
     @Override
     public void testGetHandle()
     {
-        //default instance has a random handle
-        //assertTrue("testGetHandle 0", c.getHandle().contains("123456789/"));
+        // Concepts don't have handles, but this method is required due to subclassing
     }
 
     /**
-     * Test of getType method, of class Community.
+     * Test of getType method
      */
     @Test
     @Override
@@ -120,27 +119,23 @@ public class ConceptTest extends AbstractDSpaceObjectTest
     @Override
     public void testGetName()
     {
-        //by default is empty
-        //assertThat("testGetName 0",c.getName(), equalTo(""));
+        assertThat("testGetName", c.getName(), notNullValue());
+
     }
 
 
     /**
-     * Test of getAdminObject method, of class Collection.
+     * Test of getAdminObject method
      */
     @Test
     @Override
     public void testGetAdminObject() throws SQLException
     {
-        //default community has no admin object
-        //assertThat("testGetAdminObject 0", (Concept)c.getAdminObject(Constants.REMOVE), equalTo(c));
-       // assertThat("testGetAdminObject 1", (Concept)c.getAdminObject(Constants.ADD), equalTo(c));
-       // assertThat("testGetAdminObject 2", c.getAdminObject(Constants.DELETE), nullValue());
-       // assertThat("testGetAdminObject 3", (Concept)c.getAdminObject(Constants.ADMIN), equalTo(c));
+        // This method is required due to subclassing
     }
 
     /**
-     * Test of getParentObject method, of class Collection.
+     * Test of getParentObject method
      */
     @Test
     @Override

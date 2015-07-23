@@ -11,6 +11,7 @@ import org.junit.Test;
 import java.sql.SQLException;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -25,7 +26,7 @@ public class SchemeTest extends AbstractDSpaceObjectTest
     private static final Logger log = Logger.getLogger(SchemeTest.class);
 
     /**
-     * Community instance for the tests
+     * Instance for the tests
      */
     private Scheme c;
 
@@ -44,7 +45,7 @@ public class SchemeTest extends AbstractDSpaceObjectTest
         super.init();
         try
         {
-            //we have to create a new community in the database
+            //we have to create a new scheme in the database
             context.turnOffAuthorisationSystem();
             this.c = Scheme.create(context);
             this.dspaceObject = c;
@@ -80,7 +81,7 @@ public class SchemeTest extends AbstractDSpaceObjectTest
     }
 
     /**
-     * Test of getID method, of class Community.
+     * Test of getID method
      */
     @Test
     @Override
@@ -90,18 +91,17 @@ public class SchemeTest extends AbstractDSpaceObjectTest
     }
 
     /**
-     * Test of getHandle method, of class Community.
+     * Test of getHandle method
      */
     @Test
     @Override
     public void testGetHandle()
     {
-        //default instance has a random handle
-        //assertTrue("testGetHandle 0", c.getHandle().contains("123456789/"));
+        //schemes don't have handles, but this method is required due to subclassing
     }
 
     /**
-     * Test of getType method, of class Community.
+     * Test of getType method
      */
     @Test
     @Override
@@ -112,14 +112,14 @@ public class SchemeTest extends AbstractDSpaceObjectTest
 
 
     /**
-     * Test of getName method, of class Community.
+     * Test of getName method.
      */
     @Test
     @Override
     public void testGetName()
     {
         //by default is empty
-        //assertThat("testGetName 0",c.getName(), equalTo(""));
+        assertThat("testGetName", c.getName(), notNullValue());
     }
 
 
