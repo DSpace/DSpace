@@ -184,8 +184,8 @@ compile: deploy_logs
 	        echo -e "$(RED)compile.log contains BUILD FAILURE, exiting$(NORMAL)" && exit -1; fi
 
 tests:
-	@echo "UNIT TESTING ..."
-	@cd $(DIR_SOURCE) && mvn $(MVN_OPTS_TEST) -Dlog4j.configuration=file:$(DIR_INSTALLATION)/config/log4j-console.properties test
+	@echo "UNIT TESTING is disabled for now ..."
+	#@cd $(DIR_SOURCE) && mvn $(MVN_OPTS_TEST) -Dlog4j.configuration=file:$(DIR_INSTALLATION)/config/log4j-console.properties test
 
 install:        print_message \
                 test_databases \
