@@ -50,6 +50,8 @@ public class OrcidHistory extends IdentifiableObject {
     
     private Integer typeId;
     
+    private String entityUuid;
+    
     private String owner;
     
     @Embedded
@@ -119,5 +121,13 @@ public class OrcidHistory extends IdentifiableObject {
 
 	public void setOwner(String owner) {
 		this.owner = owner;
+	}
+
+	public String getEntityUuid() {
+		return entityUuid;
+	}
+
+	public void setEntityUuid(String entityUuid) {
+		this.entityUuid = entityUuid;
 	}
 }

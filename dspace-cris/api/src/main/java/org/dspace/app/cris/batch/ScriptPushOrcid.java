@@ -7,7 +7,6 @@
  */
 package org.dspace.app.cris.batch;
 
-
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -35,223 +34,175 @@ import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.RPProperty;
+import org.dspace.app.cris.model.orcid.OrcidPreferencesUtils;
 import org.dspace.app.cris.model.orcid.OrcidQueue;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.service.RelationPreferenceService;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
 import org.dspace.core.Email;
+import org.dspace.core.I18nUtil;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.utils.DSpace;
 
 import it.cilea.osd.jdyna.value.BooleanValue;
+import it.cilea.osd.jdyna.value.TextValue;
 
-public class ScriptPushOrcid
-{
-    
-    private static final DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-    
-    /** log4j logger */
-    private static Logger log = Logger.getLogger(ScriptPushOrcid.class);
+public class ScriptPushOrcid {
 
-    /**
-     * Batch script to find potential matches between DSpace items and RP. See
-     * the technical documentation for further details.
-     */
-    public static void main(String[] args) throws ParseException
-    {
+	private static final DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
-        log.info("#### START Script bind item to researcher page: -----"
-                + new Date() + " ----- ####");
+	/** log4j logger */
+	private static Logger log = Logger.getLogger(ScriptPushOrcid.class);
 
-        DSpace dspace = new DSpace();
-  
-        SearchService searchService = dspace.getSingletonService(SearchService.class);
-        RelationPreferenceService relationPreferenceService = dspace.getServiceManager().getServiceByName(
-                "org.dspace.app.cris.service.RelationPreferenceService", RelationPreferenceService.class);
-        ApplicationService applicationService = dspace.getServiceManager().getServiceByName(
-                "applicationService", ApplicationService.class);
-        
-        CommandLineParser parser = new PosixParser();
+	/**
+	 * Batch script to find potential matches between DSpace items and RP. See
+	 * the technical documentation for further details.
+	 */
+	public static void main(String[] args) throws ParseException {
 
-        Options options = new Options();
-        options.addOption("h", "help", false, "help");
-        options.addOption("a", "all_researcher", false,
-                "Work on all researchers pages (ADMIN MODE)");
-        options.addOption("s", "single_researcher", true,
-                "Work on single researcher (ADMIN MODE)");
-        options.addOption("d", "MODE_DATE", true,
-                "Script work only on RP names modified after this date (ADMIN MODE)");
-        options.addOption("D", "MODE_HOUR", true,
-                "Script work only on RP names modified in this hours range (ADMIN MODE)");
+		log.info("#### START Script bind item to researcher page: -----" + new Date() + " ----- ####");
+		Context context = null;
+		try {
+			DSpace dspace = new DSpace();
+			context = new Context();
+			context.turnOffAuthorisationSystem();
+			SearchService searchService = dspace.getSingletonService(SearchService.class);
+			RelationPreferenceService relationPreferenceService = dspace.getServiceManager().getServiceByName(
+					"org.dspace.app.cris.service.RelationPreferenceService", RelationPreferenceService.class);
+			ApplicationService applicationService = dspace.getServiceManager().getServiceByName("applicationService",
+					ApplicationService.class);
 
-        CommandLine line = parser.parse(options, args);
+			CommandLineParser parser = new PosixParser();
 
-        if (line.hasOption('h'))
-        {
-            HelpFormatter myhelp = new HelpFormatter();
-            myhelp.printHelp("ScriptPushOrcid \n", options);
-            System.out
-                    .println("\n\nUSAGE:\n ScriptPushOrcid [-a (-d|-D <date>)|-s <researcher_identifier>] - run with no option will works on cris_queue table \n");
+			Options options = new Options();
+			options.addOption("h", "help", false, "help");
+			options.addOption("a", "all_researcher", false, "Work on all researchers pages (ADMIN MODE)");
+			options.addOption("s", "single_researcher", true, "Work on single researcher (ADMIN MODE)");
+			options.addOption("d", "MODE_DATE", true,
+					"Script work only on RP names modified after this date (ADMIN MODE)");
+			options.addOption("D", "MODE_HOUR", true,
+					"Script work only on RP names modified in this hours range (ADMIN MODE)");
 
-            System.exit(0);
-        }
+			CommandLine line = parser.parse(options, args);
 
-        if (line.hasOption('a') && line.hasOption('s'))
-        {
-            System.out
-                    .println("\n\nUSAGE:\n ScriptPushOrcid [-a (-d|-D <date>)|-s <researcher_identifier>] - run with no option will works on cris_queue table\n");
-            System.out.println("Insert either a or s like parameters");
-            log.error("Either a or s like parameters");
-            System.exit(1);
-        }
+			if (line.hasOption('h')) {
+				HelpFormatter myhelp = new HelpFormatter();
+				myhelp.printHelp("ScriptPushOrcid \n", options);
+				System.out.println(
+						"\n\nUSAGE:\n ScriptPushOrcid [-a (-d|-D <date>)|-s <researcher_identifier>] - run with no option will works on cris_queue table \n");
 
-        List<ResearcherPage> rps = null;
-        if(line.getOptions()==null || line.getOptions().length == 0) {
-        	List<OrcidQueue> queue = applicationService.getList(OrcidQueue.class);
-        	List<ResearcherPage> rpWithManualModeEnabled = new ArrayList<ResearcherPage>();
-        	for(OrcidQueue orcidQueue : queue) {
-        		//see preferences and mode (batch vs manual)
-        		ResearcherPage rp = applicationService.get(ResearcherPage.class, orcidQueue.getOwner());
-        		String metadata = "orcid-push-manual";
-				RPPropertiesDefinition rpPDef = applicationService.findPropertiesDefinitionByShortName(
-        				RPPropertiesDefinition.class, metadata);
-        		if (rpPDef != null) {		
-        			List<RPProperty> listManualMode = rp.getAnagrafica4view().get(metadata);
-					if(!listManualMode.isEmpty()) {
-        				BooleanValue value = (BooleanValue)listManualMode.get(0).getValue();
-        				if(value.getObject()) {
-        					if(!rpWithManualModeEnabled.contains(rp)) {
-        						rpWithManualModeEnabled.add(rp);
-        					}
-        					continue; 
-        				}
-        			}
-        		} else {
-        			log.warn("Metadata Properties definition not found:"+ metadata);
-        		}
-        		PushToORCID.sendOrcidQueue(applicationService, orcidQueue);
-        	}
-        	for(ResearcherPage rp : rpWithManualModeEnabled) {
-        		try {
-					Email email = Email.getEmail("manual-mode-orcid");
-					email.addRecipient(rp.getEmail().getValue());
-					email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/cris/rp/" + rp.getCrisID());
-					email.send();
-				} catch (MessagingException | IOException e) {
-					log.error("Email not send for:"+ rp.getCrisID());
+				System.exit(0);
+			}
+
+			if (line.hasOption('a') && line.hasOption('s')) {
+				System.out.println(
+						"\n\nUSAGE:\n ScriptPushOrcid [-a (-d|-D <date>)|-s <researcher_identifier>] - run with no option will works on cris_queue table\n");
+				System.out.println("Insert either a or s like parameters");
+				log.error("Either a or s like parameters");
+				System.exit(1);
+			}
+
+			List<ResearcherPage> rps = null;
+			if (line.getOptions() == null || line.getOptions().length == 0) {
+				List<OrcidQueue> queue = applicationService.getList(OrcidQueue.class);
+				List<ResearcherPage> rpWithManualModeEnabled = new ArrayList<ResearcherPage>();
+				for (OrcidQueue orcidQueue : queue) {
+					// see preferences and mode (batch vs manual)
+					ResearcherPage rp = applicationService.getEntityByCrisId(orcidQueue.getOwner(),
+							ResearcherPage.class);
+					if (PushToORCID.isManualModeEnable(rp)) {
+						if (!rpWithManualModeEnabled.contains(rp)) {
+							rpWithManualModeEnabled.add(rp);
+						}
+					}
+					PushToORCID.sendOrcidQueue(applicationService, orcidQueue);
 				}
-        	}
-        	
-        	
-        }
-        else if (line.hasOption('a'))
-        {
-            log
-                    .info("Script launched with -a parameter...it will work on all researcher...");
-            // get list of name
-            if (line.hasOption('d') || line.hasOption('D'))
-            {
+				for (ResearcherPage rp : rpWithManualModeEnabled) {
+					PushToORCID.sendEmail(context, rp, rp.getCrisID());
+				}
 
-                try
-                {
-                    Date nameTimestampLastModified;
-                    String date_string = line.getOptionValue("d");
-                    if (line.hasOption('D'))
-                    {
-                        date_string = line.getOptionValue("D");
-                        long hour = Long.parseLong(date_string);
-                        Date now = new Date();
-                        nameTimestampLastModified = new Date(now.getTime()
-                                - (hour * 60 * 60000));
-                        log.info("...it will work on RP modified between "
-                                + nameTimestampLastModified + " and " + now);
-                    }
-                    else
-                    {
-                        nameTimestampLastModified = dateFormat.parse(date_string);
-                        log.info("...it will work on RP modified after ..."
-                                + date_string);
-                    }
+			} else if (line.hasOption('a')) {
+				log.info("Script launched with -a parameter...it will work on all researcher...");
+				// get list of name
+				if (line.hasOption('d') || line.hasOption('D')) {
 
-                    rps = applicationService
-                            .getResearchersPageByNamesTimestampLastModified(nameTimestampLastModified);
-                }
-                catch (java.text.ParseException e)
-                {
-                    log
-                            .error("Error parsing the date", e);
-                    System.exit(1);
-                }
-            }
-            else
-            {
-                log.info("...it will work on all researcher...");
-                SolrQuery query = new SolrQuery("*:*");
-                query.addFilterQuery("{!field f=search.resourcetype}" + CrisConstants.RP_TYPE_ID);
-                query.setFields("search.resourceid", "search.resourcetype");
-                query.setRows(Integer.MAX_VALUE);
-                rps = new ArrayList<ResearcherPage>();
-                try
-                {
-                    QueryResponse response = searchService.search(query);
-                    SolrDocumentList docList = response.getResults();
-                    Iterator<SolrDocument> solrDoc = docList.iterator();
-                    while (solrDoc.hasNext())
-                    {
-                        SolrDocument doc = solrDoc.next();
-                        Integer rpId = (Integer) doc
-                                .getFirstValue("search.resourceid");
-                        rps.add(applicationService.get(ResearcherPage.class, rpId));
-                    }
-                }
-                catch (SearchServiceException e)
-                {
-                    log
-                    .error("Error retrieving documents", e);
-                }
-            }
-            PushToORCID.prepareAndSend(rps, relationPreferenceService, searchService, applicationService);
-        }
-        else
-        {
-            if (line.hasOption('s'))
-            {
-                // get researcher by parameter
-                String rp = line.getOptionValue("s");
-                if (rp == null || rp.isEmpty())
-                {
-                    System.out
-                            .println("\n\nUSAGE:\n ScriptPushOrcid [-a|-s <researcher_identifier>] \n");
-                    System.out
-                            .println("Researcher id parameter is needed after option -s");
-                    log
-                            .error("Researcher id parameter is needed after option -s");
-                    System.exit(1);
-                }
+					try {
+						Date nameTimestampLastModified;
+						String date_string = line.getOptionValue("d");
+						if (line.hasOption('D')) {
+							date_string = line.getOptionValue("D");
+							long hour = Long.parseLong(date_string);
+							Date now = new Date();
+							nameTimestampLastModified = new Date(now.getTime() - (hour * 60 * 60000));
+							log.info("...it will work on RP modified between " + nameTimestampLastModified + " and "
+									+ now);
+						} else {
+							nameTimestampLastModified = dateFormat.parse(date_string);
+							log.info("...it will work on RP modified after ..." + date_string);
+						}
 
-                log
-                        .info("Script launched with -s parameter...it will work on researcher with rp identifier "
-                                + rp);
-                rps = new LinkedList<ResearcherPage>();
-                ResearcherPage researcher = applicationService
-                        .get(ResearcherPage.class, Integer.parseInt(rp
-                                .substring(2)));
-                rps.add(researcher);
-                PushToORCID.prepareAndSend(rps, relationPreferenceService, searchService, applicationService);
-            }
-            else
-            {
-                System.out
-                        .println("\n\nUSAGE:\n ScriptPushOrcid [-a|-s <researcher_identifier>] \n");
-                System.out.println("Option a or s is needed - run with no option works on cris_queue table");
-                log.error("Option a or s is needed - run with no option works on cris_queue table");
-                System.exit(1);
-            }
-        }
+						rps = applicationService
+								.getResearchersPageByNamesTimestampLastModified(nameTimestampLastModified);
+					} catch (java.text.ParseException e) {
+						log.error("Error parsing the date", e);
+						System.exit(1);
+					}
+				} else {
+					log.info("...it will work on all researcher...");
+					SolrQuery query = new SolrQuery("*:*");
+					query.addFilterQuery("{!field f=search.resourcetype}" + CrisConstants.RP_TYPE_ID);
+					query.setFields("search.resourceid", "search.resourcetype");
+					query.setRows(Integer.MAX_VALUE);
+					rps = new ArrayList<ResearcherPage>();
+					try {
+						QueryResponse response = searchService.search(query);
+						SolrDocumentList docList = response.getResults();
+						Iterator<SolrDocument> solrDoc = docList.iterator();
+						while (solrDoc.hasNext()) {
+							SolrDocument doc = solrDoc.next();
+							Integer rpId = (Integer) doc.getFirstValue("search.resourceid");
+							rps.add(applicationService.get(ResearcherPage.class, rpId));
+						}
+					} catch (SearchServiceException e) {
+						log.error("Error retrieving documents", e);
+					}
+				}
+				PushToORCID.prepareAndSend(context, rps, relationPreferenceService, searchService, applicationService);
+			} else {
+				if (line.hasOption('s')) {
+					// get researcher by parameter
+					String rp = line.getOptionValue("s");
+					if (rp == null || rp.isEmpty()) {
+						System.out.println("\n\nUSAGE:\n ScriptPushOrcid [-a|-s <researcher_identifier>] \n");
+						System.out.println("Researcher id parameter is needed after option -s");
+						log.error("Researcher id parameter is needed after option -s");
+						System.exit(1);
+					}
 
-        log.info("#### END: -----" + new Date() + " ----- ####");
-        System.exit(0);
-    }
+					log.info("Script launched with -s parameter...it will work on researcher with rp identifier " + rp);
+					rps = new LinkedList<ResearcherPage>();
+					ResearcherPage researcher = applicationService.getEntityByCrisId(rp, ResearcherPage.class);
+					rps.add(researcher);
+					PushToORCID.prepareAndSend(context, rps, relationPreferenceService, searchService,
+							applicationService);
+				} else {
+					System.out.println("\n\nUSAGE:\n ScriptPushOrcid [-a|-s <researcher_identifier>] \n");
+					System.out.println("Option a or s is needed - run with no option works on cris_queue table");
+					log.error("Option a or s is needed - run with no option works on cris_queue table");
+					System.exit(1);
+				}
+			}
+		} catch (Exception ex) {
+			log.error(ex.getMessage(), ex);
+		} finally {
+			if (context != null && context.isValid()) {
+				context.abort();
+			}
+		}
+		log.info("#### END: -----" + new Date() + " ----- ####");
+		System.exit(0);
+	}
 
 }

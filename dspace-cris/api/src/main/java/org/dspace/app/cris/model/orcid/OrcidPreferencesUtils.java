@@ -116,18 +116,17 @@ public class OrcidPreferencesUtils {
 				if (oldMapOrcidProfilePreference.containsKey(metadataShortnameINTERNAL)) {
 					rpPropValues = oldMapOrcidProfilePreference.get(metadataShortnameINTERNAL);
 				}
-				
-				List<RPProperty> propsFoundedRps = researcher.getAnagrafica4view()
-						.get(metadataShortnameINTERNAL);
+
+				List<RPProperty> propsFoundedRps = researcher.getAnagrafica4view().get(metadataShortnameINTERNAL);
 				boolean founded = false;
-				for (String rpPropValue : rpPropValues) {					
+				for (String rpPropValue : rpPropValues) {
 					for (RPProperty propFoundedRp : propsFoundedRps) {
 						if (rpPropValue.equals(propFoundedRp.toString())) {
 							founded = true;
 						}
 					}
 				}
-				if (!founded && propsFoundedRps!=null && !propsFoundedRps.isEmpty()) {
+				if (!founded && propsFoundedRps != null && !propsFoundedRps.isEmpty()) {
 					return true;
 				}
 			}
@@ -303,15 +302,29 @@ public class OrcidPreferencesUtils {
 						List<RelationPreference> selected = new ArrayList<RelationPreference>();
 						for (RelationPreferenceConfiguration configuration : getRelationPreferenceService()
 								.getConfigurationService().getList()) {
-							if (configuration.getRelationConfiguration().getRelationClass().equals(Item.class)) {
+							if (dso.getType() == Constants.ITEM && configuration.getRelationConfiguration().getRelationClass().equals(Item.class)) {
 								selected = getRelationPreferenceService()
 										.findRelationsPreferencesByUUIDByRelTypeAndStatus(researcher.getUuid(),
 												configuration.getRelationConfiguration().getRelationName(),
 												RelationPreference.SELECTED);
 							}
+							else {
+								if (dso.getType() == CrisConstants.PROJECT_TYPE_ID && configuration.getRelationConfiguration().getRelationClass().equals(Project.class)) {
+									selected = getRelationPreferenceService()
+											.findRelationsPreferencesByUUIDByRelTypeAndStatus(researcher.getUuid(),
+													configuration.getRelationConfiguration().getRelationName(),
+													RelationPreference.SELECTED);
+								}	
+							}
 							for (RelationPreference sel : selected) {
-								if (sel.getItemID() == dso.getID()) {
-									return true;
+								if (dso.getType() == Constants.ITEM) {
+									if (sel.getItemID() == dso.getID()) {
+										return true;
+									}
+								} else {
+									if (sel.getTargetUUID() == dso.getHandle()) {
+										return true;
+									}
 								}
 							}
 						}
@@ -322,17 +335,32 @@ public class OrcidPreferencesUtils {
 							List<RelationPreference> hided = new ArrayList<RelationPreference>();
 							for (RelationPreferenceConfiguration configuration : getRelationPreferenceService()
 									.getConfigurationService().getList()) {
-								if (configuration.getRelationConfiguration().getRelationClass().equals(Item.class)) {
+								if (dso.getType() == Constants.ITEM && configuration.getRelationConfiguration().getRelationClass().equals(Item.class)) {
 									hided = getRelationPreferenceService()
 											.findRelationsPreferencesByUUIDByRelTypeAndStatus(researcher.getUuid(),
 													configuration.getRelationConfiguration().getRelationName(),
 													RelationPreference.HIDED);
 								}
-
+								else {
+									if (dso.getType() == CrisConstants.PROJECT_TYPE_ID && configuration.getRelationConfiguration().getRelationClass().equals(Project.class)) {
+										hided = getRelationPreferenceService()
+												.findRelationsPreferencesByUUIDByRelTypeAndStatus(researcher.getUuid(),
+														configuration.getRelationConfiguration().getRelationName(),
+														RelationPreference.HIDED);
+									}	
+								}
 								for (RelationPreference hid : hided) {
-									if (hid.getItemID() == dso.getID()) {
-										return false;
+									if (dso.getType() == Constants.ITEM) {
+										if (hid.getItemID() == dso.getID()) {
+											return false;
+										}
+
+									} else {
+										if (hid.getTargetUUID() == dso.getHandle()) {
+											return false;
+										}
 									}
+
 								}
 								return true;
 							}
@@ -351,9 +379,9 @@ public class OrcidPreferencesUtils {
 
 	}
 
-	public List<Integer> getPreferiteFundingToSendToOrcid(String crisID) {
+	public List<String> getPreferiteFundingToSendToOrcid(String crisID) {
 		ResearcherPage researcher = getApplicationService().getEntityByCrisId(crisID, ResearcherPage.class);
-		List<Integer> projectsIDsToSend = new ArrayList<Integer>();
+		List<String> projectsIDsToSend = new ArrayList<String>();
 		if (researcher != null) {
 			String projectsPrefs = ResearcherPageUtils.getStringValue(researcher, ORCID_PROJECTS_PREFS);
 			if (StringUtils.isNotBlank(projectsPrefs)) {
@@ -363,7 +391,7 @@ public class OrcidPreferencesUtils {
 						SolrQuery query = new SolrQuery("*:*");
 						query.addFilterQuery("{!field f=search.resourcetype}" + CrisConstants.PROJECT_TYPE_ID);
 						query.addFilterQuery("projectinvestigators_authority:" + crisID);
-						query.setFields("search.resourceid", "search.resourcetype");
+						query.setFields("search.resourceid", "search.resourcetype", "cris-uuid");
 						query.setRows(Integer.MAX_VALUE);
 						try {
 							QueryResponse response = getSearchService().search(query);
@@ -371,7 +399,7 @@ public class OrcidPreferencesUtils {
 							Iterator<SolrDocument> solrDoc = docList.iterator();
 							while (solrDoc.hasNext()) {
 								SolrDocument doc = solrDoc.next();
-								Integer rpId = (Integer) doc.getFirstValue("search.resourceid");
+								String rpId = (String) doc.getFirstValue("cris-uuid");
 								projectsIDsToSend.add(rpId);
 							}
 						} catch (SearchServiceException e) {
@@ -389,18 +417,18 @@ public class OrcidPreferencesUtils {
 													RelationPreference.SELECTED);
 								}
 								for (RelationPreference sel : selected) {
-									projectsIDsToSend.add(sel.getItemID());
+									projectsIDsToSend.add(sel.getTargetUUID());
 								}
 							}
 
 						} else {
 							if (Integer.parseInt(projectsPrefs) == ORCID_PREFS_VISIBLE) {
-								List<Integer> projectsIDsToSendTmp = new ArrayList<Integer>();
+								List<String> projectsIDsToSendTmp = new ArrayList<String>();
 								log.info("...it will work on all researcher...");
 								SolrQuery query = new SolrQuery("*:*");
 								query.addFilterQuery("{!field f=search.resourcetype}" + CrisConstants.PROJECT_TYPE_ID);
 								query.addFilterQuery("projectinvestigators_authority:" + crisID);
-								query.setFields("search.resourceid", "search.resourcetype");
+								query.setFields("search.resourceid", "search.resourcetype", "cris-uuid");
 								query.setRows(Integer.MAX_VALUE);
 								try {
 									QueryResponse response = getSearchService().search(query);
@@ -408,7 +436,7 @@ public class OrcidPreferencesUtils {
 									Iterator<SolrDocument> solrDoc = docList.iterator();
 									while (solrDoc.hasNext()) {
 										SolrDocument doc = solrDoc.next();
-										Integer rpId = (Integer) doc.getFirstValue("search.resourceid");
+										String rpId = (String) doc.getFirstValue("cris-uuid");
 										projectsIDsToSendTmp.add(rpId);
 									}
 								} catch (SearchServiceException e) {
@@ -424,10 +452,10 @@ public class OrcidPreferencesUtils {
 														configuration.getRelationConfiguration().getRelationName(),
 														RelationPreference.HIDED);
 									}
-									for (Integer itemId : projectsIDsToSendTmp) {
+									for (String itemId : projectsIDsToSendTmp) {
 										boolean founded = false;
 										internal: for (RelationPreference hid : hided) {
-											if (hid.getItemID().equals(itemId)) {
+											if (hid.getTargetUUID().equals(itemId)) {
 												founded = true;
 											}
 											if (founded) {
@@ -492,11 +520,12 @@ public class OrcidPreferencesUtils {
 		ResearcherPage rp = getApplicationService().getEntityByCrisId(owner, ResearcherPage.class);
 		cleanPut(rp, ORCID_PUSH_CRISPJ_ACTIVATE_PUT);
 		// retrieve the preferite
-		List<Integer> pjIDs = getPreferiteFundingToSendToOrcid(owner);
-		List<OrcidHistory> orcidHistories = getOrcidHistoryInSuccessByOwnerAndTypeId(owner, Constants.ITEM);
+		List<String> pjIDs = getPreferiteFundingToSendToOrcid(owner);
+		List<OrcidHistory> orcidHistories = getOrcidHistoryInSuccessByOwnerAndTypeId(owner,
+				CrisConstants.PROJECT_TYPE_ID);
 		List<Integer> putProjectIDs = new ArrayList<Integer>();
 		for (OrcidHistory history : orcidHistories) {
-			if (pjIDs.contains(history.getEntityId())) {
+			if (pjIDs.contains(history.getEntityUuid())) {
 				// PUT
 				pjIDs.remove(history.getEntityId());
 				putProjectIDs.add(history.getEntityId());
@@ -508,8 +537,8 @@ public class OrcidPreferencesUtils {
 		Context context = null;
 		try {
 			context = new Context();
-			for (Integer itemID : pjIDs) {
-				Project project = getApplicationService().get(Project.class, itemID);
+			for (String itemID : pjIDs) {
+				Project project = (Project)getApplicationService().getEntityByUUID(itemID);
 				prepareOrcidQueue(owner, project);
 			}
 		} catch (Exception ex) {
@@ -561,9 +590,16 @@ public class OrcidPreferencesUtils {
 				.findPropertiesDefinitionByShortName(RPPropertiesDefinition.class, metadata);
 		if (rpPDef != null) {
 			List<RPProperty> rpprops = rp.getProprietaDellaTipologia(rpPDef);
-			for (RPProperty prop : rpprops) {
-				rp.removeProprieta(prop);
+			int propDaEliminare = rpprops.size();
+
+			for (int i = 0; i < propDaEliminare; i++) {
+				// devo eliminare sempre l'ultima proprieta' perche' la lista e'
+				// una referenza
+				// alla lista mantenuta dalla cache a4v che viene alterata dal
+				// removeProprieta
+				rp.removeProprieta(rpprops.get(rpprops.size() - 1));
 			}
+			getApplicationService().saveOrUpdate(ResearcherPage.class, rp, false);
 		} else {
 			log.warn("Metadata Properties definition not found:" + metadata);
 		}
@@ -573,16 +609,21 @@ public class OrcidPreferencesUtils {
 		RPPropertiesDefinition rpPDef = getApplicationService()
 				.findPropertiesDefinitionByShortName(RPPropertiesDefinition.class, metadata);
 		if (rpPDef != null) {
+
 			List<RPProperty> rpprops = rp.getProprietaDellaTipologia(rpPDef);
-			for (RPProperty prop : rpprops) {
-				rp.removeProprieta(prop);
+			if (rpprops != null && !rpprops.isEmpty()) {
+				for (RPProperty rpprop : rpprops) {
+					BooleanValue bval = (BooleanValue) (rpprop.getValue());
+					bval.setOggetto(true);
+				}
+			} else {
+				RPProperty rpP = rp.createProprieta(rpPDef);
+				BooleanValue value = new BooleanValue();
+				value.setOggetto(true);
+				rpP.setValue(value);
+				rpP.setVisibility(0);
+
 			}
-			
-			RPProperty rpP = rp.createProprieta(rpPDef);
-			BooleanValue value = new BooleanValue();
-			value.setOggetto(true);
-			rpP.setValue(value);
-			rpP.setVisibility(0);
 
 		} else {
 			log.warn("Metadata Properties definition not found:" + metadata);

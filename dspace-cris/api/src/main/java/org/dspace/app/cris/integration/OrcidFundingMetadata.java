@@ -13,11 +13,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.dspace.app.cris.model.Project;
 import org.dspace.app.util.MappingMetadata;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
 
 /**
  * 
@@ -60,6 +57,11 @@ public class OrcidFundingMetadata extends MappingMetadata {
 	public static final String URL = "url";
 	
 	public static final String EXTERNAL_IDENTIFIER = "funding-external-identifier";
+	
+	public static final String ORGANIZATION = "organization";
+	
+	public static final String ORGANIZATION_CITY = "organization.city";
+	public static final String ORGANIZATION_COUNTRY = "organization.country";
 	
 
 	/**
@@ -111,6 +113,11 @@ public class OrcidFundingMetadata extends MappingMetadata {
 		
 		// EXTERNAL IDs
 		addMultiInvertedValues(EXTERNAL_IDENTIFIER);
+		
+		// ORGANIZATION
+		addSingleField(ORGANIZATION);
+		addSingleField(ORGANIZATION_CITY);
+		addSingleField(ORGANIZATION_COUNTRY);
 		
 	}
 
@@ -234,6 +241,27 @@ public class OrcidFundingMetadata extends MappingMetadata {
 	public String getType() {
 		if (!metadataMappings.get(TYPE).isEmpty()) {
 			return metadataMappings.get(TYPE).get(0);
+		}
+		return "grant";
+	}
+	
+	public String getOrganization() {
+		if (!metadataMappings.get(ORGANIZATION).isEmpty()) {
+			return metadataMappings.get(ORGANIZATION).get(0);
+		}
+		return null;
+	}
+	
+	public String getOrganizationCity() {
+		if (!metadataMappings.get(ORGANIZATION_CITY).isEmpty()) {
+			return metadataMappings.get(ORGANIZATION_CITY).get(0);
+		}
+		return null;
+	}
+	
+	public String getOrganizationCountry() {
+		if (!metadataMappings.get(ORGANIZATION_COUNTRY).isEmpty()) {
+			return metadataMappings.get(ORGANIZATION_COUNTRY).get(0);
 		}
 		return null;
 	}
