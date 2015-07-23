@@ -69,7 +69,7 @@
 	</bean>
 	
 	<bean id="relationRPVSPJConfiguration" class="org.dspace.app.cris.configuration.RelationConfiguration">    										
-		<property name="relationName" value="crispj.projects" />		
+		<property name="relationName" value="crisrp.projects" />		
 		<property name="relationClass" value="org.dspace.app.cris.model.Project" />		
 		<property name="query">
 			<value>projectinvestigators_authority:{0}</value>
@@ -153,7 +153,7 @@
 					</property>
 				</bean>
 				
-<!-- 				<bean
+				<bean
 					class="org.dspace.app.cris.configuration.RelationPreferenceConfiguration">
 					<property name="relationConfiguration" ref="relationRPVSPJConfiguration"/>
 					<property name="selectActionAuthLevel">
@@ -177,34 +177,21 @@
 								<property name="name" value="title" />
 								<property name="metadata">
 									<list>
-										<value>dc.title</value>
+										<value>crisproject.title</value>
 									</list>
 								</property>	
 							</bean>
 							<bean class="org.dspace.app.cris.configuration.ColumnVisualizationConfiguration">
-								<property name="name" value="contributors" />
+								<property name="name" value="investigators" />
 								<property name="metadata">
 									<list>
-										<value>dc.contributor.*</value>
+										<value>crisproject.principalinvestigator</value>
+										<value>crisproject.extprincipalinvestigator</value>
+										<value>crisproject.coinvestigators</value>
+										<value>crisproject.extcoinvestigators</value>
 									</list>
 								</property>	
 							</bean>
-							<bean class="org.dspace.app.cris.configuration.ColumnVisualizationConfiguration">
-								<property name="name" value="issued" />
-								<property name="metadata">
-									<list>
-										<value>dc.date.issued</value>
-									</list>
-								</property>	
-							</bean>
-							<bean class="org.dspace.app.cris.configuration.ColumnVisualizationConfiguration">
-								<property name="name" value="type" />
-								<property name="metadata">
-									<list>
-										<value>dc.type</value>
-									</list>
-								</property>	
-							</bean> -->
 						</list>
 					</property>
 				</bean>
