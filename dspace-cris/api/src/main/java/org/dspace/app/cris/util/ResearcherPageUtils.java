@@ -357,7 +357,7 @@ return decorator.generateDisplayValue(alternativeName, rp);
         return applicationService.getNestedMaxPosition(nested);
     }
 
-    public static <SP extends Property<STP>, STP extends PropertiesDefinition, P extends ANestedProperty<TP>, TP extends ANestedPropertiesDefinition, T extends ANestedObjectWithTypeSupport<P, TP, SP, STP>, AT extends ATypeNestedObject<TP>, DTP extends ADecoratorTypeDefinition<AT, TP>> List<T> getNestedObjectsByParentIDAndShortname(Class<T> modelClazz, Integer parentID, String typeShortname)
+    public static <P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> List<ACNO> getNestedObjectsByParentIDAndShortname(Class<ACNO> modelClazz, Integer parentID, String typeShortname)
     {    	
     	return applicationService.getNestedObjectsByParentIDAndShortname(parentID, typeShortname, modelClazz);
     }
