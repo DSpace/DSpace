@@ -54,6 +54,8 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * SolrIndexer contains the methods that index Items and their metadata,
@@ -819,82 +821,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         //Keep a list of our sort values which we added, sort values can only be added once
         List<String> sortFieldsAdded = new ArrayList<String>();
         try {
-
             DCValue[] mydc = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
             for (DCValue meta : mydc) {
-                String field = meta.schema + "." + meta.element;
-                String unqualifiedField = field;
-
-                String value = meta.value;
-
-                if (value == null) {
-                    continue;
-                }
-
-                if (meta.qualifier != null && !meta.qualifier.trim().equals("")) {
-                    field += "." + meta.qualifier;
-                }
-
-
-                //We are not indexing provenance, this is useless
-                if (field.equals("dc.description.provenance")) {
-                    continue;
-                }
-
-                //Add the field to all for autocomplete so our autocomplete works for all fields
-                doc.addField("all_ac", value);
-
-                List<String> dateIndexableFields = SearchUtils.getDateIndexableFields();
-
-                if (dateIndexableFields.contains(field) || dateIndexableFields.contains(unqualifiedField + "." + Item.ANY)) {
-                    try {
-                        Date date = toDate(value);
-                        //Check if we have a date, invalid dates can not be added
-                        if (date != null) {
-                            value = DateFormatUtils.formatUTC(date, "yyyy-MM-dd'T'HH:mm:ss'Z'");
-                            doc.addField(field + ".year", DateFormatUtils.formatUTC(date, "yyyy"));
-
-                            doc.addField(field + "_dt", value);
-
-                            if (SearchUtils.getSortFields().contains(field + "_dt") && !sortFieldsAdded.contains(field)) {
-                                //Also add a sort field
-                                doc.addField(field + "_dt_sort", value);
-                                sortFieldsAdded.add(field);
-                            }
-                        }
-                    } catch (Exception e) {
-                        log.error(e.getMessage(), e);
-                    }
-                    continue;
-                }
-
-                if (SearchUtils.getSearchFilters().contains(field) || SearchUtils.getSearchFilters().contains(unqualifiedField + "." + Item.ANY)) {
-                    //Add a dynamic fields for autocomplete in search
-                    doc.addField(field + "_ac", value);
-                }
-
-                if (SearchUtils.getAllFacets().contains(field) || SearchUtils.getAllFacets().contains(unqualifiedField + "." + Item.ANY)) {
-                    //Add a special filter
-                    String separator = SearchUtils.getConfig().getString("solr.facets.split.char");
-                    if (separator == null)
-                        doc.addField(field + "_filter", value);
-                    else
-                        doc.addField(field + "_filter", value.toLowerCase() + separator + value);
-
-                }
-
-                if (SearchUtils.getSortFields().contains(field) && !sortFieldsAdded.contains(field)) {
-                    //Only add sort value once
-                    doc.addField(field + "_sort", value);
-                    sortFieldsAdded.add(field);
-                }
-
-                doc.addField(field, value.toLowerCase());
-
-                if (meta.language != null && !meta.language.trim().equals("")) {
-                    String langField = field + "." + meta.language;
-                    doc.addField(langField, value);
-                }
+                addMetadataToSearchDoc(meta, sortFieldsAdded, doc);
             }
 
         } catch (Exception e)  {
@@ -916,75 +845,14 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             }
 
             DCValue[] mydc = dataFile.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-            for (int i = 0; i < mydc.length; i++) {
-                DCValue meta = mydc[i];
-
-                String field = meta.schema + "." + meta.element;
-                String unqualifiedField = field;
-
-                String value = meta.value;
-
-                if (value == null) {
-                    continue;
-                }
-
-                if (meta.qualifier != null && !meta.qualifier.trim().equals("")) {
-                    field += "." + meta.qualifier;
-                }
-
-
-                //We are not indexing provenance, this is useless
-                if(field.equals("dc.description.provenance"))
-                {
-                    continue;
-                }
-
+            for (DCValue meta : mydc) {
                 // No index dc.date.issued for dataFile to remedy the following issue: https://atmire.com/tickets-nescent2/view-ticket?id=465
 
-                if(field.equals("dc.date.issued")) continue;
-
-                //Add the field to all for autocomplete so our autocomplete works for all fields
-                doc.addField("all_ac", value);
-
-                List<String> dateIndexableFields = SearchUtils.getDateIndexableFields();
-
-                if (dateIndexableFields.contains(field) || dateIndexableFields.contains(unqualifiedField + "." + Item.ANY))
-                {
-                    try{
-                        Date date = toDate(value);
-                        //Check if we have a date, invalid dates can not be added
-                        if(date != null){
-                            value = DateFormatUtils.formatUTC(date, "yyyy-MM-dd'T'HH:mm:ss'Z'");
-                            doc.addField(field + ".year", DateFormatUtils.formatUTC(date, "yyyy"));
-
-                            doc.addField(field + "_dt", value);
-                        }
-                    } catch (Exception e)  {
-                        log.error(e.getMessage(), e);
-                    }
+                if(meta.schema.equals("dc") && meta.element.equals("date") && meta.qualifier.equals("issued")) {
                     continue;
                 }
 
-                if(SearchUtils.getSearchFilters().contains(field) || SearchUtils.getSearchFilters().contains(unqualifiedField + "." + Item.ANY)){
-                    //Add a dynamic fields for autocomplete in search
-                    doc.addField(field + "_ac", value);
-                }
-
-                if(SearchUtils.getAllFacets().contains(field) || SearchUtils.getAllFacets().contains(unqualifiedField + "." + Item.ANY)){
-                    //Add a special filter
-                    String separator = SearchUtils.getConfig().getString("solr.facets.split.char");
-                    if(separator == null)
-                        doc.addField(field + "_filter", value);
-                    else
-                        doc.addField(field + "_filter", value.toLowerCase() + separator + value);
-                }
-
-                doc.addField(field, value.toLowerCase());
-
-                if(meta.language != null && !meta.language.trim().equals("")) {
-                    String langField = field + "." + meta.language;
-                    doc.addField(langField, value);
-                }
+                addMetadataToSearchDoc(meta, sortFieldsAdded, doc);
             }
         }
         if(dataFiles!=null&&dataFiles.length>0)
@@ -1078,6 +946,92 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 }
             }
             log.debug("closed " + readers.size() + " readers");
+        }
+    }
+
+    private void addMetadataToSearchDoc (DCValue meta, List<String> sortFieldsAdded, SolrInputDocument doc) {
+        String field = meta.schema + "." + meta.element;
+        String unqualifiedField = field;
+
+        String value = meta.value;
+
+        if (value == null) {
+            return;
+        }
+
+        if (meta.qualifier != null && !meta.qualifier.trim().equals("")) {
+            field += "." + meta.qualifier;
+        }
+
+        //We are not indexing provenance, this is useless
+        if (field.equals("dc.description.provenance")) {
+            return;
+        }
+
+        if (field.equals("dc.contributor.author") && (meta.authority != null)) {
+            Pattern orcidPat = Pattern.compile("\\d{4}-\\d{4}-\\d{4}-\\d{4}");
+            log.debug("orcidPat is " + orcidPat.toString());
+            Matcher m = orcidPat.matcher(meta.authority);
+            if (m.find()) {
+                String orcid = m.group();
+                log.debug("processing " + orcid);
+                doc.addField("dc.contributor.author.authority", orcid);
+            }
+        }
+
+        //Add the field to all for autocomplete so our autocomplete works for all fields
+        doc.addField("all_ac", value);
+
+        List<String> dateIndexableFields = SearchUtils.getDateIndexableFields();
+
+        if (dateIndexableFields.contains(field) || dateIndexableFields.contains(unqualifiedField + "." + Item.ANY)) {
+            try {
+                Date date = toDate(value);
+                //Check if we have a date, invalid dates can not be added
+                if (date != null) {
+                    value = DateFormatUtils.formatUTC(date, "yyyy-MM-dd'T'HH:mm:ss'Z'");
+                    doc.addField(field + ".year", DateFormatUtils.formatUTC(date, "yyyy"));
+
+                    doc.addField(field + "_dt", value);
+
+                    if (SearchUtils.getSortFields().contains(field + "_dt") && !sortFieldsAdded.contains(field)) {
+                        //Also add a sort field
+                        doc.addField(field + "_dt_sort", value);
+                        sortFieldsAdded.add(field);
+                    }
+                }
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+            return;
+        }
+
+        if (SearchUtils.getSearchFilters().contains(field) || SearchUtils.getSearchFilters().contains(unqualifiedField + "." + Item.ANY)) {
+            //Add a dynamic fields for autocomplete in search
+            doc.addField(field + "_ac", value);
+        }
+
+        if (SearchUtils.getAllFacets().contains(field) || SearchUtils.getAllFacets().contains(unqualifiedField + "." + Item.ANY)) {
+            //Add a special filter
+            String separator = SearchUtils.getConfig().getString("solr.facets.split.char");
+            if (separator == null)
+                doc.addField(field + "_filter", value);
+            else
+                doc.addField(field + "_filter", value.toLowerCase() + separator + value);
+
+        }
+
+        if (SearchUtils.getSortFields().contains(field) && !sortFieldsAdded.contains(field)) {
+            //Only add sort value once
+            doc.addField(field + "_sort", value);
+            sortFieldsAdded.add(field);
+        }
+
+        doc.addField(field, value.toLowerCase());
+
+        if (meta.language != null && !meta.language.trim().equals("")) {
+            String langField = field + "." + meta.language;
+            doc.addField(langField, value);
         }
     }
 
