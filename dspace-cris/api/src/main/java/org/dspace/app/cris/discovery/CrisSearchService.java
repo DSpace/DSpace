@@ -850,7 +850,7 @@ public class CrisSearchService extends SolrServiceImpl
 
             DiscoveryConfiguration crisConfiguration = SearchUtils
                     .getDiscoveryConfigurationByName(confName);
-            if (crisConfiguration != null && crisConfiguration.getId().equals(confName))
+            if (crisConfiguration != null)
             {
                 discoveryConfigurations.add(crisConfiguration);
             }
