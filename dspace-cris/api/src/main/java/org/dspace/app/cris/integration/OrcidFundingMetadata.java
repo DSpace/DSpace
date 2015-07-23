@@ -3,7 +3,7 @@
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
  *
- * http://www.dspace.org/license/
+ * https://github.com/CILEA/dspace-cris/wiki/License
  */
 package org.dspace.app.cris.integration;
 
@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.cris.model.Project;
 import org.dspace.app.util.MappingMetadata;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -68,7 +69,7 @@ public class OrcidFundingMetadata extends MappingMetadata {
 	 * @param item
 	 *            - The item being viewed to extract metadata from
 	 */
-	public OrcidFundingMetadata(Context context, DSpaceObject item) throws SQLException {
+	public OrcidFundingMetadata(Context context, Project item) throws SQLException {
 		init("orcid-project-metadata.config");
 		// Hold onto the item in case we need to refresh a stale parse
 		this.item = item;		
