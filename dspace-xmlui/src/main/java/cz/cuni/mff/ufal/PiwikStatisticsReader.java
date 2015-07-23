@@ -111,9 +111,13 @@ public class PiwikStatisticsReader extends AbstractReader {
 
             EPerson eperson = context.getCurrentUser();
             
-            if(!(AuthorizeManager.isAdmin(context) || item.getSubmitter().getID()==eperson.getID())) {
+            if(eperson == null) {
             	throw new AuthorizeException();
             }
+            
+            /*if(!(AuthorizeManager.isAdmin(context) || item.getSubmitter().getID()==eperson.getID())) {
+            	throw new AuthorizeException();
+            }*/
             
         } catch (AuthorizeException | SQLException | IllegalStateException e) {
             throw new ProcessingException("Unable to read piwik statistics", e);
