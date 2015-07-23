@@ -954,4 +954,24 @@ public class ApplicationService extends ExtendedTabService
 	public void deleteOrcidQueueByOwnerAndTypeId(String crisID, int typeId) {
 		orcidQueueDao.deleteByOwnerAndTypeId(crisID, typeId);
 	}
+	
+	public void deleteOrcidQueueByOwnerAndUuid(String crisID, String uuId) {
+		orcidQueueDao.deleteByOwnerAndUuid(crisID, uuId);
+	}
+
+	public List<OrcidHistory> findOrcidHistoryByOwnerAndSuccess(String crisID) {
+		return orcidHistoryDao.findOrcidHistoryInSuccessByOwner(crisID);
+	}
+
+	public List<OrcidHistory> findOrcidHistoryInSuccessByOwnerAndType(String crisID, int type) {
+		return orcidHistoryDao.findOrcidHistoryInSuccessByOwnerAndTypeId(crisID, type);
+	}
+	
+	public OrcidHistory uniqueOrcidHistoryInSuccessByOwnerAndEntityIdAndTypeId(String crisID, int entityID, int typeID) {
+		return orcidHistoryDao.uniqueOrcidHistoryInSuccessByOwnerAndEntityIdAndTypeId(crisID, entityID, typeID);
+	}
+	
+	public OrcidHistory uniqueOrcidHistoryByOwnerAndEntityIdAndTypeId(String crisID, int entityID, int typeID) {
+		return orcidHistoryDao.uniqueOrcidHistoryByOwnerAndEntityIdAndTypeId(crisID, entityID, typeID);
+	}
 } 

@@ -591,7 +591,7 @@ public abstract class MappingMetadata {
 
 		Bitstream bestSoFar = null;
 		if (item instanceof Item) {
-			Item item = (Item)dso;
+			Item item = (Item) dso;
 			int bitstreamCount = 0;
 			Bundle[] contentBundles = item.getBundles("ORIGINAL");
 			for (Bundle bundle : contentBundles) {
@@ -789,16 +789,19 @@ public abstract class MappingMetadata {
 		MultiFormatDateParser multiFormatDateParser = dspace.getSingletonService(MultiFormatDateParser.class);
 
 		Metadatum v = resolveMetadataField(config);
-		Date date = multiFormatDateParser.parse(v.value);
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(date);
-		int year = cal.get(Calendar.YEAR);
-		int month = cal.get(Calendar.MONTH);
-		int day = cal.get(Calendar.DAY_OF_MONTH);
-		metadataMappings.put(fieldName + ".year", "" + year);
-		metadataMappings.put(fieldName + ".month", "" + month);
-		metadataMappings.put(fieldName + ".day", "" + day);
-		return true;
+		if (null != v && (null != v.value) && !v.value.trim().equals("")) {
+			Date date = multiFormatDateParser.parse(v.value);
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(date);
+			int year = cal.get(Calendar.YEAR);
+			int month = cal.get(Calendar.MONTH);
+			int day = cal.get(Calendar.DAY_OF_MONTH);
+			metadataMappings.put(fieldName + ".year", "" + year);
+			metadataMappings.put(fieldName + ".month", "" + (month + 1));
+			metadataMappings.put(fieldName + ".day", "" + day);
+			return true;
+		}
+		return false;
 	}
 
 	protected boolean addInvertedValues(String fieldName) {
@@ -867,7 +870,6 @@ public abstract class MappingMetadata {
 		return true;
 	}
 
-	
 	protected boolean addCurrencyField(String fieldName) {
 
 		String config = configuredFields.get(fieldName);
@@ -891,7 +893,9 @@ public abstract class MappingMetadata {
 		}
 		if (StringUtils.isEmpty(language)) {
 			Metadatum v = resolveMetadataField(languageConfig);
-			language = v.value;
+			if (null != v && (null != v.value) && !v.value.trim().equals("")) {
+				language = v.value;
+			}
 		}
 
 		Metadatum v = resolveMetadataField(config);

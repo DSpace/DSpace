@@ -65,7 +65,7 @@
     }
     
     boolean networkModuleEnabled = ConfigurationManager.getBooleanProperty(NetworkPlugin.CFG_MODULE,"network.enabled");
-    boolean changeStatusAdmin = ConfigurationManager.getBooleanProperty("cris.cfg","rp.changestatus.admin");
+    boolean changeStatusAdmin = ConfigurationManager.getBooleanProperty("cris","rp.changestatus.admin");
 %>
 <c:set var="admin" scope="request"><%=isAdmin%></c:set>
 <c:set var="statusAdmin" scope="request"><%=changeStatusAdmin%></c:set>
@@ -299,7 +299,7 @@
 		</div>
 	</div>
 </div>
-	<c:if test="${!entity.status or (!statusAdmin && !admin)}">
+	<c:if test="${(!entity.status && !statusAdmin) or (!entity.status && admin)}">
 		<p class="warning">
 			<fmt:message
 				key="jsp.layout.hku.detail.researcher-disabled" /><a				

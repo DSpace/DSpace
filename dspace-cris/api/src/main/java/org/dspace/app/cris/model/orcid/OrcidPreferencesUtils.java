@@ -23,6 +23,7 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.dspace.app.cris.configuration.RelationPreferenceConfiguration;
 import org.dspace.app.cris.discovery.CrisSearchService;
+import org.dspace.app.cris.integration.PushToORCID;
 import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.Project;
 import org.dspace.app.cris.model.RelationPreference;
@@ -32,10 +33,11 @@ import org.dspace.app.cris.model.jdyna.RPProperty;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.service.RelationPreferenceService;
 import org.dspace.app.cris.util.ResearcherPageUtils;
+import org.dspace.authority.orcid.OrcidService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
-import org.dspace.discovery.SearchService;
+import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.utils.DSpace;
 
@@ -43,7 +45,16 @@ import it.cilea.osd.jdyna.value.BooleanValue;
 
 public class OrcidPreferencesUtils {
 
-	private static final String PREFIX_ORCID_PROFILE_PREF = "orcid-profile-pref-";
+	public static final String ORCID_PUBLICATIONS_PREFS = "orcid-publications-prefs";
+	public static final String ORCID_PROJECTS_PREFS = "orcid-projects-prefs";
+
+	public static final String ORCID_PUSH_ITEM_ACTIVATE_PUT = "orcid-push-item-activate-put";
+
+	public static final String ORCID_PUSH_CRISPJ_ACTIVATE_PUT = "orcid-push-crispj-activate-put";
+
+	public static final String ORCID_PUSH_CRISRP_ACTIVATE_PUT = "orcid-push-crisrp-activate-put";
+
+	public static final String PREFIX_ORCID_PROFILE_PREF = "orcid-profile-pref-";
 
 	@Transient
 	private static Logger log = Logger.getLogger(OrcidPreferencesUtils.class);
@@ -53,29 +64,14 @@ public class OrcidPreferencesUtils {
 	private static final int ORCID_PREFS_SELECTED = 2;
 	private static final int ORCID_PREFS_VISIBLE = 3;
 
-	public static final String ORCID_MODE_UPDATE = "PUT";
-	public static final String ORCID_MODE_APPEND = "POST";
-
 	public void prepareOrcidQueue(String crisId, DSpaceObject obj) {
 
-		List<OrcidHistory> orcidHistory = getApplicationService().findOrcidHistoryByEntityIdAndTypeId(obj.getID(),
-				obj.getType());
-		if (orcidHistory != null && !orcidHistory.isEmpty()) {
-			// PUT mode
+		OrcidHistory orcidHistory = getApplicationService()
+				.uniqueOrcidHistoryInSuccessByOwnerAndEntityIdAndTypeId(crisId, obj.getID(), obj.getType());
+		if (orcidHistory != null && obj.getType() != 9) {
+			// PUT mode (we have object already send but now is not selected)
 			ResearcherPage rp = getApplicationService().getEntityByCrisId(crisId, ResearcherPage.class);
-			RPPropertiesDefinition rpPDef = getApplicationService().findPropertiesDefinitionByShortName(
-					RPPropertiesDefinition.class, "orcid-push-" + obj.getTypeText() + "-activate-put");
-			if (rpPDef != null) {
-				if (rp.getAnagrafica4view().get(rpPDef.getShortName()).isEmpty()) {
-					RPProperty rpP = rp.createProprieta(rpPDef);
-					BooleanValue value = new BooleanValue();
-					value.setOggetto(true);
-					rpP.setValue(value);
-				}
-				getApplicationService().saveOrUpdate(ResearcherPage.class, rp, false);
-			} else {
-				log.warn("Metadata Properties definition not found: orcid-push-" + obj.getTypeText() + "-activate-put");
-			}
+			notifyPut(rp, "orcid-push-" + obj.getTypeText() + "-activate-put");
 		} else {
 			OrcidQueue orcidQueue = getApplicationService().uniqueOrcidQueueByEntityIdAndTypeIdAndOwnerId(obj.getID(),
 					obj.getType(), crisId);
@@ -87,7 +83,7 @@ public class OrcidPreferencesUtils {
 				orcidQueue.setFastlookupObjectName(obj.getName());
 				orcidQueue.setFastlookupUuid(obj.getHandle());
 				// POST mode
-				orcidQueue.setMode(ORCID_MODE_APPEND);
+				orcidQueue.setMode(OrcidService.ORCID_MODE_APPEND);
 				getApplicationService().saveOrUpdate(OrcidQueue.class, orcidQueue);
 			}
 		}
@@ -95,12 +91,18 @@ public class OrcidPreferencesUtils {
 
 	public boolean isProfileSelectedToShare(ResearcherPage researcher) {
 		if (isTokenReleasedForSync(researcher, "system-orcid-token-orcid-bio-update")) {
-			//if metadata set to go on Orcid Registry have modifications return true
+
+			Map<String, List<String>> oldMapOrcidProfilePreference = researcher.getOldMapOrcidProfilePreference();
+
+			// if metadata set to go on Orcid Registry have modifications return
+			// true
 			List<RPPropertiesDefinition> metadataDefinitions = getApplicationService()
-					.likePropertiesDefinitionsByShortName(RPPropertiesDefinition.class, "orcid-profile-pref");
+					.likePropertiesDefinitionsByShortName(RPPropertiesDefinition.class, PREFIX_ORCID_PROFILE_PREF);
 			for (RPPropertiesDefinition rppd : metadataDefinitions) {
-				String metadataShortnameINTERNAL = rppd.getShortName().replaceFirst("orcid-profile-pref-", "");
+				String metadataShortnameINTERNAL = rppd.getShortName().replaceFirst(PREFIX_ORCID_PROFILE_PREF, "");
+
 				List<RPProperty> propsRps = researcher.getAnagrafica4view().get(rppd.getShortName());
+
 				for (RPProperty prop : propsRps) {
 					BooleanValue booleanValue = (BooleanValue) (prop.getValue());
 					if (booleanValue.getObject()) {
@@ -108,6 +110,25 @@ public class OrcidPreferencesUtils {
 							return true;
 						}
 					}
+				}
+
+				List<String> rpPropValues = new ArrayList<String>();
+				if (oldMapOrcidProfilePreference.containsKey(metadataShortnameINTERNAL)) {
+					rpPropValues = oldMapOrcidProfilePreference.get(metadataShortnameINTERNAL);
+				}
+				
+				List<RPProperty> propsFoundedRps = researcher.getAnagrafica4view()
+						.get(metadataShortnameINTERNAL);
+				boolean founded = false;
+				for (String rpPropValue : rpPropValues) {					
+					for (RPProperty propFoundedRp : propsFoundedRps) {
+						if (rpPropValue.equals(propFoundedRp.toString())) {
+							founded = true;
+						}
+					}
+				}
+				if (!founded && propsFoundedRps!=null && !propsFoundedRps.isEmpty()) {
+					return true;
 				}
 			}
 		}
@@ -167,7 +188,7 @@ public class OrcidPreferencesUtils {
 		ResearcherPage researcher = getApplicationService().getEntityByCrisId(crisID, ResearcherPage.class);
 		List<Integer> itemIDsToSend = new ArrayList<Integer>();
 		if (researcher != null) {
-			String publicationsPrefs = ResearcherPageUtils.getStringValue(researcher, "orcid-publications-prefs");
+			String publicationsPrefs = ResearcherPageUtils.getStringValue(researcher, ORCID_PUBLICATIONS_PREFS);
 
 			if (publicationsPrefs != null) {
 				if (Integer.parseInt(publicationsPrefs) != ORCID_PREFS_DISABLED) {
@@ -334,7 +355,7 @@ public class OrcidPreferencesUtils {
 		ResearcherPage researcher = getApplicationService().getEntityByCrisId(crisID, ResearcherPage.class);
 		List<Integer> projectsIDsToSend = new ArrayList<Integer>();
 		if (researcher != null) {
-			String projectsPrefs = ResearcherPageUtils.getStringValue(researcher, "orcid-projects-prefs");
+			String projectsPrefs = ResearcherPageUtils.getStringValue(researcher, ORCID_PROJECTS_PREFS);
 			if (StringUtils.isNotBlank(projectsPrefs)) {
 				if (Integer.parseInt(projectsPrefs) != ORCID_PREFS_DISABLED) {
 					if (Integer.parseInt(projectsPrefs) == ORCID_PREFS_ALL) {
@@ -447,6 +468,133 @@ public class OrcidPreferencesUtils {
 
 	public void deleteOrcidQueueByOwnerAndType(String crisID, int typeId) {
 		getApplicationService().deleteOrcidQueueByOwnerAndTypeId(crisID, typeId);
+	}
+
+	public boolean postOrcidProfile(String owner, String uuId) {
+		return PushToORCID.sendOrcidProfile(getApplicationService(), owner, uuId);
+	}
+
+	public boolean postOrcidFunding(String owner, String uuId) {
+		return PushToORCID.sendOrcidFunding(getApplicationService(), owner, uuId);
+	}
+
+	public boolean postOrcidWork(String owner, String uuId) {
+		return PushToORCID.sendOrcidWork(getApplicationService(), owner, uuId);
+	}
+
+	public boolean putOrcidProfiles(String owner) {
+		ResearcherPage rp = getApplicationService().getEntityByCrisId(owner, ResearcherPage.class);
+		cleanPut(rp, ORCID_PUSH_CRISRP_ACTIVATE_PUT);
+		return PushToORCID.putOrcidProfile(getApplicationService(), owner);
+	}
+
+	public boolean putOrcidFundings(String owner) {
+		ResearcherPage rp = getApplicationService().getEntityByCrisId(owner, ResearcherPage.class);
+		cleanPut(rp, ORCID_PUSH_CRISPJ_ACTIVATE_PUT);
+		// retrieve the preferite
+		List<Integer> pjIDs = getPreferiteFundingToSendToOrcid(owner);
+		List<OrcidHistory> orcidHistories = getOrcidHistoryInSuccessByOwnerAndTypeId(owner, Constants.ITEM);
+		List<Integer> putProjectIDs = new ArrayList<Integer>();
+		for (OrcidHistory history : orcidHistories) {
+			if (pjIDs.contains(history.getEntityId())) {
+				// PUT
+				pjIDs.remove(history.getEntityId());
+				putProjectIDs.add(history.getEntityId());
+			} else {
+				// REMOVE
+				getApplicationService().delete(OrcidHistory.class, history.getId());
+			}
+		}
+		Context context = null;
+		try {
+			context = new Context();
+			for (Integer itemID : pjIDs) {
+				Project project = getApplicationService().get(Project.class, itemID);
+				prepareOrcidQueue(owner, project);
+			}
+		} catch (Exception ex) {
+			log.error(ex.getMessage(), ex);
+		} finally {
+			if (context != null && context.isValid()) {
+				context.abort();
+			}
+		}
+		return PushToORCID.putOrcidFundings(getApplicationService(), owner, putProjectIDs);
+	}
+
+	public boolean putOrcidWorks(String owner) {
+		ResearcherPage rp = getApplicationService().getEntityByCrisId(owner, ResearcherPage.class);
+		cleanPut(rp, ORCID_PUSH_ITEM_ACTIVATE_PUT);
+		// retrieve the preferite
+		List<Integer> itemIDs = getPreferiteWorksToSendToOrcid(owner);
+		List<OrcidHistory> orcidHistories = getOrcidHistoryInSuccessByOwnerAndTypeId(owner, Constants.ITEM);
+		List<Integer> putItemIDs = new ArrayList<Integer>();
+		for (OrcidHistory history : orcidHistories) {
+			if (itemIDs.contains(history.getEntityId())) {
+				// PUT
+				itemIDs.remove(history.getEntityId());
+				putItemIDs.add(history.getEntityId());
+			} else {
+				// REMOVE
+				getApplicationService().delete(OrcidHistory.class, history.getId());
+			}
+		}
+		Context context = null;
+		try {
+			context = new Context();
+			for (Integer itemID : itemIDs) {
+				Item item = Item.find(context, itemID);
+				prepareOrcidQueue(owner, item);
+			}
+		} catch (Exception ex) {
+			log.error(ex.getMessage(), ex);
+		} finally {
+			if (context != null && context.isValid()) {
+				context.abort();
+			}
+		}
+		return PushToORCID.putOrcidWorks(getApplicationService(), owner, putItemIDs);
+	}
+
+	public void cleanPut(ResearcherPage rp, String metadata) {
+		RPPropertiesDefinition rpPDef = getApplicationService()
+				.findPropertiesDefinitionByShortName(RPPropertiesDefinition.class, metadata);
+		if (rpPDef != null) {
+			List<RPProperty> rpprops = rp.getProprietaDellaTipologia(rpPDef);
+			for (RPProperty prop : rpprops) {
+				rp.removeProprieta(prop);
+			}
+		} else {
+			log.warn("Metadata Properties definition not found:" + metadata);
+		}
+	}
+
+	public void notifyPut(ResearcherPage rp, String metadata) {
+		RPPropertiesDefinition rpPDef = getApplicationService()
+				.findPropertiesDefinitionByShortName(RPPropertiesDefinition.class, metadata);
+		if (rpPDef != null) {
+			List<RPProperty> rpprops = rp.getProprietaDellaTipologia(rpPDef);
+			for (RPProperty prop : rpprops) {
+				rp.removeProprieta(prop);
+			}
+			
+			RPProperty rpP = rp.createProprieta(rpPDef);
+			BooleanValue value = new BooleanValue();
+			value.setOggetto(true);
+			rpP.setValue(value);
+			rpP.setVisibility(0);
+
+		} else {
+			log.warn("Metadata Properties definition not found:" + metadata);
+		}
+	}
+
+	public List<OrcidHistory> getOrcidHistoryInSuccessByOwner(String crisID) {
+		return getApplicationService().findOrcidHistoryByOwnerAndSuccess(crisID);
+	}
+
+	public List<OrcidHistory> getOrcidHistoryInSuccessByOwnerAndTypeId(String crisID, int type) {
+		return getApplicationService().findOrcidHistoryInSuccessByOwnerAndType(crisID, type);
 	}
 
 }

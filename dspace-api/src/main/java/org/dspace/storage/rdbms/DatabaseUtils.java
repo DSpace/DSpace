@@ -572,6 +572,8 @@ public class DatabaseUtils
         if(tableExists(connection, "cris_orcid_queue")) {
         	if(tableColumnExists(connection, "cris_orcid_queue", "itemid")) {
         		return "5.3.0.0";
+        	} else if(tableColumnExists(connection, "cris_orcid_history", "owner")) {
+        		return "5.3.0.4";
         	} else if(tableColumnExists(connection, "cris_orcid_queue", "fastlookupobjectname")) {
         		return "5.3.0.3";
         	} else {

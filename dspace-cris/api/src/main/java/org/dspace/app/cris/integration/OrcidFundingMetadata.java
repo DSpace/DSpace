@@ -5,14 +5,16 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.util;
+package org.dspace.app.cris.integration;
 
 import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.util.MappingMetadata;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 
@@ -69,8 +71,8 @@ public class OrcidFundingMetadata extends MappingMetadata {
 	public OrcidFundingMetadata(Context context, DSpaceObject item) throws SQLException {
 		init("orcid-project-metadata.config");
 		// Hold onto the item in case we need to refresh a stale parse
-		this.item = item;
-		itemURL = HandleManager.resolveToURL(context, item.getHandle());
+		this.item = item;		
+		itemURL = ConfigurationManager.getProperty("dspace.url") + "/cris/uuid/" + item.getHandle();
 		parseFunding();
 	}
 

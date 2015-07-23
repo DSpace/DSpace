@@ -32,7 +32,11 @@ import it.cilea.osd.common.model.IdentifiableObject;
     @NamedQuery(name = "OrcidHistory.findOrcidHistoryByPublicationId", query = "from OrcidHistory where entityId = ? and typeId = 2 order by id"),
     @NamedQuery(name = "OrcidHistory.findOrcidHistoryByEntityIdAndTypeId", query = "from OrcidHistory where entityId = ? and typeId = ? order by id"),
     @NamedQuery(name = "OrcidHistory.findOrcidHistoryInSuccess", query = "from OrcidHistory where timestampLastAttempt.timestamp = timestampSuccessAttempt.timestamp order by id"),
-    @NamedQuery(name = "OrcidHistory.findOrcidHistoryInError", query = "from OrcidHistory where timestampLastAttempt.timestamp > timestampSuccessAttempt.timestamp order by id")
+    @NamedQuery(name = "OrcidHistory.findOrcidHistoryInError", query = "from OrcidHistory where timestampLastAttempt.timestamp > timestampSuccessAttempt.timestamp order by id"),
+    @NamedQuery(name = "OrcidHistory.findOrcidHistoryInSuccessByOwner", query = "from OrcidHistory where owner = ? and timestampLastAttempt.timestamp = timestampSuccessAttempt.timestamp order by id"),
+    @NamedQuery(name = "OrcidHistory.findOrcidHistoryInSuccessByOwnerAndTypeId", query = "from OrcidHistory where owner = ? and typeId = ? and timestampLastAttempt.timestamp = timestampSuccessAttempt.timestamp order by id"),
+    @NamedQuery(name = "OrcidHistory.uniqueOrcidHistoryInSuccessByOwnerAndEntityIdAndTypeId", query = "from OrcidHistory where owner = ? and entityId = ? and typeId = ? and timestampLastAttempt.timestamp = timestampSuccessAttempt.timestamp"),
+    @NamedQuery(name = "OrcidHistory.uniqueOrcidHistoryByOwnerAndEntityIdAndTypeId", query = "from OrcidHistory where owner = ? and entityId = ? and typeId = ?")    
 })
 public class OrcidHistory extends IdentifiableObject {
     
@@ -45,6 +49,8 @@ public class OrcidHistory extends IdentifiableObject {
     private Integer entityId;
     
     private Integer typeId;
+    
+    private String owner;
     
     @Embedded
     @AttributeOverride(name = "timestamp", column = @Column(name = "lastAttempt"))
@@ -105,5 +111,13 @@ public class OrcidHistory extends IdentifiableObject {
 
 	public void setTypeId(Integer typeId) {
 		this.typeId = typeId;
+	}
+
+	public String getOwner() {
+		return owner;
+	}
+
+	public void setOwner(String owner) {
+		this.owner = owner;
 	}
 }

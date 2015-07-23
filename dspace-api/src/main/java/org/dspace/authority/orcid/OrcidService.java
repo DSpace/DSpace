@@ -73,6 +73,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class OrcidService extends RestSource {
 
+	public static final String ORCID_MODE_UPDATE = "PUT";
+	public static final String ORCID_MODE_APPEND = "POST";
+
 	/**
 	 * log4j logger
 	 */
@@ -82,13 +85,13 @@ public class OrcidService extends RestSource {
 	private static final String PROFILE_CREATE_ENDPOINT = "/orcid-profile";
 	private static final String READ_PROFILE_ENDPOINT = "/orcid-profile";
 	private static final String READ_WORKS_ENDPOINT = "/orcid-works";
-	private static final String BIO_UPDATE_ENDPOINT = "/orcid-bio";	
+	private static final String BIO_UPDATE_ENDPOINT = "/orcid-bio";
 	private static final String SEARCH_ENDPOINT = "search/orcid-bio/";
 	private static final String FUNDING_CREATE_ENDPOINT = "/funding";
-	
+
 	private static final String READ_PUBLIC_SCOPE = "/read-public";
 	private static final String PROFILE_CREATE_SCOPE = "/orcid-profile/create";
-	
+
 	public static final String MESSAGE_VERSION = "1.2";
 
 	private static OrcidService orcid;
@@ -105,7 +108,7 @@ public class OrcidService extends RestSource {
 	private String tokenURL;
 
 	private String baseURL;
-	
+
 	public static OrcidService getOrcid() {
 		if (orcid == null) {
 			orcid = new DSpace().getServiceManager().getServiceByName("OrcidSource", OrcidService.class);
@@ -175,7 +178,6 @@ public class OrcidService extends RestSource {
 		return message.getOrcidProfile();
 	}
 
-	
 	public OrcidWorks getWorks(String id, String token) {
 
 		WebTarget target = restConnector.getClientRest(id + READ_WORKS_ENDPOINT);
@@ -191,7 +193,6 @@ public class OrcidService extends RestSource {
 		return message.getOrcidProfile().getOrcidActivities().getOrcidWorks();
 	}
 
-	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -256,7 +257,7 @@ public class OrcidService extends RestSource {
 		StringWriter sw = new StringWriter();
 		Marshaller marshaller = orcidMessageContext.createMarshaller();
 
-		validate(marshaller);
+//		validate(marshaller);
 
 		marshaller.marshal(wrapWork(work), sw);
 
@@ -264,14 +265,29 @@ public class OrcidService extends RestSource {
 
 		Response response = builder.post(entity);
 
+		OrcidMessage message = null;
+		if (response.hasEntity()) {
+			try {
+				Unmarshaller um = orcidMessageContext.createUnmarshaller();
+				message = (OrcidMessage) um.unmarshal((InputStream) response.getEntity());
+				if (message.getErrorDesc() != null) {
+					log.error(message.getErrorDesc().getContent());
+				}
+			} catch (JAXBException e) {
+				log.info("Problem unmarshalling return value " + e);
+			}
+		}
 		if (response.getStatus() != HttpStatus.SC_OK && response.getStatus() != HttpStatus.SC_CREATED) {
+			if(message!=null && message.getErrorDesc() != null && StringUtils.isNotBlank(message.getErrorDesc().getContent())) {
+				throw new RuntimeException(message.getErrorDesc().getContent());	
+			}
 			throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());
 		}
 	}
 
 	/**
-	 * Adds more "works" research activities to the ORCID Record for the
-	 * scholar represented by the specified orcid_id.
+	 * Adds more "works" research activities to the ORCID Record for the scholar
+	 * represented by the specified orcid_id.
 	 * 
 	 * Member API, require '/orcid-works/create' scope.
 	 * 
@@ -283,6 +299,11 @@ public class OrcidService extends RestSource {
 	 * @throws JAXBException
 	 */
 	public void appendWorks(String id, String token, OrcidWorks works) throws IOException, JAXBException {
+		pushWorks(id, token, works, ORCID_MODE_APPEND);
+	}
+
+	
+	private void pushWorks(String id, String token, OrcidWorks works, String method) throws IOException, JAXBException {
 		WebTarget target = restConnector.getClientRest(id + WORK_CREATE_ENDPOINT);
 
 		Builder builder = target.request().header(HttpHeaders.AUTHORIZATION, "Bearer " + token);
@@ -296,13 +317,52 @@ public class OrcidService extends RestSource {
 
 		Entity<String> entity = Entity.entity(sw.toString(), APPLICATION_ORCID_XML);
 
-		Response response = builder.post(entity);
+		Response response = null;
+		if(method.equals(ORCID_MODE_APPEND)) {
+			response = builder.post(entity);
+		}else {
+			response = builder.put(entity);
+		}
 
+		OrcidMessage message = null;
+		if (response.hasEntity()) {
+			try {
+				Unmarshaller um = orcidMessageContext.createUnmarshaller();
+				message = (OrcidMessage) um.unmarshal((InputStream) response.getEntity());
+				if (message.getErrorDesc() != null) {
+					log.error(message.getErrorDesc().getContent());
+				}
+			} catch (JAXBException e) {
+				log.info("Problem unmarshalling return value " + e);
+			}
+		}
 		if (response.getStatus() != HttpStatus.SC_OK && response.getStatus() != HttpStatus.SC_CREATED) {
+			if(message!=null && message.getErrorDesc() != null && StringUtils.isNotBlank(message.getErrorDesc().getContent())) {
+				throw new RuntimeException(message.getErrorDesc().getContent());	
+			}
 			throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());
 		}
 	}
 	
+	/**
+	 * Completely replaces all "works" research activities from a given
+	 * work-source in the ORCID Record for the scholar represented by the
+	 * specified orcid_id. (You can only update works that your client
+	 * application has added.)
+	 * 
+	 * Member API, require '/orcid-works/create' or '/orcid-works/update' scope.
+	 * 
+	 * 
+	 * @param id
+	 * @param token
+	 * @param work
+	 * @throws IOException
+	 * @throws JAXBException
+	 */
+	public void putWorks(String id, String token, OrcidWorks works) throws IOException, JAXBException {
+		pushWorks(id, token, works, ORCID_MODE_UPDATE);
+	}
+
 	/**
 	 * Creates new ORCID iDs and Records and notifies each scholar that the
 	 * record has been created. The scholar has 10 days to decline the
@@ -402,6 +462,9 @@ public class OrcidService extends RestSource {
 			}
 		}
 		if (response.getStatus() != HttpStatus.SC_OK && response.getStatus() != HttpStatus.SC_CREATED) {
+			if(message!=null && message.getErrorDesc() != null && StringUtils.isNotBlank(message.getErrorDesc().getContent())) {
+				throw new RuntimeException(message.getErrorDesc().getContent());	
+			}
 			throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());
 		}
 		return message;
@@ -454,7 +517,7 @@ public class OrcidService extends RestSource {
 		message.setMessageVersion(MESSAGE_VERSION);
 		return message;
 	}
-	
+
 	/**
 	 * Wrap a FundingList inside an empty OrcidMessage
 	 */
@@ -468,7 +531,7 @@ public class OrcidService extends RestSource {
 		message.setMessageVersion(MESSAGE_VERSION);
 		return message;
 	}
-	
+
 	/**
 	 * Wrap a Funding inside an empty OrcidMessage
 	 */
@@ -484,7 +547,7 @@ public class OrcidService extends RestSource {
 		message.setMessageVersion(MESSAGE_VERSION);
 		return message;
 	}
-	
+
 	/**
 	 * Wrap an OrcidProfile inside an empty OrcidMessage
 	 */
@@ -641,8 +704,16 @@ public class OrcidService extends RestSource {
 		return getAuthorityValuesFromOrcidResults(results);
 	}
 
-	
 	public void appendFundings(String id, String token, FundingList fundings) throws IOException, JAXBException {
+		pushFundings(id, token, fundings, ORCID_MODE_APPEND);
+	}
+
+	public void putFundings(String id, String token, FundingList fundings) throws IOException, JAXBException {
+		pushFundings(id, token, fundings, ORCID_MODE_UPDATE);
+	}
+
+	public void pushFundings(String id, String token, FundingList fundings, String method)
+			throws IOException, JAXBException {
 		WebTarget target = restConnector.getClientRest(id + FUNDING_CREATE_ENDPOINT);
 
 		Builder builder = target.request().header(HttpHeaders.AUTHORIZATION, "Bearer " + token);
@@ -656,14 +727,18 @@ public class OrcidService extends RestSource {
 
 		Entity<String> entity = Entity.entity(sw.toString(), APPLICATION_ORCID_XML);
 
-		Response response = builder.post(entity);
+		Response response = null;
+		if (method.equals(ORCID_MODE_APPEND)) {
+			builder.post(entity);
+		} else {
+			builder.put(entity);
+		}
 
 		if (response.getStatus() != HttpStatus.SC_OK && response.getStatus() != HttpStatus.SC_CREATED) {
 			throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());
 		}
 	}
 
-	
 	public void appendFunding(String id, String token, Funding funding) throws IOException, JAXBException {
 		WebTarget target = restConnector.getClientRest(id + FUNDING_CREATE_ENDPOINT);
 
@@ -672,7 +747,7 @@ public class OrcidService extends RestSource {
 		StringWriter sw = new StringWriter();
 		Marshaller marshaller = orcidMessageContext.createMarshaller();
 
-		validate(marshaller);
+//		validate(marshaller);
 
 		marshaller.marshal(wrapFunding(funding), sw);
 
@@ -680,11 +755,27 @@ public class OrcidService extends RestSource {
 
 		Response response = builder.post(entity);
 
+		OrcidMessage message = null;
+		if (response.hasEntity()) {
+			try {
+				Unmarshaller um = orcidMessageContext.createUnmarshaller();
+				message = (OrcidMessage) um.unmarshal((InputStream) response.getEntity());
+				if (message.getErrorDesc() != null) {
+					log.error(message.getErrorDesc().getContent());
+				}
+			} catch (JAXBException e) {
+				log.info("Problem unmarshalling return value " + e);
+			}
+		}
 		if (response.getStatus() != HttpStatus.SC_OK && response.getStatus() != HttpStatus.SC_CREATED) {
+			if(message!=null && message.getErrorDesc() != null && StringUtils.isNotBlank(message.getErrorDesc().getContent())) {
+				throw new RuntimeException(message.getErrorDesc().getContent());	
+			}
 			throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());
 		}
+		
 	}
-	
+
 	public static void main(String[] args)
 			throws CrosswalkException, IOException, SQLException, AuthorizeException, JAXBException {
 

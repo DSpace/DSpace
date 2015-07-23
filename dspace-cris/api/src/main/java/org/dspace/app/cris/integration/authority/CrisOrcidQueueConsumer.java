@@ -32,10 +32,7 @@ public class CrisOrcidQueueConsumer implements Consumer {
 
 	private static final Logger log = Logger.getLogger(CrisOrcidQueueConsumer.class);
 
-	private OrcidPreferencesUtils orcidPreferencesUtils = new DSpace().getSingletonService(OrcidPreferencesUtils.class);
-
-	public void initialize() throws Exception {
-	}
+	private OrcidPreferencesUtils orcidPreferencesUtils = new DSpace().getServiceManager().getServiceByName("orcidPreferencesUtils", OrcidPreferencesUtils.class);
 
 	public void consume(Context ctx, Event event) throws Exception {
 		DSpaceObject dso = event.getSubject(ctx);
@@ -81,5 +78,11 @@ public class CrisOrcidQueueConsumer implements Consumer {
 
 	public void finish(Context ctx) throws Exception {
 		// nothing to do
+	}
+
+	@Override
+	public void initialize() throws Exception {
+		// TODO Auto-generated method stub
+		
 	}
 }

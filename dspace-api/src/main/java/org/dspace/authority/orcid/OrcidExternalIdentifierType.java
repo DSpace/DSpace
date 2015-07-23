@@ -16,6 +16,7 @@ package org.dspace.authority.orcid;
  * @author tom
  */
 public enum OrcidExternalIdentifierType {
+	SOURCE_ID("source-work-id"),
 	OTHER_ID("other-id"),
 	ARXIV("arxiv"),
 	ASIN("asin"),

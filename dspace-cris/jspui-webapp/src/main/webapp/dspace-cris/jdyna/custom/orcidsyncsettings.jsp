@@ -46,6 +46,9 @@
 										<c:when test="${!empty anagraficaObject.anagrafica4view['orcid-publications-prefs'] && anagraficaObject.anagrafica4view['orcid-publications-prefs'][0].value.object==2}">
 											<span class="label label-success"><fmt:message key="jsp.orcid.custom.box.label.preferences.publications.sendonlyselected"/></span>
 										</c:when>
+									   <c:when test="${!empty anagraficaObject.anagrafica4view['orcid-publications-prefs'] && anagraficaObject.anagrafica4view['orcid-publications-prefs'][0].value.object==3}">
+											<span class="label label-success"><fmt:message key="jsp.orcid.custom.box.label.preferences.publications.sendmy"/></span>
+										</c:when>
 										<c:otherwise>
 											<span class="label label-default"><fmt:message key="jsp.orcid.custom.box.label.preferences.publications.disable"/></span>
 										</c:otherwise>
@@ -72,6 +75,9 @@
 									<c:choose>	
 										<c:when test="${!empty anagraficaObject.anagrafica4view['orcid-projects-prefs'] && anagraficaObject.anagrafica4view['orcid-projects-prefs'][0].value.object==2}">
 											<span class="label label-success"><fmt:message key="jsp.orcid.custom.box.label.preferences.projects.sendonlyselected"/></span>
+										</c:when>
+										<c:when test="${!empty anagraficaObject.anagrafica4view['orcid-projects-prefs'] && anagraficaObject.anagrafica4view['orcid-projects-prefs'][0].value.object==3}">
+											<span class="label label-success"><fmt:message key="jsp.orcid.custom.box.label.preferences.projects.sendmy"/></span>
 										</c:when>
 										<c:otherwise>
 											<span class="label label-default"><fmt:message key="jsp.orcid.custom.box.label.preferences.projects.disable"/></span>

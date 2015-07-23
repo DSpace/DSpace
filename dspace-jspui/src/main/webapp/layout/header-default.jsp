@@ -59,6 +59,7 @@
 		<link href="<%= request.getContextPath() %>/static/css/jstree/themes/default/style.min.css" rel="stylesheet"/>
 	    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/dspace-theme.css" type="text/css" />
 	    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/orcid.css" type="text/css" />
+	    <link href="<%= request.getContextPath() %>/css/jquery.dataTables.css" rel="stylesheet" type="text/css">
 <%
     if (!"NONE".equals(feedRef))
     {

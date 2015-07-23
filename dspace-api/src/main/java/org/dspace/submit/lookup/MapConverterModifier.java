@@ -41,13 +41,13 @@ public class MapConverterModifier extends AbstractModifier
 
 	private ConfigurationService configurationService;
 	
-    private Map<String, String> mapping;
+    protected Map<String, String> mapping;
 
-    private String defaultValue = "";
+    protected String defaultValue = "";
 
     private List<String> fieldKeys;
 
-    private Map<String, String> regexConfig = new HashMap<String, String>();
+    protected Map<String, String> regexConfig = new HashMap<String, String>();
 
     public final String REGEX_PREFIX = "regex.";
 
@@ -211,4 +211,5 @@ public class MapConverterModifier extends AbstractModifier
     {
         this.configurationService = configurationService;
     }
+
 }

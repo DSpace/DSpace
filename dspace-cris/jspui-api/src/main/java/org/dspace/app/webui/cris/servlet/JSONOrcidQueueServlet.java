@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.Project;
 import org.dspace.app.cris.model.ResearcherPage;
+import org.dspace.app.cris.model.orcid.OrcidPreferencesUtils;
 import org.dspace.app.cris.model.orcid.OrcidQueue;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.webui.json.JSONRequest;
@@ -36,77 +37,116 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-
 /**
  * 
  * 
  * @author l.pascarelli
  *
  */
-public class JSONOrcidQueueServlet extends JSONRequest{
+public class JSONOrcidQueueServlet extends JSONRequest {
 
 	Logger log = Logger.getLogger(JSONOrcidQueueServlet.class);
 
-	/* (non-Javadoc)
-	 * @see org.dspace.app.webui.json.JSONRequest#doJSONRequest(org.dspace.core.Context, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+	private OrcidPreferencesUtils orcidPreferencesUtils = new DSpace().getServiceManager().getServiceByName("orcidPreferencesUtils", OrcidPreferencesUtils.class);
+	private ApplicationService applicationService = new DSpace().getServiceManager().getServiceByName("applicationService",
+			ApplicationService.class);	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.dspace.app.webui.json.JSONRequest#doJSONRequest(org.dspace.core.
+	 * Context, javax.servlet.http.HttpServletRequest,
+	 * javax.servlet.http.HttpServletResponse)
 	 */
 	@Override
-	public void doJSONRequest(Context context, HttpServletRequest req,
-			HttpServletResponse resp) throws AuthorizeException, IOException {
+	public void doJSONRequest(Context context, HttpServletRequest req, HttpServletResponse resp)
+			throws AuthorizeException, IOException {
 
 		Gson json = new Gson();
 		String crisId = req.getParameter("id");
-		
-		ApplicationService applicationService = new DSpace().getServiceManager().getServiceByName("applicationService", ApplicationService.class);
-		List<OrcidQueue> queue = new ArrayList<OrcidQueue>(); 
-		if(StringUtils.isNotBlank(crisId)){			
-			queue = applicationService.findOrcidQueueByResearcherId(crisId);
+
+		JsonObject jo = new JsonObject();
+		if (req.getPathInfo().contains("post")) {
+			String uuId = req.getParameter("uuid");
+			String owner = req.getParameter("owner");
+			boolean ok = false;
+			//send to ORCID Registry
+			if (req.getPathInfo().trim().endsWith("crisrp")) {
+				ok = orcidPreferencesUtils.postOrcidProfile(owner, uuId);
+			} else if (req.getPathInfo().trim().endsWith("crispj")) {
+				ok = orcidPreferencesUtils.postOrcidFunding(owner, uuId);
+			} else {
+				ok = orcidPreferencesUtils.postOrcidWork(owner, uuId);
+			}
+			if(ok) {				
+				jo.addProperty("status", true);
+			} else {
+				jo.addProperty("status", false);
+			}
+		} else if (req.getPathInfo().contains("put")) {
+			String owner = req.getParameter("owner");
+			boolean ok = false;
+			//send to ORCID Registry
+			if (req.getPathInfo().trim().endsWith("crisrp")) {
+				ok = orcidPreferencesUtils.putOrcidProfiles(owner);
+			} else if (req.getPathInfo().trim().endsWith("crispj")) {
+				ok = orcidPreferencesUtils.putOrcidFundings(owner);
+			} else {
+				ok = orcidPreferencesUtils.putOrcidWorks(owner);
+			}
+			if(ok) {				
+				jo.addProperty("status", true);
+			} else {
+				jo.addProperty("status", false);
+			}
+		} else {
+			List<OrcidQueue> queue = new ArrayList<OrcidQueue>();
+			if (StringUtils.isNotBlank(crisId)) {
+				queue = applicationService.findOrcidQueueByResearcherId(crisId);
+			}
+			List<Map<String, Object>> dto = null;
+			try {
+				dto = getLightResultList(context, applicationService, queue);
+			} catch (SQLException e) {
+				log.error(e.getMessage(), e);
+			}
+			
+			if (dto == null || dto.isEmpty()) {
+				dto = new ArrayList<Map<String, Object>>();
+				jo.addProperty("status", false);
+				JsonElement tree = json.toJsonTree(dto);
+				jo.add("result", tree);
+			} else {
+				jo.addProperty("status", true);
+				JsonElement tree = json.toJsonTree(dto);
+				jo.add("result", tree);
+			}
+			jo.addProperty("iTotalRecords", queue.size());
+			jo.addProperty("iTotalDisplayRecords", queue.size());
 		}
-		List<Map<String, Object>> dto = null;
-		try {
-			dto = getLightResultList(context, applicationService, queue);
-		} catch (SQLException e) {
-			log.error(e.getMessage(), e);
-		}
-        
-        JsonObject jo = new JsonObject();
-        if(dto==null || dto.isEmpty()) {
-        	jo.addProperty("status", false);	
-        }
-        else {
-        	jo.addProperty("status", true);
-        	JsonElement tree = json.toJsonTree(dto);
-        	jo.add("result", tree);
-        }        
-        jo.addProperty("iTotalRecords", queue.size());
-        jo.addProperty("iTotalDisplayRecords", queue.size());
-        resp.setContentType("application/json");
-//        if you works in localhost mode and use IE10 to debug the feature uncomment the follow line
-//        resp.setHeader("Access-Control-Allow-Origin","*");
-        resp.getWriter().write(jo.toString());
+		resp.setContentType("application/json");
+		// if you works in localhost mode and use IE10 to debug the feature
+		// uncomment the follow line
+		// resp.setHeader("Access-Control-Allow-Origin","*");
+		resp.getWriter().write(jo.toString());
 	}
-	
-	
-    private List<Map<String, Object>> getLightResultList(Context context, ApplicationService applicationService,
-            List<OrcidQueue> records) throws SQLException
-    {
-        List<Map<String, Object>> results = new ArrayList<Map<String, Object>>();
-        if (records != null && records.size() > 0)
-        {
-            for (OrcidQueue record : records)
-            {
-                Map<String, Object> data = new HashMap<String, Object>();
-                data.put("id", record.getId());
-                data.put("uuid", record.getFastlookupUuid());
-                data.put("eId", record.getEntityId());
-                data.put("tText", CrisConstants.getEntityTypeText(record.getTypeId()));
-                data.put("name", record.getFastlookupObjectName());
-                data.put("owner", record.getOwner());
-                data.put("mode", record.getMode());
-                results.add(data);
-            }
-        }
-        return results;
-    }
+
+	private List<Map<String, Object>> getLightResultList(Context context, ApplicationService applicationService,
+			List<OrcidQueue> records) throws SQLException {
+		List<Map<String, Object>> results = new ArrayList<Map<String, Object>>();
+		if (records != null && records.size() > 0) {
+			for (OrcidQueue record : records) {
+				Map<String, Object> data = new HashMap<String, Object>();
+				data.put("id", record.getId());
+				data.put("uuid", record.getFastlookupUuid());
+				data.put("eId", record.getEntityId());
+				data.put("ttext", CrisConstants.getEntityTypeText(record.getTypeId()));
+				data.put("name", record.getFastlookupObjectName());
+				data.put("owner", record.getOwner());
+				data.put("mode", record.getMode());
+				results.add(data);
+			}
+		}
+		return results;
+	}
 
 }

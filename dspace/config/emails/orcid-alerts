@@ -1,0 +1,12 @@
+# Email sent to DSpace users when they have works to send to the Orcid Registry but have disable the batch mode
+#
+#          
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: You have works to send to the Orcid Registry
+
+Please login {0} to send the "works" to the Orcid Registry
+
+The DSpace Team
+

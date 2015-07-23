@@ -152,6 +152,63 @@
 						</list>
 					</property>
 				</bean>
+				
+<!-- 				<bean
+					class="org.dspace.app.cris.configuration.RelationPreferenceConfiguration">
+					<property name="relationConfiguration" ref="relationRPVSPJConfiguration"/>
+					<property name="selectActionAuthLevel">
+						<util:constant
+							static-field="org.dspace.app.cris.configuration.RelationPreferenceConfiguration.ENABLED" />
+					</property>
+					<property name="hideActionAuthLevel">
+						<util:constant
+							static-field="org.dspace.app.cris.configuration.RelationPreferenceConfiguration.ENABLED" />
+					</property>
+					<property name="unlinkActionAuthLevel">
+						<util:constant
+							static-field="org.dspace.app.cris.configuration.RelationPreferenceConfiguration.ONLY_SYSTEM_ADMIN" />
+					</property>
+					<property name="extraAction">
+						<bean class="org.dspace.app.cris.configuration.CrisExtraAction" />
+					</property>
+					<property name="columnsVisualizationConfiguration">
+						<list>
+							<bean class="org.dspace.app.cris.configuration.ColumnVisualizationConfiguration">
+								<property name="name" value="title" />
+								<property name="metadata">
+									<list>
+										<value>dc.title</value>
+									</list>
+								</property>	
+							</bean>
+							<bean class="org.dspace.app.cris.configuration.ColumnVisualizationConfiguration">
+								<property name="name" value="contributors" />
+								<property name="metadata">
+									<list>
+										<value>dc.contributor.*</value>
+									</list>
+								</property>	
+							</bean>
+							<bean class="org.dspace.app.cris.configuration.ColumnVisualizationConfiguration">
+								<property name="name" value="issued" />
+								<property name="metadata">
+									<list>
+										<value>dc.date.issued</value>
+									</list>
+								</property>	
+							</bean>
+							<bean class="org.dspace.app.cris.configuration.ColumnVisualizationConfiguration">
+								<property name="name" value="type" />
+								<property name="metadata">
+									<list>
+										<value>dc.type</value>
+									</list>
+								</property>	
+							</bean> -->
+						</list>
+					</property>
+				</bean>
+				
 			</list>
 		</property>
 	</bean>

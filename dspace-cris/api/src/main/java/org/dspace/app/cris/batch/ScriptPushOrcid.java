@@ -8,6 +8,7 @@
 package org.dspace.app.cris.batch;
 
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -15,6 +16,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.mail.MessagingException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -30,11 +33,18 @@ import org.apache.solr.common.SolrDocumentList;
 import org.dspace.app.cris.integration.PushToORCID;
 import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.ResearcherPage;
+import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
+import org.dspace.app.cris.model.jdyna.RPProperty;
+import org.dspace.app.cris.model.orcid.OrcidQueue;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.service.RelationPreferenceService;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Email;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.utils.DSpace;
+
+import it.cilea.osd.jdyna.value.BooleanValue;
 
 public class ScriptPushOrcid
 {
@@ -67,13 +77,13 @@ public class ScriptPushOrcid
         Options options = new Options();
         options.addOption("h", "help", false, "help");
         options.addOption("a", "all_researcher", false,
-                "Work on all researchers pages");
+                "Work on all researchers pages (ADMIN MODE)");
         options.addOption("s", "single_researcher", true,
-                "Work on single researcher");
+                "Work on single researcher (ADMIN MODE)");
         options.addOption("d", "MODE_DATE", true,
-                "Script work only on RP names modified after this date");
+                "Script work only on RP names modified after this date (ADMIN MODE)");
         options.addOption("D", "MODE_HOUR", true,
-                "Script work only on RP names modified in this hours range");
+                "Script work only on RP names modified in this hours range (ADMIN MODE)");
 
         CommandLine line = parser.parse(options, args);
 
@@ -82,7 +92,7 @@ public class ScriptPushOrcid
             HelpFormatter myhelp = new HelpFormatter();
             myhelp.printHelp("ScriptPushOrcid \n", options);
             System.out
-                    .println("\n\nUSAGE:\n ScriptPushOrcid [-a (-d|-D <date>)|-s <researcher_identifier>] \n");
+                    .println("\n\nUSAGE:\n ScriptPushOrcid [-a (-d|-D <date>)|-s <researcher_identifier>] - run with no option will works on cris_queue table \n");
 
             System.exit(0);
         }
@@ -90,14 +100,52 @@ public class ScriptPushOrcid
         if (line.hasOption('a') && line.hasOption('s'))
         {
             System.out
-                    .println("\n\nUSAGE:\n ScriptPushOrcid [-a (-d|-D <date>)|-s <researcher_identifier>] \n");
+                    .println("\n\nUSAGE:\n ScriptPushOrcid [-a (-d|-D <date>)|-s <researcher_identifier>] - run with no option will works on cris_queue table\n");
             System.out.println("Insert either a or s like parameters");
             log.error("Either a or s like parameters");
             System.exit(1);
         }
 
         List<ResearcherPage> rps = null;
-        if (line.hasOption('a'))
+        if(line.getOptions()==null || line.getOptions().length == 0) {
+        	List<OrcidQueue> queue = applicationService.getList(OrcidQueue.class);
+        	List<ResearcherPage> rpWithManualModeEnabled = new ArrayList<ResearcherPage>();
+        	for(OrcidQueue orcidQueue : queue) {
+        		//see preferences and mode (batch vs manual)
+        		ResearcherPage rp = applicationService.get(ResearcherPage.class, orcidQueue.getOwner());
+        		String metadata = "orcid-push-manual";
+				RPPropertiesDefinition rpPDef = applicationService.findPropertiesDefinitionByShortName(
+        				RPPropertiesDefinition.class, metadata);
+        		if (rpPDef != null) {		
+        			List<RPProperty> listManualMode = rp.getAnagrafica4view().get(metadata);
+					if(!listManualMode.isEmpty()) {
+        				BooleanValue value = (BooleanValue)listManualMode.get(0).getValue();
+        				if(value.getObject()) {
+        					if(!rpWithManualModeEnabled.contains(rp)) {
+        						rpWithManualModeEnabled.add(rp);
+        					}
+        					continue; 
+        				}
+        			}
+        		} else {
+        			log.warn("Metadata Properties definition not found:"+ metadata);
+        		}
+        		PushToORCID.sendOrcidQueue(applicationService, orcidQueue);
+        	}
+        	for(ResearcherPage rp : rpWithManualModeEnabled) {
+        		try {
+					Email email = Email.getEmail("manual-mode-orcid");
+					email.addRecipient(rp.getEmail().getValue());
+					email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/cris/rp/" + rp.getCrisID());
+					email.send();
+				} catch (MessagingException | IOException e) {
+					log.error("Email not send for:"+ rp.getCrisID());
+				}
+        	}
+        	
+        	
+        }
+        else if (line.hasOption('a'))
         {
             log
                     .info("Script launched with -a parameter...it will work on all researcher...");
@@ -196,8 +244,8 @@ public class ScriptPushOrcid
             {
                 System.out
                         .println("\n\nUSAGE:\n ScriptPushOrcid [-a|-s <researcher_identifier>] \n");
-                System.out.println("Option a or s is needed");
-                log.error("Option a or s is needed");
+                System.out.println("Option a or s is needed - run with no option works on cris_queue table");
+                log.error("Option a or s is needed - run with no option works on cris_queue table");
                 System.exit(1);
             }
         }

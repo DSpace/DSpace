@@ -528,18 +528,21 @@ public class StartupMetadataConfiguratorTool {
 					boxAuthorizationORCID.setTitle("ORCID Authorizations");
 					boxAuthorizationORCID.setShortName("orcidauthorizations");
 					boxAuthorizationORCID.setExternalJSP("orcidauthorizations");
+					boxAuthorizationORCID.setPriority(10000);
 
 					boxSettingsORCID = new BoxResearcherPage();
 					boxSettingsORCID.setVisibility(VisibilityTabConstant.LOW);
 					boxSettingsORCID.setTitle("ORCID Synchronization settings");
 					boxSettingsORCID.setShortName("orcidsyncsettings");
 					boxSettingsORCID.setExternalJSP("orcidsyncsettings");
+					boxSettingsORCID.setPriority(1000);
 
 					boxQueueORCID = new BoxResearcherPage();
 					boxQueueORCID.setVisibility(VisibilityTabConstant.LOW);
 					boxQueueORCID.setTitle("ORCID Registry Queue");
 					boxQueueORCID.setShortName("orcidsyncqueue");
 					boxQueueORCID.setExternalJSP("orcidsyncqueue");
+					boxQueueORCID.setPriority(100);
 					
 					applicationService.saveOrUpdate(BoxResearcherPage.class, boxAuthorizationORCID);
 					applicationService.saveOrUpdate(BoxResearcherPage.class, boxSettingsORCID);

@@ -7,13 +7,17 @@
  */
 package org.dspace.app.cris.integration;
 
+import java.io.IOException;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.mail.MessagingException;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
@@ -30,14 +34,17 @@ import org.dspace.app.cris.model.RelationPreference;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.jdyna.RPPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.RPProperty;
+import org.dspace.app.cris.model.orcid.OrcidHistory;
+import org.dspace.app.cris.model.orcid.OrcidPreferencesUtils;
+import org.dspace.app.cris.model.orcid.OrcidQueue;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.service.RelationPreferenceService;
 import org.dspace.app.cris.util.ResearcherPageUtils;
-import org.dspace.app.util.OrcidFundingMetadata;
-import org.dspace.app.util.OrcidWorkMetadata;
+import org.dspace.authority.orcid.OrcidExternalIdentifierType;
 import org.dspace.authority.orcid.OrcidService;
 import org.dspace.authority.orcid.jaxb.Address;
 import org.dspace.authority.orcid.jaxb.Amount;
+import org.dspace.authority.orcid.jaxb.Biography;
 import org.dspace.authority.orcid.jaxb.Citation;
 import org.dspace.authority.orcid.jaxb.CitationType;
 import org.dspace.authority.orcid.jaxb.ContactDetails;
@@ -70,6 +77,7 @@ import org.dspace.authority.orcid.jaxb.LanguageCode;
 import org.dspace.authority.orcid.jaxb.Month;
 import org.dspace.authority.orcid.jaxb.OrcidBio;
 import org.dspace.authority.orcid.jaxb.OrcidId;
+import org.dspace.authority.orcid.jaxb.OrcidMessage;
 import org.dspace.authority.orcid.jaxb.OrcidProfile;
 import org.dspace.authority.orcid.jaxb.OrcidWork;
 import org.dspace.authority.orcid.jaxb.OrcidWorks;
@@ -87,12 +95,19 @@ import org.dspace.authority.orcid.jaxb.WorkExternalIdentifiers;
 import org.dspace.authority.orcid.jaxb.WorkTitle;
 import org.dspace.authority.orcid.jaxb.Year;
 import org.dspace.content.DCPersonName;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
+import org.dspace.handle.HandleManager;
+import org.dspace.util.SimpleMapConverter;
+import org.dspace.utils.DSpace;
+
+import it.cilea.osd.common.core.SingleTimeStampInfo;
+import it.cilea.osd.jdyna.value.BooleanValue;
 
 public class PushToORCID {
 
@@ -115,8 +130,15 @@ public class PushToORCID {
 		Map<String, List<Integer>> mapPublicationsToSend = new HashMap<String, List<Integer>>();
 		Map<String, List<Integer>> mapProjectsToSend = new HashMap<String, List<Integer>>();
 
+		boolean forceSendToORCIDRegisty = ConfigurationManager.getBooleanProperty("cris",
+				"system.script.pushtoorcid.force", false);
+
 		boolean buildORCIDProfile = ConfigurationManager.getBooleanProperty("cris",
 				"system.script.pushtoorcid.profile.create.new", false);
+
+		// if defined then the script works in this default mode
+		String defaultPreference = ConfigurationManager.getProperty("cris",
+				"system.script.pushtoorcid.default.preference");
 
 		Map<String, String> mapResearcherOrcid = new HashMap<String, String>();
 		Map<String, String> mapResearcherTokenUpdateBio = new HashMap<String, String>();
@@ -126,22 +148,36 @@ public class PushToORCID {
 		Map<String, String> mapResearcherTokenUpdateFundings = new HashMap<String, String>();
 		List<String> listNewResearcherToPushOnOrcid = new ArrayList<String>();
 
-		// prepare configuration mapping ORCID->DSPACE-CRIS
-		Map<String, String> orcidConfigurationMapping = new HashMap<String, String>();
-		List<RPPropertiesDefinition> metadataDefinitions = applicationService
-				.likePropertiesDefinitionsByShortName(RPPropertiesDefinition.class, "orcid-profile-pref");
-		for (RPPropertiesDefinition rppd : metadataDefinitions) {
-			String metadataShortnameINTERNAL = rppd.getShortName().replaceFirst("orcid-profile-pref-", "");
-			String metadataShortnameORCID = rppd.getLabel();
-			orcidConfigurationMapping.put(metadataShortnameORCID, metadataShortnameINTERNAL);
-		}
+		Map<String, String> orcidConfigurationMapping = prepareConfigurationMappingForProfile(applicationService);
 
-		for (ResearcherPage researcher : rps) {
+		external: for (ResearcherPage researcher : rps) {
 
 			String crisID = researcher.getCrisID();
 			List<Integer> itemIDsToSend = new ArrayList<Integer>();
 			List<Integer> projectsIDsToSend = new ArrayList<Integer>();
 
+			boolean isManualMode = false;
+			if (!forceSendToORCIDRegisty) {
+				for (RPProperty pushManual : researcher.getAnagrafica4view().get("orcid-push-manual")) {
+					BooleanValue value = (BooleanValue) (pushManual.getValue());
+					if (value.getObject()) {
+						isManualMode = true;
+					}
+					break;
+				}
+			}
+
+			if (isManualMode) {
+				try {
+					org.dspace.core.Email email = org.dspace.core.Email.getEmail("manual-mode-orcid");
+					email.addRecipient(researcher.getEmail().getValue());
+					email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/cris/rp/" + crisID);
+					email.send();
+				} catch (MessagingException | IOException e) {
+					log.error("Email not send for:" + crisID);
+				}
+				continue external;
+			}
 			boolean prepareUpdateProfile = false;
 			boolean prepareCreateWork = false;
 			boolean prepareUpdateWork = false;
@@ -156,16 +192,31 @@ public class PushToORCID {
 				break;
 			}
 
+			String publicationsPrefs = ResearcherPageUtils.getStringValue(researcher,
+					OrcidPreferencesUtils.ORCID_PUBLICATIONS_PREFS);
+			String projectPrefs = ResearcherPageUtils.getStringValue(researcher,
+					OrcidPreferencesUtils.ORCID_PROJECTS_PREFS);
+
+			int parseIntPublicationsPrefs = ORCID_PUBLICATION_PREFS_DISABLED;
+			if (publicationsPrefs != null) {
+				parseIntPublicationsPrefs = Integer.parseInt(publicationsPrefs);
+			}
+			int parseIntProjectPrefs = ORCID_PROJECTS_PREFS_DISABLED;
+			if (projectPrefs == null) {
+				parseIntProjectPrefs = Integer.parseInt(projectPrefs);
+			}
+
 			if (buildORCIDProfile && !foundORCID) {
 				listNewResearcherToPushOnOrcid.add(crisID);
 				// default pushing all profile field founded on configuration
 				prepareUpdateProfile(applicationService, mapResearcherMetadataToSend, researcher, true);
 				// default pushing selected works
+
 				prepareWorks(relationPreferenceService, searchService, mapPublicationsToSend, researcher, crisID,
-						itemIDsToSend, "" + ORCID_PUBLICATION_PREFS_SELECTED);
+						itemIDsToSend, defaultPreference == null ? "" + parseIntPublicationsPrefs : defaultPreference);
 				// default pushing selected fundings
 				prepareFundings(relationPreferenceService, searchService, mapProjectsToSend, researcher, crisID,
-						projectsIDsToSend, "" + ORCID_PROJECTS_PREFS_SELECTED);
+						projectsIDsToSend, defaultPreference == null ? "" + parseIntProjectPrefs : defaultPreference);
 			} else {
 				for (RPProperty tokenRP : researcher.getAnagrafica4view().get("system-orcid-token-orcid-bio-update")) {
 					mapResearcherTokenUpdateBio.put(crisID, tokenRP.toString());
@@ -200,16 +251,13 @@ public class PushToORCID {
 				}
 
 				if (prepareCreateWork && prepareUpdateWork) {
-					String publicationsPrefs = ResearcherPageUtils.getStringValue(researcher,
-							"orcid-publications-prefs");
 					prepareWorks(relationPreferenceService, searchService, mapPublicationsToSend, researcher, crisID,
 							itemIDsToSend, publicationsPrefs);
 				}
 
 				if (prepareCreateFunding && prepareUpdateFunding) {
-					String projectsPrefs = ResearcherPageUtils.getStringValue(researcher, "orcid-projects-prefs");
 					prepareFundings(relationPreferenceService, searchService, mapProjectsToSend, researcher, crisID,
-							projectsIDsToSend, projectsPrefs);
+							projectsIDsToSend, projectPrefs);
 				}
 			}
 		}
@@ -304,6 +352,19 @@ public class PushToORCID {
 			}
 		}
 
+	}
+
+	public static Map<String, String> prepareConfigurationMappingForProfile(ApplicationService applicationService) {
+		// prepare configuration mapping ORCID->DSPACE-CRIS
+		Map<String, String> orcidConfigurationMapping = new HashMap<String, String>();
+		List<RPPropertiesDefinition> metadataDefinitions = applicationService
+				.likePropertiesDefinitionsByShortName(RPPropertiesDefinition.class, "orcid-profile-pref");
+		for (RPPropertiesDefinition rppd : metadataDefinitions) {
+			String metadataShortnameINTERNAL = rppd.getShortName().replaceFirst("orcid-profile-pref-", "");
+			String metadataShortnameORCID = rppd.getLabel();
+			orcidConfigurationMapping.put(metadataShortnameORCID, metadataShortnameINTERNAL);
+		}
+		return orcidConfigurationMapping;
 	}
 
 	private static void prepareFundings(RelationPreferenceService relationPreferenceService,
@@ -409,18 +470,18 @@ public class PushToORCID {
 		mapPublicationsToSend.put(crisID, itemIDsToSend);
 	}
 
-	private static void prepareUpdateProfile(ApplicationService applicationService,
+	public static void prepareUpdateProfile(ApplicationService applicationService,
 			Map<String, Map<String, List<String>>> mapResearcherMetadataToSend, ResearcherPage researcher,
 			boolean force) {
 		List<RPPropertiesDefinition> metadataDefinitions = applicationService
-				.likePropertiesDefinitionsByShortName(RPPropertiesDefinition.class, "orcid-profile-prefs");
+				.likePropertiesDefinitionsByShortName(RPPropertiesDefinition.class, "orcid-profile-pref-");
+		Map<String, List<String>> mapMetadata = new HashMap<String, List<String>>();
 		for (RPPropertiesDefinition rppd : metadataDefinitions) {
 			String metadataShortnameINTERNAL = rppd.getShortName().replaceFirst("orcid-profile-pref-", "");
 			String metadataShortnameORCID = rppd.getLabel();
 
 			List<RPProperty> metadatas = researcher.getAnagrafica4view().get(metadataShortnameINTERNAL);
 
-			Map<String, List<String>> mapMetadata = new HashMap<String, List<String>>();
 			List<String> listMetadata = new ArrayList<String>();
 
 			for (RPProperty metadata : metadatas) {
@@ -435,9 +496,8 @@ public class PushToORCID {
 				mapMetadata.put(metadataShortnameORCID, listMetadata);
 			}
 
-			mapResearcherMetadataToSend.put(researcher.getCrisID(), mapMetadata);
-
 		}
+		mapResearcherMetadataToSend.put(researcher.getCrisID(), mapMetadata);
 	}
 
 	private static FundingList buildOrcidFundings(Context context, ApplicationService applicationService, String crisId,
@@ -446,69 +506,86 @@ public class PushToORCID {
 		List<Integer> listOfItems = mapProjectsToSend.get(crisId);
 		for (Integer ii : listOfItems) {
 			Project project = applicationService.get(Project.class, ii);
-			OrcidFundingMetadata itemMetadata = new OrcidFundingMetadata(context, project);
+			Funding funding = buildOrcidFunding(context, applicationService, project);
+			fundingList.getFunding().add(funding);
+		}
+		return fundingList;
+	}
 
-			Funding funding = new Funding();
-			if (StringUtils.isNotBlank(itemMetadata.getAmount())) {
-				Amount amount = new Amount();
-				CurrencyCode currencyCode = CurrencyCode.fromValue(itemMetadata.getCurrencyCode());
-				amount.setValue(itemMetadata.getAmount());
-				amount.setCurrencyCode(currencyCode);
-				funding.setAmount(amount);
-			}
+	private static Funding buildOrcidFunding(Context context, ApplicationService applicationService, Project project)
+			throws SQLException {
+		OrcidFundingMetadata itemMetadata = new OrcidFundingMetadata(context, project);
 
-			if (StringUtils.isNotBlank(itemMetadata.getStartYear())
-					|| StringUtils.isNotBlank(itemMetadata.getStartMonth())
-					|| StringUtils.isNotBlank(itemMetadata.getStartDay())) {
-				FuzzyDate fuzzyDate = new FuzzyDate();
-				if (StringUtils.isNotBlank(itemMetadata.getStartYear())) {
-					Year year = new Year();
-					year.setValue(itemMetadata.getStartYear());
-					fuzzyDate.setYear(year);
-				}
-				if (StringUtils.isNotBlank(itemMetadata.getStartMonth())) {
-					Month month = new Month();
-					month.setValue(itemMetadata.getStartMonth());
-					fuzzyDate.setMonth(month);
-				}
-				if (StringUtils.isNotBlank(itemMetadata.getStartDay())) {
-					Day day = new Day();
-					day.setValue(itemMetadata.getStartDay());
-					fuzzyDate.setDay(day);
-				}
-				funding.setStartDate(fuzzyDate);
-			}
-			if (StringUtils.isNotBlank(itemMetadata.getEndYear()) || StringUtils.isNotBlank(itemMetadata.getEndMonth())
-					|| StringUtils.isNotBlank(itemMetadata.getEndDay())) {
-				FuzzyDate fuzzyDate = new FuzzyDate();
-				if (StringUtils.isNotBlank(itemMetadata.getEndYear())) {
-					Year year = new Year();
-					year.setValue(itemMetadata.getEndYear());
-					fuzzyDate.setYear(year);
-				}
-				if (StringUtils.isNotBlank(itemMetadata.getEndMonth())) {
-					Month month = new Month();
-					month.setValue(itemMetadata.getEndMonth());
-					fuzzyDate.setMonth(month);
-				}
-				if (StringUtils.isNotBlank(itemMetadata.getEndDay())) {
-					Day day = new Day();
-					day.setValue(itemMetadata.getEndDay());
-					fuzzyDate.setDay(day);
-				}
-				funding.setEndDate(fuzzyDate);
-			}
+		Funding funding = new Funding();
+		if (StringUtils.isNotBlank(itemMetadata.getAmount())) {
+			Amount amount = new Amount();
+			CurrencyCode currencyCode = CurrencyCode.fromValue(itemMetadata.getCurrencyCode());
+			amount.setValue(itemMetadata.getAmount());
+			amount.setCurrencyCode(currencyCode);
+			funding.setAmount(amount);
+		}
 
-			FundingContributors fundingContributors = new FundingContributors();
+		if (StringUtils.isNotBlank(itemMetadata.getStartYear()) || StringUtils.isNotBlank(itemMetadata.getStartMonth())
+				|| StringUtils.isNotBlank(itemMetadata.getStartDay())) {
+			FuzzyDate fuzzyDate = new FuzzyDate();
+			if (StringUtils.isNotBlank(itemMetadata.getStartYear())) {
+				Year year = new Year();
+				year.setValue(itemMetadata.getStartYear());
+				fuzzyDate.setYear(year);
+			}
+			if (StringUtils.isNotBlank(itemMetadata.getStartMonth())) {
+				Month month = new Month();
+				month.setValue(itemMetadata.getStartMonth());
+				fuzzyDate.setMonth(month);
+			}
+			if (StringUtils.isNotBlank(itemMetadata.getStartDay())) {
+				Day day = new Day();
+				day.setValue(itemMetadata.getStartDay());
+				fuzzyDate.setDay(day);
+			}
+			funding.setStartDate(fuzzyDate);
+		}
+		if (StringUtils.isNotBlank(itemMetadata.getEndYear()) || StringUtils.isNotBlank(itemMetadata.getEndMonth())
+				|| StringUtils.isNotBlank(itemMetadata.getEndDay())) {
+			FuzzyDate fuzzyDate = new FuzzyDate();
+			if (StringUtils.isNotBlank(itemMetadata.getEndYear())) {
+				Year year = new Year();
+				year.setValue(itemMetadata.getEndYear());
+				fuzzyDate.setYear(year);
+			}
+			if (StringUtils.isNotBlank(itemMetadata.getEndMonth())) {
+				Month month = new Month();
+				month.setValue(itemMetadata.getEndMonth());
+				fuzzyDate.setMonth(month);
+			}
+			if (StringUtils.isNotBlank(itemMetadata.getEndDay())) {
+				Day day = new Day();
+				day.setValue(itemMetadata.getEndDay());
+				fuzzyDate.setDay(day);
+			}
+			funding.setEndDate(fuzzyDate);
+		}
+
+		boolean buildFundingContributors = false;
+		FundingContributors fundingContributors = new FundingContributors();
+		if (itemMetadata.getContributorsLead() != null) {
 			for (String valContributor : itemMetadata.getContributorsLead()) {
 				addFundingContributor(fundingContributors, valContributor, "lead");
+				buildFundingContributors = true;
 			}
+		}
 
+		if (itemMetadata.getContributorsCoLead() != null) {
 			for (String valContributor : itemMetadata.getContributorsCoLead()) {
 				addFundingContributor(fundingContributors, valContributor, "colead");
+				buildFundingContributors = true;
 			}
+		}
+		if(buildFundingContributors) {
 			funding.setFundingContributors(fundingContributors);
+		}
 
+		if (itemMetadata.getExternalIdentifier() != null) {
 			FundingExternalIdentifiers fundingExternalIdentifiers = new FundingExternalIdentifiers();
 			for (String valIdentifier : itemMetadata.getExternalIdentifier()) {
 				FundingExternalIdentifier fundingExternalIdentifier = new FundingExternalIdentifier();
@@ -518,28 +595,27 @@ public class PushToORCID {
 				fundingExternalIdentifiers.getFundingExternalIdentifier().add(fundingExternalIdentifier);
 			}
 			funding.setFundingExternalIdentifiers(fundingExternalIdentifiers);
-
-			if (StringUtils.isNotBlank(itemMetadata.getTitle())) {
-				FundingTitle fundingTitle = new FundingTitle();
-				fundingTitle.setTitle(itemMetadata.getTitle());
-				funding.setFundingTitle(fundingTitle);
-			}
-			
-			if(StringUtils.isNotBlank(itemMetadata.getType())) {
-				funding.setFundingType(itemMetadata.getType());
-			}
-			
-			if(StringUtils.isNotBlank(itemMetadata.getAbstract())) {
-				funding.setShortDescription(itemMetadata.getAbstract());
-			}
-			if(StringUtils.isNotBlank(itemMetadata.getURL())) {
-				Url url = new Url();
-				url.setValue(itemMetadata.getURL());
-				funding.setUrl(url);
-			}
-			fundingList.getFunding().add(funding);
 		}
-		return fundingList;
+		
+		if (StringUtils.isNotBlank(itemMetadata.getTitle())) {
+			FundingTitle fundingTitle = new FundingTitle();
+			fundingTitle.setTitle(itemMetadata.getTitle());
+			funding.setFundingTitle(fundingTitle);
+		}
+
+		if (StringUtils.isNotBlank(itemMetadata.getType())) {
+			funding.setFundingType(itemMetadata.getType());
+		}
+
+		if (StringUtils.isNotBlank(itemMetadata.getAbstract())) {
+			funding.setShortDescription(itemMetadata.getAbstract());
+		}
+		if (StringUtils.isNotBlank(itemMetadata.getURL())) {
+			Url url = new Url();
+			url.setValue(itemMetadata.getURL());
+			funding.setUrl(url);
+		}
+		return funding;
 	}
 
 	private static void addFundingContributor(FundingContributors fundingContributors, String valContributor,
@@ -586,80 +662,95 @@ public class PushToORCID {
 		OrcidWorks orcidWorks = new OrcidWorks();
 		List<Integer> listOfItems = mapPublicationsToSend.get(crisId);
 		for (Integer ii : listOfItems) {
-			OrcidWork orcidWork = new OrcidWork();
+			buildOrcidWork(context, ii);
+		}
+		return orcidWorks;
+	}
 
-			Item item = Item.find(context, ii);
+	private static OrcidWork buildOrcidWork(Context context, Integer ii) throws SQLException {
+		OrcidWork orcidWork = new OrcidWork();
 
-			OrcidWorkMetadata itemMetadata = new OrcidWorkMetadata(context, item);
+		Item item = Item.find(context, ii);
 
-			WorkTitle worktitle = new WorkTitle();
-			worktitle.setTitle(itemMetadata.getTitle());
+		OrcidWorkMetadata itemMetadata = new OrcidWorkMetadata(context, item);
 
-			if (StringUtils.isNotBlank(itemMetadata.getSubTitle())) {
-				Subtitle subtitle = new Subtitle();
-				subtitle.setContent(itemMetadata.getSubTitle());
-				worktitle.setSubtitle(subtitle);
+		WorkTitle worktitle = new WorkTitle();
+		worktitle.setTitle(itemMetadata.getTitle());
+
+		if (StringUtils.isNotBlank(itemMetadata.getSubTitle())) {
+			Subtitle subtitle = new Subtitle();
+			subtitle.setContent(itemMetadata.getSubTitle());
+			worktitle.setSubtitle(subtitle);
+		}
+
+		if (StringUtils.isNotBlank(itemMetadata.getTranslatedTitle())) {
+			TranslatedTitle translatedTitle = new TranslatedTitle();
+			translatedTitle.setValue(itemMetadata.getTranslatedTitle());
+			String translatedLanguageCode = itemMetadata.getTranslatedTitleLanguage();
+
+			try {
+				LanguageCode langCode = LanguageCode.fromValue(translatedLanguageCode);
+				translatedTitle.setLanguageCode(langCode);
+			} catch (Exception ex) {
+				translatedTitle.setLanguageCode(LanguageCode.EN);
 			}
+			worktitle.setTranslatedTitle(translatedTitle);
+		}
 
-			if (StringUtils.isNotBlank(itemMetadata.getTranslatedTitle())) {
-				TranslatedTitle translatedTitle = new TranslatedTitle();
-				translatedTitle.setValue(itemMetadata.getTranslatedTitle());
-				String translatedLanguageCode = itemMetadata.getTranslatedTitleLanguage();
+		String citationVal = itemMetadata.getCitation();
+		if (StringUtils.isNotBlank(citationVal)) {
+			Citation citation = new Citation();
+			citation.setWorkCitationType(CitationType.fromValue(itemMetadata.getCitationType()));
+			citation.setCitation(citationVal);
+			orcidWork.setWorkCitation(citation);
+		}
 
-				try {
-					LanguageCode langCode = LanguageCode.fromValue(translatedLanguageCode);
-					translatedTitle.setLanguageCode(langCode);
-				} catch (Exception ex) {
-					translatedTitle.setLanguageCode(LanguageCode.EN);
-				}
-				worktitle.setTranslatedTitle(translatedTitle);
+		orcidWork.setWorkTitle(worktitle);
+
+		if (StringUtils.isNotBlank(itemMetadata.getJournalTitle())) {
+			JournalTitle journalTitle = new JournalTitle();
+			journalTitle.setContent(itemMetadata.getJournalTitle());
+			orcidWork.setJournalTitle(journalTitle);
+		}
+
+		DecimalFormat dateMonthAndDayFormat = new DecimalFormat("00");
+
+		if (StringUtils.isNotBlank(itemMetadata.getYear()) || StringUtils.isNotBlank(itemMetadata.getMonth())
+				|| StringUtils.isNotBlank(itemMetadata.getDay())) {
+			PublicationDate publicationDate = new PublicationDate();
+			if (StringUtils.isNotBlank(itemMetadata.getYear())) {
+				Year year = new Year();
+				year.setValue(itemMetadata.getYear());
+				publicationDate.setYear(year);
 			}
-
-			String citationVal = itemMetadata.getCitation();
-			if (StringUtils.isNotBlank(citationVal)) {
-				Citation citation = new Citation();
-				citation.setWorkCitationType(CitationType.fromValue(itemMetadata.getCitationType()));
-				citation.setCitation(citationVal);
-				orcidWork.setWorkCitation(citation);
+			if (StringUtils.isNotBlank(itemMetadata.getMonth())) {
+				Month month = new Month();
+				month.setValue(dateMonthAndDayFormat.format(Long.parseLong(itemMetadata.getMonth())));
+				publicationDate.setMonth(month);
 			}
-
-			orcidWork.setWorkTitle(worktitle);
-
-			if (StringUtils.isNotBlank(itemMetadata.getJournalTitle())) {
-				JournalTitle journalTitle = new JournalTitle();
-				journalTitle.setContent(itemMetadata.getJournalTitle());
-				orcidWork.setJournalTitle(journalTitle);
+			if (StringUtils.isNotBlank(itemMetadata.getDay())) {
+				Day day = new Day();
+				day.setValue(dateMonthAndDayFormat.format(Long.parseLong(itemMetadata.getDay())));
+				publicationDate.setDay(day);
 			}
+			orcidWork.setPublicationDate(publicationDate);
+		}
 
-			if (StringUtils.isNotBlank(itemMetadata.getYear()) || StringUtils.isNotBlank(itemMetadata.getMonth())
-					|| StringUtils.isNotBlank(itemMetadata.getDay())) {
-				PublicationDate publicationDate = new PublicationDate();
-				if (StringUtils.isNotBlank(itemMetadata.getYear())) {
-					Year year = new Year();
-					year.setValue(itemMetadata.getYear());
-					publicationDate.setYear(year);
-				}
-				if (StringUtils.isNotBlank(itemMetadata.getMonth())) {
-					Month month = new Month();
-					month.setValue(itemMetadata.getMonth());
-					publicationDate.setMonth(month);
-				}
-				if (StringUtils.isNotBlank(itemMetadata.getDay())) {
-					Day day = new Day();
-					day.setValue(itemMetadata.getDay());
-					publicationDate.setDay(day);
-				}
-				orcidWork.setPublicationDate(publicationDate);
-			}
+		if (StringUtils.isNotBlank(itemMetadata.getURL())) {
+			Url url = new Url();
+			url.setValue(itemMetadata.getURL());
+			orcidWork.setUrl(url);
+		}
 
-			if (StringUtils.isNotBlank(itemMetadata.getURL())) {
-				Url url = new Url();
-				url.setValue(itemMetadata.getURL());
-				orcidWork.setUrl(url);
-			}
+		// add source internal id
+		WorkExternalIdentifiers workExternalIdentifiers = new WorkExternalIdentifiers();
+		WorkExternalIdentifier workExternalIdentifierInternal = new WorkExternalIdentifier();
+		workExternalIdentifierInternal.setWorkExternalIdentifierId("" + item.getID());
+		workExternalIdentifierInternal.setWorkExternalIdentifierType(OrcidExternalIdentifierType.SOURCE_ID.toString());
+		workExternalIdentifiers.getWorkExternalIdentifier().add(workExternalIdentifierInternal);
 
-			WorkExternalIdentifiers workExternalIdentifiers = new WorkExternalIdentifiers();
-
+		// add other external id
+		if (itemMetadata.getExternalIdentifier() != null && !itemMetadata.getExternalIdentifier().isEmpty()) {
 			for (String valIdentifier : itemMetadata.getExternalIdentifier()) {
 				WorkExternalIdentifier workExternalIdentifier = new WorkExternalIdentifier();
 				workExternalIdentifier.setWorkExternalIdentifierId(valIdentifier);
@@ -667,60 +758,76 @@ public class PushToORCID {
 						.setWorkExternalIdentifierType(itemMetadata.getExternalIdentifierType(valIdentifier));
 				workExternalIdentifiers.getWorkExternalIdentifier().add(workExternalIdentifier);
 			}
+		}
+		orcidWork.setWorkExternalIdentifiers(workExternalIdentifiers);
 
-			orcidWork.setWorkExternalIdentifiers(workExternalIdentifiers);
+		// export if have an authority value
+		WorkContributors workContributors = new WorkContributors();
+		boolean haveContributor = false;
+		for (String valContributor : itemMetadata.getAuthors()) {
+			Contributor contributor = new Contributor();
 
-			// export if have an authority value
-			WorkContributors workContributors = new WorkContributors();
-			for (String valContributor : itemMetadata.getAuthors()) {
-				Contributor contributor = new Contributor();
+			Integer id = ResearcherPageUtils.getRealPersistentIdentifier(valContributor, ResearcherPage.class);
+			String name = valContributor;
+			String email = "";
+			String orcid = "";
+			if (null != id) {
+				ResearcherPage ro = ResearcherPageUtils.getCrisObject(id, ResearcherPage.class);
+				name = ResearcherPageUtils.getStringValue(ro, "fullName");
+				email = ResearcherPageUtils.getStringValue(ro, "email");
+				orcid = ResearcherPageUtils.getStringValue(ro, "orcid");
 
-				Integer id = ResearcherPageUtils.getRealPersistentIdentifier(valContributor, ResearcherPage.class);
-				String name = valContributor;
-				String email = "";
-				String orcid = "";
-				if (null != id) {
-					ResearcherPage ro = ResearcherPageUtils.getCrisObject(id, ResearcherPage.class);
-					name = ResearcherPageUtils.getStringValue(ro, "fullName");
-					email = ResearcherPageUtils.getStringValue(ro, "email");
-					orcid = ResearcherPageUtils.getStringValue(ro, "orcid");
-
-					if (StringUtils.isNotBlank(email)) {
-						ContributorEmail contributorEmail = new ContributorEmail();
-						contributorEmail.setValue(email);
-						contributor.setContributorEmail(contributorEmail);
-					}
-					if (StringUtils.isNotBlank(orcid)) {
-						String domainOrcid = ConfigurationManager.getProperty("cris",
-								"external.domainname.authority.service.orcid");
-						OrcidId orcidID = new OrcidId();
-						JAXBElement<String> jaxBOrcid = new JAXBElement<String>(new QName("uri"), String.class,
-								domainOrcid + orcid);
-						orcidID.getContent().add(jaxBOrcid);
-						contributor.setContributorOrcid(orcidID);
-					}
+				if (StringUtils.isNotBlank(email)) {
+					ContributorEmail contributorEmail = new ContributorEmail();
+					contributorEmail.setValue(email);
+					contributor.setContributorEmail(contributorEmail);
 				}
+				if (StringUtils.isNotBlank(orcid)) {
+					String domainOrcid = ConfigurationManager.getProperty("cris",
+							"external.domainname.authority.service.orcid");
+					OrcidId orcidID = new OrcidId();
 
-				CreditName creditName = new CreditName();
-				creditName.setValue(name);
-				contributor.setCreditName(creditName);
-
-				ContributorAttributes attributes = new ContributorAttributes();
-				// TODO now supported only author/additional
-				attributes.setContributorRole("author");
-				attributes.setContributorSequence("additional");
-				contributor.setContributorAttributes(attributes);
-				workContributors.getContributor().add(contributor);
+					JAXBElement<String> jaxBOrcid = new JAXBElement<String>(
+							new QName("http://www.orcid.org/ns/orcid", "uri", "ns2"), String.class,
+							domainOrcid + orcid);
+					orcidID.getContent().add(jaxBOrcid);
+					contributor.setContributorOrcid(orcidID);
+				}
 			}
-			orcidWork.setWorkContributors(workContributors);
 
+			CreditName creditName = new CreditName();
+			creditName.setValue(name);
+			contributor.setCreditName(creditName);
+
+			ContributorAttributes attributes = new ContributorAttributes();
+			// TODO now supported only author/additional
+			attributes.setContributorRole("author");
+			attributes.setContributorSequence("additional");
+			contributor.setContributorAttributes(attributes);
+			workContributors.getContributor().add(contributor);
+			haveContributor = true;
+		}
+		if (haveContributor) {
+			orcidWork.setWorkContributors(workContributors);
+		}
+
+		if (StringUtils.isNotBlank(itemMetadata.getLanguage())) {
 			LanguageCode language = LanguageCode.fromValue(itemMetadata.getLanguage());
 			orcidWork.setLanguageCode(language);
 		}
-		return orcidWorks;
+
+		SimpleMapConverter mapConverterModifier = new DSpace().getServiceManager()
+				.getServiceByName("mapConverterOrcidWorkType", SimpleMapConverter.class);
+		if (mapConverterModifier == null) {
+			orcidWork.setWorkType(itemMetadata.getWorkType());
+		} else {
+			orcidWork.setWorkType(mapConverterModifier.getValue(itemMetadata.getWorkType()));
+		}
+
+		return orcidWork;
 	}
 
-	private static OrcidProfile buildOrcidProfile(ApplicationService applicationService, String crisId,
+	public static OrcidProfile buildOrcidProfile(ApplicationService applicationService, String crisId,
 			Map<String, Map<String, List<String>>> mapResearcherMetadataToSend,
 			Map<String, String> orcidMetadataConfiguration) {
 
@@ -728,48 +835,87 @@ public class PushToORCID {
 
 		Map<String, List<String>> metadata = mapResearcherMetadataToSend.get(crisId);
 
-		String givenNames = getGivenName(metadata.get("name").get(0));
-		String familyName = getFamilyName(metadata.get("name").get(0));
-		String creditName = metadata.get("credit-name").get(0);
+		List<String> name = metadata.get("name");
+
+		// retrieve data from map
+		String givenNames = null;
+		String familyName = null;
+		if (name != null && !name.isEmpty()) {
+			givenNames = getGivenName(name.get(0));
+			familyName = getFamilyName(name.get(0));
+		}
+
+		String creditName = null;
+		List<String> creditname = metadata.get("credit-name");
+		if (creditname != null && !creditname.isEmpty()) {
+			creditName = creditname.get(0);
+		}
 
 		List<String> otherNames = new ArrayList<String>();
-		otherNames.add(metadata.get("name").get(0));
-		otherNames.addAll(metadata.get("other-names"));
+		otherNames.add(name.get(0));
+		List<String> othernamesPlatform = metadata.get("other-names");
+		if (othernamesPlatform != null && !othernamesPlatform.isEmpty()) {
+			otherNames.addAll(othernamesPlatform);
+		}
 
-		String biography = metadata.get("biography").get(0);
-		String primaryEmail = metadata.get("primary-email").get(0);
+		List<String> biographyString = metadata.get("biography");
+		String biography = null;
+		if (biographyString != null && !biographyString.isEmpty()) {
+			biography = biographyString.get(0);
+		}
+
+		String primaryEmail = null;
+		List<String> primaryEmailString = metadata.get("primary-email");
+		if (primaryEmailString != null && !primaryEmailString.isEmpty()) {
+			primaryEmail = primaryEmailString.get(0);
+		}
 
 		List<String> emails = metadata.get("other-emails");
 
-		String country = metadata.get("iso-3166-country").get(0);
+		List<String> isoCountryString = metadata.get("iso-3166-country");
+		String country = null;
+		if (isoCountryString != null && !isoCountryString.isEmpty()) {
+			country = isoCountryString.get(0);
+		}
 
 		List<String> keywords = metadata.get("keywords");
 
 		OrcidBio bioJAXB = new OrcidBio();
 
-		// start personal details
+		// write personal details
 		PersonalDetails personalDetails = new PersonalDetails();
-		personalDetails.setFamilyName(familyName);
 		personalDetails.setGivenNames(givenNames);
-
-		CreditName creditNameJAXB = new CreditName();
-		creditNameJAXB.setValue(creditName);
-		personalDetails.setCreditName(creditNameJAXB);
-
-		OtherNames otherNamesJAXB = new OtherNames();
-		for (String otherName : otherNames) {
-			otherNamesJAXB.getOtherName().add(otherName);
+		if (StringUtils.isNotBlank(familyName)) {
+			personalDetails.setFamilyName(familyName);
 		}
-		personalDetails.setOtherNames(otherNamesJAXB);
+
+		if (StringUtils.isNotBlank(creditName)) {
+			CreditName creditNameJAXB = new CreditName();
+			creditNameJAXB.setValue(creditName);
+			personalDetails.setCreditName(creditNameJAXB);
+		}
+
+		if (otherNames != null && !otherNames.isEmpty()) {
+			OtherNames otherNamesJAXB = new OtherNames();
+			for (String otherName : otherNames) {
+				otherNamesJAXB.getOtherName().add(otherName);
+			}
+			personalDetails.setOtherNames(otherNamesJAXB);
+		}
 
 		bioJAXB.setPersonalDetails(personalDetails);
 
 		// start biography
-		bioJAXB.getBiography().setValue(biography);
+		if (StringUtils.isNotBlank(biography)) {
+			Biography bio = new Biography();
+			bio.setValue(biography);
+		}
 
 		// start researcher-urls and external-identifiers
 		ResearcherUrls researcherUrls = new ResearcherUrls();
 		ExternalIdentifiers externalIdentifiers = new ExternalIdentifiers();
+		boolean buildResearcherUrls = false;
+		boolean buildExternalIdentifier = false;
 		for (String key : metadata.keySet()) {
 			if (key.startsWith("researcher-url-") || key.startsWith("external-identifier-")) {
 				RPPropertiesDefinition rpPD = applicationService.findPropertiesDefinitionByShortName(
@@ -777,66 +923,98 @@ public class PushToORCID {
 
 				if (key.startsWith("researcher-url-")) {
 					for (String value : metadata.get(key)) {
-						ResearcherUrl researcherUrl = new ResearcherUrl();
-						researcherUrl.setUrlName(rpPD.getLabel());
-						Url url = new Url();
-						url.setValue(value);
-						researcherUrl.getUrl();
-						researcherUrls.getResearcherUrl().add(researcherUrl);
+						if (StringUtils.isNotBlank(value)) {
+							ResearcherUrl researcherUrl = new ResearcherUrl();
+							researcherUrl.setUrlName(rpPD.getLabel());
+							Url url = new Url();
+							url.setValue(value);
+							researcherUrl.getUrl();
+							researcherUrls.getResearcherUrl().add(researcherUrl);
+							buildResearcherUrls = true;
+						}
 					}
 				}
 				if (key.startsWith("external-identifier-")) {
 					for (String value : metadata.get(key)) {
-						ExternalIdentifier externalIdentifier = new ExternalIdentifier();
-						ExternalIdCommonName commonName = new ExternalIdCommonName();
-						commonName.setContent(rpPD.getLabel());
-						externalIdentifier.setExternalIdCommonName(commonName);
-						ExternalIdReference externalIdReference = new ExternalIdReference();
-						externalIdReference.setContent(value);
-						externalIdentifier.setExternalIdReference(externalIdReference);
-						ExternalIdUrl externalIdUrl = new ExternalIdUrl();
-						externalIdUrl.setValue(value);
-						externalIdentifier.setExternalIdUrl(externalIdUrl);
-						externalIdentifiers.getExternalIdentifier().add(externalIdentifier);
+						if (StringUtils.isNotBlank(value)) {
+							ExternalIdentifier externalIdentifier = new ExternalIdentifier();
+							ExternalIdCommonName commonName = new ExternalIdCommonName();
+							commonName.setContent(rpPD.getLabel());
+							externalIdentifier.setExternalIdCommonName(commonName);
+							ExternalIdReference externalIdReference = new ExternalIdReference();
+							externalIdReference.setContent(value);
+							externalIdentifier.setExternalIdReference(externalIdReference);
+							ExternalIdUrl externalIdUrl = new ExternalIdUrl();
+							externalIdUrl.setValue(value);
+							externalIdentifier.setExternalIdUrl(externalIdUrl);
+							externalIdentifiers.getExternalIdentifier().add(externalIdentifier);
+							buildExternalIdentifier = true;
+						}
 					}
 				}
 			}
 		}
-		bioJAXB.setResearcherUrls(researcherUrls);
-		bioJAXB.setExternalIdentifiers(externalIdentifiers);
+		if (buildResearcherUrls) {
+			bioJAXB.setResearcherUrls(researcherUrls);
+		}
+		if (buildExternalIdentifier) {
+			bioJAXB.setExternalIdentifiers(externalIdentifiers);
+		}
 
 		// start contact details
 		ContactDetails contactDetailsJAXB = new ContactDetails();
 
 		List<Email> emailsJAXB = contactDetailsJAXB.getEmail();
 
-		Email emailJAXB = new Email();
-		emailJAXB.setPrimary(true);
-		emailJAXB.setValue(primaryEmail);
-		emailsJAXB.add(emailJAXB);
-
-		for (String e : emails) {
-			Email ee = new Email();
-			emailJAXB.setValue(e);
-			emailsJAXB.add(ee);
+		boolean buildContactDetails = false;
+		if (StringUtils.isNotBlank(primaryEmail)) {
+			Email emailJAXB = new Email();
+			emailJAXB.setPrimary(true);
+			emailJAXB.setValue(primaryEmail);
+			emailsJAXB.add(emailJAXB);
+			buildContactDetails = true;
 		}
 
-		Address addressJAXB = contactDetailsJAXB.getAddress();
-		Country countryJAXB = new Country();
-		countryJAXB.setValue(country);
-		addressJAXB.setCountry(countryJAXB);
-		contactDetailsJAXB.setAddress(addressJAXB);
+		if (emails != null) {
+			for (String e : emails) {
+				if (StringUtils.isNotBlank(e)) {
+					Email ee = new Email();
+					ee.setValue(e);
+					emailsJAXB.add(ee);
+					buildContactDetails = true;
+				}
+			}
+		}
 
-		bioJAXB.setContactDetails(contactDetailsJAXB);
+		if (StringUtils.isNotBlank(country)) {
+			Address addressJAXB = new Address();
+			Country countryJAXB = new Country();
+			countryJAXB.setValue(country);
+			addressJAXB.setCountry(countryJAXB);
+			contactDetailsJAXB.setAddress(addressJAXB);
+			buildContactDetails = true;
+		}
+
+		if (buildContactDetails) {
+			bioJAXB.setContactDetails(contactDetailsJAXB);
+		}
 
 		// start keywords
+		boolean buildKeywords = false;
 		Keywords keywordsJAXB = new Keywords();
-		for (String kk : keywords) {
-			Keyword k = new Keyword();
-			k.setContent(kk);
-			keywordsJAXB.getKeyword().add(k);
+		if (keywords != null) {
+			for (String kk : keywords) {
+				if (StringUtils.isNotBlank(kk)) {
+					Keyword k = new Keyword();
+					k.setContent(kk);
+					keywordsJAXB.getKeyword().add(k);
+					buildKeywords = true;
+				}
+			}
 		}
-		bioJAXB.setKeywords(keywordsJAXB);
+		if (buildKeywords) {
+			bioJAXB.setKeywords(keywordsJAXB);
+		}
 
 		profile.setOrcidBio(bioJAXB);
 		return profile;
@@ -858,6 +1036,470 @@ public class PushToORCID {
 			return tmpPersonName.getFirstNames();
 		}
 		return "";
+	}
+
+	public static String getTokenReleasedForSync(ResearcherPage researcher, String tokenName) {
+		return ResearcherPageUtils.getStringValue(researcher, tokenName);
+	}
+
+	public static boolean sendOrcidQueue(ApplicationService applicationService, OrcidQueue orcidQueue) {
+		boolean result = false;
+		if (orcidQueue != null) {
+			String owner = orcidQueue.getOwner();
+			String uuid = orcidQueue.getFastlookupUuid();
+			switch (orcidQueue.getTypeId()) {
+			case CrisConstants.RP_TYPE_ID:
+				result = sendOrcidProfile(applicationService, owner, uuid);
+				break;
+			case CrisConstants.PROJECT_TYPE_ID:
+				result = sendOrcidFunding(applicationService, owner, uuid);
+				break;
+			default:
+				result = sendOrcidWork(applicationService, owner, uuid);
+				break;
+			}
+		}
+		return result;
+	}
+
+	public static boolean sendOrcidWork(ApplicationService applicationService, String crisId, String uuid) {
+		boolean result = false;
+		log.debug("Create DSpace context");
+		Context context = null;
+		try {
+			ResearcherPage researcher = (ResearcherPage) applicationService.getEntityByCrisId(crisId,
+					ResearcherPage.class);
+
+			context = new Context();
+			context.turnOffAuthorisationSystem();
+
+			OrcidService orcidService = OrcidService.getOrcid();
+
+			log.info("Starts update ORCID Profile for:" + crisId);
+
+			String orcid = null;
+			for (RPProperty propOrcid : researcher.getAnagrafica4view().get("orcid")) {
+				orcid = propOrcid.toString();
+				break;
+			}
+
+			if (StringUtils.isNotBlank(orcid)) {
+				log.info("Prepare push for Work:" + uuid + " for ResearcherPage crisID:" + crisId + " AND orcid iD:"
+						+ orcid);
+				OrcidHistory orcidHistory = null;
+				try {
+					String tokenCreateWork = PushToORCID.getTokenReleasedForSync(researcher,
+							"system-orcid-token-orcid-works-update");
+					DSpaceObject dso = HandleManager.resolveToObject(context, uuid);
+
+					orcidHistory = applicationService.uniqueOrcidHistoryByOwnerAndEntityIdAndTypeId(
+							researcher.getCrisID(), dso.getID(), dso.getType());
+					if (tokenCreateWork != null) {
+						if (orcidHistory == null) {
+							orcidHistory = new OrcidHistory();
+							orcidHistory.setEntityId(dso.getID());
+							orcidHistory.setTypeId(dso.getType());
+							orcidHistory.setOwner(researcher.getCrisID());
+						}
+						SingleTimeStampInfo timestampAttempt = new SingleTimeStampInfo(new Date());
+						orcidHistory.setTimestampLastAttempt(timestampAttempt);
+
+						log.info("(Q1)Prepare for Work:" + uuid + " for ResearcherPage crisID:" + crisId);
+						OrcidWork work = PushToORCID.buildOrcidWork(context, dso.getID());
+						if (work != null) {
+							try {
+								orcidService.appendWork(orcid, tokenCreateWork, work);
+								result = true;
+								orcidHistory.setTimestampSuccessAttempt(timestampAttempt);
+								log.info("(A1) OK for Work:" + uuid + " for ResearcherPage crisID:" + crisId);
+							} catch (Exception ex) {
+								// build message for orcid history
+								orcidHistory.setResponseMessage(ex.getMessage());
+								log.error("ERROR!!! (E1) ERROR for Work:" + uuid + " for ResearcherPage crisID:"
+										+ crisId);
+							}
+							applicationService.saveOrUpdate(OrcidHistory.class, orcidHistory);
+							log.info("(A2) OK OrcidHistory for Work:" + uuid + " for ResearcherPage crisID:" + crisId);
+						}
+					}
+
+				} catch (Exception ex) {
+					log.info("ERROR!!! (E1) ERROR for Work:" + uuid + " for ResearcherPage crisID:" + crisId);
+					log.error(ex.getMessage());
+					if (orcidHistory != null) {
+						orcidHistory.setResponseMessage(ex.getMessage());
+						applicationService.saveOrUpdate(OrcidHistory.class, orcidHistory);
+					}
+				}
+			} else {
+				log.warn("WARNING!!! (W0) Orcid not found for ResearcherPage:" + crisId);
+			}
+			log.info("Ends append ORCID  Work:" + uuid + " for ResearcherPage crisID:" + crisId);
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		} finally {
+			if (context != null && context.isValid()) {
+				context.abort();
+			}
+		}
+
+		if (result) {
+			applicationService.deleteOrcidQueueByOwnerAndUuid(crisId, uuid);
+		}
+		return result;
+	}
+
+	public static boolean sendOrcidProfile(ApplicationService applicationService, String crisId, String uuid) {
+		boolean result = false;
+		try {
+			Map<String, Map<String, List<String>>> mapResearcherMetadataToSend = new HashMap<String, Map<String, List<String>>>();
+			Map<String, String> orcidConfigurationMapping = PushToORCID
+					.prepareConfigurationMappingForProfile(applicationService);
+			ResearcherPage researcher = (ResearcherPage) applicationService.getEntityByCrisId(crisId,
+					ResearcherPage.class);
+			PushToORCID.prepareUpdateProfile(applicationService, mapResearcherMetadataToSend, researcher, true);
+
+			OrcidService orcidService = OrcidService.getOrcid();
+
+			log.info("Starts update ORCID Profile for:" + crisId);
+
+			String orcid = null;
+			for (RPProperty propOrcid : researcher.getAnagrafica4view().get("orcid")) {
+				orcid = propOrcid.toString();
+				break;
+			}
+
+			if (StringUtils.isNotBlank(orcid)) {
+				log.info("Prepare push for ResearcherPage crisID:" + crisId + " AND orcid iD:" + orcid);
+				OrcidHistory orcidHistory = null;
+				try {
+					String tokenUpdateBio = getTokenReleasedForSync(researcher, "system-orcid-token-orcid-bio-update");
+					orcidHistory = applicationService.uniqueOrcidHistoryByOwnerAndEntityIdAndTypeId(
+							researcher.getCrisID(), researcher.getID(), researcher.getType());
+
+					if (tokenUpdateBio != null) {
+
+						if (orcidHistory == null) {
+							orcidHistory = new OrcidHistory();
+							orcidHistory.setEntityId(researcher.getId());
+							orcidHistory.setTypeId(researcher.getType());
+							orcidHistory.setOwner(researcher.getCrisID());
+						}
+						SingleTimeStampInfo timestampAttempt = new SingleTimeStampInfo(new Date());
+						orcidHistory.setTimestampLastAttempt(timestampAttempt);
+
+						log.info("(Q1)Prepare OrcidProfile for ResearcherPage crisID:" + crisId);
+						OrcidProfile profile = PushToORCID.buildOrcidProfile(applicationService, crisId,
+								mapResearcherMetadataToSend, orcidConfigurationMapping);
+						if (profile != null) {
+							try {
+								OrcidMessage message = orcidService.updateBio(orcid, tokenUpdateBio, profile);
+								if (message.getErrorDesc() != null) {
+									throw new RuntimeException(message.getErrorDesc().getContent());
+								} else {
+									result = true;
+									orcidHistory.setTimestampSuccessAttempt(timestampAttempt);
+									log.info("(A1) OK OrcidProfile for ResearcherPage crisID:" + crisId);
+								}
+							} catch (Exception ex) {
+								// build message for orcid history
+								orcidHistory.setResponseMessage(ex.getMessage());
+								log.error("ERROR!!! (E1) ERROR OrcidProfile ResearcherPage crisID:" + crisId);
+							}
+							applicationService.saveOrUpdate(OrcidHistory.class, orcidHistory);
+							log.info("(A2) OK OrcidHistory for ResearcherPage crisID:" + crisId);
+						}
+					} else {
+						log.warn("WARNING!!! (W1) Token not released for:" + crisId);
+					}
+
+				} catch (Exception ex) {
+					log.error("ERROR!!! (E2) ERROR OrcidProfile ResearcherPage crisID:" + crisId, ex);
+					if (orcidHistory != null) {
+						orcidHistory.setResponseMessage(ex.getMessage());
+						applicationService.saveOrUpdate(OrcidHistory.class, orcidHistory);
+					}
+				}
+			} else {
+				log.warn("WARNING!!! (W0) Orcid not found for:" + crisId);
+			}
+			log.info("Ends update ORCID Profile for:" + crisId);
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
+
+		if (result && StringUtils.isNotBlank(uuid)) {
+			applicationService.deleteOrcidQueueByOwnerAndUuid(crisId, uuid);
+		}
+		return result;
+	}
+
+	public static boolean sendOrcidFunding(ApplicationService applicationService, String crisId, String uuid) {
+		boolean result = false;
+		Context context = null;
+		try {
+			ResearcherPage researcher = (ResearcherPage) applicationService.getEntityByCrisId(crisId,
+					ResearcherPage.class);
+
+			context = new Context();
+			context.turnOffAuthorisationSystem();
+
+			OrcidService orcidService = OrcidService.getOrcid();
+
+			log.info("Starts update ORCID Profile for:" + crisId);
+
+			String orcid = null;
+			for (RPProperty propOrcid : researcher.getAnagrafica4view().get("orcid")) {
+				orcid = propOrcid.toString();
+				break;
+			}
+
+			if (StringUtils.isNotBlank(orcid)) {
+				log.info("Prepare push for Funding:" + uuid + " for ResearcherPage crisID:" + crisId + " AND orcid iD:"
+						+ orcid);
+				OrcidHistory orcidHistory = null;
+				try {
+					String tokenCreateFunding = getTokenReleasedForSync(researcher,
+							"system-orcid-token-funding-update");
+
+					Project project = (Project) applicationService.getEntityByUUID(uuid);
+					orcidHistory = applicationService.uniqueOrcidHistoryByOwnerAndEntityIdAndTypeId(
+							researcher.getCrisID(), project.getID(), project.getType());
+					if (tokenCreateFunding != null) {
+
+						if (orcidHistory == null) {
+							orcidHistory = new OrcidHistory();
+							orcidHistory.setEntityId(project.getId());
+							orcidHistory.setTypeId(project.getType());
+							orcidHistory.setOwner(researcher.getCrisID());
+						}
+						SingleTimeStampInfo timestampAttempt = new SingleTimeStampInfo(new Date());
+						orcidHistory.setTimestampLastAttempt(timestampAttempt);
+
+						log.info("(Q1)Prepare Funding:" + uuid + " for ResearcherPage crisID:" + crisId);
+						Funding funding = PushToORCID.buildOrcidFunding(context, applicationService, project);
+						if (funding != null) {
+							try {
+								orcidService.appendFunding(orcid, tokenCreateFunding, funding);
+								result = true;
+								orcidHistory.setTimestampSuccessAttempt(timestampAttempt);
+								log.info("(A1) OK for Funding:" + uuid + " for ResearcherPage crisID:" + crisId);
+							} catch (Exception ex) {
+								// build message for orcid history
+								orcidHistory.setResponseMessage(ex.getMessage());
+								log.error("ERROR!!! (E1) ERROR for Funding:" + uuid + " for ResearcherPage crisID:"
+										+ crisId);
+							}
+							applicationService.saveOrUpdate(OrcidHistory.class, orcidHistory);
+							log.info("(A2) OK OrcidHistory for for Funding:" + uuid + " for ResearcherPage crisID:"
+									+ crisId);
+						}
+					} else {
+						log.warn("WARNING!!! (W1) Token not released for:" + crisId);
+					}
+
+				} catch (Exception ex) {
+					log.error("ERROR!!! (E2) ERROR for Funding:" + uuid + " for ResearcherPage crisID:" + crisId, ex);
+					if (orcidHistory != null) {
+						orcidHistory.setResponseMessage(ex.getMessage());
+						applicationService.saveOrUpdate(OrcidHistory.class, orcidHistory);
+					}
+				}
+			} else {
+				log.warn("WARNING!!! (W0) Orcid not found for:" + crisId);
+			}
+			log.info("Ends update ORCID Funding:" + uuid + " for ResearcherPage crisID:" + crisId);
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		} finally {
+			if (context != null && context.isValid()) {
+				context.abort();
+			}
+		}
+
+		if (result) {
+			applicationService.deleteOrcidQueueByOwnerAndUuid(crisId, uuid);
+		}
+		return result;
+	}
+
+	public static boolean putOrcidProfile(ApplicationService applicationService, String owner) {
+		return sendOrcidProfile(applicationService, owner, null);
+	}
+
+	public static boolean putOrcidFundings(ApplicationService applicationService, String owner,
+			List<Integer> projects) {
+		boolean result = false;
+		log.debug("Create DSpace context");
+		Context context = null;
+		try {
+			ResearcherPage researcher = (ResearcherPage) applicationService.getEntityByCrisId(owner,
+					ResearcherPage.class);
+
+			context = new Context();
+			context.turnOffAuthorisationSystem();
+
+			OrcidService orcidService = OrcidService.getOrcid();
+
+			log.info("Starts update ORCID Profile for:" + owner);
+
+			String orcid = null;
+			for (RPProperty propOrcid : researcher.getAnagrafica4view().get("orcid")) {
+				orcid = propOrcid.toString();
+				break;
+			}
+
+			if (StringUtils.isNotBlank(orcid)) {
+				log.info("Prepare put for Works for ResearcherPage crisID:" + owner + " AND orcid iD:" + orcid);
+
+				try {
+					String tokenCreateWork = PushToORCID.getTokenReleasedForSync(researcher,
+							"system-orcid-token-funding-create");
+					if (tokenCreateWork != null) {
+
+						Map<String, List<Integer>> mapProjectsToSend = new HashMap<String, List<Integer>>();
+						mapProjectsToSend.put(owner, projects);
+						FundingList works = PushToORCID.buildOrcidFundings(context, applicationService, owner,
+								mapProjectsToSend);
+						String error = null;
+
+						if (works != null) {
+							try {
+								orcidService.putFundings(orcid, tokenCreateWork, works);
+								result = true;
+								log.info("(A1) OK for put Works for ResearcherPage crisID:" + owner);
+							} catch (RuntimeException ex) {
+								// build message for orcid history
+								error = ex.getMessage();
+								log.error("ERROR!!! (E1) ERROR for put Works for ResearcherPage crisID:" + owner);
+							}
+
+							for (Integer i : projects) {
+								OrcidHistory orcidHistory = applicationService
+										.uniqueOrcidHistoryByOwnerAndEntityIdAndTypeId(owner, i,
+												CrisConstants.PROJECT_TYPE_ID);
+								if (orcidHistory == null) {
+									orcidHistory = new OrcidHistory();
+								}
+								orcidHistory.setEntityId(i);
+								orcidHistory.setTypeId(CrisConstants.PROJECT_TYPE_ID);
+								orcidHistory.setOwner(owner);
+								SingleTimeStampInfo timestampAttempt = new SingleTimeStampInfo(new Date());
+								orcidHistory.setTimestampLastAttempt(timestampAttempt);
+								if (StringUtils.isNotBlank(error)) {
+									orcidHistory.setResponseMessage(error);
+								} else {
+									orcidHistory.setTimestampSuccessAttempt(timestampAttempt);
+								}
+								applicationService.saveOrUpdate(OrcidHistory.class, orcidHistory);
+							}
+
+							log.info("(A2) OK OrcidHistory for put Works for ResearcherPage crisID:" + owner);
+						}
+					}
+
+				} catch (Exception ex) {
+					log.info("ERROR!!! (E1) ERROR for put Works for ResearcherPage crisID:" + owner);
+					log.error(ex.getMessage());
+				}
+			} else {
+				log.warn("WARNING!!! (W0) Orcid not found for ResearcherPage:" + owner);
+			}
+			log.info("Ends append ORCID  Works for ResearcherPage crisID:" + owner);
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		} finally {
+			if (context != null && context.isValid()) {
+				context.abort();
+			}
+		}
+		return result;
+	}
+
+	public static boolean putOrcidWorks(ApplicationService applicationService, String owner, List<Integer> items) {
+		boolean result = false;
+		log.debug("Create DSpace context");
+		Context context = null;
+		try {
+			ResearcherPage researcher = (ResearcherPage) applicationService.getEntityByCrisId(owner,
+					ResearcherPage.class);
+
+			context = new Context();
+			context.turnOffAuthorisationSystem();
+
+			OrcidService orcidService = OrcidService.getOrcid();
+
+			log.info("Starts update ORCID Profile for:" + owner);
+
+			String orcid = null;
+			for (RPProperty propOrcid : researcher.getAnagrafica4view().get("orcid")) {
+				orcid = propOrcid.toString();
+				break;
+			}
+
+			if (StringUtils.isNotBlank(orcid)) {
+				log.info("Prepare put for Works for ResearcherPage crisID:" + owner + " AND orcid iD:" + orcid);
+
+				try {
+					String tokenCreateWork = PushToORCID.getTokenReleasedForSync(researcher,
+							"system-orcid-token-orcid-works-create");
+					if (tokenCreateWork != null) {
+
+						Map<String, List<Integer>> mapPublicationsToSend = new HashMap<String, List<Integer>>();
+						mapPublicationsToSend.put(owner, items);
+						OrcidWorks works = PushToORCID.buildOrcidWorks(context, owner, mapPublicationsToSend);
+						String error = null;
+
+						if (works != null) {
+							try {
+								orcidService.putWorks(orcid, tokenCreateWork, works);
+								result = true;
+								log.info("(A1) OK for put Works for ResearcherPage crisID:" + owner);
+							} catch (RuntimeException ex) {
+								// build message for orcid history
+								error = ex.getMessage();
+								log.error("ERROR!!! (E1) ERROR for put Works for ResearcherPage crisID:" + owner);
+							}
+
+							for (Integer i : items) {
+								OrcidHistory orcidHistory = applicationService
+										.uniqueOrcidHistoryByOwnerAndEntityIdAndTypeId(owner, i, Constants.ITEM);
+								if (orcidHistory == null) {
+									orcidHistory = new OrcidHistory();
+								}
+								orcidHistory.setEntityId(i);
+								orcidHistory.setTypeId(Constants.ITEM);
+								orcidHistory.setOwner(owner);
+								SingleTimeStampInfo timestampAttempt = new SingleTimeStampInfo(new Date());
+								orcidHistory.setTimestampLastAttempt(timestampAttempt);
+								if (StringUtils.isNotBlank(error)) {
+									orcidHistory.setResponseMessage(error);
+								} else {
+									orcidHistory.setTimestampSuccessAttempt(timestampAttempt);
+								}
+								applicationService.saveOrUpdate(OrcidHistory.class, orcidHistory);
+							}
+
+							log.info("(A2) OK OrcidHistory for put Works for ResearcherPage crisID:" + owner);
+						}
+					}
+
+				} catch (Exception ex) {
+					log.info("ERROR!!! (E1) ERROR for put Works for ResearcherPage crisID:" + owner);
+					log.error(ex.getMessage());
+				}
+			} else {
+				log.warn("WARNING!!! (W0) Orcid not found for ResearcherPage:" + owner);
+			}
+			log.info("Ends append ORCID  Works for ResearcherPage crisID:" + owner);
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		} finally {
+			if (context != null && context.isValid()) {
+				context.abort();
+			}
+		}
+		return result;
 	}
 
 }

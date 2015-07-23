@@ -7,6 +7,7 @@
  */
 package org.dspace.app.cris.model.listener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Transient;
@@ -35,13 +36,15 @@ import it.cilea.osd.jdyna.value.BooleanValue;
 
 public class OrcidQueueListener implements NativePostUpdateEventListener, PostLoadEventListener {
 
+	private static final String PREFIX_ORCID_PROFILE_PREF = OrcidPreferencesUtils.PREFIX_ORCID_PROFILE_PREF;
+
 	private static final String RELATION_CRISPJ_PROJECTS = "crispj.projects";
 
 	private static final String RELATION_CRISRP_PUBLICATIONS = "crisrp.publications";
 
-	private static final String ORCID_PUBLICATIONS_PREFS = "orcid-publications-prefs";
+	private static final String ORCID_PUBLICATIONS_PREFS = OrcidPreferencesUtils.ORCID_PUBLICATIONS_PREFS;
 
-	private static final String ORCID_PROJECTS_PREFS = "orcid-projects-prefs";
+	private static final String ORCID_PROJECTS_PREFS = OrcidPreferencesUtils.ORCID_PROJECTS_PREFS;
 
 	@Transient
 	private static Logger log = Logger.getLogger(OrcidQueueListener.class);
@@ -58,7 +61,8 @@ public class OrcidQueueListener implements NativePostUpdateEventListener, PostLo
 		try {
 			if (object instanceof ACrisObject) {
 				ACrisObject crisObj = (ACrisObject) object;
-				if (crisObj.getType() == CrisConstants.RP_TYPE_ID || crisObj.getType() == CrisConstants.PROJECT_TYPE_ID) {
+				if (crisObj.getType() == CrisConstants.RP_TYPE_ID
+						|| crisObj.getType() == CrisConstants.PROJECT_TYPE_ID) {
 					String crisID = crisObj.getCrisID();
 					if (StringUtils.isNotBlank(crisID)) {
 						try {
@@ -80,18 +84,14 @@ public class OrcidQueueListener implements NativePostUpdateEventListener, PostLo
 									if (StringUtils.isNotBlank(oldPrefProject)) {
 										// project preference is changed?
 										if (!(oldPrefProject.equals(rpProp.getValue().toString()))) {
-											//remove the queue
-											orcidPreferencesUtils.deleteOrcidQueueByOwnerAndType(crisID,CrisConstants.PROJECT_TYPE_ID);
-											//add the preferite
-											List<Integer> projectsIDs = orcidPreferencesUtils
-													.getPreferiteFundingToSendToOrcid(crisID);
-											for (Integer pjId : projectsIDs) {
-												Project project = orcidPreferencesUtils.getApplicationService()
-														.get(Project.class, pjId);
-												orcidPreferencesUtils.prepareOrcidQueue(crisID, project);
-											}
+											rp.setOldOrcidProjectsPreference(rpProp.getValue().toString());
+											// remove the queue
+											orcidPreferencesUtils.deleteOrcidQueueByOwnerAndType(crisID,
+													CrisConstants.PROJECT_TYPE_ID);
+											// notify that we needed a PUT
+											orcidPreferencesUtils.notifyPut(rp, OrcidPreferencesUtils.ORCID_PUSH_CRISPJ_ACTIVATE_PUT);
 										}
-									}
+									}									
 									break;
 								}
 
@@ -101,28 +101,15 @@ public class OrcidQueueListener implements NativePostUpdateEventListener, PostLo
 									if (StringUtils.isNotBlank(oldPrefPublications)) {
 										// publications preference change
 										if (!(oldPrefPublications.equals(rpProp.getValue().toString()))) {
-											//delete first all publication queued
-											orcidPreferencesUtils.deleteOrcidQueueByOwnerAndType(crisID,Constants.ITEM);
-											//retrieve the preferite
-											List<Integer> itemIDs = orcidPreferencesUtils
-													.getPreferiteWorksToSendToOrcid(crisID);
-											Context context = null;
-											try {
-												context = new Context();
-												for (Integer itemID : itemIDs) {
-													Item item = Item.find(context, itemID);
-													orcidPreferencesUtils.prepareOrcidQueue(crisID, item);
-												}
-											} catch (Exception ex) {
-												log.error(ex.getMessage(), ex);
-											} finally {
-												if (context != null && context.isValid()) {
-													context.abort();
-												}
-											}
-
+											rp.setOldOrcidPublicationsPreference(rpProp.getValue().toString());
+											// delete first all publication
+											// queued
+											orcidPreferencesUtils.deleteOrcidQueueByOwnerAndType(crisID,
+													Constants.ITEM);
+											// notify that we needed a PUT
+											orcidPreferencesUtils.notifyPut(rp, OrcidPreferencesUtils.ORCID_PUSH_ITEM_ACTIVATE_PUT);
 										}
-									}
+									}									
 									break;
 								}
 
@@ -224,14 +211,20 @@ public class OrcidQueueListener implements NativePostUpdateEventListener, PostLo
 			}
 
 			List<RPPropertiesDefinition> metadataDefinitions = orcidPreferencesUtils.getApplicationService()
-					.likePropertiesDefinitionsByShortName(RPPropertiesDefinition.class, "orcid-profile-pref");
+					.likePropertiesDefinitionsByShortName(RPPropertiesDefinition.class, PREFIX_ORCID_PROFILE_PREF);
 			for (RPPropertiesDefinition rppd : metadataDefinitions) {
-				String metadataShortnameINTERNAL = rppd.getShortName().replaceFirst("orcid-profile-pref-", "");
+				String metadataShortnameINTERNAL = rppd.getShortName().replaceFirst(PREFIX_ORCID_PROFILE_PREF, "");
 				List<RPProperty> propsRps = rp.getAnagrafica4view().get(rppd.getShortName());
 				for (RPProperty prop : propsRps) {
 					BooleanValue booleanValue = (BooleanValue) (prop.getValue());
 					if (booleanValue.getObject()) {
 						rp.getOldOrcidProfilePreference().add(metadataShortnameINTERNAL);
+						List<String> listProps = new ArrayList<String>();
+						for(RPProperty props : rp.getAnagrafica4view().get(metadataShortnameINTERNAL)) {
+							//manage only first value
+							listProps.add(props.toString());
+						}
+						rp.getOldMapOrcidProfilePreference().put(metadataShortnameINTERNAL, listProps);
 					}
 				}
 			}

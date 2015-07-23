@@ -14,6 +14,7 @@ import it.cilea.osd.jdyna.value.FileValue;
 import java.beans.PropertyEditor;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -149,6 +150,8 @@ public class ResearcherPage extends
     private String oldOrcidProjectsPreference;
     @Transient
     private List<String> oldOrcidProfilePreference;
+    @Transient
+    private Map<String,List<String>> oldMapOrcidProfilePreference;
     
     /**
      * Constructor method, create new ResearcherPage setting status to true.
@@ -679,6 +682,17 @@ public class ResearcherPage extends
 
 	public void setOldOrcidProfilePreference(List<String> oldOrcidProfilePreference) {
 		this.oldOrcidProfilePreference = oldOrcidProfilePreference;
+	}
+
+	public Map<String, List<String>> getOldMapOrcidProfilePreference() {
+		if(oldMapOrcidProfilePreference == null) {
+			oldMapOrcidProfilePreference = new HashMap<String, List<String>>();
+		}
+		return oldMapOrcidProfilePreference;
+	}
+
+	public void setOldMapOrcidProfilePreference(Map<String, List<String>> oldMapOrcidProfilePreference) {
+		this.oldMapOrcidProfilePreference = oldMapOrcidProfilePreference;
 	}
 
 }

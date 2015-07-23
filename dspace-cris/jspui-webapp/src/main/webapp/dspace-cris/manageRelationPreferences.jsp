@@ -14,9 +14,9 @@
 <%@ taglib uri="http://displaytag.sf.net" prefix="display"%>
 
 <c:set var="dspace.layout.head.last" scope="request">
+	<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.dataTables.min.js"></script>
+	<link href="<%= request.getContextPath() %>/css/jquery.dataTables.css" rel="stylesheet" type="text/css">
     <link href="<%= request.getContextPath() %>/css/relationManagement.css" rel="stylesheet" type="text/css">
-    <link href="<%= request.getContextPath() %>/css/jquery.dataTables.css" rel="stylesheet" type="text/css">
-    <script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript">
     	function rebuildSelectList()
     	{

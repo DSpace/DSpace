@@ -5,12 +5,14 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.util;
+package org.dspace.app.cris.integration;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.util.MappingMetadata;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
@@ -119,6 +121,9 @@ public class OrcidWorkMetadata extends MappingMetadata {
 		
 		// EXTERNAL IDs
 		addMultiInvertedValues(EXTERNAL_IDENTIFIER);
+		
+		//TYPE
+		addSingleField(TYPE);
 		
 	}
 
@@ -238,7 +243,7 @@ public class OrcidWorkMetadata extends MappingMetadata {
 		if (!metadataMappings.get(EXTERNAL_IDENTIFIER).isEmpty()) {
 			return metadataMappings.get(EXTERNAL_IDENTIFIER);
 		}
-		return null;
+		return new ArrayList<String>();
 	}
 	
 	public String getExternalIdentifierType(String identifier) {
@@ -252,12 +257,19 @@ public class OrcidWorkMetadata extends MappingMetadata {
 		if (!metadataMappings.get(AUTHORS).isEmpty()) {
 			return metadataMappings.get(AUTHORS);
 		}
-		return null;
+		return new ArrayList<String>();
 	}
 
 	public String getLanguage() {
 		if (!metadataMappings.get(LANGUAGE).isEmpty()) {
 			return metadataMappings.get(LANGUAGE).get(0);
+		}
+		return null;
+	}
+	
+	public String getWorkType() {
+		if (!metadataMappings.get(TYPE).isEmpty()) {
+			return metadataMappings.get(TYPE).get(0);
 		}
 		return null;
 	}

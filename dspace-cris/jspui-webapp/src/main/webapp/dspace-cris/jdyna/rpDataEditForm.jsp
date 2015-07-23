@@ -26,7 +26,7 @@
 	import="it.cilea.osd.jdyna.model.ADecoratorPropertiesDefinition"%>
 <%@page
 	import="org.dspace.app.cris.model.jdyna.DecoratorRestrictedField"%>
-	
+<%@ page import="org.dspace.core.ConfigurationManager" %>	
 <%@page import="it.cilea.osd.jdyna.model.AccessLevelConstants"%>
 <%@page import="java.net.URL"%>
 <%@page import="org.dspace.eperson.EPerson" %>
@@ -39,7 +39,7 @@
     // Is the logged in user an admin
     Boolean admin = (Boolean)request.getAttribute("is.admin");
     boolean isAdmin = (admin == null ? false : admin.booleanValue());
-
+    boolean changeStatusAdmin = ConfigurationManager.getBooleanProperty("cris","rp.changestatus.admin");
 %>
 <c:set var="root"><%=request.getContextPath()%></c:set>
 <c:set var="admin"><%=isAdmin%></c:set>
@@ -574,6 +574,7 @@
 		</spring:bind>
 		</div>
 		</c:if>
+		<% if(!changeStatusAdmin) { %>
 		<div class="col-md-4">	
 		<div class="cris-edit-status">
 		<spring:bind path="status">
@@ -606,6 +607,7 @@
 		</spring:bind>
 		</div>
 		</div>
+		<% } %>
 		<div class="col-md-4">
 		<div class="cris-edit-record-info">
 		<c:set var="disabled" value=" readonly='readonly'"/>
