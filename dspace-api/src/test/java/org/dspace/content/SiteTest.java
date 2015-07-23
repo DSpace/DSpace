@@ -7,22 +7,18 @@
  */
 package org.dspace.content;
 
-import cz.cuni.mff.ufal.dspace.handle.ConfigurableHandleIdentifierProvider;
 import org.dspace.AbstractUnitTest;
 import org.dspace.core.ConfigurationManager;
 import java.sql.SQLException;
 import org.dspace.core.Constants;
-import org.dspace.handle.HandleManager;
 import org.junit.*;
 import static org.hamcrest.CoreMatchers.*;
 import org.apache.log4j.Logger;
-import cz.cuni.mff.ufal.dspace.handle.PIDConfiguration;
 import static org.junit.Assert.*;
 
 /**
  * Unit Tests for class Site
- * based on class by pvillega
- * modified for LINDAT/CLARIN
+ * @author pvillega
  */
 public class SiteTest extends AbstractUnitTest
 {
@@ -103,9 +99,8 @@ public class SiteTest extends AbstractUnitTest
     @Test
     public void testGetHandle()
     {
-        assertThat("testGetHandle 0", s.getHandle(), equalTo(
-            ConfigurableHandleIdentifierProvider.completeHandle(
-                PIDConfiguration.getDefaultPrefix(), String.valueOf(Site.SITE_ID))));
+        assertThat("testGetHandle 0", s.getHandle(), equalTo(ConfigurationManager.getProperty("handle.prefix")
+                +"/"+String.valueOf(Site.SITE_ID)));
     }
 
     /**
@@ -114,9 +109,8 @@ public class SiteTest extends AbstractUnitTest
     @Test
     public void testGetSiteHandle()
     {
-        assertThat("testGetSiteHandle 0", s.getHandle(), equalTo(
-            ConfigurableHandleIdentifierProvider.completeHandle(
-                PIDConfiguration.getDefaultPrefix(), String.valueOf(Site.SITE_ID))));
+        assertThat("testGetSiteHandle 0", s.getHandle(), equalTo(ConfigurationManager.getProperty("handle.prefix")
+                +"/"+String.valueOf(Site.SITE_ID)));
     }
 
     /**
