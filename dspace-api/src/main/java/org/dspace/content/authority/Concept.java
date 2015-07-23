@@ -8,10 +8,9 @@
 package org.dspace.content.authority;
 
 import org.apache.log4j.Logger;
-import org.dspace.authority.AuthorityValue;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.Item;
+import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -25,7 +24,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -1498,5 +1496,11 @@ public class Concept extends AuthorityObject
             }
         }
 
+    }
+
+    @Override
+    public DSpaceObject getParentObject() throws SQLException
+    {
+        return this.getScheme();
     }
 }
