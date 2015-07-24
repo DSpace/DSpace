@@ -62,12 +62,18 @@ public abstract class AbstractVersionProvider {
             for(Bitstream nativeBitstream : nativeBundle.getBitstreams())
             {
                 Bitstream bitstreamNew = createBitstream(c, nativeBitstream);
-                // we need to copy the custom ressource policy rules for the 
-                // bitstream as well, like we did above for bundles
+
+                bundleNew.addBitstream(bitstreamNew);
+
+                // NOTE: bundle.addBitstream() causes Bundle policies to be inherited by default.
+                // So, we need to REMOVE any inherited TYPE_CUSTOM policies before copying over the correct ones.
+                AuthorizeManager.removeAllPoliciesByDSOAndType(c, bitstreamNew, ResourcePolicy.TYPE_CUSTOM);
+
+                // Now, we need to copy the TYPE_CUSTOM resource policies from old bitstream
+                // to the new bitstream, like we did above for bundles
                 List<ResourcePolicy> bitstreamPolicies = 
                         AuthorizeManager.findPoliciesByDSOAndType(c, nativeBitstream, ResourcePolicy.TYPE_CUSTOM);
                 AuthorizeManager.addPolicies(c, bitstreamPolicies, bitstreamNew);
-                bundleNew.addBitstream(bitstreamNew);
 
                 if(nativeBundle.getPrimaryBitstreamID() == nativeBitstream.getID())
                 {
