@@ -2,6 +2,7 @@
  */
 package org.datadryad.rest.storage;
 
+import java.lang.Integer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +15,7 @@ public abstract class AbstractStorage<T> implements StorageInterface<T> {
     protected abstract void updateObject(StoragePath path, T object) throws StorageException;
     protected abstract T readObject(StoragePath path) throws StorageException;
     protected abstract void deleteObject(StoragePath path) throws StorageException;
-    protected abstract void addAll(StoragePath path, List<T> objects) throws StorageException;
+    protected abstract void addResults(StoragePath path, List<T> objects, String searchParam, Integer limit) throws StorageException;
 
     final void checkPath(StoragePath path, List<String> expectedKeyPath) throws StorageException {
         if(path == null) {
@@ -59,7 +60,14 @@ public abstract class AbstractStorage<T> implements StorageInterface<T> {
     @Override
     public List<T> getAll(StoragePath path) throws StorageException {
         List<T> objects = new ArrayList<T>();
-        addAll(path, objects);
+        addResults(path, objects, null, null);
+        return objects;
+    }
+
+    @Override
+    public List<T> getResults(StoragePath path, String searchParam, Integer limit) throws StorageException {
+        List<T> objects = new ArrayList<T>();
+        addResults(path, objects, searchParam, limit);
         return objects;
     }
 

@@ -80,7 +80,7 @@ public class ManuscriptJSONStorageImpl extends AbstractManuscriptStorage {
     }
 
     @Override
-    protected void addAll(StoragePath path, List<Manuscript> manuscripts) throws StorageException {
+    protected void addResults(StoragePath path, List<Manuscript> manuscripts, String searchParam, Integer limit) throws StorageException {
         File subdirectory = getSubdirectory(path);
         File[] files = subdirectory.listFiles(new FilenameFilter() {
 

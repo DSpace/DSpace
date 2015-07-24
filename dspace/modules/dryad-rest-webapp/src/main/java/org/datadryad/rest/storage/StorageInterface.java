@@ -2,6 +2,7 @@
  */
 package org.datadryad.rest.storage;
 
+import java.lang.Integer;
 import java.util.List;
 
 /**
@@ -11,6 +12,7 @@ import java.util.List;
 public interface StorageInterface<T> {
     public void create(StoragePath path, T t) throws StorageException;
     public List<T> getAll(StoragePath path) throws StorageException;
+    public List<T> getResults(StoragePath path, String searchParam, Integer limit) throws StorageException;
     public T findByPath(StoragePath path) throws StorageException;
     public void update(StoragePath path, T object) throws StorageException;
     public void deleteByPath(StoragePath path) throws StorageException;
