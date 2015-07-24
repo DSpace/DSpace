@@ -46,7 +46,7 @@ public class ManuscriptResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getManuscripts(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode, @QueryParam("search") String searchParam, @QueryParam("results") Integer resultParam) {
+    public Response getManuscripts(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode, @QueryParam("search") String searchParam, @QueryParam("count") Integer resultParam) {
         try {
             // Returning a list requires POJO turned on
             StoragePath path = new StoragePath();
