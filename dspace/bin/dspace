@@ -78,4 +78,4 @@ if [ "$JAVA_OPTS" = "" ]; then
 fi
 
 # Now invoke Java
-java $JAVA_OPTS -classpath $FULLPATH org.dspace.app.launcher.ScriptLauncher "$@"
+java $JAVA_OPTS -Dlog4j.configuration=file://$DSPACEDIR/config/log4j.properties -classpath $FULLPATH org.dspace.app.launcher.ScriptLauncher "$@"
