@@ -123,7 +123,7 @@
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_thesisSemester">Thesis Semester</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_discipline">Thesis Department</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_thesisDegreeLevel">Thesis Degree Level</message>
-	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_contentType">Content Type</message>
+	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_contentType">Format</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_title">Title</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_subject">Subject</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_abstract">Abstract</message>
@@ -311,7 +311,7 @@
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.head">Search</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.search_scope">Search Scope</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.full_text_search">Full Text Search</message>
-	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.contentType">Content Type</message>
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.contentType">Format</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.discipline">Thesis Department</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.thesisSemester">Thesis Semester</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.thesisDegreeLevel">Thesis Degree Level</message>
@@ -1464,7 +1464,7 @@
     <message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.actions_collectionSentence">...across the following collections.</message>
 	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.actions_policyGroup">Group</message>
 	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.actions_policyAction">Action</message>
-	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.actions_policyResource">Content Type</message>
+	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.actions_policyResource">Format</message>
 	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.actions_policyCollections">Collection</message>
 	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.submit_add">Add policies</message>
 	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.submit_remove_all">Clear policies</message>
