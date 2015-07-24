@@ -1,7 +1,7 @@
 /**
  Colors: Find and Replace for a quick scheme.
       mirage2      this-site
- 1st: #EBC78C      #EBC78C          Top header
+ 1st: #EBC78C      #9A182B          Top header
  2nd: #D69400      #D69400          Breadcrumb
  3rd: #D69400      #D69400          side-nav/h1..h7
 */
@@ -9,11 +9,11 @@
 
 /* Override dspace-bootstrap-tweaks */
 header .navbar-brand img {
-    height: 154px;
+    height: 72px;
 }
 
 .navbar {
-    min-height: 154px;
+    min-height: 72px;
 }
 
 .navbar-brand {
@@ -23,7 +23,7 @@ header .navbar-brand img {
 
 /* Override classic-mirage-style */
 header .navbar-default {
-    background-color: #fff;
+    background-color: #9A182B;
 }
 
 .trail-wrapper {
@@ -127,7 +127,7 @@ a {
 }
 
 .navbar-inverse {
-    background-color: #EBC78C;
+    background-color: #9A182B;
 }
 .pagination > li > a, .pagination > li > span {
     color: #D69400;
