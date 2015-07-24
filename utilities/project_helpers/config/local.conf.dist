@@ -345,5 +345,6 @@ handle.canonical.prefix = http://hdl.handle.net/
 handle.prefix = 123456789
 loglevel.other=INFO
 loglevel.dspace=INFO
+handle.dir=${dspace.dir}/handle-server
 
 lr.compile.time=
