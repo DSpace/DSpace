@@ -10,13 +10,11 @@ import org.dspace.content.authority.Scheme;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.workflow.DryadWorkflowUtils;
-import org.dspace.workflow.WorkflowItem;
 
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -28,7 +26,6 @@ import java.util.*;
 public class DryadJournalSubmissionUtils {
     private static Logger log = Logger.getLogger(DryadJournalSubmissionUtils.class);
 
-    // Reading DryadJournalSubmission.properties
     public static final String FULLNAME = "fullname";
     public static final String METADATADIR = "metadataDir";
     public static final String INTEGRATED = "integrated";
@@ -37,7 +34,7 @@ public class DryadJournalSubmissionUtils {
     public static final String NOTIFY_ON_ARCHIVE = "notifyOnArchive";
     public static final String JOURNAL_ID = "journalID";
     public static final String SUBSCRIPTION_PAID = "subscriptionPaid";
-    public static final String journalPropFile =  ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName");
+
     public enum RecommendedBlackoutAction {
         BLACKOUT_TRUE
         , BLACKOUT_FALSE
