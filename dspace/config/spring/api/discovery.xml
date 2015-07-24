@@ -522,7 +522,7 @@
         <property name="splitter" value="::"/>
     </bean>
 
-    <bean id="searchFilterSubjectTimePeriod" class="org.dspace.discovery.configuration.HierarchicalSidebarFacetConfiguration">
+    <bean id="searchFilterSubjectTimePeriod" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
         <property name="indexFieldName" value="subjectTimePeriod"/>
         <property name="metadataFields">
             <list>
@@ -531,19 +531,17 @@
         </property>
         <property name="facetLimit" value="5"/>
         <property name="sortOrder" value="COUNT"/>
-        <property name="splitter" value="::"/>
     </bean>
 
-    <bean id="searchFilterSubjectPlace" class="org.dspace.discovery.configuration.HierarchicalSidebarFacetConfiguration">
+    <bean id="searchFilterSubjectPlace" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
         <property name="indexFieldName" value="subjectPlace"/>
         <property name="metadataFields">
             <list>
-                <value>dc.coverage.spacial</value>
+                <value>dc.coverage.spatial</value>
             </list>
         </property>
         <property name="facetLimit" value="5"/>
         <property name="sortOrder" value="COUNT"/>
-        <property name="splitter" value="::"/>
     </bean>
 
     <bean id="searchFilterLanguage" class="org.dspace.discovery.configuration.HierarchicalSidebarFacetConfiguration">

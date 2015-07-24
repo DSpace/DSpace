@@ -33,7 +33,7 @@
     <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dc.contributor.author_filter">Author</message>
 
     <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dc.subject_filter">Subject</message>
-    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_subjectTimePeriod">Subject: Years</message>
+    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_subjectTimePeriod">Subject: Time Period</message>
     <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_subjectPlace">Subject: Place</message>
     <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dc.subject_filter">Subject</message>
     <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dc.type_filter">Format</message>
