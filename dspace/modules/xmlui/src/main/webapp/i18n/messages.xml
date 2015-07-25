@@ -1034,7 +1034,7 @@
 		and found it is <strong>not</strong> suitable for inclusion in the collection, select "Reject".
 		You will then be asked to enter a message indicating why the item is unsuitable, and whether the
 		submitter should change something and resubmit.</message>
-	<message key="xmlui.Submission.workflow.PerformTaskStep.reject_submit">Reject item</message>
+	<message key="xmlui.Submission.workflow.PerformTaskStep.reject_submit">Return item to submitter</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.edit_help">Select this option to change
 		the item's metadata.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.edit_submit">Edit metadata</message>
@@ -1051,12 +1051,12 @@
 
 	<!-- org.dspace.app.xmlui.Submission.workflow.RejectTaskStep -->
 	<message key="xmlui.Submission.workflow.RejectTaskStep.info1">Please enter your reason for
-		rejecting the submission into the box below, indicating whether the submitter may fix a problem
+		returning the submission into the box below, indicating whether the submitter may fix a problem
 		and resubmit.</message>
 	<message key="xmlui.Submission.workflow.RejectTaskStep.reason">Reason</message>
 	<message key="xmlui.Submission.workflow.RejectTaskStep.reason_required">The reason field is
 		required</message>
-	<message key="xmlui.Submission.workflow.RejectTaskStep.submit_reject">Reject item</message>
+	<message key="xmlui.Submission.workflow.RejectTaskStep.submit_reject">Return item to submitter</message>
 
 
 
