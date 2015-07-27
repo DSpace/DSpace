@@ -1478,7 +1478,7 @@
                          alt="BMJ Open logo"/>
                 </a>
             </xsl:when>
-            <xsl:when test='$journal-name = "The Bone & Joint Journal"'>
+            <xsl:when test='$journal-name = "The Bone &amp; Joint Journal"'>
                 <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
@@ -1493,10 +1493,10 @@
                         </xsl:choose>
                     </xsl:attribute>
                     <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/BJJ.jpg"
-                         alt="The Bone & Joint Journal cover"/>
+                         alt="The Bone &amp; Joint Journal cover"/>
                 </a>
             </xsl:when>
-            <xsl:when test='$journal-name = "Bone & Joint Research"'>
+            <xsl:when test='$journal-name = "Bone &amp; Joint Research"'>
                 <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
@@ -1511,10 +1511,10 @@
                         </xsl:choose>
                     </xsl:attribute>
                     <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/BJR.jpg"
-                         alt="Bone & Joint Research cover"/>
+                         alt="Bone &amp; Joint Research cover"/>
                 </a>
             </xsl:when>
-            <xsl:when test='$journal-name = "Bone & Joint360"'>
+            <xsl:when test='$journal-name = "Bone &amp; Joint360"'>
                 <a target="_blank">
                     <xsl:attribute name="href">
                         <xsl:choose>
@@ -1529,7 +1529,7 @@
                         </xsl:choose>
                     </xsl:attribute>
                     <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/BJ360.jpg"
-                         alt="Bone & Joint360 cover"/>
+                         alt="Bone &amp; Joint360 cover"/>
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Comparative Cytogenetics"'>
