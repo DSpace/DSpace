@@ -118,6 +118,9 @@
                     </div>
                     <xsl:call-template name="itemSummaryView-DIM-date"/>
                     <xsl:call-template name="itemSummaryView-DIM-authors"/>
+                    <xsl:call-template name="itemSummaryView-DIM-citation"/>
+                    <xsl:call-template name="itemSummaryView-DIM-advisor"/>
+                    <xsl:call-template name="itemSummaryView-DIM-doi"/>
                     <xsl:if test="$ds_item_view_toggle_url != ''">
                         <xsl:call-template name="itemSummaryView-show-full"/>
                     </xsl:if>
@@ -264,6 +267,57 @@
                     <xsl:otherwise>
                         <i18n:text>xmlui.dri2xhtml.METS-1.0.no-author</i18n:text>
                     </xsl:otherwise>
+                </xsl:choose>
+            </div>
+        </xsl:if>
+    </xsl:template>
+    
+    <xsl:template name="itemSummaryView-DIM-citation">
+        <xsl:if test="dim:field[@element='identifier'][@qualifier='citation' and descendant::text()]">
+            <div class="simple-item-view-citation item-page-field-wrapper table">
+                <h5><i18n:text>xmlui.dri2xhtml.METS-1.0.item-citation</i18n:text></h5>
+                <xsl:choose>
+                    <xsl:when test="dim:field[@element='identifier'][@qualifier='citation']">
+                        <xsl:for-each select="dim:field[@element='identifier'][@qualifier='citation']">
+                            <div>
+                                <xsl:copy-of select="node()"/>
+                            </div>
+                        </xsl:for-each>
+                    </xsl:when>
+                </xsl:choose>
+            </div>
+        </xsl:if>
+    </xsl:template>
+    
+   <xsl:template name="itemSummaryView-DIM-advisor">
+        <xsl:if test="dim:field[@element='contributor'][@qualifier='advisor' and descendant::text()]">
+            <div class="simple-item-view-advisor item-page-field-wrapper table">
+                <h5><i18n:text>xmlui.dri2xhtml.METS-1.0.item-advisor</i18n:text></h5>
+                <xsl:choose>
+                    <xsl:when test="dim:field[@element='contributor'][@qualifier='advisor']">
+                        <xsl:for-each select="dim:field[@element='contributor'][@qualifier='advisor']">
+                            <div>
+                                <xsl:copy-of select="node()"/>
+                            </div>
+                        </xsl:for-each>
+                    </xsl:when>
+                </xsl:choose>
+            </div>
+        </xsl:if>
+    </xsl:template>
+
+   <xsl:template name="itemSummaryView-DIM-doi">
+        <xsl:if test="dim:field[@element='identifier'][not(@qualifier)]">
+            <div class="simple-item-view-doi item-page-field-wrapper table">
+                <h5><i18n:text>xmlui.dri2xhtml.METS-1.0.item-doi</i18n:text></h5>
+                <xsl:choose>
+                    <xsl:when test="dim:field[@element='identifier'][not(@qualifier)]">
+                        <xsl:for-each select="dim:field[@element='identifier'][not(@qualifier)]">
+                            <div>
+                                <xsl:copy-of select="node()"/>
+                            </div>
+                        </xsl:for-each>
+                    </xsl:when>
                 </xsl:choose>
             </div>
         </xsl:if>
