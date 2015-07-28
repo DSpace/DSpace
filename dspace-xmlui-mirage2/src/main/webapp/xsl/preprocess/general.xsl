@@ -100,15 +100,45 @@
         </field>
     </xsl:template>
 
-    <xsl:template match="dri:pageMeta[dri:metadata[@element = 'request'][@qualifier = 'URI']/text() = 'page/about']">
+    <xsl:template match="dri:pageMeta[starts-with(dri:metadata[@element = 'request'][@qualifier = 'URI']/text(), 'page/')]">
         <pageMeta>
             <xsl:call-template name="copy-attributes"/>
             <xsl:apply-templates select="*[not(self::dri:trail)]"/>
+
+            <xsl:variable name="pageHeading">
+                <xsl:choose>
+                    <xsl:when test="./dri:metadata[@element = 'request'][@qualifier = 'URI']/text() = 'page/about'">
+                        <xsl:text>About DRUM</xsl:text>
+                    </xsl:when>
+                    <xsl:when test="./dri:metadata[@element = 'request'][@qualifier = 'URI']/text() = 'page/about-submitting'">
+                        <xsl:text>About Submitting</xsl:text>
+                    </xsl:when>
+                    <xsl:when test="./dri:metadata[@element = 'request'][@qualifier = 'URI']/text() = 'page/statistics'">
+                        <xsl:text>About Download Statistics</xsl:text>
+                    </xsl:when>
+                    <xsl:when test="./dri:metadata[@element = 'request'][@qualifier = 'URI']/text() = 'page/permission-letter'">
+                        <xsl:text>Permission Letter</xsl:text>
+                    </xsl:when>
+                    <xsl:when test="./dri:metadata[@element = 'request'][@qualifier = 'URI']/text() = 'page/scope-of-drum-content'">
+                        <xsl:text>Scope of DRUM content</xsl:text>
+                    </xsl:when>
+                    <xsl:when test="./dri:metadata[@element = 'request'][@qualifier = 'URI']/text() = 'page/license-text'">
+                        <xsl:text>License Text</xsl:text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:text></xsl:text>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:variable>
+
+            <metadata element="title">
+                <xsl:value-of select="$pageHeading" />
+            </metadata>
             <trail target="{$context-path}/">
                 <i18n:text catalogue="default">xmlui.general.dspace_home</i18n:text>
             </trail>
             <trail>
-                <xsl:text>About This Repository</xsl:text>
+                <xsl:value-of select="$pageHeading" />
             </trail>
         </pageMeta>
     </xsl:template>

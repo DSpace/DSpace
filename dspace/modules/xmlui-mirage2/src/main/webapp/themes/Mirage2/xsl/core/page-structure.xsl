@@ -676,10 +676,28 @@
 
             <!-- Check for the custom pages -->
             <xsl:choose>
-                <xsl:when test="starts-with($request-uri, 'page/about')">
+                <xsl:when test="starts-with($request-uri, 'page/')">
                     <div class="hero-unit">
-                        <h1><i18n:text>xmlui.mirage2.page-structure.heroUnit.title</i18n:text></h1>
-                        <p><i18n:text>xmlui.mirage2.page-structure.heroUnit.content</i18n:text></p>
+                        <xsl:choose>
+                            <xsl:when test="$request-uri='page/about'">
+                                <xsl:copy-of select="document('file://apps/drum/config/pages/about')/div"  />
+                            </xsl:when>
+                            <xsl:when test="$request-uri='page/about-submitting'">
+                                <xsl:copy-of select="document('file://apps/drum/config/pages/about-submitting')/div"  />
+                            </xsl:when>
+                            <xsl:when test="$request-uri='page/statistics'">
+                                <xsl:copy-of select="document('file://apps/drum/config/pages/statistics')/div"  />
+                            </xsl:when>
+                            <xsl:when test="$request-uri='page/permission-letter'">
+                                <xsl:copy-of select="document('file://apps/drum/config/pages/permission-letter')/div"  />
+                            </xsl:when>
+                            <xsl:when test="$request-uri='page/scope-of-drum-content'">
+                                <xsl:copy-of select="document('file://apps/drum/config/pages/scope-of-drum-content')/div"  />
+                            </xsl:when>
+                            <xsl:when test="$request-uri='page/license-text'">
+                                <xsl:copy-of select="document('file://apps/drum/config/pages/license-text')/div"  />
+                            </xsl:when>
+                        </xsl:choose>        
                     </div>
                 </xsl:when>
                 <!-- Otherwise use default handling of body -->
