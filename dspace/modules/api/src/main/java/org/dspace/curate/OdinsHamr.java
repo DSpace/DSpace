@@ -39,6 +39,7 @@ import org.dspace.authority.orcid.xml.XMLtoBio;
 import org.dspace.authority.orcid.model.Bio;
 import org.dspace.authority.orcid.model.BioName;
 import org.dspace.authority.AuthorityValueGenerator;
+import org.dspace.content.authority.Choices;
 
 import org.apache.log4j.Logger;
 
@@ -192,8 +193,8 @@ public class OdinsHamr extends AbstractCurationTask {
 
                         if (hamrScore(mappedDSpaceEntry,mappedOrcidEntry) >= 0.7) {
                             authorMetadata.authority = AuthorityValueGenerator.GENERATE + "orcid" + AuthorityValueGenerator.SPLIT + mappedOrcidEntry.getOrcid();
-                            authorMetadata.confidence = 500;
-                            item.addMetadata("dc", "description", "provenance", null, "ORCID authority added to " + getName(mappedDSpaceEntry) + " because OdinsHamr matched with a value of " + hamrScore + " on " + DCDate.getCurrent().toString() + " (GMT)");
+                            authorMetadata.confidence = Choices.CF_UNCERTAIN;
+                            item.addMetadata("dc", "description", "provenance", null, "ORCID authority added to " + getName(mappedDSpaceEntry) + " with a confidence of CF_UNCERTAIN: OdinsHamr match score " + hamrScore + " on " + DCDate.getCurrent().toString() + " (GMT)");
                         }
                         setResult("Last processed item = " + handle + " -- " + itemDOI);
                     }
