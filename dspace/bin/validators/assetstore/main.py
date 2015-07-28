@@ -103,6 +103,7 @@ def db_assetstore(env):
     db_username = None
     db_pass = None
     db_table = None
+    db_port = ""
     if os.path.exists( dspace_cfg ):
         lls = open( dspace_cfg, "r" ).readlines( )
         for l in lls:
@@ -113,20 +114,23 @@ def db_assetstore(env):
                 db_pass = l.strip( ).split( "=" )[1].strip( )
             if db_table is None and l.startswith( prefix + "db.url" ):
                 db_table = l.strip( ).split( "/" )[-1].strip( )
+                db_port = l.strip( ).split( ":" )[-1].split( "/" )[0]
             if l.startswith( prefix + "database " ) or l.startswith( prefix + "database=" ):
                 db_table = l.strip( ).split( "=" )[1].split( "/" )[-1].strip( )
 
-    _logger.info( "Trying to connect to [%s] under [%s]",
-                  db_table, db_username )
+    _logger.info( "Trying to connect to [%s] under [%s] at port [%s]",
+                  db_table, db_username, db_port )
 
     # get the db table
     import bpgsql
-
     try:
         con = bpgsql.connect(
-            username=db_username, password=db_pass, host="127.0.0.1", dbname=db_table )
+            username=db_username, password=db_pass, host="127.0.0.1", dbname=db_table, port=db_port )
         cursor = con.cursor( )
-        cursor.execute( "select name, internal_id from bitstream" )
+        cursor.execute( """
+	select text_value, internal_id from bitstream as b JOIN metadatavalue as md ON md.resource_id = b.bitstream_id NATURAL JOIN metadatafieldregistry NATURAL JOIN metadataschemaregistry where md.resource_type_id = 0 and short_id='dc' and element='title' and qualifier is null; 
+
+        """ )
         objs = cursor.fetchall( )
         # better explicitly
         cursor.close( )
@@ -255,7 +259,6 @@ def parse_command_line(env):
 
 if __name__ == "__main__":
     lasted = time.time( )
-
     _logger.info( u"Starting at " + utils.host_info( ) )
 
     # do what was specified or default
