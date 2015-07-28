@@ -52,6 +52,11 @@ public interface Consts
     /** Embargo control month day name */ 
     public static final String EMBARGO_DAY        = EMBARGO_FIELD_NAME + "_day";
     
+    //  
+    public static final int INVALID_EMBARGO_STRING = 9025;
+    public static final int EMBARGO_IN_THE_PAST = 9026;
+    public static final int EMBARGO_TOO_FAR_IN_FUTURE = 9027;
+
     // ************ License consts **********************//
     
     /** Full path and name of ODC Attribution license file. */
@@ -127,5 +132,5 @@ public interface Consts
     
     // misc
     public static final String PUBLISHER_FIELD_NAME = "dc_publisher";
-    public static final String ALTERNATIVE_TITLE_FIELD_NAME = "dc_title_alternative";
+    public static final String ALTERNATIVE_TITLE_FIELD_NAME = "dc_title_alternative";    
 }

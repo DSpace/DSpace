@@ -1,6 +1,23 @@
 package uk.ac.edina.datashare.utils;
 
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.cocoon.environment.http.HttpEnvironment;
+
 public class XmlUtils {
+    /**
+     * Fetch the HTTP request object from a coccon object model.
+     * @param objectModel The cocoon object model.
+     * @return HTTP request object.
+     */
+    @SuppressWarnings("rawtypes")
+    public static HttpServletRequest getRequest(Map objectModel)
+    {
+        return (HttpServletRequest)objectModel.get(HttpEnvironment.HTTP_REQUEST_OBJECT); 
+    }
+
     /**
      * Fetch the HTTP session object from a cocoon object model.
      * @param objectModel The cocoon object model.

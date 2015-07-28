@@ -507,7 +507,6 @@ public class MetaDataUtil
      * @param item DSpace item.
      * @return Spatial coverage dublin core value.
      */
-    @SuppressWarnings("deprecation")
     public static Metadatum[] getSpatial(Item item)
     {
         return item.getMetadata(
@@ -649,7 +648,6 @@ public class MetaDataUtil
      * @param lang Metadata language.
      * @return Metadata value.
      */
-    @SuppressWarnings("deprecation")
     public static String getUnique(
             Item item,
             String element,
