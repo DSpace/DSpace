@@ -835,7 +835,12 @@ function doEditEPerson(epersonID) {
 				// using this flow because they might not have permissions. So
 				// forward
 				// them to the homepage.
-				cocoon.redirectTo(cocoon.request.getContextPath(), true);
+				var siteRoot = cocoon.request.getContextPath();	
+				if (siteRoot == "")
+				{
+					siteRoot = "/";
+				}
+	        	cocoon.redirectTo(siteRoot,true);
 				getDSContext().complete();
 				cocoon.exit();
 			}
