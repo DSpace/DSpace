@@ -52,9 +52,6 @@ public class ReplicationManager {
 	static boolean replicationOn = ConfigurationManager.getBooleanProperty(
         "lr", "lr.replication.on", false);
 	
-	static final String WHO = ConfigurationManager.getProperty(
-        "dspace.url");
-
 	static DataSet replicationService = null;
 	
 	// mandatory from CINES: EUDAT_ROR, OTHER_From, OTHER_AckEmail

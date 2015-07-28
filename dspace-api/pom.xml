@@ -223,6 +223,9 @@
                                 <output>
                                     <outputPath>${agnostic.build.dir}/testing</outputPath>
                                     <name>dspace.cfg.woven</name>
+                                    <properties>
+                                        <dspace.test.install.dir>${agnostic.build.dir}/testing/dspace</dspace.test.install.dir>
+                                    </properties>
                                     <parts>
                                         <part>
                                             <path>${agnostic.build.dir}/testing/dspace/config/dspace.cfg</path>
@@ -231,9 +234,6 @@
                                             <path>${agnostic.build.dir}/testing/dspace.cfg.more</path>
                                         </part>
                                     </parts>
-                                    <properties>
-                                        <dspace.install.dir>${agnostic.build.dir}/testing/dspace</dspace.install.dir>
-                                    </properties>
                                 </output>
                             </outputs>
                         </configuration>

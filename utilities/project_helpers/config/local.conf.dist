@@ -24,24 +24,24 @@ lr.harvestable.assetstore =
 
 # DSpace host name - should match base URL. Do not include protocol i.e. http or https and do not include port, this is only the name of server.
 # Also do not use localhost because using this property some external links will be generated.
-lr.dspace.hostname = ufal-point-dev.ms.mff.cuni.cz
+dspace.hostname = ufal-point-dev.ms.mff.cuni.cz
 
 # DSpace base URL, the full url of the instance
 # !!! URL must NOT contain trailing slash !!!
-lr.dspace.baseUrl = https://ufal-point-dev.ms.mff.cuni.cz/repository
+dspace.baseUrl = https://ufal-point-dev.ms.mff.cuni.cz/repository
 
 # DSpace URL, usually ending with /xmlui
 # DSpace base URL.  Include port number etc., but NOT trailing slash
-lr.dspace.url = ${lr.dspace.baseUrl}/xmlui
+dspace.url = ${dspace.baseUrl}/xmlui
 
 # Google analytics key
-lr.xmlui.google.analytics.key = 
+xmlui.google.analytics.key =
 
 # Database settings ########################
 
 # This is not the name of the database you are using. Instead the name of the RDBMS used e.g. postgres or oracle.
 # This is required for database creation scripts.
-lr.db.name = postgres
+db.name = postgres
 
 # The name of the database that you will use for your dspace instance.
 # If the database is not created yet, this name will be used to create the new database.
@@ -51,14 +51,14 @@ lr.database.port = 5432
 
 # Connection URL of the database. Make sure you are using the correct port and if you are connecting to remote server,
 # verify that the port is accessible. Do not change the ${lr.database}, the database name will be substituted from above property.
-lr.db.url = jdbc:postgresql://localhost:${lr.database.port}/${lr.database}
+db.url = jdbc:postgresql://localhost:${lr.database.port}/${lr.database}
 
 # The database driver you are using. Make sure that the required jars are available.
-lr.db.driver = org.postgresql.Driver
+db.driver = org.postgresql.Driver
 
 # Credentials for the database user. The user should have read/write permissions on your database.
-lr.db.username = dspace
-lr.db.password =
+db.username = dspace
+db.password =
 
 # UFAL Utilities database name.
 lr.utilities.database = XXX-UTILS-DATABASE
@@ -78,30 +78,35 @@ lr.dspace.version = lindat-dspace5
 
 # The installation directory of your instance.
 # THIS IS USED IN THE VARIABLES/MAKEFILE so don't use variables(${*}) here
-lr.dspace.dir = /opt/lindat-dspace/sources
+dspace.install.dir = /opt/lindat-dspace/installation
 
 # A description of your dspace instance. It will be used as a description of your dspace instance for other services
-lr.dspace.name = LINDAT/CLARIN digital library at Institute of Formal and Applied Linguistics, Charles University in Prague
+dspace.name = LINDAT/CLARIN digital library at Institute of Formal and Applied Linguistics, Charles University in Prague
 # Used in email templates
 lr.dspace.name.short = LINDAT/CLARIN
+
 
 ############################################
 
 # Mail settings ############################
 
 # Mail server address. you can use 127.0.0.1, if configured on localhost.
-lr.mail.server = 127.0.0.1
+mail.server = 127.0.0.1
 
 # Mail server disabled?
-lr.mail.server.disabled = true
+mail.server.disabled = true
 
 # UFAL: Contact information
 lr.help.mail = dspace-help@ufal.mff.cuni.cz
 lr.help.phone = +420-22191-4366
-lr.mail.from.address = dspace-noreply@ufal.mff.cuni.cz
-lr.feedback.recipient = dspace-help@ufal.mff.cuni.cz
-lr.info.recipient = lindat-technical@ufal.mff.cuni.cz
+mail.from.address = dspace-noreply@ufal.mff.cuni.cz
+mail.feedback.recipient = dspace-help@ufal.mff.cuni.cz
+info.recipient = lindat-technical@ufal.mff.cuni.cz
+mail.alert.recipient = ${mail.admin}
+mail.registration.notify = ${mail.admin}
 
+# General site administration (Webmaster) e-mail
+mail.admin = ${mail.feedback.recipient}
 
 # solr server address that your instance is using.
 lr.solr.log.server = http://ufal-point-dev.ms.mff.cuni.cz:8080/repository/solr
@@ -111,7 +116,7 @@ lr.solr.log.server = http://ufal-point-dev.ms.mff.cuni.cz:8080/repository/solr
 #       below upon first installation
 #       Be sure to choose location that is not deleted/overwritten upon deployment
 #       (the default value is safe)
-lr.ga.analytics.key.file = ${dspace.dir}/config/ga.api.key.p12 
+lr.ga.analytics.key.file = ${dspace.dir}/config/ga.api.key.p12
 lr.ga.analytics.profile.id = 52779327
 lr.ga.analytics.account.email = 144418224547@developer.gserviceaccount.com
 
@@ -151,7 +156,7 @@ lr.replication.eudat.homedirectory=
 lr.replication.eudat.replicadirectory=
 lr.replication.eudat.zone=
 lr.replication.eudat.defaultstorage=
-lr.replication.eudat.notification_email=${lr.info.recipient}
+lr.replication.eudat.notification_email=${info.recipient}
 # default is not set
 lr.replication.jargon.numThreads=
 # default 32 * 1024 * 1024
@@ -248,7 +253,7 @@ lr.aai.url = https://lindat.mff.cuni.cz/aai
 
 # oai path including /request
 # if you want the URL to be extracted from HttpRequest then remove OAIHandler.baseURL=${oai.baseURL} from oaicat.properties
-lr.oai.baseUrl = ${lr.dspace.baseUrl}/oai/request
+lr.oai.baseUrl = ${dspace.baseUrl}/oai/request
 
 # For reports
 harvesterInfo.url = http://catalog.clarin.eu/oai-harvester/LINDAT_CLARIN_digital_library_at_Institute_of_Formal_and_Applied_Linguistics_Charles_University_in_Prague_v1_8_2_.html
@@ -297,8 +302,8 @@ lr.tracker.bitstream.site_id = 5
 lr.statistics.api.url = https://ufal.mff.cuni.cz/piwik/
 lr.statistics.api.auth.token =
 lr.statistics.api.site_id = 5
-lr.statistics.report.path = ${lr.dspace.dir}/piwik_reports
-lr.lindat.logo.mono = ${lr.dspace.dir}/webapps/xmlui/themes/UFAL/images/lindat/lindat-logo-mono.png
+lr.statistics.report.path = ${dspace.dir}/piwik_reports
+lr.lindat.logo.mono = ${dspace.dir}/webapps/xmlui/themes/UFAL/images/lindat/lindat-logo-mono.png
 
 ############################################
 #

@@ -11,3 +11,6 @@ authority.controlled.dc.language.iso = true
 
 # use the testing assetstore.dir
 assetstore.dir = ${dspace.dir}/assetstore
+
+# use this for testing!
+dspace.dir = ${dspace.test.install.dir}

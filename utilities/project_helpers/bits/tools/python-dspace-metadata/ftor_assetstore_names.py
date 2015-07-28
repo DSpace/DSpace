@@ -42,12 +42,12 @@ class db_assets( object ):
 
     def abs_path( self, dspace_conf, handle, name ):
         """
-            Get abs path either from assetstore.dir or lr.dspace.dir/assetstore
+            Get abs path either from assetstore.dir or dspace.dir/assetstore
         """
         assetstore_dir = dspace_conf["assetstore.dir"]
         if assetstore_dir is None:
             assetstore_dir = os.path.join(
-                dspace_conf["lr.dspace.dir"], "assetstore" )
+                dspace_conf["dspace.dir"], "assetstore" )
 
         local_path = self.local_path(handle, name)
         if local_path is None:

@@ -352,6 +352,7 @@
                                         <descriptor>src/main/assembly/testEnvironment.xml</descriptor>
                                     </descriptors>
                                     <filters>
+                                        <filter>local.properties</filter>
                                         <filter>src/main/filters/testEnvironment.properties</filter>
                                     </filters>
                                 </configuration>
