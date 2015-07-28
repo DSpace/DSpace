@@ -634,37 +634,10 @@
                     <hr/>
                     <div class="col-xs-7 col-sm-8">
                         <div>
-                            <a href="http://www.dspace.org/" target="_blank">DSpace software</a> copyright&#160;&#169;&#160;2002-2013&#160; <a href="http://www.duraspace.org/" target="_blank">Duraspace</a>
+                            DRUM is brought to you by the <a href="http://www.lib.umd.edu/">University of Maryland Libraries</a><br />
+                            University of Maryland, College Park, MD 20742-7011 (301)314-1328.<br /> 
+                            Please send us your <a href="{$context-path}/feedback"> comments</a>.
                         </div>
-                        <div>
-                            <a>
-                                <xsl:attribute name="href">
-                                    <xsl:value-of
-                                            select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                                    <xsl:text>/contact</xsl:text>
-                                </xsl:attribute>
-                                <i18n:text>xmlui.dri2xhtml.structural.contact-link</i18n:text>
-                            </a>
-                            <xsl:text> | </xsl:text>
-                            <a>
-                                <xsl:attribute name="href">
-                                    <xsl:value-of
-                                            select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                                    <xsl:text>/feedback</xsl:text>
-                                </xsl:attribute>
-                                <i18n:text>xmlui.dri2xhtml.structural.feedback-link</i18n:text>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-xs-5 col-sm-4">
-                        <div class="pull-right">
-                            <span class="theme-by">Theme by&#160;</span>
-                            <br/>
-                            <a title="@mire NV" target="_blank" href="http://atmire.com">
-                                <img alt="@mire NV" src="{concat($theme-path, '/images/@mirelogo-small.png')}"/>
-                            </a>
-                        </div>
-
                     </div>
                 </div>
                 <!--Invisible link to HTML sitemap (for search engines) -->
@@ -703,10 +676,28 @@
 
             <!-- Check for the custom pages -->
             <xsl:choose>
-                <xsl:when test="starts-with($request-uri, 'page/about')">
+                <xsl:when test="starts-with($request-uri, 'page/')">
                     <div class="hero-unit">
-                        <h1><i18n:text>xmlui.mirage2.page-structure.heroUnit.title</i18n:text></h1>
-                        <p><i18n:text>xmlui.mirage2.page-structure.heroUnit.content</i18n:text></p>
+                        <xsl:choose>
+                            <xsl:when test="$request-uri='page/about'">
+                                <xsl:copy-of select="document('file://apps/drum/config/pages/about')/div"  />
+                            </xsl:when>
+                            <xsl:when test="$request-uri='page/about-submitting'">
+                                <xsl:copy-of select="document('file://apps/drum/config/pages/about-submitting')/div"  />
+                            </xsl:when>
+                            <xsl:when test="$request-uri='page/statistics'">
+                                <xsl:copy-of select="document('file://apps/drum/config/pages/statistics')/div"  />
+                            </xsl:when>
+                            <xsl:when test="$request-uri='page/permission-letter'">
+                                <xsl:copy-of select="document('file://apps/drum/config/pages/permission-letter')/div"  />
+                            </xsl:when>
+                            <xsl:when test="$request-uri='page/scope-of-drum-content'">
+                                <xsl:copy-of select="document('file://apps/drum/config/pages/scope-of-drum-content')/div"  />
+                            </xsl:when>
+                            <xsl:when test="$request-uri='page/license-text'">
+                                <xsl:copy-of select="document('file://apps/drum/config/pages/license-text')/div"  />
+                            </xsl:when>
+                        </xsl:choose>        
                     </div>
                 </xsl:when>
                 <!-- Otherwise use default handling of body -->
