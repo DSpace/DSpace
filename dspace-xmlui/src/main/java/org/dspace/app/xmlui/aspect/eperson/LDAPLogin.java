@@ -28,6 +28,7 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Password;
 import org.dspace.app.xmlui.wing.element.Text;
+import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -56,6 +57,8 @@ public class LDAPLogin extends AbstractDSpaceTransformer implements
 	public static final Message T_password = message("xmlui.EPerson.LDAPLogin.password");
 
 	public static final Message T_submit = message("xmlui.EPerson.LDAPLogin.submit");
+
+    public static final Message T_link_password_login = message("xmlui.EPerson.LDAPLogin.link_to_password_login");
 
 	/**
 	 * Generate the unique caching key. This key must be unique inside the space
@@ -191,6 +194,11 @@ public class LDAPLogin extends AbstractDSpaceTransformer implements
 		Password password = item.addPassword("ldap_password");
 		password.setRequired();
 		password.setLabel(T_password);
+
+        //if link to password
+        if(ConfigurationManager.getBooleanProperty("authentication-ldap", "login.link-to-password-auth", false)) {
+            list.addItemXref(contextPath + "/password-login", T_link_password_login);
+        }
 
 		list.addLabel();
 		Item submit = list.addItem("login-in", null);

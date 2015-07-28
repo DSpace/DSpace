@@ -569,7 +569,7 @@
 	<message key="xmlui.EPerson.LDAPLogin.error_bad_login">The user name and/or password supplied were not valid.</message>
 	<message key="xmlui.EPerson.LDAPLogin.password">Password</message>
 	<message key="xmlui.EPerson.LDAPLogin.submit">Sign in</message>
-    <message key="xmlui.EPerson.LDAPLogin.link_to_password_login">Not an LDAP User? Use password login.</message>
+    <message key="xmlui.EPerson.LDAPLogin.link_to_password_login">Not a Carthage User? Login Here.</message>
 
 	<!-- org.dspace.app.xmlui.eperson.LoginChooser.java -->
 	<message key="xmlui.EPerson.LoginChooser.title">Choose a Login Method</message>
