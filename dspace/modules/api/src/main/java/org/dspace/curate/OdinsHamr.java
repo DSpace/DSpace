@@ -86,7 +86,7 @@ public class OdinsHamr extends AbstractCurationTask {
      */
     @Override
     public int perform(DSpaceObject dso) throws IOException {
-        log.info("performing ODIN's Hamr task " + total++ );
+        log.info("performing ODIN's Hamr task " + total++);
 
         String handle = "\"[no handle found]\"";
         String itemDOI = "\"[no item DOI found]\"";
@@ -169,26 +169,32 @@ public class OdinsHamr extends AbstractCurationTask {
                 HashMap<DCValue,Bio> mappedNames = doHamrMatch(dspaceBios, orcidBios);
 
                 // output the resultant mappings
-                Iterator nameIt = mappedNames.entrySet().iterator();
+                Iterator dspaceBiosIterator = dspaceBios.iterator();
+
                 List<DCValue> authors = new ArrayList<DCValue>();
 
-                while(nameIt.hasNext()) {
-                    Map.Entry pairs = (Map.Entry)nameIt.next();
-                    Bio mappedOrcidEntry = (Bio)pairs.getValue();
-                    DCValue mappedDSpaceDCVal = (DCValue)pairs.getKey();
-                    Bio mappedDSpaceEntry = createBio("", mappedDSpaceDCVal.value);
-                    report(itemDOI + ", " + articleDOI + ", " + mappedOrcidEntry.getOrcid() + ", \"" + getName(mappedOrcidEntry) + "\", " +
-                       mappedDSpaceEntry.getOrcid() + ", \"" + getName(mappedDSpaceEntry) + "\", " + hamrScore(mappedDSpaceEntry,mappedOrcidEntry));
-
-                    // if hamrScore is greater or = to 0.7, then add this to new metadata:
-
-                    DCValue authorMetadata = mappedDSpaceDCVal.copy();
-                    if (hamrScore(mappedDSpaceEntry,mappedOrcidEntry) >= 0.7) {
-                        authorMetadata.authority = mappedOrcidEntry.getOrcid();
-                        authorMetadata.confidence = 500;
-                    }
+                while(dspaceBiosIterator.hasNext()) {
+                    DCValue dspaceBio = (DCValue) dspaceBiosIterator.next();
+                    DCValue authorMetadata = dspaceBio.copy();
                     authors.add(authorMetadata);
-                    setResult("Last processed item = " + handle + " -- " + itemDOI);
+
+                    // if there was a hamr match, update this particular author with Orcid as authority.
+                    if (mappedNames.containsKey(dspaceBio)) {
+                        Bio mappedOrcidEntry = (Bio)mappedNames.get(dspaceBio);
+                        Bio mappedDSpaceEntry = createBio("", dspaceBio.value);
+                        double hamrScore = hamrScore(mappedDSpaceEntry,mappedOrcidEntry);
+                        report(itemDOI + ", " + articleDOI + ", " + mappedOrcidEntry.getOrcid() + ", \"" + getName(mappedOrcidEntry) + "\", " +
+                                mappedDSpaceEntry.getOrcid() + ", \"" + getName(mappedDSpaceEntry) + "\", " + hamrScore);
+
+                        // if hamrScore is greater or = to 0.7, then add this to new metadata:
+
+                        if (hamrScore(mappedDSpaceEntry,mappedOrcidEntry) >= 0.7) {
+                            authorMetadata.authority = mappedOrcidEntry.getOrcid();
+                            authorMetadata.confidence = 500;
+                            item.addMetadata("dc", "description", "provenance", null, "ORCID authority added to " + auth.value + " because OdinsHamr matched with a value of " + hamrScore + " on " + DCDate.getCurrent().toString());
+                        }
+                        setResult("Last processed item = " + handle + " -- " + itemDOI);
+                    }
                 }
 
                 item.clearMetadata("dc","contributor","author",null);
