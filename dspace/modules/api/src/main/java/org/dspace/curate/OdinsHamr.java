@@ -28,6 +28,7 @@ import org.xml.sax.SAXException;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.DCDate;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.identifier.IdentifierService;
@@ -191,7 +192,7 @@ public class OdinsHamr extends AbstractCurationTask {
                         if (hamrScore(mappedDSpaceEntry,mappedOrcidEntry) >= 0.7) {
                             authorMetadata.authority = mappedOrcidEntry.getOrcid();
                             authorMetadata.confidence = 500;
-                            item.addMetadata("dc", "description", "provenance", null, "ORCID authority added to " + auth.value + " because OdinsHamr matched with a value of " + hamrScore + " on " + DCDate.getCurrent().toString());
+                            item.addMetadata("dc", "description", "provenance", null, "ORCID authority added to " + getName(mappedDSpaceEntry) + " because OdinsHamr matched with a value of " + hamrScore + " on " + DCDate.getCurrent().toString() + " (GMT)");
                         }
                         setResult("Last processed item = " + handle + " -- " + itemDOI);
                     }
