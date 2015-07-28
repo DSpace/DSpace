@@ -135,6 +135,15 @@
                 </div>
 
             </xsl:if>
+            
+            <!-- Added Static Page Links to Options Box -->
+            <div>
+                <h6 class="ds-option-set-head">Pages</h6>
+                <div id="ds-pages-option" class="ds-option-set list-group">
+                    <a class="list-group-item" href="{$context-path}/page/about">About DRUM</a>
+                    <a class="list-group-item" href="{$context-path}/page/statistics">About Download Statistics</a>
+                </div>
+            </div>
         </div>
     </xsl:template>
 
