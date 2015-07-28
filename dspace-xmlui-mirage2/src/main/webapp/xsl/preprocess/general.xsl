@@ -126,7 +126,7 @@
                         <xsl:text>License Text</xsl:text>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:text></xsl:text>
+                        <xsl:text>Page</xsl:text>
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:variable>
