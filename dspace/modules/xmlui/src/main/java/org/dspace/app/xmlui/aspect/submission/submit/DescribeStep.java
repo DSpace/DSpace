@@ -47,7 +47,6 @@ import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.MetadataAuthorityManager;
-import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
 /**
@@ -1250,19 +1249,6 @@ public class DescribeStep extends AbstractSubmissionStep
         // as a render hint.
         org.dspace.app.xmlui.wing.element.Item item = form.addItem();
         Text text = item.addText(fieldName, "submit-text");
-
-        if (dcInput.getVocabulary() != null)
-        {
-            String vocabularyUrl = new DSpace().getConfigurationService()
-                    .getProperty("dspace.url");
-            vocabularyUrl += "/JSON/controlled-vocabulary?vocabularyIdentifier="
-                    + dcInput.getVocabulary();
-            // Also hand down the field name so our summoning script knows the
-            // field the selected value is to end up in
-            vocabularyUrl += "&metadataFieldName=" + fieldName;
-            item.addXref("vocabulary:" + vocabularyUrl).addContent(
-                    T_vocabulary_link);
-        }
 
         // Setup the select field
         text.setLabel(dcInput.getLabel());
