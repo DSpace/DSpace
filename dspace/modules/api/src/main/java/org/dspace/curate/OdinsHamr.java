@@ -38,6 +38,7 @@ import org.dspace.utils.DSpace;
 import org.dspace.authority.orcid.xml.XMLtoBio;
 import org.dspace.authority.orcid.model.Bio;
 import org.dspace.authority.orcid.model.BioName;
+import org.dspace.authority.AuthorityValueGenerator;
 
 import org.apache.log4j.Logger;
 
@@ -190,7 +191,7 @@ public class OdinsHamr extends AbstractCurationTask {
                         // if hamrScore is greater or = to 0.7, then add this to new metadata:
 
                         if (hamrScore(mappedDSpaceEntry,mappedOrcidEntry) >= 0.7) {
-                            authorMetadata.authority = mappedOrcidEntry.getOrcid();
+                            authorMetadata.authority = AuthorityValueGenerator.GENERATE + "orcid" + AuthorityValueGenerator.SPLIT + mappedOrcidEntry.getOrcid();
                             authorMetadata.confidence = 500;
                             item.addMetadata("dc", "description", "provenance", null, "ORCID authority added to " + getName(mappedDSpaceEntry) + " because OdinsHamr matched with a value of " + hamrScore + " on " + DCDate.getCurrent().toString() + " (GMT)");
                         }
