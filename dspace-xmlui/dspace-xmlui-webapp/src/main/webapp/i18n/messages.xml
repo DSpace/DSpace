@@ -721,7 +721,7 @@
 	<message key="xmlui.Submission.workflow.PerformTaskStep.approve_submit">Approve item</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.commit_help">Once you've edited the item, use this option to commit the item to the archive.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.commit_submit">Commit to archive</message>
-	<message key="xmlui.Submission.workflow.PerformTaskStep.reject_help">If you have reviewed the item and found it is <strong>not</strong> suitable for inclusion in the collection, select "Reject".  You will then be asked to enter a message indicating why the item is unsuitable, and whether the submitter should change something and resubmit.</message>
+	<message key="xmlui.Submission.workflow.PerformTaskStep.reject_help">If you have reviewed the item and found it is <strong>not</strong> suitable for inclusion in the collection, select "Return item to submitter".  You will then be asked to enter a message indicating why the item is unsuitable, and whether the submitter should change something and resubmit.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.reject_submit">Return item to submitter</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.edit_help">Select this option to change the item's metadata.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.edit_submit">Edit metadata</message>
