@@ -241,7 +241,12 @@
                 <div id="dryad-home-carousel" class="ds-static-div primary">
                     <!-- REMINDER: slide publication dates are in the format YEAR-MONTH-DAY, eg, 2013-12-28 -->
                     <div class="bxslider" style="">
-						<div><span class="publication-date">2015-03-23</span>
+                        <div><span class="publication-date">2015-04-14</span>
+                            <a href="/pages/submissionIntegration">
+                                <img src="/themes/Mirage/images/integration-slide.jpg" alt="Publishers: Simplify data submission. Strengthen links between articles and data. For free. Integrate your journal with Dryad now" />
+                            </a>
+                        </div>
+                        <div><span class="publication-date">2015-03-23</span>
                             <a href="/pages/membershipOverview">
                                 <img alt="" src="/themes/Mirage/images/watering-can.png" />
                                 <p style="width: 450px; color: #363; font-size: 90%; top: 0px; right: 10px; line-height: 1.2em; position: absolute; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);">Help grow open data at Dryad:<br />Become an organizational member</p>
@@ -264,8 +269,8 @@
                         <div><span class="publication-date">2013-01-01</span>
                             <a href="/pages/repository#keyFeatures">
                                 <img src="/themes/Mirage/images/bookmarkSubmissionProcess.png" alt="Deposit data. Get permanent identifier. Watch your citations grow! Relax, your data are discoverable and secure." />
-                           </a>
-                       </div>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
