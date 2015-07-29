@@ -392,8 +392,7 @@
                                 </xsl:when>
                                 <xsl:otherwise>
                                     <li>
-                                        <form style="display: inline" action="{/dri:document/dri:meta/dri:userMeta/
-                            dri:metadata[@element='identifier' and @qualifier='loginURL']}" method="get">
+                                        <form style="display: inline" action="/ldap-login" method="get">
                                             <button class="navbar-toggle navbar-link">
                                             <b class="visible-xs glyphicon glyphicon-user" aria-hidden="true"/>
                                             </button>
@@ -444,8 +443,7 @@
                                 </xsl:when>
                                 <xsl:otherwise>
                                     <li>
-                                        <a href="{/dri:document/dri:meta/dri:userMeta/
-                            dri:metadata[@element='identifier' and @qualifier='loginURL']}">
+                                        <a href="/ldap-login">
                                             <span class="hidden-xs">
                                                 <i18n:text>xmlui.dri2xhtml.structural.login</i18n:text>
                                             </span>
