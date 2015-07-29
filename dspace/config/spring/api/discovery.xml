@@ -544,7 +544,7 @@
         <property name="sortOrder" value="COUNT"/>
     </bean>
 
-    <bean id="searchFilterLanguage" class="org.dspace.discovery.configuration.HierarchicalSidebarFacetConfiguration">
+    <bean id="searchFilterLanguage" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
         <property name="indexFieldName" value="language"/>
         <property name="metadataFields">
             <list>
