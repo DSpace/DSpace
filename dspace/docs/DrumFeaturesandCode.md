@@ -122,21 +122,8 @@ Add custom preservation bundle.
 
 ### Dual authentication: password/CAS
 
-Add capability to login with the university directory id using CAS autentication or user id/passsword.
+XMLUI comes with dual authentication capability. No customization needed.
 
-*Java Source*
-  
- * [CASAuthentication.java](../modules/additions/src/main/java/org/dspace/authenticate/CASAuthentication.java) - setup mechanics of dual authentication
- 
-*JSPUI webapp*
-
- * [chooser.jsp](../modules/jspui/src/main/webapp/login/chooser.jsp) - setup mechanics of dual authentication
-
-*Configuration*
-
-* [Messages.properties](../modules/additions/src/main/resources/Messages.properties) - login messages for JSP
-
-* [dspace.cfg](../config/dspace.cfg) - CAS section for login, login preference section
 
 ### CAS Authentication
 
@@ -175,6 +162,13 @@ Add capability to login with the university directory id using CAS autentication
 	
 * [dspace.cfg](../config/dspace.cfg) 
 
+*XMLUI Webapp*
+
+* [CASAuthentication.java](../modules/additions/src/main/java/org/dspace/authenticate/CASAuthentication.java) - made minor edit to CAS URL for redirect request.
+* [EditProfile.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/eperson/EditProfile.java) - don't allow password changes for CAS logins
+* [EPerson/sitemap.xmap](../modules/xmlui/src/main/resources/aspects/EPerson/sitemap.xmap) - Added location for CAS login.
+* [CASAuthenticateAction.java](..//modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/eperson/CASAuthenticateAction.java) - Attempts to log the user in using CAS.
+
 
 ### LDAP Authorization
 
@@ -197,6 +191,14 @@ Add capability to login with the university directory id using CAS autentication
 * [unit-edit.jsp](../modules/jspui/src/main/webapp/tools/unit-edit.jsp) - add Ldap.getGroups() to gather Group mappings for all units
 
 * [eperson-edit.jsp](../modules/jspui/src/main/webapp/dspace-admin/eperson-edit.jsp) - add faculty_only editing in admin interface for Units
+
+*XMLUI webapp*
+
+* [EditEPersonForm.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/administrative/eperson/EditEPersonForm.java) - Added UM Directory Information
+* [EditUnitsForm.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/administrative/units/EditUnitsForm.java) - Added "Faculty Only" checkbox
+* [FlowUnitsUtils.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/administrative/FlowUnitsUtils.java) - Code to update "faculty_only" field based on EditUnitsForm checkbox.
+* [administrative.js](../modules/xmlui/src/main/resources/aspects/Administrative/administrative.js) - Updated one method of FlowUnitsUtils
+* [messages.xml](../modules/xmlui/src/main/webapp/i18n/messages.xml)
 
 *Scripts*
 
@@ -257,6 +259,16 @@ Custom messaging for unathorized access to Bitstream if the Bitstream is under e
 * [embargo-list-csv.jsp](../modules/jspui/src/main/webapp/dspace-admin/statistics/embargo-list-csv.jsp) - CSV export of embargo list
 
 * [embargo-list-sql.jspf](../modules/jspui/src/main/webapp/dspace-admin/statistics/embargo-list-sql.jspf) - SQL for embargo query
+
+*XMLUI webapp*
+
+* [BitstreamReader.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/cocoon/BitstreamReader.java) - query DSpace for a particular bitstream and transmit it to the user
+
+* [ItemAdapter.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/objectmanager/ItemAdapter.java) - check if bitstream has an embargo and display message accordingly.  
+
+* [item-view.xsl](../modules/xmlui-mirage2/src/main/webapp/themes/Mirage2/xsl/aspect/artifactbrowser/item-view.xsl) - attribute EMBARGO is added.
+
+
  
 ### Loader
         transform Proquest metadata to dublin core
@@ -336,7 +348,27 @@ Maintain mapping from campus departments (from Proquest metadata) to DSpace coll
     * [etdunit-edit](../modules/jspui/src/main/webapp/tools/etdunit-edit.jsp) - edit single EtdUnit page
     * [etdunit-list](../modules/jspui/src/main/webapp/tools/etdunit-list.jsp) - list of all EtdUnit
 
+*XMLUI Webapp*
 
+* JAVA files
+    * [DeleteDepartmentsConfirm.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/administrative/etd_departments/DeleteDepartmentsConfirm.java) - loads the page for deleting a ETD Department.
+    * [EditDepartmentsForm.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/administrative/etd_departments/EditDepartmentsForm.java) - loads the page for editing a ETD Department.
+    * [ManageDepartmentsMain.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/administrative/etd_departments/ManageDepartmentsMain.java)  - loads the page for managing a ETD Department and its mapping to collections.
+    * [FlowDepartmentUtils.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/administrative/FlowDepartmentUtils.java) - contains utility functions for managing the ETD Department workflows.
+
+* Administrative Aspects
+    * [administrative.js](../modules/xmlui/src/main/resources/aspects/Administrative/administrative.js) - added new functions for creating new departments and deleting them, managing them, editing and managing them.
+    * [sitemap.xmap](../modules/xmlui/src/main/resources/aspects/Administrative/sitemap.xmap) - added administrative configurations for managing the ETD Department workflows.
+
+* Supporting files
+    * [Navigation.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/administrative/Navigation.java) - added code for linking ETD Department functionality to the Navigation bar menu.
+    * [Collection.java](../modules/additions/src/main/java/org/dspace/content/Collection.java) - added new "Search" and "Search Result Count" functionality in Collection.java
+    * [EtdUnit.java](../modules/additions/src/main/java/org/dspace/content/EtdUnit.java) - added new functionality to check whether given collection is mapped to a department. 
+    * [Constants.java](../modules/additions/src/main/java/org/dspace/core/Constants.java) - added support for ETDUNITs.
+
+* Labels
+    * [messages.xml](../modules/xmlui/src/main/webapp/i18n/messages.xml) - updated messages to include new labels for ETD Units.
+    
 <a name="item-collection-community"></a>
 ## Item/Community/Collection Display
 
@@ -364,6 +396,14 @@ Maintain mapping from campus departments (from Proquest metadata) to DSpace coll
 * [navbar-default.jsp](../modules/jspui/src/main/webapp/layout/navbar-default.jsp) - eliminate hardcoded references to /dspace in links
 
 * [main.jsp](../modules/jspui/src/main/webapp/mydspace/main.jsp) - eliminate hardcoded references to /dspace in links
+
+*XMLUI webapp*
+
+* [messages.xml](../modules/xmlui/src/main/webapp/i18n/messages.xml) - Actual text for content that is linked to from the code.
+
+* [ItemAdapter.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/objectmanager/ItemAdapter.java) - Added the code to populate the mets file with the download count.
+
+* [item-view.xsl](../modules/xmlui-mirage2/src/main/webapp/themes/Mirage2/xsl/aspect/artifactbrowser/item-view.xsl) - Added the text and formatting to display the "No. of  Downloads" for each item.
 
 
 *Scripts*
@@ -429,6 +469,13 @@ legacy, single-use loaders; do not need testing
 * [navbar-default.jsp](../modules/jspui/src/main/webapp/layout/navbar-default.jsp) - navbar fixups
 
 * [navbar-admin.jsp](../modules/jspui/src/main/webapp/layout/navbar-admin.jsp) - admin navbar fixups
+
+*XMLUI webapp*
+
+* [Navigation.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/administrative/Navigation.java) - Added links in the sidebar for the DRUM Customizations.
+
+* [messages.xml](../modules/xmlui/src/main/webapp/i18n/messages.xml) - Actual text for content that is linked to from the code in Navigation.java.
+
 
 <a name="miscellaneous"></a>
 ## Miscellaneous
@@ -509,6 +556,24 @@ handle-6.2.jar - add handle 6.2 to the lib folder
 * [embargo-list.jsp](../modules/jspui/src/main/webapp/dspace-admin/statistics/embargo-list.jsp) - add a list of all current embargoes to the statistics page
 
 * [navbar-admin.jsp](../modules/jspui/src/main/webapp/layout/navbar-admin.jsp)
+
+*XMLUI webapp*
+
+* [messages.xml](../modules/xmlui/src/main/webapp/i18n/messages.xml) - Actual text for content that is linked to from the code.
+
+* [EmbargoListHelper.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/artifactbrowser/EmbargoListHelper.java) - Helper class that gets the list of embargo files.
+
+* [EmbargoListDisplay.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/artifactbrowser/EmbargoListDisplay.java) - Class used to display the table with the list of embargos.
+
+* [EmbargoListDownloader.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/artifactbrowser/EmbargoListDownloader.java) - Class responsible for populating the CSV of the embargo data.
+
+* [ViewArtifacts/sitemap.xmap](../modules/xmlui/src/main/resources/aspects/ViewArtifacts/sitemap.xmap) - sitemap that triggers the EmbargoListDisplay class and the MonthlyStatistics class.
+
+* [sitemap.xmap](../modules/xmlui/src/main/webapp/sitemap.xmap) - sitemap that triggers the EmbargoListDownloader and the MonthlyStatisticsDownloader.
+
+* [MonthlyStatistics.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/artifactbrowser/MonthlyStatistics.java) - Class used to display a list of the available monthly statistics files.
+
+* [MonthlyStatisticsDownloader.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/artifactbrowser/MonthlyStatisticsDownloader.java) - Class used to download the text file with the monthly statistics data.
 
 
 *Database Schema*

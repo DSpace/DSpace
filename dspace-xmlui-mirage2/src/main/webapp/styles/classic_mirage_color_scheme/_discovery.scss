@@ -1,0 +1,187 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+
+
+/**
+    Discovery control gears start
+**/
+
+div.controls-gear-wrapper {
+    position: relative;
+    float: right;
+    cursor: pointer;
+
+    .dropdown-menu .glyphicon {
+        @include checkmark-style();
+    }
+
+    .discovery-controls-gear {
+        padding: 0;
+        margin-right: 3px;
+        margin-bottom: 0;
+        margin-top: 0;
+        background: none;
+        border: none;
+    }
+}
+
+ul.gear-selection{
+    margin: 0 2px 0 0;
+    list-style: none;
+    background-color: #FFFFFF;
+    position: absolute;
+    right: 0;
+    z-index: 999;
+    border: 1px solid #EBEBEB;
+    padding: 0;
+    /*Hidden by default*/
+    display: none;
+}
+
+
+.bottom ul.gear-selection {
+    /*Css to ensure that the bottom gear selection list is shown on TOP of the button */
+    bottom: 33px;
+}
+
+div.gear-icon{
+    height: 25px;
+    width: 25px;
+}
+
+
+.rgba.boxshadow ul.gear-selection{
+    -webkit-box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+ul.gear-selection ul {
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    padding-left: 0;
+}
+
+ul.gear-selection li {
+    list-style: none;
+}
+
+ul.gear-selection li.gear-head {
+    padding: 5px;
+    border-top: 1px solid #EBEBEB;
+}
+
+ul.gear-selection li.gear-head.first{
+    border-top: none;
+}
+
+
+ul.gear-selection li.gear-option{
+    padding: 5px 5px 5px 25px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+ul.gear-selection li.gear-option:hover{
+    background-color: #EBEBEB;
+}
+
+ul.gear-selection li.gear-option a{
+    color: #444444;
+    text-decoration: none;
+}
+
+/**
+    Discovery control gears end
+**/
+
+
+table.discovery-filters td.discovery-filter-input-cell input{
+    width: 98%;
+}
+
+table.discovery-filters tr.search-filter.used-filter input.filter-add
+{
+    visibility: hidden;
+}
+
+.searchTime{
+    font-size: 80%;
+    font-weight: normal;
+    color: #999;
+}
+
+
+div#aspect_discovery_SimpleSearch_div_search-results {
+    ul{
+        padding-left: 0;
+        li {
+            list-style: none;
+        }
+    }
+
+    .highlight {
+        font-weight: 700;
+    }
+}
+
+ul.pagination-links{
+    line-height: 25px;
+}
+
+//.discoverySearchBox .row {
+//    margin-bottom: 15px;
+//}
+
+.filter-control.filter-add,
+.filter-control.filter-remove {
+    width:50%;
+}
+
+@media (max-width: $screen-sm-max) {
+    .pagination .page-link-offset-3 {
+        display: none;
+    }
+}
+
+@media (max-width: $screen-xs-max) {
+    #aspect_discovery_SimpleSearch_list_primary-search .col-lg-3,
+    #aspect_discovery_SimpleSearch_div_discovery-filters-wrapper .col-lg-4,
+    #aspect_discovery_SimpleSearch_div_discovery-filters-wrapper .col-lg-2 {
+        margin-bottom: 5px;
+    }
+
+    .pagination .page-link-offset-2 {
+        display: none;
+    }
+}
+
+@media (max-width: $screen-xs-min) {
+    .pagination .page-link-offset-1 {
+        display: none;
+    }
+}
+
+#aspect_discovery_SimpleSearch_field_scope {
+    @media (max-width: $screen-xs-max) {
+        margin-bottom: 15px;
+    }
+}
+
+#filters-overview-wrapper .label {
+    cursor: pointer;
+}
+
+//#aspect_discovery_SimpleSearch_row_filter-controls {
+//    margin-bottom: 15px;
+//}
+//
+//#aspect_discovery_SearchFacetFilter_div_filter-navigation {
+//    padding-bottom: 10px;
+//}
