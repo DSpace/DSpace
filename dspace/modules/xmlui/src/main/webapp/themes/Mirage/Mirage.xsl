@@ -414,19 +414,19 @@
 
             <!-- START INTEGRATED JOURNAL-->
             <div class="home-col-2" style="clear: both; margin-left: 25px;">
-              <h1 class="ds-div-head">Recently integrated journals</h1>
-              <div id="recently_integrated_journals" class="ds-static-div primary">
-                <div class="container">
-					<!-- Ecography -->
-							  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aecography%5C%7C%5C%7C%5C%7CEcography"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-Ecog.png" alt="Ecography" /></a>
-					<!-- Ecology -->
-							  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aecology%5C%7C%5C%7C%5C%7CEcology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ecology.png" alt="Ecology" /></a>
-                  <!-- Oikos -->
-                  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aoikos%5C%7C%5C%7C%5C%7COikos"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-Oikos.png" alt="Oikos" /></a>
-                  <!-- PLOS -->
-                  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aplos%2A"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-plos.png" alt="PLOS" /></a>
+                <h1 class="ds-div-head">Recently integrated journals</h1>
+                <div id="recently_integrated_journals" class="ds-static-div primary">
+                    <div class="container">
+                        <!-- Bone & Joint 360 -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Abone%5C+%26%5C+joint%5C+360%5C%7C%5C%7C%5C%7CBone%5C+%26%5C+Joint%5C+360"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-BJ360.png" alt="Bone &amp; Joint 360" /></a>
+                        <!-- Bone & Joint Journal -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Abone%5C+%26%5C+joint%5C+journal%5C%7C%5C%7C%5C%7CBone%5C+%26%5C+Joint%5C+Journal"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-BJJ.png" alt="Bone &amp; Joint Journal" /></a>
+                        <!-- Bone & Joint Research -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Abone%5C+%26%5C+joint%5C+research%5C%7C%5C%7C%5C%7CBone%5C+%26%5C+Joint%5C+Research"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-BJR.png" alt="Bone &amp; Joint Research" /></a>
+                        <!-- Ecology -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aecology%5C%7C%5C%7C%5C%7CEcology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ecology.png" alt="Ecology" /></a>
+                    </div>
                 </div>
-              </div>
             </div>
             <!-- START STATISTICS -->
             <div class="home-col-2" style="margin-left: 25px;">
