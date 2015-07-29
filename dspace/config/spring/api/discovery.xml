@@ -553,7 +553,6 @@
         </property>
         <property name="facetLimit" value="5"/>
         <property name="sortOrder" value="COUNT"/>
-        <property name="splitter" value="::"/>
     </bean>
 
 
