@@ -317,12 +317,12 @@
 
             <!-- START CONNECT  -->
             <div class="home-col-2" style="clear: right;">
-                <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Tweets from Dryad
+                <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Latest from @datadryad
                 </h1>
 
                 <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 475px; font-size: 14px;">
                     <div id="connect-illustrated-prose">
-		      <a class="twitter-timeline" href="https://twitter.com/datadryad" data-widget-id="572434627277901824">Tweets by @datadryad</a>
+		      <a class="twitter-timeline" href="https://twitter.com/datadryad" data-widget-id="572434627277901824">Latest from @datadryad</a>
 		      <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>	
                     </div>
                 </div>
@@ -548,7 +548,7 @@
     <xsl:template match="dri:options/dri:list[@n='DryadConnect']" priority="3">
       <div class="NOT-simple-box">
         <!-- START CONNECT  -->
-        <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Tweets from Dryad
+        <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Be part of Dryad
         </h1>
         <div id="ds_connect_with_dryad" class="ds-static-div primary" style="font-size: 14px;">
             <p style="margin-bottom: 0;">
