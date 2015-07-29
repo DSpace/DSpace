@@ -476,20 +476,23 @@ references to stylesheets pulled directly from the pageMeta element. -->
                             <a href="">For organizations</a>
                             <ul>
                                 <li>
+                                    <a href="/pages/bePartOfDryad">Be part of Dryad</a>
+                                </li> 
+                                <li>
                                     <a href="/pages/submissionIntegration">Submission integration</a>
                                 </li>                            
                                 <li>
                                     <a href="/pages/membershipOverview">Membership</a>
+                                </li> 
+                                <li>
+                                    <a href="/pages/membershipMeeting">Membership meeting</a>
                                 </li>                            
                                 <li>
                                     <a href="/pages/payment">Payment plans</a>
                                 </li> 
                                 <li>
                                     <a href="/pages/paymentPlanComparisonTool">Payment plan comparison tool</a>
-                                </li>    
-                                <li>
-                                    <a href="/pages/membershipMeeting">Membership meeting</a>
-                                </li>                         
+                                </li>                            
                             </ul>
                         </li>
                         <li>
