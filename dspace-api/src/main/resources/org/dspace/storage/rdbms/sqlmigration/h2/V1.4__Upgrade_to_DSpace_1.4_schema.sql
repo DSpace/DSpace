@@ -68,8 +68,8 @@ CREATE TABLE MetadataFieldRegistry
 (
   metadata_field_id   INTEGER PRIMARY KEY,
   metadata_schema_id  INTEGER NOT NULL REFERENCES MetadataSchemaRegistry(metadata_schema_id),
-  element             VARCHAR(128),
-  qualifier           VARCHAR(128),
+  element             VARCHAR(64),
+  qualifier           VARCHAR(64),
   scope_note          VARCHAR2(2000)
 );
 

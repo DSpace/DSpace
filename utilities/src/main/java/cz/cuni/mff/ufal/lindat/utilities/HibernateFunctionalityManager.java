@@ -1,5 +1,6 @@
 package cz.cuni.mff.ufal.lindat.utilities;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -38,8 +39,8 @@ public class HibernateFunctionalityManager implements IFunctionalities {
 
 	HibernateUtil hibernateUtil = new HibernateUtil();
 	
-	public HibernateFunctionalityManager() {
-		init();
+	public HibernateFunctionalityManager(String configuration_file) throws IOException {
+		init(configuration_file);
 	}
 
 	@Override
@@ -65,11 +66,11 @@ public class HibernateFunctionalityManager implements IFunctionalities {
 		return "";
 	}
 
-	public static void init() {
-		Variables.init();
+	public static void init(String configuration_file) throws IOException {
+		Variables.init(configuration_file);
 	}
 
-	public  boolean isFunctionalityEnabled(String functionalityName) {
+	public boolean isFunctionalityEnabled(String functionalityName) {
 		// this logic needs inspection
 		if(!Variables.isConfigurationTrue(functionalityName)){
 			log.log(Level.FATAL,"Functionality " + functionalityName + " is not enabled!");

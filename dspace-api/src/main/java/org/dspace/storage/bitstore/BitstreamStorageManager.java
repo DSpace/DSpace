@@ -114,7 +114,6 @@ public class BitstreamStorageManager
     /* Read in the asset stores from the config. */
     static
     {
-    	DSpaceApi.load_dspace();
         List<Object> stores = new ArrayList<Object>();
 
 		// 'assetstore.dir' is always store number 0

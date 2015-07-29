@@ -23,7 +23,7 @@ install:
   - cd $FS/utilities/project_helpers
   - sed -i'' 's/tomcat.(TOMCAT_VERSION)/travis/' ./config/variable.makefile.example
   - sed -i'' 's/lr.common.theme = /lr.common.theme = \/tmp\/dspace/' ./config/local.conf.dist
-  - sed -i'' 's/dspace.dir = /dspace.dir = \/tmp\/dspace/' ./config/local.conf.dist
+  - sed -i'' 's/dspace.install.dir = /dspace.install.dir = \/tmp\/dspace/' ./config/local.conf.dist
   - cd $FS/utilities/project_helpers/config
   - cp local.conf.dist ../sources/local.properties
   - cd $FS/utilities/project_helpers/scripts

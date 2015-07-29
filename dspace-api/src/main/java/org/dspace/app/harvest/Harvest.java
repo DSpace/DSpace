@@ -43,10 +43,6 @@ public class Harvest
 	
     public static void main(String[] argv) throws Exception
     {
-    	
-        // try loading dspace
-        DSpaceApi.load_dspace();
-    	
         // create an options object and populate it
         CommandLineParser parser = new PosixParser();
 

@@ -107,7 +107,6 @@ public class PiwikPDFExporter  {
 	}
 		
 	public static void initialize() {
-        DSpaceApi.load_dspace();        
         PIWIK_REPORTS_OUTPUT_PATH = ConfigurationManager.getProperty("lr", "lr.statistics.report.path");
         PIWIK_API_URL = ConfigurationManager.getProperty("lr", "lr.statistics.api.url");
         PIWIK_AUTH_TOKEN = ConfigurationManager.getProperty("lr", "lr.statistics.api.auth.token");

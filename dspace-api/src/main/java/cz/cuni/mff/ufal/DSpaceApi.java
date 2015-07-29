@@ -1,6 +1,7 @@
 /* Created for LINDAT/CLARIN */
 package cz.cuni.mff.ufal;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.sql.SQLException;
@@ -28,6 +29,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
+import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
 
 import cz.cuni.mff.ufal.dspace.PIDService;
@@ -57,8 +59,10 @@ public class DSpaceApi {
 
 			@SuppressWarnings("unchecked")
 			Class<IFunctionalities> functionalities = (Class<IFunctionalities>) Class.forName(className);
-			Constructor<IFunctionalities> constructor = functionalities.getConstructor();
-			manager = constructor.newInstance();
+			Constructor<IFunctionalities> constructor = functionalities.getConstructor(String.class);
+			ConfigurationService configurationService = new DSpace().getConfigurationService();
+			String lr_cfg = configurationService.getProperty("dspace.dir") + File.separator + "config/modules/lr.cfg";
+			manager = constructor.newInstance(lr_cfg);
 
 			log.debug("Class " + className + " loaded successfully");
 			
@@ -165,8 +169,8 @@ public class DSpaceApi {
 	
 	public static void updateFileDownloadStatistics(int userID, int resourceID) {	   
 	    IFunctionalities manager = DSpaceApi.getFunctionalityManager();	    
-        manager.openSession();                
-        manager.updateFileDownloadStatistics(userID, resourceID);                                  
+        manager.openSession();
+		manager.updateFileDownloadStatistics(userID, resourceID);
         manager.close();
 	}	    		
 
@@ -263,7 +267,6 @@ public class DSpaceApi {
 
 	public static void main(String[] t) {
 		try {
-			load_dspace();
 			handle_HandleManager_createId(null, 9999, "11372/LRT-", "TEST-1");
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -474,31 +477,6 @@ public class DSpaceApi {
 		return true;
 	}
 
-	public static void load_dspace() {
-		load_dspace("./config/dspace.cfg");
-	}
-
-
-    public static void load_dspace(String explicit_file)
-    {
-        try {
-        	ConfigurationManager.getProperty("dspace.url");
-        	return;
-        }catch( Exception e) {
-        }
-
-        try {
-	        DSpaceKernelImpl kernelImpl = DSpaceKernelInit.getKernel(null);
-	        if (!kernelImpl.isRunning())
-	            kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
-	        return;
-	    }catch( Exception e) {
-	    }
-
-        // last option
-        ConfigurationManager.loadConfig(explicit_file);
-    }
-    
     public static String convertBytesToHumanReadableForm(long bytes) {
     	int exp = (int)(Math.log(bytes) / Math.log(1024));
     	String units[] = new String[]{"bytes", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"};
