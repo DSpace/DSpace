@@ -3,9 +3,9 @@ package cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.apache.cocoon.environment.Request;
@@ -26,14 +26,13 @@ import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 
 import cz.cuni.mff.ufal.dspace.b2safe.ReplicationManager;
-import fr.cines.eudat.repopack.b2safe_rp_core.DataObject;
 
 public class ControlPanelReplicationTabHelper {
 	
 	private final static String delete_prefix = "checkbox-delete";
 	private final static String url_hdl_prefix = ConfigurationManager.getProperty("handle.canonical.prefix");
 		
-	public static void showTabs(Division div, Request request, Context context) throws Exception {
+	public static void showTabs(Division div, Request request, Context context) throws WingException {
 		String action = request.getParameter("action");
 		if(action==null || action.equals("") || action.equals("toggle_on_off")) action = "show_info";
 		if(action.equals("replicate_specific") || action.equals("replicate_all_off") || action.equals("replicate_all_on")) action="repl_tobe";
@@ -74,7 +73,7 @@ public class ControlPanelReplicationTabHelper {
 					ReplicationManager.initialize();
 				} catch (Exception e) {
 					List info = mainDiv.addList("replication-config");
-					info.addItem().addContent(e.getLocalizedMessage());
+					info.addItem().addContent(e.toString());
 					return;
 				}
 			}					
@@ -103,22 +102,20 @@ public class ControlPanelReplicationTabHelper {
 	
 			Properties config = ReplicationManager.getConfiguration();
 	
-			for (Entry entry : config.entrySet()) {
-				statusList.addLabel((String)entry.getKey());
-				String value = (String)entry.getValue();
-				if (value == null) {
+            Enumeration e = config.propertyNames();
+
+            while (e.hasMoreElements()) {
+                  String key = (String) e.nextElement();
+                  if ( key.toLowerCase().contains("password") ) {
+					continue;
+                  }
+				String value = config.getProperty(key);
+				if (value == null || value.isEmpty()) {
 					value = "N/A";
 				}
+				statusList.addLabel(key);
 				statusList.addItem(value);
 			}
-	
-			/*
-			 * jargon specific for ( String s : new String[] {
-			 * "lr.replication.jargon.numThreads" }) { Row row =
-			 * table.addRow(Row.ROLE_DATA); row.addCellContent(s);
-			 * row.addCellContent(String.format("%s", System.getProperty("jargon." +
-			 * s))); }
-			 */
 		}
 	}
 	
@@ -166,7 +163,7 @@ public class ControlPanelReplicationTabHelper {
 		
 	}
 
-	public static void executeCommand(Division div, Request request, Context context) throws Exception {
+	public static void executeCommand(Division div, Request request, Context context) throws WingException {
 
 		String action = request.getParameter("action");
 		if(action==null || action.equals("")) action = "show_info";
@@ -210,14 +207,14 @@ public class ControlPanelReplicationTabHelper {
 			action = "list_replicas";
 		}
 		
-		/*if(action.equals("replicate_all_on")) {
+		if(action.equals("replicate_all_on")) {
 			ReplicationManager.setReplicateAll(true);
 			action = "repl_tobe";
 		} else
 		if(action.equals("replicate_all_off")) {
 			ReplicationManager.setReplicateAll(false);
 			action = "repl_tobe";
-		}*/
+		}
 				
 		//if (!ReplicationManager.isReplicationOn()) return;
 				
@@ -248,7 +245,7 @@ public class ControlPanelReplicationTabHelper {
 				if(file.exists()) {
 					file.delete();
 				}
-				ReplicationManager.retrieveFile(remPath, file.getAbsolutePath());
+				ReplicationManager.retriveFile(remPath, file.getAbsolutePath());
 				//message = "file retrived and stored to " + file.getAbsolutePath();
 			} catch (Exception e) {
 				//message += "Could not download path: " + e.toString();
@@ -268,11 +265,11 @@ public class ControlPanelReplicationTabHelper {
 			}
 			Division m = div.addDivision("message", "alert alert-info");
 
-			/*if(ReplicationManager.isReplicateAllOn()) {
+			if(ReplicationManager.isReplicateAllOn()) {
 				m.addPara().addXref(request.getContextPath() + "/admin/panel?tab=IRODs Replication&action=replicate_all_off", "REPLICATE ALL DAEMON: ON", "label label-success btn btn-sm pull-right active");
 			} else {
 				m.addPara().addXref(request.getContextPath() + "/admin/panel?tab=IRODs Replication&action=replicate_all_on", "REPLICATE ALL DAEMON: OFF", "label label-warning btn btn-sm pull-right");
-			}*/
+			}
 			
 			m.addPara().addContent(String.format("All items (%d), Public (%d)\n", size, ReplicationManager.getPublicItemHandles().size()));			
 			java.util.List<String> tobe = ReplicationManager.listMissingReplicas();
@@ -290,7 +287,7 @@ public class ControlPanelReplicationTabHelper {
 				Row row = tobeTable.addRow(Row.ROLE_DATA);
 				row.addCell().addContent(i++);
 				row.addCell().addXref(request.getContextPath() + "/handle/" + handle, handle);
-				/*if(ReplicationManager.inProgress.contains(handle)) {
+				if(ReplicationManager.inProgress.contains(handle)) {
 					row.addCell().addHighlight("fa fa-spinner fa-spin");
 				} else {
 					Cell c = row.addCell();
@@ -307,7 +304,7 @@ public class ControlPanelReplicationTabHelper {
 						c.addXref(request.getContextPath() + "/admin/panel?tab=IRODs Replication&action=replicate_specific" +
 								"&handle=" + handle , "", "fa fa-plus label label-primary");
 					}
-				}*/
+				}
 			}
 				
 		} catch (Exception e) {
@@ -385,11 +382,10 @@ public class ControlPanelReplicationTabHelper {
 		}
 	}
 
-	public static void listReplicas(Division div, Request request, Context context) throws Exception {
-		//java.util.List<String> list = new ArrayList<>();
-		java.util.List<DataObject> dos = null;
+	public static void listReplicas(Division div, Request request, Context context) throws WingException {
+		java.util.List<String> list = new ArrayList<>();
 		try {
-			dos = ReplicationManager.list();
+			list = ReplicationManager.listFilenames(true);
 		} catch (Exception e) {
 			Division msg = div.addDivision("message", "alert alert-error");
 			msg.addPara().addContent("Replication Failed");
@@ -413,20 +409,21 @@ public class ControlPanelReplicationTabHelper {
 		int pos = 0;
 		long all_file_size = 0;
 
-		for (DataObject one_do : dos) {
+		for (String name : list) {
 
 			Row row = table.addRow(Row.ROLE_DATA);
 			row.addCellContent(String.valueOf(++pos));
-
-			// eudat stores the file path here
-            String name = one_do.getFileName();
-            if ( null == name ) {
-                name = one_do.getRemoteDirPath();
-            }
-            
-			Map<String, String> metadata = ReplicationManager.getMetadataMap(one_do);
-			String adminStatus = metadata.get("ADMIN_Status");            
-						
+							
+			Map<String, String> metadata;
+			try {
+				metadata = ReplicationManager.getMetadataOfDataObject(name);
+			} catch (Exception e) {
+				throw new WingException(e);
+			}
+							
+			String adminStatus = metadata.get("ADMIN_Status");
+			if(adminStatus==null) adminStatus = "NA";
+			
 			String rend_status = "label ";
 			if (adminStatus!=null && adminStatus.equals("Archive_ok")) {
 				rend_status += "label-success fa fa-check bold";

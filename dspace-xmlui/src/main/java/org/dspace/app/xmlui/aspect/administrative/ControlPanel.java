@@ -196,4 +196,3 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
         super.dispose();
     }
 }
-

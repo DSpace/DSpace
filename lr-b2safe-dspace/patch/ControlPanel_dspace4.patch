@@ -1,9 +1,9 @@
 diff --git a/dspace-xmlui/src/main/java/cz/cuni/mff/ufal/dspace/app/xmlui/aspect/administrative/ControlPanelReplicationTabHelper.java b/dspace-xmlui/src/main/java/cz/cuni/mff/ufal/dspace/app/xmlui/aspect/administrative/ControlPanelReplicationTabHelper.java
 new file mode 100644
-index 0000000..66714ca
+index 0000000..286f0fa
 --- /dev/null
 +++ b/dspace-xmlui/src/main/java/cz/cuni/mff/ufal/dspace/app/xmlui/aspect/administrative/ControlPanelReplicationTabHelper.java
-@@ -0,0 +1,426 @@
+@@ -0,0 +1,430 @@
 +package cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative;
 +
 +import java.io.File;
@@ -41,8 +41,8 @@ index 0000000..66714ca
 +	public static void showConfiguration(Division mainDiv) throws WingException {
 +		
 +		Division div = mainDiv.addDivision("replication_div", "itemlist");
-+		div.addPara("", "header").addContent("Configuration");
-+		Table table = div.addTable("replication_config", 1, 2, "font_smaller");
++		div.addPara("", "header").addContent("CONFIGURATION");
++		Table table = div.addTable("irods_config", 1, 2, "font_smaller");
 +		
 +		Row row_tmp = null;
 +		
@@ -59,15 +59,29 @@ index 0000000..66714ca
 +			try {
 +				serverInfo = ReplicationManager.getServerInformation();
 +			} catch(Exception e) {
-+
++				serverInfo = new HashMap<String, String>();
 +			}
-+           if ( null != serverInfo ) {
-+			for ( Map.Entry<String, String> entry : serverInfo.entrySet() ) {
-+			    row_tmp = table.addRow(Row.ROLE_DATA);
-+			    row_tmp.addCellContent(entry.getKey());
-+			    row_tmp.addCellContent(entry.getValue());
-+           }
-+           }
++			
++			row_tmp = table.addRow(Row.ROLE_DATA);
++			row_tmp.addCellContent("IRODS Server API Version");
++			row_tmp.addCellContent(serverInfo.get("API_VERSION"));
++			
++			row_tmp = table.addRow(Row.ROLE_DATA);		
++			row_tmp.addCellContent("IRODS Server Boot Time");
++			row_tmp.addCellContent(serverInfo.get("SERVER_BOOT_TIME"));
++			
++			row_tmp = table.addRow(Row.ROLE_DATA);		
++			row_tmp.addCellContent("IRODS Server Rel Version");
++			row_tmp.addCellContent(serverInfo.get("REL_VERSION"));
++			
++			row_tmp = table.addRow(Row.ROLE_DATA);		
++			row_tmp.addCellContent("IRODS Zone");
++			row_tmp.addCellContent(serverInfo.get("RODS_ZONE"));
++			
++			row_tmp = table.addRow(Row.ROLE_DATA);		
++			row_tmp.addCellContent("IRODS Server Initialize Date");
++			row_tmp.addCellContent(serverInfo.get("INITIALIZE_DATE"));
++	
 +			Properties config = ReplicationManager.getConfiguration();
 +	
 +            java.util.Enumeration e = config.propertyNames();
@@ -141,12 +155,8 @@ index 0000000..66714ca
 +		if (request.getParameter("submit_repl_list_home") != null) {
 +			message = "Files in home directory:\n\n";
 +			try {
-+				for (DataObject one_do : ReplicationManager.list()) {
-+                    String name = one_do.getFileName();
-+                    if ( null == name ) {
-+                        name = one_do.getRemoteDirPath();
-+                    }
-+					message += name + "\n";
++				for (String f : ReplicationManager.listFilenames()) {
++					message += f + "\n";
 +				}
 +			} catch (Exception e) {
 +				message = e.getLocalizedMessage();
@@ -233,8 +243,8 @@ index 0000000..66714ca
 +				if(file.exists()) {
 +					file.delete();
 +				}
-+				ReplicationManager.retrieveFile(remPath, file.getAbsolutePath());
-+				message = "file retrieved and stored to " + file.getAbsolutePath();
++				ReplicationManager.retriveFile(remPath, file.getAbsolutePath());
++				message = "file retrived and stored to " + file.getAbsolutePath();
 +			} catch (Exception e) {
 +				message += "Could not download path: " + e.toString();
 +			}
@@ -505,7 +515,7 @@ index 434dc39..e3f750d 100644
 +    	
 +    	Request request = ObjectModelHelper.getRequest(objectModel);
 +		
-+		Division div = mainDiv.addDivision("replication_div");
++		Division div = mainDiv.addDivision("irods_div");
 +
 +		// if not initialized try initializing it
 +		if (!ReplicationManager.isInitialized()) {
