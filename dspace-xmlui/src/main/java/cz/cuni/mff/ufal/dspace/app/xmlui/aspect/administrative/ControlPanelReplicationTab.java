@@ -22,8 +22,7 @@ public class ControlPanelReplicationTab extends AbstractControlPanelTab {
 		
 		div.setHead("Replication Service");
 
-		try {
-		
+		try {		
 			ControlPanelReplicationTabHelper.showTabs(div, request, context);
 		} catch(Exception e) {
 			throw new WingException(e);
