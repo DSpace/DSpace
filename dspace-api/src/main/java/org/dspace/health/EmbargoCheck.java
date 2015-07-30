@@ -4,8 +4,6 @@
  * tree and available online at
  *
  * http://www.dspace.org/license/
- *
- * by lindat-dev team
  */
 package org.dspace.health;
 
@@ -18,6 +16,9 @@ import org.dspace.embargo.EmbargoManager;
 
 import java.sql.SQLException;
 
+/**
+ * @author LINDAT/CLARIN dev team
+ */
 public class EmbargoCheck extends Check {
 
     @Override

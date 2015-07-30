@@ -4,8 +4,6 @@
  * tree and available online at
  *
  * http://www.dspace.org/license/
- *
- * by lindat-dev team
  */
 package org.dspace.health;
 
@@ -18,6 +16,7 @@ import static java.util.Calendar.YEAR;
 
 /**
  * Information about a report run accessible by each check.
+ * @author LINDAT/CLARIN dev team
  */
 public class ReportInfo {
 

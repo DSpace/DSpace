@@ -4,8 +4,6 @@
  * tree and available online at
  *
  * http://www.dspace.org/license/
- *
- * by lindat-dev team
  */
 package org.dspace.health;
 
@@ -15,6 +13,9 @@ import org.dspace.storage.rdbms.TableRow;
 import java.sql.SQLException;
 import java.util.Map;
 
+/**
+ * @author LINDAT/CLARIN dev team
+ */
 public class ItemCheck extends Check {
 
     @Override
@@ -23,7 +24,7 @@ public class ItemCheck extends Check {
         int tot_cnt = 0;
         try {
             for (Map.Entry<String, Integer> name_count : Core.getCommunities()) {
-                ret += String.format("Collection [%s]: %d\n",
+                ret += String.format("Community [%s]: %d\n",
                     name_count.getKey(), name_count.getValue());
                 tot_cnt += name_count.getValue();
             }

@@ -4,8 +4,6 @@
  * tree and available online at
  *
  * http://www.dspace.org/license/
- *
- * by lindat-dev team
  */
 package org.dspace.health;
 
@@ -18,6 +16,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * @author LINDAT/CLARIN dev team
+ */
 public class ChecksumCheck extends Check {
 
     @Override
@@ -27,9 +28,6 @@ public class ChecksumCheck extends Check {
         Date process_start = Calendar.getInstance().getTime();
         checker.setProcessStartDate(process_start);
         checker.setDispatcher(
-            // new LimitedCountDispatcher(new SimpleDispatcher(new
-            // BitstreamInfoDAO(), null, false), 1)
-            // loop through all files
             new SimpleDispatcher(new BitstreamInfoDAO(), process_start, false));
 
         md5_collector collector = new md5_collector();
