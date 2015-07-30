@@ -4,8 +4,6 @@
  * tree and available online at
  *
  * http://www.dspace.org/license/
- *
- * by lindat-dev team
  */
 package org.dspace.health;
 
@@ -19,6 +17,9 @@ import org.dspace.embargo.service.EmbargoService;
 import java.sql.SQLException;
 import java.util.Iterator;
 
+/**
+ * @author LINDAT/CLARIN dev team
+ */
 public class EmbargoCheck extends Check {
 
     private static final EmbargoService embargoService = EmbargoServiceFactory.getInstance().getEmbargoService();

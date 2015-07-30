@@ -4,8 +4,6 @@
  * tree and available online at
  *
  * http://www.dspace.org/license/
- *
- * by lindat-dev team
  */
 package org.dspace.health;
 
@@ -16,6 +14,9 @@ import org.dspace.core.ConfigurationManager;
 import java.io.File;
 import java.util.Date;
 
+/**
+ * @author LINDAT/CLARIN dev team
+ */
 public class InfoCheck extends Check {
 
     @Override
@@ -27,9 +28,9 @@ public class InfoCheck extends Check {
         ).append("\n");
 
         sb.append("From - Till: ").append(
-            new SimpleDateFormat("MM/dd/yyyy").format(ri.from().getTime())
+            new SimpleDateFormat("yyyy-MM-dd").format(ri.from().getTime())
         ).append(" - ").append(
-            new SimpleDateFormat("MM/dd/yyyy").format(ri.till().getTime())
+            new SimpleDateFormat("yyyy-MM-dd").format(ri.till().getTime())
         ).append("\n");
 
         sb.append("Url: ").append(

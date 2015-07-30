@@ -4,15 +4,10 @@
  * tree and available online at
  *
  * http://www.dspace.org/license/
- *
- * by lindat-dev team
  */
 package org.dspace.health;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
+import org.apache.commons.cli.*;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
@@ -23,6 +18,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map.Entry;
 
+/**
+ * @author LINDAT/CLARIN dev team
+ */
 public class Report {
 
     private static Logger log = Logger.getLogger(Report.class);
@@ -147,7 +145,9 @@ public class Report {
             for (String check_name: checks().keySet()) {
                 checks_summary += String.format( "%d. %s\n", pos++, check_name );
             }
-            System.out.println( "Available checks:\n" + checks_summary );
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("dspace healthcheck", options);
+            System.out.println( "\nAvailable checks:\n" + checks_summary );
             return;
         }
 
@@ -198,6 +198,7 @@ public class Report {
                     email.send();
                 } catch (Exception e) {
                     log.fatal("Error sending email:", e);
+                    System.err.println("Error sending email:\n" + e.getMessage());
                     System.exit(1);
                 }
             }

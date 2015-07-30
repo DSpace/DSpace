@@ -4,8 +4,6 @@
  * tree and available online at
  *
  * http://www.dspace.org/license/
- *
- * by lindat-dev team
  */
 package org.dspace.health;
 
@@ -13,6 +11,7 @@ import org.apache.log4j.Logger;
 
 /**
  * Abstract check interface.
+ * @author LINDAT/CLARIN dev team
  */
 
 public abstract class Check {

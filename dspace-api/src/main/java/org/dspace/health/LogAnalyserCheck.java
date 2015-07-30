@@ -4,8 +4,6 @@
  * tree and available online at
  *
  * http://www.dspace.org/license/
- *
- * by lindat-dev team
  */
 package org.dspace.health;
 
@@ -17,6 +15,9 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author LINDAT/CLARIN dev team
+ */
 public class LogAnalyserCheck extends Check {
 
     final static private String[][] interesting_fields = new String[][] {
@@ -56,7 +57,7 @@ public class LogAnalyserCheck extends Check {
                 sb.append( String.format("%-17s: %s\n", info[1], info_map.get(info[0])) );
             }
             sb.append( String.format("Items added since [%s] (db): %s\n",
-                new SimpleDateFormat("MM/dd/yyyy").format(ri.from().getTime()),
+                new SimpleDateFormat("yyyy-MM-dd").format(ri.from().getTime()),
                 LogAnalyser.getNumItems(c)));
 
             c.complete();

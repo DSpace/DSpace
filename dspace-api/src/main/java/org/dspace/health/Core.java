@@ -4,66 +4,82 @@
  * tree and available online at
  *
  * http://www.dspace.org/license/
- *
- * by lindat-dev team
  */
 package org.dspace.health;
 
 import org.apache.commons.io.FileUtils;
-import org.dspace.content.Community;
-import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
-import org.dspace.content.Metadatum;
+import org.dspace.app.util.CollectionDropDown;
+import org.dspace.content.*;
+import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+/**
+ * @author LINDAT/CLARIN dev team
+ */
 public class Core {
 
     // get info
     //
     public static String getCollectionSizesInfo() throws SQLException {
-        String ret = "";
+        final StringBuffer ret = new StringBuffer();
         List<TableRow> rows = sql(
-            "SELECT "
-                + "(SELECT text_value FROM metadatavalue "
-                + "WHERE metadata_field_id=64 AND resource_type_id=3 AND resource_id=col.collection_id) AS name, "
-                + "SUM(bit.size_bytes) AS sum "
-                + "FROM collection2item col, item2bundle item, bundle2bitstream bun, bitstream bit "
-                + "WHERE col.item_id=item.item_id AND item.bundle_id=bun.bundle_id AND bun.bitstream_id=bit.bitstream_id "
-                + "GROUP BY col.collection_id;");
+                "SELECT" +
+                        "(SELECT text_value FROM metadatavalue NATURAL JOIN metadatafieldregistry " +
+                            "NATURAL JOIN metadataschemaregistry WHERE element='title' AND qualifier IS NULL AND short_id='dc'" +
+                            " AND resource_type_id=3 AND resource_id=col.collection_id) AS name," +
+                        "SUM(bit.size_bytes) AS sum," +
+                        " collection_id" +
+                        " FROM collection2item col, item2bundle item, bundle2bitstream bun, bitstream bit" +
+                            " WHERE col.item_id=item.item_id AND item.bundle_id=bun.bundle_id AND bun.bitstream_id=bit.bitstream_id " +
+                        "GROUP BY col.collection_id;"
+        );
         long total_size = 0;
+        final Context context = new Context();
+        Collections.sort(rows, new Comparator<TableRow>() {
+            @Override
+            public int compare(TableRow o1, TableRow o2) {
+                try {
+                    return CollectionDropDown.collectionPath(Collection.find(context, o1.getIntColumn("collection_id"))).compareTo(
+                        CollectionDropDown.collectionPath(Collection.find(context, o2.getIntColumn("collection_id")))
+                    );
+                } catch (Exception e) {
+                    ret.append(e.getMessage());
+                }
+                return 0;
+            }
+        });
         for (TableRow row : rows) {
-            double size = row.getLongColumn("sum") / (1024. * 1024.);
+            double size = row.getLongColumn("sum");
             total_size += size;
-            ret += String.format(
-                "\t%s:  %s\n", row.getStringColumn("name"), FileUtils.byteCountToDisplaySize((long)size));
+            Collection col = Collection.find(context, row.getIntColumn("collection_id"));
+            ret.append(String.format(
+                    "\t%s:  %s\n", CollectionDropDown.collectionPath(col), FileUtils.byteCountToDisplaySize((long) size)));
         }
-        ret += String.format(
-            "Total size:              %s\n", FileUtils.byteCountToDisplaySize(total_size));
+	context.abort();
+        ret.append(String.format(
+                "Total size:              %s\n", FileUtils.byteCountToDisplaySize(total_size)));
 
-        ret += String.format(
-            "Resource without policy: %d\n", getBitstreamsWithoutPolicyCount());
+        ret.append(String.format(
+                "Resource without policy: %d\n", getBitstreamsWithoutPolicyCount()));
 
-        ret += String.format(
-            "Deleted bitstreams:      %d\n", getBitstreamsDeletedCount());
+        ret.append(String.format(
+                "Deleted bitstreams:      %d\n", getBitstreamsDeletedCount()));
 
         rows = getBitstreamOrphansRows();
         String list_str = "";
         for (TableRow row : rows) {
             list_str += String.format("%d, ", row.getIntColumn("bitstream_id"));
         }
-        ret += String.format(
-            "Orphan bitstreams:       %d [%s]\n", rows.size(), list_str);
+        ret.append(String.format(
+                "Orphan bitstreams:       %d [%s]\n", rows.size(), list_str));
 
-        return ret;
+        return ret.toString();
     }
 
     public static String getObjectSizesInfo() throws SQLException {
@@ -183,13 +199,14 @@ public class Core {
         Context c = new Context();
         TableRowIterator irows = DatabaseManager
             .query(c,
-                "SELECT eperson_group_id, "
-                    + "(SELECT text_value FROM metadatavalue "
-                    + "WHERE metadata_field_id=64 AND resource_type_id=6 AND resource_id=eperson_group_id) AS name "
-                    + "FROM epersongroup "
-                    + "WHERE eperson_group_id NOT IN (SELECT eperson_group_id FROM epersongroup2eperson)");
+                "SELECT eperson_group_id," +
+                        "(SELECT text_value FROM metadatavalue NATURAL JOIN metadatafieldregistry" +
+                            " NATURAL JOIN metadataschemaregistry WHERE element='title'" +
+                                " AND qualifier IS NULL AND short_id='dc' AND resource_type_id=6 AND resource_id=eperson_group_id) AS name "+
+                        "FROM epersongroup " +
+                        "WHERE eperson_group_id NOT IN (SELECT eperson_group_id FROM epersongroup2eperson)");
         for (TableRow row : irows.toList()) {
-            ret.add( row.getStringColumn("name") );
+            ret.add(String.format("id=%s;name=%s", row.getIntColumn("eperson_group_id"), row.getStringColumn("name") ));
         }
         c.complete();
         return ret;
