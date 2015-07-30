@@ -182,7 +182,7 @@ public final class SpringServiceManager implements ServiceManagerSystem {
             log.warn("TEST Spring Service Manager running in test mode, no dspace home spring files will be loaded");
         } else {
             //Retrieve all our spring file locations depending on the deployed module
-            String[] springLoaderClassNames = configurationService.getPropertyAsType("spring.springloader.modules", new String[0]);
+            String[] springLoaderClassNames = configurationService.getArrayProperty("spring.springloader.modules");
             if(springLoaderClassNames != null){
                 for(String springLoaderClassName : springLoaderClassNames){
                     try {

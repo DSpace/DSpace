@@ -65,16 +65,29 @@ public final class DSpaceConfigurationService implements ConfigurationService {
     // Current Home directory
     private String homePath = null;
 
+    /**
+     * Initializes a ConfigurationService based on default values. The DSpace
+     * Home directory is determined based on system properties / searching.
+     * <P>
+     * See loadInitialConfig() for more details
+     */
     public DSpaceConfigurationService() {
         // init and load up current config settings
         loadInitialConfig(null);
     }
 
+    /**
+     * Initializes a ConfigurationService based on the provided home directory
+     * for DSpace
+     * @param providedHome
+     */
     public DSpaceConfigurationService(String providedHome) {
 		loadInitialConfig(providedHome);
 	}
 
-    /* (non-Javadoc)
+    /**
+     * Returns all loaded properties as a Properties object.
+     *
      * @see org.dspace.services.ConfigurationService#getProperties()
      */
     @Override
@@ -83,7 +96,9 @@ public final class DSpaceConfigurationService implements ConfigurationService {
         return ConfigurationConverter.getProperties(configuration);
     }
 
-    /* (non-Javadoc)
+    /**
+     * Returns all Property keys.
+     *
      * @see org.dspace.services.ConfigurationService#getPropertyKeys()
      */
     @Override
@@ -99,7 +114,9 @@ public final class DSpaceConfigurationService implements ConfigurationService {
         return keyList;
     }
 
-    /* (non-Javadoc)
+    /**
+     * Returns all Property keys that begin with a given prefix.
+     *
      * @see org.dspace.services.ConfigurationService#getPropertyKeys(java.lang.String)
      */
     @Override
@@ -115,7 +132,9 @@ public final class DSpaceConfigurationService implements ConfigurationService {
         return keyList;
     }
 
-    /* (non-Javadoc)
+    /**
+     * Returns all loaded properties as a Configuration object.
+     *
      * @see org.dspace.services.ConfigurationService#getConfiguration()
      */
     @Override
@@ -123,7 +142,10 @@ public final class DSpaceConfigurationService implements ConfigurationService {
         return configuration;
     }
 
-    /* (non-Javadoc)
+    /**
+     * Returns property value as an Object.
+     * If property is not found, null is returned.
+     *
      * @see org.dspace.services.ConfigurationService#getPropertyValue(java.lang.Object)
      */
     @Override
@@ -131,7 +153,10 @@ public final class DSpaceConfigurationService implements ConfigurationService {
         return configuration.getProperty(name);
     }
 
-    /* (non-Javadoc)
+    /**
+     * Returns property value as a String.
+     * If property is not found, null is returned.
+     *
      * @see org.dspace.services.ConfigurationService#getProperty(java.lang.String)
      */
     @Override
@@ -139,7 +164,10 @@ public final class DSpaceConfigurationService implements ConfigurationService {
         return getProperty(name, null);
     }
 
-    /* (non-Javadoc)
+    /**
+     * Returns property value as a String.
+     * If property is not found, default value is returned.
+     *
      * @see org.dspace.services.ConfigurationService#getProperty(java.lang.String, java.lang.String)
      */
     @Override
@@ -147,14 +175,21 @@ public final class DSpaceConfigurationService implements ConfigurationService {
         return (String) getPropertyAsType(name, defaultValue);
     }
 
-    /* (non-Javadoc)
+    /**
+     * Returns property value as an array.
+     * If property is not found, an empty array is returned.
+     *
      * @see org.dspace.services.ConfigurationService#getArrayProperty(java.lang.String)
      */
     @Override
     public String[] getArrayProperty(String name) {
         return getArrayProperty(name, new String[0]);
     }
-    /* (non-Javadoc)
+
+    /**
+     * Returns property value as an array.
+     * If property is not found, default value is returned.
+     *
      * @see org.dspace.services.ConfigurationService#getArrayProperty(java.lang.String, java.lang.String[])
      */
     @Override
@@ -162,14 +197,21 @@ public final class DSpaceConfigurationService implements ConfigurationService {
         return getPropertyAsType(name, defaultValue);
     }
 
-    /* (non-Javadoc)
+    /**
+     * Returns property value as a boolean value.
+     * If property is not found, false is returned.
+     *
      * @see org.dspace.services.ConfigurationService#getBooleanProperty(java.lang.String)
      */
     @Override
     public boolean getBooleanProperty(String name) {
         return getBooleanProperty(name, false);
     }
-    /* (non-Javadoc)
+
+    /**
+     * Returns property value as a boolean value.
+     * If property is not found, default value is returned.
+     *
      * @see org.dspace.services.ConfigurationService#getBooleanProperty(java.lang.String, boolean)
      */
     @Override
@@ -177,7 +219,14 @@ public final class DSpaceConfigurationService implements ConfigurationService {
         return getPropertyAsType(name, defaultValue);
     }
 
-    /* (non-Javadoc)
+    /**
+     * Returns property value as an int value.
+     * If property is not found, 0 is returned.
+     * <P>
+     * If you wish to avoid the 0 return value, you can use
+     * hasProperty() to first determine whether the property
+     * exits. Or, use getIntProperty(name,defaultValue).
+     *
      * @see org.dspace.services.ConfigurationService#getIntProperty(java.lang.String)
      */
     @Override
@@ -185,7 +234,10 @@ public final class DSpaceConfigurationService implements ConfigurationService {
         return getIntProperty(name, 0);
     }
 
-    /* (non-Javadoc)
+    /**
+     * Returns property value as an int value.
+     * If property is not found, default value is returned.
+     *
      * @see org.dspace.services.ConfigurationService#getIntProperty(java.lang.String, int)
      */
     @Override
@@ -193,7 +245,14 @@ public final class DSpaceConfigurationService implements ConfigurationService {
         return getPropertyAsType(name, defaultValue);
     }
 
-    /* (non-Javadoc)
+    /**
+     * Returns property value as a long value.
+     * If property is not found, 0 is returned.
+     * <P>
+     * If you wish to avoid the 0 return value, you can use
+     * hasProperty() to first determine whether the property
+     * exits. Or, use getLongProperty(name,defaultValue).
+     *
      * @see org.dspace.services.ConfigurationService#getLongProperty(java.lang.String)
      */
     @Override
@@ -201,7 +260,10 @@ public final class DSpaceConfigurationService implements ConfigurationService {
         return getLongProperty(name, 0);
     }
 
-    /* (non-Javadoc)
+    /**
+     * Returns property value as a long value.
+     * If property is not found, default value is returned.
+     *
      * @see org.dspace.services.ConfigurationService#getLongProperty(java.lang.String,long)
      */
     @Override
@@ -256,7 +318,8 @@ public final class DSpaceConfigurationService implements ConfigurationService {
     }
 
 
-    /* (non-Javadoc)
+    /**
+     * Determine if a given property key exists within the currently loaded configuration
      * @see org.dspace.services.ConfigurationService#hasProperty(java.lang.String)
      */
     @Override
@@ -304,7 +367,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
     }
 
     /**
-     * Load a series of properties into the configuration.
+     * Load (i.e. Add) a series of properties into the configuration.
      * Checks to see if the settings exist or are changed and only loads
      * changes.
      * <P>
@@ -342,7 +405,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
     }
 
     /**
-     * Loads a single additional config setting into the system.
+     * Loads (i.e. Adds) a single additional config setting into the system.
      * @param key
      * @param value
      * @return true if the config is new or changed
