@@ -33,6 +33,8 @@ public class ControlPanelHarvestingTab extends AbstractControlPanelTab
 
     private static final Message T_harvest_label_status = message("xmlui.administrative.ControlPanel.harvest_label_status");
 
+    private static final Message T_harvest_status_refresh = message("xmlui.administrative.ControlPanel.harvest_status_refresh");
+
     private static final Message T_harvest_label_actions = message("xmlui.administrative.ControlPanel.harvest_label_actions");
 
     private static final Message T_harvest_submit_start = message("xmlui.administrative.ControlPanel.harvest_submit_start");
@@ -73,7 +75,7 @@ public class ControlPanelHarvestingTab extends AbstractControlPanelTab
         harvesterControls.addLabel(T_harvest_label_status);
         Item status = harvesterControls.addItem();
         status.addContent(HarvestScheduler.getStatus());
-        status.addXref(contextPath + "/admin/panel?harvest", "(refresh)");
+        status.addXref(contextPath + "/admin/panel?tab=Harvesting", T_harvest_status_refresh);
 
         harvesterControls.addLabel(T_harvest_label_actions);
         Item actionsItem = harvesterControls.addItem();
