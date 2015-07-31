@@ -1467,7 +1467,7 @@ table.discovery-filters th.new-filter-header
     float:right;
 }
 
-# Restore standard styling of lists in class ds-ordered-list
+/* Restore standard styling of lists in class ds-ordered-list */
 
 ol.ds-ordered-list {
     list-style-type: decimal;
