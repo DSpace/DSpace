@@ -9,8 +9,8 @@ package org.dspace.statistics.util;
 
 import mockit.Mock;
 import mockit.MockUp;
+import org.dspace.AbstractUnitTest;
 import org.dspace.statistics.SolrLogger;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
@@ -19,7 +19,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author mwood
  */
-public class SpiderDetectorTest
+public class SpiderDetectorTest extends AbstractUnitTest
 {
     private static final String NOT_A_BOT_ADDRESS = "192.168.0.1";
 
