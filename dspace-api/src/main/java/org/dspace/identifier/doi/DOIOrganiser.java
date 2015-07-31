@@ -179,19 +179,19 @@ public class DOIOrganiser {
         
         if (line.hasOption('l'))
         {
-            organiser.list("reservation", null, null, DOIIdentifierProvider.TO_BE_RESERVERED);
+            organiser.list("reservation", null, null, DOIIdentifierProvider.TO_BE_RESERVED);
             organiser.list("registration", null, null, DOIIdentifierProvider.TO_BE_REGISTERED);
             organiser.list("update", null, null,
-                    DOIIdentifierProvider.UPDATE_BEFORE_REGISTERATION,
+                    DOIIdentifierProvider.UPDATE_BEFORE_REGISTRATION,
                     DOIIdentifierProvider.UPDATE_REGISTERED,
-                    DOIIdentifierProvider.UPDATE_RESERVERED);
+                    DOIIdentifierProvider.UPDATE_RESERVED);
             organiser.list("deletion", null, null, DOIIdentifierProvider.TO_BE_DELETED);
         }
 
         if (line.hasOption('s'))
         {
             TableRowIterator it = organiser
-                                    .getDOIsByStatus(DOIIdentifierProvider.TO_BE_RESERVERED);
+                                    .getDOIsByStatus(DOIIdentifierProvider.TO_BE_RESERVED);
            
             try { 
                 if (!it.hasNext()) 
@@ -244,8 +244,8 @@ public class DOIOrganiser {
         if (line.hasOption('u'))
         {
             TableRowIterator it = organiser.getDOIsByStatus(
-                    DOIIdentifierProvider.UPDATE_BEFORE_REGISTERATION,
-                    DOIIdentifierProvider.UPDATE_RESERVERED,
+                    DOIIdentifierProvider.UPDATE_BEFORE_REGISTRATION,
+                    DOIIdentifierProvider.UPDATE_RESERVED,
                     DOIIdentifierProvider.UPDATE_REGISTERED);
            
             try { 
