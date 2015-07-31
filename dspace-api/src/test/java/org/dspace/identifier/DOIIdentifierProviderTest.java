@@ -568,7 +568,7 @@ public class DOIIdentifierProviderTest
         assumeNotNull(doiRow);
         
         assertTrue("Reservation of DOI did not set the corret DOI status.",
-                DOIIdentifierProvider.TO_BE_RESERVERED.intValue() == doiRow.getIntColumn("status"));
+                DOIIdentifierProvider.TO_BE_RESERVED.intValue() == doiRow.getIntColumn("status"));
     }
     
     @Test
