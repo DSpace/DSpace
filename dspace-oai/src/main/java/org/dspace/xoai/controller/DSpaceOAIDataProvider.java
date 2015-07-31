@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.xoai.services.api.cache.XOAICacheService;
+import org.dspace.xoai.services.api.config.ConfigurationService;
 import org.dspace.xoai.services.api.config.XOAIManagerResolver;
 import org.dspace.xoai.services.api.config.XOAIManagerResolverException;
 import org.dspace.xoai.services.api.context.ContextService;
@@ -71,6 +72,10 @@ public class DSpaceOAIDataProvider
     @Autowired ItemRepositoryResolver itemRepositoryResolver;
     @Autowired IdentifyResolver identifyResolver;
     @Autowired SetRepositoryResolver setRepositoryResolver;
+
+    @Autowired
+    private ConfigurationService configurationService;
+
 
     private DSpaceResumptionTokenFormatter resumptionTokenFormat = new DSpaceResumptionTokenFormatter();
 
@@ -183,7 +188,7 @@ public class DSpaceOAIDataProvider
     @RequestMapping("/{context}")
     public String contextAction (Model model, HttpServletRequest request, HttpServletResponse response, @PathVariable("context") String xoaiContext) throws IOException, ServletException {
 
-        if(ConfigurationManager.getBooleanProperty("lr", "lr.tracker.enabled")) {
+        if(configurationService.getBooleanProperty("lr", "lr.tracker.enabled", false)) {
             // Track the OAI request for analytics platform
             TrackerFactory.createInstance(TrackingSite.OAI).trackPage(request, "LINDAT/CLARIN OAI-PMH Data Provider Endpoint");
         }
