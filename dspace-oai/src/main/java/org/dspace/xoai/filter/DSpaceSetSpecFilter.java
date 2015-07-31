@@ -92,7 +92,30 @@ public class DSpaceSetSpecFilter extends DSpaceFilter
 					return new SolrFilterResult("item.communities:"
 							+ ClientUtils.escapeQueryChars(setSpec));
 				}
-			}
+			}else if (setSpec.startsWith("col_"))
+            {
+                try
+                {
+                    return new SolrFilterResult("item.collections:"
+                            + ClientUtils.escapeQueryChars(setSpec));
+                }
+                catch (Exception ex)
+                {
+                    log.error(ex.getMessage(), ex);
+                }
+            }
+            else if (setSpec.startsWith("com_"))
+            {
+                try
+                {
+                    return new SolrFilterResult("item.communities:"
+                            + ClientUtils.escapeQueryChars(setSpec));
+                }
+                catch (Exception e)
+                {
+                    log.error(e.getMessage(), e);
+                }
+            }
 		} catch (Exception ex) {
 			log.error(ex.getMessage(), ex);
 		}
