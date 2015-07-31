@@ -581,7 +581,7 @@
             <script type="text/javascript" src="{$theme-path}/lib/select2/select2.js">&#160;</script>
         </xsl:if>
 
-        <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='controlpanel']">
+        <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI']='admin/panel'">
             <script type="text/javascript" src="{$theme-path}/lib/js/ufal-controlpanel.js">&#160;</script>
         </xsl:if>
 
