@@ -32,10 +32,12 @@ Your data package has been assigned a unique identifier, called a DOI. This DOI 
 
 REVIEWER ACCESS TO YOUR DRYAD DATA
 
-Journal editors and anonymous peer reviewers may view the submission for review purposes using the following url:
+Journal editors and anonymous peer reviewers may access your submission using the following temporary url:
 {4}
 
-This url will be functional only temporarily. If/when your publication is accepted, your Dryad submission will move out of review and into our queue for curation and archiving.
+This url SHOULD NOT be included in the manuscript. Please use your Dryad DOI (above) instead. 
+
+If/when we receive notice from the journal that your publication is accepted, your Dryad submission will move out of review and into our queue for curation and archiving.
 
 
 MODIFYING YOUR DRYAD SUBMISSION
