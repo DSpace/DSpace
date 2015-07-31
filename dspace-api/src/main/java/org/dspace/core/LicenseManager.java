@@ -12,12 +12,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import org.dspace.utils.DSpace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -140,7 +140,7 @@ public class LicenseManager
      */
     private static void init()
     {
-        File licenseFile = new File(ConfigurationManager.getProperty("dspace.dir")
+        File licenseFile = new File(new DSpace().getConfigurationService().getProperty("dspace.dir")
                 + File.separator + "config" + File.separator + "default.license");
 
         FileInputStream  fir = null;
