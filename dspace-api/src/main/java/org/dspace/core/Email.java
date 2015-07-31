@@ -37,6 +37,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import org.apache.log4j.Logger;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.EmailService;
 import org.dspace.utils.DSpace;
 
@@ -45,7 +46,7 @@ import org.dspace.utils.DSpace;
  * <P>
  * Typical use:
  * <P>
- * <code>Email email = ConfigurationManager.getEmail(name);</code><br>
+ * <code>Email email = new Email();</code><br>
  * <code>email.addRecipient("foo@bar.com");</code><br>
  * <code>email.addArgument("John");</code><br>
  * <code>email.addArgument("On the Testing of DSpace");</code><br>
@@ -236,14 +237,16 @@ public class Email
      */
     public void send() throws MessagingException, IOException
     {
+        ConfigurationService config = new DSpace().getConfigurationService();
+
         // Get the mail configuration properties
-        String from = ConfigurationManager.getProperty("mail.from.address");
-        boolean disabled = ConfigurationManager.getBooleanProperty("mail.server.disabled", false);
+        String from = config.getProperty("mail.from.address");
+        boolean disabled = config.getBooleanProperty("mail.server.disabled", false);
 
         // If no character set specified, attempt to retrieve a default
         if (charset == null)
         {
-            charset = ConfigurationManager.getProperty("mail.charset");
+            charset = config.getProperty("mail.charset");
         }
 
         // Get session
@@ -462,10 +465,11 @@ public class Email
      */
     public static void main(String[] args)
     {
-        String to = ConfigurationManager.getProperty("mail.admin");
+        ConfigurationService config = new DSpace().getConfigurationService();
+        String to = config.getProperty("mail.admin");
         String subject = "DSpace test email";
-        String server = ConfigurationManager.getProperty("mail.server");
-        String url = ConfigurationManager.getProperty("dspace.url");
+        String server = config.getProperty("mail.server");
+        String url = config.getProperty("dspace.url");
         Email e = new Email();
         e.setSubject(subject);
         e.addRecipient(to);
@@ -474,7 +478,7 @@ public class Email
         System.out.println(" - To: " + to);
         System.out.println(" - Subject: " + subject);
         System.out.println(" - Server: " + server);
-        boolean disabled = ConfigurationManager.getBooleanProperty("mail.server.disabled", false);
+        boolean disabled = config.getBooleanProperty("mail.server.disabled", false);
         try
         {
             if( disabled)

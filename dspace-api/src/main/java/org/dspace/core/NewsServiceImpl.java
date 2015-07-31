@@ -16,8 +16,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-
 import org.dspace.core.service.NewsService;
+import org.dspace.utils.DSpace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,8 +95,8 @@ public class NewsServiceImpl implements NewsService
     @Override
     public String getNewsFilePath()
     {
-
-        return ConfigurationManager.getProperty("dspace.dir")
+        String filePath = new DSpace().getConfigurationService().getProperty("dspace.dir")
                 + File.separator + "config" + File.separator;
+        return filePath;
     }
 }
