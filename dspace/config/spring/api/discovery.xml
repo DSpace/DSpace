@@ -230,6 +230,7 @@
                 <ref bean="searchFilterAdvisor" />
                 <ref bean="searchFilterDiscipline" />
                 <ref bean="searchFilterThesisSemester" />
+                <ref bean="searchFilterLanguage" />
             </list>
         </property>
         <!-- Set TagCloud configuration per discovery configuration -->
