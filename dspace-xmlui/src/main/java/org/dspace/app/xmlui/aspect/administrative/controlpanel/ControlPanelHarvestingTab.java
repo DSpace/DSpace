@@ -75,7 +75,7 @@ public class ControlPanelHarvestingTab extends AbstractControlPanelTab
         harvesterControls.addLabel(T_harvest_label_status);
         Item status = harvesterControls.addItem();
         status.addContent(HarvestScheduler.getStatus());
-        status.addXref(contextPath + "/admin/panel?tab=Harvesting", T_harvest_status_refresh);
+        status.addXref(this.web_link, T_harvest_status_refresh);
 
         harvesterControls.addLabel(T_harvest_label_actions);
         Item actionsItem = harvesterControls.addItem();

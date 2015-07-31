@@ -159,8 +159,8 @@ public class ControlPanelJavaTab extends AbstractControlPanelTab
             Item defaultSize = cocoon.addItem();
             defaultSize.addContent(String.valueOf(this.storeDefault.size())
                     + "  ");
-            defaultSize.addXref(contextPath
-                    + "/admin/panel?tab=Java Information&clearcache=true",
+            defaultSize.addXref(this.web_link
+                    + "&clearcache=true",
                     T_COCOON_CACHE_CLEAR);
         }
 
