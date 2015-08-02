@@ -37,6 +37,7 @@ install:
 
 script:
   - make test_dspace_database
+  - ls -lah /tmp/dspace/opt/lindat-dspace/installation/config/modules/
   - make test_utilities_database
   - cd $FS/ && mvn -Dmaven.test.skip=false -Dtest=cz.cuni.mff.ufal.dspace.**.*Test,cz.cuni.mff.ufal.*Test -DfailIfNoTests=false test | grep -v "Download"
   - cd $FS/utilities/project_helpers/scripts
