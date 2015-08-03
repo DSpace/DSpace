@@ -2,10 +2,11 @@
 # LINDAT/CLARIN repository
 
 * developed at: [Institute of Formal and Applied Linguistics, Charles University in Prague](http://ufal.mff.cuni.cz/)
-* deployed at: [https://lindat.mff.cuni.cz/repository/xmlui/]
-* contact: [https://lindat.mff.cuni.cz/en/about-lindat-clarin]
-* wiki: [https://github.com/ufal/lindat-dspace/wiki]
-* older version built on DSpace 1.8.2: [https://github.com/ufal/lindat-repository]
+* deployed at: https://lindat.mff.cuni.cz/repository/xmlui/
+* contact: https://lindat.mff.cuni.cz/en/about-lindat-clarin
+* wiki: https://github.com/ufal/lindat-dspace/wiki
+* release notes: [Release Notes](wiki/ReleaseNotes)
+* older version built on DSpace 1.8.2: https://github.com/ufal/lindat-repository-obsolete
 
 
 
