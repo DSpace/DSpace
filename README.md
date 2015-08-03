@@ -5,7 +5,7 @@
 * deployed at: https://lindat.mff.cuni.cz/repository/xmlui/
 * contact: https://lindat.mff.cuni.cz/en/about-lindat-clarin
 * wiki: https://github.com/ufal/lindat-dspace/wiki
-* release notes: [Release Notes](wiki/ReleaseNotes)
+* release notes: [Release Notes](https://github.com/ufal/lindat-dspace/wiki/ReleaseNotes)
 * older version built on DSpace 1.8.2: https://github.com/ufal/lindat-repository-obsolete
 
 
