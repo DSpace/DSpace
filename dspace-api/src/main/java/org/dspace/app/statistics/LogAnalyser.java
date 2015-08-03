@@ -161,7 +161,10 @@ public class LogAnalyser
    
    /** a pattern to match a valid version 1.3 log file line */
    private static Pattern valid13 = null;
-   
+
+  /** basic log line */
+   private static Pattern validBase = null;
+
    /** a pattern to match a valid version 1.4 log file line */
    private static Pattern valid14 = null;
    
@@ -388,7 +391,7 @@ public class LogAnalyser
                 {
                     // get the log line object
                     LogLine logLine = getLogLine(line);
-                    
+
                     // if there are line segments get on with the analysis
                     if (logLine != null)
                     {
@@ -439,7 +442,7 @@ public class LogAnalyser
                                 logEndDate = logLine.getDate();
                             }
                         }
-                        
+
                         // count the warnings
                         if (logLine.isLevel("WARN"))
                         {
@@ -450,9 +453,13 @@ public class LogAnalyser
                         // count the exceptions
                         if (logLine.isLevel("ERROR"))
                         {
-                        	excCount++;
+                            excCount++;
                         }
-                        
+
+                        if ( null == logLine.getAction() ) {
+                            continue;
+                        }
+
                         // is the action a search?
                         if (logLine.isAction("search"))
                         {
@@ -831,10 +838,12 @@ public class LogAnalyser
         singleRX = Pattern.compile("( . |^. | .$)");
         
         // set up the standard log file line regular expression
+        String logLineBase = "^(\\d\\d\\d\\d-\\d\\d\\-\\d\\d) \\d\\d:\\d\\d:\\d\\d,\\d\\d\\d (\\w+)\\s+\\S+ @ (.*)";
         String logLine13 = "^(\\d\\d\\d\\d-\\d\\d\\-\\d\\d) \\d\\d:\\d\\d:\\d\\d,\\d\\d\\d (\\w+)\\s+\\S+ @ ([^:]+):[^:]+:([^:]+):(.*)";
         String logLine14 = "^(\\d\\d\\d\\d-\\d\\d\\-\\d\\d) \\d\\d:\\d\\d:\\d\\d,\\d\\d\\d (\\w+)\\s+\\S+ @ ([^:]+):[^:]+:[^:]+:([^:]+):(.*)";
         valid13 = Pattern.compile(logLine13);
         valid14 = Pattern.compile(logLine14);
+        validBase = Pattern.compile(logLineBase);
         
         // set up the pattern for validating log file names
         logRegex = Pattern.compile(fileTemplate);
@@ -1198,6 +1207,16 @@ public class LogAnalyser
         }
         else
         {
+            match = validBase.matcher(line);
+            if ( match.matches() ) {
+                LogLine logLine = new LogLine(parseDate(match.group(1).trim()),
+                    LogManager.unescapeLogField(match.group(2)).trim(),
+                    null,
+                    null,
+                    null
+                );
+                return logLine;
+            }
             return null;
         }
     }
