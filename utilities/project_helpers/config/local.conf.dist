@@ -147,6 +147,7 @@ backup2l.generations = 4
 
 # iRods specific for EUDAT
 lr.replication.eudat.on=false
+lr.replication.eudat.protocol=irods
 lr.replication.eudat.host=
 lr.replication.eudat.port=
 lr.replication.eudat.username=
@@ -156,6 +157,7 @@ lr.replication.eudat.homedirectory=
 lr.replication.eudat.replicadirectory=
 lr.replication.eudat.zone=
 lr.replication.eudat.defaultstorage=
+lr.replication.eudat.id=
 lr.replication.eudat.notification_email=${info.recipient}
 # default is not set
 lr.replication.jargon.numThreads=
