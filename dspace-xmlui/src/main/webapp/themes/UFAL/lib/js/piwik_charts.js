@@ -76,7 +76,7 @@ jQuery(document).ready(function (){
 
 					series: [
 						{highlighter: {formatString: "%s<BR/><strong style='font-size: 14px;'>%s</strong> Visits"}},
-						{highlighter: {formatString: "%s<BR/><strong style='font-size: 14px;'>%s</strong> Downlaods"}}
+						{highlighter: {formatString: "%s<BR/><strong style='font-size: 14px;'>%s</strong> Downloads"}}
 					],
 
                         		highlighter: {
