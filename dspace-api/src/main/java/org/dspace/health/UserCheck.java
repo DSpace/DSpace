@@ -67,7 +67,7 @@ public class UserCheck extends Check {
             "%-20s: %d\n", "Have email", info.get("Have email"));
         for (Map.Entry<String, Integer> e : info.entrySet()) {
             if (!e.getKey().equals("Count") && !e.getKey().equals("Have email")) {
-                ret += String.format("%-20s: %s\n", e.getKey(),
+                ret += String.format("%-21s: %s\n", e.getKey(),
                     String.valueOf(e.getValue()));
             }
         }

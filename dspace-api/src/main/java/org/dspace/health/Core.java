@@ -92,7 +92,7 @@ public class Core {
             TableRowIterator irows = DatabaseManager.query(c,
                 "SELECT COUNT(*) from " + tb);
             List<TableRow> rows = irows.toList();
-            ret += String.format("Count %s: %s\n", tb,
+            ret += String.format("Count %-14s: %s\n", tb,
                 String.valueOf(rows.get(0).getLongColumn("count")));
         }
 
