@@ -418,7 +418,7 @@ public class HibernateFunctionalityManager implements IFunctionalities {
 	public static void main(String args[]) {
 		try {
 			//expecting INSTALL_DIR in args[0]
-			String dspace_path = "file://" + args[0] + "/config/modules/lr.cfg";
+			String dspace_path = args[0] + "/config/" + Variables.default_config_file;
 			Variables.init(dspace_path);
 			System.out
 					.println(String
