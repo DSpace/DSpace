@@ -29,39 +29,38 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 public class PiwikHelper {
-	
+
+
 	public static String mergeXML(String report, String downloadReport) throws Exception {
+		/**
+		 * add page views from downloadReport as nb_downloads to report
+		 */
 		Document reportDoc = loadXMLFromString(report);
 		Document downloadReportDoc = loadXMLFromString(downloadReport);
 		
 		XPathFactory xpathFactory = XPathFactory.newInstance();
 		XPath xpath = xpathFactory.newXPath();
 		XPathExpression resExpr = xpath.compile("//result");
-		XPathExpression pageViewsExpr = xpath.compile("//nb_pageviews");
-		XPathExpression uniqPageViewsExpr = xpath.compile("//nb_uniq_pageviews");
-		XPathExpression downExpr = xpath.compile("//nb_downloads");
-		XPathExpression uniqDownExpr = xpath.compile("//nb_uniq_downloads");		
+		XPathExpression downExpr = xpath.compile("./nb_downloads");
+		XPathExpression uniqDownExpr = xpath.compile("./nb_uniq_downloads");
 				
 		NodeList rRows = (NodeList)resExpr.evaluate(reportDoc, XPathConstants.NODESET);
-		NodeList dRows = (NodeList)resExpr.evaluate(downloadReportDoc, XPathConstants.NODESET);
-				
+
 		for(int i=0;i<rRows.getLength();i++) {
 			Node rRow = rRows.item(i);
-			Node dRow = dRows.item(i);
-			if(!dRow.hasChildNodes()) continue;			
 			if(!rRow.hasChildNodes()) {
 				Element nb_visits = reportDoc.createElement("nb_visits");
-				nb_visits.setNodeValue("0");
+				nb_visits.setTextContent("0");
 				Element nb_uniq_visitors = reportDoc.createElement("nb_uniq_visitors");
-				nb_uniq_visitors.setNodeValue("0");
+				nb_uniq_visitors.setTextContent("0");
 				Element nb_pageviews = reportDoc.createElement("nb_pageviews");
-				nb_pageviews.setNodeValue("0");
+				nb_pageviews.setTextContent("0");
 				Element nb_uniq_pageviews = reportDoc.createElement("nb_uniq_pageviews");
-				nb_uniq_pageviews.setNodeValue("0");
+				nb_uniq_pageviews.setTextContent("0");
 				Element nb_downloads = reportDoc.createElement("nb_downloads");
-				nb_downloads.setNodeValue("0");
+				nb_downloads.setTextContent("0");
 				Element nb_uniq_downloads = reportDoc.createElement("nb_uniq_downloads");
-				nb_uniq_downloads.setNodeValue("0");
+				nb_uniq_downloads.setTextContent("0");
 				rRow.appendChild(nb_visits);
 				rRow.appendChild(nb_uniq_visitors);
 				rRow.appendChild(nb_pageviews);
@@ -69,15 +68,19 @@ public class PiwikHelper {
 				rRow.appendChild(nb_downloads);
 				rRow.appendChild(nb_uniq_downloads);
 			}
-			Node dv = (Node)pageViewsExpr.evaluate(dRow, XPathConstants.NODE);
-			Node duv = (Node)uniqPageViewsExpr.evaluate(dRow, XPathConstants.NODE);
-			Node rd = (Node)downExpr.evaluate(rRow, XPathConstants.NODE);
-			Node rud = (Node)uniqDownExpr.evaluate(rRow, XPathConstants.NODE);
-			
-			rd.setTextContent(dv.getTextContent());
-			rud.setTextContent(duv.getTextContent());
 
-		}		
+			Node down = (Node) downExpr.evaluate(rRow, XPathConstants.NODE);
+			Node uniqDown = (Node) uniqDownExpr.evaluate(rRow, XPathConstants.NODE);
+			XPathExpression pvExpr = xpath.compile(String.format("/results/result[@%s]/nb_pageviews/text()", rRow.getAttributes().getNamedItem("date")));
+			XPathExpression upvExpr = xpath.compile(String.format("/results/result[@%s]/nb_uniq_pageviews/text()", rRow.getAttributes().getNamedItem("date")));
+
+			int pvCount = ((Double)pvExpr.evaluate(downloadReportDoc, XPathConstants.NUMBER)).intValue();
+			int upvCount = ((Double)upvExpr.evaluate(downloadReportDoc, XPathConstants.NUMBER)).intValue();
+
+			down.setTextContent(Integer.toString(pvCount));
+			uniqDown.setTextContent(Integer.toString(upvCount));
+		}
+
 		Transformer tf = TransformerFactory.newInstance().newTransformer();
 		tf.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
 		tf.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -87,6 +90,9 @@ public class PiwikHelper {
 	}
 	
 	public static String mergeJSON(String report, String downloadReport) throws Exception {
+		/**
+		 * add page views from downloadReport as nb_downloads to report
+		 */
 		JSONParser parser = new JSONParser();
 		JSONObject reportJSON = (JSONObject)parser.parse(report);
 		JSONObject downloadReportJSON = (JSONObject)parser.parse(downloadReport);
