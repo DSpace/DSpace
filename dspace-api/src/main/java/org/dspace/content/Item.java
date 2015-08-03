@@ -41,7 +41,6 @@ import org.dspace.identifier.IdentifierService;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
-import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 import org.dspace.versioning.VersioningService;
 
@@ -1205,12 +1204,6 @@ public class Item extends DSpaceObject
 
         ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(),
                 "WITHDRAW", getIdentifiers(ourContext)));
-        
-		new DSpace().getEventService().fireEvent(
-				new UsageEvent(UsageEvent.Action.WITHDRAW, new DSpace()
-						.getRequestService().getCurrentRequest()
-						.getHttpServletRequest(), ourContext, this));
-			
 
         // remove all authorization policies, saving the custom ones
         AuthorizeManager.removeAllPoliciesByDSOAndTypeNotEqualsTo(ourContext, this, ResourcePolicy.TYPE_CUSTOM);
@@ -1264,12 +1257,6 @@ public class Item extends DSpaceObject
 
         ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(),
                 "REINSTATE", getIdentifiers(ourContext)));
-
-		new DSpace().getEventService().fireEvent(
-				new UsageEvent(UsageEvent.Action.REINSTATE, new DSpace()
-						.getRequestService().getCurrentRequest()
-						.getHttpServletRequest(), ourContext, this));
-			
 
         // authorization policies
         if (colls.length > 0)

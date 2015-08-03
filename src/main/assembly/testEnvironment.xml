@@ -88,7 +88,9 @@
                         <directory>src/test/data</directory>
                         <includes>
                             <include>dspace.cfg.more</include>
+                            <include>lindat.cfg.more</include>
                         </includes>
+                        <filtered>true</filtered>
                     </fileSet>
                 </fileSets>
             </sources>

@@ -56,10 +56,6 @@ public class CreateStatReport {
 	/**User context*/
 	private static Context context;
 	
-	static {
-		DSpaceApi.load_dspace();
-	}
-
     /** the config file from which to configure the analyser */
     private static String configFile = ConfigurationManager.getProperty("dspace.dir") +
                             File.separator + "config" + File.separator +

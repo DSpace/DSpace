@@ -36,12 +36,6 @@ public class ShibbolethMailAcceptation {
 		System.out.println("CHECKING THE EMAIL");
 		log.log(Level.INFO, "Starting the check of the email!");
 
-		// If the plugin is not enabled, we should not do anything
-		//if (!FunctionalityManager.manager
-		//		.isFunctionalityEnabled("lr.mail.acceptation")) {
-		//	return email;
-		//}
-
 		// In case of any problems, we set the error message in forward.
 		if (email != null)
 			Variables

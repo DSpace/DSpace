@@ -73,8 +73,8 @@ class dspace_database( object ):
     def __init__(self, dspace_conf):
         self.con = None
         db = dspace_conf["lr.database"]
-        u = dspace_conf["lr.db.username"]
-        p = dspace_conf["lr.db.password"]
+        u = dspace_conf["db.username"]
+        p = dspace_conf["db.password"]
 
         if db is None:
             _logger.info( "DSpace config could not be parsed correctly" )

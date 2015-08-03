@@ -1,0 +1,9 @@
+# lindat-dspace uses local.properties where a lot of properties are defined
+# - put all variables wrongly substituted for testing in dspace.cfg/lr.cfg here
+# and they will be put to the end of *both* files!
+
+# use this for testing!
+dspace.dir = ${dspace.test.install.dir}
+
+# use h2 in memory for testing
+lr.utilities.db.url = ${db.url}

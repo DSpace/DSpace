@@ -23,9 +23,10 @@ public class Variables {
 	 */
 	public final static String configurationEnabled = "true";
 	public final static int invalidIntValue = -1;
-	public final static String testProperties = "testProperties";
 	public static final String loggingProperties = "utilities.logging";
 	public static final String logFile = "utilities.status";
+
+	public final static String default_config_file = "modules/lr.cfg";
 
 	/**
 	 * Loaded properties from the property file.
@@ -63,59 +64,40 @@ public class Variables {
 	/**
 	 * Function initializes the Variables class.
 	 * 
-	 * @param path
-	 *            is where the property file is stored.
+	 * @param configuration_file
+	 *            the property file path.
 	 */
-  public static void init() {
-    init(null);
-  }
-  
-  public static void init(String dspace_cfg_path) {
-		if (initialized)
-			return;
-		try {
+  public static void init(String configuration_file) throws IOException {
+		if (initialized) {
+            return;
+        }
 
-			Reader reader = null;
-			if ( null == dspace_cfg_path ) {
-				// try to search inside the archive (jm)
-				InputStream is = Variables.class.getClassLoader().getResourceAsStream("modules/lr.cfg");
-				if (null == is) {
-					is = Variables.class.getClassLoader().getResourceAsStream("config/modules/lr.cfg");
-				}
-				if ( null != is ) {
-					reader = new BufferedReader(new InputStreamReader(is));
-				}
-				// try to search the original way
-				if (null == reader ) {
-					URL url = Variables.class.getClassLoader().getResource("modules/lr.cfg");
-					if(url == null){
-						url = Variables.class.getClassLoader().getResource("config/modules/lr.cfg");
-					}
-					if ( null != url ) {
-						reader = new FileReader(url.getPath());
-					}
-				}
-			}else {
-				reader = new FileReader(  new URL(dspace_cfg_path).getPath() );
-			}
+        Reader reader = null;
+        try {
+            if (null == configuration_file) {
+                configuration_file = Variables.class.getClassLoader().getResource("./") + File.separator + default_config_file;
+                InputStream is = Variables.class.getClassLoader().getResourceAsStream(default_config_file);
+                reader = new BufferedReader(new InputStreamReader(is));
+            } else {
+                reader = new FileReader(configuration_file);
+            }
 
-			// last nasty try
-			if (reader == null) {
-				log.debug("Failed to find lr.cfg.\nUsing nasty trick.\nThe class loader search was from " + Variables.class.getClassLoader().getResource("./"));
-				System.err.println("Failed to find lr.cfg. The class loader search is from " + Variables.class.getClassLoader().getResource("./"));
-				URL url = Variables.class.getClassLoader().getResource(Variables.class.getName().replace('.', '/') + ".class");
-				url = new URL(  new URL(url.getPath().split("utilities-")[0]), "../../../../config/modules/lr.cfg");
-				reader = new FileReader( url.getPath() );
-			}
+            properties.load(reader);
+            databaseURL = get("lr.utilities.db.url");
+            databaseUser = get("lr.utilities.db.username");
+            databasePassword = get("lr.utilities.db.password");
+            initialized = true;
 
-			properties.load(reader);
-			databaseURL = get("lr.utilities.db.url");
-			databaseUser = get("lr.utilities.db.username");
-			databasePassword = get("lr.utilities.db.password");
-			initialized = true;
-		} catch(Exception e) {
-			log.error(e);
-		}
+        } catch (IOException e) {
+            log.error(e);
+            String err_msg = String.format("Failed to find and load lr.cfg from either [%s] or [%s%s] because of [%s]",
+                configuration_file,
+                Variables.class.getClassLoader().getResource("./"), default_config_file,
+                e.toString()
+            );
+            System.err.println(err_msg);
+            throw e;
+        }
 	}
 
 	/**

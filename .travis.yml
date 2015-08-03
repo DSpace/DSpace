@@ -23,7 +23,7 @@ install:
   - cd $FS/utilities/project_helpers
   - sed -i'' 's/tomcat.(TOMCAT_VERSION)/travis/' ./config/variable.makefile.example
   - sed -i'' 's/lr.common.theme = /lr.common.theme = \/tmp\/dspace/' ./config/local.conf.dist
-  - sed -i'' 's/lr.dspace.dir = /lr.dspace.dir = \/tmp\/dspace/' ./config/local.conf.dist
+  - sed -i'' 's/dspace.install.dir = /dspace.install.dir = \/tmp\/dspace/' ./config/local.conf.dist
   - cd $FS/utilities/project_helpers/config
   - cp local.conf.dist ../sources/local.properties
   - cd $FS/utilities/project_helpers/scripts
@@ -40,5 +40,5 @@ script:
   - make test_utilities_database
   - cd $FS/ && mvn -Dmaven.test.skip=false -Dtest=cz.cuni.mff.ufal.dspace.**.*Test,cz.cuni.mff.ufal.*Test -DfailIfNoTests=false test | grep -v "Download"
   - cd $FS/utilities/project_helpers/scripts
-  - make tests || echo "Unit Tests failed - as expected for now"
+  - make tests
   - #make selenium_tests || echo "Tests failed"

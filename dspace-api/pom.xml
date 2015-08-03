@@ -223,6 +223,9 @@
                                 <output>
                                     <outputPath>${agnostic.build.dir}/testing</outputPath>
                                     <name>dspace.cfg.woven</name>
+                                    <properties>
+                                        <dspace.test.install.dir>${agnostic.build.dir}/testing/dspace</dspace.test.install.dir>
+                                    </properties>
                                     <parts>
                                         <part>
                                             <path>${agnostic.build.dir}/testing/dspace/config/dspace.cfg</path>
@@ -230,10 +233,25 @@
                                         <part>
                                             <path>${agnostic.build.dir}/testing/dspace.cfg.more</path>
                                         </part>
+                                        <part>
+                                            <path>${agnostic.build.dir}/testing/lindat.cfg.more</path>
+                                        </part>
                                     </parts>
+                                </output>
+                                <output>
+                                    <outputPath>${agnostic.build.dir}/testing</outputPath>
+                                    <name>lr.cfg.woven</name>
                                     <properties>
-                                        <dspace.install.dir>${agnostic.build.dir}/testing/dspace</dspace.install.dir>
+                                        <dspace.test.install.dir>${agnostic.build.dir}/testing/dspace</dspace.test.install.dir>
                                     </properties>
+                                    <parts>
+                                        <part>
+                                            <path>${agnostic.build.dir}/testing/dspace/config/modules/lr.cfg</path>
+                                        </part>
+                                        <part>
+                                            <path>${agnostic.build.dir}/testing/lindat.cfg.more</path>
+                                        </part>
+                                    </parts>
                                 </output>
                             </outputs>
                         </configuration>
@@ -260,6 +278,7 @@
                                 <configuration>
                                     <target>
                                         <copy file="${agnostic.build.dir}/testing/dspace.cfg.woven" tofile="${agnostic.build.dir}/testing/dspace/config/dspace.cfg" />
+                                        <copy file="${agnostic.build.dir}/testing/lr.cfg.woven" tofile="${agnostic.build.dir}/testing/dspace/config/modules/lr.cfg" />
                                     </target>
                                 </configuration>
                                 <goals>
