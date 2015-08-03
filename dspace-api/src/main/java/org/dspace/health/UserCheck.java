@@ -62,15 +62,17 @@ public class UserCheck extends Check {
         }
 
         ret += String.format(
-            "Users: %d\n", info.get("Count"));
+            "%-20s: %d\n", "Users", info.get("Count"));
         ret += String.format(
-            "Have email: %d\n", info.get("Have email"));
+            "%-20s: %d\n", "Have email", info.get("Have email"));
         for (Map.Entry<String, Integer> e : info.entrySet()) {
             if (!e.getKey().equals("Count") && !e.getKey().equals("Have email")) {
-                ret += String.format("%s: %s\n", e.getKey(),
+                ret += String.format("%-20s: %s\n", e.getKey(),
                     String.valueOf(e.getValue()));
             }
         }
+
+        ret += "\n";
 
         try {
             // empty group

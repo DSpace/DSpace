@@ -54,7 +54,7 @@ public class LogAnalyserCheck extends Check {
 
             // create report
             for (String[] info : interesting_fields ) {
-                sb.append( String.format("%-17s: %s\n", info[1], info_map.get(info[0])) );
+                sb.append( String.format("%-20s: %s\n", info[1], info_map.get(info[0])) );
             }
             sb.append( String.format("Items added since [%s] (db): %s\n",
                 new SimpleDateFormat("yyyy-MM-dd").format(ri.from().getTime()),

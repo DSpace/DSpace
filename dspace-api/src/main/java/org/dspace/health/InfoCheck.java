@@ -41,19 +41,19 @@ public class InfoCheck extends Check {
         for (String[] ss : new String[][] {
             new String[] {
                 ConfigurationManager.getProperty("assetstore.dir"),
-                "Assetstore size:  ", },
+                "Assetstore size", },
             new String[] {
                 ConfigurationManager.getProperty("search.dir"),
-                "Search dir size:  ", },
+                "Search dir size", },
             new String[] {
                 ConfigurationManager.getProperty("log.dir"),
-                "Log dir size:     ", }, })
+                "Log dir size", }, })
         {
             try {
                 File dir = new File(ss[0]);
                 if (dir.exists()) {
                     long dir_size = FileUtils.sizeOfDirectory(dir);
-                    sb.append(String.format("%s: %s\n", ss[1],
+                    sb.append(String.format("%-20s: %s\n", ss[1],
                             FileUtils.byteCountToDisplaySize(dir_size))
                     );
                 } else {
