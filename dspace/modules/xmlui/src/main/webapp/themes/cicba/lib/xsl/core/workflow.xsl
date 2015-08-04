@@ -7,7 +7,7 @@
 	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc">
 	
 	<xsl:template match="dri:div[@id='aspect.submission.Submissions.div.submissions' and @n='submissions']">
-		<form xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" id="aspect_submission_Submissions_div_submissions" class="ds-interactive-div primary" action="/dspace/submissions" method="post" onsubmit="javascript:tSubmit(this);">
+		<form xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" id="aspect_submission_Submissions_div_submissions" class="ds-interactive-div primary" action="submissions" method="post" onsubmit="javascript:tSubmit(this);">
 			<xsl:apply-templates select="dri:head" />
 			<xsl:apply-templates select="dri:div[@id='aspect.submission.Submissions.div.unfinished-submisions' and @n='unfinished-submisions']" />
 			<xsl:apply-templates select="dri:div[@id='aspect.xmlworkflow.Submissions.div.workflow-tasks' and @n='workflow-tasks']" />
