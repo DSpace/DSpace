@@ -759,20 +759,16 @@ public class GoogleMetadata
     }
 
     /**
-     * Fetch metadata mappings retaining the order of the values for any given
-     * key in which they where added (like authors).
+     * Fetch all metadata mappings
      * 
-     * Usage: GoogleMetadata gmd = new GoogleMetadata(item); for (Entry<String,
-     * java.util.Collection<String>> m :
-     * gmd.getOrderedMappings().asMap().entrySet()) { for(String curValue :
-     * m.getValue()) { pageMeta.addMetadata(m.getKey()).addContent(curValue); }
-     * }
+     * Usage: GoogleMetadata gmd = new GoogleMetadata(item); for(Entry<String,
+     * String> mapping : googlemd.getMappings()) { ... }
      * 
      * @return Iterable of metadata fields mapped to Google-formatted values
      */
-    public ListMultimap<String, String> getMappings()
+    public Set<Entry<String, String>> getMappings()
     {
-        return metadataMappings;
+        return new HashSet<>(metadataMappings.entries());
     }
 
     /**
@@ -782,17 +778,13 @@ public class GoogleMetadata
     {
         List<Element> metas = new ArrayList<Element>();
 
-        for (Entry<String, java.util.Collection<String>> m : getMappings()
-                .asMap().entrySet())
+        for (Entry<String, String> m : getMappings())
         {
-            for (String curValue : m.getValue())
-            {
-                Element e = new Element("meta");
-                e.setNamespace(null);
-                e.setAttribute("name", m.getKey());
-                e.setAttribute("content", curValue);
-                metas.add(e);
-            }
+            Element e = new Element("meta");
+            e.setNamespace(null);
+            e.setAttribute("name", m.getKey());
+            e.setAttribute("content", m.getValue());
+            metas.add(e);
         }
         return metas;
     }

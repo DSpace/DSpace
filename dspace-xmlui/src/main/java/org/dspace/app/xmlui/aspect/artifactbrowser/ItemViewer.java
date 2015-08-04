@@ -281,21 +281,9 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             // Add Google metadata field names & values to DRI
             GoogleMetadata gmd = new GoogleMetadata(context, item);
 
-            for (Entry<String, java.util.Collection<String>> m : gmd
-                    .getMappings()
-                    .asMap().entrySet())
+            for (Entry<String, String> m : gmd.getMappings())
             {
-                // Iterate over the Entries which looks like
-                // GoogleScholarLabel-> OrderdList<Google-formatted value>
-                // e.G. citation_author->[firstAuthor, secondAuthor, ...,
-                // nthAuthor]
-                for (String curValue : m.getValue())
-                {
-                    // create a single metadata field like
-                    // <meta content="Mustermann, Max"
-                    // name="citation_author" />
-                    pageMeta.addMetadata(m.getKey()).addContent(curValue);
-                }
+                pageMeta.addMetadata(m.getKey()).addContent(m.getValue());
             }
         }
 
