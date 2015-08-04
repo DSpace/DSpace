@@ -109,7 +109,7 @@ mail.registration.notify = ${mail.admin}
 mail.admin = ${mail.feedback.recipient}
 
 # solr server address that your instance is using.
-lr.solr.log.server = http://ufal-point-dev.ms.mff.cuni.cz:8080/repository/solr
+solr.server = http://ufal-point-dev.ms.mff.cuni.cz:8080/repository/solr
 
 # Google Analytics
 # NOTE: Copy appropriate Google Analytics API key file to the location specified
