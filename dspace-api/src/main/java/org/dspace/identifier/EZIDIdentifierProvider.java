@@ -20,6 +20,7 @@ import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.MetadataSchema;
 import org.dspace.core.Context;
 import org.dspace.identifier.ezid.EZIDRequest;
 import org.dspace.identifier.ezid.EZIDRequestFactory;
@@ -81,7 +82,7 @@ public class EZIDIdentifierProvider
     private static final Logger log = LoggerFactory.getLogger(EZIDIdentifierProvider.class);
 
     // Configuration property names
-    static final String CFG_SHOULDER = "identifier.doi.ezid.shoulder";
+    public static final String CFG_SHOULDER = "identifier.doi.ezid.shoulder";
     static final String CFG_USER = "identifier.doi.ezid.user";
     static final String CFG_PASSWORD = "identifier.doi.ezid.password";
     static final String CFG_PUBLISHER = "identifier.doi.ezid.publisher";
@@ -92,11 +93,9 @@ public class EZIDIdentifierProvider
 
     // DSpace metadata field name elements
     // XXX move these to MetadataSchema or some such
-    public static final String MD_SCHEMA = "dc";
+    public static final String MD_SCHEMA = MetadataSchema.DC_SCHEMA;
     public static final String DOI_ELEMENT = "identifier";
-    public static final String DOI_QUALIFIER = null;
-
-    private static final String DOI_SCHEME = "doi:";
+    public static final String DOI_QUALIFIER = "uri";
 
     protected boolean GENERATE_DATACITE_XML = false;
 
@@ -132,7 +131,7 @@ public class EZIDIdentifierProvider
         }
         else
         {
-            return identifier.startsWith(DOI_SCHEME);
+            return identifier.startsWith(DOI.SCHEME);
         } // XXX more thorough test?
     }
 
@@ -146,9 +145,10 @@ public class EZIDIdentifierProvider
         List<MetadataValue> identifiers = dsoService.getMetadata(dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
         for (MetadataValue identifier : identifiers)
         {
-            if ((null != identifier.getValue()) && (identifier.getValue().startsWith(DOI_SCHEME)))
+            String identifierValue = identifier.getValue();
+            if ((null != identifierValue) && (identifierValue.startsWith(DOI.SCHEME)))
             {
-                return identifier.getValue();
+                return identifierValue;
             }
         }
 
@@ -333,7 +333,7 @@ public class EZIDIdentifierProvider
         DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(object);
         for (MetadataValue candidate : dsoService.getMetadata(object, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null))
         {
-            if (candidate.getValue().startsWith(DOI_SCHEME))
+            if (candidate.getValue().startsWith(DOI.SCHEME))
             {
                 found = candidate;
                 break;
@@ -364,9 +364,10 @@ public class EZIDIdentifierProvider
         int skipped = 0;
         for (MetadataValue id : metadata)
         {
-            if (!id.getValue().startsWith(DOI_SCHEME))
+            String idValue = id.getValue();
+            if (!idValue.startsWith(DOI.SCHEME))
             {
-                remainder.add(id.getValue());
+                remainder.add(idValue);
                 continue;
             }
 
