@@ -27,6 +27,7 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.core.Context;
 import org.dspace.identifier.ezid.EZIDRequest;
 import org.dspace.identifier.ezid.EZIDRequestFactory;
@@ -86,7 +87,7 @@ public class EZIDIdentifierProvider
     private static final Logger log = LoggerFactory.getLogger(EZIDIdentifierProvider.class);
 
     // Configuration property names
-    static final String CFG_SHOULDER = "identifier.doi.ezid.shoulder";
+    public static final String CFG_SHOULDER = "identifier.doi.ezid.shoulder";
     static final String CFG_USER = "identifier.doi.ezid.user";
     static final String CFG_PASSWORD = "identifier.doi.ezid.password";
     static final String CFG_PUBLISHER = "identifier.doi.ezid.publisher";
@@ -97,11 +98,9 @@ public class EZIDIdentifierProvider
 
     // DSpace metadata field name elements
     // XXX move these to MetadataSchema or some such
-    public static final String MD_SCHEMA = "dc";
+    public static final String MD_SCHEMA = MetadataSchemaEnum.DC.getName();
     public static final String DOI_ELEMENT = "identifier";
-    public static final String DOI_QUALIFIER = null;
-
-    private static final String DOI_SCHEME = "doi:";
+    public static final String DOI_QUALIFIER = "uri";
 
     protected boolean GENERATE_DATACITE_XML = false;
 
@@ -138,7 +137,7 @@ public class EZIDIdentifierProvider
         if (null == identifier) {
             return false;
         } else {
-            return identifier.startsWith(DOI_SCHEME);
+            return identifier.startsWith(DOI.SCHEME);
         } // XXX more thorough test?
     }
 
@@ -154,8 +153,9 @@ public class EZIDIdentifierProvider
         DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
         List<MetadataValue> identifiers = dsoService.getMetadata(dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
         for (MetadataValue identifier : identifiers) {
-            if ((null != identifier.getValue()) && (identifier.getValue().startsWith(DOI_SCHEME))) {
-                return identifier.getValue();
+            String identifierValue = identifier.getValue();
+            if ((null != identifierValue) && (identifierValue.startsWith(DOI.SCHEME))) {
+                return identifierValue;
             }
         }
 
@@ -223,9 +223,12 @@ public class EZIDIdentifierProvider
         }
 
         if (response.isSuccess()) {
-            DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
+            DSpaceObjectService<DSpaceObject> dsoService
+                    = contentServiceFactory.getDSpaceObjectService(dso);
             try {
-                dsoService.addMetadata(context, dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, idToDOI(identifier));
+                dsoService.addMetadata(context, dso,
+                        MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
+                        idToDOI(identifier));
                 dsoService.update(context, dso);
                 log.info("reserved {}", identifier);
             } catch (SQLException | AuthorizeException ex) {
@@ -324,7 +327,7 @@ public class EZIDIdentifierProvider
         MetadataValue found = null;
         DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(object);
         for (MetadataValue candidate : dsoService.getMetadata(object, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null)) {
-            if (candidate.getValue().startsWith(DOI_SCHEME)) {
+            if (candidate.getValue().startsWith(DOI.SCHEME)) {
                 found = candidate;
                 break;
             }
@@ -349,8 +352,9 @@ public class EZIDIdentifierProvider
         List<String> remainder = new ArrayList<>();
         int skipped = 0;
         for (MetadataValue id : metadata) {
-            if (!id.getValue().startsWith(DOI_SCHEME)) {
-                remainder.add(id.getValue());
+            String idValue = id.getValue();
+            if (!idValue.startsWith(DOI.SCHEME)) {
+                remainder.add(idValue);
                 continue;
             }
 
