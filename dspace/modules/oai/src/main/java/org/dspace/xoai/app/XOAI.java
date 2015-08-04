@@ -48,6 +48,8 @@ import org.dspace.xoai.solr.exceptions.DSpaceSolrIndexerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import uk.ac.edina.datashare.utils.DSpaceUtils;
+
 import javax.xml.stream.XMLStreamException;
 
 import java.io.ByteArrayOutputStream;
@@ -290,7 +292,6 @@ public class XOAI {
     }
 
     private boolean isPublic(Item item) {
-    	log.info("**************************************************************");
         try {
             AuthorizeManager.authorizeAction(context, item, Constants.READ);
             for (Bundle b : item.getBundles())
@@ -302,9 +303,14 @@ public class XOAI {
             log.error(ex.getMessage());
         }
 
-        log.info("**************************************************************");
-        log.info(org.dspace.app.util.Util.hasEmbargo(context, item));
-       
+        // DATASHARE start
+        // for testing on dev we need embargoed items showing up in OAI
+        if (DSpaceUtils.isDev() && org.dspace.app.util.Util.hasEmbargo(context, item)){
+        	log.info("******************************************** " + item.getHandle());
+        	return true;
+
+        }
+        // DATASHARE end
         
         return false;
     }

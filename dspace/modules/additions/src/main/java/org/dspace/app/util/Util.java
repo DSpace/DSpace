@@ -31,6 +31,8 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 
+import uk.ac.edina.datashare.utils.MetaDataUtil;
+
 
 /**
  * Miscellaneous utility methods
@@ -487,8 +489,7 @@ public class Util {
     {
         boolean hasEmbargo = true;
         
-        ConfigurationManager.getProperty("embargo.field.lift");
-        String embargo = ConfigurationManager.getProperty("embargo.field.lift");
+        String embargo = item.getMetadata(ConfigurationManager.getProperty("embargo.field.lift"));
         if(embargo == null || embargo.length() == 0){
             hasEmbargo = false;
         }

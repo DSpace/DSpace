@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
+import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -445,8 +446,7 @@ public class DSpaceUtils
      */
     public static boolean hasEmbargo(Context context, Item item)
     {
-    	//return Util.hasEmbargo(context, item);
-    	throw new RuntimeException("Fix this");
+    	return Util.hasEmbargo(context, item);
     }
     
     /**

@@ -99,6 +99,10 @@ public class DSpaceItemSolrRepository extends DSpaceItemRepository
     {
         try
         {
+        	for (ScopedFilter scopedFilter : filters) {
+				log.info("=>");
+				log.info(scopedFilter.getCondition().toString() + " : " + scopedFilter.getScope().toString());
+			}
             QueryResult queryResult = retrieveItems(filters, offset, length);
             return new ListItemsResults(queryResult.hasMore(), queryResult.getResults(), queryResult.getTotal());
         }
@@ -111,6 +115,8 @@ public class DSpaceItemSolrRepository extends DSpaceItemRepository
 
     private QueryResult retrieveItems (List<ScopedFilter> filters, int offset, int length) throws DSpaceSolrException {
         List<Item> list = new ArrayList<Item>();
+        log.info("==> " + solrQueryResolver.getClass());
+        log.info(solrQueryResolver.buildQuery(filters));
         SolrQuery params = new SolrQuery(solrQueryResolver.buildQuery(filters))
                 .setRows(length)
                 .setStart(offset);

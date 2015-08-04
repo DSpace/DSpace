@@ -149,6 +149,7 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
         try
         {
             DatabaseQuery databaseQuery = queryResolver.buildQuery(filters, offset, length);
+            log.info(databaseQuery.getQuery());
             TableRowIterator rowIterator = DatabaseManager.queryTable(context.getContext(), "item",
                     databaseQuery.getQuery(), databaseQuery.getParameters().toArray());
             ItemIterator iterator = new ItemIterator(context.getContext(), rowIterator);
