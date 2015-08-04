@@ -69,11 +69,6 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
     static final String CFG_NAMESPACE_SEPARATOR = "identifier.doi.namespaceseparator";
     static final char SLASH = '/';
 
-    // Metadata field name elements
-    // TODO: move these to MetadataSchema or some such?
-    public static final String MD_SCHEMA = "dc";
-    public static final String DOI_ELEMENT = "identifier";
-    public static final String DOI_QUALIFIER = "uri";
     // The DOI is queued for registered with the service provider
     public static final Integer TO_BE_REGISTERED = 1;
     // The DOI is queued for reservation with the service provider
@@ -171,7 +166,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
     }
 
     /**
-     * Set the DOI connector, which is the component that commuincates with the remote registration service
+     * Set the DOI connector, which is the component that communicates with the remote registration service
      * (eg. DataCite, EZID, Crossref)
      * Spring will use this setter to set the DOI connector from the configured property in identifier-services.xml
      *
@@ -316,7 +311,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      * @param dso        DSpaceObject the DOI should be reserved for. Some metadata of
      *                   this object will be send to the registration agency.
      * @param identifier DOI to register in a format that
-     *                   {@link org.dspace.identifier.service.DOIService#formatIdentifier(String)} accepts.
+     *                   {@link DOIService#formatIdentifier(String)} accepts.
      * @throws IdentifierException      If the format of {@code identifier} was
      *                                  unrecognized or if it was impossible to
      *                                  reserve the DOI (registration agency denied
@@ -524,9 +519,9 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
     }
 
     /**
-     * Update metadata for a registered object in the DOI Connector to update the agency records
-     * If the DOI for hte item already exists, *always* skip the filter since it should only be used for
-     * allowing / disallowing reservation and registration, not metadata updates or deletions
+     * Update metadata for a registered object in the DOI Connector to update the agency records.
+     * If the DOI for the item already exists, *always* skip the filter since it should only be used for
+     * allowing / disallowing reservation and registration, not metadata updates or deletions.
      *
      * @param context       - DSpace context
      * @param dso           - DSpaceObject identified by this DOI
@@ -583,7 +578,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
     }
 
     /**
-     * Mint a new DOI in DSpace - this is usually the first step of registration
+     * Mint a new DOI in DSpace - this is usually the first step of registration.
      * Always apply filters if they are configured
      * @param context    - DSpace context
      * @param dso        - DSpaceObject identified by the new identifier
@@ -725,21 +720,14 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
                 this.removeDOIFromObject(context, dso, doi);
                 doi = getDOIOutOfObject(dso);
             }
-        } catch (AuthorizeException ex) {
-            log.error("Error while removing a DOI out of the metadata of an " +
-                contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) +
-                " with ID " + dso.getID() + ".", ex);
-            throw new RuntimeException("Error while removing a DOI out of the metadata of an " +
-                contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) +
-                " with ID " + dso.getID() + ".", ex);
-
-        } catch (SQLException ex) {
-            log.error("Error while removing a DOI out of the metadata of an " +
-                contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) +
-                " with ID " + dso.getID() + ".", ex);
-            throw new RuntimeException("Error while removing a DOI out of the " +
-                "metadata of an " + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) +
-                " with ID " + dso.getID() + ".", ex);
+        } catch (AuthorizeException | SQLException ex) {
+            log.error("Error while removing a DOI out of the metadata of an "
+                    + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso)
+                    + " with ID " + dso.getID() + ".", ex);
+            throw new RuntimeException("Error while removing a DOI out of the "
+                    + "metadata of an "
+                    + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso)
+                    + " with ID " + dso.getID() + ".", ex);
         }
     }
 
@@ -811,7 +799,8 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      * @param identifier - String containing identifier to delete
      * @throws DOIIdentifierException
      */
-    public void deleteOnline(Context context, String identifier) throws DOIIdentifierException {
+    public void deleteOnline(Context context, String identifier)
+            throws DOIIdentifierException {
         String doi = doiService.formatIdentifier(identifier);
         DOI doiRow = null;
 
@@ -1037,7 +1026,8 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         }
         Item item = (Item) dso;
 
-        List<MetadataValue> metadata = itemService.getMetadata(item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        List<MetadataValue> metadata = itemService.getMetadata(item,
+                URI_METADATA_SCHEMA, URI_METADATA_ELEMENT, URI_METADATA_QUALIFIER, null);
         String leftPart = doiService.getResolver() + SLASH + getPrefix() + SLASH + getNamespaceSeparator();
         for (MetadataValue id : metadata) {
             if (id.getValue().startsWith(leftPart)) {
@@ -1066,8 +1056,9 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         }
         Item item = (Item) dso;
 
-        itemService.addMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
-            doiService.DOIToExternalForm(doi));
+        itemService.addMetadata(context, item, URI_METADATA_SCHEMA,
+                URI_METADATA_ELEMENT, URI_METADATA_QUALIFIER, null,
+                doiService.DOIToExternalForm(doi));
         try {
             itemService.update(context, item);
         } catch (SQLException | AuthorizeException ex) {
@@ -1094,7 +1085,8 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         }
         Item item = (Item) dso;
 
-        List<MetadataValue> metadata = itemService.getMetadata(item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
+        List<MetadataValue> metadata = itemService.getMetadata(item,
+                URI_METADATA_SCHEMA, URI_METADATA_ELEMENT, URI_METADATA_QUALIFIER, null);
         List<String> remainder = new ArrayList<>();
 
         for (MetadataValue id : metadata) {
@@ -1103,8 +1095,10 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
             }
         }
 
-        itemService.clearMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
-        itemService.addMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
+        itemService.clearMetadata(context, item, URI_METADATA_SCHEMA,
+                URI_METADATA_ELEMENT, URI_METADATA_QUALIFIER, null);
+        itemService.addMetadata(context, item, URI_METADATA_SCHEMA,
+                URI_METADATA_ELEMENT, URI_METADATA_QUALIFIER, null,
                 remainder);
         itemService.update(context, item);
     }
