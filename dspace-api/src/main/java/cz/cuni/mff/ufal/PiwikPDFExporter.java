@@ -223,7 +223,7 @@ public class PiwikPDFExporter  {
 							
 		
 		String viewsXML = PiwikHelper.readFromURL(viewsReportURL);
-		String downloadXML = PiwikHelper.readFromURL(viewsReportURL);
+		String downloadXML = PiwikHelper.readFromURL(downloadReportURL);
 		
 		viewsXML = PiwikHelper.mergeXML(viewsXML, downloadXML);
 		String countriesXML = PiwikHelper.readFromURL(countryReportURL);
