@@ -9,7 +9,7 @@ function createRejectedFilesDialog(files, fileUploadDialog) {
 </div>\
 <div class="modal-body" id="rejected_modal_body"><p>The following files are too large for conventional upload (limit is '
 		+ convertBytesToHumanReadableForm(lindat_upload_file_alert_max_file_size)
-		+ '). Please contact <a href="mailto:' + ufal_help_mail + '">Help Desk</a> about how to upload these files.</p>\
+		+ ') or are empty (0 bytes). Please contact <a href="mailto:' + ufal_help_mail + '">Help Desk</a> about how to upload these files.</p>\
 </div>\
 <div class="modal-footer">\
 <button type="button" class="btn btn-primary" id="rejected-ok-button">OK</button>\
@@ -40,7 +40,7 @@ function createRejectedFilesDialog(files, fileUploadDialog) {
 
 function convertBytesToHumanReadableForm(b) {
 	var units = [ 'bytes', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB' ];
-	var exp = Math.round(Math.log(b) / Math.log(1024));
+	var exp = b == 0 ? 0 : Math.round(Math.log(b) / Math.log(1024));
 	return Math.round((b / Math.pow(1024, exp)) * 100) / 100 + " " + units[exp];
 }
 
@@ -182,26 +182,26 @@ function createFileUploadDialog(files) {
 	return jModal;
 }
 
-function filterFiles(files, callback) {
-	var res = [];
+function filterFiles(files, callback, matching, not_matching) {
 	for ( var i = 0; i < files.length; i++) {
 		var file = files[i];
 		if (callback(file)) {
-			res.push(file);
-		}
+			matching.push(file);
+		}else{
+            not_matching.push(file);
+        }
 	}
-	return res;
 }
 
 function processFiles(files) {
 	// console.log("processing files");
 
-	var filesToUpload = filterFiles(files, function(f) {
-		return f.size <= lindat_upload_file_alert_max_file_size;
-	});
-	var filesToReject = filterFiles(files, function(f) {
-		return f.size > lindat_upload_file_alert_max_file_size;
-	});
+    var accept = function(f) {
+		return f.size > 0 && f.size <= lindat_upload_file_alert_max_file_size;
+	};
+	var filesToUpload = [];
+	var filesToReject = [];
+    filterFiles(files, accept, filesToUpload, filesToReject);
 
 	var rejectedFilesDialog;
 	var fileUploadDialog;
