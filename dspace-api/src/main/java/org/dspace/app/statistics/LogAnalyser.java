@@ -810,7 +810,7 @@ public class LogAnalyser
         singleRX = Pattern.compile("( . |^. | .$)");
         
         // set up the standard log file line regular expression
-        String logLineBase = "^(\\d\\d\\d\\d-\\d\\d\\-\\d\\d) \\d\\d:\\d\\d:\\d\\d,\\d\\d\\d (\\w+)\\s+\\S+ @ (.*)";
+        String logLineBase = "^(\\d\\d\\d\\d-\\d\\d\\-\\d\\d) \\d\\d:\\d\\d:\\d\\d,\\d\\d\\d (\\w+)\\s+\\S+ @ (.*)"; //date time LEVEL class @ whatever
         String logLine13 = "^(\\d\\d\\d\\d-\\d\\d\\-\\d\\d) \\d\\d:\\d\\d:\\d\\d,\\d\\d\\d (\\w+)\\s+\\S+ @ ([^:]+):[^:]+:([^:]+):(.*)";
         String logLine14 = "^(\\d\\d\\d\\d-\\d\\d\\-\\d\\d) \\d\\d:\\d\\d:\\d\\d,\\d\\d\\d (\\w+)\\s+\\S+ @ ([^:]+):[^:]+:[^:]+:([^:]+):(.*)";
         valid13 = Pattern.compile(logLine13);
