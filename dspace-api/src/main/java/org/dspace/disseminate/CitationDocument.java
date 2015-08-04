@@ -381,11 +381,9 @@ public class CitationDocument {
                 }
             }
 
-            contentStream.beginText();
-            contentStream.setFont(fontHelveticaOblique, 11);
-            contentStream.moveTextPositionByAmount(xpos, ypos);
-            contentStream.drawString(footer);
-            contentStream.endText();
+            //Footer
+            drawStringWordWrap(coverPage, contentStream, footer, xpos, ypos, fontHelveticaOblique, 11);
+            
         } finally {
             contentStream.close();
         }
