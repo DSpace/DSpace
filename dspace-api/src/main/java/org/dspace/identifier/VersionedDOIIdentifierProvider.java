@@ -306,7 +306,9 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider
         String bareDoi = getBareDOI(doiService.formatIdentifier(oldDoi));
         String bareDoiRef = doiService.DOIToExternalForm(bareDoi);        
         
-        List<MetadataValue> identifiers = itemService.getMetadata(item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, Item.ANY);
+        List<MetadataValue> identifiers = itemService.getMetadata(item,
+                URI_METADATA_SCHEMA, URI_METADATA_ELEMENT, URI_METADATA_QUALIFIER,
+                Item.ANY);
         // We have to remove all DOIs referencing previous versions. To do that,
         // we store all identifiers we do not know in an array list, clear 
         // dc.identifier.uri and add the safed identifiers.
@@ -328,8 +330,10 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider
         {
             try
             {
-                itemService.clearMetadata(c, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, Item.ANY);
-                itemService.addMetadata(c, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, newIdentifiers);
+                itemService.clearMetadata(c, item, URI_METADATA_SCHEMA,
+                        URI_METADATA_ELEMENT, URI_METADATA_QUALIFIER, Item.ANY);
+                itemService.addMetadata(c, item, URI_METADATA_SCHEMA,
+                        URI_METADATA_ELEMENT, URI_METADATA_QUALIFIER, null, newIdentifiers);
                 itemService.update(c, item);
             } catch (SQLException ex) {
                 throw new RuntimeException("A problem with the database connection occured.", ex);
@@ -338,6 +342,7 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider
     }
 
     @Required
+    @Override
     public void setDOIConnector(DOIConnector connector)
     {
         super.setDOIConnector(connector);
@@ -345,6 +350,7 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider
     }
     
     @Required
+    @Override
     public void setConfigurationService(ConfigurationService configurationService) {
         super.setConfigurationService(configurationService);
         this.configurationService = configurationService;

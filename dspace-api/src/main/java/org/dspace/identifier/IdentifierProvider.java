@@ -8,6 +8,7 @@
 package org.dspace.identifier;
 
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.MetadataSchema;
 import org.dspace.core.Context;
 import org.dspace.identifier.service.IdentifierService;
 import org.dspace.services.ConfigurationService;
@@ -22,6 +23,12 @@ import org.springframework.beans.factory.annotation.Required;
  * @author Ben Bosman (ben at atmire dot com)
  */
 public abstract class IdentifierProvider {
+    // DSpace metadata field name elements
+    public static final String URI_METADATA_SCHEMA = MetadataSchema.DC_SCHEMA;
+
+    public static final String URI_METADATA_ELEMENT = "identifier";
+
+    public static final String URI_METADATA_QUALIFIER = "uri";
 
     protected IdentifierService parentService;
 
@@ -39,7 +46,7 @@ public abstract class IdentifierProvider {
 
     /**
      * Can this provider provide identifiers of a given type?
-     * 
+     *
      * @param identifier requested type.
      * @return true if the given type is assignable from this provider's type.
      */
@@ -47,7 +54,7 @@ public abstract class IdentifierProvider {
 
     /**
      * Can this provider provide identifiers of a given type?
-     * 
+     *
      * @param identifier requested type.
      * @return true if this provider can provide the named type of identifier.
      */
@@ -58,7 +65,7 @@ public abstract class IdentifierProvider {
      * If you just mark an identifier for an asynchronous registration, please call
      * {@link org.dspace.content.DSpaceObject#resetIdentifiersCache()} after its registration. If you register
      * identifiers directly in this method the IdentifierService will call this method for you.
-     * 
+     *
      * @param context
      * @param item object to be named.
      * @return existing identifier of {@code item} if it has one, else a new identifier.
@@ -68,7 +75,7 @@ public abstract class IdentifierProvider {
 
     /**
      * Create an identifier for a DSpaceObject.
-     * 
+     *
      * @param context
      * @param dso object to be named.
      * @return existing identifier of {@code dso} if it has one, else a new identifier.
@@ -78,7 +85,7 @@ public abstract class IdentifierProvider {
 
     /**
      * Find the object named by a given identifier.
-     * 
+     *
      * @param context
      * @param identifier to be resolved.
      * @param attributes additional information for resolving {@code identifier}.
@@ -90,7 +97,7 @@ public abstract class IdentifierProvider {
 
     /**
      * Return the identifier for a DSpaceObject.
-     * 
+     *
      * @param context
      * @param object The object to be looked up.
      * @return identifier for {@code object}.
@@ -101,7 +108,7 @@ public abstract class IdentifierProvider {
 
     /**
      * Unbind this type of identifier(s) from an object.
-     * 
+     *
      * @param context
      * @param dso object to lose its identity.
      * @throws IdentifierException if identifier error
@@ -110,7 +117,7 @@ public abstract class IdentifierProvider {
 
     /**
      * Unbind the given identifier from an object.
-     * 
+     *
      * @param context
      * @param dso object to be de-identified.
      * @param identifier to be removed.
@@ -120,7 +127,7 @@ public abstract class IdentifierProvider {
 
     /**
      * Set an object's identifier.
-     * 
+     *
      * @param context
      * @param dso object to be identified.
      * @param identifier to be set on the object.
@@ -130,7 +137,7 @@ public abstract class IdentifierProvider {
 
     /**
      * Create a specific identifier and apply it to an object.
-     * 
+     *
      * @param context
      * @param object to be identified.
      * @param identifier to be created.
