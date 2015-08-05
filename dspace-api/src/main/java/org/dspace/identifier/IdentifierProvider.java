@@ -22,10 +22,13 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public abstract class IdentifierProvider {
     // DSpace metadata field name elements
+    /** Schema in which to store the identifier as metadata. */
     public static final String URI_METADATA_SCHEMA = MetadataSchemaEnum.DC.getName();
 
+    /** Metadata element for storing the identifier. */
     public static final String URI_METADATA_ELEMENT = "identifier";
 
+    /** Metadata qualifier for storing the identifier. */
     public static final String URI_METADATA_QUALIFIER = "uri";
 
     protected IdentifierService parentService;

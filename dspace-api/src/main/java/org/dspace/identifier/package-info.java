@@ -12,6 +12,14 @@
  * {@link org.dspace.identifier.Identifier}.  Classes outside this package
  * should rely on {@link org.dspace.identifier.service.IdentifierService} to perform
  * these operations using the most appropriate provider.
+ *
+ * <p>
+ * Providers which store the generated identifiers as metadata on the identified
+ * objects should use {@link org.dspace.identifier.IdentifierProvider#URI_METADATA_SCHEMA},
+ * {@link org.dspace.identifier.IdentifierProvider#URI_METADATA_ELEMENT}, and
+ * {@link org.dspace.identifier.IdentifierProvider#URI_METADATA_QUALIFIER} to
+ * specify the metadata field.
+ * </p>
  */
 
 package org.dspace.identifier;
