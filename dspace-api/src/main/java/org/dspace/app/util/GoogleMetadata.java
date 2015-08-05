@@ -26,7 +26,6 @@ import org.dspace.core.ConfigurationManager;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -760,17 +759,17 @@ public class GoogleMetadata
     }
 
     /**
-     * Fetch retaining the order of the values for any given key in which they
-     * where added (like authors).
-     *
+     * Fetch all metadata mappings
+     * 
      * Usage: GoogleMetadata gmd = new GoogleMetadata(item); for(Entry<String,
      * String> mapping : googlemd.getMappings()) { ... }
      * 
      * @return Iterable of metadata fields mapped to Google-formatted values
      */
-    public Collection<Entry<String, String>> getMappings()
+    public Set<Entry<String, String>> getMappings()
     {
-        return metadataMappings.entries();
+
+        return new HashSet<Entry<String, String>>(metadataMappings.entrySet());
     }
 
     /**
