@@ -33,6 +33,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.apache.tools.ant.filters.StringInputStream;
 import org.dspace.content.Item;
@@ -90,6 +91,7 @@ public class PiwikPDFExporter  {
     private static String PIWIK_AUTH_TOKEN;
     private static String PIWIK_SITE_ID;
     private static String PIWIK_DOWNLOAD_SITE_ID;
+    private static boolean PIWIK_KEEP_REPORTS;
 
     private static String LINDAT_LOGO;
     
@@ -108,6 +110,7 @@ public class PiwikPDFExporter  {
 		
 	public static void initialize() {
         PIWIK_REPORTS_OUTPUT_PATH = ConfigurationManager.getProperty("lr", "lr.statistics.report.path");
+        PIWIK_KEEP_REPORTS = ConfigurationManager.getBooleanProperty("lr", "lr.statistics.keep.reports", true);
         PIWIK_API_URL = ConfigurationManager.getProperty("lr", "lr.statistics.api.url");
         PIWIK_AUTH_TOKEN = ConfigurationManager.getProperty("lr", "lr.statistics.api.auth.token");
         PIWIK_SITE_ID = ConfigurationManager.getProperty("lr", "lr.statistics.api.site_id");
@@ -160,7 +163,15 @@ public class PiwikPDFExporter  {
 					log.error(e);
 				}
 			}
-		}		
+		}
+		//cleanup
+		if(!PIWIK_KEEP_REPORTS) {
+			try {
+				FileUtils.deleteDirectory(outputDir);
+			} catch (IOException e) {
+				log.error(e);
+			}
+		}
 	}
 	
 	public static void sendEmail(Context context, EPerson to, Item item) throws IOException, MessagingException {
