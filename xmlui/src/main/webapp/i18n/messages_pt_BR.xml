@@ -356,7 +356,7 @@
 	<message key="xmlui.ArtifactBrowser.StatisticsViewer.no_report.title">Nenhum relatório disponível no momento</message>
     <message key="xmlui.ArtifactBrowser.StatisticsViewer.no_report.text">Nenhum relatório disponível no momento para este serviço.  Por favor, cheque mais tarde.</message>
 
-	<message key="xmlui.ArtifactBrowser.SiteViewer.head_recent_submissions">Documentos destacados</message>
+	<message key="xmlui.ArtifactBrowser.SiteViewer.head_recent_submissions">Últimos documentos</message>
 
 
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_keywords">Palavra Chave</message>

@@ -366,7 +366,7 @@
 
 	<!-- Others -->
 	
-	<message key="xmlui.ArtifactBrowser.SiteViewer.head_recent_submissions">Outstanding documents</message>
+	<message key="xmlui.ArtifactBrowser.SiteViewer.head_recent_submissions">Last documents</message>
 
     <!-- Authentication messages used for bitstream authentication -->
 	<message key="xmlui.BitstreamReader.auth_header">The file is restricted</message>
