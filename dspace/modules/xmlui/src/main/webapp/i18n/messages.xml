@@ -166,7 +166,7 @@
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.sort_by"> Sort by: </message>
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.order"> Order: </message>
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.rpp"> Results: </message><!-- /Page -->
-	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.etal"> Authors/Item: </message>
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.general.etal"> Author/Item: </message>
 
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.etal.all">All</message>
 
@@ -177,7 +177,7 @@
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.order.asc">ascending (A-Z)</message>
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.order.desc">descending (Z-A)</message>
 
-	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.author.column_heading">Authors Name</message>
+	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.author.column_heading">Author Name</message>
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.dateissued.column_heading">Date Issued</message>
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.subject.column_heading">Subject</message>
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.discipline.column_heading">Theses Department</message>
@@ -229,9 +229,9 @@
 	<message key="xmlui.ArtifactBrowser.CollectionViewer.all_of_dspace">All of MOspace</message>
 	<message key="xmlui.ArtifactBrowser.CollectionViewer.full_text_search">Search within this collection:</message>
 	<message key="xmlui.ArtifactBrowser.CollectionViewer.head_browse">Browse by</message>
-	<message key="xmlui.ArtifactBrowser.CollectionViewer.browse_titles">Titles</message>
-	<message key="xmlui.ArtifactBrowser.CollectionViewer.browse_authors">Authors</message>
-	<message key="xmlui.ArtifactBrowser.CollectionViewer.browse_dates">Dates</message>
+	<message key="xmlui.ArtifactBrowser.CollectionViewer.browse_titles">Title</message>
+	<message key="xmlui.ArtifactBrowser.CollectionViewer.browse_authors">Author</message>
+	<message key="xmlui.ArtifactBrowser.CollectionViewer.browse_dates">Date</message>
 	<message key="xmlui.ArtifactBrowser.CollectionViewer.advanced_search_link">Advanced Search</message>
 	<message key="xmlui.ArtifactBrowser.CollectionViewer.head_recent_submissions">Recent Submissions</message>
 
@@ -246,9 +246,9 @@
 	<message key="xmlui.ArtifactBrowser.CommunityViewer.all_of_dspace">All of MOspace</message>
 	<message key="xmlui.ArtifactBrowser.CommunityViewer.full_text_search">Search within this community and its collections:</message>
 	<message key="xmlui.ArtifactBrowser.CommunityViewer.head_browse">Browse by</message>
-	<message key="xmlui.ArtifactBrowser.CommunityViewer.browse_titles">Titles</message>
-	<message key="xmlui.ArtifactBrowser.CommunityViewer.browse_authors">Authors</message>
-	<message key="xmlui.ArtifactBrowser.CommunityViewer.browse_dates">Dates</message>
+	<message key="xmlui.ArtifactBrowser.CommunityViewer.browse_titles">Title</message>
+	<message key="xmlui.ArtifactBrowser.CommunityViewer.browse_authors">Author</message>
+	<message key="xmlui.ArtifactBrowser.CommunityViewer.browse_dates">Date</message>
 	<message key="xmlui.ArtifactBrowser.CommunityViewer.advanced_search_link">Advanced Search</message>
 	<message key="xmlui.ArtifactBrowser.CommunityViewer.head_sub_communities">Sub-communities within this community</message>
 	<message key="xmlui.ArtifactBrowser.CommunityViewer.head_sub_collections">Collections in this community</message>
@@ -292,9 +292,9 @@
 	<message key="xmlui.ArtifactBrowser.Navigation.head_browse">Browse</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.head_all_of_dspace">All of MOspace</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.communities_and_collections">Communities &amp; Collections</message>
-	<message key="xmlui.ArtifactBrowser.Navigation.browse_title">Titles</message>
-	<message key="xmlui.ArtifactBrowser.Navigation.browse_author">Authors</message>
-	<message key="xmlui.ArtifactBrowser.Navigation.browse_subject">Subjects</message>
+	<message key="xmlui.ArtifactBrowser.Navigation.browse_title">Title</message>
+	<message key="xmlui.ArtifactBrowser.Navigation.browse_author">Author</message>
+	<message key="xmlui.ArtifactBrowser.Navigation.browse_subject">Subject</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.browse_dateissued">Date Issued</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.browse_dateaccessioned">Submit Date</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.browse_discipline">Theses Department</message>
