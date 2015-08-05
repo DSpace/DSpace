@@ -6,8 +6,6 @@
  * http://www.dspace.org/license/
  */
 
-//$.noConflict();
-
 // create latest items on from dspace RSS feed
 function createLatestItems(num) {
     if(num === 'undefined'){
@@ -69,7 +67,6 @@ function organiseMetadataGroups(){
             'id': 'aspect_submission_StepTransformer_field_dc_identifier_ismn',
             'text': 'Acknowledge sources and describe file structure.',
             'items': ['aspect_submission_StepTransformer_field_dc_source',
-                      'aspect_submission_StepTransformer_field_dc_date_embargo',
                       'aspect_submission_StepTransformer_field_dc_description_tableofcontents']
         },
         'Group 4': {
@@ -86,11 +83,7 @@ function organiseMetadataGroups(){
     $.each(map, function(i, group){
         var hide = true;
 
-        console.log(i + " : " + group.id);
-
         var li = $('#' + group.id).closest('.ds-form-item');
-
-        console.log(li);
 
         li.addClass('metadata-group');
 
@@ -100,12 +93,10 @@ function organiseMetadataGroups(){
         label.text(group.text);
 
         if(i === 'Group 1'){
-            //li.before()
             li.before('<div class="ds-form-item metadata-group-heading"><p>Optimise the \'findability\' of your submission via search engines and link to published papers by adding supplementary information:</p></div>');
         }
 
         li.click(function(event){
-            console.log("=>");
             // click on group
             event.preventDefault();
 
@@ -118,7 +109,6 @@ function organiseMetadataGroups(){
             }
 
             $.each(map[id].items, function(i, id){
-                //$('#' + id).closest('.ds-form-item').slideToggle();
                 $('#' + id).closest('.ds-form-item').toggle();
             });
 
@@ -133,7 +123,6 @@ function organiseMetadataGroups(){
         });
 
         $.each(group.items, function(j, id){
-            console.log(j + " : " + id);
             var ctrl = $('#' + id);
             var val = ctrl.val();
 
@@ -146,8 +135,6 @@ function organiseMetadataGroups(){
                 }
             }
         });
-
-        console.log(hide);
 
         if(hide){
             li.addClass('metadata-group-expand');
