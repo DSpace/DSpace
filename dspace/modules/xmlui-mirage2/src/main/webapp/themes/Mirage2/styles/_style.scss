@@ -21,3 +21,37 @@
     color: white;
     background: hotpink;
 }
+
+#aspect_submission_StepTransformer_div_submit-describe .metadata-group{
+    cursor: pointer;
+    /* background-color: #E4ECF3; */
+}
+
+.metadata-group .ds-text-field{
+    display: none;
+}
+
+.metadata-group label{
+    cursor: pointer;
+    padding-left: 20px;
+    width: 500px;
+}
+
+.metadata-group-expand {
+    background-image: url(../images/list-add.png);
+    background-repeat: no-repeat;
+    background-size: 10em;
+    /* margin-left: -1em; */
+    background-size: 2em;
+}
+
+/* .metadata-group-expand label::before { */
+/*     content: "+"; */
+/*     font-size: 12px; */
+/* } */
+
+.metadata-group-collapse {
+    background-image: url(../images/list-remove.png);
+    background-repeat: no-repeat;
+    background-size: 2em;
+}
