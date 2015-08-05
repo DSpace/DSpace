@@ -359,8 +359,6 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             return;
         }
         
-        log.info("************************************ " + Util.showDownloadAll(context, item));
-        
         // DataShare - start
         if(Util.showDownloadAll(context, item))
         {

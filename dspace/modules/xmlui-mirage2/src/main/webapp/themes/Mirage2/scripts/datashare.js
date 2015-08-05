@@ -154,15 +154,14 @@ function checkLicense(){
         var LICENSE_URL = "https://creativecommons.org/licenses/by/4.0/";
         var rights = $('#aspect_submission_StepTransformer_field_right-statement');
         var dropdown = $('#aspect_submission_StepTransformer_field_license-options');
-        var dropdownHelp = $(dropdown.siblings()[0])
 
         if($('#aspect_submission_StepTransformer_field_license-options').val() === '5'){
-            rights.closest('li').hide();
-            dropdownHelp.html('<a href="' + LICENSE_URL + '" target="_blank">What does this open licence mean?</a>');
+            rights.parent().parent().hide();
+            dropdown.next().html('<a href="' + LICENSE_URL + '" target="_blank">What does this open licence mean?</a>');
         }
         else{
-            dropdownHelp.text('');
-            rights.closest('li').show();
+            dropdown.next().text('');
+            rights.parent().parent().show();
         }
     };
 
