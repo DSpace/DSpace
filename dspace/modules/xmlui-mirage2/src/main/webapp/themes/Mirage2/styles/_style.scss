@@ -30,6 +30,12 @@ a {
 	text-decoration: underline;
 }
 
+
+// do NOT underline the active heading, it's confusing
+a.list-group-item.active {
+	text-decoration: none;
+}
+
 .navbar {
     height: 90px;
 }
