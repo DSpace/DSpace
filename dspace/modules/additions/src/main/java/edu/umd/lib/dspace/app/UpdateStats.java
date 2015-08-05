@@ -77,7 +77,7 @@ public class UpdateStats
     static long lBitstreams = 0;
 
     private static Pattern pStat = Pattern
-            .compile("^ *(\\d+): /(handle|bitstream)/(\\d+[^/]*/\\d+)(/(\\d+))?");
+            .compile("^ *(\\d+): /(handle|bitstream/handle)/(\\d+[^/]*/\\d+)(/([^?]*))?");
 
     /***************************************************************** main */
     /**
@@ -159,15 +159,14 @@ public class UpdateStats
                         else
                         {
                             // bitstream
-                            String strSeq = mStat.group(5);
+                            String strName = mStat.group(5);
 
-                            if (strSeq != null)
+                            if (strName != null)
                             {
-                                int nSeq = Integer.parseInt(strSeq);
 
                                 log.debug("Bitstream: " + "count=" + strCount
-                                        + ", handle=" + strHandle
-                                        + ", sequence=" + strSeq);
+                                        + ", handle=" + strHandle + ", name="
+                                        + strName);
 
                                 boolean found = false;
 
@@ -182,8 +181,8 @@ public class UpdateStats
                                     for (int k = 0; (k < bitstreams.length)
                                             && !found; k++)
                                     {
-                                        if (nSeq == bitstreams[k]
-                                                .getSequenceID())
+                                        if (strName.equals(bitstreams[k]
+                                                .getName()))
                                         {
                                             bs = bitstreams[k];
                                             found = true;
@@ -193,8 +192,8 @@ public class UpdateStats
 
                                 if (bs == null)
                                 {
-                                    log.warn("Unrecognized bitstream sequence: "
-                                            + strHandle + "/" + strSeq);
+                                    log.warn("Unrecognized bitstream: "
+                                            + strHandle + "/" + strName);
                                 }
                                 else
                                 {
