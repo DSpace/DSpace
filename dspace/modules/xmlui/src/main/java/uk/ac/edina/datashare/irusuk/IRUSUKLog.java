@@ -13,7 +13,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 
-//import com.atmire.statistics.export.ExportUsageEventListener;
+import com.atmire.statistics.export.ExportUsageEventListener;
 
 /**
  * Logs a datashare zip download with IRUS UK.
@@ -164,7 +164,7 @@ public class IRUSUKLog {
         }
 
         public void run() {
-/*            try{
+            try{
             	ExportUsageEventListener.processUrl(this.context, this.urlString);
             }
             catch(IOException ex){
@@ -173,6 +173,6 @@ public class IRUSUKLog {
             catch(SQLException ex){
                 throw new RuntimeException(ex);
             }
-*/        }
+        }
     }
 }
