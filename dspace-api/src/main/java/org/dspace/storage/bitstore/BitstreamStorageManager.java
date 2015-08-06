@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import org.dspace.checker.BitstreamInfoDAO;
@@ -111,7 +112,7 @@ public class BitstreamStorageManager
      */
     private static ArrayList initLegacyAssetstore(ArrayList list) {
         String storeDir = ConfigurationManager.getProperty("assetstore.dir");
-        if (storeDir == null)
+        if (StringUtils.isEmpty(storeDir))
         {
             log.info("No default assetstore.dir");
         }
@@ -122,7 +123,7 @@ public class BitstreamStorageManager
             for (int i = 1;; i++)
             {
                 storeDir = ConfigurationManager.getProperty("assetstore.dir." + i);
-                if (storeDir == null)
+                if (StringUtils.isEmpty(storeDir))
                 {
                     break;
                 }
@@ -144,30 +145,33 @@ public class BitstreamStorageManager
     {
         log.info("Init BitStore:" + storeConfig);
 		// create and initialize an asset store
-    	int split = storeConfig.indexOf(":");
-    	if (split != -1)
-    	{
-    		String prefix = storeConfig.substring(0,split);
-    		String config = storeConfig.substring(split+1);
-    		String className = ConfigurationManager.getProperty("bitstore." + prefix + ".class");
-    		if (className == null && DEFAULT_STORE_PREFIX.equals(prefix))
-    		{
-    			// use default implementation class if none explicitly defined
-    			className = DEFAULT_STORE_IMPL;
-    		}
+        String[] storeConfigArray = storeConfig.split(":");
+        if(storeConfigArray.length == 2) {
+            String prefix = storeConfigArray[0];
+            String config = storeConfigArray[1];
+
+            String className = ConfigurationManager.getProperty("bitstore." + prefix + ".class");
+            if (StringUtils.isEmpty(className) || DEFAULT_STORE_PREFIX.equals(prefix))
+            {
+                // use default implementation class if none explicitly defined
+                className = DEFAULT_STORE_IMPL;
+            }
 
             log.info("BitStore name: " + className);
-    	    try
-		    {
-    		    BitStore store = (BitStore)Class.forName(className).newInstance();
-    		    store.init(config);
-    		    list.add(store);
-		    }
-    	    catch (Exception e)
-		    {
-    	    	log.error("Cannot instantiate store class: " + className + ", exception: " + e.getMessage(), e);
-		    }
-    	}
+            try
+            {
+                BitStore store = (BitStore)Class.forName(className).newInstance();
+                store.init(config);
+                list.add(store);
+            }
+            catch (Exception e)
+            {
+                log.error("Cannot instantiate store class: " + className + ", exception: " + e.getMessage(), e);
+            }
+
+        } else {
+            log.info("Odd bitstore config: [" + storeConfig + "]");
+        }
     }
     
     private static void updateBitstream(TableRow bitstream, Map attrs)
