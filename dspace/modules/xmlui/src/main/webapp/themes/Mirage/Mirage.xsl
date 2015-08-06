@@ -241,7 +241,12 @@
                 <div id="dryad-home-carousel" class="ds-static-div primary">
                     <!-- REMINDER: slide publication dates are in the format YEAR-MONTH-DAY, eg, 2013-12-28 -->
                     <div class="bxslider" style="">
-						<div><span class="publication-date">2015-03-23</span>
+                        <div><span class="publication-date">2015-04-14</span>
+                            <a href="/pages/submissionIntegration">
+                                <img src="/themes/Mirage/images/integration-slide.jpg" alt="Publishers: Simplify data submission. Strengthen links between articles and data. For free. Integrate your journal with Dryad now" />
+                            </a>
+                        </div>
+                        <div><span class="publication-date">2015-03-23</span>
                             <a href="/pages/membershipOverview">
                                 <img alt="" src="/themes/Mirage/images/watering-can.png" />
                                 <p style="width: 450px; color: #363; font-size: 90%; top: 0px; right: 10px; line-height: 1.2em; position: absolute; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);">Help grow open data at Dryad:<br />Become an organizational member</p>
@@ -264,8 +269,8 @@
                         <div><span class="publication-date">2013-01-01</span>
                             <a href="/pages/repository#keyFeatures">
                                 <img src="/themes/Mirage/images/bookmarkSubmissionProcess.png" alt="Deposit data. Get permanent identifier. Watch your citations grow! Relax, your data are discoverable and secure." />
-                           </a>
-                       </div>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -317,41 +322,13 @@
 
             <!-- START CONNECT  -->
             <div class="home-col-2" style="clear: right;">
-                <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Be part of Dryad
+                <h1 class="ds-div-head ds_connect_with_dryad_head" id="ds_connect_with_dryad_head">Latest from @datadryad
                 </h1>
 
                 <div id="ds_connect_with_dryad" class="ds-static-div primary" style="height: 475px; font-size: 14px;">
                     <div id="connect-illustrated-prose">
-                        <p>
-                            <img src="/themes/Mirage/images/seed-2.png" style="float: left; margin-left: -8px;" 
-                                 alt="Dryad's data packages are like seeds."
-                                 title="Dryad's data packages are like seeds." />
-                            Publishers, societies, universities, libraries,
-                            funders, and other stakeholder organizations are
-                            invited to become <a href="/pages/membershipOverview">members</a>.
-                            Tap into an active knowledge-sharing network,
-                            receive discounts on data publishing fees, and help
-                            shape Dryad's future.
-                            <img src="/themes/Mirage/images/seed-3.png" style="float: right; margin-right: -8px;" 
-                                 alt="Researchers use Dryad data in their new work."
-                                 title="Researchers use Dryad data in their new work."/>
-                        </p>
-                        <p>
-                            <a href="/pages/submissionIntegration">Submission integration</a> 
-                            is a free service that allows publishers to
-                            coordinate manuscript and data submissions.
-                            It makes submitting data easy for researchers; makes linking
-                            articles and data easy for journals; and enables
-                            confidential review of data prior to publication.
-                        </p>
-                        <p>
-                            <img src="/themes/Mirage/images/seed-1.png" style="float: left; margin-left: -8px;" 
-                                 alt="New data is added to Dryad, and the cycle continues."
-                                 title="New data is added to Dryad, and the cycle continues."/>
-                            Data Publishing Charges (DPCs) support the cost of keeping Dryad's content free to use.
-                            Flexible <a href="/pages/payment">payment plans</a> 
-                            provide volume discounts.
-                        </p>
+		      <a class="twitter-timeline" href="https://twitter.com/datadryad" data-widget-id="572434627277901824">Latest from @datadryad</a>
+		      <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>	
                     </div>
                 </div>
             </div>
@@ -414,19 +391,19 @@
 
             <!-- START INTEGRATED JOURNAL-->
             <div class="home-col-2" style="clear: both; margin-left: 25px;">
-              <h1 class="ds-div-head">Recently integrated journals</h1>
-              <div id="recently_integrated_journals" class="ds-static-div primary">
-                <div class="container">
-					<!-- Ecography -->
-							  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aecography%5C%7C%5C%7C%5C%7CEcography"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-Ecog.png" alt="Ecography" /></a>
-					<!-- Ecology -->
-							  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aecology%5C%7C%5C%7C%5C%7CEcology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ecology.png" alt="Ecology" /></a>
-                  <!-- Oikos -->
-                  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aoikos%5C%7C%5C%7C%5C%7COikos"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-Oikos.png" alt="Oikos" /></a>
-                  <!-- PLOS -->
-                  <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aplos%2A"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-plos.png" alt="PLOS" /></a>
+                <h1 class="ds-div-head">Recently integrated journals</h1>
+                <div id="recently_integrated_journals" class="ds-static-div primary">
+                    <div class="container">
+                        <!-- Bone & Joint 360 -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Abone%5C+%26%5C+joint%5C+360%5C%7C%5C%7C%5C%7CBone%5C+%26%5C+Joint%5C+360"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-BJ360.png" alt="Bone &amp; Joint 360" /></a>
+                        <!-- Bone & Joint Journal -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Abone%5C+%26%5C+joint%5C+journal%5C%7C%5C%7C%5C%7CBone%5C+%26%5C+Joint%5C+Journal"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-BJJ.png" alt="Bone &amp; Joint Journal" /></a>
+                        <!-- Bone & Joint Research -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Abone%5C+%26%5C+joint%5C+research%5C%7C%5C%7C%5C%7CBone%5C+%26%5C+Joint%5C+Research"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-BJR.png" alt="Bone &amp; Joint Research" /></a>
+                        <!-- Ecology -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aecology%5C%7C%5C%7C%5C%7CEcology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ecology.png" alt="Ecology" /></a>
+                    </div>
                 </div>
-              </div>
             </div>
             <!-- START STATISTICS -->
             <div class="home-col-2" style="margin-left: 25px;">

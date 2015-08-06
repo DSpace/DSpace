@@ -58,28 +58,28 @@
     <message key="xmlui.Submission.workflow.ClaimActionXMLUI.leave_help">Leave this task in the pool for another to take.</message>
     <message key="xmlui.Submission.workflow.ClaimActionXMLUI.leave_submit">Leave task</message>
     <message key="xmlui.Submission.workflow.ClaimActionXMLUI.back">Back to overview</message>
-    <message key="xmlui.Submission.workflow.ClaimActionXMLUI.title">Accept/Reject Task</message>
+    <message key="xmlui.Submission.workflow.ClaimActionXMLUI.title">Accept/Return Task</message>
 
-    <message key="xmlui.Submission.workflow.AcceptActionXMLUI.head">Perform task: Accept/Reject item</message>
+    <message key="xmlui.Submission.workflow.AcceptActionXMLUI.head">Perform task: Accept/Return item</message>
     <message key="xmlui.Submission.workflow.AcceptActionXMLUI.info1">Actions you may perform on this task:</message>
     <message key="xmlui.Submission.workflow.AcceptActionXMLUI.reject_help">If you have reviewed the item and found it is <strong>not</strong> suitable for inclusion in the collection, select "Reject".  You will then be asked to enter a message indicating why the item is unsuitable, and whether the submitter should change something and resubmit.</message>
-    <message key="xmlui.Submission.workflow.AcceptActionXMLUI.reject_submit">Reject item</message>
+    <message key="xmlui.Submission.workflow.AcceptActionXMLUI.reject_submit">Return item to submitter</message>
     <message key="xmlui.Submission.workflow.AcceptActionXMLUI.approve_help">If you have reviewed the item and it is suitable for inclusion in the collection, select "Approve".</message>
     <message key="xmlui.Submission.workflow.AcceptActionXMLUI.approve_submit">Approve item</message>
 
 
-    <message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.head">Perform task: Accept/Reject/Edit item</message>
+    <message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.head">Perform task: Accept/Return/Edit item</message>
     <message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.info1">Actions you may perform on this task:</message>
     <message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.reject_help">If you have reviewed the item and found it is <strong>not</strong> suitable for inclusion in the collection, select "Reject".  You will then be asked to enter a message indicating why the item is unsuitable, and whether the submitter should change something and resubmit.</message>
-    <message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.reject_submit">Reject item</message>
+    <message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.reject_submit">Return item</message>
     <message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.approve_help">If you have reviewed the item and it is suitable for inclusion in the collection, select "Approve".</message>
     <message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.approve_submit">Approve item</message>
     <message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.edit_help">Select this option to change the item's metadata.</message>
     <message key="xmlui.Submission.workflow.EditMetadataActionXMLUI.edit_submit">Edit metadata</message>
 
-    <message key="xmlui.Submission.Submissions.default.startStep.acceptAction">First step: Accept/Reject action</message>
-    <message key="xmlui.Submission.Submissions.default.2ndstep.editMetadataAction">Second step: Accept/Edit/Reject action</message>
-    <message key="xmlui.Submission.Submissions.claimAction">Accept/Reject task</message>
+    <message key="xmlui.Submission.Submissions.default.startStep.acceptAction">First step: Accept/Return action</message>
+    <message key="xmlui.Submission.Submissions.default.2ndstep.editMetadataAction">Second step: Accept/Edit/Return action</message>
+    <message key="xmlui.Submission.Submissions.claimAction">Accept/Return task</message>
     <message key="xmlui.Submission.Submissions.step.unknown">Unknown state</message>
 
   </catalogue>

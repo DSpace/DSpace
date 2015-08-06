@@ -1478,6 +1478,60 @@
                          alt="BMJ Open logo"/>
                 </a>
             </xsl:when>
+            <xsl:when test='$journal-name = "The Bone &amp; Joint Journal"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of
+                                        select="string('http://www.bjj.boneandjoint.org.uk/')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/BJJ.jpg"
+                         alt="The Bone &amp; Joint Journal cover"/>
+                </a>
+            </xsl:when>
+            <xsl:when test='$journal-name = "Bone &amp; Joint Research"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of
+                                        select="string('http://www.bjr.boneandjoint.org.uk/')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/BJR.jpg"
+                         alt="Bone &amp; Joint Research cover"/>
+                </a>
+            </xsl:when>
+            <xsl:when test='$journal-name = "Bone &amp; Joint360"'>
+                <a target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of
+                                        select="string('http://www.bj360.boneandjoint.org.uk/')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/BJ360.jpg"
+                         alt="Bone &amp; Joint360 cover"/>
+                </a>
+            </xsl:when>
             <xsl:when test='$journal-name = "Comparative Cytogenetics"'>
                 <a target="_blank">
                     <xsl:attribute name="href">

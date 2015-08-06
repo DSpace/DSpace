@@ -721,18 +721,18 @@
 	<message key="xmlui.Submission.workflow.PerformTaskStep.approve_submit">Approve item</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.commit_help">Once you've edited the item, use this option to commit the item to the archive.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.commit_submit">Commit to archive</message>
-	<message key="xmlui.Submission.workflow.PerformTaskStep.reject_help">If you have reviewed the item and found it is <strong>not</strong> suitable for inclusion in the collection, select "Reject".  You will then be asked to enter a message indicating why the item is unsuitable, and whether the submitter should change something and resubmit.</message>
-	<message key="xmlui.Submission.workflow.PerformTaskStep.reject_submit">Reject item</message>
+	<message key="xmlui.Submission.workflow.PerformTaskStep.reject_help">If you have reviewed the item and found it is <strong>not</strong> suitable for inclusion in the collection, select "Return item to submitter".  You will then be asked to enter a message indicating why the item is unsuitable, and whether the submitter should change something and resubmit.</message>
+	<message key="xmlui.Submission.workflow.PerformTaskStep.reject_submit">Return item to submitter</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.edit_help">Select this option to change the item's metadata.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.edit_submit">Edit metadata</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.return_help">Return the task to the pool so that another user may perform the task.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.return_submit">Return task to pool</message>
 
 	<!-- org.dspace.app.xmlui.Submission.workflow.RejectTaskStep -->
-	<message key="xmlui.Submission.workflow.RejectTaskStep.info1">Please enter your reason for rejecting the submission into the box below, indicating whether the submitter may fix a problem and resubmit.</message>
+	<message key="xmlui.Submission.workflow.RejectTaskStep.info1">Please enter your reason for returning the submission into the box below, indicating whether the submitter may fix a problem and resubmit.</message>
 	<message key="xmlui.Submission.workflow.RejectTaskStep.reason">Reason</message>
 	<message key="xmlui.Submission.workflow.RejectTaskStep.reason_required">The reason field is required</message>
-	<message key="xmlui.Submission.workflow.RejectTaskStep.submit_reject">Reject item</message>
+	<message key="xmlui.Submission.workflow.RejectTaskStep.submit_reject">Return item to submitter</message>
 
 
 
@@ -1454,8 +1454,8 @@
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.role_buttons">  </message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.label_admins">Administrators</message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.label_wf">Workflow steps</message>
-	<message key="xmlui.administrative.collection.AssignCollectionRoles.label_wf_step1">Accept/Reject Step</message>
-	<message key="xmlui.administrative.collection.AssignCollectionRoles.label_wf_step2">Accept/Reject/Edit Metadata Step</message>
+	<message key="xmlui.administrative.collection.AssignCollectionRoles.label_wf_step1">Accept/Return Step</message>
+	<message key="xmlui.administrative.collection.AssignCollectionRoles.label_wf_step2">Accept/Return/Edit Metadata Step</message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.label_wf_step3">Edit Metadata Step</message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.label_submitters">Submitters</message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.label_default_read">Default read access</message>
