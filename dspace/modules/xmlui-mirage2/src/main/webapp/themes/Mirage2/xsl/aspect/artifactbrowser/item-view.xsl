@@ -675,7 +675,12 @@
         <xsl:call-template name="itemSummaryView-DIM-title"/>
         <div class="ds-table-responsive">
             <table class="ds-includeSet-table detailtable table table-striped table-hover">
-                <xsl:apply-templates mode="itemDetailView-DIM"/>
+                <xsl:apply-templates mode="itemDetailView-DIM">
+					<!-- Ensure all metadata fields are sorted alphabetically, by schema and then by field name, see LSO #1445 -->
+					<xsl:sort select="./@mdschema" />
+					<xsl:sort select="./@element" />
+					<xsl:sort select="./@qualifier" />
+			</xsl:apply-templates>
             </table>
         </div>
 
