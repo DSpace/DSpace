@@ -135,6 +135,7 @@ Common usage:
         <echo message="                    touching your data" />
     	<echo message="update_configs  --> Update your configs directory with new configuration files"/>
     	<echo message="update_geolite  --> Dowload and install GeoCity database into ${dspace.dir}/config" />
+        <echo message="update_spiders  --> Dowload and install Spider Robots database into ${dspace.dir}/config" />
         <echo message="update_code     --> Update compiled code (bin, lib, and etc directories)" />
         <echo message="update_webapps  --> Update web applications" />
         <echo message="update_solr_indexes --> Checks if any Solr indexes need upgrading (to latest Solr), and if so, upgrades them." />
@@ -196,6 +197,7 @@ Common usage:
     <!-- ============================================================= -->
     <target name="update_configs" depends="overwrite_configs,overwrite_solr_configs" description="Updates the Configuration Directory">
     	<antcall target="init_geolite" />
+        <antcall target="init_spiders" />
     </target>
 
     <target name="overwrite_configs" description="Overwrites a configuration directory." if="${overwrite}" depends="copy_configs_keep">
@@ -869,6 +871,8 @@ Common usage:
 
     	<antcall target="init_geolite" />
 
+        <antcall target="init_spiders" />
+
         <echo>
 ====================================================================
  The DSpace code has been installed.
@@ -945,6 +949,24 @@ You may manually install this file by following these steps:
     <target name="init_geolite" depends="check_geolite" if="need.geolite">
         <antcall target="update_geolite" />
     </target>
+     <!-- installs and/or updates Project Counter Robot List resolution database -->
+    <target name="update_spiders">
+        <echo>Downloading: http://www.projectcounter.org/r4/COUNTER_Robots_list_Jan2014.txt</echo>
+        <get src="http://www.projectcounter.org/r4/COUNTER_Robots_list_Jan2014.txt" dest="${dspace.dir}/config/COUNTER_Robots_list_Jan2014.txt" verbose="true" />
+    </target>
+
+    <target name="check_spiders">
+        <condition property="need.spiders">
+            <not>
+                <available file="${dspace.dir}/config/COUNTER_Robots_list_Jan2014.txt" />
+            </not>
+        </condition>
+    </target>
+
+    <target name="init_spiders" depends="check_spiders" if="need.spiders">
+        <antcall target="update_spiders" />
+    </target>
+
     
     <!-- Check if any Solr indexes need updating to the version of Solr/Lucene we are using. -->
     <target name="update_solr_indexes">
