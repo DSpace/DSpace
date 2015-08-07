@@ -55,9 +55,12 @@ public class JSPManager
             log.debug(LogManager.getHeader((Context) request
                     .getAttribute("dspace.context"), "view_jsp", jsp));
         }
-
-        // For the moment, a simple forward
-        request.getRequestDispatcher(jsp).forward(request, response);
+        try {
+            // For the moment, a simple forward
+            request.getRequestDispatcher(jsp).forward(request, response);
+        } catch (Exception e) {
+             throw new ServletException(e);
+        }
     }
 
     /**
