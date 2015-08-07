@@ -291,28 +291,18 @@
 
 
     <xsl:template name="itemSummaryView-DIM-authors">
-        <xsl:if test="dim:field[@element='contributor'][@qualifier='author' and descendant::text()] or dim:field[@element='creator' and descendant::text()] or dim:field[@element='contributor' and descendant::text()]">
+        <xsl:if test="(dim:field[@element='contributor'][@qualifier='author' and descendant::text()]) or (dim:field[@element='creator' and descendant::text()])">
             <div class="simple-item-view-authors item-page-field-wrapper table">
-                <xsl:choose>
-                    <xsl:when test="dim:field[@element='contributor'][@qualifier='author']">
+                    <xsl:if test="dim:field[@element='contributor'][@qualifier='author']">
                         <xsl:for-each select="dim:field[@element='contributor'][@qualifier='author']">
                             <xsl:call-template name="itemSummaryView-DIM-authors-entry" />
                         </xsl:for-each>
-                    </xsl:when>
-                    <xsl:when test="dim:field[@element='creator']">
+                    </xsl:if>
+                    <xsl:if test="dim:field[@element='creator']">
                         <xsl:for-each select="dim:field[@element='creator']">
                             <xsl:call-template name="itemSummaryView-DIM-authors-entry" />
                         </xsl:for-each>
-                    </xsl:when>
-                    <xsl:when test="dim:field[@element='contributor']">
-                        <xsl:for-each select="dim:field[@element='contributor']">
-                            <xsl:call-template name="itemSummaryView-DIM-authors-entry" />
-                        </xsl:for-each>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <i18n:text>xmlui.dri2xhtml.METS-1.0.no-author</i18n:text>
-                    </xsl:otherwise>
-                </xsl:choose>
+                    </xsl:if>
             </div>
         </xsl:if>
     </xsl:template>
@@ -361,12 +351,12 @@
     <!-- additional fields for itemSummaryView, see #1381  -->
     
     <xsl:template name="itemSummaryView-DIM-contributors">
-        <xsl:if test="dim:field[@element='contributor'][@qualifier='corporateName' and descendant::text()]">
+        <xsl:if test="dim:field[@element='contributor'][@qualifier='corporatename' and descendant::text()]">
             <div class="simple-item-view-authors item-page-field-wrapper table">
                 <h5>Contributor</h5>
                 <xsl:choose>
-                    <xsl:when test="dim:field[@element='contributor'][@qualifier='corporateName']">
-                        <xsl:for-each select="dim:field[@element='contributor'][@qualifier='corporateName']">
+                    <xsl:when test="dim:field[@element='contributor'][@qualifier='corporatename']">
+                        <xsl:for-each select="dim:field[@element='contributor'][@qualifier='corporatename']">
                             <xsl:call-template name="itemSummaryView-DIM-authors-entry" />
                         </xsl:for-each>
                     </xsl:when>
@@ -380,7 +370,7 @@
             <div class="simple-item-view-show-full item-page-field-wrapper table">
                 <h5>Format</h5>
                 <xsl:choose>
-                    <xsl:when test="dim:field[@element='type']">
+                    <xsl:when test="dim:field[@element='type'][not(@qualifier='genre')]">
                         <xsl:for-each select="dim:field[@element='type']">
               			<div><xsl:copy-of select="./node()"/></div>
                         </xsl:for-each>
