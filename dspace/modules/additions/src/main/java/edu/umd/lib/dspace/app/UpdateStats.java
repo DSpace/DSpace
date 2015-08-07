@@ -61,167 +61,192 @@ import org.dspace.handle.HandleManager;
 // Lims
 import edu.umd.lims.util.ErrorHandling;
 
-
 /*********************************************************************
- Update view statistics using the output from analog.
+ * Update view statistics using the output from analog.
+ * 
+ * @author Ben Wallberg
+ *********************************************************************/
 
- @author  Ben Wallberg
+public class UpdateStats
+{
 
-*********************************************************************/
+    private static Logger log = Logger.getLogger(UpdateStats.class);
 
-public class UpdateStats {
+    static long lItems = 0;
 
-  private static Logger log = Logger.getLogger(UpdateStats.class);
+    static long lBitstreams = 0;
 
-  static long lItems = 0;
-  static long lBitstreams = 0;
+    private static Pattern pStat = Pattern
+            .compile("^ *(\\d+): /(handle|bitstream/handle)/(\\d+[^/]*/\\d+)(/([^?]*))?");
 
-  private static Pattern pStat = Pattern.compile("^ *(\\d+): /(handle|bitstream)/(\\d+[^/]*/\\d+)(/(\\d+))?");
+    /***************************************************************** main */
+    /**
+     * Command line interface.
+     */
 
+    public static void main(String args[]) throws Exception
+    {
 
-  /***************************************************************** main */
-  /**
-   * Command line interface.
-   */
+        Context context = null;
 
-  public static void main(String args[]) throws Exception {
+        try
+        {
 
-    Context context = null;
+            // Properties
+            Properties props = System.getProperties();
 
-    try {
+            // dspace dir
+            String strDspace = ConfigurationManager.getProperty("dspace.dir");
 
-      // Properties
-      Properties props     = System.getProperties();
+            // open the stat input file
+            String strFile = strDspace + "/stats/views.txt";
+            FileInputStream fis = new FileInputStream(new File(strFile));
+            BufferedReader br = new BufferedReader(new InputStreamReader(fis,
+                    "UTF-8"));
+            log.info(strFile + " opened for reading");
 
-      // dspace dir
-      String strDspace     = ConfigurationManager.getProperty("dspace.dir");
+            // Setup context
+            context = new Context();
+            context.setIgnoreAuthorization(true);
 
-      // open the stat input file
-      String strFile = strDspace + "/stats/views.txt";
-      FileInputStream fis = new FileInputStream(new File(strFile));
-      BufferedReader br = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
-      log.info(strFile + " opened for reading");
+            // Read through each line in the file
+            String strLine = null;
+            while ((strLine = br.readLine()) != null)
+            {
 
-      // Setup context
-      context = new Context();
-      context.setIgnoreAuthorization(true);
+                Matcher mStat = pStat.matcher(strLine);
 
-      // Read through each line in the file
-      String strLine = null;
-      while ((strLine = br.readLine()) != null) {
+                if (mStat.find())
+                {
+                    String strCount = mStat.group(1);
+                    String strType = mStat.group(2);
+                    String strHandle = mStat.group(3);
 
-	Matcher mStat = pStat.matcher(strLine);
+                    int nCount = Integer.parseInt(strCount);
 
-	if (mStat.find()) {
-	  String strCount  = mStat.group(1);
-	  String strType   = mStat.group(2);
-	  String strHandle = mStat.group(3);
+                    DSpaceObject dso = HandleManager.resolveToObject(context,
+                            strHandle);
 
-	  int nCount = Integer.parseInt(strCount);
+                    if (dso == null)
+                    {
+                        // handle not found
+                        log.warn("Unrecognized handle: " + strHandle);
 
-	  DSpaceObject dso = HandleManager.resolveToObject(context, strHandle);
+                    }
+                    else if (dso.getType() == Constants.COLLECTION
+                            || dso.getType() == Constants.COMMUNITY)
+                    {
+                        // ignore collections and communities
 
-	  if (dso == null) {
-	    // handle not found
-	    log.warn("Unrecognized handle: " + strHandle);
+                    }
+                    else
+                    {
+                        Item item = (Item) dso;
 
-	  } else if (dso.getType() == Constants.COLLECTION ||
-		     dso.getType() == Constants.COMMUNITY) {
-	    // ignore collections and communities
+                        if (strType.equals("handle"))
+                        {
+                            log.debug("Item: " + "count=" + strCount
+                                    + ", handle=" + strHandle);
 
-	  } else {
-	    Item item = (Item)dso;
+                            int nItemCount = item.getIntMetadata("views");
+                            nItemCount += nCount;
+                            item.setMetadata("views", nItemCount);
+                            item.update(false);
 
-	    if (strType.equals("handle")) {
-	      log.debug("Item: "
-			+ "count=" + strCount
-			+ ", handle=" + strHandle
-			);
+                            lItems++;
 
-	      int nItemCount = item.getIntMetadata("views");
-	      nItemCount += nCount;
-	      item.setMetadata("views", nItemCount);
-	      item.update(false);
+                        }
+                        else
+                        {
+                            // bitstream
+                            String strName = mStat.group(5);
 
-	      lItems++;
+                            if (strName != null)
+                            {
 
-	    } else {
-	      // bitstream
-	      String strSeq = mStat.group(5);
-	      
-	      if (strSeq != null) {
-		int nSeq = Integer.parseInt(strSeq);
+                                log.debug("Bitstream: " + "count=" + strCount
+                                        + ", handle=" + strHandle + ", name="
+                                        + strName);
 
-		log.debug("Bitstream: "
-			  + "count=" + strCount
-			  + ", handle=" + strHandle
-			  + ", sequence=" + strSeq
-			  );
+                                boolean found = false;
 
-		boolean found = false;
+                                // Find the bitstream
+                                Bitstream bs = null;
+                                Bundle[] bundles = item.getBundles();
 
-		// Find the bitstream
-		Bitstream bs = null;
-		Bundle[] bundles = item.getBundles();
-		
-		for (int i = 0; (i < bundles.length) && !found; i++) {
-		  Bitstream[] bitstreams = bundles[i].getBitstreams();
-		  for (int k = 0; (k < bitstreams.length) && !found; k++) {
-		    if (nSeq == bitstreams[k].getSequenceID()) {
-		      bs = bitstreams[k];
-		      found = true;
-		    }
-		  }
-		}
+                                for (int i = 0; (i < bundles.length) && !found; i++)
+                                {
+                                    Bitstream[] bitstreams = bundles[i]
+                                            .getBitstreams();
+                                    for (int k = 0; (k < bitstreams.length)
+                                            && !found; k++)
+                                    {
+                                        if (strName.equals(bitstreams[k]
+                                                .getName()))
+                                        {
+                                            bs = bitstreams[k];
+                                            found = true;
+                                        }
+                                    }
+                                }
 
-		if (bs == null) {
-		  log.warn("Unrecognized bitstream sequence: "+strHandle+"/"+strSeq);
-		} else {
-		  int nItemCount = bs.getIntMetadata("views");
-		  nItemCount += nCount;
-		  bs.setMetadata("views", nItemCount);
-		  bs.update();
-		
-		  lBitstreams++;
-		}
-	      }
-	    }
+                                if (bs == null)
+                                {
+                                    log.warn("Unrecognized bitstream: "
+                                            + strHandle + "/" + strName);
+                                }
+                                else
+                                {
+                                    int nItemCount = bs.getIntMetadata("views");
+                                    nItemCount += nCount;
+                                    bs.setMetadata("views", nItemCount);
+                                    bs.update();
 
-	    
-	  }
-	}
+                                    lBitstreams++;
+                                }
+                            }
+                        }
 
-      }
+                    }
+                }
 
-      // commit
-      log.info("Committing changes");
-      context.commit();
+            }
 
-      // Close the input file
-      br.close();
+            // commit
+            log.info("Committing changes");
+            context.commit();
 
+            // Close the input file
+            br.close();
+
+        }
+
+        catch (Exception e)
+        {
+            if (context != null)
+            {
+                context.abort();
+            }
+
+            log.error(ErrorHandling.getStackTrace(e));
+        }
+
+        finally
+        {
+            if (context != null)
+            {
+                try
+                {
+                    context.complete();
+                }
+                catch (Exception e)
+                {
+                }
+            }
+
+            log.info("=====================================\n"
+                    + "Items updated:      " + lItems + "\n"
+                    + "Bitstreams updated: " + lBitstreams + "\n");
+        }
     }
-
-    catch (Exception e) {
-      if (context != null) {
-	context.abort();
-      }
-
-      log.error(ErrorHandling.getStackTrace(e));
-    }
-
-    finally {
-      if (context != null) {
-        try { context.complete(); } catch (Exception e) {}
-      }
-      
-      log.info("=====================================\n" +
-	       "Items updated:      " + lItems + "\n" +
-	       "Bitstreams updated: " + lBitstreams + "\n"
-	       );
-    }
-  }
 }
-
-
-

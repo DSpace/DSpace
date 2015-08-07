@@ -160,8 +160,12 @@ $ dup
                 * Code Organizing
                  * Remove trailing whitespace > All lines
                  * Correct indentation
-                 
- We skip the Web and XML setup for Drum as we usually for the other projects.
+    * XML
+        * XML Files > Editor
+            * Indent using spaces
+            * Indentation size: 4
+ 
+ We skip the Web setup for Drum as we usually for the other projects.
 
 
 

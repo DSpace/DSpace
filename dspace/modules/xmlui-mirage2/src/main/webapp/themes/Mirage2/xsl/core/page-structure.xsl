@@ -305,12 +305,11 @@
 
 
         <header>
-        
             <div class="navbar navbar-default navbar-static-top" role="navigation">
                 <div class="container">
-                    <div class="navbar-header">
+                    <div class="navbar-header clear-float-xs-sm">
 
-                        <button type="button" class="navbar-toggle" data-toggle="offcanvas">
+                        <button type="button" class="navbar-toggle visible-xs visible-sm" data-toggle="offcanvas">
                             <span class="sr-only">
                                 <i18n:text>xmlui.mirage2.page-structure.toggleNavigation</i18n:text>
                             </span>
@@ -319,19 +318,23 @@
                             <span class="icon-bar"></span>
                         </button>
 
+                        <a href="http://www.lib.umd.edu" class="navbar-brand">
+                           <img alt="University of Maryland Libraries" src="{$theme-path}/images/liblogo.png" />
+                        </a>
+
                         <a href="{$context-path}/" class="navbar-brand">
-                            <img src="{$theme-path}/images/DSpace-logo-line.svg" />
+                            <img alt="Digital Repository at the University of Maryland" src="{$theme-path}/images/drum-logo.png" />
                         </a>
 
 
-                        <div class="navbar-header pull-right visible-xs hidden-sm hidden-md hidden-lg">
+                        <div class="navbar-header pull-right visible-xs visible-sm hidden-md hidden-lg">
                         <ul class="nav nav-pills pull-left ">
 
                             <xsl:if test="count(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='supportedLocale']) &gt; 1">
                                 <li id="ds-language-selection-xs" class="dropdown">
                                     <xsl:variable name="active-locale" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='currentLocale']"/>
-                                    <button id="language-dropdown-toggle-xs" href="#" role="button" class="dropdown-toggle navbar-toggle navbar-link" data-toggle="dropdown">
-                                        <b class="visible-xs glyphicon glyphicon-globe" aria-hidden="true"/>
+                                    <button id="language-dropdown-toggle-xs" href="#" role="button" class="dropdown-toggle navbar-toggle navbar-link visible-xs visible-sm" data-toggle="dropdown">
+                                        <b class="visible-xs visible-sm glyphicon glyphicon-globe" aria-hidden="true"/>
                                     </button>
                                     <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="language-dropdown-toggle-xs" data-no-collapse="true">
                                         <xsl:for-each
@@ -361,8 +364,8 @@
                             <xsl:choose>
                                 <xsl:when test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
                                     <li class="dropdown">
-                                        <button class="dropdown-toggle navbar-toggle navbar-link" id="user-dropdown-toggle-xs" href="#" role="button"  data-toggle="dropdown">
-                                            <b class="visible-xs glyphicon glyphicon-user" aria-hidden="true"/>
+                                        <button class="dropdown-toggle navbar-toggle navbar-link visible-xs visible-sm" id="user-dropdown-toggle-xs" href="#" role="button"  data-toggle="dropdown">
+                                            <b class="visible-xs visible-sm glyphicon glyphicon-user" aria-hidden="true"/>
                                         </button>
                                         <ul class="dropdown-menu pull-right" role="menu"
                                             aria-labelledby="user-dropdown-toggle-xs" data-no-collapse="true">
@@ -385,8 +388,8 @@
                                     <li>
                                         <form style="display: inline" action="{/dri:document/dri:meta/dri:userMeta/
                             dri:metadata[@element='identifier' and @qualifier='loginURL']}" method="get">
-                                            <button class="navbar-toggle navbar-link">
-                                            <b class="visible-xs glyphicon glyphicon-user" aria-hidden="true"/>
+                                            <button class="navbar-toggle navbar-link visible-xs visible-sm">
+                                            <b class="visible-xs visible-sm glyphicon glyphicon-user" aria-hidden="true"/>
                                             </button>
                                         </form>
                                     </li>
@@ -396,7 +399,7 @@
                               </div>
                     </div>
 
-                    <div class="navbar-header pull-right hidden-xs">
+                    <div class="navbar-header pull-right hidden-xs hidden-sm">
                         <ul class="nav navbar-nav pull-left">
                               <xsl:call-template name="languageSelection"/>
                         </ul>
@@ -406,7 +409,7 @@
                                     <li class="dropdown">
                                         <a id="user-dropdown-toggle" href="#" role="button" class="dropdown-toggle"
                                            data-toggle="dropdown">
-                                            <span class="hidden-xs">
+                                            <span class="hidden-xs hidden-sm">
                                                 <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
                             dri:metadata[@element='identifier' and @qualifier='firstName']"/>
                                                 <xsl:text> </xsl:text>
@@ -446,7 +449,7 @@
                             </xsl:choose>
                         </ul>
 
-                        <button data-toggle="offcanvas" class="navbar-toggle visible-sm" type="button">
+                        <button data-toggle="offcanvas" class="navbar-toggle" type="button">
                             <span class="sr-only"><i18n:text>xmlui.mirage2.page-structure.toggleNavigation</i18n:text></span>
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
@@ -631,37 +634,10 @@
                     <hr/>
                     <div class="col-xs-7 col-sm-8">
                         <div>
-                            <a href="http://www.dspace.org/" target="_blank">DSpace software</a> copyright&#160;&#169;&#160;2002-2013&#160; <a href="http://www.duraspace.org/" target="_blank">Duraspace</a>
+                            DRUM is brought to you by the <a href="http://www.lib.umd.edu/">University of Maryland Libraries</a><br />
+                            University of Maryland, College Park, MD 20742-7011 (301)314-1328.<br /> 
+                            Please send us your <a href="{$context-path}/feedback"> comments</a>.
                         </div>
-                        <div>
-                            <a>
-                                <xsl:attribute name="href">
-                                    <xsl:value-of
-                                            select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                                    <xsl:text>/contact</xsl:text>
-                                </xsl:attribute>
-                                <i18n:text>xmlui.dri2xhtml.structural.contact-link</i18n:text>
-                            </a>
-                            <xsl:text> | </xsl:text>
-                            <a>
-                                <xsl:attribute name="href">
-                                    <xsl:value-of
-                                            select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                                    <xsl:text>/feedback</xsl:text>
-                                </xsl:attribute>
-                                <i18n:text>xmlui.dri2xhtml.structural.feedback-link</i18n:text>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-xs-5 col-sm-4">
-                        <div class="pull-right">
-                            <span class="theme-by">Theme by&#160;</span>
-                            <br/>
-                            <a title="@mire NV" target="_blank" href="http://atmire.com">
-                                <img alt="@mire NV" src="{concat($theme-path, '/images/@mirelogo-small.png')}"/>
-                            </a>
-                        </div>
-
                     </div>
                 </div>
                 <!--Invisible link to HTML sitemap (for search engines) -->
@@ -674,10 +650,6 @@
                     <xsl:text>&#160;</xsl:text>
                 </a>
             <p>&#160;</p>
-            <script src="//s3.amazonaws.com/umdheader.umd.edu/app/js/main.min.js"></script>
-			<script>
-			  umdHeader.init();
-			</script>
         </footer>
     </xsl:template>
 
@@ -704,10 +676,28 @@
 
             <!-- Check for the custom pages -->
             <xsl:choose>
-                <xsl:when test="starts-with($request-uri, 'page/about')">
+                <xsl:when test="starts-with($request-uri, 'page/')">
                     <div class="hero-unit">
-                        <h1><i18n:text>xmlui.mirage2.page-structure.heroUnit.title</i18n:text></h1>
-                        <p><i18n:text>xmlui.mirage2.page-structure.heroUnit.content</i18n:text></p>
+                        <xsl:choose>
+                            <xsl:when test="$request-uri='page/about'">
+                                <xsl:copy-of select="document('file://apps/drum/config/pages/about')/div"  />
+                            </xsl:when>
+                            <xsl:when test="$request-uri='page/about-submitting'">
+                                <xsl:copy-of select="document('file://apps/drum/config/pages/about-submitting')/div"  />
+                            </xsl:when>
+                            <xsl:when test="$request-uri='page/statistics'">
+                                <xsl:copy-of select="document('file://apps/drum/config/pages/statistics')/div"  />
+                            </xsl:when>
+                            <xsl:when test="$request-uri='page/permission-letter'">
+                                <xsl:copy-of select="document('file://apps/drum/config/pages/permission-letter')/div"  />
+                            </xsl:when>
+                            <xsl:when test="$request-uri='page/scope-of-drum-content'">
+                                <xsl:copy-of select="document('file://apps/drum/config/pages/scope-of-drum-content')/div"  />
+                            </xsl:when>
+                            <xsl:when test="$request-uri='page/license-text'">
+                                <xsl:copy-of select="document('file://apps/drum/config/pages/license-text')/div"  />
+                            </xsl:when>
+                        </xsl:choose>        
                     </div>
                 </xsl:when>
                 <!-- Otherwise use default handling of body -->
@@ -794,6 +784,12 @@
         <xsl:if test="dri:body/dri:div[@n='lookup']">
             <xsl:call-template name="choiceLookupPopUpSetup"/>
         </xsl:if>
+        
+        <!-- UMD Header -->
+        <script src="//s3.amazonaws.com/umdheader.umd.edu/app/js/main.min.js"></script>
+        <script>
+            umdHeader.init(); 
+        </script>
 
         <!-- Add a google analytics script if the key is present -->
         <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']">

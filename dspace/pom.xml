@@ -15,7 +15,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>4.1-4.4</version>
+        <version>4.1-5</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -62,7 +62,7 @@
         <profile>
             <id>default</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <file><exists>modules/pom.xml</exists></file>
             </activation>
             <!--
                 Builds Overlay Modules for DSpace

@@ -1,34 +1,65 @@
 # Drum 4.1 Upgrade Procedure
 
+* Switch to source directory on the drum server
 
-**[Backup](#backup)**
+       ```
+cd /apps/drum/src
+```
+* Pull the latest changes from github
 
-**[Server-Side Solr Configuration](#server-solr-configuration)**
+       ```
+git fetch
+git pull <branch_name>
+```
+* Manually update {dev,stage,prod}.properties, if necessary.
 
-**[Other Configurations](#other-config)**
+       ```
+vim prod.properties
+```
+* Build the project using maven
 
-**[Server-Side Drum Build](#drum-build)**
+       ```
+mvn clean install -Denv=prod -Dlicense.skip=true
+```
+* Stop the tomcat server
 
-**[Server-Side Drum Installation](#drum-install)**
+       ```
+cd /apps/drum/tomcat
+./control stop
+```
+* Deploy the build using ANT
 
-**[Upgrade Validation](#validation)**
+       ```
+cd /apps/drum/src/dspace/target/dspace-<VERSION>-build/
+ant update
+```
+* Start the tomcat server
 
-## <a name="backup"></a>Backup
+       ```
+cd /apps/drum/tomcat
+./control start
+```
 
-## <a name="server-solr-configuration"></a>Server-Side Solr Configuration
+### Solr Upgrade Procedure
+If the upgrade includes changes to solr configuration, upgrade the solr configuration in corresponding (dev,stage,production) solr server.
 
-## <a name="other-config"></a>Other Configurations
+* Switch to the solr cores directory in th server
 
-## <a name="drum-build"></a>Server-Side Drum Build
+       ```
+cd /apps/solr/cores
+```
+* Copy the updated configuration from the drum server.
 
-## <a name="drum-install"></a>Server-Side Drum Installation
+       ```
+scp -r <USERNAME>@drum.lib.umd.edu:/apps/drum/solr/search/conf/* drum-search/conf/
+scp -r <USERNAME>@drum.lib.umd.edu:/apps/drum/solr/statistics/conf/* drum-statistics/conf/
+scp -r <USERNAME>@drum.lib.umd.edu:/apps/drum/solr/oai/conf/* drum-oai/conf/
+```
+* Restart Solr OR Reload the drum solr cores.
 
-## <a name="validation"></a>Upgrade Validation
-
-
-
-
-
-
+       ```
+cd /apps/solr
+./control restart
+```
 
 
