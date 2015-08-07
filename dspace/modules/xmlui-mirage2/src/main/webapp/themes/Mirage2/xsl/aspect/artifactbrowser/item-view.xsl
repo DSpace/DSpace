@@ -371,7 +371,7 @@
                 <h5>Format</h5>
                 <xsl:choose>
                     <xsl:when test="dim:field[@element='type'][not(@qualifier='genre')]">
-                        <xsl:for-each select="dim:field[@element='type']">
+                        <xsl:for-each select="dim:field[@element='type'][not(@qualifier='genre')]">
               			<div><xsl:copy-of select="./node()"/></div>
                         </xsl:for-each>
                     </xsl:when>
