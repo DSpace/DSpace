@@ -139,6 +139,18 @@
 
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dateIssued.year">Date Issued</message>
 
+    <message key="xmlui.Discovery.AbstractSearch.type_authorcontributor">Filter by: Author/Contibutor</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.authorcontributor">Author/Contributor</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.authorcontributor_filter">Author/Contributor</message>
+
+    <message key="xmlui.Discovery.AbstractSearch.type_subjectTimePeriod">Filter by: Subject: Time Period</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subjectTimePeriod">Subject: Time Period</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subjectTimePeriod_filter">Subject: Time Period</message>
+
+    <message key="xmlui.Discovery.AbstractSearch.type_subjectPlace">Filter by: Subject: Place</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subjectPlace">Subject: Place</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subjectPlace_filter">Subject: Time Period</message>
+
     <message key="xmlui.Discovery.AbstractSearch.type_contentType">Filter by: Format</message>
     <message key="xmlui.Discovery.AbstractSearch.type_advisor">Filter by: Advisor</message>
     <message key="xmlui.Discovery.AbstractSearch.type_thesisSemester">Filter by: Thesis Semester</message>
@@ -161,11 +173,11 @@
     <message key="xmlui.Discovery.AbstractSearch.rpp">Results Per Page:</message>
 
 
-    <message key="xmlui.Discovery.AbstractSearch.filters.controls.add-filter">Add Filter</message>
+    <message key="xmlui.Discovery.AbstractSearch.filters.controls.add-filter">Add Fields for Search</message>
     <message key="xmlui.Discovery.AbstractSearch.filters.controls.apply-filters">Apply</message>
     <message key="xmlui.Discovery.AbstractSearch.filters.controls.remove-filter">Remove</message>
-    <message key="xmlui.Discovery.AbstractSearch.filters.controls.new-filters.head">New Filters:</message>
-    <message key="xmlui.Discovery.AbstractSearch.filters.controls.current-filters.head">Current Filters:</message>
+    <message key="xmlui.Discovery.AbstractSearch.filters.controls.new-filters.head">New Fields for Search:</message>
+    <message key="xmlui.Discovery.AbstractSearch.filters.controls.current-filters.head">Current Fields for Search:</message>
     <message key="xmlui.Discovery.AbstractSearch.filters.display">Add filters</message>
 
     <message key="xmlui.discovery.SearchFacetFilter.no-results">No filter values found</message>
@@ -174,10 +186,10 @@
     <message key="xmlui.discovery.AbstractFiltersTransformer.filters.view-more">... View More</message>
 
 
-    <message key="xmlui.Discovery.SimpleSearch.search_scope">Search</message>
-    <message key="xmlui.discovery.SimpleSearch.search_label">Search</message>
-    <message key="xmlui.Discovery.SimpleSearch.filter_head">Filters</message>
-    <message key="xmlui.Discovery.SimpleSearch.filter_help">Use filters to refine the search results.</message>
+    <message key="xmlui.Discovery.SimpleSearch.search_scope">Keyword Searches</message>
+    <message key="xmlui.discovery.SimpleSearch.search_label">Keyword Searches</message>
+    <message key="xmlui.Discovery.SimpleSearch.filter_head">Keyword search by field</message>
+    <message key="xmlui.Discovery.SimpleSearch.filter_help">Search or limit your keyword search by selected fields.</message>
 
     <message key="xmlui.Discovery.SimpleSearch.filter.contains">Contains</message>
     <message key="xmlui.Discovery.SimpleSearch.filter.equals">Exactly Matches</message>
