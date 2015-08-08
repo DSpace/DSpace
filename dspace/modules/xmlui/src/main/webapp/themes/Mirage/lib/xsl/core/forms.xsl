@@ -133,9 +133,9 @@
             <div class="ds-form-label help">
                 <xsl:variable name="help" select="dri:help"/>
                 <div class="help-title">
-                    <xsl:value-of select="concat(substring-before($help,'.'),'.')"/>
+                    <xsl:text>Manually add an author:</xsl:text>
                     <xsl:call-template name="help-hover">
-                        <xsl:with-param name="hover" select="substring-after($help,'.')"/>
+                        <xsl:with-param name="hover" select="string($help)"/>
                     </xsl:call-template>
                 </div>
             </div>
