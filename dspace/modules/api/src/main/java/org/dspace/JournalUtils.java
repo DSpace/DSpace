@@ -29,7 +29,11 @@ public class JournalUtils {
     public static Concept getJournalConceptById(Context context, String authorityId) throws SQLException {
         try
         {
-            return Concept.findByIdentifier(context,authorityId).iterator().next();
+            List<Concept> concepts = Concept.findByJournalID(context, authorityId);
+            if (concepts.size() > 0) {
+                Concept concept = concepts.get(0);
+                return concept;
+            }
         }
         catch(Exception e)
         {
