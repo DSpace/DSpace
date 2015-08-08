@@ -122,6 +122,7 @@
     <xsl:template match="dri:field[@type='composite'][dri:field/dri:instance | dri:params/@operations]" mode="authorFormComposite" priority="2">
         <xsl:variable name="confidenceIndicatorID" select="concat(translate(@id,'.','_'),'_confidence_indicator')"/>
 
+        <div class="spacer">&#160;</div>
         <!-- This div handles ORCID lookup-->
         <div class="ds-form-content">
             <xsl:call-template name="addLookupButtonAuthor"/>

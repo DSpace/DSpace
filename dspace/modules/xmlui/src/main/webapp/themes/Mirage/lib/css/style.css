@@ -1929,6 +1929,9 @@ div.ds-form-content {
     padding: 7px;
     width:100%;
 }
+a.ds-form-content {
+    vertical-align: text-top;
+}
 span.ds-form-label,label.ds-form-label {
     display: block;
     float: left;
