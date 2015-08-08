@@ -434,6 +434,38 @@ public class Concept extends AuthorityObject
         }
         return concepts;
     }
+
+    /**
+     * Find the concept by its name - assumes name is unique
+     *
+     * @param context
+     * @param journalID
+     *
+     * @return the named Concept, or null if not found
+     */
+
+    public static ArrayList<Concept> findByJournalID(Context context, String journalID)
+            throws SQLException
+    {
+        ArrayList<Concept> concepts = new ArrayList<Concept>();
+        TableRowIterator row = DatabaseManager.query(context,"select c.* from concept as c, conceptmetadatavalue as cmv where cmv.text_value = '"+journalID+"' and cmv.parent_id=c.id;");
+
+        if (row == null)
+        {
+            return null;
+        }
+        else
+        {
+
+            while(row.hasNext())
+            {
+                concepts.add(new Concept(context,row.next()));
+
+            }
+        }
+        return concepts;
+    }
+
     /**
      * Finds all concepts in the site
      *
