@@ -13,7 +13,6 @@ import org.jdom.Document;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-import org.jdom.JDOMException;
 
 import javax.mail.*;
 import javax.mail.internet.MimeMessage;
@@ -23,7 +22,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -265,6 +263,7 @@ public class DryadEmailSubmission extends HttpServlet {
             throw new SubmissionException("Unexpected email type: "
                     + mime.getContent().getClass().getName() + " reported content-type was " + mime.getContentType());
         }
+
         String message;
         if (mime.getEncoding() != null) {
             message = (String) part.getContent();
@@ -282,21 +281,24 @@ public class DryadEmailSubmission extends HttpServlet {
 
             message = builder.toString();
         }
+
         // Then we can hand off to implementer of EmailParser
         ParsingResult result = parseMessage(message, mime.getFrom());
 
         if (result.getStatus() != null) {
             throw new SubmissionException(result.getStatus());
         }
+
         if (result.hasFlawedId()) {
             throw new SubmissionException("Result ID is flawed: "
                     + result.getSubmissionId());
         }
+
         return parseToXML(result);
 
     }
 
-    private String parseToXML (ParsingResult result) throws JDOMException, SQLException, IOException{
+    private String parseToXML (ParsingResult result) {
 
         // We'll use JDOM b/c the libs are already included in DSpace
         SAXBuilder saxBuilder = new SAXBuilder();
@@ -310,30 +312,31 @@ public class DryadEmailSubmission extends HttpServlet {
 
         StringReader xmlReader = new StringReader(xml);
 
-        Format format = Format.getPrettyFormat();
-        XMLOutputter toFile = new XMLOutputter(format);
-        Document doc = saxBuilder.build(xmlReader);
-        String journalCode = result.getJournalCode();
-
-        LOGGER.info("Getting metadata dir for " + journalCode);
-
-        Context context = new Context();
-        Concept journalConcept = JournalUtils.getJournalConceptByShortID(context, journalCode);
-        File dir = new File(JournalUtils.getMetadataDir(journalConcept));
-
-        String submissionId = result.getSubmissionId();
-        String filename = DryadJournalSubmissionUtils.escapeFilename(submissionId + ".xml");
-        File file = new File(dir, filename);
         try {
+            Format format = Format.getPrettyFormat();
+            XMLOutputter toFile = new XMLOutputter(format);
+            Document doc = saxBuilder.build(xmlReader);
+            String journalCode = result.getJournalCode();
+
+            LOGGER.debug("Getting metadata dir for " + journalCode);
+
+            Context context = new Context();
+            Concept journalConcept = JournalUtils.getJournalConceptByShortID(context, journalCode);
+            File dir = new File(JournalUtils.getMetadataDir(journalConcept));
+
+            String submissionId = result.getSubmissionId();
+            String filename = DryadJournalSubmissionUtils.escapeFilename(submissionId + ".xml");
+            File file = new File(dir, filename);
+            LOGGER.info ("wrote xml to file " + file.getAbsolutePath());
             FileOutputStream out = new FileOutputStream(file);
             OutputStreamWriter writer = new OutputStreamWriter(out, "UTF-8");
 
             // And we write the output to our submissions directory
             toFile.output(doc, new BufferedWriter(writer));
         } catch (Exception details) {
+            LOGGER.debug(xml);
             throw new SubmissionRuntimeException(details);
         }
-        LOGGER.info ("wrote xml to file " + file.getAbsolutePath());
         return xml;
     }
 
