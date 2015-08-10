@@ -258,8 +258,7 @@ lr.aai.url = https://lindat.mff.cuni.cz/aai
 lr.oai.baseUrl = ${dspace.baseUrl}/oai/request
 
 # For reports
-harvesterInfo.url = http://catalog.clarin.eu/oai-harvester/LINDAT_CLARIN_digital_library_at_Institute_of_Formal_and_Applied_Linguistics_Charles_University_in_Prague_v1_8_2_.html
-harvesterInfo.anchorName = LINDAT_CLARIN_digital_library_at_Institute_of_Formal_and_Applied_Linguistics_Charles_University_in_Prague_v1_8_2_
+harvesterInfo.url = http://catalog.clarin.eu/oai-harvester/
 
 ############################################
 #
