@@ -20,6 +20,7 @@ import org.dspace.content.*;
 import org.dspace.services.ConfigurationService;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
+import org.dspace.utils.DSpace;
 import org.junit.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
@@ -78,7 +79,7 @@ public class DOIIdentifierProviderTest
             context.restoreAuthSystemState();
             context.commit();
 
-            config = kernelImpl.getConfigurationService();
+            config = new DSpace().getConfigurationService();
             // Configure the service under test.
             config.setProperty(DOIIdentifierProvider.CFG_PREFIX, PREFIX);
             config.setProperty(DOIIdentifierProvider.CFG_NAMESPACE_SEPARATOR, 

@@ -8,25 +8,19 @@
 package org.dspace.core;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
+import org.dspace.services.ConfigurationService;
+import org.dspace.utils.DSpace;
 
 /**
  * The Plugin Manager is a very simple component container.  It creates and
@@ -86,7 +80,7 @@ public class PluginManager
     /** Paths to search for third-party plugins. */
     private static final String[] classPath;
     static {
-        String path = ConfigurationManager.getProperty(CLASSPATH);
+        String path = new DSpace().getConfigurationService().getProperty(CLASSPATH);
         if (null == path)
             classPath = new String[0];
         else
@@ -121,10 +115,11 @@ public class PluginManager
         }
         else
         {
+            ConfigurationService config = new DSpace().getConfigurationService();
             String key = REUSABLE_PREFIX+implClass.getName();
-            boolean reusable = (module != null) ?
-                ConfigurationManager.getBooleanProperty(module, key, true) :
-                ConfigurationManager.getBooleanProperty(key, true);
+
+            // NOTE: module name is ignored, as reusable plugins configs ALWAYS begin with REUSABLE_PREFIX
+            boolean reusable = config.getBooleanProperty(key, true);
             cacheMeCache.put(implClass, Boolean.valueOf(reusable));
             return reusable;
         }
@@ -170,8 +165,10 @@ public class PluginManager
     {
         String iname = interfaceClass.getName();
 
+        // NOTE: module name is ignored, as single plugins ALWAYS begin with SINGLE_PREFIX
+        String key = SINGLE_PREFIX+iname;
         // configuration format is  prefix.<interface> = <classname>
-        String classname = getConfigProperty(module, SINGLE_PREFIX+iname);
+        String classname = new DSpace().getConfigurationService().getProperty(key);
 
         if (classname != null)
         {
@@ -224,16 +221,18 @@ public class PluginManager
         // cache the configuration for this interface after grovelling it once:
         // format is  prefix.<interface> = <classname>
         String iname = intfc.getName();
-        String classname[] = null;
+        String[] classname = null;
         if (!sequenceConfig.containsKey(iname))
         {
-            String val = getConfigProperty(module, SEQUENCE_PREFIX+iname);
-            if (val == null)
+            // NOTE: module name is ignored, as sequence plugins ALWAYS begin with SEQUENCE_PREFIX
+            String key = SEQUENCE_PREFIX+iname;
+
+            classname = new DSpace().getConfigurationService().getArrayProperty(key);
+            if (classname == null || classname.length==0)
             {
                 log.warn("No Configuration entry found for Sequence Plugin interface="+iname);
                 return (Object[]) Array.newInstance(intfc, 0);
             }
-            classname = val.trim().split("\\s*,\\s*");
             sequenceConfig.put(iname, classname);
         }
         else
@@ -314,62 +313,71 @@ public class PluginManager
         if (!namedPluginClasses.containsKey(iname))
         {
             // 1. Get classes named by the configuration. format is:
-            //    plugin.named.<INTF> = <CLASS> = <name>, <name> [,] \
-            //                        <CLASS> = <name>, <name> [ ... ]
-            String namedVal = getConfigProperty(module, NAMED_PREFIX+iname);
-            if (namedVal != null)
+            //    plugin.named.<INTF> = <CLASS> = <name>\, <name> [,] \
+            //                        <CLASS> = <name>\, <name> [ ... ]
+            // NOTE: module name is ignored, as named plugins ALWAYS begin with NAMED_PREFIX
+            String key = NAMED_PREFIX+iname;
+            String[] namedVals = new DSpace().getConfigurationService().getArrayProperty(key);
+            if (namedVals != null && namedVals.length>0)
             {
-                namedVal = namedVal.trim();
-                log.debug("Got Named configuration for interface="+iname+", config="+namedVal);
-
-                // match  "<classname> ="
-                Pattern classnameEqual = Pattern.compile("([\\w\\p{Sc}\\.]+)\\s*\\=");
-
-                int prevEnd = -1;
                 String prevClassName = null;
-                Matcher classMatcher = classnameEqual.matcher(namedVal);
-                while (classMatcher.find())
+                for(String namedVal : namedVals)
                 {
-                    if (prevClassName != null)
+                    String[] valSplit = namedVal.trim().split("\\s*=\\s*");
+
+                    String className = null;
+                    String name = null;
+                    
+                    // If there's no "=" separator in this value, assume it's
+                    // just a "name" that belongs with previous class.
+                    // (This may occur if there's an unescaped comma between names)
+                    if(prevClassName!=null && valSplit.length==1)
                     {
-                        found += installNamedConfigs(iname, prevClassName,
-                                namedVal.substring(prevEnd, classMatcher.start()).trim().split("\\s*,\\s*"));
+                        className = prevClassName;
+                        name = valSplit[0];
                     }
-                    prevClassName = classMatcher.group(1);
-                    prevEnd = classMatcher.end();
-                }
-                if (prevClassName != null)
-                {
-                    found += installNamedConfigs(iname, prevClassName,
-                            namedVal.substring(prevEnd).trim().split("\\s*,\\s*"));
+                    else
+                    {
+                        // first part is class name
+                        className = valSplit[0];
+                        prevClassName = className;
+                        // second part is one or more names
+                        name = valSplit[1];
+                    }
+
+                    // The name may be *multiple* names (separated by escaped commas: \,)
+                    String[] names = name.trim().split("\\s*,\\s*");
+
+                    found += installNamedConfigs(iname, className, names);
                 }
             }
 
             // 2. Get Self-named config entries:
             // format is plugin.selfnamed.<INTF> = <CLASS> , <CLASS> ..
-            String selfNamedVal = getConfigProperty(module, SELFNAMED_PREFIX+iname);
-            if (selfNamedVal != null)
+            // NOTE: module name is ignored, as self-named plugins ALWAYS begin with SELFNAMED_PREFIX
+            key = SELFNAMED_PREFIX+iname;
+            String[] selfNamedVals = new DSpace().getConfigurationService().getArrayProperty(key);
+            if (selfNamedVals != null && selfNamedVals.length>0)
             {
-                String classnames[] = selfNamedVal.trim().split("\\s*,\\s*");
-                for (int i = 0; i < classnames.length; ++i)
+                for (String classname : selfNamedVals)
                 {
                     try
                     {
-                        Class pluginClass = Class.forName(classnames[i], true, loader);
+                        Class pluginClass = Class.forName(classname, true, loader);
                         String names[] = (String[])pluginClass.getMethod("getPluginNames").
                                                    invoke(null);
                         if (names == null || names.length == 0)
                         {
-                            log.error("Self-named plugin class \"" + classnames[i] + "\" returned null or empty name list!");
+                            log.error("Self-named plugin class \"" + classname + "\" returned null or empty name list!");
                         }
                         else
                         {
-                            found += installNamedConfigs(iname, classnames[i], names);
+                            found += installNamedConfigs(iname, classname, names);
                         }
                     }
                     catch (NoSuchMethodException e)
                     {
-                        log.error("Implementation Class \""+classnames[i]+"\" is not a subclass of SelfNamedPlugin, it has no getPluginNames() method.");
+                        log.error("Implementation Class \""+classname+"\" is not a subclass of SelfNamedPlugin, it has no getPluginNames() method.");
                     }
                     catch (Exception e)
                     {
@@ -704,15 +712,6 @@ public class PluginManager
         }
     }
 
-    // get module-specific, or generic configuration property
-    private static String getConfigProperty(String module, String property)
-    {
-        if (module != null) {
-            return ConfigurationManager.getProperty(module, property);
-        }
-        return ConfigurationManager.getProperty(property);
-    }
-
     /**
      * Validate the entries in the DSpace Configuration relevant to
      * PluginManager.  Look for inconsistencies, illegal syntax, etc.
@@ -746,118 +745,35 @@ public class PluginManager
         Map<String, String> reusableKey = new HashMap<String, String>();
         HashMap<String, String> keyMap = new HashMap<String, String>();
 
-        // 1. First pass -- grovel the actual config file to check for
-        //    duplicate keys, since Properties class hides them from us.
-        //    Also build lists of each type of key, check for misspellings.
-        File config = ConfigurationManager.getConfigurationFile();
-        try
-        {
-            fr = new FileReader(config);
-            cr = new BufferedReader(fr);
-            String line = null;
-            boolean continued = false;
-            Pattern keyPattern = Pattern.compile("([^\\s\\=\\:]+)");
-            while ((line = cr.readLine()) != null)
-            {
-                line = line.trim();
-                if (line.startsWith("!") || line.startsWith("#"))
-                {
-                    continued = false;
-                }
-                else
-                {
-                    if (!continued && line.startsWith("plugin."))
-                    {
-                        Matcher km = keyPattern.matcher(line);
-                        if (km.find())
-                        {
-                            String key = line.substring(0, km.end(1));
-                            if (keyMap.containsKey(key))
-                            {
-                                log.error("Duplicate key \"" + key + "\" in DSpace configuration file=" + config.toString());
-                            }
-                            else
-                            {
-                                keyMap.put(key, key);
-                            }
+        ConfigurationService config = new DSpace().getConfigurationService();
+        // Find all property keys starting with "plugin."
+        List<String> keys = config.getPropertyKeys("plugin.");
 
-                            if (key.startsWith(SINGLE_PREFIX))
-                            {
-                                singleKey.put(key.substring(SINGLE_PREFIX.length()), key);
-                            }
-                            else if (key.startsWith(SEQUENCE_PREFIX))
-                            {
-                                sequenceKey.put(key.substring(SEQUENCE_PREFIX.length()), key);
-                            }
-                            else if (key.startsWith(NAMED_PREFIX))
-                            {
-                                namedKey.put(key.substring(NAMED_PREFIX.length()), key);
-                            }
-                            else if (key.startsWith(SELFNAMED_PREFIX))
-                            {
-                                selfnamedKey.put(key.substring(SELFNAMED_PREFIX.length()), key);
-                            }
-                            else if (key.startsWith(REUSABLE_PREFIX))
-                            {
-                                reusableKey.put(key.substring(REUSABLE_PREFIX.length()), key);
-                            }
-                            else
-                            {
-                                log.error("Key with unknown prefix \"" + key + "\" in DSpace configuration file=" + config.toString());
-                            }
-                        }
-                    }
-                    continued = line.length() > 0 && line.charAt(line.length()-1) == '\\';
-                }
-            }
-        }
-        finally
+        for(String key : keys)
         {
-            if (cr != null)
+            if (key.startsWith(SINGLE_PREFIX))
             {
-                try
-                {
-                    cr.close();
-                }
-                catch (IOException ioe)
-                {
-                }
+                singleKey.put(key.substring(SINGLE_PREFIX.length()), key);
             }
-
-            if (fr != null)
+            else if (key.startsWith(SEQUENCE_PREFIX))
             {
-                try
-                {
-                    fr.close();
-                }
-                catch (IOException ioe)
-                {
-                }
+                sequenceKey.put(key.substring(SEQUENCE_PREFIX.length()), key);
             }
-        }
-
-        // 1.1 Sanity check, make sure keyMap == set of keys from Configuration
-        Enumeration<String> pne = (Enumeration<String>)ConfigurationManager.propertyNames();
-        HashSet<String> pn = new HashSet<String>();
-        while (pne.hasMoreElements())
-        {
-            String nk = pne.nextElement();
-            if (nk.startsWith("plugin."))
+            else if (key.startsWith(NAMED_PREFIX))
             {
-                pn.add(nk);
-                if (!keyMap.containsKey(nk))
-                {
-                    log.error("Key is in ConfigurationManager.propertyNames() but NOT text crawl: \"" + nk + "\"");
-                }
+                namedKey.put(key.substring(NAMED_PREFIX.length()), key);
             }
-        }
-        Iterator<String> pi = keyMap.keySet().iterator();
-        while (pi.hasNext())
-        {
-            String key = pi.next();
-            if (!pn.contains(key))
+            else if (key.startsWith(SELFNAMED_PREFIX))
             {
-                log.error("Key is in text crawl but NOT ConfigurationManager.propertyNames(): \"" + key + "\"");
+                selfnamedKey.put(key.substring(SELFNAMED_PREFIX.length()), key);
+            }
+            else if (key.startsWith(REUSABLE_PREFIX))
+            {
+                reusableKey.put(key.substring(REUSABLE_PREFIX.length()), key);
+            }
+            else
+            {
+                log.error("Key with unknown prefix \"" + key + "\" in DSpace configuration");
             }
         }
 
@@ -887,7 +803,7 @@ public class PluginManager
         while (ii.hasNext())
         {
             String key = ii.next();
-            String val = ConfigurationManager.getProperty(SINGLE_PREFIX+key);
+            String val = config.getProperty(SINGLE_PREFIX+key);
             if (val == null)
             {
                 log.error("Single plugin config not found for: " + SINGLE_PREFIX + key);
@@ -907,20 +823,18 @@ public class PluginManager
         while (ii.hasNext())
         {
             String key = ii.next();
-            String val = ConfigurationManager.getProperty(SEQUENCE_PREFIX+key);
-            if (val == null)
+            String[] vals = config.getArrayProperty(SEQUENCE_PREFIX+key);
+            if (vals == null || vals.length==0)
             {
                 log.error("Sequence plugin config not found for: " + SEQUENCE_PREFIX + key);
             }
             else
             {
-                val = val.trim();
-                String classname[] = val.split("\\s*,\\s*");
-                for (int i = 0; i < classname.length; ++i)
+                for (String val : vals)
                 {
-                    if (checkClassname(classname[i], "implementation class"))
+                    if (checkClassname(val, "implementation class"))
                     {
-                        allImpls.put(classname[i], classname[i]);
+                        allImpls.put(val, val);
                     }
                 }
             }
@@ -932,21 +846,19 @@ public class PluginManager
         while (ii.hasNext())
         {
             String key = ii.next();
-            String val = ConfigurationManager.getProperty(SELFNAMED_PREFIX+key);
-            if (val == null)
+            String[] vals = config.getArrayProperty(SELFNAMED_PREFIX+key);
+            if (vals == null || vals.length==0)
             {
                 log.error("Selfnamed plugin config not found for: " + SELFNAMED_PREFIX + key);
             }
             else
             {
-                val = val.trim();
-                String classname[] = val.split("\\s*,\\s*");
-                for (int i = 0; i < classname.length; ++i)
+                for (String val : vals)
                 {
-                    if (checkClassname(classname[i], "selfnamed implementation class"))
+                    if (checkClassname(val, "selfnamed implementation class"))
                     {
-                        allImpls.put(classname[i], classname[i]);
-                        checkSelfNamed(classname[i]);
+                        allImpls.put(val, val);
+                        checkSelfNamed(val);
                     }
                 }
                 checkNames(key);
@@ -956,24 +868,23 @@ public class PluginManager
         // 4. named plugins - extract the classnames and treat same as sequence.
         // use named plugin config mechanism to test for duplicates, unnamed.
         ii = namedKey.keySet().iterator();
-        Pattern classnameEqual = Pattern.compile("([\\w\\p{Sc}\\.]+)\\s*\\=");
         while (ii.hasNext())
         {
             String key = ii.next();
-            String val = ConfigurationManager.getProperty(NAMED_PREFIX+key);
-            if (val == null)
+            String[] vals =config.getArrayProperty(NAMED_PREFIX+key);
+            if (vals == null || vals.length==0)
             {
                 log.error("Named plugin config not found for: " + NAMED_PREFIX + key);
             }
             else
             {
                 checkNames(key);
-                val = val.trim();
-                Matcher classMatcher = classnameEqual.matcher(val);
-                while (classMatcher.find())
+                for (String val : vals)
                 {
-                    String classname = classMatcher.group(1);
-
+                    // each named plugin has two parts to the value, format:
+                    // [classname] = [plugin-name]
+                    String val_split[] = val.split("\\s*=\\s*");
+                    String classname = val_split[0];
                     if (checkClassname(classname, "implementation class"))
                     {
                         allImpls.put(classname, classname);

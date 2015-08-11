@@ -18,7 +18,6 @@ import java.util.TimeZone;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.MockUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.discovery.MockIndexEventConsumer;
@@ -95,14 +94,11 @@ public class AbstractUnitTest
                     .getResource("test-config.properties");
             testProps.load(properties.openStream());
 
-            //load the test configuration file
-            ConfigurationManager.loadConfig(null);
-
             // Initialise the service manager kernel
             kernelImpl = DSpaceKernelInit.getKernel(null);
             if (!kernelImpl.isRunning())
             {
-                kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
+                kernelImpl.start(System.getProperty("dspace.dir")); // init the kernel
             }
             
             // Applies/initializes our mock database by invoking its constructor
@@ -200,7 +196,7 @@ public class AbstractUnitTest
         //we clear the properties
         testProps.clear();
         testProps = null;
-        
+
         //Also clear out the kernel & nullify (so JUnit will clean it up)
         if (kernelImpl!=null)
             kernelImpl.destroy();

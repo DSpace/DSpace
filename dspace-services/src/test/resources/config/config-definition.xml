@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<!-- 
+     Test Configuration Definition
+     This file defines the ordering of configuration files loaded by the ConfigurationService
+
+     For more information and examples of valid configuration definition files, see:
+     http://commons.apache.org/proper/commons-configuration/userguide_v1.10/howto_configurationbuilder.html 
+-->
+<configuration>
+    <!-- Configurations in this section override one another. 
+         Earlier values take precedence, and override any values in later config files -->
+    <override>
+        <!-- NOTE: Optionally, you could just use Variable Interpolation instead 
+             of directly loading these System/Env properties: 
+             http://commons.apache.org/proper/commons-configuration/userguide_v1.10/howto_basicfeatures.html#Variable_Interpolation -->
+        <!-- Load System properties -->
+        <system/>
+        <!-- Load Environment variables -->
+        <env/>
+
+        <!-- Load test local.properties (for unit testing)-->
+        <properties fileName="local.properties" throwExceptionOnMissing="true"/>
+    </override>
+</configuration>

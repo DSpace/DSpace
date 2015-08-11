@@ -83,7 +83,7 @@ public class MockServiceManagerSystem implements ServiceManagerSystem {
     /* (non-Javadoc)
      * @see org.dspace.kernel.ServiceManager#pushConfig(java.util.Map)
      */
-    public void pushConfig(Map<String, String> settings) {
+    public void pushConfig(Map<String, Object> settings) {
         this.sms.pushConfig(settings);
     }
 
