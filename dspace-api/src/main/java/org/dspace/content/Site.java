@@ -28,13 +28,16 @@ public class Site extends DSpaceObject
     // cache for Handle that is persistent ID for entire site.
     private static String handle = null;
 
-    private static Site theSite = null;
+    private Site() { super(); }
+
+    private Site(Context ctx) { super(ctx); }
 
     /**
      * Get the type of this object, found in Constants
      *
      * @return type of the object
      */
+    @Override
     public int getType()
     {
         return Constants.SITE;
@@ -45,6 +48,7 @@ public class Site extends DSpaceObject
      *
      * @return internal ID of object
      */
+    @Override
     public int getID()
     {
         return SITE_ID;
@@ -56,6 +60,7 @@ public class Site extends DSpaceObject
      * @return Handle of the object, or <code>null</code> if it doesn't have
      *         one
      */
+    @Override
     public String getHandle()
     {
         return getSiteHandle();
@@ -75,7 +80,9 @@ public class Site extends DSpaceObject
     }
 
     /**
-     * Get Site object corresponding to db id (which is ignored).
+     * Get Site object corresponding to db id (which is ignored).  Essentially
+     * this is a factory method for a fresh instance of Site.
+     *
      * @param context the context.
      * @param id integer database id, ignored.
      * @return Site object.
@@ -83,11 +90,7 @@ public class Site extends DSpaceObject
     public static DSpaceObject find(Context context, int id)
         throws SQLException
     {
-        if (theSite == null)
-        {
-            theSite = new Site();
-        }
-        return theSite;
+        return new Site(context);
     }
 
     void delete()
@@ -95,11 +98,13 @@ public class Site extends DSpaceObject
     {
     }
 
+    @Override
     public void update()
         throws SQLException, AuthorizeException
     {
     }
 
+    @Override
     public String getName()
     {
         return ConfigurationManager.getProperty("dspace.name");

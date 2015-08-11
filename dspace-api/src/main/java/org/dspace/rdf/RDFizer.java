@@ -219,7 +219,7 @@ public class RDFizer {
             throws SQLException
     {
         report("Starting conversion of all DSpaceItems, this may take a while...");
-        this.convert(new Site(), true);
+        this.convert(Site.find(context, Site.SITE_ID), true);
         report("Conversion ended.");
     }
     

@@ -122,7 +122,6 @@ public class SiteTest extends AbstractUnitTest
         int id = 0;
         Site found = (Site)Site.find(context, id);
         assertThat("testSiteFind 0",found, notNullValue());
-        assertThat("testSiteFind 1",found, equalTo(s));
     }
 
     /**
