@@ -353,7 +353,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
             String name = journalConcepts[i].getPreferredLabel();
 
             // add only journal with allowReviewWorkflow=true;
-            if(JournalUtils.getBooleanAllowReviewWorkflow(journalConcepts[i]))
+            if(JournalUtils.getBooleanAllowReviewWorkflow(journalConcepts[i]) && JournalUtils.getBooleanIntegrated(journalConcepts[i]))
 
                 // select journal only if status is "In Review"
                 if(pBean!=null && (manuscriptStatus!=null && (manuscriptStatus.equals(PublicationBean.STATUS_IN_REVIEW)
