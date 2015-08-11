@@ -1089,7 +1089,8 @@ public class ItemImport
     // utility methods
     ////////////////////////////////////
     // read in the map file and generate a hashmap of (file,handle) pairs
-    private Map<String, String> readMapFile(String filename) throws Exception
+    // DATASHARE - public static for batch import agreement
+    public static Map<String, String> readMapFile(String filename) throws Exception
     {
         Map<String, String> myHash = new HashMap<String, String>();
 

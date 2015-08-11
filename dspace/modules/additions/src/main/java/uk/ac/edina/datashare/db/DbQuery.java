@@ -19,6 +19,36 @@ public class DbQuery
     protected static final Logger LOG = Logger.getLogger(DbQuery.class);
     
     /**
+     * Get the batch file for a given batch id and logged in user.
+     * @param context DSpace context.
+     * @param id The batch import id.
+     * @return The map file associated with a batch import.
+     */
+    public static String fetchBatchMapFile(Context context, int id)
+    {
+        String file = null;
+        
+        try
+        {
+            TableRow row = DatabaseManager.querySingle(context,
+                    "SELECT map_file FROM batch_import WHERE id = ? AND eperson_id = ?",
+                    new Object[] {id, context.getCurrentUser().getID()});
+            
+            if(row != null)
+            {
+                file = row.getStringColumn("map_file");
+            }  
+        }
+        catch(SQLException ex)
+        {
+            LOG.error("Cannot fetch batch map file: " + ex.getMessage());
+            throw new RuntimeException(ex);
+        }
+        
+        return file;
+    }
+
+    /**
      * For a given bitstream id fetch the bitstream name
      * @param context DSace context
      * @param bitstreamId Bitstream identifier
