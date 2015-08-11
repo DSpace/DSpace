@@ -108,73 +108,37 @@
 
     <xsl:template match="dim:dim" mode="itemSummaryView-DIM">
         <div class="item-summary-view-metadata">
-        <xsl:call-template name="itemSummaryView-DIM-title"/>
-            <xsl:choose>
-                <xsl:when test="confman:getProperty('mirage2','snazy') = 'true'">
-                    <div class="col-sm-12">
-                        <!-- Add a snazy presentation section -->
-                        <xsl:call-template name="itemSummaryView-DIM-file-section-snazy"/>
+            <xsl:call-template name="itemSummaryView-DIM-title"/>
+            <div class="col-sm-12">
+                <!-- Add a snazy presentation section -->
+                <xsl:call-template name="itemSummaryView-DIM-file-section-snazy"/>
 
+                <div class="row">
+                    <div class="col-sm-4">
                         <div class="row">
-                            <!-- Left Column -->
-                            <div class="col-sm-4">
-                                <xsl:call-template name="itemSummaryView-DIM-subject"/>
-                                <xsl:call-template name="itemSummaryView-DIM-abstract"/>
-                                <xsl:call-template name="itemSummaryView-DIM-description"/>
-                                <xsl:call-template name="itemSummaryView-DIM-URI"/>
-                                <xsl:call-template name="itemSummaryView-DIM-tombstone"/>
-                                <xsl:call-template name="itemSummaryView-collections"/>
-
-                                <div class="row">
-                                    <div class="col-xs-6 col-sm-12">
-                                        <xsl:call-template name="itemSummaryView-DIM-thumbnail"/>
-                                    </div>
-                                    <div class="col-xs-6 col-sm-12">
-                                        <xsl:call-template name="itemSummaryView-DIM-file-section"/>
-                                    </div>
-                                </div>
-                                <xsl:call-template name="itemSummaryView-DIM-date"/>
-                                <xsl:call-template name="itemSummaryView-DIM-authors"/>
-                                <xsl:if test="$ds_item_view_toggle_url != ''">
-                                    <xsl:call-template name="itemSummaryView-show-full"/>
-                                </xsl:if>
+                            <div class="col-xs-6 col-sm-12">
+                                <xsl:call-template name="itemSummaryView-DIM-thumbnail"/>
                             </div>
-
-                            <!-- Right Column -->
-                            <div class="col-sm-8">
-                                <xsl:apply-templates select="." mode="itemDetailView-DIM"/>
+                            <div class="col-xs-6 col-sm-12">
+                                <xsl:call-template name="itemSummaryView-DIM-file-section"/>
                             </div>
                         </div>
+                        <xsl:call-template name="itemSummaryView-DIM-date"/>
+                        <xsl:call-template name="itemSummaryView-DIM-authors"/>
+                        <xsl:if test="$ds_item_view_toggle_url != ''">
+                            <xsl:call-template name="itemSummaryView-show-full"/>
+                        </xsl:if>
                     </div>
-                </xsl:when>
-                <xsl:otherwise>
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <div class="row">
-                                <div class="col-xs-6 col-sm-12">
-                                    <xsl:call-template name="itemSummaryView-DIM-thumbnail"/>
-                                </div>
-                                <div class="col-xs-6 col-sm-12">
-                                    <xsl:call-template name="itemSummaryView-DIM-file-section"/>
-                                </div>
-                            </div>
-                            <xsl:call-template name="itemSummaryView-DIM-date"/>
-                            <xsl:call-template name="itemSummaryView-DIM-authors"/>
-                            <xsl:if test="$ds_item_view_toggle_url != ''">
-                                <xsl:call-template name="itemSummaryView-show-full"/>
-                            </xsl:if>
-                        </div>
-                        <div class="col-sm-8">
-                            <xsl:call-template name="itemSummaryView-DIM-subject"/>
-                            <xsl:call-template name="itemSummaryView-DIM-abstract"/>
-                            <xsl:call-template name="itemSummaryView-DIM-description"/>
-                            <xsl:call-template name="itemSummaryView-DIM-URI"/>
-                            <xsl:call-template name="itemSummaryView-DIM-tombstone"/>
-                            <xsl:call-template name="itemSummaryView-collections"/>
-                        </div>
+                    <div class="col-sm-8">
+                        <xsl:call-template name="itemSummaryView-DIM-subject"/>
+                        <xsl:call-template name="itemSummaryView-DIM-abstract"/>
+                        <xsl:call-template name="itemSummaryView-DIM-description"/>
+                        <xsl:call-template name="itemSummaryView-DIM-URI"/>
+                        <xsl:call-template name="itemSummaryView-DIM-tombstone"/>
+                        <xsl:call-template name="itemSummaryView-collections"/>
                     </div>
-                </xsl:otherwise>
-            </xsl:choose>
+                </div>
+            </div>
         </div>
     </xsl:template>
 
@@ -1126,7 +1090,35 @@
                     </xsl:attribute>
                     <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:title"/>
                 </a>
-                <span class="file-size">
+            </div>
+
+            <div class="slide-arrow show">
+                <div class="showhide" data-toggle="modal">
+                    <!-- Button trigger modal -->
+                    <xsl:attribute name="data-target">
+                        <xsl:text>#myModal_</xsl:text>
+                        <xsl:value-of select="@ID"/>
+                    </xsl:attribute>
+                    Show File
+                </div>
+            </div>
+
+
+            <xsl:attribute name="id">
+                <xsl:text>myModal_</xsl:text>
+                <xsl:value-of select="@ID"/>
+            </xsl:attribute>
+
+            <div class="file-item file-mimetype">
+                <span class="label">MIME type:</span>
+                <span class="value">
+                    <xsl:value-of select="@MIMETYPE" />
+                </span>
+            </div>
+
+            <div class="file-item last">
+                <span class="label">File Size:</span>
+                <span class="value">
                     <xsl:choose>
                         <xsl:when test="@SIZE &lt; 1024">
                             <xsl:value-of select="@SIZE"/>
@@ -1148,29 +1140,7 @@
                 </span>
             </div>
 
-            <div class="slide-arrow show">
-                <div class="showhide" data-toggle="modal">
-                    <!-- Button trigger modal -->
-                    <xsl:attribute name="data-target">
-                        <xsl:text>#myModal_</xsl:text>
-                        <xsl:value-of select="@ID"/>
-                    </xsl:attribute>
-                    Show File
-                </div>
-            </div>
 
-
-            <xsl:attribute name="id">
-                <xsl:text>myModal_</xsl:text>
-                <xsl:value-of select="@ID"/>
-            </xsl:attribute>
-
-            <div class="file-item file-mimetype last">
-                <span class="label">MIME type:</span>
-                <span class="value">
-                    <xsl:value-of select="@MIMETYPE" />
-                </span>
-            </div>
             <!-- Display file based on MIME type -->
             <div class="file-view">
                 <div class="file-view-container">
