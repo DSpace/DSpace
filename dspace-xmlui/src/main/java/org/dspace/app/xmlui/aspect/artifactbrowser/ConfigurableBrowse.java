@@ -212,7 +212,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                     // Add the metadata to the validity
                     for (String[] singleEntry : browseInfo.getStringResults())
                     {
-                        validity.add(singleEntry[0]+"#"+singleEntry[1]);
+                        validity.add(StringUtils.join(singleEntry,"#"));
                     }
                 }
 
