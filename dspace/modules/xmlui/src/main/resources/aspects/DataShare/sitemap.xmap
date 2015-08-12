@@ -34,7 +34,7 @@
       <!-- <map:action name="SendFeedbackAction" -->
       <!--             src="org.edina.datashare.app.xmlui.aspect.artifactbrowser.ContactFormAction"/> -->
       <map:action name="DepositAgreeAction"
-                  src="org.edina.datashare.app.xmlui.aspect.datashare.DepositAgreeAction"/>
+                  src="uk.ac.edina.datashare.app.xmlui.aspect.datashare.DepositAgreeAction"/>
     </map:actions>
 
     <map:selectors>
