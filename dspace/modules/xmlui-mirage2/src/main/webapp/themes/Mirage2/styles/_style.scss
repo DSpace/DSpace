@@ -45,13 +45,39 @@
     background-size: 2em;
 }
 
-/* .metadata-group-expand label::before { */
-/*     content: "+"; */
-/*     font-size: 12px; */
-/* } */
-
 .metadata-group-collapse {
     background-image: url(../images/list-remove.png);
     background-repeat: no-repeat;
     background-size: 2em;
+}
+
+
+/* Time Period */
+#aspect_submission_StepTransformer_field_to-label,
+#aspect_submission_StepTransformer_field_from-label{
+    display: none;
+}
+
+/* from / to */
+#aspect_submission_StepTransformer_item_time-period .row:nth-child(2) div:nth-child(1),
+#aspect_submission_StepTransformer_item_time-period .row:nth-child(2) div:nth-child(5) {
+  width: 4em;
+}
+
+/* year */
+#aspect_submission_StepTransformer_item_time-period .row:nth-child(2) div:nth-child(2),
+#aspect_submission_StepTransformer_item_time-period .row:nth-child(2) div:nth-child(6){
+    width: 8em;
+}
+
+/* month */
+#aspect_submission_StepTransformer_item_time-period .row:nth-child(2) div:nth-child(3),
+#aspect_submission_StepTransformer_item_time-period .row:nth-child(2) div:nth-child(7){
+    width: 12em;
+}
+
+/* day */
+#aspect_submission_StepTransformer_item_time-period .row:nth-child(2) div:nth-child(4),
+#aspect_submission_StepTransformer_item_time-period .row:nth-child(2) div:nth-child(8){
+    width: 6em;
 }
