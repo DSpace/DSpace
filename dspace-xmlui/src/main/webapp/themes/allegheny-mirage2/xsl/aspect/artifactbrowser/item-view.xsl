@@ -115,6 +115,15 @@
 
                 <div class="row">
                     <div class="col-sm-4">
+                        <xsl:call-template name="itemSummaryView-field">
+                            <xsl:with-param name="schema">ac</xsl:with-param>
+                            <xsl:with-param name="element">comp</xsl:with-param>
+                            <xsl:with-param name="qualifier">compauthor</xsl:with-param>
+                        </xsl:call-template>
+
+                        <xsl:call-template name="itemSummaryView-DIM-date"/>
+                        <xsl:call-template name="itemSummaryView-DIM-authors"/>
+
                         <div class="row">
                             <div class="col-xs-6 col-sm-12">
                                 <xsl:call-template name="itemSummaryView-DIM-thumbnail"/>
@@ -123,19 +132,105 @@
                                 <xsl:call-template name="itemSummaryView-DIM-file-section"/>
                             </div>
                         </div>
-                        <xsl:call-template name="itemSummaryView-DIM-date"/>
-                        <xsl:call-template name="itemSummaryView-DIM-authors"/>
+
+                        <xsl:call-template name="itemSummaryView-field">
+                            <xsl:with-param name="schema">ac</xsl:with-param>
+                            <xsl:with-param name="element">comp</xsl:with-param>
+                            <xsl:with-param name="qualifier">firstreader</xsl:with-param>
+                        </xsl:call-template>
+
+                        <xsl:call-template name="itemSummaryView-field">
+                            <xsl:with-param name="schema">ac</xsl:with-param>
+                            <xsl:with-param name="element">comp</xsl:with-param>
+                            <xsl:with-param name="qualifier">secondreaders</xsl:with-param>
+                        </xsl:call-template>
+
+
                         <xsl:if test="$ds_item_view_toggle_url != ''">
                             <xsl:call-template name="itemSummaryView-show-full"/>
                         </xsl:if>
                     </div>
                     <div class="col-sm-8">
+
+                        <xsl:call-template name="itemSummaryView-DIM-URI"/>
                         <xsl:call-template name="itemSummaryView-DIM-subject"/>
                         <xsl:call-template name="itemSummaryView-DIM-abstract"/>
                         <xsl:call-template name="itemSummaryView-DIM-description"/>
-                        <xsl:call-template name="itemSummaryView-DIM-URI"/>
+
+                        <xsl:call-template name="itemSummaryView-field">
+                            <xsl:with-param name="schema">ac</xsl:with-param>
+                            <xsl:with-param name="element">comp</xsl:with-param>
+                            <xsl:with-param name="qualifier">abstract</xsl:with-param>
+                        </xsl:call-template>
+
                         <xsl:call-template name="itemSummaryView-DIM-tombstone"/>
                         <xsl:call-template name="itemSummaryView-collections"/>
+
+                        <xsl:call-template name="itemSummaryView-field">
+                            <xsl:with-param name="schema">dc</xsl:with-param>
+                            <xsl:with-param name="element">contributor</xsl:with-param>
+                            <xsl:with-param name="qualifier">committeechair</xsl:with-param>
+                        </xsl:call-template>
+
+                        <xsl:call-template name="itemSummaryView-field">
+                            <xsl:with-param name="schema">dc</xsl:with-param>
+                            <xsl:with-param name="element">contributor</xsl:with-param>
+                            <xsl:with-param name="qualifier">department</xsl:with-param>
+                        </xsl:call-template>
+
+                        <xsl:call-template name="itemSummaryView-field">
+                            <xsl:with-param name="schema">dc</xsl:with-param>
+                            <xsl:with-param name="element">contributor</xsl:with-param>
+                            <xsl:with-param name="qualifier">recording</xsl:with-param>
+                        </xsl:call-template>
+
+                        <xsl:call-template name="itemSummaryView-field">
+                            <xsl:with-param name="schema">dc</xsl:with-param>
+                            <xsl:with-param name="element">rights</xsl:with-param>
+                        </xsl:call-template>
+
+                        <xsl:call-template name="itemSummaryView-field">
+                            <xsl:with-param name="schema">dc</xsl:with-param>
+                            <xsl:with-param name="element">title</xsl:with-param>
+                            <xsl:with-param name="qualifier">alternative</xsl:with-param>
+                        </xsl:call-template>
+
+                        <xsl:call-template name="itemSummaryView-field">
+                            <xsl:with-param name="schema">dc</xsl:with-param>
+                            <xsl:with-param name="element">identifier</xsl:with-param>
+                            <xsl:with-param name="qualifier">citation</xsl:with-param>
+                        </xsl:call-template>
+
+                        <xsl:call-template name="itemSummaryView-field">
+                            <xsl:with-param name="schema">dc</xsl:with-param>
+                            <xsl:with-param name="element">description</xsl:with-param>
+                            <xsl:with-param name="qualifier">version</xsl:with-param>
+                        </xsl:call-template>
+
+                        <xsl:call-template name="itemSummaryView-field">
+                            <xsl:with-param name="schema">ac</xsl:with-param>
+                            <xsl:with-param name="element">comp</xsl:with-param>
+                            <xsl:with-param name="qualifier">award</xsl:with-param>
+                        </xsl:call-template>
+
+                        <xsl:call-template name="itemSummaryView-field">
+                            <xsl:with-param name="schema">dc</xsl:with-param>
+                            <xsl:with-param name="element">relation</xsl:with-param>
+                            <xsl:with-param name="qualifier">isversionof</xsl:with-param>
+                        </xsl:call-template>
+
+                        <xsl:call-template name="itemSummaryView-field">
+                            <xsl:with-param name="schema">dc</xsl:with-param>
+                            <xsl:with-param name="element">relation</xsl:with-param>
+                            <xsl:with-param name="qualifier">ispartof</xsl:with-param>
+                        </xsl:call-template>
+
+                        <xsl:call-template name="itemSummaryView-field">
+                            <xsl:with-param name="schema">dc</xsl:with-param>
+                            <xsl:with-param name="element">publisher</xsl:with-param>
+                        </xsl:call-template>
+
+
                     </div>
                 </div>
             </div>
@@ -298,6 +393,58 @@
                 </xsl:choose>
             </div>
         </xsl:if>
+    </xsl:template>
+
+    <!-- The solution to one-off metadata fields -->
+    <xsl:template name="itemSummaryView-field">
+        <xsl:param name="schema"/>
+        <xsl:param name="element"/>
+        <xsl:param name="qualifier"/>
+
+        <xsl:choose>
+            <xsl:when test="$qualifier">
+                <!-- schema.element.qualifier -->
+                <xsl:if test="dim:field[@mdschema=$schema and @element=$element and @qualifier=$qualifier and descendant::text()]">
+                    <div class="item-page-field-wrapper table">
+                        <h5>
+                            <i18n:text>
+                                <xsl:text>xmlui.metadata.</xsl:text>
+                                <xsl:copy-of select="$schema"/>.<xsl:copy-of select="$element"/>.<xsl:copy-of select="$qualifier"/>
+                            </i18n:text>
+                        </h5>
+                        <span>
+                            <xsl:for-each select="dim:field[@mdschema=$schema and @element=$element and @qualifier=$qualifier and descendant::text()]">
+                                <xsl:copy-of select="./node()"/>
+                                <xsl:if test="count(following-sibling::dim:field[@mdschema=$schema and @element=$element and @qualifier=$qualifier and descendant::text()]) != 0">
+                                    <br/>
+                                </xsl:if>
+                            </xsl:for-each>
+                        </span>
+                    </div>
+                </xsl:if>
+            </xsl:when>
+            <xsl:otherwise>
+                <!-- schema.element  no qualifier -->
+                <xsl:if test="dim:field[@mdschema=$schema and @element=$element and not(@qualifier) and descendant::text()]">
+                    <div class="item-page-field-wrapper table">
+                        <h5>
+                            <i18n:text>
+                                <xsl:text>xmlui.metadata.</xsl:text>
+                                <xsl:copy-of select="$schema"/>.<xsl:copy-of select="$element"/>
+                            </i18n:text>
+                        </h5>
+                        <span>
+                            <xsl:for-each select="dim:field[@mdschema=$schema and @element=$element and not(@qualifier) and descendant::text()]">
+                                <xsl:copy-of select="./node()"/>
+                                <xsl:if test="count(following-sibling::dim:field[@mdschema=$schema and @element=$element and not(@qualifier) and descendant::text()]) != 0">
+                                    <br/>
+                                </xsl:if>
+                            </xsl:for-each>
+                        </span>
+                    </div>
+                </xsl:if>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
     <xsl:template name="itemSummaryView-DIM-URI">
