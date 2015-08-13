@@ -9,6 +9,7 @@ package org.dspace.app.xmlui.aspect.artifactbrowser;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
@@ -67,11 +68,11 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
     // replaced & withdrawn
     private static final Message T_head_item_claimed =
             message("xmlui.ArtifactBrowser.RestrictedItem.head_item_claimed");
-    private static final Message T_head2_item_claimed =
-            message("xmlui.ArtifactBrowser.RestrictedItem.head2_item_claimed");
     private static final Message T_para_item_claimed =
             message("xmlui.ArtifactBrowser.RestrictedItem.para_item_claimed");
-    
+    private static final Message T_para2_item_claimed =
+            message("xmlui.ArtifactBrowser.RestrictedItem.para2_item_claimed");
+
 
     // withdrawn
     private static final Message T_head_item_withdrawn =
@@ -245,10 +246,28 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
         if (item.isWithdrawn()) 
                 {
             if ( item.isReplacedBy() ) {
-            	unauthorized.setHead(T_head_item_claimed);
-            	String otherIdentifier = item.getReplacedBy().get(0);
-            	unauthorized.addItem(T_head2_item_claimed.parameterize(otherIdentifier));
-            	unauthorized.addItem(T_para_item_claimed.parameterize(otherIdentifier));
+                String itemTitle = item.getMetadata("dc.title");
+                unauthorized.setHead(itemTitle);
+                Metadatum[] contributorAuthor = item.getMetadataByMetadataString("dc.contributor.author");
+                Metadatum[] contributorOther = item.getMetadataByMetadataString("dc.contributor.other");
+                Metadatum[] mds = ArrayUtils.addAll(contributorAuthor, contributorOther);
+                StringBuilder authors = new StringBuilder();
+                if(mds != null && mds.length > 0){
+                    String separator = "";
+                    for(Metadatum md : mds){
+                        authors.append(separator).append(md.value);
+                        separator = "; ";
+                    }
+                }
+                if(authors.length() > 0) {
+                    unauthorized.addItem(authors.toString());
+                }
+                unauthorized.addItem(T_head_item_claimed);
+            	unauthorized.addItem(T_para_item_claimed);
+                for(String replaced : item.getReplacedBy()){
+                    unauthorized.addItem().addXref(replaced, replaced);
+                }
+            	unauthorized.addItem(T_para2_item_claimed);
             	return;
             }else{
                 unauthorized.setHead(T_head_item_withdrawn);            	
