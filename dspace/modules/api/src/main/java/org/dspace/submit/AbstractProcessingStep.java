@@ -420,8 +420,9 @@ public abstract class AbstractProcessingStep
 
             //Inherit all the values configured
             DCValue[] sourceVals = source.getMetadata(sourceVal.schema, sourceVal.element, sourceVal.qualifier, Item.ANY);
-            for (DCValue value : sourceVals)
-                destination.addMetadata(destinVal.schema, destinVal.element, destinVal.qualifier, null, value.value);
+            for (DCValue value : sourceVals) {
+                destination.addMetadata(destinVal.schema, destinVal.element, destinVal.qualifier, null, value.value, value.authority, value.confidence);
+            }
         }
     }
     

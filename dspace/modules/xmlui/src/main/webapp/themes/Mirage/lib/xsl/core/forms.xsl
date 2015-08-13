@@ -61,6 +61,10 @@
             </xsl:call-template>
 
             <xsl:choose>
+                <xsl:when test="dri:field/dri:params[@choicesPresentation='authorLookup']">
+                    <xsl:call-template name="pick-label"/>
+                    <xsl:apply-templates mode="authorFormComposite"/>
+                </xsl:when>
                 <xsl:when test="dri:field[@type='composite']">
                     <xsl:call-template name="pick-label"/>
                     <xsl:apply-templates mode="formComposite"/>
@@ -95,42 +99,17 @@
 
     <!-- NON-instance composite fields (i.e. not repeatable) -->
     <xsl:template match="dri:field[@type='composite']" mode="formComposite">
+        <xsl:variable name="confidenceIndicatorID" select="concat(translate(@id,'.','_'),'_confidence_indicator')"/>
         <div class="ds-form-content">
             <xsl:apply-templates select="dri:help" mode="compositeComponent"/>
-            <xsl:variable name="confidenceIndicatorID" select="concat(translate(@id,'.','_'),'_confidence_indicator')"/>
             <xsl:apply-templates select="dri:field" mode="compositeComponent"/>
-            <xsl:choose>
-              <xsl:when test="dri:params/@choicesPresentation = 'suggest'">
-                <xsl:message terminate="yes">
-                  <xsl:text>ERROR: Input field with "suggest" (autocomplete) choice behavior is not implemented for Composite (e.g. "name") fields.</xsl:text>
-                </xsl:message>
-              </xsl:when>
-              <!-- lookup popup includes its own Add button if necessary. -->
-              <xsl:when test="dri:params/@choicesPresentation = 'lookup'">
-                <xsl:call-template name="addLookupButton">
-                  <xsl:with-param name="isName" select="'true'"/>
-                  <xsl:with-param name="confIndicator" select="$confidenceIndicatorID"/>
-                </xsl:call-template>
-              </xsl:when>
-                <xsl:when test="dri:params/@choicesPresentation = 'authorLookup'">
-                    <xsl:call-template name="addLookupButtonAuthor">
-                        <xsl:with-param name="isName" select="'true'"/>
-                        <xsl:with-param name="confIndicator" select="$confidenceIndicatorID"/>
-                    </xsl:call-template>
-                </xsl:when>
-            </xsl:choose>
-            <xsl:if test="dri:params/@authorityControlled">
-              <xsl:variable name="confValue" select="dri:field/dri:value[@type='authority'][1]/@confidence"/>
-              <xsl:call-template name="authorityConfidenceIcon">
-                <xsl:with-param name="confidence" select="$confValue"/>
-                <xsl:with-param name="id" select="$confidenceIndicatorID"/>
-              </xsl:call-template>
-              <xsl:call-template name="authorityInputFields">
+
+            <xsl:call-template name="authority-display">
+                <xsl:with-param name="authValue" select="dri:field/dri:value[@type='authority'][1]"/>
+                <xsl:with-param name="confID" select="$confidenceIndicatorID"/>
                 <xsl:with-param name="name" select="@n"/>
-                <xsl:with-param name="authValue" select="dri:field/dri:value[@type='authority'][1]/text()"/>
-                <xsl:with-param name="confValue" select="$confValue"/>
-              </xsl:call-template>
-            </xsl:if>
+            </xsl:call-template>
+
             <xsl:if test="dri:error or dri:field/dri:error">
                 <div class="spacer">&#160;</div>
                 <xsl:apply-templates select="dri:field/dri:error" mode="compositeComponent"/>
@@ -139,7 +118,59 @@
         </div>
     </xsl:template>
 
-    <!-- The hadling of the special case of instanced composite fields under "form" lists -->
+    <!-- Author lookup form -->
+    <xsl:template match="dri:field[@type='composite'][dri:field/dri:instance | dri:params/@operations]" mode="authorFormComposite" priority="2">
+        <xsl:variable name="confidenceIndicatorID" select="concat(translate(@id,'.','_'),'_confidence_indicator')"/>
+
+        <div class="spacer">&#160;</div>
+        <!-- This div handles ORCID lookup-->
+        <div class="ds-form-content">
+            <xsl:call-template name="addLookupButtonAuthor"/>
+            <a class="ds-form-content" href="http://orcid.org" target="_blank">What is ORCID?</a>
+        </div>
+
+        <!-- This div handles manual author add-->
+        <div class="ds-form-content">
+            <!-- display the help message here.-->
+            <div class="ds-form-label help">
+                <xsl:variable name="help" select="dri:help"/>
+                <div class="help-title">
+                    <xsl:text>Manually add an author:</xsl:text>
+                    <xsl:call-template name="help-hover">
+                        <xsl:with-param name="hover" select="string($help)"/>
+                    </xsl:call-template>
+                </div>
+            </div>
+            <xsl:apply-templates select="dri:field" mode="compositeComponent"/>
+            <xsl:if test="contains(dri:params/@operations,'add')">
+                <!-- Add buttons should be named "submit_[field]_add" so that we can ignore errors from required fields when simply adding new values-->
+                <input type="submit" i18n:attr="value" value="xmlui.Submission.submit.DescribeStep.add" name="{concat('submit_',@n,'_add')}" class="ds-button-field ds-add-button"/>
+            </xsl:if>
+            <xsl:call-template name="authority-display">
+                <xsl:with-param name="authValue" select="dri:value[@type='authority']"/>
+                <xsl:with-param name="confID" select="$confidenceIndicatorID"/>
+                <xsl:with-param name="name" select="@n"/>
+            </xsl:call-template>
+            <xsl:if test="dri:error or dri:field/dri:error">
+                <div class="spacer">&#160;</div>
+                <xsl:apply-templates select="dri:field/dri:error" mode="compositeComponent"/>
+                <xsl:apply-templates select="dri:error" mode="compositeComponent"/>
+            </xsl:if>
+        </div>
+
+        <!-- This div handles previous entries. -->
+        <div class="ds-form-content">
+            <xsl:if test="dri:field and dri:field/dri:instance">
+                <div class="ds-previous-values">
+                    <xsl:call-template name="ds-previous-values-edit-reorder">
+                        <xsl:with-param name="type" select="'orcid'"/>
+                    </xsl:call-template>
+                </div>
+            </xsl:if>
+        </div>
+    </xsl:template>
+
+    <!-- The handling of the special case of instanced composite fields under "form" lists (except author lookup) -->
     <xsl:template match="dri:field[@type='composite'][dri:field/dri:instance | dri:params/@operations]" mode="formComposite" priority="2">
         <xsl:variable name="confidenceIndicatorID" select="concat(translate(@id,'.','_'),'_confidence_indicator')"/>
         <div class="ds-form-content">
@@ -147,78 +178,36 @@
             <xsl:apply-templates select="dri:field" mode="compositeComponent"/>
             <xsl:if test="contains(dri:params/@operations,'add')">
                 <!-- Add buttons should be named "submit_[field]_add" so that we can ignore errors from required fields when simply adding new values-->
-            <input type="submit" i18n:attr="value" value="xmlui.Submission.submit.DescribeStep.add" name="{concat('submit_',@n,'_add')}" class="ds-button-field ds-add-button">
-                  <!-- Make invisible if we have choice-lookup operation that provides its own Add. -->
-                  <!--<xsl:if test="dri:params/@choicesPresentation = 'lookup'">
-                    <xsl:attribute name="style">
-                      <xsl:text>display:none;</xsl:text>
-                    </xsl:attribute>
-                    </xsl:if>-->
-               </input>
+                <input type="submit" i18n:attr="value" value="xmlui.Submission.submit.DescribeStep.add" name="{concat('submit_',@n,'_add')}" class="ds-button-field ds-add-button"/>
             </xsl:if>
-            <!-- insert choice mechansim and/or Add button here -->
-            <xsl:choose>
-              <xsl:when test="dri:params/@choicesPresentation = 'suggest'">
-                <xsl:message terminate="yes">
-                  <xsl:text>ERROR: Input field with "suggest" (autocomplete) choice behavior is not implemented for Composite (e.g. "name") fields.</xsl:text>
-                </xsl:message>
-              </xsl:when>
-              <!-- lookup popup includes its own Add button if necessary. -->
-              <xsl:when test="dri:params/@choicesPresentation = 'lookup'">
-                <xsl:call-template name="addLookupButton">
-                  <xsl:with-param name="isName" select="'true'"/>
-                  <xsl:with-param name="confIndicator" select="$confidenceIndicatorID"/>
-                </xsl:call-template>
-              </xsl:when>
-                <xsl:when test="dri:params/@choicesPresentation = 'authorLookup'">
-                    <xsl:call-template name="addLookupButtonAuthor">
-                        <xsl:with-param name="isName" select="'true'"/>
-                        <xsl:with-param name="confIndicator" select="$confidenceIndicatorID"/>
-                    </xsl:call-template>
-                </xsl:when>
-            </xsl:choose>
-            <!-- place to store authority value -->
-            <xsl:if test="dri:params/@authorityControlled">
-              <xsl:call-template name="authorityConfidenceIcon">
-                <xsl:with-param name="confidence" select="dri:value[@type='authority']/@confidence"/>
-                <xsl:with-param name="id" select="$confidenceIndicatorID"/>
-              </xsl:call-template>
-              <xsl:call-template name="authorityInputFields">
+            <xsl:call-template name="create-choices-presentation">
+                <xsl:with-param name="confidenceIndicatorID" select="$confidenceIndicatorID"/>
+                <xsl:with-param name="presentationType" select="dri:params/@choicesPresentation"/>
+            </xsl:call-template>
+            <xsl:call-template name="authority-display">
+                <xsl:with-param name="authValue" select="dri:value[@type='authority']"/>
+                <xsl:with-param name="confID" select="$confidenceIndicatorID"/>
                 <xsl:with-param name="name" select="@n"/>
-                <xsl:with-param name="authValue" select="dri:value[@type='authority']/text()"/>
-                <xsl:with-param name="confValue" select="dri:value[@type='authority']/@confidence"/>
-              </xsl:call-template>
-            </xsl:if>
+            </xsl:call-template>
             <xsl:if test="dri:error or dri:field/dri:error">
                 <div class="spacer">&#160;</div>
                 <xsl:apply-templates select="dri:field/dri:error" mode="compositeComponent"/>
                 <xsl:apply-templates select="dri:error" mode="compositeComponent"/>
             </xsl:if>
+        </div>
 
-            <!-- handle previous entries -->
-            <xsl:choose>
-                <!-- handle author list as a special case to enable reordering/editing -->
-                <xsl:when test="@n = 'dc_contributor_author'">
-                    <xsl:if test="dri:field and dri:field/dri:instance">
-                        <div class="ds-previous-values">
-                            <xsl:call-template name="ds-previous-values-edit-reorder"/>
-                        </div>
-                    </xsl:if>
-                </xsl:when>
-                <!-- handle non-author-list metadata -->
-                <xsl:otherwise>
-                    <xsl:if test="dri:instance or dri:field/dri:instance">
-                        <xsl:call-template name="ds-previous-values">
-                            <xsl:with-param name="field-iterator" select="'fieldIterator'"/>
-                            <xsl:with-param name="instance-data" select="xalan:nodeset(dri:field/dri:instance)"/>
-                        </xsl:call-template>
-                    </xsl:if>
-                </xsl:otherwise>
-            </xsl:choose>
+        <!-- This div handles previous entries. -->
+        <div class="ds-form-content">
+            <xsl:if test="dri:instance or dri:field/dri:instance">
+                <xsl:call-template name="ds-previous-values">
+                    <xsl:with-param name="field-iterator" select="'fieldIterator'"/>
+                    <xsl:with-param name="instance-data" select="xalan:nodeset(dri:field/dri:instance)"/>
+                </xsl:call-template>
+            </xsl:if>
         </div>
     </xsl:template>
 
-    <!-- The hadling of the special case of instanced composite fields under "form" lists -->
+    <!-- The handling of the special case of instanced text fields under "form" lists -->
     <xsl:template match="dri:field[@type='text'][dri:field/dri:instance | dri:params/@operations]" mode="formText" priority="2">
         <xsl:variable name="confidenceIndicatorID" select="concat(translate(@id,'.','_'),'_confidence_indicator')"/>
         <div class="ds-form-content">
@@ -226,41 +215,17 @@
             <xsl:apply-templates select="." mode="normalField"/>
             <xsl:if test="contains(dri:params/@operations,'add')">
                 <!-- Add buttons should be named "submit_[field]_add" so that we can ignore errors from required fields when simply adding new values-->
-                <input type="submit" i18n:attr="value" value="xmlui.Submission.submit.DescribeStep.add" name="{concat('submit_',@n,'_add')}" class="ds-button-field ds-add-button"></input>
+                <input type="submit" i18n:attr="value" value="xmlui.Submission.submit.DescribeStep.add" name="{concat('submit_',@n,'_add')}" class="ds-button-field ds-add-button"/>
             </xsl:if>
-            <!-- insert choice mechansim and/or Add button here -->
-            <xsl:choose>
-                <xsl:when test="dri:params/@choicesPresentation = 'suggest'">
-                    <xsl:message terminate="yes">
-                        <xsl:text>ERROR: Input field with "suggest" (autocomplete) choice behavior is not implemented for Composite (e.g. "name") fields.</xsl:text>
-                    </xsl:message>
-                </xsl:when>
-                <!-- lookup popup includes its own Add button if necessary. -->
-                <xsl:when test="dri:params/@choicesPresentation = 'lookup'">
-                    <xsl:call-template name="addLookupButton">
-                        <xsl:with-param name="isName" select="'true'"/>
-                        <xsl:with-param name="confIndicator" select="$confidenceIndicatorID"/>
-                    </xsl:call-template>
-                </xsl:when>
-                <xsl:when test="dri:params/@choicesPresentation = 'authorLookup'">
-                    <xsl:call-template name="addLookupButtonAuthor">
-                        <xsl:with-param name="isName" select="'true'"/>
-                        <xsl:with-param name="confIndicator" select="$confidenceIndicatorID"/>
-                    </xsl:call-template>
-                </xsl:when>
-            </xsl:choose>
-            <!-- place to store authority value -->
-            <xsl:if test="dri:params/@authorityControlled">
-                <xsl:call-template name="authorityConfidenceIcon">
-                    <xsl:with-param name="confidence" select="dri:value[@type='authority']/@confidence"/>
-                    <xsl:with-param name="id" select="$confidenceIndicatorID"/>
-                </xsl:call-template>
-                <xsl:call-template name="authorityInputFields">
-                    <xsl:with-param name="name" select="@n"/>
-                    <xsl:with-param name="authValue" select="dri:value[@type='authority']/text()"/>
-                    <xsl:with-param name="confValue" select="dri:value[@type='authority']/@confidence"/>
-                </xsl:call-template>
-            </xsl:if>
+            <xsl:call-template name="create-choices-presentation">
+                <xsl:with-param name="confidenceIndicatorID" select="$confidenceIndicatorID"/>
+                <xsl:with-param name="presentationType" select="dri:params/@choicesPresentation"/>
+            </xsl:call-template>
+            <xsl:call-template name="authority-display">
+                <xsl:with-param name="authValue" select="dri:value[@type='authority']"/>
+                <xsl:with-param name="confID" select="$confidenceIndicatorID"/>
+                <xsl:with-param name="name" select="@n"/>
+            </xsl:call-template>
             <xsl:if test="dri:error">
                 <div class="spacer">&#160;</div>
                 <xsl:apply-templates select="dri:error"/>
@@ -268,7 +233,6 @@
 
             <!-- handle previous entries -->
             <xsl:choose>
-                <!-- handle author list as a special case to enable reordering/editing -->
                 <xsl:when test="@n = 'dc_coverage_spatial'
                              or @n = 'dc_coverage_temporal'
                              or @n = 'dc_subject'
@@ -294,11 +258,13 @@
     </xsl:template>
 
     <xsl:template name="ds-previous-values-edit-reorder">
+        <xsl:param name="type" select="''"/>
         <table>
             <!-- Iterate over the dri:instance elements contained in this field. The instances contain
                     stored values as either "interpreted", "raw", or "default" values. -->
             <xsl:call-template name="fieldIterator-edit-reorder">
                 <xsl:with-param name="position" select="1"/>
+                <xsl:with-param name="type" select="$type"/>
             </xsl:call-template>
         </table>
     </xsl:template>
@@ -311,6 +277,7 @@
         components rather than a single field, which requires it to consider several sets of instances. -->
     <xsl:template name="fieldIterator-edit-reorder">
         <xsl:param name="position"/>
+        <xsl:param name="type" select="''"/>
         <xsl:variable name="this-instance" select="dri:instance[position()=$position]"/>
         <xsl:if test="$this-instance">
             <tr class="ds-edit-reorder-input-row">
@@ -336,35 +303,22 @@
                         <xsl:call-template name="authorityConfidenceIcon">
                             <xsl:with-param name="confidence" select="dri:instance[$position]/dri:value[@type='authority']/@confidence"/>
                             <xsl:with-param name="id" select="concat(translate(@id,'.','_'),'_confidence_indicator')"/>
+                            <xsl:with-param name="authType" select="$type"/>
                         </xsl:call-template>
                     </xsl:if>
-                    <xsl:choose>
-                        <xsl:when test="@type='composite'">
-                            <xsl:apply-templates select="dri:field/dri:instance[$position]" mode="hiddenInterpreter"/>
-                            <xsl:apply-templates select="dri:instance[$position]" mode="hiddenInterpreter"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <xsl:apply-templates select="dri:instance[$position]" mode="hiddenInterpreter"/>
-                        </xsl:otherwise>
-                    </xsl:choose>
+                    <xsl:if test="@type='composite'">
+                        <xsl:apply-templates select="dri:field/dri:instance[$position]" mode="hiddenInterpreter"/>
+                    </xsl:if>
+                    <xsl:apply-templates select="dri:instance[$position]" mode="hiddenInterpreter"/>
                 </td>
                 <!-- EDIT -->
                 <td class="ds-edit-button">
                     <xsl:if test="contains(dri:params/@operations,'add')">
                         <input type="submit" i18n:attr="value" value="xmlui.Submission.submit.DescribeStep.edit" name="{concat('submit_',@n,'_',$position,'_edit')}" class="ds-button-field ds-edit-button" >
                             <xsl:if test="dri:params/@authorityControlled = 'yes'">
-                                <xsl:choose>
-                                    <xsl:when test="@type='composite'">
-                                        <xsl:if test="dri:instance[$position]/dri:value[@type='authority']/@confidence='ACCEPTED'">
-                                            <xsl:attribute name="disabled">disabled</xsl:attribute>
-                                        </xsl:if>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xsl:if test="dri:instance[$position]/dri:value[@type='authority']/@confidence='ACCEPTED'">
-                                            <xsl:attribute name="disabled">disabled</xsl:attribute>
-                                        </xsl:if>
-                                    </xsl:otherwise>
-                                </xsl:choose>
+                                <xsl:if test="dri:instance[$position]/dri:value[@type='authority']/@confidence='ACCEPTED'">
+                                    <xsl:attribute name="disabled">disabled</xsl:attribute>
+                                </xsl:if>
                             </xsl:if>
                         </input>
                     </xsl:if>
@@ -381,6 +335,7 @@
             <!-- recurse to handle subsequent authors -->
             <xsl:call-template name="fieldIterator-edit-reorder">
                 <xsl:with-param name="position" select="$position + 1"/>
+                <xsl:with-param name="type" select="$type"/>
             </xsl:call-template>
         </xsl:if>
     </xsl:template>
@@ -400,17 +355,7 @@
             <!-- Add buttons should be named "submit_[field]_add" so that we can ignore errors from required fields when simply adding new values-->
             <input type="submit" i18n:attr="value" value="xmlui.Submission.submit.DescribeStep.add" name="{concat('submit_',@n,'_add')}" class="ds-button-field ds-add-button">
                 <!-- Make invisible if we have choice-lookup popup that provides its own Add. -->
-                <xsl:if test="dri:params/@choicesPresentation = 'lookup'">
-                    <xsl:attribute name="style">
-                        <xsl:text>display:none;</xsl:text>
-                    </xsl:attribute>
-                </xsl:if>
-                <xsl:if test="dri:params/@choicesPresentation = 'authorLookup'">
-                    <xsl:attribute name="style">
-                        <xsl:text>display:none;</xsl:text>
-                    </xsl:attribute>
-                </xsl:if>
-                <xsl:if test="dri:params/@choicesPresentation = 'authorLookup'">
+                <xsl:if test="dri:params[@choicesPresentation = 'lookup' or @choicesPresentation = 'authorLookup']">
                     <xsl:attribute name="style">
                         <xsl:text>display:none;</xsl:text>
                     </xsl:attribute>
@@ -488,6 +433,172 @@
                 <xsl:with-param name="field-iterator" select="'simpleFieldIterator'"/>
                 <xsl:with-param name="instance-data" select="xalan:nodeset(dri:instance)"/>
             </xsl:call-template>
+        </xsl:if>
+    </xsl:template>
+
+    <xsl:template name="create-choices-presentation">
+        <xsl:param name="confidenceIndicatorID"/>
+        <xsl:param name="presentationType"/>
+        <xsl:choose>
+            <xsl:when test="$presentationType = 'suggest'">
+                <xsl:message terminate="yes">
+                    <xsl:text>ERROR: Input field with "suggest" (autocomplete) choice behavior is not implemented for Composite (e.g. "name") fields.</xsl:text>
+                </xsl:message>
+            </xsl:when>
+            <xsl:when test="$presentationType = 'lookup'">
+                <!-- lookup popup includes its own Add button if necessary. -->
+                <xsl:call-template name="addLookupButton">
+                    <xsl:with-param name="isName" select="'true'"/>
+                    <xsl:with-param name="confIndicator" select="$confidenceIndicatorID"/>
+                </xsl:call-template>
+            </xsl:when>
+        </xsl:choose>
+    </xsl:template>
+
+    <xsl:template name="authority-display">
+        <xsl:param name="confID"/>
+        <xsl:param name="authValue"/>
+        <xsl:param name="name"/>
+        <xsl:if test="dri:params/@authorityControlled">
+            <xsl:call-template name="authorityConfidenceIcon">
+                <xsl:with-param name="confidence" select="$authValue/@confidence"/>
+                <xsl:with-param name="id" select="$confID"/>
+            </xsl:call-template>
+            <xsl:call-template name="authorityInputFields">
+                <xsl:with-param name="name" select="$name"/>
+                <xsl:with-param name="authValue" select="$authValue/text()"/>
+                <xsl:with-param name="confValue" select="$authValue/@confidence"/>
+            </xsl:call-template>
+        </xsl:if>
+    </xsl:template>
+
+    <xsl:template name="pick-label">
+        <xsl:choose>
+            <xsl:when test="dri:field/dri:label">
+                <xsl:variable name="help" select="./dri:field/dri:help"/>
+                <label class="ds-form-label">
+                    <xsl:if test="./dri:field/@id">
+                        <xsl:attribute name="for">
+                            <xsl:value-of select="translate(./dri:field/@id,'.','_')"/>
+                        </xsl:attribute>
+                    </xsl:if>
+                    <xsl:apply-templates select="dri:field/dri:label" mode="formComposite"/>
+
+                    <!-- display appropriate help text-->
+                    <xsl:if test="string-length($help)>0">
+                        <xsl:variable name="n" select="string(./dri:field/@n)"/>
+                        <xsl:choose>
+                            <!-- skip the first help on the forgot-email page -->
+                            <xsl:when test="./dri:field[@id='aspect.eperson.StartForgotPassword.field.email']"/>
+
+                            <!-- skip the first help for author lookup form-->
+                            <xsl:when test="./dri:field[@id='aspect.submission.StepTransformer.field.dc_contributor_author']"/>
+
+                            <!-- handle helptext on submission forms -->
+                            <xsl:when test="ancestor::dri:div[contains(@id,'aspect.submission')]">
+                                <xsl:choose>
+                                    <!-- put all help text in the hover-over field for these items -->
+                                    <xsl:when test="$n = 'dc_subject'
+                                                 or $n = 'dwc_ScientificName'
+                                                 or $n = 'dc_coverage_spatial'
+                                                 or $n = 'dc_coverage_temporal'
+                                    ">
+                                        <xsl:call-template name="help-hover">
+                                            <xsl:with-param name="hover" select="$help"/>
+                                        </xsl:call-template>
+                                    </xsl:when>
+                                    <!-- for other fields, display subsequent sentences in hover text -->
+                                    <xsl:otherwise>
+                                        <div class="help-title">
+                                            <xsl:value-of select="concat(substring-before($help,'.'),'.')"/>
+                                        </div>
+                                        <xsl:call-template name="help-hover">
+                                            <xsl:with-param name="hover" select="substring-after($help,'.')"/>
+                                        </xsl:call-template>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:when>
+
+                            <!-- all other cases -->
+                            <xsl:otherwise>
+                                <xsl:choose>
+                                    <xsl:when test="$help/i18n:text">
+                                        <xsl:call-template name="help-hover">
+                                            <xsl:with-param name="hover" select="$help/i18n:text"/>
+                                        </xsl:call-template>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:call-template name="help-hover">
+                                            <xsl:with-param name="hover" select="$help"/>
+                                        </xsl:call-template>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:if>
+                </label>
+            </xsl:when>
+            <xsl:when test="string-length(string(preceding-sibling::*[1][local-name()='label'])) > 0">
+                <xsl:choose>
+                    <xsl:when test="./dri:field/@id">
+                        <label>
+                            <xsl:apply-templates select="preceding-sibling::*[1][local-name()='label']"/>
+                            <xsl:text>:</xsl:text>
+                        </label>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <span>
+                            <xsl:apply-templates select="preceding-sibling::*[1][local-name()='label']"/>
+                            <xsl:text>:</xsl:text>
+                        </span>
+                    </xsl:otherwise>
+                </xsl:choose>
+
+            </xsl:when>
+            <xsl:when test="dri:field">
+                <xsl:variable name="help" select="dri:help/text()"/>
+                <xsl:choose>
+                    <xsl:when test="preceding-sibling::*[1][local-name()='label']">
+                        <label class="ds-form-label">
+                            <xsl:choose>
+                                <xsl:when test="./dri:field/@id">
+                                    <xsl:attribute name="for">
+                                        <xsl:value-of select="translate(./dri:field/@id,'.','_')"/>
+                                    </xsl:attribute>
+                                </xsl:when>
+                            </xsl:choose>
+                            <xsl:apply-templates select="preceding-sibling::*[1][local-name()='label']"/>&#160;
+                            <xsl:if test="string-length($help)>0">
+                                <div class="help-title">
+                                    <xsl:value-of select="concat(substring-before($help,'.'),'.')"/>
+                                </div>
+                                <xsl:call-template name="help-hover">
+                                    <xsl:with-param name="hover" select="substring-after($help,'.')"/>
+                                </xsl:call-template>
+                            </xsl:if>
+                        </label>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:apply-templates select="preceding-sibling::*[1][local-name()='label']"/>&#160;
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+                <!-- If the label is empty and the item contains no field, omit the label. This is to
+                    make the text inside the item (since what else but text can be there?) stretch across
+                    both columns of the list. -->
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    <xsl:template name="help-hover">
+        <xsl:param name="hover" select="''"/>
+        <xsl:if test="string-length($hover) > 0">
+            <img class="label-mark" src="/themes/Mirage/images/help.jpg">
+                <xsl:attribute name="title">
+                    <xsl:value-of select="$hover"/>
+                </xsl:attribute>
+            </img>
         </xsl:if>
     </xsl:template>
 
