@@ -148,9 +148,11 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
                     // try to get authority id first, its better than name
                     String journalUuid = request.getParameter("prism_publicationName_authority");
-
+                    if(journalUuid != null) {
+                        journalUuid = journalUuid.trim();
+                    }
+                    
                     String journal = request.getParameter("prism_publicationName");
-
                     if(journal!= null)
                     {
                         journal=journal.replace("*", "");
@@ -429,15 +431,15 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
         Concept journalConcept = null;
 
-        if(journalConcept==null && journalUuid != null){
+        if(journalConcept==null && journalUuid != null && journalUuid.length() > 0){
             journalConcept = JournalUtils.getJournalConceptById(context, journalUuid);
         }
 
-        if(journalConcept==null && journalShortID != null){
+        if(journalConcept==null && journalShortID != null && journalShortID.length() > 0){
             journalConcept = JournalUtils.getJournalConceptByShortID(context, journalShortID);
         }
 
-        if(journalConcept==null && journalName != null){
+        if(journalConcept==null && journalName != null && journalName.length() > 0){
             journalConcept = JournalUtils.getJournalConceptByName(context, journalName);
         }
 
