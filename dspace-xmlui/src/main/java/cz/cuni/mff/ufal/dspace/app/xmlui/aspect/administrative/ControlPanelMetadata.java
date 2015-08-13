@@ -140,6 +140,7 @@ public class ControlPanelMetadata extends AbstractControlPanelTab {
 	                    wfhead.addCellContent("relation");
 					}
 					wfhead.addCellContent("VALUE");
+					wfhead.addCellContent("Withdrawn?");
 					
 					int i = 0;
 					while ( item_iter.hasNext() )
@@ -170,6 +171,7 @@ public class ControlPanelMetadata extends AbstractControlPanelTab {
     	                            String.format("%s.%s.%s", dcval.schema, dcval.element, dcval.qualifier ) );
     	                    }
     						wsrow.addCell().addXref( dcval.value, dcval.value );
+							wsrow.addCellContent(Boolean.toString(item.isWithdrawn()));
     						i++;
                         }
 					}
