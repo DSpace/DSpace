@@ -1,48 +1,31 @@
 package org.datadryad.submission;
 
-import javax.mail.Address;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.Part;
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.dspace.JournalUtils;
+import org.dspace.content.authority.Concept;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
+import org.dspace.core.Email;
+import org.dspace.core.I18nUtil;
+import org.dspace.submit.utils.DryadJournalSubmissionUtils;
+import org.jdom.Document;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
+import javax.mail.*;
+import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.lang.StringUtils;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Email;
-import org.dspace.core.I18nUtil;
-import org.dspace.submit.utils.DryadJournalSubmissionUtils;
-
-import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-
 import java.io.*;
-
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Scanner;
-import java.util.StringTokenizer;
+import java.sql.SQLException;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Email processing servlet.
@@ -57,13 +40,6 @@ public class DryadEmailSubmission extends HttpServlet {
     private static String PROPERTIES_PROPERTY = "dryad.properties.filename";
 
     private static String EMAIL_TEMPLATE = "journal_submit_error";
-
-    // Maps not concurrent but we only access, don't write to except at init()
-    // map of Journal Codes to Journals
-    private static Map<String, PartnerJournal> myJournals;
-
-    // map of Journal Names to Journal Codes (in case code is not preent in submission)
-    private static Map<String, String> myJournalNames;
 
     // Timer for scheduled harvesting of emails
     private Timer myEmailHarvester;
@@ -223,65 +199,8 @@ public class DryadEmailSubmission extends HttpServlet {
                 ConfigurationManager.loadConfig(config);
             }
 
-            String journalPropFile = ConfigurationManager.getProperty("submit.journal.config");
-            File propFile = new File(journalPropFile);
-
-            if (!propFile.exists()) {
-                throw new SubmissionException("Can't find properties file: "
-                        + propFile.getAbsolutePath());
-            }
-
-            try {
-                props.load(new InputStreamReader(new FileInputStream(propFile), "UTF-8"));
-            } catch (IOException details) {
-                throw new SubmissionException(details);
-            }
-
             dryadGmailService = new DryadGmailService();
         }
-
-        // Next, turn those properties into something we can use
-        Map<String, PartnerJournal> journals = new HashMap<String, PartnerJournal>();
-        Enumeration<?> names = props.propertyNames();
-
-        while (names.hasMoreElements()) {
-            String propName = names.nextElement().toString();
-            StringTokenizer tokenizer = new StringTokenizer(propName, ".");
-
-            if (tokenizer.countTokens() < 3) continue;
-
-            while (tokenizer.hasMoreTokens()) {
-                if (tokenizer.nextToken().equals("journal")) {
-                    String code = tokenizer.nextToken();
-                    String property = tokenizer.nextToken();
-                    PartnerJournal journal;
-
-                    if (journals.containsKey(code)) {
-                        journal = journals.get(code);
-                    } else {
-                        journal = new PartnerJournal(code);
-                        journals.put(code, journal);
-                    }
-
-                    if (property.equals("parsingScheme")) {
-                        journal.setParsingScheme(props.getProperty(propName));
-                    } else if (property.equals("metadataDir")) {
-                        journal.setMetadataDir(props.getProperty(propName));
-                    } else if (property.equals("fullname")) {
-                        journal.setFullName(props.getProperty(propName));
-                    }
-                    // else ignore
-                }
-                // else ignore
-            }
-        }
-
-        LOGGER.debug("Checking that all journals are correctly registered");
-
-        // Returns validated map or throws an exception if there are problems
-        myJournals = validate(journals);
-        // Returns a mapping of Journal Names to Journal Codes
-        myJournalNames = mapJournalNamesToCodes(journals);
 
         LOGGER.debug("scheduling email harvesting");
         myEmailHarvester = new Timer();
@@ -337,7 +256,7 @@ public class DryadEmailSubmission extends HttpServlet {
 
     private String processMimeMessage (MimeMessage mime) throws Exception {
         LOGGER.info("MIME contentType/ID/encoding: " + mime.getContentType()
-                    + " " + mime.getContentID() + " " + mime.getEncoding());
+                + " " + mime.getContentID() + " " + mime.getEncoding());
 
         Part part = getTextPart(mime);
         if (part == null) {
@@ -401,13 +320,10 @@ public class DryadEmailSubmission extends HttpServlet {
 
             LOGGER.debug("Getting metadata dir for " + journalCode);
 
-            PartnerJournal journal = myJournals.get(journalCode);
+            Context context = new Context();
+            Concept journalConcept = JournalUtils.getJournalConceptByShortID(context, journalCode);
+            File dir = new File(JournalUtils.getMetadataDir(journalConcept));
 
-            if (journal == null) {
-                throw new SubmissionRuntimeException("Journal (" + journalCode + ") not properly registered");
-            }
-
-            File dir = journal.getMetadataDir();
             String submissionId = result.getSubmissionId();
             String filename = DryadJournalSubmissionUtils.escapeFilename(submissionId + ".xml");
             File file = new File(dir, filename);
@@ -473,7 +389,16 @@ public class DryadEmailSubmission extends HttpServlet {
         if (journalCode == null) {
             LOGGER.debug("Journal Code not found in message, trying by journal name: " + journalName);
             if (journalName != null) {
-                journalCode = myJournalNames.get(journalName);
+                Context context = null;
+                Concept concept = null;
+                try {
+                    context = new Context();
+                    concept = JournalUtils.getJournalConceptByName(context, journalName);
+                } catch (SQLException e) {
+                    throw new SubmissionException(e);
+                }
+                journalCode =  JournalUtils.getJournalShortID(concept);
+
             } else {
                 throw new SubmissionException("Journal Code not present and Journal Name not found in message");
             }
@@ -483,9 +408,21 @@ public class DryadEmailSubmission extends HttpServlet {
         }
 
         if (journalCode != null) {
-            PartnerJournal journal = myJournals.get(journalCode);
-            if (journal != null) {
-                EmailParser parser = journal.getParser();
+            // find the associated concept and initialize the parser variable.
+            Context context = null;
+            Concept concept = null;
+            try {
+                context = new Context();
+                concept = JournalUtils.getJournalConceptById(context, journalCode);
+            } catch (SQLException e) {
+                throw new SubmissionException(e);
+            }
+            String parsingScheme = JournalUtils.getParsingScheme(concept);
+            PartnerJournal partnerJournal =  new PartnerJournal(concept.getName());
+            partnerJournal.setParsingScheme(parsingScheme);
+            EmailParser parser =  partnerJournal.getParser();
+
+            if (parser != null) {
                 ParsingResult result = parser.parseMessage(lines);
 
                 result.setJournalCode(journalCode);
