@@ -96,7 +96,7 @@ public class ItemModifyConsumer implements Consumer {
 						// testing again just to be sure
 						if (ReplicationManager.isInitialized() && ReplicationManager.isReplicationOn()) {
 							// force overwrite
-							ReplicationManager.replicate(context, handle, item, true);
+							ReplicationManager.replicate(handle, true);
 						}
 
 					} catch (Exception e) {
