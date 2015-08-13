@@ -39,21 +39,17 @@ public class VLOCheck extends Check {
                     || harvesterInfoUrl.trim().length() == 0) {
                 return "PLEASE configure lr.harvester.info.url";
             }
-            final String harvesterInfoAnchorName = ConfigurationManager
-                    .getProperty("lr", "lr.harvester.info.anchorName");
-            if (harvesterInfoAnchorName == null
-                    || harvesterInfoAnchorName.trim().length() == 0) {
-                return "PLEASE configure lr.harvester.info.anchorName";
-            }
+            String dspace_name = ConfigurationManager.getProperty("dspace.name");
+            dspace_name = dspace_name.replaceAll("[ ,/]+","_");
+            harvesterInfoUrl = harvesterInfoUrl.endsWith("/") ? harvesterInfoUrl + dspace_name :
+                    harvesterInfoUrl + "/" + dspace_name;
+            harvesterInfoUrl = harvesterInfoUrl + ".html";
+            final String harvesterInfoAnchorName = dspace_name;
             // Try to download the page
             StringWriter writer = new StringWriter();
             org.apache.commons.io.IOUtils.copy(
                     new URL(harvesterInfoUrl.trim()).openStream(), writer);
             String page = writer.toString();
-            // String page =
-            // org.apache.commons.io.FileUtils.readFileToString(new
-            // File("/tmp/lindat.html"));
-            // end download
 
             Reader reader = new StringReader(page);
             HTMLEditorKit.Parser parser = new ParserDelegator();
@@ -182,6 +178,12 @@ public class VLOCheck extends Check {
             }
         }
         return ret;
+    }
+
+    public static void main(String[] args){
+        Check check = new VLOCheck();
+        check.report(new ReportInfo(7));
+
     }
 
 }
