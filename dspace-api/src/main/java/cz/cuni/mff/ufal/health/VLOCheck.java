@@ -181,7 +181,6 @@ public class VLOCheck extends Check {
     }
 
     public static void main(String[] args){
-        ConfigurationManager.loadConfig("/tmp/lr.cfg");
         Check check = new VLOCheck();
         check.report(new ReportInfo(7));
 
