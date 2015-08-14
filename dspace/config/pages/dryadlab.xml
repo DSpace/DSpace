@@ -2,6 +2,7 @@
 <document xmlns="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1" xmlns:xi="http://www.w3.org/2003/XInclude">
     <body>
         <xref rend="embed" target="dryadlab.xhtml"/>
+        <!-- TODO: add live information for current DraydLab modules, sandwiched between static elements? -->
     </body>
 
     <meta>
@@ -9,6 +10,11 @@
         <pageMeta>
             <metadata element="title">DryadLab</metadata>
             <trail target="/">Dryad Digital Repository</trail>
+	  <!-- TODO: add page-specific .js file, instead of shared 'themes/DryadLab/lib/js/dryad-pages.js'?
+	    <map:transform type="IncludePageMeta">
+		<map:parameter name="javascript#1" value="lib/jquery-1.2.min.js"/>
+            </map:transform>
+	  -->
         </pageMeta>
         <repositoryMeta/>
     </meta>

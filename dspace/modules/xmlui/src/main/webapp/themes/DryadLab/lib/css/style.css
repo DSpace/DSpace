@@ -1,0 +1,2682 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+/*
+ * style.css
+ *
+ * Primary Styles
+ */
+
+/*Font size percentages based on the tables at developer.yahoo.com/yui/fonts/ */
+h1 {
+    font-size: 182%;
+    color: #333;
+    text-align: justify;
+}
+
+h2{
+    font-size: 123.1%;
+}
+
+h3 {
+    font-size: 116%;
+}
+
+h4 {
+    font-size: 108%;
+}
+
+h5, h6 {
+    font-size: 100%;
+}
+
+/*fix for firefox in os x, where selects get the incorrect
+height if it's not explicitly set this shouldn't be noticeable in
+other browsers*/
+select {
+    height: 20px;
+}
+
+select.multiple {
+    height: auto;
+}
+
+html {
+    background-color: #eee;
+}
+body {
+    background-color: #FFFFFF;
+    width: 1000px;
+    height: 100%;
+    border: 1px solid #ddd;
+    font-family: 'Helvetica', sans-serif;
+    margin: -1px auto 0;
+}
+
+a, a:active, a:visited {
+    color: #003366;
+}
+a:hover {
+    color: #336699;
+}
+
+#ds-header-wrapper {
+    background-color: transparent;
+    color: #444;
+    min-width: 950px;
+}
+
+#ds-header {
+    background: url(../../images/dryadlab-image-ribbon.jpg) repeat-x 251px 10px;
+    border-bottom: 3px solid #bdb;
+}
+
+.ds-div-head img.feed-icon {
+    width: 16px; height: 16px; vertical-align: middle;
+}
+
+#ds-header-logo-link {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.ds-header-logo {
+    float:left;
+    width: 250px;
+    height: 57px;
+    margin-left: -8px;
+    margin-top: 10px;
+    background-position: left bottom;
+    background-repeat: no-repeat;
+    background-color: #FFFFFF;
+    padding-right: 9px;
+}
+
+#ds-header-logo-prod {
+    background-image: url('../../images/dryadlab-logo-prod.png');
+}
+
+#ds-header-logo-dev {
+    background-image: url('../../images/dryadlab-logo-dev.png');
+}
+
+#ds-header-logo-demo {
+    background-image: url('../../images/dryadlab-logo-demo.png');
+}
+
+#ds-header-logo-staging {
+    background-image: url('../../images/dryadlab-logo-staging.png');
+}
+
+#ds-header-logo-mrc {
+    background-image: url('../../images/dryadlab-logo-mrc.png');
+}
+
+#ds-header-logo-text {
+    display: none;
+    font-size: 400%;
+    color: #666;
+    line-height: 70px;
+    font-weight: normal;
+    vertical-align: middle;
+    float: left;
+}
+
+#ds-user-box {
+    right: 0;
+    top: 10px;
+    position: absolute;
+    color: #333;
+}
+
+#ds-user-box a{
+    color: #333;
+}
+
+#ds-trail-wrapper {
+    display: none;
+    background-color: transparent;
+    margin: 0;
+    padding: 0;
+    min-width: 950px;
+}
+
+#ds-trail {
+    list-style: none;
+    line-height: 138.5%;
+    margin: 0;
+    padding: 3px 0;
+}
+
+#ds-trail li {
+    display: inline;
+    color: #1F5E1F;
+    margin-right: 5px;
+}
+
+#ds-trail a {
+    color: #1F5E1F;
+}
+
+#no-js-warning,
+#ds-trail,
+#ds-header,
+#ds-footer,
+#ds-content {
+    width: 950px;
+    margin: auto;
+    position: relative;
+}
+
+/*ie6 uses quirks mode for strict xhtml pages, and in quirks mode margin: auto; doesn't center things*/
+.ie6 #no-js-warning-wrapper,
+.ie6 #ds-trail-wrapper,
+.ie6 #ds-header-wrapper,
+.ie6 #ds-footer-wrapper,
+.ie6 #ds-content-wrapper {
+    text-align: center;
+}
+
+.ie6 #ds-trail,
+.ie6 #ds-header,
+.ie6 #ds-footer,
+.ie6 #ds-content {
+    margin: 0;
+    text-align: left;
+}
+
+#ds-footer-wrapper {
+    margin-top: 10px;
+    margin-bottom: 5px;
+    overflow: hidden;
+    clear: both;
+}
+
+#ds-footer {
+    border-top: 3px solid #bdb;
+    padding: 4px 0;
+    font-size: 93%;
+    line-height: 1.6em;
+}
+
+#ds-footer img.powered-by {
+    vertical-align: middle;
+    margin-top: -3px;
+}
+
+#ds-footer-left {
+    float: left;
+}
+
+#ds-footer-right {
+    float:right;
+}
+
+#ds-footer-right span.theme-by{
+    display: inline-block;
+    vertical-align: top;
+}
+
+#ds-footer-logo-link {
+    text-decoration:none;
+    line-height: 40px;
+    cursor: pointer;
+}
+
+#ds-footer-logo {
+    display: inline-block;
+    background: url('../../images/@mirelogo-small.png');
+    background-repeat: no-repeat;
+    width: 79px;
+    height: 40px;
+}
+
+#ds-footer a {
+    color: inherit;
+}
+a.discreet {
+    text-decoration: none;
+}
+
+
+/*make transparent PNGs invisible in IE6 until PNG-fix is applied*/
+.ie6 .ds-header-logo,
+.ie6 #ds-footer-logo {
+    visibility: hidden;
+}
+
+
+#ds-body {
+    float: left;
+    width: 675px;
+    padding-top: 12px;
+}
+/* alignment fix for "nested" bodies */
+#ds-body #ds-body {
+    padding: 0;
+    margin: 0;
+    margin-top: -1em;
+}
+
+#ds-options-wrapper {
+    float: right;
+    width: 249px;
+    padding-top: 12px;
+}
+
+#ds-options {
+    padding: 0;
+    padding-top: 30px;
+}
+
+h1.ds-option-set-head,
+.ds-div-head,
+    /* special-case rules for the occasional top-level div.ds-static-div */
+#org_datadryad_dspace_xmlui_aspect_browse_ItemViewer_div_item-view.ds-static-div .ds-div-head,
+#aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home.ds-static-div .ds-div-head
+{
+    color: #333;
+    padding: 0px 0px;
+    border-bottom: 3px solid #bdb;
+}
+h1.ds-option-set-head {
+    margin-top: 5px;
+    font-size: 108%;
+}
+.ds-div-head {
+    font-size: 20px;
+    height: 25px;
+    overflow: visible;
+}
+/* remove some style for nested boxes */
+.ds-static-div .ds-div-head,
+.ds-static-div .ds-static-div,
+.ds-static-div .ds-interactive-div,
+    /* special-case rules for the occasional top-level div.ds-static-div */
+#org_datadryad_dspace_xmlui_aspect_browse_ItemViewer_div_item-view.ds-static-div,
+#aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home.ds-static-div,
+.publication-header.ds-static-div {
+    border: none;
+    padding: 0;
+    margin-top: 0px;
+    background-color: transparent;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+#ds-search-option-head {
+    margin-top: 0;
+}
+
+.ds-static-div,
+.ds-interactive-div,
+    /* special-case rules for the occasional top-level div.ds-static-div */
+#org_datadryad_dspace_xmlui_aspect_browse_ItemViewer_div_item-view.ds-static-div .ds-static-div,
+#org_datadryad_dspace_xmlui_aspect_browse_ItemViewer_div_item-view.ds-static-div .ds-interactive-div,
+#aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home.ds-static-div .ds-static-div,
+#aspect_dryadinfo_DryadBlogFeed_div_dryad-info-home.ds-static-div .ds-interactive-div,
+#aspect_paymentsystem_ShoppingCartTransformer_list_Payment, 
+#submit-data-feature-box h1,
+.simple-box,
+div.ds-option-set {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background-color: #ecf3ea; /* #f5f5f5; */
+    -webkit-border-top-left-radius: 8px;
+    -webkit-border-top-right-radius: 8px;
+    -moz-border-radius-topleft: 8px;
+    -moz-border-radius-topright: 8px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    -webkit-border-bottom-left-radius: 8px;
+    -webkit-border-bottom-right-radius: 8px;
+    -moz-border-radius-bottomleft: 8px;
+    -moz-border-radius-bottomright: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border: 1px solid #cdc; /* #ddd; */
+    -moz-box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
+    -webkit-box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
+    box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
+}
+
+#submit-data-feature-box h1 {
+    background-color: #bdb;
+    border-bottom: none;
+    -webkit-border-bottom-left-radius: 0;
+    -webkit-border-bottom-right-radius: 0;
+    -moz-border-radius-bottomleft: 0;
+    -moz-border-radius-bottomright: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+#submit-data-feature-box .primary {
+    background-color: #bdb;
+    font-size: 1.2em;
+    margin-top: 0;
+    text-align: center;
+    border-top: none;
+    -webkit-border-top-left-radius: 0;
+    -webkit-border-top-right-radius: 0;
+    -moz-border-radius-topleft: 0;
+    -moz-border-radius-topright: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+#submit-data-sidebar-box {
+    text-align: center;
+    background-color: #bdb;
+display: none;
+}
+#submit-data-sidebar-box .primary {
+    padding: 0;
+    margin: 0;
+    background-color: #bdb;
+}
+#submit-data-sidebar-box a.submitnowbutton {
+    display: block;
+    line-height: 1.1em;
+    padding: 9px 12px;
+}
+
+
+div.ds-option-set ul {
+    list-style: none;
+    margin-left: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+div.ds-option-set .ds-sublist-head {
+    font-weight: normal;
+    font-size: 100%;
+}
+
+div.ds-option-set ul.sublist {
+    margin-left: 20px;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+div#ds-feed-option li
+{
+    padding-top: 4px;
+}
+
+div#ds-feed-option a
+{
+    padding: 0px 0px 2px 20px;
+}
+
+#ds-search-option {
+    padding: 10px;
+}
+
+#ds-search-form {
+    margin-bottom: 10px;
+}
+
+#ds-search-form input.ds-text-field{
+    width: 169px;
+}
+
+#ds-search-form input.ds-button-field {
+    margin-left: 6px;
+}
+
+#ds-search-form input.ds-text-field,
+#ds-search-form input.ds-button-field{
+    margin-bottom: 10px;
+}
+
+p {
+    margin-bottom: 10px;
+    line-height: 1.5em;
+}
+li,
+div.bioText {
+    line-height: 1.5em;
+}
+.ds-div-head p,
+#submit-data-feature-box p {
+    line-height: 1.2em;
+}
+
+#aspect_eperson_PasswordLogin_div_register, #aspect_eperson_PasswordLogin_div_login {
+    padding: 10px;
+    width: 435px;
+    height: 215px;
+} 
+
+#aspect_eperson_PasswordLogin_div_register h1, #aspect_eperson_PasswordLogin_div_login h1 {
+    font-size: 130%;
+    text-align: center;
+}
+
+#aspect_eperson_PasswordLogin_div_login {
+    margin: 20px 0px 40px; /* top right bottom left */
+    float: right;
+}
+#aspect_eperson_PasswordLogin_div_login table,
+#aspect_eperson_PasswordLogin_div_login p
+{
+    width: 320px;
+    margin: auto;
+}
+
+#aspect_eperson_PasswordLogin_div_register {
+    margin: 20px 0px;
+    float: left;
+}
+#aspect_eperson_PasswordLogin_div_register p {
+    text-align: center;
+    margin: 6px 0 0;
+}
+
+#aspect_eperson_EditProfile_list_form,
+.submission fieldset.ds-form-list,
+.administrative fieldset.ds-form-list {
+    margin-bottom: 25px;
+}
+.submission fieldset.ds-form-list {
+    border: none;
+}
+#status_other_than_published,
+#aspect_submission_StepTransformer_list_doi > table {
+    border: 1px solid #ccc;
+    float: left;
+    width: 497px;
+    display: inline-block;
+    padding: 10px;
+    position: relative;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    -webkit-border-bottom-left-radius: 5px;
+    -webkit-border-bottom-right-radius: 5px;
+    -moz-border-radius-bottomleft: 5px;
+    -moz-border-radius-bottomright: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.primary {
+    margin-top: 8px;
+    margin-bottom: 20px;
+    -webkit-border-top-left-radius: 8px;
+    -webkit-border-top-right-radius: 8px;
+    -moz-border-radius-topleft: 8px;
+    -moz-border-radius-topright: 8px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    -webkit-border-bottom-left-radius: 8px;
+    -webkit-border-bottom-right-radius: 8px;
+    -moz-border-radius-bottomleft: 8px;
+    -moz-border-radius-bottomright: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border: 1px solid #cdc;
+    -moz-box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
+    -webkit-box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
+    box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
+}
+
+ol {
+    margin: 0;
+    list-style: none;
+}
+
+th,
+td {
+    padding: 5px;
+    vertical-align: middle;
+}
+
+.ds-button-field,
+#aspect_eperson_StartRegistration_list_registration-progress li {
+    background-color: #40841C;
+    border: 1px solid #555555;
+    padding: 2px 5px;
+    color: #FFFFFF;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.ds-button-field[disabled="disabled"],
+.ds-button-field.disabled,
+li.button.disabled input {
+    opacity: 0.35;
+    cursor: auto;
+}
+
+#aspect_eperson_StartRegistration_list_registration-progress li {
+    cursor: default;
+}
+
+#aspect_eperson_StartRegistration_list_registration-progress li.arrow {
+    background-color: inherit;
+    border: none;
+    color: inherit;
+    font-weight: normal;
+}
+
+.ie6 #aspect_eperson_StartRegistration_list_registration-progress li.arrow,
+.ie7 #aspect_eperson_StartRegistration_list_registration-progress li.arrow {
+    background-color: #FFFFFF;
+    color: #444444;
+}
+
+.ie6 #aspect_eperson_StartRegistration_list_registration-progress li.arrow {
+    padding-top: 5px;
+}
+
+ul.ds-progress-list {
+    margin: 0 0 10px 0;
+    padding: 2px 0;
+    text-align: center;
+}
+
+ul.ds-progress-list li {
+    font-weight: bold;
+    overflow: hidden;
+    display: inline;
+    padding: 0;
+    margin: 0;
+    max-width: 400px;
+}
+
+ul.ds-progress-list li.button {
+    padding: 0;
+}
+
+ul.ds-progress-list li.button input.ds-button-field {
+    font-size: 77%;
+}
+
+.ie6 ul.ds-progress-list li.button input.ds-button-field,
+.ie7 ul.ds-progress-list li.button input.ds-button-field {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+ul.ds-progress-list li.current input.ds-button-field,
+#aspect_eperson_StartRegistration_list_registration-progress li.current {
+    background-color: #499c73;
+    border: 1px solid #1f5e3f;
+}
+
+ul.ds-progress-list li.disabled input.ds-button-field
+#aspect_eperson_StartRegistration_list_registration-progress li.disabled {
+    background-color: #F0F2F5;
+    border: 1px solid #ccc;
+    color: #444444;
+    cursor: default;
+}
+
+.ie6 .disabled,
+.ie6 li.disabled input,
+.ie7 .ds-button-field.disabled,
+.ie7 li.button.disabled input,
+.ie8 .ds-button-field.disabled,
+.ie8 li.button.disabled input {
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity = 50);
+    zoom: 1;
+    cursor: auto;
+}
+
+ul.ds-progress-list li.arrow {
+    border: none;
+    background: none;
+    font-size: 116%;
+    font-weight: normal;
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
+.ie6 ul.ds-progress-list li.arrow {
+    height: 25px;
+    width: 25px;
+    margin: 0;
+}
+
+textarea.ds-textarea-field,
+input.ds-text-field,
+input.ds-file-field,
+input.ds-button-field,
+input.ds-password-field {
+    margin-bottom: 5px;
+    margin-top: 5px;
+    font-size: 93%;
+}
+
+textarea.ds-textarea-field,
+input.ds-text-field,
+input.ds-password-field {
+    padding: 3px;
+    border: 1px solid #AAAAAA;
+}
+
+.ie6 input.ds-text-field,
+.ie6 input.ds-password-field {
+    font-size: 85%;
+    height: 22px;
+}
+
+.submission .ds-form-list input.ds-text-field,
+.administrative .ds-form-list input.ds-text-field,
+textarea.ds-textarea-field {
+    width: 400px;
+}
+
+table textarea.ds-textarea-field {
+    width: 400px;
+}
+
+#aspect_administrative_item_EditItemMetadataForm_field_value {
+    width: 570px;
+}
+
+#aspect_administrative_registries_EditMetadataSchema_list_edit-schema-new-field-form .ds-text-field,
+#aspect_administrative_item_EditItemMetadataForm_field_language,
+.ds-composite-component input.ds-text-field {
+    width: auto;
+}
+
+textarea.ds-textarea-field:focus,
+input.ds-text-field:focus,
+input.input.ds-password-field:focus {
+    border-color: #5F9DE4;
+}
+
+/*
+ * Show a blue glow around a focused text field
+ * only target browsers that support rgba colors and boxshadows
+ * see http://www.modernizr.com/docs/
+ */
+.rgba.boxshadow textarea.ds-textarea-field:focus,
+.rgba.boxshadow input.ds-text-field:focus,
+.rgba.boxshadow input.ds-password-field:focus {
+    -moz-box-shadow:0 0 8px rgba(95, 158, 212, 0.5);
+    -webkit-box-shadow:0 0 8px rgba(95, 158, 212, 0.5);
+    box-shadow:0 0 8px rgba(95, 158, 212, 0.5);
+    border-color:rgba(95, 158, 212, 0.75);
+    outline:medium none;
+}
+
+
+#aspect_eperson_PasswordLogin_div_register span.error, 
+#aspect_eperson_PasswordLogin_div_login span.error {
+    margin-top: -4px;
+    margin-left: -138px;
+}
+span.error {
+    clear: both;
+    display: block;
+    color: #c22121;
+    font-size: 0.9em;
+    margin-top: 3px;
+}
+
+textarea.ds-textarea-field.error,
+input.ds-text-field.error,
+input.ds-password-field.error {
+    border-color: #c22121;
+    background-color: #fff2f2;
+}
+
+.rgba.boxshadow textarea.ds-textarea-field.error:focus,
+.rgba.boxshadow input.ds-text-field.error:focus,
+.rgba.boxshadow input.ds-password-field.error:focus {
+    -moz-box-shadow:0 0 8px rgba(194, 33, 33, 0.5);
+    -webkit-box-shadow:0 0 8px rgba(194, 33, 33, 0.5);
+    box-shadow:0 0 8px rgba(194, 33, 33, 0.5);
+    border-color:rgba(194, 33, 33, 0.75) !important;
+    outline:medium none;
+}
+
+
+.ds-form-list {
+    margin-top: 15px;
+}
+#aspect_submission_StepTransformer_list_submit-create-publication {
+    margin-top: 0;
+}
+
+.submission h2,
+.ds-form-list legend{
+    font-size: 182%;
+    margin-bottom: 15px;
+    color: #1F3F5E;
+}
+
+.ds-form-item legend {
+    font-size: 100%;
+    margin:0;
+    color: inherit;
+}
+
+fieldset ol {
+    margin: 0;
+}
+
+li.ds-form-item {
+    list-style: none;
+    margin-bottom: 35px;
+    vertical-align: middle !important;
+    position: relative;
+    clear: left;
+}
+
+li.ds-form-item.last {
+    margin-bottom: 0;
+}
+
+li.ds-form-item .ds-form-label{
+    font-weight: bold;
+    font-size: 123.1%;
+}
+
+li.ds-form-item label.ds-composite-component{
+    display: block;
+    float: left;
+    font-size: 93%;
+    padding:0 15px 0 0;
+}
+
+li.ds-form-item label.ds-composite-component input.ds-text-field{
+    font-size: 100%;
+    width: 242px;
+}
+
+li.ds-form-item .ds-select-field {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.ds-add-button,
+label.ds-composite-component .ds-select-field {
+    margin-top: 6px;
+    margin-bottom: 6px;
+}
+
+li.ds-form-item label.ds-composite-component.last{
+    padding:0;
+}
+
+.ds-add-button {
+    vertical-align: top;
+    margin-left: 8px;
+}
+
+
+.ds-form-content input.ds-button-field {
+    font-size: 93%;
+}
+
+#aspect_submission_StepTransformer_field_dc_date_issued_year,
+#aspect_submission_StepTransformer_field_dc_date_issued_day {
+    width: 50px;
+}
+
+#aspect_submission_StepTransformer_field_dc_identifier_value {
+    width: 130px;
+    margin-bottom: 0;
+}
+
+.ds-checkbox-field input,
+.ds-radio-field input {
+    margin-left: 0;
+}
+
+.ds-checkbox-field label,
+.ds-radio-field label {
+    margin-right: 3px;
+}
+/*hide the double label for checkboxes & radio buttons*/
+.ds-checkbox-field legend,
+.ds-radio-field legend {
+    display: none;
+}
+
+.ds-previous-values {
+    margin-top: 10px;
+    clear: both;
+}
+.submission .ds-form-list .ds-previous-values {
+    clear: left;
+    width: 100%;
+}
+
+td.ds-reorder-edit-input-col {
+    width: 80%;
+}
+img.ds-authority-confidence.cf-blank {
+    display: none;
+}
+
+#aspect_submission_Submissions_div_submissions .ds-static-div,
+.submission .ds-form-sublist ol {
+    background-color: #fafafa;
+    border: 1px solid #ccc;
+    margin-top: 3px;
+    margin-bottom: 30px;
+    padding: 10px;
+}
+
+#aspect_submission_Submissions_div_submissions table,
+#aspect_submission_Submissions_div_submissions table tr,
+#aspect_submission_Submissions_div_submissions table td,
+#aspect_submission_Submissions_div_submissions table th {
+    background-color: #FFFFFF;
+    border: 1px solid #9CACBA;
+}
+
+#aspect_submission_Submissions_div_submissions table tr.ds-table-header-row,
+#aspect_submission_Submissions_div_submissions table tr.ds-table-header-row th {
+    background-color: #B6C8D9;
+    border: 1px solid #9CACBA;
+
+}
+
+.submission .ds-form-sublist li.ds-form-item {
+    margin-bottom: 5px;
+}
+
+.submission .ds-form-sublist .ds-form-label {
+    font-weight: bold;
+}
+
+
+.administrative.tabbed ul.horizontal {
+    list-style: none;
+    margin: 15px 0 0;
+    border-bottom: 1px solid #9cacba;
+}
+
+.administrative.tabbed ul.horizontal li{
+    float: left;
+    border: 1px solid #9cacba;
+    padding: 5px;
+    margin-bottom: -1px;
+    margin-right: 7px;
+    border-bottom: none;
+}
+
+.administrative.tabbed ul.horizontal li a{
+    text-decoration: none;
+    color: #444444;
+}
+
+.administrative.tabbed ul.horizontal li.active-tab{
+    background-color: #fafafa;
+    z-index: 1;
+    font-weight: bold;
+}
+
+.pane {
+    padding: 10px;
+    clear: both;
+    background-color: #fafafa;
+    border: 1px solid #9cacba;
+    margin-bottom: 25px;
+    margin-top: 0;
+}
+
+.pane .ds-form-list {
+    margin-top: 0;
+}
+
+.administrative.tabbed .pane {
+    border-top: none;
+}
+
+.pagination,
+.pagination-masked {
+    padding: 7px;
+    padding-bottom: 15px;
+    background-color: #fff;
+    border: none;
+    line-height: 1em;
+    vertical-align:middle;
+}
+
+.pagination-links {
+    list-style: none;
+    float: right;
+    margin: 0;
+}
+
+.pagination-links li {
+    display: inline;
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+.current-page-link {
+    font-weight: bold;
+    color: #1F3F5E;
+}
+
+.current-page-link a{
+    color: #1F3F5E;
+}
+
+.pagination-info {
+    float: left;
+    margin:0;
+}
+
+.pagination-masked.top {
+    margin-top: 5px;
+}
+
+.ds-artifact-list {
+    list-style: none;
+    margin: 0;
+    line-height: 153.9%;
+}
+
+.file-wrapper {
+    padding-top: 15px !important;
+    padding-bottom: 15px !important;
+}
+
+.ds-artifact-item {
+    padding-top: 5px !important;
+    padding-bottom: 0px !important;
+    padding-left: 20px;
+    text-indent: -20px;
+}
+
+.ds-artifact-item a {
+    text-decoration: none;
+}
+.ds-artifact-item a span.doi {
+    text-decoration: underline;
+}
+.ds-artifact-item a:hover {
+    text-decoration: underline;
+}
+
+.ds-artifact-item.collection,
+.ds-artifact-item.community {
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+
+.doi {
+    white-space: nowrap;
+}
+
+.community .artifact-title a {
+    font-weight: bold;
+}
+
+.collection .artifact-title a {
+    font-weight: normal;
+}
+
+#aspect_artifactbrowser_CommunityBrowser_div_comunity-browser .short-description, #aspect_discovery_SiteRecentSubmissions_div_site-home .short-description {
+    display: none;
+}
+
+
+#aspect_discovery_SimpleSearch_list_search-query .search-filter-list label {
+    display: block;
+}
+#aspect_discovery_SimpleSearch_field_query {
+    width: 475px;
+    margin-right: 8px;
+}
+
+#aspect_artifactbrowser_SimpleSearch_div_search-results li, #aspect_discovery_SimpleSearch_div_search-results li, #aspect_artifactbrowser_AdvancedSearch_div_search-results li {
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+#aspect_artifactbrowser_SimpleSearch_div_search-results ul, #aspect_discovery_SimpleSearch_div_search-results ul, #aspect_artifactbrowser_AdvancedSearch_div_search-results ul {
+    margin-bottom: 25px;
+}
+
+#aspect_discovery_SimpleSearch_div_search h2 {
+    display: none;
+}
+
+.artifact-title {
+    font-size: 100%;
+}
+
+#recently-published-data .odd,
+#dryadlab-module-list li.odd
+{
+    background-color: #f9fff9;
+}
+#dryadlab-module-list li {
+    list-style: none;
+    line-height: 1.3em;
+    margin: 4px 0;
+}
+#dryadlab-module-list li.ds-artifact-item {
+    padding: 12px 18px !important;
+    overflow: hidden;
+}
+#dryadlab-module-list .thumb {
+    width: 200px;
+    height: 150px;
+    background-color: #000;
+    float: left;
+    clear: left;
+    text-indent: 0;
+    margin: 5px -1px;
+    border: 1px solid #cdc;
+}
+#dryadlab-module-list .download-button {
+    display: block;
+    cursor: pointer;
+    padding: 4px 0;
+    margin: 6px 0px 6px -20px;;
+    width: 300px;
+    color: #fff;
+    font-weight: 900;
+    text-align: center;
+    text-indent: 0;
+    background-color: #c03f09;
+    border-radius: 6px;
+    border: 1px solid #930;
+    background-image: -webkit-linear-gradient(top, #ee7755, #993300);
+    background-image: -moz-linear-gradient(top, #ee7755, #993300);
+    background-image: -ms-linear-gradient(top, #ee7755, #993300);
+    background-image: -o-linear-gradient(top, #ee7755, #993300);
+    background-image: linear-gradient(to bottom, #c03009, #ee6955, #c03009, #993300);
+    text-shadow: 1px 1px 1px #000000;
+    -moz-box-shadow: 3px 3px 13px rgba(33, 33, 33, 1.0);
+    -webkit-box-shadow: 3px 3px 13px rgba(33, 33, 33, 1.0);
+    box-shadow: 3px 3px 13px rgba(33, 33, 33, 1.0);
+}
+#dryadlab-module-list .discreet {
+    font-weight: normal;
+    font-size: 0.8em;
+}
+#dryadlab-module-list .full-meta-link {
+    margin: 0px 0px 0px -20px;
+    font-size: 0.8em;
+}
+#dryadlab-module-list .download-button:hover {
+    text-shadow: 2px 2px 3px #000000;
+    -moz-box-shadow: 2px 2px 9px rgba(0, 0, 0, 1.0);
+    -webkit-box-shadow: 2px 2px 9px rgba(0, 0, 0, 1.0);
+    box-shadow: 2px 2px 9px rgba(0, 0, 0, 1.0);
+    text-decoration: none;
+}
+#dryadlab-module-list span.title {
+    display: block;
+    font-weight: bold;
+    font-size: 1.1em;
+    margin: 0 0 5px 20px;
+}
+#dryadlab-module-list .indented-overview {
+    text-indent: 0;
+    line-height: 1.35em;
+    margin-left: 220px;
+}
+#dryadlab-module-list ul {
+    margin-left: 240px;
+}
+#dryadlab-home-sidebar {
+    position: absolute;
+    top: 12px;
+    left: 700px;
+}
+#dryadlab-home-sidebar h2 {
+    margin-bottom: 0.5em;
+}
+#dryadlab-home-sidebar .testimonial {
+    font-style: italic;
+    margin-bottom: 0.25em;
+}
+#dryadlab-home-sidebar .testimonial-byline {
+    text-align: right;
+    font-size: 0.9em;
+    color: #555;
+}
+
+.italics {
+    font-style: italic;
+}
+
+.result-query,
+.artifact-info {
+    color: gray;
+}
+
+.artifact-abstract {
+    text-align: justify;
+}
+
+ul.alphabet {
+    list-style: none;
+    margin: 0;
+}
+
+ul.alphabet li {
+    display:inline;
+}
+
+/* Begin customizations for login page - dleehr 2013-07-09 */
+
+form.register-left fieldset.ds-form-list, 
+form.login-right fieldset.ds-form-list {
+    margin-top: 0px;
+}
+
+li.register-row, li.login-row {
+    position: relative;
+}
+
+li.register-row label.ds-form-label,
+li.login-row label.ds-form-label {
+    font-size: 100%;
+    font-weight: normal;
+    padding-top: 12px;
+    text-align: right;
+    width: 150px;
+}
+
+li.register-row div.ds-form-content,
+li.login-row div.ds-form-content {
+    display: inline;
+    width: auto;
+    position: absolute;
+    left: 160px;
+    vertical-align: center;
+}
+
+#aspect_eperson_PasswordLogin_list_login {
+    margin-bottom: 15px;
+}
+
+/* End customizations for login page - dleehr 2013-07-09 */
+
+td select.ds-select-field {
+    margin-left: 5px;
+}
+
+form.search {
+    background-color: #fafafa;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+form.search label {
+    font-weight: bold;
+}
+
+form.search p.ds-paragraph.button-list {
+    text-align: center;
+    margin: 0;
+}
+
+form.search fieldset {
+    margin: 0;
+}
+
+form.search .ds-form-item {
+    margin: 0;
+    padding-bottom: 5px;
+}
+
+form.search .ds-form-item select{
+    margin-top: 0;
+}
+
+form.search label.ds-composite-component .ds-select-field{
+    margin-top: 6px;
+}
+
+form.search .ds-form-item label {
+    font-size: 100%;
+}
+
+form.search .ds-form-content {
+    display: inline;
+}
+
+form.search table input.ds-text-field {
+    margin: 0;
+}
+
+form.search .field-help {
+    margin: 3px 0;
+}
+
+.collection .search,
+.community .search {
+    margin-top: 25px;
+}
+
+#aspect_discovery_CollectionSearch_p_search-query,
+#aspect_discovery_CommunitySearch_p_search-query{
+    margin-bottom:0;
+}
+
+.result-query {
+    margin-bottom: 30px;
+}
+
+#aspect_administrative_registries_EditMetadataSchema_table_metadata-schema-edit-existing-fields,
+#aspect_administrative_registries_MetadataRegistryMain_table_metadata-registry-main-table,
+#aspect_administrative_registries_FormatRegistryMain_table_bitstream-format-registry,
+#aspect_submission_Submissions_table_unfinished-submissions,
+#aspect_submission_Submissions_table_submissions-inprogress,
+#aspect_submission_Submissions_table_completed-submissions,
+table.detailtable {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-collapse: collapse;
+}
+
+#aspect_administrative_registries_EditMetadataSchema_table_metadata-schema-edit-existing-fields tr,
+#aspect_administrative_registries_MetadataRegistryMain_table_metadata-registry-main-table tr,
+#aspect_administrative_registries_FormatRegistryMain_table_bitstream-format-registry tr,
+#aspect_submission_Submissions_table_unfinished-submissions tr,
+#aspect_submission_Submissions_table_submissions-inprogress tr,
+#aspect_submission_Submissions_table_completed-submissions tr,
+table.detailtable tr {
+    line-height: 1.6em;
+    border: 1px solid #ccc;
+}
+
+#aspect_administrative_registries_EditMetadataSchema_table_metadata-schema-edit-existing-fields tr.even,
+#aspect_administrative_registries_MetadataRegistryMain_table_metadata-registry-main-table tr.even,
+#aspect_administrative_registries_FormatRegistryMain_table_bitstream-format-registry tr.even,
+#aspect_submission_Submissions_table_unfinished-submissions tr.even,
+#aspect_submission_Submissions_table_submissions-inprogress tr.even,
+#aspect_submission_Submissions_table_completed-submissions tr.even,
+table.detailtable tr.even {
+    background-color: #fafafa;
+}
+
+#aspect_administrative_registries_EditMetadataSchema_table_metadata-schema-edit-existing-fields td,
+#aspect_administrative_registries_MetadataRegistryMain_table_metadata-registry-main-table td,
+#aspect_administrative_registries_FormatRegistryMain_table_bitstream-format-registry td,
+#aspect_submission_Submissions_table_unfinished-submissions td,
+#aspect_submission_Submissions_table_submissions-inprogress td,
+#aspect_submission_Submissions_table_completed-submissions td,
+table.detailtable td {
+    padding: 5px 10px;
+    text-align: justify;
+    border: 1px solid #ccc;
+    vertical-align: top;
+}
+
+#aspect_administrative_registries_EditMetadataSchema_table_metadata-schema-edit-existing-fields tr.ds-table-header-row,
+#aspect_administrative_registries_MetadataRegistryMain_table_metadata-registry-main-table tr.ds-table-header-row,
+#aspect_administrative_registries_FormatRegistryMain_table_bitstream-format-registry tr.ds-table-header-row,
+#aspect_submission_Submissions_table_unfinished-submissions tr.ds-table-header-row,
+#aspect_submission_Submissions_table_submissions-inprogress tr.ds-table-header-row,
+#aspect_submission_Submissions_table_completed-submissions tr.ds-table-header-row {
+    border: none;
+}
+
+
+table.detailtable td.label-cell {
+    font-weight: bold;
+    text-align: left;
+    width: 100px;
+}
+
+div.item-summary-view-metadata h1,
+div.item-summary-view-metadata h2 {
+    line-height: normal;
+}
+
+div.item-summary-view-metadata {
+    text-align: justify;
+    line-height: 161.6%;
+    margin-bottom: 5px;
+}
+
+div.simple-item-view-authors {
+    font-size: 123.1%;
+    font-weight: bold;
+    border-bottom:1px solid #ccc;
+    padding-bottom: 2px;
+    margin-bottom: 20px;
+    text-align: justify;
+}
+
+div.simple-item-view-authors span{
+    text-align: justify;
+}
+
+#aspect_artifactbrowser_ItemViewer_div_item-view h2,
+div.item-summary-view-metadata p.item-view-toggle-bottom,
+div.simple-item-view-description {
+    margin-top: 20px;
+}
+
+#aspect_artifactbrowser_ItemViewer_div_item-view h2,
+div.simple-item-view-description h3{
+    border-bottom:1px solid #bdb;
+    margin-bottom: 3px;
+}
+
+#aspect_artifactbrowser_ItemViewer_div_item-view h2 {
+    margin-top: 18px;
+    margin-bottom: 10px;
+}
+#aspect_artifactbrowser_ItemViewer_div_item-view h2:first-child {
+    margin-top: 5px;
+}
+
+
+.thumbnail-wrapper,
+.file-metadata,
+.file-link {
+    float: left;
+    margin-right: 15px;
+}
+
+.item-metadata {
+    float: left;
+}
+
+.file-metadata {
+    width: 400px;
+}
+
+.file-metadata span,
+.item-metadata span {
+    float: left;
+}
+
+.item-metadata span.content span {
+    float: none;
+}
+
+.file-metadata span.bold,
+.item-metadata span.bold {
+    width: 130px;
+    clear: left;
+    text-align: right;
+    margin-right: 7px;
+}
+
+#ds-system-wide-alert,
+.notice {
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #bfc221;
+    background-color: #fffff2;
+}
+
+.notice.success
+{
+    border-color: #21c221;
+    background-color: #f2fff2;
+}
+
+#ds-system-wide-alert,
+.notice.failure
+{
+    border-color: #c22121;
+    background-color: #fff2f2;
+}
+
+#ds-system-wide-alert p {
+    margin: 0;
+}
+
+#aspect_artifactbrowser_CommunityViewer_div_community-home h2,
+#aspect_artifactbrowser_CollectionViewer_div_collection-home h2 {
+    margin-top: 30px;
+    border-bottom:1px solid #ccc;
+    margin-bottom: 3px;
+}
+
+.ds-logo-wrapper {
+    display: block;
+}
+
+#aspect_administrative_item_FindItemForm_list_find-item-form .ds-form-item {
+    margin:0;
+}
+
+#aspect_administrative_registries_EditMetadataSchema_div_edit-schema-new-field  .ds-form-item.last {
+    margin-top: -25px;
+}
+
+#no-js-warning {
+    margin-top: 15px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+form.discover-search-box{
+    margin-bottom: 10px;
+}
+
+li.search-filter-list,
+li.used-filters-list
+{
+    padding-top: 5px;
+}
+
+form.discover-sort-box select{
+    margin: 0 4px;
+}
+
+.hidden {
+    display:none;
+    visibility:hidden;
+}
+/* alternating hiding that works on all screen readers, etc. 
+ *  http://alistapart.com/article/now-you-see-me
+ */
+.accessibly-hidden {
+    position: absolute; 
+    left: -999em;
+}
+
+.icon-button{
+    padding:4px;
+    cursor: pointer;
+    margin: 2px;
+    background-color: #6D859C;
+    border: 1px solid #1F3F5E;
+    text-indent: -1000px;
+    width: 30px;
+    height: 30px;
+    display:block;
+    /*Required for IE*/
+    font-size: 0;
+    line-height: 0;
+}
+
+.icon-button.arrowUp{
+    background-image: url(../../images/arrow_up_ffffff_16x16.png);
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+.icon-button.arrowDown{
+    background-image: url(../../images/arrow_down_ffffff_16x16.png);
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+/* FOR CC License */
+span.floatleft {
+    border:none;
+    float:right;
+    display:inline;
+}
+
+/* FOR CC PAGE to GROUP ITEMS horizontally */
+ul.horizontal li span.bold a { color: black; }
+
+/* group items horizontally in a list */
+
+ul.horizontalVanilla
+{
+    font-weight: bold;
+    list-style-type: none;
+    padding: 0px;
+    padding-left: 0px;
+    padding-bottom: 15px;
+    border-left: 1px solid white;
+    border-right: 1px solid white;
+    margin: 10px -1px 5px -1px;
+    width: inherit;
+}
+
+ul.horizontalVanilla li
+{
+    float: left;
+    height: 100%;
+    background-color: rgb(255, 255, 255);
+    margin: 2px 2px 0px 2px;
+    /* border: 1px solid rgb(240, 240, 210); */
+}
+
+#main-menu {
+    /* display: none; */
+}
+#main-menu .sf-menu {
+clear: both;
+    margin-top: 4px;
+    margin-bottom: 0;
+}
+#main-menu .sf-menu * {
+    font-size: 14px;
+}
+
+.submitnowbutton,
+a.learn-to-submit-button {
+    margin: 0 8px;
+    padding: 0.2em 0;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    -webkit-border-bottom-left-radius: 5px;
+    -webkit-border-bottom-right-radius: 5px;
+    -moz-border-radius-bottomleft: 5px;
+    -moz-border-radius-bottomright: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+/* general button radius */
+
+.ds-button-field,
+.link-to-button a,
+#aspect_discovery_SearchFilterTransformer_list_link-to-button a, 
+#aspect_discovery_SearchFilterTransformer_list_link-to-button a {
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    -webkit-border-bottom-left-radius: 5px;
+    -webkit-border-bottom-right-radius: 5px;
+    -moz-border-radius-bottomleft: 5px;
+    -moz-border-radius-bottomright: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+#login-item {
+    margin-right: 4px;
+}
+
+#sign-up-item {
+    margin-left: 4px;
+}    
+
+a.submitnowbutton {
+    background-color: #424242;
+    border: 1px solid #fff;
+    color: #fff;
+    text-decoration: none;
+    margin-top: 0.2em;
+    padding: 0.4em 0.8em;
+    /*  box-shadow: 0px 0px 6px rgba(33, 33, 33, 1.0); */
+    -moz-box-shadow: 2px 2px 12px rgba(33, 33, 33, 1.0);
+    -webkit-box-shadow: 2px 2px 12px rgba(33, 33, 33, 1.0);
+    box-shadow: 2px 2px 12px rgba(33, 33, 33, 1.0);
+}
+a.submitnowbutton:hover {
+    background-color: #ccc;
+    color: #333;
+}
+a.learn-to-submit-button:hover {
+    background-color: #ccc;
+    color: #333;
+}
+
+#sharing-tools {
+    float: right;
+    clear: right;
+    text-align: right;
+    position: relative;
+    top: 73px;
+}
+#sharing-tools a {
+    display: inline-block;
+    margin-left: 4px;
+}
+#sharing-tools img {
+    height: 22px;
+    width: 22px;
+}
+
+.tab-buttons {
+    padding-top: 0px;
+    padding-bottom: 8px;
+}
+#browse-data-buttons {
+    padding-top: 8px;
+    padding-bottom: 0px;
+} 
+.tab-buttons a {
+    display: inline-block;
+    font-size: 14px;
+    background-color: #bdb;
+    color: #fff;
+    text-decoration: none;
+    margin-right: 22px;
+    padding: 7px 11px 4px;
+    border: 1px solid #AAA;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    -webkit-border-bottom-left-radius: 5px;
+    -webkit-border-bottom-right-radius: 5px;
+    -moz-border-radius-bottomleft: 5px;
+    -moz-border-radius-bottomright: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    -moz-box-shadow: 3px 3px 4px rgba(33, 33, 33, 0.25);
+    -webkit-box-shadow: 3px 3px 4px rgba(33, 33, 33, 0.25);
+    box-shadow: 3px 3px 4px rgba(33, 33, 33, 0.25);
+}
+.tab-buttons a:hover {
+    background-color: #40841C;
+}
+.tab-buttons a.selected {
+    background-color: #707070;
+    color: #fff;
+    border: 1px solid #555;
+}
+.browse-data-panel h1.ds-div-head {
+    font-size: 120%;
+}
+
+.simple-box {
+    margin-bottom: 18px;
+}
+
+.simple-box h1 {
+    color: #40841C;
+    border-bottom: none;
+    padding: 0;
+    margin: 0 0 0.5em;
+}
+.simple-box h1 {
+    color: #333;
+    font-size: 18px;
+}
+.simple-box .primary {
+    padding: 0;
+    margin: 0;
+    border: none;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+.tab-panel .primary {
+    overflow: hidden;
+}
+
+h1.main-page-title {
+    font-size: 150%;
+    margin-bottom: 8px;
+}
+div.citation-view {
+    background-color: #FEFECD;
+    border: 1px solid #DDDDDD;
+    float: left;
+    min-height: 198px;
+    width: 80%;
+}
+div.journal-cover-view {
+    float: right;
+    margin-left: -25px;
+    margin-right: 25px;
+    margin-top: 0;
+    width: 15%;
+}
+blockquote {
+    margin: 10px 70px 10px 50px;
+}
+
+
+#aspect_submission_StepTransformer_item_article_status{
+    margin-top: 10px;
+}
+#N100E7{
+    margin-top: 50px;
+
+}
+#aspect_submission_StepTransformer_field_manu,#aspect_submission_StepTransformer_field_prism_publicationName {
+    width:450px;
+}
+#aspect_submission_StepTransformer_field_article_doi {
+    width:440px;
+}
+
+#unknown-doi-panel label {
+    text-indent: -25px;
+    margin-left: 20px;
+    line-height: 1.2em;
+}
+
+/*Autocomplete*/
+.ui-autocomplete{
+    position:absolute;
+    width:250px;
+    background-color:white;
+    border:1px solid #888;
+    margin:0;
+    padding:0;
+
+}
+
+#aspect_submission_StepTransformer_field_prism_publicationName_container{
+    display:none;
+}
+
+.ui-menu-item{
+    list-style-type:none;
+    display:block;
+    margin:0;
+    padding:2px;
+    cursor:pointer;
+}
+
+.ui-tooltip {
+    max-width: 400px;
+}
+
+img.ds-authority-confidence
+{ width: 16px; height: 16px; margin: 0px 2px; padding: 0px; vertical-align: bottom;}
+
+
+/* ********************* Modifications to default settings for devices/browsers with smaller widths **************** */
+
+@media screen and (max-width : 600px) {
+    div#dryad_blog {
+        display: none;
+    }
+
+    /* ensure the width of the screen is the width of the device */
+    ds-main {
+        width:94%;
+    }
+
+    /* make the body the full width of the device */
+    ds-body {
+        width:94%;
+    }
+
+    /* make the menus hidden */
+    ds-options {
+        display:none;
+    }
+}
+
+#aspect_discovery_DiscoverySubmissions_cell_workspaceitemcell_checkbox{
+    width:10px;
+}
+#journalIDStatusInReview span.field-help, #prism_publicationName span.field-help{
+    width:450px;
+}
+
+/*
+  ***************************
+  SEARCH TABS
+  ***************************
+ */
+#searchTabs ul {
+    list-style: none;
+    padding: 0px;
+    /*margin: 0px 0px -7px 0px;*/
+    margin: 0px 0px 0px 0px;
+}
+
+#searchTabs li {
+    display: inline;
+    border: solid gray;
+    border-width: 1px;
+    margin: 0 2px 0 0;
+    background-color: rgb(238, 238, 238);
+    /* padding: 3px;*/
+    padding: .25em;
+    padding-top: .5em;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+#searchTabs li a {
+    padding: 0 1em;
+}
+
+#searchTabs #selected {
+    background: white;
+    border-width: 1px 1px 0px 1px;
+    /*padding-bottom: 4px;*/
+    padding-bottom: .5em;
+}
+
+#aspect_discovery_SimpleSearch_div_search label.ds-form-label {
+    padding: 0px;
+}
+#aspect_discovery_SimpleSearch_div_search fieldset.ds-form-list {
+    border: none;
+    /* border-bottom: 1px dotted #ccc; */
+}
+
+#aspect_discovery_SimpleSearch_div_search-results {
+    margin-bottom: 4px;
+}
+
+#aspect_discovery_SimpleSearch_div_search-results ul.ds-artifact-list {
+    border: 1px solid gray;
+    list-style-type: none;
+    margin-top:3px;
+    margin-top: 0;
+}
+
+#aspect_submission_StepTransformer_item_license_accepted{
+    margin-top: 10px;
+}
+
+
+/*
+  ***************************
+  DATA PACKAGE PAGES
+  ***************************
+ */
+.publication-header {
+    margin: 0 15px 18px;
+    margin-top: 6px !important;
+    padding: 12px 18px;
+    background-color: #cdc;
+    border: 1px solid #d5d5d5;
+    -webkit-border-top-left-radius: 8px;
+    -webkit-border-top-right-radius: 8px;
+    -moz-border-radius-topleft: 8px;
+    -moz-border-radius-topright: 8px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    -webkit-border-bottom-left-radius: 8px;
+    -webkit-border-bottom-right-radius: 8px;
+    -moz-border-radius-bottomleft: 8px;
+    -moz-border-radius-bottomright: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    overflow: hidden;
+}
+.pub-header-alternate {
+    padding-bottom: 30px;
+    margin: 0 15px -20px !important;
+}
+img.pub-cover {
+    -moz-box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.6);
+    -webkit-box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.6);
+    box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.6);
+}
+.publication-header img.pub-cover {
+    float: right;
+    height: 120px;
+    width: 90px;
+    margin-left: 20px;
+}
+.publication-header .pub-title {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+.citation-sample {
+    background-color: #fcfcfc;
+    border: 1px solid #ded;
+    padding: 5px 7px;
+    margin: 8px 20px;
+    font-size: 0.9em;
+    /*
+        -moz-box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.25);
+        -webkit-box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.25);
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.25);
+    */
+}
+div.file-list {
+    margin-top: 0;
+}
+table.package-file-description {
+    width: 100%;
+    margin: 20px 0;
+    background-color: #fcfcfc;
+    border: 4px solid #fcfcfc;
+    -moz-box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+    -webkit-box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+}
+table.package-file-description th:first-child {
+    width: 120px;
+}
+table.package-metadata th,
+table.package-file-description th {
+    font-weight: bold;
+    text-align: left;
+    vertical-align: top;
+}
+table.package-metadata th:first-child,
+table.package-file-description th:first-child {
+    text-align: left;
+    color: #777;
+}
+table.package-metadata td,
+table.package-file-description td {
+    vertical-align: top;
+    text-align: left;
+}
+.license-badges {
+    padding-top: 10px;
+}
+.article-abstract {
+    background-color: #fcfcfc;
+    padding: 5px 7px;
+    margin: 8px 20px;
+    font-size: 0.9em;
+    -webkit-border-top-left-radius: 8px;
+    -webkit-border-top-right-radius: 8px;
+    -moz-border-radius-topleft: 8px;
+    -moz-border-radius-topright: 8px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    -webkit-border-bottom-left-radius: 8px;
+    -webkit-border-bottom-right-radius: 8px;
+    -moz-border-radius-bottomleft: 8px;
+    -moz-border-radius-bottomright: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+#aspect_discovery_SimpleSearch_div_search-results p{
+    margin-top:10px;
+}
+
+/*
+  ******************************
+  ***********  forms  **********
+  ******************************
+ */
+form.ds-interactive-div li.ds-form-item {
+    /* display: block; */
+    padding: 2px 0;
+    width: 100%;
+}
+form.ds-interactive-div li {
+    margin: 0;
+}
+form.ds-interactive-div li.odd {
+    background-color: rgb(255, 255, 255);
+}
+form.ds-interactive-div li.even {
+    background-color: rgb(255, 255, 255);
+}
+form.ds-interactive-div li.last {
+
+}
+li.ds-form-item {
+    float: left;
+    clear: both;
+    width: 100%;
+}
+div.ds-form-content {
+    float: left;
+    clear: right;
+    display: block;
+    padding: 7px;
+    width:100%;
+}
+span.ds-form-label,label.ds-form-label {
+    display: block;
+    float: left;
+    clear: left;
+    padding: 5px 20px 5px 10px;
+    /*width: 200px;*/
+    font-weight: bold;
+    vertical-align: middle;
+    overflow: hidden;
+}
+/* Help, error, & in-line labels */
+label.ds-composite-component {
+    display: block;
+    float: left;
+    padding: 0px 5px 0 0px;
+    font-size: 80%;
+    color: black;
+    background-color: inherit;
+    text-align: left;
+}
+input.error,textarea.error,select.error {
+    color: inherit;
+    background-color: rgb(255, 245, 245);
+    border-color: red;
+}
+
+span.field-help,
+span.composite-help {
+    display: block;
+    font-size: 90%;
+    color: gray;
+    background-color: inherit;
+    text-align: left;
+}
+
+div.spacer {
+    height: 15px;
+    margin: 0;
+    padding: 0;
+    line-height: 0px;
+    clear: both;
+}
+/* The composite field */
+span.ds-composite-field {
+    display: table-row;
+    padding: 2px;
+}
+*.ds-composite-field.ds-composite-component {
+    display: table-cell;
+    text-align: left;
+    width: auto;
+    padding-right: 10px;
+}
+*.ds-composite-field input,*.ds-composite-field textarea,*.ds-composite-field select {
+    margin-right: 5px;
+    margin-bottom: -2px;
+}
+/* Checkboxes and Radio buttons */
+fieldset.ds-checkbox-field,fieldset.ds-radio-field {
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+fieldset.ds-checkbox-field legend,fieldset.ds-radio-field legend {
+    display: none;
+}
+fieldset.ds-checkbox-field label,fieldset.ds-radio-field label {
+    display: block;
+}
+/* Sub sections within a form */
+fieldset.ds-form-list {
+    border: none;
+    padding: 0;
+    margin-left: 0;
+    margin-right: 0;
+}
+fieldset.ds-form-list ol {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    list-style-type: none;
+}
+
+fieldset.ds-form-list legend {
+    color: #336699;
+    background-color: inherit;
+    font-size: 115%;
+    font-weight: bolder;
+    margin-left: 10px;
+}
+fieldset.ds-form-sublist {
+    border: 1px solid rgb(238, 238, 238);
+    padding: 0;
+    margin: 5px;
+}
+#aspect_submission_StepTransformer_field_datafile_identifier{
+    width:300px
+}
+a.learn-to-submit-button-option:hover {
+    background-color: #ccc;
+    color: #333;
+}
+a.learn-to-submit-button,
+a.learn-to-submit-button-option {
+    background-color: #87c033;
+    border: 1px solid #555;
+    padding: 0.3em 0.5em 0.2em;
+    color: #472D2E;
+    text-decoration: none;
+    margin-top: 0.2em;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    -webkit-border-bottom-left-radius: 5px;
+    -webkit-border-bottom-right-radius: 5px;
+    -moz-border-radius-bottomleft: 5px;
+    -moz-border-radius-bottomright: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.link-to-button, 
+#aspect_discovery_SearchFilterTransformer_list_link-to-button, 
+#aspect_discovery_SearchFilterTransformer_list_link-to-button {
+    text-align: center;
+    padding-bottom: 12px;
+    list-style: none;
+    margin-left: 0;
+}
+.link-to-button a, 
+#aspect_discovery_SearchFilterTransformer_list_link-to-button a, 
+#aspect_discovery_SearchFilterTransformer_list_link-to-button a {
+    text-decoration: none;
+    font-weight:bold;
+    border:1px solid #555;
+    background: #40841C;
+    color: #FFF;
+    padding: 3px 8px 2px;
+}
+
+
+/* eliminate whitespace (visible underlining) when a link wraps a single image */
+a.single-image-link {
+    display: inline-block;
+}
+/* emulate HTML5 placeholder style for older browsers (triggered by complete-placeholder JS plugin) */
+.placeholder {
+    color: #999;
+}
+
+#aspect_discovery_MostViewedItem_table_most-viewed td:first-child {
+    width: 400px;
+}
+#aspect_discovery_MostViewedItem_table_most-viewed h2 {
+    font-size:15px;
+}
+td li{
+    list-style: none;
+}
+
+/* FAQ style */
+.question-closer {
+    float: right;
+    margin: 4px 7px 0 8px;
+}
+.answer-panel {
+    border-top: 2px dotted #ccc;
+    border-bottom: 2px dotted #ccc;
+    padding: 6px 8px;
+    background-color: #eee;
+    margin-bottom: 6px;
+}
+.answer-panel h2 {
+    font-size: 116%;
+}
+
+div.page-license {
+    margin-top: 1em;
+}
+
+#aspect_discovery_MostViewedItem_table_most-viewed > h1 {
+    width: 360px; 
+    margin-bottom: -27px; 
+    background-color: #fff; 
+    position: relative;
+}
+#aspect_discovery_MostViewedItem_table_most-viewed li.ds-artifact-item
+#aspect_discovery_MostViewedItem_table_most-viewed div.artifact-description {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+#aspect_discovery_MostViewedItem_table_most-viewed th:last-child,
+#aspect_discovery_MostViewedItem_table_most-viewed td:last-child {
+    text-align: right;
+}
+
+#aspect_submission_StepTransformer_list_submit-select-publication span.field-help,
+#aspect_submission_StepTransformer_div_submit-describe-dataset span.field-help,
+#aspect_submission_StepTransformer_list_submit-select-publication span.composite-help,
+#aspect_submission_StepTransformer_div_submit-describe-dataset span.composite-help{
+    width:350px;
+    float:right;
+    margin-right: 20px;
+    background-color: #FEFECD;
+    border:2px solid grey;
+    padding:5px;
+    font-weight: 900;
+    display: none;
+
+}
+#aspect_submission_StepTransformer_list_submit-select-publication li.ds-form-item .ds-form-label {
+    padding: 8px 20px 0 10px;
+}
+#aspect_submission_StepTransformer_list_submit-select-publication div.ds-form-content {
+    padding: 0 7px 7px;
+}
+span.field-help li{
+    list-style: none;
+}
+#aspect_submission_StepTransformer_list_submit-upload-file span.field-help{
+    width:150px;
+    margin-left:2px;
+}
+
+#aspect_submission_StepTransformer_field_datafile_identifier{
+    width:150px;
+}
+
+table.datafiletable{
+    width:100%;
+}
+table.datafiletable td {
+    padding: 0;
+}
+table.datafiletable td:first-child{
+    text-align: right;
+}
+
+table.datafiletable span.ds-composite-field{
+    display: inline-block;
+}
+
+dl.formatted,
+ol.formatted {
+  line-height: 1.5em;
+  margin: 0.25em 0;
+}
+dl.formatted dt {
+  padding-left: 1em;
+}
+dl.formatted dd,
+ol.formatted li {
+  padding-left: 2em;
+  margin-bottom: 0.75em;
+}
+
+#membershipMeetingImage small {
+    color: #fff; 
+    display: block; 
+    margin-top: -2em; 
+    padding-left: 5px; 
+    padding-bottom: 1em;
+}
+
+a.top-link {
+    float: right;
+}
+
+#aspect_submission_StepTransformer_list_submit-overview-file table {
+    clear: left;
+    margin-left: 20px;
+}
+
+/* Contact Us (Feedback Form) style */
+
+h2.feedbackform-heading,
+div.ds-form-content legend {
+    color: #40841c;
+    font-size: 18px;
+    font-weight: bold;
+    margin-left: 0;
+}
+
+a.feedbackform-user-voice-link {
+    padding: 5px;
+    text-decoration: none;
+    color: #1b8ebc;
+    background-color: #f2f2f2;
+    border: 1px solid #d7d7d7;
+}
+
+.menu-border{
+    border-top: 1px solid black;
+    margin: 5px 0;
+}
+
+.embargo_notice {
+    color: #FF0000;
+}
+
+/* ********************* Tweaks for webkit browsers (Chrome + Safari) only **************** */
+
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+    /* misplaced pager controls */
+    #dryad-home-carousel .bx-pager-item {
+        top: -7px !important;
+    }
+
+
+    /* force rounded corners in the slideshow (known Chrome bug) */
+    .bx-viewport, 
+    .bx-wrapper img {
+        -webkit-border-top-left-radius: 8px;
+        -webkit-border-top-right-radius: 8px;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        -webkit-border-bottom-left-radius: 8px;
+        -webkit-border-bottom-right-radius: 8px;
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+    }
+    
+}
+#aspect_discovery_MostDownloadedBitstream_table_most-downloaded th h2{
+    font-size: 1em;
+}
+
+.choose_browse_by{
+    display: none;
+}
+input.starts_with {
+        margin-left: 15px;
+
+    }
+
+#aspect_paymentsystem_ShoppingCartTransformer_list_transaction li{
+    display: none;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_list_currency-section{
+    text-decoration: none;
+}
+
+.paypal-next-button{
+    display: none;
+}
+
+#aspect_submission_workflow_WorkflowTransformer_field_skip_payment{
+    display:none;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_list_Payment h1{
+    margin-top:0px;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_list_Payment h1{
+    font-size:15px;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_list_currency-section{
+    list-style-type: none;
+    display: inline;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_list_currency-section li{
+    width:100px;
+    display: inline;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_list_Payment li{
+    margin-bottom:10px;
+    width:220px;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_list_Payment li span{
+    font-size: 13px;
+    width:110px;
+    padding: 0px;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_item_currency-list label{
+    font-size: 14px;
+    width:120px;
+    font-weight: bold;
+    padding: 0px;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_list_Payment li div{
+    width:100px;
+    display: inline;
+    text-align: left;
+    margin: 0px;
+    padding: 0px;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_list_country-section{
+    list-style-type: none;
+}
+
+#aspect_paymentsystem_ShoppingCartTransformer_item_payer{
+    border-top: 1px solid #cdc;
+    margin-top: 0px;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_item_total{
+    border-top: 1px solid #cdc;
+    border-top: 1px solid #cdc;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_item_country-list label{
+    font-size: 13px;
+    width:100%;
+}
+li#aspect_paymentsystem_ShoppingCartTransformer_item_country-list div select{
+    width:220px;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_item_voucher-list label{
+    font-size:13px;
+    width:100%;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_field_voucher{
+    width:160px;
+    display: inline;
+}
+#aspect_paymentsystem_ShoppingCartTransformer_item_voucher-list button{
+    display: inline;
+}
+li#aspect_paymentsystem_ShoppingCartTransformer_item_voucher-list div{
+    width:100%;
+    text-align: center;
+}
+#aspect_submission_submit_CheckoutStep_list_payment-method{
+    list-style: none;
+}
+#aspect_submission_workflow_WorkflowTransformer_list_payment-method{
+    list-style: none;
+    }
+#aspect_submission_workflow_WorkflowTransformer_list_paypal-form-buttons{
+    list-style: none;
+    padding:10px;
+}
+#aspect_submission_submit_CheckoutStep_list_paypal-form-buttons{
+    list-style: none;
+    padding:10px;
+}
+
+#aspect_paymentsystem_ShoppingCartTransformer_list_need-help {
+    margin-bottom: 20px;
+}
+
+ul.navigation-link{
+    padding: 5px 0;
+    list-style: none;
+    margin-left: -15px;
+    margin-bottom: 10px;
+}
+ul.navigation-link li{
+    display: inline-block;
+    font-size: 14px;
+    background-color: #bdb;
+    color: #fff;
+    text-decoration: none;
+    margin-right: 18px;
+    padding: 7px 11px 4px;
+    border: 1px solid #AAA;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    -webkit-border-bottom-left-radius: 5px;
+    -webkit-border-bottom-right-radius: 5px;
+    -moz-border-radius-bottomleft: 5px;
+    -moz-border-radius-bottomright: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    -moz-box-shadow: 3px 3px 4px rgba(33, 33, 33, 0.25);
+    -webkit-box-shadow: 3px 3px 4px rgba(33, 33, 33, 0.25);
+    box-shadow: 3px 3px 4px rgba(33, 33, 33, 0.25);
+}
+
+ul.navigation-link li.selected{
+    border:2px solid black;
+    padding:5px;
+    background-color: #707070;
+    color: #fff;
+    border: 1px solid #555;
+}
+
+div.step-link{
+    border: none;
+    background-color: transparent;
+    box-shadow:none;
+    padding-bottom: 0px;
+    padding-top: 0px;
+}
+
+.errorMessage{
+    color:red;
+}
+.waiver-info{
+    color:green;
+}
+.label-mark{
+
+    width:20px;
+    display:inline;
+}
+
+
+
+#aspect_eperson_TermsOfService_div_background{
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    opacity: .80;
+    -webkit-opacity: .80;
+    -moz-opacity: .80;
+    z-index: 1000;
+    border-radius: 0;
+    margin: 0;
+    padding: 0;
+}
+
+#aspect_eperson_TermsOfService_div_modal-content{
+    background-color: white;
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    box-shadow: 0 0 20px 0 #222;
+    -webkit-box-shadow: 0 0 20px 0 #222;
+    -moz-box-shadow: 0 0 20px 0 #222;
+
+    height: 250px;
+    left: 50%;
+    margin: -200px 0 0 -225px;
+    padding: 10px;
+    position: fixed;
+    top: 50%;
+    width: 450px;
+    z-index: 1000;
+}
+
+#aspect_eperson_TermsOfService_div_background.active, #aspect_eperson_TermsOfService_field_submit.active {
+    display: block;
+}
+
+/* Temporarily hide the currency selector, until we fix the currency switching problems */                                                                                                                                                 
+#aspect_paymentsystem_ShoppingCartTransformer_item_currency-list {                                                                                                                                                                         
+    display:none;
+    visibility:hidden;
+}     
+
+#aspect_submission_StepTransformer_field_journalIDStatusIntegrated{
+    display:none;
+}
+#journalIDStatusIntegrated label{
+    display:none;
+}
+
+table#aspect_submission_workflow_WorkflowTransformer_table_workflow-actions tr.archive_or_blackout_recommended  {
+    background-color: #eee;
+    border: thin solid #cdc;
+}
+
+.voucher-error{
+    color:red
+}
+
+#aspect_paymentsystem_ShoppingCartTransformer_item_remove-country div,
+#aspect_paymentsystem_ShoppingCartTransformer_item_remove-voucher div,
+#aspect_paymentsystem_ShoppingCartTransformer_item_waiver-info div {
+    width:100% !important;
+}
+
+/* add style for shopping cart in checkout page*/
+
+ul#aspect_submission_submit_CheckoutStep_list_transaction{
+    display: none;
+}
+#unknown-doi-panel span.field-help{
+    color:black !important;
+}
+
+.help-title{
+    color:grey;
+    font-size: 0.66em;
+}
+
+#aspect_submission_submit_OverviewStep_div_submit-completed-overview{
+    border: 0px;
+    -moz-box-shadow: 0px 0px 0px rgba(33, 33, 33, 1.0);
+    -webkit-box-shadow: 0px 0px 0px rgba(33, 33, 33, 1.0);
+    box-shadow: 0px 0px 0px rgba(33, 33, 33, 1.0);
+}
+
+#aspect_submission_submit_OverviewStep_div_submit-completed-overview > div.ds-static-div.subdiv {
+    margin-bottom: 18px;
+}
+
+#aspect_submission_submit_OverviewStep_div_submit-completed-overview > h1.ds-div-head {
+    color: #336699;
+    background-color: inherit;
+    font-size: 115%;
+    font-weight: bolder;
+}
+
+#aspect_submission_submit_OverviewStep_div_submit-completed-overview ul.ds-artifact-list li.ds-artifact-item {
+    padding: 0 !important;
+    margin-left: 0;
+    text-indent: 0 !important;
+}
+
+#aspect_submission_submit_OverviewStep_div_submit-completed-overview ul.ds-artifact-list li.ds-artifact-item div {
+    padding: 0 !important;
+    margin-bottom: 10px;
+}
+
+#aspect_submission_submit_OverviewStep_div_finalizedivision{
+    padding-top: 6px;
+}
+
+#SpiderTrap p a{
+    color: transparent;
+}
+
+input.ds-author-order-col {
+    width: 2em;
+}
+td.ds-author-input-col {
+    width: 80%;
+}
+td.ds-author-input-col input {
+    width: 45%;
+}
+.promotional-block {
+    line-height: 1.25em; 
+    padding: 0px 20px; 
+}
+.promotional-block p {
+    line-height: 1.25em !important; 
+}
+/*
+.promotional-block p:last-child {
+    margin-bottom: 0 !important;
+}
+*/
+.video-placeholder {
+    background-color: #000;
+    font-size: 18px;
+    color: #eee;
+    font-weight: bold;
+    text-align: center;
+    margin: 0 -120px 20px 30px;
+}

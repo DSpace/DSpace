@@ -439,6 +439,9 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                     <a href="http://blog.datadryad.org" target="_blank">Blog: News and views</a>
                                 </li>
                                 <li>
+                                    <a href="/pages/dryadlab" target="_blank">DryadLab: Research data for educators</a>
+                                </li>
+                                <li>
                                     <a href="/pages/employment">Employment opportunities</a>
                                 </li>
                                 <li>
@@ -463,6 +466,9 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                 </li>
                                 <li>
                                   <a href="/pages/faq">FAQs</a>
+                                </li>
+                                <li>
+                                  <a href="/pages/workWithDryadLab" target="_blank">Educational outreach with DryadLab</a>
                                 </li>
                                 <li>
                                   <a href="/pages/institutionalSponsors">Institutional sponsors</a>

@@ -30,3 +30,5 @@ notes.txt
 
 ## ignore OSX system files
 .DS_Store
+## Ignore Vim swap files
+*.swp
