@@ -433,7 +433,7 @@
                             <!-- MOspace navigation bar -->
 
                         <ul class="nav navbar-nav  pull-left">
-                            <li role="presentation"><a href="{$app_path}/discover">search</a></li>
+                            <li role="presentation"><a href="{$app_path}/discover">advanced search</a></li>
                         </ul>
                         <ul class="nav navbar-nav  pull-left">
                             <li role="presentation"><a href="{$app_path}/community-list">browse</a></li>
