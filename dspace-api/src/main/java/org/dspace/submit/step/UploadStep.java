@@ -15,8 +15,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Enumeration;
+import java.util.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -358,7 +357,8 @@ public class UploadStep extends AbstractProcessingStep
         // -------------------------------------------------
         
         //File ordering the first file is set as primary
-        java.util.Map<Integer,Integer> ordToId = new java.util.HashMap<Integer,Integer>();
+        int maxIndex = -1;
+        final java.util.Map<Integer,Integer> idToOrd = new java.util.HashMap<Integer,Integer>();
         try {
             Enumeration<String> order = request.getParameterNames();
             while(order.hasMoreElements()){
@@ -366,32 +366,43 @@ public class UploadStep extends AbstractProcessingStep
                 if(ord.startsWith("order_")){
                     int bitId = Integer.parseInt(ord.substring(6));
                     int index = Integer.parseInt(request.getParameter(ord));
-                    ordToId.put(index, bitId);
+                    if(index > maxIndex){
+                        maxIndex = index;
+                    }
+                    idToOrd.put(bitId, index);
                 }
             }
-            java.util.Set<Integer> keys = ordToId.keySet();
-            int size = keys.size() - removed.size();
-            if(size>0){
-                int[] ordered = new int[keys.size()];
-                    //Put the bitIds in the array ordered as user wanted
-                    for (int key : keys) {
-                        ordered[key] = ordToId.get(key);
+            Bundle[] oBundles = item.getBundles("ORIGINAL");
+            if(oBundles != null && oBundles.length > 0){
+                for(Bitstream bitstream : oBundles[0].getBitstreams()){
+                    if(!idToOrd.containsKey(bitstream.getID())){
+                        idToOrd.put(bitstream.getID(), ++maxIndex);
                     }
-                    //Since the setOrder doesn't handle non existing ids
-                    int[] orderedNotDeleted = new int[size];
-                    int i = 0;
-                    //leave out the deleted bitIds, but keep the order
-                    for (int bitId : ordered) {
-                        if (!removed.contains(bitId)) {
-                            orderedNotDeleted[i++] = bitId;
-                        }
-                    }
-                    Bundle[] bundles = item.getBundles("ORIGINAL");
-                    if (bundles.length > 0) {
-                        bundles[0].setOrder(orderedNotDeleted);
-                        bundles[0].setPrimaryBitstreamID(orderedNotDeleted[0]);
-                        bundles[0].update();
-                    }
+                }
+            }
+            for (int bitId : removed) {
+                idToOrd.remove(bitId);
+            }
+            SortedSet<Integer> orderedIds = new TreeSet<>(new Comparator<Integer>(){
+
+                @Override
+                public int compare(Integer id1, Integer id2) {
+                    return Integer.compare(idToOrd.get(id1), idToOrd.get(id2));
+                }
+            });
+            orderedIds.addAll(idToOrd.keySet());
+            int[] ordered = new int[orderedIds.size()];
+            int i = 0;
+            for(Integer id : orderedIds){
+                ordered[i++] = id;
+            }
+
+
+            Bundle[] bundles = item.getBundles("ORIGINAL");
+            if (bundles.length > 0) {
+                bundles[0].setOrder(ordered);
+                bundles[0].setPrimaryBitstreamID(ordered[0]);
+                bundles[0].update();
             }
         }catch(Exception e) {
             return STATUS_ORDER_MAYHAM;
