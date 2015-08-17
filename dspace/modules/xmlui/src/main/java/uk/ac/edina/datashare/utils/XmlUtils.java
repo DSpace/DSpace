@@ -3,6 +3,7 @@ package uk.ac.edina.datashare.utils;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cocoon.environment.http.HttpEnvironment;
 
@@ -16,6 +17,17 @@ public class XmlUtils {
     public static HttpServletRequest getRequest(Map objectModel)
     {
         return (HttpServletRequest)objectModel.get(HttpEnvironment.HTTP_REQUEST_OBJECT); 
+    }
+    
+    /**
+     * Fetch the HTTP response object from a coccon object model.
+     * @param objectModel The cocoon object model.
+     * @return HTTP response object.
+     */
+    @SuppressWarnings("rawtypes")
+    public static HttpServletResponse getResponse(Map objectModel)
+    {
+        return (HttpServletResponse)objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT); 
     }
 
     /**

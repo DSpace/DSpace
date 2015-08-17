@@ -10,6 +10,8 @@ import org.dspace.eperson.EPerson;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 
+import uk.ac.edina.datashare.eperson.RegistrationDetails;
+
 /**
  * EDINA DSpace database queries
  */
@@ -124,6 +126,37 @@ public class DbQuery
         }
         
         return item;
+    }
+    
+    /**
+     * Get the registration details for a given token
+     * @param context DSpace context
+     * @param token Registration token
+     * @return The registration details
+     */
+    public static RegistrationDetails fetchRegistrationDetails(Context context, String token)
+    {
+        RegistrationDetails details = null;
+        
+        try
+        {
+            TableRow rd = DatabaseManager.findByUnique(
+                    context, "RegistrationData",
+                    "token", token);
+            
+            if (rd != null) 
+            {   
+                details = new RegistrationDetails(rd.getStringColumn("email"),
+                                                  rd.getStringColumn("uun"));
+            }
+        }
+        catch(SQLException ex)
+        {
+            LOG.error("Cannot fetch registration details: " + ex.getMessage());
+            throw new RuntimeException(ex);
+        }
+        
+        return details;
     }
     
     /**

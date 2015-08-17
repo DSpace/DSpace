@@ -103,14 +103,15 @@ public class ContextUtil
                 log.debug("Adding Special Group id="+String.valueOf(groupIDs[i]));
             }
 
+            // DATASHARE - start
             // Set the session ID and IP address
-            String ip = request.getRemoteAddr();
+            String ip = Util.getIPAddress(request);
+            /*String ip = request.getRemoteAddr();
             if (useProxies == null) {
                 useProxies = ConfigurationManager.getBooleanProperty("useProxies", false);
             }
             if(useProxies && request.getHeader("X-Forwarded-For") != null)
             {
-                /* This header is a comma delimited list */
 	            for(String xfip : request.getHeader("X-Forwarded-For").split(","))
                 {
                     if(!request.getHeader("X-Forwarded-For").contains(ip))
@@ -118,7 +119,9 @@ public class ContextUtil
                         ip = xfip.trim();
                     }
                 }
-	        }
+	        }*/
+            // DATASHARE - end
+            
             context.setExtraLogInfo("session_id=" + request.getSession().getId() + ":ip_addr=" + ip);
 
             // Store the context in the request
