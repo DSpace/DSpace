@@ -99,63 +99,63 @@
 
     <message key="xmlui.dri2xhtml.structural.pagination-info.nototal">Now showing items {0}-{1}</message>
 
-    <message key="xmlui.Discovery.AbstractSearch.type_author">Filter by: Author</message>
+    <message key="xmlui.Discovery.AbstractSearch.type_author">Limit by: Author</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.author">Author</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.author_filter">Author</message>
 
 
-    <message key="xmlui.Discovery.AbstractSearch.type_keyword">Filter by: Keyword</message>
+    <message key="xmlui.Discovery.AbstractSearch.type_keyword">Limit by: Keyword</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.keyword">Keyword</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.keyword_filter">Keyword</message>
 
-    <message key="xmlui.Discovery.AbstractSearch.type_abstract">Filter by: Abstract</message>
+    <message key="xmlui.Discovery.AbstractSearch.type_abstract">Limit by: Abstract</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.abstract">Abstract</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.abstract_filter">Abstract</message>
 
-    <message key="xmlui.Discovery.AbstractSearch.type_series">Filter by: Series</message>
+    <message key="xmlui.Discovery.AbstractSearch.type_series">Limit by: Series</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.series">Series</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.series_filter">Series</message>
 
-    <message key="xmlui.Discovery.AbstractSearch.type_mime">Filter by: Mimetype</message>
+    <message key="xmlui.Discovery.AbstractSearch.type_mime">Limit by: Mimetype</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.mime">Mimetype</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.mime_filter">Mimetype</message>
 
-    <message key="xmlui.Discovery.AbstractSearch.type_sponsor">Filter by: Sponsor</message>
+    <message key="xmlui.Discovery.AbstractSearch.type_sponsor">Limit by: Sponsor</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.sponsor">Sponsor</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.sponsor_filter">Sponsor</message>
 
-    <message key="xmlui.Discovery.AbstractSearch.type_identifier">Filter by: Idenfitier</message>
+    <message key="xmlui.Discovery.AbstractSearch.type_identifier">Limit by: Idenfitier</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.identifier">Identifier</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.identifier_filter">Identifier</message>
 
-    <message key="xmlui.Discovery.AbstractSearch.type_language">Filter by: Language</message>
+    <message key="xmlui.Discovery.AbstractSearch.type_language">Limit by: Language</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.language">Language</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.language_filter">Language</message>
 
 
-    <message key="xmlui.Discovery.AbstractSearch.type_subject">Filter by: Subject</message>
+    <message key="xmlui.Discovery.AbstractSearch.type_subject">Limit by: Subject</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subject">Subject</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subject_filter">Subject</message>
 
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dateIssued.year">Date Issued</message>
 
-    <message key="xmlui.Discovery.AbstractSearch.type_authorcontributor">Filter by: Author/Contibutor</message>
+    <message key="xmlui.Discovery.AbstractSearch.type_authorcontributor">Limit by: Author/Contibutor</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.authorcontributor">Author/Contributor</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.authorcontributor_filter">Author/Contributor</message>
 
-    <message key="xmlui.Discovery.AbstractSearch.type_subjectTimePeriod">Filter by: Subject: Time Period</message>
+    <message key="xmlui.Discovery.AbstractSearch.type_subjectTimePeriod">Limit by: Subject: Time Period</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subjectTimePeriod">Subject: Time Period</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subjectTimePeriod_filter">Subject: Time Period</message>
 
-    <message key="xmlui.Discovery.AbstractSearch.type_subjectPlace">Filter by: Subject: Place</message>
+    <message key="xmlui.Discovery.AbstractSearch.type_subjectPlace">Limit by: Subject: Place</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subjectPlace">Subject: Place</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subjectPlace_filter">Subject: Time Period</message>
 
-    <message key="xmlui.Discovery.AbstractSearch.type_contentType">Filter by: Format</message>
-    <message key="xmlui.Discovery.AbstractSearch.type_advisor">Filter by: Advisor</message>
-    <message key="xmlui.Discovery.AbstractSearch.type_thesisSemester">Filter by: Thesis Semester</message>
-    <message key="xmlui.Discovery.AbstractSearch.type_discipline">Filter by: Thesis Department</message>
-    <message key="xmlui.Discovery.AbstractSearch.type_thesisDegreeLevel">Filter by: Thesis Degree Level</message>
+    <message key="xmlui.Discovery.AbstractSearch.type_contentType">Limit by: Format</message>
+    <message key="xmlui.Discovery.AbstractSearch.type_advisor">Limit by: Advisor</message>
+    <message key="xmlui.Discovery.AbstractSearch.type_thesisSemester">Limit by: Thesis Semester</message>
+    <message key="xmlui.Discovery.AbstractSearch.type_discipline">Limit by: Thesis Department</message>
+    <message key="xmlui.Discovery.AbstractSearch.type_thesisDegreeLevel">Limit by: Thesis Degree Level</message>
 
     <message key="xmlui.Discovery.AbstractSearch.startswith">Starts with</message>
     <message key="xmlui.Discovery.AbstractSearch.startswith.help">Or enter first few letters:</message>
@@ -174,7 +174,7 @@
 
 
     <message key="xmlui.Discovery.AbstractSearch.filters.controls.add-filter">Add Fields for Search</message>
-    <message key="xmlui.Discovery.AbstractSearch.filters.controls.apply-filters">Apply</message>
+    <message key="xmlui.Discovery.AbstractSearch.filters.controls.apply-filters">Search</message>
     <message key="xmlui.Discovery.AbstractSearch.filters.controls.remove-filter">Remove</message>
     <message key="xmlui.Discovery.AbstractSearch.filters.controls.new-filters.head">New Fields for Search:</message>
     <message key="xmlui.Discovery.AbstractSearch.filters.controls.current-filters.head">Current Fields for Search:</message>

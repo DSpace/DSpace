@@ -66,7 +66,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         message("xmlui.ArtifactBrowser.SimpleSearch.full_text_search");
     
     private static final Message T_go =
-        message("xmlui.general.go");
+        message("xmlui.general.search");
     
     /**
      * Add Page metadata.

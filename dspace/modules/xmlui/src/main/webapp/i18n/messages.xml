@@ -2507,8 +2507,8 @@
 
     <message key="xmlui.mirage2.discovery.reset">Reset</message>
     <message key="xmlui.mirage2.discovery.newFilter">Add New Filter</message>
-    <message key="xmlui.mirage2.discovery.showAdvancedFilters">[+] Show Search and Limit Fields</message>
-    <message key="xmlui.mirage2.discovery.hideAdvancedFilters">[-] Hide Search and Limit Fields</message>
+    <message key="xmlui.mirage2.discovery.showAdvancedFilters">[+] Search or Limit by Field</message>
+    <message key="xmlui.mirage2.discovery.hideAdvancedFilters">[-] Search or Limit by Field</message>
 
 
     <message key="xmlui.mirage2.forms.instancedCompositeFields.add">Add</message>
