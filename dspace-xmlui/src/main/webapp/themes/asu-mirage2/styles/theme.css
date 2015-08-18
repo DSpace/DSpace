@@ -170,3 +170,12 @@ footer {
 header .navbar-default .navbar-toggle > li > a, header .navbar-default .navbar-nav > li > a {
     color: #990033;
 }
+
+header .navbar-default .navbar-toggle, header .navbar-default .navbar-nav {
+    border-color: transparent;
+    color: #990033;
+}
+
+header .navbar-default .navbar-toggle .icon-bar, header .navbar-default .navbar-nav .icon-bar {
+    background-color: #990033;
+}
