@@ -1708,6 +1708,24 @@
                          alt="eLife logo"/>
                 </a>
             </xsl:when>
+            <xsl:when test='$journal-name = "Evidence-Based Preclinical Medicine"'>
+				<a target="_blank">
+					<xsl:attribute name="href">
+						<xsl:choose>
+							<xsl:when test="contains($article-doi,'doi:')">
+								<xsl:value-of
+										select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of
+										select="string('http://onlinelibrary.wiley.com/journal/10.1002/\(ISSN\)2054-703X')"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:attribute>
+					<img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/EBPM.PNG"
+						 alt="Evidence-Based Preclinical Medicine cover"/>
+				</a>
+			</xsl:when>
             <xsl:when test='$journal-name = "Evolution"'>
                 <a target="_blank">
                     <xsl:attribute name="href">
