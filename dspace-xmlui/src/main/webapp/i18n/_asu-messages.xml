@@ -38,6 +38,11 @@
         <message key="xmlui.general.perform">Perform</message>
         <message key="xmlui.general.queue">Queue</message>
 
+        <!-- Keys which are used by exception2dri.xsl on error pages -->
+        <message key="xmlui.error.contact_msg">Please contact the site administrator if you wish to report this error. If possible, please  provide details about what you were doing at the time this error occurred.</message>
+        <message key="xmlui.error.contact">Contact site administrator</message>
+        <message key="xmlui.error.show_stack">Show underlying error stack</message>
+
 	<!--
 		Page not found keys
 
@@ -61,6 +66,7 @@
 		This section is for feed syndications (RSS, atom, etc)
 	-->
 	<message key="xmlui.feed.general_description">The HPS Repository digital repository system captures, stores, indexes, preserves, and distributes digital research material.</message>
+	<message key="xmlui.feed.header">RSS Feeds</message>
 	<message key="xmlui.feed.logo_title">The Channel Image</message>
 	<message key="xmlui.feed.untitled">Untitled</message>
 
@@ -123,15 +129,19 @@
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_keyword">Keyword</message>
 
    <!--  some common other possibilities for Advanced Search Fields -->
+   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_advisor">Advisor</message>
+   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_composer">Composer</message>
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_contributor">Contributor</message>
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_creator">Creator</message>
-   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_subject">Subject</message>
+   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_department">Department</message>
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_description">Description</message>
-   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_relation">Relation</message>
+   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_firstLineOfChorus">First Line of Chorus</message>
+   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_firstLineOfText">First Line Of Text</message>
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_mime">Mime-Type</message>
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_other">Other Contributor</message>
-   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_advisor">Advisor</message>
-   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_department">Department</message>
+   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_publisher">Publisher</message>
+   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_relation">Relation</message>
+   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_subject">Subject</message>
 
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_ANY">Full Text</message>
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.and">AND</message>
@@ -164,6 +174,11 @@
 
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.author.column_heading">Authors Name</message>
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.subject.column_heading">Subject</message>
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.composer.column_heading">Composer</message>
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.corporateAuthor.column_heading">Corporate Author</message>
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.publisher.column_heading">Publisher</message>
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.firstLineOfText.column_heading">First Line of Text</message>
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.firstLineOfChorus.column_heading">First Line of Chorus</message>
 
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.metadata.author">Browsing {0} by Author {1}</message>
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.trail.metadata.author">Browsing {0} by Author</message>
@@ -180,6 +195,40 @@
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.item.dateaccessioned">Browsing {0} by Submit Date {1}</message>
 	<message key="xmlui.ArtifactBrowser.ConfigurableBrowse.trail.item.dateaccessioned">Browsing {0} by Submit Date</message>
 
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.metadata.composer">Browsing {0} by Composer {1}</message>
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.trail.metadata.composer">Browsing {0} by Composer</message>
+
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.metadata.corporateAuthor">Browsing {0} by Corporate Author {1}</message>
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.trail.metadata.corporateAuthor">Browsing {0} by Corporate Author</message>
+
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.metadata.publisher">Browsing {0} by Publisher {1}</message>
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.trail.metadata.publisher">Browsing {0} by Publisher</message>
+
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.metadata.firstLineOfText">Browsing {0} by First Line of Text {1}</message>
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.trail.metadata.firstLineOfText">Browsing {0} by First Line of Text</message>
+
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.title.metadata.firstLineOfChorus">Browsing {0} by First Line of Chorus {1}</message>
+    <message key="xmlui.ArtifactBrowser.ConfigurableBrowse.trail.metadata.firstLineOfChorus">Browsing {0} by First Line of Chorus</message>
+
+	<!-- org.dspace.app.xmlui.administrative.WithdrawnItems.java -->
+	<message key="xmlui.Administrative.WithdrawnItems.title.item.title">Withdrawn Items by Title</message>
+	<message key="xmlui.Administrative.WithdrawnItems.trail.item.title">Withdrawn Items by Title</message>
+
+	<message key="xmlui.Administrative.WithdrawnItems.title.item.dateissued">Withdrawn Items by Issue Date</message>
+	<message key="xmlui.Administrative.WithdrawnItems.trail.item.dateissued">Withdrawn Items by Issue Date</message>
+
+	<message key="xmlui.Administrative.WithdrawnItems.title.item.dateaccessioned">Withdrawn Items by Submit Date</message>
+	<message key="xmlui.Administrative.WithdrawnItems.trail.item.dateaccessioned">Withdrawn Items by Submit Date</message>
+
+	<!-- org.dspace.app.xmlui.administrative.PrivateItems.java -->
+	<message key="xmlui.Administrative.PrivateItems.title.item.title">Private Items by Title</message>
+	<message key="xmlui.Administrative.PrivateItems.trail.item.title">Private Items by Title</message>
+
+	<message key="xmlui.Administrative.PrivateItems.title.item.dateissued">Private Items by Issue Date</message>
+	<message key="xmlui.Administrative.PrivateItems.trail.item.dateissued">Private Items by Issue Date</message>
+
+	<message key="xmlui.Administrative.PrivateItems.title.item.dateaccessioned">Private Items by Submit Date</message>
+	<message key="xmlui.Administrative.PrivateItems.trail.item.dateaccessioned">Private Items by Submit Date</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.CollectionViewer.java -->
 	<message key="xmlui.ArtifactBrowser.CollectionViewer.search_scope">Search Scope</message>
@@ -247,6 +296,8 @@
 	<message key="xmlui.ArtifactBrowser.ItemViewer.show_simple">Show simple item record</message>
 	<message key="xmlui.ArtifactBrowser.ItemViewer.show_full">Show full item record</message>
 
+        <message key="xmlui.ArtifactBrowser.ItemViewer.withdrawn">This item has been withdrawn and is no longer available.</message>
+
 	<!-- org.dspace.app.xmlui.artifactbrowser.Navigation.java -->
 	<message key="xmlui.ArtifactBrowser.Navigation.head_browse">Browse</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.head_all_of_dspace">All of HPS Repository</message>
@@ -256,6 +307,11 @@
 	<message key="xmlui.ArtifactBrowser.Navigation.browse_subject">Subjects</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.browse_dateissued">By Issue Date</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.browse_dateaccessioned">By Submit Date</message>
+    <message key="xmlui.ArtifactBrowser.Navigation.browse_composer">Composer</message>
+    <message key="xmlui.ArtifactBrowser.Navigation.browse_corporateAuthor">Corporate Author</message>
+    <message key="xmlui.ArtifactBrowser.Navigation.browse_publisher">Publisher</message>
+    <message key="xmlui.ArtifactBrowser.Navigation.browse_firstLineOfText">First Line of Text</message>
+    <message key="xmlui.ArtifactBrowser.Navigation.browse_firstLineOfChorus">First Line of Chorus</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.head_this_collection">This Collection</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.head_this_community">This Community</message>
 
@@ -285,7 +341,13 @@
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.type_item">item</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.type_resource">resource</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.unknown">unknown</message>
+        <message key="xmlui.ArtifactBrowser.RestrictedItem.login">Proceed to login screen</message>
 
+        <message key="xmlui.ArtifactBrowser.RestrictedItem.head_item_withdrawn">This item is withdrawn</message>
+        <message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_withdrawn">The selected item is withdrawn and is no longer available.</message>
+        <message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_restricted_auth">The selected item is access restricted and requires credentials to view. Please login to access the item.</message>
+        <message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_restricted">Your user account does not have the credentials to view this item. Please contact the system administrator if you have any questions.</message>
+        
 	<!-- Authentication messages used at the top of the login page:  -->
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.auth_header">The item is restricted</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.auth_message">The item you are attempting to access is a restricted item and requires credentials to view. Please login below to access the item.</message>
@@ -304,6 +366,114 @@
 	<message key="xmlui.ItemExportDownloadReader.auth_header">This export archive is restricted.</message>
 	<message key="xmlui.ItemExportDownloadReader.auth_message">The export archive you are attempting to access is a restricted resource and requires credentials to view. Please login below to access the export archive.</message>
 
+
+	<!-- REQUEST COPY -->
+	<!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestForm.java -->
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.title">Request a copy of the document</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.trail">Request a copy of the document</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.head">Request a copy of the document</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestForm.login_para">Users of this system, can login to view this document.</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestForm.login">Login</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestForm.para1">Enter the following information to request a copy of the document from the responsible person.</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.requesterEmail">Your e-mail address</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.requesterEmail_help">This email address is used for sending the document.</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.requesterEmail.error">E-mail is mandatory</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.message">Message</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.message.error">Message is mandatory</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.files">Files</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.allFiles">All files (of this document) in restricted access.</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.notAllFiles">Only The requested file.</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.requesterName">Name</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.requesterName.error">Name is required</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.submit">Request copy</message>
+
+	<!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestSent.java -->
+	<message key="xmlui.ArtifactBrowser.ItemRequestSent.title">Your request has been sent.</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestSent.trail">Your request has been sent.</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestSent.head">Your request has been sent.</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestSent.para1">Your request has been sent to the author or responsible person.</message>
+
+	<!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestResponseDecisionForm.java -->
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.title">Document copy request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.trail">Document copy request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.head">Document copy request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.para1">IF YOU ARE THE AUTHOR (OR AN AUTHOR) OF DOCUMENT "{0}" use the buttons to answer the user's request.</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.para2">This repository will propose an appropriate model reply, which you may edit.</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.contactRequester">Initial reply to requester</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.contactAuthor"> Author permission request</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.send">Send copy</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseDecisionForm.dontSend">Don't send copy</message>
+
+	<!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestResponseTrueForm.java -->
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.title">Document copy request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.trail">Document copy request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.head">Document copy request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.para1">This is the text to be sent to the applicant.</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.message">Message</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.subject">Subject</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.toEmail">To</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.mail">Send</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.back">Back</message>
+
+    <!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestResponseFalseForm.java -->
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.title">Document copy request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.trail">Document copy request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.head">Document copy request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.para1">This is the text to be sent to the applicant (together with the document).</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.message">Message</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.subject">Subject</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.toEmail">To</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.mail">Send</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestResponseTrueForm.back">Back</message>
+	
+	 <!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestChangeStatusForm.java -->
+	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.title">Change permissions request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.trail">Change permissions request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.head">Change permissions request</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.para1">You may use this occasion to reconsider the access restrictions on the document (to avoid having to respond to these requests), if there is no reason to keep it restricted. To do so, after inserting your name and e-mail (for authentication), click the button "Change to Open Access".</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.name">Name</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.email">E-mail</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.name.error">The name is required</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.email.error">The e-mail address is required</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.changeToOpen">Change to open access</message>
+	        
+	<!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestResponseFalseForm.java -->
+	<message key="xmlui.ArtifactBrowser.ItemRequestStatusChanged.title">Request sent</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestStatusChanged.trail">Request sent</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestStatusChanged.head">Your request to change permissions has been sent</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestStatusChanged.para1">Your request has been sent to the administrator</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestStatusChanged.para2">Thanks</message>
+
+    <!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestContactRequester.java -->
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactRequester.title">Document copy request</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactRequester.trail">Document copy request</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactRequester.head">Document copy request</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactRequester.para1">Initial communication with the requester, to let them know their request is being processed.</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactRequester.toEmail">To</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactRequester.subject">Subject</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactRequester.message">Message</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactRequester.mail">Send</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactRequester.back">Back</message>
+
+    <!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestContactAuthor.java -->
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactAuthor.title">Document copy request</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactAuthor.trail">Document copy request</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactAuthor.head">Document copy request</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactAuthor.para1">This is the text to be sent to the applicant (together with the document).</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactAuthor.toEmail">To</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactAuthor.subject">Subject</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactAuthor.message">Message</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactAuthor.mail">Send</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestContactAuthor.back">Back</message>
+
+    <!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestResponseSent.java -->
+    <message key="xmlui.ArtifactBrowser.ItemRequestResponseSent.title">Your response has been sent.</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestResponseSent.trail">Your response has been sent.</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestResponseSent.head">Your response has been sent.</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestResponseSent.para1">Your response has been sent.</message>
+
+
+	
 	<!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 		                EPerson Aspect
@@ -403,6 +573,7 @@
 	<message key="xmlui.EPerson.LDAPLogin.error_bad_login">The user name and/or password supplied were not valid.</message>
 	<message key="xmlui.EPerson.LDAPLogin.password">Password</message>
 	<message key="xmlui.EPerson.LDAPLogin.submit">Sign in</message>
+    <message key="xmlui.EPerson.LDAPLogin.link_to_password_login">Not an LDAP User? Use password login.</message>
 
 	<!-- org.dspace.app.xmlui.eperson.LoginChooser.java -->
 	<message key="xmlui.EPerson.LoginChooser.title">Choose a Login Method</message>
@@ -522,7 +693,7 @@
 	<!-- org.dspace.app.xmlui.Submission.submissions -->
 	<message key="xmlui.Submission.Submissions.title">Submissions &amp; Workflow</message>
 	<message key="xmlui.Submission.Submissions.trail">Submissions</message>
-	<message key="xmlui.Submission.Submissions.head">Submissions &amp; workflow tasks</message>
+	<message key="xmlui.Submission.Submissions.head">Submissions &amp; Workflow tasks</message>
 	<message key="xmlui.Submission.Submissions.untitled"><i>Untitled</i></message>
 	<message key="xmlui.Submission.Submissions.email">email: </message>
 	<!-- Same transformer, workflow section -->
@@ -542,7 +713,7 @@
 	<!-- Same transformer, submissions section -->
 	<message key="xmlui.Submission.Submissions.submit_head1">Submissions</message>
 	<message key="xmlui.Submission.Submissions.submit_info1a">You may </message>
-	<message key="xmlui.Submission.Submissions.submit_info1b">start a new submission</message>
+	<message key="xmlui.Submission.Submissions.submit_info1b">start a new submission.</message>
 	<message key="xmlui.Submission.Submissions.submit_info1c">The submission process includes describing the item and uploading the file(s) comprising it. Each community or collection may set its own submission policy.</message>
 	<message key="xmlui.Submission.Submissions.submit_head2">Unfinished submissions</message>
 	<message key="xmlui.Submission.Submissions.submit_info2a">These are incomplete item submissions. You may also </message>
@@ -572,14 +743,24 @@
 	<message key="xmlui.Submission.Submissions.status_6">Submission being edited</message>
 	<message key="xmlui.Submission.Submissions.status_7">Submission has been archived</message>
 	<message key="xmlui.Submission.Submissions.status_unknown">Unknown state</message>
+        <!-- Same transformer, completed submissions section -->
+        <message key="xmlui.Submission.Submissions.completed.head">Archived Submissions</message>
+        <message key="xmlui.Submission.Submissions.completed.info">These are your completed submissions which have been accepted into DSpace.</message>
+        <message key="xmlui.Submission.Submissions.completed.column1">Date accepted</message>
+        <message key="xmlui.Submission.Submissions.completed.column2">Title</message>
+        <message key="xmlui.Submission.Submissions.completed.column3">Collection</message>
+        <message key="xmlui.Submission.Submissions.completed.limit">We've only listed 50 of your archived submissions above. </message>
+        <message key="xmlui.Submission.Submissions.completed.displayall">Display all my archived submissions.</message>
 
 	<!-- submission progress bar messages -->
 	<message key="xmlui.Submission.submit.progressbar.initial-questions">Initial Questions</message>
 	<message key="xmlui.Submission.submit.progressbar.describe">Describe</message>
-	<message key="xmlui.Submission.submit.progressbar.upload">Upload</message>
+    <message key="xmlui.Submission.submit.progressbar.access">Access</message>
+    <message key="xmlui.Submission.submit.progressbar.upload">Upload</message>
 	<message key="xmlui.Submission.submit.progressbar.verify">Review</message>
 	<message key="xmlui.Submission.submit.progressbar.creative-commons">Creative Commons</message>
-	<message key="xmlui.Submission.submit.progressbar.license">License</message>
+	<message key="xmlui.Submission.submit.progressbar.CClicense">CC License</message>
+    <message key="xmlui.Submission.submit.progressbar.license">License</message>
 	<message key="xmlui.Submission.submit.progressbar.complete">Complete</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.ResumeStep -->
@@ -627,14 +808,63 @@
 	<message key="xmlui.Submission.submit.DescribeStep.day">Day</message>
 	<message key="xmlui.Submission.submit.DescribeStep.series_name">Series Name</message>
 	<message key="xmlui.Submission.submit.DescribeStep.report_no">Report or paper No.</message>
+	<message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.link">Subject Categories</message>
+	<message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.title">Subject Categories</message>
+	<message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.filter.label">Filter subjects</message>
+	<message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.filter.button">Filter</message>
+	<message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.loading">Please wait while the controlled vocabulary is loading.</message>
+	<message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.error">There was an issue when loading the controlled vocabulary, please try again later.</message>
 
-	<!-- org.dspace.app.xmlui.Submission.submit.UploadStep -->
+
+    <!-- org.dspace.app.xmlui.Submission.submit.AccessStep -->
+    <message key="xmlui.Submission.submit.AccessStep.head">Access Settings</message>
+    <message key="xmlui.Submission.submit.AccessStep.access_settings">Visible to a group of selected users (no selection needed for Anonymous)</message>
+    <message key="xmlui.Submission.submit.AccessStep.open_access">Allow access once item is accepted into archive</message>
+    <message key="xmlui.Submission.submit.AccessStep.embargo">Embargo until specific date</message>
+    <message key="xmlui.Submission.submit.AccessStep.embargo_visible">Access for selected group</message>
+    <message key="xmlui.Submission.submit.AccessStep.name">Policy name</message>
+    <message key="xmlui.Submission.submit.AccessStep.name_help">A short, descriptive name for the policy (up to 30 characters). May be shown to end users. Example: "Staff-only". Optional but recommended.</message>
+    <message key="xmlui.Submission.submit.AccessStep.description">Description</message>
+    <message key="xmlui.Submission.submit.AccessStep.reason">Embargo reason</message>
+    <message key="xmlui.Submission.submit.AccessStep.reason_help">The reason for the embargo, typically for internal use only. Optional.</message>
+    <message key="xmlui.Submission.submit.AccessStep.submit_add_policy">Confirm Policy &amp; add another</message>
+    <message key="xmlui.Submission.submit.AccessStep.list_assigned_groups">Group</message>
+    <message key="xmlui.Submission.submit.AccessStep.error_format_date">Error format date</message>
+    <message key="xmlui.Submission.submit.AccessStep.error_missing_date">When Embargo selected, date is required</message>
+    <message key="xmlui.Submission.submit.AccessStep.error_duplicated_policy">An identical policy for this group and this action is already in place.</message>
+    <message key="xmlui.Submission.submit.AccessStep.table_policies">Group policies</message>
+    <message key="xmlui.Submission.submit.AccessStep.policies_help">Policies listed in this section override any default policies for the collection you're submitting to. If you wish to set an embargo but the target collection allows access for any user, you must set a policy that allows access for the Anonymous group only from a specific date onwards.</message>
+    <message key="xmlui.Submission.submit.AccessStep.no_policies">No group policies have been set up for this item.</message>
+    <message key="xmlui.Submission.submit.AccessStep.new_policy_head">Embargo</message>
+    <message key="xmlui.Submission.submit.AccessStep.private_settings">Private item</message>
+    <message key="xmlui.Submission.submit.AccessStep.private_settings_help">If selected, the item won't be searchable</message>
+    <message key="xmlui.Submission.submit.AccessStep.private_settings_label">Private</message>
+    <message key="xmlui.Submission.submit.AccessStep.column0">Name</message>
+    <message key="xmlui.Submission.submit.AccessStep.column1">Action</message>
+    <message key="xmlui.Submission.submit.AccessStep.column2">Group</message>
+    <message key="xmlui.Submission.submit.AccessStep.column3">Start Date</message>
+    <message key="xmlui.Submission.submit.AccessStep.column4">End Date</message>
+    <message key="xmlui.Submission.submit.AccessStep.table_edit_button">Edit</message>
+    <message key="xmlui.Submission.submit.AccessStep.table_delete_button">Remove</message>
+    <message key="xmlui.administrative.authorization.AccessStep.label_date_help">The first day from which access is allowed. Accepted format: yyyy, yyyy-mm, yyyy-mm-dd</message>
+    <message key="xmlui.Submission.submit.AccessStep.review_policy_line">Name: {0}; action: {1}, group: {2}, start date: {3}, end date: {4}</message>
+    <message key="xmlui.Submission.submit.AccessStep.review_public_item">The item will be searchable</message>
+    <message key="xmlui.Submission.submit.AccessStep.review_private_item">The item will not be searchable</message>
+
+
+
+    <!-- org.dspace.app.xmlui.Submission.submit.EditPolicyStep -->
+    <message key="xmlui.Submission.submit.EditPolicyStep.head">Edit Policy</message>
+
+    <!-- org.dspace.app.xmlui.Submission.submit.UploadStep -->
 	<message key="xmlui.Submission.submit.UploadStep.head">Upload File(s)</message>
 	<message key="xmlui.Submission.submit.UploadStep.file">File</message>
 	<message key="xmlui.Submission.submit.UploadStep.file_help">Please enter the full path of the file on your computer corresponding to your item. If you click "Browse...", a new window will allow you to select the file from your computer.</message>
 	<message key="xmlui.Submission.submit.UploadStep.file_error">The item must contain at least one file.</message>
 	<message key="xmlui.Submission.submit.UploadStep.upload_error">There was a problem uploading your file.  Either the filename you entered was incorrect, there was a network problem which prevented the file from reaching us correctly, or you have attempted to upload a file format marked for internal system use only.  Please try again.</message>
-	<message key="xmlui.Submission.submit.UploadStep.description">File Description</message>
+	<message key="xmlui.Submission.submit.UploadStep.virus_error">The file has not been uploaded as it appears to contain a virus. Please contact the system administrator.</message>
+    <message key="xmlui.Submission.submit.UploadStep.virus_checker_error">A technical problem was encountered whilst attempting to scan the file for viruses. Please contact the system administrator.</message>
+    <message key="xmlui.Submission.submit.UploadStep.description">File Description</message>
 	<message key="xmlui.Submission.submit.UploadStep.description_help">Optionally, provide a brief description of the file, for example "<i>Main article</i>", or "<i>Experiment data readings</i>".</message>
 	<message key="xmlui.Submission.submit.UploadStep.submit_upload">Upload file &amp; add another</message>
 	<message key="xmlui.Submission.submit.UploadStep.head2">Files Uploaded</message>
@@ -654,6 +884,37 @@
 	<message key="xmlui.Submission.submit.UploadStep.checksum">File checksum:</message>
 	<message key="xmlui.Submission.submit.UploadStep.submit_remove">Remove selected files</message>
 
+
+
+    <message key="xmlui.Submission.submit.UploadWithEmbargoStep.head">Upload File(s)</message>
+    <message key="xmlui.Submission.submit.UploadWithEmbargoStep.file">File</message>
+    <message key="xmlui.Submission.submit.UploadWithEmbargoStep.file_help">Please enter the full path of the file on your computer corresponding to your item. If you click "Browse...", a new window will allow you to select the file from your computer.</message>
+    <message key="xmlui.Submission.submit.UploadWithEmbargoStep.file_error">The item must contain at least one file.</message>
+    <message key="xmlui.Submission.submit.UploadWithEmbargoStep.upload_error">There was a problem uploading your file. Either the filename you entered was incorrect, there was a network problem which prevented the file from reaching us correctly, or you have attempted to upload a file format marked for internal system use only. Please try again.</message>
+    <message key="xmlui.Submission.submit.UploadWithEmbargoStep.virus_error">The file has not been uploaded as it appears to contain a virus. Please contact the system administrator.</message>
+    <message key="xmlui.Submission.submit.UploadWithEmbargoStep.virus_checker_error">A technical problem was encountered whilst attempting to scan the file for viruses. Please contact the system administrator.</message>
+    <message key="xmlui.Submission.submit.UploadWithEmbargoStep.description">File Description</message>
+    <message key="xmlui.Submission.submit.UploadWithEmbargoStep.description_help">Optionally, provide a brief description of the file, for example "<i>Main article</i>", or "<i>Experiment data readings</i>".</message>
+    <message key="xmlui.Submission.submit.UploadWithEmbargoStep.submit_upload">Upload file &amp; add another</message>
+    <message key="xmlui.Submission.submit.UploadWithEmbargoStep.head2">Files Uploaded</message>
+    <message key="xmlui.Submission.submit.UploadWithEmbargoStep.column0">Primary</message>
+    <message key="xmlui.Submission.submit.UploadWithEmbargoStep.column1">  </message>
+    <message key="xmlui.Submission.submit.UploadWithEmbargoStep.column2">File</message>
+    <message key="xmlui.Submission.submit.UploadWithEmbargoStep.column3">Size</message>
+    <message key="xmlui.Submission.submit.UploadWithEmbargoStep.column4">Description</message>
+    <message key="xmlui.Submission.submit.UploadWithEmbargoStep.column5">Format</message>
+    <message key="xmlui.Submission.submit.UploadWithEmbargoStep.column6"></message>
+    <message key="xmlui.Submission.submit.UploadWithEmbargoStep.unknown_name">Unknown</message>
+    <message key="xmlui.Submission.submit.UploadWithEmbargoStep.unknown_format">unknown format</message>
+    <message key="xmlui.Submission.submit.UploadWithEmbargoStep.supported">(Supported)</message>
+    <message key="xmlui.Submission.submit.UploadWithEmbargoStep.known">(Known)</message>
+    <message key="xmlui.Submission.submit.UploadWithEmbargoStep.unsupported">(Unsupported)</message>
+    <message key="xmlui.Submission.submit.UploadWithEmbargoStep.submit_edit">Edit</message>
+    <message key="xmlui.Submission.submit.UploadWithEmbargoStep.checksum">File checksum:</message>
+    <message key="xmlui.Submission.submit.UploadWithEmbargoStep.submit_remove">Remove selected files</message>
+    <message key="xmlui.Submission.submit.UploadWithEmbargoStep.submit_policy">Policies</message>
+
+
 	<!-- org.dspace.app.xmlui.Submission.submit.EditFileStep -->
 	<message key="xmlui.Submission.submit.EditFileStep.head">Edit File</message>
 	<message key="xmlui.Submission.submit.EditFileStep.file">File</message>
@@ -666,6 +927,10 @@
 	<message key="xmlui.Submission.submit.EditFileStep.info2">If the format is not in the above list, <strong>select "format not in list" above</strong> and describe the file's format in the box below.</message>
 	<message key="xmlui.Submission.submit.EditFileStep.format_user">Other Format</message>
 	<message key="xmlui.Submission.submit.EditFileStep.format_user_help">The application's name you used to create the file, and the version number (for example, "<i>ACMESoft SuperApp version 1.5</i>").</message>
+
+    <!-- org.dspace.app.xmlui.Submission.submit.EditBitstreamPolicies -->
+    <message key="xmlui.Submission.submit.EditBitstreamPolicies.head">Bitstream Access</message>
+
 
 	<!-- org.dspace.app.xmlui.Submission.submit.ReviewStep -->
 	<message key="xmlui.Submission.submit.ReviewStep.head">Review Submission</message>
@@ -684,12 +949,15 @@
 	<message key="xmlui.Submission.submit.ReviewStep.supported">supported</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.CCLicenseStep -->
-	<message key="xmlui.Submission.submit.CCLicenseStep.head">Creative Commons License</message>
-	<message key="xmlui.Submission.submit.CCLicenseStep.info1">If you wish, you may add a <a href="http://creativecommons.org/">Creative Commons</a> License to your item. <strong>Creative Commons licenses govern what people who read your work may then do with it.</strong> If you wish to select a Creative Commons license click the button below. You will be taken to the Creative Commons website, where you will be presented with several licensing options.  After selecting a license, you will be returned to this page.</message>
-	<message key="xmlui.Submission.submit.CCLicenseStep.submit_to_creative_commons">Proceed to Creative Commons website to select a license</message>
-	<message key="xmlui.Submission.submit.CCLicenseStep.license">License</message>
-	<message key="xmlui.Submission.submit.CCLicenseStep.submit_remove">Remove this Creative Commons License</message>
-	<message key="xmlui.Submission.submit.CCLicenseStep.no_license">no creative commons license selected</message>
+        <message key="xmlui.Submission.submit.CCLicenseStep.ccws_error">An error occurred ... {0}</message>
+        <message key="xmlui.Submission.submit.CCLicenseStep.head">License Your Work</message>
+        <message key="xmlui.Submission.submit.CCLicenseStep.info1">If you wish, you may add a <a href="http://creativecommons.org/">Creative Commons</a> License to your item. <strong>Creative Commons licenses govern what people who read your work may then do with it.</strong></message>
+        <message key="xmlui.Submission.submit.CCLicenseStep.submit_choose_creative_commons">Choose a license</message>
+        <message key="xmlui.Submission.submit.CCLicenseStep.submit_to_creative_commons">Proceed to Creative Commons website to select a license</message>
+        <message key="xmlui.Submission.submit.CCLicenseStep.license">License Type</message>
+        <message key="xmlui.Submission.submit.CCLicenseStep.select_change">Select or modify your license ...</message>
+        <message key="xmlui.Submission.submit.CCLicenseStep.no_license">No Creative Commons License</message>
+        <message key="xmlui.Submission.submit.CCLicenseStep.save_changes">You must click Next to save your changes.</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.LicenseStep -->
 	<message key="xmlui.Submission.submit.LicenseStep.head">Distribution License</message>
@@ -715,7 +983,7 @@
 	<message key="xmlui.Submission.workflow.PerformTaskStep.info1">Actions you may perform on this task:</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.take_help">Assign this task to yourself.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.take_submit">Take task</message>
-	<message key="xmlui.Submission.workflow.PerformTaskStep.leave_help">Leave this task in the pool for another to take.</message>
+	<message key="xmlui.Submission.workflow.PerformTaskStep.leave_help">Leave this task in the pool for another user to take.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.leave_submit">Leave task</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.approve_help">If you have reviewed the item and it is suitable for inclusion in the collection, select "Approve".</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.approve_submit">Approve item</message>
@@ -745,7 +1013,11 @@
 
 	<!-- action-generated messages. These are referenced from the sitemap rather than a transformer -->
 
-	<message key="xmlui.administrative.FlowEPersonUtils.add_eperson_success_notice">The user was added successfully.</message>
+        <message key="xmlui.administrative.FlowCurationUtils.curate_success_notice">The task was completed successfully.</message>
+        <message key="xmlui.administrative.FlowCurationUtils.curate_failed_notice">The task exited unexpectedly or failed. For more information, please contact the site administrator or check your system logs.</message>
+        <message key="xmlui.administrative.FlowCurationUtils.queue_success_notice">The task was queued successfully.</message>
+        <message key="xmlui.administrative.FlowCurationUtils.queue_failed_notice">The task could not be queued. An error occurred. For more information, please contact the site administrator or check your system logs.</message>
+        <message key="xmlui.administrative.FlowEPersonUtils.add_eperson_success_notice">The user was added successfully.</message>
 	<message key="xmlui.administrative.FlowEPersonUtils.edit_eperson_success_notice">The user was edited successfully.</message>
 	<message key="xmlui.administrative.FlowEPersonUtils.reset_password_success_notice">An email message has been sent to the user containing a token that may be used to choose a new password.</message>
 	<message key="xmlui.administrative.FlowEPersonUtils.delete_eperson_success_notice">The user(s) were deleted successfully.</message>
@@ -800,11 +1072,15 @@
 	<message key="xmlui.administrative.Navigation.administrative_registries">Registries</message>
 	<message key="xmlui.administrative.Navigation.administrative_metadata">Metadata</message>
 	<message key="xmlui.administrative.Navigation.administrative_format">Format</message>
+    <message key="xmlui.administrative.Navigation.administrative_content">Content Administration</message>
 	<message key="xmlui.administrative.Navigation.administrative_items">Items</message>
     <message key="xmlui.administrative.Navigation.administrative_withdrawn">Withdrawn Items</message>
-	<message key="xmlui.administrative.Navigation.administrative_control_panel">Control Panel</message>
+    <message key="xmlui.administrative.Navigation.administrative_private">Private Items</message>
+    <message key="xmlui.administrative.Navigation.administrative_control_panel">Control Panel</message>
     <message key="xmlui.administrative.Navigation.statistics">Statistics</message>
+    <message key="xmlui.administrative.Navigation.administrative_batch_import">Batch Import (ZIP)</message>
         <message key="xmlui.administrative.Navigation.administrative_import_metadata">Import Metadata</message>
+        <message key="xmlui.administrative.Navigation.administrative_curation">Curation Tasks</message>
 
     <!-- my account items -->
 	<message key="xmlui.administrative.Navigation.account_export">My Exports</message>
@@ -1132,8 +1408,11 @@
 	<message key="xmlui.administrative.authorization.EditContainerPolicies.main_add_link">Click here to add a new policy. </message>
 	<message key="xmlui.administrative.authorization.EditContainerPolicies.submit_add">Add</message>
 	<message key="xmlui.administrative.authorization.EditContainerPolicies.head_id">ID</message>
+    <message key="xmlui.administrative.authorization.EditContainerPolicies.head_name">Name</message>
 	<message key="xmlui.administrative.authorization.EditContainerPolicies.head_action">Action</message>
 	<message key="xmlui.administrative.authorization.EditContainerPolicies.head_group">Group</message>
+    <message key="xmlui.administrative.authorization.EditContainerPolicies.head_start_date">Start Date</message>
+    <message key="xmlui.administrative.authorization.EditContainerPolicies.head_end_date">End Date</message>
 	<message key="xmlui.administrative.authorization.EditContainerPolicies.submit_delete">Delete Selected</message>
 	<message key="xmlui.administrative.authorization.EditContainerPolicies.group_edit">Edit</message>
 
@@ -1175,12 +1454,20 @@
     <message key="xmlui.administrative.authorization.EditPolicyForm.submit_search_groups">Search</message>
     <message key="xmlui.administrative.authorization.EditPolicyForm.label_action">Select the action</message>
 
+    <message key="xmlui.administrative.authorization.EditPolicyForm.label_name">Name</message>
+    <message key="xmlui.administrative.authorization.EditPolicyForm.label_description">Description</message>
+    <message key="xmlui.administrative.authorization.EditPolicyForm.label_start_date">Start Date</message>
+    <message key="xmlui.administrative.authorization.EditPolicyForm.label_end_date">End Date</message>
+    <message key="xmlui.administrative.authorization.EditPolicyForm.error_date_format">Invalid date</message>
+    <message key="xmlui.administrative.authorization.EditPolicyForm.error_duplicated_policy">An identical policy for this group and this action is already in place.</message>
+    <message key="xmlui.administrative.authorization.EditPolicyForm.error_start_date_greater_than_end_date">Start date is greater than end date</message>
+    <message key="xmlui.administrative.authorization.EditPolicyForm.label_date_help">Accepted format: yyyy, yyyy-mm, yyyy-mm-dd</message>
 
-	<!-- org.dspace.app.xmlui.administrative.authorization.AdvacedAuthorizationsForm -->
+    <!-- org.dspace.app.xmlui.administrative.authorization.AdvacedAuthorizationsForm -->
 	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.title">Advanced Policy Manager</message>
 	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.trail">Advanced Authorizations</message>
 	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.main_head">Advanced Policy Manager</message>
-	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.main_para">Allows wildcard additions to and clearing of policies for types of content within specific collection(s). WARNING - removing READ permissions from items will make them not viewable!</message>
+	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.main_para">Allows wildcard additions to and clearing of policies for items or bitstreams within specific collection(s). WARNING - removing READ permissions from items will make them not viewable!</message>
 	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.actions_groupSentence">For all of the selected groups...</message>
     <message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.actions_actionSentence">...grant the ability to perform the following action...</message>
 	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.actions_resourceSentence">...for all following object types...</message>
@@ -1191,6 +1478,16 @@
 	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.actions_policyCollections">Collection</message>
 	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.submit_add">Add policies</message>
 	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.submit_remove_all">Clear policies</message>
+    <message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.label_date_help">Accepted format: yyyy, yyyy-mm, yyyy-mm-dd</message>
+
+    <message key="xmlui.administrative.authorization.AdvancedAuthorizationsForm.actions_name">Name</message>
+    <message key="xmlui.administrative.authorization.AdvancedAuthorizationsForm.actions_description">Description</message>
+    <message key="xmlui.administrative.authorization.AdvancedAuthorizationsForm.actions_start_date">Start Date</message>
+    <message key="xmlui.administrative.authorization.AdvancedAuthorizationsForm.actions_end_date">End Date</message>
+    <message key="xmlui.administrative.authorization.AdvancedAuthorizationsForm.error_date_format">Invalid date</message>
+    <message key="xmlui.administrative.authorization.AdvancedAuthorizationsForm.error_start_date_greater_than_end_date">Start date is greater than end date</message>
+    <message key="xmlui.administrative.authorization.AdvancedAuthorizationsForm.error_groupIds">Select at least a group</message>
+    <message key="xmlui.administrative.authorization.AdvancedAuthorizationsForm.error_collectionIds">Select at least a collection</message>
 
 	<!-- org.dspace.app.xmlui.administrative.authorization.DeletePoliciesConfirm -->
 	<message key="xmlui.administrative.authorization.DeletePoliciesConfirm.title">Confirm Policy Deletion</message>
@@ -1200,6 +1497,41 @@
 	<message key="xmlui.administrative.authorization.DeletePoliciesConfirm.head_id">ID</message>
 	<message key="xmlui.administrative.authorization.DeletePoliciesConfirm.head_action">Action</message>
 	<message key="xmlui.administrative.authorization.DeletePoliciesConfirm.head_group">Group</message>
+
+
+    <!-- Batch Import Tool -->
+    <!-- org.dspace.app.xmlui.administrative.batchimport -->
+    <message key="xmlui.administrative.batchimport.general.select_collection">Select a collection</message>
+    <message key="xmlui.administrative.batchimport.general.collection">Collection</message>
+    <message key="xmlui.administrative.batchimport.general.collection_help">Select the collection you wish to submit an item to.</message>
+    <message key="xmlui.administrative.batchimport.general.collection_default">Select a collection...</message>
+
+    <message key="xmlui.administrative.batchimport.general.title">Import Batch Load (ZIP)</message>
+    <message key="xmlui.administrative.batchimport.general.head1">Import Batch Load (ZIP)</message>
+    <message key="xmlui.administrative.batchimport.general.trail">Import Batch Load (ZIP)</message>
+    <message key="xmlui.administrative.batchimport.general.changes">changes</message>
+    <message key="xmlui.administrative.batchimport.general.no_changes">No changes were detected</message>
+    <message key="xmlui.administrative.batchimport.general.new_item">New item</message>
+    <message key="xmlui.administrative.batchimport.flow.upload_successful">Upload successful</message>
+    <message key="xmlui.administrative.batchimport.flow.upload_failed">Upload failed or no file selected</message>
+    <message key="xmlui.administrative.batchimport.flow.upload_badschema">Unknown metadata schema in heading</message>
+    <message key="xmlui.administrative.batchimport.flow.upload_badelement">Unknown metadata element in heading</message>
+    <message key="xmlui.administrative.batchimport.flow.import_successful">Import successful</message>
+    <message key="xmlui.administrative.batchimport.flow.import_failed">Import failed</message>
+    <message key="xmlui.administrative.batchimport.flow.failed_no_collection">No Destination Collection Specified</message>
+
+    <!-- org.dspace.app.xmlui.administrative.batchimport.BatchImportConfirm -->
+    <message key="xmlui.administrative.batchimport.BatchmportMain.submit_upload">Upload SimpleArchiveFormat ZIP</message>
+
+    <!-- org.dspace.app.xmlui.administrative.batchimport.BatchImportConfirm -->
+    <message key="xmlui.administrative.batchimport.BatchImportConfirm.success">Successfully processed</message>
+    <message key="xmlui.administrative.batchimport.BatchImportConfirm.changes_committed">Changes applied to item</message>
+    <message key="xmlui.administrative.batchimport.BatchImportConfirm.item_added">Added: </message>
+    <message key="xmlui.administrative.batchimport.BatchImportConfirm.item_removed">Removed: </message>
+
+    <!-- org.dspace.app.xmlui.administrative.batchimport.BatchImportUpload -->
+    <message key="xmlui.administrative.batchimport.BatchImportUpload.item_add">Add: </message>
+    <message key="xmlui.administrative.batchimport.BatchImportUpload.item_remove">Remove: </message>
 
 	<!-- general edit item messages -->
 	<message key="xmlui.administrative.item.general.item_trail">Items</message>
@@ -1221,7 +1553,7 @@
 	<message key="xmlui.administrative.item.AddBitstreamForm.bundle.METADATA">Metadata Files</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.bundle.THUMBNAIL">Thumbnails</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.bundle.LICENSE">Licenses</message>
-	<message key="xmlui.administrative.item.AddBitstreamForm.bundle.CC_LICENSE">Creative Commons Licenses</message>
+	<message key="xmlui.administrative.item.AddBitstreamForm.bundle.CC-LICENSE">Creative Commons Licenses</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.file_label">File</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.file_help">Please enter the name of the file on your computer corresponding to your item. If you click "Browse...", a new window will appear in which you can locate and select the file from your computer.</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.description_label">Description</message>
@@ -1250,6 +1582,8 @@
 	<message key="xmlui.administrative.item.ConfirmItemForm.column3">Language</message>
 	<message key="xmlui.administrative.item.ConfirmItemForm.submit_withdraw">Withdraw</message>
 	<message key="xmlui.administrative.item.ConfirmItemForm.submit_reinstate">Reinstate</message>
+    <message key="xmlui.administrative.item.ConfirmItemForm.submit_private">Make it Private</message>
+    <message key="xmlui.administrative.item.ConfirmItemForm.submit_public">Make it Public</message>
 
     <!-- org.dspace.app.xmlui.aspect.administrative.item.MoveItemForm -->
 	<message key="xmlui.administrative.item.MoveItemForm.title">Move</message>
@@ -1278,6 +1612,8 @@
 	<message key="xmlui.administrative.item.EditBitstreamForm.para2">If the format is not in the above list, <strong>select "format not in list" above</strong> and describe it in the field below.</message>
 	<message key="xmlui.administrative.item.EditBitstreamForm.user_label">Other Format</message>
 	<message key="xmlui.administrative.item.EditBitstreamForm.user_help">The application you used to create the file, and the version number (for example, "<i>ACMESoft SuperApp version 1.5</i>").</message>
+    <message key="xmlui.administrative.item.EditBitstreamForm.name_label">Filename:</message>
+    <message key="xmlui.administrative.item.EditBitstreamForm.name_help">Change the filename for this bitstream. Note that this will change the display bitstream URL, but old links will still resolve as long as the sequence ID does not change.</message>
 
 	<!-- org.dspace.app.xmlui.administrative.item.EditItemBitstreamsForm -->
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.title">Item Bitstreams</message>
@@ -1288,13 +1624,19 @@
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.column3">Description</message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.column4">Format</message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.column5">View</message>
+	<message key="xmlui.administrative.item.EditItemBitstreamsForm.column6">Order</message>
+	<message key="xmlui.administrative.item.EditItemBitstreamsForm.column7"> </message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.bundle_label"><strong>Bundle: {0}</strong></message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.primary_label"> (primary) </message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.view_link">view</message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.submit_add">Upload a new bitstream</message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.submit_delete">Delete bitstreams</message>
+	<message key="xmlui.administrative.item.EditItemBitstreamsForm.submit_reorder">Update bitstream order</message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.no_upload">You need the ADD &amp; WRITE privilege on the item and bundles to be able to upload new bitstreams.</message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.no_remove">Only System Administrators can delete bitstreams / files.</message>
+	<message key="xmlui.administrative.item.EditItemBitstreamsForm.previous_order">Previous:</message>
+	<message key="xmlui.administrative.item.EditItemBitstreamsForm.order_up">Move up</message>
+	<message key="xmlui.administrative.item.EditItemBitstreamsForm.order_down">Move down</message>
 
 	<!-- org.dspace.app.xmlui.administrative.item.EditItemMetadataForm -->
 	<message key="xmlui.administrative.item.EditItemMetadataForm.title">Item Metadata</message>
@@ -1333,7 +1675,13 @@
 	<message key="xmlui.administrative.item.EditItemStatusForm.na">n/a</message>
 	<message key="xmlui.administrative.item.EditItemStatusForm.sysadmins_only">(system administrators only)</message>
 	<message key="xmlui.administrative.item.EditItemStatusForm.collection_admins_only">(collection administrators only)</message>
-	<message key="xmlui.administrative.item.EditItemStatusForm.not_allowed">(you are not allowed to performe this action)</message>
+	<message key="xmlui.administrative.item.EditItemStatusForm.not_allowed">(you are not allowed to perform this action)</message>
+    <message key="xmlui.administrative.item.EditItemStatusForm.label_private">Make item private</message>
+    <message key="xmlui.administrative.item.EditItemStatusForm.label_public">Make item public</message>
+    <message key="xmlui.administrative.item.EditItemStatusForm.submit_private">Make it private...</message>
+    <message key="xmlui.administrative.item.EditItemStatusForm.submit_public">Make it public...</message>
+
+
 
 	<!-- org.dspace.app.xmlui.administrative.item.ViewItem -->
 	<message key="xmlui.administrative.item.ViewItem.title">View Item</message>
@@ -1360,8 +1708,8 @@
         <message key="xmlui.administrative.metadataimport.general.new_item">New item</message>
         <message key="xmlui.administrative.metadataimport.flow.upload_successful">Upload successful</message>
         <message key="xmlui.administrative.metadataimport.flow.upload_failed">Upload failed</message>
-    <message key="xmlui.administrative.metadataimport.flow.upload_badschema">Unknown metadata schema in heading</message>
-    <message key="xmlui.administrative.metadataimport.flow.upload_badelement">Unknown metadata element in heading</message>
+        <message key="xmlui.administrative.metadataimport.flow.upload_badschema">Unknown metadata schema in heading</message>
+        <message key="xmlui.administrative.metadataimport.flow.upload_badelement">Unknown metadata element in heading</message>
         <message key="xmlui.administrative.metadataimport.flow.import_successful">Import successful</message>
         <message key="xmlui.administrative.metadataimport.flow.import_failed">Import failed</message>
         <message key="xmlui.administrative.metadataimport.flow.over_limit">Number of changes exceeds maximum allowed. Limit changes or alter bulkedit.gui-item-limit in dspace.cfg</message>
@@ -1378,6 +1726,9 @@
         <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.collection_oldowner">Removed from owning collection</message>
         <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.collection_mapped">Mapped to collection</message>
         <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.collection_unmapped">Unmapped from collection</message>
+        <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.item_deleted">Item Expunged</message>
+        <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.item_withdrawn">Item Withdrawn</message>
+        <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.item_reinstated">Item Reinstated</message>
 
         <!-- org.dspace.app.xmlui.administrative.metadataimport.MetadataImportUpload -->
         <message key="xmlui.administrative.metadataimport.MetadataImportUpload.item_add">Add: </message>
@@ -1389,6 +1740,9 @@
         <message key="xmlui.administrative.metadataimport.MetadataImportUpload.changes_pending">Changes pending for item</message>
         <message key="xmlui.administrative.metadataimport.MetadataImportUpload.submit_confirm">Apply changes</message>
         <message key="xmlui.administrative.metadataimport.MetadataImportUpload.hint">Pending changes are listed below for review</message>
+        <message key="xmlui.administrative.metadataimport.MetadataImportUpload.item_delete">Expunge Item</message>
+        <message key="xmlui.administrative.metadataimport.MetadataImportUpload.item_withdraw">Withdraw Item</message>
+        <message key="xmlui.administrative.metadataimport.MetadataImportUpload.item_reinstate">Reinstate Item</message>
 
 	<!-- general mapper messages -->
 	<message key="xmlui.administrative.mapper.general.mapper_trail">Item mapper</message>
@@ -1397,7 +1751,7 @@
 	<message key="xmlui.administrative.mapper.MapperMain.title">Item Mapper</message>
 	<message key="xmlui.administrative.mapper.MapperMain.head1">Item Mapper - Map Items from Other Collections</message>
 	<message key="xmlui.administrative.mapper.MapperMain.para1">Collection: "<strong>{0}</strong>"</message>
-	<message key="xmlui.administrative.mapper.MapperMain.para2">This is the item mapper tool that allows collection administrators to map items from other collections into this collection. You can search for items from other collection and map them, or browse the list of currently mapped items.</message>
+	<message key="xmlui.administrative.mapper.MapperMain.para2">This is the item mapper tool that allows collection administrators to map items from other collections into this collection. You can search for items from other collections and map them, or browse the list of currently mapped items.</message>
 	<message key="xmlui.administrative.mapper.MapperMain.stat_label">Statistics</message>
 	<message key="xmlui.administrative.mapper.MapperMain.stat_info"><strong>{0} of {1}</strong> items in this collection are mapped in from other collections</message>
 	<message key="xmlui.administrative.mapper.MapperMain.search_label">Search</message>
@@ -1460,6 +1814,7 @@
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.label_submitters">Submitters</message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.label_default_read">Default read access</message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.sysadmins_only"><nobr>(system administrators only)</nobr></message>
+	<message key="xmlui.administrative.collection.AssignCollectionRoles.repository_role"><br/>(Repository level group, system administrators only)</message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.not_allowed"><nobr>(you are not allowed to configure this)</nobr></message>
 
         <!-- org.dspace.app.xmlui.administrative.collection.CurateCollectionForm.java -->
@@ -1528,7 +1883,7 @@
 	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.label_metadata_format">Metadata Format</message>
 	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.help_oaiurl">The url of the target repository's OAI provider service</message>
 	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.error_oaiurl">You must provide a set id of the target collection.</message>
-	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.help_oaisetid">The persistent identifier used by the OAI provider to desginate the target collection</message>
+	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.help_oaisetid">The persistent identifier used by the OAI provider to designate the target collection</message>
 	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.error_oaisetid">You must provide a set id of the target collection.</message>
 	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.label_harvest_level">Content being harvested</message>
 	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.label_harvest_level">Content being harvested</message>
@@ -1549,8 +1904,8 @@
 	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.harvest_status_ready">Collection ready for harvest</message>
 	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.harvest_status_busy">Collection is currently being harvested</message>
 	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.harvest_status_queued">Collection is in queue for harvest</message>
-	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.harvest_status_oai_error">OAI error occured during last harvest</message>
-	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.harvest_status_unknown_error">Unexpected error occured during last harvest</message>
+	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.harvest_status_oai_error">OAI error occurred during last harvest</message>
+	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.harvest_status_unknown_error">Unexpected error occurred during last harvest</message>
 	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.option_md_only">Harvest metadata only.</message>
 	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.option_md_and_ref">Harvest metadata and references to bitstreams.</message>
 	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.option_md_and_bs">Harvest metadata and bitstreams (full replication).</message>
@@ -1660,17 +2015,26 @@
 	<message key="xmlui.administrative.ControlPanel.java_vendor">Java Runtime Environment Vendor</message>
 	<message key="xmlui.administrative.ControlPanel.os_name">Operating System Name</message>
 	<message key="xmlui.administrative.ControlPanel.os_arch">Operating System Architecture</message>
-	<message key="xmlui.administrative.ControlPanel.os_version">Operating Systesm Version</message>
+	<message key="xmlui.administrative.ControlPanel.os_version">Operating System Version</message>
 	<message key="xmlui.administrative.ControlPanel.runtime_head">Runtime statistics</message>
 	<message key="xmlui.administrative.ControlPanel.runtime_processors">Available processors</message>
 	<message key="xmlui.administrative.ControlPanel.runtime_max">Maximum memory</message>
 	<message key="xmlui.administrative.ControlPanel.runtime_total">Allocated memory</message>
 	<message key="xmlui.administrative.ControlPanel.runtime_used">Used memory</message>
 	<message key="xmlui.administrative.ControlPanel.runtime_free">Free memory</message>
-	<message key="xmlui.administrative.ControlPanel.dspace_head">HPS Repository Settings</message>
-	<message key="xmlui.administrative.ControlPanel.dspace_dir">HPS Repository Installation Directory</message>
-	<message key="xmlui.administrative.ControlPanel.dspace_url">HPS Repository Base URL</message>
-	<message key="xmlui.administrative.ControlPanel.dspace_hostname">HPS Repository Host Name</message>
+        <message key="xmlui.administrative.ControlPanel.cocoon_head">Cocoon Info</message>
+        <message key="xmlui.administrative.ControlPanel.cocoon_version">Cocoon Version</message>
+        <message key="xmlui.administrative.ControlPanel.cocoon_cache_dir">Cocoon Cache Directory</message>
+        <message key="xmlui.administrative.ControlPanel.cocoon_work_dir">Cocoon Work Directory</message>
+        <message key="xmlui.administrative.ControlPanel.cocoon_main_cache_size">Main Cache Size ({0})</message>
+        <message key="xmlui.administrative.ControlPanel.cocoon_cache_clear">(Clear Cache Immediately)</message>
+        <message key="xmlui.administrative.ControlPanel.cocoon_persistent_cache_size">Persistent Cache Size ({0})</message>
+        <message key="xmlui.administrative.ControlPanel.cocoon_transient_cache_size">Transient Cache Size ({0})</message>
+	<message key="xmlui.administrative.ControlPanel.dspace_head">DSpace Settings</message>
+        <message key="xmlui.administrative.ControlPanel.dspace_version">DSpace Version</message>
+	<message key="xmlui.administrative.ControlPanel.dspace_dir">DSpace Installation Directory</message>
+	<message key="xmlui.administrative.ControlPanel.dspace_url">DSpace Base URL</message>
+	<message key="xmlui.administrative.ControlPanel.dspace_hostname">DSpace Host Name</message>
 	<message key="xmlui.administrative.ControlPanel.dspace_name">Name of the Site</message>
 	<message key="xmlui.administrative.ControlPanel.db_name">Database Name</message>
 	<message key="xmlui.administrative.ControlPanel.db_url">Database URL</message>
@@ -1707,7 +2071,7 @@
 	<message key="xmlui.administrative.ControlPanel.start_bot">START recording bot activity.</message>
 	<message key="xmlui.administrative.ControlPanel.activity_sort_time">Time Stamp</message>
 	<message key="xmlui.administrative.ControlPanel.activity_sort_user">User</message>
-	<message key="xmlui.administrative.ControlPanel.activity_sort_ip">IP Address</message>
+	<message key="xmlui.administrative.ControlPanel.activity_sort_ip">IP address</message>
 	<message key="xmlui.administrative.ControlPanel.activity_sort_url">URL Page</message>
 	<message key="xmlui.administrative.ControlPanel.activity_sort_Agent">User-Agent</message>
 	<message key="xmlui.administrative.ControlPanel.activity_anonymous">Anonymous {0}</message>
@@ -1721,11 +2085,20 @@
 	<!-- org.dspace.app.xmlui.administrative.NotAuthorized -->
 	<message key="xmlui.administrative.NotAuthorized.title">Not Authorized</message>
 	<message key="xmlui.administrative.NotAuthorized.trail">Not authorized</message>
-	<message key="xmlui.administrative.NotAuthorized.head">Insufficent privileges</message>
-	<message key="xmlui.administrative.NotAuthorized.para1a">Your account has insufficent privileges to perform the requested action. If you feel this is an error or have questions about your privileges, please contact the site's </message>
+	<message key="xmlui.administrative.NotAuthorized.head">Insufficient privileges</message>
+	<message key="xmlui.administrative.NotAuthorized.para1a">Your account has insufficient privileges to perform the requested action. If you feel this is an error or have questions about your privileges, please contact the site's </message>
 	<message key="xmlui.administrative.NotAuthorized.para1b">system administrators</message>
 	<message key="xmlui.administrative.NotAuthorized.para1c">.</message>
 	<message key="xmlui.administrative.NotAuthorized.para2">Login as another user</message>
+        
+        <!-- System-wide Curation Tasks form (org.dspace.app.xmlui.aspect.administrative.CurateForm) -->
+        <message key="xmlui.administrative.CurateForm.title">System Curation Tasks</message>
+        <message key="xmlui.administrative.CurateForm.trail">Curation Tasks</message>
+        <message key="xmlui.administrative.CurateForm.object_label_name">Handle of DSpace Object</message>
+        <message key="xmlui.administrative.CurateForm.object_hint">Hint: Enter [your-handle-prefix]/0 to run a task across entire site (not all tasks may support this capability)</message>
+        <message key="xmlui.administrative.CurateForm.task_label_name">Task</message>
+    <!-- Used by Curate<DSO>Form classes also -->
+        <message key="xmlui.administrative.CurateForm.taskgroup_label_name">Choose from the following groups</message>
 
 
     <!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1734,6 +2107,12 @@
 
         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!-->
     <message key="xmlui.statistics.title">Statistics</message>
+    <message key="xmlui.statistics.search.title">Search Statistics</message>
+    <message key="xmlui.statistics.search.head">Search Statistics</message>
+    <message key="xmlui.statistics.search.head-dso">Search Statistics for {0}</message>
+    <message key="xmlui.statistics.search.error">There was an error while generating the search statistics, please try again later.</message>
+    <message key="xmlui.statistics.search.no-results">No search statistics available for the selected period.</message>
+    <message key="xmlui.statistics.workflow.title">Workflow Statistics</message>
     <message key="xmlui.statistics.visits.total">Total Visits</message>
     <message key="xmlui.statistics.visits.month">Total Visits Per Month</message>
     <message key="xmlui.statistics.visits.views">Views</message>
@@ -1741,14 +2120,73 @@
     <message key="xmlui.statistics.visits.cities">Top cities views</message>
     <message key="xmlui.statistics.visits.bitstreams">File Visits</message>
     <message key="xmlui.statistics.Navigation.title">Statistics</message>
-    <message key="xmlui.statistics.Navigation.view">View Statistics</message>
+    <message key="xmlui.statistics.Navigation.usage.view">View Usage Statistics</message>
+    <message key="xmlui.statistics.Navigation.usage-Elasticsearch.view">View Usage Statistics</message>
+    <message key="xmlui.statistics.Navigation.search.view">View Search Statistics</message>
+    <message key="xmlui.statistics.Navigation.workflow.view">View Workflow Statistics</message>
     <message key="xmlui.statistics.trail">Statistics</message>
+    <message key="xmlui.statistics.trail-search">Search Statistics</message>
+    <message key="xmlui.statistics.trail-workflow">Workflow Statistics</message>
+    <message key="xmlui.statistics.workflow.no-results">No workflow statistics available for the selected period.</message>
+    <message key="xmlui.statistics.workflow.error">There was an error while generating the workflow statistics, please try again later.</message>
+    <message key="xmlui.statistics.workflow.head">Workflow Statistics</message>
+    <message key="xmlui.statistics.workflow.head-dso">Workflow Statistics for {0}</message>
 
 
+    <message key="xmlui.statistics.StatisticsSearchTransformer.search-terms.head">Top Search Terms</message>
+    <message key="xmlui.statistics.StatisticsSearchTransformer.search-total.head">Total</message>
+    <message key="xmlui.statistics.StatisticsSearchTransformer.time-filter.last-month">Previous month</message>
+    <message key="xmlui.statistics.StatisticsSearchTransformer.time-filter.last-6-months">Previous 6 months</message>
+    <message key="xmlui.statistics.StatisticsSearchTransformer.time-filter.last-year">Previous year</message>
+    <message key="xmlui.statistics.StatisticsSearchTransformer.time-filter.overall">Overall</message>
 
 
+    <message key="xmlui.statistics.display.table.column-label.search-terms">Search Term</message>
+    <message key="xmlui.statistics.display.table.column-label.searches">Searches</message>
+    <message key="xmlui.statistics.display.table.column-label.percent-total">% of Total</message>
+    <message key="xmlui.statistics.display.table.column-label.views-search">Pageviews / Search</message>
+    <message key="xmlui.statistics.display.table.column-label.step">Step</message>
+    <message key="xmlui.statistics.display.table.column-label.performed">Performed</message>
+    <message key="xmlui.statistics.display.table.column-label.average">Average</message>
+    <message key="xmlui.statistics.display.table.workflow.step.STEP1POOL">Accept/Reject Step Pool</message>
+    <message key="xmlui.statistics.display.table.workflow.step.STEP1">Accept/Reject Step</message>
+    <message key="xmlui.statistics.display.table.workflow.step.STEP2POOL">Accept/Reject/Edit Metadata Step Pool</message>
+    <message key="xmlui.statistics.display.table.workflow.step.STEP2">Accept/Reject/Edit Metadata Step</message>
+    <message key="xmlui.statistics.display.table.workflow.step.STEP3POOL">Edit Metadata Step Pool</message>
+    <message key="xmlui.statistics.display.table.workflow.step.STEP3">Edit Metadata Step</message>
+    <message key="xmlui.statistics.display.table.workflow.step.default.reviewstep.claimaction">Accept/Reject Step Pool</message>
+    <message key="xmlui.statistics.display.table.workflow.step.default.reviewstep.reviewaction">Accept/Reject Step</message>
+    <message key="xmlui.statistics.display.table.workflow.step.default.editstep.claimaction">Accept/Reject/Edit Metadata Step Pool</message>
+    <message key="xmlui.statistics.display.table.workflow.step.default.editstep.editaction">Accept/Reject/Edit Metadata Step</message>
+    <message key="xmlui.statistics.display.table.workflow.step.default.finaleditstep.claimaction">Edit Metadata Step Pool</message>
+    <message key="xmlui.statistics.display.table.workflow.step.default.finaleditstep.finaleditaction">Edit Metadata Step</message>
+    <message key="xmlui.statistics.display.table.workflow.step.default.finaleditstep.finaleditaction">Edit Metadata Step</message>
+    <message key="xmlui.statistics.display.table.workflow.step.scoreReview.scoreReviewStep.claimaction">Score Review Pool</message>
+    <message key="xmlui.statistics.display.table.workflow.step.scoreReview.scoreReviewStep.scorereviewaction">Score Review</message>
+    <message key="xmlui.statistics.display.table.workflow.step.scoreReview.evaluationStep.evaluationaction">Score Review Evaluation</message>
+    <message key="xmlui.statistics.display.table.workflow.step.scoreReview.evaluationStep.noUserSelectionAction">Score Review Evaluation Configuration</message>
+    <message key="xmlui.statistics.display.table.workflow.step.selectSingleReviewer.selectReviewerStep.claimaction">Single User Review Pool</message>
+    <message key="xmlui.statistics.display.table.workflow.step.selectSingleReviewer.singleUserReviewStep.autoassignAction">Single User Auto Assign Action</message>
+    <message key="xmlui.statistics.display.table.workflow.step.selectSingleReviewer.singleUserReviewStep.singleuserreviewaction">Single User Review Action</message>
 
 
+    <!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+                     Google Analytics Statistics Aspect
+
+        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!-->
+
+    <message key="xmlui.statisticsGoogleAnalytics.Navigation.title">Statistics</message>
+    <message key="xmlui.statisticsGoogleAnalytics.Navigation.usage.view">View Google Analytics Statistics</message>
+    <message key="xmlui.statisticsGoogleAnalytics.trail">Statistics</message>
+    <message key="xmlui.statisticsGoogleAnalytics.title">Google Analytics Statistics</message>
+
+    <message key="xmlui.statisticsGoogleAnalytics.dates.startDate">Start date</message>
+    <message key="xmlui.statisticsGoogleAnalytics.dates.endDate">End date</message>
+    <message key="xmlui.statisticsGoogleAnalytics.dates.refresh">Refresh</message>
+
+    <message key="xmlui.statisticsGoogleAnalytics.pageViews.title">Page Views</message>
+    <message key="xmlui.statisticsGoogleAnalytics.downloads.title">File Downloads</message>
 
 
 	<!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1777,7 +2215,7 @@
 	<message key="xmlui.dri2xhtml.structural.contact-link">Contact Us</message>
 	<message key="xmlui.dri2xhtml.structural.feedback-link">Send Feedback</message>
 
-	<message key="xmlui.dri2xhtml.structural.head-subtitle">DSpace/Manakin Repository</message>
+	<message key="xmlui.dri2xhtml.structural.head-subtitle">DSpace Repository</message>
 
 	<message key="xmlui.dri2xhtml.structural.profile">Profile: </message>
 	<message key="xmlui.dri2xhtml.structural.logout">Logout</message>
@@ -1812,12 +2250,56 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-preview">Preview</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-title">Title</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-author">Author</message>
+    <message key="xmlui.dri2xhtml.METS-1.0.item-author-corporate">Corporate Author</message>
+    <message key="xmlui.dri2xhtml.METS-1.0.item-author-of-text">Author of Text</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-abstract">Abstract</message>
+    <message key="xmlui.dri2xhtml.METS-1.0.item-composer">Composer</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-description">Description</message>
+    <message key="xmlui.dri2xhtml.METS-1.0.item-first-line-of-chorus">First Line of Chorus</message>
+    <message key="xmlui.dri2xhtml.METS-1.0.item-first-line-of-text">First Line of Text</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-uri">URI</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-date">Date</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-publisher">Publisher</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-subject">Subject</message>
+    <!-- Mirage 2 - Use schema.element.qualifer -->
+    <!-- dc - Dublin Core -->
+    <message key="xmlui.metadata.dc.abstract">Abstract</message>
+    <message key="xmlui.metadata.dc.author">Author</message>
+    <message key="xmlui.metadata.dc.author-corporate">Corporate Author</message>
+    <message key="xmlui.metadata.dc.author-of-text">Author of Text</message>
+    <message key="xmlui.metadata.dc.composer">Composer</message>
+    <message key="xmlui.metadata.dc.contributor">Contributor</message>
+    <message key="xmlui.metadata.dc.contributor.author">Author</message>
+    <message key="xmlui.metadata.dc.creator">Creator</message>
+    <message key="xmlui.metadata.dc.date">Date</message>
+    <message key="xmlui.metadata.dc.date.accessioned">Date Accessioned</message>
+    <message key="xmlui.metadata.dc.date.available">Date Available</message>
+    <message key="xmlui.metadata.dc.date.created">Date Created</message>
+    <message key="xmlui.metadata.dc.date.issued">Date of Issue</message>
+    <message key="xmlui.metadata.dc.description">Description</message>
+    <message key="xmlui.metadata.dc.description.abstract">Description</message>
+    <message key="xmlui.metadata.dc.description.provenance">Provenance</message>
+    <message key="xmlui.metadata.dc.description.sponsorship">Sponsorship</message>
+    <message key="xmlui.metadata.dc.first-line-of-chorus">First Line of Chorus</message>
+    <message key="xmlui.metadata.dc.first-line-of-text">First Line of Text</message>
+    <message key="xmlui.metadata.dc.format">Item Format</message>
+    <message key="xmlui.metadata.dc.format.mimetype">Mimetype</message>
+    <message key="xmlui.metadata.dc.identifier">Identifier</message>
+    <message key="xmlui.metadata.dc.identifier.citation">Identifier (Citation)</message>
+    <message key="xmlui.metadata.dc.identifier.other">Identifier (Other)</message>
+    <message key="xmlui.metadata.dc.identifier.uri">Identifier (URI)</message>
+    <message key="xmlui.metadata.dc.language">Item Language</message>
+    <message key="xmlui.metadata.dc.language.iso">Language</message>
+    <message key="xmlui.metadata.dc.publisher">Publisher</message>
+    <message key="xmlui.metadata.dc.relation.ispartof">Digital Collection</message>
+    <message key="xmlui.metadata.dc.relation.ispartofseries">Part of Series</message>
+    <message key="xmlui.metadata.dc.rights">Rights</message>
+    <message key="xmlui.metadata.dc.source">Source</message>
+    <message key="xmlui.metadata.dc.subject">Subject</message>
+    <message key="xmlui.metadata.dc.title">Title</message>
+    <message key="xmlui.metadata.dc.title.alternative">Alternative Title</message>
+    <message key="xmlui.metadata.dc.type">Type</message>
+    <message key="xmlui.metadata.dc.uri">URI</message>
 
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-head">Files in this item</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-file">Files</message>
@@ -1827,6 +2309,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-view">View</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-description">Description</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-viewOpen">View/<wbr/>Open</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-files-access-rights">Read access available for</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-no-files">There are no files associated with this item.</message>
 
 	<message key="xmlui.dri2xhtml.METS-1.0.size-bytes">bytes</message>
@@ -1835,6 +2318,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.size-gigabytes">Gb</message>
 
 	<message key="xmlui.dri2xhtml.METS-1.0.license-text">The following license files are associated with this item:</message>
+    <message key="xmlui.dri2xhtml.METS-1.0.cc-license-text">Except where otherwise noted, this item's license is described as </message>
 
 	<message key="xmlui.dri2xhtml.METS-1.0.collection-not-implemented">
 		The summaryView of a collection is not currently used or implemented. This can be fixed
@@ -1860,6 +2344,8 @@
 
 	<message key="xmlui.dri2xhtml.METS-1.0.header-qdc-elements">Dublin Core elements</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.header-qdc-terms">Dublin Core terms</message>
+
+        <message key="xmlui.dri2xhtml.METS-1.0.blocked">Blocked</message>
 
 
 	<!-- Special pioneer model related text, wherever it might end up -->
@@ -1972,6 +2458,7 @@
   <!-- params are: start, end, total-count, search-value -->
   <message key="xmlui.ChoiceLookupTransformer.results">Results @1@ to @2@ of @3@ for "@4@"</message>
   <message key="xmlui.ChoiceLookupTransformer.fail">Failed to load choice data: </message>
+  <message key="xmlui.ChoiceLookupTransformer.lookup">Lookup</message>
 
   <!-- Choice Lookup - sample config for dc.publisher field -->
   <message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.help">Name of Publisher</message>
@@ -1986,4 +2473,117 @@
   <message key="xmlui.ChoiceLookupTransformer.field.dc_contributor_author.title">LC Name Authority author lookup</message>
   <message key="xmlui.ChoiceLookupTransformer.field.dc_contributor_author.nonauthority">Local value "@1@" (not in Naming Authority)</message>
 
+  <!-- mobile theme -->
+  <message key="xmlui.mobile.home_mobile">DSpace Mobile</message>
+  <message key="xmlui.mobile.search_all">Search ALL</message>
+  <message key="xmlui.mobile.browse_all">Browse ALL by</message>
+  <message key="xmlui.mobile.browse_date">Date</message>
+  <message key="xmlui.mobile.browse_author">Author</message>
+  <message key="xmlui.mobile.browse_title">Title</message>
+  <message key="xmlui.mobile.browse_subject">Subject</message>
+  <message key="xmlui.mobile.related_google_scholar">Related</message>
+  <message key="xmlui.mobile.items_in_google_scholar">Items in Google Scholar</message>
+  <message key="xmlui.mobile.download">Download</message>
+
+
+    <!-- Versioning -->
+    <message key="xmlui.aspect.versioning.VersioningNavigation.context_create_version">Create version of this item</message>
+    <message key="xmlui.aspect.versioning.VersioningNavigation.context_show_version_history">Show version history</message>
+
+    <message key="xmlui.aspect.versioning.VersionItemForm.title">Create Version</message>
+    <message key="xmlui.aspect.versioning.VersionItemForm.trail">Version</message>
+    <message key="xmlui.aspect.versioning.VersionItemForm.head1">Create new version of item: {0}</message>
+    <message key="xmlui.aspect.versioning.VersionItemForm.submit_version">Version</message>
+    <message key="xmlui.aspect.versioning.VersionItemForm.submit_update_version">Update Version</message>
+    <message key="xmlui.aspect.versioning.VersionItemForm.summary">Reason for creating new version</message>
+
+    <message key="xmlui.aspect.versioning.VersionUpdateForm.title">Update Version</message>
+    <message key="xmlui.aspect.versioning.VersionUpdateForm.trail">Version</message>
+    <message key="xmlui.aspect.versioning.VersionUpdateForm.head1">Update version of item: {0}</message>
+    <message key="xmlui.aspect.versioning.VersionUpdateForm.submit_version">Version</message>
+    <message key="xmlui.aspect.versioning.VersionUpdateForm.submit_update_version">Update Version</message>
+    <message key="xmlui.aspect.versioning.VersionUpdateForm.summary">Summary</message>
+
+
+    <message key="xmlui.aspect.versioning.DeleteVersionsConfirm.title">Confirm Deletion</message>
+    <message key="xmlui.aspect.versioning.DeleteVersionsConfirm.trail">Confirm deletion</message>
+    <message key="xmlui.aspect.versioning.DeleteVersionsConfirm.head1">Confirm Deletion(s)</message>
+    <message key="xmlui.aspect.versioning.DeleteVersionsConfirm.para1">Are you sure you want to delete these versions. </message>
+    <message key="xmlui.aspect.versioning.DeleteVersionsConfirm.para2">PLEASE NOTE: That by deleting these versions, the associated items will no longer be accessible.</message>
+    <message key="xmlui.aspect.versioning.DeleteVersionsConfirm.column1">Version</message>
+    <message key="xmlui.aspect.versioning.DeleteVersionsConfirm.column2">Item</message>
+    <message key="xmlui.aspect.versioning.DeleteVersionsConfirm.column3">Editor</message>
+    <message key="xmlui.aspect.versioning.DeleteVersionsConfirm.column4">Date</message>
+    <message key="xmlui.aspect.versioning.DeleteVersionsConfirm.column5">Summary</message>
+
+
+    <message key="xmlui.aspect.versioning.RestoreVersionForm.title">Restore Version</message>
+    <message key="xmlui.aspect.versioning.RestoreVersionForm.trail">Restore Version</message>
+    <message key="xmlui.aspect.versioning.RestoreVersionForm.head1">Restore Version</message>
+    <message key="xmlui.aspect.versioning.RestoreVersionForm.para1">Are you sure you want to restore this version:</message>
+    <message key="xmlui.aspect.versioning.RestoreVersionForm.column1">Version</message>
+    <message key="xmlui.aspect.versioning.RestoreVersionForm.column2">Editor</message>
+    <message key="xmlui.aspect.versioning.RestoreVersionForm.column3">Date</message>
+    <message key="xmlui.aspect.versioning.RestoreVersionForm.column4">Summary</message>
+    <message key="xmlui.aspect.versioning.RestoreVersionForm.restore">Restore</message>
+
+    <message key="xmlui.aspect.versioning.VersionHistoryForm.head2">Version History</message>
+    <message key="xmlui.aspect.versioning.VersionHistoryForm.column1">Version</message>
+    <message key="xmlui.aspect.versioning.VersionHistoryForm.column2">Item</message>
+    <message key="xmlui.aspect.versioning.VersionHistoryForm.column3">Editor</message>
+    <message key="xmlui.aspect.versioning.VersionHistoryForm.column4">Date</message>
+    <message key="xmlui.aspect.versioning.VersionHistoryForm.column5">Summary</message>
+    <message key="xmlui.aspect.versioning.VersionHistoryForm.column6">Actions</message>
+    <message key="xmlui.aspect.versioning.VersionHistoryForm.restore">Restore</message>
+    <message key="xmlui.aspect.versioning.VersionHistoryForm.update">Update</message>
+    <message key="xmlui.aspect.versioning.VersionHistoryForm.legend">*Selected version</message>
+    <message key="xmlui.aspect.versioning.VersionHistoryForm.delete">Delete Versions</message>
+    <message key="xmlui.aspect.versioning.VersionHistoryForm.return">Return</message>
+    <message key="xmlui.aspect.versioning.VersionHistoryForm.collection_admins_only">(collection administrators only)</message>
+
+    <message key="xmlui.aspect.versioning.VersionNoticeTransformer.notice.new_version_head">Notice</message>
+    <message key="xmlui.aspect.versioning.VersionNoticeTransformer.notice.new_version_help">This is not the latest version of this item. The latest version can be found at: </message>
+    <message key="xmlui.aspect.versioning.VersionNoticeTransformer.notice.workflow_version_head">Notice</message>
+    <message key="xmlui.aspect.versioning.VersionNoticeTransformer.notice.workflow_version_help">A more recent version of this item is in the Workflow.</message>
+
+    <message key="xmlui.aspect.sherpa.submission.consult">To check the copyright and self-archiving policies per journal or publisher, please consult <a href="http://www.sherpa.ac.uk/">SHERPA/RoMEO</a>.</message>
+    <message key="xmlui.aspect.sherpa.submission.title">Publisher information</message>
+    <message key="xmlui.aspect.sherpa.submission.journal">Journal: </message>
+    <message key="xmlui.aspect.sherpa.submission.publisher">Publisher information: </message>
+    <message key="xmlui.aspect.sherpa.submission.colour">RoMEO Colour: </message>
+    <message key="xmlui.aspect.sherpa.submission.more">(More info)</message>
+    <message key="xmlui.aspect.sherpa.submission.green">green</message>
+    <message key="xmlui.aspect.sherpa.submission.blue">blue</message>
+    <message key="xmlui.aspect.sherpa.submission.white">white</message>
+    <message key="xmlui.aspect.sherpa.submission.yellow">yellow</message>
+    <!-- End Versioning -->
+
+
+    <message key="xmlui.mirage2.itemSummaryView.MetaData">Metadata</message>
+    <message key="xmlui.mirage2.itemSummaryView.Collections">Collections</message>
+
+    <message key="xmlui.mirage2.discovery.reset">Reset</message>
+    <message key="xmlui.mirage2.discovery.newFilter">Add New Filter</message>
+    <message key="xmlui.mirage2.discovery.showAdvancedFilters">Show Advanced Filters</message>
+    <message key="xmlui.mirage2.discovery.hideAdvancedFilters">Hide Advanced Filters</message>
+
+
+    <message key="xmlui.mirage2.forms.instancedCompositeFields.add">Add</message>
+    <message key="xmlui.mirage2.forms.instancedCompositeFields.remove">Remove</message>
+    <message key="xmlui.mirage2.forms.instancedCompositeFields.noSuggestionError">ERROR: Input field with "suggest" (autocomplete) choice behavior is not implemented for Composite (e.g. "name") fields.</message>
+    <message key="xmlui.mirage2.forms.nonInstancedCompositeFields.noSuggestionError">ERROR: Input field with "suggest" (autocomplete) choice behavior is not implemented for Composite (e.g. "name") fields.</message>
+    <message key="xmlui.mirage2.forms.nonCompositeFieldSet.add">Add</message>
+    <message key="xmlui.mirage2.forms.nonCompositeFieldSet.remove">Remove</message>
+
+    <message key="xmlui.mirage2.page-structure.aboutThisRepository">About This Repository</message>
+    <message key="xmlui.mirage2.page-structure.toggleNavigation">Toggle navigation</message>
+
+    <message key="xmlui.mirage2.page-structure.heroUnit.title">About This Repository</message>
+    <message key="xmlui.mirage2.page-structure.heroUnit.content">To add your own content to this page, edit webapps/xmlui/themes/Mirage2/lib/xsl/core/page-structure.xsl and add your own content to the title, trail, and body. If you wish to add additional pages, you will need to create an additional xsl:when block and match the request-uri to whatever page you are adding. Currently, static pages created through altering XSL are only available under the URI prefix of page/.</message>
+
+    <message key="xmlui.mirage2.navigation.rss.feed">feed</message>
+
+    <message key="xmlui.mirage2.choice-authority-control.loading">Loading...</message>
+
+    <message key="xmlui.mirage2.item-list.thumbnail">Thumbnail</message>
 </catalogue>
