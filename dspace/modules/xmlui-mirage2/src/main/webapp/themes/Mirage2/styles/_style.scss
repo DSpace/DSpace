@@ -70,6 +70,14 @@ img.ds-authority-confidence { display: none;}
 	font-size: larger;
 }
 
+// let's add an inline form control utility class
+// suggestion from: http://stackoverflow.com/questions/18539711/input-widths-on-bootstrap-3
+.form-control-inline {
+    min-width: 0;
+    width: auto;
+    display: inline;
+}
+
 // add in specific MOspace styles
 div#ms-tagline {
     margin: 58px 0px 0px -88px;
