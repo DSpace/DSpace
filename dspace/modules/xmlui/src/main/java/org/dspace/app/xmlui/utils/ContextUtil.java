@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.log4j.Logger;
+import org.dspace.app.util.Util;
 import org.dspace.authenticate.AuthenticationManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -105,8 +106,8 @@ public class ContextUtil
 
             // DATASHARE - start
             // Set the session ID and IP address
-            //String ip = Util.getIPAddress(request);
-            String ip = request.getRemoteAddr();
+            String ip = Util.getIPAddress(request);
+            //String ip = request.getRemoteAddr();
             if (useProxies == null) {
                 useProxies = ConfigurationManager.getBooleanProperty("useProxies", false);
             }
