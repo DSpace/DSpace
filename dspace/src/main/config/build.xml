@@ -695,10 +695,6 @@ Common usage:
             <fileset dir="${dspace.dir}/webapps/oai/" />
         </war>
 
-        <war destfile="${dspace.dir}/webapps/lni.war">
-            <fileset dir="${dspace.dir}/webapps/lni/" />
-        </war>
-
         <war destfile="${dspace.dir}/webapps/jspui.war">
             <fileset dir="${dspace.dir}/webapps/jspui/" />
         </war>
