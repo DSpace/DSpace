@@ -167,6 +167,9 @@ public class BitstreamServlet extends DSpaceServlet
             return;
         }
 
+        // Pipe the bits - throws exception if not authorized to access
+        InputStream is = bitstream.retrieve();
+
         log.info(LogManager.getHeader(context, "view_bitstream",
                 "bitstream_id=" + bitstream.getID()));
         
@@ -202,9 +205,6 @@ public class BitstreamServlet extends DSpaceServlet
                 return;
             }
         }
-        
-        // Pipe the bits
-        InputStream is = bitstream.retrieve();
      
 		// Set the response MIME type
         response.setContentType(bitstream.getFormat().getMIMEType());
