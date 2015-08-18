@@ -131,20 +131,29 @@ public class SwordUrlManager
 				throw new SwordError(DSpaceUriRegistry.BAD_URL, "The item URL is invalid");
 			}
 
-            String iid = location.substring(cBaseUrl.length());
-            if (iid.endsWith(".atom"))
+            String identifier = location.substring(cBaseUrl.length());
+            if (identifier.endsWith(".atom"))
             {
                 // this is the atom url, so we need to strip that to ge tthe item id
-                iid = iid.substring(0, iid.length() - ".atom".length());
+                identifier = identifier.substring(0, identifier.length() - ".atom".length());
             }
-			else if (iid.endsWith(".rdf"))
+			else if (identifier.endsWith(".rdf"))
 			{
 				// this is the rdf url so we need to strip that to get the item id
-				iid = iid.substring(0, iid.length() - ".rdf".length());
+				identifier = identifier.substring(0, identifier.length() - ".rdf".length());
 			}
 			
-            int itemId = Integer.parseInt(iid);
-            Item item = Item.find(context, itemId);
+			int itemId;
+            
+			try {
+				itemId = Integer.parseInt(identifier);
+			} catch (NumberFormatException e) {
+				DSpaceObject dso = HandleManager.resolveToObject(context, identifier);  
+				itemId = dso.getID();
+			}
+            
+			Item item = Item.find(context, itemId);
+			
 			return item;
 		}
 		catch (SQLException e)
