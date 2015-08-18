@@ -290,7 +290,6 @@ public class XOAI {
     }
 
     private boolean isPublic(Item item) {
-    	log.info("**************************************************************");
         try {
             AuthorizeManager.authorizeAction(context, item, Constants.READ);
             for (Bundle b : item.getBundles())
@@ -301,10 +300,6 @@ public class XOAI {
         } catch (SQLException ex) {
             log.error(ex.getMessage());
         }
-
-        log.info("**************************************************************");
-        log.info(org.dspace.app.util.Util.hasEmbargo(context, item));
-       
         
         return false;
     }

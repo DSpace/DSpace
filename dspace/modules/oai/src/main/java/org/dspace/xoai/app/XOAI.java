@@ -306,7 +306,6 @@ public class XOAI {
         // DATASHARE start
         // for testing on dev we need embargoed items showing up in OAI
         if (DSpaceUtils.isDev() && org.dspace.app.util.Util.hasEmbargo(context, item)){
-        	log.info("******************************************** " + item.getHandle());
         	return true;
 
         }

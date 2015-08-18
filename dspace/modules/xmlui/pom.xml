@@ -2,7 +2,11 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dspace.modules</groupId>
     <artifactId>xmlui</artifactId>
-    <packaging>war</packaging>
+
+    <!-- DATASHARE - start -->
+    <packaging>jar</packaging>
+    <!-- DATASHARE - end -->
+
     <name>DSpace XML-UI (Manakin) :: Local Customizations</name>
     <description>
         This project allows you to overlay your own local XML-UI customizations
