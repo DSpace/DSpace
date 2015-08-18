@@ -16,7 +16,10 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.event.Event;
 import org.junit.*;
+import org.mockito.Mockito;
+
 import static org.junit.Assert.* ;
 import static org.hamcrest.CoreMatchers.*;
 
@@ -587,5 +590,33 @@ public class ContextTest extends AbstractUnitTest
 
         // Cleanup our context
         cleanupContext(instance);
+    }
+
+    @Test
+    public void shouldCleanUpEventsWhenCompleteIsCalled() throws Exception {
+        // given
+        Event event = Mockito.mock(Event.class);
+        Context underTest = new Context();
+        underTest.addEvent(event);
+
+        // when
+        underTest.complete();
+
+        // then
+        assertFalse(underTest.hasEvents());
+    }
+
+    @Test
+    public void shouldCleanUpEventsWhenAbortIsCalled() throws Exception {
+        // given
+        Event event = Mockito.mock(Event.class);
+        Context underTest = new Context();
+        underTest.addEvent(event);
+
+        // when
+        underTest.abort();
+
+        // then
+        assertFalse(underTest.hasEvents());
     }
 }
