@@ -348,7 +348,7 @@
                         <div class="navbar-header pull-right visible-xs hidden-sm hidden-md hidden-lg">
                         <ul class="nav nav-pills pull-left ">
 
-                            <li role="presentation"><a href="{$app_path}/discover">advanced search</a></li>
+                            <li role="presentation"><a href="{$app_path}/discover">advanced<br/>search</a></li>
                             <li role="presentation"><a href="{$app_path}/community-list">browse</a></li>
                             <li role="presentation"><a href="{$app_path}/pages/add">add to MOspace</a></li>
                             <li role="presentation"><a href="{$app_path}/pages/about">about</a></li>
@@ -433,7 +433,7 @@
                             <!-- MOspace navigation bar -->
 
                         <ul class="nav navbar-nav  pull-left">
-                            <li role="presentation"><a href="{$app_path}/discover">advanced search</a></li>
+                            <li role="presentation"><a href="{$app_path}/discover">advanced<br/>search</a></li>
                         </ul>
                         <ul class="nav navbar-nav  pull-left">
                             <li role="presentation"><a href="{$app_path}/community-list">browse</a></li>
