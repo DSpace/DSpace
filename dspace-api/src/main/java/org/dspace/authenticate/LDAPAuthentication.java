@@ -7,14 +7,21 @@
  */
 package org.dspace.authenticate;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Hashtable;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
 
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.*;
+import javax.naming.ldap.InitialLdapContext;
+import javax.naming.ldap.LdapContext;
+import javax.naming.ldap.StartTlsRequest;
+import javax.naming.ldap.StartTlsResponse;
+import javax.net.ssl.SSLSession;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -196,10 +203,12 @@ public class LDAPAuthentication
         if ((StringUtils.isBlank(adminUser) || StringUtils.isBlank(adminPassword)) && !anonymousSearch)
         {
             dn = idField + "=" + netid + "," + objectContext;
-        }
-        else
-        {
-            dn = ldap.getDNOfUser(adminUser, adminPassword, context, netid);
+        } else {
+            try {
+                dn = ldap.getDNOfUser(adminUser, adminPassword, context, netid);
+            } catch (IOException ex) {
+                java.util.logging.Logger.getLogger(LDAPAuthentication.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
 
         // Check a DN was found
@@ -228,7 +237,7 @@ public class LDAPAuthentication
                 context.setCurrentUser(eperson);
 
                 // assign user to groups based on ldap dn
-                assignGroups(dn, ldap.ldapGroup, context);
+                assignGroupsBasedOnLdapDn(dn, context);
                 
                 log.info(LogManager
                     .getHeader(context, "authenticate", "type=ldap"));
@@ -287,7 +296,7 @@ public class LDAPAuthentication
                             context.setCurrentUser(eperson);
 
                             // assign user to groups based on ldap dn
-                            assignGroups(dn, ldap.ldapGroup, context);
+                            assignGroupsBasedOnLdapDn(dn, context);
 
                             return SUCCESS;
                         }
@@ -324,7 +333,7 @@ public class LDAPAuthentication
                                     context.setCurrentUser(eperson);
 
                                     // assign user to groups based on ldap dn
-                                    assignGroups(dn, ldap.ldapGroup, context);
+                                    assignGroupsBasedOnLdapDn(dn, context);
                                 }
                                 catch (AuthorizeException e)
                                 {
@@ -374,7 +383,6 @@ public class LDAPAuthentication
         protected String ldapGivenName = null;
         protected String ldapSurname = null;
         protected String ldapPhone = null;
-        protected String ldapGroup = null;
 
         /** LDAP settings */
         String ldap_provider_url = ConfigurationManager.getProperty("authentication-ldap", "provider_url");
@@ -386,14 +394,13 @@ public class LDAPAuthentication
         String ldap_givenname_field = ConfigurationManager.getProperty("authentication-ldap", "givenname_field");
         String ldap_surname_field = ConfigurationManager.getProperty("authentication-ldap", "surname_field");
         String ldap_phone_field = ConfigurationManager.getProperty("authentication-ldap", "phone_field");
-        String ldap_group_field = ConfigurationManager.getProperty("authentication-ldap", "login.groupmap.attribute"); 
 
         SpeakerToLDAP(Logger thelog)
         {
             log = thelog;
         }
 
-        protected String getDNOfUser(String adminUser, String adminPassword, Context context, String netid)
+        protected String getDNOfUser(String adminUser, String adminPassword, Context context, String netid) throws IOException
         {
             // The resultant DN
             String resultDN;
@@ -433,11 +440,27 @@ public class LDAPAuthentication
                 env.put(javax.naming.Context.SECURITY_AUTHENTICATION, "none");
             }
 
-            DirContext ctx = null;
+            boolean useTLS = ConfigurationManager.getBooleanProperty("authentication-ldap", "istarttls", false);
+            
+//            DirContext ctx = null;
+            LdapContext ctx = null;
+            StartTlsResponse tls = null;
+
             try
             {
                 // Create initial context
-                ctx = new InitialDirContext(env);
+                if (useTLS)
+                {
+                    ctx = new InitialLdapContext(env, null);
+                    
+                    // Start TLS
+                    tls = (StartTlsResponse) ctx.extendedOperation(new StartTlsRequest());
+                    SSLSession sess = tls.negotiate();
+                }
+                else
+                {
+                    ctx = new InitialDirContext(env);
+                }
 
                 Attributes matchAttrs = new BasicAttributes(true);
                 matchAttrs.put(new BasicAttribute(ldap_id_field, netid));
@@ -462,7 +485,7 @@ public class LDAPAuthentication
                         }
 
                         String attlist[] = {ldap_email_field, ldap_givenname_field,
-                                            ldap_surname_field, ldap_phone_field, ldap_group_field};
+                                            ldap_surname_field, ldap_phone_field};
                         Attributes atts = sr.getAttributes();
                         Attribute att;
 
@@ -497,14 +520,6 @@ public class LDAPAuthentication
                                 ldapPhone = (String) att.get();
                             }
                         }
-                
-                        if (attlist[4] != null) {
-                            att = atts.get(attlist[4]);
-                            if (att != null) 
-                            {
-                                ldapGroup = (String) att.get();
-                            }
-                        }
 
                         if (answer.hasMoreElements()) {
                             // Oh dear - more than one match
@@ -533,8 +548,12 @@ public class LDAPAuthentication
             finally
             {
                 // Close the context when we're done
-                try
+                // Stop TLS
+                if (useTLS)
                 {
+                    tls.close();
+                }
+                try {
                     if (ctx != null)
                     {
                         ctx.close();
@@ -636,29 +655,20 @@ public class LDAPAuthentication
      * Add authenticated users to the group defined in dspace.cfg by
      * the authentication-ldap.login.groupmap.* key.
      */
-    private void assignGroups(String dn, String group, Context context)
+    private void assignGroupsBasedOnLdapDn(String dn, Context context)
     {
         if (StringUtils.isNotBlank(dn)) 
         {
             System.out.println("dn:" + dn);
             int i = 1;
             String groupMap = ConfigurationManager.getProperty("authentication-ldap", "login.groupmap." + i);
-            
-            boolean cmp;
-            
             while (groupMap != null)
             {
                 String t[] = groupMap.split(":");
                 String ldapSearchString = t[0];
                 String dspaceGroupName = t[1];
- 
-                if (group == null) {
-                    cmp = StringUtils.containsIgnoreCase(dn, ldapSearchString + ",");
-                } else {
-                    cmp = StringUtils.equalsIgnoreCase(group, ldapSearchString);
-                }
 
-                if (cmp) 
+                if (StringUtils.containsIgnoreCase(dn, ldapSearchString)) 
                 {
                     // assign user to this group   
                     try
