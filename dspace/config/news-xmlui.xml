@@ -2,11 +2,30 @@
 <document xmlns="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 <body>
 <div id="file.news.div.news" n="news" rend="primary">
-<head>MOspace Repository</head>
-<p>MOspace is an online repository for scholarly work and resources
-created by faculty, staff and students at the University of Missouri. MOspace makes created knowledge and research
-products from UM available to the wider community of researchers and students and assures preservation of these
-materials for the future. [<xref target="/xmlui/pages/about">read more</xref>]</p>
+<head>MOspace Institutional Repository</head>
+
+ <p>The MOspace Institutional Repository is an online repository for creative and
+     scholarly works and other resources created by faculty, students, and staff at the
+     University of Missouri--Columbia and the University of Missouri--Kansas City. MOspace
+     makes these resources freely available on the web and assures their preservation for
+     the future.</p>
+
+<p><xref target="https://irsandbox.lso.umsystem.edu/xmlui/pages/about">Read more about MOspace.</xref></p>
+
+<p><hi rend="bold">Additional University of Missouri Online Library Repositories</hi></p>
+
+<list>
+<item><xref target="http://scholarsmine.mst.edu/">Scholars' Mine (MS&amp;T)</xref></item>
+<item><xref target="http://scholarship.law.missouri.edu/">Scholarship Repository (MU Law)</xref></item>
+<item><xref target="https://dl.mospace.umsystem.edu/mu/">MU Digital Library</xref></item>
+<item><xref target="https://dl.mospace.umsystem.edu/umkc/">UMKC Digital Special Collections</xref></item>
+<item><xref target="https://dl.mospace.umsystem.edu/umsl/">UMSL Digital Library</xref></item>
+<item><xref target="http://digital.library.umsystem.edu/">UM Digital Library (Legacy system for the University of Missouri)</xref></item>
+</list>
+
+
+
+
 </div>
 </body>
 <options/>
