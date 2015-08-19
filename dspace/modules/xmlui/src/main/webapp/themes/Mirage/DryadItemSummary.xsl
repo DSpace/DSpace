@@ -1708,7 +1708,7 @@
                          alt="eLife logo"/>
                 </a>
             </xsl:when>
-            <xsl:when test='$journal-name = "Evidence-Based Preclinical Medicine"'>
+            <xsl:when test='$journal-name = "Evidence&ndash;Based Preclinical Medicine"'>
 				<a target="_blank">
 					<xsl:attribute name="href">
 						<xsl:choose>
@@ -1723,7 +1723,7 @@
 						</xsl:choose>
 					</xsl:attribute>
 					<img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/EBPM.PNG"
-						 alt="Evidence-Based Preclinical Medicine cover"/>
+						 alt="Evidence&ndash;Based Preclinical Medicine cover"/>
 				</a>
 			</xsl:when>
             <xsl:when test='$journal-name = "Evolution"'>
