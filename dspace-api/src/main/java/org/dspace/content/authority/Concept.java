@@ -417,7 +417,7 @@ public class Concept extends AuthorityObject
             throws SQLException
     {
         ArrayList<Concept> concepts = new ArrayList<Concept>();
-        TableRowIterator row = DatabaseManager.query(context,"select * from concept where LOWER(identifier) like '"+identifier+"'");
+        TableRowIterator row = DatabaseManager.query(context,"select * from concept where LOWER(identifier) like ?", identifier);
 
         if (row == null)
         {
@@ -449,7 +449,7 @@ public class Concept extends AuthorityObject
     {
         ArrayList<Concept> concepts = new ArrayList<Concept>();
         int journal_field_id = 101;
-        TableRowIterator row = DatabaseManager.query(context, "select c.* from concept as c, conceptmetadatavalue as cmv where upper(cmv.text_value) = '" + journalID + "' and cmv.parent_id = c.id and cmv.field_id = " + journal_field_id + ";");
+        TableRowIterator row = DatabaseManager.query(context, "select c.* from concept as c, conceptmetadatavalue as cmv where upper(cmv.text_value) = ? and cmv.parent_id = c.id and cmv.field_id = ?;", journalID, journal_field_id);
 
         if (row == null)
         {
