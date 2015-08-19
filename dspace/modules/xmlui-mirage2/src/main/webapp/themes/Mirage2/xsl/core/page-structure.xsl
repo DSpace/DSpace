@@ -340,7 +340,7 @@
                         </a>
 
                         <div id="ms-tagline" class="navbar-header pull-left hidden-sm hidden-xs hidden-md">
-                             Preserving the intellectual output &amp; resources of the University of Missouri
+                             Shared more. Cited more. Safe forever.
                          </div>
 
 

@@ -78,6 +78,14 @@ img.ds-authority-confidence { display: none;}
     display: inline;
 }
 
+// hmm... form-control-inline doesn't seem to work, let's override the DSpace style instead
+.ds-select-field {
+    min-width: 0;
+    max-width: 200px;
+    width: auto;
+    display: inline;
+}
+
 // add in specific MOspace styles
 div#ms-tagline {
     margin: 58px 0px 0px -88px;
