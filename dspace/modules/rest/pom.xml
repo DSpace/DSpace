@@ -52,6 +52,20 @@
                         <overlay>
                             <groupId>org.dspace</groupId>
                             <artifactId>dspace-rest</artifactId>
+                            <type>war</type>
+                            <excludes>
+                                <exclude>WEB-INF/classes/**</exclude>
+                                <exclude>WEB-INF/web.xml</exclude>
+                            </excludes>
+                        </overlay>
+                        <overlay>
+                            <groupId>org.dspace</groupId>
+                            <artifactId>dspace-rest</artifactId>
+                            <type>war</type>
+                            <filtered>true</filtered>
+                            <includes>
+                                <include>WEB-INF/web.xml</include>
+                            </includes>
                         </overlay>
                     </overlays>
                 </configuration>
