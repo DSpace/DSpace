@@ -40,8 +40,10 @@ public enum ExtraLicenseField {
 	ADDRESS (new RequiredValidator(), true, "Address is required."),
 	COUNTRY (new RequiredValidator(), true, "Country is required."),
 	EXTRA_EMAIL (new EmailValidator(), true, "Please enter a valid email address.", null),
-	ORGANIZATION (null, true, "Please enter organization.");
-	
+	ORGANIZATION (new LengthValidator(), true, "Please enter organization."),
+	REQUIRED_ORGANIZATION (new RequiredValidator(), true, "Please enter organization."),
+	INTENDED_USE (new LengthValidator(), true, "Please state your intended use of this item.");
+
 	private Validator validator = null;
 	private Action action = null;
 	private boolean metadata = true;
@@ -236,12 +238,21 @@ class EmailValidator implements Validator {
 	
 }
 
+class LengthValidator implements Validator{
+
+	@Override
+	public boolean validate(String value){
+		return value.length() < 255;
+	}
+}
+
 
 class RequiredValidator implements Validator {
 
 	@Override
 	public boolean validate(String value) {
-		if(value==null || value.trim().isEmpty()) {
+		Validator length = new LengthValidator();
+		if(value==null || value.trim().isEmpty() || !length.validate(value)) {
 			return false;
 		}
 		return true;

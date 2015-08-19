@@ -222,7 +222,7 @@ public class UFALLicenceAgreement extends AbstractDSpaceTransformer {
 	            		t.setValue(val);
 	            		session.removeAttribute("extra_" + exField.name());
 	            	} else
-	            	if(exField.equals(ExtraLicenseField.ORGANIZATION)) {
+	            	if(exField.equals(ExtraLicenseField.ORGANIZATION) || exField.equals(ExtraLicenseField.REQUIRED_ORGANIZATION)) {
 	            		val = (String)functionalityManager.getRegisteredUser(eperson.getID()).getOrganization();
 	            		t.setValue(val);
 	            		session.removeAttribute("extra_" + exField.name());	            		
