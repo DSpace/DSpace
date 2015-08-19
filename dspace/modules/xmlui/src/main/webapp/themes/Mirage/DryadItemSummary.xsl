@@ -1709,8 +1709,8 @@
                 </a>
             </xsl:when>
             
-			<xsl:when test='$journal-name = "Evidence Based Medicine"'>
-				<a target="_blank">
+			<xsl:when test='$journal-name = "Evidence&ndash;Based Medicine"'>
+            	<a target="_blank">
 					<xsl:attribute name="href">
 						<xsl:choose>
 							<xsl:when test="contains($article-doi,'doi:')">
@@ -1724,9 +1724,9 @@
 						</xsl:choose>
 					</xsl:attribute>
 					<img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/EBPM.png"
-						 alt="Evidence Based Medicine cover"/>
+						 alt="Evidence&ndash;Based Medicine cover"/>
 				</a>
-			</xsl:when>
+        	</xsl:when>
             
             <xsl:when test='$journal-name = "Evolution"'>
                 <a target="_blank">
