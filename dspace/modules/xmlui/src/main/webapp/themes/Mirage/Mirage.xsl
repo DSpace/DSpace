@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-
     The contents of this file are subject to the license and copyright
     detailed in the LICENSE and NOTICE files at the root of the source
     tree and available online at
-
     http://www.dspace.org/license/
-
 -->
 <!--
     Original author: Alexey Maslov
@@ -446,12 +443,9 @@
         The template to handle dri:options. Since it contains only dri:list tags (which carry the actual
         information), the only things than need to be done is creating the ds-options div and applying
         the templates inside it.
-
         In fact, the only bit of real work this template does is add the search box, which has to be
         handled specially in that it is not actually included in the options div, and is instead built
         from metadata available under pageMeta.
-
-
 -->
 
     <xsl:template match="dri:options/dri:list[@n='administrative']"/>
@@ -492,13 +486,9 @@
     <xsl:template match="dri:options/dri:list[@n='DryadInfo']" priority="3">
         <div id="main-menu">
             <ul class="sf-menu">
-
                 <xsl:apply-templates select="dri:list" mode="nested"/>
-
-
                 <xsl:apply-templates select="dri:item" mode="nested"/>
             </ul>
-
         </div>
     </xsl:template>
     -->
@@ -645,11 +635,11 @@
     <!--xsl:variable name="doc" select="document(concat('pages/', $pageName, '.xhtml'))"/-->
 
     <xsl:template match="dri:xref[@rend='embed']">
-               
+               
         <xsl:variable name="url" select="concat('pages/',@target)"/>
-               
+               
         <xsl:copy-of select="document(string($url))/html/*"/>
-           
+           
     </xsl:template>
 
     <!-- description of dataset for 'Submission overview' page -->
@@ -764,9 +754,7 @@
                         </xsl:choose>
                     </xsl:with-param>
                     </xsl:call-template>
-
                     <div class="ds-form-content">
-
                     <xsl:if test="dri:field[@type='radio']">
                         <xsl:apply-templates select="dri:field[@type='radio']"/>
                         <br/>
@@ -777,7 +765,6 @@
                         - journalID_status_in_review
                         - journalID
                         - MANUSCRIPT NUMBER
-
                     -->
                     <xsl:for-each select="dri:field[@type='composite']/dri:field">
                         <tr class="selectPubSubmitTable"><td>
@@ -919,7 +906,6 @@ parameter that is being used (see variable defined above) -->
 
     <!--
 <xsl:template match="/dri:document/dri:body/dri:div/dri:div[@id='aspect.discovery.SimpleSearch.div.search-results']/dri:list">
-
 </xsl:template>
 -->
     <xsl:template match="/dri:document/dri:body/dri:div/dri:div/dri:list[@n='tabs']">
@@ -1044,7 +1030,6 @@ parameter that is being used (see variable defined above) -->
                             />_tooltip
                     </xsl:attribute>
                 </xsl:if>
-
                 <xsl:apply-templates/>
             </span>
         </xsl:if>
