@@ -8,17 +8,20 @@
 package org.dspace.authenticate;
 
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.collections.ListUtils;
 import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
 
 /**
  * A stackable authentication method
@@ -46,6 +49,7 @@ public class PasswordAuthentication
     /** log4j category */
     private static Logger log = Logger.getLogger(PasswordAuthentication.class);
 
+
     /**
      * Look to see if this email address is allowed to register.
      * <p>
@@ -55,6 +59,7 @@ public class PasswordAuthentication
      * Example - aber.ac.uk domain : @aber.ac.uk
      * Example - MIT domain and all .ac.uk domains: @mit.edu, .ac.uk
      */
+    @Override
     public boolean canSelfRegister(Context context,
                                    HttpServletRequest request,
                                    String email)
@@ -91,6 +96,7 @@ public class PasswordAuthentication
     /**
      *  Nothing extra to initialize.
      */
+    @Override
     public void initEPerson(Context context, HttpServletRequest request,
             EPerson eperson)
         throws SQLException
@@ -100,6 +106,7 @@ public class PasswordAuthentication
     /**
      * We always allow the user to change their password.
      */
+    @Override
     public boolean allowSetPassword(Context context,
                                     HttpServletRequest request,
                                     String username)
@@ -113,6 +120,7 @@ public class PasswordAuthentication
      * from some source.
      * @return false
      */
+    @Override
     public boolean isImplicit()
     {
         return false;
@@ -122,28 +130,29 @@ public class PasswordAuthentication
      * Add authenticated users to the group defined in authentication-password.cfg by
      * the login.specialgroup key.
      */
-    public int[] getSpecialGroups(Context context, HttpServletRequest request)
+    @Override
+    public List<Group> getSpecialGroups(Context context, HttpServletRequest request)
     {
         // Prevents anonymous users from being added to this group, and the second check
 		// ensures they are password users
 		try
 		{
-			if (context.getCurrentUser().getPasswordHash() != null && !context.getCurrentUser().getPasswordHash().toString().equals(""))
+			if (EPersonServiceFactory.getInstance().getEPersonService().getPasswordHash(context.getCurrentUser()) != null && !EPersonServiceFactory.getInstance().getEPersonService().getPasswordHash(context.getCurrentUser()).toString().equals(""))
 			{
 				String groupName = ConfigurationManager.getProperty("authentication-password", "login.specialgroup");
 				if ((groupName != null) && (!groupName.trim().equals("")))
 				{
-				    Group specialGroup = Group.findByName(context, groupName);
+				    Group specialGroup = EPersonServiceFactory.getInstance().getGroupService().findByName(context, groupName);
 					if (specialGroup == null)
 					{
 						// Oops - the group isn't there.
 						log.warn(LogManager.getHeader(context,
 								"password_specialgroup",
 								"Group defined in modules/authentication-password.cfg login.specialgroup does not exist"));
-						return new int[0];
+						return ListUtils.EMPTY_LIST;
 					} else
 					{
-						return new int[] { specialGroup.getID() };
+						return Arrays.asList(specialGroup);
 					}
 				}
 			}
@@ -151,7 +160,7 @@ public class PasswordAuthentication
 		catch (Exception e) {
 			// The user is not a password user, so we don't need to worry about them
 		}
-		return new int[0];
+		return ListUtils.EMPTY_LIST;
     }
 
     /**
@@ -187,6 +196,7 @@ public class PasswordAuthentication
      * <br>NO_SUCH_USER    - no EPerson with matching email address.
      * <br>BAD_ARGS        - missing username, or user matched but cannot login.
      */
+    @Override
     public int authenticate(Context context,
                             String username,
                             String password,
@@ -198,14 +208,7 @@ public class PasswordAuthentication
         {
             EPerson eperson = null;
             log.info(LogManager.getHeader(context, "authenticate", "attempting password auth of user="+username));
-            try
-            {
-                eperson = EPerson.findByEmail(context, username.toLowerCase());
-            }
-            catch (AuthorizeException e)
-            {
-                log.trace("Failed to authorize looking up EPerson", e);
-            }
+            eperson = EPersonServiceFactory.getInstance().getEPersonService().findByEmail(context, username.toLowerCase());
 
             if (eperson == null)
             {
@@ -223,7 +226,7 @@ public class PasswordAuthentication
                 log.warn(LogManager.getHeader(context, "authenticate", "rejecting PasswordAuthentication because "+username+" requires certificate."));
                 return CERT_REQUIRED;
             }
-            else if (eperson.checkPassword(password))
+            else if (EPersonServiceFactory.getInstance().getEPersonService().checkPassword(context, eperson, password))
             {
                 // login is ok if password matches:
                 context.setCurrentUser(eperson);
@@ -258,6 +261,7 @@ public class PasswordAuthentication
      *
      * @return fully-qualified URL
      */
+    @Override
     public String loginPageURL(Context context,
                             HttpServletRequest request,
                             HttpServletResponse response)
@@ -275,6 +279,7 @@ public class PasswordAuthentication
      *
      * @return Message key to look up in i18n message catalog.
      */
+    @Override
     public String loginPageTitle(Context context)
     {
         return "org.dspace.eperson.PasswordAuthentication.title";

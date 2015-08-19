@@ -20,7 +20,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
 import org.dspace.rdf.RDFUtil;
 import org.dspace.utils.DSpace;
 
@@ -85,7 +85,7 @@ public class DataProviderServlet extends HttpServlet {
         try
         {
             context = new Context(Context.READ_ONLY);
-            dso = HandleManager.resolveToObject(context, handle);
+            dso = HandleServiceImpl.resolveToObject(context, handle);
         }
         catch (SQLException ex)
         {

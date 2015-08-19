@@ -33,14 +33,14 @@
 <%@ page import="org.dspace.content.Metadatum" %>
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
-<%@ page import="org.dspace.handle.HandleManager" %>
-<%@ page import="org.dspace.license.CreativeCommons" %>
+<%@ page import="org.dspace.handle.HandleServiceImpl" %>
+<%@ page import="org.dspace.license.CreativeCommonsServiceImpl" %>
 <%@page import="javax.servlet.jsp.jstl.fmt.LocaleSupport"%>
 <%@page import="org.dspace.versioning.Version"%>
 <%@page import="org.dspace.core.Context"%>
 <%@page import="org.dspace.app.webui.util.VersionUtil"%>
 <%@page import="org.dspace.app.webui.util.UIUtil"%>
-<%@page import="org.dspace.authorize.AuthorizeManager"%>
+<%@page import="org.dspace.authorize.AuthorizeServiceImpl"%>
 <%@page import="java.util.List"%>
 <%@page import="org.dspace.core.Constants"%>
 <%@page import="org.dspace.eperson.EPerson"%>
@@ -63,8 +63,8 @@
     String handle = item.getHandle();
 
     // CC URL & RDF
-    String cc_url = CreativeCommons.getLicenseURL(item);
-    String cc_rdf = CreativeCommons.getLicenseRDF(item);
+    String cc_url = CreativeCommonsServiceImpl.getLicenseURL(item);
+    String cc_rdf = CreativeCommonsServiceImpl.getLicenseRDF(item);
 
     // Full title needs to be put into a string to use as tag argument
     String title = "";
@@ -137,7 +137,7 @@
                 <%-- <strong>Please use this identifier to cite or link to this item:
                 <code><%= HandleManager.getCanonicalForm(handle) %></code></strong>--%>
                 <div class="well"><fmt:message key="jsp.display-item.identifier"/>
-                <code><%= HandleManager.getCanonicalForm(handle) %></code></div>
+                <code><%= HandleServiceImpl.getCanonicalForm(handle) %></code></div>
 <%
         if (admin_button)  // admin edit button
         { %>

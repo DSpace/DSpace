@@ -8,8 +8,8 @@
 package org.dspace.rest.common;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.util.MetadataExposure;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.app.util.MetadataExposureServiceImpl;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.content.Bundle;
 import org.dspace.content.Metadatum;
 import org.dspace.core.Context;
@@ -62,7 +62,7 @@ public class Item extends DSpaceObject {
             metadata = new ArrayList<MetadataEntry>();
             Metadatum[] dcvs = item.getMetadata(org.dspace.content.Item.ANY, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY);
             for (Metadatum dcv : dcvs) {
-                if (!MetadataExposure.isHidden(context, dcv.schema, dcv.element, dcv.qualifier)) {
+                if (!MetadataExposureServiceImpl.isHidden(context, dcv.schema, dcv.element, dcv.qualifier)) {
                     metadata.add(new MetadataEntry(dcv.getField(), dcv.value, dcv.language));
                 }
             }
@@ -107,7 +107,7 @@ public class Item extends DSpaceObject {
             for(Bundle bundle : bundles) {
                 org.dspace.content.Bitstream[] itemBitstreams = bundle.getBitstreams();
                 for(org.dspace.content.Bitstream itemBitstream : itemBitstreams) {
-                    if(AuthorizeManager.authorizeActionBoolean(context, itemBitstream, org.dspace.core.Constants.READ)) {
+                    if(AuthorizeServiceImpl.authorizeActionBoolean(context, itemBitstream, org.dspace.core.Constants.READ)) {
                         bitstreams.add(new Bitstream(itemBitstream, null));
                     }
                 }

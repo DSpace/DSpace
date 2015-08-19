@@ -19,10 +19,13 @@ import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.logging.Level;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.packager.PackageException;
 import org.dspace.content.packager.PackageUtils;
@@ -30,6 +33,9 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
 import org.jdom.Element;
 import org.jdom.Namespace;
 
@@ -92,6 +98,11 @@ public class METSRightsCrosswalk
     // Value of METSRights <UserName> @USERTYPE attribute to use for DSpace Groups
     private static final String PERSON_USERTYPE = "INDIVIDUAL";
 
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+    protected ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
+
 
     /*----------- Dissemination functions -------------------*/
 
@@ -127,7 +138,7 @@ public class METSRightsCrosswalk
      * @throws AuthorizeException
      */
     @Override
-    public Element disseminateElement(DSpaceObject dso)
+    public Element disseminateElement(Context context, DSpaceObject dso)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
@@ -156,8 +167,7 @@ public class METSRightsCrosswalk
         // what those rights are -- too many types of content can be stored in DSpace
 
         //Get all policies on this DSpace Object
-        Context context = new Context();
-        List<ResourcePolicy> policies = AuthorizeManager.getPolicies(context, dso);
+        List<ResourcePolicy> policies = authorizeService.getPolicies(context, dso);
 
         //For each DSpace policy
         for(ResourcePolicy policy : policies)
@@ -205,11 +215,11 @@ public class METSRightsCrosswalk
               //Default all DSpace groups to have "MANAGED GRP" as the type
               String contextClass=GROUP_CONTEXTCLASS;
 
-              if(group.getID()==Group.ANONYMOUS_ID) //DSpace Anonymous Group = 'GENERAL PUBLIC' type
+              if(StringUtils.equals(group.getName(), Group.ANONYMOUS)) //DSpace Anonymous Group = 'GENERAL PUBLIC' type
               {
                   contextClass = ANONYMOUS_CONTEXTCLASS;
               }
-              else if(group.getID()==Group.ADMIN_ID) //DSpace Administrator Group = 'REPOSITORY MGR' type
+              else if(StringUtils.equals(group.getName(), Group.ADMIN)) //DSpace Administrator Group = 'REPOSITORY MGR' type
               {
                   contextClass = ADMIN_CONTEXTCLASS;
               }
@@ -282,17 +292,16 @@ public class METSRightsCrosswalk
            
         }//end for each policy
 
-        context.complete();
         return rightsMD;
     }
 
     @Override
-    public List<Element> disseminateList(DSpaceObject dso)
+    public List<Element> disseminateList(Context context, DSpaceObject dso)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
         List<Element> result = new ArrayList<Element>(1);
-        result.add(disseminateElement(dso));
+        result.add(disseminateElement(context, dso));
         return result;
     }
 
@@ -401,14 +410,14 @@ public class METSRightsCrosswalk
      * @throws AuthorizeException
      */
     @Override
-    public void ingest(Context context, DSpaceObject dso, Element root)
+    public void ingest(Context context, DSpaceObject dso, Element root, boolean createMissingMetadataFields)
         throws CrosswalkException, IOException, SQLException, AuthorizeException
     {
         if (!(root.getName().equals("RightsDeclarationMD")))
         {
             throw new MetadataValidationException("Wrong root element for METSRights: " + root.toString());
         }
-        ingest(context, dso, root.getChildren());
+        ingest(context, dso, root.getChildren(), createMissingMetadataFields);
     }
 
     /**
@@ -432,7 +441,7 @@ public class METSRightsCrosswalk
      * @see RoleCrosswalk
      */
     @Override
-    public void ingest(Context context, DSpaceObject dso, List<Element> ml)
+    public void ingest(Context context, DSpaceObject dso, List<Element> ml, boolean createMissingMetadataFields)
         throws CrosswalkException, IOException, SQLException, AuthorizeException
     {
         // we cannot crosswalk METSRights to a SITE object
@@ -445,7 +454,7 @@ public class METSRightsCrosswalk
         // as we don't want them to conflict with policies we will be adding
         if(!ml.isEmpty())
         {
-            AuthorizeManager.removeAllPolicies(context, dso);
+            authorizeService.removeAllPolicies(context, dso);
         }
 
         // Loop through each Element in the List
@@ -455,7 +464,7 @@ public class METSRightsCrosswalk
             // if we're fed a <RightsDeclarationMD> wrapper object, recurse on its guts:
             if (element.getName().equals("RightsDeclarationMD"))
             {
-                ingest(context, dso, element.getChildren());
+                ingest(context, dso, element.getChildren(), createMissingMetadataFields);
             }
             // "Context" section (where permissions are stored)
             else if (element.getName().equals("Context"))
@@ -469,15 +478,15 @@ public class METSRightsCrosswalk
                 {                 
                     SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd" );
                     try {
-                        ResourcePolicy rp = ResourcePolicy.create(context);
+                        ResourcePolicy rp = resourcePolicyService.create(context);
                         if (element.getAttributeValue("CONTEXTCLASS").equalsIgnoreCase("GENERAL PUBLIC")) {
-                            Group anonGroup = Group.find(context, 0);
+                            Group anonGroup = groupService.findByName(context, Group.ANONYMOUS);
                             rp.setGroup(anonGroup);
                         }
                         else
                         {
                             if (element.getAttributeValue("CONTEXTCLASS").equalsIgnoreCase("REPOSITORY MGR")) {
-                                Group adminGroup = Group.find(context, 1);
+                                Group adminGroup = groupService.findByName(context, Group.ADMIN);
                                 rp.setGroup(adminGroup);
                             }
                         }
@@ -545,7 +554,7 @@ public class METSRightsCrosswalk
                     if(ANONYMOUS_CONTEXTCLASS.equals(contextClass))
                     {
                         //get DSpace Anonymous group, ID=0
-                        Group anonGroup = Group.find(context, 0);
+                        Group anonGroup = groupService.findByName(context, Group.ANONYMOUS);
                         if(anonGroup==null)
                         {
                             throw new CrosswalkInternalException("The DSpace database has not been properly initialized.  The Anonymous Group is missing from the database.");
@@ -556,7 +565,7 @@ public class METSRightsCrosswalk
                     else if(ADMIN_CONTEXTCLASS.equals(contextClass))
                     {
                         //get DSpace Administrator group, ID=1
-                        Group adminGroup = Group.find(context, 1);
+                        Group adminGroup = groupService.findByName(context, Group.ADMIN);
                         if(adminGroup==null)
                         {
                             throw new CrosswalkInternalException("The DSpace database has not been properly initialized.  The Administrator Group is missing from the database.");
@@ -578,7 +587,7 @@ public class METSRightsCrosswalk
                             groupName = PackageUtils.translateGroupNameForImport(context, groupName);
 
                             //Check if this group exists in DSpace already
-                            Group group = Group.findByName(context, groupName);
+                            Group group = groupService.findByName(context, groupName);
 
                             //if not found, throw an error -- user should restore group from the SITE AIP
                             if(group==null)
@@ -609,13 +618,13 @@ public class METSRightsCrosswalk
                         String personEmail = element.getChildTextTrim("UserName", METSRights_NS);
 
                         //Check if this person exists in DSpace already
-                        EPerson person = EPerson.findByEmail(context, personEmail);
+                        EPerson person = ePersonService.findByEmail(context, personEmail);
 
                         //If cannot find by email, try by netID
                         //(though METSRights should contain email if it was exported by DSpace)
                         if(person==null)
                         {
-                            person = EPerson.findByNetid(context, personEmail);
+                            person = ePersonService.findByNetid(context, personEmail);
                         }
 
                         //if not found, throw an error -- user should restore person from the SITE AIP
@@ -647,18 +656,16 @@ public class METSRightsCrosswalk
      *
      * @param context DSpace context object
      * @param dso The DSpace Object
-     * @param group The DSpace Group
-     * @param permsElement The METSRights <code>Permissions</code> element
      */
 private void assignPermissions(Context context, DSpaceObject dso, List<ResourcePolicy> policies)
         throws SQLException, AuthorizeException
     {
-        AuthorizeManager.removeAllPolicies(context, dso);
+        authorizeService.removeAllPolicies(context, dso);
         if (policies == null){
             throw new AuthorizeException("Policies are null");
         }
         else{
-            AuthorizeManager.addPolicies(context, policies, dso);
+            authorizeService.addPolicies(context, policies, dso);
         }
     }
 
@@ -680,7 +687,7 @@ private void assignPermissions(Context context, DSpaceObject dso, List<ResourceP
         }
 
         //Otherwise, add the appropriate group policy for this object
-        AuthorizeManager.addPolicy(context, dso, actionID, group);
+        authorizeService.addPolicy(context, dso, actionID, group);
     }
 
      /**
@@ -711,7 +718,7 @@ private void assignPermissions(Context context, DSpaceObject dso, List<ResourceP
         }
 
         //Otherwise, add the appropriate EPerson policy for this object
-        AuthorizeManager.addPolicy(context, dso, actionID, person);
+        authorizeService.addPolicy(context, dso, actionID, person);
     }
 
     /**

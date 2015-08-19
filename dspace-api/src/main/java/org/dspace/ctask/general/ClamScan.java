@@ -22,10 +22,9 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
+import org.dspace.content.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
@@ -44,31 +43,32 @@ import org.dspace.curate.Suspendable;
 @Suspendable(invoked= Curator.Invoked.INTERACTIVE)
 public class ClamScan extends AbstractCurationTask
 {
-    private static final int DEFAULT_CHUNK_SIZE = 4096;//2048
-    private static final byte[] INSTREAM   = "zINSTREAM\0".getBytes();
-    private static final byte[] PING            = "zPING\0".getBytes();
-    private static final byte[] STATS          = "nSTATS\n".getBytes();//prefix with z
-    private static final byte[] IDSESSION = "zIDSESSION\0".getBytes();
-    private static final byte[] END = "zEND\0".getBytes();
-    private static final String PLUGIN_PREFIX = "clamav";
-    private static final String INFECTED_MESSAGE = "had virus detected.";
-    private static final String CLEAN_MESSAGE = "had no viruses detected.";
-    private static final String CONNECT_FAIL_MESSAGE = "Unable to connect to virus service - check setup";
-    private static final String SCAN_FAIL_MESSAGE = "Error encountered using virus service - check setup";
-    private static final String NEW_ITEM_HANDLE = "in workflow";
+    protected final int DEFAULT_CHUNK_SIZE = 4096;//2048
+    protected final byte[] INSTREAM   = "zINSTREAM\0".getBytes();
+    protected final byte[] PING            = "zPING\0".getBytes();
+    protected final byte[] STATS          = "nSTATS\n".getBytes();//prefix with z
+    protected final byte[] IDSESSION = "zIDSESSION\0".getBytes();
+    protected final byte[] END = "zEND\0".getBytes();
+    protected final String PLUGIN_PREFIX = "clamav";
+    protected final String INFECTED_MESSAGE = "had virus detected.";
+    protected final String CLEAN_MESSAGE = "had no viruses detected.";
+    protected final String CONNECT_FAIL_MESSAGE = "Unable to connect to virus service - check setup";
+    protected final String SCAN_FAIL_MESSAGE = "Error encountered using virus service - check setup";
+    protected final String NEW_ITEM_HANDLE = "in workflow";
 
     private static Logger log = Logger.getLogger(ClamScan.class);
     
-    private static String host = null;
-    private static int  port = 0;
-    private static int timeout = 0;
-    private static boolean failfast = true;
+    protected String host = null;
+    protected int  port = 0;
+    protected int timeout = 0;
+    protected boolean failfast = true;
     
-    private int status = Curator.CURATE_UNSET;
-    private List<String> results = null;
+    protected int status = Curator.CURATE_UNSET;
+    protected List<String> results = null;
 
-    private Socket socket = null;
-    private DataOutputStream dataOutputStream = null;
+    protected Socket socket = null;
+    protected DataOutputStream dataOutputStream = null;
+    protected BitstreamService bitstreamService;
 
     @Override
     public void init(Curator curator, String taskId) throws IOException
@@ -78,6 +78,7 @@ public class ClamScan extends AbstractCurationTask
         port = ConfigurationManager.getIntProperty(PLUGIN_PREFIX, "service.port");
         timeout = ConfigurationManager.getIntProperty(PLUGIN_PREFIX, "socket.timeout");
         failfast = ConfigurationManager.getBooleanProperty(PLUGIN_PREFIX, "scan.failfast");
+        bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     }
 
     @Override
@@ -103,11 +104,12 @@ public class ClamScan extends AbstractCurationTask
             
             try
             {
-                Bundle bundle = item.getBundles("ORIGINAL")[0];
+                Bundle bundle = itemService.getBundles(item, "ORIGINAL").get(0);
                 results = new ArrayList<String>();
-                for (Bitstream bitstream : bundle.getBitstreams())
+                for (BundleBitstream bundleBitstream : bundle.getBitstreams())
                 {
-                    InputStream inputstream = bitstream.retrieve();
+                    Bitstream bitstream = bundleBitstream.getBitstream();
+                    InputStream inputstream = bitstreamService.retrieve(Curator.curationContext(), bitstream);
                     logDebugMessage("Scanning " + bitstream.getName() + " . . . ");
                     int bstatus = scan(bitstream, inputstream, getItemHandle(item));
                     inputstream.close();
@@ -158,7 +160,7 @@ public class ClamScan extends AbstractCurationTask
      * This method opens a session.
      */
 
-    private void openSession() throws IOException
+    protected void openSession() throws IOException
     {
         socket = new Socket();
         try
@@ -207,7 +209,7 @@ public class ClamScan extends AbstractCurationTask
      *
      *
      */
-    private void closeSession()
+    protected void closeSession()
     {
         if (dataOutputStream != null)
         {
@@ -242,8 +244,8 @@ public class ClamScan extends AbstractCurationTask
      * @return a ScanResult representing the server response
      * @throws IOException
      */
-    final static byte[] buffer = new byte[DEFAULT_CHUNK_SIZE];;
-    private int scan(Bitstream bitstream, InputStream inputstream, String itemHandle)
+    final byte[] buffer = new byte[DEFAULT_CHUNK_SIZE];;
+    protected int scan(Bitstream bitstream, InputStream inputstream, String itemHandle)
     {
         try
         {
@@ -323,7 +325,7 @@ public class ClamScan extends AbstractCurationTask
          return Curator.CURATE_ERROR;
     }
 
-    private void formatResults(Item item) throws IOException
+    protected void formatResults(Item item) throws IOException
     {
         StringBuilder sb = new StringBuilder();
         sb.append("Item: ").append(getItemHandle(item)).append(" ");
@@ -346,14 +348,14 @@ public class ClamScan extends AbstractCurationTask
         setResult(sb.toString());
     }
 
-    private static String getItemHandle(Item item)
+    protected String getItemHandle(Item item)
     {
         String handle = item.getHandle();
         return (handle != null) ? handle: NEW_ITEM_HANDLE;
     }
 
 
-    private void logDebugMessage(String message)
+    protected void logDebugMessage(String message)
     {
         if (log.isDebugEnabled())
         {

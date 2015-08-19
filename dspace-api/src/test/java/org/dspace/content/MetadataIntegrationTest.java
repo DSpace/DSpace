@@ -16,7 +16,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.dspace.AbstractIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.Constants;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,6 +33,14 @@ public class MetadataIntegrationTest  extends AbstractIntegrationTest
     /** log4j category */
     private static final Logger log = Logger.getLogger(MetadataIntegrationTest.class);
 
+
+    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+    protected MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
+    protected MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
+    protected MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
 
     /**
      * This method will be run before every test as per @Before. It will
@@ -73,38 +82,32 @@ public class MetadataIntegrationTest  extends AbstractIntegrationTest
 
         //we create the structure
         context.turnOffAuthorisationSystem();
-        Item it = Item.create(context);
+        Community owningCommunity = communityService.create(null, context);
+        Collection collection = collectionService.create(context, owningCommunity);
+        Item it = workspaceItemService.create(context, collection, false).getItem();
 
-        MetadataSchema schema = new MetadataSchema("htpp://test/schema/", schemaName);
-        schema.create(context);
+        MetadataSchema schema = metadataSchemaService.create(context, schemaName, "htpp://test/schema/");
 
-        MetadataField field1 = new MetadataField(schema, "elem1", "qual1", "note 1");
-        field1.create(context);
+        MetadataField field1 = metadataFieldService.create(context, schema, "elem1", "qual1", "note 1");
 
-        MetadataField field2 = new MetadataField(schema, "elem2", "qual2", "note 2");
-        field2.create(context);
+        MetadataField field2 = metadataFieldService.create(context, schema, "elem2", "qual2", "note 2");
 
-        MetadataValue value1 = new MetadataValue(field1);
-        value1.setResourceId(it.getID());
-        value1.setResourceTypeId(Constants.ITEM);
+        MetadataValue value1 = metadataValueService.create(context, it, field1);
         value1.setValue("value1");
-        value1.create(context);
+        metadataValueService.update(context, value1);
 
-        MetadataValue value2 = new MetadataValue(field2);
-        value2.setResourceId(it.getID());
-        value2.setResourceTypeId(Constants.ITEM);
+        MetadataValue value2 = metadataValueService.create(context, it, field2);
         value2.setValue("value2");
-        value2.create(context);
-        
-        context.commit();
+        metadataValueService.update(context, value2);
+
 
         //verify it works as expected
         assertThat("testCreateSchema 0", schema.getName(), equalTo(schemaName));
-        assertThat("testCreateSchema 1", field1.getSchemaID(), equalTo(schema.getSchemaID()));
-        assertThat("testCreateSchema 2", field2.getSchemaID(), equalTo(schema.getSchemaID()));
+        assertThat("testCreateSchema 1", field1.getMetadataSchema(), equalTo(schema));
+        assertThat("testCreateSchema 2", field2.getMetadataSchema(), equalTo(schema));
 
-        MetadataField[] fields = MetadataField.findAllInSchema(context, schema.getSchemaID());
-        assertTrue("testCreateSchema 3", fields.length == 2);
+        List<MetadataField> fields = metadataFieldService.findAllInSchema(context, schema);
+        assertTrue("testCreateSchema 3", fields.size() == 2);
         boolean exist = true;
         for(MetadataField f : fields)
         {
@@ -115,24 +118,23 @@ public class MetadataIntegrationTest  extends AbstractIntegrationTest
         }
         assertTrue("testCreateSchema 4", exist);
 
-        List<MetadataValue> col1 = MetadataValue.findByField(context, field1.getFieldID());
+        List<MetadataValue> col1 = metadataValueService.findByField(context, field1);
         assertTrue("testCreateSchema 5", col1.contains(value1));
 
-        List<MetadataValue> col2 = MetadataValue.findByField(context, field2.getFieldID());
+        List<MetadataValue> col2 = metadataValueService.findByField(context, field2);
         assertTrue("testCreateSchema 6", col2.contains(value2));
 
         //clean database
-        value1.delete(context);
-        col1 = MetadataValue.findByField(context, field1.getFieldID());
+        it.removeMetadata(value1);
+        col1 = metadataValueService.findByField(context, field1);
         assertFalse("testCreateSchema 7", col1.contains(value1));
 
-        value2.delete(context);
-        field1.delete(context);
-        field2.delete(context);
-        schema.delete(context);
+        it.removeMetadata(value2);
+        metadataFieldService.delete(context, field1);
+        metadataFieldService.delete(context, field2);
+        metadataSchemaService.delete(context, schema);
 
         context.restoreAuthSystemState();
-        context.commit();
     }
 
 }

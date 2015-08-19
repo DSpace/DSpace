@@ -23,14 +23,14 @@
 <%@page import="javax.servlet.jsp.jstl.fmt.LocaleSupport"%>
 <%@ page import="org.dspace.content.Metadatum" %>
 <%@ page import="org.dspace.content.Item" %>
-<%@ page import="org.dspace.content.SupervisedItem" %>
+<%@ page import="org.dspace.content.SupervisedItemServiceImpl" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="org.dspace.eperson.Group" %>
 <%@ page import="org.dspace.core.Utils" %>
 
 <%
     // get the object array out of the request
-    SupervisedItem[] supervisedItems = (SupervisedItem[]) request.getAttribute("supervised");
+    SupervisedItemServiceImpl[] supervisedItems = (SupervisedItemServiceImpl[]) request.getAttribute("supervised");
     request.setAttribute("LanguageSwitch", "hide");
 %>
 

@@ -14,7 +14,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.swordapp.server.SwordError;
@@ -201,7 +201,7 @@ public class SwordUrlManager
 				throw new SwordError(DSpaceUriRegistry.BAD_URL, "The deposit URL is incomplete");
 			}
 
-			DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+			DSpaceObject dso = HandleServiceImpl.resolveToObject(context, handle);
             if (dso == null)
             {
                 return null;
@@ -284,7 +284,7 @@ public class SwordUrlManager
 					url = url.substring(0, url.length() - 1);
 				}
 
-				DSpaceObject dso = HandleManager.resolveToObject(context, url);
+				DSpaceObject dso = HandleServiceImpl.resolveToObject(context, url);
                 if (dso == null)
                 {
                     return null;
@@ -545,7 +545,7 @@ public class SwordUrlManager
         // item
         else
         {
-		    return HandleManager.getCanonicalForm(item.getHandle());
+		    return HandleServiceImpl.getCanonicalForm(item.getHandle());
         }
         return null;
 	}

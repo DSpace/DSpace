@@ -32,7 +32,7 @@ import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
 
 public class DiscoverUtility
 {
@@ -68,7 +68,7 @@ public class DiscoverUtility
             }
             return null;
         }
-        DSpaceObject scope = HandleManager.resolveToObject(context, location);
+        DSpaceObject scope = HandleServiceImpl.resolveToObject(context, location);
         return scope;
     }
 

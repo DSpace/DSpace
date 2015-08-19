@@ -8,17 +8,19 @@
 package org.dspace.versioning;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.identifier.IdentifierException;
-import org.dspace.identifier.IdentifierService;
-import org.dspace.utils.DSpace;
+import org.dspace.identifier.service.IdentifierService;
+import org.dspace.versioning.service.VersionHistoryService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 
 /**
@@ -31,56 +33,58 @@ import org.dspace.authorize.ResourcePolicy;
 public class DefaultItemVersionProvider extends AbstractVersionProvider implements ItemVersionProvider
 {
 
+    @Autowired(required = true)
+    protected WorkspaceItemService workspaceItemService;
+    @Autowired(required = true)
+    protected VersionHistoryService versionHistoryService;
+    @Autowired(required = true)
+    protected IdentifierService identifierService;
+    @Autowired(required = true)
+    protected AuthorizeService authorizeService;
+
+    @Override
     public Item createNewItemAndAddItInWorkspace(Context context, Item nativeItem) {
         try
         {
-            WorkspaceItem workspaceItem = WorkspaceItem.create(context, nativeItem.getOwningCollection(), false);
+            WorkspaceItem workspaceItem = workspaceItemService.create(context, nativeItem.getOwningCollection(), false);
             Item itemNew = workspaceItem.getItem();
-            itemNew.update();
+            itemService.update(context, itemNew);
             return itemNew;
-        }catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }catch (AuthorizeException e) {
-           throw new RuntimeException(e.getMessage(), e);
-        }catch (IOException e) {
+        }catch (SQLException | AuthorizeException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
+    @Override
     public void deleteVersionedItem(Context c, Version versionToDelete, VersionHistory history)
     {
         try
         {
             // if versionToDelete is the current version we have to reinstate the previous version
             // and reset canonical
-            if(history.isLastVersion(versionToDelete) && history.size() > 1)
+            if(versionHistoryService.isLastVersion(history, versionToDelete) && history.getVersions().size() > 1)
             {
                 // reset the previous version to archived
-                Item item = history.getPrevious(versionToDelete).getItem();
+                Item item = versionHistoryService.getPrevious(history, versionToDelete).getItem();
                 item.setArchived(true);
-                item.update();
+                itemService.update(c, item);
             }
 
             // assign tombstone to the Identifier and reset canonical to the previous version only if there is a previous version
-            IdentifierService identifierService = new DSpace().getSingletonService(IdentifierService.class);
             Item itemToDelete=versionToDelete.getItem();
             identifierService.delete(c, itemToDelete);
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        } catch (AuthorizeException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        } catch (IdentifierException e) {
+        } catch (SQLException | AuthorizeException | IdentifierException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
+    @Override
     public Item updateItemState(Context c, Item itemNew, Item previousItem)
     {
         try
         {
-            copyMetadata(itemNew, previousItem);
+            copyMetadata(c, itemNew, previousItem);
             createBundlesAndAddBitstreams(c, itemNew, previousItem);
-            IdentifierService identifierService = new DSpace().getSingletonService(IdentifierService.class);
             try
             {
                 identifierService.reserve(c, itemNew);
@@ -94,13 +98,11 @@ public class DefaultItemVersionProvider extends AbstractVersionProvider implemen
             // only to preserve customly set policies and embargos (which are
             // realized by custom policies with a start date).
             List<ResourcePolicy> policies = 
-                    AuthorizeManager.findPoliciesByDSOAndType(c, previousItem, ResourcePolicy.TYPE_CUSTOM);
-            AuthorizeManager.addPolicies(c, policies, itemNew);
-            itemNew.update();
+                    authorizeService.findPoliciesByDSOAndType(c, previousItem, ResourcePolicy.TYPE_CUSTOM);
+            authorizeService.addPolicies(c, policies, itemNew);
+            itemService.update(c, itemNew);
             return itemNew;
-        }catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        } catch (AuthorizeException e) {
+        }catch (IOException | SQLException | AuthorizeException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }

@@ -16,11 +16,10 @@ import org.dspace.app.webui.submit.JSPStepManager;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
-import org.dspace.content.LicenseUtils;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.license.CreativeCommons;
+import org.dspace.license.CreativeCommonsServiceImpl;
 import org.dspace.submit.step.LicenseStep;
 
 import javax.servlet.ServletException;
@@ -101,7 +100,7 @@ public class JSPCCLicenseStep extends JSPStep
     {
         // Do we already have a CC license?
         Item item = subInfo.getSubmissionItem().getItem();
-        boolean exists = CreativeCommons.hasLicense(context, item);
+        boolean exists = CreativeCommonsServiceImpl.hasLicense(context, item);
         request.setAttribute("cclicense.exists", Boolean.valueOf(exists));
 
         JSPStepManager.showJSP(request, response, subInfo, CC_LICENSE_JSP);

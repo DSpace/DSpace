@@ -35,7 +35,7 @@ import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
@@ -49,8 +49,8 @@ import org.dspace.content.authority.Choices;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.handle.HandleManager;
-import org.dspace.license.CreativeCommons;
+import org.dspace.handle.HandleServiceImpl;
+import org.dspace.license.CreativeCommonsServiceImpl;
 
 /**
  * Servlet for editing and deleting (expunging) items
@@ -123,7 +123,7 @@ public class EditItemServlet extends DSpaceServlet
         else if ((handle != null) && !handle.equals(""))
         {
             // resolve handle
-            DSpaceObject dso = HandleManager.resolveToObject(context, handle.trim());
+            DSpaceObject dso = HandleServiceImpl.resolveToObject(context, handle.trim());
 
             // make sure it's an ITEM
             if ((dso != null) && (dso.getType() == Constants.ITEM))
@@ -191,7 +191,7 @@ public class EditItemServlet extends DSpaceServlet
         Item item = Item.find(context, UIUtil.getIntParameter(request,
                 "item_id"));
  
-        String handle = HandleManager.findHandle(context, item);
+        String handle = HandleServiceImpl.findHandle(context, item);
 
         // now check to see if person can edit item
         checkEditAuthorization(context, item);
@@ -257,7 +257,7 @@ public class EditItemServlet extends DSpaceServlet
             break;
 
         case START_MOVE_ITEM:
-                if (AuthorizeManager.isAdmin(context,item))
+                if (AuthorizeServiceImpl.isAdmin(context, item))
                 {
                         // Display move collection page with fields of collections and communities
                         Collection[] allNotLinkedCollections = item.getCollectionsNotLinked();
@@ -267,7 +267,7 @@ public class EditItemServlet extends DSpaceServlet
                         List<Collection> authNotLinkedCollections = new ArrayList<Collection>();
                         for (Collection c : allNotLinkedCollections)
                         {
-                            if (AuthorizeManager.authorizeActionBoolean(context, c, Constants.ADD))
+                            if (AuthorizeServiceImpl.authorizeActionBoolean(context, c, Constants.ADD))
                             {
                                 authNotLinkedCollections.add(c);
                             }
@@ -276,7 +276,7 @@ public class EditItemServlet extends DSpaceServlet
                 List<Collection> authLinkedCollections = new ArrayList<Collection>();
                 for (Collection c : allLinkedCollections)
                 {
-                    if (AuthorizeManager.authorizeActionBoolean(context, c, Constants.REMOVE))
+                    if (AuthorizeServiceImpl.authorizeActionBoolean(context, c, Constants.REMOVE))
                     {
                         authLinkedCollections.add(c);
                     }
@@ -299,7 +299,7 @@ public class EditItemServlet extends DSpaceServlet
                 break;
                         
         case CONFIRM_MOVE_ITEM:
-                if (AuthorizeManager.isAdmin(context,item))
+                if (AuthorizeServiceImpl.isAdmin(context, item))
                 {
                         Collection fromCollection = Collection.find(context, UIUtil.getIntParameter(request, "collection_from_id"));
                         Collection toCollection = Collection.find(context, UIUtil.getIntParameter(request, "collection_to_id"));
@@ -412,14 +412,14 @@ public class EditItemServlet extends DSpaceServlet
             // remove/add bitstream to the item
             context.turnOffAuthorisationSystem();
                 // set or replace existing CC license
-                CreativeCommons.setLicense( context, item,
-                   request.getParameter("cc_license_url") );
+                CreativeCommonsServiceImpl.setLicense(context, item,
+                        request.getParameter("cc_license_url"));
                 context.restoreAuthSystemState();
                 context.commit();
         }
   
         // Get the handle, if any
-        String handle = HandleManager.findHandle(context, item);
+        String handle = HandleServiceImpl.findHandle(context, item);
 
         // Collections
         Collection[] collections = item.getCollections();
@@ -446,7 +446,7 @@ public class EditItemServlet extends DSpaceServlet
             }
         }
 
-        request.setAttribute("admin_button", AuthorizeManager.authorizeActionBoolean(context, item, Constants.ADMIN));
+        request.setAttribute("admin_button", AuthorizeServiceImpl.authorizeActionBoolean(context, item, Constants.ADMIN));
         try
         {
             AuthorizeUtil.authorizeManageItemPolicy(context, item);
@@ -457,7 +457,7 @@ public class EditItemServlet extends DSpaceServlet
             request.setAttribute("policy_button", Boolean.FALSE);
         }
         
-        if (AuthorizeManager.authorizeActionBoolean(context, item
+        if (AuthorizeServiceImpl.authorizeActionBoolean(context, item
                 .getParentObject(), Constants.REMOVE))
         {
             request.setAttribute("delete_button", Boolean.TRUE);
@@ -469,7 +469,7 @@ public class EditItemServlet extends DSpaceServlet
         
         try
         {
-            AuthorizeManager.authorizeAction(context, item, Constants.ADD);
+            AuthorizeServiceImpl.authorizeAction(context, item, Constants.ADD);
             request.setAttribute("create_bitstream_button", Boolean.TRUE);
         }
         catch (AuthorizeException authex)
@@ -479,7 +479,7 @@ public class EditItemServlet extends DSpaceServlet
         
         try
         {
-            AuthorizeManager.authorizeAction(context, item, Constants.REMOVE);
+            AuthorizeServiceImpl.authorizeAction(context, item, Constants.REMOVE);
             request.setAttribute("remove_bitstream_button", Boolean.TRUE);
         }
         catch (AuthorizeException authex)
@@ -536,12 +536,12 @@ public class EditItemServlet extends DSpaceServlet
 
 		if (item.isDiscoverable()) 
 		{
-			request.setAttribute("privating_button", AuthorizeManager
+			request.setAttribute("privating_button", AuthorizeServiceImpl
 					.authorizeActionBoolean(context, item, Constants.WRITE));
 		} 
 		else 
 		{
-			request.setAttribute("publicize_button", AuthorizeManager
+			request.setAttribute("publicize_button", AuthorizeServiceImpl
 					.authorizeActionBoolean(context, item, Constants.WRITE));
 		}
         

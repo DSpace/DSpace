@@ -23,6 +23,7 @@ import org.dspace.content.DCDate;
 import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.Thumbnail;
+import org.dspace.content.authority.MetadataAuthorityServiceImpl;
 import org.dspace.content.service.ItemService;
 
 import org.dspace.core.ConfigurationManager;
@@ -31,8 +32,9 @@ import org.dspace.core.Context;
 import org.dspace.core.Utils;
 
 import org.dspace.sort.SortOption;
-import org.dspace.storage.bitstore.BitstreamStorageManager;
+import org.dspace.storage.bitstore.BitstreamStorageServiceImpl;
 import org.dspace.utils.DSpace;
+
 
 import java.awt.image.BufferedImage;
 
@@ -51,7 +53,6 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import javax.servlet.jsp.tagext.TagSupport;
-import org.dspace.content.authority.MetadataAuthorityManager;
 
 /**
  * Tag for display a list of items
@@ -498,7 +499,7 @@ public class ItemListTag extends TagSupport
                                     String argument;
                                     String value;
                                     if (metadataArray[j].authority != null &&
-                                            metadataArray[j].confidence >= MetadataAuthorityManager.getManager()
+                                            metadataArray[j].confidence >= MetadataAuthorityServiceImpl.getManager()
                                                 .getMinConfidence(metadataArray[j].schema, metadataArray[j].element, metadataArray[j].qualifier))
                                     {
                                         argument = "authority";
@@ -794,7 +795,7 @@ public class ItemListTag extends TagSupport
         {
             Context c = UIUtil.obtainContext(hrq);
 
-            InputStream is = BitstreamStorageManager.retrieve(c, bitstream
+            InputStream is = BitstreamStorageServiceImpl.retrieve(c, bitstream
                     .getID());
 
             //AuthorizeManager.authorizeAction(bContext, this, Constants.READ);

@@ -125,13 +125,24 @@
       <filter-name>rdf-content-negotiation</filter-name>
       <url-pattern>/handle/*</url-pattern>
   </filter-mapping>
- 
+
+
+    <!-- Listener to initialise / clean up the application -->
+    <listener>
+       <listener-class>
+          org.dspace.app.util.DSpaceContextListener
+       </listener-class>
+    </listener>
 
   <!-- kernel start listener (from impl), starts up the kernel for standalong webapps -->
   <listener>
      <listener-class>org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener</listener-class>
   </listener>
-  
+
+    <listener>
+   		<listener-class>org.dspace.app.util.DSpaceWebappListener</listener-class>
+   	</listener>
+
   <!-- Listener to clean up Commons-FileUpload -->
   <listener>
      <listener-class>
@@ -139,18 +150,12 @@
      </listener-class>
   </listener>
   
-  <!-- Listener to initialise / clean up the application -->
-  <listener>
-     <listener-class>
-        org.dspace.app.util.DSpaceContextListener
-     </listener-class>
-  </listener>
 
   <!-- Load Spring applicationContext -->
   <listener>
       <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
   </listener>
-  
+
   <!-- Servlets -->
 
   <servlet>

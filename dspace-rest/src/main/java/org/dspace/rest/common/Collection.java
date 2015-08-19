@@ -8,6 +8,7 @@
 package org.dspace.rest.common;
 
 import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;

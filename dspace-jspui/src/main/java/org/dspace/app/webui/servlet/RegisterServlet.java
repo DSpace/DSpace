@@ -11,10 +11,10 @@ import com.sun.mail.smtp.SMTPAddressFailedException;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
-import org.dspace.authenticate.AuthenticationManager;
+import org.dspace.authenticate.AuthenticationServiceImpl;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.*;
-import org.dspace.eperson.AccountManager;
+import org.dspace.eperson.AccountServiceImpl;
 import org.dspace.eperson.EPerson;
 
 import javax.mail.MessagingException;
@@ -110,7 +110,7 @@ public class RegisterServlet extends DSpaceServlet
         else
         {
             // We have a token. Find out who the it's for
-            String email = AccountManager.getEmail(context, token);
+            String email = AccountServiceImpl.getEmail(context, token);
 
             EPerson eperson = null;
 
@@ -129,7 +129,7 @@ public class RegisterServlet extends DSpaceServlet
             {
                 // Indicate if user can set password
                 boolean setPassword =
-                    AuthenticationManager.allowSetPassword(context, request, email);
+                    AuthenticationServiceImpl.allowSetPassword(context, request, email);
                 request.setAttribute("set.password", Boolean.valueOf(setPassword));
 
                 // Forward to "personal info page"
@@ -244,7 +244,7 @@ public class RegisterServlet extends DSpaceServlet
                     // Find out from site authenticator whether this email can
                     // self-register
                     boolean canRegister =
-                        AuthenticationManager.canSelfRegister(context, request, email);
+                        AuthenticationServiceImpl.canSelfRegister(context, request, email);
 
                     if (canRegister)
                     {
@@ -257,7 +257,7 @@ public class RegisterServlet extends DSpaceServlet
 
                             try
                             {
-                                AccountManager.sendRegistrationInfo(context, email);
+                                AccountServiceImpl.sendRegistrationInfo(context, email);
                             }
                             catch (javax.mail.SendFailedException e)
                             {
@@ -369,7 +369,7 @@ public class RegisterServlet extends DSpaceServlet
                     log.info(LogManager.getHeader(context,
                             "sendtoken_forgotpw", "email=" + email));
 
-                    AccountManager.sendForgotPasswordInfo(context, email);
+                    AccountServiceImpl.sendForgotPasswordInfo(context, email);
                     JSPManager.showJSP(request, response,
                             "/register/password-token-sent.jsp");
 
@@ -430,7 +430,7 @@ public class RegisterServlet extends DSpaceServlet
         String token = request.getParameter("token");
 
         // Get the email address
-        String email = AccountManager.getEmail(context, token);
+        String email = AccountServiceImpl.getEmail(context, token);
         String netid = request.getParameter("netid");
         if ((netid!=null)&&(email==null))
         {
@@ -494,13 +494,13 @@ public class RegisterServlet extends DSpaceServlet
         eperson.setSelfRegistered(true);
 
         // Give site auth a chance to set/override appropriate fields
-        AuthenticationManager.initEPerson(context, request, eperson);
+        AuthenticationServiceImpl.initEPerson(context, request, eperson);
 
         // If the user set a password, make sure it's OK
         boolean passwordOK = true;
         if (!eperson.getRequireCertificate() && netid==null &&
-            AuthenticationManager.allowSetPassword(context, request,
-                eperson.getEmail()))
+            AuthenticationServiceImpl.allowSetPassword(context, request,
+                    eperson.getEmail()))
         {
             passwordOK = EditProfileServlet.confirmAndSetPassword(eperson,
                     request);
@@ -515,7 +515,7 @@ public class RegisterServlet extends DSpaceServlet
             // delete the token
             if (token!=null)
             {
-                AccountManager.deleteToken(context, token);
+                AccountServiceImpl.deleteToken(context, token);
             }
             
             // Update user record
@@ -535,7 +535,7 @@ public class RegisterServlet extends DSpaceServlet
             request.setAttribute("password.problem", Boolean.valueOf(!passwordOK));
 
             // Indicate if user can set password
-            boolean setPassword = AuthenticationManager.allowSetPassword(
+            boolean setPassword = AuthenticationServiceImpl.allowSetPassword(
                     context, request, email);
             request.setAttribute("set.password", Boolean.valueOf(setPassword));
 
@@ -566,7 +566,7 @@ public class RegisterServlet extends DSpaceServlet
         String token = request.getParameter("token");
 
         // Get the eperson associated with the password change
-        EPerson eperson = AccountManager.getEPerson(context, token);
+        EPerson eperson = AccountServiceImpl.getEPerson(context, token);
 
         // If the token isn't valid, show an error
         if (eperson == null)
@@ -596,7 +596,7 @@ public class RegisterServlet extends DSpaceServlet
                     "email=" + eperson.getEmail()));
 
             eperson.update();
-            AccountManager.deleteToken(context, token);
+            AccountServiceImpl.deleteToken(context, token);
 
             JSPManager.showJSP(request, response,
                     "/register/password-changed.jsp");

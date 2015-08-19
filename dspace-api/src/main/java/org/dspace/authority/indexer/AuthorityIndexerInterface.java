@@ -9,8 +9,11 @@
 package org.dspace.authority.indexer;
 
 import org.dspace.authority.AuthorityValue;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+
+import java.sql.SQLException;
 
 /**
  *
@@ -29,7 +32,7 @@ public interface AuthorityIndexerInterface {
 
     public AuthorityValue nextValue();
 
-    public boolean hasMore();
+    public boolean hasMore() throws SQLException, AuthorizeException;
 
     public void close();
 

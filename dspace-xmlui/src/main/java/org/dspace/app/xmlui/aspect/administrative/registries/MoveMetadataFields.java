@@ -9,6 +9,7 @@ package org.dspace.app.xmlui.aspect.administrative.registries;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
@@ -24,6 +25,9 @@ import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.MetadataFieldService;
+import org.dspace.content.service.MetadataSchemaService;
 
 /**
  * Show a list of selected fields, and prompt the user to enter a destination schema for these fields.
@@ -58,7 +62,10 @@ public class MoveMetadataFields extends AbstractDSpaceTransformer
 		message("xmlui.administrative.registries.MoveMetadataField.submit_move");
 	private static final Message T_submit_cancel =
 		message("xmlui.general.cancel");
-	
+
+	protected MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
+	protected MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
+
 	
 	public void addPageMeta(PageMeta pageMeta) throws WingException
     {
@@ -72,13 +79,13 @@ public class MoveMetadataFields extends AbstractDSpaceTransformer
 	public void addBody(Body body) throws WingException, SQLException, AuthorizeException
 	{
 		// Get all our parameters
-		MetadataSchema[] schemas = MetadataSchema.findAll(context); 
+		List<MetadataSchema> schemas = metadataSchemaService.findAll(context);
 		String idsString = parameters.getParameter("fieldIDs", null);
 		
 		ArrayList<MetadataField> fields = new ArrayList<MetadataField>();
 		for (String id : idsString.split(","))
 		{
-			MetadataField field = MetadataField.find(context,Integer.valueOf(id));
+			MetadataField field = metadataFieldService.find(context,Integer.valueOf(id));
 			fields.add(field);
 		}
  
@@ -100,7 +107,7 @@ public class MoveMetadataFields extends AbstractDSpaceTransformer
 			String fieldEelement = field.getElement();
 			String fieldQualifier = field.getQualifier();
 			
-			MetadataSchema schema = MetadataSchema.find(context, field.getSchemaID());
+			MetadataSchema schema = field.getMetadataSchema();
 			String schemaName = schema.getName();
 			
 			StringBuilder fieldName = new StringBuilder()

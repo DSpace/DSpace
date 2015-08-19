@@ -8,7 +8,6 @@
 package org.dspace.app.util;
 
 import org.dspace.core.ConfigurationManager;
-import org.dspace.storage.rdbms.DatabaseManager;
 import org.apache.log4j.Logger;
 
 import javax.servlet.ServletContextListener;
@@ -34,7 +33,6 @@ public class DSpaceContextListener implements ServletContextListener
      */
     public static final String DSPACE_CONFIG_PARAMETER = "dspace-config";
 
-    private AbstractDSpaceWebapp webApp;
 
     /**
      * Initialize any resources required by the application.
@@ -115,24 +113,6 @@ public class DSpaceContextListener implements ServletContextListener
                     "the DSpace configuration file is stored in a context variable, 'dspace-config', in \n" +
                     "either the local servlet or global context.\n\n",e);
         }
-
-        /**
-         * Stage 3
-         *
-         * Register that this application is running.
-         */
-
-        try {
-            Class webappClass = Class.forName("org.dspace.utils.DSpaceWebapp");
-            webApp = (AbstractDSpaceWebapp) webappClass.newInstance();
-            webApp.register();
-        } catch (ClassNotFoundException ex) {
-            event.getServletContext().log("Can't create webapp MBean:  " + ex.getMessage());
-        } catch (InstantiationException ex) {
-            event.getServletContext().log("Can't create webapp MBean:  " + ex.getMessage());
-        } catch (IllegalAccessException ex) {
-            event.getServletContext().log("Can't create webapp MBean:  " + ex.getMessage());
-        }
     }
 
     /**
@@ -143,13 +123,8 @@ public class DSpaceContextListener implements ServletContextListener
     @Override
     public void contextDestroyed(ServletContextEvent event)
     {
-        webApp.deregister();
-
         try
         {
-            // Remove the database pool
-            DatabaseManager.shutdown();
-
             // Clean out the introspector
             Introspector.flushCaches();
 

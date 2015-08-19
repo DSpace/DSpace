@@ -31,8 +31,9 @@ import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.browse.BrowseException;
+import org.dspace.content.InstallItemServiceImpl;
 import org.dspace.content.service.ItemService;
 import org.dspace.rest.common.Collection;
 import org.dspace.rest.common.Item;
@@ -177,7 +178,7 @@ public class CollectionsResource extends Resource
             org.dspace.content.Collection[] dspaceCollections = org.dspace.content.Collection.findAll(context, limit, offset);
             for(org.dspace.content.Collection dspaceCollection : dspaceCollections)
             {
-                if (AuthorizeManager.authorizeActionBoolean(context, dspaceCollection, org.dspace.core.Constants.READ))
+                if (AuthorizeServiceImpl.authorizeActionBoolean(context, dspaceCollection, org.dspace.core.Constants.READ))
                 {
                     Collection collection = new org.dspace.rest.common.Collection(dspaceCollection, null, context, limit,
                             offset);
@@ -359,7 +360,7 @@ public class CollectionsResource extends Resource
             browse.indexItem(dspaceItem);
 
             log.trace("Installing item to collection(id=" + collectionId + ").");
-            dspaceItem = org.dspace.content.InstallItem.installItem(context, workspaceItem);
+            dspaceItem = InstallItemServiceImpl.installItem(context, workspaceItem);
 
             returnItem = new Item(dspaceItem, "", context);
 
@@ -596,7 +597,7 @@ public class CollectionsResource extends Resource
                 log.warn("Item(id=" + itemId + ") was not found!");
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
-            else if (!AuthorizeManager.authorizeActionBoolean(context, item, org.dspace.core.Constants.REMOVE))
+            else if (!AuthorizeServiceImpl.authorizeActionBoolean(context, item, org.dspace.core.Constants.REMOVE))
             {
                 context.abort();
                 if (context.getCurrentUser() != null)
@@ -680,7 +681,7 @@ public class CollectionsResource extends Resource
 
             for (org.dspace.content.Collection dspaceCollection : dspaceCollections)
             {
-                if (AuthorizeManager.authorizeActionBoolean(context, dspaceCollection, org.dspace.core.Constants.READ))
+                if (AuthorizeServiceImpl.authorizeActionBoolean(context, dspaceCollection, org.dspace.core.Constants.READ))
                 {
                     if (dspaceCollection.getName().equals(name))
                     {
@@ -749,7 +750,7 @@ public class CollectionsResource extends Resource
                 log.warn("Collection(id=" + id + ") was not found!");
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
-            else if (!AuthorizeManager.authorizeActionBoolean(context, collection, action))
+            else if (!AuthorizeServiceImpl.authorizeActionBoolean(context, collection, action))
             {
                 context.abort();
                 if (context.getCurrentUser() != null)

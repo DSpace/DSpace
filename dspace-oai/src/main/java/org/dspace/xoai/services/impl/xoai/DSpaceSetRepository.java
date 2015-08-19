@@ -16,7 +16,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
@@ -198,7 +198,7 @@ public class DSpaceSetRepository implements SetRepository
         {
             try
             {
-                DSpaceObject dso = HandleManager.resolveToObject(_context,
+                DSpaceObject dso = HandleServiceImpl.resolveToObject(_context,
                         setSpec.replace("col_", "").replace("_", "/"));
                 if (dso == null || !(dso instanceof Collection))
                     return false;
@@ -213,7 +213,7 @@ public class DSpaceSetRepository implements SetRepository
         {
             try
             {
-                DSpaceObject dso = HandleManager.resolveToObject(_context,
+                DSpaceObject dso = HandleServiceImpl.resolveToObject(_context,
                         setSpec.replace("com_", "").replace("_", "/"));
                 if (dso == null || !(dso instanceof Community))
                     return false;

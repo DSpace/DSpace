@@ -23,12 +23,10 @@ import org.dspace.app.webui.submit.JSPStep;
 import org.dspace.app.webui.submit.JSPStepManager;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Item;
 import org.dspace.content.LicenseUtils;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.license.CreativeCommons;
 import org.dspace.submit.step.LicenseStep;
 
 /**

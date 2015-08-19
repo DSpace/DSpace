@@ -14,7 +14,9 @@ import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.selection.Selector;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.utils.ContextUtil;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
@@ -56,6 +58,8 @@ public class AuthenticatedSelector extends AbstractLogEnabled implements
 
     public static final String ADMINISTRATOR = "administrator";
 
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+
     /**
      * Determine if the authenticated eperson matches the given expression.
      */
@@ -82,7 +86,7 @@ public class AuthenticatedSelector extends AbstractLogEnabled implements
             else if (ADMINISTRATOR.equals(expression))
             {
                 // Is this eperson an administrator?
-                return AuthorizeManager.isAdmin(context);
+                return authorizeService.isAdmin(context);
             }
 
             // Otherwise return false;

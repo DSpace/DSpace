@@ -20,7 +20,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.core.ConfigurationManager;
@@ -113,7 +113,7 @@ public class RetrieveServlet extends DSpaceServlet
                     isLicense = true;
             }
             
-            if (isLicense && !displayLicense && !AuthorizeManager.isAdmin(context))
+            if (isLicense && !displayLicense && !AuthorizeServiceImpl.isAdmin(context))
             {
                 throw new AuthorizeException();
             }

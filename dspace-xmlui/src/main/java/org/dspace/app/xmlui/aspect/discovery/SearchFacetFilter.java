@@ -31,7 +31,9 @@ import org.dspace.core.Constants;
 import org.dspace.discovery.*;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
@@ -77,6 +79,9 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 
     private SearchService searchService = null;
     private static final Message T_go = message("xmlui.general.go");
+
+    protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+
 
     public SearchFacetFilter() {
 
@@ -137,7 +142,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 
                 if (dso != null) {
                     // Add the actual collection;
-                    validity.add(dso);
+                    validity.add(context, dso);
                 }
 
                 // add recently submitted items, serialize solr query contents.
@@ -146,7 +151,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
                 validity.add("numFound:" + response.getDspaceObjects().size());
 
                 for (DSpaceObject resultDso : queryResults.getDspaceObjects()) {
-                    validity.add(resultDso);
+                    validity.add(context, resultDso);
                 }
 
                 for (String facetField : queryResults.getFacetResults().keySet()) {
@@ -252,7 +257,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if ((dso instanceof Collection) || (dso instanceof Community)) {
-            HandleUtil.buildHandleTrail(dso, pageMeta, contextPath, true);
+            HandleUtil.buildHandleTrail(context, dso, pageMeta, contextPath, true);
         }
 
         pageMeta.addTrail().addContent(message("xmlui.Discovery.AbstractSearch.type_" + facetField));
@@ -569,7 +574,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         else
         {
             // Get the search scope from the location parameter
-            dso = HandleManager.resolveToObject(context, scopeString);
+            dso = handleService.resolveToObject(context, scopeString);
         }
 
         return dso;
