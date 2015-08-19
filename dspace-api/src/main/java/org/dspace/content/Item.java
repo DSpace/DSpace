@@ -40,6 +40,7 @@ import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.utils.DSpace;
 import org.dspace.versioning.VersioningService;
+import org.dspace.workflow.WorkflowItem;
 
 /**
  * Class representing an item in DSpace.
@@ -1109,6 +1110,44 @@ public class Item extends DSpaceObject
 
 
     /**
+     * Delete the item from the archive, remove it from collections. 
+     * This operation cannot be undone.
+     * 
+     * TODO: is it necessary to also remove it from workflows?
+     *
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IOException
+     */
+    public void expunge() throws SQLException, AuthorizeException, IOException
+    {
+        // Check authorisation here. If we don't, it may happen that we remove the
+        // metadata but when getting to the point of removing the bundles we get an exception
+        // leaving the database in an inconsistent state
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
+
+        // Remove this Item from any Collections it may be in.
+        Collection[] collections = this.getCollections();
+        for (Collection collection : collections)
+        {  
+            collection.removeItem(this);
+        }
+
+        // If it is in someone's workspace, remove it therefrom.
+        WorkspaceItem wsItem = WorkspaceItem.findByItem(ourContext, this);
+        if (null != wsItem)
+            wsItem.deleteWrapper();
+
+        // If it is in a workflow, remove it therefrom.
+        WorkflowItem wfItem = WorkflowItem.findByItem(ourContext, this);
+        if (null != wfItem)
+            wfItem.deleteWrapper();
+
+        // At last we can destroy the Item itself.
+        this.delete(); // not strictly necessary as collection.removeItem() calls this if it's the item's only remaining owning collection
+    }
+    
+    /**
      * Withdraw the item from the archive. It is kept in place, and the content
      * and metadata are not deleted, but it is not publicly accessible.
      *
@@ -1233,9 +1272,10 @@ public class Item extends DSpaceObject
     }
 
     /**
-     * Delete (expunge) the item. Bundles and bitstreams are also deleted if
+     * Delete (permanently remove) the item. Bundles and bitstreams are also deleted if
      * they are not also included in another item. The Dublin Core metadata is
      * deleted.
+     * This doesn't remove collection membership, use <code>Item.expunge()</code> for that.
      *
      * @throws SQLException
      * @throws AuthorizeException
