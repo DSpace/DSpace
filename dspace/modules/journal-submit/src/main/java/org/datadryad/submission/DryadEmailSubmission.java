@@ -316,7 +316,7 @@ public class DryadEmailSubmission extends HttpServlet {
             Format format = Format.getPrettyFormat();
             XMLOutputter toFile = new XMLOutputter(format);
             Document doc = saxBuilder.build(xmlReader);
-            String journalCode = result.getJournalCode();
+            String journalCode = JournalUtils.cleanJournalCode(result.getJournalCode());
 
             LOGGER.debug("Getting metadata dir for " + journalCode);
 
@@ -411,6 +411,7 @@ public class DryadEmailSubmission extends HttpServlet {
             // find the associated concept and initialize the parser variable.
             Context context = null;
             Concept concept = null;
+            journalCode = JournalUtils.cleanJournalCode(journalCode);
             try {
                 context = new Context();
                 concept = JournalUtils.getJournalConceptById(context, journalCode);

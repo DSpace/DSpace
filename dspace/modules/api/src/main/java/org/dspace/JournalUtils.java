@@ -291,5 +291,12 @@ public class JournalUtils {
         return sb.toString();
     }
 
+    /**
+     * @return a cleaned version of journalCode
+     */
+    public static String cleanJournalCode(String journalCode) {
+        return journalCode.replaceAll("[^a-zA-Z0-9]", "").toUpperCase();
+    }
+
 
 }
