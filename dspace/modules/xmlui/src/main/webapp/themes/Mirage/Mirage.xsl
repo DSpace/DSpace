@@ -407,7 +407,7 @@
                         <!-- Bone & Joint Research -->
                         <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Abone%5C+%26%5C+joint%5C+research%5C%7C%5C%7C%5C%7CBone%5C+%26%5C+Joint%5C+Research"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-BJR.png" alt="Bone &amp; Joint Research" /></a>
                         <!-- Evidence-Based Preclinical Medicine -->
-		  				<a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aevidence-based%5C+preclinical%5C+medicine%5C%7C%5C%7C%5C%7CEvidence-Based%5C+Preclinical%5C+Medicine"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-EBPM.PNG" alt="Evidence&ndash;Based Preclinical Medicine" /></a>
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aevidence%5C+based%5C+preclinical%5C+medicine%5C%7C%5C%7C%5C%7CEvidence%5C+based%5C+preclinical%5C+medicine"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-EBPM.PNG" alt="Evidence&ndash;Based Preclinical Medicine" /></a>
                     </div>
                 </div>
             </div>
