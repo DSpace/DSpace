@@ -23,14 +23,11 @@ import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeServiceImpl;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.*;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.xoai.exceptions.CompilingException;
 import org.dspace.xoai.services.api.cache.XOAICacheService;
 import org.dspace.xoai.services.api.cache.XOAIItemCacheService;
@@ -55,10 +52,12 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import javax.inject.Inject;
+import org.dspace.content.service.ItemService;
 
 import static com.lyncode.xoai.dataprovider.core.Granularity.Second;
-import static org.dspace.content.Item.find;
 import static org.dspace.xoai.util.ItemUtils.retrieveMetadata;
 
 /**
@@ -68,9 +67,9 @@ import static org.dspace.xoai.util.ItemUtils.retrieveMetadata;
 public class XOAI {
     private static Logger log = LogManager.getLogger(XOAI.class);
 
-    private Context context;
+    private final Context context;
     private boolean optimize;
-    private boolean verbose;
+    private final boolean verbose;
     private boolean clean;
 
     @Autowired
@@ -87,15 +86,19 @@ public class XOAI {
     private XOAIItemCacheService xoaiItemCacheService;
     @Autowired
     private CollectionsService collectionsService;
+    @Inject
+    private AuthorizeService authorizeService;
+    @Inject
+    private ItemService itemService;
 
 
-    private static List<String> getFileFormats(Item item) {
-        List<String> formats = new ArrayList<String>();
+    private List<String> getFileFormats(Item item) {
+        List<String> formats = new ArrayList<>();
         try {
-            for (Bundle b : item.getBundles("ORIGINAL")) {
-                for (Bitstream bs : b.getBitstreams()) {
-                    if (!formats.contains(bs.getFormat().getMIMEType())) {
-                        formats.add(bs.getFormat().getMIMEType());
+            for (Bundle b : itemService.getBundles(item, "ORIGINAL")) {
+                for (BundleBitstream bs : b.getBitstreams()) {
+                    if (!formats.contains(bs.getBitstream().getFormat(context).getMIMEType())) {
+                        formats.add(bs.getBitstream().getFormat(context).getMIMEType());
                     }
                 }
             }
@@ -154,11 +157,7 @@ public class XOAI {
             // Set last compilation date
             xoaiLastCompilationCacheService.put(new Date());
             return result;
-        } catch (DSpaceSolrException ex) {
-            throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
-        } catch (SolrServerException ex) {
-            throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
-        } catch (IOException ex) {
+        } catch (DSpaceSolrException | SolrServerException | IOException ex) {
             throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
         }
     }
@@ -257,17 +256,20 @@ public class XOAI {
             doc.addField("item.communities",
                     "com_" + com.getHandle().replace("/", "_"));
 
-        Metadatum[] allData = item.getMetadata(Item.ANY, Item.ANY, Item.ANY,
-                Item.ANY);
-        for (Metadatum dc : allData) {
-            String key = "metadata." + dc.schema + "." + dc.element;
-            if (dc.qualifier != null) {
-                key += "." + dc.qualifier;
+        List<MetadataValue> allData = itemService.getMetadata(item,
+                Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        for (MetadataValue dc : allData) {
+            MetadataField field = dc.getMetadataField();
+            String key = "metadata."
+                    + field.getMetadataSchema().getName() + "."
+                    + field.getElement();
+            if (field.getQualifier() != null) {
+                key += "." + field.getQualifier();
             }
-            doc.addField(key, dc.value);
-            if (dc.authority != null) {
-                doc.addField(key + ".authority", dc.authority);
-                doc.addField(key + ".confidence", dc.confidence + "");
+            doc.addField(key, dc.getValue());
+            if (dc.getAuthority() != null) {
+                doc.addField(key + ".authority", dc.getAuthority());
+                doc.addField(key + ".confidence", dc.getConfidence() + "");
             }
         }
 
@@ -276,10 +278,10 @@ public class XOAI {
         }
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        XmlOutputContext context = XmlOutputContext.emptyContext(out, Second);
-        retrieveMetadata(item).write(context);
-        context.getWriter().flush();
-        context.getWriter().close();
+        XmlOutputContext xmlContext = XmlOutputContext.emptyContext(out, Second);
+        retrieveMetadata(item).write(xmlContext);
+        xmlContext.getWriter().flush();
+        xmlContext.getWriter().close();
         doc.addField("item.compile", out.toString());
 
         if (verbose) {
@@ -294,7 +296,7 @@ public class XOAI {
         boolean pub = false;
         try {
             //Check if READ access allowed on this Item
-            pub = AuthorizeManager.authorizeActionBoolean(context, item, Constants.READ);
+            pub = authorizeService.authorizeActionBoolean(context, item, Constants.READ);
         } catch (SQLException ex) {
             log.error(ex.getMessage());
         }
@@ -327,9 +329,7 @@ public class XOAI {
             solrServerResolver.getServer().deleteByQuery("*:*");
             solrServerResolver.getServer().commit();
             System.out.println("Index cleared");
-        } catch (SolrServerException ex) {
-            throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
-        } catch (IOException ex) {
+        } catch (SolrServerException | IOException ex) {
             throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
         }
     }
@@ -449,13 +449,13 @@ public class XOAI {
     }
 
     private void compile() throws CompilingException {
-        ItemIterator iterator;
+        Iterator<Item> iterator;
         try {
             Date last = xoaiLastCompilationCacheService.get();
 
             if (last == null) {
                 System.out.println("Retrieving all items to be compiled");
-                iterator = Item.findAll(context);
+                iterator = itemService.findAll(context);
             } else {
                 System.out.println("Retrieving items modified after " + last + " to be compiled");
                 String query = "SELECT * FROM item WHERE last_modified>?";
@@ -466,13 +466,10 @@ public class XOAI {
                 Item item = iterator.next();
                 if (verbose) System.out.println("Compiling item with handle: " + item.getHandle());
                 xoaiItemCacheService.put(item, retrieveMetadata(item));
-                context.clearCache();
             }
 
             xoaiLastCompilationCacheService.put(new Date());
-        } catch (SQLException e) {
-            throw new CompilingException(e);
-        } catch (IOException e) {
+        } catch (SQLException | IOException e) {
             throw new CompilingException(e);
         }
         System.out.println("Items compiled");

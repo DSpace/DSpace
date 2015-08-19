@@ -39,6 +39,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 
 /**
  * 
@@ -48,7 +50,10 @@ import java.util.regex.Pattern;
 public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
 {
 
-    private static Logger log = LogManager.getLogger(DSpaceItemDatabaseRepository.class);
+    private static final Logger log = LogManager.getLogger(DSpaceItemDatabaseRepository.class);
+
+    private static final HandleService handleService
+            = HandleServiceFactory.getInstance().getHandleService();
 
     private XOAIItemCacheService cacheService;
     private boolean useCache;
@@ -79,11 +84,11 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
 
     private List<ReferenceSet> getSets(org.dspace.content.Item item)
     {
-        List<ReferenceSet> sets = new ArrayList<ReferenceSet>();
-        List<Community> coms = new ArrayList<Community>();
+        List<ReferenceSet> sets = new ArrayList<>();
+        List<Community> coms = new ArrayList<>();
         try
         {
-            Collection[] itemCollections = item.getCollections();
+            List<Collection> itemCollections = item.getCollections();
             for (Collection col : itemCollections)
             {
                 ReferenceSet s = new DSpaceSet(col);
@@ -113,7 +118,7 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
             String parts[] = id.split(Pattern.quote(":"));
             if (parts.length == 3)
             {
-                DSpaceObject obj = HandleServiceImpl.resolveToObject(context.getContext(),
+                DSpaceObject obj = handleService.resolveToObject(context.getContext(),
                         parts[2]);
                 if (obj == null)
                     throw new IdDoesNotExistException();
@@ -129,12 +134,8 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
             log.debug(e.getMessage(), e);
             throw new IdDoesNotExistException();
         }
-        catch (SQLException e)
+        catch (SQLException | IOException | ContextServiceException e)
         {
-            throw new OAIException(e);
-        } catch (IOException e) {
-            throw new OAIException(e);
-        } catch (ContextServiceException e) {
             throw new OAIException(e);
         }
         throw new IdDoesNotExistException();
@@ -145,7 +146,7 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
     public ListItemsResults getItems(List<ScopedFilter> filters, int offset,
             int length) throws OAIException
     {
-        List<Item> list = new ArrayList<Item>();
+        List<Item> list = new ArrayList<>();
         try
         {
             DatabaseQuery databaseQuery = queryResolver.buildQuery(filters, offset, length);
@@ -179,7 +180,7 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
             List<ScopedFilter> filters, int offset, int length) throws OAIException
     {
 
-        List<ItemIdentifier> list = new ArrayList<ItemIdentifier>();
+        List<ItemIdentifier> list = new ArrayList<>();
         try
         {
             DatabaseQuery databaseQuery = queryResolver.buildQuery(filters, offset, length);

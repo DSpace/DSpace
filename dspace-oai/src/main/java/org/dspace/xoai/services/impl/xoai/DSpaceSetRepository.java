@@ -16,7 +16,6 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleServiceImpl;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
@@ -26,6 +25,11 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 
 /**
  * 
@@ -34,6 +38,15 @@ import java.util.List;
 public class DSpaceSetRepository implements SetRepository
 {
     private static final Logger log = LogManager.getLogger(DSpaceSetRepository.class);
+
+    private static final CommunityService communityService
+            = ContentServiceFactory.getInstance().getCommunityService();
+
+    private static final CollectionService collectionService
+            = ContentServiceFactory.getInstance().getCollectionService();
+
+    private static final HandleService handleService
+            = HandleServiceFactory.getInstance().getHandleService();
 
     private final Context _context;
 
@@ -84,9 +97,9 @@ public class DSpaceSetRepository implements SetRepository
      */
     private List<Set> community(int offset, int length)
     {
-        List<Set> array = new ArrayList<Set>();
+        List<Set> array = new ArrayList<>();
         StringBuffer query = new StringBuffer("SELECT community_id FROM community ORDER BY community_id");
-        List<Serializable> params = new ArrayList<Serializable>();
+        List<Serializable> params = new ArrayList<>();
 
         DatabaseManager.applyOffsetAndLimit(query,params,offset,length);
 
@@ -99,7 +112,7 @@ public class DSpaceSetRepository implements SetRepository
             {
                 TableRow row = iterator.next();
                 int communityID = row.getIntColumn("community_id");
-                Community community = Community.find(_context, communityID);
+                Community community = communityService.find(_context, communityID);
                 array.add(DSpaceSet.newDSpaceCommunitySet(
                         community.getHandle(), community.getName()));
                 i++;
@@ -122,9 +135,9 @@ public class DSpaceSetRepository implements SetRepository
      */
     private List<Set> collection(int offset, int length)
     {
-        List<Set> array = new ArrayList<Set>();
+        List<Set> array = new ArrayList<>();
         StringBuffer query = new StringBuffer("SELECT collection_id FROM collection ORDER BY collection_id");
-        List<Serializable> params = new ArrayList<Serializable>();
+        List<Serializable> params = new ArrayList<>();
 
         DatabaseManager.applyOffsetAndLimit(query,params,offset,length);
 
@@ -137,7 +150,7 @@ public class DSpaceSetRepository implements SetRepository
             {
                 TableRow row = iterator.next();
                 int collectionID = row.getIntColumn("collection_id");
-                Collection collection = Collection.find(_context, collectionID);
+                Collection collection = collectionService.find(_context, collectionID);
                 array.add(DSpaceSet.newDSpaceCollectionSet(
                         collection.getHandle(),
                         collection.getName()));
@@ -156,7 +169,7 @@ public class DSpaceSetRepository implements SetRepository
     {
         // Only database sets (virtual sets are added by lyncode common library)
         log.debug("Querying sets. Offset: " + offset + " - Length: " + length);
-        List<Set> array = new ArrayList<Set>();
+        List<Set> array = new ArrayList<>();
         int communityCount = this.getCommunityCount();
         log.debug("Communities: " + communityCount);
         int collectionCount = this.getCollectionCount();
@@ -198,13 +211,11 @@ public class DSpaceSetRepository implements SetRepository
         {
             try
             {
-                DSpaceObject dso = HandleServiceImpl.resolveToObject(_context,
+                DSpaceObject dso = handleService.resolveToObject(_context,
                         setSpec.replace("col_", "").replace("_", "/"));
-                if (dso == null || !(dso instanceof Collection))
-                    return false;
-                return true;
+                return !(dso == null || !(dso instanceof Collection));
             }
-            catch (Exception ex)
+            catch (IllegalStateException | SQLException ex)
             {
                 log.error(ex.getMessage(), ex);
             }
@@ -213,13 +224,11 @@ public class DSpaceSetRepository implements SetRepository
         {
             try
             {
-                DSpaceObject dso = HandleServiceImpl.resolveToObject(_context,
+                DSpaceObject dso = handleService.resolveToObject(_context,
                         setSpec.replace("com_", "").replace("_", "/"));
-                if (dso == null || !(dso instanceof Community))
-                    return false;
-                return true;
+                return !(dso == null || !(dso instanceof Community));
             }
-            catch (Exception ex)
+            catch (IllegalStateException | SQLException ex)
             {
                 log.error(ex.getMessage(), ex);
             }
