@@ -7,6 +7,7 @@
  */
 package org.dspace.submit.step;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -28,6 +29,7 @@ import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.ctask.general.ClamScan;
 import org.dspace.curate.Curator;
 import org.dspace.submit.AbstractProcessingStep;
 
@@ -541,23 +543,34 @@ public class UploadStep extends AbstractProcessingStep
                 }
 
                 // Check for virus
-                if (ConfigurationManager.getBooleanProperty("submission-curation", "virus-scan"))
+                String scan = (ConfigurationManager.getProperty("submission-curation", "virus-scan"));
+                if(scan != null)
                 {
-                    Curator curator = new Curator();
-                    curator.addTask("vscan").curate(item);
-                    int status = curator.getStatus("vscan");
-                    if (status == Curator.CURATE_ERROR)
+                    int status = Curator.CURATE_UNSET;
+                    if(scan.equals("clamdscan"))
                     {
-                        backoutBitstream(subInfo, b, item);
-                        return STATUS_VIRUS_CHECKER_UNAVAILABLE;
+                        File file = new File(request.getParameter("file"));
+                        log.debug("scan " + file + " using clamdscan");
+                        status = new ClamScan().virusCheck(file);
                     }
-                    else if (status == Curator.CURATE_FAIL)
+                    else if(Boolean.parseBoolean(scan))
                     {
-                        backoutBitstream(subInfo, b, item);
-                        return STATUS_CONTAINS_VIRUS;
+                        log.debug("scan " + b.getName() + " using tcp");
+                        status = new ClamScan().virusCheck(b);
                     }
+                	
+                	if (status == Curator.CURATE_ERROR)
+                	{
+                		backoutBitstream(subInfo, b, item);
+                		return STATUS_VIRUS_CHECKER_UNAVAILABLE;
+                	}
+                	else if (status == Curator.CURATE_FAIL)
+                	{
+                		backoutBitstream(subInfo, b, item);
+                		return STATUS_CONTAINS_VIRUS;
+                	}
                 }
-
+                
                 // If we got this far then everything is more or less ok.
 
                 // Comment - not sure if this is the right place for a commit here

@@ -9,18 +9,22 @@ package org.dspace.ctask.general;
 // above package assignment temporary pending better aysnch release process
 // package org.dspace.ctask.integrity;
 
+import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -46,8 +50,8 @@ public class ClamScan extends AbstractCurationTask
 {
     private static final int DEFAULT_CHUNK_SIZE = 4096;//2048
     private static final byte[] INSTREAM   = "zINSTREAM\0".getBytes();
-    private static final byte[] PING            = "zPING\0".getBytes();
-    private static final byte[] STATS          = "nSTATS\n".getBytes();//prefix with z
+    //private static final byte[] PING            = "zPING\0".getBytes();
+    //private static final byte[] STATS          = "nSTATS\n".getBytes();//prefix with z
     private static final byte[] IDSESSION = "zIDSESSION\0".getBytes();
     private static final byte[] END = "zEND\0".getBytes();
     private static final String PLUGIN_PREFIX = "clamav";
@@ -70,14 +74,17 @@ public class ClamScan extends AbstractCurationTask
     private Socket socket = null;
     private DataOutputStream dataOutputStream = null;
 
+    public ClamScan(){
+        host = ConfigurationManager.getProperty(PLUGIN_PREFIX, "service.host");
+        port = ConfigurationManager.getIntProperty(PLUGIN_PREFIX, "service.port");
+        timeout = ConfigurationManager.getIntProperty(PLUGIN_PREFIX, "socket.timeout");
+        failfast = ConfigurationManager.getBooleanProperty(PLUGIN_PREFIX, "scan.failfast");    	
+    }
+    
     @Override
     public void init(Curator curator, String taskId) throws IOException
     {
         super.init(curator, taskId);
-        host = ConfigurationManager.getProperty(PLUGIN_PREFIX, "service.host");
-        port = ConfigurationManager.getIntProperty(PLUGIN_PREFIX, "service.port");
-        timeout = ConfigurationManager.getIntProperty(PLUGIN_PREFIX, "socket.timeout");
-        failfast = ConfigurationManager.getBooleanProperty(PLUGIN_PREFIX, "scan.failfast");
     }
 
     @Override
@@ -129,7 +136,7 @@ public class ClamScan extends AbstractCurationTask
                         status = bstatus;
                     }
                     
-                }             
+                }
             }
             catch (AuthorizeException authE)
             {
@@ -150,9 +157,93 @@ public class ClamScan extends AbstractCurationTask
             }
         }
         return status;
+    }    
+
+    /**
+     * Is bitstream virus free? Check using TCP.
+     * @param bitstream The bitstream to check for virus.
+     * @return Curator.CURATE_SUCCESS if bitstream is virus free?
+     */
+    public int virusCheck(Bitstream bitstream)
+    {
+        int bstatus = Curator.CURATE_FAIL;
+
+        try
+        {
+            openSession();
+            log.info("Scanning " + bitstream.getName() + " . . . ");
+            bstatus = scan(bitstream, bitstream.retrieve(), NEW_ITEM_HANDLE);
+        }
+        catch (IOException ex){log.warn(ex);}
+        catch(AuthorizeException ex){log.warn(ex);}
+        catch(SQLException ex){log.warn(ex);}
+        finally
+        {
+            closeSession();
+        }
+        
+        return bstatus;
     }
     
+    /**
+     * Is file virus free? Check using clamdscan process.
+     * @param file The file to check for virus.
+     * @return Curator.CURATE_SUCCESS if file is virus free?
+     */
+    public int virusCheck(File file)
+    {
+        int bstatus = Curator.CURATE_FAIL;
+        
+        final Pattern PATTERN = Pattern.compile(".*Infected files: 0.*");
+        BufferedReader stdInput = null;
+        
+        try
+        {
+            // spawn clamscan process and wait for result
+            Process p = Runtime.getRuntime().exec(new String[] {"clamdscan", file.getPath()});
+           
+            p.waitFor();
+            int retVal = p.exitValue();
+            if(retVal == 0)
+            {
+                // good status returned check if pattern is in output 
+                stdInput = new BufferedReader(
+                        new InputStreamReader(p.getInputStream()));
+                
+                String s = null;
+                while((s = stdInput.readLine()) != null)
+                {
+                    Matcher matchHandle = PATTERN.matcher(s);
+                    if(matchHandle.find())
+                    {
+                        bstatus = Curator.CURATE_SUCCESS;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                bstatus = Curator.CURATE_ERROR;
+            }
+        }
+        catch(InterruptedException ex){log.warn(ex);}
+        catch(IOException ex){log.warn(ex);}
+        finally
+        {
+            if(stdInput != null)
+            {
+                try{stdInput.close();} catch (Exception e){log.warn(e);}
+            }
+        }
 
+        if(bstatus != Curator.CURATE_SUCCESS)
+        {
+            log.warn("*** File " + file + " has failed virus check. status = " + bstatus);
+        }
+
+        return bstatus;
+    }
+    
     /** openSession
      *
      * This method opens a session.
@@ -311,8 +402,16 @@ public class ClamScan extends AbstractCurationTask
                 String itemMsg = "item - " + itemHandle + ": ";
                 String bsMsg = "bitstream - " + bitstream.getName() +
                                ": SequenceId - " +  bitstream.getSequenceID() + ": infected";
-                report(itemMsg + bsMsg);
-                results.add(bsMsg);
+                
+                if(this.curator != null)
+                {
+                    report(itemMsg + bsMsg);
+                    results.add(bsMsg);
+                }
+                else{
+                    log.warn(bsMsg);
+                }
+                
                 return Curator.CURATE_FAIL;
             }
             else
@@ -351,7 +450,7 @@ public class ClamScan extends AbstractCurationTask
         String handle = item.getHandle();
         return (handle != null) ? handle: NEW_ITEM_HANDLE;
     }
-
+    
 
     private void logDebugMessage(String message)
     {
