@@ -1709,7 +1709,7 @@
                 </a>
             </xsl:when>
             
-			<xsl:when test='$journal-name = "Evidence-Based Medicine"'>
+			<xsl:when test='$journal-name = "Evidence-based Preclinical Medicine"'>
 				<a target="_blank">
 					<xsl:attribute name="href">
 						<xsl:choose>
@@ -1719,11 +1719,12 @@
 							</xsl:when>
 							<xsl:otherwise>
 								<xsl:value-of
-										select="string('http://ebm.bmj.com')"/>
+										select="string('http://onlinelibrary.wiley.com/journal/10.1002/%28ISSN%292054-703X')"/>
 							</xsl:otherwise>
 						</xsl:choose>
 					</xsl:attribute>
-					<img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/EBPM.png" alt="Evidence-Based Medicine cover"/>
+					<img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/EBPM.png"
+						 alt="Evidence-based Preclinical Medicine cover"/>
 				</a>
 			</xsl:when>
             
