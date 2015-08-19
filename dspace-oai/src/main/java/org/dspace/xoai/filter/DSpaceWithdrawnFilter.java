@@ -31,7 +31,7 @@ public class DSpaceWithdrawnFilter extends DSpaceFilter {
     @Override
     public DatabaseFilterResult buildDatabaseQuery(Context context)
     {
-        List<Object> params = new ArrayList<Object>();
+        List<Object> params = new ArrayList<>();
 
         String filter = "i.withdrawn=TRUE";
         if(DatabaseManager.isOracle())
@@ -48,10 +48,7 @@ public class DSpaceWithdrawnFilter extends DSpaceFilter {
         // we can properly respond with a "deleted" status via OAI-PMH.
         // Don't worry, this does NOT make the metadata public for withdrawn items,
         // it merely provides an item "tombstone" via OAI-PMH.
-        if (item.isDeleted())
-            return true;
-        else
-            return false;
+        return item.isDeleted();
     }
 
     @Override

@@ -16,11 +16,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseQuery {
-    private static Logger log = Logger.getLogger(DatabaseQuery.class);
+    private static final Logger log = Logger.getLogger(DatabaseQuery.class);
 
     private String query;
-    private List<Object> parameters;
-    private Context context;
+    private final List<Object> parameters;
+    private final Context context;
     private Integer total;
 
     private String countQuery;
@@ -28,7 +28,7 @@ public class DatabaseQuery {
 
     public DatabaseQuery(Context context) {
         this.context = context;
-        this.parameters = new ArrayList<Object>();
+        this.parameters = new ArrayList<>();
     }
 
     public String getQuery() {

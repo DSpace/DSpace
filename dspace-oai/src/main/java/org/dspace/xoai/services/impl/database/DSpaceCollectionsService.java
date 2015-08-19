@@ -19,18 +19,24 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.UUID;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CommunityService;
 
 public class DSpaceCollectionsService implements CollectionsService {
 
     private ContextService contextService;
+    private static final CommunityService communityService
+            = ContentServiceFactory.getInstance().getCommunityService();
 
-    public List<Integer> getAllSubCollections(int communityId)
+    @Override
+    public List<UUID> getAllSubCollections(UUID communityId)
             throws SQLException
     {
-        Queue<Community> comqueue = new LinkedList<Community>();
-        List<Integer> list = new ArrayList<Integer>();
+        Queue<Community> comqueue = new LinkedList<>();
+        List<UUID> list = new ArrayList<>();
         try {
-            comqueue.add(Community.find(contextService.getContext(), communityId));
+            comqueue.add(communityService.find(contextService.getContext(), communityId));
         } catch (ContextServiceException e) {
             throw new SQLException(e);
         }
@@ -40,26 +46,27 @@ public class DSpaceCollectionsService implements CollectionsService {
             for (Community sub : c.getSubcommunities())
                 comqueue.add(sub);
             for (Collection col : c.getCollections())
-                if (!list.contains(col))
+                if (!list.contains(col.getID()))
                     list.add(col.getID());
         }
         return list;
     }
 
+    @Override
     public List<Community> flatParentCommunities(Collection c)
             throws SQLException
     {
-        Queue<Community> queue = new LinkedList<Community>();
-        List<Community> result = new ArrayList<Community>();
+        Queue<Community> queue = new LinkedList<>();
+        List<Community> result = new ArrayList<>();
         for (Community com : c.getCommunities())
             queue.add(com);
 
         while (!queue.isEmpty())
         {
             Community p = queue.poll();
-            Community par = p.getParentCommunity();
+            List<Community> par = p.getParentCommunities();
             if (par != null)
-                queue.add(par);
+                queue.addAll(par);
             if (!result.contains(p))
                 result.add(p);
         }
@@ -67,20 +74,21 @@ public class DSpaceCollectionsService implements CollectionsService {
         return result;
     }
 
+    @Override
     public List<Community> flatParentCommunities(Community c)
             throws SQLException
     {
-        Queue<Community> queue = new LinkedList<Community>();
-        List<Community> result = new ArrayList<Community>();
+        Queue<Community> queue = new LinkedList<>();
+        List<Community> result = new ArrayList<>();
 
         queue.add(c);
 
         while (!queue.isEmpty())
         {
             Community p = queue.poll();
-            Community par = p.getParentCommunity();
+            List<Community> par = p.getParentCommunities();
             if (par != null)
-                queue.add(par);
+                queue.addAll(par);
             if (!result.contains(p))
                 result.add(p);
         }
@@ -88,21 +96,22 @@ public class DSpaceCollectionsService implements CollectionsService {
         return result;
     }
 
+    @Override
     public List<Community> flatParentCommunities(Item c)
             throws SQLException
     {
-        Queue<Community> queue = new LinkedList<Community>();
-        List<Community> result = new ArrayList<Community>();
+        Queue<Community> queue = new LinkedList<>();
+        List<Community> result = new ArrayList<>();
 
-        for (Community com : c.getCommunities())
-            queue.add(com);
+        for (Collection com : c.getCollections())
+            queue.addAll(com.getCommunities());
 
         while (!queue.isEmpty())
         {
             Community p = queue.poll();
-            Community par = p.getParentCommunity();
+            List<Community> par = p.getParentCommunities();
             if (par != null)
-                queue.add(par);
+                queue.addAll(par);
             if (!result.contains(p))
                 result.add(p);
         }

@@ -39,8 +39,8 @@ public class DSpaceDatabaseQueryResolver implements DatabaseQueryResolver {
 
     @Override
     public DatabaseQuery buildQuery(List<ScopedFilter> filters, int offset, int length) throws DatabaseQueryException {
-        List<Object> parameters = new ArrayList<Object>();
-        List<Object> countParameters = new ArrayList<Object>();
+        List<Object> parameters = new ArrayList<>();
+        List<Object> countParameters = new ArrayList<>();
         String query = "SELECT i.* FROM item i ";
         String countQuery = "SELECT COUNT(*) as count FROM item i";
 
@@ -98,7 +98,7 @@ public class DSpaceDatabaseQueryResolver implements DatabaseQueryResolver {
     }
 
     private String buildCondition (List<ScopedFilter> filters, List<Object> parameters) throws ContextServiceException {
-        List<String> whereCond = new ArrayList<String>();
+        List<String> whereCond = new ArrayList<>();
         for (ScopedFilter filter : filters)
             whereCond.add(this.buildQuery(filter.getCondition(), filter.getScope(), parameters));
 

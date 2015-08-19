@@ -8,6 +8,7 @@
 package org.dspace.xoai.filter;
 
 import com.lyncode.xoai.dataprovider.core.ReferenceSet;
+import java.sql.SQLException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -21,6 +22,8 @@ import org.dspace.xoai.services.api.database.CollectionsService;
 import org.dspace.xoai.services.api.database.HandleResolver;
 
 import java.util.List;
+import java.util.UUID;
+import org.dspace.xoai.services.api.database.HandleResolverException;
 
 /**
  *
@@ -28,11 +31,11 @@ import java.util.List;
  */
 public class DSpaceSetSpecFilter extends DSpaceFilter
 {
-    private static Logger log = LogManager.getLogger(DSpaceSetSpecFilter.class);
+    private static final Logger log = LogManager.getLogger(DSpaceSetSpecFilter.class);
 
-    private String setSpec;
-    private HandleResolver handleResolver;
-    private CollectionsService collectionsService;
+    private final String setSpec;
+    private final HandleResolver handleResolver;
+    private final CollectionsService collectionsService;
 
     public DSpaceSetSpecFilter(CollectionsService collectionsService, HandleResolver handleResolver, String spec)
     {
@@ -66,14 +69,14 @@ public class DSpaceSetSpecFilter extends DSpaceFilter
             {
                 DSpaceObject dso = handleResolver.resolve(setSpec.replace("com_", "").replace("_", "/"));
 		if(dso != null){
-                	List<Integer> list = collectionsService.getAllSubCollections(dso.getID());
+                	List<UUID> list = collectionsService.getAllSubCollections(dso.getID());
 	                String subCollections = StringUtils.join(list.iterator(), ",");
         	        return new DatabaseFilterResult(
                 	        "EXISTS (SELECT tmp.* FROM collection2item tmp WHERE tmp.resource_id=i.item_id AND collection_id IN ("
                                 + subCollections + "))");
 		}
             }
-            catch (Exception e)
+            catch (HandleResolverException | SQLException e)
             {
                 log.error(e.getMessage(), e);
             }

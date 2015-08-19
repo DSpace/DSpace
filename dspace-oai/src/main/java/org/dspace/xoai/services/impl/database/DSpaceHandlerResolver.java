@@ -7,28 +7,27 @@
  */
 package org.dspace.xoai.services.impl.database;
 
-
+import java.sql.SQLException;
+import javax.inject.Inject;
 import org.dspace.content.DSpaceObject;
-import org.dspace.handle.HandleServiceImpl;
+import org.dspace.handle.service.HandleService;
 import org.dspace.xoai.services.api.context.ContextService;
 import org.dspace.xoai.services.api.context.ContextServiceException;
 import org.dspace.xoai.services.api.database.HandleResolver;
 import org.dspace.xoai.services.api.database.HandleResolverException;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.sql.SQLException;
 
 public class DSpaceHandlerResolver implements HandleResolver {
-    @Autowired
+    @Inject
     private ContextService contextService;
+
+    @Inject
+    private HandleService handleService;
 
     @Override
     public DSpaceObject resolve(String handle) throws HandleResolverException {
         try {
-            return HandleServiceImpl.resolveToObject(contextService.getContext(), handle);
-        } catch (ContextServiceException e) {
-            throw new HandleResolverException(e);
-        } catch (SQLException e) {
+            return handleService.resolveToObject(contextService.getContext(), handle);
+        } catch (ContextServiceException | SQLException e) {
             throw new HandleResolverException(e);
         }
     }
@@ -36,10 +35,8 @@ public class DSpaceHandlerResolver implements HandleResolver {
     @Override
     public String getHandle(DSpaceObject object) throws HandleResolverException {
         try {
-            return HandleServiceImpl.findHandle(contextService.getContext(), object);
-        } catch (SQLException e) {
-            throw new HandleResolverException(e);
-        } catch (ContextServiceException e) {
+            return handleService.findHandle(contextService.getContext(), object);
+        } catch (SQLException | ContextServiceException e) {
             throw new HandleResolverException(e);
         }
     }
