@@ -334,7 +334,7 @@ public class DryadEmailSubmission extends HttpServlet {
             // And we write the output to our submissions directory
             toFile.output(doc, new BufferedWriter(writer));
         } catch (Exception details) {
-            LOGGER.debug(xml);
+            LOGGER.debug("failed to write to file: xml content would have been: " + xml);
             throw new SubmissionRuntimeException(details);
         }
         return xml;
