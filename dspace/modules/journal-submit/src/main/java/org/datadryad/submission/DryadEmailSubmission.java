@@ -414,7 +414,7 @@ public class DryadEmailSubmission extends HttpServlet {
             journalCode = JournalUtils.cleanJournalCode(journalCode);
             try {
                 context = new Context();
-                concept = JournalUtils.getJournalConceptById(context, journalCode);
+                concept = JournalUtils.getJournalConceptByShortID(context, journalCode);
             } catch (SQLException e) {
                 throw new SubmissionException(e);
             }
