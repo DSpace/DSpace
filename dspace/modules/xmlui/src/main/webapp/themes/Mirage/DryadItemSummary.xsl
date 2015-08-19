@@ -1723,8 +1723,7 @@
 							</xsl:otherwise>
 						</xsl:choose>
 					</xsl:attribute>
-					<img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/EBPM.png"
-						 alt="Evidence-Based Medicine cover"/>
+					<img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/EBPM.png" alt="Evidence-Based Medicine cover"/>
 				</a>
 			</xsl:when>
             
