@@ -7,7 +7,7 @@
 -->
 <!--
     Original author: Alexey Maslov
-    Extensively modified by many others....
+    Extensively modified by many others...
 -->
 
 <xsl:stylesheet xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
