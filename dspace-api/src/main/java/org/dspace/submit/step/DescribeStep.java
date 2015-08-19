@@ -224,7 +224,7 @@ public class DescribeStep extends AbstractProcessingStep
             }
             else if (inputType.equals("date"))
             {
-                readDate(request, item, schema, element, qualifier);
+                readDate(request, item, schema, element, qualifier, inputs[j].getRepeatable());
             }
             // choice-controlled input with "select" presentation type is
             // always rendered as a dropdown menu
@@ -798,10 +798,37 @@ public class DescribeStep extends AbstractProcessingStep
      * @throws SQLException
      */
     protected void readDate(HttpServletRequest request, Item item, String schema,
-            String element, String qualifier) throws SQLException
+            String element, String qualifier, boolean repeated) throws SQLException
     {
         String metadataField = MetadataField
                 .formKey(schema, element, qualifier);
+
+        if (repeated) {
+            List<String> vals = getRepeatedParameter(request, metadataField, metadataField);
+
+            // Find out if the relevant "remove" button was pressed
+            // TODO: These separate remove buttons are only relevant
+            // for DSpace JSP UI, and the code below can be removed
+            // once the DSpace JSP UI is obsolete!
+            String buttonPressed = Util.getSubmitButton(request, "");
+            String removeButton = "submit_" + metadataField + "_remove_";
+
+            if (buttonPressed.startsWith(removeButton)) {
+                int valToRemove = Integer.parseInt(buttonPressed
+                        .substring(removeButton.length()));
+
+                vals.remove(valToRemove);
+            }
+            for (String val : vals) {
+                if (StringUtils.isNotBlank(val)) {
+                    String validated = new DCDate(val).toString();
+                    if (!validated.equals("null")) {
+                        item.addMetadata(schema, element, qualifier, null, validated);
+                    }
+                }
+            }
+
+        }
 
         int year = Util.getIntParameter(request, metadataField + "_year");
         int month = Util.getIntParameter(request, metadataField + "_month");

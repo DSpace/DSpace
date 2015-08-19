@@ -393,9 +393,7 @@
                         <!-- Delete buttons should be named "submit_[field]_delete" so that we can ignore errors from required fields when simply removing values-->
                         <input type="submit" value="Remove selected" name="{concat('submit_',@n,'_delete')}" class="ds-button-field ds-delete-button" />
                     </xsl:if>
-                    <xsl:for-each select="dri:field">
-                        <xsl:apply-templates select="dri:instance" mode="hiddenInterpreter"/>
-                    </xsl:for-each>
+                    <xsl:apply-templates select="dri:instance" mode="hiddenInterpreter"/>
                 </div>
             </xsl:if>
         </div>
@@ -606,9 +604,7 @@
                     <!-- Delete buttons should be named "submit_[field]_delete" so that we can ignore errors from required fields when simply removing values-->
                     <input type="submit" value="Remove selected" name="{concat('submit_',@n,'_delete')}" class="ds-button-field ds-delete-button" />
                 </xsl:if>
-                <xsl:for-each select="dri:field">
-                    <xsl:apply-templates select="dri:instance" mode="hiddenInterpreter"/>
-                </xsl:for-each>
+                <xsl:apply-templates select="dri:instance" mode="hiddenInterpreter"/>
             </div>
         </xsl:if>
     </xsl:template>
