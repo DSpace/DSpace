@@ -1,3 +1,11 @@
+--
+-- The contents of this file are subject to the license and copyright
+-- detailed in the LICENSE and NOTICE files at the root of the source
+-- tree and available online at
+--
+-- http://www.dspace.org/license/
+--
+
 -- Alter workflow item
 ALTER TABLE workflowitem RENAME COLUMN item_id to item_legacy_id;
 ALTER TABLE workflowitem ADD COLUMN item_id UUID REFERENCES Item(uuid);
