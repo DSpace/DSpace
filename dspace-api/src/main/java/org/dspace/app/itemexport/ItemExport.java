@@ -103,26 +103,18 @@ public class ItemExport
 
         Options options = new Options();
 
-        options.addOption("t", "type", true, "type: COLLECTION or ITEM");
+        options.addOption("t", "type", true, "type: COMMUNITY, COLLECTION or ITEM");
         options.addOption("i", "id", true, "ID or handle of thing to export");
         options.addOption("d", "dest", true,
                 "destination where you want items to go");
         options.addOption("m", "migrate", false, "export for migration (remove handle and metadata that will be re-created in new system)");
         options.addOption("n", "number", true,
                 "sequence number to begin exporting items with");
+        options.addOption("x", "exclude-bitstreams", false, "exclude bitstreams)");
         options.addOption("z", "zip", true, "export as zip file (specify filename e.g. export.zip)");
         options.addOption("h", "help", false, "help");
 
         CommandLine line = parser.parse(options, argv);
-
-        String typeString = null;
-        String destDirName = null;
-        String myIDString = null;
-        int seqStart = -1;
-        int myType = -1;
-
-        Item myItem = null;
-        Collection mycollection = null;
 
         if (line.hasOption('h'))
         {
@@ -136,33 +128,52 @@ public class ItemExport
             System.exit(0);
         }
 
+        int myType = -1;
         if (line.hasOption('t')) // type
         {
-            typeString = line.getOptionValue('t');
-
-            if ("ITEM".equals(typeString))
-            {
-                myType = Constants.ITEM;
-            }
-            else if ("COLLECTION".equals(typeString))
-            {
-                myType = Constants.COLLECTION;
-            }
+            myType = Constants.getTypeID(line.getOptionValue('t'));
+        }
+        if (myType != Constants.COMMUNITY &&
+            myType != Constants.COLLECTION &&
+            myType != Constants.ITEM) {
+            System.out.println("type must be COMMUNITY, COLLECTION or ITEM (-h for help)");
+            System.exit(1);
         }
 
-        if (line.hasOption('i')) // id
+        String myIDString = null;
+        if (line.hasOption('i')) // id or handle
         {
             myIDString = line.getOptionValue('i');
         }
+        if (myIDString == null)
+        {
+            System.out
+                    .println("ID must be set to either a database ID or a handle (-h for help)");
+            System.exit(1);
+        }
 
+        String destDirName = null;
         if (line.hasOption('d')) // dest
         {
             destDirName = line.getOptionValue('d');
         }
+        if (destDirName == null)
+        {
+            System.out
+                    .println("destination directory must be set (-h for help)");
+            System.exit(1);
+        }
 
+        int seqStart = -1;
         if (line.hasOption('n')) // number
         {
             seqStart = Integer.parseInt(line.getOptionValue('n'));
+        }
+        if (seqStart == -1)
+        {
+            System.out
+                    .println("sequence start number must be set (-h for help)");
+            System.exit(1);
         }
 
         boolean migrate = false;
@@ -170,6 +181,8 @@ public class ItemExport
         {
             migrate = true;
         }
+
+        boolean excludeBitstreams = line.hasOption('x');
 
         boolean zip = false;
         String zipFileName = "";
@@ -179,137 +192,70 @@ public class ItemExport
             zipFileName = line.getOptionValue('z');
         }
 
-        // now validate the args
-        if (myType == -1)
-        {
-            System.out
-                    .println("type must be either COLLECTION or ITEM (-h for help)");
-            System.exit(1);
-        }
-
-        if (destDirName == null)
-        {
-            System.out
-                    .println("destination directory must be set (-h for help)");
-            System.exit(1);
-        }
-
-        if (seqStart == -1)
-        {
-            System.out
-                    .println("sequence start number must be set (-h for help)");
-            System.exit(1);
-        }
-
-        if (myIDString == null)
-        {
-            System.out
-                    .println("ID must be set to either a database ID or a handle (-h for help)");
-            System.exit(1);
-        }
 
         Context c = new Context();
         c.setIgnoreAuthorization(true);
 
-        if (myType == Constants.ITEM)
+        DSpaceObject myObj = null;
+        // first, is myIDString a handle?
+        if (myIDString.indexOf('/') != -1)
         {
-            // first, is myIDString a handle?
-            if (myIDString.indexOf('/') != -1)
-            {
-                myItem = (Item) HandleManager.resolveToObject(c, myIDString);
+            myObj = HandleManager.resolveToObject(c, myIDString);
 
-                if ((myItem == null) || (myItem.getType() != Constants.ITEM))
-                {
-                    myItem = null;
+            if ((myObj == null)) {
+                System.out.println("Error, no object with handle '" + myIDString + "'");
+                System.exit(1);
+            }
+        } else {
+            switch (myType) {
+                case Constants.ITEM:
+                    myObj = Item.find(c, Integer.parseInt(myIDString));
+                    break;
+                case Constants.COLLECTION:
+                    myObj = Collection.find(c, Integer.parseInt(myIDString));
+                    break;
+                case Constants.COMMUNITY:
+                    myObj = Community.find(c, Integer.parseInt(myIDString));
+                    break;
                 }
-            }
-            else
-            {
-                myItem = Item.find(c, Integer.parseInt(myIDString));
-            }
-
-            if (myItem == null)
-            {
-                System.out
-                        .println("Error, item cannot be found: " + myIDString);
-            }
-        }
-        else
-        {
-            if (myIDString.indexOf('/') != -1)
-            {
-                // has a / must be a handle
-                mycollection = (Collection) HandleManager.resolveToObject(c,
-                        myIDString);
-
-                // ensure it's a collection
-                if ((mycollection == null)
-                        || (mycollection.getType() != Constants.COLLECTION))
-                {
-                    mycollection = null;
-                }
-            }
-            else if (myIDString != null)
-            {
-                mycollection = Collection.find(c, Integer.parseInt(myIDString));
-            }
-
-            if (mycollection == null)
-            {
-                System.out.println("Error, collection cannot be found: "
-                        + myIDString);
+            if (myObj == null) {
+                System.out.println("Error, " + Constants.typeText[myType] + " cannot be found: "
+                                               + myIDString);
                 System.exit(1);
             }
         }
-
-        if (zip)
-        {
-            ItemIterator items;
-            if (myItem != null)
-            {
-                List<Integer> myItems = new ArrayList<Integer>();
-                myItems.add(myItem.getID());
-                items = new ItemIterator(c, myItems);
-            }
-            else
-            {
-                System.out.println("Exporting from collection: " + myIDString);
-                items = mycollection.getItems();
-            }
-            exportAsZip(c, items, destDirName, zipFileName, seqStart, migrate);
+        if (myObj.getType() != myType) {
+            System.out.println("Error, '" + myIDString + "' is not a " + Constants.typeText[myType]);
+            System.exit(1);
         }
-        else
-        {
-            if (myItem != null)
-            {
-                // it's only a single item
-                exportItem(c, myItem, destDirName, seqStart, migrate);
-            }
-            else
-            {
-                System.out.println("Exporting from collection: " + myIDString);
 
-                // it's a collection, so do a bunch of items
-                ItemIterator i = mycollection.getItems();
-                try
-                {
-                    exportItem(c, i, destDirName, seqStart, migrate);
-                }
-                finally
-                {
-                    if (i != null)
-                    {
-                        i.close();
-                    }
-                }
+        ItemIterator items;
+
+        if (myObj.getType() == Constants.ITEM) {
+            List<Integer> myItems = new ArrayList<Integer>();
+            myItems.add(myObj.getID());
+            items = new ItemIterator(c, myItems);
+        } else {
+            if (myType == Constants.COLLECTION) {
+                items = ((Collection) myObj).getItems();
+            } else {
+                items = ((Community) myObj).getItems();
             }
+        }
+
+        if (zip) {
+            System.out.println("Exporting to Zip from " + Constants.typeText[myType] + ": " + myIDString);
+            exportAsZip(c, items, destDirName, zipFileName, seqStart, excludeBitstreams, migrate);
+        } else {
+            System.out.println("Exporting from " + Constants.typeText[myType] + ": " + myIDString);
+            exportItem(c, items, destDirName, seqStart, excludeBitstreams, migrate);
         }
 
         c.complete();
     }
 
     private static void exportItem(Context c, ItemIterator i,
-            String destDirName, int seqStart, boolean migrate) throws Exception
+            String destDirName, int seqStart, boolean excludeBistreams, boolean migrate) throws Exception
     {
         int mySequenceNumber = seqStart;
         int counter = SUBDIR_LIMIT - 1;
@@ -344,13 +290,13 @@ public class ItemExport
             }
 
             System.out.println("Exporting item to " + mySequenceNumber);
-            exportItem(c, i.next(), fullPath, mySequenceNumber, migrate);
+            exportItem(c, i.next(), fullPath, mySequenceNumber, excludeBistreams, migrate);
             mySequenceNumber++;
         }
     }
 
     private static void exportItem(Context c, Item myItem, String destDirName,
-            int seqStart, boolean migrate) throws Exception
+            int seqStart, boolean excludeBistreams, boolean migrate) throws Exception
     {
         File destDir = new File(destDirName);
 
@@ -372,7 +318,8 @@ public class ItemExport
             {
                 // make it this far, now start exporting
                 writeMetadata(c, myItem, itemDir, migrate);
-                writeBitstreams(c, myItem, itemDir);
+                if (! excludeBistreams)
+                    writeBitstreams(c, myItem, itemDir);
                 if (!migrate)
                 {
                     writeHandle(c, myItem, itemDir);
@@ -695,7 +642,7 @@ public class ItemExport
      */
     public static void exportAsZip(Context context, ItemIterator items,
                                    String destDirName, String zipFileName,
-                                   int seqStart, boolean migrate) throws Exception
+                                   int seqStart, boolean excludeBitstreams, boolean migrate) throws Exception
     {
         String workDir = getExportWorkDirectory() +
                          System.getProperty("file.separator") +
@@ -714,7 +661,7 @@ public class ItemExport
         }
 
         // export the items using normal export method
-        exportItem(context, items, workDir, seqStart, migrate);
+        exportItem(context, items, workDir, seqStart, excludeBitstreams, migrate);
 
         // now zip up the export directory created above
         zip(workDir, destDirName + System.getProperty("file.separator") + zipFileName);
@@ -1004,7 +951,7 @@ public class ItemExport
 
 
                             // export the items using normal export method
-                            exportItem(context, iitems, workDir, 1, migrate);
+                            exportItem(context, iitems, workDir, 1, /* excludeBitstreams */ false, migrate);
                             iitems.close();
                         }
 
