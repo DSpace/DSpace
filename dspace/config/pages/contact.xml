@@ -1,0 +1,59 @@
+<document xmlns="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
+    version="1.1">
+
+    <body>
+        <div id="file.contact.div.contact" n="contact" rend="primary">
+ <head>Contact Us</head>
+            
+<p>Complete the <xref target="https://mospace.umsystem.edu/xmlui/feedback">MOspace Feedback 
+    Form</xref>, or contact a repository manager using the contact information below.</p>
+
+<list n="MU-contact">
+    <head>University of Missouri--Columbia</head>
+    <item>Felicity Dykas, repository manager</item>
+    <item>573-882-4656</item>
+    <item><xref target="mailto:mospace@missouri.edu">mospace@missouri.edu</xref></item>
+</list>
+
+
+<list n="UMKC-contact">
+    <head>University of Missouri--Kansas City</head>
+    <item>Kathleen Schweitzberger, repository manager</item>
+    <item>816-235-2227</item>
+    <item><xref target="mailto:mospace@umkc.edu">mospace@umkc.edu</xref></item>
+</list>
+
+
+<list n="UM-contact">
+    <head>General Questions about MOspace</head>
+    <item>Felicity Dykas, repository manager</item>
+    <item>573-882-4656</item>
+    <item><xref target="mailto:mospace@missouri.edu">mospace@missouri.edu</xref></item>
+ </list>
+
+<list n="MST-contact">
+    <head>Scholars Mine at the Missouri University of Science and Technology</head>
+    <item><xref target="mailto:scholarsmine@mst.edu">scholarsmine@mst.edu</xref>
+</list>
+
+
+<list n="UMSL-contact">
+    <item>Tim Nelson</item>
+    <head>University of Missouri--St. Louis</head>
+    <item>314-516-5080</item>
+    <item><xref target="mailto:nelsontm@UMSL.edu">nelsontm@UMSL.edu</item>
+</list>
+
+</div>
+</body>
+
+    <meta>
+        <pageMeta>
+            <metadata element="title">Contact Us</metadata>
+            <trail target="../">MOspace Home</trail>
+        </pageMeta>
+    </meta>
+
+
+
+</document>

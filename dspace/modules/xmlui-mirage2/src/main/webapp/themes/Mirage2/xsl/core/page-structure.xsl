@@ -348,12 +348,6 @@
                         <div class="navbar-header pull-right visible-xs hidden-sm hidden-md hidden-lg">
                         <ul class="nav nav-pills pull-left ">
 
-                            <li role="presentation"><a href="{$app_path}/discover">advanced<br/>search</a></li>
-                            <li role="presentation"><a href="{$app_path}/community-list">browse</a></li>
-                            <li role="presentation"><a href="{$app_path}/pages/add">add to MOspace</a></li>
-                            <li role="presentation"><a href="{$app_path}/pages/about">about</a></li>
-                            <li role="presentation"><a href="{$app_path}/pages/help">help</a></li>
-
                             <xsl:if test="count(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='supportedLocale']) &gt; 1">
                                 <li id="ds-language-selection-xs" class="dropdown">
                                     <xsl:variable name="active-locale" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='currentLocale']"/>
@@ -433,13 +427,10 @@
                             <!-- MOspace navigation bar -->
 
                         <ul class="nav navbar-nav  pull-left">
-                            <li role="presentation"><a href="{$app_path}/discover">advanced<br/>search</a></li>
+                            <li role="presentation"><a href="{$app_path}/discover">advanced search</a></li>
                         </ul>
-                        <ul class="nav navbar-nav  pull-left">
-                            <li role="presentation"><a href="{$app_path}/community-list">browse</a></li>
-                        </ul>
-                        <ul class="nav navbar-nav  pull-left">
-                            <li role="presentation"><a href="{$app_path}/pages/add">add to MOspace</a></li>
+                       <ul class="nav navbar-nav  pull-left">
+                            <li role="presentation"><a href="{$app_path}/pages/add">submit works</a></li>
                         </ul>
                         <ul class="nav navbar-nav  pull-left">
                             <li role="presentation"><a href="{$app_path}/pages/about">about</a></li>
@@ -447,6 +438,10 @@
                         <ul class="nav navbar-nav  pull-left">
                             <li role="presentation"><a href="{$app_path}/pages/help">help</a></li>
                         </ul>
+                        <ul class="nav navbar-nav  pull-left">
+                            <li role="presentation"><a href="{$app_path}/pages/contact">contact us</a></li>
+                        </ul>
+
 
                         <ul class="nav navbar-nav pull-left">
                             <xsl:choose>
@@ -731,15 +726,6 @@
                     <hr/>
                     <div class="col-xs-7 col-sm-8">
                        <div class="hidden-print">
-                            <a>
-                                <xsl:attribute name="href">
-                                    <xsl:value-of
-                                            select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                                    <xsl:text>/contact</xsl:text>
-                                </xsl:attribute>
-                                <i18n:text>xmlui.dri2xhtml.structural.contact-link</i18n:text>
-                            </a>
-                            <xsl:text> | </xsl:text>
                             <a>
                                 <xsl:attribute name="href">
                                     <xsl:value-of
