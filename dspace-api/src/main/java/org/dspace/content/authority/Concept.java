@@ -448,7 +448,8 @@ public class Concept extends AuthorityObject
             throws SQLException
     {
         ArrayList<Concept> concepts = new ArrayList<Concept>();
-        TableRowIterator row = DatabaseManager.query(context,"select c.* from concept as c, conceptmetadatavalue as cmv where cmv.text_value = '"+journalID+"' and cmv.parent_id=c.id;");
+        int journal_field_id = 101;
+        TableRowIterator row = DatabaseManager.query(context, "select c.* from concept as c, conceptmetadatavalue as cmv where upper(cmv.text_value) = '" + journalID + "' and cmv.parent_id = c.id and cmv.field_id = " + journal_field_id + ";");
 
         if (row == null)
         {
