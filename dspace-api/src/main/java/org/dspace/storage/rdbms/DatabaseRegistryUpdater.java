@@ -11,9 +11,10 @@ import java.io.File;
 import java.sql.Connection;
 import org.dspace.administer.MetadataImporter;
 import org.dspace.administer.RegistryLoader;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
+import org.dspace.services.ConfigurationService;
+import org.dspace.utils.DSpace;
 import org.flywaydb.core.api.MigrationInfo;
 import org.flywaydb.core.api.callback.FlywayCallback;
 import org.slf4j.Logger;
@@ -48,13 +49,14 @@ public class DatabaseRegistryUpdater implements FlywayCallback
      */
     private void updateRegistries()
     {
+        ConfigurationService config = new DSpace().getConfigurationService();
         Context context = null;
         try
         {
             context = new Context();
             context.turnOffAuthorisationSystem();
 
-            String base = ConfigurationManager.getProperty("dspace.dir")
+            String base = config.getProperty("dspace.dir")
                             + File.separator + "config" + File.separator
                             + "registries" + File.separator;
 
@@ -70,7 +72,8 @@ public class DatabaseRegistryUpdater implements FlywayCallback
             MetadataImporter.loadRegistry(base + "sword-metadata.xml", true);
 
             // Check if XML Workflow is enabled in workflow.cfg
-            if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow"))
+            String framework = config.getProperty("workflow.framework");
+            if (framework!=null && framework.equals("xmlworkflow"))
             {
                 // If so, load in the workflow metadata types as well
                 MetadataImporter.loadRegistry(base + "workflow-types.xml", true);

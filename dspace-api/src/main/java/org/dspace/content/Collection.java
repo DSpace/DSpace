@@ -35,6 +35,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import org.dspace.services.ConfigurationService;
+import org.dspace.utils.DSpace;
 
 /**
  * Class representing a collection.
@@ -1223,6 +1225,8 @@ public class Collection extends DSpaceObject
         log.info(LogManager.getHeader(ourContext, "delete_collection",
                 "collection_id=" + getID()));
 
+        ConfigurationService config = new DSpace().getConfigurationService();
+
         ourContext.addEvent(new Event(Event.DELETE, Constants.COLLECTION, 
                 getID(), getHandle(), getIdentifiers(ourContext)));
 
@@ -1287,7 +1291,9 @@ public class Collection extends DSpaceObject
         // Remove all authorization policies
         AuthorizeManager.removeAllPolicies(ourContext, this);
 
-        if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){
+        // Check if XML Workflow is enabled in workflow.cfg
+        String workflowFramework = config.getProperty("workflow.framework");
+        if (workflowFramework!=null && workflowFramework.equals("xmlworkflow")){
             // Remove any xml_WorkflowItems
             XmlWorkflowItem[] xmlWfarray = XmlWorkflowItem
                     .findByCollection(ourContext, this);
@@ -1337,7 +1343,8 @@ public class Collection extends DSpaceObject
         // Remove any Handle
         HandleManager.unbindHandle(ourContext, this);
 
-        if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){
+        // Check if XML Workflow is enabled in workflow.cfg
+        if (workflowFramework!=null && workflowFramework.equals("xmlworkflow")){
             // delete all CollectionRoles for this Collection
             for (CollectionRole collectionRole : CollectionRole.findByCollection(ourContext, this.getID())) {
                 collectionRole.delete();

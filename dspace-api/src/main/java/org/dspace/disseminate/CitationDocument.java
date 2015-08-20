@@ -111,7 +111,7 @@ public class CitationDocument {
 
 
         //Load enabled collections
-        citationEnabledCollections = ConfigurationManager.getProperty("disseminate-citation", "enabled_collections");
+        citationEnabledCollections = ConfigurationManager.getProperty("citation-page", "enabled_collections");
         citationEnabledCollectionsList = new ArrayList<String>();
         if(citationEnabledCollections != null && citationEnabledCollections.length() > 0) {
             String[] collectionChunks = citationEnabledCollections.split(",");
@@ -122,7 +122,7 @@ public class CitationDocument {
         }
 
         //Load enabled communities, and add to collection-list
-        citationEnabledCommunities = ConfigurationManager.getProperty("disseminate-citation", "enabled_communities");
+        citationEnabledCommunities = ConfigurationManager.getProperty("citation-page", "enabled_communities");
         if(citationEnabledCollectionsList == null) {
             citationEnabledCollectionsList = new ArrayList<String>();
         }
@@ -152,28 +152,28 @@ public class CitationDocument {
         }
 
         // Configurable text/fields, we'll set sane defaults
-        String header1Config = ConfigurationManager.getProperty("disseminate-citation", "header1");
+        String header1Config = ConfigurationManager.getProperty("citation-page", "header1");
         if(StringUtils.isNotBlank(header1Config)) {
             header1 = header1Config.split(",");
         } else {
             header1 = new String[]{"DSpace Institution", ""};
         }
 
-        String header2Config = ConfigurationManager.getProperty("disseminate-citation", "header2");
+        String header2Config = ConfigurationManager.getProperty("citation-page", "header2");
         if(StringUtils.isNotBlank(header2Config)) {
             header2 = header2Config.split(",");
         } else {
             header2 = new String[]{"DSpace Repository", "http://dspace.org"};
         }
 
-        String fieldsConfig = ConfigurationManager.getProperty("disseminate-citation", "fields");
+        String fieldsConfig = ConfigurationManager.getProperty("citation-page", "fields");
         if(StringUtils.isNotBlank(fieldsConfig)) {
             fields = fieldsConfig.split(",");
         } else {
             fields = new String[]{"dc.date.issued", "dc.title", "dc.creator", "dc.contributor.author", "dc.publisher", "_line_", "dc.identifier.citation", "dc.identifier.uri"};
         }
 
-        String footerConfig = ConfigurationManager.getProperty("disseminate-citation", "footer");
+        String footerConfig = ConfigurationManager.getProperty("citation-page", "footer");
         if(StringUtils.isNotBlank(footerConfig)) {
             footer = footerConfig;
         } else {
@@ -198,13 +198,13 @@ public class CitationDocument {
 
     /**
      * Boolean to determine is citation-functionality is enabled globally for entire site.
-     * config/module/disseminate-citation: enable_globally, default false. true=on, false=off
+     * config/module/citation-page: enable_globally, default false. true=on, false=off
      */
     private static Boolean citationEnabledGlobally = null;
 
     private static boolean isCitationEnabledGlobally() {
         if(citationEnabledGlobally == null) {
-            citationEnabledGlobally = ConfigurationManager.getBooleanProperty("disseminate-citation", "enable_globally", false);
+            citationEnabledGlobally = ConfigurationManager.getBooleanProperty("citation-page", "enable_globally", false);
         }
 
         return citationEnabledGlobally;
@@ -238,11 +238,11 @@ public class CitationDocument {
      * We need to determine if we will intercept this bitstream download, and give out a citation dissemination rendition.
      *
      * What will trigger a redirect/intercept?
-     *  Citation enabled globally (all citable bitstreams will get "watermarked") modules/disseminate-citation: enable_globally
+     *  Citation enabled globally (all citable bitstreams will get "watermarked") modules/citation-page: enable_globally
      *    OR
      *  The container is this object is whitelist enabled.
-     *      - community:  modules/disseminate-citation: enabled_communities
-     *      - collection: modules/disseminate-citation: enabled_collections
+     *      - community:  modules/citation-page: enabled_communities
+     *      - collection: modules/citation-page: enabled_collections
      * AND
      *  This User is not an admin. (Admins need to be able to view the "raw" original instead.)
      * AND
@@ -275,7 +275,7 @@ public class CitationDocument {
 
     private static Boolean isCitationFirstPage() {
         if(citationAsFirstPage == null) {
-            citationAsFirstPage = ConfigurationManager.getBooleanProperty("disseminate-citation", "citation_as_first_page", true);
+            citationAsFirstPage = ConfigurationManager.getBooleanProperty("citation-page", "citation_as_first_page", true);
         }
 
         return citationAsFirstPage;

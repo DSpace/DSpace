@@ -36,14 +36,13 @@ import org.dspace.content.DCDate;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
 import org.dspace.core.SelfNamedPlugin;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
-import org.dspace.search.DSIndexer;
+import org.dspace.utils.DSpace;
 
 /**
  * MediaFilterManager is the class that invokes the media/format filters over the
@@ -94,12 +93,9 @@ public class MediaFilterManager
     public static final String FILTER_PLUGIN_SEPARATOR = "\034";
 
     static {
-        String publicPermissionFilters = ConfigurationManager.getProperty("filter.org.dspace.app.mediafilter.publicPermission");
-        if(publicPermissionFilters != null) {
-            String[] publicPermisionFiltersArray = publicPermissionFilters.split(",");
-            for(String filter : publicPermisionFiltersArray) {
-                publicFiltersClasses.add(filter.trim());
-            }
+        String[] publicPermisionFiltersArray = new DSpace().getConfigurationService().getArrayProperty("filter.org.dspace.app.mediafilter.publicPermission");
+        for(String filter : publicPermisionFiltersArray) {
+            publicFiltersClasses.add(filter.trim());
         }
     }
     
@@ -217,8 +213,7 @@ public class MediaFilterManager
         else
         { 
             //retrieve list of all enabled media filter plugins!
-            String enabledPlugins = ConfigurationManager.getProperty(MEDIA_FILTER_PLUGINS_KEY);
-            filterNames = enabledPlugins.split(",\\s*");
+            filterNames = new DSpace().getConfigurationService().getArrayProperty(MEDIA_FILTER_PLUGINS_KEY);
         }
                 
         //initialize an array of our enabled filters
@@ -259,13 +254,13 @@ public class MediaFilterManager
                 //  filter.<class-name>.<plugin-name>.inputFormats
                 //For other MediaFilters, format of key is: 
                 //  filter.<class-name>.inputFormats
-                String formats = ConfigurationManager.getProperty(
+                String[] formats = new DSpace().getConfigurationService().getArrayProperty(
                     FILTER_PREFIX + "." + filterClassName + 
                     (pluginName!=null ? "." + pluginName : "") +
                     "." + INPUT_FORMATS_SUFFIX);
             
                 //add to internal map of filters to supported formats	
-                if (formats != null)
+                if (formats != null && formats.length>0)
                 {
                     //For SelfNamedPlugins, map key is:  
                     //  <class-name><separator><plugin-name>
@@ -273,7 +268,7 @@ public class MediaFilterManager
                     //  <class-name>
                     filterFormats.put(filterClassName + 
         	            (pluginName!=null ? FILTER_PLUGIN_SEPARATOR + pluginName : ""),
-        	            Arrays.asList(formats.split(",[\\s]*")));
+        	            Arrays.asList(formats));
                 }
             }//end if filter!=null
         }//end for

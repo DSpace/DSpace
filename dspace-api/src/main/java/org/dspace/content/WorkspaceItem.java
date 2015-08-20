@@ -17,15 +17,16 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.services.ConfigurationService;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.utils.DSpace;
 
 /**
  * Class representing an item in the process of being submitted by a user
@@ -139,6 +140,8 @@ public class WorkspaceItem implements InProgressSubmission
         // Check the user has permission to ADD to the collection
         AuthorizeManager.authorizeAction(c, coll, Constants.ADD);
 
+        ConfigurationService config = new DSpace().getConfigurationService();
+
         // Create an item
         Item i = Item.create(c);
         i.setSubmitter(c.getCurrentUser());
@@ -157,7 +160,9 @@ public class WorkspaceItem implements InProgressSubmission
         AuthorizeManager.addPolicy(c, i, Constants.READ, e, ResourcePolicy.TYPE_SUBMISSION);
 
 
-        if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("originalworkflow")) {
+        // Check if XML Workflow is enabled in workflow.cfg
+        String workflowFramework = config.getProperty("workflow.framework");
+        if (workflowFramework!=null && workflowFramework.equals("originalworkflow")) {
             if (step1group != null)
             {
                 AuthorizeManager.addPolicy(c, i, Constants.READ, step1group, ResourcePolicy.TYPE_WORKFLOW);
@@ -178,7 +183,7 @@ public class WorkspaceItem implements InProgressSubmission
         // write permission
         AuthorizeManager.addPolicy(c, i, Constants.WRITE, e, ResourcePolicy.TYPE_SUBMISSION);
 
-        if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("originalworkflow")) {
+        if (workflowFramework!=null && workflowFramework.equals("originalworkflow")) {
             if (step1group != null)
             {
                 AuthorizeManager.addPolicy(c, i, Constants.WRITE, step1group, ResourcePolicy.TYPE_WORKFLOW);
@@ -198,7 +203,7 @@ public class WorkspaceItem implements InProgressSubmission
         // add permission
         AuthorizeManager.addPolicy(c, i, Constants.ADD, e, ResourcePolicy.TYPE_SUBMISSION);
 
-        if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("originalworkflow")) {
+        if (workflowFramework!=null && workflowFramework.equals("originalworkflow")) {
             if (step1group != null)
             {
                 AuthorizeManager.addPolicy(c, i, Constants.ADD, step1group, ResourcePolicy.TYPE_WORKFLOW);
@@ -218,7 +223,7 @@ public class WorkspaceItem implements InProgressSubmission
         // remove contents permission
         AuthorizeManager.addPolicy(c, i, Constants.REMOVE, e, ResourcePolicy.TYPE_SUBMISSION);
 
-        if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("originalworkflow")) {
+        if (workflowFramework!=null && workflowFramework.equals("originalworkflow")) {
             if (step1group != null)
             {
                 AuthorizeManager.addPolicy(c, i, Constants.REMOVE, step1group, ResourcePolicy.TYPE_WORKFLOW);

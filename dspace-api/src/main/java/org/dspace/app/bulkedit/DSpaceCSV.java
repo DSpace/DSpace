@@ -9,20 +9,16 @@ package org.dspace.app.bulkedit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.authority.AuthorityValue;
-import org.dspace.app.bulkedit.DSpaceCSVLine;
-import org.dspace.app.bulkedit.MetadataImport;
-import org.dspace.app.bulkedit.MetadataImportInvalidHeadingException;
-import org.dspace.content.Collection;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.content.authority.Choices;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.io.*;
+import org.dspace.utils.DSpace;
 
 /**
  * Utility class to read and write CSV files
@@ -262,14 +258,11 @@ public class DSpaceCSV implements Serializable
 
         // Set the metadata fields to ignore
         ignore = new HashMap<String, String>();
-        String toIgnore = ConfigurationManager.getProperty("bulkedit", "ignore-on-export");
-        if ((toIgnore == null) || ("".equals(toIgnore.trim())))
-        {
-            // Set a default value
-            toIgnore = "dc.date.accessioned, dc.date.available, " +
-                       "dc.date.updated, dc.description.provenance";
-        }
-        String[] toIgnoreArray = toIgnore.split(",");
+
+        // Specify default values
+        String[] defaultValues = new String[]{"dc.date.accessioned, dc.date.available, " +
+                                              "dc.date.updated, dc.description.provenance"};
+        String[] toIgnoreArray = new DSpace().getConfigurationService().getArrayProperty("bulkedit.ignore-on-export", defaultValues);
         for (String toIgnoreString : toIgnoreArray)
         {
             if (!"".equals(toIgnoreString.trim()))
@@ -304,7 +297,7 @@ public class DSpaceCSV implements Serializable
     private void setValueSeparator()
     {
         // Get the value separator
-        valueSeparator = ConfigurationManager.getProperty("bulkedit", "valueseparator");
+        valueSeparator = new DSpace().getConfigurationService().getProperty("bulkedit.valueseparator");
         if ((valueSeparator != null) && (!"".equals(valueSeparator.trim())))
         {
             valueSeparator = valueSeparator.trim();
@@ -333,7 +326,7 @@ public class DSpaceCSV implements Serializable
     private void setFieldSeparator()
     {
         // Get the value separator
-        fieldSeparator = ConfigurationManager.getProperty("bulkedit", "fieldseparator");
+        fieldSeparator =new DSpace().getConfigurationService().getProperty("bulkedit.fieldseparator");
         if ((fieldSeparator != null) && (!"".equals(fieldSeparator.trim())))
         {
             fieldSeparator = fieldSeparator.trim();
@@ -375,7 +368,7 @@ public class DSpaceCSV implements Serializable
     private void setAuthoritySeparator()
     {
         // Get the value separator
-        authoritySeparator = ConfigurationManager.getProperty("bulkedit", "authorityseparator");
+        authoritySeparator = new DSpace().getConfigurationService().getProperty("bulkedit.authorityseparator");
         if ((authoritySeparator != null) && (!"".equals(authoritySeparator.trim())))
         {
             authoritySeparator = authoritySeparator.trim();

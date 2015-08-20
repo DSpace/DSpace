@@ -20,10 +20,11 @@ import java.util.ArrayList;
 import javax.sql.DataSource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexingService;
 import org.dspace.discovery.SearchServiceException;
+import org.dspace.services.ConfigurationService;
+import org.dspace.utils.DSpace;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
 import org.flywaydb.core.api.MigrationInfo;
@@ -54,7 +55,7 @@ public class DatabaseUtils
      // When this temp file exists, the "checkReindexDiscovery()" method will auto-reindex Discovery
     // Reindex flag file is at [dspace]/solr/search/conf/reindex.flag
     // See also setReindexDiscovery()/getReindexDiscover()
-    private static final String reindexDiscoveryFilePath = ConfigurationManager.getProperty("dspace.dir") +
+    private static final String reindexDiscoveryFilePath = new DSpace().getConfigurationService().getProperty("dspace.dir") +
                             File.separator + "solr" +
                             File.separator + "search" +
                             File.separator + "conf" +
@@ -66,6 +67,8 @@ public class DatabaseUtils
      */
     public static void main(String[] argv)
     {
+        ConfigurationService config = new DSpace().getConfigurationService();
+
         // Usage checks
         if (argv.length < 1)
         {
@@ -83,7 +86,7 @@ public class DatabaseUtils
             DataSource dataSource = DatabaseManager.initDataSource();
 
             // Get configured DB URL for reporting below
-            String url = ConfigurationManager.getProperty("db.url");
+            String url = config.getProperty("db.url");
 
             // Point Flyway API to our database
             Flyway flyway = setupFlyway(dataSource);
@@ -94,10 +97,10 @@ public class DatabaseUtils
                 // Try to connect to the database
                 System.out.println("\nAttempting to connect to database using these configurations: ");
                 System.out.println(" - URL: " + url);
-                System.out.println(" - Driver: " + ConfigurationManager.getProperty("db.driver"));
-                System.out.println(" - Username: " + ConfigurationManager.getProperty("db.username"));
+                System.out.println(" - Driver: " + config.getProperty("db.driver"));
+                System.out.println(" - Username: " + config.getProperty("db.username"));
                 System.out.println(" - Password: [hidden]");
-                System.out.println(" - Schema: " + ConfigurationManager.getProperty("db.schema"));
+                System.out.println(" - Schema: " + config.getProperty("db.schema"));
                 System.out.println("\nTesting connection...");
                 try
                 {
@@ -254,6 +257,8 @@ public class DatabaseUtils
      */
     private static Flyway setupFlyway(DataSource datasource)
     {
+        ConfigurationService config = new DSpace().getConfigurationService();
+
         if (flywaydb==null)
         {
             try(Connection connection = datasource.getConnection())
@@ -278,7 +283,7 @@ public class DatabaseUtils
                 // (We skip this for H2 as it's only used for unit testing)
                 if(!dbType.equals(DatabaseManager.DBMS_H2))
                 {
-                    scriptLocations.add("filesystem:" + ConfigurationManager.getProperty("dspace.dir") +
+                    scriptLocations.add("filesystem:" + config.getProperty("dspace.dir") +
                                         "/etc/" + dbType);
                 }
 
@@ -292,7 +297,8 @@ public class DatabaseUtils
                 // Special scenario: If XMLWorkflows are enabled, we need to run its migration(s)
                 // as it REQUIRES database schema changes. XMLWorkflow uses Java migrations
                 // which first check whether the XMLWorkflow tables already exist
-                if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow"))
+                String framework = config.getProperty("workflow.framework");
+                if (framework!=null && framework.equals("xmlworkflow"))
                 {
                     scriptLocations.add("classpath:org.dspace.storage.rdbms.xmlworkflow");
                 }
@@ -889,7 +895,7 @@ public class DatabaseUtils
         DatabaseMetaData meta = connection.getMetaData();
         
         // Check the configured "db.schema" FIRST for the value configured there
-        schema = DatabaseManager.canonicalize(ConfigurationManager.getProperty("db.schema"));
+        schema = DatabaseManager.canonicalize(new DSpace().getConfigurationService().getProperty("db.schema"));
         
         // If unspecified, determine "sane" defaults based on DB type
         if(StringUtils.isBlank(schema))

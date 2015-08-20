@@ -42,7 +42,7 @@ public class MicrosoftTranslator extends AbstractTranslator
 
     @Override
     protected void initApi() {
-        apiKey =  ConfigurationManager.getProperty(PLUGIN_PREFIX, "translate.api.key.microsoft");
+        apiKey =  ConfigurationManager.getProperty(PLUGIN_PREFIX, "api.key.microsoft");
     }
 
     @Override

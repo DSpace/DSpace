@@ -9,7 +9,6 @@ package org.dspace.authenticate;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +22,7 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.utils.DSpace;
 
 /**
  * Adds users to special groups based on IP address. Configuration parameter
@@ -78,24 +78,20 @@ public class IPAuthentication implements AuthenticationMethod
         ipMatcherGroupIDs = new HashMap<IPMatcher, Integer>();
         ipMatcherGroupNames = new HashMap<IPMatcher, String>();
 
-        Enumeration e = ConfigurationManager.propertyNames("authentication-ip");
+        List<String> propNames = new DSpace().getConfigurationService().getPropertyKeys("authentication-ip");
 
-        while (e.hasMoreElements())
+        for(String propName : propNames)
         {
-            String propName = (String) e.nextElement();
-            if (propName.startsWith("ip."))
-            {
-                String[] nameParts = propName.split("\\.");
+            String[] nameParts = propName.split("\\.");
 
-                if (nameParts.length == 2)
-                {
-                    addMatchers(nameParts[1], ConfigurationManager.getProperty("authentication-ip", propName));
-                }
-                else
-                {
-                    log.warn("Malformed configuration property name: "
-                            + propName);
-                }
+            if (nameParts.length == 2)
+            {
+                addMatchers(nameParts[1], new DSpace().getConfigurationService().getProperty(propName));
+            }
+            else
+            {
+                log.warn("Malformed configuration property name: "
+                        + propName);
             }
         }
     }

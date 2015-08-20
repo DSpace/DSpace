@@ -240,12 +240,11 @@ public class RDFConfiguration {
      */
     public static String[] loadConfigurationArray(String key)
     {
-        String value = (new DSpace()).getConfigurationService().getProperty(key);
-        if (StringUtils.isEmpty(value))
-        {
+        ConfigurationService config = new DSpace().getConfigurationService();
+        if(config.hasProperty(key))
+            return config.getArrayProperty(key);
+        else
             return null;
-        }        
-        return value.split(",\\s*");
     }
 
     
