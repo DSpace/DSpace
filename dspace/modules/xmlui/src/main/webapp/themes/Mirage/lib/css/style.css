@@ -61,6 +61,7 @@ a:hover {
     background-color: transparent;
     color: #444;
     min-width: 950px;
+    padding-bottom: 10px;
 }
 
 #ds-header {
