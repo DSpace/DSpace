@@ -18,6 +18,7 @@ import org.hibernate.Query;
 
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 
 /**
@@ -125,5 +126,37 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         query.setParameter("withdrawn", includeWithdrawn);
 
         return count(query);
+    }
+
+    private static final String FIND_ALL
+            = "select item_id FROM item WHERE (in_archive=TRUE OR withdrawn=TRUE)"
+            + " AND discoverable=TRUE";
+    private static final String FIND_SINCE
+            = "select item_id FROM item WHERE (in_archive=TRUE OR withdrawn=TRUE)"
+            + " AND discoverable=TRUE AND last_modified > :last_modified";
+    @Override
+    public Iterator<Item> findInArchiveOrWithdrawnDiscoverableModifiedSince(
+            Context context, Date since)
+            throws SQLException
+    {
+        Query query;
+        if (null == since){
+            query = createQuery(context, FIND_ALL);
+        }
+        else
+        {
+            query = createQuery(context, FIND_SINCE);
+            query.setParameter("last_modified", since);
+        }
+        return iterate(query);
+    }
+
+    @Override
+    public Iterator<Item> findByLastModifiedSince(Context context, Date since)
+            throws SQLException
+    {
+        Query query = createQuery(context, "SELECT * FROM item WHERE last_modified > :last_modified");
+        query.setParameter("last_modified", since);
+        return iterate(query);
     }
 }

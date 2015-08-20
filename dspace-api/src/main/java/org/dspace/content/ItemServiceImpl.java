@@ -208,6 +208,13 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
+    public Iterator<Item> findInArchiveOrWithdrawnDiscoverableModifiedSince(Context context, Date since)
+            throws SQLException
+    {
+        return itemDAO.findInArchiveOrWithdrawnDiscoverableModifiedSince(context, since);
+    }
+
+    @Override
     public void updateLastModified(Context context, Item item) throws SQLException, AuthorizeException {
         item.setLastModified(new Date());
         update(context, item);
@@ -1131,5 +1138,12 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Override
     public Item findByLegacyId(Context context, int id) throws SQLException {
         return itemDAO.findByLegacyId(context, id, Item.class);
+    }
+
+    @Override
+    public Iterator<Item> findByLastModifiedSince(Context context, Date last)
+            throws SQLException
+    {
+        return itemDAO.findByLastModifiedSince(context, last);
     }
 }
