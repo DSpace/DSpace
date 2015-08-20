@@ -7,8 +7,10 @@
  */
 package org.dspace.sword2;
 
-import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.swordapp.server.AtomStatement;
@@ -16,8 +18,12 @@ import org.swordapp.server.Statement;
 import org.swordapp.server.SwordError;
 import org.swordapp.server.SwordServerException;
 
+import java.util.List;
+
 public class AtomStatementDisseminator extends GenericStatementDisseminator implements SwordStatementDisseminator
 {
+	protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+	
 	public Statement disseminate(Context context, Item item) throws DSpaceSwordException, SwordError, SwordServerException
 	{
 		SwordUrlManager urlManager = new SwordUrlManager(new SwordConfigurationDSpace(), context);
@@ -43,20 +49,20 @@ public class AtomStatementDisseminator extends GenericStatementDisseminator impl
 			return null;
 		}
 
-		Metadatum[] dcvs = item.getMetadataByMetadataString(field);
-		if (dcvs == null || dcvs.length == 0)
+		List<MetadataValue> dcvs = itemService.getMetadataByMetadataString(item, field);
+		if (dcvs == null || dcvs.isEmpty())
 		{
 			return null;
 		}
 
 		StringBuilder md = new StringBuilder();
-		for (Metadatum dcv : dcvs)
+		for (MetadataValue dcv : dcvs)
 		{
 			if (md.length() > 0)
 			{
 				md.append(", ");
 			}
-			md.append(dcv.value);
+			md.append(dcv.getValue());
 		}
 		return md.toString();
 	}

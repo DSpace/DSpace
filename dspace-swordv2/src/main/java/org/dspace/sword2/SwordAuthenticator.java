@@ -8,7 +8,15 @@
 package org.dspace.sword2;
 
 import org.dspace.authenticate.AuthenticationServiceImpl;
+import org.dspace.authenticate.factory.AuthenticateServiceFactory;
+import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.authorize.AuthorizeServiceImpl;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.LogManager;
@@ -19,12 +27,15 @@ import org.dspace.eperson.Group;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.apache.log4j.Logger;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.swordapp.server.AuthCredentials;
 import org.swordapp.server.SwordAuthException;
 import org.swordapp.server.SwordError;
 import org.swordapp.server.UriRegistry;
 
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -40,6 +51,13 @@ public class SwordAuthenticator
 	/** logger */
 	private static Logger log = Logger.getLogger(SwordAuthenticator.class);
 
+	protected AuthenticationService authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
+	protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+	protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+	protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+	protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+	protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
 	/**
 	 * Does the given username and password authenticate for the
 	 * given DSpace Context?
@@ -51,12 +69,8 @@ public class SwordAuthenticator
 	 */
 	public boolean authenticates(Context context, String un, String pw)
 	{
-		int auth = AuthenticationServiceImpl.authenticate(context, un, pw, null, null);
-		if (auth == AuthenticationMethod.SUCCESS)
-		{
-			return true;
-		}
-		return false;
+		int auth = authenticationService.authenticate(context, un, pw, null, null);
+		return auth == AuthenticationMethod.SUCCESS;
 	}
 
 	/**
@@ -69,19 +83,11 @@ public class SwordAuthenticator
 	private Context constructContext()
 		throws DSpaceSwordException
 	{
-		try
-		{
-            Context context = new Context();
-            // Set the session ID and IP address
-            context.setExtraLogInfo("session_id=0");
+		Context context = new Context();
+		// Set the session ID and IP address
+		context.setExtraLogInfo("session_id=0");
 
-            return context;
-        }
-		catch (SQLException e)
-		{
-			log.error("caught exception: ", e);
-			throw new DSpaceSwordException("There was a problem with the database", e);
-		}
+		return context;
 	}
 
 	/**
@@ -99,36 +105,12 @@ public class SwordAuthenticator
 			throws DSpaceSwordException, SwordError, SwordAuthException
 	{
 		Context context = this.constructContext();
-		SwordContext sc = null;
+		SwordContext sc;
 		try
         {
             sc = this.authenticate(context, auth);
         }
-        catch (DSpaceSwordException e)
-        {
-            if (context != null && context.isValid())
-            {
-                context.abort();
-            }
-            throw e;
-        }
-        catch (SwordError e)
-        {
-            if (context != null && context.isValid())
-            {
-                context.abort();
-            }
-            throw e;
-        }
-        catch (SwordAuthException e)
-        {
-            if (context != null && context.isValid())
-            {
-                context.abort();
-            }
-            throw e;
-        }
-        catch (RuntimeException e)
+        catch (DSpaceSwordException | SwordError | RuntimeException | SwordAuthException e)
         {
             if (context != null && context.isValid())
             {
@@ -193,13 +175,12 @@ public class SwordAuthenticator
 					authenticated = true;
 					sc.setAuthenticated(ep);
 					 // Set any special groups - invoke the authentication mgr.
-		            int[] groupIDs = AuthenticationServiceImpl.getSpecialGroups(context, null);
+		            List<Group> specialGroups = authenticationService.getSpecialGroups(context, null);
 
-		            for (int i = 0; i < groupIDs.length; i++)
-		            {
-		                context.setSpecialGroup(groupIDs[i]);
-		                log.debug("Adding Special Group id="+String.valueOf(groupIDs[i]));
-		            }
+					for (Group specialGroup : specialGroups) {
+						context.setSpecialGroup(specialGroup.getID());
+						log.debug("Adding Special Group id=" + specialGroup.getID());
+					}
 					
 					sc.setAuthenticatorContext(context);
 					sc.setContext(context);
@@ -211,10 +192,10 @@ public class SwordAuthenticator
 				EPerson epObo = null;
 				if (obo != null)
 				{
-					epObo = EPerson.findByEmail(context, obo);
+					epObo = ePersonService.findByEmail(context, obo);
 					if (epObo == null)
 					{
-						epObo = EPerson.findByNetid(context, obo);
+						epObo = ePersonService.findByNetid(context, obo);
 					}
 
 					if (epObo != null)
@@ -223,13 +204,12 @@ public class SwordAuthenticator
 						Context oboContext = this.constructContext();
 						oboContext.setCurrentUser(epObo);
 		                // Set any special groups - invoke the authentication mgr.
-	                    int[] groupIDs = AuthenticationServiceImpl.getSpecialGroups(oboContext, null);
+	                    List<Group> specialGroups = authenticationService.getSpecialGroups(oboContext, null);
 
-	                    for (int i = 0; i < groupIDs.length; i++)
-	                    {
-	                        oboContext.setSpecialGroup(groupIDs[i]);
-	                        log.debug("Adding Special Group id="+String.valueOf(groupIDs[i]));
-	                    }
+						for (Group specialGroup : specialGroups) {
+							oboContext.setSpecialGroup(specialGroup.getID());
+							log.debug("Adding Special Group id=" + specialGroup.getID());
+						}
 						sc.setContext(oboContext);
 					}
 					else
@@ -263,11 +243,6 @@ public class SwordAuthenticator
 		{
 			log.error("caught exception: ", e);
 			throw new DSpaceSwordException("There was a problem accessing the repository user database", e);
-		}
-		catch (AuthorizeException e)
-		{
-			log.error("caught exception: ", e);
-			throw new SwordAuthException("There was a problem authenticating or authorising the user", e);
 		}
 	}
 
@@ -316,7 +291,7 @@ public class SwordAuthenticator
 			EPerson authenticated = swordContext.getAuthenticated();
 			if (authenticated != null)
 			{
-				return AuthorizeServiceImpl.isAdmin(swordContext.getAuthenticatorContext());
+				return authorizeService.isAdmin(swordContext.getAuthenticatorContext());
 			}
 			return false;
 		}
@@ -344,7 +319,7 @@ public class SwordAuthenticator
 		{
 			if (onBehalfOf != null)
 			{
-				return AuthorizeServiceImpl.isAdmin(swordContext.getOnBehalfOfContext());
+				return authorizeService.isAdmin(swordContext.getOnBehalfOfContext());
 			}
 			return false;
 		}
@@ -399,25 +374,21 @@ public class SwordAuthenticator
 	 */
 	public boolean isInGroup(Group group, EPerson eperson)
 	{
-		EPerson[] eps = group.getMembers();
-		Group[] groups = group.getMemberGroups();
+		List<EPerson> eps = group.getMembers();
+		List<Group> groups = group.getMemberGroups();
 
 		// is the user in the current group
-		for (int i = 0; i < eps.length; i++)
-		{
-			if (eperson.getID() == eps[i].getID())
-			{
+		for (EPerson ep : eps) {
+			if (eperson.getID().equals(ep.getID())) {
 				return true;
 			}
 		}
 
 		// is the eperson in the sub-groups (recurse)
-		if (groups != null && groups.length > 0)
+		if (groups != null && !groups.isEmpty())
 		{
-			for (int j = 0; j < groups.length; j++)
-			{
-				if (isInGroup(groups[j], eperson))
-				{
+			for (Group group1 : groups) {
+				if (isInGroup(group1, eperson)) {
 					return true;
 				}
 			}
@@ -467,8 +438,8 @@ public class SwordAuthenticator
 			// locate all the top level communities
 			Context context = swordContext.getContext();
 			List<Community> allowed = new ArrayList<Community>();
-			Community[] comms = Community.findAllTop(context);
-			for (int i = 0; i < comms.length; i++)
+			List<Community> comms = communityService.findAllTop(context);
+			for (Community comm : comms)
 			{
 				boolean authAllowed = false;
 				boolean oboAllowed = false;
@@ -483,20 +454,20 @@ public class SwordAuthenticator
 				// so we do not need to check that separately
 				if (!authAllowed)
 				{
-					authAllowed = AuthorizeServiceImpl.authorizeActionBoolean(swordContext.getAuthenticatorContext(), comms[i], Constants.READ);
+					authAllowed = authorizeService.authorizeActionBoolean(swordContext.getAuthenticatorContext(), comm, Constants.READ);
 				}
 
 				// if we have not already determined that the obo user is ok to submit, look up the READ policy on the
 				// community.  THis will include determining if the user is an administrator.
 				if (!oboAllowed)
 				{
-					oboAllowed = AuthorizeServiceImpl.authorizeActionBoolean(swordContext.getOnBehalfOfContext(), comms[i], Constants.READ);
+					oboAllowed = authorizeService.authorizeActionBoolean(swordContext.getOnBehalfOfContext(), comm, Constants.READ);
 				}
 
 				// final check to see if we are allowed to READ
 				if (authAllowed && oboAllowed)
 				{
-					allowed.add(comms[i]);
+					allowed.add(comm);
 				}
 			}
 			return allowed;
@@ -545,10 +516,10 @@ public class SwordAuthenticator
 		// -- the on-behalf-of user is null
 		try
 		{
-			Community[] comms = community.getSubcommunities();
-			List<Community> allowed = new ArrayList<Community>();
+			List<Community> comms = community.getSubcommunities();
+			List<Community> allowed = new ArrayList<>();
 
-			for (int i = 0; i < comms.length; i++)
+			for (Community comm : comms)
 			{
 				boolean authAllowed = false;
 				boolean oboAllowed = false;
@@ -563,20 +534,20 @@ public class SwordAuthenticator
 				// so we do not need to check that separately
 				if (!authAllowed)
 				{
-					authAllowed = AuthorizeServiceImpl.authorizeActionBoolean(swordContext.getAuthenticatorContext(), comms[i], Constants.READ);
+					authAllowed = authorizeService.authorizeActionBoolean(swordContext.getAuthenticatorContext(), comm, Constants.READ);
 				}
 
 				// if we have not already determined that the obo user is ok to submit, look up the READ policy on the
 				// community.  THis will include determining if the user is an administrator.
 				if (!oboAllowed)
 				{
-					oboAllowed = AuthorizeServiceImpl.authorizeActionBoolean(swordContext.getOnBehalfOfContext(), comms[i], Constants.READ);
+					oboAllowed = authorizeService.authorizeActionBoolean(swordContext.getOnBehalfOfContext(), comm, Constants.READ);
 				}
 
 				// final check to see if we are allowed to READ
 				if (authAllowed && oboAllowed)
 				{
-					allowed.add(comms[i]);
+					allowed.add(comm);
 				}
 			}
 			return allowed;
@@ -648,11 +619,11 @@ public class SwordAuthenticator
 			Context authContext = swordContext.getAuthenticatorContext();
 
 			// short cut by obtaining the collections to which the authenticated user can submit
-			org.dspace.content.Collection[] cols = org.dspace.content.Collection.findAuthorized(authContext, community, Constants.ADD);
-			List<org.dspace.content.Collection> allowed = new ArrayList<org.dspace.content.Collection>();
+			List<Collection> cols = collectionService.findAuthorized(authContext, community, Constants.ADD);
+			List<org.dspace.content.Collection> allowed = new ArrayList<>();
 
 			// now find out if the obo user is allowed to submit to any of these collections
-			for (int i = 0; i < cols.length; i++)
+			for (Collection col : cols)
 			{
 				boolean oboAllowed = false;
 
@@ -666,13 +637,13 @@ public class SwordAuthenticator
 				// community.  THis will include determining if the user is an administrator.
 				if (!oboAllowed)
 				{
-					oboAllowed = AuthorizeServiceImpl.authorizeActionBoolean(swordContext.getOnBehalfOfContext(), cols[i], Constants.ADD);
+					oboAllowed = authorizeService.authorizeActionBoolean(swordContext.getOnBehalfOfContext(), col, Constants.ADD);
 				}
 
 				// final check to see if we are allowed to READ
 				if (oboAllowed)
 				{
-					allowed.add(cols[i]);
+					allowed.add(col);
 				}
 			}
 			return allowed;
@@ -720,8 +691,8 @@ public class SwordAuthenticator
 
 		try
 		{
-			List<Item> allowed = new ArrayList<Item>();
-			ItemIterator ii = collection.getItems();
+			List<Item> allowed = new ArrayList<>();
+			Iterator<Item> ii = itemService.findByCollection(swordContext.getContext(), collection);
 
 			while (ii.hasNext())
 			{
@@ -737,29 +708,32 @@ public class SwordAuthenticator
 				}
 
 				// get the "ORIGINAL" bundle(s)
-				Bundle[] bundles = item.getBundles("ORIGINAL");
+				List<Bundle> bundles = item.getBundles();
 
 				// look up the READ policy on the community.  This will include determining if the user is an administrator
 				// so we do not need to check that separately
 				if (!authAllowed)
 				{
-					boolean write = AuthorizeServiceImpl.authorizeActionBoolean(swordContext.getAuthenticatorContext(), item, Constants.WRITE);
+					boolean write = authorizeService.authorizeActionBoolean(swordContext.getAuthenticatorContext(), item, Constants.WRITE);
 					
 					boolean add = false;
-					if (bundles.length == 0)
+					if (bundles.isEmpty())
                     {
-                        add = AuthorizeServiceImpl.authorizeActionBoolean(swordContext.getAuthenticatorContext(), item, Constants.ADD);
+                        add = authorizeService.authorizeActionBoolean(swordContext.getAuthenticatorContext(), item, Constants.ADD);
                     }
                     else
                     {
-                        for (int i = 0; i < bundles.length; i++)
-                        {
-                            add = AuthorizeServiceImpl.authorizeActionBoolean(swordContext.getAuthenticatorContext(), bundles[i], Constants.ADD);
-                            if (!add)
-                            {
-                                break;
-                            }
-                        }
+						for (Bundle bundle : bundles)
+						{
+							if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName()))
+							{
+								add = authorizeService.authorizeActionBoolean(swordContext.getAuthenticatorContext(), bundle, Constants.ADD);
+								if (!add)
+								{
+									break;
+								}
+							}
+						}
                     }
 
 					authAllowed = write && add;
@@ -769,23 +743,26 @@ public class SwordAuthenticator
 				// community.  THis will include determining if the user is an administrator.
 				if (!oboAllowed)
 				{
-					boolean write = AuthorizeServiceImpl.authorizeActionBoolean(swordContext.getOnBehalfOfContext(), item, Constants.WRITE);
+					boolean write = authorizeService.authorizeActionBoolean(swordContext.getOnBehalfOfContext(), item, Constants.WRITE);
 
 					boolean add = false;
-					if (bundles.length == 0)
+					if (bundles.isEmpty())
                     {
-                        add = AuthorizeServiceImpl.authorizeActionBoolean(swordContext.getAuthenticatorContext(), item, Constants.ADD);
+                        add = authorizeService.authorizeActionBoolean(swordContext.getAuthenticatorContext(), item, Constants.ADD);
                     }
                     else
                     {
-                        for (int i = 0; i < bundles.length; i++)
-                        {
-                            add = AuthorizeServiceImpl.authorizeActionBoolean(swordContext.getAuthenticatorContext(), bundles[i], Constants.ADD);
-                            if (!add)
-                            {
-                                break;
-                            }
-                        }
+						for (Bundle bundle : bundles)
+						{
+							if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName()))
+							{
+								add = authorizeService.authorizeActionBoolean(swordContext.getAuthenticatorContext(), bundle, Constants.ADD);
+								if (!add)
+								{
+									break;
+								}
+							}
+						}
                     }
 
 					oboAllowed = write && add;
@@ -854,14 +831,14 @@ public class SwordAuthenticator
 			// so we do not need to check that separately
 			if (!authAllowed)
 			{
-				authAllowed = AuthorizeServiceImpl.authorizeActionBoolean(swordContext.getAuthenticatorContext(), collection, Constants.ADD);
+				authAllowed = authorizeService.authorizeActionBoolean(swordContext.getAuthenticatorContext(), collection, Constants.ADD);
 			}
 
 			// if we have not already determined that the obo user is ok to submit, look up the READ policy on the
 			// community.  THis will include determining if the user is an administrator.
 			if (!oboAllowed)
 			{
-				oboAllowed = AuthorizeServiceImpl.authorizeActionBoolean(swordContext.getOnBehalfOfContext(), collection, Constants.ADD);
+				oboAllowed = authorizeService.authorizeActionBoolean(swordContext.getOnBehalfOfContext(), collection, Constants.ADD);
 			}
 
 			// final check to see if we are allowed to READ
@@ -908,24 +885,27 @@ public class SwordAuthenticator
 
             // we now need to check whether the selected context that we are authorising
             // has the appropriate permissions
-            boolean write = AuthorizeServiceImpl.authorizeActionBoolean(allowContext, item, Constants.WRITE);
+            boolean write = authorizeService.authorizeActionBoolean(allowContext, item, Constants.WRITE);
 
-            Bundle[] bundles = item.getBundles("ORIGINAL");
+            List<Bundle> bundles = item.getBundles();
             boolean add = false;
-            if (bundles.length == 0)
+            if (bundles.isEmpty())
             {
-                add = AuthorizeServiceImpl.authorizeActionBoolean(allowContext, item, Constants.ADD);
+                add = authorizeService.authorizeActionBoolean(allowContext, item, Constants.ADD);
             }
             else
             {
-                for (int i = 0; i < bundles.length; i++)
-                {
-                    add = AuthorizeServiceImpl.authorizeActionBoolean(allowContext, bundles[i], Constants.ADD);
-                    if (!add)
-                    {
-                        break;
-                    }
-                }
+				for (Bundle bundle : bundles)
+				{
+					if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName()))
+					{
+						add = authorizeService.authorizeActionBoolean(allowContext, bundle, Constants.ADD);
+						if (!add)
+						{
+							break;
+						}
+					}
+				}
             }
 
             boolean allowed = write && add;
@@ -987,17 +967,9 @@ public class SwordAuthenticator
 	public boolean canSubmitTo(SwordContext context, DSpaceObject dso)
 			throws DSpaceSwordException
 	{
-		if (dso instanceof Collection)
-		{
+		if (dso instanceof Collection) {
 			return this.canSubmitTo(context, (Collection) dso);
-		}
-		else if (dso instanceof Item)
-		{
-			return this.canSubmitTo(context, (Item) dso);
-		}
-		else
-		{
-			return false;
-		}
+		} else
+			return dso instanceof Item && this.canSubmitTo(context, (Item) dso);
 	}
 }

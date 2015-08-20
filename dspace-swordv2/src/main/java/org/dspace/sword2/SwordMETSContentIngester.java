@@ -15,14 +15,20 @@ import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.packager.PackageIngester;
 import org.dspace.content.packager.PackageParameters;
 import org.dspace.content.packager.PackageUtils;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
 import org.dspace.handle.HandleServiceImpl;
 
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.swordapp.server.Deposit;
 import org.swordapp.server.SwordAuthException;
 import org.swordapp.server.SwordError;
@@ -33,6 +39,10 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester
 	/** Log4j logger */
 	public static final Logger log = Logger.getLogger(SwordMETSContentIngester.class);
 
+	protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+	protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+	protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+	protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
 
     public DepositResult ingest(Context context, Deposit deposit, DSpaceObject dso, VerboseDescription verboseDescription)
             throws DSpaceSwordException, SwordError, SwordAuthException, SwordServerException
@@ -61,11 +71,11 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester
             // us finer control over the workflow state of the item, whereas asking
             // the ingester to /create/ this item causes it to be injected into the workflow,
             // irrespective of the In-Progress header provided by the depositor
-            WorkspaceItem wsi = WorkspaceItem.create(context, collection, true);
+            WorkspaceItem wsi = workspaceItemService.create(context, collection, true);
             Item item = wsi.getItem();
 
             // need to add a licence file, otherwise the METS replace function raises a NullPointerException
-            String licence = collection.getLicense();
+            String licence = collectionService.getLicense(collection);
             if (PackageUtils.findDepositLicense(context, item) == null)
             {
                 PackageUtils.addDepositLicense(context, licence, item, collection);
@@ -124,24 +134,23 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester
 
 			// update the item metadata to inclue the current time as
 			// the updated date
-			this.setUpdatedDate(installedItem, verboseDescription);
+			this.setUpdatedDate(context, installedItem, verboseDescription);
 
 			// DSpace ignores the slug value as suggested identifier, but
 			// it does store it in the metadata
-			this.setSlug(installedItem, deposit.getSlug(), verboseDescription);
+			this.setSlug(context, installedItem, deposit.getSlug(), verboseDescription);
 
 			// in order to write these changes, we need to bypass the
 			// authorisation briefly, because although the user may be
 			// able to add stuff to the repository, they may not have
 			// WRITE permissions on the archive.
-			boolean ignore = context.ignoreAuthorization();
-			context.setIgnoreAuthorization(true);
-			installedItem.update();
-			context.setIgnoreAuthorization(ignore);
+			context.turnOffAuthorisationSystem();
+			itemService.update(context, installedItem);
+			context.restoreAuthSystemState();
 
 			// for some reason, DSpace will not give you the handle automatically,
 			// so we have to look it up
-			String handle = HandleServiceImpl.findHandle(context, installedItem);
+			String handle = handleService.findHandle(context, installedItem);
 
 			verboseDescription.append("Ingest successful");
 			verboseDescription.append("Item created with internal identifier: " + installedItem.getID());
@@ -231,20 +240,19 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester
 
 			// update the item metadata to inclue the current time as
 			// the updated date
-			this.setUpdatedDate(installedItem, verboseDescription);
+			this.setUpdatedDate(context, installedItem, verboseDescription);
 
 			// in order to write these changes, we need to bypass the
 			// authorisation briefly, because although the user may be
 			// able to add stuff to the repository, they may not have
 			// WRITE permissions on the archive.
-			boolean ignore = context.ignoreAuthorization();
-			context.setIgnoreAuthorization(true);
-			installedItem.update();
-			context.setIgnoreAuthorization(ignore);
+			context.turnOffAuthorisationSystem();
+			itemService.update(context, installedItem);
+			context.restoreAuthSystemState();
 
 			// for some reason, DSpace will not give you the handle automatically,
 			// so we have to look it up
-			String handle = HandleServiceImpl.findHandle(context, installedItem);
+			String handle = handleService.findHandle(context, installedItem);
 
 			verboseDescription.append("Replace successful");
 

@@ -12,10 +12,7 @@ import org.apache.abdera.i18n.iri.IRI;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.model.Link;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
-import org.dspace.content.Item;
+import org.dspace.content.*;
 import org.dspace.core.*;
 import org.swordapp.server.SwordError;
 import org.swordapp.server.SwordServerException;
@@ -26,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 public class FeedContentDisseminator extends AbstractSimpleDC implements SwordContentDisseminator
@@ -40,25 +38,22 @@ public class FeedContentDisseminator extends AbstractSimpleDC implements SwordCo
 
             this.addMetadata(feed, item);
 
-            Bundle[] originals = item.getBundles("ORIGINAL");
-            for (Bundle original : originals)
+            List<Bundle> bundles = item.getBundles();
+            for (Bundle bundle : bundles)
             {
-                Bitstream[] bss = original.getBitstreams();
-                for (Bitstream bitstream : bss)
+                if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName()))
                 {
-                    Entry entry = feed.addEntry();
-                    this.populateEntry(context, entry, bitstream);
+                    List<BundleBitstream> bundleBitstreams = bundle.getBitstreams();
+                    for (BundleBitstream bundleBitstream : bundleBitstreams) {
+                        Entry entry = feed.addEntry();
+                        this.populateEntry(context, entry, bundleBitstream.getBitstream());
+                    }
                 }
             }
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             feed.writeTo(baos);
-            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-            return bais;
-        }
-        catch (SQLException e)
-        {
-            throw new DSpaceSwordException(e);
+            return new ByteArrayInputStream(baos.toByteArray());
         }
         catch (IOException e)
         {
@@ -98,7 +93,12 @@ public class FeedContentDisseminator extends AbstractSimpleDC implements SwordCo
     private void populateEntry(Context context, Entry entry, Bitstream bitstream)
             throws DSpaceSwordException
     {
-        BitstreamFormat format = bitstream.getFormat();
+        BitstreamFormat format = null;
+        try {
+            format = bitstream.getFormat(context);
+        } catch (SQLException e) {
+            throw new DSpaceSwordException(e);
+        }
         String contentType = null;
         if (format != null)
         {

@@ -8,20 +8,21 @@
 package org.dspace.sword2;
 
 import org.apache.abdera.i18n.iri.IRI;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
+import org.dspace.content.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.ItemService;
 import org.dspace.handle.HandleServiceImpl;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.swordapp.server.SwordError;
 
 import java.sql.SQLException;
 import java.net.URL;
 import java.net.MalformedURLException;
+import java.util.List;
 
 /**
  * @author Richard Jones
@@ -31,6 +32,10 @@ import java.net.MalformedURLException;
  */
 public class SwordUrlManager
 {
+	protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+	protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+	protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+
 	/** the sword configuration */
 	private SwordConfigurationDSpace config;
 
@@ -142,9 +147,8 @@ public class SwordUrlManager
 				// this is the rdf url so we need to strip that to get the item id
 				iid = iid.substring(0, iid.length() - ".rdf".length());
 			}
-			
-            int itemId = Integer.parseInt(iid);
-            Item item = Item.find(context, itemId);
+
+            Item item = itemService.findByIdOrLegacyId(context, iid);
 			return item;
 		}
 		catch (SQLException e)
@@ -201,7 +205,7 @@ public class SwordUrlManager
 				throw new SwordError(DSpaceUriRegistry.BAD_URL, "The deposit URL is incomplete");
 			}
 
-			DSpaceObject dso = HandleServiceImpl.resolveToObject(context, handle);
+			DSpaceObject dso = handleService.resolveToObject(context, handle);
             if (dso == null)
             {
                 return null;
@@ -284,7 +288,7 @@ public class SwordUrlManager
 					url = url.substring(0, url.length() - 1);
 				}
 
-				DSpaceObject dso = HandleServiceImpl.resolveToObject(context, url);
+				DSpaceObject dso = handleService.resolveToObject(context, url);
                 if (dso == null)
                 {
                     return null;
@@ -412,22 +416,22 @@ public class SwordUrlManager
 	{
 		try
 		{
-			Bundle[] bundles = bitstream.getBundles();
+			List<BundleBitstream> bundles = bitstream.getBundles();
 			Bundle parent = null;
-			if (bundles.length > 0)
+			if (!bundles.isEmpty())
 			{
-				parent = bundles[0];
+				parent = bundles.get(0).getBundle();
 			}
 			else
 			{
 				throw new DSpaceSwordException("Encountered orphaned bitstream");
 			}
 
-			Item[] items = parent.getItems();
+			List<Item> items = parent.getItems();
 			Item item;
-			if (items.length > 0)
+			if (!items.isEmpty())
 			{
-				item = items[0];
+				item = items.get(0);
 			}
 			else
 			{
@@ -481,10 +485,10 @@ public class SwordUrlManager
 
 			// the bitstream id is the part up to the first "/"
 			int firstSlash = bitstreamParts.indexOf("/");
-			int bid = Integer.parseInt(bitstreamParts.substring(0, firstSlash));
+			String bid = bitstreamParts.substring(0, firstSlash);
 			String fn = bitstreamParts.substring(firstSlash + 1);
 
-            Bitstream bitstream = Bitstream.find(context, bid);
+            Bitstream bitstream = bitstreamService.findByIdOrLegacyId(context, bid);
 			return bitstream;
 		}
 		catch (SQLException e)
@@ -545,7 +549,7 @@ public class SwordUrlManager
         // item
         else
         {
-		    return HandleServiceImpl.getCanonicalForm(item.getHandle());
+		    return handleService.getCanonicalForm(item.getHandle());
         }
         return null;
 	}

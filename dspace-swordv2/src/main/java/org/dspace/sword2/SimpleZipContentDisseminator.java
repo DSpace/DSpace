@@ -10,8 +10,12 @@ package org.dspace.sword2;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
+import org.dspace.content.BundleBitstream;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.swordapp.server.SwordError;
@@ -24,12 +28,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class SimpleZipContentDisseminator implements SwordContentDisseminator
 {
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+
     public InputStream disseminate(Context context, Item item)
             throws DSpaceSwordException, SwordError, SwordServerException
     {
@@ -41,33 +48,28 @@ public class SimpleZipContentDisseminator implements SwordContentDisseminator
             OutputStream outStream = new FileOutputStream(new File(fn));
             ZipOutputStream zip = new ZipOutputStream(outStream);
 
-            Bundle[] originals = item.getBundles("ORIGINAL");
-            for (Bundle original : originals)
+            List<Bundle> bundles = item.getBundles();
+            for (Bundle bundle : bundles)
             {
-                Bitstream[] bss = original.getBitstreams();
-                for (Bitstream bitstream : bss)
+                if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName()))
                 {
-                    ZipEntry ze = new ZipEntry(bitstream.getName());
-                    zip.putNextEntry(ze);
-                    InputStream is = bitstream.retrieve();
-                    Utils.copy(is, zip);
-                    zip.closeEntry();
-                    is.close();
+                    List<BundleBitstream> bss = bundle.getBitstreams();
+                    for (BundleBitstream bundleBitstream : bss) {
+                        Bitstream bitstream = bundleBitstream.getBitstream();
+                        ZipEntry ze = new ZipEntry(bitstream.getName());
+                        zip.putNextEntry(ze);
+                        InputStream is = bitstreamService.retrieve(context, bitstream);
+                        Utils.copy(is, zip);
+                        zip.closeEntry();
+                        is.close();
+                    }
                 }
             }
             zip.close();
 
             return new TempFileInputStream(new File(fn));
         }
-        catch (SQLException e)
-        {
-            throw new DSpaceSwordException(e);
-        }
-        catch (IOException e)
-        {
-            throw new DSpaceSwordException(e);
-        }
-        catch (AuthorizeException e)
+        catch (SQLException | IOException | AuthorizeException e)
         {
             throw new DSpaceSwordException(e);
         }

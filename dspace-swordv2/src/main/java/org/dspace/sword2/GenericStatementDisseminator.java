@@ -9,6 +9,7 @@ package org.dspace.sword2;
 
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
+import org.dspace.content.BundleBitstream;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -64,15 +65,18 @@ public abstract class GenericStatementDisseminator implements SwordStatementDiss
 			List<OriginalDeposit> originalDeposits = new ArrayList<OriginalDeposit>();
 
             // an original deposit is everything in the SWORD bundle
-			Bundle[] swords = item.getBundles(swordBundle);
-			for (Bundle sword : swords)
+			List<Bundle> bundles = item.getBundles();
+			for (Bundle bundle : bundles)
 			{
-				for (Bitstream bitstream : sword.getBitstreams())
+				if (swordBundle.equals(bundle.getName()))
 				{
-					// note that original deposits don't have actionable urls
-					OriginalDeposit deposit = new OriginalDeposit(this.urlManager.getBitstreamUrl(bitstream));
-					deposit.setMediaType(bitstream.getFormat().getMIMEType());
-					originalDeposits.add(deposit);
+					List<BundleBitstream> bundleBitstreams = bundle.getBitstreams();
+					for (BundleBitstream bundleBitstream : bundleBitstreams) {
+						// note that original deposits don't have actionable urls
+						OriginalDeposit deposit = new OriginalDeposit(this.urlManager.getBitstreamUrl(bundleBitstream.getBitstream()));
+						deposit.setMediaType(bundleBitstream.getBitstream().getFormat(context).getMIMEType());
+						originalDeposits.add(deposit);
+					}
 				}
 			}
 			return originalDeposits;
@@ -126,16 +130,19 @@ public abstract class GenericStatementDisseminator implements SwordStatementDiss
 
             for (String bundleName : includeBundles)
             {
-                Bundle[] bundles = item.getBundles(bundleName);
+                List<Bundle> bundles = item.getBundles();
                 for (Bundle bundle : bundles)
                 {
-                    for (Bitstream bitstream : bundle.getBitstreams())
-                    {
-                        // note that individual bitstreams have actionable urls
-                        ResourcePart part = new ResourcePart(this.urlManager.getActionableBitstreamUrl(bitstream));
-                        part.setMediaType(bitstream.getFormat().getMIMEType());
-                        resources.add(part);
-                    }
+					if (bundleName.equals(bundle.getName()))
+					{
+						List<BundleBitstream> bundleBitstreams = bundle.getBitstreams();
+						for (BundleBitstream bundleBitstream : bundleBitstreams) {
+							// note that individual bitstreams have actionable urls
+							ResourcePart part = new ResourcePart(this.urlManager.getActionableBitstreamUrl(bundleBitstream.getBitstream()));
+							part.setMediaType(bundleBitstream.getBitstream().getFormat(context).getMIMEType());
+							resources.add(part);
+						}
+					}
                 }
             }
 

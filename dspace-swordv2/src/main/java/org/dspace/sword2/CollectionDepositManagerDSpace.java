@@ -15,6 +15,8 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.core.*;
 import org.swordapp.server.AuthCredentials;
 import org.swordapp.server.CollectionDepositManager;
@@ -47,6 +49,7 @@ public class CollectionDepositManagerDSpace extends DSpaceSwordAPI implements Co
 {
 	/** logger */
 	private static Logger log = Logger.getLogger(CollectionDepositManagerDSpace.class);
+	protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 
 	private VerboseDescription verboseDescription = new VerboseDescription();
 
@@ -315,7 +318,7 @@ public class CollectionDepositManagerDSpace extends DSpaceSwordAPI implements Co
 		this.verboseDescription.append("Performing deposit using deposit URL: " + depositUrl);
 
         this.verboseDescription.append("Location resolves to collection with handle: " + collection.getHandle() +
-					" and name: " + collection.getMetadata("name"));
+					" and name: " + collectionService.getName(collection));
 
 		return collection;
 	}

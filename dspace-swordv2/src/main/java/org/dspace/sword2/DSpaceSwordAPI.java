@@ -16,6 +16,11 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.*;
 import org.swordapp.server.AuthCredentials;
 import org.swordapp.server.Deposit;
@@ -50,21 +55,19 @@ public class DSpaceSwordAPI
 {
     private static Logger log = Logger.getLogger(DSpaceSwordAPI.class);
 
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
+
 	public SwordContext noAuthContext()
 			throws DSpaceSwordException
 	{
-		try
-		{
-			SwordContext sc = new SwordContext();
-			Context context = new Context();
-			sc.setContext(context);
-			return sc;
-		}
-		catch (SQLException e)
-		{
-			throw new DSpaceSwordException(e);
-		}
-	}
+        SwordContext sc = new SwordContext();
+        Context context = new Context();
+        sc.setContext(context);
+        return sc;
+    }
 
     public SwordContext doAuth(AuthCredentials authCredentials)
             throws SwordAuthException, SwordError, DSpaceSwordException
@@ -260,8 +263,7 @@ public class DSpaceSwordAPI
 
                 // in order to be allowed to add the file back to the item, we need to ignore authorisations
                 // for a moment
-                boolean ignoreAuth = context.ignoreAuthorization();
-                context.setIgnoreAuthorization(true);
+                context.turnOffAuthorisationSystem();
 
                 String bundleName = ConfigurationManager.getProperty("swordv2-server", "bundle.name");
                 if (bundleName == null || "".equals(bundleName))
@@ -269,34 +271,38 @@ public class DSpaceSwordAPI
                     bundleName = "SWORD";
                 }
                 Item item = result.getItem();
-                Bundle[] bundles = item.getBundles(bundleName);
+                List<Bundle> bundles = item.getBundles();
                 Bundle swordBundle = null;
-                if (bundles.length > 0)
+                for (Bundle bundle : bundles)
                 {
-                    swordBundle = bundles[0];
+                    if (bundleName.equals(bundle.getName()))
+                    {
+                        swordBundle = bundle;
+                        break;
+                    }
                 }
                 if (swordBundle == null)
                 {
-                    swordBundle = item.createBundle(bundleName);
+                    swordBundle = bundleService.create(context, item, bundleName);
                 }
 
                 if (deposit.isMultipart() || deposit.isEntryOnly())
                 {
                     String entry = deposit.getSwordEntry().toString();
                     ByteArrayInputStream bais = new ByteArrayInputStream(entry.getBytes());
-                    Bitstream entryBitstream = swordBundle.createBitstream(bais);
+                    Bitstream entryBitstream = bitstreamService.create(context, swordBundle, bais);
 
                     String fn = this.createEntryFilename(context, deposit, true);
-                    entryBitstream.setName(fn);
-                    entryBitstream.setDescription("Original SWORD entry document");
+                    entryBitstream.setName(context, fn);
+                    entryBitstream.setDescription(context, "Original SWORD entry document");
 
-                    BitstreamFormat bf = BitstreamFormat.findByMIMEType(context, "application/xml");
+                    BitstreamFormat bf = bitstreamFormatService.findByMIMEType(context, "application/xml");
                     if (bf != null)
                     {
-                        entryBitstream.setFormat(bf);
+                        entryBitstream.setFormat(context, bf);
                     }
 
-                    entryBitstream.update();
+                    bitstreamService.update(context, entryBitstream);
 
                     verboseDescription.append("Original entry stored as " + fn + ", in item bundle " + swordBundle);
                 }
@@ -310,7 +316,7 @@ public class DSpaceSwordAPI
                     try
                     {
                         fis = deposit.getInputStream();
-                        bitstream = swordBundle.createBitstream(fis);
+                        bitstream = bitstreamService.create(context, swordBundle, fis);
                     }
                     finally
                     {
@@ -327,16 +333,16 @@ public class DSpaceSwordAPI
                         }
                     }
 
-                    bitstream.setName(fn);
-                    bitstream.setDescription("Orignal SWORD deposit file");
+                    bitstream.setName(context, fn);
+                    bitstream.setDescription(context, "Original SWORD deposit file");
 
-                    BitstreamFormat bf = BitstreamFormat.findByMIMEType(context, deposit.getMimeType());
+                    BitstreamFormat bf = bitstreamFormatService.findByMIMEType(context, deposit.getMimeType());
                     if (bf != null)
                     {
-                        bitstream.setFormat(bf);
+                        bitstream.setFormat(context, bf);
                     }
 
-                    bitstream.update();
+                    bitstreamService.update(context, bitstream);
                     if (result.getOriginalDeposit() == null)
                     {
                         // it may be that the original deposit is already set, in which case we
@@ -346,29 +352,14 @@ public class DSpaceSwordAPI
                     verboseDescription.append("Original deposit stored as " + fn + ", in item bundle " + swordBundle);
                 }
 
-                swordBundle.update();
-                item.update();
+                bundleService.update(context, swordBundle);
+                itemService.update(context, item);
 
                 // now reset the context ignore authorisation
-                context.setIgnoreAuthorization(ignoreAuth);
+                context.restoreAuthSystemState();
             }
         }
-        catch (SQLException e)
-        {
-            log.error("caught exception: ", e);
-            throw new DSpaceSwordException(e);
-        }
-        catch (AuthorizeException e)
-        {
-            log.error("caught exception: ", e);
-            throw new DSpaceSwordException(e);
-        }
-        catch (FileNotFoundException e)
-        {
-            log.error("caught exception: ", e);
-            throw new DSpaceSwordException(e);
-        }
-        catch (IOException e)
+        catch (SQLException | AuthorizeException | IOException e)
         {
             log.error("caught exception: ", e);
             throw new DSpaceSwordException(e);
@@ -388,8 +379,8 @@ public class DSpaceSwordAPI
     {
         try
         {
-            BitstreamFormat bf = BitstreamFormat.findByMIMEType(context, deposit.getMimeType());
-            String[] exts = null;
+            BitstreamFormat bf = bitstreamFormatService.findByMIMEType(context, deposit.getMimeType());
+            List<String> exts = null;
             if (bf != null)
             {
                 exts = bf.getExtensions();
@@ -406,7 +397,7 @@ public class DSpaceSwordAPI
                 }
                 if (exts != null)
                 {
-                    fn = fn + "." + exts[0];
+                    fn = fn + "." + exts.get(0);
                 }
             }
 

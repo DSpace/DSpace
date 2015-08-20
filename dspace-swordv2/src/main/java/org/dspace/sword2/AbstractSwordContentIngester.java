@@ -7,15 +7,11 @@
  */
 package org.dspace.sword2;
 
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
-import org.dspace.content.Collection;
-import org.dspace.content.DCDate;
-import org.dspace.content.Metadatum;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
+import org.apache.log4j.Logger;
+import org.dspace.content.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.swordapp.server.Deposit;
@@ -23,14 +19,18 @@ import org.swordapp.server.SwordAuthException;
 import org.swordapp.server.SwordError;
 import org.swordapp.server.SwordServerException;
 
-import java.io.IOException;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.StringTokenizer;
 
 public abstract class AbstractSwordContentIngester implements SwordContentIngester
 {
+	public static final Logger log = Logger.getLogger(AbstractSwordContentIngester.class);
+
+	protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
+	protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
     public DepositResult ingest(Context context, Deposit deposit, DSpaceObject dso, VerboseDescription verboseDescription)
             throws DSpaceSwordException, SwordError, SwordAuthException, SwordServerException
     {
@@ -72,10 +72,10 @@ public abstract class AbstractSwordContentIngester implements SwordContentIngest
 			return null;
 		}
 
-		BitstreamFormat[] formats = BitstreamFormat.findAll(context);
+		List<BitstreamFormat> formats = bitstreamFormatService.findAll(context);
 		for (BitstreamFormat format : formats)
 		{
-			String[] extensions = format.getExtensions();
+			List<String> extensions = format.getExtensions();
 			for (String ext : extensions)
 			{
 				if (ext.equals(fext))
@@ -92,10 +92,12 @@ public abstract class AbstractSwordContentIngester implements SwordContentIngest
 	 * the field in which to store this metadata in the configuration
 	 * sword.updated.field
 	 *
+	 *
+	 * @param context
 	 * @param item
 	 * @throws DSpaceSwordException
 	 */
-	protected void setUpdatedDate(Item item, VerboseDescription verboseDescription)
+	protected void setUpdatedDate(Context context, Item item, VerboseDescription verboseDescription)
 			throws DSpaceSwordException
 	{
 		String field = ConfigurationManager.getProperty("swordv2-server", "updated.field");
@@ -104,10 +106,15 @@ public abstract class AbstractSwordContentIngester implements SwordContentIngest
 			throw new DSpaceSwordException("No configuration, or configuration is invalid for: sword.updated.field");
 		}
 
-		Metadatum dc = this.configToDC(field, null);
-		item.clearMetadata(dc.schema, dc.element, dc.qualifier, Item.ANY);
-		DCDate date = new DCDate(new Date());
-		item.addMetadata(dc.schema, dc.element, dc.qualifier, null, date.toString());
+		MetadataFieldInfo info = this.configToDC(field, null);
+		try {
+			itemService.clearMetadata(context, item, info.schema, info.element, info.qualifier, Item.ANY);
+			DCDate date = new DCDate(new Date());
+			itemService.addMetadata(context, item, info.schema, info.element, info.qualifier, null, date.toString());
+		} catch (SQLException e) {
+			log.error("Caught exception trying to set update date", e);
+			throw new DSpaceSwordException(e);
+		}
 
 		verboseDescription.append("Updated date added to response from item metadata where available");
 	}
@@ -118,11 +125,13 @@ public abstract class AbstractSwordContentIngester implements SwordContentIngest
 	 * field in which to store this metadata in the configuration
 	 * sword.slug.field
 	 *
+	 *
+	 * @param context
 	 * @param item
 	 * @param slugVal
 	 * @throws DSpaceSwordException
 	 */
-	protected void setSlug(Item item, String slugVal, VerboseDescription verboseDescription)
+	protected void setSlug(Context context, Item item, String slugVal, VerboseDescription verboseDescription)
 			throws DSpaceSwordException
 	{
 		// if there isn't a slug value, don't set it
@@ -137,9 +146,14 @@ public abstract class AbstractSwordContentIngester implements SwordContentIngest
 			throw new DSpaceSwordException("No configuration, or configuration is invalid for: sword.slug.field");
 		}
 
-		Metadatum dc = this.configToDC(field, null);
-		item.clearMetadata(dc.schema, dc.element, dc.qualifier, Item.ANY);
-		item.addMetadata(dc.schema, dc.element, dc.qualifier, null, slugVal);
+		MetadataFieldInfo info = this.configToDC(field, null);
+		try {
+			itemService.clearMetadata(context, item, info.schema, info.element, info.qualifier, Item.ANY);
+			itemService.addMetadata(context, item, info.schema, info.element, info.qualifier, null, slugVal);
+		} catch (SQLException e) {
+			log.error("Caught exception trying to set slug", e);
+			throw new DSpaceSwordException(e);
+		}
 
 		verboseDescription.append("Slug value set in response where available");
 	}
@@ -155,21 +169,27 @@ public abstract class AbstractSwordContentIngester implements SwordContentIngest
 	 * @param config
 	 * @param def
 	 */
-	protected Metadatum configToDC(String config, String def)
+	private MetadataFieldInfo configToDC(String config, String def)
 	{
-		Metadatum dcv = new Metadatum();
-		dcv.schema = def;
-		dcv.element= def;
-		dcv.qualifier = def;
+		MetadataFieldInfo mfi = new MetadataFieldInfo();
+		mfi.schema = def;
+		mfi.element= def;
+		mfi.qualifier = def;
 
 		StringTokenizer stz = new StringTokenizer(config, ".");
-		dcv.schema = stz.nextToken();
-		dcv.element = stz.nextToken();
+		mfi.schema = stz.nextToken();
+		mfi.element = stz.nextToken();
 		if (stz.hasMoreTokens())
 		{
-			dcv.qualifier = stz.nextToken();
+			mfi.qualifier = stz.nextToken();
 		}
 
-		return dcv;
+		return mfi;
+	}
+
+	private class MetadataFieldInfo {
+		private String schema;
+		private String element;
+		private String qualifier;
 	}
 }

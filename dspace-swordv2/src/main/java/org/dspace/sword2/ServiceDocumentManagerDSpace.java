@@ -11,6 +11,8 @@ import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CommunityService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -30,6 +32,8 @@ public class ServiceDocumentManagerDSpace implements ServiceDocumentManager
 {
 	/** logger */
 	private static Logger log = Logger.getLogger(ServiceDocumentManagerDSpace.class);
+
+	protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
 
 	public ServiceDocument getServiceDocument(String sdUri, AuthCredentials authCredentials, SwordConfiguration config)
 			throws SwordError, SwordServerException, SwordAuthException
@@ -149,7 +153,7 @@ public class ServiceDocumentManagerDSpace implements ServiceDocumentManager
 			{
 				Community community = (Community) dso;
 				SwordWorkspace workspace = new SwordWorkspace();
-				workspace.setTitle(community.getMetadata("name"));
+				workspace.setTitle(communityService.getName(community));
 
 				List<Collection> collections = swordAuth.getAllowedCollections(context, community);
 				for (Collection collection : collections)
