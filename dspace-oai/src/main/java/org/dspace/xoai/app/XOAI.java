@@ -168,16 +168,9 @@ public class XOAI {
                         + last.toString());
         // Index both in_archive items AND withdrawn items. Withdrawn items will be flagged withdrawn
         // (in order to notify external OAI harvesters of their new status)
-        String sqlQuery = "SELECT item_id FROM item WHERE (in_archive=TRUE OR withdrawn=TRUE) AND discoverable=TRUE AND last_modified > ?";
-        if(DatabaseManager.isOracle()){
-                sqlQuery = "SELECT item_id FROM item WHERE (in_archive=1 OR withdrawn=1) AND discoverable=1 AND last_modified > ?";
-        }
-
         try {
-            TableRowIterator iterator = DatabaseManager
-                    .query(context,
-                            sqlQuery,
-                            new java.sql.Timestamp(last.getTime()));
+            Iterator<Item> iterator = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(
+                    context, last);
             return this.index(iterator);
         } catch (SQLException ex) {
             throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
@@ -189,38 +182,25 @@ public class XOAI {
         try {
             // Index both in_archive items AND withdrawn items. Withdrawn items will be flagged withdrawn
             // (in order to notify external OAI harvesters of their new status)
-            String sqlQuery = "SELECT item_id FROM item WHERE (in_archive=TRUE OR withdrawn=TRUE) AND discoverable=TRUE";
-            if(DatabaseManager.isOracle()){
-                sqlQuery = "SELECT item_id FROM item WHERE (in_archive=1 OR withdrawn=1) AND discoverable=1";
-            }
-
-            TableRowIterator iterator = DatabaseManager.query(context,
-                    sqlQuery);
+            Iterator<Item> iterator = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(
+                    context, null);
             return this.index(iterator);
         } catch (SQLException ex) {
             throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
         }
     }
 
-    private int index(TableRowIterator iterator)
+    private int index(Iterator<Item> iterator)
             throws DSpaceSolrIndexerException {
         try {
             int i = 0;
             SolrServer server = solrServerResolver.getServer();
             while (iterator.hasNext()) {
                 try {
-                    server.add(this.index(find(context, iterator.next().getIntColumn("item_id"))));
-                    context.clearCache();
-                } catch (SQLException ex) {
+                    server.add(this.index(iterator.next()));
+                } catch (SQLException | MetadataBindException | ParseException
+                        | XMLStreamException | WritingXmlException ex) {
                     log.error(ex.getMessage(), ex);
-                } catch (MetadataBindException e) {
-                    log.error(e.getMessage(), e);
-                } catch (ParseException e) {
-                    log.error(e.getMessage(), e);
-                } catch (XMLStreamException e) {
-                    log.error(e.getMessage(), e);
-                } catch (WritingXmlException e) {
-                    log.error(e.getMessage(), e);
                 }
                 i++;
                 if (i % 100 == 0) System.out.println(i + " items imported so far...");
@@ -228,11 +208,7 @@ public class XOAI {
             System.out.println("Total: " + i + " items");
             server.commit();
             return i;
-        } catch (SQLException ex) {
-            throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
-        } catch (SolrServerException ex) {
-            throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
-        } catch (IOException ex) {
+        } catch (SolrServerException | IOException ex) {
             throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
         }
     }
@@ -458,8 +434,7 @@ public class XOAI {
                 iterator = itemService.findAll(context);
             } else {
                 System.out.println("Retrieving items modified after " + last + " to be compiled");
-                String query = "SELECT * FROM item WHERE last_modified>?";
-                iterator = new ItemIterator(context, DatabaseManager.query(context, query, new java.sql.Date(last.getTime())));
+                iterator = itemService.findByLastModifiedSince(context, last);
             }
 
             while (iterator.hasNext()) {
