@@ -8,41 +8,44 @@
 <p>Complete the <xref target="https://mospace.umsystem.edu/xmlui/feedback">MOspace Feedback 
     Form</xref>, or contact a repository manager using the contact information below.</p>
 
-<list n="MU-contact">
-    <head>University of Missouri--Columbia</head>
-    <item>Felicity Dykas, repository manager</item>
-    <item>573-882-4656</item>
-    <item><xref target="mailto:mospace@missouri.edu">mospace@missouri.edu</xref></item>
-</list>
+<table n="contacts" rows="5">
+<row><cell>
+    <hi rend="bold">University of Missouri--Columbia</hi>
+    <p>Felicity Dykas, repository manager</p>
+    <p>573-882-4656</p>
+    <p><xref target="mailto:mospace@missouri.edu">mospace@missouri.edu</xref></p>
+</cell></row>
 
 
-<list n="UMKC-contact">
-    <head>University of Missouri--Kansas City</head>
-    <item>Kathleen Schweitzberger, repository manager</item>
-    <item>816-235-2227</item>
-    <item><xref target="mailto:mospace@umkc.edu">mospace@umkc.edu</xref></item>
-</list>
+<row><cell>
+    <hi rend="bold">University of Missouri--Kansas City</hi>
+    <p>Kathleen Schweitzberger, repository manager</p>
+    <p>816-235-2227</p>
+    <p><xref target="mailto:mospace@umkc.edu">mospace@umkc.edu</xref></p>
+</cell></row>
 
 
-<list n="UM-contact">
-    <head>General Questions about MOspace</head>
-    <item>Felicity Dykas, repository manager</item>
-    <item>573-882-4656</item>
-    <item><xref target="mailto:mospace@missouri.edu">mospace@missouri.edu</xref></item>
- </list>
+<row><cell>
+    <hi rend="bold">General Questions about MOspace</hi>
+    <p>Felicity Dykas, repository manager</p>
+    <p>573-882-4656</p>
+    <p><xref target="mailto:mospace@missouri.edu">mospace@missouri.edu</xref></p>
+</cell></row>
 
-<list n="MST-contact">
-    <head>Scholars Mine at the Missouri University of Science and Technology</head>
-    <item><xref target="mailto:scholarsmine@mst.edu">scholarsmine@mst.edu</xref>
-</list>
+<row><cell>
+    <hi rend="bold">Scholars Mine at the Missouri University of Science and Technology</hi>
+    <p><xref target="mailto:scholarsmine@mst.edu">scholarsmine@mst.edu</xref></p>
+</cell></row>
 
 
-<list n="UMSL-contact">
-    <item>Tim Nelson</item>
-    <head>University of Missouri--St. Louis</head>
-    <item>314-516-5080</item>
-    <item><xref target="mailto:nelsontm@UMSL.edu">nelsontm@UMSL.edu</item>
-</list>
+<row><cell>
+    <p>Tim Nelson</p>
+    <hi rend="bold">University of Missouri--St. Louis</hi>
+    <p>314-516-5080</p>
+    <p><xref target="mailto:nelsontm@UMSL.edu">nelsontm@UMSL.edu</xref></p>
+</cell></row>
+
+</table>
 
 </div>
 </body>

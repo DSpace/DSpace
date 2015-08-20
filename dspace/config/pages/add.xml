@@ -5,13 +5,13 @@
 
 <head>Submitting Content to MOspace</head>
 
-<head>Who may submit content?</head>
+<hi rend="bold">Who may submit content?</hi>
 
 <p>Faculty, students, staff, and other individuals or entities associated with the University of Missouri--Columbia, 
     the University of Missouri--Kansas City, and the University of Missouri System are encouraged to submit works to MOspace. 
     Co-authors need not be affiliated with the University of Missouri.</p>
 
-<head>Submitting files</head>
+<hi rend="bold">Submitting files</hi>
 <p>Submit files to:</p>
 <list>
 <item>University of Missouri--Columbia: <xref target="mospace@missouri.edu">mospace@missouri.edu</xref></item>
@@ -19,17 +19,17 @@
 <item>University of Missouri System: <xref target="mospace@missouri.edu">mospace@missouri.edu</xref></item>
 </list>
 
-<head>File types</head>
+<hi rend="bold">File types</hi>
 
 <p>Most electronic formats can be placed in MOspace. PDF is the preferred format for text documents. 
     For some file formats, such as proprietary or executable files, preservation beyond simple bit-level integrity, cannot be guaranteed.</p>
 
-<head>Previously published content</head>
+<hi rend="bold">Previously published content</hi>
 
 <p>Publishers may restrict your ability to include previously published content in an open access repository. 
     Contact us for help in determining the guidelines for specific journals and publishers.</p>
 
-<head>Contact us</head>
+<hi rend="bold">Contact us</hi>
 
 <p><xref target="mospace.umsystem.edu/xmlui/contact">Contact us</xref> if you 
     have questions about submitting content, file formats, and publisher restrictions on 
