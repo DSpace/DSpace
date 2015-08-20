@@ -7,17 +7,16 @@
  */
 package org.dspace.sword2;
 
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.Collection;
-import org.dspace.content.Item;
+import org.dspace.content.*;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.swordapp.server.Deposit;
 import org.swordapp.server.SwordError;
 import org.swordapp.server.UriRegistry;
 
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * This implementation of WorkflowManager is unrestricted and allows UPDATE and DELETE operations
@@ -75,15 +74,17 @@ public class WorkflowManagerUnrestricted implements WorkflowManager
         // this is equivalent to asking whether the media resource in the item can be deleted
         try
         {
-            for (Bundle bundle : bitstream.getBundles())
+            List<BundleBitstream> bundleBitstreams = bitstream.getBundles();
+            for (BundleBitstream bundleBitstream : bundleBitstreams)
             {
                 // is the bitstream in the ORIGINAL bundle?  If not, it can't be worked on
-                if (!"ORIGINAL".equals(bundle.getName()))
+                if (!Constants.CONTENT_BUNDLE_NAME.equals(bundleBitstream.getBundle().getName()))
                 {
                     throw new SwordError(UriRegistry.ERROR_METHOD_NOT_ALLOWED, "The file is not in a bundle which can be modified");
                 }
 
-                for (Item item : bundle.getItems())
+                List<Item> items = bundleBitstream.getBundle().getItems();
+                for (Item item : items)
                 {
                     this.deleteMediaResource(context, item);
                 }
@@ -101,15 +102,17 @@ public class WorkflowManagerUnrestricted implements WorkflowManager
         // this is equivalent to asking whether the media resource in the item can be deleted
         try
         {
-            for (Bundle bundle : bitstream.getBundles())
+            List<BundleBitstream> bundleBitstreams = bitstream.getBundles();
+            for (BundleBitstream bundleBitstream : bundleBitstreams)
             {
                 // is the bitstream in the ORIGINAL bundle?  If not, it can't be worked on
-                if (!"ORIGINAL".equals(bundle.getName()))
+                if (!Constants.CONTENT_BUNDLE_NAME.equals(bundleBitstream.getBundle().getName()))
                 {
                     throw new SwordError(UriRegistry.ERROR_METHOD_NOT_ALLOWED, "The file is not in a bundle which can be modified");
                 }
 
-                for (Item item : bundle.getItems())
+                List<Item> items = bundleBitstream.getBundle().getItems();
+                for (Item item : items)
                 {
                     this.replaceResourceContent(context, item);
                 }

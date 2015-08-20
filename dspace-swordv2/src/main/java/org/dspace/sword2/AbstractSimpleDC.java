@@ -8,11 +8,15 @@
 
 package org.dspace.sword2;
 
-import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Properties;
 
 public class AbstractSimpleDC
@@ -20,12 +24,14 @@ public class AbstractSimpleDC
     protected HashMap<String, String> dcMap = null;
     protected HashMap<String, String> atomMap = null;
 
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
     protected void loadMetadataMaps()
     {
         if (this.dcMap == null)
         {
             // we should load our DC map from configuration
-            this.dcMap = new HashMap<String, String>();
+            this.dcMap = new HashMap<>();
             Properties props = ConfigurationManager.getProperties("swordv2-server");
             for (Object key : props.keySet())
             {
@@ -41,7 +47,7 @@ public class AbstractSimpleDC
 
         if (this.atomMap == null)
         {
-            this.atomMap = new HashMap<String, String>();
+            this.atomMap = new HashMap<>();
             Properties props = ConfigurationManager.getProperties("swordv2-server");
                 for (Object key : props.keySet())
                 {
@@ -61,14 +67,15 @@ public class AbstractSimpleDC
         this.loadMetadataMaps();
 
         SimpleDCMetadata md = new SimpleDCMetadata();
-        Metadatum[] all = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        List<MetadataValue> all = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
 
-        for (Metadatum dcv : all)
+        for (MetadataValue dcv : all)
         {
-            String valueMatch = dcv.schema + "." + dcv.element;
-            if (dcv.qualifier != null)
+            MetadataField field = dcv.getMetadataField();
+            String valueMatch = field.getMetadataSchema().getName() + "." + field.getElement();
+            if (field.getQualifier() != null)
             {
-                valueMatch += "." + dcv.qualifier;
+                valueMatch += "." + field.getQualifier();
             }
 
             // look for the metadata in the dublin core map
@@ -77,7 +84,7 @@ public class AbstractSimpleDC
                 String value = this.dcMap.get(key);
                 if (valueMatch.equals(value))
                 {
-                    md.addDublinCore(key, dcv.value);
+                    md.addDublinCore(key, dcv.getValue());
                 }
             }
 
@@ -87,7 +94,7 @@ public class AbstractSimpleDC
                 String value = this.atomMap.get(key);
                 if (valueMatch.equals(value))
                 {
-                    md.addAtom(key, dcv.value);
+                    md.addAtom(key, dcv.getValue());
                 }
             }
         }

@@ -12,6 +12,8 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
@@ -29,6 +31,8 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 {
 	/** logger */
  	public static final Logger log = Logger.getLogger(SwordConfigurationDSpace.class);
+
+	protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
 
 	/** whether we can be verbose */
 	private boolean verbose = true;
@@ -430,10 +434,9 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 			{
 				// items will take any of the bitstream formats registered, plus
 				// any swordaccepts mimetypes
-				BitstreamFormat[] bfs = BitstreamFormat.findNonInternal(context);
-				for (int i = 0; i < bfs.length; i++)
-				{
-					accepts.add(bfs[i].getMIMEType());
+				List<BitstreamFormat> bfs = bitstreamFormatService.findNonInternal(context);
+				for (BitstreamFormat bf : bfs) {
+					accepts.add(bf.getMIMEType());
 				}
 				for (String format : swordaccepts)
                 {

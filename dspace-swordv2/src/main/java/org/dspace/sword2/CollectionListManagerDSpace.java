@@ -13,27 +13,31 @@ import org.apache.abdera.i18n.iri.IRI;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.dspace.content.Collection;
-import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflowbasic.BasicWorkflowItem;
-import org.swordapp.server.AuthCredentials;
-import org.swordapp.server.CollectionListManager;
-import org.swordapp.server.SwordAuthException;
-import org.swordapp.server.SwordConfiguration;
-import org.swordapp.server.SwordError;
-import org.swordapp.server.SwordServerException;
+import org.dspace.workflowbasic.factory.BasicWorkflowServiceFactory;
+import org.dspace.workflowbasic.service.BasicWorkflowItemService;
+import org.swordapp.server.*;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class CollectionListManagerDSpace extends DSpaceSwordAPI implements CollectionListManager
 {
+	protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+	protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+	protected BasicWorkflowItemService basicWorkflowItemService = BasicWorkflowServiceFactory.getInstance().getBasicWorkflowItemService();
+
 	public Feed listCollectionContents(IRI colIRI, AuthCredentials authCredentials, SwordConfiguration swordConfig)
 			throws SwordServerException, SwordError, SwordAuthException
 	{
@@ -52,8 +56,7 @@ public class CollectionListManagerDSpace extends DSpaceSwordAPI implements Colle
             }
 
 			List<Item> items = this.listItems(sc, collection, swordConfig);
-			Feed feed = this.itemListToFeed(sc, items, swordConfig);
-			return feed;
+			return this.itemListToFeed(sc, items, swordConfig);
 		}
 		catch (DSpaceSwordException e)
 		{
@@ -100,14 +103,14 @@ public class CollectionListManagerDSpace extends DSpaceSwordAPI implements Colle
 			List<Item> collectionItems = new ArrayList<Item>();
 
 			// first get the ones out of the archive
-			ItemIterator items = Item.findBySubmitter(sc.getContext(), person);
+			Iterator<Item> items = itemService.findBySubmitter(sc.getContext(), person);
 			while(items.hasNext())
 			{
 				Item item = items.next();
-				Collection[] cols = item.getCollections();
+				List<Collection> cols = item.getCollections();
 				for (Collection col : cols)
 				{
-					if (col.getID() == collection.getID())
+					if (col.getID().equals(collection.getID()))
 					{
 						collectionItems.add(item);
 						break;
@@ -116,23 +119,23 @@ public class CollectionListManagerDSpace extends DSpaceSwordAPI implements Colle
 			}
 
 			// now get the ones out of the workspace
-			WorkspaceItem[] wsis = WorkspaceItem.findByEPerson(sc.getContext(), person);
+			List<WorkspaceItem> wsis = workspaceItemService.findByEPerson(sc.getContext(), person);
 			for (WorkspaceItem wsi : wsis)
 			{
                 Item item = wsi.getItem();
 
                 // check for the wsi collection
                 Collection wsCol = wsi.getCollection();
-                if (wsCol.getID() == collection.getID())
+                if (wsCol.getID().equals(collection.getID()))
                 {
                     collectionItems.add(item);
                 }
 
                 // then see if there are any additional associated collections
-				Collection[] cols = item.getCollections();
+				List<Collection> cols = item.getCollections();
 				for (Collection col : cols)
 				{
-					if (col.getID() == collection.getID())
+					if (col.getID().equals(collection.getID()))
 					{
 						collectionItems.add(item);
 						break;
@@ -141,23 +144,23 @@ public class CollectionListManagerDSpace extends DSpaceSwordAPI implements Colle
 			}
 
 			// finally get the ones out of the workflow
-			BasicWorkflowItem[] wfis = BasicWorkflowItem.findByEPerson(sc.getContext(), person);
+			List<BasicWorkflowItem> wfis = basicWorkflowItemService.findByOwner(sc.getContext(), person);
 			for (BasicWorkflowItem wfi : wfis)
 			{
 				Item item = wfi.getItem();
 
                 // check for the wfi collection
                 Collection wfCol = wfi.getCollection();
-                if (wfCol.getID() == collection.getID())
+                if (wfCol.getID().equals(collection.getID()))
                 {
                     collectionItems.add(item);
                 }
 
                 // then see if there are any additional associated collections
-				Collection[] cols = item.getCollections();
+				List<Collection> cols = item.getCollections();
 				for (Collection col : cols)
 				{
-					if (col.getID() == collection.getID())
+					if (col.getID().equals(collection.getID()))
 					{
 						collectionItems.add(item);
 						break;
@@ -180,20 +183,20 @@ public class CollectionListManagerDSpace extends DSpaceSwordAPI implements Colle
 			return null;
 		}
 
-		Metadatum[] dcvs = item.getMetadataByMetadataString(field);
+		List<MetadataValue> dcvs = itemService.getMetadataByMetadataString(item, field);
 		if (dcvs == null)
 		{
 			return null;
 		}
 
 		StringBuilder md = new StringBuilder();
-		for (Metadatum dcv : dcvs)
+		for (MetadataValue dcv : dcvs)
 		{
 			if (md.length() > 0)
 			{
 				md.append(", ");
 			}
-			md.append(dcv.value);
+			md.append(dcv.getValue());
 		}
 		return md.toString();
 	}

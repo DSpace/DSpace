@@ -11,24 +11,33 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
-import org.dspace.storage.rdbms.TableRowIterator;
-import org.dspace.workflowbasic.BasicWorkflowItem;
-import org.dspace.workflowbasic.BasicWorkflowServiceImpl;
-import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.workflow.WorkflowException;
-import org.dspace.xmlworkflow.XmlWorkflowServiceImpl;
+import org.dspace.workflowbasic.BasicWorkflowItem;
+import org.dspace.workflowbasic.factory.BasicWorkflowServiceFactory;
+import org.dspace.workflowbasic.service.BasicWorkflowItemService;
+import org.dspace.workflowbasic.service.BasicWorkflowService;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 
-import javax.mail.MessagingException;
 import java.io.IOException;
 import java.sql.SQLException;
 
 public class WorkflowTools
 {
+    protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+
+    protected BasicWorkflowItemService basicWorkflowItemService = BasicWorkflowServiceFactory.getInstance().getBasicWorkflowItemService();
+    protected BasicWorkflowService basicWorkflowService = BasicWorkflowServiceFactory.getInstance().getBasicWorkflowService();
+
+    protected XmlWorkflowItemService xmlWorkflowItemService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService();
+    protected XmlWorkflowService xmlWorkflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
+
     /**
      * Is the given item in the DSpace workflow?
      *
@@ -45,9 +54,9 @@ public class WorkflowTools
         try
         {
             if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){
-                return XmlWorkflowItem.findByItem(context, item) != null;
+                return xmlWorkflowItemService.findByItem(context, item) != null;
             }else{
-                return BasicWorkflowItem.findByItem(context, item) != null;
+                return basicWorkflowItemService.findByItem(context, item) != null;
             }
         }
         catch (SQLException e)
@@ -71,7 +80,7 @@ public class WorkflowTools
     {
         try
         {
-            return WorkspaceItem.findByItem(context, item) != null;
+            return workspaceItemService.findByItem(context, item) != null;
         }
         catch (SQLException e)
         {
@@ -95,9 +104,9 @@ public class WorkflowTools
         try
         {
             if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){
-                return XmlWorkflowItem.findByItem(context, item);
+                return xmlWorkflowItemService.findByItem(context, item);
             }else{
-                return BasicWorkflowItem.findByItem(context, item);
+                return basicWorkflowItemService.findByItem(context, item);
             }
         }
         catch (SQLException e)
@@ -121,7 +130,7 @@ public class WorkflowTools
     {
         try
         {
-            return WorkspaceItem.findByItem(context, item);
+            return workspaceItemService.findByItem(context, item);
         }
         catch (SQLException e)
         {
@@ -147,34 +156,20 @@ public class WorkflowTools
             boolean notify = ConfigurationManager.getBooleanProperty("swordv2-server", "workflow.notify");
             if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow")) {
                 if (notify) {
-                    XmlWorkflowServiceImpl.start(context, wsi);
+                    xmlWorkflowService.start(context, wsi);
                 } else {
-                    XmlWorkflowServiceImpl.startWithoutNotify(context, wsi);
+                    xmlWorkflowService.startWithoutNotify(context, wsi);
                 }
             } else {
                 if (notify) {
-                    BasicWorkflowServiceImpl.start(context, wsi);
+                    basicWorkflowService.start(context, wsi);
                 } else {
-                    BasicWorkflowServiceImpl.startWithoutNotify(context, wsi);
+                    basicWorkflowService.startWithoutNotify(context, wsi);
                 }
             }
         }
-        catch (SQLException e)
+        catch (SQLException | WorkflowException | IOException | AuthorizeException e)
         {
-            throw new DSpaceSwordException(e);
-        }
-        catch (AuthorizeException e)
-        {
-            throw new DSpaceSwordException(e);
-        }
-        catch (IOException e)
-        {
-            throw new DSpaceSwordException(e);
-        } catch (WorkflowException e) {
-            throw new DSpaceSwordException(e);
-        } catch (WorkflowConfigurationException e) {
-            throw new DSpaceSwordException(e);
-        } catch (MessagingException e) {
             throw new DSpaceSwordException(e);
         }
     }
@@ -198,21 +193,13 @@ public class WorkflowTools
             {
                 if(wfi instanceof BasicWorkflowItem)
                 {
-                    BasicWorkflowServiceImpl.abort(context, (BasicWorkflowItem) wfi, context.getCurrentUser());
+                    basicWorkflowService.abort(context, (BasicWorkflowItem) wfi, context.getCurrentUser());
                 }else{
-                    XmlWorkflowServiceImpl.abort(context, (XmlWorkflowItem) wfi, context.getCurrentUser());
+                    xmlWorkflowService.abort(context, (XmlWorkflowItem) wfi, context.getCurrentUser());
                 }
             }
         }
-        catch (SQLException e)
-        {
-            throw new DSpaceSwordException(e);
-        }
-        catch (AuthorizeException e)
-        {
-            throw new DSpaceSwordException(e);
-        }
-        catch (IOException e)
+        catch (SQLException | AuthorizeException | IOException e)
         {
             throw new DSpaceSwordException(e);
         }

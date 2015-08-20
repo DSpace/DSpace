@@ -10,13 +10,20 @@ package org.dspace.sword2;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeServiceImpl;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.workflow.WorkflowItemService;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.swordapp.server.AuthCredentials;
 import org.swordapp.server.ContainerManager;
 import org.swordapp.server.Deposit;
@@ -36,6 +43,11 @@ import java.util.TreeMap;
 public class ContainerManagerDSpace extends DSpaceSwordAPI implements ContainerManager
 {
 	private static Logger log = Logger.getLogger(ContainerManagerDSpace.class);
+
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected WorkflowItemService workflowItemService = WorkflowServiceFactory.getInstance().getWorkflowItemService();
+    protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
 
 	private VerboseDescription verboseDescription = new VerboseDescription();
 
@@ -100,7 +112,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI implements ContainerM
             }
 
             // we can't give back an entry unless the user is authorised to retrieve it
-            AuthorizeServiceImpl.authorizeAction(context, item, Constants.READ);
+            authorizeService.authorizeAction(context, item, Constants.READ);
 
 			ReceiptGenerator genny = new ReceiptGenerator();
 			DepositReceipt receipt = genny.createReceipt(context, item, config);
@@ -111,15 +123,10 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI implements ContainerM
         {
             throw new SwordAuthException();
         }
-        catch (SQLException e)
+        catch (SQLException | DSpaceSwordException e)
         {
             throw new SwordServerException(e);
-        }
-		catch (DSpaceSwordException e)
-		{
-			throw new SwordServerException(e);
-		}
-		finally
+        } finally
         {
             // this is a read operation only, so there's never any need to commit the context
             if (sc != null)
@@ -191,22 +198,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI implements ContainerM
             {
 				result = this.doReplaceMetadata(sc, item, deposit, authCredentials, config);
             }
-            catch(DSpaceSwordException e)
-            {
-                if (config.isKeepPackageOnFailedIngest())
-                {
-                    try
-                    {
-                        this.storeEntryAsFile(deposit, authCredentials, config);
-                    }
-                    catch(IOException e2)
-                    {
-                        log.warn("Unable to store SWORD entry as file: " + e);
-                    }
-                }
-                throw e;
-            }
-            catch(SwordError e)
+            catch (DSpaceSwordException | SwordError e)
             {
                 if (config.isKeepPackageOnFailedIngest())
                 {
@@ -222,7 +214,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI implements ContainerM
                 throw e;
             }
 
-			// now we've produced a deposit, we need to decide on its workflow state
+            // now we've produced a deposit, we need to decide on its workflow state
             wfm.resolveState(context, deposit, result, this.verboseDescription);
 
             ReceiptGenerator genny = new ReceiptGenerator();
@@ -317,23 +309,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI implements ContainerM
 			{
 				result = this.replaceFromMultipart(sc, item, deposit, authCredentials, config);
 			}
-			catch(DSpaceSwordException e)
-			{
-				if (config.isKeepPackageOnFailedIngest())
-				{
-					try
-					{
-						this.storePackageAsFile(deposit, authCredentials, config);
-						this.storeEntryAsFile(deposit, authCredentials, config);
-					}
-					catch(IOException e2)
-					{
-						log.warn("Unable to store SWORD package as file: " + e);
-					}
-				}
-				throw e;
-			}
-			catch(SwordError e)
+			catch (DSpaceSwordException | SwordError e)
 			{
 				if (config.isKeepPackageOnFailedIngest())
 				{
@@ -450,22 +426,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI implements ContainerM
             {
 				result = this.doAddMetadata(sc, item, deposit, authCredentials, config);
             }
-            catch(DSpaceSwordException e)
-            {
-                if (config.isKeepPackageOnFailedIngest())
-                {
-                    try
-                    {
-                        this.storeEntryAsFile(deposit, authCredentials, config);
-                    }
-                    catch(IOException e2)
-                    {
-                        log.warn("Unable to store SWORD entry as file: " + e);
-                    }
-                }
-                throw e;
-            }
-            catch(SwordError e)
+            catch (DSpaceSwordException | SwordError e)
             {
                 if (config.isKeepPackageOnFailedIngest())
                 {
@@ -481,7 +442,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI implements ContainerM
                 throw e;
             }
 
-			// now we've produced a deposit, we need to decide on its workflow state
+            // now we've produced a deposit, we need to decide on its workflow state
             wfm.resolveState(context, deposit, result, this.verboseDescription);
 
             ReceiptGenerator genny = new ReceiptGenerator();
@@ -717,9 +678,9 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI implements ContainerM
 			// delegate the to the version manager to get rid of any existing content and to version
 			// if if necessary
 			VersionManager vm = new VersionManager();
-			vm.removeBundle(item, "ORIGINAL");
+			vm.removeBundle(context, item, "ORIGINAL");
 		}
-		catch (SQLException e)
+		catch (SQLException | IOException e)
 		{
 			throw new DSpaceSwordException(e);
 		}
@@ -727,12 +688,8 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI implements ContainerM
 		{
 			throw new SwordAuthException(e);
 		}
-		catch (IOException e)
-		{
-			throw new DSpaceSwordException(e);
-		}
 
-		DepositResult result;
+        DepositResult result;
         if (swordConfig.isEntryFirst())
         {
             // do the entry deposit
@@ -824,22 +781,22 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI implements ContainerM
 			if (wft.isItemInWorkspace(swordContext.getContext(), item))
 			{
 				WorkspaceItem wsi = wft.getWorkspaceItem(context, item);
-				wsi.deleteAll();
+				workspaceItemService.deleteAll(context, wsi);
 			}
 			else if (wft.isItemInWorkflow(context, item))
 			{
 				InProgressSubmission wfi = wft.getWorkflowItem(context, item);
-				wfi.deleteWrapper();
+				workflowItemService.deleteWrapper(context, wfi);
 			}
 
 			// then delete the item
-			Collection[] collections = item.getCollections();
+			List<Collection> collections = item.getCollections();
 			for (Collection collection : collections)
 			{
-				collection.removeItem(item);
+				collectionService.removeItem(context, collection, item);
 			}
 		}
-		catch (SQLException e)
+		catch (SQLException | IOException e)
 		{
 			throw new DSpaceSwordException(e);
 		}
@@ -847,11 +804,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI implements ContainerM
 		{
 			throw new SwordAuthException(e);
 		}
-		catch (IOException e)
-		{
-			throw new DSpaceSwordException(e);
-		}
-	}
+    }
 
 	private Item getDSpaceTarget(Context context, String editUrl, SwordConfigurationDSpace config)
 			throws DSpaceSwordException, SwordError

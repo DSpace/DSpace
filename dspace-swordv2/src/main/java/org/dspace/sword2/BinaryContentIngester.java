@@ -12,22 +12,32 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.swordapp.server.Deposit;
 import org.swordapp.server.SwordAuthException;
 import org.swordapp.server.SwordError;
 import org.swordapp.server.SwordServerException;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
 public class BinaryContentIngester extends AbstractSwordContentIngester
 {
+	protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+	protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+	protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+	protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+
 	public DepositResult ingestToCollection(Context context, Deposit deposit, Collection collection, VerboseDescription verboseDescription, DepositResult result)
 			throws DSpaceSwordException, SwordError, SwordAuthException, SwordServerException
 	{
@@ -47,37 +57,36 @@ public class BinaryContentIngester extends AbstractSwordContentIngester
 			if (item == null)
 			{
 				// simple zip ingester uses the item template, since there is no native metadata
-				wsi = WorkspaceItem.create(context, collection, true);
+				wsi = workspaceItemService.create(context, collection, true);
 				item = wsi.getItem();
 			}
 
-			Bitstream bs = item.createSingleBitstream(deposit.getInputStream());
+			Bitstream bs = itemService.createSingleBitstream(context, deposit.getInputStream(), item);
 			BitstreamFormat format = this.getFormat(context, deposit.getFilename());
-			bs.setName(deposit.getFilename());
-			bs.setFormat(format);
-			bs.update();
+			bs.setName(context, deposit.getFilename());
+			bs.setFormat(context, format);
+			bitstreamService.update(context, bs);
 
 			// now we have an item in the workspace, and we need to consider adding some metadata to it,
 			// but since the binary file didn't contain anything, what do we do?
-			item.addMetadata("dc", "title", null, null, "Untitled: " + deposit.getFilename());
-			item.addMetadata("dc", "description", null, null, "Zip file deposted by SWORD without accompanying metadata");
+			itemService.addMetadata(context, item, "dc", "title", null, null, "Untitled: " + deposit.getFilename());
+			itemService.addMetadata(context, item, "dc", "description", null, null, "Zip file deposted by SWORD without accompanying metadata");
 
 			// update the item metadata to inclue the current time as
 			// the updated date
-			this.setUpdatedDate(item, verboseDescription);
+			this.setUpdatedDate(context, item, verboseDescription);
 
 			// DSpace ignores the slug value as suggested identifier, but
 			// it does store it in the metadata
-			this.setSlug(item, deposit.getSlug(), verboseDescription);
+			this.setSlug(context, item, deposit.getSlug(), verboseDescription);
 
 			// in order to write these changes, we need to bypass the
 			// authorisation briefly, because although the user may be
 			// able to add stuff to the repository, they may not have
 			// WRITE permissions on the archive.
-			boolean ignore = context.ignoreAuthorization();
-			context.setIgnoreAuthorization(true);
-			item.update();
-			context.setIgnoreAuthorization(ignore);
+			context.turnOffAuthorisationSystem();
+			itemService.update(context, item);
+			context.restoreAuthSystemState();
 
 			verboseDescription.append("Ingest successful");
 			verboseDescription.append("Item created with internal identifier: " + item.getID());
@@ -92,11 +101,7 @@ public class BinaryContentIngester extends AbstractSwordContentIngester
 		{
 			throw new SwordAuthException(e);
 		}
-		catch (SQLException e)
-		{
-			throw new DSpaceSwordException(e);
-		}
-		catch (IOException e)
+		catch (SQLException | IOException e)
 		{
 			throw new DSpaceSwordException(e);
 		}
@@ -114,35 +119,37 @@ public class BinaryContentIngester extends AbstractSwordContentIngester
 			result.setItem(item);
 
 			// get the original bundle
-			Bundle[] originals = item.getBundles("ORIGINAL");
+			List<Bundle> originals = item.getBundles();
 			Bundle original = null;
-			if (originals.length > 0)
+			for (Bundle bundle : originals)
 			{
-				original = originals[0];
+				if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName()))
+				{
+					original = bundle;
+				}
 			}
-			else
+			if (original == null)
 			{
-				original = item.createBundle("ORIGINAL");
+				original = bundleService.create(context, item, Constants.CONTENT_BUNDLE_NAME);
 			}
 
-            Bitstream bs = original.createBitstream(deposit.getInputStream());
+            Bitstream bs = bitstreamService.create(context, original, deposit.getInputStream());
             BitstreamFormat format = this.getFormat(context, deposit.getFilename());
-            bs.setFormat(format);
-			bs.setName(deposit.getFilename());
-			bs.update();
+            bs.setFormat(context, format);
+			bs.setName(context, deposit.getFilename());
+			bitstreamService.update(context, bs);
 
 			// update the item metadata to inclue the current time as
 			// the updated date
-			this.setUpdatedDate(item, verboseDescription);
+			this.setUpdatedDate(context, item, verboseDescription);
 
 			// in order to write these changes, we need to bypass the
 			// authorisation briefly, because although the user may be
 			// able to add stuff to the repository, they may not have
 			// WRITE permissions on the archive.
-			boolean ignore = context.ignoreAuthorization();
-			context.setIgnoreAuthorization(true);
-			item.update();
-			context.setIgnoreAuthorization(ignore);
+			context.turnOffAuthorisationSystem();
+			itemService.update(context, item);
+			context.restoreAuthSystemState();
 
 			verboseDescription.append("ingest successful");
 
@@ -156,11 +163,7 @@ public class BinaryContentIngester extends AbstractSwordContentIngester
 		{
 			throw new SwordAuthException(e);
 		}
-		catch (SQLException e)
-		{
-			throw new DSpaceSwordException(e);
-		}
-		catch (IOException e)
+		catch (SQLException | IOException e)
 		{
 			throw new DSpaceSwordException(e);
 		}

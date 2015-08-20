@@ -8,8 +8,12 @@
 package org.dspace.sword2;
 
 import org.apache.abdera.i18n.iri.IRI;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.core.ConfigurationManager;
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
@@ -26,6 +30,8 @@ import java.util.List;
 public class CollectionCollectionGenerator implements AtomCollectionGenerator
 {
 	private static Logger log = Logger.getLogger(CommunityCollectionGenerator.class);
+
+	protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 
 	/**
 	 * Build the collection for the given DSpaceObject.  In this implementation,
@@ -53,16 +59,16 @@ public class CollectionCollectionGenerator implements AtomCollectionGenerator
 		String location = urlManager.getDepositLocation(col);
 
 		// collection title is just its name
-		String title = col.getMetadata("name");
+		String title = collectionService.getName(col);
 
 		// the collection policy is the licence to which the collection adheres
-		String collectionPolicy = col.getLicense();
+		String collectionPolicy = collectionService.getLicense(col);
 
 		// FIXME: what is the treatment?  Doesn't seem appropriate for DSpace
 		// String treatment = " ";
 
 		// abstract is the short description of the collection
-		String dcAbstract = col.getMetadata("short_description");
+		List<MetadataValue> dcAbstracts = collectionService.getMetadataByMetadataString(col, "short_description");
 
 		// we just do support mediation
 		boolean mediation = swordConfig.isMediated();
@@ -71,13 +77,13 @@ public class CollectionCollectionGenerator implements AtomCollectionGenerator
 		scol.setLocation(location);
 
 		// add the title if it exists
-		if (title != null && !"".equals(title))
+		if (StringUtils.isNotBlank(title))
 		{
 			scol.setTitle(title);
 		}
 
 		// add the collection policy if it exists
-		if (collectionPolicy != null && !"".equals(collectionPolicy))
+		if (StringUtils.isNotBlank(collectionPolicy))
 		{
 			scol.setCollectionPolicy(collectionPolicy);
 		}
@@ -87,9 +93,13 @@ public class CollectionCollectionGenerator implements AtomCollectionGenerator
 		// scol.setTreatment(treatment);
 
 		// add the abstract if it exists
-		if (dcAbstract != null && !"".equals(dcAbstract))
+		if (dcAbstracts != null && !dcAbstracts.isEmpty())
 		{
-			scol.setAbstract(dcAbstract);
+			String firstValue = dcAbstracts.get(0).getValue();
+			if (StringUtils.isNotBlank(firstValue))
+			{
+				scol.setAbstract(firstValue);
+			}
 		}
 
 		scol.setMediation(mediation);

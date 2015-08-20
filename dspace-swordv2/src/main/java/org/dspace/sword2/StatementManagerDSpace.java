@@ -10,6 +10,8 @@ package org.dspace.sword2;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeServiceImpl;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -32,6 +34,8 @@ import java.util.TreeMap;
 public class StatementManagerDSpace extends DSpaceSwordAPI implements StatementManager
 {
 	private static Logger log = Logger.getLogger(StatementManagerDSpace.class);
+
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
 	public Statement getStatement(String stateIRI, Map<String, String> accept, AuthCredentials authCredentials, SwordConfiguration swordConfig)
 			throws SwordServerException, SwordError, SwordAuthException
@@ -64,7 +68,7 @@ public class StatementManagerDSpace extends DSpaceSwordAPI implements StatementM
             }
 
             // find out if we are allowed to read the item's statement
-            AuthorizeServiceImpl.authorizeAction(context, item, Constants.READ);
+            authorizeService.authorizeAction(context, item, Constants.READ);
 
 			// find out, now we know what we're being asked for, whether this is allowed
 			WorkflowManagerFactory.getInstance().retrieveStatement(context, item);
@@ -74,8 +78,8 @@ public class StatementManagerDSpace extends DSpaceSwordAPI implements StatementM
 
 			if (suffix != null)
 			{
-                Map<Float, List<String>> analysed = new HashMap<Float, List<String>>();
-                List<String> list = new ArrayList<String>();
+                Map<Float, List<String>> analysed = new HashMap<>();
+                List<String> list = new ArrayList<>();
                 list.add(suffix);
                 analysed.put((float) 1.0, list);
                 disseminator = SwordDisseminatorFactory.getStatementInstance(analysed);
@@ -92,22 +96,16 @@ public class StatementManagerDSpace extends DSpaceSwordAPI implements StatementM
                 disseminator = SwordDisseminatorFactory.getStatementInstance(analysed);
 			}
 
-			Statement statement = disseminator.disseminate(context, item);
-            return statement;
+            return disseminator.disseminate(context, item);
         }
         catch (AuthorizeException e)
         {
             throw new SwordAuthException();
         }
-        catch (SQLException e)
+        catch (SQLException | DSpaceSwordException e)
         {
             throw new SwordServerException(e);
-        }
-        catch (DSpaceSwordException e)
-        {
-            throw new SwordServerException(e);
-        }
-        finally
+        } finally
         {
             if (sc != null)
             {

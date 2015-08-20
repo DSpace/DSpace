@@ -7,32 +7,29 @@
  */
 package org.dspace.sword2;
 
+import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Collection;
-import org.dspace.content.DCDate;
-import org.dspace.content.Metadatum;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.content.WorkspaceItem;
+import org.dspace.content.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.swordapp.server.Deposit;
-import org.swordapp.server.SwordAuthException;
-import org.swordapp.server.SwordEntry;
-import org.swordapp.server.SwordError;
-import org.swordapp.server.SwordServerException;
+import org.swordapp.server.*;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 public class SimpleDCEntryIngester extends AbstractSimpleDC implements SwordEntryIngester
 {
+	private static final Logger log = Logger.getLogger(SimpleDCEntryIngester.class);
+
+	protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+	protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+
 	public SimpleDCEntryIngester()
     {
         this.loadMetadataMaps();
@@ -72,24 +69,23 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC implements SwordEntr
 			// clean out any existing item metadata which is allowed to be replaced
             if (replace)
             {
-                this.removeMetadata(item);
+                this.removeMetadata(context, item);
             }
 
 			// add the metadata to the item
-			this.addMetadataToItem(deposit, item);
+			this.addMetadataToItem(context, deposit, item);
 
 			// update the item metadata to inclue the current time as
 			// the updated date
-			this.setUpdatedDate(item, verboseDescription);
+			this.setUpdatedDate(context, item, verboseDescription);
 
 			// in order to write these changes, we need to bypass the
 			// authorisation briefly, because although the user may be
 			// able to add stuff to the repository, they may not have
 			// WRITE permissions on the archive.
-			boolean ignore = context.ignoreAuthorization();
-			context.setIgnoreAuthorization(true);
-			item.update();
-			context.setIgnoreAuthorization(ignore);
+			context.turnOffAuthorisationSystem();
+			itemService.update(context, item);
+			context.restoreAuthSystemState();
 
 			verboseDescription.append("Update successful");
 
@@ -98,58 +94,58 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC implements SwordEntr
 
 			return result;
 		}
-		catch (SQLException e)
-		{
-			throw new DSpaceSwordException(e);
-		}
-		catch (AuthorizeException e)
+		catch (SQLException | AuthorizeException e)
 		{
 			throw new DSpaceSwordException(e);
 		}
 	}
 
-    private void removeMetadata(Item item)
+    private void removeMetadata(Context context, Item item)
             throws DSpaceSwordException
     {
         String raw = ConfigurationManager.getProperty("swordv2-server", "metadata.replaceable");
         String[] parts = raw.split(",");
         for (String part : parts)
         {
-            Metadatum dcv = this.makeDCValue(part.trim(), null);
-            item.clearMetadata(dcv.schema, dcv.element, dcv.qualifier, Item.ANY);
-        }
+			MetadataValueInfo info = this.makeMetadataValueInfo(part.trim(), null);
+			try {
+				itemService.clearMetadata(context, item, info.schema, info.element, info.qualifier, Item.ANY);
+			} catch (SQLException e) {
+				log.error("Caught exception trying to remove metadata", e);
+				throw new DSpaceSwordException(e);
+			}
+		}
     }
 
-    private void addUniqueMetadata(Metadatum dcv, Item item)
-    {
-        String qual = dcv.qualifier;
-        if (dcv.qualifier == null)
+    private void addUniqueMetadata(Context context, MetadataValueInfo info, Item item) throws SQLException {
+        String qual = info.qualifier;
+        if (info.qualifier == null)
         {
             qual = Item.ANY;
         }
 
-        String lang = dcv.language;
-        if (dcv.language == null)
+        String lang = info.language;
+        if (info.language == null)
         {
             lang = Item.ANY;
         }
-        Metadatum[] existing = item.getMetadata(dcv.schema, dcv.element, qual, lang);
-        for (Metadatum dcValue : existing)
+		List<MetadataValue> existing = itemService.getMetadata(item, info.schema, info.element, qual, lang);
+        for (MetadataValue dcValue : existing)
         {
             // FIXME: probably we want to be slightly more careful about qualifiers and languages
             //
             // if the submitted value is already attached to the item, just skip it
-            if (dcValue.value.equals(dcv.value))
+            if (dcValue.getValue().equals(info.value))
             {
                 return;
             }
         }
 
         // if we get to here, go on and add the metadata
-        item.addMetadata(dcv.schema, dcv.element, dcv.qualifier, dcv.language, dcv.value);
+        itemService.addMetadata(context, item, info.schema, info.element, info.qualifier, info.language, info.value);
     }
 
-	private void addMetadataToItem(Deposit deposit, Item item)
+	private void addMetadataToItem(Context context, Deposit deposit, Item item)
 			throws DSpaceSwordException
 	{
 		// now, go through and get the metadata from the EntryPart and put it in DSpace
@@ -163,8 +159,13 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC implements SwordEntr
 			String titleField = this.dcMap.get("title");
 			if (titleField != null)
 			{
-				Metadatum dcv = this.makeDCValue(titleField, title);
-                this.addUniqueMetadata(dcv, item);
+				MetadataValueInfo info = this.makeMetadataValueInfo(titleField, title);
+				try {
+					this.addUniqueMetadata(context, info, item);
+				} catch (SQLException e) {
+					log.error("Caught exception trying to add title", e);
+					throw new DSpaceSwordException(e);
+				}
 			}
 		}
 		if (summary != null)
@@ -172,8 +173,13 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC implements SwordEntr
 			String abstractField = this.dcMap.get("abstract");
 			if (abstractField != null)
 			{
-				Metadatum dcv = this.makeDCValue(abstractField, summary);
-                this.addUniqueMetadata(dcv, item);
+				MetadataValueInfo info = this.makeMetadataValueInfo(abstractField, summary);
+				try {
+					this.addUniqueMetadata(context, info, item);
+				} catch (SQLException e) {
+					log.error("Caught exception trying to set abstract", e);
+					throw new DSpaceSwordException(e);
+				}
 			}
 		}
 
@@ -188,11 +194,16 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC implements SwordEntr
 			}
 
 			// now add all the metadata terms
-            Metadatum dcv = this.makeDCValue(dsTerm, null);
+			MetadataValueInfo info = this.makeMetadataValueInfo(dsTerm, null);
 			for (String value : dc.get(term))
 			{
-                dcv.value = value;
-                this.addUniqueMetadata(dcv, item);
+                info.value = value;
+				try {
+					this.addUniqueMetadata(context, info, item);
+				} catch (SQLException e) {
+					log.error("Caught exception trying to add metadata", e);
+					throw new DSpaceSwordException(e);
+				}
 			}
 		}
 	}
@@ -216,29 +227,28 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC implements SwordEntr
             if (item == null)
             {
                 // simple zip ingester uses the item template, since there is no native metadata
-                wsi = WorkspaceItem.create(context, collection, true);
+                wsi = workspaceItemService.create(context, collection, true);
                 item = wsi.getItem();
             }
 
             // add the metadata to the item
-			this.addMetadataToItem(deposit, item);
+			this.addMetadataToItem(context, deposit, item);
 
 			// update the item metadata to inclue the current time as
 			// the updated date
-			this.setUpdatedDate(item, verboseDescription);
+			this.setUpdatedDate(context, item, verboseDescription);
 
 			// DSpace ignores the slug value as suggested identifier, but
 			// it does store it in the metadata
-			this.setSlug(item, deposit.getSlug(), verboseDescription);
+			this.setSlug(context, item, deposit.getSlug(), verboseDescription);
 
 			// in order to write these changes, we need to bypass the
 			// authorisation briefly, because although the user may be
 			// able to add stuff to the repository, they may not have
 			// WRITE permissions on the archive.
-			boolean ignore = context.ignoreAuthorization();
-			context.setIgnoreAuthorization(true);
-			item.update();
-			context.setIgnoreAuthorization(ignore);
+			context.turnOffAuthorisationSystem();
+			itemService.update(context, item);
+			context.restoreAuthSystemState();
 
 			verboseDescription.append("Ingest successful");
 			verboseDescription.append("Item created with internal identifier: " + item.getID());
@@ -256,16 +266,12 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC implements SwordEntr
 		{
 			throw new DSpaceSwordException(e);
 		}
-		catch (IOException e)
-		{
-			throw new DSpaceSwordException(e);
-		}
-    }
+	}
 
-    public Metadatum makeDCValue(String field, String value)
+    public MetadataValueInfo makeMetadataValueInfo(String field, String value)
             throws DSpaceSwordException
     {
-        Metadatum dcv = new Metadatum();
+		MetadataValueInfo dcv = new MetadataValueInfo();
         String[] bits = field.split("\\.");
         if (bits.length < 2 || bits.length > 3)
         {
@@ -286,10 +292,12 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC implements SwordEntr
 	 * the field in which to store this metadata in the configuration
 	 * sword.updated.field
 	 *
+	 *
+	 * @param context
 	 * @param item
 	 * @throws DSpaceSwordException
 	 */
-	protected void setUpdatedDate(Item item, VerboseDescription verboseDescription)
+	protected void setUpdatedDate(Context context, Item item, VerboseDescription verboseDescription)
 			throws DSpaceSwordException
 	{
 		String field = ConfigurationManager.getProperty("swordv2-server", "updated.field");
@@ -298,10 +306,15 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC implements SwordEntr
 			throw new DSpaceSwordException("No configuration, or configuration is invalid for: sword.updated.field");
 		}
 
-		Metadatum dc = this.makeDCValue(field, null);
-		item.clearMetadata(dc.schema, dc.element, dc.qualifier, Item.ANY);
-		DCDate date = new DCDate(new Date());
-		item.addMetadata(dc.schema, dc.element, dc.qualifier, null, date.toString());
+		MetadataValueInfo info = this.makeMetadataValueInfo(field, null);
+		try {
+			itemService.clearMetadata(context, item, info.schema, info.element, info.qualifier, Item.ANY);
+			DCDate date = new DCDate(new Date());
+			itemService.addMetadata(context, item, info.schema, info.element, info.qualifier, null, date.toString());
+		} catch (SQLException e) {
+			log.error("Exception caught trying to set updated date", e);
+			throw new DSpaceSwordException(e);
+		}
 
 		verboseDescription.append("Updated date added to response from item metadata where available");
 	}
@@ -312,11 +325,13 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC implements SwordEntr
 	 * field in which to store this metadata in the configuration
 	 * sword.slug.field
 	 *
+	 *
+	 * @param context
 	 * @param item
 	 * @param slugVal
 	 * @throws DSpaceSwordException
 	 */
-	protected void setSlug(Item item, String slugVal, VerboseDescription verboseDescription)
+	protected void setSlug(Context context, Item item, String slugVal, VerboseDescription verboseDescription)
 			throws DSpaceSwordException
 	{
 		// if there isn't a slug value, don't set it
@@ -331,9 +346,14 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC implements SwordEntr
 			throw new DSpaceSwordException("No configuration, or configuration is invalid for: sword.slug.field");
 		}
 
-		Metadatum dc = this.makeDCValue(field, null);
-		item.clearMetadata(dc.schema, dc.element, dc.qualifier, Item.ANY);
-		item.addMetadata(dc.schema, dc.element, dc.qualifier, null, slugVal);
+		MetadataValueInfo info = this.makeMetadataValueInfo(field, null);
+		try {
+			itemService.clearMetadata(context, item, info.schema, info.element, info.qualifier, Item.ANY);
+			itemService.addMetadata(context, item, info.schema, info.element, info.qualifier, null, slugVal);
+		} catch (SQLException e) {
+			log.error("Caught exception trying to set slug", e);
+			throw new DSpaceSwordException(e);
+		}
 
 		verboseDescription.append("Slug value set in response where available");
 	}
@@ -348,5 +368,13 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC implements SwordEntr
 	private String getTreatment() throws DSpaceSwordException
 	{
 		return "A metadata only item has been created";
+	}
+
+	private class MetadataValueInfo {
+		private String schema;
+		private String element;
+		private String qualifier;
+		private String language;
+		private String value;
 	}
 }

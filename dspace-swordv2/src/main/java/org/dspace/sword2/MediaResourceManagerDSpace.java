@@ -10,9 +10,14 @@ package org.dspace.sword2;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeServiceImpl;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
+import org.dspace.content.BundleBitstream;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -41,6 +46,9 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
 {
     private static Logger log = Logger.getLogger(MediaResourceManagerDSpace.class);
 
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+
     private VerboseDescription verboseDescription = new VerboseDescription();
 
     private boolean isAccessible(Context context, Bitstream bitstream)
@@ -48,7 +56,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
     {
         try
         {
-            return AuthorizeServiceImpl.authorizeActionBoolean(context, bitstream, Constants.READ);
+            return authorizeService.authorizeActionBoolean(context, bitstream, Constants.READ);
         }
         catch (SQLException e)
         {
@@ -61,7 +69,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
     {
         try
         {
-            return AuthorizeServiceImpl.authorizeActionBoolean(context, item, Constants.READ);
+            return authorizeService.authorizeActionBoolean(context, item, Constants.READ);
         }
         catch (SQLException e)
         {
@@ -74,21 +82,16 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
     {
         try
         {
-            InputStream stream = bitstream.retrieve();
-            MediaResource mr = new MediaResource(stream, bitstream.getFormat().getMIMEType(), null, true);
+            InputStream stream = bitstreamService.retrieve(context, bitstream);
+            MediaResource mr = new MediaResource(stream, bitstream.getFormat(context).getMIMEType(), null, true);
             mr.setContentMD5(bitstream.getChecksum());
             mr.setLastModified(this.getLastModified(context, bitstream));
             return mr;
         }
-        catch (IOException e)
+        catch (IOException | SQLException e)
         {
             throw new SwordServerException(e);
-        }
-        catch (SQLException e)
-        {
-            throw new SwordServerException(e);
-        }
-        catch (AuthorizeException e)
+        } catch (AuthorizeException e)
         {
             throw new SwordAuthException(e);
         }
@@ -131,8 +134,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
         // Note that at this stage, if we don't have a desiredContentType, it will
         // be null, and the disseminator is free to choose the format
         InputStream stream = disseminator.disseminate(context, item);
-        MediaResource mr = new MediaResource(stream, disseminator.getContentType(), disseminator.getPackaging());
-        return mr;
+        return new MediaResource(stream, disseminator.getContentType(), disseminator.getPackaging());
     }
 
     public MediaResource getMediaResourceRepresentation(String uri, Map<String, String> accept, AuthCredentials authCredentials, SwordConfiguration swordConfig)
@@ -175,7 +177,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
                     ctx = sc.getContext();
 
                     // re-retrieve the bitstream using the new context
-                    bitstream = Bitstream.find(ctx, bitstream.getID());
+                    bitstream = bitstreamService.find(ctx, bitstream.getID());
 
                     // and re-verify its accessibility
                     accessible = this.isAccessible(ctx, bitstream);
@@ -231,15 +233,10 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
                 return mr;
             }
         }
-        catch (SQLException e)
+        catch (SQLException | DSpaceSwordException e)
         {
             throw new SwordServerException(e);
-        }
-        catch (DSpaceSwordException e)
-        {
-            throw new SwordServerException(e);
-        }
-        finally
+        } finally
         {
             // if there is a sword context, abort it (this will abort the inner dspace context as well)
             if (sc != null)
@@ -257,9 +254,11 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
             throws SQLException
     {
         Date lm = null;
-        for (Bundle bundle : bitstream.getBundles())
+        List<BundleBitstream> bundleBitstreams = bitstream.getBundles();
+        for (BundleBitstream bundleBitstream : bundleBitstreams)
         {
-            for (Item item : bundle.getItems())
+            List<Item> items = bundleBitstream.getBundle().getItems();
+            for (Item item : items)
             {
                 Date possible = item.getLastModified();
                 if (lm == null)
@@ -301,7 +300,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
                 log.debug(LogManager.getHeader(context, "sword_replace", ""));
             }
 
-            DepositReceipt receipt = null;
+            DepositReceipt receipt;
 			SwordUrlManager urlManager = config.getUrlManager(context, config);
 			if (urlManager.isActionableBitstreamUrl(context, emUri))
 			{
@@ -317,10 +316,12 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
                 wfm.replaceBitstream(context, bitstream);
 
                 // check that we can submit to ALL the items this bitstream is in
-				List<Item> items = new ArrayList<Item>();
-				for (Bundle bundle : bitstream.getBundles())
+				List<Item> items = new ArrayList<>();
+                List<BundleBitstream> bundleBitstreams = bitstream.getBundles();
+                for (BundleBitstream bundleBitstream : bundleBitstreams)
 				{
-					for (Item item : bundle.getItems())
+                    List<Item> bundleItems = bundleBitstream.getBundle().getItems();
+                    for (Item item : bundleItems)
 					{
 						this.checkAuth(sc, item);
 						items.add(item);
@@ -339,7 +340,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
                 {
                     result = this.replaceBitstream(sc, items, bitstream, deposit, authCredentials, config);
                 }
-                catch(DSpaceSwordException e)
+                catch (DSpaceSwordException | SwordError e)
                 {
                     if (config.isKeepPackageOnFailedIngest())
                     {
@@ -354,22 +355,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
                     }
                     throw e;
                 }
-                catch(SwordError e)
-                {
-                    if (config.isKeepPackageOnFailedIngest())
-                    {
-                        try
-                        {
-                            this.storePackageAsFile(deposit, authCredentials, config);
-                        }
-                        catch(IOException e2)
-                        {
-                            log.warn("Unable to store SWORD package as file: " + e);
-                        }
-                    }
-                    throw e;
-                }
-                
+
                 // now we've produced a deposit, we need to decide on its workflow state
                 wfm.resolveState(context, deposit, null, this.verboseDescription, false);
 
@@ -417,22 +403,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
                 {
                     this.replaceContent(sc, item, deposit, authCredentials, config);
                 }
-                catch(DSpaceSwordException e)
-                {
-                    if (config.isKeepPackageOnFailedIngest())
-                    {
-                        try
-                        {
-                            this.storePackageAsFile(deposit, authCredentials, config);
-                        }
-                        catch(IOException e2)
-                        {
-                            log.warn("Unable to store SWORD package as file: " + e);
-                        }
-                    }
-                    throw e;
-                }
-                catch(SwordError e)
+                catch (DSpaceSwordException | SwordError e)
                 {
                     if (config.isKeepPackageOnFailedIngest())
                     {
@@ -525,10 +496,11 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
 				wfm.deleteBitstream(context, bitstream);
 
 				// check that we can submit to ALL the items this bitstream is in
-				List<Item> items = new ArrayList<Item>();
-				for (Bundle bundle : bitstream.getBundles())
+				List<Item> items = new ArrayList<>();
+				for (BundleBitstream bundleBitstream : bitstream.getBundles())
 				{
-					for (Item item : bundle.getItems())
+                    List<Item> bundleItems = bundleBitstream.getBundle().getItems();
+                    for (Item item : bundleItems)
 					{
 						this.checkAuth(sc, item);
 						items.add(item);
@@ -677,7 +649,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
                 this.verboseDescription.append("Depositing on behalf of: " + sc.getOnBehalfOf().getEmail());
             }
 
-			DepositResult result = null;
+			DepositResult result;
             try
             {
 				result = this.addContent(sc, item, deposit, authCredentials, config);
@@ -687,26 +659,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
 					result = cm.doAddMetadata(sc, item, deposit, authCredentials, config, result);
 				}
             }
-            catch(DSpaceSwordException e)
-            {
-                if (config.isKeepPackageOnFailedIngest())
-                {
-                    try
-                    {
-                        this.storePackageAsFile(deposit, authCredentials, config);
-						if (deposit.isMultipart())
-						{
-							this.storeEntryAsFile(deposit, authCredentials, config);
-						}
-                    }
-                    catch(IOException e2)
-                    {
-                        log.warn("Unable to store SWORD package as file: " + e);
-                    }
-                }
-                throw e;
-            }
-            catch(SwordError e)
+            catch (DSpaceSwordException | SwordError e)
             {
                 if (config.isKeepPackageOnFailedIngest())
                 {
@@ -779,13 +732,14 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
 		{
 			// remove content only really means everything from the ORIGINAL bundle
 			VersionManager vm = new VersionManager();
-			Bundle[] originals = item.getBundles("ORIGINAL");
-			for (Bundle original : originals)
+			List<Bundle> bundles = item.getBundles();
+			for (Bundle bundle : bundles)
 			{
-				vm.removeBundle(item, original);
+                if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName()))
+				vm.removeBundle(swordContext.getContext(), item, bundle);
 			}
 		}
-		catch (SQLException e)
+		catch (SQLException | IOException e)
 		{
 			throw new DSpaceSwordException(e);
 		}
@@ -793,11 +747,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
 		{
 			throw new SwordAuthException(e);
 		}
-		catch (IOException e)
-		{
-			throw new DSpaceSwordException(e);
-		}
-	}
+    }
 
 	private void removeBitstream(SwordContext swordContext, Bitstream bitstream, List<Item> items, AuthCredentials authCredentials, SwordConfigurationDSpace swordConfig)
 			throws DSpaceSwordException, SwordAuthException
@@ -808,10 +758,10 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
 			VersionManager vm = new VersionManager();
 			for (Item item : items)
 			{
-				vm.removeBitstream(item, bitstream);
+				vm.removeBitstream(swordContext.getContext(), item, bitstream);
 			}
 		}
-		catch (SQLException e)
+		catch (SQLException | IOException e)
 		{
 			throw new DSpaceSwordException(e);
 		}
@@ -819,11 +769,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
 		{
 			throw new SwordAuthException(e);
 		}
-		catch (IOException e)
-		{
-			throw new DSpaceSwordException(e);
-		}
-	}
+    }
 
     private void replaceContent(SwordContext swordContext, Item item, Deposit deposit, AuthCredentials authCredentials, SwordConfigurationDSpace swordConfig)
 			throws DSpaceSwordException, SwordError, SwordAuthException, SwordServerException
@@ -844,9 +790,9 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
 			// delegate the to the version manager to get rid of any existing content and to version
 			// if if necessary
 			VersionManager vm = new VersionManager();
-			vm.removeBundle(item, "ORIGINAL");
+			vm.removeBundle(swordContext.getContext(), item, "ORIGINAL");
 		}
-		catch (SQLException e)
+		catch (SQLException | IOException e)
 		{
 			throw new DSpaceSwordException(e);
 		}
@@ -854,12 +800,8 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
 		{
 			throw new SwordAuthException(e);
 		}
-		catch (IOException e)
-		{
-			throw new DSpaceSwordException(e);
-		}
 
-		// do the deposit
+        // do the deposit
 		DepositResult result = si.ingest(context, deposit, item, this.verboseDescription);
 		this.verboseDescription.append("Replace completed successfully");
 
@@ -908,15 +850,15 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
                 else
                 {
                     // now duplicate the bitstream to all the others
-                    Bundle[] bundles = item.getBundles("ORIGINAL");
-                    if (bundles.length > 0)
+                    List<Bundle> bundles = item.getBundles();
+                    if (!bundles.isEmpty())
                     {
-                        bundles[0].addBitstream(result.getOriginalDeposit());
+                        bundleService.addBitstream(context, bundles.get(0), result.getOriginalDeposit());
                     }
                     else
                     {
-                        Bundle bundle = item.createBundle("ORIGINAL");
-                        bundle.addBitstream(result.getOriginalDeposit());
+                        Bundle bundle = bundleService.create(context, item, Constants.CONTENT_BUNDLE_NAME);
+                        bundleService.addBitstream(context, bundle, result.getOriginalDeposit());
                     }
                 }
 
