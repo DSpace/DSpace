@@ -98,12 +98,12 @@ public class OAIHarvester {
 	Context ourContext;
 
     // Namespace used by the ORE serialization format
-    // Set in dspace.cfg as harvester.oai.oreSerializationFormat.{ORESerialKey} = {ORESerialNS}
+    // Set in dspace.cfg as oai.harvester.oreSerializationFormat.{ORESerialKey} = {ORESerialNS}
     private Namespace ORESerialNS;
     private String ORESerialKey;
 
     // Namespace of the descriptive metadata that should be harvested in addition to the ORE
-    // Set in dspace.cfg as harvester.oai.metadataformats.{MetadataKey} = {MetadataNS},{Display Name}
+    // Set in dspace.cfg as oai.harvester.metadataformats.{MetadataKey} = {MetadataNS},{Display Name}
     private Namespace metadataNS;
     private String metadataKey;
 
@@ -153,7 +153,7 @@ public class OAIHarvester {
         metadataNS = OAIHarvester.getDMDNamespace(metadataKey);
 
         if (metadataNS == null) {
-        	log.error("No matching metadata namespace found for \"" + metadataKey + "\", see oai.cfg option \"harvester.oai.metadataformats.{MetadataKey} = {MetadataNS},{Display Name}\"");
+        	log.error("No matching metadata namespace found for \"" + metadataKey + "\", see oai.cfg option \"oai.harvester.metadataformats.{MetadataKey} = {MetadataNS},{Display Name}\"");
         	throw new HarvestingException("Metadata declaration not found");
         }
 	}
@@ -166,7 +166,7 @@ public class OAIHarvester {
 	private static Namespace getORENamespace() {
 		String ORESerializationString = null;
 		String ORESeialKey = null;
-		String oreString = "harvester.oai.oreSerializationFormat.";
+		String oreString = "oai.harvester.oreSerializationFormat.";
 
         Enumeration pe = ConfigurationManager.propertyNames("oai");
 
@@ -193,7 +193,7 @@ public class OAIHarvester {
 	 */
 	private static Namespace getDMDNamespace(String metadataKey) {
 		String metadataString = null;
-        String metaString = "harvester.oai.metadataformats.";
+        String metaString = "oai.harvester.metadataformats.";
 
         Enumeration pe = ConfigurationManager.propertyNames("oai");
 

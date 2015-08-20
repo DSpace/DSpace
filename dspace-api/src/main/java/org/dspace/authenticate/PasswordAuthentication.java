@@ -16,12 +16,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections.ListUtils;
 import org.apache.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.utils.DSpace;
 
 /**
  * A stackable authentication method
@@ -66,8 +66,8 @@ public class PasswordAuthentication
                                                  throws SQLException
     {
         // Is there anything set in domain.valid?
-        String domains = ConfigurationManager.getProperty("authentication-password", "domain.valid");
-        if ((domains == null) || (domains.trim().equals("")))
+        String[] domains = new DSpace().getConfigurationService().getArrayProperty("authentication-password.domain.valid");
+        if ((domains == null) || (domains.length==0))
         {
             // No conditions set, so must be able to self register
             return true;
@@ -75,12 +75,11 @@ public class PasswordAuthentication
         else
         {
             // Itterate through all domains
-            String[] options = domains.trim().split(",");
             String check;
             email = email.trim().toLowerCase();
-            for (int i = 0; i < options.length; i++)
+            for (int i = 0; i < domains.length; i++)
             {
-                check = options[i].trim().toLowerCase();
+                check = domains[i].trim().toLowerCase();
                 if (email.endsWith(check))
                 {
                     // A match, so we can register this user
@@ -139,7 +138,7 @@ public class PasswordAuthentication
 		{
 			if (EPersonServiceFactory.getInstance().getEPersonService().getPasswordHash(context.getCurrentUser()) != null && !EPersonServiceFactory.getInstance().getEPersonService().getPasswordHash(context.getCurrentUser()).toString().equals(""))
 			{
-				String groupName = ConfigurationManager.getProperty("authentication-password", "login.specialgroup");
+				String groupName = new DSpace().getConfigurationService().getProperty("authentication-password.login.specialgroup");
 				if ((groupName != null) && (!groupName.trim().equals("")))
 				{
 				    Group specialGroup = EPersonServiceFactory.getInstance().getGroupService().findByName(context, groupName);
