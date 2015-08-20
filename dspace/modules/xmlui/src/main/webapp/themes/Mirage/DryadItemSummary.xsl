@@ -2744,9 +2744,13 @@
             <xsl:when test="contains($nameString,'#')">
                 <!-- name contains an Orcid: make it a hyperlink. -->
                 <xsl:variable name="orcid" select="substring-before(substring-after($nameString,'#'),'#')"/>
-                <!--<a href="http://orcid.org/{$orcid}">-->
+                <!--https://dev.datadryad.org/discover?query=0000-0002-1497-1284&submit=Go-->
+                <a>
+                    <xsl:attribute name="href">
+                        <xsl:value-of select="concat($context-path,'/discover?query=',$orcid,'&amp;submit=Go')"/>
+                    </xsl:attribute>
                     <xsl:value-of select="$author"/>
-                <!--</a>-->
+                </a>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:value-of select="$author"/>
