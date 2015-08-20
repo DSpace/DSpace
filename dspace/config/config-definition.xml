@@ -23,15 +23,21 @@
         <!-- Load Environment variables -->
         <env/>
 
-        <!-- Load our dspace.cfg-->
+        <!-- Allow user to override any configs in a local.cfg -->
+        <!-- Any properties in this config will override defaults in dspace.cfg
+            (or any included *.cfg file) -->
+        <properties fileName="local.cfg" throwExceptionOnMissing="false" config-name="local" config-optional="true">
+            <!-- Reload this file if it has changed, and at least 1 minute (60,000 ms) has passed -->
+            <reloadingStrategy refreshDelay="60000"
+                config-class="org.apache.commons.configuration.reloading.FileChangedReloadingStrategy"/>
+        </properties>
+
+        <!-- Load our dspace.cfg (which in turn loads all module configs) -->
         <properties fileName="dspace.cfg" throwExceptionOnMissing="true">
             <!-- Reload this file if it has changed, and at least 1 minute (60,000 ms) has passed -->
             <reloadingStrategy refreshDelay="60000"
                 config-class="org.apache.commons.configuration.reloading.FileChangedReloadingStrategy"/>
         </properties>
-        
-        <!-- Load dspace-defaults.cfg (defines default settings for dspace-services) -->
-        <properties fileName="dspace-defaults.cfg" config-optional="true"/>
     </override>
     
 </configuration>

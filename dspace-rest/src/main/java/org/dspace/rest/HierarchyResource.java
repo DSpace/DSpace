@@ -26,7 +26,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.HttpHeaders;
 
 import java.io.UnsupportedEncodingException;
@@ -72,7 +71,7 @@ public class HierarchyResource extends Resource {
 		
         try {
             context = createContext(getUser(headers));
-            if (ConfigurationManager.getBooleanProperty("rest", "rest-hierarchy-authenticate", true) == false) {
+            if (ConfigurationManager.getBooleanProperty("rest", "hierarchy-authenticate", true) == false) {
                 context.turnOffAuthorisationSystem();            	
             }
 
