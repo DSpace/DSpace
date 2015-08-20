@@ -13,6 +13,11 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.authorize.AuthorizeException;
@@ -23,9 +28,9 @@ import org.purl.sword.base.ErrorCodes;
 import org.apache.log4j.Logger;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * @author Richard Jones
@@ -37,6 +42,11 @@ public class CollectionDepositor extends Depositor
 {
 	/** logger */
 	private static Logger log = Logger.getLogger(CollectionDepositor.class);
+
+	protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+	protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+	protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+	protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
 
 	/**
 	 * The DSpace Collection we are depositing into
@@ -122,8 +132,7 @@ public class CollectionDepositor extends Depositor
 
 				// in order to be allowed to add the file back to the item, we need to ignore authorisations
 				// for a moment
-				boolean ignoreAuth = context.ignoreAuthorization();
-				context.setIgnoreAuthorization(true);
+				context.turnOffAuthorisationSystem();
 
 				String bundleName = ConfigurationManager.getProperty("sword-server", "bundle.name");
 				if (bundleName == null || "".equals(bundleName))
@@ -131,15 +140,20 @@ public class CollectionDepositor extends Depositor
 					bundleName = "SWORD";
 				}
 				Item item = result.getItem();
-				Bundle[] bundles = item.getBundles(bundleName);
+				List<Bundle> bundles = item.getBundles();
 				Bundle swordBundle = null;
-				if (bundles.length > 0)
+				for (Bundle bundle : bundles)
 				{
-					swordBundle = bundles[0];
+					if (bundleName.equals(bundle.getName()))
+					{
+						// we found one
+						swordBundle = bundle;
+						break;
+					}
 				}
 				if (swordBundle == null)
 				{
-					swordBundle = item.createBundle(bundleName);
+					swordBundle = bundleService.create(context, item, bundleName);
 				}
 
 				String fn = swordService.getFilename(context, deposit, true);
@@ -149,7 +163,7 @@ public class CollectionDepositor extends Depositor
                 try
                 {
                     fis = new FileInputStream(deposit.getFile());
-                    bitstream = swordBundle.createBitstream(fis);
+                    bitstream = bitstreamService.create(context, swordBundle, fis);
                 }
                 finally
                 {
@@ -159,24 +173,23 @@ public class CollectionDepositor extends Depositor
                     }
                 }
 
-                bitstream.setName(fn);
-                bitstream.setDescription("SWORD deposit package");
+                bitstream.setName(context, fn);
+                bitstream.setDescription(context, "SWORD deposit package");
 
-                BitstreamFormat bf = BitstreamFormat.findByMIMEType(context, deposit.getContentType());
+                BitstreamFormat bf = bitstreamFormatService.findByMIMEType(context, deposit.getContentType());
                 if (bf != null)
                 {
-                    bitstream.setFormat(bf);
+					bitstreamService.setFormat(context, bitstream, bf);
                 }
 
-                bitstream.update();
-
-                swordBundle.update();
-                item.update();
+				bitstreamService.update(context, bitstream);
+				bundleService.update(context, swordBundle);
+				itemService.update(context, item);
 
 				swordService.message("Original package stored as " + fn + ", in item bundle " + swordBundle);
 
 				// now reset the context ignore authorisation
-				context.setIgnoreAuthorization(ignoreAuth);
+				context.restoreAuthSystemState();
 
 				// set the media link for the created item
 				result.setMediaLink(urlManager.getMediaLink(bitstream));
@@ -187,22 +200,7 @@ public class CollectionDepositor extends Depositor
 				result.setMediaLink(urlManager.getBaseMediaLinkUrl());
 			}
 		}
-		catch (SQLException e)
-		{
-			log.error("caught exception: ", e);
-			throw new DSpaceSWORDException(e);
-		}
-		catch (AuthorizeException e)
-		{
-			log.error("caught exception: ", e);
-			throw new DSpaceSWORDException(e);
-		}
-		catch (FileNotFoundException e)
-		{
-			log.error("caught exception: ", e);
-			throw new DSpaceSWORDException(e);
-		}
-		catch (IOException e)
+		catch (SQLException | AuthorizeException | IOException e)
 		{
 			log.error("caught exception: ", e);
 			throw new DSpaceSWORDException(e);

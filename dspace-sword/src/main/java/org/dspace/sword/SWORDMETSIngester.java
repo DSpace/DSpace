@@ -8,29 +8,32 @@
 package org.dspace.sword;
 
 import java.io.File;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 
-import org.dspace.content.Collection;
-import org.dspace.content.DCDate;
-import org.dspace.content.Metadatum;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
+import org.dspace.content.*;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.packager.PackageIngester;
 import org.dspace.content.packager.PackageParameters;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.MetadataValueService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
 import org.dspace.handle.HandleServiceImpl;
 
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.purl.sword.base.Deposit;
 import org.purl.sword.base.SWORDErrorException;
 
 public class SWORDMETSIngester implements SWORDIngester
 {
 	private SWORDService swordService;
+	protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
 	/** Log4j logger */
 	public static final Logger log = Logger.getLogger(SWORDMETSIngester.class);
@@ -113,7 +116,7 @@ public class SWORDMETSIngester implements SWORDIngester
 			
 			// update the item metadata to inclue the current time as
 			// the updated date
-			this.setUpdatedDate(installedItem);
+			this.setUpdatedDate(context, installedItem);
 			
 			// DSpace ignores the slug value as suggested identifier, but
 			// it does store it in the metadata
@@ -123,14 +126,14 @@ public class SWORDMETSIngester implements SWORDIngester
 			// authorisation briefly, because although the user may be
 			// able to add stuff to the repository, they may not have
 			// WRITE permissions on the archive.
-			boolean ignore = context.ignoreAuthorization();
-			context.setIgnoreAuthorization(true);
-			installedItem.update();
-			context.setIgnoreAuthorization(ignore);
+			context.turnOffAuthorisationSystem();
+			itemService.update(context, installedItem);
+			context.restoreAuthSystemState();
 			
 			// for some reason, DSpace will not give you the handle automatically,
 			// so we have to look it up
-			String handle = HandleServiceImpl.findHandle(context, installedItem);
+			HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+			String handle = handleService.findHandle(context, installedItem);
 			
 			swordService.message("Ingest successful");
 			swordService.message("Item created with internal identifier: " + installedItem.getID());
@@ -167,10 +170,12 @@ public class SWORDMETSIngester implements SWORDIngester
 	 * the field in which to store this metadata in the configuration
 	 * sword.updated.field
 	 * 
+	 *
+	 * @param context
 	 * @param item
 	 * @throws DSpaceSWORDException
 	 */
-	private void setUpdatedDate(Item item)
+	private void setUpdatedDate(Context context, Item item)
 		throws DSpaceSWORDException
 	{
 		String field = ConfigurationManager.getProperty("sword-server", "updated.field");
@@ -178,11 +183,16 @@ public class SWORDMETSIngester implements SWORDIngester
 		{
 			throw new DSpaceSWORDException("No configuration, or configuration is invalid for: sword.updated.field");
 		}
-		
-		Metadatum dc = this.configToDC(field, null);
-		item.clearMetadata(dc.schema, dc.element, dc.qualifier, Item.ANY);
-		DCDate date = new DCDate(new Date());
-		item.addMetadata(dc.schema, dc.element, dc.qualifier, null, date.toString());
+
+		MetadataFieldInfo dc = this.configToDC(field, null);
+		try {
+			itemService.clearMetadata(context, item, dc.schema, dc.element, dc.qualifier, Item.ANY);
+			DCDate date = new DCDate(new Date());
+			itemService.addMetadata(context, item, dc.schema, dc.element, dc.qualifier, null, date.toString());
+		} catch (SQLException e) {
+			log.error("Caught exception: ", e);
+			throw new DSpaceSWORDException(e);
+		}
 
 		swordService.message("Updated date added to response from item metadata where available");
 	}
@@ -211,10 +221,15 @@ public class SWORDMETSIngester implements SWORDIngester
 		{
 			throw new DSpaceSWORDException("No configuration, or configuration is invalid for: sword.slug.field");
 		}
-		
-		Metadatum dc = this.configToDC(field, null);
-		item.clearMetadata(dc.schema, dc.element, dc.qualifier, Item.ANY);
-		item.addMetadata(dc.schema, dc.element, dc.qualifier, null, slugVal);
+
+		MetadataFieldInfo mfi = this.configToDC(field, null);
+		try {
+			itemService.clearMetadata(swordService.getContext(), item, mfi.schema, mfi.element, mfi.qualifier, Item.ANY);
+			itemService.addMetadata(swordService.getContext(), item, mfi.schema, mfi.element, mfi.qualifier, null, slugVal);
+		} catch (SQLException e) {
+			log.error("Caught exception: ", e);
+			throw new DSpaceSWORDException(e);
+		}
 
 		swordService.message("Slug value set in response where available");
 	}
@@ -231,22 +246,22 @@ public class SWORDMETSIngester implements SWORDIngester
 	 * @param def
 	 * @return
 	 */
-	private Metadatum configToDC(String config, String def)
+	private MetadataFieldInfo configToDC(String config, String def)
 	{
-		Metadatum dcv = new Metadatum();
-		dcv.schema = def;
-		dcv.element= def;
-		dcv.qualifier = def;
+		MetadataFieldInfo mfi = new MetadataFieldInfo();
+		mfi.schema = def;
+		mfi.element= def;
+		mfi.qualifier = def;
 		
 		StringTokenizer stz = new StringTokenizer(config, ".");
-		dcv.schema = stz.nextToken();
-		dcv.element = stz.nextToken();
+		mfi.schema = stz.nextToken();
+		mfi.element = stz.nextToken();
 		if (stz.hasMoreTokens())
 		{
-			dcv.qualifier = stz.nextToken();
+			mfi.qualifier = stz.nextToken();
 		}
 		
-		return dcv;
+		return mfi;
 	}
 
 	/**
@@ -262,5 +277,11 @@ public class SWORDMETSIngester implements SWORDIngester
 				"and provided with a unique identifier.  The metadata in the manifest has been " +
 				"extracted and attached to the DSpace item, which has been provided with " +
 				"an identifier leading to an HTML splash page.";
+	}
+
+	private class MetadataFieldInfo {
+		private String schema;
+		private String element;
+		private String qualifier;
 	}
 }

@@ -7,11 +7,9 @@
  */
 package org.dspace.sword;
 
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
-import org.dspace.content.Item;
+import org.dspace.content.*;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.purl.sword.atom.Content;
 import org.purl.sword.atom.ContentType;
 import org.purl.sword.atom.InvalidMediaTypeException;
@@ -21,6 +19,7 @@ import org.purl.sword.atom.Title;
 import org.apache.log4j.Logger;
 
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * @author Richard Jones
@@ -73,7 +72,13 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry
 			}
 
 			String bsurl = urlManager.getBitstreamUrl(this.bitstream);
-			BitstreamFormat bf = this.bitstream.getFormat();
+			BitstreamFormat bf = null;
+			try {
+				bf = this.bitstream.getFormat(swordService.getContext());
+			} catch (SQLException e) {
+				log.error("Exception caught: ", e);
+				throw new DSpaceSWORDException(e);
+			}
 			String format = "application/octet-stream";
 			if (bf != null)
 			{
@@ -146,7 +151,13 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry
 		SWORDUrlManager urlManager = swordService.getUrlManager();
 
 		String bsurl = urlManager.getBitstreamUrl(this.bitstream);
-		BitstreamFormat bf = this.bitstream.getFormat();
+		BitstreamFormat bf;
+		try {
+			bf = this.bitstream.getFormat(swordService.getContext());
+		} catch (SQLException e) {
+			log.error("Exception caught: ", e);
+			throw new DSpaceSWORDException(e);
+		}
 		String format = "application/octet-stream";
 		if (bf != null)
 		{
@@ -183,31 +194,36 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry
 		try
 		{
 			// work our way up to the item
-			Bundle[] bundles = this.bitstream.getBundles();
-			if (bundles.length == 0)
+			List<BundleBitstream> bundle2bitstreams = this.bitstream.getBundles();
+			if (bundle2bitstreams.isEmpty())
 			{
 				log.error("Found orphaned bitstream: " + bitstream.getID());
 				throw new DSpaceSWORDException("Orphaned bitstream discovered");
 			}
-			Item[] items = bundles[0].getItems();
-			if (items.length == 0)
+			Bundle bundle = bundle2bitstreams.get(0).getBundle();
+			List<Item> items = bundle.getItems();
+			if (items.isEmpty())
 			{
-				log.error("Found orphaned bundle: " + bundles[0].getID());
+				log.error("Found orphaned bundle: " + bundle.getID());
 				throw new DSpaceSWORDException("Orphaned bundle discovered");
 			}
-			Item item = items[0];
+			Item item = items.get(0);
 
 			// now get the licence out of the item
 			SWORDUrlManager urlManager = swordService.getUrlManager();
 			StringBuilder rightsString = new StringBuilder();
-			Bundle[] lbundles = item.getBundles("LICENSE");
-			for (int i = 0; i < lbundles.length; i++)
-			{
-				Bitstream[] bss = lbundles[i].getBitstreams();
-				for (int j = 0; j < bss.length; j++)
+			List<Bundle> lbundles = item.getBundles();
+			for (Bundle lbundle : lbundles) {
+				if (!Constants.LICENSE_BUNDLE_NAME.equals(lbundle.getName()))
 				{
-					String url = urlManager.getBitstreamUrl(bss[j]);
-					rightsString.append(url + " ");
+					// skip non-license bundles
+					continue;
+				}
+				List<BundleBitstream> bss = lbundle.getBitstreams();
+				for (BundleBitstream b2b : bss) {
+					Bitstream bs = b2b.getBitstream();
+					String url = urlManager.getBitstreamUrl(bs);
+					rightsString.append(url).append(" ");
 				}
 			}
 

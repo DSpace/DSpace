@@ -7,6 +7,10 @@
  */
 package org.dspace.sword;
 
+import org.apache.commons.lang.StringUtils;
+import org.dspace.content.authority.Choice;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.purl.sword.base.Collection;
 import org.dspace.content.*;
 import org.dspace.core.Context;
@@ -20,6 +24,8 @@ import java.util.List;
  */
 public class ItemCollectionGenerator extends ATOMCollectionGenerator
 {
+	protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
 	public ItemCollectionGenerator(SWORDService service)
 	{
 		super(service);
@@ -30,8 +36,8 @@ public class ItemCollectionGenerator extends ATOMCollectionGenerator
 	 * is not an instance of a DSpace Item this method will throw an
 	 * exception.
 	 *
-	 * @param dso
-	 * @throws DSpaceSWORDException
+	 * @param dso the dso for which the collection should be build
+	 * @throws DSpaceSWORDException if the dso is not an instance of Item
 	 */
 	public Collection buildCollection(DSpaceObject dso) throws DSpaceSWORDException
 	{
@@ -54,10 +60,14 @@ public class ItemCollectionGenerator extends ATOMCollectionGenerator
 
 		// the item title is the sword collection title, or "untitled" otherwise
 		String title = "Untitled";
-		Metadatum[] dcv = item.getMetadataByMetadataString("dc.title");
-		if (dcv.length > 0)
+		List<MetadataValue> dcv = itemService.getMetadataByMetadataString(item, "dc.title");
+		if (!dcv.isEmpty())
 		{
-			title = dcv[0].value;
+			String firstValue = dcv.get(0).getValue();
+			if (StringUtils.isNotBlank(firstValue))
+			{
+				title = firstValue;
+			}
 		}
 		scol.setTitle(title);
 
@@ -67,12 +77,16 @@ public class ItemCollectionGenerator extends ATOMCollectionGenerator
 
 		// abstract is the short description of the item, if it exists
 		String dcAbstract = "";
-		Metadatum[] dcva = item.getMetadataByMetadataString("dc.description.abstract");
-		if (dcva.length > 0)
+		List<MetadataValue> dcva = itemService.getMetadataByMetadataString(item, "dc.description.abstract");
+		if (!dcva.isEmpty())
 		{
-			dcAbstract = dcva[0].value;
+			String firstValue = dcva.get(0).getValue();
+			if (StringUtils.isNotBlank(firstValue))
+			{
+				dcAbstract = firstValue;
+			}
 		}
-		if (dcAbstract != null && !"".equals(dcAbstract))
+		if (StringUtils.isNotBlank(dcAbstract))
 		{
 			scol.setAbstract(dcAbstract);
 		}

@@ -7,23 +7,19 @@
  */
 package org.dspace.sword;
 
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
-import org.dspace.content.DCDate;
-import org.dspace.content.Metadatum;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.handle.HandleServiceImpl;
-import org.purl.sword.atom.Content;
-import org.purl.sword.atom.ContentType;
-import org.purl.sword.atom.InvalidMediaTypeException;
-import org.purl.sword.atom.Link;
-import org.purl.sword.atom.Rights;
-import org.purl.sword.atom.Summary;
-import org.purl.sword.atom.Title;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.content.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
+import org.purl.sword.atom.*;
 
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * @author Richard Jones
@@ -34,6 +30,9 @@ public class ItemEntryGenerator extends DSpaceATOMEntry
 {
 	/** logger */
 	private static Logger log = Logger.getLogger(ItemEntryGenerator.class);
+
+	protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+	protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
 	protected ItemEntryGenerator(SWORDService service)
 	{
@@ -47,12 +46,11 @@ public class ItemEntryGenerator extends DSpaceATOMEntry
 	 */
 	protected void addCategories()
 	{
-		Metadatum[] dcv = item.getMetadataByMetadataString("dc.subject.*");
+		List<MetadataValue> dcv = itemService.getMetadataByMetadataString(item, "dc.subject.*");
 		if (dcv != null)
 		{
-			for (int i = 0; i < dcv.length; i++)
-			{
-				entry.addCategory(dcv[i].value);
+			for (MetadataValue aDcv : dcv) {
+				entry.addCategory(aDcv.getValue());
 			}
 		}
 	}
@@ -78,11 +76,11 @@ public class ItemEntryGenerator extends DSpaceATOMEntry
 					handle = item.getHandle();
 				}
 
-				if (handle != null && !"".equals(handle))
+				if (StringUtils.isNotBlank(handle))
 				{
 					boolean keepOriginal = ConfigurationManager.getBooleanProperty("sword-server", "keep-original-package");
 					String swordBundle = ConfigurationManager.getProperty("sword-server", "bundle.name");
-					if (swordBundle == null || "".equals(swordBundle))
+					if (StringUtils.isBlank(swordBundle))
 					{
 						swordBundle = "SWORD";
 					}
@@ -92,25 +90,26 @@ public class ItemEntryGenerator extends DSpaceATOMEntry
 					if (keepOriginal)
 					{
 						Content con = new Content();
-						Bundle[] bundles = item.getBundles(swordBundle);
-						if (bundles.length > 0)
+						List<Bundle> bundles = item.getBundles();
+						for (Bundle bundle : bundles)
 						{
-							Bitstream[] bss = bundles[0].getBitstreams();
-							for (int i = 0; i < bss.length; i++)
-							{
-								BitstreamFormat bf = bss[i].getFormat();
-								String format = "application/octet-stream";
-								if (bf != null)
-								{
-									format = bf.getMIMEType();
+							if (swordBundle.equals(bundle.getName())) {
+								List<BundleBitstream> bss = bundle.getBitstreams();
+								for (BundleBitstream bs : bss) {
+									BitstreamFormat bf = bs.getBitstream().getFormat(swordService.getContext());
+									String format = "application/octet-stream";
+									if (bf != null) {
+										format = bf.getMIMEType();
+									}
+									con.setType(format);
+
+									// calculate the bitstream link.
+									String bsLink = urlManager.getBitstreamUrl(bs.getBitstream());
+									con.setSource(bsLink);
+
+									entry.setContent(con);
 								}
-								con.setType(format);
-
-								// calculate the bitstream link.
-								String bsLink = urlManager.getBitstreamUrl(bss[i]);
-								con.setSource(bsLink);
-
-								entry.setContent(con);
+								break;
 							}
 						}
 					}
@@ -119,7 +118,7 @@ public class ItemEntryGenerator extends DSpaceATOMEntry
 						// return a link to the DSpace entry page
 						Content content = new Content();
 						content.setType("text/html");
-						content.setSource(HandleServiceImpl.getCanonicalForm(handle));
+						content.setSource(handleService.getCanonicalForm(handle));
 						entry.setContent(content);
 					}
 				}
@@ -154,9 +153,9 @@ public class ItemEntryGenerator extends DSpaceATOMEntry
 				handle = item.getHandle();
 			}
 
-			if (handle != null && !"".equals(handle))
+			if (StringUtils.isNotBlank(handle))
 			{
-				entry.setId(HandleServiceImpl.getCanonicalForm(handle));
+				entry.setId(handleService.getCanonicalForm(handle));
 				return;
 			}
 		}
@@ -193,30 +192,30 @@ public class ItemEntryGenerator extends DSpaceATOMEntry
 			}
 
 			// link to all the files in the item
-			Bundle[] bundles = item.getBundles("ORIGINAL");
-			for (int i = 0; i < bundles.length ; i++)
-			{
-				Bitstream[] bss = bundles[i].getBitstreams();
-				for (int j = 0; j < bss.length; j++)
-				{
-					Link link = new Link();
-					String url = urlManager.getBitstreamUrl(bss[j]);
-					link.setHref(url);
-					link.setRel("part");
+			List<Bundle> bundles = item.getBundles();
+			for (Bundle bundle : bundles) {
+				if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName())) {
+					List<BundleBitstream> bss = bundle.getBitstreams();
+					for (BundleBitstream bs : bss) {
+						Link link = new Link();
+						String url = urlManager.getBitstreamUrl(bs.getBitstream());
+						link.setHref(url);
+						link.setRel("part");
 
-					BitstreamFormat bsf = bss[j].getFormat();
-					if (bsf != null)
-					{
-						link.setType(bsf.getMIMEType());
+						BitstreamFormat bsf = bs.getBitstream().getFormat(swordService.getContext());
+						if (bsf != null) {
+							link.setType(bsf.getMIMEType());
+						}
+
+						entry.addLink(link);
 					}
-
-					entry.addLink(link);
+					break;
 				}
 			}
 
 			// link to the item splash page
 			Link splash = new Link();
-			splash.setHref(HandleServiceImpl.getCanonicalForm(handle));
+			splash.setHref(handleService.getCanonicalForm(handle));
 			splash.setRel("alternate");
 			splash.setType("text/html");
 			entry.addLink(splash);
@@ -233,10 +232,10 @@ public class ItemEntryGenerator extends DSpaceATOMEntry
 	 */
 	protected void addPublishDate()
 	{
-		Metadatum[] dcv = item.getMetadataByMetadataString("dc.date.issued");
-		if (dcv != null && dcv.length == 1)
+		List<MetadataValue> dcv = itemService.getMetadataByMetadataString(item, "dc.date.issued");
+		if (dcv != null && !dcv.isEmpty())
         {
-            entry.setPublished(dcv[0].value);
+            entry.setPublished(dcv.get(0).getValue());
         }
 	}
 
@@ -250,46 +249,42 @@ public class ItemEntryGenerator extends DSpaceATOMEntry
 			throws DSpaceSWORDException
 	{
 		SWORDUrlManager urlManager = swordService.getUrlManager();
-		
-		try
-		{
-			String handle = this.item.getHandle();
 
-			// if there's no handle, we can't give a link
-			if (handle == null || "".equals(handle))
+		String handle = this.item.getHandle();
+
+		// if there's no handle, we can't give a link
+		if (StringUtils.isBlank(handle))
+        {
+            return;
+        }
+
+		String base = ConfigurationManager.getProperty("dspace.url");
+
+		// if there's no base URL, we are stuck
+		if (base == null)
+        {
+            return;
+        }
+
+		StringBuilder rightsString = new StringBuilder();
+		List<Bundle> bundles = item.getBundles();
+		for (Bundle bundle : bundles) {
+            if (Constants.LICENSE_BUNDLE_NAME.equals(bundle.getName()))
 			{
-				return;
-			}
-
-			String base = ConfigurationManager.getProperty("dspace.url");
-
-			// if there's no base URL, we are stuck
-			if (base == null)
-			{
-				return;
-			}
-
-			StringBuilder rightsString = new StringBuilder();
-			Bundle[] bundles = item.getBundles("LICENSE");
-			for (int i = 0; i < bundles.length; i++)
-			{
-				Bitstream[] bss = bundles[i].getBitstreams();
-				for (int j = 0; j < bss.length; j++)
+                List<BundleBitstream> bss = bundle.getBitstreams();
+                for (BundleBitstream bs : bss)
 				{
-					String url = urlManager.getBitstreamUrl(bss[j]);
-					rightsString.append(url + " ");
-				}
-			}
+                    String url = urlManager.getBitstreamUrl(bs.getBitstream());
+                    rightsString.append(url).append(" ");
+                }
+                break;
+            }
+        }
 
-			Rights rights = new Rights();
-			rights.setContent(rightsString.toString());
-			rights.setType(ContentType.TEXT);
-			entry.setRights(rights);
-		}
-		catch (SQLException e)
-		{
-			throw new DSpaceSWORDException(e);
-		}
+		Rights rights = new Rights();
+		rights.setContent(rightsString.toString());
+		rights.setType(ContentType.TEXT);
+		entry.setRights(rights);
 	}
 
 	/**
@@ -298,13 +293,13 @@ public class ItemEntryGenerator extends DSpaceATOMEntry
 	 */
 	protected void addSummary()
 	{
-		Metadatum[] dcv = item.getMetadataByMetadataString("dc.description.abstract");
+		List<MetadataValue> dcv = itemService.getMetadataByMetadataString(item, "dc.description.abstract");
 		if (dcv != null)
 		{
-			for (int i = 0; i < dcv.length; i++)
+			for (MetadataValue aDcv : dcv)
 			{
 				Summary summary = new Summary();
-				summary.setContent(dcv[i].value);
+				summary.setContent(aDcv.getValue());
 				summary.setType(ContentType.TEXT);
 				entry.setSummary(summary);
 			}
@@ -317,13 +312,13 @@ public class ItemEntryGenerator extends DSpaceATOMEntry
 	 */
 	protected void addTitle()
 	{
-		Metadatum[] dcv = item.getMetadataByMetadataString("dc.title");
+		List<MetadataValue> dcv = itemService.getMetadataByMetadataString(item, "dc.title");
 		if (dcv != null)
 		{
-			for (int i = 0; i < dcv.length; i++)
+			for (MetadataValue aDcv : dcv)
 			{
 				Title title = new Title();
-				title.setContent(dcv[i].value);
+				title.setContent(aDcv.getValue());
 				title.setType(ContentType.TEXT);
 				entry.setTitle(title);
 			}
@@ -337,10 +332,10 @@ public class ItemEntryGenerator extends DSpaceATOMEntry
 	protected void addLastUpdatedDate()
 	{
 		String config = ConfigurationManager.getProperty("sword-server", "updated.field");
-		Metadatum[] dcv = item.getMetadataByMetadataString(config);
-		if (dcv != null && dcv.length == 1)
+		List<MetadataValue> dcv = itemService.getMetadataByMetadataString(item, config);
+		if (dcv != null && dcv.size() == 1)
         {
-            DCDate dcd = new DCDate(dcv[0].value);
+            DCDate dcd = new DCDate(dcv.get(0).getValue());
             entry.setUpdated(dcd.toString());
         }
 	}

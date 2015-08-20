@@ -7,6 +7,8 @@
  */
 package org.dspace.sword;
 
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.purl.sword.base.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
@@ -24,6 +26,7 @@ public class CollectionCollectionGenerator extends ATOMCollectionGenerator
 {
 	/** logger */
 	private static Logger log = Logger.getLogger(CollectionCollectionGenerator.class);
+	protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 
 	/**
 	 * Construct an object taking the sword service instance an argument
@@ -61,16 +64,16 @@ public class CollectionCollectionGenerator extends ATOMCollectionGenerator
 		String location = urlManager.getDepositLocation(col);
 
 		// collection title is just its name
-		String title = col.getMetadata("name");
+		String title = collectionService.getMetadata(col, "name");
 
 		// the collection policy is the licence to which the collection adheres
-		String collectionPolicy = col.getLicense();
+		String collectionPolicy = collectionService.getLicense(col);
 
 		// FIXME: what is the treatment?  Doesn't seem appropriate for DSpace
 		// String treatment = " ";
 
 		// abstract is the short description of the collection
-		String dcAbstract = col.getMetadata("short_description");
+		String dcAbstract = collectionService.getMetadata(col, "short_description");
 
 		// we just do support mediation
 		boolean mediation = swordConfig.isMediated();

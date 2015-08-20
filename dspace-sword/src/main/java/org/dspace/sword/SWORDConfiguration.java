@@ -7,6 +7,8 @@
  */
 package org.dspace.sword;
 
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.content.Collection;
@@ -45,6 +47,8 @@ public class SWORDConfiguration
 
     /** logger */
  	public static final Logger log = Logger.getLogger(SWORDConfiguration.class);
+
+	protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
 
 	/** whether we can support noOp */
 	private boolean noOp = true;
@@ -283,10 +287,9 @@ public class SWORDConfiguration
 			}
 			else if (dso instanceof Item)
 			{
-				BitstreamFormat[] bfs = BitstreamFormat.findNonInternal(context);
-				for (int i = 0; i < bfs.length; i++)
-				{
-					accepts.add(bfs[i].getMIMEType());
+				List<BitstreamFormat> bfs = bitstreamFormatService.findNonInternal(context);
+				for (BitstreamFormat bf : bfs) {
+					accepts.add(bf.getMIMEType());
 				}
 			}
 
