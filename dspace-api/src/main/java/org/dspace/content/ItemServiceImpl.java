@@ -1110,6 +1110,16 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
+    public int countItems(Context context, Community community) throws SQLException {
+        List<Collection> collections = communityService.getAllCollections(context, community);
+        int itemCount = 0;
+        for(Collection collection : collections) {
+            itemCount += countItems(context, collection);
+        }
+        return itemCount;
+    }
+
+    @Override
     protected void getAuthoritiesAndConfidences(String fieldKey, Collection collection, List<String> values, List<String> authorities, List<Integer> confidences, int i) {
         Choices c = choiceAuthorityService.getBestMatch(fieldKey, values.get(i), collection, null);
         authorities.add(c.values.length > 0 ? c.values[0].authority : null);

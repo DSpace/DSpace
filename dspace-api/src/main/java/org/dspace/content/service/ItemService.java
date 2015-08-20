@@ -449,4 +449,11 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      */
     public Iterator<Item> findByLastModifiedSince(Context context, Date last)
             throws SQLException;
+
+/**
+     * counts items in the given community
+     *
+     * @return total items
+     */
+    public int countItems(Context context, Community community) throws SQLException;
 }
