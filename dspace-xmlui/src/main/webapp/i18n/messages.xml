@@ -1907,7 +1907,9 @@
     <message key="xmlui.ExtraLicenseField.LicenseForm.ADDRESS">Address</message>
     <message key="xmlui.ExtraLicenseField.LicenseForm.COUNTRY">Country</message>
     <message key="xmlui.ExtraLicenseField.LicenseForm.EXTRA_EMAIL">Ask user for another email address</message>
-    <message key="xmlui.ExtraLicenseField.LicenseForm.ORGANIZATION">Ask user for organization.</message>
+    <message key="xmlui.ExtraLicenseField.LicenseForm.ORGANIZATION">Ask user for organization (optional).</message>
+	<message key="xmlui.ExtraLicenseField.LicenseForm.REQUIRED_ORGANIZATION">Ask user for organization (mandatory).</message>
+	<message key="xmlui.ExtraLicenseField.LicenseForm.INTENDED_USE">Ask user for his intentions with the item.</message>
 
     <!-- These keys will map to the labels for extra license fields during LicenseStep in submission -->
     <message key="xmlui.ExtraLicenseField.submission.SEND_TOKEN">You will receive an email with download instructions.</message>
@@ -1917,6 +1919,8 @@
     <message key="xmlui.ExtraLicenseField.submission.COUNTRY">Country</message>
     <message key="xmlui.ExtraLicenseField.submission.EXTRA_EMAIL">Email</message>
     <message key="xmlui.ExtraLicenseField.submission.ORGANIZATION">Organization</message>
+	<message key="xmlui.ExtraLicenseField.submission.REQUIRED_ORGANIZATION">Organization</message>
+	<message key="xmlui.ExtraLicenseField.submission.INTENDED_USE">Intended use</message>
 
 	<!-- org.dspace.app.xmlui.administrative.item.FindItemForm -->
 	<message key="xmlui.administrative.item.FindItemForm.title">Find Item</message>
