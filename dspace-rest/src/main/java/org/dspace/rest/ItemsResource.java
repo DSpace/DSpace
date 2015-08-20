@@ -550,7 +550,7 @@ public class ItemsResource extends Resource
             }
 
             dspaceBitstream = org.dspace.content.Bitstream.find(context, dspaceBitstream.getID());
-            bitstream = new Bitstream(dspaceBitstream, "");
+            bitstream = new Bitstream(dspaceBitstream, "", context);
 
             context.complete();
 
