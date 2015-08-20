@@ -7,14 +7,22 @@
  */
 package org.dspace.sword;
 
+import org.apache.commons.lang.StringUtils;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CommunityService;
 import org.purl.sword.base.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Community;
 import org.apache.log4j.Logger;
 
+import java.util.List;
+
 public class CommunityCollectionGenerator extends ATOMCollectionGenerator
 {
 	private static Logger log = Logger.getLogger(CommunityCollectionGenerator.class);
+
+	protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
 
 	public CommunityCollectionGenerator(SWORDService service)
 	{
@@ -43,8 +51,8 @@ public class CommunityCollectionGenerator extends ATOMCollectionGenerator
 		scol.setLocation(location);
 
 		// collection title is just the community name
-		String title = com.getMetadata("name");
-		if (title != null && !"".equals(title))
+		String title = communityService.getName(com);
+		if (StringUtils.isNotBlank(title))
 		{
 			scol.setTitle(title);
 		}
@@ -54,10 +62,14 @@ public class CommunityCollectionGenerator extends ATOMCollectionGenerator
 		// String collectionPolicy = col.getLicense();
 
 		// abstract is the short description of the collection
-		String dcAbstract = com.getMetadata("short_description");
-		if (dcAbstract != null && !"".equals(dcAbstract))
+		List<MetadataValue> abstracts = communityService.getMetadataByMetadataString(com, "short_description");
+		if (abstracts != null && !abstracts.isEmpty())
 		{
-			scol.setAbstract(dcAbstract);
+			String firstValue = abstracts.get(0).getValue();
+			if (StringUtils.isNotBlank(firstValue))
+			{
+				scol.setAbstract(firstValue);
+			}
 		}
 
 		// do we support mediated deposit

@@ -169,7 +169,7 @@ public class SWORDContext
 			// commit the primary context
 			if (context != null && context.isValid())
 			{
-				context.commit();
+				context.complete();
 			}
 
 			// the secondary context is for filtering permissions by only, and is

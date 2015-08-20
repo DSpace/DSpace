@@ -7,6 +7,9 @@
  */
 package org.dspace.sword;
 
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
 import org.purl.sword.base.ServiceDocument;
 import org.purl.sword.base.SWORDErrorException;
 import org.purl.sword.base.Service;
@@ -23,6 +26,9 @@ import java.util.List;
 
 public class ServiceDocumentManager
 {
+	protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+	protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+
 	private SWORDService swordService;
 
 	private SWORDAuthenticator swordAuth;
@@ -125,7 +131,7 @@ public class ServiceDocumentManager
 			{
 				Collection collection = (Collection) dso;
 				Workspace workspace = new Workspace();
-				workspace.setTitle(collection.getMetadata("name"));
+				workspace.setTitle(collectionService.getMetadata(collection, "name"));
 
 				List<Item> items = swordAuth.getAllowedItems(swordContext, collection);
 				for (Item item : items)
@@ -140,7 +146,7 @@ public class ServiceDocumentManager
 			{
 				Community community = (Community) dso;
 				Workspace workspace = new Workspace();
-				workspace.setTitle(community.getMetadata("name"));
+				workspace.setTitle(communityService.getMetadata(community, "name"));
 
 				List<Collection> collections = swordAuth.getAllowedCollections(swordContext, community);
 				for (Collection collection : collections)

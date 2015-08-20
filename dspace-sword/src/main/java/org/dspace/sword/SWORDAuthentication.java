@@ -8,6 +8,8 @@
 package org.dspace.sword;
 
 import org.dspace.authenticate.AuthenticationServiceImpl;
+import org.dspace.authenticate.factory.AuthenticateServiceFactory;
+import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.core.Context;
 import org.dspace.authenticate.AuthenticationMethod;
 
@@ -31,11 +33,8 @@ public class SWORDAuthentication
 	 */
 	public boolean authenticates(Context context, String un, String pw)
 	{
-		int auth = AuthenticationServiceImpl.authenticate(context, un, pw, null, null);
-		if (auth == AuthenticationMethod.SUCCESS)
-		{
-			return true;
-		}
-		return false;
+		AuthenticationService authService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
+		int auth = authService.authenticate(context, un, pw, null, null);
+		return auth == AuthenticationMethod.SUCCESS;
 	}
 }

@@ -10,9 +10,12 @@ package org.dspace.sword;
 import java.sql.SQLException;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.core.Context;
 import org.dspace.content.BitstreamFormat;
 
@@ -33,6 +36,8 @@ public class SWORDService
 {
 	/** Log4j logging instance */
 	public static final Logger log = Logger.getLogger(SWORDService.class);
+
+	protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
 
 	/** The SWORD context of the request */
 	private SWORDContext swordContext;
@@ -152,8 +157,8 @@ public class SWORDService
 	{
 		try
 		{
-			BitstreamFormat bf = BitstreamFormat.findByMIMEType(context, deposit.getContentType());
-			String[] exts = null;
+			BitstreamFormat bf = bitstreamFormatService.findByMIMEType(context, deposit.getContentType());
+			List<String> exts = null;
 			if (bf != null)
 			{
 				exts = bf.getExtensions();
@@ -168,9 +173,9 @@ public class SWORDService
 				{
 					fn = fn + ".original";
 				}
-				if (exts != null)
+				if (exts != null && !exts.isEmpty())
 				{
-					fn = fn + "." + exts[0];
+					fn = fn + "." + exts.get(0);
 				}
 			}
 

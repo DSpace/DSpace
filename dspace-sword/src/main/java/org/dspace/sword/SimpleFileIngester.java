@@ -8,6 +8,13 @@
 package org.dspace.sword;
 
 import java.io.FileInputStream;
+
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
+import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
 import org.purl.sword.base.Deposit;
 import org.purl.sword.base.SWORDErrorException;
 import org.dspace.content.Bitstream;
@@ -20,6 +27,7 @@ import org.dspace.authorize.AuthorizeException;
 
 import java.sql.SQLException;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author Richard Jones
@@ -30,6 +38,11 @@ import java.io.IOException;
  */
 public class SimpleFileIngester implements SWORDIngester
 {
+
+	protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+	protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+	protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+	protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
 
     /**
      * Perform the ingest using the given deposit object onto the specified
@@ -59,15 +72,19 @@ public class SimpleFileIngester implements SWORDIngester
 			Context context = swordService.getContext();
 			SWORDUrlManager urlManager = swordService.getUrlManager();
 
-			Bundle[] bundles = item.getBundles("ORIGINAL");
-			Bundle original;
-			if (bundles.length > 0)
+			List<Bundle> bundles = item.getBundles();
+			Bundle original = null;
+			for (Bundle bundle : bundles)
 			{
-				original = bundles[0];
+				if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName()))
+				{
+					original = bundle;
+					break;
+				}
 			}
-			else
+			if (original == null)
 			{
-				original = item.createBundle("ORIGINAL");
+				original = bundleService.create(context, item, Constants.CONTENT_BUNDLE_NAME);
 			}
 
             Bitstream bs;
@@ -76,7 +93,7 @@ public class SimpleFileIngester implements SWORDIngester
             try
             {
                 fis = new FileInputStream(deposit.getFile());
-                bs = original.createBitstream(fis);
+				bs = bitstreamService.create(context, original, fis);
             }
             finally
             {
@@ -87,26 +104,25 @@ public class SimpleFileIngester implements SWORDIngester
             }
 
 			String fn = swordService.getFilename(context, deposit, false);
-			bs.setName(fn);
+			bs.setName(context, fn);
 
 			swordService.message("File created in item with filename " + fn);
 
-			BitstreamFormat bf = BitstreamFormat.findByMIMEType(context, deposit.getContentType());
+			BitstreamFormat bf = bitstreamFormatService.findByMIMEType(context, deposit.getContentType());
 			if (bf != null)
 			{
-				bs.setFormat(bf);
+				bs.setFormat(context, bf);
 			}
 
 			// to do the updates, we need to ignore authorisation in the context
-			boolean ignoreAuth = context.ignoreAuthorization();
-			context.setIgnoreAuthorization(true);
+			context.turnOffAuthorisationSystem();
 
-			bs.update();
-			original.update();
-			item.update();
+			bitstreamService.update(context, bs);
+			bundleService.update(context, original);
+			itemService.update(context, item);
 
 			// reset the ignore authorisation
-			context.setIgnoreAuthorization(ignoreAuth);
+			context.restoreAuthSystemState();
 
 			DepositResult result = new DepositResult();
 			result.setHandle(urlManager.getBitstreamUrl(bs));
@@ -115,15 +131,7 @@ public class SimpleFileIngester implements SWORDIngester
 
 			return result;
 		}
-		catch (SQLException e)
-		{
-			throw new DSpaceSWORDException(e);
-		}
-		catch (AuthorizeException e)
-		{
-			throw new DSpaceSWORDException(e);
-		}
-		catch (IOException e)
+		catch (SQLException | AuthorizeException | IOException e)
 		{
 			throw new DSpaceSWORDException(e);
 		}
@@ -132,7 +140,7 @@ public class SimpleFileIngester implements SWORDIngester
 	/**
 	 * Get the description of the treatment this class provides to the deposit
 	 * 
-	 * @return
+	 * @return the description
 	 */
 	private String getTreatment()
 	{

@@ -7,20 +7,21 @@
  */
 package org.dspace.sword;
 
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
+import org.apache.commons.lang.StringUtils;
+import org.dspace.content.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.handle.HandleServiceImpl;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.purl.sword.base.SWORDErrorException;
 
 import java.sql.SQLException;
 import java.net.URL;
 import java.net.MalformedURLException;
+import java.util.List;
 
 /**
  * @author Richard Jones
@@ -35,6 +36,8 @@ public class SWORDUrlManager
 
 	/** the active dspace context */
 	private Context context;
+	protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+	protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
 	public SWORDUrlManager(SWORDConfiguration config, Context context)
 	{
@@ -134,7 +137,7 @@ public class SWORDUrlManager
 				throw new SWORDErrorException(DSpaceSWORDErrorCodes.BAD_URL, "The deposit URL is incomplete");
 			}
 
-			DSpaceObject dso = HandleServiceImpl.resolveToObject(context, handle);
+			DSpaceObject dso = handleService.resolveToObject(context, handle);
 
 			if (!(dso instanceof Collection))
 			{
@@ -179,7 +182,7 @@ public class SWORDUrlManager
 				throw new SWORDErrorException(DSpaceSWORDErrorCodes.BAD_URL, "The deposit URL is incomplete");
 			}
 
-			DSpaceObject dso = HandleServiceImpl.resolveToObject(context, handle);
+			DSpaceObject dso = handleService.resolveToObject(context, handle);
 
 			if (!(dso instanceof Collection) && !(dso instanceof Item))
 			{
@@ -258,7 +261,7 @@ public class SWORDUrlManager
 					url = url.substring(0, url.length() - 1);
 				}
 
-				DSpaceObject dso = HandleServiceImpl.resolveToObject(context, url);
+				DSpaceObject dso = handleService.resolveToObject(context, url);
 				if (dso instanceof Collection || dso instanceof Community)
 				{
 					return dso;
@@ -284,8 +287,7 @@ public class SWORDUrlManager
 				{
 					bsid = bsid.substring(0, url.length() - 1);
 				}
-
-                return Bitstream.find(context, Integer.parseInt(bsid));
+				return bitstreamService.findByIdOrLegacyId(context, bsid);
 			}
 			else
 			{
@@ -414,22 +416,22 @@ public class SWORDUrlManager
 	{
 		try
 		{
-			Bundle[] bundles = bitstream.getBundles();
+			List<BundleBitstream> bundles = bitstream.getBundles();
 			Bundle parent = null;
-			if (bundles.length > 0)
+			if (!bundles.isEmpty())
 			{
-				parent = bundles[0];
+				parent = bundles.get(0).getBundle();
 			}
 			else
 			{
 				throw new DSpaceSWORDException("Encountered orphaned bitstream");
 			}
 
-			Item[] items = parent.getItems();
+			List<Item> items = parent.getItems();
 			Item item;
-			if (items.length > 0)
+			if (!items.isEmpty())
 			{
-				item = items[0];
+				item = items.get(0);
 			}
 			else
 			{
@@ -465,7 +467,7 @@ public class SWORDUrlManager
 			throws DSpaceSWORDException
 	{
 		String mlUrl = ConfigurationManager.getProperty("sword-server", "media-link.url");
-		if (mlUrl == null || "".equals(mlUrl))
+		if (StringUtils.isBlank(mlUrl))
 		{
 			String dspaceUrl = ConfigurationManager.getProperty("dspace.baseUrl");
 			if (dspaceUrl == null || "".equals(dspaceUrl))
@@ -520,22 +522,22 @@ public class SWORDUrlManager
 	{
 		try
 		{
-			Bundle[] bundles = bitstream.getBundles();
+			List<BundleBitstream> bundles = bitstream.getBundles();
 			Bundle parent = null;
-			if (bundles.length > 0)
+			if (!bundles.isEmpty())
 			{
-				parent = bundles[0];
+				parent = bundles.get(0).getBundle();
 			}
 			else
 			{
 				throw new DSpaceSWORDException("Encountered orphaned bitstream");
 			}
 
-			Item[] items = parent.getItems();
+			List<Item> items = parent.getItems();
 			Item item;
-			if (items.length > 0)
+			if (!items.isEmpty())
 			{
-				item = items[0];
+				item = items.get(0);
 			}
 			else
 			{
@@ -548,9 +550,7 @@ public class SWORDUrlManager
 				return itemUrl;
 			}
 
-			String bsUrl = itemUrl + "/bitstream/" + bitstream.getID();
-
-			return bsUrl;
+			return itemUrl + "/bitstream/" + bitstream.getID();
 		}
 		catch (SQLException e)
 		{

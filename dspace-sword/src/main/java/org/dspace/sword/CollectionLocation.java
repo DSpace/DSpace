@@ -18,6 +18,8 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleServiceImpl;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 
 /**
  * This class provides a single point of contact for
@@ -31,7 +33,9 @@ public class CollectionLocation
 {
 	/** Log4j logger */
 	public static final Logger log = Logger.getLogger(CollectionLocation.class);
-	
+
+	protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+
 	/**
 	 * Obtain the deposit URL for the given collection.  These URLs
 	 * should not be considered persistent, but will remain consistent
@@ -75,8 +79,8 @@ public class CollectionLocation
 			{
 				throw new DSpaceSWORDException("The deposit URL is incomplete");
 			}
-			
-			DSpaceObject dso = HandleServiceImpl.resolveToObject(context, handle);
+
+			DSpaceObject dso = handleService.resolveToObject(context, handle);
 			
 			if (!(dso instanceof Collection))
 			{

@@ -169,9 +169,8 @@ public class DSpaceSWORDServer implements SWORDServer
 			// prep the service request, then get the service document out of it
 			SWORDService service = new SWORDService(sc);
 			MediaEntryManager manager = new MediaEntryManager(service);
-			AtomDocumentResponse doc = manager.getMediaEntry(adr.getLocation());
 
-			return doc;
+			return manager.getMediaEntry(adr.getLocation());
 		}
 		catch (DSpaceSWORDException e)
 		{

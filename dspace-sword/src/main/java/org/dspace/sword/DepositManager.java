@@ -10,11 +10,15 @@ package org.dspace.sword;
 import java.io.*;
 import java.util.Date;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
@@ -66,8 +70,9 @@ public class DepositManager
 
 		if (dso instanceof Collection)
 		{
+			CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 			swordService.message("Location resolves to collection with handle: " + dso.getHandle() +
-				" and name: " + ((Collection) dso).getMetadata("name"));
+					" and name: " + collectionService.getName((Collection) dso));
 		}
 		else if (dso instanceof Item)
 		{
@@ -147,37 +152,7 @@ public class DepositManager
         {
             result = dep.doDeposit(deposit);
         }
-        catch(DSpaceSWORDException e)
-        {
-            if (swordService.getSwordConfig().isKeepPackageOnFailedIngest())
-            {
-                try
-                {
-                    storePackageAsFile(deposit);
-                }
-                catch(IOException e2)
-                {
-                    log.warn("Unable to store SWORD package as file: " + e);
-                }
-            }
-            throw e;
-        }
-        catch(SWORDErrorException e)
-        {
-            if (swordService.getSwordConfig().isKeepPackageOnFailedIngest())
-            {
-                try
-                {
-                    storePackageAsFile(deposit);
-                }
-                catch(IOException e2)
-                {
-                    log.warn("Unable to store SWORD package as file: " + e);
-                }
-            }
-            throw e;
-        }
-        catch(RuntimeException e)
+        catch (DSpaceSWORDException | SWORDErrorException | RuntimeException e)
         {
             if (swordService.getSwordConfig().isKeepPackageOnFailedIngest())
             {
@@ -200,7 +175,7 @@ public class DepositManager
 		// a record of the handle straight away.
 		String handle = result.getHandle();
 		int state = Deposit.CREATED;
-		if (handle == null || "".equals(handle))
+		if (StringUtils.isBlank(handle))
 		{
 			state = Deposit.ACCEPTED;
 		}
