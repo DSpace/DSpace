@@ -60,7 +60,7 @@
                 <p>For items not commercially published, author permission is all that is needed to
                     allow the Library to add it to MOspace. Library personnel can download items
                     from websites or upload items directly via author submission. Most electronic
-                    formats are accepted for submission. See our <xref target="https://mospace.umsystem.edu/xmlui/pages/add">help page for adding
+                    formats are accepted for submission. See our <xref target="/xmlui/pages/add">help page for adding
                         resources to MOspace</xref> for more information.</p>
                 <p>We look forward to receiving your submissions.</p>
             
@@ -69,8 +69,8 @@
                     developed at MIT.</p>
             
             <hi rend="bold">For More Information</hi>
-                <p>For more information, consult our <xref target="https://mospace.umsystem.edu/xmlui/pages/help">help page</xref>, or 
-                    <xref target="https://mospace.umsystem.edu/xmlui/pages/help">Contact Us</xref>.</p>
+                <p>For more information, consult our <xref target="/xmlui/pages/help">help page</xref>, or 
+                    <xref target="/xmlui/pages/contact">Contact Us</xref>.</p>
 <hi rend="bold">Additional University of Missouri Online Library Repositories</hi>
 
 <list>
