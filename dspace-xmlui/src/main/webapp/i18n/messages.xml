@@ -935,7 +935,7 @@
     <message key="xmlui.ufal.UFALLicenceAgreement.head">Licence Agreement</message>
     <message key="xmlui.ufal.UFALLicenceAgreement.trail_item">Item</message>
     <message key="xmlui.ufal.UFALLicenceAgreement.trail_license_agreement">Licence Agreement</message>
-    <message key="xmlui.ufal.UFALLicenceAgreement.agree_message">The requested content is distributed under one or more licence(s). You have to agree to the licence(s) below before you can obtain the content. Please, read the licence(s) by clicking on the button(s) carefully.</message>
+    <message key="xmlui.ufal.UFALLicenceAgreement.agree_message">The requested content is distributed under one or more licence(s). You have to agree to the licence(s) below before you can obtain the content. Please, view the licence(s) by clicking on the button(s) and read it carefully. The data filled below might be shared with the submitter of the item and/or for creating statistics.</message>
     <message key="xmlui.ufal.UFALLicenceAgreement.functionality_blocked">UFALLicenceAgreement functionality has been blocked at configuration file.</message>
     <message key="xmlui.ufal.UFALLicenceAgreement.signer_message">By clicking on the button below I, SIGNER with the above ID, agree to the <b>LICENCE(s)</b> restricting the usage of requested BITSTREAM(s).</message>
 

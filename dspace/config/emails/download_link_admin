@@ -9,19 +9,21 @@
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: ${lr.dspace.name.short}: New File Download Request
+Subject: ${lr.dspace.name.short}: New File Download Request (CC)
+
+This is an information for administrators and other configured people about a new download request.
 
 User Details:
 	Name: {3}
 	Email: {4}
 	
-Link of the requested file:
+Link of the requested file (does not contain the download token):
 	{1}
   
 The file is distributed under specific license:
 	{2}
 
-Extra MetaData Provided by user:
+Extra information filled by the user:
 	{5}
 
 ${lr.dspace.name.short} Team
