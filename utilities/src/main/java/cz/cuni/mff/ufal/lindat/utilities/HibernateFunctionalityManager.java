@@ -99,6 +99,7 @@ public class HibernateFunctionalityManager implements IFunctionalities {
 			switch (license.getConfirmation()) {
 
 			case 2:
+			case 3:
 				result.add(license);
 				break;
 			case 0:

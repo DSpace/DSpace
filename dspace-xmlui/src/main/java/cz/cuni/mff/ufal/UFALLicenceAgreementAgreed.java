@@ -47,7 +47,11 @@ public class UFALLicenceAgreementAgreed {
 			// Loading variables through the web browser
 			Request request = ObjectModelHelper.getRequest(objectModel);
 
+			int eID = 0;
 			EPerson eperson = context.getCurrentUser();
+			if(eperson!=null) {
+				eID = eperson.getID();
+			}
 
 			String handle = request.getParameter("item-handle");
 
@@ -101,7 +105,7 @@ public class UFALLicenceAgreementAgreed {
 				List<LicenseResourceMapping> mappings = functionalityManager.getAllMappings(bitstreamID);
 
 				UserRegistration user = new UserRegistration();
-				user.setEpersonId(eperson.getID());
+				user.setEpersonId(eID);
 
 				for (LicenseResourceMapping mapping : mappings) {
 					Set<LicenseResourceUserAllowance> allowances = mapping.getLicenseResourceUserAllowances();

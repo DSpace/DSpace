@@ -123,6 +123,13 @@ public class UFALLicenceAgreement extends AbstractDSpaceTransformer {
 			int bitstreamID = parameters.getParameterAsInteger("bitstreamId", -1);
 
 			ArrayList<String> licenseRequiresExtra = new ArrayList<String>();
+			
+			int userID = 0; 
+			try{
+				userID = context.getCurrentUser().getID();
+			}catch(NullPointerException e) {
+				userID = 0;
+			}			
 
 			if (allzip) {
 
@@ -136,7 +143,6 @@ public class UFALLicenceAgreement extends AbstractDSpaceTransformer {
 				}
 			} else {
 			
-				int userID = context.getCurrentUser().getID();
 				java.util.List<LicenseDefinition> licenses = functionalityManager.getLicensesToAgree(userID, bitstreamID);
 
 				//if there are no licenses to agree, display what allzip would (but we shouldn't get here in that case)
@@ -174,25 +180,37 @@ public class UFALLicenceAgreement extends AbstractDSpaceTransformer {
 			form.addHidden("allzip").setValue(String.valueOf(allzip));
 			form.addHidden("bitstreamId").setValue(bitstreamID);
 			
-			String personCredentials = context.getCurrentUser().getFirstName() + " " + context.getCurrentUser().getLastName();
-			String personId = context.getCurrentUser().getEmail();
+			String personCredentials = "";
+			String personId = "";
+			
+			if(userID != 0) {
+				personCredentials = context.getCurrentUser().getFirstName() + " " + context.getCurrentUser().getLastName();
+				personId = context.getCurrentUser().getEmail();
+			}
 			
 			String header_rend = "bold";
 			Table table = form.addTable("user-info", 4 + licenseRequiresExtra.size(), 2);
 			
 			// Signer name row
-            Row r = table.addRow();
-            r.addCell(null, null, header_rend).addContent("Signer");
-            Text nameTextField = r.addCell().addHighlight("bold").addText("name");
-            nameTextField.setValue(personCredentials);
-            nameTextField.setDisabled();
+            Row r =  null;
+
+            if(userID != 0) {
+	            r =  table.addRow();
+	            r.addCell(null, null, header_rend).addContent("Signer");
+	            Text nameTextField = r.addCell().addHighlight("bold").addText("name");
+	            nameTextField.setValue(personCredentials);            
+            	nameTextField.setDisabled();
+            }
 			
             // Signer ID (email address of the user)
             r = table.addRow();
-            r.addCell(null, null, header_rend).addContent("User ID");
-            Text t = r.addCell().addHighlight("bold").addText("user-id");
-            t.setValue(personId);
-            t.setDisabled();
+            Text t = null;
+            if(userID != 0) {            
+	            r.addCell(null, null, header_rend).addContent("User ID");            
+	            t = r.addCell().addHighlight("bold").addText("user-id");
+	            t.setValue(personId);
+            	t.setDisabled();
+            }
 
             // Item handle
             r = table.addRow();
@@ -223,7 +241,9 @@ public class UFALLicenceAgreement extends AbstractDSpaceTransformer {
 	            		session.removeAttribute("extra_" + exField.name());
 	            	} else
 	            	if(exField.equals(ExtraLicenseField.ORGANIZATION)) {
-	            		val = (String)functionalityManager.getRegisteredUser(eperson.getID()).getOrganization();
+	            		if(userID!=0) {
+	            			val = (String)functionalityManager.getRegisteredUser(eperson.getID()).getOrganization();
+	            		}
 	            		t.setValue(val);
 	            		session.removeAttribute("extra_" + exField.name());	            		
 	            	}
