@@ -173,7 +173,7 @@ class SendEmailAction implements Action {
 		}
 
 		Email email2User = Email.getEmail(I18nUtil.getEmailFilename(locale, "download_link"));
-		if(email!=null || !email.isEmpty()) {
+		if(email!=null && !email.isEmpty()) {
 			email2User.addRecipient(email);
 		}
         if(extraMetadata.containsKey(ExtraLicenseField.EXTRA_EMAIL.toString())) {
