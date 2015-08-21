@@ -223,9 +223,14 @@ class SendEmailAction implements Action {
         	email2Admin.addArgument(link.toString());
     		for(LicenseDefinition license : licenses) {
     			email2Admin.addArgument(license.getDefinition());
-    		}        	
-        	email2Admin.addArgument(eperson.getFullName());
-        	email2Admin.addArgument(eperson.getEmail());
+    		}
+			if(eperson != null) {
+				email2Admin.addArgument(eperson.getFullName());
+				email2Admin.addArgument(eperson.getEmail());
+			}else{
+				email2Admin.addArgument("Anonymous user");
+				email2Admin.addArgument("Anonymous user");
+			}
         	StringBuffer exdata = new StringBuffer();
         	for(String key : extraMetadata.keySet()) {
         		exdata.append(key).append(": ").append(extraMetadata.get(key).toString());
