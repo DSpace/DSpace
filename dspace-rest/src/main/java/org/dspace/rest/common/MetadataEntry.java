@@ -8,6 +8,7 @@
 package org.dspace.rest.common;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.regex.Pattern;
 
 /**
  * @author peterdietz, Rostislav Novak (Computing and Information Centre, CTU in
@@ -62,6 +63,25 @@ public class MetadataEntry
     public void setLanguage(String language)
     {
         this.language = language;
+    }
+
+    public String getSchema() {
+        String[] fieldPieces = key.split(Pattern.quote("."));
+        return fieldPieces[0];
+    }
+
+    public String getElement() {
+        String[] fieldPieces = key.split(Pattern.quote("."));
+        return fieldPieces[1];
+    }
+
+    public String getQualifier() {
+        String[] fieldPieces = key.split(Pattern.quote("."));
+        if(fieldPieces.length == 3) {
+            return fieldPieces[2];
+        } else {
+            return null;
+        }
     }
 
 }

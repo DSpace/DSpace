@@ -23,8 +23,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.rest.common.Status;
 import org.dspace.rest.common.User;
 import org.dspace.rest.exceptions.ContextException;
@@ -38,6 +39,7 @@ import org.dspace.rest.exceptions.ContextException;
  */
 @Path("/")
 public class RestIndex {
+    protected EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
     private static Logger log = Logger.getLogger(RestIndex.class);
 
     @javax.ws.rs.core.Context public static ServletContext servletContext;
@@ -212,7 +214,7 @@ public class RestIndex {
 
             if(ePerson != null) {
                 //DB EPerson needed since token won't have full info, need context
-                EPerson dbEPerson = EPerson.findByEmail(context, ePerson.getEmail());
+                EPerson dbEPerson = epersonService.findByEmail(context, ePerson.getEmail());
                 String token = Resource.getToken(headers);
                 Status status = new Status(dbEPerson.getEmail(), dbEPerson.getFullName(), token);
                 return status;
@@ -223,8 +225,6 @@ public class RestIndex {
             Resource.processException("Status context error: " + e.getMessage(), context);
         } catch (SQLException e) {
             Resource.processException("Status eperson db lookup error: " + e.getMessage(), context);
-        } catch (AuthorizeException e) {
-            Resource.processException("Status eperson authorize exception: " + e.getMessage(), context);
         } finally {
             context.abort();
         }

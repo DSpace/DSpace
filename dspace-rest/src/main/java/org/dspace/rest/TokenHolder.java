@@ -16,8 +16,13 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
+import org.dspace.authenticate.AuthenticationMethod;
+import org.dspace.authenticate.factory.AuthenticateServiceFactory;
+import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.rest.common.User;
 
 /**
@@ -29,6 +34,7 @@ import org.dspace.rest.common.User;
  */
 public class TokenHolder
 {
+
 
     private static final Logger log = Logger.getLogger(TokenHolder.class);
 
@@ -53,43 +59,36 @@ public class TokenHolder
      */
     public static String login(User user) throws WebApplicationException
     {
+        AuthenticationService authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
+        EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
+
         org.dspace.core.Context context = null;
         String token = null;
 
         try
         {
             context = new org.dspace.core.Context();
-            EPerson dspaceUser = EPerson.findByEmail(context, user.getEmail());
 
-            if ((dspaceUser == null) || (!dspaceUser.checkPassword(user.getPassword())))
+            int status = authenticationService.authenticate(context, user.getEmail(), user.getPassword(), null, null);
+            if (status == AuthenticationMethod.SUCCESS)
             {
-                token = null;
-            }
-            else if (tokens.containsKey(user.getEmail()))
-            {
-                token = tokens.get(user.getEmail());
-            }
-            else
-            {
-                token = generateToken();
-                persons.put(token, dspaceUser);
-                tokens.put(user.getEmail(), token);
+                EPerson ePerson = epersonService.findByEmail(context, user.getEmail());
+                if(tokens.containsKey(ePerson.getEmail())) {
+                    token = tokens.get(ePerson.getEmail());
+                } else {
+                    token = generateToken();
+                    persons.put(token, ePerson);
+                    tokens.put(ePerson.getEmail(), token);
+                }
             }
 
-            log.trace("User(" + user.getEmail() + ") has been logged.");
+            log.trace("User(" + user.getEmail() + ") has been logged in.");
             context.complete();
-
         }
         catch (SQLException e)
         {
             context.abort();
             log.error("Could not read user from database. Message:" + e);
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        }
-        catch (AuthorizeException e)
-        {
-            context.abort();
-            log.error("Could not find user, AuthorizeException. Message:" + e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
         finally
