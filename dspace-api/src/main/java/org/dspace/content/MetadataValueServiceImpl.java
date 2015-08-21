@@ -102,4 +102,12 @@ public class MetadataValueServiceImpl implements MetadataValueService {
     public void deleteByMetadataField(Context context, MetadataField metadataField) throws SQLException {
         metadataValueDAO.deleteByMetadataField(context, metadataField);
     }
+
+    @Override
+    public MetadataValue getMinimum(Context context, int metadataFieldId)
+            throws SQLException
+    {
+        return metadataValueDAO.getMinimum(context,
+                metadataFieldId);
+    }
 }

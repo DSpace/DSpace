@@ -55,4 +55,15 @@ public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> im
         query.setParameter("metadataField", metadataField);
         query.executeUpdate();
     }
+
+    @Override
+    public MetadataValue getMinimum(Context context, int metadataFieldId)
+            throws SQLException
+    {
+        String queryString = "SELECT m FROM metadatavalue WHERE metadata_field_id = :metadata_field_id ORDER BY value";
+        Query query = createQuery(context, queryString);
+        query.setParameter("metadata_field_id", metadataFieldId);
+        query.setMaxResults(1);
+        return (MetadataValue) query.uniqueResult();
+    }
 }

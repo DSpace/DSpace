@@ -10,7 +10,6 @@ package org.dspace.xoai.filter;
 import java.util.ArrayList;
 import java.util.List;
 import org.dspace.core.Context;
-import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.xoai.data.DSpaceItem;
 import org.dspace.xoai.filter.results.DatabaseFilterResult;
 import org.dspace.xoai.filter.results.SolrFilterResult;
@@ -34,8 +33,6 @@ public class DSpaceWithdrawnFilter extends DSpaceFilter {
         List<Object> params = new ArrayList<>();
 
         String filter = "i.withdrawn=TRUE";
-        if(DatabaseManager.isOracle())
-            filter = "i.withdrawn=1";
 
         return new DatabaseFilterResult(filter, params);
     }

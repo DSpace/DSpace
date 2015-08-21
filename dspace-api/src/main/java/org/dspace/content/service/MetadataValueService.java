@@ -80,4 +80,15 @@ public interface MetadataValueService {
     public List<MetadataValue> findByValueLike(Context context, String value) throws SQLException;
 
     public void deleteByMetadataField(Context context, MetadataField metadataField) throws SQLException;
+
+    /**
+     * Get the minimum value of a given metadata field across all objects.
+     *
+     * @param context
+     * @param metadataFieldId unique identifier of the interesting field.
+     * @return
+     * @throws SQLException
+     */
+    public MetadataValue getMinimum(Context context, int metadataFieldId)
+            throws SQLException;
 }

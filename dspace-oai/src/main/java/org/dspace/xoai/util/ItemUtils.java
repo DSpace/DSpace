@@ -14,7 +14,6 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bundle;
-import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
@@ -31,7 +30,9 @@ import org.dspace.content.BundleBitstream;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Context;
 
 /**
  * 
@@ -44,6 +45,9 @@ public class ItemUtils
 
     private static final ItemService itemService
             = ContentServiceFactory.getInstance().getItemService();
+
+    private static final BitstreamService bitstreamService
+            = ContentServiceFactory.getInstance().getBitstreamService();
 
     private static Element getElement(List<Element> list, String name)
     {
@@ -68,7 +72,7 @@ public class ItemUtils
         e.setName(name);
         return e;
     }
-    public static Metadata retrieveMetadata (Item item) {
+    public static Metadata retrieveMetadata (Context context, Item item) {
         Metadata metadata;
         
         //DSpaceDatabaseItem dspaceItem = new DSpaceDatabaseItem(item);
@@ -188,9 +192,9 @@ public class ItemUtils
                     }
                     if (bsName == null)
                     {
-                        String ext[] = bit.getBitstream().getFormat().getExtensions();
+                        List<String> ext = bit.getBitstream().getFormat(context).getExtensions();
                         bsName = "bitstream_" + sid
-                                + (ext.length > 0 ? ext[0] : "");
+                                + (ext.isEmpty() ? "" : ext.get(0));
                     }
                     if (handle != null && baseUrl != null)
                     {
@@ -220,7 +224,7 @@ public class ItemUtils
                         bitstream.getField().add(
                                 createValue("description", description));
                     bitstream.getField().add(
-                            createValue("format", bit.getBitstream().getFormat()
+                            createValue("format", bit.getBitstream().getFormat(context)
                                     .getMIMEType()));
                     bitstream.getField().add(
                             createValue("size", "" + bit.getBitstream().getSize()));
@@ -279,7 +283,7 @@ public class ItemUtils
                     InputStream in;
                     try
                     {
-                        in = licBit.getBitstream().retrieve();
+                        in = bitstreamService.retrieve(context, licBit.getBitstream());
                         ByteArrayOutputStream out = new ByteArrayOutputStream();
                         Utils.bufferedCopy(in, out);
                         license.getField().add(

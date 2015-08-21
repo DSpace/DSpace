@@ -8,8 +8,6 @@
 package org.dspace.xoai.services.impl.database;
 
 import org.dspace.core.Context;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.xoai.exceptions.InvalidMetadataFieldException;
 import org.dspace.xoai.services.api.database.FieldResolver;
 
