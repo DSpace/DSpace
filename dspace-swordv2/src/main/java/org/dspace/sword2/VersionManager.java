@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 public class VersionManager
@@ -35,11 +36,13 @@ public class VersionManager
 			throws SQLException, AuthorizeException, IOException
 	{
 		boolean keep = ConfigurationManager.getBooleanProperty("swordv2-server", "versions.keep");
-		List<Bundle> bundles = item.getBundles();
-		for (Bundle b : bundles)
+		Iterator<Bundle> bundles = item.getBundles().iterator();
+		while (bundles.hasNext())
 		{
+			Bundle b = bundles.next();
 			if (name.equals(b.getName()))
 			{
+				bundles.remove();
 				this.removeBundle(context, item, b, keep);
 			}
 		}
@@ -62,9 +65,11 @@ public class VersionManager
 		}
 
         // remove all the bitstreams from the bundle
-		List<BundleBitstream> bundleBitstreams = source.getBitstreams();
-		for (BundleBitstream bundleBitstream : bundleBitstreams)
+		Iterator<BundleBitstream> bundleBitstreams = source.getBitstreams().iterator();
+		while (bundleBitstreams.hasNext())
 		{
+			BundleBitstream bundleBitstream = bundleBitstreams.next();
+			bundleBitstreams.remove();
 			bundleService.removeBitstream(context, source, bundleBitstream.getBitstream());
 		}
 
@@ -88,11 +93,13 @@ public class VersionManager
 			exempt = this.archiveBitstream(context, item, bitstream);
 		}
 
-		List<BundleBitstream> bundleBitstreams = bitstream.getBundles();
-		for (BundleBitstream bundleBitstream : bundleBitstreams)
+		Iterator<BundleBitstream> bundleBitstreams = bitstream.getBundles().iterator();
+		while (bundleBitstreams.hasNext())
 		{
+			BundleBitstream bundleBitstream = bundleBitstreams.next();
 			if (exempt != null && bundleBitstream.getBundle().getID() != exempt.getID())
 			{
+				bundleBitstreams.remove();
 				bundleService.removeBitstream(context, bundleBitstream.getBundle(), bitstream);
 			}
 		}
