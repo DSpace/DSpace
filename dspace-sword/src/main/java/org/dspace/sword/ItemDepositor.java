@@ -8,21 +8,23 @@
 package org.dspace.sword;
 
 import org.apache.commons.lang.StringUtils;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.Context;
 import org.purl.sword.base.Deposit;
-import org.purl.sword.base.SWORDErrorException;
 import org.purl.sword.base.ErrorCodes;
+import org.purl.sword.base.SWORDErrorException;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
 
 public class ItemDepositor extends Depositor
@@ -178,9 +180,12 @@ public class ItemDepositor extends Depositor
 			// from them.  This will ensure that the bitstream is physically
 			// removed from the disk.
 			Bitstream bs = result.getBitstream();
-			List<BundleBitstream> b2bs = bs.getBundles();
-			for (BundleBitstream b2b : b2bs) {
-				Bundle bundle = b2b.getBundle();
+			Iterator<BundleBitstream> b2bs = bs.getBundles().iterator();
+			while (b2bs.hasNext())
+			{
+				BundleBitstream bundleBitstream = b2bs.next();
+				b2bs.remove();
+				Bundle bundle = bundleBitstream.getBundle();
 				bundleService.removeBitstream(sc.getContext(), bundle, bs);
 				bundleService.update(sc.getContext(), bundle);
 			}

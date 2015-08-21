@@ -9,7 +9,6 @@ package org.dspace.sword2;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
@@ -21,26 +20,12 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.swordapp.server.AuthCredentials;
-import org.swordapp.server.Deposit;
-import org.swordapp.server.DepositReceipt;
-import org.swordapp.server.MediaResource;
-import org.swordapp.server.MediaResourceManager;
-import org.swordapp.server.SwordAuthException;
-import org.swordapp.server.SwordConfiguration;
-import org.swordapp.server.SwordError;
-import org.swordapp.server.SwordServerException;
-import org.swordapp.server.UriRegistry;
+import org.swordapp.server.*;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaResourceManager
 {
@@ -732,11 +717,15 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI implements MediaR
 		{
 			// remove content only really means everything from the ORIGINAL bundle
 			VersionManager vm = new VersionManager();
-			List<Bundle> bundles = item.getBundles();
-			for (Bundle bundle : bundles)
+			Iterator<Bundle> bundles = item.getBundles().iterator();
+			while (bundles.hasNext())
 			{
+                Bundle bundle = bundles.next();
                 if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName()))
-				vm.removeBundle(swordContext.getContext(), item, bundle);
+                {
+                    bundles.remove();
+                    vm.removeBundle(swordContext.getContext(), item, bundle);
+                }
 			}
 		}
 		catch (SQLException | IOException e)

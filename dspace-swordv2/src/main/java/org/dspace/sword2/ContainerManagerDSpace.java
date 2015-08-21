@@ -9,10 +9,8 @@ package org.dspace.sword2;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.Collection;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
@@ -24,14 +22,7 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.workflow.WorkflowItemService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
-import org.swordapp.server.AuthCredentials;
-import org.swordapp.server.ContainerManager;
-import org.swordapp.server.Deposit;
-import org.swordapp.server.DepositReceipt;
-import org.swordapp.server.SwordAuthException;
-import org.swordapp.server.SwordConfiguration;
-import org.swordapp.server.SwordError;
-import org.swordapp.server.SwordServerException;
+import org.swordapp.server.*;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -790,11 +781,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI implements ContainerM
 			}
 
 			// then delete the item
-			List<Collection> collections = item.getCollections();
-			for (Collection collection : collections)
-			{
-				collectionService.removeItem(context, collection, item);
-			}
+            itemService.delete(context, item);
 		}
 		catch (SQLException | IOException e)
 		{
