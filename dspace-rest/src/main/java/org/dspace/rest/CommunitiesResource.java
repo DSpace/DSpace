@@ -7,34 +7,28 @@
  */
 package org.dspace.rest;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeServiceImpl;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
 import org.dspace.rest.common.Collection;
 import org.dspace.rest.common.Community;
 import org.dspace.rest.exceptions.ContextException;
 import org.dspace.usage.UsageEvent;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class which provides CRUD methods over communities.
@@ -45,6 +39,10 @@ import org.dspace.usage.UsageEvent;
 @Path("/communities")
 public class CommunitiesResource extends Resource
 {
+    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+
     private static Logger log = Logger.getLogger(CommunitiesResource.class);
 
     /**
@@ -151,7 +149,7 @@ public class CommunitiesResource extends Resource
         {
             context = createContext(getUser(headers));
 
-            org.dspace.content.Community[] dspaceCommunities = org.dspace.content.Community.findAll(context);
+            List<org.dspace.content.Community> dspaceCommunities = communityService.findAll(context);
             communities = new ArrayList<Community>();
 
             if (!((limit != null) && (limit >= 0) && (offset != null) && (offset >= 0)))
@@ -161,12 +159,12 @@ public class CommunitiesResource extends Resource
                 offset = 0;
             }
 
-            for (int i = offset; (i < (offset + limit)) && i < dspaceCommunities.length; i++)
+            for (int i = offset; (i < (offset + limit)) && i < dspaceCommunities.size(); i++)
             {
-                if (AuthorizeServiceImpl.authorizeActionBoolean(context, dspaceCommunities[i], org.dspace.core.Constants.READ))
+                if (authorizeService.authorizeActionBoolean(context, dspaceCommunities.get(i), org.dspace.core.Constants.READ))
                 {
-                    Community community = new Community(dspaceCommunities[i], expand, context);
-                    writeStats(dspaceCommunities[i], UsageEvent.Action.VIEW, user_ip, user_agent,
+                    Community community = new Community(dspaceCommunities.get(i), expand, context);
+                    writeStats(dspaceCommunities.get(i), UsageEvent.Action.VIEW, user_ip, user_agent,
                             xforwardedfor, headers, request, context);
                     communities.add(community);
                 }
@@ -233,22 +231,22 @@ public class CommunitiesResource extends Resource
         {
             context = createContext(getUser(headers));
 
-            org.dspace.content.Community[] dspaceCommunities = org.dspace.content.Community.findAllTop(context);
+            List<org.dspace.content.Community> dspaceCommunities = communityService.findAllTop(context);
             communities = new ArrayList<Community>();
 
             if (!((limit != null) && (limit >= 0) && (offset != null) && (offset >= 0)))
             {
-                log.warn("Pagging was badly set, using default values.");
+                log.warn("Paging was badly set, using default values.");
                 limit = 100;
                 offset = 0;
             }
 
-            for (int i = offset; (i < (offset + limit)) && i < dspaceCommunities.length; i++)
+            for (int i = offset; (i < (offset + limit)) && i < dspaceCommunities.size(); i++)
             {
-                if (AuthorizeServiceImpl.authorizeActionBoolean(context, dspaceCommunities[i], org.dspace.core.Constants.READ))
+                if (authorizeService.authorizeActionBoolean(context, dspaceCommunities.get(i), org.dspace.core.Constants.READ))
                 {
-                    Community community = new Community(dspaceCommunities[i], expand, context);
-                    writeStats(dspaceCommunities[i], UsageEvent.Action.VIEW, user_ip, user_agent,
+                    Community community = new Community(dspaceCommunities.get(i), expand, context);
+                    writeStats(dspaceCommunities.get(i), UsageEvent.Action.VIEW, user_ip, user_agent,
                             xforwardedfor, headers, request, context);
                     communities.add(community);
                 }
@@ -327,13 +325,13 @@ public class CommunitiesResource extends Resource
             }
 
             collections = new ArrayList<Collection>();
-            org.dspace.content.Collection[] dspaceCollections = dspaceCommunity.getCollections();
-            for (int i = offset; (i < (offset + limit)) && (i < dspaceCollections.length); i++)
+            List<org.dspace.content.Collection> dspaceCollections = dspaceCommunity.getCollections();
+            for (int i = offset; (i < (offset + limit)) && (i < dspaceCollections.size()); i++)
             {
-                if (AuthorizeServiceImpl.authorizeActionBoolean(context, dspaceCollections[i], org.dspace.core.Constants.READ))
+                if (authorizeService.authorizeActionBoolean(context, dspaceCollections.get(i), org.dspace.core.Constants.READ))
                 {
-                    collections.add(new Collection(dspaceCollections[i], expand, context, 20, 0));
-                    writeStats(dspaceCollections[i], UsageEvent.Action.VIEW, user_ip, user_agent,
+                    collections.add(new Collection(dspaceCollections.get(i), expand, context, 20, 0));
+                    writeStats(dspaceCollections.get(i), UsageEvent.Action.VIEW, user_ip, user_agent,
                             xforwardedfor, headers, request, context);
                 }
             }
@@ -413,13 +411,13 @@ public class CommunitiesResource extends Resource
             }
 
             communities = new ArrayList<Community>();
-            org.dspace.content.Community[] dspaceCommunities = dspaceCommunity.getSubcommunities();
-            for (int i = offset; (i < (offset + limit)) && (i < dspaceCommunities.length); i++)
+            List<org.dspace.content.Community> dspaceCommunities = dspaceCommunity.getSubcommunities();
+            for (int i = offset; (i < (offset + limit)) && (i < dspaceCommunities.size()); i++)
             {
-                if (AuthorizeServiceImpl.authorizeActionBoolean(context, dspaceCommunities[i], org.dspace.core.Constants.READ))
+                if (authorizeService.authorizeActionBoolean(context, dspaceCommunities.get(i), org.dspace.core.Constants.READ))
                 {
-                    communities.add(new Community(dspaceCommunities[i], expand, context));
-                    writeStats(dspaceCommunities[i], UsageEvent.Action.VIEW, user_ip, user_agent,
+                    communities.add(new Community(dspaceCommunities.get(i), expand, context));
+                    writeStats(dspaceCommunities.get(i), UsageEvent.Action.VIEW, user_ip, user_agent,
                             xforwardedfor, headers, request, context);
                 }
             }
@@ -476,7 +474,7 @@ public class CommunitiesResource extends Resource
         {
             context = createContext(getUser(headers));
 
-            if (!AuthorizeServiceImpl.isAdmin(context))
+            if (!authorizeService.isAdmin(context))
             {
                 context.abort();
                 String user = "anonymous";
@@ -488,16 +486,15 @@ public class CommunitiesResource extends Resource
                 throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }
 
-            org.dspace.content.Community dspaceCommunity = org.dspace.content.Community.create(null, context);
+            org.dspace.content.Community dspaceCommunity = communityService.create(null, context);
             writeStats(dspaceCommunity, UsageEvent.Action.CREATE, user_ip, user_agent, xforwardedfor,
                     headers, request, context);
 
-            dspaceCommunity.setMetadata("name", community.getName());
-            dspaceCommunity.setMetadata(org.dspace.content.Community.COPYRIGHT_TEXT, community.getCopyrightText());
-            dspaceCommunity.setMetadata(org.dspace.content.Community.INTRODUCTORY_TEXT, community.getIntroductoryText());
-            dspaceCommunity.setMetadata(org.dspace.content.Community.SHORT_DESCRIPTION, community.getShortDescription());
-            dspaceCommunity.setMetadata(org.dspace.content.Community.SIDEBAR_TEXT, community.getSidebarText());
-            dspaceCommunity.update();
+            communityService.setMetadata(context, dspaceCommunity, "name", community.getName());
+            communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.COPYRIGHT_TEXT, community.getCopyrightText());
+            communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.INTRODUCTORY_TEXT, community.getIntroductoryText());
+            communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.SHORT_DESCRIPTION, community.getShortDescription());
+            communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.SIDEBAR_TEXT, community.getSidebarText());
 
             retCommunity = new Community(dspaceCommunity, "", context);
             context.complete();
@@ -565,17 +562,15 @@ public class CommunitiesResource extends Resource
             writeStats(dspaceCommunity, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
                     headers, request, context);
 
-            org.dspace.content.Collection dspaceCollection = dspaceCommunity.createCollection();
-            dspaceCollection.setLicense(collection.getLicense());
+            org.dspace.content.Collection dspaceCollection = collectionService.create(context, dspaceCommunity);
+
+            collectionService.setMetadata(context, dspaceCollection, "license", collection.getLicense());
             // dspaceCollection.setLogo(collection.getLogo()); // TODO Add this option.
-            dspaceCollection.setMetadata("name", collection.getName());
-            dspaceCollection.setMetadata(org.dspace.content.Collection.COPYRIGHT_TEXT, collection.getCopyrightText());
-            dspaceCollection.setMetadata(org.dspace.content.Collection.INTRODUCTORY_TEXT, collection.getIntroductoryText());
-            dspaceCollection.setMetadata(org.dspace.content.Collection.SHORT_DESCRIPTION, collection.getShortDescription());
-            dspaceCollection.setMetadata(org.dspace.content.Collection.SIDEBAR_TEXT, collection.getSidebarText());
-            dspaceCollection.setLicense(collection.getLicense());
-            dspaceCollection.update();
-            dspaceCommunity.update();
+            collectionService.setMetadata(context, dspaceCollection, "name", collection.getName());
+            collectionService.setMetadata(context, dspaceCollection, org.dspace.content.Collection.COPYRIGHT_TEXT, collection.getCopyrightText());
+            collectionService.setMetadata(context, dspaceCollection, org.dspace.content.Collection.INTRODUCTORY_TEXT, collection.getIntroductoryText());
+            collectionService.setMetadata(context, dspaceCollection, org.dspace.content.Collection.SHORT_DESCRIPTION, collection.getShortDescription());
+            collectionService.setMetadata(context, dspaceCollection, org.dspace.content.Collection.SIDEBAR_TEXT, collection.getSidebarText());
 
             retCollection = new Collection(dspaceCollection, "", context, 100, 0);
             context.complete();
@@ -650,14 +645,12 @@ public class CommunitiesResource extends Resource
             writeStats(dspaceParentCommunity, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
                     headers, request, context);
 
-            org.dspace.content.Community dspaceCommunity = org.dspace.content.Community.create(dspaceParentCommunity, context);
-            dspaceCommunity.setMetadata("name", community.getName());
-            dspaceCommunity.setMetadata(org.dspace.content.Community.COPYRIGHT_TEXT, community.getCopyrightText());
-            dspaceCommunity.setMetadata(org.dspace.content.Community.INTRODUCTORY_TEXT, community.getIntroductoryText());
-            dspaceCommunity.setMetadata(org.dspace.content.Community.SHORT_DESCRIPTION, community.getShortDescription());
-            dspaceCommunity.setMetadata(org.dspace.content.Community.SIDEBAR_TEXT, community.getSidebarText());
-            dspaceCommunity.update();
-            dspaceParentCommunity.update();
+            org.dspace.content.Community dspaceCommunity = communityService.createSubcommunity(context, dspaceParentCommunity);
+            communityService.setMetadata(context, dspaceCommunity, "name", community.getName());
+            communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.COPYRIGHT_TEXT, community.getCopyrightText());
+            communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.INTRODUCTORY_TEXT, community.getIntroductoryText());
+            communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.SHORT_DESCRIPTION, community.getShortDescription());
+            communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.SIDEBAR_TEXT, community.getSidebarText());
 
             retCommunity = new Community(dspaceCommunity, "", context);
             context.complete();
@@ -729,12 +722,11 @@ public class CommunitiesResource extends Resource
                     headers, request, context);
 
             // dspaceCommunity.setLogo(arg0); // TODO Add this option.
-            dspaceCommunity.setMetadata("name", community.getName());
-            dspaceCommunity.setMetadata(org.dspace.content.Community.COPYRIGHT_TEXT, community.getCopyrightText());
-            dspaceCommunity.setMetadata(org.dspace.content.Community.INTRODUCTORY_TEXT, community.getIntroductoryText());
-            dspaceCommunity.setMetadata(org.dspace.content.Community.SHORT_DESCRIPTION, community.getShortDescription());
-            dspaceCommunity.setMetadata(org.dspace.content.Community.SIDEBAR_TEXT, community.getSidebarText());
-            dspaceCommunity.update();
+            communityService.setMetadata(context, dspaceCommunity, "name", community.getName());
+            communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.COPYRIGHT_TEXT, community.getCopyrightText());
+            communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.INTRODUCTORY_TEXT, community.getIntroductoryText());
+            communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.SHORT_DESCRIPTION, community.getShortDescription());
+            communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.SIDEBAR_TEXT, community.getSidebarText());
 
             context.complete();
 
@@ -746,10 +738,6 @@ public class CommunitiesResource extends Resource
         catch (ContextException e)
         {
             processException("Could not update community(id=" + communityId + "), ContextException Message:" + e, context);
-        }
-        catch (AuthorizeException e)
-        {
-            processException("Could not update community(id=" + communityId + "), AuthorizeException. Message:" + e, context);
         }
         finally
         {
@@ -795,7 +783,7 @@ public class CommunitiesResource extends Resource
             writeStats(community, UsageEvent.Action.DELETE, user_ip, user_agent, xforwardedfor, headers,
                     request, context);
 
-            community.delete();
+            communityService.delete(context, community);
             context.complete();
 
         }
@@ -862,15 +850,7 @@ public class CommunitiesResource extends Resource
             context = createContext(getUser(headers));
 
             org.dspace.content.Community community = findCommunity(context, communityId, org.dspace.core.Constants.WRITE);
-            org.dspace.content.Collection collection = null;
-            for (org.dspace.content.Collection dspaceCollection : community.getAllCollections())
-            {
-                if (dspaceCollection.getID() == collectionId)
-                {
-                    collection = dspaceCollection;
-                    break;
-                }
-            }
+            org.dspace.content.Collection collection = collectionService.findByLegacyId(context, collectionId);
 
             if (collection == null)
             {
@@ -878,7 +858,7 @@ public class CommunitiesResource extends Resource
                 log.warn("Collection(id=" + collectionId + ") was not found!");
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
-            else if (!AuthorizeServiceImpl.authorizeActionBoolean(context, collection, org.dspace.core.Constants.REMOVE))
+            else if (!authorizeService.authorizeActionBoolean(context, collection, org.dspace.core.Constants.REMOVE))
             {
                 context.abort();
                 if (context.getCurrentUser() != null)
@@ -892,12 +872,12 @@ public class CommunitiesResource extends Resource
                 throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }
 
+            communityService.removeCollection(context, community, collection);
+
             writeStats(community, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers,
                     request, context);
             writeStats(collection, UsageEvent.Action.DELETE, user_ip, user_agent, xforwardedfor, headers,
                     request, context);
-
-            community.removeCollection(collection);
 
             context.complete();
 
@@ -969,15 +949,7 @@ public class CommunitiesResource extends Resource
 
             org.dspace.content.Community parentCommunity = findCommunity(context, parentCommunityId,
                     org.dspace.core.Constants.WRITE);
-            org.dspace.content.Community subcommunity = null;
-            for (org.dspace.content.Community dspaceCommunity : parentCommunity.getSubcommunities())
-            {
-                if (dspaceCommunity.getID() == subcommunityId)
-                {
-                    subcommunity = dspaceCommunity;
-                    break;
-                }
-            }
+            org.dspace.content.Community subcommunity = communityService.findByLegacyId(context, subcommunityId);
 
             if (subcommunity == null)
             {
@@ -985,7 +957,7 @@ public class CommunitiesResource extends Resource
                 log.warn("Subcommunity(id=" + subcommunityId + ") in community(id=" + ") was not found!");
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
-            else if (!AuthorizeServiceImpl.authorizeActionBoolean(context, subcommunity, org.dspace.core.Constants.REMOVE))
+            else if (!authorizeService.authorizeActionBoolean(context, subcommunity, org.dspace.core.Constants.REMOVE))
             {
                 context.abort();
                 if (context.getCurrentUser() != null)
@@ -999,12 +971,13 @@ public class CommunitiesResource extends Resource
                 throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }
 
+            communityService.removeSubcommunity(context, parentCommunity, subcommunity);
+
             writeStats(parentCommunity, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
                     headers, request, context);
             writeStats(subcommunity, UsageEvent.Action.DELETE, user_ip, user_agent, xforwardedfor, headers,
                     request, context);
 
-            parentCommunity.removeSubcommunity(subcommunity);
             context.complete();
 
         }
@@ -1060,7 +1033,7 @@ public class CommunitiesResource extends Resource
         org.dspace.content.Community community = null;
         try
         {
-            community = org.dspace.content.Community.find(context, id);
+            community = communityService.findByLegacyId(context, id);
 
             if (community == null)
             {
@@ -1068,7 +1041,7 @@ public class CommunitiesResource extends Resource
                 log.warn("Community(id=" + id + ") was not found!");
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
-            else if (!AuthorizeServiceImpl.authorizeActionBoolean(context, community, action))
+            else if (!authorizeService.authorizeActionBoolean(context, community, action))
             {
                 context.abort();
                 if (context.getCurrentUser() != null)
