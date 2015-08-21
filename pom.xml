@@ -35,7 +35,12 @@
         <solr.version>4.10.2</solr.version>
         <jena.version>2.12.0</jena.version>
         <slf4j.version>1.6.1</slf4j.version>
-        <hibernate.version>4.3.10.Final</hibernate.version>
+        <!--
+            Hibernate version pinned to 4.2, 4.3 does not work with the spring version we are currently using
+            Upgrading the spring version will make the XMLUI crash
+        -->
+        <hibernate.version>4.2.19.Final</hibernate.version>
+        <spring.version>3.2.14.RELEASE</spring.version>
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
              as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
         <root.basedir>${basedir}</root.basedir>
@@ -848,8 +853,7 @@
           <dependency>
               <groupId>org.springframework</groupId>
               <artifactId>spring-orm</artifactId>
-              <!--<version>4.1.4.RELEASE</version>-->
-              <version>3.2.0.RELEASE</version>
+              <version>${spring.version}</version>
           </dependency>
          <dependency>
             <groupId>org.swordapp</groupId>
@@ -860,49 +864,49 @@
         <dependency>
             <artifactId>spring-core</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.2.0.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-beans</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.2.0.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-aop</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.2.0.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-context</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.2.0.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-tx</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.2.0.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-jdbc</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.2.0.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-web</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.2.0.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-webmvc</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.2.0.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
 
          <dependency>

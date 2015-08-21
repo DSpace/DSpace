@@ -18,6 +18,7 @@ import org.dspace.event.Dispatcher;
 import org.dspace.event.Event;
 import org.dspace.event.factory.EventServiceFactory;
 import org.dspace.event.service.EventService;
+import org.dspace.storage.rdbms.DatabaseConfigVO;
 import org.dspace.utils.DSpace;
 import org.springframework.util.CollectionUtils;
 
@@ -151,6 +152,12 @@ public class Context
     DBConnection getDBConnection()
     {
         return dbConnection;
+    }
+
+
+    public DatabaseConfigVO getDBConfig() throws SQLException
+    {
+        return dbConnection.getDatabaseConfig();
     }
 
     public String getDbType(){

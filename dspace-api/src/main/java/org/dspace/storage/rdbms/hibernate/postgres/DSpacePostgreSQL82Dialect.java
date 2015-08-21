@@ -7,7 +7,7 @@
  */
 package org.dspace.storage.rdbms.hibernate.postgres;
 
-import org.hibernate.dialect.PostgreSQL9Dialect;
+import org.hibernate.dialect.PostgreSQL82Dialect;
 import org.hibernate.metamodel.spi.TypeContributions;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.type.PostgresUUIDType;
@@ -18,12 +18,17 @@ import org.hibernate.type.PostgresUUIDType;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class DSpacePostgreSQL9Dialect extends PostgreSQL9Dialect
+public class DSpacePostgreSQL82Dialect extends PostgreSQL82Dialect
 {
     @Override
     public void contributeTypes(final TypeContributions typeContributions, final ServiceRegistry serviceRegistry) {
         super.contributeTypes(typeContributions, serviceRegistry);
         typeContributions.contributeType(new InternalPostgresUUIDType());
+    }
+
+    @Override
+    protected void registerHibernateType(int code, String name) {
+        super.registerHibernateType(code, name);
     }
 
     protected static class InternalPostgresUUIDType extends PostgresUUIDType {

@@ -47,7 +47,7 @@ CREATE TABLE Webapp
     AppName VARCHAR2(32),
     URL VARCHAR2(1000),
     Started TIMESTAMP,
-    isUI NUMBER(1)
+    isUI INTEGER
 );
 
 CREATE SEQUENCE webapp_seq;
@@ -62,11 +62,11 @@ CREATE TABLE requestitem
   token varchar(48),
   item_id INTEGER,
   bitstream_id INTEGER,
-  allfiles NUMBER(1),
+  allfiles BOOLEAN,
   request_email VARCHAR2(64),
   request_name VARCHAR2(64),
   request_date TIMESTAMP,
-  accept_request NUMBER(1),
+  accept_request BOOLEAN,
   decision_date TIMESTAMP,
   expires TIMESTAMP,
   CONSTRAINT requestitem_pkey PRIMARY KEY (requestitem_id),

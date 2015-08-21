@@ -50,6 +50,7 @@ import org.dspace.harvest.HarvestScheduler;
 import org.dspace.harvest.factory.HarvestServiceFactory;
 import org.dspace.harvest.service.HarvestSchedulingService;
 import org.dspace.harvest.service.HarvestedCollectionService;
+import org.dspace.storage.rdbms.DatabaseConfigVO;
 import org.xml.sax.SAXException;
 
 /**
@@ -102,8 +103,6 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
     private static final Message T_DB_URL 			= message("xmlui.administrative.ControlPanel.db_url");
     private static final Message T_DB_DRIVER 			= message("xmlui.administrative.ControlPanel.db_driver");
     private static final Message T_DB_MAX_CONN 			= message("xmlui.administrative.ControlPanel.db_maxconnections");
-    private static final Message T_DB_MAX_WAIT 			= message("xmlui.administrative.ControlPanel.db_maxwait");
-    private static final Message T_DB_MAX_IDLE 			= message("xmlui.administrative.ControlPanel.db_maxidle");
     private static final Message T_MAIL_SERVER 			= message("xmlui.administrative.ControlPanel.mail_server");
     private static final Message T_MAIL_FROM_ADDRESS            = message("xmlui.administrative.ControlPanel.mail_from_address");
     private static final Message T_FEEDBACK_RECIPIENT           = message("xmlui.administrative.ControlPanel.mail_feedback_recipient");
@@ -496,8 +495,7 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
     /**
      * List important DSpace configuration parameters.
      */
-    private void addDSpaceConfiguration(Division div) throws WingException 
-    {
+    private void addDSpaceConfiguration(Division div) throws WingException, SQLException {
 
         // LIST: DSpace
         List dspace = div.addList("dspace");
@@ -521,20 +519,15 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
         dspace.addLabel(T_DB_NAME);
         dspace.addItem(notempty(context.getDbType()));
 
+        DatabaseConfigVO dbConfig = context.getDBConfig();
         dspace.addLabel(T_DB_URL);
-        dspace.addItem(notempty(ConfigurationManager.getProperty("db.url")));
+        dspace.addItem(notempty(dbConfig.getDatabaseUrl()));
 
         dspace.addLabel(T_DB_DRIVER);
-        dspace.addItem(notempty(ConfigurationManager.getProperty("db.driver")));
+        dspace.addItem(notempty(dbConfig.getDatabaseDriver()));
 
         dspace.addLabel(T_DB_MAX_CONN);
-        dspace.addItem(notempty(ConfigurationManager.getProperty("db.maxconnections")));
-
-        dspace.addLabel(T_DB_MAX_WAIT);
-        dspace.addItem(notempty(ConfigurationManager.getProperty("db.maxwait")));
-
-        dspace.addLabel(T_DB_MAX_IDLE);
-        dspace.addItem(notempty(ConfigurationManager.getProperty("db.maxidle")));
+        dspace.addItem(notempty(String.valueOf(dbConfig.getMaxConnections())));
 
        	dspace.addLabel(T_MAIL_SERVER);
         dspace.addItem(notempty(ConfigurationManager.getProperty("mail.server")));
