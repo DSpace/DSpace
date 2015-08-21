@@ -7,6 +7,9 @@
  */
 package org.dspace.core;
 
+import org.dspace.storage.rdbms.DatabaseConfigVO;
+
+import javax.sql.DataSource;
 import java.sql.SQLException;
 
 /**
@@ -31,4 +34,8 @@ public interface DBConnection<T> {
     public void shutdown();
 
     public String getType();
+
+    public DataSource getDataSource();
+
+    public DatabaseConfigVO getDatabaseConfig() throws SQLException;
 }

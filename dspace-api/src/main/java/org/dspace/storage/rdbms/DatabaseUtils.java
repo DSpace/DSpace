@@ -87,46 +87,24 @@ public class DatabaseUtils
             // Call initDataSource to JUST initialize the dataSource WITHOUT fully
             // initializing the DatabaseManager itself. This ensures we do NOT
             // immediately run our Flyway DB migrations on this database
-            //TODO: HIBERNATE FIX FLYWAY
-            DataSource dataSource = null; //DatabaseManager.initDataSource();
+            DBConnection dbConnection = new DSpace().getSingletonService(DBConnection.class);
+            DataSource dataSource = dbConnection.getDataSource();
+            DatabaseConfigVO databaseConfig = dbConnection.getDatabaseConfig();
 
             // Get configured DB URL for reporting below
-            String url = ConfigurationManager.getProperty("db.url");
+            String url = databaseConfig.getDatabaseUrl();
+
+
 
             // Point Flyway API to our database
             Flyway flyway = setupFlyway(dataSource);
 
-            // "test" = Test Database Connection
-            if(argv[0].equalsIgnoreCase("test"))
+            if(argv[0].equalsIgnoreCase("migrate"))
             {
-                // Try to connect to the database
-                System.out.println("\nAttempting to connect to database using these configurations: ");
-                System.out.println(" - URL: " + url);
-                System.out.println(" - Driver: " + ConfigurationManager.getProperty("db.driver"));
-                System.out.println(" - Username: " + ConfigurationManager.getProperty("db.username"));
-                System.out.println(" - Password: [hidden]");
-                System.out.println(" - Schema: " + ConfigurationManager.getProperty("db.schema"));
-                System.out.println("\nTesting connection...");
-                try
-                {
-                    // Just do a high level test by getting our configured DataSource and attempting to connect to it
-                    // NOTE: We specifically do NOT call DatabaseManager.getConnection() because that will attempt
-                    // a full initialization of DatabaseManager & also cause database migrations/upgrades to occur
-                    Connection connection = dataSource.getConnection();
-                    connection.close();
+                try (Connection connection = dataSource.getConnection()) {
                 }
-                catch (SQLException sqle)
-                {
-                    System.err.println("\nError: ");
-                    System.err.println(" - " + sqle);
-                    System.err.println("\nPlease see the DSpace documentation for assistance.\n");
-                    System.exit(1);
-                }
-
-                System.out.println("Connected successfully!\n");
-            }
-            // "info" = Basic Database Information
-            else if(argv[0].equalsIgnoreCase("info"))
+            }else
+            if(argv[0].equalsIgnoreCase("info"))
             {
                 // Get basic Database info
                 Connection connection = dataSource.getConnection();
@@ -155,51 +133,6 @@ public class DatabaseUtils
                     }
                 }
                 connection.close();
-            }
-            // "migrate" = Manually run any outstanding Database migrations (if any)
-            else if(argv[0].equalsIgnoreCase("migrate"))
-            {
-                System.out.println("\nDatabase URL: " + url);
-
-                // "migrate" allows for an OPTIONAL second argument:
-                //    - "ignored" = Also run any previously "ignored" migrations during the migration
-                //    - [version] = ONLY run migrations up to a specific DSpace version (ONLY FOR TESTING)
-                if(argv.length==2)
-                {
-                    if(argv[1].equalsIgnoreCase("ignored"))
-                    {
-                        System.out.println("Migrating database to latest version AND running previously \"Ignored\" migrations... (Check logs for details)");
-                        Connection connection = dataSource.getConnection();
-                        // Update the database to latest version, but set "outOfOrder=true"
-                        // This will ensure any old migrations in the "ignored" state are now run
-                        updateDatabase(dataSource, connection, null, true);
-                        connection.close();
-                    }
-                    else
-                    {
-                        // Otherwise, we assume "argv[1]" is a valid migration version number
-                        // This is only for testing! Never specify for Production!
-                        System.out.println("Migrating database ONLY to version " + argv[1] + " ... (Check logs for details)");
-                        System.out.println("\nWARNING: It is highly likely you will see errors in your logs when the Metadata");
-                        System.out.println("or Bitstream Format Registry auto-update. This is because you are attempting to");
-                        System.out.println("use an OLD version " + argv[1] + " Database with a newer DSpace API. NEVER do this in a");
-                        System.out.println("PRODUCTION scenario. The resulting old DB is only useful for migration testing.\n");
-                        Connection connection = dataSource.getConnection();
-                        // Update the database, to the version specified.
-                        updateDatabase(dataSource, connection, argv[1], false);
-                        connection.close();
-                    }
-                }
-                else
-                {
-                    System.out.println("Migrating database to latest version... (Check logs for details)");
-                    // NOTE: This looks odd, but all we really need to do is ensure the
-                    // DatabaseManager auto-initializes. It'll take care of the migration itself.
-                    // Asking for our DB Name will ensure DatabaseManager.initialize() is called.
-                    //TODO: HIBERNATE FIX FLYWAY
-//                    DatabaseManager.getDbName();
-                }
-                System.out.println("Done.");
             }
             // "repair" = Run Flyway repair script
             else if(argv[0].equalsIgnoreCase("repair"))
@@ -232,10 +165,8 @@ public class DatabaseUtils
             {
                 System.out.println("\nUsage: database [action]");
                 System.out.println("Valid actions: 'test', 'info', 'migrate', 'repair' or 'clean'");
-                System.out.println(" - test    = Test database connection is OK");
                 System.out.println(" - info    = Describe basic info about database, including migrations run");
                 System.out.println(" - migrate = Migrate the Database to the latest version");
-                System.out.println("             Optionally, specify \"ignored\" to also run \"Ignored\" migrations");
                 System.out.println(" - repair  = Attempt to repair any previously failed database migrations");
                 System.out.println(" - clean   = DESTROY all data and tables in Database (WARNING there is no going back!)");
                 System.out.println("");
