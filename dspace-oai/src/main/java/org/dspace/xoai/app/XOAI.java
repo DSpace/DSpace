@@ -255,7 +255,7 @@ public class XOAI {
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         XmlOutputContext xmlContext = XmlOutputContext.emptyContext(out, Second);
-        retrieveMetadata(item).write(xmlContext);
+        retrieveMetadata(context, item).write(xmlContext);
         xmlContext.getWriter().flush();
         xmlContext.getWriter().close();
         doc.addField("item.compile", out.toString());
@@ -440,7 +440,7 @@ public class XOAI {
             while (iterator.hasNext()) {
                 Item item = iterator.next();
                 if (verbose) System.out.println("Compiling item with handle: " + item.getHandle());
-                xoaiItemCacheService.put(item, retrieveMetadata(item));
+                xoaiItemCacheService.put(item, retrieveMetadata(context, item));
             }
 
             xoaiLastCompilationCacheService.put(new Date());

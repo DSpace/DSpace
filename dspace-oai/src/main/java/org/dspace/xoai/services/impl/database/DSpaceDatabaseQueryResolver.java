@@ -15,7 +15,6 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.xoai.services.api.config.ConfigurationService;
 import org.dspace.xoai.services.api.context.ContextService;
 import org.dspace.xoai.services.api.context.ContextServiceException;
