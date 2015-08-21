@@ -123,7 +123,13 @@ class SendEmailAction implements Action {
 		Map<String, String> extraMetadata = (Map<String, String>)objectModel.get("extraMetadata");
         boolean allzip = (Boolean)objectModel.get("allzip");
 		
+        int epersonID = 0;
+        String email = "";
 		EPerson eperson = context.getCurrentUser();
+		if(eperson!=null) {
+			epersonID = eperson.getID();
+			email = eperson.getEmail();
+		}
         Locale locale = context.getCurrentLocale();
 		Bitstream bitstream = null;
 		if(allzip) {
@@ -144,7 +150,7 @@ class SendEmailAction implements Action {
         
         IFunctionalities manager = DSpaceApi.getFunctionalityManager();
         manager.openSession();
-        token = manager.getToken(eperson.getID(), bitstream.getID());
+        token = manager.getToken(epersonID, bitstream.getID());
 
         String base = ConfigurationManager.getProperty("dspace.url");
 		StringBuffer link = null;
@@ -166,10 +172,12 @@ class SendEmailAction implements Action {
 		}
 
 		Email email2User = Email.getEmail(I18nUtil.getEmailFilename(locale, "download_link"));
-        email2User.addRecipient(eperson.getEmail());
+		if(email!=null || !email.isEmpty()) {
+			email2User.addRecipient(email);
+		}
         if(extraMetadata.containsKey(ExtraLicenseField.EXTRA_EMAIL.toString())) {
         	String exEmail = extraMetadata.get(ExtraLicenseField.EXTRA_EMAIL.toString());
-        	if(exEmail!=null && !exEmail.isEmpty() && !exEmail.equals(eperson.getEmail())) {
+        	if(exEmail!=null && !exEmail.isEmpty() && !exEmail.equals(email)) {
         		email2User.addRecipient(exEmail);
         	}
         }

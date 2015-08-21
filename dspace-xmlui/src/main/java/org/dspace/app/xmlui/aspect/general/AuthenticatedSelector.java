@@ -7,6 +7,7 @@
  */
 package org.dspace.app.xmlui.aspect.general;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.avalon.framework.logger.AbstractLogEnabled;
@@ -27,6 +28,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
 import cz.cuni.mff.ufal.DSpaceApi;
+import cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseDefinition;
 import cz.cuni.mff.ufal.lindat.utilities.interfaces.IFunctionalities;
 
 /**
@@ -83,11 +85,32 @@ public class AuthenticatedSelector extends AbstractLogEnabled implements
             EPerson eperson = context.getCurrentUser();
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
+            IFunctionalities manager = DSpaceApi.getFunctionalityManager();
+            
+            
+            /** if license confirmation for a bitstream is 3 then allow everyone (signin not required) */
+            if(ObjectModelHelper.getRequest(objectModel).getRequestURI().endsWith("license/agree")) {	            
+            	Item item = (Item)dso;            	            
+	            manager.openSession();
+	            Bundle[] originals = item.getBundles("ORIGINAL");
+	            for(Bundle bundle : originals) {
+	            	for(Bitstream b : bundle.getBitstreams()) {
+	            		List<LicenseDefinition> licenses = manager.getLicenses(b.getID());
+	            		for(LicenseDefinition license : licenses) {
+	            			if(license.getConfirmation()==3) {
+	            				manager.closeSession();
+	            				return true;	
+	            			}
+	            		}	            		
+	            	}
+	            }
+	            manager.closeSession();
+            }
+
             /** UFAL: first check the dtoken */
             Request request = ObjectModelHelper.getRequest(objectModel);
             String dtoken = request.getParameter("dtoken");
             if(dtoken!=null && !dtoken.isEmpty()) {
-	            IFunctionalities manager = DSpaceApi.getFunctionalityManager();
 	            manager.openSession();
 	            boolean tokenVerified = true;
                 if (dso instanceof Item) { // should be an item

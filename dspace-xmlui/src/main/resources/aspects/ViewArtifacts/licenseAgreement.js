@@ -156,7 +156,7 @@ function doLicenseAgree(handleUrl){
             bitId = cocoon.request.get("bitstreamId");
         }
         sendPageAndWait(handleUrl + "/ufal-licence-agreement", {"allzip":allzip, "bitstreamId":bitId}, result);
-        assertEperson();
+        
         result = UFALLicenceAgreement.validate(getObjectModel());
 
         if(cocoon.request.get("confirm_license") && result.getContinue()){
