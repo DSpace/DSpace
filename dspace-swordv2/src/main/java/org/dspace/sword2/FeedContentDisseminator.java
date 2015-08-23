@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 package org.dspace.sword2;
@@ -26,7 +26,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public class FeedContentDisseminator extends AbstractSimpleDC implements SwordContentDisseminator
+public class FeedContentDisseminator extends AbstractSimpleDC
+        implements SwordContentDisseminator
 {
     public InputStream disseminate(Context context, Item item)
             throws DSpaceSwordException, SwordError, SwordServerException
@@ -43,10 +44,13 @@ public class FeedContentDisseminator extends AbstractSimpleDC implements SwordCo
             {
                 if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName()))
                 {
-                    List<BundleBitstream> bundleBitstreams = bundle.getBitstreams();
-                    for (BundleBitstream bundleBitstream : bundleBitstreams) {
+                    List<BundleBitstream> bundleBitstreams = bundle
+                            .getBitstreams();
+                    for (BundleBitstream bundleBitstream : bundleBitstreams)
+                    {
                         Entry entry = feed.addEntry();
-                        this.populateEntry(context, entry, bundleBitstream.getBitstream());
+                        this.populateEntry(context, entry,
+                                bundleBitstream.getBitstream());
                     }
                 }
             }
@@ -90,13 +94,17 @@ public class FeedContentDisseminator extends AbstractSimpleDC implements SwordCo
         }
     }
 
-    private void populateEntry(Context context, Entry entry, Bitstream bitstream)
+    private void populateEntry(Context context, Entry entry,
+            Bitstream bitstream)
             throws DSpaceSwordException
     {
         BitstreamFormat format = null;
-        try {
+        try
+        {
             format = bitstream.getFormat(context);
-        } catch (SQLException e) {
+        }
+        catch (SQLException e)
+        {
             throw new DSpaceSwordException(e);
         }
         String contentType = null;
@@ -105,7 +113,8 @@ public class FeedContentDisseminator extends AbstractSimpleDC implements SwordCo
             contentType = format.getMIMEType();
         }
 
-        SwordUrlManager urlManager = new SwordUrlManager(new SwordConfigurationDSpace(), context);
+        SwordUrlManager urlManager = new SwordUrlManager(
+                new SwordConfigurationDSpace(), context);
         String bsUrl = urlManager.getBitstreamUrl(bitstream);
 
         entry.setId(bsUrl);
@@ -133,10 +142,12 @@ public class FeedContentDisseminator extends AbstractSimpleDC implements SwordCo
     public boolean disseminatesContentType(String contentType)
             throws DSpaceSwordException, SwordError, SwordServerException
     {
-        return "application/atom+xml".equals(contentType) || "application/atom+xml;type=feed".equals(contentType);
+        return "application/atom+xml".equals(contentType) ||
+                "application/atom+xml;type=feed".equals(contentType);
     }
 
-    public boolean disseminatesPackage(String contentType) throws DSpaceSwordException, SwordError, SwordServerException
+    public boolean disseminatesPackage(String contentType)
+            throws DSpaceSwordException, SwordError, SwordServerException
     {
         // we're just going to ignore packaging formats here
         return true;

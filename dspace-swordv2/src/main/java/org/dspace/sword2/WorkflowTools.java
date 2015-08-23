@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 package org.dspace.sword2;
@@ -30,13 +30,20 @@ import java.sql.SQLException;
 
 public class WorkflowTools
 {
-    protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+    protected WorkspaceItemService workspaceItemService = ContentServiceFactory
+            .getInstance().getWorkspaceItemService();
 
-    protected BasicWorkflowItemService basicWorkflowItemService = BasicWorkflowServiceFactory.getInstance().getBasicWorkflowItemService();
-    protected BasicWorkflowService basicWorkflowService = BasicWorkflowServiceFactory.getInstance().getBasicWorkflowService();
+    protected BasicWorkflowItemService basicWorkflowItemService = BasicWorkflowServiceFactory
+            .getInstance().getBasicWorkflowItemService();
 
-    protected XmlWorkflowItemService xmlWorkflowItemService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService();
-    protected XmlWorkflowService xmlWorkflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
+    protected BasicWorkflowService basicWorkflowService = BasicWorkflowServiceFactory
+            .getInstance().getBasicWorkflowService();
+
+    protected XmlWorkflowItemService xmlWorkflowItemService = XmlWorkflowServiceFactory
+            .getInstance().getXmlWorkflowItemService();
+
+    protected XmlWorkflowService xmlWorkflowService = XmlWorkflowServiceFactory
+            .getInstance().getXmlWorkflowService();
 
     /**
      * Is the given item in the DSpace workflow?
@@ -53,10 +60,16 @@ public class WorkflowTools
     {
         try
         {
-            if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){
+            if (ConfigurationManager
+                    .getProperty("workflow", "workflow.framework")
+                    .equals("xmlworkflow"))
+            {
                 return xmlWorkflowItemService.findByItem(context, item) != null;
-            }else{
-                return basicWorkflowItemService.findByItem(context, item) != null;
+            }
+            else
+            {
+                return basicWorkflowItemService.findByItem(context, item) !=
+                        null;
             }
         }
         catch (SQLException e)
@@ -103,9 +116,14 @@ public class WorkflowTools
     {
         try
         {
-            if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){
+            if (ConfigurationManager
+                    .getProperty("workflow", "workflow.framework")
+                    .equals("xmlworkflow"))
+            {
                 return xmlWorkflowItemService.findByItem(context, item);
-            }else{
+            }
+            else
+            {
                 return basicWorkflowItemService.findByItem(context, item);
             }
         }
@@ -153,17 +171,29 @@ public class WorkflowTools
             WorkspaceItem wsi = this.getWorkspaceItem(context, item);
 
             // kick off the workflow
-            boolean notify = ConfigurationManager.getBooleanProperty("swordv2-server", "workflow.notify");
-            if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow")) {
-                if (notify) {
+            boolean notify = ConfigurationManager
+                    .getBooleanProperty("swordv2-server", "workflow.notify");
+            if (ConfigurationManager
+                    .getProperty("workflow", "workflow.framework")
+                    .equals("xmlworkflow"))
+            {
+                if (notify)
+                {
                     xmlWorkflowService.start(context, wsi);
-                } else {
+                }
+                else
+                {
                     xmlWorkflowService.startWithoutNotify(context, wsi);
                 }
-            } else {
-                if (notify) {
+            }
+            else
+            {
+                if (notify)
+                {
                     basicWorkflowService.start(context, wsi);
-                } else {
+                }
+                else
+                {
                     basicWorkflowService.startWithoutNotify(context, wsi);
                 }
             }
@@ -191,11 +221,15 @@ public class WorkflowTools
             // abort the workflow
             if (wfi != null)
             {
-                if(wfi instanceof BasicWorkflowItem)
+                if (wfi instanceof BasicWorkflowItem)
                 {
-                    basicWorkflowService.abort(context, (BasicWorkflowItem) wfi, context.getCurrentUser());
-                }else{
-                    xmlWorkflowService.abort(context, (XmlWorkflowItem) wfi, context.getCurrentUser());
+                    basicWorkflowService.abort(context, (BasicWorkflowItem) wfi,
+                            context.getCurrentUser());
+                }
+                else
+                {
+                    xmlWorkflowService.abort(context, (XmlWorkflowItem) wfi,
+                            context.getCurrentUser());
                 }
             }
         }

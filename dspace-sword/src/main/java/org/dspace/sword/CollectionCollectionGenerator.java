@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 package org.dspace.sword;
@@ -24,111 +24,120 @@ import java.util.List;
  */
 public class CollectionCollectionGenerator extends ATOMCollectionGenerator
 {
-	/** logger */
-	private static Logger log = Logger.getLogger(CollectionCollectionGenerator.class);
-	protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    /** logger */
+    private static Logger log = Logger
+            .getLogger(CollectionCollectionGenerator.class);
 
-	/**
-	 * Construct an object taking the sword service instance an argument
-	 * @param service
-	 */
-	public CollectionCollectionGenerator(SWORDService service)
-	{
-		super(service);
-		log.debug("Create new instance of CollectionCollectionGenerator");
-	}
+    protected CollectionService collectionService = ContentServiceFactory
+            .getInstance().getCollectionService();
 
-	/**
-	 * Build the collection for the given DSpaceObject.  In this implementation,
-	 * if the object is not a DSpace Collection, it will throw an exception.
-	 * @param dso
-	 * @throws DSpaceSWORDException
-	 */
-	public Collection buildCollection(DSpaceObject dso) throws DSpaceSWORDException
-	{
-		if (!(dso instanceof org.dspace.content.Collection))
-		{
-			log.error("buildCollection passed argument which is not of type Collection");
-			throw new DSpaceSWORDException("Incorrect ATOMCollectionGenerator instantiated");
-		}
+    /**
+     * Construct an object taking the sword service instance an argument
+     * @param service
+     */
+    public CollectionCollectionGenerator(SWORDService service)
+    {
+        super(service);
+        log.debug("Create new instance of CollectionCollectionGenerator");
+    }
 
-		// get the things we need out of the service
-		SWORDConfiguration swordConfig = swordService.getSwordConfig();
-		SWORDUrlManager urlManager = swordService.getUrlManager();
+    /**
+     * Build the collection for the given DSpaceObject.  In this implementation,
+     * if the object is not a DSpace Collection, it will throw an exception.
+     * @param dso
+     * @throws DSpaceSWORDException
+     */
+    public Collection buildCollection(DSpaceObject dso)
+            throws DSpaceSWORDException
+    {
+        if (!(dso instanceof org.dspace.content.Collection))
+        {
+            log.error(
+                    "buildCollection passed argument which is not of type Collection");
+            throw new DSpaceSWORDException(
+                    "Incorrect ATOMCollectionGenerator instantiated");
+        }
 
-		org.dspace.content.Collection col = (org.dspace.content.Collection) dso;
+        // get the things we need out of the service
+        SWORDConfiguration swordConfig = swordService.getSwordConfig();
+        SWORDUrlManager urlManager = swordService.getUrlManager();
 
-		Collection scol = new Collection();
+        org.dspace.content.Collection col = (org.dspace.content.Collection) dso;
 
-		// prepare the parameters to be put in the sword collection
-		String location = urlManager.getDepositLocation(col);
+        Collection scol = new Collection();
 
-		// collection title is just its name
-		String title = collectionService.getMetadata(col, "name");
+        // prepare the parameters to be put in the sword collection
+        String location = urlManager.getDepositLocation(col);
 
-		// the collection policy is the licence to which the collection adheres
-		String collectionPolicy = collectionService.getLicense(col);
+        // collection title is just its name
+        String title = collectionService.getMetadata(col, "name");
 
-		// FIXME: what is the treatment?  Doesn't seem appropriate for DSpace
-		// String treatment = " ";
+        // the collection policy is the licence to which the collection adheres
+        String collectionPolicy = collectionService.getLicense(col);
 
-		// abstract is the short description of the collection
-		String dcAbstract = collectionService.getMetadata(col, "short_description");
+        // FIXME: what is the treatment?  Doesn't seem appropriate for DSpace
+        // String treatment = " ";
 
-		// we just do support mediation
-		boolean mediation = swordConfig.isMediated();
+        // abstract is the short description of the collection
+        String dcAbstract = collectionService
+                .getMetadata(col, "short_description");
 
-		// load up the sword collection
-		scol.setLocation(location);
+        // we just do support mediation
+        boolean mediation = swordConfig.isMediated();
 
-		// add the title if it exists
-		if (title != null && !"".equals(title))
-		{
-			scol.setTitle(title);
-		}
+        // load up the sword collection
+        scol.setLocation(location);
 
-		// add the collection policy if it exists
-		if (collectionPolicy != null && !"".equals(collectionPolicy))
-		{
-			scol.setCollectionPolicy(collectionPolicy);
-		}
+        // add the title if it exists
+        if (title != null && !"".equals(title))
+        {
+            scol.setTitle(title);
+        }
 
-		// FIXME: leave the treatment out for the time being,
-		// as there is no analogue
-		// scol.setTreatment(treatment);
+        // add the collection policy if it exists
+        if (collectionPolicy != null && !"".equals(collectionPolicy))
+        {
+            scol.setCollectionPolicy(collectionPolicy);
+        }
 
-		// add the abstract if it exists
-		if (dcAbstract != null && !"".equals(dcAbstract))
-		{
-			scol.setAbstract(dcAbstract);
-		}
+        // FIXME: leave the treatment out for the time being,
+        // as there is no analogue
+        // scol.setTreatment(treatment);
 
-		scol.setMediation(mediation);
+        // add the abstract if it exists
+        if (dcAbstract != null && !"".equals(dcAbstract))
+        {
+            scol.setAbstract(dcAbstract);
+        }
 
-        List<String> accepts = swordService.getSwordConfig().getCollectionAccepts();
+        scol.setMediation(mediation);
+
+        List<String> accepts = swordService.getSwordConfig()
+                .getCollectionAccepts();
         for (String accept : accepts)
         {
             scol.addAccepts(accept);
         }
 
-		// add the accept packaging values
-		Map<String, Float> aps = swordConfig.getAcceptPackaging(col);
-		for (Map.Entry<String, Float> ap : aps.entrySet())
-		{
-			scol.addAcceptPackaging(ap.getKey(), ap.getValue());
-		}
+        // add the accept packaging values
+        Map<String, Float> aps = swordConfig.getAcceptPackaging(col);
+        for (Map.Entry<String, Float> ap : aps.entrySet())
+        {
+            scol.addAcceptPackaging(ap.getKey(), ap.getValue());
+        }
 
-		// should we offer the items in the collection up as deposit
-		// targets?
-		boolean itemService = ConfigurationManager.getBooleanProperty("sword-server", "expose-items");
-		if (itemService)
-		{
-			String subService = urlManager.constructSubServiceUrl(col);
-			scol.setService(subService);
-		}
+        // should we offer the items in the collection up as deposit
+        // targets?
+        boolean itemService = ConfigurationManager
+                .getBooleanProperty("sword-server", "expose-items");
+        if (itemService)
+        {
+            String subService = urlManager.constructSubServiceUrl(col);
+            scol.setService(subService);
+        }
 
-		log.debug("Created ATOM Collection for DSpace Collection");
+        log.debug("Created ATOM Collection for DSpace Collection");
 
-		return scol;
-	}
+        return scol;
+    }
 }

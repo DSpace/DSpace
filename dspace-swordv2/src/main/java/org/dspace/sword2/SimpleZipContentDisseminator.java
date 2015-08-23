@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 package org.dspace.sword2;
@@ -35,7 +35,8 @@ import java.util.zip.ZipOutputStream;
 
 public class SimpleZipContentDisseminator implements SwordContentDisseminator
 {
-    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    protected BitstreamService bitstreamService = ContentServiceFactory
+            .getInstance().getBitstreamService();
 
     public InputStream disseminate(Context context, Item item)
             throws DSpaceSwordException, SwordError, SwordServerException
@@ -43,8 +44,11 @@ public class SimpleZipContentDisseminator implements SwordContentDisseminator
         try
         {
             // first write everything to a temp file
-            String tempDir = ConfigurationManager.getProperty("upload.temp.dir");
-            String fn = tempDir + File.separator + "SWORD." + item.getID() + "." + UUID.randomUUID().toString() + ".zip";
+            String tempDir = ConfigurationManager
+                    .getProperty("upload.temp.dir");
+            String fn =
+                    tempDir + File.separator + "SWORD." + item.getID() + "." +
+                            UUID.randomUUID().toString() + ".zip";
             OutputStream outStream = new FileOutputStream(new File(fn));
             ZipOutputStream zip = new ZipOutputStream(outStream);
 
@@ -54,11 +58,13 @@ public class SimpleZipContentDisseminator implements SwordContentDisseminator
                 if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName()))
                 {
                     List<BundleBitstream> bss = bundle.getBitstreams();
-                    for (BundleBitstream bundleBitstream : bss) {
+                    for (BundleBitstream bundleBitstream : bss)
+                    {
                         Bitstream bitstream = bundleBitstream.getBitstream();
                         ZipEntry ze = new ZipEntry(bitstream.getName());
                         zip.putNextEntry(ze);
-                        InputStream is = bitstreamService.retrieve(context, bitstream);
+                        InputStream is = bitstreamService
+                                .retrieve(context, bitstream);
                         Utils.copy(is, zip);
                         zip.closeEntry();
                         is.close();

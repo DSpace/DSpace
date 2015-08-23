@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 package org.dspace.sword2;
@@ -25,68 +25,77 @@ import java.util.List;
 
 public class CommunityCollectionGenerator implements AtomCollectionGenerator
 {
-	private static Logger log = Logger.getLogger(CommunityCollectionGenerator.class);
+    private static Logger log = Logger
+            .getLogger(CommunityCollectionGenerator.class);
 
-	protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
-	protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    protected HandleService handleService = HandleServiceFactory.getInstance()
+            .getHandleService();
 
-	public SwordCollection buildCollection(Context context, DSpaceObject dso, SwordConfigurationDSpace swordConfig)
-		throws DSpaceSwordException
-	{
-		if (!(dso instanceof Community))
-		{
-			log.error("buildCollection passed something other than a Community object");
-			throw new DSpaceSwordException("Incorrect ATOMCollectionGenerator instantiated");
-		}
+    protected CommunityService communityService = ContentServiceFactory
+            .getInstance().getCommunityService();
 
-		// get the things we need out of the service
-		SwordUrlManager urlManager = swordConfig.getUrlManager(context, swordConfig);
+    public SwordCollection buildCollection(Context context, DSpaceObject dso,
+            SwordConfigurationDSpace swordConfig)
+            throws DSpaceSwordException
+    {
+        if (!(dso instanceof Community))
+        {
+            log.error(
+                    "buildCollection passed something other than a Community object");
+            throw new DSpaceSwordException(
+                    "Incorrect ATOMCollectionGenerator instantiated");
+        }
 
-		Community com = (Community) dso;
-		SwordCollection scol = new SwordCollection();
+        // get the things we need out of the service
+        SwordUrlManager urlManager = swordConfig
+                .getUrlManager(context, swordConfig);
 
-		// prepare the parameters to be put in the sword collection
-		String location = urlManager.getDepositLocation(com);
-		if (location == null)
-		{
-			location = handleService.getCanonicalForm(com.getHandle());
-		}
-		scol.setLocation(location);
+        Community com = (Community) dso;
+        SwordCollection scol = new SwordCollection();
 
-		// collection title is just the community name
-		String title = communityService.getName(com);
-		if (StringUtils.isNotBlank(title))
-		{
-			scol.setTitle(title);
-		}
+        // prepare the parameters to be put in the sword collection
+        String location = urlManager.getDepositLocation(com);
+        if (location == null)
+        {
+            location = handleService.getCanonicalForm(com.getHandle());
+        }
+        scol.setLocation(location);
 
-		// FIXME: the community has no obvious licence
-		// the collection policy is the licence to which the collection adheres
-		// String collectionPolicy = col.getLicense();
+        // collection title is just the community name
+        String title = communityService.getName(com);
+        if (StringUtils.isNotBlank(title))
+        {
+            scol.setTitle(title);
+        }
 
-		// abstract is the short description of the collection
-		List<MetadataValue> abstracts = communityService.getMetadataByMetadataString(com, "short_description");
-		if (abstracts != null && !abstracts.isEmpty())
-		{
-			String firstValue = abstracts.get(0).getValue();
-			if (StringUtils.isNotBlank(firstValue))
-			{
-				scol.setAbstract(firstValue);
-			}
-		}
+        // FIXME: the community has no obvious licence
+        // the collection policy is the licence to which the collection adheres
+        // String collectionPolicy = col.getLicense();
 
-		// do we support mediated deposit
-		scol.setMediation(swordConfig.isMediated());
+        // abstract is the short description of the collection
+        List<MetadataValue> abstracts = communityService
+                .getMetadataByMetadataString(com, "short_description");
+        if (abstracts != null && !abstracts.isEmpty())
+        {
+            String firstValue = abstracts.get(0).getValue();
+            if (StringUtils.isNotBlank(firstValue))
+            {
+                scol.setAbstract(firstValue);
+            }
+        }
 
-		// NOTE: for communities, there are no MIME types that it accepts.
-		// the list of mime types that we accept
+        // do we support mediated deposit
+        scol.setMediation(swordConfig.isMediated());
 
-		// offer up the collections from this item as deposit targets
-		String subService = urlManager.constructSubServiceUrl(com);
-		scol.addSubService(new IRI(subService));
+        // NOTE: for communities, there are no MIME types that it accepts.
+        // the list of mime types that we accept
 
-		log.debug("Created ATOM Collection for DSpace Community");
+        // offer up the collections from this item as deposit targets
+        String subService = urlManager.constructSubServiceUrl(com);
+        scol.addSubService(new IRI(subService));
 
-		return scol;
-	}
+        log.debug("Created ATOM Collection for DSpace Community");
+
+        return scol;
+    }
 }

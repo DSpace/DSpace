@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 package org.dspace.sword2;
@@ -17,13 +17,13 @@ import java.io.InputStream;
 public interface SwordContentDisseminator
 {
     public InputStream disseminate(Context context, Item item)
-        throws DSpaceSwordException, SwordError, SwordServerException;
+            throws DSpaceSwordException, SwordError, SwordServerException;
 
     public boolean disseminatesContentType(String contentType)
-        throws DSpaceSwordException, SwordError, SwordServerException;
+            throws DSpaceSwordException, SwordError, SwordServerException;
 
     public boolean disseminatesPackage(String contentType)
-        throws DSpaceSwordException, SwordError, SwordServerException;
+            throws DSpaceSwordException, SwordError, SwordServerException;
 
     public void setContentType(String contentType);
 

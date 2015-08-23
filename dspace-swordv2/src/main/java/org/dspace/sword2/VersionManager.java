@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 package org.dspace.sword2;
@@ -28,81 +28,97 @@ import java.util.List;
 
 public class VersionManager
 {
-	protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-	protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
-	protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    protected ItemService itemService = ContentServiceFactory.getInstance()
+            .getItemService();
 
-	public void removeBundle(Context context, Item item, String name)
-			throws SQLException, AuthorizeException, IOException
-	{
-		boolean keep = ConfigurationManager.getBooleanProperty("swordv2-server", "versions.keep");
-		Iterator<Bundle> bundles = item.getBundles().iterator();
-		while (bundles.hasNext())
-		{
-			Bundle b = bundles.next();
-			if (name.equals(b.getName()))
-			{
-				bundles.remove();
-				this.removeBundle(context, item, b, keep);
-			}
-		}
-	}
+    protected BundleService bundleService = ContentServiceFactory.getInstance()
+            .getBundleService();
 
-	public void removeBundle(Context context, Item item, Bundle source)
-			throws SQLException, AuthorizeException, IOException
-	{
-		boolean keep = ConfigurationManager.getBooleanProperty("swordv2-server", "versions.keep");
-		this.removeBundle(context, item, source, keep);
-	}
+    protected BitstreamService bitstreamService = ContentServiceFactory
+            .getInstance().getBitstreamService();
 
-	public void removeBundle(Context context, Item item, Bundle source, boolean archive)
-			throws SQLException, AuthorizeException, IOException
-	{
+    public void removeBundle(Context context, Item item, String name)
+            throws SQLException, AuthorizeException, IOException
+    {
+        boolean keep = ConfigurationManager
+                .getBooleanProperty("swordv2-server", "versions.keep");
+        Iterator<Bundle> bundles = item.getBundles().iterator();
+        while (bundles.hasNext())
+        {
+            Bundle b = bundles.next();
+            if (name.equals(b.getName()))
+            {
+                bundles.remove();
+                this.removeBundle(context, item, b, keep);
+            }
+        }
+    }
+
+    public void removeBundle(Context context, Item item, Bundle source)
+            throws SQLException, AuthorizeException, IOException
+    {
+        boolean keep = ConfigurationManager
+                .getBooleanProperty("swordv2-server", "versions.keep");
+        this.removeBundle(context, item, source, keep);
+    }
+
+    public void removeBundle(Context context, Item item, Bundle source,
+            boolean archive)
+            throws SQLException, AuthorizeException, IOException
+    {
         // archive the bundle contents if desired
-		if (archive)
-		{
-			this.archiveBundle(context, item, source);
-		}
+        if (archive)
+        {
+            this.archiveBundle(context, item, source);
+        }
 
         // remove all the bitstreams from the bundle
-		Iterator<BundleBitstream> bundleBitstreams = source.getBitstreams().iterator();
-		while (bundleBitstreams.hasNext())
-		{
-			BundleBitstream bundleBitstream = bundleBitstreams.next();
-			bundleBitstreams.remove();
-			bundleService.removeBitstream(context, source, bundleBitstream.getBitstream());
-		}
+        Iterator<BundleBitstream> bundleBitstreams = source.getBitstreams()
+                .iterator();
+        while (bundleBitstreams.hasNext())
+        {
+            BundleBitstream bundleBitstream = bundleBitstreams.next();
+            bundleBitstreams.remove();
+            bundleService.removeBitstream(context, source,
+                    bundleBitstream.getBitstream());
+        }
 
         // delete the bundle itself
-		itemService.removeBundle(context, item, source);
-	}
+        itemService.removeBundle(context, item, source);
+    }
 
-	public void removeBitstream(Context context, Item item, Bitstream bitstream)
-			throws SQLException, AuthorizeException, IOException
-	{
-		boolean keep = ConfigurationManager.getBooleanProperty("swordv2-server", "versions.keep");
-		this.removeBitstream(context, item, bitstream, keep);
-	}
+    public void removeBitstream(Context context, Item item, Bitstream bitstream)
+            throws SQLException, AuthorizeException, IOException
+    {
+        boolean keep = ConfigurationManager
+                .getBooleanProperty("swordv2-server", "versions.keep");
+        this.removeBitstream(context, item, bitstream, keep);
+    }
 
-	public void removeBitstream(Context context, Item item, Bitstream bitstream, boolean keep)
-			throws SQLException, AuthorizeException, IOException
-	{
-		Bundle exempt = null;
-		if (keep)
-		{
-			exempt = this.archiveBitstream(context, item, bitstream);
-		}
+    public void removeBitstream(Context context, Item item, Bitstream bitstream,
+            boolean keep)
+            throws SQLException, AuthorizeException, IOException
+    {
+        Bundle exempt = null;
+        if (keep)
+        {
+            exempt = this.archiveBitstream(context, item, bitstream);
+        }
 
-		Iterator<BundleBitstream> bundleBitstreams = bitstream.getBundles().iterator();
-		while (bundleBitstreams.hasNext())
-		{
-			BundleBitstream bundleBitstream = bundleBitstreams.next();
-			if (exempt != null && bundleBitstream.getBundle().getID() != exempt.getID())
-			{
-				bundleBitstreams.remove();
-				bundleService.removeBitstream(context, bundleBitstream.getBundle(), bitstream);
-			}
-		}
+        Iterator<BundleBitstream> bundleBitstreams = bitstream.getBundles()
+                .iterator();
+        while (bundleBitstreams.hasNext())
+        {
+            BundleBitstream bundleBitstream = bundleBitstreams.next();
+            if (exempt != null &&
+                    bundleBitstream.getBundle().getID() != exempt.getID())
+            {
+                bundleBitstreams.remove();
+                bundleService
+                        .removeBitstream(context, bundleBitstream.getBundle(),
+                                bitstream);
+            }
+        }
 
         // there is nowhere in the metadata to say when this file was moved, so we
         // are going to drop it into the description
@@ -114,66 +130,74 @@ public class VersionManager
             newDesc += desc;
         }
         bitstream.setDescription(context, newDesc);
-		bitstreamService.update(context, bitstream);
-	}
+        bitstreamService.update(context, bitstream);
+    }
 
-	private Bundle archiveBitstream(Context context, Item item, Bitstream bitstream)
-			throws SQLException, AuthorizeException, IOException
-	{
-		String swordBundle = ConfigurationManager.getProperty("swordv2-server", "bundle.deleted");
-		if (swordBundle == null)
-		{
-			swordBundle = "DELETED";
-		}
+    private Bundle archiveBitstream(Context context, Item item,
+            Bitstream bitstream)
+            throws SQLException, AuthorizeException, IOException
+    {
+        String swordBundle = ConfigurationManager
+                .getProperty("swordv2-server", "bundle.deleted");
+        if (swordBundle == null)
+        {
+            swordBundle = "DELETED";
+        }
 
-		List<Bundle> bundles = item.getBundles();
-		Bundle archive = null;
-		for (Bundle bundle : bundles) {
-			if (swordBundle.equals(bundle.getName())) {
-				archive = bundle;
-				break;
-			}
-		}
-		if (archive == null)
-		{
-			archive = bundleService.create(context, item, swordBundle);
-		}
-		this.archiveBitstream(context, archive, bitstream);
-		return archive;
-	}
+        List<Bundle> bundles = item.getBundles();
+        Bundle archive = null;
+        for (Bundle bundle : bundles)
+        {
+            if (swordBundle.equals(bundle.getName()))
+            {
+                archive = bundle;
+                break;
+            }
+        }
+        if (archive == null)
+        {
+            archive = bundleService.create(context, item, swordBundle);
+        }
+        this.archiveBitstream(context, archive, bitstream);
+        return archive;
+    }
 
-	private void archiveBitstream(Context context, Bundle target, Bitstream bitstream)
-			throws SQLException, AuthorizeException, IOException
-	{
-		bundleService.addBitstream(context, target, bitstream);
-	}
+    private void archiveBitstream(Context context, Bundle target,
+            Bitstream bitstream)
+            throws SQLException, AuthorizeException, IOException
+    {
+        bundleService.addBitstream(context, target, bitstream);
+    }
 
-	private void archiveBundle(Context context, Item item, Bundle source)
-			throws SQLException, AuthorizeException, IOException
-	{
-		// get the datestamped root bundle name
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		String oldName = "VER" + sdf.format(new Date());
-		oldName = this.getNumberedName(item, oldName, 0);
+    private void archiveBundle(Context context, Item item, Bundle source)
+            throws SQLException, AuthorizeException, IOException
+    {
+        // get the datestamped root bundle name
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String oldName = "VER" + sdf.format(new Date());
+        oldName = this.getNumberedName(item, oldName, 0);
 
-		Bundle old = bundleService.create(context, item, oldName);
-		List<BundleBitstream> bundleBitstreams = source.getBitstreams();
-		for (BundleBitstream bundleBitstream : bundleBitstreams)
-		{
-			bundleService.addBitstream(context, old, bundleBitstream.getBitstream());
-		}
-	}
+        Bundle old = bundleService.create(context, item, oldName);
+        List<BundleBitstream> bundleBitstreams = source.getBitstreams();
+        for (BundleBitstream bundleBitstream : bundleBitstreams)
+        {
+            bundleService
+                    .addBitstream(context, old, bundleBitstream.getBitstream());
+        }
+    }
 
-	private String getNumberedName(Item item, String name, int number)
-			throws SQLException
-	{
-		String nName = name + "." + Integer.toString(number);
-		List<Bundle> bundles = item.getBundles();
-		for (Bundle bundle : bundles) {
-			if (nName.equals(bundle.getName())) {
-				return this.getNumberedName(item, name, number + 1);
-			}
-		}
-		return nName;
-	}
+    private String getNumberedName(Item item, String name, int number)
+            throws SQLException
+    {
+        String nName = name + "." + Integer.toString(number);
+        List<Bundle> bundles = item.getBundles();
+        for (Bundle bundle : bundles)
+        {
+            if (nName.equals(bundle.getName()))
+            {
+                return this.getNumberedName(item, name, number + 1);
+            }
+        }
+        return nName;
+    }
 }

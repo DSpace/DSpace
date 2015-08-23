@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 package org.dspace.sword2;
@@ -16,9 +16,14 @@ import org.swordapp.server.SwordServerException;
 
 public interface SwordEntryIngester
 {
-    DepositResult ingest(Context context, Deposit deposit, DSpaceObject target, VerboseDescription verboseDescription)
-			throws DSpaceSwordException, SwordError, SwordAuthException, SwordServerException;
+    DepositResult ingest(Context context, Deposit deposit, DSpaceObject target,
+            VerboseDescription verboseDescription)
+            throws DSpaceSwordException, SwordError, SwordAuthException,
+            SwordServerException;
 
-    DepositResult ingest(Context context, Deposit deposit, DSpaceObject target, VerboseDescription verboseDescription, DepositResult result, boolean replace)
-			throws DSpaceSwordException, SwordError, SwordAuthException, SwordServerException;
+    DepositResult ingest(Context context, Deposit deposit, DSpaceObject target,
+            VerboseDescription verboseDescription, DepositResult result,
+            boolean replace)
+            throws DSpaceSwordException, SwordError, SwordAuthException,
+            SwordServerException;
 }
