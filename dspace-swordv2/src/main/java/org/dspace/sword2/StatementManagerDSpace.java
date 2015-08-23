@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 package org.dspace.sword2;
@@ -31,17 +31,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class StatementManagerDSpace extends DSpaceSwordAPI implements StatementManager
+public class StatementManagerDSpace extends DSpaceSwordAPI
+        implements StatementManager
 {
-	private static Logger log = Logger.getLogger(StatementManagerDSpace.class);
+    private static Logger log = Logger.getLogger(StatementManagerDSpace.class);
 
-    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory
+            .getInstance().getAuthorizeService();
 
-	public Statement getStatement(String stateIRI, Map<String, String> accept, AuthCredentials authCredentials, SwordConfiguration swordConfig)
-			throws SwordServerException, SwordError, SwordAuthException
-	{
+    public Statement getStatement(String stateIRI, Map<String, String> accept,
+            AuthCredentials authCredentials, SwordConfiguration swordConfig)
+            throws SwordServerException, SwordError, SwordAuthException
+    {
         SwordContext sc = null;
-		try
+        try
         {
             SwordConfigurationDSpace config = (SwordConfigurationDSpace) swordConfig;
 
@@ -51,13 +54,19 @@ public class StatementManagerDSpace extends DSpaceSwordAPI implements StatementM
 
             if (log.isDebugEnabled())
             {
-                log.debug(LogManager.getHeader(context, "sword_get_statement", ""));
+                log.debug(LogManager
+                        .getHeader(context, "sword_get_statement", ""));
             }
 
             // log the request
-            String un = authCredentials.getUsername() != null ? authCredentials.getUsername() : "NONE";
-            String obo = authCredentials.getOnBehalfOf() != null ? authCredentials.getOnBehalfOf() : "NONE";
-            log.info(LogManager.getHeader(context, "sword_get_statement", "username=" + un + ",on_behalf_of=" + obo));
+            String un = authCredentials.getUsername() != null ?
+                    authCredentials.getUsername() :
+                    "NONE";
+            String obo = authCredentials.getOnBehalfOf() != null ?
+                    authCredentials.getOnBehalfOf() :
+                    "NONE";
+            log.info(LogManager.getHeader(context, "sword_get_statement",
+                    "username=" + un + ",on_behalf_of=" + obo));
 
             // first thing is to figure out what we're being asked to work on
             SwordUrlManager urlManager = config.getUrlManager(context, config);
@@ -70,31 +79,36 @@ public class StatementManagerDSpace extends DSpaceSwordAPI implements StatementM
             // find out if we are allowed to read the item's statement
             authorizeService.authorizeAction(context, item, Constants.READ);
 
-			// find out, now we know what we're being asked for, whether this is allowed
-			WorkflowManagerFactory.getInstance().retrieveStatement(context, item);
+            // find out, now we know what we're being asked for, whether this is allowed
+            WorkflowManagerFactory.getInstance()
+                    .retrieveStatement(context, item);
 
-			String suffix = urlManager.getTypeSuffix(context, stateIRI);
-			SwordStatementDisseminator disseminator = null;
+            String suffix = urlManager.getTypeSuffix(context, stateIRI);
+            SwordStatementDisseminator disseminator = null;
 
-			if (suffix != null)
-			{
+            if (suffix != null)
+            {
                 Map<Float, List<String>> analysed = new HashMap<>();
                 List<String> list = new ArrayList<>();
                 list.add(suffix);
                 analysed.put((float) 1.0, list);
-                disseminator = SwordDisseminatorFactory.getStatementInstance(analysed);
-			}
-			else
-			{
-				// we rely on the content negotiation to do the work
-				String acceptContentType = this.getHeader(accept, "Accept", null);
+                disseminator = SwordDisseminatorFactory
+                        .getStatementInstance(analysed);
+            }
+            else
+            {
+                // we rely on the content negotiation to do the work
+                String acceptContentType = this
+                        .getHeader(accept, "Accept", null);
 
                 // we extract from the Accept header the ordered list of content types
-                TreeMap<Float, List<String>> analysed = this.analyseAccept(acceptContentType);
+                TreeMap<Float, List<String>> analysed = this
+                        .analyseAccept(acceptContentType);
 
                 // the meat of this is done by the package disseminator
-                disseminator = SwordDisseminatorFactory.getStatementInstance(analysed);
-			}
+                disseminator = SwordDisseminatorFactory
+                        .getStatementInstance(analysed);
+            }
 
             return disseminator.disseminate(context, item);
         }
@@ -105,12 +119,13 @@ public class StatementManagerDSpace extends DSpaceSwordAPI implements StatementM
         catch (SQLException | DSpaceSwordException e)
         {
             throw new SwordServerException(e);
-        } finally
+        }
+        finally
         {
             if (sc != null)
             {
                 sc.abort();
             }
         }
-	}
+    }
 }

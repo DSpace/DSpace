@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 
@@ -22,9 +22,11 @@ import java.util.Properties;
 public class AbstractSimpleDC
 {
     protected HashMap<String, String> dcMap = null;
+
     protected HashMap<String, String> atomMap = null;
 
-    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected ItemService itemService = ContentServiceFactory.getInstance()
+            .getItemService();
 
     protected void loadMetadataMaps()
     {
@@ -32,7 +34,8 @@ public class AbstractSimpleDC
         {
             // we should load our DC map from configuration
             this.dcMap = new HashMap<>();
-            Properties props = ConfigurationManager.getProperties("swordv2-server");
+            Properties props = ConfigurationManager
+                    .getProperties("swordv2-server");
             for (Object key : props.keySet())
             {
                 String keyString = (String) key;
@@ -48,17 +51,18 @@ public class AbstractSimpleDC
         if (this.atomMap == null)
         {
             this.atomMap = new HashMap<>();
-            Properties props = ConfigurationManager.getProperties("swordv2-server");
-                for (Object key : props.keySet())
+            Properties props = ConfigurationManager
+                    .getProperties("swordv2-server");
+            for (Object key : props.keySet())
+            {
+                String keyString = (String) key;
+                if (keyString.startsWith("atom."))
                 {
-                    String keyString = (String) key;
-                    if (keyString.startsWith("atom."))
-                    {
-                        String k = keyString.substring("atom.".length());
-                        String v = (String) props.get(key);
-                        this.atomMap.put(k, v);
-                    }
+                    String k = keyString.substring("atom.".length());
+                    String v = (String) props.get(key);
+                    this.atomMap.put(k, v);
                 }
+            }
         }
     }
 
@@ -67,12 +71,14 @@ public class AbstractSimpleDC
         this.loadMetadataMaps();
 
         SimpleDCMetadata md = new SimpleDCMetadata();
-        List<MetadataValue> all = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        List<MetadataValue> all = itemService
+                .getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
 
         for (MetadataValue dcv : all)
         {
             MetadataField field = dcv.getMetadataField();
-            String valueMatch = field.getMetadataSchema().getName() + "." + field.getElement();
+            String valueMatch = field.getMetadataSchema().getName() + "." +
+                    field.getElement();
             if (field.getQualifier() != null)
             {
                 valueMatch += "." + field.getQualifier();

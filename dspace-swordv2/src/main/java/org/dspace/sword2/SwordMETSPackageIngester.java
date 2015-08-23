@@ -2,11 +2,10 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 package org.dspace.sword2;
-
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -35,11 +34,12 @@ public class SwordMETSPackageIngester extends DSpaceMETSIngester
      */
     @Override
     public void addLicense(Context context, Item item, String license,
-                                    Collection collection, PackageParameters params)
-        throws PackageValidationException,
+            Collection collection, PackageParameters params)
+            throws PackageValidationException,
             AuthorizeException, SQLException, IOException
     {
-        if (PackageUtils.findDepositLicense(context, item) == null && license != null)
+        if (PackageUtils.findDepositLicense(context, item) == null &&
+                license != null)
         {
             PackageUtils.addDepositLicense(context, license, item, collection);
         }

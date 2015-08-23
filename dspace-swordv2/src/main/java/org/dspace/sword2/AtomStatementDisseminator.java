@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 package org.dspace.sword2;
@@ -20,50 +20,58 @@ import org.swordapp.server.SwordServerException;
 
 import java.util.List;
 
-public class AtomStatementDisseminator extends GenericStatementDisseminator implements SwordStatementDisseminator
+public class AtomStatementDisseminator extends GenericStatementDisseminator
+        implements SwordStatementDisseminator
 {
-	protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-	
-	public Statement disseminate(Context context, Item item) throws DSpaceSwordException, SwordError, SwordServerException
-	{
-		SwordUrlManager urlManager = new SwordUrlManager(new SwordConfigurationDSpace(), context);
-		String feedUri = urlManager.getAtomStatementUri(item);
+    protected ItemService itemService = ContentServiceFactory.getInstance()
+            .getItemService();
 
-		String authorField = ConfigurationManager.getProperty("swordv2-server", "author.field");
-		String titleField = ConfigurationManager.getProperty("swordv2-server", "title.field");
-		String updatedField = ConfigurationManager.getProperty("swordv2-server", "updated.field");
+    public Statement disseminate(Context context, Item item)
+            throws DSpaceSwordException, SwordError, SwordServerException
+    {
+        SwordUrlManager urlManager = new SwordUrlManager(
+                new SwordConfigurationDSpace(), context);
+        String feedUri = urlManager.getAtomStatementUri(item);
 
-		String author = this.stringMetadata(item, authorField);
-		String title = this.stringMetadata(item, titleField);
-		String updated = this.stringMetadata(item, updatedField);
+        String authorField = ConfigurationManager
+                .getProperty("swordv2-server", "author.field");
+        String titleField = ConfigurationManager
+                .getProperty("swordv2-server", "title.field");
+        String updatedField = ConfigurationManager
+                .getProperty("swordv2-server", "updated.field");
 
-		Statement s = new AtomStatement(feedUri, author, title, updated);
-		this.populateStatement(context, item, s);
-		return s;
-	}
+        String author = this.stringMetadata(item, authorField);
+        String title = this.stringMetadata(item, titleField);
+        String updated = this.stringMetadata(item, updatedField);
 
-	private String stringMetadata(Item item, String field)
-	{
-		if (field == null)
-		{
-			return null;
-		}
+        Statement s = new AtomStatement(feedUri, author, title, updated);
+        this.populateStatement(context, item, s);
+        return s;
+    }
 
-		List<MetadataValue> dcvs = itemService.getMetadataByMetadataString(item, field);
-		if (dcvs == null || dcvs.isEmpty())
-		{
-			return null;
-		}
+    private String stringMetadata(Item item, String field)
+    {
+        if (field == null)
+        {
+            return null;
+        }
 
-		StringBuilder md = new StringBuilder();
-		for (MetadataValue dcv : dcvs)
-		{
-			if (md.length() > 0)
-			{
-				md.append(", ");
-			}
-			md.append(dcv.getValue());
-		}
-		return md.toString();
-	}
+        List<MetadataValue> dcvs = itemService
+                .getMetadataByMetadataString(item, field);
+        if (dcvs == null || dcvs.isEmpty())
+        {
+            return null;
+        }
+
+        StringBuilder md = new StringBuilder();
+        for (MetadataValue dcv : dcvs)
+        {
+            if (md.length() > 0)
+            {
+                md.append(", ");
+            }
+            md.append(dcv.getValue());
+        }
+        return md.toString();
+    }
 }

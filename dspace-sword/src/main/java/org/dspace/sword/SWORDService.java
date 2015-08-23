@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 package org.dspace.sword;
@@ -34,164 +34,168 @@ import org.purl.sword.base.Deposit;
  */
 public class SWORDService
 {
-	/** Log4j logging instance */
-	public static final Logger log = Logger.getLogger(SWORDService.class);
+    /** Log4j logging instance */
+    public static final Logger log = Logger.getLogger(SWORDService.class);
 
-	protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
+    protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory
+            .getInstance().getBitstreamFormatService();
 
-	/** The SWORD context of the request */
-	private SWORDContext swordContext;
+    /** The SWORD context of the request */
+    private SWORDContext swordContext;
 
-	/** The configuration of the sword server instance */
-	private SWORDConfiguration swordConfig;
+    /** The configuration of the sword server instance */
+    private SWORDConfiguration swordConfig;
 
-	/** The URL Generator */
-	private SWORDUrlManager urlManager;
+    /** The URL Generator */
+    private SWORDUrlManager urlManager;
 
-	/** a holder for the messages coming through from the implementation */
-	private StringBuilder verboseDescription = new StringBuilder();
+    /** a holder for the messages coming through from the implementation */
+    private StringBuilder verboseDescription = new StringBuilder();
 
-	/** is this a verbose operation */
-	private boolean verbose = false;
+    /** is this a verbose operation */
+    private boolean verbose = false;
 
-	/** date formatter */
-	private SimpleDateFormat dateFormat;
+    /** date formatter */
+    private SimpleDateFormat dateFormat;
 
-	/**
-	 * Construct a new service instance around the given authenticated
-	 * sword context
-	 *
-	 * @param sc
-	 */
-	public SWORDService(SWORDContext sc)
-	{
-		this.swordContext = sc;
-		this.swordConfig = new SWORDConfiguration();
-		this.urlManager = new SWORDUrlManager(this.swordConfig, this.swordContext.getContext());
-		dateFormat = new SimpleDateFormat("[yyyy-MM-dd HH:mm:ss.S]");
-	}
+    /**
+     * Construct a new service instance around the given authenticated
+     * sword context
+     *
+     * @param sc
+     */
+    public SWORDService(SWORDContext sc)
+    {
+        this.swordContext = sc;
+        this.swordConfig = new SWORDConfiguration();
+        this.urlManager = new SWORDUrlManager(this.swordConfig,
+                this.swordContext.getContext());
+        dateFormat = new SimpleDateFormat("[yyyy-MM-dd HH:mm:ss.S]");
+    }
 
-	public SWORDUrlManager getUrlManager()
-	{
-		return urlManager;
-	}
+    public SWORDUrlManager getUrlManager()
+    {
+        return urlManager;
+    }
 
-	public void setUrlManager(SWORDUrlManager urlManager)
-	{
-		this.urlManager = urlManager;
-	}
+    public void setUrlManager(SWORDUrlManager urlManager)
+    {
+        this.urlManager = urlManager;
+    }
 
-	public SWORDContext getSwordContext()
-	{
-		return swordContext;
-	}
+    public SWORDContext getSwordContext()
+    {
+        return swordContext;
+    }
 
-	public void setSwordContext(SWORDContext swordContext)
-	{
-		this.swordContext = swordContext;
-	}
+    public void setSwordContext(SWORDContext swordContext)
+    {
+        this.swordContext = swordContext;
+    }
 
-	public SWORDConfiguration getSwordConfig()
-	{
-		return swordConfig;
-	}
+    public SWORDConfiguration getSwordConfig()
+    {
+        return swordConfig;
+    }
 
-	public void setSwordConfig(SWORDConfiguration swordConfig)
-	{
-		this.swordConfig = swordConfig;
-	}
+    public void setSwordConfig(SWORDConfiguration swordConfig)
+    {
+        this.swordConfig = swordConfig;
+    }
 
-	public Context getContext()
-	{
-		return this.swordContext.getContext();
-	}
+    public Context getContext()
+    {
+        return this.swordContext.getContext();
+    }
 
-	public boolean isVerbose()
-	{
-		return verbose;
-	}
+    public boolean isVerbose()
+    {
+        return verbose;
+    }
 
-	public void setVerbose(boolean verbose)
-	{
-		this.verbose = verbose;
-	}
+    public void setVerbose(boolean verbose)
+    {
+        this.verbose = verbose;
+    }
 
-	public StringBuilder getVerboseDescription()
-	{
-		return verboseDescription;
-	}
+    public StringBuilder getVerboseDescription()
+    {
+        return verboseDescription;
+    }
 
-	/**
-	 * shortcut to registering a message with the verboseDescription
-	 * member variable.  This checks to see if the request is
-	 * verbose, meaning we don't have to do it inline and break nice
-	 * looking code up
-	 *
-	 * @param message
-	 */
-	public void message(String message)
-	{
-		// build the processing message
-		String msg = dateFormat.format(new Date()) + " " + message + "; \n\n";
+    /**
+     * shortcut to registering a message with the verboseDescription
+     * member variable.  This checks to see if the request is
+     * verbose, meaning we don't have to do it inline and break nice
+     * looking code up
+     *
+     * @param message
+     */
+    public void message(String message)
+    {
+        // build the processing message
+        String msg = dateFormat.format(new Date()) + " " + message + "; \n\n";
 
-		// if this is a verbose deposit, then log it
-		if (this.verbose)
-		{
-			verboseDescription.append(msg);
-		}
+        // if this is a verbose deposit, then log it
+        if (this.verbose)
+        {
+            verboseDescription.append(msg);
+        }
 
-		// add to server logs anyway
-		log.info(msg);
-	}
+        // add to server logs anyway
+        log.info(msg);
+    }
 
-	/**
-	 * Construct the most appropriate filename for the incoming deposit.
-	 *
-	 * @param context
-	 * @param deposit
-	 * @param original
-	 * @throws DSpaceSWORDException
-	 */
-	public String getFilename(Context context, Deposit deposit, boolean original)
-			throws DSpaceSWORDException
-	{
-		try
-		{
-			BitstreamFormat bf = bitstreamFormatService.findByMIMEType(context, deposit.getContentType());
-			List<String> exts = null;
-			if (bf != null)
-			{
-				exts = bf.getExtensions();
-			}
+    /**
+     * Construct the most appropriate filename for the incoming deposit.
+     *
+     * @param context
+     * @param deposit
+     * @param original
+     * @throws DSpaceSWORDException
+     */
+    public String getFilename(Context context, Deposit deposit,
+            boolean original)
+            throws DSpaceSWORDException
+    {
+        try
+        {
+            BitstreamFormat bf = bitstreamFormatService
+                    .findByMIMEType(context, deposit.getContentType());
+            List<String> exts = null;
+            if (bf != null)
+            {
+                exts = bf.getExtensions();
+            }
 
-			String fn = deposit.getFilename();
-			if (fn == null || "".equals(fn))
-			{
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-				fn = "sword-" + sdf.format(new Date());
-				if (original)
-				{
-					fn = fn + ".original";
-				}
-				if (exts != null && !exts.isEmpty())
-				{
-					fn = fn + "." + exts.get(0);
-				}
-			}
+            String fn = deposit.getFilename();
+            if (fn == null || "".equals(fn))
+            {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                fn = "sword-" + sdf.format(new Date());
+                if (original)
+                {
+                    fn = fn + ".original";
+                }
+                if (exts != null && !exts.isEmpty())
+                {
+                    fn = fn + "." + exts.get(0);
+                }
+            }
 
-			return fn;
-		}
-		catch (SQLException e)
-		{
-			throw new DSpaceSWORDException(e);
-		}
-	}
+            return fn;
+        }
+        catch (SQLException e)
+        {
+            throw new DSpaceSWORDException(e);
+        }
+    }
 
-	/**
-	 * Get the name of the temp files that should be used.
-	 */
-	public String getTempFilename()
-	{
-		return "sword-" + (new Date()).getTime();
-	}
+    /**
+     * Get the name of the temp files that should be used.
+     */
+    public String getTempFilename()
+    {
+        return "sword-" + (new Date()).getTime();
+    }
 }

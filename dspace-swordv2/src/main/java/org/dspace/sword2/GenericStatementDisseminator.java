@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 package org.dspace.sword2;
@@ -24,135 +24,152 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class GenericStatementDisseminator implements SwordStatementDisseminator
+public abstract class GenericStatementDisseminator
+        implements SwordStatementDisseminator
 {
-	protected SwordUrlManager urlManager;
+    protected SwordUrlManager urlManager;
 
-	protected void populateStatement(Context context, Item item, Statement statement)
-			throws DSpaceSwordException
-	{
-		this.urlManager = new SwordUrlManager(new SwordConfigurationDSpace(), context);
+    protected void populateStatement(Context context, Item item,
+            Statement statement)
+            throws DSpaceSwordException
+    {
+        this.urlManager = new SwordUrlManager(new SwordConfigurationDSpace(),
+                context);
         List<String> includeBundles = this.getIncludeBundles();
         String originalDepositBundle = this.getOriginalDepositsBundle();
 
         // we only list the original deposits in full if the sword bundle is in the includeBundles
         if (includeBundles.contains(originalDepositBundle))
         {
-            List<OriginalDeposit> originalDeposits = this.getOriginalDeposits(context, item, originalDepositBundle);
+            List<OriginalDeposit> originalDeposits = this
+                    .getOriginalDeposits(context, item, originalDepositBundle);
             statement.setOriginalDeposits(originalDeposits);
         }
 
-		Map<String, String> states = this.getStates(context, item);
+        Map<String, String> states = this.getStates(context, item);
         statement.setStates(states);
 
         // remove the original deposit bundle from the include bundles
         includeBundles.remove(originalDepositBundle);
-		List<ResourcePart> resources = this.getResourceParts(context, item, includeBundles);
+        List<ResourcePart> resources = this
+                .getResourceParts(context, item, includeBundles);
         statement.setResources(resources);
 
         Date lastModified = this.getLastModified(context, item);
         statement.setLastModified(lastModified);
-	}
+    }
 
-	protected List<OriginalDeposit> getOriginalDeposits(Context context, Item item, String swordBundle)
-			throws DSpaceSwordException
-	{
-		try
-		{
+    protected List<OriginalDeposit> getOriginalDeposits(Context context,
+            Item item, String swordBundle)
+            throws DSpaceSwordException
+    {
+        try
+        {
             // NOTE: DSpace does not store file metadata, so we can't access the information
             // about who deposited what, when, on behalf of whoever.
 
-			List<OriginalDeposit> originalDeposits = new ArrayList<OriginalDeposit>();
+            List<OriginalDeposit> originalDeposits = new ArrayList<OriginalDeposit>();
 
             // an original deposit is everything in the SWORD bundle
-			List<Bundle> bundles = item.getBundles();
-			for (Bundle bundle : bundles)
-			{
-				if (swordBundle.equals(bundle.getName()))
-				{
-					List<BundleBitstream> bundleBitstreams = bundle.getBitstreams();
-					for (BundleBitstream bundleBitstream : bundleBitstreams) {
-						// note that original deposits don't have actionable urls
-						OriginalDeposit deposit = new OriginalDeposit(this.urlManager.getBitstreamUrl(bundleBitstream.getBitstream()));
-						deposit.setMediaType(bundleBitstream.getBitstream().getFormat(context).getMIMEType());
-						originalDeposits.add(deposit);
-					}
-				}
-			}
-			return originalDeposits;
-		}
-		catch (SQLException e)
-		{
-			throw new DSpaceSwordException(e);
-		}
-	}
+            List<Bundle> bundles = item.getBundles();
+            for (Bundle bundle : bundles)
+            {
+                if (swordBundle.equals(bundle.getName()))
+                {
+                    List<BundleBitstream> bundleBitstreams = bundle
+                            .getBitstreams();
+                    for (BundleBitstream bundleBitstream : bundleBitstreams)
+                    {
+                        // note that original deposits don't have actionable urls
+                        OriginalDeposit deposit = new OriginalDeposit(
+                                this.urlManager.getBitstreamUrl(
+                                        bundleBitstream.getBitstream()));
+                        deposit.setMediaType(bundleBitstream.getBitstream()
+                                .getFormat(context).getMIMEType());
+                        originalDeposits.add(deposit);
+                    }
+                }
+            }
+            return originalDeposits;
+        }
+        catch (SQLException e)
+        {
+            throw new DSpaceSwordException(e);
+        }
+    }
 
-	protected Map<String, String> getStates(Context context, Item item)
-			throws DSpaceSwordException
-	{
-		SwordConfigurationDSpace config = new SwordConfigurationDSpace();
-		WorkflowTools wft = new WorkflowTools();
-		Map<String, String> states = new HashMap<String, String>();
-		if (item.isWithdrawn())
-		{
-			String uri = config.getStateUri("withdrawn");
-			String desc = config.getStateDescription("withdrawn");
-			states.put(uri, desc);
-		}
-		else if (item.isArchived())
-		{
-			String uri = config.getStateUri("archive");
-			String desc = config.getStateDescription("archive");
-			states.put(uri, desc);
-		}
-		else if (wft.isItemInWorkflow(context, item))
-		{
-			String uri = config.getStateUri("workflow");
-			String desc = config.getStateDescription("workflow");
-			states.put(uri, desc);
-		}
-		else if (wft.isItemInWorkspace(context, item))
-		{
-			String uri = config.getStateUri("workspace");
-			String desc = config.getStateDescription("workspace");
-			states.put(uri, desc);
-		}
-		return states;
-	}
+    protected Map<String, String> getStates(Context context, Item item)
+            throws DSpaceSwordException
+    {
+        SwordConfigurationDSpace config = new SwordConfigurationDSpace();
+        WorkflowTools wft = new WorkflowTools();
+        Map<String, String> states = new HashMap<String, String>();
+        if (item.isWithdrawn())
+        {
+            String uri = config.getStateUri("withdrawn");
+            String desc = config.getStateDescription("withdrawn");
+            states.put(uri, desc);
+        }
+        else if (item.isArchived())
+        {
+            String uri = config.getStateUri("archive");
+            String desc = config.getStateDescription("archive");
+            states.put(uri, desc);
+        }
+        else if (wft.isItemInWorkflow(context, item))
+        {
+            String uri = config.getStateUri("workflow");
+            String desc = config.getStateDescription("workflow");
+            states.put(uri, desc);
+        }
+        else if (wft.isItemInWorkspace(context, item))
+        {
+            String uri = config.getStateUri("workspace");
+            String desc = config.getStateDescription("workspace");
+            states.put(uri, desc);
+        }
+        return states;
+    }
 
-	protected List<ResourcePart> getResourceParts(Context context, Item item, List<String> includeBundles)
-			throws DSpaceSwordException
-	{
-		try
-		{
-			// the list of resource parts is everything in the bundles to be included
-			List<ResourcePart> resources = new ArrayList<ResourcePart>();
+    protected List<ResourcePart> getResourceParts(Context context, Item item,
+            List<String> includeBundles)
+            throws DSpaceSwordException
+    {
+        try
+        {
+            // the list of resource parts is everything in the bundles to be included
+            List<ResourcePart> resources = new ArrayList<ResourcePart>();
 
             for (String bundleName : includeBundles)
             {
                 List<Bundle> bundles = item.getBundles();
                 for (Bundle bundle : bundles)
                 {
-					if (bundleName.equals(bundle.getName()))
-					{
-						List<BundleBitstream> bundleBitstreams = bundle.getBitstreams();
-						for (BundleBitstream bundleBitstream : bundleBitstreams) {
-							// note that individual bitstreams have actionable urls
-							ResourcePart part = new ResourcePart(this.urlManager.getActionableBitstreamUrl(bundleBitstream.getBitstream()));
-							part.setMediaType(bundleBitstream.getBitstream().getFormat(context).getMIMEType());
-							resources.add(part);
-						}
-					}
+                    if (bundleName.equals(bundle.getName()))
+                    {
+                        List<BundleBitstream> bundleBitstreams = bundle
+                                .getBitstreams();
+                        for (BundleBitstream bundleBitstream : bundleBitstreams)
+                        {
+                            // note that individual bitstreams have actionable urls
+                            ResourcePart part = new ResourcePart(this.urlManager
+                                    .getActionableBitstreamUrl(
+                                            bundleBitstream.getBitstream()));
+                            part.setMediaType(bundleBitstream.getBitstream()
+                                    .getFormat(context).getMIMEType());
+                            resources.add(part);
+                        }
+                    }
                 }
             }
 
-			return resources;
-		}
-		catch (SQLException e)
-		{
-			throw new DSpaceSwordException(e);
-		}
-	}
+            return resources;
+        }
+        catch (SQLException e)
+        {
+            throw new DSpaceSwordException(e);
+        }
+    }
 
     protected Date getLastModified(Context context, Item item)
     {
@@ -161,7 +178,8 @@ public abstract class GenericStatementDisseminator implements SwordStatementDiss
 
     private List<String> getIncludeBundles()
     {
-        String cfg = ConfigurationManager.getProperty("swordv2-server", "statement.bundles");
+        String cfg = ConfigurationManager
+                .getProperty("swordv2-server", "statement.bundles");
         if (cfg == null || "".equals(cfg))
         {
             cfg = "ORIGINAL, SWORD";
@@ -181,7 +199,8 @@ public abstract class GenericStatementDisseminator implements SwordStatementDiss
 
     private String getOriginalDepositsBundle()
     {
-        String swordBundle = ConfigurationManager.getProperty("swordv2-server", "bundle.name");
+        String swordBundle = ConfigurationManager
+                .getProperty("swordv2-server", "bundle.name");
         if (swordBundle == null)
         {
             swordBundle = "SWORD";
