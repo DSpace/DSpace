@@ -28,9 +28,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.eperson.Group;
 
 /** 
  * This servlet provides an interface to the statistics reporting for a DSpace
@@ -41,6 +42,13 @@ import org.dspace.eperson.Group;
  */
 public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServlet
 {
+	private AuthorizeService authorizeService;
+	
+	@Override
+	public void init() throws ServletException {
+		super.init();
+		authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+	}
     protected void doDSGet(Context c, 
         HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
@@ -61,7 +69,7 @@ public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServle
         request.setAttribute("navbar", navbar);
         
         // is the user a member of the Administrator (1) group
-        boolean admin = Group.isMember(c, 1);
+        boolean admin = authorizeService.isAdmin(c);
         
         if (publicise || admin)
         {

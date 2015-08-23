@@ -7,10 +7,10 @@
  */
 package org.dspace.app.webui.servlet;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -23,13 +23,16 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.app.webui.util.JSPManager;
-import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.itemimport.BTEBatchImportService;
-import org.dspace.app.itemimport.ItemImport;
+import org.dspace.app.itemimport.factory.ItemImportServiceFactory;
+import org.dspace.app.itemimport.service.ItemImportService;
+import org.dspace.app.webui.util.FileUploadRequest;
+import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
-import org.dspace.core.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.core.Context;
 import org.dspace.utils.DSpace;
 
 /**
@@ -41,7 +44,18 @@ public class BatchImportServlet extends DSpaceServlet
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(BatchImportServlet.class);
+    
+    private CollectionService collectionService;
 
+    private ItemImportService itemImportService;
+    
+    @Override
+    public void init() throws ServletException {
+    	super.init();
+    	collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    	itemImportService = ItemImportServiceFactory.getInstance().getItemImportService();
+    	
+    }
     /**
      * Respond to a post request for metadata bulk importing via csv
      *
@@ -80,20 +94,19 @@ public class BatchImportServlet extends DSpaceServlet
     	    	String colIdS = wrapper.getParameter("colId");
     	    	if (colIdS!=null){
     	    		collections = new ArrayList<Collection>();
-    	    		collections.add(Collection.find(context, Integer.parseInt(colIdS)));
+    	    		collections.add(collectionService.findByIdOrLegacyId(context, colIdS));
 
     	    	}
     	    	else {
-    	    		collections = Arrays.asList(Collection.findAll(context));
+    	    		collections = collectionService.findAll(context);
     	    	}
     	    	request.setAttribute("collections", collections);
     	    	
     	    	
     	    	Collection owningCollection = null;
     			if (wrapper.getParameter("collection") != null) {
-    				int colId = Integer.parseInt(wrapper.getParameter("collection"));
-    				if (colId > 0)
-    					owningCollection = Collection.find(context, colId);
+					owningCollection = collectionService.findByIdOrLegacyId(context,
+							wrapper.getParameter("collection"));
     			}
     			
     	    	//Get all the possible data loaders from the Spring configuration
@@ -194,7 +207,7 @@ public class BatchImportServlet extends DSpaceServlet
         				filePath = f.getAbsolutePath();
     				}
     				
-    				ItemImport.processUIImport(filePath, owningCollection, reqCollections, uploadId, finalInputType, context);
+    				itemImportService.processUIImport(filePath, owningCollection, reqCollections, uploadId, finalInputType, context, true);
     				
     				request.setAttribute("has-error", "false");
     				request.setAttribute("uploadId", null);
@@ -253,11 +266,11 @@ public class BatchImportServlet extends DSpaceServlet
 		String colIdS = request.getParameter("colId");
 		if (colIdS!=null){
 			collections = new ArrayList<Collection>();
-			collections.add(Collection.find(context, Integer.parseInt(colIdS)));
+			collections.add(collectionService.findByIdOrLegacyId(context, colIdS));
 
 		}
 		else {
-			collections = Arrays.asList(Collection.findAll(context));
+			collections = collectionService.findAll(context);
 		}
 
 		request.setAttribute("collections", collections);

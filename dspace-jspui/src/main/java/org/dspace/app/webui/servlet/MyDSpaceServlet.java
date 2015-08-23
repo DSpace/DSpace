@@ -12,9 +12,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -22,32 +23,43 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.itemexport.ItemExportServiceImpl;
-import org.dspace.app.itemimport.ItemImportServiceImpl;
-import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.itemexport.ItemExportException;
+import org.dspace.app.itemexport.factory.ItemExportServiceFactory;
+import org.dspace.app.itemexport.service.ItemExportService;
 import org.dspace.app.itemimport.BTEBatchImportService;
 import org.dspace.app.itemimport.BatchUpload;
-import org.dspace.app.util.SubmissionConfigReader;
+import org.dspace.app.itemimport.factory.ItemImportServiceFactory;
+import org.dspace.app.itemimport.service.ItemImportService;
 import org.dspace.app.util.SubmissionConfig;
+import org.dspace.app.util.SubmissionConfigReader;
+import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
-import org.dspace.content.SupervisedItemServiceImpl;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.SupervisedItemService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.handle.HandleServiceImpl;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.GroupService;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.utils.DSpace;
 import org.dspace.workflowbasic.BasicWorkflowItem;
-import org.dspace.workflowbasic.BasicWorkflowServiceImpl;
+import org.dspace.workflowbasic.factory.BasicWorkflowServiceFactory;
+import org.dspace.workflowbasic.service.BasicWorkflowItemService;
+import org.dspace.workflowbasic.service.BasicWorkflowService;
 
 /**
  * Servlet for constructing the components of the "My DSpace" page
@@ -84,6 +96,43 @@ public class MyDSpaceServlet extends DSpaceServlet
 
     public static final int REQUEST_BATCH_IMPORT_ACTION = 7;
     
+    private WorkspaceItemService workspaceItemService;
+    
+    private BasicWorkflowService workflowService;
+    
+    private BasicWorkflowItemService workflowItemService;
+    
+    private HandleService handleService;
+    
+    private ItemService itemService;
+    
+    private ItemExportService itemExportService;
+    
+    private ItemImportService itemImportService;
+    
+    private CollectionService collectionService;
+    
+    private CommunityService communityService;
+    
+    private GroupService groupService;
+    
+    private SupervisedItemService supervisedItemService;
+    
+    @Override
+    public void init() throws ServletException {
+    	super.init();
+    	handleService = HandleServiceFactory.getInstance().getHandleService();
+    	itemService = ContentServiceFactory.getInstance().getItemService();
+		workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+		workflowService = BasicWorkflowServiceFactory.getInstance().getBasicWorkflowService();
+		workflowItemService = BasicWorkflowServiceFactory.getInstance().getBasicWorkflowItemService();
+		itemExportService =  ItemExportServiceFactory.getInstance().getItemExportService();
+		itemImportService = ItemImportServiceFactory.getInstance().getItemImportService();
+		collectionService = ContentServiceFactory.getInstance().getCollectionService();
+		communityService = ContentServiceFactory.getInstance().getCommunityService();
+		groupService = EPersonServiceFactory.getInstance().getGroupService();
+		supervisedItemService =  ContentServiceFactory.getInstance().getSupervisedItemService();
+    }
     
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
@@ -165,7 +214,7 @@ public class MyDSpaceServlet extends DSpaceServlet
         try
         {
             int wsID = Integer.parseInt(request.getParameter("workspace_id"));
-            workspaceItem = WorkspaceItem.find(context, wsID);
+            workspaceItem = workspaceItemService.find(context, wsID);
         }
         catch (NumberFormatException nfe)
         {
@@ -178,7 +227,7 @@ public class MyDSpaceServlet extends DSpaceServlet
         try
         {
             int wfID = Integer.parseInt(request.getParameter("workflow_id"));
-            workflowItem = BasicWorkflowItem.find(context, wfID);
+            workflowItem = workflowItemService.find(context, wfID);
         }
         catch (NumberFormatException nfe)
         {
@@ -268,7 +317,7 @@ public class MyDSpaceServlet extends DSpaceServlet
                 log.info(LogManager.getHeader(context, "unclaim_workflow",
                         "workflow_id=" + workflowItem.getID()));
 
-                BasicWorkflowServiceImpl.unclaim(context, workflowItem, context
+                workflowService.unclaim(context, workflowItem, context
                         .getCurrentUser());
 
                 showMainPage(context, request, response);
@@ -307,7 +356,7 @@ public class MyDSpaceServlet extends DSpaceServlet
         try
         {
             int wsID = Integer.parseInt(request.getParameter("workspace_id"));
-            workspaceItem = WorkspaceItem.find(context, wsID);
+            workspaceItem = workspaceItemService.find(context, wsID);
         }
         catch (NumberFormatException nfe)
         {
@@ -330,7 +379,7 @@ public class MyDSpaceServlet extends DSpaceServlet
             log.info(LogManager.getHeader(context, "remove_submission",
                     "workspace_item_id=" + workspaceItem.getID() + ",item_id="
                             + workspaceItem.getItem().getID()));
-            workspaceItem.deleteAll();
+            workspaceItemService.deleteAll(context, workspaceItem);
             showMainPage(context, request, response);
             context.complete();
         }
@@ -365,7 +414,7 @@ public class MyDSpaceServlet extends DSpaceServlet
         try
         {
             int wfID = Integer.parseInt(request.getParameter("workflow_id"));
-            workflowItem = BasicWorkflowItem.find(context, wfID);
+            workflowItem = workflowItemService.find(context, wfID);
         }
         catch (NumberFormatException nfe)
         {
@@ -384,7 +433,7 @@ public class MyDSpaceServlet extends DSpaceServlet
         if (buttonPressed.equals("submit_start"))
         {
             // User clicked "start" button to claim the task
-            BasicWorkflowServiceImpl.claim(context, workflowItem, context
+            workflowService.claim(context, workflowItem, context
                     .getCurrentUser());
 
             // Display "perform task" page
@@ -422,7 +471,7 @@ public class MyDSpaceServlet extends DSpaceServlet
         try
         {
             int wfID = Integer.parseInt(request.getParameter("workflow_id"));
-            workflowItem = BasicWorkflowItem.find(context, wfID);
+            workflowItem = workflowItemService.find(context, wfID);
         }
         catch (NumberFormatException nfe)
         {
@@ -443,18 +492,18 @@ public class MyDSpaceServlet extends DSpaceServlet
             Item item = workflowItem.getItem();
 
             // Advance the item along the workflow
-            BasicWorkflowServiceImpl.advance(context, workflowItem, context
+            workflowService.advance(context, workflowItem, context
                     .getCurrentUser());
 
             // FIXME: This should be a return value from advance()
             // See if that gave the item a Handle. If it did,
             // the item made it into the archive, so we
             // should display a suitable page.
-            String handle = HandleServiceImpl.findHandle(context, item);
+            String handle = handleService.findHandle(context, item);
 
             if (handle != null)
             {
-                String displayHandle = HandleServiceImpl.getCanonicalForm(handle);
+                String displayHandle = handleService.getCanonicalForm(handle);
 
                 request.setAttribute("handle", displayHandle);
                 JSPManager.showJSP(request, response,
@@ -495,7 +544,7 @@ public class MyDSpaceServlet extends DSpaceServlet
         else if (buttonPressed.equals("submit_pool"))
         {
             // Return task to pool
-            BasicWorkflowServiceImpl.unclaim(context, workflowItem, context
+            workflowService.unclaim(context, workflowItem, context
                     .getCurrentUser());
             showMainPage(context, request, response);
             context.complete();
@@ -531,7 +580,7 @@ public class MyDSpaceServlet extends DSpaceServlet
         try
         {
             int wfID = Integer.parseInt(request.getParameter("workflow_id"));
-            workflowItem = BasicWorkflowItem.find(context, wfID);
+            workflowItem = workflowItemService.find(context, wfID);
         }
         catch (NumberFormatException nfe)
         {
@@ -551,8 +600,8 @@ public class MyDSpaceServlet extends DSpaceServlet
         {
             String reason = request.getParameter("reason");
 
-            WorkspaceItem wsi = BasicWorkflowServiceImpl.reject(context, workflowItem,
-                    context.getCurrentUser(), reason);
+            WorkspaceItem wsi = workflowService.sendWorkflowItemBackSubmission(context, workflowItem,
+                    context.getCurrentUser(), null, reason);
 
             // Load the Submission Process for the collection this WSI is
             // associated with
@@ -567,7 +616,7 @@ public class MyDSpaceServlet extends DSpaceServlet
             int lastStep = subConfig.getNumberOfSteps() - 2;
             wsi.setStageReached(lastStep);
             wsi.setPageReached(AbstractProcessingStep.LAST_PAGE_REACHED);
-            wsi.update();
+            workspaceItemService.update(context, wsi);
 
             JSPManager
                     .showJSP(request, response, "/mydspace/task-complete.jsp");
@@ -586,7 +635,7 @@ public class MyDSpaceServlet extends DSpaceServlet
     	if (request.getParameter("item_id") != null) {
 			Item item = null;
 			try {
-				item = Item.find(context, Integer.parseInt(request
+				item = itemService.find(context, UUID.fromString(request
 						.getParameter("item_id")));
 			} catch (Exception e) {
 				log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
@@ -602,7 +651,7 @@ public class MyDSpaceServlet extends DSpaceServlet
 	            return;
 			} else {
 				try {
-					ItemExportServiceImpl.createDownloadableExport(item, context, migrate);
+					itemExportService.createDownloadableExport(item, context, migrate);
 				} catch (ItemExportException iee) {
                     log.warn(LogManager.getHeader(context, "export_too_large_error", UIUtil
 		                    .getRequestLogInfo(request)));
@@ -622,7 +671,7 @@ public class MyDSpaceServlet extends DSpaceServlet
 		} else if (request.getParameter("collection_id") != null) {
 			Collection col = null;
 			try {
-				col = Collection.find(context, Integer.parseInt(request
+				col = collectionService.find(context, UUID.fromString(request
 						.getParameter("collection_id")));
 			} catch (Exception e) {
 				log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
@@ -638,7 +687,7 @@ public class MyDSpaceServlet extends DSpaceServlet
 	            return;
 			} else {
 				try {
-					ItemExportServiceImpl.createDownloadableExport(col, context, migrate);
+					itemExportService.createDownloadableExport(col, context, migrate);
 				} catch (ItemExportException iee) {
                     log.warn(LogManager.getHeader(context, "export_too_large_error", UIUtil
 		                    .getRequestLogInfo(request)));
@@ -656,7 +705,7 @@ public class MyDSpaceServlet extends DSpaceServlet
 		} else if (request.getParameter("community_id") != null) {
 			Community com = null;
 			try {
-				com = Community.find(context, Integer.parseInt(request
+				com = communityService.find(context, UUID.fromString(request
 						.getParameter("community_id")));
 			} catch (Exception e) {
 				log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
@@ -672,7 +721,7 @@ public class MyDSpaceServlet extends DSpaceServlet
 	            return;
 			} else {
 				try {
-					ItemExportServiceImpl.createDownloadableExport(com, context, migrate);
+					itemExportService.createDownloadableExport(com, context, migrate);
 				} catch (ItemExportException iee) {
                     log.warn(LogManager.getHeader(context, "export_too_large_error", UIUtil
 		                    .getRequestLogInfo(request)));
@@ -704,7 +753,7 @@ public class MyDSpaceServlet extends DSpaceServlet
     		
     		String mapFilePath = null;
     		try {
-    			mapFilePath = ItemImportServiceImpl.getImportUploadableDirectory(context.getCurrentUser().getID()) + File.separator + uploadId + File.separator + "mapfile";
+    			mapFilePath = itemImportService.getImportUploadableDirectory(context.getCurrentUser()) + File.separator + uploadId + File.separator + "mapfile";
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -738,9 +787,8 @@ public class MyDSpaceServlet extends DSpaceServlet
     		outStream.close();
     	}
     	else if (buttonPressed.equals("submit_delete")){
-    		ItemImportServiceImpl itemImport = new ItemImportServiceImpl();
     		try {
-				itemImport.deleteBatchUpload(context, uploadId);
+				itemImportService.deleteBatchUpload(context, uploadId);
 				showMainPage(context, request, response);
 				
 			} catch (Exception e) {
@@ -753,7 +801,7 @@ public class MyDSpaceServlet extends DSpaceServlet
             request.setAttribute("uploadId", uploadId);
         	
         	//Get all collections
-    		List<Collection> collections = Arrays.asList(Collection.findAll(context));
+    		List<Collection> collections = collectionService.findAll(context);
     		request.setAttribute("collections", collections);
 
     		//Get all the possible data loaders from the Spring configuration
@@ -793,32 +841,29 @@ public class MyDSpaceServlet extends DSpaceServlet
         log.info(LogManager.getHeader(context, "view_mydspace", ""));
         EPerson currentUser = context.getCurrentUser();
 
-        // FIXME: WorkflowManager should return arrays
-        List<BasicWorkflowItem> ownedList = BasicWorkflowServiceImpl.getOwnedTasks(context, currentUser);
-        BasicWorkflowItem[] owned = ownedList.toArray(new BasicWorkflowItem[ownedList.size()]);
+        List<BasicWorkflowItem> ownedList = workflowService.getOwnedTasks(context, currentUser);
 
         // Pooled workflow items
-        List<BasicWorkflowItem> pooledList = BasicWorkflowServiceImpl.getPooledTasks(context, currentUser);
-        BasicWorkflowItem[] pooled = pooledList.toArray(new BasicWorkflowItem[pooledList.size()]);
+        List<BasicWorkflowItem> pooledList = workflowService.getPooledTasks(context, currentUser);
 
         // User's WorkflowItems
-        BasicWorkflowItem[] workflowItems = BasicWorkflowItem.findByEPerson(context, currentUser);
+        List<BasicWorkflowItem> workflowItems = workflowItemService.findByOwner(context, currentUser);
 
         // User's PersonalWorkspace
-        WorkspaceItem[] workspaceItems = WorkspaceItem.findByEPerson(context, currentUser);
+        List<WorkspaceItem> workspaceItems = workspaceItemService.findByEPerson(context, currentUser);
 
         // User's authorization groups
-        Group[] memberships = Group.allMemberGroups(context, currentUser);
+        List<Group> memberships = groupService.allMemberGroups(context, currentUser);
         
         // Should the group memberships be displayed
         boolean displayMemberships = ConfigurationManager.getBooleanProperty("webui.mydspace.showgroupmemberships", false);
 
-        SupervisedItemServiceImpl[] supervisedItems = SupervisedItemServiceImpl.findbyEPerson(
+        List<WorkspaceItem> supervisedItems = supervisedItemService.findbyEPerson(
                 context, currentUser);
         // export archives available for download
         List<String> exportArchives = null;
         try{
-        	exportArchives = ItemExportServiceImpl.getExportsAvailable(currentUser);
+        	exportArchives = itemExportService.getExportsAvailable(currentUser);
         }
         catch (Exception e) {
 			// nothing to do they just have no export archives available for download
@@ -827,7 +872,7 @@ public class MyDSpaceServlet extends DSpaceServlet
         // imports available for view
         List<BatchUpload> importUploads = null;
         try{
-        	importUploads = ItemImportServiceImpl.getImportsAvailable(currentUser);
+        	importUploads = itemImportService.getImportsAvailable(currentUser);
         }
         catch (Exception e) {
 			// nothing to do they just have no export archives available for download
@@ -838,8 +883,8 @@ public class MyDSpaceServlet extends DSpaceServlet
         request.setAttribute("mydspace.user", currentUser);
         request.setAttribute("workspace.items", workspaceItems);
         request.setAttribute("workflow.items", workflowItems);
-        request.setAttribute("workflow.owned", owned);
-        request.setAttribute("workflow.pooled", pooled);
+        request.setAttribute("workflow.owned", ownedList);
+        request.setAttribute("workflow.pooled", pooledList);
         request.setAttribute("group.memberships", memberships);
         request.setAttribute("display.groupmemberships", Boolean.valueOf(displayMemberships));
         request.setAttribute("supervised.items", supervisedItems);
@@ -867,36 +912,19 @@ public class MyDSpaceServlet extends DSpaceServlet
     {
         // Turn the iterator into a list
         List<Item> subList = new LinkedList<Item>();
-        ItemIterator subs = Item.findBySubmitter(context, context
+        Iterator<Item> subs = itemService.findBySubmitter(context, context
                 .getCurrentUser());
 
-        try
+        while (subs.hasNext())
         {
-            while (subs.hasNext())
-            {
-                subList.add(subs.next());
-            }
-        }
-        finally
-        {
-            if (subs != null)
-            {
-                subs.close();
-            }
-        }
-
-        Item[] items = new Item[subList.size()];
-
-        for (int i = 0; i < subList.size(); i++)
-        {
-            items[i] = subList.get(i);
+            subList.add(subs.next());
         }
 
         log.info(LogManager.getHeader(context, "view_own_submissions", "count="
-                + items.length));
+                + subList.size()));
 
         request.setAttribute("user", context.getCurrentUser());
-        request.setAttribute("items", items);
+        request.setAttribute("items", subList);
 
         JSPManager.showJSP(request, response, "/mydspace/own-submissions.jsp");
     }

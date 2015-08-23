@@ -32,13 +32,14 @@ import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
-import org.dspace.handle.HandleServiceImpl;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 
 public class DiscoverUtility
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(DiscoverUtility.class);
-
+    
     public static final int TYPE_FACETS = 1;
     public static final int TYPE_TAGCLOUD = 2;
     
@@ -68,7 +69,8 @@ public class DiscoverUtility
             }
             return null;
         }
-        DSpaceObject scope = HandleServiceImpl.resolveToObject(context, location);
+        HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+        DSpaceObject scope = handleService.resolveToObject(context, location);
         return scope;
     }
 

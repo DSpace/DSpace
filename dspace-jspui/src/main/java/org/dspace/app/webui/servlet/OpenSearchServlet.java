@@ -16,7 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.discovery.DiscoverySearchRequestProcessor;
-import org.dspace.app.webui.search.LuceneSearchRequestProcessor;
 import org.dspace.app.webui.search.SearchProcessorException;
 import org.dspace.app.webui.search.SearchRequestProcessor;
 import org.dspace.authorize.AuthorizeException;

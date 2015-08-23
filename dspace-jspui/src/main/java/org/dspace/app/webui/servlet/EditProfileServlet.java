@@ -21,6 +21,8 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 
 /**
  * Servlet for handling editing user profiles
@@ -32,6 +34,15 @@ public class EditProfileServlet extends DSpaceServlet
 {
     /** Logger */
     private static Logger log = Logger.getLogger(EditProfileServlet.class);
+    
+    protected EPersonService personService;
+    
+    @Override
+    public void init() throws ServletException {
+    	super.init();
+    	personService = EPersonServiceFactory.getInstance().getEPersonService();
+    }
+    
 
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
@@ -62,7 +73,7 @@ public class EditProfileServlet extends DSpaceServlet
         }
 
         // Set the user profile info
-        boolean ok = updateUserProfile(eperson, request);
+        boolean ok = updateUserProfile(context, eperson, request);
 
         if (!ok)
         {
@@ -85,7 +96,7 @@ public class EditProfileServlet extends DSpaceServlet
             // Update the DB
             log.info(LogManager.getHeader(context, "edit_profile",
                     "password_changed=" + settingPassword));
-            eperson.update();
+            personService.update(context, eperson);
 
             // Show confirmation
             request.setAttribute("password.updated", Boolean.valueOf(settingPassword));
@@ -118,8 +129,8 @@ public class EditProfileServlet extends DSpaceServlet
      * @return true if the user supplied all the required information, false if
      *         they left something out.
      */
-    public static boolean updateUserProfile(EPerson eperson,
-            HttpServletRequest request)
+    public boolean updateUserProfile(Context context, EPerson eperson,
+            HttpServletRequest request) throws SQLException
     {
         // Get the parameters from the form
         String lastName = request.getParameter("last_name");
@@ -128,10 +139,10 @@ public class EditProfileServlet extends DSpaceServlet
         String language = request.getParameter("language");
 
         // Update the eperson
-        eperson.setFirstName(firstName);
-        eperson.setLastName(lastName);
-        eperson.setMetadata("phone", phone);
-        eperson.setLanguage(language);
+        eperson.setFirstName(context, firstName);
+        eperson.setLastName(context, lastName);
+        personService.setMetadataSingleValue(context, eperson, "eperson" , "phone", null, null, phone);
+        eperson.setLanguage(context, language);
 
         // Check all required fields are there
         return (!StringUtils.isEmpty(lastName) && !StringUtils.isEmpty(firstName));
@@ -149,7 +160,7 @@ public class EditProfileServlet extends DSpaceServlet
      * 
      * @return true if everything went OK, or false
      */
-    public static boolean confirmAndSetPassword(EPerson eperson,
+    public  boolean confirmAndSetPassword(EPerson eperson,
             HttpServletRequest request)
     {
         // Get the passwords
@@ -169,7 +180,7 @@ public class EditProfileServlet extends DSpaceServlet
         }
 
         // Everything OK so far, change the password
-        eperson.setPassword(password);
+        personService.setPassword(eperson, password);
 
         return true;
     }
