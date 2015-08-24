@@ -127,6 +127,20 @@
                         select="$metsDoc/mets:METS/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='format'][@qualifier='extent'][1]"/>
                 <xsl:text>]</xsl:text>
             </xsl:if>
+            <br/>
+	        <!-- Show parent of community/collection -->
+	        <xsl:if test="dri:list[@n=(concat($handle, ':dc.other')) and descendant::text()]">
+	        	<div class="show_parent" title="{dri:list[@n=(concat($handle, ':dc.other'))]/dri:item}">
+	        		<xsl:choose >
+	        			<xsl:when test="string-length(dri:list[@n=(concat($handle, ':dc.other'))]/dri:item) &gt; 60">
+	        				<xsl:value-of select="concat(substring(dri:list[@n=(concat($handle, ':dc.other'))]/dri:item,1,56),'...')"/>
+	        			</xsl:when>
+	        			<xsl:otherwise>
+	        				<xsl:value-of select="dri:list[@n=(concat($handle, ':dc.other'))]/dri:item"/>
+	        			</xsl:otherwise>
+	        		</xsl:choose>
+	        	</div>
+	        </xsl:if>
         </div>
     </xsl:template>
 
@@ -160,7 +174,16 @@
         <br/>
         <!-- Show parent of community/collection -->
         <xsl:if test="dri:list[@n=(concat($handle, ':dc.other')) and descendant::text()]">
-        	<xsl:value-of select="dri:list[@n=(concat($handle, ':dc.other'))]/dri:item"/>
+        	<div class="show_parent" title="{dri:list[@n=(concat($handle, ':dc.other'))]/dri:item}">
+        		<xsl:choose >
+        			<xsl:when test="string-length(dri:list[@n=(concat($handle, ':dc.other'))]/dri:item) &gt; 60">
+        				<xsl:value-of select="concat(substring(dri:list[@n=(concat($handle, ':dc.other'))]/dri:item,1,56),'...')"/>
+        			</xsl:when>
+        			<xsl:otherwise>
+        				<xsl:value-of select="dri:list[@n=(concat($handle, ':dc.other'))]/dri:item"/>
+        			</xsl:otherwise>
+        		</xsl:choose>
+        	</div>
         </xsl:if>
         </div>
 

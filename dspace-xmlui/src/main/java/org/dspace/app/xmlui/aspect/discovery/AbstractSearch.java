@@ -463,7 +463,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
     	else //  it is either a collection or a community
     	{
     		genericAddMetadata(all,dso,highlightedResults,dsoMetadata);
-    		String parent = dso.getParentObject().getMetadata("name");
+    		String parent = getAllParents(dso);
             String identifier_uri = "http://hdl.handle.net/" + dso.getHandle();
             if(StringUtils.isNotBlank(parent))
             {
@@ -474,6 +474,29 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
                 addMetadataField(highlightedResults, "dc.identifier.uri", dsoMetadata.addList(dso.getHandle() + ":dc.identifier.uri"), identifier_uri);
             }
     	}
+    }
+    
+    private String getAllParents(DSpaceObject dso) throws SQLException
+    {
+    	ArrayList<String> parents = new ArrayList<String>();
+    	try
+    	{
+	    	while(dso.getParentObject()!=null)
+	    	{	    		
+	    		parents.add(dso.getParentObject().getMetadata("name"));
+	    		dso=dso.getParentObject();
+	    	}
+    	}
+    	finally
+    	{
+    		String result="";
+    		for(int i=parents.size();i>0;i--)
+    			{
+    			  result += parents.get(i-1)+" > ";
+    			}
+    		return result;
+    	}
+    	
     }
     
     private void genericAddMetadata(Metadatum[] allMetadata,DSpaceObject dso,DiscoverResult.DSpaceObjectHighlightResult highlightedResults,org.dspace.app.xmlui.wing.element.List dsoMetadata ) throws WingException, SQLException
