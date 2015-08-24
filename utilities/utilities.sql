@@ -263,47 +263,6 @@ ALTER SEQUENCE license_resource_user_allowance_transaction_id_seq OWNED BY licen
 
 SELECT pg_catalog.setval('license_resource_user_allowance_transaction_id_seq', 241, true);
 
-
---
--- Name: organization; Type: TABLE; Schema: public; Owner: dspace; Tablespace: 
---
-
-CREATE TABLE organization (
-    organization_id integer NOT NULL,
-    name character varying(256) NOT NULL
-);
-
-
-ALTER TABLE public.organization OWNER TO dspace;
-
---
--- Name: organization_organization_id_seq_1; Type: SEQUENCE; Schema: public; Owner: dspace
---
-
-CREATE SEQUENCE organization_organization_id_seq_1
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.organization_organization_id_seq_1 OWNER TO dspace;
-
---
--- Name: organization_organization_id_seq_1; Type: SEQUENCE OWNED BY; Schema: public; Owner: dspace
---
-
-ALTER SEQUENCE organization_organization_id_seq_1 OWNED BY organization.organization_id;
-
-
---
--- Name: organization_organization_id_seq_1; Type: SEQUENCE SET; Schema: public; Owner: dspace
---
-
-SELECT pg_catalog.setval('organization_organization_id_seq_1', 1, false);
-
-
 --
 -- Name: piwik_report; Type: TABLE; Schema: public; Owner: dspace; Tablespace: 
 --
@@ -343,48 +302,6 @@ ALTER SEQUENCE piwik_report_report_id_seq OWNED BY piwik_report.report_id;
 --
 
 SELECT pg_catalog.setval('piwik_report_report_id_seq', 18, true);
-
-
---
--- Name: shibboleth_attribute_mapping; Type: TABLE; Schema: public; Owner: dspace; Tablespace: 
---
-
-CREATE TABLE shibboleth_attribute_mapping (
-    mapping_id integer NOT NULL,
-    organization_id integer NOT NULL,
-    source_name character varying NOT NULL,
-    target_name character varying NOT NULL
-);
-
-
-ALTER TABLE public.shibboleth_attribute_mapping OWNER TO dspace;
-
---
--- Name: shibboleth_attribute_mapping_mapping_id_seq; Type: SEQUENCE; Schema: public; Owner: dspace
---
-
-CREATE SEQUENCE shibboleth_attribute_mapping_mapping_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.shibboleth_attribute_mapping_mapping_id_seq OWNER TO dspace;
-
---
--- Name: shibboleth_attribute_mapping_mapping_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dspace
---
-
-ALTER SEQUENCE shibboleth_attribute_mapping_mapping_id_seq OWNED BY shibboleth_attribute_mapping.mapping_id;
-
-
---
--- Name: shibboleth_attribute_mapping_mapping_id_seq; Type: SEQUENCE SET; Schema: public; Owner: dspace
---
-
-SELECT pg_catalog.setval('shibboleth_attribute_mapping_mapping_id_seq', 1, true);
 
 
 --
@@ -498,27 +415,11 @@ ALTER TABLE ONLY license_resource_mapping ALTER COLUMN mapping_id SET DEFAULT ne
 
 ALTER TABLE ONLY license_resource_user_allowance ALTER COLUMN transaction_id SET DEFAULT nextval('license_resource_user_allowance_transaction_id_seq'::regclass);
 
-
---
--- Name: organization_id; Type: DEFAULT; Schema: public; Owner: dspace
---
-
-ALTER TABLE ONLY organization ALTER COLUMN organization_id SET DEFAULT nextval('organization_organization_id_seq_1'::regclass);
-
-
 --
 -- Name: report_id; Type: DEFAULT; Schema: public; Owner: dspace
 --
 
 ALTER TABLE ONLY piwik_report ALTER COLUMN report_id SET DEFAULT nextval('piwik_report_report_id_seq'::regclass);
-
-
---
--- Name: mapping_id; Type: DEFAULT; Schema: public; Owner: dspace
---
-
-ALTER TABLE ONLY shibboleth_attribute_mapping ALTER COLUMN mapping_id SET DEFAULT nextval('shibboleth_attribute_mapping_mapping_id_seq'::regclass);
-
 
 --
 -- Name: user_metadata_id; Type: DEFAULT; Schema: public; Owner: dspace
@@ -564,42 +465,6 @@ COPY license_label (label_id, label, title, is_extended) FROM stdin;
 15	MIT	The MIT License	t
 18	OSI	The Open Source Initiative 	t
 \.
-
-
---
--- Data for Name: organization; Type: TABLE DATA; Schema: public; Owner: dspace
---
-
-COPY organization (organization_id, name) FROM stdin;
-1	https://cas.cuni.cz/idp/shibboleth
-2	https://idp2.ics.muni.cz/idp/shibboleth
-3	https://shib.zcu.cz/idp/shibboleth
-0	default
-\.
-
-
---
--- Data for Name: shibboleth_attribute_mapping; Type: TABLE DATA; Schema: public; Owner: dspace
---
-
-COPY shibboleth_attribute_mapping (mapping_id, organization_id, source_name, target_name) FROM stdin;
-1	1	user_id	mail
-2	1	shibboleth_user_id	persistent-id
-3	1	user_fname	givenName
-4	1	user_lname	sn
-5	2	user_id	eppn
-6	2	shibboleth_user_id	eppn
-7	2	user_lname	cn
-8	3	user_id	mail
-9	3	shibboleth_user_id	eppn
-10	3	user_fname	givenName
-11	3	user_lname	sn
-12	0	user_id	mail
-13	0	shibboleth_user_id	eppn
-14	0	user_fname	givenName
-15	0	user_lname	sn
-\.
-
 
 --
 -- Name: license_definition_pkey; Type: CONSTRAINT; Schema: public; Owner: dspace; Tablespace: 
@@ -650,28 +515,11 @@ ALTER TABLE ONLY license_resource_user_allowance
 
 
 --
--- Name: organization_id; Type: CONSTRAINT; Schema: public; Owner: dspace; Tablespace: 
---
-
-ALTER TABLE ONLY organization
-    ADD CONSTRAINT organization_id PRIMARY KEY (organization_id);
-
-
---
 -- Name: piwik_report_pkey; Type: CONSTRAINT; Schema: public; Owner: dspace; Tablespace: 
 --
 
 ALTER TABLE ONLY piwik_report
     ADD CONSTRAINT piwik_report_pkey PRIMARY KEY (report_id);
-
-
---
--- Name: shibboleth_attribute_mapping_pkey; Type: CONSTRAINT; Schema: public; Owner: dspace; Tablespace: 
---
-
-ALTER TABLE ONLY shibboleth_attribute_mapping
-    ADD CONSTRAINT shibboleth_attribute_mapping_pkey PRIMARY KEY (mapping_id);
-
 
 --
 -- Name: user_metadata_pkey; Type: CONSTRAINT; Schema: public; Owner: dspace; Tablespace: 
@@ -773,15 +621,6 @@ ALTER TABLE ONLY license_resource_user_allowance
 
 ALTER TABLE ONLY user_metadata
     ADD CONSTRAINT license_resource_user_allowance_user_metadata_fk FOREIGN KEY (transaction_id) REFERENCES license_resource_user_allowance(transaction_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: organization_shibboleth_attribute_mapping_fk; Type: FK CONSTRAINT; Schema: public; Owner: dspace
---
-
-ALTER TABLE ONLY shibboleth_attribute_mapping
-    ADD CONSTRAINT organization_shibboleth_attribute_mapping_fk FOREIGN KEY (organization_id) REFERENCES organization(organization_id);
-
 
 --
 -- Name: user_registration_license_definition_fk; Type: FK CONSTRAINT; Schema: public; Owner: dspace
