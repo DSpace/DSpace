@@ -11,14 +11,13 @@ import java.util.Properties;
 import org.apache.cocoon.environment.Request;
 import org.apache.commons.io.FileUtils;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Button;
 import org.dspace.app.xmlui.wing.element.Cell;
 import org.dspace.app.xmlui.wing.element.CheckBox;
 import org.dspace.app.xmlui.wing.element.Division;
+import org.dspace.app.xmlui.wing.element.Highlight;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
-import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
@@ -222,25 +221,6 @@ public class ControlPanelReplicationTabHelper {
 		if(action.equals("repl_not_tobe")) {
 			showCannotReplicate(div, request, context);
 		}
-		
-		// Download path
-		//
-		else if (request.getParameter("submit_repl_download") != null) {
-			try {
-				//fixme these parameters are never set neither is the one above
-				/*String remPath = request.getParameter("submit_repl_download_filepath");
-				String locPath = request.getParameter("submit_local_download_filepath");
-				File file = new File(locPath);
-				if(file.exists()) {
-					file.delete();
-				}
-				ReplicationManager.retrieveFile(remPath, file.getAbsolutePath());*/
-				//message = "file retrived and stored to " + file.getAbsolutePath();
-			} catch (Exception e) {
-				//message += "Could not download path: " + e.toString();
-			}
-
-		}
 
 	}
 
@@ -411,8 +391,9 @@ public class ControlPanelReplicationTabHelper {
 		
 		Division msg = div.addDivision("message", "alert alert-info");
 		
-		msg.addPara().addHighlight("pull-right").addButton("action", "label label-important btn btn-sm btn-primary").setValue("Retrieve");
-		msg.addPara().addHighlight("pull-right").addButton("action", "label label-important btn btn-sm btn-danger").setValue("Delete");		
+		Highlight h = msg.addPara().addHighlight("pull-right");		
+		h.addButton("action", "label label-primary btn btn-sm btn-primary").setValue("Retrieve");
+		h.addButton("action", "label label-important btn btn-sm btn-danger").setValue("Delete");
 		
 		// display it
 		Table table = div.addTable("replica_items", 1, 6);
