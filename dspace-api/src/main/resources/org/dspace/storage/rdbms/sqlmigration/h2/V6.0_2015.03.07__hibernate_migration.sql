@@ -384,3 +384,19 @@ ALTER TABLE most_recent_checksum ADD COLUMN bitstream_id UUID;
 ALTER TABLE most_recent_checksum ADD CONSTRAINT most_recent_checksum_bitstream_id_fk FOREIGN KEY (bitstream_id) REFERENCES Bitstream;
 UPDATE most_recent_checksum SET bitstream_id = (SELECT Bitstream.uuid FROM Bitstream WHERE most_recent_checksum.bitstream_legacy_id = Bitstream.bitstream_id);
 ALTER TABLE most_recent_checksum DROP COLUMN bitstream_legacy_id;
+
+ALTER TABLE checksum_history ALTER COLUMN bitstream_id rename to bitstream_legacy_id;
+ALTER TABLE checksum_history ADD COLUMN bitstream_id UUID;
+ALTER TABLE checksum_history ADD CONSTRAINT checksum_history_id_fk FOREIGN KEY (bitstream_id) REFERENCES Bitstream;
+UPDATE checksum_history SET bitstream_id = (SELECT Bitstream.uuid FROM Bitstream WHERE checksum_history.bitstream_legacy_id = Bitstream.bitstream_id);
+ALTER TABLE checksum_history DROP COLUMN bitstream_legacy_id;
+
+--Alter table doi
+ALTER TABLE doi ADD COLUMN dspace_object UUID;
+ALTER TABLE doi ADD CONSTRAINT doi_dspace_object_fk FOREIGN KEY (dspace_object) REFERENCES dspaceobject;
+UPDATE doi SET dspace_object = (SELECT community.uuid FROM community WHERE doi.resource_id = community.community_id AND doi.resource_type_id = 4)  WHERE doi.resource_type_id = 4;
+UPDATE doi SET dspace_object = (SELECT collection.uuid FROM collection WHERE doi.resource_id = collection.collection_id AND doi.resource_type_id = 3)  WHERE doi.resource_type_id = 3;
+UPDATE doi SET dspace_object = (SELECT item.uuid FROM item WHERE doi.resource_id = item.item_id AND doi.resource_type_id = 2)  WHERE doi.resource_type_id = 2;
+UPDATE doi SET dspace_object = (SELECT bundle.uuid FROM bundle WHERE doi.resource_id = bundle.bundle_id AND doi.resource_type_id = 1)  WHERE doi.resource_type_id = 1;
+UPDATE doi SET dspace_object = (SELECT bitstream.uuid FROM bitstream WHERE doi.resource_id = bitstream.bitstream_id AND doi.resource_type_id = 0)  WHERE doi.resource_type_id = 0;
+
