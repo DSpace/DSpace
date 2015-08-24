@@ -159,6 +159,7 @@ lr.replication.eudat.zone=
 lr.replication.eudat.defaultstorage=
 lr.replication.eudat.id=
 lr.replication.eudat.notification_email=${info.recipient}
+lr.replication.eudat.retrievetopath=
 # default is not set
 lr.replication.jargon.numThreads=
 # default 32 * 1024 * 1024

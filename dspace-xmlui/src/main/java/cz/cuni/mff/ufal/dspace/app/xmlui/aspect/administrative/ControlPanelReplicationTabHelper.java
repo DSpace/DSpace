@@ -31,6 +31,7 @@ public class ControlPanelReplicationTabHelper {
 	
 	private final static String delete_prefix = "checkbox-delete";
 	private final static String url_hdl_prefix = ConfigurationManager.getProperty("handle.canonical.prefix");
+	private final static String retrieve_path = ConfigurationManager.getProperty("lr", "lr.replication.eudat.retrievetopath");
 		
 	public static void showTabs(Division div, Request request, Context context) throws WingException {
 		String action = request.getParameter("action");
@@ -165,6 +166,36 @@ public class ControlPanelReplicationTabHelper {
 			}
 			action = "list_replicas";
 		}
+		
+		if(action.equals("Retrieve")) {
+			Map<String, String> params = request.getParameters();
+			
+			ArrayList<String> toret = new ArrayList<String>();
+	
+			for (String key : params.keySet()) {
+				if (key.startsWith(delete_prefix)) {
+					String fileName = params.get(key);
+					toret.add(fileName);
+				}
+			}
+			
+			if(!toret.isEmpty()) {
+				Division m = div.addDivision("message", "alert alert-success bold");
+				for(String fileName : toret) {
+					try {
+						ReplicationManager.retrieveFile(fileName, retrieve_path);
+						m.addPara().addContent("Retrieve Successfully " + fileName);
+					} catch (Exception e) {
+						m.addPara(null, "text-error").addContent("Unable to retrieve file " + fileName + " " + e.getLocalizedMessage());
+					}
+				}
+			} else {
+				Division m = div.addDivision("message", "alert alert-error");
+				m.addPara("Please select an item to retreive .");
+			}
+			action = "list_replicas";
+		}
+		
 		
 		if(action.equals("replicate_all_on")) {
 			ReplicationManager.setReplicateAll(true);
@@ -380,7 +411,8 @@ public class ControlPanelReplicationTabHelper {
 		
 		Division msg = div.addDivision("message", "alert alert-info");
 		
-		msg.addPara().addHighlight("pull-right").addButton("action", "label label-important btn btn-sm btn-danger").setValue("Delete");
+		msg.addPara().addHighlight("pull-right").addButton("action", "label label-important btn btn-sm btn-primary").setValue("Retrieve");
+		msg.addPara().addHighlight("pull-right").addButton("action", "label label-important btn btn-sm btn-danger").setValue("Delete");		
 		
 		// display it
 		Table table = div.addTable("replica_items", 1, 6);
@@ -391,7 +423,7 @@ public class ControlPanelReplicationTabHelper {
 		head.addCellContent("ITEM");
 		head.addCellContent("SIZE REP/ORIG");
 		head.addCellContent("INFO");
-		head.addCell("DEL_COL", null, null).addContent("DEL");
+		head.addCell("DEL_COL", null, null).addContent("");
 
 		int pos = 0;
 		long all_file_size = 0;
