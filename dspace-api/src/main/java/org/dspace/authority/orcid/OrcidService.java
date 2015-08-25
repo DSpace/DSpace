@@ -481,7 +481,7 @@ public class OrcidService extends RestSource {
 	 */
 	public OrcidAccessToken getMemberSearchToken() throws IOException {
 		String code = READ_PUBLIC_SCOPE;
-		return getAccessToken(code);
+		return getAccessToken(code, "scope", "client_credentials");
 	}
 
 	/**
@@ -494,9 +494,22 @@ public class OrcidService extends RestSource {
 	 */
 	public OrcidAccessToken getMemberProfileCreateToken() throws IOException {
 		String code = PROFILE_CREATE_SCOPE;
-		return getAccessToken(code);
+		return getAccessToken(code, "scope", "client_credentials");
 	}
 
+	
+	
+	/**
+	 * Allows an ORCID member client to exchange an OAuth Authorization Code for
+	 * an OAuth Access Token.
+	 * 
+	 * @return
+	 * @throws IOException
+	 */
+	public OrcidAccessToken getAuthorizationAccessToken(String code) throws IOException {
+		return getAccessToken(code, "code", "authorization_code");
+	}
+	
 	/**
 	 * Allows an ORCID client to exchange an OAuth Authorization Code for an
 	 * OAuth Access Token for a specific access scope.
@@ -506,14 +519,14 @@ public class OrcidService extends RestSource {
 	 * @throws IOException
 	 * @throws JsonProcessingException
 	 */
-	private OrcidAccessToken getAccessToken(String scope) throws IOException, JsonProcessingException {
+	private OrcidAccessToken getAccessToken(String code, String codeOrScope, String grantType) throws IOException, JsonProcessingException {
 		Client client = ClientBuilder.newClient(restConnector.getClientConfig());
 		WebTarget target = client.target(tokenURL);
 		Form form = new Form();
 		form.param("client_id", clientID);
 		form.param("client_secret", clientSecretKey);
-		form.param("grant_type", "client_credentials");
-		form.param("scope", scope);
+		form.param("grant_type", grantType);
+		form.param(codeOrScope, code);
 		Builder builder = target.request().accept(MediaType.APPLICATION_JSON);
 		String response = builder.post(Entity.form(form), String.class);
 		return new ObjectMapper().reader(OrcidAccessToken.class).readValue(response);
@@ -803,4 +816,5 @@ public class OrcidService extends RestSource {
 	public void setBaseURL(String baseURL) {
 		this.baseURL = baseURL;
 	}
+	
 }
