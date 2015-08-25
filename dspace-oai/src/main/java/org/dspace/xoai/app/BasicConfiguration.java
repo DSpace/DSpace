@@ -29,7 +29,6 @@ import org.dspace.xoai.services.api.solr.SolrServerResolver;
 import org.dspace.xoai.services.api.xoai.DSpaceFilterResolver;
 import org.dspace.xoai.services.api.xoai.IdentifyResolver;
 import org.dspace.xoai.services.api.xoai.ItemRepositoryResolver;
-import org.dspace.xoai.services.api.xoai.SetRepositoryResolver;
 import org.dspace.xoai.services.impl.cache.DSpaceEmptyCacheService;
 import org.dspace.xoai.services.impl.cache.DSpaceXOAICacheService;
 import org.dspace.xoai.services.impl.cache.DSpaceXOAIItemCacheService;
@@ -43,7 +42,6 @@ import org.dspace.xoai.services.impl.solr.DSpaceSolrServerResolver;
 import org.dspace.xoai.services.impl.xoai.BaseDSpaceFilterResolver;
 import org.dspace.xoai.services.impl.xoai.DSpaceIdentifyResolver;
 import org.dspace.xoai.services.impl.xoai.DSpaceItemRepositoryResolver;
-import org.dspace.xoai.services.impl.xoai.DSpaceSetRepositoryResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -115,10 +113,6 @@ public class BasicConfiguration {
     @Bean
     public ItemRepositoryResolver itemRepositoryResolver () {
         return new DSpaceItemRepositoryResolver();
-    }
-    @Bean
-    public SetRepositoryResolver setRepositoryResolver () {
-        return new DSpaceSetRepositoryResolver();
     }
     @Bean
     public IdentifyResolver identifyResolver () {
