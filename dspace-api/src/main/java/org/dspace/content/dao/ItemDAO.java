@@ -57,10 +57,13 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item>
     /**
      * Get all Items installed or withdrawn, discoverable, and modified since a Date.
      * @param context
-     * @param since earliest interesting last-modified date, or null for no date test.
+     * @param archived
+     * @param withdrawn
+     * @param discoverable
+     * @param lastModified earliest interesting last-modified date.
      * @return
      */
-    public Iterator<Item> findInArchiveOrWithdrawnDiscoverableModifiedSince(
-            Context context, Date since)
+    public Iterator<Item> findAll(Context context, boolean archived,
+            boolean withdrawn, boolean discoverable, Date lastModified)
             throws SQLException;
 }

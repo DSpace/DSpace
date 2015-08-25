@@ -45,6 +45,22 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     }
 
     @Override
+    public Iterator<Item> findAll(Context context, boolean archived,
+            boolean withdrawn, boolean discoverable, Date lastModified)
+            throws SQLException
+    {
+        Query query = createQuery(context, "SELECT i FROM Item i"
+                + " WHERE (inArchive = :in_archive OR withdrawn = :withdrawn)"
+                + "  AND discoverable = :discoverable"
+                + "  AND last_modified > :last_modified");
+        query.setParameter("in_archive", archived);
+        query.setParameter("withdrawn", withdrawn);
+        query.setParameter("discoverable", discoverable);
+        query.setParameter("last_modified", lastModified);
+        return iterate(query);
+    }
+
+    @Override
     public Iterator<Item> findBySubmitter(Context context, EPerson eperson) throws SQLException {
         Query query = createQuery(context, "FROM Item WHERE inArchive= :in_archive and submitter= :submitter");
         query.setParameter("in_archive", true);
@@ -126,29 +142,6 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         query.setParameter("withdrawn", includeWithdrawn);
 
         return count(query);
-    }
-
-    private static final String FIND_ALL
-            = "select item_id FROM item WHERE (in_archive=TRUE OR withdrawn=TRUE)"
-            + " AND discoverable=TRUE";
-    private static final String FIND_SINCE
-            = "select item_id FROM item WHERE (in_archive=TRUE OR withdrawn=TRUE)"
-            + " AND discoverable=TRUE AND last_modified > :last_modified";
-    @Override
-    public Iterator<Item> findInArchiveOrWithdrawnDiscoverableModifiedSince(
-            Context context, Date since)
-            throws SQLException
-    {
-        Query query;
-        if (null == since){
-            query = createQuery(context, FIND_ALL);
-        }
-        else
-        {
-            query = createQuery(context, FIND_SINCE);
-            query.setParameter("last_modified", since);
-        }
-        return iterate(query);
     }
 
     @Override

@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Generic Database Access Object interface class that should be implemented by all DAO's.
+ * Generic Database Access Object interface class that should be implemented by all DAOs.
  * It offers up a lot of general methods so these don't need to be declared again in each DAO.
  * The default hibernate implementation offers up a class that implements all these methods.
  *
@@ -26,13 +26,37 @@ public interface GenericDAO<T>
 
     public void delete(Context context, T t) throws SQLException;
 
+    /**
+     * Fetch all persisted instances of a given object type.
+     *
+     * @param context
+     * @param clazz the desired type.
+     * @return
+     * @throws SQLException
+     */
     public List<T> findAll(Context context, Class<T> clazz) throws SQLException;
 
+    /**
+     * Execute a JPQL query returning a unique result.
+     *
+     * @param context
+     * @param query
+     * @return
+     * @throws SQLException
+     */
     public T findUnique(Context context, String query) throws SQLException;
 
     public T findByID(Context context, Class clazz, int id) throws SQLException;
 
     public T findByID(Context context, Class clazz, UUID id) throws SQLException;
 
+    /**
+     * Execute a JPQL query and return a collection of results.
+     *
+     * @param context
+     * @param query
+     * @return
+     * @throws SQLException
+     */
     public List<T> findMany(Context context, String query) throws SQLException;
 }
