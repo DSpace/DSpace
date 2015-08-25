@@ -7,13 +7,18 @@
  */
 package org.dspace.core;
 
+import org.dspace.storage.rdbms.DatabaseConfigVO;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.orm.hibernate4.SessionFactoryUtils;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 /**
@@ -83,4 +88,23 @@ public class HibernateDBConnection implements DBConnection<Session> {
         return ((SessionFactoryImplementor) sessionFactory).getDialect().toString();
     }
 
+    @Override
+    public DataSource getDataSource() {
+        return SessionFactoryUtils.getDataSource(sessionFactory);
+    }
+
+    @Override
+    public DatabaseConfigVO getDatabaseConfig() throws SQLException {
+        DatabaseConfigVO databaseConfigVO = new DatabaseConfigVO();
+
+        try (Connection connection = getDataSource().getConnection()) {
+            DatabaseMetaData metaData = connection.getMetaData();
+            databaseConfigVO.setDatabaseDriver(metaData.getDriverName());
+            databaseConfigVO.setDatabaseUrl(metaData.getURL());
+            databaseConfigVO.setSchema(metaData.getSchemaTerm());
+            databaseConfigVO.setMaxConnections(metaData.getMaxConnections());
+            databaseConfigVO.setUserName(metaData.getUserName());
+        }
+        return databaseConfigVO;
+    }
 }
