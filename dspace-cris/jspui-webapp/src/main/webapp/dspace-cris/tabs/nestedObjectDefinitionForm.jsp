@@ -24,8 +24,111 @@
 <%@page import="it.cilea.osd.jdyna.utils.SimpleSelectableObject"%>
 <%@page import="org.dspace.app.cris.model.jdyna.DynamicObjectType"%>
 <%@page import="org.dspace.app.cris.model.CrisConstants"%>
+<%@page import="org.dspace.app.cris.model.ResearchObject"%>
+<%@page import="org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition"%>
+<%@page import="it.cilea.osd.jdyna.model.PropertiesDefinition"%>
+<%@page import="org.dspace.app.cris.model.jdyna.widget.WidgetClassificationTree"%>
 
 <%@ taglib uri="jdynatags" prefix="dyna" %>
+<c:set var="dspace.layout.head.last" scope="request">
+    <link href="<%= request.getContextPath() %>/css/select2/select2.css" type="text/css" rel="stylesheet" />
+    <link href="<%= request.getContextPath() %>/css/select2/select2-bootstrap.css" type="text/css" rel="stylesheet" />
+	<script type="text/javascript" src="<%=request.getContextPath()%>/js/select2/select2.min.js"></script>
+    <script type="text/javascript"><!--
+	
+		j(document).ready(function() {
+        	jQuery(".jdynadropdown").select2({"dropdownAutoWidth": true});
+        	
+			var $eventSelectOne = jQuery("#treeObjectType");
+			$eventSelectOne.on("change", function (e) { 
+				FillDropdown1(jQuery('#treeObjectType').val());
+				FillDropdown2(jQuery('#treeObjectType').val());
+			});
+			
+			//var countSelectTwo = 0;
+			//var $eventSelectTwo = jQuery("#rootObjectId");			
+			//$eventSelectTwo.on("select2-open", function (e) {
+			//	if(countSelectTwo == 0) {
+			//	FillDropdown1(jQuery('#treeObjectType').val(), jQuery('#rootObjectId option:selected').val(), jQuery('#rootObjectId option:selected').text());
+			//	countSelectTwo = countSelectTwo + 1;
+			//	}
+			//}); 
+			
+			
+			var countSelectThree = 0;
+			var $eventSelectThree = jQuery("#metadataBuilder");
+			
+			$eventSelectThree.on("select2-open", function (e) {
+				if(countSelectThree == 0) {
+				FillDropdown2(jQuery('#treeObjectType').val(), jQuery('#metadataBuilder option:selected').val(), jQuery('#metadataBuilder option:selected').text());
+				countSelectThree = countSelectThree + 1;
+				}
+			}); 
+		});
+    
+	    var FillDropdown1 = function(selectedVal, optionSelectedId, optionSelectedVal)
+	    {
+	        if(jQuery.isEmptyObject(selectedVal))
+	        {
+	            return;
+	        }
+
+        	jQuery('#rootObjectId').select2('destroy');
+        	jQuery('#rootObjectId').html("");
+        	jQuery('#rootObjectId').select2({"dropdownAutoWidth": true, "allowClear": true, "placeholder": "Select one or leave blank"});
+        	jQuery("#rootObjectId").append("<option></option>");
+        	if(optionSelectedId!=null) {
+        		jQuery("#rootObjectId").append("<option value="+optionSelectedId+">"+optionSelectedVal+"</option>");
+        		jQuery("#rootObjectId").append("<option disabled></option>");
+        	}
+        	
+	        jQuery.post(
+	        		"<%= request.getContextPath() %>/cris/tools/widget/buildClassificationTree.htm",
+	                {type: selectedVal, method: "filldropdownwithresearchobject"},
+	        function(data)
+	        {
+	            if(data != null && data.length > 0) {   
+	            	
+		            jQuery.each(data, function(i, item)
+		            {
+		            	jQuery("#rootObjectId").append("<option value='"+item['ID']+"'>"+ item['name'] +"</option>");	
+		            });
+	            }
+	        });
+	    }
+	    
+	    
+	    var FillDropdown2 = function(selectedVal, optionSelectedId, optionSelectedVal)
+	    {
+	        if(jQuery.isEmptyObject(selectedVal))
+	        {
+	            return;
+	        }
+
+        	jQuery('#metadataBuilder').select2('destroy');
+        	jQuery('#metadataBuilder').html("");
+        	jQuery('#metadataBuilder').select2({"dropdownAutoWidth": true, "allowClear": true, "placeholder": "Select one (required)"});
+        	jQuery("#metadataBuilder").append("<option></option>");
+        	if(optionSelectedId!=null) {
+        		jQuery("#metadataBuilder").append("<option value="+optionSelectedId+">"+optionSelectedVal+"</option>");
+        		jQuery("#metadataBuilder").append("<option disabled></option>");
+        	}
+	        jQuery.post(
+	        		"<%= request.getContextPath() %>/cris/tools/widget/buildClassificationTree.htm",
+	                {type: selectedVal, method: "filldropdownwithmetadatadefinition"},
+	        function(data)
+	        {
+	            if(data != null && data.length > 0) {   
+
+		            jQuery.each(data, function(i, item)
+		            {
+		            	jQuery("#metadataBuilder").append("<option value='"+item['id']+"'>"+ item['label'] +"</option>");	
+		            });
+	            }
+	        });
+	    }
+	--></script>
+</c:set>
 <c:set var="STANDARD_ACCESS" value="<%=  AccessLevelConstants.STANDARD_ACCESS %>"></c:set>
 <dspace:layout locbar="link" navbar="admin" style="submission"
 	titlekey="jsp.dspace-admin.researchers-list">
@@ -175,25 +278,7 @@
 							key="jsp.layout.hku.label.propertiesdefinition.widget" /></legend> <input
 							type="hidden" id="renderingparent" name="renderingparent"
 							value="${renderingparent}" /> 
-							
-						<input type="submit" name="text"
-							value="<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.addtextnesteddynamicfield" />" />
-						<input type="submit" name="date"
-							value="<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.adddatenesteddynamicfield" />" />
-						<input type="submit" name="link"
-							value="<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.addlinknesteddynamicfield" />" />
-						<input type="submit" name="file"
-							value="<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.addfilenesteddynamicfield" />" />	
-						<input type="submit" name="pointerrp"
-							value="<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.addrppointernesteddynamicfield" />" />							
-						<input type="submit" name="pointerpj"
-							value="<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.addpjpointernesteddynamicfield" />" />
-						<input type="submit" name="pointerou"
-							value="<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.addoupointernesteddynamicfield" />" />
-						<input type="submit" name="pointerdo"
-							value="<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.adddopointernesteddynamicfield" />" />
-						<input type="submit" name="link"
-							value="<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.addbooleannesteddynamicfield" />" />	
+														
 						<c:forEach
 							items="${propertiesdefinition.real.mask}"
 							var="subtypo" varStatus="i">
@@ -366,23 +451,84 @@
 										</c:if>
 										<c:if test="${subtypo.rendering.triview eq 'checkradio'}">
 										<fieldset>
-										<legend><fmt:message key="jsp.dspace-admin.cris.jdyna.pointer.${propertiesdefinition.rendering.valoreClass.simpleName}" /></legend>
-										<dyna:text propertyPath="real.mask[${i.count - 1}].rendering.option4row"  visibility="false"
-											labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.checkradio.option4row" helpKey="help.jdyna.message.rendering.checkradio.option4row"/>
-										<div class="dynaClear">
-										&nbsp;
-										</div>
-										<dyna:text propertyPath="real.mask[${i.count - 1}].rendering.staticValues"  visibility="false"
-											labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.checkradio.staticValues" helpKey="help.jdyna.message.rendering.checkradio.staticValues"/>
- 										<div class="dynaClear">
-										&nbsp;
-										</div>							
-										<dyna:text propertyPath="real.mask[${i.count - 1}].rendering.dropdown"  visibility="false"
-											labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.checkradio.dropdown" helpKey="help.jdyna.message.rendering.checkradio.dropdown"/>
+											<dyna:text propertyPath="real.mask[${i.count - 1}].rendering.option4row"  visibility="false"
+												labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.checkradio.option4row" helpKey="help.jdyna.message.rendering.checkradio.option4row"/>
+											<div class="dynaClear">
+											&nbsp;
+											</div>
+					
+											<dyna:text propertyPath="real.mask[${i.count - 1}].rendering.staticValues"  visibility="false"
+												labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.checkradio.staticValues" helpKey="help.jdyna.message.rendering.checkradio.staticValues"/>
+					 						<div class="dynaClear">
+											&nbsp;
+											</div>
+											<dyna:boolean propertyPath="real.mask[${i.count - 1}].rendering.dropdown"
+												labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.checkradio.dropdown" helpKey="help.jdyna.message.rendering.checkradio.dropdown"/>
 										</fieldset>											
 										</c:if>					
-								
-								<dyna:text propertyPath="real.mask[${i.count - 1}].priority"  helpKey="help.jdyna.message.priority"
+										<c:if test="${subtypo.rendering.triview eq 'classificationTree'}">
+										<fieldset>
+											
+										<% 
+												List<DynamicObjectType> researchobjects = (List<DynamicObjectType>)request.getAttribute("researchobjects");
+										        PropertiesDefinition subtypo = (PropertiesDefinition)pageContext.getAttribute("subtypo");
+												WidgetClassificationTree widgetClassification = (WidgetClassificationTree)subtypo.getRendering();
+												List<SimpleSelectableObject>  types = new LinkedList<SimpleSelectableObject>();
+												List<SimpleSelectableObject>  typesEmptyA = new LinkedList<SimpleSelectableObject>();
+												List<SimpleSelectableObject>  typesEmptyB = new LinkedList<SimpleSelectableObject>();
+												if(widgetClassification.getRootResearchObject() != null) {
+													SimpleSelectableObject sso = new SimpleSelectableObject();
+												    sso.setDisplayValue(widgetClassification.getRootResearchObject().getName());
+												    sso.setIdentifyingValue(widgetClassification.getRootResearchObject().getIdentifyingValue());
+												    typesEmptyA.add(sso);
+												}
+												if(widgetClassification.getMetadataBuilderTree() != null) {
+													SimpleSelectableObject sso = new SimpleSelectableObject();
+												    sso.setDisplayValue(widgetClassification.getMetadataBuilderTree().getLabel());
+												    sso.setIdentifyingValue(widgetClassification.getMetadataBuilderTree().getIdentifyingValue());
+												    typesEmptyB.add(sso);
+												}
+												for(DynamicObjectType objs : researchobjects) {
+												    SimpleSelectableObject sso = new SimpleSelectableObject();
+												    sso.setDisplayValue(objs.getLabel());
+												    sso.setIdentifyingValue(objs.getShortName());
+												    types.add(sso);
+												}												
+										%>
+										<dyna:dropdown id="treeObjectType" propertyPath="real.mask[${i.count - 1}].rendering.treeObjectType" labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.classificationtree.treeObjectType"  helpKey="help.jdyna.message.rendering.classificationtree.treeObjectType" collection="<%= types %>"/>												
+										<div class="dynaClear">
+											&nbsp;
+										</div>
+				
+				<%--					
+										<dyna:dropdown id="rootObjectId" propertyPath="real.mask[${i.count - 1}].rendering.rootResearchObject" labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.classificationtree.rootObjectId" helpKey="help.jdyna.message.rendering.classificationtree.rootObjectId" collection="<%= typesEmptyA %>"/>												
+										<div class="dynaClear">
+											&nbsp;
+										</div>
+				--%>
+				
+										<dyna:dropdown id="metadataBuilder" propertyPath="real.mask[${i.count - 1}].rendering.metadataBuilderTree" labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.classificationtree.metadataBuilder" helpKey="help.jdyna.message.rendering.classificationtree.metadataBuilder" collection="<%= typesEmptyB %>"/>												
+										<div class="dynaClear">
+											&nbsp;
+										</div>						
+																
+										<dyna:textarea toolbar="nessuna" propertyPath="real.mask[${i.count - 1}].rendering.display"
+											rows="4" cols="60"
+											labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.classificationtree.display" 
+											helpKey="help.jdyna.message.rendering.classificationtree.display"/>
+										<div class="dynaClear">
+											&nbsp;
+										</div>
+										
+				<%--					
+									<dyna:boolean propertyPath="real.mask[${i.count - 1}].rendering.chooseOnlyLeaves"
+											labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.classificationtree.chooseOnlyLeaves" helpKey="help.jdyna.message.rendering.classificationtree.chooseOnlyLeaves"/>
+				--%>					
+										</fieldset>																		
+								</c:if>		
+		
+		
+		<dyna:text propertyPath="real.mask[${i.count - 1}].priority"  helpKey="help.jdyna.message.priority"
 								labelKey="jsp.layout.hku.label.propertiesdefinition.priority" size="5" visibility="false"/>
 		
 		<div class="dynaClear">
@@ -436,7 +582,6 @@
 		</div>		
 		
 		
-		
 
 		
 		
@@ -451,12 +596,55 @@
 
 						</c:forEach></fieldset>
 
-
 		<input type="hidden" id="tabId" name="tabId" value="${tabId}" />
 		<input type="hidden" id="boxId" name="boxId" value="${boxId}" />
-		<input type="submit" name="save"
+		<input class="btn btn-primary pull-right" type="submit" name="save"
 			value="<fmt:message key="jsp.layout.hku.researcher.button.save" />" />
-
+			
+						<div class="btn-group dropup pull-right">
+						  <button class="btn btn-default"><fmt:message key="jsp.layout.hku.researcher.button.default.option.dropdown" /></button>
+  						  <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+    							<span class="caret"></span>
+  						  </button>
+  						  <ul class="dropdown-menu">
+    						<!-- dropdown menu links -->
+    						<li>
+							<input class="btn btn-default col-md-12" type="submit" name="text"
+								value="<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.addtextnesteddynamicfield" />" />
+							</li><li>
+							<input class="btn btn-default col-md-12" type="submit" name="date"
+								value="<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.adddatenesteddynamicfield" />" />
+							</li><li>
+							<input class="btn btn-default col-md-12" type="submit" name="link"
+								value="<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.addlinknesteddynamicfield" />" />
+							</li><li>
+							<input class="btn btn-default col-md-12" type="submit" name="file"
+								value="<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.addfilenesteddynamicfield" />" />
+							</li><li>	
+							<input class="btn btn-default col-md-12" type="submit" name="pointerrp"
+								value="<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.addrppointernesteddynamicfield" />" />
+							</li><li>							
+							<input class="btn btn-default col-md-12" type="submit" name="pointerpj"
+								value="<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.addpjpointernesteddynamicfield" />" />
+							</li><li>
+							<input class="btn btn-default col-md-12" type="submit" name="pointerou"
+								value="<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.addoupointernesteddynamicfield" />" />
+							</li><li>
+							<input class="btn btn-default col-md-12" type="submit" name="pointerdo"
+								value="<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.adddopointernesteddynamicfield" />" />
+							</li><li>
+							<input class="btn btn-default col-md-12" type="submit" name="boolean"
+								value="<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.addbooleannesteddynamicfield" />" />
+							</li><li>	
+							<input class="btn btn-default col-md-12" type="submit" name="checkradio"
+								value="<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.adddropdowncheckradioboxnesteddynamicfield" />" />
+							</li><li>
+							<input class="btn btn-default col-md-12" type="submit" name="classificationtree"
+								value="<fmt:message key="jsp.dspace-admin.hku.jdyna-configuration.addclassificationtreenesteddynamicfield" />" />
+							</li>
+  						</ul>	
+						</div>		
+						
 	</form:form>
 
 

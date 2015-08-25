@@ -219,6 +219,12 @@
 					<c:if test="${boxed.real.rendering.triview == 'file'}">
 						<c:set var="controller" value="File" />
 					</c:if>
+					<c:if test="${boxed.real.rendering.triview == 'classificationTree'}">
+						<c:set var="controller" value="ClassificationTree" />
+					</c:if>
+					<c:if test="${boxed.real.rendering.triview == 'checkradio'}">
+						<c:set var="controller" value="CheckRadio" />
+					</c:if>
 					<c:if test="${boxed.real.rendering.triview == 'pointer'}">
 						<c:set var="controller" value="${boxed.real.rendering.valoreClass.simpleName}" />
 					</c:if>
@@ -324,6 +330,12 @@
 					<c:if test="${boxed.real.rendering.triview == 'link'}">
 						<c:set var="controller" value="Link" />
 					</c:if>
+					<c:if test="${boxed.real.rendering.triview == 'classificationTree'}">
+						<c:set var="controller" value="ClassificationTree" />
+					</c:if>
+					<c:if test="${boxed.real.rendering.triview == 'checkradio'}">
+						<c:set var="controller" value="CheckRadio" />
+					</c:if>
 					<c:if test="${boxed.real.rendering.triview == 'pointer'}">
 						<c:set var="controller" value="${boxed.real.rendering.valoreClass.simpleName}" />
 					</c:if>
@@ -405,63 +417,78 @@
 		<input type="hidden" id="tabId" name="tabId" value="${tabId}" />
 		<input type="submit" class="btn btn-primary pull-right"
 			value="<fmt:message key="jsp.layout.hku.researcher.button.save" />" />
-		<div class="clearfix"> </div>
+		
 		<c:if test="${!empty box.id}">
-			<a class="btn btn-default"
+	  <div class="btn-group dropup pull-right">
+      <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+        <fmt:message key="jsp.layout.hku.researcher.button.default.option.dropdown" />
+        <span class="caret"></span>
+      </a>
+      <ul class="dropdown-menu">
+        <!-- dropdown menu links -->
+        	<li><a 
 				href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createDateDynamicField.htm?boxId=${box.id}&tabId=${tabId}">
 			<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.newdatedynamicfield" />
-			</a>
-			<a class="btn btn-default"
+			</a></li><li>
+			<a 
 				href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createTextDynamicField.htm?boxId=${box.id}&tabId=${tabId}">
 			<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.newtextdynamicfield" />
-			</a>
-			<a class="btn btn-default"
+			</a></li><li>
+			<a 
 				href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createNestedDynamicField.htm?boxId=${box.id}&tabId=${tabId}">
 			<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.newnesteddynamicfield" />
-			</a>
-			<a class="btn btn-default"
+			</a></li><li>
+			<a 
 				href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createLinkDynamicField.htm?boxId=${box.id}&tabId=${tabId}">
 			<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.newlinkdynamicfield" />
-			</a>
-			<a class="btn btn-default"
+			</a></li><li>
+			<a 
 				href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createFileDynamicField.htm?boxId=${box.id}&tabId=${tabId}">
 			<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.newfiledynamicfield" />
-			</a>
-			<a class="btn btn-default"
+			</a></li><li>
+			<a 
 				href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createRPPointerDynamicField.htm?boxId=${box.id}&tabId=${tabId}">
 			<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.newrppointerdynamicfield" />
-			</a>
-			<a class="btn btn-default"
+			</a></li><li>
+			<a 
 				href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createProjectPointerDynamicField.htm?boxId=${box.id}&tabId=${tabId}">
 			<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.newprojectpointerdynamicfield" />
-			</a>
-			<a class="btn btn-default"
+			</a></li><li>
+			<a 
 				href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createOUPointerDynamicField.htm?boxId=${box.id}&tabId=${tabId}">
 			<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.newoupointerdynamicfield" />
-			</a>
-			<a class="btn btn-default"
+			</a></li><li>
+			<a 
 				href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createDOPointerDynamicField.htm?boxId=${box.id}&tabId=${tabId}">
 			<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.newdopointerdynamicfield" />
-			</a>
-			<a class="btn btn-default"
+			</a></li><li>
+			<a 
 				href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createBooleanDynamicField.htm?boxId=${box.id}&tabId=${tabId}">
 			<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.newbooleandynamicfield" />
-			</a>
-			<a class="btn btn-default"
+			</a></li><li>
+			<a 
 				href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createCheckRadioDynamicField.htm?boxId=${box.id}&tabId=${tabId}">
 			<fmt:message
 				key="jsp.dspace-admin.hku.jdyna-configuration.newcheckradiodynamicfield" />
-			</a>
+			</a></li><li>
+			<a 
+				href="<%=request.getContextPath()%>/cris/administrator/${specificPartPath}/createClassificationTreeDynamicField.htm?boxId=${box.id}&tabId=${tabId}">
+			<fmt:message
+				key="jsp.dspace-admin.hku.jdyna-configuration.newclassificationtreedynamicfield" />
+			</a></li>
+        
+      	</ul>
+    </div>
 		</c:if>
 
 	</form:form>

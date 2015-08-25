@@ -930,6 +930,10 @@ public class ApplicationService extends ExtendedTabService
                 * maxResults, maxResults);
     }
   
+    public List<ResearchObject> getResearchObjectByShortNameType(String shortName) {
+    	return researchDao.findByShortNameType(shortName);
+    }
+    
     @Override
     public <P, PK extends Serializable> void delete(Class<P> model, PK pkey) {    	
     	super.delete(model, pkey);

@@ -23,8 +23,113 @@
 <%@page import="it.cilea.osd.jdyna.utils.SimpleSelectableObject"%>
 <%@page import="org.dspace.app.cris.model.jdyna.DynamicObjectType"%>
 <%@page import="org.dspace.app.cris.model.CrisConstants"%>
+<%@page import="org.dspace.app.cris.model.ResearchObject"%>
+<%@page import="org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition"%>
+<%@page import="it.cilea.osd.jdyna.model.ADecoratorPropertiesDefinition"%>
+<%@page import="org.dspace.app.cris.model.jdyna.widget.WidgetClassificationTree"%>
+
 <%@ taglib uri="jdynatags" prefix="dyna" %>
 
+
+<c:set var="dspace.layout.head.last" scope="request">
+    <link href="<%= request.getContextPath() %>/css/select2/select2.css" type="text/css" rel="stylesheet" />
+    <link href="<%= request.getContextPath() %>/css/select2/select2-bootstrap.css" type="text/css" rel="stylesheet" />
+	<script type="text/javascript" src="<%=request.getContextPath()%>/js/select2/select2.min.js"></script>
+    <script type="text/javascript"><!--
+	
+		j(document).ready(function() {
+        	jQuery(".jdynadropdown").select2({"dropdownAutoWidth": true});
+        	
+			var $eventSelectOne = jQuery("#treeObjectType");
+			$eventSelectOne.on("change", function (e) { 
+				FillDropdown1(jQuery('#treeObjectType').val());
+				FillDropdown2(jQuery('#treeObjectType').val());
+			});
+			
+			//var countSelectTwo = 0;
+			//var $eventSelectTwo = jQuery("#rootObjectId");			
+			//$eventSelectTwo.on("select2-open", function (e) {
+			//	if(countSelectTwo == 0) {
+			//	FillDropdown1(jQuery('#treeObjectType').val(), jQuery('#rootObjectId option:selected').val(), jQuery('#rootObjectId option:selected').text());
+			//	countSelectTwo = countSelectTwo + 1;
+			//	}
+			//}); 
+			
+			
+			var countSelectThree = 0;
+			var $eventSelectThree = jQuery("#metadataBuilder");
+			
+			$eventSelectThree.on("select2-open", function (e) {
+				if(countSelectThree == 0) {
+				FillDropdown2(jQuery('#treeObjectType').val(), jQuery('#metadataBuilder option:selected').val(), jQuery('#metadataBuilder option:selected').text());
+				countSelectThree = countSelectThree + 1;
+				}
+			}); 
+		});
+    
+	    var FillDropdown1 = function(selectedVal, optionSelectedId, optionSelectedVal)
+	    {
+	        if(jQuery.isEmptyObject(selectedVal))
+	        {
+	            return;
+	        }
+
+        	jQuery('#rootObjectId').select2('destroy');
+        	jQuery('#rootObjectId').html("");
+        	jQuery('#rootObjectId').select2({"dropdownAutoWidth": true, "allowClear": true, "placeholder": "Select one or leave blank"});
+        	jQuery("#rootObjectId").append("<option></option>");
+        	if(optionSelectedId!=null) {
+        		jQuery("#rootObjectId").append("<option value="+optionSelectedId+">"+optionSelectedVal+"</option>");
+        		jQuery("#rootObjectId").append("<option disabled></option>");
+        	}
+        	
+	        jQuery.post(
+	        		"<%= request.getContextPath() %>/cris/tools/widget/buildClassificationTree.htm",
+	                {type: selectedVal, method: "filldropdownwithresearchobject"},
+	        function(data)
+	        {
+	            if(data != null && data.length > 0) {   
+	            	
+		            jQuery.each(data, function(i, item)
+		            {
+		            	jQuery("#rootObjectId").append("<option value='"+item['ID']+"'>"+ item['name'] +"</option>");	
+		            });
+	            }
+	        });
+	    }
+	    
+	    
+	    var FillDropdown2 = function(selectedVal, optionSelectedId, optionSelectedVal)
+	    {
+	        if(jQuery.isEmptyObject(selectedVal))
+	        {
+	            return;
+	        }
+
+        	jQuery('#metadataBuilder').select2('destroy');
+        	jQuery('#metadataBuilder').html("");
+        	jQuery('#metadataBuilder').select2({"dropdownAutoWidth": true, "allowClear": true, "placeholder": "Select one (required)"});
+        	jQuery("#metadataBuilder").append("<option></option>");
+        	if(optionSelectedId!=null) {
+        		jQuery("#metadataBuilder").append("<option value="+optionSelectedId+">"+optionSelectedVal+"</option>");
+        		jQuery("#metadataBuilder").append("<option disabled></option>");
+        	}
+	        jQuery.post(
+	        		"<%= request.getContextPath() %>/cris/tools/widget/buildClassificationTree.htm",
+	                {type: selectedVal, method: "filldropdownwithmetadatadefinition"},
+	        function(data)
+	        {
+	            if(data != null && data.length > 0) {   
+
+		            jQuery.each(data, function(i, item)
+		            {
+		            	jQuery("#metadataBuilder").append("<option value='"+item['id']+"'>"+ item['label'] +"</option>");	
+		            });
+	            }
+	        });
+	    }
+	--></script>
+</c:set>
 <dspace:layout locbar="link" navbar="admin" style="submission"
 	titlekey="jsp.dspace-admin.researchers-list">
 
@@ -344,7 +449,73 @@
 						</fieldset>											
 					</c:when>
 					<c:otherwise>
-					<%-- nothing --%>
+					
+					<c:choose>
+					<c:when test="${propertiesdefinition.rendering.triview eq 'classificationTree'}">
+						<fieldset>
+						<legend><fmt:message key="jsp.dspace-admin.cris.jdyna.classificationtree.${propertiesdefinition.rendering.valoreClass.simpleName}" /></legend>
+							
+						<% 
+								List<DynamicObjectType> researchobjects = (List<DynamicObjectType>)request.getAttribute("researchobjects");
+						        ADecoratorPropertiesDefinition propertiesDefinition = (ADecoratorPropertiesDefinition)request.getAttribute("propertiesdefinition");
+								WidgetClassificationTree widgetClassification = (WidgetClassificationTree)propertiesDefinition.getRendering();
+								List<SimpleSelectableObject>  types = new LinkedList<SimpleSelectableObject>();
+								List<SimpleSelectableObject>  typesEmptyA = new LinkedList<SimpleSelectableObject>();
+								List<SimpleSelectableObject>  typesEmptyB = new LinkedList<SimpleSelectableObject>();
+								if(widgetClassification.getRootResearchObject() != null) {
+									SimpleSelectableObject sso = new SimpleSelectableObject();
+								    sso.setDisplayValue(widgetClassification.getRootResearchObject().getName());
+								    sso.setIdentifyingValue(widgetClassification.getRootResearchObject().getIdentifyingValue());
+								    typesEmptyA.add(sso);
+								}
+								if(widgetClassification.getMetadataBuilderTree() != null) {
+									SimpleSelectableObject sso = new SimpleSelectableObject();
+								    sso.setDisplayValue(widgetClassification.getMetadataBuilderTree().getLabel());
+								    sso.setIdentifyingValue(widgetClassification.getMetadataBuilderTree().getIdentifyingValue());
+								    typesEmptyB.add(sso);
+								}
+								for(DynamicObjectType objs : researchobjects) {
+								    SimpleSelectableObject sso = new SimpleSelectableObject();
+								    sso.setDisplayValue(objs.getLabel());
+								    sso.setIdentifyingValue(objs.getShortName());
+								    types.add(sso);
+								}												
+						%>
+						<dyna:dropdown id="treeObjectType" propertyPath="real.rendering.treeObjectType" labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.classificationtree.treeObjectType"  helpKey="help.jdyna.message.rendering.classificationtree.treeObjectType" collection="<%= types %>"/>												
+						<div class="dynaClear">
+							&nbsp;
+						</div>
+
+<%--					
+						<dyna:dropdown id="rootObjectId" propertyPath="real.rendering.rootResearchObject" labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.classificationtree.rootObjectId" helpKey="help.jdyna.message.rendering.classificationtree.rootObjectId" collection="<%= typesEmptyA %>"/>												
+						<div class="dynaClear">
+							&nbsp;
+						</div>
+--%>
+
+						<dyna:dropdown id="metadataBuilder" propertyPath="real.rendering.metadataBuilderTree" labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.classificationtree.metadataBuilder" helpKey="help.jdyna.message.rendering.classificationtree.metadataBuilder" collection="<%= typesEmptyB %>"/>												
+						<div class="dynaClear">
+							&nbsp;
+						</div>						
+												
+						<dyna:textarea toolbar="nessuna" propertyPath="real.rendering.display"
+							rows="4" cols="60"
+							labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.classificationtree.display" 
+							helpKey="help.jdyna.message.rendering.classificationtree.display"/>
+						<div class="dynaClear">
+							&nbsp;
+						</div>
+						
+<%--					
+					<dyna:boolean propertyPath="real.rendering.chooseOnlyLeaves"
+							labelKey="jsp.layout.hku.label.propertiesdefinition.rendering.classificationtree.chooseOnlyLeaves" helpKey="help.jdyna.message.rendering.classificationtree.chooseOnlyLeaves"/>
+--%>					
+						</fieldset>											
+					</c:when>
+					<c:otherwise>
+						<%-- nothing --%>
+					</c:otherwise>
+					</c:choose>					
 					</c:otherwise>
 					</c:choose>
 					</c:otherwise>

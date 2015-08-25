@@ -67,10 +67,17 @@
 	<link rel="stylesheet" href="<%= request.getContextPath() %>/css/commons-edit-jquery-for-cris.css" type="text/css" />    
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/researcher.css" type="text/css" />
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/jdyna.css" type="text/css" />    
-	<script type="text/javascript" src="<%= request.getContextPath() %>/js/jscalendar/calendar.js"> </script>
+    <link href="<%= request.getContextPath() %>/css/select2/select2.css" type="text/css" rel="stylesheet" />
+    <link href="<%= request.getContextPath() %>/css/select2/select2-bootstrap.css" type="text/css" rel="stylesheet" />
+    <link href="<%= request.getContextPath() %>/css/jstree/themes/default/style.min.css" type="text/css" rel="stylesheet" />
+	<script type="text/javascript" src="<%= request.getContextPath() %>/js/jscalendar/calendar.js"> </script>	
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/jscalendar/lang/calendar-en.js"> </script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/jscalendar/calendar-setup.js"> </script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery.form.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/js/select2/select2.min.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/js/jstree/jstree.min.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/js/jstree/thirdparty/_makeTree.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/js/jstree/thirdparty/_queryTreeSort.js"></script>
 		
 	<style>
     .ui-autocomplete-loading {
@@ -282,6 +289,8 @@
 	
 	j(document).ready(function()
 	{
+		j('.jdynadropdown').select2();
+		
 		j('#nested_edit_dialog').dialog({
 			autoOpen: false,
 			modal: true,
@@ -320,6 +329,7 @@
 		
 		activeTab();
 		activePointer();
+		activeTree();
 	});
 
 	
@@ -407,7 +417,106 @@
 	});
 }
 
-				
+	var activeTree = function() {
+		 j(".classificationtreeinfo").each(function(){
+			 var id = j(this).html();
+			 var treeObjectType = j('#classificationtree_'+id+'_treeObjectType').html();
+			 var rootResearchObject = j('#classificationtree_'+id+'_rootResearchObject').html();
+			 var metadataBuilderTree = j('#classificationtree_'+id+'_metadataBuilderTree').html();
+			 var chooseOnlyLeaves = j('#classificationtree_'+id+'_chooseOnlyLeaves').html();
+			 var repeatable = j('#classificationtree_'+id+'_repeatable').html();
+			 var propertyPath = j('#classificationtree_'+id+'_propertyPath').html();
+			
+			 j('#classificationtree_'+id+'_selected div img').click(
+					 function(){
+						 j(this).parent().remove();
+			 });
+			 j('#classificationtree_'+id+'_btn').click(
+			 function(event){
+		     j('#classificationtree_modal').modal();	 
+			 event.preventDefault()
+			 j('#classificationtree_modal .modal-body').html('');
+			 j('#classificationtree_modal .modal-footer').html('');
+			 
+			 j('#classificationtree_modal .modal-body').append("<div id=\"jstree_div\"></div>")
+			 j('#classificationtree_modal .modal-footer').append("<button type=\"button\" id=\"btn-close-modal-classificationtree\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button>")
+			 j('#classificationtree_modal .modal-footer').append("<button type=\"button\" id=\"button-save-classificationtree_"+propertyPath+"\" class=\"btn btn-primary btn-classificationtree-save\">Done</button>")
+			 				
+			j('.btn-classificationtree-save').click(
+					 function(event){
+						  var propertyPath = j(this).attr("id");
+						  var realPP = propertyPath.replace('button-save-classificationtree_anagraficadto.','');
+						  var n = j('#classificationtree_modal .modal-body').find(".jstree-clicked");
+						  if(n.length>0) {
+							  if(n.length>1) {									  
+								 j("#classificationtree_"+id+"_selected").html('');
+								 j.each(n, function( index, value ) {
+									 var idValue = j(this).parent().attr("id");
+									 var labelValue = j(this).text();				
+									 var div = j("<div id=\"classificationtree_"+ id +"_selected_"+index+"\">");
+									 var input = j("<input type=\"hidden\" id=\""+realPP+"["+index+"]\" name=\""+realPP+"["+index+"]\">").val(idValue);										 
+									 var label = j("<span>").text(labelValue);
+									 div.append(input);										 
+									 div.append(label);
+									 j("#classificationtree_"+id+"_selected").append(div);
+									 
+						           	 var img = j("<img class=\"jdyna-icon jdyna-action-icon jdyna-delete-button\" src=\"<%=request.getContextPath()%>/image/jdyna/delete_icon.gif\">");
+						             j("#classificationtree_"+id+"_selected_"+index).append(img);
+					                 img.click(function(){                     	
+					                 	j("#classificationtree_"+id+"_selected_"+index).html('');
+					                 	var _input = j( "<input type='hidden' id='_"+realPP+"["+index+"]"+"' name='_"+realPP+"["+index+"]"+"'>" ).val('true');
+					                 	j("#classificationtree_"+id+"_selected_"+index).append(_input);             
+					                 });
+								 });
+							  }
+							  else {
+								var idValue = j(n).parent().attr("id");
+								var labelValue = j(n).text();
+								j("#classificationtree_"+id+"_selected").html('');
+								var div = j("<div id=\"classificationtree_"+ id +"_selected_0\">");
+								var input = j("<input type=\"hidden\" id=\""+realPP+"[0]\" name=\""+realPP+"[0]\">").val(idValue);
+								
+								var label = j("<span>").text(labelValue);
+								div.append(input);									
+								div.append(label);
+								j("#classificationtree_"+id+"_selected").append(div);
+				            	var img = j("<img class=\"jdyna-icon jdyna-action-icon jdyna-delete-button\" src=\"<%=request.getContextPath()%>/image/jdyna/delete_icon.gif\">");
+				            	j("#classificationtree_"+id+"_selected").append(img);
+			                     img.click(function(){                     	
+			                        j("#classificationtree_"+id+"_selected").html('');
+			                        var _input = j( "<input type='hidden' id='_"+realPP+"[0]"+"' name='_"+realPP+"[0]"+"'>" ).val('true');
+			                      	j("#classificationtree_"+id+"_selected").append(_input);                     	
+			                  	 });
+							  }
+						  }
+						  
+						  j("#classificationtree_modal").modal("hide");
+					 }
+					 
+			);
+
+			 j('#jstree_div').jstree({
+				 'core' : {
+				   'data' : {
+				     'url': 'buildClassificationTree.htm?method=buildtree&id='+rootResearchObject+'&type='+treeObjectType+'&builder='+metadataBuilderTree,						 
+				   	}
+				  },
+			 	  "checkbox" : {
+			      	"keep_selected_style" : false
+			 	  },
+		    	  "types" : {
+		    	 	"default" : {
+		    	 		"icon" : "fa fa-flash"
+		    	 	}
+		    	  },			    	  
+	    	 	  "plugins" : [ "checkbox", "types"]		    	 	 
+			});
+
+		 });
+	 });
+		 
+	}
+		
 		-->
 	</script>
 	
@@ -652,4 +761,20 @@
 </form:form>
 </div>
 <div id="nested_edit_dialog">&nbsp;</div>
+<div id="classificationtree_modal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"></h4>
+      </div>
+      <div class="modal-body">
+		<div id="jstree_div"></div>         
+      </div>
+      <div class="modal-footer">
+        
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 </dspace:layout>

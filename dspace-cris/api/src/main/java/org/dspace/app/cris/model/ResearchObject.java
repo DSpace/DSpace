@@ -40,6 +40,7 @@ import org.dspace.app.cris.model.jdyna.ProjectAdditionalFieldStorage;
 @Table(name = "cris_do", uniqueConstraints = @UniqueConstraint(columnNames={"sourceID","sourceRef"}))
 @NamedQueries({
         @NamedQuery(name = "ResearchObject.findAll", query = "from ResearchObject order by id"),
+        @NamedQuery(name = "ResearchObject.findByShortNameType", query = "from ResearchObject where typo.shortName = ? order by id"),
         @NamedQuery(name = "ResearchObject.count", query = "select count(*) from ResearchObject"),
         @NamedQuery(name = "ResearchObject.countByType", query = "select count(*) from ResearchObject where typo = ?"),
         @NamedQuery(name = "ResearchObject.paginate.id.asc", query = "from ResearchObject order by id asc"),

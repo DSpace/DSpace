@@ -152,6 +152,8 @@
 		
 		<mapping class="org.dspace.app.cris.model.jdyna.value.DOPointer" />
 
+		<mapping class="org.dspace.app.cris.model.jdyna.value.Classification" />
+
 		<mapping class="it.cilea.osd.jdyna.model.AWidget" />
 		<mapping class="it.cilea.osd.jdyna.widget.WidgetTesto" />
 		<mapping class="it.cilea.osd.jdyna.widget.WidgetLink" />
@@ -161,6 +163,8 @@
 		<mapping class="it.cilea.osd.jdyna.widget.WidgetNumero" />
 		<mapping class="it.cilea.osd.jdyna.widget.WidgetBoolean" />
 		<mapping class="it.cilea.osd.jdyna.widget.WidgetCheckRadio" />
+		<mapping class="it.cilea.osd.jdyna.widget.AWidgetClassificationTree" />
+		<mapping class="org.dspace.app.cris.model.jdyna.widget.WidgetClassificationTree" />
 
 		<mapping class="it.cilea.osd.jdyna.widget.Size" />
 		<mapping class="it.cilea.osd.jdyna.web.Box" />

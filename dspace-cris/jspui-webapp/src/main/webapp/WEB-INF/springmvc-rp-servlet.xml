@@ -22,8 +22,14 @@
 	<bean id="baseFormController" abstract="true"
 		class="it.cilea.osd.common.controller.BaseFormController">
 		<property name="customPropertyEditors">
-			<map>				
+			<map>
 				<entry
+					key="org.dspace.app.cris.model.ResearchObject"
+					value-ref="researchObjectEditor" />		
+				<entry
+					key="org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition"
+					value-ref="dynamicPropertiesDefinitionEditor" />		
+				<entry				
 					key="org.dspace.app.cris.model.jdyna.DecoratorRPPropertiesDefinition"
 					value-ref="decoratorRPPropertiesDefinitionEditor" />
 				<entry
@@ -738,6 +744,42 @@
 		<property name="validator" ref="rpDynamicFieldValidator" />
 	</bean>
 	
+	<bean id="editRPClassificationTreeDynamicFieldController" parent="baseFormController"
+		class="org.dspace.app.webui.cris.controller.admin.FormWidgetClassificationTreeController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.RPPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>org.dspace.app.cris.model.jdyna.widget.WidgetClassificationTree
+			</value>
+		</constructor-arg>
+		<constructor-arg index="2">
+			<value>org.dspace.app.cris.model.jdyna.BoxResearcherPage
+			</value>
+		</constructor-arg>
+		<property name="successView">
+			<value>redirect:/cris/administrator/rp/editBox.htm</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorRPPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>
+		<property name="specificPartPath">
+			<value>rp</value>
+		</property>
+		<property name="validator" ref="rpDynamicFieldValidator" />
+	</bean>
+	
 	<bean id="editRPNestedDynamicFieldController" parent="baseFormController"
 		class="org.dspace.app.webui.cris.controller.admin.FormExtendedNestedObjectDefinitionController">
 		<property name="applicationService">
@@ -776,6 +818,15 @@
 		<property name="addFileView">
 			<value>redirect:/cris/administrator/rp/addFileToNestedDynamicField.htm</value>
 		</property>
+		<property name="addBooleanView">
+			<value>redirect:/cris/administrator/rp/addBooleanToNestedDynamicField.htm</value>
+		</property>
+		<property name="addCheckradioView">
+			<value>redirect:/cris/administrator/rp/addCheckradioToNestedDynamicField.htm</value>
+		</property>
+		<property name="addClassificationtreeView">
+			<value>redirect:/cris/administrator/rp/addClassificationtreeToNestedDynamicField.htm</value>
+		</property>		
 		<property name="addPointerRPView">		
 			<value>redirect:/cris/administrator/rp/addPointerRPToNestedDynamicField.htm</value>
 		</property>
@@ -1596,6 +1647,124 @@
 		<property name="validator" ref="rpNestedPDFieldValidator" />
 	</bean>
 	
+	<bean id="addBooleanToRPNestedDynamicFieldController" parent="baseFormController"
+		class="it.cilea.osd.jdyna.controller.FormAddToNestedDefinitionController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.RPNestedPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>it.cilea.osd.jdyna.widget.WidgetBoolean
+			</value>
+		</constructor-arg>
+		<constructor-arg index="2">			
+				<value>org.dspace.app.cris.model.jdyna.BoxResearcherPage</value>			
+		</constructor-arg>
+		<constructor-arg index="3">			
+				<value>org.dspace.app.cris.model.jdyna.DecoratorRPTypeNested</value>			
+		</constructor-arg>
+		<property name="successView">
+			<value>redirect:/cris/administrator/rp/editNestedDynamicField.htm
+			</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorRPNestedPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>
+		<property name="specificPartPath">
+			<value>rp</value>
+		</property>
+		<property name="validator" ref="rpNestedPDFieldValidator" />		
+	</bean>
+	
+	<bean id="addCheckradioToRPNestedDynamicFieldController" parent="baseFormController"
+		class="it.cilea.osd.jdyna.controller.FormAddToNestedDefinitionController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.RPNestedPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>it.cilea.osd.jdyna.widget.WidgetCheckRadio
+			</value>
+		</constructor-arg>
+		<constructor-arg index="2">			
+				<value>org.dspace.app.cris.model.jdyna.BoxResearcherPage</value>			
+		</constructor-arg>
+		<constructor-arg index="3">			
+				<value>org.dspace.app.cris.model.jdyna.DecoratorRPTypeNested</value>			
+		</constructor-arg>
+		<property name="successView">
+			<value>redirect:/cris/administrator/rp/editNestedDynamicField.htm
+			</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorRPNestedPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>
+		<property name="specificPartPath">
+			<value>rp</value>
+		</property>
+		<property name="validator" ref="rpNestedPDFieldValidator" />		
+	</bean>
+	
+	<bean id="addClassificationtreeToRPNestedDynamicFieldController" parent="baseFormController"
+		class="org.dspace.app.webui.cris.controller.admin.FormExtendedAddToNestedDefinitionController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.RPNestedPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>org.dspace.app.cris.model.jdyna.widget.WidgetClassificationTree
+			</value>
+		</constructor-arg>
+		<constructor-arg index="2">			
+				<value>org.dspace.app.cris.model.jdyna.BoxResearcherPage</value>			
+		</constructor-arg>
+		<constructor-arg index="3">			
+				<value>org.dspace.app.cris.model.jdyna.DecoratorRPTypeNested</value>			
+		</constructor-arg>
+		<property name="successView">
+			<value>redirect:/cris/administrator/rp/editNestedDynamicField.htm
+			</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorRPNestedPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>
+		<property name="specificPartPath">
+			<value>rp</value>
+		</property>
+		<property name="validator" ref="rpNestedPDFieldValidator" />		
+	</bean>
+	
+	
 	<bean id="deleteRPNestedFieldController"
 		class="it.cilea.osd.jdyna.controller.DecoratorATypeNestedController">
 		<constructor-arg index="0">			
@@ -1971,6 +2140,43 @@
 		</constructor-arg>
 		<constructor-arg index="1">
 			<value>it.cilea.osd.jdyna.widget.WidgetCheckRadio
+			</value>
+		</constructor-arg>
+		<constructor-arg index="2">
+			<value>
+				org.dspace.app.cris.model.jdyna.BoxProject
+			</value>
+		</constructor-arg>
+		<property name="successView">
+			<value>redirect:/cris/administrator/project/editBox.htm</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorProjectPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="specificPartPath">
+			<value>project</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>
+		<property name="validator" ref="grantDynamicFieldValidator" />
+	</bean>
+	
+	<bean id="editProjectClassificationTreeDynamicFieldController" parent="baseFormController"
+		class="org.dspace.app.webui.cris.controller.admin.FormWidgetClassificationTreeController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>org.dspace.app.cris.model.jdyna.widget.WidgetClassificationTree
 			</value>
 		</constructor-arg>
 		<constructor-arg index="2">
@@ -2819,6 +3025,126 @@
 		<property name="validator" ref="grantNestedPDFieldValidator" />
 	</bean>
 	
+	<bean id="addBooleanToProjectNestedDynamicFieldController" parent="baseFormController"
+		class="it.cilea.osd.jdyna.controller.FormAddToNestedDefinitionController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.ProjectNestedPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>it.cilea.osd.jdyna.widget.WidgetBoolean
+			</value>
+		</constructor-arg>
+		<constructor-arg index="2">			
+				<value>org.dspace.app.cris.model.jdyna.BoxProject</value>			
+		</constructor-arg>
+		<constructor-arg index="3">			
+			<value>org.dspace.app.cris.model.jdyna.DecoratorProjectTypeNested
+			</value>
+		</constructor-arg>
+		<property name="successView">
+			<value>redirect:/cris/administrator/project/editNestedDynamicField.htm
+			</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorProjectNestedPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>
+		<property name="specificPartPath">
+			<value>project</value>
+		</property>		
+		<property name="validator" ref="grantNestedPDFieldValidator" />
+	</bean>
+	
+	<bean id="addCheckradioToProjectNestedDynamicFieldController" parent="baseFormController"
+		class="it.cilea.osd.jdyna.controller.FormAddToNestedDefinitionController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.ProjectNestedPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>it.cilea.osd.jdyna.widget.WidgetCheckRadio
+			</value>
+		</constructor-arg>
+		<constructor-arg index="2">			
+				<value>org.dspace.app.cris.model.jdyna.BoxProject</value>			
+		</constructor-arg>
+		<constructor-arg index="3">			
+			<value>org.dspace.app.cris.model.jdyna.DecoratorProjectTypeNested
+			</value>
+		</constructor-arg>
+		<property name="successView">
+			<value>redirect:/cris/administrator/project/editNestedDynamicField.htm
+			</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorProjectNestedPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>
+		<property name="specificPartPath">
+			<value>project</value>
+		</property>		
+		<property name="validator" ref="grantNestedPDFieldValidator" />
+	</bean>
+	
+	<bean id="addClassificationtreeToProjectNestedDynamicFieldController" parent="baseFormController"
+		class="org.dspace.app.webui.cris.controller.admin.FormExtendedAddToNestedDefinitionController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.ProjectNestedPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>org.dspace.app.cris.model.jdyna.widget.WidgetClassificationTree
+			</value>
+		</constructor-arg>
+		<constructor-arg index="2">			
+				<value>org.dspace.app.cris.model.jdyna.BoxProject</value>			
+		</constructor-arg>
+		<constructor-arg index="3">			
+			<value>org.dspace.app.cris.model.jdyna.DecoratorProjectTypeNested
+			</value>
+		</constructor-arg>
+		<property name="successView">
+			<value>redirect:/cris/administrator/project/editNestedDynamicField.htm
+			</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorProjectNestedPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>
+		<property name="specificPartPath">
+			<value>project</value>
+		</property>		
+		<property name="validator" ref="grantNestedPDFieldValidator" />
+	</bean>
+	
 	<bean id="deleteProjectNestedFieldController"
 		class="it.cilea.osd.jdyna.controller.DecoratorATypeNestedController">
 		<constructor-arg index="0">			
@@ -2882,6 +3208,15 @@
 		</property>
 		<property name="addFileView">
 			<value>redirect:/cris/administrator/project/addFileToNestedDynamicField.htm</value>
+		</property>
+		<property name="addBooleanView">
+			<value>redirect:/cris/administrator/project/addBooleanToNestedDynamicField.htm</value>
+		</property>
+		<property name="addCheckradioView">
+			<value>redirect:/cris/administrator/project/addCheckradioToNestedDynamicField.htm</value>
+		</property>
+		<property name="addClassificationtreeView">
+			<value>redirect:/cris/administrator/project/addClassificationtreeToNestedDynamicField.htm</value>
 		</property>
 		<property name="addPointerRPView">		
 			<value>redirect:/cris/administrator/project/addPointerRPToNestedDynamicField.htm</value>
@@ -3274,6 +3609,43 @@
 		</constructor-arg>
 		<constructor-arg index="1">
 			<value>it.cilea.osd.jdyna.widget.WidgetCheckRadio
+			</value>
+		</constructor-arg>
+		<constructor-arg index="2">
+			<value>
+				org.dspace.app.cris.model.jdyna.BoxOrganizationUnit
+			</value>
+		</constructor-arg>
+		<property name="successView">
+			<value>redirect:/cris/administrator/ou/editBox.htm</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorOUPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="specificPartPath">
+			<value>ou</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>
+		<property name="validator" ref="ouDynamicFieldValidator" />
+	</bean>
+	
+	<bean id="editOUClassificationTreeDynamicFieldController" parent="baseFormController"
+		class="org.dspace.app.webui.cris.controller.admin.FormWidgetClassificationTreeController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.OUPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>org.dspace.app.cris.model.jdyna.widget.WidgetClassificationTree
 			</value>
 		</constructor-arg>
 		<constructor-arg index="2">
@@ -4104,6 +4476,119 @@
 		<property name="validator" ref="ouNestedPDFieldValidator" />	
 	</bean>
 	
+	<bean id="addBooleanToOUNestedDynamicFieldController" parent="baseFormController"
+		class="it.cilea.osd.jdyna.controller.FormAddToNestedDefinitionController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.OUNestedPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>it.cilea.osd.jdyna.widget.WidgetBoolean
+			</value>
+		</constructor-arg>
+		<constructor-arg index="2">			
+				<value>org.dspace.app.cris.model.jdyna.BoxOrganizationUnit</value>			
+		</constructor-arg>
+		<constructor-arg index="3">			
+				<value>org.dspace.app.cris.model.jdyna.DecoratorOUTypeNested</value>			
+		</constructor-arg>
+		<property name="successView">
+			<value>redirect:/cris/administrator/ou/editNestedDynamicField.htm</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorOUNestedPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>
+		<property name="specificPartPath">
+			<value>ou</value>
+		</property>		
+		<property name="validator" ref="ouNestedPDFieldValidator" />
+	</bean>
+	
+	<bean id="addCheckradioToOUNestedDynamicFieldController" parent="baseFormController"
+		class="it.cilea.osd.jdyna.controller.FormAddToNestedDefinitionController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.OUNestedPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>it.cilea.osd.jdyna.widget.WidgetCheckRadio
+			</value>
+		</constructor-arg>
+		<constructor-arg index="2">			
+				<value>org.dspace.app.cris.model.jdyna.BoxOrganizationUnit</value>			
+		</constructor-arg>
+		<constructor-arg index="3">			
+				<value>org.dspace.app.cris.model.jdyna.DecoratorOUTypeNested</value>			
+		</constructor-arg>
+		<property name="successView">
+			<value>redirect:/cris/administrator/ou/editNestedDynamicField.htm</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorOUNestedPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>
+		<property name="specificPartPath">
+			<value>ou</value>
+		</property>		
+		<property name="validator" ref="ouNestedPDFieldValidator" />
+	</bean>
+	
+	<bean id="addClassificationtreeToOUNestedDynamicFieldController" parent="baseFormController"
+		class="org.dspace.app.webui.cris.controller.admin.FormExtendedAddToNestedDefinitionController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.OUNestedPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>org.dspace.app.cris.model.jdyna.widget.WidgetClassificationTree
+			</value>
+		</constructor-arg>
+		<constructor-arg index="2">			
+				<value>org.dspace.app.cris.model.jdyna.BoxOrganizationUnit</value>			
+		</constructor-arg>
+		<constructor-arg index="3">			
+				<value>org.dspace.app.cris.model.jdyna.DecoratorOUTypeNested</value>			
+		</constructor-arg>
+		<property name="successView">
+			<value>redirect:/cris/administrator/ou/editNestedDynamicField.htm</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorOUNestedPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>
+		<property name="specificPartPath">
+			<value>ou</value>
+		</property>		
+		<property name="validator" ref="ouNestedPDFieldValidator" />
+	</bean>
 	
 	<bean id="deleteOUNestedFieldController"
 		class="it.cilea.osd.jdyna.controller.DecoratorATypeNestedController">
@@ -4165,6 +4650,15 @@
 		</property>
 		<property name="addFileView">
 			<value>redirect:/cris/administrator/ou/addFileToNestedDynamicField.htm</value>
+		</property>
+		<property name="addBooleanView">
+			<value>redirect:/cris/administrator/ou/addBooleanToNestedDynamicField.htm</value>
+		</property>
+		<property name="addCheckradioView">
+			<value>redirect:/cris/administrator/ou/addCheckradioToNestedDynamicField.htm</value>
+		</property>
+		<property name="addClassificationtreeView">
+			<value>redirect:/cris/administrator/ou/addClassificationtreeToNestedDynamicField.htm</value>
 		</property>
 		<property name="addPointerRPView">		
 			<value>redirect:/cris/administrator/ou/addPointerRPToNestedDynamicField.htm</value>
@@ -4330,6 +4824,19 @@
 			<value>resultSearchPointer</value>
 		</property>		
 	</bean>
+
+	<bean id="buildClassificationTree"
+		class="org.dspace.app.webui.cris.controller.jdyna.CrisClassificationTreeController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<property name="searchService">
+			<ref bean="crisSearchService" />
+		</property>
+		<property name="viewName">
+			<value>jdyna/resultClassificationTree</value>
+		</property>		
+	</bean>	
 	
 	<bean id="rpDeleteController"
 		class="org.dspace.app.webui.cris.controller.ResearcherPageDetailsController">
@@ -4861,6 +5368,42 @@
 		<property name="validator" ref="doDynamicFieldValidator" />
 	</bean>
 			
+	<bean id="editDOClassificationTreeDynamicFieldController" parent="baseFormController"
+		class="org.dspace.app.webui.cris.controller.admin.FormWidgetClassificationTreeController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>org.dspace.app.cris.model.jdyna.widget.WidgetClassificationTree
+			</value>
+		</constructor-arg>
+		<constructor-arg index="2">
+			<value>org.dspace.app.cris.model.jdyna.BoxDynamicObject
+			</value>
+		</constructor-arg>		
+		<property name="typoModel">
+			<value>org.dspace.app.cris.model.jdyna.DynamicObjectType</value>
+		</property>
+		<property name="successView">
+			<value>redirect:/cris/administrator/other/2ndlevel/editBox.htm</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorDynamicPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>		
+		<property name="validator" ref="doDynamicFieldValidator" />
+	</bean>
+	
 	<bean id="deleteDONestedFieldController"
 		class="it.cilea.osd.jdyna.controller.DecoratorATypeNestedController">
 		<constructor-arg index="0">			
@@ -4923,6 +5466,15 @@
 		</property>
 		<property name="addFileView">
 			<value>redirect:/cris/administrator/other/2ndlevel/addFileToNestedDynamicField.htm</value>
+		</property>
+		<property name="addBooleanView">
+			<value>redirect:/cris/administrator/other/2ndlevel/addBooleanToNestedDynamicField.htm</value>
+		</property>
+		<property name="addCheckradioView">
+			<value>redirect:/cris/administrator/other/2ndlevel/addCheckradioToNestedDynamicField.htm</value>
+		</property>
+		<property name="addClassificationtreeView">
+			<value>redirect:/cris/administrator/other/2ndlevel/addClassificationtreeToNestedDynamicField.htm</value>
 		</property>
 		<property name="addPointerRPView">		
 			<value>redirect:/cris/administrator/other/2ndlevel/addPointerRPToNestedDynamicField.htm</value>
@@ -5688,6 +6240,110 @@
 		<property name="validator" ref="doNestedPDFieldValidator" />			
 	</bean>
 	
+	<bean id="addBooleanToDONestedDynamicFieldController" parent="baseFormController"
+		class="it.cilea.osd.jdyna.controller.FormAddToNestedDefinitionController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.DynamicNestedPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>it.cilea.osd.jdyna.widget.WidgetBoolean
+			</value>
+		</constructor-arg>
+		<constructor-arg index="2">			
+				<value>org.dspace.app.cris.model.jdyna.BoxDynamicObject</value>			
+		</constructor-arg>
+		<constructor-arg index="3">			
+				<value>org.dspace.app.cris.model.jdyna.DecoratorDynamicTypeNested</value>			
+		</constructor-arg>
+		<property name="successView">
+			<value>redirect:/cris/administrator/other/2ndlevel/editNestedDynamicField.htm</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorDynamicNestedPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>		
+		<property name="validator" ref="doNestedPDFieldValidator" />
+	</bean>
+	
+	<bean id="addCheckradioToDONestedDynamicFieldController" parent="baseFormController"
+		class="it.cilea.osd.jdyna.controller.FormAddToNestedDefinitionController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.DynamicNestedPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>it.cilea.osd.jdyna.widget.WidgetCheckRadio
+			</value>
+		</constructor-arg>
+		<constructor-arg index="2">			
+				<value>org.dspace.app.cris.model.jdyna.BoxDynamicObject</value>			
+		</constructor-arg>
+		<constructor-arg index="3">			
+				<value>org.dspace.app.cris.model.jdyna.DecoratorDynamicTypeNested</value>			
+		</constructor-arg>
+		<property name="successView">
+			<value>redirect:/cris/administrator/other/2ndlevel/editNestedDynamicField.htm</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorDynamicNestedPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>		
+		<property name="validator" ref="doNestedPDFieldValidator" />
+	</bean>
+	
+	<bean id="addClassificationtreeToDONestedDynamicFieldController" parent="baseFormController"
+		class="org.dspace.app.webui.cris.controller.admin.FormExtendedAddToNestedDefinitionController">
+		<property name="applicationService">
+			<ref bean="applicationService" />
+		</property>
+		<constructor-arg index="0">
+			<value>org.dspace.app.cris.model.jdyna.DynamicNestedPropertiesDefinition
+			</value>
+		</constructor-arg>
+		<constructor-arg index="1">
+			<value>org.dspace.app.cris.model.jdyna.widget.WidgetClassificationTree
+			</value>
+		</constructor-arg>
+		<constructor-arg index="2">			
+				<value>org.dspace.app.cris.model.jdyna.BoxDynamicObject</value>			
+		</constructor-arg>
+		<constructor-arg index="3">			
+				<value>org.dspace.app.cris.model.jdyna.DecoratorDynamicTypeNested</value>			
+		</constructor-arg>
+		<property name="successView">
+			<value>redirect:/cris/administrator/other/2ndlevel/editNestedDynamicField.htm</value>
+		</property>
+		<property name="commandClass">
+			<value>org.dspace.app.cris.model.jdyna.DecoratorDynamicNestedPropertiesDefinition
+			</value>
+		</property>
+		<property name="commandName">
+			<value>propertiesdefinition</value>
+		</property>
+		<property name="formView">
+			<value>/tabs/propertiesDefinitionForm</value>
+		</property>		
+		<property name="validator" ref="doNestedPDFieldValidator" />
+	</bean>
 	<bean id="editDODynamicDataController" parent="baseFormController"
 		class="org.dspace.app.webui.cris.controller.jdyna.FormDODynamicMetadataController">
 		<property name="applicationService">
@@ -5862,6 +6518,9 @@
 				<prop key="/tools/ou/searchPointer.htm">searchOUPointer</prop>
 				<prop key="/tools/*/searchPointer.htm">searchDOPointer</prop>
 				
+				<!-- show dialog classification tree -->
+				<prop key="/tools/*/buildClassificationTree.htm">buildClassificationTree</prop>
+				
 				<!-- Management of nested objects -->				
 				<prop key="/rp/viewNested.htm">viewRPNestedDetailsController</prop>
 				<prop key="/tools/rp/addNested.htm">editRPNestedDetailsController</prop>
@@ -5929,6 +6588,8 @@
 				<prop key="/administrator/rp/editTextDynamicField.htm">editRPTextDynamicFieldController</prop>
 				<prop key="/administrator/rp/createBooleanDynamicField.htm">editRPBooleanDynamicFieldController</prop>
 				<prop key="/administrator/rp/editBooleanDynamicField.htm">editRPBooleanDynamicFieldController</prop>
+				<prop key="/administrator/rp/createClassificationTreeDynamicField.htm">editRPClassificationTreeDynamicFieldController</prop>
+				<prop key="/administrator/rp/editClassificationTreeDynamicField.htm">editRPClassificationTreeDynamicFieldController</prop>
 				<prop key="/administrator/rp/createCheckRadioDynamicField.htm">editRPCheckRadioDynamicFieldController</prop>
 				<prop key="/administrator/rp/editCheckRadioDynamicField.htm">editRPCheckRadioDynamicFieldController</prop>
 				<prop key="/administrator/rp/createLinkDynamicField.htm">editRPLinkDynamicFieldController</prop>
@@ -5946,6 +6607,9 @@
 				<prop key="/administrator/rp/addTextToNestedDynamicField.htm">addTextToRPNestedDynamicFieldController</prop>
 				<prop key="/administrator/rp/addLinkToNestedDynamicField.htm">addLinkToRPNestedDynamicFieldController</prop>
 				<prop key="/administrator/rp/addFileToNestedDynamicField.htm">addFileToRPNestedDynamicFieldController</prop>
+				<prop key="/administrator/rp/addBooleanToNestedDynamicField.htm">addBooleanToRPNestedDynamicFieldController</prop>
+				<prop key="/administrator/rp/addCheckradioToNestedDynamicField.htm">addCheckradioToRPNestedDynamicFieldController</prop>
+				<prop key="/administrator/rp/addClassificationtreeToNestedDynamicField.htm">addClassificationtreeToRPNestedDynamicFieldController</prop>
 				<prop key="/administrator/rp/addPointerRPToNestedDynamicField.htm">addPointerRPToRPNestedDynamicFieldController</prop>
 				<prop key="/administrator/rp/addPointerProjectToNestedDynamicField.htm">addPointerProjectToRPNestedDynamicFieldController</prop>
 				<prop key="/administrator/rp/addPointerOUToNestedDynamicField.htm">addPointerOUToRPNestedDynamicFieldController</prop>
@@ -5995,6 +6659,8 @@
 				<prop key="/administrator/project/editTextDynamicField.htm">editProjectTextDynamicFieldController</prop>
 				<prop key="/administrator/project/createBooleanDynamicField.htm">editProjectBooleanDynamicFieldController</prop>
 				<prop key="/administrator/project/editBooleanDynamicField.htm">editProjectBooleanDynamicFieldController</prop>
+				<prop key="/administrator/project/createClassificationTreeDynamicField.htm">editProjectClassificationTreeDynamicFieldController</prop>
+				<prop key="/administrator/project/editClassificationTreeDynamicField.htm">editProjectClassificationTreeDynamicFieldController</prop>
 				<prop key="/administrator/project/createCheckRadioDynamicField.htm">editProjectCheckRadioDynamicFieldController</prop>
 				<prop key="/administrator/project/editCheckRadioDynamicField.htm">editProjectCheckRadioDynamicFieldController</prop>
 				<prop key="/administrator/project/createLinkDynamicField.htm">editProjectLinkDynamicFieldController</prop>
@@ -6012,6 +6678,9 @@
 				<prop key="/administrator/project/addTextToNestedDynamicField.htm">addTextToProjectNestedDynamicFieldController</prop>
 				<prop key="/administrator/project/addLinkToNestedDynamicField.htm">addLinkToProjectNestedDynamicFieldController</prop>
 				<prop key="/administrator/project/addFileToNestedDynamicField.htm">addFileToProjectNestedDynamicFieldController</prop>
+				<prop key="/administrator/project/addBooleanToNestedDynamicField.htm">addBooleanToProjectNestedDynamicFieldController</prop>
+				<prop key="/administrator/project/addCheckradioToNestedDynamicField.htm">addCheckradioToProjectNestedDynamicFieldController</prop>
+				<prop key="/administrator/project/addClassificationtreeToNestedDynamicField.htm">addClassificationtreeToProjectNestedDynamicFieldController</prop>
 				<prop key="/administrator/project/addPointerRPToNestedDynamicField.htm">addPointerRPToProjectNestedDynamicFieldController</prop>
 				<prop
 					key="/administrator/project/addPointerProjectToNestedDynamicField.htm">addPointerProjectToProjectNestedDynamicFieldController</prop>
@@ -6054,6 +6723,8 @@
 				<prop key="/administrator/ou/editTextDynamicField.htm">editOUTextDynamicFieldController</prop>
 				<prop key="/administrator/ou/createBooleanDynamicField.htm">editOUBooleanDynamicFieldController</prop>
 				<prop key="/administrator/ou/editBooleanDynamicField.htm">editOUBooleanDynamicFieldController</prop>
+				<prop key="/administrator/ou/createClassificationTreeDynamicField.htm">editOUClassificationTreeDynamicFieldController</prop>
+				<prop key="/administrator/ou/editClassificationTreeDynamicField.htm">editOUClassificationTreeDynamicFieldController</prop>
 				<prop key="/administrator/ou/createCheckRadioDynamicField.htm">editOUCheckRadioDynamicFieldController</prop>
 				<prop key="/administrator/ou/editCheckRadioDynamicField.htm">editOUCheckRadioDynamicFieldController</prop>
 				<prop key="/administrator/ou/createLinkDynamicField.htm">editOULinkDynamicFieldController</prop>
@@ -6071,6 +6742,9 @@
 				<prop key="/administrator/ou/addTextToNestedDynamicField.htm">addTextToOUNestedDynamicFieldController</prop>
 				<prop key="/administrator/ou/addLinkToNestedDynamicField.htm">addLinkToOUNestedDynamicFieldController</prop>
 				<prop key="/administrator/ou/addFileToNestedDynamicField.htm">addFileToOUNestedDynamicFieldController</prop>
+				<prop key="/administrator/ou/addBooleanToNestedDynamicField.htm">addBooleanToOUNestedDynamicFieldController</prop>
+				<prop key="/administrator/ou/addCheckradioToNestedDynamicField.htm">addCheckradioToOUNestedDynamicFieldController</prop>
+				<prop key="/administrator/ou/addClassificationtreeToNestedDynamicField.htm">addClassificationtreeToOUNestedDynamicFieldController</prop>
 				<prop key="/administrator/ou/addPointerRPToNestedDynamicField.htm">addPointerRPToOUNestedDynamicFieldController</prop>
 				<prop key="/administrator/ou/addPointerProjectToNestedDynamicField.htm">addPointerProjectToOUNestedDynamicFieldController</prop>
 				<prop key="/administrator/ou/addPointerOUToNestedDynamicField.htm">addPointerOUToOUNestedDynamicFieldController</prop>
@@ -6120,6 +6794,8 @@
 				<prop key="/administrator/*/editTextDynamicField.htm">editDOTextDynamicFieldController</prop>
 				<prop key="/administrator/*/createBooleanDynamicField.htm">editDOBooleanDynamicFieldController</prop>
 				<prop key="/administrator/*/editBooleanDynamicField.htm">editDOBooleanDynamicFieldController</prop>
+				<prop key="/administrator/*/createClassificationTreeDynamicField.htm">editDOClassificationTreeDynamicFieldController</prop>
+				<prop key="/administrator/*/editClassificationTreeDynamicField.htm">editDOClassificationTreeDynamicFieldController</prop>
 				<prop key="/administrator/*/createCheckRadioDynamicField.htm">editDOCheckRadioDynamicFieldController</prop>
 				<prop key="/administrator/*/editCheckRadioDynamicField.htm">editDOCheckRadioDynamicFieldController</prop>
 				<prop key="/administrator/*/createLinkDynamicField.htm">editDOLinkDynamicFieldController</prop>
@@ -6137,6 +6813,9 @@
 				<prop key="/administrator/*/addTextToNestedDynamicField.htm">addTextToDONestedDynamicFieldController</prop>
 				<prop key="/administrator/*/addLinkToNestedDynamicField.htm">addLinkToDONestedDynamicFieldController</prop>
 				<prop key="/administrator/*/addFileToNestedDynamicField.htm">addFileToDONestedDynamicFieldController</prop>
+				<prop key="/administrator/*/addBooleanToNestedDynamicField.htm">addBooleanToDONestedDynamicFieldController</prop>
+				<prop key="/administrator/*/addCheckradioToNestedDynamicField.htm">addCheckradioToDONestedDynamicFieldController</prop>
+				<prop key="/administrator/*/addClassificationtreeToNestedDynamicField.htm">addClassificationtreeToDONestedDynamicFieldController</prop>
 				<prop key="/administrator/*/addPointerRPToNestedDynamicField.htm">addPointerRPToDONestedDynamicFieldController</prop>
 				<prop key="/administrator/*/addPointerProjectToNestedDynamicField.htm">addPointerProjectToDONestedDynamicFieldController</prop>
 				<prop key="/administrator/*/addPointerOUToNestedDynamicField.htm">addPointerOUToDONestedDynamicFieldController</prop>
@@ -6210,7 +6889,23 @@
 		<property name="applicationService" ref="applicationService">
 		</property>
 	</bean>
+	
+	<bean id="researchObjectEditor" class="it.cilea.osd.jdyna.editor.ModelPropertyEditor">
+		<constructor-arg>
+			<value>org.dspace.app.cris.model.ResearchObject</value>
+		</constructor-arg>
+		<property name="applicationService" ref="applicationService">
+		</property>
+	</bean>
 
+	<bean id="dynamicPropertiesDefinitionEditor" class="it.cilea.osd.jdyna.editor.ModelPropertyEditor">
+		<constructor-arg>
+			<value>org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition</value>
+		</constructor-arg>
+		<property name="applicationService" ref="applicationService">
+		</property>
+	</bean>
+	
 	<bean id="decoratorRPPropertiesDefinitionEditor" class="it.cilea.osd.jdyna.editor.ModelPropertyEditor">
 		<constructor-arg>
 			<value>org.dspace.app.cris.model.jdyna.DecoratorRPPropertiesDefinition
