@@ -8,10 +8,8 @@
 package org.dspace.core;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.dspace.core.GenericDAO;
 import org.hibernate.*;
 import org.hibernate.criterion.Projections;
-import org.hibernate.type.StandardBasicTypes;
 
 import java.sql.SQLException;
 import java.util.Iterator;
@@ -19,7 +17,8 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Hibernate implementation for generic DAO interface, also includes additional hibernate calls that are comonly used
+ * Hibernate implementation for generic DAO interface.  Also includes additional
+ * Hibernate calls that are commonly used.
  * Each DAO should extend this class to prevent code duplication.
  *
  * @author kevinvandevelde at atmire.com
@@ -83,6 +82,14 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
         return result;
     }
 
+    /**
+     * Execute a JPA Criteria query and return a collection of results.
+     *
+     * @param context
+     * @param query
+     * @return
+     * @throws SQLException
+     */
     public List<T> findMany(Context context, Query query) throws SQLException {
         @SuppressWarnings("unchecked")
         List<T> result = (List<T>) query.list();
@@ -116,8 +123,9 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     }
 
     /**
-     * Retrieve a unique result from the query, if multiple results CAN be retrieved an exception will be thrown
-     * so only use when the criteria state uniqueness in the database
+     * Retrieve a unique result from the query.  If multiple results CAN be
+     * retrieved an exception will be thrown,
+     * so only use when the criteria state uniqueness in the database.
      * @param criteria
      * @return
      */
@@ -129,7 +137,8 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     }
 
     /**
-     * Retrieve a single result from the query, best used if you expect a single result but this isn't enforced on the database
+     * Retrieve a single result from the query.  Best used if you expect a
+     * single result, but this isn't enforced on the database.
      * @param criteria
      * @return
      */

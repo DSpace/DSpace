@@ -211,7 +211,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     public Iterator<Item> findInArchiveOrWithdrawnDiscoverableModifiedSince(Context context, Date since)
             throws SQLException
     {
-        return itemDAO.findInArchiveOrWithdrawnDiscoverableModifiedSince(context, since);
+        return itemDAO.findAll(context, true, true, true, since);
     }
 
     @Override
@@ -230,7 +230,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Override
     public List<Community> getCommunities(Context context, Item item) throws SQLException {
-        List<Community> result = new ArrayList<Community>();
+        List<Community> result = new ArrayList<>();
         List<Collection> collections = item.getCollections();
         for (Collection collection : collections) {
             List<Community> owningCommunities = collection.getCommunities();
@@ -245,7 +245,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Override
     public List<Bundle> getBundles(Item item, String name) throws SQLException {
-        List<Bundle> matchingBundles = new ArrayList<Bundle>();
+        List<Bundle> matchingBundles = new ArrayList<>();
         // now only keep bundles with matching names
         List<Bundle> bunds = item.getBundles();
         for (Bundle bund : bunds) {
@@ -323,7 +323,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Override
     public List<Bitstream> getNonInternalBitstreams(Context context, Item item) throws SQLException {
-        List<Bitstream> bitstreamList = new ArrayList<Bitstream>();
+        List<Bitstream> bitstreamList = new ArrayList<>();
 
         // Go through the bundles and bitstreams picking out ones which aren't
         // of internal formats
@@ -653,13 +653,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     public boolean isOwningCollection(Item item, Collection collection) {
         Collection owningCollection = item.getOwningCollection();
 
-        if (owningCollection != null && collection.getID().equals(owningCollection.getID()))
-        {
-            return true;
-        }
-
-        // not the owner
-        return false;
+        return owningCollection != null && collection.getID().equals(owningCollection.getID());
     }
 
     @Override
@@ -881,13 +875,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             return true;
         }
 
-        // is this person an COLLECTION_EDITOR for the owning collection?
-        if (collectionService.canEditBoolean(context, item.getOwningCollection(), false))
-        {
-            return true;
-        }
-
-        return false;
+        return collectionService.canEditBoolean(context, item.getOwningCollection(), false);
     }
 
 
