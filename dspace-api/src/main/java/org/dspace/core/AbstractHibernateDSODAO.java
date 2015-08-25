@@ -70,7 +70,7 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
                 if(StringUtils.isNotBlank(operator))
                 {
                     query.append(" (");
-                    query.append("lower(" + metadataField.toString()).append(".value) ").append(operator).append(" lower(:queryParam)");
+                    query.append("lower(STR(" + metadataField.toString()).append(".value)) ").append(operator).append(" lower(:queryParam)");
                     query.append(")");
                     if(i < metadataFields.size() - 1)
                     {
@@ -98,7 +98,7 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
             query.append(" ORDER BY ");
             for (int i = 0; i < metadataSortFields.size(); i++) {
                 MetadataField metadataField = metadataSortFields.get(i);
-                query.append(metadataField.toString()).append(".value");
+                query.append("STR(").append(metadataField.toString()).append(".value)");
                 if(i != metadataSortFields.size() -1)
                 {
                     query.append(",");

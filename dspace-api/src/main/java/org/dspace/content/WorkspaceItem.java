@@ -25,7 +25,7 @@ import javax.persistence.*;
  * @version $Revision$
  */
 @Entity
-@Table(name = "workspaceitem", schema = "public")
+@Table(name = "workspaceitem")
 public class WorkspaceItem implements InProgressSubmission
 {
 
@@ -63,7 +63,6 @@ public class WorkspaceItem implements InProgressSubmission
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            schema = "public",
             name = "epersongroup2workspaceitem",
             joinColumns = {@JoinColumn(name = "workspace_item_id") },
             inverseJoinColumns = {@JoinColumn(name = "eperson_group_id") }

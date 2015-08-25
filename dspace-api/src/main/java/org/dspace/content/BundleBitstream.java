@@ -18,7 +18,7 @@ import java.io.Serializable;
  * @author kevinvandevelde at atmire.com
  */
 @Entity
-@Table(name="bundle2bitstream", schema = "public")
+@Table(name="bundle2bitstream")
 public class BundleBitstream implements Serializable {
 
     @Id

@@ -20,7 +20,7 @@ import javax.persistence.*;
  * @author Mark Diggory (markd at atmire dot com)
  */
 @Entity
-@Table(name="cwf_claimtask", schema = "public")
+@Table(name="cwf_claimtask")
 public class ClaimedTask {
 
 

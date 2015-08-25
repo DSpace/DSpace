@@ -17,7 +17,7 @@ import javax.persistence.*;
  * @author kevinvandevelde at atmire.com
  */
 @Entity
-@Table(name="handle", schema = "public")
+@Table(name="handle")
 public class Handle {
 
     @Id

@@ -22,7 +22,7 @@ import java.sql.SQLException;
  * @author Mark Diggory (markd at atmire dot com)
  */
 @Entity
-@Table(name="cwf_pooltask", schema = "public")
+@Table(name="cwf_pooltask")
 public class PoolTask {
 
     @Id

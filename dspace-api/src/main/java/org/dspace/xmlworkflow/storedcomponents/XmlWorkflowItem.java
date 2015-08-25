@@ -24,7 +24,7 @@ import java.sql.SQLException;
  * @author Mark Diggory (markd at atmire dot com)
  */
 @Entity
-@Table(name="cwf_workflowitem", schema = "public")
+@Table(name="cwf_workflowitem")
 public class XmlWorkflowItem implements WorkflowItem {
 
     @Id

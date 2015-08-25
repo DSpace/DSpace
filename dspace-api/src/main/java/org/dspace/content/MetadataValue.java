@@ -7,6 +7,7 @@
  */
 package org.dspace.content;
 
+import org.hibernate.annotations.Type;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 import javax.persistence.*;
@@ -23,7 +24,7 @@ import javax.persistence.*;
  * @see org.dspace.content.MetadataField
  */
 @Entity
-@Table(name="metadatavalue", schema = "public")
+@Table(name="metadatavalue")
 public class MetadataValue
 {
     /** The reference to the metadata field */
@@ -39,10 +40,9 @@ public class MetadataValue
     private MetadataField metadataField = null;
 
     /** The value of the field */
-//    @Column(name = "text_value")
-//    @Lob
-//    @Type(type = "org.hibernate.type.TextType")
-    @Column(name="text_value", columnDefinition = "text")
+    @Lob
+    @Type(type="org.hibernate.type.MaterializedClobType")
+    @Column(name="text_value")
     private String value;
 
     /** The language of the field, may be <code>null</code> */

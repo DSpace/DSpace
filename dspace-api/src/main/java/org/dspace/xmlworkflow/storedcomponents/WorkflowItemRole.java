@@ -24,7 +24,7 @@ import java.sql.SQLException;
  * @author Mark Diggory (markd at atmire dot com)
  */
 @Entity
-@Table(name="cwf_workflowitemrole", schema = "public")
+@Table(name="cwf_workflowitemrole")
 public class WorkflowItemRole {
 
     @Id

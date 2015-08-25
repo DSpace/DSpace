@@ -21,7 +21,7 @@ import java.util.List;
  * @author Ben Bosman (ben at atmire dot com)
  */
 @Entity
-@Table(name="versionhistory", schema = "public")
+@Table(name="versionhistory")
 public class VersionHistory {
 
     @Id

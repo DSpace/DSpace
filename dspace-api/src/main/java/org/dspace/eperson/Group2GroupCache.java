@@ -18,7 +18,7 @@ import java.io.Serializable;
  * @author kevinvandevelde at atmire.com
  */
 @Entity
-@Table(name = "group2groupcache", schema = "public" )
+@Table(name = "group2groupcache" )
 public class Group2GroupCache implements Serializable {
 
     @Id

@@ -30,7 +30,7 @@ import javax.persistence.*;
  * @version $Revision$
  */
 @Entity
-@Table(name="bitstreamformatregistry", schema = "public")
+@Table(name="bitstreamformatregistry")
 public class BitstreamFormat
 {
 
@@ -59,7 +59,7 @@ public class BitstreamFormat
     private boolean internal = false;
 
     @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name="fileextension", joinColumns=@JoinColumn(name="bitstream_format_id"), schema = "public")
+    @CollectionTable(name="fileextension", joinColumns=@JoinColumn(name="bitstream_format_id"))
         @CollectionId(
                 columns = @Column(name="file_extension_id"),
                 type=@Type(type="integer"),

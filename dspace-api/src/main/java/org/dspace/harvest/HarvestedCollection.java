@@ -17,7 +17,7 @@ import java.util.Date;
  */
 
 @Entity
-@Table(name="harvested_collection", schema = "public")
+@Table(name="harvested_collection")
 public class HarvestedCollection
 {
     @Id

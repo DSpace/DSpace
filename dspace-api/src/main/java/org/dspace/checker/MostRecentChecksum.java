@@ -19,7 +19,7 @@ import java.util.Date;
  * @author kevinvandevelde at atmire.com
  */
 @Entity
-@Table(name="most_recent_checksum", schema = "public")
+@Table(name="most_recent_checksum")
 public class MostRecentChecksum implements Serializable
 {
 

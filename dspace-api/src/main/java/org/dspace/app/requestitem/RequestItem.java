@@ -17,7 +17,7 @@ import java.util.Date;
  * Object representing an Item Request
  */
 @Entity
-@Table(name="requestitem", schema = "public")
+@Table(name="requestitem")
 public class RequestItem {
 
 

@@ -17,7 +17,7 @@ import javax.persistence.*;
  * @author Alexey Maslov
  */
 @Entity
-@Table(name="harvested_item", schema = "public")
+@Table(name="harvested_item")
 public class HarvestedItem
 {
     @Id

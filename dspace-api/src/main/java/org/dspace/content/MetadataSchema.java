@@ -25,7 +25,7 @@ import javax.persistence.*;
  * @see org.dspace.content.MetadataField
  */
 @Entity
-@Table(name="metadataschemaregistry", schema = "public")
+@Table(name="metadataschemaregistry")
 public class MetadataSchema
 {
     /** Short Name of built-in Dublin Core schema. */

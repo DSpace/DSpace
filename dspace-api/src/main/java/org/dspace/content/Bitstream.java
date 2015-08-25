@@ -30,7 +30,7 @@ import javax.persistence.*;
  * @version $Revision$
  */
 @Entity
-@Table(name="bitstream", schema = "public")
+@Table(name="bitstream")
 public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
 {
     @Column(name="bitstream_id", insertable = false, updatable = false)

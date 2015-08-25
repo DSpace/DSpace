@@ -17,7 +17,7 @@ import javax.persistence.*;
  * @author kevinvandevelde at atmire.com
  */
 @Entity
-@Table(name = "subscription", schema = "public")
+@Table(name = "subscription")
 public class Subscription {
 
     @Id

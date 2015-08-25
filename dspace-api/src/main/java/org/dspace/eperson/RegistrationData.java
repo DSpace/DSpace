@@ -16,7 +16,7 @@ import java.util.Date;
  * @author kevinvandevelde at atmire.com
  */
 @Entity
-@Table(name="registrationdata", schema = "public")
+@Table(name="registrationdata")
 public class RegistrationData {
 
     @Id
