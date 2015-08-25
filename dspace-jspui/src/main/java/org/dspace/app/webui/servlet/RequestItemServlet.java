@@ -7,34 +7,45 @@
  */
 package org.dspace.app.webui.servlet;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.dspace.app.requestitem.RequestItemAuthor;
-import org.dspace.app.requestitem.RequestItemAuthorExtractor;
-import org.dspace.app.webui.util.JSPManager;
-import org.dspace.app.webui.util.RequestItemManager;
-import org.dspace.app.webui.util.UIUtil;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.Metadatum;
-import org.dspace.content.Item;
-import org.dspace.core.*;
-import org.dspace.eperson.EPerson;
-import org.dspace.handle.HandleServiceImpl;
-import org.dspace.storage.bitstore.BitstreamStorageServiceImpl;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
-import org.dspace.utils.DSpace;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.text.MessageFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.text.MessageFormat;
-import java.util.Date;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.dspace.app.requestitem.RequestItem;
+import org.dspace.app.requestitem.RequestItemAuthor;
+import org.dspace.app.requestitem.RequestItemAuthorExtractor;
+import org.dspace.app.requestitem.factory.RequestItemServiceFactory;
+import org.dspace.app.requestitem.service.RequestItemService;
+import org.dspace.app.webui.util.JSPManager;
+import org.dspace.app.webui.util.UIUtil;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
+import org.dspace.content.BundleBitstream;
+import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.ItemService;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.core.Email;
+import org.dspace.core.I18nUtil;
+import org.dspace.core.LogManager;
+import org.dspace.eperson.EPerson;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
+import org.dspace.utils.DSpace;
 
 /**
  * Servlet for generate a statistisc report
@@ -62,6 +73,23 @@ public class RequestItemServlet extends DSpaceServlet
     /* resume leter for request dspace administrator*/
     public static final int RESUME_FREEACESS = 5;
 
+    private HandleService handleService;
+    
+    private ItemService itemService;
+    
+    private BitstreamService bitstreamService;
+    
+    private RequestItemService requestItemService;
+    
+    @Override
+    public void init() throws ServletException {
+    	super.init();
+    	itemService = ContentServiceFactory.getInstance().getItemService();
+    	bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    	handleService = HandleServiceFactory.getInstance().getHandleService();
+    	requestItemService = RequestItemServiceFactory.getInstance().getRequestItemService();
+    }
+    
     protected void doDSGet(Context context,
         HttpServletRequest request,
         HttpServletResponse response)
@@ -135,26 +163,22 @@ public class RequestItemServlet extends DSpaceServlet
         // handle
         String handle = request.getParameter("handle");
         
-        String bitstream_id=request.getParameter("bitstream-id");
+        UUID bitstream_id= UIUtil.getUUIDParameter(request, "bitstream-id");
         
         // Title
         String title = null;
         Item item = null;
         if (StringUtils.isNotBlank(handle))
         {
-            item = (Item) HandleServiceImpl.resolveToObject(context, handle);
+            item = (Item) handleService.resolveToObject(context, handle);
             
         }
         if (item == null)
         {   
         	JSPManager.showInvalidIDError(request, response, handle, -1);
         }
-        Metadatum[] titleDC = item.getDC("title", null, Item.ANY);
-        if (titleDC != null || titleDC.length > 0)
-        {
-            title = titleDC[0].value;
-        }
-        else
+        title = itemService.getMetadataFirstValue(item, "dc", "title", null, Item.ANY);
+        if (title == null)
 		{
 			title = I18nUtil.getMessage("jsp.general.untitled", context);
 		}
@@ -197,6 +221,9 @@ public class RequestItemServlet extends DSpaceServlet
 
             try
             {
+            	String token = requestItemService.createRequest(context, bitstream_id != null?
+            			bitstreamService.find(context, bitstream_id):null, item, allfiles, requesterEmail, reqname, coment);
+            	
                 // All data is there, send the email
 				Email email = Email.getEmail(I18nUtil.getEmailFilename(
 						context.getCurrentLocale(), "request_item.author"));
@@ -216,15 +243,12 @@ public class RequestItemServlet extends DSpaceServlet
 				email.addArgument(reqname);
 				email.addArgument(requesterEmail);
 				email.addArgument(allfiles ? I18nUtil
-						.getMessage("itemRequest.all") : Bitstream.find(
-						context, Integer.parseInt(bitstream_id)).getName());
-				email.addArgument(HandleServiceImpl.getCanonicalForm(item
+						.getMessage("itemRequest.all") : bitstreamService.find(context, bitstream_id).getName());
+				email.addArgument(handleService.getCanonicalForm(item
                         .getHandle()));
 				email.addArgument(title); // request item title
 				email.addArgument(coment); // message
-				email.addArgument(RequestItemManager.getLinkTokenEmail(context,
-						bitstream_id, item.getID(), requesterEmail, reqname,
-						allfiles));
+				email.addArgument(token);
 				
 				email.addArgument(authorName); // corresponding author name
 				email.addArgument(authorEmail); // corresponding author email
@@ -282,19 +306,19 @@ public class RequestItemServlet extends DSpaceServlet
        // Token
         String token = request.getParameter("token");
        
-        TableRow requestItem = RequestItemManager.getRequestbyToken( context, token);
+        RequestItem requestItem = requestItemService.findByToken(context, token);
         // validate
         if (requestItem != null)
         {
-            Item item = Item.find(context, requestItem.getIntColumn("item_id"));
-            String title = "";
-             if (item != null)
-            {   
-                Metadatum[] titleDC = item.getDC("title", null, Item.ANY);
-                if (titleDC != null || titleDC.length > 0) 
-                    title = titleDC[0].value; 
-            }
-            request.setAttribute("request-name", requestItem.getStringColumn("request_name"));
+			Item item = requestItem.getItem();
+			String title = "";
+			if (item != null) {
+				title = itemService.getMetadataFirstValue(item, "dc", "title", null, Item.ANY);
+				if (title == null) {
+					title = "";
+				}
+			}
+            request.setAttribute("request-name", requestItem.getReqName());
             request.setAttribute("handle", item.getHandle());
             request.setAttribute("title", title);
             
@@ -321,22 +345,22 @@ public class RequestItemServlet extends DSpaceServlet
 
 		// get token, get register, get email template, format email, get
 		// message to jsp
-		TableRow requestItem = RequestItemManager.getRequestbyToken(context,
+		RequestItem requestItem = requestItemService.findByToken(context,
 				token);
 
 		if (requestItem != null && (yes || no)) {
-			Item item = Item.find(context, requestItem.getIntColumn("item_id"));
+			Item item = requestItem.getItem();
 
-			Metadatum[] titleDC = item.getDC("title", null, Item.ANY);
-			String title = titleDC.length > 0 ? titleDC[0].value : I18nUtil
+			String title = itemService.getMetadataFirstValue(item, "dc", "title", null, Item.ANY);
+			title = title != null ? title : I18nUtil
 					.getMessage("jsp.general.untitled", context);
 			
 
 			EPerson submiter = item.getSubmitter();
 
 			Object[] args = new String[]{
-						requestItem.getStringColumn("request_name"),
-						HandleServiceImpl.getCanonicalForm(item.getHandle()), // User
+						requestItem.getReqName(),
+						handleService.getCanonicalForm(item.getHandle()), // User
 						title, // request item title
 						submiter.getFullName(), // # submmiter name
 						submiter.getEmail() // # submmiter email
@@ -376,7 +400,7 @@ public class RequestItemServlet extends DSpaceServlet
        
         if (submit_next)
         {
-            TableRow requestItem = RequestItemManager.getRequestbyToken( context, token);
+            RequestItem requestItem = requestItemService.findByToken( context, token);
             // validate
             if (requestItem != null)
             {
@@ -386,50 +410,45 @@ public class RequestItemServlet extends DSpaceServlet
                 boolean accept = UIUtil.getBoolParameter(request, "accept_request");
                 try
                 {
-                    Item item = Item.find(context, requestItem.getIntColumn("item_id"));
+                    Item item = requestItem.getItem();
                     Email email = new Email();
                     email.setSubject(subject);
                     email.setContent("{0}");
-        			email.addRecipient(requestItem.getStringColumn("request_email"));
+        			email.addRecipient(requestItem.getReqEmail());
                     email.addArgument(message);
                     
 					// add attach
 					if (accept) {
-						if (requestItem.getBooleanColumn("allfiles")) {
-							Bundle[] bundles = item.getBundles("ORIGINAL");
-							for (int i = 0; i < bundles.length; i++) {
-								Bitstream[] bitstreams = bundles[i]
-										.getBitstreams();
-								for (int k = 0; k < bitstreams.length; k++) {
-									if (!bitstreams[k].getFormat().isInternal()
-											&& RequestItemManager.isRestricted(
-													context, bitstreams[k])) {
+						if (requestItem.getBitstream() == null) {
+							List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
+							for (Bundle b : bundles) {
+								List<BundleBitstream> bbitstreams = b.getBitstreams();
+								for (BundleBitstream bb : bbitstreams) {
+									Bitstream bitstream = bb.getBitstream();
+									if (!bitstream.getFormat(context).isInternal()
+											&& authorizeService.authorizeActionBoolean(context, null, bitstream, Constants.READ, false)) {
 										email.addAttachment(
-												BitstreamStorageServiceImpl
+												bitstreamService
 														.retrieve(
                                                                 context,
-                                                                bitstreams[k]
-                                                                        .getID()),
-												bitstreams[k].getName(),
-												bitstreams[k].getFormat()
+                                                                bitstream),
+												bitstream.getName(),
+												bitstream.getFormat(context)
 														.getMIMEType());
 									}
 								}
 							}
 						} else {
-							Bitstream bit = Bitstream.find(context,
-									requestItem.getIntColumn("bitstream_id"));
-							email.addAttachment(BitstreamStorageServiceImpl
-									.retrieve(context, requestItem
-                                            .getIntColumn("bitstream_id")), bit
-									.getName(), bit.getFormat().getMIMEType());
+							Bitstream bit = requestItem.getBitstream();
+							email.addAttachment(bitstreamService.retrieve(context, bit), bit.getName(),
+									bit.getFormat(context).getMIMEType());
 						}
 					}
                     email.send();
 
-                    requestItem.setColumn("accept_request",accept);
-                    requestItem.setColumn("decision_date",new Date());
-                    DatabaseManager.update(context, requestItem);
+                    requestItem.setAccept_request(accept);
+                    requestItem.setDecision_date(new Date());
+                    requestItemService.update(context, requestItem);
 
                     log.info(LogManager.getHeader(context,
                         "sent_attach_requestItem",
@@ -469,13 +488,12 @@ public class RequestItemServlet extends DSpaceServlet
 		String mail = request.getParameter("email");
 		// get token, get register, get email template, format email, get
 		// message to jsp
-		TableRow requestItem = RequestItemManager.getRequestbyToken(context,
+		RequestItem requestItem = requestItemService.findByToken(context,
 				token);
 
 		if (requestItem != null && free) {
 			try {
-				Item item = Item.find(context,
-						requestItem.getIntColumn("item_id"));
+				Item item = requestItem.getItem();
 
 				String emailRequest;
 				EPerson submiter = item.getSubmitter();
@@ -493,18 +511,17 @@ public class RequestItemServlet extends DSpaceServlet
 						context.getCurrentLocale(), "request_item.admin"));
 				email.addRecipient(emailRequest);
 
-				email.addArgument(Bitstream.find(context,
-						requestItem.getIntColumn("bitstream_id")).getName());
-				email.addArgument(HandleServiceImpl.getCanonicalForm(item
+				email.addArgument(requestItem.getBitstream().getName());
+				email.addArgument(handleService.getCanonicalForm(item
                         .getHandle()));
-				email.addArgument(requestItem.getStringColumn("token"));
+				email.addArgument(requestItem.getToken());
 				email.addArgument(name);
 				email.addArgument(mail);
 
 				email.send();
 
 				log.info(LogManager.getHeader(context, "sent_adm_requestItem",
-						"token=" + requestItem.getStringColumn("token")
+						"token=" + requestItem.getToken()
 								+ "item_id=" + item.getID()));
 
 				JSPManager.showJSP(request, response,
@@ -518,4 +535,28 @@ public class RequestItemServlet extends DSpaceServlet
 			JSPManager.showInvalidIDError(request, response, token, -1);
 		}
    }
+	
+	/**
+     * Get the link to the author in RequestLink email.
+     * 
+     * @param email
+     *            The email address to mail to
+     *
+     * @exception SQLExeption
+     *
+     */
+    public static String getLinkTokenEmail(Context context, String token)
+            throws SQLException
+    {
+        String base = ConfigurationManager.getProperty("dspace.url");
+
+        String specialLink = (new StringBuffer()).append(base).append(
+                base.endsWith("/") ? "" : "/").append(
+                "request-item").append("?step=" + RequestItemServlet.ENTER_TOKEN)
+                .append("&token=")
+                .append(token)
+                .toString();
+        
+        return specialLink;
+    }
 }

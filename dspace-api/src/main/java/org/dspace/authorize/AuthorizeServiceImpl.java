@@ -7,12 +7,23 @@
  */
 package org.dspace.authorize;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
-import org.dspace.content.*;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
+import org.dspace.content.BundleBitstream;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.WorkspaceItemService;
@@ -23,9 +34,6 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.workflow.WorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.sql.SQLException;
-import java.util.*;
 
 /**
  * AuthorizeManager handles all authorization checks for DSpace. For better
@@ -87,6 +95,12 @@ public class AuthorizeServiceImpl implements AuthorizeService
     @Override
     public void authorizeAction(Context c, DSpaceObject o, int action, boolean useInheritance) throws AuthorizeException, SQLException
     {
+    	authorizeAction(c, c.getCurrentUser(), o, action, useInheritance);
+    }
+    
+    @Override
+    public void authorizeAction(Context c, EPerson e, DSpaceObject o, int action, boolean useInheritance) throws AuthorizeException, SQLException
+    {
         if (o == null)
         {
             // action can be -1 due to a null entry
@@ -100,7 +114,6 @@ public class AuthorizeServiceImpl implements AuthorizeService
                 actionText = Constants.actionText[action];
             }
 
-            EPerson e = c.getCurrentUser();
             UUID userid;
 
             if (e == null)
@@ -116,13 +129,12 @@ public class AuthorizeServiceImpl implements AuthorizeService
                             + actionText + " by user " + userid);
         }
 
-        if (!authorize(c, o, action, c.getCurrentUser(), useInheritance))
+        if (!authorize(c, o, action, e, useInheritance))
         {
             // denied, assemble and throw exception
             int otype = o.getType();
             UUID oid = o.getID();
             UUID userid;
-            EPerson e = c.getCurrentUser();
 
             if (e == null)
             {
@@ -178,6 +190,27 @@ public class AuthorizeServiceImpl implements AuthorizeService
         return isAuthorized;
     }
 
+    @Override
+    public boolean authorizeActionBoolean(Context c, EPerson e, DSpaceObject o, int a, boolean useInheritance) throws SQLException
+    {
+        boolean isAuthorized = true;
+
+        if (o == null)
+        {
+            return false;
+        }
+
+        try
+        {
+            authorizeAction(c, e, o, a, useInheritance);
+        } catch (AuthorizeException ex)
+        {
+            isAuthorized = false;
+        }
+
+        return isAuthorized;
+    }
+    
     /**
      * Check to see if the given user can perform the given action on the given
      * object. Always returns true if the ignore authorization flat is set in
