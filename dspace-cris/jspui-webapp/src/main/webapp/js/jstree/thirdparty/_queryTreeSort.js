@@ -1,3 +1,10 @@
+/*
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/CILEA/dspace-cris/wiki/License
+ */
 var _queryTreeSort = function(options) {
   var cfi, e, i, id, o, pid, rfi, ri, thisid, _i, _j, _len, _len1, _ref, _ref1;
   id = options.id || "id";
