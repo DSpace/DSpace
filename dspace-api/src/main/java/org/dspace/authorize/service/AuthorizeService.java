@@ -7,6 +7,10 @@
  */
 package org.dspace.authorize.service;
 
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.List;
+
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Collection;
@@ -14,10 +18,6 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.List;
 
 /**
  * AuthorizeManager handles all authorization checks for DSpace. For better
@@ -91,6 +91,28 @@ public interface AuthorizeService {
             throws AuthorizeException, SQLException;
 
     /**
+     * Checks that the specified eperson can perform the given action on
+     * the given object. Throws an exception if the user is not authorized,
+     * otherwise the method call does nothing.
+     *
+     * @param c
+     *         context
+     * @param e
+     * 		   the eperson to use for the authorization check        
+     * @param o
+     *         a DSpaceObject
+     * @param useInheritance
+     *         flag to say if ADMIN action on the current object or parent
+     *         object can be used
+     * @param action
+     *         action to perform from <code>org.dspace.core.Constants</code>
+     * @throws AuthorizeException
+     *         if the user is denied
+     */
+    public void authorizeAction(Context c, EPerson e, DSpaceObject o, int action, boolean useInheritance)
+            throws AuthorizeException, SQLException;
+    
+    /**
      * same authorize, returns boolean for those who don't want to deal with
      * catching exceptions.
      *
@@ -124,6 +146,27 @@ public interface AuthorizeService {
      *         authorized to perform the given action on the given object
      */
     public boolean authorizeActionBoolean(Context c, DSpaceObject o, int a, boolean useInheritance) throws SQLException;
+    
+    /**
+     * same authorize with a specif eperson (not the current user), returns boolean for those who don't want to deal with
+     * catching exceptions.
+     *
+     * @param c
+     *         DSpace context
+     * @param e
+     * 		   EPerson to use in the check        
+     * @param o
+     *         DSpaceObject
+     * @param a
+     *         action being attempted, from
+     *         <code>org.dspace.core.Constants</code>
+     * @param useInheritance
+     *         flag to say if ADMIN action on the current object or parent
+     *         object can be used
+     * @return <code>true</code> if the requested user is
+     *         authorized to perform the given action on the given object
+     */
+    public boolean authorizeActionBoolean(Context c, EPerson e, DSpaceObject o, int a, boolean useInheritance) throws SQLException;
 
     ///////////////////////////////////////////////
     // admin check methods

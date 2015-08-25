@@ -7,12 +7,12 @@
  */
 package org.dspace.app.requestitem.service;
 
+import java.sql.SQLException;
+
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-
-import java.sql.SQLException;
 
 /**
  * Service interface class for the RequestItem object.
@@ -23,9 +23,9 @@ import java.sql.SQLException;
 public interface RequestItemService {
 
     /**
-     * Generate a unique id of the request and put it into the DB
+     * Generate a request item representing the request and put it into the DB
      * @param context
-     * @return
+     * @return the token of the request item
      * @throws java.sql.SQLException
      */
     public String createRequest(Context context, Bitstream bitstream, Item item, boolean allFiles, String reqEmail, String reqName, String reqMessage)
