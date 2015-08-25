@@ -9,6 +9,7 @@ package org.dspace.app.webui.servlet.admin;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.lang.time.DateUtils;
 
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.app.webui.servlet.DSpaceServlet;
@@ -493,6 +495,20 @@ public class AuthorizeAdminServlet extends DSpaceServlet
                     .getIntParameter(request, "collection_id");
             int communityId = UIUtil.getIntParameter(request, "community_id");
             int itemId = UIUtil.getIntParameter(request, "item_id");
+            Date startDate = null;
+            try {
+                startDate = DateUtils.parseDate(request.getParameter("policy_start_date"),
+                        new String[]{"yyyy-MM-dd", "yyyy-MM", "yyyy"});
+            } catch (Exception ex) {
+                //Ignore start date is already null
+            }
+            Date endDate = null;
+            try {
+                endDate = DateUtils.parseDate(request.getParameter("policy_end_date"),
+                        new String[]{"yyyy-MM-dd", "yyyy-MM", "yyyy"});
+            } catch (Exception ex) {
+                //Ignore end date is already null
+            }
 
             Item item = null;
             Collection collection = null;
@@ -574,6 +590,11 @@ public class AuthorizeAdminServlet extends DSpaceServlet
                 // modify the policy
                 policy.setAction(actionId);
                 policy.setGroup(group);
+                // start and end dates are used for Items and Bitstreams only.
+                // Set start and end date even if they are null to be able to 
+                // delete previously set dates.
+                policy.setStartDate(startDate);
+                policy.setEndDate(endDate);
                 policy.update();
 
                 // show edit form!

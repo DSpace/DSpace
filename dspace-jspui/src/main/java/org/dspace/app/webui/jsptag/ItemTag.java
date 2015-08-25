@@ -862,11 +862,13 @@ public class ItemTag extends TagSupport
 
             						if (tb != null)
             						{
-            							String myPath = request.getContextPath()
-                                            	+ "/retrieve/"
-                                            	+ tb.getID()
-                                            	+ "/"
-                                            	+ UIUtil.encodeBitstreamName(tb
+                                                            if (AuthorizeManager.authorizeActionBoolean(context, tb, Constants.READ))
+                                                            {
+                                                                String myPath = request.getContextPath()
+                                                                    + "/retrieve/"
+                                                                    + tb.getID()
+                                                                    + "/"
+                                                                    + UIUtil.encodeBitstreamName(tb
                                             			.getName(),
                                             			Constants.DEFAULT_ENCODING);
 
@@ -875,6 +877,7 @@ public class ItemTag extends TagSupport
             							out.print("<img src=\"" + myPath + "\" ");
             							out.print("alt=\"" + tAltText
             									+ "\" /></a><br />");
+                                                            }
             						}
             					}
 

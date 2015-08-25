@@ -179,7 +179,7 @@
                 <dependency>
                     <groupId>org.dspace.modules</groupId>
                     <artifactId>xmlui-mirage2</artifactId>
-                    <version>5.2-SNAPSHOT</version>
+                    <version>5.3</version>
                     <type>war</type>
                 </dependency>
             </dependencies>
