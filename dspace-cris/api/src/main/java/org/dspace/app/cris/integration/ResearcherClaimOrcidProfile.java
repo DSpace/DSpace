@@ -56,7 +56,10 @@ public class ResearcherClaimOrcidProfile implements PostLoggedInAction, ExtraLog
 					}
 				}
 				
-				fromOrcidToResearcherPage(request, orcid, scope, rp);
+				if(rp!=null) {
+					fromOrcidToResearcherPage(request, orcid, scope, rp);	
+				}
+				
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage(), e);
