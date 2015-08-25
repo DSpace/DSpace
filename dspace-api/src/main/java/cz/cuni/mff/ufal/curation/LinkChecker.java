@@ -160,7 +160,7 @@ public class LinkChecker extends AbstractCurationTask
      * Perform the link checking.
      *
      * @param dso
-     *            The DSpaaceObject to be checked
+     *            The DSpaceObject to be checked
      * @return The curation task status of the checking
      * @throws java.io.IOException
      *             THrown if something went wrong
@@ -598,18 +598,20 @@ public class LinkChecker extends AbstractCurationTask
 
     protected int getConnectTimeout()
     {
-        if(cachedReadTimeout == null)
+        if(cachedConnectTimeout == null)
         {
-            cachedReadTimeout = ConfigurationManager.getIntProperty(LR_CONFIG_MODULE, LINK_CHECKER_CONNECT_TIMEOUT_KEY, LINK_CHECKER_CONNECT_TIMEOUT);
+            cachedConnectTimeout = ConfigurationManager.getIntProperty(
+                LR_CONFIG_MODULE, LINK_CHECKER_CONNECT_TIMEOUT_KEY, LINK_CHECKER_CONNECT_TIMEOUT);
         }
-        return cachedReadTimeout;
+        return cachedConnectTimeout;
     }
 
     protected int getReadTimeout()
     {
         if(cachedReadTimeout == null)
         {
-            cachedReadTimeout = ConfigurationManager.getIntProperty(LR_CONFIG_MODULE, LINK_CHECKER_CONNECT_TIMEOUT_KEY, LINK_CHECKER_CONNECT_TIMEOUT);
+            cachedReadTimeout = ConfigurationManager.getIntProperty(
+                LR_CONFIG_MODULE, LINK_CHECKER_READ_TIMEOUT_KEY, LINK_CHECKER_READ_TIMEOUT);
         }
         return cachedReadTimeout;
     }
