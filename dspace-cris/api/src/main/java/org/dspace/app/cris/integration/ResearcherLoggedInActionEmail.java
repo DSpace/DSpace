@@ -102,7 +102,7 @@ public class ResearcherLoggedInActionEmail implements PostLoggedInAction
             
             if (save)
             {
-                applicationService.saveOrUpdate(ResearcherPage.class, rp);
+                applicationService.saveOrUpdate(ResearcherPage.class, rp, false);
             }
         }
         catch (Exception e)

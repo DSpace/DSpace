@@ -10,6 +10,7 @@ package org.dspace.app.cris.integration;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.authenticate.PostLoggedInAction;
@@ -22,6 +23,9 @@ public class ResearcherLoggedInAction implements PostLoggedInAction
     private ApplicationService applicationService;
     
     private String netidSourceRef;
+    
+	/** the logger */
+	private static Logger log = Logger.getLogger(ResearcherLoggedInAction.class);
     
     @Override
     public void loggedIn(Context context, HttpServletRequest request,
@@ -43,7 +47,7 @@ public class ResearcherLoggedInAction implements PostLoggedInAction
 	                else {
 	                    rp.setEpersonID(eperson.getID());
 	                }
-					applicationService.saveOrUpdate(ResearcherPage.class, rp);
+					applicationService.saveOrUpdate(ResearcherPage.class, rp, false);
                 }
             }
         }
