@@ -18,12 +18,12 @@ import org.dspace.core.Context;
 import org.dspace.xoai.data.DSpaceItem;
 import org.dspace.xoai.filter.results.DatabaseFilterResult;
 import org.dspace.xoai.filter.results.SolrFilterResult;
-import org.dspace.xoai.services.api.database.CollectionsService;
-import org.dspace.xoai.services.api.database.HandleResolver;
+import org.dspace.xoai.services.api.CollectionsService;
+import org.dspace.xoai.services.api.HandleResolver;
 
 import java.util.List;
 import java.util.UUID;
-import org.dspace.xoai.services.api.database.HandleResolverException;
+import org.dspace.xoai.services.api.HandleResolverException;
 
 /**
  *

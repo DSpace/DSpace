@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.xoai.exceptions.InvalidMetadataFieldException;
 import org.dspace.xoai.services.api.config.ConfigurationService;
-import org.dspace.xoai.services.api.database.EarliestDateResolver;
+import org.dspace.xoai.services.api.EarliestDateResolver;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 

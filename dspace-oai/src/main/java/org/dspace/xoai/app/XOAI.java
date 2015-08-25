@@ -35,7 +35,7 @@ import org.dspace.xoai.services.api.cache.XOAILastCompilationCacheService;
 import org.dspace.xoai.services.api.config.ConfigurationService;
 import org.dspace.xoai.services.api.config.XOAIManagerResolver;
 import org.dspace.xoai.services.api.context.ContextService;
-import org.dspace.xoai.services.api.database.CollectionsService;
+import org.dspace.xoai.services.api.CollectionsService;
 import org.dspace.xoai.services.api.solr.SolrServerResolver;
 import org.dspace.xoai.solr.DSpaceSolrSearch;
 import org.dspace.xoai.solr.exceptions.DSpaceSolrException;

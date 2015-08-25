@@ -17,7 +17,7 @@ import org.dspace.xoai.filter.results.DatabaseFilterResult;
 import org.dspace.xoai.filter.results.SolrFilterResult;
 import org.dspace.xoai.services.api.context.ContextService;
 import org.dspace.xoai.services.api.context.ContextServiceException;
-import org.dspace.xoai.services.api.database.FieldResolver;
+import org.dspace.xoai.services.api.FieldResolver;
 import org.dspace.xoai.services.api.xoai.DSpaceFilterResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 

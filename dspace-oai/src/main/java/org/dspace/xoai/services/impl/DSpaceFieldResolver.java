@@ -5,11 +5,11 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.xoai.services.impl.database;
+package org.dspace.xoai.services.impl;
 
 import org.dspace.core.Context;
 import org.dspace.xoai.exceptions.InvalidMetadataFieldException;
-import org.dspace.xoai.services.api.database.FieldResolver;
+import org.dspace.xoai.services.api.FieldResolver;
 
 import java.sql.SQLException;
 import java.util.regex.Pattern;

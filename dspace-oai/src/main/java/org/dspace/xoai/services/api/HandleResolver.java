@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.xoai.services.api.database;
+package org.dspace.xoai.services.api;
 
 import org.dspace.content.DSpaceObject;
 

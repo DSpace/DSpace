@@ -5,14 +5,14 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.xoai.services.impl.database;
+package org.dspace.xoai.services.impl;
 
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.xoai.services.api.context.ContextService;
 import org.dspace.xoai.services.api.context.ContextServiceException;
-import org.dspace.xoai.services.api.database.CollectionsService;
+import org.dspace.xoai.services.api.CollectionsService;
 
 import java.sql.SQLException;
 import java.util.ArrayList;

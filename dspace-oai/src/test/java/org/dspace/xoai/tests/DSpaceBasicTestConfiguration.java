@@ -9,7 +9,7 @@ package org.dspace.xoai.tests;
 
 import org.dspace.xoai.services.api.config.ConfigurationService;
 import org.dspace.xoai.services.api.context.ContextService;
-import org.dspace.xoai.services.api.database.FieldResolver;
+import org.dspace.xoai.services.api.FieldResolver;
 import org.dspace.xoai.services.api.xoai.DSpaceFilterResolver;
 import org.dspace.xoai.services.impl.xoai.BaseDSpaceFilterResolver;
 import org.dspace.xoai.tests.helpers.stubs.StubbedConfigurationService;
