@@ -40,8 +40,8 @@ public class DSpaceDatabaseQueryResolver implements DatabaseQueryResolver {
     public DatabaseQuery buildQuery(List<ScopedFilter> filters, int offset, int length) throws DatabaseQueryException {
         List<Object> parameters = new ArrayList<>();
         List<Object> countParameters = new ArrayList<>();
-        String query = "SELECT i.* FROM item i ";
-        String countQuery = "SELECT COUNT(*) as count FROM item i";
+        String query = "SELECT i FROM item i ";
+        String countQuery = "SELECT COUNT(i) as count FROM item i";
 
         String where = null;
         try {
@@ -52,10 +52,6 @@ public class DSpaceDatabaseQueryResolver implements DatabaseQueryResolver {
         countParameters.addAll(parameters);
 
         String whereInArchive = "WHERE i.in_archive=true";
-        if(DatabaseManager.isOracle())
-        {
-            whereInArchive = "WHERE i.in_archive=1";
-        }
 
         if (!where.equals("")) {
             query += " " + whereInArchive + " AND " + where;
@@ -66,18 +62,7 @@ public class DSpaceDatabaseQueryResolver implements DatabaseQueryResolver {
         }
 
         query += " ORDER BY i.item_id";
-        boolean postgres = ! DatabaseManager.isOracle();
-        if (postgres)
-        {
-            query += " OFFSET ? LIMIT ?";
-        }
-        else
-        {
-            // Oracle
-            query = "SELECT * FROM (" + query
-                    + ") WHERE ROWNUM BETWEEN ? AND ?";
-            length = length + offset;
-        }
+        query += " OFFSET ? LIMIT ?";
         parameters.add(offset);
         parameters.add(length);
 

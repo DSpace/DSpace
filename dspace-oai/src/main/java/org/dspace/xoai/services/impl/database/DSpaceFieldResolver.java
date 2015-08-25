@@ -13,9 +13,15 @@ import org.dspace.xoai.services.api.database.FieldResolver;
 
 import java.sql.SQLException;
 import java.util.regex.Pattern;
+import org.dspace.content.MetadataField;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.MetadataFieldService;
 
 public class DSpaceFieldResolver implements FieldResolver {
     private MetadataFieldCache metadataFieldCache = null;
+
+    private static final MetadataFieldService metadataFieldService
+            = ContentServiceFactory.getInstance().getMetadataFieldService();
 
     @Override
     public int getFieldID(Context context, String field) throws InvalidMetadataFieldException, SQLException {
@@ -31,28 +37,11 @@ public class DSpaceFieldResolver implements FieldResolver {
                 String qualifier = null;
                 if (pieces.length > 2)
                     qualifier = pieces[2];
-                String query = "SELECT mfr.metadata_field_id as mid FROM metadatafieldregistry mfr, "
-                        + "metadataschemaregistry msr WHERE mfr.metadata_schema_id=mfr.metadata_schema_id AND "
-                        + "msr.short_id = ? AND mfr.element = ?";
 
-                TableRowIterator iterator;
-
-                if (qualifier == null)
+                MetadataField metadataField = metadataFieldService.findByElement(context, schema, element, qualifier);
+                if (null != metadataField)
                 {
-                    query += " AND mfr.qualifier is NULL";
-                    iterator = DatabaseManager.query(context, query, schema,
-                            element);
-                }
-                else
-                {
-                    query += " AND mfr.qualifier = ?";
-                    iterator = DatabaseManager.query(context, query, schema,
-                            element, qualifier);
-                }
-
-                if (iterator.hasNext())
-                {
-                    metadataFieldCache.add(field, iterator.next().getIntColumn("mid"));
+                    metadataFieldCache.add(field, metadataField.getFieldID());
                 }
                 else
                     throw new InvalidMetadataFieldException();
