@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.xoai.services.impl.database;
+package org.dspace.xoai.services.impl;
 
 import java.sql.SQLException;
 import javax.inject.Inject;
@@ -13,10 +13,10 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.handle.service.HandleService;
 import org.dspace.xoai.services.api.context.ContextService;
 import org.dspace.xoai.services.api.context.ContextServiceException;
-import org.dspace.xoai.services.api.database.HandleResolver;
-import org.dspace.xoai.services.api.database.HandleResolverException;
+import org.dspace.xoai.services.api.HandleResolver;
+import org.dspace.xoai.services.api.HandleResolverException;
 
-public class DSpaceHandlerResolver implements HandleResolver {
+public class DSpaceHandleResolver implements HandleResolver {
     @Inject
     private ContextService contextService;
 

@@ -5,14 +5,14 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.xoai.services.impl.database;
+package org.dspace.xoai.services.impl;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.xoai.exceptions.InvalidMetadataFieldException;
-import org.dspace.xoai.services.api.database.EarliestDateResolver;
-import org.dspace.xoai.services.api.database.FieldResolver;
+import org.dspace.xoai.services.api.EarliestDateResolver;
+import org.dspace.xoai.services.api.FieldResolver;
 import org.dspace.xoai.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
