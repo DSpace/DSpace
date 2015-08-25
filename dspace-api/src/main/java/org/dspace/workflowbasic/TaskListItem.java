@@ -17,7 +17,7 @@ import javax.persistence.*;
  * @author kevinvandevelde at atmire.com
  */
 @Entity
-@Table(name = "tasklistitem", schema = "public")
+@Table(name = "tasklistitem")
 public class TaskListItem {
 
     @Id

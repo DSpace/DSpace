@@ -18,7 +18,7 @@ import javax.persistence.Table;
  * By default, the handle suffix "0" represents the Site, e.g. "1721.1/0"
  */
 @Entity
-@Table(name = "site", schema = "public")
+@Table(name = "site")
 public class Site extends DSpaceObject
 {
 

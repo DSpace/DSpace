@@ -26,7 +26,7 @@ import java.sql.SQLException;
 
  */
 @Entity
-@Table(name="cwf_collectionrole", schema = "public")
+@Table(name="cwf_collectionrole")
 public class CollectionRole {
 
     @Id

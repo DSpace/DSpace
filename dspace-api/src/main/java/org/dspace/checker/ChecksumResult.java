@@ -15,7 +15,7 @@ import javax.persistence.*;
  * @author kevinvandevelde at atmire.com
  */
 @Entity
-@Table(name="checksum_results", schema = "public")
+@Table(name="checksum_results")
 public final class ChecksumResult
 {
     @Id

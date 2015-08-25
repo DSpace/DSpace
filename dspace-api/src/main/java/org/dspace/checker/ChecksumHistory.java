@@ -22,7 +22,7 @@ import java.util.UUID;
  *
  */
 @Entity
-@Table(name="checksum_history", schema = "public")
+@Table(name="checksum_history")
 public class ChecksumHistory
 {
 

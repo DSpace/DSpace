@@ -23,7 +23,7 @@ import javax.persistence.*;
  * @version $Revision$
  */
 @Entity
-@Table(name = "workflowitem", schema = "public")
+@Table(name = "workflowitem")
 public class BasicWorkflowItem implements WorkflowItem
 {
 

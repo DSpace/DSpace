@@ -22,7 +22,7 @@ import java.util.Date;
  * @author Ben Bosman (ben at atmire dot com)
  */
 @Entity
-@Table(name="versionitem", schema = "public")
+@Table(name="versionitem")
 public class Version {
 
     @Id

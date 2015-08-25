@@ -21,7 +21,7 @@ import javax.persistence.*;
  */
 @Entity
 @Inheritance(strategy= InheritanceType.JOINED)
-@Table(name = "dspaceobject", schema = "public")
+@Table(name = "dspaceobject")
 public abstract class DSpaceObject implements Serializable
 {
     @Id

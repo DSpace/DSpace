@@ -11,6 +11,10 @@ import org.hibernate.dialect.PostgreSQL82Dialect;
 import org.hibernate.metamodel.spi.TypeContributions;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.type.PostgresUUIDType;
+import org.hibernate.type.descriptor.sql.LongVarcharTypeDescriptor;
+import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
+
+import java.sql.Types;
 
 /**
  * UUID's are not supported by default in hibernate due to differences in the database in order to fix this a custom sql dialect is needed.
@@ -37,5 +41,26 @@ public class DSpacePostgreSQL82Dialect extends PostgreSQL82Dialect
         protected boolean registerUnderJavaType() {
             return true;
         }
+    }
+
+    /**
+     * Override is needed to properly support the CLOB on metadatavalue in postgres & oracle.
+     * @param sqlCode
+     * @return
+     */
+    @Override
+    public SqlTypeDescriptor getSqlTypeDescriptorOverride(int sqlCode) {
+        SqlTypeDescriptor descriptor;
+        switch (sqlCode) {
+            case Types.CLOB: {
+                descriptor = LongVarcharTypeDescriptor.INSTANCE;
+                break;
+            }
+            default: {
+                descriptor = super.getSqlTypeDescriptorOverride(sqlCode);
+                break;
+            }
+        }
+        return descriptor;
     }
 }
