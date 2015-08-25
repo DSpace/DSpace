@@ -8,10 +8,6 @@
 package org.dspace.app.cris.discovery;
 
 
-import it.cilea.osd.common.listener.NativePostDeleteEventListener;
-import it.cilea.osd.common.listener.NativePostUpdateEventListener;
-import it.cilea.osd.common.model.Identifiable;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Date;
@@ -22,6 +18,10 @@ import org.dspace.app.cris.model.jdyna.ACrisNestedObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
+
+import it.cilea.osd.common.listener.NativePostDeleteEventListener;
+import it.cilea.osd.common.listener.NativePostUpdateEventListener;
+import it.cilea.osd.common.model.Identifiable;
 
 /**
  * This listener is used to keep the Search Solr core up-to-date with change to CRIS-NESTED fields. 
@@ -53,6 +53,7 @@ public class NativeNestedListenerSolrIndexer implements NativePostUpdateEventLis
     @Override
     public <T extends Identifiable> void onPostUpdate(T entity)
     {
+    	
         Object object = entity;
         if (!(object instanceof ACrisNestedObject))
         {
@@ -60,6 +61,8 @@ public class NativeNestedListenerSolrIndexer implements NativePostUpdateEventLis
             return;
         }
 
+        log.debug("Call onPostUpdate " + NativeNestedListenerSolrIndexer.class);
+        
         ACrisNestedObject nested = (ACrisNestedObject) object;
 
         try
@@ -78,6 +81,7 @@ public class NativeNestedListenerSolrIndexer implements NativePostUpdateEventLis
     @Override
     public <T> void onPostDelete(T entity)
     {
+    	
         Object object = entity;
         if (!(object instanceof ACrisNestedObject))
         {
@@ -85,6 +89,8 @@ public class NativeNestedListenerSolrIndexer implements NativePostUpdateEventLis
             return;
         }
 
+        log.debug("Call onPostDelete " + NativeNestedListenerSolrIndexer.class);
+        
         ACrisNestedObject nested = (ACrisNestedObject) object;
 
         try

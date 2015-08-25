@@ -7,12 +7,11 @@
  */
 package org.dspace.app.cris.model.listener;
 
-import it.cilea.osd.common.core.SingleTimeStampInfo;
-
 import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.RestrictedField;
 import org.hibernate.event.spi.PostLoadEvent;
@@ -21,6 +20,8 @@ import org.hibernate.event.spi.PreInsertEvent;
 import org.hibernate.event.spi.PreInsertEventListener;
 import org.hibernate.event.spi.PreUpdateEvent;
 import org.hibernate.event.spi.PreUpdateEventListener;
+
+import it.cilea.osd.common.core.SingleTimeStampInfo;
 
 /**
  * This listner is used to keep track of changes in the RP name fields, all the
@@ -36,6 +37,10 @@ import org.hibernate.event.spi.PreUpdateEventListener;
 public class RPListener implements PreUpdateEventListener, PreInsertEventListener,
         PostLoadEventListener
 {
+	
+	private static Logger log = Logger
+            .getLogger(RPListener.class);
+	
     /**
      * After the loading of the data the listner store "the initial values" of
      * the name fields in a transient field so to compare it with the current
@@ -46,6 +51,8 @@ public class RPListener implements PreUpdateEventListener, PreInsertEventListene
         Object object = event.getEntity();
         if (object instanceof ResearcherPage)
         {
+        	log.debug("Call onPostLoad " + RPListener.class);
+        	
             ResearcherPage rp = (ResearcherPage) object;
 
             String oldNames = "";
@@ -77,6 +84,7 @@ public class RPListener implements PreUpdateEventListener, PreInsertEventListene
 
             rp.setOldNames(oldNames);
 
+            log.debug("End onPostLoad " + RPListener.class);
         }
     }
 
@@ -90,6 +98,8 @@ public class RPListener implements PreUpdateEventListener, PreInsertEventListene
         Object object = event.getEntity();
         if (object instanceof ResearcherPage)
         {
+        	log.debug("Call onPreUpdate " + RPListener.class);
+        	
             ResearcherPage rp = (ResearcherPage) object;
 
             String newNames = "";
@@ -140,6 +150,7 @@ public class RPListener implements PreUpdateEventListener, PreInsertEventListene
                     event.getState()[idx] = new SingleTimeStampInfo(new Date());
                 }
             }
+            log.debug("End onPreUpdate " + RPListener.class);
         }
         return false;
     }

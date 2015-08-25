@@ -10,6 +10,7 @@ package org.dspace.app.cris.model.listener;
 
 import java.util.UUID;
 
+import org.apache.log4j.Logger;
 import org.dspace.app.cris.model.UUIDSupport;
 import org.hibernate.HibernateException;
 import org.hibernate.event.internal.DefaultSaveOrUpdateEventListener;
@@ -18,6 +19,9 @@ import org.hibernate.event.spi.SaveOrUpdateEvent;
 public class UUIDListener extends DefaultSaveOrUpdateEventListener
 {
 
+	private static Logger log = Logger
+            .getLogger(UUIDListener.class);
+	
     private void generateUUID(Object object)
     {
         UUIDSupport uuidOwner = (UUIDSupport) object;
@@ -34,9 +38,12 @@ public class UUIDListener extends DefaultSaveOrUpdateEventListener
         Object object = event.getObject();
         if (object instanceof UUIDSupport)
         {
+        	log.debug("UUIDSupport Call onSaveOrUpdate " + UUIDListener.class);
             generateUUID(object);
         }
+        log.debug("onSaveOrUpdate continue " + UUIDListener.class);
         super.onSaveOrUpdate(event);
+        log.debug("onSaveOrUpdate end " + UUIDListener.class);
     }
 
 }

@@ -24,12 +24,15 @@ public class CrisIDListener implements NativePostUpdateEventListener {
 
 	@Override
 	public <T extends Identifiable> void onPostUpdate(T entity) {
+		
 		Object object = entity;
 		if (!(object instanceof ACrisObject)) {
 			// nothing to do
 			return;
 		}
 
+		log.debug("Call onPostUpdate " + CrisIDListener.class);
+		
 		ACrisObject crisObj = (ACrisObject) object;
 
 		try {
@@ -40,6 +43,8 @@ public class CrisIDListener implements NativePostUpdateEventListener {
 		} catch (Exception e) {
 			log.error("Failed to build CRISID for entity " + crisObj.getTypeText() + "/" + crisObj.getCrisID());
 		}
+		
+		log.debug("End onPostUpdate " + CrisIDListener.class);
 	}
 
 	//

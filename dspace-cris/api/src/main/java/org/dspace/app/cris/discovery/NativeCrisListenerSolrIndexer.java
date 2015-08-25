@@ -8,10 +8,6 @@
 package org.dspace.app.cris.discovery;
 
 
-import it.cilea.osd.common.listener.NativePostDeleteEventListener;
-import it.cilea.osd.common.listener.NativePostUpdateEventListener;
-import it.cilea.osd.common.model.Identifiable;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Date;
@@ -22,6 +18,10 @@ import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
+
+import it.cilea.osd.common.listener.NativePostDeleteEventListener;
+import it.cilea.osd.common.listener.NativePostUpdateEventListener;
+import it.cilea.osd.common.model.Identifiable;
 
 /**
  * This listener is used to keep the Search Solr core up-to-date with change to CRIS fields. 
@@ -53,6 +53,7 @@ public class NativeCrisListenerSolrIndexer implements NativePostUpdateEventListe
     @Override
     public <T extends Identifiable> void onPostUpdate(T entity)
     {
+    	
         Object object = entity;
         if (!(object instanceof ACrisObject))
         {
@@ -60,6 +61,8 @@ public class NativeCrisListenerSolrIndexer implements NativePostUpdateEventListe
             return;
         }
 
+        log.debug("Call onPostUpdate " + NativeCrisListenerSolrIndexer.class);
+        
         ACrisObject cris = (ACrisObject) object;
 
         try
@@ -78,6 +81,7 @@ public class NativeCrisListenerSolrIndexer implements NativePostUpdateEventListe
     @Override
     public <T> void onPostDelete(T entity)
     {
+    	
         Object object = entity;
         if (!(object instanceof ACrisObject))
         {
@@ -85,6 +89,8 @@ public class NativeCrisListenerSolrIndexer implements NativePostUpdateEventListe
             return;
         }
 
+        log.debug("Call onPostDelete " + NativeCrisListenerSolrIndexer.class);
+        
         ACrisObject cris = (ACrisObject) object;
 
         try

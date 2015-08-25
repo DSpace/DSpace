@@ -42,7 +42,7 @@ public class RPResourcePolicyListener implements PostUpdateEventListener,
 
     @Override
     public void onPostDelete(PostDeleteEvent event)
-    {
+    {    	
         Object object = event.getEntity();
         if (!(object instanceof ResearcherPage))
         {
@@ -50,6 +50,8 @@ public class RPResourcePolicyListener implements PostUpdateEventListener,
             return;
         }
 
+        log.debug("Call onPostDelete " + RPResourcePolicyListener.class);
+        
         ResearcherPage cris = (ResearcherPage) object;
 
         Context context = null;
@@ -75,7 +77,7 @@ public class RPResourcePolicyListener implements PostUpdateEventListener,
                 context.abort();
             }
         }
-
+        log.debug("End onPostDelete " + RPResourcePolicyListener.class);
     }
 
     private void delete(Integer epersonID, Integer rpID, Context context)
@@ -103,6 +105,8 @@ public class RPResourcePolicyListener implements PostUpdateEventListener,
             return;
         }
 
+        log.debug("Call onPostInsert " + RPResourcePolicyListener.class);
+        
         ResearcherPage cris = (ResearcherPage) object;
 
         Context context = null;
@@ -135,7 +139,7 @@ public class RPResourcePolicyListener implements PostUpdateEventListener,
                 context.abort();
             }
         }
-
+        log.debug("End onPostInsert " + RPResourcePolicyListener.class);
     }
 
     @Override
@@ -149,6 +153,8 @@ public class RPResourcePolicyListener implements PostUpdateEventListener,
             return;
         }
 
+        log.debug("Call onPostUpdate " + RPResourcePolicyListener.class);
+        
         ResearcherPage cris = (ResearcherPage) object;
 
         Context context = null;
@@ -192,6 +198,7 @@ public class RPResourcePolicyListener implements PostUpdateEventListener,
                 context.abort();
             }
         }
+        log.debug("End onPostUpdate " + RPResourcePolicyListener.class);
     }
 
     @Override
@@ -200,8 +207,10 @@ public class RPResourcePolicyListener implements PostUpdateEventListener,
         Object object = event.getEntity();
         if (object instanceof ResearcherPage)
         {
+        	log.debug("Call onPostLoad " + RPResourcePolicyListener.class);
             ResearcherPage rp = (ResearcherPage) object;
             rp.setOldEpersonID(rp.getEpersonID());
+            log.debug("End onPostLoad " + RPResourcePolicyListener.class);
         }
     }
 

@@ -52,12 +52,15 @@ public class OrcidQueueListener implements NativePostUpdateEventListener, PostLo
 	private OrcidPreferencesUtils orcidPreferencesUtils;
 
 	@Override
-	public <T extends Identifiable> void onPostUpdate(T entity) {
+	public <T extends Identifiable> void onPostUpdate(T entity) {		
 		Object object = entity;
 		if (!(object instanceof ACrisObject) && !(object instanceof RelationPreference)) {
 			// nothing to do
 			return;
 		}
+		
+		log.debug("Call onPostUpdate " + OrcidQueueListener.class);
+		
 		try {
 			if (object instanceof ACrisObject) {
 				ACrisObject crisObj = (ACrisObject) object;
@@ -184,6 +187,7 @@ public class OrcidQueueListener implements NativePostUpdateEventListener, PostLo
 			log.error("Generic Fails when try to build ORCID queue", ex);
 		}
 
+		log.debug("End Call onPostUpdate " + OrcidQueueListener.class);
 	}
 
 	public OrcidPreferencesUtils getOrcidPreferencesUtils() {
@@ -196,8 +200,11 @@ public class OrcidQueueListener implements NativePostUpdateEventListener, PostLo
 
 	@Override
 	public void onPostLoad(PostLoadEvent event) {
+		
 		Object object = event.getEntity();
 		if (object instanceof ResearcherPage) {
+			log.debug("Call onPostLoad " + OrcidQueueListener.class);
+			
 			ResearcherPage rp = (ResearcherPage) object;
 
 			List<RPProperty> propsPublications = rp.getAnagrafica4view().get(ORCID_PUBLICATIONS_PREFS);
@@ -228,7 +235,7 @@ public class OrcidQueueListener implements NativePostUpdateEventListener, PostLo
 					}
 				}
 			}
-
+			log.debug("End onPostLoad " + OrcidQueueListener.class);
 		}
 	}
 
