@@ -8,7 +8,6 @@
 package org.dspace.sword2;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -16,14 +15,10 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.workflow.WorkflowException;
-import org.dspace.workflowbasic.BasicWorkflowItem;
-import org.dspace.workflowbasic.factory.BasicWorkflowServiceFactory;
-import org.dspace.workflowbasic.service.BasicWorkflowItemService;
-import org.dspace.workflowbasic.service.BasicWorkflowService;
-import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
-import org.dspace.xmlworkflow.service.XmlWorkflowService;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
-import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.WorkflowItemService;
+import org.dspace.workflow.WorkflowService;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -33,21 +28,15 @@ public class WorkflowTools
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory
             .getInstance().getWorkspaceItemService();
 
-    protected BasicWorkflowItemService basicWorkflowItemService = BasicWorkflowServiceFactory
-            .getInstance().getBasicWorkflowItemService();
+    protected WorkflowItemService workflowItemService = WorkflowServiceFactory
+            .getInstance().getWorkflowItemService();
 
-    protected BasicWorkflowService basicWorkflowService = BasicWorkflowServiceFactory
-            .getInstance().getBasicWorkflowService();
-
-    protected XmlWorkflowItemService xmlWorkflowItemService = XmlWorkflowServiceFactory
-            .getInstance().getXmlWorkflowItemService();
-
-    protected XmlWorkflowService xmlWorkflowService = XmlWorkflowServiceFactory
-            .getInstance().getXmlWorkflowService();
+    protected WorkflowService workflowService = WorkflowServiceFactory
+            .getInstance().getWorkflowService();
 
     /**
      * Is the given item in the DSpace workflow?
-     *
+     * <p>
      * This method queries the database directly to determine if this is the
      * case rather than using the DSpace API (which is very slow).
      *
@@ -60,17 +49,7 @@ public class WorkflowTools
     {
         try
         {
-            if (ConfigurationManager
-                    .getProperty("workflow", "workflow.framework")
-                    .equals("xmlworkflow"))
-            {
-                return xmlWorkflowItemService.findByItem(context, item) != null;
-            }
-            else
-            {
-                return basicWorkflowItemService.findByItem(context, item) !=
-                        null;
-            }
+            return workflowItemService.findByItem(context, item) != null;
         }
         catch (SQLException e)
         {
@@ -80,7 +59,7 @@ public class WorkflowTools
 
     /**
      * Is the given item in a DSpace workspace?
-     *
+     * <p>
      * This method queries the database directly to determine if this is the
      * case rather than using the DSpace API (which is very slow).
      *
@@ -103,7 +82,7 @@ public class WorkflowTools
 
     /**
      * Obtain the WorkflowItem object which wraps the given Item.
-     *
+     * <p>
      * This method queries the database directly to determine if this is the
      * case rather than using the DSpace API (which is very slow).
      *
@@ -111,21 +90,12 @@ public class WorkflowTools
      * @param item
      * @throws DSpaceSwordException
      */
-    public InProgressSubmission getWorkflowItem(Context context, Item item)
+    public WorkflowItem getWorkflowItem(Context context, Item item)
             throws DSpaceSwordException
     {
         try
         {
-            if (ConfigurationManager
-                    .getProperty("workflow", "workflow.framework")
-                    .equals("xmlworkflow"))
-            {
-                return xmlWorkflowItemService.findByItem(context, item);
-            }
-            else
-            {
-                return basicWorkflowItemService.findByItem(context, item);
-            }
+            return workflowItemService.findByItem(context, item);
         }
         catch (SQLException e)
         {
@@ -135,7 +105,7 @@ public class WorkflowTools
 
     /**
      * Obtain the WorkspaceItem object which wraps the given Item.
-     *
+     * <p>
      * This method queries the database directly to determine if this is the
      * case rather than using the DSpace API (which is very slow).
      *
@@ -173,29 +143,13 @@ public class WorkflowTools
             // kick off the workflow
             boolean notify = ConfigurationManager
                     .getBooleanProperty("swordv2-server", "workflow.notify");
-            if (ConfigurationManager
-                    .getProperty("workflow", "workflow.framework")
-                    .equals("xmlworkflow"))
+            if (notify)
             {
-                if (notify)
-                {
-                    xmlWorkflowService.start(context, wsi);
-                }
-                else
-                {
-                    xmlWorkflowService.startWithoutNotify(context, wsi);
-                }
+                workflowService.start(context, wsi);
             }
             else
             {
-                if (notify)
-                {
-                    basicWorkflowService.start(context, wsi);
-                }
-                else
-                {
-                    basicWorkflowService.startWithoutNotify(context, wsi);
-                }
+                workflowService.startWithoutNotify(context, wsi);
             }
         }
         catch (SQLException | WorkflowException | IOException | AuthorizeException e)
@@ -216,21 +170,12 @@ public class WorkflowTools
         try
         {
             // find the item in the workflow if it exists
-            InProgressSubmission wfi = this.getWorkflowItem(context, item);
+            WorkflowItem wfi = this.getWorkflowItem(context, item);
 
             // abort the workflow
             if (wfi != null)
             {
-                if (wfi instanceof BasicWorkflowItem)
-                {
-                    basicWorkflowService.abort(context, (BasicWorkflowItem) wfi,
-                            context.getCurrentUser());
-                }
-                else
-                {
-                    xmlWorkflowService.abort(context, (XmlWorkflowItem) wfi,
-                            context.getCurrentUser());
-                }
+                workflowService.abort(context, wfi, context.getCurrentUser());
             }
         }
         catch (SQLException | AuthorizeException | IOException e)
