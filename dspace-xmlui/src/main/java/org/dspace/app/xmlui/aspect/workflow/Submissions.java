@@ -329,7 +329,7 @@ public class Submissions extends AbstractDSpaceTransformer
      */
     private void addSubmissionsInWorkflow(Division division) throws SQLException, WingException
     {
-    	List<BasicWorkflowItem> inprogressItems = basicWorkflowItemService.findByOwner(context, context.getCurrentUser());
+    	List<BasicWorkflowItem> inprogressItems = basicWorkflowItemService.findBySubmitter(context, context.getCurrentUser());
 
     	// If there is nothing in progress then don't add anything.
     	if (!(inprogressItems.size() > 0))
