@@ -1018,6 +1018,9 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
 
     @Override
     public void deleteCollection(Context context, Collection collection) throws SQLException, IOException, AuthorizeException {
+        collection.setWorkflowGroup(1, null);
+        collection.setWorkflowGroup(2, null);
+        collection.setWorkflowGroup(3, null);
         workflowItemService.deleteByCollection(context, collection);
     }
 
