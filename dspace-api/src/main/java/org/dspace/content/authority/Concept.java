@@ -44,7 +44,7 @@ public class Concept extends AuthorityObject
 
     /** log4j logger */
     private static Logger log = Logger.getLogger(Concept.class);
-
+    private static int journal_field_id;
 
     /**
      * Construct a Concept from a given context and tablerow
@@ -55,6 +55,11 @@ public class Concept extends AuthorityObject
     Concept(Context context, TableRow row) throws SQLException
     {
         super(context,row);
+        String schema = "journal";
+        String element = "journalID";
+        MetadataSchema mds = MetadataSchema.find(context, schema);
+        MetadataField mdf = MetadataField.findByElement(context, mds.getSchemaID(), element, null);
+        journal_field_id = mdf.getFieldID();
 
     }
 
@@ -448,7 +453,7 @@ public class Concept extends AuthorityObject
             throws SQLException
     {
         ArrayList<Concept> concepts = new ArrayList<Concept>();
-        int journal_field_id = 101;
+        log.info ("journal field id is " + journal_field_id);
         TableRowIterator row = DatabaseManager.query(context, "select c.* from concept as c, conceptmetadatavalue as cmv where upper(cmv.text_value) = ? and cmv.parent_id = c.id and cmv.field_id = ?;", journalID, journal_field_id);
 
         if (row == null)
