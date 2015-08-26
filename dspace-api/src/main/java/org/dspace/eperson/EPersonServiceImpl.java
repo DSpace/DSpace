@@ -8,6 +8,7 @@
 package org.dspace.eperson;
 
 import org.apache.commons.codec.DecoderException;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -345,7 +346,13 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
     @Override
     public List<EPerson> findByGroups(Context c, Set<Group> groups) throws SQLException {
-        return ePersonDAO.findByGroups(c, groups);
+        //Make sure we at least have one group, if not don't even bother searching.
+        if(CollectionUtils.isNotEmpty(groups))
+        {
+            return ePersonDAO.findByGroups(c, groups);
+        }else{
+            return new ArrayList<>();
+        }
     }
 
     @Override
