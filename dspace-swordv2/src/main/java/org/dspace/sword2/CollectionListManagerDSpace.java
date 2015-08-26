@@ -21,9 +21,9 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.workflowbasic.BasicWorkflowItem;
-import org.dspace.workflowbasic.factory.BasicWorkflowServiceFactory;
-import org.dspace.workflowbasic.service.BasicWorkflowItemService;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.WorkflowItemService;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.swordapp.server.*;
 
 import java.sql.SQLException;
@@ -40,8 +40,8 @@ public class CollectionListManagerDSpace extends DSpaceSwordAPI
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory
             .getInstance().getWorkspaceItemService();
 
-    protected BasicWorkflowItemService basicWorkflowItemService = BasicWorkflowServiceFactory
-            .getInstance().getBasicWorkflowItemService();
+    protected WorkflowItemService workflowItemService = WorkflowServiceFactory
+            .getInstance().getWorkflowItemService();
 
     public Feed listCollectionContents(IRI colIRI,
             AuthCredentials authCredentials, SwordConfiguration swordConfig)
@@ -114,7 +114,7 @@ public class CollectionListManagerDSpace extends DSpaceSwordAPI
             EPerson person = sc.getOnBehalfOf() != null ?
                     sc.getOnBehalfOf() :
                     sc.getAuthenticated();
-            List<Item> collectionItems = new ArrayList<Item>();
+            List<Item> collectionItems = new ArrayList<>();
 
             // first get the ones out of the archive
             Iterator<Item> items = itemService
@@ -160,27 +160,31 @@ public class CollectionListManagerDSpace extends DSpaceSwordAPI
             }
 
             // finally get the ones out of the workflow
-            List<BasicWorkflowItem> wfis = basicWorkflowItemService
-                    .findByOwner(sc.getContext(), person);
-            for (BasicWorkflowItem wfi : wfis)
+            List wfis = workflowItemService.findBySubmitter(sc.getContext(),
+                    person);
+            for (Object found : wfis)
             {
-                Item item = wfi.getItem();
-
-                // check for the wfi collection
-                Collection wfCol = wfi.getCollection();
-                if (wfCol.getID().equals(collection.getID()))
+                if (found instanceof WorkflowItem)
                 {
-                    collectionItems.add(item);
-                }
+                    WorkflowItem wfi = (WorkflowItem) found;
+                    Item item = wfi.getItem();
 
-                // then see if there are any additional associated collections
-                List<Collection> cols = item.getCollections();
-                for (Collection col : cols)
-                {
-                    if (col.getID().equals(collection.getID()))
+                    // check for the wfi collection
+                    Collection wfCol = wfi.getCollection();
+                    if (wfCol.getID().equals(collection.getID()))
                     {
                         collectionItems.add(item);
-                        break;
+                    }
+
+                    // then see if there are any additional associated collections
+                    List<Collection> cols = item.getCollections();
+                    for (Collection col : cols)
+                    {
+                        if (col.getID().equals(collection.getID()))
+                        {
+                            collectionItems.add(item);
+                            break;
+                        }
                     }
                 }
             }

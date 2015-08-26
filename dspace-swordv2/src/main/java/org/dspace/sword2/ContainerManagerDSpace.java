@@ -11,15 +11,14 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowItemService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.swordapp.server.*;
@@ -38,9 +37,6 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
 
     protected AuthorizeService authorizeService = AuthorizeServiceFactory
             .getInstance().getAuthorizeService();
-
-    protected CollectionService collectionService = ContentServiceFactory
-            .getInstance().getCollectionService();
 
     protected WorkflowItemService workflowItemService = WorkflowServiceFactory
             .getInstance().getWorkflowItemService();
@@ -896,7 +892,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
             }
             else if (wft.isItemInWorkflow(context, item))
             {
-                InProgressSubmission wfi = wft.getWorkflowItem(context, item);
+                WorkflowItem wfi = wft.getWorkflowItem(context, item);
                 workflowItemService.deleteWrapper(context, wfi);
             }
 
