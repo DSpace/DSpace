@@ -334,8 +334,8 @@ public class AuthenticationUtil
     	// Just to be double be sure, make sure the administrator
     	// is the one who actually authenticated himself.
 	    HttpSession session = request.getSession(false);
-	    Integer authenticatedID = (Integer) session.getAttribute(AUTHENTICATED_USER_ID); 
-	    if (context.getCurrentUser().getID().equals(authenticatedID))
+        UUID authenticatedID = (UUID) session.getAttribute(AUTHENTICATED_USER_ID);
+	    if (!context.getCurrentUser().getID().equals(authenticatedID))
         {
             throw new AuthorizeException("xmlui.utils.AuthenticationUtil.onlyAuthenticatedAdmins");
         }
