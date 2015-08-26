@@ -19,6 +19,8 @@ import org.dspace.event.Event;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataSchema;
 
 import java.io.IOException;
 import java.sql.SQLException;
