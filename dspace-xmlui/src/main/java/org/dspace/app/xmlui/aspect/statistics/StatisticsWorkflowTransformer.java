@@ -8,6 +8,7 @@
 package org.dspace.app.xmlui.aspect.statistics;
 
 import org.apache.cocoon.ProcessingException;
+import org.apache.cocoon.ResourceNotFoundException;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.dspace.app.util.Util;
@@ -42,6 +43,7 @@ public class StatisticsWorkflowTransformer extends AbstractStatisticsDataTransfo
     private static final Message T_no_results = message("xmlui.statistics.workflow.no-results");
     private static final Message T_workflow_head = message("xmlui.statistics.workflow.head");
     private static final Message T_workflow_head_dso = message("xmlui.statistics.workflow.head-dso");
+    private static final String HANDLE_PREFIX = "handle/";
 
     /**
      * Add a page title and trail links
@@ -54,9 +56,11 @@ public class StatisticsWorkflowTransformer extends AbstractStatisticsDataTransfo
 
         if(dso != null)
         {
-            HandleUtil.buildHandleTrail(context, dso, pageMeta, contextPath);
+
+            HandleUtil.buildHandleTrail(context, dso, pageMeta, contextPath,true);
+
         }
-        pageMeta.addTrailLink(contextPath + (dso != null && dso.getHandle() != null ? "/handle/" + dso.getHandle() : "") + "/workflow-statistics", T_trail);
+        pageMeta.addTrail().addContent(T_trail);
 
         // Add the page title
         pageMeta.addMetadata("title").addContent(T_head_title);
@@ -74,6 +78,14 @@ public class StatisticsWorkflowTransformer extends AbstractStatisticsDataTransfo
         StringBuilder actionPath = new StringBuilder().append(contextPath);
         if(dso != null){
             actionPath.append("/handle/").append(dso.getHandle());
+        }
+        else
+        {
+        	String uri = request.getSitemapURI();
+        	if(uri.startsWith(HANDLE_PREFIX))
+        	{
+        		throw new ResourceNotFoundException("Unable to locate item");
+        	}
         }
         actionPath.append("/workflow-statistics");
 

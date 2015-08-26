@@ -8,6 +8,7 @@
 package org.dspace.app.xmlui.aspect.statistics;
 
 import org.apache.cocoon.ProcessingException;
+import org.apache.cocoon.ResourceNotFoundException;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.dspace.app.xmlui.utils.HandleUtil;
@@ -43,6 +44,7 @@ public class StatisticsSearchTransformer extends AbstractStatisticsDataTransform
     private static final Message T_search_head = message("xmlui.statistics.search.head");
     private static final Message T_search_head_dso = message("xmlui.statistics.search.head-dso");
     private static final Message T_no_results = message("xmlui.statistics.search.no-results");
+    private static final String HANDLE_PREFIX = "handle/";
 
     /**
      * Add a page title and trail links
@@ -55,9 +57,11 @@ public class StatisticsSearchTransformer extends AbstractStatisticsDataTransform
 
         if(dso != null)
         {
-            HandleUtil.buildHandleTrail(context, dso, pageMeta, contextPath);
+
+            HandleUtil.buildHandleTrail(context, dso, pageMeta, contextPath,true);
+
         }
-        pageMeta.addTrailLink(contextPath + (dso != null && dso.getHandle() != null ? "/handle/" + dso.getHandle() : "") + "/search-statistics", T_trail);
+        pageMeta.addTrail().addContent(T_trail);
 
         // Add the page title
         pageMeta.addMetadata("title").addContent(T_head_title);
@@ -74,6 +78,14 @@ public class StatisticsSearchTransformer extends AbstractStatisticsDataTransform
             StringBuilder actionPath = new StringBuilder().append(request.getContextPath());
             if(dso != null){
                 actionPath.append("/handle/").append(dso.getHandle());
+            }
+            else
+            {
+            	String uri = request.getSitemapURI();
+            	if(uri.startsWith(HANDLE_PREFIX))
+            	{
+            		throw new ResourceNotFoundException("Unable to locate item");
+            	}
             }
             actionPath.append("/search-statistics");
 
