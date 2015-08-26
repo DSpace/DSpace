@@ -57,12 +57,6 @@ public class Concept extends AuthorityObject
     Concept(Context context, TableRow row) throws SQLException
     {
         super(context,row);
-        String schema = "journal";
-        String element = "journalID";
-        MetadataSchema mds = MetadataSchema.find(context, schema);
-        MetadataField mdf = MetadataField.findByElement(context, mds.getSchemaID(), element, null);
-        journal_field_id = mdf.getFieldID();
-
     }
 
     public Date getCreated()
@@ -452,9 +446,14 @@ public class Concept extends AuthorityObject
      */
 
     public static ArrayList<Concept> findByJournalID(Context context, String journalID)
-            throws SQLException
+            throws SQLException, AuthorizeException
     {
         ArrayList<Concept> concepts = new ArrayList<Concept>();
+        String schema = "journal";
+        String element = "journalID";
+        MetadataSchema mds = MetadataSchema.find(context, schema);
+        MetadataField mdf = MetadataField.findByElement(context, mds.getSchemaID(), element, null);
+        journal_field_id = mdf.getFieldID();
         log.info ("journal field id is " + journal_field_id);
         TableRowIterator row = DatabaseManager.query(context, "select c.* from concept as c, conceptmetadatavalue as cmv where upper(cmv.text_value) = ? and cmv.parent_id = c.id and cmv.field_id = ?;", journalID, journal_field_id);
 
