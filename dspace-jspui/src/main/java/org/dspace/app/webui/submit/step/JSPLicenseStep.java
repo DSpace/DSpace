@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
 import org.dspace.app.webui.servlet.SubmissionController;
@@ -25,6 +24,8 @@ import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.LicenseUtils;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.submit.step.LicenseStep;
@@ -73,6 +74,8 @@ public class JSPLicenseStep extends JSPStep
 
     /** log4j logger */
     private static Logger log = Logger.getLogger(JSPLicenseStep.class);
+    
+    private WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
 
     /**
      * Do any pre-processing to determine which JSP (if any) is used to generate
@@ -158,10 +161,7 @@ public class JSPLicenseStep extends JSPStep
                     && (SubmissionController.getStepReached(subInfo) <= SubmissionController.FIRST_STEP))
             {
                 WorkspaceItem wi = (WorkspaceItem) subInfo.getSubmissionItem();
-                wi.deleteAll();
-
-                // commit changes
-                context.commit();
+                workspaceItemService.deleteAll(context, wi);
             }
 
             // Show the license rejected page

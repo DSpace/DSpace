@@ -65,17 +65,11 @@ public class VersioningItemHome implements ItemHomeProcessor {
 						hasVersionButton = true;
 					}
 				}
-			} catch (SQLException e) {
-				throw new PluginException(e.getMessage());
-			}
-
-			if (VersionUtil.hasVersionHistory(context, item)) {
-				hasVersionHistory = true;
-				history = VersionUtil.retrieveVersionHistory(context, item);
-				for(Version versRow : history.getVersions()) {  
-					
-		            //Skip items currently in submission
-		            try {
+				if (VersionUtil.hasVersionHistory(context, item)) {
+					hasVersionHistory = true;
+					history = VersionUtil.retrieveVersionHistory(context, item);
+					for(Version versRow : history.getVersions()) {  
+						//Skip items currently in submission
 						if(VersionUtil.isItemInSubmission(context, versRow.getItem()))
 						{
 						    continue;
@@ -83,10 +77,10 @@ public class VersioningItemHome implements ItemHomeProcessor {
 						else {
 							historyVersions.add(versRow);
 						}
-					} catch (SQLException e) {
-						throw new PluginException(e.getMessage());
 					}
 				}
+			} catch (SQLException e) {
+				throw new PluginException(e.getMessage());
 			}
 
 			// Check if we have a history for the item

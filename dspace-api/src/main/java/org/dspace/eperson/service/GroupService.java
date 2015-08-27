@@ -7,15 +7,15 @@
  */
 package org.dspace.eperson.service;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.service.DSpaceObjectLegacySupportService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * Service interface class for the Group object.
@@ -27,6 +27,7 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
 
     public static final int NAME = 1; // sort by NAME (default)
 	public static final int ANONYMOUS_ID = 0;
+	public static final int ID = 0;
 
 
     /**

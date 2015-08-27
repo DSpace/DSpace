@@ -9,6 +9,8 @@ package org.dspace.app.webui.submit.step;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +28,9 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -82,6 +87,10 @@ public class JSPUploadWithEmbargoStep extends JSPUploadStep
 
     /** log4j logger */
     private static Logger log = Logger.getLogger(JSPUploadWithEmbargoStep.class);
+    
+    private BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    
+    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
     /**
      * Do any post-processing after the step's backend processing occurred (in
@@ -123,7 +132,7 @@ public class JSPUploadWithEmbargoStep extends JSPUploadStep
             response.setContentType("text/html");
             JSONUploadResponse jsonResponse = new JSONUploadResponse();
             String bitstreamName = null;
-            int bitstreamID = -1;
+            UUID bitstreamID = null;
             long size = 0;
             String url = null;
             if (subInfo.getBitstream() != null)
@@ -145,14 +154,13 @@ public class JSPUploadWithEmbargoStep extends JSPUploadStep
         if (buttonPressed.equalsIgnoreCase(UploadStep.SUBMIT_SKIP_BUTTON) ||
             (buttonPressed.equalsIgnoreCase(UploadStep.SUBMIT_UPLOAD_BUTTON) && !fileRequired))
         {
-            Bundle[] bundles = subInfo.getSubmissionItem().getItem()
-                    .getBundles("ORIGINAL");
+            List<Bundle> bundles = itemService.getBundles(subInfo.getSubmissionItem().getItem(), "ORIGINAL");
 
             boolean fileAlreadyUploaded = false;
             
             for (Bundle bnd : bundles)
             {
-            	fileAlreadyUploaded = bnd.getBitstreams().length > 0;
+            	fileAlreadyUploaded = bnd.getBitstreams().size() > 0;
             	if (fileAlreadyUploaded)
             	{
             		break;
@@ -313,8 +321,8 @@ public class JSPUploadWithEmbargoStep extends JSPUploadStep
             // Which bitstream does the user want to describe?
             try
             {
-                int id = Integer.parseInt(buttonPressed.substring(16));
-                bitstream = Bitstream.find(context, id);
+                UUID id = UUID.fromString(buttonPressed.substring(16));
+                bitstream = bitstreamService.find(context, id);
             }
             catch (NumberFormatException nfe)
             {
@@ -344,8 +352,8 @@ public class JSPUploadWithEmbargoStep extends JSPUploadStep
             // Which bitstream does the user want to describe?
             try
             {
-                int id = Integer.parseInt(buttonPressed.substring(14));
-                bitstream = Bitstream.find(context, id);
+                UUID id = UUID.fromString(buttonPressed.substring(14));
+                bitstream = bitstreamService.find(context, id);
             }
             catch (NumberFormatException nfe)
             {

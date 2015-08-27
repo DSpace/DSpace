@@ -111,16 +111,12 @@ public class VersionHistoryServlet extends DSpaceServlet
         else if (submit != null && submit.equals("submit_delete"))
         {
             String[] versionIDs = request.getParameterValues("remove");
-            for (String v : versionIDs) {
-            	Version version = versioningService.getVersion(context, Integer.parseInt(v));
-            	versioningService.removeVersion(context, version);
-            }            
-
-            Version latestVersion = versionHistoryService.getLatestVersion(history);
+            Item latestVersion = doDeleteVersions(request, itemID, versionIDs);
+            
 			if (latestVersion != null)
             {
                 response.sendRedirect(request.getContextPath()
-                        + "/tools/history?delete=true&itemID="+latestVersion.getItem().getID().toString());
+                        + "/tools/history?delete=true&itemID="+latestVersion.getID().toString());
             }
             else
             {
@@ -167,8 +163,8 @@ public class VersionHistoryServlet extends DSpaceServlet
      * @throws AuthorizeException
      * @throws SQLException
      */
-    private Integer doDeleteVersions(HttpServletRequest request,
-            Integer itemID, String... versionIDs) throws SQLException,
+    private Item doDeleteVersions(HttpServletRequest request,
+            UUID itemID, String... versionIDs) throws SQLException,
             AuthorizeException, IOException
     {
 

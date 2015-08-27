@@ -9,6 +9,7 @@ package org.dspace.app.webui.servlet.admin;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +21,8 @@ import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 
 /**
  * Servlet browsing through e-people and selecting them
@@ -29,6 +32,14 @@ import org.dspace.eperson.EPerson;
  */
 public class EPersonListServlet extends DSpaceServlet
 {
+	private EPersonService personService;
+	
+	@Override
+	public void init() throws ServletException {
+		super.init();
+		personService = EPersonServiceFactory.getInstance().getEPersonService();
+	}
+	
 	protected void doDSPost(Context context, HttpServletRequest request, 
 			HttpServletResponse response) throws ServletException, IOException, 
 			SQLException, AuthorizeException 
@@ -78,17 +89,17 @@ public class EPersonListServlet extends DSpaceServlet
         }
         
 
-        EPerson[] epeople;
+        List<EPerson> epeople;
         String search = request.getParameter("search");
         if (search != null && !search.equals(""))
         {
-            epeople = EPerson.search(context, search);
+            epeople = personService.search(context, search);
             request.setAttribute("offset", Integer.valueOf(offset));
         }
         else
         {
             // Retrieve the e-people in the specified order
-            epeople = EPerson.findAll(context, sortBy);
+            epeople = personService.findAll(context, sortBy);
             request.setAttribute("offset", Integer.valueOf(0));
         }        
         

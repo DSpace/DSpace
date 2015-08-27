@@ -9,14 +9,16 @@ package org.dspace.app.webui.submit.step;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.app.util.SubmissionInfo;
+import org.dspace.app.util.Util;
 import org.dspace.app.webui.submit.JSPStep;
 import org.dspace.app.webui.submit.JSPStepManager;
 import org.dspace.app.webui.util.JSPManager;
@@ -24,6 +26,8 @@ import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.submit.step.SelectCollectionStep;
@@ -66,6 +70,8 @@ public class JSPSelectCollectionStep extends JSPStep
 
     /** log4j logger */
     private static Logger log = Logger.getLogger(JSPSelectCollectionStep.class);
+    
+    private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 
     /**
      * Do any pre-processing to determine which JSP (if any) is used to generate
@@ -104,12 +110,12 @@ public class JSPSelectCollectionStep extends JSPStep
          * With no parameters, this servlet prepares for display of the Select
          * Collection JSP.
          */
-        String collectionID = request.getParameter("collection");
+        UUID collectionID = Util.getUUIDParameter(request, "collection");
         Collection col = null;
 
         if (collectionID != null)
         {
-            col = Collection.find(context, Integer.parseInt(collectionID));
+            col = collectionService.find(context, collectionID);
         }
 
         // if we already have a valid collection, then we can forward directly
@@ -125,25 +131,25 @@ public class JSPSelectCollectionStep extends JSPStep
             // gather info for JSP page
             Community com = UIUtil.getCommunityLocation(request);
 
-            Collection[] collections;
+            List<Collection> collections;
 
             if (com != null)
             {
                 // In a community. Show collections in that community only.
-                collections = Collection.findAuthorized(context, com,
+                collections = collectionService.findAuthorized(context, com,
                         Constants.ADD);
             }
             else
             {
                 // Show all collections
-                collections = Collection.findAuthorizedOptimized(context,
+                collections = collectionService.findAuthorizedOptimized(context,
                         Constants.ADD);
             }
 
             // This is a special case, where the user came back to this
             // page after not selecting a collection. This will display
             // the "Please select a collection" message to the user
-            if (collectionID != null && Integer.parseInt(collectionID) == -1)
+            if (collectionID == null)
             {
                 // specify "no collection" error message should be displayed
                 request.setAttribute("no.collection", Boolean.TRUE);

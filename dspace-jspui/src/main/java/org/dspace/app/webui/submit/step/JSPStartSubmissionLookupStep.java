@@ -9,7 +9,6 @@ package org.dspace.app.webui.submit.step;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -27,9 +26,10 @@ import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.submit.lookup.SubmissionLookupDataLoader;
 import org.dspace.submit.lookup.SubmissionLookupService;
 import org.dspace.submit.step.StartSubmissionLookupStep;
 import org.dspace.utils.DSpace;
@@ -76,6 +76,8 @@ public class JSPStartSubmissionLookupStep extends JSPStep
     SubmissionLookupService slService = new DSpace().getServiceManager()
             .getServiceByName(SubmissionLookupService.class.getCanonicalName(),
                     SubmissionLookupService.class);
+    
+	private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 
     /**
      * Do any pre-processing to determine which JSP (if any) is used to generate
@@ -122,13 +124,13 @@ public class JSPStartSubmissionLookupStep extends JSPStep
          * With no parameters, this servlet prepares for display of the Select
          * Collection JSP.
          */
-        int collection_id = UIUtil.getIntParameter(request, "collection");
-        int collectionID = UIUtil.getIntParameter(request, "collectionid");
+        UUID collection_id = UIUtil.getUUIDParameter(request, "collection");
+        UUID collectionID = UIUtil.getUUIDParameter(request, "collectionid");
         Collection col = null;
 
-        if (collectionID != -1)
+        if (collectionID != null)
         {
-            col = Collection.find(context, collectionID);
+            col = collectionService.find(context, collectionID);
         }
 
         // if we already have a valid collection, then we can forward directly
@@ -143,18 +145,18 @@ public class JSPStartSubmissionLookupStep extends JSPStep
             // gather info for JSP page
             Community com = UIUtil.getCommunityLocation(request);
 
-            Collection[] collections;
+            List<Collection> collections;
 
             if (com != null)
             {
                 // In a community. Show collections in that community only.
-                collections = Collection.findAuthorized(context, com,
+                collections = collectionService.findAuthorized(context, com,
                         Constants.ADD);
             }
             else
             {
                 // Show all collections
-                collections = Collection.findAuthorizedOptimized(context,
+                collections = collectionService.findAuthorizedOptimized(context,
                         Constants.ADD);
             }
 
