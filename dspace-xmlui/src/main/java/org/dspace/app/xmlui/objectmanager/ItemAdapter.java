@@ -530,15 +530,15 @@ public class ItemAdapter extends AbstractAdapter
             List<Bundle> bundles = findEnabledBundles();
             for (Bundle bundle : bundles)
             {
-              List<BundleBitstream> bundleBitstreams = bundle.getBitstreams();
+              List<Bitstream> bitstreams = bundle.getBitstreams();
 
               // Create a sub-section of <amdSec> for each bitstream in bundle
-              for(BundleBitstream bundleBitstream : bundleBitstreams)
+              for(Bitstream bitstream : bitstreams)
               {
                  // Only render the section if crosswalk works with bitstreams
-                 if(crosswalk.canDisseminate(bundleBitstream.getBitstream()))
+                 if(crosswalk.canDisseminate(bitstream))
                  {
-                    renderAmdSubSection(amdSecName, mdType, crosswalk, bundleBitstream.getBitstream());
+                    renderAmdSubSection(amdSecName, mdType, crosswalk, bitstream);
                  }
               } // end for each bitstream
             } // end for each bundle
@@ -722,9 +722,8 @@ public class ItemAdapter extends AbstractAdapter
             attributes.put("USE", use);
             startElement(METS,"fileGrp",attributes);
             
-            for (BundleBitstream bundleBitstream : bundle.getBitstreams())
+            for (Bitstream bitstream : bundle.getBitstreams())
             {
-                Bitstream bitstream = bundleBitstream.getBitstream();
                 // //////////////////////////////
                 // Determine the file's IDs
                 String fileID = getFileID(bitstream);
@@ -973,13 +972,13 @@ public class ItemAdapter extends AbstractAdapter
                     && bundle.getName().equals("ORIGINAL"))
             {
                 // Now find the corresponding bitstream
-                List<BundleBitstream> bundleBitstreams = bundle.getBitstreams();
+                List<Bitstream> bitstreams = bundle.getBitstreams();
 
-                for (BundleBitstream bundleBitstream : bundleBitstreams)
+                for (Bitstream bitstream : bitstreams)
                 {
-                    if (bundleBitstream.getBitstream().getName().equals(originalFilename))
+                    if (bitstream.getName().equals(originalFilename))
                     {
-                        return bundleBitstream.getBitstream();
+                        return bitstream;
                     }
                 }
             }

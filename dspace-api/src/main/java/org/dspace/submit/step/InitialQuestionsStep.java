@@ -187,7 +187,7 @@ public class InitialQuestionsStep extends AbstractProcessingStep
 
                     if (bundles.size() > 0)
                     {
-                        List<BundleBitstream> bitstreams = bundles.get(0).getBitstreams();
+                        List<Bitstream> bitstreams = bundles.get(0).getBitstreams();
 
                         willRemoveFiles = bitstreams.size() > 1;
                     }
@@ -318,18 +318,18 @@ public class InitialQuestionsStep extends AbstractProcessingStep
 
             if (bundles.size() > 0)
             {
-                Iterator<BundleBitstream> bundleBitstreams = bundles.get(0).getBitstreams().iterator();
+                Iterator<Bitstream> bitstreams = bundles.get(0).getBitstreams().iterator();
                 //Do NOT remove the first one
-                if(bundleBitstreams.hasNext())
+                if(bitstreams.hasNext())
                 {
-                    bundleBitstreams.next();
+                    bitstreams.next();
                 }
 
-                while (bundleBitstreams.hasNext())
+                while (bitstreams.hasNext())
                 {
                     //TODO: HIBERNATE, write unit test for this
-                    BundleBitstream bundleBitstream = bundleBitstreams.next();
-                    bundleService.removeBitstream(context, bundles.get(0), bundleBitstream.getBitstream());
+                    Bitstream bitstream = bitstreams.next();
+                    bundleService.removeBitstream(context, bundles.get(0), bitstream);
                 }
             }
         }

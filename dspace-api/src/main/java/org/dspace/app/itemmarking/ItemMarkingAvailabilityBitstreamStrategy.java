@@ -14,7 +14,6 @@ import java.util.List;
 import org.dspace.app.util.Util;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.BundleBitstream;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
@@ -60,8 +59,7 @@ public class ItemMarkingAvailabilityBitstreamStrategy implements ItemMarkingExtr
 				return markInfo;
 			}
 			else {
-				BundleBitstream bundleBitstream = originalBundle.getBitstreams().get(0);
-                Bitstream bitstream = bundleBitstream.getBitstream();
+                Bitstream bitstream = originalBundle.getBitstreams().get(0);
 
                 ItemMarkingInfo signInfo = new ItemMarkingInfo();
                 signInfo.setImageName(availableImageName);

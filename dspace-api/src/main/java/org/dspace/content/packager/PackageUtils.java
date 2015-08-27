@@ -222,11 +222,10 @@ public class PackageUtils
         }
         for (Bundle bundle : bundles)
         {
-            List<BundleBitstream> bitstreams = bundle.getBitstreams();
+            List<Bitstream> bitstreams = bundle.getBitstreams();
 
-            for (BundleBitstream bundleBitstream : bitstreams)
+            for (Bitstream bitstream : bitstreams)
             {
-                Bitstream bitstream = bundleBitstream.getBitstream();
                 if (bsName.equals(bitstream.getName())) {
                     return bitstream;
                 }
@@ -259,10 +258,9 @@ public class PackageUtils
             bundles = itemService.getBundles(item, bnName);
         }
         for (Bundle bundle : bundles) {
-            List<BundleBitstream> bundleBitstreams = bundle.getBitstreams();
+            List<Bitstream> bitstreams = bundle.getBitstreams();
 
-            for (BundleBitstream bundleBitstream : bundleBitstreams) {
-                Bitstream bitstream = bundleBitstream.getBitstream();
+            for (Bitstream bitstream : bitstreams) {
                 if (bitstream.getFormat(context).getID() == fid) {
                     return bitstream;
                 }
@@ -401,12 +399,11 @@ public class PackageUtils
         for (Bundle bundle : bundles)
         {
             // Assume license will be in its own bundle
-            List<BundleBitstream> bundleBitstreams = bundle.getBitstreams();
+            List<Bitstream> bitstreams = bundle.getBitstreams();
 
-            for (BundleBitstream bundleBitstream : bundleBitstreams)
+            for (Bitstream bitstream : bitstreams)
             {
                 // The License should have a file format of "License"
-                Bitstream bitstream = bundleBitstream.getBitstream();
                 if (bitstream.getFormat(context).getID() == licenseFormatId) {
                     //found a bitstream with format "License" -- return it
                     return bitstream;
@@ -416,8 +413,8 @@ public class PackageUtils
             // If we couldn't find a bitstream with format = "License",
             // we will just assume the first bitstream is the deposit license
             // (usually a safe assumption as it is in the LICENSE bundle)
-            if (bundleBitstreams.size() > 0) {
-                return bundleBitstreams.get(0).getBitstream();
+            if (bitstreams.size() > 0) {
+                return bitstreams.get(0);
             }
         }
 

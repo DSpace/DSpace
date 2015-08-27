@@ -12,7 +12,6 @@ import java.util.List;
 
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.BundleBitstream;
 
 /**
  *   BitstreamFilter implementation to filter by bundle name
@@ -50,10 +49,9 @@ public class BitstreamFilterByBundleName extends BitstreamFilter {
 		
 		try
 		{
-			List<BundleBitstream> bundles = bitstream.getBundles();
-			for (BundleBitstream bundleBitstream : bundles)
+			List<Bundle> bundles = bitstream.getBundles();
+			for (Bundle b : bundles)
 			{
-                Bundle b = bundleBitstream.getBundle();
                 if (b.getName().equals(bundleName))
 				{
 					return true;

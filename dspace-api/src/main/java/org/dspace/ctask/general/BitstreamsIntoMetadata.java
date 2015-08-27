@@ -57,15 +57,15 @@ public class BitstreamsIntoMetadata extends AbstractCurationTask
                 itemService.clearMetadata(Curator.curationContext(), item, "dc", "format", Item.ANY, Item.ANY);
                 for (Bundle bundle : item.getBundles()) {
                     if ("ORIGINAL".equals(bundle.getName())) {
-                        for (BundleBitstream bundleBitstream : bundle.getBitstreams()) {
+                        for (Bitstream bitstream : bundle.getBitstreams()) {
                             // Add the metadata and update the item
-                            addMetadata(item, bundleBitstream.getBitstream(), "original");
+                            addMetadata(item, bitstream, "original");
                             changed = true;
                         }
                     } else if ("THUMBNAIL".equals(bundle.getName())) {
-                        for (BundleBitstream bundleBitstream : bundle.getBitstreams()) {
+                        for (Bitstream bitstream : bundle.getBitstreams()) {
                             // Add the metadata and update the item
-                            addMetadata(item, bundleBitstream.getBitstream(), "thumbnail");
+                            addMetadata(item, bitstream, "thumbnail");
                             changed = true;
                         }
                     }

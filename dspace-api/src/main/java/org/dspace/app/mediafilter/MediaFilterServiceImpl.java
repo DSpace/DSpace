@@ -168,10 +168,10 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
         boolean done = false;
         for (Bundle myBundle : myBundles) {
             // now look at all of the bitstreams
-            List<BundleBitstream> myBitstreams = myBundle.getBitstreams();
+            List<Bitstream> myBitstreams = myBundle.getBitstreams();
 
-            for (BundleBitstream myBitstream : myBitstreams) {
-                done |= filterBitstream(context, myItem, myBitstream.getBitstream());
+            for (Bitstream myBitstream : myBitstreams) {
+                done |= filterBitstream(context, myItem, myBitstream);
             }
         }
         return done;
@@ -215,7 +215,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                     }
                 } catch (Exception e) {
                     String handle = myItem.getHandle();
-                    List<BundleBitstream> bundles = myBitstream.getBundles();
+                    List<Bundle> bundles = myBitstream.getBundles();
                     long size = myBitstream.getSize();
                     String checksum = myBitstream.getChecksum() + " (" + myBitstream.getChecksumAlgorithm() + ")";
                     int assetstore = myBitstream.getStoreNumber();
@@ -223,8 +223,8 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                     // Printout helpful information to find the errored bitstream.
                     System.out.println("ERROR filtering, skipping bitstream:\n");
                     System.out.println("\tItem Handle: " + handle);
-                    for (BundleBitstream bundle : bundles) {
-                        System.out.println("\tBundle Name: " + bundle.getBundle().getName());
+                    for (Bundle bundle : bundles) {
+                        System.out.println("\tBundle Name: " + bundle.getName());
                     }
                     System.out.println("\tFile Size: " + size);
                     System.out.println("\tChecksum: " + checksum);
@@ -318,12 +318,12 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
         {
             // only finds the last match (FIXME?)
             for (Bundle bundle : bundles) {
-                List<BundleBitstream> bitstreams = bundle.getBitstreams();
+                List<Bitstream> bitstreams = bundle.getBitstreams();
 
-                for (BundleBitstream bundleBitstream : bitstreams) {
-                    if (bundleBitstream.getBitstream().getName().equals(newName)) {
+                for (Bitstream bitstream : bitstreams) {
+                    if (bitstream.getName().equals(newName)) {
                         targetBundle = bundle;
-                        existingBitstream = bundleBitstream.getBitstream();
+                        existingBitstream = bitstream;
                     }
                 }
             }

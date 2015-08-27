@@ -188,9 +188,9 @@ public class HandleUtil
         if (aDso instanceof Bitstream)
         {
         	Bitstream bitstream = (Bitstream) aDso;
-        	List<BundleBitstream> bundles = bitstream.getBundles();
+        	List<Bundle> bundles = bitstream.getBundles();
 
-        	aDso = bundles.get(0).getBundle();
+        	aDso = bundles.get(0);
         }
 
         if (aDso instanceof Bundle)

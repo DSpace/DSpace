@@ -196,7 +196,7 @@ ALTER TABLE bundle2bitstream ALTER COLUMN bitstream_id SET NOT NULL;
 ALTER TABLE bundle2bitstream DROP COLUMN bundle_legacy_id;
 ALTER TABLE bundle2bitstream DROP COLUMN bitstream_legacy_id;
 ALTER TABLE bundle2bitstream DROP COLUMN id;
-ALTER TABLE bundle2bitstream add primary key (bitstream_id,bundle_id);
+ALTER TABLE bundle2bitstream add primary key (bitstream_id,bundle_id,bitstream_order);
 
 
 -- Migrate item

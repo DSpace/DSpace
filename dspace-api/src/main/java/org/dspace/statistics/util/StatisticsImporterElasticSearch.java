@@ -13,7 +13,7 @@ import org.apache.commons.cli.*;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.Bitstream;
-import org.dspace.content.BundleBitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.DSpaceObjectLegacySupportService;
@@ -273,10 +273,10 @@ public class StatisticsImporterElasticSearch {
 
                 if (dso instanceof Bitstream) {
                     Bitstream bit = (Bitstream) dso;
-                    List<BundleBitstream> bundles = bit.getBundles();
+                    List<Bundle> bundles = bit.getBundles();
                     postBuilder = postBuilder.field("bundleName").startArray();
-                    for (BundleBitstream bundle : bundles) {
-                        postBuilder = postBuilder.value(bundle.getBundle().getName());
+                    for (Bundle bundle : bundles) {
+                        postBuilder = postBuilder.value(bundle.getName());
                     }
                     postBuilder = postBuilder.endArray();
                 }

@@ -438,9 +438,8 @@ public abstract class AbstractMETSDisseminator
                             throw new AuthorizeException("Not authorized to read Bundle named \"" + bundle.getName() + "\"");
                         }
                     }
-                    List<BundleBitstream> bitstreams = bundle.getBitstreams();
-                    for (BundleBitstream bundleBitstream : bitstreams) {
-                        Bitstream bitstream = bundleBitstream.getBitstream();
+                    List<Bitstream> bitstreams = bundle.getBitstreams();
+                    for (Bitstream bitstream : bitstreams) {
                         boolean auth = authorizeService.authorizeActionBoolean(context,
                                 bitstream, Constants.READ);
                         if (auth ||
@@ -885,7 +884,7 @@ public abstract class AbstractMETSDisseminator
                     }
                 }
 
-                List<BundleBitstream> bitstreams = bundle.getBitstreams();
+                List<Bitstream> bitstreams = bundle.getBitstreams();
 
                 // Create a fileGrp, USE = permuted Bundle name
                 FileGrp fileGrp = new FileGrp();
@@ -909,9 +908,8 @@ public abstract class AbstractMETSDisseminator
                 }
 
                 // For each bitstream, add to METS manifest
-                for (BundleBitstream bundleBitstream : bitstreams)
+                for (Bitstream bitstream : bitstreams)
                 {
-                    Bitstream bitstream = bundleBitstream.getBitstream();
                     // Check for authorization.  Handle unauthorized
                     // bitstreams to match the logic in disseminate(),
                     // i.e. "unauth=zero" means include a 0-length bitstream,
@@ -1274,11 +1272,10 @@ public abstract class AbstractMETSDisseminator
             if ((bundle.getName() != null)
                     && bundle.getName().equals("ORIGINAL")) {
                 // Now find the corresponding bitstream
-                List<BundleBitstream> bundleBitstreams = bundle.getBitstreams();
+                List<Bitstream> bitstreams = bundle.getBitstreams();
 
-                for (BundleBitstream bundleBitstream : bundleBitstreams)
+                for (Bitstream bitstream : bitstreams)
                 {
-                    Bitstream bitstream = bundleBitstream.getBitstream();
                     if (bitstream.getName().equals(originalFilename)) {
                         return bitstream;
                     }
@@ -1487,10 +1484,10 @@ public abstract class AbstractMETSDisseminator
             {
                 // get handle of parent Item of this bitstream, if there is one:
                 String handle = null;
-                List<BundleBitstream> bn = bitstream.getBundles();
+                List<Bundle> bn = bitstream.getBundles();
                 if (bn.size() > 0)
                 {
-                    List<Item> bi = bn.get(0).getBundle().getItems();
+                    List<Item> bi = bn.get(0).getItems();
                     if (bi.size() > 0)
                     {
                         handle = bi.get(0).getHandle();

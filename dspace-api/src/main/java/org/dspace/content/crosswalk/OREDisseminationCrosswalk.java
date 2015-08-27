@@ -216,7 +216,7 @@ public class OREDisseminationCrosswalk
         
         // Add a link and an oreatom metadata entry for each bitstream in the item
         List<Bundle> bundles = item.getBundles();
-        List<BundleBitstream> bitstreams;
+        List<Bitstream> bitstreams;
         for (Bundle bundle : bundles) 
         {
         	// Omit the special "ORE" bitstream
@@ -226,9 +226,8 @@ public class OREDisseminationCrosswalk
             }
         	
         	bitstreams = bundle.getBitstreams();
-        	for (BundleBitstream bundleBitstream : bitstreams)
+        	for (Bitstream bs : bitstreams)
         	{
-                Bitstream bs = bundleBitstream.getBitstream();
                 arLink = new Element("link",ATOM_NS);
         		arLink.setAttribute("rel", ORE_NS.getURI()+"aggregates");
         		arLink.setAttribute("href",dsUrl + "/bitstream/handle/" + item.getHandle() + "/" + encodeForURL(bs.getName()) + "?sequence=" + bs.getSequenceID());

@@ -159,10 +159,9 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
 	    		//verify bundle + name are not duplicates
 	        	for (Bundle b : bundles)
 	        	{
-	        		List<BundleBitstream> bundleBitstreams = b.getBitstreams();
-	        		for (BundleBitstream bundleBitstream : bundleBitstreams)
+	        		List<Bitstream> bitstreams = b.getBitstreams();
+	        		for (Bitstream bsm : bitstreams)
 	        		{
-                        Bitstream bsm = bundleBitstream.getBitstream();
                         if (bsm.getName().equals(ce.filename))
 	        			{
 	        				throw new IllegalArgumentException("Duplicate bundle + filename cannot be added: " 

@@ -124,18 +124,18 @@ public class WorkflowManagerDefault implements WorkflowManager
         // this is equivalent to asking whether the media resource in the item can be deleted
         try
         {
-            List<BundleBitstream> bundleBitstreams = bitstream.getBundles();
-            for (BundleBitstream bundleBitstream : bundleBitstreams)
+            List<Bundle> bundles = bitstream.getBundles();
+            for (Bundle bundle : bundles)
             {
                 // is the bitstream in the ORIGINAL bundle?  If not, it can't be worked on
                 if (!Constants.CONTENT_BUNDLE_NAME
-                        .equals(bundleBitstream.getBundle().getName()))
+                        .equals(bundle.getName()))
                 {
                     throw new SwordError(UriRegistry.ERROR_METHOD_NOT_ALLOWED,
                             "The file is not in a bundle which can be modified");
                 }
 
-                List<Item> items = bundleBitstream.getBundle().getItems();
+                List<Item> items = bundle.getItems();
                 for (Item item : items)
                 {
                     this.deleteMediaResource(context, item);
@@ -166,18 +166,18 @@ public class WorkflowManagerDefault implements WorkflowManager
         // this is equivalent to asking whether the media resource in the item can be deleted
         try
         {
-            List<BundleBitstream> bundleBitstreams = bitstream.getBundles();
-            for (BundleBitstream bundleBitstream : bundleBitstreams)
+            List<Bundle> bundles = bitstream.getBundles();
+            for (Bundle bundle : bundles)
             {
                 // is the bitstream in the ORIGINAL bundle?  If not, it can't be worked on
                 if (!Constants.CONTENT_BUNDLE_NAME
-                        .equals(bundleBitstream.getBundle().getName()))
+                        .equals(bundle.getName()))
                 {
                     throw new SwordError(UriRegistry.ERROR_METHOD_NOT_ALLOWED,
                             "The file is not in a bundle which can be modified");
                 }
 
-                for (Item item : bundleBitstream.getBundle().getItems())
+                for (Item item : bundle.getItems())
                 {
                     this.replaceResourceContent(context, item);
                 }

@@ -282,7 +282,7 @@ public class AuthorizeServiceImpl implements AuthorizeService
         }
         if (o instanceof Bundle)
         {
-            ignoreCustomPolicies = !isAnyItemInstalled(c, ((Bundle) o).getBitstreams());
+            ignoreCustomPolicies = !isAnyItemInstalled(c, Arrays.asList(((Bundle) o)));
         }
         if (o instanceof Item)
         {
@@ -327,12 +327,12 @@ public class AuthorizeServiceImpl implements AuthorizeService
 
     // check whether any bundle belongs to any item that passed submission
     // and workflow process
-    protected boolean isAnyItemInstalled(Context ctx, List<BundleBitstream> bundles)
+    protected boolean isAnyItemInstalled(Context ctx, List<Bundle> bundles)
             throws SQLException
     {
-        for (BundleBitstream bundle : bundles)
+        for (Bundle bundle : bundles)
         {
-            for (Item item : bundle.getBundle().getItems())
+            for (Item item : bundle.getItems())
             {
                 if (workspaceItemService.findByItem(ctx, item) == null
                         && workflowItemService.findByItem(ctx, item) == null)

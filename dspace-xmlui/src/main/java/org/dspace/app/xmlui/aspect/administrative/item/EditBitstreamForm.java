@@ -29,7 +29,6 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
-import org.dspace.content.BundleBitstream;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
@@ -103,10 +102,10 @@ public class EditBitstreamForm extends AbstractDSpaceTransformer
 					bitstreamFormatService.findNonInternal(context);
 		
 		boolean primaryBitstream = false;
-		java.util.List<BundleBitstream> bundles = bitstream.getBundles();
+		java.util.List<Bundle> bundles = bitstream.getBundles();
 		if (bundles != null && bundles.size() > 0)
 		{
-			if (bitstream.equals(bundles.get(0).getBundle().getPrimaryBitstream()))
+			if (bitstream.equals(bundles.get(0).getPrimaryBitstream()))
 			{
 				primaryBitstream = true;
 			}

@@ -40,9 +40,14 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport
     @JoinColumn(name = "primary_bitstream_id")
     private Bitstream primaryBitstream;
 
-    @OneToMany(mappedBy = "bundle", fetch = FetchType.LAZY)
-    @OrderBy("bitstreamOrder asc")
-    private List<BundleBitstream> bitstreams = new ArrayList<>();
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name="bundle2bitstream",
+            joinColumns={@JoinColumn(name="bundle_id") },
+            inverseJoinColumns={@JoinColumn(name="bitstream_id") }
+    )
+    @OrderColumn(name="bitstream_order")
+    private List<Bitstream> bitstreams = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -122,11 +127,11 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport
      * 
      * @return the bitstreams
      */
-    public List<BundleBitstream> getBitstreams() {
+    public List<Bitstream> getBitstreams() {
         return bitstreams;
     }
 
-    void addBitstream(BundleBitstream bitstream){
+    void addBitstream(Bitstream bitstream){
         bitstreams.add(bitstream);
     }
 

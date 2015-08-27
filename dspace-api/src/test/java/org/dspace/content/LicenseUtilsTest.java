@@ -236,7 +236,7 @@ public class LicenseUtilsTest extends AbstractUnitTest
         LicenseUtils.grantLicense(context, item, defaultLicense);
 
         StringWriter writer = new StringWriter();
-        IOUtils.copy(bitstreamService.retrieve(context, itemService.getBundles(item, "LICENSE").get(0).getBitstreams().get(0).getBitstream()), writer);
+        IOUtils.copy(bitstreamService.retrieve(context, itemService.getBundles(item, "LICENSE").get(0).getBitstreams().get(0)), writer);
         String license = writer.toString();
 
         assertThat("testGrantLicense 0",license, equalTo(defaultLicense));

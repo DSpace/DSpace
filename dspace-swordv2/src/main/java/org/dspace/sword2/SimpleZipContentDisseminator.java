@@ -10,7 +10,6 @@ package org.dspace.sword2;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.BundleBitstream;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
@@ -57,10 +56,9 @@ public class SimpleZipContentDisseminator implements SwordContentDisseminator
             {
                 if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName()))
                 {
-                    List<BundleBitstream> bss = bundle.getBitstreams();
-                    for (BundleBitstream bundleBitstream : bss)
+                    List<Bitstream> bss = bundle.getBitstreams();
+                    for (Bitstream bitstream : bss)
                     {
-                        Bitstream bitstream = bundleBitstream.getBitstream();
                         ZipEntry ze = new ZipEntry(bitstream.getName());
                         zip.putNextEntry(ze);
                         InputStream is = bitstreamService

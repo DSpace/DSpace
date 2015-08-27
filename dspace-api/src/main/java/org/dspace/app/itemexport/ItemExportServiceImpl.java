@@ -367,12 +367,11 @@ public class ItemExportServiceImpl implements ItemExportService
 
             for (Bundle bundle : bundles) {
                 // bundles can have multiple bitstreams now...
-                List<BundleBitstream> bitstreams = bundle.getBitstreams();
+                List<Bitstream> bitstreams = bundle.getBitstreams();
 
                 String bundleName = bundle.getName();
 
-                for (BundleBitstream bundleBitstream : bitstreams) {
-                    Bitstream bitstream = bundleBitstream.getBitstream();
+                for (Bitstream bitstream : bitstreams) {
                     String myName = bitstream.getName();
                     String oldName = myName;
 
@@ -563,11 +562,11 @@ public class ItemExportServiceImpl implements ItemExportService
                             for (Bundle bundle : bundles)
                             {
                                 // get all the bitstreams in each bundle
-                                List<BundleBitstream> bundleBitstreams = bundle.getBitstreams();
-                                for (BundleBitstream bundleBitstream : bundleBitstreams)
+                                List<Bitstream> bitstreams = bundle.getBitstreams();
+                                for (Bitstream bitstream : bitstreams)
                                 {
                                     // add up the size
-                                    size += bundleBitstream.getBitstream().getSize();
+                                    size += bitstream.getSize();
                                 }
                             }
                             items.add(item.getID());
@@ -599,11 +598,11 @@ public class ItemExportServiceImpl implements ItemExportService
                         for (Bundle bundle : bundles)
                         {
                             // get all the bitstreams in the bundle
-                            List<BundleBitstream> bundleBitstreams = bundle.getBitstreams();
-                            for (BundleBitstream bundleBitstream : bundleBitstreams)
+                            List<Bitstream> bitstreams = bundle.getBitstreams();
+                            for (Bitstream bitstream : bitstreams)
                             {
                                 // add up the size
-                                size += bundleBitstream.getBitstream().getSize();
+                                size += bitstream.getSize();
                             }
                         }
                         items.add(item.getID());
@@ -625,11 +624,11 @@ public class ItemExportServiceImpl implements ItemExportService
                 for (Bundle bundle : bundles)
                 {
                     // get all the bitstreams in the bundle
-                    List<BundleBitstream> bundleBitstreams = bundle.getBitstreams();
-                    for (BundleBitstream bundleBitstream : bundleBitstreams)
+                    List<Bitstream> bitstreams = bundle.getBitstreams();
+                    for (Bitstream bitstream : bitstreams)
                     {
                         // add up the size
-                        size += bundleBitstream.getBitstream().getSize();
+                        size += bitstream.getSize();
                     }
                 }
                 ArrayList<UUID> items = new ArrayList<>();

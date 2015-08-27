@@ -317,10 +317,9 @@ public class PolicySet
                     for (Bundle bundle : bundles) {
                         System.out.println("Bundle " + bundle.getID());
 
-                        List<BundleBitstream> bitstreams = bundle.getBitstreams();
+                        List<Bitstream> bitstreams = bundle.getBitstreams();
 
-                        for (BundleBitstream bundleBitstream : bitstreams) {
-                            Bitstream bitstream = bundleBitstream.getBitstream();
+                        for (Bitstream bitstream : bitstreams) {
                             if (filter == null ||
                                     bitstream.getName().indexOf(filter) != -1) {
                                 // is this a replace? delete policies first

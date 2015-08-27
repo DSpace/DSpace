@@ -122,10 +122,9 @@ public class RDFConsumer implements Consumer
                         + "and we'll cover it by a REMOVE event on its bundle.");
                 return;
             }
-            List<BundleBitstream> bundleBitstreams = bitstream.getBundles();
-            for (BundleBitstream bundleBitstream : bundleBitstreams)
+            List<Bundle> bundles = bitstream.getBundles();
+            for (Bundle b : bundles)
             {
-                Bundle b = bundleBitstream.getBundle();
                 List<Item> items = b.getItems();
                 for (Item i : items)
                 {

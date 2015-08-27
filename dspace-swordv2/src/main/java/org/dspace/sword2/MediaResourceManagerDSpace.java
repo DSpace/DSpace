@@ -13,7 +13,6 @@ import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.BundleBitstream;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
@@ -260,10 +259,10 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
             throws SQLException
     {
         Date lm = null;
-        List<BundleBitstream> bundleBitstreams = bitstream.getBundles();
-        for (BundleBitstream bundleBitstream : bundleBitstreams)
+        List<Bundle> bundles = bitstream.getBundles();
+        for (Bundle bundle : bundles)
         {
-            List<Item> items = bundleBitstream.getBundle().getItems();
+            List<Item> items = bundle.getItems();
             for (Item item : items)
             {
                 Date possible = item.getLastModified();
@@ -325,10 +324,10 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
 
                 // check that we can submit to ALL the items this bitstream is in
                 List<Item> items = new ArrayList<>();
-                List<BundleBitstream> bundleBitstreams = bitstream.getBundles();
-                for (BundleBitstream bundleBitstream : bundleBitstreams)
+                List<Bundle> bundles = bitstream.getBundles();
+                for (Bundle bundle : bundles)
                 {
-                    List<Item> bundleItems = bundleBitstream.getBundle()
+                    List<Item> bundleItems = bundle
                             .getItems();
                     for (Item item : bundleItems)
                     {
@@ -529,9 +528,9 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
 
                 // check that we can submit to ALL the items this bitstream is in
                 List<Item> items = new ArrayList<>();
-                for (BundleBitstream bundleBitstream : bitstream.getBundles())
+                for (Bundle bundle : bitstream.getBundles())
                 {
-                    List<Item> bundleItems = bundleBitstream.getBundle()
+                    List<Item> bundleItems = bundle
                             .getItems();
                     for (Item item : bundleItems)
                     {

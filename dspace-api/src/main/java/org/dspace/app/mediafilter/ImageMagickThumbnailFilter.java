@@ -18,7 +18,6 @@ import javax.imageio.ImageIO;
 
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.BundleBitstream;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -157,8 +156,7 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter implements 
     {
     	String nsrc = source.getName();
     	for(Bundle b: itemService.getBundles(item, "THUMBNAIL")) {
-    		for(BundleBitstream bundleBitstream: b.getBitstreams()) {
-                Bitstream bit = bundleBitstream.getBitstream();
+    		for(Bitstream bit: b.getBitstreams()) {
                 String n = bit.getName();
     			if (n != null) {
     				if (nsrc != null) {

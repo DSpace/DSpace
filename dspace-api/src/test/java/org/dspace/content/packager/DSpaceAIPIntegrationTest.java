@@ -641,12 +641,12 @@ public class DSpaceAIPIntegrationTest extends AbstractUnitTest
         List<Bundle> bundles = itemService.getBundles(testItem, Constants.CONTENT_BUNDLE_NAME);
         if(bundles.size()>0)
         {
-            List<BundleBitstream> bitstreams = bundles.get(0).getBitstreams();
+            List<Bitstream> bitstreams = bundles.get(0).getBitstreams();
             bitstreamCount = bitstreams.size();
             if(bitstreamCount>0)
             {
-                bitstreamName = bitstreams.get(0).getBitstream().getName();
-                bitstreamCheckSum = bitstreams.get(0).getBitstream().getChecksum();
+                bitstreamName = bitstreams.get(0).getName();
+                bitstreamCheckSum = bitstreams.get(0).getChecksum();
             }
         }
 

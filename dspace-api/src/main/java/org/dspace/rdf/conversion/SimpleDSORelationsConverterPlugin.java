@@ -525,9 +525,8 @@ implements ConverterPlugin
             // be configurable).
             if (bundle.getName().equals("ORIGINAL"))
             {
-                for (BundleBitstream bundleBitstream : bundle.getBitstreams())
+                for (Bitstream bs : bundle.getBitstreams())
                 {
-                    Bitstream bs = bundleBitstream.getBitstream();
                     if (RDFUtil.isPublicBoolean(context, bs))
                     {
                         String url = bitstreamURI(context, bs);

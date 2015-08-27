@@ -244,10 +244,10 @@ public class PREMISCrosswalk
         String baseUrl = ConfigurationManager.getProperty("dspace.url");
         String handle = null;
         // get handle of parent Item of this bitstream, if there is one:
-        List<BundleBitstream> bn = bitstream.getBundles();
+        List<Bundle> bn = bitstream.getBundles();
         if (bn.size() > 0)
         {
-            List<Item> bi = bn.get(0).getBundle().getItems();
+            List<Item> bi = bn.get(0).getItems();
             if (bi.size() > 0)
             {
                 handle = bi.get(0).getHandle();

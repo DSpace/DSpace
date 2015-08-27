@@ -330,10 +330,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         List<Bundle> bunds = item.getBundles();
 
         for (Bundle bund : bunds) {
-            List<BundleBitstream> bitstreams = bund.getBitstreams();
+            List<Bitstream> bitstreams = bund.getBitstreams();
 
-            for (BundleBitstream bundleBitstream : bitstreams) {
-                Bitstream bitstream = bundleBitstream.getBitstream();
+            for (Bitstream bitstream : bitstreams) {
                 if (!bitstream.getFormat(context).isInternal()) {
                     // Bitstream is not of an internal format
                     bitstreamList.add(bitstream);
@@ -389,10 +388,10 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         for (Bundle bund : bunds) {
             boolean removethisbundle = false;
 
-            List<BundleBitstream> bits = bund.getBitstreams();
+            List<Bitstream> bits = bund.getBitstreams();
 
-            for (BundleBitstream bit : bits) {
-                BitstreamFormat bft = bit.getBitstream().getFormat(context);
+            for (Bitstream bit : bits) {
+                BitstreamFormat bft = bit.getFormat(context);
 
                 if (bft.getID() == licensetype) {
                     removethisbundle = true;
@@ -426,10 +425,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         // find the highest current sequence number
         for (Bundle bund : bunds) {
-            List<BundleBitstream> streams = bund.getBitstreams();
+            List<Bitstream> streams = bund.getBitstreams();
 
-            for (BundleBitstream bundleBitstream : streams) {
-                Bitstream bitstream = bundleBitstream.getBitstream();
+            for (Bitstream bitstream : streams) {
                 if (bitstream.getSequenceID() > sequence) {
                     sequence = bitstream.getSequenceID();
                 }
@@ -441,10 +439,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
 
         for (Bundle bund : bunds) {
-            List<BundleBitstream> streams = bund.getBitstreams();
+            List<Bitstream> streams = bund.getBitstreams();
 
-            for (BundleBitstream bundleBitstream : streams) {
-                Bitstream stream = bundleBitstream.getBitstream();
+            for (Bitstream stream : streams) {
                 if (stream.getSequenceID() < 0) {
                     stream.setSequenceID(sequence);
                     sequence++;
@@ -687,10 +684,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         List<Bundle> bunds = item.getBundles();
 
         for (Bundle mybundle : bunds) {
-            List<BundleBitstream> bs = mybundle.getBitstreams();
+            List<Bitstream> bs = mybundle.getBitstreams();
 
-            for (BundleBitstream b : bs) {
-                Bitstream bitstream = b.getBitstream();
+            for (Bitstream bitstream : bs) {
                 // remove bitstream policies
                 authorizeService.removeGroupPolicies(context, bitstream, group);
             }
@@ -731,9 +727,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             List<ResourcePolicy> policiesBundleToAdd = filterPoliciesToAdd(context, defaultCollectionPolicies, mybundle);
             authorizeService.addPolicies(context, policiesBundleToAdd, mybundle);
 
-            for(BundleBitstream bundleBitstream : mybundle.getBitstreams())
+            for(Bitstream bitstream : mybundle.getBitstreams())
             {
-                Bitstream bitstream = bundleBitstream.getBitstream();
                 // if come from InstallItem: remove all submission/workflow policies
                 authorizeService.removeAllPoliciesByDSOAndType(context, bitstream, ResourcePolicy.TYPE_SUBMISSION);
                 authorizeService.removeAllPoliciesByDSOAndType(context, bitstream, ResourcePolicy.TYPE_WORKFLOW);

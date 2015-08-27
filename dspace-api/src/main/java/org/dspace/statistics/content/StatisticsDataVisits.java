@@ -407,7 +407,7 @@ public class StatisticsDataVisits extends StatisticsData
                         for (int j = 0; j < item.getBundles().size(); j++) {
                             Bundle bundle = item.getBundles().get(j);
                             for (int k = 0; k < bundle.getBitstreams().size(); k++) {
-                                Bitstream bitstream = bundle.getBitstreams().get(k).getBitstream();
+                                Bitstream bitstream = bundle.getBitstreams().get(k);
                                 if(!bitstream.getFormat(context).isInternal()){
                                     // Add a separate query for each bitstream
                                     query.setDso(bitstream, bitstream.getType(), dsoLength);
@@ -607,10 +607,10 @@ public class StatisticsDataVisits extends StatisticsData
 
                     //Get our owning item
                     Item owningItem = null;
-                    List<BundleBitstream> bunds = bit.getBundles();
-                    if(0 < bunds.size() && 0 < bunds.get(0).getBundle().getItems().size())
+                    List<Bundle> bunds = bit.getBundles();
+                    if(0 < bunds.size() && 0 < bunds.get(0).getItems().size())
                     {
-                        owningItem = bunds.get(0).getBundle().getItems().get(0);
+                        owningItem = bunds.get(0).getItems().get(0);
                     }
 
                     // If possible reference this bitstream via a handle, however this may

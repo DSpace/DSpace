@@ -77,12 +77,11 @@ public class DeleteBitstreamsByFilterAction extends UpdateBitstreamsAction {
 		
 		for (Bundle b : bundles)    
 		{
-			List<BundleBitstream> bitstreams = b.getBitstreams();
+			List<Bitstream> bitstreams = b.getBitstreams();
 			String bundleName = b.getName();
 
-			for (BundleBitstream bundleBitstream : bitstreams)
+			for (Bitstream bs : bitstreams)
 			{
-                Bitstream bs = bundleBitstream.getBitstream();
                 if (filter.accept(bs))
 				{
 	    			if (isTest)

@@ -76,9 +76,8 @@ public abstract class AbstractVersionProvider {
                     authorizeService.findPoliciesByDSOAndType(c, nativeBundle, ResourcePolicy.TYPE_CUSTOM);
             authorizeService.addPolicies(c, bundlePolicies, bundleNew);
             
-            for(BundleBitstream nativeBundleBitstream : nativeBundle.getBitstreams())
+            for(Bitstream nativeBitstream : nativeBundle.getBitstreams())
             {
-                Bitstream nativeBitstream = nativeBundleBitstream.getBitstream();
                 Bitstream bitstreamNew = createBitstream(c, nativeBitstream);
 
                 bundleService.addBitstream(c, bundleNew, bitstreamNew);
