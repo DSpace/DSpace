@@ -30,8 +30,8 @@ CREATE SEQUENCE cwf_in_progress_user_seq;
 CREATE TABLE cwf_workflowitem
 (
   workflowitem_id integer DEFAULT nextval('cwf_workflowitem_seq') PRIMARY KEY,
-  item_id        UUID REFERENCES item(uuid) UNIQUE,
-  collection_id  UUID REFERENCES collection(uuid),
+  item_id        INTEGER REFERENCES item(item_id) UNIQUE,
+  collection_id  INTEGER REFERENCES collection(collection_id),
 
   -- Answers to questions on first page of submit UI
   multiple_titles       BOOL,
@@ -42,8 +42,8 @@ CREATE TABLE cwf_workflowitem
 
 );
 
-CREATE INDEX cwf_workflowitem_item_fk_idx ON cwf_workflowitem(uuid);
-CREATE INDEX cwf_workflowitem_coll_fk_idx ON cwf_workflowitem(uuid);
+CREATE INDEX cwf_workflowitem_item_fk_idx ON cwf_workflowitem(item_id);
+CREATE INDEX cwf_workflowitem_coll_fk_idx ON cwf_workflowitem(collection_id);
 
 
 CREATE TABLE cwf_collectionrole (
@@ -63,8 +63,8 @@ CREATE TABLE cwf_workflowitemrole (
   workflowitemrole_id integer DEFAULT nextval('cwf_workflowitemrole_seq') PRIMARY KEY,
   role_id Text,
   workflowitem_id integer REFERENCES cwf_workflowitem(workflowitem_id),
-  eperson_id UUID REFERENCES eperson(uuid),
-  group_id UUID REFERENCES epersongroup(eperson_group_id)
+  eperson_id integer REFERENCES eperson(eperson_id),
+  group_id integer REFERENCES epersongroup(eperson_group_id)
 );
 ALTER TABLE ONLY cwf_workflowitemrole
 ADD CONSTRAINT cwf_workflowitemrole_unique UNIQUE (role_id, workflowitem_id, eperson_id);
@@ -79,11 +79,11 @@ CREATE TABLE cwf_pooltask (
   workflow_id   TEXT,
   step_id       TEXT,
   action_id     TEXT,
-  eperson_id    UUID REFERENCES EPerson(uuid),
-  group_id      UUID REFERENCES epersongroup(uuid)
+  eperson_id    INTEGER REFERENCES EPerson(eperson_id),
+  group_id      INTEGER REFERENCES epersongroup(eperson_group_id)
 );
 
-CREATE INDEX cwf_pooltask_eperson_fk_idx ON cwf_pooltask(uuid);
+CREATE INDEX cwf_pooltask_eperson_fk_idx ON cwf_pooltask(eperson_id);
 CREATE INDEX cwf_pooltask_workflow_fk_idx ON cwf_pooltask(workflowitem_id);
 CREATE INDEX cwf_pooltask_workflow_eperson_fk_idx ON cwf_pooltask(eperson_id,workflowitem_id);
 
@@ -95,7 +95,7 @@ CREATE TABLE cwf_claimtask (
   workflow_id Text,
   step_id Text,
   action_id Text,
-  owner_id UUID REFERENCES eperson(uuid)
+  owner_id integer REFERENCES eperson(eperson_id)
 );
 
 ALTER TABLE ONLY cwf_claimtask
@@ -112,7 +112,7 @@ CREATE INDEX cwf_claimtask_workflow_step_action_eperson_fk_idx ON cwf_claimtask(
 CREATE TABLE cwf_in_progress_user (
   in_progress_user_id integer DEFAULT nextval('cwf_in_progress_user_seq') PRIMARY KEY,
   workflowitem_id integer REFERENCES cwf_workflowitem(workflowitem_id),
-  user_id UUID REFERENCES eperson(uuid),
+  user_id integer REFERENCES eperson(eperson_id),
   finished BOOL
 );
 
