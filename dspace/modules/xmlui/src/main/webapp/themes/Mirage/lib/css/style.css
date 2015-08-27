@@ -61,6 +61,7 @@ a:hover {
     background-color: transparent;
     color: #444;
     min-width: 950px;
+    padding-bottom: 10px;
 }
 
 #ds-header {
@@ -244,13 +245,6 @@ a.discreet {
 #ds-body {
     float: left;
     width: 675px;
-    padding-top: 12px;
-}
-/* alignment fix for "nested" bodies */
-#ds-body #ds-body {
-    padding: 0;
-    margin: 0;
-    margin-top: -1em;
 }
 
 #ds-options-wrapper {
@@ -1931,6 +1925,7 @@ div.ds-form-content {
 }
 a.ds-form-content {
     vertical-align: text-top;
+    padding: 7px;
 }
 span.ds-form-label,label.ds-form-label {
     display: block;

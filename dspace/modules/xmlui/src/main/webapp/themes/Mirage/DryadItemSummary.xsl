@@ -1708,6 +1708,26 @@
                          alt="eLife logo"/>
                 </a>
             </xsl:when>
+            
+			<xsl:when test='$journal-name = "Evidence-based Preclinical Medicine"'>
+				<a target="_blank">
+					<xsl:attribute name="href">
+						<xsl:choose>
+							<xsl:when test="contains($article-doi,'doi:')">
+								<xsl:value-of
+										select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of
+										select="string('http://onlinelibrary.wiley.com/journal/10.1002/%28ISSN%292054-703X')"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:attribute>
+					<img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/EBPM.png"
+						 alt="Evidence-based Preclinical Medicine cover"/>
+				</a>
+			</xsl:when>
+            
             <xsl:when test='$journal-name = "Evolution"'>
                 <a target="_blank">
                     <xsl:attribute name="href">
@@ -2724,9 +2744,13 @@
             <xsl:when test="contains($nameString,'#')">
                 <!-- name contains an Orcid: make it a hyperlink. -->
                 <xsl:variable name="orcid" select="substring-before(substring-after($nameString,'#'),'#')"/>
-                <!--<a href="http://orcid.org/{$orcid}">-->
+                <!--https://dev.datadryad.org/discover?query=0000-0002-1497-1284&submit=Go-->
+                <a>
+                    <xsl:attribute name="href">
+                        <xsl:value-of select="concat($context-path,'/discover?query=',$orcid,'&amp;submit=Go')"/>
+                    </xsl:attribute>
                     <xsl:value-of select="$author"/>
-                <!--</a>-->
+                </a>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:value-of select="$author"/>

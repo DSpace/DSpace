@@ -125,7 +125,7 @@
         <div class="spacer">&#160;</div>
         <!-- This div handles ORCID lookup-->
         <div class="ds-form-content">
-            <xsl:call-template name="addLookupButtonAuthor"/>
+            <xsl:call-template name="addLookupButtonAuthor"/><br/>
             <a class="ds-form-content" href="http://orcid.org" target="_blank">What is ORCID?</a>
         </div>
 
