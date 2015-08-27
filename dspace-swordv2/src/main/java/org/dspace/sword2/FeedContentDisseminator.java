@@ -44,13 +44,13 @@ public class FeedContentDisseminator extends AbstractSimpleDC
             {
                 if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName()))
                 {
-                    List<BundleBitstream> bundleBitstreams = bundle
+                    List<Bitstream> bitstreams = bundle
                             .getBitstreams();
-                    for (BundleBitstream bundleBitstream : bundleBitstreams)
+                    for (Bitstream bitstream : bitstreams)
                     {
                         Entry entry = feed.addEntry();
                         this.populateEntry(context, entry,
-                                bundleBitstream.getBitstream());
+                                bitstream);
                     }
                 }
             }

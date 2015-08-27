@@ -10,7 +10,6 @@ package org.dspace.sword2;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.BundleBitstream;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
@@ -73,14 +72,14 @@ public class VersionManager
         }
 
         // remove all the bitstreams from the bundle
-        Iterator<BundleBitstream> bundleBitstreams = source.getBitstreams()
+        Iterator<Bitstream> bitstreams = source.getBitstreams()
                 .iterator();
-        while (bundleBitstreams.hasNext())
+        while (bitstreams.hasNext())
         {
-            BundleBitstream bundleBitstream = bundleBitstreams.next();
-            bundleBitstreams.remove();
+            Bitstream bitstream = bitstreams.next();
+            bitstreams.remove();
             bundleService.removeBitstream(context, source,
-                    bundleBitstream.getBitstream());
+                    bitstream);
         }
 
         // delete the bundle itself
@@ -105,17 +104,17 @@ public class VersionManager
             exempt = this.archiveBitstream(context, item, bitstream);
         }
 
-        Iterator<BundleBitstream> bundleBitstreams = bitstream.getBundles()
+        Iterator<Bundle> bundles = bitstream.getBundles()
                 .iterator();
-        while (bundleBitstreams.hasNext())
+        while (bundles.hasNext())
         {
-            BundleBitstream bundleBitstream = bundleBitstreams.next();
+            Bundle bundle = bundles.next();
             if (exempt != null &&
-                    bundleBitstream.getBundle().getID() != exempt.getID())
+                    bundle.getID() != exempt.getID())
             {
-                bundleBitstreams.remove();
+                bundles.remove();
                 bundleService
-                        .removeBitstream(context, bundleBitstream.getBundle(),
+                        .removeBitstream(context, bundle,
                                 bitstream);
             }
         }
@@ -178,11 +177,11 @@ public class VersionManager
         oldName = this.getNumberedName(item, oldName, 0);
 
         Bundle old = bundleService.create(context, item, oldName);
-        List<BundleBitstream> bundleBitstreams = source.getBitstreams();
-        for (BundleBitstream bundleBitstream : bundleBitstreams)
+        List<Bitstream> bitstreams = source.getBitstreams();
+        for (Bitstream bitstream : bitstreams)
         {
             bundleService
-                    .addBitstream(context, old, bundleBitstream.getBitstream());
+                    .addBitstream(context, old, bitstream);
         }
     }
 

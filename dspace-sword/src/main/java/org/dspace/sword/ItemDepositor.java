@@ -204,12 +204,11 @@ public class ItemDepositor extends Depositor
             // from them.  This will ensure that the bitstream is physically
             // removed from the disk.
             Bitstream bs = result.getBitstream();
-            Iterator<BundleBitstream> b2bs = bs.getBundles().iterator();
-            while (b2bs.hasNext())
+            Iterator<Bundle> bundles = bs.getBundles().iterator();
+            while (bundles.hasNext())
             {
-                BundleBitstream bundleBitstream = b2bs.next();
-                b2bs.remove();
-                Bundle bundle = bundleBitstream.getBundle();
+                Bundle bundle = bundles.next();
+                bundles.remove();
                 bundleService.removeBitstream(sc.getContext(), bundle, bs);
                 bundleService.update(sc.getContext(), bundle);
             }

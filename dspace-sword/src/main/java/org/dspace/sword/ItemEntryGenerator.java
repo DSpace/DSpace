@@ -103,11 +103,11 @@ public class ItemEntryGenerator extends DSpaceATOMEntry
                         {
                             if (swordBundle.equals(bundle.getName()))
                             {
-                                List<BundleBitstream> bss = bundle
+                                List<Bitstream> bss = bundle
                                         .getBitstreams();
-                                for (BundleBitstream bs : bss)
+                                for (Bitstream bs : bss)
                                 {
-                                    BitstreamFormat bf = bs.getBitstream()
+                                    BitstreamFormat bf = bs
                                             .getFormat(
                                                     swordService.getContext());
                                     String format = "application/octet-stream";
@@ -119,7 +119,7 @@ public class ItemEntryGenerator extends DSpaceATOMEntry
 
                                     // calculate the bitstream link.
                                     String bsLink = urlManager
-                                            .getBitstreamUrl(bs.getBitstream());
+                                            .getBitstreamUrl(bs);
                                     con.setSource(bsLink);
 
                                     entry.setContent(con);
@@ -213,16 +213,16 @@ public class ItemEntryGenerator extends DSpaceATOMEntry
             {
                 if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName()))
                 {
-                    List<BundleBitstream> bss = bundle.getBitstreams();
-                    for (BundleBitstream bs : bss)
+                    List<Bitstream> bss = bundle.getBitstreams();
+                    for (Bitstream bs : bss)
                     {
                         Link link = new Link();
                         String url = urlManager
-                                .getBitstreamUrl(bs.getBitstream());
+                                .getBitstreamUrl(bs);
                         link.setHref(url);
                         link.setRel("part");
 
-                        BitstreamFormat bsf = bs.getBitstream()
+                        BitstreamFormat bsf = bs
                                 .getFormat(swordService.getContext());
                         if (bsf != null)
                         {
@@ -294,10 +294,10 @@ public class ItemEntryGenerator extends DSpaceATOMEntry
         {
             if (Constants.LICENSE_BUNDLE_NAME.equals(bundle.getName()))
             {
-                List<BundleBitstream> bss = bundle.getBitstreams();
-                for (BundleBitstream bs : bss)
+                List<Bitstream> bss = bundle.getBitstreams();
+                for (Bitstream bs : bss)
                 {
-                    String url = urlManager.getBitstreamUrl(bs.getBitstream());
+                    String url = urlManager.getBitstreamUrl(bs);
                     rightsString.append(url).append(" ");
                 }
                 break;

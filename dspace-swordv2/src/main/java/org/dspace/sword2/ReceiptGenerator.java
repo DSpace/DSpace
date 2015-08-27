@@ -157,10 +157,10 @@ public class ReceiptGenerator
             {
                 continue;
             }
-            List<BundleBitstream> bss = bundle.getBitstreams();
-            for (BundleBitstream bs : bss)
+            List<Bitstream> bss = bundle.getBitstreams();
+            for (Bitstream bs : bss)
             {
-                String url = urlManager.getBitstreamUrl(bs.getBitstream());
+                String url = urlManager.getBitstreamUrl(bs);
                 rightsString.append(url).append(" ");
             }
         }
@@ -218,10 +218,10 @@ public class ReceiptGenerator
             {
                 continue;
             }
-            List<BundleBitstream> bss = bundle.getBitstreams();
-            for (BundleBitstream bs : bss)
+            List<Bitstream> bss = bundle.getBitstreams();
+            for (Bitstream bs : bss)
             {
-                String url = urlManager.getBitstreamUrl(bs.getBitstream());
+                String url = urlManager.getBitstreamUrl(bs);
                 rightsString.append(url).append(" ");
             }
         }

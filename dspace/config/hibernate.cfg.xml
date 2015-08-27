@@ -58,7 +58,6 @@
         <mapping class="org.dspace.content.Bitstream"/>
         <mapping class="org.dspace.content.BitstreamFormat"/>
         <mapping class="org.dspace.content.Bundle"/>
-        <mapping class="org.dspace.content.BundleBitstream"/>
         <mapping class="org.dspace.content.Collection"/>
         <mapping class="org.dspace.content.Community"/>
         <mapping class="org.dspace.content.Item"/>

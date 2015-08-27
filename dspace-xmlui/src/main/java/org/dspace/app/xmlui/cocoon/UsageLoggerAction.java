@@ -158,13 +158,13 @@ public class UsageLoggerAction extends AbstractAction {
     	List<Bundle> bundles = item.getBundles();
         for (Bundle bundle : bundles)
         {
-            List<BundleBitstream> bundleBitstreams = bundle.getBitstreams();
+            List<Bitstream> bitstreams = bundle.getBitstreams();
 
-            for (BundleBitstream bundleBitstream : bundleBitstreams)
+            for (Bitstream bitstream : bitstreams)
             {
-            	if (bundleBitstream.getBitstream().getSequenceID() == sequence)
+            	if (bitstream.getSequenceID() == sequence)
             	{
-            		return bundleBitstream.getBitstream();
+            		return bitstream;
                 }
             }
         }
@@ -206,13 +206,13 @@ public class UsageLoggerAction extends AbstractAction {
 	    	List<Bundle> bundles = item.getBundles();
 	        for (Bundle bundle : bundles)
 	        {
-	            List<BundleBitstream> bundleBitstreams = bundle.getBitstreams();
+	            List<Bitstream> bitstreams = bundle.getBitstreams();
 
-	            for (BundleBitstream bundleBitstream : bundleBitstreams)
+	            for (Bitstream bitstream : bitstreams)
 	            {
-	            	if (name.equals(bundleBitstream.getBitstream().getName()))
+	            	if (name.equals(bitstream.getName()))
 	            	{
-	            		return bundleBitstream.getBitstream();
+	            		return bitstream;
 	            	}
 	            }
 	        }

@@ -194,7 +194,7 @@ public class UploadStep extends AbstractSubmissionStep
         String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
         boolean disableFileEditing = (submissionInfo.isInWorkflow()) && !ConfigurationManager.getBooleanProperty("workflow", "reviewer.file-edit");
         java.util.List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
-        java.util.List<BundleBitstream> bitstreams = new ArrayList<>();
+        java.util.List<Bitstream> bitstreams = new ArrayList<>();
         if (bundles.size() > 0)
         {
             bitstreams = bundles.get(0).getBitstreams();
@@ -268,9 +268,8 @@ public class UploadStep extends AbstractSubmissionStep
             header.addCellContent(T_column5); // format
             header.addCellContent(T_column6); // edit button
 
-            for (BundleBitstream bundleBitstream : bitstreams)
+            for (Bitstream bitstream : bitstreams)
             {
-                Bitstream bitstream = bundleBitstream.getBitstream();
                 UUID id = bitstream.getID();
                 String name = bitstream.getName();
                 String url = makeBitstreamLink(item, bitstream);
@@ -452,15 +451,14 @@ public class UploadStep extends AbstractSubmissionStep
         // Review all uploaded files
         Item item = submission.getItem();
         java.util.List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
-        java.util.List<BundleBitstream> bitstreams = new ArrayList<>();
+        java.util.List<Bitstream> bitstreams = new ArrayList<>();
         if (bundles.size() > 0)
         {
             bitstreams = bundles.get(0).getBitstreams();
         }
 
-        for (BundleBitstream bundleBitstream : bitstreams)
+        for (Bitstream bitstream : bitstreams)
         {
-            Bitstream bitstream = bundleBitstream.getBitstream();
             BitstreamFormat bitstreamFormat = bitstream.getFormat(context);
 
             String name = bitstream.getName();

@@ -106,9 +106,8 @@ public class ClamScan extends AbstractCurationTask
             {
                 Bundle bundle = itemService.getBundles(item, "ORIGINAL").get(0);
                 results = new ArrayList<String>();
-                for (BundleBitstream bundleBitstream : bundle.getBitstreams())
+                for (Bitstream bitstream : bundle.getBitstreams())
                 {
-                    Bitstream bitstream = bundleBitstream.getBitstream();
                     InputStream inputstream = bitstreamService.retrieve(Curator.curationContext(), bitstream);
                     logDebugMessage("Scanning " + bitstream.getName() + " . . . ");
                     int bstatus = scan(bitstream, inputstream, getItemHandle(item));

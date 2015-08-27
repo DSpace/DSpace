@@ -127,14 +127,14 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
 			Cell bundleCell = files.addRow("bundle_head_" + bundle.getID(), Row.ROLE_DATA, "").addCell(1, 5);
 			bundleCell.addContent(T_bundle_label.parameterize(bundle.getName()));
 
-			java.util.List<BundleBitstream> bundleBitstreams = bundle.getBitstreams();
+			java.util.List<Bitstream> bitstreams = bundle.getBitstreams();
             ArrayList<UUID> bitstreamIdOrder = new ArrayList<>();
-            for (BundleBitstream bundleBitstream  : bundleBitstreams) {
-                bitstreamIdOrder.add(bundleBitstream.getBitstream().getID());
+            for (Bitstream bitstream  : bitstreams) {
+                bitstreamIdOrder.add(bitstream.getID());
             }
 
-            for (int bitstreamIndex = 0; bitstreamIndex < bundleBitstreams.size(); bitstreamIndex++) {
-                Bitstream bitstream = bundleBitstreams.get(bitstreamIndex).getBitstream();
+            for (int bitstreamIndex = 0; bitstreamIndex < bitstreams.size(); bitstreamIndex++) {
+                Bitstream bitstream = bitstreams.get(bitstreamIndex);
                 boolean primary = (bitstream.equals(bundle.getPrimaryBitstream()));
                 String name = bitstream.getName();
 
@@ -202,8 +202,8 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
                     }
                     upButton.setValue(T_order_up);
                     upButton.setHelp(T_order_up);
-                    Button downButton = cell.addButton("submit_order_" + bundle.getID() + "_" + bitstream.getID() + "_down", (bitstreamIndex == (bundleBitstreams.size() - 1) ? "disabled" : "") + " icon-button arrowDown ");
-                    if(bitstreamIndex == (bundleBitstreams.size() - 1)){
+                    Button downButton = cell.addButton("submit_order_" + bundle.getID() + "_" + bitstream.getID() + "_down", (bitstreamIndex == (bitstreams.size() - 1) ? "disabled" : "") + " icon-button arrowDown ");
+                    if(bitstreamIndex == (bitstreams.size() - 1)){
                         downButton.setDisabled();
                     }
                     downButton.setValue(T_order_down);

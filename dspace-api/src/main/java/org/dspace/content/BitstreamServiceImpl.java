@@ -13,7 +13,6 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.BitstreamDAO;
-import org.dspace.content.dao.BundleBitstreamDAO;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
@@ -47,8 +46,6 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
     @Autowired(required = true)
     protected BitstreamDAO bitstreamDAO;
-    @Autowired(required = true)
-    protected BundleBitstreamDAO bundleBitstreamDAO;
     @Autowired(required = true)
     protected ItemService itemService;
 
@@ -246,16 +243,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         context.addEvent(new Event(Event.DELETE, Constants.BITSTREAM, bitstream.getID(),
                 String.valueOf(bitstream.getSequenceID()), getIdentifiers(context, bitstream)));
 
-        Iterator<BundleBitstream> bundleBits = bitstream.getBundles().iterator();
-        while(bundleBits.hasNext())
-        {
-            BundleBitstream bundleBitstream = bundleBits.next();
-            if(bundleBitstream.getBitstream().getID().equals(bitstream.getID()))
-            {
-                bundleBits.remove();
-                bundleBitstreamDAO.delete(context, bundleBitstream);
-            }
-        }
+        bitstream.getBundles().clear();
 
 
         // Remove policies
@@ -288,11 +276,11 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
     @Override
     public DSpaceObject getParentObject(Context context, Bitstream bitstream) throws SQLException {
-        List<BundleBitstream> bundles = bitstream.getBundles();
+        List<Bundle> bundles = bitstream.getBundles();
         if (CollectionUtils.isNotEmpty(bundles))
         {
             // the ADMIN action is not allowed on Bundle object so skip to the item
-            Item item = (Item) bundleService.getParentObject(context, bundles.iterator().next().getBundle());
+            Item item = (Item) bundleService.getParentObject(context, bundles.iterator().next());
             if (item != null)
             {
                 return item;
@@ -367,12 +355,12 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         List<Bundle> bundles = itemService.getBundles(item, bundleName);
         for (int i = 0; i < bundles.size(); i++) {
             Bundle bundle = bundles.get(i);
-            List<BundleBitstream> bitstreams = bundle.getBitstreams();
+            List<Bitstream> bitstreams = bundle.getBitstreams();
             for (int j = 0; j < bitstreams.size(); j++) {
-                BundleBitstream bundleBitstream = bitstreams.get(j);
-                if(StringUtils.equals(bundleBitstream.getBitstream().getName(), bitstreamName))
+                Bitstream bitstream = bitstreams.get(j);
+                if(StringUtils.equals(bitstream.getName(), bitstreamName))
                 {
-                    return bundleBitstream.getBitstream();
+                    return bitstream;
                 }
             }
         }
@@ -384,10 +372,10 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         List<Bundle> bundles = itemService.getBundles(item, bundleName);
         if(CollectionUtils.isNotEmpty(bundles))
         {
-            List<BundleBitstream> bitstreams = bundles.get(0).getBitstreams();
+            List<Bitstream> bitstreams = bundles.get(0).getBitstreams();
             if(CollectionUtils.isNotEmpty(bitstreams))
             {
-                return bitstreams.get(0).getBitstream();
+                return bitstreams.get(0);
             }
         }
         return null;
