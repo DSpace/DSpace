@@ -9,6 +9,7 @@ package org.dspace.app.webui.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class JSONUploadResponse
 {
@@ -16,12 +17,12 @@ public class JSONUploadResponse
 
     JSONFileSizeLimitExceeded fileSizeLimitExceeded;
     
-    public void addUploadFileStatus(String name, int bitstreamID,
+    public void addUploadFileStatus(String name, UUID bitstreamID,
             long size, String url, int status)
     {
         JSONUploadFileStatus uploadFileStatus = new JSONUploadFileStatus();
         uploadFileStatus.name = name;
-        uploadFileStatus.bitstreamID = bitstreamID;
+        uploadFileStatus.bitstreamID = bitstreamID.toString();
         uploadFileStatus.size = size;
         uploadFileStatus.url = url;
         uploadFileStatus.status = status;
@@ -41,7 +42,7 @@ class JSONUploadFileStatus
 {
     String name;
 
-    int bitstreamID;
+    String bitstreamID;
 
     long size;
 

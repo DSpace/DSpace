@@ -61,7 +61,7 @@ public class VersionItemServlet extends DSpaceServlet
         
         String summary = request.getParameter("summary");
         if (submit!=null && submit.equals("submit_version")){                        
-            Integer wsid = VersionUtil.processCreateNewVersion(context, item.getLegacyId(), summary);            
+            Integer wsid = VersionUtil.processCreateNewVersion(context, item.getID(), summary);            
             response.sendRedirect(request.getContextPath()+"/submit?resume=" + wsid);
             context.complete();
             return;

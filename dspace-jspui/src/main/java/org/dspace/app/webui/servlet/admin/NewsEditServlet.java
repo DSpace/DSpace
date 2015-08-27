@@ -19,7 +19,8 @@ import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
-import org.dspace.core.NewsServiceImpl;
+import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.core.service.NewsService;
 
 /**
  * Servlet for editing the front page news
@@ -28,6 +29,14 @@ import org.dspace.core.NewsServiceImpl;
  */
 public class NewsEditServlet extends DSpaceServlet
 {
+	private NewsService newsService;
+	
+	@Override
+	public void init() throws ServletException {
+		super.init();
+		newsService = CoreServiceFactory.getInstance().getNewsService();
+	}
+	
     protected void doDSGet(Context c, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -51,7 +60,7 @@ public class NewsEditServlet extends DSpaceServlet
         if (button.equals("submit_edit"))
         {
             //get the existing text from the file
-            news = NewsServiceImpl.readNewsFile(position);
+            news = newsService.readNewsFile(position);
 
             //pass the position back to the JSP
             request.setAttribute("position", position);
@@ -69,7 +78,7 @@ public class NewsEditServlet extends DSpaceServlet
             news = (String) request.getParameter("news");
 
             //write the string out to file
-            NewsServiceImpl.writeNewsFile(position, news);
+            newsService.writeNewsFile(position, news);
 
             JSPManager
                     .showJSP(request, response, "/dspace-admin/news-main.jsp");

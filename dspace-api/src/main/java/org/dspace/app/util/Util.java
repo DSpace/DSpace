@@ -12,14 +12,19 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Locale;
+import java.util.Properties;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
-import org.dspace.content.MetadataValue;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.core.Constants;
 import org.dspace.core.I18nUtil;
 
@@ -255,6 +260,47 @@ public class Util {
             return null;
         }
     }
+    
+    /**
+     * Obtain a List of UUID parameters from the given request as an UUID. null
+     * is returned if parameter doesn't exist. <code>null</code> is returned in
+     * position of the list if that particular value is garbled.
+     *
+     * @param request
+     *            the HTTP request
+     * @param param
+     *            the name of the parameter
+     *
+     * @return list of UUID or null
+     */
+    public static List<UUID> getUUIDParameters(HttpServletRequest request,
+            String param)
+    {
+        String[] request_values = request.getParameterValues(param);
+
+        if (request_values == null)
+        {
+            return null;
+        }
+
+        List<UUID> return_values = new ArrayList<UUID>(request_values.length);
+
+        for (String s : request_values)
+        {
+            try
+            {
+                return_values.add(UUID.fromString(s.trim()));
+            }
+            catch (Exception e)
+            {
+                // Problem with parameter, stuff null in the list
+            	return_values.add(null);
+            }
+        }
+
+        return return_values;
+    }
+
 
     /**
      * Obtain an array of int parameters from the given request as an int. null
