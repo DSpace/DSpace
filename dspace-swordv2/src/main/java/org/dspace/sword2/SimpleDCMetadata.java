@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 
@@ -14,6 +14,7 @@ import java.util.Map;
 public class SimpleDCMetadata
 {
     private Map<String, String> dublinCore = new HashMap<String, String>();
+
     private Map<String, String> atom = new HashMap<String, String>();
 
     public void addDublinCore(String element, String value)
