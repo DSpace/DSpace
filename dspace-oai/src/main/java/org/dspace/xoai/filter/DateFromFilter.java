@@ -11,9 +11,7 @@ import com.lyncode.builder.DateBuilder;
 import com.lyncode.xoai.dataprovider.services.api.DateProvider;
 import com.lyncode.xoai.dataprovider.services.impl.BaseDateProvider;
 import org.apache.solr.client.solrj.util.ClientUtils;
-import org.dspace.core.Context;
 import org.dspace.xoai.data.DSpaceItem;
-import org.dspace.xoai.filter.results.DatabaseFilterResult;
 import org.dspace.xoai.filter.results.SolrFilterResult;
 
 import java.util.Date;
@@ -23,19 +21,12 @@ import java.util.Date;
  * @author Lyncode Development Team <dspace@lyncode.com>
  */
 public class DateFromFilter extends DSpaceFilter {
-    private static DateProvider dateProvider = new BaseDateProvider();
-    private Date date;
+    private static final DateProvider dateProvider = new BaseDateProvider();
+    private final Date date;
 
     public DateFromFilter(Date date)
     {
         this.date = new DateBuilder(date).setMinMilliseconds().build();
-    }
-
-    @Override
-    public DatabaseFilterResult buildDatabaseQuery(Context context)
-    {
-        return new DatabaseFilterResult("i.last_modified >= ?",
-                new java.sql.Date(date.getTime()));
     }
 
     @Override

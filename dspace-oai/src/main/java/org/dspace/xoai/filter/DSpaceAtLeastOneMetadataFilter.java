@@ -8,7 +8,6 @@
 
 package org.dspace.xoai.filter;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,9 +16,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.core.Constants;
-import org.dspace.core.Context;
 import org.dspace.xoai.data.DSpaceItem;
-import org.dspace.xoai.exceptions.InvalidMetadataFieldException;
 import org.dspace.xoai.filter.data.DSpaceMetadataFilterOperator;
 import org.dspace.xoai.filter.results.DatabaseFilterResult;
 import org.dspace.xoai.filter.results.SolrFilterResult;
@@ -34,7 +31,7 @@ import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.SimpleType;
  * @author Lyncode Development Team <dspace@lyncode.com>
  */
 public class DSpaceAtLeastOneMetadataFilter extends DSpaceFilter {
-    private static Logger log = LogManager.getLogger(DSpaceAtLeastOneMetadataFilter.class);
+    private static final Logger log = LogManager.getLogger(DSpaceAtLeastOneMetadataFilter.class);
 
     private String field;
     private DSpaceMetadataFilterOperator operator = DSpaceMetadataFilterOperator.UNDEF;
@@ -74,21 +71,6 @@ public class DSpaceAtLeastOneMetadataFilter extends DSpaceFilter {
             operator = DSpaceMetadataFilterOperator.valueOf(getConfiguration()
                     .get("operator").asSimpleType().asString().toUpperCase());
         return operator;
-    }
-
-    @Override
-    public DatabaseFilterResult buildDatabaseQuery(Context context) {
-        if (this.getField() != null) {
-            try {
-                int id = fieldResolver.getFieldID(context, this.getField());
-                return this.getWhere(id, this.getValues());
-            } catch (InvalidMetadataFieldException ex) {
-                log.error(ex.getMessage(), ex);
-            } catch (SQLException ex) {
-                log.error(ex.getMessage(), ex);
-            }
-        }
-        return new DatabaseFilterResult();
     }
 
     @Override

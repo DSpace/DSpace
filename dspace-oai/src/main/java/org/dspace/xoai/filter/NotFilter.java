@@ -7,23 +7,14 @@
  */
 package org.dspace.xoai.filter;
 
-import org.dspace.core.Context;
 import org.dspace.xoai.data.DSpaceItem;
-import org.dspace.xoai.filter.results.DatabaseFilterResult;
 import org.dspace.xoai.filter.results.SolrFilterResult;
 
 public class NotFilter extends DSpaceFilter {
-    private DSpaceFilter inFilter;
+    private final DSpaceFilter inFilter;
 
     public NotFilter(DSpaceFilter inFilter) {
         this.inFilter = inFilter;
-    }
-
-
-    @Override
-    public DatabaseFilterResult buildDatabaseQuery(Context context) {
-        DatabaseFilterResult result = inFilter.buildDatabaseQuery(context);
-        return new DatabaseFilterResult("NOT ("+result.getQuery()+")", result.getParameters());
     }
 
     @Override

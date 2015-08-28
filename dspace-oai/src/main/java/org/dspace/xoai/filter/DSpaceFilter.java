@@ -32,7 +32,6 @@ public abstract class DSpaceFilter implements Filter
     /** The oai context */
     protected Context context;
 
-    public abstract DatabaseFilterResult buildDatabaseQuery(Context context);
     public abstract SolrFilterResult buildSolrQuery();
     public abstract boolean isShown(DSpaceItem item);
 
