@@ -74,9 +74,7 @@ public class ItemUtils
     }
     public static Metadata retrieveMetadata (Context context, Item item) {
         Metadata metadata;
-        
-        //DSpaceDatabaseItem dspaceItem = new DSpaceDatabaseItem(item);
-        
+
         // read all metadata into Metadata Object
         metadata = new Metadata();
         List<MetadataValue> vals = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
