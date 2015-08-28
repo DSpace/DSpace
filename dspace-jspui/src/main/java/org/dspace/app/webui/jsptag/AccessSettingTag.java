@@ -7,26 +7,31 @@
  */
 package org.dspace.app.webui.jsptag;
 
-import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.log4j.Logger;
-import org.dspace.app.util.SubmissionInfo;
-import org.dspace.app.webui.util.UIUtil;
-import org.dspace.authorize.AuthorizeServiceImpl;
-import org.dspace.authorize.ResourcePolicy;
-import org.dspace.content.DSpaceObject;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
-import org.dspace.eperson.Group;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import javax.servlet.jsp.tagext.TagSupport;
+
+import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.log4j.Logger;
+import org.dspace.app.util.SubmissionInfo;
+import org.dspace.app.webui.util.UIUtil;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.GroupService;
 
 /**
  * Tag to display embargo settings
@@ -62,7 +67,10 @@ public class AccessSettingTag extends TagSupport
 
     /** add the policy button */
     private boolean addpolicy = false;
+    
+    private AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
+    private GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
 
     public AccessSettingTag()
     {
@@ -97,7 +105,7 @@ public class AccessSettingTag extends TagSupport
             List<ResourcePolicy> policies = null;
             if (!advanced && dso != null)
             {
-                policies = AuthorizeServiceImpl.findPoliciesByDSOAndType(context, dso, ResourcePolicy.TYPE_CUSTOM);
+                policies = authorizeService.findPoliciesByDSOAndType(context, dso, ResourcePolicy.TYPE_CUSTOM);
             }
             else if (rp != null)
             {
@@ -106,7 +114,7 @@ public class AccessSettingTag extends TagSupport
             }
 
             String name = "";
-            int group_id = 0; 
+            UUID group_id = null; 
             String startDate = "";
             String reason = "";
             String radio0Checked = " checked=\"checked\"";
@@ -146,7 +154,7 @@ public class AccessSettingTag extends TagSupport
                 sb.append(label_group).append("\n");
                 sb.append("<select class=\"form-control\" name=\"group_id\" id=\"select_group\">\n");
 
-                Group[] groups = getGroups(context, hrq, subInfo);
+                List<Group> groups = getGroups(context, hrq, subInfo);
                 if (groups != null)
                 {
                     for (Group group : groups)
@@ -367,22 +375,22 @@ public class AccessSettingTag extends TagSupport
         addpolicy = false;
     }
 
-    private Group[] getGroups(Context context, HttpServletRequest request, SubmissionInfo subInfo)
+    private List<Group> getGroups(Context context, HttpServletRequest request, SubmissionInfo subInfo)
         throws SQLException
     {
-        Group[] groups = null;
+        List<Group> groups = null;
         // retrieve groups
         if (restrictedGroup != null)
         {
-            Group uiGroup = Group.findByName(context, restrictedGroup);
+            Group uiGroup = groupService.findByName(context, restrictedGroup);
             if (uiGroup != null)
             {
                 groups = uiGroup.getMemberGroups();
             }
         }
 
-        if (groups == null || groups.length == 0){
-            groups = Group.findAll(context, Group.NAME);
+        if (groups == null || groups.size() == 0){
+            groups = groupService.findAll(context, GroupService.NAME);
         }
 
         return groups;

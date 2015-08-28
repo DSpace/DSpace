@@ -8,7 +8,6 @@
 package org.dspace.app.webui.jsptag;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.jsp.JspException;
@@ -19,6 +18,8 @@ import javax.servlet.jsp.tagext.TagSupport;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.ResourcePolicyService;
 
 /**
  * Tag to display embargo settings
@@ -34,6 +35,8 @@ public class PoliciesListTag extends TagSupport
     /** Groups to make options list */
     private transient List<ResourcePolicy> policies = null;
     private transient boolean showButton = true;
+    
+    private ResourcePolicyService policyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
     
     public PoliciesListTag()
     {
@@ -84,7 +87,7 @@ public class PoliciesListTag extends TagSupport
 
                     sb.append("<tr>\n");
                     sb.append("<td class=\"access").append(column1).append("\">").append(rpName).append("</td>\n");
-                    sb.append("<td class=\"access").append(column2).append("\">").append(policy.getActionText()).append("</td>\n");
+                    sb.append("<td class=\"access").append(column2).append("\">").append(policyService.getActionText(policy)).append("</td>\n");
                     sb.append("<td class=\"access").append(column1).append("\">").append(policy.getGroup().getName()).append("</td>\n");
                     sb.append("<td class=\"access").append(column2).append("\">").append(startDate).append("</td>\n");
                     sb.append("<td class=\"access").append(column1).append("\">").append(endDate).append("</td>\n");
@@ -107,10 +110,6 @@ public class PoliciesListTag extends TagSupport
         catch (IOException ie)
         {
             throw new JspException(ie);
-        }
-        catch (SQLException e)
-        {
-        	throw new JspException(e);
         }
 
         return SKIP_BODY;
