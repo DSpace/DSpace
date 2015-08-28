@@ -7,8 +7,11 @@
  */
 package org.dspace.content.factory;
 
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 /**
  * Factory implementation to get services for the content package, use ContentServiceFactory.getInstance() to retrieve an implementation
@@ -16,6 +19,12 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author kevinvandevelde at atmire.com
  */
 public class ContentServiceFactoryImpl extends ContentServiceFactory {
+
+
+    @Autowired(required = true)
+    private List<DSpaceObjectService<? extends DSpaceObject>> dSpaceObjectServices;
+    @Autowired(required = true)
+    private List<DSpaceObjectLegacySupportService<? extends DSpaceObject>> dSpaceObjectLegacySupportServices;
 
     @Autowired(required = true)
     private BitstreamFormatService bitstreamFormatService;
@@ -44,6 +53,16 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
     @Autowired(required = true)
     private SiteService siteService;
 
+
+    @Override
+    public List<DSpaceObjectService<? extends DSpaceObject>> getDSpaceObjectServices() {
+        return dSpaceObjectServices;
+    }
+
+    @Override
+    public List<DSpaceObjectLegacySupportService<? extends DSpaceObject>> getDSpaceObjectLegacySupportServices() {
+        return dSpaceObjectLegacySupportServices;
+    }
 
     @Override
     public BitstreamFormatService getBitstreamFormatService()
