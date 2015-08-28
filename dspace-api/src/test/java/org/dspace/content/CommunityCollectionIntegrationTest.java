@@ -9,10 +9,14 @@ package org.dspace.content;
 
 import org.databene.contiperf.Required;
 import org.databene.contiperf.PerfTest;
+
+import java.io.IOException;
 import java.sql.SQLException;
 import org.apache.log4j.Logger;
 import org.dspace.AbstractIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,6 +39,11 @@ public class CommunityCollectionIntegrationTest extends AbstractIntegrationTest
     /** log4j category */
     private static final Logger log = Logger.getLogger(CommunityCollectionIntegrationTest.class);
 
+    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
+    protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
 
     /**
      * This method will be run before every test as per @Before. It will
@@ -59,8 +68,7 @@ public class CommunityCollectionIntegrationTest extends AbstractIntegrationTest
      */
     @After
     @Override
-    public void destroy()
-    {
+    public void destroy() {
         super.destroy();
     }
 
@@ -74,23 +82,19 @@ public class CommunityCollectionIntegrationTest extends AbstractIntegrationTest
     {
         //we create the structure
         context.turnOffAuthorisationSystem();
-        Community parent = Community.create(null, context);        
-        Community child1 = Community.create(parent, context);
+        Community parent = communityService.create(null, context);
+        Community child1 = communityService.create(parent, context);
         
-        Collection col1 = Collection.create(context);        
-        Collection col2 = Collection.create(context);
-        
-        child1.addCollection(col1);        
-        child1.addCollection(col2);
+        Collection col1 = collectionService.create(context, child1);
+        Collection col2 = collectionService.create(context, child1);
         
         context.restoreAuthSystemState();
-        context.commit();
-        
+
         //verify it works as expected
-        assertThat("testCreateTree 0", parent.getParentCommunity(), nullValue());
-        assertThat("testCreateTree 1", child1.getParentCommunity(), equalTo(parent));
-        assertThat("testCreateTree 2", (Community) col1.getParentObject(), equalTo(child1));
-        assertThat("testCreateTree 3", (Community) col2.getParentObject(), equalTo(child1));
+        assertThat("testCreateTree 0", parent.getParentCommunities().size(), not(0));
+        assertThat("testCreateTree 1", child1.getParentCommunities().get(0), equalTo(parent));
+        assertThat("testCreateTree 2", (Community) collectionService.getParentObject(context, col1), equalTo(child1));
+        assertThat("testCreateTree 3", (Community) collectionService.getParentObject(context, col2), equalTo(child1));
     }
 
      /**
@@ -99,42 +103,31 @@ public class CommunityCollectionIntegrationTest extends AbstractIntegrationTest
     @Test
     @PerfTest(invocations = 50, threads = 1)
     @Required(percentile95 = 2000, average= 1800)
-    public void testCountItems() throws SQLException, AuthorizeException
-    {
+    public void testCountItems() throws SQLException, AuthorizeException, IOException {
         //make it an even number, not too high to reduce time during testing
         int totalitems = 4;
 
         //we create the structure
         context.turnOffAuthorisationSystem();
-        Community parent = Community.create(null, context);
-        Community child1 = Community.create(parent, context);
+        Community parent = communityService.create(null, context);
+        Community child1 = communityService.create(parent, context);
 
-        Collection col1 = Collection.create(context);
-        Collection col2 = Collection.create(context);
-
-        child1.addCollection(col1);
-        child1.addCollection(col2);
+        Collection col1 = collectionService.create(context, child1);
+        Collection col2 = collectionService.create(context, child1);
 
         for(int count = 0; count < totalitems/2; count++)
         {
-            Item item1 = Item.create(context);
-            item1.setArchived(true);
-            item1.update();
-            Item item2 = Item.create(context);
-            item2.setArchived(true);
-            item2.update();
 
-            col1.addItem(item1);            
-            col2.addItem(item2);
+            Item item1 = installItemService.installItem(context, workspaceItemService.create(context, col1, false));
+            Item item2 = installItemService.installItem(context, workspaceItemService.create(context, col2, false));
         }
 
         context.restoreAuthSystemState();
-        context.commit();
 
         //verify it works as expected
-        assertThat("testCountItems 0", col1.countItems(), equalTo(totalitems/2));
-        assertThat("testCountItems 1", col2.countItems(), equalTo(totalitems/2));
-        assertThat("testCountItems 2", child1.countItems(), equalTo(totalitems));
-        assertThat("testCountItems 3", parent.countItems(), equalTo(totalitems));
+        assertThat("testCountItems 0", itemService.countItems(context, col1), equalTo(totalitems/2));
+        assertThat("testCountItems 1", itemService.countItems(context, col2), equalTo(totalitems/2));
+        assertThat("testCountItems 2", communityService.countItems(context, child1), equalTo(totalitems));
+        assertThat("testCountItems 3", communityService.countItems(context, parent), equalTo(totalitems));
     }
 }

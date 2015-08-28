@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.locks.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -20,7 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.Context;
@@ -64,7 +63,7 @@ public class CommunityListServlet extends DSpaceServlet
             }
 
             // can they admin communities?
-            if (AuthorizeManager.isAdmin(context)) 
+            if (AuthorizeServiceImpl.isAdmin(context))
             {
                 // set a variable to create an edit button
                 request.setAttribute("admin_button", Boolean.TRUE);

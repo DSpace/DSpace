@@ -9,6 +9,7 @@ package org.dspace.app.xmlui.cocoon;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.UUID;
 
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.ResourceNotFoundException;
@@ -26,8 +27,14 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.xml.sax.SAXException;
 
 /**
@@ -77,6 +84,11 @@ import org.xml.sax.SAXException;
  */
 public class DSpaceMETSGenerator extends AbstractGenerator
 {
+    protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+   	protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
 	/**
 	 * Generate the METS Document.
 	 */
@@ -98,7 +110,7 @@ public class DSpaceMETSGenerator extends AbstractGenerator
             
 			// Generate the METS document
 			contentHandler.startDocument();
-			adapter.renderMETS(contentHandler,lexicalHandler);
+			adapter.renderMETS(context, contentHandler,lexicalHandler);
 			contentHandler.endDocument();
 			
 		} catch (WingException we) {
@@ -136,7 +148,7 @@ public class DSpaceMETSGenerator extends AbstractGenerator
 		 if (handle != null)
          {
             // Specified using a regular handle.
-            DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+            DSpaceObject dso = handleService.resolveToObject(context, handle);
 
             // Handles can be either items or containers.
             if (dso instanceof Item)
@@ -157,23 +169,23 @@ public class DSpaceMETSGenerator extends AbstractGenerator
          	{
          		String type = parts[0];
                        String strid = parts[1];
-         		int id = 0;
+         		UUID id = null;
 
                         // Handle prefixes must be treated as strings
                         // all non-repository types need integer IDs
                         if ("repository".equals(type))
                         {
-                                if (HandleManager.getPrefix().equals(strid))
+                                if (handleService.getPrefix().equals(strid))
                                 {
                                     adapter = new RepositoryAdapter(context, contextPath);
                                 }
                         }
                         else
                         {
-                               id = Integer.valueOf(parts[1]); 
+                               id = UUID.fromString(parts[1]);
          			if ("item".equals(type))
          			{
-         				Item item = Item.find(context,id);
+         				Item item = itemService.find(context,id);
          				if (item != null)
                          {
                              adapter = new ItemAdapter(context, item, contextPath);
@@ -181,7 +193,7 @@ public class DSpaceMETSGenerator extends AbstractGenerator
          			}
          			else if ("collection".equals(type))
          			{
-         				Collection collection = Collection.find(context,id);
+         				Collection collection = collectionService.find(context,id);
          				if (collection != null)
                          {
                              adapter = new ContainerAdapter(context, collection, contextPath);
@@ -189,7 +201,7 @@ public class DSpaceMETSGenerator extends AbstractGenerator
          			}
          			else if ("community".equals(type))
          			{
-         				Community community = Community.find(context,id);
+         				Community community = communityService.find(context,id);
          				if (community != null)
                          {
                              adapter = new ContainerAdapter(context, community, contextPath);

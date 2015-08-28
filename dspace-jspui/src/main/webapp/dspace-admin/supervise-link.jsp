@@ -27,7 +27,7 @@
 <%@ page import="org.dspace.content.WorkspaceItem" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="org.dspace.eperson.Group" %>
-<%@ page import="org.dspace.eperson.Supervisor" %>
+<%@ page import="org.dspace.eperson.SupervisorServiceImpl" %>
 <%@ page import="org.dspace.core.Utils" %>
 <%@page import="javax.servlet.jsp.jstl.fmt.LocaleSupport"%>
 
@@ -73,9 +73,9 @@
 
             <label class="input-group-addon"><fmt:message key="jsp.dspace-admin.supervise-link.policy"/></label>
             <select class="form-control" name="PolicyType">
-                <option value="<%= Supervisor.POLICY_NONE %>" selected="selected"><fmt:message key="jsp.dspace-admin.supervise-link.policynone"/></option>
-                <option value="<%= Supervisor.POLICY_EDITOR %>"><fmt:message key="jsp.dspace-admin.supervise-link.policyeditor"/></option>
-                <option value="<%= Supervisor.POLICY_OBSERVER %>"><fmt:message key="jsp.dspace-admin.supervise-link.policyobserver"/></option>
+                <option value="<%= SupervisorServiceImpl.POLICY_NONE %>" selected="selected"><fmt:message key="jsp.dspace-admin.supervise-link.policynone"/></option>
+                <option value="<%= SupervisorServiceImpl.POLICY_EDITOR %>"><fmt:message key="jsp.dspace-admin.supervise-link.policyeditor"/></option>
+                <option value="<%= SupervisorServiceImpl.POLICY_OBSERVER %>"><fmt:message key="jsp.dspace-admin.supervise-link.policyobserver"/></option>
             </select>
 </div>
 <%-- Select the workspace item to be supervised --%>

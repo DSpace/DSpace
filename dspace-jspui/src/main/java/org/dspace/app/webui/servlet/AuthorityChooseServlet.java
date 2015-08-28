@@ -18,10 +18,11 @@ import java.sql.SQLException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.dspace.content.authority.ChoiceAuthorityServiceImpl;
 import org.xml.sax.SAXException;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.ChoicesXMLGenerator;
 import org.dspace.core.Context;
@@ -64,7 +65,7 @@ public class AuthorityChooseServlet extends DSpaceServlet {
     private void process(Context context, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException, AuthorizeException {
         String[] paths = request.getPathInfo().split("/");
         String field = paths[paths.length-1];
-        ChoiceAuthorityManager cam = ChoiceAuthorityManager.getManager();
+        ChoiceAuthorityServiceImpl cam = ChoiceAuthorityServiceImpl.getManager();
 
         String query = request.getParameter("query");
         String format = request.getParameter("format");

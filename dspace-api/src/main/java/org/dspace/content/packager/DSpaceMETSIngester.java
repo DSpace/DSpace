@@ -48,7 +48,7 @@ public class DSpaceMETSIngester
        extends AbstractMETSIngester
 {
     // first part of required mets@PROFILE value
-    private static final String PROFILE_START = "DSpace METS SIP Profile";
+    protected static final String PROFILE_START = "DSpace METS SIP Profile";
 
     // just check the profile name.
     @Override
@@ -241,8 +241,8 @@ public class DSpaceMETSIngester
                 {
                     //String mfileId = mfile.getAttributeValue("ID");
                     //Bitstream bs = (Bitstream)fileIdToBitstream.get(mfileId);
-                    bs.setName(newName);
-                    bs.update();
+                    bs.setName(context, newName);
+                    bitstreamService.update(context, bs);
                 }
             }
         }

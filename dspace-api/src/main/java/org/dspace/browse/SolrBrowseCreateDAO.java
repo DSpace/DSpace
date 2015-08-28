@@ -7,27 +7,25 @@
  */
 package org.dspace.browse;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
-import org.dspace.content.Metadatum;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.authority.ChoiceAuthorityManager;
-import org.dspace.content.authority.MetadataAuthorityManager;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
+import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.content.authority.service.MetadataAuthorityService;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.discovery.SolrServiceImpl;
 import org.dspace.discovery.SolrServiceIndexPlugin;
 import org.dspace.sort.OrderFormat;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
-import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.utils.DSpace;
 
 /**
@@ -42,7 +40,12 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
 
     // reference to a DBMS BrowseCreateDAO needed to remove old tables when
     // switching from DBMS to SOLR
-    private BrowseCreateDAO dbCreateDAO;
+    protected BrowseCreateDAO dbCreateDAO;
+    
+    protected final ItemService itemService;
+    
+    protected final ChoiceAuthorityService choiceAuthorityService;
+    protected final MetadataAuthorityService metadataAuthorityService;
 
     private static final Logger log = Logger
             .getLogger(SolrBrowseCreateDAO.class);
@@ -61,22 +64,15 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
             throw new IllegalStateException(e);
         }
 
+        itemService = ContentServiceFactory.getInstance().getItemService();
+        choiceAuthorityService = ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
+        metadataAuthorityService = ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
         for (BrowseIndex bi : bis)
             bi.generateMdBits();
     }
 
     public SolrBrowseCreateDAO(Context context) throws BrowseException
     {
-        // For compatibility with previous versions
-        if (! DatabaseManager.isOracle())
-        {
-            dbCreateDAO = new BrowseCreateDAOPostgres(context);
-        }
-        else
-        {
-            dbCreateDAO = new BrowseCreateDAOOracle(context);
-        }
-
         try
         {
             bis = BrowseIndex.getBrowseIndices();
@@ -89,6 +85,10 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
 
         for (BrowseIndex bi : bis)
             bi.generateMdBits();
+        itemService = ContentServiceFactory.getInstance().getItemService();
+        choiceAuthorityService = ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
+        metadataAuthorityService = ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
+
     }
 
     @Override
@@ -128,17 +128,13 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
                     for (int mdIdx = 0; mdIdx < bi.getMetadataCount(); mdIdx++)
                     {
                         String[] md = bi.getMdBits(mdIdx);
-                        Metadatum[] values = item.getMetadata(md[0], md[1],
+                        List<MetadataValue> values = itemService.getMetadata(item, md[0], md[1],
                                 md[2], Item.ANY);
 
                         // if we have values to index on, then do so
-                        if (values != null && values.length > 0)
+                        if (values != null && values.size() > 0)
                         {
-                            int minConfidence = MetadataAuthorityManager
-                                    .getManager().getMinConfidence(
-                                            values[0].schema,
-                                            values[0].element,
-                                            values[0].qualifier);
+                            int minConfidence = metadataAuthorityService.getMinConfidence(values.get(0).getMetadataField());
 
                             boolean ignoreAuthority = new DSpace()
                                     .getConfigurationService()
@@ -151,38 +147,33 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
                                                             "discovery.browse.authority.ignore",
                                                             new Boolean(false)),
                                             true);
-                            for (int x = 0; x < values.length; x++)
+                            for (int x = 0; x < values.size(); x++)
                             {
                                 // Ensure that there is a value to index before
                                 // inserting it
-                                if (StringUtils.isEmpty(values[x].value))
+                                if (StringUtils.isEmpty(values.get(x).getValue()))
                                 {
                                     log.error("Null metadata value for item "
                                             + item.getID()
                                             + ", field: "
-                                            + values[x].schema
-                                            + "."
-                                            + values[x].element
-                                            + (values[x].qualifier == null ? ""
-                                                    : "." + values[x].qualifier));
+                                            + values.get(x).getMetadataField().toString()
+                                    );
                                 }
                                 else
                                 {
                                     if (bi.isAuthorityIndex()
-                                            && (values[x].authority == null || values[x].confidence < minConfidence))
+                                            && (values.get(x).getAuthority() == null || values.get(x).getConfidence() < minConfidence))
                                     {
                                         // if we have an authority index only
                                         // authored metadata will go here!
                                         log.debug("Skipping item="
                                                 + item.getID() + ", field="
-                                                + values[x].schema + "."
-                                                + values[x].element + "."
-                                                + values[x].qualifier
-                                                + ", value=" + values[x].value
+                                                + values.get(x).getMetadataField().toString()
+                                                + ", value=" + values.get(x).getValue()
                                                 + ", authority="
-                                                + values[x].authority
+                                                + values.get(x).getAuthority()
                                                 + ", confidence="
-                                                + values[x].confidence
+                                                + values.get(x).getConfidence()
                                                 + " (BAD AUTHORITY)");
                                         continue;
                                     }
@@ -190,10 +181,10 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
                                     // is there any valid (with appropriate
                                     // confidence) authority key?
                                     if ((ignoreAuthority && !bi.isAuthorityIndex())
-                                            || (values[x].authority != null && values[x].confidence >= minConfidence))
+                                            || (values.get(x).getAuthority() != null && values.get(x).getConfidence() >= minConfidence))
                                     {
-                                        distFAuths.add(values[x].authority);
-                                        distValuesForAC.add(values[x].value);
+                                        distFAuths.add(values.get(x).getAuthority());
+                                        distValuesForAC.add(values.get(x).getValue());
 
                                         String preferedLabel = null;
                                         boolean ignorePrefered = new DSpace()
@@ -210,14 +201,8 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
                                                         true);
                                         if (!ignorePrefered)
                                         {
-                                            preferedLabel = ChoiceAuthorityManager
-                                                    .getManager()
-                                                    .getLabel(
-                                                            values[x].schema,
-                                                            values[x].element,
-                                                            values[x].qualifier,
-                                                            values[x].authority,
-                                                            values[x].language);
+                                            preferedLabel = choiceAuthorityService
+                                                    .getLabel(values.get(x), values.get(x).getLanguage());
                                         }
                                         List<String> variants = null;
 
@@ -235,14 +220,9 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
                                                         true);
                                         if (!ignoreVariants)
                                         {
-                                            variants = ChoiceAuthorityManager
-                                                    .getManager()
+                                            variants = choiceAuthorityService
                                                     .getVariants(
-                                                            values[x].schema,
-                                                            values[x].element,
-                                                            values[x].qualifier,
-                                                            values[x].authority,
-                                                            values[x].language);
+                                                            values.get(x));
                                         }
 
                                         if (StringUtils
@@ -251,14 +231,14 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
                                             String nLabel = OrderFormat
                                                     .makeSortString(
                                                             preferedLabel,
-                                                            values[x].language,
+                                                            values.get(x).getLanguage(),
                                                             bi.getDataType());
                                             distFValues
                                                     .add(nLabel
                                                             + SolrServiceImpl.FILTER_SEPARATOR
                                                             + preferedLabel
                                                             + SolrServiceImpl.AUTHORITY_SEPARATOR
-                                                            + values[x].authority);
+                                                            + values.get(x).getAuthority());
                                             distValuesForAC.add(preferedLabel);
                                         }
 
@@ -269,14 +249,14 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
                                                 String nVal = OrderFormat
                                                         .makeSortString(
                                                                 var,
-                                                                values[x].language,
+                                                                values.get(x).getLanguage(),
                                                                 bi.getDataType());
                                                 distFValues
                                                         .add(nVal
                                                                 + SolrServiceImpl.FILTER_SEPARATOR
                                                                 + var
                                                                 + SolrServiceImpl.AUTHORITY_SEPARATOR
-                                                                + values[x].authority);
+                                                                + values.get(x).getAuthority());
                                                 distValuesForAC.add(var);
                                             }
                                         }
@@ -289,15 +269,15 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
                                         // value
                                         String nVal = OrderFormat
                                                 .makeSortString(
-                                                        values[x].value,
-                                                        values[x].language,
+                                                        values.get(x).getValue(),
+                                                        values.get(x).getLanguage(),
                                                         bi.getDataType());
                                         distFValues
                                                 .add(nVal
                                                         + SolrServiceImpl.FILTER_SEPARATOR
-                                                        + values[x].value);
-                                        distFVal.add(values[x].value);
-                                        distValuesForAC.add(values[x].value);
+                                                        + values.get(x).getValue());
+                                        distFVal.add(values.get(x).getValue());
+                                        distValuesForAC.add(values.get(x).getValue());
                                     }
                                 }
                             }
@@ -330,12 +310,12 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
         {
             for (SortOption so : SortOption.getSortOptions())
             {
-                Metadatum[] dcvalue = item.getMetadataByMetadataString(so.getMetadata());
-                if (dcvalue != null && dcvalue.length > 0)
+                List<MetadataValue> dcvalue = itemService.getMetadataByMetadataString(item, so.getMetadata());
+                if (dcvalue != null && dcvalue.size() > 0)
                 {
                     String nValue = OrderFormat
-                            .makeSortString(dcvalue[0].value,
-                                    dcvalue[0].language, so.getType());
+                            .makeSortString(dcvalue.get(0).getValue(),
+                                    dcvalue.get(0).getLanguage(), so.getType());
                     doc.addField("bi_sort_" + so.getNumber() + "_sort", nValue);
                 }
             }
@@ -348,22 +328,22 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
     }
 
     @Override
-    public void deleteByItemID(String table, int itemID) throws BrowseException
+    public void deleteByItemID(String table, UUID itemID) throws BrowseException
     {
     }
 
     @Override
-    public void deleteCommunityMappings(int itemID) throws BrowseException
+    public void deleteCommunityMappings(UUID itemID) throws BrowseException
     {
     }
 
     @Override
-    public void updateCommunityMappings(int itemID) throws BrowseException
+    public void updateCommunityMappings(UUID itemID) throws BrowseException
     {
     }
 
     @Override
-    public void insertIndex(String table, int itemID, Map sortCols)
+    public void insertIndex(String table, UUID itemID, Map sortCols)
             throws BrowseException
     {
 		// this is required to be sure that communities2item will be cleaned
@@ -372,7 +352,7 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
     }
 
     @Override
-    public boolean updateIndex(String table, int itemID, Map sortCols)
+    public boolean updateIndex(String table, UUID itemID, Map sortCols)
             throws BrowseException
     {
         return false;
@@ -470,7 +450,8 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
         return INFO_NOSQL_TO_RUN;
     }
 
-    public MappingResults updateDistinctMappings(String table, int itemID,
+    @Override
+    public MappingResults updateDistinctMappings(String table, UUID itemID,
             Set<Integer> distinctIDs) throws BrowseException
     {
         return new MappingResults()
@@ -503,10 +484,10 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
     }
 
     @Override
-    public List<Integer> deleteMappingsByItemID(String mapTable, int itemID)
+    public List<Integer> deleteMappingsByItemID(String mapTable, UUID itemID)
             throws BrowseException
     {
-        return new ArrayList<Integer>();
+        return new ArrayList<>();
     }
 
     @Override

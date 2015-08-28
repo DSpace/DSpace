@@ -34,14 +34,14 @@ import javax.ws.rs.core.Response.Status;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.eperson.Group;
 import org.dspace.rest.common.Bitstream;
 import org.dspace.rest.common.ResourcePolicy;
 import org.dspace.rest.exceptions.ContextException;
-import org.dspace.storage.bitstore.BitstreamStorageManager;
+import org.dspace.storage.bitstore.BitstreamStorageServiceImpl;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.usage.UsageEvent;
@@ -225,7 +225,7 @@ public class BitstreamResource extends Resource
             // TODO If bitstream doesn't exist, throws exception.
             for (int i = offset; (i < (offset + limit)) && (i < dspaceBitstreams.length); i++)
             {
-                if (AuthorizeManager.authorizeActionBoolean(context, dspaceBitstreams[i], org.dspace.core.Constants.READ))
+                if (AuthorizeServiceImpl.authorizeActionBoolean(context, dspaceBitstreams[i], org.dspace.core.Constants.READ))
                 {
                     if (dspaceBitstreams[i].getParentObject() != null)
                     { // To eliminate bitstreams which cause exception, because of
@@ -542,7 +542,7 @@ public class BitstreamResource extends Resource
                     headers, request, context);
 
             log.trace("Creating new bitstream.");
-            int newBitstreamId = BitstreamStorageManager.store(context, is);
+            int newBitstreamId = BitstreamStorageServiceImpl.store(context, is);
 
             log.trace("Looking for table rows of bitstreams.");
             TableRow originalBitstreamRow = DatabaseManager.find(context, "Bitstream", bitstreamId);
@@ -557,7 +557,7 @@ public class BitstreamResource extends Resource
             bitstream.setColumn("size_bytes", size_bytes);
 
             DatabaseManager.update(context, originalBitstreamRow);
-            BitstreamStorageManager.delete(context, newBitstreamId);
+            BitstreamStorageServiceImpl.delete(context, newBitstreamId);
 
             context.complete();
 
@@ -807,7 +807,7 @@ public class BitstreamResource extends Resource
                 log.warn("Bitstream(id=" + id + ") was not found!");
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
-            else if (!AuthorizeManager.authorizeActionBoolean(context, bitstream, action))
+            else if (!AuthorizeServiceImpl.authorizeActionBoolean(context, bitstream, action))
             {
                 context.abort();
                 if (context.getCurrentUser() != null)

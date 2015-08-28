@@ -29,6 +29,9 @@ import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.app.xmlui.wing.element.TextArea;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.MetadataFieldService;
+import org.dspace.content.service.MetadataSchemaService;
 
 /**
  * Edit a metadata schema by: listing all the existing fields in
@@ -102,7 +105,10 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 		message("xmlui.administrative.registries.EditMetadataSchema.error_qualifier_tolong");	
 	private static final Message T_error_qualifier_badchar =
 		message("xmlui.administrative.registries.EditMetadataSchema.error_qualifier_badchar");	
-	
+
+	protected MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
+	protected MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
+
 	
 	public void addPageMeta(PageMeta pageMeta) throws WingException
     {
@@ -119,8 +125,8 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 		int schemaID = parameters.getParameterAsInteger("schemaID",-1);
 		int updateID = parameters.getParameterAsInteger("updateID",-1);
 		int highlightID = parameters.getParameterAsInteger("highlightID",-1);
-		MetadataSchema schema = MetadataSchema.find(context,schemaID);
-		MetadataField[] fields = MetadataField.findAllInSchema(context, schemaID);
+		MetadataSchema schema = metadataSchemaService.find(context,schemaID);
+		java.util.List<MetadataField> fields = metadataFieldService.findAllInSchema(context, schema);
 		String schemaName = schema.getName();
 		String schemaNamespace = schema.getNamespace();
 		
@@ -159,7 +165,7 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 		Division existingFields = main.addDivision("metadata-schema-edit-existing-fields");
 		existingFields.setHead(T_head2);
 		
-		Table table = existingFields.addTable("metadata-schema-edit-existing-fields", fields.length+1, 5);
+		Table table = existingFields.addTable("metadata-schema-edit-existing-fields", fields.size()+1, 5);
 		
 		Row header = table.addRow(Row.ROLE_HEADER);
 		header.addCellContent(T_column1);
@@ -208,7 +214,7 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 			row.addCell().addContent(fieldScopeNote);
 		}
 		
-		if (fields.length == 0)
+		if (fields.size() == 0)
 		{
 			// No fields, let the user know.
 			table.addRow().addCell(1,4).addHighlight("italic").addContent(T_empty);
@@ -219,7 +225,7 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 			// Only show the actions if there are fields available to perform them on.
 			Para actions = main.addPara();
 			actions.addButton("submit_delete").setValue(T_submit_delete);
-			if (MetadataSchema.findAll(context).length > 1)
+			if (metadataSchemaService.findAll(context).size() > 1)
             {
                 actions.addButton("submit_move").setValue(T_submit_move);
             }
@@ -287,7 +293,7 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 	public void addUpdateFieldForm(Division div, String schemaName, int fieldID, java.util.List<String> errors) throws WingException, SQLException
 	{
 		
-		MetadataField field = MetadataField.find(context, fieldID);
+		MetadataField field = metadataFieldService.find(context, fieldID);
 		
 		Request request = ObjectModelHelper.getRequest(objectModel);
 		String elementValue = request.getParameter("updateElement");

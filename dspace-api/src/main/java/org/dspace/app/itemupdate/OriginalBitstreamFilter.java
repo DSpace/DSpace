@@ -8,9 +8,11 @@
 package org.dspace.app.itemupdate;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
+import org.dspace.content.BundleBitstream;
 
 /** 
  * 		Filter all bitstreams in the ORIGINAL bundle
@@ -31,15 +33,17 @@ public class OriginalBitstreamFilter extends BitstreamFilterByBundleName
 	 *  
 	 *  @throws BitstreamFilterException
 	 */
-	public boolean accept(Bitstream bitstream) 
+	@Override
+    public boolean accept(Bitstream bitstream)
 	throws BitstreamFilterException
 	{		
 		try
 		{
-			Bundle[] bundles = bitstream.getBundles();
-			for (Bundle b : bundles)
+			List<BundleBitstream> bundles = bitstream.getBundles();
+			for (BundleBitstream bundleBitstream : bundles)
 			{
-				if (b.getName().equals("ORIGINAL"))
+                Bundle bundle = bundleBitstream.getBundle();
+                if (bundle.getName().equals("ORIGINAL"))
 				{
 					return true;
 				}

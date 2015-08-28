@@ -16,9 +16,12 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 
@@ -43,14 +46,17 @@ public class SubmissionLookupUtils
     private static final Pattern converterPattern = Pattern
             .compile(".*\\((.*)\\)");
 
+    protected static final MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
+    protected static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
     public static LookupProvidersCheck getProvidersCheck(Context context,
             Item item, String dcSchema, String dcElement, String dcQualifier)
     {
         try
         {
             LookupProvidersCheck check = new LookupProvidersCheck();
-            MetadataSchema[] schemas = MetadataSchema.findAll(context);
-            Metadatum[] values = item.getMetadata(dcSchema, dcElement,
+            List<MetadataSchema> schemas = metadataSchemaService.findAll(context);
+            List<MetadataValue> values = itemService.getMetadata(item, dcSchema, dcElement,
                     dcQualifier, Item.ANY);
 
             for (MetadataSchema schema : schemas)
@@ -59,24 +65,24 @@ public class SubmissionLookupUtils
                 if (schema.getNamespace().startsWith(
                         SubmissionLookupService.SL_NAMESPACE_PREFIX))
                 {
-                    Metadatum[] slCache = item.getMetadata(schema.getName(),
+                    List<MetadataValue> slCache = itemService.getMetadata(item, schema.getName(),
                             dcElement, dcQualifier, Item.ANY);
-                    if (slCache.length == 0)
+                    if (slCache.size() == 0)
                         continue;
 
-                    if (slCache.length != values.length)
+                    if (slCache.size() != values.size())
                     {
                         error = true;
                     }
                     else
                     {
-                        for (int idx = 0; idx < values.length; idx++)
+                        for (int idx = 0; idx < values.size(); idx++)
                         {
-                            Metadatum v = values[idx];
-                            Metadatum sl = slCache[idx];
+                            MetadataValue v = values.get(idx);
+                            MetadataValue sl = slCache.get(idx);
                             // FIXME gestire authority e possibilita' multiple:
                             // match non sicuri, affiliation, etc.
-                            if (!v.value.equals(sl.value))
+                            if (!v.getValue().equals(sl.getValue()))
                             {
                                 error = true;
                                 break;

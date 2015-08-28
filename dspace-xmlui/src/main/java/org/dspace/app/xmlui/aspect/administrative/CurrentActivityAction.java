@@ -7,11 +7,7 @@
  */
 package org.dspace.app.xmlui.aspect.administrative;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 
 import javax.servlet.http.HttpSession;
 
@@ -160,7 +156,7 @@ public class CurrentActivityAction extends AbstractAction
     	private String sessionID;
     	
     	/** The eperson ID */
-    	private int epersonID = -1;
+    	private UUID epersonID = null;
     	
     	/** The url being viewed */
     	private String url;
@@ -216,7 +212,7 @@ public class CurrentActivityAction extends AbstractAction
     		return sessionID;
     	}
     	
-    	public int getEPersonID()
+    	public UUID getEPersonID()
     	{
     		return epersonID;
     	}
@@ -246,7 +242,7 @@ public class CurrentActivityAction extends AbstractAction
     	 */
     	public boolean isAnonymous()
     	{
-    		return (epersonID == -1);
+    		return (epersonID == null);
     	}
     	
     	/**

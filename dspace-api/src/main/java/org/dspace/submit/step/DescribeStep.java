@@ -25,16 +25,12 @@ import org.dspace.app.util.DCInput;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Collection;
-import org.dspace.content.DCDate;
-import org.dspace.content.DCPersonName;
-import org.dspace.content.DCSeriesNumber;
-import org.dspace.content.Metadatum;
-import org.dspace.content.Item;
-import org.dspace.content.MetadataField;
-import org.dspace.content.authority.MetadataAuthorityManager;
-import org.dspace.content.authority.ChoiceAuthorityManager;
+import org.dspace.content.*;
 import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
+import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.content.authority.service.MetadataAuthorityService;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.submit.AbstractProcessingStep;
@@ -80,11 +76,17 @@ public class DescribeStep extends AbstractProcessingStep
     // the metadata language qualifier
     public static final String LANGUAGE_QUALIFIER = getDefaultLanguageQualifier();
 
+    protected final ChoiceAuthorityService choiceAuthorityService;
+    protected final MetadataAuthorityService metadataAuthorityService;
+
+
     /** Constructor */
     public DescribeStep() throws ServletException
     {
         //load the DCInputsReader
         getInputsReader();
+        metadataAuthorityService = ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
+        choiceAuthorityService = ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
     }
 
    
@@ -112,6 +114,7 @@ public class DescribeStep extends AbstractProcessingStep
      *         doPostProcessing() below! (if STATUS_COMPLETE or 0 is returned,
      *         no errors occurred!)
      */
+    @Override
     public int doProcessing(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo)
             throws ServletException, IOException, SQLException,
@@ -145,9 +148,9 @@ public class DescribeStep extends AbstractProcessingStep
 
         // Fetch the document type (dc.type)
         String documentType = "";
-        if( (item.getMetadataByMetadataString("dc.type") != null) && (item.getMetadataByMetadataString("dc.type").length >0) )
+        if( (itemService.getMetadataByMetadataString(item, "dc.type") != null) && (itemService.getMetadataByMetadataString(item, "dc.type").size() >0) )
         {
-            documentType = item.getMetadataByMetadataString("dc.type")[0].value;
+            documentType = itemService.getMetadataByMetadataString(item, "dc.type").get(0).getValue();
         }
         
         // Step 1:
@@ -170,13 +173,13 @@ public class DescribeStep extends AbstractProcessingStep
 		        for (int j = 0; j < pairs.size(); j += 2)
 		        {
 			        String qualifier = pairs.get(j+1);
-			        item.clearMetadata(inputs[i].getSchema(), inputs[i].getElement(), qualifier, Item.ANY);
+                    itemService.clearMetadata(context, item, inputs[i].getSchema(), inputs[i].getElement(), qualifier, Item.ANY);
 		        }
 	        }
 	        else
 	        {
 		        String qualifier = inputs[i].getQualifier();
-		        item.clearMetadata(inputs[i].getSchema(), inputs[i].getElement(), qualifier, Item.ANY);
+                itemService.clearMetadata(context, item, inputs[i].getSchema(), inputs[i].getElement(), qualifier, Item.ANY);
 	        }
         }
 
@@ -214,23 +217,22 @@ public class DescribeStep extends AbstractProcessingStep
                 fieldName = schema + "_" + element;
             }
 
-            String fieldKey = MetadataAuthorityManager.makeFieldKey(schema, element, qualifier);
-            ChoiceAuthorityManager cmgr = ChoiceAuthorityManager.getManager();
+            String fieldKey = metadataAuthorityService.makeFieldKey(schema, element, qualifier);
             String inputType = inputs[j].getInputType();
             if (inputType.equals("name"))
             {
-                readNames(request, item, schema, element, qualifier, inputs[j]
+                readNames(context, request, item, schema, element, qualifier, inputs[j]
                         .getRepeatable());
             }
             else if (inputType.equals("date"))
             {
-                readDate(request, item, schema, element, qualifier);
+                readDate(context, request, item, schema, element, qualifier);
             }
             // choice-controlled input with "select" presentation type is
             // always rendered as a dropdown menu
             else if (inputType.equals("dropdown") || inputType.equals("list") ||
-                     (cmgr.isChoicesConfigured(fieldKey) &&
-                      "select".equals(cmgr.getPresentation(fieldKey))))
+                     (choiceAuthorityService.isChoicesConfigured(fieldKey) &&
+                      "select".equals(choiceAuthorityService.getPresentation(fieldKey))))
             {
                 String[] vals = request.getParameterValues(fieldName);
                 if (vals != null)
@@ -239,7 +241,7 @@ public class DescribeStep extends AbstractProcessingStep
                     {
                         if (!vals[z].equals(""))
                         {
-                            item.addMetadata(schema, element, qualifier, LANGUAGE_QUALIFIER,
+                            itemService.addMetadata(context, item, schema, element, qualifier, LANGUAGE_QUALIFIER,
                                     vals[z]);
                         }
                     }
@@ -247,7 +249,7 @@ public class DescribeStep extends AbstractProcessingStep
             }
             else if (inputType.equals("series"))
             {
-                readSeriesNumbers(request, item, schema, element, qualifier,
+                readSeriesNumbers(context, request, item, schema, element, qualifier,
                         inputs[j].getRepeatable());
             }
             else if (inputType.equals("qualdrop_value"))
@@ -268,7 +270,7 @@ public class DescribeStep extends AbstractProcessingStep
                             + element + "_remove_" + z)
                             && !thisVal.equals(""))
                     {
-                        item.addMetadata(schema, element, thisQual, null,
+                        itemService.addMetadata(context, item, schema, element, thisQual, null,
                                 thisVal);
                     }
                 }
@@ -277,7 +279,7 @@ public class DescribeStep extends AbstractProcessingStep
                     || (inputType.equals("twobox"))
                     || (inputType.equals("textarea")))
             {
-                readText(request, item, schema, element, qualifier, inputs[j]
+                readText(context, request, item, schema, element, qualifier, inputs[j]
                         .getRepeatable(), LANGUAGE_QUALIFIER);
             }
             else
@@ -324,10 +326,10 @@ public class DescribeStep extends AbstractProcessingStep
                 {
                     qualifier = Item.ANY;
                 }
-                Metadatum[] values = item.getMetadata(inputs[i].getSchema(),
+                List<MetadataValue> values = itemService.getMetadata(item, inputs[i].getSchema(),
                         inputs[i].getElement(), qualifier, Item.ANY);
 
-                if ((inputs[i].isRequired() && values.length == 0) &&
+                if ((inputs[i].isRequired() && values.size() == 0) &&
                      inputs[i].isVisible(subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE : DCInput.SUBMISSION_SCOPE))
                 {
                     // since this field is missing add to list of error fields
@@ -338,10 +340,10 @@ public class DescribeStep extends AbstractProcessingStep
 
         // Step 4:
         // Save changes to database
-        subInfo.getSubmissionItem().update();
+        ContentServiceFactory.getInstance().getInProgressSubmissionService(subInfo.getSubmissionItem()).update(context, subInfo.getSubmissionItem());
 
         // commit changes
-        context.commit();
+        context.dispatchEvents();
 
         // check for request for more input fields, first
         if (moreInput)
@@ -382,6 +384,7 @@ public class DescribeStep extends AbstractProcessingStep
      *
      * @return the number of pages in this step
      */
+    @Override
     public int getNumberOfPages(HttpServletRequest request,
             SubmissionInfo subInfo) throws ServletException
     {
@@ -507,14 +510,12 @@ public class DescribeStep extends AbstractProcessingStep
      * @param repeated
      *            set to true if the field is repeatable on the form
      */
-    protected void readNames(HttpServletRequest request, Item item,
-            String schema, String element, String qualifier, boolean repeated)
-    {
-        String metadataField = MetadataField
-                .formKey(schema, element, qualifier);
+    protected void readNames(Context context, HttpServletRequest request, Item item,
+            String schema, String element, String qualifier, boolean repeated) throws SQLException {
+        String metadataField = metadataFieldService.findByElement(context, schema, element, qualifier).toString();
 
-        String fieldKey = MetadataAuthorityManager.makeFieldKey(schema, element, qualifier);
-        boolean isAuthorityControlled = MetadataAuthorityManager.getManager().isAuthorityControlled(fieldKey);
+        String fieldKey = metadataAuthorityService.makeFieldKey(schema, element, qualifier);
+        boolean isAuthorityControlled = metadataAuthorityService.isAuthorityControlled(fieldKey);
 
         // Names to add
         List<String> firsts = new LinkedList<String>();
@@ -621,7 +622,7 @@ public class DescribeStep extends AbstractProcessingStep
                 {
                     String authKey = auths.size() > i ? auths.get(i) : null;
                     String sconf = (authKey != null && confs.size() > i) ? confs.get(i) : null;
-                    if (MetadataAuthorityManager.getManager().isAuthorityRequired(fieldKey) &&
+                    if (metadataAuthorityService.isAuthorityRequired(fieldKey) &&
                         (authKey == null || authKey.length() == 0))
                     {
                         log.warn("Skipping value of "+metadataField+" because the required Authority key is missing or empty.");
@@ -629,7 +630,7 @@ public class DescribeStep extends AbstractProcessingStep
                     }
                     else
                     {
-                        item.addMetadata(schema, element, qualifier, null,
+                        itemService.addMetadata(context, item, schema, element, qualifier, null,
                                 new DCPersonName(l, f).toString(), authKey,
                                 (sconf != null && sconf.length() > 0) ?
                                         Choices.getConfidenceValue(sconf) : Choices.CF_ACCEPTED);
@@ -637,7 +638,7 @@ public class DescribeStep extends AbstractProcessingStep
                 }
                 else
                 {
-                    item.addMetadata(schema, element, qualifier, null,
+                    itemService.addMetadata(context, item, schema, element, qualifier, null,
                             new DCPersonName(l, f).toString());
                 }
             }
@@ -676,16 +677,14 @@ public class DescribeStep extends AbstractProcessingStep
      * @param lang
      *            language to set (ISO code)
      */
-    protected void readText(HttpServletRequest request, Item item, String schema,
-            String element, String qualifier, boolean repeated, String lang)
-    {
+    protected void readText(Context context, HttpServletRequest request, Item item, String schema,
+            String element, String qualifier, boolean repeated, String lang) throws SQLException {
         // FIXME: Of course, language should be part of form, or determined
         // some other way
-        String metadataField = MetadataField
-                .formKey(schema, element, qualifier);
+        String metadataField = metadataFieldService.findByElement(context, schema, element, qualifier).toString();
 
-        String fieldKey = MetadataAuthorityManager.makeFieldKey(schema, element, qualifier);
-        boolean isAuthorityControlled = MetadataAuthorityManager.getManager().isAuthorityControlled(fieldKey);
+        String fieldKey = metadataAuthorityService.makeFieldKey(schema, element, qualifier);
+        boolean isAuthorityControlled = metadataAuthorityService.isAuthorityControlled(fieldKey);
 
         // Values to add
         List<String> vals = null;
@@ -755,22 +754,22 @@ public class DescribeStep extends AbstractProcessingStep
                 {
                     String authKey = auths.size() > i ? auths.get(i) : null;
                     String sconf = (authKey != null && confs.size() > i) ? confs.get(i) : null;
-                    if (MetadataAuthorityManager.getManager().isAuthorityRequired(fieldKey) &&
-                        (authKey == null || authKey.length() == 0))
+                    if (metadataAuthorityService.isAuthorityRequired(fieldKey) &&
+                            (authKey == null || authKey.length() == 0))
                     {
                         log.warn("Skipping value of "+metadataField+" because the required Authority key is missing or empty.");
                         addErrorField(request, metadataField);
                     }
                     else
                     {
-                        item.addMetadata(schema, element, qualifier, lang, s,
+                        itemService.addMetadata(context, item, schema, element, qualifier, lang, s,
                                 authKey, (sconf != null && sconf.length() > 0) ?
                                         Choices.getConfidenceValue(sconf) : Choices.CF_ACCEPTED);
                     }
                 }
                 else
                 {
-                    item.addMetadata(schema, element, qualifier, lang, s);
+                    itemService.addMetadata(context, item, schema, element, qualifier, lang, s);
                 }
             }
         }
@@ -797,11 +796,10 @@ public class DescribeStep extends AbstractProcessingStep
      *            the metadata qualifier, or null if unqualified
      * @throws SQLException
      */
-    protected void readDate(HttpServletRequest request, Item item, String schema,
+    protected void readDate(Context context, HttpServletRequest request, Item item, String schema,
             String element, String qualifier) throws SQLException
     {
-        String metadataField = MetadataField
-                .formKey(schema, element, qualifier);
+        String metadataField = metadataFieldService.findByElement(context, schema, element, qualifier).toString();
 
         int year = Util.getIntParameter(request, metadataField + "_year");
         int month = Util.getIntParameter(request, metadataField + "_month");
@@ -817,7 +815,7 @@ public class DescribeStep extends AbstractProcessingStep
         if (year > 0)
         {
             // Only put in date if there is one!
-            item.addMetadata(schema, element, qualifier, null, d.toString());
+            itemService.addMetadata(context, item, schema, element, qualifier, null, d.toString());
         }
     }
 
@@ -855,11 +853,9 @@ public class DescribeStep extends AbstractProcessingStep
      * @param repeated
      *            set to true if the field is repeatable on the form
      */
-    protected void readSeriesNumbers(HttpServletRequest request, Item item,
-            String schema, String element, String qualifier, boolean repeated)
-    {
-        String metadataField = MetadataField
-                .formKey(schema, element, qualifier);
+    protected void readSeriesNumbers(Context context, HttpServletRequest request, Item item,
+            String schema, String element, String qualifier, boolean repeated) throws SQLException {
+        String metadataField = metadataFieldService.findByElement(context, schema, element, qualifier).toString();
 
         // Names to add
         List<String> series = new LinkedList<String>();
@@ -917,7 +913,7 @@ public class DescribeStep extends AbstractProcessingStep
             // Only add non-empty
             if (!s.equals("") || !n.equals(""))
             {
-                item.addMetadata(schema, element, qualifier, null,
+                itemService.addMetadata(context, item, schema, element, qualifier, null,
                         new DCSeriesNumber(s, n).toString());
             }
         }

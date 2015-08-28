@@ -8,6 +8,7 @@
 package org.dspace.app.xmlui.aspect.administrative.item;
 
 import java.sql.SQLException;
+import java.util.UUID;
 
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
@@ -20,6 +21,9 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 
 import org.dspace.app.util.CollectionDropDown;
@@ -46,6 +50,9 @@ public class MoveItemForm extends AbstractDSpaceTransformer {
     private static final Message T_submit_inherit = message("xmlui.administrative.item.MoveItemForm.inherit_policies");
     private static final Message T_submit_inherit_help = message("xmlui.administrative.item.MoveItemForm.inherit_policies_help");
 
+    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
 
 	public void addPageMeta(PageMeta pageMeta) throws WingException
 	{
@@ -60,14 +67,14 @@ public class MoveItemForm extends AbstractDSpaceTransformer {
 	public void addBody(Body body) throws WingException, SQLException 
 	{
         // Get our parameters and state
-        int itemID = parameters.getParameterAsInteger("itemID",-1);
-        Item item = Item.find(context, itemID);
+        UUID itemID = UUID.fromString(parameters.getParameter("itemID", null));
+        Item item = itemService.find(context, itemID);
         
         // DIVISION: Main
         Division main = body.addInteractiveDivision("move-item", contextPath+"/admin/item", Division.METHOD_POST, "primary administrative item");
         main.setHead(T_head1.parameterize(item.getHandle()));
 
-        Collection[] collections = Collection.findAuthorizedOptimized(context, Constants.ADD);
+        java.util.List<Collection> collections = collectionService.findAuthorizedOptimized(context, Constants.ADD);
 
         List list = main.addList("select-collection", List.TYPE_FORM);
         Select select = list.addItem().addSelect("collectionID");
@@ -81,16 +88,16 @@ public class MoveItemForm extends AbstractDSpaceTransformer {
         
         for (Collection collection : collections)
         {
-            String name = collection.getMetadata("name");
+            String name = collection.getName();
             if (name.length() > 50)
             {
                 name = name.substring(0, 47) + "...";
             }
 
             // Only add the item if it isn't already the owner
-            if (!item.isOwningCollection(collection))
+            if (!itemService.isOwningCollection(item, collection))
             {
-                select.addOption(collection.equals(owningCollection), collection.getID(), CollectionDropDown.collectionPath(collection));
+                select.addOption(collection.equals(owningCollection), collection.getID().toString(), CollectionDropDown.collectionPath(collection));
             }
         }
         

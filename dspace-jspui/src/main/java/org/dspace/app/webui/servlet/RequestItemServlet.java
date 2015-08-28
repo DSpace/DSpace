@@ -21,8 +21,8 @@ import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.core.*;
 import org.dspace.eperson.EPerson;
-import org.dspace.handle.HandleManager;
-import org.dspace.storage.bitstore.BitstreamStorageManager;
+import org.dspace.handle.HandleServiceImpl;
+import org.dspace.storage.bitstore.BitstreamStorageServiceImpl;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.utils.DSpace;
@@ -142,7 +142,7 @@ public class RequestItemServlet extends DSpaceServlet
         Item item = null;
         if (StringUtils.isNotBlank(handle))
         {
-            item = (Item) HandleManager.resolveToObject(context, handle);
+            item = (Item) HandleServiceImpl.resolveToObject(context, handle);
             
         }
         if (item == null)
@@ -218,8 +218,8 @@ public class RequestItemServlet extends DSpaceServlet
 				email.addArgument(allfiles ? I18nUtil
 						.getMessage("itemRequest.all") : Bitstream.find(
 						context, Integer.parseInt(bitstream_id)).getName());
-				email.addArgument(HandleManager.getCanonicalForm(item
-						.getHandle()));
+				email.addArgument(HandleServiceImpl.getCanonicalForm(item
+                        .getHandle()));
 				email.addArgument(title); // request item title
 				email.addArgument(coment); // message
 				email.addArgument(RequestItemManager.getLinkTokenEmail(context,
@@ -336,7 +336,7 @@ public class RequestItemServlet extends DSpaceServlet
 
 			Object[] args = new String[]{
 						requestItem.getStringColumn("request_name"),
-						HandleManager.getCanonicalForm(item.getHandle()), // User
+						HandleServiceImpl.getCanonicalForm(item.getHandle()), // User
 						title, // request item title
 						submiter.getFullName(), // # submmiter name
 						submiter.getEmail() // # submmiter email
@@ -405,11 +405,11 @@ public class RequestItemServlet extends DSpaceServlet
 											&& RequestItemManager.isRestricted(
 													context, bitstreams[k])) {
 										email.addAttachment(
-												BitstreamStorageManager
+												BitstreamStorageServiceImpl
 														.retrieve(
-																context,
-																bitstreams[k]
-																		.getID()),
+                                                                context,
+                                                                bitstreams[k]
+                                                                        .getID()),
 												bitstreams[k].getName(),
 												bitstreams[k].getFormat()
 														.getMIMEType());
@@ -419,9 +419,9 @@ public class RequestItemServlet extends DSpaceServlet
 						} else {
 							Bitstream bit = Bitstream.find(context,
 									requestItem.getIntColumn("bitstream_id"));
-							email.addAttachment(BitstreamStorageManager
+							email.addAttachment(BitstreamStorageServiceImpl
 									.retrieve(context, requestItem
-											.getIntColumn("bitstream_id")), bit
+                                            .getIntColumn("bitstream_id")), bit
 									.getName(), bit.getFormat().getMIMEType());
 						}
 					}
@@ -495,8 +495,8 @@ public class RequestItemServlet extends DSpaceServlet
 
 				email.addArgument(Bitstream.find(context,
 						requestItem.getIntColumn("bitstream_id")).getName());
-				email.addArgument(HandleManager.getCanonicalForm(item
-						.getHandle()));
+				email.addArgument(HandleServiceImpl.getCanonicalForm(item
+                        .getHandle()));
 				email.addArgument(requestItem.getStringColumn("token"));
 				email.addArgument(name);
 				email.addArgument(mail);

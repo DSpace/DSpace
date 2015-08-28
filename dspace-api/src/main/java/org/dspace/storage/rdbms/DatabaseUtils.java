@@ -17,13 +17,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Locale;
 import javax.sql.DataSource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.core.DBConnection;
 import org.dspace.discovery.IndexingService;
 import org.dspace.discovery.SearchServiceException;
+import org.dspace.utils.DSpace;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
 import org.flywaydb.core.api.MigrationInfo;
@@ -60,6 +63,10 @@ public class DatabaseUtils
                             File.separator + "conf" +
                             File.separator + "reindex.flag";
 
+    public static final String DBMS_POSTGRES="postgres";
+    public static final String DBMS_ORACLE="oracle";
+    public static final String DBMS_H2="h2";
+
     /**
      * Commandline tools for managing database changes, etc.
      * @param argv
@@ -80,45 +87,24 @@ public class DatabaseUtils
             // Call initDataSource to JUST initialize the dataSource WITHOUT fully
             // initializing the DatabaseManager itself. This ensures we do NOT
             // immediately run our Flyway DB migrations on this database
-            DataSource dataSource = DatabaseManager.initDataSource();
+            DBConnection dbConnection = new DSpace().getSingletonService(DBConnection.class);
+            DataSource dataSource = dbConnection.getDataSource();
+            DatabaseConfigVO databaseConfig = dbConnection.getDatabaseConfig();
 
             // Get configured DB URL for reporting below
-            String url = ConfigurationManager.getProperty("db.url");
+            String url = databaseConfig.getDatabaseUrl();
+
+
 
             // Point Flyway API to our database
             Flyway flyway = setupFlyway(dataSource);
 
-            // "test" = Test Database Connection
-            if(argv[0].equalsIgnoreCase("test"))
+            if(argv[0].equalsIgnoreCase("migrate"))
             {
-                // Try to connect to the database
-                System.out.println("\nAttempting to connect to database using these configurations: ");
-                System.out.println(" - URL: " + url);
-                System.out.println(" - Driver: " + ConfigurationManager.getProperty("db.driver"));
-                System.out.println(" - Username: " + ConfigurationManager.getProperty("db.username"));
-                System.out.println(" - Password: [hidden]");
-                System.out.println(" - Schema: " + ConfigurationManager.getProperty("db.schema"));
-                System.out.println("\nTesting connection...");
-                try
-                {
-                    // Just do a high level test by getting our configured DataSource and attempting to connect to it
-                    // NOTE: We specifically do NOT call DatabaseManager.getConnection() because that will attempt
-                    // a full initialization of DatabaseManager & also cause database migrations/upgrades to occur
-                    Connection connection = dataSource.getConnection();
-                    connection.close();
+                try (Connection connection = dataSource.getConnection()) {
                 }
-                catch (SQLException sqle)
-                {
-                    System.err.println("\nError: ");
-                    System.err.println(" - " + sqle);
-                    System.err.println("\nPlease see the DSpace documentation for assistance.\n");
-                    System.exit(1);
-                }
-
-                System.out.println("Connected successfully!\n");
-            }
-            // "info" = Basic Database Information
-            else if(argv[0].equalsIgnoreCase("info"))
+            }else
+            if(argv[0].equalsIgnoreCase("info"))
             {
                 // Get basic Database info
                 Connection connection = dataSource.getConnection();
@@ -147,50 +133,6 @@ public class DatabaseUtils
                     }
                 }
                 connection.close();
-            }
-            // "migrate" = Manually run any outstanding Database migrations (if any)
-            else if(argv[0].equalsIgnoreCase("migrate"))
-            {
-                System.out.println("\nDatabase URL: " + url);
-
-                // "migrate" allows for an OPTIONAL second argument:
-                //    - "ignored" = Also run any previously "ignored" migrations during the migration
-                //    - [version] = ONLY run migrations up to a specific DSpace version (ONLY FOR TESTING)
-                if(argv.length==2)
-                {
-                    if(argv[1].equalsIgnoreCase("ignored"))
-                    {
-                        System.out.println("Migrating database to latest version AND running previously \"Ignored\" migrations... (Check logs for details)");
-                        Connection connection = dataSource.getConnection();
-                        // Update the database to latest version, but set "outOfOrder=true"
-                        // This will ensure any old migrations in the "ignored" state are now run
-                        updateDatabase(dataSource, connection, null, true);
-                        connection.close();
-                    }
-                    else
-                    {
-                        // Otherwise, we assume "argv[1]" is a valid migration version number
-                        // This is only for testing! Never specify for Production!
-                        System.out.println("Migrating database ONLY to version " + argv[1] + " ... (Check logs for details)");
-                        System.out.println("\nWARNING: It is highly likely you will see errors in your logs when the Metadata");
-                        System.out.println("or Bitstream Format Registry auto-update. This is because you are attempting to");
-                        System.out.println("use an OLD version " + argv[1] + " Database with a newer DSpace API. NEVER do this in a");
-                        System.out.println("PRODUCTION scenario. The resulting old DB is only useful for migration testing.\n");
-                        Connection connection = dataSource.getConnection();
-                        // Update the database, to the version specified.
-                        updateDatabase(dataSource, connection, argv[1], false);
-                        connection.close();
-                    }
-                }
-                else
-                {
-                    System.out.println("Migrating database to latest version... (Check logs for details)");
-                    // NOTE: This looks odd, but all we really need to do is ensure the
-                    // DatabaseManager auto-initializes. It'll take care of the migration itself.
-                    // Asking for our DB Name will ensure DatabaseManager.initialize() is called.
-                    DatabaseManager.getDbName();
-                }
-                System.out.println("Done.");
             }
             // "repair" = Run Flyway repair script
             else if(argv[0].equalsIgnoreCase("repair"))
@@ -223,10 +165,8 @@ public class DatabaseUtils
             {
                 System.out.println("\nUsage: database [action]");
                 System.out.println("Valid actions: 'test', 'info', 'migrate', 'repair' or 'clean'");
-                System.out.println(" - test    = Test database connection is OK");
                 System.out.println(" - info    = Describe basic info about database, including migrations run");
                 System.out.println(" - migrate = Migrate the Database to the latest version");
-                System.out.println("             Optionally, specify \"ignored\" to also run \"Ignored\" migrations");
                 System.out.println(" - repair  = Attempt to repair any previously failed database migrations");
                 System.out.println(" - clean   = DESTROY all data and tables in Database (WARNING there is no going back!)");
                 System.out.println("");
@@ -265,9 +205,7 @@ public class DatabaseUtils
 
                 // Migration scripts are based on DBMS Keyword (see full path below)
                 DatabaseMetaData meta = connection.getMetaData();
-                // NOTE: we use "findDbKeyword()" here as it won't cause
-                // DatabaseManager.initialize() to be called (which in turn auto-calls Flyway)
-                String dbType = DatabaseManager.findDbKeyword(meta);
+                String dbType = findDbKeyword(meta);
                 connection.close();
 
                 // Determine location(s) where Flyway will load all DB migrations
@@ -276,7 +214,7 @@ public class DatabaseUtils
                 // First, add location for custom SQL migrations, if any (based on DB Type)
                 // e.g. [dspace.dir]/etc/[dbtype]/
                 // (We skip this for H2 as it's only used for unit testing)
-                if(!dbType.equals(DatabaseManager.DBMS_H2))
+                if(!dbType.equals(DBMS_H2))
                 {
                     scriptLocations.add("filesystem:" + ConfigurationManager.getProperty("dspace.dir") +
                                         "/etc/" + dbType);
@@ -304,7 +242,7 @@ public class DatabaseUtils
                 // Set flyway callbacks (i.e. classes which are called post-DB migration and similar)
                 // In this situation, we have a Registry Updater that runs PRE-migration
                 // NOTE: DatabaseLegacyReindexer only indexes in Legacy Lucene & RDBMS indexes. It can be removed once those are obsolete.
-                flywaydb.setCallbacks(new DatabaseRegistryUpdater(), new DatabaseLegacyReindexer());
+//                flywaydb.setCallbacks(new DatabaseRegistryUpdater(), new DatabaseLegacyReindexer());
             }
             catch(SQLException e)
             {
@@ -458,12 +396,12 @@ public class DatabaseUtils
                 // Get info about which database type we are using
                 connection = dataSource.getConnection();
                 DatabaseMetaData meta = connection.getMetaData();
-                String dbKeyword = DatabaseManager.findDbKeyword(meta);
+                String dbKeyword = findDbKeyword(meta);
 
                 // If this is Oracle, the only way to entirely clean the database
                 // is to also purge the "Recyclebin". See:
                 // http://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_9018.htm
-                if(dbKeyword.equals(DatabaseManager.DBMS_ORACLE))
+                if(dbKeyword.equals(DBMS_ORACLE))
                 {
                     PreparedStatement statement = null;
                     try
@@ -760,11 +698,11 @@ public class DatabaseUtils
             sequenceName = canonicalize(connection, sequenceName);
 
             // Different database types store sequence information in different tables
-            String dbtype = DatabaseManager.findDbKeyword(connection.getMetaData());
+            String dbtype = findDbKeyword(connection.getMetaData());
             String sequenceSQL = null;
             switch(dbtype)
             {
-                case DatabaseManager.DBMS_POSTGRES:
+                case DBMS_POSTGRES:
                     // Default schema in PostgreSQL is "public"
                     if(schema == null)
                     {
@@ -779,12 +717,12 @@ public class DatabaseUtils
                     // We need to filter by schema in PostgreSQL
                     schemaFilter = true;
                     break;
-                case DatabaseManager.DBMS_ORACLE:
+                case DBMS_ORACLE:
                     // Oracle specific query for a sequence owned by our current DSpace user
                     // NOTE: No need to filter by schema for Oracle, as Schema = User
                     sequenceSQL = "SELECT COUNT(1) FROM user_sequences WHERE sequence_name=?";
                     break;
-                case DatabaseManager.DBMS_H2:
+                case DBMS_H2:
                     // In H2, sequences are listed in the "information_schema.sequences" table
                     // SEE: http://www.h2database.com/html/grammar.html#information_schema
                     sequenceSQL = "SELECT COUNT(1) " +
@@ -887,31 +825,25 @@ public class DatabaseUtils
     {
         String schema = null;
         DatabaseMetaData meta = connection.getMetaData();
-        
-        // Check the configured "db.schema" FIRST for the value configured there
-        schema = DatabaseManager.canonicalize(ConfigurationManager.getProperty("db.schema"));
-        
+
+        // Determine our DB type
+
         // If unspecified, determine "sane" defaults based on DB type
-        if(StringUtils.isBlank(schema))
+        String dbType = findDbKeyword(meta);
+        if (StringUtils.equals(dbType, DBMS_POSTGRES))
         {
-            String dbType = DatabaseManager.findDbKeyword(meta);
-        
-            if(dbType.equals(DatabaseManager.DBMS_POSTGRES))
-            {
-                // For PostgreSQL, the default schema is named "public"
-                // See: http://www.postgresql.org/docs/9.0/static/ddl-schemas.html
-                schema = "public";
-            }
-            else if (dbType.equals(DatabaseManager.DBMS_ORACLE))
-            {
-                // For Oracle, default schema is actually the user account
-                // See: http://stackoverflow.com/a/13341390
-                schema = meta.getUserName();
-            }
-            else
-                schema = null;
+            // For PostgreSQL, the default schema is named "public"
+            // See: http://www.postgresql.org/docs/9.0/static/ddl-schemas.html
+            schema = "public";
         }
-        
+        else if (StringUtils.equals(dbType, DBMS_ORACLE))
+        {
+            // Schema is actually the user account
+            // See: http://stackoverflow.com/a/13341390
+            schema = meta.getUserName();
+        }
+        else
+            schema = null;
         return schema;
     }
     
@@ -1104,4 +1036,28 @@ public class DatabaseUtils
             }
         }
     }
+
+    protected static String findDbKeyword(DatabaseMetaData meta)
+            throws SQLException
+    {
+        String prodName = meta.getDatabaseProductName();
+        String dbms_lc = prodName.toLowerCase(Locale.ROOT);
+        if (dbms_lc.contains("postgresql"))
+        {
+            return DBMS_POSTGRES;
+        }
+        else if (dbms_lc.contains("oracle"))
+        {
+            return DBMS_ORACLE;
+        }
+        else if (dbms_lc.contains("h2")) // Used for unit testing only
+        {
+            return DBMS_H2;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
 }

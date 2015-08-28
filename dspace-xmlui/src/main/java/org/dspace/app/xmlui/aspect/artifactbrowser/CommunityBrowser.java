@@ -38,6 +38,8 @@ import org.dspace.browse.ItemCounter;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CommunityService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.LogManager;
@@ -88,7 +90,9 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
     
     /** cached validity object */
     private SourceValidity validity;
-    
+
+    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+
     /**
      * Set the component up, pulling any configuration values from the sitemap
      * parameters.
@@ -127,7 +131,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
 	        try {
 	            DSpaceValidity validity = new DSpaceValidity();
 	            
-	            TreeNode root = buildTree(Community.findAllTop(context));
+	            TreeNode root = buildTree(communityService.findAllTop(context));
 	            
 	            Stack<TreeNode> stack = new Stack<TreeNode>();
 	            stack.push(root);
@@ -136,7 +140,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
 	            {
 	                TreeNode node = stack.pop();
 	                
-	                validity.add(node.getDSO());
+	                validity.add(context, node.getDSO());
 	                
 	                // If we are configured to use collection strengths (i.e. item counts) then include that number in the validity.
 	                boolean showCount = ConfigurationManager.getBooleanProperty("webui.strengths.show");
@@ -201,7 +205,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         division.setHead(T_head);
         division.addPara(T_select);
 
-        TreeNode root = buildTree(Community.findAllTop(context));
+        TreeNode root = buildTree(communityService.findAllTop(context));
         
         boolean full = ConfigurationManager.getBooleanProperty("xmlui.community-list.render.full", true);
         
@@ -283,11 +287,11 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         String name = null;
         if (dso instanceof Community)
         {
-            name = ((Community) dso).getMetadata("name");
+            name = ((Community) dso).getName();
         }
         else if (dso instanceof Collection)
         {
-            name = ((Collection) dso).getMetadata("name");
+            name = ((Collection) dso).getName();
         }
         
         String url = contextPath + "/handle/"+dso.getHandle();
@@ -303,7 +307,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         
             for (TreeNode collectionNode : collectionNodes)
             {
-                String collectionName = ((Collection) collectionNode.getDSO()).getMetadata("name");
+                String collectionName = ((Collection) collectionNode.getDSO()).getName();
                 String collectionUrl = contextPath + "/handle/"+collectionNode.getDSO().getHandle();
                 subList.addItemXref(collectionUrl, collectionName);
             }
@@ -343,7 +347,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
      * @param communities The root level communities
      * @return A root level node.
      */
-    private TreeNode buildTree(Community[] communities) throws SQLException
+    private TreeNode buildTree(java.util.List<Community> communities) throws SQLException
     {
         if (root != null)
         {

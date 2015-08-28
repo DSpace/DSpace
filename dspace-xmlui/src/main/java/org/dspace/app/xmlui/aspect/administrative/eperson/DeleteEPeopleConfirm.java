@@ -9,6 +9,7 @@ package org.dspace.app.xmlui.aspect.administrative.eperson;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
@@ -21,6 +22,8 @@ import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 
 /**
  * Present the user with a list of not-yet-but-soon-to-be-deleted-epeople.
@@ -62,7 +65,9 @@ public class DeleteEPeopleConfirm extends AbstractDSpaceTransformer
 	
 	private static final Message T_submit_cancel =
 		message("xmlui.general.cancel");
-	
+
+	protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+
 	
 	public void addPageMeta(PageMeta pageMeta) throws WingException
     {
@@ -80,7 +85,7 @@ public class DeleteEPeopleConfirm extends AbstractDSpaceTransformer
 		ArrayList<EPerson> epeople = new ArrayList<EPerson>();
 		for (String id : idsString.split(","))
 		{
-			EPerson person = EPerson.find(context,Integer.valueOf(id));
+			EPerson person = ePersonService.find(context, UUID.fromString(id));
 			epeople.add(person);
 		}
  
@@ -98,7 +103,7 @@ public class DeleteEPeopleConfirm extends AbstractDSpaceTransformer
     	for (EPerson eperson : epeople) 
     	{
     		Row row = table.addRow();
-    		row.addCell().addContent(eperson.getID());
+    		row.addCell().addContent(eperson.getID().toString());
         	row.addCell().addContent(eperson.getFullName());
         	row.addCell().addContent(eperson.getEmail());
 	    }

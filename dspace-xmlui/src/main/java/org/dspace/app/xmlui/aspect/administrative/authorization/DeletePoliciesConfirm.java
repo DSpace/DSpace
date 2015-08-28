@@ -20,6 +20,8 @@ import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.ResourcePolicyService;
 
 /**
  * @author Alexey Maslov
@@ -54,7 +56,8 @@ public class DeletePoliciesConfirm extends AbstractDSpaceTransformer
 		message("xmlui.general.delete");
 	private static final Message T_submit_cancel =
 		message("xmlui.general.cancel");
-	
+
+	protected ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
 	
 	public void addPageMeta(PageMeta pageMeta) throws WingException
     {
@@ -73,7 +76,7 @@ public class DeletePoliciesConfirm extends AbstractDSpaceTransformer
 		ArrayList<ResourcePolicy> policies = new ArrayList<ResourcePolicy>();
 		for (String id : idsString.split(","))
 		{
-			ResourcePolicy policy = ResourcePolicy.find(context,Integer.valueOf(id));
+			ResourcePolicy policy = resourcePolicyService.find(context,Integer.valueOf(id));
 			policies.add(policy);
 		}
  
@@ -92,7 +95,7 @@ public class DeletePoliciesConfirm extends AbstractDSpaceTransformer
     	{
     		Row row = table.addRow();
     		row.addCell().addContent(policy.getID());
-        	row.addCell().addContent(policy.getActionText());
+        	row.addCell().addContent(resourcePolicyService.getActionText(policy));
         	if (policy.getGroup() != null)
             {
                 row.addCell().addContent(policy.getGroup().getName());

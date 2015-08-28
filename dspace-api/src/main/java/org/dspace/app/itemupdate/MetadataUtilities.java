@@ -32,6 +32,10 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.commons.lang.StringUtils;
 import org.apache.xpath.XPathAPI;
 
+import org.dspace.content.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
+import org.dspace.core.Context;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -40,9 +44,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Metadatum;
-import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
 import org.dspace.core.ConfigurationManager;
 
 
@@ -56,7 +57,9 @@ import org.dspace.core.ConfigurationManager;
  *
  */
 public class MetadataUtilities {
-	
+
+    protected static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
     /**      
      * 
      *  Working around Item API to delete a value-specific Metadatum
@@ -72,32 +75,31 @@ public class MetadataUtilities {
      * 
      * @return true if metadata field is found with matching value and was deleted
      */
-    public static boolean deleteMetadataByValue(Item item, DtoMetadata dtom, boolean isLanguageStrict)
-    {   	
-    	Metadatum[] ar = null;
+    public static boolean deleteMetadataByValue(Context context, Item item, DtoMetadata dtom, boolean isLanguageStrict) throws SQLException {
+    	List<MetadataValue> ar = null;
     	
     	if (isLanguageStrict)
     	{   // get all for given type
-    		ar = item.getMetadata(dtom.schema, dtom.element, dtom.qualifier, dtom.language);  
+    		ar = itemService.getMetadata(item, dtom.schema, dtom.element, dtom.qualifier, dtom.language);
     	}
     	else
     	{
-    		ar = item.getMetadata(dtom.schema, dtom.element, dtom.qualifier, Item.ANY);  
+    		ar = itemService.getMetadata(item, dtom.schema, dtom.element, dtom.qualifier, Item.ANY);
     	}
     	
     	boolean found = false;
     	
     	//build new set minus the one to delete
     	List<String> vals = new ArrayList<String>();
-    	for (Metadatum dcv : ar)
+    	for (MetadataValue dcv : ar)
     	{
-    		if (dcv.value.equals(dtom.value))
+    		if (dcv.getValue().equals(dtom.value))
     		{
     			found = true;
     		}
     		else
     		{
-    			vals.add(dcv.value);
+    			vals.add(dcv.getValue());
     		}
     	}
     	
@@ -105,14 +107,14 @@ public class MetadataUtilities {
     	{   
         	if (isLanguageStrict)
         	{           		
-        		item.clearMetadata(dtom.schema, dtom.element, dtom.qualifier, dtom.language);
+                itemService.clearMetadata(context, item, dtom.schema, dtom.element, dtom.qualifier, dtom.language);
         	}
         	else
         	{
-        		item.clearMetadata(dtom.schema, dtom.element, dtom.qualifier, Item.ANY);
+                itemService.clearMetadata(context, item, dtom.schema, dtom.element, dtom.qualifier, Item.ANY);
         	}
     	
-    		item.addMetadata(dtom.schema, dtom.element, dtom.qualifier, dtom.language, vals.toArray(new String[vals.size()]));   	
+            itemService.addMetadata(context, item, dtom.schema, dtom.element, dtom.qualifier, dtom.language, vals);
     	}
 		return found;
     }
@@ -126,57 +128,56 @@ public class MetadataUtilities {
      * @param textToAppend
      * @throws IllegalArgumentException  - When target metadata field is not found
      */
-    public static void appendMetadata(Item item, DtoMetadata dtom, boolean isLanguageStrict, 
+    public static void appendMetadata(Context context, Item item, DtoMetadata dtom, boolean isLanguageStrict,
     		String textToAppend)
-    throws IllegalArgumentException
-    {   	
-    	Metadatum[] ar = null;
+            throws IllegalArgumentException, SQLException {
+    	List<MetadataValue> ar = null;
     	
     	// get all values for given element/qualifier
     	if (isLanguageStrict)  // get all for given element/qualifier
     	{   
-    		ar = item.getMetadata(dtom.schema, dtom.element, dtom.qualifier, dtom.language);  
+    		ar = itemService.getMetadata(item, dtom.schema, dtom.element, dtom.qualifier, dtom.language);
     	}
     	else
     	{
-    		ar = item.getMetadata(dtom.schema, dtom.element, dtom.qualifier, Item.ANY);  
+    		ar = itemService.getMetadata(item, dtom.schema, dtom.element, dtom.qualifier, Item.ANY);
     	}
     	
-    	if (ar.length == 0)
+    	if (ar.size() == 0)
     	{
     		throw new IllegalArgumentException("Metadata to append to not found");
     	}
     	
     	int idx = 0;  //index of field to change
-    	if (ar.length > 1)  //need to pick one, can't be sure it's the last one
+    	if (ar.size() > 1)  //need to pick one, can't be sure it's the last one
     	{
     		// TODO maybe get highest id ?
     	}
     	
     	//build new set minus the one to delete
     	List<String> vals = new ArrayList<String>();
-    	for (int i=0; i < ar.length; i++) 
+    	for (int i=0; i < ar.size(); i++)
     	{
     		if (i == idx)
     		{
-    			vals.add(ar[i].value + textToAppend);
+    			vals.add(ar.get(i).getValue() + textToAppend);
     		}
     		else
     		{
-    			vals.add(ar[i].value);
+    			vals.add(ar.get(i).getValue());
     		}
     	}
 
     	if (isLanguageStrict)
     	{           		
-    		item.clearMetadata(dtom.schema, dtom.element, dtom.qualifier, dtom.language);
+            itemService.clearMetadata(context, item, dtom.schema, dtom.element, dtom.qualifier, dtom.language);
     	}
     	else
     	{
-    		item.clearMetadata(dtom.schema, dtom.element, dtom.qualifier, Item.ANY);
+            itemService.clearMetadata(context, item, dtom.schema, dtom.element, dtom.qualifier, Item.ANY);
     	}
 	
-		item.addMetadata(dtom.schema, dtom.element, dtom.qualifier, dtom.language, vals.toArray(new String[vals.size()]));   	
+        itemService.addMetadata(context, item, dtom.schema, dtom.element, dtom.qualifier, dtom.language, vals);
     }
  
     /**
@@ -424,10 +425,10 @@ public class MetadataUtilities {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public static List<Integer> readDeleteContentsFile(File f)
+    public static List<String> readDeleteContentsFile(File f)
     throws FileNotFoundException, IOException
     {
-    	List<Integer> list = new ArrayList<Integer>();
+    	List<String> list = new ArrayList<>();
     	
     	BufferedReader in = null;
     	
@@ -444,16 +445,7 @@ public class MetadataUtilities {
 	                continue;
 	            }
 	            
-	            int n = 0;
-	            try
-	            {
-	            	n = Integer.parseInt(line);
-		    		list.add(n);	    		
-	            }
-	            catch(NumberFormatException e)
-	            {
-	            	ItemUpdate.pr("Error reading delete contents line:" + e.toString());
-	            }            	
+                list.add(line);
 	    	}
     	}
     	finally
@@ -477,10 +469,12 @@ public class MetadataUtilities {
      * @param dcv
      * @return string displaying elements of the Metadatum
      */
-    public static String getDCValueString(Metadatum dcv)
+    public static String getDCValueString(MetadataValue dcv)
     {
-    	return "schema: " + dcv.schema + "; element: " + dcv.element + "; qualifier: " + dcv.qualifier +
-    	       "; language: " + dcv.language + "; value: " + dcv.value;
+        MetadataField metadataField = dcv.getMetadataField();
+        MetadataSchema metadataSchema = metadataField.getMetadataSchema();
+        return "schema: " + metadataSchema.getName() + "; element: " + metadataField.getElement() + "; qualifier: " + metadataField.getQualifier() +
+    	       "; language: " + dcv.getLanguage() + "; value: " + dcv.getValue();
     }
 
 	/**

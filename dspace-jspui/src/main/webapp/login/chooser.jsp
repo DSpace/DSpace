@@ -24,7 +24,7 @@
 
 <%@ page import="org.dspace.app.webui.util.JSPManager" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
-<%@ page import="org.dspace.authenticate.AuthenticationManager" %>
+<%@ page import="org.dspace.authenticate.AuthenticationServiceImpl" %>
 <%@ page import="org.dspace.authenticate.AuthenticationMethod" %>
 <%@ page import="org.dspace.core.Context" %>
 <%@ page import="org.dspace.core.LogManager" %>
@@ -54,7 +54,7 @@
           <h2><fmt:message key="jsp.login.chooser.chooseyour"/></h2>
           <ul>
 <%
-    Iterator ai = AuthenticationManager.authenticationMethodIterator();
+    Iterator ai = AuthenticationServiceImpl.authenticationMethodIterator();
     AuthenticationMethod am;
     Context context = null;
     try

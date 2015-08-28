@@ -18,8 +18,13 @@ import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.xmlworkflow.*;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 
 import java.util.Map;
 
@@ -37,6 +42,12 @@ public class UnclaimTasksAction extends AbstractAction
 
     private static final Logger log = Logger.getLogger(UnclaimTasksAction.class);
 
+    protected ClaimedTaskService claimedTaskService = XmlWorkflowServiceFactory.getInstance().getClaimedTaskService();
+    protected XmlWorkflowItemService xmlWorkflowItemService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService();
+    protected XmlWorkflowService xmlWorkflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
+    protected WorkflowRequirementsService workflowRequirementsService = XmlWorkflowServiceFactory.getInstance().getWorkflowRequirementsService();
+
+
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel, String source, Parameters parameters) throws Exception {
         Request request = ObjectModelHelper.getRequest(objectModel);
         Context context = ContextUtil.obtainContext(objectModel);
@@ -47,12 +58,12 @@ public class UnclaimTasksAction extends AbstractAction
     	{
     		for (String workflowID : workflowIDs)
     		{
-                XmlWorkflowItem workflowItem = XmlWorkflowItem.find(context, Integer.valueOf(workflowID.split(":")[0]));
+                XmlWorkflowItem workflowItem = xmlWorkflowItemService.find(context, Integer.valueOf(workflowID.split(":")[0]));
 
-                ClaimedTask pooledTask = ClaimedTask.findByWorkflowIdAndEPerson(context, workflowItem.getID(), context.getCurrentUser().getID());
-                XmlWorkflowManager.deleteClaimedTask(context, workflowItem, pooledTask);
+                ClaimedTask pooledTask = claimedTaskService.findByWorkflowIdAndEPerson(context, workflowItem, context.getCurrentUser());
+                xmlWorkflowService.deleteClaimedTask(context, workflowItem, pooledTask);
 
-                WorkflowRequirementsManager.removeClaimedUser(context, workflowItem, context.getCurrentUser(), workflowID.split(":")[1]);
+                workflowRequirementsService.removeClaimedUser(context, workflowItem, context.getCurrentUser(), workflowID.split(":")[1]);
                 log.info(LogManager.getHeader(context, "unclaim_workflow", "workflow_id=" + workflowItem.getID()));
 
             }

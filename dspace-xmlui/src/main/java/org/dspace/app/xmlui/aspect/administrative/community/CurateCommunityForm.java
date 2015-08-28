@@ -11,6 +11,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.UUID;
+
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CommunityService;
 import org.xml.sax.SAXException;
 
 import org.apache.avalon.framework.parameters.Parameters;
@@ -56,7 +60,9 @@ public class CurateCommunityForm extends AbstractDSpaceTransformer   {
 
     private static final Message T_label_name = message("xmlui.administrative.community.CurateCommunityForm.label_name");
     private static final Message T_taskgroup_label_name = message("xmlui.administrative.CurateForm.taskgroup_label_name");
-    
+
+    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+
     public void setup(SourceResolver resolver, Map objectModel, String src,
     		          Parameters parameters) throws ProcessingException, SAXException, IOException
     {
@@ -89,8 +95,8 @@ public class CurateCommunityForm extends AbstractDSpaceTransformer   {
                                     throws WingException, SQLException,
                                                         AuthorizeException, UnsupportedEncodingException
 	{
-		int communityID = parameters.getParameterAsInteger("communityID", -1);
-		Community thisCommunity = Community.find(context, communityID);
+		UUID communityID = UUID.fromString(parameters.getParameter("communityID", null));
+		Community thisCommunity = communityService.find(context, communityID);
 
 		String baseURL = contextPath + "/admin/community?administrative-continue=" + knot.getId();
 

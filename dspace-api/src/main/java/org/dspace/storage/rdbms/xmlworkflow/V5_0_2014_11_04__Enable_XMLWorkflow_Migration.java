@@ -12,7 +12,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
-import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.flywaydb.core.api.migration.MigrationChecksumProvider;
 import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
@@ -61,6 +60,17 @@ public class V5_0_2014_11_04__Enable_XMLWorkflow_Migration
             // If XMLWorkflow Table ALREADY exists, then this migration is a noop, we assume you manually ran the sql scripts
             if (!DatabaseUtils.tableExists(connection, "cwf_workflowitem"))
             {
+                String dbtype = connection.getMetaData().getDatabaseProductName();
+                String dbFileLocation = null;
+                if(dbtype.toLowerCase().contains("postgres"))
+                {
+                    dbFileLocation = "postgres";
+                }else
+                if(dbtype.toLowerCase().contains("oracle")){
+                    dbFileLocation = "oracle";
+                }
+
+
                 // Determine path of this migration class (as the SQL scripts 
                 // we will run are based on this path under /src/main/resources)
                 String packagePath = V5_0_2014_11_04__Enable_XMLWorkflow_Migration.class.getPackage().getName().replace(".", "/");
@@ -68,7 +78,7 @@ public class V5_0_2014_11_04__Enable_XMLWorkflow_Migration
                 // Get the contents of our DB Schema migration script, based on path & DB type
                 // (e.g. /src/main/resources/[path-to-this-class]/postgres/xml_workflow_migration.sql)
                 String dbMigrateSQL = new ClassPathResource(packagePath + "/" +
-                                                        DatabaseManager.getDbKeyword() +
+                                                        dbFileLocation +
                                                         "/xml_workflow_migration.sql", getClass().getClassLoader()).loadAsString(Constants.DEFAULT_ENCODING);
 
                 // Actually execute the Database schema migration SQL
@@ -78,7 +88,7 @@ public class V5_0_2014_11_04__Enable_XMLWorkflow_Migration
                 // Get the contents of our data migration script, based on path & DB type
                 // (e.g. /src/main/resources/[path-to-this-class]/postgres/data_workflow_migration.sql)
                 String dataMigrateSQL = new ClassPathResource(packagePath + "/" +
-                                                          DatabaseManager.getDbKeyword() +
+                                                          dbFileLocation +
                                                           "/data_workflow_migration.sql", getClass().getClassLoader()).loadAsString(Constants.DEFAULT_ENCODING);
 
                 // Actually execute the Data migration SQL

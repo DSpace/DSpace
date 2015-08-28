@@ -14,14 +14,13 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.dspace.app.util.CollectionDropDown;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Subscribe;
+import org.dspace.eperson.SubscribeServiceImpl;
 
 /**
  * Servlet for constructing the components of the "My DSpace" page
@@ -54,7 +53,7 @@ public class SubscribeServlet extends DSpaceServlet
         if (submit.equals("submit_clear"))
         {
             // unsubscribe user from everything
-            Subscribe.unsubscribe(context, e, null);
+            SubscribeServiceImpl.unsubscribe(context, e, null);
 
             // Show the list of subscriptions
             showSubscriptions(context, request, response, true);
@@ -69,7 +68,7 @@ public class SubscribeServlet extends DSpaceServlet
             // Sanity check - ignore duff values
             if (c != null)
             {
-                Subscribe.subscribe(context, e, c);
+                SubscribeServiceImpl.subscribe(context, e, c);
             }
 
             // Show the list of subscriptions
@@ -85,7 +84,7 @@ public class SubscribeServlet extends DSpaceServlet
             // Sanity check - ignore duff values
             if (c != null)
             {
-                Subscribe.unsubscribe(context, e, c);
+                SubscribeServiceImpl.unsubscribe(context, e, c);
             }
 
             // Show the list of subscriptions
@@ -120,10 +119,10 @@ public class SubscribeServlet extends DSpaceServlet
             throws ServletException, IOException, SQLException
     {
         // collections the currently logged in user can subscribe to
-        Collection[] avail = Subscribe.getAvailableSubscriptions(context);
+        Collection[] avail = SubscribeServiceImpl.getAvailableSubscriptions(context);
         
         // Subscribed collections
-        Collection[] subs = Subscribe.getSubscriptions(context, context
+        Collection[] subs = SubscribeServiceImpl.getSubscriptions(context, context
                 .getCurrentUser());
 
         request.setAttribute("availableSubscriptions", avail);

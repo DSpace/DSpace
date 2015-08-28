@@ -8,9 +8,9 @@
 package org.dspace.authenticate;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Hashtable;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -18,14 +18,20 @@ import javax.naming.directory.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.authenticate.factory.AuthenticateServiceFactory;
+import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
 
 /**
  * This combined LDAP authentication method supersedes both the 'LDAPAuthentication'
@@ -46,9 +52,15 @@ public class LDAPAuthentication
     /** log4j category */
     private static Logger log = Logger.getLogger(LDAPAuthentication.class);
 
+    protected AuthenticationService authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
+    protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+
+
     /**
      * Let a real auth method return true if it wants.
      */
+    @Override
     public boolean canSelfRegister(Context context,
                                    HttpServletRequest request,
                                    String username)
@@ -61,6 +73,7 @@ public class LDAPAuthentication
     /**
      *  Nothing here, initialization is done when auto-registering.
      */
+    @Override
     public void initEPerson(Context context, HttpServletRequest request,
             EPerson eperson)
         throws SQLException
@@ -72,6 +85,7 @@ public class LDAPAuthentication
     /**
      * Cannot change LDAP password through dspace, right?
      */
+    @Override
     public boolean allowSetPassword(Context context,
                                     HttpServletRequest request,
                                     String username)
@@ -84,6 +98,7 @@ public class LDAPAuthentication
     /*
      * This is an explicit method.
      */
+    @Override
     public boolean isImplicit()
     {
         return false;
@@ -93,7 +108,8 @@ public class LDAPAuthentication
      * Add authenticated users to the group defined in dspace.cfg by
      * the login.specialgroup key.
      */
-    public int[] getSpecialGroups(Context context, HttpServletRequest request)
+    @Override
+    public List<Group> getSpecialGroups(Context context, HttpServletRequest request)
     {
         // Prevents anonymous users from being added to this group, and the second check
         // ensures they are LDAP users
@@ -104,17 +120,17 @@ public class LDAPAuthentication
                 String groupName = ConfigurationManager.getProperty("authentication-ldap", "login.specialgroup");
                 if ((groupName != null) && (!groupName.trim().equals("")))
                 {
-                    Group ldapGroup = Group.findByName(context, groupName);
+                    Group ldapGroup = groupService.findByName(context, groupName);
                     if (ldapGroup == null)
                     {
                         // Oops - the group isn't there.
                         log.warn(LogManager.getHeader(context,
                                 "ldap_specialgroup",
                                 "Group defined in login.specialgroup does not exist"));
-                        return new int[0];
+                        return ListUtils.EMPTY_LIST;
                     } else
                     {
-                        return new int[] { ldapGroup.getID() };
+                        return Arrays.asList(ldapGroup);
                     }
                 }
             }
@@ -122,7 +138,7 @@ public class LDAPAuthentication
         catch (Exception npe) {
             // The user is not an LDAP user, so we don't need to worry about them
         }
-        return new int[0];
+        return ListUtils.EMPTY_LIST;
     }
 
     /*
@@ -158,6 +174,7 @@ public class LDAPAuthentication
      * <br>NO_SUCH_USER    - user not found using this method.
      * <br>BAD_ARGS        - user/pw not appropriate for this method
      */
+    @Override
     public int authenticate(Context context,
                             String netid,
                             String password,
@@ -177,7 +194,7 @@ public class LDAPAuthentication
         EPerson eperson = null;
         try
         {
-                eperson = EPerson.findByNetid(context, netid.toLowerCase());
+                eperson = ePersonService.findByNetid(context, netid.toLowerCase());
         }
         catch (SQLException e)
         {
@@ -274,15 +291,15 @@ public class LDAPAuthentication
                 {
                     try
                     {
-                        eperson = EPerson.findByEmail(context, email);
+                        eperson = ePersonService.findByEmail(context, email);
                         if (eperson!=null)
                         {
                             log.info(LogManager.getHeader(context,
                                     "type=ldap-login", "type=ldap_but_already_email"));
                             context.setIgnoreAuthorization(true);
                             eperson.setNetid(netid.toLowerCase());
-                            eperson.update();
-                            context.commit();
+                            ePersonService.update(context, eperson);
+                            context.dispatchEvents();
                             context.setIgnoreAuthorization(false);
                             context.setCurrentUser(eperson);
 
@@ -299,28 +316,28 @@ public class LDAPAuthentication
                                 try
                                 {
                                     context.setIgnoreAuthorization(true);
-                                    eperson = EPerson.create(context);
+                                    eperson = ePersonService.create(context);
                                     if (StringUtils.isNotEmpty(email))
                                     {
                                         eperson.setEmail(email);
                                     }
                                     if (StringUtils.isNotEmpty(ldap.ldapGivenName))
                                     {
-                                        eperson.setFirstName(ldap.ldapGivenName);
+                                        eperson.setFirstName(context, ldap.ldapGivenName);
                                     }
                                     if (StringUtils.isNotEmpty(ldap.ldapSurname))
                                     {
-                                        eperson.setLastName(ldap.ldapSurname);
+                                        eperson.setLastName(context, ldap.ldapSurname);
                                     }
                                     if (StringUtils.isNotEmpty(ldap.ldapPhone))                                    
                                     {
-                                        eperson.setMetadata("phone", ldap.ldapPhone);
+                                        ePersonService.setMetadata(context, eperson, "phone", ldap.ldapPhone);
                                     }
                                     eperson.setNetid(netid.toLowerCase());
                                     eperson.setCanLogIn(true);
-                                    AuthenticationManager.initEPerson(context, request, eperson);
-                                    eperson.update();
-                                    context.commit();
+                                    authenticationService.initEPerson(context, request, eperson);
+                                    ePersonService.update(context, eperson);
+                                    context.dispatchEvents();
                                     context.setCurrentUser(eperson);
 
                                     // assign user to groups based on ldap dn
@@ -609,6 +626,7 @@ public class LDAPAuthentication
      *
      * @return fully-qualified URL
      */
+    @Override
     public String loginPageURL(Context context,
                             HttpServletRequest request,
                             HttpServletResponse response)
@@ -626,6 +644,7 @@ public class LDAPAuthentication
      *
      * @return Message key to look up in i18n message catalog.
      */
+    @Override
     public String loginPageTitle(Context context)
     {
         return "org.dspace.eperson.LDAPAuthentication.title";
@@ -663,12 +682,11 @@ public class LDAPAuthentication
                     // assign user to this group   
                     try
                     {
-                        Group ldapGroup = Group.findByName(context, dspaceGroupName);
+                        Group ldapGroup = groupService.findByName(context, dspaceGroupName);
                         if (ldapGroup != null)
                         {
-                            ldapGroup.addMember(context.getCurrentUser());
-                            ldapGroup.update();
-                            context.commit();
+                            groupService.addMember(context, ldapGroup, context.getCurrentUser());
+                            groupService.update(context, ldapGroup);
                         }
                         else
                         {

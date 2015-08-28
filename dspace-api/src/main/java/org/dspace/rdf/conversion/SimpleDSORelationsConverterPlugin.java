@@ -15,25 +15,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.Util;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
-import org.dspace.content.Site;
+import org.dspace.content.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.SiteService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.rdf.RDFConfiguration;
 import org.dspace.rdf.RDFUtil;
 import org.dspace.services.ConfigurationService;
-import org.dspace.utils.DSpace;
 
 /**
  *
@@ -66,6 +64,11 @@ implements ConverterPlugin
     protected String[] collection2item;
     protected String[] item2collection;
     protected String[] item2bitstream;
+
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    protected SiteService siteService = ContentServiceFactory.getInstance().getSiteService();
 
     public SimpleDSORelationsConverterPlugin()
     {
@@ -227,7 +230,7 @@ implements ConverterPlugin
             return null;
         }
 
-        Community[] topLevelCommies = Community.findAllTop(context);
+        List<Community> topLevelCommies = communityService.findAllTop(context);
         for (Community community : topLevelCommies)
         {
             if (!RDFUtil.isPublicBoolean(context, community))
@@ -302,11 +305,12 @@ implements ConverterPlugin
         }
         
         // add all parents
-        DSpaceObject[] parents = community.getAllParents();
+        List<Community> communityParentList = communityService.getAllParents(context, community);
+        DSpaceObject[] parents = communityParentList.toArray(new DSpaceObject[communityParentList.size()]);
         // check whether this is a top level community
         if (parents.length == 0)
         {
-            parents = new DSpaceObject[] {Site.find(context, Site.SITE_ID)};
+            parents = new DSpaceObject[] {siteService.findSite(context)};
         }
         for (DSpaceObject parent : parents)
         {
@@ -359,7 +363,7 @@ implements ConverterPlugin
             }
         }
         // add all collections.
-        for (Collection col : community.getAllCollections())
+        for (Collection col : communityService.getAllCollections(context, community))
         {
             if (!RDFUtil.isPublicBoolean(context, col))
             {
@@ -418,7 +422,7 @@ implements ConverterPlugin
         }
         
         // add all parents
-        DSpaceObject[] parents = collection.getCommunities();
+        List<Community> parents = collection.getCommunities();
         for (DSpaceObject parent : parents)
         {
             if (!RDFUtil.isPublicBoolean(context, parent))
@@ -439,7 +443,7 @@ implements ConverterPlugin
         }
         
         // add all items
-        ItemIterator items = collection.getAllItems();
+        Iterator<Item> items = itemService.findAllByCollection(context, collection);
         while (items.hasNext())
         {
             String id = RDFUtil.generateIdentifier(context, items.next());
@@ -494,7 +498,7 @@ implements ConverterPlugin
         }
         
         // add all parents
-        Collection[] collections = item.getCollections();
+        List<Collection> collections = item.getCollections();
         for (DSpaceObject parent : collections)
         {
             if (!RDFUtil.isPublicBoolean(context, parent))
@@ -523,11 +527,12 @@ implements ConverterPlugin
             // be configurable).
             if (bundle.getName().equals("ORIGINAL"))
             {
-                for (Bitstream bs : bundle.getBitstreams())
+                for (BundleBitstream bundleBitstream : bundle.getBitstreams())
                 {
+                    Bitstream bs = bundleBitstream.getBitstream();
                     if (RDFUtil.isPublicBoolean(context, bs))
                     {
-                        String url = bitstreamURI(bs);
+                        String url = bitstreamURI(context, bs);
                         if (url != null)
                         {
                             for (String link : item2bitstream)
@@ -560,10 +565,10 @@ implements ConverterPlugin
      * Collection logo.
      * @throws SQLException 
      */
-    public String bitstreamURI(Bitstream bitstream)
+    public String bitstreamURI(Context context, Bitstream bitstream)
             throws SQLException
     {
-        DSpaceObject parent = bitstream.getParentObject();
+        DSpaceObject parent = bitstreamService.getParentObject(context, bitstream);
 
         if (!(parent instanceof Item))
         {
