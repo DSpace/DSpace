@@ -66,17 +66,6 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport
     }
 
     /**
-     * Get the name of the bundle
-     * 
-     * @return name of the bundle (ORIGINAL, TEXT, THUMBNAIL) or NULL if not set
-     */
-    @Override
-    public String getName()
-    {
-        return getBundleService().getMetadataFirstValue(this, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
-    }
-
-    /**
      * Set the name of the bundle
      * 
      * @param name

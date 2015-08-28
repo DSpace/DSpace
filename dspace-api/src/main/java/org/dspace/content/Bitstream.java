@@ -121,17 +121,6 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
     }
 
     /**
-     * Get the name of this bitstream - typically the filename, without any path
-     * information
-     * 
-     * @return the name of the bitstream
-     */
-    @Override
-    public String getName(){
-        return getBitstreamService().getMetadataFirstValue(this, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
-    }
-
-    /**
      * Set the name of the bitstream
      * 
      * @param n

@@ -15,6 +15,8 @@ import java.io.Serializable;
 import java.util.*;
 
 import javax.persistence.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.DSpaceObjectService;
 
 /**
  * Abstract base class for DSpace objects
@@ -108,7 +110,26 @@ public abstract class DSpaceObject implements Serializable
         return id;
     }
 
-    public abstract String getName();
+    /**
+     * Get a proper name for the object. This may return <code>null</code>.
+     * Name should be suitable for display in a user interface.
+     * 
+     * This method is linked to the same method of the DSpaceObjectService. If 
+     * this methods is overridden the method in the service class should be 
+     * overridden too so both methods always returns the same values.
+     *
+     * @return Name for the object, or <code>null</code> if it doesn't have
+     *         one
+     */
+    public String getName()
+    {
+        DSpaceObjectService service = ContentServiceFactory.getInstance().getDSpaceObjectService(this);
+        if (service == null)
+        {
+            return null;
+        }
+        return service.getName(this);
+    }
 
     /**
      * Get the Handle of the object. This may return <code>null</code>

@@ -95,7 +95,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
                 return null;
             }
 
-            thumbBitstream = bitstreamService.getBitstreamByName(item, "THUMBNAIL", primaryBitstream.getName() + ".jpg");
+            thumbBitstream = bitstreamService.getBitstreamByName(item, "THUMBNAIL", bitstreamService.getName(primaryBitstream) + ".jpg");
 
         } else {
             if (requireOriginal) {
@@ -242,7 +242,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // now only keep bundles with matching names
         List<Bundle> bunds = item.getBundles();
         for (Bundle bund : bunds) {
-            if (name.equals(bund.getName())) {
+            if (name.equals(bundleService.getName(bund))) {
                 matchingBundles.add(bund);
             }
         }
@@ -272,7 +272,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         bundle.addItem(item);
 
         context.addEvent(new Event(Event.ADD, Constants.ITEM, item.getID(),
-                Constants.BUNDLE, bundle.getID(), bundle.getName(),
+                Constants.BUNDLE, bundle.getID(), bundleService.getName(bundle),
                 getIdentifiers(context, item)));
     }
 
@@ -290,7 +290,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
 
         context.addEvent(new Event(Event.REMOVE, Constants.ITEM, item.getID(),
-                Constants.BUNDLE, bundle.getID(), bundle.getName(), getIdentifiers(context, item)));
+                Constants.BUNDLE, bundle.getID(), bundleService.getName(bundle), getIdentifiers(context, item)));
 
         if (CollectionUtils.isEmpty(bundle.getItems())) {
             bundleService.delete(context, bundle);
@@ -487,7 +487,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         List<Collection> colls = item.getCollections();
 
         for (Collection coll : colls) {
-            prov.append(coll.getName()).append(" (ID: ").append(coll.getID()).append(")\n");
+            prov.append(collectionService.getName(coll)).append(" (ID: ").append(coll.getID()).append(")\n");
         }
 
         // Set withdrawn flag. timestamp will be set; last_modified in update()
@@ -534,7 +534,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
                 .append("Item was in collections:\n");
 
         for (Collection coll : colls) {
-            prov.append(coll.getName()).append(" (ID: ").append(coll.getID()).append(")\n");
+            prov.append(collectionService.getName(coll)).append(" (ID: ").append(coll.getID()).append(")\n");
         }
 
         // Clear withdrawn flag
@@ -625,7 +625,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
        log.info(LogManager.getHeader(context, "remove_bundle", "item_id="
                + item.getID() + ",bundle_id=" + b.getID()));
-       context.addEvent(new Event(Event.REMOVE, Constants.ITEM, item.getID(), Constants.BUNDLE, b.getID(), b.getName()));
+       context.addEvent(new Event(Event.REMOVE, Constants.ITEM, item.getID(), Constants.BUNDLE, b.getID(), bundleService.getName(b)));
    }
 
     protected void removeVersion(Context context, Item item) throws AuthorizeException, SQLException
@@ -1096,7 +1096,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
                     return true;
                 }
             }
-            log.debug("item(" + item.getID() + ") " + item.getName() + " is unlisted.");
+            log.debug("item(" + item.getID() + ") " + this.getName(item) + " is unlisted.");
             return false;
         } catch (SQLException e) {
             log.error(e.getMessage());
