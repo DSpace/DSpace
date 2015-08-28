@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -70,16 +71,16 @@ public class RDFizer {
      * multiple DSpaceObjects (g.e. Communities with all Subcommunities and
      * Items).
      */
-    protected Set<String> processed;
+    protected Set<UUID> processed;
 
-    public RDFizer() throws SQLException
+    public RDFizer()
     {
         this.configurationService = new DSpace().getConfigurationService();
         this.stdout = false;
         this.verbose = false;
         this.dryrun = false;
         this.lang = "TURTLE";
-        this.processed = new CopyOnWriteArraySet<String>();
+        this.processed = new CopyOnWriteArraySet<UUID>();
         this.context = new Context(Context.READ_ONLY);
         this.contentServiceFactory = ContentServiceFactory.getInstance();
         this.communityService = contentServiceFactory.getCommunityService();
@@ -232,7 +233,7 @@ public class RDFizer {
             throws SQLException
     {
         report("Starting conversion of all DSpaceItems, this may take a while...");
-        this.convert(new Site(), true);
+        this.convert(contentServiceFactory.getSiteService().findSite(context), true);
         report("Conversion ended.");
     }
     
@@ -338,7 +339,7 @@ public class RDFizer {
         }
         markProcessed(dso);
         // this is useful to debug depth first search, but it is really noisy.
-        // log.debug("Procesing " + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) + " " + dso.getID() + handle + ".");
+        //log.debug("Procesing " + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) + " " + dso.getID() + ":" + dso.getHandle() + ".");
         
         // if this method is used for conversion we should check if we have the
         // permissions to read a DSO before converting all of it decendents
@@ -410,9 +411,10 @@ public class RDFizer {
             }
         }
 
-//        Currently Bundles and Bitsreams arn't supported as independent entities.
+//        Currently Bundles and Bitsreams aren't supported as independent entities.
 //        The should be converted as part of an item. So we do not need to make
-//        the recursive call for them.
+//        the recursive call for them. An item itself will be converted as part
+//        of the callback call below.
 //        
 //        if (dso instanceof Item)
 //        {
@@ -439,16 +441,12 @@ public class RDFizer {
     
     protected boolean isProcessed(DSpaceObject dso)
     {
-        String key = Integer.toString(dso.getType()) + "/" 
-                + dso.getID().toString();
-        return this.processed.contains(key);
+        return this.processed.contains(dso.getID());
     }
     
     protected void markProcessed(DSpaceObject dso)
     {
-        String key = Integer.toString(dso.getType()) + "/" 
-                + dso.getID().toString();
-        this.processed.add(key);
+        this.processed.add(dso.getID());
     }
     
     protected void report(String message)
@@ -794,17 +792,7 @@ public class RDFizer {
         Context context = new Context(Context.READ_ONLY);
 
         RDFizer myself = null;
-        try {
-            myself = new RDFizer();
-        } catch (SQLException ex) {
-            System.err.println("A problem with the database occurred: " 
-                    + ex.getMessage());
-            ex.printStackTrace(System.err);
-            log.error(ex);
-            context.abort();
-            System.exit(1);
-        }
-        
+        myself = new RDFizer();        
         myself.overrideContext(context);
         myself.runCLI(args);
         

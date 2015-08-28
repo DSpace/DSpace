@@ -422,8 +422,7 @@ implements ConverterPlugin
         }
         
         // add all parents
-        List<Community> parents = collection.getCommunities();
-        for (DSpaceObject parent : parents)
+        for (DSpaceObject parent : collection.getCommunities())
         {
             if (!RDFUtil.isPublicBoolean(context, parent))
             {
@@ -498,8 +497,7 @@ implements ConverterPlugin
         }
         
         // add all parents
-        List<Collection> collections = item.getCollections();
-        for (DSpaceObject parent : collections)
+        for (DSpaceObject parent : item.getCollections())
         {
             if (!RDFUtil.isPublicBoolean(context, parent))
             {

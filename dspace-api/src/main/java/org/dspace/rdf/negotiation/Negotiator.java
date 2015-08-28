@@ -15,11 +15,8 @@ import java.util.Iterator;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.SiteService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.rdf.RDFConfiguration;
-import org.dspace.utils.DSpace;
 
 /**
  *
@@ -35,8 +32,6 @@ public class Negotiator {
     public static final int TURTLE = 3;
     public static final int N3 = 4;
 
-    protected static final SiteService siteService = ContentServiceFactory.getInstance().getSiteService();
-    
     public static final String DEFAULT_LANG="html";
     
     private static final Logger log = Logger.getLogger(Negotiator.class);
@@ -267,8 +262,7 @@ public class Negotiator {
         // if html is requested we have to forward to the repositories webui.
         if ("html".equals(lang))
         {
-            urlBuilder.append((new DSpace()).getConfigurationService()
-                    .getProperty("dspace.url"));
+            urlBuilder.append(ConfigurationManager.getProperty("dspace.url"));
             if (!handle.equals(ConfigurationManager.getProperty("handle.prefix") + "/0"))
             {
                 urlBuilder.append("/handle/");

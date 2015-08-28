@@ -31,8 +31,8 @@ implements URIGenerator
     private static final Logger log = Logger.getLogger(DOIURIGenerator.class);
 
     /*
-     * Currently (August 31 2014, in preparation of DSpace 5.0) DSpace supports DOIs for items only. This fallback
-     * will be used to generate an URI, whenever no DOI was found that could be used to.
+     * Currently (DSpace 5) DSpace supports DOIs for items only. This fallback
+     * will be used to generate an URI, whenever no DOI was found.
      */
     protected final static URIGenerator fallback = new LocalURIGenerator();
     protected final DOIService doiService = IdentifierServiceFactory.getInstance().getDOIService();

@@ -24,6 +24,8 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
+import org.dspace.workflow.WorkflowItemService;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 
 /**
  *
@@ -40,6 +42,16 @@ public class RDFConsumer implements Consumer
     protected BundleService bundleService;
     protected SiteService siteService;
     protected WorkspaceItemService workspaceItemService;
+    protected WorkflowItemService workflowItemService;
+    
+    @Override
+    public void initialize() throws Exception {
+        bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+        bundleService = ContentServiceFactory.getInstance().getBundleService();
+        siteService = ContentServiceFactory.getInstance().getSiteService();
+        workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+        workflowItemService = WorkflowServiceFactory.getInstance().getWorkflowItemService();
+    }
 
     @Override
     public void consume(Context ctx, Event event)
@@ -47,12 +59,10 @@ public class RDFConsumer implements Consumer
     {
         if (this.toConvert == null)
         {
-            log.debug("Initalized first queue.");
             this.toConvert = new LinkedList<>();
         }
         if (this.toDelete == null)
         {
-            log.debug("Initalized second queue.");
             this.toDelete = new LinkedList<>();
         }
         
@@ -119,9 +129,10 @@ public class RDFConsumer implements Consumer
                 List<Item> items = b.getItems();
                 for (Item i : items)
                 {
-                    if (workspaceItemService.findByItem(ctx, i) != null)
+                    if (workspaceItemService.findByItem(ctx, i) != null
+                            || workflowItemService.findByItem(ctx, i) != null)
                     {
-                        log.debug("Ignoring Item " + i.getID() + " as a corresponding workspace item exists.");
+                        log.debug("Ignoring Item " + i.getID() + " as a corresponding workspace or workflow item exists.");
                         continue;
                     }
                     DSOIdentifier id = new DSOIdentifier(i, ctx);
@@ -169,11 +180,12 @@ public class RDFConsumer implements Consumer
             List<Item> items = bundle.getItems();
             for (Item i : items)
             {
-                if (workspaceItemService.findByItem(ctx, i) != null)
-                {
-                    log.debug("Ignoring Item " + i.getID() + " as a corresponding workspace item exists.");
-                    continue;
-                }
+                if (workspaceItemService.findByItem(ctx, i) != null
+                            || workflowItemService.findByItem(ctx, i) != null)
+                    {
+                        log.debug("Ignoring Item " + i.getID() + " as a corresponding workspace or workflow item exists.");
+                        continue;
+                    }
                 DSOIdentifier id = new DSOIdentifier(i, ctx);
                 if (!this.toDelete.contains(id) && !this.toConvert.contains(id))
                 {
@@ -244,11 +256,14 @@ public class RDFConsumer implements Consumer
             // ignore unfinished submissions here. Every unfinished submission
             // has an workspace item. The item flag "in_archive" doesn't help us
             // here as this is also set to false if a newer version was submitted.
-            if (dso instanceof Item
-                    && workspaceItemService.findByItem(ctx, (Item) dso) != null)
+            if (dso instanceof Item)
             {
-                log.debug("Ignoring Item " + dso.getID() + " as a corresponding workspace item exists.");
-                return;
+                if (workspaceItemService.findByItem(ctx, (Item) dso) != null
+                        || workflowItemService.findByItem(ctx, (Item) dso) != null)
+                {
+                    log.debug("Ignoring Item " + dso.getID() + " as a corresponding workspace or workflow item exists.");
+                    return;
+                }
             }
 
             DSOIdentifier id = new DSOIdentifier(dso, ctx);
@@ -280,16 +295,20 @@ public class RDFConsumer implements Consumer
     }
     
     public void consumeSite(Context ctx, Event event) throws SQLException {
-        // in case a top level community was added or remove.
-        // event type remove won't be thrown until DS-1966 is fixed (f.e. by
-        // merging PR #517).
         if (event.getEventType() == Event.ADD
-                || event.getEventType() == Event.REMOVE)
+                || event.getEventType() == Event.REMOVE
+                || event.getEventType() == Event.MODIFY
+                || event.getEventType() == Event.MODIFY_METADATA)
         {
             Site site = siteService.findSite(ctx);
+            
             DSOIdentifier id = new DSOIdentifier(Constants.SITE,
                     site.getID(), site.getHandle(), Arrays.asList(site.getHandle()));
-            if (!this.toConvert.contains(id)) this.toConvert.add(id);
+            
+            if (!this.toConvert.contains(id))
+            {
+                this.toConvert.add(id);
+            }
             return;
         }
         log.warn("Got an unexpected Event for the SITE. Event type is " 
@@ -435,14 +454,6 @@ public class RDFConsumer implements Consumer
     public void finish(Context ctx) throws Exception {
     }
 
-    @Override
-    public void initialize() throws Exception {
-        bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
-        bundleService = ContentServiceFactory.getInstance().getBundleService();
-        siteService = ContentServiceFactory.getInstance().getSiteService();
-        workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-    }
-
     
     class DSOIdentifier
     {
@@ -466,8 +477,9 @@ public class RDFConsumer implements Consumer
                     && dso.getType() != Constants.COLLECTION
                     && dso.getType() != Constants.ITEM)
             {
-                throw new IllegalArgumentException("Provided DSpaceObject does"
-                        + " not have a handle!");
+                throw new IllegalArgumentException(
+                        ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getTypeText(dso)
+                                + " is currently not supported as independent entity by dspace-rdf.");
             }
             this.type = dso.getType();
             this.id = dso.getID();
@@ -479,23 +491,14 @@ public class RDFConsumer implements Consumer
         public boolean equals(Object o)
         {
             if (!(o instanceof DSOIdentifier)) return false;
-            DSOIdentifier dsoId = (DSOIdentifier) o;
-            
-            /*
-            log.warn("Testing if " + Constants.typeText[this.type] + " " 
-                    + Integer.toString(this.id) + " and " 
-                    + Constants.typeText[dsoId.type] + " " 
-                    + Integer.toString(dsoId.id) + " are equal.");
-            */
-            return (this.type == dsoId.type && this.id == dsoId.id);
+            // Cast o to DSOIdentifier and compare the UUIDs for equality.
+            return this.id.equals(((DSOIdentifier) o).id);
         }
         
         @Override
         public int hashCode()
         {
-            /* log.debug("Created hash " + Integer.toString(this.type + (10*this.id)));*/
-
-            // as at least up to DSpace version 4.1 DSpaceObjectType is a 
+            // as at least up to DSpace version 5.3 DSpaceObjectType is a 
             // one-digit number, this should produce an distinct hash.
             return this.type + (10*this.id.hashCode());
         }
