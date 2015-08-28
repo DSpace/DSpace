@@ -7,11 +7,14 @@
  */
 package org.dspace.content;
 
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.SiteService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 /**
  * Represents the root of the DSpace Archive.
@@ -21,6 +24,9 @@ import javax.persistence.Table;
 @Table(name = "site")
 public class Site extends DSpaceObject
 {
+
+    @Transient
+    private SiteService siteService;
 
     /**
      * Get the type of this object, found in Constants
@@ -36,11 +42,20 @@ public class Site extends DSpaceObject
     @Override
     public String getName()
     {
-        return ConfigurationManager.getProperty("dspace.name");
+        return getSiteService().getName(this);
     }
 
     public String getURL()
     {
         return ConfigurationManager.getProperty("dspace.url");
     }
+
+    private SiteService getSiteService() {
+        if(siteService == null)
+        {
+            siteService = ContentServiceFactory.getInstance().getSiteService();
+        }
+        return siteService;
+    }
+
 }
