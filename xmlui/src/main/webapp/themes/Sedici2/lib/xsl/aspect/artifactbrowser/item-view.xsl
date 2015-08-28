@@ -467,20 +467,6 @@
 		</xsl:call-template>
 
 		<xsl:call-template name="render-normal-field">
-			<xsl:with-param name="name" select="'identifier-doi'"/>
-			<xsl:with-param name="elements" select="dim:field[@element='identifier' and @qualifier='doi'] "/>
-			<xsl:with-param name="separator" select="' | '"/>
-			<xsl:with-param name="type" select="'url'"/>
-		</xsl:call-template>
-
-		<xsl:call-template name="render-normal-field">
-			<xsl:with-param name="name" select="'identifier-handle'"/>
-			<xsl:with-param name="elements" select="dim:field[@element='identifier' and @qualifier='handle'] "/>
-			<xsl:with-param name="separator" select="' | '"/>
-			<xsl:with-param name="type" select="'url'"/>
-		</xsl:call-template>
-
-		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'identifier-other'"/>
 			<xsl:with-param name="elements" select="dim:field[@element='identifier' and @qualifier='other'] "/>
 			<xsl:with-param name="separator" select="' | '"/>
@@ -997,7 +983,7 @@
 		<div id="item-file-section">
 			<h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text></h2>
 			<xsl:choose>
-				<xsl:when test="./mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL' or @USE='ORE'] or ./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@element='identifier' and @qualifier='uri' and @mdschema='sedici']">
+				<xsl:when test="./mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL' or @USE='ORE'] or ./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@element='identifier' and (@qualifier='uri' or @qualifier='doi' or @qualifier='handle') and @mdschema='sedici']">
 					<xsl:if test="./mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL']">
 						<xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL']">
 							<xsl:with-param name="context" select="."/>
@@ -1013,6 +999,16 @@
 					<!-- Localizacion Electronica -->
 					<xsl:if test="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@element='identifier' and @qualifier='uri' and @mdschema='sedici']">
 						<xsl:apply-templates select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@element='identifier' and @qualifier='uri' and @mdschema='sedici'] "/>
+					</xsl:if>
+					
+					<!-- DOI -->
+					<xsl:if test="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@element='identifier' and @qualifier='doi' and @mdschema='sedici']">
+						<xsl:apply-templates select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@element='identifier' and @qualifier='doi' and @mdschema='sedici'] "/>
+					</xsl:if>
+					
+					<!-- HANDLE -->
+					<xsl:if test="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@element='identifier' and @qualifier='handle' and @mdschema='sedici']">
+						<xsl:apply-templates select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@element='identifier' and @qualifier='handle' and @mdschema='sedici'] "/>
 					</xsl:if>
 				</xsl:when>
 				<xsl:otherwise>
@@ -1212,7 +1208,24 @@
 	</xsl:template>
 
 
-	<xsl:template match="dim:field[@element='identifier' and @qualifier='uri' and @mdschema='sedici']">
+	<xsl:template match="dim:field[@element='identifier' and (@qualifier='uri' or @qualifier='doi' or @qualifier='handle') and @mdschema='sedici']">
+		<xsl:variable name="url_value">
+			<xsl:choose>
+				<xsl:when test="@qualifier='doi'">
+					<xsl:if test="not(starts-with(.,'https://dx.doi.org/') or starts-with(.,'http://dx.doi.org/'))">
+						<xsl:value-of select="'https://dx.doi.org/'"/>
+					</xsl:if>
+				</xsl:when>
+				<xsl:when test="@qualifier='handle'">
+					<xsl:if test="not(starts-with(.,'https://hdl.handle.net/') or starts-with(.,'http://hdl.handle.net/'))">
+						<xsl:value-of select="'https://hdl.handle.net/'"/>
+					</xsl:if>
+				</xsl:when>
+			</xsl:choose>
+			
+			<xsl:value-of select="."/>
+		
+		</xsl:variable>
 		<div class="file-wrapper clearfix">
 			<div class="thumbnail-wrapper">
 				<a class="image-link" target="_blank">
@@ -1225,13 +1238,15 @@
 			<div class="file-metadata">
 				<div>
 					<i18n:text>xmlui.dri2xhtml.METS-1.0.item-identifier-uri</i18n:text>
+					<xsl:if test="@qualifier='doi'"><xsl:value-of select="' (DOI)'"/></xsl:if>
+					<xsl:if test="@qualifier='handle'"><xsl:value-of select="' (HANDLE)'"/></xsl:if>
 				</div>
 				<div>
 					<a class="image-link" target="_blank">
 						<xsl:attribute name="href">
-							<xsl:value-of select="." />
+							<xsl:value-of select="$url_value" />
 						</xsl:attribute>
-						<xsl:value-of select="java:ar.edu.unlp.sedici.xmlui.xsl.XslExtensions.getBaseUrl(.)" disable-output-escaping="yes"/>
+						<xsl:value-of select="java:ar.edu.unlp.sedici.xmlui.xsl.XslExtensions.getBaseUrl($url_value)" disable-output-escaping="yes"/>
 						<xsl:text>/...</xsl:text>
 					</a>
 				</div>
