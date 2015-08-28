@@ -34,22 +34,6 @@ public class BaseDSpaceFilterResolver implements DSpaceFilterResolver {
     @Autowired
     ContextService contextService;
 
-    @Override
-    public String buildDatabaseQuery(Condition condition, List<Object> parameters, Scope scope) throws ContextServiceException {
-        DSpaceFilter filter = getFilter(condition);
-        DatabaseFilterResult result = filter.buildDatabaseQuery(contextService.getContext());
-        if (result.hasResult())
-        {
-            parameters.addAll(result.getParameters());
-            if (scope == MetadataFormat)
-                return "(item.deleted:true OR ("
-                        + result.getQuery() + "))";
-            else
-                return "(" + result.getQuery() + ")";
-        }
-        return "true";
-    }
-
     public DSpaceFilter getFilter (Condition condition) {
         if (condition instanceof AndCondition) return (DSpaceFilter) getFilter((AndCondition) condition);
         else if (condition instanceof OrCondition) return (DSpaceFilter) getFilter((OrCondition) condition);

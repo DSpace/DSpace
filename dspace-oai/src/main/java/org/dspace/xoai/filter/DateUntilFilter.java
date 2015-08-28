@@ -24,18 +24,12 @@ import java.util.Date;
  */
 public class DateUntilFilter extends DSpaceFilter
 {
-    private static DateProvider dateProvider = new BaseDateProvider();
-    private Date date;
+    private static final DateProvider dateProvider = new BaseDateProvider();
+    private final Date date;
 
     public DateUntilFilter(Date date)
     {
         this.date = new DateBuilder(date).setMaxMilliseconds().build();
-    }
-
-    @Override
-    public DatabaseFilterResult buildDatabaseQuery(Context context)
-    {
-        return new DatabaseFilterResult("i.last_modified <= ?", new java.sql.Date(date.getTime()));
     }
 
     @Override

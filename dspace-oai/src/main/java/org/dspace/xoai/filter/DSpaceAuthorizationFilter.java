@@ -9,8 +9,6 @@
 package org.dspace.xoai.filter;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -18,11 +16,9 @@ import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
-import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.xoai.data.DSpaceItem;
-import org.dspace.xoai.filter.results.DatabaseFilterResult;
 import org.dspace.xoai.filter.results.SolrFilterResult;
 
 /**
@@ -38,19 +34,6 @@ public class DSpaceAuthorizationFilter extends DSpaceFilter
 
     private static final HandleService handleService
             = HandleServiceFactory.getInstance().getHandleService();
-
-    @Override
-    public DatabaseFilterResult buildDatabaseQuery(Context context)
-    {
-        List<Object> params = new ArrayList<>();
-        return new DatabaseFilterResult("EXISTS (SELECT p.action_id FROM "
-                + "resourcepolicy p, " + "bundle2bitstream b, " + "bundle bu, "
-                + "item2bundle ib " + "WHERE " + "p.resource_type_id=0 AND "
-                + "p.resource_id=b.bitstream_id AND "
-                + "p.epersongroup_id=0 AND " + "b.bundle_id=ib.bundle_id AND "
-                + "bu.bundle_id=b.bundle_id AND " + "bu.name='ORIGINAL' AND "
-                + "ib.item_id=i.item_id)", params);
-    }
 
     @Override
     public boolean isShown(DSpaceItem item)
