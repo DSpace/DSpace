@@ -11,8 +11,10 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.SiteDAO;
 import org.dspace.content.service.SiteService;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.event.Event;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,12 +72,27 @@ public class SiteServiceImpl extends DSpaceObjectServiceImpl<Site> implements Si
     }
 
     @Override
-    public void update(Context context, Site dso) throws SQLException, AuthorizeException {
+    public void update(Context context, Site site) throws SQLException, AuthorizeException {
         if(!authorizeService.isAdmin(context)){
             throw new AuthorizeException();
         }
-        siteDAO.save(context, dso);
+        if(site.isMetadataModified())
+        {
+            context.addEvent(new Event(Event.MODIFY_METADATA, site.getType(), site.getID(), site.getDetails(), getIdentifiers(context, site)));
+        }
+        if(site.isModified()) {
+            context.addEvent(new Event(Event.MODIFY, site.getType(), site.getID(), site.getDetails(), getIdentifiers(context, site)));
+        }
+        site.clearModified();
+        site.clearDetails();
 
+        siteDAO.save(context, site);
+    }
+
+    @Override
+    public String getName(Site dso)
+    {
+        return ConfigurationManager.getProperty("dspace.name");
     }
 
     @Override
