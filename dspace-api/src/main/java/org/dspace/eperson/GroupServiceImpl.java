@@ -323,6 +323,11 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                 + group.getID()));
     }
 
+    @Override
+    public int getSupportsTypeConstant() {
+        return Constants.GROUP;
+    }
+
     /**
      * Return true if group has no direct or indirect members
      */

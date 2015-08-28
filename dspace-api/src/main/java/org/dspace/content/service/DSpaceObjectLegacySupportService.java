@@ -33,4 +33,11 @@ public interface DSpaceObjectLegacySupportService<T extends DSpaceObject> {
      * @throws java.sql.SQLException only upon failure accessing the database.
      */
     public T findByLegacyId(Context context, int id) throws SQLException;
+
+    /**
+     * Returns the Constants which this service supports
+     *
+     * @return a org.dspace.core.Constants that represents a DSpaceObjct type
+     */
+    public int getSupportsTypeConstant();
 }

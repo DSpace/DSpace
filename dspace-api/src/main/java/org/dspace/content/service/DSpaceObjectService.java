@@ -337,4 +337,13 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
     public void update(Context context, T dso) throws SQLException, AuthorizeException;
 
     public void delete(Context context, T dso) throws SQLException, AuthorizeException, IOException;
+
+
+    /**
+     * Returns the Constants which this service supports
+     *
+     * @return a org.dspace.core.Constants that represents a DSpaceObjct type
+     */
+    public int getSupportsTypeConstant();
+
 }

@@ -466,6 +466,11 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
     }
 
+    @Override
+    public int getSupportsTypeConstant() {
+        return Constants.COMMUNITY;
+    }
+
 
     /**
      * Internal method to remove the community and all its children from the

@@ -730,6 +730,11 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
+    public int getSupportsTypeConstant() {
+        return Constants.COLLECTION;
+    }
+
+    @Override
     public List<Collection> findAuthorized(Context context, Community community, int actionID) throws SQLException {
         List<Collection> myResults = new ArrayList<Collection>();
 

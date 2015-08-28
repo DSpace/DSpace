@@ -585,6 +585,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         rawDelete(context,  item);
     }
 
+    @Override
+    public int getSupportsTypeConstant() {
+        return Constants.ITEM;
+    }
+
     protected void rawDelete(Context context, Item item) throws AuthorizeException, SQLException, IOException {
         authorizeService.authorizeAction(context, item, Constants.REMOVE);
 

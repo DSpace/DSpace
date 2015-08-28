@@ -225,6 +225,11 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     }
 
     @Override
+    public int getSupportsTypeConstant() {
+        return Constants.EPERSON;
+    }
+
+    @Override
     public void setPassword(EPerson ePerson, String password) {
         PasswordHash hash = new PasswordHash(password);
         ePerson.setDigestAlgorithm(hash.getAlgorithm());

@@ -16,12 +16,18 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.utils.DSpace;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 
+import java.util.List;
+
 /**
  * Abstract factory to get services for the content package, use ContentServiceFactory.getInstance() to retrieve an implementation
  *
  * @author kevinvandevelde at atmire.com
  */
 public abstract class ContentServiceFactory {
+
+    public abstract List<DSpaceObjectService<? extends DSpaceObject>> getDSpaceObjectServices();
+
+    public abstract List<DSpaceObjectLegacySupportService<? extends DSpaceObject>> getDSpaceObjectLegacySupportServices();
 
     public abstract BitstreamFormatService getBitstreamFormatService();
 
@@ -71,48 +77,27 @@ public abstract class ContentServiceFactory {
 
     public DSpaceObjectService getDSpaceObjectService(int type)
     {
-        switch (type)
-        {
-            case Constants.BITSTREAM:
-                return getBitstreamService();
-            case Constants.BUNDLE:
-                return getBundleService();
-            case Constants.ITEM:
-                return getItemService();
-            case Constants.COLLECTION:
-                return getCollectionService();
-            case Constants.COMMUNITY:
-                return getCommunityService();
-            case Constants.GROUP:
-                return EPersonServiceFactory.getInstance().getGroupService();
-            case Constants.EPERSON:
-                return EPersonServiceFactory.getInstance().getEPersonService();
-            default:
-                throw new UnsupportedOperationException();
+        for (int i = 0; i < getDSpaceObjectServices().size(); i++) {
+            DSpaceObjectService objectService = getDSpaceObjectServices().get(i);
+            if(objectService.getSupportsTypeConstant() == type)
+            {
+                return objectService;
+            }
         }
+        throw new UnsupportedOperationException("Unknown DSpace type: " + type);
     }
 
     public DSpaceObjectLegacySupportService<? extends DSpaceObject> getDSpaceLegacyObjectService(int type)
     {
-        switch (type)
-        {
-            case Constants.BITSTREAM:
-                return getBitstreamService();
-            case Constants.BUNDLE:
-                return getBundleService();
-            case Constants.ITEM:
-                return getItemService();
-            case Constants.COLLECTION:
-                return getCollectionService();
-            case Constants.COMMUNITY:
-                return getCommunityService();
-            case Constants.GROUP:
-                return EPersonServiceFactory.getInstance().getGroupService();
-            case Constants.EPERSON:
-                return EPersonServiceFactory.getInstance().getEPersonService();
-            default:
-                throw new UnsupportedOperationException();
+        for (int i = 0; i < getDSpaceObjectLegacySupportServices().size(); i++) {
+            DSpaceObjectLegacySupportService<? extends DSpaceObject> objectLegacySupportService = getDSpaceObjectLegacySupportServices().get(i);
+            if(objectLegacySupportService.getSupportsTypeConstant() == type)
+            {
+                return objectLegacySupportService;
+            }
+
         }
+        throw new UnsupportedOperationException("Unknown DSpace type: " + type);
     }
 
     public static ContentServiceFactory getInstance(){

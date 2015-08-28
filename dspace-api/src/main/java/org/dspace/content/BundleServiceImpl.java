@@ -440,6 +440,11 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
     }
 
     @Override
+    public int getSupportsTypeConstant() {
+        return Constants.BUNDLE;
+    }
+
+    @Override
     public Bundle findByIdOrLegacyId(Context context, String id) throws SQLException {
         if(StringUtils.isNumeric(id))
         {

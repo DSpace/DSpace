@@ -18,7 +18,8 @@ import java.sql.SQLException;
  *
  * @author kevinvandevelde at atmire.com
  */
-public interface SiteService {
+public interface SiteService extends DSpaceObjectService<Site>
+{
 
     public Site createSite(Context context) throws SQLException;
 
