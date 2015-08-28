@@ -15,10 +15,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.util.ClientUtils;
-import org.dspace.core.Constants;
 import org.dspace.xoai.data.DSpaceItem;
 import org.dspace.xoai.filter.data.DSpaceMetadataFilterOperator;
-import org.dspace.xoai.filter.results.DatabaseFilterResult;
 import org.dspace.xoai.filter.results.SolrFilterResult;
 
 import com.google.common.base.Function;
@@ -50,7 +48,7 @@ public class DSpaceAtLeastOneMetadataFilter extends DSpaceFilter {
             if (parameterValue == null) parameterValue = getConfiguration().get("values");
 
             if (parameterValue instanceof SimpleType) {
-                values = new ArrayList<String>();
+                values = new ArrayList<>();
                 values.add(((SimpleType) parameterValue).asString());
             } else if (parameterValue instanceof ParameterList) {
                 values = new ListBuilder<ParameterValue>()
@@ -61,7 +59,7 @@ public class DSpaceAtLeastOneMetadataFilter extends DSpaceFilter {
                                 return elem.asSimpleType().asString();
                             }
                         });
-            } else values = new ArrayList<String>();
+            } else values = new ArrayList<>();
         }
         return values;
     }
@@ -120,65 +118,10 @@ public class DSpaceAtLeastOneMetadataFilter extends DSpaceFilter {
         return false;
     }
 
-    private DatabaseFilterResult getWhere(int mdid, List<String> values) {
-        List<String> parts = new ArrayList<String>();
-        List<Object> params = new ArrayList<Object>();
-        params.add(mdid);
-        for (String v : values)
-            this.buildWhere(v, parts, params);
-        if (parts.size() > 0) {
-            String query = "EXISTS (SELECT tmp.* FROM metadatavalue tmp WHERE tmp.resource_id=i.item_id AND tmp.resource_type_id=" + Constants.ITEM+ " AND tmp.metadata_field_id=?"
-                    + " AND ("
-                    + StringUtils.join(parts.iterator(), " OR ")
-                    + "))";
-            return new DatabaseFilterResult(query, params);
-        }
-        return new DatabaseFilterResult();
-    }
-
-    private void buildWhere(String value, List<String> parts,
-                            List<Object> params) {
-        switch (this.getOperator()) {
-            case ENDS_WITH:
-                parts.add("(tmp.text_value LIKE ?)");
-                params.add("%" + value);
-                break;
-            case STARTS_WITH:
-                parts.add("(tmp.text_value LIKE ?)");
-                params.add(value + "%");
-                break;
-            case EQUAL:
-                parts.add("(tmp.text_value LIKE ?)");
-                params.add(value);
-                break;
-            case GREATER:
-                parts.add("(tmp.text_value > ?)");
-                params.add(value);
-                break;
-            case LOWER:
-                parts.add("(tmp.text_value < ?)");
-                params.add(value);
-                break;
-            case LOWER_OR_EQUAL:
-                parts.add("(tmp.text_value <= ?)");
-                params.add(value);
-                break;
-            case GREATER_OR_EQUAL:
-                parts.add("(tmp.text_value >= ?)");
-                params.add(value);
-                break;
-            case CONTAINS:
-            default:
-                parts.add("(tmp.text_value LIKE ?)");
-                params.add("%" + value + "%");
-                break;
-        }
-    }
-
     @Override
     public SolrFilterResult buildSolrQuery() {
         String field = this.getField();
-        List<String> parts = new ArrayList<String>();
+        List<String> parts = new ArrayList<>();
         if (this.getField() != null) {
             for (String v : this.getValues())
                 this.buildQuery("metadata." + field,

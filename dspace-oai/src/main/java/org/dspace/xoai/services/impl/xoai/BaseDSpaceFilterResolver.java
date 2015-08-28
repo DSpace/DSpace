@@ -13,15 +13,12 @@ import com.lyncode.xoai.dataprovider.filter.conditions.*;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.ParameterMap;
 import org.apache.log4j.Logger;
 import org.dspace.xoai.filter.*;
-import org.dspace.xoai.filter.results.DatabaseFilterResult;
 import org.dspace.xoai.filter.results.SolrFilterResult;
 import org.dspace.xoai.services.api.context.ContextService;
 import org.dspace.xoai.services.api.context.ContextServiceException;
 import org.dspace.xoai.services.api.FieldResolver;
 import org.dspace.xoai.services.api.xoai.DSpaceFilterResolver;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
 
 import static com.lyncode.xoai.dataprovider.filter.Scope.MetadataFormat;
 
