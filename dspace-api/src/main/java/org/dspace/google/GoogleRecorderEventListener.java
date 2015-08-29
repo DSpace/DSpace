@@ -8,6 +8,7 @@
 
 package org.dspace.google;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -60,11 +61,11 @@ public class GoogleRecorderEventListener extends AbstractUsageEventListener {
 
             // This is a wee bit messy but these keys should be combined in future.
             analyticsKey = new DSpace().getConfigurationService().getProperty("jspui.google.analytics.key");
-            if (analyticsKey == null ) {
+            if (StringUtils.isBlank(analyticsKey)) {
                 analyticsKey = new DSpace().getConfigurationService().getProperty("xmlui.google.analytics.key");
             }
 
-            if (analyticsKey != null ) {
+            if (StringUtils.isNotBlank(analyticsKey)) {
                 try {
                     UsageEvent ue = (UsageEvent)event;
 
