@@ -94,6 +94,13 @@ public class GoogleRecorderEventListener extends AbstractUsageEventListener {
     }
 
     private void logEvent(UsageEvent ue, String category, String action) throws IOException, SQLException {
+        String dntHeader = ue.getRequest().getHeader("DNT");
+        if (StringUtils.isNotBlank(dntHeader) && "1".equals(dntHeader))
+        {
+            log.debug("Not sending usage event to Google Analytics, DNT:1 present");
+            return;
+        }
+
         HttpPost httpPost = new HttpPost(GoogleURL);
 
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
