@@ -880,6 +880,7 @@ public class Item extends DSpaceObject
                 }
             }
         }
+        updateMetadata();
     }
 
     /**
@@ -1013,6 +1014,7 @@ public class Item extends DSpaceObject
         // Now swap the old list of values for the new, unremoved values
         setMetadata(values);
         dublinCore.metadataChanged = true;
+        updateMetadata();
     }
 
     /**
