@@ -19,7 +19,7 @@ CREATE TABLE site
 
 );
 
-ALTER TABLE eperson ADD COLUMN uuid UUID DEFAULT gen_random_uuid() UNIQUE;
+ALTER TABLE eperson ADD COLUMN uuid UUID UNIQUE;
 INSERT INTO dspaceobject  (uuid) SELECT uuid FROM eperson;
 ALTER TABLE eperson ADD FOREIGN KEY (uuid) REFERENCES dspaceobject;
 ALTER TABLE eperson ALTER COLUMN uuid SET NOT NULL;
@@ -31,7 +31,7 @@ UPDATE eperson SET self_registered = false WHERE self_registered IS NULL;
 
 
 
-ALTER TABLE epersongroup ADD COLUMN uuid UUID DEFAULT gen_random_uuid() UNIQUE;
+ALTER TABLE epersongroup ADD COLUMN uuid UUID UNIQUE;
 INSERT INTO dspaceobject  (uuid) SELECT uuid FROM epersongroup;
 ALTER TABLE epersongroup ADD FOREIGN KEY (uuid) REFERENCES dspaceobject;
 ALTER TABLE epersongroup ALTER COLUMN uuid SET NOT NULL;
@@ -39,7 +39,7 @@ ALTER TABLE epersongroup ADD CONSTRAINT epersongroup_id_unique UNIQUE(uuid);
 ALTER TABLE epersongroup ADD PRIMARY KEY (uuid);
 ALTER TABLE epersongroup ALTER COLUMN eperson_group_id DROP NOT NULL;
 
-ALTER TABLE item ADD COLUMN uuid UUID DEFAULT gen_random_uuid() UNIQUE;
+ALTER TABLE item ADD COLUMN uuid UUID UNIQUE;
 INSERT INTO dspaceobject  (uuid) SELECT uuid FROM item;
 ALTER TABLE item ADD FOREIGN KEY (uuid) REFERENCES dspaceobject;
 ALTER TABLE item ALTER COLUMN uuid SET NOT NULL;
@@ -47,7 +47,7 @@ ALTER TABLE item ADD CONSTRAINT item_id_unique UNIQUE(uuid);
 ALTER TABLE item ADD PRIMARY KEY (uuid);
 ALTER TABLE item ALTER COLUMN item_id DROP NOT NULL;
 
-ALTER TABLE community ADD COLUMN uuid UUID DEFAULT gen_random_uuid() UNIQUE;
+ALTER TABLE community ADD COLUMN uuid UUID UNIQUE;
 INSERT INTO dspaceobject  (uuid) SELECT uuid FROM community;
 ALTER TABLE community ADD FOREIGN KEY (uuid) REFERENCES dspaceobject;
 ALTER TABLE community ALTER COLUMN uuid SET NOT NULL;
@@ -56,7 +56,7 @@ ALTER TABLE community ADD PRIMARY KEY (uuid);
 ALTER TABLE community ALTER COLUMN community_id DROP NOT NULL;
 
 
-ALTER TABLE collection ADD COLUMN uuid UUID DEFAULT gen_random_uuid() UNIQUE;
+ALTER TABLE collection ADD COLUMN uuid UUID UNIQUE;
 INSERT INTO dspaceobject  (uuid) SELECT uuid FROM collection;
 ALTER TABLE collection ADD FOREIGN KEY (uuid) REFERENCES dspaceobject;
 ALTER TABLE collection ALTER COLUMN uuid SET NOT NULL;
@@ -64,7 +64,7 @@ ALTER TABLE collection ADD CONSTRAINT collection_id_unique UNIQUE(uuid);
 ALTER TABLE collection ADD PRIMARY KEY (uuid);
 ALTER TABLE collection ALTER COLUMN collection_id DROP NOT NULL;
 
-ALTER TABLE bundle ADD COLUMN uuid UUID DEFAULT gen_random_uuid() UNIQUE;
+ALTER TABLE bundle ADD COLUMN uuid UUID UNIQUE;
 INSERT INTO dspaceobject  (uuid) SELECT uuid FROM bundle;
 ALTER TABLE bundle ADD FOREIGN KEY (uuid) REFERENCES dspaceobject;
 ALTER TABLE bundle ALTER COLUMN uuid SET NOT NULL;
@@ -72,7 +72,7 @@ ALTER TABLE bundle ADD CONSTRAINT bundle_id_unique UNIQUE(uuid);
 ALTER TABLE bundle ADD PRIMARY KEY (uuid);
 ALTER TABLE bundle ALTER COLUMN bundle_id DROP NOT NULL;
 
-ALTER TABLE bitstream ADD COLUMN uuid UUID DEFAULT gen_random_uuid() UNIQUE;
+ALTER TABLE bitstream ADD COLUMN uuid UUID UNIQUE;
 INSERT INTO dspaceobject  (uuid) SELECT uuid FROM bitstream;
 ALTER TABLE bitstream ADD FOREIGN KEY (uuid) REFERENCES dspaceobject;
 ALTER TABLE bitstream ALTER COLUMN uuid SET NOT NULL;
@@ -318,7 +318,7 @@ UPDATE metadatavalue SET dspace_object_id = (SELECT bundle.uuid FROM bundle WHER
 UPDATE metadatavalue SET dspace_object_id = (SELECT bitstream.uuid FROM bitstream WHERE metadatavalue.resource_id = bitstream.bitstream_id AND metadatavalue.resource_type_id = 0) WHERE metadatavalue.resource_type_id= 0;
 DROP INDEX metadatavalue_item_idx;
 DROP INDEX metadatavalue_item_idx2;
-ALTER TABLE metadatavalue DROP COLUMN IF EXISTS resource_id;
+ALTER TABLE metadatavalue DROP COLUMN resource_id;
 ALTER TABLE metadatavalue DROP COLUMN resource_type_id;
 UPDATE MetadataValue SET confidence = -1 WHERE confidence IS NULL;
 
