@@ -810,7 +810,7 @@ public class Item extends DSpaceObject
     public void addMetadata(String schema, String element, String qualifier, String lang,
                             String[] values, String authorities[], int confidences[])
     {
-        List<DCValue> dublinCore = getMetadata();
+        List<DCValue> dcValueList = getMetadata();
         MetadataAuthorityManager mam = MetadataAuthorityManager.getManager();
         boolean authorityControlled = mam.isAuthorityControlled(schema, element, qualifier);
         boolean authorityRequired = mam.isAuthorityRequired(schema, element, qualifier);
@@ -872,8 +872,8 @@ public class Item extends DSpaceObject
             {
                 dcv.value = null;
             }
-            if(!dublinCore.contains(dcv)){
-                dublinCore.add(dcv);
+            if(!dcValueList.contains(dcv)){
+                dcValueList.add(dcv);
                 addDetails(fieldName);
                 if (values.length > 0)
                 {
@@ -881,11 +881,6 @@ public class Item extends DSpaceObject
                 }
             }
         }
-
-//        if (values.length > 0)
-//        {
-//            dublinCoreChanged = true;
-//        }
     }
 
     /**
