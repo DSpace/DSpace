@@ -9,6 +9,7 @@ package org.dspace.content;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.RuntimeException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.*;
@@ -1672,14 +1673,22 @@ public class Item extends DSpaceObject
                 }
             }
         }
+        updateMetadata();
 
-        // Map counting number of values for each element/qualifier.
-        // Keys are Strings: "element" or "element.qualifier"
-        // Values are Integers indicating number of values written for a
-        // element/qualifier
-        Map<String,Integer> elementCount = new HashMap<String,Integer>();
+        Event newEvent = new Event(Event.MODIFY_METADATA, Constants.ITEM, getID(), getDetails());
+        ourContext.addEvent(newEvent);
+        log.debug ("update issued an event " + newEvent.toString());
+        clearDetails();
 
+    }
+
+    public void updateMetadata() {
         if (dublinCore.metadataChanged) {
+            // Map counting number of values for each element/qualifier.
+            // Keys are Strings: "element" or "element.qualifier"
+            // Values are Integers indicating number of values written for a
+            // element/qualifier
+            Map<String,Integer> elementCount = new HashMap<String,Integer>();
 
             dublinCore.metadataChanged = false;
             List<DCValue> currMetadata = getMetadata();
@@ -1711,27 +1720,30 @@ public class Item extends DSpaceObject
                 // Store the calculated place number, reset the stored flag, and cache the metadatafield
                 placeNum[dcIdx] = current;
                 storedDC[dcIdx] = false;
-                dcFields[dcIdx] = getMetadataField(dcv);
-                if (dcFields[dcIdx] == null)
-                {
-                    // Bad DC field, log and throw exception
-                    log.warn(LogManager
-                            .getHeader(ourContext, "bad_dc",
-                                    "Bad DC field. schema="+dcv.schema
-                                            + ", element: \""
-                                            + ((dcv.element == null) ? "null"
-                                            : dcv.element)
-                                            + "\" qualifier: \""
-                                            + ((dcv.qualifier == null) ? "null"
-                                            : dcv.qualifier)
-                                            + "\" value: \""
-                                            + ((dcv.value == null) ? "null"
-                                            : dcv.value) + "\""));
+                try {
+                    dcFields[dcIdx] = getMetadataField(dcv);
+                    if (dcFields[dcIdx] == null) {
+                        // Bad DC field, log and throw exception
+                        log.warn(LogManager
+                                .getHeader(ourContext, "bad_dc",
+                                        "Bad DC field. schema=" + dcv.schema
+                                                + ", element: \""
+                                                + ((dcv.element == null) ? "null"
+                                                : dcv.element)
+                                                + "\" qualifier: \""
+                                                + ((dcv.qualifier == null) ? "null"
+                                                : dcv.qualifier)
+                                                + "\" value: \""
+                                                + ((dcv.value == null) ? "null"
+                                                : dcv.value) + "\""));
 
-                    throw new SQLException("bad_dublin_core "
-                            + "schema="+dcv.schema+", "
-                            + dcv.element
-                            + " " + dcv.qualifier);
+                        throw new SQLException("bad_dublin_core "
+                                + "schema=" + dcv.schema + ", "
+                                + dcv.element
+                                + " " + dcv.qualifier);
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
                 }
             }
 
@@ -1838,11 +1850,10 @@ public class Item extends DSpaceObject
                             modified = true;
                         }
                     }
-                }
-                finally
-                {
                     tri.close();
                 }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
 
             // Add missing in-memory DC
@@ -1862,7 +1873,11 @@ public class Item extends DSpaceObject
                     metadata.setPlace(placeNum[dcIdx]);
                     metadata.setAuthority(dcv.authority);
                     metadata.setConfidence(dcv.confidence);
-                    metadata.create(ourContext);
+                    try {
+                        metadata.create(ourContext);
+                    } catch (Exception e) {
+                        throw new RuntimeException ("Couldn't create metadata for item " + getID(), e);
+                    }
                     dublinCore.metadataChanged = true;
                     modified = true;
                 }
