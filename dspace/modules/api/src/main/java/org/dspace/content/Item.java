@@ -2864,7 +2864,7 @@ public class Item extends DSpaceObject
 
         List<DCValue> get(Context c, int itemId, Logger log) throws SQLException
         {
-            if (metadata == null)
+            if ((metadataChanged==true)||(metadata == null))
             {
                 metadata = new ArrayList<DCValue>();
 
