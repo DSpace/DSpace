@@ -122,13 +122,6 @@ public class Item extends DSpaceObject
         context.cache(this, row.getIntColumn("item_id"));
     }
 
-    private TableRowIterator retrieveMetadata() throws SQLException
-    {
-        return DatabaseManager.queryTable(ourContext, "MetadataValue",
-                "SELECT * FROM MetadataValue WHERE item_id= ? ORDER BY metadata_field_id, place",
-                itemRow.getIntColumn("item_id"));
-    }
-
     /**
      * Get an item from the database. The item, its Dublin Core metadata, and
      * the bundle and bitstream metadata are all loaded into memory.
@@ -1744,11 +1737,10 @@ public class Item extends DSpaceObject
 
             // Now the precalculations are done, iterate through the existing metadata
             // looking for matches
-            TableRowIterator tri = retrieveMetadata();
-            if (tri != null)
-            {
-                try
-                {
+            try {
+                TableRowIterator tri = dublinCore.retrieveMetadata(getID());
+
+                if (tri != null) {
                     while (tri.hasNext())
                     {
                         TableRow tr = tri.next();
