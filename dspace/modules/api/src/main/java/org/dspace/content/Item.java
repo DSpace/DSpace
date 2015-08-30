@@ -1689,15 +1689,16 @@ public class Item extends DSpaceObject
         if (dublinCore.metadataChanged) {
 
             dublinCore.metadataChanged = false;
+            List<DCValue> currMetadata = getMetadata();
             // Arrays to store the working information required
-            int[]     placeNum = new int[getMetadata().size()];
-            boolean[] storedDC = new boolean[getMetadata().size()];
-            MetadataField[] dcFields = new MetadataField[getMetadata().size()];
+            int[]     placeNum = new int[currMetadata.size()];
+            boolean[] storedDC = new boolean[currMetadata.size()];
+            MetadataField[] dcFields = new MetadataField[currMetadata.size()];
 
             // Work out the place numbers for the in memory DC
-            for (int dcIdx = 0; dcIdx < getMetadata().size(); dcIdx++)
+            for (int dcIdx = 0; dcIdx < currMetadata.size(); dcIdx++)
             {
-                DCValue dcv = getMetadata().get(dcIdx);
+                DCValue dcv = currMetadata.get(dcIdx);
 
                 // Work out the place number for ordering
                 int current = 0;
@@ -1755,13 +1756,13 @@ public class Item extends DSpaceObject
                         boolean removeRow = true;
 
                         // Go through the in-memory metadata, unless we've already decided to keep this row
-                        for (int dcIdx = 0; dcIdx < getMetadata().size() && removeRow; dcIdx++)
+                        for (int dcIdx = 0; dcIdx < currMetadata.size() && removeRow; dcIdx++)
                         {
                             // Only process if this metadata has not already been matched to something in the DB
                             if (!storedDC[dcIdx])
                             {
                                 boolean matched = true;
-                                DCValue dcv   = getMetadata().get(dcIdx);
+                                DCValue dcv   = currMetadata.get(dcIdx);
 
                                 // Check the metadata field is the same
                                 if (matched && dcFields[dcIdx].getFieldID() != tr.getIntColumn("metadata_field_id"))
