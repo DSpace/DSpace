@@ -119,7 +119,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class SolrServiceImpl implements SearchService, IndexingService {
 
-    private static final Logger log = Logger.getLogger(SolrServiceImpl.class);
+    private static final Logger log = cz.cuni.mff.ufal.Logger.getLogger(SolrServiceImpl.class);
 
     protected static final String LAST_INDEXED_FIELD = "SolrIndexer.lastIndexed";
 
