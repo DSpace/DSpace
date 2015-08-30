@@ -331,14 +331,25 @@ public class Item extends DSpaceObject
      */
     public void updateLastModified()
     {
-        try {
+        if (modified) {
             Date lastModified = new Timestamp(new Date().getTime());
             itemRow.setColumn("last_modified", lastModified);
-            DatabaseManager.updateQuery(ourContext, "UPDATE item SET last_modified = ? WHERE item_id= ? ", lastModified, getID());
-            //Also fire a modified event since the item HAS been modified
-            ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), null));
-        } catch (SQLException e) {
-            log.error(LogManager.getHeader(ourContext, "Error while updating last modified timestamp", "Item: " + getID()));
+
+            // Make sure that withdrawn and in_archive are non-null
+            if (itemRow.isColumnNull("in_archive")) {
+                itemRow.setColumn("in_archive", false);
+            }
+
+            if (itemRow.isColumnNull("withdrawn")) {
+                itemRow.setColumn("withdrawn", false);
+            }
+
+            try {
+                DatabaseManager.update(ourContext, itemRow);
+            } catch (SQLException e) {
+                log.error(LogManager.getHeader(ourContext, "Error while updating last modified timestamp", "Item: " + getID()));
+            }
+            modified = false;
         }
     }
 
@@ -1680,6 +1691,7 @@ public class Item extends DSpaceObject
         log.debug ("update issued an event " + newEvent.toString());
         clearDetails();
 
+        updateLastModified();
     }
 
     public void updateMetadata() {
@@ -1882,34 +1894,6 @@ public class Item extends DSpaceObject
                     modified = true;
                 }
             }
-        }
-
-        if (dublinCoreChanged || modified)
-        {
-            // Set the last modified date
-            itemRow.setColumn("last_modified", new Date());
-
-            // Make sure that withdrawn and in_archive are non-null
-            if (itemRow.isColumnNull("in_archive"))
-            {
-                itemRow.setColumn("in_archive", false);
-            }
-
-            if (itemRow.isColumnNull("withdrawn"))
-            {
-                itemRow.setColumn("withdrawn", false);
-            }
-
-            DatabaseManager.update(ourContext, itemRow);
-
-            if (dublinCoreChanged)
-            {
-                ourContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.ITEM, getID(), getDetails()));
-                clearDetails();
-            }
-
-            ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), null));
-            modified = false;
             dublinCore.metadataChanged = false;
         }
     }
