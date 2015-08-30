@@ -93,12 +93,6 @@ public class Item extends DSpaceObject
     private String handle;
 
     /**
-     * True if the Dublin Core has changed since reading from the DB or the last
-     * update()
-     */
-    private boolean dublinCoreChanged;
-
-    /**
      * True if anything else was changed since last update()
      * (to drive event mechanism)
      */
@@ -117,7 +111,7 @@ public class Item extends DSpaceObject
     {
         ourContext = context;
         itemRow = row;
-        dublinCoreChanged = false;
+        dublinCore.metadataChanged = false;
         modified = false;
         clearDetails();
 
@@ -877,7 +871,7 @@ public class Item extends DSpaceObject
                 addDetails(fieldName);
                 if (values.length > 0)
                 {
-                    dublinCoreChanged = true;
+                    dublinCore.metadataChanged = true;
                 }
             }
         }
@@ -1013,7 +1007,7 @@ public class Item extends DSpaceObject
 
         // Now swap the old list of values for the new, unremoved values
         setMetadata(values);
-        dublinCoreChanged = true;
+        dublinCore.metadataChanged = true;
     }
 
     /**
@@ -1692,11 +1686,9 @@ public class Item extends DSpaceObject
         // element/qualifier
         Map<String,Integer> elementCount = new HashMap<String,Integer>();
 
-        // Redo Dublin Core if it's changed
-        if (dublinCoreChanged)
-        {
-            dublinCoreChanged = false;
+        if (dublinCore.metadataChanged) {
 
+            dublinCore.metadataChanged = false;
             // Arrays to store the working information required
             int[]     placeNum = new int[getMetadata().size()];
             boolean[] storedDC = new boolean[getMetadata().size()];
@@ -1849,7 +1841,7 @@ public class Item extends DSpaceObject
                         if (removeRow)
                         {
                             DatabaseManager.delete(ourContext, tr);
-                            dublinCoreChanged = true;
+                            dublinCore.metadataChanged = true;
                             modified = true;
                         }
                     }
@@ -1878,7 +1870,7 @@ public class Item extends DSpaceObject
                     metadata.setAuthority(dcv.authority);
                     metadata.setConfidence(dcv.confidence);
                     metadata.create(ourContext);
-                    dublinCoreChanged = true;
+                    dublinCore.metadataChanged = true;
                     modified = true;
                 }
             }
@@ -1906,11 +1898,11 @@ public class Item extends DSpaceObject
             {
                 ourContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.ITEM, getID(), getDetails()));
                 clearDetails();
-                dublinCoreChanged = false;
             }
 
             ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), null));
             modified = false;
+            dublinCore.metadataChanged = false;
         }
     }
 
@@ -2871,12 +2863,12 @@ public class Item extends DSpaceObject
     private void setMetadata(List<DCValue> metadata)
     {
         dublinCore.set(metadata);
-        dublinCoreChanged = true;
     }
 
     class MetadataCache
     {
         List<DCValue> metadata = null;
+        boolean metadataChanged = true;
 
         List<DCValue> get(Context c, int itemId, Logger log) throws SQLException
         {
@@ -2946,6 +2938,7 @@ public class Item extends DSpaceObject
         void set(List<DCValue> m)
         {
             metadata = m;
+            metadataChanged = true;
         }
 
         TableRowIterator retrieveMetadata(int itemId) throws SQLException
