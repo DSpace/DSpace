@@ -349,7 +349,7 @@ public class Item extends DSpaceObject
             try {
                 DatabaseManager.update(ourContext, itemRow);
             } catch (SQLException e) {
-                log.error(LogManager.getHeader(ourContext, "Error while updating last modified timestamp", "Item: " + getID()));
+                log.error(LogManager.getHeader(ourContext, "Error while updating last modified timestamp", "Item: " + internalItemId));
             }
             modified = false;
         }
@@ -1386,7 +1386,7 @@ public class Item extends DSpaceObject
         AuthorizeManager.authorizeAction(ourContext, this, Constants.ADD);
 
         log.info(LogManager.getHeader(ourContext, "add_bundle", "item_id="
-                + getID() + ",bundle_id=" + b.getID()));
+                + internalItemId + ",bundle_id=" + b.getID()));
 
         // Check it's not already there
         Bundle[] bunds = getBundles();
@@ -1408,11 +1408,11 @@ public class Item extends DSpaceObject
 
         // Insert the mapping
         TableRow mappingRow = DatabaseManager.row("item2bundle");
-        mappingRow.setColumn("item_id", getID());
+        mappingRow.setColumn("item_id", internalItemId);
         mappingRow.setColumn("bundle_id", b.getID());
         DatabaseManager.insert(ourContext, mappingRow);
 
-        ourContext.addEvent(new Event(Event.ADD, Constants.ITEM, getID(), Constants.BUNDLE, b.getID(), b.getName()));
+        ourContext.addEvent(new Event(Event.ADD, Constants.ITEM, internalItemId, Constants.BUNDLE, b.getID(), b.getName()));
     }
 
     /**
@@ -1432,7 +1432,7 @@ public class Item extends DSpaceObject
         AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
 
         log.info(LogManager.getHeader(ourContext, "remove_bundle", "item_id="
-                + getID() + ",bundle_id=" + b.getID()));
+                + internalItemId + ",bundle_id=" + b.getID()));
 
         // Remove from internal list of bundles
         Bundle[] bunds = getBundles();
@@ -1451,9 +1451,9 @@ public class Item extends DSpaceObject
         DatabaseManager.updateQuery(ourContext,
                 "DELETE FROM item2bundle WHERE item_id= ? " +
                         "AND bundle_id= ? ",
-                getID(), b.getID());
+                internalItemId, b.getID());
 
-        ourContext.addEvent(new Event(Event.REMOVE, Constants.ITEM, getID(), Constants.BUNDLE, b.getID(), b.getName()));
+        ourContext.addEvent(new Event(Event.REMOVE, Constants.ITEM, internalItemId, Constants.BUNDLE, b.getID(), b.getName()));
 
         // If the bundle is orphaned, it's removed
         TableRowIterator tri = DatabaseManager.query(ourContext,
@@ -1650,7 +1650,7 @@ public class Item extends DSpaceObject
         }
 
         log.info(LogManager.getHeader(ourContext, "update_item", "item_id="
-                + getID()));
+                + internalItemId));
 
         // Set sequence IDs for bitstreams in item
         int sequence = 0;
@@ -1690,7 +1690,7 @@ public class Item extends DSpaceObject
         }
         updateMetadata();
 
-        Event newEvent = new Event(Event.MODIFY_METADATA, Constants.ITEM, getID(), getDetails());
+        Event newEvent = new Event(Event.MODIFY_METADATA, Constants.ITEM, internalItemId, getDetails());
         ourContext.addEvent(newEvent);
         log.debug ("update issued an event " + newEvent.toString());
         clearDetails();
@@ -1700,7 +1700,7 @@ public class Item extends DSpaceObject
 
     public void updateMetadata() {
         if (dublinCore.metadataChanged) {
-            modified = dublinCore.updateMetadata(getID());
+            modified = dublinCore.updateMetadata();
         }
     }
 
@@ -1791,7 +1791,7 @@ public class Item extends DSpaceObject
         // Update item in DB
         update();
 
-        ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), "WITHDRAW"));
+        ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, internalItemId, "WITHDRAW"));
 
         // and all of our authorization policies
         // FIXME: not very "multiple-inclusion" friendly
@@ -1799,7 +1799,7 @@ public class Item extends DSpaceObject
 
         // Write log
         log.info(LogManager.getHeader(ourContext, "withdraw_item", "user="
-                + e.getEmail() + ",item_id=" + getID()));
+                + e.getEmail() + ",item_id=" + internalItemId));
     }
 
     /**
@@ -1849,7 +1849,7 @@ public class Item extends DSpaceObject
         // Update item in DB
         update();
 
-        ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), "REINSTATE"));
+        ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, internalItemId, "REINSTATE"));
 
         // authorization policies
         if (colls.length > 0)
@@ -1863,7 +1863,7 @@ public class Item extends DSpaceObject
 
         // Write log
         log.info(LogManager.getHeader(ourContext, "reinstate_item", "user="
-                + e.getEmail() + ",item_id=" + getID()));
+                + e.getEmail() + ",item_id=" + internalItemId));
     }
 
     /**
@@ -1882,10 +1882,10 @@ public class Item extends DSpaceObject
         // leaving the database in an inconsistent state
         AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
 
-        ourContext.addEvent(new Event(Event.DELETE, Constants.ITEM, getID(), getHandle()));
+        ourContext.addEvent(new Event(Event.DELETE, Constants.ITEM, internalItemId, getHandle()));
 
         VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
-        VersionHistory history = versioningService.findVersionHistory(ourContext, this.getID());
+        VersionHistory history = versioningService.findVersionHistory(ourContext, internalItemId);
 
         Version version=null;
         Version previous=null;
@@ -1897,13 +1897,13 @@ public class Item extends DSpaceObject
                 objectId=previous.getItem().getID();
         }
 
-        ourContext.addEvent(new Event(Event.DELETE, Constants.ITEM, getID(), Constants.ITEM, objectId, getHandle()));
+        ourContext.addEvent(new Event(Event.DELETE, Constants.ITEM, internalItemId, Constants.ITEM, objectId, getHandle()));
 
         log.info(LogManager.getHeader(ourContext, "delete_item", "item_id="
-                + getID()));
+                + internalItemId));
 
         // Remove from cache
-        ourContext.removeCached(this, getID());
+        ourContext.removeCached(this, internalItemId);
 
         // Remove from browse indices, if appropriate
         /** XXX FIXME
@@ -1958,7 +1958,7 @@ public class Item extends DSpaceObject
 
 
                     //Check if this is our current dataset, if so no need to readd it
-                    if(dataset != null && dataset instanceof Item && dataset.getID() == getID())
+                    if(dataset != null && dataset instanceof Item && dataset.getID() == internalItemId)
                         continue;
 
                     //Add our identifier
@@ -1967,7 +1967,7 @@ public class Item extends DSpaceObject
                 }
                 publication.update();
             } catch (IllegalArgumentException e){
-                log.error(LogManager.getHeader(ourContext, "Error while deleting a data file", "data file id:" + getID()), e);
+                log.error(LogManager.getHeader(ourContext, "Error while deleting a data file", "data file id:" + internalItemId), e);
             }
         }
 
@@ -2013,7 +2013,7 @@ public class Item extends DSpaceObject
     public void decache() throws SQLException
     {
         // Remove item and it's submitter from cache
-        ourContext.removeCached(this, getID());
+        ourContext.removeCached(this, internalItemId);
         if (submitter != null)
         {
             ourContext.removeCached(submitter, submitter.getID());
@@ -2059,7 +2059,7 @@ public class Item extends DSpaceObject
         {
             return false;
         }
-        if (this.getID() != other.getID())
+        if (internalItemId != other.getID())
         {
             return false;
         }
@@ -2107,8 +2107,7 @@ public class Item extends DSpaceObject
     private void removeMetadataFromDatabase() throws SQLException
     {
         DatabaseManager.updateQuery(ourContext,
-                "DELETE FROM MetadataValue WHERE item_id= ? ",
-                getID());
+                "DELETE FROM MetadataValue WHERE item_id= ? ", internalItemId);
     }
 
     /**
@@ -2249,7 +2248,7 @@ public class Item extends DSpaceObject
         replaceAllBitstreamPolicies(policies);
 
         log.debug(LogManager.getHeader(ourContext, "item_inheritCollectionDefaultPolicies",
-                "item_id=" + getID()));
+                "item_id=" + internalItemId));
     }
 
     /**
@@ -2291,7 +2290,7 @@ public class Item extends DSpaceObject
         {
             // Update the owning collection
             log.info(LogManager.getHeader(ourContext, "move_item",
-                    "item_id=" + getID() + ", from " +
+                    "item_id=" + internalItemId + ", from " +
                             "collection_id=" + from.getID() + " to " +
                             "collection_id=" + to.getID()));
             setOwningCollection(to);
@@ -2318,7 +2317,7 @@ public class Item extends DSpaceObject
             // Note that updating the owning collection above will have the same effect,
             // so we only do this here if the owning collection hasn't changed.
 
-            ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), null));
+            ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, internalItemId, null));
         }
     }
 
@@ -2492,7 +2491,7 @@ public class Item extends DSpaceObject
             // is a template item?
             TableRow qResult = DatabaseManager.querySingle(ourContext,
                     "SELECT collection_id FROM collection " +
-                            "WHERE template_item_id = ?",getID());
+                            "WHERE template_item_id = ?",internalItemId);
             if (qResult != null)
             {
                 collection = Collection.find(ourContext, qResult.getIntColumn("collection_id"));
@@ -2600,7 +2599,7 @@ public class Item extends DSpaceObject
             // is a template item?
             TableRow qResult = DatabaseManager.querySingle(ourContext,
                     "SELECT collection_id FROM collection " +
-                            "WHERE template_item_id = ?",getID());
+                            "WHERE template_item_id = ?",internalItemId);
             if (qResult != null)
             {
                 return Collection.find(ourContext,qResult.getIntColumn("collection_id"));
@@ -2646,7 +2645,7 @@ public class Item extends DSpaceObject
 
     private List<DCValue> getMetadata()
     {
-        return dublinCore.get(getID());
+        return dublinCore.get();
     }
 
     private void setMetadata(List<DCValue> metadata)
@@ -2659,13 +2658,13 @@ public class Item extends DSpaceObject
         List<DCValue> metadata = null;
         boolean metadataChanged = true;
 
-        List<DCValue> get(int itemId) {
+        List<DCValue> get() {
             if ((metadataChanged==true)||(metadata == null)) {
                 metadata = new ArrayList<DCValue>();
 
                 // Get Dublin Core metadata
                 try {
-                    TableRowIterator tri = retrieveMetadata(itemId);
+                    TableRowIterator tri = retrieveMetadata();
                     if (tri != null) {
                         while (tri.hasNext()) {
                             TableRow resultRow = tri.next();
@@ -2700,7 +2699,7 @@ public class Item extends DSpaceObject
                         tri.close();
                     }
                 } catch (SQLException e) {
-                    throw new RuntimeException("couldn't access database metadata for item " + itemId, e);
+                    throw new RuntimeException("couldn't access database metadata for item " + internalItemId, e);
                 }
             }
             return metadata;
@@ -2712,19 +2711,19 @@ public class Item extends DSpaceObject
             metadataChanged = true;
         }
 
-        TableRowIterator retrieveMetadata(int itemId) throws SQLException
+        TableRowIterator retrieveMetadata() throws SQLException
         {
-            if (itemId > 0)
+            if (internalItemId > 0)
             {
                 return DatabaseManager.queryTable(ourContext, "MetadataValue",
                         "SELECT * FROM MetadataValue WHERE item_id= ? ORDER BY metadata_field_id, place",
-                        itemId);
+                        internalItemId);
             }
 
             return null;
         }
 
-        boolean updateMetadata(int itemId) {
+        boolean updateMetadata() {
             boolean hasBeenModified = false;
 
             metadataChanged = false;
@@ -2736,7 +2735,7 @@ public class Item extends DSpaceObject
             Map<String,Integer> elementCount = new HashMap<String,Integer>();
 
             try {
-                List<DCValue> currMetadata = get(itemId);
+                List<DCValue> currMetadata = get();
                 // Arrays to store the working information required
                 int[]     placeNum = new int[currMetadata.size()];
                 boolean[] storedDC = new boolean[currMetadata.size()];
@@ -2790,7 +2789,7 @@ public class Item extends DSpaceObject
 
                 // Now the precalculations are done, iterate through the existing metadata
                 // looking for matches
-                TableRowIterator tri = retrieveMetadata(getID());
+                TableRowIterator tri = retrieveMetadata();
 
                 if (tri != null) {
                     while (tri.hasNext())
@@ -2893,14 +2892,14 @@ public class Item extends DSpaceObject
                 }
 
                 // Add missing in-memory DC
-                for (int dcIdx = 0; dcIdx < get(itemId).size(); dcIdx++) {
+                for (int dcIdx = 0; dcIdx < get().size(); dcIdx++) {
                     // Only write values that are not already in the db
                     if (!storedDC[dcIdx]) {
-                        DCValue dcv = get(itemId).get(dcIdx);
+                        DCValue dcv = get().get(dcIdx);
 
                         // Write DCValue
                         MetadataValue metadata = new MetadataValue();
-                        metadata.setItemId(getID());
+                        metadata.setItemId(Item.this.internalItemId);
                         metadata.setFieldId(dcFields[dcIdx].getFieldID());
                         metadata.setValue(dcv.value);
                         metadata.setLanguage(dcv.language);
@@ -2910,7 +2909,7 @@ public class Item extends DSpaceObject
                         try {
                             metadata.create(ourContext);
                         } catch (Exception e) {
-                            throw new RuntimeException("Couldn't create metadata for item " + getID(), e);
+                            throw new RuntimeException("Couldn't create metadata for item " + Item.this.internalItemId, e);
                         }
                         hasBeenModified = true;
                     }
