@@ -1698,6 +1698,7 @@ public class Item extends DSpaceObject
 
     public void updateMetadata() {
         if (dublinCore.metadataChanged) {
+            modified = dublinCore.updateMetadata(ourContext, getID(), log);
         }
     }
 
