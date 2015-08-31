@@ -2657,43 +2657,28 @@ public class Item extends DSpaceObject
         List<DCValue> metadata = null;
         boolean metadataChanged = true;
 
-        List<DCValue> get(Context c, int itemId, Logger log)
-        {
-            if ((metadataChanged==true)||(metadata == null))
-            {
+        List<DCValue> get(Context c, int itemId, Logger log) {
+            if ((metadataChanged==true)||(metadata == null)) {
                 metadata = new ArrayList<DCValue>();
 
                 // Get Dublin Core metadata
                 try {
                     TableRowIterator tri = retrieveMetadata(itemId);
-                } catch (SQLException e) {
-                    throw new RuntimeException("couldn't access database metadata for item " + itemId, e);
-                }
-                if (tri != null)
-                {
-                    try
-                    {
-                        while (tri.hasNext())
-                        {
+                    if (tri != null) {
+                        while (tri.hasNext()) {
                             TableRow resultRow = tri.next();
 
                             // Get the associated metadata field and schema information
                             int fieldID = resultRow.getIntColumn("metadata_field_id");
                             MetadataField field = MetadataField.find(c, fieldID);
 
-                            if (field == null)
-                            {
+                            if (field == null) {
                                 log.error("Loading item - cannot find metadata field " + fieldID);
-                            }
-                            else
-                            {
+                            } else {
                                 MetadataSchema schema = MetadataSchema.find(c, field.getSchemaID());
-                                if (schema == null)
-                                {
+                                if (schema == null) {
                                     log.error("Loading item - cannot find metadata schema " + field.getSchemaID() + ", field " + fieldID);
-                                }
-                                else
-                                {
+                                } else {
                                     // Make a DCValue object
                                     DCValue dcv = new DCValue();
                                     dcv.element = field.getElement();
@@ -2710,18 +2695,12 @@ public class Item extends DSpaceObject
                                 }
                             }
                         }
-                    } catch (SQLException e) {
-                        throw new RuntimeException("couldn't access database metadata for item " + itemId, e);
-                    } finally {
-                        // close the TableRowIterator to free up resources
-                        if (tri != null)
-                        {
-                            tri.close();
-                        }
+                        tri.close();
                     }
+                } catch (SQLException e) {
+                    throw new RuntimeException("couldn't access database metadata for item " + itemId, e);
                 }
             }
-
             return metadata;
         }
 
