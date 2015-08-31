@@ -29,4 +29,7 @@ public interface MetadataValueDAO extends GenericDAO<MetadataValue> {
     public List<MetadataValue> findByValueLike(Context context, String value) throws SQLException;
 
     public void deleteByMetadataField(Context context, MetadataField metadataField) throws SQLException;
+
+    public MetadataValue getMinimum(Context context, int metadataFieldId)
+            throws SQLException;
 }

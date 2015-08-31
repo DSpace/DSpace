@@ -5,21 +5,22 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.xoai.services.impl.database;
+package org.dspace.xoai.services.impl;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.xoai.exceptions.InvalidMetadataFieldException;
-import org.dspace.xoai.services.api.database.EarliestDateResolver;
-import org.dspace.xoai.services.api.database.FieldResolver;
+import org.dspace.xoai.services.api.EarliestDateResolver;
+import org.dspace.xoai.services.api.FieldResolver;
 import org.dspace.xoai.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.SQLException;
 import java.util.Date;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.MetadataValueService;
 
 public class DSpaceEarliestDateResolver implements EarliestDateResolver {
     private static final Logger log = LogManager.getLogger(DSpaceEarliestDateResolver.class);
@@ -30,20 +31,13 @@ public class DSpaceEarliestDateResolver implements EarliestDateResolver {
     @Override
     public Date getEarliestDate(Context context) throws InvalidMetadataFieldException, SQLException {
         String query = "SELECT MIN(text_value) as value FROM metadatavalue WHERE metadata_field_id = ?";
-        boolean postgres = ! DatabaseManager.isOracle();
 
-        if (!postgres) {
-            query = "SELECT MIN(TO_CHAR(text_value)) as value FROM metadatavalue WHERE metadata_field_id = ?";
-        }
-
-        TableRowIterator iterator = DatabaseManager
-                .query(context,
-                        query,
-                        fieldResolver.getFieldID(context, "dc.date.available"));
-
-        if (iterator.hasNext())
+        MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
+        MetadataValue minimum = metadataValueService.getMinimum(context,
+                fieldResolver.getFieldID(context, "dc.date.available"));
+        if (null != minimum)
         {
-            String str = iterator.next().getStringColumn("value");
+            String str = minimum.getValue();
             try
             {
                 Date d = DateUtils.parse(str);

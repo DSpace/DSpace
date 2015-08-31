@@ -7,12 +7,7 @@
  */
 package org.dspace.xoai.filter;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.dspace.core.Context;
-import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.xoai.data.DSpaceItem;
-import org.dspace.xoai.filter.results.DatabaseFilterResult;
 import org.dspace.xoai.filter.results.SolrFilterResult;
 
 /**
@@ -29,18 +24,6 @@ import org.dspace.xoai.filter.results.SolrFilterResult;
 public class DSpaceWithdrawnFilter extends DSpaceFilter {
 
     @Override
-    public DatabaseFilterResult buildDatabaseQuery(Context context)
-    {
-        List<Object> params = new ArrayList<Object>();
-
-        String filter = "i.withdrawn=TRUE";
-        if(DatabaseManager.isOracle())
-            filter = "i.withdrawn=1";
-
-        return new DatabaseFilterResult(filter, params);
-    }
-
-    @Override
     public boolean isShown(DSpaceItem item)
     {
         // For DSpace, if an Item is withdrawn, "isDeleted()" will be true.
@@ -48,10 +31,7 @@ public class DSpaceWithdrawnFilter extends DSpaceFilter {
         // we can properly respond with a "deleted" status via OAI-PMH.
         // Don't worry, this does NOT make the metadata public for withdrawn items,
         // it merely provides an item "tombstone" via OAI-PMH.
-        if (item.isDeleted())
-            return true;
-        else
-            return false;
+        return item.isDeleted();
     }
 
     @Override

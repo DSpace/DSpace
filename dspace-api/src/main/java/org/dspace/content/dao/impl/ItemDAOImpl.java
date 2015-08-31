@@ -18,6 +18,7 @@ import org.hibernate.Query;
 
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 
 /**
@@ -40,6 +41,22 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         Query query = createQuery(context, "FROM Item WHERE inArchive= :in_archive or withdrawn = :withdrawn");
         query.setParameter("in_archive", archived);
         query.setParameter("withdrawn", withdrawn);
+        return iterate(query);
+    }
+
+    @Override
+    public Iterator<Item> findAll(Context context, boolean archived,
+            boolean withdrawn, boolean discoverable, Date lastModified)
+            throws SQLException
+    {
+        Query query = createQuery(context, "SELECT i FROM Item i"
+                + " WHERE (inArchive = :in_archive OR withdrawn = :withdrawn)"
+                + "  AND discoverable = :discoverable"
+                + "  AND last_modified > :last_modified");
+        query.setParameter("in_archive", archived);
+        query.setParameter("withdrawn", withdrawn);
+        query.setParameter("discoverable", discoverable);
+        query.setParameter("last_modified", lastModified);
         return iterate(query);
     }
 
@@ -125,5 +142,14 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         query.setParameter("withdrawn", includeWithdrawn);
 
         return count(query);
+    }
+
+    @Override
+    public Iterator<Item> findByLastModifiedSince(Context context, Date since)
+            throws SQLException
+    {
+        Query query = createQuery(context, "SELECT i FROM item i WHERE last_modified > :last_modified");
+        query.setParameter("last_modified", since);
+        return iterate(query);
     }
 }

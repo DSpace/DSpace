@@ -17,6 +17,7 @@ import org.dspace.eperson.Group;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -115,6 +116,15 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * @throws SQLException
      */
     public Iterator<Item> findByCollection(Context context, Collection collection, Integer limit, Integer offset) throws SQLException;
+
+    /**
+     * Get all Items installed or withdrawn, discoverable, and modified since a Date.
+     * @param context
+     * @param since earliest interesting last-modified date, or null for no date test.
+     * @return 
+     */
+    public Iterator<Item> findInArchiveOrWithdrawnDiscoverableModifiedSince(Context context, Date since)
+            throws SQLException;
 
     /**
      * Get all the items in this collection. The order is indeterminate.
@@ -429,4 +439,14 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * @return  total items
      */
     public int countItems(Context context, Collection collection) throws SQLException;
+
+    /**
+     * Find all Items modified since a Date.
+     *
+     * @param context
+     * @param last Earliest interesting last-modified date.
+     * @return 
+     */
+    public Iterator<Item> findByLastModifiedSince(Context context, Date last)
+            throws SQLException;
 }
