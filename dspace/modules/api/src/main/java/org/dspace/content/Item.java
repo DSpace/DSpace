@@ -2939,7 +2939,7 @@ public class Item extends DSpaceObject
                         hasBeenModified = true;
                     }
                 }
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
             return hasBeenModified;
