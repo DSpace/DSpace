@@ -128,3 +128,10 @@ dt, td.label-cell, .detailtable .label-cell {
 	font-size: 17px;
 	padding-top: 1em;
 }
+
+// don't set margin: 0 on section headings for the side navigation, it looks ugly on mobile phones
+#ds-options h2,h6 {
+	text-align: center;
+}
+
+
