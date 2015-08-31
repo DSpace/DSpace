@@ -41,7 +41,7 @@ public class SolrLoggerUsageEventListener extends AbstractUsageEventListener {
                 	if(ue.getRequest()!=null){
                 		SolrLogger.postView(ue.getObject(), ue.getRequest(), currentUser);
                 	} else {
-                		SolrLogger.postView(ue.getObject(), ue.getIp(), ue.getUserAgent(), ue.getXforwarderfor(), currentUser);
+                		SolrLogger.postView(ue.getObject(), ue.getIp(), ue.getUserAgent(), ue.getXForwardedFor(), currentUser);
                 	}
                 }else
                 if(UsageEvent.Action.SEARCH == ue.getAction()){
