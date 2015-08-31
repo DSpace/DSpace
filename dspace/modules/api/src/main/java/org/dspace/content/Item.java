@@ -2759,60 +2759,60 @@ public class Item extends DSpaceObject
             // element/qualifier
             Map<String,Integer> elementCount = new HashMap<String,Integer>();
 
-            List<DCValue> currMetadata = get(ourContext,itemId,log);
-            // Arrays to store the working information required
-            int[]     placeNum = new int[currMetadata.size()];
-            boolean[] storedDC = new boolean[currMetadata.size()];
-            MetadataField[] dcFields = new MetadataField[currMetadata.size()];
+            try {
+                List<DCValue> currMetadata = get(ourContext,itemId,log);
+                // Arrays to store the working information required
+                int[]     placeNum = new int[currMetadata.size()];
+                boolean[] storedDC = new boolean[currMetadata.size()];
+                MetadataField[] dcFields = new MetadataField[currMetadata.size()];
 
-            // Work out the place numbers for the in memory DC
-            for (int dcIdx = 0; dcIdx < currMetadata.size(); dcIdx++)
-            {
-                DCValue dcv = currMetadata.get(dcIdx);
-
-                // Work out the place number for ordering
-                int current = 0;
-
-                // Key into map is "element" or "element.qualifier"
-                String key = dcv.element + ((dcv.qualifier == null) ? "" : ("." + dcv.qualifier));
-
-                Integer currentInteger = elementCount.get(key);
-                if (currentInteger != null)
+                // Work out the place numbers for the in memory DC
+                for (int dcIdx = 0; dcIdx < currMetadata.size(); dcIdx++)
                 {
-                    current = currentInteger.intValue();
-                }
+                    DCValue dcv = currMetadata.get(dcIdx);
 
-                current++;
-                elementCount.put(key, Integer.valueOf(current));
+                    // Work out the place number for ordering
+                    int current = 0;
 
-                // Store the calculated place number, reset the stored flag, and cache the metadatafield
-                placeNum[dcIdx] = current;
-                storedDC[dcIdx] = false;
-                try {
-                    dcFields[dcIdx] = getMetadataField(dcv);
-                    if (dcFields[dcIdx] == null) {
-                        // Bad DC field, log and throw exception
-                        log.warn(LogManager
-                                .getHeader(ourContext, "bad_dc",
-                                        "Bad DC field. schema=" + dcv.schema
-                                                + ", element: \""
-                                                + ((dcv.element == null) ? "null"
-                                                : dcv.element)
-                                                + "\" qualifier: \""
-                                                + ((dcv.qualifier == null) ? "null"
-                                                : dcv.qualifier)
-                                                + "\" value: \""
-                                                + ((dcv.value == null) ? "null"
-                                                : dcv.value) + "\""));
+                    // Key into map is "element" or "element.qualifier"
+                    String key = dcv.element + ((dcv.qualifier == null) ? "" : ("." + dcv.qualifier));
 
-                        throw new SQLException("bad_dublin_core "
-                                + "schema=" + dcv.schema + ", "
-                                + dcv.element
-                                + " " + dcv.qualifier);
+                    Integer currentInteger = elementCount.get(key);
+                    if (currentInteger != null)
+                    {
+                        current = currentInteger.intValue();
                     }
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
+
+                    current++;
+                    elementCount.put(key, Integer.valueOf(current));
+
+                    // Store the calculated place number, reset the stored flag, and cache the metadatafield
+                    placeNum[dcIdx] = current;
+                    storedDC[dcIdx] = false;
+                        dcFields[dcIdx] = getMetadataField(dcv);
+                        if (dcFields[dcIdx] == null) {
+                            // Bad DC field, log and throw exception
+                            log.warn(LogManager
+                                    .getHeader(ourContext, "bad_dc",
+                                            "Bad DC field. schema=" + dcv.schema
+                                                    + ", element: \""
+                                                    + ((dcv.element == null) ? "null"
+                                                    : dcv.element)
+                                                    + "\" qualifier: \""
+                                                    + ((dcv.qualifier == null) ? "null"
+                                                    : dcv.qualifier)
+                                                    + "\" value: \""
+                                                    + ((dcv.value == null) ? "null"
+                                                    : dcv.value) + "\""));
+
+                            throw new SQLException("bad_dublin_core "
+                                    + "schema=" + dcv.schema + ", "
+                                    + dcv.element
+                                    + " " + dcv.qualifier);
+                        }
                 }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
 
             // Now the precalculations are done, iterate through the existing metadata
@@ -2923,30 +2923,32 @@ public class Item extends DSpaceObject
                 throw new RuntimeException(e);
             }
 
-            // Add missing in-memory DC
-            for (int dcIdx = 0; dcIdx < get(ourContext, itemId, log).size(); dcIdx++)
-            {
-                // Only write values that are not already in the db
-                if (!storedDC[dcIdx])
-                {
-                    DCValue dcv = get(ourContext, itemId, log).get(dcIdx);
+            try {
+                // Add missing in-memory DC
+                for (int dcIdx = 0; dcIdx < get(ourContext, itemId, log).size(); dcIdx++) {
+                    // Only write values that are not already in the db
+                    if (!storedDC[dcIdx]) {
+                        DCValue dcv = get(ourContext, itemId, log).get(dcIdx);
 
-                    // Write DCValue
-                    MetadataValue metadata = new MetadataValue();
-                    metadata.setItemId(getID());
-                    metadata.setFieldId(dcFields[dcIdx].getFieldID());
-                    metadata.setValue(dcv.value);
-                    metadata.setLanguage(dcv.language);
-                    metadata.setPlace(placeNum[dcIdx]);
-                    metadata.setAuthority(dcv.authority);
-                    metadata.setConfidence(dcv.confidence);
-                    try {
-                        metadata.create(ourContext);
-                    } catch (Exception e) {
-                        throw new RuntimeException ("Couldn't create metadata for item " + getID(), e);
+                        // Write DCValue
+                        MetadataValue metadata = new MetadataValue();
+                        metadata.setItemId(getID());
+                        metadata.setFieldId(dcFields[dcIdx].getFieldID());
+                        metadata.setValue(dcv.value);
+                        metadata.setLanguage(dcv.language);
+                        metadata.setPlace(placeNum[dcIdx]);
+                        metadata.setAuthority(dcv.authority);
+                        metadata.setConfidence(dcv.confidence);
+                        try {
+                            metadata.create(ourContext);
+                        } catch (Exception e) {
+                            throw new RuntimeException("Couldn't create metadata for item " + getID(), e);
+                        }
+                        hasBeenModified = true;
                     }
-                    hasBeenModified = true;
                 }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
             return hasBeenModified;
         }
