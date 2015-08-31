@@ -1698,7 +1698,7 @@ public class Item extends DSpaceObject
 
     public void updateMetadata() {
         if (dublinCore.metadataChanged) {
-            modified = dublinCore.updateMetadata(ourContext, getID(), log);
+            modified = dublinCore.updateMetadata(getID());
         }
     }
 
@@ -2644,7 +2644,7 @@ public class Item extends DSpaceObject
 
     private List<DCValue> getMetadata()
     {
-        return dublinCore.get(ourContext, getID(), log);
+        return dublinCore.get(getID());
     }
 
     private void setMetadata(List<DCValue> metadata)
@@ -2657,7 +2657,7 @@ public class Item extends DSpaceObject
         List<DCValue> metadata = null;
         boolean metadataChanged = true;
 
-        List<DCValue> get(Context c, int itemId, Logger log) {
+        List<DCValue> get(int itemId) {
             if ((metadataChanged==true)||(metadata == null)) {
                 metadata = new ArrayList<DCValue>();
 
@@ -2670,12 +2670,12 @@ public class Item extends DSpaceObject
 
                             // Get the associated metadata field and schema information
                             int fieldID = resultRow.getIntColumn("metadata_field_id");
-                            MetadataField field = MetadataField.find(c, fieldID);
+                            MetadataField field = MetadataField.find(ourContext, fieldID);
 
                             if (field == null) {
                                 log.error("Loading item - cannot find metadata field " + fieldID);
                             } else {
-                                MetadataSchema schema = MetadataSchema.find(c, field.getSchemaID());
+                                MetadataSchema schema = MetadataSchema.find(ourContext, field.getSchemaID());
                                 if (schema == null) {
                                     log.error("Loading item - cannot find metadata schema " + field.getSchemaID() + ", field " + fieldID);
                                 } else {
@@ -2722,7 +2722,7 @@ public class Item extends DSpaceObject
             return null;
         }
 
-        boolean updateMetadata(Context ourContext, int itemId, Logger log) {
+        boolean updateMetadata(int itemId) {
             boolean hasBeenModified = false;
 
             metadataChanged = false;
@@ -2734,7 +2734,7 @@ public class Item extends DSpaceObject
             Map<String,Integer> elementCount = new HashMap<String,Integer>();
 
             try {
-                List<DCValue> currMetadata = get(ourContext,itemId,log);
+                List<DCValue> currMetadata = get(itemId);
                 // Arrays to store the working information required
                 int[]     placeNum = new int[currMetadata.size()];
                 boolean[] storedDC = new boolean[currMetadata.size()];
@@ -2891,10 +2891,10 @@ public class Item extends DSpaceObject
                 }
 
                 // Add missing in-memory DC
-                for (int dcIdx = 0; dcIdx < get(ourContext, itemId, log).size(); dcIdx++) {
+                for (int dcIdx = 0; dcIdx < get(itemId).size(); dcIdx++) {
                     // Only write values that are not already in the db
                     if (!storedDC[dcIdx]) {
-                        DCValue dcv = get(ourContext, itemId, log).get(dcIdx);
+                        DCValue dcv = get(itemId).get(dcIdx);
 
                         // Write DCValue
                         MetadataValue metadata = new MetadataValue();
