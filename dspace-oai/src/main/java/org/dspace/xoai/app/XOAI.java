@@ -96,9 +96,9 @@ public class XOAI {
         List<String> formats = new ArrayList<>();
         try {
             for (Bundle b : itemService.getBundles(item, "ORIGINAL")) {
-                for (BundleBitstream bs : b.getBitstreams()) {
-                    if (!formats.contains(bs.getBitstream().getFormat(context).getMIMEType())) {
-                        formats.add(bs.getBitstream().getFormat(context).getMIMEType());
+                for (Bitstream bs : b.getBitstreams()) {
+                    if (!formats.contains(bs.getFormat(context).getMIMEType())) {
+                        formats.add(bs.getFormat(context).getMIMEType());
                     }
                 }
             }
