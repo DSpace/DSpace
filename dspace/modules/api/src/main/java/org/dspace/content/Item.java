@@ -2811,13 +2811,9 @@ public class Item extends DSpaceObject
                                     + " " + dcv.qualifier);
                         }
                 }
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
 
-            // Now the precalculations are done, iterate through the existing metadata
-            // looking for matches
-            try {
+                // Now the precalculations are done, iterate through the existing metadata
+                // looking for matches
                 TableRowIterator tri = retrieveMetadata(getID());
 
                 if (tri != null) {
@@ -2919,11 +2915,7 @@ public class Item extends DSpaceObject
                     }
                     tri.close();
                 }
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
 
-            try {
                 // Add missing in-memory DC
                 for (int dcIdx = 0; dcIdx < get(ourContext, itemId, log).size(); dcIdx++) {
                     // Only write values that are not already in the db
