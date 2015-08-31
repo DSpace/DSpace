@@ -2644,16 +2644,7 @@ public class Item extends DSpaceObject
 
     private List<DCValue> getMetadata()
     {
-        try
-        {
-            return dublinCore.get(ourContext, getID(), log);
-        }
-        catch (SQLException e)
-        {
-            log.error("Loading item - cannot load metadata");
-        }
-
-        return new ArrayList<DCValue>();
+        return dublinCore.get(ourContext, getID(), log);
     }
 
     private void setMetadata(List<DCValue> metadata)
@@ -2666,15 +2657,18 @@ public class Item extends DSpaceObject
         List<DCValue> metadata = null;
         boolean metadataChanged = true;
 
-        List<DCValue> get(Context c, int itemId, Logger log) throws SQLException
+        List<DCValue> get(Context c, int itemId, Logger log)
         {
             if ((metadataChanged==true)||(metadata == null))
             {
                 metadata = new ArrayList<DCValue>();
 
                 // Get Dublin Core metadata
-                TableRowIterator tri = retrieveMetadata(itemId);
-
+                try {
+                    TableRowIterator tri = retrieveMetadata(itemId);
+                } catch (SQLException e) {
+                    throw new RuntimeException("couldn't access database metadata for item " + itemId, e);
+                }
                 if (tri != null)
                 {
                     try
@@ -2716,9 +2710,9 @@ public class Item extends DSpaceObject
                                 }
                             }
                         }
-                    }
-                    finally
-                    {
+                    } catch (SQLException e) {
+                        throw new RuntimeException("couldn't access database metadata for item " + itemId, e);
+                    } finally {
                         // close the TableRowIterator to free up resources
                         if (tri != null)
                         {
