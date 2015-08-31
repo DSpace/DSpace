@@ -99,6 +99,8 @@ public class Item extends DSpaceObject
      */
     private boolean modified;
 
+    private int internalItemId;
+
     /**
      * Construct an item with the given table row
      *
@@ -112,6 +114,7 @@ public class Item extends DSpaceObject
     {
         ourContext = context;
         itemRow = row;
+        internalItemId = row.getIntColumn("item_id");
         dublinCore.metadataChanged = false;
         modified = false;
         clearDetails();
@@ -120,7 +123,7 @@ public class Item extends DSpaceObject
         handle = HandleManager.findHandle(context, this);
 
         // Cache ourselves
-        context.cache(this, row.getIntColumn("item_id"));
+        context.cache(this, internalItemId);
     }
 
     /**
@@ -261,9 +264,8 @@ public class Item extends DSpaceObject
      *
      * @return the internal identifier
      */
-    public int getID()
-    {
-        return itemRow.getIntColumn("item_id");
+    public int getID() {
+        return internalItemId;
     }
 
 
