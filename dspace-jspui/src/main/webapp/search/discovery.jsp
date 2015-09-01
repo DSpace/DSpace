@@ -435,7 +435,7 @@ else if( qResults != null)
     
     // create the URLs accessing the previous and next search result pages
     String baseURL =  request.getContextPath()
-                    + (searchScope != "" ? "/handle/" + searchScope : "")
+                    + (!searchScope.equals("") ? "/handle/" + searchScope : "")
                     + "/simple-search?query="
                     + URLEncoder.encode(query,"UTF-8")
                     + httpFilters
@@ -690,7 +690,7 @@ else
 	        if (idx != limit && !appliedFilterQueries.contains(f+"::"+fvalue.getFilterType()+"::"+fvalue.getAsFilterQuery()))
 	        {
 	        %><li class="list-group-item"><span class="badge"><%= fvalue.getCount() %></span> <a href="<%= request.getContextPath()
-                + (searchScope!=""?"/handle/"+searchScope:"")
+                + (!searchScope.equals("")?"/handle/"+searchScope:"")
                 + "/simple-search?query="
                 + URLEncoder.encode(query,"UTF-8")
                 + "&amp;sort_by=" + sortedBy
@@ -715,7 +715,7 @@ else
 	        %><li class="list-group-item"><span style="visibility: hidden;">.</span>
 	        <% if (currFp > 0) { %>
 	        <a class="pull-left" href="<%= request.getContextPath()
-	            + (searchScope!=""?"/handle/"+searchScope:"")
+	            + (!searchScope.equals("")?"/handle/"+searchScope:"")
                 + "/simple-search?query="
                 + URLEncoder.encode(query,"UTF-8")
                 + "&amp;sort_by=" + sortedBy
@@ -727,7 +727,7 @@ else
             <% } %>
             <% if (idx == limit) { %>
             <a href="<%= request.getContextPath()
-	            + (searchScope!=""?"/handle/"+searchScope:"")
+	            + (!searchScope.equals("")?"/handle/"+searchScope:"")
                 + "/simple-search?query="
                 + URLEncoder.encode(query,"UTF-8")
                 + "&amp;sort_by=" + sortedBy
