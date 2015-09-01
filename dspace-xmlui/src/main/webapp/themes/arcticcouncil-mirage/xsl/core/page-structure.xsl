@@ -327,7 +327,7 @@
                         </button>
 
                         <a href="http://www.arctic-council.org/" class="navbar-brand" title="Arctic Council Secretariat">
-                            <img src="{$theme-path}/images/logo.png" />
+                            <img src="{$theme-path}/images/AC_logo_small_web_260px.gif" />
                         </a>
 
 
@@ -636,34 +636,45 @@
     <!-- Like the header, the footer contains various miscellaneous text, links, and image placeholders -->
     <xsl:template name="buildFooter">
         <footer>
-            <div class="container-fluid">
-                    <div class="row">
-                        <a>
-                            <xsl:attribute name="href">
-                                <xsl:value-of
-                                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                                <xsl:text>/contact</xsl:text>
-                            </xsl:attribute>
-                            <i18n:text>xmlui.dri2xhtml.structural.contact-link</i18n:text>
-                        </a>
-                        <xsl:text> | </xsl:text>
-                        <a>
-                            <xsl:attribute name="href">
-                                <xsl:value-of
-                                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                                <xsl:text>/feedback</xsl:text>
-                            </xsl:attribute>
-                            <i18n:text>xmlui.dri2xhtml.structural.feedback-link</i18n:text>
-                        </a>
-                    </div>
-                    <div class="row">
-                        Copyright &#169; 2014 <a href="http://www.arctic-council.org/" target="_blank">Arctic Council
-                        Secretariat</a>. All Rights Reserved.
-                    </div>
-                    <div class="row">
-                        This archive is powered by <a href="http://www.dspace.org/" target="_blank">DSpace</a>.
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-12 col-md-7">
+                        <div class="footer-left">
+                            <div class="custom">
+                                <p>
+                                    <strong>Contact the Arctic Council Secretariat</strong>
+                                </p>
+                                <p>
+                                    Fram Centre, Postboks 6606 Langnes, 9296 Tromsø, Norway
+                                    <br/>
+                                    + 47 77 75 01 40
+                                    <br/>
+                                    <a href="mailto:acs@arctic-council.org">acs@arctic-council.org</a>
+                                </p>
+                                <p><a>
+                                    <xsl:attribute name="href">
+                                        <xsl:value-of
+                                                select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                                        <xsl:text>/contact</xsl:text>
+                                    </xsl:attribute>
+                                    <i18n:text>xmlui.dri2xhtml.structural.contact-link</i18n:text>
+                                </a>
+                                |
+                                <a>
+                                    <xsl:attribute name="href">
+                                        <xsl:value-of
+                                                select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                                        <xsl:text>/feedback</xsl:text>
+                                    </xsl:attribute>
+                                    <i18n:text>xmlui.dri2xhtml.structural.feedback-link</i18n:text>
+                                </a></p>
+
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+
                 <!--Invisible link to HTML sitemap (for search engines) -->
                 <a class="hidden">
                     <xsl:attribute name="href">
@@ -674,6 +685,7 @@
                     <xsl:text>&#160;</xsl:text>
                 </a>
                 <p>&#160;</p>
+            </div>
         </footer>
     </xsl:template>
 

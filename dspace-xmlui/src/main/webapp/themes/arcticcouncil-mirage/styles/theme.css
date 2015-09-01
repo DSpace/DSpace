@@ -1,27 +1,84 @@
 /* Override dspace-bootstrap-tweaks */
 header .navbar-brand img {
-    height: 56px;
-    margin-top: -6px;
+    height: 52px;
+    margin-top: 12px;
 }
 
 .navbar {
-    min-height: 77px;
+    min-height: 105px;
 }
 
 /* Override classic-mirage-style */
 header .navbar-default {
-    background-color: #99ccff;
+    background-color: #ffffff;
 }
 
 .trail-wrapper {
-    background-color: #006699;
+    background-color: #ffffff;
+    border-bottom: none;
+    font-family: 'Helvetica Neue', Roboto, Helvetica, Arial, sans-serif;
 }
 .trail-wrapper .breadcrumb > li + li:before {
-    color: #eaf1f7;
+    color: #000000;
 }
 .trail-wrapper .breadcrumb > .active {
-    color: #eee;
+    color: #000000;
 }
+
+.breadcrumb, .breadcrumb a {
+    color: #000000;
+}
+
+/* mimic ac header */
+.trail-wrapper .breadcrumb > li {
+    border-right-color: #dadedf;
+    -webkit-transition: all 0.2s;
+    -o-transition: all 0.2s;
+    transition: all 0.2s;
+}
+
+.trail-wrapper .breadcrumb > li {
+    border-right: 1px solid #ecf0f1;
+}
+
+.trail-wrapper .breadcrumb {
+    width: 100%;
+    border-top: 1px solid #dadedf;
+    border-bottom: 1px solid #dadedf;
+    height: 52px;
+}
+
+.breadcrumb {
+    border-radius: 0;
+}
+
+.breadcrumb > li {
+    position: relative;
+    display: block;
+    float: left;
+    border-right: 1px solid #ecf0f1;
+    font-weight: 700;
+    padding: 9px;
+}
+
+.breadcrumb>li+li:before {
+    content: none;
+    padding: 0 5px;
+    color: #ccc;
+}
+
+.trail-wrapper .breadcrumb > li:hover {background-color: #f4f6f7;}
+.breadcrumb > li > a:hover,.breadcrumb > li > a:focus{color:#313337;background:none}
+
+header .navbar-default .navbar-toggle > li > a, header .navbar-default .navbar-nav > li > a {
+    color: #000000;
+}
+
+header .navbar-default .navbar-nav > li:hover {
+    background-color: #f4f6f7;
+    border: 1px solid #f4f6f7;
+}
+
 .trail-wrapper .sidebar-toggle .icon-bar {
     background-color: #d98b00;
 }
@@ -42,7 +99,7 @@ header .navbar-default {
     border: 1px solid #8b9eb2;
 }
 .btn-success[disabled], .btn-success.disabled {
-    background-color: #99ccff;
+    background-color: #ffffff;
     border: 1px solid #8b9eb2;
 }
 .btn-success:hover {
@@ -51,20 +108,20 @@ header .navbar-default {
 
 /* Header Person dropdown */
 header .navbar-default .navbar-toggle > .open > a, header .navbar-default .navbar-toggle > .open > a:hover, header .navbar-default .navbar-toggle > .open > a:focus, header .navbar-default .navbar-nav > .open > a, header .navbar-default .navbar-nav > .open > a:hover, header .navbar-default .navbar-nav > .open > a:focus {
-    background-color: #006699;
-    color: #eaf1f7;
+    background-color: #f4f6f7;
+    color: #000000;
 }
 header .navbar-default .navbar-toggle > li > a:hover, header .navbar-default .navbar-toggle > li > a:focus, header .navbar-default .navbar-nav > li > a:hover, header .navbar-default .navbar-nav > li > a:focus {
-    background-color: #006699;
-    color: #eaf1f7;
+    background-color: #f4f6f7;
+    color: #000000;
 }
 header .navbar-default .navbar-toggle > .active > a, header .navbar-default .navbar-toggle > .active > a:hover, header .navbar-default .navbar-toggle > .active > a:focus, header .navbar-default .navbar-nav > .active > a, header .navbar-default .navbar-nav > .active > a:hover, header .navbar-default .navbar-nav > .active > a:focus {
-    background-color: #006699;
-    color: #eaf1f7;
+    background-color: #f4f6f7;
+    color: #000000;
 }
 header .navbar-default .navbar-toggle > .open > a, header .navbar-default .navbar-toggle > .open > a:hover, header .navbar-default .navbar-toggle > .open > a:focus, header .navbar-default .navbar-nav > .open > a, header .navbar-default .navbar-nav > .open > a:hover, header .navbar-default .navbar-nav > .open > a:focus {
-    background-color: #006699;
-    color: #eaf1f7;
+    background-color: #f4f6f7;
+    color: #000000;
 }
 
 /* Registration Buttons */
@@ -114,7 +171,7 @@ a {
 }
 
 .navbar-inverse {
-    background-color: #99ccff;
+    background-color: #ffffff;
 }
 .pagination > li > a, .pagination > li > span {
     color: #d98b00;
@@ -151,4 +208,8 @@ a.thumbnail:hover, a.thumbnail:focus, a.thumbnail.active {
 }
 .panel-primary > .panel-footer + .panel-collapse > .panel-body {
     border-bottom-color: #d98b00
+}
+
+footer {
+    color: #cccccc;
 }
