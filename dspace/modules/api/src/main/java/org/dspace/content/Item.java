@@ -526,7 +526,7 @@ public class Item extends DSpaceObject
     {
         // Build up list of matching values
         List<DCValue> values = new ArrayList<DCValue>();
-        for (DCValue dcv : getMetadata())
+        for (DCValue dcv : dublinCore.getMetadata())
         {
             if (match(schema, element, qualifier, lang, dcv))
             {
@@ -811,7 +811,7 @@ public class Item extends DSpaceObject
     public void addMetadata(String schema, String element, String qualifier, String lang,
                             String[] values, String authorities[], int confidences[])
     {
-        List<DCValue> dcValueList = getMetadata();
+        List<DCValue> dcValueList = dublinCore.getMetadata();
         MetadataAuthorityManager mam = MetadataAuthorityManager.getManager();
         boolean authorityControlled = mam.isAuthorityControlled(schema, element, qualifier);
         boolean authorityRequired = mam.isAuthorityRequired(schema, element, qualifier);
@@ -1005,7 +1005,7 @@ public class Item extends DSpaceObject
     {
         // We will build a list of values NOT matching the values to clear
         List<DCValue> values = new ArrayList<DCValue>();
-        for (DCValue dcv : getMetadata())
+        for (DCValue dcv : dublinCore.getMetadata())
         {
             if (!match(schema, element, qualifier, lang, dcv))
             {
@@ -1014,7 +1014,7 @@ public class Item extends DSpaceObject
         }
 
         // Now swap the old list of values for the new, unremoved values
-        setMetadata(values);
+        dublinCore.setMetadata(values);
         dublinCore.metadataChanged = true;
         updateMetadata();
     }
@@ -2642,23 +2642,12 @@ public class Item extends DSpaceObject
         return new ItemIterator(context, rows);
     }
 
-
-    private List<DCValue> getMetadata()
-    {
-        return dublinCore.get();
-    }
-
-    private void setMetadata(List<DCValue> metadata)
-    {
-        dublinCore.set(metadata);
-    }
-
     class MetadataCache
     {
         List<DCValue> metadata = null;
         boolean metadataChanged = true;
 
-        List<DCValue> get() {
+        List<DCValue> getMetadata() {
             if ((metadataChanged==true)||(metadata == null)) {
                 metadata = new ArrayList<DCValue>();
 
@@ -2705,7 +2694,7 @@ public class Item extends DSpaceObject
             return metadata;
         }
 
-        void set(List<DCValue> m)
+        void setMetadata(List<DCValue> m)
         {
             metadata = m;
             metadataChanged = true;
@@ -2735,7 +2724,7 @@ public class Item extends DSpaceObject
             Map<String,Integer> elementCount = new HashMap<String,Integer>();
 
             try {
-                List<DCValue> currMetadata = get();
+                List<DCValue> currMetadata = getMetadata();
                 // Arrays to store the working information required
                 int[]     placeNum = new int[currMetadata.size()];
                 boolean[] storedDC = new boolean[currMetadata.size()];
@@ -2892,14 +2881,14 @@ public class Item extends DSpaceObject
                 }
 
                 // Add missing in-memory DC
-                for (int dcIdx = 0; dcIdx < get().size(); dcIdx++) {
+                for (int dcIdx = 0; dcIdx < getMetadata().size(); dcIdx++) {
                     // Only write values that are not already in the db
                     if (!storedDC[dcIdx]) {
-                        DCValue dcv = get().get(dcIdx);
+                        DCValue dcv = getMetadata().get(dcIdx);
 
                         // Write DCValue
                         MetadataValue metadata = new MetadataValue();
-                        metadata.setItemId(Item.this.internalItemId);
+                        metadata.setItemId(internalItemId);
                         metadata.setFieldId(dcFields[dcIdx].getFieldID());
                         metadata.setValue(dcv.value);
                         metadata.setLanguage(dcv.language);
@@ -2909,7 +2898,7 @@ public class Item extends DSpaceObject
                         try {
                             metadata.create(ourContext);
                         } catch (Exception e) {
-                            throw new RuntimeException("Couldn't create metadata for item " + Item.this.internalItemId, e);
+                            throw new RuntimeException("Couldn't create metadata for item " + internalItemId, e);
                         }
                         hasBeenModified = true;
                     }
