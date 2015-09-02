@@ -21,7 +21,7 @@ import org.dspace.content.*;
 import org.dspace.content.authority.Concept;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.submit.utils.DryadJournalSubmissionUtils;
+import org.dspace.JournalUtils;
 import org.dspace.utils.DSpace;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.VersionHistoryImpl;
@@ -381,7 +381,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
         {
             try{
 
-                Map<String, String> properties = DryadJournalSubmissionUtils.findJournalProperties(context,journal);
+                Map<String, String> properties = JournalUtils.findJournalProperties(context,journal);
                 if(properties!=null){
                 String subscription = properties.get("integrated");
                 if(subscription==null || !subscription.equals(ShoppingCart.FREE))
@@ -486,7 +486,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
         {
             if(journal!=null&&journal.length()>0) {
                 //update shoppingcart journal
-                Map<String, String> properties = DryadJournalSubmissionUtils.findJournalProperties(c,journal);
+                Map<String, String> properties = JournalUtils.findJournalProperties(c,journal);
                 Boolean subscription = false;
                 if(properties!=null){
                     if(StringUtils.equals(properties.get("subscriptionPaid"), ShoppingCart.FREE))
