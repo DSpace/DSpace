@@ -390,5 +390,45 @@ public class JournalUtils {
         return coll.getHandle().equals(ConfigurationManager.getProperty("submit.publications.collection"));
     }
 
+    public static Map<String, String> findJournalProperties(Context c, String journal){
+        Map<String, String> myJournalProperties = new HashMap<String, String>();
+
+
+        try {
+            String publicationNameProp = ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName");
+            Scheme scheme = Scheme.findByIdentifier(c, publicationNameProp);
+            int schemeID = scheme.getID();
+            Concept[] concepts = Concept.findByPreferredLabel(c,journal, schemeID);
+            log.debug("journal lookup: name = " + journal + ", publicationNameProp = " + publicationNameProp + ", ID  = " + schemeID);
+            //todo:add the journal order
+            Concept concept = concepts[0];
+
+            String key = concept.getPreferredLabel();
+            ArrayList<AuthorityMetadataValue> metadataValues = concept.getMetadata();
+            Map<String, String> map = new HashMap<String, String>();
+            for(AuthorityMetadataValue metadataValue : metadataValues){
+
+                if(metadataValue.qualifier!=null){
+                    myJournalProperties.put(metadataValue.element + '.' + metadataValue.qualifier, metadataValue.value);
+                }
+                else
+                {
+                    myJournalProperties.put(metadataValue.element, metadataValue.value);
+                }
+
+            }
+
+        }catch (Exception e) {
+            log.error("Error while loading journal properties", e);
+        }
+        return myJournalProperties;
+
+    }
+
+    public static Boolean shouldEnterBlackoutByDefault(Context context, Item item, Collection collection) throws SQLException {
+        JournalUtils.RecommendedBlackoutAction action = JournalUtils.recommendedBlackoutAction(context, item, collection);
+        return (action == JournalUtils.RecommendedBlackoutAction.BLACKOUT_TRUE ||
+                action == JournalUtils.RecommendedBlackoutAction.JOURNAL_NOT_INTEGRATED);
+    }
 
 }
