@@ -5,7 +5,6 @@ package org.datadryad.rest.utils;
 import java.util.Map;
 import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.models.Organization;
-import org.dspace.submit.utils.DryadJournalSubmissionUtils;
 import org.dspace.JournalUtils;
 
 /**
@@ -30,7 +29,7 @@ public class JournalPropertiesUtilities {
     }
 
     /**
-     * Uses DryadJournalSubmissionUtils.journalProperties to find a matching
+     * Uses JournalUtils.journalProperties to find a matching
      * journal code.
      * @param organizationCode case-sensitive organization (journal) code to look up
      * @return a Map of journal properties for the journal with the code, or null if not found
@@ -39,7 +38,7 @@ public class JournalPropertiesUtilities {
         // The journal properties is a Map of Journal Name strings to Maps of properties
         // So to look up by journal code we need iterate over map values
         Map<String,String> properties = null;
-        Map<String, Map<String,String>> allJournalProperties = DryadJournalSubmissionUtils.journalProperties;
+        Map<String, Map<String,String>> allJournalProperties = JournalUtils.journalProperties;
         for(String journalName : allJournalProperties.keySet() ) {
             Map<String, String> journalProperites = allJournalProperties.get(journalName);
             if(journalProperites.containsKey(JournalUtils.JOURNAL_ID)) {
