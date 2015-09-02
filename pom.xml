@@ -723,6 +723,18 @@
             </modules>
         </profile>
 
+        <profile>
+            <id>dspace-remote-handle-resolver</id>
+            <activation>
+                <file>
+                    <exists>dspace-remote-handle-resolver/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>dspace-remote-handle-resolver</module>
+            </modules>
+        </profile>
+
       <!--
          The 'release' profile is used by the 'maven-release-plugin' (see above)
          to actually perform a DSpace software release to Maven central.
@@ -739,6 +751,7 @@
              <module>dspace-jspui</module>
              <module>dspace-oai</module>
              <module>dspace-rdf</module>
+            <module>dspace-remote-handle-resolver</module>
              <module>dspace-rest</module>
              <module>dspace-services</module>
              <module>dspace-solr</module>

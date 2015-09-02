@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,6 @@ import org.apache.log4j.Logger;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import java.util.Iterator;
 
 /**
  * Extension to the CNRI Handle Server that translates requests to resolve
@@ -60,15 +60,15 @@ public class MultiRemoteDSpaceRepositoryHandlePlugin implements HandleStorage
      * to the configuration file to use in the system property 
      * <code>dspace.handle.plugin.configuration</code>.
      */
-    private static String CONFIG_FILE_NAME = "handle-dspace-plugin.cfg";
+    private static final String CONFIG_FILE_NAME = "handle-dspace-plugin.cfg";
     /**
      * Every Property starting with this key will be used as DSpace endpoint
      * while resolving handles, f.e. http://localhost:8080/xmlui/handleresolver.
      */
-    private static String PROPERTY_KEY = "dspace.handle.endpoint";
+    private static final String PROPERTY_KEY = "dspace.handle.endpoint";
     
     /** log4j category */
-    private static Logger log = Logger
+    private static final Logger log = Logger
             .getLogger(MultiRemoteDSpaceRepositoryHandlePlugin.class);
     
     // maps prefixes to URLs from DSpace instances
@@ -107,7 +107,7 @@ public class MultiRemoteDSpaceRepositoryHandlePlugin implements HandleStorage
         for (Enumeration e = properties.propertyNames(); e.hasMoreElements();)
         {
             String propertyName = (String) e.nextElement();
-            if (propertyName.startsWith(this.PROPERTY_KEY))
+            if (propertyName.startsWith(PROPERTY_KEY))
             {
                 // load the prefixes of this instance
                 loadPrefixes(properties.getProperty(propertyName));
