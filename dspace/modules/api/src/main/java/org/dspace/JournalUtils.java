@@ -19,7 +19,20 @@ import java.util.List;
 public class JournalUtils {
 
     private static Logger log = Logger.getLogger(JournalUtils.class);
+    public static final String FULLNAME = "fullname";
+    public static final String METADATADIR = "metadataDir";
+    public static final String INTEGRATED = "integrated";
+    public static final String PUBLICATION_BLACKOUT = "publicationBlackout";
+    public static final String NOTIFY_ON_REVIEW = "notifyOnReview";
+    public static final String NOTIFY_ON_ARCHIVE = "notifyOnArchive";
+    public static final String JOURNAL_ID = "journalID";
+    public static final String SUBSCRIPTION_PAID = "subscriptionPaid";
 
+    public enum RecommendedBlackoutAction {
+        BLACKOUT_TRUE
+        , BLACKOUT_FALSE
+        , JOURNAL_NOT_INTEGRATED
+    }
 
     public static Concept[] getJournalConcepts(Context context) throws SQLException {
         Scheme scheme = Scheme.findByIdentifier(context, ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName"));
@@ -97,7 +110,7 @@ public class JournalUtils {
     }
 
     public static String getIntegrated(Concept concept) {
-        AuthorityMetadataValue[] vals = concept.getMetadata("journal","integrated",null, Item.ANY);
+        AuthorityMetadataValue[] vals = concept.getMetadata("journal", "integrated", null, Item.ANY);
         if(vals != null && vals.length > 0)
             return vals[0].value;
 

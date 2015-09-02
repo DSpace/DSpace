@@ -26,21 +26,6 @@ import java.util.Map;
 public class DryadJournalSubmissionUtils {
     private static Logger log = Logger.getLogger(DryadJournalSubmissionUtils.class);
 
-    public static final String FULLNAME = "fullname";
-    public static final String METADATADIR = "metadataDir";
-    public static final String INTEGRATED = "integrated";
-    public static final String PUBLICATION_BLACKOUT = "publicationBlackout";
-    public static final String NOTIFY_ON_REVIEW = "notifyOnReview";
-    public static final String NOTIFY_ON_ARCHIVE = "notifyOnArchive";
-    public static final String JOURNAL_ID = "journalID";
-    public static final String SUBSCRIPTION_PAID = "subscriptionPaid";
-
-    public enum RecommendedBlackoutAction {
-        BLACKOUT_TRUE
-        , BLACKOUT_FALSE
-        , JOURNAL_NOT_INTEGRATED
-    }
-
     public static final java.util.Map<String, Map<String, String>> journalProperties = new HashMap<String, Map<String, String>>();
     static{
         Context context = null;
