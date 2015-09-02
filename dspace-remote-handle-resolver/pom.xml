@@ -14,6 +14,12 @@
     <artifactId>dspace-remote-handle-resolver</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
+    <name>DSpace Remote Handle Resolver</name>
+    <inceptionYear>2013</inceptionYear>
+    <description>
+        A storage plugin for the Handle System resolver.  It ships all
+        operations to a remote DSpace instance.
+    </description>
 
     <dependencies>
         <dependency>

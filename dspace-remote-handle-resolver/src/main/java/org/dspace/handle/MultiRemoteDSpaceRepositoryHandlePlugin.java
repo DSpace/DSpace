@@ -44,13 +44,13 @@ import com.google.gson.JsonParser;
  * handles into remote calls to the mini-DSpace Handle resolver JSON API. This
  * only provides some of the functionality (namely, the resolving of handles to
  * URLs) of the CNRI HandleStorage interface.
- * 
+ *
  * <p>
  * This class is intended to be embedded in the CNRI Handle Server. It conforms
  * to the HandleStorage interface that was delivered with Handle Server version
  * 6.2.0.
  * </p>
- * 
+ *
  * @author Andrea Bollini
  */
 public class MultiRemoteDSpaceRepositoryHandlePlugin implements HandleStorage
@@ -66,11 +66,11 @@ public class MultiRemoteDSpaceRepositoryHandlePlugin implements HandleStorage
      * while resolving handles, f.e. http://localhost:8080/xmlui/handleresolver.
      */
     private static final String PROPERTY_KEY = "dspace.handle.endpoint";
-    
+
     /** log4j category */
     private static final Logger log = Logger
             .getLogger(MultiRemoteDSpaceRepositoryHandlePlugin.class);
-    
+
     // maps prefixes to URLs from DSpace instances
     private Map<String, String> prefixes;
 
