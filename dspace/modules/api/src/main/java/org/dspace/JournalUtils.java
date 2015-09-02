@@ -2,6 +2,8 @@ package org.dspace;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.Item;
+import org.dspace.content.Collection;
+import org.dspace.content.DCValue;
 import org.dspace.content.authority.AuthorityMetadataValue;
 import org.dspace.content.authority.Concept;
 import org.dspace.content.authority.Scheme;
