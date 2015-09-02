@@ -291,5 +291,33 @@ public class JournalUtils {
         return sb.toString();
     }
 
+    /**
+     * Replaces invalid filename characters by percent-escaping.  Based on
+     * http://stackoverflow.com/questions/1184176/how-can-i-safely-encode-a-string-in-java-to-use-as-a-filename
+     *
+     * @param filename A filename to escape
+     * @return The filename, with special characters escaped with percent
+     */
+    public static String escapeFilename(String filename) {
+        final char fileSep = System.getProperty("file.separator").charAt(0); // e.g. '/'
+        final char escape = '%';
+        int len = filename.length();
+        StringBuilder sb = new StringBuilder(len);
+        for (int i = 0; i < len; i++) {
+            char ch = filename.charAt(i);
+            if (ch < ' ' || ch >= 0x7F || ch == fileSep
+                    || (ch == '.' && i == 0) // we don't want to collide with "." or ".."!
+                    || ch == escape) {
+                sb.append(escape);
+                if (ch < 0x10) {
+                    sb.append('0'); // Leading zero
+                }
+                sb.append(Integer.toHexString(ch));
+            } else {
+                sb.append(ch);
+            }
+        }
+        return sb.toString();
+    }
 
 }

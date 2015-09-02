@@ -325,7 +325,7 @@ public class DryadEmailSubmission extends HttpServlet {
             File dir = new File(JournalUtils.getMetadataDir(journalConcept));
 
             String submissionId = result.getSubmissionId();
-            String filename = DryadJournalSubmissionUtils.escapeFilename(submissionId + ".xml");
+            String filename = JournalUtils.escapeFilename(submissionId + ".xml");
             File file = new File(dir, filename);
             LOGGER.info ("wrote xml to file " + file.getAbsolutePath());
             FileOutputStream out = new FileOutputStream(file);

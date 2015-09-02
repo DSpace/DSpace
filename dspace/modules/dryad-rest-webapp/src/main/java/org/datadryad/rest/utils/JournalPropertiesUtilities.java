@@ -6,6 +6,7 @@ import java.util.Map;
 import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.models.Organization;
 import org.dspace.submit.utils.DryadJournalSubmissionUtils;
+import org.dspace.JournalUtils;
 
 /**
  *
@@ -85,6 +86,6 @@ public class JournalPropertiesUtilities {
         if(manuscriptId == null || manuscriptId.length() == 0) {
             throw new IllegalArgumentException("manuscriptId is empty");
         }
-        return DryadJournalSubmissionUtils.escapeFilename(manuscriptId);
+        return JournalUtils.escapeFilename(manuscriptId);
     }
 }
