@@ -64,7 +64,7 @@ public class DryadJournalSubmissionUtils {
     }
 
     public static Map<String, String> findJournalProperties(Context c, String journal){
-        Map<String, String> journalProperties = new HashMap<String, String>();
+        Map<String, String> myJournalProperties = new HashMap<String, String>();
 
 
             try {
@@ -82,11 +82,11 @@ public class DryadJournalSubmissionUtils {
                     for(AuthorityMetadataValue metadataValue : metadataValues){
 
                         if(metadataValue.qualifier!=null){
-                            journalProperties.put(metadataValue.element+'.'+metadataValue.qualifier,metadataValue.value);
+                            myJournalProperties.put(metadataValue.element + '.' + metadataValue.qualifier, metadataValue.value);
                         }
                         else
                         {
-                            journalProperties.put(metadataValue.element,metadataValue.value);
+                            myJournalProperties.put(metadataValue.element, metadataValue.value);
                         }
 
                     }
@@ -94,7 +94,7 @@ public class DryadJournalSubmissionUtils {
             }catch (Exception e) {
                 log.error("Error while loading journal properties", e);
             }
-        return journalProperties;
+        return myJournalProperties;
 
     }
 
