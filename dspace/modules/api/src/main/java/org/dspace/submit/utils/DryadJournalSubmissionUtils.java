@@ -104,40 +104,6 @@ public class DryadJournalSubmissionUtils {
                 action == JournalUtils.RecommendedBlackoutAction.JOURNAL_NOT_INTEGRATED);
     }
 
-    public static JournalUtils.RecommendedBlackoutAction recommendedBlackoutAction(Context context, Item item, Collection collection) throws SQLException {
-        // get Journal
-        Item dataPackage=item;
-        if(!isDataPackage(collection))
-            dataPackage = DryadWorkflowUtils.getDataPackage(context, item);
-        DCValue[] journalFullNames = dataPackage.getMetadata("prism.publicationName");
-        String journalFullName=null;
-        if(journalFullNames!=null && journalFullNames.length > 0){
-            journalFullName=journalFullNames[0].value;
-        }
-
-        Map<String, String> values = JournalUtils.journalProperties.get(journalFullName);
-        // Ignore blackout setting if journal is not (yet) integrated
-        // get journal's blackout setting
-        // journal is blacked out if its blackout setting is true or if it has no setting
-        String isIntegrated = null;
-        String isBlackedOut = null;
-        if(values!=null && values.size()>0) {
-            isIntegrated = values.get(JournalUtils.INTEGRATED);
-            isBlackedOut = values.get(JournalUtils.PUBLICATION_BLACKOUT);
-        }
-
-        if(isIntegrated == null || isIntegrated.equals("false")) {
-            // journal is not integrated.  Enter blackout by default
-            return JournalUtils.RecommendedBlackoutAction.JOURNAL_NOT_INTEGRATED;
-        } else if(isBlackedOut==null || isBlackedOut.equals("true")) {
-            // journal has a blackout setting and it's set to true
-            return JournalUtils.RecommendedBlackoutAction.BLACKOUT_TRUE;
-        } else {
-            // journal is integrated but blackout setting is false or missing
-            return JournalUtils.RecommendedBlackoutAction.BLACKOUT_FALSE;
-        }
-    }
-
 
     private static boolean isDataPackage(Collection coll) throws SQLException {
         return coll.getHandle().equals(ConfigurationManager.getProperty("submit.publications.collection"));

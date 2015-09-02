@@ -150,7 +150,7 @@ public class EditMetadataActionXMLUI extends AbstractXMLUIAction {
         }
 
         // Check if this item should enter blackout by default or not
-        this.recommendedBlackoutAction = DryadJournalSubmissionUtils.recommendedBlackoutAction(context, item, collection);
+        this.recommendedBlackoutAction = JournalUtils.recommendedBlackoutAction(context, item, collection);
 
         switch (page){
             case EditMetadataAction.MAIN_PAGE:

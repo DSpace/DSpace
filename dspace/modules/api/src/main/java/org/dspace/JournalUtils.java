@@ -7,6 +7,7 @@ import org.dspace.content.authority.Concept;
 import org.dspace.content.authority.Scheme;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.workflow.DryadWorkflowUtils;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -348,6 +349,40 @@ public class JournalUtils {
 
     public static Map<String, String> getPropertiesByJournal(String key){
         return journalProperties.get(key);
+    }
+
+    public static RecommendedBlackoutAction recommendedBlackoutAction(Context context, Item item, Collection collection) throws SQLException {
+        // get Journal
+        Item dataPackage=item;
+        if(!isDataPackage(collection))
+            dataPackage = DryadWorkflowUtils.getDataPackage(context, item);
+        DCValue[] journalFullNames = dataPackage.getMetadata("prism.publicationName");
+        String journalFullName=null;
+        if(journalFullNames!=null && journalFullNames.length > 0){
+            journalFullName=journalFullNames[0].value;
+        }
+
+        Map<String, String> values = journalProperties.get(journalFullName);
+        // Ignore blackout setting if journal is not (yet) integrated
+        // get journal's blackout setting
+        // journal is blacked out if its blackout setting is true or if it has no setting
+        String isIntegrated = null;
+        String isBlackedOut = null;
+        if(values!=null && values.size()>0) {
+            isIntegrated = values.get(INTEGRATED);
+            isBlackedOut = values.get(PUBLICATION_BLACKOUT);
+        }
+
+        if(isIntegrated == null || isIntegrated.equals("false")) {
+            // journal is not integrated.  Enter blackout by default
+            return RecommendedBlackoutAction.JOURNAL_NOT_INTEGRATED;
+        } else if(isBlackedOut==null || isBlackedOut.equals("true")) {
+            // journal has a blackout setting and it's set to true
+            return RecommendedBlackoutAction.BLACKOUT_TRUE;
+        } else {
+            // journal is integrated but blackout setting is false or missing
+            return RecommendedBlackoutAction.BLACKOUT_FALSE;
+        }
     }
 
 }
