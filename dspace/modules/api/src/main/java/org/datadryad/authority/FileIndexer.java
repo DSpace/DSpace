@@ -5,7 +5,7 @@ import org.dspace.authority.indexer.AuthorityIndexerInterface;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
-import org.dspace.submit.utils.DryadJournalSubmissionUtils;
+import org.dspace.JournalUtils;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -27,7 +27,7 @@ public class FileIndexer implements AuthorityIndexerInterface {
     Context context;
 
     public void init() {
-        Map<String, Map<String, String>> journalProperties = DryadJournalSubmissionUtils.journalProperties;
+        Map<String, Map<String, String>> journalProperties = JournalUtils.journalProperties;
         Set<String> keys = journalProperties.keySet();
         for(String key :keys){
             try {
@@ -83,11 +83,7 @@ public class FileIndexer implements AuthorityIndexerInterface {
 
     private AuthorityValue createHashMap(Map<String, String> props) throws Exception {
 
-        String value = props.get(DryadJournalSubmissionUtils.FULLNAME);
-
-//        String integratedJournal = props.get(DryadJournalSubmissionUtils.INTEGRATED);
-//        if(integratedJournal!=null && integratedJournal.equals("true"))
-//            value+="*";
+        String value = props.get(JournalUtils.FULLNAME);
 
         AuthorityValue authorityValue = new AuthorityValue();
 
