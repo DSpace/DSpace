@@ -20,7 +20,7 @@ import java.sql.SQLException;
  *
  * @author kevinvandevelde at atmire.com
  */
-public interface SiteDAO extends GenericDAO<Site> {
+public interface SiteDAO extends DSpaceObjectDAO<Site> {
 
     public Site findSite(Context context) throws SQLException;
 }

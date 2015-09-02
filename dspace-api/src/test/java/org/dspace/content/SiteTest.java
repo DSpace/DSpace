@@ -134,6 +134,7 @@ public class SiteTest extends AbstractUnitTest
     public void testGetName() 
     {
         assertThat("testGetName 0",s.getName(), equalTo(ConfigurationManager.getProperty("dspace.name")));
+        assertThat("testGetName 1",siteService.getName(s), equalTo(ConfigurationManager.getProperty("dspace.name")));
     }
 
 

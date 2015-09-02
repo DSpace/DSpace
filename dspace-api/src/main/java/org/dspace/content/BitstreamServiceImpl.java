@@ -269,6 +269,11 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     }
 
     @Override
+    public int getSupportsTypeConstant() {
+        return Constants.BITSTREAM;
+    }
+
+    @Override
     public InputStream retrieve(Context context, Bitstream bitstream) throws IOException, SQLException, AuthorizeException {
         // Maybe should return AuthorizeException??
         authorizeService.authorizeAction(context, bitstream, Constants.READ);
