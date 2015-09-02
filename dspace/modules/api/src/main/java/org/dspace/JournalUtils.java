@@ -386,5 +386,9 @@ public class JournalUtils {
             return RecommendedBlackoutAction.BLACKOUT_FALSE;
         }
     }
+    private static boolean isDataPackage(Collection coll) throws SQLException {
+        return coll.getHandle().equals(ConfigurationManager.getProperty("submit.publications.collection"));
+    }
+
 
 }

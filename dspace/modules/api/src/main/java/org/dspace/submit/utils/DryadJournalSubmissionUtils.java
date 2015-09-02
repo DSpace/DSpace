@@ -99,15 +99,11 @@ public class DryadJournalSubmissionUtils {
     }
 
     public static Boolean shouldEnterBlackoutByDefault(Context context, Item item, Collection collection) throws SQLException {
-        JournalUtils.RecommendedBlackoutAction action = recommendedBlackoutAction(context, item, collection);
+        JournalUtils.RecommendedBlackoutAction action = JournalUtils.recommendedBlackoutAction(context, item, collection);
         return (action == JournalUtils.RecommendedBlackoutAction.BLACKOUT_TRUE ||
                 action == JournalUtils.RecommendedBlackoutAction.JOURNAL_NOT_INTEGRATED);
     }
 
-
-    private static boolean isDataPackage(Collection coll) throws SQLException {
-        return coll.getHandle().equals(ConfigurationManager.getProperty("submit.publications.collection"));
-    }
 
 
 }
