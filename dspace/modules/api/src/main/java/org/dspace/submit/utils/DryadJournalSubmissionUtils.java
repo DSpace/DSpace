@@ -10,6 +10,7 @@ import org.dspace.content.authority.Scheme;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.workflow.DryadWorkflowUtils;
+import org.dspace.JournalUtils;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -26,7 +27,6 @@ import java.util.Map;
 public class DryadJournalSubmissionUtils {
     private static Logger log = Logger.getLogger(DryadJournalSubmissionUtils.class);
 
-    public static final java.util.Map<String, Map<String, String>> journalProperties = new HashMap<String, Map<String, String>>();
     static{
         Context context = null;
 
@@ -144,16 +144,4 @@ public class DryadJournalSubmissionUtils {
     }
 
 
-    public static String findKeyByFullname(String fullname){
-        Map<String, String> props = journalProperties.get(fullname);
-        if(props!=null)
-            return props.get(DryadJournalSubmissionUtils.JOURNAL_ID);
-
-        return null;
-    }
-
-
-    public static Map<String, String> getPropertiesByJournal(String key){
-        return journalProperties.get(key);
-    }
 }

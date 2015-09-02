@@ -34,6 +34,8 @@ public class JournalUtils {
         , JOURNAL_NOT_INTEGRATED
     }
 
+    public static final java.util.Map<String, Map<String, String>> journalProperties = new HashMap<String, Map<String, String>>();
+
     public static Concept[] getJournalConcepts(Context context) throws SQLException {
         Scheme scheme = Scheme.findByIdentifier(context, ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName"));
         return scheme.getConcepts();
@@ -118,7 +120,7 @@ public class JournalUtils {
     }
 
     public static boolean getBooleanIntegrated(Concept concept) {
-        AuthorityMetadataValue[] vals = concept.getMetadata("journal","integrated",null, Item.ANY);
+        AuthorityMetadataValue[] vals = concept.getMetadata("journal", "integrated", null, Item.ANY);
         if(vals != null && vals.length > 0)
             return vals[0].value.toLowerCase().equals("true");
 
@@ -331,6 +333,18 @@ public class JournalUtils {
             }
         }
         return sb.toString();
+    }
+    public static String findKeyByFullname(String fullname){
+        Map<String, String> props = journalProperties.get(fullname);
+        if(props!=null)
+            return props.get(JOURNAL_ID);
+
+        return null;
+    }
+
+
+    public static Map<String, String> getPropertiesByJournal(String key){
+        return journalProperties.get(key);
     }
 
 }
