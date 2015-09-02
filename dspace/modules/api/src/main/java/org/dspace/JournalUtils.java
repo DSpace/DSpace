@@ -10,6 +10,9 @@ import org.dspace.core.Context;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * User: lantian @ atmire . com

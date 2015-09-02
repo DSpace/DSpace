@@ -99,12 +99,12 @@ public class DryadJournalSubmissionUtils {
     }
 
     public static Boolean shouldEnterBlackoutByDefault(Context context, Item item, Collection collection) throws SQLException {
-        RecommendedBlackoutAction action = recommendedBlackoutAction(context, item, collection);
+        JournalUtils.RecommendedBlackoutAction action = recommendedBlackoutAction(context, item, collection);
         return (action == JournalUtils.RecommendedBlackoutAction.BLACKOUT_TRUE ||
                 action == JournalUtils.RecommendedBlackoutAction.JOURNAL_NOT_INTEGRATED);
     }
 
-    public static RecommendedBlackoutAction recommendedBlackoutAction(Context context, Item item, Collection collection) throws SQLException {
+    public static JournalUtils.RecommendedBlackoutAction recommendedBlackoutAction(Context context, Item item, Collection collection) throws SQLException {
         // get Journal
         Item dataPackage=item;
         if(!isDataPackage(collection))

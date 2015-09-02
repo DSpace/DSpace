@@ -24,7 +24,7 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.identifier.DOIIdentifierProvider;
-import org.dspace.submit.utils.DryadJournalSubmissionUtils;
+import org.dspace.JournalUtils;
 
 /**
  * Refactoring email notification methods into this class.
@@ -139,9 +139,9 @@ public class WorkflowEmailManager {
         if(values!=null && values.length> 0){
             String journal = values[0].value;
             if(journal!=null){
-                Map<String, String> properties = DryadJournalSubmissionUtils.getPropertiesByJournal(journal);
+                Map<String, String> properties = JournalUtils.getPropertiesByJournal(journal);
                 if(properties != null) {
-                    String emails = properties.get(DryadJournalSubmissionUtils.NOTIFY_ON_ARCHIVE);
+                    String emails = properties.get(JournalUtils.NOTIFY_ON_ARCHIVE);
                     if(emails != null) {
                         String[] emails_=emails.split(",");
                         for(String emailAddr : emails_){

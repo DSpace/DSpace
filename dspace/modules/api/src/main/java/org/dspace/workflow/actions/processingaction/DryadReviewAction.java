@@ -10,7 +10,7 @@ import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
-import org.dspace.submit.utils.DryadJournalSubmissionUtils;
+import org.dspace.JournalUtils;
 import org.dspace.workflow.*;
 import org.dspace.workflow.actions.ActionResult;
 
@@ -81,9 +81,9 @@ public class DryadReviewAction extends ProcessingAction {
         if(values!=null && values.length> 0){
             String journal = values[0].value;
             if(journal!=null){
-                Map<String, String> properties = DryadJournalSubmissionUtils.getPropertiesByJournal(journal);
+                Map<String, String> properties = JournalUtils.getPropertiesByJournal(journal);
                 if(properties!=null){
-                    String emails = properties.get(DryadJournalSubmissionUtils.NOTIFY_ON_REVIEW);
+                    String emails = properties.get(JournalUtils.NOTIFY_ON_REVIEW);
                     log.debug("reviewers for journal " + journal + " are " + emails);
                     if(emails != null) {
                         String[] emails_=emails.split(",");
