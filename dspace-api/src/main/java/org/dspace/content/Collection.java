@@ -33,7 +33,7 @@ import java.util.List;
  * @version $Revision$
  */
 @Entity
-@Table(name="collection", schema = "public")
+@Table(name="collection")
 public class Collection extends DSpaceObject implements DSpaceObjectLegacySupport
 {
 
@@ -79,7 +79,6 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
     @JoinTable(
-            schema = "public",
             name = "community2collection",
             joinColumns = {@JoinColumn(name = "collection_id") },
             inverseJoinColumns = {@JoinColumn(name = "community_id") }

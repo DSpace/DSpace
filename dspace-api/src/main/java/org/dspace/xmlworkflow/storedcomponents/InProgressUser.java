@@ -20,7 +20,7 @@ import javax.persistence.*;
  * @author Mark Diggory (markd at atmire dot com)
  */
 @Entity
-@Table(name="cwf_in_progress_user", schema = "public")
+@Table(name="cwf_in_progress_user")
 public class InProgressUser {
 
     @Id

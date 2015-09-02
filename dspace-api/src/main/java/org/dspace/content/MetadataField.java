@@ -22,7 +22,7 @@ import javax.persistence.*;
  * @see org.dspace.content.MetadataSchema
  */
 @Entity
-@Table(name="metadatafieldregistry", schema = "public")
+@Table(name="metadatafieldregistry")
 public class MetadataField {
 
     @Id

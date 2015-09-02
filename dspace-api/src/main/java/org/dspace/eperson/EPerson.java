@@ -29,7 +29,7 @@ import javax.persistence.*;
  * @version $Revision$
  */
 @Entity
-@Table(name = "eperson", schema = "public")
+@Table(name = "eperson")
 public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport
 {
     @Column(name="eperson_id", insertable = false, updatable = false)

@@ -16,7 +16,7 @@ import java.util.Date;
  * @author kevinvandevelde at atmire.com
  */
 @Entity
-@Table(name="webapp", schema = "public")
+@Table(name="webapp")
 public class WebApp {
 
 

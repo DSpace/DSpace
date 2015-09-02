@@ -66,6 +66,7 @@ public class MigrationUtils
                 constraintNameSQL = "SELECT CONSTRAINT_NAME " +
                                     "FROM USER_CONS_COLUMNS " +
                                     "WHERE TABLE_NAME = ? AND COLUMN_NAME = ?";
+                cascade = true;
                 break;
             case "h2":
                 // In H2, constraints are listed in the "information_schema.constraints" table

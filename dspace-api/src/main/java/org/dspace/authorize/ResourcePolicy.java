@@ -22,7 +22,7 @@ import java.util.Date;
  * @author kevinvandevelde at atmire.com
  */
 @Entity
-@Table(name="resourcepolicy", schema = "public")
+@Table(name="resourcepolicy")
 public class ResourcePolicy{
     public static String TYPE_SUBMISSION = "TYPE_SUBMISSION";
     public static String TYPE_WORKFLOW = "TYPE_WORKFLOW";

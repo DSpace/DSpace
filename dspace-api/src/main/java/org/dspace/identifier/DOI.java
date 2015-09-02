@@ -18,7 +18,7 @@ import javax.persistence.*;
  * @author Pascal-Nicolas Becker
  */
 @Entity
-@Table(name = "Doi", schema = "public" )
+@Table(name = "Doi" )
 public class DOI
         implements Identifier
 {
