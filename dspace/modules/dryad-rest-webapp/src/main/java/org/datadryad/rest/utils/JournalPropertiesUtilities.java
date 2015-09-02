@@ -42,8 +42,8 @@ public class JournalPropertiesUtilities {
         Map<String, Map<String,String>> allJournalProperties = DryadJournalSubmissionUtils.journalProperties;
         for(String journalName : allJournalProperties.keySet() ) {
             Map<String, String> journalProperites = allJournalProperties.get(journalName);
-            if(journalProperites.containsKey(DryadJournalSubmissionUtils.JOURNAL_ID)) {
-                String journalCode = journalProperites.get(DryadJournalSubmissionUtils.JOURNAL_ID);
+            if(journalProperites.containsKey(JournalUtils.JOURNAL_ID)) {
+                String journalCode = journalProperites.get(JournalUtils.JOURNAL_ID);
                 if(journalCode.equals(organizationCode)) {
                     properties = journalProperites;
                     break;
@@ -68,7 +68,7 @@ public class JournalPropertiesUtilities {
         if(properties == null) {
             throw new IllegalArgumentException("Organization code " + organizationCode + " not found");
         }
-        final String directory = properties.get(DryadJournalSubmissionUtils.METADATADIR);
+        final String directory = properties.get(JournalUtils.METADATADIR);
         return directory;
     }
 

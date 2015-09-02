@@ -49,7 +49,7 @@ public class DryadJournalSubmissionUtils {
                         map.put(metadataValue.element+'.'+metadataValue.qualifier,metadataValue.value);
                     }
                     if(key!=null&&key.length()>0){
-                        journalProperties.put(key, map);
+                        JournalUtils.journalProperties.put(key, map);
                     }
                 }
             }
@@ -100,8 +100,8 @@ public class DryadJournalSubmissionUtils {
 
     public static Boolean shouldEnterBlackoutByDefault(Context context, Item item, Collection collection) throws SQLException {
         RecommendedBlackoutAction action = recommendedBlackoutAction(context, item, collection);
-        return (action == RecommendedBlackoutAction.BLACKOUT_TRUE ||
-                action == RecommendedBlackoutAction.JOURNAL_NOT_INTEGRATED);
+        return (action == JournalUtils.RecommendedBlackoutAction.BLACKOUT_TRUE ||
+                action == JournalUtils.RecommendedBlackoutAction.JOURNAL_NOT_INTEGRATED);
     }
 
     public static RecommendedBlackoutAction recommendedBlackoutAction(Context context, Item item, Collection collection) throws SQLException {
@@ -115,26 +115,26 @@ public class DryadJournalSubmissionUtils {
             journalFullName=journalFullNames[0].value;
         }
 
-        Map<String, String> values = journalProperties.get(journalFullName);
+        Map<String, String> values = JournalUtils.journalProperties.get(journalFullName);
         // Ignore blackout setting if journal is not (yet) integrated
         // get journal's blackout setting
         // journal is blacked out if its blackout setting is true or if it has no setting
         String isIntegrated = null;
         String isBlackedOut = null;
         if(values!=null && values.size()>0) {
-            isIntegrated = values.get(INTEGRATED);
-            isBlackedOut = values.get(PUBLICATION_BLACKOUT);
+            isIntegrated = values.get(JournalUtils.INTEGRATED);
+            isBlackedOut = values.get(JournalUtils.PUBLICATION_BLACKOUT);
         }
 
         if(isIntegrated == null || isIntegrated.equals("false")) {
             // journal is not integrated.  Enter blackout by default
-            return RecommendedBlackoutAction.JOURNAL_NOT_INTEGRATED;
+            return JournalUtils.RecommendedBlackoutAction.JOURNAL_NOT_INTEGRATED;
         } else if(isBlackedOut==null || isBlackedOut.equals("true")) {
             // journal has a blackout setting and it's set to true
-            return RecommendedBlackoutAction.BLACKOUT_TRUE;
+            return JournalUtils.RecommendedBlackoutAction.BLACKOUT_TRUE;
         } else {
             // journal is integrated but blackout setting is false or missing
-            return RecommendedBlackoutAction.BLACKOUT_FALSE;
+            return JournalUtils.RecommendedBlackoutAction.BLACKOUT_FALSE;
         }
     }
 
