@@ -865,6 +865,22 @@
 						<xsl:value-of
 							select="mets:FLocat[@LOCTYPE='URL']/@xlink:title" />
 					</dd>
+
+					<dt>
+						List of Files
+					</dt>
+					<dd>
+						<xsl:value-of
+								select="string(mets:Local/mets:file)" />
+					</dd>
+					<dt>
+						Arbitrary info - should be displayed in a loop
+					</dt>
+					<dd>
+						<xsl:value-of
+								select="string(mets:Local/mets:file)" />
+					</dd>
+
 					<dt>
 						<i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-size</i18n:text>
 					</dt>

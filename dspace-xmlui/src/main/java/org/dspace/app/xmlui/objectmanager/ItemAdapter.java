@@ -1118,6 +1118,22 @@ public class ItemAdapter extends AbstractAdapter
         // ///////////////////////
         // End file location
         endElement(METS,"FLocate");
+
+
+        // show bitstream metadata
+        Metadatum[] ms = bitstream.getMetadata("local", "bitstream", Item.ANY, Item.ANY);
+        startElement(METS, "Local");
+        for (Metadatum m : ms) {
+            attributes = new AttributeMap();
+            startElement(METS, m.qualifier, attributes);
+            if ( null != m.value ) {
+                sendCharacters(m.value);
+            }
+            endElement(METS, m.qualifier);
+        }
+        endElement(METS, "Local");
+
+
         
         // ////////////////////////////////
         // End the file
