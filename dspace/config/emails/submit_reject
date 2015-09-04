@@ -6,16 +6,15 @@
 # {3}  Reason for the rejection
 # {4}  Link to 'My Account' page
 #
-Subject: ${lr.dspace.name.short}: Submission Rejected
+Subject: ${lr.dspace.name.short}: Submission Returned for Corrections
 
 You submitted: {0}
 
-Your submission has been rejected by {2}
-with the following explanation:
+One of our editors, {2}, asked for the following corrections to be made to your submission:
 
 {3}
 
-Your submission has not been deleted!  You can access it from your account 
+You can access your submission from your account
 "Submissions" page: {4}
 
 
