@@ -28,7 +28,7 @@ import cz.cuni.mff.ufal.dspace.b2safe.ReplicationManager;
 
 public class ControlPanelReplicationTabHelper {
 	
-	private final static String delete_prefix = "checkbox-delete";
+	private final static String checkbox_prefix = "checkbox-select";
 	private final static String url_hdl_prefix = ConfigurationManager.getProperty("handle.canonical.prefix");
 	private final static String retrieve_path = ConfigurationManager.getProperty("lr", "lr.replication.eudat.retrievetopath");
 		
@@ -140,7 +140,7 @@ public class ControlPanelReplicationTabHelper {
 			ArrayList<String> todel = new ArrayList<String>();
 	
 			for (String key : params.keySet()) {
-				if (key.startsWith(delete_prefix)) {
+				if (key.startsWith(checkbox_prefix)) {
 					String fileName = params.get(key);
 					todel.add(fileName);
 				}
@@ -172,7 +172,7 @@ public class ControlPanelReplicationTabHelper {
 			ArrayList<String> toret = new ArrayList<String>();
 	
 			for (String key : params.keySet()) {
-				if (key.startsWith(delete_prefix)) {
+				if (key.startsWith(checkbox_prefix)) {
 					String fileName = params.get(key);
 					toret.add(fileName);
 				}
@@ -489,7 +489,7 @@ public class ControlPanelReplicationTabHelper {
 			c.addHighlight(rend_status).addContent(" " + md5);
 			c.addHighlight("label label-default fa fa-clock-o bold").addContent(" " + metadata.get("INFO_TimeOfTransfer"));
 			
-			CheckBox r = row.addCell("todelete", Row.ROLE_DATA, "todelete").addCheckBox(delete_prefix + "_" + pos);
+			CheckBox r = row.addCell("todelete", Row.ROLE_DATA, "todelete").addCheckBox(checkbox_prefix + "_" + pos);
 			r.addOption(name);
 
 		}
