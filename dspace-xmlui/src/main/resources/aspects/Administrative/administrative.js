@@ -2045,6 +2045,12 @@ function doEditBitstream(itemID, bitstreamID)
 
             result = FlowItemUtils.processEditBitstream(getDSContext(),itemID,bitstreamID,bitstreamName,primary,description,formatID,userFormat, cocoon.request);
         }
+		else if (cocoon.request.get("submit_clear_local_metadata"))
+		{
+			result = FlowItemUtils.processDeleteBitstreamLocalMetadata(
+				getDSContext(), itemID, bitstreamID, cocoon.request
+			);
+		}
     } while (result == null || ! result.getContinue())
 
     return result;

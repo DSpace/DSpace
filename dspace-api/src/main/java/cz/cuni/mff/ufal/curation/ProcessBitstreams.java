@@ -44,7 +44,10 @@ public class ProcessBitstreams extends AbstractCurationTask implements Consumer 
         if (dso instanceof Item) {
             try {
                 Item item = (Item)dso;
-                processItem(item);
+                boolean processed = processItem(item);
+                if ( processed ) {
+                    status = Curator.CURATE_SUCCESS;
+                }
             } catch (Exception ex) {
                 status = Curator.CURATE_FAIL;
                 results.append(ex.getLocalizedMessage()).append("\n");
@@ -56,12 +59,15 @@ public class ProcessBitstreams extends AbstractCurationTask implements Consumer 
 		return status;
 	}
 
-	void processItem(Item item) throws SQLException, AuthorizeException {
+	boolean processItem(Item item) throws SQLException, AuthorizeException {
+        boolean processed = false;
         for ( Bundle bundle : item.getBundles() ) {
             for ( Bitstream b : bundle.getBitstreams() ) {
+                processed = true;
                 processBitstream(b);
             }
         }
+        return processed;
 	}
 
     // event consumer

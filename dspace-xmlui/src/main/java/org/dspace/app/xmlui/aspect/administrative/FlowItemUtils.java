@@ -75,6 +75,7 @@ public class FlowItemUtils
 	private static final Message T_bitstream_updated = new Message("default","The bitstream has been updated.");
 	private static final Message T_bitstream_delete = new Message("default","The selected bitstreams have been deleted.");
 	private static final Message T_bitstream_order = new Message("default","The bitstream order has been successfully altered.");
+	private static final Message T_bitstream_not_found = new Message("default","The bitstream was not found.");
     private static final Message T_emgargo_set = new Message("default","The embargo was set.");
 
     private static Logger log = cz.cuni.mff.ufal.Logger.getLogger(FlowItemUtils.class);
@@ -852,7 +853,30 @@ public class FlowItemUtils
 		
 		return result;
 	}
-	
+
+	public static FlowResult processDeleteBitstreamLocalMetadata(
+		Context context, int itemID, int bitstreamID, Request request) throws SQLException, AuthorizeException
+	{
+		FlowResult result = new FlowResult();
+		result.setContinue(false);
+
+		Bitstream bitstream = Bitstream.find(context, bitstreamID);
+		if ( null != bitstream ) {
+			bitstream.clearMetadata("local", Item.ANY, Item.ANY, Item.ANY);
+			bitstream.update();
+			// Save our changes
+			context.commit();
+			result.setOutcome(true);
+			result.setMessage(T_bitstream_updated);
+		}else {
+			result.setOutcome(false);
+			result.setMessage(T_bitstream_not_found);
+		}
+
+		result.setContinue(true);
+
+		return result;
+	}
 	/**
 	 * Delete the given bitstreams from the bundle and item. If there are no more bitstreams 
 	 * left in a bundle then also remove it.

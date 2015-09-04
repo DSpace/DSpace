@@ -266,6 +266,9 @@ public class Curator
             // do we need to iterate over the object ?
             if (type == Constants.ITEM || tr.task.isDistributive())
             {
+                if (type == Constants.ITEM) {
+                    ++_curated_item_count;
+                }
                 tr.run(dso);
             }
             else if (type == Constants.COLLECTION)
