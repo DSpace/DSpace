@@ -1,13 +1,22 @@
 /* Created for LINDAT/CLARIN */
 package cz.cuni.mff.ufal.curation;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Enumeration;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.ArchiveException;
+import org.apache.commons.compress.archivers.ArchiveInputStream;
+import org.apache.commons.compress.archivers.ArchiveStreamFactory;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
@@ -30,6 +39,10 @@ public class ProcessBitstreams extends AbstractCurationTask implements Consumer 
     public static String element = "bitstream";
 
     private int status = Curator.CURATE_UNSET;
+
+    public static int ERROR = -1;
+    public static int SKIPPED = 1;
+    public static int OK = 0;
 
     // curator
     //
@@ -60,14 +73,20 @@ public class ProcessBitstreams extends AbstractCurationTask implements Consumer 
 	}
 
 	boolean processItem(Item item) throws SQLException, AuthorizeException {
-        boolean processed = false;
+        int processed = 0;
         for ( Bundle bundle : item.getBundles() ) {
             for ( Bitstream b : bundle.getBitstreams() ) {
-                processed = true;
-                processBitstream(b);
+                if (OK == processBitstream(b)) {
+                    processed += 1;
+                }else if (SKIPPED == processBitstream(b)) {
+                    processed += 1;
+                }else {
+                    processed = (0 < processed) ? -processed : processed;
+                    processed -= 1;
+                }
             }
         }
-        return processed;
+        return processed > 0;
 	}
 
     // event consumer
@@ -105,31 +124,52 @@ public class ProcessBitstreams extends AbstractCurationTask implements Consumer 
     // do the processing
     //
 
-    static void processBitstream(Bitstream b) throws SQLException, AuthorizeException {
-        addBitstreamContent(b);
+    static int processBitstream(Bitstream b) throws SQLException, AuthorizeException {
+        int ret;
+        ret = addBitstreamContent(b);
+        return ret;
     }
 
-    static void addBitstreamContent(Bitstream b) throws SQLException, AuthorizeException {
+    static ArchiveInputStream getIS(String mime, InputStream is) {
+        if ( mime.equals("application/zip") ) {
+            return new ZipArchiveInputStream(is);
+        }
+        else if ( mime.equals("application/x-gzip") ) {
+        }
+        else if ( mime.equals("application/gzip") ) {
+        }
+        else if ( mime.equals("application/x-tar") ) {
+            return new TarArchiveInputStream(is);
+        }
+        else if ( mime.equals("application/x-xz") ) {
+        }
+        return null;
+    }
+
+    static int addBitstreamContent(Bitstream b) throws SQLException, AuthorizeException {
         b.clearMetadata(schema, element, "file", Item.ANY);
 
         //
-        if ("application/zip".equals(b.getFormat().getMIMEType())) {
-            ZipInputStream zip;
-            try {
-                zip = new ZipInputStream(b.retrieve());
-                ZipEntry entry;
-                while ((entry = zip.getNextEntry()) != null) {
-                    String content = String.format(
-                        "%s|%d", entry.getName(), entry.getSize()
-                    );
-                    b.addMetadata( schema, element, "file", Item.ANY, content );
-                }
-            } catch (Exception e) {
-                log.error(e);
+        try {
+            String mime = b.getFormat().getMIMEType();
+            ArchiveInputStream is = getIS(mime, b.retrieve());
+            if ( null == is ) {
+                return SKIPPED;
             }
+            ArchiveEntry entry;
+            while ((entry = is.getNextEntry()) != null) {
+                String content = String.format(
+                    "%s|%d", entry.getName(), entry.getSize()
+                );
+                b.addMetadata( schema, element, "file", Item.ANY, content );
+            }
+        } catch (Exception e) {
+            log.error(e);
+            return ERROR;
         }
 
         b.update();
+        return OK;
     }
 
 }
