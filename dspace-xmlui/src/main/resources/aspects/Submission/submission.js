@@ -206,18 +206,19 @@ function doSubmission()
    {
        // Resume a previous submission
        var workspace = WorkspaceItem.find(getDSContext(), workspaceID);
-       
+
+       // Get the collection handle for this item.
+       var handle = workspace.getCollection().getHandle();
+
        // First check that the id is valid.
        var submitterID = workspace.getSubmitter().getID()
        var currentID = getDSContext().getCurrentUser().getID();
        if (submitterID == currentID)
        {
-           // Get the collection handle for this item.
-           var handle = workspace.getCollection().getHandle();
-
            // Record that this is a submission id, not a workflow id.
            //(specify "S" for submission item, for FlowUtils.findSubmission())
            workspaceID = "S"+workspaceID;
+
            do {
                sendPageAndWait("handle/"+handle+"/submit/resumeStep",
                    {"id":workspaceID,"step":"0.0"});
@@ -238,6 +239,29 @@ function doSubmission()
            } while (1 == 1)
 
 
+       }
+       else{
+           //change the submitter if "checks" pass
+           //TODO we should at least send an email, this might expose submission data without proper license
+           do {
+               sendPageAndWait("handle/" + handle + "/submit/ownerChange",
+                   {"id": workspaceID});
+               if(cocoon.request.get("submit_own")){
+                   var subInfo = getSubmissionInfo("S"+workspaceID);
+                   var item = subInfo.getSubmissionItem().getItem();
+                   var current = getDSContext().getCurrentUser();
+                   item.setSubmitter(current);
+                   var provenance  = "Submitter id changed from " + submitterID + "("
+                       + workspace.getSubmitter().getEmail() + ") to " +
+                       current.getID() + "(" + current.getEmail() + ")";
+                   item.addMetadata("dc", "description", "provenance", "en", provenance);
+                   subInfo.getSubmissionItem().update();
+                   var contextPath = cocoon.request.getContextPath();
+                   cocoon.redirectTo(contextPath + "/submit?workspaceID=" + workspaceID, true);
+                   getDSContext().complete();
+                   cocoon.exit();
+               }
+           } while (true);
        }
    }
 

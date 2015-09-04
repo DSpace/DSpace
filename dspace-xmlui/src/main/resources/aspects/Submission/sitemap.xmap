@@ -27,6 +27,7 @@
       <!-- <UFAL> -->
       <!-- <map:transformer name="SelectCollectionStep" src="org.dspace.app.xmlui.aspect.submission.submit.SelectCollectionStep"/> -->
       <map:transformer name="SelectCollectionStep" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.submission.submit.SelectCollectionStep"/>
+      <map:transformer name="OwnerChange" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.submission.submit.OwnerChangeForm"/>
       <!-- </UFAL> -->
       <map:transformer name="ResumeStep" src="org.dspace.app.xmlui.aspect.submission.submit.ResumeStep"/>
       <map:transformer name="SaveOrRemoveStep" src="org.dspace.app.xmlui.aspect.submission.submit.SaveOrRemoveStep"/>
@@ -240,7 +241,13 @@
                 <map:parameter name="handle" value="{flow-attribute:handle}"/>
               </map:transform>
             </map:match>
-            
+
+            <map:match pattern="handle/*/*/submit/ownerChange">
+              <map:transform type="OwnerChange">
+                <map:parameter name="id" value="{flow-attribute:id}"/>
+              </map:transform>
+            </map:match>
+
           </map:match> <!-- flow match-->
           
           <!-- javascript libraries and utils for choice/authority-control -->
