@@ -11,14 +11,13 @@ import java.util.Properties;
 import org.apache.cocoon.environment.Request;
 import org.apache.commons.io.FileUtils;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Button;
 import org.dspace.app.xmlui.wing.element.Cell;
 import org.dspace.app.xmlui.wing.element.CheckBox;
 import org.dspace.app.xmlui.wing.element.Division;
+import org.dspace.app.xmlui.wing.element.Highlight;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
-import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
@@ -29,8 +28,9 @@ import cz.cuni.mff.ufal.dspace.b2safe.ReplicationManager;
 
 public class ControlPanelReplicationTabHelper {
 	
-	private final static String delete_prefix = "checkbox-delete";
+	private final static String checkbox_prefix = "checkbox-select";
 	private final static String url_hdl_prefix = ConfigurationManager.getProperty("handle.canonical.prefix");
+	private final static String retrieve_path = ConfigurationManager.getProperty("lr", "lr.replication.eudat.retrievetopath");
 		
 	public static void showTabs(Division div, Request request, Context context) throws WingException {
 		String action = request.getParameter("action");
@@ -140,7 +140,7 @@ public class ControlPanelReplicationTabHelper {
 			ArrayList<String> todel = new ArrayList<String>();
 	
 			for (String key : params.keySet()) {
-				if (key.startsWith(delete_prefix)) {
+				if (key.startsWith(checkbox_prefix)) {
 					String fileName = params.get(key);
 					todel.add(fileName);
 				}
@@ -166,6 +166,36 @@ public class ControlPanelReplicationTabHelper {
 			action = "list_replicas";
 		}
 		
+		if(action.equals("Retrieve")) {
+			Map<String, String> params = request.getParameters();
+			
+			ArrayList<String> toret = new ArrayList<String>();
+	
+			for (String key : params.keySet()) {
+				if (key.startsWith(checkbox_prefix)) {
+					String fileName = params.get(key);
+					toret.add(fileName);
+				}
+			}
+			
+			if(!toret.isEmpty()) {
+				Division m = div.addDivision("message", "alert alert-success bold");
+				for(String fileName : toret) {
+					try {
+						ReplicationManager.retrieveFile(fileName, retrieve_path);
+						m.addPara().addContent("Retrieve Successfully " + fileName);
+					} catch (Exception e) {
+						m.addPara(null, "text-error").addContent("Unable to retrieve file " + fileName + " " + e.getLocalizedMessage());
+					}
+				}
+			} else {
+				Division m = div.addDivision("message", "alert alert-error");
+				m.addPara("Please select an item to retreive .");
+			}
+			action = "list_replicas";
+		}
+		
+		
 		if(action.equals("replicate_all_on")) {
 			ReplicationManager.setReplicateAll(true);
 			action = "repl_tobe";
@@ -190,25 +220,6 @@ public class ControlPanelReplicationTabHelper {
 		} else
 		if(action.equals("repl_not_tobe")) {
 			showCannotReplicate(div, request, context);
-		}
-		
-		// Download path
-		//
-		else if (request.getParameter("submit_repl_download") != null) {
-			try {
-				//fixme these parameters are never set neither is the one above
-				/*String remPath = request.getParameter("submit_repl_download_filepath");
-				String locPath = request.getParameter("submit_local_download_filepath");
-				File file = new File(locPath);
-				if(file.exists()) {
-					file.delete();
-				}
-				ReplicationManager.retrieveFile(remPath, file.getAbsolutePath());*/
-				//message = "file retrived and stored to " + file.getAbsolutePath();
-			} catch (Exception e) {
-				//message += "Could not download path: " + e.toString();
-			}
-
 		}
 
 	}
@@ -380,7 +391,9 @@ public class ControlPanelReplicationTabHelper {
 		
 		Division msg = div.addDivision("message", "alert alert-info");
 		
-		msg.addPara().addHighlight("pull-right").addButton("action", "label label-important btn btn-sm btn-danger").setValue("Delete");
+		Highlight h = msg.addPara().addHighlight("pull-right");		
+		h.addButton("action", "label label-primary btn btn-sm btn-primary").setValue("Retrieve");
+		h.addButton("action", "label label-important btn btn-sm btn-danger").setValue("Delete");
 		
 		// display it
 		Table table = div.addTable("replica_items", 1, 6);
@@ -391,7 +404,7 @@ public class ControlPanelReplicationTabHelper {
 		head.addCellContent("ITEM");
 		head.addCellContent("SIZE REP/ORIG");
 		head.addCellContent("INFO");
-		head.addCell("DEL_COL", null, null).addContent("DEL");
+		head.addCell("DEL_COL", null, null).addContent("");
 
 		int pos = 0;
 		long all_file_size = 0;
@@ -476,7 +489,7 @@ public class ControlPanelReplicationTabHelper {
 			c.addHighlight(rend_status).addContent(" " + md5);
 			c.addHighlight("label label-default fa fa-clock-o bold").addContent(" " + metadata.get("INFO_TimeOfTransfer"));
 			
-			CheckBox r = row.addCell("todelete", Row.ROLE_DATA, "todelete").addCheckBox(delete_prefix + "_" + pos);
+			CheckBox r = row.addCell("todelete", Row.ROLE_DATA, "todelete").addCheckBox(checkbox_prefix + "_" + pos);
 			r.addOption(name);
 
 		}
