@@ -100,7 +100,7 @@
 					</cmd:ResourceRef>
 				</cmd:ResourceProxy>
 				<xsl:call-template name="ProcessSourceURI"/>
-				<xsl:call-template name="ProcessBitstreams"/>
+				<!-- xsl:call-template name="ProcessBitstreams"/ -->
 			</cmd:ResourceProxyList>
 			<cmd:JournalFileProxyList/>
 			<cmd:ResourceRelationList/>
