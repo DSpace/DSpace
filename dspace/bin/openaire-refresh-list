@@ -1,18 +1,51 @@
-#!/bin/sh
+#!/bin/bash
 
 # Get the DSPACE/bin directory
-BINDIR=`dirname $0`
+BINDIR=$(dirname $0)
+
+echo "> Starting \"$0\" execution..."
 
 echo "Updating OpenAIRE Project list"
-echo "BINDIR=$BINDIR"
 
 # Read parameters from DSpace config
-FILE=`$BINDIR/dspace dsrun org.dspace.core.ConfigurationManager -module openaire -property projects.filename`
-ONLINE=`$BINDIR/dspace dsrun org.dspace.core.ConfigurationManager -module openaire -property projects.url`
+FILE= openaire-cache.list
+ONLINE="http://api.openaire.eu/projects/dspace/FP7/ALL/ALL###http://api.openaire.eu/projects/dspace/WT/ALL/ALL"
 
-ONLINE=`echo $ONLINE | sed 's/\"//g'`
+ONLINE=$(echo $ONLINE | sed 's/\"//g')
 
-echo "FILE=$FILE"
-echo "ONLINE=$ONLINE"
 
-wget -nv -O $FILE "$ONLINE" && $BINDIR/dspace dsrun org.dspace.content.authority.OpenAIREAuthority
+XML_CLOSE_ELEMENTS="</value-pairs>\n</form-value-pairs>"
+
+IFS=$'\n'
+i=1
+
+for url in $(echo "$ONLINE" | sed 's_###_\n_g');
+do
+   if [ $i -eq 1 ]; then
+      if [[ $url == http* ]]; then
+         wget --no-check-certificate "$url" -O "${i}.xml"
+      else
+         cp "$url" "${i}.xml"
+      fi
+
+      xmllint --format "${i}.xml" | head -n -2 > $FILE
+      rm "${i}.xml"
+
+      i=$(($i+1))
+   else
+      if [[ $url == http* ]]; then
+         wget --no-check-certificate "$url" -O "${i}.xml"
+      else
+         cp "$url" "${i}.xml"
+      fi
+
+      xmllint --format "${i}.xml" | head -n -2 | tail -n +4 >> $FILE
+      rm "${i}.xml"
+
+      i=$(($i+1))
+   fi
+done
+
+echo -e "\n$XML_CLOSE_ELEMENTS" >> $FILE
+
+echo "> Ended \"$0\" execution."
