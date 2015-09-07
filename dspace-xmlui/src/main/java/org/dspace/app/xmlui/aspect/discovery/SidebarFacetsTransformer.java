@@ -157,7 +157,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
         //If we are on a search page performing a search a query may be used
         String query = request.getParameter("query");
         if(query != null && !"".equals(query)){
-            // Escape any special characters in this user-entered query
+            // Do standard escaping of some characters in this user-entered query
             query = DiscoveryUIUtils.escapeQueryChars(query);
             queryArgs.setQuery(query);
         }
