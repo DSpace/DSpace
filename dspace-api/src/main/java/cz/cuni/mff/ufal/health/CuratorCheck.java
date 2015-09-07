@@ -41,6 +41,7 @@ public class CuratorCheck extends Check {
             "requiredmetadata",
             "fastchecklinks",
             "checkhandles",
+            "openaire",
             "checkmetadata" }) {
             try {
                 ret += String.format("=================\n\nCuration Task %s", task_name);
