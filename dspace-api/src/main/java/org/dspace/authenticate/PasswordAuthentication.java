@@ -225,6 +225,16 @@ public class PasswordAuthentication
             }
             else if (eperson.checkPassword(password))
             {
+                context.turnOffAuthorisationSystem();
+                eperson.setLoggedIn();
+                try {
+                    eperson.update();
+                    context.commit();
+                } catch (AuthorizeException e) {
+                } finally {
+                    context.restoreAuthSystemState();
+                }
+
                 // login is ok if password matches:
                 context.setCurrentUser(eperson);
                 log.info(LogManager.getHeader(context, "authenticate", "type=PasswordAuthentication"));
