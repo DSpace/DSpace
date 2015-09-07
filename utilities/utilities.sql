@@ -27,7 +27,7 @@ CREATE TABLE license_definition (
     label_id integer NOT NULL,
     created_on timestamp without time zone DEFAULT now() NOT NULL,
     confirmation integer DEFAULT 0 NOT NULL,
-    required_info character varying(64)
+    required_info character varying(256)
 );
 
 
