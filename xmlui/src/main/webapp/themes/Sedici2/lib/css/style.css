@@ -3942,6 +3942,18 @@ table.dropdown-table.ui-accordion tr:hover td{
   font-style:italic;
 }
 
+.intro-text .cc_license_text img{
+  padding: 10px 5px 10px 0px;
+  float: left;
+}
+
+.intro-text .cc_license_text span {
+  padding: 7px 0px;
+  display: flex;
+  vertical-align:top;
+  font-size: 10px;
+}
+
 /*Social bar styles*/
  .share-bar>div {
        display:inline-block;

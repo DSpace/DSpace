@@ -2127,6 +2127,7 @@ este momento. Cuando se usa QDC para los elementos de SEDICI se recomienda el us
     <message key="xmlui.administrative.CurateForm.taskgroup_label_name">Elija de entre los siguientes grupos</message>
     
     <message key="xmlui.dri2xhtml.METS-1.0.cc-license-text">Excepto donde se diga explícitamente, este item se publica bajo la siguiente licencia </message>
+    <message key="xmlui.dri2xhtml.METS-1.0.cc-license-text-collection-community">Excepto donde se diga explícitamente, las obras dentro de esta colección/comunidad se publican bajo la licencia </message>
     
 
   <!--###### File Format MIME Type Mappings ######-->

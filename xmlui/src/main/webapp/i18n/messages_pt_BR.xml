@@ -1941,6 +1941,7 @@
 	<message key="xmlui.dri2xht1ml.METS-1.0.item-record-source">Os dados deste registro foram obtidos de</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-note">Notas</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.cc-license-text">Exceto quando indicado o contrário, este item é publicado com a seguinte licença </message>
+	<message key="xmlui.dri2xhtml.METS-1.0.cc-license-text-collection-community">Exceto quando indicado o contrário, as obras nesta coleção / comunidade são publicados sob a licença </message>
 	<message key="xmlui.dri2xhtml.METS-1.0.code-value-de">Alemão</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.code-value-en">Inglês</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.code-value-es">Espanhol</message>
