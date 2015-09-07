@@ -75,6 +75,8 @@ public class Params extends AbstractWingElement implements StructuralElement
     public static final String OPERATION_ADD = "add";
 
     public static final String OPERATION_DELETE = "delete";
+    
+    public static final String EDITOR = "editorToolbar";
 
     public static final String[] OPERATIONS = { OPERATION_ADD, OPERATION_DELETE };
     
@@ -132,7 +134,9 @@ public class Params extends AbstractWingElement implements StructuralElement
 
     /** Value of choicesClosed option */
     protected boolean choicesClosed = false;
-
+    
+    /** Value that indicates that the editor will be applied to a textarea */
+    protected String editorToolbar = null;
     /**
      * Construct a new parameter's element
      *
@@ -350,6 +354,10 @@ public class Params extends AbstractWingElement implements StructuralElement
     }
 
 
+	public void setEditorToolbar(String toolbar) {
+		this.editorToolbar=toolbar;
+		
+	}
 
     /**
      * Translate this element and all contained elements into SAX events. The
@@ -463,8 +471,14 @@ public class Params extends AbstractWingElement implements StructuralElement
         {
             attributes.put(A_AUTOFOCUS, this.autofocus);
         }
+        
+        if(this.editorToolbar!=null)
+        {
+        	attributes.put(EDITOR,this.editorToolbar);
+        }
 
         startElement(contentHandler, namespaces, E_PARAMS, attributes);
         endElement(contentHandler, namespaces, E_PARAMS);
     }
+
 }

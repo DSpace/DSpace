@@ -168,4 +168,9 @@ public class TextArea extends Field
         instances.add(instance);
         return instance;
     }
+
+	public void setEditorToolbar(String editorToolbar) {
+		this.params.setEditorToolbar(editorToolbar);
+		
+	}
 }

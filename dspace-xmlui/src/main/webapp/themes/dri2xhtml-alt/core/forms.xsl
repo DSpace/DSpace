@@ -900,6 +900,15 @@
                                        <i18n:text>xmlui.dri2xhtml.default.textarea.value</i18n:text>
                                     </xsl:if>
                                 </textarea>
+								<xsl:if test="./dri:params[@editorToolbar]">
+									<script>										 
+										CKEDITOR.replace( '<xsl:value-of select="./attribute::n"/>' , {											
+											toolbar : [
+												<xsl:value-of select="./dri:params/attribute::editorToolbar"/>
+											]
+										});
+									</script>
+								</xsl:if>
 
 
               <!-- add place to store authority value -->
