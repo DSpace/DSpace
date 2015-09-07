@@ -160,7 +160,13 @@
                     </xsl:attribute>
                 </link>
             </xsl:if>
-
+			<xsl:if test="/dri:document/dri:body/dri:div[@id='aspect.submission.StepTransformer.div.submit-describe']/dri:list[@id='aspect.submission.StepTransformer.list.submit-describe']">
+				<script type="text/javascript" src="//cdn.ckeditor.com/4.4.7/full/ckeditor.js">&#160;</script>
+				<script>var path= "<xsl:value-of select="$context-path"/>;
+				CKEDITOR.config.customConfig =path.concat("/static/js/editorConfig.js");					
+				CKEDITOR.config.language= "<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page' and @qualifier='currentLocale']"/>";
+				</script>
+			</xsl:if>
             <!-- The following javascript removes the default text of empty text areas when they are focused on or submitted -->
             <!-- There is also javascript to disable submitting a form when the 'enter' key is pressed. -->
                         <script type="text/javascript">

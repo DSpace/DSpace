@@ -829,7 +829,11 @@ public class DescribeStep extends AbstractSubmissionStep
         {
                 // Plain old Textarea
                 TextArea textArea = form.addItem().addTextArea(fieldName,"submit-textarea");
-
+                String editorToolbar=ConfigurationManager.getProperty("input-forms."+fieldName+".editorToolbar");
+                if(editorToolbar!=null)
+                {
+                	textArea.setEditorToolbar(editorToolbar);
+                }
                 // Setup the text area
                 textArea.setLabel(dcInput.getLabel());
                 textArea.setHelp(cleanHints(dcInput.getHints()));
