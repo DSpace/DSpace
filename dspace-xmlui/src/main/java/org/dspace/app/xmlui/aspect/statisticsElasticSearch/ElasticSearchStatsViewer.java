@@ -360,6 +360,7 @@ public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
             if(termName.equalsIgnoreCase("bitstream")) {
                 Bitstream bitstream = Bitstream.find(context, Integer.parseInt(facetEntry.getTerm().string()));
                 Item item = (Item) bitstream.getParentObject();
+                log.info("BitstreamID: " + bitstream.getID());
                 row.addCell().addXref(contextPath + "/handle/" + item.getHandle(), item.getName());
                 row.addCellContent(getFirstMetadataValue(item, "dc.creator"));
                 row.addCellContent(getFirstMetadataValue(item, "dc.publisher"));

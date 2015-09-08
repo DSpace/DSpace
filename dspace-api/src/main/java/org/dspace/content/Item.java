@@ -344,11 +344,10 @@ public class Item extends DSpaceObject
     {
         if(handle == null) {
                 try {
-                                handle = HandleManager.findHandle(this.ourContext, this);
-                        } catch (SQLException e) {
-                                // TODO Auto-generated catch block
-                                //e.printStackTrace();
-                        }
+                    handle = HandleManager.findHandle(this.ourContext, this);
+                } catch (SQLException e) {
+                    log.error("ERROR on item.getHandle for item:" + this.getID());
+                }
         }
         return handle;
     }
