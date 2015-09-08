@@ -191,6 +191,48 @@ public class Bitstream extends DSpaceObject
         return bitstreamArray;
     }
 
+    public static Bitstream[] findAllInStoreNumber(Context context, Integer storeNumber) throws SQLException
+    {
+        TableRowIterator tri = DatabaseManager.queryTable(context, "bitstream",
+                "SELECT * FROM bitstream where store_number = ?", storeNumber);
+
+        List<Bitstream> bitstreams = new ArrayList<Bitstream>();
+
+        try
+        {
+            while (tri.hasNext())
+            {
+                TableRow row = tri.next();
+
+                // First check the cache
+                Bitstream fromCache = (Bitstream) context.fromCache(
+                        Bitstream.class, row.getIntColumn("bitstream_id"));
+
+                if (fromCache != null)
+                {
+                    bitstreams.add(fromCache);
+                }
+                else
+                {
+                    bitstreams.add(new Bitstream(context, row));
+                }
+            }
+        }
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+            {
+                tri.close();
+            }
+        }
+
+        Bitstream[] bitstreamArray = new Bitstream[bitstreams.size()];
+        bitstreamArray = bitstreams.toArray(bitstreamArray);
+
+        return bitstreamArray;
+    }
+
     /**
      * Create a new bitstream, with a new ID. The checksum and file size are
      * calculated. This method is not public, and does not check authorisation;
@@ -262,13 +304,17 @@ public class Bitstream extends DSpaceObject
     }
 
     /**
-     * Get the internal identifier of this bitstream
+     * Get the bitstream id
      * 
-     * @return the internal identifier
+     * @return the bitstream ID
      */
     public int getID()
     {
         return bRow.getIntColumn("bitstream_id");
+    }
+
+    public String getInternalId() {
+        return bRow.getStringColumn(INTERNAL_ID);
     }
 
     public String getHandle()
@@ -679,6 +725,15 @@ public class Bitstream extends DSpaceObject
      */
     public int getStoreNumber() {
         return bRow.getIntColumn("store_number");
+    }
+
+    /**
+     * Set / change the store number that an asset is located in
+     * @param storeNumber
+     */
+    public void setStoreNumber(int storeNumber) {
+        bRow.setColumn(STORE_NUMBER, storeNumber);
+        modified = true;
     }
 
     /**

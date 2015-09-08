@@ -20,6 +20,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.checker.BitstreamInfoDAO;
 import org.dspace.content.Bitstream;
 import org.dspace.core.ConfigurationManager;
@@ -375,6 +376,46 @@ public class BitstreamStorageManager
 		return bitstream_id;
 	}
 
+    /**
+     * Migrates all assets off of one assetstore to another
+     * @param assetstoreSource
+     * @param assetstoreDestination
+     */
+    public static void migrate(Context context, Integer assetstoreSource, Integer assetstoreDestination, boolean deleteOld, Integer batchCommitSize) {
+        //Find all the bitstreams on the old source, copy it to new destination, update store_number, save, remove old
+
+        try {
+            Bitstream[] allBitstreamsInSource = Bitstream.findAllInStoreNumber(context, assetstoreSource);
+            Integer processedCounter = 0;
+
+            for(Bitstream bitstream : allBitstreamsInSource) {
+                InputStream inputStream = bitstream.retrieve();
+                log.debug("Copying bitstream:" + bitstream.getID() + " from assetstore[" + assetstoreSource + "] to assetstore[" + assetstoreDestination+"]");
+                stores[assetstoreDestination].put(inputStream, bitstream.getInternalId());
+                bitstream.setStoreNumber(assetstoreDestination);
+                bitstream.update();
+
+                if(deleteOld) {
+                    log.debug("Removing bitstream:" + bitstream.getID() + " from assetstore[" + assetstoreSource + "]");
+                    stores[assetstoreSource].remove(bitstream.getInternalId());
+                }
+
+                processedCounter++;
+                //modulo
+                if((processedCounter % batchCommitSize) == 0) {
+                    log.info("Migration Commit Checkpoint: " + processedCounter);
+                    context.commit();
+                }
+            }
+        } catch (SQLException e) {
+            log.error(e);
+        } catch (IOException e) {
+            log.error(e);
+        } catch (AuthorizeException e) {
+            log.error(e);
+        }
+    }
+
 	/**
 	 * Does the internal_id column in the bitstream row indicate the bitstream
 	 * is a registered file
@@ -604,5 +645,17 @@ public class BitstreamStorageManager
         row.setColumn(Bitstream.BITSTREAM_ID, -1);
         DatabaseManager.insert(context, row);
         return row.getIntColumn(Bitstream.BITSTREAM_ID);
+    }
+
+    public static void printStores(Context context) {
+        try {
+            for (int i = 0; i < stores.length; i++) {
+                int countBitstreams = Bitstream.findAllInStoreNumber(context, i).length;
+                System.out.println("store[" + i + "] == " + stores[i].getClass().getSimpleName() + ", which has " + countBitstreams + " # of bitstreams.");
+            }
+            System.out.println("Incoming assetstore is store[" + incoming + "]");
+        } catch (SQLException e) {
+            log.error(e);
+        }
     }
 }
