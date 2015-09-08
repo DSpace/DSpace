@@ -369,6 +369,9 @@ public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
                     row.addCellContent(getFirstMetadataValue(item, "dc.date.issued"));
                 } else {
                     row.addCellContent("Deleted Object");
+                    row.addCell();
+                    row.addCell();
+                    row.addCell();
                     log.info("Parent object (item) has been deleted");
                 }
 
