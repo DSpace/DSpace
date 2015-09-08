@@ -196,7 +196,7 @@ public class DOIOrganiser {
             try { 
                 if (!it.hasNext()) 
                 {
-                    System.err.println("There are no objects in the database "
+                    System.out.println("There are no objects in the database "
                             + "that could be reserved.");
                 }
                 
@@ -223,7 +223,7 @@ public class DOIOrganiser {
             try {
                 if (!it.hasNext()) 
                 {
-                    System.err.println("There are no objects in the database "
+                    System.out.println("There are no objects in the database "
                             + "that could be registered.");
                 }
                 while (it.hasNext())
@@ -233,14 +233,7 @@ public class DOIOrganiser {
                             context, 
                             doiRow.getIntColumn("resource_type_id"), 
                             doiRow.getIntColumn("resource_id"));
-                    
-                    // DATASHARE - prevent nullpointer exception
-                    if(dso != null){
-                        organiser.register(doiRow, dso);
-                    }
-                    else{
-                        System.err.println("No such item: " + doiRow.getIntColumn("resource_id"));
-                    }
+                    organiser.register(doiRow, dso);
                 }
             } catch (SQLException ex) {
                 System.err.println("Error in database connection:" + ex.getMessage());
@@ -258,7 +251,7 @@ public class DOIOrganiser {
             try { 
                 if (!it.hasNext()) 
                 {
-                    System.err.println("There are no objects in the database "
+                    System.out.println("There are no objects in the database "
                             + "whose metadata needs an update.");
                 }
                 
@@ -269,13 +262,6 @@ public class DOIOrganiser {
                             context, 
                             doiRow.getIntColumn("resource_type_id"), 
                             doiRow.getIntColumn("resource_id"));
-                    
-                    // DATASHARE - start
-					if(dso == null){
-                        System.out.println("Cant find item with resource id: " +
-                                           Integer.toString(doiRow.getIntColumn("resource_id")));
-					}
-                    // DATASHARE - end
                     organiser.update(doiRow, dso);
                 }
             } catch (SQLException ex) {
@@ -292,7 +278,7 @@ public class DOIOrganiser {
             try { 
                 if (!it.hasNext()) 
                 {
-                    System.err.println("There are no objects in the database "
+                    System.out.println("There are no objects in the database "
                             + "that could be deleted.");
                 }
                 

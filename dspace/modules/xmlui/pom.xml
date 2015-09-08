@@ -4,7 +4,9 @@
     <artifactId>xmlui</artifactId>
 
     <!-- DATASHARE - start -->
-    <packaging>jar</packaging>
+    <!-- datashare need a jar of xmlui for tests to run -->
+    <!-- <packaging>jar</packaging> -->
+    <packaging>war</packaging>
     <!-- DATASHARE - end -->
 
     <name>DSpace XML-UI (Manakin) :: Local Customizations</name>
