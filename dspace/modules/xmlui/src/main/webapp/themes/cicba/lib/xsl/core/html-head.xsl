@@ -198,7 +198,13 @@
 
                         var runAfterJSImports = new FnArray();
             </script>
-            <script type="text/javascript" src="//cdn.ckeditor.com/4.4.7/standard/ckeditor.js">&#160;</script>
+            <xsl:if test="/dri:document/dri:body/dri:div[@id='aspect.submission.StepTransformer.div.submit-describe']/dri:list[@id='aspect.submission.StepTransformer.list.submit-describe']">
+				<script type="text/javascript" src="//cdn.ckeditor.com/4.4.7/full/ckeditor.js">&#160;</script>
+				<script type="text/javascript">var path= "<xsl:value-of select="$context-path"/>";
+				CKEDITOR.config.customConfig =path.concat("/static/js/editorConfig.js");					
+				CKEDITOR.config.language= "<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page' and @qualifier='currentLocale']"/>";
+				</script>
+			</xsl:if>
 	</xsl:template>
 	
 	<xsl:template name="addPageTitle">

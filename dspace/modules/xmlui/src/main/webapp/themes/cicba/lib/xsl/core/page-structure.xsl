@@ -524,20 +524,12 @@
 		
 		 <script type="text/javascript">
 		        $(document).ready(function(){
-		        	if($('textarea[name=introductory_text]').length){
+		        	 <xsl:if test="/dri:document/dri:body/dri:div[@id='aspect.submission.StepTransformer.div.submit-describe']/dri:list[@id='aspect.submission.StepTransformer.list.submit-describe']">
 		        		var path= "<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath']"/>";
 		        		path=path.concat("/static/js/eqneditor/");
 				        CKEDITOR.plugins.addExternal( 'eqneditor', path, 'plugin.js' );
 						CKEDITOR.config.extraPlugins = 'eqneditor';
-						CKEDITOR.config.entities=false;
-						CKEDITOR.config.language= "<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page' and @qualifier='currentLocale']"/>";
-						CKEDITOR.replace( 'introductory_text', {
-							toolbar : [
-								 ['Bold', 'Italic', 'Underline', 'SpecialChar'], ['Link', 'Unlink' ],[ 'NumberedList', 'BulletedList', '-',
-								 'Outdent', 'Indent', 'EqnEditor'], ['Source']
-							] 
-						});
-					};
+					</xsl:if>
 				});
 		  </script>
 		
