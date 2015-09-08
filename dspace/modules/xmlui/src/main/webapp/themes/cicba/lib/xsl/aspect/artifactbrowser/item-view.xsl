@@ -50,6 +50,7 @@
 		<xsl:param name="nodes"></xsl:param>
 		<xsl:param name="anchor"></xsl:param>
 		<xsl:param name="isDate"></xsl:param>
+		<xsl:param name="editor">False</xsl:param>
 
 		<xsl:for-each select="$nodes">
 			<span>
@@ -67,6 +68,9 @@
 							<xsl:call-template name="cambiarFecha" >
 									<xsl:with-param name="isDate" select="$isDate"></xsl:with-param>									
 							</xsl:call-template>
+					</xsl:when>
+					<xsl:when test="$editor='True'">
+						<xsl:value-of select="text()" disable-output-escaping="yes"/>
 					</xsl:when>
 					<xsl:otherwise>
 						<xsl:copy-of select="text()"/>
@@ -116,6 +120,7 @@
 		<xsl:param name="container">div</xsl:param>
 		<xsl:param name="null_message"></xsl:param>
 		<xsl:param name="isDate"></xsl:param>
+		<xsl:param name="editor">False</xsl:param>
 		
 		<xsl:variable name="mp" select="str:split($field,'.')" />
 		<xsl:variable name="schema" select="$mp[1]"/>
@@ -146,6 +151,7 @@
 								<xsl:with-param name="nodes" select="$nodes"/>
 								<xsl:with-param name="isDate" select="$isDate"/>
 								<xsl:with-param name="anchor" select="$is_linked_authority"/>
+								<xsl:with-param name="editor" select="$editor"/>
 							</xsl:call-template>
 						</xsl:when>
 						<xsl:when test="$null_message">
@@ -364,6 +370,7 @@
 	       		<xsl:call-template name="render-metadata">
 					<xsl:with-param name="field" select="'dcterms.abstract'" />
 					<xsl:with-param name="separator" select="''" />
+					<xsl:with-param name="editor">True</xsl:with-param>
 				</xsl:call-template>
 	      		</div>
 	      	</div>
