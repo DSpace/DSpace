@@ -19,6 +19,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -1149,6 +1151,25 @@ public class DatabaseUtils
     public static void clearFlywayDBCache()
     {
         flywaydb = null;
+    }
+
+    public static String getCurrentFlywayState(Connection connection) throws SQLException
+    {
+        PreparedStatement statement = connection.prepareStatement("SELECT version FROM schema_version ORDER BY installed_rank desc");
+        ResultSet resultSet = statement.executeQuery();
+        resultSet.next();
+        return resultSet.getString("version");
+    }
+
+    public static Double getCurrentFlywayDSpaceState(Connection connection) throws SQLException
+    {
+        String flywayState = getCurrentFlywayState(connection);
+        Matcher matcher = Pattern.compile("^([0-9]*\\.[0-9]*)(\\.)?.*").matcher(flywayState);
+        if(matcher.matches())
+        {
+            return Double.parseDouble(matcher.group(1));
+        }
+        return null;
     }
 
 }

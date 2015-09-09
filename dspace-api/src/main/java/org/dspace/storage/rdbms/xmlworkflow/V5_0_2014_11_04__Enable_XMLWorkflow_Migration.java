@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  * This class represents a Flyway DB Java Migration
  * http://flywaydb.org/documentation/migration/java.html
  * <P>
- * It can upgrade a 5.0 (or above) version of DSpace to use the XMLWorkflow.
+ * It can upgrade a 5.0 version of DSpace to use the XMLWorkflow.
  * 
  * @author Tim Donohue
  */
@@ -52,8 +52,12 @@ public class V5_0_2014_11_04__Enable_XMLWorkflow_Migration
     public void migrate(Connection connection)
             throws IOException, SQLException
     {
+        String currentFlyWayState = DatabaseUtils.getCurrentFlywayState(connection);
+
         // Make sure XML Workflow is enabled in workflow.cfg before proceeding
-        if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow"))
+        if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow")
+                //This migration won't work in DSpace 6, so we cannot execute it, in DSpace 5 it should work so allow it prior to version 6
+                && DatabaseUtils.getCurrentFlywayDSpaceState(connection) < 6)
         {
             // Now, check if the XMLWorkflow table (cwf_workflowitem) already exists in this database
             // If XMLWorkflow Table does NOT exist in this database, then lets do the migration!
