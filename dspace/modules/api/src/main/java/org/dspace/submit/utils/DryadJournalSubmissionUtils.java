@@ -1,21 +1,5 @@
 package org.dspace.submit.utils;
 
-import org.apache.log4j.Logger;
-import org.dspace.content.Collection;
-import org.dspace.content.DCValue;
-import org.dspace.content.Item;
-import org.dspace.content.authority.AuthorityMetadataValue;
-import org.dspace.content.authority.Concept;
-import org.dspace.content.authority.Scheme;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
-import org.dspace.workflow.DryadWorkflowUtils;
-import org.dspace.JournalUtils;
-
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -26,42 +10,6 @@ import java.util.Map;
  */
 public class DryadJournalSubmissionUtils {
     private static Logger log = Logger.getLogger(DryadJournalSubmissionUtils.class);
-
-    static{
-        Context context = null;
-
-        try {
-            context = new Context();
-            Scheme scheme = Scheme.findByIdentifier(context, ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName"));
-            Concept[] concepts = scheme.getConcepts();
-            //todo:add the journal order
-            //String journalTypes = properties.getProperty("journal.order");
-            for(Concept concept:concepts){
-                String key = concept.getPreferredLabel();
-                ArrayList<AuthorityMetadataValue> metadataValues = concept.getMetadata();
-                Map<String, String> map = new HashMap<String, String>();
-                for(AuthorityMetadataValue metadataValue : metadataValues){
-                    if(metadataValue.qualifier==null){
-                        map.put(metadataValue.element,metadataValue.value);
-                    }
-                    else
-                    {
-                        map.put(metadataValue.element+'.'+metadataValue.qualifier,metadataValue.value);
-                    }
-                    if(key!=null&&key.length()>0){
-                        JournalUtils.journalProperties.put(key, map);
-                    }
-                }
-            }
-            context.complete();
-        }catch (Exception e) {
-            if(context!=null)
-            {
-                context.abort();
-            }
-            log.error("Error while loading journal properties", e);
-        }
-    }
 
 
 

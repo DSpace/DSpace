@@ -42,6 +42,41 @@ public class JournalUtils {
 
     public static final java.util.Map<String, Map<String, String>> journalProperties = new HashMap<String, Map<String, String>>();
 
+    static{
+        Context context = null;
+
+        try {
+            context = new Context();
+            Scheme scheme = Scheme.findByIdentifier(context, ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName"));
+            Concept[] concepts = scheme.getConcepts();
+            //todo:add the journal order
+            //String journalTypes = properties.getProperty("journal.order");
+            for(Concept concept:concepts){
+                String key = concept.getPreferredLabel();
+                ArrayList<AuthorityMetadataValue> metadataValues = concept.getMetadata();
+                Map<String, String> map = new HashMap<String, String>();
+                for(AuthorityMetadataValue metadataValue : metadataValues){
+                    if(metadataValue.qualifier==null){
+                        map.put(metadataValue.element,metadataValue.value);
+                    }
+                    else
+                    {
+                        map.put(metadataValue.element+'.'+metadataValue.qualifier,metadataValue.value);
+                    }
+                    if(key!=null&&key.length()>0){
+                        journalProperties.put(key, map);
+                    }
+                }
+            }
+            context.complete();
+        }catch (Exception e) {
+            if(context!=null)
+            {
+                context.abort();
+            }
+            log.error("Error while loading journal properties", e);
+        }
+    }
     public static Concept[] getJournalConcepts(Context context) throws SQLException {
         Scheme scheme = Scheme.findByIdentifier(context, ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName"));
         return scheme.getConcepts();
