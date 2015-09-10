@@ -11,7 +11,6 @@ import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
 import org.apache.log4j.Logger;
-import org.dspace.submit.utils.DryadJournalSubmissionUtils;
 import org.dspace.workflow.DryadWorkflowUtils;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;

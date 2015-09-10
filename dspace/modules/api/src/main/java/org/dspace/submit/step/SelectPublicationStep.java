@@ -20,7 +20,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.handle.HandleManager;
 import org.dspace.submit.bean.PublicationBean;
 import org.dspace.submit.model.ModelPublication;
-import org.dspace.submit.utils.DryadJournalSubmissionUtils;
 import org.dspace.workflow.WorkflowRequirementsManager;
 import org.jdom.Element;
 import org.jdom.input.DOMBuilder;
