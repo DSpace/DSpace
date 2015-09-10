@@ -60,12 +60,12 @@
 
     if (collection != null)
     {
-        linkText = collection.getMetadata("name");
+        linkText = collection.getName();
         linkBack = "/handle/" + collection.getHandle();
     }
     else if (community != null)
     {
-        linkText = community.getMetadata("name");
+        linkText = community.getName();
         linkBack = "/handle/" + community.getHandle();
     }
 %>
@@ -80,7 +80,7 @@
 	    {
    %>
             	<fmt:message key="browse.no-results.col">
-                    <fmt:param><%= collection.getMetadata("name")%></fmt:param>
+                    <fmt:param><%= collection.getName() %></fmt:param>
                 </fmt:message>
    <%
 	    }
@@ -88,7 +88,7 @@
 	    {
    %>
    		<fmt:message key="browse.no-results.com">
-            <fmt:param><%= community.getMetadata("name")%></fmt:param>
+            <fmt:param><%= community.getName() %></fmt:param>
         </fmt:message>
    <%
  	    }

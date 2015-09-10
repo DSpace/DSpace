@@ -15,6 +15,8 @@
   -                  is null, we are creating one.
   --%>
 
+<%@page import="org.dspace.content.factory.ContentServiceFactory"%>
+<%@page import="org.dspace.content.service.CommunityService"%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
@@ -30,6 +32,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%
+	CommunityService comServ = ContentServiceFactory.getInstance().getCommunityService();
     Community community = (Community) request.getAttribute("community");
     int parentID = UIUtil.getIntParameter(request, "parent_community_id");
     // Is the logged in user a sys admin
@@ -61,11 +64,11 @@
     
     if (community != null)
     {
-        name = community.getMetadata("name");
-        shortDesc = community.getMetadata("short_description");
-        intro = community.getMetadata("introductory_text");
-        copy = community.getMetadata("copyright_text");
-        side = community.getMetadata("side_bar_text");
+        name = comServ.getMetadata(community, "name");
+        shortDesc = comServ.getMetadata(community, "short_description");
+        intro = comServ.getMetadata(community, "introductory_text");
+        copy = comServ.getMetadata(community, "copyright_text");
+        side = comServ.getMetadata(community, "side_bar_text");
         logo = community.getLogo();
         admins = community.getAdministrators();
     }

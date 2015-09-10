@@ -43,22 +43,22 @@
     <%-- <h1>Upload Logo</h1> --%>
     <h1><fmt:message key="jsp.dspace-admin.upload-logo.title"/></h1>   
     <%-- <p>Select the logo to upload for
-	<%= (collection != null ? "collection <strong>" + collection.getMetadata("name") + "</strong>"
-                                : "community <strong>" + community.getMetadata("name") + "</strong>") %>
+	<%= (collection != null ? "collection <strong>" + collection.getName()  + "</strong>"
+                                : "community <strong>" + community.getName()  + "</strong>") %>
     </p> --%>    
     	<p>
     	    <%
 	    	if (collection != null){
 	    %>
 	    		<fmt:message key="jsp.dspace-admin.upload-logo.select.col">
-                    <fmt:param><%= collection.getMetadata("name")%></fmt:param>
+                    <fmt:param><%= collection.getName() %></fmt:param>
                 </fmt:message>
 	    <%	
 	    	}
 	    	else{
 	    %>
 	    		<fmt:message key="jsp.dspace-admin.upload-logo.select.com">
-                    <fmt:param><%= community.getMetadata("name")%></fmt:param>
+                    <fmt:param><%= community.getName() %></fmt:param>
                 </fmt:message>
 	    <%
 	    	}
