@@ -1374,6 +1374,26 @@
                          alt="Basic and Applied Ecology cover"/>
                 </a>
             </xsl:when>
+            
+            <xsl:when test='$journal-name = "Biodiversity Data Journal"'>
+            	<a target="_blank">
+                	<xsl:attribute name="href">
+                    	<xsl:choose>
+                        	<xsl:when test="contains($article-doi,'doi:')">
+                            	<xsl:value-of
+                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                        	</xsl:when>
+                        	<xsl:otherwise>
+                            	<xsl:value-of
+                                    select="string('http://bdj.pensoft.net/')"/>
+                        	</xsl:otherwise>
+                    	</xsl:choose>
+                	</xsl:attribute>
+                	<img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/BDJ-Cover.png"
+                     	alt="Biodiversity Data Journal cover"/>
+            	</a>
+        	</xsl:when>
+            
             <xsl:when test='$journal-name = "Biological Journal of the Linnean Society"'>
                 <a target="_blank">
                     <xsl:attribute name="href">
@@ -2272,6 +2292,26 @@
                          alt="Nordic Journal of Botany cover"/>
                 </a>
             </xsl:when>
+            
+            <xsl:when test='$journal-name = "Nota Lepidopterologica"'>
+            	<a target="_blank">
+                	<xsl:attribute name="href">
+                    	<xsl:choose>
+                        	<xsl:when test="contains($article-doi,'doi:')">
+                            	<xsl:value-of
+                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                        	</xsl:when>
+                        	<xsl:otherwise>
+                            	<xsl:value-of
+                                    select="string('http://nl.pensoft.net/')"/>
+                        	</xsl:otherwise>
+                    	</xsl:choose>
+                	</xsl:attribute>
+                	<img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/korica.png"
+                     	alt="Nota Lepidopterologica cover"/>
+            	</a>
+        	</xsl:when>
+            
             <xsl:when test='$journal-name = "Oikos"'>
                 <a target="_blank">
                     <xsl:attribute name="href">
@@ -2379,6 +2419,26 @@
                          alt="Perspectives in Plant Ecology, Evolution and Systematics cover"/>
                 </a>
             </xsl:when>
+            
+            <xsl:when test='$journal-name = "Physiological and Biochemical Zoology"'>
+            	<a target="_blank">
+                	<xsl:attribute name="href">
+                    	<xsl:choose>
+                        	<xsl:when test="contains($article-doi,'doi:')">
+                            	<xsl:value-of
+                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                        	</xsl:when>
+                        	<xsl:otherwise>
+                            	<xsl:value-of
+                                    select="string('http://www.jstor.org/journal/physbioczool')"/>
+                        	</xsl:otherwise>
+                    	</xsl:choose>
+                	</xsl:attribute>
+                	<img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/PBZv88n4cover.png"
+                    	 alt="Physiological and Biochemical Zoology cover"/>
+            	</a>
+        	</xsl:when>
+            
             <xsl:when test='$journal-name = "PhytoKeys"'>
                 <a target="_blank">
                     <xsl:attribute name="href">
