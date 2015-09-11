@@ -17,6 +17,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.itemexport.ItemExportServiceImpl;
+import org.dspace.app.itemexport.factory.ItemExportServiceFactory;
+import org.dspace.app.itemexport.service.ItemExportService;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Constants;
@@ -37,7 +39,15 @@ import org.dspace.core.Utils;
 public class ItemExportArchiveServlet extends DSpaceServlet {
 	/** log4j category */
 	private static Logger log = Logger.getLogger(ItemExportArchiveServlet.class);
+	
+	private ItemExportService itemExportService;
 
+	@Override
+	public void init() throws ServletException {
+		super.init();
+		itemExportService = ItemExportServiceFactory.getInstance().getItemExportService();
+	}
+	
 	@Override
 	protected void doDSGet(Context context, HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException,
@@ -46,11 +56,11 @@ public class ItemExportArchiveServlet extends DSpaceServlet {
 
 		filename = request.getPathInfo().substring(
 				request.getPathInfo().lastIndexOf('/')+1);
-		System.out.println(filename);
+		log.debug(filename);
 
-		if (ItemExportServiceImpl.canDownload(context, filename)) {
+		if (itemExportService.canDownload(context, filename)) {
 			try {
-				InputStream exportStream = ItemExportServiceImpl
+				InputStream exportStream = itemExportService
 						.getExportDownloadInputStream(filename, context
                                 .getCurrentUser());
 
@@ -71,8 +81,8 @@ public class ItemExportArchiveServlet extends DSpaceServlet {
 				// TODO: Currently the date of the item, since we don't have
 				// dates
 				// for files
-				long lastModified = ItemExportServiceImpl
-						.getExportFileLastModified(filename);
+				long lastModified = itemExportService
+						.getExportFileLastModified(context, filename);
 				response.setDateHeader("Last-Modified", lastModified);
 
 				// Check for if-modified-since header
@@ -89,7 +99,7 @@ public class ItemExportArchiveServlet extends DSpaceServlet {
 				response.setContentType(ItemExportServiceImpl.COMPRESSED_EXPORT_MIME_TYPE);
 
 				// Response length
-				long size = ItemExportServiceImpl.getExportFileSize(filename);
+				long size = itemExportService.getExportFileSize(context, filename);
 				response.setHeader("Content-Length", String.valueOf(size));
 
 				response.setHeader("Content-Disposition",

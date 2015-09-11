@@ -340,7 +340,7 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             
             request.setAttribute("browse.info", binfo);
 
-            if (AuthorizeServiceImpl.isAdmin(context))
+            if (authorizeService.isAdmin(context))
             {
                 // Set a variable to create admin buttons
                 request.setAttribute("admin_button", Boolean.TRUE);
