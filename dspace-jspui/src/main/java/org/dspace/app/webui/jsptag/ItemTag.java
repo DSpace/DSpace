@@ -39,7 +39,6 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.browse.BrowseException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.BundleBitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.Item;
@@ -847,7 +846,7 @@ public class ItemTag extends TagSupport
         		// check if primary bitstream is html
         		if (bunds.get(0) != null)
         		{
-        			List<BundleBitstream> bits = bunds.get(0).getBitstreams();
+        			List<Bitstream> bits = bunds.get(0).getBitstreams();
 
         			for (int i = 0; (i < bits.size()) && !html; i++)
         			{
@@ -947,11 +946,10 @@ public class ItemTag extends TagSupport
 					}
             		for (Bundle bundle : bundles)
             		{
-            			List<BundleBitstream> bitstreams = bundle.getBitstreams();
+            			List<Bitstream> bitstreams = bundle.getBitstreams();
 
-            			for (BundleBitstream bb : bitstreams)
+            			for (Bitstream b : bitstreams)
             			{
-            				Bitstream b = bb.getBitstream();
             				// Skip internal types
             				if (!b.getFormat(context).isInternal())
             				{
@@ -1114,11 +1112,10 @@ public class ItemTag extends TagSupport
 
         for (Bundle bundle : bundles)
         {
-            List<BundleBitstream> bitstreams = bundle.getBitstreams();
+            List<Bitstream> bitstreams = bundle.getBitstreams();
 
-            for (BundleBitstream bb : bitstreams)
+            for (Bitstream b : bitstreams)
             {
-            	Bitstream b = bb.getBitstream();
                 out.print("<div align=\"center\" class=\"standard\">");
                 out.print("<strong><a class=\"btn btn-primary\" target=\"_blank\" href=\"");
                 out.print(request.getContextPath());

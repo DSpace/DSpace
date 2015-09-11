@@ -23,7 +23,6 @@ import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.BundleBitstream;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -154,13 +153,13 @@ public class BitstreamServlet extends DSpaceServlet
 
             for (int i = 0; (i < bundles.size()) && !found; i++)
             {
-                List<BundleBitstream> bitstreams = bundles.get(i).getBitstreams();
+                List<Bitstream> bitstreams = bundles.get(i).getBitstreams();
 
                 for (int k = 0; (k < bitstreams.size()) && !found; k++)
                 {
-                    if (sequenceID == bitstreams.get(k).getBitstream().getSequenceID())
+                    if (sequenceID == bitstreams.get(k).getSequenceID())
                     {
-                        bitstream = bitstreams.get(k).getBitstream();
+                        bitstream = bitstreams.get(k);
                         found = true;
                     }
                 }

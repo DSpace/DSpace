@@ -39,7 +39,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
-import org.dspace.content.BundleBitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -839,17 +838,17 @@ public class EditItemServlet extends DSpaceServlet
         {
             List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
             for (Bundle bundle : bundles) {
-                List<BundleBitstream> bitstreams = bundle.getBitstreams();
+                List<Bitstream> bitstreams = bundle.getBitstreams();
                 UUID[] newBitstreamOrder = new UUID[bitstreams.size()];
                 if (button.equals("submit_update_order")) {
-                    for (BundleBitstream bitstream : bitstreams) {
+                    for (Bitstream bitstream : bitstreams) {
                         //The order is determined by javascript
                         //For each of our bitstream retrieve the order value
-                        int order = Util.getIntParameter(request, "order_" + bitstream.getBitstream().getID());
+                        int order = Util.getIntParameter(request, "order_" + bitstream.getID());
                         //-1 the order since the order needed to start from one
                         order--;
                         //Place the bitstream identifier in the correct order
-                        newBitstreamOrder[order] = bitstream.getBitstream().getID();
+                        newBitstreamOrder[order] = bitstream.getID();
                     }
                 }else{
                     //Javascript isn't operational retrieve the value from the hidden field
@@ -928,8 +927,8 @@ public class EditItemServlet extends DSpaceServlet
                 Collection owningCollection = item.getOwningCollection();
                 if (owningCollection != null)
                 {
-                    BundleBitstream bnd = b.getBundles().get(0);
-                    bundleService.inheritCollectionDefaultPolicies(context, bnd.getBundle(), 
+                    Bundle bnd = b.getBundles().get(0);
+                    bundleService.inheritCollectionDefaultPolicies(context, bnd,
                     		owningCollection);
                 }
             } 
