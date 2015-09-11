@@ -19,7 +19,6 @@ import javax.servlet.jsp.tagext.TagSupport;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.BundleBitstream;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -86,11 +85,11 @@ public class ItemPreviewTag extends TagSupport
         
         if (bundles.size() > 0)
         {
-        	List<BundleBitstream> bitstreams = bundles.get(0).getBitstreams();
+        	List<Bitstream> bitstreams = bundles.get(0).getBitstreams();
         	
             HttpServletRequest request = (HttpServletRequest)pageContext.getRequest();
             out.println("<br/><p align=\"center\">");
-            Bitstream bitstream = bitstreams.get(0).getBitstream();
+            Bitstream bitstream = bitstreams.get(0);
 			out.println("<img src=\""
             		    + request.getContextPath() + "/retrieve/"
             		    + bitstream.getID() + "/"

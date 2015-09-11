@@ -31,7 +31,6 @@ import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.BundleBitstream;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
@@ -422,9 +421,8 @@ public class RequestItemServlet extends DSpaceServlet
 						if (requestItem.getBitstream() == null) {
 							List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
 							for (Bundle b : bundles) {
-								List<BundleBitstream> bbitstreams = b.getBitstreams();
-								for (BundleBitstream bb : bbitstreams) {
-									Bitstream bitstream = bb.getBitstream();
+								List<Bitstream> bbitstreams = b.getBitstreams();
+								for (Bitstream bitstream : bbitstreams) {
 									if (!bitstream.getFormat(context).isInternal()
 											&& authorizeService.authorizeActionBoolean(context, null, bitstream, Constants.READ, false)) {
 										email.addAttachment(

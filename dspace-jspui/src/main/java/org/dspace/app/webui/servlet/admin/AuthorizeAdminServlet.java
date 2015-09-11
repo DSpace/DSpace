@@ -31,7 +31,6 @@ import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.BundleBitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -779,11 +778,10 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             bundlePolicies.put(myBundle.getID(), myPolicies);
 
             // go through all bundle's bitstreams, add to bitstream map
-            List<BundleBitstream> bitstreams = myBundle.getBitstreams();
+            List<Bitstream> bitstreams = myBundle.getBitstreams();
 
-            for (BundleBitstream bb : bitstreams)
+            for (Bitstream myBitstream : bitstreams)
             {
-                Bitstream myBitstream = bb.getBitstream();
                 myPolicies = authorizeService.getPolicies(c, myBitstream);
                 bitstreamPolicies.put(myBitstream.getID(),
                         myPolicies);

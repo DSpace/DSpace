@@ -22,7 +22,6 @@ import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.BundleBitstream;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
@@ -107,13 +106,13 @@ public class HTMLServlet extends DSpaceServlet
 
         for (Bundle bundle : bundles)
         {
-            List<BundleBitstream> bitstreams = bundle.getBitstreams();
+            List<Bitstream> bitstreams = bundle.getBitstreams();
 
-            for (BundleBitstream bb : bitstreams)
+            for (Bitstream bb : bitstreams)
             {
-                if (bsName.equals(bb.getBitstream().getName()))
+                if (bsName.equals(bb.getName()))
                 {
-                    return bb.getBitstream();
+                    return bb;
                 }
             }
         }
