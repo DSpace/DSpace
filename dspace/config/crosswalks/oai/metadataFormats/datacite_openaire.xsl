@@ -155,7 +155,55 @@
 	</xsl:template>
 
 	<xsl:template name="Language_R" />
-	<xsl:template name="ResourceType_R" />
+
+	<xsl:template name="ResourceType_R">
+		<!--
+			request for this information by OpenAIRE
+				Controlled List Values:
+
+				Audiovisual
+				Collection
+				Dataset
+				Event
+				Image
+				InteractiveResource
+				Model
+				PhysicalObject
+				Service
+				Software
+				Sound
+				Text
+				Workflow
+				Other
+		!-->
+
+		<!-- type -->
+		<xsl:variable name="dc_type" select="xalan:distinct(doc:metadata/doc:element[@name='dc']/doc:element[@name='type']/doc:element/doc:field[@name='value'])[1]"/>
+		<xsl:choose>
+			<xsl:when test="$dc_type='corpus'">
+				<resourceType resourceTypeGeneral="Dataset">
+					<xsl:value-of select="$dc_type"/>
+				</resourceType>
+			</xsl:when>
+			<xsl:when test="$dc_type='toolService'">
+				<resourceType resourceTypeGeneral="Software">
+					<xsl:value-of select="$dc_type"/>
+				</resourceType>
+			</xsl:when>
+			<xsl:when test="$dc_type='lexicalConceptualResource'">
+				<resourceType resourceTypeGeneral="Dataset">
+					<xsl:value-of select="$dc_type"/>
+				</resourceType>
+			</xsl:when>
+			<xsl:when test="$dc_type='languageDescription'">
+				<resourceType resourceTypeGeneral="Dataset">
+					<xsl:value-of select="."/>
+				</resourceType>
+			</xsl:when>
+		</xsl:choose>
+
+	</xsl:template>
+
 	<xsl:template name="AlternateIdentifier_O" />
 	<!-- TODO Related identifiers in submission? -->
 	<xsl:template name="RelatedIdentifier_MA" />
