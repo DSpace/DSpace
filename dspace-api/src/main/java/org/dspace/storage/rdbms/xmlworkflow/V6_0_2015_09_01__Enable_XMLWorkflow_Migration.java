@@ -57,13 +57,13 @@ public class V6_0_2015_09_01__Enable_XMLWorkflow_Migration implements JdbcMigrat
 
                 // Get the contents of our data migration script, based on path & DB type
                 // (e.g. /src/main/resources/[path-to-this-class]/postgres/data_workflow_migration.sql)
-                String dataMigrateSQL = "";//new ClassPathResource(packagePath + "/" +
-                                           //               dbFileLocation +
-                                             //             "/data_workflow_migration.sql", getClass().getClassLoader()).loadAsString(Constants.DEFAULT_ENCODING);
+                String dataMigrateSQL = new ClassPathResource(packagePath + "/" +
+                                                          dbFileLocation +
+                                                          "/v6.0_data_workflow_migration.sql", getClass().getClassLoader()).loadAsString(Constants.DEFAULT_ENCODING);
 
                 // Actually execute the Data migration SQL
                 // This will migrate all existing traditional workflows to the new XMLWorkflow system & tables
-//                DatabaseUtils.executeSql(connection, dataMigrateSQL);
+                DatabaseUtils.executeSql(connection, dataMigrateSQL);
 
                 // Assuming both succeeded, save the size of the scripts for getChecksum() below
                 migration_file_size = dbMigrateSQL.length() + dataMigrateSQL.length();

@@ -146,9 +146,10 @@ WHERE dspace_object IN
 --     public static final int ADD = 3;
 --     public static final int REMOVE = 4;
 -- Item
-INSERT INTO resourcepolicy (policy_id, dspace_object, action_id, eperson_id)
+INSERT INTO resourcepolicy (policy_id, resource_type_id, dspace_object, action_id, eperson_id)
 SELECT
 getnextid('resourcepolicy') AS policy_id,
+2 AS resource_type_id,
 cwf_workflowitem.item_id AS dspace_object,
 temptable.action_id AS action_id,
 cwf_claimtask.owner_id AS eperson_id
@@ -156,9 +157,10 @@ FROM (cwf_workflowitem INNER JOIN cwf_claimtask ON cwf_workflowitem.workflowitem
 (VALUES (0), (1), (2), (3), (4)) AS temptable(action_id);
 
 -- Bundles
-INSERT INTO resourcepolicy (policy_id, dspace_object, action_id, eperson_id)
+INSERT INTO resourcepolicy (policy_id, resource_type_id, dspace_object, action_id, eperson_id)
 SELECT
 getnextid('resourcepolicy') AS policy_id,
+1 AS resource_type_id,
 item2bundle.bundle_id AS dspace_object,
 temptable.action_id AS action_id,
 cwf_claimtask.owner_id AS eperson_id
@@ -169,9 +171,10 @@ FROM
 ), (VALUES (0), (1), (2), (3), (4)) AS temptable(action_id);
 
 -- Bitstreams
-INSERT INTO resourcepolicy (policy_id, dspace_object, action_id, eperson_id)
+INSERT INTO resourcepolicy (policy_id, resource_type_id, dspace_object, action_id, eperson_id)
 SELECT
 getnextid('resourcepolicy') AS policy_id,
+0 AS resource_type_id,
 bundle2bitstream.bitstream_id AS dspace_object,
 temptable.action_id AS action_id,
 cwf_claimtask.owner_id AS eperson_id
@@ -185,9 +188,10 @@ FROM
 
 -- Create policies for pooled tasks
 
-INSERT INTO resourcepolicy (policy_id, dspace_object, action_id, epersongroup_id)
+INSERT INTO resourcepolicy (policy_id, resource_type_id, dspace_object, action_id, epersongroup_id)
 SELECT
 getnextid('resourcepolicy') AS policy_id,
+2 AS resource_type_id,
 cwf_workflowitem.item_id AS dspace_object,
 temptable.action_id AS action_id,
 cwf_pooltask.group_id AS epersongroup_id
@@ -195,9 +199,10 @@ FROM (cwf_workflowitem INNER JOIN cwf_pooltask ON cwf_workflowitem.workflowitem_
 (VALUES (0), (1), (2), (3), (4)) AS temptable(action_id);
 
 -- Bundles
-INSERT INTO resourcepolicy (policy_id, dspace_object, action_id, epersongroup_id)
+INSERT INTO resourcepolicy (policy_id, resource_type_id, dspace_object, action_id, epersongroup_id)
 SELECT
 getnextid('resourcepolicy') AS policy_id,
+1 AS resource_type_id,
 item2bundle.bundle_id AS dspace_object,
 temptable.action_id AS action_id,
 cwf_pooltask.group_id AS epersongroup_id
@@ -208,9 +213,10 @@ FROM
 ), (VALUES (0), (1), (2), (3), (4)) AS temptable(action_id);
 
 -- Bitstreams
-INSERT INTO resourcepolicy (policy_id, dspace_object, action_id, epersongroup_id)
+INSERT INTO resourcepolicy (policy_id, resource_type_id, dspace_object, action_id, epersongroup_id)
 SELECT
 getnextid('resourcepolicy') AS policy_id,
+0 AS resource_type_id,
 bundle2bitstream.bitstream_id AS dspace_object,
 temptable.action_id AS action_id,
 cwf_pooltask.group_id AS epersongroup_id
@@ -225,31 +231,34 @@ FROM
 
 -- Create policies for submitter
 -- TODO: only add if unique
-INSERT INTO resourcepolicy (policy_id, dspace_object, action_id, eperson_id)
+INSERT INTO resourcepolicy (policy_id, resource_type_id, dspace_object, action_id, eperson_id)
 SELECT
 getnextid('resourcepolicy') AS policy_id,
+2 AS resource_type_id,
 cwf_workflowitem.item_id AS dspace_object,
 0 AS action_id,
 item.submitter_id AS eperson_id
-FROM (cwf_workflowitem INNER JOIN item ON cwf_workflowitem.item_id = item.item_id);
+FROM (cwf_workflowitem INNER JOIN item ON cwf_workflowitem.item_id = item.uuid);
 
-INSERT INTO resourcepolicy (policy_id, dspace_object, action_id, eperson_id)
+INSERT INTO resourcepolicy (policy_id, resource_type_id, dspace_object, action_id, eperson_id)
 SELECT
 getnextid('resourcepolicy') AS policy_id,
+1 AS resource_type_id,
 item2bundle.bundle_id AS dspace_object,
 0 AS action_id,
 item.submitter_id AS eperson_id
-FROM ((cwf_workflowitem INNER JOIN item ON cwf_workflowitem.item_id = item.item_id)
+FROM ((cwf_workflowitem INNER JOIN item ON cwf_workflowitem.item_id = item.uuid)
       INNER JOIN item2bundle ON cwf_workflowitem.item_id = item2bundle.item_id
      );
 
-INSERT INTO resourcepolicy (policy_id, action_id, eperson_id)
+INSERT INTO resourcepolicy (policy_id, resource_type_id, dspace_object, action_id, eperson_id)
 SELECT
 getnextid('resourcepolicy') AS policy_id,
+0 AS resource_type_id,
 bundle2bitstream.bitstream_id AS dspace_object,
 0 AS action_id,
 item.submitter_id AS eperson_id
-FROM (((cwf_workflowitem INNER JOIN item ON cwf_workflowitem.item_id = item.item_id)
+FROM (((cwf_workflowitem INNER JOIN item ON cwf_workflowitem.item_id = item.uuid)
       INNER JOIN item2bundle ON cwf_workflowitem.item_id = item2bundle.item_id)
       INNER JOIN bundle2bitstream ON item2bundle.bundle_id = bundle2bitstream.bundle_id
      );
