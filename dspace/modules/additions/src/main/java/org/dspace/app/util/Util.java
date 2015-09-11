@@ -535,14 +535,14 @@ public class Util {
     }
     
     /**
-     * Should download all option be shown? Download all link will not be
+     * Should download all option be allowed? Download all link will not be
      * visible if the item has an embargo, if the total download is greater than
      * dspace.downloadall.limit or the item is withdrawn. 
      * @param context
      * @param item
      * @return True if download all option should be shown.
      */
-    public static boolean showDownloadAll(Context context, Item item)
+    public static boolean allowDownloadAll(Context context, Item item)
     {
         return(!hasEmbargo(context, item) && !isLargeDownload(item) && !item.isWithdrawn());
     }
