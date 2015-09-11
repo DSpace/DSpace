@@ -190,7 +190,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
 
             AuthorizeUtil.authorizeManageItemPolicy(c, item);
 			ResourcePolicy policy = authorizeService.createResourcePolicy(c, item,
-					groupService.findByLegacyId(c, GroupService.ANONYMOUS_ID), null, -1, null);
+					groupService.findByName(c, Group.ANONYMOUS), null, -1, null);
 
             List<Group> groups = groupService.findAll(c, GroupService.NAME);
             List<EPerson> epeople = personService.findAll(c, EPerson.EMAIL);
@@ -242,7 +242,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
 
             AuthorizeUtil.authorizeManageBundlePolicy(c, bundle);
 			ResourcePolicy policy = authorizeService.createResourcePolicy(c, bundle,
-					groupService.findByLegacyId(c, GroupService.ANONYMOUS_ID), null, -1, null);
+					groupService.findByName(c, Group.ANONYMOUS), null, -1, null);
 
             List<Group> groups = groupService.findAll(c, GroupService.NAME);
             List<EPerson> epeople = personService.findAll(c, EPerson.EMAIL);
@@ -270,7 +270,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
 
             AuthorizeUtil.authorizeManageBitstreamPolicy(c, bitstream);
 			ResourcePolicy policy = authorizeService.createResourcePolicy(c, bitstream,
-					groupService.findByLegacyId(c, GroupService.ANONYMOUS_ID), null, -1, null);
+					groupService.findByName(c, Group.ANONYMOUS), null, -1, null);
 
             List<Group> groups = groupService.findAll(c, GroupService.NAME);
             List<EPerson> epeople = personService.findAll(c, EPerson.EMAIL);
@@ -316,7 +316,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
 
             AuthorizeUtil.authorizeManageCollectionPolicy(c, collection);
 			ResourcePolicy policy = authorizeService.createResourcePolicy(c, collection,
-					groupService.findByLegacyId(c, GroupService.ANONYMOUS_ID), null, -1, null);
+					groupService.findByName(c, Group.ANONYMOUS), null, -1, null);
 
 
             List<Group> groups = groupService.findAll(c, GroupService.NAME);
@@ -405,7 +405,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             {
                 // create new policy
     			policy = authorizeService.createResourcePolicy(c, collection,
-    					groupService.findByLegacyId(c, GroupService.ANONYMOUS_ID), null, -1, null);
+    					groupService.findByName(c, Group.ANONYMOUS), null, -1, null);
             }
             else
             {
@@ -441,7 +441,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             {
                 // create new policy
     			policy = authorizeService.createResourcePolicy(c, community,
-    					groupService.findByLegacyId(c, GroupService.ANONYMOUS_ID), null, -1, null);
+    					groupService.findByName(c, Group.ANONYMOUS), null, -1, null);
 
             }
             else
@@ -472,7 +472,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
 
             AuthorizeUtil.authorizeManageCollectionPolicy(c, collection);
 			ResourcePolicy policy = authorizeService.createResourcePolicy(c, collection,
-					groupService.findByLegacyId(c, GroupService.ANONYMOUS_ID), null, -1, null);
+					groupService.findByName(c, Group.ANONYMOUS), null, -1, null);
 
 
             List<Group> groups = groupService.findAll(c, GroupService.NAME);
@@ -499,7 +499,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
 
             AuthorizeUtil.authorizeManageCommunityPolicy(c, community);
 			ResourcePolicy policy = authorizeService.createResourcePolicy(c, community,
-					groupService.findByLegacyId(c, GroupService.ANONYMOUS_ID), null, -1, null);
+					groupService.findByName(c, Group.ANONYMOUS), null, -1, null);
 
 
             List<Group> groups = groupService.findAll(c, GroupService.NAME);
@@ -698,12 +698,12 @@ public class AuthorizeAdminServlet extends DSpaceServlet
 
             // if it's to bitstreams, do it to bundles too
             PolicySet.setPolicies(c, Constants.COLLECTION, collectionId,
-                    resourceType, 0, groupService.findByLegacyId(c, GroupService.ANONYMOUS_ID).getID(), false, true);
+                    resourceType, 0, groupService.findByName(c, Group.ANONYMOUS).getID(), false, true);
 
             if (resourceType == Constants.BITSTREAM)
             {
                 PolicySet.setPolicies(c, Constants.COLLECTION, collectionId,
-                        Constants.BUNDLE, 0, groupService.findByLegacyId(c, GroupService.ANONYMOUS_ID).getID(), false, true);
+                        Constants.BUNDLE, 0, groupService.findByName(c, Group.ANONYMOUS).getID(), false, true);
             }
 
             // return to the main page

@@ -15,12 +15,12 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Properties;
 import java.sql.SQLException;
+import java.util.UUID;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.content.Collection;
-import org.dspace.content.authority.ChoiceAuthorityServiceImpl;
 import org.xml.sax.SAXException;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
@@ -83,10 +83,10 @@ public class AuthorityChooseServlet extends DSpaceServlet {
 
         String query = request.getParameter("query");
         String format = request.getParameter("format");
-        int collectionID = UIUtil.getIntParameter(request, "collection");
+        UUID collectionID = UIUtil.getUUIDParameter(request, "collection");
         int start = UIUtil.getIntParameter(request, "start");
         int limit = UIUtil.getIntParameter(request, "limit");
-        Collection collection = collectionService.findByLegacyId(context, collectionID);
+        Collection collection = collectionService.find(context, collectionID);
         
         Choices result = choiceAuthorityService.getMatches(field, query, collection, start, limit, null);
 //        Choice[] testValues = {

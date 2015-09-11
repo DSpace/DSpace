@@ -349,7 +349,7 @@ public class EPersonAdminServlet extends DSpaceServlet
                 }
                 
                 // You may not assume the login of another super administrator
-                Group administrators = groupService.findByLegacyId(context,1);
+                Group administrators = groupService.findByName(context,Group.ADMIN);
                 if (groupService.isDirectMember(administrators, e))
                 {                    
                     JSPManager.showJSP(request, response,

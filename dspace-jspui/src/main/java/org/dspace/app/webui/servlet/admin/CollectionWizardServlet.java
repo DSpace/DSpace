@@ -763,7 +763,7 @@ public class CollectionWizardServlet extends DSpaceServlet
                 EditCommunitiesServlet.storeAuthorizeAttributeCollectionEdit(context, request, collection);
             }
 
-            JSPManager.showJSP(request, response, "/tools/edit-collectionService.jsp");
+            JSPManager.showJSP(request, response, "/tools/edit-collection.jsp");
 
             break;
         }
