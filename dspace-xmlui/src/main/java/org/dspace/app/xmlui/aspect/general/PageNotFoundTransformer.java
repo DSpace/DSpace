@@ -7,15 +7,14 @@
  */
 package org.dspace.app.xmlui.aspect.general;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 
 import org.apache.cocoon.ResourceNotFoundException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
-import org.apache.cocoon.environment.ObjectModelHelper;
-import org.apache.cocoon.environment.Request;
-import org.apache.cocoon.util.HashUtil;
+import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -27,7 +26,6 @@ import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -69,9 +67,8 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
      */
     public Serializable getKey() 
     {
-        Request request = ObjectModelHelper.getRequest(objectModel);
-        
-        return HashUtil.hash(request.getSitemapURI());
+        // Prevent caching; Cocoon won't send 404 response codes for cached responses
+        return null;
     }
 
     /**
@@ -158,16 +155,12 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
         if (this.bodyEmpty)
         {
             Division notFound = body.addDivision("page-not-found","primary");
-            
             notFound.setHead(T_head);
-            
-            notFound.addPara(T_para1); 
-
+            notFound.addPara(T_para1);
             notFound.addPara().addXref(contextPath + "/",T_go_home);
 
-            throw new ResourceNotFoundException("Page cannot be found");
-
-
+            final HttpServletResponse response = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 
