@@ -49,14 +49,7 @@ public class GroupListServlet extends DSpaceServlet
 		
 		// What are we sorting by?  Name is default
 		int sortBy = GroupService.NAME;
-		
-		String sbParam = request.getParameter("sortby");
 
-		if (sbParam != null && sbParam.equals("id"))
-		{
-			sortBy = GroupService.ID;
-		}
-		
 		// What's the index of the first group to show?  Default is 0
 		int first = UIUtil.getIntParameter(request, "first");
 		if (first == -1)

@@ -360,7 +360,7 @@ public class FeedServlet extends DSpaceServlet
                 checkAccess:
                     for (Group group : authorizeService.getAuthorizedGroups(context, result, Constants.READ))
                         {
-                        if ((group.getLegacyId() != null && group.getLegacyId() == GroupService.ANONYMOUS_ID))
+                        if ((group.getName() != null && group.getName().equals(Group.ANONYMOUS)))
                         {
                             items.add(result);
                             break checkAccess;
