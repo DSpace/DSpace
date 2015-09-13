@@ -20,6 +20,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.w3c.dom.Document;
@@ -115,7 +116,33 @@ public class PiwikHelper {
 		}
 		return reportJSON.toJSONString();
 	}
-	
+
+	public static String mergeJSONResults(String report) throws Exception {
+		JSONParser parser = new JSONParser();
+		JSONArray json = (JSONArray)parser.parse(report);
+		JSONObject views = (JSONObject)json.get(0);
+		JSONObject downloads = (JSONObject)json.get(1);
+		JSONObject result = new JSONObject();
+
+		for(Object key : views.keySet()) {
+			JSONObject view_data = new JSONObject();
+			// any valid view data?
+			try {
+				view_data = (JSONObject) views.get(key);
+			} catch (ClassCastException e) {
+			}
+			// any valid download data?
+			try {
+				JSONObject download_data = (JSONObject)downloads.get(key);
+				view_data.put("nb_downloads", download_data.get("nb_pageviews"));
+				view_data.put("nb_uniq_downloads", download_data.get("nb_uniq_pageviews"));
+			} catch (ClassCastException e) {
+			}
+			result.put(key, view_data);
+		}
+		return result.toJSONString();
+	}
+
 	public static String readFromURL(String url) throws IOException {
 		StringBuilder output = new StringBuilder();		
 		URL widget = new URL(url);
