@@ -38,6 +38,7 @@ importClass(Packages.cz.cuni.mff.ufal.administrative.LicenseForm);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowBatchImportUtils);
 importClass(Packages.java.lang.System);
 importClass(Packages.org.dspace.core.ConfigurationManager);
+importClass(Packages.cz.cuni.mff.ufal.administrative.EditItemServicesForm);
 
 /**
  * Simple access method to access the current cocoon object model.
@@ -1506,6 +1507,11 @@ function doEditItem(itemID)
         {
             editEmbargo(itemID);
         }
+        else if (cocoon.request.get("services"))
+        {
+            doEditItemServices(itemID);
+        }
+	    
                 else
 		{
 			// This case should never happen but to prevent an infinite loop
@@ -1529,6 +1535,7 @@ function doEditNavigateAway(should_stay) {
     || cocoon.request.get("submit_curate") 
     || cocoon.request.get("edit_license") 
     || cocoon.request.get("embargo") 
+    || cocoon.request.get("services") 
     ) {
       return true;
     }
@@ -1573,6 +1580,40 @@ function doEditItemLicense(itemID) {
             return null;
         }
     } while (true)
+}
+
+	
+/**
+*  Add/Remove Item Services
+*/
+function doEditItemServices(itemID){
+	var result;
+	do {
+		sendPageAndWait("admin/item/services",{"itemID":itemID}, result);
+		assertEditItem(itemID);
+		if (cocoon.request.get("activate"))
+		{
+			var serviceName = cocoon.request.get("activate");			
+			result = EditItemServicesForm.activate(getDSContext(), itemID, serviceName, cocoon.request);
+		}
+		else
+		if (cocoon.request.get("deactivate"))
+		{
+			var serviceName = cocoon.request.get("deactivate");
+			result = EditItemServicesForm.deactivate(getDSContext(), itemID, serviceName);
+		}
+		else
+		if (cocoon.request.get("update"))
+		{
+			var serviceName = cocoon.request.get("update");
+			result = EditItemServicesForm.update(getDSContext(), itemID, serviceName, cocoon.request);
+		}		
+		else 
+		{
+			// go back to wherever we came from.
+			return null;
+		}
+	} while (true)
 }
 
 

@@ -53,6 +53,7 @@ to administer DSpace.
 			<map:transformer name="EditItemLicenseForm" src="cz.cuni.mff.ufal.administrative.EditItemLicenseForm"/>
 			<map:transformer name="LicenseForm" src="cz.cuni.mff.ufal.administrative.LicenseForm"/>
 			<map:transformer name="EditItemEmbargoForm" src="cz.cuni.mff.ufal.administrative.UpdateEmbargoForm"/>
+			<map:transformer name="EditItemServicesForm" src="cz.cuni.mff.ufal.administrative.EditItemServicesForm"/>			
     
             <map:transformer name="ManageHandlesMain" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.handle.ManageHandlesMain"/>
             <map:transformer name="EditHandleForm" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.handle.EditHandleForm"/>
@@ -126,6 +127,7 @@ to administer DSpace.
 		
 		<map:selectors>
     		<map:selector name="AuthenticatedSelector" src="org.dspace.app.xmlui.aspect.general.AuthenticatedSelector"/>
+    		<map:selector name="IfServiceManagerSelector" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.general.IfServiceManagerSelector"/>
     	</map:selectors>
     	
     </map:components>
@@ -581,151 +583,192 @@ to administer DSpace.
 		        		<!--
 		        			
 		        			-->
-		        		<map:match pattern="admin/item/status">
-		        			<map:transform type="EditItemStatusForm">
-		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
-		        			</map:transform>
-		        		</map:match>
-		        		
-		        		<map:match pattern="admin/item/bitstreams">
-                            <!--Add the javascript-->
-                            <map:transform type="IncludePageMeta">
-                                <map:parameter name="javascript.static#1" value="loadJQuery.js"/>
-                                <map:parameter name="javascript.static#2" value="static/js/bitstream-ordering.js"/>
-                            </map:transform>
+		        			
+		        			
+					<map:select type="IfServiceManagerSelector">
+						
+						<map:when test="servicemanager">
+						
+			        		<map:match pattern="admin/item/status">
+			        			<map:transform type="EditItemStatusForm">
+			        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+			        			</map:transform>
+			        		</map:match>
+						
+							<map:match pattern="admin/item/view_item">
+			        			<map:transform type="ViewItem">
+			        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+			        			</map:transform>
+			        		</map:match>
+						
+							<map:match pattern="admin/item/services">
+			        			<map:transform type="EditItemServicesForm">
+			        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+			        			</map:transform>
+			        		</map:match>					
+						
+						</map:when>
+					
+						<map:otherwise>
+						
+			        		<map:match pattern="admin/item/status">
+			        			<map:transform type="EditItemStatusForm">
+			        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+			        			</map:transform>
+			        		</map:match>
+			        		
+			        		<map:match pattern="admin/item/bitstreams">
+	                            <!--Add the javascript-->
+	                            <map:transform type="IncludePageMeta">
+	                                <map:parameter name="javascript.static#1" value="loadJQuery.js"/>
+	                                <map:parameter name="javascript.static#2" value="static/js/bitstream-ordering.js"/>
+	                            </map:transform>
+	
+			        			<map:transform type="EditItemBitstreamsForm">
+			        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+			        			</map:transform>
+			        		</map:match>
+			        		
+			        		<map:match pattern="admin/item/embargo">
+			        			<map:transform type="EditItemEmbargoForm">
+			        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+			        			</map:transform>
+			        		</map:match>
+			        		
+			        		<map:match pattern="admin/item/metadata">
+			        			<map:transform type="EditItemMetadataForm">
+			        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+			        				<map:parameter name="templateCollectionID" value="{flow-attribute:templateCollectionID}"/>
+			        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
+			        			</map:transform>
+			        		</map:match>
+			        		
+			        		<map:match pattern="admin/item/view_item">
+			        			<map:transform type="ViewItem">
+			        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+			        			</map:transform>
+			        		</map:match>
+	
+	                        <!-- Curation options -->
+			        		<map:match pattern="admin/item/curateItem">
+	                            <map:transform type="CurateItemForm">
+	                                <map:parameter name="select_curate_group" value="{flow-attribute:select_curate_group}"/>
+	                                <map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+	                            </map:transform>
+	                        </map:match>
+			        		
+	                        <!-- Edit Item License (UFAL) -->
+	                        <map:match pattern="admin/item/edit_license">
+			        			<map:transform type="EditItemLicenseForm">
+			        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+			        				<map:parameter name="define" value="false"/>
+			        			</map:transform>
+			        		</map:match>
+	
+							<!-- Define License Form (UFAL) -->
+							<map:match pattern="admin/item/edit_license_define">
+			        			<map:transform type="EditItemLicenseForm">
+			        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+			        				<map:parameter name="define" value="true"/>
+			        			</map:transform>
+			        		</map:match>
+									        				        		
+			        		<!--
+			        			Upload a new bitstream
+			        			-->
+			        		<map:match pattern="admin/item/add-bitstream">
+			        			<map:transform type="AddBitstreamForm">
+			        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+			        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
+			        			</map:transform>
+			        		</map:match>
+			        		
+			        		<!--
+			        			Edit a bitstream's metadata
+			        			-->
+			        		<map:match pattern="admin/item/edit-bitstream">
+			        			<map:transform type="EditBitstreamForm">
+			        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+			        				<map:parameter name="bitstreamID" value="{flow-attribute:bitstreamID}"/>
+			        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
+			        			</map:transform>
+			        		</map:match>
+			        		
+			        		<map:match pattern="admin/item/delete-bitstreams">
+			        			<map:transform type="DeleteBitstreamsConfirm">
+			        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+			        				<map:parameter name="bitstreamIDs" value="{flow-attribute:bitstreamIDs}"/>
+			        			</map:transform>
+			        		</map:match>
+			        		
+			        		<!--
+			        			Confirm the item's deletion
+			        			-->
+			        		<map:match pattern="admin/item/delete">
+			        			<map:transform type="ConfirmItemForm">
+			        				<map:parameter name="confirm" value="delete"/>
+			        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+			        			</map:transform>
+			        		</map:match>
+			        		
+			        		<!--
+			        			Confirm the item's withdraw
+			        			-->
+			        		<map:match pattern="admin/item/withdraw">
+			        			<map:transform type="ConfirmItemForm">
+			        				<map:parameter name="confirm" value="withdraw"/>
+			        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+			        			</map:transform>
+			        		</map:match>
+			        		
+			        		<!--
+			        			Confirm the item's reinstatiation
+			        			-->
+			        		<map:match pattern="admin/item/reinstate">
+			        			<map:transform type="ConfirmItemForm">
+			        				<map:parameter name="confirm" value="reinstate"/>
+			        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+			        			</map:transform>
+			        		</map:match>
+	
+			        		<map:match pattern="admin/item/private">
+	                            <map:transform type="ConfirmItemForm">
+	                                <map:parameter name="confirm" value="private"/>
+	                                <map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+	                            </map:transform>
+	                        </map:match>
+	
+	                        <map:match pattern="admin/item/public">
+	                            <map:transform type="ConfirmItemForm">
+	                                <map:parameter name="confirm" value="public"/>
+	                                <map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+	                            </map:transform>
+	                        </map:match>
+	
+			        		
+			        		<!--
+			        			Move the item to another collection
+			        			-->
+			        		<map:match pattern="admin/item/move">
+			        			<map:transform type="MoveItemForm">
+			        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+			        				<map:parameter name="collectionID" value="{flow-attribute:collectionID}"/>
+	                                <map:parameter name="inheritPolicies" value="{flow-attribute:inheritPolicies}"/>                                
+			        			</map:transform>
+			        		</map:match>
 
-		        			<map:transform type="EditItemBitstreamsForm">
-		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
-		        			</map:transform>
-		        		</map:match>
-		        		
-		        		<map:match pattern="admin/item/embargo">
-		        			<map:transform type="EditItemEmbargoForm">
-		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
-		        			</map:transform>
-		        		</map:match>
-		        		
-		        		<map:match pattern="admin/item/metadata">
-		        			<map:transform type="EditItemMetadataForm">
-		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
-		        				<map:parameter name="templateCollectionID" value="{flow-attribute:templateCollectionID}"/>
-		        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
-		        			</map:transform>
-		        		</map:match>
-		        		
-		        		<map:match pattern="admin/item/view_item">
-		        			<map:transform type="ViewItem">
-		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
-		        			</map:transform>
-		        		</map:match>
-
-                        <!-- Curation options -->
-		        		<map:match pattern="admin/item/curateItem">
-                            <map:transform type="CurateItemForm">
-                                <map:parameter name="select_curate_group" value="{flow-attribute:select_curate_group}"/>
-                                <map:parameter name="itemID" value="{flow-attribute:itemID}"/>
-                            </map:transform>
-                        </map:match>
-		        		
-                        <!-- Edit Item License (UFAL) -->
-                        <map:match pattern="admin/item/edit_license">
-		        			<map:transform type="EditItemLicenseForm">
-		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
-		        				<map:parameter name="define" value="false"/>
-		        			</map:transform>
-		        		</map:match>
-
-						<!-- Define License Form (UFAL) -->
-						<map:match pattern="admin/item/edit_license_define">
-		        			<map:transform type="EditItemLicenseForm">
-		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
-		        				<map:parameter name="define" value="true"/>
-		        			</map:transform>
-		        		</map:match>
-								        				        		
-		        		<!--
-		        			Upload a new bitstream
-		        			-->
-		        		<map:match pattern="admin/item/add-bitstream">
-		        			<map:transform type="AddBitstreamForm">
-		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
-		        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
-		        			</map:transform>
-		        		</map:match>
-		        		
-		        		<!--
-		        			Edit a bitstream's metadata
-		        			-->
-		        		<map:match pattern="admin/item/edit-bitstream">
-		        			<map:transform type="EditBitstreamForm">
-		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
-		        				<map:parameter name="bitstreamID" value="{flow-attribute:bitstreamID}"/>
-		        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
-		        			</map:transform>
-		        		</map:match>
-		        		
-		        		<map:match pattern="admin/item/delete-bitstreams">
-		        			<map:transform type="DeleteBitstreamsConfirm">
-		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
-		        				<map:parameter name="bitstreamIDs" value="{flow-attribute:bitstreamIDs}"/>
-		        			</map:transform>
-		        		</map:match>
-		        		
-		        		<!--
-		        			Confirm the item's deletion
-		        			-->
-		        		<map:match pattern="admin/item/delete">
-		        			<map:transform type="ConfirmItemForm">
-		        				<map:parameter name="confirm" value="delete"/>
-		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
-		        			</map:transform>
-		        		</map:match>
-		        		
-		        		<!--
-		        			Confirm the item's withdraw
-		        			-->
-		        		<map:match pattern="admin/item/withdraw">
-		        			<map:transform type="ConfirmItemForm">
-		        				<map:parameter name="confirm" value="withdraw"/>
-		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
-		        			</map:transform>
-		        		</map:match>
-		        		
-		        		<!--
-		        			Confirm the item's reinstatiation
-		        			-->
-		        		<map:match pattern="admin/item/reinstate">
-		        			<map:transform type="ConfirmItemForm">
-		        				<map:parameter name="confirm" value="reinstate"/>
-		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
-		        			</map:transform>
-		        		</map:match>
-
-		        		<map:match pattern="admin/item/private">
-                            <map:transform type="ConfirmItemForm">
-                                <map:parameter name="confirm" value="private"/>
-                                <map:parameter name="itemID" value="{flow-attribute:itemID}"/>
-                            </map:transform>
-                        </map:match>
-
-                        <map:match pattern="admin/item/public">
-                            <map:transform type="ConfirmItemForm">
-                                <map:parameter name="confirm" value="public"/>
-                                <map:parameter name="itemID" value="{flow-attribute:itemID}"/>
-                            </map:transform>
-                        </map:match>
-
-		        		
-		        		<!--
-		        			Move the item to another collection
-		        			-->
-		        		<map:match pattern="admin/item/move">
-		        			<map:transform type="MoveItemForm">
-		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
-		        				<map:parameter name="collectionID" value="{flow-attribute:collectionID}"/>
-                                <map:parameter name="inheritPolicies" value="{flow-attribute:inheritPolicies}"/>                                
-		        			</map:transform>
-		        		</map:match>
+							<map:match pattern="admin/item/services">
+			        			<map:transform type="EditItemServicesForm">
+			        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+			        			</map:transform>
+			        		</map:match>					
+			        		
+			        								
+						</map:otherwise>
+						
+					</map:select>					
+		        			
+		        			
 
 		        	<!-- Item Mapper -->
 		        	

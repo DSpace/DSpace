@@ -1724,6 +1724,7 @@
         <message key="xmlui.administrative.item.general.option_queue">Queue</message>
     <message key="xmlui.administrative.item.general.option_license">License</message>
     <message key="xmlui.administrative.item.general.option_embargo">Embargo</message>
+    <message key="xmlui.administrative.item.general.option_services">Services</message>
 
 	<!-- org.dspace.app.xmlui.administrative.item.AddBitstreamForm -->
 	<message key="xmlui.administrative.item.AddBitstreamForm.title">Upload Bitstream</message>
@@ -1894,6 +1895,10 @@
     <message key="xmlui.administrative.item.DefineLicenseForm.success_message">New License added successfully.</message>
     <message key="xmlui.administrative.item.DefineLicenseForm.already_exists">License already exists.</message>
     <message key="xmlui.administrative.item.DefineLicenseForm.unknown_error">Unable to add the license.</message>
+
+    <!-- cz.cuni.mff.ufal.administrative.EditItemServicesForm -->
+    <message key="xmlui.administrative.item.EditItemServicesForm.title">Services</message>
+    <message key="xmlui.administrative.item.EditItemServicesForm.trail">Services</message>
 
     <!-- cz.cuni.mff.ufal.administrative.LicenseForm -->
     <message key="xmlui.administrative.LicenseForm.title">Repository Licenses</message>

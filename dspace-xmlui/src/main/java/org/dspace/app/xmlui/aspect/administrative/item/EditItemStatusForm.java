@@ -26,6 +26,8 @@ import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 
+import cz.cuni.mff.ufal.dspace.app.xmlui.aspect.general.IfServiceManagerSelector;
+
 /**
  * Display basic meta-meta information about the item and allow the user to change 
  * its state such as withdraw or reinstate, possibly even completely deleting the item!
@@ -100,7 +102,7 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 		
 		// LIST: options
 		List options = main.addList("options",List.TYPE_SIMPLE,"horizontal");
-		ViewItem.add_options(options, baseURL, ViewItem.T_option_status, tabLink);
+		ViewItem.add_options(context, eperson, options, baseURL, ViewItem.T_option_status, tabLink);
 		
 		main = main.addDivision("item-status", "well well-light");
 		
@@ -154,62 +156,66 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 		}
 		
 		
-		itemInfo.addLabel(T_label_auth);
-		try
-		{
-		    AuthorizeUtil.authorizeManageItemPolicy(context, item);
-		    itemInfo.addItem().addButton("submit_authorization").setValue(T_submit_authorizations);
-		}
-		catch (AuthorizeException authex) 
-		{
-		    addNotAllowedButton(itemInfo.addItem(), "submit_authorization", T_submit_authorizations);
-		}
+		
+		// don't display the following action buttons for Service Managers
+		if(!IfServiceManagerSelector.isNonAdminServiceManager(context, eperson)) {
+		
+			itemInfo.addLabel(T_label_auth);
+			try
+			{
+			    AuthorizeUtil.authorizeManageItemPolicy(context, item);
+			    itemInfo.addItem().addButton("submit_authorization").setValue(T_submit_authorizations);
+			}
+			catch (AuthorizeException authex) 
+			{
+			    addNotAllowedButton(itemInfo.addItem(), "submit_authorization", T_submit_authorizations);
+			}
+		
+			if(!item.isWithdrawn())
+			{
+				itemInfo.addLabel(T_label_withdraw);
+				try
+				{
+					AuthorizeUtil.authorizeWithdrawItem(context, item);
+					itemInfo.addItem().addButton("submit_withdraw").setValue(T_submit_withdraw);
+				}
+				catch (AuthorizeException authex) 
+				{
+					addNotAllowedButton(itemInfo.addItem(), "submit_withdraw", T_submit_withdraw);
+				}
+			}
+			else
+			{	
+				itemInfo.addLabel(T_label_reinstate);
+				try
+				{
+					AuthorizeUtil.authorizeReinstateItem(context, item);
+					itemInfo.addItem().addButton("submit_reinstate").setValue(T_submit_reinstate);
+				}
+				catch (AuthorizeException authex) 
+				{
+					addNotAllowedButton(itemInfo.addItem(), "submit_reinstate", T_submit_reinstate);
+				}
+			}
+			
+			itemInfo.addLabel(T_label_move);
+			addCollectionAdminOnlyButton(itemInfo.addItem(), item.getOwningCollection(), "submit_move", T_submit_move);
 	
-		if(!item.isWithdrawn())
-		{
-			itemInfo.addLabel(T_label_withdraw);
-			try
+	
+	        privateOrPublicAccess(item, itemInfo);
+	
+	
+	
+			itemInfo.addLabel(T_label_delete);
+			if (AuthorizeManager.authorizeActionBoolean(context, item, Constants.DELETE))
 			{
-				AuthorizeUtil.authorizeWithdrawItem(context, item);
-				itemInfo.addItem().addButton("submit_withdraw").setValue(T_submit_withdraw);
+				itemInfo.addItem().addButton("submit_delete").setValue(T_submit_delete);
 			}
-			catch (AuthorizeException authex) 
+			else
 			{
-				addNotAllowedButton(itemInfo.addItem(), "submit_withdraw", T_submit_withdraw);
-			}
-		}
-		else
-		{	
-			itemInfo.addLabel(T_label_reinstate);
-			try
-			{
-				AuthorizeUtil.authorizeReinstateItem(context, item);
-				itemInfo.addItem().addButton("submit_reinstate").setValue(T_submit_reinstate);
-			}
-			catch (AuthorizeException authex) 
-			{
-				addNotAllowedButton(itemInfo.addItem(), "submit_reinstate", T_submit_reinstate);
+				addNotAllowedButton(itemInfo.addItem(), "submit_delete", T_submit_delete);
 			}
 		}
-		
-		itemInfo.addLabel(T_label_move);
-		addCollectionAdminOnlyButton(itemInfo.addItem(), item.getOwningCollection(), "submit_move", T_submit_move);
-
-
-        privateOrPublicAccess(item, itemInfo);
-
-
-
-		itemInfo.addLabel(T_label_delete);
-		if (AuthorizeManager.authorizeActionBoolean(context, item, Constants.DELETE))
-		{
-			itemInfo.addItem().addButton("submit_delete").setValue(T_submit_delete);
-		}
-		else
-		{
-			addNotAllowedButton(itemInfo.addItem(), "submit_delete", T_submit_delete);
-		}
-		
 		
 		
 		
