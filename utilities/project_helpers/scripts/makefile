@@ -64,7 +64,7 @@ endif
 # LINDAT/CLARIN specific
 
 LOCAL_CONF              :=$(DIR_SOURCE)/local.properties
-URL_LINDAT_COMMON_GIT   :=https://redmine.ms.mff.cuni.cz/lindat/lindat-common.git
+URL_LINDAT_COMMON_GIT   :=https://github.com/ufal/lindat-common.git
 
 DATABASE_NAME           :=$(shell cd $(BASE) && python setup.lindat.py --get="lr.database" --from="$(LOCAL_CONF)")
 UTILITIES_DATABASE_NAME :=$(shell cd $(BASE) && python setup.lindat.py --get="lr.utilities.database" --from="$(LOCAL_CONF)")
@@ -82,7 +82,7 @@ DSPACE_BIN              :=${DIR_INSTALLATION}/bin/dspace
 DSPACE_CFG_BASENAME     :=dspace.cfg
 DSPACE_CFG              :=$(DIR_SOURCE)/dspace/config/$(DSPACE_CFG_BASENAME)
 DSPACE_CFG_EXISTS       :=$(shell (if [ -e $(DSPACE_CFG) ]; then echo 1; else echo 0; fi ))
-DSPACE_MVN_PROJECTS     :=-P 'xpdf-mediafilter-support,!dspace-jspui,!dspace-sword-client,!dspace-swordv2,!dspace-sword,!dspace-lni,!dspace-rdf,!dspace-rest,!dspace-xmlui-mirage2'
+DSPACE_MVN_PROJECTS     :=-P 'xpdf-mediafilter-support,!dspace-jspui,!dspace-sword-client,!dspace-swordv2,!dspace-sword,!dspace-lni,!dspace-rdf,!dspace-xmlui-mirage2'
 
 MVN_ENV			:=local
 
@@ -203,7 +203,7 @@ install_dspace:
 
 postinstall: update_lindat_common
 	rm -rf $(DIR_LINDAT_THEME_IN_WEBAPPS)
-	ln -s $(DIR_LINDAT_COMMON_THEME) $(DIR_LINDAT_THEME_IN_WEBAPPS)
+	ln -s $(DIR_LINDAT_COMMON_THEME)/dist $(DIR_LINDAT_THEME_IN_WEBAPPS)
 	@$(MAKE) grant_rights
 	@echo "DEPLOYMENT (INSTALL + POSTINSTALL) SUCCESSFUL"
 

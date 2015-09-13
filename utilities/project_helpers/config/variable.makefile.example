@@ -5,7 +5,7 @@
 # 
 
 # lindat settings
-LINDAT_COMMON_THEME_FETCH=git checkout -f bootstrap3 && git pull
+LINDAT_COMMON_THEME_FETCH=git fetch && git checkout -f master && git pull
 
 # tomcat
 TOMCAT_VERSION=6
