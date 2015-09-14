@@ -145,7 +145,7 @@ public class CommunitiesResource extends Resource
 
         log.info("Reading all communities.(offset=" + offset + " ,limit=" + limit + ").");
         org.dspace.core.Context context = null;
-        ArrayList<Community> communities = null;
+        ArrayList<Community> communities = new ArrayList<Community>();
 
         try
         {
