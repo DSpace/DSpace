@@ -250,14 +250,8 @@
 		                <i18n:text>xmlui.dri2xhtml.METS-1.0.item-no-files</i18n:text>
 		            </xsl:otherwise>
 		        </xsl:choose>
-		        
-				<!-- Falta acomodar el campo dcterms.identifier.url -->
-				<xsl:call-template name="render-metadata">
-					<xsl:with-param name="field" select="'dcterms.identifier.url '" />
-					<xsl:with-param name="container" select="'h4'" />
-				</xsl:call-template>
-					
-		        
+		        <!-- Campo dcterms.identifier.url -->
+		        <xsl:apply-templates select="./mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim" mode="dctermsIdentifierUrl"/>		        
 		        <!-- optional: Altmeric.com badge and PlumX widget -->
 		        <xsl:if test='confman:getProperty("altmetrics", "altmetric.enabled") and ($identifier_doi or $identifier_handle)'>
 		            <xsl:call-template name='impact-altmetric'/>
@@ -327,7 +321,7 @@
 			<div class="media-body">
 				<p>
 					<a href="{$file_url}">
-						<xsl:value-of select="mets:FLocat/@xlink:label" />
+						<xsl:value-of select="mets:FLocat/@xlink:label" />&#160;
 					</a>
 				</p>
 				<p>
@@ -360,6 +354,13 @@
 				</p>
 			</div>
 		</li>
+	</xsl:template>
+	
+	<xsl:template match="dim:dim" mode="dctermsIdentifierUrl">
+				<xsl:call-template name="render-metadata">
+					<xsl:with-param name="field" select="'dcterms.identifier.url'" />
+					<xsl:with-param name="container" select="'h5'" />
+				</xsl:call-template>
 	</xsl:template>
 	
 	 <xsl:template match="dim:dim" mode="itemSummaryView-DIM">
