@@ -36,10 +36,12 @@
 <%@ page import="org.dspace.content.BitstreamFormat" %>
 <%@ page import="org.dspace.core.Context" %>
 <%@ page import="org.dspace.core.LogManager" %>
+<%@ page import="java.util.List" %>
+<%@ page import="org.dspace.content.factory.ContentServiceFactory" %>
 
 <%
     Context context = null;
-    BitstreamFormat[] formats = null;
+    List<BitstreamFormat> formats = null;
     
     try
     {
@@ -47,23 +49,19 @@
         context = UIUtil.obtainContext(request);
       
        // Get the Bitstream formats
-        formats = BitstreamFormat.findAll(context);
+        formats = ContentServiceFactory.getInstance().getBitstreamFormatService().findAll(context);
     }
-    catch (SQLException se)
-    {
+    catch (SQLException se) {
         // Database error occurred.
         Logger log = Logger.getLogger("org.dspace.jsp");
         log.warn(LogManager.getHeader(context,
-            "database_error",
-            se.toString()), se);
+                "database_error",
+                se.toString()), se);
 
         // Also email an alert
         UIUtil.sendAlert(request, se);
 
         JSPManager.showInternalError(request, response);
-    }
-    finally {
-        context.abort();
     }
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -120,35 +118,35 @@
     </tr>
 
 <%
-    for (int i = 0; i < formats.length; i++)
+    for (int i = 0; i < formats.size(); i++)
     {
-        if ( formats[i].isInternal() )
+        if ( formats.get(i).isInternal() )
             continue;
 
-        String[] extensions = formats[i].getExtensions();
+        List<String> extensions = formats.get(i).getExtensions();
         String extValue = "";
 
-        for (int j = 0 ; j < extensions.length; j++)
+        for (int j = 0 ; j < extensions.size(); j++)
         {
             if (j > 0)
             {
                 extValue = extValue + ", ";
             }
-            extValue = extValue + extensions[j];
+            extValue = extValue + extensions.get(j);
         }
 %>
            <tr>
-                <td headers="t1"><%= formats[i].getShortDescription() %></td>
+                <td headers="t1"><%= formats.get(i).getShortDescription() %></td>
                 <td headers="t2"><%= extValue %></td>
-                <td headers="t3"><%= formats[i].getMIMEType() %></td>
+                <td headers="t3"><%= formats.get(i).getMIMEType() %></td>
                 <td headers="t4">
                 <%
-                    if(formats[i].getSupportLevel() == 2)
+                    if(formats.get(i).getSupportLevel() == 2)
                     {
                             %><fmt:message key="jsp.help.formats.support.supported" /><%
                         
                     }
-                    else if(formats[i].getSupportLevel() == 1)
+                    else if(formats.get(i).getSupportLevel() == 1)
                     {
                             %><fmt:message key="jsp.help.formats.support.known" /><%
                     }

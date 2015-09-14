@@ -139,6 +139,7 @@ public class DSpaceServlet extends HttpServlet
             // Also email an alert
             UIUtil.sendAlert(request, se);
 
+            context.abort();
             JSPManager.showInternalError(request, response);
         }
         catch (AuthorizeException ae)
@@ -166,7 +167,13 @@ public class DSpaceServlet extends HttpServlet
             // Abort the context if it's still valid
             if ((context != null) && context.isValid())
             {
-                context.abort();
+                //Always commit at the end
+                try {
+                    context.complete();
+                } catch (SQLException e) {
+                    log.error(e.getMessage(), e);
+                    JSPManager.showInternalError(request, response);
+                }
             }
         }
     }

@@ -26,6 +26,7 @@
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.license.CreativeCommonsServiceImpl" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
+<%@ page import="org.dspace.license.factory.LicenseServiceFactory" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
@@ -59,7 +60,7 @@
 
     String licenseURL = "";
     if(licenseExists)
-        licenseURL = CreativeCommonsServiceImpl.getLicenseURL(subInfo.getSubmissionItem().getItem());
+        licenseURL = LicenseServiceFactory.getInstance().getCreativeCommonsService().getLicenseURL(context, subInfo.getSubmissionItem().getItem());
 %>
 
 <dspace:layout style="submission"

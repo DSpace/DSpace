@@ -38,6 +38,7 @@
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.content.BitstreamFormat" %>
 <%@ page import="org.dspace.content.Item" %>
+<%@ page import="org.dspace.content.factory.ContentServiceFactory" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
@@ -54,9 +55,9 @@
     boolean showChecksums = ((Boolean) request.getAttribute("show.checksums")).booleanValue();
 
     // Get the bitstream
-    Bitstream[] all = subInfo.getSubmissionItem().getItem().getNonInternalBitstreams();
-    Bitstream bitstream = all[0];
-    BitstreamFormat format = bitstream.getFormat();
+    List<Bitstream> all = ContentServiceFactory.getInstance().getItemService().getNonInternalBitstreams(context, subInfo.getSubmissionItem().getItem());
+    Bitstream bitstream = all.get(0);
+    BitstreamFormat format = bitstream.getFormat(context);
 
     boolean withEmbargo = ((Boolean)request.getAttribute("with_embargo")).booleanValue();
 %>
@@ -130,7 +131,7 @@
                     <fmt:param><fmt:formatNumber><%= bitstream.getSize() %></fmt:formatNumber></fmt:param>
                 </fmt:message></td>
                 <td headers="t3" class="evenRowOddCol">
-                    <%= bitstream.getFormatDescription() %>
+                    <%= bitstream.getFormatDescription(context) %>
 <%    
     if (format.getSupportLevel() == 0)
     { %>

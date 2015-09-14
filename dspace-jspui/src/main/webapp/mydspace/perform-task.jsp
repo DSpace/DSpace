@@ -50,7 +50,7 @@
     {
 %>
 	<p><fmt:message key="jsp.mydspace.perform-task.text1">
-        <fmt:param><%= collection.getMetadata("name") %></fmt:param>
+        <fmt:param><%= collection.getName() %></fmt:param>
          </fmt:message></p>
 <%
     }
@@ -58,7 +58,7 @@
     {
 %>
 	<p><fmt:message key="jsp.mydspace.perform-task.text3">
-        <fmt:param><%= collection.getMetadata("name") %></fmt:param>
+        <fmt:param><%= collection.getName() %></fmt:param>
 	</fmt:message></p>
 <%
     }
@@ -66,7 +66,7 @@
     {
 %>
 	<p><fmt:message key="jsp.mydspace.perform-task.text4">
-        <fmt:param><%= collection.getMetadata("name") %></fmt:param>
+        <fmt:param><%= collection.getName() %></fmt:param>
     </fmt:message></p>
 <%
     }
