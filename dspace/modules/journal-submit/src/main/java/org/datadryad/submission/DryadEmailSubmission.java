@@ -416,26 +416,31 @@ public class DryadEmailSubmission extends HttpServlet {
             } catch (SQLException e) {
                 throw new SubmissionException(e);
             }
-            String parsingScheme = JournalUtils.getParsingScheme(concept);
-            PartnerJournal partnerJournal =  new PartnerJournal(concept.getName());
-            partnerJournal.setParsingScheme(parsingScheme);
-            EmailParser parser =  partnerJournal.getParser();
+            if (concept != null) {
+                String parsingScheme = JournalUtils.getParsingScheme(concept);
+                PartnerJournal partnerJournal = new PartnerJournal(concept.getName());
+                partnerJournal.setParsingScheme(parsingScheme);
+                EmailParser parser = partnerJournal.getParser();
 
-            if (parser != null) {
-                ParsingResult result = parser.parseMessage(lines);
+                if (parser != null) {
+                    ParsingResult result = parser.parseMessage(lines);
+                    if ((result != null) && (result.getSubmissionId() == null)) {
+                        throw new SubmissionException("No submission ID found in message");
+                    }
+                    result.setJournalCode(journalCode);
+                    result.setJournalName(journalName);
+                    // Do this because this is what the parsers are expecting to
+                    // build the corresponding author field from
+                    for (Address address : addresses) {
+                        result.setSenderEmailAddress(address.toString());
+                    }
 
-                result.setJournalCode(journalCode);
-                result.setJournalName(journalName);
-
-                // Do this because this is what the parsers are expecting to
-                // build the corresponding author field from
-                for (Address address : addresses) {
-                    result.setSenderEmailAddress(address.toString());
+                    return result;
+                } else {
+                    throw new SubmissionException("Journal " + journalCode + " parsing scheme not found");
                 }
-
-                return result;
             } else {
-                throw new SubmissionException("Journal " + journalCode + " not found in configuration");
+                throw new SubmissionException("Concept not found for journal " + journalCode);
             }
         } else {
             throw new SubmissionException("Journal code not found in message");
