@@ -32,18 +32,14 @@
 <%@ page  import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%@ page import="org.dspace.app.webui.servlet.MyDSpaceServlet" %>
-<%@ page import="org.dspace.content.Collection" %>
-<%@ page import="org.dspace.content.DCDate" %>
-<%@ page import="org.dspace.content.Item" %>
-<%@ page import="org.dspace.content.SupervisedItemServiceImpl" %>
 <%@ page import="org.dspace.content.WorkspaceItem" %>
 <%@ page import="org.dspace.core.Utils" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="org.dspace.eperson.Group"   %>
 <%@ page import="org.dspace.workflowbasic.BasicWorkflowItem" %>
-<%@ page import="org.dspace.workflowbasic.BasicWorkflowServiceImpl" %>
 <%@ page import="java.util.List" %>
 <%@page import="org.dspace.app.itemimport.BatchUpload"%>
+<%@ page import="org.dspace.workflowbasic.service.BasicWorkflowService" %>
 
 <%
     EPerson user = (EPerson) request.getAttribute("mydspace.user");
@@ -133,9 +129,9 @@
             {
 
             //There was once some code...
-            case BasicWorkflowServiceImpl.WFSTATE_STEP1: %><fmt:message key="jsp.mydspace.main.sub1"/><% break;
-            case BasicWorkflowServiceImpl.WFSTATE_STEP2: %><fmt:message key="jsp.mydspace.main.sub2"/><% break;
-            case BasicWorkflowServiceImpl.WFSTATE_STEP3: %><fmt:message key="jsp.mydspace.main.sub3"/><% break;
+            case BasicWorkflowService.WFSTATE_STEP1: %><fmt:message key="jsp.mydspace.main.sub1"/><% break;
+            case BasicWorkflowService.WFSTATE_STEP2: %><fmt:message key="jsp.mydspace.main.sub2"/><% break;
+            case BasicWorkflowService.WFSTATE_STEP3: %><fmt:message key="jsp.mydspace.main.sub3"/><% break;
             }
 %>
                 </td>
@@ -199,9 +195,9 @@
 <%
             switch (pooled.get(i).getState())
             {
-            case BasicWorkflowServiceImpl.WFSTATE_STEP1POOL: %><fmt:message key="jsp.mydspace.main.sub1"/><% break;
-            case BasicWorkflowServiceImpl.WFSTATE_STEP2POOL: %><fmt:message key="jsp.mydspace.main.sub2"/><% break;
-            case BasicWorkflowServiceImpl.WFSTATE_STEP3POOL: %><fmt:message key="jsp.mydspace.main.sub3"/><% break;
+            case BasicWorkflowService.WFSTATE_STEP1POOL: %><fmt:message key="jsp.mydspace.main.sub1"/><% break;
+            case BasicWorkflowService.WFSTATE_STEP2POOL: %><fmt:message key="jsp.mydspace.main.sub2"/><% break;
+            case BasicWorkflowService.WFSTATE_STEP3POOL: %><fmt:message key="jsp.mydspace.main.sub3"/><% break;
             }
 %>
                     </td>

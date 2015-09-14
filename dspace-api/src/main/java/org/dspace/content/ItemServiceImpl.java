@@ -761,9 +761,15 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         authorizeService.removeAllPoliciesByDSOAndType(context, item, ResourcePolicy.TYPE_SUBMISSION);
         authorizeService.removeAllPoliciesByDSOAndType(context, item, ResourcePolicy.TYPE_WORKFLOW);
 
-        // add default policies only if not already in place
-        List<ResourcePolicy> policiesToAdd = filterPoliciesToAdd(context, defaultCollectionPolicies, item);
-        authorizeService.addPolicies(context, policiesToAdd, item);
+        try {
+            //We just removed all policies so only an admin will be able to add additional policies, ignore the authorizations for now.
+            context.turnOffAuthorisationSystem();
+            // add default policies only if not already in place
+            List<ResourcePolicy> policiesToAdd = filterPoliciesToAdd(context, defaultCollectionPolicies, item);
+            authorizeService.addPolicies(context, policiesToAdd, item);
+        } finally {
+            context.restoreAuthSystemState();
+        }
     }
 
     @Override

@@ -198,7 +198,7 @@ public class ItemTag extends TagSupport
     private transient Item item;
 
     /** Collections this item appears in */
-    private transient Collection[] collections;
+    private transient List<Collection> collections;
 
     /** The style to use - "default" or "full" */
     private String style;
@@ -349,9 +349,9 @@ public class ItemTag extends TagSupport
      * 
      * @return the collections
      */
-    public Collection[] getCollections()
+    public List<Collection> getCollections()
     {
-        return (Collection[]) ArrayUtils.clone(collections);
+        return collections;
     }
 
     /**
@@ -360,9 +360,9 @@ public class ItemTag extends TagSupport
      * @param collectionsIn
      *            the collections
      */
-    public void setCollections(Collection[] collectionsIn)
+    public void setCollections(List<Collection> collectionsIn)
     {
-        collections = (Collection[]) ArrayUtils.clone(collectionsIn);
+        collections = collectionsIn;
     }
 
     /**
@@ -770,14 +770,14 @@ public class ItemTag extends TagSupport
             		(style.equals("full")?"colspan=\"2\"":"")
             		+">");
 
-            for (int i = 0; i < collections.length; i++)
+            for (int i = 0; i < collections.size(); i++)
             {
                 out.print("<a href=\"");
                 out.print(request.getContextPath());
                 out.print("/handle/");
-                out.print(collections[i].getHandle());
+                out.print(collections.get(i).getHandle());
                 out.print("\">");
-                out.print(collections[i].getName());
+                out.print(collections.get(i).getName());
                 out.print("</a><br/>");
             }
 
@@ -852,7 +852,7 @@ public class ItemTag extends TagSupport
         			for (int i = 0; (i < bits.size()) && !html; i++)
         			{
         				Bitstream b = bits.get(i).getBitstream();
-						if (b.getID().equals(bunds.get(0).getPrimaryBitstream().getID()))
+						if (b.equals(bunds.get(0).getPrimaryBitstream()))
         				{
         					html = b.getFormat(context).getMIMEType().equals(
         							"text/html");

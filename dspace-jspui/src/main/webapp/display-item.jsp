@@ -51,7 +51,7 @@
     Boolean suggest = (Boolean)request.getAttribute("suggest.enable");
     boolean suggestLink = (suggest == null ? false : suggest.booleanValue());
     Item item = (Item) request.getAttribute("item");
-    Collection[] collections = (Collection[]) request.getAttribute("collections");
+    List<Collection> collections = (List<Collection>) request.getAttribute("collections");
     Boolean admin_b = (Boolean)request.getAttribute("admin_button");
     boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
     

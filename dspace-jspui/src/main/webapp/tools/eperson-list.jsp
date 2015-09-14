@@ -31,12 +31,13 @@
 <%@page import="org.apache.commons.lang.StringEscapeUtils"%>
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="org.dspace.core.Utils" %>
+<%@ page import="java.util.List" %>
 
 <%
 	int PAGESIZE = 50;
 
-    EPerson[] epeople =
-        (EPerson[]) request.getAttribute("epeople");
+    List<EPerson> epeople =
+        (List<EPerson>) request.getAttribute("epeople");
     int sortBy = ((Integer)request.getAttribute("sortby" )).intValue();
     int first = ((Integer)request.getAttribute("first")).intValue();
 	boolean multiple = (request.getAttribute("multiple") != null);
@@ -54,10 +55,10 @@
 	{
 	  last = first + PAGESIZE;
 	}
-	if (last >= epeople.length) last = epeople.length - 1;
+	if (last >= epeople.size()) last = epeople.size() - 1;
 
 	// Index of first eperson on last page
-	int jumpEnd = ((epeople.length - 1) / PAGESIZE) * PAGESIZE;
+	int jumpEnd = ((epeople.size() - 1) / PAGESIZE) * PAGESIZE;
 
 	// Now work out values for next/prev page buttons
 	int jumpFiveBack;
@@ -91,7 +92,7 @@
 	{
 		jumpOneForward = first + PAGESIZE;
 	}
-	if (jumpOneForward > epeople.length) jumpOneForward = jumpEnd;
+	if (jumpOneForward > epeople.size()) jumpOneForward = jumpEnd;
 
 	int jumpFiveForward;
 	if (search != null && !search.trim().equals(""))
@@ -102,7 +103,7 @@
 	{
 		jumpFiveForward = first + PAGESIZE * 5;
 	}
-	if (jumpFiveForward > epeople.length) jumpFiveForward = jumpEnd;
+	if (jumpFiveForward > epeople.size()) jumpFiveForward = jumpEnd;
 
 	// What's the link?
 	String sortByParam = "lastname";
@@ -167,7 +168,7 @@ function clearEPeople()
 	<h3><fmt:message key="jsp.tools.eperson-list.heading">
         <fmt:param><%= ((search != null && !search.equals(""))?offset:first) + 1 %></fmt:param>
         <fmt:param><%= last + 1 %></fmt:param>
-        <fmt:param><%= epeople.length %></fmt:param>
+        <fmt:param><%= epeople.size() %></fmt:param>
     </fmt:message></h3>
 
 <%
@@ -281,7 +282,7 @@ function clearEPeople()
 
     for (int i = (search != null && !search.equals(""))?offset:first; i <= last; i++)
     {
-        EPerson e = epeople[i];
+        EPerson e = epeople.get(i);
 		// Make sure no quotes in full name will mess up our Javascript
         String fullname = StringEscapeUtils.escapeXml(StringEscapeUtils.escapeJavaScript(e.getFullName()));
         String email = StringEscapeUtils.escapeXml(StringEscapeUtils.escapeJavaScript(e.getEmail()));
@@ -290,7 +291,7 @@ function clearEPeople()
 			<td headers="t1">
 			    <input class="btn btn-success" type="button" value="<%
 			if (multiple) { %><fmt:message key="jsp.tools.general.add"/><% }
-			else {          %><fmt:message key="jsp.tools.general.select"/><% } %>" onclick="javascript:<%= clearList %>addEPerson(<%= e.getID() %>, '<%= email %>', '<%= fullname %>');<%= closeWindow %>"/></td>
+			else {          %><fmt:message key="jsp.tools.general.select"/><% } %>" onclick="javascript:<%= clearList %>addEPerson('<%= e.getID() %>', '<%= email %>', '<%= fullname %>');<%= closeWindow %>"/></td>
 			<td headers="t2"><%= e.getID() %></td>
 			<td headers="t3"><%= (e.getEmail() == null ? "" : Utils.addEntities(e.getEmail())) %></td>
             <td headers="t4">
