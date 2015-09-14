@@ -31,6 +31,8 @@
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.core.Context" %>
 <%@ page import="org.dspace.submit.AbstractProcessingStep" %>
+<%@ page import="org.dspace.authorize.service.AuthorizeService" %>
+<%@ page import="org.dspace.authorize.factory.AuthorizeServiceFactory" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
@@ -42,7 +44,7 @@
     SubmissionInfo subInfo = SubmissionController.getSubmissionInfo(context, request);
 
     // Policies List
-    List<ResourcePolicy> policies = AuthorizeServiceImpl.findPoliciesByDSOAndType(context, subInfo.getSubmissionItem().getItem(), ResourcePolicy.TYPE_CUSTOM);
+    List<ResourcePolicy> policies = AuthorizeServiceFactory.getInstance().getAuthorizeService().findPoliciesByDSOAndType(context, subInfo.getSubmissionItem().getItem(), ResourcePolicy.TYPE_CUSTOM);
 
     boolean advanced = ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
 

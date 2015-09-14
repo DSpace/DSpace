@@ -89,11 +89,7 @@
         UIUtil.sendAlert(request, se);
         JSPManager.showInternalError(request, response);
     }
-    finally 
-    {
-    	context.abort();
-    }
-  
+
 %>
           </ul>
         </td>
