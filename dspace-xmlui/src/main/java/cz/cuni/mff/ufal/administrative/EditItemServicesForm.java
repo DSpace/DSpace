@@ -2,6 +2,7 @@
 package cz.cuni.mff.ufal.administrative;
 
 import java.sql.SQLException;
+import java.util.Locale;
 
 import org.apache.cocoon.environment.Request;
 import org.apache.log4j.Logger;
@@ -19,6 +20,8 @@ import org.dspace.content.Item;
 import org.dspace.content.Metadatum;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.core.Email;
+import org.dspace.core.I18nUtil;
 
 
 /**
@@ -127,9 +130,9 @@ public class EditItemServicesForm extends AbstractDSpaceTransformer {
 	
 	public static FlowResult activate(Context context, int itemID, String serviceName, Request request) {
 		FlowResult result = new FlowResult();
+		result.setOutcome(false);
+		result.setContinue(false);		
 		if(serviceName == null || serviceName.isEmpty()) {
-			result.setOutcome(false);
-			result.setContinue(false);
 			result.addError("Invalid Service.");
 			return result;
 		}
@@ -137,8 +140,23 @@ public class EditItemServicesForm extends AbstractDSpaceTransformer {
 		try {
 			Item item = Item.find(context, itemID);
 			int count = Integer.parseInt(request.getParameter(serviceName + "_url_count"));
+
+			boolean ok = false;
+			for(int i=1;i<count;i++) {
+				String key = request.getParameter(serviceName + "_url_key_" + i);
+				String value = request.getParameter(serviceName + "_url_value_" + i);
+				if(key!=null && !key.isEmpty() && value!=null && !value.isEmpty()) {
+					ok = true;
+				}
+			}
+			
+			if(!ok) {
+				result.addError("At least one key/value pair is required.");
+			}
 			
 			item.clearMetadata("local", "featuredService", serviceName, Item.ANY);
+			
+			StringBuilder changes = new StringBuilder();
 									
 			for(int i=1;i<=count;i++) {
 			
@@ -146,24 +164,40 @@ public class EditItemServicesForm extends AbstractDSpaceTransformer {
 				String value = request.getParameter(serviceName + "_url_value_" + i);
 				
 				if(key==null || key.isEmpty() || value==null || value.isEmpty()) continue;
-							
+								
 				item.addMetadata("local", "featuredService", serviceName, Item.ANY, key + "|" + value);
+				
+				changes.append(key).append(": ").append(value);
+				changes.append("\n");	
 				
 			}
 						
 			item.update();
 			
-			result.setContinue(true);
-			result.setOutcome(true);
 			if(request.get("update")!=null) {
 				result.setMessage(new Message("default", "Service Updated Successfully"));
 			} else {
 				result.setMessage(new Message("default", "Service Activated Successfully"));
 			}
+			result.setContinue(true);
+			result.setOutcome(true);
+			
+			try{
+		        Locale locale = context.getCurrentLocale();
+		        Email bean = Email.getEmail(I18nUtil.getEmailFilename(locale, "service_activation"));
+		        String emailTo = ConfigurationManager.getProperty("info.recipient");
+		        bean.addRecipient(emailTo);
+		        bean.addArgument(item.getHandle());	        
+		        bean.addArgument(item.getMetadataByMetadataString("dc.title")[0].value);
+		        bean.addArgument(ConfigurationManager.getProperty("lr", "featured.service." + serviceName + ".fullname"));
+		        bean.addArgument(changes.toString());
+		        bean.send();
+			}catch(Exception e) {
+				log.error(e);
+			}
+			
 		} catch (Exception e) {
 			log.error(e);
-			result.setOutcome(false);
-			result.setContinue(false);
 			result.addError(e.getMessage());
 		}
 		
@@ -184,7 +218,21 @@ public class EditItemServicesForm extends AbstractDSpaceTransformer {
 			item.update();
 			result.setContinue(true);
 			result.setOutcome(true);
-			result.setMessage(new Message("default", "Service Deactivated Successfully"));			
+			result.setMessage(new Message("default", "Service Deactivated Successfully"));
+			
+			try{
+		        Locale locale = context.getCurrentLocale();
+		        Email bean = Email.getEmail(I18nUtil.getEmailFilename(locale, "service_deactivation"));
+		        String emailTo = ConfigurationManager.getProperty("info.recipient");
+		        bean.addRecipient(emailTo);
+		        bean.addArgument(item.getHandle());	        
+		        bean.addArgument(item.getMetadataByMetadataString("dc.title")[0].value);
+		        bean.addArgument(ConfigurationManager.getProperty("lr", "featured.service." + serviceName + ".fullname"));
+		        bean.send();
+			}catch(Exception e) {
+				log.error(e);
+			}			
+			
 		} catch (Exception e) {
 			log.error(e);
 			result.setOutcome(false);
