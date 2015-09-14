@@ -233,6 +233,7 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
             HttpServletResponse response) throws SearchProcessorException,
             IOException, ServletException
     {
+        init();
         List<Item> resultsItems;
         List<Collection> resultsCollections;
         List<Community> resultsCommunities;
@@ -514,6 +515,7 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
     public void doItemMapSearch(Context context, HttpServletRequest request,
             HttpServletResponse response) throws SearchProcessorException, ServletException, IOException
     {
+        init();
         String queryString = (String) request.getParameter("query");
         Collection collection = (Collection) request.getAttribute("collection");
         int page = UIUtil.getIntParameter(request, "page")-1;

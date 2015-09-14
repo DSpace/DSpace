@@ -407,9 +407,9 @@
 <% 
 
 DiscoverResult qResults = (DiscoverResult)request.getAttribute("queryresults");
-Item      [] items       = (Item[]      )request.getAttribute("items");
-Community [] communities = (Community[] )request.getAttribute("communities");
-Collection[] collections = (Collection[])request.getAttribute("collections");
+List<Item>      items       = (List<Item>      )request.getAttribute("items");
+List<Community> communities = (List<Community> )request.getAttribute("communities");
+List<Collection>collections = (List<Collection>)request.getAttribute("collections");
 
 if( error )
 {
@@ -531,21 +531,21 @@ else if( qResults != null)
 <!-- give a content to the div -->
 </div>
 <div class="discovery-result-results">
-<% if (communities.length > 0 ) { %>
+<% if (communities.size() > 0 ) { %>
     <div class="panel panel-info">
     <div class="panel-heading"><fmt:message key="jsp.search.results.comhits"/></div>
     <dspace:communitylist  communities="<%= communities %>" />
     </div>
 <% } %>
 
-<% if (collections.length > 0 ) { %>
+<% if (collections.size() > 0 ) { %>
     <div class="panel panel-info">
     <div class="panel-heading"><fmt:message key="jsp.search.results.colhits"/></div>
     <dspace:collectionlist collections="<%= collections %>" />
     </div>
 <% } %>
 
-<% if (items.length > 0) { %>
+<% if (items.size() > 0) { %>
     <div class="panel panel-info">
     <div class="panel-heading"><fmt:message key="jsp.search.results.itemhits"/></div>
     <dspace:itemlist items="<%= items %>" authorLimit="<%= etAl %>" />
@@ -553,7 +553,7 @@ else if( qResults != null)
 <% } %>
 </div>
 <%-- if the result page is enought long... --%>
-<% if ((communities.length + collections.length + items.length) > 10) {%>
+<% if ((communities.size() + collections.size() + items.size()) > 10) {%>
 <%-- show again the navigation info/links --%>
 <div class="discovery-result-pagination row container">
     <%-- <p align="center">Results <//%=qResults.getStart()+1%>-<//%=qResults.getStart()+qResults.getHitHandles().size()%> of --%>

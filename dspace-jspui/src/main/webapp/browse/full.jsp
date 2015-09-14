@@ -70,11 +70,11 @@
 	
 	if (community != null)
 	{
-		scope = "\"" + community.getMetadata("name") + "\"";
+		scope = "\"" + community.getName() + "\"";
 	}
 	if (collection != null)
 	{
-		scope = "\"" + collection.getMetadata("name") + "\"";
+		scope = "\"" + collection.getName() + "\"";
 	}
 	
 	type = bix.getName();
