@@ -9,6 +9,7 @@ package org.dspace.app.webui.jsptag;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
@@ -57,7 +58,7 @@ public class SelectCollectionTag extends TagSupport
         {
             HttpServletRequest hrq = (HttpServletRequest) pageContext.getRequest();
             Context context = UIUtil.obtainContext(hrq);
-            Collection[] collections = (Collection[]) hrq.getAttribute("collections");
+            List<Collection> collections = (List<Collection>) hrq.getAttribute("collections");
 
             sb.append("<select");
             if (name != null)

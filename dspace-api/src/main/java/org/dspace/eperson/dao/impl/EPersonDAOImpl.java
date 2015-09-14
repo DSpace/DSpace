@@ -80,8 +80,8 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
 
     @Override
     public List<EPerson> findAll(Context context, MetadataField metadataSortField, String sortField) throws SQLException {
-        String queryString = "SELECT person FROM EPerson as person ";
-        Query query = getSearchQuery(context, queryString, null, null, Collections.singletonList(metadataSortField), sortField);
+        String queryString = "SELECT " + EPerson.class.getSimpleName().toLowerCase() + " FROM EPerson as " + EPerson.class.getSimpleName().toLowerCase();
+        Query query = getSearchQuery(context, queryString, null, ListUtils.EMPTY_LIST, Collections.singletonList(metadataSortField), sortField);
         return list(query);
 
     }

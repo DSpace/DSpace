@@ -1084,10 +1084,6 @@ public class GoogleMetadata
 			result = AuthorizeServiceFactory.getInstance().getAuthorizeService().authorizeActionBoolean(context, bitstream, Constants.READ, true);
 		} catch (SQLException e) {
 			log.error("Cannot determine whether bitstream is public, assuming it isn't. bitstream_id=" + bitstream.getID(), e);
-		} finally {
-			if (context != null) {
-				context.abort();
-			}
 		}
 		return result;
 	}
