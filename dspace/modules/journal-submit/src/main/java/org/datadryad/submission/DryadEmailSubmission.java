@@ -450,35 +450,24 @@ public class DryadEmailSubmission extends HttpServlet {
         return result;
     }
 
-    private Map<String, PartnerJournal> validate(
-            Map<String, PartnerJournal> aJournalMap) {
-        Map<String, PartnerJournal> results = new HashMap<String, PartnerJournal>();
+    public EmailParser getParser(String myParsingScheme) {
+        String className = EmailParser.class.getPackage().getName()
+                + ".EmailParserFor" + StringUtils.capitalize(myParsingScheme);
 
-        for (String journalCode : aJournalMap.keySet()) {
-            PartnerJournal journal = aJournalMap.get(journalCode);
-            if (!journal.isComplete()) {
-                throw new SubmissionRuntimeException(journal.getName()
-                        + "'s configuration isn't complete");
-            } else {
-                // now store our metadata by the journal name instead of code
-                results.put(journalCode, journal);
-            }
+        LOGGER.debug("Getting parser: " + className);
 
-            LOGGER.debug("Registered journal: " + journal.toString());
+        try {
+            return (EmailParser) Class.forName(className).newInstance();
         }
-
-        return results;
-    }
-
-    private Map<String, String> mapJournalNamesToCodes(
-            Map<String, PartnerJournal> aJournalMap) {
-        Map<String, String> results = new HashMap<String, String>();
-
-        for (String journalCode : aJournalMap.keySet()) {
-            PartnerJournal journal = aJournalMap.get(journalCode);
-            results.put(journal.getName(), journalCode);
+        catch (ClassNotFoundException details) {
+            throw new SubmissionRuntimeException(details);
         }
-        return results;
+        catch (IllegalAccessException details) {
+            throw new SubmissionRuntimeException(details);
+        }
+        catch (InstantiationException details) {
+            throw new SubmissionRuntimeException(details);
+        }
     }
 
     /**
