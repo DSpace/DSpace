@@ -314,7 +314,7 @@ public class EmailParserForManuscriptCentral extends EmailParser {
         
         // Exit-processing: if the last matched field is ABSTRACT, 
         // its data are not saved and they must be saved here
-        if (previousField.equals("abstract")){
+        if ((previousField != null) && (previousField.equals("abstract"))){
             dataForXml.put(fieldToXMLTagTable.get("abstract"), 
                 StoredLines);
         }
