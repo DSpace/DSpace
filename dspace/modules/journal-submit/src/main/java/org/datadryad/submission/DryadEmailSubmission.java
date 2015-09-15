@@ -342,56 +342,52 @@ public class DryadEmailSubmission extends HttpServlet {
 
     private ParsingResult parseMessage(String aMessage, Address[] addresses)
             throws SubmissionException {
-        List<String> lines = new ArrayList<String>();
+        List<String> dryadContent = new ArrayList<String>();
         Scanner emailScanner = new Scanner(aMessage);
         String journalName = null;
         String journalCode = null;
-        Pattern journalCodePattern = Pattern.compile("^\\s*>*\\s*(Journal Code):\\s*(.+)");
-        Pattern journalNamePattern = Pattern.compile("^\\s*>*\\s*(JOURNAL|Journal Name):\\s*(.+)");
         boolean dryadContentStarted = false;
+        ParsingResult result = null;
+        Context context = null;
+        Concept concept = null;
         while (emailScanner.hasNextLine()) {
-            String line = emailScanner.nextLine();
+            String line = emailScanner.nextLine().replace("\u00A0",""); // \u00A0 is Unicode nbsp; these should be removed
+
+            // Stop reading lines at EndDryadContent
+            if (line.contains("EndDryadContent")) {
+                break;
+            }
 
             if (StringUtils.stripToEmpty(line).equals("")) {
                 continue;
-            } else {
-                Matcher journalCodeMatcher = journalCodePattern.matcher(line);
-                if (journalCodeMatcher.find()) {
-                    journalCode = StringUtils.stripToEmpty(journalCodeMatcher.group(2));
-                    // strip out leading NBSP if present
-                    if (journalCode.codePointAt(0) == 160) {
-                        journalCode = journalCode.substring(1);
-                    }
-                    dryadContentStarted = true;
-                }
+            }
 
-                Matcher journalNameMatcher = journalNamePattern.matcher(line);
-                if (journalNameMatcher.find()) {
-                    journalName = StringUtils.stripToEmpty(journalNameMatcher.group(2));
-                    if (journalName.codePointAt(0) == 160) {          //Journal of Heredity has started inserting NBSP in several fields, including journal title
-                        journalName = journalName.substring(1);
-                    }
-                    dryadContentStarted = true;
-                }
+            Matcher journalCodeMatcher = Pattern.compile("^\\s*>*\\s*(Journal Code):\\s*([a-zA-Z]+)").matcher(line);
+            if (journalCodeMatcher.find()) {
+                journalCode = journalCodeMatcher.group(2);
+                dryadContentStarted = true;
+                continue;
+            }
 
-                if (dryadContentStarted) {
-                    lines.add(line);
-                }
-                // Stop reading lines at EndDryadContent
-                if (line.contains("EndDryadContent")) {
-                    break;
-                }
+            Matcher journalNameMatcher = Pattern.compile("^\\s*>*\\s*(JOURNAL|Journal Name):\\s*(.+)").matcher(line);
+            if (journalNameMatcher.find()) {
+                journalName = journalNameMatcher.group(2);
+                journalName = StringUtils.stripToEmpty(journalName);
+                dryadContentStarted = true;
+                continue;
+            }
+
+            if (dryadContentStarted) {
+                dryadContent.add(line);
             }
         }
         // After reading the entire message, attempt to find the PartnerJournal object by
         // Journal Code.  If Journal Code is not present, fall back to Journal Name
+        context = new Context();
         if (journalCode == null) {
             LOGGER.debug("Journal Code not found in message, trying by journal name: " + journalName);
             if (journalName != null) {
-                Context context = null;
-                Concept concept = null;
                 try {
-                    context = new Context();
                     concept = JournalUtils.getJournalConceptByName(context, journalName);
                 } catch (SQLException e) {
                     throw new SubmissionException(e);
@@ -401,51 +397,53 @@ public class DryadEmailSubmission extends HttpServlet {
             } else {
                 throw new SubmissionException("Journal Code not present and Journal Name not found in message");
             }
-            if (journalCode == null) {
-                throw new SubmissionException("Journal Name " + journalName + " did not match a known Journal Code");
-            }
         }
 
-        if (journalCode != null) {
-            // find the associated concept and initialize the parser variable.
-            Context context = null;
-            Concept concept = null;
-            try {
-                context = new Context();
-                concept = JournalUtils.getJournalConceptById(context, journalCode);
-            } catch (SQLException e) {
-                throw new SubmissionException(e);
-            }
-            if (concept != null) {
-                String parsingScheme = JournalUtils.getParsingScheme(concept);
-                PartnerJournal partnerJournal = new PartnerJournal(concept.getName());
-                partnerJournal.setParsingScheme(parsingScheme);
-                EmailParser parser = partnerJournal.getParser();
-
-                if (parser != null) {
-                    ParsingResult result = parser.parseMessage(lines);
-                    if ((result != null) && (result.getSubmissionId() == null)) {
-                        throw new SubmissionException("No submission ID found in message");
-                    }
-                    result.setJournalCode(journalCode);
-                    result.setJournalName(journalName);
-                    // Do this because this is what the parsers are expecting to
-                    // build the corresponding author field from
-                    for (Address address : addresses) {
-                        result.setSenderEmailAddress(address.toString());
-                    }
-
-                    return result;
-                } else {
-                    throw new SubmissionException("Journal " + journalCode + " parsing scheme not found");
-                }
-            } else {
-                throw new SubmissionException("Concept not found for journal " + journalCode);
-            }
-        } else {
-            throw new SubmissionException("Journal code not found in message");
+        // if journalCode is still null, throw an exception.
+        if (journalCode == null) {
+            throw new SubmissionException("Journal Name " + journalName + " did not match a known Journal Name");
         }
 
+        // find the associated concept and initialize the parser variable.
+        try {
+            concept = JournalUtils.getJournalConceptById(context, journalCode);
+        } catch (SQLException e) {
+            throw new SubmissionException(e);
+        }
+
+        if (concept == null) {
+            throw new SubmissionException("Concept not found for journal " + journalCode);
+        }
+
+        try {
+            String parsingScheme = JournalUtils.getParsingScheme(concept);
+            EmailParser parser = getEmailParser(parsingScheme);
+            result = parser.parseMessage(dryadContent);
+        } catch (SubmissionException e) {
+            throw new SubmissionException("Journal " + journalCode + " parsing scheme not found");
+        }
+
+        result = parser.parseMessage(lines);
+        if (result == null) {
+            throw new SubmissionException("Message could not be parsed");
+        }
+
+        if (result.getSubmissionId() == null) {
+            throw new SubmissionException("No submission ID found in message");
+        }
+
+        result.setJournalCode(journalCode);
+        result.setJournalName(journalName);
+        // Do this because this is what the parsers are expecting to
+        // build the corresponding author field from
+        for (Address address : addresses) {
+            result.setSenderEmailAddress(address.toString());
+        }
+
+        if (context != null) {
+            context.complete();
+        }
+        return result;
     }
 
     private Map<String, PartnerJournal> validate(
