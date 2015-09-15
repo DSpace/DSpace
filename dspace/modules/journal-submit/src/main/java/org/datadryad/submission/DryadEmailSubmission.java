@@ -385,67 +385,68 @@ public class DryadEmailSubmission extends HttpServlet {
         // Journal Code.  If Journal Code is not present, fall back to Journal Name
         try {
             context = new Context();
+            if (journalCode == null) {
+                LOGGER.debug("Journal Code not found in message, trying by journal name: " + journalName);
+                if (journalName != null) {
+                    try {
+                        concept = JournalUtils.getJournalConceptByName(context, journalName);
+                    } catch (SQLException e) {
+                        throw new SubmissionException(e);
+                    }
+                    journalCode =  JournalUtils.getJournalShortID(concept);
+
+                } else {
+                    throw new SubmissionException("Journal Code not present and Journal Name not found in message");
+                }
+            }
+
+            // if journalCode is still null, throw an exception.
+            if (journalCode == null) {
+                throw new SubmissionException("Journal Name " + journalName + " did not match a known Journal Name");
+            }
+
+            // find the associated concept and initialize the parser variable.
+            try {
+                concept = JournalUtils.getJournalConceptById(context, journalCode);
+            } catch (SQLException e) {
+                throw new SubmissionException(e);
+            }
+
+            if (concept == null) {
+                throw new SubmissionException("Concept not found for journal " + journalCode);
+            }
+
+            try {
+                String parsingScheme = JournalUtils.getParsingScheme(concept);
+                EmailParser parser = getEmailParser(parsingScheme);
+                result = parser.parseMessage(dryadContent);
+            } catch (SubmissionException e) {
+                throw new SubmissionException("Journal " + journalCode + " parsing scheme not found");
+            }
+
+            if (result == null) {
+                throw new SubmissionException("Message could not be parsed");
+            }
+
+            if (result.getSubmissionId() == null) {
+                throw new SubmissionException("No submission ID found in message");
+            }
+
+            result.setJournalCode(journalCode);
+            result.setJournalName(journalName);
+            // Do this because this is what the parsers are expecting to
+            // build the corresponding author field from
+            for (Address address : addresses) {
+                result.setSenderEmailAddress(address.toString());
+            }
+
+            if (context != null) {
+                context.complete();
+            }
         } catch (SQLException e) {
             throw new SubmissionException("Couldn't get context", e);
         }
-        if (journalCode == null) {
-            LOGGER.debug("Journal Code not found in message, trying by journal name: " + journalName);
-            if (journalName != null) {
-                try {
-                    concept = JournalUtils.getJournalConceptByName(context, journalName);
-                } catch (SQLException e) {
-                    throw new SubmissionException(e);
-                }
-                journalCode =  JournalUtils.getJournalShortID(concept);
 
-            } else {
-                throw new SubmissionException("Journal Code not present and Journal Name not found in message");
-            }
-        }
-
-        // if journalCode is still null, throw an exception.
-        if (journalCode == null) {
-            throw new SubmissionException("Journal Name " + journalName + " did not match a known Journal Name");
-        }
-
-        // find the associated concept and initialize the parser variable.
-        try {
-            concept = JournalUtils.getJournalConceptById(context, journalCode);
-        } catch (SQLException e) {
-            throw new SubmissionException(e);
-        }
-
-        if (concept == null) {
-            throw new SubmissionException("Concept not found for journal " + journalCode);
-        }
-
-        try {
-            String parsingScheme = JournalUtils.getParsingScheme(concept);
-            EmailParser parser = getEmailParser(parsingScheme);
-            result = parser.parseMessage(dryadContent);
-        } catch (SubmissionException e) {
-            throw new SubmissionException("Journal " + journalCode + " parsing scheme not found");
-        }
-
-        if (result == null) {
-            throw new SubmissionException("Message could not be parsed");
-        }
-
-        if (result.getSubmissionId() == null) {
-            throw new SubmissionException("No submission ID found in message");
-        }
-
-        result.setJournalCode(journalCode);
-        result.setJournalName(journalName);
-        // Do this because this is what the parsers are expecting to
-        // build the corresponding author field from
-        for (Address address : addresses) {
-            result.setSenderEmailAddress(address.toString());
-        }
-
-        if (context != null) {
-            context.complete();
-        }
         return result;
     }
 
