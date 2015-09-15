@@ -61,6 +61,8 @@ public class Params extends AbstractWingElement implements StructuralElement
     /** The name of the HTML5 autofocus field */
     public static final String A_AUTOFOCUS = "autofocus";
 
+    public static final String A_PLACEHOLDER = "placeholder";
+
     /** The name of the field to use for a list of choices */
     public static final String A_CHOICES = "choices";
 
@@ -123,6 +125,9 @@ public class Params extends AbstractWingElement implements StructuralElement
 
     /** Value of the HTML5 autofocus field */
     protected String autofocus = null;
+
+    /** Placeholder. */
+    protected String placeholder = null;
 
     /** Value of the Choices attribute */
     protected String choices = null;
@@ -309,6 +314,14 @@ public class Params extends AbstractWingElement implements StructuralElement
     }
 
     /**
+     * Placeholder.
+     */
+    public void setPlaceholder(String value)
+    {
+        this.placeholder = value;
+    }
+
+    /**
      *
      * @param fieldKey pre-determined metadata field key
      */
@@ -462,6 +475,11 @@ public class Params extends AbstractWingElement implements StructuralElement
         if (this.autofocus != null)
         {
             attributes.put(A_AUTOFOCUS, this.autofocus);
+        }
+
+        if (this.placeholder != null)
+        {
+            attributes.put(A_PLACEHOLDER, this.placeholder);
         }
 
         startElement(contentHandler, namespaces, E_PARAMS, attributes);

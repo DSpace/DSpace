@@ -474,7 +474,9 @@
 	<xsl:template match="dim:dim" mode="recentList-DIM-metadata">
 		<xsl:param name="href" />
 		<div class="item-type">
+			<xsl:text>&#160;</xsl:text>
 			<xsl:value-of select="dim:field[@element='type'][1]/node()" />
+			<xsl:text>&#160;</xsl:text>
 		</div>
 		
         <xsl:if test="dim:field[@mdschema='local' and @element='branding']">

@@ -1,7 +1,7 @@
 <!-- DSpace Custom Submit input form definition language -->
 
 
- <!ELEMENT input-forms (form-map, form-definitions, form-definitions-extra, form-value-pairs) >
+ <!ELEMENT input-forms (form-map, form-definitions, form-definitions-extra, form-value-pairs, form-complex-definitions) >
 
  <!ELEMENT form-map (name-map)* >
  <!ELEMENT name-map EMPTY >
@@ -11,11 +11,20 @@
 
  <!ELEMENT form-definitions (form)+ >
  <!ELEMENT form-definitions-extra (form)+ >
+ <!ELEMENT form-complex-definitions (definition)+ >
  <!ELEMENT form (page)+ >
  <!ATTLIST form name NMTOKEN #REQUIRED>
  <!ELEMENT page (field)+ >
  <!ATTLIST page number NMTOKEN #REQUIRED>
- <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, repeatable?, visibility?, repeatable-component?, repeatable-parse?, autocomplete?, mapped-to?, label, type-bind?, input-type, hint, required?, vocabulary?, regexp?, regexp-warning?, additional?, component-label?, collapsible?, acl?, class?) >
+ <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, repeatable?, visibility?,
+         repeatable-component?, repeatable-parse?,
+         mapped-to?, label, type-bind?, input-type, hint, autocomplete?, required?, placeholder?,
+         vocabulary?, regexp?, regexp-warning?, additional?, component-label?, collapsible?, acl?, class?) >
+ <!ELEMENT definition (input*) >
+ <!ATTLIST definition
+        name CDATA #REQUIRED
+        >
+
  <!ELEMENT dc-schema (#PCDATA) >
  <!ELEMENT dc-element (#PCDATA) >
  <!ELEMENT dc-qualifier (#PCDATA) >
@@ -31,7 +40,22 @@
  <!ELEMENT component-label (#PCDATA) >
  <!ELEMENT collapsible (#PCDATA) >
  <!ELEMENT input-type (#PCDATA)>
-  
+
+ <!ELEMENT input (#PCDATA) >
+ <!ATTLIST input type CDATA #REQUIRED >
+ <!ATTLIST input name CDATA #REQUIRED >
+ <!ATTLIST input label CDATA #IMPLIED >
+ <!ATTLIST input regexp CDATA #IMPLIED >
+ <!ATTLIST input pairs CDATA #IMPLIED >
+ <!ATTLIST input help CDATA #IMPLIED >
+ <!ATTLIST input autocomplete CDATA #IMPLIED >
+ <!ATTLIST input placeholder CDATA #IMPLIED >
+ <!ATTLIST input id CDATA #IMPLIED >
+ <!ATTLIST input class CDATA #IMPLIED >
+ <!ATTLIST input readonly CDATA #IMPLIED >
+ <!ATTLIST input mapped-to-if-not-default CDATA #IMPLIED >
+ <!ATTLIST input value CDATA #IMPLIED >
+
  <!ELEMENT hint (#PCDATA) >
  <!ELEMENT required (#PCDATA)>
 
@@ -41,7 +65,9 @@
  <!-- will be used in  String.matches, so mind proper escaping -->
  <!ELEMENT regexp (#PCDATA) >
  <!ELEMENT regexp-warning (#PCDATA) >
- 
+
+ <!ELEMENT placeholder (#PCDATA) >
+
  <!--
       ACL element for fine-grained access control 
       the content should be semicolon separated list of entries in format matching the following regexp:

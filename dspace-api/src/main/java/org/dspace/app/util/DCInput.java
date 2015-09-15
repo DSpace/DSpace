@@ -7,15 +7,7 @@
  */
 package org.dspace.app.util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.dspace.content.MetadataSchema;
@@ -54,6 +46,9 @@ public class DCInput
     /** UFAL/jmisutka - */
     private String extra = null;
 
+    /** extra class */
+    private String extraClass = null;
+
     /** UFAL/jmisutka - */
     private String collapsible = null;
 
@@ -71,6 +66,9 @@ public class DCInput
 
     /** a label describing input */
     private String label = null;
+
+    /** a label describing input */
+    private String placeholder = null;
 
     /** a label describing input */
     private String component_label = null;
@@ -147,6 +145,7 @@ public class DCInput
         extraRepeatableComponent = fieldMap.get("repeatable-component");
         autocomplete = fieldMap.get("autocomplete");
         extra = fieldMap.get("extra");
+        extraClass = fieldMap.get("class");
         collapsible = fieldMap.get("collapsible");
         component_label = fieldMap.get("component-label");
         regexp = fieldMap.get("regexp");
@@ -176,6 +175,7 @@ public class DCInput
                 || "yes".equalsIgnoreCase(repParseStr);
 
         label = fieldMap.get("label");
+        placeholder = fieldMap.get("placeholder");
         inputType = fieldMap.get("input-type");
         // these types are list-controlled
         if ("dropdown".equals(inputType) || "qualdrop_value".equals(inputType)
@@ -367,8 +367,18 @@ public class DCInput
     }
 
     /**
+     * Get placeholder.
+     *
+     * @return the palceholder
+     */
+    public String getPlaceholder()
+    {
+        return placeholder;
+    }
+
+    /**
      * Get the label for this form row.
-     * 
+     *
      * @return the label
      */
     public String getLabel()
@@ -562,9 +572,9 @@ public class DCInput
         return autocomplete;
     }
 
-    public String getExtra()
+    public String getExtraClass()
     {
-        return extra;
+        return extraClass;
     }
 
     public boolean hasExtraAttribute(String extra_string)
@@ -669,13 +679,13 @@ public class DCInput
 	public static class ComplexDefinition{
 		//use something that wont get replaced when entering into db
 		public static final String SEPARATOR = "@@";
-		private SortedMap<String, Map<String, String>> inputs;
+		private Map<String, Map<String, String>> inputs;
 		private String name;
 		private Map<String, List<String>> valuePairs = null;
 
 		public ComplexDefinition(String definitionName) {
 			name = definitionName;
-			inputs = new TreeMap<String, Map<String, String>>();
+			inputs = new LinkedHashMap<>();
 		}
 
 		public String getName() {
@@ -703,6 +713,10 @@ public class DCInput
 		public Set<String> getInputNames() {
 			return inputs.keySet();
 		}
+
+        public List<String> getSortedInputNames() {
+            return new ArrayList<>(new TreeSet<>(inputs.keySet()));
+        }
 
 		public int inputsCount() {
 			return getInputNames().size();
