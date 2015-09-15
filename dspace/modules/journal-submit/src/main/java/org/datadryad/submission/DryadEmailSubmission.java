@@ -450,7 +450,7 @@ public class DryadEmailSubmission extends HttpServlet {
         return result;
     }
 
-    public EmailParser getParser(String myParsingScheme) {
+    private EmailParser getEmailParser(String myParsingScheme) throws SubmissionException {
         String className = EmailParser.class.getPackage().getName()
                 + ".EmailParserFor" + StringUtils.capitalize(myParsingScheme);
 
