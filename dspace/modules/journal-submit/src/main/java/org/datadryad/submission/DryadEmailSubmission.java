@@ -381,9 +381,13 @@ public class DryadEmailSubmission extends HttpServlet {
                 dryadContent.add(line);
             }
         }
-        // After reading the entire message, attempt to find the PartnerJournal object by
+        // After reading the entire message, attempt to find the journal by
         // Journal Code.  If Journal Code is not present, fall back to Journal Name
-        context = new Context();
+        try {
+            context = new Context();
+        } catch (SQLException e) {
+            throw new SubmissionException("Couldn't get context", e);
+        }
         if (journalCode == null) {
             LOGGER.debug("Journal Code not found in message, trying by journal name: " + journalName);
             if (journalName != null) {
@@ -423,7 +427,6 @@ public class DryadEmailSubmission extends HttpServlet {
             throw new SubmissionException("Journal " + journalCode + " parsing scheme not found");
         }
 
-        result = parser.parseMessage(lines);
         if (result == null) {
             throw new SubmissionException("Message could not be parsed");
         }
