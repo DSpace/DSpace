@@ -8,18 +8,18 @@
 package org.dspace.rest;
 
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import org.apache.log4j.Logger;
 import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authenticate.service.AuthenticationService;
-import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
@@ -40,9 +40,10 @@ public class TokenHolder
 
     public static String TOKEN_HEADER = "rest-dspace-token";
 
-    private static Map<String, String> tokens = new HashMap<String, String>(); // Map with pair Email,token
-
-    private static Map<String, EPerson> persons = new HashMap<String, EPerson>(); // Map with pair token,Eperson
+    /**
+     * Collection holding the auth-token, and the corresponding EPerson's UUID
+     */
+    private static BiMap<String, UUID> tokenPersons = HashBiMap.create();
 
     /**
      * Login user into rest api. It check user credentials if they are okay.
@@ -73,12 +74,11 @@ public class TokenHolder
             if (status == AuthenticationMethod.SUCCESS)
             {
                 EPerson ePerson = epersonService.findByEmail(context, user.getEmail());
-                if(tokens.containsKey(ePerson.getEmail())) {
-                    token = tokens.get(ePerson.getEmail());
+                if(tokenPersons.inverse().containsKey(ePerson.getID())) {
+                    token = tokenPersons.inverse().get(ePerson.getID());
                 } else {
                     token = generateToken();
-                    persons.put(token, ePerson);
-                    tokens.put(ePerson.getEmail(), token);
+                    tokenPersons.put(token, ePerson.getID());
                 }
             }
 
@@ -114,7 +114,15 @@ public class TokenHolder
      */
     public static EPerson getEPerson(String token)
     {
-        return persons.get(token);
+        try {
+            EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
+            UUID epersonID = tokenPersons.get(token);
+            Context context = new Context();
+            return epersonService.find(context, epersonID);
+        } catch (SQLException e) {
+            log.error(e);
+            return null;
+        }
     }
 
     /**
@@ -126,17 +134,16 @@ public class TokenHolder
      */
     public static boolean logout(String token)
     {
-        if ((token == null) || (persons.get(token) == null))
+        if ((token == null) || (! tokenPersons.containsKey(token)))
         {
             return false;
         }
-        String email = persons.get(token).getEmail();
-        EPerson person = persons.remove(token);
-        if (person == null)
+
+        UUID personID = tokenPersons.remove(token);
+        if (personID == null)
         {
             return false;
         }
-        tokens.remove(email);
         return true;
     }
 
