@@ -14,6 +14,7 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
+import org.dspace.eperson.EPerson;
 import org.dspace.rest.common.Collection;
 import org.dspace.rest.common.Community;
 import org.dspace.rest.exceptions.ContextException;
@@ -472,8 +473,8 @@ public class CommunitiesResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
-
+            EPerson eperson = getUser(headers);
+            context = createContext(eperson);
             if (!authorizeService.isAdmin(context))
             {
                 context.abort();
@@ -498,7 +499,6 @@ public class CommunitiesResource extends Resource
 
             retCommunity = new Community(dspaceCommunity, "", context);
             context.complete();
-
         }
         catch (SQLException e)
         {

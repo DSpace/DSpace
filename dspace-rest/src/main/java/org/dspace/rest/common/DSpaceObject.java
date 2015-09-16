@@ -28,8 +28,10 @@ import java.util.UUID;
  */
 @XmlRootElement(name = "dspaceobject")
 public class DSpaceObject {
-    //UUID (not legacy ID)
-    private String id;
+    //legacyID
+    private Integer id;
+
+    private String uuid;
 
     private String name;
     private String handle;
@@ -46,23 +48,20 @@ public class DSpaceObject {
     }
 
     public DSpaceObject(org.dspace.content.DSpaceObject dso) {
-        setId(dso.getID());
+        //setId(); legacyID
+        setUUID(dso.getID().toString());
         setName(dso.getName());
         setHandle(dso.getHandle());
         DSpaceObjectService dspaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(dso);
         setType(dspaceObjectService.getTypeText(dso).toLowerCase());
     }
 
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
-    }
-
-    public void setId(UUID uuid) {
-        this.id = uuid.toString();
     }
 
     public String getName(){
@@ -104,5 +103,13 @@ public class DSpaceObject {
 
     public void addExpand(String expandableAttribute) {
         this.expand.add(expandableAttribute);
+    }
+
+    public String getUUID() {
+        return uuid;
+    }
+
+    public void setUUID(String uuid) {
+        this.uuid = uuid;
     }
 }
