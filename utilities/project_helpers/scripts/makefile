@@ -203,7 +203,7 @@ install_dspace:
 
 postinstall: update_lindat_common
 	rm -rf $(DIR_LINDAT_THEME_IN_WEBAPPS)
-	ln -s $(DIR_LINDAT_COMMON_THEME)/dist $(DIR_LINDAT_THEME_IN_WEBAPPS)
+	ln -s $(DIR_LINDAT_COMMON_THEME) $(DIR_LINDAT_THEME_IN_WEBAPPS)
 	@$(MAKE) grant_rights
 	@echo "DEPLOYMENT (INSTALL + POSTINSTALL) SUCCESSFUL"
 
