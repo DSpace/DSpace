@@ -18,6 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import org.dspace.authorize.AuthorizeException;
@@ -742,9 +743,6 @@ public class PackageUtils
         }
     }
 
-    /** Recognize and pick apart likely "magic" group names */
-    protected static final Pattern groupAnalyzer
-        = Pattern.compile("^(COMMUNITY|COLLECTION)_([0-9]+)_(.+)");
 
     /** Lookaside list for translations we've already done, so we don't generate
      * multiple names for the same group
@@ -793,22 +791,21 @@ public class PackageUtils
             throws PackageException
     {
         // See if this resembles a default Group name
-        Matcher matched = groupAnalyzer.matcher(groupName);
-        if (!matched.matches())
+
+        String objID = StringUtils.substringBetween(groupName, "_", "_");
+        int objType = StringUtils.startsWith(groupName, "COLLECTION_") ? Constants.COLLECTION : (StringUtils.startsWith(groupName, "COMMUNITY_") ? Constants.COMMUNITY : -1);
+        String groupType = StringUtils.substringAfterLast(groupName, "_");
+        if (objID == null && objType != -1)
             return groupName;
 
-        // It does!  Pick out the components
-        String objType = matched.group(1);
-        String objID = matched.group(2);
-        String groupType = matched.group(3);
 
         try
         {
             //We'll translate this internal ID into a Handle
 
             //First, get the object via the Internal ID
-            DSpaceObject dso = ContentServiceFactory.getInstance().getDSpaceObjectService(Constants
-                    .getTypeID(objType)).find(context, UUID.fromString(objID));
+            DSpaceObject dso = ContentServiceFactory.getInstance().getDSpaceLegacyObjectService(objType).findByIdOrLegacyId(context, objID);
+            ;
 
             if(dso==null)
             {
