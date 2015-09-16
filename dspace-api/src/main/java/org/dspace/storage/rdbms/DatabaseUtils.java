@@ -1155,7 +1155,7 @@ public class DatabaseUtils
 
     public static String getCurrentFlywayState(Connection connection) throws SQLException
     {
-        PreparedStatement statement = connection.prepareStatement("SELECT version FROM schema_version ORDER BY installed_rank desc");
+        PreparedStatement statement = connection.prepareStatement("SELECT \"version\" FROM \"schema_version\" ORDER BY \"installed_rank\" desc");
         ResultSet resultSet = statement.executeQuery();
         resultSet.next();
         return resultSet.getString("version");
