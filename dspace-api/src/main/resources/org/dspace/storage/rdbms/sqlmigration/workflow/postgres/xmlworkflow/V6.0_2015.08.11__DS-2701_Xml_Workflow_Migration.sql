@@ -6,7 +6,9 @@
 -- http://www.dspace.org/license/
 --
 
-
+------------------------------------------------------
+-- DS-2701 Service based API / Hibernate integration
+------------------------------------------------------
 UPDATE collection SET workflow_step_1 = null;
 UPDATE collection SET workflow_step_2 = null;
 UPDATE collection SET workflow_step_3 = null;

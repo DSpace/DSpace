@@ -6,6 +6,9 @@
 -- http://www.dspace.org/license/
 --
 
+------------------------------------------------------
+-- DS-2701 Service based API / Hibernate integration
+------------------------------------------------------
 ALTER TABLE workflowitem ALTER COLUMN item_id rename to item_legacy_id;
 ALTER TABLE workflowitem ADD COLUMN item_id UUID;
 ALTER TABLE workflowitem ADD CONSTRAINT workflowitem_item_id_fk FOREIGN KEY (item_id) REFERENCES Item;

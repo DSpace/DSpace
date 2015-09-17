@@ -6,6 +6,9 @@
 -- http://www.dspace.org/license/
 --
 
+------------------------------------------------------
+-- DS-2701 Service based API / Hibernate integration
+------------------------------------------------------
 DROP VIEW community2item;
 
 CREATE TABLE dspaceobject

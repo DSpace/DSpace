@@ -18,7 +18,7 @@ import java.sql.Connection;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class V6_0_2015_03_06__Dso_Uuid_Migration implements JdbcMigration, MigrationChecksumProvider {
+public class V6_0_2015_03_06__DS_2701_Dso_Uuid_Migration implements JdbcMigration, MigrationChecksumProvider {
 
     private int checksum = -1;
 
