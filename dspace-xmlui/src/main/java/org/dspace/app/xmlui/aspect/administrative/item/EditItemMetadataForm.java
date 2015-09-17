@@ -148,7 +148,7 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
         {
     	  String tabLink = baseURL + "&submit_metadata";
           List options = main.addList("options",List.TYPE_SIMPLE,"horizontal");
-          ViewItem.add_options(options, baseURL, ViewItem.T_option_metadata, tabLink);
+          ViewItem.add_options(context, eperson, options, baseURL, ViewItem.T_option_metadata, tabLink);
         }
 
         // LIST: add new metadata

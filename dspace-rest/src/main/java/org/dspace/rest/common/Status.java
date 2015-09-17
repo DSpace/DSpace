@@ -7,11 +7,11 @@
  */
 package org.dspace.rest.common;
 
-import org.codehaus.jackson.annotate.JsonProperty;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlElement;
 
 /**
  * Used to handle/determine status of REST API.
@@ -61,44 +61,44 @@ public class Status
         }
     }
 
-    @JsonProperty("okay")
+    @XmlElement(name="okay")
     public boolean isOkay()
     {
         return this.okay;
     }
 
-    @JsonProperty("okay")
+    @XmlElement(name="okay")
     public void setOkay(boolean okay)
     {
         this.okay = okay;
     }
 
-    @JsonProperty("authenticated")
+    @XmlElement(name="authenticated")
     public boolean isAuthenticated() {
         return authenticated;
     }
 
-    @JsonProperty("authenticated")
+    @XmlElement(name="authenticated")
     public void setAuthenticated(boolean authenticated) {
         this.authenticated = authenticated;
     }
 
-    @JsonProperty("email")
+    @XmlElement(name="email")
     public String getEmail() {
         return email;
     }
 
-    @JsonProperty("email")
+    @XmlElement(name="email")
     public void setEmail(String email) {
         this.email = email;
     }
 
-    @JsonProperty("fullname")
+    @XmlElement(name="fullname")
     public String getFullname() {
         return fullname;
     }
 
-    @JsonProperty("fullname")
+    @XmlElement(name="fullname")
     public void setFullname(String fullname) {
         this.fullname = fullname;
     }

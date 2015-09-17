@@ -1,0 +1,21 @@
+# E-mail to admin about deactivation of a service for an item
+#
+# Parameters: {0} Item Handle
+#             {1} Item Title 
+#             {2} Service Name
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: Service Deactivated
+
+{2} for the following item is deactivated: 
+
+Item handle: {0}
+Item Title: {1}
+	
+
+_____________________________________
+${dspace.name},
+WWW: ${dspace.url}
+Email: ${lr.help.mail}
+Tel.: ${lr.help.phone}

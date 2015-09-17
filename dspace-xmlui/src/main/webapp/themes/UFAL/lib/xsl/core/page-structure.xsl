@@ -541,7 +541,7 @@
         <script type="text/javascript">
             <xsl:attribute name="src">
                  <xsl:value-of select="$theme-path" />
-                 <xsl:text>/lib/js/citation.js</xsl:text>
+                 <xsl:text>/lib/lindat/public/js/lindat-refbox.js</xsl:text>
             </xsl:attribute>&#160;</script>
 
 

@@ -40,7 +40,7 @@ import org.dspace.rest.exceptions.ContextException;
 public class RestIndex {
     private static Logger log = Logger.getLogger(RestIndex.class);
 
-    @javax.ws.rs.core.Context public static ServletContext servletContext;
+    @javax.ws.rs.core.Context public ServletContext servletContext;
 
     /**
      * Return html page with information about REST api. It contains methods all

@@ -9,9 +9,8 @@ package org.dspace.rest.common;
 
 import java.util.Date;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 @XmlRootElement(name = "resourcepolicy")
 public class ResourcePolicy{
@@ -92,7 +91,7 @@ public class ResourcePolicy{
 		return action;
 	}
 	
-	@JsonIgnore
+	@XmlTransient
 	public int getActionInt(){
 		switch(action) {
 		case READ:

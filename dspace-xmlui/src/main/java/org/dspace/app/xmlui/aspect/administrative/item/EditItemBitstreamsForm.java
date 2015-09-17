@@ -96,7 +96,7 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
 		String tabLink = baseURL + "&submit_bitstreams";
 		// LIST: options
 		List options = main.addList("options",List.TYPE_SIMPLE,"horizontal");
-		ViewItem.add_options(options, baseURL, ViewItem.T_option_bitstreams, tabLink);
+		ViewItem.add_options(context, eperson, options, baseURL, ViewItem.T_option_bitstreams, tabLink);
 
 		
 		
