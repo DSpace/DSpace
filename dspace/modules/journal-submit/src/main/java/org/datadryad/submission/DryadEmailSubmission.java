@@ -439,14 +439,19 @@ public class DryadEmailSubmission extends HttpServlet {
             for (Address address : addresses) {
                 result.setSenderEmailAddress(address.toString());
             }
-
-            if (context != null) {
-                context.complete();
-            }
         } catch (SQLException e) {
             throw new SubmissionException("Couldn't get context", e);
         }
-
+        finally {
+            try {
+                if (context != null) {
+                    context.complete();
+                }
+            } catch (SQLException e) {
+                context.abort();
+                throw new RuntimeException("Context.complete threw an exception, aborting instead");
+            }
+        }
         return result;
     }
 
