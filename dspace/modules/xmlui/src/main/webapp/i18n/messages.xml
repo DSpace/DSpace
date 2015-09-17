@@ -85,6 +85,7 @@
 <message key="xmlui.cicdigital.trail.que-es-cic-digital">¿What is CIC-Digital?</message>
 <message key="xmlui.cicdigital.trail.politicas-del-repositorio">Repository policies</message>
 	<!-- Home messages -->
+<message key="xmlui.cicdigital.home.centros">centers</message>
 <message key="xmlui.cicdigital.home.subir-material">Upload material</message>
 <message key="xmlui.cicdigital.home.subir-material-descripcion">Through the process of auto-archive you can contribute with their own research and scientific developments to the content within the Institutional Repository of the Comisión de Investigaciones Científicas de la Provincia de Buenos Aires.</message>
 <message key="xmlui.cicdigital.home.explore">Explore the repository</message>
