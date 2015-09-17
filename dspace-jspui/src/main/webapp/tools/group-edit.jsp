@@ -33,12 +33,13 @@
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="org.dspace.eperson.Group"   %>
 <%@ page import="org.dspace.core.Utils" %>
+<%@ page import="java.util.List" %>
 
 <%
     Group group = (Group) request.getAttribute("group");
-    EPerson [] epeople = (EPerson []) request.getAttribute("members");
+    List<EPerson> epeople = (List<EPerson>) request.getAttribute("members");
     
-	Group   [] groups  = (Group   []) request.getAttribute("membergroups");
+	List<Group>   groups  = (List<Group>) request.getAttribute("membergroups");
 	request.setAttribute("LanguageSwitch", "hide");
 %>
 
