@@ -2,15 +2,13 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- * <p>
+ *
  * http://www.dspace.org/license/
  */
 package org.dspace.sword;
 
-import org.dspace.authenticate.AuthenticationServiceImpl;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authenticate.service.AuthenticationService;
-import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
@@ -25,12 +23,10 @@ import org.dspace.core.Constants;
 import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.apache.log4j.Logger;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
-import org.dspace.eperson.service.GroupService;
 import org.purl.sword.base.*;
 
 import java.sql.SQLException;
