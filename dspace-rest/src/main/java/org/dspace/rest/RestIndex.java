@@ -35,7 +35,6 @@ import org.dspace.rest.exceptions.ContextException;
  * 
  * @author Rostislav Novak (Computing and Information Centre, CTU in Prague)
  * 
- * GUCODE[[twb27:add additional verbs]]
  */
 @Path("/")
 public class RestIndex {
