@@ -33,7 +33,6 @@ import org.dspace.rest.common.Report;
  * 
  * @author Rostislav Novak (Computing and Information Centre, CTU in Prague)
  * 
- * GUCODE[[twb27:add additional verbs]]
  */
 @Path("/reports")
 public class RestReports {
