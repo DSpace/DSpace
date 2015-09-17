@@ -99,13 +99,7 @@
 		<xsl:choose>
 			<!-- identifier.uri row -->
 			<xsl:when test="$clause = 2 and (dim:field[@element='identifier' and @qualifier='uri'])">
-				<div data-target="#exporter_model_div" class="citationbox">
-					<xsl:attribute name="uri">
-                 		<xsl:value-of select="dim:field[@element='identifier' and @qualifier='uri']/node()" />
-               		</xsl:attribute>
-					<xsl:attribute name="oai">
-						<xsl:value-of select="$oai-url" />
-					</xsl:attribute>               		
+				<div class="refbox">
 					<xsl:attribute name="handle">
                         <xsl:value-of select="substring-after(/mets:METS/@ID,'hdl:')" />
                     </xsl:attribute>               		
@@ -745,13 +739,7 @@
 
 	<xsl:template match="dim:dim" mode="itemDetailView-DIM">
 		<xsl:if test="dim:field[@element='identifier' and @qualifier='uri']">
-				<div data-target="#exporter_model_div" class="citationbox">
-					<xsl:attribute name="uri">
-                 		<xsl:value-of select="dim:field[@element='identifier' and @qualifier='uri']/node()" />
-               		</xsl:attribute>
-					<xsl:attribute name="oai">
-						<xsl:value-of select="$oai-url" />
-					</xsl:attribute>               		               		
+				<div class="refbox">
 					<xsl:attribute name="handle">
                         <xsl:value-of select="substring-after(/mets:METS/@ID,'hdl:')" />
                     </xsl:attribute>               		
