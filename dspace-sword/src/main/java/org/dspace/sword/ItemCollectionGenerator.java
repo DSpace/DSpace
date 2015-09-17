@@ -2,13 +2,12 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- * <p>
+ *
  * http://www.dspace.org/license/
  */
 package org.dspace.sword;
 
 import org.apache.commons.lang.StringUtils;
-import org.dspace.content.authority.Choice;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.purl.sword.base.Collection;
