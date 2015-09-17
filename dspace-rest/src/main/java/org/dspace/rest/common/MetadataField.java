@@ -7,8 +7,6 @@
  */
 package org.dspace.rest.common;
 
-import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Context;
 
 import javax.ws.rs.WebApplicationException;
@@ -20,25 +18,33 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Terry Brady, Georgetown University.
  * Metadata field representation
+ * @author Terry Brady, Georgetown University.
  */
 @XmlRootElement(name = "field")
 public class MetadataField {
-    private static Logger log = Logger.getLogger(MetadataField.class);
-
+	private int fieldId;
     private String name;
     private String element;
     private String qualifier;
     private String description;
+    
+    private MetadataSchema parentSchema;
+
+    @XmlElement(required = true)
+    private ArrayList<String> expand = new ArrayList<String>();
 
     public MetadataField(){}
 
-    public MetadataField(org.dspace.content.MetadataSchema schema, org.dspace.content.MetadataField field, Context context) throws SQLException, WebApplicationException{
-        setup(schema, field, context);
+    public MetadataField(org.dspace.content.MetadataSchema schema, org.dspace.content.MetadataField field, String expand, Context context) throws SQLException, WebApplicationException{
+        setup(schema, field, expand, context);
     }
 
-    private void setup(org.dspace.content.MetadataSchema schema, org.dspace.content.MetadataField field, Context context) throws SQLException{
+    private void setup(org.dspace.content.MetadataSchema schema, org.dspace.content.MetadataField field, String expand, Context context) throws SQLException{
+        List<String> expandFields = new ArrayList<String>();
+        if(expand != null) {
+            expandFields = Arrays.asList(expand.split(","));
+        }
         StringBuilder sb = new StringBuilder();
         sb.append(schema.getName());
         sb.append(".");
@@ -49,11 +55,28 @@ public class MetadataField {
         }
         
         this.setName(sb.toString());
+        this.setFieldId(field.getFieldID());
         this.setElement(field.getElement());
         this.setQualifier(field.getQualifier());
         this.setDescription(field.getScopeNote());
+        
+        if (expandFields.contains("parentSchema") || expandFields.contains("all")) {
+        	this.addExpand("parentSchema");
+        	parentSchema = new MetadataSchema(schema, "", context);
+        }
     }
 
+    public void setParentSchema(MetadataSchema schema) {
+    	this.parentSchema = schema;
+    }
+    
+    public MetadataSchema getParentSchema() {
+    	return this.parentSchema;
+    }
+    
+    public void setFieldId(int fieldId) {
+        this.fieldId = fieldId;
+    }
     public void setName(String name) {
         this.name = name;
     }
@@ -67,6 +90,9 @@ public class MetadataField {
         this.description = description;
     }
     
+    public int getFieldId() {
+        return fieldId;
+    }
     public String getName() {
         return name;
     }
@@ -79,5 +105,16 @@ public class MetadataField {
     }
     public String getDescription() {
         return description;
+    }
+    public List<String> getExpand() {
+        return expand;
+    }
+
+    public void setExpand(ArrayList<String> expand) {
+        this.expand = expand;
+    }
+
+    public void addExpand(String expandableAttribute) {
+        this.expand.add(expandableAttribute);
     }
 }
