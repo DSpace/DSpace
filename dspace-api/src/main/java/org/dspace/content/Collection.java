@@ -105,13 +105,6 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
 
     }
 
-    @Override
-    public String getName()
-    {
-        String value = getCollectionService().getMetadataFirstValue(this, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
-        return value == null ? "" : value;
-    }
-
     /**
      * Get the logo for the collection. <code>null</code> is returned if the
      * collection does not have a logo.

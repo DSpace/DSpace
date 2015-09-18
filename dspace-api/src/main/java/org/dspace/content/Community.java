@@ -222,12 +222,6 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     }
 
     @Override
-    public String getName() {
-        String value = getCommunityService().getMetadataFirstValue(this, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
-        return value == null ? "" : value;
-    }
-
-    @Override
     public Integer getLegacyId() {
         return legacyId;
     }

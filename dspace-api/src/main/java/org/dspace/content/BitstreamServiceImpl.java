@@ -370,7 +370,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
             List<BundleBitstream> bitstreams = bundle.getBitstreams();
             for (int j = 0; j < bitstreams.size(); j++) {
                 BundleBitstream bundleBitstream = bitstreams.get(j);
-                if(StringUtils.equals(bundleBitstream.getBitstream().getName(), bitstreamName))
+                if(StringUtils.equals(this.getName(bundleBitstream.getBitstream()), bitstreamName))
                 {
                     return bundleBitstream.getBitstream();
                 }

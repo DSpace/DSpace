@@ -326,12 +326,6 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
     }
 
     @Override
-    public String getName()
-    {
-        return getItemService().getMetadataFirstValue(this, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
-    }
-
-    @Override
     public Integer getLegacyId() {
         return legacyId;
     }
