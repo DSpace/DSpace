@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- * <p>
+ *
  * http://www.dspace.org/license/
  */
 package org.dspace.sword;
@@ -11,7 +11,6 @@ import org.apache.commons.lang.StringUtils;
 import org.dspace.content.*;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
-import org.dspace.handle.HandleServiceImpl;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
