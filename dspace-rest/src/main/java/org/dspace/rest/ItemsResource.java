@@ -849,10 +849,14 @@ public class ItemsResource extends Resource
                     request, context);
 
             log.trace("Deleting bitstream...");
-            for (org.dspace.content.Bundle bundle : item.getBundles())
+            Iterator<Bundle> bundleIterator = item.getBundles().iterator();
+            while(bundleIterator.hasNext())
             {
-                for (org.dspace.content.BundleBitstream bit : bundle.getBitstreams())
+                Bundle bundle = bundleIterator.next();
+                Iterator<BundleBitstream> bundleBitstreamIterator = bundle.getBitstreams().iterator();
+                while (bundleBitstreamIterator.hasNext())
                 {
+                    BundleBitstream bundleBitstream = bundleBitstreamIterator.next();
                     if (bundleBitstream.getBitstream().getID() == bitstream.getID())
                     {
                         bundleService.removeBitstream(context, bundle, bitstream);
