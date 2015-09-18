@@ -36,7 +36,6 @@
 <%@ page import="org.dspace.content.Bundle" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.authorize.factory.AuthorizeServiceFactory" %>
-<%@ page import="org.dspace.content.BundleBitstream" %>
 <%@ page import="org.dspace.content.factory.ContentServiceFactory" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
@@ -143,7 +142,7 @@
     String row = "even";
 
     List<Bitstream> bitstreams = ContentServiceFactory.getInstance().getItemService().getNonInternalBitstreams(context, subInfo.getSubmissionItem().getItem());
-    List<BundleBitstream> bundles = null;
+    List<Bundle> bundles = null;
 
     if (bitstreams.get(0) != null) {
         bundles = bitstreams.get(0).getBundles();
@@ -172,7 +171,7 @@
 		<td headers="t1" class="<%= row %>RowEvenCol" align="center">
 		    <input class="form-control" type="radio" name="primary_bitstream_id" value="<%= bitstreams.get(i).getID() %>"
 			   <% if (bundles.get(0) != null) {
-				if (bitstreams.get(i).equals(bundles.get(0).getBundle().getPrimaryBitstream())) { %>
+				if (bitstreams.get(i).equals(bundles.get(0).getPrimaryBitstream())) { %>
 			       	  <%="checked='checked'" %>
 			   <%   }
 			      } %> />

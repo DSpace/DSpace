@@ -15,7 +15,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.log4j.Logger;
-import org.dspace.content.BundleBitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
@@ -66,7 +66,7 @@ public class Bitstream extends DSpaceObject {
         //A logo bitstream might not have a bundle...
         if(bitstream.getBundles() != null & bitstream.getBundles().size() >= 0) {
             if(bitstreamService.getParentObject(context, bitstream).getType() == Constants.ITEM) {
-                bundleName = bitstream.getBundles().get(0).getBundle().getName();
+                bundleName = bitstream.getBundles().get(0).getName();
             }
         }
 
@@ -90,9 +90,9 @@ public class Bitstream extends DSpaceObject {
         if(expandFields.contains("policies") || expandFields.contains("all")) {
             // Find policies without context.
         	List<ResourcePolicy> tempPolicies = new ArrayList<ResourcePolicy>();
-        	List<BundleBitstream> bundleBitstreams = bitstream.getBundles();
-			for (BundleBitstream bundleBitstream : bundleBitstreams) {
-				List<org.dspace.authorize.ResourcePolicy> bitstreamsPolicies = bundleService.getBitstreamPolicies(context, bundleBitstream.getBundle());
+        	List<Bundle> bundles = bitstream.getBundles();
+			for (Bundle bundle : bundles) {
+				List<org.dspace.authorize.ResourcePolicy> bitstreamsPolicies = bundleService.getBitstreamPolicies(context, bundle);
 				for (org.dspace.authorize.ResourcePolicy policy : bitstreamsPolicies) {
                     if(policy.getdSpaceObject().equals(bitstream)) {
                         tempPolicies.add(new ResourcePolicy(policy));

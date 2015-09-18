@@ -850,7 +850,7 @@ public class ItemTag extends TagSupport
 
         			for (int i = 0; (i < bits.size()) && !html; i++)
         			{
-        				Bitstream b = bits.get(i).getBitstream();
+        				Bitstream b = bits.get(i);
 						if (b.equals(bunds.get(0).getPrimaryBitstream()))
         				{
         					html = b.getFormat(context).getMIMEType().equals(
