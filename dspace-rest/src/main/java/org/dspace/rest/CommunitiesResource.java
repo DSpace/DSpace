@@ -70,7 +70,7 @@ public class CommunitiesResource extends Resource
     @GET
     @Path("/{community_id}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Community getCommunity(@PathParam("community_id") Integer communityId, @QueryParam("expand") String expand,
+    public Community getCommunity(@PathParam("community_id") String communityId, @QueryParam("expand") String expand,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
             @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
@@ -299,7 +299,7 @@ public class CommunitiesResource extends Resource
     @GET
     @Path("/{community_id}/collections")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Collection[] getCommunityCollections(@PathParam("community_id") Integer communityId,
+    public Collection[] getCommunityCollections(@PathParam("community_id") String communityId,
             @QueryParam("expand") String expand, @QueryParam("limit") @DefaultValue("100") Integer limit,
             @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("userIP") String user_ip,
             @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
@@ -385,7 +385,7 @@ public class CommunitiesResource extends Resource
     @GET
     @Path("/{community_id}/communities")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Community[] getCommunityCommunities(@PathParam("community_id") Integer communityId,
+    public Community[] getCommunityCommunities(@PathParam("community_id") String communityId,
             @QueryParam("expand") String expand, @QueryParam("limit") @DefaultValue("20") Integer limit,
             @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("userIP") String user_ip,
             @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
@@ -544,7 +544,7 @@ public class CommunitiesResource extends Resource
     @POST
     @Path("/{community_id}/collections")
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Collection addCommunityCollection(@PathParam("community_id") Integer communityId, Collection collection,
+    public Collection addCommunityCollection(@PathParam("community_id") String communityId, Collection collection,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
             @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
@@ -626,7 +626,7 @@ public class CommunitiesResource extends Resource
     @POST
     @Path("/{community_id}/communities")
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Community addCommunityCommunity(@PathParam("community_id") Integer communityId, Community community,
+    public Community addCommunityCommunity(@PathParam("community_id") String communityId, Community community,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
             @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
@@ -704,7 +704,7 @@ public class CommunitiesResource extends Resource
     @PUT
     @Path("/{community_id}")
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Response updateCommunity(@PathParam("community_id") Integer communityId, Community community,
+    public Response updateCommunity(@PathParam("community_id") String communityId, Community community,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
             @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
@@ -767,7 +767,7 @@ public class CommunitiesResource extends Resource
      */
     @DELETE
     @Path("/{community_id}")
-    public Response deleteCommunity(@PathParam("community_id") Integer communityId, @QueryParam("userIP") String user_ip,
+    public Response deleteCommunity(@PathParam("community_id") String communityId, @QueryParam("userIP") String user_ip,
             @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
     {
@@ -836,8 +836,8 @@ public class CommunitiesResource extends Resource
      */
     @DELETE
     @Path("/{community_id}/collections/{collection_id}")
-    public Response deleteCommunityCollection(@PathParam("community_id") Integer communityId,
-            @PathParam("collection_id") Integer collectionId, @QueryParam("userIP") String user_ip,
+    public Response deleteCommunityCollection(@PathParam("community_id") String communityId,
+            @PathParam("collection_id") String collectionId, @QueryParam("userIP") String user_ip,
             @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
     {
@@ -850,7 +850,7 @@ public class CommunitiesResource extends Resource
             context = createContext(getUser(headers));
 
             org.dspace.content.Community community = findCommunity(context, communityId, org.dspace.core.Constants.WRITE);
-            org.dspace.content.Collection collection = collectionService.findByLegacyId(context, collectionId);
+            org.dspace.content.Collection collection = collectionService.findByIdOrLegacyId(context, collectionId);
 
             if (collection == null)
             {
@@ -934,8 +934,8 @@ public class CommunitiesResource extends Resource
      */
     @DELETE
     @Path("/{community_id}/communities/{community_id2}")
-    public Response deleteCommunityCommunity(@PathParam("community_id") Integer parentCommunityId,
-            @PathParam("community_id2") Integer subcommunityId, @QueryParam("userIP") String user_ip,
+    public Response deleteCommunityCommunity(@PathParam("community_id") String parentCommunityId,
+            @PathParam("community_id2") String subcommunityId, @QueryParam("userIP") String user_ip,
             @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
     {
@@ -949,7 +949,7 @@ public class CommunitiesResource extends Resource
 
             org.dspace.content.Community parentCommunity = findCommunity(context, parentCommunityId,
                     org.dspace.core.Constants.WRITE);
-            org.dspace.content.Community subcommunity = communityService.findByLegacyId(context, subcommunityId);
+            org.dspace.content.Community subcommunity = communityService.findByIdOrLegacyId(context, subcommunityId);
 
             if (subcommunity == null)
             {
@@ -999,7 +999,7 @@ public class CommunitiesResource extends Resource
         catch (ContextException e)
         {
             processException("Could not delete subcommunity(id=" + subcommunityId + ") in community(id=" + parentCommunityId
-                    + "), ContextExcpetion. Message:" + e.getMessage(), context);
+                    + "), ContextException. Message:" + e.getMessage(), context);
         }
         finally
         {
@@ -1027,13 +1027,13 @@ public class CommunitiesResource extends Resource
      *             Is thrown when item with passed id is not exists and if user
      *             has no permission to do passed action.
      */
-    private org.dspace.content.Community findCommunity(org.dspace.core.Context context, int id, int action)
+    private org.dspace.content.Community findCommunity(org.dspace.core.Context context, String id, int action)
             throws WebApplicationException
     {
         org.dspace.content.Community community = null;
         try
         {
-            community = communityService.findByLegacyId(context, id);
+            community = communityService.findByIdOrLegacyId(context, id);
 
             if (community == null)
             {
