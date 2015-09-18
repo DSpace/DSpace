@@ -7,6 +7,7 @@
     http://www.dspace.org/license/
 
 --%>
+<%@page import="org.dspace.content.Item"%>
 <%--
   - Advanced Search JSP
   -
@@ -17,6 +18,8 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.dspace.content.Community" %>
+<%@ page import="org.dspace.content.factory.ContentServiceFactory"%>
+<%@ page import="org.dspace.content.service.CommunityService"%>
 <%@ page import="org.dspace.search.QueryResults" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
@@ -37,7 +40,7 @@
 	String conjunction1 	= request.getParameter("conjunction1") == null ? "AND" : request.getParameter("conjunction1");
 	String conjunction2 	= request.getParameter("conjunction2") == null ? "AND" : request.getParameter("conjunction2");
 
-        QueryResults qResults = (QueryResults)request.getAttribute("queryresults");
+    QueryResults qResults   = (QueryResults)request.getAttribute("queryresults");
 
 	//Read the configuration to find out the search indices dynamically
 	int idx = 1;
@@ -78,20 +81,24 @@
     <tr>
       <td class="oddRowEvenCol" align="center">
       	<p><strong><fmt:message key="jsp.search.advanced.search"/></strong>&nbsp;
-		<select name="location">
-			<option selected="selected" value="/"><fmt:message key="jsp.general.genericScope"/></option>
+            <select name="location">
+                <option selected="selected" value="/"><fmt:message key="jsp.general.genericScope"/></option>
 
-<%
-        for (int i = 0; i < communityArray.length; i++)
-        {
-%>
-			<option value="<%= communityArray[i].getHandle() %>"><%= communityArray[i].getMetadata("name") %></option>
-<%
-        }
-%>
-		</select>
-              </p>
-         <table cellspacing="2" border="0" width="80%">
+        <%
+            CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+            for (int i = 0; i < communityArray.length; i++)
+            {
+        %>
+                <option value="<%= communityArray[i].getHandle() %>">
+                    <%= communityService.getMetadataFirstValue(communityArray[i],
+                            "dc", "title", null, Item.ANY) %>
+                </option>
+        <%
+            }
+        %>
+            </select>
+        </p>
+        <table cellspacing="2" border="0" width="80%">
 		  <tr>
                 <td class="evenRowEvenCol">
                     <table border="0">

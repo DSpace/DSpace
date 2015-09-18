@@ -7,7 +7,6 @@
     http://www.dspace.org/license/
 
 --%>
-
 <%--
   - Display the results of a simple search
   -
@@ -34,14 +33,19 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
-    prefix="fmt" %>
+           prefix="fmt" %>
 
-<%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+<%@ taglib uri="http://www.dspace.org/dspace-tags.tld"
+           prefix="dspace" %>
+
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="java.net.URLEncoder"            %>
 <%@ page import="org.dspace.content.Community"   %>
 <%@ page import="org.dspace.content.Collection"  %>
 <%@ page import="org.dspace.content.Item"        %>
+<%@ page import="org.dspace.content.factory.ContentServiceFactory"%>
+<%@ page import="org.dspace.content.service.CollectionService"%>
+<%@ page import="org.dspace.content.service.CommunityService"%>
 <%@ page import="org.dspace.search.QueryResults" %>
 <%@ page import="org.dspace.sort.SortOption" %>
 <%@ page import="java.util.Enumeration" %>
@@ -111,6 +115,9 @@
                                 <%-- <strong>Search:</strong>&nbsp;<select name="location"> --%>
                                 <label for="tlocation"><strong><fmt:message key="jsp.search.results.searchin"/></strong></label>&nbsp;<select name="location" id="tlocation">
 <%
+    CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+
     if (community == null && collection == null)
     {
         // Scope of the search was all of DSpace.  The scope control will list
@@ -122,7 +129,9 @@
         for (int i = 0; i < communityArray.length; i++)
         {
 %>
-                                    <option value="<%= communityArray[i].getHandle() %>"><%= communityArray[i].getMetadata("name") %></option>
+                                    <option value="<%= communityArray[i].getHandle() %>">
+                                        <%= communityService.getMetadataFirstValue(communityArray[0], "dc", "title", null, Item.ANY) %>
+                                    </option>
 <%
         }
     }
@@ -133,12 +142,19 @@
 %>
                                     <%-- <option value="/">All of DSpace</option> --%>
                                     <option value="/"><fmt:message key="jsp.general.genericScope"/></option>
-                                    <option selected="selected" value="<%= community.getHandle() %>"><%= community.getMetadata("name") %></option>
+                                    <option selected="selected" value="<%= community.getHandle() %>">
+                                        <%= communityService.getMetadataFirstValue(community, "dc",
+                                                "title", null, Item.ANY) %>
+                                    </option>
 <%
         for (int i = 0; i < collectionArray.length; i++)
         {
 %>
-                                    <option value="<%= collectionArray[i].getHandle() %>"><%= collectionArray[i].getMetadata("name") %></option>
+                                    <option value="<%= collectionArray[i].getHandle() %>">
+                                        <%= collectionService.getMetadataFirstValue(
+                                                        collectionArray[i], "dc", "title",
+                                                        null, Item.ANY) %>
+                                    </option>
 <%
         }
     }
@@ -148,8 +164,15 @@
 %>
                                     <%-- <option value="/">All of DSpace</option> --%>
                                     <option value="/"><fmt:message key="jsp.general.genericScope"/></option>
-                                    <option value="<%= community.getHandle() %>"><%= community.getMetadata("name") %></option>
-                                    <option selected="selected" value="<%= collection.getHandle() %>"><%= collection.getMetadata("name") %></option>
+                                    <option value="<%= community.getHandle() %>">
+                                        <%= communityService.getMetadataFirstValue(
+                                                        community, "dc", "title",
+                                                        null, Item.ANY) %>
+                                    </option>
+                                    <option selected="selected" value="<%= collection.getHandle() %>">
+                                        <%= collectionService.getMetadataFirstValue(
+                                                collection, "dc", "title", null, Item.ANY) %>
+                                    </option>
 <%
     }
 %>

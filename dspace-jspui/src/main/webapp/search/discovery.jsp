@@ -165,41 +165,43 @@
     <%-- Controls for a repeat search --%>
 	<div class="discovery-query panel-heading">
     <form action="simple-search" method="get">
-         <label for="tlocation">
+        <label for="tlocation">
          	<fmt:message key="jsp.search.results.searchin"/>
-         </label>
-         <select name="location" id="tlocation">
+        </label>
+        <select name="location" id="tlocation">
 <%
     if (scope == null)
     {
         // Scope of the search was all of DSpace.  The scope control will list
         // "all of DSpace" and the communities.
 %>
-                                    <%-- <option selected value="/">All of DSpace</option> --%>
-                                    <option selected="selected" value="/"><fmt:message key="jsp.general.genericScope"/></option>
+            <%-- <option selected value="/">All of DSpace</option> --%>
+            <option selected="selected" value="/"><fmt:message key="jsp.general.genericScope"/></option>
 <%  }
     else
     {
 %>
-									<option value="/"><fmt:message key="jsp.general.genericScope"/></option>
+            <option value="/"><fmt:message key="jsp.general.genericScope"/></option>
 <%  }      
     for (DSpaceObject dso : scopes)
     {
 %>
-                                <option value="<%= dso.getHandle() %>" <%=dso.getHandle().equals(searchScope)?"selected=\"selected\"":"" %>>
-                                	<%= dso.getName() %></option>
+            <option value="<%= dso.getHandle() %>" <%=dso.getHandle().equals(searchScope)?"selected=\"selected\"":"" %>>
+                <%= dso.getName() %>
+            </option>
 <%
     }
-%>                                </select><br/>
-                                <label for="query"><fmt:message key="jsp.search.results.searchfor"/></label>
-                                <input type="text" size="50" id="query" name="query" value="<%= (query==null ? "" : Utils.addEntities(query)) %>"/>
-                                <input type="submit" id="main-query-submit" class="btn btn-primary" value="<fmt:message key="jsp.general.go"/>" />
+%>
+        </select><br/>
+        <label for="query"><fmt:message key="jsp.search.results.searchfor"/></label>
+        <input type="text" size="50" id="query" name="query" value="<%= (query==null ? "" : Utils.addEntities(query)) %>"/>
+        <input type="submit" id="main-query-submit" class="btn btn-primary" value="<fmt:message key="jsp.general.go"/>" />
 <% if (StringUtils.isNotBlank(spellCheckQuery)) {%>
 	<p class="lead"><fmt:message key="jsp.search.didyoumean"><fmt:param><a id="spellCheckQuery" data-spell="<%= Utils.addEntities(spellCheckQuery) %>" href="#"><%= spellCheckQuery %></a></fmt:param></fmt:message></p>
 <% } %>                  
-                                <input type="hidden" value="<%= rpp %>" name="rpp" />
-                                <input type="hidden" value="<%= sortedBy %>" name="sort_by" />
-                                <input type="hidden" value="<%= order %>" name="order" />
+        <input type="hidden" value="<%= rpp %>" name="rpp" />
+        <input type="hidden" value="<%= sortedBy %>" name="sort_by" />
+        <input type="hidden" value="<%= order %>" name="order" />
 <% if (appliedFilters.size() > 0 ) { %>                                
 		<div class="discovery-search-appliedFilters">
 		<span><fmt:message key="jsp.search.filter.applied" /></span>
@@ -315,7 +317,7 @@
 				}
 	} %>	
            <label for="rpp"><fmt:message key="search.results.perpage"/></label>
-           <select name="rpp">
+           <select name="rpp" id="rpp">
 <%
                for (int i = 5; i <= 100 ; i += 5)
                {
@@ -332,7 +334,7 @@
            {
 %>
                <label for="sort_by"><fmt:message key="search.results.sort-by"/></label>
-               <select name="sort_by">
+               <select name="sort_by" id="sort_by">
                    <option value="score"><fmt:message key="search.sort-by.relevance"/></option>
 <%
                for (String sortBy : sortOptions)
@@ -347,12 +349,12 @@
            }
 %>
            <label for="order"><fmt:message key="search.results.order"/></label>
-           <select name="order">
+           <select name="order" id="order">
                <option value="ASC" <%= ascSelected %>><fmt:message key="search.order.asc" /></option>
                <option value="DESC" <%= descSelected %>><fmt:message key="search.order.desc" /></option>
            </select>
            <label for="etal"><fmt:message key="search.results.etal" /></label>
-           <select name="etal">
+           <select name="etal" id="etal">
 <%
                String unlimitedSelect = "";
                if (etAl < 1)
