@@ -80,19 +80,6 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
     }
 
     /**
-     * Get the internal identifier of this bitstream
-     *
-     * @return the internal identifier
-     *
-     * @deprecated use getID()
-     */
-    public int getLegacyID()
-    {
-        return legacyId;
-    }
-
-
-    /**
      * Get the sequence ID of this bitstream
      * 
      * @return the sequence ID

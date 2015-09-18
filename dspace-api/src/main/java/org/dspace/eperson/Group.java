@@ -77,18 +77,6 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport
     public Group() {
     }
 
-    /**
-     * get the ID of the group object
-     *
-     * @return id
-     *
-     * @deprecated use getID()
-     */
-    public int getLegacyID()
-    {
-        return legacyId;
-    }
-
     void addMember(EPerson e)
     {
         getMembers().add(e);
