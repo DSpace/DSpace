@@ -534,6 +534,8 @@ public class ItemsResource extends Resource
                         dspacePolicy.setStartDate(date);
                     }
 
+                    resourcePolicyService.update(context, dspacePolicy);
+
                     bitstreamService.updateLastModified(context, dspaceBitstream);
                 }
             }
