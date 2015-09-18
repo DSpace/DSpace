@@ -687,7 +687,7 @@ public class BitstreamResource extends Resource
                     request, context);
 
             org.dspace.authorize.ResourcePolicy resourcePolicy = resourcePolicyService.find(context, policyId);
-            if(resourcePolicy.getdSpaceObject().getID() == dspaceBitstream.getID() && authorizeService.authorizeActionBoolean(context, dspaceBitstream, org.dspace.core.Constants.REMOVE)) {
+            if(resourcePolicy.getdSpaceObject().getID().equals(dspaceBitstream.getID()) && authorizeService.authorizeActionBoolean(context, dspaceBitstream, org.dspace.core.Constants.REMOVE)) {
 
                 try {
                     resourcePolicyService.delete(context, resourcePolicy);
