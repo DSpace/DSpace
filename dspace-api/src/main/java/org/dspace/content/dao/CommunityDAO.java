@@ -23,7 +23,7 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public interface CommunityDAO extends DSpaceObjectDAO<Community> {
+public interface CommunityDAO extends DSpaceObjectLegacySupportDAO<Community> {
 
     public List<Community> findAll(Context context, MetadataField sortField) throws SQLException;
 

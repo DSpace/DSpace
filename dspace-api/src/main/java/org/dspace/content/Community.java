@@ -74,18 +74,6 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     protected Community() {
     }
 
-    /**
-     * Get the internal ID of this community
-     *
-     * @return the internal identifier
-     *
-     * @deprecated use getID()
-     */
-    public int getLegacyID()
-    {
-        return legacyId;
-    }
-
     void addSubCommunity(Community subCommunity)
     {
         getSubcommunities().add(subCommunity);
