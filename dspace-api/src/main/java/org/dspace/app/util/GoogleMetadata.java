@@ -11,6 +11,7 @@ import java.sql.SQLException;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
+
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
 
@@ -22,20 +23,22 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
-
 import org.jdom.Element;
 
 /**
@@ -757,16 +760,17 @@ public class GoogleMetadata
     }
 
     /**
-     * Fetch all metadata mappings
-     * 
+     * Fetch retaining the order of the values for any given key in which they
+     * where added (like authors).
+     *
      * Usage: GoogleMetadata gmd = new GoogleMetadata(item); for(Entry<String,
      * String> mapping : googlemd.getMappings()) { ... }
      * 
      * @return Iterable of metadata fields mapped to Google-formatted values
      */
-    public Set<Entry<String, String>> getMappings()
+    public Collection<Entry<String, String>> getMappings()
     {
-        return new HashSet<>(metadataMappings.entries());
+        return metadataMappings.entries();
     }
 
     /**
@@ -1041,7 +1045,6 @@ public class GoogleMetadata
 	 */
 	private Bitstream findLinkableFulltext(Item item) throws SQLException {
 		Bitstream bestSoFar = null;
-		int bitstreamCount = 0;
 		Bundle[] contentBundles = item.getBundles("ORIGINAL");
 		for (Bundle bundle : contentBundles) {
 			int primaryBitstreamId = bundle.getPrimaryBitstreamID();
@@ -1050,15 +1053,15 @@ public class GoogleMetadata
 				if (candidate.getID() == primaryBitstreamId) { // is primary -> use this one
 					if (isPublic(candidate)) {
 						return candidate;
+					}					
+				} else 
+					{
+						
+						if (bestSoFar == null && isPublic(candidate)) { //if bestSoFar is null but the candidate is not public you don't use it and try to find another
+						bestSoFar = candidate;
+						}					
 					}
-				} else if (bestSoFar == null) {
-					bestSoFar = candidate;
-				}
-				bitstreamCount++;
 			}
-		}
-		if (bitstreamCount > 1 || !isPublic(bestSoFar)) {
-			bestSoFar = null;
 		}
 
 		return bestSoFar;

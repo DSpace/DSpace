@@ -14,9 +14,7 @@ import java.util.List;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -49,29 +47,25 @@ public class DSpaceAuthorizationFilter extends DSpaceFilter
     @Override
     public boolean isShown(DSpaceItem item)
     {
+        boolean pub = false;
         try
         {
+            // If Handle or Item are not found, return false
             String handle = DSpaceItem.parseHandle(item.getIdentifier());
-            if (handle == null) return false;
+            if (handle == null)
+                return false;
             Item dspaceItem = (Item) HandleManager.resolveToObject(context, handle);
-            AuthorizeManager.authorizeAction(context, dspaceItem, Constants.READ);
-            for (Bundle b : dspaceItem.getBundles())
-                AuthorizeManager.authorizeAction(context, b, Constants.READ);
-            return true;
-        }
-        catch (AuthorizeException ex)
-        {
-            log.error(ex.getMessage(), ex);
+            if (dspaceItem == null)
+                return false;
+
+            // Check if READ access allowed on Item
+            pub = AuthorizeManager.authorizeActionBoolean(context, dspaceItem, Constants.READ);
         }
         catch (SQLException ex)
         {
             log.error(ex.getMessage(), ex);
         }
-        catch (Exception ex)
-        {
-            log.error(ex.getMessage(), ex);
-        }
-        return false;
+        return pub;
     }
 
     @Override
