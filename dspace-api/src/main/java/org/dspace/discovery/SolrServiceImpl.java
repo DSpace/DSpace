@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.TimeZone;
 import java.util.Vector;
 
@@ -1490,10 +1492,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 		// inspect for seasons
 
 
-		String spring = "(\\d{4}) (?i:.*SPRING.*)";
-		String summer = "(\\d{4}) (?i:.*SUMMER.*)";
-		String fall = "(\\d{4}) (?i:.*FALL.*)";
-		String winter = "(\\d{4}) (?i:.*WINTER.*)";
+		private static final Pattern springRE = Pattern.compile("(\\d{4}) (?i:.*SPRING.*)");
+		private static final Pattern summerRE = Pattern.compile("(\\d{4}) (?i:.*SUMMER.*)");
+		private static final Pattern fallRE   = Pattern.compile("(\\d{4}) (?i:.*FALL.*)");
+		private static final Pattern winterRE = Pattern.compile("(\\d{4}) (?i:.*WINTER.*)");
 
 
 		if (t.matches(spring)){
