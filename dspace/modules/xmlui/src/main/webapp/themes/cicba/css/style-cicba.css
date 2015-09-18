@@ -97,6 +97,7 @@ body > .container-fluid {
 	padding-left: 25px;
 	padding-right: 25px;
 	margin-bottom:0px;
+	background: none;
 }
 
 .static-page ol{
@@ -108,7 +109,6 @@ body > .container-fluid {
 }
 
 #cic-trail {
-	background-color: #f5f5f5;
 }
 
 #cic-footer {

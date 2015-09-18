@@ -11,7 +11,8 @@
 		entirely of dri:div tags). -->
 	<xsl:template match="dri:body">
 		<div id="cic-body" class="row">
-<!--			<div>-->
+			<xsl:call-template name="buildTrail" />
+			<!-- <div> -->
 			<xsl:if
 				test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='alert'][@qualifier='message']">
 				<div id="ds-system-wide-alert">
@@ -21,7 +22,7 @@
 					</p>
 				</div>
 			</xsl:if>
-			
+
 
 			<!-- Check for the custom pages -->
 			<xsl:choose>
@@ -29,23 +30,27 @@
 					<xsl:call-template name="buildHome" />
 				</xsl:when>
 				<!-- Handler for Static pages -->
-				
+
 				<xsl:when test="starts-with($request-uri, 'page/')">
 					<div class="static-page">
-						<xsl:copy-of select="document(concat('../../../',$request-uri,'.xhtml') )" />
+						<xsl:copy-of
+							select="document(concat('../../../',$request-uri,'.xhtml') )" />
 					</div>
 				</xsl:when>
 				<!-- Si tenemos datos de discovery para mostrar, lo hacemos en un sidebar -->
-				<xsl:when test="/dri:document/dri:options/dri:list[@n='discovery']/child::node()">
+				<xsl:when
+					test="/dri:document/dri:options/dri:list[@n='discovery']/child::node()">
 					<div class="row">
 						<div class="col-md-9">
 							<xsl:apply-templates />
 						</div>
 						<div class="col-md-3" id="cic-sidebar">
 							<h3>
-								<xsl:copy-of select="/dri:document/dri:options/dri:list[@n='discovery']/dri:head" />
+								<xsl:copy-of
+									select="/dri:document/dri:options/dri:list[@n='discovery']/dri:head" />
 							</h3>
-							<xsl:for-each select="/dri:document/dri:options/dri:list[@n='discovery']/dri:list">
+							<xsl:for-each
+								select="/dri:document/dri:options/dri:list[@n='discovery']/dri:list">
 								<xsl:call-template name="buildPanelFromList" />
 							</xsl:for-each>
 						</div>
@@ -59,53 +64,64 @@
 				</xsl:otherwise>
 			</xsl:choose>
 
-<!--		</div>-->
+			<!-- </div> -->
 		</div>
 	</xsl:template>
-	
-	
+
+
 	<xsl:template name="buildHome">
 
 		<div class="row">
 			<div class="col-md-7" id="welcome-panel">
-			<div class= "bs-callout bs-callout-info">
-				<xsl:for-each select="dri:div[@n='news']">
-<!-- 					<h1><xsl:copy-of select="dri:head" /></h1> -->
-					<xsl:copy-of select="dri:p" />
-				</xsl:for-each>
+				<div class="bs-callout bs-callout-info">
+					<xsl:for-each select="dri:div[@n='news']">
+						<!-- <h1><xsl:copy-of select="dri:head" /></h1> -->
+						<xsl:copy-of select="dri:p" />
+					</xsl:for-each>
 				</div>
 			</div>
 			<div class="col-md-5 hidden-xs">
 				<xsl:call-template name="build-img">
-					<xsl:with-param name="img.src">images/provincia.png</xsl:with-param>
+					<xsl:with-param name="img.src">
+						images/provincia.png
+					</xsl:with-param>
 				</xsl:call-template>
 			</div>
 		</div>
 		<div id="home-highlight" class="row">
-<!-- 			<div id="home-highlight-img"> -->
-<!-- 				<xsl:text> </xsl:text> -->
-<!-- 			</div> -->
+			<!-- <div id="home-highlight-img"> -->
+			<!-- <xsl:text> </xsl:text> -->
+			<!-- </div> -->
 			<div id="home-highlight-content" class="col-md-7">
 				<form id="home-search-form" class="form-inline" role="form">
-					<xsl:attribute name="action"><xsl:value-of select="$search-url" /></xsl:attribute>
-				   <label for="q">
-				   		<i18n:text>xmlui.cicdigital.home.explore</i18n:text>
-				   </label>
-				    <div>
-				    	<input type="text" name="query" class="form-control" autofocus="true" size="30" placeholder="Ingrese su búsqueda ..."/>
-					    <button type="submit" name="lr" class="btn btn-link"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+					<xsl:attribute name="action"><xsl:value-of
+						select="$search-url" /></xsl:attribute>
+					<label for="q">
+						<i18n:text>xmlui.cicdigital.home.explore</i18n:text>
+					</label>
+					<div>
+						<input type="text" name="query" class="form-control"
+							autofocus="true" size="30" placeholder="Ingrese su búsqueda ..." />
+						<button type="submit" name="lr" class="btn btn-link">
+							<span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+						</button>
 					</div>
 				</form>
 				<div id="home-browse-bar">
-					
-					<div class="btn-group btn-group-justified" role="group"  aria-label="...">
+
+					<div class="btn-group btn-group-justified" role="group"
+						aria-label="...">
 						<a class="btn" role="button">
 							<xsl:attribute name="href">
 								<xsl:call-template name="print-path">
 									<xsl:with-param name="path">/browse?type=author</xsl:with-param>
 								</xsl:call-template>
 							</xsl:attribute>
-							<i18n:text>xmlui.ArtifactBrowser.Navigation.head_browse</i18n:text><xsl:text> </xsl:text><i18n:text>xmlui.ArtifactBrowser.CollectionViewer.browse_authors</i18n:text>
+							<i18n:text>xmlui.ArtifactBrowser.Navigation.head_browse
+							</i18n:text>
+							<xsl:text> </xsl:text>
+							<i18n:text>xmlui.ArtifactBrowser.CollectionViewer.browse_authors
+							</i18n:text>
 						</a>
 						<a class="btn" role="button">
 							<xsl:attribute name="href">
@@ -113,7 +129,10 @@
 									<xsl:with-param name="path">/handle/123456789/3</xsl:with-param>
 								</xsl:call-template>
 							</xsl:attribute>
-							<i18n:text>xmlui.ArtifactBrowser.Navigation.head_browse</i18n:text><xsl:text> </xsl:text><i18n:text>xmlui.cicdigital.home.centros</i18n:text>
+							<i18n:text>xmlui.ArtifactBrowser.Navigation.head_browse
+							</i18n:text>
+							<xsl:text> </xsl:text>
+							<i18n:text>xmlui.cicdigital.home.centros</i18n:text>
 						</a>
 						<a class="btn" role="button">
 							<xsl:attribute name="href">
@@ -121,29 +140,37 @@
 									<xsl:with-param name="path">/discover</xsl:with-param>
 								</xsl:call-template>
 							</xsl:attribute>
-							<i18n:text>xmlui.ArtifactBrowser.Navigation.head_all_of_dspace</i18n:text>
+							<i18n:text>xmlui.ArtifactBrowser.Navigation.head_all_of_dspace
+							</i18n:text>
 						</a>
 					</div>
 				</div>
-			</div><!--
-    		--><div id="home-autoarchivo" class="col-md-5">
-<!-- 				<h3> -->
-					<xsl:call-template name="build-anchor">
-						<xsl:with-param name="a.href">/submissions</xsl:with-param>
-						<xsl:with-param name="a.value">
-							 <xsl:text> </xsl:text><i18n:text>xmlui.cicdigital.home.subir-material</i18n:text>
-						</xsl:with-param>
-						<xsl:with-param name="img.src">images/flecha_subir.png</xsl:with-param>
-					</xsl:call-template>
-<!-- 				</h3> -->
+			</div><!-- -->
+			<div id="home-autoarchivo" class="col-md-5">
+				<!-- <h3> -->
+				<xsl:call-template name="build-anchor">
+					<xsl:with-param name="a.href">
+						/submissions
+					</xsl:with-param>
+					<xsl:with-param name="a.value">
+						<xsl:text> </xsl:text>
+						<i18n:text>xmlui.cicdigital.home.subir-material</i18n:text>
+					</xsl:with-param>
+					<xsl:with-param name="img.src">
+						images/flecha_subir.png
+					</xsl:with-param>
+				</xsl:call-template>
+				<!-- </h3> -->
 				<p>
-					<i18n:text>xmlui.cicdigital.home.subir-material-descripcion</i18n:text>
+					<i18n:text>xmlui.cicdigital.home.subir-material-descripcion
+					</i18n:text>
 				</p>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-7">
-			<xsl:for-each select="dri:div[@n='site-home']/dri:div[@n='site-recent-submission']">
+				<xsl:for-each
+					select="dri:div[@n='site-home']/dri:div[@n='site-recent-submission']">
 					<h3>
 						<xsl:copy-of select="dri:head" />
 					</h3>
@@ -156,15 +183,71 @@
 								select="dri:p[@n='recent-submission-view-more']/dri:xref/node()" />
 						</xsl:with-param>
 					</xsl:call-template>
-					
-			</xsl:for-each>
+
+				</xsl:for-each>
 			</div>
 			<div class="col-md-5">
 				<xsl:call-template name="build-img">
-					<xsl:with-param name="img.src">images/generica_72.png</xsl:with-param>
+					<xsl:with-param name="img.src">
+						images/generica_72.png
+					</xsl:with-param>
 				</xsl:call-template>
 			</div>
 		</div>
-		
+
+	</xsl:template>
+
+	<!-- The header (distinct from the HTML head element) contains the title, 
+		subtitle, login box and various placeholders for header images -->
+	<xsl:template name="buildTrail">
+
+		<div class="row" id="cic-trail">
+			<ol class="breadcrumb">
+				<xsl:choose>
+					<!-- Static pages trail -->
+					<!-- <xsl:when test="starts-with($request-uri, 'page/')">
+						<li>
+							<xsl:call-template name="build-anchor">
+								<xsl:with-param name="a.href">
+									/
+								</xsl:with-param>
+								<xsl:with-param name="a.value">
+									<i18n:text>xmlui.general.dspace_home</i18n:text>
+								</xsl:with-param>
+							</xsl:call-template>
+						</li>
+						<li class="active">
+							<i18n:text>
+								<xsl:value-of
+									select="concat('xmlui.cicdigital.trail.',substring-after($request-uri,'/'))" />
+							</i18n:text>
+						</li>
+					</xsl:when> -->
+					
+					<!-- Dynamic pages trail -->
+					<xsl:when
+						test="count(/dri:document/dri:meta/dri:pageMeta/dri:trail/@target) > 0">
+						<xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:trail">
+
+							<!-- Solo se imprimen los elementos con un target y se omite el primer 
+								trail correspondiente al inicio -->
+							<xsl:if
+								test="@target and . != /dri:document/dri:meta/dri:pageMeta/dri:trail[1]">
+								<li>
+									<a>
+										<xsl:attribute name="href"><xsl:value-of
+											select="@target" /></xsl:attribute>
+										<xsl:copy-of select="." />
+									</a>
+								</li>
+							</xsl:if>
+						</xsl:for-each>
+					</xsl:when>
+					<xsl:otherwise>
+						<!-- No se muestra nada porque estamos en el home -->
+					</xsl:otherwise>
+				</xsl:choose>
+			</ol>
+		</div>
 	</xsl:template>
 </xsl:stylesheet>

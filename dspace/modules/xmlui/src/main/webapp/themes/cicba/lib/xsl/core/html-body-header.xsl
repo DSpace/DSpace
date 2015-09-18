@@ -313,58 +313,5 @@
 		</div>
 		
 			<xsl:call-template name="buildTopSidebar" />
-		<!--The trail is built by applying a template over pageMeta's trail children. -->
-		<xsl:call-template name="buildTrail" />
-	</xsl:template>
-
-
-
-	<!-- The header (distinct from the HTML head element) contains the title, 
-		subtitle, login box and various placeholders for header images -->
-	<xsl:template name="buildTrail">
-		<div class="row" id="cic-trail">
-		<ol class="breadcrumb">
-			<xsl:choose>
-				<!-- Static pages trail -->
-				<xsl:when test="starts-with($request-uri, 'page/')">
-					<li>
-						<xsl:call-template name="build-anchor">
-							<xsl:with-param name="a.href">/</xsl:with-param>
-							<xsl:with-param name="a.value">
-								<i18n:text>xmlui.general.dspace_home</i18n:text>
-							</xsl:with-param>
-						</xsl:call-template>
-					</li>
-					<li class="active">
-						<i18n:text>
-                        	<xsl:value-of select="concat('xmlui.cicdigital.trail.',substring-after($request-uri,'/'))"/>
-                         </i18n:text>
-					</li>
-				</xsl:when>
-				<xsl:when test="count(/dri:document/dri:meta/dri:pageMeta/dri:trail/@target) > 0">
-					<xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:trail">
-						<li>
-							<a>
-								<xsl:choose>
-									<xsl:when test="@target">
-										<xsl:attribute name="href"><xsl:value-of
-											select="@target" /></xsl:attribute>
-									</xsl:when>
-									<xsl:otherwise>
-										<xsl:attribute name="class">active</xsl:attribute>
-									</xsl:otherwise>
-								</xsl:choose>
-								<xsl:copy-of select="." />
-							</a>
-						</li>
-					</xsl:for-each>
-
-				</xsl:when>
-				<xsl:otherwise>
-					<!-- No se muestra nada porque estamos en el home -->
-				</xsl:otherwise>
-			</xsl:choose>
-		</ol>
-		</div>
 	</xsl:template>
 </xsl:stylesheet>
