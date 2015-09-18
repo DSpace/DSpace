@@ -88,7 +88,7 @@ public class ItemsResource extends Resource
     @GET
     @Path("/{item_id}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Item getItem(@PathParam("item_id") Integer itemId, @QueryParam("expand") String expand,
+    public Item getItem(@PathParam("item_id") String itemId, @QueryParam("expand") String expand,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
             @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
@@ -225,7 +225,7 @@ public class ItemsResource extends Resource
     @GET
     @Path("/{item_id}/metadata")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public MetadataEntry[] getItemMetadata(@PathParam("item_id") Integer itemId, @QueryParam("userIP") String user_ip,
+    public MetadataEntry[] getItemMetadata(@PathParam("item_id") String itemId, @QueryParam("userIP") String user_ip,
             @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
     {
@@ -283,7 +283,7 @@ public class ItemsResource extends Resource
     @GET
     @Path("/{item_id}/bitstreams")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Bitstream[] getItemBitstreams(@PathParam("item_id") Integer itemId,
+    public Bitstream[] getItemBitstreams(@PathParam("item_id") String itemId,
             @QueryParam("limit") @DefaultValue("20") Integer limit, @QueryParam("offset") @DefaultValue("0") Integer offset,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
             @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
@@ -355,7 +355,7 @@ public class ItemsResource extends Resource
     @POST
     @Path("/{item_id}/metadata")
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Response addItemMetadata(@PathParam("item_id") Integer itemId, List<org.dspace.rest.common.MetadataEntry> metadata,
+    public Response addItemMetadata(@PathParam("item_id") String itemId, List<org.dspace.rest.common.MetadataEntry> metadata,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
             @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
@@ -427,9 +427,9 @@ public class ItemsResource extends Resource
     // TODO Add option to add bitstream by URI.(for very big files)
     @POST
     @Path("/{item_id}/bitstreams")
-    public Bitstream addItemBitstream(@PathParam("item_id") Integer itemId, InputStream inputStream,
+    public Bitstream addItemBitstream(@PathParam("item_id") String itemId, InputStream inputStream,
             @QueryParam("name") String name, @QueryParam("description") String description,
-            @QueryParam("groupId") Integer groupId, @QueryParam("year") Integer year, @QueryParam("month") Integer month,
+            @QueryParam("groupId") String groupId, @QueryParam("year") Integer year, @QueryParam("month") Integer month,
             @QueryParam("day") Integer day, @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
             @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
@@ -511,7 +511,7 @@ public class ItemsResource extends Resource
 
                     org.dspace.authorize.ResourcePolicy dspacePolicy = resourcePolicyService.create(context);
                     dspacePolicy.setAction(org.dspace.core.Constants.READ);
-                    dspacePolicy.setGroup(groupService.findByLegacyId(context, groupId));
+                    dspacePolicy.setGroup(groupService.findByIdOrLegacyId(context, groupId));
                     dspacePolicy.setdSpaceObject(dspaceBitstream);
                     if ((year != null) || (month != null) || (day != null))
                     {
@@ -538,7 +538,7 @@ public class ItemsResource extends Resource
                 }
             }
 
-            dspaceBitstream = bitstreamService.findByLegacyId(context, dspaceBitstream.getLegacyId());
+            dspaceBitstream = bitstreamService.find(context, dspaceBitstream.getID());
             bitstream = new Bitstream(dspaceBitstream, "", context);
 
             context.complete();
@@ -594,7 +594,7 @@ public class ItemsResource extends Resource
     @PUT
     @Path("/{item_id}/metadata")
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Response updateItemMetadata(@PathParam("item_id") Integer itemId, MetadataEntry[] metadata,
+    public Response updateItemMetadata(@PathParam("item_id") String itemId, MetadataEntry[] metadata,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
             @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
@@ -672,7 +672,7 @@ public class ItemsResource extends Resource
      */
     @DELETE
     @Path("/{item_id}")
-    public Response deleteItem(@PathParam("item_id") Integer itemId, @QueryParam("userIP") String user_ip,
+    public Response deleteItem(@PathParam("item_id") String itemId, @QueryParam("userIP") String user_ip,
             @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
     {
@@ -688,7 +688,7 @@ public class ItemsResource extends Resource
             writeStats(dspaceItem, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwardedfor, headers, request, context);
 
             log.trace("Deleting item.");
-            org.dspace.content.Collection collection = collectionService.findByLegacyId(context, dspaceItem.getCollections().get(0).getLegacyId());
+            org.dspace.content.Collection collection = collectionService.find(context, dspaceItem.getCollections().get(0).getID());
             collectionService.removeItem(context, collection, dspaceItem);
             context.complete();
 
@@ -740,7 +740,7 @@ public class ItemsResource extends Resource
      */
     @DELETE
     @Path("/{item_id}/metadata")
-    public Response deleteItemMetadata(@PathParam("item_id") Integer itemId, @QueryParam("userIP") String user_ip,
+    public Response deleteItemMetadata(@PathParam("item_id") String itemId, @QueryParam("userIP") String user_ip,
             @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
     {
@@ -814,7 +814,7 @@ public class ItemsResource extends Resource
      */
     @DELETE
     @Path("/{item_id}/bitstreams/{bitstream_id}")
-    public Response deleteItemBitstream(@PathParam("item_id") Integer itemId, @PathParam("bitstream_id") Integer bitstreamId,
+    public Response deleteItemBitstream(@PathParam("item_id") String itemId, @PathParam("bitstream_id") String bitstreamId,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
             @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
@@ -828,7 +828,7 @@ public class ItemsResource extends Resource
             context = createContext(getUser(headers));
             org.dspace.content.Item item = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
-            org.dspace.content.Bitstream bitstream = bitstreamService.findByLegacyId(context, bitstreamId);
+            org.dspace.content.Bitstream bitstream = bitstreamService.findByIdOrLegacyId(context, bitstreamId);
             if (bitstream == null)
             {
                 context.abort();
@@ -989,12 +989,12 @@ public class ItemsResource extends Resource
      *             Is thrown when item with passed id is not exists and if user
      *             has no permission to do passed action.
      */
-    private org.dspace.content.Item findItem(org.dspace.core.Context context, int id, int action) throws WebApplicationException
+    private org.dspace.content.Item findItem(org.dspace.core.Context context, String id, int action) throws WebApplicationException
     {
         org.dspace.content.Item item = null;
         try
         {
-            item = itemService.findByLegacyId(context, id);
+            item = itemService.findByIdOrLegacyId(context, id);
 
             if (item == null)
             {

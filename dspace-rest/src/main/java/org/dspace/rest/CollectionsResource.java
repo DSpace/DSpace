@@ -96,7 +96,7 @@ public class CollectionsResource extends Resource
     @GET
     @Path("/{collection_id}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public org.dspace.rest.common.Collection getCollection(@PathParam("collection_id") Integer collectionId,
+    public org.dspace.rest.common.Collection getCollection(@PathParam("collection_id") String collectionId,
             @QueryParam("expand") String expand, @QueryParam("limit") @DefaultValue("100") Integer limit,
             @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("userIP") String user_ip,
             @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
@@ -251,7 +251,7 @@ public class CollectionsResource extends Resource
     @GET
     @Path("/{collection_id}/items")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public org.dspace.rest.common.Item[] getCollectionItems(@PathParam("collection_id") Integer collectionId,
+    public org.dspace.rest.common.Item[] getCollectionItems(@PathParam("collection_id") String collectionId,
             @QueryParam("expand") String expand, @QueryParam("limit") @DefaultValue("100") Integer limit,
             @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("userIP") String user_ip,
             @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
@@ -332,7 +332,7 @@ public class CollectionsResource extends Resource
     @POST
     @Path("/{collection_id}/items")
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Item addCollectionItem(@PathParam("collection_id") Integer collectionId, Item item,
+    public Item addCollectionItem(@PathParam("collection_id") String collectionId, Item item,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
             @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
@@ -427,7 +427,7 @@ public class CollectionsResource extends Resource
     @PUT
     @Path("/{collection_id}")
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Response updateCollection(@PathParam("collection_id") Integer collectionId,
+    public Response updateCollection(@PathParam("collection_id") String collectionId,
             org.dspace.rest.common.Collection collection, @QueryParam("userIP") String user_ip,
             @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
@@ -496,7 +496,7 @@ public class CollectionsResource extends Resource
     @DELETE
     @Path("/{collection_id}")
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Response deleteCollection(@PathParam("collection_id") Integer collectionId, @QueryParam("userIP") String user_ip,
+    public Response deleteCollection(@PathParam("collection_id") String collectionId, @QueryParam("userIP") String user_ip,
             @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
     {
@@ -563,7 +563,7 @@ public class CollectionsResource extends Resource
     @DELETE
     @Path("/{collection_id}/items/{item_id}")
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Response deleteCollectionItem(@PathParam("collection_id") Integer collectionId, @PathParam("item_id") Integer itemId,
+    public Response deleteCollectionItem(@PathParam("collection_id") String collectionId, @PathParam("item_id") String itemId,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
             @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
@@ -576,8 +576,8 @@ public class CollectionsResource extends Resource
         {
             context = createContext(getUser(headers));
 
-            org.dspace.content.Collection dspaceCollection = collectionService.findByLegacyId(context, collectionId);
-            org.dspace.content.Item item = itemService.findByLegacyId(context, itemId);
+            org.dspace.content.Collection dspaceCollection = collectionService.findByIdOrLegacyId(context, collectionId);
+            org.dspace.content.Item item = itemService.findByIdOrLegacyId(context, itemId);
 
 
             if(dspaceCollection == null) {
@@ -731,13 +731,13 @@ public class CollectionsResource extends Resource
      *             Is thrown when item with passed id is not exists and if user
      *             has no permission to do passed action.
      */
-    private org.dspace.content.Collection findCollection(org.dspace.core.Context context, int id, int action)
+    private org.dspace.content.Collection findCollection(org.dspace.core.Context context, String id, int action)
             throws WebApplicationException
     {
         org.dspace.content.Collection collection = null;
         try
         {
-            collection = collectionService.findByLegacyId(context, id);
+            collection = collectionService.findByIdOrLegacyId(context, id);
 
             if (collection == null)
             {

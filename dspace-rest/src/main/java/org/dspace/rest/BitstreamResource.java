@@ -98,7 +98,7 @@ public class BitstreamResource extends Resource
     @GET
     @Path("/{bitstream_id}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Bitstream getBitstream(@PathParam("bitstream_id") Integer bitstreamId, @QueryParam("expand") String expand,
+    public Bitstream getBitstream(@PathParam("bitstream_id") String bitstreamId, @QueryParam("expand") String expand,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
             @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
@@ -154,7 +154,7 @@ public class BitstreamResource extends Resource
     @GET
     @Path("/{bitstream_id}/policy")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public ResourcePolicy[] getBitstreamPolicies(@PathParam("bitstream_id") Integer bitstreamId, @Context HttpHeaders headers)
+    public ResourcePolicy[] getBitstreamPolicies(@PathParam("bitstream_id") String bitstreamId, @Context HttpHeaders headers)
     {
 
         log.info("Reading bitstream(id=" + bitstreamId + ") policies.");
@@ -294,7 +294,7 @@ public class BitstreamResource extends Resource
      */
     @GET
     @Path("/{bitstream_id}/retrieve")
-    public javax.ws.rs.core.Response getBitstreamData(@PathParam("bitstream_id") Integer bitstreamId,
+    public javax.ws.rs.core.Response getBitstreamData(@PathParam("bitstream_id") String bitstreamId,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
             @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
@@ -364,7 +364,7 @@ public class BitstreamResource extends Resource
     @POST
     @Path("/{bitstream_id}/policy")
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public javax.ws.rs.core.Response addBitstreamPolicy(@PathParam("bitstream_id") Integer bitstreamId, ResourcePolicy policy,
+    public javax.ws.rs.core.Response addBitstreamPolicy(@PathParam("bitstream_id") String bitstreamId, ResourcePolicy policy,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
             @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
@@ -435,7 +435,7 @@ public class BitstreamResource extends Resource
     @PUT
     @Path("/{bitstream_id}")
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Response updateBitstream(@PathParam("bitstream_id") Integer bitstreamId, Bitstream bitstream,
+    public Response updateBitstream(@PathParam("bitstream_id") String bitstreamId, Bitstream bitstream,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
             @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
@@ -540,7 +540,7 @@ public class BitstreamResource extends Resource
     // TODO Change to better logic, without editing database.
     @PUT
     @Path("/{bitstream_id}/data")
-    public Response updateBitstreamData(@PathParam("bitstream_id") Integer bitstreamId, InputStream is,
+    public Response updateBitstreamData(@PathParam("bitstream_id") String bitstreamId, InputStream is,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
             @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
@@ -610,7 +610,7 @@ public class BitstreamResource extends Resource
      */
     @DELETE
     @Path("/{bitstream_id}")
-    public Response deleteBitstream(@PathParam("bitstream_id") Integer bitstreamId, @QueryParam("userIP") String user_ip,
+    public Response deleteBitstream(@PathParam("bitstream_id") String bitstreamId, @QueryParam("userIP") String user_ip,
             @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
     {
@@ -670,7 +670,7 @@ public class BitstreamResource extends Resource
      */
     @DELETE
     @Path("/{bitstream_id}/policy/{policy_id}")
-    public javax.ws.rs.core.Response deleteBitstreamPolicy(@PathParam("bitstream_id") Integer bitstreamId,
+    public javax.ws.rs.core.Response deleteBitstreamPolicy(@PathParam("bitstream_id") String bitstreamId,
             @PathParam("policy_id") Integer policyId, @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
             @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
@@ -687,7 +687,7 @@ public class BitstreamResource extends Resource
                     request, context);
 
             org.dspace.authorize.ResourcePolicy resourcePolicy = resourcePolicyService.find(context, policyId);
-            if(resourcePolicy.getdSpaceObject() == dspaceBitstream && authorizeService.authorizeActionBoolean(context, dspaceBitstream, org.dspace.core.Constants.REMOVE)) {
+            if(resourcePolicy.getdSpaceObject().getID() == dspaceBitstream.getID() && authorizeService.authorizeActionBoolean(context, dspaceBitstream, org.dspace.core.Constants.REMOVE)) {
 
                 try {
                     resourcePolicyService.delete(context, resourcePolicy);
@@ -766,13 +766,13 @@ public class BitstreamResource extends Resource
      *             Is thrown when item with passed id is not exists and if user
      *             has no permission to do passed action.
      */
-    private org.dspace.content.Bitstream findBitstream(org.dspace.core.Context context, int id, int action)
+    private org.dspace.content.Bitstream findBitstream(org.dspace.core.Context context, String id, int action)
             throws WebApplicationException
     {
         org.dspace.content.Bitstream bitstream = null;
         try
         {
-            bitstream = bitstreamService.findByIdOrLegacyId(context, Integer.toString(id));
+            bitstream = bitstreamService.findByIdOrLegacyId(context, id);
 
             if ((bitstream == null) || (bitstreamService.getParentObject(context, bitstream) == null))
             {
