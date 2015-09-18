@@ -499,7 +499,7 @@ public class ItemsResource extends Resource
                     // Remove default bitstream policies
                     List<org.dspace.authorize.ResourcePolicy> policiesToRemove = new ArrayList<org.dspace.authorize.ResourcePolicy>();
                     for (org.dspace.authorize.ResourcePolicy policy : bitstreamsPolicies) {
-                        if (policy.getdSpaceObject().getID() == dspaceBitstream.getID())
+                        if (policy.getdSpaceObject().getID().equals(dspaceBitstream.getID()))
                         {
                             policiesToRemove.add(policy);
                         }
@@ -631,6 +631,8 @@ public class ItemsResource extends Resource
                     itemService.addMetadata(context, dspaceItem, data[0], data[1], data[2], entry.getLanguage(), entry.getValue());
                 }
             }
+            //Update the item to ensure that all the events get fired.
+            itemService.update(context, dspaceItem);
 
             context.complete();
 
@@ -643,8 +645,10 @@ public class ItemsResource extends Resource
         {
             processException(
                     "Could not update metadata in item(id=" + itemId + "), ContextException. Message: " + e.getMessage(), context);
-        }
-        finally
+        } catch (AuthorizeException e) {
+            processException(
+                    "Could not update metadata in item(id=" + itemId + "), AuthorizeException. Message: " + e.getMessage(), context);
+        } finally
         {
             processFinally(context);
         }
@@ -857,8 +861,9 @@ public class ItemsResource extends Resource
                 while (bundleBitstreamIterator.hasNext())
                 {
                     BundleBitstream bundleBitstream = bundleBitstreamIterator.next();
-                    if (bundleBitstream.getBitstream().getID() == bitstream.getID())
+                    if (bundleBitstream.getBitstream().getID().equals(bitstream.getID()))
                     {
+                        bundleBitstreamIterator.remove();
                         bundleService.removeBitstream(context, bundle, bitstream);
                     }
                 }

@@ -94,7 +94,7 @@ public class Bitstream extends DSpaceObject {
 			for (BundleBitstream bundleBitstream : bundleBitstreams) {
 				List<org.dspace.authorize.ResourcePolicy> bitstreamsPolicies = bundleService.getBitstreamPolicies(context, bundleBitstream.getBundle());
 				for (org.dspace.authorize.ResourcePolicy policy : bitstreamsPolicies) {
-                    if(policy.getdSpaceObject() == bitstream) {
+                    if(policy.getdSpaceObject().equals(bitstream)) {
                         tempPolicies.add(new ResourcePolicy(policy));
                     }
 				}
