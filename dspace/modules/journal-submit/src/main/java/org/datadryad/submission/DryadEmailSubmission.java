@@ -449,7 +449,7 @@ public class DryadEmailSubmission extends HttpServlet {
                 }
             } catch (SQLException e) {
                 context.abort();
-                throw new RuntimeException("Context.complete threw an exception, aborting instead");
+                throw new RuntimeException("Context.complete threw an exception, aborting instead", e);
             }
         }
         return result;
