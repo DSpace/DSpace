@@ -119,10 +119,10 @@ public class Item extends DSpaceObject {
             List<Bundle> bundles = item.getBundles();
             for(Bundle bundle : bundles) {
 
-                List<org.dspace.content.BundleBitstream> itemBundleBitstreams = bundle.getBitstreams();
-                for(org.dspace.content.BundleBitstream itemBundleBitstream : itemBundleBitstreams) {
-                    if(authorizeService.authorizeActionBoolean(context, itemBundleBitstream.getBitstream(), org.dspace.core.Constants.READ)) {
-                        bitstreams.add(new Bitstream(itemBundleBitstream.getBitstream(), null, context));
+                List<org.dspace.content.Bitstream> itemBitstreams = bundle.getBitstreams();
+                for(org.dspace.content.Bitstream itemBitstream : itemBitstreams) {
+                    if(authorizeService.authorizeActionBoolean(context, itemBitstream, org.dspace.core.Constants.READ)) {
+                        bitstreams.add(new Bitstream(itemBitstream, null, context));
                     }
                 }
             }
