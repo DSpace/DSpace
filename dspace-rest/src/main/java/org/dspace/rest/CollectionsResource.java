@@ -371,6 +371,7 @@ public class CollectionsResource extends Resource
 
             log.trace("Installing item to collection(id=" + collectionId + ").");
             dspaceItem = installItemService.installItem(context, workspaceItem);
+            workspaceItemService.update(context, workspaceItem);
 
             returnItem = new Item(dspaceItem, "", context);
 
@@ -453,6 +454,7 @@ public class CollectionsResource extends Resource
             collectionService.setMetadata(context, dspaceCollection, org.dspace.content.Collection.INTRODUCTORY_TEXT, collection.getIntroductoryText());
             collectionService.setMetadata(context, dspaceCollection, org.dspace.content.Collection.SHORT_DESCRIPTION, collection.getShortDescription());
             collectionService.setMetadata(context, dspaceCollection, org.dspace.content.Collection.SIDEBAR_TEXT, collection.getSidebarText());
+            collectionService.update(context, dspaceCollection);
 
             context.complete();
 
@@ -465,8 +467,9 @@ public class CollectionsResource extends Resource
         catch (SQLException e)
         {
             processException("Could not update collection(id=" + collectionId + "), SQLException. Message: " + e, context);
-        }
-        finally
+        } catch (AuthorizeException e) {
+            processException("Could not update collection(id=" + collectionId + "), AuthorizeException. Message: " + e, context);
+        } finally
         {
             processFinally(context);
         }
@@ -514,6 +517,7 @@ public class CollectionsResource extends Resource
                     headers, request, context);
 
             collectionService.delete(context, dspaceCollection);
+            collectionService.update(context, dspaceCollection);
         }
         catch (ContextException e)
         {
@@ -607,6 +611,8 @@ public class CollectionsResource extends Resource
             }
 
             collectionService.removeItem(context, dspaceCollection, item);
+            collectionService.update(context, dspaceCollection);
+            itemService.update(context, item);
 
             writeStats(dspaceCollection, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
                     headers, request, context);

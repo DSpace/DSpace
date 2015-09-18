@@ -496,6 +496,7 @@ public class CommunitiesResource extends Resource
             communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.INTRODUCTORY_TEXT, community.getIntroductoryText());
             communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.SHORT_DESCRIPTION, community.getShortDescription());
             communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.SIDEBAR_TEXT, community.getSidebarText());
+            communityService.update(context, dspaceCommunity);
 
             retCommunity = new Community(dspaceCommunity, "", context);
             context.complete();
@@ -557,13 +558,11 @@ public class CommunitiesResource extends Resource
         try
         {
             context = createContext(getUser(headers));
-            org.dspace.content.Community dspaceCommunity = findCommunity(context, communityId, org.dspace.core.Constants.WRITE);
 
+            org.dspace.content.Community dspaceCommunity = findCommunity(context, communityId, org.dspace.core.Constants.WRITE);
             writeStats(dspaceCommunity, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
                     headers, request, context);
-
             org.dspace.content.Collection dspaceCollection = collectionService.create(context, dspaceCommunity);
-
             collectionService.setMetadata(context, dspaceCollection, "license", collection.getLicense());
             // dspaceCollection.setLogo(collection.getLogo()); // TODO Add this option.
             collectionService.setMetadata(context, dspaceCollection, "name", collection.getName());
@@ -571,7 +570,8 @@ public class CommunitiesResource extends Resource
             collectionService.setMetadata(context, dspaceCollection, org.dspace.content.Collection.INTRODUCTORY_TEXT, collection.getIntroductoryText());
             collectionService.setMetadata(context, dspaceCollection, org.dspace.content.Collection.SHORT_DESCRIPTION, collection.getShortDescription());
             collectionService.setMetadata(context, dspaceCollection, org.dspace.content.Collection.SIDEBAR_TEXT, collection.getSidebarText());
-
+            collectionService.update(context, dspaceCollection);
+            communityService.update(context, dspaceCommunity);
             retCollection = new Collection(dspaceCollection, "", context, 100, 0);
             context.complete();
 
@@ -651,6 +651,8 @@ public class CommunitiesResource extends Resource
             communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.INTRODUCTORY_TEXT, community.getIntroductoryText());
             communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.SHORT_DESCRIPTION, community.getShortDescription());
             communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.SIDEBAR_TEXT, community.getSidebarText());
+            communityService.update(context, dspaceCommunity);
+            communityService.update(context, dspaceParentCommunity);
 
             retCommunity = new Community(dspaceCommunity, "", context);
             context.complete();
@@ -727,7 +729,7 @@ public class CommunitiesResource extends Resource
             communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.INTRODUCTORY_TEXT, community.getIntroductoryText());
             communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.SHORT_DESCRIPTION, community.getShortDescription());
             communityService.setMetadata(context, dspaceCommunity, org.dspace.content.Community.SIDEBAR_TEXT, community.getSidebarText());
-
+            communityService.update(context, dspaceCommunity);
             context.complete();
 
         }
@@ -738,8 +740,9 @@ public class CommunitiesResource extends Resource
         catch (ContextException e)
         {
             processException("Could not update community(id=" + communityId + "), ContextException Message:" + e, context);
-        }
-        finally
+        } catch (AuthorizeException e) {
+            processException("Could not update community(id=" + communityId + "), AuthorizeException Message:" + e, context);
+        } finally
         {
             processFinally(context);
         }
@@ -784,6 +787,7 @@ public class CommunitiesResource extends Resource
                     request, context);
 
             communityService.delete(context, community);
+            communityService.update(context, community);
             context.complete();
 
         }
@@ -873,6 +877,8 @@ public class CommunitiesResource extends Resource
             }
 
             communityService.removeCollection(context, community, collection);
+            communityService.update(context, community);
+            collectionService.update(context, collection);
 
             writeStats(community, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers,
                     request, context);
@@ -972,6 +978,8 @@ public class CommunitiesResource extends Resource
             }
 
             communityService.removeSubcommunity(context, parentCommunity, subcommunity);
+            communityService.update(context, parentCommunity);
+            communityService.update(context, subcommunity);
 
             writeStats(parentCommunity, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
                     headers, request, context);
