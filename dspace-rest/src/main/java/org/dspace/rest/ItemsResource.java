@@ -499,7 +499,7 @@ public class ItemsResource extends Resource
                     // Remove default bitstream policies
                     List<org.dspace.authorize.ResourcePolicy> policiesToRemove = new ArrayList<org.dspace.authorize.ResourcePolicy>();
                     for (org.dspace.authorize.ResourcePolicy policy : bitstreamsPolicies) {
-                        if (policy.getdSpaceObject() == dspaceBitstream)
+                        if (policy.getdSpaceObject().getID() == dspaceBitstream.getID())
                         {
                             policiesToRemove.add(policy);
                         }
@@ -853,7 +853,7 @@ public class ItemsResource extends Resource
             {
                 for (org.dspace.content.BundleBitstream bit : bundle.getBitstreams())
                 {
-                    if (bit.getBitstream() == bitstream)
+                    if (bundleBitstream.getBitstream().getID() == bitstream.getID())
                     {
                         bundleService.removeBitstream(context, bundle, bitstream);
                     }
