@@ -143,7 +143,14 @@ public class Item extends DSpaceObject implements BrowsableDSpaceObject
 
         if (fromCache != null)
         {
-            return fromCache.getWrapper();
+            if (context.isRequiredItemWrapper())
+            {
+                return fromCache.getWrapper();
+            }
+            else
+            {
+                return fromCache;
+            }
         }
 
         TableRow row = DatabaseManager.find(context, "item", id);
@@ -167,6 +174,9 @@ public class Item extends DSpaceObject implements BrowsableDSpaceObject
         }
 
         Item item = new Item(context, row);
+        if (!context.isRequiredItemWrapper()) {
+            return item;    
+        }
         return item.getWrapper();
     }
 

@@ -25,6 +25,7 @@ import javax.sql.DataSource;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.EPersonCRISIntegration;
+import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.event.Dispatcher;
@@ -101,6 +102,11 @@ public class Context
     /** options */
     private short options = 0;
 
+    /**
+     * Check to get ItemWrapper on demand {@link Item}
+     */
+    private boolean requiredItemWrapper = true;
+    
     /**
      * Construct a new context object with default options. A database connection is opened.
      * No user is authenticated.
@@ -728,5 +734,15 @@ public class Context
         }
 
         super.finalize();
+    }
+
+    public boolean isRequiredItemWrapper()
+    {
+        return requiredItemWrapper;
+    }
+
+    public void setRequiredItemWrapper(boolean requiredItemWrapper)
+    {
+        this.requiredItemWrapper = requiredItemWrapper;
     }
 }

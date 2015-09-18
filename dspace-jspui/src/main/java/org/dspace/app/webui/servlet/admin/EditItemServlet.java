@@ -113,11 +113,10 @@ public class EditItemServlet extends DSpaceServlet
 
         // See if an item ID or Handle was passed in
         Item itemToEdit = null;
-
+        context.setRequiredItemWrapper(false);
         if (internalID > 0)
         {
             itemToEdit = Item.find(context, internalID);
-
             showError = (itemToEdit == null);
         }
         else if ((handle != null) && !handle.equals(""))
@@ -136,7 +135,8 @@ public class EditItemServlet extends DSpaceServlet
                 showError = true;
             }
         }
-
+        context.setRequiredItemWrapper(true);
+        
         // Show edit form if appropriate
         if (itemToEdit != null)
         {
@@ -187,10 +187,10 @@ public class EditItemServlet extends DSpaceServlet
          * indicating what needs to be done (from the constants above.)
          */
         int action = UIUtil.getIntParameter(request, "action");
-
+        context.setRequiredItemWrapper(false);
         Item item = Item.find(context, UIUtil.getIntParameter(request,
                 "item_id"));
- 
+        context.setRequiredItemWrapper(true);
         String handle = HandleManager.findHandle(context, item);
 
         // now check to see if person can edit item
