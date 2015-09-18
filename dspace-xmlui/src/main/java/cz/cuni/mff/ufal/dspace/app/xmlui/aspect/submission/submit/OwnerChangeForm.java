@@ -76,8 +76,15 @@ public class OwnerChangeForm extends AbstractDSpaceTransformer {
         if(eperson == null || eperson.getID() < 1){
             throw new AuthorizeException("You are not authorized to view this page.");
         }
+
         if(id != -1){
-            Item item = WorkspaceItem.find(context, id).getItem();
+            WorkspaceItem wi = WorkspaceItem.find(context, id);
+            Item item = wi.getItem();
+            Request request = ObjectModelHelper.getRequest(objectModel);
+            String paramToken = request.getParameter("share_token");
+            if(paramToken == null || paramToken.equals("") || !wi.getShareToken().equals(paramToken)){
+                throw new AuthorizeException("Invalid token.");
+            }
             EPerson sub = item.getSubmitter();
             div.addPara(String.format("This items currently belongs to %s (%s)", sub.getFullName(), sub.getEmail()));
             div.addList("buttons-list").addItem().addButton("submit_own").setValue("Take It");

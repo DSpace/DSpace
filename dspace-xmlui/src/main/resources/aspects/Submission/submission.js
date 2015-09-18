@@ -234,6 +234,14 @@ function doSubmission()
                    getDSContext().complete();
                    cocoon.exit();
                }
+               else if (cocoon.request.get("submit_share"))
+               {
+                    FlowUtils.shareSubmission(getObjectModel(), workspaceID);
+                    var contextPath = cocoon.request.getContextPath();
+                    cocoon.redirectTo(contextPath+"/submissions",true);
+                    getDSContext().complete();
+                    cocoon.exit();
+               }
 
 
            } while (1 == 1)
@@ -242,7 +250,6 @@ function doSubmission()
        }
        else{
            //change the submitter if "checks" pass
-           //TODO we should at least send an email, this might expose submission data without proper license
            do {
                sendPageAndWait("handle/" + handle + "/submit/ownerChange",
                    {"id": workspaceID});

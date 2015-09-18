@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
 
+import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
@@ -31,8 +32,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
-import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.*;
 import org.dspace.handle.HandleManager;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.workflow.WorkflowItem;
@@ -422,5 +422,30 @@ public class FlowUtils {
 
         //convert into an array and return that
         return listStepNumbers.toArray(new StepAndPage[listStepNumbers.size()]);
+    }
+
+    public static void shareSubmission(Map objectModel, String workspaceID) throws IOException, AuthorizeException, SQLException, MessagingException {
+        Context context = ContextUtil.obtainContext(objectModel);
+        if(workspaceID.startsWith("S")){
+            workspaceID = workspaceID.substring(1);
+        }
+        WorkspaceItem wi = WorkspaceItem.find(context, Integer.parseInt(workspaceID));
+        String token = wi.getShareToken();
+        wi.update();
+
+        Email email2User = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "share_submission"));
+        String email = context.getCurrentUser().getEmail();
+        if(email!=null && !email.isEmpty()) {
+            email2User.addRecipient(email);
+        }
+        String contextPath = ObjectModelHelper.getRequest(objectModel).getContextPath();
+        String base = ConfigurationManager.getProperty("dspace.baseUrl");
+        if(base.endsWith("/")){
+            base = base.substring(0,base.length() - 1);
+        }
+        String link = base + contextPath + "/submit?workspaceID=" + workspaceID + "&share_token=" + token;
+        email2User.addArgument(link);
+
+        email2User.send();
     }
 }
