@@ -4,9 +4,7 @@
 <hibernate-configuration>
     <session-factory>
 
-        <property name="hibernate.connection.driver_class">${db.driver}</property>
         <property name="hibernate.dialect">${db.dialect}</property>
-        <property name="hibernate.connection.url">${db.url}</property>
         <!--
          Schema name - if your database contains multiple schemas, you can avoid
          problems with retrieving the definitions of duplicate object names by
@@ -16,8 +14,6 @@
          UNLESS your Oracle DB Account (in db.username) has access to multiple schemas.
         -->
         <property name="hibernate.default_schema">${db.schema}</property>
-        <property name="hibernate.connection.username">${db.username}</property>
-        <property name="hibernate.connection.password">${db.password}</property>
         <property name="hibernate.hbm2ddl.auto">validate</property>
         <property name="hibernate.hbm2ddl.import_files_sql_extractor">org.hibernate.tool.hbm2ddl.SingleLineSqlCommandExtractor</property>
         <property name="hibernate.connection.autocommit">false</property>
