@@ -109,6 +109,8 @@ public class AbstractUnitTest
             {
                 kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
             }
+            //Clear our old flyway object
+            DatabaseUtils.clearFlywayDBCache();
             //Migrate & setup our database
             DatabaseUtils.main(new String[]{"migrate"});
 

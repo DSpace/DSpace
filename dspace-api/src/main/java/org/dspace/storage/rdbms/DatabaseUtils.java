@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Locale;
 import javax.sql.DataSource;
 
-import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
@@ -322,11 +322,6 @@ public class DatabaseUtils
                 // NOTE: DatabaseLegacyReindexer only indexes in Legacy Lucene & RDBMS indexes. It can be removed once those are obsolete.
                 List<FlywayCallback> flywayCallbacks = new DSpace().getServiceManager().getServicesByType(FlywayCallback.class);
                 flywaydb.setCallbacks(flywayCallbacks.toArray(new FlywayCallback[flywayCallbacks.size()]));
-
-                // Set flyway callbacks (i.e. classes which are called post-DB migration and similar)
-                // In this situation, we have a Registry Updater that runs PRE-migration
-                // NOTE: DatabaseLegacyReindexer only indexes in Legacy Lucene & RDBMS indexes. It can be removed once those are obsolete.
-//                flywaydb.setCallbacks(new DatabaseRegistryUpdater(), new DatabaseLegacyReindexer());
             }
             catch(SQLException e)
             {
@@ -1140,6 +1135,14 @@ public class DatabaseUtils
         {
             return null;
         }
+    }
+
+    /**
+     * In case of a unit test the flyway db is cached to long leading to exceptions, we need to clear the object
+     */
+    public static void clearFlywayDBCache()
+    {
+        flywaydb = null;
     }
 
 }
