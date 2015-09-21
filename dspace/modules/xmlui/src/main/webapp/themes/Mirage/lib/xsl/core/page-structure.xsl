@@ -468,7 +468,7 @@ references to stylesheets pulled directly from the pageMeta element. -->
                                   <a href="/pages/faq">FAQs</a>
                                 </li>
                                 <li>
-                                  <a href="/pages/workWithDryadLab" target="_blank">Educational outreach with DryadLab</a>
+                                  <a href="/pages/dryadlab" target="_blank">Educational outreach with DryadLab</a>
                                 </li>
                                 <li>
                                   <a href="/pages/institutionalSponsors">Institutional sponsors</a>
