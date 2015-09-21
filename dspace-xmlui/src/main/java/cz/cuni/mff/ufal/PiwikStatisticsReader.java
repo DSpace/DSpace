@@ -7,6 +7,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -54,7 +55,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class PiwikStatisticsReader extends AbstractReader {
-	
+
 	private static Logger log = Logger.getLogger(PiwikStatisticsReader.class);
 	
     /** The Cocoon response */
@@ -73,11 +74,17 @@ public class PiwikStatisticsReader extends AbstractReader {
     
     
     /** Piwik configurations */
-    private static final String PIWIK_API_URL = ConfigurationManager.getProperty("lr", "lr.statistics.api.url");
-    private static final String PIWIK_AUTH_TOKEN = ConfigurationManager.getProperty("lr", "lr.statistics.api.auth.token");
-    private static final String PIWIK_SITE_ID = ConfigurationManager.getProperty("lr", "lr.statistics.api.site_id");
-    private static final String PIWIK_DOWNLOAD_SITE_ID = ConfigurationManager.getProperty("lr", "lr.tracker.bitstream.site_id");
-    
+    private static final String PIWIK_API_URL = ConfigurationManager.getProperty(
+		"lr", "lr.statistics.api.url");
+    private static final String PIWIK_AUTH_TOKEN = ConfigurationManager.getProperty(
+		"lr", "lr.statistics.api.auth.token");
+    private static final String PIWIK_SITE_ID = ConfigurationManager.getProperty(
+		"lr", "lr.statistics.api.site_id");
+	private static final String PIWIK_DOWNLOAD_SITE_ID = ConfigurationManager.getProperty(
+		"lr", "lr.tracker.bitstream.site_id");
+	private static final int PIWIK_SHOW_LAST_N_DAYS = ConfigurationManager.getIntProperty(
+		"lr", "lr.statistics.show_last_n", 7);
+
     /**
      * Set up the PiwikStatisticsReader
      *
@@ -129,50 +136,76 @@ public class PiwikStatisticsReader extends AbstractReader {
 	@Override
 	public void generate() throws IOException, SAXException, ProcessingException {
 		try {
+			// should contain the period
 			String queryString = request.getQueryString();
-			
-			String module = request.getParameter("module");
-			String method = request.getParameter("method");
+
 			String format = request.getParameter("format");
-			
 			if(format==null || format.isEmpty()) {
 				format = "xml";
 			}
-			
-			if(module!=null && !module.equals("API")) {
-				throw new Exception("Only piwik module=API requests are processed.");
+			int last_n = PIWIK_SHOW_LAST_N_DAYS;
+			String last_n_param = request.getParameter("last_n");
+			if (null != last_n_param) {
+				last_n = Integer.parseInt(last_n_param);
 			}
-			
-			
-			if(method!=null && method.equals("API.get")) {
-				Calendar cal = Calendar.getInstance();
-				Date today = cal.getTime();
-				cal.add(Calendar.DATE, -7);
-				Date weekBefore = cal.getTime();
-				
-				SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-				
-				String url = PIWIK_API_URL + rest + "?" + queryString + "&date=" + df.format(weekBefore) + "," + df.format(today) + "&idSite=" + PIWIK_SITE_ID + "&token_auth=" + PIWIK_AUTH_TOKEN + "&segment=pageUrl=@" + item.getHandle();																			
-				String downloadURL = PIWIK_API_URL + rest + "?" + queryString + "&date=" + df.format(weekBefore) + "," + df.format(today) + "&idSite=" + PIWIK_DOWNLOAD_SITE_ID + "&token_auth=" + PIWIK_AUTH_TOKEN + "&segment=pageUrl=@" + item.getHandle();				
-				String report = PiwikHelper.readFromURL(url);
-				String downloadReport = PiwikHelper.readFromURL(downloadURL);
-				
-				String merge = "";
 
-				if(format.equalsIgnoreCase("xml")) {
-					merge = PiwikHelper.mergeXML(report, downloadReport);
-				} else
-				if(format.equalsIgnoreCase("json")) {
-					merge = PiwikHelper.mergeJSON(report, downloadReport);
+			Calendar cal = Calendar.getInstance();
+			Date today = cal.getTime();
+			cal.add(Calendar.DATE, -last_n);
+			Date weekBefore = cal.getTime();
+
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
+			String urlParams =
+				  "&date=" + df.format(weekBefore) + "," + df.format(today)
+				+ "&idSite=" + PIWIK_SITE_ID
+				+ "&token_auth=" + PIWIK_AUTH_TOKEN
+				+ "&segment=pageUrl=@" + item.getHandle()
+				+ "&columns=nb_pageviews,nb_uniq_pageviews,nb_uniq_visitors,nb_visits";
+			String downloadUrlParams =
+				  "&date=" + df.format(weekBefore) + "," + df.format(today)
+				+ "&idSite=" + PIWIK_DOWNLOAD_SITE_ID
+				+ "&token_auth=" + PIWIK_AUTH_TOKEN
+				+ "&segment=pageUrl=@" + item.getHandle()
+				+ "&columns=nb_pageviews,nb_uniq_pageviews";
+
+			final boolean two_requests = false;
+			String mergedResult = "";
+			queryString += "&token_auth=" + PIWIK_AUTH_TOKEN +
+				"&module=API";
+			String piwikApiGetQuery = "method=API.get";
+
+			if ( two_requests ) {
+
+				String report = PiwikHelper.readFromURL(
+					PIWIK_API_URL + rest + "?" + queryString + "&" + piwikApiGetQuery + urlParams
+				);
+				String downloadReport = PiwikHelper.readFromURL(
+					PIWIK_API_URL + rest + "?" + queryString + "&" + piwikApiGetQuery + downloadUrlParams
+				);
+
+				if (format.equalsIgnoreCase("xml")) {
+					mergedResult = PiwikHelper.mergeXML(report, downloadReport);
+				} else if (format.equalsIgnoreCase("json")) {
+					mergedResult = PiwikHelper.mergeJSON(report, downloadReport);
 				}
-				
-				out.write(merge.getBytes());
-			} else {
-				String url = PIWIK_API_URL + rest + "?" + queryString  + "&idSite=" + PIWIK_SITE_ID + "&token_auth=" + PIWIK_AUTH_TOKEN + "&segment=pageUrl=@" + item.getHandle();
-				String report = PiwikHelper.readFromURL(url);
-				out.write(report.getBytes());
+			}else {
+				String piwikBulkApiGetQuery = "&method=API.getBulkRequest";
+				queryString += "&format=JSON";
+
+				String url0 = URLEncoder.encode(piwikApiGetQuery + urlParams, "UTF-8");
+				String url1 = URLEncoder.encode(piwikApiGetQuery + downloadUrlParams, "UTF-8");
+				String report = PiwikHelper.readFromURL(
+					PIWIK_API_URL + rest + "?"
+						+ queryString + piwikBulkApiGetQuery
+						+ "&urls[0]=" + url0
+						+ "&urls[1]=" + url1
+				);
+				mergedResult = PiwikHelper.mergeJSONResults(report);
+
 			}
-			
+
+			out.write(mergedResult.getBytes());
 			out.flush();
 			
 		} catch (Exception e) {

@@ -1032,7 +1032,7 @@
     <xsl:template name="visits_over_time">
         <xsl:variable name="reportURL">
             <xsl:value-of select="concat($context-path, '/', substring-before($request-uri, '/piwik-statistics'))"/>
-            <xsl:text disable-output-escaping="yes">/piwik?module=API&amp;method=API.get&amp;period=day</xsl:text>
+            <xsl:text disable-output-escaping="yes">/piwik?period=day</xsl:text>
         </xsl:variable>
 
                 <div class="panel panel-default">
@@ -1058,8 +1058,7 @@
                                         <li role="presentation">
                                                 <a role="menuitem" tabindex="-1" target="_blank">
                                                         <xsl:attribute name="href">
-                                                        <xsl:value-of select="$reportURL" />
-                                                        <xsl:text disable-output-escaping="yes">&amp;format=JSON</xsl:text>
+	                                                        <xsl:value-of select="$reportURL" />
                                                         </xsl:attribute>
                                                         JSON
                                                 </a>
@@ -1073,7 +1072,6 @@
                         <div id="visits_over_time_chart" class="jqplot-target">
                                 <xsl:attribute name="data-url">
                                         <xsl:value-of select="$reportURL" />
-					<xsl:text disable-output-escaping="yes">&amp;format=JSON</xsl:text>
                                 </xsl:attribute>
                                 <div id="piwik-loading" style="width: 100%; height: 100%; z-index=1; display: none;"><i class="fa fa-pulse fa-3x" >&#xf110;</i></div>
                         </div>
