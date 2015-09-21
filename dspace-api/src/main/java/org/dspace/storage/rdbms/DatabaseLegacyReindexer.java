@@ -158,6 +158,16 @@ public class DatabaseLegacyReindexer implements FlywayCallback
     }
 
     @Override
+    public void beforeBaseline(Connection connection) {
+
+    }
+
+    @Override
+    public void afterBaseline(Connection connection) {
+
+    }
+
+    @Override
     public void beforeRepair(Connection connection) {
 
     }
