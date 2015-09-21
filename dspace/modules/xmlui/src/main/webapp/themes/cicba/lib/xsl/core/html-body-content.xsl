@@ -33,24 +33,20 @@
 
 				<xsl:when test="starts-with($request-uri, 'page/')">
 					<div class="static-page">
-						<xsl:copy-of
-							select="document(concat('../../../',$request-uri,'.xhtml') )" />
+						<xsl:copy-of select="document(concat('../../../',$request-uri,'.xhtml') )" />
 					</div>
 				</xsl:when>
 				<!-- Si tenemos datos de discovery para mostrar, lo hacemos en un sidebar -->
-				<xsl:when
-					test="/dri:document/dri:options/dri:list[@n='discovery']/child::node()">
+				<xsl:when test="/dri:document/dri:options/dri:list[@n='discovery']/child::node()">
 					<div class="row">
 						<div class="col-md-9">
 							<xsl:apply-templates />
 						</div>
 						<div class="col-md-3" id="cic-sidebar">
 							<h3>
-								<xsl:copy-of
-									select="/dri:document/dri:options/dri:list[@n='discovery']/dri:head" />
+								<xsl:copy-of select="/dri:document/dri:options/dri:list[@n='discovery']/dri:head" />
 							</h3>
-							<xsl:for-each
-								select="/dri:document/dri:options/dri:list[@n='discovery']/dri:list">
+							<xsl:for-each select="/dri:document/dri:options/dri:list[@n='discovery']/dri:list">
 								<xsl:call-template name="buildPanelFromList" />
 							</xsl:for-each>
 						</div>
@@ -82,9 +78,7 @@
 			</div>
 			<div class="col-md-5 hidden-xs">
 				<xsl:call-template name="build-img">
-					<xsl:with-param name="img.src">
-						images/provincia.png
-					</xsl:with-param>
+					<xsl:with-param name="img.src">images/provincia.png</xsl:with-param>
 				</xsl:call-template>
 			</div>
 		</div>
@@ -94,34 +88,25 @@
 			<!-- </div> -->
 			<div id="home-highlight-content" class="col-md-7">
 				<form id="home-search-form" class="form-inline" role="form">
-					<xsl:attribute name="action"><xsl:value-of
-						select="$search-url" /></xsl:attribute>
-					<label for="q">
-						<i18n:text>xmlui.cicdigital.home.explore</i18n:text>
-					</label>
-					<div>
-						<input type="text" name="query" class="form-control"
-							autofocus="true" size="30" placeholder="Ingrese su búsqueda ..." />
-						<button type="submit" name="lr" class="btn btn-link">
-							<span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-						</button>
+					<xsl:attribute name="action"><xsl:value-of select="$search-url" /></xsl:attribute>
+				   <label for="q">
+				   		<i18n:text>xmlui.cicdigital.home.explore</i18n:text>
+				   </label>
+				    <div>
+				    	<input type="text" name="query" class="form-control" autofocus="true" size="30" placeholder="Ingrese su búsqueda ..."/>
+					    <button type="submit" name="lr" class="btn btn-link"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
 					</div>
 				</form>
 				<div id="home-browse-bar">
-
-					<div class="btn-group btn-group-justified" role="group"
-						aria-label="...">
+					
+					<div class="btn-group btn-group-justified" role="group"  aria-label="...">
 						<a class="btn" role="button">
 							<xsl:attribute name="href">
 								<xsl:call-template name="print-path">
 									<xsl:with-param name="path">/browse?type=author</xsl:with-param>
 								</xsl:call-template>
 							</xsl:attribute>
-							<i18n:text>xmlui.ArtifactBrowser.Navigation.head_browse
-							</i18n:text>
-							<xsl:text> </xsl:text>
-							<i18n:text>xmlui.ArtifactBrowser.CollectionViewer.browse_authors
-							</i18n:text>
+							<i18n:text>xmlui.ArtifactBrowser.Navigation.head_browse</i18n:text><xsl:text> </xsl:text><i18n:text>xmlui.ArtifactBrowser.CollectionViewer.browse_authors</i18n:text>
 						</a>
 						<a class="btn" role="button">
 							<xsl:attribute name="href">
@@ -129,10 +114,7 @@
 									<xsl:with-param name="path">/handle/123456789/3</xsl:with-param>
 								</xsl:call-template>
 							</xsl:attribute>
-							<i18n:text>xmlui.ArtifactBrowser.Navigation.head_browse
-							</i18n:text>
-							<xsl:text> </xsl:text>
-							<i18n:text>xmlui.cicdigital.home.centros</i18n:text>
+							<i18n:text>xmlui.ArtifactBrowser.Navigation.head_browse</i18n:text><xsl:text> </xsl:text><i18n:text>xmlui.cicdigital.home.centros</i18n:text>
 						</a>
 						<a class="btn" role="button">
 							<xsl:attribute name="href">
@@ -140,37 +122,29 @@
 									<xsl:with-param name="path">/discover</xsl:with-param>
 								</xsl:call-template>
 							</xsl:attribute>
-							<i18n:text>xmlui.ArtifactBrowser.Navigation.head_all_of_dspace
-							</i18n:text>
+							<i18n:text>xmlui.ArtifactBrowser.Navigation.head_all_of_dspace</i18n:text>
 						</a>
 					</div>
 				</div>
-			</div><!-- -->
-			<div id="home-autoarchivo" class="col-md-5">
-				<!-- <h3> -->
-				<xsl:call-template name="build-anchor">
-					<xsl:with-param name="a.href">
-						/submissions
-					</xsl:with-param>
-					<xsl:with-param name="a.value">
-						<xsl:text> </xsl:text>
-						<i18n:text>xmlui.cicdigital.home.subir-material</i18n:text>
-					</xsl:with-param>
-					<xsl:with-param name="img.src">
-						images/flecha_subir.png
-					</xsl:with-param>
-				</xsl:call-template>
-				<!-- </h3> -->
+			</div><!--
+    		--><div id="home-autoarchivo" class="col-md-5">
+<!-- 				<h3> -->
+					<xsl:call-template name="build-anchor">
+						<xsl:with-param name="a.href">/submissions</xsl:with-param>
+						<xsl:with-param name="a.value">
+							 <xsl:text> </xsl:text><i18n:text>xmlui.cicdigital.home.subir-material</i18n:text>
+						</xsl:with-param>
+						<xsl:with-param name="img.src">images/flecha_subir.png</xsl:with-param>
+					</xsl:call-template>
+<!-- 				</h3> -->
 				<p>
-					<i18n:text>xmlui.cicdigital.home.subir-material-descripcion
-					</i18n:text>
+					<i18n:text>xmlui.cicdigital.home.subir-material-descripcion</i18n:text>
 				</p>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-7">
-				<xsl:for-each
-					select="dri:div[@n='site-home']/dri:div[@n='site-recent-submission']">
+			<xsl:for-each select="dri:div[@n='site-home']/dri:div[@n='site-recent-submission']">
 					<h3>
 						<xsl:copy-of select="dri:head" />
 					</h3>
@@ -188,9 +162,7 @@
 			</div>
 			<div class="col-md-5">
 				<xsl:call-template name="build-img">
-					<xsl:with-param name="img.src">
-						images/generica_72.png
-					</xsl:with-param>
+					<xsl:with-param name="img.src">images/generica_72.png</xsl:with-param>
 				</xsl:call-template>
 			</div>
 		</div>
