@@ -359,7 +359,7 @@
 		<xsl:choose>
 			<xsl:when
 				test="/dri:document/dri:meta/dri:userMeta[@authenticated = 'yes']">
-				<div id="userbox" style="position: absolute !important; opacity: 1 !important;">
+				<div id="userbox" style="opacity: 1 !important;">
 					<div class="label label-primary"
 						style="margin: 5px 15px 5px 5px; padding: 5px 10px 5px 10px; font-size: 12px;">
 
@@ -388,7 +388,7 @@
 
 			</xsl:when>
 			<xsl:otherwise>
-				<div id="userbox" style="position: absolute !important; opacity: 1 !important;">
+				<div id="userbox" style="opacity: 1 !important;">
 					<div class="label label-important"
 						style="margin: 5px 15px 5px 5px; padding: 5px 10px 5px 10px; font-size: 16px;">
 
