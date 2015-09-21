@@ -17,7 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.sql.Connection;
 
 /**
- * Callback method to ensure that the default groups are created each time a kernel is created.
+ * Callback method to ensure that the default groups are created in the database
+ * AFTER the database migration completes.
  *
  * @author kevinvandevelde at atmire.com
  */

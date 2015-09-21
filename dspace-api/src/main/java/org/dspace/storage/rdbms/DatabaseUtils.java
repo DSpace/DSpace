@@ -393,7 +393,7 @@ public class DatabaseUtils
             // (i.e. all later migrations are left as "pending"). By default we always migrate to latest version.
             if(!StringUtils.isBlank(targetVersion))
             {
-                flyway.setTarget(targetVersion);
+                flyway.setTargetAsString(targetVersion);
             }
 
             // Does the necessary Flyway table ("schema_version") exist in this database?
@@ -409,14 +409,14 @@ public class DatabaseUtils
                 if (dbVersion==null)
                 {
                     // Initialize the Flyway database table with defaults (version=1)
-                    flyway.init();
+                    flyway.baseline();
                 }
                 else
                 {
                     // Otherwise, pass our determined DB version to Flyway to initialize database table
-                    flyway.setInitVersion(dbVersion);
-                    flyway.setInitDescription("Initializing from DSpace " + dbVersion + " database schema");
-                    flyway.init();
+                    flyway.setBaselineVersionAsString(dbVersion);
+                    flyway.setBaselineDescription("Initializing from DSpace " + dbVersion + " database schema");
+                    flyway.baseline();
                 }
             }
 
@@ -1114,6 +1114,12 @@ public class DatabaseUtils
         }
     }
 
+    /**
+     * Determine the type of Database, based on the DB connection's metadata info
+     * @param meta DatabaseMetaData from DB Connection
+     * @return a DB keyword/type (see DatabaseUtils.DBMS_* constants)
+     * @throws SQLException
+     */
     protected static String findDbKeyword(DatabaseMetaData meta)
             throws SQLException
     {
