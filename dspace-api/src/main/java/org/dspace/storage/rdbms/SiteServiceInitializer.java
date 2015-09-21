@@ -17,7 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.sql.Connection;
 
 /**
- * Callback method to ensure that the Site is created (if no site exists) each time a kernel is created.
+ * Callback method to ensure that the Site object is created (if no site exists)
+ * after the database migration completes.
  *
  * @author kevinvandevelde at atmire.com
  */
