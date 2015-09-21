@@ -8,25 +8,29 @@
 package org.dspace.storage.rdbms;
 
 import org.apache.log4j.Logger;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.SiteService;
 import org.dspace.core.Context;
 import org.dspace.services.KernelStartupCallbackService;
+import org.flywaydb.core.api.MigrationInfo;
+import org.flywaydb.core.api.callback.FlywayCallback;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.sql.Connection;
 
 /**
  * Callback method to ensure that the Site is created (if no site exists) each time a kernel is created.
  *
  * @author kevinvandevelde at atmire.com
  */
-public class SiteServiceInitializer implements KernelStartupCallbackService {
+public class SiteServiceInitializer implements FlywayCallback {
 
     private Logger log = Logger.getLogger(SiteServiceInitializer.class);
 
     @Autowired(required = true)
     protected SiteService siteService;
 
-    @Override
-    public void executeCallback() {
+    public void initializeSiteObject() {
         // After every migrate, ensure default Site is setup correctly.
         Context context = null;
         try
@@ -54,6 +58,76 @@ public class SiteServiceInitializer implements KernelStartupCallbackService {
                 context.abort();
         }
 
+
+    }
+
+    @Override
+    public void beforeClean(Connection connection) {
+
+    }
+
+    @Override
+    public void afterClean(Connection connection) {
+
+    }
+
+    @Override
+    public void beforeMigrate(Connection connection) {
+
+    }
+
+    @Override
+    public void afterMigrate(Connection connection) {
+        initializeSiteObject();
+    }
+
+    @Override
+    public void beforeEachMigrate(Connection connection, MigrationInfo migrationInfo) {
+
+    }
+
+    @Override
+    public void afterEachMigrate(Connection connection, MigrationInfo migrationInfo) {
+
+    }
+
+    @Override
+    public void beforeValidate(Connection connection) {
+
+    }
+
+    @Override
+    public void afterValidate(Connection connection) {
+
+    }
+
+    @Override
+    public void beforeInit(Connection connection) {
+
+    }
+
+    @Override
+    public void afterInit(Connection connection) {
+
+    }
+
+    @Override
+    public void beforeRepair(Connection connection) {
+
+    }
+
+    @Override
+    public void afterRepair(Connection connection) {
+
+    }
+
+    @Override
+    public void beforeInfo(Connection connection) {
+
+    }
+
+    @Override
+    public void afterInfo(Connection connection) {
 
     }
 }

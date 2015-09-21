@@ -59,6 +59,7 @@
             <exclude>config/hibernate.cfg.xml</exclude>
             <exclude>config/log4j.properties</exclude>
             <exclude>config/modules/**</exclude>
+            <exclude>config/spring/**</exclude>
          </excludes>
       </fileSet>
       <!-- Copy over all module configs & filter them -->
@@ -66,6 +67,7 @@
          <outputDirectory>.</outputDirectory>
          <includes>
             <include>config/modules/**</include>
+            <include>config/spring/**</include>
             <include>config/hibernate.cfg.xml</include>
          </includes>
          <filtered>true</filtered>

@@ -28,7 +28,7 @@ import java.sql.SQLException;
  */
 public class HibernateDBConnection implements DBConnection<Session> {
 
-    @Autowired
+    @Autowired(required = true)
     @Qualifier("sessionFactory")
     private SessionFactory sessionFactory;
 
