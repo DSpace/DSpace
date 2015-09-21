@@ -29,11 +29,12 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%@ page import="org.dspace.eperson.Group"   %>
+<%@ page import="java.util.List" %>
 
 <%
     Group group = (Group) request.getAttribute("group");
-    Group [] groups = 
-        (Group []) request.getAttribute("groups");
+    List<Group> groups =
+        (List<Group>) request.getAttribute("groups");
 %>
 
 <dspace:layout style="submission" titlekey="jsp.dspace-admin.group-group-select.title"
@@ -54,9 +55,9 @@
                 <input type="hidden" name="group_id" value="<%=group.getID()%>" />
    				<div class="row col-md-4 col-md-offset-4">
                     <select class="form-control" size="15" name="groups_id" multiple="multiple">
-                        <%  for (int i = 0; i < groups.length; i++) { %>
-                            <option value="<%= groups[i].getID()%>">
-                                <%= groups[i].getName()%>
+                        <%  for (int i = 0; i < groups.size(); i++) { %>
+                            <option value="<%= groups.get(i).getID()%>">
+                                <%= groups.get(i).getName()%>
                             </option>
                         <%  } %>
                 </select>

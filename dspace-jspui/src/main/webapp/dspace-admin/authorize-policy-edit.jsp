@@ -47,12 +47,13 @@
 <%@ page import="org.dspace.core.Constants"           %>
 <%@ page import="org.dspace.eperson.EPerson"          %>
 <%@ page import="org.dspace.eperson.Group"            %>
+<%@ page import="java.util.List" %>
 
 
 <%
     ResourcePolicy policy = (ResourcePolicy) request.getAttribute("policy"    );
-    Group   [] groups     = (Group  []     ) request.getAttribute("groups"    );
-    EPerson [] epeople    = (EPerson[]     ) request.getAttribute("epeople"   );
+    List<Group>   groups     = (List<Group>) request.getAttribute("groups"    );
+    List<EPerson> epeople    = (List<EPerson>) request.getAttribute("epeople"   );
     String edit_title     = (String        ) request.getAttribute("edit_title");
     String id_name        = (String        ) request.getAttribute("id_name"   );
     String id             = (String        ) request.getAttribute("id"        );
@@ -60,7 +61,7 @@
     
     // calculate the resource type and its relevance ID
     // to check what actions to present
-    int resourceType      = policy.getResourceType();
+    int resourceType      = policy.getdSpaceObject().getType();
     int resourceRelevance = 1 << resourceType;
     
     request.setAttribute("LanguageSwitch", "hide");  
@@ -89,9 +90,9 @@
             	</span>
             	<span class="col-md-10">
                 <select class="form-control" size="15" name="group_id" id="tgroup_id">
-                    <%  for(int i = 0; i < groups.length; i++ ) { %>
-                            <option value="<%= groups[i].getID() %>" <%= (groups[i].getID() == policy.getGroupID() ? "selected=\"selected\"" : "" ) %> >
-                            <%= groups[i].getName()%>
+                    <%  for(int i = 0; i < groups.size(); i++ ) { %>
+                            <option value="<%= groups.get(i).getID() %>" <%= (groups.get(i).equals((policy.getGroup()))  ? "selected=\"selected\"" : "" ) %> >
+                            <%= groups.get(i).getName()%>
                             </option>
                         <%  } %>
                 </select>

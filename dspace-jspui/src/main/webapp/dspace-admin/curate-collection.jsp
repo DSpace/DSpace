@@ -30,14 +30,21 @@
 <%@ page import="org.dspace.app.webui.util.CurateTaskResult" %>
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
+<%@ page import="java.util.UUID" %>
+<%@ page import="org.dspace.content.factory.ContentServiceFactory" %>
+<%@ page import="org.dspace.content.service.CollectionService" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
+<%@ page import="org.dspace.core.Context" %>
 <%!
     private static final String TASK_QUEUE_NAME = ConfigurationManager.getProperty("curate", "ui.queuename");
 %>
 <%
+    Context context = UIUtil.obtainContext(request);
+    CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     Collection collection = (Collection) request.getAttribute("collection");
-    int collectionID = (collection != null ? collection.getID() : -1);
-    int communityID = (collection.getParentObject() != null ? collection.getParentObject().getID() : -1);
-    String title = (collection != null ? collection.getMetadata("name") : "Unknown Collection");
+    UUID collectionID = (collection != null ? collection.getID() : null);
+    UUID communityID = (collectionService.getParentObject(context, collection) != null ? collectionService.getParentObject(context, collection).getID() : null);
+    String title = (collection != null ? collection.getName() : "Unknown Collection");
     String groupOptions = (String)request.getAttribute("curate_group_options");
     String taskOptions = (String)request.getAttribute("curate_task_options");
 %>
