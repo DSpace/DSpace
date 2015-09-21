@@ -9,24 +9,27 @@ package org.dspace.storage.rdbms;
 
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
+import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
-import org.dspace.services.KernelStartupCallbackService;
+import org.flywaydb.core.api.MigrationInfo;
+import org.flywaydb.core.api.callback.FlywayCallback;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.sql.Connection;
 
 /**
  * Callback method to ensure that the default groups are created each time a kernel is created.
  *
  * @author kevinvandevelde at atmire.com
  */
-public class GroupServiceInitializer implements KernelStartupCallbackService {
+public class GroupServiceInitializer implements FlywayCallback {
 
     private final Logger log = Logger.getLogger(GroupServiceInitializer.class);
 
     @Autowired(required = true)
     protected GroupService groupService;
 
-    @Override
-    public void executeCallback() {
+    public void initGroups() {
         // After every migrate, ensure default Groups are setup correctly.
         Context context = null;
         try
@@ -51,6 +54,76 @@ public class GroupServiceInitializer implements KernelStartupCallbackService {
             if(context!=null && context.isValid())
                 context.abort();
         }
+
+    }
+
+    @Override
+    public void beforeClean(Connection connection) {
+
+    }
+
+    @Override
+    public void afterClean(Connection connection) {
+
+    }
+
+    @Override
+    public void beforeMigrate(Connection connection) {
+
+    }
+
+    @Override
+    public void afterMigrate(Connection connection) {
+        initGroups();
+    }
+
+    @Override
+    public void beforeEachMigrate(Connection connection, MigrationInfo migrationInfo) {
+
+    }
+
+    @Override
+    public void afterEachMigrate(Connection connection, MigrationInfo migrationInfo) {
+
+    }
+
+    @Override
+    public void beforeValidate(Connection connection) {
+
+    }
+
+    @Override
+    public void afterValidate(Connection connection) {
+
+    }
+
+    @Override
+    public void beforeInit(Connection connection) {
+
+    }
+
+    @Override
+    public void afterInit(Connection connection) {
+
+    }
+
+    @Override
+    public void beforeRepair(Connection connection) {
+
+    }
+
+    @Override
+    public void afterRepair(Connection connection) {
+
+    }
+
+    @Override
+    public void beforeInfo(Connection connection) {
+
+    }
+
+    @Override
+    public void afterInfo(Connection connection) {
 
     }
 }

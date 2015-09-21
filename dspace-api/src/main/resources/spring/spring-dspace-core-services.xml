@@ -33,7 +33,7 @@
         <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
     </bean>
 
-    <bean name="org.dspace.core.DBConnection" class="org.dspace.core.HibernateDBConnection"/>
+    <bean name="org.dspace.core.DBConnection" class="org.dspace.core.HibernateDBConnection" lazy-init="true"/>
 
     <bean class="org.dspace.storage.rdbms.DatabaseLegacyReindexer"/>
     <bean class="org.dspace.storage.rdbms.DatabaseRegistryUpdater"/>

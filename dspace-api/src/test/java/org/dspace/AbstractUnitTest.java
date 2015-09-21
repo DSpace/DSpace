@@ -29,6 +29,7 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
+import org.dspace.storage.rdbms.DatabaseUtils;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -108,6 +109,8 @@ public class AbstractUnitTest
             {
                 kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
             }
+            //Migrate & setup our database
+            DatabaseUtils.main(new String[]{"migrate"});
 
             // Initialize mock indexer (which does nothing, since Solr isn't running)
             new MockIndexEventConsumer();

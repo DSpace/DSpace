@@ -8,15 +8,16 @@
 package org.dspace.storage.rdbms;
 
 import java.io.File;
+import java.sql.Connection;
+
 import org.dspace.administer.MetadataImporter;
 import org.dspace.administer.RegistryLoader;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.eperson.service.GroupService;
-import org.dspace.services.KernelStartupCallbackService;
+import org.flywaydb.core.api.MigrationInfo;
+import org.flywaydb.core.api.callback.FlywayCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * This is a FlywayCallback class which automatically updates the
@@ -33,13 +34,10 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Tim Donohue
  */
-public class DatabaseRegistryUpdater implements KernelStartupCallbackService
+public class DatabaseRegistryUpdater implements FlywayCallback
 {
      /** logging category */
     private static final Logger log = LoggerFactory.getLogger(DatabaseRegistryUpdater.class);
-
-    @Autowired(required = true)
-    protected GroupService groupService;
 
     /**
      * Method to actually update our registries from latest configs
@@ -93,8 +91,72 @@ public class DatabaseRegistryUpdater implements KernelStartupCallbackService
     }
 
     @Override
-    public void executeCallback()
-    {
+    public void beforeClean(Connection connection) {
+
+    }
+
+    @Override
+    public void afterClean(Connection connection) {
+
+    }
+
+    @Override
+    public void beforeMigrate(Connection connection) {
+
+    }
+
+    @Override
+    public void afterMigrate(Connection connection) {
         updateRegistries();
+    }
+
+    @Override
+    public void beforeEachMigrate(Connection connection, MigrationInfo migrationInfo) {
+
+    }
+
+    @Override
+    public void afterEachMigrate(Connection connection, MigrationInfo migrationInfo) {
+
+    }
+
+    @Override
+    public void beforeValidate(Connection connection) {
+
+    }
+
+    @Override
+    public void afterValidate(Connection connection) {
+
+    }
+
+    @Override
+    public void beforeInit(Connection connection) {
+
+    }
+
+    @Override
+    public void afterInit(Connection connection) {
+
+    }
+
+    @Override
+    public void beforeRepair(Connection connection) {
+
+    }
+
+    @Override
+    public void afterRepair(Connection connection) {
+
+    }
+
+    @Override
+    public void beforeInfo(Connection connection) {
+
+    }
+
+    @Override
+    public void afterInfo(Connection connection) {
+
     }
 }
