@@ -130,6 +130,13 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
     public static final String VARIANTS_STORE_SEPARATOR = "###";
 
+	/* compiled regular expressions for date string matching */
+	private static final Pattern springRE = Pattern.compile("(\\d{4}) (?i:.*SPRING.*)");
+	private static final Pattern summerRE = Pattern.compile("(\\d{4}) (?i:.*SUMMER.*)");
+	private static final Pattern fallRE   = Pattern.compile("(\\d{4}) (?i:.*FALL.*)");
+	private static final Pattern winterRE = Pattern.compile("(\\d{4}) (?i:.*WINTER.*)");
+
+
     /**
      * Non-Static CommonsHttpSolrServer for processing indexing events.
      */
@@ -1280,9 +1287,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         if(date != null)
                         {
                             doc.addField(field + "_dt", date);
-                        }else{
-                            log.warn("Error while indexing sort date field, item: " + item.getHandle() + " metadata field: " + field + " date value: " + date);
                         }
+						// skip any errors here and ignore them, they are not important
                     }else{
                         doc.addField(field + "_sort", value);
                     }
@@ -1487,32 +1493,30 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      */
     public static Date toDate(String t)
     {
+
+		// null trap, just skip the nulls, don't try to parse them
+		if (t == null){
+			return null;
+		}
+
         SimpleDateFormat[] dfArr;
 
 		// inspect for seasons
-
-
-		private static final Pattern springRE = Pattern.compile("(\\d{4}) (?i:.*SPRING.*)");
-		private static final Pattern summerRE = Pattern.compile("(\\d{4}) (?i:.*SUMMER.*)");
-		private static final Pattern fallRE   = Pattern.compile("(\\d{4}) (?i:.*FALL.*)");
-		private static final Pattern winterRE = Pattern.compile("(\\d{4}) (?i:.*WINTER.*)");
-
-
-		if (t.matches(spring)){
+		if (springRE.matcher(t).matches()){
 			// munge for April	 
-			t = t.replaceAll(spring,"$1 Apr 01");
+			t = springRE.matcher(t).replaceAll("$1 Apr 01");
 		} 
-		if (t.matches(summer)){
+		if (summerRE.matcher(t).matches()){
 			// munge for July	 
-			t = t.replaceAll(summer,"$1 Jul 01");
+			t = summerRE.matcher(t).replaceAll("$1 Jul 01");
 		}
-		if (t.matches(fall)){
+		if (fallRE.matcher(t).matches()){
 			// munge for September	 
-			t = t.replaceAll(fall,"$1 Sep 01");
+			t = fallRE.matcher(t).replaceAll("$1 Sep 01");
 		}		
-		if (t.matches(winter)){
+		if (winterRE.matcher(t).matches()){
 			// munge for December	 
-			t = t.replaceAll(winter,"$1 Dec 01");
+			t = winterRE.matcher(t).replaceAll("$1 Dec 01");
 		}
 
 		// Choose the likely date formats based on string length
