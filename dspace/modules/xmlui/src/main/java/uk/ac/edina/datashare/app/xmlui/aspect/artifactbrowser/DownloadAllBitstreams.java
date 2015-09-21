@@ -75,7 +75,7 @@ public class DownloadAllBitstreams extends AbstractReader implements Recyclable
             {
                 Item item = (Item)dso;
                 
-                if(!DSpaceUtils.hasEmbargo(context, item))
+                if(org.dspace.app.util.Util.allowDownloadAll(context, item))
                 {
                     Bundle bundle[] = item.getBundles();
                     this.files = new ArrayList<Bitstream>();
@@ -101,6 +101,10 @@ public class DownloadAllBitstreams extends AbstractReader implements Recyclable
                     Request request = ObjectModelHelper.getRequest(objectModel);
                     LOG.info(this.fileName);
                     new IRUSUKLog(context, request, item, this.fileName);
+                }
+                else
+                {
+                	LOG.warn("Download all attempted for " + item.getName());
                 }
             }
         }

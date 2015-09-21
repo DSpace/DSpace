@@ -360,7 +360,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         }
         
         // DataShare - start
-        if(Util.showDownloadAll(context, item))
+        if(Util.allowDownloadAll(context, item))
         {
 	        final String CLS = "download-all";
 	        Division div = division.addDivision("download-all-top", CLS);
