@@ -22,8 +22,8 @@
   -                      array of the collections in the community to put in
   -                      the drop-down box
   -   items            - the results.  An array of Items, most relevant first
-  -   communities      - results, Community[]
-  -   collections      - results, Collection[]
+  -   communities      - results, List<Community>
+  -   collections      - results, List<Collection>
   -
   -   query            - The original query
   -
@@ -40,6 +40,7 @@
 
 <%@ page import="java.net.URLEncoder"            %>
 <%@ page import="java.util.Enumeration"          %>
+<%@ page import="java.util.List"                 %>
 <%@ page import="java.util.Set"                  %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.dspace.content.Community"   %>
@@ -58,12 +59,13 @@
     // Get the attributes
     Community   community        = (Community   ) request.getAttribute("community" );
     Collection  collection       = (Collection  ) request.getAttribute("collection");
-    Community[] communityArray   = (Community[] ) request.getAttribute("community.array");
-    Collection[] collectionArray = (Collection[]) request.getAttribute("collection.array");
 
-    Item      [] items       = (Item[]      )request.getAttribute("items");
-    Community [] communities = (Community[] )request.getAttribute("communities");
-    Collection[] collections = (Collection[])request.getAttribute("collections");
+    List<Community> allCommunities  = (List<Community> ) request.getAttribute("community.array");
+    List<Collection> allCollections = (List<Collection>) request.getAttribute("collection.array");
+
+    List<Item>       items       = (List<Item>      )request.getAttribute("items");
+    List<Community>  communities = (List<Community> )request.getAttribute("communities");
+    List<Collection> collections = (List<Collection>)request.getAttribute("collections");
 
     String query = (String) request.getAttribute("query");
 
@@ -121,11 +123,11 @@
                                     <%-- <option selected value="/">All of DSpace</option> --%>
                                     <option selected="selected" value="/"><fmt:message key="jsp.general.genericScope"/></option>
 <%
-        for (int i = 0; i < communityArray.length; i++)
+        for (Community aCommunity: allCommunities)
         {
 %>
-                                    <option value="<%= communityArray[i].getHandle() %>">
-                                        <%= communityArray[i].getName() %>
+                                    <option value="<%= aCommunity.getHandle() %>">
+                                        <%= aCommunity.getName() %>
                                     </option>
 <%
         }
@@ -141,11 +143,11 @@
                                         <%= community.getName() %>
                                     </option>
 <%
-        for (int i = 0; i < collectionArray.length; i++)
+        for (Collection aCollection : allCollections)
         {
 %>
-                                    <option value="<%= collectionArray[i].getHandle() %>">
-                                        <%= collectionArray[i].getName() %>
+                                    <option value="<%= aCollection.getHandle() %>">
+                                        <%= aCollection.getName() %>
                                     </option>
 <%
         }
@@ -310,23 +312,23 @@ else
    </div>
 
 <%
-    if(0 < communities.length || 0 < collections.length || 0 < items.length){
+    if(!(communities.isEmpty() && collections.isEmpty() && items.isEmpty())){
 %>
 <div id="search-results-division">
-<% if (communities.length > 0 ) { %>
+<% if (!communities.isEmpty() ) { %>
     <%-- <h3>Community Hits:</h3> --%>
     <h3><fmt:message key="jsp.search.results.comhits"/></h3>
     <dspace:communitylist  communities="<%= communities %>" />
 <% } %>
 
-<% if (collections.length > 0 ) { %>
+<% if (!collections.isEmpty()) { %>
     <br/>
     <%-- <h3>Collection hits:</h3> --%>
     <h3><fmt:message key="jsp.search.results.colhits"/></h3>
     <dspace:collectionlist collections="<%= collections %>" />
 <% } %>
 
-<% if (items.length > 0) { %>
+<% if (!items.isEmpty()) { %>
     <br/>
     <%-- <h3>Item hits:</h3> --%>
     <h3><fmt:message key="jsp.search.results.itemhits"/></h3>

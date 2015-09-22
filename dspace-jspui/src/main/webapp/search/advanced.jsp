@@ -7,7 +7,6 @@
     http://www.dspace.org/license/
 
 --%>
-<%@page import="org.dspace.content.Item"%>
 <%--
   - Advanced Search JSP
   -
@@ -16,18 +15,23 @@
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
+
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.List"%>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.dspace.content.Community" %>
-<%@ page import="org.dspace.search.QueryResults" %>
-<%@ page import="java.util.ArrayList" %>
+<%@ page import="org.dspace.content.Item"%>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
+<%@ page import="org.dspace.search.QueryResults" %>
+
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 
 <%
-    Community [] communityArray = (Community[] )request.getAttribute("communities");
-	String query1 			= request.getParameter("query1") == null ? "" : request.getParameter("query1");
+    List<Community> communities = (List<Community>)request.getAttribute("communities");
+
+    String query1 			= request.getParameter("query1") == null ? "" : request.getParameter("query1");
 	String query2 			= request.getParameter("query2") == null ? "" : request.getParameter("query2");
 	String query3 			= request.getParameter("query3") == null ? "" : request.getParameter("query3");
 
@@ -83,11 +87,11 @@
                 <option selected="selected" value="/"><fmt:message key="jsp.general.genericScope"/></option>
 
         <%
-            for (int i = 0; i < communityArray.length; i++)
+            for (Community community : communities)
             {
         %>
-                <option value="<%= communityArray[i].getHandle() %>">
-                    <%= communityArray[i].getName() %>
+                <option value="<%= community.getHandle() %>">
+                    <%= community.getName() %>
                 </option>
         <%
             }
