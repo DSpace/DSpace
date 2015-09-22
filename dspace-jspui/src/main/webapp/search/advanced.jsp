@@ -18,8 +18,6 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.dspace.content.Community" %>
-<%@ page import="org.dspace.content.factory.ContentServiceFactory"%>
-<%@ page import="org.dspace.content.service.CommunityService"%>
 <%@ page import="org.dspace.search.QueryResults" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
@@ -85,13 +83,11 @@
                 <option selected="selected" value="/"><fmt:message key="jsp.general.genericScope"/></option>
 
         <%
-            CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
             for (int i = 0; i < communityArray.length; i++)
             {
         %>
                 <option value="<%= communityArray[i].getHandle() %>">
-                    <%= communityService.getMetadataFirstValue(communityArray[i],
-                            "dc", "title", null, Item.ANY) %>
+                    <%= communityArray[i].getName() %>
                 </option>
         <%
             }
