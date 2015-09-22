@@ -373,7 +373,7 @@
             <Configuration>
                 <string name="field">dc.rights</string>
                 <string name="operator">contains</string>
-                <list>
+                <list name="values">
                     <string>open access</string>
                     <string>openAccess</string>
                 </list>
@@ -400,7 +400,7 @@
             <Configuration>
                 <string name="field">dc.relation</string>
                 <string name="operator">starts_with</string>
-                <string name="value">info:eu-repo/grantAgreement/EC/FP</string>
+                <string name="value">info:eu-repo/grantAgreement/EC</string>
             </Configuration>
         </CustomCondition>
     </Filters>
