@@ -1192,7 +1192,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                             	}
                             	else
                             	{
-                                	doc.addField(searchFilter.getIndexFieldName() + "_filter", value.toLowerCase() + separator + value);
+                                
+									// TODO: if one were wanting to add normalization to the casing of the indexed value, one would do so here, with "value"
+									// you could even do it and pretend it's an "authority" by using the AUTHORITY_SEPARATOR as above
+
+									doc.addField(searchFilter.getIndexFieldName() + "_filter", value.toLowerCase() + separator + value);
                             	}
                             }else
                                 if(searchFilter.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE))
@@ -1281,7 +1285,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         type = recentSubmissionsConfigurationMap.get(field).getType();
                     }
 
-                    if(type.equals(DiscoveryConfigurationParameters.TYPE_DATE))
+                    if(type.equals(DiscoveryConfigurationParameters.TYPE_DATE) && value != null)
                     {
                         Date date = MultiFormatDateParser.parse(value);
                         if(date != null)
