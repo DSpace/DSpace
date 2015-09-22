@@ -117,7 +117,7 @@ public class DatabaseUtils
                     System.out.println(" - Driver: " + meta.getDriverName() + " version " + meta.getDriverVersion());
                     System.out.println(" - Username: " + meta.getUserName());
                     System.out.println(" - Password: [hidden]");
-                    System.out.println(" - Schema: " + getSchemaName(connection));
+                    System.out.println(" - Schema: " + connection.getSchema());
                     connection.close();
                 }
                 catch (SQLException sqle)
@@ -134,7 +134,7 @@ public class DatabaseUtils
                 Connection connection = dataSource.getConnection();
                 DatabaseMetaData meta = connection.getMetaData();
                 System.out.println("\nDatabase URL: " + meta.getURL());
-                System.out.println("Database Schema: " + getSchemaName(connection));
+                System.out.println("Database Schema: " + connection.getSchema());
                 System.out.println("Database Software: " + meta.getDatabaseProductName() + " version " + meta.getDatabaseProductVersion());
                 System.out.println("Database Driver: " + meta.getDriverName() + " version " + meta.getDriverVersion());
 
@@ -641,7 +641,7 @@ public class DatabaseUtils
         {
             // Get the name of the Schema that the DSpace Database is using
             // (That way we can search the right schema)
-            String schema = getSchemaName(connection);
+            String schema = connection.getSchema();
 
             // Get information about our database.
             DatabaseMetaData meta = connection.getMetaData();
@@ -702,7 +702,7 @@ public class DatabaseUtils
         {
             // Get the name of the Schema that the DSpace Database is using
             // (That way we can search the right schema)
-            String schema = getSchemaName(connection);
+            String schema = connection.getSchema();
 
             // Canonicalize everything to the proper case based on DB type
             schema = canonicalize(connection, schema);
@@ -761,7 +761,7 @@ public class DatabaseUtils
         {
             // Get the name of the Schema that the DSpace Database is using
             // (That way we can search the right schema)
-            String schema = getSchemaName(connection);
+            String schema = connection.getSchema();
 
             // Canonicalize everything to the proper case based on DB type
             schema = canonicalize(connection, schema);
@@ -877,46 +877,6 @@ public class DatabaseUtils
         }
     }
 
-    /**
-     * Get the Database Schema Name in use by this Connection, so that it can
-     * be used to limit queries in other methods (e.g. tableExists()).
-     * <P>
-     * NOTE: Once we upgrade to using Apache Commons DBCP / Pool version 2.0,
-     * this method WILL BE REMOVED in favor of java.sql.Connection's new
-     * "getSchema()" method.
-     * http://docs.oracle.com/javase/7/docs/api/java/sql/Connection.html#getSchema()
-     * 
-     * @param connection 
-     *            Current Database Connection
-     * @return Schema name as a string, or "null" if cannot be determined or unspecified
-     */
-    public static String getSchemaName(Connection connection)
-            throws SQLException
-    {
-        String schema = null;
-        DatabaseMetaData meta = connection.getMetaData();
-
-        // Determine our DB type
-
-        // If unspecified, determine "sane" defaults based on DB type
-        String dbType = findDbKeyword(meta);
-        if (StringUtils.equals(dbType, DBMS_POSTGRES))
-        {
-            // For PostgreSQL, the default schema is named "public"
-            // See: http://www.postgresql.org/docs/9.0/static/ddl-schemas.html
-            schema = "public";
-        }
-        else if (StringUtils.equals(dbType, DBMS_ORACLE))
-        {
-            // Schema is actually the user account
-            // See: http://stackoverflow.com/a/13341390
-            schema = meta.getUserName();
-        }
-        else
-            schema = null;
-        return schema;
-    }
-    
     /**
      * Return the canonical name for a database identifier based on whether this
      * database defaults to storing identifiers in uppercase or lowercase.
