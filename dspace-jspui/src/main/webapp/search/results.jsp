@@ -38,18 +38,15 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld"
            prefix="dspace" %>
 
-<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="java.net.URLEncoder"            %>
+<%@ page import="java.util.Enumeration"          %>
+<%@ page import="java.util.Set"                  %>
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.dspace.content.Community"   %>
 <%@ page import="org.dspace.content.Collection"  %>
 <%@ page import="org.dspace.content.Item"        %>
-<%@ page import="org.dspace.content.factory.ContentServiceFactory"%>
-<%@ page import="org.dspace.content.service.CollectionService"%>
-<%@ page import="org.dspace.content.service.CommunityService"%>
 <%@ page import="org.dspace.search.QueryResults" %>
-<%@ page import="org.dspace.sort.SortOption" %>
-<%@ page import="java.util.Enumeration" %>
-<%@ page import="java.util.Set" %>
+<%@ page import="org.dspace.sort.SortOption"     %>
 
 <%
     String order = (String)request.getAttribute("order");
@@ -115,8 +112,6 @@
                                 <%-- <strong>Search:</strong>&nbsp;<select name="location"> --%>
                                 <label for="tlocation"><strong><fmt:message key="jsp.search.results.searchin"/></strong></label>&nbsp;<select name="location" id="tlocation">
 <%
-    CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
-    CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 
     if (community == null && collection == null)
     {
@@ -130,7 +125,7 @@
         {
 %>
                                     <option value="<%= communityArray[i].getHandle() %>">
-                                        <%= communityService.getMetadataFirstValue(communityArray[0], "dc", "title", null, Item.ANY) %>
+                                        <%= communityArray[i].getName() %>
                                     </option>
 <%
         }
@@ -143,17 +138,14 @@
                                     <%-- <option value="/">All of DSpace</option> --%>
                                     <option value="/"><fmt:message key="jsp.general.genericScope"/></option>
                                     <option selected="selected" value="<%= community.getHandle() %>">
-                                        <%= communityService.getMetadataFirstValue(community, "dc",
-                                                "title", null, Item.ANY) %>
+                                        <%= community.getName() %>
                                     </option>
 <%
         for (int i = 0; i < collectionArray.length; i++)
         {
 %>
                                     <option value="<%= collectionArray[i].getHandle() %>">
-                                        <%= collectionService.getMetadataFirstValue(
-                                                        collectionArray[i], "dc", "title",
-                                                        null, Item.ANY) %>
+                                        <%= collectionArray[i].getName() %>
                                     </option>
 <%
         }
@@ -165,13 +157,10 @@
                                     <%-- <option value="/">All of DSpace</option> --%>
                                     <option value="/"><fmt:message key="jsp.general.genericScope"/></option>
                                     <option value="<%= community.getHandle() %>">
-                                        <%= communityService.getMetadataFirstValue(
-                                                        community, "dc", "title",
-                                                        null, Item.ANY) %>
+                                        <%= community.getName() %>
                                     </option>
                                     <option selected="selected" value="<%= collection.getHandle() %>">
-                                        <%= collectionService.getMetadataFirstValue(
-                                                collection, "dc", "title", null, Item.ANY) %>
+                                        <%= collection.getName() %>
                                     </option>
 <%
     }
