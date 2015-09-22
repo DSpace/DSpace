@@ -189,7 +189,7 @@ public class DatabaseUtils
                         System.out.println("PRODUCTION scenario. The resulting old DB is only useful for migration testing.\n");
                         Connection connection = dataSource.getConnection();
                         // Update the database, to the version specified.
-                        updateDatabase(dataSource, connection, argv[1], false);
+                        updateDatabase(dataSource, connection, argv[1], true);
                         connection.close();
                     }
                 }
@@ -306,15 +306,6 @@ public class DatabaseUtils
                     scriptLocations.add("classpath:org.dspace.storage.rdbms.xmlworkflow");
                 }
 
-
-                //We cannot request services at this point, so we will have to do it the old fashioned way
-                if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow"))
-                {
-                    scriptLocations.add("classpath:org.dspace.storage.rdbms.sqlmigration.workflow." + dbType + ".xmlworkflow");
-                }else{
-                    scriptLocations.add("classpath:org.dspace.storage.rdbms.sqlmigration.workflow." + dbType + ".basicWorkflow");
-                }
-
                 // Now tell Flyway which locations to load SQL / Java migrations from
                 log.info("Loading Flyway DB migrations from: " + StringUtils.join(scriptLocations, ", "));
                 flywaydb.setLocations(scriptLocations.toArray(new String[scriptLocations.size()]));
@@ -353,8 +344,8 @@ public class DatabaseUtils
     protected static synchronized void updateDatabase(DataSource datasource, Connection connection)
             throws SQLException
     {
-        // By default, upgrade to the *latest* version and never run migrations out-of-order
-        updateDatabase(datasource, connection, null, false);
+        // By default, upgrade to the *latest* version and run migrations out-of-order
+        updateDatabase(datasource, connection, null, true);
     }
 
     /**
@@ -1153,8 +1144,7 @@ public class DatabaseUtils
         flywaydb = null;
     }
 
-    public static String getCurrentFlywayState(Connection connection) throws SQLException
-    {
+    public static String getCurrentFlywayState(Connection connection) throws SQLException {
         PreparedStatement statement = connection.prepareStatement("SELECT \"version\" FROM \"schema_version\" ORDER BY \"installed_rank\" desc");
         ResultSet resultSet = statement.executeQuery();
         resultSet.next();

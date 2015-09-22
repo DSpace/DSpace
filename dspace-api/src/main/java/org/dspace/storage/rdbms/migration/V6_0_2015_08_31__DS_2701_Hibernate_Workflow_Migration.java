@@ -13,7 +13,7 @@ import java.sql.Connection;
  * Date: 1/09/15
  * Time: 12:08
  */
-public class V6_0_2015_08_31__Hibernate_Workflow_Migration implements JdbcMigration, MigrationChecksumProvider
+public class V6_0_2015_08_31__DS_2701_Hibernate_Workflow_Migration implements JdbcMigration, MigrationChecksumProvider
 {
 
     // Size of migration script run
@@ -42,12 +42,12 @@ public class V6_0_2015_08_31__Hibernate_Workflow_Migration implements JdbcMigrat
         {
             // Get the contents of our data migration script, based on path & DB type
             dataMigrateSQL = new ClassPathResource(sqlMigrationPath + "xmlworkflow"+
-                                                      "/V6_0_2015_08_11__Xml_Workflow_Migration.sql", getClass().getClassLoader()).loadAsString(Constants.DEFAULT_ENCODING);
+                                                      "/V6.0_2015.08.11__DS-2701_Xml_Workflow_Migration.sql", getClass().getClassLoader()).loadAsString(Constants.DEFAULT_ENCODING);
         }else{
             //Migrate the basic workflow
                         // Get the contents of our data migration script, based on path & DB type
             dataMigrateSQL = new ClassPathResource(sqlMigrationPath + "basicWorkflow"+
-                                                      "/V6_0_2015_08_11__Basic_Workflow_Migration.sql", getClass().getClassLoader()).loadAsString(Constants.DEFAULT_ENCODING);
+                                                      "/V6.0_2015.08.11__DS-2701_Basic_Workflow_Migration.sql", getClass().getClassLoader()).loadAsString(Constants.DEFAULT_ENCODING);
         }
 
         // Actually execute the Data migration SQL
