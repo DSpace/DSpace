@@ -14,7 +14,7 @@ import java.sql.Connection;
  * Date: 1/09/15
  * Time: 11:34
  */
-public class V6_0_2015_09_01__Enable_XMLWorkflow_Migration implements JdbcMigration, MigrationChecksumProvider
+public class V6_0_2015_09_01__DS_2701_Enable_XMLWorkflow_Migration implements JdbcMigration, MigrationChecksumProvider
 {
     // Size of migration script run
     protected Integer migration_file_size = -1;
@@ -43,13 +43,13 @@ public class V6_0_2015_09_01__Enable_XMLWorkflow_Migration implements JdbcMigrat
 
                 // Determine path of this migration class (as the SQL scripts
                 // we will run are based on this path under /src/main/resources)
-                String packagePath = V6_0_2015_09_01__Enable_XMLWorkflow_Migration.class.getPackage().getName().replace(".", "/");
+                String packagePath = V6_0_2015_09_01__DS_2701_Enable_XMLWorkflow_Migration.class.getPackage().getName().replace(".", "/");
 
                 // Get the contents of our DB Schema migration script, based on path & DB type
                 // (e.g. /src/main/resources/[path-to-this-class]/postgres/xml_workflow_migration.sql)
                 String dbMigrateSQL = new ClassPathResource(packagePath + "/" +
                                                         dbFileLocation +
-                                                        "/v6.0_xml_workflow_migration.sql", getClass().getClassLoader()).loadAsString(Constants.DEFAULT_ENCODING);
+                                                        "/v6.0__DS-2701_xml_workflow_migration.sql", getClass().getClassLoader()).loadAsString(Constants.DEFAULT_ENCODING);
 
                 // Actually execute the Database schema migration SQL
                 // This will create the necessary tables for the XMLWorkflow feature
@@ -59,7 +59,7 @@ public class V6_0_2015_09_01__Enable_XMLWorkflow_Migration implements JdbcMigrat
                 // (e.g. /src/main/resources/[path-to-this-class]/postgres/data_workflow_migration.sql)
                 String dataMigrateSQL = new ClassPathResource(packagePath + "/" +
                                                           dbFileLocation +
-                                                          "/v6.0_data_workflow_migration.sql", getClass().getClassLoader()).loadAsString(Constants.DEFAULT_ENCODING);
+                                                          "/v6.0__DS-2701_data_workflow_migration.sql", getClass().getClassLoader()).loadAsString(Constants.DEFAULT_ENCODING);
 
                 // Actually execute the Data migration SQL
                 // This will migrate all existing traditional workflows to the new XMLWorkflow system & tables
