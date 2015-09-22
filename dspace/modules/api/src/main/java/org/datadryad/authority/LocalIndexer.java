@@ -11,13 +11,13 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
 import org.dspace.services.ConfigurationService;
-import org.dspace.submit.utils.DryadJournalSubmissionUtils;
 import org.dspace.utils.DSpace;
 import org.dspace.core.Utils;
 
 import java.sql.SQLException;
 
 import java.util.*;
+import org.dspace.JournalUtils;
 
 /**
  * Created by IntelliJ IDEA.
@@ -192,14 +192,14 @@ public class LocalIndexer implements AuthorityIndexerInterface {
 
 
     public boolean haveToAddAsterisk(String value){
-        Map<String, Map<String, String>> journalProperties = DryadJournalSubmissionUtils.journalProperties;
+        Map<String, Map<String, String>> journalProperties = JournalUtils.journalProperties;
         Set<String> keys = journalProperties.keySet();
         for(String key :keys){
             Map<String, String> props = journalProperties.get(key);
-            String valueProp = props.get(DryadJournalSubmissionUtils.FULLNAME);
+            String valueProp = props.get(JournalUtils.FULLNAME);
 
             if(value.equals(valueProp)){
-                String integratedJournal = props.get(DryadJournalSubmissionUtils.INTEGRATED);
+                String integratedJournal = props.get(JournalUtils.INTEGRATED);
                 if(integratedJournal!=null && integratedJournal.equals("true"))
                     return true;
             }
