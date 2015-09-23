@@ -28,12 +28,13 @@
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.app.util.CollectionDropDown" %>
+<%@ page import="java.util.List" %>
 
 <%
-    Collection[] availableSubscriptions =
-        (Collection[]) request.getAttribute("availableSubscriptions");
-    Collection[] subscriptions =
-        (Collection[]) request.getAttribute("subscriptions");
+    List<Collection> availableSubscriptions =
+        (List<Collection>) request.getAttribute("availableSubscriptions");
+    List<Collection> subscriptions =
+        (List<Collection>) request.getAttribute("subscriptions");
     boolean updated =
         ((Boolean) request.getAttribute("updated")).booleanValue();
 %>
@@ -61,10 +62,10 @@
             <select id="available-subscriptions" class="form-control" name="collection">
                 <option value="-1"><fmt:message key="jsp.mydspace.subscriptions.select_collection" /></option>
 <%
-    for (int i = 0; i < availableSubscriptions.length; i++)
+    for (int i = 0; i < availableSubscriptions.size(); i++)
     {
 %>
-                <option value="<%= availableSubscriptions[i].getID() %>"><%= CollectionDropDown.collectionPath(availableSubscriptions[i], 0) %></option>
+                <option value="<%= availableSubscriptions.get(i).getID() %>"><%= CollectionDropDown.collectionPath(availableSubscriptions.get(i), 0) %></option>
 <%
     }
 %>
@@ -75,7 +76,7 @@
 	</form>
         
 <%
-    if (subscriptions.length > 0)
+    if (subscriptions.size() > 0)
     {
 %>
 	<p><fmt:message key="jsp.mydspace.subscriptions.info3"/></p>
@@ -84,7 +85,7 @@
 <%
         String row = "odd";
 
-        for (int i = 0; i < subscriptions.length; i++)
+        for (int i = 0; i < subscriptions.size(); i++)
         {
 %>
             <tr>
@@ -94,11 +95,11 @@
                   --%>
 
                  <td class="<%= row %>RowOddCol">
-                      <a href="<%= request.getContextPath() %>/handle/<%= subscriptions[i].getHandle() %>"><%= CollectionDropDown.collectionPath(subscriptions[i],0) %></a>
+                      <a href="<%= request.getContextPath() %>/handle/<%= subscriptions.get(i).getHandle() %>"><%= CollectionDropDown.collectionPath(subscriptions.get(i),0) %></a>
                  </td>
                  <td class="<%= row %>RowEvenCol">
                     <form method="post" action=""> 
-                        <input type="hidden" name="collection" value="<%= subscriptions[i].getID() %>" />
+                        <input type="hidden" name="collection" value="<%= subscriptions.get(i).getID() %>" />
 			<input class="btn btn-warning" type="submit" name="submit_unsubscribe" value="<fmt:message key="jsp.mydspace.subscriptions.unsub.button"/>" />
                     </form>
                  </td>
