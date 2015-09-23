@@ -117,7 +117,7 @@ public class DatabaseUtils
                     System.out.println(" - Driver: " + meta.getDriverName() + " version " + meta.getDriverVersion());
                     System.out.println(" - Username: " + meta.getUserName());
                     System.out.println(" - Password: [hidden]");
-                    System.out.println(" - Schema: " + connection.getSchema());
+                    System.out.println(" - Schema: " + getSchemaName(connection));
                     connection.close();
                 }
                 catch (SQLException sqle)
@@ -134,7 +134,7 @@ public class DatabaseUtils
                 Connection connection = dataSource.getConnection();
                 DatabaseMetaData meta = connection.getMetaData();
                 System.out.println("\nDatabase URL: " + meta.getURL());
-                System.out.println("Database Schema: " + connection.getSchema());
+                System.out.println("Database Schema: " + getSchemaName(connection));
                 System.out.println("Database Software: " + meta.getDatabaseProductName() + " version " + meta.getDatabaseProductVersion());
                 System.out.println("Database Driver: " + meta.getDriverName() + " version " + meta.getDriverVersion());
 
@@ -641,7 +641,7 @@ public class DatabaseUtils
         {
             // Get the name of the Schema that the DSpace Database is using
             // (That way we can search the right schema)
-            String schema = connection.getSchema();
+            String schema = getSchemaName(connection);
 
             // Get information about our database.
             DatabaseMetaData meta = connection.getMetaData();
@@ -702,7 +702,7 @@ public class DatabaseUtils
         {
             // Get the name of the Schema that the DSpace Database is using
             // (That way we can search the right schema)
-            String schema = connection.getSchema();
+            String schema = getSchemaName(connection);
 
             // Canonicalize everything to the proper case based on DB type
             schema = canonicalize(connection, schema);
@@ -761,7 +761,7 @@ public class DatabaseUtils
         {
             // Get the name of the Schema that the DSpace Database is using
             // (That way we can search the right schema)
-            String schema = connection.getSchema();
+            String schema = getSchemaName(connection);
 
             // Canonicalize everything to the proper case based on DB type
             schema = canonicalize(connection, schema);
@@ -875,6 +875,61 @@ public class DatabaseUtils
             // If any FlywayException (Runtime) is thrown, change it to a SQLException
             throw new SQLException("Flyway executeSql() error occurred", fe);
         }
+    }
+
+    /**
+     * Get the Database Schema Name in use by this Connection, so that it can
+     * be used to limit queries in other methods (e.g. tableExists()).
+     *
+     * @param connection
+     *            Current Database Connection
+     * @return Schema name as a string, or "null" if cannot be determined or unspecified
+     */
+    public static String getSchemaName(Connection connection)
+            throws SQLException
+    {
+        String schema = null;
+        
+        // Try to get the schema from the DB connection itself.
+        // As long as the Database driver supports JDBC4.1, there should be a getSchema() method
+        // If this method is unimplemented or doesn't exist, it will throw an exception (likely an AbstractMethodError)
+        try
+        {
+            schema = connection.getSchema();
+        }
+        catch (Exception|AbstractMethodError e)
+        {
+        }
+
+        // If we don't know our schema, let's try the schema in the DSpace configuration
+        if(StringUtils.isBlank(schema))
+        {
+            schema = canonicalize(connection, ConfigurationManager.getProperty("db.schema"));
+        }
+            
+        // Still blank? Ok, we'll find a "sane" default based on the DB type
+        if(StringUtils.isBlank(schema))
+        {
+            DatabaseMetaData meta = connection.getMetaData();
+            String dbType = findDbKeyword(meta);
+
+            if(dbType.equals(DBMS_POSTGRES))
+            {
+                // For PostgreSQL, the default schema is named "public"
+                // See: http://www.postgresql.org/docs/9.0/static/ddl-schemas.html
+                schema = "public";
+            }
+            else if (dbType.equals(DBMS_ORACLE))
+            {
+                // For Oracle, default schema is actually the user account
+                // See: http://stackoverflow.com/a/13341390
+                schema = meta.getUserName();
+            }
+            else // For H2 (in memory), there is no such thing as a schema
+                schema = null;
+        }
+
+        return schema;
     }
 
     /**
