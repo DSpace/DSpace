@@ -57,7 +57,6 @@
 <%@ page import="org.dspace.eperson.Group"            %>
 <%@ page import="org.dspace.authorize.factory.AuthorizeServiceFactory" %>
 <%@ page import="org.dspace.authorize.service.ResourcePolicyService" %>
-<%@ page import="org.dspace.content.BundleBitstream" %>
 
 
 <%
@@ -208,11 +207,11 @@
 %>
     </table>
 <%
-        List<BundleBitstream> bitstreams = myBun.getBitstreams();
+        List<Bitstream> bitstreams = myBun.getBitstreams();
                 
         for( int s = 0; s < bitstreams.size(); s++ )
         {
-            Bitstream myBits = bitstreams.get(s).getBitstream();
+            Bitstream myBits = bitstreams.get(s);
             myPolicies  = (List)bitstream_policies.get(myBits.getID());
 
             // display bitstream header w/ID, filename
