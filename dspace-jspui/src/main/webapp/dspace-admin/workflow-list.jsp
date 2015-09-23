@@ -30,10 +30,14 @@
 <%@ page import="org.dspace.core.Utils" %>
 <%@ page import="org.dspace.workflowbasic.BasicWorkflowServiceImpl" %>
 <%@ page import="org.dspace.workflowbasic.BasicWorkflowItem" %>
+<%@ page import="java.util.List" %>
+<%@ page import="org.dspace.workflowbasic.factory.BasicWorkflowServiceFactory" %>
+<%@ page import="org.dspace.workflowbasic.service.BasicWorkflowService" %>
 
 <%
-    BasicWorkflowItem[] workflows =
-        (BasicWorkflowItem[]) request.getAttribute("workflows");
+    BasicWorkflowService basicWorkflowService = BasicWorkflowServiceFactory.getInstance().getBasicWorkflowService();
+    List<BasicWorkflowItem> workflows =
+        (List<BasicWorkflowItem>) request.getAttribute("workflows");
 %>
 
 <dspace:layout style="submission" 
@@ -56,23 +60,23 @@
        </tr>
 <%
     String row = "even";
-    for (int i = 0; i < workflows.length; i++)
+    for (int i = 0; i < workflows.size(); i++)
     {
 %>
         <tr>
-            <td class="<%= row %>RowOddCol"><%= workflows[i].getID() %></td>
+            <td class="<%= row %>RowOddCol"><%= workflows.get(i).getID() %></td>
             <td class="<%= row %>RowEvenCol">
-                    <%= workflows[i].getCollection().getMetadata("name") %>
+                    <%= workflows.get(i).getCollection().getName() %>
             </td>
             <td class="<%= row %>RowOddCol">
-                    <%= BasicWorkflowServiceImpl.getSubmitterName(workflows[i])   %>
+                    <%= basicWorkflowService.getSubmitterName(workflows.get(i))   %>
             </td>
             <td class="<%= row %>RowEvenCol">
-                    <%= Utils.addEntities(BasicWorkflowServiceImpl.getItemTitle(workflows[i]))  %>
+                    <%= Utils.addEntities(basicWorkflowService.getItemTitle(workflows.get(i)))  %>
             </td>
             <td class="<%= row %>RowOddCol">
                <form method="post" action="">
-                   <input type="hidden" name="workflow_id" value="<%= workflows[i].getID() %>"/>
+                   <input type="hidden" name="workflow_id" value="<%= workflows.get(i).getID() %>"/>
                    <input class="btn btn-default" type="submit" name="submit_abort" value="<fmt:message key="jsp.dspace-admin.general.abort-w-confirm"/>" />
               </form>
             </td>
