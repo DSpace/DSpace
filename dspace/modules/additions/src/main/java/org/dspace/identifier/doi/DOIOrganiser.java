@@ -360,7 +360,7 @@ public class DOIOrganiser {
         
         if(line.hasOption("update-doi"))
         {
-            String identifier = line.getOptionValue('u');
+            String identifier = line.getOptionValue("update-doi");
             
             if(null == identifier)
             {
