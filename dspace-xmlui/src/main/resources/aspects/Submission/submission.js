@@ -29,6 +29,8 @@ importClass(Packages.org.dspace.authorize.factory.AuthorizeServiceFactory);
 importClass(Packages.org.dspace.core.ConfigurationManager);
 importClass(Packages.org.dspace.license.service.CreativeCommonsService);
 importClass(Packages.org.dspace.workflow.factory.WorkflowServiceFactory);
+importClass(Packages.org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory);
+
 
 importClass(Packages.org.dspace.app.xmlui.utils.ContextUtil);
 
@@ -105,6 +107,17 @@ function getWorkspaceItemService() {
 function getItemService() {
     return ContentServiceFactory.getInstance().getItemService();
 }
+
+function getWorkflowItemService()
+{
+    return XmlWorkflowServiceFactory.getInstance().getWorkflowItemService();
+}
+
+function getWorkflowFactory()
+{
+    return XmlWorkflowServiceFactory.getInstance().getWorkflowFactory();
+}
+
 
 /**
  * Return the SubmissionInfo for the current submission
@@ -735,8 +748,8 @@ function doWorkflowEditMetadata() {
     //    submissionControl(handle, "X"+workflowItemId, null);
     if (workflowItemId.startsWith("X")) {
         workflowItemId = workflowItemId.replace("X", "");
-        var coll = XmlWorkflowItem.find(getDSContext(), workflowItemId).getCollection();
-        var workflow = WorkflowFactory.getWorkflow(coll);
+        var coll = getWorkflowItemService().find(getDSContext(), workflowItemId).getCollection();
+        var workflow = getWorkflowFactory().getWorkflow(coll);
         var step = workflow.getStep(cocoon.request.get("stepID"));
         var action = step.getActionConfig(cocoon.request.get("actionID"));
         submissionControl(handle, "X"+workflowItemId, null);

@@ -74,11 +74,13 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         query.append("SELECT item FROM Item as item ");
         addMetadataLeftJoin(query, Item.class.getSimpleName().toLowerCase(), Collections.singletonList(metadataField));
         query.append(" WHERE item.inArchive = :in_archive");
+        query.append(" AND item.submitter =:submitter");
         addMetadataSortQuery(query, Collections.singletonList(metadataField), null);
 
         Query hibernateQuery = createQuery(context, query.toString());
         hibernateQuery.setParameter(metadataField.toString(), metadataField.getFieldID());
         hibernateQuery.setParameter("in_archive", true);
+        hibernateQuery.setParameter("submitter", eperson);
         hibernateQuery.setMaxResults(limit);
         return iterate(hibernateQuery);
     }
