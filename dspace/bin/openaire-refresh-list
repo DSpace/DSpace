@@ -8,7 +8,7 @@ echo "> Starting \"$0\" execution..."
 echo "Updating OpenAIRE Project list"
 
 # Read parameters from DSpace config
-FILE= openaire-cache.list
+FILE=openaire-cache.list
 ONLINE="http://api.openaire.eu/projects/dspace/FP7/ALL/ALL###http://api.openaire.eu/projects/dspace/WT/ALL/ALL"
 
 ONLINE=$(echo $ONLINE | sed 's/\"//g')
@@ -28,7 +28,7 @@ do
          cp "$url" "${i}.xml"
       fi
 
-      xmllint --format "${i}.xml" | head -n -2 > $FILE
+      xmllint --format "${i}.xml" | head -n -2 > "$FILE"
       rm "${i}.xml"
 
       i=$(($i+1))
@@ -39,7 +39,7 @@ do
          cp "$url" "${i}.xml"
       fi
 
-      xmllint --format "${i}.xml" | head -n -2 | tail -n +4 >> $FILE
+      xmllint --format "${i}.xml" | head -n -2 | tail -n +4 >> "$FILE"
       rm "${i}.xml"
 
       i=$(($i+1))
