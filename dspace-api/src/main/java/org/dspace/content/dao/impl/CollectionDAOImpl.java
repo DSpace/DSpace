@@ -58,12 +58,12 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
         addMetadataSortQuery(query, Arrays.asList(order), null);
 
         Query hibernateQuery = createQuery(context, query.toString());
-        if(limit != null)
+        if(offset != null)
         {
-            hibernateQuery.setFirstResult(limit);
+            hibernateQuery.setFirstResult(offset);
         }
-        if(offset != null){
-            hibernateQuery.setMaxResults(offset);
+        if(limit != null){
+            hibernateQuery.setMaxResults(limit);
         }
         hibernateQuery.setParameter(order.toString(), order.getFieldID());
         return list(hibernateQuery);
