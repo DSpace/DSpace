@@ -3,6 +3,11 @@
         "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
     <session-factory>
+        <!--
+         NOTE: If you are looking for the Hibernate database connection info
+         (driver, url, username, pwd), it is initialized in the 'dataSource'
+         bean in [dspace.dir]/config/spring/api/core-hibernate.xml
+        -->
 
         <property name="hibernate.dialect">${db.dialect}</property>
         <!--

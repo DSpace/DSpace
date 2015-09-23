@@ -9,7 +9,6 @@ package org.dspace.storage.rdbms;
 
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
-import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
 import org.flywaydb.core.api.MigrationInfo;
 import org.flywaydb.core.api.callback.FlywayCallback;
@@ -18,7 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.sql.Connection;
 
 /**
- * Callback method to ensure that the default groups are created each time a kernel is created.
+ * Callback method to ensure that the default groups are created in the database
+ * AFTER the database migration completes.
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -104,6 +104,16 @@ public class GroupServiceInitializer implements FlywayCallback {
 
     @Override
     public void afterInit(Connection connection) {
+
+    }
+
+    @Override
+    public void beforeBaseline(Connection connection) {
+
+    }
+
+    @Override
+    public void afterBaseline(Connection connection) {
 
     }
 

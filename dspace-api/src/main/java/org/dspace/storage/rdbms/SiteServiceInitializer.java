@@ -8,10 +8,8 @@
 package org.dspace.storage.rdbms;
 
 import org.apache.log4j.Logger;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.SiteService;
 import org.dspace.core.Context;
-import org.dspace.services.KernelStartupCallbackService;
 import org.flywaydb.core.api.MigrationInfo;
 import org.flywaydb.core.api.callback.FlywayCallback;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.sql.Connection;
 
 /**
- * Callback method to ensure that the Site is created (if no site exists) each time a kernel is created.
+ * Callback method to ensure that the Site object is created (if no site exists)
+ * after the database migration completes.
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -108,6 +107,16 @@ public class SiteServiceInitializer implements FlywayCallback {
 
     @Override
     public void afterInit(Connection connection) {
+
+    }
+
+    @Override
+    public void beforeBaseline(Connection connection) {
+
+    }
+
+    @Override
+    public void afterBaseline(Connection connection) {
 
     }
 
