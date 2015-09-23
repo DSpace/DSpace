@@ -172,17 +172,14 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         if(0 < filterFields.size())
         {
             Division searchFiltersDiv = searchBoxDivision.addInteractiveDivision("search-filters",
-                    "discover", Division.METHOD_GET, "discover-filters-box " + (0 < filterTypes.size() ? "" : "hidden"));
+                    "discover", Division.METHOD_GET, "discover-filters-box");
 
             Division filtersWrapper = searchFiltersDiv.addDivision("discovery-filters-wrapper");
             filtersWrapper.setHead(T_filter_label);
             filtersWrapper.addPara(T_filter_help);
             Table filtersTable = filtersWrapper.addTable("discovery-filters", 1, 4, "discovery-filters");
 
-
-            //If we have any filters, show them
-            if(filterTypes.size() > 0)
-            {
+			// ALWAYS show the filters
 
                 filtersTable.addRow(Row.ROLE_HEADER).addCell("", Cell.ROLE_HEADER, 1, 4, "new-filter-header").addContent(T_filter_current_filters);
                 for (int i = 0; i <  filterTypes.size(); i++)
@@ -199,8 +196,6 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
                 }
                 filtersTable.addRow("filler-row", Row.ROLE_DATA, "search-filter filler").addCell(1, 4).addContent("");
                 filtersTable.addRow(Row.ROLE_HEADER).addCell("", Cell.ROLE_HEADER, 1, 4, "new-filter-header").addContent(T_filter_new_filters);
-            }
-
 
             int index = filterTypes.size() + 1;
             Row row = filtersTable.addRow("filter-new-" + index, Row.ROLE_DATA, "search-filter");
@@ -223,13 +218,14 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         //results.setHead(T_head);
         buildMainForm(search);
 
-        // Add the result division
-        try {
-            buildSearchResultsDivision(search);
-        } catch (SearchServiceException e) {
-            throw new UIException(e.getMessage(), e);
-        }
-
+        // Add the result division (only if we've actually searched for something)
+		if ( "" != getQuery() ) {
+			try {
+				buildSearchResultsDivision(search);
+			} catch (SearchServiceException e) {
+				throw new UIException(e.getMessage(), e);
+			}
+		}
     }
 
     protected void addFilterRow(java.util.List<DiscoverySearchFilter> filterFields, int index, Row row, String selectedFilterType, String relationalOperator, String value) throws WingException {
@@ -358,12 +354,12 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
      */
     private void addHiddenFormFields(String type, Request request, Map<String, String[]> fqs, Division division) throws WingException {
         if(type.equals("filter") || type.equals("sort")){
-            if(request.getParameter("query") != null){
+            /*if(request.getParameter("query") != null){*/
                 division.addHidden("query").setValue(request.getParameter("query"));
-            }
-            if(request.getParameter("scope") != null){
+            /*}*/
+            /*if(request.getParameter("scope") != null){*/
                 division.addHidden("scope").setValue(request.getParameter("scope"));
-            }
+            /*}*/
         }
 
         //Add the filter queries, current search settings so these remain saved when performing a new search !
