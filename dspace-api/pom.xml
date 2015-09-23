@@ -368,8 +368,8 @@
             <artifactId>commons-lang</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-pool</groupId>
-            <artifactId>commons-pool</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-validator</groupId>

@@ -14,10 +14,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.commons.pool.KeyedObjectPool;
-import org.apache.commons.pool.KeyedPoolableObjectFactory;
-import org.apache.commons.pool.PoolUtils;
-import org.apache.commons.pool.impl.GenericKeyedObjectPool;
+import org.apache.commons.pool2.KeyedObjectPool;
+import org.apache.commons.pool2.KeyedPooledObjectFactory;
+import org.apache.commons.pool2.PoolUtils;
+import org.apache.commons.pool2.PooledObject;
+import org.apache.commons.pool2.impl.DefaultPooledObject;
+import org.apache.commons.pool2.impl.GenericKeyedObjectPool;
+import org.apache.commons.pool2.impl.GenericKeyedObjectPoolConfig;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -38,7 +41,7 @@ public class EventServiceImpl implements EventService
 
     protected DispatcherPoolFactory dispatcherFactory = null;
 
-    protected GenericKeyedObjectPool.Config poolConfig = null;
+    protected GenericKeyedObjectPoolConfig poolConfig = null;
 
     // Keyed FIFO Pool of event dispatchers
     protected KeyedObjectPool dispatcherPool = null;
@@ -65,14 +68,16 @@ public class EventServiceImpl implements EventService
 
             // TODO EVENT Eviction parameters should be set
 
-            poolConfig = new GenericKeyedObjectPool.Config();
-            poolConfig.maxActive = 100;
-            poolConfig.maxIdle = 5;
-            poolConfig.maxTotal = 100;
+            poolConfig = new GenericKeyedObjectPoolConfig();
+            poolConfig.setMaxTotalPerKey(100);
+            poolConfig.setMaxIdlePerKey(5);
+            poolConfig.setMaxTotal(100);
 
             try
             {
                 dispatcherFactory = new DispatcherPoolFactory();
+
+
                 dispatcherPool = PoolUtils
                         .synchronizedPool(new GenericKeyedObjectPool(
                                 dispatcherFactory, poolConfig));
@@ -158,7 +163,7 @@ public class EventServiceImpl implements EventService
         }
     }
 
-    protected class DispatcherPoolFactory implements KeyedPoolableObjectFactory
+    protected class DispatcherPoolFactory implements KeyedPooledObjectFactory<String,Dispatcher>
     {
 
         // Prefix of keys in DSpace Configuration
@@ -173,10 +178,13 @@ public class EventServiceImpl implements EventService
             log.info("");
         }
 
-        @Override
-        public Object makeObject(Object dispatcherName) throws Exception
-        {
+        public PooledObject<Dispatcher> wrap(Dispatcher d) {
+           return new DefaultPooledObject<>(d);
+        }
 
+        @Override
+        public PooledObject<Dispatcher> makeObject(String dispatcherName) throws Exception
+        {
             Dispatcher dispatcher = null;
             String dispClass = dispatchers.get(dispatcherName);
 
@@ -266,12 +274,12 @@ public class EventServiceImpl implements EventService
                         "Requested Dispatcher Does Not Exist In DSpace Configuration!");
             }
 
-            return dispatcher;
+            return wrap(dispatcher);
 
         }
 
         @Override
-        public void activateObject(Object arg0, Object arg1) throws Exception
+        public void activateObject(String arg0, PooledObject<Dispatcher> arg1) throws Exception
         {
             // No-op
             return;
@@ -279,12 +287,14 @@ public class EventServiceImpl implements EventService
         }
 
         @Override
-        public void destroyObject(Object key, Object dispatcher)
+        public void destroyObject(String key, PooledObject<Dispatcher> pooledDispatcher)
                 throws Exception
         {
             Context ctx = new Context();
 
-            for (Iterator ci = ((Dispatcher) dispatcher).getConsumers()
+            Dispatcher dispatcher = pooledDispatcher.getObject();
+
+            for (Iterator ci = dispatcher.getConsumers()
                     .iterator(); ci.hasNext();)
             {
                 ConsumerProfile cp = (ConsumerProfile) ci.next();
@@ -293,12 +303,10 @@ public class EventServiceImpl implements EventService
                     cp.getConsumer().finish(ctx);
                 }
             }
-            return;
-
         }
 
         @Override
-        public void passivateObject(Object arg0, Object arg1) throws Exception
+        public void passivateObject(String arg0, PooledObject<Dispatcher> arg1) throws Exception
         {
             // No-op
             return;
@@ -306,7 +314,7 @@ public class EventServiceImpl implements EventService
         }
 
         @Override
-        public boolean validateObject(Object arg0, Object arg1)
+        public boolean validateObject(String arg0, PooledObject<Dispatcher> arg1)
         {
             // No-op
             return false;
