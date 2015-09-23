@@ -15,8 +15,10 @@ import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
+import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
+import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
@@ -24,9 +26,7 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * This class manages the upload step with embargo fields during the submission.
@@ -189,7 +189,7 @@ public class UploadWithEmbargoStep extends UploadStep
 		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
 		boolean disableFileEditing = (submissionInfo.isInWorkflow()) && !ConfigurationManager.getBooleanProperty("workflow", "reviewer.file-edit");
         java.util.List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
-        java.util.List<BundleBitstream> bitstreams = new ArrayList<>();
+        java.util.List<Bitstream> bitstreams = new ArrayList<>();
 		if (bundles.size() > 0)
 		{
 			bitstreams = bundles.get(0).getBitstreams();
@@ -274,10 +274,8 @@ public class UploadWithEmbargoStep extends UploadStep
 	        header.addCellContent(T_column5); // format
 	        header.addCellContent(T_column6); // edit button
 	        
-	        for (BundleBitstream bundleBitstream : bitstreams)
+	        for (Bitstream bitstream : bitstreams)
 	        {
-                Bitstream bitstream = bundleBitstream.getBitstream();
-
                 UUID id = bitstream.getID();
 	        	String name = bitstream.getName();
 	        	String url = makeBitstreamLink(item, bitstream);
@@ -411,15 +409,14 @@ public class UploadWithEmbargoStep extends UploadStep
         // Review all uploaded files
         Item item = submission.getItem();
         java.util.List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
-        java.util.List<BundleBitstream> bitstreams = new ArrayList<>();
+        java.util.List<Bitstream> bitstreams = new ArrayList<>();
         if (bundles.size() > 0)
         {
             bitstreams = bundles.get(0).getBitstreams();
         }
         
-        for (BundleBitstream bundleBitstream : bitstreams)
+        for (Bitstream bitstream : bitstreams)
         {
-            Bitstream bitstream = bundleBitstream.getBitstream();
             BitstreamFormat bitstreamFormat = bitstream.getFormat(context);
             
             String name = bitstream.getName();

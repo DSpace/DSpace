@@ -405,16 +405,16 @@ public class UploadStep extends AbstractProcessingStep
 
         // remove bitstream from bundle..
         // delete bundle if it's now empty
-        List<BundleBitstream> bundles = bitstream.getBundles();
+        List<Bundle> bundles = bitstream.getBundles();
 
-        bundleService.removeBitstream(context, bundles.get(0).getBundle(), bitstream);
+        bundleService.removeBitstream(context, bundles.get(0), bitstream);
 
-        List<BundleBitstream> bitstreams = bundles.get(0).getBundle().getBitstreams();
+        List<Bitstream> bitstreams = bundles.get(0).getBitstreams();
 
         // remove bundle if it's now empty
         if (bitstreams.size() < 1)
         {
-            itemService.removeBundle(context, item, bundles.get(0).getBundle());
+            itemService.removeBundle(context, item, bundles.get(0));
             itemService.update(context, item);
         }
 
@@ -591,16 +591,16 @@ public class UploadStep extends AbstractProcessingStep
     {
         // remove bitstream from bundle..
         // delete bundle if it's now empty
-        List<BundleBitstream> bundleBitstreams = b.getBundles();
+        List<Bundle> bundles = b.getBundles();
 
-        bundleService.removeBitstream(context, bundleBitstreams.get(0).getBundle(), b);
+        bundleService.removeBitstream(context, bundles.get(0), b);
 
-        List<BundleBitstream> bitstreams = bundleBitstreams.get(0).getBundle().getBitstreams();
+        List<Bitstream> bitstreams = bundles.get(0).getBitstreams();
 
         // remove bundle if it's now empty
         if (bitstreams.size() < 1)
         {
-            itemService.removeBundle(context, item, bundleBitstreams.get(0).getBundle());
+            itemService.removeBundle(context, item, bundles.get(0));
             itemService.update(context, item);
         }
 

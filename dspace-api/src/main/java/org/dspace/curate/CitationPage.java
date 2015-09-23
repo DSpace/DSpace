@@ -108,8 +108,7 @@ public class CitationPage extends AbstractCurationTask {
         //Create a map of the bitstreams in the displayBundle. This is used to
         //check if the bundle being cited is already in the display bundle.
         Map<String,Bitstream> displayMap = new HashMap<String,Bitstream>();
-        for (BundleBitstream bundleBitstream : dBundle.getBitstreams()) {
-            Bitstream bs = bundleBitstream.getBitstream();
+        for (Bitstream bs : dBundle.getBitstreams()) {
             displayMap.put(bs.getName(), bs);
         }
 
@@ -136,12 +135,11 @@ public class CitationPage extends AbstractCurationTask {
         //Start looping through our bundles. Anything that is citable in these
         //bundles will be cited.
         for (Bundle bundle : bundles) {
-            List<BundleBitstream> bundleBitstreams = bundle.getBitstreams();
+            List<Bitstream> bitstreams = bundle.getBitstreams();
 
             // Loop through each file and generate a cover page for documents
             // that are PDFs.
-            for (BundleBitstream bundleBitstream : bundleBitstreams) {
-                Bitstream bitstream = bundleBitstream.getBitstream();
+            for (Bitstream bitstream : bitstreams) {
                 BitstreamFormat format = bitstream.getFormat(Curator.curationContext());
 
                 //If bitstream is a PDF document then it is citable.
@@ -211,8 +209,8 @@ public class CitationPage extends AbstractCurationTask {
         if (bundle.getID() != pBundle.getID()) {
             bundleService.addBitstream(context, pBundle, bitstream);
             bundleService.removeBitstream(context, bundle, bitstream);
-            List<BundleBitstream> originalBits = bundle.getBitstreams();
-            if (originalBits == null || originalBits.size() == 0) {
+            List<Bitstream> bitstreams = bundle.getBitstreams();
+            if (bitstreams == null || bitstreams.size() == 0) {
                 itemService.removeBundle(context, item, bundle);
             }
         }

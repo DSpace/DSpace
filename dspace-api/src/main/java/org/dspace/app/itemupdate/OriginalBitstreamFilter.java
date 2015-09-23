@@ -12,7 +12,6 @@ import java.util.List;
 
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.BundleBitstream;
 
 /** 
  * 		Filter all bitstreams in the ORIGINAL bundle
@@ -39,10 +38,9 @@ public class OriginalBitstreamFilter extends BitstreamFilterByBundleName
 	{		
 		try
 		{
-			List<BundleBitstream> bundles = bitstream.getBundles();
-			for (BundleBitstream bundleBitstream : bundles)
+			List<Bundle> bundles = bitstream.getBundles();
+			for (Bundle bundle : bundles)
 			{
-                Bundle bundle = bundleBitstream.getBundle();
                 if (bundle.getName().equals("ORIGINAL"))
 				{
 					return true;

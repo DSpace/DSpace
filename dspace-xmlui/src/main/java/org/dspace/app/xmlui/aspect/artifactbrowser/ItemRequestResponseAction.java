@@ -23,7 +23,6 @@ import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.BundleBitstream;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -199,9 +198,8 @@ public class ItemRequestResponseAction extends AbstractAction
         if (requestItem.isAllfiles()){
             List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
             for (Bundle bundle : bundles) {
-                List<BundleBitstream> bundleBitstreams = bundle.getBitstreams();
-                for (BundleBitstream bundleBitstream : bundleBitstreams) {
-                    Bitstream bitstream = bundleBitstream.getBitstream();
+                List<Bitstream> bitstreams = bundle.getBitstreams();
+                for (Bitstream bitstream : bitstreams) {
                     if (!bitstream.getFormat(context).isInternal() /*&& RequestItemManager.isRestricted(context, bitstreams[k])*/) {
                         email.addAttachment(bitstreamStorageService.retrieve(context, bitstream), bitstream.getName(), bitstream.getFormat(context).getMIMEType());
                     }

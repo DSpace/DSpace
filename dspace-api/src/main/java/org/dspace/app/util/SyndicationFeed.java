@@ -371,9 +371,8 @@ public class SyndicationFeed
                     try {
                         List<Bundle> bunds = itemService.getBundles(item, "ORIGINAL");
                         if (bunds.get(0) != null) {
-                            List<BundleBitstream> bits = bunds.get(0).getBitstreams();
-                            for (BundleBitstream bundleBitstream : bits) {
-                                Bitstream bit = bundleBitstream.getBitstream();
+                            List<Bitstream> bits = bunds.get(0).getBitstreams();
+                            for (Bitstream bit : bits) {
                                 String mime = bit.getFormat(context).getMIMEType();
                                 if (podcastableMIMETypes.contains(mime)) {
                                     SyndEnclosure enc = new SyndEnclosureImpl();

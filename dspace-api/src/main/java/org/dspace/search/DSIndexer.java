@@ -1232,11 +1232,11 @@ public class DSIndexer
                 if ((myBundle.getName() != null)
                         && myBundle.getName().equals("TEXT")) {
                     // a-ha! grab the text out of the bitstreams
-                    List<BundleBitstream> bundleBitstreams = myBundle.getBitstreams();
+                    List<Bitstream> bitstreams = myBundle.getBitstreams();
 
-                    for (j = 0; j < bundleBitstreams.size(); j++)
+                    for (j = 0; j < bitstreams.size(); j++)
                         try {
-                            Bitstream bitstream = bundleBitstreams.get(j).getBitstream();
+                            Bitstream bitstream = bitstreams.get(j);
                             // Add each InputStream to the Indexed Document (Acts like an Append)
                             doc.add(new Field("default", new BufferedReader(new InputStreamReader(bitstreamService.retrieve(context, bitstream)))));
 

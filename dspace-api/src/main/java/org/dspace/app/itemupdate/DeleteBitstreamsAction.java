@@ -70,10 +70,9 @@ public class DeleteBitstreamsAction extends UpdateBitstreamsAction
 			    		}
 			    		else
 			    		{
-				    		List<BundleBitstream> bundles = bs.getBundles();
-				    		for (BundleBitstream bundleBitstream : bundles)
+				    		List<Bundle> bundles = bs.getBundles();
+				    		for (Bundle b : bundles)
 				    		{
-                                Bundle b = bundleBitstream.getBundle();
                                 if (isTest)
 				    			{
 					    			ItemUpdate.pr("Delete bitstream with id = " + id);
@@ -91,7 +90,7 @@ public class DeleteBitstreamsAction extends UpdateBitstreamsAction
 				            	DtoMetadata dtom = DtoMetadata.create("dc.description.provenance", "en", "");
 				            	
 				            	String append = "Bitstream " + bs.getName() + " deleted on " + DCDate.getCurrent() + "; ";
-				            	Item item = bundles.iterator().next().getBundle().getItems().iterator().next();
+				            	Item item = bundles.iterator().next().getItems().iterator().next();
 					    		ItemUpdate.pr("Append provenance with: " + append);
 					    		
 					    		if (!isTest)

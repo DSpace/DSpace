@@ -13,7 +13,6 @@ import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Bundle;
-import org.dspace.content.BundleBitstream;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.*;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -491,7 +490,7 @@ public class ItemsResource extends Resource
             // Create policy for bitstream
             if (groupId != null)
             {
-                List<BundleBitstream> bundleBitstreams = dspaceBitstream.getBundles();
+                bundles = dspaceBitstream.getBundles();
                 for (Bundle dspaceBundle : bundles)
                 {
                     List<org.dspace.authorize.ResourcePolicy> bitstreamsPolicies = bundleService.getBitstreamPolicies(context, dspaceBundle);
@@ -853,21 +852,7 @@ public class ItemsResource extends Resource
                     request, context);
 
             log.trace("Deleting bitstream...");
-            Iterator<Bundle> bundleIterator = item.getBundles().iterator();
-            while(bundleIterator.hasNext())
-            {
-                Bundle bundle = bundleIterator.next();
-                Iterator<BundleBitstream> bundleBitstreamIterator = bundle.getBitstreams().iterator();
-                while (bundleBitstreamIterator.hasNext())
-                {
-                    BundleBitstream bundleBitstream = bundleBitstreamIterator.next();
-                    if (bundleBitstream.getBitstream().getID().equals(bitstream.getID()))
-                    {
-                        bundleBitstreamIterator.remove();
-                        bundleService.removeBitstream(context, bundle, bitstream);
-                    }
-                }
-            }
+            bitstreamService.delete(context, bitstream);
 
             context.complete();
 

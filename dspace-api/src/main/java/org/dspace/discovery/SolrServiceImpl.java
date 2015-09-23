@@ -1349,11 +1349,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         && myBundle.getName().equals("TEXT"))
                 {
                     // a-ha! grab the text out of the bitstreams
-                    List<BundleBitstream> bundleBitstreams = myBundle.getBitstreams();
+                    List<Bitstream> bitstreams = myBundle.getBitstreams();
 
-                    for (BundleBitstream bundleBitstream : bundleBitstreams)
+                    for (Bitstream myBitstream : bitstreams)
                     {
-                        Bitstream myBitstream = bundleBitstream.getBitstream();
                         try {
 
                             streams.add(new BitstreamContentStream(context, myBitstream));

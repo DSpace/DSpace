@@ -61,9 +61,8 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
     @JoinColumn(name = "bitstream_format_id")
     private BitstreamFormat bitstreamFormat;
 
-    @OneToMany(mappedBy = "bitstream", fetch = FetchType.LAZY)
-    @OrderBy("bitstreamOrder asc")
-    private List<BundleBitstream> bundles = new ArrayList<>();
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "bitstreams")
+    private List<Bundle> bundles = new ArrayList<>();
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy="logo")
     private Community community;
@@ -265,12 +264,12 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
      * @return array of <code>Bundle</code> s this bitstream appears in
      * @throws SQLException
      */
-    public List<BundleBitstream> getBundles() throws SQLException
+    public List<Bundle> getBundles() throws SQLException
     {
         return bundles;
     }
 
-    void setBundles(List<BundleBitstream> bundles) {
+    void setBundles(List<Bundle> bundles) {
         this.bundles = bundles;
     }
 

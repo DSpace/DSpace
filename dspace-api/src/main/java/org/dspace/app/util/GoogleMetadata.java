@@ -1055,9 +1055,8 @@ public class GoogleMetadata
 		int bitstreamCount = 0;
 		List<Bundle> contentBundles = itemService.getBundles(item, "ORIGINAL");
 		for (Bundle bundle : contentBundles) {
-            List<BundleBitstream> bundleBitstreams = bundle.getBitstreams();
-            for (BundleBitstream bundleBitstream : bundleBitstreams) {
-                Bitstream candidate = bundleBitstream.getBitstream();
+            List<Bitstream> bitstreams = bundle.getBitstreams();
+            for (Bitstream candidate : bitstreams) {
                 if (candidate.equals(bundle.getPrimaryBitstream())) { // is primary -> use this one
                     if (isPublic(candidate)) {
                         return candidate;

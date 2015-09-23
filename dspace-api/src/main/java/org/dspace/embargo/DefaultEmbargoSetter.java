@@ -99,9 +99,8 @@ public class DefaultEmbargoSetter implements EmbargoSetter
             {
                 //AuthorizeManager.removePoliciesActionFilter(context, bn, Constants.READ);
                 generatePolicies(context, liftDate.toDate(), null, bn, item.getOwningCollection());
-                for (BundleBitstream bundleBitstream : bn.getBitstreams())
+                for (Bitstream bs : bn.getBitstreams())
                 {
-                    Bitstream bs = bundleBitstream.getBitstream();
                     //AuthorizeManager.removePoliciesActionFilter(context, bs, Constants.READ);
                     generatePolicies(context, liftDate.toDate(), null, bs, item.getOwningCollection());
                 }
@@ -176,9 +175,8 @@ public class DefaultEmbargoSetter implements EmbargoSetter
                     }
                 }
 
-                for (BundleBitstream bundleBitstream : bn.getBitstreams())
+                for (Bitstream bs : bn.getBitstreams())
                 {
-                    Bitstream bs = bundleBitstream.getBitstream();
                     for (ResourcePolicy rp : getAuthorizeService().getPoliciesActionFilter(context, bs, Constants.READ))
                     {
                         System.out.println("CHECK WARNING: Item "+item.getHandle()+", Bitstream "+bs.getName()+" (in Bundle "+bn.getName()+") allows READ by "+

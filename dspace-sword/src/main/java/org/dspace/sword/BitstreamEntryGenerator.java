@@ -198,14 +198,14 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry
         try
         {
             // work our way up to the item
-            List<BundleBitstream> bundle2bitstreams = this.bitstream
+            List<Bundle> bundle2bitstreams = this.bitstream
                     .getBundles();
             if (bundle2bitstreams.isEmpty())
             {
                 log.error("Found orphaned bitstream: " + bitstream.getID());
                 throw new DSpaceSWORDException("Orphaned bitstream discovered");
             }
-            Bundle bundle = bundle2bitstreams.get(0).getBundle();
+            Bundle bundle = bundle2bitstreams.get(0);
             List<Item> items = bundle.getItems();
             if (items.isEmpty())
             {
@@ -225,10 +225,9 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry
                     // skip non-license bundles
                     continue;
                 }
-                List<BundleBitstream> bss = lbundle.getBitstreams();
-                for (BundleBitstream b2b : bss)
+                List<Bitstream> bss = lbundle.getBitstreams();
+                for (Bitstream bs : bss)
                 {
-                    Bitstream bs = b2b.getBitstream();
                     String url = urlManager.getBitstreamUrl(bs);
                     rightsString.append(url).append(" ");
                 }

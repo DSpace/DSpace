@@ -340,7 +340,7 @@ public class BundleTest extends AbstractDSpaceObjectTest
         bundleService.addBitstream(context, b, bs);
         assertThat("testGetBitstreams 2", b.getBitstreams(), notNullValue());
         assertThat("testGetBitstreams 3", b.getBitstreams().size(), equalTo(1));
-        assertThat("testGetBitstreams 4", b.getBitstreams().get(0).getBitstream().getName(), equalTo(name));
+        assertThat("testGetBitstreams 4", b.getBitstreams().get(0).getName(), equalTo(name));
     }
 
     /**

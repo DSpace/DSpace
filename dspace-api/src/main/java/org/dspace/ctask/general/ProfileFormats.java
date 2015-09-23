@@ -52,9 +52,8 @@ public class ProfileFormats extends AbstractCurationTask
     {
         for (Bundle bundle : item.getBundles())
         {
-            for (BundleBitstream bundleBitstream : bundle.getBitstreams())
+            for (Bitstream bs : bundle.getBitstreams())
             {
-                Bitstream bs = bundleBitstream.getBitstream();
                 String fmt = bs.getFormat(Curator.curationContext()).getShortDescription();
                 Integer count = fmtTable.get(fmt);
                 if (count == null)

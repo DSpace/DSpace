@@ -544,17 +544,17 @@
 
     for (int i = 0; i < bundles.size(); i++)
     {
-        List<BundleBitstream> bitstreams = bundles.get(i).getBitstreams();
+        List<Bitstream> bitstreams = bundles.get(i).getBitstreams();
         for (int j = 0; j < bitstreams.size(); j++)
         {
             ArrayList<UUID> bitstreamIdOrder = new ArrayList<UUID>();
-            for (BundleBitstream bundleBitstream : bitstreams) {
-                bitstreamIdOrder.add(bundleBitstream.getBitstream().getID());
+            for (Bitstream bitstream : bitstreams) {
+                bitstreamIdOrder.add(bitstream.getID());
             }
 
             // Parameter names will include the bundle and bitstream ID
             // e.g. "bitstream_14_18_desc" is the description of bitstream 18 in bundle 14
-            Bitstream bitstream = bitstreams.get(j).getBitstream();
+            Bitstream bitstream = bitstreams.get(j);
             String key = bundles.get(i).getID() + "_" + (bitstream).getID();
             BitstreamFormat bf = (bitstream).getFormat(UIUtil.obtainContext(request));
 %>

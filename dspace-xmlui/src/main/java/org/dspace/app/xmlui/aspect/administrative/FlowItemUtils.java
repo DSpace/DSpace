@@ -522,7 +522,7 @@ public class FlowItemUtils
 				Collection owningCollection = item.getOwningCollection();
 				if (owningCollection != null)
 				{
-				    Bundle bnd = bitstream.getBundles().get(0).getBundle();
+				    Bundle bnd = bitstream.getBundles().get(0);
 				    bundleService.inheritCollectionDefaultPolicies(context, bnd, owningCollection);
 				}
 			}
@@ -624,10 +624,10 @@ public class FlowItemUtils
 		
 		//Step 2:
 		// Check if the primary bitstream status has changed
-		List<BundleBitstream> bundles = bitstream.getBundles();
+		List<Bundle> bundles = bitstream.getBundles();
 		if (bundles != null && bundles.size() > 0)
 		{
-			Bundle bundle = bundles.get(0).getBundle();
+			Bundle bundle = bundles.get(0);
 			if (bundle.getPrimaryBitstream() != null && bundle.getPrimaryBitstream().toString().equals(String.valueOf(bitstreamID)))
 			{
 				// currently the bitstream is primary
@@ -745,12 +745,11 @@ public class FlowItemUtils
 
         List<Bundle> bundles = item.getBundles();
         for (Bundle bundle : bundles) {
-            List<BundleBitstream> bundleBitstreams = bundle.getBitstreams();
+            List<Bitstream> bitstreams = bundle.getBitstreams();
 
-            UUID[] newBitstreamOrder = new UUID[bundleBitstreams.size()];
+            UUID[] newBitstreamOrder = new UUID[bitstreams.size()];
             if (submitButton.equals("submit_update_order")) {
-                for (BundleBitstream bundleBitstream : bundleBitstreams) {
-					Bitstream bitstream = bundleBitstream.getBitstream();
+                for (Bitstream bitstream : bitstreams) {
 					//The order is determined by javascript
                     //For each of our bitstream retrieve the order value
                     int order = Util.getIntParameter(request, "order_" + bitstream.getID());

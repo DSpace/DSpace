@@ -304,9 +304,9 @@ public class DSpaceValidity implements SourceValidity
             validityKey.append(bundle.getName());
             validityKey.append(bundle.getPrimaryBitstream() != null ? bundle.getPrimaryBitstream().getID() : "");
             
-            for(BundleBitstream bundleBitstream : bundle.getBitstreams())
+            for(Bitstream bitstream : bundle.getBitstreams())
             {
-                this.add(context, bundleBitstream.getBitstream());
+                this.add(context, bitstream);
             }
         }
         else if (dso instanceof Bitstream)

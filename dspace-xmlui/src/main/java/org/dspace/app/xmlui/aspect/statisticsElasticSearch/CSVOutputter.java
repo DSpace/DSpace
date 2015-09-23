@@ -191,7 +191,7 @@ public class CSVOutputter extends AbstractReader implements Recyclable
                 
                 entryValues[0] = bitstream.getID() + "";
                 entryValues[1] = bitstream.getName();
-                entryValues[2] = bitstream.getBundles().get(0).getBundle().getName();
+                entryValues[2] = bitstream.getBundles().get(0).getName();
                 entryValues[3] = item.getName();
                 entryValues[4] = "http://hdl.handle.net/" + item.getHandle();
                 entryValues[5] = wrapInDelimitedString(itemService.getMetadataByMetadataString(item, "dc.creator"));

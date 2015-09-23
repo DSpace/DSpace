@@ -268,10 +268,10 @@ public class ElasticSearchLoggerServiceImpl implements ElasticSearchLoggerServic
 
             if (dspaceObject instanceof Bitstream) {
                 Bitstream bit = (Bitstream) dspaceObject;
-                List<BundleBitstream> bundles = bit.getBundles();
+                List<Bundle> bundles = bit.getBundles();
                 docBuilder.field("bundleName").startArray();
-                for (BundleBitstream bundleBitstream : bundles) {
-                    docBuilder.value(bundleBitstream.getBundle().getName());
+                for (Bundle bundle : bundles) {
+                    docBuilder.value(bundle.getName());
                 }
                 docBuilder.endArray();
             }
@@ -386,10 +386,10 @@ public class ElasticSearchLoggerServiceImpl implements ElasticSearchLoggerServic
 
             if (dspaceObject instanceof Bitstream) {
                 Bitstream bit = (Bitstream) dspaceObject;
-                List<BundleBitstream> bundles = bit.getBundles();
+                List<Bundle> bundles = bit.getBundles();
                 docBuilder.field("bundleName").startArray();
-                for (BundleBitstream bundleBitstream : bundles) {
-                    docBuilder.value(bundleBitstream.getBundle().getName());
+                for (Bundle bundle : bundles) {
+                    docBuilder.value(bundle.getName());
                 }
                 docBuilder.endArray();
             }
@@ -493,8 +493,8 @@ public class ElasticSearchLoggerServiceImpl implements ElasticSearchLoggerServic
         } else if (dso instanceof Bitstream) {
             Bitstream bitstream = (Bitstream) dso;
 
-            for (BundleBitstream bundleBitstream : bitstream.getBundles()) {
-                for (Item item : bundleBitstream.getBundle().getItems()) {
+            for (Bundle bundle : bitstream.getBundles()) {
+                for (Item item : bundle.getItems()) {
 
                     parents.get("owningItem").add(item.getID().toString());
                     buildParents(item, parents);

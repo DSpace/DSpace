@@ -215,9 +215,9 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             if(dspaceObject instanceof Bitstream)
             {
                 Bitstream bit = (Bitstream) dspaceObject;
-                List<BundleBitstream> bundleBitstreams = bit.getBundles();
-                for (BundleBitstream bundle : bundleBitstreams) {
-                    doc1.addField("bundleName", bundle.getBundle().getName());
+                List<Bundle> bundles = bit.getBundles();
+                for (Bundle bundle : bundles) {
+                    doc1.addField("bundleName", bundle.getName());
                 }
             }
 
@@ -253,9 +253,9 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 				return;
 			if (dspaceObject instanceof Bitstream) {
 				Bitstream bit = (Bitstream) dspaceObject;
-				List<BundleBitstream> bundles = bit.getBundles();
-				for (BundleBitstream bundleBitstream : bundles) {
-					doc1.addField("bundleName", bundleBitstream.getBundle().getName());
+				List<Bundle> bundles = bit.getBundles();
+				for (Bundle bundle : bundles) {
+					doc1.addField("bundleName", bundle.getName());
 				}
 			}
 
@@ -600,9 +600,9 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         else if (dso instanceof Bitstream)
         {
             Bitstream bitstream = (Bitstream) dso;
-            List<BundleBitstream> bundles = bitstream.getBundles();
-            for (BundleBitstream bundleBitstream : bundles) {
-                List<Item> items = bundleBitstream.getBundle().getItems();
+            List<Bundle> bundles = bitstream.getBundles();
+            for (Bundle bundle : bundles) {
+                List<Item> items = bundle.getItems();
                 for (Item item : items) {
                     doc1.addField("owningItem", item.getID());
                     storeParents(doc1, item);
@@ -1376,9 +1376,9 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                         Bitstream bitstream = bitstreamService.findByIdOrLegacyId(context, bitstreamId);
                         //Attempt to retrieve our bitstream !
                         if (bitstream != null){
-                            List<BundleBitstream> bundles = bitstream.getBundles();
+                            List<Bundle> bundles = bitstream.getBundles();
                             if(bundles != null && 0 < bundles.size()){
-                                Bundle bundle = bundles.get(0).getBundle();
+                                Bundle bundle = bundles.get(0);
                                 bundleName = bundle.getName();
                             }else{
                                 //No bundle found, we are either a collection or a community logo, check for it !

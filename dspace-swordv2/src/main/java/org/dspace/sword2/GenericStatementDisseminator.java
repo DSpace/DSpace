@@ -9,7 +9,6 @@ package org.dspace.sword2;
 
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.BundleBitstream;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -76,15 +75,15 @@ public abstract class GenericStatementDisseminator
             {
                 if (swordBundle.equals(bundle.getName()))
                 {
-                    List<BundleBitstream> bundleBitstreams = bundle
+                    List<Bitstream> bitstreams = bundle
                             .getBitstreams();
-                    for (BundleBitstream bundleBitstream : bundleBitstreams)
+                    for (Bitstream bitstream : bitstreams)
                     {
                         // note that original deposits don't have actionable urls
                         OriginalDeposit deposit = new OriginalDeposit(
                                 this.urlManager.getBitstreamUrl(
-                                        bundleBitstream.getBitstream()));
-                        deposit.setMediaType(bundleBitstream.getBitstream()
+                                        bitstream));
+                        deposit.setMediaType(bitstream
                                 .getFormat(context).getMIMEType());
                         originalDeposits.add(deposit);
                     }
@@ -147,15 +146,15 @@ public abstract class GenericStatementDisseminator
                 {
                     if (bundleName.equals(bundle.getName()))
                     {
-                        List<BundleBitstream> bundleBitstreams = bundle
+                        List<Bitstream> bitstreams = bundle
                                 .getBitstreams();
-                        for (BundleBitstream bundleBitstream : bundleBitstreams)
+                        for (Bitstream bitstream : bitstreams)
                         {
                             // note that individual bitstreams have actionable urls
                             ResourcePart part = new ResourcePart(this.urlManager
                                     .getActionableBitstreamUrl(
-                                            bundleBitstream.getBitstream()));
-                            part.setMediaType(bundleBitstream.getBitstream()
+                                            bitstream));
+                            part.setMediaType(bitstream
                                     .getFormat(context).getMIMEType());
                             resources.add(part);
                         }

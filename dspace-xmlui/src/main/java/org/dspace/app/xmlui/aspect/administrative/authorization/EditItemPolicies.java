@@ -31,7 +31,6 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.BundleBitstream;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -123,8 +122,7 @@ public class EditItemPolicies extends AbstractDSpaceTransformer
 		/* First, set up our various data structures */
 		Item item = itemService.find(context, itemID);
 		List<Bundle> bundles = item.getBundles();
-		Bitstream[] bitstreams;
-		
+
 		ArrayList<ResourcePolicy> itemPolicies = (ArrayList<ResourcePolicy>) authorizeService.getPolicies(context, item);
 		
 		// DIVISION: main
@@ -162,9 +160,8 @@ public class EditItemPolicies extends AbstractDSpaceTransformer
     		this.rowBuilder(baseURL, table, bundlePolicies, bundle.getID(), Constants.BUNDLE, highlightID);
     		
     		// And eventually to the bundle's bitstreams
-    		List<BundleBitstream> bundleBitstreams = bundle.getBitstreams();
-    		for (BundleBitstream bundleBitstream : bundleBitstreams) {
-				Bitstream bitstream = bundleBitstream.getBitstream();
+    		List<Bitstream> bitstreams = bundle.getBitstreams();
+    		for (Bitstream bitstream : bitstreams) {
 				subheader = table.addRow(null,Row.ROLE_HEADER,"subheader");
         		subheader.addCell(null, null, 1, 7, "doubleIndent").addContent(T_subhead_bitstream.parameterize(bitstream.getName(),bitstream.getID()));
         		subheader.addCell().addXref(baseURL + "&submit_add_bitstream_" + bitstream.getID(), T_add_bitstreamPolicy_link);

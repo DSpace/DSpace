@@ -437,11 +437,11 @@ public class SWORDUrlManager
     {
         try
         {
-            List<BundleBitstream> bundles = bitstream.getBundles();
+            List<Bundle> bundles = bitstream.getBundles();
             Bundle parent = null;
             if (!bundles.isEmpty())
             {
-                parent = bundles.get(0).getBundle();
+                parent = bundles.get(0);
             }
             else
             {
@@ -549,11 +549,11 @@ public class SWORDUrlManager
     {
         try
         {
-            List<BundleBitstream> bundles = bitstream.getBundles();
+            List<Bundle> bundles = bitstream.getBundles();
             Bundle parent = null;
             if (!bundles.isEmpty())
             {
-                parent = bundles.get(0).getBundle();
+                parent = bundles.get(0);
             }
             else
             {

@@ -13,8 +13,7 @@ import com.lyncode.xoai.util.Base64Utils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Bundle;
-import org.dspace.content.Item;
+import org.dspace.content.*;
 import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
@@ -26,9 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
-import org.dspace.content.BundleBitstream;
-import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
@@ -166,23 +162,23 @@ public class ItemUtils
 
                 Element bitstreams = create("bitstreams");
                 bundle.getElement().add(bitstreams);
-                List<BundleBitstream> bits = b.getBitstreams();
-                for (BundleBitstream bit : bits)
+                List<Bitstream> bits = b.getBitstreams();
+                for (Bitstream bit : bits)
                 {
                     Element bitstream = create("bitstream");
                     bitstreams.getElement().add(bitstream);
                     String url = "";
-                    String bsName = bit.getBitstream().getName();
-                    String sid = String.valueOf(bit.getBitstream().getSequenceID());
+                    String bsName = bit.getName();
+                    String sid = String.valueOf(bit.getSequenceID());
                     String baseUrl = ConfigurationManager.getProperty("oai",
                             "bitstream.baseUrl");
                     String handle = null;
                     // get handle of parent Item of this bitstream, if there
                     // is one:
-                    List<BundleBitstream> bn = bit.getBitstream().getBundles();
+                    List<Bundle> bn = bit.getBundles();
                     if (!bn.isEmpty())
                     {
-                        List<Item> bi = bn.get(0).getBundle().getItems();
+                        List<Item> bi = bn.get(0).getItems();
                         if (!bi.isEmpty())
                         {
                             handle = bi.get(0).getHandle();
@@ -190,7 +186,7 @@ public class ItemUtils
                     }
                     if (bsName == null)
                     {
-                        List<String> ext = bit.getBitstream().getFormat(context).getExtensions();
+                        List<String> ext = bit.getFormat(context).getExtensions();
                         bsName = "bitstream_" + sid
                                 + (ext.isEmpty() ? "" : ext.get(0));
                     }
@@ -206,11 +202,11 @@ public class ItemUtils
                         url = URLUtils.encode(bsName);
                     }
 
-                    String cks = bit.getBitstream().getChecksum();
-                    String cka = bit.getBitstream().getChecksumAlgorithm();
-                    String oname = bit.getBitstream().getSource();
-                    String name = bit.getBitstream().getName();
-                    String description = bit.getBitstream().getDescription();
+                    String cks = bit.getChecksum();
+                    String cka = bit.getChecksumAlgorithm();
+                    String oname = bit.getSource();
+                    String name = bit.getName();
+                    String description = bit.getDescription();
 
                     if (name != null)
                         bitstream.getField().add(
@@ -222,17 +218,17 @@ public class ItemUtils
                         bitstream.getField().add(
                                 createValue("description", description));
                     bitstream.getField().add(
-                            createValue("format", bit.getBitstream().getFormat(context)
+                            createValue("format", bit.getFormat(context)
                                     .getMIMEType()));
                     bitstream.getField().add(
-                            createValue("size", "" + bit.getBitstream().getSize()));
+                            createValue("size", "" + bit.getSize()));
                     bitstream.getField().add(createValue("url", url));
                     bitstream.getField().add(
                             createValue("checksum", cks));
                     bitstream.getField().add(
                             createValue("checksumAlgorithm", cka));
                     bitstream.getField().add(
-                            createValue("sid", bit.getBitstream().getSequenceID()
+                            createValue("sid", bit.getSequenceID()
                                     + ""));
                 }
             }
@@ -274,14 +270,14 @@ public class ItemUtils
             if (!licBundles.isEmpty())
             {
                 Bundle licBundle = licBundles.get(0);
-                List<BundleBitstream> licBits = licBundle.getBitstreams();
+                List<Bitstream> licBits = licBundle.getBitstreams();
                 if (!licBits.isEmpty())
                 {
-                    BundleBitstream licBit = licBits.get(0);
+                    Bitstream licBit = licBits.get(0);
                     InputStream in;
                     try
                     {
-                        in = bitstreamService.retrieve(context, licBit.getBitstream());
+                        in = bitstreamService.retrieve(context, licBit);
                         ByteArrayOutputStream out = new ByteArrayOutputStream();
                         Utils.bufferedCopy(in, out);
                         license.getField().add(
