@@ -56,7 +56,8 @@ public class V5_0_2014_11_04__Enable_XMLWorkflow_Migration
 
         // Make sure XML Workflow is enabled in workflow.cfg before proceeding
         if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow")
-                //This migration won't work in DSpace 6, so we cannot execute it, in DSpace 5 it should work so allow it prior to version 6
+                // If your database was upgraded to DSpace 6 prior to enabling XML Workflow, we MUST skip this 5.x migration, as it is incompatible
+                // with a 6.x database. In that scenario the corresponding 6.x XML Workflow migration will create necessary tables.
                 && DatabaseUtils.getCurrentFlywayDSpaceState(connection) < 6)
         {
             // Now, check if the XMLWorkflow table (cwf_workflowitem) already exists in this database
