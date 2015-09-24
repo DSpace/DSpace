@@ -169,8 +169,8 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         addHiddenFormFields("search", request, fqs, mainSearchDiv);
 
 
-        if(0 < filterFields.size())
-        {
+       /* if(0 < filterFields.size())
+        { */
             Division searchFiltersDiv = searchBoxDivision.addInteractiveDivision("search-filters",
                     "discover", Division.METHOD_GET, "discover-filters-box");
 
@@ -208,7 +208,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
 
             addHiddenFormFields("filter", request, fqs, searchFiltersDiv);
 
-        }
+       /* }*/
 
 
 //        query.addPara(null, "button-list").addButton("submit").setValue(T_go);
@@ -353,14 +353,6 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
      * @throws WingException will never occur
      */
     private void addHiddenFormFields(String type, Request request, Map<String, String[]> fqs, Division division) throws WingException {
-        if(type.equals("filter") || type.equals("sort")){
-            /*if(request.getParameter("query") != null){*/
-                division.addHidden("query").setValue(request.getParameter("query"));
-            /*}*/
-            /*if(request.getParameter("scope") != null){*/
-                division.addHidden("scope").setValue(request.getParameter("scope"));
-            /*}*/
-        }
 
         //Add the filter queries, current search settings so these remain saved when performing a new search !
         if(type.equals("search") || type.equals("sort"))
@@ -369,20 +361,20 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
             {
                 String[] values = fqs.get(parameter);
                 for (String value : values) {
-                    division.addHidden(parameter).setValue(value);
+                   // division.addHidden(parameter).setValue(value);
                 }
             }
         }
 
         if(type.equals("search") || type.equals("filter")){
             if(request.getParameter("rpp") != null){
-                division.addHidden("rpp").setValue(request.getParameter("rpp"));
+                //division.addHidden("rpp").setValue(request.getParameter("rpp"));
             }
             if(request.getParameter("sort_by") != null){
-                division.addHidden("sort_by").setValue(request.getParameter("sort_by"));
+                //division.addHidden("sort_by").setValue(request.getParameter("sort_by"));
             }
             if(request.getParameter("order") != null){
-                division.addHidden("order").setValue(request.getParameter("order"));
+                //division.addHidden("order").setValue(request.getParameter("order"));
             }
         }
     }
