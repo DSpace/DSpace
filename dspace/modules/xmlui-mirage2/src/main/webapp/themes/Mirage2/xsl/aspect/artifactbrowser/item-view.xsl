@@ -106,28 +106,29 @@
     <xsl:template match="dim:dim" mode="itemSummaryView-DIM">
         <div class="item-summary-view-metadata">
             <xsl:call-template name="itemSummaryView-DIM-title"/>
+            <!-- DATASHARE - start -->
             <div class="row">
                 <div class="col-sm-4">
                     <div class="row">
                         <div class="col-xs-6 col-sm-12">
                             <xsl:call-template name="itemSummaryView-DIM-thumbnail"/>
                         </div>
-                        <div class="col-xs-6 col-sm-12">
-                            <xsl:call-template name="itemSummaryView-DIM-file-section"/>
-                        </div>
                     </div>
-                    <xsl:call-template name="itemSummaryView-DIM-date"/>
-                    <xsl:call-template name="itemSummaryView-DIM-authors"/>
+                    <xsl:call-template name="itemSummaryView-DIM-date-available"/>
+                    <xsl:call-template name="itemSummaryView-DIM-type"/>
+                    <xsl:call-template name="itemSummaryView-DIM-creators"/>
+                    <xsl:call-template name="itemSummaryView-DIM-publisher"/>
                     <xsl:if test="$ds_item_view_toggle_url != ''">
                         <xsl:call-template name="itemSummaryView-show-full"/>
                     </xsl:if>
                 </div>
                 <div class="col-sm-8">
-                    <xsl:call-template name="itemSummaryView-DIM-abstract"/>
-                    <xsl:call-template name="itemSummaryView-DIM-URI"/>
-                    <xsl:call-template name="itemSummaryView-collections"/>
+                  <xsl:call-template name="itemSummaryView-DIM-citation"/>
+                  <xsl:call-template name="itemSummaryView-DIM-description"/>
+                  <xsl:call-template name="itemSummaryView-DIM-file-section"/>
                 </div>
             </div>
+            <!-- DATASHARE - end -->
         </div>
     </xsl:template>
 
@@ -330,10 +331,23 @@
     <xsl:template name="itemSummaryView-DIM-file-section">
         <xsl:choose>
             <xsl:when test="//mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL' or @USE='LICENSE']/mets:file">
+              <!-- DATASHARE - start -->
+              <xsl:if test="$document/dri:meta/dri:pageMeta/dri:metadata[@element='download-all-file']">
+                <div id="item-page-download-all">
+                  <a>
+                    <xsl:attribute name="href">
+                      <xsl:value-of select="$document/dri:meta/dri:pageMeta/dri:metadata[@element='download-all-file']"/>
+                    </xsl:attribute>
+                    <xsl:text>Download DataSet</xsl:text>
+                  </a>
+                </div>
+              </xsl:if>
+
                 <div class="item-page-field-wrapper table">
-                    <h5>
-                        <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-viewOpen</i18n:text>
-                    </h5>
+                    <!-- <h5> -->
+                    <!--     <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-viewOpen</i18n:text> -->
+                    <!-- </h5> -->
+                    <!-- DATASHARE - end -->
 
                     <xsl:variable name="label-1">
                             <xsl:choose>
@@ -450,6 +464,83 @@
             </a>
         </div>
     </xsl:template>
+
+    <!-- DATASHARE - start -->
+    <xsl:template name="itemSummaryView-DIM-date-available">
+      <xsl:if test="dim:field[@element='date' and @qualifier='available' and descendant::text()]">
+        <div class="simple-item-view-date-available word-break item-page-field-wrapper table">
+          <h5>Date Available</h5>
+          <xsl:for-each select="dim:field[@element='date' and @qualifier='available']">
+            <xsl:copy-of select="substring(./node(),1,10)"/>
+            <xsl:if test="count(following-sibling::dim:field[@element='date' and @qualifier='available']) != 0">
+              <br/>
+            </xsl:if>
+          </xsl:for-each>
+        </div>
+      </xsl:if>
+    </xsl:template>
+    <xsl:template name="itemSummaryView-DIM-type">
+      <xsl:if test="dim:field[@element='type' and descendant::text()]">
+        <div class="simple-item-view-type word-break item-page-field-wrapper table">
+          <h5>Data Type</h5>
+          <xsl:for-each select="dim:field[@element='type']">
+            <xsl:copy-of select="substring(./node(),1,10)"/>
+            <xsl:if test="count(following-sibling::dim:field[@element='type']) != 0">
+              <br/>
+            </xsl:if>
+          </xsl:for-each>
+          <br/>
+        </div>
+      </xsl:if>
+    </xsl:template>
+    <xsl:template name="itemSummaryView-DIM-creators">
+      <xsl:if test="dim:field[@element='creator' and descendant::text()]">
+        <div class="simple-item-view-creators item-page-field-wrapper table">
+          <h5>Data Creator</h5>
+          <xsl:for-each select="dim:field[@element='creator']">
+            <xsl:copy-of select="substring(./node(),1,10)"/>
+          </xsl:for-each>
+        </div>
+      </xsl:if>
+    </xsl:template>
+    <xsl:template name="itemSummaryView-DIM-publisher">
+      <xsl:if test="dim:field[@element='publisher' and descendant::text()]">
+        <div class="simple-item-view-publisher item-page-field-wrapper table">
+          <h5>Data Publisher</h5>
+          <xsl:for-each select="dim:field[@element='publisher']">
+            <xsl:copy-of select="substring(./node(),1,10)"/>
+          </xsl:for-each>
+        </div>
+      </xsl:if>
+    </xsl:template>
+    <xsl:template name="itemSummaryView-DIM-citation">
+      <xsl:if test="dim:field[@element='identifier' and @qualifier='citation' and descendant::text()]">
+        <div class="simple-item-view-citation word-break item-page-field-wrapper table">
+          <h5>Citation</h5>
+          <xsl:for-each select="dim:field[@element='identifier' and @qualifier='citation']">
+            <xsl:copy-of select="substring(./node(),1,10)"/>
+            <xsl:if test="count(following-sibling::dim:field[@element='identifier' and @qualifier='citation']) != 0">
+              <br/>
+            </xsl:if>
+          </xsl:for-each>
+        </div>
+      </xsl:if>
+    </xsl:template>
+    <xsl:template name="itemSummaryView-DIM-description">
+      <xsl:if test="dim:field[@element='description' and @qualifier='abstract' and descendant::text()]">
+        <div class="simple-item-view-description word-break item-page-field-wrapper table">
+          <h5>Description</h5>
+          <xsl:for-each select="dim:field[@element='description' and @qualifier='abstract']">
+            <xsl:copy-of select="substring(./node(),1,10)"/>
+            <xsl:if test="count(following-sibling::dim:field[@element='description' and @qualifier='abstract']) != 0">
+              <br/>
+            </xsl:if>
+          </xsl:for-each>
+        </div>
+      </xsl:if>
+    </xsl:template>
+
+    <!-- DATASHARE - end -->
 
     <xsl:template match="dim:dim" mode="itemDetailView-DIM">
         <xsl:call-template name="itemSummaryView-DIM-title"/>

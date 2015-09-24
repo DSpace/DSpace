@@ -264,7 +264,16 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             Metadata md = pageMeta.addMetadata("identifier", idType);
             md.addContent(idValue);
         }
-
+        
+        // DATASHARE - start
+        if(Util.allowDownloadAll(context, item))
+        {
+            final String DA = contextPath + "/download/" +
+                    dso.getHandle() + "/" + dso.getName().replaceAll(" ", "_") + ".zip";
+            pageMeta.addMetadata("download-all-file").addContent(DA);
+        }
+        // DATASHARE - end
+        
         String sfxserverImg = ConfigurationManager.getProperty("sfx.server.image_url");
         if (sfxserverImg != null && sfxserverImg.length() > 0)
         {
@@ -360,7 +369,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         }
         
         // DataShare - start
-        if(Util.allowDownloadAll(context, item))
+        /*if(Util.allowDownloadAll(context, item))
         {
 	        final String CLS = "download-all";
 	        Division div = division.addDivision("download-all-top", CLS);
@@ -374,7 +383,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 	        para.addFigure(ICON, HREF, "");
 	        para.addXref(HREF, message("item.view.download-all"), null, HINT);
 	        para.addFigure(ICON, HREF, "");
-        }
+        }*/
         // DataShare - end
         
         Para showfullPara = division.addPara(null, "item-view-toggle item-view-toggle-top");

@@ -11,20 +11,36 @@
  * It will be included in all color schemes
  */
 
-//example mixin to set the text-selection style
-@mixin selection {
-    ::-moz-selection { @content; }
-    ::selection { @content; }
+
+/*************************** header  *******************************/
+.navbar{
+    min-height: 75px;
 }
 
-@include selection {
-    color: white;
-    background: hotpink;
+header .navbar-default {
+    background-color: #25476c;
 }
+
+header .navbar-brand img {
+  height: 3em;
+}
+
+#header-eduni{
+    float: right;
+}
+
+/*************************** footer *******************************/
+#footer-is-icon{
+    float: left;
+    padding-right: 3em;
+}
+
+
+
+/*************************** ingest *******************************/
 
 #aspect_submission_StepTransformer_div_submit-describe .metadata-group{
     cursor: pointer;
-    /* background-color: #E4ECF3; */
 }
 
 .metadata-group .ds-text-field{
@@ -41,7 +57,6 @@
     background-image: url(../images/list-add.png);
     background-repeat: no-repeat;
     background-size: 10em;
-    /* margin-left: -1em; */
     background-size: 2em;
 }
 
@@ -81,8 +96,23 @@
 #aspect_submission_StepTransformer_item_time-period .row:nth-child(2) div:nth-child(8){
     width: 6em;
 }
-/*
-#aspect_eperson_EditProfile_list_security{
-    display: none;
+
+/*************************** item view *******************************/
+.item-summary-view-metadata h5{
+    font-weight: bold;
 }
-*/
+
+#item-page-download-all{
+    padding-bottom: 0.6em;
+}
+
+//example mixin to set the text-selection style
+@mixin selection {
+    ::-moz-selection { @content; }
+    ::selection { @content; }
+}
+
+@include selection {
+    color: white;
+    background: hotpink;
+}
