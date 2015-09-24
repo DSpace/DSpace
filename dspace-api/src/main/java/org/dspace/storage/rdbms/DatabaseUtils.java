@@ -59,7 +59,7 @@ public class DatabaseUtils
     // Our Flyway DB object (initialized by setupFlyway())
     private static Flyway flywaydb;
 
-     // When this temp file exists, the "checkReindexDiscovery()" method will auto-reindex Discovery
+    // When this temp file exists, the "checkReindexDiscovery()" method will auto-reindex Discovery
     // Reindex flag file is at [dspace]/solr/search/conf/reindex.flag
     // See also setReindexDiscovery()/getReindexDiscover()
     private static final String reindexDiscoveryFilePath = ConfigurationManager.getProperty("dspace.dir") +
@@ -68,6 +68,7 @@ public class DatabaseUtils
                             File.separator + "conf" +
                             File.separator + "reindex.flag";
 
+    // Types of databases supported by DSpace. See getDbType()
     public static final String DBMS_POSTGRES="postgres";
     public static final String DBMS_ORACLE="oracle";
     public static final String DBMS_H2="h2";
@@ -275,8 +276,7 @@ public class DatabaseUtils
                 flywaydb.setEncoding("UTF-8");
 
                 // Migration scripts are based on DBMS Keyword (see full path below)
-                DatabaseMetaData meta = connection.getMetaData();
-                String dbType = findDbKeyword(meta);
+                String dbType = getDbType(connection);
                 connection.close();
 
                 // Determine location(s) where Flyway will load all DB migrations
@@ -468,7 +468,7 @@ public class DatabaseUtils
                 // Get info about which database type we are using
                 connection = dataSource.getConnection();
                 DatabaseMetaData meta = connection.getMetaData();
-                String dbKeyword = findDbKeyword(meta);
+                String dbKeyword = getDbType(connection);
 
                 // If this is Oracle, the only way to entirely clean the database
                 // is to also purge the "Recyclebin". See:
@@ -768,7 +768,7 @@ public class DatabaseUtils
             sequenceName = canonicalize(connection, sequenceName);
 
             // Different database types store sequence information in different tables
-            String dbtype = findDbKeyword(connection.getMetaData());
+            String dbtype = getDbType(connection);
             String sequenceSQL = null;
             switch(dbtype)
             {
@@ -910,8 +910,7 @@ public class DatabaseUtils
         // Still blank? Ok, we'll find a "sane" default based on the DB type
         if(StringUtils.isBlank(schema))
         {
-            DatabaseMetaData meta = connection.getMetaData();
-            String dbType = findDbKeyword(meta);
+            String dbType = getDbType(connection);
 
             if(dbType.equals(DBMS_POSTGRES))
             {
@@ -923,6 +922,7 @@ public class DatabaseUtils
             {
                 // For Oracle, default schema is actually the user account
                 // See: http://stackoverflow.com/a/13341390
+                DatabaseMetaData meta = connection.getMetaData();
                 schema = meta.getUserName();
             }
             else // For H2 (in memory), there is no such thing as a schema
@@ -1123,14 +1123,16 @@ public class DatabaseUtils
     }
 
     /**
-     * Determine the type of Database, based on the DB connection's metadata info
-     * @param meta DatabaseMetaData from DB Connection
+     * Determine the type of Database, based on the DB connection.
+     * 
+     * @param connection current DB Connection
      * @return a DB keyword/type (see DatabaseUtils.DBMS_* constants)
      * @throws SQLException
      */
-    protected static String findDbKeyword(DatabaseMetaData meta)
+    public static String getDbType(Connection connection)
             throws SQLException
     {
+        DatabaseMetaData meta = connection.getMetaData();
         String prodName = meta.getDatabaseProductName();
         String dbms_lc = prodName.toLowerCase(Locale.ROOT);
         if (dbms_lc.contains("postgresql"))
