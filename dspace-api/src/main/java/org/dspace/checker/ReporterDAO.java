@@ -252,8 +252,8 @@ public class ReporterDAO extends DAOSupport
                         .getString("short_description"), rs
                         .getInt("bitstream_id"), bitstream.getFormatDescription(), rs
                         .getString("internal_id"), bitstream.getSource(), rs
-                        .getString("checksum_algorithm"), rs
-                        .getString("checksum"), bitstream.getName(), bitstream.getDescription()));
+                        .getString(Bitstream.CHECKSUM_ALGORITHM), rs
+                        .getString(Bitstream.CHECKSUM), bitstream.getName(), bitstream.getDescription()));
             }
         }
         catch (SQLException e)

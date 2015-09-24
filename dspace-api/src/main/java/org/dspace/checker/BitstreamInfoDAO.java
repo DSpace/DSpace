@@ -248,14 +248,14 @@ public final class BitstreamInfoDAO extends DAOSupport
             // if the bitstream is found return it
             if (rs.next())
             {
-                Bitstream bitstream = Bitstream.find(context, rs.getInt("bitstream_id"));
-                info = new BitstreamInfo(rs.getBoolean("deleted"), rs
-                        .getInt("store_number"), rs.getLong("size_bytes"), rs
+                Bitstream bitstream = Bitstream.find(context, rs.getInt(Bitstream.BITSTREAM_ID));
+                info = new BitstreamInfo(rs.getBoolean(Bitstream.DELETED), rs
+                        .getInt(Bitstream.STORE_NUMBER), rs.getLong(Bitstream.SIZE_BYTES), rs
                         .getString("short_description"), rs
-                        .getInt("bitstream_id"), bitstream.getUserFormatDescription(), rs
-                        .getString("internal_id"), bitstream.getSource(), rs
-                        .getString("checksum_algorithm"), rs
-                        .getString("checksum"), bitstream.getName(), rs
+                        .getInt(Bitstream.BITSTREAM_ID), bitstream.getUserFormatDescription(), rs
+                        .getString(Bitstream.INTERNAL_ID), bitstream.getSource(), rs
+                        .getString(Bitstream.CHECKSUM_ALGORITHM), rs
+                        .getString(Bitstream.CHECKSUM), bitstream.getName(), rs
                         .getTimestamp("last_process_end_date"), rs
                         .getBoolean("to_be_processed"), new Date());
             }
