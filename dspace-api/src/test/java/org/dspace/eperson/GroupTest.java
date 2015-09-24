@@ -7,7 +7,6 @@
  */
 package org.dspace.eperson;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
@@ -89,15 +88,15 @@ public class GroupTest extends AbstractUnitTest {
     {
         try {
             context.turnOffAuthorisationSystem();
-            if(level1Group != null)
-            {
-                groupService.delete(context, level1Group);
-                level1Group = null;
-            }
             if(level2Group != null)
             {
                 groupService.delete(context,level2Group);
                 level2Group = null;
+            }
+            if(level1Group != null)
+            {
+                groupService.delete(context, level1Group);
+                level1Group = null;
             }
             if(topGroup != null)
             {
@@ -184,18 +183,25 @@ public class GroupTest extends AbstractUnitTest {
 
     @Test
     public void findAllNameSort() throws SQLException {
+        // Retrieve groups sorted by name
         List<Group> groups = groupService.findAll(context, GroupService.NAME);
 
         assertThat("findAllNameSort 1", groups, notNullValue());
 
-        //Check our sorting order by adding to a treeSet & check against arraylist values
-        List<String> listNames = new ArrayList<String>();
-        Set<String> setNames = new TreeSet<String>();
+        // Add all group names to two arraylists (arraylists are unsorted)
+        // NOTE: we use lists here because we don't want duplicate names removed
+        List<String> names = new ArrayList<String>();
+        List<String> sortedNames = new ArrayList<String>();
         for (Group group : groups) {
-            listNames.add(group.getName());
-            setNames.add(group.getName());
+            names.add(group.getName());
+            sortedNames.add(group.getName());
         }
-        assertTrue("findAllNameSort 2 ", ArrayUtils.isEquals(setNames.toArray(new String[setNames.size()]), listNames.toArray(new String[listNames.size()])));
+
+        // Now, sort the "sortedNames" Arraylist
+        Collections.sort(sortedNames);
+
+        // Verify the sorted arraylist is still equal to the original (unsorted) one
+        assertEquals("findAllNameSort compareLists", sortedNames, names);
     }
 
     @Test
