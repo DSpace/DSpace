@@ -91,7 +91,7 @@ public class CommunityCollectionIntegrationTest extends AbstractIntegrationTest
         context.restoreAuthSystemState();
 
         //verify it works as expected
-        assertThat("testCreateTree 0", parent.getParentCommunities().size(), not(0));
+        assertThat("testCreateTree 0", parent.getParentCommunities().size(), is(0));
         assertThat("testCreateTree 1", child1.getParentCommunities().get(0), equalTo(parent));
         assertThat("testCreateTree 2", (Community) collectionService.getParentObject(context, col1), equalTo(child1));
         assertThat("testCreateTree 3", (Community) collectionService.getParentObject(context, col2), equalTo(child1));

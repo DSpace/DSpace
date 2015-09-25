@@ -59,7 +59,7 @@ public class DatabaseUtils
     // Our Flyway DB object (initialized by setupFlyway())
     private static Flyway flywaydb;
 
-     // When this temp file exists, the "checkReindexDiscovery()" method will auto-reindex Discovery
+    // When this temp file exists, the "checkReindexDiscovery()" method will auto-reindex Discovery
     // Reindex flag file is at [dspace]/solr/search/conf/reindex.flag
     // See also setReindexDiscovery()/getReindexDiscover()
     private static final String reindexDiscoveryFilePath = ConfigurationManager.getProperty("dspace.dir") +
@@ -68,6 +68,7 @@ public class DatabaseUtils
                             File.separator + "conf" +
                             File.separator + "reindex.flag";
 
+    // Types of databases supported by DSpace. See getDbType()
     public static final String DBMS_POSTGRES="postgres";
     public static final String DBMS_ORACLE="oracle";
     public static final String DBMS_H2="h2";
@@ -117,7 +118,7 @@ public class DatabaseUtils
                     System.out.println(" - Driver: " + meta.getDriverName() + " version " + meta.getDriverVersion());
                     System.out.println(" - Username: " + meta.getUserName());
                     System.out.println(" - Password: [hidden]");
-                    System.out.println(" - Schema: " + connection.getSchema());
+                    System.out.println(" - Schema: " + getSchemaName(connection));
                     connection.close();
                 }
                 catch (SQLException sqle)
@@ -134,7 +135,7 @@ public class DatabaseUtils
                 Connection connection = dataSource.getConnection();
                 DatabaseMetaData meta = connection.getMetaData();
                 System.out.println("\nDatabase URL: " + meta.getURL());
-                System.out.println("Database Schema: " + connection.getSchema());
+                System.out.println("Database Schema: " + getSchemaName(connection));
                 System.out.println("Database Software: " + meta.getDatabaseProductName() + " version " + meta.getDatabaseProductVersion());
                 System.out.println("Database Driver: " + meta.getDriverName() + " version " + meta.getDriverVersion());
 
@@ -275,8 +276,7 @@ public class DatabaseUtils
                 flywaydb.setEncoding("UTF-8");
 
                 // Migration scripts are based on DBMS Keyword (see full path below)
-                DatabaseMetaData meta = connection.getMetaData();
-                String dbType = findDbKeyword(meta);
+                String dbType = getDbType(connection);
                 connection.close();
 
                 // Determine location(s) where Flyway will load all DB migrations
@@ -468,7 +468,7 @@ public class DatabaseUtils
                 // Get info about which database type we are using
                 connection = dataSource.getConnection();
                 DatabaseMetaData meta = connection.getMetaData();
-                String dbKeyword = findDbKeyword(meta);
+                String dbKeyword = getDbType(connection);
 
                 // If this is Oracle, the only way to entirely clean the database
                 // is to also purge the "Recyclebin". See:
@@ -641,7 +641,7 @@ public class DatabaseUtils
         {
             // Get the name of the Schema that the DSpace Database is using
             // (That way we can search the right schema)
-            String schema = connection.getSchema();
+            String schema = getSchemaName(connection);
 
             // Get information about our database.
             DatabaseMetaData meta = connection.getMetaData();
@@ -702,7 +702,7 @@ public class DatabaseUtils
         {
             // Get the name of the Schema that the DSpace Database is using
             // (That way we can search the right schema)
-            String schema = connection.getSchema();
+            String schema = getSchemaName(connection);
 
             // Canonicalize everything to the proper case based on DB type
             schema = canonicalize(connection, schema);
@@ -761,14 +761,14 @@ public class DatabaseUtils
         {
             // Get the name of the Schema that the DSpace Database is using
             // (That way we can search the right schema)
-            String schema = connection.getSchema();
+            String schema = getSchemaName(connection);
 
             // Canonicalize everything to the proper case based on DB type
             schema = canonicalize(connection, schema);
             sequenceName = canonicalize(connection, sequenceName);
 
             // Different database types store sequence information in different tables
-            String dbtype = findDbKeyword(connection.getMetaData());
+            String dbtype = getDbType(connection);
             String sequenceSQL = null;
             switch(dbtype)
             {
@@ -875,6 +875,61 @@ public class DatabaseUtils
             // If any FlywayException (Runtime) is thrown, change it to a SQLException
             throw new SQLException("Flyway executeSql() error occurred", fe);
         }
+    }
+
+    /**
+     * Get the Database Schema Name in use by this Connection, so that it can
+     * be used to limit queries in other methods (e.g. tableExists()).
+     *
+     * @param connection
+     *            Current Database Connection
+     * @return Schema name as a string, or "null" if cannot be determined or unspecified
+     */
+    public static String getSchemaName(Connection connection)
+            throws SQLException
+    {
+        String schema = null;
+        
+        // Try to get the schema from the DB connection itself.
+        // As long as the Database driver supports JDBC4.1, there should be a getSchema() method
+        // If this method is unimplemented or doesn't exist, it will throw an exception (likely an AbstractMethodError)
+        try
+        {
+            schema = connection.getSchema();
+        }
+        catch (Exception|AbstractMethodError e)
+        {
+        }
+
+        // If we don't know our schema, let's try the schema in the DSpace configuration
+        if(StringUtils.isBlank(schema))
+        {
+            schema = canonicalize(connection, ConfigurationManager.getProperty("db.schema"));
+        }
+            
+        // Still blank? Ok, we'll find a "sane" default based on the DB type
+        if(StringUtils.isBlank(schema))
+        {
+            String dbType = getDbType(connection);
+
+            if(dbType.equals(DBMS_POSTGRES))
+            {
+                // For PostgreSQL, the default schema is named "public"
+                // See: http://www.postgresql.org/docs/9.0/static/ddl-schemas.html
+                schema = "public";
+            }
+            else if (dbType.equals(DBMS_ORACLE))
+            {
+                // For Oracle, default schema is actually the user account
+                // See: http://stackoverflow.com/a/13341390
+                DatabaseMetaData meta = connection.getMetaData();
+                schema = meta.getUserName();
+            }
+            else // For H2 (in memory), there is no such thing as a schema
+                schema = null;
+        }
+
+        return schema;
     }
 
     /**
@@ -1068,14 +1123,16 @@ public class DatabaseUtils
     }
 
     /**
-     * Determine the type of Database, based on the DB connection's metadata info
-     * @param meta DatabaseMetaData from DB Connection
+     * Determine the type of Database, based on the DB connection.
+     * 
+     * @param connection current DB Connection
      * @return a DB keyword/type (see DatabaseUtils.DBMS_* constants)
      * @throws SQLException
      */
-    protected static String findDbKeyword(DatabaseMetaData meta)
+    public static String getDbType(Connection connection)
             throws SQLException
     {
+        DatabaseMetaData meta = connection.getMetaData();
         String prodName = meta.getDatabaseProductName();
         String dbms_lc = prodName.toLowerCase(Locale.ROOT);
         if (dbms_lc.contains("postgresql"))

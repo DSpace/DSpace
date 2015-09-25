@@ -30,18 +30,11 @@ public class V6_0_2015_08_31__DS_2701_Hibernate_Workflow_Migration implements Jd
     @Override
     public void migrate(Connection connection) throws Exception
     {
-        String dbtype = connection.getMetaData().getDatabaseProductName();
-        String dbFileLocation = null;
-        if(dbtype.toLowerCase().contains("postgres"))
-        {
-            dbFileLocation = "postgres";
-        }else
-        if(dbtype.toLowerCase().contains("oracle")){
-            dbFileLocation = "oracle";
-        }
+        // Based on type of DB, get path to SQL migration script
+        String dbtype = DatabaseUtils.getDbType(connection);
 
         String dataMigrateSQL;
-        String sqlMigrationPath = "org/dspace/storage/rdbms/sqlmigration/workflow/" + dbFileLocation +"/";
+        String sqlMigrationPath = "org/dspace/storage/rdbms/sqlmigration/workflow/" + dbtype +"/";
         // Now, check if the XMLWorkflow table (cwf_workflowitem) already exists in this database
         // If XMLWorkflow Table does NOT exist in this database, then lets do the migration!
         // If XMLWorkflow Table ALREADY exists, then this migration is a noop, we assume you manually ran the sql scripts
