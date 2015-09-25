@@ -1,18 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<!--
+  A slightly custom version of hibernate.cfg.xml which is used for Unit Testing and the H2 database.
+  This OVERRIDES the default [dspace]/config/hibernate.cfg.xml. So it should be kept in sync with that file!
+-->
 <hibernate-configuration>
     <session-factory>
+        <!--
+         NOTE: If you are looking for the Hibernate database connection info
+         (driver, url, username, pwd), it is initialized in the 'dataSource'
+         bean in [dspace.dir]/config/spring/api/core-hibernate.xml
+        -->
 
-
-        <property name="hibernate.dialect">org.hibernate.dialect.H2Dialect</property>
-
-
-        <property name="hibernate.hbm2ddl.auto">update</property>
-
-
-
+        <property name="hibernate.dialect">${db.dialect}</property>
+        <!--
+         Schema name - if your database contains multiple schemas, you can avoid
+         problems with retrieving the definitions of duplicate object names by
+         specifying the schema name that is used for DSpace.
+         ORACLE USAGE NOTE: In Oracle, schema is equivalent to "username". This means
+         specifying a "db.schema" is often unnecessary (i.e. you can leave it blank),
+         UNLESS your Oracle DB Account (in db.username) has access to multiple schemas.
+        -->
+        <!-- H2 doesn't use schemas -->
         <!--<property name="hibernate.default_schema"></property>-->
+        <property name="hibernate.hbm2ddl.auto">update</property>  <!-- custom for H2 -->
         <property name="hibernate.hbm2ddl.import_files_sql_extractor">org.hibernate.tool.hbm2ddl.SingleLineSqlCommandExtractor</property>
         <property name="hibernate.connection.autocommit">false</property>
         <property name="hibernate.current_session_context_class">org.hibernate.context.internal.ThreadLocalSessionContext</property>
@@ -21,9 +33,9 @@
 
         <!--Connection pool parameters -->
         <!-- Maximum number of DB connections in pool -->
-        <property name="hibernate.c3p0.max_size">30</property>
+        <property name="hibernate.c3p0.max_size">${db.maxconnections}</property>
         <!-- Determine the number of statements to be cached. -->
-        <property name="hibernate.c3p0.max_statements">50</property>
+        <property name="hibernate.c3p0.max_statements">${db.statementpool.cache}</property>
 
 
 
@@ -63,7 +75,6 @@
         <mapping class="org.dspace.eperson.EPerson"/>
         <mapping class="org.dspace.eperson.Group"/>
         <mapping class="org.dspace.eperson.Group2GroupCache"/>
-        <!--<mapping class="org.dspace.eperson.Group2Group"/>-->
         <mapping class="org.dspace.eperson.RegistrationData"/>
         <mapping class="org.dspace.eperson.Subscription"/>
 
