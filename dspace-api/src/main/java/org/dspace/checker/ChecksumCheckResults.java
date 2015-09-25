@@ -10,16 +10,16 @@ package org.dspace.checker;
 /**
  * Enumeration of ChecksumCheckResults containing constants for checksum
  * comparison result that must correspond to values in checksum_result table.
- * 
+ *
  * @author Jim Downing
  * @author Grace Carpenter
  * @author Nathan Sarr
- * 
- * 
  * @todo Refactor these as properties of ChecksumChecker?
  */
 public class ChecksumCheckResults
 {
+
+
     /**
      * Bitstream not found result.
      */
@@ -59,4 +59,10 @@ public class ChecksumCheckResults
      * No match between requested algorithm and previously used algorithm.
      */
     public static final String CHECKSUM_ALGORITHM_INVALID = "CHECKSUM_ALGORITHM_INVALID";
+
+    /**
+     * List of available Checksum Result Strings
+     */
+    public static final String[] RESULTS_LIST = {BITSTREAM_NOT_FOUND, BITSTREAM_INFO_NOT_FOUND, BITSTREAM_NOT_PROCESSED, BITSTREAM_MARKED_DELETED, CHECKSUM_MATCH, CHECKSUM_NO_MATCH, CHECKSUM_ALGORITHM_INVALID};
+
 }

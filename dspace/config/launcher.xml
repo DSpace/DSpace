@@ -8,6 +8,20 @@
         </step>
     </command>
     <command>
+        <name>checksum</name>
+        <description>Run checksum checker or print/count last checksum results </description>
+        <step>
+            <class>org.dspace.app.checker.ChecksumWorker</class>
+        </step>
+    </command>
+    <command>
+        <name>checkhistory</name>
+        <description>Print, count, or delete historic checksum results</description>
+        <step>
+            <class>org.dspace.app.checker.ChecksumHistoryWorker</class>
+        </step>
+    </command>
+    <command>
         <name>checker-emailer</name>
         <description>Send emails related to the checksum checker</description>
         <step>

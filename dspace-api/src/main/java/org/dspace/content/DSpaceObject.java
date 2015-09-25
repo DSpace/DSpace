@@ -8,11 +8,14 @@
 package org.dspace.content;
 
 import java.sql.SQLException;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.log4j.Logger;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -21,15 +24,14 @@ import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.event.Event;
+import org.dspace.handle.HandleManager;
+import org.dspace.identifier.IdentifierService;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
-import org.dspace.handle.HandleManager;
-import org.dspace.identifier.IdentifierService;
 import org.dspace.utils.DSpace;
 
 /**
@@ -1383,5 +1385,64 @@ public abstract class DSpaceObject
                 return new String[]{null, null, null};
         }
     }
-    
+    public String toString() {
+        return Constants.typeText[getType()] + "." + getID();
+    }
+
+    /**
+     * expects a two part string as parameter:
+     *   * TYPE.ID, where TYPE is a DSpaceObject type and ID is the object id
+     *   * a handle
+     *   * GROUP.group name,
+     *   * or EPERSON.netid
+     *
+     * returns DSpaceObject that corresponds to string or null
+     * @param str    must have format TYPE.ID
+     * @return
+     */
+    public static DSpaceObject fromString(Context c, String str) throws SQLException {
+        if (str == null) {
+            return null;
+        }
+        String left= null, right = null;
+        int doti = str.indexOf('.');
+        if (doti != -1 && doti < str.length()-1) {
+            left = str.substring(0,doti);
+            right = str.substring(doti+1);
+        }
+
+        if (left == null) {
+            // this could be a handle
+            return HandleManager.resolveToObject(c, str);
+        } else {
+            int typeId = Constants.getTypeID(left.toUpperCase());
+            if (typeId == -1) {
+                // not one of the DSPaceObject types
+                return null;
+            }
+
+            try {
+                int id = Integer.parseInt(right);
+                return DSpaceObject.find(c, typeId, id);
+            } catch (NumberFormatException ne) {
+                switch (typeId) {
+                    case Constants.EPERSON: {
+                        DSpaceObject person = EPerson.findByNetid(c, right);
+                        if (person == null) {
+                            try {
+                                person = EPerson.findByEmail(c, right);
+                            } catch (AuthorizeException e) {
+                                person = null;
+                            }
+                        }
+                        return person;
+                    }
+                    case Constants.GROUP:
+                        return Group.findByName(c, right);
+                    default:
+                        return null;
+                }
+            }
+        }
+    }
 }
