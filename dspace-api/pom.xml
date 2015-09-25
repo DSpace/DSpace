@@ -259,7 +259,16 @@
                                 <phase>process-test-resources</phase>
                                 <configuration>
                                     <target>
+                                        <!-- Ant task to copy dspace.cfg.woven to location of test dspace.cfg file -->
                                         <copy file="${agnostic.build.dir}/testing/dspace.cfg.woven" tofile="${agnostic.build.dir}/testing/dspace/config/dspace.cfg" />
+                                        <!-- Now, do one final filter of our Test configs, replacing any remaining "${dspace.dir}"
+                                             placeholders, with the full path of our Unit Test directory -->
+                                        <!-- NOTE: This final filtering is necessary, because dspace.dir doesn't get filled out
+                                             in our test dspace.cfg until Fileweaver runs above. -->
+                                        <replace dir="${agnostic.build.dir}/testing/dspace/config/" value="${agnostic.build.dir}/testing/dspace">
+                                            <include name="**/*"/>
+                                            <replacetoken>${dspace.dir}</replacetoken>
+                                        </replace>
                                     </target>
                                 </configuration>
                                 <goals>
