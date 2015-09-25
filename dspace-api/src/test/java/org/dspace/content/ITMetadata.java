@@ -28,10 +28,10 @@ import static org.hamcrest.CoreMatchers.*;
  * This is an integration test to validate the metadata classes
  * @author pvillega
  */
-public class MetadataIntegrationTest  extends AbstractIntegrationTest
+public class ITMetadata  extends AbstractIntegrationTest
 {
     /** log4j category */
-    private static final Logger log = Logger.getLogger(MetadataIntegrationTest.class);
+    private static final Logger log = Logger.getLogger(ITMetadata.class);
 
 
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
