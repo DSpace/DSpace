@@ -24,7 +24,7 @@
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
 
-    <!-- NOTE: first file in wins when using maven-assembly-plugin. So, overriden
+    <!-- NOTE: first file in wins when using maven-assembly-plugin. So, overridden
          files have to be included first. -->
     <moduleSets>
         <!-- FIRST, search for a 'src/test/data/dspaceFolder' data directory in
