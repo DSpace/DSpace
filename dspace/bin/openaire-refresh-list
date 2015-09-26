@@ -8,8 +8,8 @@ echo "> Starting \"$0\" execution..."
 echo "Updating OpenAIRE Project list"
 
 # Read parameters from DSpace config
-FILE=openaire-cache.list
-ONLINE="http://api.openaire.eu/projects/dspace/FP7/ALL/ALL###http://api.openaire.eu/projects/dspace/WT/ALL/ALL"
+FILE=`$BINDIR/dspace dsrun org.dspace.core.ConfigurationManager -module openaire -property projects.filename`
+ONLINE=`$BINDIR/dspace dsrun org.dspace.core.ConfigurationManager -module openaire -property projects.url`
 
 ONLINE=$(echo $ONLINE | sed 's/\"//g')
 
@@ -21,26 +21,27 @@ i=1
 
 for url in $(echo "$ONLINE" | sed 's_###_\n_g');
 do
+   INTFILE=$BINDIR/${i}.xml
    if [ $i -eq 1 ]; then
       if [[ $url == http* ]]; then
-         wget --no-check-certificate "$url" -O "${i}.xml"
+         wget --no-check-certificate "$url" -O "${INTFILE}"
       else
-         cp "$url" "${i}.xml"
+         cp "$url" "${INTFILE}"
       fi
 
-      xmllint --format "${i}.xml" | head -n -2 > "$FILE"
-      rm "${i}.xml"
+      xmllint --format "${INTFILE}" | head -n -2 > "$FILE"
+      rm "${INTFILE}"
 
       i=$(($i+1))
    else
       if [[ $url == http* ]]; then
-         wget --no-check-certificate "$url" -O "${i}.xml"
+         wget --no-check-certificate "$url" -O "${INTFILE}"
       else
-         cp "$url" "${i}.xml"
+         cp "$url" "${INTFILE}"
       fi
 
-      xmllint --format "${i}.xml" | head -n -2 | tail -n +4 >> "$FILE"
-      rm "${i}.xml"
+      xmllint --format "${INTFILE}" | head -n -2 | tail -n +4 >> "$FILE"
+      rm "${INTFILE}"
 
       i=$(($i+1))
    fi
