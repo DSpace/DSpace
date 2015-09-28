@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.servicemanager;
+package org.dspace.kernel;
 
 import java.util.Date;
 
@@ -23,10 +23,8 @@ import javax.management.modelmbean.ModelMBeanAttributeInfo;
 import javax.management.modelmbean.ModelMBeanInfoSupport;
 import javax.management.modelmbean.ModelMBeanOperationInfo;
 
-import org.dspace.kernel.CommonLifecycle;
-import org.dspace.kernel.DSpaceKernel;
-import org.dspace.kernel.DSpaceKernelManager;
-import org.dspace.kernel.ServiceManager;
+import org.dspace.servicemanager.DSpaceServiceManager;
+import org.dspace.servicemanager.ServiceManagerSystem;
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
 import org.dspace.services.ConfigurationService;
 import org.slf4j.Logger;
@@ -35,30 +33,27 @@ import org.slf4j.LoggerFactory;
 /**
  * This is the kernel implementation which starts up the core of DSpace,
  * registers the mbean, and initializes the DSpace object.
- * It also loads up the configuration.  Sets a JRE shutdown hook.
+ * It also loads up the configuration and sets a JRE shutdown hook.
  * <p>
- * Note that this does not start itself and calling the constuctor does 
+ * Note that this does not start itself and calling the constructor does
  * not actually start it up either. It has to be explicitly started by
- * calling the start method so something in the system needs to do that. 
- * If the bean is already started then calling start on it again has no 
+ * calling the start method so something in the system needs to do that.
+ * If the bean is already started then calling start on it again has no
  * effect.
- * <p>
- * The name of this instance can be specified if desired.
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
-public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, CommonLifecycle<DSpaceKernel> {
+public final class DSpaceKernelImpl
+        implements DSpaceKernel, DynamicMBean, CommonLifecycle<DSpaceKernel> {
 
-    private static Logger log = LoggerFactory.getLogger(DSpaceKernelImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(DSpaceKernelImpl.class);
 
     /**
      * Creates a DSpace Kernel, does not do any checks though.
-     * Do not call this; use {@link DSpaceKernelInit#getKernel(String)}.
-     *
-     * @param name the name for the kernel
+     * Do not call this; use {@link DSpaceKernelManager#getKernel()}.
      */
-    protected DSpaceKernelImpl(String name) {
-        this.mBeanName = DSpaceKernelManager.checkName(name);
+    protected DSpaceKernelImpl() {
+        this.mBeanName = DSpaceKernelManager.getMBeanName();
     }
 
     private String mBeanName = MBEAN_NAME;
@@ -74,6 +69,7 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, Commo
             synchronized (lock) {
                 // No shutdown hook registered yet
                 this.shutdownHook = new Thread() {
+                    @Override
                     public void run() {
                         doDestroy();
                     }
@@ -84,11 +80,13 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, Commo
     }
 
     private ConfigurationService configurationService;
+    @Override
     public ConfigurationService getConfigurationService() {
         return configurationService;
     }
 
     private ServiceManagerSystem serviceManagerSystem;
+    @Override
     public ServiceManager getServiceManager() {
         return serviceManagerSystem;
     }
@@ -96,6 +94,7 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, Commo
     /* (non-Javadoc)
      * @see org.dspace.kernel.DSpaceKernel#getMBeanName()
      */
+    @Override
     public String getMBeanName() {
         return mBeanName;
     }
@@ -103,6 +102,7 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, Commo
     /* (non-Javadoc)
      * @see org.dspace.kernel.DSpaceKernel#isRunning()
      */
+    @Override
     public boolean isRunning() {
         synchronized (lock) {
             return running;
@@ -112,6 +112,7 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, Commo
     /* (non-Javadoc)
      * @see org.dspace.kernel.CommonLifecycle#getManagedBean()
      */
+    @Override
     public DSpaceKernel getManagedBean() {
         synchronized (lock) {
             return kernel;
@@ -121,25 +122,28 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, Commo
     /* (non-Javadoc)
      * @see org.dspace.kernel.CommonLifecycle#start()
      */
+    @Override
     public void start() {
 		start(null);
 	}
 
     /**
-     * This starts up the entire core system.  May be called more than 
+     * This starts up the entire core system.  May be called more than
      * once:  subsequent calls return without effect.
      *
      * @param dspaceHome path to DSpace home directory
      */
     public void start(String dspaceHome) {
         if (running) {
-            //log.warn("Kernel ("+this+") is already started");
             return;
         }
 
         synchronized (lock) {
             lastLoadDate = new Date();
             long startTime = System.currentTimeMillis();
+
+            // Register the MBean.
+            DSpaceKernelManager.registerMBean(mBeanName, this);
 
             // create the configuration service and get the configuration
             DSpaceConfigurationService dsConfigService = new DSpaceConfigurationService(dspaceHome);
@@ -149,9 +153,6 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, Commo
             serviceManagerSystem = new DSpaceServiceManager(dsConfigService);
             serviceManagerSystem.startup();
 
-            // initialize the static
-//            DSpace.initialize(serviceManagerSystem);
-
             loadTime = System.currentTimeMillis() - startTime;
 
             kernel = this;
@@ -159,12 +160,14 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, Commo
             // add in the shutdown hook
             registerShutdownHook();
         }
-        log.info("DSpace kernel startup completed in "+loadTime+" ms and registered as MBean: " + mBeanName);
+        log.info("DSpace kernel startup completed in {} ms and registered as MBean: {}",
+                loadTime, mBeanName);
     }
 
     /* (non-Javadoc)
      * @see org.dspace.kernel.CommonLifecycle#stop()
      */
+    @Override
     public void stop() {
         if (! running) {
             //log.warn("Kernel ("+this+") is already stopped");
@@ -172,7 +175,6 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, Commo
         }
 
         synchronized (lock) {
-//            DSpace.initialize(null); // clear out the static cover
             // wipe all the variables to free everything up
             running = false;
             kernel = null;
@@ -183,12 +185,13 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, Commo
             configurationService = null;
         }
         // log completion (logger may be gone at this point so we cannot really use it)
-        log.info("DSpace kernel shutdown completed and unregistered MBean: " + mBeanName);
+        log.info("DSpace kernel shutdown completed and unregistered MBean: {}", mBeanName);
     }
 
     /* (non-Javadoc)
      * @see org.dspace.kernel.CommonLifecycle#destroy()
      */
+    @Override
     public void destroy() {
         if (this.destroyed) {
             return;
@@ -199,11 +202,6 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, Commo
                 stop();
             } catch (Exception e) {
                 // oh well
-            }
-
-            // If this was the default kernel, clear it
-            if (DSpaceKernelManager.getDefaultKernel() == this) {
-                DSpaceKernelManager.setDefaultKernel(null);
             }
 
             try {
@@ -246,28 +244,51 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, Commo
 
     @Override
     public String toString() {
-        return "DSpaceKernel:" + mBeanName + ":lastLoad=" + lastLoadDate + ":loadTime=" + loadTime + ":running=" + running + ":kernel=" + (kernel == null ? null : kernel.getClass().getName() +"@"+kernel.getClass().getClassLoader() + ":" + super.toString());
+        StringBuilder rv = new StringBuilder(256);
+
+        rv.append("DSpaceKernel:").append(mBeanName)
+                .append(":lastLoad=").append(lastLoadDate)
+                .append(":loadTime=").append(loadTime)
+                .append(":running=").append(running)
+                .append(":kernel=");
+
+        if (kernel == null)
+            rv.append("null");
+        else
+            rv.append(kernel.getClass().getName())
+                    .append('@').append(kernel.getClass().getClassLoader())
+                    .append(':').append(super.toString());
+
+        return rv.toString();
     }
 
     // MBEAN methods
 
     private Date lastLoadDate;
-    /** Time that this kernel was started, as a java.util.Date. */
+    /**
+     * Time that this kernel was started, as a java.util.Date.
+     * @see getLoadTime().
+     */
     public Date getLastLoadDate() {
         return new Date(lastLoadDate.getTime());
     }
 
     private long loadTime;
-    /** Time that this kernel was started, as seconds since the epoch. */
+    /**
+     * Time that this kernel was started, as seconds since the epoch.
+     * @see getLastLoadDate().
+     */
     public long getLoadTime() {
         return loadTime;
     }
 
+    @Override
     public Object invoke(String actionName, Object[] params, String[] signature)
     throws MBeanException, ReflectionException {
         return this;
     }
 
+    @Override
     public MBeanInfo getMBeanInfo() {
         Descriptor lastLoadDateDesc = new DescriptorSupport(new String[] {"name=LastLoadDate",
                 "descriptorType=attribute", "default=0", "displayName=Last Load Date",
@@ -295,7 +316,9 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, Commo
         return new ModelMBeanInfoSupport(this.getClass().getName(), "DSpace Kernel", mmbai, null, mmboi, null);
     }
 
-    public Object getAttribute(String attribute) throws AttributeNotFoundException, MBeanException, ReflectionException {
+    @Override
+    public Object getAttribute(String attribute)
+            throws AttributeNotFoundException, MBeanException, ReflectionException {
         if ("LastLoadDate".equals(attribute)) {
             return getLastLoadDate();
         } else if ("LastLoadTime".equals(attribute)) {
@@ -304,16 +327,19 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, Commo
         throw new AttributeNotFoundException("invalid attribute: " + attribute);
     }
 
+    @Override
     public AttributeList getAttributes(String[] attributes) {
         // TODO Auto-generated method stub
         return null;
     }
 
+    @Override
     public void setAttribute(Attribute attribute) throws AttributeNotFoundException,
     InvalidAttributeValueException, MBeanException, ReflectionException {
         throw new InvalidAttributeValueException("Cannot set attribute: " + attribute);
     }
 
+    @Override
     public AttributeList setAttributes(AttributeList attributes) {
         // TODO Auto-generated method stub
         return null;

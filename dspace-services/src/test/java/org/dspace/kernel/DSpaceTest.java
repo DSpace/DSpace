@@ -5,35 +5,25 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.servicemanager;
+package org.dspace.kernel;
 
 import static org.junit.Assert.*;
 
-import org.dspace.kernel.DSpaceKernel;
-import org.dspace.kernel.DSpaceKernelManager;
 import org.dspace.utils.DSpace;
 import org.junit.Test;
 
 /**
  * Make sure the DSpace static cover works
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class DSpaceTest {
 
     @Test
     public void testDSpaceObject() {
-        try {
-            DSpace dspace = new DSpace();
-            dspace.getServiceManager();
-            fail("should have thrown exception");
-        } catch (IllegalStateException e) {
-            assertNotNull(e.getMessage());
-        }
-
-        DSpaceKernelImpl kernelImpl = DSpaceKernelInit.getKernel(null);
+        DSpaceKernelImpl kernelImpl = (DSpaceKernelImpl) DSpaceKernelManager.getKernel();
         kernelImpl.start(); // triggers the init
-        DSpaceKernel kernel = new DSpaceKernelManager().getKernel();
+        DSpaceKernel kernel = DSpaceKernelManager.getKernel();
         assertNotNull(kernel);
         assertEquals(kernel, kernelImpl);
 
@@ -56,7 +46,7 @@ public class DSpaceTest {
         assertEquals(dspace.getServiceManager(), dspace2.getServiceManager());
 
         // REPEAT
-        kernel = new DSpaceKernelManager().getKernel();
+        kernel = DSpaceKernelManager.getKernel();
 
         o = dspace.getServiceManager();
         assertNotNull(o);
@@ -79,7 +69,7 @@ public class DSpaceTest {
         dspace2 = null;
         o = null;
     }
-    
+
 /*********
     @Test
     public void testStaticCover() {

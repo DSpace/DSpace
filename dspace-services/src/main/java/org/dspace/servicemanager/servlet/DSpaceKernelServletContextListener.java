@@ -5,6 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
+
 package org.dspace.servicemanager.servlet;
 
 import java.io.File;
@@ -14,13 +15,12 @@ import javax.naming.InitialContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.dspace.servicemanager.DSpaceKernelImpl;
-import org.dspace.servicemanager.DSpaceKernelInit;
+import org.dspace.kernel.DSpaceKernelImpl;
+import org.dspace.kernel.DSpaceKernelManager;
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
 
-
 /**
- * This servlet context listener will handle startup of the kernel if it 
+ * This servlet context listener will handle startup of the kernel if it
  * is not there.
  * Shutdown of the context listener does not shutdown the kernel though;
  * that is tied to the shutdown of the JVM.
@@ -49,37 +49,36 @@ public final class DSpaceKernelServletContextListener implements ServletContextL
     private String getProvidedHome(ServletContextEvent arg0){
     	String providedHome = null;
     	try {
-			Context ctx = new InitialContext();
-			providedHome = (String) ctx.lookup("java:/comp/env/" + DSpaceConfigurationService.DSPACE_HOME);
-		} catch (Exception e) {
-			// do nothing
-		}
-		
-		if (providedHome == null)
-		{
-			String dspaceHome = arg0.getServletContext().getInitParameter(DSpaceConfigurationService.DSPACE_HOME);
-			if(dspaceHome != null && !dspaceHome.equals("") && 
-					!dspaceHome.equals("${" + DSpaceConfigurationService.DSPACE_HOME + "}")){
-				File test = new File(dspaceHome);
-				if(test.exists() && new File(test,DSpaceConfigurationService.DSPACE_CONFIG_PATH).exists()) {
-					providedHome = dspaceHome;
+            Context ctx = new InitialContext();
+            providedHome = (String) ctx.lookup("java:/comp/env/" + DSpaceConfigurationService.DSPACE_HOME);
+        } catch (Exception e) {
+            // do nothing
+        }
+
+        if (providedHome == null)
+        {
+            String dspaceHome = arg0.getServletContext().getInitParameter(DSpaceConfigurationService.DSPACE_HOME);
+            if(dspaceHome != null && !dspaceHome.equals("") &&
+                            !dspaceHome.equals("${" + DSpaceConfigurationService.DSPACE_HOME + "}")){
+                File test = new File(dspaceHome);
+                if(test.exists() && new File(test,DSpaceConfigurationService.DSPACE_CONFIG_PATH).exists()) {
+                    providedHome = dspaceHome;
                 }
-			}
-		}
-		return providedHome;
+            }
+        }
+        return providedHome;
     }
-    
+
     /* (non-Javadoc)
      * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
      */
+    @Override
     public void contextInitialized(ServletContextEvent arg0)
     {
         // start the kernel when the webapp starts
         try {
-            this.kernelImpl = DSpaceKernelInit.getKernel(null);
-            if (! this.kernelImpl.isRunning()) {
-            	this.kernelImpl.start(getProvidedHome(arg0)); // init the kernel
-            }
+            this.kernelImpl = (DSpaceKernelImpl) DSpaceKernelManager.getKernel(
+            getProvidedHome(arg0));
         } catch (Exception e) {
             // failed to start so destroy it and log and throw an exception
             try {
@@ -96,6 +95,7 @@ public final class DSpaceKernelServletContextListener implements ServletContextL
     /* (non-Javadoc)
      * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
      */
+    @Override
     public void contextDestroyed(ServletContextEvent arg0)
     {
         // currently we are stopping the kernel when the webapp stops
@@ -103,21 +103,6 @@ public final class DSpaceKernelServletContextListener implements ServletContextL
             this.kernelImpl.destroy();
             this.kernelImpl = null;
         }
-        // No longer going to use JCL
-//        // clean up the logger for this webapp
-//        LogFactory.release(Thread.currentThread().getContextClassLoader());
-        // No longer cleaning this up here since it causes failures
-//        // cleanup the datasource
-//        try {
-//            for (Enumeration<?> e = DriverManager.getDrivers(); e.hasMoreElements(); ) {
-//                Driver driver = (Driver) e.nextElement();
-//                if (driver.getClass().getClassLoader() == getClass().getClassLoader()) {
-//                    DriverManager.deregisterDriver(driver);
-//                }
-//            }
-//        } catch (Throwable e) {
-//            System.err.println("Unable to clean up JDBC driver: " + e.getMessage());
-//        }
     }
 
 }

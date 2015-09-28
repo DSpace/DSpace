@@ -22,13 +22,13 @@ import org.dspace.services.RequestService;
 
 
 /**
- * This servlet filter will handle the hookup and setup for DSpace 
- * requests.  It should be applied to any webapp that is using the 
+ * This servlet filter will handle the hookup and setup for DSpace
+ * requests.  It should be applied to any webapp that is using the
  * DSpace core.
  * <p>
- * It will also do anything necessary to the requests that are coming 
+ * It will also do anything necessary to the requests that are coming
  * into a DSpace web application and the responses on their way out.
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public final class DSpaceWebappServletFilter implements Filter {
@@ -100,7 +100,7 @@ public final class DSpaceWebappServletFilter implements Filter {
      * @return the current DSpace kernel or fail
      */
     public DSpaceKernel getKernel() {
-        DSpaceKernel kernel = new DSpaceKernelManager().getKernel();
+        DSpaceKernel kernel = DSpaceKernelManager.getKernel();
         if (! kernel.isRunning()) {
             throw new IllegalStateException("The DSpace kernel is not running: " + kernel);
         }

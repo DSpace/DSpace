@@ -23,21 +23,14 @@ import org.mortbay.jetty.testing.ServletTester;
 /**
  * This starts up a jetty server and tests the ability for the servlet filter to start a kernel
  * and correctly shut it down
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class DSpaceKernelServletContextListenerTest {
 
     @Test
+    @SuppressWarnings("UnusedAssignment")
     public void testSampleRequest() {
-        // make sure no kernel yet
-        try {
-            new DSpaceKernelManager().getKernel();
-            fail("Should have thrown exception");
-        } catch (IllegalStateException e) {
-            assertNotNull(e.getMessage());
-        }
-
         ServletTester tester = new ServletTester();
         tester.setContextPath("/");
         tester.getContext().addEventListener(new DSpaceKernelServletContextListener());
@@ -50,10 +43,10 @@ public class DSpaceKernelServletContextListenerTest {
         }
 
         // now there should be a kernel
-        assertNotNull( new DSpaceKernelManager().getKernel() );
+        assertNotNull(DSpaceKernelManager.getKernel() );
 
         // now fire the request
-        String jettyRequest = 
+        String jettyRequest =
             "GET /dspace HTTP/1.1\r\n"+
             "Host: tester\r\n"+
             "\r\n";
@@ -68,7 +61,7 @@ public class DSpaceKernelServletContextListenerTest {
         }
 
         // now there should be a kernel
-        assertNotNull( new DSpaceKernelManager().getKernel() );
+        assertNotNull(DSpaceKernelManager.getKernel() );
 
         // try a request a different way
         HttpTester request = new HttpTester();
@@ -95,7 +88,7 @@ public class DSpaceKernelServletContextListenerTest {
 //        assertFalse(content.contains("request=null"));
 
         // now there should be a kernel
-        assertNotNull( new DSpaceKernelManager().getKernel() );
+        assertNotNull(DSpaceKernelManager.getKernel() );
 
         try {
             tester.stop();
@@ -103,14 +96,6 @@ public class DSpaceKernelServletContextListenerTest {
             fail("Could not stop the jetty server: " + e.getMessage());
         }
 
-        // back to no kernel again
-        try {
-            new DSpaceKernelManager().getKernel();
-            fail("Should have thrown exception");
-        } catch (IllegalStateException e) {
-            assertNotNull(e.getMessage());
-        }
-        
         tester = null;
         request = null;
         response = null;
