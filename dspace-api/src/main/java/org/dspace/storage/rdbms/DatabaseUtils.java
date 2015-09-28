@@ -90,12 +90,8 @@ public class DatabaseUtils
 
         try
         {
-            // Call initDataSource to JUST initialize the dataSource WITHOUT fully
-            // initializing the DatabaseManager itself. This ensures we do NOT
-            // immediately run our Flyway DB migrations on this database
-            DataSource dataSource = new DSpace().getServiceManager().getServiceByName("dataSource", BasicDataSource.class);
-
-            // Get configured DB URL for reporting below
+            // Get a reference to our configured DataSource
+            DataSource dataSource = getDataSource();
 
             // Point Flyway API to our database
             Flyway flyway = setupFlyway(dataSource);
@@ -103,14 +99,11 @@ public class DatabaseUtils
             // "test" = Test Database Connection
             if(argv[0].equalsIgnoreCase("test"))
             {
-
-
                 // Try to connect to the database
                 System.out.println("\nAttempting to connect to database");
-                try
+                try(Connection connection = dataSource.getConnection())
                 {
                     // Just do a high level test by getting our configured DataSource and attempting to connect to it
-                    Connection connection = dataSource.getConnection();
                     DatabaseMetaData meta = connection.getMetaData();
                     System.out.println("Connected successfully!");
                     System.out.println("Database Software: " + meta.getDatabaseProductName() + " version " + meta.getDatabaseProductVersion());
@@ -119,119 +112,144 @@ public class DatabaseUtils
                     System.out.println(" - Username: " + meta.getUserName());
                     System.out.println(" - Password: [hidden]");
                     System.out.println(" - Schema: " + getSchemaName(connection));
-                    connection.close();
                 }
                 catch (SQLException sqle)
                 {
-                    System.err.println("\nError: ");
+                    System.err.println("\nError running 'test': ");
                     System.err.println(" - " + sqle);
                     System.err.println("\nPlease see the DSpace documentation for assistance.\n");
+                    sqle.printStackTrace();
                     System.exit(1);
                 }
-            }else
-            if(argv[0].equalsIgnoreCase("info"))
+            }
+            else if(argv[0].equalsIgnoreCase("info"))
             {
-                // Get basic Database info
-                Connection connection = dataSource.getConnection();
-                DatabaseMetaData meta = connection.getMetaData();
-                System.out.println("\nDatabase URL: " + meta.getURL());
-                System.out.println("Database Schema: " + getSchemaName(connection));
-                System.out.println("Database Software: " + meta.getDatabaseProductName() + " version " + meta.getDatabaseProductVersion());
-                System.out.println("Database Driver: " + meta.getDriverName() + " version " + meta.getDriverVersion());
-
-                // Get info table from Flyway
-                System.out.println("\n" + MigrationInfoDumper.dumpToAsciiTable(flyway.info().all()));
-
-                // If Flyway is NOT yet initialized, also print the determined version information
-                // NOTE: search is case sensitive, as flyway table name is ALWAYS lowercase,
-                // See: http://flywaydb.org/documentation/faq.html#case-sensitive
-                if(!tableExists(connection, flyway.getTable(), true))
+                try(Connection connection = dataSource.getConnection())
                 {
-                    System.out.println("\nNOTE: This database is NOT yet initialized for auto-migrations (via Flyway).");
-                    // Determine which version of DSpace this looks like
-                    String dbVersion = determineDBVersion(connection);
-                    if (dbVersion!=null)
+                    // Get basic Database info
+                    DatabaseMetaData meta = connection.getMetaData();
+                    System.out.println("\nDatabase URL: " + meta.getURL());
+                    System.out.println("Database Schema: " + getSchemaName(connection));
+                    System.out.println("Database Software: " + meta.getDatabaseProductName() + " version " + meta.getDatabaseProductVersion());
+                    System.out.println("Database Driver: " + meta.getDriverName() + " version " + meta.getDriverVersion());
+
+                    // Get info table from Flyway
+                    System.out.println("\n" + MigrationInfoDumper.dumpToAsciiTable(flyway.info().all()));
+
+                    // If Flyway is NOT yet initialized, also print the determined version information
+                    // NOTE: search is case sensitive, as flyway table name is ALWAYS lowercase,
+                    // See: http://flywaydb.org/documentation/faq.html#case-sensitive
+                    if(!tableExists(connection, flyway.getTable(), true))
                     {
-                        System.out.println("\nYour database looks to be compatible with DSpace version " + dbVersion);
-                        System.out.println("All upgrades *after* version " + dbVersion + " will be run during the next migration.");
-                        System.out.println("\nIf you'd like to upgrade now, simply run 'dspace database migrate'.");
+                        System.out.println("\nNOTE: This database is NOT yet initialized for auto-migrations (via Flyway).");
+                        // Determine which version of DSpace this looks like
+                        String dbVersion = determineDBVersion(connection);
+                        if (dbVersion!=null)
+                        {
+                            System.out.println("\nYour database looks to be compatible with DSpace version " + dbVersion);
+                            System.out.println("All upgrades *after* version " + dbVersion + " will be run during the next migration.");
+                            System.out.println("\nIf you'd like to upgrade now, simply run 'dspace database migrate'.");
+                        }
                     }
                 }
-                connection.close();
+                catch (SQLException e)
+                {
+                    System.err.println("Info exception:");
+                    e.printStackTrace();
+                    System.exit(1);
+                }
             }
             else if(argv[0].equalsIgnoreCase("migrate"))
             {
-                try (Connection connection = dataSource.getConnection();){
-                    System.out.println("\nDatabase URL: " + connection.getMetaData().getURL());
-                }
-
-                // "migrate" allows for an OPTIONAL second argument:
-                //    - "ignored" = Also run any previously "ignored" migrations during the migration
-                //    - [version] = ONLY run migrations up to a specific DSpace version (ONLY FOR TESTING)
-                if(argv.length==2)
+                try (Connection connection = dataSource.getConnection())
                 {
-                    if(argv[1].equalsIgnoreCase("ignored"))
+                    System.out.println("\nDatabase URL: " + connection.getMetaData().getURL());
+
+                    // "migrate" allows for an OPTIONAL second argument:
+                    //    - "ignored" = Also run any previously "ignored" migrations during the migration
+                    //    - [version] = ONLY run migrations up to a specific DSpace version (ONLY FOR TESTING)
+                    if(argv.length==2)
                     {
-                        System.out.println("Migrating database to latest version AND running previously \"Ignored\" migrations... (Check logs for details)");
-                        Connection connection = dataSource.getConnection();
-                        // Update the database to latest version, but set "outOfOrder=true"
-                        // This will ensure any old migrations in the "ignored" state are now run
-                        updateDatabase(dataSource, connection, null, true);
-                        connection.close();
+                        if(argv[1].equalsIgnoreCase("ignored"))
+                        {
+                            System.out.println("Migrating database to latest version AND running previously \"Ignored\" migrations... (Check logs for details)");
+                            // Update the database to latest version, but set "outOfOrder=true"
+                            // This will ensure any old migrations in the "ignored" state are now run
+                            updateDatabase(dataSource, connection, null, true);
+                        }
+                        else
+                        {
+                            // Otherwise, we assume "argv[1]" is a valid migration version number
+                            // This is only for testing! Never specify for Production!
+                            System.out.println("Migrating database ONLY to version " + argv[1] + " ... (Check logs for details)");
+                            System.out.println("\nWARNING: It is highly likely you will see errors in your logs when the Metadata");
+                            System.out.println("or Bitstream Format Registry auto-update. This is because you are attempting to");
+                            System.out.println("use an OLD version " + argv[1] + " Database with a newer DSpace API. NEVER do this in a");
+                            System.out.println("PRODUCTION scenario. The resulting old DB is only useful for migration testing.\n");
+                            // Update the database, to the version specified.
+                            updateDatabase(dataSource, connection, argv[1], true);
+                        }
                     }
                     else
                     {
-                        // Otherwise, we assume "argv[1]" is a valid migration version number
-                        // This is only for testing! Never specify for Production!
-                        System.out.println("Migrating database ONLY to version " + argv[1] + " ... (Check logs for details)");
-                        System.out.println("\nWARNING: It is highly likely you will see errors in your logs when the Metadata");
-                        System.out.println("or Bitstream Format Registry auto-update. This is because you are attempting to");
-                        System.out.println("use an OLD version " + argv[1] + " Database with a newer DSpace API. NEVER do this in a");
-                        System.out.println("PRODUCTION scenario. The resulting old DB is only useful for migration testing.\n");
-                        Connection connection = dataSource.getConnection();
-                        // Update the database, to the version specified.
-                        updateDatabase(dataSource, connection, argv[1], true);
-                        connection.close();
-                    }
-                }
-                else
-                {
-                    System.out.println("Migrating database to latest version... (Check logs for details)");
-                    try (Connection connection = dataSource.getConnection()) {
+                        System.out.println("Migrating database to latest version... (Check logs for details)");
                         updateDatabase(dataSource, connection);
                     }
+                    System.out.println("Done.");
                 }
-                System.out.println("Done.");
+                catch(SQLException e)
+                {
+                    System.err.println("Migration exception:");
+                    e.printStackTrace();
+                    System.exit(1);
+                }
             }
             // "repair" = Run Flyway repair script
             else if(argv[0].equalsIgnoreCase("repair"))
             {
-                try (Connection connection = dataSource.getConnection();){
+                try (Connection connection = dataSource.getConnection();)
+                {
                     System.out.println("\nDatabase URL: " + connection.getMetaData().getURL());
+                    System.out.println("Attempting to repair any previously failed migrations via FlywayDB... (Check logs for details)");
+                    flyway.repair();
+                    System.out.println("Done.");
                 }
-                System.out.println("Attempting to repair any previously failed migrations via FlywayDB... (Check logs for details)");
-                flyway.repair();
-                System.out.println("Done.");
+                catch(SQLException|FlywayException e)
+                {
+                    System.err.println("Repair exception:");
+                    e.printStackTrace();
+                    System.exit(1);
+                }
             }
             // "clean" = Run Flyway clean script
             else if(argv[0].equalsIgnoreCase("clean"))
             {
                 BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-                try (Connection connection = dataSource.getConnection();){
-                    System.out.println("\nDatabase URL: " + connection.getMetaData().getURL());
-                }
-                System.out.println("\nWARNING: ALL DATA AND TABLES IN YOUR DATABASE WILL BE PERMANENTLY DELETED.\n");
-                System.out.println("There is NO turning back from this action. Backup your DB before continuing.");
-                System.out.println("If you are using Oracle, your RECYCLEBIN will also be PURGED.\n");
-                System.out.print("Do you want to PERMANENTLY DELETE everything from your database? [y/n]: ");
-                String choiceString = input.readLine();
-                input.close();
-
-                if (choiceString.equalsIgnoreCase("y"))
+                try (Connection connection = dataSource.getConnection())
                 {
-                    System.out.println("Scrubbing database clean... (Check logs for details)");
-                    cleanDatabase(flyway, dataSource);
-                    System.out.println("Done.");
+                    System.out.println("\nDatabase URL: " + connection.getMetaData().getURL());
+                    System.out.println("\nWARNING: ALL DATA AND TABLES IN YOUR DATABASE WILL BE PERMANENTLY DELETED.\n");
+                    System.out.println("There is NO turning back from this action. Backup your DB before continuing.");
+                    if(getDbType(connection).equals(DBMS_ORACLE))
+                    {
+                        System.out.println("ORACLE WARNING: your RECYCLEBIN will also be PURGED.\n");
+                    }
+                    System.out.print("Do you want to PERMANENTLY DELETE everything from your database? [y/n]: ");
+                    String choiceString = input.readLine();
+                    input.close();
+
+                    if (choiceString.equalsIgnoreCase("y"))
+                    {
+                        System.out.println("Scrubbing database clean... (Check logs for details)");
+                        cleanDatabase(flyway, dataSource);
+                        System.out.println("Done.");
+                    }
+                }
+                catch(SQLException e)
+                {
+                    System.err.println("Clean exception:");
+                    e.printStackTrace();
+                    System.exit(1);
                 }
             }
             else
@@ -323,6 +341,31 @@ public class DatabaseUtils
         }
 
         return flywaydb;
+    }
+
+    /**
+     * Ensures the current database is up-to-date with regards
+     * to the latest DSpace DB schema. If the scheme is not up-to-date,
+     * then any necessary database migrations are performed.
+     * <P>
+     * FlywayDB (http://flywaydb.org/) is used to perform database migrations.
+     * If a Flyway DB migration fails it will be rolled back to the last
+     * successful migration, and any errors will be logged.
+     *
+     * @throws SQLException
+     *      If database cannot be upgraded.
+     */
+    public static synchronized void updateDatabase()
+            throws SQLException
+    {
+        // Get our configured dataSource
+        DataSource dataSource = getDataSource();
+
+        try(Connection connection = dataSource.getConnection())
+        {
+            // Upgrade database to the latest version of our schema
+            updateDatabase(dataSource, connection);
+        }
     }
 
     /**
@@ -462,18 +505,15 @@ public class DatabaseUtils
             // For MOST database types, this takes care of everything
             flyway.clean();
 
-            Connection connection = null;
-            try
+            try(Connection connection = dataSource.getConnection())
             {
                 // Get info about which database type we are using
-                connection = dataSource.getConnection();
-                DatabaseMetaData meta = connection.getMetaData();
-                String dbKeyword = getDbType(connection);
+                String dbType = getDbType(connection);
 
                 // If this is Oracle, the only way to entirely clean the database
                 // is to also purge the "Recyclebin". See:
                 // http://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_9018.htm
-                if(dbKeyword.equals(DBMS_ORACLE))
+                if(dbType.equals(DBMS_ORACLE))
                 {
                     PreparedStatement statement = null;
                     try
@@ -487,11 +527,6 @@ public class DatabaseUtils
                             statement.close();
                     }
                 }
-            }
-            finally
-            {
-                if(connection!=null && !connection.isClosed())
-                    connection.close();
             }
         }
         catch(FlywayException fe)
@@ -1151,6 +1186,20 @@ public class DatabaseUtils
         {
             return null;
         }
+    }
+
+    /**
+     * Get a reference to the configured DataSource (which can be used to
+     * initialize the database using Flyway).
+     * <P>
+     * This is NOT public, as we discourage direct connections to the database
+     * which bypass Hibernate. Only Flyway should be allowed a direct connection.
+     * @return DataSource
+     */
+    private static DataSource getDataSource()
+    {
+        // DataSource is configured via our ServiceManager (i.e. via Spring).
+        return new DSpace().getServiceManager().getServiceByName("dataSource", BasicDataSource.class);
     }
 
     /**
