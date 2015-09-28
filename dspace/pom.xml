@@ -24,13 +24,6 @@
         <root.basedir>${basedir}/..</root.basedir>
     </properties>
 
-    <build>
-        <filters>
-            <!-- Filter using the properties file defined by dspace-parent POM -->
-            <filter>${filters.file}</filter>
-        </filters>
-    </build>
-
     <profiles>
 
         <!-- Build Profile. This builds all Overlay modules for DSpace -->   
@@ -78,6 +71,10 @@
                             <descriptors>
                                 <descriptor>src/main/assembly/assembly.xml</descriptor>
                             </descriptors>
+                            <filters>
+                                <!-- Filter using the properties file defined by dspace-parent POM -->
+                                <filter>${filters.file}</filter>
+                            </filters>
                         </configuration>
                         <executions>
                             <execution>
