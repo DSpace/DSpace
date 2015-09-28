@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import javax.inject.Inject;
 import org.dspace.kernel.DSpaceKernel;
-import org.dspace.servicemanager.DSpaceKernelInit;
+import org.dspace.kernel.DSpaceKernelManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,7 +116,7 @@ public class MultiFormatDateParser
     public static void main(String[] args)
             throws IOException
     {
-        DSpaceKernel kernel = DSpaceKernelInit.getKernel(null); // Mainly to initialize Spring
+        DSpaceKernel kernel = DSpaceKernelManager.getKernel(null); // Mainly to initialize Spring
         // TODO direct log to stdout/stderr somehow
 
         if (args.length > 0) // Test data supplied on the command line
