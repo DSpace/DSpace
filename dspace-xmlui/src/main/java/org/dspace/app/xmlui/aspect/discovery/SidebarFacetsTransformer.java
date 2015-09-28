@@ -222,7 +222,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                             {
                                 //When we have an hierarchical facet always show the "view more" they may want to filter the children of the top nodes
                                 if(field.getType().equals(DiscoveryConfigurationParameters.TYPE_HIERARCHICAL)){
-                                    addViewMoreUrl(filterValsList, dso, request, field.getIndexFieldName());
+                                    addViewMoreUrl(filterValsList, dso, request, field);
                                 }
                                 break;
                             }
@@ -252,7 +252,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                             }
                             //Show a "view more" url should there be more values, unless we have a date
                             if (i == shownFacets - 1 && !field.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)/*&& facetField.getGap() == null*/) {
-                                addViewMoreUrl(filterValsList, dso, request, field.getIndexFieldName());
+                                addViewMoreUrl(filterValsList, dso, request, field);
                             }
                         }
                     }
@@ -301,12 +301,12 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
         return parametersString;
     }
 
-    private void addViewMoreUrl(List facet, DSpaceObject dso, Request request, String fieldName) throws WingException, UnsupportedEncodingException {
+    private void addViewMoreUrl(List facet, DSpaceObject dso, Request request, DiscoverySearchFilterFacet field) throws WingException, UnsupportedEncodingException {
         String parameters = retrieveParameters(request);
         facet.addItem().addXref(
                 contextPath +
                         (dso == null ? "" : "/handle/" + dso.getHandle()) +
-                        "/search-filter?" + parameters + BrowseFacet.FACET_FIELD + "=" + fieldName,
+                        "/search-filter?" + parameters + BrowseFacet.FACET_FIELD + "=" + field.getIndexFieldName()+"&order="+field.getSortOrder(),
                 T_VIEW_MORE
 
         );

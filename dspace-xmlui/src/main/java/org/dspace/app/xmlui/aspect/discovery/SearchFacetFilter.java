@@ -44,6 +44,8 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.List;
 
+import static org.dspace.discovery.configuration.DiscoveryConfigurationParameters.SORT;
+
 /**
  * Filter which displays facets on which a user can filter his discovery search
  *
@@ -58,7 +60,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
     private static final Message T_dspace_home = message("xmlui.general.dspace_home");
     private static final Message T_starts_with = message("xmlui.Discovery.AbstractSearch.startswith");
     private static final Message T_starts_with_help = message("xmlui.Discovery.AbstractSearch.startswith.help");
-
+    private static SORT sortOrder;
     /**
      * The cache of recently submitted items
      */
@@ -224,11 +226,13 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 
         String facetField = request.getParameter(SearchFilterParam.FACET_FIELD);
         DiscoverFacetField discoverFacetField;
+        // Enumerations don't handle mixed cases, setting to uppercase to match convention
+        SORT sortOrder = getSortOrder(request);
         if(request.getParameter(SearchFilterParam.STARTS_WITH) != null)
         {
-            discoverFacetField = new DiscoverFacetField(facetField, DiscoveryConfigurationParameters.TYPE_TEXT, getPageSize() + 1, DiscoveryConfigurationParameters.SORT.VALUE, request.getParameter(SearchFilterParam.STARTS_WITH).toLowerCase());
+            discoverFacetField = new DiscoverFacetField(facetField, DiscoveryConfigurationParameters.TYPE_TEXT, getPageSize() + 1, sortOrder, request.getParameter(SearchFilterParam.STARTS_WITH).toLowerCase());
         }else{
-            discoverFacetField = new DiscoverFacetField(facetField, DiscoveryConfigurationParameters.TYPE_TEXT, getPageSize() + 1, DiscoveryConfigurationParameters.SORT.VALUE);
+            discoverFacetField = new DiscoverFacetField(facetField, DiscoveryConfigurationParameters.TYPE_TEXT, getPageSize() + 1, sortOrder);
         }
 
 
@@ -242,6 +246,21 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         }
 
         return queryResults;
+    }
+
+    private SORT getSortOrder(Request request) {
+        String sortOrderString = request.getParameter("order");
+        // First check for an already configured sortOrder (provided a new one is not being set)
+        if(sortOrder!=null && StringUtils.isBlank(sortOrderString)){
+            return sortOrder;
+        }
+        // Default to sort on value if none found
+        if(StringUtils.isBlank(sortOrderString) || SORT.valueOf(sortOrderString.toUpperCase())==null){
+            sortOrder= SORT.VALUE;
+        }else{
+            sortOrder= SORT.valueOf(request.getParameter("order").toUpperCase());
+        }
+        return sortOrder;
     }
 
         /**
@@ -273,8 +292,10 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         SearchFilterParam browseParams = new SearchFilterParam(request);
         // Build the DRI Body
         Division div = body.addDivision("browse-by-" + request.getParameter(SearchFilterParam.FACET_FIELD), "primary");
-
+        div.setHead(message("xmlui.Discovery.AbstractSearch.type_" + browseParams.getFacetField()));
+        if(getSortOrder(request).equals(SORT.VALUE)){
         addBrowseJumpNavigation(div, browseParams, request);
+        }
         addBrowseControls(div, browseParams);
 
         // Set up the major variables
@@ -300,7 +321,6 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 
                 Division results = body.addDivision("browse-by-" + facetField + "-results", "primary");
 
-                results.setHead(message("xmlui.Discovery.AbstractSearch.type_" + browseParams.getFacetField()));
                 if (values != null && 0 < values.size()) {
 
 
