@@ -126,52 +126,6 @@
                         <map:matcher name="StatisticsAuthorizedMatcher" src="org.dspace.app.xmlui.aspect.statistics.StatisticsAuthorizedMatcher"/>
                 </map:matchers>
                 <map:selectors>
-                        <map:selector name="browser" src="org.apache.cocoon.selection.BrowserSelector"
-                                logger="sitemap.selector.browser">
-                                <!-- Identify web-crawling robots (spiders)
-                                   - to support if-modified-since protocol, but not on browsers
-                                   - because it would let pages that depend on authorization get cached.
-                                   - List these first since may spiders also include browser signatures in their user-agent strings.
-                                  -->
-                                <browser name="spider" useragent="Googlebot"/>
-                                <browser name="spider" useragent="msnbot"/>
-                                <browser name="spider" useragent="Yahoo! Slurp"/>
-                                <browser name="spider" useragent="Y!J"/>
-                                <browser name="spider" useragent="Yahoo Pipes"/>
-                                <browser name="spider" useragent="YahooCacheSystem"/>
-                                <browser name="spider" useragent="Ask Jeeves"/>
-                                <browser name="spider" useragent="FAST Enterprise Crawle"/>
-                                <browser name="spider" useragent="Ultraseek"/>
-                                <browser name="spider" useragent="Baiduspider"/>
-                                <browser name="spider" useragent="yacybot"/>
-
-                                <!-- Interactive browsers -->
-                                <browser name="opera" useragent="Opera"/>
-                                <browser name="opera8" useragent="Opera/8."/>
-                                <browser name="opera9" useragent="Opera/9."/>
-                                <!-- Yes, Opera 10, really identifies itself as "9.8" -->
-                                <browser name="opera10" useragent="Opera/9.8"/>
-                                <browser name="explorer" useragent="MSIE"/>
-                                <browser name="explorer6" useragent="MSIE 6"/>
-                                <browser name="explorer7" useragent="MSIE 7"/>
-                                <browser name="explorer8" useragent="MSIE 8"/>
-                                <browser name="explorer9" useragent="MSIE 9"/>
-                                <browser name="chrome" useragent="Chrome"/>
-                                <browser name="chrome4" useragent="Chrome/4."/>
-                                <browser name="chrome5" useragent="Chrome/5."/>
-                                <browser name="chrome6" useragent="Chrome/6."/>
-                                <browser name="safari" useragent="Safari"/>
-                                <browser name="safari2" useragent="(KHTML, like Gecko) Safari"/>
-                                <browser name="safari3" useragent="(KHTML, like Gecko) Version/3"/>
-                                <browser name="safari4" useragent="(KHTML, like Gecko) Version/4"/>
-                                <browser name="safari5" useragent="(KHTML, like Gecko) Version/5"/>
-                                <browser name="firefox" useragent="Firefox"/>
-                                <browser name="firefox1" useragent="Firefox/1."/>
-                                <browser name="firefox2" useragent="Firefox/2."/>
-                                <browser name="firefox3" useragent="Firefox/3."/>
-                                <browser name="firefox4" useragent="Firefox/4."/>
-                                <browser name="konqueror" useragent="Konqueror/"/>
-                        </map:selector>
                         <map:selector name="parameter" src="org.apache.cocoon.selection.ParameterSelector"/>
                         <map:selector logger="sitemap.selector.exception" name="exception" src="org.apache.cocoon.selection.ExceptionSelector">
                                 <exception name="not-found" class="org.apache.cocoon.ResourceNotFoundException"/>
@@ -251,41 +205,18 @@
                                 that on to the generator so it can implement If-Modified-Since protocol.
                         -->
                         <map:match pattern="bitstream/handle/*/*/**">
-                                <map:match type="request-parameter" pattern="sequence">
-                                        <map:select type="browser">
-                                          <map:when test="spider">
-                                            <map:read type="BitstreamReader">
-                                                    <map:parameter name="userAgent" value="spider"/>
-                                                    <map:parameter name="handle" value="{../1}/{../2}"/>
-                                                    <map:parameter name="name" value="{../3}"/>
-                                                    <map:parameter name="sequence" value="{1}"/>
-                                            </map:read>
-                                          </map:when>
-                                          <map:otherwise>
-                                            <map:read type="BitstreamReader">
-                                                    <map:parameter name="handle" value="{../1}/{../2}"/>
-                                                    <map:parameter name="name" value="{../3}"/>
-                                                    <map:parameter name="sequence" value="{1}"/>
-                                            </map:read>
-                                          </map:otherwise>
-                                        </map:select>
-                                </map:match>
-                                <!-- otherwise, call without sequence parameter -->
-                                <map:select type="browser">
-                                  <map:when test="spider">
-                                    <map:read type="BitstreamReader">
-                                            <map:parameter name="userAgent" value="spider"/>
-                                            <map:parameter name="handle" value="{1}/{2}"/>
-                                            <map:parameter name="name" value="{3}"/>
-                                    </map:read>
-                                  </map:when>
-                                  <map:otherwise>
-                                    <map:read type="BitstreamReader">
-                                            <map:parameter name="handle" value="{1}/{2}"/>
-                                            <map:parameter name="name" value="{3}"/>
-                                    </map:read>
-                                  </map:otherwise>
-                                </map:select>
+                            <map:match type="request-parameter" pattern="sequence">
+                                <map:read type="BitstreamReader">
+                                    <map:parameter name="handle" value="{../1}/{../2}"/>
+                                    <map:parameter name="name" value="{../3}"/>
+                                    <map:parameter name="sequence" value="{1}"/>
+                                </map:read>
+                            </map:match>
+                            <!-- otherwise, call without sequence parameter -->
+                            <map:read type="BitstreamReader">
+                                <map:parameter name="handle" value="{1}/{2}"/>
+                                <map:parameter name="name" value="{3}"/>
+                            </map:read>
                         </map:match>
 
                         <!--
@@ -296,40 +227,17 @@
                                 /bitstream/item/[itemID]/[name]?sequence=[sequence]
                         -->
                         <map:match pattern="bitstream/item/*/**">
-                                <map:match type="request-parameter" pattern="sequence">
-                                  <map:select type="browser">
-                                    <map:when test="spider">
-                                      <map:read type="BitstreamReader">
-                                              <map:parameter name="userAgent" value="spider"/>
-                                              <map:parameter name="itemID" value="{../1}"/>
-                                              <map:parameter name="name" value="{../2}"/>
-                                              <map:parameter name="sequence" value="{1}"/>
-                                      </map:read>
-                                    </map:when>
-                                    <map:otherwise>
-                                      <map:read type="BitstreamReader">
-                                              <map:parameter name="itemID" value="{../1}"/>
-                                              <map:parameter name="name" value="{../2}"/>
-                                              <map:parameter name="sequence" value="{1}"/>
-                                      </map:read>
-                                    </map:otherwise>
-                                  </map:select>
-                                </map:match>
-                                <map:select type="browser">
-                                  <map:when test="spider">
-                                    <map:read type="BitstreamReader">
-                                            <map:parameter name="userAgent" value="spider"/>
-                                            <map:parameter name="itemID" value="{1}"/>
-                                            <map:parameter name="name" value="{2}"/>
-                                    </map:read>
-                                  </map:when>
-                                  <map:otherwise>
-                                    <map:read type="BitstreamReader">
-                                            <map:parameter name="itemID" value="{1}"/>
-                                            <map:parameter name="name" value="{2}"/>
-                                    </map:read>
-                                  </map:otherwise>
-                                </map:select>
+                            <map:match type="request-parameter" pattern="sequence">
+                                <map:read type="BitstreamReader">
+                                    <map:parameter name="itemID" value="{../1}"/>
+                                    <map:parameter name="name" value="{../2}"/>
+                                    <map:parameter name="sequence" value="{1}"/>
+                                </map:read>
+                            </map:match>
+                            <map:read type="BitstreamReader">
+                                <map:parameter name="itemID" value="{1}"/>
+                                <map:parameter name="name" value="{2}"/>
+                            </map:read>
                         </map:match>
 
                         <!--
@@ -338,19 +246,9 @@
                                 /bitstream/id/[bitstreamID]/[ignored]
                         -->
                         <map:match pattern="bitstream/id/*/**">
-                                <map:select type="browser">
-                                  <map:when test="spider">
-                                    <map:read type="BitstreamReader">
-                                            <map:parameter name="userAgent" value="spider"/>
-                                            <map:parameter name="bitstreamID" value="{1}"/>
-                                    </map:read>
-                                  </map:when>
-                                  <map:otherwise>
-                                    <map:read type="BitstreamReader">
-                                            <map:parameter name="bitstreamID" value="{1}"/>
-                                    </map:read>
-                                  </map:otherwise>
-                                </map:select>
+                            <map:read type="BitstreamReader">
+                                <map:parameter name="bitstreamID" value="{1}"/>
+                            </map:read>
                         </map:match>
 
 
