@@ -96,14 +96,6 @@ public class DSpaceKernelServletContextListenerTest {
             fail("Could not stop the jetty server: " + e.getMessage());
         }
 
-        // back to no kernel again
-        try {
-            DSpaceKernelManager.getKernel();
-            fail("Should have thrown exception");
-        } catch (IllegalStateException e) {
-            assertNotNull(e.getMessage());
-        }
-
         tester = null;
         request = null;
         response = null;
