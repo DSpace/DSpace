@@ -66,7 +66,7 @@ public class DryadGmailService {
                     .build();
             myCredential = getMyCredential();
         } catch (IOException e) {
-            throw new RuntimeException(e.toString());
+            throw new RuntimeException("Something is wrong with the stored credential file; please remove it and reauthorize.");
         }
     }
 
