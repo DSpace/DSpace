@@ -360,6 +360,39 @@
 			</xsl:text>
 			</script>
 			
+			<xsl:if test="dri:body/dri:div[@n='submit-cclicense']">
+				<script type="text/javascript">
+					<xsl:text disable-output-escaping="yes">
+					$(document).ready(function(){
+						var nc_text = "";
+						var sa_text = "";
+						var nd_text = "";
+						var showCCLicenseSelected = function(){
+							switch (this.name){
+								case "commercial_chooser":
+									switch(this.value){
+										case "y": nc_text = ""; break;
+										case "n": nc_text = "-nc"; break;
+									}
+									break;
+								case "derivatives_chooser":
+									switch(this.value){
+										case "y": nd_text = ""; sa_text=""; break;
+										case "sa": nd_text = ""; sa_text = "-sa"; break;
+										case "n": nd_text = "-nd"; sa_text=""; break;
+									}
+									break;
+							}
+							$('.selectedCCLicense').html("La licencia actual seleccionada es &lt;a target='_blank' href='https://creativecommons.org/licenses/by" + nc_text + nd_text + sa_text +"/4.0'&gt;Creative Commons BY"+ (nc_text + nd_text + sa_text).toUpperCase() + " 4.0&lt;/a&gt;");	
+						};
+						$("#N100AB input[name='commercial_chooser']").click(showCCLicenseSelected);
+						$("#N100CD input[name='derivatives_chooser']").click(showCCLicenseSelected);
+						$("#aspect_submission_StepTransformer_list_statusList ol li:first").prepend('&lt;div class="selectedCCLicense"&gt;&#160;&lt;/div&gt;')
+					});
+					</xsl:text>
+				</script>
+			</xsl:if>
+			
 			<script type="text/javascript">
 				<xsl:text disable-output-escaping="yes">
 				//Adds a group of radio buttons used for select an embargo period.				
