@@ -13,6 +13,10 @@ ul {
 	margin-left: 0px;
 }
 
+ol {
+	padding-left: 40px;
+}
+
 #welcome-panel h1 {
 	color: rgb(186, 223, 229);
 	font-weight: bold;
@@ -42,11 +46,19 @@ ul {
 
 
 #cic-header  > #banner-cic-digital{
-	font-size: 22px;
+	font-size: 1.54em;
     vertical-align: middle;
     padding: 50px 30px;
     font-family: "sans-serif";
 }
+
+@media(min-width:991px) and (max-width:1360px){
+	#cic-header  > #banner-cic-digital{
+		padding-bottom: 30px;
+	}
+}
+
+
 #cic-header  > #banner-cic-digital .small{
   font-size: 70%;
 }
@@ -430,6 +442,11 @@ li.ds-artifact-item.community {
 	margin-right: 20px;
 }
 
+.metadata-dcterms_abstract .metadata-values span{
+	white-space: pre-wrap;
+	line-height: 1.8;
+}
+
 .metadata-dcterms_abstract .metadata-label {
 	background-color: #509296;
 	color: white;
@@ -441,7 +458,7 @@ li.ds-artifact-item.community {
 
 .metadata-values>span:nth-child(n+2):BEFORE {
 	/* 	background-color: red; */
-	content: ' | ';
+	/*content: ' | ';*/
 	font-weight: bold;
 }
 

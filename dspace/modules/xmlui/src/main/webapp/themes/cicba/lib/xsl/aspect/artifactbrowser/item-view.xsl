@@ -415,6 +415,7 @@
 					</xsl:call-template>
 					<xsl:call-template name="render-metadata">
 						<xsl:with-param name="field" select="'dcterms.subject'" />
+						<xsl:with-param name="separator" select="' | '" />
 						<xsl:with-param name="container" select="'li'" />
 					</xsl:call-template>
 					<xsl:call-template name="render-metadata">

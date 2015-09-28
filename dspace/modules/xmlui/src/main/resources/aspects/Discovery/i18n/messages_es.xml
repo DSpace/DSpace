@@ -94,6 +94,13 @@
 
 	<message key="xmlui.dri2xhtml.structural.pagination-info.nototal">Mostrando items {0}-{1}</message>
 
+
+	<message key="xmlui.Discovery.AbstractSearch.type_keyword">Filtrar por: Palabra clave</message>
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.keyword">Palabra clave</message>
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.keyword_filter">Palabra clave</message>
+	<message key="xmlui.Discovery.AbstractSearch.type_type">Filtrar por: Tipo</message>
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.Type">Tipo</message>
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.type_filter">Tipo</message>
 	<message key="xmlui.Discovery.AbstractSearch.type_author">Filtrar por: Autor</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.author">Autor</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.author_filter">Autor</message>
@@ -114,11 +121,14 @@
 	<message key="xmlui.Discovery.AbstractSearch.sort_by.dc.date.issued_dt_desc">Fecha de carga Desc</message>
 
 	<message key="xmlui.Discovery.AbstractSearch.sort_by.dc.title_sort_asc">Título Asc</message>
-	<message key="xmlui.Discovery.AbstractSearch.sort_by.dc.date.issued_dt_asc">Fecha Asc</message>
-	<message key="xmlui.Discovery.AbstractSearch.sort_by.dc.date.issued_dt_desc">Fecha de carga Asc</message>
+	<message key="xmlui.Discovery.AbstractSearch.sort_by.dcterms.issued_dt_asc">Fecha de publicacion Asc</message>
+	<message key="xmlui.Discovery.AbstractSearch.sort_by.dcterms.issued_dt_desc">Fecha de publicacion Desc</message>
 	<message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dc.title_sort">Título</message>
-	<message
-		key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dc.date.issued_dt">Fecha</message>
+	
+	<message key="xmlui.Discovery.AbstractSearch.sort_by.dc.date.accessioned_dt_asc">Fecha de carga Asc</message>
+	<message key="xmlui.Discovery.AbstractSearch.sort_by.dc.date.accessioned_dt_desc">Fecha de carga Desc</message>
+	
+	<message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dc.date.issued_dt">Fecha</message>
 
 	<message key="xmlui.Discovery.AbstractSearch.rpp">Resultados por página:</message>
 
