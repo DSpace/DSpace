@@ -1251,7 +1251,7 @@ public class DatabaseUtils
         }
         else
         {
-            return null;
+            return dbms_lc;
         }
     }
 
