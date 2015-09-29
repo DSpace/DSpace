@@ -115,6 +115,19 @@ public class RestIndex {
                   		"<li>DELETE /bitstreams/{bitstream id} - Delete the specified bitstream from DSpace.</li>" +
                   		"<li>DELETE /bitstreams/{bitstream id}/policy/{policy_id} - Delete the specified bitstream policy.</li>" +
                   	"</ul>" +
+                    "<h2>Metadata and Schema Registry</h2>" +
+                    "<ul>" +
+                        "<li>GET /registries/schema - Return the list of metadata schemas in the registry</li>" +
+                        "<li>GET /registries/schema/{schema_prefix} - Returns the specified metadata schema</li>" +
+                        "<li>GET /registries/schema/{schema_prefix}/metadata-fields/{element} - Returns the metadata field within a schema with an unqualified element name</li>" +
+                        "<li>GET /registries/schema/{schema_prefix}/metadata-fields/{element}/{qualifier} - Returns the metadata field within a schema with a qualified element name</li>" +
+                        "<li>POST /registries/schema/ - Add a schema to the schema registry</li>" +
+                        "<li>POST /registries/schema/{schema_prefix}/metadata-fields - Add a metadata field to the specified schema</li>" +
+                        "<li>GET /registries/metadata-fields/{field_id} - Return the specified metadata field</li>" +
+                        "<li>PUT /registries/metadata-fields/{field_id} - Update the specified metadata field</li>" +
+                        "<li>DELETE /registries/metadata-fields/{field_id} - Delete the specified metadata field from the metadata field registry</li>" +
+                        "<li>DELETE /registries/schema/{schema_id} - Delete the specified schema from the schema registry</li>" +
+                    "</ul>" +
                 "</body></html> ";
     }
     
@@ -127,6 +140,7 @@ public class RestIndex {
     @Path("/test")
     public String test()
     {
+        log.info("REST TEST");
         return "REST api is running.";
     }
 
