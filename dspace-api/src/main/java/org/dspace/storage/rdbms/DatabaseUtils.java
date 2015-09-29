@@ -290,15 +290,39 @@ public class DatabaseUtils
             // "clean" = Run Flyway clean script
             else if(argv[0].equalsIgnoreCase("clean"))
             {
-                BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
                 try (Connection connection = dataSource.getConnection())
                 {
+                    String dbType = getDbType(connection);
+
+                    // Not all Postgres user accounts will be able to run a 'clean',
+                    // as only 'superuser' accounts can remove the 'pgcrypto' extension.
+                    if(dbType.equals(DBMS_POSTGRES))
+                    {
+                        // Check if database user has permissions suitable to run a clean
+                        if(!checkCleanPermissions(connection))
+                        {
+                            String username = connection.getMetaData().getUserName();
+                            // Exit immediately, providing a descriptive error message
+                            System.out.println("\nERROR: The database user '" + username + "' does not have sufficient privileges to run a 'database clean' (via Flyway).");
+                            System.out.println("\nIn order to run a 'clean', the database user MUST have 'superuser' privileges");
+                            System.out.println("OR the '" + PGCRYPTO + "' extension must be installed in a separate schema (see documentation).");
+                            System.out.println("\nOptionally, you could also manually remove the '" + PGCRYPTO + "' extension first (DROP EXTENSION '" + PGCRYPTO + "' CASCADE), then rerun the 'clean'");
+                            System.exit(1);
+                        }
+                    }
+
+                    BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+
                     System.out.println("\nDatabase URL: " + connection.getMetaData().getURL());
                     System.out.println("\nWARNING: ALL DATA AND TABLES IN YOUR DATABASE WILL BE PERMANENTLY DELETED.\n");
                     System.out.println("There is NO turning back from this action. Backup your DB before continuing.");
-                    if(getDbType(connection).equals(DBMS_ORACLE))
+                    if(dbType.equals(DBMS_ORACLE))
                     {
-                        System.out.println("ORACLE WARNING: your RECYCLEBIN will also be PURGED.\n");
+                        System.out.println("\nORACLE WARNING: your RECYCLEBIN will also be PURGED.\n");
+                    }
+                    else if(dbType.equals(DBMS_POSTGRES))
+                    {
+                        System.out.println("\nPOSTGRES WARNING: the '" + PGCRYPTO + "' extension will be dropped if it is in the same schema as the DSpace database.\n");
                     }
                     System.out.print("Do you want to PERMANENTLY DELETE everything from your database? [y/n]: ");
                     String choiceString = input.readLine();
@@ -1368,6 +1392,7 @@ public class DatabaseUtils
      * Check if the pgcrypto extension is BOTH installed AND up-to-date.
      * <P>
      * This requirement is only needed for PostgreSQL databases.
+     * It doesn't matter what schema pgcrypto is installed in, as long as it exists.
      * @return true if everything is installed & up-to-date. False otherwise.
      */
     public static boolean isPgcryptoUpToDate()
@@ -1390,6 +1415,123 @@ public class DatabaseUtils
         catch(SQLException e)
         {
             throw new FlywayException("Unable to determine whether 'pgcrypto' extension is up-to-date.", e);
+        }
+    }
+
+    /**
+     * Check if the pgcrypto extension is installed into a particular schema
+     * <P>
+     * This allows us to check if pgcrypto needs to be REMOVED prior to running
+     * a 'clean' on this database. If pgcrypto is in the same schema as the
+     * dspace database, a 'clean' will require removing pgcrypto FIRST.
+     *
+     * @param schema name of schema
+     * @return true if pgcrypto is in this schema. False otherwise.
+     */
+    public static boolean isPgcryptoInSchema(String schema)
+    {
+        // Get our configured dataSource
+        DataSource dataSource = getDataSource();
+
+        try(Connection connection = dataSource.getConnection())
+        {
+            // Check if pgcrypto is installed in the current database schema.
+            String pgcryptoInstalledInSchema = "SELECT extversion FROM pg_extension,pg_namespace " +
+                                                 "WHERE pg_extension.extnamespace=pg_namespace.oid " +
+                                                 "AND extname=? " +
+                                                 "AND nspname=?;";
+            Double pgcryptoVersion = null;
+            try (PreparedStatement statement = connection.prepareStatement(pgcryptoInstalledInSchema))
+            {
+                statement.setString(1,PGCRYPTO);
+                statement.setString(2, schema);
+                try(ResultSet results = statement.executeQuery())
+                {
+                    if(results.next())
+                    {
+                        pgcryptoVersion = results.getDouble("extversion");
+                    }
+                }
+            }
+
+            // If a pgcrypto version returns, it's installed in this schema
+            if(pgcryptoVersion!=null)
+                return true;
+            else
+                return false;
+        }
+        catch(SQLException e)
+        {
+            throw new FlywayException("Unable to determine whether 'pgcrypto' extension is installed in schema '" + schema + "'.", e);
+        }
+    }
+
+
+    /**
+     * Check if the current user has permissions to run a clean on existing
+     * database.
+     * <P>
+     * Mostly this just checks if you need to remove pgcrypto, and if so,
+     * whether you have permissions to do so.
+     *
+     * @param current database connection
+     * @return true if permissions valid, false otherwise
+     */
+    private static boolean checkCleanPermissions(Connection connection)
+    {
+        try
+        {
+            String dbType = getDbType(connection);
+           
+            // If we are using Postgres, special permissions or setup are
+            // necessary to be able to remove the 'pgcrypto' extension.
+            if(dbType.equals(DBMS_POSTGRES))
+            {
+                // get username of our db user
+                String username = connection.getMetaData().getUserName();
+
+                // Check their permissions. Are they a 'superuser'?
+                String checkSuperuser = "SELECT rolsuper FROM pg_roles WHERE rolname=?;";
+                boolean superuser = false;
+                try (PreparedStatement statement = connection.prepareStatement(checkSuperuser))
+                {
+                    statement.setString(1,username);
+                    try(ResultSet results = statement.executeQuery())
+                    {
+                        if(results.next())
+                        {
+                            superuser = results.getBoolean("rolsuper");
+                        }
+                    }
+                }
+                catch(SQLException e)
+                {
+                    throw new FlywayException("Unable to determine if user '" + username + "' is a superuser.", e);
+                }
+
+                // If user is a superuser, then "clean" can be run successfully
+                if(superuser)
+                {
+                    return true;
+                }
+                else // Otherwise, we'll need to see which schema 'pgcrypto' is installed in
+                {
+                    // Get current schema name
+                    String schema = getSchemaName(connection);
+
+                    // If pgcrypto is installed in this schema, then superuser privileges are needed to remove it
+                    if(isPgcryptoInSchema(schema))
+                        return false;
+                    else // otherwise, a 'clean' can be run by anyone
+                        return true;
+                }
+            }
+            else // for all other dbTypes, a clean is possible
+                return true;
+        }
+        catch(SQLException e)
+        {
+            throw new FlywayException("Unable to determine if DB user has 'clean' privileges.", e);
         }
     }
 

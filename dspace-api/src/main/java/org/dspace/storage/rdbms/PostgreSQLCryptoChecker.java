@@ -9,6 +9,7 @@ package org.dspace.storage.rdbms;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import org.apache.log4j.Logger;
 import org.flywaydb.core.api.FlywayException;
 import org.flywaydb.core.api.MigrationInfo;
@@ -63,9 +64,50 @@ public class PostgreSQLCryptoChecker implements FlywayCallback
         }
     }
 
+    /**
+     * Remove pgcrypto (if necessary).
+     * <P>
+     * The pgcrypto extension MUST be removed before a clean or else errors occur.
+     * This method checks if it needs to be removed and, if so, removes it.
+     * @param connection database connection
+     */
+    public void removePgCrypto(Connection connection)
+    {
+        try
+        {
+            String dbType = DatabaseUtils.getDbType(connection);
+
+            // ONLY remove if this is a PostgreSQL database
+            if(dbType!=null && dbType.equals(DatabaseUtils.DBMS_POSTGRES))
+            {
+                // Get current schema
+                String schema = DatabaseUtils.getSchemaName(connection);
+
+                // Check if pgcrypto is in this schema
+                // If so, it MUST be removed before a 'clean'
+                if(DatabaseUtils.isPgcryptoInSchema(schema))
+                {
+                    // remove the extension
+                    try(Statement statement = connection.createStatement())
+                    {
+                        // WARNING: ONLY superusers can remove pgcrypto. However, at this point,
+                        // we have already verified user acct permissions via DatabaseUtils.checkCleanPermissions()
+                        // (which is called prior to a 'clean' being triggered).
+                        statement.execute("DROP EXTENSION " + DatabaseUtils.PGCRYPTO + " CASCADE");
+                    }
+                }
+            }
+        }
+        catch(SQLException e)
+        {
+            throw new FlywayException("Failed to check for and/or remove '" + DatabaseUtils.PGCRYPTO + "' extension", e);
+        }
+    }
+
     @Override
     public void beforeClean(Connection connection) {
-   
+        // If pgcrypto is installed, remove it
+        removePgCrypto(connection);
     }
 
     @Override
