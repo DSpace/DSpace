@@ -520,6 +520,12 @@ public class DatabaseUtils
         // We will now check prior versions in reverse chronological order, looking
         // for specific tables or columns that were newly created in each version.
 
+        // Is this pre-DSpace 5.0 (with Bitstream Created)? Look for the "created" column in the "bitstream" table
+        if(tableColumnExists(connection, "bitstream", "created"))
+        {
+            return "5.0.2014.12.13"; // This version matches the version in the SQL migration for this feature
+        }
+
         // Is this pre-DSpace 5.0 (with Metadata 4 All changes)? Look for the "resource_id" column in the "metadatavalue" table
         if(tableColumnExists(connection, "metadatavalue", "resource_id"))
         {

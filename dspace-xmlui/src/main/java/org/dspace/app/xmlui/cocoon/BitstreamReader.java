@@ -10,6 +10,7 @@ package org.dspace.app.xmlui.cocoon;
 import java.io.*;
 import java.net.URLEncoder;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.Map;
 
 import javax.mail.internet.MimeUtility;
@@ -121,13 +122,23 @@ public class BitstreamReader extends AbstractReader implements Recyclable
 
     /**
      * When should a bitstream expire in milliseconds. This should be set to
-     * some low value just to prevent someone hiting DSpace repeatedy from
+     * some low value just to prevent someone hitting DSpace repeatedly from
      * killing the server. Note: there are 1000 milliseconds in a second.
      *
      * Format: minutes * seconds * milliseconds
      *  60 * 60 * 1000 == 1 hour
      */
-    protected static final int expires = 60 * 60 * 1000;
+    protected static final int expires = ConfigurationManager.getIntProperty("xmlui.bitstream.expires", 60 * 60 * 1000);
+
+    /**
+     * Block Archiving in Search Engines and Proxies, enable by default
+     */
+    protected static final boolean ALLOW_CACHING = ConfigurationManager.getBooleanProperty("xmlui.bitstream.cache", true);
+
+    /**
+     * Threshold at which disposition header is set
+     */
+    protected int threshold = ConfigurationManager.getIntProperty("xmlui.content_disposition_threshold", 8388608);
 
     /** The Cocoon response */
     protected Response response;
@@ -150,11 +161,10 @@ public class BitstreamReader extends AbstractReader implements Recyclable
     /** True if bitstream is readable by anonymous users */
     protected boolean isAnonymouslyReadable;
 
-    /** Item containing the Bitstream */
-    private Item item = null;
+    /** Last Time the Bitstream Attributes were modified */
+    private Date lastModified;
 
-    /** True if user agent making this request was identified as spider. */
-    private boolean isSpider = false;
+    private boolean notModified;
 
     /** TEMP file for citation PDF. We will save here, so we can delete the temp file when done.  */
     private File tempFile;
@@ -170,18 +180,20 @@ public class BitstreamReader extends AbstractReader implements Recyclable
     {
         super.setup(resolver, objectModel, src, par);
 
+        // Check to see if a context already exists or not. We may
+        // have been aggregated into an http request by the XSL document
+        // pulling in an XML-based bitstream. In this case the context has
+        // already been created and we should leave it open because the
+        // normal processes will close it.
+        boolean BitstreamReaderOpenedContext = !ContextUtil.isContextAvailable(objectModel);
+        Context context = null;
+
         try
         {
             this.request = ObjectModelHelper.getRequest(objectModel);
             this.response = ObjectModelHelper.getResponse(objectModel);
-            
-            // Check to see if a context already exists or not. We may
-            // have been aggregated into an http request by the XSL document
-            // pulling in an XML-based bitstream. In this case the context has
-            // already been created and we should leave it open because the
-            // normal processes will close it.
-            boolean BitstreamReaderOpenedContext = !ContextUtil.isContextAvailable(objectModel);
-            Context context = ContextUtil.obtainContext(objectModel);
+
+            context = ContextUtil.obtainContext(objectModel);
             
             // Get our parameters that identify the bitstream
             int itemID = par.getParameterAsInteger("itemID", -1);
@@ -190,12 +202,12 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             
             int sequence = par.getParameterAsInteger("sequence", -1);
             String name = par.getParameter("name", null);
-        
-            this.isSpider = par.getParameter("userAgent", "").equals("spider");
 
-            // Resolve the bitstream
+            // Resolve the bitstream and Item if possible.
+            // these are local fields to assure they can be easily abandoned and GC'd during bitstream download
             Bitstream bitstream = null;
             DSpaceObject dso = null;
+            Item item = null;
             
             if (bitstreamID > -1)
             {
@@ -320,6 +332,23 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                 }
             }
 
+            // Gather last modified timestamp if possible
+            if(bitstream.getLastModified() != null)
+                this.lastModified = bitstream.getLastModified();
+            else if(item != null)
+                this.lastModified = item.getLastModified();
+            else
+                this.lastModified = null;
+
+            // Check for if-modified-since header,  we can return a 304 early if this is the case.
+            long modSince = request.getDateHeader("If-Modified-Since");
+            if (modSince != -1 && lastModified != null && lastModified.getTime() <= modSince)
+            {
+                // Item has not been modified since requested date, generate should not return content, returning.
+                notModified = true;
+                return;
+            }
+
             // Success, bitstream found and the user has access to read it.
             // Store these for later retrieval:
 
@@ -407,19 +436,24 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                     bitstreamName = "bitstream";
                 }
             }
-            
+
+            // Stop all processing, there is a critical issue with the bitstream being retrievable, do not log event.
+            if(this.bitstreamInputStream == null)
+            {
+                log.error("bitstreamInputStream = null");
+                throw new ProcessingException("Unable to read bitstream as bitstream not found in assetstore");
+            }
+
             // Log that the bitstream has been viewed, this is non-cached and the complexity
             // of adding it to the sitemap for every possible bitstream uri is not very tractable
+            // TODO: Should view event happen if 304 or HEAD is returned with no actual content?
             new DSpace().getEventService().fireEvent(
                                 new UsageEvent(
                                                 UsageEvent.Action.VIEW,
                                                 ObjectModelHelper.getRequest(objectModel),
                                                 ContextUtil.obtainContext(ObjectModelHelper.getRequest(objectModel)),
                                                 bitstream));
-            
-            // If we created the database connection close it, otherwise leave it open.
-            if (BitstreamReaderOpenedContext)
-            	context.complete();
+
         }
         catch (SQLException sqle)
         {
@@ -428,6 +462,20 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         catch (AuthorizeException ae)
         {
             throw new ProcessingException("Unable to read bitstream.",ae);
+        }
+        finally
+        {
+            // If we created the database connection close it, otherwise leave it open.
+            if (BitstreamReaderOpenedContext) {
+                try {
+                    context.complete();
+                } catch (SQLException e) {
+                    if(log.isDebugEnabled())
+                        log.debug(e.getMessage(),e);
+                    else
+                        log.error(e.getMessage());
+                }
+            }
         }
     }
 
@@ -560,58 +608,63 @@ public class BitstreamReader extends AbstractReader implements Recyclable
     public void generate() throws IOException, SAXException,
             ProcessingException
     {
-        if (this.bitstreamInputStream == null)
-        {
-            return;
-        }
-        
-        // Only allow If-Modified-Since protocol if request is from a spider
-        // since response headers would encourage a browser to cache results
-        // that might change with different authentication.
-        if (isSpider)
-        {
-            // Check for if-modified-since header -- ONLY if not authenticated
-            long modSince = request.getDateHeader("If-Modified-Since");
-            if (modSince != -1 && item != null && item.getLastModified().getTime() < modSince)
+
+        // Only encourage caching and modified-since if this is not a restricted resource, i.e.
+        // if it is accessed anonymously or is readable by Anonymous:
+        if (isAnonymouslyReadable) {
+
+            response.setDateHeader("Expires", System.currentTimeMillis() + expires);
+
+            // Only allow caching if enabled in configuration
+            if (ALLOW_CACHING) {
+                // Allow caching of anonymously available content and configure expires.
+                response.setHeader("Cache-Control", "max-age=" + expires + ", must-revalidate"); // HTTP 1.1.
+            }
+            else
+            {
+                // Block Caching of anonymously available content and configure expires
+                response.setHeader("Cache-Control", "no-cache, no-store, max-age=" + expires + ", must-revalidate"); // HTTP 1.1.
+                response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
+                response.setHeader("X-Robots-Tag", "noarchive");
+            }
+
+            // Set Last-Modified so client can send If-Modified-Since based on DSpace modified timestamps.
+            if (lastModified != null)
+            {
+                response.setDateHeader("Last-Modified", lastModified.getTime());
+            }
+
+            // If notModified we can return early if this is the case.
+            if (notModified)
             {
                 // Item has not been modified since requested date,
-                // hence bitstream has not been, either; return 304
+                // hence bitstream has not; return 304
                 response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
                 return;
             }
         }
-
-        // Only set Last-Modified: header for spiders or anonymous
-        // access, since it might encourage browse to cache the result
-        // which might leave a result only available to authenticated
-        // users in the cache for a response later to anonymous user.
-        try
+        else
         {
-            if (item != null && (isSpider || ContextUtil.obtainContext(request).getCurrentUser() == null))
-            {
-                // TODO:  Currently just borrow the date of the item, since
-                // we don't have last-mod dates for Bitstreams
-                response.setDateHeader("Last-Modified", item.getLastModified()
-                        .getTime());
-            }
-        }
-        catch (SQLException e)
-        {
-            throw new ProcessingException(e);
+            // Never Cache and always Expire Private Content, Crawler should never reach here
+            // Proxies may get here when proxing content for authenticated users.
+            response.setHeader("Cache-Control", "no-cache, no-store, max-age=0, must-revalidate"); // HTTP 1.1.
+            response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
+            response.setDateHeader("Expires", 0); // Proxies.
+            response.setHeader("X-Robots-Tag", "noindex, noarchive");
         }
 
-        byte[] buffer = new byte[BUFFER_SIZE];
-        int length = -1;
-
-        // Only encourage caching if this is not a restricted resource, i.e.
-        // if it is accessed anonymously or is readable by Anonymous:
-        if (isAnonymouslyReadable)
+        if (this.bitstreamInputStream == null)
         {
-            response.setDateHeader("Expires", System.currentTimeMillis() + expires);
+            // This should be an error reported, and, by no means, an empty file.
+            throw new ProcessingException("failed to retrieve content of Bitstream");
         }
-        
+
+        if(bitstreamMimeType != null) {
+            // Set the Content-Type header so that the file is rendered in browser if possible.
+            response.setHeader("Content-Type", bitstreamMimeType);
+        }
+
         // If this is a large bitstream then tell the browser it should treat it as a download.
-        int threshold = ConfigurationManager.getIntProperty("xmlui.content_disposition_threshold");
         if (bitstreamSize > threshold && threshold != 0)
         {
                 String name  = bitstreamName;
@@ -635,6 +688,13 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                 response.setHeader("Content-Disposition", "attachment;filename=" + '"' + name + '"');
         }
 
+        if(request.getMethod().equals("HEAD"))
+        {
+            return;
+        }
+
+        byte[] buffer = new byte[BUFFER_SIZE];
+        int length = -1;
         ByteRange byteRange = null;
 
         // Turn off partial downloads, they cause problems
@@ -747,6 +807,8 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         this.response = null;
         this.request = null;
         this.bitstreamInputStream = null;
+        this.lastModified = null;
+        this.notModified = false;
         this.bitstreamSize = 0;
         this.bitstreamMimeType = null;
     }

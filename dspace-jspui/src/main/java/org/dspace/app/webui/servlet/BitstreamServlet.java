@@ -10,6 +10,7 @@ package org.dspace.app.webui.servlet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.Date;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -20,6 +21,8 @@ import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
@@ -49,16 +52,29 @@ public class BitstreamServlet extends DSpaceServlet
     private static Logger log = Logger.getLogger(BitstreamServlet.class);
 
     /**
+     * When should a bitstream expire in milliseconds. This should be set to
+     * some low value just to prevent someone hitting DSpace repeatedly from
+     * killing the server. Note: there are 1000 milliseconds in a second.
+     *
+     * Format: minutes * seconds * milliseconds
+     *  60 * 60 * 1000 == 1 hour
+     */
+    protected static final int expires = ConfigurationManager.getIntProperty("webui.bitstream.expires", 60 * 60 * 1000);
+
+    /**
+     * Block Archiving in Search Engines and Proxies, enable by default
+     */
+    protected static final boolean ALLOW_CACHING = ConfigurationManager.getBooleanProperty("webui.bitstream.cache", true);
+
+    /**
      * Threshold on Bitstream size before content-disposition will be set.
      */
-    private int threshold;
+    protected static final int threshold = ConfigurationManager.getIntProperty("webui.content_disposition_threshold", 8388608);
     
     @Override
 	public void init(ServletConfig arg0) throws ServletException {
 
 		super.init(arg0);
-		threshold = ConfigurationManager
-				.getIntProperty("webui.content_disposition_threshold");
 	}
 
     @Override
@@ -182,27 +198,80 @@ public class BitstreamServlet extends DSpaceServlet
         
         // Modification date
         // Only use last-modified if this is an anonymous access
+        // Set Cache Control headers appropriately.
         // - caching content that may be generated under authorisation
         //   is a security problem
+        // Gather last modified timestamp if possible
+        Date lastModified;
+
+        if(bitstream.getLastModified() != null)
+            lastModified = bitstream.getLastModified();
+        else if(item != null)
+            lastModified = item.getLastModified();
+        else
+            lastModified = null;
+
+
+        boolean isAnonymouslyReadable = false;
+
         if (context.getCurrentUser() == null)
         {
-            // TODO: Currently the date of the item, since we don't have dates
-            // for files
-            response.setDateHeader("Last-Modified", item.getLastModified()
-                    .getTime());
+            isAnonymouslyReadable = true;
+        }
+        else
+        {
+            for (ResourcePolicy rp : AuthorizeManager.getPoliciesActionFilter(context, bitstream, Constants.READ))
+            {
+                if (rp.getGroupID() == 0)
+                {
+                    isAnonymouslyReadable = true;
+                }
+            }
+        }
 
-            // Check for if-modified-since header
+        if (isAnonymouslyReadable)
+        {
+            response.setDateHeader("Expires", System.currentTimeMillis() + expires);
+
+            // Only allow caching if enabled in configuration
+            if (ALLOW_CACHING) {
+                // Allow caching of anonymously available content and configure expires.
+                response.setHeader("Cache-Control", "max-age=" + expires + ", must-revalidate"); // HTTP 1.1.
+            }
+            else
+            {
+                // Block Caching of anonymously available content and configure expires
+                response.setHeader("Cache-Control", "no-cache, no-store, max-age=" + expires + ", must-revalidate"); // HTTP 1.1.
+                response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
+                response.setHeader("X-Robots-Tag", "noarchive");
+            }
+
+            // Set Last-Modified so client can send If-Modified-Since based on DSpace modified timestamps.
+            if (lastModified != null)
+            {
+                response.setDateHeader("Last-Modified", lastModified.getTime());
+            }
+
+            // If modified-since header provided, it was already cached,, then check it in all cases
             long modSince = request.getDateHeader("If-Modified-Since");
 
-            if (modSince != -1 && item.getLastModified().getTime() < modSince)
+            if (modSince != -1 && lastModified != null && lastModified.getTime() <= modSince)
             {
-                // Item has not been modified since requested date,
-                // hence bitstream has not; return 304
+                // Bitstream has not been modified since requested date, return 304
                 response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
                 return;
             }
         }
-        
+        else
+        {
+            // Never Cache and always Expire Private Content, Crawler should never reach here
+            // Proxies may get here when proxing content for authenticated users.
+            response.setHeader("Cache-Control", "no-cache, no-store, max-age=0, must-revalidate"); // HTTP 1.1.
+            response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
+            response.setDateHeader("Expires", 0); // Proxies.
+            response.setHeader("X-Robots-Tag", "noindex, noarchive");
+        }
+
         // Pipe the bits
         InputStream is = bitstream.retrieve();
      

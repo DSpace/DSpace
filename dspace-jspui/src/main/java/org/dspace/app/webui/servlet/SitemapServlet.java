@@ -94,7 +94,7 @@ public class SitemapServlet extends DSpaceServlet
         // Check for if-modified-since header
         long modSince = request.getDateHeader("If-Modified-Since");
 
-        if (modSince != -1 && lastMod < modSince)
+        if (modSince != -1 && lastMod <= modSince)
         {
             // Sitemap file has not been modified since requested date,
             // hence bitstream has not; return 304
