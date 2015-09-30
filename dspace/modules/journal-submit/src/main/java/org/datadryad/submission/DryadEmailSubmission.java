@@ -146,11 +146,11 @@ public class DryadEmailSubmission extends HttpServlet {
                     MimeMessage message = DryadGmailService.getMessageForId(mID);
                     try {
                         processMimeMessage(message);
-                        DryadGmailService.removeJournalLabelForMessageWithId(mID);
                     } catch (Exception details) {
                         DryadGmailService.addErrorLabelForMessageWithId(mID);
-                        LOGGER.info("Exception thrown while processing MIME message: " + details.getMessage() + ", " + details.getClass().getName());
+                        LOGGER.info("Exception thrown while processing message " + mID + ": " + details.getMessage() + ", " + details.getClass().getName());
                     }
+                    DryadGmailService.removeJournalLabelForMessageWithId(mID);
                 }
             }
             DryadGmailService.completeJournalProcessing();
