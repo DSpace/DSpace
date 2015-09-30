@@ -55,10 +55,10 @@ public class PostgreSQLCryptoChecker implements FlywayCallback
             // of the 'pgcrypto' extension MUST be installed to continue.
             
             // Check if pgcrypto is both installed & a supported version
-            if(!DatabaseUtils.isPgcryptoUpToDate())
+            if(!PostgresUtils.isPgcryptoUpToDate())
             {
                 throw new FlywayException("This PostgreSQL Database is INCOMPATIBLE with DSpace. The upgrade will NOT proceed. " +
-                        "A supported version (>=" + DatabaseUtils.PGCRYPTO_VERSION + ") of the '" + DatabaseUtils.PGCRYPTO + "' extension must be installed! " +
+                        "A supported version (>=" + PostgresUtils.PGCRYPTO_VERSION + ") of the '" + PostgresUtils.PGCRYPTO + "' extension must be installed! " +
                         "Please run 'dspace database info' for additional info/tips.");
             }
         }
@@ -85,7 +85,7 @@ public class PostgreSQLCryptoChecker implements FlywayCallback
 
                 // Check if pgcrypto is in this schema
                 // If so, it MUST be removed before a 'clean'
-                if(DatabaseUtils.isPgcryptoInSchema(schema))
+                if(PostgresUtils.isPgcryptoInSchema(schema))
                 {
                     // remove the extension
                     try(Statement statement = connection.createStatement())
@@ -93,14 +93,14 @@ public class PostgreSQLCryptoChecker implements FlywayCallback
                         // WARNING: ONLY superusers can remove pgcrypto. However, at this point,
                         // we have already verified user acct permissions via DatabaseUtils.checkCleanPermissions()
                         // (which is called prior to a 'clean' being triggered).
-                        statement.execute("DROP EXTENSION " + DatabaseUtils.PGCRYPTO + " CASCADE");
+                        statement.execute("DROP EXTENSION " + PostgresUtils.PGCRYPTO + " CASCADE");
                     }
                 }
             }
         }
         catch(SQLException e)
         {
-            throw new FlywayException("Failed to check for and/or remove '" + DatabaseUtils.PGCRYPTO + "' extension", e);
+            throw new FlywayException("Failed to check for and/or remove '" + PostgresUtils.PGCRYPTO + "' extension", e);
         }
     }
 
