@@ -136,17 +136,21 @@ public class DryadEmailSubmission extends HttpServlet {
     private void retrieveMail () {
         LOGGER.info ("retrieving mail with label '" + ConfigurationManager.getProperty("submit.journal.email.label") + "'");
         try {
-            ArrayList<MimeMessage> messages = DryadGmailService.processJournalEmails();
-            if (messages != null) {
-                LOGGER.info("retrieved " + messages.size() + " messages");
-                for (MimeMessage message : messages) {
+            List<String> messageIDs = DryadGmailService.getJournalMessageIds();
+            if (messageIDs != null) {
+                LOGGER.info("retrieved " + messageIDs.size() + " messages");
+                for (String mID : messageIDs) {
+                    MimeMessage message = DryadGmailService.getMessageForId(mID);
                     try {
                         processMimeMessage(message);
+                        DryadGmailService.removeJournalLabelForMessageWithId(mID);
                     } catch (Exception details) {
+                        DryadGmailService.addErrorLabelForMessageWithId(mID);
                         LOGGER.info("Exception thrown while processing MIME message: " + details.getMessage() + ", " + details.getClass().getName());
                     }
                 }
             }
+            DryadGmailService.completeJournalProcessing();
         } catch (IOException e) {
             LOGGER.info("Exception thrown: " + e.getMessage() + ", " + e.getClass().getName());
         }

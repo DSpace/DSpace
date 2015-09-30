@@ -1,34 +1,26 @@
 package org.datadryad.submission;
-import org.dspace.core.*;
+
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.googleapis.auth.oauth2.*;
 import com.google.api.client.auth.oauth2.DataStoreCredentialRefreshListener;
+import com.google.api.client.googleapis.auth.oauth2.*;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.repackaged.org.apache.commons.codec.binary.Base64;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.*;
-import com.google.api.client.repackaged.org.apache.commons.codec.binary.Base64;
-
-import java.io.IOException;
-import java.lang.RuntimeException;
-import java.lang.String;
-import java.util.*;
-import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.LinkedHashMap;
-import java.util.Properties;
-import javax.mail.internet.MimeMessage;
-import javax.mail.Session;
-
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.dspace.core.*;
+
+import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.File;
+import java.io.StringReader;
+import java.util.*;
 
 public class DryadGmailService {
     private static final Logger LOGGER = Logger.getLogger(DryadGmailService.class);
@@ -186,27 +178,21 @@ public class DryadGmailService {
 
         ArrayList<String> labels = new ArrayList<String>();
         labels.add(ConfigurationManager.getProperty("submit.journal.email.label"));
-        List<String> journalMessageIDs = getJournalEmails();
+        List<String> journalMessageIDs = getJournalMessageIds();
 
         for (String mID : journalMessageIDs) {
-            Message message = currentMessages.get(mID);
-            ByteArrayInputStream postBody = new java.io.ByteArrayInputStream(Base64.decodeBase64(message.getRaw()));
-            Session session = Session.getInstance(new Properties());
-            try {
-                MimeMessage mimeMessage = new MimeMessage(session, postBody);
+            MimeMessage mimeMessage = getMessageForId(mID);
+            if (mimeMessage != null) {
                 mimeMessages.add(mimeMessage);
-            } catch (javax.mail.MessagingException e) {
-                throw new RuntimeException("MessagingException: " + e.getMessage());
             }
             modifyMessage(mID, new ArrayList<String>(), labels);
-
         }
-        finishJournalEmails();
+        completeJournalProcessing();
         return mimeMessages;
     }
 
-    // queries the Gmail API and returns a list of Gmail message IDs. This list is valid until finishJournalEmails is called.
-    public static List<String> getJournalEmails () throws IOException {
+    // queries the Gmail API and returns a list of Gmail message IDs. This list is valid until completeJournalProcessing is called.
+    public static List<String> getJournalMessageIds() throws IOException {
         List<String> result = new LinkedList<String>();
         if (currentMessages == null) {
 
@@ -225,10 +211,40 @@ public class DryadGmailService {
         return result;
     }
 
-    public static void finishJournalEmails () {
+    public static void completeJournalProcessing() {
         currentMessages = null;
     }
 
+    public static MimeMessage getMessageForId(String mID) {
+        Message message = currentMessages.get(mID);
+        ByteArrayInputStream postBody = new java.io.ByteArrayInputStream(Base64.decodeBase64(message.getRaw()));
+        Session session = Session.getInstance(new Properties());
+        try {
+            return new MimeMessage(session, postBody);
+        } catch (javax.mail.MessagingException e) {
+            throw new RuntimeException("MessagingException: " + e.getMessage());
+        }
+    }
+
+    // convenience methods for adding/removing previously-defined labels
+
+    public static void addJournalLabelForMessageWithId (String mID) {
+        ArrayList<String> labels = new ArrayList<String>();
+        labels.add(ConfigurationManager.getProperty("submit.journal.email.label"));
+        modifyMessage(mID, labels, new ArrayList<String>());
+    }
+
+    public static void removeJournalLabelForMessageWithId (String mID) {
+        ArrayList<String> labels = new ArrayList<String>();
+        labels.add(ConfigurationManager.getProperty("submit.journal.email.label"));
+        modifyMessage(mID, new ArrayList<String>(), labels);
+    }
+
+    public static void addErrorLabelForMessageWithId (String mID) {
+        ArrayList<String> labels = new ArrayList<String>();
+        labels.add(ConfigurationManager.getProperty("submit.journal.email.error.label"));
+        modifyMessage(mID, labels, new ArrayList<String>());
+    }
 
     /**
      * Modify the labels a message is associated with.
@@ -238,27 +254,31 @@ public class DryadGmailService {
      * @param labelsToRemove List of label ids to remove.
      * @throws IOException
      */
-    public static void modifyMessage(String messageId, List<String> labelsToAdd, List<String> labelsToRemove) throws IOException {
+    public static void modifyMessage(String messageId, List<String> labelsToAdd, List<String> labelsToRemove) {
         ArrayList<String> labelIDsToAdd = new ArrayList<String>();
         ArrayList<String> labelIDsToRemove = new ArrayList<String>();
 
-        ListLabelsResponse labelsResponse = getMyGmailService().users().labels().list(getMyUserID()).execute();
-        List<Label> labelList = labelsResponse.getLabels();
-        for (Label label : labelList) {
-            for (String labelName : labelsToAdd) {
-                if (label.getName().equals(labelName)) {
-                    labelIDsToAdd.add(label.getId());
+        try {
+            ListLabelsResponse labelsResponse = getMyGmailService().users().labels().list(getMyUserID()).execute();
+            List<Label> labelList = labelsResponse.getLabels();
+            for (Label label : labelList) {
+                for (String labelName : labelsToAdd) {
+                    if (label.getName().equals(labelName)) {
+                        labelIDsToAdd.add(label.getId());
+                    }
+                }
+                for (String labelName : labelsToRemove) {
+                    if (label.getName().equals(labelName)) {
+                        labelIDsToRemove.add(label.getId());
+                    }
                 }
             }
-            for (String labelName : labelsToRemove) {
-                if (label.getName().equals(labelName)) {
-                    labelIDsToRemove.add(label.getId());
-                }
-            }
+            ModifyMessageRequest mods = new ModifyMessageRequest().setAddLabelIds(labelIDsToAdd)
+                    .setRemoveLabelIds(labelIDsToRemove);
+            Message message = getMyGmailService().users().messages().modify(getMyUserID(), messageId, mods).execute();
+        } catch (IOException e) {
+            throw new RuntimeException (" Couldn't modify message " + messageId, e);
         }
-        ModifyMessageRequest mods = new ModifyMessageRequest().setAddLabelIds(labelIDsToAdd)
-                .setRemoveLabelIds(labelIDsToRemove);
-        Message message = getMyGmailService().users().messages().modify(getMyUserID(), messageId, mods).execute();
     }
 
 }
