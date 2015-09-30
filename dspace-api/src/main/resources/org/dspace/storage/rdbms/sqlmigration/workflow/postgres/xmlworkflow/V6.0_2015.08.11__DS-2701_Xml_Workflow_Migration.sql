@@ -25,6 +25,10 @@ ALTER TABLE cwf_workflowitem ADD COLUMN collection_id UUID REFERENCES Collection
 UPDATE cwf_workflowitem SET collection_id = (SELECT collection.uuid FROM collection WHERE cwf_workflowitem.collection_legacy_id = collection.collection_id);
 ALTER TABLE cwf_workflowitem DROP COLUMN collection_legacy_id;
 
+UPDATE cwf_workflowitem SET multiple_titles = FALSE WHERE multiple_titles IS NULL;
+UPDATE cwf_workflowitem SET published_before = FALSE WHERE published_before IS NULL;
+UPDATE cwf_workflowitem SET multiple_files = FALSE WHERE multiple_files IS NULL;
+
 -- cwf_collectionrole
 ALTER TABLE cwf_collectionrole RENAME COLUMN collection_id to collection_legacy_id;
 ALTER TABLE cwf_collectionrole ADD COLUMN collection_id UUID REFERENCES Collection(uuid);
@@ -71,4 +75,5 @@ ALTER TABLE cwf_in_progress_user RENAME COLUMN user_id to eperson_legacy_id;
 ALTER TABLE cwf_in_progress_user ADD COLUMN user_id UUID REFERENCES eperson(uuid);
 UPDATE cwf_in_progress_user SET user_id = (SELECT eperson.uuid FROM eperson WHERE cwf_in_progress_user.eperson_legacy_id = eperson.eperson_id);
 ALTER TABLE cwf_in_progress_user DROP COLUMN eperson_legacy_id;
+UPDATE cwf_in_progress_user SET finished = FALSE WHERE finished IS NULL;
 

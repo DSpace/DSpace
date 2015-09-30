@@ -68,6 +68,10 @@ INSERT INTO dspaceobject  (uuid) SELECT uuid FROM bitstream;
 ALTER TABLE bitstream ADD FOREIGN KEY (uuid) REFERENCES dspaceobject;
 ALTER TABLE bitstream MODIFY uuid NOT NULL;
 ALTER TABLE bitstream ADD CONSTRAINT bitstream_id_unique PRIMARY KEY (uuid);
+UPDATE bitstream SET sequence_id = -1 WHERE sequence_id IS NULL;
+UPDATE bitstream SET size_bytes = -1 WHERE size_bytes IS NULL;
+UPDATE bitstream SET deleted = '0' WHERE deleted IS NULL;
+UPDATE bitstream SET store_number = -1 WHERE store_number IS NULL;
 
 -- Migrate EPersonGroup2EPerson table
 ALTER TABLE EPersonGroup2EPerson RENAME COLUMN eperson_group_id to eperson_group_legacy_id;
@@ -195,6 +199,9 @@ ALTER TABLE item RENAME COLUMN owning_collection to owning_collection_legacy;
 ALTER TABLE item ADD owning_collection RAW(16) REFERENCES Collection(uuid);
 UPDATE item SET owning_collection = (SELECT Collection.uuid FROM Collection WHERE item.owning_collection_legacy = collection.collection_id);
 ALTER TABLE item DROP COLUMN owning_collection_legacy;
+UPDATE item SET in_archive = '0' WHERE in_archive IS NULL;
+UPDATE item SET discoverable = '0' WHERE discoverable IS NULL;
+UPDATE item SET withdrawn = '0' WHERE withdrawn IS NULL;
 
 -- Migrate bundle
 ALTER TABLE bundle RENAME COLUMN primary_bitstream_id to primary_bitstream_legacy_id;
@@ -263,6 +270,8 @@ UPDATE ResourcePolicy SET dspace_object = (SELECT collection.uuid FROM collectio
 UPDATE ResourcePolicy SET dspace_object = (SELECT item.uuid FROM item WHERE ResourcePolicy.resource_id = item.item_id AND ResourcePolicy.resource_type_id = 2)  WHERE ResourcePolicy.resource_type_id = 2;
 UPDATE ResourcePolicy SET dspace_object = (SELECT bundle.uuid FROM bundle WHERE ResourcePolicy.resource_id = bundle.bundle_id AND ResourcePolicy.resource_type_id = 1)  WHERE ResourcePolicy.resource_type_id = 1;
 UPDATE ResourcePolicy SET dspace_object = (SELECT bitstream.uuid FROM bitstream WHERE ResourcePolicy.resource_id = bitstream.bitstream_id AND ResourcePolicy.resource_type_id = 0)  WHERE ResourcePolicy.resource_type_id = 0;
+UPDATE resourcepolicy SET resource_type_id = -1 WHERE resource_type_id IS NULL;
+UPDATE resourcepolicy SET action_id = -1 WHERE action_id IS NULL;
 
 
 -- Migrate Subscription
@@ -286,6 +295,7 @@ ALTER TABLE versionitem RENAME COLUMN item_id to item_legacy_id;
 ALTER TABLE versionitem ADD item_id RAW(16) REFERENCES Item(uuid);
 UPDATE versionitem SET item_id = (SELECT item.uuid FROM item WHERE versionitem.item_legacy_id = item.item_id);
 ALTER TABLE versionitem DROP COLUMN item_legacy_id;
+UPDATE versionitem SET version_number = -1 WHERE version_number IS NULL;
 
 -- Migrate handle table
 ALTER TABLE handle RENAME COLUMN resource_id to resource_legacy_id;
@@ -310,6 +320,7 @@ DROP INDEX metadatavalue_item_idx2;
 ALTER TABLE metadatavalue DROP COLUMN resource_id;
 ALTER TABLE metadatavalue DROP COLUMN resource_type_id;
 UPDATE MetadataValue SET confidence = -1 WHERE confidence IS NULL;
+UPDATE metadatavalue SET place = -1 WHERE place IS NULL;
 
 -- Alter harvested item
 ALTER TABLE harvested_item RENAME COLUMN item_id to item_legacy_id;
@@ -322,6 +333,8 @@ ALTER TABLE harvested_collection RENAME COLUMN collection_id to collection_legac
 ALTER TABLE harvested_collection ADD collection_id RAW(16) REFERENCES Collection(uuid);
 UPDATE harvested_collection SET collection_id = (SELECT collection.uuid FROM collection WHERE harvested_collection.collection_legacy_id = collection.collection_id);
 ALTER TABLE harvested_collection DROP COLUMN collection_legacy_id;
+UPDATE harvested_collection SET harvest_type = -1 WHERE harvest_type IS NULL;
+UPDATE harvested_collection SET harvest_status = -1 WHERE harvest_status IS NULL;
 
 
 --Alter workspaceitem
@@ -334,6 +347,11 @@ ALTER TABLE workspaceitem RENAME COLUMN collection_id to collection_legacy_id;
 ALTER TABLE workspaceitem ADD collection_id RAW(16) REFERENCES Collection(uuid);
 UPDATE workspaceitem SET collection_id = (SELECT collection.uuid FROM collection WHERE workspaceitem.collection_legacy_id = collection.collection_id);
 ALTER TABLE workspaceitem DROP COLUMN collection_legacy_id;
+UPDATE workspaceitem SET multiple_titles = '0' WHERE multiple_titles IS NULL;
+UPDATE workspaceitem SET published_before = '0' WHERE published_before IS NULL;
+UPDATE workspaceitem SET multiple_files = '0' WHERE multiple_files IS NULL;
+UPDATE workspaceitem SET stage_reached = -1 WHERE stage_reached IS NULL;
+UPDATE workspaceitem SET page_reached = -1 WHERE page_reached IS NULL;
 
 ALTER TABLE epersongroup2workspaceitem RENAME COLUMN eperson_group_id to eperson_group_legacy_id;
 ALTER TABLE epersongroup2workspaceitem ADD eperson_group_id RAW(16) REFERENCES epersongroup(uuid);
@@ -350,6 +368,8 @@ ALTER TABLE most_recent_checksum RENAME COLUMN bitstream_id to bitstream_legacy_
 ALTER TABLE most_recent_checksum ADD bitstream_id RAW(16) REFERENCES Bitstream(uuid);
 UPDATE most_recent_checksum SET bitstream_id = (SELECT Bitstream.uuid FROM Bitstream WHERE most_recent_checksum.bitstream_legacy_id = Bitstream.bitstream_id);
 ALTER TABLE most_recent_checksum DROP COLUMN bitstream_legacy_id;
+UPDATE most_recent_checksum SET to_be_processed = '0' WHERE to_be_processed IS NULL;
+UPDATE most_recent_checksum SET matched_prev_checksum = '0' WHERE matched_prev_checksum IS NULL;
 
 ALTER TABLE checksum_history RENAME COLUMN bitstream_id to bitstream_legacy_id;
 ALTER TABLE checksum_history ADD bitstream_id RAW(16) REFERENCES Bitstream(uuid);
@@ -365,3 +385,9 @@ UPDATE doi SET dspace_object = (SELECT item.uuid FROM item WHERE doi.resource_id
 UPDATE doi SET dspace_object = (SELECT bundle.uuid FROM bundle WHERE doi.resource_id = bundle.bundle_id AND doi.resource_type_id = 1)  WHERE doi.resource_type_id = 1;
 UPDATE doi SET dspace_object = (SELECT bitstream.uuid FROM bitstream WHERE doi.resource_id = bitstream.bitstream_id AND doi.resource_type_id = 0)  WHERE doi.resource_type_id = 0;
 
+UPDATE bitstreamformatregistry SET support_level = -1 WHERE support_level IS NULL;
+
+UPDATE requestitem SET allfiles = '0' WHERE allfiles IS NULL;
+UPDATE requestitem SET accept_request = '0' WHERE accept_request IS NULL;
+
+UPDATE webapp SET isui = -1 WHERE isui IS NULL;
