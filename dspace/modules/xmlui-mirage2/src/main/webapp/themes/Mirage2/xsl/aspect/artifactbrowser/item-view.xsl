@@ -471,7 +471,7 @@
         <div class="simple-item-view-date-available word-break item-page-field-wrapper table">
           <h5>Date Available</h5>
           <xsl:for-each select="dim:field[@element='date' and @qualifier='available']">
-            <xsl:copy-of select="substring(./node(),1,10)"/>
+            <xsl:copy-of select="./node()"/>
             <xsl:if test="count(following-sibling::dim:field[@element='date' and @qualifier='available']) != 0">
               <br/>
             </xsl:if>
@@ -484,7 +484,7 @@
         <div class="simple-item-view-type word-break item-page-field-wrapper table">
           <h5>Data Type</h5>
           <xsl:for-each select="dim:field[@element='type']">
-            <xsl:copy-of select="substring(./node(),1,10)"/>
+            <xsl:copy-of select="./node()"/>
             <xsl:if test="count(following-sibling::dim:field[@element='type']) != 0">
               <br/>
             </xsl:if>
@@ -498,7 +498,7 @@
         <div class="simple-item-view-creators item-page-field-wrapper table">
           <h5>Data Creator</h5>
           <xsl:for-each select="dim:field[@element='creator']">
-            <xsl:copy-of select="substring(./node(),1,10)"/>
+            <xsl:copy-of select="./node()"/>
           </xsl:for-each>
         </div>
       </xsl:if>
@@ -508,7 +508,7 @@
         <div class="simple-item-view-publisher item-page-field-wrapper table">
           <h5>Data Publisher</h5>
           <xsl:for-each select="dim:field[@element='publisher']">
-            <xsl:copy-of select="substring(./node(),1,10)"/>
+            <xsl:copy-of select="./node()"/>
           </xsl:for-each>
         </div>
       </xsl:if>
@@ -518,7 +518,7 @@
         <div class="simple-item-view-citation word-break item-page-field-wrapper table">
           <h5>Citation</h5>
           <xsl:for-each select="dim:field[@element='identifier' and @qualifier='citation']">
-            <xsl:copy-of select="substring(./node(),1,10)"/>
+            <xsl:copy-of select="./node()"/>
             <xsl:if test="count(following-sibling::dim:field[@element='identifier' and @qualifier='citation']) != 0">
               <br/>
             </xsl:if>
@@ -531,7 +531,7 @@
         <div class="simple-item-view-description word-break item-page-field-wrapper table">
           <h5>Description</h5>
           <xsl:for-each select="dim:field[@element='description' and @qualifier='abstract']">
-            <xsl:copy-of select="substring(./node(),1,10)"/>
+            <xsl:copy-of select="./node()"/>
             <xsl:if test="count(following-sibling::dim:field[@element='description' and @qualifier='abstract']) != 0">
               <br/>
             </xsl:if>
