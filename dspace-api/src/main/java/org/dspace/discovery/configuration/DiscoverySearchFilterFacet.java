@@ -54,7 +54,7 @@ public class DiscoverySearchFilterFacet extends DiscoverySearchFilter {
 
     public void setSortOrderSidebar(DiscoveryConfigurationParameters.SORT sortOrderSidebar)
     {
-        this.sortOrderFilterPage = sortOrderSidebar;
+        this.sortOrderSidebar = sortOrderSidebar;
     }
 
     @Override
