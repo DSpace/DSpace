@@ -306,7 +306,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
         facet.addItem().addXref(
                 contextPath +
                         (dso == null ? "" : "/handle/" + dso.getHandle()) +
-                        "/search-filter?" + parameters + BrowseFacet.FACET_FIELD + "=" + field.getIndexFieldName()+"&order="+field.getSortOrder(),
+                        "/search-filter?" + parameters + BrowseFacet.FACET_FIELD + "=" + field.getIndexFieldName()+"&order="+field.getSortOrderFilterPage(),
                 T_VIEW_MORE
 
         );
@@ -426,7 +426,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                             //We need a list of our years
                             //We have a date range add faceting for our field
                             //The faceting will automatically be limited to the 10 years in our span due to our filterquery
-                            queryArgs.addFacetField(new DiscoverFacetField(facet.getIndexFieldName(), facet.getType(), 10, facet.getSortOrder()));
+                            queryArgs.addFacetField(new DiscoverFacetField(facet.getIndexFieldName(), facet.getType(), 10, facet.getSortOrderSidebar()));
                         }else{
                             java.util.List<String> facetQueries = new ArrayList<String>();
                             //Create facet queries but limit them to 11 (11 == when we need to show a "show more" url)
@@ -463,7 +463,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                     int facetLimit = facet.getFacetLimit();
                     //Add one to our facet limit to make sure that if we have more then the shown facets that we show our "show more" url
                     facetLimit++;
-                    queryArgs.addFacetField(new DiscoverFacetField(facet.getIndexFieldName(), facet.getType(), facetLimit, facet.getSortOrder()));
+                    queryArgs.addFacetField(new DiscoverFacetField(facet.getIndexFieldName(), facet.getType(), facetLimit, facet.getSortOrderSidebar()));
                 }
             }
         }
