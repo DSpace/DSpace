@@ -12,12 +12,18 @@ import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.*;
 import com.google.api.client.repackaged.org.apache.commons.codec.binary.Base64;
 
+import java.io.IOException;
 import java.lang.RuntimeException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Properties;
+import java.lang.String;
+import java.util.*;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Properties;
 import javax.mail.internet.MimeMessage;
 import javax.mail.Session;
 
@@ -37,6 +43,8 @@ public class DryadGmailService {
     private Credential myCredential;
     private Gmail myGmailService;
     private GoogleAuthorizationCodeFlow myAuthCodeFlow;
+
+    private static LinkedHashMap<String,Message> currentMessages = null;
 
     /**
      * Instantiate a DryadGmailService object.
@@ -119,8 +127,7 @@ public class DryadGmailService {
 
         String result = "";
 
-        List<Message> messages = dryadGmailService.retrieveMessagesWithLabels(labels);
-        // Print ID of each Thread.
+        List<Message> messages = retrieveMessagesWithLabels(labels);
         if (messages != null) {
             ArrayList<String> processedMessageIDs = new ArrayList<String>();
             result = result + ("got " + messages.size() + " test messages");
@@ -131,13 +138,42 @@ public class DryadGmailService {
         return result;
     }
 
-    public List<Message> retrieveMessagesWithLabels (List<String> labels) throws IOException {
-        List<Message> messages = listMessagesWithLabels(labels);
+    public static List<Message> retrieveMessagesWithLabels (List<String> labels) throws IOException {
+        List<Message> labeledMessages = new ArrayList<Message>();
 
+        // Look through the possible labels from Gmail and add the ones that match the requested labels.
+        ArrayList<String> labelIDs = new ArrayList<String>();
+        ListLabelsResponse labelsResponse = getMyGmailService().users().labels().list(getMyUserID()).execute();
+        List<Label> labelList = labelsResponse.getLabels();
+        for (Label label : labelList) {
+            for (String labelName : labels) {
+                if (label.getName().equals(labelName)) {
+                    labelIDs.add(label.getId());
+                }
+            }
+        }
+
+        // If we have Gmail labels, then start looking for all pages of emails that match the label.
+        if (!labelIDs.isEmpty()) {
+            ListMessagesResponse response = myGmailService.users().messages().list(myUserID)
+                    .setLabelIds(labelIDs).execute();
+
+            while (response.getMessages() != null) {
+                labeledMessages.addAll(response.getMessages());
+                if (response.getNextPageToken() != null) {
+                    String pageToken = response.getNextPageToken();
+                    response = myGmailService.users().messages().list(myUserID).setLabelIds(labelIDs)
+                            .setPageToken(pageToken).execute();
+                } else {
+                    break;
+                }
+            }
+        }
+
+        // process the retrieved emails and save the raw text to the resultMessages
         ArrayList<Message> resultMessages = new ArrayList<Message>();
-        // Print ID of each Thread.
-        if (messages != null) {
-            for (Message m : messages) {
+        if (labeledMessages != null) {
+            for (Message m : labeledMessages) {
                 Message message = getMyGmailService().users().messages().get(getMyUserID(), m.getId()).setFormat("raw").execute();
                 resultMessages.add(message);
             }
@@ -146,13 +182,12 @@ public class DryadGmailService {
     }
 
     public static ArrayList<MimeMessage> processJournalEmails () throws IOException {
-        DryadGmailService dryadGmailService = new DryadGmailService();
         ArrayList<String> labels = new ArrayList<String>();
         ArrayList<MimeMessage> mimeMessages = new ArrayList<MimeMessage>();
 
         labels.add(ConfigurationManager.getProperty("submit.journal.email.label"));
-        List<Message> messages = dryadGmailService.retrieveMessagesWithLabels(labels);
-        // Print ID of each Thread.
+        List<Message> messages = retrieveMessagesWithLabels(labels);
+
         if (messages != null) {
             ArrayList<String> processedMessageIDs = new ArrayList<String>();
             for (Message message : messages) {
@@ -164,51 +199,10 @@ public class DryadGmailService {
                 } catch (javax.mail.MessagingException e) {
                     throw new RuntimeException("MessagingException: " + e.getMessage());
                 }
-                dryadGmailService.modifyMessage(message.getId(), new ArrayList<String>(), labels);
+                modifyMessage(message.getId(), new ArrayList<String>(), labels);
             }
         }
         return mimeMessages;
-    }
-
-    /**
-     * List all Messages of the user's mailbox with labelIds applied.
-     *
-     * @param labels Only return Messages with these labels applied.
-     * @throws IOException
-     */
-    private List<Message> listMessagesWithLabels(List<String> labels) throws IOException {
-        ArrayList<String> labelIDs = new ArrayList<String>();
-
-        ListLabelsResponse labelsResponse = getMyGmailService().users().labels().list(getMyUserID()).execute();
-        List<Label> labelList = labelsResponse.getLabels();
-        for (Label label : labelList) {
-            for (String labelName : labels) {
-                if (label.getName().equals(labelName)) {
-                    labelIDs.add(label.getId());
-                }
-            }
-        }
-
-        List<Message> messages = new ArrayList<Message>();
-        if (labelIDs.isEmpty()) {
-            return messages;
-        }
-
-        ListMessagesResponse response = myGmailService.users().messages().list(myUserID)
-                .setLabelIds(labelIDs).execute();
-
-        while (response.getMessages() != null) {
-            messages.addAll(response.getMessages());
-            if (response.getNextPageToken() != null) {
-                String pageToken = response.getNextPageToken();
-                response = myGmailService.users().messages().list(myUserID).setLabelIds(labelIDs)
-                        .setPageToken(pageToken).execute();
-            } else {
-                break;
-            }
-        }
-
-        return messages;
     }
 
     /**
@@ -219,7 +213,7 @@ public class DryadGmailService {
      * @param labelsToRemove List of label ids to remove.
      * @throws IOException
      */
-    public void modifyMessage(String messageId, List<String> labelsToAdd, List<String> labelsToRemove) throws IOException {
+    public static void modifyMessage(String messageId, List<String> labelsToAdd, List<String> labelsToRemove) throws IOException {
         ArrayList<String> labelIDsToAdd = new ArrayList<String>();
         ArrayList<String> labelIDsToRemove = new ArrayList<String>();
 
