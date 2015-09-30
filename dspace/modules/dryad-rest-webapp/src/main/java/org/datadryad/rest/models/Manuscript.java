@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.codehaus.jackson.annotate.JsonIgnore;
@@ -39,10 +40,10 @@ public class Manuscript {
     @XmlElement(name="abstract")
     @JsonProperty("abstract")
     public String manuscript_abstract;
-    public AuthorsList authors;
+    public AuthorsList authors = new AuthorsList();
     public CorrespondingAuthor correspondingAuthor = new CorrespondingAuthor();
     public String dryadDataDOI;
-    public KeywordsList keywords;
+    public KeywordsList keywords = new KeywordsList();
     public String manuscriptId;
     public String status;
     public String title;
@@ -50,6 +51,7 @@ public class Manuscript {
     public Date publicationDate;
     public String dataReviewURL;
     public String dataAvailabilityStatement;
+    public Map<String, String> optionalProperties;
     public Manuscript() {} // JAXB needs this
 
     public Manuscript(String manuscriptId, String status) {
@@ -58,7 +60,7 @@ public class Manuscript {
     }
 
     @JsonIgnore
-    public Organization organization;
+    public Organization organization = new Organization();
 
     @JsonIgnore
     public Boolean isValid() {
