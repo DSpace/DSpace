@@ -95,6 +95,9 @@ public class DryadEmailSubmission extends HttpServlet {
         } else if (requestURI.contains("retrieve")) {
             LOGGER.info("manually running DryadGmailService");
             retrieveMail();
+        } else if (requestURI.contains("clear")) {
+            LOGGER.info("clearing retrieved messages");
+            DryadGmailService.completeJournalProcessing();
         } else {
             aResponse.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED,
                     "GET is not supported, you must POST to this service");
