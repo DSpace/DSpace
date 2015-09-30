@@ -35,14 +35,14 @@ public class DryadGmailService {
     private static final String SCOPE = "https://www.googleapis.com/auth/gmail.modify";
     private static final String APP_NAME = "Dryad Email Authorization";
 
-    private String myUserID;
+    private static String myUserID;
     private GoogleClientSecrets myClientSecrets;
     private FileDataStoreFactory myDataStoreFactory;
-    private HttpTransport myHttpTransport;
-    private JsonFactory myJsonFactory;
-    private Credential myCredential;
-    private Gmail myGmailService;
-    private GoogleAuthorizationCodeFlow myAuthCodeFlow;
+    private static HttpTransport myHttpTransport;
+    private static JsonFactory myJsonFactory;
+    private static Credential myCredential;
+    private static Gmail myGmailService;
+    private static GoogleAuthorizationCodeFlow myAuthCodeFlow;
 
     private static LinkedHashMap<String,Message> currentMessages = null;
 
@@ -70,7 +70,7 @@ public class DryadGmailService {
                     .setDataStoreFactory(myDataStoreFactory)
                     .setAccessType("offline")
                     .setApprovalPrompt("force")
-                    .addRefreshListener(new DataStoreCredentialRefreshListener(myUserID,myDataStoreFactory))
+                    .addRefreshListener(new DataStoreCredentialRefreshListener(getMyUserID(),myDataStoreFactory))
                     .build();
             myCredential = getMyCredential();
         } catch (IOException e) {
@@ -88,7 +88,7 @@ public class DryadGmailService {
 
         try {
             GoogleTokenResponse response = codeTokenRequest.setRedirectUri(GoogleOAuthConstants.OOB_REDIRECT_URI).execute();
-            myCredential = myAuthCodeFlow.createAndStoreCredential(response, myUserID);
+            myCredential = myAuthCodeFlow.createAndStoreCredential(response, getMyUserID());
         } catch (IOException e) {
             throw new RuntimeException("couldn't authorize: code was " + code + "\n" + e.toString());
         }
@@ -99,15 +99,15 @@ public class DryadGmailService {
         return myAuthCodeFlow.newAuthorizationUrl().setRedirectUri(GoogleOAuthConstants.OOB_REDIRECT_URI).build();
     }
 
-    public Credential getMyCredential() {
+    public static Credential getMyCredential() {
         try {
-            return myAuthCodeFlow.loadCredential(myUserID);
+            return myAuthCodeFlow.loadCredential(getMyUserID());
         } catch (IOException e) {
             throw new RuntimeException("couldn't load credential: " + e.getMessage());
         }
     }
 
-    public Gmail getMyGmailService() {
+    public static Gmail getMyGmailService() {
         if (myGmailService == null) {
             // Create a new authorized Gmail API client
             myGmailService = new Gmail.Builder(myHttpTransport, myJsonFactory, getMyCredential()).build();
@@ -115,7 +115,7 @@ public class DryadGmailService {
         return myGmailService;
     }
 
-    public String getMyUserID() {
+    public static String getMyUserID() {
         return myUserID;
     }
 
@@ -155,14 +155,14 @@ public class DryadGmailService {
 
         // If we have Gmail labels, then start looking for all pages of emails that match the label.
         if (!labelIDs.isEmpty()) {
-            ListMessagesResponse response = myGmailService.users().messages().list(myUserID)
+            ListMessagesResponse response = getMyGmailService().users().messages().list(getMyUserID())
                     .setLabelIds(labelIDs).execute();
 
             while (response.getMessages() != null) {
                 labeledMessages.addAll(response.getMessages());
                 if (response.getNextPageToken() != null) {
                     String pageToken = response.getNextPageToken();
-                    response = myGmailService.users().messages().list(myUserID).setLabelIds(labelIDs)
+                    response = getMyGmailService().users().messages().list(getMyUserID()).setLabelIds(labelIDs)
                             .setPageToken(pageToken).execute();
                 } else {
                     break;
@@ -216,7 +216,7 @@ public class DryadGmailService {
 
             currentMessages = new LinkedHashMap<String, Message>();
             for (Message m : messages) {
-                currentMessages.put(m.getID(), m);
+                currentMessages.put(m.getId(), m);
             }
             result.addAll(currentMessages.keySet());
         } else {
@@ -242,7 +242,7 @@ public class DryadGmailService {
         ArrayList<String> labelIDsToAdd = new ArrayList<String>();
         ArrayList<String> labelIDsToRemove = new ArrayList<String>();
 
-        ListLabelsResponse labelsResponse = myGmailService.users().labels().list(myUserID).execute();
+        ListLabelsResponse labelsResponse = getMyGmailService().users().labels().list(getMyUserID()).execute();
         List<Label> labelList = labelsResponse.getLabels();
         for (Label label : labelList) {
             for (String labelName : labelsToAdd) {
@@ -258,7 +258,7 @@ public class DryadGmailService {
         }
         ModifyMessageRequest mods = new ModifyMessageRequest().setAddLabelIds(labelIDsToAdd)
                 .setRemoveLabelIds(labelIDsToRemove);
-        Message message = myGmailService.users().messages().modify(myUserID, messageId, mods).execute();
+        Message message = getMyGmailService().users().messages().modify(getMyUserID(), messageId, mods).execute();
     }
 
 }
