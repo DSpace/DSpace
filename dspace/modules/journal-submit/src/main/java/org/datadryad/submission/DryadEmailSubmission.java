@@ -358,7 +358,17 @@ public class DryadEmailSubmission extends HttpServlet {
                 break;
             }
 
+            // Stop reading lines if we've run into the sig line
+            if (StringUtils.stripToEmpty(line).equals("--")) {
+                break;
+            }
+
             if (StringUtils.stripToEmpty(line).equals("")) {
+                continue;
+            }
+
+            // Skip lines that are just visual separators, like "xxxxxxxxxx" or "=========="
+            if (StringUtils.stripToEmpty(line).matches("(.)\\1{5,}")) {
                 continue;
             }
 
