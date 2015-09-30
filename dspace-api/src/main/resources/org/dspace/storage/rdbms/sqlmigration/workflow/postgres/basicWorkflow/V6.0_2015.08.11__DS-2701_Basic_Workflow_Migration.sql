@@ -30,4 +30,8 @@ ALTER TABLE workflowitem RENAME COLUMN owner to owner_legacy_id;
 ALTER TABLE workflowitem ADD COLUMN owner UUID REFERENCES EPerson (uuid);
 UPDATE workflowitem SET owner = (SELECT eperson.uuid FROM eperson WHERE workflowitem.owner_legacy_id = eperson.eperson_id);
 ALTER TABLE workflowitem DROP COLUMN owner_legacy_id;
+UPDATE workflowitem SET state = -1 WHERE state IS NULL;
+UPDATE workflowitem SET multiple_titles = FALSE WHERE multiple_titles IS NULL;
+UPDATE workflowitem SET published_before = FALSE WHERE published_before IS NULL;
+UPDATE workflowitem SET multiple_files = FALSE WHERE multiple_files IS NULL;
 
