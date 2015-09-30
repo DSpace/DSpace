@@ -73,6 +73,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
     protected DiscoverQuery queryArgs;
 
     private int DEFAULT_PAGE_SIZE = 10;
+    private int currentOffset = 0;
 
 
     private SearchService searchService = null;
@@ -265,7 +266,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
     public void addBody(Body body) throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException {
         Request request = ObjectModelHelper.getRequest(objectModel);
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-
+        updateQueryResultsAndOffset(request, dso);
         SearchFilterParam browseParams = new SearchFilterParam(request);
         // Build the DRI Body
         Division div = body.addDivision("browse-by-" + request.getParameter(SearchFilterParam.FACET_FIELD), "primary");
@@ -279,7 +280,6 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         // Build the collection viewer division.
 
         //Make sure we get our results
-        queryResults = getQueryResponse(dso);
         if (this.queryResults != null) {
 
             Map<String, List<DiscoverResult.FacetResult>> facetFields = this.queryResults.getFacetResults();
@@ -307,6 +307,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
                     if(offSet == -1){
                         offSet = 0;
                     }
+                    currentOffset=offSet;
 
                     //Only show the nextpageurl if we have at least one result following our current results
                     String nextPageUrl = null;
@@ -344,6 +345,19 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
                     results.addPara(message("xmlui.discovery.SearchFacetFilter.no-results"));
                 }
             }
+        }
+    }
+
+    private void updateQueryResultsAndOffset(Request request, DSpaceObject dso) {
+        int configuredOffset=-1;
+        boolean retainOffset = false;
+        if (request.getParameters().containsKey("update")) {
+            configuredOffset = currentOffset;
+            retainOffset=true;
+        }
+        queryResults = getQueryResponse(dso);
+        if (retainOffset) {
+            queryArgs.setFacetOffset(configuredOffset);
         }
     }
 
@@ -438,7 +452,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         int offSet = Util.getIntParameter(request, SearchFilterParam.OFFSET);
         if (offSet == -1)
         {
-            offSet = 0;
+            offSet = currentOffset;
         }
 
         Map<String, String> parameters = new HashMap<String, String>();
@@ -455,13 +469,14 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 
     private String getPreviousPageURL(SearchFilterParam browseParams, Request request) throws UnsupportedEncodingException, UIException {
         //If our offset should be 0 then we shouldn't be able to view a previous page url
-        if (0 == queryArgs.getFacetOffset() && Util.getIntParameter(request, "offset") == -1)
+        boolean currentOffsetSmallerOrEqualTO0 = currentOffset <= 0;
+        if (0 == queryArgs.getFacetOffset() && Util.getIntParameter(request, "offset") == -1 && currentOffsetSmallerOrEqualTO0)
         {
             return null;
         }
 
         int offset = Util.getIntParameter(request, SearchFilterParam.OFFSET);
-        if(offset == -1 || offset == 0)
+        if(currentOffsetSmallerOrEqualTO0 && (offset == -1 || offset == 0))
         {
             return null;
         }
@@ -469,7 +484,8 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.putAll(browseParams.getCommonBrowseParams());
         parameters.putAll(browseParams.getControlParameters());
-        parameters.put(SearchFilterParam.OFFSET, String.valueOf(offset - getPageSize()));
+        String offSet = String.valueOf((currentOffset - getPageSize()<0)? 0:currentOffset - getPageSize());
+        parameters.put(SearchFilterParam.OFFSET, offSet);
 
         // Add the filter queries
         String url = generateURL("search-filter", parameters);
