@@ -9,12 +9,20 @@ namespace xml "http: //www.w3.org /XML/1998/namespace"
 /* NARANJA #F5802D */
 /* NARANJA rgba(245, 128, 45, 0.6); */
 
+.static-page ul {
+	margin-left: 40px;
+}
+
+.static-page ol {
+	padding-left: 40px;
+}
+
 ul {
 	margin-left: 0px;
 }
 
 ol {
-	padding-left: 40px;
+	padding-left: 0px;
 }
 
 #welcome-panel h1 {
