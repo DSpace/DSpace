@@ -73,7 +73,7 @@ public class AbstractUnitTest
 
     /** 
      * This method will be run before the first test as per @BeforeClass. It will
-     * initialize resources required for the tests.
+     * initialize shared resources required for all tests of this class.
      *
      * Due to the way Maven works, unit tests can't be run from a POM package,
      * which forbids us to run the tests from the Assembly and Configuration
@@ -109,10 +109,21 @@ public class AbstractUnitTest
             {
                 kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
             }
-            //Clear our old flyway object
+            // Clear our old flyway object. Because this DB is in-memory, its
+            // data is lost when the last connection is closed. So, we need
+            // to (re)start Flyway from scratch for each Unit Test class.
             DatabaseUtils.clearFlywayDBCache();
-            //Migrate & setup our database
-            DatabaseUtils.main(new String[]{"migrate"});
+
+            try
+            {
+                // Update/Initialize the database to latest version (via Flyway)
+                DatabaseUtils.updateDatabase();
+            }
+            catch(SQLException se)
+            {
+                log.error("Error initializing database", se);
+                fail("Error initializing database: " + se.getMessage());
+            }
 
             // Initialize mock indexer (which does nothing, since Solr isn't running)
             new MockIndexEventConsumer();
@@ -123,13 +134,13 @@ public class AbstractUnitTest
         catch (IOException ex)
         {
             log.error("Error initializing tests", ex);
-            fail("Error initializing tests");
+            fail("Error initializing tests: " + ex.getMessage());
         }
     }
 
     /**
      * This method will be run before every test as per @Before. It will
-     * initialize resources required for the tests.
+     * initialize resources required for each individual unit test.
      *
      * Other methods can be annotated with @Before here or in subclasses
      * but no execution order is guaranteed
@@ -165,7 +176,6 @@ public class AbstractUnitTest
             EPersonServiceFactory.getInstance().getGroupService().initDefaultGroupNames(context);
 
             context.restoreAuthSystemState();
-//            context.commit();
         }
         catch (AuthorizeException ex)
         {
@@ -213,31 +223,6 @@ public class AbstractUnitTest
             kernelImpl.destroy();
         kernelImpl = null;
     }
-
-    /**
-     * This method checks the configuration for Surefire has been done properly
-     * and classes that start with Abstract are ignored. It is also required
-     * to be able to run this class directly from and IDE (we need one test)
-     */
-    /*
-    @Test
-    public void testValidationShouldBeIgnored()
-    {
-        assertTrue(5 != 0.67) ;
-    }
-    */
-
-    /**
-     * This method expects and exception to be thrown. It also has a time
-     * constraint, failing if the test takes more than 15 ms.
-     */
-    /*
-    @Test(expected=java.lang.Exception.class, timeout=15)
-    public void getException() throws Exception
-    {
-        throw new Exception("Fail!");
-    }
-    */
 
     /**
      *  Utility method to cleanup a created Context object (to save memory).

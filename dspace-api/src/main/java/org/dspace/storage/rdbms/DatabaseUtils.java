@@ -90,12 +90,8 @@ public class DatabaseUtils
 
         try
         {
-            // Call initDataSource to JUST initialize the dataSource WITHOUT fully
-            // initializing the DatabaseManager itself. This ensures we do NOT
-            // immediately run our Flyway DB migrations on this database
-            DataSource dataSource = new DSpace().getServiceManager().getServiceByName("dataSource", BasicDataSource.class);
-
-            // Get configured DB URL for reporting below
+            // Get a reference to our configured DataSource
+            DataSource dataSource = getDataSource();
 
             // Point Flyway API to our database
             Flyway flyway = setupFlyway(dataSource);
@@ -103,14 +99,11 @@ public class DatabaseUtils
             // "test" = Test Database Connection
             if(argv[0].equalsIgnoreCase("test"))
             {
-
-
                 // Try to connect to the database
                 System.out.println("\nAttempting to connect to database");
-                try
+                try(Connection connection = dataSource.getConnection())
                 {
                     // Just do a high level test by getting our configured DataSource and attempting to connect to it
-                    Connection connection = dataSource.getConnection();
                     DatabaseMetaData meta = connection.getMetaData();
                     System.out.println("Connected successfully!");
                     System.out.println("Database Software: " + meta.getDatabaseProductName() + " version " + meta.getDatabaseProductVersion());
@@ -119,129 +112,240 @@ public class DatabaseUtils
                     System.out.println(" - Username: " + meta.getUserName());
                     System.out.println(" - Password: [hidden]");
                     System.out.println(" - Schema: " + getSchemaName(connection));
-                    connection.close();
                 }
                 catch (SQLException sqle)
                 {
-                    System.err.println("\nError: ");
+                    System.err.println("\nError running 'test': ");
                     System.err.println(" - " + sqle);
                     System.err.println("\nPlease see the DSpace documentation for assistance.\n");
+                    sqle.printStackTrace();
                     System.exit(1);
                 }
-            }else
-            if(argv[0].equalsIgnoreCase("info"))
+            }
+            else if(argv[0].equalsIgnoreCase("info") || argv[0].equalsIgnoreCase("status"))
             {
-                // Get basic Database info
-                Connection connection = dataSource.getConnection();
-                DatabaseMetaData meta = connection.getMetaData();
-                System.out.println("\nDatabase URL: " + meta.getURL());
-                System.out.println("Database Schema: " + getSchemaName(connection));
-                System.out.println("Database Software: " + meta.getDatabaseProductName() + " version " + meta.getDatabaseProductVersion());
-                System.out.println("Database Driver: " + meta.getDriverName() + " version " + meta.getDriverVersion());
-
-                // Get info table from Flyway
-                System.out.println("\n" + MigrationInfoDumper.dumpToAsciiTable(flyway.info().all()));
-
-                // If Flyway is NOT yet initialized, also print the determined version information
-                // NOTE: search is case sensitive, as flyway table name is ALWAYS lowercase,
-                // See: http://flywaydb.org/documentation/faq.html#case-sensitive
-                if(!tableExists(connection, flyway.getTable(), true))
+                try(Connection connection = dataSource.getConnection())
                 {
-                    System.out.println("\nNOTE: This database is NOT yet initialized for auto-migrations (via Flyway).");
-                    // Determine which version of DSpace this looks like
-                    String dbVersion = determineDBVersion(connection);
-                    if (dbVersion!=null)
+                    // Get basic Database info
+                    DatabaseMetaData meta = connection.getMetaData();
+                    String dbType = getDbType(connection);
+                    System.out.println("\nDatabase Type: " + dbType);
+                    System.out.println("Database URL: " + meta.getURL());
+                    System.out.println("Database Schema: " + getSchemaName(connection));
+                    System.out.println("Database Software: " + meta.getDatabaseProductName() + " version " + meta.getDatabaseProductVersion());
+                    System.out.println("Database Driver: " + meta.getDriverName() + " version " + meta.getDriverVersion());
+
+                    // For Postgres, report whether pgcrypto is installed
+                    // (If it isn't, we'll also write out warnings...see below)
+                    if(dbType.equals(DBMS_POSTGRES))
                     {
-                        System.out.println("\nYour database looks to be compatible with DSpace version " + dbVersion);
-                        System.out.println("All upgrades *after* version " + dbVersion + " will be run during the next migration.");
-                        System.out.println("\nIf you'd like to upgrade now, simply run 'dspace database migrate'.");
+                        boolean pgcryptoUpToDate = PostgresUtils.isPgcryptoUpToDate();
+                        Double pgcryptoVersion = PostgresUtils.getPgcryptoInstalledVersion(connection);
+                        System.out.println("PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension installed/up-to-date? " + pgcryptoUpToDate  + " " + ((pgcryptoVersion!=null) ? "(version=" + pgcryptoVersion + ")" : "(not installed)"));
+                    }
+
+                    // Get info table from Flyway
+                    System.out.println("\n" + MigrationInfoDumper.dumpToAsciiTable(flyway.info().all()));
+
+                    // If Flyway is NOT yet initialized, also print the determined version information
+                    // NOTE: search is case sensitive, as flyway table name is ALWAYS lowercase,
+                    // See: http://flywaydb.org/documentation/faq.html#case-sensitive
+                    if(!tableExists(connection, flyway.getTable(), true))
+                    {
+                        System.out.println("\nNOTE: This database is NOT yet initialized for auto-migrations (via Flyway).");
+                        // Determine which version of DSpace this looks like
+                        String dbVersion = determineDBVersion(connection);
+                        if (dbVersion!=null)
+                        {
+                            System.out.println("\nYour database looks to be compatible with DSpace version " + dbVersion);
+                            System.out.println("All upgrades *after* version " + dbVersion + " will be run during the next migration.");
+                            System.out.println("\nIf you'd like to upgrade now, simply run 'dspace database migrate'.");
+                        }
+                    }
+
+                    // For PostgreSQL databases, we need to check for the 'pgcrypto' extension.
+                    // If it is NOT properly installed, we'll need to warn the user, as DSpace will be unable to proceed.
+                    if(dbType.equals(DBMS_POSTGRES))
+                    {
+                        // Get version of pgcrypto available in this postgres instance
+                        Double pgcryptoAvailable = PostgresUtils.getPgcryptoAvailableVersion(connection);
+
+                        // Generic requirements message
+                        String requirementsMsg = "\n** DSpace REQUIRES PostgreSQL >= " + PostgresUtils.POSTGRES_VERSION + " AND " + PostgresUtils.PGCRYPTO + " extension >= " + PostgresUtils.PGCRYPTO_VERSION + " **\n";
+
+                        // Check if installed in PostgreSQL & a supported version
+                        if(pgcryptoAvailable!=null && pgcryptoAvailable.compareTo(PostgresUtils.PGCRYPTO_VERSION)>=0)
+                        {
+                            // We now know it's available in this Postgres. Let's see if it is installed in this database.
+                            Double pgcryptoInstalled = PostgresUtils.getPgcryptoInstalledVersion(connection);
+
+                            // Check if installed in database, but outdated version
+                            if(pgcryptoInstalled!=null && pgcryptoInstalled.compareTo(PostgresUtils.PGCRYPTO_VERSION)<0)
+                            {
+                                System.out.println("\nWARNING: PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension is OUTDATED (installed version=" + pgcryptoInstalled + ", available version = " + pgcryptoAvailable + ").");
+                                System.out.println(requirementsMsg);
+                                System.out.println("To update it, please connect to your DSpace database as a 'superuser' and manually run the following command: ");
+                                System.out.println("\n  ALTER EXTENSION " + PostgresUtils.PGCRYPTO + " UPDATE TO '" + pgcryptoAvailable + "';\n");
+                            }
+                            else if(pgcryptoInstalled==null) // If it's not installed in database
+                            {
+                                System.out.println("\nWARNING: PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension is NOT INSTALLED on this database.");
+                                System.out.println(requirementsMsg);
+                                System.out.println("To install it, please connect to your DSpace database as a 'superuser' and manually run the following command: ");
+                                System.out.println("\n  CREATE EXTENSION " + PostgresUtils.PGCRYPTO + ";\n");
+                            }
+                        }
+                        // Check if installed in Postgres, but an unsupported version
+                        else if(pgcryptoAvailable!=null && pgcryptoAvailable.compareTo(PostgresUtils.PGCRYPTO_VERSION)<0)
+                        {
+                            System.out.println("\nWARNING: UNSUPPORTED version of PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension found (version=" + pgcryptoAvailable + ").");
+                            System.out.println(requirementsMsg);
+                            System.out.println("Make sure you are running a supported version of PostgreSQL, and then install " + PostgresUtils.PGCRYPTO + " version >= " + PostgresUtils.PGCRYPTO_VERSION);
+                            System.out.println("The '" + PostgresUtils.PGCRYPTO + "' extension is often provided in the 'postgresql-contrib' package for your operating system.");
+                        }
+                        else if(pgcryptoAvailable==null) // If it's not installed in Postgres
+                        {
+                            System.out.println("\nWARNING: PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension is NOT AVAILABLE. Please install it into this PostgreSQL instance.");
+                            System.out.println(requirementsMsg);
+                            System.out.println("The '" + PostgresUtils.PGCRYPTO + "' extension is often provided in the 'postgresql-contrib' package for your operating system.");
+                            System.out.println("Once the extension is installed globally, please connect to your DSpace database as a 'superuser' and manually run the following command: ");
+                            System.out.println("\n  CREATE EXTENSION " + PostgresUtils.PGCRYPTO + ";\n");
+                        }
                     }
                 }
-                connection.close();
+                catch (SQLException e)
+                {
+                    System.err.println("Info exception:");
+                    e.printStackTrace();
+                    System.exit(1);
+                }
             }
             else if(argv[0].equalsIgnoreCase("migrate"))
             {
-                try (Connection connection = dataSource.getConnection();){
-                    System.out.println("\nDatabase URL: " + connection.getMetaData().getURL());
-                }
-
-                // "migrate" allows for an OPTIONAL second argument:
-                //    - "ignored" = Also run any previously "ignored" migrations during the migration
-                //    - [version] = ONLY run migrations up to a specific DSpace version (ONLY FOR TESTING)
-                if(argv.length==2)
+                try (Connection connection = dataSource.getConnection())
                 {
-                    if(argv[1].equalsIgnoreCase("ignored"))
+                    System.out.println("\nDatabase URL: " + connection.getMetaData().getURL());
+
+                    // "migrate" allows for an OPTIONAL second argument:
+                    //    - "ignored" = Also run any previously "ignored" migrations during the migration
+                    //    - [version] = ONLY run migrations up to a specific DSpace version (ONLY FOR TESTING)
+                    if(argv.length==2)
                     {
-                        System.out.println("Migrating database to latest version AND running previously \"Ignored\" migrations... (Check logs for details)");
-                        Connection connection = dataSource.getConnection();
-                        // Update the database to latest version, but set "outOfOrder=true"
-                        // This will ensure any old migrations in the "ignored" state are now run
-                        updateDatabase(dataSource, connection, null, true);
-                        connection.close();
+                        if(argv[1].equalsIgnoreCase("ignored"))
+                        {
+                            System.out.println("Migrating database to latest version AND running previously \"Ignored\" migrations... (Check logs for details)");
+                            // Update the database to latest version, but set "outOfOrder=true"
+                            // This will ensure any old migrations in the "ignored" state are now run
+                            updateDatabase(dataSource, connection, null, true);
+                        }
+                        else
+                        {
+                            // Otherwise, we assume "argv[1]" is a valid migration version number
+                            // This is only for testing! Never specify for Production!
+                            System.out.println("Migrating database ONLY to version " + argv[1] + " ... (Check logs for details)");
+                            System.out.println("\nWARNING: It is highly likely you will see errors in your logs when the Metadata");
+                            System.out.println("or Bitstream Format Registry auto-update. This is because you are attempting to");
+                            System.out.println("use an OLD version " + argv[1] + " Database with a newer DSpace API. NEVER do this in a");
+                            System.out.println("PRODUCTION scenario. The resulting old DB is only useful for migration testing.\n");
+                            // Update the database, to the version specified.
+                            updateDatabase(dataSource, connection, argv[1], true);
+                        }
                     }
                     else
                     {
-                        // Otherwise, we assume "argv[1]" is a valid migration version number
-                        // This is only for testing! Never specify for Production!
-                        System.out.println("Migrating database ONLY to version " + argv[1] + " ... (Check logs for details)");
-                        System.out.println("\nWARNING: It is highly likely you will see errors in your logs when the Metadata");
-                        System.out.println("or Bitstream Format Registry auto-update. This is because you are attempting to");
-                        System.out.println("use an OLD version " + argv[1] + " Database with a newer DSpace API. NEVER do this in a");
-                        System.out.println("PRODUCTION scenario. The resulting old DB is only useful for migration testing.\n");
-                        Connection connection = dataSource.getConnection();
-                        // Update the database, to the version specified.
-                        updateDatabase(dataSource, connection, argv[1], true);
-                        connection.close();
-                    }
-                }
-                else
-                {
-                    System.out.println("Migrating database to latest version... (Check logs for details)");
-                    try (Connection connection = dataSource.getConnection()) {
+                        System.out.println("Migrating database to latest version... (Check dspace logs for details)");
                         updateDatabase(dataSource, connection);
                     }
+                    System.out.println("Done.");
                 }
-                System.out.println("Done.");
+                catch(SQLException e)
+                {
+                    System.err.println("Migration exception:");
+                    e.printStackTrace();
+                    System.exit(1);
+                }
             }
             // "repair" = Run Flyway repair script
             else if(argv[0].equalsIgnoreCase("repair"))
             {
-                try (Connection connection = dataSource.getConnection();){
+                try (Connection connection = dataSource.getConnection();)
+                {
                     System.out.println("\nDatabase URL: " + connection.getMetaData().getURL());
+                    System.out.println("Attempting to repair any previously failed migrations via FlywayDB... (Check dspace logs for details)");
+                    flyway.repair();
+                    System.out.println("Done.");
                 }
-                System.out.println("Attempting to repair any previously failed migrations via FlywayDB... (Check logs for details)");
-                flyway.repair();
-                System.out.println("Done.");
+                catch(SQLException|FlywayException e)
+                {
+                    System.err.println("Repair exception:");
+                    e.printStackTrace();
+                    System.exit(1);
+                }
             }
             // "clean" = Run Flyway clean script
             else if(argv[0].equalsIgnoreCase("clean"))
             {
-                BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-                try (Connection connection = dataSource.getConnection();){
-                    System.out.println("\nDatabase URL: " + connection.getMetaData().getURL());
-                }
-                System.out.println("\nWARNING: ALL DATA AND TABLES IN YOUR DATABASE WILL BE PERMANENTLY DELETED.\n");
-                System.out.println("There is NO turning back from this action. Backup your DB before continuing.");
-                System.out.println("If you are using Oracle, your RECYCLEBIN will also be PURGED.\n");
-                System.out.print("Do you want to PERMANENTLY DELETE everything from your database? [y/n]: ");
-                String choiceString = input.readLine();
-                input.close();
-
-                if (choiceString.equalsIgnoreCase("y"))
+                try (Connection connection = dataSource.getConnection())
                 {
-                    System.out.println("Scrubbing database clean... (Check logs for details)");
-                    cleanDatabase(flyway, dataSource);
-                    System.out.println("Done.");
+                    String dbType = getDbType(connection);
+
+                    // Not all Postgres user accounts will be able to run a 'clean',
+                    // as only 'superuser' accounts can remove the 'pgcrypto' extension.
+                    if(dbType.equals(DBMS_POSTGRES))
+                    {
+                        // Check if database user has permissions suitable to run a clean
+                        if(!PostgresUtils.checkCleanPermissions(connection))
+                        {
+                            String username = connection.getMetaData().getUserName();
+                            // Exit immediately, providing a descriptive error message
+                            System.out.println("\nERROR: The database user '" + username + "' does not have sufficient privileges to run a 'database clean' (via Flyway).");
+                            System.out.println("\nIn order to run a 'clean', the database user MUST have 'superuser' privileges");
+                            System.out.println("OR the '" + PostgresUtils.PGCRYPTO + "' extension must be installed in a separate schema (see documentation).");
+                            System.out.println("\nOptionally, you could also manually remove the '" + PostgresUtils.PGCRYPTO + "' extension first (DROP EXTENSION '" + PostgresUtils.PGCRYPTO + "' CASCADE), then rerun the 'clean'");
+                            System.exit(1);
+                        }
+                    }
+
+                    BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+
+                    System.out.println("\nDatabase URL: " + connection.getMetaData().getURL());
+                    System.out.println("\nWARNING: ALL DATA AND TABLES IN YOUR DATABASE WILL BE PERMANENTLY DELETED.\n");
+                    System.out.println("There is NO turning back from this action. Backup your DB before continuing.");
+                    if(dbType.equals(DBMS_ORACLE))
+                    {
+                        System.out.println("\nORACLE WARNING: your RECYCLEBIN will also be PURGED.\n");
+                    }
+                    else if(dbType.equals(DBMS_POSTGRES))
+                    {
+                        System.out.println("\nPOSTGRES WARNING: the '" + PostgresUtils.PGCRYPTO + "' extension will be dropped if it is in the same schema as the DSpace database.\n");
+                    }
+                    System.out.print("Do you want to PERMANENTLY DELETE everything from your database? [y/n]: ");
+                    String choiceString = input.readLine();
+                    input.close();
+
+                    if (choiceString.equalsIgnoreCase("y"))
+                    {
+                        System.out.println("Scrubbing database clean... (Check dspace logs for details)");
+                        cleanDatabase(flyway, dataSource);
+                        System.out.println("Done.");
+                    }
+                }
+                catch(SQLException e)
+                {
+                    System.err.println("Clean exception:");
+                    e.printStackTrace();
+                    System.exit(1);
                 }
             }
             else
             {
                 System.out.println("\nUsage: database [action]");
                 System.out.println("Valid actions: 'test', 'info', 'migrate', 'repair' or 'clean'");
-                System.out.println(" - info    = Describe basic info about database, including migrations run");
-                System.out.println(" - migrate = Migrate the Database to the latest version");
-                System.out.println(" - repair  = Attempt to repair any previously failed database migrations");
-                System.out.println(" - clean   = DESTROY all data and tables in Database (WARNING there is no going back!)");
+                System.out.println(" - test          = Performs a test connection to database to validate connection settings");
+                System.out.println(" - info / status = Describe basic info/status about database, including validating the compatibility of this database");
+                System.out.println(" - migrate       = Migrate the database to the latest version");
+                System.out.println(" - repair        = Attempt to repair any previously failed database migrations (via Flyway repair)");
+                System.out.println(" - clean         = DESTROY all data and tables in database (WARNING there is no going back!)");
                 System.out.println("");
             }
 
@@ -323,6 +427,31 @@ public class DatabaseUtils
         }
 
         return flywaydb;
+    }
+
+    /**
+     * Ensures the current database is up-to-date with regards
+     * to the latest DSpace DB schema. If the scheme is not up-to-date,
+     * then any necessary database migrations are performed.
+     * <P>
+     * FlywayDB (http://flywaydb.org/) is used to perform database migrations.
+     * If a Flyway DB migration fails it will be rolled back to the last
+     * successful migration, and any errors will be logged.
+     *
+     * @throws SQLException
+     *      If database cannot be upgraded.
+     */
+    public static synchronized void updateDatabase()
+            throws SQLException
+    {
+        // Get our configured dataSource
+        DataSource dataSource = getDataSource();
+
+        try(Connection connection = dataSource.getConnection())
+        {
+            // Upgrade database to the latest version of our schema
+            updateDatabase(dataSource, connection);
+        }
     }
 
     /**
@@ -462,18 +591,15 @@ public class DatabaseUtils
             // For MOST database types, this takes care of everything
             flyway.clean();
 
-            Connection connection = null;
-            try
+            try(Connection connection = dataSource.getConnection())
             {
                 // Get info about which database type we are using
-                connection = dataSource.getConnection();
-                DatabaseMetaData meta = connection.getMetaData();
-                String dbKeyword = getDbType(connection);
+                String dbType = getDbType(connection);
 
                 // If this is Oracle, the only way to entirely clean the database
                 // is to also purge the "Recyclebin". See:
                 // http://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_9018.htm
-                if(dbKeyword.equals(DBMS_ORACLE))
+                if(dbType.equals(DBMS_ORACLE))
                 {
                     PreparedStatement statement = null;
                     try
@@ -487,11 +613,6 @@ public class DatabaseUtils
                             statement.close();
                     }
                 }
-            }
-            finally
-            {
-                if(connection!=null && !connection.isClosed())
-                    connection.close();
             }
         }
         catch(FlywayException fe)
@@ -1149,8 +1270,22 @@ public class DatabaseUtils
         }
         else
         {
-            return null;
+            return dbms_lc;
         }
+    }
+
+    /**
+     * Get a reference to the configured DataSource (which can be used to
+     * initialize the database using Flyway).
+     * <P>
+     * This is NOT public, as we discourage direct connections to the database
+     * which bypass Hibernate. Only Flyway should be allowed a direct connection.
+     * @return DataSource
+     */
+    protected static DataSource getDataSource()
+    {
+        // DataSource is configured via our ServiceManager (i.e. via Spring).
+        return new DSpace().getServiceManager().getServiceByName("dataSource", BasicDataSource.class);
     }
 
     /**
@@ -1178,5 +1313,4 @@ public class DatabaseUtils
         }
         return null;
     }
-
 }
