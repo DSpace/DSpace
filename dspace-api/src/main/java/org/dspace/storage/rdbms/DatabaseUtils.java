@@ -73,11 +73,6 @@ public class DatabaseUtils
     public static final String DBMS_ORACLE="oracle";
     public static final String DBMS_H2="h2";
 
-    // PostgreSQL pgcrypto extention name, and required versions of Postgres & pgcrypto
-    public static final String PGCRYPTO="pgcrypto";
-    public static final Double PGCRYPTO_VERSION=1.1;
-    public static final Double POSTGRES_VERSION=9.4;
-
     /**
      * Commandline tools for managing database changes, etc.
      * @param argv
@@ -144,9 +139,9 @@ public class DatabaseUtils
                     // (If it isn't, we'll also write out warnings...see below)
                     if(dbType.equals(DBMS_POSTGRES))
                     {
-                        boolean pgcryptoUpToDate = DatabaseUtils.isPgcryptoUpToDate();
-                        Double pgcryptoVersion = getPgcryptoInstalledVersion(connection);
-                        System.out.println("PostgreSQL '" + PGCRYPTO + "' extension installed/up-to-date? " + pgcryptoUpToDate  + " " + ((pgcryptoVersion!=null) ? "(version=" + pgcryptoVersion + ")" : "(not installed)"));
+                        boolean pgcryptoUpToDate = PostgresUtils.isPgcryptoUpToDate();
+                        Double pgcryptoVersion = PostgresUtils.getPgcryptoInstalledVersion(connection);
+                        System.out.println("PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension installed/up-to-date? " + pgcryptoUpToDate  + " " + ((pgcryptoVersion!=null) ? "(version=" + pgcryptoVersion + ")" : "(not installed)"));
                     }
 
                     // Get info table from Flyway
@@ -173,48 +168,48 @@ public class DatabaseUtils
                     if(dbType.equals(DBMS_POSTGRES))
                     {
                         // Get version of pgcrypto available in this postgres instance
-                        Double pgcryptoAvailable = getPgcryptoAvailableVersion(connection);
+                        Double pgcryptoAvailable = PostgresUtils.getPgcryptoAvailableVersion(connection);
 
                         // Generic requirements message
-                        String requirementsMsg = "\n** DSpace REQUIRES PostgreSQL >= " + POSTGRES_VERSION + " AND " + PGCRYPTO + " extension >= " + PGCRYPTO_VERSION + " **\n";
+                        String requirementsMsg = "\n** DSpace REQUIRES PostgreSQL >= " + PostgresUtils.POSTGRES_VERSION + " AND " + PostgresUtils.PGCRYPTO + " extension >= " + PostgresUtils.PGCRYPTO_VERSION + " **\n";
 
                         // Check if installed in PostgreSQL & a supported version
-                        if(pgcryptoAvailable!=null && pgcryptoAvailable.compareTo(PGCRYPTO_VERSION)>=0)
+                        if(pgcryptoAvailable!=null && pgcryptoAvailable.compareTo(PostgresUtils.PGCRYPTO_VERSION)>=0)
                         {
                             // We now know it's available in this Postgres. Let's see if it is installed in this database.
-                            Double pgcryptoInstalled = getPgcryptoInstalledVersion(connection);
+                            Double pgcryptoInstalled = PostgresUtils.getPgcryptoInstalledVersion(connection);
 
                             // Check if installed in database, but outdated version
-                            if(pgcryptoInstalled!=null && pgcryptoInstalled.compareTo(PGCRYPTO_VERSION)<0)
+                            if(pgcryptoInstalled!=null && pgcryptoInstalled.compareTo(PostgresUtils.PGCRYPTO_VERSION)<0)
                             {
-                                System.out.println("\nWARNING: PostgreSQL '" + PGCRYPTO + "' extension is OUTDATED (installed version=" + pgcryptoInstalled + ", available version = " + pgcryptoAvailable + ").");
+                                System.out.println("\nWARNING: PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension is OUTDATED (installed version=" + pgcryptoInstalled + ", available version = " + pgcryptoAvailable + ").");
                                 System.out.println(requirementsMsg);
                                 System.out.println("To update it, please connect to your DSpace database as a 'superuser' and manually run the following command: ");
-                                System.out.println("\n  ALTER EXTENSION " + PGCRYPTO + " UPDATE TO '" + pgcryptoAvailable + "';\n");
+                                System.out.println("\n  ALTER EXTENSION " + PostgresUtils.PGCRYPTO + " UPDATE TO '" + pgcryptoAvailable + "';\n");
                             }
                             else if(pgcryptoInstalled==null) // If it's not installed in database
                             {
-                                System.out.println("\nWARNING: PostgreSQL '" + PGCRYPTO + "' extension is NOT INSTALLED on this database.");
+                                System.out.println("\nWARNING: PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension is NOT INSTALLED on this database.");
                                 System.out.println(requirementsMsg);
                                 System.out.println("To install it, please connect to your DSpace database as a 'superuser' and manually run the following command: ");
-                                System.out.println("\n  CREATE EXTENSION " + PGCRYPTO + ";\n");
+                                System.out.println("\n  CREATE EXTENSION " + PostgresUtils.PGCRYPTO + ";\n");
                             }
                         }
                         // Check if installed in Postgres, but an unsupported version
-                        else if(pgcryptoAvailable!=null && pgcryptoAvailable.compareTo(PGCRYPTO_VERSION)<0)
+                        else if(pgcryptoAvailable!=null && pgcryptoAvailable.compareTo(PostgresUtils.PGCRYPTO_VERSION)<0)
                         {
-                            System.out.println("\nWARNING: UNSUPPORTED version of PostgreSQL '" + PGCRYPTO + "' extension found (version=" + pgcryptoAvailable + ").");
+                            System.out.println("\nWARNING: UNSUPPORTED version of PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension found (version=" + pgcryptoAvailable + ").");
                             System.out.println(requirementsMsg);
-                            System.out.println("Make sure you are running a supported version of PostgreSQL, and then install " + PGCRYPTO + " version >= " + PGCRYPTO_VERSION);
-                            System.out.println("The '" + PGCRYPTO + "' extension is often provided in the 'postgresql-contrib' package for your operating system.");
+                            System.out.println("Make sure you are running a supported version of PostgreSQL, and then install " + PostgresUtils.PGCRYPTO + " version >= " + PostgresUtils.PGCRYPTO_VERSION);
+                            System.out.println("The '" + PostgresUtils.PGCRYPTO + "' extension is often provided in the 'postgresql-contrib' package for your operating system.");
                         }
                         else if(pgcryptoAvailable==null) // If it's not installed in Postgres
                         {
-                            System.out.println("\nWARNING: PostgreSQL '" + PGCRYPTO + "' extension is NOT AVAILABLE. Please install it into this PostgreSQL instance.");
+                            System.out.println("\nWARNING: PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension is NOT AVAILABLE. Please install it into this PostgreSQL instance.");
                             System.out.println(requirementsMsg);
-                            System.out.println("The '" + PGCRYPTO + "' extension is often provided in the 'postgresql-contrib' package for your operating system.");
+                            System.out.println("The '" + PostgresUtils.PGCRYPTO + "' extension is often provided in the 'postgresql-contrib' package for your operating system.");
                             System.out.println("Once the extension is installed globally, please connect to your DSpace database as a 'superuser' and manually run the following command: ");
-                            System.out.println("\n  CREATE EXTENSION " + PGCRYPTO + ";\n");
+                            System.out.println("\n  CREATE EXTENSION " + PostgresUtils.PGCRYPTO + ";\n");
                         }
                     }
                 }
@@ -299,14 +294,14 @@ public class DatabaseUtils
                     if(dbType.equals(DBMS_POSTGRES))
                     {
                         // Check if database user has permissions suitable to run a clean
-                        if(!checkCleanPermissions(connection))
+                        if(!PostgresUtils.checkCleanPermissions(connection))
                         {
                             String username = connection.getMetaData().getUserName();
                             // Exit immediately, providing a descriptive error message
                             System.out.println("\nERROR: The database user '" + username + "' does not have sufficient privileges to run a 'database clean' (via Flyway).");
                             System.out.println("\nIn order to run a 'clean', the database user MUST have 'superuser' privileges");
-                            System.out.println("OR the '" + PGCRYPTO + "' extension must be installed in a separate schema (see documentation).");
-                            System.out.println("\nOptionally, you could also manually remove the '" + PGCRYPTO + "' extension first (DROP EXTENSION '" + PGCRYPTO + "' CASCADE), then rerun the 'clean'");
+                            System.out.println("OR the '" + PostgresUtils.PGCRYPTO + "' extension must be installed in a separate schema (see documentation).");
+                            System.out.println("\nOptionally, you could also manually remove the '" + PostgresUtils.PGCRYPTO + "' extension first (DROP EXTENSION '" + PostgresUtils.PGCRYPTO + "' CASCADE), then rerun the 'clean'");
                             System.exit(1);
                         }
                     }
@@ -322,7 +317,7 @@ public class DatabaseUtils
                     }
                     else if(dbType.equals(DBMS_POSTGRES))
                     {
-                        System.out.println("\nPOSTGRES WARNING: the '" + PGCRYPTO + "' extension will be dropped if it is in the same schema as the DSpace database.\n");
+                        System.out.println("\nPOSTGRES WARNING: the '" + PostgresUtils.PGCRYPTO + "' extension will be dropped if it is in the same schema as the DSpace database.\n");
                     }
                     System.out.print("Do you want to PERMANENTLY DELETE everything from your database? [y/n]: ");
                     String choiceString = input.readLine();
@@ -1287,7 +1282,7 @@ public class DatabaseUtils
      * which bypass Hibernate. Only Flyway should be allowed a direct connection.
      * @return DataSource
      */
-    private static DataSource getDataSource()
+    protected static DataSource getDataSource()
     {
         // DataSource is configured via our ServiceManager (i.e. via Spring).
         return new DSpace().getServiceManager().getServiceByName("dataSource", BasicDataSource.class);
@@ -1318,221 +1313,4 @@ public class DatabaseUtils
         }
         return null;
     }
-
-    /**
-     * Get version of pgcrypto extension available. The extension is "available"
-     * if it's been installed via operating system tools/packages. It also
-     * MUST be installed in the DSpace database (see getPgcryptoInstalled()).
-     * <P>
-     * The pgcrypto extension is required for Postgres databases
-     * * @param current database connection
-     * @return version number or null if not available
-     */
-    private static Double getPgcryptoAvailableVersion(Connection connection)
-    {
-        Double version = null;
-
-        String checkPgCryptoAvailable = "SELECT default_version AS version FROM pg_available_extensions WHERE name=?";
-
-        // Run the query to obtain the version of 'pgcrypto' available
-        try (PreparedStatement statement = connection.prepareStatement(checkPgCryptoAvailable))
-        {
-            statement.setString(1,PGCRYPTO);
-            try(ResultSet results = statement.executeQuery())
-            {
-                if(results.next())
-                {
-                    version = results.getDouble("version");
-                }
-            }
-        }
-        catch(SQLException e)
-        {
-            throw new FlywayException("Unable to determine whether 'pgcrypto' extension is available.", e);
-        }
-
-        return version;
-    }
-
-    /**
-     * Get version of pgcrypto extension installed in the DSpace database.
-     * <P>
-     * The pgcrypto extension is required for Postgres databases to support
-     * UUIDs.
-     * @param current database connection
-     * @return version number or null if not installed
-     */
-    private static Double getPgcryptoInstalledVersion(Connection connection)
-    {
-        Double version = null;
-
-        String checkPgCryptoInstalled = "SELECT extversion AS version FROM pg_extension WHERE extname=?";
-
-        // Run the query to obtain the version of 'pgcrypto' installed on this database
-        try (PreparedStatement statement = connection.prepareStatement(checkPgCryptoInstalled))
-        {
-            statement.setString(1,PGCRYPTO);
-            try(ResultSet results = statement.executeQuery())
-            {
-                if(results.next())
-                {
-                    version = results.getDouble("version");
-                }
-            }
-        }
-        catch(SQLException e)
-        {
-            throw new FlywayException("Unable to determine whether 'pgcrypto' extension is available.", e);
-        }
-
-        return version;
-    }
-
-    /**
-     * Check if the pgcrypto extension is BOTH installed AND up-to-date.
-     * <P>
-     * This requirement is only needed for PostgreSQL databases.
-     * It doesn't matter what schema pgcrypto is installed in, as long as it exists.
-     * @return true if everything is installed & up-to-date. False otherwise.
-     */
-    public static boolean isPgcryptoUpToDate()
-    {
-        // Get our configured dataSource
-        DataSource dataSource = getDataSource();
-
-        try(Connection connection = dataSource.getConnection())
-        {
-            Double pgcryptoInstalled = getPgcryptoInstalledVersion(connection);
-
-            // Check if installed & up-to-date in this DSpace database
-            if(pgcryptoInstalled!=null && pgcryptoInstalled.compareTo(PGCRYPTO_VERSION)>=0)
-            {
-                return true;
-            }
-
-            return false;
-        }
-        catch(SQLException e)
-        {
-            throw new FlywayException("Unable to determine whether 'pgcrypto' extension is up-to-date.", e);
-        }
-    }
-
-    /**
-     * Check if the pgcrypto extension is installed into a particular schema
-     * <P>
-     * This allows us to check if pgcrypto needs to be REMOVED prior to running
-     * a 'clean' on this database. If pgcrypto is in the same schema as the
-     * dspace database, a 'clean' will require removing pgcrypto FIRST.
-     *
-     * @param schema name of schema
-     * @return true if pgcrypto is in this schema. False otherwise.
-     */
-    public static boolean isPgcryptoInSchema(String schema)
-    {
-        // Get our configured dataSource
-        DataSource dataSource = getDataSource();
-
-        try(Connection connection = dataSource.getConnection())
-        {
-            // Check if pgcrypto is installed in the current database schema.
-            String pgcryptoInstalledInSchema = "SELECT extversion FROM pg_extension,pg_namespace " +
-                                                 "WHERE pg_extension.extnamespace=pg_namespace.oid " +
-                                                 "AND extname=? " +
-                                                 "AND nspname=?;";
-            Double pgcryptoVersion = null;
-            try (PreparedStatement statement = connection.prepareStatement(pgcryptoInstalledInSchema))
-            {
-                statement.setString(1,PGCRYPTO);
-                statement.setString(2, schema);
-                try(ResultSet results = statement.executeQuery())
-                {
-                    if(results.next())
-                    {
-                        pgcryptoVersion = results.getDouble("extversion");
-                    }
-                }
-            }
-
-            // If a pgcrypto version returns, it's installed in this schema
-            if(pgcryptoVersion!=null)
-                return true;
-            else
-                return false;
-        }
-        catch(SQLException e)
-        {
-            throw new FlywayException("Unable to determine whether 'pgcrypto' extension is installed in schema '" + schema + "'.", e);
-        }
-    }
-
-
-    /**
-     * Check if the current user has permissions to run a clean on existing
-     * database.
-     * <P>
-     * Mostly this just checks if you need to remove pgcrypto, and if so,
-     * whether you have permissions to do so.
-     *
-     * @param current database connection
-     * @return true if permissions valid, false otherwise
-     */
-    private static boolean checkCleanPermissions(Connection connection)
-    {
-        try
-        {
-            String dbType = getDbType(connection);
-           
-            // If we are using Postgres, special permissions or setup are
-            // necessary to be able to remove the 'pgcrypto' extension.
-            if(dbType.equals(DBMS_POSTGRES))
-            {
-                // get username of our db user
-                String username = connection.getMetaData().getUserName();
-
-                // Check their permissions. Are they a 'superuser'?
-                String checkSuperuser = "SELECT rolsuper FROM pg_roles WHERE rolname=?;";
-                boolean superuser = false;
-                try (PreparedStatement statement = connection.prepareStatement(checkSuperuser))
-                {
-                    statement.setString(1,username);
-                    try(ResultSet results = statement.executeQuery())
-                    {
-                        if(results.next())
-                        {
-                            superuser = results.getBoolean("rolsuper");
-                        }
-                    }
-                }
-                catch(SQLException e)
-                {
-                    throw new FlywayException("Unable to determine if user '" + username + "' is a superuser.", e);
-                }
-
-                // If user is a superuser, then "clean" can be run successfully
-                if(superuser)
-                {
-                    return true;
-                }
-                else // Otherwise, we'll need to see which schema 'pgcrypto' is installed in
-                {
-                    // Get current schema name
-                    String schema = getSchemaName(connection);
-
-                    // If pgcrypto is installed in this schema, then superuser privileges are needed to remove it
-                    if(isPgcryptoInSchema(schema))
-                        return false;
-                    else // otherwise, a 'clean' can be run by anyone
-                        return true;
-                }
-            }
-            else // for all other dbTypes, a clean is possible
-                return true;
-        }
-        catch(SQLException e)
-        {
-            throw new FlywayException("Unable to determine if DB user has 'clean' privileges.", e);
-        }
-    }
-
 }
