@@ -89,6 +89,7 @@ public class Community extends DSpaceObject{
                     log.info("Omitted restricted collection: " + collection.getID() + " _ " + collection.getName());
                 }
             }
+            setCollections(restCollections);
         } else {
             this.addExpand("collections");
         }
