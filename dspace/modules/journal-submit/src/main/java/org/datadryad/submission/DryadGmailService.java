@@ -205,6 +205,31 @@ public class DryadGmailService {
         return mimeMessages;
     }
 
+    // queries the Gmail API and returns a list of Gmail message IDs. This list is valid until finishJournalEmails is called.
+    public static List<String> getJournalEmails () throws IOException {
+        List<String> result = new LinkedList<String>();
+        if (currentMessages == null) {
+
+            ArrayList<String> labels = new ArrayList<String>();
+            labels.add(ConfigurationManager.getProperty("submit.journal.email.label"));
+            List<Message> messages = retrieveMessagesWithLabels(labels);
+
+            currentMessages = new LinkedHashMap<String, Message>();
+            for (Message m : messages) {
+                currentMessages.put(m.getID(), m);
+            }
+            result.addAll(currentMessages.keySet());
+        } else {
+            throw new RuntimeException("Journal emails are still processing: " + currentMessages.size() + " messages remaining.");
+        }
+        return result;
+    }
+
+    public static void finishJournalEmails () {
+        currentMessages = null;
+    }
+
+
     /**
      * Modify the labels a message is associated with.
      *
