@@ -91,7 +91,7 @@ public class PostgreSQLCryptoChecker implements FlywayCallback
                     try(Statement statement = connection.createStatement())
                     {
                         // WARNING: ONLY superusers can remove pgcrypto. However, at this point,
-                        // we have already verified user acct permissions via DatabaseUtils.checkCleanPermissions()
+                        // we have already verified user acct permissions via PostgresUtils.checkCleanPermissions()
                         // (which is called prior to a 'clean' being triggered).
                         statement.execute("DROP EXTENSION " + PostgresUtils.PGCRYPTO + " CASCADE");
                     }

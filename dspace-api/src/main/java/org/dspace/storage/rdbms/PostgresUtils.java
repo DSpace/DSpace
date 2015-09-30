@@ -93,7 +93,7 @@ public class PostgresUtils
         }
         catch(SQLException e)
         {
-            throw new FlywayException("Unable to determine whether 'pgcrypto' extension is available.", e);
+            throw new FlywayException("Unable to determine whether 'pgcrypto' extension is installed.", e);
         }
 
         return version;
