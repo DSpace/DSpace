@@ -8,21 +8,32 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
-import org.jdom.Document;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 
-import javax.mail.*;
 import javax.mail.internet.MimeMessage;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.Part;
+import javax.mail.Session;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Properties;
+import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -109,9 +120,7 @@ public class DryadEmailSubmission extends HttpServlet {
             InputStream postBody = aRequest.getInputStream();
             Session session = Session.getInstance(new Properties());
             MimeMessage mime = new MimeMessage(session, postBody);
-            String xml = processMimeMessage(mime);
-            // Nice to return our result in case we are debugging output
-            toBrowser.println(xml);
+            processMimeMessage(mime);
             toBrowser.close();
         } catch (Exception details) {
             sendEmailIfConfigured(details);
@@ -253,7 +262,7 @@ public class DryadEmailSubmission extends HttpServlet {
         }
     }
 
-    private String processMimeMessage (MimeMessage mime) throws Exception {
+    private void processMimeMessage (MimeMessage mime) throws Exception {
         LOGGER.info("MIME contentType/ID/encoding: " + mime.getContentType()
                 + " " + mime.getContentID() + " " + mime.getEncoding());
 
@@ -281,78 +290,16 @@ public class DryadEmailSubmission extends HttpServlet {
             message = builder.toString();
         }
 
-        // Then we can hand off to implementer of EmailParser
-        ParsingResult result = parseMessage(message, mime.getFrom());
-
-        if (result.getStatus() != null) {
-            throw new SubmissionException(result.getStatus());
-        }
-
-        if (result.hasFlawedId()) {
-            throw new SubmissionException("Result ID is flawed: "
-                    + result.getSubmissionId());
-        }
-
-        return parseToXML(result);
-
-    }
-
-    private String parseToXML (ParsingResult result) {
-
-        // We'll use JDOM b/c the libs are already included in DSpace
-        SAXBuilder saxBuilder = new SAXBuilder();
-        String xml = result.getSubmissionData().toString();
-
-        // FIXME: Individual Email parsers don't supply a root element
-        // Our JDOM classes below will add version, encoding, etc.
-        xml = "<DryadEmailSubmission>"
-                + System.getProperty("line.separator") + xml
-                + "</DryadEmailSubmission>";
-
-        StringReader xmlReader = new StringReader(xml);
-
-        try {
-            Format format = Format.getPrettyFormat();
-            XMLOutputter toFile = new XMLOutputter(format);
-            Document doc = saxBuilder.build(xmlReader);
-            String journalCode = result.getJournalCode();
-
-            LOGGER.debug("Getting metadata dir for " + journalCode);
-
-            Context context = new Context();
-            Concept journalConcept = JournalUtils.getJournalConceptByShortID(context, journalCode);
-            File dir = new File(JournalUtils.getMetadataDir(journalConcept));
-
-            String submissionId = result.getSubmissionId();
-            String filename = JournalUtils.escapeFilename(submissionId + ".xml");
-            File file = new File(dir, filename);
-            LOGGER.info ("wrote xml to file " + file.getAbsolutePath());
-            FileOutputStream out = new FileOutputStream(file);
-            OutputStreamWriter writer = new OutputStreamWriter(out, "UTF-8");
-
-            // And we write the output to our submissions directory
-            toFile.output(doc, new BufferedWriter(writer));
-        } catch (Exception details) {
-            LOGGER.debug(xml);
-            throw new SubmissionRuntimeException(details);
-        }
-        return xml;
-    }
-
-
-    private ParsingResult parseMessage(String aMessage, Address[] addresses)
-            throws SubmissionException {
         List<String> dryadContent = new ArrayList<String>();
-        Scanner emailScanner = new Scanner(aMessage);
+        Scanner emailScanner = new Scanner(message);
         String journalName = null;
         String journalCode = null;
+        EmailParser parser = null;
         boolean dryadContentStarted = false;
-        ParsingResult result = null;
         Context context = null;
         Concept concept = null;
         while (emailScanner.hasNextLine()) {
             String line = emailScanner.nextLine().replace("\u00A0",""); // \u00A0 is Unicode nbsp; these should be removed
-
             // Stop reading lines at EndDryadContent
             if (line.contains("EndDryadContent")) {
                 break;
@@ -376,7 +323,6 @@ public class DryadEmailSubmission extends HttpServlet {
             if (journalCodeMatcher.find()) {
                 journalCode = journalCodeMatcher.group(2);
                 dryadContentStarted = true;
-                continue;
             }
 
             Matcher journalNameMatcher = Pattern.compile("^\\s*>*\\s*(JOURNAL|Journal Name):\\s*(.+)").matcher(line);
@@ -384,7 +330,6 @@ public class DryadEmailSubmission extends HttpServlet {
                 journalName = journalNameMatcher.group(2);
                 journalName = StringUtils.stripToEmpty(journalName);
                 dryadContentStarted = true;
-                continue;
             }
 
             if (dryadContentStarted) {
@@ -403,7 +348,7 @@ public class DryadEmailSubmission extends HttpServlet {
                     } catch (SQLException e) {
                         throw new SubmissionException(e);
                     }
-                    journalCode =  JournalUtils.getJournalShortID(concept);
+                    journalCode = JournalUtils.getJournalShortID(concept);
 
                 } else {
                     throw new SubmissionException("Journal Code not present and Journal Name not found in message");
@@ -415,39 +360,32 @@ public class DryadEmailSubmission extends HttpServlet {
                 throw new SubmissionException("Journal Name " + journalName + " did not match a known Journal Name");
             }
 
-            // find the associated concept and initialize the parser variable.
-            try {
-                concept = JournalUtils.getJournalConceptById(context, journalCode);
-            } catch (SQLException e) {
-                throw new SubmissionException(e);
+            if (concept == null) {
+                // find the associated concept based on the journalCode.
+                try {
+                    concept = JournalUtils.getJournalConceptById(context, journalCode);
+                } catch (SQLException e) {
+                    throw new SubmissionException(e);
+                }
             }
 
             if (concept == null) {
                 throw new SubmissionException("Concept not found for journal " + journalCode);
             }
 
+            // at this point, concept is not null.
             try {
-                String parsingScheme = JournalUtils.getParsingScheme(concept);
-                EmailParser parser = getEmailParser(parsingScheme);
-                result = parser.parseMessage(dryadContent);
+                parser = getEmailParser(JournalUtils.getParsingScheme(concept));
+                parser.parseMessage(dryadContent);
             } catch (SubmissionException e) {
                 throw new SubmissionException("Journal " + journalCode + " parsing scheme not found");
             }
 
-            if (result == null) {
-                throw new SubmissionException("Message could not be parsed");
-            }
-
-            if (result.getSubmissionId() == null) {
-                throw new SubmissionException("No submission ID found in message");
-            }
-
-            result.setJournalCode(journalCode);
-            result.setJournalName(journalName);
-            // Do this because this is what the parsers are expecting to
-            // build the corresponding author field from
-            for (Address address : addresses) {
-                result.setSenderEmailAddress(address.toString());
+            if (parser.getManuscript().isValid()) {
+                String filename = JournalUtils.escapeFilename(parser.getManuscript().manuscriptId + ".xml");
+                parser.writeManuscriptToXMLFile(new File(JournalUtils.getMetadataDir(concept), filename));
+            } else {
+                throw new SubmissionException("Parser could not validly parse the message");
             }
         } catch (SQLException e) {
             throw new SubmissionException("Couldn't get context", e);
@@ -459,10 +397,9 @@ public class DryadEmailSubmission extends HttpServlet {
                 }
             } catch (SQLException e) {
                 context.abort();
-                throw new RuntimeException("Context.complete threw an exception, aborting instead", e);
+                throw new RuntimeException("Context.complete threw an exception, aborting instead");
             }
         }
-        return result;
     }
 
     private EmailParser getEmailParser(String myParsingScheme) throws SubmissionException {
@@ -475,13 +412,14 @@ public class DryadEmailSubmission extends HttpServlet {
             return (EmailParser) Class.forName(className).newInstance();
         }
         catch (ClassNotFoundException details) {
-            throw new SubmissionRuntimeException(details);
+            // return a base EmailParser
+            return new EmailParser();
         }
         catch (IllegalAccessException details) {
-            throw new SubmissionRuntimeException(details);
+            throw new SubmissionException(details);
         }
         catch (InstantiationException details) {
-            throw new SubmissionRuntimeException(details);
+            throw new SubmissionException(details);
         }
     }
 
