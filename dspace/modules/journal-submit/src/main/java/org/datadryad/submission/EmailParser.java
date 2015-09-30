@@ -80,6 +80,15 @@ public class EmailParser {
         fieldToXMLTagMap.put("all authors", AUTHORS);
         fieldToXMLTagMap.put("classification description", CLASSIFICATION);
         fieldToXMLTagMap.put("keywords",CLASSIFICATION);
+        fieldToXMLTagMap.put("contact author",CORRESPONDING_AUTHOR);
+        fieldToXMLTagMap.put("contact author email",EMAIL);
+        fieldToXMLTagMap.put("contact author address 1",ADDRESS_LINE_1);
+        fieldToXMLTagMap.put("contact author address 2",ADDRESS_LINE_2);
+        fieldToXMLTagMap.put("contact author address 3",ADDRESS_LINE_3);
+        fieldToXMLTagMap.put("contact author city",CITY);
+        fieldToXMLTagMap.put("contact author state",STATE);
+        fieldToXMLTagMap.put("contact author country",COUNTRY);
+        fieldToXMLTagMap.put("contact author zip/postal code",ZIP);
 
         // commonly-used field names for optional XML tags
         fieldToXMLTagMap.put("ISSN", ISSN);
