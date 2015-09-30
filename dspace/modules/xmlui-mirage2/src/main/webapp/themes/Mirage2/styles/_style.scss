@@ -106,6 +106,10 @@ header .navbar-brand img {
     padding-bottom: 0.6em;
 }
 
+.glyphicon-lock {
+    color: #FF9900;
+}
+
 //example mixin to set the text-selection style
 @mixin selection {
     ::-moz-selection { @content; }
