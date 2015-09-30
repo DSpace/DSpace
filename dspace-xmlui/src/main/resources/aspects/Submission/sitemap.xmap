@@ -28,6 +28,7 @@
       <!-- <map:transformer name="SelectCollectionStep" src="org.dspace.app.xmlui.aspect.submission.submit.SelectCollectionStep"/> -->
       <map:transformer name="SelectCollectionStep" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.submission.submit.SelectCollectionStep"/>
       <map:transformer name="OwnerChange" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.submission.submit.OwnerChangeForm"/>
+      <map:transformer name="DisplayShareLink" src="cz.cuni.mff.ufal.dspace.app.xmlui.aspect.submission.submit.DisplayShareLink"/>
       <!-- </UFAL> -->
       <map:transformer name="ResumeStep" src="org.dspace.app.xmlui.aspect.submission.submit.ResumeStep"/>
       <map:transformer name="SaveOrRemoveStep" src="org.dspace.app.xmlui.aspect.submission.submit.SaveOrRemoveStep"/>
@@ -245,6 +246,12 @@
             <map:match pattern="handle/*/*/submit/ownerChange">
               <map:transform type="OwnerChange">
                 <map:parameter name="id" value="{flow-attribute:id}"/>
+              </map:transform>
+            </map:match>
+
+            <map:match pattern="submit/displayShareLink">
+              <map:transform type="DisplayShareLink">
+                <map:parameter name="link" value="{flow-attribute:link}"/>
               </map:transform>
             </map:match>
 

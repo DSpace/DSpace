@@ -424,7 +424,7 @@ public class FlowUtils {
         return listStepNumbers.toArray(new StepAndPage[listStepNumbers.size()]);
     }
 
-    public static void shareSubmission(Map objectModel, String workspaceID) throws IOException, AuthorizeException, SQLException, MessagingException {
+    public static String shareSubmission(Map objectModel, String workspaceID) throws IOException, AuthorizeException, SQLException, MessagingException {
         Context context = ContextUtil.obtainContext(objectModel);
         if(workspaceID.startsWith("S")){
             workspaceID = workspaceID.substring(1);
@@ -447,5 +447,6 @@ public class FlowUtils {
         email2User.addArgument(link);
 
         email2User.send();
+        return link;
     }
 }
