@@ -18,7 +18,8 @@
             <artifactId>maven-war-plugin</artifactId>
             <configuration>
               <archiveClasses>false</archiveClasses>
-              <webResources>
+              <attachClasses>true</attachClasses>
+                <webResources>
                 <resource>
                   <filtering>true</filtering>
                   <directory>${basedir}/src/main/webapp</directory>

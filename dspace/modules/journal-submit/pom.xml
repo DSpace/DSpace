@@ -103,6 +103,12 @@
 			<artifactId>dspace-api</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.dspace.modules</groupId>
+			<artifactId>dryad-rest-webapp</artifactId>
+			<version>${project.version}</version>
+			<classifier>classes</classifier>
+		</dependency>
+		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
 			<version>2.4</version>
