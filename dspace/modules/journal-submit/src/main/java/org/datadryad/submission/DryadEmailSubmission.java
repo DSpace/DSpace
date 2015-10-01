@@ -410,7 +410,6 @@ public class DryadEmailSubmission extends HttpServlet {
             }
 
             // find the associated concept and initialize the parser variable.
-            Concept concept = null;
             journalCode = JournalUtils.cleanJournalCode(journalCode);
             try {
                 concept = JournalUtils.getJournalConceptByShortID(context, journalCode);

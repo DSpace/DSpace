@@ -455,7 +455,7 @@ public class Concept extends AuthorityObject
         MetadataField mdf = MetadataField.findByElement(context, mds.getSchemaID(), element, null);
         journal_field_id = mdf.getFieldID();
         log.info ("journal field id is " + journal_field_id);
-        TableRowIterator row = DatabaseManager.query(context, "select c.* from concept as c, conceptmetadatavalue as cmv where upper(cmv.text_value) = ? and cmv.parent_id = c.id and cmv.field_id = ?;", journalID, journal_field_id);
+        TableRowIterator row = DatabaseManager.query(context, "select c.* from concept as c, conceptmetadatavalue as cmv where upper(cmv.text_value) = ? and cmv.parent_id = c.id and cmv.field_id = ?;", journalID.toUpperCase(), journal_field_id);
 
         if (row == null)
         {
