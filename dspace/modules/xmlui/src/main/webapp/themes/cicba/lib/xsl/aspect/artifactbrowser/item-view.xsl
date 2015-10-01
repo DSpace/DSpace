@@ -6,7 +6,10 @@
 	xmlns:dc="http://purl.org/dc/elements/1.1/" 
 
     xmlns:xalan="http://xml.apache.org/xalan"
-    xmlns:java="http://xml.apache.org/xalan/java" 
+    xmlns:java="http://xml.apache.org/xalan/java"
+     
+    xmlns:encoder="xalan://java.net.URLEncoder"
+    
 	xmlns:helper="ar.edu.unlp.sedici.dspace.util.HelperFunctions" 
 	xmlns:confman="org.dspace.core.ConfigurationManager"
     xmlns:math="http://exslt.org/math"
@@ -51,6 +54,7 @@
 		<xsl:param name="anchor"></xsl:param>
 		<xsl:param name="isDate"></xsl:param>
 		<xsl:param name="editor">False</xsl:param>
+		<xsl:param name="local_browse_type"></xsl:param>
 
 		<xsl:for-each select="$nodes">
 			<span>
@@ -60,6 +64,19 @@
 				<xsl:choose>
 					<xsl:when test="$anchor">
 						<xsl:choose>
+							<xsl:when test="$local_browse_type">
+								<xsl:choose>
+									<xsl:when test="@authority!=''">
+										<xsl:call-template name="build-anchor">
+											<xsl:with-param name="a.href" select="concat('http://digital.cic.gba.gob.ar/browse?authority=', @authority, '&amp;', 'type=', $local_browse_type)"/>
+											<xsl:with-param name="a.value" select="text()"/>
+										</xsl:call-template>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="text()" />
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:when>
 							<xsl:when test="@authority!=''">
 								<xsl:call-template name="build-anchor">
 									<xsl:with-param name="a.href" select="@authority"/>
@@ -131,7 +148,8 @@
 		<xsl:param name="null_message"></xsl:param>
 		<xsl:param name="isDate"></xsl:param>
 		<xsl:param name="editor">False</xsl:param>
-		
+		<xsl:param name="local_browse_type"></xsl:param>
+				
 		<xsl:variable name="mp" select="str:split($field,'.')" />
 		<xsl:variable name="schema" select="$mp[1]"/>
 		<xsl:variable name="element" select="$mp[position()=2]"/>
@@ -162,6 +180,7 @@
 								<xsl:with-param name="isDate" select="$isDate"/>
 								<xsl:with-param name="anchor" select="$is_linked_authority"/>
 								<xsl:with-param name="editor" select="$editor"/>
+								<xsl:with-param name="local_browse_type" select="$local_browse_type"/>
 							</xsl:call-template>
 						</xsl:when>
 						<xsl:when test="$null_message">
@@ -197,9 +216,11 @@
 		    		</xsl:call-template>
 			    	<xsl:call-template name="render-metadata">
 		    			<xsl:with-param name="field" select="'dcterms.creator.*'" />
-		    			<xsl:with-param name="separator" select="''" />
+		    			<xsl:with-param name="separator" select="' | '" />
 		    			<xsl:with-param name="show_label" select="'false'" />
 		    			<xsl:with-param name="null_message"><i18n:text>xmlui.dri2xhtml.METS-1.0.no-author</i18n:text></xsl:with-param>
+		    			<xsl:with-param name="is_linked_authority" select="'true'" />
+		    			<xsl:with-param name="local_browse_type" select="'author'" />
 		    		</xsl:call-template>
 		    		
 				</div>
@@ -273,7 +294,7 @@
     	</div>
 
 	    <!-- Creative Commons Logo -->
-        <div class="row">
+        <div class="row" id="item-view-CC">
         	<xsl:variable name="cc-uri">
 				<xsl:value-of select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='dcterms' and @element='license']/@authority"/>
 			</xsl:variable>
@@ -289,6 +310,24 @@
 				<i18n:text><xsl:value-of select="concat('xmlui.dri2xhtml.structural.cc-',xmlui:stripDash(xmlui:replaceAll(substring-after($cc-uri, 'http://creativecommons.org/licenses/'), '/', '-')))"/></i18n:text>
 			</div>
 	     </div>
+	     
+	     <!-- Show full link -->
+	        <div class="row ds-paragraph item-view-toggle item-view-toggle-bottom">
+	            <div class="col-md-12">
+	            	<a>
+	                	<xsl:attribute name="href"><xsl:value-of select="$ds_item_view_toggle_url"/></xsl:attribute>
+	                	<i18n:text>xmlui.ArtifactBrowser.ItemViewer.show_full</i18n:text>
+	            	</a>
+	            </div>
+	        </div>
+    	
+        <span class="Z3988">
+            <xsl:attribute name="title">
+                <xsl:call-template name="renderCOinS"/>
+            </xsl:attribute>
+            &#xFEFF; <!-- non-breaking space to force separating the end tag -->
+        </span>
+	     
     </xsl:template>
 	
 	<xsl:template match="mets:file" priority="10">
@@ -412,6 +451,8 @@
 					<xsl:call-template name="render-metadata">
 						<xsl:with-param name="field" select="'dcterms.subject.materia'" />
 						<xsl:with-param name="container" select="'li'" />
+						<xsl:with-param name="is_linked_authority" select="'true'" />
+						<xsl:with-param name="local_browse_type" select="'subject'"/>
 					</xsl:call-template>
 					<xsl:call-template name="render-metadata">
 						<xsl:with-param name="field" select="'dcterms.subject'" />
@@ -526,6 +567,7 @@
 						<xsl:call-template name="render-metadata">
 							<xsl:with-param name="field" select="'dc.identifier.uri'" />
 							<xsl:with-param name="container" select="'li'" />
+							<xsl:with-param name="is_linked_authority" select="'true'" />
 						</xsl:call-template>
 						<xsl:call-template name="render-metadata">
 							<xsl:with-param name="field" select="'dcterms.license'" />
@@ -536,24 +578,7 @@
 				</div>
 			</div>
 			
-			<!-- Show full link -->
-	        <div class="row ds-paragraph item-view-toggle item-view-toggle-bottom">
-	            <div class="col-md-12">
-	            	<a>
-	                	<xsl:attribute name="href"><xsl:value-of select="$ds_item_view_toggle_url"/></xsl:attribute>
-	                	<i18n:text>xmlui.ArtifactBrowser.ItemViewer.show_full</i18n:text>
-	            	</a>
-	            </div>
-	        </div>
-    	
-    	
-    	
-        <span class="Z3988">
-            <xsl:attribute name="title">
-                <xsl:call-template name="renderCOinS"/>
-            </xsl:attribute>
-            &#xFEFF; <!-- non-breaking space to force separating the end tag -->
-        </span>
+			
         
     </xsl:template>
     

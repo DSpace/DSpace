@@ -10,6 +10,7 @@ namespace xml "http: //www.w3.org /XML/1998/namespace"
 /* NARANJA rgba(245, 128, 45, 0.6); */
 
 ul {
+	padding-left: 40px;
 	margin-left: 0px;
 }
 
@@ -417,7 +418,6 @@ li.ds-artifact-item.community {
 .metadata-dcterms_creator__ {
 	font-size: 120%;
 	font-style: italic;
-	font-weight: bold;
 }
 
 .dcterms-creators {
@@ -585,4 +585,9 @@ height: 33px;
 	max-height: 300px;
 	overflow-y: auto;
 	overflow-x: hidden;
+}
+
+#item-view-CC {
+	margin-top: 1em;
+	margin-bottom: 1em
 }
