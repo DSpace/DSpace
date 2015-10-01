@@ -4,7 +4,6 @@
  * tree and available online at
  *
  * http://www.dspace.org/license/
- * GUCODE[[twb27:custom module]]
  */
 package org.dspace.rest;
 
@@ -79,8 +78,6 @@ public class FilteredItemsResource extends Resource {
 	 * @param query_val
 	 *            List of metadata values to evaluate in a metadata query.
 	 *            Each list value is used in conjunction with a query_value and query_op.
-	 * @param show_fields
-	 *            List of metadata fields to return with the items retrieved in the metadata query.
  	 * @param collSel
 	 *            List of collections to query.
      * @param headers
@@ -105,7 +102,6 @@ public class FilteredItemsResource extends Resource {
             @QueryParam("query_field[]") @DefaultValue("dc.title") List<String> query_field,
             @QueryParam("query_op[]") @DefaultValue("exists") List<String> query_op,
             @QueryParam("query_val[]") @DefaultValue("") List<String> query_val,
-            @QueryParam("show_fields[]") @DefaultValue("") List<String> show_fields,
             @QueryParam("collSel[]") @DefaultValue("") List<String> collSel,
     		@Context HttpHeaders headers, @Context HttpServletRequest request) {
         org.dspace.core.Context context = null;

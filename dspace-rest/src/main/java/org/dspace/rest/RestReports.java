@@ -31,9 +31,8 @@ import org.dspace.rest.common.Report;
  * Root of RESTful api. It provides login and logout. Also have method for
  * printing every method which is provides by RESTful api.
  * 
- * @author Rostislav Novak (Computing and Information Centre, CTU in Prague)
+ * @author Terry Brady, Georgetown University
  * 
- * GUCODE[[twb27:add additional verbs]]
  */
 @Path("/reports")
 public class RestReports {

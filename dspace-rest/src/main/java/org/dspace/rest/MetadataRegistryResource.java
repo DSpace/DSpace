@@ -45,7 +45,6 @@ import org.dspace.rest.common.MetadataField;
 
 /**
  * Class which provides read methods over the metadata registry.
- * GUCODE[[twb27:custom module]]
  * 
  * @author Terry Brady, Georgetown University
  * 
