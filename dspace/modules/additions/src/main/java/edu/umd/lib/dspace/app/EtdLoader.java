@@ -757,7 +757,7 @@ public class EtdLoader
         if (n != null)
         {
             Node n2 = getXPath("@remove").selectSingleNode(n);
-            if (n2 != null)
+            if (n2 != null && !"".equals(n2.getText()))
             {
                 strEmbargo = n2.getText();
             }
