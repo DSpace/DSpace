@@ -865,7 +865,7 @@ Common usage:
     <!-- ============================================================= -->
 
     <target name="fresh_install"
-            depends="init_installation,init_configs,test_database,migrate_database,install_code"
+            depends="init_installation,init_configs,test_database,install_code,migrate_database"
             description="Do a fresh install of the system, overwriting any data">
 
         <delete failonerror="no">
