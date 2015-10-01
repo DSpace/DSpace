@@ -85,11 +85,7 @@ public class JournalUtils {
     public static Concept getJournalConceptById(Context context, String authorityId) throws SQLException {
         try
         {
-            List<Concept> concepts = Concept.findByJournalID(context, authorityId);
-            if (concepts.size() > 0) {
-                Concept concept = concepts.get(0);
-                return concept;
-            }
+            return Concept.findByIdentifier(context,authorityId).iterator().next();
         }
         catch(Exception e)
         {
@@ -121,15 +117,12 @@ public class JournalUtils {
 
 
     public static Concept getJournalConceptByShortID(Context context, String journalShortID) throws SQLException {
-        Scheme scheme = Scheme.findByIdentifier(context, ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName"));
         try
         {
-            // TODO : a better query would be in Concept and filter at the db level
-            for(Concept concept : scheme.getConcepts())
-            {
-                String shortId = getJournalShortID(concept);
-                if(shortId != null && shortId.equals(journalShortID))
-                    return concept;
+            List<Concept> concepts = Concept.findByJournalID(context, journalShortID);
+            if (concepts.size() > 0) {
+                Concept concept = concepts.get(0);
+                return concept;
             }
         }
         catch(Exception e)
@@ -464,6 +457,10 @@ public class JournalUtils {
         JournalUtils.RecommendedBlackoutAction action = JournalUtils.recommendedBlackoutAction(context, item, collection);
         return (action == JournalUtils.RecommendedBlackoutAction.BLACKOUT_TRUE ||
                 action == JournalUtils.RecommendedBlackoutAction.JOURNAL_NOT_INTEGRATED);
+    }
+
+    public static String cleanJournalCode(String journalCode) {
+        return journalCode.replaceAll("[^a-zA-Z0-9]", "").toUpperCase();
     }
 
 }
