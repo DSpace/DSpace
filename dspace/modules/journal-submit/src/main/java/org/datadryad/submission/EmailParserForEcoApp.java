@@ -13,6 +13,9 @@ public class EmailParserForEcoApp extends EmailParser {
 		fieldToXMLTagMap.put("journal senior editor", "Journal_Editor");
 		fieldToXMLTagMap.put("journal admin email", "Journal_Editor_Email");
 		fieldToXMLTagMap.put("journal embargo period", "Journal_Embargo_Period");
+
+		// unnecessary fields
+		fieldToXMLTagMap.put("Dryad author url", UNNECESSARY);
 	}
 
 	@Override
