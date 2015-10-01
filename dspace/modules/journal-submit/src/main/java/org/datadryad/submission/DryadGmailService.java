@@ -173,24 +173,6 @@ public class DryadGmailService {
         return resultMessages;
     }
 
-    public static ArrayList<MimeMessage> processJournalEmails () throws IOException {
-        ArrayList<MimeMessage> mimeMessages = new ArrayList<MimeMessage>();
-
-        ArrayList<String> labels = new ArrayList<String>();
-        labels.add(ConfigurationManager.getProperty("submit.journal.email.label"));
-        List<String> journalMessageIDs = getJournalMessageIds();
-
-        for (String mID : journalMessageIDs) {
-            MimeMessage mimeMessage = getMessageForId(mID);
-            if (mimeMessage != null) {
-                mimeMessages.add(mimeMessage);
-            }
-            modifyMessage(mID, new ArrayList<String>(), labels);
-        }
-        completeJournalProcessing();
-        return mimeMessages;
-    }
-
     // queries the Gmail API and returns a list of Gmail message IDs. This list is valid until completeJournalProcessing is called.
     public static List<String> getJournalMessageIds() throws IOException {
         List<String> result = new LinkedList<String>();
