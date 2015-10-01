@@ -15,8 +15,8 @@
 -- ===============================================================
 
 -- Remove NOT NULL restrictions from the checksum columns of most_recent_checksum
-ALTER TABLE most_recent_checksum MODIFY expected_checksum null;
-ALTER TABLE most_recent_checksum MODIFY current_checksum null;
+ALTER TABLE most_recent_checksum ALTER COLUMN expected_checksum SET NOT NULL;
+ALTER TABLE most_recent_checksum ALTER COLUMN current_checksum SET NOT NULL;
 
 ------------------------------------------------------
 -- New Column language language in EPerson

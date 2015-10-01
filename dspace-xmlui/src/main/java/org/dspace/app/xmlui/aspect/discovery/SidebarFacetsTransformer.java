@@ -30,7 +30,9 @@ import org.dspace.discovery.*;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
@@ -70,6 +72,8 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
     protected SourceValidity validity;
     private static final Message T_FILTER_HEAD = message("xmlui.discovery.AbstractFiltersTransformer.filters.head");
     private static final Message T_VIEW_MORE = message("xmlui.discovery.AbstractFiltersTransformer.filters.view-more");
+
+    protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
 
     protected SearchService getSearchService()
     {
@@ -121,13 +125,13 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                 // Add the actual collection;
                 if (dso != null)
                 {
-                    val.add(dso);
+                    val.add(context, dso);
                 }
 
                 val.add("numFound:" + queryResults.getDspaceObjects().size());
 
                 for (DSpaceObject resultDso : queryResults.getDspaceObjects()) {
-                    val.add(resultDso);
+                    val.add(context, resultDso);
                 }
 
                 for (String facetField : queryResults.getFacetResults().keySet()) {
@@ -492,7 +496,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
         else
         {
             // Get the search scope from the location parameter
-            dso = HandleManager.resolveToObject(context, scopeString);
+            dso = handleService.resolveToObject(context, scopeString);
         }
 
         return dso;

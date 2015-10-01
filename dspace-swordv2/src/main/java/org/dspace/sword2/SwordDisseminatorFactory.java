@@ -17,7 +17,8 @@ import java.util.Map;
 
 public class SwordDisseminatorFactory
 {
-    public static SwordContentDisseminator getContentInstance(Map<Float, List<String>> accept, String acceptPackaging)
+    public static SwordContentDisseminator getContentInstance(
+            Map<Float, List<String>> accept, String acceptPackaging)
             throws DSpaceSwordException, SwordError
     {
         try
@@ -31,9 +32,13 @@ public class SwordDisseminatorFactory
                 {
                     for (String format : accept.get(q))
                     {
-						format = format.replace(";", "_"); // clean up the string for the plugin manager
-						format = format.replace("=", "_"); // clean up the string for the plugin manager
-                        disseminator = (SwordContentDisseminator) PluginManager.getNamedPlugin("swordv2-server", SwordContentDisseminator.class, format);
+                        format = format.replace(";",
+                                "_"); // clean up the string for the plugin manager
+                        format = format.replace("=",
+                                "_"); // clean up the string for the plugin manager
+                        disseminator = (SwordContentDisseminator) PluginManager
+                                .getNamedPlugin("swordv2-server",
+                                        SwordContentDisseminator.class, format);
                         if (disseminator == null)
                         {
                             continue;
@@ -42,7 +47,8 @@ public class SwordDisseminatorFactory
                         {
                             // if we find a disseminator which says it does this format, then find out if it
                             // will do the packaging
-                            if (!disseminator.disseminatesPackage(acceptPackaging))
+                            if (!disseminator
+                                    .disseminatesPackage(acceptPackaging))
                             {
                                 disseminator = null;
                                 continue;
@@ -62,9 +68,14 @@ public class SwordDisseminatorFactory
             {
                 if (acceptPackaging != null)
                 {
-					acceptPackaging = acceptPackaging.replace(";", "_"); // clean up the string for the plugin manager
-					acceptPackaging = acceptPackaging.replace("=", "_"); // clean up the string for the plugin manager
-                    disseminator = (SwordContentDisseminator) PluginManager.getNamedPlugin("swordv2-server", SwordContentDisseminator.class, acceptPackaging);
+                    acceptPackaging = acceptPackaging.replace(";",
+                            "_"); // clean up the string for the plugin manager
+                    acceptPackaging = acceptPackaging.replace("=",
+                            "_"); // clean up the string for the plugin manager
+                    disseminator = (SwordContentDisseminator) PluginManager
+                            .getNamedPlugin("swordv2-server",
+                                    SwordContentDisseminator.class,
+                                    acceptPackaging);
                     if (disseminator != null)
                     {
                         if (accept != null)
@@ -73,7 +84,8 @@ public class SwordDisseminatorFactory
                             {
                                 for (String format : accept.get(q))
                                 {
-                                    if (!disseminator.disseminatesContentType(format))
+                                    if (!disseminator
+                                            .disseminatesContentType(format))
                                     {
                                         disseminator = null;
                                     }
@@ -90,7 +102,8 @@ public class SwordDisseminatorFactory
 
             if (disseminator == null)
             {
-                throw new SwordError(UriRegistry.ERROR_CONTENT, 406, "No plugin can disseminate the requested formats");
+                throw new SwordError(UriRegistry.ERROR_CONTENT, 406,
+                        "No plugin can disseminate the requested formats");
             }
 
             disseminator.setPackaging(acceptPackaging);
@@ -102,45 +115,54 @@ public class SwordDisseminatorFactory
         }
     }
 
-	public static SwordStatementDisseminator getStatementInstance(Map<Float, List<String>> accept)
+    public static SwordStatementDisseminator getStatementInstance(
+            Map<Float, List<String>> accept)
             throws DSpaceSwordException, SwordError
     {
-		SwordStatementDisseminator disseminator = null;
+        SwordStatementDisseminator disseminator = null;
 
-		// first try to load disseminators based on content type
-		if (accept != null)
-		{
-			for (Float q : accept.keySet())
-			{
-				for (String format : accept.get(q))
-				{
-					format = format.replace(";", "_"); // clean up the string for the plugin manager
-					format = format.replace("=", "_"); // clean up the string for the plugin manager
-					disseminator = (SwordStatementDisseminator) PluginManager.getNamedPlugin("swordv2-server", SwordStatementDisseminator.class, format);
-					if (disseminator != null)
-					{
-						break;
-					}
-				}
-			}
-		}
+        // first try to load disseminators based on content type
+        if (accept != null)
+        {
+            for (Float q : accept.keySet())
+            {
+                for (String format : accept.get(q))
+                {
+                    format = format.replace(";",
+                            "_"); // clean up the string for the plugin manager
+                    format = format.replace("=",
+                            "_"); // clean up the string for the plugin manager
+                    disseminator = (SwordStatementDisseminator) PluginManager
+                            .getNamedPlugin("swordv2-server",
+                                    SwordStatementDisseminator.class, format);
+                    if (disseminator != null)
+                    {
+                        break;
+                    }
+                }
+            }
+        }
 
-		if (disseminator == null)
-		{
-			throw new SwordError(UriRegistry.ERROR_CONTENT, 406, "No plugin can disseminate the requested formats");
-		}
+        if (disseminator == null)
+        {
+            throw new SwordError(UriRegistry.ERROR_CONTENT, 406,
+                    "No plugin can disseminate the requested formats");
+        }
 
-		return disseminator;
-	}
+        return disseminator;
+    }
 
     public static SwordEntryDisseminator getEntryInstance()
             throws DSpaceSwordException, SwordError
     {
-        SwordEntryDisseminator disseminator = (SwordEntryDisseminator) PluginManager.getSinglePlugin("swordv2-server", SwordEntryDisseminator.class);
+        SwordEntryDisseminator disseminator = (SwordEntryDisseminator) PluginManager
+                .getSinglePlugin("swordv2-server",
+                        SwordEntryDisseminator.class);
         if (disseminator == null)
         {
-            throw new SwordError(DSpaceUriRegistry.REPOSITORY_ERROR, "No disseminator configured for handling sword entry documents");
+            throw new SwordError(DSpaceUriRegistry.REPOSITORY_ERROR,
+                    "No disseminator configured for handling sword entry documents");
         }
         return disseminator;
-	}
+    }
 }

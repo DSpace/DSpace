@@ -16,7 +16,7 @@
     <!-- Identifier Service Application Interface.  Will be autowired with
          any Identifier Providers present in Spring context.
     -->
-    <bean id="org.dspace.identifier.IdentifierService"
+    <bean id="org.dspace.identifier.service.IdentifierService"
           class="org.dspace.identifier.IdentifierServiceImpl"
           autowire="byType"
           scope="singleton"/>

@@ -8,13 +8,11 @@
 package org.dspace.content;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.sort.OrderFormat;
 
 /**
@@ -31,16 +29,18 @@ import org.dspace.sort.OrderFormat;
 public class ItemComparator implements Comparator, Serializable
 {
     /** Dublin Core element */
-    private String element;
+    protected String element;
 
     /** Dublin Core qualifier */
-    private String qualifier;
+    protected String qualifier;
 
     /** Language */
-    private String language;
+    protected String language;
 
     /** Whether maximum or minimum value will be used */
-    private boolean max;
+    protected boolean max;
+
+    protected ItemService itemService;
 
     /**
      * Constructor.
@@ -63,6 +63,7 @@ public class ItemComparator implements Comparator, Serializable
         this.qualifier = qualifier;
         this.language = language;
         this.max = max;
+        this.itemService = ContentServiceFactory.getInstance().getItemService();
     }
 
     /**
@@ -85,6 +86,7 @@ public class ItemComparator implements Comparator, Serializable
      *         -1 if the second is lexicographically greater than the first, and
      *         0 otherwise.
      */
+    @Override
     public int compare(Object first, Object second)
     {
         if ((!(first instanceof Item)) || (!(second instanceof Item)))
@@ -148,7 +150,7 @@ public class ItemComparator implements Comparator, Serializable
      * Return true if the first string is equal to the second. Either or both
      * may be null.
      */
-    private boolean equalsWithNull(String first, String second)
+    protected boolean equalsWithNull(String first, String second)
     {
         if (first == null && second == null)
         {
@@ -173,32 +175,32 @@ public class ItemComparator implements Comparator, Serializable
      *            The item to check
      * @return The chosen value, or null
      */
-    private String getValue(Item item)
+    protected String getValue(Item item)
     {
         // The overall array and each element are guaranteed non-null
-        Metadatum[] dcvalues = item.getDC(element, qualifier, language);
+        List<MetadataValue> dcvalues = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, element, qualifier, language);
 
-        if (dcvalues.length == 0)
+        if (dcvalues.size() == 0)
         {
             return null;
         }
 
-        if (dcvalues.length == 1)
+        if (dcvalues.size() == 1)
         {
-            return normalizeTitle(dcvalues[0]);
+            return normalizeTitle(dcvalues.get(0));
         }
 
         // We want to sort using Strings, but also keep track of
         // which Metadatum the value came from.
         Map<String, Integer> values = new HashMap<String, Integer>();
 
-        for (int i = 0; i < dcvalues.length; i++)
+        for (int i = 0; i < dcvalues.size(); i++)
         {
-            String value = dcvalues[i].value;
+            String value = dcvalues.get(i).getValue();
 
             if (value != null)
             {
-                values.put(value, Integer.valueOf(i));
+                values.put(value, i);
             }
         }
 
@@ -211,21 +213,21 @@ public class ItemComparator implements Comparator, Serializable
         String chosen = max ? Collections.max(valueSet)
                 : Collections.min(valueSet);
 
-        int index = (values.get(chosen)).intValue();
+        int index = values.get(chosen);
 
-        return normalizeTitle(dcvalues[index]);
+        return normalizeTitle(dcvalues.get(index));
     }
 
     /**
      * Normalize the title of a Metadatum.
      */
-    private String normalizeTitle(Metadatum value)
+    protected String normalizeTitle(MetadataValue value)
     {
         if (!"title".equals(element))
         {
-            return value.value;
+            return value.getValue();
         }
 
-        return OrderFormat.makeSortString(value.value, value.language, OrderFormat.TITLE);
+        return OrderFormat.makeSortString(value.getValue(), value.getLanguage(), OrderFormat.TITLE);
     }
 }

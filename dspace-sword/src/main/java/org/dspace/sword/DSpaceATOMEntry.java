@@ -24,296 +24,297 @@ import org.purl.sword.atom.Generator;
  * handles the objects in a default way, but the intention is
  * for you to be able to extend the class with your own
  * representation if necessary.
- * 
+ *
  * @author Richard Jones
  *
  */
 public abstract class DSpaceATOMEntry
 {
-	/** the SWORD ATOM entry which this class effectively decorates */
-	protected SWORDEntry entry;
-	
-	/** the item this ATOM entry represents */
-	protected Item item = null;
+    /** the SWORD ATOM entry which this class effectively decorates */
+    protected SWORDEntry entry;
 
-	/** The bitstream this ATOM entry represents */
-	protected Bitstream bitstream = null;
+    /** the item this ATOM entry represents */
+    protected Item item = null;
 
-	/** the deposit result */
-	protected DepositResult result = null;
+    /** The bitstream this ATOM entry represents */
+    protected Bitstream bitstream = null;
 
-	/** sword service implementation */
-	protected SWORDService swordService;
+    /** the deposit result */
+    protected DepositResult result = null;
 
-	/** the original deposit */
-	protected Deposit deposit = null;
+    /** sword service implementation */
+    protected SWORDService swordService;
 
-	/**
-	 * Create a new atom entry object around the given service
-	 *
-	 * @param service
-	 */
-	protected DSpaceATOMEntry(SWORDService service)
-	{
-		this.swordService = service;
-	}
+    /** the original deposit */
+    protected Deposit deposit = null;
 
-	/**
-	 * Reset all the internal variables of the class to their original values
-	 */
-	public void reset()
-	{
-		this.entry = new SWORDEntry();
-		this.item = null;
-		this.bitstream = null;
-		this.result = null;
-		this.deposit = null;
-	}
+    /**
+     * Create a new atom entry object around the given service
+     *
+     * @param service
+     */
+    protected DSpaceATOMEntry(SWORDService service)
+    {
+        this.swordService = service;
+    }
 
-	/**
-	 * Get the SWORD entry for the given DSpace object.  In this case,
-	 * we should be responding to requests for the media link, so this
-	 * method will throw an error unless the DSpace object is an instance
-	 * of the Bitstream.
-	 *
-	 * @param dso
-	 * @throws DSpaceSWORDException
-	 */
-	public SWORDEntry getSWORDEntry(DSpaceObject dso)
-			throws DSpaceSWORDException
-	{
-		// reset the object, just in case
-		this.reset();
+    /**
+     * Reset all the internal variables of the class to their original values
+     */
+    public void reset()
+    {
+        this.entry = new SWORDEntry();
+        this.item = null;
+        this.bitstream = null;
+        this.result = null;
+        this.deposit = null;
+    }
 
-		// NOTE: initially this exists just for the purposes of responding to media-link
-		// requests, so should only ever respond to entries on Bitstreams
-		if (dso instanceof Bitstream)
-		{
-			this.bitstream = (Bitstream) dso;
-		}
-		else
-		{
-			throw new DSpaceSWORDException("Can only recover a sword entry for a bitstream via this method");
-		}
+    /**
+     * Get the SWORD entry for the given DSpace object.  In this case,
+     * we should be responding to requests for the media link, so this
+     * method will throw an error unless the DSpace object is an instance
+     * of the Bitstream.
+     *
+     * @param dso
+     * @throws DSpaceSWORDException
+     */
+    public SWORDEntry getSWORDEntry(DSpaceObject dso)
+            throws DSpaceSWORDException
+    {
+        // reset the object, just in case
+        this.reset();
 
-		this.constructEntry();
+        // NOTE: initially this exists just for the purposes of responding to media-link
+        // requests, so should only ever respond to entries on Bitstreams
+        if (dso instanceof Bitstream)
+        {
+            this.bitstream = (Bitstream) dso;
+        }
+        else
+        {
+            throw new DSpaceSWORDException(
+                    "Can only recover a sword entry for a bitstream via this method");
+        }
 
-		return entry;
-	}
+        this.constructEntry();
 
-	/**
-	 * Construct the SWORDEntry object which represents the given
-	 * item with the given handle.  An argument as to whether this
-	 * is a NoOp request is required because in that event the 
-	 * assigned identifier for the item will not be added to the
-	 * SWORDEntry as it will be invalid.
-	 * 
-	 * @param result	the result of the deposit operation
-	 * @param deposit		the original deposit request
-	 * @return		the SWORDEntry for the item
-	 */
-	public SWORDEntry getSWORDEntry(DepositResult result, Deposit deposit)
-		throws DSpaceSWORDException
-	{
-		this.reset();
+        return entry;
+    }
 
-		this.entry = new SWORDEntry();
-		this.item = result.getItem();
-		this.bitstream = result.getBitstream();
-		this.result = result;
-		this.deposit = deposit;
+    /**
+     * Construct the SWORDEntry object which represents the given
+     * item with the given handle.  An argument as to whether this
+     * is a NoOp request is required because in that event the
+     * assigned identifier for the item will not be added to the
+     * SWORDEntry as it will be invalid.
+     *
+     * @param result    the result of the deposit operation
+     * @param deposit        the original deposit request
+     * @return the SWORDEntry for the item
+     */
+    public SWORDEntry getSWORDEntry(DepositResult result, Deposit deposit)
+            throws DSpaceSWORDException
+    {
+        this.reset();
 
-		this.constructEntry();
+        this.entry = new SWORDEntry();
+        this.item = result.getItem();
+        this.bitstream = result.getBitstream();
+        this.result = result;
+        this.deposit = deposit;
 
-		return entry;
-	}
+        this.constructEntry();
 
-	/**
-	 * Construct the entry
-	 *
-	 * @throws DSpaceSWORDException
-	 */
-	protected void constructEntry()
-			throws DSpaceSWORDException
-	{
-		// set the generator
-		this.addGenerator();
+        return entry;
+    }
 
-		// add the authors to the sword entry
-		this.addAuthors();
+    /**
+     * Construct the entry
+     *
+     * @throws DSpaceSWORDException
+     */
+    protected void constructEntry()
+            throws DSpaceSWORDException
+    {
+        // set the generator
+        this.addGenerator();
 
-		// add the category information to the sword entry
-		this.addCategories();
+        // add the authors to the sword entry
+        this.addAuthors();
 
-		// add a content element to the sword entry
-		this.addContentElement();
+        // add the category information to the sword entry
+        this.addCategories();
 
-		// add a packaging element to the sword entry
-		this.addPackagingElement();
+        // add a content element to the sword entry
+        this.addContentElement();
 
-		// add contributors (authors plus any other bits) to the sword entry
-		this.addContributors();
+        // add a packaging element to the sword entry
+        this.addPackagingElement();
 
-		// add the identifier for the item, if the id is going
-		// to be valid by the end of the request
-		this.addIdentifier();
+        // add contributors (authors plus any other bits) to the sword entry
+        this.addContributors();
 
-		// add any appropriate links
-		this.addLinks();
+        // add the identifier for the item, if the id is going
+        // to be valid by the end of the request
+        this.addIdentifier();
 
-		// add the publish date
-		this.addPublishDate();
+        // add any appropriate links
+        this.addLinks();
 
-		// add the rights information
-		this.addRights();
+        // add the publish date
+        this.addPublishDate();
 
-		// add the summary of the item
-		this.addSummary();
+        // add the rights information
+        this.addRights();
 
-		// add the title of the item
-		this.addTitle();
+        // add the summary of the item
+        this.addSummary();
 
-		// add the date on which the entry was last updated
-		this.addLastUpdatedDate();
+        // add the title of the item
+        this.addTitle();
 
-		// set the treatment
-		this.addTreatment();
-	}
+        // add the date on which the entry was last updated
+        this.addLastUpdatedDate();
 
-	/**
-	 * Add deposit treatment text
-	 */
-	protected void addTreatment()
-	{
-		if (result != null)
-		{
-			entry.setTreatment(result.getTreatment());
-		}
-	}
+        // set the treatment
+        this.addTreatment();
+    }
 
-	/**
-	 * add the generator field content
-	 */
-	protected void addGenerator()
-	{
-		boolean identify = ConfigurationManager.getBooleanProperty("sword-server", "identify-version");
-		SWORDUrlManager urlManager = swordService.getUrlManager();
-		String softwareUri = urlManager.getGeneratorUrl();
-		if (identify)
-		{
-			Generator generator = new Generator();
-			generator.setUri(softwareUri);
-			generator.setVersion(SWORDProperties.VERSION);
-			entry.setGenerator(generator);
-		}
-	}
+    /**
+     * Add deposit treatment text
+     */
+    protected void addTreatment()
+    {
+        if (result != null)
+        {
+            entry.setTreatment(result.getTreatment());
+        }
+    }
 
-	/**
-	 * set the packaging format of the deposit
-	 */
-	protected void addPackagingElement()
-	{
-		if (deposit != null)
-		{
-			entry.setPackaging(deposit.getPackaging());
-		}
-	}
+    /**
+     * add the generator field content
+     */
+    protected void addGenerator()
+    {
+        boolean identify = ConfigurationManager
+                .getBooleanProperty("sword-server", "identify-version");
+        SWORDUrlManager urlManager = swordService.getUrlManager();
+        String softwareUri = urlManager.getGeneratorUrl();
+        if (identify)
+        {
+            Generator generator = new Generator();
+            generator.setUri(softwareUri);
+            generator.setVersion(SWORDProperties.VERSION);
+            entry.setGenerator(generator);
+        }
+    }
 
-	/**
-	 * add the author names from the bibliographic metadata.  Does
-	 * not supply email addresses or URIs, both for privacy, and
-	 * because the data is not so readily available in DSpace.
-	 *
-	 */
-	protected void addAuthors()
-	{
-		if (deposit != null)
-		{
-			String username = this.deposit.getUsername();
-			Author author = new Author();
-			author.setName(username);
-			entry.addAuthors(author);
-		}
-	}
+    /**
+     * set the packaging format of the deposit
+     */
+    protected void addPackagingElement()
+    {
+        if (deposit != null)
+        {
+            entry.setPackaging(deposit.getPackaging());
+        }
+    }
 
-	/**
-	 * Add the list of contributors to the item.  This will include
-	 * the authors, and any other contributors that are supplied
-	 * in the bibliographic metadata
-	 *
-	 */
-	protected void addContributors()
-	{
-		if (deposit != null)
-		{
-			String obo = deposit.getOnBehalfOf();
-			if (obo != null)
-			{
-				Contributor cont = new Contributor();
-				cont.setName(obo);
-				entry.addContributor(cont);
-			}
-		}
-	}
+    /**
+     * add the author names from the bibliographic metadata.  Does
+     * not supply email addresses or URIs, both for privacy, and
+     * because the data is not so readily available in DSpace.
+     *
+     */
+    protected void addAuthors()
+    {
+        if (deposit != null)
+        {
+            String username = this.deposit.getUsername();
+            Author author = new Author();
+            author.setName(username);
+            entry.addAuthors(author);
+        }
+    }
 
-	/**
-	 * Add all the subject classifications from the bibliographic
-	 * metadata.
-	 *
-	 */
-	abstract void addCategories() throws DSpaceSWORDException;
+    /**
+     * Add the list of contributors to the item.  This will include
+     * the authors, and any other contributors that are supplied
+     * in the bibliographic metadata
+     *
+     */
+    protected void addContributors()
+    {
+        if (deposit != null)
+        {
+            String obo = deposit.getOnBehalfOf();
+            if (obo != null)
+            {
+                Contributor cont = new Contributor();
+                cont.setName(obo);
+                entry.addContributor(cont);
+            }
+        }
+    }
 
-	/**
-	 * Set the content type that DSpace received.  This is just
-	 * "application/zip" in this default implementation.
-	 *
-	 */
-	abstract void addContentElement() throws DSpaceSWORDException;
+    /**
+     * Add all the subject classifications from the bibliographic
+     * metadata.
+     *
+     */
+    abstract void addCategories() throws DSpaceSWORDException;
 
+    /**
+     * Set the content type that DSpace received.  This is just
+     * "application/zip" in this default implementation.
+     *
+     */
+    abstract void addContentElement() throws DSpaceSWORDException;
 
-	/**
-	 * Add the identifier for the item.  If the item object has
-	 * a handle already assigned, this is used, otherwise, the 
-	 * passed handle is used.  It is set in the form that
-	 * they can be used to access the resource over http (i.e.
-	 * a real URL).
-	 */
-	abstract void addIdentifier() throws DSpaceSWORDException;
-	
-	/**
-	 * Add links associated with this item.
-	 *
-	 */
-	abstract void addLinks() throws DSpaceSWORDException;
-	
-	/**
-	 * Add the date of publication from the bibliographic metadata
-	 *
-	 */
-	abstract void addPublishDate() throws DSpaceSWORDException;
+    /**
+     * Add the identifier for the item.  If the item object has
+     * a handle already assigned, this is used, otherwise, the
+     * passed handle is used.  It is set in the form that
+     * they can be used to access the resource over http (i.e.
+     * a real URL).
+     */
+    abstract void addIdentifier() throws DSpaceSWORDException;
 
-	/**
-	 * Add rights information.  This attaches an href to the URL
-	 * of the item's licence file
-	 *
-	 */
-	abstract void addRights() throws DSpaceSWORDException;
+    /**
+     * Add links associated with this item.
+     *
+     */
+    abstract void addLinks() throws DSpaceSWORDException;
 
-	/**
-	 * Add the summary/abstract from the bibliographic metadata
-	 *
-	 */
-	abstract void addSummary() throws DSpaceSWORDException;
-	
-	/**
-	 * Add the title from the bibliographic metadata
-	 *
-	 */
-	abstract void addTitle() throws DSpaceSWORDException;
-	
-	/**
-	 * Add the date that this item was last updated
-	 *
-	 */
-	abstract void addLastUpdatedDate() throws DSpaceSWORDException;
+    /**
+     * Add the date of publication from the bibliographic metadata
+     *
+     */
+    abstract void addPublishDate() throws DSpaceSWORDException;
+
+    /**
+     * Add rights information.  This attaches an href to the URL
+     * of the item's licence file
+     *
+     */
+    abstract void addRights() throws DSpaceSWORDException;
+
+    /**
+     * Add the summary/abstract from the bibliographic metadata
+     *
+     */
+    abstract void addSummary() throws DSpaceSWORDException;
+
+    /**
+     * Add the title from the bibliographic metadata
+     *
+     */
+    abstract void addTitle() throws DSpaceSWORDException;
+
+    /**
+     * Add the date that this item was last updated
+     *
+     */
+    abstract void addLastUpdatedDate() throws DSpaceSWORDException;
 }

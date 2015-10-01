@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +26,8 @@ import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.utils.DSpace;
 
@@ -42,16 +45,24 @@ public class SHERPAPublisherPolicyServlet extends DSpaceServlet
                     SHERPASubmitService.class.getCanonicalName(),
                     SHERPASubmitService.class);
 
+    private ItemService itemService;
+    
     /** log4j logger */
     private static Logger log = Logger
             .getLogger(SHERPAPublisherPolicyServlet.class);
 
+    @Override
+    public void init() throws ServletException {
+    	super.init();
+    	itemService = ContentServiceFactory.getInstance().getItemService();
+    }
+    
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
-        int itemID = UIUtil.getIntParameter(request, "item_id");
-        Item item = Item.find(context, itemID);
+        UUID itemID = UIUtil.getUUIDParameter(request, "item_id");
+        Item item = itemService.find(context, itemID);
         if (item == null)
         {
             return;

@@ -18,38 +18,40 @@ import org.purl.sword.base.SWORDErrorException;
  */
 public abstract class Depositor
 {
-	/**
-	 * The sword service implementation
-	 */
-	protected SWORDService swordService;
+    /**
+     * The sword service implementation
+     */
+    protected SWORDService swordService;
 
-	/**
-	 * Construct a new Depositor with the given sword service on the given
-	 * dspace object.  It is anticipated that extensions of this class will
-	 * specialise in certain kinds of dspace object
-	 *
-	 * @param swordService
-	 * @param dso
-	 */
-	public Depositor(SWORDService swordService, DSpaceObject dso)
-	{
-		this.swordService = swordService;
-	}
+    /**
+     * Construct a new Depositor with the given sword service on the given
+     * dspace object.  It is anticipated that extensions of this class will
+     * specialise in certain kinds of dspace object
+     *
+     * @param swordService
+     * @param dso
+     */
+    public Depositor(SWORDService swordService, DSpaceObject dso)
+    {
+        this.swordService = swordService;
+    }
 
-	/**
-	 * Execute the deposit process with the given sword deposit.
-	 *
-	 * @param deposit
-	 * @throws SWORDErrorException
-	 * @throws DSpaceSWORDException
-	 */
-	public abstract DepositResult doDeposit(Deposit deposit) throws SWORDErrorException, DSpaceSWORDException;
+    /**
+     * Execute the deposit process with the given sword deposit.
+     *
+     * @param deposit
+     * @throws SWORDErrorException
+     * @throws DSpaceSWORDException
+     */
+    public abstract DepositResult doDeposit(Deposit deposit)
+            throws SWORDErrorException, DSpaceSWORDException;
 
-	/**
-	 * Undo any changes to the archive effected by the deposit
-	 * 
-	 * @param result
-	 * @throws DSpaceSWORDException
-	 */
-	public abstract void undoDeposit(DepositResult result) throws DSpaceSWORDException;
+    /**
+     * Undo any changes to the archive effected by the deposit
+     *
+     * @param result
+     * @throws DSpaceSWORDException
+     */
+    public abstract void undoDeposit(DepositResult result)
+            throws DSpaceSWORDException;
 }

@@ -37,11 +37,9 @@
 <%@ page import="org.dspace.browse.ItemCounter"%>
 <%@ page import="org.dspace.content.*"%>
 <%@ page import="org.dspace.core.ConfigurationManager"%>
-<%@ page import="org.dspace.core.Context" %>
 <%@ page import="org.dspace.core.Utils" %>
 <%@ page import="org.dspace.eperson.Group"     %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
-<%@ page import="java.net.URLEncoder" %>
 
 <%
     // Retrieve attributes
@@ -67,25 +65,26 @@
 	// get the browse indices
     BrowseIndex[] bis = BrowseIndex.getBrowseIndices();
 
+    CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     // Put the metadata values into guaranteed non-null variables
-    String name = collection.getMetadata("name");
-    String intro = collection.getMetadata("introductory_text");
+    String name = collectionService.getMetadata(collection, "name");
+    String intro = collectionService.getMetadata(collection, "introductory_text");
     if (intro == null)
     {
         intro = "";
     }
-    String copyright = collection.getMetadata("copyright_text");
+    String copyright = collectionService.getMetadata(collection, "copyright_text");
     if (copyright == null)
     {
         copyright = "";
     }
-    String sidebar = collection.getMetadata("side_bar_text");
+    String sidebar = collectionService.getMetadata(collection, "side_bar_text");
     if(sidebar == null)
     {
         sidebar = "";
     }
 
-    String communityName = community.getMetadata("name");
+    String communityName = collectionService.getMetadata(collection, "name");
     String communityLink = "/handle/" + community.getHandle();
 
     Bitstream logo = collection.getLogo();
@@ -104,6 +103,9 @@
 %>
 
 <%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
+<%@ page import="org.dspace.content.factory.ContentServiceFactory" %>
+<%@ page import="org.dspace.content.service.CollectionService" %>
+<%@ page import="org.dspace.content.service.ItemService" %>
 <dspace:layout locbar="commLink" title="<%= name %>" feedData="<%= feedData %>">
     <div class="well">
     <div class="row"><div class="col-md-8"><h2><%= name %>
@@ -369,19 +371,20 @@
 %>
 	<h3><fmt:message key="jsp.collection-home.recentsub"/></h3>
 <%
-		Item[] items = rs.getRecentSubmissions();
-		for (int i = 0; i < items.length; i++)
+    ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    List<Item> items = rs.getRecentSubmissions();
+		for (int i = 0; i < items.size(); i++)
 		{
-			Metadatum[] dcv = items[i].getMetadata("dc", "title", null, Item.ANY);
+			List<MetadataValue> dcv = itemService.getMetadata(items.get(i), "dc", "title", null, Item.ANY);
 			String displayTitle = "Untitled";
 			if (dcv != null)
 			{
-				if (dcv.length > 0)
+				if (dcv.size() > 0)
 				{
-					displayTitle = Utils.addEntities(dcv[0].value);
+					displayTitle = Utils.addEntities(dcv.get(0).getValue());
 				}
 			}
-			%><p class="recentItem"><a href="<%= request.getContextPath() %>/handle/<%= items[i].getHandle() %>"><%= displayTitle %></a></p><%
+			%><p class="recentItem"><a href="<%= request.getContextPath() %>/handle/<%= items.get(i).getHandle() %>"><%= displayTitle %></a></p><%
 		}
 %>
     <p>&nbsp;</p>

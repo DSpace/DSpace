@@ -16,9 +16,14 @@ import org.swordapp.server.SwordServerException;
 
 public interface SwordEntryIngester
 {
-    DepositResult ingest(Context context, Deposit deposit, DSpaceObject target, VerboseDescription verboseDescription)
-			throws DSpaceSwordException, SwordError, SwordAuthException, SwordServerException;
+    DepositResult ingest(Context context, Deposit deposit, DSpaceObject target,
+            VerboseDescription verboseDescription)
+            throws DSpaceSwordException, SwordError, SwordAuthException,
+            SwordServerException;
 
-    DepositResult ingest(Context context, Deposit deposit, DSpaceObject target, VerboseDescription verboseDescription, DepositResult result, boolean replace)
-			throws DSpaceSwordException, SwordError, SwordAuthException, SwordServerException;
+    DepositResult ingest(Context context, Deposit deposit, DSpaceObject target,
+            VerboseDescription verboseDescription, DepositResult result,
+            boolean replace)
+            throws DSpaceSwordException, SwordError, SwordAuthException,
+            SwordServerException;
 }

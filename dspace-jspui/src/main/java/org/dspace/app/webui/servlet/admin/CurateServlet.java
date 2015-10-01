@@ -21,24 +21,26 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.util.Util;
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.CurateTaskResult;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
-import org.dspace.curate.Curator;
 import org.dspace.core.LogManager;
-import org.dspace.handle.HandleManager;
+import org.dspace.curate.Curator;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 
 /**
  *
@@ -79,6 +81,23 @@ public class CurateServlet extends DSpaceServlet
     /** Logger */
     private static Logger log = Logger.getLogger(CurateServlet.class);
 
+    private CommunityService communityService;
+    
+    private CollectionService collectionService;
+    
+    private ItemService itemService;
+    
+    private HandleService handleService;
+    
+    @Override
+    public void init() throws ServletException {
+    	super.init();
+    	communityService = ContentServiceFactory.getInstance().getCommunityService();
+    	collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    	itemService = ContentServiceFactory.getInstance().getItemService();
+    	handleService = HandleServiceFactory.getInstance().getHandleService();
+    }
+    
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -116,11 +135,11 @@ public class CurateServlet extends DSpaceServlet
 
         if (button.startsWith("submit_community_"))
         {
-            Community community = Community.find(context, 
-                UIUtil.getIntParameter(request, "community_id"));
+            Community community = communityService.find(context, 
+                UIUtil.getUUIDParameter(request, "community_id"));
             request.setAttribute("community", community);
 
-            if (!AuthorizeManager.isAdmin(context, community))
+            if (!authorizeService.isAdmin(context, community))
             {
                 throw new AuthorizeException("Only community admins are allowed to perform curation tasks");
             }
@@ -138,11 +157,11 @@ public class CurateServlet extends DSpaceServlet
         }
         else if (button.startsWith("submit_collection_"))
         {
-            Collection collection = Collection.find(context, 
-                UIUtil.getIntParameter(request, "collection_id"));
+            Collection collection = collectionService.find(context, 
+                UIUtil.getUUIDParameter(request, "collection_id"));
             request.setAttribute("collection", collection);
 
-            if (!AuthorizeManager.isAdmin(context, collection))
+            if (!authorizeService.isAdmin(context, collection))
             {
                 throw new AuthorizeException("Only collection admins are allowed to perform curation tasks");
             }
@@ -160,11 +179,11 @@ public class CurateServlet extends DSpaceServlet
         }
         else if (button.startsWith("submit_item_"))
         {
-            Item item = Item.find(context, 
-                UIUtil.getIntParameter(request, "item_id"));
+            Item item = itemService.find(context, 
+                UIUtil.getUUIDParameter(request, "item_id"));
             request.setAttribute("item", item);
 
-            if (!AuthorizeManager.isAdmin(context, item))
+            if (!authorizeService.isAdmin(context, item))
             {
                 throw new AuthorizeException("Only item admins are allowed to perform curation tasks");
             }
@@ -187,15 +206,15 @@ public class CurateServlet extends DSpaceServlet
             {
                 if (handle.endsWith("/0"))
                 {
-                    if (!AuthorizeManager.isAdmin(context))
+                    if (!authorizeService.isAdmin(context))
                     {
                         throw new AuthorizeException("Only system admins are allowed to perform curation tasks over the site");
                     } 
                 }
                 else
                 {
-                    DSpaceObject dso = HandleManager.resolveToObject(context, handle);
-                    if (!AuthorizeManager.isAdmin(context, dso))
+                    DSpaceObject dso = handleService.resolveToObject(context, handle);
+                    if (!authorizeService.isAdmin(context, dso))
                     {
                         throw new AuthorizeException("Only object (hdl:"+handle+") admins are allowed to perform curation tasks");
                     }

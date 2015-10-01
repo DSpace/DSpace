@@ -21,7 +21,7 @@ import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.statistics.Dataset;
 import org.dspace.statistics.ObjectCount;
-import org.dspace.statistics.SolrLogger;
+import org.dspace.statistics.SolrLoggerServiceImpl;
 import org.dspace.statistics.content.filter.StatisticsFilter;
 import org.dspace.utils.DSpace;
 
@@ -80,7 +80,7 @@ public class StatisticsDataWorkflow extends StatisticsData {
             DatasetGenerator datasetGenerator = datasetGenerators.get(0);
             if(datasetGenerator instanceof DatasetTypeGenerator){
                 DatasetTypeGenerator typeGenerator = (DatasetTypeGenerator) datasetGenerator;
-                ObjectCount[] topCounts = SolrLogger.queryFacetField(query, defaultFilterQuery, typeGenerator.getType(), typeGenerator.getMax(), typeGenerator.isIncludeTotal(), null);
+                ObjectCount[] topCounts = solrLoggerService.queryFacetField(query, defaultFilterQuery, typeGenerator.getType(), typeGenerator.getMax(), typeGenerator.isIncludeTotal(), null);
 
                 //Retrieve our total field counts
                 Map<String, Long> totalFieldCounts = new HashMap<String, Long>();
@@ -126,7 +126,7 @@ public class StatisticsDataWorkflow extends StatisticsData {
      * @return the query as a string
      */
     protected String getQuery() {
-        String query = "statistics_type:" + SolrLogger.StatisticsType.WORKFLOW.text();
+        String query = "statistics_type:" + SolrLoggerServiceImpl.StatisticsType.WORKFLOW.text();
         query += " AND NOT(previousWorkflowStep: SUBMIT)";
         if(currentDso != null){
             if(currentDso.getType() == Constants.COMMUNITY){
@@ -155,7 +155,7 @@ public class StatisticsDataWorkflow extends StatisticsData {
      * @throws org.apache.solr.client.solrj.SolrServerException
      */
     protected Map<String, Long> getTotalFacetCounts(DatasetTypeGenerator typeGenerator) throws SolrServerException {
-        ObjectCount[] objectCounts = SolrLogger.queryFacetField(getQuery(), null, typeGenerator.getType(), -1, false, null);
+        ObjectCount[] objectCounts = solrLoggerService.queryFacetField(getQuery(), null, typeGenerator.getType(), -1, false, null);
         Map<String, Long> result = new HashMap<String, Long>();
         for (ObjectCount objectCount : objectCounts) {
             result.put(objectCount.getValue(), objectCount.getCount());
@@ -170,7 +170,7 @@ public class StatisticsDataWorkflow extends StatisticsData {
         String workflowStartDate = configurationService.getProperty("usage-statistics.workflow-start-date");
         if(workflowStartDate == null){
             //Query our solr for it !
-            QueryResponse oldestRecord = SolrLogger.query(getQuery(), null, null, 1, 0, null, null, null, null, "time", true);
+            QueryResponse oldestRecord = solrLoggerService.query(getQuery(), null, null, 1, 0, null, null, null, null, "time", true);
             if(0 < oldestRecord.getResults().getNumFound()){
                 SolrDocument solrDocument = oldestRecord.getResults().get(0);
                 Date oldestDate = (Date) solrDocument.getFieldValue("time");

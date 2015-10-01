@@ -42,6 +42,8 @@
 <%@ page import="org.dspace.core.Constants"           %>
 <%@ page import="org.dspace.eperson.EPerson"          %>
 <%@ page import="org.dspace.eperson.Group"            %>
+<%@ page import="org.dspace.authorize.factory.AuthorizeServiceFactory" %>
+<%@ page import="org.dspace.authorize.service.ResourcePolicyService" %>
 
 
 <%
@@ -58,7 +60,7 @@
                nocache="true">
   
 	<h1><fmt:message key="jsp.dspace-admin.authorize-community-edit.policies">
-        <fmt:param><%= community.getMetadata("name") %></fmt:param>
+        <fmt:param><%= community.getName() %></fmt:param>
         <fmt:param>hdl:<%= community.getHandle() %></fmt:param>
         <fmt:param><%=community.getID()%></fmt:param>
     </fmt:message>
@@ -84,6 +86,7 @@
         </tr>
 
 <%
+    ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
     String row = "even";
     for (ResourcePolicy rp : policies)
     {
@@ -91,7 +94,7 @@
         <tr>
             <td headers="t1" class="<%= row %>RowOddCol"><%= rp.getID() %></td>
             <td headers="t2" class="<%= row %>RowEvenCol">
-                    <%= rp.getActionText() %>
+                    <%= resourcePolicyService.getActionText(rp) %>
             </td>
             <td headers="t3" class="<%= row %>RowOddCol">
                     <%= (rp.getGroup()   == null ? "..." : rp.getGroup().getName() ) %>  

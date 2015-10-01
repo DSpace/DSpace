@@ -7,13 +7,15 @@
  */
 package org.dspace.content.authority;
 
+import org.dspace.content.Collection;
+
 /**
  * Plugin interface that supplies an authority control mechanism for
  * one metadata field.
  *
  * @author Larry Stone
- * @see ChoiceAuthorityManager
- * @see MetadataAuthorityManager
+ * @see ChoiceAuthorityServiceImpl
+ * @see MetadataAuthorityServiceImpl
  */
 public interface ChoiceAuthority
 {
@@ -39,7 +41,7 @@ public interface ChoiceAuthority
      * @param locale explicit localization key if available, or null
      * @return a Choices object (never null).
      */
-    public Choices getMatches(String field, String text, int collection, int start, int limit, String locale);
+    public Choices getMatches(String field, String text, Collection collection, int start, int limit, String locale);
 
     /**
      * Get the single "best" match (if any) of a value in the authority
@@ -56,7 +58,7 @@ public interface ChoiceAuthority
      * @param locale explicit localization key if available, or null
      * @return a Choices object (never null) with 1 or 0 values.
      */
-    public Choices getBestMatch(String field, String text, int collection, String locale);
+    public Choices getBestMatch(String field, String text, Collection collection, String locale);
 
     /**
      * Get the canonical user-visible "label" (i.e. short descriptive text)

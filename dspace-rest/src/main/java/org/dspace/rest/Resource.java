@@ -7,7 +7,6 @@
  */
 package org.dspace.rest;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,29 +70,15 @@ public class Resource
      */
     protected static org.dspace.core.Context createContext(EPerson person) throws ContextException
     {
+        org.dspace.core.Context context = new org.dspace.core.Context();
+        //context.getDBConnection().setAutoCommit(false); // Disable autocommit.
 
-        org.dspace.core.Context context = null;
-
-        try
+        if (person != null)
         {
-            context = new org.dspace.core.Context();
-            context.getDBConnection().setAutoCommit(false); // Disable autocommit.
-
-            if (person != null)
-            {
-                context.setCurrentUser(person);
-            }
-
-            return context;
+            context.setCurrentUser(person);
         }
-        catch (SQLException e)
-        {
-            if ((context != null) && (context.isValid()))
-            {
-                context.abort();
-            }
-            throw new ContextException("Could not create context, SQLException. Message: " + e, e);
-        }
+
+        return context;
     }
 
     /**

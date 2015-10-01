@@ -65,6 +65,7 @@ public class ItemCountDAOSolr implements ItemCountDAO
      * @param count
      * @throws ItemCountException
      */
+    @Override
     public void collectionCount(Collection collection, int count) throws ItemCountException
     {
         log.error("Caching is not supported by the ItemCountDAOSolr as it is not really needed, Solr is faster!");
@@ -77,6 +78,7 @@ public class ItemCountDAOSolr implements ItemCountDAO
      * @param count
      * @throws ItemCountException
      */
+    @Override
     public void communityCount(Community community, int count) throws ItemCountException
     {
         log.error("Caching is not supported by the ItemCountDAOSolr as it is not really needed, Solr is faster!");
@@ -88,6 +90,7 @@ public class ItemCountDAOSolr implements ItemCountDAO
      * @param context
      * @throws ItemCountException
      */
+    @Override
     public void setContext(Context context) throws ItemCountException
     {
         this.context = context;
@@ -99,6 +102,7 @@ public class ItemCountDAOSolr implements ItemCountDAO
      * @param dso
      * @throws ItemCountException
      */
+    @Override
     public int getCount(DSpaceObject dso) throws ItemCountException
     {
     	loadCount();
@@ -133,6 +137,7 @@ public class ItemCountDAOSolr implements ItemCountDAO
      * @param dso
      * @throws ItemCountException
      */
+    @Override
     public void remove(DSpaceObject dso) throws ItemCountException
     {
     }

@@ -32,7 +32,11 @@
 		<listener-class>org.dspace.app.util.DSpaceContextListener</listener-class>
 	</listener>
 
-    <servlet>
+	<listener>
+		<listener-class>org.dspace.app.util.DSpaceWebappListener</listener-class>
+	</listener>
+
+	<servlet>
         <servlet-name>oai</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <init-param>

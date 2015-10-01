@@ -48,7 +48,7 @@
 
     <%-- <h1>Edit Your Profile</h1> --%>
 	<h1><fmt:message key="jsp.register.edit-profile.title"/>
-	<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#editprofile\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup>
+        <dspace:popup page='<%= LocaleSupport.getLocalizedMessage(pageContext, "help.index") + "#editprofile"%>'><fmt:message key="jsp.morehelp"/></dspace:popup>
 	</h1>
     
 <%
@@ -85,26 +85,24 @@
         <%-- <p><strong>Optionally</strong>, you can choose a new password and enter it into the box below, and confirm it by typing it
         again into the second box for verification.  It should be at least six characters long.</p> --%>
 		<p class="alert"><fmt:message key="jsp.register.edit-profile.info5"/></p>
-			<div class="form-group">
-                            <%-- <td align="right" class="standard"><label for="tpassword"><strong>New Password:</strong></label></td> --%>
-							<label class="col-md-offset-3 col-md-2 control-label" for="tpassword"><fmt:message key="jsp.register.edit-profile.pswd.field"/></label>
-							<div class="col-md-3">
-                            	<input class="form-control" type="password" name="password" id="tpassword" />
-                            </div>
+        <div class="form-group">
+            <label class="col-md-offset-3 col-md-2 control-label" for="tpassword"><fmt:message key="jsp.register.edit-profile.pswd.field"/></label>
+            <div class="col-md-3">
+                <input class="form-control" type="password" name="password" id="tpassword" />
             </div>
-            <div class="form-group">
-	                           <%-- <td align="right" class="standard"><strong>Again to Confirm:</strong></td> --%>
-							<label class="col-md-offset-3 col-md-2 control-label" for="tpassword_confirm"><fmt:message key="jsp.register.edit-profile.confirm.field"/></label>
-							<div class="col-md-3">
-                            	<input class="form-control" type="password" name="password_confirm" id="tpassword_confirm" /></td>
-                            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-offset-3 col-md-2 control-label" for="tpassword_confirm"><fmt:message key="jsp.register.edit-profile.confirm.field"/></label>
+            <div class="col-md-3">
+                <input class="form-control" type="password" name="password_confirm" id="tpassword_confirm" />
             </div>
+        </div>
 <%
-  }
+    }
 %>
-	<div class="col-md-offset-5">
-       <%-- <p align="center"><input type="submit" name="submit" value="Update Profile"></p> --%>
-	   <input class="btn btn-success col-md-4" type="submit" name="submit" value="<fmt:message key="jsp.register.edit-profile.update.button"/>" />
-	 </div>
+        <div class="col-md-offset-5">
+            <%-- <p align="center"><input type="submit" name="submit" value="Update Profile"></p> --%>
+            <input class="btn btn-success col-md-4" type="submit" name="submit" value="<fmt:message key="jsp.register.edit-profile.update.button"/>" />
+        </div>
     </form>
 </dspace:layout>

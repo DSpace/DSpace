@@ -7,10 +7,8 @@
  */
 package org.dspace.content;
 
-import java.io.IOException;
 import java.sql.SQLException;
 
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.eperson.EPerson;
 
 /**
@@ -28,16 +26,6 @@ public interface InProgressSubmission
      * @return the internal identifier
      */
     int getID();
-
-    /**
-     * Deletes submission wrapper, doesn't delete item contents
-     */
-    void deleteWrapper() throws SQLException, IOException, AuthorizeException;
-
-    /**
-     * Update the submission, including the unarchived item.
-     */
-    void update() throws SQLException, AuthorizeException;
 
     /**
      * Get the incomplete item object

@@ -8,6 +8,8 @@
 package org.dspace.app.xmlui.aspect.administrative.mapper;
 
 import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.UUID;
 
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
@@ -19,10 +21,13 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.Text;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.xml.sax.SAXException;
 
@@ -52,7 +57,12 @@ public class MapperMain extends AbstractDSpaceTransformer {
 	private static final Message T_submit_browse = message("xmlui.administrative.mapper.MapperMain.submit_browse");
 	
 	private static final Message T_no_add = message("xmlui.administrative.mapper.MapperMain.no_add");
-	
+
+
+	protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+	protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
 	public void addPageMeta(PageMeta pageMeta) throws WingException  
 	{
 		pageMeta.addMetadata("title").addContent(T_title);
@@ -62,11 +72,10 @@ public class MapperMain extends AbstractDSpaceTransformer {
 	}
 
 	
-	public void addBody(Body body) throws SAXException, WingException, SQLException
-	{
+	public void addBody(Body body) throws SAXException, WingException, SQLException {
 		// Get our parameters and state;
-		int collectionID = parameters.getParameterAsInteger("collectionID",-1);
-		Collection collection = Collection.find(context,collectionID);
+		UUID collectionID = UUID.fromString(parameters.getParameter("collectionID",null));
+		Collection collection = collectionService.find(context,collectionID);
 		
 		int[] counts = getNumberOfMappedAndUnmappedItems(collection);
 		int count_native = counts[0];
@@ -79,7 +88,7 @@ public class MapperMain extends AbstractDSpaceTransformer {
 		Division div = body.addInteractiveDivision("manage-mapper",contextPath + "/admin/mapper", Division.METHOD_GET,"primary administrative mapper");
 		div.setHead(T_head1);
 		
-		div.addPara(T_para1.parameterize(collection.getMetadata("name")));
+		div.addPara(T_para1.parameterize(collection.getName()));
 		
 		div.addPara(T_para2);
 		
@@ -95,7 +104,7 @@ public class MapperMain extends AbstractDSpaceTransformer {
 		Text query = queryItem.addText("query");
 		Button button = queryItem.addButton("submit_author");
 		button.setValue(T_submit_search);
-		if (!AuthorizeManager.authorizeActionBoolean(context, collection, Constants.ADD))
+		if (!authorizeService.authorizeActionBoolean(context, collection, Constants.ADD))
 		{
 			query.setDisabled();
 			button.setDisabled();
@@ -123,35 +132,25 @@ public class MapperMain extends AbstractDSpaceTransformer {
 		int count_import = 0;
 		
 		// get all items from that collection
-        ItemIterator iterator = collection.getItems();
+        Iterator<Item> iterator = itemService.findByCollection(context, collection);
 
-        try
-        {
-            // iterate through the items in this collection, and count how many
-            // are native, and how many are imports, and which collections they
-            // came from
-            while (iterator.hasNext())
-            {
-                Item item = iterator.next();
+		// iterate through the items in this collection, and count how many
+		// are native, and how many are imports, and which collections they
+		// came from
+		while (iterator.hasNext())
+		{
+			Item item = iterator.next();
 
-                if (item.isOwningCollection(collection))
-                {
-                    count_native++;
-                }
-                else
-                {
-                    count_import++;
-                }
-            }
-        }
-        finally
-        {
-            if (iterator != null)
-            {
-                iterator.close();
-            }
-        }
-        
+			if (itemService.isOwningCollection(item, collection))
+			{
+				count_native++;
+			}
+			else
+			{
+				count_import++;
+			}
+		}
+
         int[] counts = new int[2];
         counts[0] = count_native;
         counts[1] = count_import;
