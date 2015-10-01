@@ -2028,7 +2028,7 @@ Para más infomación, visite
 <message key="xmlui.dri2xhtml.structural.link_cc">Creative Commons</message>
 <message key="xmlui.dri2xhtml.structural.link_original_license">Licencia original</message>
 <!-- CIC-Digital -->
-<message key="xmlui.dri2xhtml.structural.cc-item-view-text">Exceptuando que se explicite de otra forma, esta obra se publica con la licencia Creative Commons </message>
+<message key="xmlui.dri2xhtml.structural.cc-item-view-text">Esta obra se publica con la licencia Creative Commons </message>
 
 <message key="mxlui.dri2xhtml.structural.cc-phone">Telefono</message>
 <message key="mxlui.dri2xhtml.structural.cc-street">Calle</message>

@@ -2208,7 +2208,7 @@
 	<message key="xmlui.dri2xhtml.structural.link_cc">Creative Commons</message>
 	<message key="xmlui.dri2xhtml.structural.link_original_license">Original License</message>
 	<!-- CIC-Digital -->
-	<message key="xmlui.dri2xhtml.structural.cc-item-view-text">Except that explicite otherwise, this work is published under license Creative Commons </message>
+	<message key="xmlui.dri2xhtml.structural.cc-item-view-text">This work is published under license Creative Commons </message>
 	<message key="xmlui.dri2xhtml.structural.cc-by-4.0">Attribution 4.0 International (BY 4.0)</message>
 	<message key="xmlui.dri2xhtml.structural.cc-by-sa-4.0">Attribution-ShareAlike 4.0 International (BY-SA 4.0)</message>
 	<message key="xmlui.dri2xhtml.structural.cc-by-nd-4.0">Attribution-NoDerivatives  4.0 International (BY-ND 4.0)</message>
