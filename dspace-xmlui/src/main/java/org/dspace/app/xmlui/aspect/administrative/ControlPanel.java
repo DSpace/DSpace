@@ -10,11 +10,8 @@ package org.dspace.app.xmlui.aspect.administrative;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
+
 import org.apache.avalon.framework.activity.Disposable;
 import org.apache.avalon.framework.service.ServiceException;
 import org.apache.avalon.framework.service.ServiceManager;
@@ -40,12 +37,20 @@ import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.app.xmlui.wing.element.TextArea;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.Collection;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.harvest.HarvestedCollection;
-import org.dspace.harvest.OAIHarvester.HarvestScheduler;
-import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.harvest.HarvestScheduler;
+import org.dspace.harvest.factory.HarvestServiceFactory;
+import org.dspace.harvest.service.HarvestSchedulingService;
+import org.dspace.harvest.service.HarvestedCollectionService;
+import org.dspace.storage.rdbms.DatabaseConfigVO;
 import org.xml.sax.SAXException;
 
 /**
@@ -98,8 +103,6 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
     private static final Message T_DB_URL 			= message("xmlui.administrative.ControlPanel.db_url");
     private static final Message T_DB_DRIVER 			= message("xmlui.administrative.ControlPanel.db_driver");
     private static final Message T_DB_MAX_CONN 			= message("xmlui.administrative.ControlPanel.db_maxconnections");
-    private static final Message T_DB_MAX_WAIT 			= message("xmlui.administrative.ControlPanel.db_maxwait");
-    private static final Message T_DB_MAX_IDLE 			= message("xmlui.administrative.ControlPanel.db_maxidle");
     private static final Message T_MAIL_SERVER 			= message("xmlui.administrative.ControlPanel.mail_server");
     private static final Message T_MAIL_FROM_ADDRESS            = message("xmlui.administrative.ControlPanel.mail_from_address");
     private static final Message T_FEEDBACK_RECIPIENT           = message("xmlui.administrative.ControlPanel.mail_feedback_recipient");
@@ -155,9 +158,14 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
     private static final Message T_harvest_label_oai_source 		= message("xmlui.administrative.ControlPanel.harvest_label_oai_source");
     private static final Message T_harvest_head_harvester_settings 	= message("xmlui.administrative.ControlPanel.harvest_head_harvester_settings");
 
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    protected HarvestedCollectionService harvestedCollectionService = HarvestServiceFactory.getInstance().getHarvestedCollectionService();
+    protected HarvestSchedulingService harvestSchedulingService = HarvestServiceFactory.getInstance().getHarvestSchedulingService();
+
 
     /** 
-     * The service manager allows us to access the continuation's 
+     * The service manager allows us to access the continuation's
      * manager.  It is obtained from the Serviceable API
      */
     private ServiceManager serviceManager;
@@ -228,7 +236,7 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
                     UIException, SQLException, IOException, AuthorizeException 
     {
 
-        if (!AuthorizeManager.isAdmin(context))
+        if (!authorizeService.isAdmin(context))
         {
             throw new AuthorizeException("You are not authorized to view this page.");
         }
@@ -487,8 +495,7 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
     /**
      * List important DSpace configuration parameters.
      */
-    private void addDSpaceConfiguration(Division div) throws WingException 
-    {
+    private void addDSpaceConfiguration(Division div) throws WingException, SQLException {
 
         // LIST: DSpace
         List dspace = div.addList("dspace");
@@ -510,22 +517,17 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
         dspace.addItem(notempty(ConfigurationManager.getProperty("dspace.name")));
 
         dspace.addLabel(T_DB_NAME);
-        dspace.addItem(notempty(DatabaseManager.getDbName()));
+        dspace.addItem(notempty(context.getDbType()));
 
+        DatabaseConfigVO dbConfig = context.getDBConfig();
         dspace.addLabel(T_DB_URL);
-        dspace.addItem(notempty(ConfigurationManager.getProperty("db.url")));
+        dspace.addItem(notempty(dbConfig.getDatabaseUrl()));
 
         dspace.addLabel(T_DB_DRIVER);
-        dspace.addItem(notempty(ConfigurationManager.getProperty("db.driver")));
+        dspace.addItem(notempty(dbConfig.getDatabaseDriver()));
 
         dspace.addLabel(T_DB_MAX_CONN);
-        dspace.addItem(notempty(ConfigurationManager.getProperty("db.maxconnections")));
-
-        dspace.addLabel(T_DB_MAX_WAIT);
-        dspace.addItem(notempty(ConfigurationManager.getProperty("db.maxwait")));
-
-        dspace.addLabel(T_DB_MAX_IDLE);
-        dspace.addItem(notempty(ConfigurationManager.getProperty("db.maxidle")));
+        dspace.addItem(notempty(String.valueOf(dbConfig.getMaxConnections())));
 
        	dspace.addLabel(T_MAIL_SERVER);
         dspace.addItem(notempty(ConfigurationManager.getProperty("mail.server")));
@@ -775,8 +777,8 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
             Row eventRow = activeUsers.addRow();
 
             eventRow.addCellContent(timeStampMessage);
-            int eid = event.getEPersonID();
-            EPerson eperson = EPerson.find(context, eid);
+            UUID eid = event.getEPersonID();
+            EPerson eperson = ePersonService.find(context, eid);
             if (eperson != null)
             {
                 String name = eperson.getFullName();
@@ -875,11 +877,11 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
                 // ordered to the top. Otherwise fall back to comparing session
                 // IDs. Unfortunately, we cannot compare eperson names because 
                 // we do not have access to a context object.
-                if (a.getEPersonID() > 0  && b.getEPersonID() < 0)
+                if (a.getEPersonID() != null  && b.getEPersonID() == null)
                 {
                     return 1; // A > B
                 }
-                else if (a.getEPersonID() < 0  && b.getEPersonID() > 0)
+                else if (a.getEPersonID() == null  && b.getEPersonID() != null)
                 {
                     return -1; // B > A
                 }
@@ -948,33 +950,33 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 
         harvesterControls.addLabel(T_harvest_label_collections);
         Item allCollectionsItem = harvesterControls.addItem();
-        java.util.List<Integer> allCollections =  HarvestedCollection.findAll(context);
-        for (Integer oaiCollection : allCollections) {
-                allCollectionsItem.addXref(baseURL + oaiCollection, oaiCollection.toString());
+        java.util.List<HarvestedCollection> allCollections =  harvestedCollectionService.findAll(context);
+        for (HarvestedCollection oaiCollection : allCollections) {
+                allCollectionsItem.addXref(baseURL + oaiCollection.getCollection().getID(), oaiCollection.getCollection().getName());
         }
         harvesterControls.addLabel(T_harvest_label_active);
         Item busyCollectionsItem = harvesterControls.addItem();
-        java.util.List<Integer> busyCollections =  HarvestedCollection.findByStatus(context, HarvestedCollection.STATUS_BUSY);
-        for (Integer busyCollection : busyCollections) {
-                busyCollectionsItem.addXref(baseURL + busyCollection, busyCollection.toString());
+        java.util.List<HarvestedCollection> busyCollections =  harvestedCollectionService.findByStatus(context, HarvestedCollection.STATUS_BUSY);
+        for (HarvestedCollection busyCollection : busyCollections) {
+                busyCollectionsItem.addXref(baseURL + busyCollection.getCollection().getID(), busyCollection.getCollection().getName());
         }
         harvesterControls.addLabel(T_harvest_label_queued);
         Item queuedCollectionsItem = harvesterControls.addItem();
-        java.util.List<Integer> queuedCollections =  HarvestedCollection.findByStatus(context, HarvestedCollection.STATUS_QUEUED);
-        for (Integer queuedCollection : queuedCollections) {
-                queuedCollectionsItem.addXref(baseURL + queuedCollection, queuedCollection.toString());
+        java.util.List<HarvestedCollection> queuedCollections =  harvestedCollectionService.findByStatus(context, HarvestedCollection.STATUS_QUEUED);
+        for (HarvestedCollection queuedCollection : queuedCollections) {
+                queuedCollectionsItem.addXref(baseURL + queuedCollection.getCollection().getID(), queuedCollection.getCollection().getName());
         }
         harvesterControls.addLabel(T_harvest_label_oai_errors);
         Item oaiErrorsItem = harvesterControls.addItem();
-        java.util.List<Integer> oaiErrors =  HarvestedCollection.findByStatus(context, HarvestedCollection.STATUS_OAI_ERROR);
-        for (Integer oaiError : oaiErrors) {
-                oaiErrorsItem.addXref(baseURL + oaiError, oaiError.toString());
+        java.util.List<HarvestedCollection> oaiErrors =  harvestedCollectionService.findByStatus(context, HarvestedCollection.STATUS_OAI_ERROR);
+        for (HarvestedCollection oaiError : oaiErrors) {
+                oaiErrorsItem.addXref(baseURL + oaiError, oaiError.getCollection().getName());
         }
         harvesterControls.addLabel(T_harvest_label_internal_errors);
         Item internalErrorsItem = harvesterControls.addItem();
-        java.util.List<Integer> internalErrors =  HarvestedCollection.findByStatus(context, HarvestedCollection.STATUS_UNKNOWN_ERROR);
-        for (Integer internalError : internalErrors) {
-                internalErrorsItem.addXref(baseURL + internalError, internalError.toString());
+        java.util.List<HarvestedCollection> internalErrors =  harvestedCollectionService.findByStatus(context, HarvestedCollection.STATUS_UNKNOWN_ERROR);
+        for (HarvestedCollection internalError : internalErrors) {
+                internalErrorsItem.addXref(baseURL + internalError.getCollection().getID().toString(), internalError.getCollection().getName());
         }
 		
         // OAI Generator settings

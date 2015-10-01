@@ -16,6 +16,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.core.Context;
+import org.dspace.workflow.WorkflowException;
 
 
 /**
@@ -72,8 +73,8 @@ public interface PackageIngester
      */
     DSpaceObject ingest(Context context, DSpaceObject parent, File pkgFile,
                          PackageParameters params, String license)
-        throws PackageException, CrosswalkException,
-               AuthorizeException, SQLException, IOException;
+            throws PackageException, CrosswalkException,
+            AuthorizeException, SQLException, IOException, WorkflowException;
 
 
     /**
@@ -114,9 +115,9 @@ public interface PackageIngester
      */
     List<String> ingestAll(Context context, DSpaceObject parent, File pkgFile,
                                 PackageParameters params, String license)
-        throws PackageException, UnsupportedOperationException,
-               CrosswalkException, AuthorizeException,
-               SQLException, IOException;
+            throws PackageException, UnsupportedOperationException,
+            CrosswalkException, AuthorizeException,
+            SQLException, IOException, WorkflowException;
 
     /**
      * Replace an existing DSpace Object with contents of the ingested package.
@@ -141,9 +142,9 @@ public interface PackageIngester
      */
     DSpaceObject replace(Context context, DSpaceObject dso,
                             File pkgFile, PackageParameters params)
-        throws PackageException, UnsupportedOperationException,
-               CrosswalkException, AuthorizeException,
-               SQLException, IOException;
+            throws PackageException, UnsupportedOperationException,
+            CrosswalkException, AuthorizeException,
+            SQLException, IOException, WorkflowException;
 
     /**
      * Recursively replace one or more DSpace Objects out of the contents
@@ -181,9 +182,9 @@ public interface PackageIngester
      */
     List<String> replaceAll(Context context, DSpaceObject dso,
                                 File pkgFile, PackageParameters params)
-        throws PackageException, UnsupportedOperationException,
-               CrosswalkException, AuthorizeException,
-               SQLException, IOException;
+            throws PackageException, UnsupportedOperationException,
+            CrosswalkException, AuthorizeException,
+            SQLException, IOException, WorkflowException;
 
 
     /**

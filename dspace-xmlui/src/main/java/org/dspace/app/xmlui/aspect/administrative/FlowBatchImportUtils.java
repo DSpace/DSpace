@@ -13,17 +13,23 @@ import org.apache.cocoon.servlet.multipart.PartOnDisk;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.app.itemimport.ItemImport;
+import org.dspace.app.itemimport.ItemImportServiceImpl;
+import org.dspace.app.itemimport.factory.ItemImportServiceFactory;
+import org.dspace.app.itemimport.service.ItemImportService;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandleServiceImpl;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Utility methods to processes BatchImport actions. These methods are used
@@ -47,6 +53,9 @@ public class FlowBatchImportUtils {
     // Other variables
     private static Logger log = Logger.getLogger(FlowBatchImportUtils.class);
 
+    protected static final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+    protected static final ItemImportService itemImportService = ItemImportServiceFactory.getInstance().getItemImportService();
+
     public static FlowResult processBatchImport(Context context, Request request) throws SQLException, AuthorizeException, IOException, Exception {
 
         FlowResult result = new FlowResult();
@@ -55,8 +64,6 @@ public class FlowBatchImportUtils {
         String zipFile = (String) request.getSession().getAttribute("zip");
 
         if (zipFile != null) {
-            // Commit the changes
-            context.commit();
             request.getSession().removeAttribute("zipFile");
 
             log.debug(LogManager.getHeader(context, "batchimport", " items changed"));
@@ -105,8 +112,6 @@ public class FlowBatchImportUtils {
                 }
 
                 // Process CSV without import
-                ItemImport itemImport = new ItemImport();
-
                 String collectionHandle = String.valueOf(request.get("collectionHandle"));
                 if (StringUtils.isEmpty(collectionHandle) || !collectionHandle.contains("/")) {
                     //fail
@@ -117,11 +122,11 @@ public class FlowBatchImportUtils {
                     return result;
                 }
 
-                Collection[] collections = new Collection[1];
+                List<Collection> collections = new ArrayList<>();
 
                 try {
-                    Collection collection = (Collection) HandleManager.resolveToObject(context, collectionHandle);
-                    collections[0] = collection;
+                    Collection collection = (Collection) handleService.resolveToObject(context, collectionHandle);
+                    collections.add(collection);
                 } catch (SQLException e) {
                     log.error("UIBatchImport failed due to collection not existing.", e);
                     result.setContinue(false);
@@ -132,7 +137,7 @@ public class FlowBatchImportUtils {
 
                 File mapFile = null;
                 try {
-                    mapFile = File.createTempFile(file.getName(), ".map", ItemImport.getTempWorkDirFile());
+                    mapFile = File.createTempFile(file.getName(), ".map", itemImportService.getTempWorkDirFile());
                 } catch (IOException e) {
                     log.error("BatchImportUI Unable to create mapfile", e);
                     result.setContinue(false);
@@ -142,7 +147,7 @@ public class FlowBatchImportUtils {
                 }
 
 
-                log.info("Attempt UIBatchImport to collection: " + collections[0].getName()
+                log.info("Attempt UIBatchImport to collection: " + collections.get(0).getName()
                         + ", zip: " + file.getName()
                         + ", map: " + mapFile.getAbsolutePath());
 
@@ -170,7 +175,7 @@ public class FlowBatchImportUtils {
 
                 String sourceBatchDir = null;
                 try {
-                    sourceBatchDir = ItemImport.unzip(file);
+                    sourceBatchDir = itemImportService.unzip(file);
                 } catch (IOException e) {
                     log.error("BatchImportUI Unable to unzip", e);
                     result.setContinue(false);
@@ -181,7 +186,7 @@ public class FlowBatchImportUtils {
 
                 //TODO, Should we run this in TEST mode first, to ensure we get a clean pass?
                 try {
-                    itemImport.addItemsAtomic(context, collections, sourceBatchDir, mapFile.getAbsolutePath(), true);
+                    itemImportService.addItemsAtomic(context, collections, sourceBatchDir, mapFile.getAbsolutePath(), true);
                 } catch (Exception e) {
                     log.error("BatchImportUI - Failure during import: " + e.getMessage());
                     result.setContinue(false);
@@ -207,7 +212,7 @@ public class FlowBatchImportUtils {
                     log.error("BatchImportUI - Unable to print the mapfile to response", e);
                 }
 
-                log.info("Success! UIBatchImport to collection: " + collections[0].getName()
+                log.info("Success! UIBatchImport to collection: " + collections.get(0).getName()
                         + ", zip: " + file.getName()
                         + ", map: " + mapFile.getAbsolutePath());
             } else {
@@ -219,7 +224,7 @@ public class FlowBatchImportUtils {
 
             return result;
         }finally {
-            ItemImport.cleanupZipTemp();
+            itemImportService.cleanupZipTemp();
         }
     }
 }

@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -22,12 +23,16 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 
@@ -63,6 +68,12 @@ public class HTMLServlet extends DSpaceServlet
      */
     private int maxDepthGuess;
 
+    private ItemService itemService;
+    
+    private HandleService handleService;
+    
+    private BitstreamService bitstreamService;
+    
     /**
      * Create an HTML Servlet
      */
@@ -79,6 +90,10 @@ public class HTMLServlet extends DSpaceServlet
         {
             maxDepthGuess = 3;
         }
+        
+        itemService = ContentServiceFactory.getInstance().getItemService();
+        handleService = HandleServiceFactory.getInstance().getHandleService();
+        bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     }
     
     // Return bitstream whose name matches the target bitstream-name
@@ -87,17 +102,17 @@ public class HTMLServlet extends DSpaceServlet
     private static Bitstream getItemBitstreamByName(Item item, String bsName)
     						throws SQLException
     {
-        Bundle[] bundles = item.getBundles();
+        List<Bundle> bundles = item.getBundles();
 
-        for (int i = 0; i < bundles.length; i++)
+        for (Bundle bundle : bundles)
         {
-            Bitstream[] bitstreams = bundles[i].getBitstreams();
+            List<Bitstream> bitstreams = bundle.getBitstreams();
 
-            for (int k = 0; k < bitstreams.length; k++)
+            for (Bitstream bb : bitstreams)
             {
-                if (bsName.equals(bitstreams[k].getName()))
+                if (bsName.equals(bb.getName()))
                 {
-                    return bitstreams[k];
+                    return bb;
                 }
             }
         }
@@ -176,12 +191,11 @@ public class HTMLServlet extends DSpaceServlet
                 {
                     String dbIDString = handle
                             .substring(handle.indexOf('/') + 1);
-                    int dbID = Integer.parseInt(dbIDString);
-                    item = Item.find(context, dbID);
+                    item = itemService.findByIdOrLegacyId(context, dbIDString);
                 }
                 else
                 {
-                    item = (Item) HandleManager
+                    item = (Item) handleService
                             .resolveToObject(context, handle);
                 }
             }
@@ -221,14 +235,14 @@ public class HTMLServlet extends DSpaceServlet
 			//		Constants.BITSTREAM, bitstream.getID());
 
             // Set the response MIME type
-            response.setContentType(bitstream.getFormat().getMIMEType());
+            response.setContentType(bitstream.getFormat(context).getMIMEType());
 
             // Response length
             response.setHeader("Content-Length", String.valueOf(bitstream
                     .getSize()));
 
             // Pipe the bits
-            InputStream is = bitstream.retrieve();
+            InputStream is = bitstreamService.retrieve(context, bitstream);
 
             Utils.bufferedCopy(is, response.getOutputStream());
             is.close();

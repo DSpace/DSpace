@@ -30,10 +30,11 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.content.Collection" %>
+<%@ page import="java.util.List" %>
 
 <%
-    Collection [] collections =
-        (Collection[]) request.getAttribute("collections");
+    List<Collection> collections =
+        (List<Collection>) request.getAttribute("collections");
        
     request.setAttribute("LanguageSwitch", "hide");
 %>
@@ -50,9 +51,9 @@
     <form method="post" action="">
 				<div class="row col-md-4 col-md-offset-4">
                     <select class="form-control" size="12" name="collection_id">
-                        <%  for (int i = 0; i < collections.length; i++) { %>
-                            <option value="<%= collections[i].getID()%>">
-                                <%= collections[i].getMetadata("name")%>
+                        <%  for (int i = 0; i < collections.size(); i++) { %>
+                            <option value="<%= collections.get(i).getID()%>">
+                                <%= collections.get(i).getName()%>
                             </option>
                         <%  } %>
                     </select>

@@ -40,33 +40,33 @@
 
     <p><fmt:message key="jsp.register.new-ldap-user.info2"/></p>
     
-    <form action="<%= request.getContextPath() %>/register" method="post" action="">
+    <form action="<%= request.getContextPath() %>/register" method="post">
 
         <input type="hidden" name="step" value="<%= RegisterServlet.ENTER_EMAIL_PAGE %>">
-	<table class="miscTable" align="center">
-            <tr>
-                <td class="oddRowEvenCol">
-                    <table border="0" cellpadding="5">
-                    	<tr>
-                            <td class="standard"><strong><fmt:message key="jsp.register.new-ldap-user.label.username"/></strong></td>
-                            <td class="standard"><input type="text" name="netid"></td>
-                        </tr>
-                        <tr>
-                            <td class="standard"><strong><fmt:message key="jsp.register.new-ldap-user.label.password"/></strong></td>
-                            <td class="standard"><input type="password" name="password"></td>
-                        </tr>
-                        <tr>
-                            <td class="standard"><strong><fmt:message key="jsp.register.new-ldap-user.label.email"/></strong></td>
-                            <td class="standard"><input type="text" name="email"></td>
-                        </tr>
-                        <tr>
-                            <td align="center" colspan="2">
-                                <input type="submit" name="submit" value="<fmt:message key="jsp.register.new-ldap-user.button.register"/>"/>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
+        	<table class="miscTable" align="center">
+                <tr>
+                    <td class="oddRowEvenCol">
+                        <table border="0" cellpadding="5">
+                            <tr>
+                                <td class="standard"><strong><fmt:message key="jsp.register.new-ldap-user.label.username"/></strong></td>
+                                <td class="standard"><input type="text" name="netid"></td>
+                            </tr>
+                            <tr>
+                                <td class="standard"><strong><fmt:message key="jsp.register.new-ldap-user.label.password"/></strong></td>
+                                <td class="standard"><input type="password" name="password"></td>
+                            </tr>
+                            <tr>
+                                <td class="standard"><strong><fmt:message key="jsp.register.new-ldap-user.label.email"/></strong></td>
+                                <td class="standard"><input type="text" name="email"></td>
+                            </tr>
+                            <tr>
+                                <td align="center" colspan="2">
+                                    <input type="submit" name="submit" value="<fmt:message key="jsp.register.new-ldap-user.button.register"/>"/>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
         </table>
     </form>
     

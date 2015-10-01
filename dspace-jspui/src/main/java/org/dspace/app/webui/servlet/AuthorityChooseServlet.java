@@ -15,15 +15,22 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Properties;
 import java.sql.SQLException;
+import java.util.UUID;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.dspace.content.Collection;
 import org.xml.sax.SAXException;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.ChoicesXMLGenerator;
+import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
+import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.content.authority.service.MetadataAuthorityService;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
 
 import org.apache.xml.serializer.SerializerFactory;
@@ -38,7 +45,16 @@ import org.apache.xml.serializer.Method;
  * @author bollini
  */
 public class AuthorityChooseServlet extends DSpaceServlet {
-
+	private ChoiceAuthorityService choiceAuthorityService;
+	
+	private CollectionService collectionService;
+	
+	@Override
+	public void init() throws ServletException {
+		super.init();
+		choiceAuthorityService = ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
+		collectionService = ContentServiceFactory.getInstance().getCollectionService();
+	}
     @Override
     protected void doDSGet(Context context, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException, AuthorizeException {
         process(context, request, response);
@@ -64,15 +80,15 @@ public class AuthorityChooseServlet extends DSpaceServlet {
     private void process(Context context, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException, AuthorizeException {
         String[] paths = request.getPathInfo().split("/");
         String field = paths[paths.length-1];
-        ChoiceAuthorityManager cam = ChoiceAuthorityManager.getManager();
 
         String query = request.getParameter("query");
         String format = request.getParameter("format");
-        int collection = UIUtil.getIntParameter(request, "collection");
+        UUID collectionID = UIUtil.getUUIDParameter(request, "collection");
         int start = UIUtil.getIntParameter(request, "start");
         int limit = UIUtil.getIntParameter(request, "limit");
-
-        Choices result = cam.getMatches(field, query, collection, start, limit, null);
+        Collection collection = collectionService.find(context, collectionID);
+        
+        Choices result = choiceAuthorityService.getMatches(field, query, collection, start, limit, null);
 //        Choice[] testValues = {
 //            new Choice("rp0001", "VALUE1","TEST LABEL1"),
 //            new Choice("rp0002", "VALUE2","TEST LABEL2"),

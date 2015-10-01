@@ -9,17 +9,16 @@ package org.dspace.app.xmlui.utils;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
-import org.dspace.browse.BrowseItem;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.Metadatum;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
+import org.dspace.content.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
@@ -63,6 +62,12 @@ public class DSpaceValidity implements SourceValidity
     
     /** The length of time that a cache is assumed to be valid */
     protected long assumedValidityDelay = 0;
+
+
+    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+   	protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
 
     /**
      * Create a new DSpace validity object. 
@@ -222,7 +227,7 @@ public class DSpaceValidity implements SourceValidity
      * @param dso
      *          The object to add to the validity.
      */
-    public void add(DSpaceObject dso) throws SQLException
+    public void add(Context context, DSpaceObject dso) throws SQLException
     {
         if (this.completed)
         {
@@ -239,14 +244,14 @@ public class DSpaceValidity implements SourceValidity
 
             validityKey.append("Community:");
             validityKey.append(community.getHandle());
-            validityKey.append(community.getMetadata("introductory_text"));
-            validityKey.append(community.getMetadata("short_description"));
-            validityKey.append(community.getMetadata("side_bar_text"));
-            validityKey.append(community.getMetadata("copyright_text"));
-            validityKey.append(community.getMetadata("name"));
+            validityKey.append(communityService.getMetadata(community, "introductory_text"));
+            validityKey.append(communityService.getMetadata(community, "short_description"));
+            validityKey.append(communityService.getMetadata(community, "side_bar_text"));
+            validityKey.append(communityService.getMetadata(community, "copyright_text"));
+            validityKey.append(communityService.getMetadata(community, "name"));
             
             // Add the communities logo
-            this.add(community.getLogo());
+            this.add(context, community.getLogo());
 
         } 
         else if (dso instanceof Collection)
@@ -255,16 +260,16 @@ public class DSpaceValidity implements SourceValidity
             
             validityKey.append("Collection:");
             validityKey.append(collection.getHandle());
-            validityKey.append(collection.getMetadata("introductory_text"));
-            validityKey.append(collection.getMetadata("short_description"));
-            validityKey.append(collection.getMetadata("side_bar_text"));
-            validityKey.append(collection.getMetadata("provenance_description"));
-            validityKey.append(collection.getMetadata("copyright_text"));
-            validityKey.append(collection.getMetadata("license"));
-            validityKey.append(collection.getMetadata("name")); 
+            validityKey.append(collectionService.getMetadata(collection, "introductory_text"));
+            validityKey.append(collectionService.getMetadata(collection, "short_description"));
+            validityKey.append(collectionService.getMetadata(collection, "side_bar_text"));
+            validityKey.append(collectionService.getMetadata(collection, "provenance_description"));
+            validityKey.append(collectionService.getMetadata(collection, "copyright_text"));
+            validityKey.append(collectionService.getMetadata(collection, "license"));
+            validityKey.append(collectionService.getMetadata(collection, "name")); 
             
             // Add the logo also;
-            this.add(collection.getLogo());
+            this.add(context, collection.getLogo());
             
         }
         else if (dso instanceof Item)
@@ -276,36 +281,18 @@ public class DSpaceValidity implements SourceValidity
             validityKey.append(item.getOwningCollection());
             validityKey.append(item.getLastModified());
             // Include all metadata values in the validity key.
-            Metadatum[] dcvs = item.getMetadata(Item.ANY, Item.ANY,Item.ANY,Item.ANY);
-            for (Metadatum dcv : dcvs)
+            List<MetadataValue> dcvs = itemService.getMetadata(item, Item.ANY, Item.ANY,Item.ANY,Item.ANY);
+            for (MetadataValue dcv : dcvs)
             {
-                validityKey.append(dcv.schema).append(".");
-                validityKey.append(dcv.element).append(".");
-                validityKey.append(dcv.qualifier).append(".");
-                validityKey.append(dcv.language).append("=");
-                validityKey.append(dcv.value);
+                validityKey.append(dcv.getMetadataField().toString('.'));
+                validityKey.append(dcv.getLanguage()).append("=");
+                validityKey.append(dcv.getValue());
             }
             
             for(Bundle bundle : item.getBundles())
             {
                 // Add each of the items bundles & bitstreams.
-                this.add(bundle);
-            }
-        }
-        else if (dso instanceof BrowseItem)
-        {
-        	BrowseItem browseItem = (BrowseItem) dso;
-        	
-        	validityKey.append("BrowseItem:");
-        	validityKey.append(browseItem.getHandle());
-        	Metadatum[] dcvs = browseItem.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-            for (Metadatum dcv : dcvs)
-            {
-                validityKey.append(dcv.schema).append(".");
-                validityKey.append(dcv.element).append(".");
-                validityKey.append(dcv.qualifier).append(".");
-                validityKey.append(dcv.language).append("=");
-                validityKey.append(dcv.value);
+                this.add(context, bundle);
             }
         }
         else if (dso instanceof Bundle)
@@ -315,11 +302,11 @@ public class DSpaceValidity implements SourceValidity
             validityKey.append("Bundle:");
             validityKey.append(bundle.getID());
             validityKey.append(bundle.getName());
-            validityKey.append(bundle.getPrimaryBitstreamID());
+            validityKey.append(bundle.getPrimaryBitstream() != null ? bundle.getPrimaryBitstream().getID() : "");
             
             for(Bitstream bitstream : bundle.getBitstreams())
             {
-                this.add(bitstream);
+                this.add(context, bitstream);
             }
         }
         else if (dso instanceof Bitstream)
@@ -336,7 +323,7 @@ public class DSpaceValidity implements SourceValidity
             validityKey.append(bitstream.getChecksumAlgorithm());
             validityKey.append(bitstream.getSize());
             validityKey.append(bitstream.getUserFormatDescription());
-            validityKey.append(bitstream.getFormat().getDescription());
+            validityKey.append(bitstream.getFormat(context).getDescription());
         }
         else if (dso instanceof EPerson)
         {

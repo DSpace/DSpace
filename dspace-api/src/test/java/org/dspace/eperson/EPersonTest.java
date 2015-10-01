@@ -9,12 +9,13 @@
 package org.dspace.eperson;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import org.apache.commons.codec.DecoderException;
+import org.apache.log4j.Logger;
 import org.dspace.AbstractUnitTest;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.storage.rdbms.TableRow;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -24,7 +25,9 @@ import static org.junit.Assert.*;
  */
 public class EPersonTest extends AbstractUnitTest
 {
-    private static TableRow row1;
+    protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    private static final Logger log = Logger.getLogger(EPersonTest.class);
+
 
     public EPersonTest()
     {
@@ -43,15 +46,39 @@ public class EPersonTest extends AbstractUnitTest
     {
         super.init();
 
-        // Build a TableRow for an EPerson to wrap
-        final ArrayList<String> epersonColumns = new ArrayList<String>();
-        epersonColumns.add("eperson_id");
-        epersonColumns.add("password");
-        epersonColumns.add("salt");
-        epersonColumns.add("digest_algorithm");
-
-        row1 = new TableRow("EPerson", epersonColumns);   
+        context.turnOffAuthorisationSystem();
+        try {
+            EPerson eperson = ePersonService.create(context);
+            eperson.setEmail("kevin@dspace.org");
+            eperson.setFirstName(context, "Kevin");
+            eperson.setLastName(context, "Van de Velde");
+            eperson.setNetid("1985");
+            eperson.setPassword("test");
+            ePersonService.update(context, eperson);
+        } catch (SQLException | AuthorizeException ex) {
+            log.error("Error in init", ex);
+            fail("Error in init: " + ex.getMessage());
+        } finally {
+            context.restoreAuthSystemState();
+        }
     }
+
+    @Override
+    public void destroy() {
+        context.turnOffAuthorisationSystem();
+        try {
+            EPerson testPerson = ePersonService.findByEmail(context, "kevin@dspace.org");
+            if(testPerson != null)
+            {
+                ePersonService.delete(context, testPerson);
+            }
+        } catch (Exception ex) {
+            log.error("Error in destroy", ex);
+            fail("Error in destroy: " + ex.getMessage());
+        }
+        super.destroy();
+    }
+
 
     /**
      * Test of equals method, of class EPerson.
@@ -663,22 +690,8 @@ public class EPersonTest extends AbstractUnitTest
     public void testCheckPassword()
             throws SQLException, DecoderException
     {
-        final String attempt = "secret";
-        EPerson instance = new EPerson(context, row1);
-
-        // Test old unsalted MD5 hash
-        final String hash = "5ebe2294ecd0e0f08eab7690d2a6ee69"; // MD5("secret");
-        instance.setPasswordHash(new PasswordHash(null, null, hash));
-        boolean result = instance.checkPassword(attempt);
-        assertTrue("check string with matching MD5 hash", result);
-        // It should have converted the password to the new hash
-        assertEquals("should have upgraded algorithm",
-                PasswordHash.getDefaultAlgorithm(),
-                instance.getPasswordHash().getAlgorithm());
-        assertTrue("upgraded hash should still match",
-                instance.checkPassword(attempt));
-
-        // TODO test a salted multiround hash
+        EPerson eperson = ePersonService.findByEmail(context, "kevin@dspace.org");
+        ePersonService.checkPassword(context, eperson, "test");
     }
 
     /**
@@ -705,9 +718,8 @@ public class EPersonTest extends AbstractUnitTest
             throws SQLException
     {
         System.out.println("getType");
-        EPerson instance = new EPerson(context, row1);
         int expResult = Constants.EPERSON;
-        int result = instance.getType();
+        int result = eperson.getType();
         assertEquals("Should return Constants.EPERSON", expResult, result);
     }
 

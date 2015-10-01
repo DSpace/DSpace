@@ -15,12 +15,16 @@
   -    recent.submissions - RecetSubmissions
   --%>
 
+<%@page import="org.dspace.core.factory.CoreServiceFactory"%>
+<%@page import="org.dspace.core.service.NewsService"%>
+<%@page import="org.dspace.content.service.CommunityService"%>
+<%@page import="org.dspace.content.factory.ContentServiceFactory"%>
+<%@page import="org.dspace.content.service.ItemService"%>
 <%@page import="org.dspace.core.Utils"%>
 <%@page import="org.dspace.content.Bitstream"%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="java.io.File" %>
@@ -33,18 +37,17 @@
 <%@ page import="org.dspace.app.webui.components.RecentSubmissions" %>
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
-<%@ page import="org.dspace.core.NewsManager" %>
 <%@ page import="org.dspace.browse.ItemCounter" %>
-<%@ page import="org.dspace.content.Metadatum" %>
 <%@ page import="org.dspace.content.Item" %>
 
 <%
-    Community[] communities = (Community[]) request.getAttribute("communities");
+    List<Community> communities = (List<Community>) request.getAttribute("communities");
 
     Locale sessionLocale = UIUtil.getSessionLocale(request);
     Config.set(request.getSession(), Config.FMT_LOCALE, sessionLocale);
-    String topNews = NewsManager.readNewsFile(LocaleSupport.getLocalizedMessage(pageContext, "news-top.html"));
-    String sideNews = NewsManager.readNewsFile(LocaleSupport.getLocalizedMessage(pageContext, "news-side.html"));
+    NewsService newsService = CoreServiceFactory.getInstance().getNewsService();
+    String topNews = newsService.readNewsFile(LocaleSupport.getLocalizedMessage(pageContext, "news-top.html"));
+    String sideNews = newsService.readNewsFile(LocaleSupport.getLocalizedMessage(pageContext, "news-side.html"));
 
     boolean feedEnabled = ConfigurationManager.getBooleanProperty("webui.feed.enable");
     String feedData = "NONE";
@@ -56,6 +59,8 @@
     ItemCounter ic = new ItemCounter(UIUtil.obtainContext(request));
 
     RecentSubmissions submissions = (RecentSubmissions) request.getAttribute("recent.submissions");
+    ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
 %>
 
 <dspace:layout locbar="nolink" titlekey="jsp.home.title" feedData="<%= feedData %>">
@@ -110,23 +115,21 @@ if (submissions != null && submissions.count() > 0)
 		    boolean first = true;
 		    for (Item item : submissions.getRecentSubmissions())
 		    {
-		        Metadatum[] dcv = item.getMetadata("dc", "title", null, Item.ANY);
-		        String displayTitle = "Untitled";
-		        if (dcv != null & dcv.length > 0)
+		        String displayTitle = itemService.getMetadataFirstValue(item, "dc", "title", null, Item.ANY);
+		        if (displayTitle == null)
 		        {
-		            displayTitle = Utils.addEntities(dcv[0].value);
+		        	displayTitle = "Untitled";
 		        }
-		        dcv = item.getMetadata("dc", "description", "abstract", Item.ANY);
-		        String displayAbstract = "";
-		        if (dcv != null & dcv.length > 0)
+		        String displayAbstract = itemService.getMetadataFirstValue(item, "dc", "description", "abstract", Item.ANY);
+		        if (displayAbstract == null)
 		        {
-		            displayAbstract = Utils.addEntities(dcv[0].value);
+		            displayAbstract = "";
 		        }
 		%>
 		    <div style="padding-bottom: 50px; min-height: 200px;" class="item <%= first?"active":""%>">
-		      <div style="padding-left: 80px; padding-right: 80px; display: inline-block;"><%= StringUtils.abbreviate(displayTitle, 400) %> 
+		      <div style="padding-left: 80px; padding-right: 80px; display: inline-block;"><%= Utils.addEntities(StringUtils.abbreviate(displayTitle, 400)) %> 
 		      	<a href="<%= request.getContextPath() %>/handle/<%=item.getHandle() %>" class="btn btn-success">See</a>
-                        <p><%= StringUtils.abbreviate(displayAbstract, 500) %></p>
+                        <p><%= Utils.addEntities(StringUtils.abbreviate(displayAbstract, 500)) %></p>
 		      </div>
 		    </div>
 		<%
@@ -159,7 +162,7 @@ if (submissions != null && submissions.count() > 0)
 </div>
 <div class="container row">
 <%
-if (communities != null && communities.length != 0)
+if (communities != null && communities.size() != 0)
 {
 %>
 	<div class="col-md-4">		
@@ -168,11 +171,11 @@ if (communities != null && communities.length != 0)
 				<div class="list-group">
 <%
 	boolean showLogos = ConfigurationManager.getBooleanProperty("jspui.home-page.logos", true);
-    for (int i = 0; i < communities.length; i++)
+    for (Community com : communities)
     {
 %><div class="list-group-item row">
 <%  
-		Bitstream logo = communities[i].getLogo();
+		Bitstream logo = com.getLogo();
 		if (showLogos && logo != null) { %>
 	<div class="col-md-3">
         <img alt="Logo" class="img-responsive" src="<%= request.getContextPath() %>/retrieve/<%= logo.getID() %>" /> 
@@ -181,18 +184,18 @@ if (communities != null && communities.length != 0)
 <% } else { %>
 	<div class="col-md-12">
 <% }  %>		
-		<h4 class="list-group-item-heading"><a href="<%= request.getContextPath() %>/handle/<%= communities[i].getHandle() %>"><%= communities[i].getMetadata("name") %></a>
+		<h4 class="list-group-item-heading"><a href="<%= request.getContextPath() %>/handle/<%= com.getHandle() %>"><%= com.getName() %></a>
 <%
         if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
         {
 %>
-		<span class="badge pull-right"><%= ic.getCount(communities[i]) %></span>
+		<span class="badge pull-right"><%= ic.getCount(com) %></span>
 <%
         }
 
 %>
 		</h4>
-		<p><%= communities[i].getMetadata("short_description") %></p>
+		<p><%= communityService.getMetadata(com, "short_description") %></p>
     </div>
 </div>                            
 <%

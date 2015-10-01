@@ -25,6 +25,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.LogManager;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.actions.ActionInterface;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.xml.sax.SAXException;
@@ -75,13 +76,10 @@ public abstract class AbstractXMLUIAction extends AbstractDSpaceTransformer impl
 
         int id = parameters.getParameterAsInteger("workflowID", -1);
         try {
-            workflowItem = XmlWorkflowItem.find(context, id);
+            workflowItem = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService().find(context, id);
         } catch (SQLException e) {
             log.error(LogManager.getHeader(context, "Error while retrieving workflowitem", "workflowitemid: " + id), e);
             throw new ProcessingException("Error while retrieving workflowitem", e);
-        }  catch (AuthorizeException e) {
-            log.error(LogManager.getHeader(context, "You are not authorized for this action", "workflowitemid: " + id), e);
-            throw new ProcessingException("You are not authorized for this action", e);
         }
     }
 
@@ -94,7 +92,7 @@ public abstract class AbstractXMLUIAction extends AbstractDSpaceTransformer impl
         Collection collection = workflowItem.getCollection();
 
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
-        HandleUtil.buildHandleTrail(collection,pageMeta,contextPath, true);
+        HandleUtil.buildHandleTrail(context, collection,pageMeta,contextPath, true);
         pageMeta.addTrail().addContent(T_workflow_trail);
 
     }

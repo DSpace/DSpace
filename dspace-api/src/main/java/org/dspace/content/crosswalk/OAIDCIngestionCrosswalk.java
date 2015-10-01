@@ -14,6 +14,9 @@ import java.util.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataSchema;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.jdom.Element;
@@ -30,17 +33,18 @@ import org.jdom.Namespace;
 public class OAIDCIngestionCrosswalk
     implements IngestionCrosswalk
 {
-    private static final Namespace DC_NS = Namespace.getNamespace("http://www.dspace.org/xmlns/dspace/dim");
-    private static final Namespace OAI_DC_NS = Namespace.getNamespace("http://www.openarchives.org/OAI/2.0/oai_dc/");
-    
-	public void ingest(Context context, DSpaceObject dso, List<Element> metadata) throws CrosswalkException, IOException, SQLException, AuthorizeException {
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
+	@Override
+	public void ingest(Context context, DSpaceObject dso, List<Element> metadata, boolean createMissingMetadataFields) throws CrosswalkException, IOException, SQLException, AuthorizeException {
         Element wrapper = new Element("wrap", metadata.get(0).getNamespace());
 		wrapper.addContent(metadata);
 		
-		ingest(context,dso,wrapper);
+		ingest(context,dso,wrapper, createMissingMetadataFields);
 	}
 
-	public void ingest(Context context, DSpaceObject dso, Element root) throws CrosswalkException, IOException, SQLException, AuthorizeException {
+	@Override
+	public void ingest(Context context, DSpaceObject dso, Element root, boolean createMissingMetadataFields) throws CrosswalkException, IOException, SQLException, AuthorizeException {
 		
 		if (dso.getType() != Constants.ITEM)
         {
@@ -55,12 +59,13 @@ public class OAIDCIngestionCrosswalk
         
         List<Element> metadata = root.getChildren();
         for (Element element : metadata) {
-		// get language - prefer xml:lang, accept lang.
-		String lang = element.getAttributeValue("lang", Namespace.XML_NAMESPACE);
-		if (lang == null) {
-			lang = element.getAttributeValue("lang");
-		}
-		item.addMetadata("dc", element.getName(), null, lang, element.getText());
+			// get language - prefer xml:lang, accept lang.
+			String lang = element.getAttributeValue("lang", Namespace.XML_NAMESPACE);
+			if (lang == null) {
+				lang = element.getAttributeValue("lang");
+			}
+			CrosswalkUtils.checkMetadata(context, MetadataSchema.DC_SCHEMA, element.getName(), null, createMissingMetadataFields);
+			itemService.addMetadata(context, item, "dc", element.getName(), null, lang, element.getText());
         }
         
 	}

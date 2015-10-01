@@ -9,8 +9,12 @@ package org.dspace.content;
 
 import java.io.FileInputStream;
 import java.io.File;
+
 import org.dspace.AbstractUnitTest;
 import org.apache.log4j.Logger;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.BitstreamService;
 import org.junit.*;
 import static org.junit.Assert.* ;
 import static org.hamcrest.CoreMatchers.*;
@@ -24,6 +28,9 @@ public class FormatIdentifierTest extends AbstractUnitTest
 
     /** log4j category */
     private static final Logger log = Logger.getLogger(FormatIdentifierTest.class);
+
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
 
     /**
      * This method will be run before every test as per @Before. It will
@@ -62,29 +69,26 @@ public class FormatIdentifierTest extends AbstractUnitTest
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream bs = null; 
         BitstreamFormat result = null;
-        BitstreamFormat pdf = BitstreamFormat.findByShortDescription(context, "Adobe PDF");
+        BitstreamFormat pdf = bitstreamFormatService.findByShortDescription(context, "Adobe PDF");
         
         //test null filename
         //TODO: the check if filename is null is wrong, as it checks after using a toLowerCase
         //which can trigger the NPE
-        bs = Bitstream.create(context, new FileInputStream(f));
-        context.commit();
-        bs.setName(null);
-        result = FormatIdentifier.guessFormat(context, bs);
+        bs = bitstreamService.create(context, new FileInputStream(f));
+        bs.setName(context, null);
+        result = bitstreamFormatService.guessFormat(context, bs);
         assertThat("testGuessFormat 0",result, nullValue());
 
         //test unknown format
-        bs = Bitstream.create(context, new FileInputStream(f));
-        bs.setName("file_without_extension.");
-        context.commit();
-        result = FormatIdentifier.guessFormat(context, bs);
+        bs = bitstreamService.create(context, new FileInputStream(f));
+        bs.setName(context, "file_without_extension.");
+        result = bitstreamFormatService.guessFormat(context, bs);
         assertThat("testGuessFormat 1",result, nullValue());
 
         //test known format
-        bs = Bitstream.create(context, new FileInputStream(f));
-        bs.setName(testProps.get("test.bitstream").toString());
-        context.commit();
-        result = FormatIdentifier.guessFormat(context, bs);
+        bs = bitstreamService.create(context, new FileInputStream(f));
+        bs.setName(context, testProps.get("test.bitstream").toString());
+        result = bitstreamFormatService.guessFormat(context, bs);
         assertThat("testGuessFormat 2",result.getID(), equalTo(pdf.getID()));
         assertThat("testGuessFormat 3",result.getMIMEType(), equalTo(pdf.getMIMEType()));
         assertThat("testGuessFormat 4",result.getExtensions(), equalTo(pdf.getExtensions()));

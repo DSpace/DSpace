@@ -24,6 +24,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.browse.*;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
@@ -49,7 +50,7 @@ public class CollectionRecentSubmissions extends AbstractDSpaceTransformer imple
     private static final int RECENT_SUBMISSIONS = 5;
 
     /** The cache of recently submitted items */
-    private java.util.List<BrowseItem> recentSubmissionItems;
+    private java.util.List<Item> recentSubmissionItems;
 
     private static final Message T_head_recent_submissions =
         message("xmlui.ArtifactBrowser.CollectionViewer.head_recent_submissions");
@@ -113,12 +114,12 @@ public class CollectionRecentSubmissions extends AbstractDSpaceTransformer imple
 	            DSpaceValidity validity = new DSpaceValidity();
 
 	            // Add the actual collection;
-	            validity.add(collection);
+	            validity.add(context, collection);
 
 	            // add recently submitted items
-	            for(BrowseItem item : getRecentlySubmittedItems(collection))
+	            for(Item item : getRecentlySubmittedItems(collection))
 	            {
-	                validity.add(item);
+	                validity.add(context, item);
 	            }
 
 	            this.validity = validity.complete();
@@ -143,7 +144,7 @@ public class CollectionRecentSubmissions extends AbstractDSpaceTransformer imple
         Collection collection = (Collection) dso;
 
 
-        java.util.List<BrowseItem> items = getRecentlySubmittedItems(collection);
+        java.util.List<Item> items = getRecentlySubmittedItems(collection);
         if(items.size() == 0)
         {
             return;
@@ -157,7 +158,7 @@ public class CollectionRecentSubmissions extends AbstractDSpaceTransformer imple
         ReferenceSet lastSubmitted = lastSubmittedDiv.addReferenceSet(
                 "collection-last-submitted", ReferenceSet.TYPE_SUMMARY_LIST,
                 null, "recent-submissions");
-        for (BrowseItem item : items)
+        for (Item item : items)
         {
             lastSubmitted.addReference(item);
         }
@@ -169,7 +170,7 @@ public class CollectionRecentSubmissions extends AbstractDSpaceTransformer imple
      * @param collection The collection.
      */
     @SuppressWarnings("unchecked") // The cast from getLastSubmitted is correct, it dose infact return a list of Items.
-    private java.util.List<BrowseItem> getRecentlySubmittedItems(Collection collection)
+    private java.util.List<Item> getRecentlySubmittedItems(Collection collection)
         throws SQLException
     {
         if (recentSubmissionItems != null)
@@ -181,7 +182,7 @@ public class CollectionRecentSubmissions extends AbstractDSpaceTransformer imple
         int numRecentSubmissions = ConfigurationManager.getIntProperty("recent.submissions.count", RECENT_SUBMISSIONS);
         if(numRecentSubmissions == 0)
         {
-            return new ArrayList<BrowseItem>();
+            return new ArrayList<Item>();
         }
         BrowserScope scope = new BrowserScope(context);
         scope.setCollection(collection);

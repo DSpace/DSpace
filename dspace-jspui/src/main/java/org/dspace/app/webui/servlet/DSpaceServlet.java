@@ -20,6 +20,8 @@ import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 
@@ -61,6 +63,14 @@ public class DSpaceServlet extends HttpServlet
     /** log4j category */
     private static Logger log = Logger.getLogger(DSpaceServlet.class);
 
+    protected AuthorizeService authorizeService;
+
+    @Override
+    public void init() throws ServletException {
+    	super.init();
+        authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    }
+    
     protected void doGet(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException
     {
@@ -129,6 +139,7 @@ public class DSpaceServlet extends HttpServlet
             // Also email an alert
             UIUtil.sendAlert(request, se);
 
+            context.abort();
             JSPManager.showInternalError(request, response);
         }
         catch (AuthorizeException ae)
@@ -156,7 +167,13 @@ public class DSpaceServlet extends HttpServlet
             // Abort the context if it's still valid
             if ((context != null) && context.isValid())
             {
-                context.abort();
+                //Always commit at the end
+                try {
+                    context.complete();
+                } catch (SQLException e) {
+                    log.error(e.getMessage(), e);
+                    JSPManager.showInternalError(request, response);
+                }
             }
         }
     }

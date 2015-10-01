@@ -44,7 +44,7 @@ public interface EmbargoSetter
      * @return absolute date on which the embargo is to be lifted, or null if none
      */
     public DCDate parseTerms(Context context, Item item, String terms)
-        throws SQLException, AuthorizeException, IOException;
+        throws SQLException, AuthorizeException;
 
     /**
      * Enforce embargo by (for example) turning off all read access to
@@ -54,7 +54,7 @@ public interface EmbargoSetter
      * @param item the item to embargo
      */
     public void setEmbargo(Context context, Item item)
-        throws SQLException, AuthorizeException, IOException;
+        throws SQLException, AuthorizeException;
 
     /**
      * Check that embargo is properly set on Item.  For example: no read access

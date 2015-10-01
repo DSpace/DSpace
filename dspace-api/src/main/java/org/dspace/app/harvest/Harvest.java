@@ -9,7 +9,9 @@ package org.dspace.app.harvest;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -20,15 +22,21 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.browse.IndexBrowse;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.ItemService;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
+import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.harvest.HarvestedCollection;
 import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
+import org.dspace.harvest.HarvestingException;
 import org.dspace.harvest.OAIHarvester;
-import org.dspace.harvest.OAIHarvester.HarvestingException;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.handle.HandleManager;
+import org.dspace.harvest.factory.HarvestServiceFactory;
+import org.dspace.harvest.service.HarvestedCollectionService;
 
 /**
  *  Test class for harvested collections.
@@ -38,7 +46,11 @@ import org.dspace.handle.HandleManager;
 public class Harvest
 {
     private static Context context;
-	
+
+    private static final HarvestedCollectionService harvestedCollectionService = HarvestServiceFactory.getInstance().getHarvestedCollectionService();
+    private static final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    private static final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+
     public static void main(String[] argv) throws Exception
     {
         // create an options object and populate it
@@ -195,11 +207,11 @@ public class Harvest
                 System.exit(1);
             }
         	
-        	List<Integer> cids = HarvestedCollection.findAll(context);
-        	System.out.println("Purging the following collections (deleting items and resetting harvest status): " + cids.toString());
-	    	for (Integer cid : cids) 
+        	List<HarvestedCollection> harvestedCollections = harvestedCollectionService.findAll(context);
+	    	for (HarvestedCollection harvestedCollection : harvestedCollections)
 	    	{
-	    		harvester.purgeCollection(cid.toString(), eperson);
+                System.out.println("Purging the following collections (deleting items and resetting harvest status): " + harvestedCollection.getCollection().getID().toString());
+                harvester.purgeCollection(harvestedCollection.getCollection().getID().toString(), eperson);
 	    	}
 	    	context.complete();
         }
@@ -272,7 +284,7 @@ public class Harvest
                 if (collectionID.indexOf('/') != -1)
                 {
                     // string has a / so it must be a handle - try and resolve it
-                    dso = HandleManager.resolveToObject(context, collectionID);
+                    dso = HandleServiceFactory.getInstance().getHandleService().resolveToObject(context, collectionID);
 
                     // resolved, now make sure it's a collection
                     if (dso == null || dso.getType() != Constants.COLLECTION)
@@ -289,7 +301,7 @@ public class Harvest
                 else
                 {
                     System.out.println("Looking up by id: " + collectionID + ", parsed as '" + Integer.parseInt(collectionID) + "', " + "in context: " + context);
-                    targetCollection = Collection.find(context, Integer.parseInt(collectionID));
+                    targetCollection = collectionService.find(context, UUID.fromString(collectionID));
                 }
             }
             // was the collection valid?
@@ -314,15 +326,15 @@ public class Harvest
     	System.out.println(collection.getID());
     	    	
     	try {
-    		HarvestedCollection hc = HarvestedCollection.find(context, collection.getID());
+    		HarvestedCollection hc = harvestedCollectionService.find(context, collection);
         	if (hc == null) {
-        		hc = HarvestedCollection.create(context, collection.getID());
+        		hc = harvestedCollectionService.create(context, collection);
         	}
     		
     		context.turnOffAuthorisationSystem();
     		hc.setHarvestParams(type, oaiSource, oaiSetId, mdConfigId);
     		hc.setHarvestStatus(HarvestedCollection.STATUS_READY);
-    		hc.update();
+            harvestedCollectionService.update(context, hc);
     		context.restoreAuthSystemState();
     		context.complete();
     	} 
@@ -352,11 +364,12 @@ public class Harvest
    	
     	try 
     	{
-    		EPerson eperson = EPerson.findByEmail(context, email);
+    		EPerson eperson = ePersonService.findByEmail(context, email);
         	context.setCurrentUser(eperson);
     		context.turnOffAuthorisationSystem();
-    		
-    		ItemIterator it = collection.getAllItems();
+
+            ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+            Iterator<Item> it = itemService.findByCollection(context, collection);
     		IndexBrowse ib = new IndexBrowse(context);
     		int i=0;
     		while (it.hasNext()) {
@@ -364,24 +377,24 @@ public class Harvest
     			Item item = it.next();
     			System.out.println("Deleting: " + item.getHandle());
     			ib.itemRemoved(item);
-    			collection.removeItem(item);
-    			// commit every 50 items
+                collectionService.removeItem(context, collection, item);
+    			// Dispatch events every 50 items
     			if (i%50 == 0) {
-    				context.commit();
+    				context.dispatchEvents();
     				i=0;
     			}
     		}
     		
-    		HarvestedCollection hc = HarvestedCollection.find(context, collection.getID());
+    		HarvestedCollection hc = harvestedCollectionService.find(context, collection);
     		if (hc != null) {
-	    		hc.setHarvestResult(null,"");
+	    		hc.setLastHarvested(null);
+                hc.setHarvestMessage("");
 	    		hc.setHarvestStatus(HarvestedCollection.STATUS_READY);
 	    		hc.setHarvestStartTime(null);
-	    		hc.update();
+                harvestedCollectionService.update(context, hc);
     		}
     		context.restoreAuthSystemState();    		
-    		context.commit();
-    	} 
+    	}
     	catch (Exception e) {
     		System.out.println("Changes could not be committed");
     		e.printStackTrace();
@@ -403,7 +416,7 @@ public class Harvest
     	OAIHarvester harvester = null;
     	try {
     		Collection collection = resolveCollection(collectionID);
-        	HarvestedCollection hc = HarvestedCollection.find(context, collection.getID());
+        	HarvestedCollection hc = harvestedCollectionService.find(context, collection);
     		harvester = new OAIHarvester(context, collection, hc);
     		System.out.println("success. ");
     	}
@@ -419,7 +432,7 @@ public class Harvest
     	    	
     	try {
     		// Harvest will not work for an anonymous user
-        	EPerson eperson = EPerson.findByEmail(context, email);
+        	EPerson eperson = ePersonService.findByEmail(context, email);
         	System.out.println("Harvest started... ");
         	context.setCurrentUser(eperson);
     		harvester.runHarvest();
@@ -446,16 +459,14 @@ public class Harvest
 
     	try
     	{
-            List<Integer> cids = HarvestedCollection.findAll(context);
-            for (Integer cid : cids)
+            List<HarvestedCollection> harvestedCollections = harvestedCollectionService.findAll(context);
+            for (HarvestedCollection harvestedCollection : harvestedCollections)
             {
-                HarvestedCollection hc = HarvestedCollection.find(context, cid);
                 //hc.setHarvestResult(null,"");
-                hc.setHarvestStartTime(null);
-                hc.setHarvestStatus(HarvestedCollection.STATUS_READY);
-                hc.update();
+                harvestedCollection.setHarvestStartTime(null);
+                harvestedCollection.setHarvestStatus(HarvestedCollection.STATUS_READY);
+                harvestedCollectionService.update(context, harvestedCollection);
             }
-            context.commit();
             System.out.println("success. ");
     	}
     	catch (Exception ex) {
@@ -467,12 +478,12 @@ public class Harvest
     /**
      * Starts up the harvest scheduler. Terminating this process will stop the scheduler.
      */
-    private static void startHarvester() 
+    private static void startHarvester()
     {
         try
         {
             System.out.print("Starting harvest loop... ");
-            OAIHarvester.startNewScheduler();
+            HarvestServiceFactory.getInstance().getHarvestSchedulingService().startNewScheduler();
             System.out.println("running. ");
     	}
     	catch (Exception ex) {

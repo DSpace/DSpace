@@ -8,12 +8,17 @@
 package org.dspace.versioning;
 
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
-import org.dspace.utils.DSpace;
+import org.dspace.versioning.factory.VersionServiceFactory;
+import org.dspace.versioning.service.VersionHistoryService;
+import org.dspace.versioning.service.VersioningService;
 
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,10 +33,22 @@ public class VersioningConsumer implements Consumer {
 
     private static Set<Item> itemsToProcess;
 
-    public void initialize() throws Exception {}
+    private VersionHistoryService versionHistoryService;
+    private VersioningService versioningService;
+    private ItemService itemService;
 
+
+    @Override
+    public void initialize() throws Exception {
+        versionHistoryService = VersionServiceFactory.getInstance().getVersionHistoryService();
+        versioningService = VersionServiceFactory.getInstance().getVersionService();
+        itemService = ContentServiceFactory.getInstance().getItemService();
+    }
+
+    @Override
     public void finish(Context ctx) throws Exception {}
 
+    @Override
     public void consume(Context ctx, Event event) throws Exception {
         if(itemsToProcess == null){
             itemsToProcess = new HashSet<Item>();
@@ -45,8 +62,8 @@ public class VersioningConsumer implements Consumer {
             if (item != null && item.isArchived()) {
                 VersionHistory history = retrieveVersionHistory(ctx, item);
                 if (history != null) {
-                    Version latest = history.getLatestVersion();
-                    Version previous = history.getPrevious(latest);
+                    Version latest = versionHistoryService.getLatestVersion(history);
+                    Version previous = versionHistoryService.getPrevious(history, latest);
                     if(previous != null){
                         Item previousItem = previous.getItem();
                         if(previousItem != null){
@@ -57,7 +74,7 @@ public class VersioningConsumer implements Consumer {
                             //and browse index we need to fire a new event
                             ctx.addEvent(new Event(Event.MODIFY, 
                                     previousItem.getType(), previousItem.getID(),
-                                    null, previousItem.getIdentifiers(ctx)));
+                                    null, itemService.getIdentifiers(ctx, previousItem)));
                         }
                     }
                 }
@@ -65,25 +82,24 @@ public class VersioningConsumer implements Consumer {
         }
     }
 
+    @Override
     public void end(Context ctx) throws Exception {
         if(itemsToProcess != null){
             for(Item item : itemsToProcess){
                 ctx.turnOffAuthorisationSystem();
                 try {
-                    item.update();
+                    itemService.update(ctx, item);
                 } finally {
                     ctx.restoreAuthSystemState();
                 }
             }
-            ctx.getDBConnection().commit();
         }
 
         itemsToProcess = null;
     }
 
 
-    private static org.dspace.versioning.VersionHistory retrieveVersionHistory(Context c, Item item) {
-        VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
-        return versioningService.findVersionHistory(c, item.getID());
+    protected org.dspace.versioning.VersionHistory retrieveVersionHistory(Context c, Item item) throws SQLException {
+        return versioningService.findVersionHistory(c, item);
     }
 }

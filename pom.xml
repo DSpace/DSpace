@@ -35,6 +35,12 @@
         <solr.version>4.10.2</solr.version>
         <jena.version>2.12.0</jena.version>
         <slf4j.version>1.6.1</slf4j.version>
+        <!--
+            Hibernate version pinned to 4.2, 4.3 does not work with the spring version we are currently using
+            Upgrading the spring version will make the XMLUI crash
+        -->
+        <hibernate.version>4.2.19.Final</hibernate.version>
+        <spring.version>3.2.14.RELEASE</spring.version>
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
              as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
         <root.basedir>${basedir}</root.basedir>
@@ -83,7 +89,7 @@
              <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.17</version>
+                <version>2.18.1</version>
                 <configuration>
                     <!-- Allow for the ability to pass JVM memory flags for Unit Tests. Since
                          maven-surefire-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
@@ -124,7 +130,7 @@
              </plugin>
              <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.4.1</version>
+                <version>2.5.5</version>
              </plugin>
              <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -659,23 +665,6 @@
             </modules>
         </profile>
 
-        <!--
-           Builds LNI WAR & Client for DSpace
-        -->
-       <!-- Note:- The LNI module is not built by default and is considered deprecated.
-            To build it activate the profile with '-Pdspace-lni'. -->
-        <profile>
-            <id>dspace-lni</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <modules>
-                <module>dspace-lni</module>
-                <module>dspace-lni/dspace-lni-client</module>
-            </modules>
-        </profile>
-
-
       <!--
          The 'release' profile is used by the 'maven-release-plugin' (see above)
          to actually perform a DSpace software release to Maven central.
@@ -690,7 +679,6 @@
          <modules>
              <module>dspace-api</module>
              <module>dspace-jspui</module>
-             <module>dspace-lni</module>
              <module>dspace-oai</module>
              <module>dspace-rdf</module>
              <module>dspace-rest</module>
@@ -780,24 +768,6 @@
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-lni</artifactId>
-            <version>6.0-SNAPSHOT</version>
-            <type>jar</type>
-            <classifier>classes</classifier>
-         </dependency>
-         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-lni-client</artifactId>
-            <version>6.0-SNAPSHOT</version>
-         </dependency>
-         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-lni</artifactId>
-            <version>6.0-SNAPSHOT</version>
-            <type>war</type>
-         </dependency>
-         <dependency>
-            <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui</artifactId>
             <version>6.0-SNAPSHOT</version>
             <type>jar</type>
@@ -862,6 +832,29 @@
          </dependency>
          <!-- DSpace third Party Dependencies -->
 
+          <dependency>
+              <groupId>org.hibernate</groupId>
+              <artifactId>hibernate-core</artifactId>
+              <version>${hibernate.version}</version>
+          </dependency>
+
+          <dependency>
+          	<groupId>org.hibernate</groupId>
+          	<artifactId>hibernate-ehcache</artifactId>
+          	<version>${hibernate.version}</version>
+          </dependency>
+          <dependency>
+             <groupId>org.hibernate</groupId>
+             <artifactId>hibernate-c3p0</artifactId>
+             <version>${hibernate.version}</version>
+          </dependency>
+
+
+          <dependency>
+              <groupId>org.springframework</groupId>
+              <artifactId>spring-orm</artifactId>
+              <version>${spring.version}</version>
+          </dependency>
          <dependency>
             <groupId>org.swordapp</groupId>
             <artifactId>sword-common</artifactId>
@@ -871,49 +864,49 @@
         <dependency>
             <artifactId>spring-core</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-beans</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-aop</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-context</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-tx</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-jdbc</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-web</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-webmvc</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
 
          <dependency>
@@ -979,9 +972,9 @@
             <!-- <version>3.1</version> xmlui - wing -->
          </dependency>
          <dependency>
-            <groupId>commons-dbcp</groupId>
-            <artifactId>commons-dbcp</artifactId>
-            <version>1.4</version>
+             <groupId>org.apache.commons</groupId>
+             <artifactId>commons-dbcp2</artifactId>
+            <version>2.1.1</version>
          </dependency>
          <dependency>
             <groupId>commons-discovery</groupId>
@@ -1010,9 +1003,9 @@
             <version>1.1.1</version>
          </dependency>
          <dependency>
-            <groupId>commons-pool</groupId>
-            <artifactId>commons-pool</artifactId>
-            <version>1.4</version>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+            <version>2.4.2</version>
          </dependency>
           <dependency>
               <groupId>commons-validator</groupId>
@@ -1160,9 +1153,9 @@
             <version>51.1</version>
          </dependency>
          <dependency>
-            <groupId>postgresql</groupId>
+            <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>9.1-901-1.jdbc4</version>
+            <version>9.4-1203-jdbc41</version>
          </dependency>
          <dependency>
             <groupId>com.oracle</groupId>
@@ -1237,7 +1230,7 @@
          <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.4.180</version>
+            <version>1.4.187</version>
             <scope>test</scope>
          </dependency>
          <!-- Contiperf is used for performance tests within our Unit/Integration tests -->
@@ -1263,6 +1256,16 @@
               <groupId>com.google.http-client</groupId>
               <artifactId>google-http-client-jackson2</artifactId>
               <version>1.19.0</version>
+              <exclusions>
+                  <exclusion>
+                      <artifactId>jackson-core</artifactId>
+                      <groupId>com.fasterxml.jackson.core</groupId>
+                  </exclusion>
+                  <exclusion>
+                      <artifactId>jackson-databind</artifactId>
+                      <groupId>com.fasterxml.jackson.core</groupId>
+                  </exclusion>
+              </exclusions>
           </dependency>
           <dependency>
               <groupId>com.google.oauth-client</groupId>

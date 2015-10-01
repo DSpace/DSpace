@@ -16,9 +16,9 @@
 <%@ page import="org.dspace.app.bulkedit.BulkEditChange" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="org.dspace.content.Item" %>
-<%@ page import="org.dspace.content.Metadatum" %>
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.dspace.app.bulkedit.BulkEditMetadataValue" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
@@ -72,8 +72,8 @@
             for (BulkEditChange change : changes)
             {
                 // Get the changes
-                List<Metadatum> adds = change.getAdds();
-                List<Metadatum> removes = change.getRemoves();
+                List<BulkEditMetadataValue> adds = change.getAdds();
+                List<BulkEditMetadataValue> removes = change.getRemoves();
                 List<Collection> newCollections = change.getNewMappedCollections();
                 List<Collection> oldCollections = change.getOldMappedCollections();
                 boolean first = false;
@@ -256,16 +256,16 @@
                 }
 
                 // Show additions
-                for (Metadatum dcv : adds)
+                for (BulkEditMetadataValue dcv : adds)
                 {
-                    String md = dcv.schema + "." + dcv.element;
-                    if (dcv.qualifier != null)
+                    String md = dcv.getSchema() + "." + dcv.getElement();
+                    if (dcv.getQualifier() != null)
                     {
-                        md += "." + dcv.qualifier;
+                        md += "." + dcv.getQualifier();
                     }
-                    if (dcv.language != null)
+                    if (dcv.getLanguage() != null)
                     {
-                        md += "[" + dcv.language + "]";
+                        md += "[" + dcv.getLanguage() + "]";
                     }
                     if (!first)
                     {
@@ -286,16 +286,16 @@
                 }
 
                 // Show removals
-                for (Metadatum dcv : removes)
+                for (BulkEditMetadataValue dcv : removes)
                 {
-                    String md = dcv.schema + "." + dcv.element;
-                    if (dcv.qualifier != null)
+                    String md = dcv.getSchema() + "." + dcv.getElement();
+                    if (dcv.getQualifier() != null)
                     {
-                        md += "." + dcv.qualifier;
+                        md += "." + dcv.getQualifier();
                     }
-                    if (dcv.language != null)
+                    if (dcv.getLanguage() != null)
                     {
-                        md += "[" + dcv.language + "]";
+                        md += "[" + dcv.getLanguage() + "]";
                     }
                     if (!first)
                     {

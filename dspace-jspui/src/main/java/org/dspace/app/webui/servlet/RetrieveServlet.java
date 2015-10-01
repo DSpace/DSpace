@@ -20,9 +20,10 @@ import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -49,12 +50,15 @@ public class RetrieveServlet extends DSpaceServlet
      */
     private int threshold;
     
+    private BitstreamService bitstreamService;
+    
     @Override
 	public void init(ServletConfig arg0) throws ServletException {
 
 		super.init(arg0);
 		threshold = ConfigurationManager
 				.getIntProperty("webui.content_disposition_threshold");
+		bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 	}
     
     protected void doDSGet(Context context, HttpServletRequest request,
@@ -89,8 +93,7 @@ public class RetrieveServlet extends DSpaceServlet
             // Find the corresponding bitstream
             try
             {
-                int id = Integer.parseInt(idString);
-                bitstream = Bitstream.find(context, id);
+                bitstream = bitstreamService.findByIdOrLegacyId(context, idString);
             }
             catch (NumberFormatException nfe)
             {
@@ -104,7 +107,7 @@ public class RetrieveServlet extends DSpaceServlet
 
             // Check whether we got a License and if it should be displayed
             // (Note: list of bundles may be empty array, if a bitstream is a Community/Collection logo)
-            Bundle bundle = bitstream.getBundles().length>0 ? bitstream.getBundles()[0] : null;
+            Bundle bundle = bitstream.getBundles().size()>0 ? bitstream.getBundles().get(0) : null;
             
             if (bundle!=null && 
                 bundle.getName().equals(Constants.LICENSE_BUNDLE_NAME) &&
@@ -113,7 +116,7 @@ public class RetrieveServlet extends DSpaceServlet
                     isLicense = true;
             }
             
-            if (isLicense && !displayLicense && !AuthorizeManager.isAdmin(context))
+            if (isLicense && !displayLicense && !authorizeService.isAdmin(context))
             {
                 throw new AuthorizeException();
             }
@@ -132,10 +135,10 @@ public class RetrieveServlet extends DSpaceServlet
 		   //Constants.BITSTREAM, bitstream.getID());
 
             // Pipe the bits
-            InputStream is = bitstream.retrieve();
+            InputStream is = bitstreamService.retrieve(context, bitstream);
 
             // Set the response MIME type
-            response.setContentType(bitstream.getFormat().getMIMEType());
+            response.setContentType(bitstream.getFormat(context).getMIMEType());
 
             // Response length
             response.setHeader("Content-Length", String.valueOf(bitstream
