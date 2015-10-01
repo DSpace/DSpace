@@ -310,16 +310,16 @@ public class DryadEmailSubmission extends HttpServlet {
                 + "</DryadEmailSubmission>";
 
         StringReader xmlReader = new StringReader(xml);
-
+	Context context = null;
         try {
             Format format = Format.getPrettyFormat();
             XMLOutputter toFile = new XMLOutputter(format);
             Document doc = saxBuilder.build(xmlReader);
-            String journalCode = result.getJournalCode();
+            String journalCode = JournalUtils.cleanJournalCode(result.getJournalCode());
 
             LOGGER.debug("Getting metadata dir for " + journalCode);
 
-            Context context = new Context();
+            context = new Context();
             Concept journalConcept = JournalUtils.getJournalConceptByShortID(context, journalCode);
             File dir = new File(JournalUtils.getMetadataDir(journalConcept));
 
@@ -333,9 +333,13 @@ public class DryadEmailSubmission extends HttpServlet {
             // And we write the output to our submissions directory
             toFile.output(doc, new BufferedWriter(writer));
         } catch (Exception details) {
-            LOGGER.debug(xml);
+            LOGGER.debug("failed to write to file: xml content would have been: " + xml);
             throw new SubmissionRuntimeException(details);
-        }
+        } finally {
+	    if (context != null) {
+		context.abort();
+	    }
+	}
         return xml;
     }
 
@@ -406,11 +410,13 @@ public class DryadEmailSubmission extends HttpServlet {
             }
 
             // find the associated concept and initialize the parser variable.
+            Concept concept = null;
+            journalCode = JournalUtils.cleanJournalCode(journalCode);
             try {
-                concept = JournalUtils.getJournalConceptById(context, journalCode);
+                concept = JournalUtils.getJournalConceptByShortID(context, journalCode);
             } catch (SQLException e) {
                 throw new SubmissionException(e);
-            }
+	    }
 
             if (concept == null) {
                 throw new SubmissionException("Concept not found for journal " + journalCode);
