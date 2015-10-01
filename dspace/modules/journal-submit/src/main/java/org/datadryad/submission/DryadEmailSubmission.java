@@ -1,6 +1,7 @@
 package org.datadryad.submission;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.dspace.JournalUtils;
 import org.dspace.content.authority.Concept;
@@ -307,6 +308,7 @@ public class DryadEmailSubmission extends HttpServlet {
         Concept concept = null;
         while (emailScanner.hasNextLine()) {
             String line = emailScanner.nextLine().replace("\u00A0",""); // \u00A0 is Unicode nbsp; these should be removed
+            line = StringEscapeUtils.unescapeHtml(line);
             // Stop reading lines at EndDryadContent
             if (line.contains("EndDryadContent")) {
                 break;
