@@ -131,7 +131,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     enum OP {equals,not_equals,like,not_like,contains,doesnt_contain,exists,doesnt_exist,matches,doesnt_match;}
     
     @Override
-    public Iterator<Item> findByMetadataQuery(Context context, List<List<Integer>> listFieldList, List<String> query_op, List<String> query_val, List<UUID> collectionUuids, String regexClause) throws SQLException {
+    public Iterator<Item> findByMetadataQuery(Context context, List<List<MetadataField>> listFieldList, List<String> query_op, List<String> query_val, List<UUID> collectionUuids, String regexClause) throws SQLException {
     	Criteria criteria = createCriteria(context, Item.class, "item");
     	
     	if (!collectionUuids.isEmpty()){
@@ -164,7 +164,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         	subcriteria.setProjection(Projections.property("mv.dSpaceObject"));
         	
         	if (!listFieldList.get(i).isEmpty()) {
-        		subcriteria.add(Restrictions.in("fieldId", listFieldList.get(i)));
+        		subcriteria.add(Restrictions.in("metadataField", listFieldList.get(i)));
         	}
         	
         	sb.append(op.name() + " ");
@@ -188,7 +188,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         		criteria.add(Subqueries.notExists(subcriteria));        		
         	}
         }
-    	log.debug(String.format("Running custom query with %d filters", index));
+     	log.debug(String.format("Running custom query with %d filters", index));
 
         return list(criteria).iterator();
     }
