@@ -28,8 +28,14 @@
 		<param-value>${dspace.dir}</param-value>
 	</context-param>
 
+
 	<listener>
 		<listener-class>org.dspace.app.util.DSpaceContextListener</listener-class>
+	</listener>
+	<listener>
+	   <listener-class>
+		  org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener
+	   </listener-class>
 	</listener>
 
 	<listener>
