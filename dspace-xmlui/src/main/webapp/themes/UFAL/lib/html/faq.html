@@ -211,7 +211,7 @@
 	<div>
 		<h3 id="searching">How do I get the most of my searches</h3>
 		<p>
-			If you are not satisfied with the results of your searches, you might wish to go beyond plain text searches.
+			In contrast to other search engines this one uses OR as a default operator; see examples below that clarify this. If you are not satisfied with the results of your searches, you might wish to go beyond plain text searches.
 			You may search only in certain fields, use negation, add score (emphasis) to some parts of the query and match
 			more. The search engine is SOLR so use it's syntax if you know it or check it in <a href="https://cwiki.apache.org/confluence/display/solr/The+Standard+Query+Parser">the documentation</a>.
 		</p>
@@ -224,11 +224,13 @@
 					padding-bottom:5px;
 				}
 			</style>
+			<dt><a href="../discover?query=PDT+wordnet">PDT wordnet</a> vs <a href="../discover?query=PDT+AND+wordnet">PDT AND wordnet</a></dt>
+			<dd>The default operator is OR; ie. the first example searches for PDT OR WordNet in all text fields.</dd>
 			<dt><a href="../discover?query=dc.title%3AP%3FT+%26%26+-dc.title%3AWordNet">dc.title:P?T &amp;&amp; -dc.title:WordNet</a></dt>
 			<dd>Returns all items having P?T in title - ? stands for any character (eg. PDT) - and not having WordNet in the title</dd>
 			<dt><a href="../discover?query=dc.title%3A%22Czech+WordNet%22">dc.title:"Czech WordNet"</a></dt>
 			<dd>Use double quotes (&quot;) for exact matches and multiword expressions</dd>
-			<dt><a href="../discover?query=author%3A%28Bojar+-Tamchyna%29+%26%26+%28dc.language.iso%3A%28ces+AND+eng%29+OR+language%3A%28czech+AND+english%29%29">author:(Bojar -Tamchyna) &amp;&amp; (dc.language.iso:(ces AND eng) OR language:(czech AND english))</a></dt>
+			<dt><a href="../discover?query=author%3A%28Bojar+%26%26+-Tamchyna%29+%26%26+%28dc.language.iso%3A%28ces+AND+eng%29+OR+language%3A%28czech+AND+english%29%29">author:(Bojar && -Tamchyna) &amp;&amp; (dc.language.iso:(ces AND eng) OR language:(czech AND english))</a></dt>
 			<dd>Search for items by one author and not the other; interesting are only items about both czech and english languages.</dd>
 		</dl>
 		</p>
