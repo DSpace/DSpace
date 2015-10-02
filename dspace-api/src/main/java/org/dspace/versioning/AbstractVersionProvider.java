@@ -101,7 +101,7 @@ public abstract class AbstractVersionProvider {
     }
 
 
-    protected Bitstream createBitstream(Context context, Bitstream nativeBitstream) throws AuthorizeException, SQLException, IOException {
+    protected Bitstream  createBitstream(Context context, Bitstream nativeBitstream) throws AuthorizeException, SQLException, IOException {
         Bitstream newBitstream = bitstreamStorageService.clone(context, nativeBitstream);
 	    List<MetadataValue> bitstreamMeta = bitstreamService.getMetadata(nativeBitstream, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
 	    for (MetadataValue value : bitstreamMeta) {
