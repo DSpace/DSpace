@@ -128,7 +128,7 @@ public class FilteredItemsResource extends Resource {
             }
 
     		List<UUID> uuids = getUuidsFromStrings(collSel);
-    		List<List<Integer>> listFieldList = getMetadataFieldsList(context, query_field);    		
+    		List<List<MetadataField>> listFieldList = getMetadataFieldsList(context, query_field);    		
 
             Iterator<org.dspace.content.Item> childItems = itemService.findByMetadataQuery(context, listFieldList, query_op, query_val, uuids, regexClause);
              
@@ -159,10 +159,10 @@ public class FilteredItemsResource extends Resource {
         }
     }
 	
-	private List<List<Integer>> getMetadataFieldsList(org.dspace.core.Context context, List<String> query_field) throws SQLException {
-		List<List<Integer>> listFieldList = new ArrayList<List<Integer>>();
+	private List<List<MetadataField>> getMetadataFieldsList(org.dspace.core.Context context, List<String> query_field) throws SQLException {
+		List<List<MetadataField>> listFieldList = new ArrayList<List<MetadataField>>();
 		for(String s: query_field) {
-			ArrayList<Integer> fields = new ArrayList<Integer>();
+			ArrayList<MetadataField> fields = new ArrayList<MetadataField>();
 			listFieldList.add(fields);
 			if (s.equals("*")) {
 				continue;
@@ -182,12 +182,12 @@ public class FilteredItemsResource extends Resource {
         	}
         	if ("*".equals(qualifier)) {
     			for(MetadataField mf: metadataFieldService.findByUnqualifiedElement(context, schema, element)){
-        			fields.add(mf.getFieldID());        		    				
+        			fields.add(mf);        		    				
     			}
         	} else {
     			MetadataField mf = metadataFieldService.findByElement(context, schema, element, qualifier);
     			if (mf != null) {
-        			fields.add(mf.getFieldID());    				
+        			fields.add(mf);    				
     			}
         	}
 		}
