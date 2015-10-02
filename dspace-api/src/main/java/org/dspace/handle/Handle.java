@@ -29,7 +29,7 @@ public class Handle {
     @Column(name = "handle", unique = true)
     private String handle;
 
-    @OneToOne(fetch =  FetchType.EAGER)
+    @ManyToOne(fetch =  FetchType.EAGER)
     @JoinColumn(name = "resource_id")
     private DSpaceObject dso;
 

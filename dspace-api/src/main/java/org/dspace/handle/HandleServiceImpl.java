@@ -137,7 +137,7 @@ public class HandleServiceImpl implements HandleService
 
         handle.setHandle(handleId);
         handle.setDSpaceObject(dso);
-        dso.setHandle(handle);
+        dso.addHandle(handle);
         handle.setResourceTypeId(dso.getType());
         handleDAO.save(context, handle);
 
@@ -201,7 +201,7 @@ public class HandleServiceImpl implements HandleService
 
         handle.setResourceTypeId(dso.getType());
         handle.setDSpaceObject(dso);
-        dso.setHandle(handle);
+        dso.addHandle(handle);
         handleDAO.save(context, handle);
 
         if (log.isDebugEnabled())

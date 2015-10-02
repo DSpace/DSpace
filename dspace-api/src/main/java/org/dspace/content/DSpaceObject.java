@@ -7,6 +7,7 @@
  */
 package org.dspace.content;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.handle.Handle;
 import org.hibernate.annotations.GenericGenerator;
@@ -39,8 +40,12 @@ public abstract class DSpaceObject implements Serializable
     @OrderBy("metadataField, place")
     private List<MetadataValue> metadata = new ArrayList<>();
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "dso")
-    private Handle handle;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "dso")
+    // Order by is here to ensure that the oldest handle is retrieved first,
+    // multiple handles are assigned to the latest version of an item the original handle will have the lowest identifier
+    // This handle is the prefered handle.
+    @OrderBy("handle_id ASC")
+    private List<Handle> handles = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "dSpaceObject", cascade={CascadeType.PERSIST}, orphanRemoval = false)
     private List<ResourcePolicy> resourcePolicies = new ArrayList<>();
@@ -118,12 +123,21 @@ public abstract class DSpaceObject implements Serializable
      */
     public String getHandle()
     {
-        return (handle != null ? handle.getHandle() : null);
+        return (CollectionUtils.isNotEmpty(handles) ? handles.get(0).getHandle() : null);
     }
 
-    public void setHandle(Handle handle)
+    void setHandle(List<Handle> handle)
     {
-        this.handle = handle;
+        this.handles = handle;
+    }
+
+    public void addHandle(Handle handle)
+    {
+        this.handles.add(handle);
+    }
+
+    public List<Handle> getHandles() {
+        return handles;
     }
 
     protected List<MetadataValue> getMetadata() {

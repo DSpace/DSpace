@@ -111,7 +111,14 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
                     Version previous = versionHistoryService.getPrevious(history, version);
                     if (versionHistoryService.isFirstVersion(history, previous))
                     {
-                        modifyHandleMetadata(context, previous.getItem(), (canonical + DOT + 1));
+                        try{
+                            //If we have a reviewer he/she might not have the rights to edit the metadata of this item, so temporarly grant them.
+                            context.turnOffAuthorisationSystem();
+                            modifyHandleMetadata(context, previous.getItem(), (canonical + DOT + 1));
+                        }finally {
+                            context.restoreAuthSystemState();
+                        }
+
                     }
                     // Check if our previous item hasn't got a handle anymore.
                     // This only occurs when a switch has been made from the standard handle identifier provider

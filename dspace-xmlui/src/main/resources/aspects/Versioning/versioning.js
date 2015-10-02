@@ -8,6 +8,7 @@
 
 importClass(Packages.java.lang.Class);
 importClass(Packages.java.lang.ClassLoader);
+importClass(Packages.java.util.UUID)
 
 importClass(Packages.org.dspace.app.xmlui.utils.FlowscriptUtils);
 
@@ -16,11 +17,9 @@ importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowResult);
 importClass(Packages.org.apache.cocoon.environment.http.HttpEnvironment);
 importClass(Packages.org.apache.cocoon.servlet.multipart.Part);
 importClass(Packages.org.dspace.content.Item);
+importClass(Packages.org.dspace.content.factory.ContentServiceFactory)
 
-importClass(Packages.org.dspace.handle.HandleManager);
 importClass(Packages.org.dspace.core.Constants);
-importClass(Packages.org.dspace.authorize.AuthorizeManager);
-importClass(Packages.org.dspace.license.CreativeCommons);
 
 importClass(Packages.org.dspace.app.xmlui.utils.ContextUtil);
 importClass(Packages.org.dspace.app.xmlui.cocoon.HttpServletRequestCocoonWrapper);
@@ -42,6 +41,12 @@ function getObjectModel()
 {
   return FlowscriptUtils.getObjectModel(cocoon);
 }
+
+function getItemService()
+{
+    return ContentServiceFactory.getInstance().getItemService();
+}
+
 
 /**
  * Return the DSpace context for this request since each HTTP request generates
@@ -87,7 +92,7 @@ function getHttpResponse()
  * Start editing an individual item.
  */
 function startCreateNewVersionItem(){
-	var itemID = cocoon.request.get("itemID");
+	var itemID = UUID.fromString((cocoon.request.get("itemID")));
 
 	assertEditItem(itemID);
 
@@ -96,7 +101,7 @@ function startCreateNewVersionItem(){
         result = doCreateNewVersion(itemID, result);
     }while(result!=null);
 
-	var item = Item.find(getDSContext(),itemID);
+	var item = getItemService().find(getDSContext(),itemID);
 
     //Send us back to the item page if we cancel !
     cocoon.redirectTo(cocoon.request.getContextPath() + "/handle/" + item.getHandle(), true);
@@ -139,7 +144,7 @@ function doCreateNewVersion(itemID, result){
  * Start editing an individual item.
  */
 function startVersionHistoryItem(){
-	var itemID = cocoon.request.get("itemID");
+	var itemID = UUID.fromString((cocoon.request.get("itemID")));
 
 	assertEditItem(itemID);
 
@@ -158,7 +163,7 @@ function doVersionHistoryItem(itemID, result){
 
         if (cocoon.request.get("submit_cancel")){
             //Pressed the cancel button, redirect us to the item page
-            var item = Item.find(getDSContext(),itemID);
+            var item = getItemService().find(getDSContext(),itemID);
 
            	cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+item.getHandle(),true);
            	getDSContext().complete();
@@ -183,13 +188,13 @@ function doVersionHistoryItem(itemID, result){
 		}
         else if (cocoon.request.get("submit_restore") && cocoon.request.get("versionID")){
 		    var versionID = cocoon.request.get("versionID");
-            itemID = cocoon.request.get("itemID");
+            itemID = UUID.fromString(cocoon.request.get("itemID"));
 
 		    result = doRestoreVersion(itemID, versionID);
 		}
         else if (cocoon.request.get("submit_update") && cocoon.request.get("versionID")){
 		    var versionID = cocoon.request.get("versionID");
-            itemID = cocoon.request.get("itemID");
+            itemID = UUID.fromString((cocoon.request.get("itemID")));
 		    result = doUpdateVersion(itemID, versionID);
 		}
 	} while (true)
