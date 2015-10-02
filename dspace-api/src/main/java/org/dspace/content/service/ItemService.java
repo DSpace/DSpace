@@ -403,6 +403,8 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
                                               String schema, String element, String qualifier, String value)
             throws SQLException, AuthorizeException, IOException;
 
+    public Iterator<Item> findByMetadataQuery(Context context, List<String> query_field, List<String> query_op, List<String> query_val, List<String> collection_ids, String regexClause)
+       throws SQLException, AuthorizeException, IOException;
 
     /**
      * Find all the items in the archive with a given authority key value
