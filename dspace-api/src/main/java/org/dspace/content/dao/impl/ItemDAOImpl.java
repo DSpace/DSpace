@@ -131,22 +131,14 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     enum OP {equals,not_equals,like,not_like,contains,doesnt_contain,exists,doesnt_exist,matches,doesnt_match;}
     
     @Override
-    public Iterator<Item> findByMetadataQuery(Context context, List<String> query_field, List<String> query_op, List<String> query_val, List<String> collection_ids, String regexClause) throws SQLException {
+    public Iterator<Item> findByMetadataQuery(Context context, List<String> query_field, List<String> query_op, List<String> query_val, List<UUID> collectionUuids, String regexClause) throws SQLException {
     	Criteria criteria = createCriteria(context, Item.class, "item");
     	
-		List<UUID> uuids = new ArrayList<UUID>();
-		for(String s: collection_ids) {
-			try {
-				uuids.add(UUID.fromString(s));
-			} catch (IllegalArgumentException e) {
-				log.warn("Invalid collection UUID: " + s);
-			}
-		}
-    	if (!uuids.isEmpty()){
+    	if (!collectionUuids.isEmpty()){
 			DetachedCriteria dcollCriteria = DetachedCriteria.forClass(Collection.class, "coll");
         	dcollCriteria.setProjection(Projections.property("coll.id"));
         	dcollCriteria.add(Restrictions.eqProperty("coll.id", "item.owningCollection"));
-			dcollCriteria.add(Restrictions.in("coll.id", uuids));
+			dcollCriteria.add(Restrictions.in("coll.id", collectionUuids));
 			criteria.add(Subqueries.exists(dcollCriteria));
     	}
     	

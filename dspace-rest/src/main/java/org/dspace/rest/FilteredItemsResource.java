@@ -35,6 +35,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 /*
  * This class retrieves items by a constructed metadata query evaluated against a set of Item Filters.
@@ -124,7 +125,17 @@ public class FilteredItemsResource extends Resource {
             if (regexClause == null) {
             	regexClause = "";
             }
-            Iterator<org.dspace.content.Item> childItems = itemService.findByMetadataQuery(context, query_field, query_op, query_val, collSel, regexClause);
+
+    		List<UUID> uuids = new ArrayList<UUID>();
+    		for(String s: collSel) {
+    			try {
+    				uuids.add(UUID.fromString(s));
+    			} catch (IllegalArgumentException e) {
+    				log.warn("Invalid collection UUID: " + s);
+    			}
+    		}
+
+            Iterator<org.dspace.content.Item> childItems = itemService.findByMetadataQuery(context, query_field, query_op, query_val, uuids, regexClause);
              
             itemFilterSet.processSaveItems(context, childItems, true, expand);
     	    writeStats(siteService.findSite(context), UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers, request, context);
