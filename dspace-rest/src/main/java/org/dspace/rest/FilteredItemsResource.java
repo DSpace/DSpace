@@ -169,7 +169,7 @@ public class FilteredItemsResource extends Resource {
 			}
         	String schema = "";
         	String element = "";
-        	String qualifier = "";
+        	String qualifier = null;
         	String[] parts = s.split("\\.");
         	if (parts.length>0) {
         		schema = parts[0];
@@ -186,7 +186,9 @@ public class FilteredItemsResource extends Resource {
     			}
         	} else {
     			MetadataField mf = metadataFieldService.findByElement(context, schema, element, qualifier);
-    			fields.add(mf.getFieldID());
+    			if (mf != null) {
+        			fields.add(mf.getFieldID());    				
+    			}
         	}
 		}
 		return listFieldList;
