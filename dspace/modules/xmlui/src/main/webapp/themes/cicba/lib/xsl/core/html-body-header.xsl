@@ -4,6 +4,7 @@
 	version="1.0" xmlns:dim="http://www.dspace.org/xmlns/dspace/dim"
 	xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mods="http://www.loc.gov/mods/v3"
 	xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:confman="org.dspace.core.ConfigurationManager"
+	xmlns:xmlui="xalan://ar.edu.unlp.sedici.dspace.xmlui.util.XSLTHelper"
 	xmlns="http://www.w3.org/1999/xhtml" exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc confman">
 
 	<!-- Display language selection if more than 1 language is supported -->
@@ -19,6 +20,7 @@
 			<xsl:for-each
 				select="//dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='supportedLocale']">
 				<xsl:variable name="locale" select="." />
+				<xsl:variable name="queryString" select="xmlui:replaceAll(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='queryString']/text(), '\blocale-attribute=(en&amp;?|es&amp;?)', '')"/>
 				<li role="presentation">
 					<xsl:if test="$locale = $currentLocale">
 						<xsl:attribute name="class">active</xsl:attribute>
@@ -27,7 +29,10 @@
 						<xsl:with-param name="a.href">
 							<xsl:value-of select="$current-uri" />
 							<xsl:text>?locale-attribute=</xsl:text>
-							<xsl:value-of select="$locale" />
+							<xsl:value-of select="$locale" />				
+							<xsl:if test="$queryString != '' ">
+								<xsl:value-of select="concat('&amp;', $queryString)"/>
+							</xsl:if>
 						</xsl:with-param>
 						<xsl:with-param name="a.value">
 							<xsl:value-of
