@@ -88,7 +88,7 @@ MVN_ENV			:=local
 
 MVN_OPTS_BASE	:=-Dassembly.recompressZippedFiles=false -Dassembly.ignorePermissions=true -Denforcer.skip=true -Dfork=true -Denv=$(MVN_ENV)
 MVN_OPTS		:=$(MVN_OPTS_BASE) -Dmaven.test.skip=true $(DSPACE_MVN_PROJECTS) -P '!generate-test-env'
-MVN_OPTS_TEST	:=$(MVN_OPTS_BASE) -Dmaven.test.skip=false $(DSPACE_MVN_PROJECTS)
+MVN_OPTS_TEST	:=$(MVN_OPTS_BASE) -Dmaven.test.skip=false $(DSPACE_MVN_PROJECTS) -B
 
 # makefile specific
 
@@ -178,7 +178,7 @@ compile: deploy_logs
 	@echo "COMPILING SOURCE ..."
 	@echo "Updating lr.compile.time..."
 	@if grep -q "lr\.compile\.time" $(LOCAL_CONF);then sed --follow-symlinks -i'' "s/^lr\.compile\.time=.*/lr.compile.time=`date`/" $(LOCAL_CONF); else echo -e "$(RED)Compile time not updated$(NORMAL)";fi
-	@cd $(DIR_SOURCE) && mvn $(MVN_OPTS) package 2>&1 | $(HIDE_PASSW) | tee $(DIR_DEPLOY_LOGS)/$@.log
+	@cd $(DIR_SOURCE) && mvn clean package $(MVN_OPTS) 2>&1 | $(HIDE_PASSW) | tee $(DIR_DEPLOY_LOGS)/$@.log
 	@echo ""
 	@if grep -q "BUILD FAILURE" $(DIR_DEPLOY_LOGS)/compile.log; then \
 	        echo -e "$(RED)compile.log contains BUILD FAILURE, exiting$(NORMAL)" && exit -1; fi

@@ -31,14 +31,22 @@ install:
   - sudo -u postgres createuser --superuser dspace
   - make create_databases
   - echo "Installing prerequisites"
+  - sudo free -m -t
   - make install_libs
+  - sudo free -m -t
   - make new_deploy | grep -v "Download"
+  - sudo free -m -t
   - make print_message
 
 script:
+  - sudo free -m -t
   - make test_dspace_database
+  - sudo free -m -t
   - make test_utilities_database
+  - sudo free -m -t
   - cd $FS/ && mvn -Dmaven.test.skip=false -Dtest=cz.cuni.mff.ufal.dspace.**.*Test,cz.cuni.mff.ufal.*Test -DfailIfNoTests=false test | grep -v "Download"
+  - sudo free -m -t
   - cd $FS/utilities/project_helpers/scripts
+  - sudo free -m -t
   - make tests
   - #make selenium_tests || echo "Tests failed"
