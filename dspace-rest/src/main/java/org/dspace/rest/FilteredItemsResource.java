@@ -10,11 +10,8 @@ package org.dspace.rest;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-<<<<<<< HEAD
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
-=======
->>>>>>> d85cd56... New REST commands
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
@@ -40,10 +37,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-<<<<<<< HEAD
 import java.util.UUID;
-=======
->>>>>>> d85cd56... New REST commands
 
 /*
  * This class retrieves items by a constructed metadata query evaluated against a set of Item Filters.
@@ -143,11 +137,7 @@ public class FilteredItemsResource extends Resource {
     	    writeStats(siteService.findSite(context), UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers, request, context);
     	    result.annotateQuery(query_field, query_op, query_val);
     	    context.complete();
-        } catch (IOException e) {
-            processException(e.getMessage(), context);
         } catch (SQLException e) {
-        	processException(e.getMessage(), context);
-        } catch (AuthorizeException e) {
         	processException(e.getMessage(), context);
         } catch (ContextException e) {
         	processException("Unauthorized filtered item query. " + e.getMessage(), context);
