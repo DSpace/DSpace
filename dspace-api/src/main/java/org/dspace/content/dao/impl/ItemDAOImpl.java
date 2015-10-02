@@ -131,7 +131,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     enum OP {equals,not_equals,like,not_like,contains,doesnt_contain,exists,doesnt_exist,matches,doesnt_match;}
     
     @Override
-    public Iterator<Item> findByMetadataQuery(Context context, List<String> query_field, List<String> query_op, List<String> query_val, List<UUID> collectionUuids, String regexClause) throws SQLException {
+    public Iterator<Item> findByMetadataQuery(Context context, List<List<Integer>> listFieldList, List<String> query_op, List<String> query_val, List<UUID> collectionUuids, String regexClause) throws SQLException {
     	Criteria criteria = createCriteria(context, Item.class, "item");
     	
     	if (!collectionUuids.isEmpty()){
@@ -142,7 +142,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
 			criteria.add(Subqueries.exists(dcollCriteria));
     	}
     	
-        int index = Math.min(query_field.size(), Math.min(query_op.size(), query_val.size()));
+        int index = Math.min(listFieldList.size(), Math.min(query_op.size(), query_val.size()));
         StringBuilder sb = new StringBuilder();
 
         for(int i=0; i<index; i++) {
@@ -159,44 +159,12 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         		}
         	}
         	
-        	
-        	String schema = "";
-        	String element = "";
-        	String qualifier = "";
-        	boolean allFields = query_field.get(i).equals("*");
-        	String[] parts = query_field.get(i).split("\\.");
-        	if (parts.length>0) {
-        		schema = parts[0];
-        	}
-        	if (parts.length>1) {
-        		element = parts[1];
-        	}
-        	if (parts.length>2) {
-        		qualifier = parts[2];
-        	}
-        	
         	DetachedCriteria subcriteria = DetachedCriteria.forClass(MetadataValue.class,"mv");
         	subcriteria.add(Property.forName("mv.dSpaceObject").eqProperty("item.id"));
         	subcriteria.setProjection(Projections.property("mv.dSpaceObject"));
         	
-        	if (!allFields) {
-        		DetachedCriteria  fieldCriteria = DetachedCriteria.forClass(MetadataField.class,"mfr");
-        		fieldCriteria.add(Property.forName("mv.metadataField").eqProperty("mfr.id"));
-        		fieldCriteria.setProjection(Projections.property("mfr.id"));
-        		fieldCriteria.add(Restrictions.eq("element", element));
-        		if (qualifier.equals("*")){
-        		} else if (qualifier.isEmpty()){
-        			fieldCriteria.add(Restrictions.isNull("qualifier"));
-        		} else {
-            		fieldCriteria.add(Restrictions.eq("qualifier", qualifier));        			
-        		}
-        		subcriteria.add(Subqueries.exists(fieldCriteria));
-
-        		DetachedCriteria schemaCriteria = DetachedCriteria.forClass(MetadataSchema.class,"msr");
-        		schemaCriteria.setProjection(Projections.property("msr.id"));
-        		schemaCriteria.add(Property.forName("msr.id").eqProperty("mfr.metadataSchema"));
-        		schemaCriteria.add(Property.forName("msr.name").eq(schema));
-                fieldCriteria.add(Subqueries.exists(schemaCriteria));    		
+        	if (!listFieldList.get(i).isEmpty()) {
+        		subcriteria.add(Restrictions.in("fieldId", listFieldList.get(i)));
         	}
         	
         	sb.append(op.name() + " ");
