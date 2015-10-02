@@ -2191,7 +2191,7 @@ function doAuthorizeContainer(containerType, containerID)
         }
         else if (cocoon.request.get("submit_edit") && cocoon.request.get("policy_id")) {
             // Edit an existing policy
-            var policyID = UUID.fromString(cocoon.request.get("policy_id"));
+            var policyID = cocoon.request.get("policy_id");
             result = doEditPolicy(containerType,containerID,policyID);
             highlightID = policyID;
         }
