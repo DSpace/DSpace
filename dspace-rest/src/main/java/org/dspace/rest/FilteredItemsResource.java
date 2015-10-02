@@ -10,10 +10,7 @@ package org.dspace.rest;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-<<<<<<< HEAD
 import org.dspace.content.Item;
-=======
->>>>>>> 627f8ec... Change query_field part of signature
 import org.dspace.content.MetadataField;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
@@ -144,6 +141,10 @@ public class FilteredItemsResource extends Resource {
         	processException(e.getMessage(), context);
         } catch (ContextException e) {
         	processException("Unauthorized filtered item query. " + e.getMessage(), context);
+		} catch (AuthorizeException e) {
+        	processException("Unauthorized filtered item query. " + e.getMessage(), context);
+		} catch (IOException e) {
+        	processException("Filtered item query error. " + e.getMessage(), context);
 		} finally {
 			processFinally(context);
         }
@@ -171,7 +172,7 @@ public class FilteredItemsResource extends Resource {
         	if (parts.length>2) {
         		qualifier = parts[2];
         	}
-        
+
         	if (Item.ANY.equals(qualifier)) {
     			for(MetadataField mf: metadataFieldService.findFieldsByElementNameUnqualified(context, schema, element)){
         			fields.add(mf);        		    				
