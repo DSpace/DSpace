@@ -943,10 +943,10 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
-    public Iterator<Item> findByMetadataQuery(Context context, List<String> query_field, List<String> query_op, List<String> query_val, List<String> collection_ids, String regexClause)
+    public Iterator<Item> findByMetadataQuery(Context context, List<String> query_field, List<String> query_op, List<String> query_val, List<UUID> collectionUuids, String regexClause)
           throws SQLException, AuthorizeException, IOException
     {
-        return itemDAO.findByMetadataQuery(context, query_field, query_op, query_val, collection_ids, regexClause);
+        return itemDAO.findByMetadataQuery(context, query_field, query_op, query_val, collectionUuids, regexClause);
     }
 
     @Override
