@@ -279,6 +279,8 @@ public class MetadataRegistryResource extends Resource
         catch (SQLException e)
         {
             processException("Could not read metadata field, SQLException. Message:" + e, context);
+            log.error(e.getMessage());
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
         catch (ContextException e)
         {
@@ -346,6 +348,8 @@ public class MetadataRegistryResource extends Resource
         catch (SQLException e)
         {
             processException("Could not read metadata field, SQLException. Message:" + e, context);
+            log.error(e.getMessage());
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
         catch (ContextException e)
         {
