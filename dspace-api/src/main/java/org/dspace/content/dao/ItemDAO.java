@@ -16,6 +16,7 @@ import org.dspace.eperson.EPerson;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Database Access Object interface class for the Item object.
@@ -45,6 +46,8 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item>
     public Iterator<Item> findBySubmitter(Context context, EPerson eperson, MetadataField metadataField, int limit) throws SQLException;
 
     public Iterator<Item> findByMetadataField(Context context, MetadataField metadataField, String value, boolean inArchive) throws SQLException;
+
+    public Iterator<Item> findByMetadataQuery(Context context, List<String> query_field, List<String> query_op, List<String> query_val, List<String> collection_ids, String regexClause) throws SQLException;
 
     public Iterator<Item> findByAuthorityValue(Context context, MetadataField metadataField, String authority, boolean inArchive) throws SQLException;
 
