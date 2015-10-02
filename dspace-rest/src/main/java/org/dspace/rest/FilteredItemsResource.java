@@ -10,7 +10,10 @@ package org.dspace.rest;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
+<<<<<<< HEAD
 import org.dspace.content.Item;
+=======
+>>>>>>> 627f8ec... Change query_field part of signature
 import org.dspace.content.MetadataField;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
