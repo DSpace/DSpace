@@ -13,6 +13,8 @@
         <property name="url" value="${db.url}"/>
         <property name="username" value="${db.username}"/>
         <property name="password" value="${db.password}"/>
+        <property name="maxWaitMillis" value="${db.maxwait}"/>
+        <property name="maxIdle" value="${db.maxidle}"/>
     </bean>
 
 </beans>
