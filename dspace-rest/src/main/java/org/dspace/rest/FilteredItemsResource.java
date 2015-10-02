@@ -10,6 +10,7 @@ package org.dspace.rest;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.MetadataField;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
@@ -126,16 +127,10 @@ public class FilteredItemsResource extends Resource {
             	regexClause = "";
             }
 
-    		List<UUID> uuids = new ArrayList<UUID>();
-    		for(String s: collSel) {
-    			try {
-    				uuids.add(UUID.fromString(s));
-    			} catch (IllegalArgumentException e) {
-    				log.warn("Invalid collection UUID: " + s);
-    			}
-    		}
+    		List<UUID> uuids = getUuidsFromStrings(collSel);
+    		List<List<MetadataField>> listFieldList = getMetadataFieldsList(context, query_field);    		
 
-            Iterator<org.dspace.content.Item> childItems = itemService.findByMetadataQuery(context, query_field, query_op, query_val, uuids, regexClause);
+            Iterator<org.dspace.content.Item> childItems = itemService.findByMetadataQuery(context, listFieldList, query_op, query_val, uuids, regexClause);
              
             itemFilterSet.processSaveItems(context, childItems, true, expand);
     	    writeStats(siteService.findSite(context), UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers, request, context);
@@ -163,5 +158,52 @@ public class FilteredItemsResource extends Resource {
             }
         }
     }
+	
+	private List<List<MetadataField>> getMetadataFieldsList(org.dspace.core.Context context, List<String> query_field) throws SQLException {
+		List<List<MetadataField>> listFieldList = new ArrayList<List<MetadataField>>();
+		for(String s: query_field) {
+			ArrayList<MetadataField> fields = new ArrayList<MetadataField>();
+			listFieldList.add(fields);
+			if (s.equals("*")) {
+				continue;
+			}
+        	String schema = "";
+        	String element = "";
+        	String qualifier = null;
+        	String[] parts = s.split("\\.");
+        	if (parts.length>0) {
+        		schema = parts[0];
+        	}
+        	if (parts.length>1) {
+        		element = parts[1];
+        	}
+        	if (parts.length>2) {
+        		qualifier = parts[2];
+        	}
+        	if ("*".equals(qualifier)) {
+    			for(MetadataField mf: metadataFieldService.findByUnqualifiedElement(context, schema, element)){
+        			fields.add(mf);        		    				
+    			}
+        	} else {
+    			MetadataField mf = metadataFieldService.findByElement(context, schema, element, qualifier);
+    			if (mf != null) {
+        			fields.add(mf);    				
+    			}
+        	}
+		}
+		return listFieldList;
+	}
+	
+	private List<UUID> getUuidsFromStrings(List<String> collSel) {
+		List<UUID> uuids = new ArrayList<UUID>();
+		for(String s: collSel) {
+			try {
+				uuids.add(UUID.fromString(s));
+			} catch (IllegalArgumentException e) {
+				log.warn("Invalid collection UUID: " + s);
+			}
+		}
+		return uuids;
+	}
     
 }
