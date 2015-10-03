@@ -1,8 +1,9 @@
 package org.datadryad.submission;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.datadryad.rest.models.Manuscript;
 import org.dspace.JournalUtils;
 import org.dspace.content.authority.Concept;
 import org.dspace.core.ConfigurationManager;
@@ -10,31 +11,19 @@ import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 
-import javax.mail.internet.MimeMessage;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
 import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.Scanner;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -303,6 +292,7 @@ public class DryadEmailSubmission extends HttpServlet {
         String journalName = null;
         String journalCode = null;
         EmailParser parser = null;
+        Manuscript manuscript = null;
         boolean dryadContentStarted = false;
         Context context = null;
         Concept concept = null;
@@ -386,13 +376,15 @@ public class DryadEmailSubmission extends HttpServlet {
             try {
                 parser = getEmailParser(JournalUtils.getParsingScheme(concept));
                 parser.parseMessage(dryadContent);
+                manuscript = parser.getManuscript();
             } catch (SubmissionException e) {
                 throw new SubmissionException("Journal " + journalCode + " parsing scheme not found");
             }
 
-            if (parser.getManuscript().isValid()) {
-                String filename = JournalUtils.escapeFilename(parser.getManuscript().manuscriptId + ".xml");
+            if ((manuscript != null) && (manuscript.isValid())) {
+                String filename = JournalUtils.escapeFilename(manuscript.manuscriptId + ".xml");
                 parser.writeManuscriptToXMLFile(new File(JournalUtils.getMetadataDir(concept), filename));
+                parser.writeManuscriptToDB();
             } else {
                 throw new SubmissionException("Parser could not validly parse the message");
             }
