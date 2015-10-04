@@ -21,6 +21,13 @@
 		2) Some general keys which are specific to a particular aspect
 		   may be found at xmlui.<Aspect> without specifiying a
 		   particular java class.
+
+		Advanced Search related keys
+		Filter name:               xmlui.ArtifactBrowser.SimpleSearch.filter.author
+		Facet heading:             xmlui.ArtifactBrowser.AdvancedSearch.type_author
+		"Filter by" page heading:  xmlui.Discovery.AbstractSearch.type_author
+		
+		To overlay this file, copy it to [dspace-source]/dspace/modules/xmlui/src/main/resources/aspects/Discovery/i18n/messages.xml.
 		-->
 
 
