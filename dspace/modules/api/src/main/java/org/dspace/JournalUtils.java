@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * User: lantian @ atmire . com
@@ -195,6 +197,23 @@ public class JournalUtils {
         return null;
     }
 
+    public static String getCanonicalManuscriptID(Concept concept, Manuscript manuscript) {
+        String canonicalID = manuscript.manuscriptId;
+        String regex = null;
+        try {
+            AuthorityMetadataValue[] vals = concept.getMetadata("journal","manuscriptNumberIgnorePattern",null, Item.ANY);
+            if(vals != null && vals.length > 0) {
+                regex = vals[0].getValue();
+                Matcher manuscriptMatcher = Pattern.compile(regex).matcher(canonicalID);
+                if (manuscriptMatcher.find()) {
+                    canonicalID = manuscriptMatcher.group(1);
+                }
+            }
+        } catch(Exception e) {
+            log.error(e.getMessage(),e);
+        }
+        return canonicalID;
+    }
 
     public static String getFullName(Concept concept) {
         AuthorityMetadataValue[] vals = concept.getMetadata("journal","fullname",null, Item.ANY);
@@ -474,25 +493,37 @@ public class JournalUtils {
         return journalCode.replaceAll("[^a-zA-Z0-9]", "").toUpperCase();
     }
 
-    public static void writeManuscriptToXMLFile(Manuscript manuscript, File file) {
-        FileOutputStream outputStream = null;
+    public static void writeManuscriptToXMLFile(Context context, Manuscript manuscript) throws StorageException{
         try {
-            outputStream = new FileOutputStream(file);
-        } catch (FileNotFoundException e) {
-            LOGGER.warn("couldn't open a file to write", e);
-        }
-
-        if (outputStream != null) {
-            try {
-                ManuscriptToLegacyXMLConverter.convertToInternalXML(manuscript, outputStream);
-                LOGGER.info("wrote xml to file " + file.getAbsolutePath());
-            } catch (JAXBException e) {
-                LOGGER.warn("couldn't convert to XML");
+            log.info ("looking for metadatadir for " + manuscript.manuscriptId);
+            Concept concept = JournalUtils.getJournalConceptById(context, manuscript.manuscriptId);
+            if (concept == null) {
+                log.info ("couldn't find concept");
             }
+            String filename = JournalUtils.escapeFilename(manuscript.manuscriptId + ".xml");
+            File file = new File(JournalUtils.getMetadataDir(concept), filename);
+            FileOutputStream outputStream = null;
+
+            try {
+                outputStream = new FileOutputStream(file);
+            } catch (FileNotFoundException e) {
+                log.warn("couldn't open a file to write", e);
+            }
+
+            if (outputStream != null) {
+                try {
+                    ManuscriptToLegacyXMLConverter.convertToInternalXML(manuscript, outputStream);
+                    log.info("wrote xml to file " + file.getAbsolutePath());
+                } catch (JAXBException e) {
+                    log.warn("couldn't convert to XML");
+                }
+            }
+        } catch (SQLException e) {
+            throw new StorageException(e);
         }
     }
 
-    public static void writeManuscriptToDB(Manuscript manuscript) throws StorageException {
+    public static void writeManuscriptToDB(Context context, Manuscript manuscript) throws StorageException {
         StoragePath storagePath = new StoragePath();
         storagePath.addPathElement(Organization.ORGANIZATION_CODE, manuscript.organization.organizationCode);
 
@@ -501,10 +532,10 @@ public class JournalUtils {
         List<Organization> orgs = organizationStorage.getResults(storagePath, manuscript.organization.organizationCode, 0);
         if (orgs.size() == 0) {
             try {
-                LOGGER.info ("creating an organization " + manuscript.organization.organizationCode);
+                log.info ("creating an organization " + manuscript.organization.organizationCode);
                 organizationStorage.create(storagePath, manuscript.organization);
             } catch (StorageException ex) {
-                LOGGER.error("Exception creating organizations", ex);
+                log.error("Exception creating organizations", ex);
             }
         }
 
@@ -516,18 +547,17 @@ public class JournalUtils {
         if (manuscripts.size() == 0) {
             try {
                 manuscriptStorage.create(storagePath, manuscript);
-                LOGGER.info("adding manuscript " + manuscript.manuscriptId + " to the database for organization " + manuscript.organization.organizationCode);
+                log.info("adding manuscript " + manuscript.manuscriptId + " to the database for organization " + manuscript.organization.organizationCode);
             } catch (StorageException ex) {
-                LOGGER.error("Exception creating manuscript", ex);
+                log.error("Exception creating manuscript", ex);
             }
         } else {
             try {
                 manuscriptStorage.update(storagePath, manuscript);
-                LOGGER.info("updating manuscript " + manuscript.manuscriptId + " to the database for organization " + manuscript.organization.organizationCode);
+                log.info("updating manuscript " + manuscript.manuscriptId + " to the database for organization " + manuscript.organization.organizationCode);
             } catch (StorageException ex) {
-                LOGGER.error("Exception updating manuscript", ex);
+                log.error("Exception updating manuscript", ex);
             }
         }
     }
-
 }

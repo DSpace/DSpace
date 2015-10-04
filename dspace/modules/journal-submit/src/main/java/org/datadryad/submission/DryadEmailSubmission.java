@@ -127,7 +127,7 @@ public class DryadEmailSubmission extends HttpServlet {
     }
 
     private void retrieveMail () {
-        LOGGER.info ("retrieving mail with label '" + ConfigurationManager.getProperty("submit.journal.email.label") + "'");
+        LOGGER.info("retrieving mail with label '" + ConfigurationManager.getProperty("submit.journal.email.label") + "'");
         try {
             List<String> messageIDs = DryadGmailService.getJournalMessageIds();
             if (messageIDs != null) {
@@ -365,7 +365,7 @@ public class DryadEmailSubmission extends HttpServlet {
                 concept = JournalUtils.getJournalConceptByShortID(context, journalCode);
             } catch (SQLException e) {
                 throw new SubmissionException(e);
-	    }
+	        }
 
             if (concept == null) {
                 throw new SubmissionException("Concept not found for journal " + journalCode);
@@ -381,9 +381,8 @@ public class DryadEmailSubmission extends HttpServlet {
             }
 
             if ((manuscript != null) && (manuscript.isValid())) {
-                String filename = JournalUtils.escapeFilename(manuscript.manuscriptId + ".xml");
-                JournalUtils.writeManuscriptToXMLFile(manuscript, new File(JournalUtils.getMetadataDir(concept), filename));
-                JournalUtils.writeManuscriptToDB(manuscript);
+                JournalUtils.writeManuscriptToXMLFile(context, manuscript);
+                JournalUtils.writeManuscriptToDB(context, manuscript);
             } else {
                 throw new SubmissionException("Parser could not validly parse the message");
             }

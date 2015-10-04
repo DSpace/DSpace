@@ -91,38 +91,10 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.glassfish.extras</groupId>
-            <artifactId>glassfish-embedded-web</artifactId>
-            <version>${glassfish.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.oltu.oauth2</groupId>
-            <artifactId>org.apache.oltu.oauth2.common</artifactId>
-            <version>${oltu.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.oltu.oauth2</groupId>
-            <artifactId>org.apache.oltu.oauth2.authzserver</artifactId>
-            <version>${oltu.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.oltu.oauth2</groupId>
-            <artifactId>org.apache.oltu.oauth2.resourceserver</artifactId>
-            <version>${oltu.version}</version>
-        </dependency>
-        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <version>${servlet-api.version}</version>
             <scope>provided</scope>
-        </dependency>
-        <!-- Ensure slf4j api version 1.5.6.
-             oltu brings in 1.6.1, but rest of DSpace 1.7 expects 1.5.6 -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.5.6</version>
         </dependency>
         <!-- DSpace dependencies -->
         <dependency>
@@ -157,8 +129,6 @@
     </dependencies>
     <properties>
         <jersey.version>1.18.1</jersey.version>
-        <oltu.version>1.0.0</oltu.version>
-        <glassfish.version>3.1.1</glassfish.version>
         <servlet-api.version>2.5</servlet-api.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <netbeans.hint.deploy.server>Tomcat</netbeans.hint.deploy.server>
