@@ -26,6 +26,8 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <attachClasses>true</attachClasses>
+                    <!-- Filter the web.xml -->
+                    <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                 </configuration>
             </plugin>
         </plugins>

@@ -38,15 +38,8 @@
                     <!-- In version 2.1-alpha-1, this was incorrectly named warSourceExcludes -->
                     <packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
                     <warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
-                    <webResources>
-                        <resource>
-                            <filtering>true</filtering>
-                            <directory>${basedir}/src/main/webapp</directory>
-                            <includes>
-                                <include>WEB-INF/web.xml</include>
-                            </includes>
-                        </resource>
-                    </webResources>
+                    <!-- Filter the web.xml -->
+                    <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                 </configuration>
                 <executions>
                     <execution>

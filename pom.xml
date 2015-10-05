@@ -99,6 +99,8 @@
                 <version>2.4</version>
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
+                    <!-- Filter the web.xml -->
+                    <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                     <archive>
                         <manifest>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
