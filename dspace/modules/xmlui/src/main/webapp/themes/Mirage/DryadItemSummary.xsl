@@ -1994,6 +1994,24 @@
                     <img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/ijm.png" alt="International Journal of Myriapodology cover"/>
                 </a>
             </xsl:when>
+			<xsl:when test='$journal-name = "International Journal of Plant Sciences"'>
+				<a target="_blank">
+					<xsl:attribute name="href">
+						<xsl:choose>
+							<xsl:when test="contains($article-doi,'doi:')">
+								<xsl:value-of
+										select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:value-of
+										select="string('http://www.jstor.org/journal/intejplanscie')"/>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:attribute>
+					<img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/IJPS_cover.png"
+						 alt="International Journal of Plant Sciences cover"/>
+				</a>
+			</xsl:when>   
             <xsl:when test='$journal-name = "Journal of Animal Ecology"'>
                 <a target="_blank">
                     <xsl:attribute name="href">

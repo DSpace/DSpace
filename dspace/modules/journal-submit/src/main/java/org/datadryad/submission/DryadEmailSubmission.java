@@ -359,14 +359,13 @@ public class DryadEmailSubmission extends HttpServlet {
                 throw new SubmissionException("Journal Name " + journalName + " did not match a known Journal Name");
             }
 
-            if (concept == null) {
-                // find the associated concept based on the journalCode.
-                try {
-                    concept = JournalUtils.getJournalConceptById(context, journalCode);
-                } catch (SQLException e) {
-                    throw new SubmissionException(e);
-                }
-            }
+            // find the associated concept and initialize the parser variable.
+            journalCode = JournalUtils.cleanJournalCode(journalCode);
+            try {
+                concept = JournalUtils.getJournalConceptByShortID(context, journalCode);
+            } catch (SQLException e) {
+                throw new SubmissionException(e);
+	    }
 
             if (concept == null) {
                 throw new SubmissionException("Concept not found for journal " + journalCode);
