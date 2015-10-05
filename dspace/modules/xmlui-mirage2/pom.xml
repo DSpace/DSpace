@@ -146,14 +146,9 @@
                 <configuration>
                     <archiveClasses>false</archiveClasses>
                     <warSourceExcludes>themes/**</warSourceExcludes>
+                    <!-- Filter the web.xml -->
+                    <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                     <webResources>
-                        <resource>
-                            <filtering>true</filtering>
-                            <directory>${basedir}/src/main/webapp</directory>
-                            <includes>
-                                <include>WEB-INF/web.xml</include>
-                            </includes>
-                        </resource>
                         <resource>
                             <directory>${project.build.directory}/themes</directory>
                             <targetPath>themes</targetPath>
