@@ -29,7 +29,9 @@ public class EmailParser {
     protected Manuscript manuscript;
     protected Map<String, String> dataForXML = new LinkedHashMap<String, String>();
 
-    // required XML tags that correspond to parts of LegacyManuscript
+    // required XML tags that correspond to parts of Manuscript
+    public static final String JOURNAL_CODE = "Journal_Code";
+    public static final String JOURNAL = "Journal";
     public static final String ABSTRACT = "Abstract";
     public static final String AUTHORS = "Authors";
     public static final String ARTICLE_STATUS = "Article_Status";
@@ -47,11 +49,10 @@ public class EmailParser {
     public static final String CLASSIFICATION = "Classification";
 
     // commonly-used XML tags:
-    public static final String JOURNAL_CODE = "Journal_Code";
-    public static final String JOURNAL = "Journal";
     public static final String ISSN = "ISSN";
     public static final String ORCID = "ORCID";
     public static final String RESEARCHER_ID = "Researcher_ID";
+    public static final String DRYAD_DOI = "Dryad_DOI";
 
     // Parsers that deal with specific and unneeded fields should assign fields to the UNNECESSARY tag:
     public static final String UNNECESSARY = "Unnecessary";
@@ -87,6 +88,7 @@ public class EmailParser {
 
         // commonly-used field names for optional XML tags
         fieldToXMLTagMap.put("ISSN", ISSN);
+        fieldToXMLTagMap.put("ms dryad doi", DRYAD_DOI);
     }
 
     /** The Pattern for dryad_ id. */
@@ -186,6 +188,7 @@ public class EmailParser {
         manuscript.correspondingAuthor.address.state = (String) dataForXML.remove(STATE);
         manuscript.correspondingAuthor.address.country = (String) dataForXML.remove(COUNTRY);
         manuscript.correspondingAuthor.address.zip = (String) dataForXML.remove(ZIP);
+        manuscript.dryadDataDOI = (String) dataForXML.remove(DRYAD_DOI);
         manuscript.optionalProperties = dataForXML;
     }
 
