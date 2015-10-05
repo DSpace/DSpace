@@ -12,6 +12,7 @@ import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.*;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.utils.DSpace;
@@ -28,6 +29,7 @@ import java.sql.SQLException;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 
@@ -42,6 +44,7 @@ public class VersioningTest extends AbstractUnitTest {
 
     private static final Logger log = Logger.getLogger(VersioningTest.class);
 
+    private String originalHandle;
     private Item originalItem;
     private Item versionedItem;
     private String summary = "Unit test version";
@@ -55,6 +58,8 @@ public class VersioningTest extends AbstractUnitTest {
     protected VersioningService versionService = VersionServiceFactory.getInstance().getVersionService();
     protected VersionHistoryService versionHistoryService = VersionServiceFactory.getInstance().getVersionHistoryService();
 
+    //A regex that can be used to see if a handle contains the format of handle created by the org.dspace.identifier.VersionedHandleIdentifierProvider
+    protected String versionedHandleRegex = ConfigurationManager.getProperty("handle.prefix") + "\\/[0-9]*\\.[0-9]";
 
     /**
      * This method will be run before every test as per @Before. It will
@@ -77,6 +82,7 @@ public class VersioningTest extends AbstractUnitTest {
             WorkspaceItem is = workspaceItemService.create(context, col, false);
 
             originalItem = installItemService.installItem(context, is);
+            originalHandle = originalItem.getHandle();
 
             Version version = versionService.createNewVersion(context, originalItem, summary);
             WorkspaceItem wsi = workspaceItemService.findByItem(context, version.getItem());
@@ -136,7 +142,20 @@ public class VersioningTest extends AbstractUnitTest {
 
     @Test
     public void testVersionHandle() throws Exception {
-        assertThat("Test_version_handle", versionedItem.getHandle(), notNullValue());
+        /*
+        Verify the handles assigned to an item, the original item should get a single handle
+        while the versioned item should get 2 handles, the original handle & a versioned one.
+         */
+        assertThat("Test_version_handle 1", versionedItem.getHandle(), notNullValue());
+        assertThat("Test_version_handle 2", originalItem.getHandle(), notNullValue());
+        assertTrue("Test_version_handle 3 ", originalItem.getHandles().size() == 1);
+        assertTrue("Test_version_handle 4 ", versionedItem.getHandles().size() == 2);
+        assertTrue("Test_version_handle 5 ", originalItem.getHandle().matches(versionedHandleRegex));
+        assertTrue("Test_version_handle 6 ", originalItem.getHandle().startsWith(originalHandle + "."));
+        //The getHandle method should always return the original handle
+        assertTrue("Test_version_handle 7 ", versionedItem.getHandle().equals(originalHandle));
+        assertTrue("Test_version_handle 8 ", versionedItem.getHandles().get(1).getHandle().startsWith(originalHandle + "."));
+        assertTrue("Test_version_handle 9 ", versionedItem.getHandles().get(1).getHandle().matches(versionedHandleRegex));
     }
 
     @Test
