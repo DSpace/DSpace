@@ -380,7 +380,10 @@ public class DryadEmailSubmission extends HttpServlet {
                 throw new SubmissionException("Journal " + journalCode + " parsing scheme not found");
             }
 
-            if ((manuscript != null) && (manuscript.isValid())) {
+            if ((manuscript != null) && (JournalUtils.manuscriptIsValid(context, manuscript))) {
+                // edit the manuscript ID to the canonical one:
+                manuscript.manuscriptId = JournalUtils.getCanonicalManuscriptID(context, manuscript);
+
                 JournalUtils.writeManuscriptToXMLFile(context, manuscript);
                 JournalUtils.writeManuscriptToDB(context, manuscript);
             } else {

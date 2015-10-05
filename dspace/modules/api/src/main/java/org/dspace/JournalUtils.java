@@ -197,22 +197,30 @@ public class JournalUtils {
         return null;
     }
 
-    public static String getCanonicalManuscriptID(Concept concept, Manuscript manuscript) {
+    public static String getCanonicalManuscriptID(Context context, Manuscript manuscript) {
         String canonicalID = manuscript.manuscriptId;
         String regex = null;
         try {
+            Concept concept = getJournalConceptByShortID(context, manuscript.organization.organizationCode);
             AuthorityMetadataValue[] vals = concept.getMetadata("journal","manuscriptNumberIgnorePattern",null, Item.ANY);
             if(vals != null && vals.length > 0) {
                 regex = vals[0].getValue();
                 Matcher manuscriptMatcher = Pattern.compile(regex).matcher(canonicalID);
                 if (manuscriptMatcher.find()) {
                     canonicalID = manuscriptMatcher.group(1);
+                } else {
+                    canonicalID = null;
                 }
             }
         } catch(Exception e) {
             log.error(e.getMessage(),e);
         }
         return canonicalID;
+    }
+
+    public static Boolean manuscriptIsValid(Context context, Manuscript manuscript) {
+        Boolean result = manuscript.isValid() && (getCanonicalManuscriptID(context, manuscript) != null);
+        return result;
     }
 
     public static String getFullName(Concept concept) {
@@ -451,7 +459,6 @@ public class JournalUtils {
     public static Map<String, String> findJournalProperties(Context c, String journal){
         Map<String, String> myJournalProperties = new HashMap<String, String>();
 
-
         try {
             String publicationNameProp = ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName");
             Scheme scheme = Scheme.findByIdentifier(c, publicationNameProp);
@@ -493,29 +500,28 @@ public class JournalUtils {
         return journalCode.replaceAll("[^a-zA-Z0-9]", "").toUpperCase();
     }
 
-    public static void writeManuscriptToXMLFile(Context context, Manuscript manuscript) throws StorageException{
+    public static void writeManuscriptToXMLFile(Context context, Manuscript manuscript) throws StorageException {
         try {
-            log.info ("looking for metadatadir for " + manuscript.manuscriptId);
-            Concept concept = JournalUtils.getJournalConceptById(context, manuscript.manuscriptId);
-            if (concept == null) {
-                log.info ("couldn't find concept");
-            }
-            String filename = JournalUtils.escapeFilename(manuscript.manuscriptId + ".xml");
-            File file = new File(JournalUtils.getMetadataDir(concept), filename);
-            FileOutputStream outputStream = null;
+            log.debug ("looking for metadatadir for " + manuscript.organization.organizationCode);
+            Concept concept = JournalUtils.getJournalConceptByShortID(context, manuscript.organization.organizationCode);
+            if (concept != null) {
+                String filename = JournalUtils.escapeFilename(manuscript.manuscriptId + ".xml");
+                File file = new File(JournalUtils.getMetadataDir(concept), filename);
+                FileOutputStream outputStream = null;
 
-            try {
-                outputStream = new FileOutputStream(file);
-            } catch (FileNotFoundException e) {
-                log.warn("couldn't open a file to write", e);
-            }
-
-            if (outputStream != null) {
                 try {
-                    ManuscriptToLegacyXMLConverter.convertToInternalXML(manuscript, outputStream);
-                    log.info("wrote xml to file " + file.getAbsolutePath());
-                } catch (JAXBException e) {
-                    log.warn("couldn't convert to XML");
+                    outputStream = new FileOutputStream(file);
+                } catch (FileNotFoundException e) {
+                    log.warn("couldn't open a file to write", e);
+                }
+
+                if (outputStream != null) {
+                    try {
+                        ManuscriptToLegacyXMLConverter.convertToInternalXML(manuscript, outputStream);
+                        log.info("wrote xml to file " + file.getAbsolutePath());
+                    } catch (JAXBException e) {
+                        log.warn("couldn't convert to XML");
+                    }
                 }
             }
         } catch (SQLException e) {
