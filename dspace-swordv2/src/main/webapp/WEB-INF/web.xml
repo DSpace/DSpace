@@ -105,12 +105,12 @@
 	   -->
 	<listener>
 		<listener-class>
-			org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener
+			org.dspace.app.util.DSpaceContextListener
 		</listener-class>
 	</listener>
 	<listener>
 		<listener-class>
-			org.dspace.app.util.DSpaceContextListener
+			org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener
 		</listener-class>
 	</listener>
 
