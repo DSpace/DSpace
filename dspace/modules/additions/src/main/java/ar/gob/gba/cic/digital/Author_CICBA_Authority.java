@@ -19,7 +19,7 @@ public class Author_CICBA_Authority extends CICBAAuthority {
 		pqs.append("WHERE {\n");
 		pqs.append("?person a foaf:Person ; foaf:givenName ?name ; foaf:familyName ?surname .\n");
 		pqs.append("OPTIONAL { ?person foaf:Organization ?a ; dc:identifier ?id . ?a a foaf:Organization ; dc:title ?affiliation }\n");
-		pqs.append("FILTER(REGEX(?id, ?key, \"i\"))\n");
+		pqs.append("FILTER(REGEX(?person, ?key, \"i\"))\n");
 		pqs.append("}\n");
 
 		pqs.setLiteral("key", key);

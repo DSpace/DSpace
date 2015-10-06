@@ -193,20 +193,7 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
                                             || (values[x].authority != null && values[x].confidence >= minConfidence))
                                     {
                                         distFAuths.add(values[x].authority);
-                                        distValuesForAC.add(values[x].value);
-                                        
-                                        String nVal2 = OrderFormat
-                                                .makeSortString(
-                                                        values[x].value,
-                                                        values[x].language,
-                                                        bi.getDataType());
-                                        distFValues
-                                        .add(nVal2
-                                                + SolrServiceImpl.FILTER_SEPARATOR
-                                                + nVal2
-                                                + SolrServiceImpl.AUTHORITY_SEPARATOR
-                                                + values[x].authority);
-                                        
+                                        distValuesForAC.add(values[x].value);                                       
 
                                         String preferedLabel = null;
                                         boolean ignorePrefered = new DSpace()
