@@ -154,6 +154,7 @@ public class UFALLicenceAgreementAgreed {
 			params.put("extraMetadata", seenExtra);
 			params.put("allzip", allzip);
 			params.put("ip", request.getRemoteAddr());
+			params.put("token", token);
 
 			for (ExtraLicenseField exField : actions) {
 				exField.performAction(params);
