@@ -32,8 +32,8 @@
           class="org.dspace.browse.SolrBrowseCreateDAO">
     </bean>
     
-    <!-- Additional indexing plugin make filtering by full text exists posible via SOLR -->
-    <bean id="fullTextFilter" class="org.dspace.discovery.SolrServiceFullTextFilterPlugin"/>
+    <!-- Additional indexing plugin make filtering by has content in original bundle (like pdf's, images) posible via SOLR -->
+    <bean id="hasContentInOriginalBundle" class="org.dspace.discovery.SolrServiceContentInOriginalBundleFilterPlugin"/>
 
     <!--Bean that is used for mapping communities/collections to certain discovery configurations.-->
     <bean id="org.dspace.discovery.configuration.DiscoveryConfigurationService" class="org.dspace.discovery.configuration.DiscoveryConfigurationService">
@@ -101,7 +101,7 @@
                 <ref bean="searchFilterAuthor" />
                 <ref bean="searchFilterSubject" />
                 <ref bean="searchFilterIssued" />
-		<ref bean="searchFilterFulltext"/>
+		        <ref bean="searchFilterContentInOriginalBundle"/>
             </list>
         </property>
         <!-- Set TagCloud configuration per discovery configuration -->
@@ -113,7 +113,7 @@
                 <ref bean="searchFilterAuthor" />
                 <ref bean="searchFilterSubject" />
                 <ref bean="searchFilterIssued" />
-		<ref bean="searchFilterFulltext"/>
+		        <ref bean="searchFilterContentInOriginalBundle"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -208,7 +208,7 @@
                 <ref bean="searchFilterAuthor" />
                 <ref bean="searchFilterSubject" />
                 <ref bean="searchFilterIssued" />
-		<ref bean="searchFilterFulltext"/>
+		        <ref bean="searchFilterContentInOriginalBundle"/>
             </list>
         </property>
         <!-- Set TagCloud configuration per discovery configuration -->
@@ -220,7 +220,7 @@
                 <ref bean="searchFilterAuthor" />
                 <ref bean="searchFilterSubject" />
                 <ref bean="searchFilterIssued" />
-		<ref bean="searchFilterFulltext"/>
+		        <ref bean="searchFilterContentInOriginalBundle"/>
             </list>
         </property>
         <!--The sort filters for the discovery search (same as defaultConfiguration above)-->
@@ -412,8 +412,8 @@
         <property name="sortOrder" value="VALUE"/>
     </bean>
     
-    <bean id="searchFilterFulltext" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
-        <property name="indexFieldName" value="has_full_text"/>
+    <bean id="searchFilterContentInOriginalBundle" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="has_content_in_original_bundle"/>
         <property name="metadataFields">
             <list/>
         </property>

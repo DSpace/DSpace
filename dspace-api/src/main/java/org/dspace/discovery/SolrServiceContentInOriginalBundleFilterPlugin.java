@@ -19,8 +19,8 @@ import org.dspace.discovery.SolrServiceIndexPlugin;
 
 /**
  * This plugin adds three fields to the solr index to make a facet with/without
- * full text possible. It is activated simply by adding this class as a bean to
- * discovery.xml.
+ * content in the ORIGINAL Bundle possible (like full text, images...). It is
+ * activated simply by adding this class as a bean to discovery.xml.
  * 
  * The facet is added to Discovery in the usual way (create a searchFilter bean
  * and add it to the expected place) just with an empty list of used metadata
@@ -29,15 +29,13 @@ import org.dspace.discovery.SolrServiceIndexPlugin;
  * @author Christian Scheible <christian.scheible@uni-konstanz.de>
  * 
  */
-public class SolrServiceFullTextFilterPlugin implements SolrServiceIndexPlugin
+public class SolrServiceContentInOriginalBundleFilterPlugin implements SolrServiceIndexPlugin
 {
 
-    private static final Logger log = Logger
-            .getLogger(SolrServiceFullTextFilterPlugin.class);
+    private static final Logger log = Logger.getLogger(SolrServiceContentInOriginalBundleFilterPlugin.class);
 
     @Override
-    public void additionalIndex(Context context, DSpaceObject dso,
-            SolrInputDocument document)
+    public void additionalIndex(Context context, DSpaceObject dso, SolrInputDocument document)
     {
         if (dso instanceof Item)
         {
@@ -50,22 +48,21 @@ public class SolrServiceFullTextFilterPlugin implements SolrServiceIndexPlugin
                 // they are needed in order to work as a facet and filter.
                 if (bundles.length == 0)
                 {
-                    // no full text attached.
-                    document.addField("has_full_text", false);
-                    document.addField("has_full_text_keyword", false);
-                    document.addField("has_full_text_filter", false);
+                    // no content in the original bundle
+                    document.addField("has_content_in_original_bundle", false);
+                    document.addField("has_content_in_original_bundle_keyword", false);
+                    document.addField("has_content_in_original_bundle_filter", false);
                 }
                 else
                 {
-                    document.addField("has_full_text", true);
-                    document.addField("has_full_text_keyword", true);
-                    document.addField("has_full_text_filter", true);
+                    document.addField("has_content_in_original_bundle", true);
+                    document.addField("has_content_in_original_bundle_keyword", true);
+                    document.addField("has_content_in_original_bundle_filter", true);
                 }
             }
             catch (SQLException e)
             {
-                log.error("Error adding additional solr field for full text facet: "
-                        + e.getMessage());
+                log.error("Error adding additional solr field for original bundle content facet: " + e.getMessage());
             }
         }
 
