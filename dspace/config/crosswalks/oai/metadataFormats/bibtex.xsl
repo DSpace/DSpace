@@ -55,12 +55,20 @@
     </xsl:template>
     
     <xsl:template name="author">
-            <xsl:if test="doc:metadata/doc:element[@name='dc']/doc:element[@name='contributor']/doc:element[@name='author']/doc:element/doc:field[@name='value']">
-                author = {<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='contributor']/doc:element[@name='author']/doc:element/doc:field[@name='value']">
-                                            <xsl:value-of select="util:bibtexify(.)"/>
-                                            <xsl:if test="position() != last()"> and  </xsl:if>
-                          </xsl:for-each>},
-            </xsl:if>
+            <xsl:choose>
+                    <xsl:when test="doc:metadata/doc:element[@name='dc']/doc:element[@name='contributor']/doc:element[@name='author']/doc:element/doc:field[@name='value']">
+                        author = {<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='contributor']/doc:element[@name='author']/doc:element/doc:field[@name='value']">
+                                                    <xsl:value-of select="util:bibtexify(.)"/>
+                                                    <xsl:if test="position() != last()"> and  </xsl:if>
+                                  </xsl:for-each>},
+                    </xsl:when>
+                    <xsl:when test="doc:metadata/doc:element[@name='dc']/doc:element[@name='contributor']/doc:element[@name='other']/doc:element/doc:field[@name='value']">
+                        author = {<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='contributor']/doc:element[@name='other']/doc:element/doc:field[@name='value']">
+                                                    <xsl:value-of select="util:bibtexify(.)"/>
+                                                    <xsl:if test="position() != last()"> and  </xsl:if>
+                                  </xsl:for-each>},
+                    </xsl:when>
+            </xsl:choose>
     </xsl:template>
     
     <!-- Do not escape -->
