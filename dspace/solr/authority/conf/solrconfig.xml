@@ -58,18 +58,18 @@
   <!-- When a regex is specified in addition to a directory, only the
        files in that directory which completely match the regex
        (anchored on both ends) will be included.
+    -->
   <lib dir="../../dist/" regex="apache-solr-cell-\d.*\.jar" />
   <lib dir="../../dist/" regex="apache-solr-clustering-\d.*\.jar" />
   <lib dir="../../dist/" regex="apache-solr-dataimporthandler-\d.*\.jar" />
   <lib dir="../../dist/" regex="apache-solr-langid-\d.*\.jar" />
   <lib dir="../../dist/" regex="apache-solr-velocity-\d.*\.jar" />
-    -->
 
   <!-- If a dir option (with or without a regex) is used and nothing
        is found that matches, it will be ignored
+    -->
   <lib dir="../../contrib/clustering/lib/downloads/" />
   <lib dir="../../contrib/clustering/lib/" />
-    -->
   <!-- an exact path can be used to specify a specific file.  This will cause
        a serious error to be logged if it can't be loaded.
   <lib path="../a-jar-that-does-not-exist.jar" />
