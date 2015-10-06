@@ -15,7 +15,8 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.content.Collection;
-import org.dspace.content.Community;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.xml.sax.SAXException;
 
@@ -40,6 +41,8 @@ public class BatchImportMain extends AbstractDSpaceTransformer {
     private static final Message T_collection_help = message("xmlui.administrative.batchimport.general.collection_help");
     private static final Message T_collection_default = message("xmlui.administrative.batchimport.general.collection_default");
 
+    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+
     public void addPageMeta(PageMeta pageMeta) throws WingException
     {
         pageMeta.addMetadata("title").addContent(T_title);
@@ -57,7 +60,7 @@ public class BatchImportMain extends AbstractDSpaceTransformer {
         div.setHead(T_head1);
 
         //Choose Destination Collection
-        Collection[] collections = Collection.findAuthorized(context, null, Constants.ADD);
+        java.util.List<Collection> collections = collectionService.findAuthorized(context, null, Constants.ADD);
 
         List list = div.addList("select-collection", List.TYPE_FORM);
         list.setHead(T_select_collection);

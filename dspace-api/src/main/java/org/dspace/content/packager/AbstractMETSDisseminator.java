@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -57,26 +58,25 @@ import org.apache.log4j.Logger;
 
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.Community;
-import org.dspace.content.Collection;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.*;
 import org.dspace.content.crosswalk.AbstractPackagerWrappingCrosswalk;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.CrosswalkObjectNotSupported;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.SiteService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.PluginManager;
 import org.dspace.core.Utils;
-import org.dspace.license.CreativeCommons;
+import org.dspace.license.factory.LicenseServiceFactory;
+import org.dspace.license.service.CreativeCommonsService;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.output.Format;
@@ -121,10 +121,15 @@ public abstract class AbstractMETSDisseminator
     private static Logger log = Logger.getLogger(AbstractMETSDisseminator.class);
 
     // JDOM xml output writer - indented format for readability.
-    private static XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
+    protected static XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
+
+    protected final AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    protected final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    protected final SiteService siteService = ContentServiceFactory.getInstance().getSiteService();
+    protected final CreativeCommonsService creativeCommonsService = LicenseServiceFactory.getInstance().getCreativeCommonsService();
 
     // for gensym()
-    private int idCounter = 1;
+    protected int idCounter = 1;
 
     /**
      * Default date/time (in milliseconds since epoch) to set for Zip Entries
@@ -134,7 +139,7 @@ public abstract class AbstractMETSDisseminator
      * change whenever Zip is regenerated (even if compressed files are unchanged)
      * 1036368000 seconds * 1000 = Nov 4, 2002 GMT (the date DSpace 1.0 was released)
      */
-    private static final int DEFAULT_MODIFIED_DATE = 1036368000 * 1000;
+    protected static final int DEFAULT_MODIFIED_DATE = 1036368000 * 1000;
 
     /**
      * Suffix for Template objects (e.g. Item Templates)
@@ -150,7 +155,7 @@ public abstract class AbstractMETSDisseminator
      */
     protected static class MdStreamCache
     {
-        private Map<MdRef,InputStream> extraFiles = new HashMap<MdRef,InputStream>();
+        protected Map<MdRef,InputStream> extraFiles = new HashMap<MdRef,InputStream>();
 
         public void addStream(MdRef key, InputStream md)
         {
@@ -418,72 +423,55 @@ public abstract class AbstractMETSDisseminator
             //get last modified time
             long lmTime = ((Item)dso).getLastModified().getTime();
 
-            Bundle bundles[] = item.getBundles();
-            for (int i = 0; i < bundles.length; i++)
+            List<Bundle> bundles = item.getBundles();
+            for (Bundle bundle : bundles)
             {
-                if (includeBundle(bundles[i]))
-                {
+                if (includeBundle(bundle)) {
                     // unauthorized bundle?
-                    if (!AuthorizeManager.authorizeActionBoolean(context,
-                                bundles[i], Constants.READ))
-                    {
+                    if (!authorizeService.authorizeActionBoolean(context,
+                            bundle, Constants.READ)) {
                         if (unauth != null &&
-                            (unauth.equalsIgnoreCase("skip")))
-                        {
-                            log.warn("Skipping Bundle[\""+bundles[i].getName()+"\"] because you are not authorized to read it.");
+                                (unauth.equalsIgnoreCase("skip"))) {
+                            log.warn("Skipping Bundle[\"" + bundle.getName() + "\"] because you are not authorized to read it.");
                             continue;
-                        }
-                        else
-                        {
-                            throw new AuthorizeException("Not authorized to read Bundle named \"" + bundles[i].getName() + "\"");
+                        } else {
+                            throw new AuthorizeException("Not authorized to read Bundle named \"" + bundle.getName() + "\"");
                         }
                     }
-                    Bitstream[] bitstreams = bundles[i].getBitstreams();
-                    for (int k = 0; k < bitstreams.length; k++)
-                    {
-                        boolean auth = AuthorizeManager.authorizeActionBoolean(context,
-                                bitstreams[k], Constants.READ);
+                    List<Bitstream> bitstreams = bundle.getBitstreams();
+                    for (Bitstream bitstream : bitstreams) {
+                        boolean auth = authorizeService.authorizeActionBoolean(context,
+                                bitstream, Constants.READ);
                         if (auth ||
-                            (unauth != null && unauth.equalsIgnoreCase("zero")))
-                        {
-                            String zname = makeBitstreamURL(bitstreams[k], params);
+                                (unauth != null && unauth.equalsIgnoreCase("zero"))) {
+                            String zname = makeBitstreamURL(context, bitstream, params);
                             ZipEntry ze = new ZipEntry(zname);
-                            if (log.isDebugEnabled())
-                            {
-                                log.debug(new StringBuilder().append("Writing CONTENT stream of bitstream(").append(bitstreams[k].getID()).append(") to Zip: ").append(zname).append(", size=").append(bitstreams[k].getSize()).toString());
+                            if (log.isDebugEnabled()) {
+                                log.debug(new StringBuilder().append("Writing CONTENT stream of bitstream(").append(bitstream.getID()).append(") to Zip: ").append(zname).append(", size=").append(bitstream.getSize()).toString());
                             }
-                            if (lmTime != 0)
-                            {
+                            if (lmTime != 0) {
                                 ze.setTime(lmTime);
-                            }
-                            else //Set a default modified date so that checksum of Zip doesn't change if Zip contents are unchanged
+                            } else //Set a default modified date so that checksum of Zip doesn't change if Zip contents are unchanged
                             {
                                 ze.setTime(DEFAULT_MODIFIED_DATE);
                             }
-                            ze.setSize(auth ? bitstreams[k].getSize() : 0);
+                            ze.setSize(auth ? bitstream.getSize() : 0);
                             zip.putNextEntry(ze);
-                            if (auth)
-                            {
-                                InputStream input = bitstreams[k].retrieve();
+                            if (auth) {
+                                InputStream input = bitstreamService.retrieve(context, bitstream);
                                 Utils.copy(input, zip);
                                 input.close();
-                            }
-                            else
-                            {
+                            } else {
                                 log.warn("Adding zero-length file for Bitstream, SID="
-                                        + String.valueOf(bitstreams[k].getSequenceID())
+                                        + String.valueOf(bitstream.getSequenceID())
                                         + ", not authorized for READ.");
                             }
                             zip.closeEntry();
-                        }
-                        else if (unauth != null &&
-                                 unauth.equalsIgnoreCase("skip"))
-                        {
-                            log.warn("Skipping Bitstream, SID="+String.valueOf(bitstreams[k].getSequenceID())+", not authorized for READ.");
-                        }
-                        else
-                        {
-                            throw new AuthorizeException("Not authorized to read Bitstream, SID="+String.valueOf(bitstreams[k].getSequenceID()));
+                        } else if (unauth != null &&
+                                unauth.equalsIgnoreCase("skip")) {
+                            log.warn("Skipping Bitstream, SID=" + String.valueOf(bitstream.getSequenceID()) + ", not authorized for READ.");
+                        } else {
+                            throw new AuthorizeException("Not authorized to read Bitstream, SID=" + String.valueOf(bitstream.getSequenceID()));
                         }
                     }
                 }
@@ -499,7 +487,7 @@ public abstract class AbstractMETSDisseminator
                                  ((Community)dso).getLogo();
             if (logoBs != null)
             {
-                String zname = makeBitstreamURL(logoBs, params);
+                String zname = makeBitstreamURL(context, logoBs, params);
                 ZipEntry ze = new ZipEntry(zname);
                 if (log.isDebugEnabled())
                 {
@@ -509,7 +497,7 @@ public abstract class AbstractMETSDisseminator
                 //Set a default modified date so that checksum of Zip doesn't change if Zip contents are unchanged
                 ze.setTime(DEFAULT_MODIFIED_DATE);
                 zip.putNextEntry(ze);
-                Utils.copy(logoBs.retrieve(), zip);
+                Utils.copy(bitstreamService.retrieve(context, logoBs), zip);
                 zip.closeEntry();
             }
         }
@@ -620,7 +608,7 @@ public abstract class AbstractMETSDisseminator
                     MdWrap mdWrap = new MdWrap();
                     setMdType(mdWrap, metsName);
                     XmlData xmlData = new XmlData();
-                    if (crosswalkToMetsElement(xwalk, dso, xmlData) != null)
+                    if (crosswalkToMetsElement(context, xwalk, dso, xmlData) != null)
                     {
                         mdWrap.getContent().add(xmlData);
                         mdSec.getContent().add(mdWrap);
@@ -877,97 +865,83 @@ public abstract class AbstractMETSDisseminator
             // Create the bitstream-level techMd and div's for structmap
             // at the same time so we can connect the IDREFs to IDs.
             fileSec = new FileSec();
-            Bundle[] bundles = item.getBundles();
-            for (int i = 0; i < bundles.length; i++)
+            List<Bundle> bundles = item.getBundles();
+            for (Bundle bundle : bundles)
             {
-                if (!includeBundle(bundles[i]))
-                {
+                if (!includeBundle(bundle)) {
                     continue;
                 }
 
                 // unauthorized bundle?
                 // NOTE: This must match the logic in disseminate()
-                if (!AuthorizeManager.authorizeActionBoolean(context,
-                            bundles[i], Constants.READ))
-                {
+                if (!authorizeService.authorizeActionBoolean(context,
+                        bundle, Constants.READ)) {
                     if (unauth != null &&
-                        (unauth.equalsIgnoreCase("skip")))
-                    {
+                            (unauth.equalsIgnoreCase("skip"))) {
                         continue;
-                    }
-                    else
-                    {
-                        throw new AuthorizeException("Not authorized to read Bundle named \"" + bundles[i].getName() + "\"");
+                    } else {
+                        throw new AuthorizeException("Not authorized to read Bundle named \"" + bundle.getName() + "\"");
                     }
                 }
 
-                Bitstream[] bitstreams = bundles[i].getBitstreams();
+                List<Bitstream> bitstreams = bundle.getBitstreams();
 
                 // Create a fileGrp, USE = permuted Bundle name
                 FileGrp fileGrp = new FileGrp();
-                String bName = bundles[i].getName();
-                if ((bName != null) && !bName.equals(""))
-                {
+                String bName = bundle.getName();
+                if ((bName != null) && !bName.equals("")) {
                     fileGrp.setUSE(bundleToFileGrp(bName));
                 }
 
                 // add technical metadata for a bundle
-                String techBundID = addAmdSec(context, bundles[i], params, mets, extraStreams);
-                if (techBundID != null)
-                {
+                String techBundID = addAmdSec(context, bundle, params, mets, extraStreams);
+                if (techBundID != null) {
                     fileGrp.setADMID(techBundID);
                 }
 
                 // watch for primary bitstream
-                int primaryBitstreamID = -1;
+                Bitstream primaryBitstream = null;
                 boolean isContentBundle = false;
-                if ((bName != null) && bName.equals("ORIGINAL"))
-                {
+                if ((bName != null) && bName.equals("ORIGINAL")) {
                     isContentBundle = true;
-                    primaryBitstreamID = bundles[i].getPrimaryBitstreamID();
+                    primaryBitstream = bundle.getPrimaryBitstream();
                 }
 
                 // For each bitstream, add to METS manifest
-                for (int bits = 0; bits < bitstreams.length; bits++)
+                for (Bitstream bitstream : bitstreams)
                 {
                     // Check for authorization.  Handle unauthorized
                     // bitstreams to match the logic in disseminate(),
                     // i.e. "unauth=zero" means include a 0-length bitstream,
                     // "unauth=skip" means to ignore it (and exclude from
                     // manifest).
-                    boolean auth = AuthorizeManager.authorizeActionBoolean(context,
-                            bitstreams[bits], Constants.READ);
-                    if (!auth)
-                    {
-                        if (unauth != null && unauth.equalsIgnoreCase("skip"))
-                        {
+                    boolean auth = authorizeService.authorizeActionBoolean(context,
+                            bitstream, Constants.READ);
+                    if (!auth) {
+                        if (unauth != null && unauth.equalsIgnoreCase("skip")) {
                             continue;
-                        }
-                        else if (!(unauth != null && unauth.equalsIgnoreCase("zero")))
-                        {
-                            throw new AuthorizeException("Not authorized to read Bitstream, SID=" + String.valueOf(bitstreams[bits].getSequenceID()));
+                        } else if (!(unauth != null && unauth.equalsIgnoreCase("zero"))) {
+                            throw new AuthorizeException("Not authorized to read Bitstream, SID=" + String.valueOf(bitstream.getSequenceID()));
                         }
                     }
 
-                    String sid = String.valueOf(bitstreams[bits].getSequenceID());
+                    String sid = String.valueOf(bitstream.getSequenceID());
                     String fileID = bitstreamIDstart + sid;
                     edu.harvard.hul.ois.mets.File file = new edu.harvard.hul.ois.mets.File();
                     file.setID(fileID);
-                    file.setSEQ(bitstreams[bits].getSequenceID());
+                    file.setSEQ(bitstream.getSequenceID());
                     fileGrp.getContent().add(file);
 
                     // set primary bitstream in structMap
-                    if (bitstreams[bits].getID() == primaryBitstreamID)
-                    {
+                    if (bitstream.equals(primaryBitstream)) {
                         Fptr fptr = new Fptr();
                         fptr.setFILEID(fileID);
                         div0.getContent().add(0, fptr);
                     }
 
                     // if this is content, add to structmap too:
-                    if (isContentBundle)
-                    {
-                        div0.getContent().add(makeFileDiv(fileID, getObjectTypeString(bitstreams[bits])));
+                    if (isContentBundle) {
+                        div0.getContent().add(makeFileDiv(fileID, getObjectTypeString(bitstream)));
                     }
 
                     /*
@@ -976,50 +950,43 @@ public abstract class AbstractMETSDisseminator
                      * out which bitstream to be in the same group as
                      */
                     String groupID = "GROUP_" + bitstreamIDstart + sid;
-                    if ((bundles[i].getName() != null)
-                            && (bundles[i].getName().equals("THUMBNAIL") ||
-                                bundles[i].getName().startsWith("TEXT")))
-                    {
+                    if ((bundle.getName() != null)
+                            && (bundle.getName().equals("THUMBNAIL") ||
+                            bundle.getName().startsWith("TEXT"))) {
                         // Try and find the original bitstream, and chuck the
                         // derived bitstream in the same group
                         Bitstream original = findOriginalBitstream(item,
-                                bitstreams[bits]);
-                        if (original != null)
-                        {
-                                groupID = "GROUP_" + bitstreamIDstart
+                                bitstream);
+                        if (original != null) {
+                            groupID = "GROUP_" + bitstreamIDstart
                                     + original.getSequenceID();
                         }
                     }
                     file.setGROUPID(groupID);
-                    file.setMIMETYPE(bitstreams[bits].getFormat().getMIMEType());
-                    file.setSIZE(auth ? bitstreams[bits].getSize() : 0);
+                    file.setMIMETYPE(bitstream.getFormat(context).getMIMEType());
+                    file.setSIZE(auth ? bitstream.getSize() : 0);
 
                     // Translate checksum and type to METS
-                    String csType = bitstreams[bits].getChecksumAlgorithm();
-                    String cs = bitstreams[bits].getChecksum();
-                    if (auth && cs != null && csType != null)
-                    {
-                        try
-                        {
+                    String csType = bitstream.getChecksumAlgorithm();
+                    String cs = bitstream.getChecksum();
+                    if (auth && cs != null && csType != null) {
+                        try {
                             file.setCHECKSUMTYPE(Checksumtype.parse(csType));
                             file.setCHECKSUM(cs);
-                        }
-                        catch (MetsException e)
-                        {
-                            log.warn("Cannot set bitstream checksum type="+csType+" in METS.");
+                        } catch (MetsException e) {
+                            log.warn("Cannot set bitstream checksum type=" + csType + " in METS.");
                         }
                     }
 
                     // FLocat: point to location of bitstream contents.
                     FLocat flocat = new FLocat();
                     flocat.setLOCTYPE(Loctype.URL);
-                    flocat.setXlinkHref(makeBitstreamURL(bitstreams[bits], params));
+                    flocat.setXlinkHref(makeBitstreamURL(context, bitstream, params));
                     file.getContent().add(flocat);
 
                     // technical metadata for bitstream
-                    String techID = addAmdSec(context, bitstreams[bits], params, mets, extraStreams);
-                    if (techID != null)
-                    {
+                    String techID = addAmdSec(context, bitstream, params, mets, extraStreams);
+                    if (techID != null) {
                         file.setADMID(techID);
                     }
                 }
@@ -1029,7 +996,7 @@ public abstract class AbstractMETSDisseminator
         else if (dso.getType() == Constants.COLLECTION)
         {
             Collection collection = (Collection)dso;
-            ItemIterator ii = collection.getItems();
+            Iterator<Item> ii = itemService.findByCollection(context, collection);
             while (ii.hasNext())
             {
                 //add a child <div> for each item in collection
@@ -1084,32 +1051,30 @@ public abstract class AbstractMETSDisseminator
             if (logoBs != null)
             {
                 fileSec = new FileSec();
-                addLogoBitstream(logoBs, fileSec, div0, params);
+                addLogoBitstream(context, logoBs, fileSec, div0, params);
             }
         }
         else if (dso.getType() == Constants.COMMUNITY)
         {
             // Subcommunities are directly under "DSpace Object Contents" <div>,
             // but are labeled as Communities.
-            Community subcomms[] = ((Community)dso).getSubcommunities();
-            for (int i = 0; i < subcomms.length; ++i)
+            List<Community> subcomms = ((Community)dso).getSubcommunities();
+            for (Community subcomm : subcomms)
             {
                 //add a child <div> for each subcommunity in this community
-                Div childDiv = makeChildDiv(getObjectTypeString(subcomms[i]), subcomms[i], params);
-                if(childDiv!=null)
-                {
+                Div childDiv = makeChildDiv(getObjectTypeString(subcomm), subcomm, params);
+                if (childDiv != null) {
                     div0.getContent().add(childDiv);
                 }
             }
             // Collections are also directly under "DSpace Object Contents" <div>,
             // but are labeled as Collections.
-            Collection colls[] = ((Community)dso).getCollections();
-            for (int i = 0; i < colls.length; ++i)
+            List<Collection> colls = ((Community)dso).getCollections();
+            for (Collection coll : colls)
             {
                 //add a child <div> for each collection in this community
-                Div childDiv = makeChildDiv(getObjectTypeString(colls[i]), colls[i], params);
-                if(childDiv!=null)
-                {
+                Div childDiv = makeChildDiv(getObjectTypeString(coll), coll, params);
+                if (childDiv != null) {
                     div0.getContent().add(childDiv);
                 }
             }
@@ -1118,21 +1083,20 @@ public abstract class AbstractMETSDisseminator
             if (logoBs != null)
             {
                 fileSec = new FileSec();
-                addLogoBitstream(logoBs, fileSec, div0, params);
+                addLogoBitstream(context, logoBs, fileSec, div0, params);
             }
         }
         else if (dso.getType() == Constants.SITE)
         {
             // This is a site-wide <structMap>, which just lists the top-level
             // communities.  Each top level community is referenced by a div.
-            Community comms[] = Community.findAllTop(context);
-            for (int i = 0; i < comms.length; ++i)
+            List<Community> comms = communityService.findAllTop(context);
+            for (Community comm : comms)
             {
                 //add a child <div> for each top level community in this site
-                Div childDiv = makeChildDiv(getObjectTypeString(comms[i]),
-                        comms[i], params);
-                if(childDiv!=null)
-                {
+                Div childDiv = makeChildDiv(getObjectTypeString(comm),
+                        comm, params);
+                if (childDiv != null) {
                     div0.getContent().add(childDiv);
                 }
             }
@@ -1169,12 +1133,11 @@ public abstract class AbstractMETSDisseminator
     // Install logo bitstream into METS for Community, Collection.
     // Add a file element, and refer to it from an fptr in the first div
     // of the main structMap.
-    protected void addLogoBitstream(Bitstream logoBs, FileSec fileSec, Div div0, PackageParameters params)
-    {
+    protected void addLogoBitstream(Context context, Bitstream logoBs, FileSec fileSec, Div div0, PackageParameters params) throws SQLException {
         edu.harvard.hul.ois.mets.File file = new edu.harvard.hul.ois.mets.File();
         String fileID = gensym("logo");
         file.setID(fileID);
-        file.setMIMETYPE(logoBs.getFormat().getMIMEType());
+        file.setMIMETYPE(logoBs.getFormat(context).getMIMEType());
         file.setSIZE(logoBs.getSize());
 
         // Translate checksum and type to METS
@@ -1196,7 +1159,7 @@ public abstract class AbstractMETSDisseminator
         //Create <fileGroup USE="LOGO"> with a <FLocat> pointing at bitstream
         FLocat flocat = new FLocat();
         flocat.setLOCTYPE(Loctype.URL);
-        flocat.setXlinkHref(makeBitstreamURL(logoBs, params));
+        flocat.setXlinkHref(makeBitstreamURL(context, logoBs, params));
         file.getContent().add(flocat);
         FileGrp fileGrp = new FileGrp();
         fileGrp.setUSE("LOGO");
@@ -1293,10 +1256,10 @@ public abstract class AbstractMETSDisseminator
      *
      * @return the corresponding original bitstream (or null)
      */
-    protected static Bitstream findOriginalBitstream(Item item, Bitstream derived)
+    protected Bitstream findOriginalBitstream(Item item, Bitstream derived)
         throws SQLException
     {
-        Bundle[] bundles = item.getBundles();
+        List<Bundle> bundles = item.getBundles();
 
         // Filename of original will be filename of the derived bitstream
         // minus the extension (last 4 chars - .jpg or .txt)
@@ -1304,19 +1267,17 @@ public abstract class AbstractMETSDisseminator
                 derived.getName().length() - 4);
 
         // First find "original" bundle
-        for (int i = 0; i < bundles.length; i++)
+        for (Bundle bundle : bundles)
         {
-            if ((bundles[i].getName() != null)
-                    && bundles[i].getName().equals("ORIGINAL"))
-            {
+            if ((bundle.getName() != null)
+                    && bundle.getName().equals("ORIGINAL")) {
                 // Now find the corresponding bitstream
-                Bitstream[] bitstreams = bundles[i].getBitstreams();
+                List<Bitstream> bitstreams = bundle.getBitstreams();
 
-                for (int bsnum = 0; bsnum < bitstreams.length; bsnum++)
+                for (Bitstream bitstream : bitstreams)
                 {
-                    if (bitstreams[bsnum].getName().equals(originalFilename))
-                    {
-                        return bitstreams[bsnum];
+                    if (bitstream.getName().equals(originalFilename)) {
+                        return bitstream;
                     }
                 }
             }
@@ -1329,7 +1290,7 @@ public abstract class AbstractMETSDisseminator
     // Get result from crosswalk plugin and add it to the document,
     // including namespaces and schema.
     // returns the new/modified element upon success.
-    private MetsElement crosswalkToMetsElement(DisseminationCrosswalk xwalk,
+    protected MetsElement crosswalkToMetsElement(Context context, DisseminationCrosswalk xwalk,
                                  DSpaceObject dso, MetsElement me)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
@@ -1357,7 +1318,7 @@ public abstract class AbstractMETSDisseminator
             PreformedXML pXML = null;
             if (xwalk.preferList())
             {
-                List<Element> res = xwalk.disseminateList(dso);
+                List<Element> res = xwalk.disseminateList(context, dso);
                 if (!(res == null || res.isEmpty()))
                 {
                     pXML = new PreformedXML(outputter.outputString(res));
@@ -1365,7 +1326,7 @@ public abstract class AbstractMETSDisseminator
             }
             else
             {
-                Element res = xwalk.disseminateElement(dso);
+                Element res = xwalk.disseminateElement(context, dso);
                 if (res != null)
                 {
                     pXML = new PreformedXML(outputter.outputString(res));
@@ -1418,14 +1379,14 @@ public abstract class AbstractMETSDisseminator
         {
             //Locate the LICENSE bundle
             Item i = (Item)dso;
-            Bundle license[] = i.getBundles(Constants.LICENSE_BUNDLE_NAME);
+            List<Bundle> license = itemService.getBundles(i, Constants.LICENSE_BUNDLE_NAME);
 
             //Are we already including the LICENSE bundle's bitstreams in this package?
-            if(license!=null && license.length>0 && includeBundle(license[0]))
+            if(license!=null && license.size()>0 && includeBundle(license.get(0)))
             {
                 //Since we are including the LICENSE bitstreams, lets find our LICENSE bitstream path & link to it.
                 Bitstream licenseBs = PackageUtils.findDepositLicense(context, (Item)dso);
-                mdRef.setXlinkHref(makeBitstreamURL(licenseBs, params));
+                mdRef.setXlinkHref(makeBitstreamURL(context, licenseBs, params));
             }
         }
         //If this <mdRef> is a reference to a Creative Commons Textual License
@@ -1434,14 +1395,14 @@ public abstract class AbstractMETSDisseminator
         {
             //Locate the CC-LICENSE bundle
             Item i = (Item)dso;
-            Bundle license[] = i.getBundles(CreativeCommons.CC_BUNDLE_NAME);
+            List<Bundle> license = itemService.getBundles(i, CreativeCommonsService.CC_BUNDLE_NAME);
 
             //Are we already including the CC-LICENSE bundle's bitstreams in this package?
-            if(license!=null && license.length>0 && includeBundle(license[0]))
+            if(license!=null && license.size()>0 && includeBundle(license.get(0)))
             {
                 //Since we are including the CC-LICENSE bitstreams, lets find our CC-LICENSE (textual) bitstream path & link to it.
-                Bitstream ccText = CreativeCommons.getLicenseTextBitstream(i);
-                mdRef.setXlinkHref(makeBitstreamURL(ccText, params));
+                Bitstream ccText = creativeCommonsService.getLicenseTextBitstream(i);
+                mdRef.setXlinkHref(makeBitstreamURL(context, ccText, params));
             }
         }
         //If this <mdRef> is a reference to a Creative Commons RDF License
@@ -1450,14 +1411,14 @@ public abstract class AbstractMETSDisseminator
         {
             //Locate the CC-LICENSE bundle
             Item i = (Item)dso;
-            Bundle license[] = i.getBundles(CreativeCommons.CC_BUNDLE_NAME);
+            List<Bundle> license = itemService.getBundles(i, CreativeCommonsService.CC_BUNDLE_NAME);
 
             //Are we already including the CC-LICENSE bundle's bitstreams in this package?
-            if(license!=null && license.length>0 && includeBundle(license[0]))
+            if(license!=null && license.size()>0 && includeBundle(license.get(0)))
             {
                 //Since we are including the CC-LICENSE bitstreams, lets find our CC-LICENSE (RDF) bitstream path & link to it.
-                Bitstream ccRdf = CreativeCommons.getLicenseRdfBitstream(i);
-                mdRef.setXlinkHref(makeBitstreamURL(ccRdf, params));
+                Bitstream ccRdf = creativeCommonsService.getLicenseRdfBitstream(i);
+                mdRef.setXlinkHref(makeBitstreamURL(context, ccRdf, params));
             }
         }
     }
@@ -1513,8 +1474,7 @@ public abstract class AbstractMETSDisseminator
      * @param params Packager Parameters
      * @return String in URL format naming path to bitstream.
      */
-    public String makeBitstreamURL(Bitstream bitstream, PackageParameters params)
-    {
+    public String makeBitstreamURL(Context context, Bitstream bitstream, PackageParameters params) throws SQLException {
         // if bare manifest, use external "persistent" URI for bitstreams
         if (params != null && (params.getBooleanProperty("manifestOnly", false)))
         {
@@ -1524,13 +1484,13 @@ public abstract class AbstractMETSDisseminator
             {
                 // get handle of parent Item of this bitstream, if there is one:
                 String handle = null;
-                Bundle[] bn = bitstream.getBundles();
-                if (bn.length > 0)
+                List<Bundle> bn = bitstream.getBundles();
+                if (bn.size() > 0)
                 {
-                    Item bi[] = bn[0].getItems();
-                    if (bi.length > 0)
+                    List<Item> bi = bn.get(0).getItems();
+                    if (bi.size() > 0)
                     {
-                        handle = bi[0].getHandle();
+                        handle = bi.get(0).getHandle();
                     }
                 }
                 if (handle != null)
@@ -1569,8 +1529,8 @@ public abstract class AbstractMETSDisseminator
         else
         {
             String base = "bitstream_"+String.valueOf(bitstream.getID());
-            String ext[] = bitstream.getFormat().getExtensions();
-            return (ext.length > 0) ? base+"."+ext[0] : base;
+            List<String> ext = bitstream.getFormat(context).getExtensions();
+            return (ext.size() > 0) ? base+"."+ext.get(0) : base;
         }
     }
 
@@ -1578,7 +1538,7 @@ public abstract class AbstractMETSDisseminator
      * Create metsHdr element - separate so subclasses can override.
      */
     public abstract MetsHdr makeMetsHdr(Context context, DSpaceObject dso,
-                               PackageParameters params);
+                               PackageParameters params) throws SQLException;
     /**
      * Returns name of METS profile to which this package conforms, e.g.
      *  "DSpace METS DIP Profile 1.0"

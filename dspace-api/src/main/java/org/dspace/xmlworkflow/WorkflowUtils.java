@@ -17,8 +17,13 @@ import org.dspace.core.I18nUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.GroupService;
+import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
+import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -40,6 +45,9 @@ public class WorkflowUtils extends Util{
     /** log4j category */
     public static Logger log = Logger.getLogger(WorkflowUtils.class);
 
+    protected static final CollectionRoleService collectionRoleService = XmlWorkflowServiceFactory.getInstance().getCollectionRoleService();
+    protected static final GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+    protected static final XmlWorkflowFactory xmlWorkflowFactory = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory();
 
     /**
      * Return a string for logging, containing useful information about the
@@ -201,28 +209,25 @@ public class WorkflowUtils extends Util{
     /*
      * Creates a role for a collection by linking a group of epersons to a role ID
      */
-    public static void createCollectionWorkflowRole(Context context, int collectionId, String roleId, Group group) throws AuthorizeException, SQLException {
-        CollectionRole ass = CollectionRole.create(context);
-        ass.setCollectionId(collectionId);
-        ass.setRoleId(roleId);
-        ass.setGroupId(group);
-        ass.update();
+    public static void createCollectionWorkflowRole(Context context, Collection collection, String roleId, Group group) throws AuthorizeException, SQLException {
+        CollectionRole ass = collectionRoleService.create(context, collection, roleId, group);
+        collectionRoleService.update(context, ass);
     }
     /*
      * Deletes a role group linked to a given role and a collection
      */
     public static void deleteRoleGroup(Context context, Collection collection, String roleID) throws SQLException, IOException, WorkflowConfigurationException {
-        Workflow workflow = WorkflowFactory.getWorkflow(collection);
+        Workflow workflow = xmlWorkflowFactory.getWorkflow(collection);
         Role role = workflow.getRoles().get(roleID);
         if(role.getScope() == Role.Scope.COLLECTION){
-            CollectionRole ass = CollectionRole.find(context, collection.getID(), roleID);
-            ass.delete();
+            CollectionRole ass = collectionRoleService.find(context, collection, roleID);
+            collectionRoleService.delete(context, ass);
         }
     }
 
 
-    public static HashMap<String, Role> getCollectionRoles(Collection thisCollection) throws IOException, WorkflowConfigurationException {
-        Workflow workflow = WorkflowFactory.getWorkflow(thisCollection);
+    public static HashMap<String, Role> getCollectionRoles(Collection thisCollection) throws IOException, WorkflowConfigurationException, SQLException {
+        Workflow workflow = xmlWorkflowFactory.getWorkflow(thisCollection);
         LinkedHashMap<String, Role> result = new LinkedHashMap<String, Role>();
         if(workflow != null){
             //Make sure we find one
@@ -241,8 +246,8 @@ public class WorkflowUtils extends Util{
     }
 
 
-    public static HashMap<String, Role> getCollectionAndRepositoryRoles(Collection thisCollection) throws IOException, WorkflowConfigurationException {
-        Workflow workflow = WorkflowFactory.getWorkflow(thisCollection);
+    public static HashMap<String, Role> getCollectionAndRepositoryRoles(Collection thisCollection) throws IOException, WorkflowConfigurationException, SQLException {
+        Workflow workflow = xmlWorkflowFactory.getWorkflow(thisCollection);
         LinkedHashMap<String, Role> result = new LinkedHashMap<String, Role>();
         if(workflow != null){
             //Make sure we find one
@@ -261,8 +266,8 @@ public class WorkflowUtils extends Util{
     }
 
 
-    public static HashMap<String, Role> getAllExternalRoles(Collection thisCollection) throws IOException, WorkflowConfigurationException {
-        Workflow workflow = WorkflowFactory.getWorkflow(thisCollection);
+    public static HashMap<String, Role> getAllExternalRoles(Collection thisCollection) throws IOException, WorkflowConfigurationException, SQLException {
+        Workflow workflow = xmlWorkflowFactory.getWorkflow(thisCollection);
         LinkedHashMap<String, Role> result = new LinkedHashMap<String, Role>();
         if(workflow != null){
             //Make sure we find one
@@ -280,12 +285,12 @@ public class WorkflowUtils extends Util{
         return result;
     }
 
-    public static Group getRoleGroup(Context context, int collectionId, Role role) throws SQLException {
+    public static Group getRoleGroup(Context context, Collection collection, Role role) throws SQLException {
         if(role.getScope() == Role.Scope.REPOSITORY){
-            return Group.findByName(context, role.getName());
+            return groupService.findByName(context, role.getName());
         }else
         if(role.getScope() == Role.Scope.COLLECTION){
-            CollectionRole collectionRole = CollectionRole.find(context, collectionId, role.getId());
+            CollectionRole collectionRole = collectionRoleService.find(context, collection, role.getId());
         if(collectionRole == null)
             return null;
 

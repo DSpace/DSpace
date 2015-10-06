@@ -10,6 +10,8 @@ package org.dspace.administer;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -20,9 +22,8 @@ import org.apache.log4j.Logger;
 import org.apache.xpath.XPathAPI;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.BitstreamFormat;
-import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
-import org.dspace.content.NonUniqueMetadataException;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.w3c.dom.Document;
@@ -47,6 +48,8 @@ public class RegistryLoader
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(RegistryLoader.class);
+
+    protected static BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
 
     /**
      * For invoking via the command line
@@ -167,30 +170,32 @@ public class RegistryLoader
         String[] extensions = getRepeatedElementData(node, "extension");
 
         // Check if this format already exists in our registry (by mime type)
-        BitstreamFormat exists = BitstreamFormat.findByMIMEType(context, mimeType);
+        BitstreamFormat exists = bitstreamFormatService.findByMIMEType(context, mimeType);
         
         // If not found by mimeType, check by short description (since this must also be unique)
         if(exists==null)
         {    
-            exists = BitstreamFormat.findByShortDescription(context, shortDesc);
+            exists = bitstreamFormatService.findByShortDescription(context, shortDesc);
         }
             
         // If it doesn't exist, create it..otherwise skip it.
         if(exists==null)
         {
             // Create the format object
-            BitstreamFormat format = BitstreamFormat.create(context);
+            BitstreamFormat format = bitstreamFormatService.create(context);
 
             // Fill it out with the values
             format.setMIMEType(mimeType);
-            format.setShortDescription(shortDesc);
+            bitstreamFormatService.setShortDescription(context, format, shortDesc);
             format.setDescription(desc);
             format.setSupportLevel(supportLevel);
             format.setInternal(internal);
-            format.setExtensions(extensions);
+            ArrayList<String> extensionList = new ArrayList<>();
+            extensionList.addAll(Arrays.asList(extensions));
+            format.setExtensions(extensionList);
 
             // Write to database
-            format.update();
+            bitstreamFormatService.update(context, format);
         }
     }
 

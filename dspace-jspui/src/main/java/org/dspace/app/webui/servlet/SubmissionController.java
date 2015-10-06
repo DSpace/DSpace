@@ -10,14 +10,13 @@ package org.dspace.app.webui.servlet;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.Enumeration;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -34,19 +33,21 @@ import org.dspace.app.webui.util.JSONUploadResponse;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.workflow.WorkflowItem;
 import org.dspace.submit.AbstractProcessingStep;
+import org.dspace.submit.step.UploadStep;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.WorkflowItemService;
+import org.dspace.workflowbasic.factory.BasicWorkflowServiceFactory;
 
 import com.google.gson.Gson;
-import java.util.Collections;
-import javax.servlet.http.HttpSession;
-import org.dspace.submit.step.UploadStep;
 
 /**
  * Submission Manager servlet for DSpace. Handles the initial submission of
@@ -121,6 +122,23 @@ public class SubmissionController extends DSpaceServlet
     private static Logger log = Logger
             .getLogger(SubmissionController.class);
 
+    private static WorkspaceItemService workspaceItemService;
+    
+    private static BitstreamService bitstreamService;
+    
+    private static BundleService bundleService;
+    
+    private static WorkflowItemService workflowItemService;
+    
+    @Override
+    public void init() throws ServletException {
+    	super.init();
+    	// this is a sort of HACK as we are injecting static services using the singleton nature of the servlet...
+    	workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+    	bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    	bundleService = ContentServiceFactory.getInstance().getBundleService();
+    	workflowItemService = BasicWorkflowServiceFactory.getInstance().getBasicWorkflowItemService();    	
+    }
     
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
@@ -151,7 +169,7 @@ public class SubmissionController extends DSpaceServlet
             try
             {
                 // load the workspace item
-                WorkspaceItem wi = WorkspaceItem.find(context, Integer
+                WorkspaceItem wi = workspaceItemService.find(context, Integer
                         .parseInt(workspaceID));
 
                 //load submission information
@@ -171,8 +189,7 @@ public class SubmissionController extends DSpaceServlet
                     wi.setPageReached(AbstractProcessingStep.LAST_PAGE_REACHED);
                     
                     //commit all changes to database immediately
-                    wi.update();
-                    context.commit();
+                    workspaceItemService.update(context, wi);
                     
                     //update submission info
                     si.setSubmissionItem(wi);
@@ -195,7 +212,7 @@ public class SubmissionController extends DSpaceServlet
             try
             {
                 // load the workflow item
-                WorkflowItem wi = WorkflowItem.find(context, Integer
+                WorkflowItem wi = workflowItemService.find(context, Integer
                         .parseInt(workflowID));
 
                 //load submission information
@@ -311,7 +328,6 @@ public class SubmissionController extends DSpaceServlet
                                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                                     return;
                                 }
-                                context.commit();
                             }
                             return;
                         }
@@ -468,9 +484,7 @@ public class SubmissionController extends DSpaceServlet
         if (!subInfo.isInWorkflow() && (currentStepConfig.getStepNumber() > getStepReached(subInfo)))
         {
             // update submission info
-            userHasReached(subInfo, currentStepConfig.getStepNumber());
-            // commit changes to database
-            context.commit();
+            userHasReached(context, subInfo, currentStepConfig.getStepNumber());
             
             // flag that we just started this step (for JSPStepManager class)
             setBeginningOfStep(request, true);
@@ -876,7 +890,7 @@ public class SubmissionController extends DSpaceServlet
                 double stepAndPageReached = Float.parseFloat(getStepReached(subInfo)+"."+JSPStepManager.getPageReached(subInfo));
                 
                 if (result != AbstractProcessingStep.STATUS_COMPLETE && currStepAndPage < stepAndPageReached){
-                    setReachedStepAndPage(subInfo, currStep, currPage);
+                    setReachedStepAndPage(context, subInfo, currStep, currPage);
                 }
                 
                 //commit & close context
@@ -969,7 +983,7 @@ public class SubmissionController extends DSpaceServlet
             // Cancellation page only applies to workspace items
             WorkspaceItem wi = (WorkspaceItem) subInfo.getSubmissionItem();
 
-            wi.deleteAll();
+            workspaceItemService.deleteAll(context, wi);
 
             JSPManager.showJSP(request, response,
                     "/submit/cancelled-removed.jsp");
@@ -1045,14 +1059,14 @@ public class SubmissionController extends DSpaceServlet
             {
                 int workflowID = UIUtil.getIntParameter(request, "workflow_id");
                 
-                info = SubmissionInfo.load(request, WorkflowItem.find(context, workflowID));
+                info = SubmissionInfo.load(request, workflowItemService.find(context, workflowID));
             }
             else if(request.getParameter("workspace_item_id") != null)
             {
                 int workspaceID = UIUtil.getIntParameter(request,
                         "workspace_item_id");
                 
-                info = SubmissionInfo.load(request, WorkspaceItem.find(context, workspaceID));
+                info = SubmissionInfo.load(request, workspaceItemService.find(context, workspaceID));
             }
             else
             {
@@ -1074,15 +1088,15 @@ public class SubmissionController extends DSpaceServlet
 
             if (request.getParameter("bundle_id") != null)
             {
-                int bundleID = UIUtil.getIntParameter(request, "bundle_id");
-                info.setBundle(Bundle.find(context, bundleID));
+                UUID bundleID = UIUtil.getUUIDParameter(request, "bundle_id");
+                info.setBundle(bundleService.find(context, bundleID));
             }
 
             if (request.getParameter("bitstream_id") != null)
             {
-                int bitstreamID = UIUtil.getIntParameter(request,
+                UUID bitstreamID = UIUtil.getUUIDParameter(request,
                         "bitstream_id");
-                info.setBitstream(Bitstream.find(context, bitstreamID));
+                info.setBitstream(bitstreamService.find(context, bitstreamID));
             }
 
             // save to Request Attribute
@@ -1383,7 +1397,7 @@ public class SubmissionController extends DSpaceServlet
      * @param step
      *            the step the user has just reached
      */
-    private void userHasReached(SubmissionInfo subInfo, int step)
+    private void userHasReached(Context c, SubmissionInfo subInfo, int step)
             throws SQLException, AuthorizeException, IOException
     {
         if (!subInfo.isInWorkflow() && subInfo.getSubmissionItem() != null)
@@ -1395,7 +1409,7 @@ public class SubmissionController extends DSpaceServlet
                 wi.setStageReached(step);
                 wi.setPageReached(1); // reset page reached back to 1 (since
                                         // it's page 1 of the new step)
-                wi.update();
+                workspaceItemService.update(c, wi);
             }
         }
     }
@@ -1409,7 +1423,7 @@ public class SubmissionController extends DSpaceServlet
     * @param step the step to set as reached, can be also a previous reached step
     * @param page the page (within the step) to set as reached, can be also a previous reached page
     */
-    private void setReachedStepAndPage(SubmissionInfo subInfo, int step,
+    private void setReachedStepAndPage(Context c, SubmissionInfo subInfo, int step,
             int page) throws SQLException, AuthorizeException, IOException
     {
         if (!subInfo.isInWorkflow() && subInfo.getSubmissionItem() != null)
@@ -1418,7 +1432,7 @@ public class SubmissionController extends DSpaceServlet
 
             wi.setStageReached(step);
             wi.setPageReached(page);
-            wi.update();
+            workspaceItemService.update(c, wi);
         }
     }
 

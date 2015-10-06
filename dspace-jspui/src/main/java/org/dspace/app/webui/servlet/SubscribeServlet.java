@@ -9,19 +9,24 @@ package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.dspace.app.util.CollectionDropDown;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Subscribe;
+import org.dspace.eperson.Subscription;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.SubscribeService;
 
 /**
  * Servlet for constructing the components of the "My DSpace" page
@@ -31,6 +36,17 @@ import org.dspace.eperson.Subscribe;
  */
 public class SubscribeServlet extends DSpaceServlet
 {
+	private SubscribeService subscribeService;
+	
+	private CollectionService collectionService;
+	
+	@Override
+	public void init() throws ServletException {
+		super.init();
+		subscribeService = EPersonServiceFactory.getInstance().getSubscribeService();
+		collectionService = ContentServiceFactory.getInstance().getCollectionService();
+	}
+	
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -54,7 +70,7 @@ public class SubscribeServlet extends DSpaceServlet
         if (submit.equals("submit_clear"))
         {
             // unsubscribe user from everything
-            Subscribe.unsubscribe(context, e, null);
+            subscribeService.unsubscribe(context, e, null);
 
             // Show the list of subscriptions
             showSubscriptions(context, request, response, true);
@@ -63,13 +79,13 @@ public class SubscribeServlet extends DSpaceServlet
         }
         else if (submit.equals("submit_subscribe"))
         {
-            int collID = UIUtil.getIntParameter(request, "collection");
-            Collection c = Collection.find(context, collID);
+            UUID collID = UIUtil.getUUIDParameter(request, "collection");
+            Collection c = collectionService.find(context, collID);
 
             // Sanity check - ignore duff values
             if (c != null)
             {
-                Subscribe.subscribe(context, e, c);
+                subscribeService.subscribe(context, e, c);
             }
 
             // Show the list of subscriptions
@@ -79,13 +95,13 @@ public class SubscribeServlet extends DSpaceServlet
         }
         else if (submit.equals("submit_unsubscribe"))
         {
-            int collID = UIUtil.getIntParameter(request, "collection");
-            Collection c = Collection.find(context, collID);
+            UUID collID = UIUtil.getUUIDParameter(request, "collection");
+            Collection c = collectionService.find(context, collID);
 
             // Sanity check - ignore duff values
             if (c != null)
             {
-                Subscribe.unsubscribe(context, e, c);
+                subscribeService.unsubscribe(context, e, c);
             }
 
             // Show the list of subscriptions
@@ -120,10 +136,10 @@ public class SubscribeServlet extends DSpaceServlet
             throws ServletException, IOException, SQLException
     {
         // collections the currently logged in user can subscribe to
-        Collection[] avail = Subscribe.getAvailableSubscriptions(context);
+        List<Collection> avail = subscribeService.getAvailableSubscriptions(context);
         
         // Subscribed collections
-        Collection[] subs = Subscribe.getSubscriptions(context, context
+        List<Subscription> subs = subscribeService.getSubscriptions(context, context
                 .getCurrentUser());
 
         request.setAttribute("availableSubscriptions", avail);

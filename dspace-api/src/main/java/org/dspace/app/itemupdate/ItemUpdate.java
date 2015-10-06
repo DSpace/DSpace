@@ -14,12 +14,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -28,9 +23,13 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 
 /**
  *   
@@ -73,7 +72,10 @@ public class ItemUpdate {
 	public static final Map<String, String> filterAliases = new HashMap<String, String>();
 	
 	public static boolean verbose = false;
-	
+
+    protected static final EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    protected static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
 	static
 	{
 		filterAliases.put("ORIGINAL", "org.dspace.app.itemupdate.OriginalBitstreamFilter");
@@ -85,7 +87,8 @@ public class ItemUpdate {
     // File listing filter to check for folders
     static FilenameFilter directoryFilter = new FilenameFilter()
     {
-        public boolean accept(File dir, String n)
+        @Override
+		public boolean accept(File dir, String n)
         {
             File f = new File(dir.getAbsolutePath() + File.separatorChar + n);
             return f.isDirectory();
@@ -95,7 +98,8 @@ public class ItemUpdate {
     // File listing filter to check for files (not directories)
     static FilenameFilter fileFilter = new FilenameFilter()
     {
-        public boolean accept(File dir, String n)
+        @Override
+		public boolean accept(File dir, String n)
         {
             File f = new File(dir.getAbsolutePath() + File.separatorChar + n);
             return (f.isFile());
@@ -103,9 +107,9 @@ public class ItemUpdate {
     };
 
     // instance variables
-    private ActionManager actionMgr = new ActionManager(); 
-    private List<String> undoActionList = new ArrayList<String>();  
-    private String eperson;
+    protected ActionManager actionMgr = new ActionManager();
+    protected List<String> undoActionList = new ArrayList<String>();
+    protected String eperson;
    
     /**
      * 
@@ -387,8 +391,8 @@ public class ItemUpdate {
         }
         System.exit(status);
     }
-    
-    private void processArchive(Context context, String sourceDirPath, String itemField,
+
+    protected void processArchive(Context context, String sourceDirPath, String itemField,
     		String metadataIndexName, boolean alterProvenance, boolean isTest)
     throws Exception
     {
@@ -444,9 +448,7 @@ public class ItemUpdate {
 	    		if (!isTest)
 	    		{
     				Item item = itarch.getItem();
-    				item.update();  //need to update before commit
-    				context.commit();  
-	    			item.decache();
+                    itemService.update(context, item);  //need to update before commit
 	    		}
     			ItemUpdate.pr("Item " + dirname + " completed");
     			successItemCount++;
@@ -512,7 +514,7 @@ public class ItemUpdate {
      * @throws FileNotFoundException
      * @throws IOException
      */
-	private File initUndoArchive(File sourceDir)
+    protected File initUndoArchive(File sourceDir)
 	throws FileNotFoundException, IOException
 	{				
 		File parentDir = sourceDir.getCanonicalFile().getParentFile();
@@ -553,7 +555,7 @@ public class ItemUpdate {
 	
 	//private void write
 
-    private void setEPerson(Context context, String eperson)
+    protected void setEPerson(Context context, String eperson)
     throws Exception
     {
         if (eperson == null)
@@ -567,11 +569,11 @@ public class ItemUpdate {
         if (eperson.indexOf('@') != -1)
         {
             // @ sign, must be an email
-            myEPerson = EPerson.findByEmail(context, eperson);
+            myEPerson = epersonService.findByEmail(context, eperson);
         }
         else
         {
-            myEPerson = EPerson.find(context, Integer.parseInt(eperson));
+            myEPerson = epersonService.find(context, UUID.fromString(eperson));
         }
 
         if (myEPerson == null)

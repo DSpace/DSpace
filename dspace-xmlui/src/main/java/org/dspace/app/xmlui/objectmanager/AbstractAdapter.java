@@ -24,6 +24,7 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
+import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -293,7 +294,7 @@ public abstract class AbstractAdapter
 	/**
 	 * Render the complete METS document.
 	 */
-    public final void renderMETS(ContentHandler contentHandler, LexicalHandler lexicalHandler) throws WingException, SAXException, CrosswalkException, IOException, SQLException 
+    public final void renderMETS(Context context, ContentHandler contentHandler, LexicalHandler lexicalHandler) throws WingException, SAXException, CrosswalkException, IOException, SQLException
     {
     		this.contentHandler = contentHandler;
     		this.lexicalHandler = lexicalHandler;
@@ -348,7 +349,7 @@ public abstract class AbstractAdapter
             }
     		if (all || sections.contains("fileSec"))
             {
-                renderFileSection();
+                renderFileSection(context);
             }
     		if (all || sections.contains("structMap"))
             {
@@ -383,7 +384,7 @@ public abstract class AbstractAdapter
 	protected void renderHeader() throws WingException, SAXException, CrosswalkException, IOException, SQLException  {}
 	protected void renderDescriptiveSection() throws WingException, SAXException, CrosswalkException, IOException, SQLException  {}
 	protected void renderAdministrativeSection() throws WingException, SAXException, CrosswalkException, IOException, SQLException  {}
-	protected void renderFileSection() throws WingException, SAXException, CrosswalkException, IOException, SQLException  {}
+	protected void renderFileSection(Context context) throws WingException, SAXException, CrosswalkException, IOException, SQLException  {}
 	protected void renderStructureMap() throws WingException, SAXException, CrosswalkException, IOException, SQLException  {}
 	protected void renderStructuralLink() throws WingException, SAXException, CrosswalkException, IOException, SQLException  {}
 	protected void renderBehavioralSection() throws WingException, SAXException, CrosswalkException, IOException, SQLException  {}
@@ -405,9 +406,9 @@ public abstract class AbstractAdapter
      *            The group id for this file, if it is derived from another file
      *            then they should share the same groupID.
      */
-	protected final void renderFile(Item item, Bitstream bitstream, String fileID, String groupID) throws SAXException
-	{
-       renderFile(item, bitstream, fileID, groupID, null);
+	protected final void renderFile(Context context, Item item, Bitstream bitstream, String fileID, String groupID) throws SAXException, SQLException
+    {
+       renderFile(context, item, bitstream, fileID, groupID, null);
     }
 
 	/**
@@ -427,13 +428,13 @@ public abstract class AbstractAdapter
      *            The IDs of the administrative metadata sections which pertain
      *            to this file
      */
-	protected final void renderFile(Item item, Bitstream bitstream, String fileID, String groupID, String admID) throws SAXException
-	{
+	protected final void renderFile(Context context, Item item, Bitstream bitstream, String fileID, String groupID, String admID) throws SAXException, SQLException
+    {
 		AttributeMap attributes;
 		
 		// //////////////////////////////
     	// Determine the file attributes
-        BitstreamFormat format = bitstream.getFormat();
+        BitstreamFormat format = bitstream.getFormat(context);
         String mimeType = null;
         if (format != null)
         {

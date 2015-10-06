@@ -8,23 +8,26 @@
 package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
+import java.sql.SQLException;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
-
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.core.LogManager;
 
 /**
  * Class to deal with viewing workspace items during the authoring process.
@@ -39,7 +42,18 @@ public class ViewWorkspaceItemServlet
 
     /** log4j logger */
     private static Logger log = Logger.getLogger(ViewWorkspaceItemServlet.class);
+    
+    private AuthorizeService authorizeService;
+    
+    private WorkspaceItemService workspaceItemService;
 
+    @Override
+    public void init() throws ServletException {
+    	super.init();
+    	authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    	workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+    }
+    
     protected void doDSGet(Context c, 
         HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
@@ -80,13 +94,13 @@ public class ViewWorkspaceItemServlet
         int wsItemID = UIUtil.getIntParameter(request,"workspace_id");
         
         // get the workspace item, item and collections from the request value
-        WorkspaceItem wsItem = WorkspaceItem.find(c, wsItemID);
+        WorkspaceItem wsItem = workspaceItemService.find(c, wsItemID);
         Item item = wsItem.getItem();
         //Collection[] collections = item.getCollections();
         Collection[] collections = {wsItem.getCollection()};
         
         // Ensure the user has authorisation
-        AuthorizeManager.authorizeAction(c, item, Constants.READ);
+        authorizeService.authorizeAction(c, item, Constants.READ);
         
         log.info(LogManager.getHeader(c, 
             "View Workspace Item Metadata", 

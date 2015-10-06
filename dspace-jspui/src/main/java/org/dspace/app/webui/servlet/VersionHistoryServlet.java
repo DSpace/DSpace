@@ -9,6 +9,7 @@ package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.UUID;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -19,12 +20,18 @@ import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.app.webui.util.VersionUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.utils.DSpace;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
+import org.dspace.versioning.factory.VersionServiceFactory;
+import org.dspace.versioning.service.VersionHistoryService;
+import org.dspace.versioning.service.VersioningService;
 
 /**
  * Servlet for handling the operations in the version history page
@@ -37,22 +44,40 @@ public class VersionHistoryServlet extends DSpaceServlet
 
     /** log4j category */
     private static Logger log = Logger.getLogger(VersionHistoryServlet.class);
+    
+    private AuthorizeService authorizeService;
+    
+    private ItemService itemService;
+    
+    private VersionHistoryService versionHistoryService;
+
+    private VersioningService versioningService;
+    
+    @Override
+    public void init() throws ServletException {
+    	super.init();
+    	authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    	itemService = ContentServiceFactory.getInstance().getItemService();
+    	versionHistoryService = VersionServiceFactory.getInstance().getVersionHistoryService();
+    	versioningService = VersionServiceFactory.getInstance().getVersionService();
+    }
+
 
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
-        Integer itemID = UIUtil.getIntParameter(request, "itemID");
+        UUID itemID = UIUtil.getUUIDParameter(request, "itemID");
         String versionID = request.getParameter("versionID");
 
-        Item item = Item.find(context, itemID);
+        Item item = itemService.find(context, itemID);
 
         if (item == null) {
         	throw new IllegalArgumentException("Item is null");
         }
         
-        if(!AuthorizeManager.isAdmin(context,
-                        item.getOwningCollection()))
+        if(!authorizeService.isAdmin(context,
+                item.getOwningCollection()))
         {
             // Check if only administrators can view the item history
             if (new DSpace().getConfigurationService().getPropertyAsType(
@@ -68,10 +93,10 @@ public class VersionHistoryServlet extends DSpaceServlet
                 item);
         if (versionID == null || versionID.isEmpty())
         {
-            Version version = history.getVersion(item);
+            Version version = versionHistoryService.getVersion(history, item);
             if (version != null)
             {
-                versionID = String.valueOf(version.getVersionId());
+                versionID = String.valueOf(version.getId());
             }
         }
         String submit = UIUtil.getSubmitButton(request, "submit");
@@ -86,11 +111,12 @@ public class VersionHistoryServlet extends DSpaceServlet
         else if (submit != null && submit.equals("submit_delete"))
         {
             String[] versionIDs = request.getParameterValues("remove");
-            Integer result = doDeleteVersions(request, itemID, versionIDs);
-            if (result != null)
+            Item latestVersion = doDeleteVersions(request, itemID, versionIDs);
+            
+			if (latestVersion != null)
             {
                 response.sendRedirect(request.getContextPath()
-                        + "/tools/history?delete=true&itemID="+history.getLatestVersion().getItemID());
+                        + "/tools/history?delete=true&itemID="+latestVersion.getID().toString());
             }
             else
             {
@@ -103,7 +129,6 @@ public class VersionHistoryServlet extends DSpaceServlet
         }
         else if (submit != null && submit.equals("submit_restore"))
         {
-
             doRestoreVersion(request, itemID, versionID);
         }
         else if (submit != null && submit.equals("submit_update"))
@@ -138,8 +163,8 @@ public class VersionHistoryServlet extends DSpaceServlet
      * @throws AuthorizeException
      * @throws SQLException
      */
-    private Integer doDeleteVersions(HttpServletRequest request,
-            Integer itemID, String... versionIDs) throws SQLException,
+    private Item doDeleteVersions(HttpServletRequest request,
+            UUID itemID, String... versionIDs) throws SQLException,
             AuthorizeException, IOException
     {
 
@@ -156,8 +181,8 @@ public class VersionHistoryServlet extends DSpaceServlet
      * @throws SQLException
      * @throws NumberFormatException
      */
-    private Integer doRestoreVersion(HttpServletRequest request,
-            Integer itemID, String versionID) throws NumberFormatException,
+    private UUID doRestoreVersion(HttpServletRequest request,
+            UUID itemID, String versionID) throws NumberFormatException,
             SQLException, AuthorizeException, IOException
     {
 
@@ -174,7 +199,7 @@ public class VersionHistoryServlet extends DSpaceServlet
      * @throws AuthorizeException
      * @throws SQLException
      */
-    private Integer doUpdateVersion(HttpServletRequest request, Integer itemID,
+    private UUID doUpdateVersion(HttpServletRequest request, UUID itemID,
             String versionID) throws SQLException, AuthorizeException,
             IOException
     {

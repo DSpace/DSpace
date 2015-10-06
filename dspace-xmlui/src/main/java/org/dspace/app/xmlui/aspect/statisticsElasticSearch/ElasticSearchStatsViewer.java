@@ -17,9 +17,13 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.content.*;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.statistics.DataTermsFacet;
-import org.dspace.statistics.ElasticSearchLogger;
+import org.dspace.statistics.factory.StatisticsServiceFactory;
+import org.dspace.statistics.service.ElasticSearchLoggerService;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -55,6 +59,10 @@ public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
     private static DSpaceObject dso;
     private static Date dateStart;
     private static Date dateEnd;
+
+    protected ElasticSearchLoggerService elasticSearchLoggerService = StatisticsServiceFactory.getInstance().getElasticSearchLoggerService();
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+	protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
     protected static TermFilterBuilder justOriginals = FilterBuilders.termFilter("bundleName", "ORIGINAL");
 
@@ -98,7 +106,7 @@ public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
         pageMeta.addMetadata("title").addContent("Statistics Report for : " + dso.getName());
 
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
-        HandleUtil.buildHandleTrail(dso,pageMeta,contextPath, true);
+        HandleUtil.buildHandleTrail(context, dso,pageMeta,contextPath, true);
         pageMeta.addTrail().addContent("View Statistics");
     }
 
@@ -110,14 +118,14 @@ public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
         this.dso = dso;
         this.dateStart = dateStart;
         this.dateEnd = dateEnd;
-        client = ElasticSearchLogger.getInstance().getClient();
+        client = elasticSearchLoggerService.getClient();
     }
     
     public void addBody(Body body) throws WingException, SQLException {
         try {
             //Try to find our dspace object
             dso = HandleUtil.obtainHandle(objectModel);
-            client = ElasticSearchLogger.getInstance().getClient();
+            client = elasticSearchLoggerService.getClient();
 
             division = body.addDivision("elastic-stats");
             division.setHead("Statistical Report for " + dso.getName());
@@ -298,7 +306,7 @@ public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
         FilterBuilder rangeFilter = FilterBuilders.rangeFilter("time").from(dateStart).to(dateEnd);
         FilteredQueryBuilder filteredQueryBuilder = QueryBuilders.filteredQuery(termQuery, rangeFilter);
 
-        SearchRequestBuilder searchRequestBuilder = client.prepareSearch(ElasticSearchLogger.getInstance().indexName)
+        SearchRequestBuilder searchRequestBuilder = client.prepareSearch(elasticSearchLoggerService.getIndexName())
                 .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
                 .setQuery(filteredQueryBuilder)
                 .setSize(0);
@@ -358,8 +366,8 @@ public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
             Row row = facetTable.addRow();
 
             if(termName.equalsIgnoreCase("bitstream")) {
-                Bitstream bitstream = Bitstream.find(context, Integer.parseInt(facetEntry.getTerm().string()));
-                Item item = (Item) bitstream.getParentObject();
+                Bitstream bitstream = bitstreamService.findByIdOrLegacyId(context, facetEntry.getTerm().string());
+                Item item = (Item) bitstreamService.getParentObject(context, bitstream);
                 row.addCell().addXref(contextPath + "/handle/" + item.getHandle(), item.getName());
                 row.addCellContent(getFirstMetadataValue(item, "dc.creator"));
                 row.addCellContent(getFirstMetadataValue(item, "dc.publisher"));
@@ -409,9 +417,9 @@ public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
     }
     
     private String getFirstMetadataValue(Item item, String metadataKey) {
-        Metadatum[] dcValue = item.getMetadataByMetadataString(metadataKey);
-        if(dcValue.length > 0) {
-            return dcValue[0].value;
+        List<MetadataValue> dcValue = itemService.getMetadataByMetadataString(item, metadataKey);
+        if(dcValue.size() > 0) {
+            return dcValue.get(0).getValue();
         } else {
             return "";
         }

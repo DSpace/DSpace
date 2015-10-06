@@ -55,7 +55,7 @@ public interface FormatFilter
      * 
      * @return result of filter's transformation, written out to a bitstream
      */
-    public InputStream getDestinationStream(InputStream source)
+    public InputStream getDestinationStream(Item item, InputStream source, boolean verbose)
             throws Exception;
 
     /**
@@ -77,7 +77,7 @@ public interface FormatFilter
      * @return true if bitstream processing should continue, 
      * 			false if this bitstream should be skipped
      */
-    public boolean preProcessBitstream(Context c, Item item, Bitstream source)
+    public boolean preProcessBitstream(Context c, Item item, Bitstream source, boolean verbose)
             throws Exception;
         
     /**

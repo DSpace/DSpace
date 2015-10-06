@@ -18,8 +18,8 @@ import com.lyncode.xoai.dataprovider.services.api.ItemRepository;
 import org.dspace.xoai.filter.DSpaceSetSpecFilter;
 import org.dspace.xoai.filter.DateFromFilter;
 import org.dspace.xoai.filter.DateUntilFilter;
-import org.dspace.xoai.services.api.database.CollectionsService;
-import org.dspace.xoai.services.api.database.HandleResolver;
+import org.dspace.xoai.services.api.CollectionsService;
+import org.dspace.xoai.services.api.HandleResolver;
 
 import java.util.Date;
 import java.util.List;

@@ -7,6 +7,8 @@
  */
 package org.dspace.app.mediafilter;
 
+import org.dspace.content.Item;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
@@ -22,6 +24,7 @@ import javax.swing.text.html.HTMLEditorKit;
 public class HTMLFilter extends MediaFilter
 {
 
+    @Override
     public String getFilteredName(String oldFilename)
     {
         return oldFilename + ".txt";
@@ -31,6 +34,7 @@ public class HTMLFilter extends MediaFilter
      * @return String bundle name
      *  
      */
+    @Override
     public String getBundleName()
     {
         return "TEXT";
@@ -39,6 +43,7 @@ public class HTMLFilter extends MediaFilter
     /**
      * @return String bitstreamformat
      */
+    @Override
     public String getFormatString()
     {
         return "Text";
@@ -47,6 +52,7 @@ public class HTMLFilter extends MediaFilter
     /**
      * @return String description
      */
+    @Override
     public String getDescription()
     {
         return "Extracted text";
@@ -58,7 +64,8 @@ public class HTMLFilter extends MediaFilter
      * 
      * @return InputStream the resulting input stream
      */
-    public InputStream getDestinationStream(InputStream source)
+    @Override
+    public InputStream getDestinationStream(Item currentItem, InputStream source, boolean verbose)
             throws Exception
     {
         // try and read the document - set to ignore character set directive,

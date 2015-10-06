@@ -30,7 +30,7 @@ class DtoMetadata
 	final String language;
 	final String value;
 	
-	private DtoMetadata(String schema, String element, String qualifier, String language, String value) 
+	protected DtoMetadata(String schema, String element, String qualifier, String language, String value)
 	{
 		this.schema = schema;
 		this.element = element;

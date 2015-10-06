@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.rdf.RDFUtil;
@@ -50,7 +51,7 @@ implements ConverterPlugin
         
         Model general = this.readFile(CONSTANT_DATA_GENERAL_KEY_SUFFIX,
                 RDFUtil.generateIdentifier(context, dso));
-        Model typeSpecific = this.readFile(dso.getTypeText(), 
+        Model typeSpecific = this.readFile(ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getTypeText(dso),
                 RDFUtil.generateIdentifier(context, dso));
         
         if (general == null)

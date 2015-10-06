@@ -40,7 +40,7 @@
     <%-- <p>Are you sure the community <strong><%= community.getMetadata("name") %></strong>
     should be deleted?  This will delete:</p> --%>
     <p><fmt:message key="jsp.tools.confirm-delete-community.confirm">
-        <fmt:param><%= community.getMetadata("name") %></fmt:param>
+        <fmt:param><%= community.getName() %></fmt:param>
     </fmt:message></p>
         
     <ul>

@@ -50,17 +50,8 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <archiveClasses>false</archiveClasses>
-                    <webResources>
-                        <resource>
-                            <filtering>true</filtering>
-                            <directory>
-                                ${basedir}/src/main/webapp
-                            </directory>
-                            <includes>
-                                <include>WEB-INF/web.xml</include>
-                            </includes>
-                        </resource>
-                    </webResources>
+                     <!-- Filter the web.xml -->
+                    <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                     <overlays>
                         <overlay />
                         <overlay>

@@ -41,6 +41,7 @@ public class LocaleOrderingFilter implements TextFilter
      * @param str The string to parse
      * @return String the sort ordering text
      */
+    @Override
     public String filter(String str)
     {
         RuleBasedCollator collator = getCollator();
@@ -72,6 +73,7 @@ public class LocaleOrderingFilter implements TextFilter
      * We don't need to use the language parameter, so map this to
      * the standard sort string filter
      */
+    @Override
     public String filter(String str, String lang)
     {
         return filter(str);

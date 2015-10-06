@@ -9,15 +9,18 @@
 package org.dspace.rdf.storage;
 
 import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Site;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.SiteService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
 import org.dspace.rdf.RDFConfiguration;
-import org.dspace.utils.DSpace;
 
 /**
  *
@@ -26,16 +29,18 @@ import org.dspace.utils.DSpace;
 public class LocalURIGenerator implements URIGenerator {
     private static final Logger log = Logger.getLogger(LocalURIGenerator.class);
 
+    protected final SiteService siteService = ContentServiceFactory.getInstance().getSiteService();
+
     @Override
-    public String generateIdentifier(Context context, int type, int id, 
-            String handle, String[] identifiers)
+    public String generateIdentifier(Context context, int type, UUID id,
+            String handle, List<String> identifiers)
             throws SQLException
     {
         String urlPrefix = RDFConfiguration.getDSpaceRDFModuleURI() + "/resource/";
         
         if (type == Constants.SITE)
         {
-            return urlPrefix + Site.getSiteHandle();
+            return urlPrefix + siteService.findSite(context).getHandle();
         }
         
         if (type == Constants.COMMUNITY 
@@ -62,7 +67,7 @@ public class LocalURIGenerator implements URIGenerator {
             return null;
         }
         
-        return generateIdentifier(context, dso.getType(), dso.getID(), dso.getHandle(), dso.getIdentifiers(context));
+        return generateIdentifier(context, dso.getType(), dso.getID(), dso.getHandle(), ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getIdentifiers(context, dso));
     }
 
 }

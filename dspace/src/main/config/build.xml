@@ -145,7 +145,7 @@ Common usage:
         <echo message="fresh_install   --> Perform a fresh installation of the software. " />
         <echo message="" />
         <echo message="clean_backups   --> Remove .bak directories under install directory" />
-        <echo message="test_database   --> Attempt to connect to the DSpace database in order to verify that configuration is correct" />
+        <echo message="migrate_database   --> Migrate the DSpace database to the latest version." />
         <echo message="" />
         <echo message="" />
         <echo message="Available parameters are:" />
@@ -186,7 +186,7 @@ Common usage:
     <!-- Update an installation                                        -->
     <!-- ============================================================= -->
 
-    <target name="update" depends="update_configs,update_code,update_webapps,update_solr_indexes" description="Update installed code and web applications (without clobbering data/config)">
+    <target name="update" depends="update_configs,update_code,migrate_database,update_webapps,update_solr_indexes" description="Update installed code and web applications (without clobbering data/config)">
     </target>
 
     <!-- ============================================================= -->
@@ -695,10 +695,6 @@ Common usage:
             <fileset dir="${dspace.dir}/webapps/oai/" />
         </war>
 
-        <war destfile="${dspace.dir}/webapps/lni.war">
-            <fileset dir="${dspace.dir}/webapps/lni/" />
-        </war>
-
         <war destfile="${dspace.dir}/webapps/jspui.war">
             <fileset dir="${dspace.dir}/webapps/jspui/" />
         </war>
@@ -794,11 +790,22 @@ Common usage:
 
     <!-- Test the connection to the database -->
     <target name="test_database">
-        <java classname="org.dspace.storage.rdbms.DatabaseUtils" classpathref="class.path" fork="yes" failonerror="yes">
+        <java classname="org.dspace.app.launcher.ScriptLauncher" classpathref="class.path" fork="yes" failonerror="yes">
             <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
             <sysproperty key="dspace.log.init.disable" value="true" />
             <sysproperty key="dspace.configuration" value="${config}" />
+            <arg value="database" />
             <arg value="test" />
+        </java>
+    </target>
+    <!-- Migrate the database -->
+    <target name="migrate_database">
+        <java classname="org.dspace.app.launcher.ScriptLauncher" classpathref="class.path" fork="yes" failonerror="yes">
+            <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+            <sysproperty key="dspace.log.init.disable" value="true" />
+            <sysproperty key="dspace.configuration" value="${config}" />
+            <arg value="database" />
+            <arg value="migrate" />
         </java>
     </target>
 
@@ -858,7 +865,7 @@ Common usage:
     <!-- ============================================================= -->
 
     <target name="fresh_install"
-            depends="init_installation,init_configs,test_database,install_code"
+            depends="init_installation,init_configs,test_database,install_code,migrate_database"
             description="Do a fresh install of the system, overwriting any data">
 
         <delete failonerror="no">

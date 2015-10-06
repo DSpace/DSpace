@@ -19,6 +19,7 @@ import java.io.Writer;
 import org.apache.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.util.PDFTextStripper;
+import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 
 /*
@@ -32,6 +33,7 @@ public class PDFFilter extends MediaFilter
 
     private static Logger log = Logger.getLogger(PDFFilter.class);
 
+    @Override
     public String getFilteredName(String oldFilename)
     {
         return oldFilename + ".txt";
@@ -41,6 +43,7 @@ public class PDFFilter extends MediaFilter
      * @return String bundle name
      *
      */
+    @Override
     public String getBundleName()
     {
         return "TEXT";
@@ -49,6 +52,7 @@ public class PDFFilter extends MediaFilter
     /**
      * @return String bitstreamformat
      */
+    @Override
     public String getFormatString()
     {
         return "Text";
@@ -57,6 +61,7 @@ public class PDFFilter extends MediaFilter
     /**
      * @return String description
      */
+    @Override
     public String getDescription()
     {
         return "Extracted text";
@@ -68,7 +73,8 @@ public class PDFFilter extends MediaFilter
      *
      * @return InputStream the resulting input stream
      */
-    public InputStream getDestinationStream(InputStream source)
+    @Override
+    public InputStream getDestinationStream(Item currentItem, InputStream source, boolean verbose)
             throws Exception
     {
         try
