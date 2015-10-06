@@ -55,10 +55,6 @@
   <!-- A dir option by itself adds any files found in the directory to the
        classpath, this is useful for including all jars in a directory.
     -->
-  <lib dir="../../contrib/extraction/lib" />
-  <lib dir="../../contrib/clustering/lib/" />
-  <lib dir="../../contrib/velocity/lib" />
-
   <!-- When a regex is specified in addition to a directory, only the
        files in that directory which completely match the regex
        (anchored on both ends) will be included.
