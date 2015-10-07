@@ -138,6 +138,12 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     }
 
     @Override
+    public List<Community> findAll(Context context, Integer limit, Integer offset) throws SQLException {
+        MetadataField nameField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null);
+        return communityDAO.findAll(context, nameField, limit, offset);
+    }
+
+    @Override
     public List<Community> findAllTop(Context context) throws SQLException
     {
         // get all communities that are not children

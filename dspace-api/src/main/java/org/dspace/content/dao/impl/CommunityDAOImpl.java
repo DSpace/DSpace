@@ -46,13 +46,24 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
     @Override
     public List<Community> findAll(Context context, MetadataField sortField) throws SQLException
     {
+        return findAll(context, sortField, null, null);
+    }
+
+    @Override
+    public List<Community> findAll(Context context, MetadataField sortField, Integer limit, Integer offset) throws SQLException {
         StringBuilder queryBuilder = new StringBuilder();
-        queryBuilder.append("SELECT community FROM Community as community ");
-        addMetadataLeftJoin(queryBuilder, Community.class.getSimpleName().toLowerCase(), Arrays.asList(sortField));
+        queryBuilder.append("SELECT ").append(Community.class.getSimpleName()).append(" FROM Community as ").append(Community.class.getSimpleName()).append(" ");
+        addMetadataLeftJoin(queryBuilder, Community.class.getSimpleName(), Arrays.asList(sortField));
         addMetadataSortQuery(queryBuilder, Arrays.asList(sortField), ListUtils.EMPTY_LIST);
 
-
         Query query = createQuery(context, queryBuilder.toString());
+        if(offset != null)
+        {
+            query.setFirstResult(offset);
+        }
+        if(limit != null){
+            query.setMaxResults(limit);
+        }
         query.setParameter(sortField.toString(), sortField.getFieldID());
         return list(query);
     }
