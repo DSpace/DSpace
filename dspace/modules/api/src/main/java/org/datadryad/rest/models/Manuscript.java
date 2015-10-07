@@ -128,7 +128,6 @@ public class Manuscript {
         return STATUS_REJECTED.equals(this.status) || STATUS_NEEDS_REVISION.equals(this.status);
     }
 
-    @JsonIgnore
     public List<String> getKeywords() {
         if(keywords != null && keywords.keyword != null) {
             return keywords.keyword;

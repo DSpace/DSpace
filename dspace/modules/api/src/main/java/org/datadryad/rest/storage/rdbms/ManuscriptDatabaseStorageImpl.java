@@ -152,6 +152,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     static TableRow tableRowFromManuscript(Manuscript manuscript, Integer organizationId) throws IOException {
         if(manuscript != null) {
             String json_data = writer.writeValueAsString(manuscript);
+            log.info("writing out json_data " + json_data);
             TableRow row = new TableRow(MANUSCRIPT_TABLE, MANUSCRIPT_COLUMNS);
             row.setColumn(COLUMN_ORGANIZATION_ID, organizationId);
             row.setColumn(COLUMN_MSID, manuscript.manuscriptId);
@@ -235,9 +236,11 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and organization_id = ? and active = ?";
         TableRow existingRow = DatabaseManager.querySingleTable(context, MANUSCRIPT_TABLE, query, msid, organizationId, ACTIVE_TRUE);
 
+        log.info ("hello " + manuscript.keywords.keyword.toString());
         if(existingRow != null) {
             String json_data = writer.writeValueAsString(manuscript);
-            existingRow.setColumn(COLUMN_JSON_DATA,json_data);
+            log.info("writing out json_data w " + json_data);
+            existingRow.setColumn(COLUMN_JSON_DATA, json_data);
             DatabaseManager.update(context, existingRow);
         }
     }

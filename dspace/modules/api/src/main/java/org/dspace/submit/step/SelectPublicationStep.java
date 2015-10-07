@@ -468,7 +468,8 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                 //We have a valid journal
                 // Unescape the manuscriptNumber to get the filename
                 String fileName = JournalUtils.unescapeFilename(manuscriptNumber);
-                PublicationBean pBean = ModelPublication.getDataFromPublisherFile(fileName, JournalUtils.getJournalShortID(journalConcept), journalPath);
+                PublicationBean pBean = JournalUtils.getPublicationBeanFromManuscriptStorage(manuscriptNumber, JournalUtils.getJournalShortID(journalConcept));
+
                 if (pBean.getMessage().equals((""))) {
 
                     // check if the status is "in review" or "rejected"
