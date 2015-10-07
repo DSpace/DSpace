@@ -55,7 +55,7 @@ public interface SolrLoggerService {
                                 EPerson currentUser);
 
     public void postView(DSpaceObject dspaceObject,
-   			String ip, String userAgent, String xforwarderfor, EPerson currentUser);
+   			String ip, String userAgent, String xforwardedfor, EPerson currentUser);
 
     public void postSearch(DSpaceObject resultObject, HttpServletRequest request, EPerson currentUser,
                                  List<String> queries, int rpp, String sortBy, String order, int page, DSpaceObject scope);
