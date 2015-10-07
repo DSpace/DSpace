@@ -213,8 +213,8 @@ fresh_install: update_lindat_common
 
 # Grant rights to installation
 grant_rights:
-	sudo chown -R $(TOMCAT_USER):$(TOMCAT_GROUP) $(DIR_INSTALLATION)/
-	sudo chmod -R g+w $(DIR_INSTALLATION)/
+	chown -R $(TOMCAT_USER):$(TOMCAT_GROUP) $(DIR_INSTALLATION)/
+	chmod -R g+w $(DIR_INSTALLATION)/
 	
 # maven uses prerequisites to check for mvn version
 # keep this here for non _guru builds
@@ -242,12 +242,21 @@ test_utilities_database:
 test_databases: test_utilities_database test_dspace_database
 
 create_databases:
-	@echo "CREATING DSpace DATABASE .."
-	sudo -u postgres createdb -p $(DB_PORT) "$(DATABASE_NAME)" --owner $(DSPACE_USER) --encoding "UTF-8" --template=template0
-	@echo "CREATING UTILITIES DATABASE ..."
-	sudo -u postgres createdb -p $(DB_PORT) "$(UTILITIES_DATABASE_NAME)" --owner $(DSPACE_USER) --encoding "UTF-8" --template=template0
-	sudo -u postgres psql --set=utildir="$(DIR_UTILITIES)" -p $(DB_PORT) $(UTILITIES_DATABASE_NAME) < $(DIR_UTILITIES)/utilities.sql
-	@echo "DONE"
+ifeq ("${CI}", "true")
+			@echo "CREATING DSpace DATABASE .."
+			createdb --username=postgres  -p $(DB_PORT) "$(DATABASE_NAME)" --owner $(DSPACE_USER) --encoding "UTF-8" --template=template0
+			@echo "CREATING UTILITIES DATABASE ..."
+			createdb --username postgres  -p $(DB_PORT) "$(UTILITIES_DATABASE_NAME)" --owner $(DSPACE_USER) --encoding "UTF-8" --template=template0
+			psql --username postgres  --set=utildir="$(DIR_UTILITIES)" -p $(DB_PORT) $(UTILITIES_DATABASE_NAME) < $(DIR_UTILITIES)/utilities.sql
+			@echo "DONE"
+else
+			@echo "CREATING DSpace DATABASE .."
+			sudo -u postgres createdb -p $(DB_PORT) "$(DATABASE_NAME)" --owner $(DSPACE_USER) --encoding "UTF-8" --template=template0
+			@echo "CREATING UTILITIES DATABASE ..."
+			sudo -u postgres createdb -p $(DB_PORT) "$(UTILITIES_DATABASE_NAME)" --owner $(DSPACE_USER) --encoding "UTF-8" --template=template0
+			sudo -u postgres psql --set=utildir="$(DIR_UTILITIES)" -p $(DB_PORT) $(UTILITIES_DATABASE_NAME) < $(DIR_UTILITIES)/utilities.sql
+			@echo "DONE"
+endif
 
 #update utilities database
 #dspace5+ db updated through flywaydb only!
