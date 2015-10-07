@@ -146,7 +146,7 @@ public class EZIDIdentifierProvider
         for (MetadataValue identifier : identifiers)
         {
             String identifierValue = identifier.getValue();
-            if ((null != identifierValue) && (identifierValue.startsWith(DOI.SCHEME)))
+            if (supports(identifierValue))
             {
                 return identifierValue;
             }
@@ -341,7 +341,7 @@ public class EZIDIdentifierProvider
         for (MetadataValue candidate : dsoService.getMetadata(object,
                 URI_METADATA_SCHEMA, URI_METADATA_ELEMENT, URI_METADATA_QUALIFIER, null))
         {
-            if (candidate.getValue().startsWith(DOI.SCHEME))
+            if (supports(candidate.getValue()))
             {
                 found = candidate;
                 break;
@@ -374,7 +374,7 @@ public class EZIDIdentifierProvider
         for (MetadataValue id : metadata)
         {
             String idValue = id.getValue();
-            if (!idValue.startsWith(DOI.SCHEME))
+            if (!supports(idValue))
             {
                 remainder.add(idValue);
                 continue;
