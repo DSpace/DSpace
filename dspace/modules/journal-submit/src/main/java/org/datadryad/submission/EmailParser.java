@@ -289,6 +289,7 @@ public class EmailParser {
                 }
             }
 
+
             // check to see if the last element was actually two names separated by "and"
             // or is actually the last name prefixed by "and" (because of an Oxford comma)
             String lastElement = authorStrings.remove(authorStrings.size()-1);
