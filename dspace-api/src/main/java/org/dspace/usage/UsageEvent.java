@@ -221,11 +221,11 @@ public class UsageEvent extends Event {
 		this.userAgent = userAgent;
 	}
 
-	public String getXforwarderfor() {
+	public String getXforwardedfor() {
 		return xforwardedfor;
 	}
 
-	public void setXforwarderfor(String xforwardedfor) {
+	public void setXforwardedfor(String xforwardedfor) {
 		this.xforwardedfor = xforwardedfor;
 	}
 
