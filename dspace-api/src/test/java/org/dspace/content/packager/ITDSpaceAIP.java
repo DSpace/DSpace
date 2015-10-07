@@ -49,10 +49,10 @@ import org.junit.rules.TemporaryFolder;
  * 
  * @author Tim Donohue
  */
-public class DSpaceAIPIntegrationTest extends AbstractUnitTest
+public class ITDSpaceAIP extends AbstractUnitTest
 {
     /** log4j category */
-    private static final Logger log = Logger.getLogger(DSpaceAIPIntegrationTest.class);
+    private static final Logger log = Logger.getLogger(ITDSpaceAIP.class);
     
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();

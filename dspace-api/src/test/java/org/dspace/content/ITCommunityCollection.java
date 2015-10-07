@@ -34,10 +34,10 @@ import static org.hamcrest.CoreMatchers.*;
  *
  * @author pvillega
  */
-public class CommunityCollectionIntegrationTest extends AbstractIntegrationTest
+public class ITCommunityCollection extends AbstractIntegrationTest
 {
     /** log4j category */
-    private static final Logger log = Logger.getLogger(CommunityCollectionIntegrationTest.class);
+    private static final Logger log = Logger.getLogger(ITCommunityCollection.class);
 
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
