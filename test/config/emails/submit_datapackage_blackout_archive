@@ -9,6 +9,7 @@
 # {3}  The doi's of the data files
 # {4}  The submitters full name
 # {5}  The manuscript identifier (or "none available" if the metadata doesn't contain one)
+# {6}  The formatted dx.doi.org URL
 #
 Subject: Dryad submission approved {1}
 
@@ -26,9 +27,9 @@ CITING YOUR DRYAD DATA
 
 Ensure that readers can find your data!
 
-We recommend that the article include a link to the Dryad data as follows (subsitute your DOI suffix for the xxxxx):
+We recommend that the article include a link to the Dryad data as follows:
 
-Data available from the Dryad Digital Repository: http://dx.doi.org/10.5061/dryad.xxxxx 
+Data available from the Dryad Digital Repository: {6}
 
 Your journal may follow the CrossRef recommendation that the data package be cited in the article Reference list. If so, the citation should include the Dryad package DOI, e.g.: 
 
