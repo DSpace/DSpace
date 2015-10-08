@@ -542,14 +542,11 @@ public class JournalUtils {
 // if there isn't a manuscript already in the db, create it. Otherwise, update.
         if (manuscripts.size() == 0) {
             try {
-                log.info ("ms has keywords " + manuscript.keywords.keyword);
-
                 manuscriptStorage.create(storagePath, manuscript);
             } catch (StorageException ex) {
                 log.error("Exception creating manuscript", ex);
             }
         } else {
-            log.info ("ms has keywords " + manuscript.keywords.keyword);
             try {
                 manuscriptStorage.update(storagePath, manuscript);
             } catch (StorageException ex) {
@@ -614,8 +611,7 @@ public class JournalUtils {
         }
         pBean.setAuthors(authorstrings);
         ArrayList<String> subjectKeywords = new ArrayList<String>();
-        for (String keyword : manuscript.keywords.keyword) {
-            log.info ("adding keyword " + keyword);
+        for (String keyword : manuscript.keywords) {
             subjectKeywords.add(keyword);
         }
         pBean.setSubjectKeywords(subjectKeywords);
@@ -630,7 +626,6 @@ public class JournalUtils {
             Concept journalConcept = JournalUtils.getJournalConceptByShortID(context, selectedJournalId);
             // canonicalize the manuscriptNumber:
             manuscriptNumber = JournalUtils.getCanonicalManuscriptID(context, manuscriptNumber, selectedJournalId);
-            log.info ("dealing with manuscript " + manuscriptNumber);
             // first, look for a matching manuscript in the database:
             List<Manuscript> manuscripts = JournalUtils.getManuscriptsMatchingID(selectedJournalId,manuscriptNumber);
             if (manuscripts.size() > 0) {

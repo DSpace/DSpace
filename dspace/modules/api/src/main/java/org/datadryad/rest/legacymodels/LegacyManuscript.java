@@ -58,7 +58,7 @@ public class LegacyManuscript {
         }
         this.Abstract = manuscript.manuscript_abstract;
         this.optionalProperties = manuscript.optionalProperties;
-        for(String keyword : manuscript.keywords.keyword) {
+        for(String keyword : manuscript.keywords) {
             this.Classification.keyword.add(keyword.toString());
         }
     }

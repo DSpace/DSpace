@@ -10,6 +10,8 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
+import org.dspace.workflow.ApproveRejectReviewItem;
+import org.dspace.workflow.ApproveRejectReviewItemException;
 
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
@@ -382,15 +384,41 @@ public class DryadEmailSubmission extends HttpServlet {
             if ((manuscript != null) && (JournalUtils.manuscriptIsValid(context, manuscript))) {
                 // edit the manuscript ID to the canonical one:
                 manuscript.manuscriptId = JournalUtils.getCanonicalManuscriptID(context, manuscript);
-                LOGGER.debug("hello3");
-                LOGGER.debug("ms has keywords " + manuscript.keywords.keyword.toString());
 
                 JournalUtils.writeManuscriptToDB(context, manuscript);
-                LOGGER.debug("ms still has keywords " + manuscript.keywords.keyword.toString());
 
-                LOGGER.debug("hello4");
                 JournalUtils.writeManuscriptToXMLFile(context, manuscript);
-                LOGGER.debug("ms still still has keywords " + manuscript.keywords.keyword.toString());
+
+                if (manuscript.status.equals(Manuscript.STATUS_SUBMITTED)) {
+                    // if this is a submission:
+                    JournalUtils.writeManuscriptToXMLFile(context, manuscript);
+                } else {
+                    Boolean approved = null;
+
+                    if (manuscript.status.equals(Manuscript.STATUS_ACCEPTED)) {
+                        approved = true;
+                    } else if (manuscript.status.equals(Manuscript.STATUS_REJECTED)) {
+                        approved = false;
+                    } else if (manuscript.status.equals(Manuscript.STATUS_NEEDS_REVISION)) {
+                        approved = false;
+                    } else if (manuscript.status.equals(Manuscript.STATUS_PUBLISHED)) {
+                        approved = true;
+                    }
+
+                    if (approved != null) {
+                        try {
+                            if (Manuscript.dryadDataDOI != null) {
+                                ApproveRejectReviewItem.reviewItemDOI(approved, Manuscript.dryadDataDOI);
+                            } else if (Manuscript.manuscriptId != null) {
+                                ApproveRejectReviewItem.reviewItem(approved, Manuscript.manuscriptId);
+                            } else {
+                                // we need to compare manuscript's authors with workflow items from the same journal.
+                            }
+                        } catch (ApproveRejectReviewItemException e) {
+                            // somehow we need to note that this item did not find a match
+                        }
+                    }
+                }
             } else {
                 throw new SubmissionException("Parser could not validly parse the message");
             }

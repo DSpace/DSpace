@@ -2,6 +2,7 @@
  */
 package org.datadryad.rest.models;
 
+import java.lang.String;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public class Manuscript {
     public AuthorsList authors = new AuthorsList();
     public CorrespondingAuthor correspondingAuthor = new CorrespondingAuthor();
     public String dryadDataDOI;
-    public KeywordsList keywords = new KeywordsList();
+    public List<String> keywords = new ArrayList<String>();
     public String manuscriptId;
     public String status;
     public String title;
@@ -107,11 +108,9 @@ public class Manuscript {
         localCorrespondingAuthor.email = "smith@example.com";
         this.correspondingAuthor = localCorrespondingAuthor;
         this.dryadDataDOI = "doi:10.5061/dryad.abc123";
-        KeywordsList localKeywords = new KeywordsList();
-        localKeywords.keyword.add("Science");
-        localKeywords.keyword.add("Data");
-        localKeywords.keyword.add("Publishing");
-        this.keywords = localKeywords;
+        this.keywords.add("Science");
+        this.keywords.add("Data");
+        this.keywords.add("Publishing");
         this.manuscriptId = "MS12345";
         this.publicationDOI = "doi:10.12345/987cba";
         try {
@@ -127,13 +126,4 @@ public class Manuscript {
     public Boolean isRejected() {
         return STATUS_REJECTED.equals(this.status) || STATUS_NEEDS_REVISION.equals(this.status);
     }
-
-    public List<String> getKeywords() {
-        if(keywords != null && keywords.keyword != null) {
-            return keywords.keyword;
-        } else {
-            return new ArrayList<String>();
-        }
-    }
-
 }
