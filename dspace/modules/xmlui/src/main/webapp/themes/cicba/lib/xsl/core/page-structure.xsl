@@ -495,13 +495,14 @@
 			  labels: [<xsl:for-each select="/dri:document/dri:body/dri:div[@n='item-home']/dri:div[@n='stats']/dri:table[last()-1]/dri:row/dri:cell[text()!='' and @role='data' and @rend='labelcell']">'<xsl:value-of select="." />',</xsl:for-each>],
 			  series: [<xsl:for-each select="/dri:document/dri:body/dri:div[@n='item-home']/dri:div[@n='stats']/dri:table[last()-1]/dri:row/dri:cell[text()!='' and @role='data' and @rend='datacell']">'<xsl:value-of select="." />',</xsl:for-each>]
 			};
-			
+
+			<xsl:text disable-output-escaping="yes">			
+			if(data.labels.length > 0 &amp;&amp; data.series.length > 0){
 			/*Calculate: what series are under the 'minimumUmbralProportion' of the statistics values? 
 			  Group them in a group 'others' to prevent a label overlay. */
 			var minimumUmbralProportion = 0.04;
 			var total = data.series.reduce(function sum(prev, curr) { return parseInt(prev) + parseInt(curr); });
 			var totalAccessUnderUmbral = 0; 
-			<xsl:text disable-output-escaping="yes">
 			data.series = data.series.filter(function(element, index){
 				if (parseInt(element) / total &lt; minimumUmbralProportion){
 					//If element is under the umbral, mark the corresponding label as to delete.
@@ -511,15 +512,18 @@
 				}
 				return true;
 			});
-			</xsl:text>
 			data.labels = data.labels.filter(function(element, index){
 				if (element == '-1'){
 					return false;
 				}
 				return true;
 			});
-			data.labels.push('<i18n:text>xmlui.statistics.display.chartist.country.others</i18n:text>');
-			data.series.push(totalAccessUnderUmbral.toString());
+			
+			if(totalAccessUnderUmbral &gt; 0){
+			</xsl:text>
+				data.labels.push('<i18n:text>xmlui.statistics.display.chartist.country.others</i18n:text>');
+				data.series.push(totalAccessUnderUmbral.toString());
+			}
 			
 			// Configure options for "Pie" chart.
 			var options = {
@@ -551,6 +555,7 @@
 			
 			// Create the "Pie" chart.
 			new Chartist.Pie('#chart2', data, options, responsiveOptions);
+			}
 		 	}
 		});
 		</script>

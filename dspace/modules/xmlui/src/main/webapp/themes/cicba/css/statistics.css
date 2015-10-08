@@ -67,14 +67,14 @@
   stroke-width: 1px;
 }
 
-@media screen and (max-width: 320px){  .tamanio .ct-chart-pie g.ct-series text {
+@media screen and (max-width: 320px){  .tamanio .ct-chart-pie g text.ct-label {
       font-size: 13px; }
 }
-@media screen and (min-width: 321px) and (max-width: 767px){ .tamanio .ct-chart-pie g.ct-series text {
+@media screen and (min-width: 321px) and (max-width: 767px){ .tamanio .ct-chart-pie g text.ct-label {
       font-size: 14px; }
 }
 
-@media screen and (min-width: 768px){ .tamanio .ct-chart-pie g.ct-series text {
+@media screen and (min-width: 768px){ .tamanio .ct-chart-pie g text.ct-label {
       font-size: 16px; }
 }
 
