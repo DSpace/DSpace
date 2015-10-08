@@ -38,6 +38,7 @@ public class EmailParser {
     public static final String MANUSCRIPT = "Manuscript_ID";
     public static final String ARTICLE_TITLE = "Article_Title";
     public static final String CORRESPONDING_AUTHOR = "Corresponding_Author";
+    public static final String CORRESPONDING_AUTHOR_ORCID = "Corresponding_Author_ORCID";
     public static final String EMAIL = "Email";
     public static final String ADDRESS_LINE_1 = "Address_Line_1";
     public static final String ADDRESS_LINE_2 = "Address_Line_2";
@@ -89,6 +90,7 @@ public class EmailParser {
         // commonly-used field names for optional XML tags
         fieldToXMLTagMap.put("ISSN", ISSN);
         fieldToXMLTagMap.put("ms dryad doi", DRYAD_DOI);
+        fieldToXMLTagMap.put("contact author orcid", CORRESPONDING_AUTHOR_ORCID);
     }
 
     /** The Pattern for dryad_ id. */
@@ -162,7 +164,6 @@ public class EmailParser {
 
         manuscript.manuscript_abstract = (String) dataForXML.remove(ABSTRACT);
         String authorstring = (String) dataForXML.remove(AUTHORS);
-        LOGGER.debug ("parsing authorstring " + authorstring);
         manuscript.authors.author = parseAuthorList(authorstring);
 
         manuscript.dryadDataDOI = null;
@@ -180,6 +181,10 @@ public class EmailParser {
 
         manuscript.correspondingAuthor.author = parseAuthor((String) dataForXML.remove(CORRESPONDING_AUTHOR));
         manuscript.correspondingAuthor.email = parseEmailAddress((String) dataForXML.remove(EMAIL));
+        manuscript.correspondingAuthor.author.identifier = (String) dataForXML.remove(CORRESPONDING_AUTHOR_ORCID);
+        if (manuscript.correspondingAuthor.author.identifier != null) {
+            manuscript.correspondingAuthor.author.identifierType = "ORCID";
+        }
 
         manuscript.correspondingAuthor.address = new Address();
         manuscript.correspondingAuthor.address.addressLine1 = (String) dataForXML.remove(ADDRESS_LINE_1);
