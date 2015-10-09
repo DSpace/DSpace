@@ -49,6 +49,7 @@ ALTER TABLE item ALTER COLUMN uuid SET NOT NULL;
 ALTER TABLE item ADD CONSTRAINT item_id_unique UNIQUE(uuid);
 ALTER TABLE item ADD PRIMARY KEY (uuid);
 ALTER TABLE item ALTER COLUMN item_id DROP NOT NULL;
+CREATE INDEX item_id_idx on item(item_id);
 
 ALTER TABLE community ADD COLUMN uuid UUID DEFAULT gen_random_uuid() UNIQUE;
 INSERT INTO dspaceobject  (uuid) SELECT uuid FROM community;
@@ -74,6 +75,7 @@ ALTER TABLE bundle ALTER COLUMN uuid SET NOT NULL;
 ALTER TABLE bundle ADD CONSTRAINT bundle_id_unique UNIQUE(uuid);
 ALTER TABLE bundle ADD PRIMARY KEY (uuid);
 ALTER TABLE bundle ALTER COLUMN bundle_id DROP NOT NULL;
+CREATE INDEX bundle_id_idx on bundle(bundle_id);
 
 ALTER TABLE bitstream ADD COLUMN uuid UUID DEFAULT gen_random_uuid() UNIQUE;
 INSERT INTO dspaceobject  (uuid) SELECT uuid FROM bitstream;
@@ -82,6 +84,7 @@ ALTER TABLE bitstream ALTER COLUMN uuid SET NOT NULL;
 ALTER TABLE bitstream ADD CONSTRAINT bitstream_id_unique UNIQUE(uuid);
 ALTER TABLE bitstream ADD PRIMARY KEY (uuid);
 ALTER TABLE bitstream ALTER COLUMN bitstream_id DROP NOT NULL;
+CREATE INDEX bitstream_id_idx on bitstream(bitstream_id);
 UPDATE bitstream SET sequence_id = -1 WHERE sequence_id IS NULL;
 UPDATE bitstream SET size_bytes = -1 WHERE size_bytes IS NULL;
 UPDATE bitstream SET deleted = FALSE WHERE deleted IS NULL;
