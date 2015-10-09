@@ -131,6 +131,11 @@ public class Context
         {
             // Obtain a non-auto-committing connection
             dbConnection = new DSpace().getSingletonService(DBConnection.class);
+            if(dbConnection == null)
+            {
+                log.fatal("Cannot obtain the bean which provides a database connection. " +
+                        "Check previous entries in the dspace.log to find why the db failed to initialize.");
+            }
         }
 
         currentUser = null;
