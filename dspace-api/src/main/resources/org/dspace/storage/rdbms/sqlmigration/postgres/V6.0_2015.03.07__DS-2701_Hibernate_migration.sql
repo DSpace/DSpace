@@ -29,6 +29,7 @@ ALTER TABLE eperson ALTER COLUMN uuid SET NOT NULL;
 ALTER TABLE eperson ADD CONSTRAINT eperson_id_unique UNIQUE(uuid);
 ALTER TABLE eperson ADD PRIMARY KEY (uuid);
 ALTER TABLE eperson ALTER COLUMN eperson_id DROP NOT NULL;
+CREATE INDEX eperson_id_idx on eperson(eperson_id);
 UPDATE eperson SET require_certificate = false WHERE require_certificate IS NULL;
 UPDATE eperson SET self_registered = false WHERE self_registered IS NULL;
 
@@ -41,6 +42,7 @@ ALTER TABLE epersongroup ALTER COLUMN uuid SET NOT NULL;
 ALTER TABLE epersongroup ADD CONSTRAINT epersongroup_id_unique UNIQUE(uuid);
 ALTER TABLE epersongroup ADD PRIMARY KEY (uuid);
 ALTER TABLE epersongroup ALTER COLUMN eperson_group_id DROP NOT NULL;
+CREATE INDEX eperson_group_id_idx on epersongroup(eperson_group_id);
 
 ALTER TABLE item ADD COLUMN uuid UUID DEFAULT gen_random_uuid() UNIQUE;
 INSERT INTO dspaceobject  (uuid) SELECT uuid FROM item;
@@ -58,6 +60,7 @@ ALTER TABLE community ALTER COLUMN uuid SET NOT NULL;
 ALTER TABLE community ADD CONSTRAINT community_id_unique UNIQUE(uuid);
 ALTER TABLE community ADD PRIMARY KEY (uuid);
 ALTER TABLE community ALTER COLUMN community_id DROP NOT NULL;
+CREATE INDEX community_id_idx on community(community_id);
 
 
 ALTER TABLE collection ADD COLUMN uuid UUID DEFAULT gen_random_uuid() UNIQUE;
@@ -67,6 +70,7 @@ ALTER TABLE collection ALTER COLUMN uuid SET NOT NULL;
 ALTER TABLE collection ADD CONSTRAINT collection_id_unique UNIQUE(uuid);
 ALTER TABLE collection ADD PRIMARY KEY (uuid);
 ALTER TABLE collection ALTER COLUMN collection_id DROP NOT NULL;
+CREATE INDEX collection_id_idx on collection(collection_id);
 
 ALTER TABLE bundle ADD COLUMN uuid UUID DEFAULT gen_random_uuid() UNIQUE;
 INSERT INTO dspaceobject  (uuid) SELECT uuid FROM bundle;
