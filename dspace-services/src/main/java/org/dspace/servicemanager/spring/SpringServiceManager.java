@@ -99,6 +99,7 @@ public final class SpringServiceManager implements ServiceManagerSystem {
                     bean = (T) applicationContext.getBean(name, type);
                 } catch (BeansException e) {
                     // no luck, try the fall back option
+                    log.error(e.getMessage(), e);
                     bean = null;
                 }
             } else {
@@ -107,6 +108,7 @@ public final class SpringServiceManager implements ServiceManagerSystem {
                     bean = (T) applicationContext.getBean(type.getName(), type);
                 } catch (BeansException e) {
                     // no luck, try the fall back option
+                    log.error(e.getMessage(), e);
                     bean = null;
                 }
             }
@@ -121,6 +123,7 @@ public final class SpringServiceManager implements ServiceManagerSystem {
                     }
                 } catch (BeansException e) {
                     // I guess there are no beans of this type
+                    log.error(e.getMessage(), e);
                     bean = null;
                 }
             }
