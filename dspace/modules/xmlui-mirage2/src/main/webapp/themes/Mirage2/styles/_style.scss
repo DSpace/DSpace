@@ -48,8 +48,13 @@ header .navbar-brand img {
     text-align: left;
 }
 
+// let's use this font family for everything
+* {
+	font-family: 'Proxima Nova',Gotham,Helvetica,Arial,sans-serif;
+}
+
 h1,h2,h3,h4,h5,h6,h7,h8,h9, .community-browser-row a  {
-    font-family: Georgia,Times,"Times New Roman",serif;
+    font-family: 'Proxima Nova',Gotham,Helvetica,Arial,sans-serif;
     font-weight: bold;
 }
 
