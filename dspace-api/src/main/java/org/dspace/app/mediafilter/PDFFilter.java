@@ -97,7 +97,7 @@ public class PDFFilter extends MediaFilter
             
             try
             {
-                pdfDoc = PDDocument.load(source);
+                pdfDoc = PDDocument.loadNonSeq(source, null);
                 pts.writeText(pdfDoc, writer);
             }
             finally
