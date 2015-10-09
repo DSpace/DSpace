@@ -202,7 +202,7 @@ public class AssociationAnywhere {
         }
         catch (Exception e)
         {
-            throw new AssociationAnywhereException(e.getMessage());
+            throw new AssociationAnywhereException("unable to deduct credits for " + customerId, e);
         }
 
     }
