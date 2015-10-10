@@ -29,6 +29,7 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.rest.common.Status;
 import org.dspace.rest.common.User;
 import org.dspace.rest.exceptions.ContextException;
+import org.springframework.stereotype.Component;
 
 /**
  * Root of RESTful api. It provides login and logout. Also have method for
@@ -37,12 +38,13 @@ import org.dspace.rest.exceptions.ContextException;
  * @author Rostislav Novak (Computing and Information Centre, CTU in Prague)
  * 
  */
+@Component
 @Path("/")
 public class RestIndex {
     protected EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
     private static Logger log = Logger.getLogger(RestIndex.class);
 
-    @javax.ws.rs.core.Context public static ServletContext servletContext;
+    @javax.ws.rs.core.Context public ServletContext servletContext;
 
     /**
      * Return html page with information about REST api. It contains methods all

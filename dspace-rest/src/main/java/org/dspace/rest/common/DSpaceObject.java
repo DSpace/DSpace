@@ -12,6 +12,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.rest.Resource;
 
+import javax.servlet.ServletContext;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -37,8 +38,8 @@ public class DSpaceObject {
     private String handle;
     private String type;
 
-    @XmlElement(name = "link", required = true)
-    private String link;
+//    @XmlElement(name = "link", required = true)
+//    private String link;
 
     @XmlElement(required = true)
     private ArrayList<String> expand = new ArrayList<String>();
@@ -54,6 +55,7 @@ public class DSpaceObject {
         setHandle(dso.getHandle());
         DSpaceObjectService dspaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(dso);
         setType(dspaceObjectService.getTypeText(dso).toLowerCase());
+//        link = createLink(context)
     }
 
     public Integer getId() {
@@ -81,7 +83,7 @@ public class DSpaceObject {
     }
 
     public String getLink() {
-        return Resource.getServletContextPath() + "/" + English.plural(getType()) + "/" + getId();
+        return "";
     }
 
     public String getType() {
@@ -111,5 +113,9 @@ public class DSpaceObject {
 
     public void setUUID(String uuid) {
         this.uuid = uuid;
+    }
+
+    private String createLink(ServletContext context){
+        return context.getContextPath() + "/" + English.plural(getType()) + "/" + getId();
     }
 }
