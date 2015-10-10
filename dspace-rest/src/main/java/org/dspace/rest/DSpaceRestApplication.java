@@ -7,7 +7,6 @@ import org.springframework.web.filter.RequestContextFilter;
 public class DSpaceRestApplication extends ResourceConfig {
 
     public DSpaceRestApplication() {
-        register(RequestContextFilter.class);
         register(JacksonFeature.class);
         packages("org.dspace.rest");
     }

@@ -38,8 +38,8 @@ public class DSpaceObject {
     private String handle;
     private String type;
 
-//    @XmlElement(name = "link", required = true)
-//    private String link;
+    @XmlElement(name = "link", required = true)
+    private String link;
 
     @XmlElement(required = true)
     private ArrayList<String> expand = new ArrayList<String>();
@@ -48,14 +48,14 @@ public class DSpaceObject {
 
     }
 
-    public DSpaceObject(org.dspace.content.DSpaceObject dso) {
+    public DSpaceObject(org.dspace.content.DSpaceObject dso, ServletContext servletContext) {
         //setId(); legacyID
         setUUID(dso.getID().toString());
         setName(dso.getName());
         setHandle(dso.getHandle());
         DSpaceObjectService dspaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(dso);
         setType(dspaceObjectService.getTypeText(dso).toLowerCase());
-//        link = createLink(context)
+        link = createLink(servletContext);
     }
 
     public Integer getId() {
@@ -83,7 +83,7 @@ public class DSpaceObject {
     }
 
     public String getLink() {
-        return "";
+        return link;
     }
 
     public String getType() {
