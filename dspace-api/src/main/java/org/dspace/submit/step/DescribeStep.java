@@ -301,6 +301,9 @@ public class DescribeStep extends AbstractProcessingStep
                 readText(request, item, schema, element, qualifier, inputs[j]
                         .getRepeatable(), LANGUAGE_QUALIFIER, inputs[j].getRepeatableParse());
             } else if(inputType.equals("complex")){
+            	if(buttonPressed.equals("submit_local_sponsor_delete")) {
+            		item.clearMetadata("dc", "relation", null, Item.ANY);
+            	}
                 readComplex(request, item, schema, element, qualifier, inputs[j]);
             }
             else
@@ -459,6 +462,24 @@ public class DescribeStep extends AbstractProcessingStep
         DCInput.ComplexDefinition definition = input.getComplexDefinition();
         java.util.Map<String, java.util.List<String>> fieldsValues = new HashMap<String, java.util.List<String>>();
         int valuesPerField = 0;
+        
+        String buttonPressed = Util.getSubmitButton(request, NEXT_BUTTON);
+    	if(buttonPressed.equals("submit_" + metadataField + "_delete")) {
+        	for(String name : definition.getSortedInputNames()){
+                Map<String, String> input_map = definition.getInput(name);
+                String mapped = input_map.get("mapped-to-if-not-default");
+                if(mapped != null && !mapped.isEmpty())  {
+                	String md[] = mapped.split("\\.");
+                	if(md.length==2) {
+                		item.clearMetadata(md[0], md[1], null, Item.ANY);
+                	}
+                	else if(md.length==3){
+                		item.clearMetadata(md[0], md[1], md[2], Item.ANY);
+                	}
+                }
+        	}    		
+    	}
+
 
         if (repeated)
         {
