@@ -49,14 +49,24 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
             boolean withdrawn, boolean discoverable, Date lastModified)
             throws SQLException
     {
-        Query query = createQuery(context, "SELECT i FROM Item i"
-                + " WHERE (inArchive = :in_archive OR withdrawn = :withdrawn)"
-                + "  AND discoverable = :discoverable"
-                + "  AND last_modified > :last_modified");
+        StringBuilder queryStr = new StringBuilder();
+        queryStr.append("SELECT i FROM Item i");
+        queryStr.append(" WHERE (inArchive = :in_archive OR withdrawn = :withdrawn)");
+        queryStr.append(" AND discoverable = :discoverable");
+
+        if(lastModified != null)
+        {
+            queryStr.append(" AND last_modified > :last_modified");
+        }
+
+        Query query = createQuery(context, queryStr.toString());
         query.setParameter("in_archive", archived);
         query.setParameter("withdrawn", withdrawn);
         query.setParameter("discoverable", discoverable);
-        query.setDate("last_modified", lastModified);
+        if(lastModified != null)
+        {
+            query.setTimestamp("last_modified", lastModified);
+	}
         return iterate(query);
     }
 
@@ -151,7 +161,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
             throws SQLException
     {
         Query query = createQuery(context, "SELECT i FROM item i WHERE last_modified > :last_modified");
-        query.setDate("last_modified", since);
+        query.setTimestamp("last_modified", since);
         return iterate(query);
     }
 }
