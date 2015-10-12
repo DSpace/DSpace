@@ -56,7 +56,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         query.setParameter("in_archive", archived);
         query.setParameter("withdrawn", withdrawn);
         query.setParameter("discoverable", discoverable);
-        query.setParameter("last_modified", lastModified);
+        query.setDate("last_modified", lastModified);
         return iterate(query);
     }
 
@@ -151,7 +151,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
             throws SQLException
     {
         Query query = createQuery(context, "SELECT i FROM item i WHERE last_modified > :last_modified");
-        query.setParameter("last_modified", since);
+        query.setDate("last_modified", since);
         return iterate(query);
     }
 }
