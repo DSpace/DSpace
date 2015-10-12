@@ -184,8 +184,7 @@ public class Submissions extends AbstractDSpaceTransformer
                 Division start = division.addDivision("start-submision");
                 start.setHead(T_s_head1);
                 Para p = start.addPara();
-                p.addContent(T_s_info1a);
-                p.addXref(contextPath+"/submit",T_s_info1b);
+                p.addXref(contextPath+"/submit",T_s_info1b, "btn btn-repository");
                 Para secondP = start.addPara();
                 secondP.addContent(T_s_info1c);
                 return;
@@ -196,8 +195,7 @@ public class Submissions extends AbstractDSpaceTransformer
     	unfinished.setHead(T_s_head2);
     	Para p = unfinished.addPara();
     	p.addContent(T_s_info2a);
-    	p.addHighlight("bold").addXref(contextPath+"/submit",T_s_info2b);
-    	p.addContent(T_s_info2c);
+    	p.addHighlight("bold").addXref(contextPath+"/submit",T_s_info2b, "btn btn-repository");
 
     	// Calculate the number of rows.
     	// Each list pluss the top header and bottom row for the button.
