@@ -11,6 +11,19 @@ import com.lyncode.xoai.dataprovider.exceptions.ConfigurationException;
 import com.lyncode.xoai.dataprovider.exceptions.MetadataBindException;
 import com.lyncode.xoai.dataprovider.exceptions.WritingXmlException;
 import com.lyncode.xoai.dataprovider.xml.XmlOutputContext;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.ConnectException;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import javax.xml.stream.XMLStreamException;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
@@ -23,8 +36,18 @@ import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.*;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.MetadataField;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -33,29 +56,14 @@ import org.dspace.xoai.services.api.cache.XOAICacheService;
 import org.dspace.xoai.services.api.cache.XOAIItemCacheService;
 import org.dspace.xoai.services.api.cache.XOAILastCompilationCacheService;
 import org.dspace.xoai.services.api.config.ConfigurationService;
-import org.dspace.xoai.services.api.config.XOAIManagerResolver;
-import org.dspace.xoai.services.api.context.ContextService;
 import org.dspace.xoai.services.api.CollectionsService;
 import org.dspace.xoai.services.api.solr.SolrServerResolver;
 import org.dspace.xoai.solr.DSpaceSolrSearch;
 import org.dspace.xoai.solr.exceptions.DSpaceSolrException;
 import org.dspace.xoai.solr.exceptions.DSpaceSolrIndexerException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import javax.xml.stream.XMLStreamException;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.net.ConnectException;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import javax.inject.Inject;
-import org.dspace.content.service.ItemService;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import static com.lyncode.xoai.dataprovider.core.Granularity.Second;
 import static org.dspace.xoai.util.ItemUtils.retrieveMetadata;
@@ -75,21 +83,14 @@ public class XOAI {
     @Autowired
     private SolrServerResolver solrServerResolver;
     @Autowired
-    private XOAIManagerResolver xoaiManagerResolver;
-    @Autowired
-    private ContextService contextService;
-    @Autowired
     private XOAILastCompilationCacheService xoaiLastCompilationCacheService;
-    @Autowired
-    private XOAICacheService xoaiCacheService;
     @Autowired
     private XOAIItemCacheService xoaiItemCacheService;
     @Autowired
     private CollectionsService collectionsService;
-    @Inject
-    private AuthorizeService authorizeService;
-    @Inject
-    private ItemService itemService;
+
+    private final AuthorizeService authorizeService;
+    private final ItemService itemService;
 
 
     private List<String> getFileFormats(Item item) {
@@ -113,11 +114,19 @@ public class XOAI {
         this.optimize = optimize;
         this.clean = clean;
         this.verbose = verbose;
+
+        // Load necessary DSpace services
+        this.authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+        this.itemService = ContentServiceFactory.getInstance().getItemService();
     }
 
     public XOAI(Context ctx, boolean hasOption) {
-        context = ctx;
-        verbose = hasOption;
+        this.context = ctx;
+        this.verbose = hasOption;
+
+        // Load necessary DSpace services
+        this.authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+        this.itemService = ContentServiceFactory.getInstance().getItemService();
     }
 
     private void println(String line) {
