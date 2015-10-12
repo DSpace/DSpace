@@ -26,15 +26,6 @@
 
 
 
-        <!--Connection pool parameters -->
-        <!-- Maximum number of DB connections in pool -->
-        <property name="hibernate.c3p0.max_size">${db.maxconnections}</property>
-        <!-- Determine the number of statements to be cached. -->
-        <property name="hibernate.c3p0.max_statements">${db.statementpool.cache}</property>
-
-
-
-
 
         <!--Debug property that can be used to display the sql-->
         <property name="show_sql">false</property>
