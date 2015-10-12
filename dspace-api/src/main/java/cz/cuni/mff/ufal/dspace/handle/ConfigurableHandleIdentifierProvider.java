@@ -449,12 +449,13 @@ public class ConfigurableHandleIdentifierProvider extends IdentifierProvider {
      * @return
      */
     private static String createHandleId(int id,
-                                         PIDCommunityConfiguration pidCommunityConfiguration)
+                                         PIDCommunityConfiguration pidCommunityConfiguration,
+                                         DSpaceObject dso)
     {
         String handleId = null;
         if (pidCommunityConfiguration.isEpic())
         {
-            handleId = createEpicHandleId(id, pidCommunityConfiguration);
+            handleId = createEpicHandleId(id, pidCommunityConfiguration, dso);
         }
         else if (pidCommunityConfiguration.isLocal())
         {
@@ -559,7 +560,7 @@ public class ConfigurableHandleIdentifierProvider extends IdentifierProvider {
                 PIDCommunityConfiguration pidCommunityConfiguration = PIDConfiguration
                     .getPIDCommunityConfiguration(dso);
                 try{
-                    handle_str = createHandleId(handle.getID(), pidCommunityConfiguration);
+                    handle_str = createHandleId(handle.getID(), pidCommunityConfiguration, dso);
                 }catch(IllegalStateException e){
                     try
                     {
@@ -739,7 +740,8 @@ public class ConfigurableHandleIdentifierProvider extends IdentifierProvider {
      * @return
      */
     private static String createEpicHandleId(int id,
-                                             PIDCommunityConfiguration pidCommunityConfiguration)
+                                             PIDCommunityConfiguration pidCommunityConfiguration,
+                                             DSpaceObject dso)
     {
         String handleId;
 
@@ -751,7 +753,7 @@ public class ConfigurableHandleIdentifierProvider extends IdentifierProvider {
             handleId = DSpaceApi.handle_HandleManager_createId(log, id, prefix, suffix);
             // if the handle created successfully register the final handle
             DSpaceApi
-                .handle_HandleManager_registerFinalHandleURL(log, handleId);
+                .handle_HandleManager_registerFinalHandleURL(log, handleId, dso);
         }
         catch (IOException e)
         {
