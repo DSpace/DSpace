@@ -81,5 +81,17 @@
         <qualifier>count</qualifier>
         <scope_note>Count of files in the item</scope_note>
     </dc-type>                            
+    <dc-type>
+        <schema>local</schema>
+        <element>featuredService</element>
+        <qualifier>kontext</qualifier>
+        <scope_note>Links to data in kontext</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>local</schema>
+        <element>featuredService</element>
+        <qualifier>pmltq</qualifier>
+        <scope_note>Links to data in PML-TQ</scope_note>
+    </dc-type>
 </dspace-dc-types>
 

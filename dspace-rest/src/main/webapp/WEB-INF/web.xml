@@ -10,25 +10,14 @@
 -->
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://java.sun.com/xml/ns/javaee"
-         xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-         id="WebApp_ID" version="2.5">
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         id="WebApp_ID" version="3.0">
     <servlet>
         <servlet-name>DSpace REST API</servlet-name>
-        <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
+        <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
         <init-param>
-            <!--
-             The jersey ServletContainer will look for our Root Resource Class
-             (i.e. our HelloWorld class) in the foo.bar package
-             There are other ways to register this; see the jersey documentation for
-             more details
-            -->
-            <param-name>com.sun.jersey.config.property.packages</param-name>
-            <param-value>org.dspace.rest</param-value>
-        </init-param>
-        <init-param>
-            <param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
-            <param-value>true</param-value>
+            <param-name>javax.ws.rs.Application</param-name>
+            <param-value>cz.cuni.mff.ufal.dspace.rest.Application</param-value>
         </init-param>
         <!--
         Load the ServletContainer at startup.  A value of 1 indicates the ServletContainer

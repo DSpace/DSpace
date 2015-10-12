@@ -1391,3 +1391,7 @@ div.modal-scrollbar {
 #aspect_submission_StepTransformer_list_controls .licenseselector {
 	margin: 10px 0px 10px 0px;
 }
+
+.refbox {
+	margin-bottom: 10px;
+}

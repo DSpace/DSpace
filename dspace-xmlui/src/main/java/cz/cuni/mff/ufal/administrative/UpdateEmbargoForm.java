@@ -72,7 +72,7 @@ public class UpdateEmbargoForm extends AbstractDSpaceTransformer {
 
 		// LIST: options
 		List options = main.addList("options", List.TYPE_SIMPLE, "horizontal");
-		ViewItem.add_options(options, baseURL, ViewItem.T_option_embargo, tabLink);
+		ViewItem.add_options(context, eperson, options, baseURL, ViewItem.T_option_embargo, tabLink);
 
 		List form = main.addList("currentEmbargo", List.TYPE_FORM);
 		form.setHead(

@@ -184,4 +184,59 @@
         </input>
     </xsl:template>
     
+    <xsl:template match="dri:div[@n='featuredService']//dri:list[@n='service_urls']" priority="10">    
+		<dl>
+			<dt>
+				<xsl:value-of select="dri:label[@n='base_url_label']/node()"/>						
+			</dt>
+			<dd>
+				<span>
+					<xsl:attribute name="id">
+						<xsl:value-of select="translate(dri:item[@n='base_url_value']/@id,'.','_')"/>
+					</xsl:attribute>
+					<xsl:value-of select="dri:item[@n='base_url_value']/node()"/>
+				</span>
+			</dd>
+			<dt>
+				<xsl:value-of select="dri:label[@n='add_links_label']/node()"/>
+			</dt>
+			<dd>
+				<table class="table">
+					<thead>
+						<xsl:apply-templates select="dri:item[@n='url_count']/dri:field" />
+						<tr><th>Key</th><th>Value <a href="#" class="add-service-url pull-right"><i class="fa fa-plus-circle">&#160;</i></a></th></tr>
+					</thead>
+					<tbody>
+						<xsl:for-each select="dri:item[starts-with(@n, 'text_fields_')]">
+							<tr>
+								<td class="col-md-3">
+									<xsl:apply-templates select="dri:field[@rend = 'url_key']" />
+								</td>
+								<td class="col-md-9">
+									<xsl:apply-templates select="dri:field[@rend = 'url_value']" />
+								</td>
+							</tr>
+						</xsl:for-each>
+						<tr>
+							<td colspan="2" class="text-right">
+						    	<xsl:for-each select="dri:item[@n='buttons']/dri:field">
+						    		<button>
+						   				<xsl:call-template name="standardAttributes" />
+										<xsl:attribute name="name">
+											<xsl:value-of select="@n"/>
+										</xsl:attribute>					
+										<xsl:attribute name="value">
+											<xsl:value-of select="dri:value/node()"/>
+										</xsl:attribute>
+										<xsl:value-of select="dri:label/node()" />
+						    		</button>
+						    	</xsl:for-each>							
+							</td>
+						</tr>						
+					</tbody>
+				</table>
+			</dd>
+		</dl>		
+    </xsl:template>
+    
 </xsl:stylesheet>

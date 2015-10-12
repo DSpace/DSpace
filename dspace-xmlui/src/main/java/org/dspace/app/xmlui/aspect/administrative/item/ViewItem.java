@@ -24,6 +24,10 @@ import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+
+import cz.cuni.mff.ufal.dspace.app.xmlui.aspect.general.IfServiceManagerSelector;
 
 /**
  * Display basic meta-meta information about the item and allow the user to
@@ -48,6 +52,7 @@ public class ViewItem extends AbstractDSpaceTransformer {
 	public static final Message T_option_curate = message("xmlui.administrative.item.general.option_curate");
 	public static final Message T_option_license = message("xmlui.administrative.item.general.option_license");
 	public static final Message T_option_embargo = message("xmlui.administrative.item.general.option_embargo");
+	public static final Message T_option_services = message("xmlui.administrative.item.general.option_services");
 
 	private static final Message T_title = message("xmlui.administrative.item.ViewItem.title");
 	private static final Message T_trail = message("xmlui.administrative.item.ViewItem.trail");
@@ -90,7 +95,7 @@ public class ViewItem extends AbstractDSpaceTransformer {
 		
 		// LIST: options
 		List options = main.addList("options", List.TYPE_SIMPLE, "horizontal");
-		add_options(options, baseURL, T_option_view, tabLink);
+		add_options(context, eperson, options, baseURL, T_option_view, tabLink);
 
 		
 		main = main.addDivision("item-view", "well well-small well-light");
@@ -110,8 +115,6 @@ public class ViewItem extends AbstractDSpaceTransformer {
             showfullPara.addXref(link).addContent(T_show_full);
         }
 
-		Division view = main.addDivision("item-view", "well well-white");
-		
 		ReferenceSet referenceSet;
 		referenceSet = main.addReferenceSet("collection-viewer",
 				showFullItem?ReferenceSet.TYPE_DETAIL_VIEW:ReferenceSet.TYPE_SUMMARY_VIEW);
@@ -142,23 +145,46 @@ public class ViewItem extends AbstractDSpaceTransformer {
 			String baseURL,
 			Message to_highlight) throws WingException 
 	{
-		add_options( options, baseURL, to_highlight, null );
+		add_options( null, null, options, baseURL, to_highlight, null );
 	}
+	
 	public static void add_options(
 			List options, 
-			String baseURL,
-			Message to_highlight, 
-			String highlighted_link) throws WingException 
+			String baseURL, Message to_highlight, String highlighted_link) throws WingException 
+	{
+		add_options( null, null, options, baseURL, to_highlight, highlighted_link );
+	}
+	
+	public static void add_options(
+			Context context, 
+			EPerson eperson,
+			List options, 
+			String baseURL, Message to_highlight, String highlighted_link) throws WingException 
 	{
 		
 		LinkedHashMap<String, Message> map = new LinkedHashMap<String, Message>();
-		map.put("&submit_status", T_option_status);
-		map.put("&submit_bitstreams", T_option_bitstreams);
-		map.put("&submit_metadata", T_option_metadata);
-		map.put("&view_item", T_option_view);
-		map.put("&submit_curate", T_option_curate);
-		map.put("&edit_license", T_option_license);
-		map.put("&embargo", T_option_embargo);
+		
+		boolean isServiceManger = false;
+		try {
+			isServiceManger = IfServiceManagerSelector.isNonAdminServiceManager(context, eperson);
+		} catch (SQLException e) {
+			
+		}
+		
+		if(isServiceManger) {
+			map.put("&submit_status", T_option_status);
+			map.put("&view_item", T_option_view);			
+			map.put("&services", T_option_services);
+		} else {		
+			map.put("&submit_status", T_option_status);
+			map.put("&submit_bitstreams", T_option_bitstreams);
+			map.put("&submit_metadata", T_option_metadata);
+			map.put("&view_item", T_option_view);
+			map.put("&submit_curate", T_option_curate);
+			map.put("&edit_license", T_option_license);
+			map.put("&embargo", T_option_embargo);
+			map.put("&services", T_option_services);
+		}
 		
 		for ( Map.Entry<String, Message> tab : map.entrySet()) 
 		{

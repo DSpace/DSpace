@@ -1,0 +1,26 @@
+# E-mail to admin about activation of a service for an item
+#
+# Parameters: {0} Item Handle
+#             {1} Item Title 
+#             {2} Service Name
+#			  {3} New values
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: Service Integration Update
+
+Following item''s integrated services details are updated:
+
+Item handle: {0}
+Item Title: {1}
+Updated Service: {2}
+Changes:
+
+{3}
+	
+
+_____________________________________
+${dspace.name},
+WWW: ${dspace.url}
+Email: ${lr.help.mail}
+Tel.: ${lr.help.phone}

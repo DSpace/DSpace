@@ -214,7 +214,11 @@ public class ControlPanelBitstreams extends AbstractControlPanelTab {
 			if ( dso != null ) {
 				String handle = dso.getHandle();
 				if ( handle != null ) {
-					wsrow.addCell().addXref( contextPath + "/handle/" + handle, b.getName() );
+					String name = b.getName();
+					if ( null == name ) {
+						name = String.format("<<belongs to:%s (%s)>>", dso.getTypeText(), handle);
+					}
+					wsrow.addCell().addXref(contextPath + "/handle/" + handle, name);
 				}else {
 					dso = null;
 				}
