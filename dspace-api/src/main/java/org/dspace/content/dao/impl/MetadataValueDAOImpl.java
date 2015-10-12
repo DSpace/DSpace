@@ -60,7 +60,7 @@ public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> im
     public MetadataValue getMinimum(Context context, int metadataFieldId)
             throws SQLException
     {
-        String queryString = "SELECT m FROM metadatavalue m WHERE metadata_field_id = :metadata_field_id ORDER BY value";
+        String queryString = "SELECT m FROM MetadataValue m WHERE metadata_field_id = :metadata_field_id ORDER BY text_value";
         Query query = createQuery(context, queryString);
         query.setParameter("metadata_field_id", metadataFieldId);
         query.setMaxResults(1);
