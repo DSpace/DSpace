@@ -1288,125 +1288,159 @@ public class DescribeStep extends AbstractSubmissionStep
         protected void renderComplexField(List form, String fieldName, DCInput dcInput, Metadatum[] dcValues, boolean readonly) throws WingException
         {
 
-                        String rend = dcInput.getRendsAsString();
+            String rend = dcInput.getRendsAsString();
 
-                        org.dspace.app.xmlui.wing.element.Item item = form.addItem(null, rend + " list-complex-field");
+            org.dspace.app.xmlui.wing.element.Item item = form.addItem(null, rend + " list-complex-field");
 
-                        rend += "submit-complex";
+            rend += "submit-complex";
 
-                        Composite composite = item.addComposite(fieldName, rend);
+            Composite composite = item.addComposite(fieldName, rend);
 
-                        DCInput.ComplexDefinition definition = dcInput.getComplexDefinition();
-                        java.util.List<Field> fields = new ArrayList<Field>();
-                        for (String name : definition.getInputNames()) {
-                        		String fullInputName = fieldName + "_" + name;
-                        	    Field field = null;
-                                String type = definition.getInput(name).get("type");
-                                if ("text".equals(type)) {
-                                		String autocomplete  = definition.getInput(name).get("autocomplete");
-                                		if(isAutocompletable(autocomplete)) {
-                                            field = composite.addText(fullInputName, rend + " autocomplete"); 
-                                			addAutocompleteComponents(fullInputName, autocomplete, item);
-                                		} else {
-                                            field = composite.addText(fullInputName, rend); 
-                                		}
-                                } else if ("dropdown".equals(type)){
-                                        Select select = composite.addSelect(fullInputName, rend);
-                                        // Setup the possible options
-                                        java.util.List<String> pairs = definition.getValuePairsForInput(name);
-                                        for (int i = 0; i < pairs.size(); i += 2)
-                                        {
-                                                String display = pairs.get(i);
-                                                String value   = pairs.get(i+1);
-                                                select.addOption(value,display);
-                                        }
-                                        field = select;
-                                } else {
-                                        // nothing yet;
-                                }
-                                
-                                String label = definition.getInput(name).get("label");
-                                if(label != null && field != null){
-                                	field.setLabel(label);
-                                }
-                                String help = definition.getInput(name).get("help");
-                                if(help != null && field != null){
-                                	field.setHelp(help);
-                                }
-                                if(field != null){
-                                    fields.add(field);
-                                }
-                        }
+            DCInput.ComplexDefinition definition = dcInput.getComplexDefinition();
+            Map<String, Field> fields = new HashMap<>();
+            for (String name : definition.getInputNames()) {
+                String fullInputName = fieldName + "_" + name;
+                Field field = null;
+                Map<String, String> input_map = definition.getInput(name);
+                String type = input_map.get("type");
+                String rend_field = "";
+                if (null != input_map.get("class")) {
+                    rend_field += " " + input_map.get("class");
+                }
 
-                        // Setup the field's values
-                        for (Metadatum dcValue : dcValues) {
-                                java.util.List<String> values = split(dcValue.value);
-                                fill(fields,values,true,definition,fieldName);
-                                composite.addInstance().setValue(StringUtils.join(values.iterator(), ";"));
+                if ("text".equals(type)) {
+                        String autocomplete = input_map.get("autocomplete");
+                        if(isAutocompletable(autocomplete)) {
+                            field = composite.addText(fullInputName, rend_field + " autocomplete");
+                            addAutocompleteComponents(fullInputName, autocomplete, item);
+                        } else {
+                            field = composite.addText(fullInputName, rend_field);
                         }
+                } else if ("dropdown".equals(type)){
+                        Select select = composite.addSelect(fullInputName, rend_field);
+                        // Setup the possible options
+                        java.util.List<String> pairs = definition.getValuePairsForInput(name);
+                        for (int i = 0; i < pairs.size(); i += 2)
+                        {
+                            String display = pairs.get(i);
+                            String value   = pairs.get(i+1);
+                            select.addOption(value,display);
+                        }
+                        field = select;
+                } else {
+                        // nothing yet;
+                }
 
-                         if(regexError.containsKey(fieldName)) {
-                                // partially fill the form
-                        	 	java.util.List<String> values = split(regexError.get(fieldName));
-                                fill(fields,values,false,definition,fieldName);
-                        }
+                if (null == field) {
+                    continue;
+                }
+                String label = input_map.get("label");
+                if(label != null){
+                    field.setLabel(label);
+                }
+                String help = input_map.get("help");
+                if(help != null){
+                    field.setHelp(help);
+                }
+                String placeholder = input_map.get("placeholder");
+                if(placeholder != null){
+                    field.setPlaceholder(placeholder);
+                }
+                String field_readonly = input_map.get("readonly");
+                if(field_readonly != null && field_readonly.equals("true")){
+                    field.setDisabled();
+                }
+                String value = input_map.get("value");
+                if(value != null){
+                    field.setValue(value);
+                }
+                fields.put(name, field);
+            }
 
-                        // Setup the full name
-                        composite.setLabel(dcInput.getLabel());
-                        composite.setHelp(cleanHints(dcInput.getHints()));
-                        if (dcInput.isRequired()) {
-                                composite.setRequired();
-                        }
-                        if (isFieldInError(fieldName) || regexError.containsKey(fieldName)) {
-                                if (dcInput.getWarning() != null
-                                                && dcInput.getWarning().length() > 0) {
-                                        composite.addError(dcInput.getWarning());
-                                } else {
-                                        composite.addError("Fill all the fields, please.");
-                                }
-                        }
-                        if (dcInput.isRepeatable() && !readonly) {
-                                composite.enableAddOperation();
-                        }
-                        if ((dcInput.isRepeatable() || dcValues.length > 1) && !readonly) {
-                                composite.enableDeleteOperation();
-                        }
+            // Setup the field's values
+            for (Metadatum dcValue : dcValues) {
+                    java.util.List<String> values = split(dcValue.value);
+                    fillExistingValues(fields, values);
+                    composite.addInstance().setValue(StringUtils.join(values.iterator(), ";"));
+            }
 
-                        if (readonly) {
-                                composite.setDisabled();
-                                for (Field field : fields) {
-                                        field.setDisabled();
-                                }
-                        }
+             if(regexError.containsKey(fieldName)) {
+                 // partially fill the form
+                 java.util.List<String> values = split(regexError.get(fieldName));
+                 Map<String,String> value_map = new HashMap<>();
+                 int i = 0;
+                 for ( String key : definition.getSortedInputNames() ) {
+                     value_map.put(key, values.get(i));
+                     ++i;
+                 }
+                fillPartialError(fields, value_map, definition);
+            }
+
+            // Setup the full name
+            composite.setLabel(dcInput.getLabel());
+            composite.setHelp(cleanHints(dcInput.getHints()));
+            if (dcInput.isRequired()) {
+                    composite.setRequired();
+            }
+            if (isFieldInError(fieldName) || regexError.containsKey(fieldName)) {
+                    if (dcInput.getWarning() != null
+                                    && dcInput.getWarning().length() > 0) {
+                            composite.addError(dcInput.getWarning());
+                    } else {
+                            composite.addError("Fill all the fields, please.");
+                    }
+            }
+            if (dcInput.isRepeatable() && !readonly) {
+                    composite.enableAddOperation();
+            }
+            if ((dcInput.isRepeatable() || dcValues.length > 1) && !readonly) {
+                    composite.enableDeleteOperation();
+            }
+
+            if (readonly) {
+                    composite.setDisabled();
+                    for (Field field : fields.values()) {
+                            field.setDisabled();
+                    }
+            }
 
         }
-        
-		private void fill(java.util.List<Field> fields,
-				java.util.List<String> values, boolean addInstances, ComplexDefinition definition, String fieldName) throws WingException {
-                //fill the form
-                for (int i = 0; i < fields.size(); i++) {
-                        Field field = fields.get(i);
-                        String value = values.get(i);
-                        if(addInstances){
-                                Instance instance = field.addInstance();
-                                //XXX: Branching on type
-                                if(field instanceof Select){
-                                        instance.setOptionSelected(value);
-                                } else{
-                                        instance.setValue(value);
-                                }
-                        } else{
-                        	//currently with error only
-                                field.setValue(value);
-                                String inputName = StringUtils.difference(fieldName+"_", field.getName());
-                                String regex = definition.getInput(inputName).get("regexp");
-                                if(!DCInput.isAllowedValue(value, regex)){
-                                	//attach the regex error to the right field
-                                	field.addError(String.format("The field doesn't match the required regular expression (format) \"%s\"",regex));
-                                }
-                        }
+
+        private void fillExistingValues(Map<String, Field> fields, java.util.List<String> values) throws WingException {
+            //fill the form
+            int i = 0;
+            for (Field field : fields.values()) {
+                String value = values.get(i);
+                Instance instance = field.addInstance();
+                //XXX: Branching on type
+                if(field instanceof Select){
+                    instance.setOptionSelected(value);
+                } else{
+                    instance.setValue(value);
                 }
-		}
+                ++i;
+            }
+        }
+
+        private void fillPartialError(Map<String, Field> fields,
+                                      Map<String,String> values,
+                                      ComplexDefinition definition) throws WingException {
+            for (Map.Entry<String,String> item : values.entrySet()) {
+                // input name
+                String input_name = item.getKey();
+                // input value
+                String value = item.getValue();
+                // field specified by input name (could be displayed differently than stored)
+                Field field = fields.get(input_name);
+                field.setValue(value);
+                // any regexp error?
+                String regex = definition.getInput(input_name).get("regexp");
+                if(!DCInput.isAllowedValue(value, regex)){
+                    //attach the regex error to the right field
+                    field.addError(String.format("The field doesn't match the required regular expression (format) \"%s\"", regex));
+                }
+            }
+        }
 
 		private java.util.List<String> split(String value) {
         	//
@@ -1488,6 +1522,10 @@ public class DescribeStep extends AbstractSubmissionStep
             	rend += " autocomplete";
             	addAutocompleteComponents(fieldName, dcInput, item);
             }
+
+            if (null != dcInput.getExtraClass()) {
+                rend += " " + dcInput.getExtraClass();
+            }
             
             Text text = item.addText(fieldName, rend);                                    
 
@@ -1563,6 +1601,11 @@ public class DescribeStep extends AbstractSubmissionStep
                 if (readonly)
                 {
                     text.setDisabled();
+                }else {
+                    if (null != dcInput.getPlaceholder())
+                    {
+                        text.setPlaceholder(dcInput.getPlaceholder());
+                    }
                 }
                 
                 // Setup the field's values

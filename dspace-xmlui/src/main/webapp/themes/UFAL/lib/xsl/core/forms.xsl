@@ -266,7 +266,7 @@
 		</div>
 	</xsl:template>
 
-	<!-- The hadling of the special case of instanced composite fields under "form" lists -->
+	<!-- The handling of the special case of instanced composite fields under "form" lists -->
 	<xsl:template match="dri:field[@type='composite'][dri:field/dri:instance | dri:params/@operations]" mode="formComposite" priority="2">
 		<xsl:variable name="confidenceIndicatorID" select="concat(translate(@id,'.','_'),'_confidence_indicator')" />
 		<div class="form-group">
@@ -986,7 +986,7 @@
 						<xsl:attribute name="type">submit</xsl:attribute>
 					</xsl:when>
 					<xsl:otherwise>
-						<xsl:attribute name="class">form-control <xsl:if test="contains(@rend,'autocomplete')"> autocomplete</xsl:if></xsl:attribute>
+						<xsl:attribute name="class">form-control <xsl:value-of select="./@rend" /></xsl:attribute>
 					</xsl:otherwise>
 					</xsl:choose>
 					<xsl:attribute name="value">
@@ -1085,6 +1085,9 @@
 		<xsl:if test="@type= 'textarea'">
 			<xsl:attribute name="onfocus">javascript:tFocus(this);</xsl:attribute>
 		</xsl:if>
+        <xsl:if test="dri:params/@placeholder">
+            <xsl:attribute name="placeholder"><xsl:value-of select="dri:params/@placeholder"/></xsl:attribute>
+        </xsl:if>
 	</xsl:template>
 
 	<!-- Since the field element contains only the type attribute, all other 

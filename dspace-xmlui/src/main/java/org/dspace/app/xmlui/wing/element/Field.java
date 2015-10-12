@@ -290,6 +290,15 @@ public abstract class Field extends AbstractWingElement implements
     }
 
     /**
+     * Placeholder.
+     * @param value To add placeholder.
+     */
+    public void setPlaceholder(String value)
+    {
+        this.params.setPlaceholder(value);
+    }
+
+    /**
      * Declare that this field has a value to be chosen from a choice
      * provider (see ChoicesManager).  Value is a metadata field key
      * naming the field whose choices to use.

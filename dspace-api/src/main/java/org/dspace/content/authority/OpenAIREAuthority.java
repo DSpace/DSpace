@@ -80,7 +80,7 @@ public class OpenAIREAuthority implements ChoiceAuthority
     private static final String FileProperty = "projects.filename";
     private static final String MinimumChars = "projects.suggest.minchar";
     private static final String MaxSuggests = "projects.suggest.max";
-    private static final int MaxSuggestionLength = 66;
+    private static final int MaxSuggestionLength = -1;
 
 	static {
 		try {
@@ -136,7 +136,7 @@ public class OpenAIREAuthority implements ChoiceAuthority
     }
 
     private String getPrettyChoiceText (String text) {
-    	if (text.length() > OpenAIREAuthority.MaxSuggestionLength) {
+    	if (0 < OpenAIREAuthority.MaxSuggestionLength && text.length() > OpenAIREAuthority.MaxSuggestionLength) {
     		return text.substring(0, OpenAIREAuthority.MaxSuggestionLength - 3) + "...";
     	} else return text;
     }
