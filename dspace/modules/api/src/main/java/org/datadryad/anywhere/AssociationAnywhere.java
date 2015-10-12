@@ -105,7 +105,7 @@ public class AssociationAnywhere {
             String requestUrl =  ConfigurationManager.getProperty("association.anywhere.url")
                     + "/CENCREDWEBSVCLIB.GET_CREDITS_XML?p_input_xml_doc="
                     + URLEncoder.encode(createRequest(customerId,"load-credit"));
-
+	    log.debug("AA URL is " + requestUrl);
             HttpClient client = new HttpClient();
             GetMethod get = new GetMethod(requestUrl);
             client.executeMethod(get);
@@ -143,6 +143,7 @@ public class AssociationAnywhere {
             String requestUrl =  ConfigurationManager.getProperty("association.anywhere.url")
                     + "/CENSSAWEBSVCLIB.GET_CUST_INFO_XML?p_input_xml_doc="
                     + URLEncoder.encode(createRequest(customerId,"customer-info"));
+	    log.debug("AA URL is " + requestUrl);
             HttpClient client = new HttpClient();
             GetMethod get = new GetMethod(requestUrl);
             client.executeMethod(get);
@@ -182,6 +183,7 @@ public class AssociationAnywhere {
             String requestUrl =  ConfigurationManager.getProperty("association.anywhere.url")
                     + "/CENCREDWEBSVCLIB.INS_CREDIT_XML?p_input_xml_doc="
                     + URLEncoder.encode(createRequest(customerId,"update-credit"));
+	    log.debug("AA URL is " + requestUrl);
             HttpClient client = new HttpClient();
             GetMethod get = new GetMethod(requestUrl);
             client.executeMethod(get);
