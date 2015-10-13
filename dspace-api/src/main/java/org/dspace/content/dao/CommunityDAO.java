@@ -27,6 +27,8 @@ public interface CommunityDAO extends DSpaceObjectLegacySupportDAO<Community> {
 
     public List<Community> findAll(Context context, MetadataField sortField) throws SQLException;
 
+    public List<Community> findAll(Context context, MetadataField sortField, Integer limit, Integer offset) throws SQLException;
+
     public Community findByAdminGroup(Context context, Group group) throws SQLException;
 
     public List<Community> findAllNoParent(Context context, MetadataField sortField) throws SQLException;
