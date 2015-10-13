@@ -41,9 +41,10 @@
             <vendor-id><xsl:value-of select="$username"/></vendor-id>
             <vendor-password><xsl:value-of select="$password"/></vendor-password>
             <cust-id><xsl:value-of select="$customerId"/></cust-id>
-            <trans-type>DEFERRED</trans-type>
+            <trans-type>PREPAID</trans-type>
             <trans-date><xsl:value-of select="$date"/></trans-date>
             <cred-accepted>-1</cred-accepted>
+	    <cred-unit>DEP</cred-unit>
         </credit-request>
     </xsl:template>
 
