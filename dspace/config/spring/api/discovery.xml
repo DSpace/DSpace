@@ -418,7 +418,8 @@
         </property>
         <property name="facetLimit" value="2"/>
         <property name="type" value="standard"/>
-        <property name="sortOrder" value="VALUE"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="VALUE"/>
     </bean>
 
     <!--Sort properties-->

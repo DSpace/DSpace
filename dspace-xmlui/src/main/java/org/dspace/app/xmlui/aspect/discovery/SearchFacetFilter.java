@@ -482,6 +482,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         parameters.putAll(browseParams.getCommonBrowseParams());
         parameters.putAll(browseParams.getControlParameters());
         parameters.put(SearchFilterParam.OFFSET, String.valueOf(offSet + getPageSize()));
+        parameters.put(SearchFilterParam.ORDER, getSortOrder(request).name());
 
         // Add the filter queries
         String url = generateURL("search-filter", parameters);
@@ -507,6 +508,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.putAll(browseParams.getCommonBrowseParams());
         parameters.putAll(browseParams.getControlParameters());
+        parameters.put(SearchFilterParam.ORDER, getSortOrder(request).name());
         String offSet = String.valueOf((currentOffset - getPageSize()<0)? 0:currentOffset - getPageSize());
         parameters.put(SearchFilterParam.OFFSET, offSet);
 
@@ -556,6 +558,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         /** The browse control params **/
         public static final String OFFSET = "offset";
         public static final String STARTS_WITH = "starts_with";
+        public static final String ORDER = "order";
 
 
         private SearchFilterParam(Request request){
