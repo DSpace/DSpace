@@ -40,12 +40,12 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
-import org.dspace.eperson.SubscribeServiceImpl;
 import org.dspace.eperson.Subscription;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.SubscribeService;
+import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
 
@@ -490,8 +490,8 @@ public class EditProfile extends AbstractDSpaceTransformer
      */
     private static Locale[] getSupportedLocales()
     {
-        String ll = ConfigurationManager.getProperty("webui.supported.locales");
-        if (ll != null)
+        String[] ll = new DSpace().getConfigurationService().getArrayProperty("webui.supported.locales");
+        if(ll != null && ll.length>0)
         {
             return I18nUtil.parseLocales(ll);
         }
