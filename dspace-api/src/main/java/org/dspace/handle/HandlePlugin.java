@@ -52,7 +52,7 @@ public class HandlePlugin implements HandleStorage
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(HandlePlugin.class);
-    private static final String repositoryName;
+    public static final String repositoryName;
     private static final String repositoryEmail;
     static {
         String name = ConfigurationManager.getProperty(
@@ -73,7 +73,7 @@ public class HandlePlugin implements HandleStorage
     private static final boolean resolveMetadata = ConfigurationManager.getBooleanProperty(
             "lr", "lr.pid.resolvemetadata", true);
 
-    private static final String magicBean = "@magicLindat@";
+    public static final String magicBean = "@magicLindat@";
 
 
     /**
