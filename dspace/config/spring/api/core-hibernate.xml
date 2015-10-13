@@ -15,6 +15,7 @@
         <property name="password" value="${db.password}"/>
         <property name="maxWaitMillis" value="${db.maxwait}"/>
         <property name="maxIdle" value="${db.maxidle}"/>
+        <property name="maxTotal" value="${db.maxconnections}"/>
     </bean>
 
 </beans>
