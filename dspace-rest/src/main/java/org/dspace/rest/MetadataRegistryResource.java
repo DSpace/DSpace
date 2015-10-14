@@ -110,8 +110,6 @@ public class MetadataRegistryResource extends Resource
         catch (SQLException e)
         {
             processException("Could not read metadata schemas, SQLException. Message:" + e, context);
-            log.error(e.getMessage());
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
         catch (ContextException e)
         {
@@ -165,8 +163,7 @@ public class MetadataRegistryResource extends Resource
             org.dspace.content.MetadataSchema schema = metadataSchemaService.find(context, schemaPrefix);
             metadataSchema = new MetadataSchema(schema, expand, context);
             if (schema == null) {
-                log.error(String.format("Schema not found for index %s", schemaPrefix));
-                throw new WebApplicationException(Response.Status.NOT_FOUND);
+            	processException(String.format("Schema not found for index %s", schemaPrefix), context);
             }
 
             context.complete();
@@ -174,8 +171,6 @@ public class MetadataRegistryResource extends Resource
         catch (SQLException e)
         {
             processException("Could not read metadata schema, SQLException. Message:" + e, context);
-            log.error(e.getMessage());
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
         catch (ContextException e)
         {
@@ -284,8 +279,6 @@ public class MetadataRegistryResource extends Resource
         catch (SQLException e)
         {
             processException("Could not read metadata field, SQLException. Message:" + e, context);
-            log.error(e.getMessage());
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
         catch (ContextException e)
         {
@@ -353,8 +346,6 @@ public class MetadataRegistryResource extends Resource
         catch (SQLException e)
         {
             processException("Could not read metadata field, SQLException. Message:" + e, context);
-            log.error(e.getMessage());
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
         catch (ContextException e)
         {

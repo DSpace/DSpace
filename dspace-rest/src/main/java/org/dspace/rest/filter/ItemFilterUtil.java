@@ -83,7 +83,7 @@ public class ItemFilterUtil {
         	for(Bitstream bit: bundle.getBitstreams()) {
             	for(String mime: mimeList.split(",")) {
                     try {
-						if (bit.getFormat(context).getMIMEType().equals(mime)) {
+						if (bit.getFormat(context).getMIMEType().equals(mime.trim())) {
 							count++;
 						}
 					} catch (SQLException e) {
@@ -107,7 +107,7 @@ public class ItemFilterUtil {
             		if (bitDesc == null) {
             			continue;
             		}
-                    if (bitDesc.equals(desc)) {
+                    if (bitDesc.equals(desc.trim())) {
                     	count++;
                     }
             	}
@@ -126,7 +126,7 @@ public class ItemFilterUtil {
             	}
             	for(Bitstream bit: bundle.getBitstreams()) {
                 	for(String mime: mimeList.split(",")) {
-                        if (bit.getFormat(context).getMIMEType().equals(mime)) {
+                        if (bit.getFormat(context).getMIMEType().equals(mime.trim())) {
                         	if (bit.getSize() < size) {
                             	count++;                        		
                         	}
@@ -149,7 +149,7 @@ public class ItemFilterUtil {
             	}
             	for(Bitstream bit: bundle.getBitstreams()) {
                 	for(String mime: mimeList.split(",")) {
-                        if (bit.getFormat(context).getMIMEType().equals(mime)) {
+                        if (bit.getFormat(context).getMIMEType().equals(mime.trim())) {
                         	if (bit.getSize() > size) {
                             	count++;                        		
                         	}
@@ -189,7 +189,7 @@ public class ItemFilterUtil {
 		}
 		ArrayList<String> bundles = new ArrayList<String>();
 		for(String bundleName: bundleList.split(",")) {
-			bundles.add(bundleName);
+			bundles.add(bundleName.trim());
 		}
 		for(Bundle bundle: item.getBundles()) {
 			if (!bundles.contains(bundle.getName())) {
@@ -214,7 +214,7 @@ public class ItemFilterUtil {
 			}
 		} else {
 			for(String field: fieldList.split(",")) {
-				for(MetadataValue md: itemService.getMetadataByMetadataString(item, field)){
+				for(MetadataValue md: itemService.getMetadataByMetadataString(item, field.trim())){
 					if (regex.matcher(md.getValue()).matches()) {
 						return true;
 					}
@@ -237,7 +237,7 @@ public class ItemFilterUtil {
 			}
 		} else {
 			for(String field: fieldList.split(",")) {
-				for(MetadataValue md: itemService.getMetadataByMetadataString(item, field)){
+				for(MetadataValue md: itemService.getMetadataByMetadataString(item, field.trim())){
 					if (regex.matcher(md.getValue()).matches()) {
 						matches = true;
 					} else {
@@ -250,14 +250,8 @@ public class ItemFilterUtil {
 	}
 
 	static boolean recentlyModified(Item item, int days) {
-		String accDate = itemService.getMetadata(item, "dc.date.accessioned");
-		if (accDate == null) {
-			return false;
-		}
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.DATE, -days);
-		SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
-		String cmp = sdf.format(cal.getTime());
-		return accDate.compareTo(cmp) >= 0;
+		return cal.getTime().before(item.getLastModified());
 	}
 }

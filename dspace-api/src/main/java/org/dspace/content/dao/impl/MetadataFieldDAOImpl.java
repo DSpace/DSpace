@@ -71,7 +71,7 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
     }
 
     @Override
-    public List<MetadataField> findByUnqualifiedElement(Context context, String metadataSchema, String element) throws SQLException
+    public List<MetadataField> findFieldsByElementNameUnqualified(Context context, String metadataSchema, String element) throws SQLException
     {
         Criteria criteria = createCriteria(context, MetadataField.class);
         criteria.createAlias("metadataSchema", "s").add(

@@ -33,7 +33,7 @@ public interface MetadataFieldDAO extends GenericDAO<MetadataField> {
     public MetadataField findByElement(Context context, String metadataSchema, String element, String qualifier)
             throws SQLException;
 
-    public List<MetadataField> findByUnqualifiedElement(Context context, String metadataSchema, String element) 
+    public List<MetadataField> findFieldsByElementNameUnqualified(Context context, String metadataSchema, String element) 
     		throws SQLException;
     
     public List<MetadataField> findAllInSchema(Context context, MetadataSchema metadataSchema)
