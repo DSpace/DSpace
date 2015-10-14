@@ -400,14 +400,14 @@
                 <h1 class="ds-div-head">Recently integrated journals</h1>
                 <div id="recently_integrated_journals" class="ds-static-div primary">
                     <div class="container">
+						<!-- American Journal of Botany -->
+						<a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aamerican%5C+journal%5C+of%5C+botany%5C%7C%5C%7C%5C%7CAmerican%5C+Journal%5C+of%5C+Botany"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-AMJBOTCover.png" alt="American Journal of Botany" /></a>
                         <!-- International Journal of Plant Sciences -->
                         <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Ainternational%5C+journal%5C+of%5C+plant%5C+sciences%5C%7C%5C%7C%5C%7CInternational%5C+Journal%5C+of%5C+Plant%5C+Sciences"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-IJPS_cover.png" alt="International Journal of Plant Sciences" /></a>
                     	<!-- Physiological and Biochemical Zoology -->
 		  				<a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aphysiological%5C+and%5C+biochemical%5C+zoology%5C%7C%5C%7C%5C%7CPhysiological%5C+and%5C+Biochemical%5C+Zoology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-PBZv88n4cover.png" alt="Physiological and Biochemical Zoology" /></a>
 		  				<!-- Nota Lepidopterologica -->
 		  				<a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Anota%5C+lepidopterologica%5C%7C%5C%7C%5C%7CNota%5C+Lepidopterologica"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-korica.png" alt="Nota Lepidopterologica" /></a>
-		  				<!-- Biodiversity Data Journal -->
-		  				<a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Abiodiversity%5C+data%5C+journal%5C%7C%5C%7C%5C%7CBiodiversity%5C+Data%5C+Journal"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-BDJ-Cover.png" alt="Biodiversity Data Journal" /></a>
                     </div>
                 </div>
             </div>
