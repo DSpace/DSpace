@@ -9,6 +9,7 @@ package org.dspace.rest.filter;
 
 import java.sql.SQLException;
 
+import org.apache.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
@@ -25,6 +26,7 @@ import org.dspace.rest.filter.ItemFilterUtil.BundleName;
 public class ItemFilterDefsPerm implements ItemFilterList {
     protected static AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 	public static final String CAT_PERM = "Perimission Filters";
+	private static Logger log = Logger.getLogger(ItemFilterDefsPerm.class);
 	public ItemFilterDefsPerm(){
 	}
 	public enum EnumItemFilterPermissionDefs implements ItemFilterTest {
@@ -43,6 +45,7 @@ public class ItemFilterDefsPerm implements ItemFilterList {
 	                    }
 	                }
 	            } catch (SQLException e) {
+	            	ItemFilterDefsPerm.log.warn("SQL Exception testing original bitstream access " + e.getMessage(), e);
 	            }
 	            return false;
 	        }        
@@ -62,6 +65,7 @@ public class ItemFilterDefsPerm implements ItemFilterList {
 	                    }
 	                }
 	            } catch (SQLException e) {
+	            	ItemFilterDefsPerm.log.warn("SQL Exception testing thumbnail bitstream access " + e.getMessage(), e);
 	            }
 	            return false;
 	        }        
@@ -72,7 +76,7 @@ public class ItemFilterDefsPerm implements ItemFilterList {
 	        	try {
 					return !authorizeService.authorizeActionBoolean(getAnonContext(), item, org.dspace.core.Constants.READ);
 				} catch (SQLException e) {
-					e.printStackTrace();
+	            	ItemFilterDefsPerm.log.warn("SQL Exception testing item metadata access " + e.getMessage(), e);
 					return false;
 				}
 	        }        
