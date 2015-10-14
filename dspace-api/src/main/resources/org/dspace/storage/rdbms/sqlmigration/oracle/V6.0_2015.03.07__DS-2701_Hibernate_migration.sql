@@ -181,6 +181,19 @@ ALTER TABLE bundle2bitstream ADD bundle_id RAW(16) REFERENCES Bundle(uuid);
 ALTER TABLE bundle2bitstream ADD bitstream_id RAW(16) REFERENCES Bitstream(uuid);
 UPDATE bundle2bitstream SET bundle_id = (SELECT bundle.uuid FROM bundle WHERE bundle2bitstream.bundle_legacy_id = bundle.bundle_id);
 UPDATE bundle2bitstream SET bitstream_id = (SELECT bitstream.uuid FROM bitstream WHERE bundle2bitstream.bitstream_legacy_id = bitstream.bitstream_id);
+ALTER TABLE bundle2bitstream RENAME COLUMN bitstream_order to bitstream_order_legacy;
+ALTER TABLE bundle2bitstream ADD bitstream_order INTEGER;
+MERGE INTO     bundle2bitstream     dst
+USING  (       SELECT     ROWID     AS r_id
+                   ,      ROW_NUMBER () OVER ( PARTITION BY  bundle_id
+                                           ORDER BY          bitstream_order_legacy, bitstream_id
+                            )         AS new_order
+            FROM     bundle2bitstream
+       )                 src
+ON     (dst.ROWID     = src.r_id)
+WHEN MATCHED THEN UPDATE
+SET    dst.bitstream_order       = (src.new_order-1)
+;
 ALTER TABLE bundle2bitstream MODIFY bundle_id NOT NULL;
 ALTER TABLE bundle2bitstream MODIFY bitstream_id NOT NULL;
 ALTER TABLE bundle2bitstream DROP COLUMN bundle_legacy_id;
