@@ -551,7 +551,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         
         for (int i : RESULTS_PER_PAGE_PROGRESSION)
         {
-            rppSelect.addOption((i == Integer.parseInt(ConfigurationManager.getProperty("webui.browse.resultPerPage"))), i, Integer.toString(i));
+            rppSelect.addOption((i == info.getResultsPerPage()), i, Integer.toString(i));
  
         }
 
@@ -654,7 +654,8 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         params.etAl = RequestUtils.getIntParameter(request, BrowseParams.ETAL);
 
         params.scope = new BrowserScope(context);
-
+        //setting the deafult value
+        params.scope.setResultsPerPage(Integer.parseInt(ConfigurationManager.getProperty("webui.browse.resultPerPage")));
         // Are we in a community or collection?
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (dso instanceof Community)
@@ -730,7 +731,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             params.scope.setOrder(request.getParameter(BrowseParams.ORDER));
             int offset = RequestUtils.getIntParameter(request, BrowseParams.OFFSET);
             params.scope.setOffset(offset > 0 ? offset : 0);
-            params.scope.setResultsPerPage(Integer.parseInt(ConfigurationManager.getProperty("webui.browse.resultPerPage")));
+            params.scope.setResultsPerPage(RequestUtils.getIntParameter(request, BrowseParams.RESULTS_PER_PAGE));
             params.scope.setStartsWith(decodeFromURL(request.getParameter(BrowseParams.STARTS_WITH)));
             String filterValue = request.getParameter(BrowseParams.FILTER_VALUE[0]);
             if (filterValue == null)
