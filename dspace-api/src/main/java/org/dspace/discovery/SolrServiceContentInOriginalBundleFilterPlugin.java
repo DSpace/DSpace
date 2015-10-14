@@ -7,15 +7,14 @@
  */
 package org.dspace.discovery;
 
-import java.sql.SQLException;
+import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-import org.dspace.discovery.SolrServiceIndexPlugin;
 
 /**
  * This plugin adds three fields to the solr index to make a facet with/without
@@ -32,39 +31,60 @@ import org.dspace.discovery.SolrServiceIndexPlugin;
 public class SolrServiceContentInOriginalBundleFilterPlugin implements SolrServiceIndexPlugin
 {
 
-    private static final Logger log = Logger.getLogger(SolrServiceContentInOriginalBundleFilterPlugin.class);
-
     @Override
     public void additionalIndex(Context context, DSpaceObject dso, SolrInputDocument document)
     {
         if (dso instanceof Item)
         {
             Item item = (Item) dso;
-            Bundle[] bundles;
-            try
+            boolean hasOriginalBundleWithContent = hasOriginalBundleWithContent(item);
+
+            // _keyword and _filter because
+            // they are needed in order to work as a facet and filter.
+            if (!hasOriginalBundleWithContent)
             {
-                bundles = item.getBundles("ORIGINAL");
-                // _keyword and _filter because
-                // they are needed in order to work as a facet and filter.
-                if (bundles.length == 0)
-                {
-                    // no content in the original bundle
-                    document.addField("has_content_in_original_bundle", false);
-                    document.addField("has_content_in_original_bundle_keyword", false);
-                    document.addField("has_content_in_original_bundle_filter", false);
-                }
-                else
-                {
-                    document.addField("has_content_in_original_bundle", true);
-                    document.addField("has_content_in_original_bundle_keyword", true);
-                    document.addField("has_content_in_original_bundle_filter", true);
-                }
+                // no content in the original bundle
+                document.addField("has_content_in_original_bundle", false);
+                document.addField("has_content_in_original_bundle_keyword", false);
+                document.addField("has_content_in_original_bundle_filter", false);
             }
-            catch (SQLException e)
+            else
             {
-                log.error("Error adding additional solr field for original bundle content facet: " + e.getMessage());
+                document.addField("has_content_in_original_bundle", true);
+                document.addField("has_content_in_original_bundle_keyword", true);
+                document.addField("has_content_in_original_bundle_filter", true);
             }
         }
+    }
 
+    /**
+     * Checks whether the given item has a bundle with the name ORIGINAL
+     * containing at least one bitstream.
+     * 
+     * @param item
+     *            to check
+     * @return true if there is at least on bitstream in the bundle named
+     *         ORIGINAL, otherwise false
+     */
+    private boolean hasOriginalBundleWithContent(Item item)
+    {
+        List<Bundle> bundles;
+        bundles = item.getBundles();
+        if (bundles != null)
+        {
+            for (Bundle curBundle : bundles)
+            {
+                String bName = curBundle.getName();
+                if ((bName != null) && bName.equals("ORIGINAL"))
+                {
+                    List<Bitstream> bitstreams = curBundle.getBitstreams();
+                    if (bitstreams != null && bitstreams.size() > 0)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }
