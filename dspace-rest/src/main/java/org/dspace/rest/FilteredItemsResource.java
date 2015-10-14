@@ -10,6 +10,7 @@ package org.dspace.rest;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
@@ -107,14 +108,13 @@ public class FilteredItemsResource extends Resource {
             @QueryParam("collSel[]") @DefaultValue("") List<String> collSel,
     		@Context HttpHeaders headers, @Context HttpServletRequest request) {
         org.dspace.core.Context context = null;
+        ItemFilterSet itemFilterSet = new ItemFilterSet(filters, true);
+        ItemFilter result = itemFilterSet.getAllFiltersFilter();
         try {
             context = createContext(getUser(headers));
             if (!ConfigurationManager.getBooleanProperty("rest", "rest-reporting-authenticate", false)) {
                 context.turnOffAuthorisationSystem();            	
             }
-
-            ItemFilterSet itemFilterSet = new ItemFilterSet(filters, true);
-            ItemFilter result = itemFilterSet.getAllFiltersFilter();
             
             int index = Math.min(query_field.size(), Math.min(query_op.size(), query_val.size()));
             List<ItemFilterQuery> itemFilterQueries = new ArrayList<ItemFilterQuery>();
@@ -135,28 +135,19 @@ public class FilteredItemsResource extends Resource {
             itemFilterSet.processSaveItems(context, childItems, true, expand);
     	    writeStats(siteService.findSite(context), UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers, request, context);
     	    result.annotateQuery(query_field, query_op, query_val);
-            return result;
+    	    context.complete();
         } catch (IOException e) {
-            log.error(e.getMessage());
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+            processException(e.getMessage(), context);
         } catch (SQLException e) {
-            log.error(e.getMessage());
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        	processException(e.getMessage(), context);
         } catch (AuthorizeException e) {
-            log.error(e.getMessage());
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        	processException(e.getMessage(), context);
         } catch (ContextException e) {
-            log.error("Unauthorized filtered item query. " + e.getMessage());
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        	processException("Unauthorized filtered item query. " + e.getMessage(), context);
 		} finally {
-            if(context != null) {
-                try {
-                    context.complete();
-                } catch (SQLException e) {
-                    log.error(e.getMessage() + " occurred while trying to close");
-                }
-            }
+			processFinally(context);
         }
+        return result;
     }
 	
 	private List<List<MetadataField>> getMetadataFieldsList(org.dspace.core.Context context, List<String> query_field) throws SQLException {
@@ -180,8 +171,9 @@ public class FilteredItemsResource extends Resource {
         	if (parts.length>2) {
         		qualifier = parts[2];
         	}
-        	if ("*".equals(qualifier)) {
-    			for(MetadataField mf: metadataFieldService.findByUnqualifiedElement(context, schema, element)){
+        
+        	if (Item.ANY.equals(qualifier)) {
+    			for(MetadataField mf: metadataFieldService.findFieldsByElementNameUnqualified(context, schema, element)){
         			fields.add(mf);        		    				
     			}
         	} else {
