@@ -165,6 +165,7 @@ public class FilteredCollectionsResource extends Resource {
     		@QueryParam("filters") @DefaultValue("is_item") String filters,
     		@Context HttpHeaders headers, @Context HttpServletRequest request) {
         org.dspace.core.Context context = null;
+        FilteredCollection retColl = new org.dspace.rest.common.FilteredCollection();
         try {
             context = createContext(getUser(headers));
             if (!ConfigurationManager.getBooleanProperty("rest", "rest-reporting-authenticate", false)) {
@@ -174,25 +175,19 @@ public class FilteredCollectionsResource extends Resource {
             org.dspace.content.Collection collection = collectionService.findByIdOrLegacyId(context, collection_id);
             if(authorizeService.authorizeActionBoolean(context, collection, org.dspace.core.Constants.READ)) {
 				writeStats(collection, UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers, request, context);
-                return new org.dspace.rest.common.FilteredCollection(collection, filters, expand, context, limit, offset);
+                retColl = new org.dspace.rest.common.FilteredCollection(collection, filters, expand, context, limit, offset);
             } else {
                 throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }
+            context.complete();
         } catch (SQLException e) {
-            log.error(e.getMessage());
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+            processException(e.getMessage(), context);
         } catch (ContextException e) {
-            log.error(String.format("Could not read collection %d.  %s", collection_id, e.getMessage()));
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+            processException(String.format("Could not read collection %d.  %s", collection_id, e.getMessage()), context);
 		} finally {
-            if(context != null) {
-                try {
-                    context.complete();
-                } catch (SQLException e) {
-                    log.error(e.getMessage() + " occurred while trying to close");
-                }
-            }
+			processFinally(context);
         }
+        return retColl;
     }
     
 }
