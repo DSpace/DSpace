@@ -35,7 +35,8 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
-import org.dspace.servicemanager.DSpaceKernelInit;
+import org.dspace.services.ConfigurationService;
+import org.dspace.utils.DSpace;
 import org.dspace.workflow.WorkflowException;
 import org.junit.*;
 
@@ -64,6 +65,7 @@ public class ITDSpaceAIP extends AbstractUnitTest
     protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
     protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
     protected PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
+    protected ConfigurationService configService = new DSpace().getConfigurationService();
 
     /** InfoMap multiple value separator (see saveObjectInfo() and assertObject* methods) **/
     private static final String valueseparator = "::";
@@ -92,21 +94,6 @@ public class ITDSpaceAIP extends AbstractUnitTest
     @BeforeClass
     public static void setUpClass()
     {
-        // Initialise the service manager kernel
-        kernelImpl = DSpaceKernelInit.getKernel(null);
-        if (!kernelImpl.isRunning())
-        {
-            kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
-        }
-
-        // Initialize MockConfigurationManager, and tell it to load properties by default
-        new MockConfigurationManager(true);
-
-        // Override default value of configured temp directory to point at our
-        // JUnit TemporaryFolder. This ensures Crosswalk classes like RoleCrosswalk 
-        // store their temp files in a place where JUnit can clean them up automatically.
-        MockConfigurationManager.setProperty("upload.temp.dir", testFolder.getRoot().getAbsolutePath());
-        
         try
         {
             Context context = new Context();
@@ -259,6 +246,13 @@ public class ITDSpaceAIP extends AbstractUnitTest
     {
         // call init() from AbstractUnitTest to initialize testing framework
         super.init();
+
+        // Override default value of configured temp directory to point at our
+        // JUnit TemporaryFolder. This ensures Crosswalk classes like RoleCrosswalk
+        // store their temp files in a place where JUnit can clean them up automatically.
+        new NonStrictExpectations(configService.getClass()) {{
+            configService.getProperty("upload.temp.dir"); result = testFolder.getRoot().getAbsolutePath();
+        }};
         
         try
         {
