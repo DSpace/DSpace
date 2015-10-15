@@ -74,6 +74,7 @@ public class AbstractDSpaceTest
             kernelImpl = DSpaceKernelInit.getKernel(null);
             if (!kernelImpl.isRunning())
             {
+                // NOTE: the "dspace.dir" system property MUST be specified via Maven
                 kernelImpl.start(System.getProperty("dspace.dir")); // init the kernel
             }
 
