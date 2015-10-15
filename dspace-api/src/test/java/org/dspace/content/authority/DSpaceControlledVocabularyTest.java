@@ -10,7 +10,7 @@ package org.dspace.content.authority;
 import java.io.IOException;
 
 import org.dspace.content.Collection;
-import org.dspace.AbstractUnitTest;
+import org.dspace.AbstractDSpaceTest;
 import org.dspace.core.factory.CoreServiceFactory;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -21,7 +21,7 @@ import org.junit.*;
  *
  * @author mwood
  */
-public class DSpaceControlledVocabularyTest extends AbstractUnitTest
+public class DSpaceControlledVocabularyTest extends AbstractDSpaceTest
 {
     public DSpaceControlledVocabularyTest()
     {

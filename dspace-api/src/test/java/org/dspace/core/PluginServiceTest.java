@@ -7,7 +7,7 @@
  */
 package org.dspace.core;
 
-import org.dspace.AbstractUnitTest;
+import org.dspace.AbstractDSpaceTest;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.core.service.PluginService;
 import static org.junit.Assert.assertEquals;
@@ -26,7 +26,7 @@ import org.junit.Test;
  *
  * @author Tim Donohue
  */
-public class PluginServiceTest extends AbstractUnitTest
+public class PluginServiceTest extends AbstractDSpaceTest
 {
     // Get our enabled pluginService
     private PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
