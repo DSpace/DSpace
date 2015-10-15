@@ -14,8 +14,8 @@ import java.util.Properties;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCDate;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.utils.DSpace;
 
 /**
  * Plugin implementation of the embargo setting function. The parseTerms()
@@ -35,18 +35,8 @@ import org.dspace.core.Context;
  */
 public class DayTableEmbargoSetter extends DefaultEmbargoSetter
 {
-    private Properties termProps = new Properties();
-	
     public DayTableEmbargoSetter() {
         super();
-        // load properties
-        String terms = ConfigurationManager.getProperty("embargo.terms.days");
-        if (terms != null && terms.length() > 0) {
-            for (String term : terms.split(",")) {
-                String[] parts = term.trim().split(":");
-                termProps.setProperty(parts[0].trim(), parts[1].trim());
-            }
-        }
     }
     
     /**
@@ -61,6 +51,10 @@ public class DayTableEmbargoSetter extends DefaultEmbargoSetter
     @Override
     public DCDate parseTerms(Context context, Item item, String terms)
         throws SQLException, AuthorizeException {
+
+        String termsOpen = new DSpace().getConfigurationService().getProperty("embargo.terms.open");
+        Properties termProps = getTermProperties();
+
     	if (terms != null) {
             if (termsOpen.equals(terms)) {
                 return EmbargoServiceImpl.FOREVER;
@@ -73,5 +67,24 @@ public class DayTableEmbargoSetter extends DefaultEmbargoSetter
             }
         }
         return null;
+    }
+
+    /**
+     * Get term properties from configuration
+     * @return Properties
+     */
+    private Properties getTermProperties()
+    {
+        Properties termProps = new Properties();
+
+        String terms = new DSpace().getConfigurationService().getProperty("embargo.terms.days");
+        if (terms != null && terms.length() > 0) {
+            for (String term : terms.split(",")) {
+                String[] parts = term.trim().split(":");
+                termProps.setProperty(parts[0].trim(), parts[1].trim());
+            }
+        }
+
+        return termProps;
     }
 }
