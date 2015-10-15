@@ -58,77 +58,11 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
     @Autowired(required = true)
     protected PluginService pluginService;
 
+    private final String CHOICES_PLUGIN_PREFIX = "choices.plugin.";
+    private final String CHOICES_PRESENTATION_PREFIX = "choices.presentation.";
+    private final String CHOICES_CLOSED_PREFIX = "choices.closed.";
+
     private ChoiceAuthorityServiceImpl() {
-    }
-
-    /**
-     * Initialize the bean (after dependency injection has already taken place).
-     * Ensures the configurationService is injected, so that we can load
-     * choices from configuration.
-     * Called by "init-method" in Spring config.
-     */
-    public void init() throws Exception
-    {
-        List<String> propKeys = configurationService.getPropertyKeys("choices");
-        Iterator<String> keyIterator = propKeys.iterator();
-        final String choicesPrefix = "choices.";
-        final String choicesPlugin = "choices.plugin.";
-        final String choicesPresentation = "choices.presentation.";
-        final String choicesClosed = "choices.closed.";
-      property:
-        while (keyIterator.hasNext())
-        {
-            String key = keyIterator.next();
-            if (key.startsWith(choicesPrefix))
-            {
-                if (key.startsWith(choicesPlugin))
-                {
-                    String fkey = config2fkey(key.substring(choicesPlugin.length()));
-                    if (fkey == null)
-                    {
-                        log.warn("Skipping invalid ChoiceAuthority configuration property: "+key+": does not have schema.element.qualifier");
-                        continue property;
-                    }
-
-                    // XXX FIXME maybe add sanity check, call
-                    // MetadataField.findByElement to make sure it's a real field.
-                    ChoiceAuthority ma = (ChoiceAuthority)
-                        pluginService.getNamedPlugin(ChoiceAuthority.class, configurationService.getProperty(key));
-                    if (ma == null)
-                    {
-                        log.warn("Skipping invalid configuration for "+key+" because named plugin not found: "+configurationService.getProperty(key));
-                        continue property;
-                    }
-                    controller.put(fkey, ma);
-                     
-                    log.debug("Choice Control: For field="+fkey+", Plugin="+ma);
-                }
-                else if (key.startsWith(choicesPresentation))
-                {
-                    String fkey = config2fkey(key.substring(choicesPresentation.length()));
-                    if (fkey == null)
-                    {
-                        log.warn("Skipping invalid ChoiceAuthority configuration property: "+key+": does not have schema.element.qualifier");
-                        continue property;
-                    }
-                    presentation.put(fkey, configurationService.getProperty(key));
-                }
-                else if (key.startsWith(choicesClosed))
-                {
-                    String fkey = config2fkey(key.substring(choicesClosed.length()));
-                    if (fkey == null)
-                    {
-                        log.warn("Skipping invalid ChoiceAuthority configuration property: "+key+": does not have schema.element.qualifier");
-                        continue property;
-                    }
-                    closed.put(fkey, configurationService.getBooleanProperty(key));
-                }
-                else
-                {
-                    log.error("Illegal configuration property: " + key);
-                }
-            }
-        }
     }
 
     // translate tail of configuration key (supposed to be schema.element.qual)
@@ -165,7 +99,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
     public Choices getMatches(String fieldKey, String query, Collection collection,
             int start, int limit, String locale)
     {
-        ChoiceAuthority ma = controller.get(fieldKey);
+        ChoiceAuthority ma = getChoiceAuthorityMap().get(fieldKey);
         if (ma == null)
         {
             throw new IllegalArgumentException(
@@ -177,7 +111,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
 
     @Override
     public Choices getMatches(String fieldKey, String query, Collection collection, int start, int limit, String locale, boolean externalInput) {
-        ChoiceAuthority ma = controller.get(fieldKey);
+        ChoiceAuthority ma = getChoiceAuthorityMap().get(fieldKey);
         if (ma == null) {
             throw new IllegalArgumentException(
                     "No choices plugin was configured for  field \"" + fieldKey
@@ -193,7 +127,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
     public Choices getBestMatch(String fieldKey, String query, Collection collection,
             String locale)
     {
-        ChoiceAuthority ma = controller.get(fieldKey);
+        ChoiceAuthority ma = getChoiceAuthorityMap().get(fieldKey);
         if (ma == null)
         {
             throw new IllegalArgumentException(
@@ -212,7 +146,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
     @Override
     public String getLabel(String fieldKey, String authKey, String locale)
     {
-        ChoiceAuthority ma = controller.get(fieldKey);
+        ChoiceAuthority ma = getChoiceAuthorityMap().get(fieldKey);
         if (ma == null)
         {
             throw new IllegalArgumentException("No choices plugin was configured for  field \"" + fieldKey + "\".");
@@ -223,25 +157,25 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
     @Override
     public boolean isChoicesConfigured(String fieldKey)
     {
-        return controller.containsKey(fieldKey);
+        return getChoiceAuthorityMap().containsKey(fieldKey);
     }
 
     @Override
     public String getPresentation(String fieldKey)
     {
-        return presentation.get(fieldKey);
+        return getPresentationMap().get(fieldKey);
     }
 
     @Override
     public boolean isClosed(String fieldKey)
     {
-        return closed.containsKey(fieldKey) && closed.get(fieldKey);
+        return getClosedMap().containsKey(fieldKey) && getClosedMap().get(fieldKey);
     }
 
     @Override
     public List<String> getVariants(MetadataValue metadataValue)
     {
-        ChoiceAuthority ma = controller.get(metadataValue.getMetadataField().toString());
+        ChoiceAuthority ma = getChoiceAuthorityMap().get(metadataValue.getMetadataField().toString());
         if (ma instanceof AuthorityVariantsSupport)
         {
             AuthorityVariantsSupport avs = (AuthorityVariantsSupport) ma;
@@ -260,6 +194,104 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
         {
             return schema + "_" + element + "_" + qualifier;
         }
+    }
+
+    /**
+     * Return map of key to ChoiceAuthority plugin
+     * @return
+     */
+    private Map<String,ChoiceAuthority> getChoiceAuthorityMap()
+    {
+        // If empty, load from configuration
+        if(controller.isEmpty())
+        {
+            // Get all configuration keys starting with a given prefix
+            List<String> propKeys = configurationService.getPropertyKeys(CHOICES_PLUGIN_PREFIX);
+            Iterator<String> keyIterator = propKeys.iterator();
+            while(keyIterator.hasNext())
+            {
+                String key = keyIterator.next();
+                String fkey = config2fkey(key.substring(CHOICES_PLUGIN_PREFIX.length()));
+                if (fkey == null)
+                {
+                    log.warn("Skipping invalid ChoiceAuthority configuration property: "+key+": does not have schema.element.qualifier");
+                    continue;
+                }
+
+                // XXX FIXME maybe add sanity check, call
+                // MetadataField.findByElement to make sure it's a real field.
+                ChoiceAuthority ma = (ChoiceAuthority)
+                    pluginService.getNamedPlugin(ChoiceAuthority.class, configurationService.getProperty(key));
+                if (ma == null)
+                {
+                    log.warn("Skipping invalid configuration for "+key+" because named plugin not found: "+configurationService.getProperty(key));
+                    continue;
+                }
+                controller.put(fkey, ma);
+
+                log.debug("Choice Control: For field="+fkey+", Plugin="+ma);
+            }
+        }
+
+        return controller;
+    }
+
+    /**
+     * Return map of key to presentation
+     * @return
+     */
+    private Map<String,String> getPresentationMap()
+    {
+        // If empty, load from configuration
+        if(presentation.isEmpty())
+        {
+            // Get all configuration keys starting with a given prefix
+            List<String> propKeys = configurationService.getPropertyKeys(CHOICES_PRESENTATION_PREFIX);
+            Iterator<String> keyIterator = propKeys.iterator();
+            while(keyIterator.hasNext())
+            {
+                String key = keyIterator.next();
+
+                String fkey = config2fkey(key.substring(CHOICES_PRESENTATION_PREFIX.length()));
+                if (fkey == null)
+                {
+                    log.warn("Skipping invalid ChoiceAuthority configuration property: "+key+": does not have schema.element.qualifier");
+                    continue;
+                }
+                presentation.put(fkey, configurationService.getProperty(key));
+            }
+        }
+
+        return presentation;
+    }
+
+    /**
+     * Return map of key to closed setting
+     * @return
+     */
+    private Map<String,Boolean> getClosedMap()
+    {
+        // If empty, load from configuration
+        if(closed.isEmpty())
+        {
+            // Get all configuration keys starting with a given prefix
+            List<String> propKeys = configurationService.getPropertyKeys(CHOICES_CLOSED_PREFIX);
+            Iterator<String> keyIterator = propKeys.iterator();
+            while(keyIterator.hasNext())
+            {
+                String key = keyIterator.next();
+
+                String fkey = config2fkey(key.substring(CHOICES_CLOSED_PREFIX.length()));
+                if (fkey == null)
+                {
+                    log.warn("Skipping invalid ChoiceAuthority configuration property: "+key+": does not have schema.element.qualifier");
+                    continue;
+                }
+                closed.put(fkey, configurationService.getBooleanProperty(key));
+            }
+        }
+
+        return closed;
     }
 
 }
