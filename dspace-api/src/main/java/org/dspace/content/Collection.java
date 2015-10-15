@@ -28,6 +28,7 @@ import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
+import java.io.Serializable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.PreparedStatement;
@@ -294,31 +295,48 @@ public class Collection extends DSpaceObject
      * @return the collections in the system
      * @throws SQLException
      */
-    public static Collection[] findAll(Context context) throws SQLException {
+    public static Collection[] findAll(Context context) throws SQLException
+    {
         TableRowIterator tri = null;
-        try {
-            String query = "SELECT c.* FROM collection c " +
-                    "LEFT JOIN metadatavalue m on (m.resource_id = c.collection_id and m.resource_type_id = ? and m.metadata_field_id = ?) ";
-            if(DatabaseManager.isOracle()){
-                query += " ORDER BY cast(m.text_value as varchar2(128))";
-            }else{
-                query += " ORDER BY m.text_value";
-            }
+        List<Collection> collections = null;
+        List<Serializable> params = new ArrayList<Serializable>();
+        StringBuffer query = new StringBuffer(
+            "SELECT c.*" +
+            "FROM collection c " +
+            "LEFT JOIN metadatavalue m ON (" +
+              "m.resource_id = c.collection_id AND " +
+              "m.resource_type_id = ? AND " +
+              "m.metadata_field_id = ?" +
+            ")"
+        );
 
-            tri = DatabaseManager.query(context,
-                    query,
-                    Constants.COLLECTION,
-                    MetadataField.findByElement(context, MetadataSchema.find(context, MetadataSchema.DC_SCHEMA).getSchemaID(), "title", null).getFieldID()
-            );
-        } catch (SQLException e) {
-            log.error("Find all Collections - ",e);
-            throw e;
+        if (DatabaseManager.isOracle())
+        {
+            query.append(" ORDER BY cast(m.text_value as varchar2(128))");
+        }
+        else
+        {
+            query.append(" ORDER BY m.text_value");
         }
 
-        List<Collection> collections = new ArrayList<Collection>();
+        params.add(Constants.COLLECTION);
+        params.add(
+          MetadataField.findByElement(
+            context,
+            MetadataSchema.find(context, MetadataSchema.DC_SCHEMA).getSchemaID(),
+            "title",
+            null
+          ).getFieldID()
+        );
 
         try
         {
+            tri = DatabaseManager.query(
+              context, query.toString(), params.toArray()
+            );
+
+            collections = new ArrayList<Collection>();
+
             while (tri.hasNext())
             {
                 TableRow row = tri.next();
@@ -336,6 +354,11 @@ public class Collection extends DSpaceObject
                     collections.add(new Collection(context, row));
                 }
             }
+        }
+        catch (SQLException e)
+        {
+            log.error("Find all Collections - ", e);
+            throw e;
         }
         finally
         {
@@ -363,31 +386,47 @@ public class Collection extends DSpaceObject
     public static Collection[] findAll(Context context, Integer limit, Integer offset) throws SQLException
     {
         TableRowIterator tri = null;
-        try{
-            String query = "SELECT c.* FROM collection c " +
-                    "LEFT JOIN metadatavalue m on (m.resource_id = c.collection_id and m.resource_type_id = ? and m.metadata_field_id = ?) ";
+        List<Collection> collections = null;
+        List<Serializable> params = new ArrayList<Serializable>();
+        StringBuffer query = new StringBuffer(
+            "SELECT c.*" +
+            "FROM collection c " +
+            "LEFT JOIN metadatavalue m ON (" +
+              "m.resource_id = c.collection_id AND " +
+              "m.resource_type_id = ? AND " +
+              "m.metadata_field_id = ?" +
+            ")"
+        );
 
-            if(DatabaseManager.isOracle()){
-                query += " ORDER BY cast(m.text_value as varchar2(128))";
-            }else{
-                query += " ORDER BY m.text_value";
-            }
-            query += " limit ? offset ?";
-            tri = DatabaseManager.query(context,
-                    query,
-                    Constants.COLLECTION,
-                    MetadataField.findByElement(context, MetadataSchema.find(context, MetadataSchema.DC_SCHEMA).getSchemaID(), "title", null).getFieldID(),
-                    limit,
-                    offset
-            );
-        } catch (SQLException e) {
-            log.error("Find all Collections offset/limit - ",e);
-            throw e;
+        if (DatabaseManager.isOracle())
+        {
+            query.append(" ORDER BY cast(m.text_value as varchar2(128))");
         }
-        List<Collection> collections = new ArrayList<Collection>();
+        else
+        {
+            query.append(" ORDER BY m.text_value");
+        }
+
+        params.add(Constants.COLLECTION);
+        params.add(
+          MetadataField.findByElement(
+            context,
+            MetadataSchema.find(context, MetadataSchema.DC_SCHEMA).getSchemaID(),
+            "title",
+            null
+          ).getFieldID()
+        );
+
+        DatabaseManager.applyOffsetAndLimit(query, params, offset, limit);
 
         try
         {
+            tri = DatabaseManager.query(
+              context, query.toString(), params.toArray()
+            );
+
+            collections = new ArrayList<Collection>();
+
             while (tri.hasNext())
             {
                 TableRow row = tri.next();
@@ -405,6 +444,11 @@ public class Collection extends DSpaceObject
                     collections.add(new Collection(context, row));
                 }
             }
+        }
+        catch (SQLException e)
+        {
+            log.error("Find all Collections offset/limit - ", e);
+            throw e;
         }
         finally
         {
@@ -450,13 +494,20 @@ public class Collection extends DSpaceObject
      */
     public ItemIterator getItems(Integer limit, Integer offset) throws SQLException
     {
-        String myQuery = "SELECT item.* FROM item, collection2item WHERE "
-                + "item.item_id=collection2item.item_id AND "
-                + "collection2item.collection_id= ? "
-                + "AND item.in_archive='1' limit ? offset ?";
+        List<Serializable> params = new ArrayList<Serializable>();
+        StringBuffer myQuery = new StringBuffer(
+            "SELECT item.* " + 
+            "FROM item, collection2item " + 
+            "WHERE item.item_id = collection2item.item_id " +
+              "AND collection2item.collection_id = ? " +
+              "AND item.in_archive = '1'"
+        );
 
-        TableRowIterator rows = DatabaseManager.queryTable(ourContext, "item",
-                myQuery,getID(), limit, offset);
+        params.add(getID());
+        DatabaseManager.applyOffsetAndLimit(myQuery, params, offset, limit);
+
+        TableRowIterator rows = DatabaseManager.query(ourContext,
+                myQuery.toString(), params.toArray());
 
         return new ItemIterator(ourContext, rows);
     }
@@ -1513,7 +1564,7 @@ public class Collection extends DSpaceObject
 
     public static Collection[] findAuthorizedOptimized(Context context, int actionID) throws java.sql.SQLException
     {
-        if(! ConfigurationManager.getBooleanProperty("org.dspace.content.Collection.findAuthorizedPerformanceOptimize", true)) {
+        if(! ConfigurationManager.getBooleanProperty("org.dspace.content.Collection.findAuthorizedPerformanceOptimize", false)) {
             // Fallback to legacy query if config says so. The rationale could be that a site found a bug.
             return findAuthorized(context, null, actionID);
         }

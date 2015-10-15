@@ -331,6 +331,7 @@ public class SolrLogger
 		    {
 		        doc1.addField("userAgent", request.getHeader("User-Agent"));
 		    }
+		    doc1.addField("isBot",isSpiderBot);
             // Save the location information if valid, save the event without
             // location information if not valid
             if(locationService != null)
@@ -354,7 +355,7 @@ public class SolrLogger
                     doc1.addField("city", location.city);
                     doc1.addField("latitude", location.latitude);
                     doc1.addField("longitude", location.longitude);
-                    doc1.addField("isBot",isSpiderBot);
+                    
 
 
                 }
@@ -416,6 +417,7 @@ public class SolrLogger
 		    {
 		        doc1.addField("userAgent", userAgent);
 		    }
+		    doc1.addField("isBot",isSpiderBot);
             // Save the location information if valid, save the event without
             // location information if not valid
             if(locationService != null)
@@ -439,7 +441,7 @@ public class SolrLogger
                     doc1.addField("city", location.city);
                     doc1.addField("latitude", location.latitude);
                     doc1.addField("longitude", location.longitude);
-                    doc1.addField("isBot",isSpiderBot);
+                    
 
 
                 }
@@ -1338,6 +1340,7 @@ public class SolrLogger
                 //Upload the data in the csv files to our new solr core
                 ContentStreamUpdateRequest contentStreamUpdateRequest = new ContentStreamUpdateRequest("/update/csv");
                 contentStreamUpdateRequest.setParam("stream.contentType", "text/plain;charset=utf-8");
+	            contentStreamUpdateRequest.setParam("skip", "_version_");
                 contentStreamUpdateRequest.setAction(AbstractUpdateRequest.ACTION.COMMIT, true, true);
                 contentStreamUpdateRequest.addFile(tempCsv, "text/plain;charset=utf-8");
 

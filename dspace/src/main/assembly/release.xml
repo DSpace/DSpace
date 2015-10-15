@@ -46,6 +46,21 @@
          <!-- Ensure line endings in all files are Unix (LF) line endings-->
          <lineEnding>unix</lineEnding>
       </fileSet>
+      <!-- Ensure the presence of "empty" overlay directories for build
+           steps that need them.
+           By default our ".gitignore" files are excluded by
+           "useDefaultExcludes=true". -->
+      <fileSet>
+         <directory>..</directory>
+         <useDefaultExcludes>false</useDefaultExcludes>
+         <includes>
+            <include>dspace/modules/**/.gitignore</include>
+         </includes>
+         <excludes>
+            <exclude>**/target/**</exclude>
+         </excludes>
+         <lineEnding>unix</lineEnding>
+      </fileSet>
    </fileSets>
 
 </assembly>

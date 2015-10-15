@@ -486,7 +486,7 @@ else if( qResults != null)
 	
 	if (pageFirst != 1)
 	{
-	    %><li><a href="<%= firstURL %>">1</a></li><li>...</li><%
+	    %><li><a href="<%= firstURL %>">1</a></li><li class="disabled"><span>...</span></li><%
 	}
 	
 	for( long q = pageFirst; q <= pageLast; q++ )
@@ -576,7 +576,7 @@ else
 
 if (pageFirst != 1)
 {
-    %><li><a href="<%= firstURL %>">1</a></li><li class="disabled"><span>...<span></li><%
+    %><li><a href="<%= firstURL %>">1</a></li><li class="disabled"><span>...</span></li><%
 }
 
 for( long q = pageFirst; q <= pageLast; q++ )

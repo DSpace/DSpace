@@ -1212,7 +1212,7 @@
         </div>
     </xsl:template>
 
-    <xsl:template match="dri:*[count(dri:field) > 1 and dri:field[@type='button'] and count(dri:field[not(@type='button' or @type='')]) = 0]" priority="4">
+    <xsl:template match="dri:*[count(dri:field) > 1 and dri:field[@type='button'] and count(dri:field[not(@type='button' or @type='')]) = 0 and not(preceding-sibling::*[1][local-name()='label'])]" priority="4">
         <div>
             <xsl:call-template name="standardAttributes">
             </xsl:call-template>
@@ -1321,9 +1321,9 @@
                         <xsl:text> btn-default</xsl:text>
                     </xsl:if>
                 </xsl:when>
-                <xsl:otherwise>
+                <xsl:when test="not(@type='file')">
                     <xsl:text>form-control </xsl:text>
-                </xsl:otherwise>
+                </xsl:when>
             </xsl:choose>
 
                 <xsl:if test="@rend">

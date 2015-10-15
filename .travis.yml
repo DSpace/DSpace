@@ -1,4 +1,5 @@
 language: java
+sudo: false
 
 env: 
   # Give Maven 1GB of memory to work with
