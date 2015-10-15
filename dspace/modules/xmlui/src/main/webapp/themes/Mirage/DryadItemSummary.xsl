@@ -1339,6 +1339,25 @@
         <xsl:param name="journal-name"/>
         <xsl:param name="article-doi"/>
         <xsl:choose>
+        
+        	<xsl:when test='$journal-name = "American Journal of Botany"'>
+            	<a target="_blank">
+                	<xsl:attribute name="href">
+                    	<xsl:choose>
+                        	<xsl:when test="contains($article-doi,'doi:')">
+                            	<xsl:value-of
+                                    	select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                        	</xsl:when>
+                        	<xsl:otherwise>
+                            	<xsl:value-of
+                                    	select="string('http://www.amjbot.org/')"/>
+                        	</xsl:otherwise>
+                    	</xsl:choose>
+                	</xsl:attribute>
+                	<img class="pub-cover" id="journal-logo" src="/themes/Dryad/images/coverimages/AMJBOTCover.png"
+                    	alt="American Journal of Botany cover"/>
+            	</a>
+        	</xsl:when>        
             <xsl:when test='$journal-name = "The American Naturalist"'>
                 <a target="_blank">
                     <xsl:attribute name="href">
