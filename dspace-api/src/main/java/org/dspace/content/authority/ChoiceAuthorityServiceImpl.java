@@ -10,16 +10,16 @@ package org.dspace.content.authority;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Enumeration;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 
 import org.dspace.content.Collection;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.PluginManager;
-import org.springframework.beans.factory.InitializingBean;
+import org.dspace.core.service.PluginService;
+import org.dspace.services.ConfigurationService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Broker for ChoiceAuthority plugins, and for other information configured
@@ -40,7 +40,7 @@ import org.springframework.beans.factory.InitializingBean;
  * @author Larry Stone
  * @see ChoiceAuthority
  */
-public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService, InitializingBean
+public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
 {
     private Logger log = Logger.getLogger(ChoiceAuthorityServiceImpl.class);
 
@@ -53,22 +53,32 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService,
     // map of field key to closed value
     protected Map<String,Boolean> closed = new HashMap<String,Boolean>();
 
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
+    @Autowired(required = true)
+    protected PluginService pluginService;
+
     private ChoiceAuthorityServiceImpl() {
     }
 
-    @Override
-    public void afterPropertiesSet() throws Exception
+    /**
+     * Initialize the bean (after dependency injection has already taken place).
+     * Ensures the configurationService is injected, so that we can load
+     * choices from configuration.
+     * Called by "init-method" in Spring config.
+     */
+    public void init() throws Exception
     {
-
-        Enumeration pn = ConfigurationManager.propertyNames();
+        List<String> propKeys = configurationService.getPropertyKeys("choices");
+        Iterator<String> keyIterator = propKeys.iterator();
         final String choicesPrefix = "choices.";
         final String choicesPlugin = "choices.plugin.";
         final String choicesPresentation = "choices.presentation.";
         final String choicesClosed = "choices.closed.";
       property:
-        while (pn.hasMoreElements())
+        while (keyIterator.hasNext())
         {
-            String key = (String)pn.nextElement();
+            String key = keyIterator.next();
             if (key.startsWith(choicesPrefix))
             {
                 if (key.startsWith(choicesPlugin))
@@ -82,12 +92,11 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService,
 
                     // XXX FIXME maybe add sanity check, call
                     // MetadataField.findByElement to make sure it's a real field.
-                     
                     ChoiceAuthority ma = (ChoiceAuthority)
-                        PluginManager.getNamedPlugin(ChoiceAuthority.class, ConfigurationManager.getProperty(key));
+                        pluginService.getNamedPlugin(ChoiceAuthority.class, configurationService.getProperty(key));
                     if (ma == null)
                     {
-                        log.warn("Skipping invalid configuration for "+key+" because named plugin not found: "+ConfigurationManager.getProperty(key));
+                        log.warn("Skipping invalid configuration for "+key+" because named plugin not found: "+configurationService.getProperty(key));
                         continue property;
                     }
                     controller.put(fkey, ma);
@@ -102,7 +111,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService,
                         log.warn("Skipping invalid ChoiceAuthority configuration property: "+key+": does not have schema.element.qualifier");
                         continue property;
                     }
-                    presentation.put(fkey, ConfigurationManager.getProperty(key));
+                    presentation.put(fkey, configurationService.getProperty(key));
                 }
                 else if (key.startsWith(choicesClosed))
                 {
@@ -112,7 +121,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService,
                         log.warn("Skipping invalid ChoiceAuthority configuration property: "+key+": does not have schema.element.qualifier");
                         continue property;
                     }
-                    closed.put(fkey, Boolean.valueOf(ConfigurationManager.getBooleanProperty(key)));
+                    closed.put(fkey, configurationService.getBooleanProperty(key));
                 }
                 else
                 {

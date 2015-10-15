@@ -42,8 +42,9 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
-import org.dspace.core.PluginManager;
 import org.dspace.core.Utils;
+import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.core.service.PluginService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.harvest.factory.HarvestServiceFactory;
@@ -88,7 +89,7 @@ public class OAIHarvester {
 	protected HandleService handleService;
 	protected HarvestedItemService harvestedItemService;
 	protected WorkspaceItemService workspaceItemService;
-
+    protected PluginService pluginService;
 
     //  The collection this harvester instance is dealing with
 	Collection targetCollection;
@@ -126,6 +127,7 @@ public class OAIHarvester {
 		installItemService = ContentServiceFactory.getInstance().getInstallItemService();
 
 		workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+        pluginService = CoreServiceFactory.getInstance().getPluginService();
 
 		if (dso.getType() != Constants.COLLECTION)
         {
@@ -451,14 +453,14 @@ public class OAIHarvester {
 
 		// If we are only harvesting descriptive metadata, the record should already contain all we need
     	List<Element> descMD = record.getChild("metadata", OAI_NS).getChildren();
-    	IngestionCrosswalk MDxwalk = (IngestionCrosswalk)PluginManager.getNamedPlugin(IngestionCrosswalk.class, this.metadataKey);
+    	IngestionCrosswalk MDxwalk = (IngestionCrosswalk)pluginService.getNamedPlugin(IngestionCrosswalk.class, this.metadataKey);
 
     	// Otherwise, obtain the ORE ReM and initiate the ORE crosswalk
     	IngestionCrosswalk ORExwalk = null;
     	Element oreREM = null;
     	if (harvestRow.getHarvestType() > 1) {
     		oreREM = getMDrecord(harvestRow.getOaiSource(), itemOaiID, OREPrefix).get(0);
-    		ORExwalk = (IngestionCrosswalk)PluginManager.getNamedPlugin(IngestionCrosswalk.class, this.ORESerialKey);
+    		ORExwalk = (IngestionCrosswalk)pluginService.getNamedPlugin(IngestionCrosswalk.class, this.ORESerialKey);
 		}
 
     	// Ignore authorization

@@ -20,7 +20,7 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
+import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 
@@ -280,7 +280,7 @@ public class Curator
     {
         if (taskQ == null)
         {
-            taskQ = (TaskQueue)PluginManager.getSinglePlugin("curate", TaskQueue.class);
+            taskQ = (TaskQueue) CoreServiceFactory.getInstance().getPluginService().getSinglePlugin(TaskQueue.class);
         }
         if (taskQ != null)
         {

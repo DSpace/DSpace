@@ -13,19 +13,23 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
+import org.dspace.core.service.PluginService;
 import org.dspace.services.ConfigurationService;
-import org.dspace.utils.DSpace;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * The Plugin Manager is a very simple component container.  It creates and
- * organizes components (plugins), and helps select a plugin in the cases
- * where there are many possible choices.  It also gives some limited
+ * The Legacy Plugin Service is a very simple component container (based on the
+ * legacy PluginManager class). It reads defined "plugins" (interfaces) from
+ * config file(s) and makes them available to the API. (@TODO: Someday, this
+ * entire "plugin" framework needs to be replaced by Spring Beans.)
+ * <p>
+ * It creates and organizes components (plugins), and helps select a plugin in
+ * the cases where there are many possible choices. It also gives some limited
  * control over the lifecycle of a plugin.  It manages three different types
  * (usage patterns) of plugins:
  * <p>
@@ -53,12 +57,13 @@ import org.dspace.utils.DSpace;
  *  names in the configuration entry.
  *
  * @author Larry Stone
+ * @author Tim Donohue (turned old PluginManager into a PluginService)
  * @see SelfNamedPlugin
  */
-public class PluginManager
+public class LegacyPluginServiceImpl implements PluginService
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(PluginManager.class);
+    private static Logger log = Logger.getLogger(LegacyPluginServiceImpl.class);
 
     /**
      * Prefixes of names of properties to look for in DSpace Configuration
@@ -78,51 +83,32 @@ public class PluginManager
     private static final String SEP = "\034";
 
     /** Paths to search for third-party plugins. */
-    private static final String[] classPath;
-    static {
-        String path = new DSpace().getConfigurationService().getProperty(CLASSPATH);
+    private String[] classPath;
+
+    /** Custom class loader to search for third-party plugins. */
+    private PathsClassLoader loader;
+
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
+
+    private LegacyPluginServiceImpl() {
+    }
+
+    /**
+     * Initialize the bean (after dependency injection has already taken place).
+     * Ensures the configurationService is injected, so that we can load
+     * plugin classpath info from config.
+     * Called by "init-method" in Spring config.
+     */
+    void init()
+    {
+        String path = configurationService.getProperty(CLASSPATH);
         if (null == path)
             classPath = new String[0];
         else
             classPath = path.split(":");
-    }
 
-    /** Custom class loader to search for third-party plugins. */
-    private static final PathsClassLoader loader
-            = new PathsClassLoader(PluginManager.class.getClassLoader(), classPath);
-
-    // Map of plugin class to "reusable" metric (as Boolean, must be Object)
-    // Key is Class, value is Boolean (true by default).
-    private static Map<Class<Object>, Boolean> cacheMeCache = new HashMap<Class<Object>, Boolean>();
-
-    /**
-     * Whether or not to cache instances of this class. Ironically,
-     * the cacheability information is itself cached.
-     * <P>
-     * By default, all plugin class instances ARE cached. To disable instance
-     * caching for a specific plugin class, you must add a configuration similar
-     * to this in your dspace.cfg:
-     * <code>
-     * plugin.reusable.[full-class-name] = false
-     * </code>
-     * @return true if class instances should be cached in memory, false otherwise.
-     */
-    private static boolean cacheMe(String module, Class implClass)
-    {
-        if (cacheMeCache.containsKey(implClass))
-        {
-            return (cacheMeCache.get(implClass)).booleanValue();
-        }
-        else
-        {
-            ConfigurationService config = new DSpace().getConfigurationService();
-            String key = REUSABLE_PREFIX+implClass.getName();
-
-            // NOTE: module name is ignored, as reusable plugins configs ALWAYS begin with REUSABLE_PREFIX
-            boolean reusable = config.getBooleanProperty(key, true);
-            cacheMeCache.put(implClass, Boolean.valueOf(reusable));
-            return reusable;
-        }
+        loader = new PathsClassLoader(LegacyPluginServiceImpl.class.getClassLoader(), classPath);
     }
 
     /**
@@ -139,28 +125,8 @@ public class PluginManager
      * @return instance of plugin
      * @throws PluginConfigurationError
      */
-    public static Object getSinglePlugin(Class interfaceClass)
-        throws PluginConfigurationError, PluginInstantiationException
-    {
-        return getSinglePlugin(null, interfaceClass);
-    }
-
-    /**
-     * Returns an instance of the singleton (single) plugin implementing
-     * the given interface.  There must be exactly one single plugin
-     * configured for this interface, otherwise the
-     * <code>PluginConfigurationError</code> is thrown.
-     * <p>
-     * Note that this is the only "get plugin" method which throws an
-     * exception.  It is typically used at initialization time to set up
-     * a permanent part of the system so any failure is fatal.
-     *
-     * @param module name of config module, or <code>null</code> for standard location
-     * @param interfaceClass interface Class object
-     * @return instance of plugin
-     * @throws PluginConfigurationError
-     */
-    public static Object getSinglePlugin(String module, Class interfaceClass)
+    @Override
+    public Object getSinglePlugin(Class interfaceClass)
         throws PluginConfigurationError, PluginInstantiationException
     {
         String iname = interfaceClass.getName();
@@ -168,11 +134,11 @@ public class PluginManager
         // NOTE: module name is ignored, as single plugins ALWAYS begin with SINGLE_PREFIX
         String key = SINGLE_PREFIX+iname;
         // configuration format is  prefix.<interface> = <classname>
-        String classname = new DSpace().getConfigurationService().getProperty(key);
+        String classname = configurationService.getProperty(key);
 
         if (classname != null)
         {
-            return getAnonymousPlugin(module, classname.trim());
+            return getAnonymousPlugin(classname.trim());
         }
         else
         {
@@ -180,58 +146,40 @@ public class PluginManager
         }
     }
 
-    // cache of config data for Sequence Plugins; format its
-    // <interface-name> -> [ <classname>.. ]  (value is Array)
-    private static Map<String, String[]> sequenceConfig = new HashMap<String, String[]>();
-
     /**
-     * Returns instances of all plugins that implement the interface
-     * intface, in an Array.  Returns an empty array if no there are no
+     * Returns instances of all plugins that implement the interface,
+     * in an Array.  Returns an empty array if no there are no
      * matching plugins.
      * <p>
      * The order of the plugins in the array is the same as their class
      * names in the configuration's value field.
      *
-     * @param intfc interface for which to find plugins.
+     * @param interfaceClass interface for which to find plugins.
      * @return an array of plugin instances; if none are
      *   available an empty array is returned.
      */
-    public static Object[] getPluginSequence(Class intfc)
+    @Override
+    public Object[] getPluginSequence(Class interfaceClass)
         throws PluginInstantiationException
     {
-        return getPluginSequence(null, intfc);
-    }
+        // cache of config data for Sequence Plugins; format its
+        // <interface-name> -> [ <classname>.. ]  (value is Array)
+        Map<String, String[]> sequenceConfig = new HashMap<String, String[]>();
 
-    /**
-     * Returns instances of all plugins that implement the interface
-     * intface, in an Array.  Returns an empty array if no there are no
-     * matching plugins.
-     * <p>
-     * The order of the plugins in the array is the same as their class
-     * names in the configuration's value field.
-     *
-     * @param module name of config module, or <code>null</code> for standard
-     * @param intfc interface for which to find plugins.
-     * @return an array of plugin instances; if none are
-     *   available an empty array is returned.
-     */
-    public static Object[] getPluginSequence(String module, Class intfc)
-        throws PluginInstantiationException
-    {
         // cache the configuration for this interface after grovelling it once:
         // format is  prefix.<interface> = <classname>
-        String iname = intfc.getName();
+        String iname = interfaceClass.getName();
         String[] classname = null;
         if (!sequenceConfig.containsKey(iname))
         {
             // NOTE: module name is ignored, as sequence plugins ALWAYS begin with SEQUENCE_PREFIX
             String key = SEQUENCE_PREFIX+iname;
 
-            classname = new DSpace().getConfigurationService().getArrayProperty(key);
+            classname = configurationService.getArrayProperty(key);
             if (classname == null || classname.length==0)
             {
                 log.warn("No Configuration entry found for Sequence Plugin interface="+iname);
-                return (Object[]) Array.newInstance(intfc, 0);
+                return (Object[]) Array.newInstance(interfaceClass, 0);
             }
             sequenceConfig.put(iname, classname);
         }
@@ -240,52 +188,31 @@ public class PluginManager
             classname = sequenceConfig.get(iname);
         }
 
-        Object result[] = (Object[])Array.newInstance(intfc, classname.length);
+        Object result[] = (Object[])Array.newInstance(interfaceClass, classname.length);
         for (int i = 0; i < classname.length; ++i)
         {
             log.debug("Adding Sequence plugin for interface= "+iname+", class="+classname[i]);
-            result[i] = getAnonymousPlugin(module, classname[i]);
+            result[i] = getAnonymousPlugin(classname[i]);
         }
         return result;
     }
 
-
-    // Map of cached (reusable) single plugin instances - class -> instance.
-    private static Map<Serializable, Object> anonymousInstanceCache = new HashMap<Serializable, Object>();
-
     // Get possibly-cached plugin instance for un-named plugin,
     // this is shared by Single and Sequence plugins.
-    private static Object getAnonymousPlugin(String module, String classname)
+    private Object getAnonymousPlugin(String classname)
         throws PluginInstantiationException
     {
         try
         {
             Class pluginClass = Class.forName(classname, true, loader);
-            if (cacheMe(module, pluginClass))
-            {
-                Object cached = anonymousInstanceCache.get(pluginClass);
-                if (cached == null)
-                {
-                    cached = pluginClass.newInstance();
-                    anonymousInstanceCache.put(pluginClass, cached);
-                }
-                return cached;
-            }
-            else
-            {
-                return pluginClass.newInstance();
-            }
+            return pluginClass.newInstance();
         }
         catch (ClassNotFoundException e)
         {
             throw new PluginInstantiationException("Cannot load plugin class: " +
             		                               e.toString(), e);
         }
-        catch (InstantiationException e)
-        {
-            throw new PluginInstantiationException(e);
-        }
-        catch (IllegalAccessException e)
+        catch (InstantiationException|IllegalAccessException e)
         {
             throw new PluginInstantiationException(e);
         }
@@ -293,13 +220,13 @@ public class PluginManager
 
     // Map of named plugin classes, [intfc,name] -> class
     // Also contains intfc -> "marker" to mark when interface has been loaded.
-    private static Map<String, String> namedPluginClasses = new HashMap<String, String>();
+    private Map<String, String> namedPluginClasses = new HashMap<String, String>();
 
     // Map of cached (reusable) named plugin instances, [class,name] -> instance
-    private static Map<Serializable, Object> namedInstanceCache = new HashMap<Serializable, Object>();
+    private Map<Serializable, Object> namedInstanceCache = new HashMap<Serializable, Object>();
 
     // load and cache configuration data for the given interface.
-    private static void configureNamedPlugin(String module, String iname)
+    private void configureNamedPlugin(String iname)
         throws ClassNotFoundException
     {
         int found = 0;
@@ -317,7 +244,7 @@ public class PluginManager
             //                        <CLASS> = <name>\, <name> [ ... ]
             // NOTE: module name is ignored, as named plugins ALWAYS begin with NAMED_PREFIX
             String key = NAMED_PREFIX+iname;
-            String[] namedVals = new DSpace().getConfigurationService().getArrayProperty(key);
+            String[] namedVals = configurationService.getArrayProperty(key);
             if (namedVals != null && namedVals.length>0)
             {
                 String prevClassName = null;
@@ -356,7 +283,7 @@ public class PluginManager
             // format is plugin.selfnamed.<INTF> = <CLASS> , <CLASS> ..
             // NOTE: module name is ignored, as self-named plugins ALWAYS begin with SELFNAMED_PREFIX
             key = SELFNAMED_PREFIX+iname;
-            String[] selfNamedVals = new DSpace().getConfigurationService().getArrayProperty(key);
+            String[] selfNamedVals = configurationService.getArrayProperty(key);
             if (selfNamedVals != null && selfNamedVals.length>0)
             {
                 for (String classname : selfNamedVals)
@@ -394,7 +321,7 @@ public class PluginManager
     }
 
     // add info for a named plugin to cache, under all its names.
-    private static int installNamedConfigs(String iname, String classname, String names[])
+    private int installNamedConfigs(String iname, String classname, String names[])
         throws ClassNotFoundException
     {
         int found = 0;
@@ -418,38 +345,22 @@ public class PluginManager
 
     /**
      * Returns an instance of a plugin that implements the interface
-     * intface and is bound to a name matching name.  If there is no
+     * and is bound to a name matching name.  If there is no
      * matching plugin, it returns null.  The names are matched by
      * String.equals().
      *
-     * @param intfc the interface class of the plugin
+     * @param interfaceClass the interface class of the plugin
      * @param name under which the plugin implementation is configured.
      * @return instance of plugin implementation, or null if there is no match or an error.
      */
-    public static Object getNamedPlugin(Class intfc, String name)
-         throws PluginInstantiationException
-    {
-        return getNamedPlugin(null, intfc, name);
-    }
-
-    /**
-     * Returns an instance of a plugin that implements the interface
-     * intface and is bound to a name matching name.  If there is no
-     * matching plugin, it returns null.  The names are matched by
-     * String.equals().
-     *
-     * @param module config module, or <code>null</code> for standard location
-     * @param intfc the interface class of the plugin
-     * @param name under which the plugin implementation is configured.
-     * @return instance of plugin implementation, or null if there is no match or an error.
-     */
-    public static Object getNamedPlugin(String module, Class intfc, String name)
+    @Override
+    public Object getNamedPlugin(Class interfaceClass, String name)
          throws PluginInstantiationException
     {
         try
         {
-            String iname = intfc.getName();
-            configureNamedPlugin(module, iname);
+            String iname = interfaceClass.getName();
+            configureNamedPlugin(iname);
             String key = iname + SEP + name;
             String cname = namedPluginClasses.get(key);
             if (cname == null)
@@ -459,36 +370,15 @@ public class PluginManager
             else
             {
                 Class pluginClass = Class.forName(cname, true, loader);
-                if (cacheMe(module, pluginClass))
+                log.debug("Creating instance of: " + cname +
+                              " for interface=" + iname +
+                              " pluginName=" + name );
+                Object result = pluginClass.newInstance();
+                if (result instanceof SelfNamedPlugin)
                 {
-                    String nkey = pluginClass.getName() + SEP + name;
-                    Object cached = namedInstanceCache.get(nkey);
-                    if (cached == null)
-                    {
-                        log.debug("Creating cached instance of: " + cname +
-                                          " for interface=" + iname +
-                                          " pluginName=" + name );
-                        cached = pluginClass.newInstance();
-                        if (cached instanceof SelfNamedPlugin)
-                        {
-                            ((SelfNamedPlugin) cached).setPluginInstanceName(name);
-                        }
-                        namedInstanceCache.put(nkey, cached);
-                    }
-                    return cached;
+                    ((SelfNamedPlugin) result).setPluginInstanceName(name);
                 }
-                else
-                {
-                        log.debug("Creating UNcached instance of: " + cname +
-                                  " for interface=" + iname +
-                                  " pluginName=" + name );
-                    Object result = pluginClass.newInstance();
-                    if (result instanceof SelfNamedPlugin)
-                    {
-                        ((SelfNamedPlugin) result).setPluginInstanceName(name);
-                    }
-                    return result;
-                }
+                return result;
             }
         }
         catch (ClassNotFoundException e)
@@ -496,11 +386,7 @@ public class PluginManager
             throw new PluginInstantiationException("Cannot load plugin class: " +
             		                               e.toString(), e);
         }
-        catch (InstantiationException e)
-        {
-            throw new PluginInstantiationException(e);
-        }
-        catch (IllegalAccessException e)
+        catch (InstantiationException|IllegalAccessException e)
         {
             throw new PluginInstantiationException(e);
         }
@@ -510,36 +396,21 @@ public class PluginManager
 
     /**
      * Returns whether a plugin exists which implements the specified interface
-     * and has a specified name.  If a matching plugin is found to be configured,
+     * and has a specified name. If a matching plugin is found to be configured,
      * return true. If there is no matching plugin, return false.
      *
-     * @param intfc the interface class of the plugin
+     * @param interfaceClass the interface class of the plugin
      * @param name under which the plugin implementation is configured.
      * @return true if plugin was found to be configured, false otherwise
      */
-    public static boolean hasNamedPlugin(Class intfc, String name)
-         throws PluginInstantiationException
-    {
-        return hasNamedPlugin(null, intfc, name);
-    }
-
-   /**
-     * Returns whether a plugin exists which implements the specified interface
-     * and has a specified name.  If a matching plugin is found to be configured,
-     * return true. If there is no matching plugin, return false.
-     *
-     * @param module the config module or <code>null</code> for regular location
-     * @param intfc the interface class of the plugin
-     * @param name under which the plugin implementation is configured.
-     * @return true if plugin was found to be configured, false otherwise
-     */
-    public static boolean hasNamedPlugin(String module, Class intfc, String name)
+    @Override
+    public boolean hasNamedPlugin(Class interfaceClass, String name)
          throws PluginInstantiationException
     {
         try
         {
-            String iname = intfc.getName();
-            configureNamedPlugin(module, iname);
+            String iname = interfaceClass.getName();
+            configureNamedPlugin(iname);
             String key = iname + SEP + name;
             return namedPluginClasses.get(key) != null;
         }
@@ -552,42 +423,24 @@ public class PluginManager
 
     /**
      * Returns all of the names under which a named plugin implementing
-     * the interface intface can be requested (with getNamedPlugin()).
+     * the interface can be requested (with getNamedPlugin()).
      * The array is empty if there are no matches.  Use this to populate
      * a menu of plugins for interactive selection, or to document what
      * the possible choices are.
      * <p>
      * NOTE: The names are NOT returned in any deterministic order.
      *
-     * @param intfc plugin interface for which to return names.
+     * @param interfaceClass plugin interface for which to return names.
      * @return an array of strings with every name; if none are
      *   available an empty array is returned.
      */
-    public static String[] getAllPluginNames(Class intfc)
-    {
-            return getAllPluginNames(null, intfc);
-    }
-
-    /**
-     * Returns all of the names under which a named plugin implementing
-     * the interface intface can be requested (with getNamedPlugin()).
-     * The array is empty if there are no matches.  Use this to populate
-     * a menu of plugins for interactive selection, or to document what
-     * the possible choices are.
-     * <p>
-     * NOTE: The names are NOT returned in any deterministic order.
-     *
-     * @param module the module name
-     * @param intfc plugin interface for which to return names.
-     * @return an array of strings with every name; if none are
-     *   available an empty array is returned.
-     */
-    public static String[] getAllPluginNames(String module, Class intfc)
+    @Override
+    public String[] getAllPluginNames(Class interfaceClass)
     {
         try
         {
-            String iname = intfc.getName();
-            configureNamedPlugin(module, iname);
+            String iname = interfaceClass.getName();
+            configureNamedPlugin(iname);
             String prefix = iname + SEP;
             ArrayList<String> result = new ArrayList<String>();
 
@@ -611,43 +464,13 @@ public class PluginManager
         }
     }
 
-    /**
-     * Tells the Plugin Manager to let go of any references to a
-     * reusable plugin, to prevent it from being given out again and to
-     * allow the object to be garbage-collected.  Call this when a
-     * plugin instance must be taken out of circulation.
-     *
-     * @param plugin the object to release, must have been created by
-     *   <code>getNamedPlugin</code> etc.
-     */
-    public static void releasePlugin(Object plugin)
-    {
-        forgetInstance(plugin, namedInstanceCache);
-        forgetInstance(plugin, anonymousInstanceCache);
-    }
-
-    private static void forgetInstance(Object plugin, Map<Serializable, Object> cacheMap)
-    {
-        Collection values = cacheMap.values();
-        Iterator ci = values.iterator();
-        while (ci.hasNext())
-        {
-            // Identity comparison is valid for this usage
-            Object val = ci.next();
-            if (val == plugin)
-            {
-                values.remove(val);
-            }
-        }
-    }
-
     /* -----------------------------------------------------------------
      *  Code to check configuration is all below this line
      * -----------------------------------------------------------------
      */
 
     // true if classname is valid and loadable.
-    private static boolean checkClassname(String iname, String msg)
+    private boolean checkClassname(String iname, String msg)
     {
         try
         {
@@ -664,7 +487,7 @@ public class PluginManager
     }
 
     // true if classname is loadable AND is subclass of SelfNamedPlugin
-    private static boolean checkSelfNamed(String iname)
+    private boolean checkSelfNamed(String iname)
     {
         try
         {
@@ -681,7 +504,7 @@ public class PluginManager
     }
 
     // recursively climb superclass stack until we find SelfNamedPlugin
-    private static boolean checkSelfNamed(Class cls)
+    private boolean checkSelfNamed(Class cls)
     {
         Class sup = cls.getSuperclass();
         if (sup == null)
@@ -700,11 +523,11 @@ public class PluginManager
 
     // check named-plugin names by interface -- call the usual
     // configuration and let it find missing or duplicate names.
-    private static void checkNames(String iname)
+    private void checkNames(String iname)
     {
         try
         {
-            configureNamedPlugin(null, iname);
+            configureNamedPlugin(iname);
         }
         catch (ClassNotFoundException ce)
         {
@@ -714,7 +537,7 @@ public class PluginManager
 
     /**
      * Validate the entries in the DSpace Configuration relevant to
-     * PluginManager.  Look for inconsistencies, illegal syntax, etc.
+ LegacyPluginServiceImpl.  Look for inconsistencies, illegal syntax, etc.
      * Announce violations with "log.error" so they appear in the log
      * or in the standard error stream if this is run interactively.
      * <ul>
@@ -727,7 +550,7 @@ public class PluginManager
      * <li>Named plugin entries lacking names.
      * </ul>
      */
-    public static void checkConfiguration()
+    public void checkConfiguration()
         throws IOException
     {
         FileReader fr = null;
@@ -745,9 +568,8 @@ public class PluginManager
         Map<String, String> reusableKey = new HashMap<String, String>();
         HashMap<String, String> keyMap = new HashMap<String, String>();
 
-        ConfigurationService config = new DSpace().getConfigurationService();
         // Find all property keys starting with "plugin."
-        List<String> keys = config.getPropertyKeys("plugin.");
+        List<String> keys = configurationService.getPropertyKeys("plugin.");
 
         for(String key : keys)
         {
@@ -803,7 +625,7 @@ public class PluginManager
         while (ii.hasNext())
         {
             String key = ii.next();
-            String val = config.getProperty(SINGLE_PREFIX+key);
+            String val = configurationService.getProperty(SINGLE_PREFIX+key);
             if (val == null)
             {
                 log.error("Single plugin config not found for: " + SINGLE_PREFIX + key);
@@ -823,7 +645,7 @@ public class PluginManager
         while (ii.hasNext())
         {
             String key = ii.next();
-            String[] vals = config.getArrayProperty(SEQUENCE_PREFIX+key);
+            String[] vals = configurationService.getArrayProperty(SEQUENCE_PREFIX+key);
             if (vals == null || vals.length==0)
             {
                 log.error("Sequence plugin config not found for: " + SEQUENCE_PREFIX + key);
@@ -846,7 +668,7 @@ public class PluginManager
         while (ii.hasNext())
         {
             String key = ii.next();
-            String[] vals = config.getArrayProperty(SELFNAMED_PREFIX+key);
+            String[] vals = configurationService.getArrayProperty(SELFNAMED_PREFIX+key);
             if (vals == null || vals.length==0)
             {
                 log.error("Selfnamed plugin config not found for: " + SELFNAMED_PREFIX + key);
@@ -871,7 +693,7 @@ public class PluginManager
         while (ii.hasNext())
         {
             String key = ii.next();
-            String[] vals =config.getArrayProperty(NAMED_PREFIX+key);
+            String[] vals = configurationService.getArrayProperty(NAMED_PREFIX+key);
             if (vals == null || vals.length==0)
             {
                 log.error("Named plugin config not found for: " + NAMED_PREFIX + key);
@@ -910,7 +732,7 @@ public class PluginManager
      * <code>checkConfiguration</code> and shows the results.
      * There are no command-line options.
      */
-    public static void main(String[] argv) throws Exception
+    public void main(String[] argv) throws Exception
     {
         checkConfiguration();
     }

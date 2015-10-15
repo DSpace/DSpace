@@ -9,6 +9,7 @@ package org.dspace.core.factory;
 
 import org.dspace.core.service.LicenseService;
 import org.dspace.core.service.NewsService;
+import org.dspace.core.service.PluginService;
 import org.dspace.utils.DSpace;
 
 /**
@@ -21,6 +22,8 @@ public abstract class CoreServiceFactory {
     public abstract LicenseService getLicenseService();
 
     public abstract NewsService getNewsService();
+
+    public abstract PluginService getPluginService();
 
     public static CoreServiceFactory getInstance()
     {

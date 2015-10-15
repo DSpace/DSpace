@@ -41,7 +41,8 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.core.PluginManager;
+import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.core.service.PluginService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -77,11 +78,6 @@ public class HandleServlet extends DSpaceServlet
     /** log4j category */
     private static final Logger log = Logger.getLogger(HandleServlet.class);
 
-    /** For obtaining &lt;meta&gt; elements to put in the &lt;head&gt; */
-    private final transient DisseminationCrosswalk xHTMLHeadCrosswalk
-             = (DisseminationCrosswalk) PluginManager
-                .getNamedPlugin(DisseminationCrosswalk.class, "XHTML_HEAD_ITEM");
-
     // services API
     private final transient HandleService handleService
              = HandleServiceFactory.getInstance().getHandleService();
@@ -97,6 +93,14 @@ public class HandleServlet extends DSpaceServlet
     
     private final transient CollectionService collectionService
              = ContentServiceFactory.getInstance().getCollectionService();
+    
+    private final transient PluginService pluginService
+             = CoreServiceFactory.getInstance().getPluginService();
+    
+    /** For obtaining &lt;meta&gt; elements to put in the &lt;head&gt; */
+    private final transient DisseminationCrosswalk xHTMLHeadCrosswalk
+             = (DisseminationCrosswalk) pluginService
+                .getNamedPlugin(DisseminationCrosswalk.class, "XHTML_HEAD_ITEM");
 
     @Override
     protected void doDSGet(Context context, HttpServletRequest request,
@@ -486,7 +490,7 @@ public class HandleServlet extends DSpaceServlet
     {
         try
         {
-            ItemHomeProcessor[] chp = (ItemHomeProcessor[]) PluginManager.getPluginSequence(ItemHomeProcessor.class);
+            ItemHomeProcessor[] chp = (ItemHomeProcessor[]) pluginService.getPluginSequence(ItemHomeProcessor.class);
             for (int i = 0; i < chp.length; i++)
             {
                 chp[i].process(context, request, response, item);
@@ -576,7 +580,7 @@ public class HandleServlet extends DSpaceServlet
     {
     	try
     	{
-    		CommunityHomeProcessor[] chp = (CommunityHomeProcessor[]) PluginManager.getPluginSequence(CommunityHomeProcessor.class);
+    		CommunityHomeProcessor[] chp = (CommunityHomeProcessor[]) pluginService.getPluginSequence(CommunityHomeProcessor.class);
     		for (int i = 0; i < chp.length; i++)
     		{
     			chp[i].process(context, request, response, community);
@@ -723,7 +727,7 @@ public class HandleServlet extends DSpaceServlet
     {
     	try
     	{
-    		CollectionHomeProcessor[] chp = (CollectionHomeProcessor[]) PluginManager.getPluginSequence(CollectionHomeProcessor.class);
+    		CollectionHomeProcessor[] chp = (CollectionHomeProcessor[]) pluginService.getPluginSequence(CollectionHomeProcessor.class);
     		for (int i = 0; i < chp.length; i++)
     		{
     			chp[i].process(context, request, response, collection);

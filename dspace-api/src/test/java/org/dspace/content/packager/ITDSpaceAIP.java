@@ -24,6 +24,8 @@ import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.*;
 import org.dspace.core.*;
+import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.core.service.PluginService;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -61,6 +63,7 @@ public class ITDSpaceAIP extends AbstractUnitTest
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
     protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
     protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+    protected PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
 
     /** InfoMap multiple value separator (see saveObjectInfo() and assertObject* methods) **/
     private static final String valueseparator = "::";
@@ -794,7 +797,7 @@ public class ITDSpaceAIP extends AbstractUnitTest
             throws PackageException, CrosswalkException, AuthorizeException, SQLException, IOException
     {
         // Get a reference to the configured "AIP" package disseminator
-        PackageDisseminator dip = (PackageDisseminator) PluginManager
+        PackageDisseminator dip = (PackageDisseminator) pluginService
                     .getNamedPlugin(PackageDisseminator.class, "AIP");
         if (dip == null)
         {
@@ -832,7 +835,7 @@ public class ITDSpaceAIP extends AbstractUnitTest
     private void restoreFromAIP(DSpaceObject parent, File aipFile, PackageParameters pkgParams, boolean recursive)
             throws PackageException, CrosswalkException, AuthorizeException, SQLException, IOException, WorkflowException {
         // Get a reference to the configured "AIP" package ingestor
-        PackageIngester sip = (PackageIngester) PluginManager
+        PackageIngester sip = (PackageIngester) pluginService
                     .getNamedPlugin(PackageIngester.class, "AIP");
         if(sip == null)
         {
@@ -869,7 +872,7 @@ public class ITDSpaceAIP extends AbstractUnitTest
     private void replaceFromAIP(DSpaceObject dso, File aipFile, PackageParameters pkgParams, boolean recursive)
             throws PackageException, CrosswalkException, AuthorizeException, SQLException, IOException, WorkflowException {
         // Get a reference to the configured "AIP" package ingestor
-        PackageIngester sip = (PackageIngester) PluginManager
+        PackageIngester sip = (PackageIngester) pluginService
                     .getNamedPlugin(PackageIngester.class, "AIP");
         if (sip == null)
         {

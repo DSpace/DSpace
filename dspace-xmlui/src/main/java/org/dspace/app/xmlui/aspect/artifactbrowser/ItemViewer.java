@@ -25,7 +25,6 @@ import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
-import org.dspace.app.sfx.SFXFileReaderServiceImpl;
 import org.dspace.app.sfx.factory.SfxServiceFactory;
 import org.dspace.app.sfx.service.SFXFileReaderService;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -48,13 +47,13 @@ import org.dspace.app.util.GoogleMetadata;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.core.PluginManager;
 import org.jdom.Element;
 import org.jdom.Text;
 import org.jdom.output.XMLOutputter;
 import org.xml.sax.SAXException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.app.xmlui.wing.element.Metadata;
+import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.utils.DSpace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -291,7 +290,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         // Metadata for <head> element
         if (xHTMLHeadCrosswalk == null)
         {
-            xHTMLHeadCrosswalk = (DisseminationCrosswalk) PluginManager.getNamedPlugin(
+            xHTMLHeadCrosswalk = (DisseminationCrosswalk) CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(
               DisseminationCrosswalk.class, "XHTML_HEAD_ITEM");
         }
 

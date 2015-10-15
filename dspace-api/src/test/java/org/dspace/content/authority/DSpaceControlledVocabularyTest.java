@@ -11,7 +11,7 @@ import java.io.IOException;
 
 import org.dspace.content.Collection;
 import org.dspace.AbstractUnitTest;
-import org.dspace.core.PluginManager;
+import org.dspace.core.factory.CoreServiceFactory;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.junit.*;
@@ -86,7 +86,7 @@ public class DSpaceControlledVocabularyTest extends AbstractUnitTest
         // (under /src/test/data/dspaceFolder/) and it should be auto-loaded
         // by test configs in /src/test/data/dspace.cfg.more
         DSpaceControlledVocabulary instance = (DSpaceControlledVocabulary)
-                PluginManager.getNamedPlugin(Class.forName(PLUGIN_INTERFACE), "farm");
+                CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(Class.forName(PLUGIN_INTERFACE), "farm");
         assertNotNull(instance);
         Choices result = instance.getMatches(field, text, collection, start,
                 limit, locale);
