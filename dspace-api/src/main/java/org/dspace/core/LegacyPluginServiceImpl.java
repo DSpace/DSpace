@@ -308,7 +308,7 @@ public class LegacyPluginServiceImpl implements PluginService
                     }
                     catch (Exception e)
                     {
-                        log.error("While configuring self-named plugin: " + e.toString());
+                        log.error("Error while configuring self-named plugin", e);
                     }
                 }
             }
