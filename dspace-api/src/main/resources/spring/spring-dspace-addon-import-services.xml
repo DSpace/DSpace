@@ -20,6 +20,22 @@
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
 
     <bean id="importService" class="org.dspace.importer.external.service.ImportService" scope="singleton"
-          lazy-init="false" autowire="byType" destroy-method="destroy"/>
+          lazy-init="false" autowire="byType" destroy-method="destroy">
+
+    </bean>
+
+    <bean id="PubmedImportService" class="org.dspace.importer.external.pubmed.service.other.ImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="PubmedMetadataFieldMapping"/>
+        <property name="baseAddress" value="http://eutils.ncbi.nlm.nih.gov/entrez/eutils/"/>
+
+    </bean>
+    <bean id="PubmedMetadataFieldMapping"
+          class="org.dspace.importer.external.pubmed.metadatamapping.PubmedFieldMapping">
+    </bean>
+
+    <!-- Metadatafield used to check against if it's already imported or not during the JSONLookupSearcher-->
+    <bean id="lookupID" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.other"/>
+    </bean>
 
 </beans>

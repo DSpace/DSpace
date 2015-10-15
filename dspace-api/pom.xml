@@ -682,6 +682,11 @@
             <artifactId>axiom-api</artifactId>
             <version>1.2.14</version>
         </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>2.9.1</version>
+        </dependency>
         <!-- S3 -->
         <dependency>
             <groupId>com.amazonaws</groupId>

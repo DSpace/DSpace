@@ -1,0 +1,32 @@
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<p>Showing records {{shownStart}}-{{shownCount}} of {{total}}</p>
+<ul class="publication-records-modal">
+    <li>
+        <ul>
+            {{#each records}}
+                <li {{#if record.[imported]}}class="imported"{{/if}}>
+                    {{#each record.[dc.title]}}
+                        {{#ifCond @index "==" 0}}<span class="bold">{{this}}</span> {{/ifCond}}
+                    {{/each}}
+                </li>
+                <li {{#if record.[imported]}}class="imported"{{/if}}>
+                    {{#each record.[dc.contributor.author]}}
+                        {{#ifCond @index "<" 5}} <span>{{this}}{{#unless @last}}, {{/unless}} </span>{{/ifCond}}
+                        {{#ifCond @index "==" 5}}...{{/ifCond}}
+                    {{/each}}
+                </li>
+                <li {{#if record.[imported]}}class="imported"{{/if}}>
+                    <button id="publication-records-import-{{record.[dc.identifier.other]}}" class="ds-button-field btn btn-default publication-records-import-btn float-right" name="import" type="submit">Import</button>
+                </li>
+            {{/each}}
+        </ul>
+    </li>
+</ul>
