@@ -58,8 +58,9 @@ public class AssociationAnywhere {
         Options options = new Options();
 
         options.addOption("i", "customer id", true, "customer id");
+        options.addOption("p", "data package id", false, "package id");
         options.addOption("u", "update credit", false, "update credit");
-        options.addOption("d", "deduct credit", false, "deduct credit");
+        options.addOption("t", "tally credit", false, "tally credit");
         options.addOption("l", "list customer", false, "list customer");
         CommandLine line = parser.parse(options, argv);
 
@@ -72,8 +73,8 @@ public class AssociationAnywhere {
                 updateConcept(context);
 
         }
-        else if(line.hasOption("d")){
-            deductCredit(line.getOptionValue("i"));
+        else if(line.hasOption("t")){
+            tallyCredit(line.getOptionValue("i"), line.getOptionValue("p"));
         }
         else if(line.hasOption("l")){
             System.out.print(printDocument(loadCustomerInfo(line.getOptionValue("i"))));
@@ -96,6 +97,10 @@ public class AssociationAnywhere {
 
     }
 
+    
+    /**
+       Returns the number of credits currently available for the given customer.
+     **/
     private static String getCredit(String customerId)
             throws Exception
     {
@@ -104,7 +109,7 @@ public class AssociationAnywhere {
 
             String requestUrl =  ConfigurationManager.getProperty("association.anywhere.url")
                     + "/CENCREDWEBSVCLIB.GET_CREDITS_XML?p_input_xml_doc="
-                    + URLEncoder.encode(createRequest(customerId,"load-credit"));
+		+ URLEncoder.encode(createRequest(customerId,"sync credits", "load-credit"));
 	    log.debug("AA URL is " + requestUrl);
             HttpClient client = new HttpClient();
             GetMethod get = new GetMethod(requestUrl);
@@ -141,8 +146,8 @@ public class AssociationAnywhere {
         try {
 
             String requestUrl =  ConfigurationManager.getProperty("association.anywhere.url")
-                    + "/CENSSAWEBSVCLIB.GET_CUST_INFO_XML?p_input_xml_doc="
-                    + URLEncoder.encode(createRequest(customerId,"customer-info"));
+		+ "/CENSSAWEBSVCLIB.GET_CUST_INFO_XML?p_input_xml_doc="
+		+ URLEncoder.encode(createRequest(customerId,"load customer info", "customer-info"));
 	    log.debug("AA URL is " + requestUrl);
             HttpClient client = new HttpClient();
             GetMethod get = new GetMethod(requestUrl);
@@ -169,7 +174,7 @@ public class AssociationAnywhere {
      * @return status of response.
      * @throws AssociationAnywhereException
      */
-    public static String deductCredit(String customerId) throws AssociationAnywhereException {
+    public static String tallyCredit(String customerId, String dataPackageID) throws AssociationAnywhereException {
         log.debug("deducting one credit for customerId " + customerId);
         
         if("test".equals(customerId))
@@ -181,8 +186,8 @@ public class AssociationAnywhere {
 
         try {
             String requestUrl =  ConfigurationManager.getProperty("association.anywhere.url")
-                    + "/CENCREDWEBSVCLIB.INS_CREDIT_XML?p_input_xml_doc="
-                    + URLEncoder.encode(createRequest(customerId,"update-credit"));
+		+ "/CENCREDWEBSVCLIB.INS_CREDIT_XML?p_input_xml_doc="
+		+ URLEncoder.encode(createRequest(customerId, dataPackageID, "update-credit"));
 	    log.debug("AA URL is " + requestUrl);
             HttpClient client = new HttpClient();
             GetMethod get = new GetMethod(requestUrl);
@@ -253,6 +258,13 @@ public class AssociationAnywhere {
     }
 
     /**
+       Retrieve the type of payment plan being used by the customer.
+     **/ 
+    private String getCustomerPlanType(String customerId) {
+	return "Error getCustomerPlanType";
+    }
+
+    /**
      * Update Credit for a specific customer id.
      * @param customerId
      * @throws Exception
@@ -280,7 +292,7 @@ public class AssociationAnywhere {
             {
                 //set journal.submissionPaid=true and journal paymentPlanType=subscription
                 changeConceptMetadataValue(concept,"subscriptionPaid","true");
-                changeConceptMetadataValue(concept,"paymentPlanType","subscription");
+                changeConceptMetadataValue(concept,"paymentPlanType", JournalUtils.SUBSCRIPTION_PLAN);
             }
             else
             {
@@ -296,7 +308,7 @@ public class AssociationAnywhere {
             {
                 //set submissionPaid=true and paymentPlanType=deferred
                 changeConceptMetadataValue(concept,"subscriptionPaid","true");
-                changeConceptMetadataValue(concept,"paymentPlanType","deferred");
+                changeConceptMetadataValue(concept,"paymentPlanType", JournalUtils.DEFERRED_PLAN);
             }
             else
             {
@@ -309,9 +321,9 @@ public class AssociationAnywhere {
         {
             if(credit!=null&&Integer.parseInt(credit)>0)
             {
-                //set submissionPaid=true and paymentPlanType=null
+                //set as a prepaid journal
                 changeConceptMetadataValue(concept,"subscriptionPaid","true");
-                changeConceptMetadataValue(concept,"paymentPlanType","");
+                changeConceptMetadataValue(concept,"paymentPlanType", JournalUtils.PREPAID_PLAN);
             }
             else
             {
@@ -357,25 +369,41 @@ public class AssociationAnywhere {
 
     static SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
-    private static String createRequest(String customerId, String form)
+    private static String createRequest(String customerId, String transactionDescription, String form)
     {
         try {
-            if(template == null)
+            if(template == null) {
                 template = TransformerFactory.newInstance().newTemplates(new StreamSource(AssociationAnywhere.class.getResourceAsStream("/anywhere/request-templates.xsl")));
-
+	    }
             Transformer transformer = template.newTransformer();
             transformer.setParameter("username",ConfigurationManager.getProperty("association.anywhere.username"));
             transformer.setParameter("password", ConfigurationManager.getProperty("association.anywhere.password"));
             transformer.setParameter("customerId", customerId);
             transformer.setParameter("date", dateFormat.format(new Date()));
+	    transformer.setParameter("transactionDescription", transactionDescription);
+
+	    Concept concept = JournalUtils.getJournalConceptByCustomerId(customerId);
+	    if(concept != null) {
+		String transactionType = JournalUtils.getPaymentPlanType(concept);
+		if (transactionType != null) {
+		    transformer.setParameter("transactionType", transactionType);
+		}
+	    }
+	    
+
+	    String creditsAccepted = "1";
+	    if(transactionType.equals(JournalUtils.PREPAID_PLAN)) {
+		creditsAccepted = "-1";
+	    }
+            transformer.setParameter("creditsAccepted", creditsAccepted);
 
             StringWriter writer = new StringWriter();
             transformer.transform(new StreamSource(new StringReader("<" + form + "/>")),new StreamResult(writer));
             return writer.toString();
         } catch (TransformerConfigurationException e) {
-            log.error(e.getMessage(), e);
+            log.error("Unable to generate request URL", e);
         } catch (TransformerException e) {
-            log.error(e.getMessage(), e);
+            log.error("Unable to generate request URL", e);
         }
         return null;
     }

@@ -81,7 +81,7 @@ public class FinalPaymentAction extends ProcessingAction {
 	    // if journal-based subscription is in place, transaction is paid
 	    if(shoppingCart.getJournalSub()) {
 		log.info("processed journal subscription for Item " + itemID + ", journal = " + shoppingCart.getJournal());
-        log.debug("deduct credit from journal = "+shoppingCart.getJournal());
+        log.debug("tally credit for journal = " + shoppingCart.getJournal());
         String success = "";
         Scheme scheme = Scheme.findByIdentifier(c,ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName"));
         Concept[] concepts = Concept.findByPreferredLabel(c,shoppingCart.getJournal(),scheme.getID());
@@ -89,7 +89,7 @@ public class FinalPaymentAction extends ProcessingAction {
             AuthorityMetadataValue[] metadataValues = concepts[0].getMetadata("journal", "customerId", null, Item.ANY);
             if(metadataValues!=null&&metadataValues.length>0){
                 try{
-                    success = AssociationAnywhere.deductCredit(metadataValues[0].value);
+                    success = AssociationAnywhere.tallyCredit(metadataValues[0].value, itemID);
                     shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
                     Date date= new Date();
                     shoppingCart.setPaymentDate(date);
@@ -99,7 +99,7 @@ public class FinalPaymentAction extends ProcessingAction {
                 }catch (Exception e)
                 {
                     log.error(e.getMessage(),e);
-                    sendPaymentErrorEmail(c, wfi, shoppingCart,"problem: credit not deducted successfully. \\n \\n " + e.getMessage());
+                    sendPaymentErrorEmail(c, wfi, shoppingCart,"problem: credit not tallied successfully. \\n \\n " + e.getMessage());
                     return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, 2);
                 }
             }

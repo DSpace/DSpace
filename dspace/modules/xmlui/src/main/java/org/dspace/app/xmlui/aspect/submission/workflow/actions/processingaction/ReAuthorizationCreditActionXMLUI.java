@@ -65,12 +65,12 @@ public class ReAuthorizationCreditActionXMLUI extends AbstractXMLUIAction {
             mainDiv.addPara(success);
             if(shoppingCart!=null&&!shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED))
             {
-                mainDiv.addPara().addContent("NOTE : click the credit button will deduct your credit.");
+                mainDiv.addPara().addContent("NOTE : click the credit button will tally your credit.");
                 mainDiv.addList("submit-credit").addItem().addButton("submit-credit").setValue("Re-submit Credit");
             }
             else
             {
-                mainDiv.addPara().addContent("NOTE : credit already deducted ,click skip button to submit the item.");
+                mainDiv.addPara().addContent("NOTE : credit already tallied, click skip button to submit the item.");
                 mainDiv.addList("submit-next").addItem().addButton("submit-credit-next").setValue("Skip resubmit credit");
             }
 
@@ -98,7 +98,7 @@ public class ReAuthorizationCreditActionXMLUI extends AbstractXMLUIAction {
             // if journal-based subscription is in place, transaction is paid
             if(!shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)&&shoppingCart.getJournalSub()) {
                 log.info("processed journal subscription for Item " + item.getHandle() + ", journal = " + shoppingCart.getJournal());
-                log.debug("deduct credit from journal = "+shoppingCart.getJournal());
+                log.debug("tally credit for journal = "+shoppingCart.getJournal());
 
                 Scheme scheme = Scheme.findByIdentifier(context, ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName"));
                 Concept[] concepts = Concept.findByPreferredLabel(context,shoppingCart.getJournal(),scheme.getID());
@@ -106,7 +106,7 @@ public class ReAuthorizationCreditActionXMLUI extends AbstractXMLUIAction {
                     AuthorityMetadataValue[] metadataValues = concepts[0].getMetadata("internal", "journal", "customerId", Item.ANY);
                     if(metadataValues!=null&&metadataValues.length>0){
                         try{
-                            success = AssociationAnywhere.deductCredit(metadataValues[0].value);
+                            success = AssociationAnywhere.tallyCredit(metadataValues[0].value, item.getID());
                             shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
                             Date date= new Date();
                             shoppingCart.setPaymentDate(date);
@@ -115,7 +115,7 @@ public class ReAuthorizationCreditActionXMLUI extends AbstractXMLUIAction {
 
                         }catch (Exception e)
                         {
-                            sendPaymentErrorEmail(context, workflowItem, shoppingCart,"problem: credit not deducted successfully. \\n \\n " + e.getMessage());
+                            sendPaymentErrorEmail(context, workflowItem, shoppingCart,"problem: credit not tallied successfully. \\n \\n " + e.getMessage());
                             log.error(e.getMessage());
                             return e.getMessage();
                         }

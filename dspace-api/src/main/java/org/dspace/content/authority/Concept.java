@@ -444,18 +444,20 @@ public class Concept extends AuthorityObject
      *
      * @return the named Concept, or null if not found
      */
+    public static ArrayList<Concept> findByJournalID(Context context, String journalID) throws SQLException, AuthorizeException {
+	// TODO: call the method below using  journalID.toUpperCase(), "journal, "journalID
 
-    public static ArrayList<Concept> findByJournalID(Context context, String journalID)
+    }
+
+    public static ArrayList<Concept> findByJournalID(Context context, String searchString, String schema, String element)
             throws SQLException, AuthorizeException
     {
         ArrayList<Concept> concepts = new ArrayList<Concept>();
-        String schema = "journal";
-        String element = "journalID";
         MetadataSchema mds = MetadataSchema.find(context, schema);
         MetadataField mdf = MetadataField.findByElement(context, mds.getSchemaID(), element, null);
-        journal_field_id = mdf.getFieldID();
+        target_field_id = mdf.getFieldID();
         log.info ("journal field id is " + journal_field_id);
-        TableRowIterator row = DatabaseManager.query(context, "select c.* from concept as c, conceptmetadatavalue as cmv where upper(cmv.text_value) = ? and cmv.parent_id = c.id and cmv.field_id = ?;", journalID.toUpperCase(), journal_field_id);
+        TableRowIterator row = DatabaseManager.query(context, "select c.* from concept as c, conceptmetadatavalue as cmv where upper(cmv.text_value) = ? and cmv.parent_id = c.id and cmv.field_id = ?;", searchString, target_field_id);
 
         if (row == null)
         {
