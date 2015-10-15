@@ -421,7 +421,16 @@
             testChunks: true,
             throttleProgressCallbacks:1,
             method: "multipart",
-            query:{workspace_item_id:'<%= subInfo.getSubmissionItem().getID()%>'}
+            <%
+            if (subInfo.isInWorkflow())
+            {
+            %>
+                query:{workflow_id:'<%= subInfo.getSubmissionItem().getID()%>'}
+            <%
+            } else {
+            %>
+                query:{workspace_item_id:'<%= subInfo.getSubmissionItem().getID()%>'}
+            <%}%>
           });
         // Resumable.js isn't supported, fall back on a different method
 
