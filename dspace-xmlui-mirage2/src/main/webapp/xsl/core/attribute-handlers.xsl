@@ -209,6 +209,7 @@
                     </xsl:if>
 
                 </div>
+                <ul class="ds-artifact-list list-unstyled"></ul>
             </xsl:when>
             <xsl:when test=". = 'masked'">
                 <div class="pagination-masked clearfix {$position}">
