@@ -68,7 +68,7 @@
 	<xsl:template name="buildHome">
 
 		<div class="row">
-			<div class="col-md-7" id="welcome-panel">
+			<div class="col-md-7 hidden-xs" id="welcome-panel">
 				<div class="bs-callout bs-callout-info">
 					<xsl:for-each select="dri:div[@n='news']">
 						<!-- <h1><xsl:copy-of select="dri:head" /></h1> -->
@@ -76,9 +76,9 @@
 					</xsl:for-each>
 				</div>
 			</div>
-			<div class="col-md-5 hidden-xs">
+			<div class="col-md-5 hidden-xs hidden-sm">
 				<xsl:call-template name="build-img">
-					<xsl:with-param name="img.src">images/provincia.png</xsl:with-param>
+					<xsl:with-param name="img.src">images/decorativa.png</xsl:with-param>
 				</xsl:call-template>
 			</div>
 		</div>
@@ -92,9 +92,13 @@
 				   <label for="q">
 				   		<i18n:text>xmlui.cicdigital.home.explore</i18n:text>
 				   </label>
-				    <div>
-				    	<input type="text" name="query" class="form-control" autofocus="true" size="30" placeholder="Ingrese su búsqueda ..."/>
-					    <button type="submit" name="lr" class="btn btn-link"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+				    <div class="container">
+				    	<div class="col-xs-10 col-sm-11">
+					    	<input type="text" name="query" class="form-control" size="30" placeholder="Ingrese su búsqueda ..."/>
+					    </div>
+					    <div class="col-xs-2 col-sm-1" id="lupa-button">
+						    <button type="submit" name="lr" class="btn btn-link"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+						</div>
 					</div>
 				</form>
 				<div id="home-browse-bar">
@@ -106,7 +110,7 @@
 									<xsl:with-param name="path">/browse?type=author</xsl:with-param>
 								</xsl:call-template>
 							</xsl:attribute>
-							<i18n:text>xmlui.ArtifactBrowser.Navigation.head_browse</i18n:text><xsl:text> </xsl:text><i18n:text>xmlui.ArtifactBrowser.CollectionViewer.browse_authors</i18n:text>
+							<div class="hidden-xs"><i18n:text>xmlui.ArtifactBrowser.Navigation.head_browse</i18n:text></div><xsl:text> </xsl:text><i18n:text>xmlui.ArtifactBrowser.CollectionViewer.browse_authors</i18n:text>
 						</a>
 						<a class="btn" role="button">
 							<xsl:attribute name="href">
@@ -114,7 +118,7 @@
 									<xsl:with-param name="path">/handle/123456789/3</xsl:with-param>
 								</xsl:call-template>
 							</xsl:attribute>
-							<i18n:text>xmlui.ArtifactBrowser.Navigation.head_browse</i18n:text><xsl:text> </xsl:text><i18n:text>xmlui.cicdigital.home.centros</i18n:text>
+							<div class="hidden-xs"><i18n:text>xmlui.ArtifactBrowser.Navigation.head_browse</i18n:text></div><xsl:text> </xsl:text><i18n:text>xmlui.cicdigital.home.centros</i18n:text>
 						</a>
 						<a class="btn" role="button">
 							<xsl:attribute name="href">
@@ -160,7 +164,7 @@
 
 				</xsl:for-each>
 			</div>
-			<div class="col-md-5">
+			<div class="col-md-5 hidden-xs">
 				<xsl:call-template name="build-img">
 					<xsl:with-param name="img.src">images/generica_72.png</xsl:with-param>
 				</xsl:call-template>
@@ -174,37 +178,14 @@
 	<xsl:template name="buildTrail">
 
 		<div class="row" id="cic-trail">
-			<ol class="breadcrumb">
-				<xsl:choose>
-					<!-- Static pages trail -->
-					<!-- <xsl:when test="starts-with($request-uri, 'page/')">
-						<li>
-							<xsl:call-template name="build-anchor">
-								<xsl:with-param name="a.href">
-									/
-								</xsl:with-param>
-								<xsl:with-param name="a.value">
-									<i18n:text>xmlui.general.dspace_home</i18n:text>
-								</xsl:with-param>
-							</xsl:call-template>
-						</li>
-						<li class="active">
-							<i18n:text>
-								<xsl:value-of
-									select="concat('xmlui.cicdigital.trail.',substring-after($request-uri,'/'))" />
-							</i18n:text>
-						</li>
-					</xsl:when> -->
-					
-					<!-- Dynamic pages trail -->
-					<xsl:when
-						test="count(/dri:document/dri:meta/dri:pageMeta/dri:trail/@target) > 0">
+			<xsl:choose>
+				<!-- Dynamic pages trail -->
+				<xsl:when test="count(/dri:document/dri:meta/dri:pageMeta/dri:trail/@target) > 0">
+					<ol class="breadcrumb">
 						<xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:trail">
-
 							<!-- Solo se imprimen los elementos con un target y se omite el primer 
 								trail correspondiente al inicio -->
-							<xsl:if
-								test="@target and . != /dri:document/dri:meta/dri:pageMeta/dri:trail[1]">
+							<xsl:if test="@target and . != /dri:document/dri:meta/dri:pageMeta/dri:trail[1]">
 								<li>
 									<a>
 										<xsl:attribute name="href"><xsl:value-of
@@ -214,12 +195,12 @@
 								</li>
 							</xsl:if>
 						</xsl:for-each>
-					</xsl:when>
-					<xsl:otherwise>
-						<!-- No se muestra nada porque estamos en el home -->
-					</xsl:otherwise>
-				</xsl:choose>
-			</ol>
+					</ol>
+				</xsl:when>
+				<xsl:otherwise>
+					<div id="invisible">a</div>
+				</xsl:otherwise>
+			</xsl:choose>
 		</div>
 	</xsl:template>
 </xsl:stylesheet>

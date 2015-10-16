@@ -52,18 +52,25 @@
 		<div class="row" id="cic-menu">
 			<nav class="navbar navbar-inverse" role="navigation">
 				<div class="container-fluid">
+				<div class="row">
 					<div class="navbar-header" id="navbar-brand-dspace">
-				      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-				        <span class="sr-only">Toggle navigation</span>
-				        
-					      <xsl:call-template name="build-img">
-					      	<xsl:with-param name="img.src">images/dspace-logo-only.png</xsl:with-param>
-					      	<xsl:with-param name="img.alt">DSpace</xsl:with-param>
-					      </xsl:call-template>
-				      </button>
-				      <a class="navbar-brand visible-xs" href="#">
-				      	Repositorio CIC-DIGITAL
-					  </a>
+				      <div class="col-xs-2">
+					      <div class="row">
+						      <button type="button" id="navbar-toggle-button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-label="menu">
+						        <span class="sr-only">Toggle navigation</span>
+						        <span class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></span>
+		<!-- 					      <xsl:call-template name="build-img"> -->
+		<!-- 					      	<xsl:with-param name="img.src">images/dspace-logo-only.png</xsl:with-param> -->
+		<!-- 					      	<xsl:with-param name="img.alt">DSpace</xsl:with-param> -->
+		<!-- 					      </xsl:call-template> -->
+						      </button>
+					      </div>
+				      </div>
+<!-- 				      <div class="col-xs-9 col-xs-pull-3"> -->
+<!-- 				      <a class="navbar-brand visible-xs" href="#"> -->
+<!-- 				      	Repositorio CIC-DIGITAL -->
+<!-- 					  </a> -->
+<!-- 					  </div> -->
 				    </div>
 					<!-- Collect the nav links, forms, and other content for toggling -->
  					<div id="bs-example-navbar-collapse-1" class="collapse navbar-collapse" >
@@ -214,6 +221,7 @@
 						</ul>
 						
 					</div><!-- /.navbar-collapse -->
+				</div>
 				</div><!-- /.container-fluid -->
 			</nav>
 		</div>
@@ -299,19 +307,19 @@
 		<div id="cic-header" class="row">
 		
 			
-			<div id="logo-cic-digital" class="col-xs-12 col-md-3">
+			<div id="logo-cic-digital" class="col-xs-12 col-sm-3 col-md-3">
 				<xsl:call-template name="build-anchor">
-					<xsl:with-param name="img.src">images/logo_CIC_DIGITAL.png</xsl:with-param>
+					<xsl:with-param name="img.src">images/Header_cic.png</xsl:with-param>
 					<xsl:with-param name="img.alt">CIC-DIGITAL</xsl:with-param>
 				</xsl:call-template>
 			</div><!-- 
-			 --><div id="banner-cic-digital"  class="hidden-xs col-md-6">
+			 --><div id="banner-cic-digital"  class="hidden-xs col-sm-7 col-md-7">
 				<div class="">Repositorio de la Comisión de Investigaciones Científicas</div>
 				<small>Ministerio de Producción, Ciencia y Tecnología</small>
 			</div><!-- 
-			 --><div id="logo-ba" class="hidden-xs col-md-3">
+			 --><div id="logo-ba" class="hidden-xs col-sm-2 col-md-2">
 				<xsl:call-template name="build-img">
-					<xsl:with-param name="img.src">images/logo_BA.png</xsl:with-param>
+					<xsl:with-param name="img.src">images/scioli.png</xsl:with-param>
 					<xsl:with-param name="img.alt">Buenos Aires</xsl:with-param>
 				</xsl:call-template>
 			</div>
