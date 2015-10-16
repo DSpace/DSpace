@@ -7,9 +7,7 @@
 
     xmlns:xalan="http://xml.apache.org/xalan"
     xmlns:java="http://xml.apache.org/xalan/java"
-     
     xmlns:encoder="xalan://java.net.URLEncoder"
-    
 	xmlns:helper="ar.edu.unlp.sedici.dspace.util.HelperFunctions" 
 	xmlns:confman="org.dspace.core.ConfigurationManager"
     xmlns:math="http://exslt.org/math"
@@ -54,6 +52,7 @@
 		<xsl:param name="anchor"></xsl:param>
 		<xsl:param name="isDate"></xsl:param>
 		<xsl:param name="editor">False</xsl:param>
+		<xsl:param name="reduced">False</xsl:param>
 		<xsl:param name="local_browse_type"></xsl:param>
 
 		<xsl:for-each select="$nodes">
@@ -68,7 +67,7 @@
 								<xsl:choose>
 									<xsl:when test="@authority!=''">
 										<xsl:call-template name="build-anchor">
-											<xsl:with-param name="a.href" select="concat('http://digital.cic.gba.gob.ar/browse?authority=', @authority, '&amp;', 'type=', $local_browse_type)"/>
+											<xsl:with-param name="a.href" select="concat('http://digital.cic.gba.gob.ar/browse?authority=', encoder:encode(@authority), '&amp;', 'type=', $local_browse_type)"/>
 											<xsl:with-param name="a.value" select="text()"/>
 										</xsl:call-template>
 									</xsl:when>
@@ -95,6 +94,10 @@
 							<xsl:call-template name="cambiarFecha" >
 									<xsl:with-param name="isDate" select="$isDate"></xsl:with-param>									
 							</xsl:call-template>
+					</xsl:when>
+					<xsl:when test="($editor='True') and ($reduced='True')">
+						<xsl:value-of select="substring(text(),1,200)" disable-output-escaping="yes"/>
+						<xsl:value-of select="concat(substring-before(substring(text(),200,300),'.'), '.')" disable-output-escaping="yes"/>
 					</xsl:when>
 					<xsl:when test="$editor='True'">
 						<xsl:value-of select="text()" disable-output-escaping="yes"/>
@@ -148,6 +151,7 @@
 		<xsl:param name="null_message"></xsl:param>
 		<xsl:param name="isDate"></xsl:param>
 		<xsl:param name="editor">False</xsl:param>
+		<xsl:param name="reduced"></xsl:param>
 		<xsl:param name="local_browse_type"></xsl:param>
 				
 		<xsl:variable name="mp" select="str:split($field,'.')" />
@@ -179,6 +183,7 @@
 								<xsl:with-param name="nodes" select="$nodes"/>
 								<xsl:with-param name="isDate" select="$isDate"/>
 								<xsl:with-param name="anchor" select="$is_linked_authority"/>
+								<xsl:with-param name="reduced" select="$reduced"/>
 								<xsl:with-param name="editor" select="$editor"/>
 								<xsl:with-param name="local_browse_type" select="$local_browse_type"/>
 							</xsl:call-template>
@@ -197,8 +202,8 @@
 	
     <xsl:template name="itemSummaryView-DIM">
     	<xsl:for-each select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim">
-	    	<div class="row item-head">
-		    	<div class="col-md-12">
+	    	<div class="row item-head, col-md-12">
+		    	<div class="col-md-8 col-md-push-3">
 			    	<xsl:call-template name="render-metadata">
 			    		<xsl:with-param name="field" select="'dc.type'" />
 			    		<xsl:with-param name="show_label" select="'false'" />
@@ -224,11 +229,18 @@
 		    		</xsl:call-template>
 		    		
 				</div>
+				<div class="col-md-1 col-md-push-3 hidden-xs hidden-sm year-box">
+	    			<label id="año"><i18n:text>xmlui.ArtifactBrowser.ItemViewer.year</i18n:text><h3><xsl:value-of select="substring(//mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@mdschema='dcterms'][@element='issued']/text(), 1, 4)"></xsl:value-of></h3></label>
+	    		</div>
+	    		<div class="col-md-1 col-md-push-3 visible-xs visible-sm year-box" id="year-box-small">
+	    			<label id="año"><i18n:text>xmlui.ArtifactBrowser.ItemViewer.year</i18n:text>: <xsl:value-of select="substring(//mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@mdschema='dcterms'][@element='issued']/text(), 1, 4)"></xsl:value-of></label>
+	    		</div>
+	    		
 	    	</div>
 	    </xsl:for-each>
     	
     	<div class="row">
-	    	<div class="col-md-9">
+	    	<div class="col-md-9 col-md-push-3">
 	    	
 	    <!-- Generate the info about the item from the metadata section -->
 		        <xsl:apply-templates select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim"
@@ -236,7 +248,8 @@
 		    	
 		    	
 	    	</div>
-	    	<div class="col-md-3">
+	    	
+	    	<div class="col-md-3 col-md-pull-9" id="thumbnail-container">
 	    	
 	    		<!-- Advertencia de embargo (por ahora esta deshabilitado) -->
 				<xsl:if test="has-embargo">
@@ -249,7 +262,7 @@
 					</div>
 				</xsl:if>
 				
-				<div class="item-preview">
+				<div class="item-preview  hidden-xs">
 					 <xsl:variable name="thumbnail_file" select="./mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/mets:file[1]"/>
 					 <xsl:call-template name="build-anchor">
 						<xsl:with-param name="a.href"><xsl:value-of select="./mets:fileSec/mets:fileGrp[@USE='CONTENT']/mets:file[position()=1]/mets:FLocat/@xlink:href"/></xsl:with-param>
@@ -417,12 +430,48 @@
 		<xsl:variable name="abstract" select="./dim:field[@mdschema='dcterms' and @element='abstract']"/>
        	<xsl:if test="$abstract != ''">
 	       	<div class="row">
-	       		<div class="col-md-12">
-	       		<xsl:call-template name="render-metadata">
-					<xsl:with-param name="field" select="'dcterms.abstract'" />
-					<xsl:with-param name="separator" select="''" />
-					<xsl:with-param name="editor">True</xsl:with-param>
-				</xsl:call-template>
+	       		<script>
+	       			function swap(show, hide){
+	       				document.getElementById(show).style.display = 'block';
+	       				document.getElementById(hide).style.display = 'none';
+	       			}
+	     			
+	       			function show_more(){
+	       				if (document.getElementById("abstract-xs-short")) {
+	       					swap("abstract-xs-long", "abstract-xs-short");
+	       					swap("show-less-btn", "show-more-btn");
+	       				}
+	       			}
+	       			function show_less(){
+	       				if (document.getElementById("abstract-xs-long")) {
+	       					swap("abstract-xs-short", "abstract-xs-long")
+	       					swap("show-more-btn", "show-less-btn");
+	       				}
+	       			}
+	       		</script>
+	       		
+	       		<div class="col-md-12" id="abstract-xs-short">	       		
+		       		<xsl:call-template name="render-metadata">
+						<xsl:with-param name="field" select="'dcterms.abstract'" />
+						<xsl:with-param name="separator" select="''" />
+						<xsl:with-param name="reduced">True</xsl:with-param>
+						<xsl:with-param name="editor">True</xsl:with-param>
+					</xsl:call-template>
+	      		</div>
+	       		<div class="col-md-12" id="abstract-xs-long">	       		
+		       		<xsl:call-template name="render-metadata">
+						<xsl:with-param name="field" select="'dcterms.abstract'" />
+						<xsl:with-param name="separator" select="''" />
+						<xsl:with-param name="editor">True</xsl:with-param>
+					</xsl:call-template>
+	      		</div>
+	      		<div class="col-xs-4 col-xs-push-7">
+					<div class="view-btn" id="show-more-btn">
+		      			<a id="toggle-view-btn" onClick="show_more()"><i18n:text>xmlui.ArtifactBrowser.ItemViewer.show_more</i18n:text></a>
+		      		</div> 
+		      		<div class="view-btn" id="show-less-btn">
+		      			<a id="toggle-view-btn" onClick="show_less()"><i18n:text>xmlui.ArtifactBrowser.ItemViewer.show_less</i18n:text></a>
+		      		</div> 
 	      		</div>
 	      	</div>
       	</xsl:if>
@@ -503,13 +552,13 @@
 						<xsl:with-param name="is_linked_authority" select="'true'"/>
 					</xsl:call-template>
 					<xsl:call-template name="render-metadata">
+						<xsl:with-param name="field" select="'dcterms.isPartOf.series'" />
+						<xsl:with-param name="container" select="'li'" />
+					</xsl:call-template>
+					<xsl:call-template name="render-metadata">
 						<xsl:with-param name="field" select="'dcterms.isPartOf.issue'" />
 						<xsl:with-param name="container" select="'li'" />
 						<xsl:with-param name="is_linked_authority" select="'true'"/>
-					</xsl:call-template>
-					<xsl:call-template name="render-metadata">
-						<xsl:with-param name="field" select="'dcterms.isPartOf.series'" />
-						<xsl:with-param name="container" select="'li'" />
 					</xsl:call-template>
 					<xsl:call-template name="render-metadata">
 						<xsl:with-param name="field" select="'dcterms.identifier.isbn'" />

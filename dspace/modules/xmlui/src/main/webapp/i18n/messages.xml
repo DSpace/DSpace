@@ -269,6 +269,7 @@
 	<message key="xmlui.ArtifactBrowser.FeedbackSent.para1">Your comments have been received.</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.ItemViewer.java -->
+	<message key="xmlui.ArtifactBrowser.ItemViewer.year">Year</message>
 	<message key="xmlui.ArtifactBrowser.ItemViewer.trail">View Item</message>
 	<message key="xmlui.ArtifactBrowser.ItemViewer.head_parent_collections">This item appears in the following Collection(s)</message>
 	<message key="xmlui.ArtifactBrowser.ItemViewer.show_simple">Show simple item record</message>
@@ -278,6 +279,9 @@
 	<message key="xmlui.ArtifactBrowser.ItemViewer.specific_info">Specific Information</message>
 	<message key="xmlui.ArtifactBrowser.ItemViewer.other_info">Another data</message>
 	<message key="xmlui.ArtifactBrowser.ItemViewer.file">{0} file</message>
+	
+	<message key="xmlui.ArtifactBrowser.ItemViewer.show_more">read more</message>
+	<message key="xmlui.ArtifactBrowser.ItemViewer.show_less">read less</message>
 
         <message key="xmlui.ArtifactBrowser.ItemViewer.withdrawn">This item has been withdrawn and is no longer available.</message>
 
