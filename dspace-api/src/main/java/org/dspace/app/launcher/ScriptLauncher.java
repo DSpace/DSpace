@@ -215,12 +215,12 @@ public class ScriptLauncher
                 Object[] arguments = {useargs};
 
                 // Useful for debugging, so left in the code...
-                /**System.out.print("About to execute: " + className);
+                System.out.print("About to execute: " + className);
                 for (String param : useargs)
                 {
                     System.out.print(" " + param);
                 }
-                System.out.println("");**/
+                System.out.println("");
 
                 Method main = target.getMethod("main", argTypes);
                 main.invoke(null, arguments);
