@@ -382,8 +382,8 @@ public class DryadEmailSubmission extends HttpServlet {
 
             if ((manuscript != null) && (manuscript.isValid())) {
                 String filename = JournalUtils.escapeFilename(manuscript.manuscriptId + ".xml");
-                parser.writeManuscriptToXMLFile(new File(JournalUtils.getMetadataDir(concept), filename));
-                parser.writeManuscriptToDB();
+                JournalUtils.writeManuscriptToXMLFile(manuscript, new File(JournalUtils.getMetadataDir(concept), filename));
+                JournalUtils.writeManuscriptToDB(manuscript);
             } else {
                 throw new SubmissionException("Parser could not validly parse the message");
             }

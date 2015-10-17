@@ -1,9 +1,16 @@
 package org.dspace;
 
 import org.apache.log4j.Logger;
-import org.dspace.content.Item;
+import org.datadryad.rest.converters.ManuscriptToLegacyXMLConverter;
+import org.datadryad.rest.models.Manuscript;
+import org.datadryad.rest.models.Organization;
+import org.datadryad.rest.storage.StorageException;
+import org.datadryad.rest.storage.StoragePath;
+import org.datadryad.rest.storage.rdbms.ManuscriptDatabaseStorageImpl;
+import org.datadryad.rest.storage.rdbms.OrganizationDatabaseStorageImpl;
 import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
+import org.dspace.content.Item;
 import org.dspace.content.authority.AuthorityMetadataValue;
 import org.dspace.content.authority.Concept;
 import org.dspace.content.authority.Scheme;
@@ -11,10 +18,14 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.workflow.DryadWorkflowUtils;
 
+import javax.xml.bind.JAXBException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -461,6 +472,62 @@ public class JournalUtils {
 
     public static String cleanJournalCode(String journalCode) {
         return journalCode.replaceAll("[^a-zA-Z0-9]", "").toUpperCase();
+    }
+
+    public static void writeManuscriptToXMLFile(Manuscript manuscript, File file) {
+        FileOutputStream outputStream = null;
+        try {
+            outputStream = new FileOutputStream(file);
+        } catch (FileNotFoundException e) {
+            LOGGER.warn("couldn't open a file to write", e);
+        }
+
+        if (outputStream != null) {
+            try {
+                ManuscriptToLegacyXMLConverter.convertToInternalXML(manuscript, outputStream);
+                LOGGER.info("wrote xml to file " + file.getAbsolutePath());
+            } catch (JAXBException e) {
+                LOGGER.warn("couldn't convert to XML");
+            }
+        }
+    }
+
+    public static void writeManuscriptToDB(Manuscript manuscript) throws StorageException {
+        StoragePath storagePath = new StoragePath();
+        storagePath.addPathElement(Organization.ORGANIZATION_CODE, manuscript.organization.organizationCode);
+
+        // check to see if this organization exists in the database: if not, add it.
+        OrganizationDatabaseStorageImpl organizationStorage = new OrganizationDatabaseStorageImpl();
+        List<Organization> orgs = organizationStorage.getResults(storagePath, manuscript.organization.organizationCode, 0);
+        if (orgs.size() == 0) {
+            try {
+                LOGGER.info ("creating an organization " + manuscript.organization.organizationCode);
+                organizationStorage.create(storagePath, manuscript.organization);
+            } catch (StorageException ex) {
+                LOGGER.error("Exception creating organizations", ex);
+            }
+        }
+
+        ManuscriptDatabaseStorageImpl manuscriptStorage = new ManuscriptDatabaseStorageImpl();
+        storagePath.addPathElement(Manuscript.MANUSCRIPT_ID, manuscript.manuscriptId);
+        List<Manuscript> manuscripts = manuscriptStorage.getResults(storagePath, manuscript.manuscriptId, 10);
+
+        // if there isn't a manuscript already in the db, create it. Otherwise, update.
+        if (manuscripts.size() == 0) {
+            try {
+                manuscriptStorage.create(storagePath, manuscript);
+                LOGGER.info("adding manuscript " + manuscript.manuscriptId + " to the database for organization " + manuscript.organization.organizationCode);
+            } catch (StorageException ex) {
+                LOGGER.error("Exception creating manuscript", ex);
+            }
+        } else {
+            try {
+                manuscriptStorage.update(storagePath, manuscript);
+                LOGGER.info("updating manuscript " + manuscript.manuscriptId + " to the database for organization " + manuscript.organization.organizationCode);
+            } catch (StorageException ex) {
+                LOGGER.error("Exception updating manuscript", ex);
+            }
+        }
     }
 
 }

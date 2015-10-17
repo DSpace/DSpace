@@ -2,20 +2,10 @@ package org.datadryad.submission;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.datadryad.rest.converters.ManuscriptToLegacyXMLConverter;
 import org.datadryad.rest.models.Address;
 import org.datadryad.rest.models.Author;
 import org.datadryad.rest.models.Manuscript;
-import org.datadryad.rest.models.Organization;
-import org.datadryad.rest.storage.StorageException;
-import org.datadryad.rest.storage.StoragePath;
-import org.datadryad.rest.storage.rdbms.ManuscriptDatabaseStorageImpl;
-import org.datadryad.rest.storage.rdbms.OrganizationDatabaseStorageImpl;
 
-import javax.xml.bind.JAXBException;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -207,59 +197,6 @@ public class EmailParser {
         manuscript = ms;
     }
 
-    public void writeManuscriptToXMLFile(File file) {
-        FileOutputStream outputStream = null;
-        try {
-            outputStream = new FileOutputStream(file);
-        } catch (FileNotFoundException e) {
-            LOGGER.warn("couldn't open a file to write", e);
-        }
-
-        if (outputStream != null) {
-            try {
-                ManuscriptToLegacyXMLConverter.convertToInternalXML(manuscript, outputStream);
-                LOGGER.info("wrote xml to file " + file.getAbsolutePath());
-            } catch (JAXBException e) {
-                LOGGER.warn("couldn't convert to XML");
-            }
-        }
-    }
-
-    public void writeManuscriptToDB() throws StorageException {
-        StoragePath storagePath = new StoragePath();
-        storagePath.addPathElement(Organization.ORGANIZATION_CODE, manuscript.organization.organizationCode);
-
-        // check to see if this organization exists in the database: if not, add it.
-        OrganizationDatabaseStorageImpl organizationStorage = new OrganizationDatabaseStorageImpl();
-        List<Organization> orgs = organizationStorage.getResults(storagePath, manuscript.organization.organizationCode, 0);
-        if (orgs.size() == 0) {
-            try {
-                LOGGER.info ("creating an organization " + manuscript.organization.organizationCode);
-                organizationStorage.create(storagePath, manuscript.organization);
-            } catch (StorageException ex) {
-                LOGGER.error("Exception creating organizations", ex);
-            }
-        }
-
-        ManuscriptDatabaseStorageImpl manuscriptStorage = new ManuscriptDatabaseStorageImpl();
-        storagePath.addPathElement(Manuscript.MANUSCRIPT_ID, manuscript.manuscriptId);
-        List<Manuscript> manuscripts = manuscriptStorage.getResults(storagePath, manuscript.manuscriptId, 10);
-        if (manuscripts.size() == 0) {
-            try {
-                manuscriptStorage.create(storagePath, manuscript);
-                LOGGER.info("adding manuscript " + manuscript.manuscriptId + " to the database for organization " + manuscript.organization.organizationCode);
-            } catch (StorageException ex) {
-                LOGGER.error("Exception creating manuscript", ex);
-            }
-        } else {
-            try {
-                manuscriptStorage.update(storagePath, manuscript);
-                LOGGER.info("updating manuscript " + manuscript.manuscriptId + " to the database for organization " + manuscript.organization.organizationCode);
-            } catch (StorageException ex) {
-                LOGGER.error("Exception updating manuscript", ex);
-            }
-        }
-    }
 
     public static String parseEmailAddress(String emailString) {
         String email = emailString;
