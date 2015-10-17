@@ -52,7 +52,7 @@ public abstract class AutoWorkflowProcessor {
             }
             EPerson systemCurator = EPerson.findByEmail(c, email);
             if(systemCurator == null) {
-                throw new AutoWorkflowProcessorException("system.curator.account does not refer to an existing user.");
+                throw new AutoWorkflowProcessorException("system.curator.account " + email + " does not refer to an existing user.");
             }
             return systemCurator;
         } catch (AuthorizeException ex) {
