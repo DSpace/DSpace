@@ -162,6 +162,7 @@ public class EmailParser {
 
         manuscript.manuscript_abstract = (String) dataForXML.remove(ABSTRACT);
         String authorstring = (String) dataForXML.remove(AUTHORS);
+        LOGGER.debug ("parsing authorstring " + authorstring);
         manuscript.authors.author = parseAuthorList(authorstring);
 
         manuscript.dryadDataDOI = null;
@@ -255,6 +256,7 @@ public class EmailParser {
                 author.familyName = namepattern.group(2) + suffix;
             }
         }
+        LOGGER.debug("parsed " + author.givenNames + " " + author.familyName);
         return author;
     }
 

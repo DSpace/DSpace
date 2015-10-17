@@ -25,7 +25,6 @@ import java.util.*;
 public class DryadGmailService {
     private static final Logger LOGGER = Logger.getLogger(DryadGmailService.class);
     private static final String SCOPE = "https://www.googleapis.com/auth/gmail.modify";
-    private static final String APP_NAME = "Dryad Email Authorization";
 
     private static String myUserID;
     private GoogleClientSecrets myClientSecrets;
@@ -76,9 +75,15 @@ public class DryadGmailService {
     }
 
     public void authorize (String code) {
+        try {
+        myAuthCodeFlow = new GoogleAuthorizationCodeFlow.Builder(myHttpTransport, myJsonFactory, myClientSecrets, Arrays.asList(SCOPE))
+                .setDataStoreFactory(myDataStoreFactory)
+                .setAccessType("offline")
+                .setApprovalPrompt("force")
+                .addRefreshListener(new DataStoreCredentialRefreshListener(getMyUserID(),myDataStoreFactory))
+                .build();
         GoogleAuthorizationCodeTokenRequest codeTokenRequest = myAuthCodeFlow.newTokenRequest(code);
 
-        try {
             GoogleTokenResponse response = codeTokenRequest.setRedirectUri(GoogleOAuthConstants.OOB_REDIRECT_URI).execute();
             myCredential = myAuthCodeFlow.createAndStoreCredential(response, getMyUserID());
         } catch (IOException e) {
