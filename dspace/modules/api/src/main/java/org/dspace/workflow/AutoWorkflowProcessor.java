@@ -47,9 +47,12 @@ public abstract class AutoWorkflowProcessor {
     static EPerson getSystemCurator(Context c)  throws AutoWorkflowProcessorException, SQLException {
         try {
             String email = ConfigurationManager.getProperty("workflow", "system.curator.account");
+            if (email == null) {
+                throw new AutoWorkflowProcessorException("system.curator.account is not present in config/modules/workflow.cfg.");
+            }
             EPerson systemCurator = EPerson.findByEmail(c, email);
             if(systemCurator == null) {
-                throw new AutoWorkflowProcessorException("system.curator.email is not present in config/workflow.cfg or does not refer to an existing user.");
+                throw new AutoWorkflowProcessorException("system.curator.account does not refer to an existing user.");
             }
             return systemCurator;
         } catch (AuthorizeException ex) {
