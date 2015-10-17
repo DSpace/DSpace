@@ -64,7 +64,7 @@ public class EmailParserTest extends TestCase{
     
     @Test
     public void testProcessAuthorList() {
-        List<Author> test1 = EmailParser.parseAuthorList("Pawel Lichocki; Danesh Tarapore, Dr.; Laurent Keller, Prof.; Dario Floreano, Prof.");
+        List<Author> test1 = EmailParser.parseAuthorList("Pawel Lichocki; Dr. Danesh Tarapore; Laurent Keller, PhD; Dario Floreano, Ph.D.");
         assertNotNull(test1);
         assertEquals(4,test1.size());
         assertEquals("Lichocki, Pawel",test1.get(0).fullName());
