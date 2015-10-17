@@ -407,10 +407,10 @@ public class DryadEmailSubmission extends HttpServlet {
 
                     if (approved != null) {
                         try {
-                            if (Manuscript.dryadDataDOI != null) {
-                                ApproveRejectReviewItem.reviewItemDOI(approved, Manuscript.dryadDataDOI);
-                            } else if (Manuscript.manuscriptId != null) {
-                                ApproveRejectReviewItem.reviewItem(approved, Manuscript.manuscriptId);
+                            if (manuscript.dryadDataDOI != null) {
+                                ApproveRejectReviewItem.reviewItemDOI(approved, manuscript.dryadDataDOI);
+                            } else if (manuscript.manuscriptId != null) {
+                                ApproveRejectReviewItem.reviewItem(approved, manuscript.manuscriptId);
                             } else {
                                 // we need to compare manuscript's authors with workflow items from the same journal.
                             }
