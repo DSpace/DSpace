@@ -123,6 +123,7 @@ class SendEmailAction implements Action {
 		String ip = (String)objectModel.get("ip");
 		Map<String, String> extraMetadata = (Map<String, String>)objectModel.get("extraMetadata");
         boolean allzip = (Boolean)objectModel.get("allzip");
+		String token = (String)objectModel.get("token");
 		
         int epersonID = 0;
         String email = "";
@@ -147,12 +148,6 @@ class SendEmailAction implements Action {
 			bitstream = Bitstream.find(context, bitID);
 		}
         
-        String token = null;
-        
-        IFunctionalities manager = DSpaceApi.getFunctionalityManager();
-        manager.openSession();
-        token = manager.getToken(epersonID, bitstream.getID());
-
         String base = ConfigurationManager.getProperty("dspace.url");
 		StringBuffer link = null;
 		if(allzip) {
@@ -188,6 +183,8 @@ class SendEmailAction implements Action {
         	email2User.addArgument(bitstream.getName());
         }
 		email2User.addArgument(link.toString() + "dtoken=" + token);
+		IFunctionalities manager = DSpaceApi.getFunctionalityManager();
+		manager.openSession();
         List<LicenseDefinition> licenses = manager.getLicensesToAgree(-1, bitstream.getID());
 		List<String> ccEmails = new ArrayList<>();
 		for(LicenseDefinition license : licenses) {
