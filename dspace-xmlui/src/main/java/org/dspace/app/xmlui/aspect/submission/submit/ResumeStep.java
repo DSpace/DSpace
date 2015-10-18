@@ -46,7 +46,9 @@ public class ResumeStep extends AbstractStep
         message("xmlui.Submission.submit.ResumeStep.submit_resume");
     protected static final Message T_submit_cancel = 
         message("xmlui.general.cancel");
-  
+	protected static final Message T_submit_share =
+			message("xmlui.Submission.submit.ResumeStep.submit_share");
+
 	/**
 	 * Establish our required parameters, abstractStep will enforce these.
 	 */
@@ -98,5 +100,6 @@ public class ResumeStep extends AbstractStep
 		org.dspace.app.xmlui.wing.element.Item actions = form.addItem();
 		actions.addButton("submit_resume").setValue(T_submit_resume);
 		actions.addButton("submit_cancel").setValue(T_submit_cancel);
+		actions.addButton("submit_share").setValue(T_submit_share);
 	}
 }

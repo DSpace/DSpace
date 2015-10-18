@@ -206,18 +206,19 @@ function doSubmission()
    {
        // Resume a previous submission
        var workspace = WorkspaceItem.find(getDSContext(), workspaceID);
-       
+
+       // Get the collection handle for this item.
+       var handle = workspace.getCollection().getHandle();
+
        // First check that the id is valid.
        var submitterID = workspace.getSubmitter().getID()
        var currentID = getDSContext().getCurrentUser().getID();
        if (submitterID == currentID)
        {
-           // Get the collection handle for this item.
-           var handle = workspace.getCollection().getHandle();
-
            // Record that this is a submission id, not a workflow id.
            //(specify "S" for submission item, for FlowUtils.findSubmission())
            workspaceID = "S"+workspaceID;
+
            do {
                sendPageAndWait("handle/"+handle+"/submit/resumeStep",
                    {"id":workspaceID,"step":"0.0"});
@@ -233,14 +234,49 @@ function doSubmission()
                    getDSContext().complete();
                    cocoon.exit();
                }
+               else if (cocoon.request.get("submit_share"))
+               {
+                   shareSubmission(workspaceID);
+               }
 
 
            } while (1 == 1)
 
 
        }
+       else{
+           //change the submitter if "checks" pass
+           do {
+               sendPageAndWait("handle/" + handle + "/submit/ownerChange",
+                   {"id": workspaceID});
+               if(cocoon.request.get("submit_own")){
+                   var subInfo = getSubmissionInfo("S"+workspaceID);
+                   var item = subInfo.getSubmissionItem().getItem();
+                   var current = getDSContext().getCurrentUser();
+                   item.setSubmitter(current);
+                   var provenance  = "Submitter id changed from " + submitterID + "("
+                       + workspace.getSubmitter().getEmail() + ") to " +
+                       current.getID() + "(" + current.getEmail() + ")";
+                   item.addMetadata("dc", "description", "provenance", "en", provenance);
+                   subInfo.getSubmissionItem().update();
+                   var contextPath = cocoon.request.getContextPath();
+                   cocoon.redirectTo(contextPath + "/submit?workspaceID=" + workspaceID, true);
+                   getDSContext().complete();
+                   cocoon.exit();
+               }
+           } while (true);
+       }
    }
 
+}
+
+function shareSubmission(workspaceID)
+{
+    var link = FlowUtils.shareSubmission(getObjectModel(), workspaceID);
+    var contextPath = cocoon.request.getContextPath();
+    sendPage("submit/displayShareLink",{"link": link});
+    getDSContext().commit();
+    cocoon.exit();
 }
 
 /**
@@ -380,6 +416,36 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
         	{
         			submitStepSaveOrRemove(collectionHandle,workspaceID,step,page);
         	}
+        }
+        // User clicked "Save & Share"
+        else if(cocoon.request.get(AbstractProcessingStep.SAVE_SHARE_BUTTON))
+        {
+            var inWorkflow = submissionInfo.isInWorkflow();
+            if (inWorkflow && response_flag==AbstractProcessingStep.STATUS_COMPLETE)
+            {
+                var contextPath = cocoon.request.getContextPath();
+                cocoon.redirectTo(contextPath+"/submissions",true);
+                cocoon.exit();
+            }
+            else if (!inWorkflow)
+            {
+                //part of submitStepSaveOrRemove that saves
+                // we need to update the reached step to prevent smart user to skip file upload
+                // or keep empty required metadata using the resume
+                var maxStep = FlowUtils.getMaximumStepReached(getDSContext(),workspaceID);
+                var maxPage = FlowUtils.getMaximumPageReached(getDSContext(),workspaceID);
+                var maxStepAndPage = new StepAndPage(maxStep,maxPage);
+
+                var currStepAndPage = new StepAndPage(step,page);
+
+                if (maxStepAndPage.compareTo(currStepAndPage) > 0)
+                {
+                    FlowUtils.setBackPageReached(getDSContext(),workspaceID, step, page);
+                }
+                //share and exit
+                shareSubmission(workspaceID);
+            }
+
         }
         
         //User clicked on Progress Bar:

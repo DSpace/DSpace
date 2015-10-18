@@ -83,6 +83,9 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
         message("xmlui.Submission.general.default.title");
     protected static final Message T_default_trail = 
         message("xmlui.Submission.general.default.trail");
+
+    protected static final Message T_save_share =
+            message("xmlui.Submission.general.submission.save_share");
     
     
     /** Progress Bar Language Strings */
@@ -351,6 +354,8 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
         
         // always show "Save/Cancel"
         actions.addButton(AbstractProcessingStep.CANCEL_BUTTON).setValue(T_save);
+        // always show "Save & Share"
+        actions.addButton(AbstractProcessingStep.SAVE_SHARE_BUTTON).setValue(T_save_share);
         
         // If last step, show "Complete Submission"
         if(isLastStep())

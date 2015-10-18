@@ -17,10 +17,7 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.*;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -698,5 +695,14 @@ public class WorkspaceItem implements InProgressSubmission
     public void setPublishedBefore(boolean b)
     {
         wiRow.setColumn("published_before", b);
+    }
+
+    public String getShareToken() {
+        String token = wiRow.getStringColumn("share_token");
+        if(token == null || token.equals("")){
+            token  = Utils.generateHexKey();
+            wiRow.setColumn("share_token", token);
+        }
+        return token;
     }
 }

@@ -79,6 +79,9 @@ public abstract class AbstractProcessingStep
      **************************************************************************/
     public static final String PROGRESS_BAR_PREFIX = "submit_jump_";
 
+    //Name of Save & Share button
+    public static final String SAVE_SHARE_BUTTON = "submit_save_share";
+
     /***************************************************************************
      * Flag which specifies that the LAST PAGE of a step has been reached. This
      * flag is used when a Workflow Item is rejected (and returned to the

@@ -520,6 +520,11 @@ public class DatabaseUtils
         // We will now check prior versions in reverse chronological order, looking
         // for specific tables or columns that were newly created in each version.
 
+        if(tableColumnExists(connection, "workspaceitem", "share_token"))
+        {
+            return "5.3.2015.09.18";
+        }
+
         // Is this pre-DSpace 5.0 (with Metadata 4 All changes)? Look for the "resource_id" column in the "metadatavalue" table
         if(tableColumnExists(connection, "metadatavalue", "resource_id"))
         {

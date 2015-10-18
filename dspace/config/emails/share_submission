@@ -1,0 +1,21 @@
+# E-mail with a download link
+#
+# Parameters: {0} is expanded to submission link
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: ${lr.dspace.name.short}: Submission share link
+To pass your submission to another user give them the following link:
+ {0}
+
+If you have trouble please contact
+${lr.help.mail} or call us at ${lr.help.phone}
+
+
+${lr.dspace.name.short} Team
+
+_____________________________________
+${dspace.name},
+WWW: ${dspace.url}
+Email: ${lr.help.mail}
+Tel.: ${lr.help.phone}
