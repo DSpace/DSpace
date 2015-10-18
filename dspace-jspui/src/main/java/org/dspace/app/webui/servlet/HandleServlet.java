@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.GoogleMetadata;
 import org.dspace.app.webui.util.Authenticate;
@@ -129,8 +130,7 @@ public class HandleServlet extends DSpaceServlet
 
         if (dso == null)
         {
-            log.info(LogManager
-                    .getHeader(context, "invalid_id", "path=" + path));
+            log.info(LogManager.getHeader(context, "invalid_id", "path=" + path));
             JSPManager.showInvalidIDError(request, response, StringEscapeUtils.escapeHtml(path), -1);
 
             return;
@@ -152,7 +152,47 @@ public class HandleServlet extends DSpaceServlet
             // and firing a usage event for the DSO we're reporting for
             return;
 
+        } else if ("/display-statistics.jsp".equals(extraPathInfo))
+        {
+            request.getRequestDispatcher(extraPathInfo).forward(request, response);
+            // If we don't return here, we keep processing and end up
+            // throwing a NPE when checking community authorization
+            // and firing a usage event for the DSO we're reporting for
+            return;
+        } else if ("/browse".equals((extraPathInfo)) || StringUtils.startsWith(extraPathInfo, "/browse?")) {
+        	// Add the location if we got a community or collection
+        	if (dso instanceof Community)
+        	{
+        		Community c = (Community) dso;
+        		request.setAttribute("dspace.community", c);
+        	} else if (dso instanceof Collection)
+        	{
+        		Collection c = (Collection) dso;
+        		request.setAttribute("dspace.collection", c);
+        	}
+            request.getRequestDispatcher(extraPathInfo).forward(request, response);
+            // If we don't return here, we keep processing and end up
+            // throwing a NPE when checking community authorization
+            // and firing a usage event for the DSO we're reporting for
+            return;
+        } else if ("/simple-search".equals(extraPathInfo) || StringUtils.startsWith(extraPathInfo, "simple-search?")) {
+        	// Add the location if we got a community or collection
+        	if (dso instanceof Community)
+        	{
+        		Community c = (Community) dso;
+        		request.setAttribute("dspace.community", c);
+        	} else if (dso instanceof Collection)
+        	{
+        		Collection c = (Collection) dso;
+        		request.setAttribute("dspace.collection", c);
+        	}
+            request.getRequestDispatcher(extraPathInfo).forward(request, response);
+            // If we don't return here, we keep processing and end up
+            // throwing a NPE when checking community authorization
+            // and firing a usage event for the DSO we're reporting for
+            return;
         }
+
 
         // OK, we have a valid Handle. What is it?
         if (dso.getType() == Constants.ITEM)
@@ -195,9 +235,9 @@ public class HandleServlet extends DSpaceServlet
             }
             else
             {
-                // Forward to another servlet
-                request.getRequestDispatcher(extraPathInfo).forward(request,
-                        response);
+                log.debug("Found Item with extraPathInfo => Error.");
+                JSPManager.showInvalidIDError(request, response, StringEscapeUtils.escapeHtml(path), -1);
+                return;
             }
 
         }
@@ -231,9 +271,9 @@ public class HandleServlet extends DSpaceServlet
             }
             else
             {
-                // Forward to another servlet
-                request.getRequestDispatcher(extraPathInfo).forward(request,
-                        response);
+                log.debug("Found Collection with extraPathInfo => Error.");
+                JSPManager.showInvalidIDError(request, response, StringEscapeUtils.escapeHtml(path), -1);
+                return;
             }
         }
         else if (dso.getType() == Constants.COMMUNITY)
@@ -255,9 +295,9 @@ public class HandleServlet extends DSpaceServlet
             }
             else
             {
-                // Forward to another servlet
-                request.getRequestDispatcher(extraPathInfo).forward(request,
-                        response);
+                log.debug("Found Community with extraPathInfo => Error.");
+                JSPManager.showInvalidIDError(request, response, StringEscapeUtils.escapeHtml(path), -1);
+                return;
             }
         }
         else

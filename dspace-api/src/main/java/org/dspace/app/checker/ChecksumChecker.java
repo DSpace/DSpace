@@ -8,6 +8,7 @@
 package org.dspace.app.checker;
 
 import java.io.FileNotFoundException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -32,6 +33,7 @@ import org.dspace.checker.ListDispatcher;
 import org.dspace.checker.ResultsLogger;
 import org.dspace.checker.ResultsPruner;
 import org.dspace.checker.SimpleDispatcher;
+import org.dspace.core.Context;
 import org.dspace.core.Utils;
 
 /**
@@ -78,8 +80,7 @@ public final class ChecksumChecker
      *            <dd>Don't prune results before running checker</dd>
      *            </dl>
      */
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) throws SQLException {
         // set up command line parser
         CommandLineParser parser = new PosixParser();
         CommandLine line = null;
@@ -230,7 +231,13 @@ public final class ChecksumChecker
         checker.setProcessStartDate(processStart);
         checker.setDispatcher(dispatcher);
         checker.setCollector(logger);
-        checker.process();
+        Context context = new Context();
+        try {
+            checker.process(context);
+        } finally {
+            context.commit();
+            context.complete();
+        }
         System.exit(0);
     }
 

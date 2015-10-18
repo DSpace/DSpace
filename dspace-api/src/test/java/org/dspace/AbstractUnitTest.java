@@ -16,6 +16,7 @@ import java.util.Properties;
 import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.util.MockUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -112,6 +113,9 @@ public class AbstractUnitTest
 
             // Initialize a mock indexer (which does nothing, since Solr isn't running)
             new MockIndexEventConsumer();
+
+            // Initialize mock Util class
+            new MockUtil();
         }
         catch (IOException ex)
         {
@@ -232,6 +236,7 @@ public class AbstractUnitTest
     /**
      *  Utility method to cleanup a created Context object (to save memory).
      *  This can also be used by individual tests to cleanup context objects they create.
+     * @param c
      */
     protected void cleanupContext(Context c)
     {

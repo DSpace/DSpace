@@ -40,9 +40,9 @@ public final class DSpaceKernelManager {
         {
             theKernel = new DSpaceKernelImpl();
             log.info("Created new kernel: " + theKernel);
-            ((DSpaceKernelImpl)theKernel).start(dspaceDir);
         }
 
+        ((DSpaceKernelImpl)theKernel).start(dspaceDir);
         return theKernel;
     }
 

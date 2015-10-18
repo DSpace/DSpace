@@ -242,13 +242,13 @@ public class SolrLogger
     }
     
 	public static void postView(DSpaceObject dspaceObject,
-			String ip, String userAgent, String xforwarderfor, EPerson currentUser) {
+			String ip, String userAgent, String xforwardedfor, EPerson currentUser) {
 		if (solr == null || locationService == null) {
 			return;
 		}
 
 		try {
-			SolrInputDocument doc1 = getCommonSolrDoc(dspaceObject, ip, userAgent, xforwarderfor,
+			SolrInputDocument doc1 = getCommonSolrDoc(dspaceObject, ip, userAgent, xforwardedfor,
 					currentUser);
 			if (doc1 == null)
 				return;
@@ -331,6 +331,7 @@ public class SolrLogger
 		    {
 		        doc1.addField("userAgent", request.getHeader("User-Agent"));
 		    }
+		    doc1.addField("isBot",isSpiderBot);
             // Save the location information if valid, save the event without
             // location information if not valid
             if(locationService != null)
@@ -354,7 +355,7 @@ public class SolrLogger
                     doc1.addField("city", location.city);
                     doc1.addField("latitude", location.latitude);
                     doc1.addField("longitude", location.longitude);
-                    doc1.addField("isBot",isSpiderBot);
+                    
 
 
                 }
@@ -376,7 +377,7 @@ public class SolrLogger
         return doc1;
     }
 
-    private static SolrInputDocument getCommonSolrDoc(DSpaceObject dspaceObject, String ip, String userAgent, String xforwarderfor, EPerson currentUser) throws SQLException {
+    private static SolrInputDocument getCommonSolrDoc(DSpaceObject dspaceObject, String ip, String userAgent, String xforwardedfor, EPerson currentUser) throws SQLException {
         boolean isSpiderBot = SpiderDetector.isSpider(ip);
         if(isSpiderBot &&
                 !ConfigurationManager.getBooleanProperty("usage-statistics", "logBots", true))
@@ -388,14 +389,14 @@ public class SolrLogger
         // Save our basic info that we already have
 
 
-            if (isUseProxies() && xforwarderfor != null) {
+            if (isUseProxies() && xforwardedfor != null) {
                 /* This header is a comma delimited list */
-                for (String xfip : xforwarderfor.split(",")) {
+                for (String xfip : xforwardedfor.split(",")) {
                     /* proxy itself will sometime populate this header with the same value in
                     remote address. ordering in spec is vague, we'll just take the last
                     not equal to the proxy
                     */
-                    if (!xforwarderfor.contains(ip)) {
+                    if (!xforwardedfor.contains(ip)) {
                         ip = xfip.trim();
                     }
                 }
@@ -416,6 +417,7 @@ public class SolrLogger
 		    {
 		        doc1.addField("userAgent", userAgent);
 		    }
+		    doc1.addField("isBot",isSpiderBot);
             // Save the location information if valid, save the event without
             // location information if not valid
             if(locationService != null)
@@ -439,7 +441,7 @@ public class SolrLogger
                     doc1.addField("city", location.city);
                     doc1.addField("latitude", location.latitude);
                     doc1.addField("longitude", location.longitude);
-                    doc1.addField("isBot",isSpiderBot);
+                    
 
 
                 }
@@ -1338,6 +1340,7 @@ public class SolrLogger
                 //Upload the data in the csv files to our new solr core
                 ContentStreamUpdateRequest contentStreamUpdateRequest = new ContentStreamUpdateRequest("/update/csv");
                 contentStreamUpdateRequest.setParam("stream.contentType", "text/plain;charset=utf-8");
+	            contentStreamUpdateRequest.setParam("skip", "_version_");
                 contentStreamUpdateRequest.setAction(AbstractUpdateRequest.ACTION.COMMIT, true, true);
                 contentStreamUpdateRequest.addFile(tempCsv, "text/plain;charset=utf-8");
 

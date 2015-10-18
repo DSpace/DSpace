@@ -813,7 +813,12 @@ function doEditEPerson(epersonID)
         		// the user is loged in as another user, we can't let them continue on
         		// using this flow because they might not have permissions. So forward
         		// them to the homepage.
-        		cocoon.redirectTo(cocoon.request.getContextPath(),true);
+			var siteRoot = cocoon.request.getContextPath();	
+			if (siteRoot == "")
+			{
+				siteRoot = "/";
+			}
+        		cocoon.redirectTo(siteRoot,true);
 				getDSContext().complete();
 				cocoon.exit();
         	}

@@ -26,4 +26,5 @@ public interface AuthorityIndexingService {
 
     public void commit();
 
+    public boolean isConfiguredProperly();
 }

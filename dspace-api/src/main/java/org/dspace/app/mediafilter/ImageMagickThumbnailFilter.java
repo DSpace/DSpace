@@ -38,6 +38,7 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter implements 
 {
 	private static int width = 180;
 	private static int height = 120;
+        private static boolean flatten = true;
 	static String bitstreamDescription = "IM Thumbnail";
 	static final String defaultPattern = "Generated Thumbnail";
 	static Pattern replaceRegex = Pattern.compile(defaultPattern);
@@ -48,6 +49,7 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter implements 
 		ProcessStarter.setGlobalSearchPath(s);
 		width = ConfigurationManager.getIntProperty("thumbnail.maxwidth", width);
 		height = ConfigurationManager.getIntProperty("thumbnail.maxheight", height);
+                flatten = ConfigurationManager.getBooleanProperty(pre + ".flatten", flatten);
 		String description = ConfigurationManager.getProperty(pre + ".bitstreamDescription");
 		if (description != null) {
 			bitstreamDescription = description;
@@ -132,6 +134,10 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter implements 
 		IMOperation op = new IMOperation();
 		String s = "[" + page + "]";
 		op.addImage(f.getAbsolutePath()+s);
+                if (flatten)
+                {
+                    op.flatten();
+                }
 		op.addImage(f2.getAbsolutePath());
         if (MediaFilterManager.isVerbose) {
 		    System.out.println("IM Image Param: "+op);

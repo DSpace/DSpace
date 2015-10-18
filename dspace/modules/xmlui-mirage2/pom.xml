@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>modules</artifactId>
-        <version>5.0-rc3-SNAPSHOT</version>
+        <version>6.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -23,7 +23,7 @@
         <grunt.color.scheme>classic_mirage_color_scheme</grunt.color.scheme>
         <mirage2.deps.included>true</mirage2.deps.included>
         <!-- Versions of build dependencies to be auto-installed when "mirage2.deps.included=true" -->
-        <sass.version>3.4.3</sass.version>
+        <sass.version>3.3.14</sass.version>
         <compass.version>1.0.1</compass.version>
         <node.version>0.10.31</node.version>
         <npm.version>1.4.23</npm.version>
@@ -359,7 +359,7 @@
                         <plugin>
                             <groupId>com.github.eirslett</groupId>
                             <artifactId>frontend-maven-plugin</artifactId>
-                            <version>0.0.16</version>
+                            <version>0.0.23</version>
                         </plugin>
                     </plugins>
                 </pluginManagement>

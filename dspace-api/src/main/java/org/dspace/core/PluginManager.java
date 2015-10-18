@@ -101,8 +101,18 @@ public class PluginManager
     // Key is Class, value is Boolean (true by default).
     private static Map<Class<Object>, Boolean> cacheMeCache = new HashMap<Class<Object>, Boolean>();
 
-    // Predicate -- whether or not to cache this class.  Ironically,
-    // the cacheability information is itself cached.
+    /**
+     * Whether or not to cache instances of this class. Ironically,
+     * the cacheability information is itself cached.
+     * <P>
+     * By default, all plugin class instances ARE cached. To disable instance
+     * caching for a specific plugin class, you must add a configuration similar
+     * to this in your dspace.cfg:
+     * <code>
+     * plugin.reusable.[full-class-name] = false
+     * </code>
+     * @return true if class instances should be cached in memory, false otherwise.
+     */
     private static boolean cacheMe(String module, Class implClass)
     {
         if (cacheMeCache.containsKey(implClass))
