@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SpiderDetector {
 
-    private static Logger log = LoggerFactory.getLogger(SpiderDetector.class);
+    private static final Logger log = LoggerFactory.getLogger(SpiderDetector.class);
 
     private static Boolean useProxies;
 
@@ -43,10 +43,12 @@ public class SpiderDetector {
     private static IPTable table = null;
 
     /** Collection of regular expressions to match known spiders' agents. */
-    private static List<Pattern> agents = Collections.synchronizedList(new ArrayList<Pattern>());
+    private static final List<Pattern> agents
+            = Collections.synchronizedList(new ArrayList<Pattern>());
 
     /** Collection of regular expressions to match known spiders' domain names. */
-    private static List<Pattern> domains = Collections.synchronizedList(new ArrayList<Pattern>());
+    private static final List<Pattern> domains
+            = Collections.synchronizedList(new ArrayList<Pattern>());
 
     /**
      * Utility method which reads lines from a file & returns them in a Set.
@@ -58,7 +60,7 @@ public class SpiderDetector {
     public static Set<String> readPatterns(File patternFile)
             throws IOException
     {
-        Set<String> patterns = new HashSet<String>();
+        Set<String> patterns = new HashSet<>();
 
         if (!patternFile.exists() || !patternFile.isFile())
         {
@@ -66,21 +68,22 @@ public class SpiderDetector {
         }
 
         //Read our file & get all them patterns.
-        BufferedReader in = new BufferedReader(new FileReader(patternFile));
-        String line;
-        while ((line = in.readLine()) != null) {
-            if (!line.startsWith("#")) {
-                line = line.trim();
+        try (BufferedReader in = new BufferedReader(new FileReader(patternFile)))
+        {
+            String line;
+            while ((line = in.readLine()) != null) {
+                if (!line.startsWith("#")) {
+                    line = line.trim();
 
-                if (!line.equals("")) {
-                    patterns.add(line);
+                    if (!line.equals("")) {
+                        patterns.add(line);
+                    }
+                } else {
+                    //   ua.add(line.replaceFirst("#","").replaceFirst("UA","").trim());
+                    // ... add this functionality later
                 }
-            } else {
-                //   ua.add(line.replaceFirst("#","").replaceFirst("UA","").trim());
-                // ... add this functionality later
             }
         }
-        in.close();
         return patterns;
     }
 
@@ -134,7 +137,7 @@ public class SpiderDetector {
                     log.info("No spider file loaded");
                 }
             }
-            catch (Exception e) {
+            catch (IOException | IPTable.IPFormatException e) {
                 log.error("Error Loading Spiders:" + e.getMessage(), e);
             }
 
@@ -200,7 +203,7 @@ public class SpiderDetector {
     {
         // See if any agent patterns match
         if (null != agent)
-        {   
+        {
             synchronized(agents)
             {
                 if (agents.isEmpty())
@@ -233,7 +236,7 @@ public class SpiderDetector {
         // No.  See if any DNS names match
         if (null != hostname)
         {
-            synchronized(domains) 
+            synchronized(domains)
             {
                 if (domains.isEmpty())
                     loadPatterns("domains", domains);
@@ -293,14 +296,7 @@ public class SpiderDetector {
 
     private static boolean isUseProxies() {
         if(useProxies == null) {
-            if ("true".equals(ConfigurationManager.getProperty("useProxies")))
-            {
-                useProxies = true;
-            }
-            else
-            {
-                useProxies = false;
-            }
+            useProxies = "true".equals(ConfigurationManager.getProperty("useProxies"));
         }
 
         return useProxies;
