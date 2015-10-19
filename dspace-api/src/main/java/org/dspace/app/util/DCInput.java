@@ -28,6 +28,15 @@ public class DCInput
 
     /** the DC namespace schema */
     private String dcSchema = null;
+    
+    /** the input language */
+    private boolean language = false;
+    
+    /** the language code use for the input */
+    private static final String LanguageName = "common_iso_languages";
+
+    /** the language list and their value */
+    private List<String> valueLanguageList = null;
 
     /** a label describing input */
     private String label = null;
@@ -100,6 +109,14 @@ public class DCInput
             dcSchema = MetadataSchema.DC_SCHEMA;
         }
 
+        //check if the input have a language tag
+        language = Boolean.valueOf(fieldMap.get("language"));
+        valueLanguageList = new ArrayList();
+        if (language)
+        {
+            valueLanguageList = listMap.get(LanguageName);
+        }
+        
         String repStr = fieldMap.get("repeatable");
         repeatable = "true".equalsIgnoreCase(repStr)
                 || "yes".equalsIgnoreCase(repStr);
@@ -255,6 +272,16 @@ public class DCInput
     {
         return dcQualifier;
     }
+    
+    /**
+     * Get the language for this form row.
+     * 
+     * @return the language state
+     */
+    public boolean getLanguage()
+    {
+        return language;
+    }
 
     /**
      * Get the hint for this form row, formatted for an HTML table
@@ -296,6 +323,17 @@ public class DCInput
         return valueList;
     }
 
+    /**
+     * Get the list of language tags 
+     * 
+     * @return the list of language
+     */
+
+    public List<String> getValueLanguageList() 
+    {
+        return valueLanguageList;
+    }
+    
     /**
      * Get the name of the controlled vocabulary that is associated with this
      * field
