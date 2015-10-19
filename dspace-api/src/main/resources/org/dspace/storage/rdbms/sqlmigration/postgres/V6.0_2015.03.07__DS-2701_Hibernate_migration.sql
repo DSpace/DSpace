@@ -134,8 +134,16 @@ ALTER TABLE Collection2Item ALTER COLUMN item_id SET NOT NULL;
 ALTER TABLE Collection2Item DROP COLUMN collection_legacy_id;
 ALTER TABLE Collection2Item DROP COLUMN item_legacy_id;
 ALTER TABLE Collection2Item DROP COLUMN id;
--- Magic query that will delete all duplicate collection item_id references from the database (if we don't do this the primary key creation will fail)
-DELETE FROM collection2item WHERE ctid NOT IN (SELECT max(ctid) FROM collection2item GROUP BY collection_id,item_id);
+
+DELETE FROM collection2item a USING (
+      SELECT max(ctid) as ctid, collection_id,item_id
+        FROM collection2item 
+        GROUP BY collection_id,item_id HAVING COUNT(*) > 1
+      ) b
+WHERE a.collection_id = b.collection_id
+AND a.item_id = b.item_id
+AND a.ctid <> b.ctid;
+
 ALTER TABLE Collection2Item add primary key (collection_id,item_id);
 
 -- Migrate Community2Community
