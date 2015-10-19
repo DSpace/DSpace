@@ -69,7 +69,7 @@ public class EditItemServicesForm extends AbstractDSpaceTransformer {
 		
 		// LIST: options
 		List options = main.addList("options", List.TYPE_SIMPLE, "horizontal");
-		ViewItem.add_options(context, eperson, options, baseURL, ViewItem.T_option_services, tabLink);
+		ViewItem.add_options(context, eperson, options, baseURL, ViewItem.T_option_services, tabLink, item);
 		
 		String featuredServices = ConfigurationManager.getProperty("lr", "featured.services");
 		

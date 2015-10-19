@@ -99,7 +99,7 @@ public class CurateItemForm extends AbstractDSpaceTransformer {
 
 		// LIST: options
 		List options = main.addList("options", List.TYPE_SIMPLE, "horizontal");
-		ViewItem.add_options(context, eperson, options, baseURL, ViewItem.T_option_curate, tabLink);
+		ViewItem.add_options(context, eperson, options, baseURL, ViewItem.T_option_curate, tabLink, item);
 
 	    List curationTaskList = main.addList("curationTaskList", "form");
         String curateGroup = "";

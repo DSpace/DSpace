@@ -102,7 +102,7 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 		
 		// LIST: options
 		List options = main.addList("options",List.TYPE_SIMPLE,"horizontal");
-		ViewItem.add_options(context, eperson, options, baseURL, ViewItem.T_option_status, tabLink);
+		ViewItem.add_options(context, eperson, options, baseURL, ViewItem.T_option_status, tabLink, item);
 		
 		main = main.addDivision("item-status", "well well-light");
 		
@@ -158,7 +158,7 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 		
 		
 		// don't display the following action buttons for Service Managers
-		if(!IfServiceManagerSelector.isNonAdminServiceManager(context, eperson)) {
+		if(!IfServiceManagerSelector.isNonAdminServiceManager(context, eperson, item)) {
 		
 			itemInfo.addLabel(T_label_auth);
 			try
