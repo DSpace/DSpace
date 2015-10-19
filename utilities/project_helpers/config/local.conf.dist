@@ -16,6 +16,8 @@ lr.pid.service.testPid =
 # default configuration should have asterisk as the community ID
 # subprefix is only used for local handles
 lr.pid.community.configurations = community=*,prefix=99999,type=local,canonical_prefix=http://hdl.handle.net/
+# if true, PID metadata will be filled with object metadata like title
+lr.pid.resolvemetadata = true
 
 
 # UFAL mounted assetstore for restricted item harvesting. Please mind the trailing slash
@@ -351,6 +353,7 @@ http.proxy.host =
 http.proxy.port =
 handle.canonical.prefix = http://hdl.handle.net/
 handle.prefix = 123456789
+handle.resolvemetadata = true
 loglevel.other=INFO
 loglevel.dspace=INFO
 handle.dir=${dspace.dir}/handle-server

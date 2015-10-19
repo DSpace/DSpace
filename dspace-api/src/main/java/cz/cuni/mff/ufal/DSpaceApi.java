@@ -5,20 +5,19 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 
+import cz.cuni.mff.ufal.dspace.AbstractPIDService;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.Metadatum;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -27,6 +26,7 @@ import org.dspace.core.I18nUtil;
 import org.dspace.core.Utils;
 import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandlePlugin;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.services.ConfigurationService;
@@ -51,7 +51,8 @@ public class DSpaceApi {
 
 		IFunctionalities manager = null;
 
-		String className = ConfigurationManager.getProperty("lr", "lr.utilities.functionalityManager.class"); // cz.cuni.mff.ufal.lindat.utilities.HibernateFunctionalityManager
+		String className = ConfigurationManager.getProperty(
+				"lr", "lr.utilities.functionalityManager.class"); // cz.cuni.mff.ufal.lindat.utilities.HibernateFunctionalityManager
 
 		try {
 
@@ -236,35 +237,6 @@ public class DSpaceApi {
 		return metadata_map;
 	}
 
-	/*
-	 * Function originally taken from Petr Pajas' modifications.
-	 * 
-	 * not used anymore!
-	 */
-	public static void submit_step_CompleteStep(Logger log, Context context,
-			SubmissionInfo subInfo) throws ServletException {
-		// added for UFAL purposes: finally, the item URL should be working and
-		// we are able
-		// to re-register the PID (handle) to point to the actual item URL in
-		// dspace
-		try {
-			log.debug("doProcessing.CompleteStep.java: Contex commited, now re-registering the PID, now finding handle with context="
-					+ context.toString()
-					+ ", and subInfo="
-					+ subInfo.getSubmissionItem().getItem().toString());
-			context.turnOffAuthorisationSystem();
-			String handle = HandleManager.findHandle(context, subInfo
-					.getSubmissionItem().getItem());
-			log.info("registering final URL for handle " + handle);
-			// HandleManager.registerFinalHandleURL(handle);
-			DSpaceApi.handle_HandleManager_registerFinalHandleURL(log, handle);
-			context.restoreAuthSystemState();
-		} catch (Exception error) {
-			throw new ServletException(error);
-		} // end of try - catch block
-
-	}
-
 	public static void main(String[] t) {
 		try {
 			handle_HandleManager_createId(null, 9999, "11372/LRT-", "TEST-1");
@@ -334,7 +306,7 @@ public class DSpaceApi {
 	 *                If a database error occurs
 	 */
 	public static void handle_HandleManager_registerFinalHandleURL(Logger log,
-			String pid) throws IOException {
+			String pid, DSpaceObject dso) throws IOException {
 		if (pid == null) {
 			log.info("Modification failed invalid/null PID.");
 			return;
@@ -350,7 +322,8 @@ public class DSpaceApi {
 		log.debug("Asking for changing the PID '" + pid + "' to " + url);
 		
 		try {
-			PIDService.modifyPID(pid, url);
+			Map<String, String> fields = HandlePlugin.extractMetadata(dso);
+			PIDService.modifyPID(pid, url, fields);
 		} catch (Exception e) {
 			throw new IOException("Failed to map PID " + pid + " to " + url
 				+ " (" + e.toString() + ")");

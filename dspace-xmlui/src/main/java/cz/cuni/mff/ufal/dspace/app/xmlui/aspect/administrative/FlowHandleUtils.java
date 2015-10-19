@@ -232,7 +232,7 @@ public class FlowHandleUtils {
 			}
 		} else{
 			try {
-				PIDService.modifyPID(pid,url);
+				PIDService.modifyPID(pid,url,null);
 				result.setContinue(true);
 				result.setOutcome(true);
 				result.setMessage(T_handle_successfully_saved);

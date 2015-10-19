@@ -1,9 +1,7 @@
 /* Created for LINDAT/CLARIN */
 package cz.cuni.mff.ufal.dspace;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 import org.dspace.core.ConfigurationManager;
 
@@ -54,10 +52,13 @@ public class PIDService {
 		return pidService.resolvePID(PID);
 	}
 
-	public static String modifyPID(String PID, String URL) throws Exception {		
+	public static String modifyPID(String PID, String URL, Map<String, String> additionalFields) throws Exception {
 		initialize();
-		Map<String, String> handleFields = new HashMap<String, String>();
-		handleFields.put(HANDLE_FIELDS.URL.toString(), URL);		
+		Map<String, String> handleFields = new LinkedHashMap<String, String>();
+		handleFields.put(HANDLE_FIELDS.URL.toString(), URL);
+		if (null != additionalFields) {
+			handleFields.putAll(additionalFields);
+		}
 		return pidService.modifyPID(PID, handleFields);
 	}
 
@@ -105,7 +106,7 @@ public class PIDService {
 		Random randomGenerator = new Random();
 	    int randomInt = randomGenerator.nextInt(10000);
 		String url = String.format("http://only.testing.mff.cuni.cz/%d", randomInt);
-		modifyPID(PID, url);
+		modifyPID(PID, url, null);
 		String resolved = resolvePID(PID);
 		if ( resolved.equals(url) ) {
 			return "testing succesful";

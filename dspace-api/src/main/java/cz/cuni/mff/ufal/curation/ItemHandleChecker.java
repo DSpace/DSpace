@@ -182,7 +182,7 @@ public class ItemHandleChecker extends LinkChecker
     private void correctHandle(String handle) throws IOException
     {
         log.info("Trying to correct PID " + handle);
-        DSpaceApi.handle_HandleManager_registerFinalHandleURL(log, handle);
+        DSpaceApi.handle_HandleManager_registerFinalHandleURL(log, handle, null);
     }
 
 }
