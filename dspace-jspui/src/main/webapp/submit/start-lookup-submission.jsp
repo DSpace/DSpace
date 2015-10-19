@@ -42,7 +42,7 @@
         (List<Collection>) request.getAttribute("collections");
 
     //get collection id from the collection home
-    int collection_id = (Integer) request.getAttribute("collection_id");
+    String collection_id = (String) request.getAttribute("collection_id");
     
     //check if we need to display the "no collection selected" error
     Boolean noCollection = (Boolean) request.getAttribute("no.collection");
