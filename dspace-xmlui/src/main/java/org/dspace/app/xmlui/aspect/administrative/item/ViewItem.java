@@ -23,6 +23,7 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -95,7 +96,7 @@ public class ViewItem extends AbstractDSpaceTransformer {
 		
 		// LIST: options
 		List options = main.addList("options", List.TYPE_SIMPLE, "horizontal");
-		add_options(context, eperson, options, baseURL, T_option_view, tabLink);
+		add_options(context, eperson, options, baseURL, T_option_view, tabLink, item);
 
 		
 		main = main.addDivision("item-view", "well well-small well-light");
@@ -145,28 +146,32 @@ public class ViewItem extends AbstractDSpaceTransformer {
 			String baseURL,
 			Message to_highlight) throws WingException 
 	{
-		add_options( null, null, options, baseURL, to_highlight, null );
+		add_options( null, null, options, baseURL, to_highlight, null, null);
 	}
 	
 	public static void add_options(
 			List options, 
 			String baseURL, Message to_highlight, String highlighted_link) throws WingException 
 	{
-		add_options( null, null, options, baseURL, to_highlight, highlighted_link );
+		add_options( null, null, options, baseURL, to_highlight, highlighted_link, null);
 	}
 	
 	public static void add_options(
 			Context context, 
 			EPerson eperson,
 			List options, 
-			String baseURL, Message to_highlight, String highlighted_link) throws WingException 
+			String baseURL, Message to_highlight, String highlighted_link, DSpaceObject dso) throws WingException 
 	{
 		
 		LinkedHashMap<String, Message> map = new LinkedHashMap<String, Message>();
 		
 		boolean isServiceManger = false;
 		try {
-			isServiceManger = IfServiceManagerSelector.isNonAdminServiceManager(context, eperson);
+			if(dso!=null) {
+				isServiceManger = IfServiceManagerSelector.isNonAdminServiceManager(context, eperson, dso);
+			} else {
+				isServiceManger = IfServiceManagerSelector.isNonAdminServiceManager(context, eperson);
+			}
 		} catch (SQLException e) {
 			
 		}

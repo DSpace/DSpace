@@ -94,5 +94,20 @@ public class IfServiceManagerSelector extends AbstractLogEnabled implements
     	}
     	return false;
     }
+    
+    public static boolean isNonAdminServiceManager(Context context, EPerson eperson, DSpaceObject dso) throws SQLException {
+    	try {
+    		Group sm_group = Group.findByName(context, "Service Managers");
+    		if(sm_group != null) {
+    			if(sm_group.isMember(eperson) && !AuthorizeManager.isAdmin(context, dso)) {
+    				return true;
+    			}
+    		}
+    	}catch(Exception e) {
+    		return false;
+    	}
+    	return false;
+    }
+    
 
 }
