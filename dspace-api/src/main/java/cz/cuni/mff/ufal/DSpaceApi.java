@@ -150,7 +150,7 @@ public class DSpaceApi {
 			    if(tokenFound) { // database token match with url token 
 			        return true;
 			    } else {
-			    	throw new AuthorizeException("The download token is invalid or expires.");
+			    	throw new DownloadTokenExpiredException("The download token is invalid or expires.");
 			    }
 			    
 			}			
@@ -488,4 +488,5 @@ public class DSpaceApi {
     }
     
 }
+
 

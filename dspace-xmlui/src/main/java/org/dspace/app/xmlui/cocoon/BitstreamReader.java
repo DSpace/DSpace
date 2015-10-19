@@ -20,6 +20,7 @@ import javax.mail.internet.MimeUtility;
 import javax.servlet.http.HttpServletResponse;
 
 import cz.cuni.mff.ufal.UFALLicenceAgreement;
+
 import org.apache.avalon.excalibur.pool.Recyclable;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
@@ -53,6 +54,7 @@ import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
 import cz.cuni.mff.ufal.DSpaceApi;
+import cz.cuni.mff.ufal.DownloadTokenExpiredException;
 import cz.cuni.mff.ufal.MissingLicenseAgreementException;
 import cz.cuni.mff.ufal.tracker.TrackerFactory;
 import cz.cuni.mff.ufal.tracker.TrackingSite;
@@ -309,6 +311,12 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                         bitstream, objectModel, true);
                 return;
             }
+            catch (DownloadTokenExpiredException e)
+            {
+                redirectToFileDownlaodWithoutToken(context, request, dso, item,
+                        bitstream, objectModel, true);
+                return;            	
+            }
             catch (AuthorizeException e)
             {
                 redirectToRestrictionInfo(context, request, dso, item,
@@ -430,6 +438,24 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         }
     }
 
+    public static void redirectToFileDownlaodWithoutToken(
+            Context context,
+            Request request,
+            DSpaceObject dso,
+            Item item,
+            Bitstream bitstream,
+            Map objectModel,
+            boolean include_bistreamId) throws IOException
+    {
+          String redictURL = request.getRequestURI() + "?";
+          String queryString = request.getQueryString();
+          
+          redictURL += queryString.replaceAll("dtoken=[^&]+", "");
+          HttpServletResponse httpResponse = (HttpServletResponse)
+                  objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+                  httpResponse.sendRedirect(redictURL);
+    }
+    
     //<UFAL>
     public static void redirectToLicenseAgreement(
             Context context,
@@ -846,3 +872,4 @@ public class BitstreamReader extends AbstractReader implements Recyclable
 
 
 }
+
