@@ -322,6 +322,44 @@
         </div>
     </xsl:template>
 
+    <xsl:template name="itemSummaryView-DIM-discipline-entry">
+        <div>
+			<a>
+			<xsl:attribute name="href">
+				<xsl:value-of select="concat($context-path,'/browse?type=discipline&amp;value=')"/>
+                <xsl:copy-of select="encoder:encode(node())"/>
+			</xsl:attribute>
+			<xsl:copy-of select="node()"/>
+			</a>
+        </div>
+    </xsl:template>
+
+
+    <xsl:template name="itemSummaryView-DIM-keyword-entry">
+        <div>
+			<a>
+			<xsl:attribute name="href">
+				<xsl:value-of select="concat($context-path,'/discover?query=')"/>
+                <xsl:copy-of select="encoder:encode(node())"/>
+			</xsl:attribute>
+			<xsl:copy-of select="node()"/>
+			</a>
+        </div>
+    </xsl:template>
+
+    <xsl:template name="itemSummaryView-DIM-format-entry">
+        <div>
+			<a>
+			<xsl:attribute name="href">
+				<xsl:value-of select="concat($context-path,'/discover?filtertype=contentType&amp;filter_relational_operator=equals&amp;filter=')"/>
+                <xsl:copy-of select="encoder:encode(node())"/>
+			</xsl:attribute>
+			<xsl:copy-of select="node()"/>
+			</a>
+        </div>
+    </xsl:template>
+
+
     <xsl:template name="itemSummaryView-DIM-misc-entry">
         <div>
             <xsl:copy-of select="node()"/>
@@ -378,7 +416,7 @@
                 <xsl:choose>
                     <xsl:when test="dim:field[@element='type'][not(@qualifier='genre')]">
                         <xsl:for-each select="dim:field[@element='type'][not(@qualifier='genre')]">
-              			<div><xsl:copy-of select="./node()"/></div>
+							<xsl:call-template name="itemSummaryView-DIM-format-entry" />
                         </xsl:for-each>
                     </xsl:when>
                 </xsl:choose>
@@ -393,7 +431,7 @@
                 <xsl:choose>
                     <xsl:when test="dim:field[@element='relation'][@qualifier='ispartofseries']">
                         <xsl:for-each select="dim:field[@element='relation'][@qualifier='ispartofseries']">
-              				<div><xsl:copy-of select="./node()"/></div>
+							<xsl:call-template name="itemSummaryView-DIM-keyword-entry" />
                         </xsl:for-each>
                     </xsl:when>
                 </xsl:choose>
@@ -408,7 +446,7 @@
                 <xsl:choose>
                     <xsl:when test="dim:field[@element='relation'][@qualifier='ispartof']">
                         <xsl:for-each select="dim:field[@element='relation'][@qualifier='ispartof']">
-              				<div><xsl:copy-of select="./node()"/></div>
+							<xsl:call-template name="itemSummaryView-DIM-keyword-entry" />
                         </xsl:for-each>
                     </xsl:when>
                 </xsl:choose>
@@ -486,7 +524,7 @@
                     <xsl:for-each select="dim:field[@element='degree' and @qualifier='discipline']">
                         <xsl:choose>
                             <xsl:when test="node()">
-                                <xsl:copy-of select="node()"/>
+								<xsl:call-template name="itemSummaryView-DIM-discipline-entry" />
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:text>&#160;</xsl:text>
