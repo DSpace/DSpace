@@ -135,6 +135,7 @@ ALTER TABLE Collection2Item DROP COLUMN collection_legacy_id;
 ALTER TABLE Collection2Item DROP COLUMN item_legacy_id;
 ALTER TABLE Collection2Item DROP COLUMN id;
 
+-- Magic query that will delete all duplicate collection item_id references from the database (if we don't do this the primary key creation will fail)
 DELETE FROM collection2item a USING (
       SELECT max(ctid) as ctid, collection_id,item_id
         FROM collection2item 
