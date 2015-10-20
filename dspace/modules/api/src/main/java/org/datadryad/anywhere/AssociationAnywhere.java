@@ -12,6 +12,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 
 import org.apache.log4j.Logger;
 
+import org.dspace.JournalUtils;
 import org.dspace.content.Item;
 import org.dspace.content.authority.AuthorityMetadataValue;
 import org.dspace.content.authority.Concept;
@@ -34,6 +35,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URLEncoder;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -64,26 +66,28 @@ public class AssociationAnywhere {
         options.addOption("l", "list customer", false, "list customer");
         CommandLine line = parser.parse(options, argv);
 
-        if(line.hasOption("u"))
-        {
-            Context context = new Context();
-            if(line.hasOption("i"))
-                updateConcept(context, line.getOptionValue("i"));
-            else
-                updateConcept(context);
-
-        }
-        else if(line.hasOption("t")){
-            tallyCredit(line.getOptionValue("i"), line.getOptionValue("p"));
-        }
-        else if(line.hasOption("l")){
-            System.out.print(printDocument(loadCustomerInfo(line.getOptionValue("i"))));
-        }
-        else if(line.hasOption("i")){
-            //load credit
-            String credit = getCredit(line.getOptionValue("i"));
-            System.out.println("credit : "+ credit);
-        }
+	Context context = new Context(); 
+	try {
+	    if(line.hasOption("u")) {
+		if(line.hasOption("i"))
+		    updateConcept(context, line.getOptionValue("i"));
+		else
+		    updateConcept(context);
+	    }
+	    else if(line.hasOption("t")){
+		tallyCredit(context, line.getOptionValue("i"), line.getOptionValue("p"));
+	    }
+	    else if(line.hasOption("l")){
+		System.out.print(printDocument(loadCustomerInfo(context, line.getOptionValue("i"))));
+	    }
+	    else if(line.hasOption("i")) {
+		//load credit
+		String credit = getCredit(context, line.getOptionValue("i"));
+		System.out.println("credit : "+ credit);
+	    }
+	} finally {
+	    context.commit();
+	}
     }
 
     /**
@@ -101,7 +105,7 @@ public class AssociationAnywhere {
     /**
        Returns the number of credits currently available for the given customer.
      **/
-    private static String getCredit(String customerId)
+    private static String getCredit(Context context, String customerId)
             throws Exception
     {
         log.debug("getting credits for customerId " + customerId);
@@ -109,7 +113,7 @@ public class AssociationAnywhere {
 
             String requestUrl =  ConfigurationManager.getProperty("association.anywhere.url")
                     + "/CENCREDWEBSVCLIB.GET_CREDITS_XML?p_input_xml_doc="
-		+ URLEncoder.encode(createRequest(customerId,"sync credits", "load-credit"));
+		+ URLEncoder.encode(createRequest(context, customerId,"sync credits", "load-credit"));
 	    log.debug("AA URL is " + requestUrl);
             HttpClient client = new HttpClient();
             GetMethod get = new GetMethod(requestUrl);
@@ -139,7 +143,7 @@ public class AssociationAnywhere {
      * @return Document of response.
      * @throws Exception
      */
-    private static Document loadCustomerInfo(String customerId)
+    private static Document loadCustomerInfo(Context context, String customerId)
             throws Exception
     {
 
@@ -147,7 +151,7 @@ public class AssociationAnywhere {
 
             String requestUrl =  ConfigurationManager.getProperty("association.anywhere.url")
 		+ "/CENSSAWEBSVCLIB.GET_CUST_INFO_XML?p_input_xml_doc="
-		+ URLEncoder.encode(createRequest(customerId,"load customer info", "customer-info"));
+		+ URLEncoder.encode(createRequest(context, customerId,"load customer info", "customer-info"));
 	    log.debug("AA URL is " + requestUrl);
             HttpClient client = new HttpClient();
             GetMethod get = new GetMethod(requestUrl);
@@ -174,7 +178,7 @@ public class AssociationAnywhere {
      * @return status of response.
      * @throws AssociationAnywhereException
      */
-    public static String tallyCredit(String customerId, String dataPackageID) throws AssociationAnywhereException {
+    public static String tallyCredit(Context context, String customerId, String dataPackageID) throws AssociationAnywhereException {
         log.debug("deducting one credit for customerId " + customerId);
         
         if("test".equals(customerId))
@@ -187,7 +191,7 @@ public class AssociationAnywhere {
         try {
             String requestUrl =  ConfigurationManager.getProperty("association.anywhere.url")
 		+ "/CENCREDWEBSVCLIB.INS_CREDIT_XML?p_input_xml_doc="
-		+ URLEncoder.encode(createRequest(customerId, dataPackageID, "update-credit"));
+		+ URLEncoder.encode(createRequest(context, customerId, dataPackageID, "update-credit"));
 	    log.debug("AA URL is " + requestUrl);
             HttpClient client = new HttpClient();
             GetMethod get = new GetMethod(requestUrl);
@@ -227,11 +231,9 @@ public class AssociationAnywhere {
         {
             for(AuthorityMetadataValue value : concept.getMetadata("internal", "journal", "customerId",AuthorityMetadataValue.ANY))
             {
-                updateConcept(concept, value.getValue());
+                updateConcept(context, concept, value.getValue());
             }
         }
-
-        context.commit();
     }
 
     /**
@@ -249,12 +251,9 @@ public class AssociationAnywhere {
             for(AuthorityMetadataValue value : concept.getMetadata("internal", "journal", "customerId",AuthorityMetadataValue.ANY))
             {
                 if(customerId != null && customerId.equals(value.getValue()))
-                    updateConcept(concept, value.getValue());
+                    updateConcept(context, concept, value.getValue());
             }
         }
-
-        context.commit();
-
     }
 
     /**
@@ -269,7 +268,7 @@ public class AssociationAnywhere {
      * @param customerId
      * @throws Exception
      */
-    private static void updateConcept(Concept concept, String customerId)
+    private static void updateConcept(Context context, Concept concept, String customerId)
             throws Exception {
 
         if(customerId==null)
@@ -277,8 +276,8 @@ public class AssociationAnywhere {
             throw new AssociationAnywhereException("customerId cannot be null");
         }
 
-        String credit = getCredit(customerId);
-        Document customerInfo = loadCustomerInfo(customerId);
+        String credit = getCredit(context, customerId);
+        Document customerInfo = loadCustomerInfo(context, customerId);
         String result = printDocument(customerInfo);
 
         String classSubclassDescr = getStringValue(customerInfo, "//classSubclassDescr");
@@ -369,7 +368,7 @@ public class AssociationAnywhere {
 
     static SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
-    private static String createRequest(String customerId, String transactionDescription, String form)
+    private static String createRequest(Context context, String customerID, String transactionDescription, String form)
     {
         try {
             if(template == null) {
@@ -378,25 +377,24 @@ public class AssociationAnywhere {
             Transformer transformer = template.newTransformer();
             transformer.setParameter("username",ConfigurationManager.getProperty("association.anywhere.username"));
             transformer.setParameter("password", ConfigurationManager.getProperty("association.anywhere.password"));
-            transformer.setParameter("customerId", customerId);
+            transformer.setParameter("customerID", customerID);
             transformer.setParameter("date", dateFormat.format(new Date()));
 	    transformer.setParameter("transactionDescription", transactionDescription);
 
-	    Concept concept = JournalUtils.getJournalConceptByCustomerId(customerId);
+	    Concept concept = JournalUtils.getJournalConceptByCustomerID(context, customerID);
 	    if(concept != null) {
 		String transactionType = JournalUtils.getPaymentPlanType(concept);
+	
 		if (transactionType != null) {
 		    transformer.setParameter("transactionType", transactionType);
 		}
-	    }
-	    
 
-	    String creditsAccepted = "1";
-	    if(transactionType.equals(JournalUtils.PREPAID_PLAN)) {
-		creditsAccepted = "-1";
+		String creditsAccepted = "1";
+		if(transactionType.equals(JournalUtils.PREPAID_PLAN)) {
+		    creditsAccepted = "-1";
+		}
+		transformer.setParameter("creditsAccepted", creditsAccepted);
 	    }
-            transformer.setParameter("creditsAccepted", creditsAccepted);
-
             StringWriter writer = new StringWriter();
             transformer.transform(new StreamSource(new StringReader("<" + form + "/>")),new StreamResult(writer));
             return writer.toString();
@@ -404,7 +402,9 @@ public class AssociationAnywhere {
             log.error("Unable to generate request URL", e);
         } catch (TransformerException e) {
             log.error("Unable to generate request URL", e);
-        }
+        } catch (SQLException e) {
+            log.error("Unable to generate request URL", e);
+	}
         return null;
     }
 

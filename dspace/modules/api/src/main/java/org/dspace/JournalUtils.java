@@ -118,31 +118,37 @@ public class JournalUtils {
         return null;
     }
 
-
-    public static Concept getJournalConceptByShortID(Context context, String journalShortID) throws SQLException {
-        try
-        {
-            List<Concept> concepts = Concept.findByJournalID(context, journalShortID);
+    public static Concept getJournalConceptByCustomerID(Context context, String customerID) throws SQLException {
+        try {
+            List<Concept> concepts = Concept.findByConceptMetadata(context, customerID, "journal", "customerID");
             if (concepts.size() > 0) {
                 Concept concept = concepts.get(0);
                 return concept;
             }
         }
-        catch(Exception e)
-        {
-            if(log.isDebugEnabled())
-                log.error(e.getMessage(),e);
-            else
-                log.error(e);
+        catch(Exception e) {
+                log.error("unable to find journal by AssociationAnywhere customer ID",e);
         }
 
         return null;
     }
 
 
-    public static Concept getJournalConceptByCustomerId(String customerId) {
-	
+    public static Concept getJournalConceptByShortID(Context context, String journalShortID) throws SQLException {
+        try {
+            List<Concept> concepts = Concept.findByConceptMetadata(context, journalShortID.toUpperCase(), "journal", "journalID");
+            if (concepts.size() > 0) {
+                Concept concept = concepts.get(0);
+                return concept;
+            }
+        }
+        catch(Exception e) {
+                log.error("unable to find journal by journalID",e);
+        }
+
+        return null;
     }
+
 
     public static Concept[] getJournalConcept(Context context,String journal) throws SQLException {
         Scheme scheme = Scheme.findByIdentifier(context, ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName"));
@@ -267,6 +273,7 @@ public class JournalUtils {
 
         return null;
     }
+
     public static String getParsingScheme(Concept concept) {
         AuthorityMetadataValue[] vals = concept.getMetadata("journal","parsingScheme",null, Item.ANY);
         if(vals != null && vals.length > 0)
@@ -275,6 +282,13 @@ public class JournalUtils {
         return null;
     }
 
+    public static String getPaymentPlanType(Concept concept) {
+        AuthorityMetadataValue[] vals = concept.getMetadata("journal","paymentPlanType",null, Item.ANY);
+        if(vals != null && vals.length > 0)
+            return vals[0].value;
+
+        return null;
+    }
 
     public static String getEmbargoAllowed(Concept concept) {
         AuthorityMetadataValue[] vals = concept.getMetadata("journal","embargoAllowed",null, Item.ANY);

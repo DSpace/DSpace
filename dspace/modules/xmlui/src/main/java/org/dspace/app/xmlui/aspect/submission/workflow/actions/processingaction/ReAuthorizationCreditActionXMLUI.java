@@ -17,6 +17,7 @@ import org.dspace.content.authority.AuthorityMetadataValue;
 import org.dspace.content.authority.Concept;
 import org.dspace.content.authority.Scheme;
 import org.dspace.core.*;
+import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.paymentsystem.PaymentSystemService;
 import org.dspace.paymentsystem.ShoppingCart;
 import org.dspace.utils.DSpace;
@@ -106,7 +107,7 @@ public class ReAuthorizationCreditActionXMLUI extends AbstractXMLUIAction {
                     AuthorityMetadataValue[] metadataValues = concepts[0].getMetadata("internal", "journal", "customerId", Item.ANY);
                     if(metadataValues!=null&&metadataValues.length>0){
                         try{
-                            success = AssociationAnywhere.tallyCredit(metadataValues[0].value, item.getID());
+                            success = AssociationAnywhere.tallyCredit(context, metadataValues[0].value, DOIIdentifierProvider.getDoiValue(item));
                             shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
                             Date date= new Date();
                             shoppingCart.setPaymentDate(date);

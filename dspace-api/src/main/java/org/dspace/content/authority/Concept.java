@@ -437,27 +437,20 @@ public class Concept extends AuthorityObject
     }
 
     /**
-     * Find the concept by its name - assumes name is unique
+     * Find concepts by a metadata value in the concept metadata.
      *
-     * @param context
-     * @param journalID
-     *
-     * @return the named Concept, or null if not found
+     * @return the matching Concepts, or null if not found
      */
-    public static ArrayList<Concept> findByJournalID(Context context, String journalID) throws SQLException, AuthorizeException {
-	// TODO: call the method below using  journalID.toUpperCase(), "journal, "journalID
-
-    }
-
-    public static ArrayList<Concept> findByJournalID(Context context, String searchString, String schema, String element)
+    public static ArrayList<Concept> findByConceptMetadata(Context context, String searchString, String metadataSchema, String metadataElement)
             throws SQLException, AuthorizeException
     {
         ArrayList<Concept> concepts = new ArrayList<Concept>();
-        MetadataSchema mds = MetadataSchema.find(context, schema);
-        MetadataField mdf = MetadataField.findByElement(context, mds.getSchemaID(), element, null);
-        target_field_id = mdf.getFieldID();
-        log.info ("journal field id is " + journal_field_id);
+        MetadataSchema mds = MetadataSchema.find(context, metadataSchema);
+        MetadataField mdf = MetadataField.findByElement(context, mds.getSchemaID(), metadataElement, null);
+        int target_field_id = mdf.getFieldID();
+        log.info ("looking up concept metadata for " + searchString + " in field number " + target_field_id);
         TableRowIterator row = DatabaseManager.query(context, "select c.* from concept as c, conceptmetadatavalue as cmv where upper(cmv.text_value) = ? and cmv.parent_id = c.id and cmv.field_id = ?;", searchString, target_field_id);
+
 
         if (row == null)
         {

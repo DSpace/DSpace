@@ -2,7 +2,7 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.1" >
     <xsl:param name="username"/>
     <xsl:param name="password"/>
-    <xsl:param name="customerId"/>
+    <xsl:param name="customerID"/>
     <xsl:param name="date"/>
     <xsl:param name="transactionType"/>
     <xsl:param name="creditsAccepted"/>
@@ -11,14 +11,14 @@
         <creditRequest>
             <integratorUsername><xsl:value-of select="$username"/></integratorUsername>
             <integratorPassword><xsl:value-of select="$password"/></integratorPassword>
-            <custId><xsl:value-of select="$customerId"/></custId>
+            <custId><xsl:value-of select="$customerID"/></custId>
             <txTy>PREPAID</txTy>
         </creditRequest>
     </xsl:template>
 
     <xsl:template match="/customer-info">
         <custInfoRequest>
-            <custId><xsl:value-of select="$customerId"/></custId>
+            <custId><xsl:value-of select="$customerID"/></custId>
             <integratorUsername><xsl:value-of select="$username"/></integratorUsername>
             <integratorPassword><xsl:value-of select="$password"/></integratorPassword>
             <details includeCodeValues="true">
@@ -42,7 +42,7 @@
         <credit-request>
             <vendor-id><xsl:value-of select="$username"/></vendor-id>
             <vendor-password><xsl:value-of select="$password"/></vendor-password>
-            <cust-id><xsl:value-of select="$customerId"/></cust-id>
+            <cust-id><xsl:value-of select="$customerID"/></cust-id>
             <trans-type><xsl:value-of select="$transactionType"/></trans-type>
             <trans-date><xsl:value-of select="$date"/></trans-date>
             <cred-accepted><xsl:value-of select="$creditsAccepted"/></cred-accepted>
