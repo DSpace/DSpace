@@ -438,12 +438,11 @@ public class FlowUtils {
         if(email!=null && !email.isEmpty()) {
             email2User.addRecipient(email);
         }
-        String contextPath = ObjectModelHelper.getRequest(objectModel).getContextPath();
-        String base = ConfigurationManager.getProperty("dspace.baseUrl");
+        String base = ConfigurationManager.getProperty("dspace.url");
         if(base.endsWith("/")){
             base = base.substring(0,base.length() - 1);
         }
-        String link = base + contextPath + "/submit?workspaceID=" + workspaceID + "&share_token=" + token;
+        String link = base + "/submit?workspaceID=" + workspaceID + "&share_token=" + token;
         email2User.addArgument(link);
 
         email2User.send();

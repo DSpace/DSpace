@@ -17,10 +17,10 @@ import java.sql.SQLException;
 import java.util.Map;
 
 public class DisplayShareLink  extends AbstractDSpaceTransformer{
-    private static final Message T_title 				= message("Share link");
-    private static final Message T_trail 				= message("Share link");
-    private static final Message T_head 				= message("Share link");
-    private static final Message T_para 				= message("To pass your submission to another user give them the following link: {0}");
+    private static final Message T_title 				= message("xmlui.aspect.submission.submit.DisplayShareLink.title");
+    private static final Message T_trail 				= message("xmlui.aspect.submission.submit.DisplayShareLink.trail");
+    private static final Message T_head 				= message("xmlui.aspect.submission.submit.DisplayShareLink.head");
+    private static final Message T_para 				= message("xmlui.aspect.submission.submit.DisplayShareLink.para");
 
     private static final Message T_DSPACE_HOME		= message("xmlui.general.dspace_home");
 
