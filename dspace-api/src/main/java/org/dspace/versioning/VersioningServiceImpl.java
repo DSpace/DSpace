@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Required;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -95,7 +96,9 @@ public class VersioningServiceImpl implements VersioningService {
             //Delete the item linked to the version
             Item item = version.getItem();
             // Completely delete the item
-            itemService.delete(c, item);
+            if (item != null) {
+                itemService.delete(c, item);
+            }
         }catch (Exception e) {
             c.abort();
             throw new RuntimeException(e.getMessage(), e);
@@ -171,10 +174,10 @@ public class VersioningServiceImpl implements VersioningService {
 
     protected int getNextVersionNumer(Version latest){
         if(latest==null) return 1;
-
+        
         return latest.getVersionNumber()+1;
-    }
-
+        }
+        
     @Required
     public void setProvider(DefaultItemVersionProvider provider) {
         this.provider = provider;

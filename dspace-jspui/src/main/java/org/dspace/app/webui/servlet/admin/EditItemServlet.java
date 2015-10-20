@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -255,11 +256,13 @@ public class EditItemServlet extends DSpaceServlet
             // Delete the item - if "cancel" was pressed this would be
             // picked up above
             // FIXME: Don't know if this does all it should - remove Handle?
-            List<Collection> collections = item.getCollections();
-
+            Iterator<Collection> collIter = item.getCollections().iterator();
+            
             // Remove item from all the collections it's in
-            for (Collection c : collections)
+            while(collIter.hasNext())
             {
+                Collection c = collIter.next();
+                collIter.remove();
                 collectionService.removeItem(context, c, item);
             }
 
