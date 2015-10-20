@@ -326,9 +326,14 @@ public class HandleServiceImpl implements HandleService
         Handle dbHandle = findHandleInternal(context, handle);
         if(dbHandle != null)
         {
-            //Remove the old handle from the current handle list
-            dbHandle.getDSpaceObject().getHandles().remove(dbHandle);
-            //Transfer the current handle to the new object
+            // Check if we have to remove the handle from the current handle list
+            // or if object is alreday deleted.
+            if (dbHandle.getDSpaceObject() != null)
+            {
+                // Remove the old handle from the current handle list
+                dbHandle.getDSpaceObject().getHandles().remove(dbHandle);
+            }
+            // Transfer the current handle to the new object
             dbHandle.setDSpaceObject(newOwner);
             dbHandle.setResourceTypeId(newOwner.getType());
             newOwner.getHandles().add(0, dbHandle);
