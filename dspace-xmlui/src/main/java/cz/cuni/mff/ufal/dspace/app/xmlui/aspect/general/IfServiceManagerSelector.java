@@ -64,9 +64,11 @@ public class IfServiceManagerSelector extends AbstractLogEnabled implements
         {
             Context context = ContextUtil.obtainContext(objectModel);
             EPerson eperson = context.getCurrentUser();
+            int itemID = parameters.getParameterAsInteger("itemID", -1);
+            Item item = Item.find(context, itemID);
 
             if(expression.equals(SERVICEMANAGER)) {
-            	return isNonAdminServiceManager(context, eperson);
+            	return isNonAdminServiceManager(context, eperson, item);
             }
 
             // Otherwise return false;
@@ -82,24 +84,20 @@ public class IfServiceManagerSelector extends AbstractLogEnabled implements
     }
     
     public static boolean isNonAdminServiceManager(Context context, EPerson eperson) throws SQLException {
-    	try {
-    		Group sm_group = Group.findByName(context, "Service Managers");
-    		if(sm_group != null) {
-    			if(sm_group.isMember(eperson) && !AuthorizeManager.isAdmin(context)) {
-    				return true;
-    			}
-    		}
-    	}catch(Exception e) {
-    		return false;
-    	}
-    	return false;
+    	return isNonAdminServiceManager(context, eperson, null);
     }
     
     public static boolean isNonAdminServiceManager(Context context, EPerson eperson, DSpaceObject dso) throws SQLException {
     	try {
     		Group sm_group = Group.findByName(context, "Service Managers");
     		if(sm_group != null) {
-    			if(sm_group.isMember(eperson) && !AuthorizeManager.isAdmin(context, dso)) {
+    			boolean isAdmin = false;
+    			if(dso==null) {
+    				isAdmin = AuthorizeManager.isAdmin(context);
+    			} else {
+    				isAdmin = AuthorizeManager.isAdmin(context, dso);
+    			}
+    			if(sm_group.isMember(eperson) && !isAdmin) {
     				return true;
     			}
     		}

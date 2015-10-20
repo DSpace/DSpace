@@ -587,6 +587,8 @@ to administer DSpace.
 		        			
 					<map:select type="IfServiceManagerSelector">
 						
+						<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+						
 						<map:when test="servicemanager">
 						
 			        		<map:match pattern="admin/item/status">
