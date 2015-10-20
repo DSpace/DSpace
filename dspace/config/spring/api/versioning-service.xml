@@ -19,7 +19,7 @@
          Default Item Versioning Provider, defines behavior for replicating
          Item, Metadata, Bundles and Bitstreams. Autowired at this time.
      -->
-    <bean id="org.dspace.versioning.VersioningService"
+    <bean id="org.dspace.versioning.service.VersioningService"
           class="org.dspace.versioning.VersioningServiceImpl"
           autowire="byType"
           scope="singleton">
@@ -36,7 +36,7 @@
                
            </bean>
        </property>
- 
+
     </bean>
-    
+
 </beans>
