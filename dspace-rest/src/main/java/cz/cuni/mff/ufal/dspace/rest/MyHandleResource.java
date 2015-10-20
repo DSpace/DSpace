@@ -12,21 +12,16 @@ import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
-/**
- * Created by okosarko on 13.10.15.
- */
+@Disable
 @Path("/services")
 public class MyHandleResource extends Resource {
     private static Logger log = Logger.getLogger(MyHandleResource.class);
@@ -101,15 +96,9 @@ public class MyHandleResource extends Resource {
     }
 
     private String createHandle(String subprefix, String url, org.dspace.core.Context context) throws SQLException{
-        String query = "select handle from handle where url like ? ;";
-        TableRowIterator tri = DatabaseManager.query(context, query, url);
-        if(tri.hasNext()){
-            TableRow row = tri.next();
-            //if the url is there don't create it again
-            return row.getStringColumn("handle");
-        }
         String handle;
-        query = "select * from handle where handle like ? ;";
+        TableRowIterator tri;
+        String query = "select * from handle where handle like ? ;";
         while(true){
             String rnd = RandomStringUtils.random(4,true,true).toUpperCase();
             handle = prefix + "/" + subprefix + rnd;
@@ -126,3 +115,4 @@ public class MyHandleResource extends Resource {
         return handle;
     }
 }
+
