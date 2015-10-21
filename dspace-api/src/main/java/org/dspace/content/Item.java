@@ -523,6 +523,41 @@ public class Item extends DSpaceObject
         }
         modified = true;
     }
+    
+    /**
+     * Change the e-person.
+     * This is a public method since it is handled by the WorkspaceItem class
+     * in the ingest package. <code>update</code> must be called to write
+     * the change to the database.
+     *
+     * @param sub
+     *            the submitter
+     */
+    public void changeSubmitter(EPerson sub) throws SQLException, AuthorizeException
+    {
+        submitter = sub;
+
+        if (submitter != null)
+        {
+            itemRow.setColumn("submitter_id", submitter.getID());
+        }
+        else
+        {
+            itemRow.setColumnNull("submitter_id");
+        }
+        
+        
+        // changing policies to new owner
+        List<ResourcePolicy> oldPolicies = AuthorizeManager.getPolicies(ourContext, this);
+        for(ResourcePolicy policy : oldPolicies) {
+        	if(policy.getEPerson()!=null) {
+        		policy.setEPerson(submitter);
+        		policy.update();
+        	}
+        }        
+                
+        modified = true;
+    }    
 
     /**
      * See whether this Item is contained by a given Collection.

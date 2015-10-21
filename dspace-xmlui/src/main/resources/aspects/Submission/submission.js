@@ -253,7 +253,7 @@ function doSubmission()
                    var subInfo = getSubmissionInfo("S"+workspaceID);
                    var item = subInfo.getSubmissionItem().getItem();
                    var current = getDSContext().getCurrentUser();
-                   item.setSubmitter(current);
+                   item.changeSubmitter(current);
                    var provenance  = "Submitter id changed from " + submitterID + "("
                        + workspace.getSubmitter().getEmail() + ") to " +
                        current.getID() + "(" + current.getEmail() + ")";
