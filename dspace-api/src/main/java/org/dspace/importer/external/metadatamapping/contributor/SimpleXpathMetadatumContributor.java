@@ -45,7 +45,7 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
         this.metadataFieldMapping = metadataFieldMapping;
     }
 
-    @Resource(name="isiFullprefixMapping")
+    @Resource(name="FullprefixMapping")
     public void setPrefixToNamespaceMapping(Map<String, String> prefixToNamespaceMapping) {
         this.prefixToNamespaceMapping = prefixToNamespaceMapping;
     }

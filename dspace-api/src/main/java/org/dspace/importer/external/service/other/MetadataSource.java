@@ -5,7 +5,6 @@
  *
  * http://www.dspace.org/license/
  */
-
 package org.dspace.importer.external.service.other;
 
 import org.apache.log4j.Logger;

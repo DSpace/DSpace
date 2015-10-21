@@ -107,8 +107,8 @@ to administer DSpace.
     	<map:actions>
     		<map:action name="ControlPanelAction" src="org.dspace.app.xmlui.aspect.administrative.ControlPanelAction" />
     		<map:action name="CurrentActivityAction" src="org.dspace.app.xmlui.aspect.administrative.CurrentActivityAction" />
-                <map:action name="ClearCacheAction" src="org.apache.cocoon.acting.ClearCacheAction"/>        
-    	</map:actions>		
+                <map:action name="ClearCacheAction" src="org.apache.cocoon.acting.ClearCacheAction"/>
+    	</map:actions>
 		
 		<map:selectors>
     		<map:selector name="AuthenticatedSelector" src="org.dspace.app.xmlui.aspect.general.AuthenticatedSelector"/>

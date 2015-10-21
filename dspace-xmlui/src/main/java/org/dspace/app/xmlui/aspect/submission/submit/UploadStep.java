@@ -7,11 +7,6 @@
  */
 package org.dspace.app.xmlui.aspect.submission.submit;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.sql.SQLException;
-import java.util.*;
-
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.environment.SourceResolver;
@@ -20,30 +15,27 @@ import org.dspace.app.sherpa.SHERPAJournal;
 import org.dspace.app.sherpa.SHERPAPublisher;
 import org.dspace.app.sherpa.SHERPAResponse;
 import org.dspace.app.sherpa.submit.SHERPASubmitService;
-import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.util.Util;
 import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
+import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Button;
-import org.dspace.app.xmlui.wing.element.Cell;
-import org.dspace.app.xmlui.wing.element.Radio;
-import org.dspace.app.xmlui.wing.element.CheckBox;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.File;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.Row;
-import org.dspace.app.xmlui.wing.element.Table;
-import org.dspace.app.xmlui.wing.element.Text;
-import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
+import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * This is a step of the item submission processes. The upload
@@ -141,7 +133,7 @@ public class UploadStep extends AbstractSubmissionStep
      * Global reference to edit file page
      * (this is used when a user requests to edit a bitstream)
      **/
-    private EditFileStep editFile = null;
+    protected EditFileStep editFile = null;
 
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
@@ -496,7 +488,7 @@ public class UploadStep extends AbstractSubmissionStep
      * @param bitstream The bitstream to link to
      * @returns a String link to the bitstream
      */
-    private String makeBitstreamLink(Item item, Bitstream bitstream)
+    protected String makeBitstreamLink(Item item, Bitstream bitstream)
     {
         String name = bitstream.getName();
         StringBuilder result = new StringBuilder(contextPath);

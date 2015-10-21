@@ -7,23 +7,15 @@
  */
 package org.dspace.app.xmlui.aspect.submission.submit;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Map;
-import java.util.UUID;
-
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.environment.SourceResolver;
-import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.aspect.administrative.importer.external.fileaccess.FileAccessUI;
 import org.dspace.app.xmlui.aspect.submission.AbstractStep;
+import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.Select;
-import org.dspace.app.xmlui.wing.element.Text;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -31,7 +23,15 @@ import org.dspace.content.Collection;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.fileaccess.factory.FileAccessServiceFactory;
+import org.dspace.fileaccess.service.FileAccessFromMetadataService;
+import org.dspace.importer.external.scidir.entitlement.ArticleAccess;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * This is a sub step of the Upload step during item submission. This 
@@ -44,13 +44,13 @@ import org.xml.sax.SAXException;
  * upload step.
  * <P>
  * NOTE: As a sub step, it is called directly from the UploadStep class.
- * 
+ *
  * @author Scott Phillips
  * @author Tim Donohue (updated for Configurable Submission)
  */
 public class EditFileStep extends AbstractStep
 {
-	
+
 	/** Language Strings **/
     protected static final Message T_head = 
         message("xmlui.Submission.submit.EditFileStep.head");
@@ -83,6 +83,7 @@ public class EditFileStep extends AbstractStep
 	private Bitstream bitstream;
 
     protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
+    protected FileAccessFromMetadataService fileAccessFromMetadataService = FileAccessServiceFactory.getInstance().getFileAccessFromMetadataService();
 
 	
 	/**
@@ -138,6 +139,11 @@ public class EditFileStep extends AbstractStep
         description.setLabel(T_description);
         description.setHelp(T_description_help);
         description.setValue(bitstream.getDescription());
+
+        ArticleAccess fileAccess = fileAccessFromMetadataService.getFileAccess(context, bitstream);
+        boolean fileAccessError = this.errorFlag == org.dspace.submit.step.ElsevierUploadStep.STATUS_NO_FIlE_ACCESS_ERROR;
+        FileAccessUI.addAccessSelection(edit, "file-access", fileAccess.getAudience(), fileAccessError);
+        FileAccessUI.addEmbargoDateField(edit, fileAccess);
 
         // if AdvancedAccessPolicy=false: add simmpleFormEmbargo in UploadStep
         boolean isAdvancedFormEnabled= DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);

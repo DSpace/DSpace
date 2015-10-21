@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.1.xsd
+ http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd"
+       default-autowire-candidates="*Service,*DAO,javax.sql.DataSource,*Map">
+
+    <context:annotation-config/>
+
+    <util:map id="LiveImportFields">
+        <entry key="affiliation" value="aff"/>
+        <entry key="title" value="ttl"/>
+        <entry key="author" value="aut"/>
+        <entry key="doi" value="doi"/>
+    </util:map>
+
+    <bean name="LiveImportUtils" class="org.dspace.importer.external.scidir.util.LiveImportUtils" />
+
+    <util:map id="FullprefixMapping" key-type="java.lang.String" value-type="java.lang.String">
+        <description>Defines the namespace mappin for the SimpleXpathMetadatum contributors</description>
+        <entry key="http://purl.org/dc/elements/1.1/" value="dc"/>
+        <entry key="http://prismstandard.org/namespaces/basic/2.0/" value="prism"/>
+        <entry key="http://a9.com/-/spec/opensearch/1.1/" value="opensearch"/>
+        <entry key="http://www.w3.org/2005/Atom" value="x"/>
+    </util:map>
+
+    <util:map id="scidirMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+              value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
+        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
+            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
+            what metadatafield is generated.
+        </description>
+        <entry key-ref="dc.title" value-ref="titleContrib"/>
+        <entry key-ref="elsevier.identifier.doi" value-ref="doiContrib"/>
+        <entry key-ref="dc.identifier.uri" value-ref="uriContrib"/>
+        <entry key-ref="dc.identifier" value-ref="identifierContrib"/>
+        <entry key-ref="elsevier.identifier.eid" value-ref="eidContrib"/>
+        <entry key-ref="dc.creator" value-ref="creatorContrib"/>
+        <entry key-ref="dc.relation.ispartof" value-ref="publicationContrib"/>
+        <entry key-ref="dc.identifier.issn" value-ref="issnContrib"/>
+        <entry key-ref="dc.identifier.isbn" value-ref="isbnContrib"/>
+        <entry key-ref="elsevier.volume" value-ref="volumeContrib"/>
+        <entry key-ref="elsevier.issue.identifier" value-ref="issueIdentifierContrib"/>
+        <entry key-ref="elsevier.issue.name" value-ref="issueNameContrib"/>
+        <entry key-ref="elsevier.coverdate" value-ref="coverdateContrib"/>
+        <entry key-ref="elsevier.coverdisplaydate" value-ref="coverdisplaydateContrib"/>
+        <entry key-ref="elsevier.startingpage" value-ref="startingpageContrib"/>
+        <entry key-ref="elsevier.endingpage" value-ref="endingpageContrib"/>
+        <entry key-ref="elsevier.openaccess" value-ref="openaccessContrib"/>
+        <entry key-ref="elsevier.openaccessflag" value-ref="openaccessflagContrib"/>
+        <entry key-ref="elsevier.openaccessarticle" value-ref="openaccessarticleContrib"/>
+        <entry key-ref="elsevier.openarchivearticle" value-ref="openarchivearticleContrib"/>
+        <entry key-ref="elsevier.openaccessuserlicense" value-ref="openaccessuserlicenseContrib"/>
+        <entry key-ref="dc.type" value-ref="typeContrib"/>
+        <entry key-ref="elsevier.identifier.pii" value-ref="piiContrib"/>
+        <entry key-ref="dc.contributor.author" value-ref="authorContrib"/>
+        <entry key-ref="elsevier.teaser" value-ref="teaserContrib"/>
+        <entry key-ref="elsevier.url.scidir" value-ref="scidirurlContrib"/>
+        <entry key-ref="elsevier.url.self" value-ref="selfurlContrib"/>
+        <entry key-ref="elsevier.url.abstract" value-ref="abstracturlContrib"/>
+        <entry key-ref="elsevier.edition" value-ref="editionContrib"/>
+        <entry key-ref="dc.description.abstract" value-ref="abstractContrib"/>
+        <entry key-ref="elsevier.aggregationtype" value-ref="aggregationtypeContrib"/>
+        <entry key-ref="dc.rights.license" value-ref="copyrightContrib"/>
+    </util:map>
+
+    <bean class="org.dspace.importer.external.scidir.GenerateQueryForItem" id="DOIBasedService">
+        <description>Defines how an org.dspace.content.Item is mapped to a query in ISI. Please note that exactly one of
+            these must be present. If multiple are present the result is undefined.
+        </description>
+        <constructor-arg value="dc.identifier.doi"/>
+    </bean>
+
+    <bean class="java.lang.Long" id="interRequestTime">
+        <description>Defines the throttling interval for requests to scidir</description>
+        <constructor-arg value="1000"/>
+    </bean>
+
+    <bean class="java.lang.Integer" id="maxRetry">
+        <constructor-arg value="2"/>
+    </bean>
+
+    <!-- Metadatafields-->
+
+    <bean id="dc.title" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.title"/>
+    </bean>
+
+    <bean id="elsevier.identifier.doi" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="elsevier.identifier.doi"/>
+    </bean>
+
+    <bean id="dc.identifier.uri" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.uri"/>
+    </bean>
+
+    <bean id="dc.identifier" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier"/>
+    </bean>
+
+    <bean id="elsevier.identifier.eid" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig" name="importId">
+        <constructor-arg value="elsevier.identifier.eid"/>
+    </bean>
+
+    <bean id="dc.creator" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.creator"/>
+    </bean>
+
+    <bean id="dc.relation.ispartof" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.relation.ispartof"/>
+    </bean>
+
+    <bean id="dc.identifier.issn" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.issn"/>
+    </bean>
+
+    <bean id="dc.identifier.isbn" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.isbn"/>
+    </bean>
+
+    <bean id="elsevier.volume" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="elsevier.volume"/>
+    </bean>
+
+    <bean id="elsevier.issue.identifier" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="elsevier.issue.identifier"/>
+    </bean>
+
+    <bean id="elsevier.issue.name" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="elsevier.issue.name"/>
+    </bean>
+
+    <bean id="elsevier.coverdate" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="elsevier.coverdate"/>
+    </bean>
+
+    <bean id="elsevier.coverdisplaydate" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="elsevier.coverdisplaydate"/>
+    </bean>
+
+    <bean id="elsevier.startingpage" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="elsevier.startingpage"/>
+    </bean>
+
+    <bean id="elsevier.endingpage" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="elsevier.endingpage"/>
+    </bean>
+
+    <bean id="elsevier.openaccess" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="elsevier.openaccess"/>
+    </bean>
+
+    <bean id="elsevier.openaccessflag" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="elsevier.openaccessflag"/>
+    </bean>
+
+    <bean id="elsevier.openaccessarticle" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="elsevier.openaccessarticle"/>
+    </bean>
+
+    <bean id="elsevier.openarchivearticle" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="elsevier.openarchivearticle"/>
+    </bean>
+
+    <bean id="elsevier.openaccessuserlicense" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="elsevier.openaccessuserlicense"/>
+    </bean>
+
+    <bean id="dc.type" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.type"/>
+    </bean>
+
+    <bean id="elsevier.identifier.pii" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="elsevier.identifier.pii"/>
+    </bean>
+
+    <bean id="dc.contributor.author" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.contributor.author"/>
+    </bean>
+
+    <bean id="dc.description.abstract" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.description.abstract"/>
+    </bean>
+
+    <bean id="elsevier.url.scidir" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="elsevier.url.scidir"/>
+    </bean>
+
+    <bean id="elsevier.url.self" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="elsevier.url.self"/>
+    </bean>
+
+    <bean id="elsevier.url.abstract" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="elsevier.url.abstract"/>
+    </bean>
+
+    <bean id="elsevier.edition" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="elsevier.edition"/>
+    </bean>
+
+    <bean id="elsevier.teaser" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="elsevier.teaser"/>
+    </bean>
+
+    <bean id="elsevier.aggregationtype" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="elsevier.aggregationtype"/>
+    </bean>
+
+    <bean id="dc.rights.license" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.rights.license"/>
+    </bean>
+
+    <bean id="elsevier.identifier.scopusid" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="elsevier.identifier.scopusid"/>
+    </bean>
+
+    <bean id="elsevier.identifier.scopuseid" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="elsevier.identifier.scopuseid"/>
+    </bean>
+
+    <bean id="elsevier.identifier.pubmedid" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="elsevier.identifier.pubmedid"/>
+    </bean>
+
+
+    <!-- Metadata Contributors-->
+
+    <bean id="titleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.title"/>
+        <property name="query" value="dc:title"/>
+    </bean>
+
+    <bean id="doiContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="elsevier.identifier.doi"/>
+        <property name="query" value="prism:doi"/>
+    </bean>
+
+    <bean id="uriContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.identifier.uri"/>
+        <property name="query" value="prism:url"/>
+    </bean>
+
+    <bean id="identifierContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.identifier"/>
+        <property name="query" value="dc:identifier"/>
+    </bean>
+
+    <bean id="eidContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="elsevier.identifier.eid"/>
+        <property name="query" value="x:eid"/>
+    </bean>
+
+    <bean id="creatorContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.creator"/>
+        <property name="query" value="dc:creator"/>
+    </bean>
+
+    <bean id="publicationContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.relation.ispartof"/>
+        <property name="query" value="prism:publicationName"/>
+    </bean>
+
+    <bean id="issnContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.identifier.issn"/>
+        <property name="query" value="prism:issn"/>
+    </bean>
+
+    <bean id="isbnContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.identifier.isbn"/>
+        <property name="query" value="prism:isbn"/>
+    </bean>
+
+    <bean id="volumeContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="elsevier.volume"/>
+        <property name="query" value="prism:volume"/>
+    </bean>
+
+    <bean id="issueIdentifierContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="elsevier.issue.identifier"/>
+        <property name="query" value="prism:issueIdentifier"/>
+    </bean>
+
+    <bean id="issueNameContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="elsevier.issue.name"/>
+        <property name="query" value="prism:issueName"/>
+    </bean>
+
+    <bean id="coverdateContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="elsevier.coverdate"/>
+        <property name="query" value="prism:coverDate"/>
+    </bean>
+
+    <bean id="coverdisplaydateContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="elsevier.coverdisplaydate"/>
+        <property name="query" value="prism:coverDisplayDate"/>
+    </bean>
+
+    <bean id="startingpageContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="elsevier.startingpage"/>
+        <property name="query" value="prism:startingPage"/>
+    </bean>
+
+    <bean id="endingpageContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="elsevier.endingpage"/>
+        <property name="query" value="prism:endingPage"/>
+    </bean>
+
+    <bean id="openaccessContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="elsevier.openaccess"/>
+        <property name="query" value="x:openaccess"/>
+    </bean>
+
+    <bean id="openaccessflagContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="elsevier.openaccessflag"/>
+        <property name="query" value="x:openaccessFlag"/>
+    </bean>
+
+    <bean id="openaccessarticleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="elsevier.openaccessarticle"/>
+        <property name="query" value="x:openaccessArticle"/>
+    </bean>
+
+    <bean id="openarchivearticleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="elsevier.openarchivearticle"/>
+        <property name="query" value="x:openArchiveArticle"/>
+    </bean>
+
+    <bean id="openaccessuserlicenseContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="elsevier.openaccessuserlicense"/>
+        <property name="query" value="x:openaccessUserLicense"/>
+    </bean>
+
+    <bean id="typeContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.type"/>
+        <property name="query" value="x:pubType"/>
+    </bean>
+
+    <bean id="piiContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="elsevier.identifier.pii"/>
+        <property name="query" value="x:pii"/>
+    </bean>
+
+    <bean id="authorContrib" class="org.dspace.importer.external.metadatamapping.contributor.CombinedMetadatumContributor">
+        <property name="separator" value=", "/>
+        <property name="metadatumContributors" ref="combinedauthorList"/>
+        <property name="field" ref="dc.contributor.author"/>
+    </bean>
+
+    <util:list id="combinedauthorList" value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor" list-class="java.util.LinkedList">
+        <ref bean="lastNameContrib"/>
+        <ref bean="firstNameContrib"/>
+    </util:list>
+
+    <bean id="lastNameContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.contributor.author"/>
+        <property name="query" value="x:authors/x:author/x:surname"/>
+    </bean>
+
+    <bean id="firstNameContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.contributor.author"/>
+        <property name="query" value="x:authors/x:author/x:given-name"/>
+    </bean>
+
+    <bean id="teaserContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="elsevier.teaser"/>
+        <property name="query" value="prism:teaser"/>
+    </bean>
+
+    <bean id="scidirurlContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="elsevier.url.scidir"/>
+        <property name="query" value="x:link[@ref='scidir']"/>
+    </bean>
+
+    <bean id="selfurlContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="elsevier.url.self"/>
+        <property name="query" value="x:link[@ref='self']"/>
+    </bean>
+
+    <bean id="abstracturlContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="elsevier.url.abstract"/>
+        <property name="query" value="x:link[@ref='abstract']"/>
+    </bean>
+
+    <bean id="editionContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="elsevier.edition"/>
+        <property name="query" value="x:link[@ref='self']"/>
+    </bean>
+
+    <bean id="abstractContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.description.abstract"/>
+        <property name="query" value="dc:description"/>
+    </bean>
+
+    <bean id="aggregationtypeContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="elsevier.aggregationtype"/>
+        <property name="query" value="prism:aggregationType"/>
+    </bean>
+
+    <bean id="copyrightContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.rights.license"/>
+        <property name="query" value="prism:copyright"/>
+    </bean>
+
+
+</beans>

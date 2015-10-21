@@ -5,7 +5,6 @@
  *
  * http://www.dspace.org/license/
  */
-
 package org.dspace.importer.external.service;
 
 import org.dspace.importer.external.datamodel.ImportRecord;

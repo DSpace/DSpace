@@ -38,4 +38,10 @@
         <constructor-arg value="dc.identifier.other"/>
     </bean>
 
+    <bean id="ScidirImportService" class="org.dspace.importer.external.scidir.ScidirImportSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="ScidirMetadataFieldMapping"/>
+        <property name="apiUrl" value="http://api.elsevier.com/content/search/scidir"/>
+    </bean>
+
+    <bean id="ScidirMetadataFieldMapping" class="org.dspace.importer.external.scidir.ScidirMetadataFieldMapping"/>
 </beans>

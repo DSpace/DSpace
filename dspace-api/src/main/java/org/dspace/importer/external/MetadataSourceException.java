@@ -5,7 +5,6 @@
  *
  * http://www.dspace.org/license/
  */
-
 package org.dspace.importer.external;
 
 /** Represents a problem with the input source: e.g. cannot connect to the source.

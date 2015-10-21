@@ -7,6 +7,45 @@
  */
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
+import org.apache.cocoon.caching.CacheableProcessingComponent;
+import org.apache.cocoon.environment.ObjectModelHelper;
+import org.apache.cocoon.environment.Request;
+import org.apache.cocoon.environment.http.HttpEnvironment;
+import org.apache.cocoon.util.HashUtil;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.excalibur.source.SourceValidity;
+import org.dspace.app.sfx.factory.SfxServiceFactory;
+import org.dspace.app.sfx.service.SFXFileReaderService;
+import org.dspace.app.util.GoogleMetadata;
+import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
+import org.dspace.app.xmlui.utils.DSpaceValidity;
+import org.dspace.app.xmlui.utils.HandleUtil;
+import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.wing.Message;
+import org.dspace.app.xmlui.wing.WingException;
+import org.dspace.app.xmlui.wing.element.*;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.crosswalk.CrosswalkException;
+import org.dspace.content.crosswalk.DisseminationCrosswalk;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.fileaccess.factory.FileAccessServiceFactory;
+import org.dspace.fileaccess.service.ItemMetadataService;
+import org.jdom.Element;
+import org.jdom.Text;
+import org.jdom.output.XMLOutputter;
+import org.xml.sax.SAXException;
+import org.dspace.app.xmlui.wing.element.Metadata;
+import org.dspace.core.factory.CoreServiceFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
+
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -17,45 +56,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.servlet.http.HttpServletResponse;
-import org.apache.cocoon.caching.CacheableProcessingComponent;
-import org.apache.cocoon.environment.ObjectModelHelper;
-import org.apache.cocoon.environment.Request;
-import org.apache.cocoon.environment.http.HttpEnvironment;
-import org.apache.cocoon.util.HashUtil;
-import org.apache.excalibur.source.SourceValidity;
-import org.dspace.app.sfx.factory.SfxServiceFactory;
-import org.dspace.app.sfx.service.SFXFileReaderService;
-import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
-import org.dspace.app.xmlui.utils.DSpaceValidity;
-import org.dspace.app.xmlui.utils.HandleUtil;
-import org.dspace.app.xmlui.utils.UIException;
-import org.dspace.app.xmlui.wing.Message;
-import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.ReferenceSet;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Para;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Collection;
-import org.dspace.content.MetadataValue;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.app.util.GoogleMetadata;
-import org.dspace.content.crosswalk.CrosswalkException;
-import org.dspace.content.crosswalk.DisseminationCrosswalk;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.services.factory.DSpaceServicesFactory;
-import org.jdom.Element;
-import org.jdom.Text;
-import org.jdom.output.XMLOutputter;
-import org.xml.sax.SAXException;
-import org.dspace.app.xmlui.wing.element.Metadata;
-import org.dspace.core.factory.CoreServiceFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Display a single item.
@@ -81,21 +81,26 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         message("xmlui.ArtifactBrowser.ItemViewer.head_parent_collections");
 
     private static final Message T_withdrawn = message("xmlui.ArtifactBrowser.ItemViewer.withdrawn");
+
+    private static final Message T_elsevier_embed = message("xmlui.ArtifactBrowser.ItemViewer.elsevier_embed");
+    private static final Message T_elsevier_entitlement = message("xmlui.ArtifactBrowser.ItemViewer.elsevier_entitlement");
+
+    /** Cached validity object */
+    private SourceValidity validity = null;
+
+    /** XHTML crosswalk instance */
+    private DisseminationCrosswalk xHTMLHeadCrosswalk = null;
     
-	/** Cached validity object */
-	private SourceValidity validity = null;
-
-	/** XHTML crosswalk instance */
-	private DisseminationCrosswalk xHTMLHeadCrosswalk = null;
-
 	private final String sfxFile = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
             + File.separator + "config" + File.separator + "sfx.xml";
 
-	private String sfxQuery = null;
+    private String sfxQuery = null;
 
     private static final Logger log = LoggerFactory.getLogger(ItemViewer.class);
 
     protected SFXFileReaderService sfxFileReaderService = SfxServiceFactory.getInstance().getSfxFileReaderService();
+
+    protected static ItemMetadataService itemMetadataService = FileAccessServiceFactory.getInstance().getItemMetadataService();
 
     /**
      * Generate the unique caching key.
@@ -206,7 +211,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             sfxserverUrl = sfxserverUrl.trim() +"&" + sfxQuery.trim();
             pageMeta.addMetadata("sfx","server").addContent(sfxserverUrl);
         }
-        
+
         // Add persistent identifiers
         /* Temporarily switch to using metadata directly.
          * FIXME Proper fix is to have IdentifierService handle all durable
@@ -269,7 +274,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         String sfxserverImg = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("sfx.server.image_url");
         if (sfxserverImg != null && sfxserverImg.length() > 0)
         {
-            pageMeta.addMetadata("sfx","image_url").addContent(sfxserverImg);
+            pageMeta.addMetadata("sfx", "image_url").addContent(sfxserverImg);
         }
 
         boolean googleEnabled = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty(
@@ -318,6 +323,14 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             // TODO: Is this the right exception class?
             throw new WingException(ce);
         }
+
+        boolean entitlementCheck = ConfigurationManager.getBooleanProperty("elsevier-sciencedirect", "entitlement.check.enabled", false);
+        if(entitlementCheck) {
+            pageMeta.addMetadata("window.DSpace", "item_pii").addContent(itemMetadataService.getPII(item));
+            pageMeta.addMetadata("window.DSpace", "item_doi").addContent(itemMetadataService.getDOI(item));
+            pageMeta.addMetadata("window.DSpace", "elsevier_apikey").addContent(ConfigurationManager.getProperty("elsevier-sciencedirect", "api.key"));
+            pageMeta.addMetadata("window.DSpace", "elsevier_entitlement_url").addContent(ConfigurationManager.getProperty("elsevier-sciencedirect", "api.entitlement.url"));
+        }
     }
 
     /**
@@ -355,7 +368,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             p.addContent(T_withdrawn);
             //Set proper response. Return "404 Not Found"
             HttpServletResponse response = (HttpServletResponse)objectModel
-                    .get(HttpEnvironment.HTTP_RESPONSE_OBJECT);   
+                    .get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
@@ -395,6 +408,18 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         {
             appearsInclude.addReference(collection);
         }
+
+        division.addPara("entitlement", "entitlement-wrapper hidden").addXref("", T_elsevier_entitlement, "entitlement-link");
+
+
+        boolean embedDisplay = ConfigurationManager.getBooleanProperty("elsevier-sciencedirect", "embed.display");
+        String pii = itemMetadataService.getPII(item);
+        if (embedDisplay && StringUtils.isNotBlank(pii) && StringUtils.isNotBlank(item.getHandle())) {
+            String link = contextPath + "/handle/" + item.getHandle() + "/elsevier-embed/" + pii;
+            Para para = division.addPara("elsevier-embed-page", "elsevier-embed-page");
+            para.addXref(link, T_elsevier_embed);
+        }
+
 
         showfullPara = division.addPara(null,"item-view-toggle item-view-toggle-bottom");
 

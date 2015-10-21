@@ -10,6 +10,7 @@ package org.dspace.app.xmlui.objectmanager;
 import org.dspace.app.util.Util;
 import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.app.util.service.MetadataExposureService;
+import org.dspace.app.xmlui.objectmanager.plugins.adapter.decorators.AdapterDecoratorManager;
 import org.dspace.app.xmlui.wing.AttributeMap;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.authorize.AuthorizeException;
@@ -38,7 +39,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -715,6 +719,11 @@ public class ItemAdapter extends AbstractAdapter
                 continue;
             }
 
+                if (fileGrpTypes.size() != 0 && !fileGrpTypes.contains(use))
+                    // The user requested specific file groups and this is not one of them.
+                    continue;
+
+
             // ///////////////////
             // Start bundle's file group
             attributes = new AttributeMap();
@@ -760,7 +769,10 @@ public class ItemAdapter extends AbstractAdapter
             // End the bundle's file group
             endElement(METS,"fileGrp");
         }
-        
+
+        AdapterDecoratorManager manager = AdapterDecoratorManager.getInstance();
+        manager.decorateElement(context, Constants.ITEM, AdapterDecoratorManager.FILE_SEC, this);
+
         // //////////////////////
         // End the file section
         endElement(METS,"fileSec");
@@ -835,8 +847,8 @@ public class ItemAdapter extends AbstractAdapter
                 String fileID = getFileID(bitstream);
                 attributes.put("FILEID", fileID);
                 
-                startElement(METS,"fptr",attributes);
-                endElement(METS,"fptr");
+                startElement(METS, "fptr", attributes);
+                endElement(METS, "fptr");
                 
                 // ///////////////////////////////
                 // End the div
@@ -845,7 +857,7 @@ public class ItemAdapter extends AbstractAdapter
 
         // ////////////////////////////////
         // End the special first division
-        endElement(METS,"div");
+        endElement(METS, "div");
         
         // ///////////////////////
         // End the structure map

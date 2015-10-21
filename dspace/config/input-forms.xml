@@ -107,6 +107,28 @@
        </field>
 
        <field>
+         <dc-schema>elsevier</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier>pii</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>PII</label>
+         <input-type>onebox</input-type>
+         <hint>Enter the PII for this item.</hint>
+         <required></required>
+       </field>
+
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>DOI</label>
+         <input-type>onebox</input-type>
+         <hint>Enter DOI for this item.</hint>
+         <required></required>
+       </field>
+
+       <field>
          <dc-schema>dc</dc-schema>
          <dc-element>relation</dc-element>
          <dc-qualifier>ispartofseries</dc-qualifier>

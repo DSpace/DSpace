@@ -796,12 +796,22 @@
     <xsl:template name="addJavascript">
 
         <script type="text/javascript"><xsl:text>
-                         if(typeof window.publication === 'undefined'){
-                            window.publication={};
+                         if(typeof window.import === 'undefined'){
+                            window.import={};
                           };
-                        window.publication.contextPath= '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/><xsl:text>';</xsl:text>
-            <xsl:text>window.publication.themePath= '</xsl:text><xsl:value-of select="$theme-path"/><xsl:text>';</xsl:text>
+                        window.import.contextPath= '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/><xsl:text>';</xsl:text>
+            <xsl:text>window.import.themePath= '</xsl:text><xsl:value-of select="$theme-path"/><xsl:text>';</xsl:text>
         </script>
+        <script type="text/javascript"><xsl:text>
+            if(typeof window.DSpace === 'undefined'){
+            window.DSpace={};
+            };</xsl:text>
+            <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='window.DSpace']"><xsl:text>
+                window.DSpace.</xsl:text><xsl:value-of select="@qualifier"/><xsl:text>= '</xsl:text><xsl:value-of select="text()"/><xsl:text>';</xsl:text>
+            </xsl:for-each>
+        </script>
+
+
         <!--TODO concat & minify!-->
 
         <script>

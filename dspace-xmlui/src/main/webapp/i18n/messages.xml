@@ -239,7 +239,9 @@
 	<message key="xmlui.ArtifactBrowser.ItemViewer.show_simple">Show simple item record</message>
 	<message key="xmlui.ArtifactBrowser.ItemViewer.show_full">Show full item record</message>
 
-        <message key="xmlui.ArtifactBrowser.ItemViewer.withdrawn">This item has been withdrawn and is no longer available.</message>
+	<message key="xmlui.ArtifactBrowser.ItemViewer.withdrawn">This item has been withdrawn and is no longer available.</message>
+	<message key="xmlui.ArtifactBrowser.ItemViewer.elsevier_embed">Elsevier embed page</message>
+	<message key="xmlui.ArtifactBrowser.ItemViewer.elsevier_entitlement">entitlement</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.Navigation.java -->
         <!-- Note: As of DSpace 6.0, org.dspace.app.xmlui.aspect.artifactbrowser.Navigation has been removed. -->
@@ -1002,6 +1004,7 @@
     <message key="xmlui.administrative.Navigation.context_export_community">Export Community</message>
     <message key="xmlui.administrative.Navigation.context_export_metadata">Export Metadata</message>
     <message key="xmlui.administrative.Navigation.context_search_export_metadata">Export Search Metadata</message>
+    <message key="xmlui.administrative.Navigation.context_liveimport">Elsevier Import</message>
 
 	<!-- Site administrator options -->
 	<message key="xmlui.administrative.Navigation.administrative_head">Administrative</message>
@@ -2503,5 +2506,67 @@
     <message key="xmlui.Submission.submit.progressbar.lookup">Lookup</message>
     <message key="xmlui.ChoiceLookupTransformer.lookup">Lookup</message>
 
+
+
+    <message key="xmlui.scidir.live-import.trail">Elsevier Import</message>
+    <message key="xmlui.scidir.live-import.head">Elsevier Import</message>
+    <message key="xmlui.scidir.live-import.hint">Fill in at least one of the following fields.</message>
+    <message key="xmlui.scidir.live-import.affiliation">affiliation</message>
+    <message key="xmlui.scidir.live-import.affiliation_hint"><p>The name of the institution the publication is conntected to.</p><p>Example: "broad institute"</p></message>
+    <message key="xmlui.scidir.live-import.title">title</message>
+    <message key="xmlui.scidir.live-import.title_hint"><p>The publication's title.</p><p>Example: "Integrating phenotypic small-molecule profiling and human genetics"</p></message>
+    <message key="xmlui.scidir.live-import.author">author</message>
+    <message key="xmlui.scidir.live-import.author_hint"><p>The name of one of the publication's authors.</p><p>Example: "Bridget K., Wagner"</p></message>
+    <message key="xmlui.scidir.live-import.doi">DOI</message>
+    <message key="xmlui.scidir.live-import.doi_hint"><p>The publication's doi.</p><p>Example: "10.1016/j.tig.2014.11.002"</p></message>
+    <message key="xmlui.scidir.live-import.submit">Search</message>
+
+    <message key="xmlui.scidir.live-import-result.submit">Back</message>
+    <message key="xmlui.scidir.live-import-result.submit-next">Next</message>
+    <message key="xmlui.scidir.live-import-result.no-fields-error">You must fill in one of the fields before starting the import.</message>
+    <message key="xmlui.scidir.live-import-result.records-found">{0} records found, now showing {1} to {2}</message>
+    <message key="xmlui.scidir.live-import-result.no-records-found">No records found</message>
+    <message key="xmlui.scidir.live-import-result.records-selected">{0} records selected</message>
+
+    <message key="xmlui.scidir.live-import-selected.records-selected">{0} records selected:</message>
+    <message key="xmlui.scidir.live-import-selected.import-action-workspace">Send imported items to workspace</message>
+    <message key="xmlui.scidir.live-import-selected.import-action-workflow">Send imported items to workflow</message>
+    <message key="xmlui.scidir.live-import-selected.import-action-archive">Archive imported items</message>
+    <message key="xmlui.scidir.live-import-selected.submit-cancel">Cancel</message>
+    <message key="xmlui.scidir.live-import-selected.submit-import">Import</message>
+    <message key="xmlui.scidir.live-import-selected.collection">Select collection:</message>
+    <message key="xmlui.scidir.live-import-selected.action">Select action:</message>
+
+    <message key="xmlui.scidir.live-import-action.success">Import finished successful</message>
+    <message key="xmlui.scidir.live-import-action.failure">Import failed</message>
+
+    <message key="xmlui.Submission.submit.LiveImportStep.submit_lookup">Search</message>
+    <message key="xmlui.Submission.submit.LiveImportStep.submit_skip">Skip Import</message>
+    <message key="xmlui.Submission.submit.LiveImportStep.title">Search</message>
+    <message key="xmlui.Submission.submit.LiveImportStep.lookup_help"><p>Fill in at least one of the following fields and press "Search". A list of all matching publications will be shown. Import a publication by clicking "import".</p><p>Importing a publication will detele all metadata that was already added to this item!</p></message>
+    <message key="xmlui.Submission.submit.LiveImportStep.lookup_help2">Use the "Search" button to search publications in Elsevier. Continue without importing using the "Next" button.</message>
+    <message key="xmlui.Submission.submit.LiveImportStep.submit_import_item">Imported Publication:</message>
+    <message key="xmlui.Submission.submit.LiveImportStep.records-found">{0} records found, now showing {1} to {2}:</message>
+    <message key="xmlui.Submission.submit.LiveImportStep.no-records">No records found</message>
+    <message key="xmlui.Submission.submit.LiveImportStep.submit_results">Search results</message>
+    <message key="xmlui.Submission.submit.progressbar.liveimport">Elsevier Import</message>
+
+
+    <message key="com.atmire.sciencedirect.embed.ElsevierEmbed.title">Elsevier embed page</message>
+    <message key="com.atmire.sciencedirect.embed.ElsevierEmbed.trail">Elsevier embed page</message>
+    <message key="com.atmire.sciencedirect.embed.ElsevierEmbed.title_error">The embed page cannot be rendered</message>
+    <message key="com.atmire.sciencedirect.embed.ElsevierEmbed.error.embed_page_disabled">The embed pages have been disabled</message>
+    <message key="com.atmire.sciencedirect.embed.ElsevierEmbed.error.not_an_item">There is no item associated with this URL</message>
+    <message key="com.atmire.sciencedirect.embed.ElsevierEmbed.error.invalid_pii">The given PII does not match with the item</message>
+
+    <message key="xmlui.file-access.FileAccessUI.label">File access</message>
+	<message key="xmlui.file-access.FileAccessUI.embargo_date">Embargo end date</message>
+	<message key="xmlui.file-access.FileAccessUI.embargo_date_help">Fill in the embargo end date if file access is embargo</message>
+	<message key="xmlui.file-access.FileAccessUI.option.public">public</message>
+    <message key="xmlui.file-access.FileAccessUI.option.restricted">restricted</message>
+	<message key="xmlui.file-access.FileAccessUI.option.embargo">embargo</message>
+
+    <message key="xmlui.Submission.submit.ElsevierUploadStep.open_access">The Elsevier lookup identified the record as open access</message>
+    <message key="xmlui.Submission.submit.ElsevierUploadStep.restricted_access">The Elsevier lookup identified the record as restricted access</message>
 
 </catalogue>

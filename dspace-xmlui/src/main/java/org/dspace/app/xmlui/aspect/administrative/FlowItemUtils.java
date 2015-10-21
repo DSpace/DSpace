@@ -7,14 +7,10 @@
  */
 package org.dspace.app.xmlui.aspect.administrative;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.util.*;
-
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.servlet.multipart.Part;
 import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.util.Util;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
@@ -30,10 +26,16 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.curate.Curator;
+import org.dspace.fileaccess.factory.FileAccessServiceFactory;
+import org.dspace.fileaccess.service.FileAccessFromMetadataService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * Utility methods to processes actions on Groups. These methods are used
@@ -69,9 +71,9 @@ public class FlowItemUtils
 	protected static final MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
 
 	protected static final BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
+	protected static final FileAccessFromMetadataService fileAccessFromMetadataService = FileAccessServiceFactory.getInstance().getFileAccessFromMetadataService();
 
 	protected static final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
-
 	
 	/**
 	 * Resolve the given identifier to an item. The identifier may be either an
@@ -511,6 +513,15 @@ public class FlowItemUtils
 
 			String bundleName = request.getParameter("bundle");
 			
+			String fileAccess = request.getParameter("file-access");
+			DCDate fileAccessDate = fileAccessFromMetadataService.getEmbargoDate(request);
+
+			if (StringUtils.isBlank(fileAccess)) {
+				result.setContinue(false);
+				result.setOutcome(false);
+				result.setMessage(new Message("default", "No file access has been selected."));
+			} else {
+
 			Bitstream bitstream;
 			List<Bundle> bundles = itemService.getBundles(item, bundleName);
 			if (bundles.size() < 1)
@@ -559,11 +570,13 @@ public class FlowItemUtils
 			itemService.update(context, item);
 
             processAccessFields(context, request, item.getOwningCollection(), bitstream);
-			
+
+				fileAccessFromMetadataService.setFileAccess(context, bitstream, fileAccess, fileAccessDate);
 
 			result.setContinue(true);
 	        result.setOutcome(true);
 	        result.setMessage(T_bitstream_added); 
+		}
 		}
 		else
 		{
@@ -676,8 +689,12 @@ public class FlowItemUtils
 		// Save our changes
 		bitstreamService.update(context, bitstream);
 
-        processAccessFields(context, request, ((Item)bitstreamService.getParentObject(context,bitstream)).getOwningCollection(), bitstream);
+        processAccessFields(context, request, ((Item) bitstreamService.getParentObject(context, bitstream)).getOwningCollection(), bitstream);
 
+		String fileAccess = request.getParameter("file-access");
+		DCDate fileAccessDate = fileAccessFromMetadataService.getEmbargoDate(request);
+
+		fileAccessFromMetadataService.setFileAccess(context, bitstream, fileAccess, fileAccessDate);
 
         result.setContinue(true);
 	     result.setOutcome(true);
