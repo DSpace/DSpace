@@ -24,6 +24,7 @@ import org.dspace.utils.DSpace;
 import org.dspace.workflow.DryadWorkflowUtils;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowRequirementsManager;
+import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -52,11 +53,13 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
     protected static final Message T_workflow_title = message("xmlui.Submission.general.workflow.title");
     private static final Message T_head_has_part = message("xmlui.ArtifactBrowser.ItemViewer.head_hasPart");
     private static final Message T_in_workflow = message("xmlui.DryadItemSummary.in_workflow");
+    private static final Message T_not_in_review = message("xmlui.DryadItemSummary.not_in_review");
 
 
     private WorkflowItem wfItem;
     private boolean authorized;
     private boolean currentlyInReview;
+    private String requestDoi;
     List<Item> dataFiles = new ArrayList<Item>();
 
     @Override
@@ -71,18 +74,19 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
         // 1. wfID + token
         // 2. provisional DOI (since it is not yet public)
 
-        String requestDoi = request.getParameter("doi");
+        requestDoi = request.getParameter("doi");
         if(requestDoi != null) {
+            authorized = true;
             loadWFItemByDOI(requestDoi);
             if(wfItem == null) {
                 // Not found
                 return;
             }
             // DOI was found. Set authorized true and the reviewerToken for downloads
-            authorized = true;
             String reviewerKey = getItemToken();
             request.getSession().setAttribute("reviewerToken", reviewerKey);
         } else {
+            requestDoi = "";
             // DOI not present, require token
             String token = request.getParameter("token");
             if (token != null) {
