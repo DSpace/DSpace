@@ -55,6 +55,7 @@
  <!ATTLIST input readonly CDATA #IMPLIED >
  <!ATTLIST input mapped-to-if-not-default CDATA #IMPLIED >
  <!ATTLIST input value CDATA #IMPLIED >
+ <!ATTLIST input required CDATA #IMPLIED >
 
  <!ELEMENT hint (#PCDATA) >
  <!ELEMENT required (#PCDATA)>

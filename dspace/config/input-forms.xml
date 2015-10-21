@@ -1015,31 +1015,31 @@
     <form-complex-definitions>
         <!-- currently only text and dropbox -->
         <definition name="contact_person">
-            <input name="1_givenname" type="text" label="Contact person's given name"/>
-            <input name="2_surname" type="text" label="Contact person's surname" help="Family name"/>
-            <input name="3_email" type="text" label="Contact person's email" regexp="[^@]+@[^\.@]+\.[^@]+"/>
+            <input name="1_givenname" type="text" label="Contact person's given name" required="true" />
+            <input name="2_surname" type="text" label="Contact person's surname" help="Family name" required="true"/>
+            <input name="3_email" type="text" label="Contact person's email" regexp="[^@]+@[^\.@]+\.[^@]+" required="true"/>
             <input name="4_affiliation" type="text" label="Contact person's institution name"
-                   autocomplete="solr-publisher_ac"/>
+                   autocomplete="solr-publisher_ac" required="true"/>
 
             <input name="4_affiliation" type="text" label="Contact person's institution name"
-                   autocomplete="solr-publisher_ac"/>
+                   autocomplete="solr-publisher_ac" required="true"/>
 
         </definition>
 
         <definition name="funding">
             <input name="4_type" type="dropdown" label="Funding type" pairs="metashare_funding"
-                   class="openaire-type-map"/>
+                   class="openaire-type-map" required="true" />
             <input name="2_code"
                    placeholder="Start typing the name/number of the grant..."
                    type="text"
                    label="Grant no. or funding project code"
                    class="openaire-code-autocomplete"
                    autocomplete="solr-local.sponsor_ac"
-                    />
-            <input name="1_orgname" type="text" label="Funding organization"/>
-            <input name="3_projname" type="text" label="Funding project name" autocomplete="solr-local.sponsor_ac"/>
+                    required="true" />
+            <input name="1_orgname" type="text" label="Funding organization" required="true" />
+            <input name="3_projname" type="text" label="Funding project name" autocomplete="solr-local.sponsor_ac" required="true" />
             <input name="5_openaire_id"
-                   value="N/A"
+                   value=""
                    type="text"
                    readonly="true"
                    label="EU Project Identifier (OpenAIRE)"

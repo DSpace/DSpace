@@ -510,7 +510,6 @@ public class DescribeStep extends AbstractProcessingStep
         //for all values
         for(int i = 0; i < valuesPerField; i++){
         	StringBuilder complexValue = new StringBuilder();
-        	int emptyFields = 0;
         	//separator empty for first iter
         	String separator = "";
         	//in all fields
@@ -523,8 +522,11 @@ public class DescribeStep extends AbstractProcessingStep
         		} else{
         			value = "";
         		}
-        		if("".equals(value)){
-        			++emptyFields;
+        		
+        		boolean required = input_map.get("required")!=null && input_map.get("required").equalsIgnoreCase("true");
+        		
+        		if(value.isEmpty() && required){
+        			error = true;
         		}
                 String regex = input_map.get("regexp");
                 if(!value.isEmpty() && !DCInput.isAllowedValue(value, regex)) {
@@ -545,13 +547,12 @@ public class DescribeStep extends AbstractProcessingStep
         	//required and all empty handled by doProcessing
         	//this checks whether one of the fields was empty
         	String finalValue = complexValue.toString();
-        	if( emptyFields > 0 && emptyFields < definition.inputsCount()){
-        		error = true;
-        	}
-        	if(error){
+        	boolean finalValueEmpty = finalValue.replace(separator, "").trim().isEmpty();
+        	
+        	if(error && !finalValueEmpty){
         		//incomplete as regex errors
         		addRegexError(request,metadataField,finalValue);
-        	}else if(emptyFields != definition.inputsCount()){
+        	}else if(!finalValueEmpty){
         		//add the final value only if it is not empty
         		item.addMetadata(schema, element, qualifier, null, finalValue);
                 // add mappings if not existing
