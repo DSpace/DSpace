@@ -160,61 +160,61 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
             Para p = div.addPara();
             p.addContent(T_not_in_review);
             p.addXref(requestDoi, ConfigurationManager.getProperty("dspace.baseUrl") + "/resource?" + requestDoi);
-        }
-        Request request = ObjectModelHelper.getRequest(objectModel);
-
-        Division div = body.addInteractiveDivision("main-div", contextPath + "/review", Division.METHOD_POST, "");
-
-        // Adding message for withdrawn or workflow item
-        addWarningMessage(wfItem.getItem(), div);
-
-        //Add an overview of the item in question
-        String showfull = request.getParameter("submit_full_item_info");
-
-        // if the user selected showsimple, remove showfull.
-        if (showfull != null && request.getParameter("submit_simple_item_info") != null)
-            showfull = null;
-
-
-        DCValue[] vals = wfItem.getItem().getMetadata("dc.title");
-        ReferenceSet referenceSet = null;
-
-        if (showfull == null) {
-            referenceSet = div.addReferenceSet("narf", ReferenceSet.TYPE_SUMMARY_VIEW);
-            if (vals != null && vals[0] != null)
-                referenceSet.setHead(vals[0].value);
-            else
-                referenceSet.setHead(T_workflow_head);
-            div.addPara().addButton("submit_full_item_info").setValue(T_showfull);
         } else {
-            referenceSet = div.addReferenceSet("narf", ReferenceSet.TYPE_DETAIL_VIEW);
-            if (vals != null && vals[0] != null)
-                referenceSet.setHead(vals[0].value);
-            else
-                referenceSet.setHead(T_workflow_head);
-            div.addPara().addButton("submit_simple_item_info").setValue(T_showsimple);
+            Request request = ObjectModelHelper.getRequest(objectModel);
 
-            div.addHidden("submit_full_item_info").setValue("true");
-        }
+            Division div = body.addInteractiveDivision("main-div", contextPath + "/review", Division.METHOD_POST, "");
+
+            // Adding message for withdrawn or workflow item
+            addWarningMessage(wfItem.getItem(), div);
+
+            //Add an overview of the item in question
+            String showfull = request.getParameter("submit_full_item_info");
+
+            // if the user selected showsimple, remove showfull.
+            if (showfull != null && request.getParameter("submit_simple_item_info") != null)
+                showfull = null;
 
 
+            DCValue[] vals = wfItem.getItem().getMetadata("dc.title");
+            ReferenceSet referenceSet = null;
 
-        // adding the dataFile
-        org.dspace.app.xmlui.wing.element.Reference itemRef = referenceSet.addReference(wfItem.getItem());
-        if (wfItem.getItem().getMetadata("dc.relation.haspart").length > 0) {
-            ReferenceSet hasParts;
-            hasParts = itemRef.addReferenceSet("embeddedView", null, "hasPart");
-            hasParts.setHead(T_head_has_part);
+            if (showfull == null) {
+                referenceSet = div.addReferenceSet("narf", ReferenceSet.TYPE_SUMMARY_VIEW);
+                if (vals != null && vals[0] != null)
+                    referenceSet.setHead(vals[0].value);
+                else
+                    referenceSet.setHead(T_workflow_head);
+                div.addPara().addButton("submit_full_item_info").setValue(T_showfull);
+            } else {
+                referenceSet = div.addReferenceSet("narf", ReferenceSet.TYPE_DETAIL_VIEW);
+                if (vals != null && vals[0] != null)
+                    referenceSet.setHead(vals[0].value);
+                else
+                    referenceSet.setHead(T_workflow_head);
+                div.addPara().addButton("submit_simple_item_info").setValue(T_showsimple);
 
-            if (dataFiles.size() == 0) retrieveDataFiles(wfItem.getItem());
-
-            for (Item obj : dataFiles) {
-                hasParts.addReference(obj);
+                div.addHidden("submit_full_item_info").setValue("true");
             }
-        }
 
-        div.addHidden("token").setValue(request.getParameter("token"));
-        div.addHidden("wfID").setValue(String.valueOf(wfItem.getID()));
+
+            // adding the dataFile
+            org.dspace.app.xmlui.wing.element.Reference itemRef = referenceSet.addReference(wfItem.getItem());
+            if (wfItem.getItem().getMetadata("dc.relation.haspart").length > 0) {
+                ReferenceSet hasParts;
+                hasParts = itemRef.addReferenceSet("embeddedView", null, "hasPart");
+                hasParts.setHead(T_head_has_part);
+
+                if (dataFiles.size() == 0) retrieveDataFiles(wfItem.getItem());
+
+                for (Item obj : dataFiles) {
+                    hasParts.addReference(obj);
+                }
+            }
+
+            div.addHidden("token").setValue(request.getParameter("token"));
+            div.addHidden("wfID").setValue(String.valueOf(wfItem.getID()));
+        }
     }
 
     private void loadWFItemByDOI(String doi) throws IOException {
