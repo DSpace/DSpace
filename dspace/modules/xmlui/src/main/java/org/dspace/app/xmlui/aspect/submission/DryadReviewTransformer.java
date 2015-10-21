@@ -156,7 +156,10 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
             throw new AuthorizeException("You are not authorized to review the submission");
         }
         if (!currentlyInReview) {
-            throw new AuthorizeException("The submission is not currently in review");
+            Division div = body.addDivision("not_in_review");
+            Para p = div.addPara();
+            p.addContent(T_not_in_review);
+            p.addXref(requestDoi, ConfigurationManager.getProperty("dspace.baseUrl") + "/resource?" + requestDoi);
         }
         Request request = ObjectModelHelper.getRequest(objectModel);
 
