@@ -87,7 +87,7 @@ public class CollectionDropDown {
 		for (int i = 0; i < collections.length; i++)
 		{
 			Collection collection = collections[i];
-			CollectionPathEntry entry = new CollectionPathEntry(collection, collectionPath(collection));
+			CollectionPathEntry entry = new CollectionPathEntry(collection, collectionPath(collection, 0));
 			result[i] = entry;
 		}
 		Arrays.sort(result);
