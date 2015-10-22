@@ -61,19 +61,21 @@ public class TokenHolder
             context = new org.dspace.core.Context();
             EPerson dspaceUser = EPerson.findByEmail(context, user.getEmail());
 
-            if ((dspaceUser == null) || (!dspaceUser.checkPassword(user.getPassword())))
-            {
-                token = null;
-            }
-            else if (tokens.containsKey(user.getEmail()))
-            {
-                token = tokens.get(user.getEmail());
-            }
-            else
-            {
-                token = generateToken();
-                persons.put(token, dspaceUser);
-                tokens.put(user.getEmail(), token);
+            synchronized (TokenHolder.class) {
+                if ((dspaceUser == null) || (!dspaceUser.checkPassword(user.getPassword())))
+                {
+                    token = null;
+                }
+                else if (tokens.containsKey(user.getEmail()))
+                {
+                    token = tokens.get(user.getEmail());
+                }
+                else
+                {
+                    token = generateToken();
+                    persons.put(token, dspaceUser);
+                    tokens.put(user.getEmail(), token);
+                }
             }
 
             log.trace("User(" + user.getEmail() + ") has been logged.");
@@ -113,7 +115,7 @@ public class TokenHolder
      * @return Return instance of EPerson if is token right, otherwise it
      *         returns NULL.
      */
-    public static EPerson getEPerson(String token)
+    public static synchronized EPerson getEPerson(String token)
     {
         return persons.get(token);
     }
@@ -125,7 +127,7 @@ public class TokenHolder
      *            Token under which is stored eperson.
      * @return Return true if was all okay, otherwise return false.
      */
-    public static boolean logout(String token)
+    public static synchronized boolean logout(String token)
     {
         if ((token == null) || (persons.get(token) == null))
         {
