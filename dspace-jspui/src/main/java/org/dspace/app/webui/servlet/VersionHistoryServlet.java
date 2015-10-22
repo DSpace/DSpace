@@ -7,6 +7,7 @@
  */
 package org.dspace.app.webui.servlet;
 
+import com.hp.hpl.jena.sparql.vocabulary.DOAP;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
@@ -29,6 +30,7 @@ import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
+import org.dspace.versioning.service.VersioningService;
 
 /**
  * Servlet for handling the operations in the version history page
@@ -47,6 +49,9 @@ public class VersionHistoryServlet extends DSpaceServlet
 
     private final transient VersionHistoryService versionHistoryService
              = VersionServiceFactory.getInstance().getVersionHistoryService();
+    
+    private final transient VersioningService versioningService
+            = VersionServiceFactory.getInstance().getVersionService();
 
     @Override
     protected void doDSGet(Context context, HttpServletRequest request,
@@ -75,11 +80,10 @@ public class VersionHistoryServlet extends DSpaceServlet
         }
 
         // manage if versionID is not came by request
-        VersionHistory history = VersionUtil.retrieveVersionHistory(context,
-                item);
+        VersionHistory history = versionHistoryService.findByItem(context, item);
         if (versionID == null || versionID.isEmpty())
         {
-            Version version = versionHistoryService.getVersion(history, item);
+            Version version = versionHistoryService.getVersion(context, history, item);
             if (version != null)
             {
                 versionID = String.valueOf(version.getId());
@@ -130,6 +134,7 @@ public class VersionHistoryServlet extends DSpaceServlet
         request.setAttribute("item", item);
         request.setAttribute("itemID", itemID);
         request.setAttribute("versionID", versionID);
+        request.setAttribute("allVersions", versioningService.getVersionsByHistory(context, history));
         JSPManager.showJSP(request, response, "/tools/version-history.jsp");
     }
 

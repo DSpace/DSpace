@@ -101,7 +101,7 @@ public class VersionItemForm extends AbstractDSpaceTransformer {
         Para actions = main.addPara();
 
         org.dspace.versioning.VersionHistory history = retrieveVersionHistory(item);
-        if(history!=null && versionHistoryService.hasNext(history ,item))
+        if(history!=null && versionHistoryService.hasNext(context, history ,item))
         {
             actions.addButton("submit_update_version").setValue(T_submit_update_version);
         }

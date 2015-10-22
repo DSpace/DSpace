@@ -38,6 +38,7 @@ import org.dspace.workflow.factory.WorkflowServiceFactory;
  * Item level versioning feature utility method
  * 
  * @author Luigi Andrea Pascarelli
+ * @author Pascal-Nicolas Becker (dspace at pascal dash becker dot de)
  * 
  */
 public class VersionUtil
@@ -55,7 +56,7 @@ public class VersionUtil
 	private static WorkspaceItemService workspaceItemService;
 	
 	private static WorkflowItemService workflowItemService;
-	
+        
 	private synchronized static void initialize() {
 		initialezed = true;
 		itemService = ContentServiceFactory.getInstance().getItemService();
@@ -195,9 +196,8 @@ public class VersionUtil
     	initialize();
         try
         {
-        	Item item = itemService.find(context, itemId);
-            VersionHistory versionHistory = versioningService
-                    .findVersionHistory(context, item);
+            Item item = itemService.find(context, itemId);
+            VersionHistory versionHistory = versionHistoryService.findByItem(context, item);
 
             for (String id : versionIDs)
             {
@@ -206,7 +206,7 @@ public class VersionUtil
 
             // Retrieve the latest version of our history (IF any is even
             // present)
-            Version latestVersion = versionHistoryService.getLatestVersion(versionHistory);
+            Version latestVersion = versionHistoryService.getLatestVersion(context, versionHistory);
             if (latestVersion == null)
             {
                 return null;
@@ -229,38 +229,6 @@ public class VersionUtil
     }
 
     /**
-     * Check if the item is the last version builded
-     * 
-     * @param context
-     * @param item
-     * @return true or false
-     * @throws SQLException 
-     */
-    public static boolean isLatest(Context context, Item item) throws SQLException
-    {
-    	initialize();
-        VersionHistory history = retrieveVersionHistory(context, item);
-		return (history == null
-				|| versionHistoryService.getLatestVersion(history).getItem().getID()
-					.equals(item.getID()));
-    }
-
-    /**
-     * Check if the item have a version history
-     * 
-     * @param context
-     * @param item
-     * @return true or false
-     * @throws SQLException 
-     */
-    public static boolean hasVersionHistory(Context context, Item item) throws SQLException
-    {
-    	initialize();
-        VersionHistory history = retrieveVersionHistory(context, item);
-        return (history != null);
-    }
-
-    /**
      * Return the latest version, if there isn't or the user not have permission
      * then return null.
      * 
@@ -273,11 +241,11 @@ public class VersionUtil
             throws SQLException
     {
     	initialize();
-        VersionHistory history = retrieveVersionHistory(context, item);
+        VersionHistory history = versionHistoryService.findByItem(context, item);
 
         if (history != null)
         {
-            List<Version> allVersions = history.getVersions();
+            List<Version> allVersions = versioningService.getVersionsByHistory(context, history);
             for (Version version : allVersions)
             {
                 if (version.getItem().isArchived()
@@ -291,23 +259,6 @@ public class VersionUtil
         }
 
         return null;
-    }
-
-    /**
-     * Retrieve the version history of the item
-     * 
-     * @param context
-     * @param item
-     * @return history
-     * @throws SQLException 
-     */
-    public static VersionHistory retrieveVersionHistory(Context context,
-            Item item) throws SQLException
-    {
-    	initialize();
-        VersioningService versioningService = new DSpace()
-                .getSingletonService(VersioningService.class);
-        return versioningService.findVersionHistory(context, item);
     }
 
     /**

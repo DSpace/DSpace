@@ -13,6 +13,8 @@ import org.dspace.core.GenericDAO;
 import org.dspace.versioning.VersionHistory;
 
 import java.sql.SQLException;
+import java.util.List;
+import org.dspace.versioning.Version;
 
 /**
  * Database Access Object interface class for the VersionHistory object.

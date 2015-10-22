@@ -108,8 +108,15 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
 
                     // in case of first version we have to modify the previous metadata to be xxxx.1
                     Version version = versionService.getVersion(context, item);
-                    Version previous = versionHistoryService.getPrevious(history, version);
-                    if (versionHistoryService.isFirstVersion(history, previous))
+                    Version previous;
+                    boolean isFirstVersion;
+                    try {
+                        previous = versionHistoryService.getPrevious(context, history, version);
+                        isFirstVersion = versionHistoryService.isFirstVersion(context, history, previous);
+                    } catch (SQLException ex) {
+                        throw new RuntimeException("A problem with the database connection occured.", ex);
+                    }
+                    if (isFirstVersion)
                     {
                         try{
                             //If we have a reviewer he/she might not have the rights to edit the metadata of this item, so temporarly grant them.
@@ -153,7 +160,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
             VersionHistory itemHistory = getHistory(context, identifier);
             if(!identifier.matches(".*/.*\\.\\d+") && itemHistory!=null){
 
-                int newVersionNumber = versionHistoryService.getLatestVersion(itemHistory).getVersionNumber()+1;
+                int newVersionNumber = versionHistoryService.getLatestVersion(context, itemHistory).getVersionNumber()+1;
                 String canonical = identifier;
                 identifier = identifier.concat(".").concat("" + newVersionNumber);
                 restoreItAsVersion(context, dso, identifier, item, canonical, itemHistory);
@@ -204,14 +211,15 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
         return null;
     }
 
-    protected void restoreItAsVersion(Context context, DSpaceObject dso, String identifier, Item item, String canonical, VersionHistory history) throws SQLException, IOException, AuthorizeException
+    protected void restoreItAsVersion(Context context, DSpaceObject dso, String identifier, Item item, String canonical, VersionHistory history)
+            throws SQLException, IOException, AuthorizeException
     {
         createNewIdentifier(context, dso, identifier);
         populateHandleMetadata(context, item);
 
         int versionNumber = Integer.parseInt(identifier.substring(identifier.lastIndexOf(".") + 1));
         versionService.createNewVersion(context, history, item, "Restoring from AIP Service", new Date(), versionNumber);
-        Version latest = versionHistoryService.getLatestVersion(history);
+        Version latest = versionHistoryService.getLatestVersion(context, history);
 
 
         // if restoring the lastest version: needed to move the canonical
@@ -320,9 +328,15 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
 
                 // If it is the most current version occurs to move the canonical to the previous version
                 VersionHistory history = versionHistoryService.findByItem(context, item);
-                if(history!=null && versionHistoryService.getLatestVersion(history).getItem().equals(item) && history.getVersions().size() > 1)
+                if(history!=null && versionHistoryService.getLatestVersion(context, history).getItem().equals(item)
+                        && versionService.getVersionsByHistory(context, history).size() > 1)
                 {
-                    Item previous = versionHistoryService.getPrevious(history, versionHistoryService.getLatestVersion(history)).getItem();
+                    Item previous;
+                    try {
+                        previous = versionHistoryService.getPrevious(context, history, versionHistoryService.getLatestVersion(context, history)).getItem();
+                    } catch (SQLException ex) {
+                        throw new RuntimeException("A problem with our database connection occured.", ex);
+                    }
 
                     // Modify Canonical: 12345/100 will point to the new item
                     String canonical = getCanonical(context, previous);
@@ -394,9 +408,14 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
         //  - id.1-->old URL
         //  - id.2-->new URL
         Version version = versionService.getVersion(context, item);
-        Version previous = versionHistoryService.getPrevious(history, version);
+        Version previous;
+        try {
+            previous = versionHistoryService.getPrevious(context, history, version);
+        } catch (SQLException ex) {
+            throw new RuntimeException("A problem with our database connection occured.");
+        }
         String canonical = getCanonical(context, previous.getItem());
-        if (versionHistoryService.isFirstVersion(history, previous))
+        if (versionHistoryService.isFirstVersion(context, history, previous))
         {
             // add a new Identifier for previous item: 12345/100.1
             String identifierPreviousItem=canonical + DOT + previous.getVersionNumber();

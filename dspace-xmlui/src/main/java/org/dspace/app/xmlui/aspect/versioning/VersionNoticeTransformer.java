@@ -31,6 +31,7 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import org.dspace.versioning.service.VersioningService;
 
 /**
  * Adds a notice to item page in the following conditions
@@ -51,6 +52,7 @@ public class VersionNoticeTransformer extends AbstractDSpaceTransformer {
 
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+    protected VersioningService versioningService = VersionServiceFactory.getInstance().getVersionService();
     protected VersionHistoryService versionHistoryService = VersionServiceFactory.getInstance().getVersionHistoryService();
 
     @Override
@@ -104,7 +106,7 @@ public class VersionNoticeTransformer extends AbstractDSpaceTransformer {
 
     private Version retrieveLatestVersion(VersionHistory history, Item item) throws SQLException {
         //Attempt to retrieve the latest version
-        List<Version> allVersions = history.getVersions();
+        List<Version> allVersions = versioningService.getVersionsByHistory(context, history);
         for (Version version : allVersions) {
             if (version.getItem().isArchived() || authorizeService.isAdmin(context, item.getOwningCollection()))
             {

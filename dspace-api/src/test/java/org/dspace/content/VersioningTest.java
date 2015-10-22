@@ -122,7 +122,7 @@ public class VersioningTest extends AbstractUnitTest {
     {
         VersionHistory versionHistory = versionHistoryService.findByItem(context, originalItem);
         assertThat("testFindVersionHistory", versionHistory, notNullValue());
-        Version version = versionHistoryService.getVersion(versionHistory, versionedItem);
+        Version version = versionHistoryService.getVersion(context, versionHistory, versionedItem);
         assertThat("testFindVersion", version, notNullValue());
     }
 
@@ -134,7 +134,7 @@ public class VersioningTest extends AbstractUnitTest {
     {
         //Start by creating a new item !
         VersionHistory versionHistory = versionHistoryService.findByItem(context, originalItem);
-        Version version = versionHistoryService.getVersion(versionHistory, versionedItem);
+        Version version = versionHistoryService.getVersion(context, versionHistory, versionedItem);
         assertThat("Test_version_summary", summary, equalTo(version.getSummary()));
     }
 

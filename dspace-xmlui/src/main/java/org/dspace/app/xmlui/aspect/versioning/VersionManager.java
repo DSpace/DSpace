@@ -155,14 +155,14 @@ public class VersionManager {
 
             Item item = itemService.find(context, itemId);
 
-            VersionHistory versionHistory = versioningService.findVersionHistory(context, item);
+            VersionHistory versionHistory = versionHistoryService.findByItem(context, item);
 
             for (String id : versionIDs) {
                 versioningService.removeVersion(context, versioningService.getVersion(context, Integer.parseInt(id)));
             }
 
             //Retrieve the latest version of our history (IF any is even present)
-            Version latestVersion = versionHistoryService.getLatestVersion(versionHistory);
+            Version latestVersion = versionHistoryService.getLatestVersion(context, versionHistory);
             if(latestVersion == null){
                 result.setParameter("itemID", null);
             }else{

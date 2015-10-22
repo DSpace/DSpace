@@ -7,6 +7,7 @@
     http://www.dspace.org/license/
 
 --%>
+<%@page import="java.util.List"%>
 <%--
   - Version history table with functionalities
   -
@@ -20,6 +21,7 @@
 <%@page import="org.dspace.versioning.Version"%>
 <%@page import="org.dspace.app.webui.util.VersionUtil"%>
 <%@page import="org.dspace.versioning.VersionHistory"%>
+<%@page import="org.dspace.versioning.factory.VersionServiceFactory"%>
 <%@ page import="java.util.UUID" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
@@ -73,7 +75,7 @@ var j = jQuery.noConflict();
     <%-- Versioning table --%>
 <%
                 
-	VersionHistory history = VersionUtil.retrieveVersionHistory(context, item);
+        List<Version> allVersions = (List<Version>) request.getAttribute("allVersions");
 						 
 %>
 	<div id="versionHistory">
@@ -94,8 +96,7 @@ var j = jQuery.noConflict();
 				id="t5" class="oddRowEvenCol"><fmt:message key="jsp.version.history.column5"/> </th>
 		</tr>
 		
-		<% for(Version versRow : history.getVersions()) {  
-		
+                <% for(Version versRow : allVersions) {
 			EPerson versRowPerson = versRow.getEPerson();
 			String[] identifierPath = VersionUtil.addItemIdentifier(item, versRow);
 
