@@ -9,6 +9,13 @@
  */
 package cz.cuni.mff.ufal.health;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.LaxRedirectStrategy;
+import org.apache.http.util.EntityUtils;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.health.Check;
 import org.dspace.health.Core;
@@ -20,8 +27,6 @@ import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.parser.ParserDelegator;
 import java.io.Reader;
 import java.io.StringReader;
-import java.io.StringWriter;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,11 +50,14 @@ public class VLOCheck extends Check {
                     harvesterInfoUrl + "/" + dspace_name;
             harvesterInfoUrl = harvesterInfoUrl + ".html";
             final String harvesterInfoAnchorName = dspace_name;
-            // Try to download the page
-            StringWriter writer = new StringWriter();
-            org.apache.commons.io.IOUtils.copy(
-                    new URL(harvesterInfoUrl.trim()).openStream(), writer);
-            String page = writer.toString();
+            String page = null;
+            try (CloseableHttpClient client = HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategy()).build()){
+                HttpGet httpGet = new HttpGet(harvesterInfoUrl.trim());
+                try (CloseableHttpResponse response = client.execute(httpGet)){
+                    HttpEntity entity = response.getEntity();
+                    page = EntityUtils.toString(entity);
+                }
+            }
 
             Reader reader = new StringReader(page);
             HTMLEditorKit.Parser parser = new ParserDelegator();
