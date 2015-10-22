@@ -13,25 +13,27 @@
 	<div>
 		<h3 id="formats">Metadata formats</h3>
 		<p>
-			We are able to disseminate the submission metadata in various formats including but not limited to CMDI and oai_dc. See the <a href="https://lindat.mff.cuni.cz/repository/oai/request?verb=ListMetadataFormats">full list of supported formats</a> but note that some of the formats might not be applicable to all items. The various formats help us promote the submitted content in number of aggregators (and/or search engines).	
+			During the submission process, users fill out metadata fields which are stored as a part of the record. We are able to disseminate the submission metadata in various formats including but not limited to <a href="http://clarin.eu/cmdi">CMDI</a> and <a href="http://www.openarchives.org/OAI/2.0/oai_dc.xsd">oai_dc</a>. See the <a href="https://lindat.mff.cuni.cz/repository/oai/request?verb=ListMetadataFormats">full list of supported formats</a> but note that some of the formats might not be applicable to all items. The various formats help us promote the submitted content in number of aggregators (and/or search engines).	
 		</p>
 		<h4>CMDI</h4>
 		<p>
-			See the CLARIN introduction to <a href="http://clarin.eu/cmdi">component metadata</a> in order to get more information about this topic. Despite we can support submissions with attached cmdi file to a degree, we prefer guiding the user through our submission process. Thus ensuring metadata in reasonable quality.
+			See the CLARIN introduction to <a href="http://clarin.eu/cmdi">component metadata</a> in order to get more information about this topic.
 		</p>
 		<p>
-			Our current submissions are adhering to the <a href="http://catalog.clarin.eu/ds/ComponentRegistry/rest/registry/profiles/clarin.eu:cr1:p_1403526079380/xsd">clarin.eu:cr1:p_1403526079380</a> profile/schema. Portion of older submissions is using different profile <a href="http://catalog.clarin.eu/ds/ComponentRegistry/rest/registry/profiles/clarin.eu:cr1:p_1349361150622/xsd">clarin.eu:cr1:p_1349361150622</a>
+			Our current submissions are adhering to the <a href="https://catalog.clarin.eu/ds/ComponentRegistry?registrySpace=published&amp;itemId=clarin.eu:cr1:p_1403526079380">clarin.eu:cr1:p_1403526079380</a> profile/schema. Portion of older submissions (basically those submitted before Sep/Oct 2014) is using different profile <a href="https://catalog.clarin.eu/ds/ComponentRegistry?registrySpace=published&amp;itemId=clarin.eu:cr1:p_1349361150622">clarin.eu:cr1:p_1349361150622</a>. We decided to create the new profile to better reflect the submission process the user goes through. The former one was a combination of OLAC and MetaShare components, which forced us to handle duplicities in various places. It also bounded us to someone else's metadata schema and it's semantics, which we could neither influence nor change.
 		</p>
 		<p>
-			Both profiles are fairly covered with links to a concept registry.
+			Both profiles are fairly covered with links to a concept registry. The links going to now retired <a href="http://www.isocat.org">ISOcat DCR</a> were redirected to <a href="https://www.clarin.eu/conceptregistry/">CCR</a> and the OLAC component's concept links are to the <a href="http://purl.org/dc/terms">DCMI terms</a> concepts (eg. the concept link for abstract is <a href="http://purl.org/dc/terms/abstract">http://purl.org/dc/terms/abstract</a>). <a href="https://vlo.clarin.eu/">VLO</a> does not use these specific concepts in it's <a href="https://lux17.mpi.nl/isocat/clarin/vlo/mapping/index.html">mappings</a> and rather maps paths inside one particular <a href="https://catalog.clarin.eu/ds/ComponentRegistry?registrySpace=published&amp;itemId=clarin.eu:cr1:p_1288172614026">profile</a>. For only some particular facets this xpath was extended in order for the mapping to work also with the <a href="https://catalog.clarin.eu/ds/ComponentRegistry?registrySpace=published&amp;itemId=clarin.eu:cr1:c_1349361150621">component</a> derived from this particular profile. Another reason for creating our own profile was the fact that DC concepts were still to broad.
 		</p>
+		<p>However, we are supporting submissions with arbitrary CMDI metadata files that are used in OAI-PMH when the CMDI metadata profile is requested.</p>
+		<p>Various points in the above paragraphs should discourage you from reusing <a href="https://catalog.clarin.eu/ds/ComponentRegistry?registrySpace=published&amp;itemId=clarin.eu:cr1:p_1349361150622">clarin.eu:cr1:p_1349361150622</a>. For reusing it's specific components, keep in mind what was said above about the VLO mapping. <a href="https://catalog.clarin.eu/ds/ComponentRegistry?registrySpace=published&amp;itemId=clarin.eu:cr1:p_1403526079380">clarin.eu:cr1:p_1403526079380</a> was created with VLO mapping in mind (though this can change), but still reflects our view of the world and our use cases. If you don't gather much more information than is described below, you might find this profile suitable for your needs or as a base for your own one.</p>
 		<h4>oai_dc</h4>
 		<p>oai_dc is the format required by <a href="http://www.openarchives.org/OAI/2.0/oai_dc.xsd">OAI-PMH</a>. See the <a href="#mapping">mapping section</a> in order to understand how we map our submission to this format.</p>
 	</div>	
 	<br/>
 	<div>
 		<h3 id="metadata">Submitted metadata</h3>
-		<p>Following list enumerates the fields we ask in the submission. It's very likely to change. The metadata are submitted in English. Different formats contain different generated metadata (eg. human readable language names acompanying the iso codes, identifiers, other dates).</p>
+		<p>Following list enumerates the fields we ask in the submission workflow (the list is subject to sporadic changes). The metadata are submitted in English. There are subtle differences depending on the type of the resource being submitted. Not all the fields are present in all the formats. There are fields that are automatically generated (eg. human readable language names acompanying the iso codes, identifiers, other dates).</p>
 		<table class="table-bordered">
 			<thead>
 				<tr><th>Field name</th><th>Description</th><th>Status</th></tr>
@@ -82,7 +84,7 @@
 				</tr>
 				<tr>
 					<td><strong>Funding</strong></td>
-					<td>Sponsors and funding that supported work described by the submission. Stored as structured string containing project name, project code, the funding organization and the type of funds (own/national/eu).</td>
+					<td>Sponsors and funding that supported work described by the submission. Stored as structured string containing project name, project code, the funding organization, the type of funds (own/national/eu) and OpenAIRE identifier (which is also stored in dc.relation)</td>
 					<td><span class="label label-info">repeatable</span></td>
 				</tr>
 				<tr>
