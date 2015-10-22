@@ -159,7 +159,8 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
             Division div = body.addDivision("not_in_review");
             Para p = div.addPara();
             p.addContent(T_not_in_review);
-            String archivedURL = ConfigurationManager.getProperty("dspace.baseUrl") + "/resource?" + requestDoi;
+            requestDoi = requestDoi.replace("doi:","");
+            String archivedURL = ConfigurationManager.getProperty("doi.hostname") + "/" + requestDoi;
             p.addXref(archivedURL,archivedURL);
         } else {
             Request request = ObjectModelHelper.getRequest(objectModel);
