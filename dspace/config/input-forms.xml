@@ -1050,8 +1050,8 @@
         </definition>
 
         <definition name="sizeInfo">
-            <input name="1_size" type="text" regexp="\d+.?\d*"/>
-            <input name="2_unit" type="dropdown" pairs="metashare_sizeunit" label="Unit"/>
+            <input name="1_size" type="text" regexp="\d+.?\d*" required="true"/>
+            <input name="2_unit" type="dropdown" pairs="metashare_sizeunit" label="Unit" required="true"/>
         </definition>
     </form-complex-definitions>
 
