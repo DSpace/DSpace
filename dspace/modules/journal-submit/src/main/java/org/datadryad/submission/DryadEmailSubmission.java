@@ -388,37 +388,6 @@ public class DryadEmailSubmission extends HttpServlet {
                 JournalUtils.writeManuscriptToDB(context, manuscript);
 
                 JournalUtils.writeManuscriptToXMLFile(context, manuscript);
-
-                if (manuscript.status.equals(Manuscript.STATUS_SUBMITTED)) {
-                    // if this is a submission:
-                    JournalUtils.writeManuscriptToXMLFile(context, manuscript);
-                } else {
-                    Boolean approved = null;
-
-                    if (manuscript.status.equals(Manuscript.STATUS_ACCEPTED)) {
-                        approved = true;
-                    } else if (manuscript.status.equals(Manuscript.STATUS_REJECTED)) {
-                        approved = false;
-                    } else if (manuscript.status.equals(Manuscript.STATUS_NEEDS_REVISION)) {
-                        approved = false;
-                    } else if (manuscript.status.equals(Manuscript.STATUS_PUBLISHED)) {
-                        approved = true;
-                    }
-
-                    if (approved != null) {
-                        try {
-                            if (manuscript.dryadDataDOI != null) {
-                                ApproveRejectReviewItem.reviewItemDOI(approved, manuscript.dryadDataDOI);
-                            } else if (manuscript.manuscriptId != null) {
-                                ApproveRejectReviewItem.reviewItem(approved, manuscript.manuscriptId);
-                            } else {
-                                // we need to compare manuscript's authors with workflow items from the same journal.
-                            }
-                        } catch (ApproveRejectReviewItemException e) {
-                            // somehow we need to note that this item did not find a match
-                        }
-                    }
-                }
             } else {
                 throw new SubmissionException("Parser could not validly parse the message");
             }
