@@ -4,7 +4,6 @@
     <artifactId>xmlui</artifactId>
 
     <packaging>war</packaging>
-    <!-- DATASHARE - end -->
 
     <name>DSpace XML-UI (Manakin) :: Local Customizations</name>
     <description>
@@ -110,19 +109,19 @@
 
                     <!-- DATASHARE - start -->
                     <!-- datashare need a jar of xmlui -->
-                    <plugin>
-                      <groupId>org.apache.maven.plugins</groupId>
-                      <artifactId>maven-jar-plugin</artifactId>
-                      <executions>
-                        <execution>
-                          <id>make-a-jar</id>
-                          <phase>package</phase>
-                          <goals>
-                            <goal>jar</goal>
-                          </goals>
-                        </execution>
-                      </executions>
-                    </plugin>
+                    <!-- <plugin> -->
+                    <!--   <groupId>org.apache.maven.plugins</groupId> -->
+                    <!--   <artifactId>maven-jar-plugin</artifactId> -->
+                    <!--   <executions> -->
+                    <!--     <execution> -->
+                    <!--       <id>make-a-jar</id> -->
+                    <!--       <phase>package</phase> -->
+                    <!--       <goals> -->
+                    <!--         <goal>jar</goal> -->
+                    <!--       </goals> -->
+                    <!--     </execution> -->
+                    <!--   </executions> -->
+                    <!-- </plugin> -->
                     <!-- DATASHARE - end -->
 
                 </plugins>
@@ -195,19 +194,19 @@
 
                     <!-- DATASHARE - start -->
                     <!-- datashare need a jar of xmlui -->
-                    <plugin>
-                      <groupId>org.apache.maven.plugins</groupId>
-                      <artifactId>maven-jar-plugin</artifactId>
-                      <executions>
-                        <execution>
-                          <id>make-a-jar</id>
-                          <phase>package</phase>
-                          <goals>
-                            <goal>jar</goal>
-                          </goals>
-                        </execution>
-                      </executions>
-                    </plugin>
+                    <!-- <plugin> -->
+                    <!--   <groupId>org.apache.maven.plugins</groupId> -->
+                    <!--   <artifactId>maven-jar-plugin</artifactId> -->
+                    <!--   <executions> -->
+                    <!--     <execution> -->
+                    <!--       <id>make-a-jar</id> -->
+                    <!--       <phase>package</phase> -->
+                    <!--       <goals> -->
+                    <!--         <goal>jar</goal> -->
+                    <!--       </goals> -->
+                    <!--     </execution> -->
+                    <!--   </executions> -->
+                    <!-- </plugin> -->
                     <!-- DATASHARE - end -->
 
                 </plugins>

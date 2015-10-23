@@ -14,27 +14,91 @@
 
 /*************************** header  *******************************/
 .navbar{
-    min-height: 75px;
+    min-height: 9em;
 }
 
 header .navbar-default {
-    background-color: #25476c;
+    background-color: white;
 }
+
 
 header .navbar-brand img {
-  height: 3em;
+    height: 6em;
 }
 
-#header-eduni{
+#header-datashare{
+    margin-left: -3em;
+}
+
+#header-eduni .navbar-brand{
+    padding-top: 1em;
+}
+
+#header-eduni .navbar-brand img {
+    padding: 0;
+    height: 2.5em;
+}
+
+#header-eduni {
     float: right;
 }
+
+#is-banner{
+    padding-top: 0.5em;
+    background-color: #d40032;
+    color: white;
+    height: 3em;
+    font-family: "Crimson Text",serif;
+    font-size: 18px;
+}
+
+#is-banner a:visited{
+    color: white;
+}
+
+#is-banner-text{
+    padding-top: 0.2em;
+    float: left;
+}
+
+#is-banner-contact-us{
+    padding-top: -0.2em;
+    float: right;
+}
+
+.trail-wrapper {
+    background-color: #cccccc;
+    height: 1.8em;
+}
+
+.trail-wrapper .breadcrumb{
+    padding-top: 0.2em;
+}
+
+
+/*************************** home page  *******************************/
+#upload-data{
+    padding-bottom: 1em;
+}
+
+
+.btn-primary {
+    background-color: #d40032;
+    border-color: #d40032;
+}
+
+/*************************** menu *******************************/
+.list-group-item.active, .list-group-item.active:hover, .list-group-item.active:focus {
+    background-color: #d40032;
+    border-color: #d40032;
+}
+
 
 /*************************** footer *******************************/
 #footer-is-icon{
     float: left;
     padding-right: 3em;
 }
-
 
 
 /*************************** ingest *******************************/

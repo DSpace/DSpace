@@ -325,7 +325,7 @@
         <header>
             <div class="navbar navbar-default navbar-static-top" role="navigation">
                 <div class="container">
-                    <div class="navbar-header">
+                    <div id="header-datashare" class="navbar-header">
 
                         <button type="button" class="navbar-toggle" data-toggle="offcanvas">
                             <span class="sr-only">
@@ -338,13 +338,13 @@
 
                           <!-- DATASHARE - start -->
                         <a href="{$context-path}/" class="navbar-brand">
-                          <img alt="Edinburgh DataShare" src="{$theme-path}/images/datashare_edinburgh.gif" />
+                          <img alt="Edinburgh DataShare" src="{$theme-path}/images/datashare_edinburgh.png" />
                         </a>
                     </div>
 
                     <div id="header-eduni" class="navbar-header">
                       <a href="http://www.ed.ac.uk/home" class="navbar-brand">
-                        <img alt="Edinburgh DataShare" src="{$theme-path}/images/edinburgh-uni.gif" />
+                        <img alt="Edinburgh DataShare" src="{$theme-path}/images/edinburgh-uni.png" />
                       </a>
                     </div>
 
@@ -494,6 +494,24 @@
     <!-- The header (distinct from the HTML head element) contains the title, subtitle, login box and various
         placeholders for header images -->
     <xsl:template name="buildTrail">
+
+      <!-- DATASHARE - start -->
+      <div id="is-banner">
+        <div class="container">
+          <div class="row">
+            <div id="is-banner-text">
+              <a href="http://www.ed.ac.uk/information-services">INFORMATION SERVICES</a>
+            </div>
+            <div id="is-banner-contact-us">
+              <a href="http://www.ed.ac.uk/information-services/research-support/data-library/contact-us">
+              <img alt="Contact Us" src="{$theme-path}/images/contact-us.png"/>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- DATASHARE - end -->
+
         <div class="trail-wrapper hidden-print">
             <div class="container">
                 <div class="row">
@@ -718,7 +736,7 @@
                       <div>
                         <ul>
                           <li><a href="http://www.ed.ac.uk/information-services/research-support/data-library/contact-us">Contact Us</a></li>
-                          <li>Accessability</li>
+                          <li>Accessibility</li>
                           <li>Cookies &amp; Policies</li>
                         </ul>
                       </div>
