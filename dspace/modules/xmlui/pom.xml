@@ -3,9 +3,6 @@
     <groupId>org.dspace.modules</groupId>
     <artifactId>xmlui</artifactId>
 
-    <!-- DATASHARE - start -->
-    <!-- datashare need a jar of xmlui for tests to run -->
-    <!-- <packaging>jar</packaging> -->
     <packaging>war</packaging>
     <!-- DATASHARE - end -->
 
@@ -111,6 +108,23 @@
                         </executions>
                     </plugin>
 
+                    <!-- DATASHARE - start -->
+                    <!-- datashare need a jar of xmlui -->
+                    <plugin>
+                      <groupId>org.apache.maven.plugins</groupId>
+                      <artifactId>maven-jar-plugin</artifactId>
+                      <executions>
+                        <execution>
+                          <id>make-a-jar</id>
+                          <phase>package</phase>
+                          <goals>
+                            <goal>jar</goal>
+                          </goals>
+                        </execution>
+                      </executions>
+                    </plugin>
+                    <!-- DATASHARE - end -->
+
                 </plugins>
             </build>
         </profile>
@@ -178,6 +192,23 @@
                             </execution>
                         </executions>
                     </plugin>
+
+                    <!-- DATASHARE - start -->
+                    <!-- datashare need a jar of xmlui -->
+                    <plugin>
+                      <groupId>org.apache.maven.plugins</groupId>
+                      <artifactId>maven-jar-plugin</artifactId>
+                      <executions>
+                        <execution>
+                          <id>make-a-jar</id>
+                          <phase>package</phase>
+                          <goals>
+                            <goal>jar</goal>
+                          </goals>
+                        </execution>
+                      </executions>
+                    </plugin>
+                    <!-- DATASHARE - end -->
 
                 </plugins>
             </build>

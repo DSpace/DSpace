@@ -156,7 +156,6 @@ public class DepositAgreeAction  extends AbstractAction{
         try{
             int iId = Integer.parseInt(id);
             String mapFile = DbQuery.fetchBatchMapFile(context, iId);
-            
             try{
                 Map<String, String> files = ItemImport.readMapFile(mapFile);
                 for(String itemId : files.values()) {
@@ -173,7 +172,7 @@ public class DepositAgreeAction  extends AbstractAction{
                 }
             }
             catch(Exception ex){
-                map.put("result", "Problem finding batch");
+                map.put("result", "Problem finding batch: " + ex.getMessage());
             }
             
         }
