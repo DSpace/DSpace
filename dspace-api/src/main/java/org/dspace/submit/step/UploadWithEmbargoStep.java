@@ -557,8 +557,8 @@ public class UploadWithEmbargoStep extends UploadStep
         }
         // FORM: UploadStep SELECTED OPERATION: go to EditBitstreamPolicies
         else if (buttonPressed.startsWith("submit_editPolicy_")){
-            String bitstreamID = buttonPressed.substring("submit_editPolicy_".length());
-            Bitstream b = bitstreamService.find(context, Util.getUUIDParameter(request, bitstreamID));
+            UUID bitstreamID = UUID.fromString(buttonPressed.substring("submit_editPolicy_".length()));
+            Bitstream b = bitstreamService.find(context, bitstreamID);
             subInfo.setBitstream(b);
             return STATUS_EDIT_POLICIES;
         }
