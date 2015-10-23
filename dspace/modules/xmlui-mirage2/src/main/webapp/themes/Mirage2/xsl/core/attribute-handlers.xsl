@@ -289,7 +289,7 @@
                                             <xsl:value-of
                                                     select="substring-after(parent::node()/@pageURLMask,'{pageNum}')"/>
                                         </xsl:attribute>
-                                        <xsl:text>&#171;</xsl:text>
+                                        <span class="glyphicon glyphicon-arrow-left"></span>
                                     </a>
                                 </li>
                                 <xsl:if test="(parent::node()/@currentPage - 4) &gt; 0">
@@ -363,7 +363,7 @@
                                                 <xsl:value-of
                                                         select="substring-after(parent::node()/@pageURLMask,'{pageNum}')"/>
                                             </xsl:attribute>
-                                            <xsl:text>&#187;</xsl:text>
+                                            <span class="glyphicon glyphicon-arrow-right"></span>
                                         </a>
                                     </li>
                                 </xsl:if>
