@@ -286,8 +286,8 @@ public class EmailParser {
                 authors = authorString.split("\\s*,\\s*");
                 // although, if there was only one author and it was listed as lastname, firstname, it'd have a comma too...
                 if (authors.length == 2) {
-                    authors = new String[0];
                     authorStrings.add(authors[1] + " " + authors[0]);
+                    authors = new String[0];
                 }
             }
 
