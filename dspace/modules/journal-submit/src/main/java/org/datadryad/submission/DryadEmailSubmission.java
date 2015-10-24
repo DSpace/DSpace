@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.lang.Runtime;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -140,7 +141,8 @@ public class DryadEmailSubmission extends HttpServlet {
                         processMimeMessage(message);
                     } catch (Exception details) {
                         DryadGmailService.addErrorLabelForMessageWithId(mID);
-                        LOGGER.info("Exception thrown while processing message " + mID + ": " + details.getMessage() + ", " + details.getClass().getName());
+                        LOGGER.info("Exception thrown while processing message " + mID + ": " + details.getMessage() + ", " + details.getClass().getName() + details.getStackTrace().toString());
+                        throw new RuntimeException(details);
                     }
                     DryadGmailService.removeJournalLabelForMessageWithId(mID);
                 }
