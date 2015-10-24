@@ -284,16 +284,16 @@ public class EmailParser {
             // if it didn't have semicolons, it must have commas
             if (authors.length == 1) {
                 authors = authorString.split("\\s*,\\s*");
+                // although, if there was only one author and it was listed as lastname, firstname, it'd have a comma too...
+                if (authors.length == 2) {
+                    authors = new String[0];
+                    authorStrings.add(authors[1] + " " + authors[0]);
+                }
             }
 
-            // although, if there was only one author and it was listed as lastname, firstname, it'd have a comma too...
-            if (authors.length == 2) {
-                authorStrings.add(authors[1] + " " + authors[0]);
-            } else {
-                for (int i = 0; i < authors.length; i++) {
-                    if (authors[i] != null) {
-                        authorStrings.add(authors[i]);
-                    }
+            for (int i = 0; i < authors.length; i++) {
+                if (authors[i] != null) {
+                    authorStrings.add(authors[i]);
                 }
             }
 
