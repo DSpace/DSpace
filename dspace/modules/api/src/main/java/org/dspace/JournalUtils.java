@@ -536,13 +536,14 @@ public class JournalUtils {
     }
 
     public static void writeManuscriptToDB(Context context, Manuscript manuscript) throws StorageException {
+        String journalCode = cleanJournalCode(manuscript.organization.organizationCode);
         StoragePath storagePath = new StoragePath();
-        storagePath.addPathElement(Organization.ORGANIZATION_CODE, manuscript.organization.organizationCode);
+        storagePath.addPathElement(Organization.ORGANIZATION_CODE, journalCode);
         storagePath.addPathElement(Manuscript.MANUSCRIPT_ID, manuscript.manuscriptId);
 
         ManuscriptDatabaseStorageImpl manuscriptStorage = new ManuscriptDatabaseStorageImpl();
-        List<Manuscript> manuscripts = getManuscriptsMatchingID(manuscript.organization.organizationCode, manuscript.manuscriptId);
-// if there isn't a manuscript already in the db, create it. Otherwise, update.
+        List<Manuscript> manuscripts = getManuscriptsMatchingID(journalCode, manuscript.manuscriptId);
+        // if there isn't a manuscript already in the db, create it. Otherwise, update.
         if (manuscripts.size() == 0) {
             try {
                 manuscriptStorage.create(storagePath, manuscript);
@@ -559,6 +560,9 @@ public class JournalUtils {
     }
 
     public static void createOrganizationinDB(Context context, Organization organization) throws StorageException {
+        // normalize with all caps for the code:
+        organization.organizationCode = cleanJournalCode(organization.organizationCode);
+
         StoragePath storagePath = new StoragePath();
         storagePath.addPathElement(Organization.ORGANIZATION_CODE, organization.organizationCode);
 
@@ -576,6 +580,7 @@ public class JournalUtils {
     }
 
     public static List<Manuscript> getManuscriptsMatchingID(String journalCode, String manuscriptId) {
+        journalCode = cleanJournalCode(journalCode);
         ArrayList<Manuscript> manuscripts = new ArrayList<Manuscript>();
         StoragePath storagePath = new StoragePath();
         storagePath.addPathElement(Organization.ORGANIZATION_CODE, journalCode);
@@ -597,7 +602,7 @@ public class JournalUtils {
     public static PublicationBean getPublicationBeanFromManuscript(Manuscript manuscript) {
         PublicationBean pBean = new PublicationBean();
         pBean.setManuscriptNumber(manuscript.manuscriptId);
-        pBean.setJournalID(manuscript.organization.organizationCode);
+        pBean.setJournalID(cleanJournalCode(manuscript.organization.organizationCode));
         pBean.setJournalName(manuscript.organization.organizationName);
         pBean.setTitle(manuscript.title);
         pBean.setAbstract(manuscript.manuscript_abstract);
