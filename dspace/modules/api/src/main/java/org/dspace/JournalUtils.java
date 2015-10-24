@@ -218,6 +218,9 @@ public class JournalUtils {
                 } else {
                     canonicalID = null;
                 }
+            } else {
+                // there is no regex specified, just use the manuscript.
+                canonicalID = manuscriptId;
             }
         } catch(Exception e) {
             log.error(e.getMessage(),e);
