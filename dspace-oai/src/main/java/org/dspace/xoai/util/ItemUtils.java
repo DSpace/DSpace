@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
+import org.dspace.app.util.factory.UtilServiceFactory;
+import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
@@ -38,6 +40,9 @@ import org.dspace.core.Context;
 public class ItemUtils
 {
     private static final Logger log = LogManager.getLogger(ItemUtils.class);
+    
+    private static final MetadataExposureService metadataExposureService
+            = UtilServiceFactory.getInstance().getMetadataExposureService();
 
     private static final ItemService itemService
             = ContentServiceFactory.getInstance().getItemService();
@@ -77,6 +82,19 @@ public class ItemUtils
         for (MetadataValue val : vals)
         {
             MetadataField field = val.getMetadataField();
+            
+            // Don't expose fields that are hidden by configuration
+            try {
+                if (metadataExposureService.isHidden(context,
+                        field.getMetadataSchema().getName(),
+                        field.getElement(),
+                        field.getQualifier()))
+                {
+                    continue;
+                }
+            } catch(SQLException se) {
+                throw new RuntimeException(se);
+            }
 
             Element valueElem = null;
             Element schema = getElement(metadata.getElement(), field.getMetadataSchema().getName());

@@ -29,6 +29,7 @@ ALTER TABLE eperson ALTER COLUMN uuid SET NOT NULL;
 ALTER TABLE eperson ADD CONSTRAINT eperson_id_unique UNIQUE(uuid);
 ALTER TABLE eperson ADD PRIMARY KEY (uuid);
 ALTER TABLE eperson ALTER COLUMN eperson_id DROP NOT NULL;
+CREATE INDEX eperson_id_idx on eperson(eperson_id);
 UPDATE eperson SET require_certificate = false WHERE require_certificate IS NULL;
 UPDATE eperson SET self_registered = false WHERE self_registered IS NULL;
 
@@ -41,6 +42,7 @@ ALTER TABLE epersongroup ALTER COLUMN uuid SET NOT NULL;
 ALTER TABLE epersongroup ADD CONSTRAINT epersongroup_id_unique UNIQUE(uuid);
 ALTER TABLE epersongroup ADD PRIMARY KEY (uuid);
 ALTER TABLE epersongroup ALTER COLUMN eperson_group_id DROP NOT NULL;
+CREATE INDEX eperson_group_id_idx on epersongroup(eperson_group_id);
 
 ALTER TABLE item ADD COLUMN uuid UUID DEFAULT gen_random_uuid() UNIQUE;
 INSERT INTO dspaceobject  (uuid) SELECT uuid FROM item;
@@ -49,6 +51,7 @@ ALTER TABLE item ALTER COLUMN uuid SET NOT NULL;
 ALTER TABLE item ADD CONSTRAINT item_id_unique UNIQUE(uuid);
 ALTER TABLE item ADD PRIMARY KEY (uuid);
 ALTER TABLE item ALTER COLUMN item_id DROP NOT NULL;
+CREATE INDEX item_id_idx on item(item_id);
 
 ALTER TABLE community ADD COLUMN uuid UUID DEFAULT gen_random_uuid() UNIQUE;
 INSERT INTO dspaceobject  (uuid) SELECT uuid FROM community;
@@ -57,6 +60,7 @@ ALTER TABLE community ALTER COLUMN uuid SET NOT NULL;
 ALTER TABLE community ADD CONSTRAINT community_id_unique UNIQUE(uuid);
 ALTER TABLE community ADD PRIMARY KEY (uuid);
 ALTER TABLE community ALTER COLUMN community_id DROP NOT NULL;
+CREATE INDEX community_id_idx on community(community_id);
 
 
 ALTER TABLE collection ADD COLUMN uuid UUID DEFAULT gen_random_uuid() UNIQUE;
@@ -66,6 +70,7 @@ ALTER TABLE collection ALTER COLUMN uuid SET NOT NULL;
 ALTER TABLE collection ADD CONSTRAINT collection_id_unique UNIQUE(uuid);
 ALTER TABLE collection ADD PRIMARY KEY (uuid);
 ALTER TABLE collection ALTER COLUMN collection_id DROP NOT NULL;
+CREATE INDEX collection_id_idx on collection(collection_id);
 
 ALTER TABLE bundle ADD COLUMN uuid UUID DEFAULT gen_random_uuid() UNIQUE;
 INSERT INTO dspaceobject  (uuid) SELECT uuid FROM bundle;
@@ -74,6 +79,7 @@ ALTER TABLE bundle ALTER COLUMN uuid SET NOT NULL;
 ALTER TABLE bundle ADD CONSTRAINT bundle_id_unique UNIQUE(uuid);
 ALTER TABLE bundle ADD PRIMARY KEY (uuid);
 ALTER TABLE bundle ALTER COLUMN bundle_id DROP NOT NULL;
+CREATE INDEX bundle_id_idx on bundle(bundle_id);
 
 ALTER TABLE bitstream ADD COLUMN uuid UUID DEFAULT gen_random_uuid() UNIQUE;
 INSERT INTO dspaceobject  (uuid) SELECT uuid FROM bitstream;
@@ -82,6 +88,7 @@ ALTER TABLE bitstream ALTER COLUMN uuid SET NOT NULL;
 ALTER TABLE bitstream ADD CONSTRAINT bitstream_id_unique UNIQUE(uuid);
 ALTER TABLE bitstream ADD PRIMARY KEY (uuid);
 ALTER TABLE bitstream ALTER COLUMN bitstream_id DROP NOT NULL;
+CREATE INDEX bitstream_id_idx on bitstream(bitstream_id);
 UPDATE bitstream SET sequence_id = -1 WHERE sequence_id IS NULL;
 UPDATE bitstream SET size_bytes = -1 WHERE size_bytes IS NULL;
 UPDATE bitstream SET deleted = FALSE WHERE deleted IS NULL;
@@ -127,8 +134,17 @@ ALTER TABLE Collection2Item ALTER COLUMN item_id SET NOT NULL;
 ALTER TABLE Collection2Item DROP COLUMN collection_legacy_id;
 ALTER TABLE Collection2Item DROP COLUMN item_legacy_id;
 ALTER TABLE Collection2Item DROP COLUMN id;
+
 -- Magic query that will delete all duplicate collection item_id references from the database (if we don't do this the primary key creation will fail)
-DELETE FROM collection2item WHERE ctid NOT IN (SELECT max(ctid) FROM collection2item GROUP BY collection_id,item_id);
+DELETE FROM collection2item a USING (
+      SELECT max(ctid) as ctid, collection_id,item_id
+        FROM collection2item 
+        GROUP BY collection_id,item_id HAVING COUNT(*) > 1
+      ) b
+WHERE a.collection_id = b.collection_id
+AND a.item_id = b.item_id
+AND a.ctid <> b.ctid;
+
 ALTER TABLE Collection2Item add primary key (collection_id,item_id);
 
 -- Migrate Community2Community

@@ -66,6 +66,16 @@ public interface CommunityService extends DSpaceObjectService<Community>, DSpace
     public List<Community> findAll(Context context) throws SQLException;
 
     /**
+     * Get all communities in the system. Adds support for limit and offset.
+     * @param context
+     * @param limit
+     * @param offset
+     * @return
+     * @throws SQLException
+     */
+    public List<Community> findAll(Context context, Integer limit, Integer offset) throws SQLException;
+
+    /**
      * Get a list of all top-level communities in the system. These are
      * alphabetically sorted by community name. A top-level community is one
      * without a parent community.

@@ -10,6 +10,7 @@ package org.dspace.xoai.services.impl;
 import java.sql.SQLException;
 import javax.inject.Inject;
 import org.dspace.content.DSpaceObject;
+import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.xoai.services.api.context.ContextService;
 import org.dspace.xoai.services.api.context.ContextServiceException;
@@ -20,8 +21,12 @@ public class DSpaceHandleResolver implements HandleResolver {
     @Inject
     private ContextService contextService;
 
-    @Inject
-    private HandleService handleService;
+    private final HandleService handleService;
+
+    public DSpaceHandleResolver()
+    {
+        handleService = HandleServiceFactory.getInstance().getHandleService();
+    }
 
     @Override
     public DSpaceObject resolve(String handle) throws HandleResolverException {
