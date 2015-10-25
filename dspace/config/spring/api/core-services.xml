@@ -82,7 +82,7 @@
     <bean class="org.dspace.license.CreativeCommonsServiceImpl"/>
 
     <bean class="org.dspace.statistics.ElasticSearchLoggerServiceImpl" lazy-init="true"/>
-    <bean class="org.dspace.statistics.SolrLoggerServiceImpl"/>
+    <bean id="solrLoggerService" class="org.dspace.statistics.SolrLoggerServiceImpl"/>
 
     <bean class="org.dspace.versioning.VersionHistoryServiceImpl"/>
 
