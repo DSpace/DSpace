@@ -57,6 +57,7 @@ public class SupervisorServiceImpl implements SupervisorService{
         // make a table row in the database table, and update with the relevant
         // details
         workspaceItem.getSupervisorGroups().add(group);
+        group.getSupervisedItems().add(workspaceItem);
 
         // If a default policy type has been requested, apply the policies using
         // the DSpace API for doing so
