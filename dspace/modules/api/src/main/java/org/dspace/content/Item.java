@@ -1690,9 +1690,6 @@ public class Item extends DSpaceObject
         }
         updateMetadata();
 
-        Event newEvent = new Event(Event.MODIFY_METADATA, Constants.ITEM, internalItemId, getDetails());
-        ourContext.addEvent(newEvent);
-        log.debug ("update issued an event " + newEvent.toString());
         clearDetails();
 
         updateLastModified();
