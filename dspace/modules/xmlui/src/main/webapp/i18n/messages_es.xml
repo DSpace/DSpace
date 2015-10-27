@@ -104,14 +104,14 @@
 <message key="xmlui.cicdigital.discoveryList.no-value.dcterms-type-type">Sin tipo asignado</message>
 <message key="xmlui.cicdigital.discoveryList.no-value.dcterms.abstract">Sin resumen asignado</message>
 
+<message key="xmlui.cicdigital.staticPage.what-is-cic-digital.uri">/page/que-es-cic-digital_es</message>
+<message key="xmlui.cicdigital.staticPage.reposiotry-policies.uri">/page/politicas-del-repositorio_es</message>
+<message key="xmlui.cicdigital.staticPage.how-to-contribute-material.uri">/page/como-aportar-material_es</message>
 	<!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 		             ArtifactBrowser Aspect
 
 		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!-->
-
-
-
 
 
 

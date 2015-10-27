@@ -8,6 +8,7 @@
 	xmlns:mods="http://www.loc.gov/mods/v3"
 	xmlns:dc="http://purl.org/dc/elements/1.1/"
     xmlns:confman="org.dspace.core.ConfigurationManager"
+    xmlns:xmlui="xalan://ar.edu.unlp.sedici.dspace.xmlui.util.XSLTHelper"
 	xmlns="http://www.w3.org/1999/xhtml"
 	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc confman">
 
@@ -213,7 +214,7 @@
                 <xsl:choose>
                         <xsl:when test="starts-with($request-uri, 'page/')">
                                 <i18n:text>
-                                	<xsl:value-of select="concat('xmlui.cicdigital.title.',substring-after($request-uri,'/'))"/>
+                                	<xsl:value-of select="concat('xmlui.cicdigital.title.', xmlui:replaceAll(substring-after($request-uri,'/'), '(_en|_es)', ''))"/>
                                 </i18n:text>
                         </xsl:when>
                         <xsl:when test="not($page_title)">

@@ -110,7 +110,7 @@
 									<xsl:with-param name="path">/browse?type=author</xsl:with-param>
 								</xsl:call-template>
 							</xsl:attribute>
-							<div class="hidden-xs"><i18n:text>xmlui.ArtifactBrowser.Navigation.head_browse</i18n:text></div><xsl:text> </xsl:text><i18n:text>xmlui.ArtifactBrowser.CollectionViewer.browse_authors</i18n:text>
+							<span class="hidden-xs"><i18n:text>xmlui.ArtifactBrowser.Navigation.head_browse</i18n:text></span><xsl:text> </xsl:text><i18n:text>xmlui.ArtifactBrowser.CollectionViewer.browse_authors</i18n:text>
 						</a>
 						<a class="btn" role="button">
 							<xsl:attribute name="href">
@@ -118,7 +118,7 @@
 									<xsl:with-param name="path">/handle/123456789/3</xsl:with-param>
 								</xsl:call-template>
 							</xsl:attribute>
-							<div class="hidden-xs"><i18n:text>xmlui.ArtifactBrowser.Navigation.head_browse</i18n:text></div><xsl:text> </xsl:text><i18n:text>xmlui.cicdigital.home.centros</i18n:text>
+							<span class="hidden-xs"><i18n:text>xmlui.ArtifactBrowser.Navigation.head_browse</i18n:text></span><xsl:text> </xsl:text><i18n:text>xmlui.cicdigital.home.centros</i18n:text>
 						</a>
 						<a class="btn" role="button">
 							<xsl:attribute name="href">
@@ -164,11 +164,7 @@
 
 				</xsl:for-each>
 			</div>
-			<div class="col-md-5 hidden-xs">
-				<xsl:call-template name="build-img">
-					<xsl:with-param name="img.src">images/generica_72.png</xsl:with-param>
-				</xsl:call-template>
-			</div>
+			
 		</div>
 
 	</xsl:template>

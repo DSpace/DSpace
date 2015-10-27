@@ -27,7 +27,14 @@
 					</xsl:if>
 					<xsl:call-template name="build-anchor">
 						<xsl:with-param name="a.href">
-							<xsl:value-of select="$current-uri" />
+							<xsl:choose>
+								<xsl:when test="starts-with($request-uri, 'page/')">
+									<xsl:value-of select="xmlui:replaceAll($request-uri, '(_en|_es)', concat('_', $locale))" />							
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:value-of select="$current-uri" />
+								</xsl:otherwise>
+							</xsl:choose>
 							<xsl:text>?locale-attribute=</xsl:text>
 							<xsl:value-of select="$locale" />				
 							<xsl:if test="$queryString != '' ">
@@ -114,32 +121,29 @@
 										<i18n:text>xmlui.cicdigital.home.sobre-repositorio</i18n:text>
 									</li>
 									<li>
-										<a>
-											<xsl:attribute name="href">
+										<a href="xmlui.cicdigital.staticPage.what-is-cic-digital.uri" i18n:attr="href"/>
+											<!-- <xsl:attribute name="href">
 												<xsl:value-of select="concat($context-path,'/page/que-es-cic-digital')"></xsl:value-of>
-											</xsl:attribute>
+											</xsl:attribute>  -->
 											<i18n:text>xmlui.cicdigital.title.que-es-cic-digital</i18n:text>
-										</a>
 									</li>
 									<li>
-										<a>
-											<xsl:attribute name="href">
+										<a href="xmlui.cicdigital.staticPage.reposiotry-policies.uri" i18n:attr="href"/>
+											<!--<xsl:attribute name="href">
 												<xsl:value-of select="concat($context-path,'/page/politicas-del-repositorio')"></xsl:value-of>
-											</xsl:attribute>
+											</xsl:attribute> -->
 											<i18n:text>xmlui.cicdigital.title.politicas-del-repositorio</i18n:text>	
-										</a>
 									</li>
 									<li class="divider"></li>
 									<li class="dropdown-header">
 										<i18n:text>xmlui.cicdigital.home.informacion-autores</i18n:text>
 									</li>
 									<li>
-										<a>
-											<xsl:attribute name="href">
+										<a href="xmlui.cicdigital.staticPage.how-to-contribute-material.uri" i18n:attr="href"/>
+											<!-- <xsl:attribute name="href">
 												<xsl:value-of select="concat($context-path,'/page/como-aportar-material')"></xsl:value-of>
-											</xsl:attribute>
-											<i18n:text>xmlui.cicdigital.title.como-aportar-material</i18n:text>	
-										</a>
+											</xsl:attribute>-->
+											<i18n:text>xmlui.cicdigital.title.como-aportar-material</i18n:text>	 
 									</li>
 									<li>
 										<a>

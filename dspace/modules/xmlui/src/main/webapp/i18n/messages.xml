@@ -102,13 +102,16 @@
 <message key="xmlui.cicdigital.discoveryList.no-value.dcterms-creators">No authors assigned</message>
 <message key="xmlui.cicdigital.discoveryList.no-value.dcterms-type-type">No type assigned</message>
 <message key="xmlui.cicdigital.discoveryList.no-value.dcterms.abstract">No abstract assigned</message>
+
+
+<message key="xmlui.cicdigital.staticPage.what-is-cic-digital.uri">/page/que-es-cic-digital_en</message>
+<message key="xmlui.cicdigital.staticPage.reposiotry-policies.uri">/page/politicas-del-repositorio_en</message>
+<message key="xmlui.cicdigital.staticPage.how-to-contribute-material.uri">/page/como-aportar-material_en</message>
 	<!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 		             ArtifactBrowser Aspect
 
 		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!-->
-
-
 
 
 
