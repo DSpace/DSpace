@@ -1367,7 +1367,7 @@
                                         select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
-                                <xsl:value-of select="string('http://www.asnamnat.org/amnat')"/>
+                                <xsl:value-of select="string('http://www.jstor.org/journal/amernatu')"/>
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
