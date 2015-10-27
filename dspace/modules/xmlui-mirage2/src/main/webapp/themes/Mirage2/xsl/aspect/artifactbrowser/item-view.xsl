@@ -499,6 +499,7 @@
           <h5>Data Creator</h5>
           <xsl:for-each select="dim:field[@element='creator']">
             <xsl:copy-of select="./node()"/>
+            <br/>
           </xsl:for-each>
         </div>
       </xsl:if>
