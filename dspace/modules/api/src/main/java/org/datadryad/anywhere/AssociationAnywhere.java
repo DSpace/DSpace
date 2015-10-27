@@ -61,7 +61,7 @@ public class AssociationAnywhere {
 
         options.addOption("i", "customer id", true, "customer id");
         options.addOption("p", "data package id", false, "package id");
-        options.addOption("u", "update credit", false, "update credit");
+        options.addOption("u", "update customer settings", false, "update customer settings");
         options.addOption("t", "tally credit", false, "tally credit");
         options.addOption("l", "list customer", false, "list customer");
         CommandLine line = parser.parse(options, argv);

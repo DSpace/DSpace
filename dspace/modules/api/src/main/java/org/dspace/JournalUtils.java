@@ -33,9 +33,9 @@ public class JournalUtils {
     public static final String NOTIFY_ON_ARCHIVE = "notifyOnArchive";
     public static final String JOURNAL_ID = "journalID";
     public static final String SUBSCRIPTION_PAID = "subscriptionPaid";
-    public static final String SUBSCRIPTION_PLAN = "subscription plan";
-    public static final String PREPAID_PLAN = "prepaid payment plan";
-    public static final String DEFERRED_PLAN = "deferred payment plan";
+    public static final String SUBSCRIPTION_PLAN = "SUBSCRIPTION";
+    public static final String PREPAID_PLAN = "PREPAID";
+    public static final String DEFERRED_PLAN = "DEFERRED";
 
     public enum RecommendedBlackoutAction {
         BLACKOUT_TRUE
