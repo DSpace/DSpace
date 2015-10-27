@@ -127,14 +127,15 @@
                          <div id="datashare-footer">
                            <div id="footer-1">
                              <div class="container">
-                               <a href="http://www.ed.ac.uk/">THE UNIVERSITY OF EDINBURGH</a>
+                               <div>
+                                 <a href="http://www.ed.ac.uk/">THE UNIVERSITY OF EDINBURGH</a>
+                               </div>
+                               <div id="footer-dsa">
+                                 <a href="https://assessment.datasealofapproval.org/assessment_175/seal/html/">
+                                   <img border="0" src="{$theme-path}/images/dsa.gif" alt="dsa_logo" width="80"/>
+                                 </a>
+                               </div>
                              </div>
-                             <div id="footer-dsa">
-                               <a href="https://assessment.datasealofapproval.org/assessment_175/seal/html/">
-                                 <img border="0" src="{$theme-path}/images/dsa.gif" alt="dsa_logo" width="80"/>
-                               </a>
-                             </div>
-
                            </div>
                            <div id="footer-2">
                              <div class="container">
