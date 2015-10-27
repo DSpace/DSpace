@@ -12,6 +12,7 @@ import static org.junit.Assert.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import mockit.Expectations;
 
 import org.junit.After;
 import org.junit.Before;
@@ -523,4 +524,59 @@ public class DSpaceConfigurationServiceTest {
         dscs = null;
     }
 
+    /**
+     * Test method for {@link org.dspace.servicemanager.config.DSpaceConfigurationService#getDSpaceHome(java.lang.String)}.
+     */
+    @Test
+    public void testGetDSpaceHomeSysProperty() {
+        final DSpaceConfigurationService dscs = new DSpaceConfigurationService();
+
+        // Set System Property for DSpace Home
+        new Expectations(System.class) {{
+            // return "/mydspace" two times
+            System.getProperty(DSpaceConfigurationService.DSPACE_HOME); result = "/mydspace";
+        }};
+        // Ensure /mydspace looks like a valid DSpace home directory
+        new Expectations(dscs.getClass()) {{
+            dscs.isValidDSpaceHome("/mydspace"); result = true;
+        }};
+
+        // Assert Home is the same as System Property
+        assertEquals("System property set", "/mydspace", dscs.getDSpaceHome(null));
+    }
+
+    @Test
+    public void testGetDSpaceHomeSysPropertyOverride() {
+        final DSpaceConfigurationService dscs = new DSpaceConfigurationService();
+
+        // Set System Property for DSpace Home
+        new Expectations(System.class) {{
+            System.getProperty(DSpaceConfigurationService.DSPACE_HOME); result = "/mydspace";
+        }};
+        // Ensure /mydspace looks like a valid DSpace home directory
+        new Expectations(dscs.getClass()) {{
+            dscs.isValidDSpaceHome("/mydspace"); result = true;
+        }};
+
+        // Assert System Property overrides the value passed in, if it is valid
+        assertEquals("System property override", "/mydspace", dscs.getDSpaceHome("/myotherdspace"));
+    }
+
+    @Test
+    public void testGetDSpaceHomeNoSysProperty() {
+
+        final DSpaceConfigurationService dscs = new DSpaceConfigurationService();
+
+        // No system property set
+        new Expectations(System.class) {{
+            System.getProperty(DSpaceConfigurationService.DSPACE_HOME); result = null;
+        }};
+        // Ensure /mydspace looks like a valid DSpace home directory
+        new Expectations(dscs.getClass()) {{
+            dscs.isValidDSpaceHome("/mydspace"); result = true;
+        }};
+
+        // Assert provided home is used
+        assertEquals("Home based on passed in value", "/mydspace", dscs.getDSpaceHome("/mydspace"));
+    }
 }

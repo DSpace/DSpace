@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.InetAddress;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -357,7 +359,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
                 configuration.clearProperty(name);
                 log.info("Cleared the configuration setting for name ("+name+")");
             }
-            else if(!value.equals(oldValue))
+            else if(value!=null && !value.equals(oldValue))
             {
                changed = true;
                configuration.setProperty(name, value);
@@ -459,28 +461,8 @@ public final class DSpaceConfigurationService implements ConfigurationService {
      */
     private void loadInitialConfig(String providedHome)
     {
-        // See if homePath is specified as a System Property
-        homePath = System.getProperty(DSPACE_HOME);
-
-        // If a provided home was passed in & no system property, use provided home
-        if (providedHome != null && homePath == null) {
-            homePath = providedHome;
-        }
-        // If still null, check Catalina
-        if (homePath == null) {
-            String catalina = getCatalina();
-            if (catalina != null) {
-                homePath = catalina + File.separatorChar + DSPACE + File.separatorChar;
-            }
-        }
-        // If still null, check "user.home" system property
-        if (homePath == null) {
-            homePath = System.getProperty("user.home");
-        }
-        // Finally, no other option but to assume root path ("/")
-        if (homePath == null) {
-            homePath = "/";
-        }
+        // Determine the DSpace home directory
+        homePath = getDSpaceHome(providedHome);
 
         // Based on homePath get full path to the configuration definition
         String configDefinition = homePath + File.separatorChar + DSPACE_CONFIG_DEFINITION_PATH;
@@ -573,6 +555,102 @@ public final class DSpaceConfigurationService implements ConfigurationService {
 
         // Return the configuration directory and number of configs loaded
         return "ConfigDir=" + configuration.getString(DSPACE_HOME) + File.separatorChar + DEFAULT_CONFIG_DIR + ", Size=" + size;
+    }
+
+    /**
+     * This attempts to find the DSpace home directory, based on system properties,
+     * and the providedHome (if not null).
+     * <p>The initial value of {@code dspace.dir} will be:</p>
+     * <ol>
+     *  <li>the value of the system property {@code dspace.dir} if defined;</li>
+     *  <li>else the value of {@code providedHome} if not null;</li>
+     *  <li>else the servlet container's home + "/dspace/" if defined (see {@link getCatalina()});</li>
+     *  <li>else the user's home directory if defined;</li>
+     *  <li>else "/".
+     * </ol>
+     * @param providedHome provided home directory (may be null)
+     * @return full path to DSpace home
+     */
+    protected String getDSpaceHome(String providedHome)
+    {
+        // See if valid home specified as system property (most trusted)
+        String sysProperty = System.getProperty(DSPACE_HOME);
+        if(isValidDSpaceHome(sysProperty))
+        {
+            return sysProperty;
+        }
+
+        // See if valid home passed in
+        if(isValidDSpaceHome(providedHome))
+        {
+            return providedHome;
+        }
+
+        // If still not found, attempt to determine location of our JAR
+        String pathRelativeToJar = null;
+        try
+        {
+            // Check location of our running JAR
+            URL jarLocation = getClass().getProtectionDomain().getCodeSource().getLocation();
+            // Convert to a file & get "grandparent" directory
+            // This JAR should be running in [dspace]/lib/, so its parent is [dspace]/lib, and grandparent is [dspace]
+            pathRelativeToJar = new File(jarLocation.toURI()).getParentFile().getParentFile().getAbsolutePath();
+            // Is the grandparent directory of where the JAR resides a valid DSpace home?
+            if(isValidDSpaceHome(pathRelativeToJar))
+            {
+                return pathRelativeToJar;
+            }
+        }
+        catch(URISyntaxException e)
+        { // do nothing
+        }
+
+        // If still not valid, check Catalina
+        String catalina = getCatalina();
+        if(isValidDSpaceHome(catalina))
+        {
+            return catalina;
+        }
+
+        // If still not valid, check "user.home" system property
+        String userHome = System.getProperty("user.home");
+        if(isValidDSpaceHome(userHome))
+        {
+            return userHome;
+        }
+
+        // Finally, try root path ("/")
+        if (isValidDSpaceHome("/")) {
+            return "/";
+        }
+
+        // If none of the above worked, DSpace Kernel will fail to start.
+        throw new RuntimeException("DSpace home directory could not be determined. It MUST include a subpath of " +
+                                   "'" + File.separatorChar + DSPACE_CONFIG_DEFINITION_PATH + "'. " +
+                                   "Please consider setting the '" + DSPACE_HOME + "' system property or ensure the dspace-api.jar is being run from [dspace]/lib/.");
+    }
+
+    /**
+     * Returns whether a given path seems to have the required DSpace configurations
+     * in order to make it a valid DSpace home directory
+     * @param path
+     * @return true if path seems valid, false otherwise
+     */
+    protected boolean isValidDSpaceHome(String path)
+    {
+        // If null path, return false immediately
+        if(path==null)
+            return false;
+
+        // Based on path get full path to the configuration definition
+        String configDefinition = path + File.separatorChar + DSPACE_CONFIG_DEFINITION_PATH;
+        File configDefFile = new File(configDefinition);
+
+        // Check if the required config exists
+        if(configDefFile.exists())
+            return true;
+        else
+            return false;
     }
 
     /**
