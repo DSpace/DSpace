@@ -123,6 +123,37 @@
                              </div>
                          </div>
 
+                         <!-- DATASHARE - start -->
+                         <div id="datashare-footer">
+                           <div id="footer-1">
+                             <div class="container">
+                               <a href="http://www.ed.ac.uk/">THE UNIVERSITY OF EDINBURGH</a>
+                             </div>
+                             <div id="footer-dsa">
+                               <a href="https://assessment.datasealofapproval.org/assessment_175/seal/html/">
+                                 <img border="0" src="{$theme-path}/images/dsa.gif" alt="dsa_logo" width="80"/>
+                               </a>
+                             </div>
+
+                           </div>
+                           <div id="footer-2">
+                             <div class="container">
+                               <div id="footer-2-col-1">
+                                 <ul>
+                                   <li><a href="http://www.ed.ac.uk/about/website/accessibility">Accessibility</a></li>
+                                   <li><a href="http://www.ed.ac.uk/about/website/privacy">Privacy &amp; cookies</a></li>
+                                 </ul>
+                               </div>
+                               <div id="footer-2-col-2">
+                                 <ul>
+                                   <li><a href="http://www.ed.ac.uk/information-services/research-support/data-library/data-repository/service-policies/service-level-definition">Service level definition</a></li>
+                                   <li><a href="http://www.ed.ac.uk/about/website/freedom-information">Freedom of information</a></li>
+                                 </ul>
+                               </div>
+                             </div>
+                           </div>
+                         </div>
+                         <!-- DATASHARE - end -->
 
                         </xsl:otherwise>
                     </xsl:choose>
@@ -723,40 +754,40 @@
     <!-- Like the header, the footer contains various miscellaneous text, links, and image placeholders -->
     <xsl:template name="buildFooter">
         <footer>
-                <div class="row">
-                    <hr/>
-                    <div class="col-xs-7 col-sm-8">
-                      <div id="footer-is-icon">
-                        <span class="theme-by">Theme by&#160;</span>
-                        <br/>
-                        <a title="@mire NV" target="_blank" href="http://atmire.com">
-                          <img alt="@mire NV" src="{concat($theme-path, '/images/@mirelogo-small.png')}"/>
-                        </a>
-                      </div>
-                      <div>
-                        <ul>
-                          <li><a href="http://www.ed.ac.uk/information-services/research-support/data-library/contact-us">Contact Us</a></li>
-                          <li>Accessibility</li>
-                          <li>Cookies &amp; Policies</li>
-                        </ul>
-                      </div>
-                    </div>
-                    <div class="col-xs-5 col-sm-4 hidden-print">
-                      <div class="pull-right">
-                        <a target="_blank" href="http://edina.ac.uk/">
-                          <img alt="EDINA" src="{concat($theme-path, '/images/edina.png')}"/>
-                        </a>
-                      </div>
+                <!-- <div class="row"> -->
+                <!--     <hr/> -->
+                <!--     <div class="col-xs-7 col-sm-8"> -->
+                <!--       <div id="footer-is-icon"> -->
+                <!--         <span class="theme-by">Theme by&#160;</span> -->
+                <!--         <br/> -->
+                <!--         <a title="@mire NV" target="_blank" href="http://atmire.com"> -->
+                <!--           <img alt="@mire NV" src="{concat($theme-path, '/images/@mirelogo-small.png')}"/> -->
+                <!--         </a> -->
+                <!--       </div> -->
+                <!--       <div> -->
+                <!--         <ul> -->
+                <!--           <li><a href="http://www.ed.ac.uk/information-services/research-support/data-library/contact-us">Contact Us</a></li> -->
+                <!--           <li>Accessibility</li> -->
+                <!--           <li>Cookies &amp; Policies</li> -->
+                <!--         </ul> -->
+                <!--       </div> -->
+                <!--     </div> -->
+                <!--     <div class="col-xs-5 col-sm-4 hidden-print"> -->
+                <!--       <div class="pull-right"> -->
+                <!--         <a target="_blank" href="http://edina.ac.uk/"> -->
+                <!--           <img alt="EDINA" src="{concat($theme-path, '/images/edina.png')}"/> -->
+                <!--         </a> -->
+                <!--       </div> -->
 
-                    </div>
+                <!--     </div> -->
 
-                </div>
+                <!-- </div> -->
 
-                <div id="footer-charity-statement" class="row">
-                  <div class="col-xs-8">
-                    <p>The University of Edinburgh is a charitable body, registered in Scotland, with registration number SC005336.</p>
-                  </div>
-                </div>
+                <!-- <div id="footer-charity-statement" class="row"> -->
+                <!--   <div class="col-xs-8"> -->
+                <!--     <p>The University of Edinburgh is a charitable body, registered in Scotland, with registration number SC005336.</p> -->
+                <!--   </div> -->
+                <!-- </div> -->
 
 
                 <!--Invisible link to HTML sitemap (for search engines) -->

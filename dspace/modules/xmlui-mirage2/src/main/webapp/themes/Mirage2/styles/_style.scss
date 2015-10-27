@@ -14,7 +14,7 @@
 
 /*************************** header  *******************************/
 .navbar{
-    min-height: 9em;
+    min-height: 10em;
 }
 
 header .navbar-default {
@@ -52,6 +52,10 @@ header .navbar-brand img {
     font-size: 18px;
 }
 
+#is-banner a{
+    color: white;
+}
+
 #is-banner a:visited{
     color: white;
 }
@@ -66,9 +70,14 @@ header .navbar-brand img {
     float: right;
 }
 
+#is-banner-contact-us img{
+    height: 2em;
+}
+
 .trail-wrapper {
     background-color: #cccccc;
     height: 1.8em;
+    border-bottom: 1px solid #cccccc;
 }
 
 .trail-wrapper .breadcrumb{
@@ -87,6 +96,11 @@ header .navbar-brand img {
     border-color: #d40032;
 }
 
+#home-welcome-deposit ul,
+#about-datashare ul{
+    list-style-type: none;
+}
+
 /*************************** menu *******************************/
 .list-group-item.active, .list-group-item.active:hover, .list-group-item.active:focus {
     background-color: #d40032;
@@ -95,9 +109,56 @@ header .navbar-brand img {
 
 
 /*************************** footer *******************************/
-#footer-is-icon{
+#footer-1{
+    font-family: "Crimson Text",serif;
+    font-size: 1.3em;
+    height: 2.6em;
+    background-color: #252525;
+    color: #777777;
+}
+
+#footer-1 .container{
+    padding-top: 0.6em;
+}
+
+#footer-1 a:visited{
+    color: #777777;
+}
+
+#footer-uoe{
     float: left;
-    padding-right: 3em;
+}
+#footer-dsa{
+    float: right;
+    padding-right: 5em;
+    margin-top: -1.5em;
+}
+
+#footer-2{
+    height: 6em;
+    background-color: #4a4a4a;
+    color: white;
+}
+
+#footer-2 a{
+    color: white;
+}
+
+#footer-2 .container{
+    padding-top: 0.6em;
+}
+
+#footer-2 ul{
+    list-style-type: none;
+    padding: 0 5em 0 0;
+}
+
+#footer-2-col-1{
+    float: left;
+}
+
+#footer-2 a:visited{
+    color: white;
 }
 
 
