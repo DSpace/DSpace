@@ -445,27 +445,26 @@ public class Concept extends AuthorityObject
             throws SQLException, AuthorizeException
     {
         ArrayList<Concept> concepts = new ArrayList<Concept>();
-        MetadataSchema mds = MetadataSchema.find(context, metadataSchema);
-        MetadataField mdf = MetadataField.findByElement(context, mds.getSchemaID(), metadataElement, null);
-        int target_field_id = mdf.getFieldID();
-        log.info ("looking up concept metadata for " + searchString + " in field number " + target_field_id);
-        TableRowIterator row = DatabaseManager.query(context, "select c.* from concept as c, conceptmetadatavalue as cmv where upper(cmv.text_value) = ? and cmv.parent_id = c.id and cmv.field_id = ?;", searchString, target_field_id);
+	try {
+	    MetadataSchema mds = MetadataSchema.find(context, metadataSchema);
+	    MetadataField mdf = MetadataField.findByElement(context, mds.getSchemaID(), metadataElement, null);
+	    int target_field_id = mdf.getFieldID();
+	    log.info ("looking up concept metadata for " + searchString + " in field number " + target_field_id);
+	    TableRowIterator row = DatabaseManager.query(context, "select c.* from concept as c, conceptmetadatavalue as cmv where upper(cmv.text_value) = ? and cmv.parent_id = c.id and cmv.field_id = ?;", searchString, target_field_id);
 
 
-        if (row == null)
-        {
-            return null;
-        }
-        else
-        {
+	    if (row == null) {
+		    return null;
+	    } else {
+		while(row.hasNext()) {
+		    concepts.add(new Concept(context,row.next()));
+		}
+	    }
+	} catch (NullPointerException e) {
+	    log.error("Unable to find concept by metadata: search=" + searchString + ", schema=" + metadataSchema + ", element=" + metadataElement, e);
+	}
 
-            while(row.hasNext())
-            {
-                concepts.add(new Concept(context,row.next()));
-
-            }
-        }
-        return concepts;
+	return concepts;
     }
 
     /**
