@@ -280,7 +280,7 @@
 	<!-- CIC-Digital -->
 	<message key="xmlui.ArtifactBrowser.ItemViewer.general_info">General Information</message>
 	<message key="xmlui.ArtifactBrowser.ItemViewer.specific_info">Specific Information</message>
-	<message key="xmlui.ArtifactBrowser.ItemViewer.other_info">Another data</message>
+	<message key="xmlui.ArtifactBrowser.ItemViewer.other_info">More</message>
 	<message key="xmlui.ArtifactBrowser.ItemViewer.file">{0} file</message>
 	
 	<message key="xmlui.ArtifactBrowser.ItemViewer.show_more">read more</message>

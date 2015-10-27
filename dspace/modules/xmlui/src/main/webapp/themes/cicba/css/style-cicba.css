@@ -489,6 +489,11 @@ li.ds-artifact-item.community {
 	font-size: 95%;
 }
 
+#item-context {
+	color: #31708f;
+	font-size: 95%;
+}
+
 .metadata-dc_title {
 	font-size: 150%;
 	margin-top: 10px;
@@ -530,6 +535,12 @@ li.ds-artifact-item.community {
 	display: block;
 	padding-bottom: 20px;
 }
+
+#item-container .list-unstyled {
+	margin-left:unset;
+	margin-top:2em;
+}
+
 /*
 .metadata-dcterms_abstract>.metadata-values>span:BEFORE {
 	content: attr(xml\:lang);

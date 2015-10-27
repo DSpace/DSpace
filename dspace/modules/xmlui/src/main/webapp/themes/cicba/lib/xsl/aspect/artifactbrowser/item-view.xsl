@@ -204,10 +204,27 @@
     	<xsl:for-each select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim">
 	    	<div class="row item-head, col-md-12">
 		    	<div class="col-md-8 col-md-push-3">
-			    	<xsl:call-template name="render-metadata">
-			    		<xsl:with-param name="field" select="'dc.type'" />
-			    		<xsl:with-param name="show_label" select="'false'" />
-			    	</xsl:call-template>
+		    		<div id="item-context">
+				    	<xsl:call-template name="render-metadata">
+				    		<xsl:with-param name="field" select="'dc.type'" />
+				    		<xsl:with-param name="show_label" select="'false'" />
+				    		<xsl:with-param name="container" select="'span'" />
+				    	</xsl:call-template>.
+				    	<xsl:call-template name="render-metadata">
+							<xsl:with-param name="field" select="'dcterms.isPartOf.series'" />
+							<xsl:with-param name="show_label" select="'false'" />
+							<xsl:with-param name="container" select="'span'" />
+						</xsl:call-template>
+						<xsl:if test="dim:field[@mdschema='dcterms' and @element='isPartOf' and @qualifier='series']/text() != ''">
+							;
+						</xsl:if>
+						<xsl:call-template name="render-metadata">
+							<xsl:with-param name="field" select="'dcterms.isPartOf.issue'" />
+							<xsl:with-param name="show_label" select="'false'" />
+							<xsl:with-param name="is_linked_authority" select="'true'"/>
+							<xsl:with-param name="container" select="'span'" />
+						</xsl:call-template>
+					</div>
 		    		<xsl:call-template name="render-metadata">
 		    			<xsl:with-param name="field" select="'dc.title'" />
 		    			<xsl:with-param name="show_label" select="'false'" />
@@ -240,7 +257,7 @@
 	    </xsl:for-each>
     	
     	<div class="row">
-	    	<div class="col-md-9 col-md-push-3">
+	    	<div id="item-container" class="col-md-9 col-md-push-3">
 	    	
 	    <!-- Generate the info about the item from the metadata section -->
 		        <xsl:apply-templates select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim"
@@ -476,11 +493,49 @@
 	      	</div>
       	</xsl:if>
 	    <div class="row">
-	    
-	
-		   	<div class="col-md-6">
-		   		<h3><i18n:text>xmlui.ArtifactBrowser.ItemViewer.general_info</i18n:text></h3>
+		   	<div class="col-md-12">
+		   		<!-- <h3><i18n:text>xmlui.ArtifactBrowser.ItemViewer.general_info</i18n:text></h3> -->
 				<ul class="list-unstyled">
+					<xsl:call-template name="render-metadata">
+						<xsl:with-param name="field" select="'dcterms.title.investigacion'" />
+						<xsl:with-param name="container" select="'li'" />
+					</xsl:call-template>
+					<xsl:call-template name="render-metadata">
+						<xsl:with-param name="field" select="'dcterms.contributor.director'" />
+						<xsl:with-param name="container" select="'li'" />
+					</xsl:call-template>
+					<xsl:call-template name="render-metadata">
+						<xsl:with-param name="field" select="'cic.thesis.degree'" />
+						<xsl:with-param name="container" select="'li'" />
+					</xsl:call-template>
+					<xsl:call-template name="render-metadata">
+						<xsl:with-param name="field" select="'cic.thesis.grantor'" />
+						<xsl:with-param name="container" select="'li'" />
+					</xsl:call-template>
+					<xsl:call-template name="render-metadata">
+						<xsl:with-param name="field" select="'dcterms.isPartOf.item'" />
+						<xsl:with-param name="container" select="'li'" />
+						<xsl:with-param name="is_linked_authority" select="'true'"/>
+					</xsl:call-template>	
+					<xsl:call-template name="render-metadata">
+						<xsl:with-param name="field" select="'dcterms.identifier.isbn'" />
+						<xsl:with-param name="container" select="'li'" />
+					</xsl:call-template>
+					<xsl:call-template name="render-metadata">
+						<xsl:with-param name="field" select="'dcterms.relation'" />
+						<xsl:with-param name="container" select="'li'" />
+						<xsl:with-param name="is_linked_authority" select="'true'"/>
+					</xsl:call-template>
+					<xsl:call-template name="render-metadata">
+						<xsl:with-param name="field" select="'dcterms.hasPart'" />
+						<xsl:with-param name="container" select="'li'" />
+						<xsl:with-param name="is_linked_authority" select="'true'"/>
+					</xsl:call-template>
+					<xsl:call-template name="render-metadata">
+						<xsl:with-param name="field" select="'dcterms.isVersionOf'" />
+						<xsl:with-param name="container" select="'li'" />
+						<xsl:with-param name="is_linked_authority" select="'true'"/>
+					</xsl:call-template>
 					<xsl:call-template name="render-metadata">
 						<xsl:with-param name="field" select="'dcterms.alternative'" />
 						<xsl:with-param name="container" select="'li'" />
@@ -521,69 +576,7 @@
 						<xsl:with-param name="container" select="'li'" />
 					</xsl:call-template>
 				</ul>
-
 		   	</div>
-		   	
-		   	<div class="col-md-6">
-		   		<h3><i18n:text>xmlui.ArtifactBrowser.ItemViewer.specific_info</i18n:text></h3>
-				<ul class="list-unstyled">
-					<xsl:call-template name="render-metadata">
-						<xsl:with-param name="field" select="'dcterms.title.investigacion'" />
-						<xsl:with-param name="container" select="'li'" />
-					</xsl:call-template>
-					<xsl:call-template name="render-metadata">
-						<xsl:with-param name="field" select="'dcterms.contributor.director'" />
-						<xsl:with-param name="container" select="'li'" />
-					</xsl:call-template>
-					<xsl:call-template name="render-metadata">
-						<xsl:with-param name="field" select="'cic.thesis.degree'" />
-						<xsl:with-param name="container" select="'li'" />
-					</xsl:call-template>
-					<xsl:call-template name="render-metadata">
-						<xsl:with-param name="field" select="'cic.thesis.grantor'" />
-						<xsl:with-param name="container" select="'li'" />
-					</xsl:call-template>
-				</ul>
-				
-				<ul class="list-unstyled">
-					<xsl:call-template name="render-metadata">
-						<xsl:with-param name="field" select="'dcterms.isPartOf.item'" />
-						<xsl:with-param name="container" select="'li'" />
-						<xsl:with-param name="is_linked_authority" select="'true'"/>
-					</xsl:call-template>
-					<xsl:call-template name="render-metadata">
-						<xsl:with-param name="field" select="'dcterms.isPartOf.series'" />
-						<xsl:with-param name="container" select="'li'" />
-					</xsl:call-template>
-					<xsl:call-template name="render-metadata">
-						<xsl:with-param name="field" select="'dcterms.isPartOf.issue'" />
-						<xsl:with-param name="container" select="'li'" />
-						<xsl:with-param name="is_linked_authority" select="'true'"/>
-					</xsl:call-template>
-					<xsl:call-template name="render-metadata">
-						<xsl:with-param name="field" select="'dcterms.identifier.isbn'" />
-						<xsl:with-param name="container" select="'li'" />
-					</xsl:call-template>
-	
-					<xsl:call-template name="render-metadata">
-						<xsl:with-param name="field" select="'dcterms.relation'" />
-						<xsl:with-param name="container" select="'li'" />
-						<xsl:with-param name="is_linked_authority" select="'true'"/>
-					</xsl:call-template>
-					<xsl:call-template name="render-metadata">
-						<xsl:with-param name="field" select="'dcterms.hasPart'" />
-						<xsl:with-param name="container" select="'li'" />
-						<xsl:with-param name="is_linked_authority" select="'true'"/>
-					</xsl:call-template>
-					<xsl:call-template name="render-metadata">
-						<xsl:with-param name="field" select="'dcterms.isVersionOf'" />
-						<xsl:with-param name="container" select="'li'" />
-						<xsl:with-param name="is_linked_authority" select="'true'"/>
-					</xsl:call-template>
-				</ul>
-		   	</div>
-		   	
-		   	
     	</div>
 			<div class="row">
 				<div class="col-md-12">
