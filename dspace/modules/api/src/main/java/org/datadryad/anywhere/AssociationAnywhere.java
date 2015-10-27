@@ -395,13 +395,16 @@ public class AssociationAnywhere {
 	
 		if (transactionType != null) {
 		    transformer.setParameter("transactionType", transactionType);
+	       
+		    String creditsAccepted = "1";
+		    if(transactionType.equals(JournalUtils.PREPAID_PLAN)) {
+			creditsAccepted = "-1";
+		    }
+		
+		    transformer.setParameter("creditsAccepted", creditsAccepted);
+		} else {
+		    log.error("Journal w/ customerID " + customerID + " does not have a transactionType.");
 		}
-
-		String creditsAccepted = "1";
-		if(transactionType.equals(JournalUtils.PREPAID_PLAN)) {
-		    creditsAccepted = "-1";
-		}
-		transformer.setParameter("creditsAccepted", creditsAccepted);
 	    }
             StringWriter writer = new StringWriter();
             transformer.transform(new StreamSource(new StringReader("<" + form + "/>")),new StreamResult(writer));
