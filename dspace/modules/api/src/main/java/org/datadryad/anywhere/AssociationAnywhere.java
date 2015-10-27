@@ -69,18 +69,22 @@ public class AssociationAnywhere {
 	Context context = new Context(); 
 	try {
 	    if(line.hasOption("u")) {
+		log.debug("aa updating credits");
 		if(line.hasOption("i"))
 		    updateConcept(context, line.getOptionValue("i"));
 		else
 		    updateConcept(context);
 	    }
 	    else if(line.hasOption("t")){
+		log.debug("aa tallying credits");
 		tallyCredit(context, line.getOptionValue("i"), line.getOptionValue("p"));
 	    }
 	    else if(line.hasOption("l")){
+		log.debug("aa list customer");
 		System.out.print(printDocument(loadCustomerInfo(context, line.getOptionValue("i"))));
 	    }
 	    else if(line.hasOption("i")) {
+		log.debug("aa listing credits");
 		//load credit
 		String credit = getCredit(context, line.getOptionValue("i"));
 		System.out.println("credit : "+ credit);
@@ -179,7 +183,7 @@ public class AssociationAnywhere {
      * @throws AssociationAnywhereException
      */
     public static String tallyCredit(Context context, String customerId, String dataPackageID) throws AssociationAnywhereException {
-        log.debug("deducting one credit for customerId " + customerId);
+        log.debug("tallying one credit for customerId " + customerId);
         
         if("test".equals(customerId))
         {
@@ -379,6 +383,10 @@ public class AssociationAnywhere {
             transformer.setParameter("password", ConfigurationManager.getProperty("association.anywhere.password"));
             transformer.setParameter("customerID", customerID);
             transformer.setParameter("date", dateFormat.format(new Date()));
+
+	    if(transactionDescription == null) {
+		transactionDescription = "";
+	    }
 	    transformer.setParameter("transactionDescription", transactionDescription);
 
 	    Concept concept = JournalUtils.getJournalConceptByCustomerID(context, customerID);
