@@ -44,10 +44,10 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
             joinColumns = {@JoinColumn(name = "parent_comm_id") },
             inverseJoinColumns = {@JoinColumn(name = "child_comm_id") }
     )
-    private List<Community> parentCommunities = new ArrayList<>();
-
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "parentCommunities")
     private List<Community> subCommunities = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "subCommunities")
+    private List<Community> parentCommunities = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "communities", cascade = {CascadeType.PERSIST})
     private List<Collection> collections = new ArrayList<>();
