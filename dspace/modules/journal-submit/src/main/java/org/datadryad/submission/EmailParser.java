@@ -122,6 +122,12 @@ public class EmailParser {
                 }
             }
         }
+
+        // if article status says "in review", it's the same as a submission
+        if (dataForXML.get(ARTICLE_STATUS).equalsIgnoreCase("in review")) {
+            dataForXML.put(ARTICLE_STATUS,Manuscript.STATUS_SUBMITTED);
+        }
+
         // remove any unnecessary tags
         dataForXML.remove(UNNECESSARY);
 
