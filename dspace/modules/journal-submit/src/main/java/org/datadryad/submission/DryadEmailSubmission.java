@@ -142,7 +142,7 @@ public class DryadEmailSubmission extends HttpServlet {
                     } catch (Exception details) {
                         DryadGmailService.addErrorLabelForMessageWithId(mID);
                         LOGGER.info("Exception thrown while processing message " + mID + ": " + details.getMessage() + ", " + details.getClass().getName() + details.getStackTrace().toString());
-                        throw new RuntimeException(details);
+//                        throw new RuntimeException(details);
                     }
                     DryadGmailService.removeJournalLabelForMessageWithId(mID);
                 }
