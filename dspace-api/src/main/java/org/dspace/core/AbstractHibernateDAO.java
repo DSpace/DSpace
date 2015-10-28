@@ -164,7 +164,7 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     public Iterator<T> iterate(Query query)
     {
         @SuppressWarnings("unchecked")
-        Iterator<T> result = (Iterator<T>) query.iterate();
+        Iterator<T> result = new HibernateScrollableResultsIterator<>(query.setCacheMode(CacheMode.IGNORE));
         return result;
     }
 
