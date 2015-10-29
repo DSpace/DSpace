@@ -3116,6 +3116,7 @@ Dryad is a <strong>nonprofit organization</strong> that provides <strong>long-te
     <message key="xmlui.DryadItemSummary.withdrawn">The current Item is withdrawn</message>
     <message key="xmlui.DryadItemSummary.in_workflow">Unpublished data -- the associated publication is in review </message>
     <message key="xmlui.DryadItemSummary.notCurrentVersion">This is not the most current version of this Item</message>
+	<message key="xmlui.DryadItemSummary.not_in_review">This item has been archived at </message>
     <message key="xmlui.DryadItemSummary.mostCurrentVersion">&#160;&#160;[View current version]</message>
     <message key="xmlui.DryadItemSummary.charge">Payment Charge</message>
     <message key="xmlui.DryadItemSummary.transactionId">Transaction Id</message>
