@@ -1,0 +1,1 @@
+ALTER TABLE handle ALTER COLUMN url TYPE text;
