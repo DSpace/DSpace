@@ -292,16 +292,21 @@ public class EventServiceImpl implements EventService
         {
             Context ctx = new Context();
 
-            Dispatcher dispatcher = pooledDispatcher.getObject();
+            try {
+                Dispatcher dispatcher = pooledDispatcher.getObject();
 
-            for (Iterator ci = dispatcher.getConsumers()
-                    .iterator(); ci.hasNext();)
-            {
-                ConsumerProfile cp = (ConsumerProfile) ci.next();
-                if (cp != null)
+                for (Iterator ci = dispatcher.getConsumers()
+                        .iterator(); ci.hasNext();)
                 {
-                    cp.getConsumer().finish(ctx);
+                    ConsumerProfile cp = (ConsumerProfile) ci.next();
+                    if (cp != null)
+                    {
+                        cp.getConsumer().finish(ctx);
+                    }
                 }
+            } catch (Exception e) {
+                ctx.abort();
+                throw e;
             }
         }
 
