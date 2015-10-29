@@ -89,7 +89,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.9</version>
+                <version>1.9.1</version>
                 <executions>
                     <execution>
                         <phase>validate</phase>
@@ -103,7 +103,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>buildnumber-maven-plugin</artifactId>
-                <version>1.3</version>
+                <version>1.4</version>
                 <executions>
                     <execution>
                         <phase>validate</phase>
