@@ -256,6 +256,10 @@ public class Util {
         }
         catch (Exception e)
         {
+            // at least log this error to make debugging easier
+            // do not silently return null only.
+            log.warn("Unable to recoginze UUID from String \"" 
+                    + val.trim() + "\". Will return null.", e);
             // Problem with parameter
             return null;
         }
