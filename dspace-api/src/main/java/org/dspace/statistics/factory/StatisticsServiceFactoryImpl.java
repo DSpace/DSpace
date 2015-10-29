@@ -9,7 +9,7 @@ package org.dspace.statistics.factory;
 
 import org.dspace.statistics.service.ElasticSearchLoggerService;
 import org.dspace.statistics.service.SolrLoggerService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.dspace.utils.DSpace;
 
 /**
  * Factory implementation to get services for the statistics package, use StatisticsServiceFactory.getInstance() to retrieve an implementation
@@ -18,20 +18,15 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class StatisticsServiceFactoryImpl extends StatisticsServiceFactory {
 
-    @Autowired(required = true)
-//    @Lazy
-    private ElasticSearchLoggerService elasticSearchLogger;
-
-    @Autowired(required = true)
-    private SolrLoggerService solrLoggerService;
-
     @Override
     public SolrLoggerService getSolrLoggerService() {
-        return solrLoggerService;
+        // In order to lazy load, we cannot autowire it and instead load it by name
+        return new DSpace().getServiceManager().getServiceByName("solrLoggerService", SolrLoggerService.class);
     }
 
     @Override
     public ElasticSearchLoggerService getElasticSearchLoggerService() {
-        return elasticSearchLogger;
+        // In order to lazy load, we cannot autowire it and instead load it by name
+        return new DSpace().getServiceManager().getServiceByName("elasticSearchLoggerService", ElasticSearchLoggerService.class);
     }
 }
