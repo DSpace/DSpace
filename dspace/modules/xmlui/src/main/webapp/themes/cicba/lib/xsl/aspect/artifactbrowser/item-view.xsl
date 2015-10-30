@@ -106,6 +106,9 @@
 						<xsl:copy-of select="text()"/>
 					</xsl:otherwise>				
 				</xsl:choose>
+				<xsl:if test="@qualifier='editor'">
+					<span class='editor-label'>(editor)</span>
+				</xsl:if>
 			</span>
 			<xsl:if test="not(position()=last())">
 	        	<xsl:value-of select="$separator" /> 
@@ -562,6 +565,7 @@
 						<xsl:with-param name="field" select="'dcterms.subject'" />
 						<xsl:with-param name="separator" select="' | '" />
 						<xsl:with-param name="container" select="'li'" />
+						<xsl:with-param name="local_browse_type" select="'subject'"/>
 					</xsl:call-template>
 					<xsl:call-template name="render-metadata">
 						<xsl:with-param name="field" select="'dcterms.spatial'" />
