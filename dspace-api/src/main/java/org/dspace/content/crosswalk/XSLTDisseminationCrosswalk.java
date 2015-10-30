@@ -110,8 +110,8 @@ public class XSLTDisseminationCrosswalk
         String myAlias = getPluginInstanceName();
         if (myAlias == null)
         {
-            log.error("Must use PluginManager to instantiate XSLTDisseminationCrosswalk so the class knows its name.");
-            throw new CrosswalkInternalException("Must use PluginManager to instantiate XSLTDisseminationCrosswalk so the class knows its name.");
+            log.error("Must use PluginService to instantiate XSLTDisseminationCrosswalk so the class knows its name.");
+            throw new CrosswalkInternalException("Must use PluginService to instantiate XSLTDisseminationCrosswalk so the class knows its name.");
         }
 
         // all configs for this plugin instance start with this:

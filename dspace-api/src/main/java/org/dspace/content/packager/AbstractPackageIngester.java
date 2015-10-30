@@ -50,21 +50,10 @@ import org.dspace.workflow.WorkflowException;
  * <P>
  * All Package ingesters should either extend this abstract class
  * or implement <code>PackageIngester</code> to better suit their needs.
- * <P>
- * WARNING: If you choose to extend this Abstract class, you must DISABLE
- * plugin instance caching for your new class in dspace.cfg. This will ensure
- * the "pkgIngestedMap" and any other global instance variables are RESET
- * for each package ingest. To DISABLE plugin instance caching, just place
- * the following configuration in your dspace.cfg:
- * <code>
- * plugin.reusable.[full-class-name] = false
- * </code>
- * For more information see the org.dspace.core.PluginManager cacheMe() method,
- * which defaults to caching all plugin class instances.
  *
  * @author Tim Donohue
  * @see PackageIngester
- * @see PluginManager
+ * @see PluginService
  */
 public abstract class AbstractPackageIngester
         implements PackageIngester

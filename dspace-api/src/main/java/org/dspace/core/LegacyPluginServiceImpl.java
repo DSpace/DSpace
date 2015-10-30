@@ -24,8 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * The Legacy Plugin Service is a very simple component container (based on the
- * legacy PluginManager class). It reads defined "plugins" (interfaces) from
- * config file(s) and makes them available to the API. (@TODO: Someday, this
+ * legacy PluginManager class from <=5.x). It reads defined "plugins" (interfaces)
+ * from config file(s) and makes them available to the API. (@TODO: Someday, this
  * entire "plugin" framework needs to be replaced by Spring Beans.)
  * <p>
  * It creates and organizes components (plugins), and helps select a plugin in
@@ -72,7 +72,6 @@ public class LegacyPluginServiceImpl implements PluginService
     private static final String SEQUENCE_PREFIX = "plugin.sequence.";
     private static final String NAMED_PREFIX = "plugin.named.";
     private static final String SELFNAMED_PREFIX = "plugin.selfnamed.";
-    private static final String REUSABLE_PREFIX = "plugin.reusable.";
 
     /** Configuration name of paths to search for third-party plugins. */
     private static final String CLASSPATH = "plugin.classpath";
@@ -565,8 +564,6 @@ public class LegacyPluginServiceImpl implements PluginService
         Map<String, String> sequenceKey = new HashMap<String, String>();
         Map<String, String> namedKey = new HashMap<String, String>();
         Map<String, String> selfnamedKey = new HashMap<String, String>();
-        Map<String, String> reusableKey = new HashMap<String, String>();
-        HashMap<String, String> keyMap = new HashMap<String, String>();
 
         // Find all property keys starting with "plugin."
         List<String> keys = configurationService.getPropertyKeys("plugin.");
@@ -589,10 +586,6 @@ public class LegacyPluginServiceImpl implements PluginService
             {
                 selfnamedKey.put(key.substring(SELFNAMED_PREFIX.length()), key);
             }
-            else if (key.startsWith(REUSABLE_PREFIX))
-            {
-                reusableKey.put(key.substring(REUSABLE_PREFIX.length()), key);
-            }
             else
             {
                 log.error("Key with unknown prefix \"" + key + "\" in DSpace configuration");
@@ -607,7 +600,6 @@ public class LegacyPluginServiceImpl implements PluginService
         allInterfaces.addAll(sequenceKey .keySet());
         allInterfaces.addAll(namedKey.keySet());
         allInterfaces.addAll(selfnamedKey.keySet());
-        allInterfaces.addAll(reusableKey.keySet());
         Iterator<String> ii = allInterfaces.iterator();
         while (ii.hasNext())
         {
@@ -712,17 +704,6 @@ public class LegacyPluginServiceImpl implements PluginService
                         allImpls.put(classname, classname);
                     }
                 }
-            }
-        }
-
-        // 5. all classes named in Reusable config lines must be other classes.
-        Iterator<String> ri = reusableKey.keySet().iterator();
-        while (ri.hasNext())
-        {
-            String rk = ri.next();
-            if (!(allImpls.containsKey(rk)))
-            {
-                log.error("In plugin.reusable configuration, class \"" + rk + "\" is NOT a plugin implementation class.");
             }
         }
     }
