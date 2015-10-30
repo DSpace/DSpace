@@ -19,17 +19,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This is the kernel implementation which starts up the core of DSpace,
- * registers the mbean, and initializes the DSpace object.
+ * This is the kernel implementation which starts up the core of DSpace
  * It also loads up the configuration.  Sets a JRE shutdown hook.
  * <p>
- * Note that this does not start itself and calling the constuctor does 
- * not actually start it up either. It has to be explicitly started by
+ * Note that this does not start itself and calling the {@link #getInstance()}
+ * does not actually start it up either. It has to be explicitly started by
  * calling the start method so something in the system needs to do that. 
  * If the bean is already started then calling start on it again has no 
  * effect.
  * <p>
- * The name of this instance can be specified if desired.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
@@ -42,8 +40,14 @@ public final class DSpaceKernel {
     }
 
     private DSpaceKernel(){
+        log.info("Created new kernel: " + this);
     }
 
+    /**
+     * Returns lazy initialized singleton instance DSpaceKernel. Initialization is thread safe.
+     *
+     * @return thread safe singleton instance of DSpaceKernel
+     */
     public static DSpaceKernel getInstance() {
         return Holder.INSTANCE;
     }
@@ -76,7 +80,7 @@ public final class DSpaceKernel {
     }
 
     public void start(String dspaceHome) {
-        if (running) {
+        if (isRunning()) {
             //log.warn("Kernel ("+this+") is already started");
             return;
         }
@@ -118,8 +122,6 @@ public final class DSpaceKernel {
             } catch (Exception e) {
                 // oh well
             }
-
-            DSpaceKernelManager.setDefaultKernel(null);
 
             if (this.shutdownHook != null) {
                 try {

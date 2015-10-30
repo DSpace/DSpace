@@ -9,8 +9,6 @@ package org.dspace.servicemanager.servlet;
 
 import static org.junit.Assert.*;
 
-import java.io.IOException;
-
 import org.dspace.kernel.DSpaceKernelManager;
 import org.dspace.utils.servlet.DSpaceWebappServletFilter;
 import org.junit.Test;
@@ -30,13 +28,6 @@ public class DSpaceKernelServletContextListenerTest {
 
     @Test
     public void testSampleRequest() {
-        // make sure no kernel yet
-        try {
-            new DSpaceKernelManager().getKernel();
-            fail("Should have thrown exception");
-        } catch (IllegalStateException e) {
-            assertNotNull(e.getMessage());
-        }
 
         ServletTester tester = new ServletTester();
         tester.setContextPath("/");
@@ -61,8 +52,6 @@ public class DSpaceKernelServletContextListenerTest {
             String content = tester.getResponses(jettyRequest);
             assertNotNull(content);
             assertTrue(content.contains("DSpaceTest"));
-//            assertFalse(content.contains("session=null"));
-//            assertFalse(content.contains("request=null"));
         } catch (Exception e) {
             fail("Could not fire request: " + e.getMessage());
         }
@@ -80,10 +69,8 @@ public class DSpaceKernelServletContextListenerTest {
 
         try {
             response.parse( tester.getResponses(request.generate()) );
-        } catch (IOException e1) {
-            fail("Could not parse response: " + e1.getMessage());
-        } catch (Exception e1) {
-            fail("Could not parse response: " + e1.getMessage());
+        } catch (Exception e) {
+            fail("Could not parse response: " + e.getMessage());
         }
 
         assertTrue(response.getMethod() == null);
@@ -91,8 +78,6 @@ public class DSpaceKernelServletContextListenerTest {
         String content = response.getContent();
         assertNotNull(content);
         assertTrue(content.contains("DSpaceTest"));
-//        assertFalse(content.contains("session=null"));
-//        assertFalse(content.contains("request=null"));
 
         // now there should be a kernel
         assertNotNull( new DSpaceKernelManager().getKernel() );
@@ -101,14 +86,6 @@ public class DSpaceKernelServletContextListenerTest {
             tester.stop();
         } catch (Exception e) {
             fail("Could not stop the jetty server: " + e.getMessage());
-        }
-
-        // back to no kernel again
-        try {
-            new DSpaceKernelManager().getKernel();
-            fail("Should have thrown exception");
-        } catch (IllegalStateException e) {
-            assertNotNull(e.getMessage());
         }
         
         tester = null;

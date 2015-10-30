@@ -43,7 +43,7 @@ public final class DSpace {
      * @throws IllegalStateException if the kernel is not already running
      */
     public DSpace() {
-        kernel = new DSpaceKernelManager().getKernel();
+        kernel = DSpaceKernel.getInstance();
     }
 
     public ServiceManager getServiceManager() {

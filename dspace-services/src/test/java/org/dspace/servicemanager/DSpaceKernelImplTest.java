@@ -59,37 +59,6 @@ public class DSpaceKernelImplTest {
     }
 
     @Test
-    public void testMultipleKernels() {
-        assertNotNull(kernelImpl);
-        kernelImpl.start(null);
-        assertNotNull(kernelImpl);
-        assertNotNull(this.kernelImpl.getConfigurationService());
-        assertNotNull(this.kernelImpl.getServiceManager());
-        assertNotNull(kernelImpl.getConfigurationService());
-        assertNotNull(kernelImpl.getServiceManager());
-        assertEquals(kernelImpl.getConfigurationService(), this.kernelImpl.getConfigurationService());
-        assertEquals(kernelImpl.getServiceManager(), this.kernelImpl.getServiceManager());
-        
-        DSpaceKernel kernel2 = DSpaceKernelInit.getKernel(); // checks for the existing kernelImpl but does not init
-        kernel2.start(null);
-        assertNotNull(kernel2);
-        assertNotNull(kernel2.getConfigurationService());
-        assertNotNull(kernel2.getServiceManager());
-        assertNotNull(kernel2.getConfigurationService());
-        assertNotNull(kernel2.getServiceManager());
-        assertEquals(kernel2.getConfigurationService(), kernel2.getConfigurationService());
-        assertEquals(kernel2.getServiceManager(), kernel2.getServiceManager());
-
-        assertNotSame(kernelImpl, kernel2);
-        assertNotSame(kernelImpl.getConfigurationService(), kernel2.getConfigurationService());
-        assertNotSame(kernelImpl.getServiceManager(), kernel2.getServiceManager());
-
-        kernel2.destroy();
-        kernelImpl.destroy();
-        kernelImpl = kernel2 = null;
-    }
-
-    @Test
     public void testClassLoaders() {
         ClassLoader current = Thread.currentThread().getContextClassLoader();
         ClassLoader cl1 = new URLClassLoader(new URL[0], current);

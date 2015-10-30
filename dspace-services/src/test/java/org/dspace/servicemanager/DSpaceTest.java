@@ -22,19 +22,8 @@ public class DSpaceTest {
 
     @Test
     public void testDSpaceObject() {
-        try {
-            DSpace dspace = new DSpace();
-            dspace.getServiceManager();
-            fail("should have thrown exception");
-        } catch (IllegalStateException e) {
-            assertNotNull(e.getMessage());
-        }
-
-        DSpaceKernel kernelImpl = DSpaceKernelInit.getKernel();
-        kernelImpl.start(null); // triggers the init
-        DSpaceKernel kernel = new DSpaceKernelManager().getKernel();
-        assertNotNull(kernel);
-        assertEquals(kernel, kernelImpl);
+        DSpaceKernel kernel = DSpaceKernel.getInstance();
+        kernel.start(null);
 
         DSpace dspace = new DSpace();
         Object o = dspace.getServiceManager();
@@ -71,8 +60,7 @@ public class DSpaceTest {
         assertEquals(o, kernel.getServiceManager());
 
         //trash the references
-        kernelImpl.destroy();
-        kernelImpl = null;
+        kernel.destroy();
         kernel = null;
         dspace = null;
         dspace2 = null;

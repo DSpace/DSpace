@@ -7,33 +7,20 @@
  */
 package org.dspace.servicemanager;
 
-import org.dspace.kernel.DSpaceKernelManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
- * This class simplifies the handling of lookup, registration, and 
- * access of a DSpace Kernel MBean.  This class has all static 
- * methods.
+ * Left due to API compatibility.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class DSpaceKernelInit {
 
-    private static Logger log = LoggerFactory.getLogger(DSpaceKernelInit.class);
-
     /**
-     * Creates or retrieves a DSpace Kernel with the given name.
+     * Executes {@link org.dspace.servicemanager.DSpaceKernel#getInstance DSpaceKernel.getInstance()}
+     * Left due to API compatibility
      *
      * @return a DSpace Kernel
-     * @throws IllegalStateException if the Kernel cannot be created
      */
     public static DSpaceKernel getKernel() {
-        DSpaceKernel kernelImpl = DSpaceKernel.getInstance();
-        log.info("Created new kernel: " + kernelImpl);
-
-        DSpaceKernelManager.setDefaultKernel(kernelImpl);
-
-        return kernelImpl;
+        return DSpaceKernel.getInstance();
     }
 }

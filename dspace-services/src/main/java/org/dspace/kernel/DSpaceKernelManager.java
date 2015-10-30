@@ -10,31 +10,19 @@ package org.dspace.kernel;
 import org.dspace.servicemanager.DSpaceKernel;
 
 /**
- * Allows the DSpace kernel to be accessed if desired.
+ * Left due to API compatibility.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public final class DSpaceKernelManager {
 
-    private static DSpaceKernel defaultKernel = null;
-    
-    public static void setDefaultKernel(DSpaceKernel kernel) {
-        defaultKernel = kernel;
-    }
-
     /**
-     * Get the kernel.  This will be a single instance for the JVM, but
-     * the method will retrieve the same instance regardless of this 
-     * object instance.
+     * Executes {@link org.dspace.servicemanager.DSpaceKernel#getInstance DSpaceKernel.getInstance()}
+     * Left due to API compatibility
      *
-     * @return the DSpace kernel
-     * @throws IllegalStateException if the kernel is not available
+     * @return a DSpace Kernel
      */
     public DSpaceKernel getKernel() {
-        if (defaultKernel == null) {
-            throw new IllegalStateException("The DSpace kernel is not started yet, please start it before attempting to use it");
-        }
-
-        return defaultKernel;
+        return DSpaceKernel.getInstance();
     }
 }
