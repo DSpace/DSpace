@@ -130,7 +130,7 @@ public class FilteredItemsResource extends Resource {
     		List<UUID> uuids = getUuidsFromStrings(collSel);
     		List<List<MetadataField>> listFieldList = getMetadataFieldsList(context, query_field);    		
 
-            Iterator<org.dspace.content.Item> childItems = itemService.findByMetadataQuery(context, listFieldList, query_op, query_val, uuids, regexClause);
+            Iterator<org.dspace.content.Item> childItems = itemService.findByMetadataQuery(context, listFieldList, query_op, query_val, uuids, regexClause, offset, limit);
              
             itemFilterSet.processSaveItems(context, childItems, true, expand);
     	    writeStats(siteService.findSite(context), UsageEvent.Action.VIEW, user_ip, user_agent, xforwarderfor, headers, request, context);
