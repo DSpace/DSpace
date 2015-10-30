@@ -14,7 +14,7 @@ import javax.naming.InitialContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.dspace.servicemanager.DSpaceKernelImpl;
+import org.dspace.servicemanager.DSpaceKernel;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
 
@@ -39,7 +39,7 @@ import org.dspace.servicemanager.config.DSpaceConfigurationService;
  */
 public final class DSpaceKernelServletContextListener implements ServletContextListener {
 
-    private transient DSpaceKernelImpl kernelImpl;
+    private transient DSpaceKernel kernelImpl;
 
     /*
      * Find DSpace's "home" directory.
@@ -76,7 +76,7 @@ public final class DSpaceKernelServletContextListener implements ServletContextL
     {
         // start the kernel when the webapp starts
         try {
-            this.kernelImpl = DSpaceKernelInit.getKernel(null);
+            this.kernelImpl = DSpaceKernelInit.getKernel();
             if (! this.kernelImpl.isRunning()) {
             	this.kernelImpl.start(getProvidedHome(arg0)); // init the kernel
             }

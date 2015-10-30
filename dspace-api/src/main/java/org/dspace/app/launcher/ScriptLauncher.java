@@ -7,13 +7,12 @@
  */
 package org.dspace.app.launcher;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.TreeMap;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.servicemanager.DSpaceKernelImpl;
+import org.dspace.servicemanager.DSpaceKernel;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.services.RequestService;
 import org.jdom.Document;
@@ -29,7 +28,7 @@ import org.jdom.input.SAXBuilder;
 public class ScriptLauncher
 {
     /** The service manager kernel */
-    private static transient DSpaceKernelImpl kernelImpl;
+    private static transient DSpaceKernel kernelImpl;
 
     /** Definitions of all commands. */
     private static final Document commandConfigs = getConfig();
@@ -40,7 +39,7 @@ public class ScriptLauncher
      * @param args Any parameters required to be passed to the scripts it executes
      */
     public static void main(String[] args)
-            throws FileNotFoundException, IOException
+            throws IOException
     {
         // Check that there is at least one argument
         if (args.length < 1)
@@ -52,7 +51,7 @@ public class ScriptLauncher
 
         // Initialise the service manager kernel
         try {
-            kernelImpl = DSpaceKernelInit.getKernel(null);
+            kernelImpl = DSpaceKernelInit.getKernel();
             if (!kernelImpl.isRunning())
             {
                 kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
@@ -89,7 +88,6 @@ public class ScriptLauncher
 
     /**
      * Recognize and execute a single command.
-     * @param doc
      * @param args
      */
     static int runOneCommand(String[] args)

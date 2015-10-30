@@ -7,7 +7,6 @@
  */
 package org.dspace.servicemanager;
 
-import org.dspace.kernel.DSpaceKernel;
 import org.dspace.kernel.DSpaceKernelManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +21,6 @@ import org.slf4j.LoggerFactory;
 public class DSpaceKernelInit {
 
     private static Logger log = LoggerFactory.getLogger(DSpaceKernelInit.class);
-    
-    private static final Object staticLock = new Object();
 
     /**
      * Creates or retrieves a DSpace Kernel with the given name.
@@ -31,33 +28,12 @@ public class DSpaceKernelInit {
      * @return a DSpace Kernel
      * @throws IllegalStateException if the Kernel cannot be created
      */
-    public static DSpaceKernelImpl getKernel(String name) {
-        if (name != null) {
-            try {
-                DSpaceKernel kernel = new DSpaceKernelManager().getKernel(name);
-                if (kernel != null) {
-                    if (kernel instanceof DSpaceKernelImpl) {
-                        return (DSpaceKernelImpl)kernel;
-                    }
+    public static DSpaceKernel getKernel() {
+        DSpaceKernel kernelImpl = DSpaceKernel.getInstance();
+        log.info("Created new kernel: " + kernelImpl);
 
-                    throw new IllegalStateException("Wrong DSpaceKernel implementation");
-                }
-            } catch (Exception e) {
-                // Ignore exceptions here
-            }
-        }
+        DSpaceKernelManager.setDefaultKernel(kernelImpl);
 
-        synchronized (staticLock) {
-            DSpaceKernelImpl kernelImpl = new DSpaceKernelImpl(name);
-            log.info("Created new kernel: " + kernelImpl);
-
-            if (name != null) {
-                DSpaceKernelManager.registerMBean(kernelImpl.getMBeanName(), kernelImpl);
-            } else {
-                DSpaceKernelManager.setDefaultKernel(kernelImpl);
-            }
-
-            return kernelImpl;
-        }
+        return kernelImpl;
     }
 }

@@ -12,7 +12,6 @@ import static org.junit.Assert.*;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-import org.dspace.kernel.DSpaceKernel;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,11 +24,11 @@ import org.junit.Test;
  */
 public class DSpaceKernelImplTest {
 
-    DSpaceKernelImpl kernelImpl;
+    private DSpaceKernel kernelImpl;
 
     @Before
     public void init() {
-        kernelImpl = DSpaceKernelInit.getKernel(null); // checks for the existing kernel but does not init
+        kernelImpl = DSpaceKernelInit.getKernel(); // checks for the existing kernel but does not init
     }
 
     @After
@@ -41,59 +40,53 @@ public class DSpaceKernelImplTest {
     }
 
     /**
-     * Test method for {@link org.dspace.servicemanager.DSpaceKernelImpl#start()}.
+     * Test method for {@link DSpaceKernel#start(String)}.
      */
     @Test
     public void testKernel() {
-        kernelImpl.start();
+        kernelImpl.start(null);
         assertNotNull(kernelImpl);
-        DSpaceKernel kernel = kernelImpl.getManagedBean();
-        assertNotNull(kernel);
+        assertNotNull(kernelImpl);
+        assertNotNull(this.kernelImpl.getConfigurationService());
+        assertNotNull(this.kernelImpl.getServiceManager());
         assertNotNull(kernelImpl.getConfigurationService());
         assertNotNull(kernelImpl.getServiceManager());
-        assertNotNull(kernel.getConfigurationService());
-        assertNotNull(kernel.getServiceManager());
-        assertEquals(kernel.getConfigurationService(), kernelImpl.getConfigurationService());
-        assertEquals(kernel.getServiceManager(), kernelImpl.getServiceManager());
-        kernelImpl.stop();
+        assertEquals(kernelImpl.getConfigurationService(), this.kernelImpl.getConfigurationService());
+        assertEquals(kernelImpl.getServiceManager(), this.kernelImpl.getServiceManager());
+        this.kernelImpl.destroy();
         
-        kernel = null;
+        kernelImpl = null;
     }
 
     @Test
     public void testMultipleKernels() {
         assertNotNull(kernelImpl);
-        kernelImpl.start();
-        DSpaceKernel kernel = kernelImpl.getManagedBean();
-        assertNotNull(kernel);
+        kernelImpl.start(null);
+        assertNotNull(kernelImpl);
+        assertNotNull(this.kernelImpl.getConfigurationService());
+        assertNotNull(this.kernelImpl.getServiceManager());
         assertNotNull(kernelImpl.getConfigurationService());
         assertNotNull(kernelImpl.getServiceManager());
-        assertNotNull(kernel.getConfigurationService());
-        assertNotNull(kernel.getServiceManager());
-        assertEquals(kernel.getConfigurationService(), kernelImpl.getConfigurationService());
-        assertEquals(kernel.getServiceManager(), kernelImpl.getServiceManager());
+        assertEquals(kernelImpl.getConfigurationService(), this.kernelImpl.getConfigurationService());
+        assertEquals(kernelImpl.getServiceManager(), this.kernelImpl.getServiceManager());
         
-        DSpaceKernelImpl kernelImpl2 = DSpaceKernelInit.getKernel("AZ-kernel"); // checks for the existing kernel but does not init
-        kernelImpl2.start();
-        DSpaceKernel kernel2 = kernelImpl2.getManagedBean();
+        DSpaceKernel kernel2 = DSpaceKernelInit.getKernel(); // checks for the existing kernelImpl but does not init
+        kernel2.start(null);
         assertNotNull(kernel2);
-        assertNotNull(kernelImpl2.getConfigurationService());
-        assertNotNull(kernelImpl2.getServiceManager());
         assertNotNull(kernel2.getConfigurationService());
         assertNotNull(kernel2.getServiceManager());
-        assertEquals(kernel2.getConfigurationService(), kernelImpl2.getConfigurationService());
-        assertEquals(kernel2.getServiceManager(), kernelImpl2.getServiceManager());
+        assertNotNull(kernel2.getConfigurationService());
+        assertNotNull(kernel2.getServiceManager());
+        assertEquals(kernel2.getConfigurationService(), kernel2.getConfigurationService());
+        assertEquals(kernel2.getServiceManager(), kernel2.getServiceManager());
 
-        assertNotSame(kernel, kernel2);
-        assertNotSame(kernel.getConfigurationService(), kernel2.getConfigurationService());
-        assertNotSame(kernel.getServiceManager(), kernel2.getServiceManager());
+        assertNotSame(kernelImpl, kernel2);
+        assertNotSame(kernelImpl.getConfigurationService(), kernel2.getConfigurationService());
+        assertNotSame(kernelImpl.getServiceManager(), kernel2.getServiceManager());
 
-        kernelImpl2.stop();
-        kernelImpl2.destroy();
-        kernelImpl2 = null;
-        kernel = kernel2 = null;
-        
-        kernelImpl.stop();
+        kernel2.destroy();
+        kernelImpl.destroy();
+        kernelImpl = kernel2 = null;
     }
 
     @Test

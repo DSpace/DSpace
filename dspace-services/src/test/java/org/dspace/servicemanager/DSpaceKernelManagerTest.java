@@ -9,7 +9,6 @@ package org.dspace.servicemanager;
 
 import static org.junit.Assert.*;
 
-import org.dspace.kernel.DSpaceKernel;
 import org.dspace.kernel.DSpaceKernelManager;
 import org.junit.After;
 import org.junit.Before;
@@ -24,12 +23,12 @@ import org.junit.Test;
 public class DSpaceKernelManagerTest {
 
     DSpaceKernelManager kernelManager;
-    DSpaceKernelImpl kernelImpl;
+    DSpaceKernel kernelImpl;
 
     @Before
     public void init() {
-        kernelImpl = DSpaceKernelInit.getKernel(null);
-        kernelImpl.start(); // init the kernel
+        kernelImpl = DSpaceKernelInit.getKernel();
+        kernelImpl.start(null); // init the kernel
         kernelManager = new DSpaceKernelManager();
     }
 
@@ -37,7 +36,6 @@ public class DSpaceKernelManagerTest {
     public void destroy() {
         if (kernelImpl != null) {
             // cleanup the kernel
-            kernelImpl.stop();
             kernelImpl.destroy();
         }
         kernelImpl = null;

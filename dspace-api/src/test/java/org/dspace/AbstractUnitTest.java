@@ -27,7 +27,7 @@ import org.dspace.discovery.MockIndexEventConsumer;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
-import org.dspace.servicemanager.DSpaceKernelImpl;
+import org.dspace.servicemanager.DSpaceKernel;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.junit.After;
@@ -67,7 +67,7 @@ public class AbstractUnitTest
      */
     protected EPerson eperson;
 
-    protected static DSpaceKernelImpl kernelImpl;
+    protected static DSpaceKernel kernelImpl;
 
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
@@ -104,7 +104,7 @@ public class AbstractUnitTest
             ConfigurationManager.loadConfig(null);
 
             // Initialise the service manager kernel
-            kernelImpl = DSpaceKernelInit.getKernel(null);
+            kernelImpl = DSpaceKernelInit.getKernel();
             if (!kernelImpl.isRunning())
             {
                 kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));

@@ -9,7 +9,6 @@ package org.dspace.servicemanager;
 
 import static org.junit.Assert.*;
 
-import org.dspace.kernel.DSpaceKernel;
 import org.dspace.kernel.DSpaceKernelManager;
 import org.dspace.utils.DSpace;
 import org.junit.Test;
@@ -31,8 +30,8 @@ public class DSpaceTest {
             assertNotNull(e.getMessage());
         }
 
-        DSpaceKernelImpl kernelImpl = DSpaceKernelInit.getKernel(null);
-        kernelImpl.start(); // triggers the init
+        DSpaceKernel kernelImpl = DSpaceKernelInit.getKernel();
+        kernelImpl.start(null); // triggers the init
         DSpaceKernel kernel = new DSpaceKernelManager().getKernel();
         assertNotNull(kernel);
         assertEquals(kernel, kernelImpl);
@@ -90,7 +89,7 @@ public class DSpaceTest {
             assertNotNull(e.getMessage());
         }
 
-        DSpaceKernelImpl kernelImpl = DSpaceKernelInit.getKernel(null);
+        DSpaceKernel kernelImpl = DSpaceKernelInit.getKernel(null);
         kernelImpl.start(); // triggers the init
         DSpaceKernel kernel = new DSpaceKernelManager().getKernel();
         assertNotNull(kernel);
@@ -145,8 +144,8 @@ public class DSpaceTest {
             assertNotNull(e.getMessage());
         }
 
-        DSpaceKernelImpl kernelImpl = DSpaceKernelInit.getKernel(null);
-        DSpaceKernelImpl kernelImpl2 = DSpaceKernelInit.getKernel(null);
+        DSpaceKernel kernelImpl = DSpaceKernelInit.getKernel(null);
+        DSpaceKernel kernelImpl2 = DSpaceKernelInit.getKernel(null);
         assertEquals(kernelImpl, kernelImpl2);
         kernelImpl2 = null;
 
