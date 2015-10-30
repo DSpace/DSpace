@@ -106,8 +106,8 @@
 						<xsl:copy-of select="text()"/>
 					</xsl:otherwise>				
 				</xsl:choose>
-				<xsl:if test="@qualifier='editor'">
-					<span class='editor-label'>(editor)</span>
+				<xsl:if test="@qualifier='editor' or @qualifier='compilator'">
+					<span class='editor-label'>(<i18n:text>xmlui.dri2xhtml.METS-1.0.item-dcterms_creator_<xsl:value-of select="@qualifier" /></i18n:text>)</span>
 				</xsl:if>
 			</span>
 			<xsl:if test="not(position()=last())">
