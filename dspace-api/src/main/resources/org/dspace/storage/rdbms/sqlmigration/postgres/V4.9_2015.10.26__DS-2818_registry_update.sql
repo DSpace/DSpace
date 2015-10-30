@@ -1,4 +1,20 @@
--- Special case of migration, we need to the EPerson schema in order to get our metadata for all queries to work
+--
+-- The contents of this file are subject to the license and copyright
+-- detailed in the LICENSE and NOTICE files at the root of the source
+-- tree and available online at
+--
+-- http://www.dspace.org/license/
+--
+
+-- ===============================================================
+-- WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
+--
+-- DO NOT MANUALLY RUN THIS DATABASE MIGRATION. IT WILL BE EXECUTED
+-- AUTOMATICALLY (IF NEEDED) BY "FLYWAY" WHEN YOU STARTUP DSPACE.
+-- http://flywaydb.org/
+-- ===============================================================
+
+--  Special case of migration, we need to the EPerson schema in order to get our metadata for all queries to work
 -- but we cannot a DB connection until our database is up to date, so we need to create our registries manually in sql
 
 INSERT INTO metadataschemaregistry (namespace, short_id) SELECT 'http://dspace.org/eperson', 'eperson'
