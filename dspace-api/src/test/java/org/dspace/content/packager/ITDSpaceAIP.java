@@ -90,10 +90,10 @@ public class ITDSpaceAIP extends AbstractUnitTest
     public static void setUpClass()
     {
         // Initialise the service manager kernel
-        kernelImpl = DSpaceKernelInit.getKernel();
-        if (!kernelImpl.isRunning())
+        kernel = DSpaceKernelInit.getKernel();
+        if (!kernel.isRunning())
         {
-            kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
+            kernel.start(ConfigurationManager.getProperty("dspace.dir"));
         }
 
         // Initialize MockConfigurationManager, and tell it to load properties by default

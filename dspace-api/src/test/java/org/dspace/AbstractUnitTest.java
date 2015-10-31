@@ -67,7 +67,7 @@ public class AbstractUnitTest
      */
     protected EPerson eperson;
 
-    protected static DSpaceKernel kernelImpl;
+    protected static DSpaceKernel kernel;
 
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
@@ -104,10 +104,10 @@ public class AbstractUnitTest
             ConfigurationManager.loadConfig(null);
 
             // Initialise the service manager kernel
-            kernelImpl = DSpaceKernelInit.getKernel();
-            if (!kernelImpl.isRunning())
+            kernel = DSpaceKernelInit.getKernel();
+            if (!kernel.isRunning())
             {
-                kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
+                kernel.start(ConfigurationManager.getProperty("dspace.dir"));
             }
             // Clear our old flyway object. Because this DB is in-memory, its
             // data is lost when the last connection is closed. So, we need
@@ -219,9 +219,9 @@ public class AbstractUnitTest
         testProps = null;
 
         //Also clear out the kernel & nullify (so JUnit will clean it up)
-        if (kernelImpl!=null)
-            kernelImpl.destroy();
-        kernelImpl = null;
+        if (kernel !=null)
+            kernel.destroy();
+        kernel = null;
     }
 
     /**

@@ -28,7 +28,7 @@ import org.jdom.input.SAXBuilder;
 public class ScriptLauncher
 {
     /** The service manager kernel */
-    private static transient DSpaceKernel kernelImpl;
+    private static transient DSpaceKernel kernel;
 
     /** Definitions of all commands. */
     private static final Document commandConfigs = getConfig();
@@ -51,17 +51,17 @@ public class ScriptLauncher
 
         // Initialise the service manager kernel
         try {
-            kernelImpl = DSpaceKernelInit.getKernel();
-            if (!kernelImpl.isRunning())
+            kernel = DSpaceKernelInit.getKernel();
+            if (!kernel.isRunning())
             {
-                kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
+                kernel.start(ConfigurationManager.getProperty("dspace.dir"));
             }
         } catch (Exception e)
         {
             // Failed to start so destroy it and log and throw an exception
             try
             {
-                kernelImpl.destroy();
+                kernel.destroy();
             }
             catch (Exception e1)
             {
@@ -77,10 +77,10 @@ public class ScriptLauncher
         status = runOneCommand(args);
 
         // Destroy the service kernel if it is still alive
-        if (kernelImpl != null)
+        if (kernel != null)
         {
-            kernelImpl.destroy();
-            kernelImpl = null;
+            kernel.destroy();
+            kernel = null;
         }
 
         System.exit(status);
@@ -195,7 +195,7 @@ public class ScriptLauncher
             }
 
             // Establish the request service startup
-            RequestService requestService = kernelImpl.getServiceManager().getServiceByName(
+            RequestService requestService = kernel.getServiceManager().getServiceByName(
                     RequestService.class.getName(), RequestService.class);
             if (requestService == null)
             {
