@@ -22,24 +22,22 @@ import org.junit.Test;
  */
 public class DSpaceKernelManagerTest {
 
-    DSpaceKernelManager kernelManager;
-    DSpaceKernel kernelImpl;
+    private DSpaceKernelManager kernelManager;
+    private DSpaceKernel kernel;
 
     @Before
     public void init() {
-        kernelImpl = DSpaceKernelInit.getKernel();
-        kernelImpl.start(null); // init the kernel
+        kernel = DSpaceKernelInit.getKernel();
+        kernel.start(null); // init the kernel
         kernelManager = new DSpaceKernelManager();
     }
 
     @After
     public void destroy() {
-        if (kernelImpl != null) {
+        if (kernel != null) {
             // cleanup the kernel
-            kernelImpl.destroy();
+            kernel.destroy();
         }
-        kernelImpl = null;
-        kernelManager = null;
     }
 
     /**
@@ -52,8 +50,5 @@ public class DSpaceKernelManagerTest {
         DSpaceKernel k2 = kernelManager.getKernel();
         assertNotNull(k2);
         assertEquals(kernel, k2);
-        
-        kernel = k2 = null;
     }
-
 }
