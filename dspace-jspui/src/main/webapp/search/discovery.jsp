@@ -198,8 +198,8 @@
 	<p class="lead"><fmt:message key="jsp.search.didyoumean"><fmt:param><a id="spellCheckQuery" data-spell="<%= Utils.addEntities(spellCheckQuery) %>" href="#"><%= spellCheckQuery %></a></fmt:param></fmt:message></p>
 <% } %>                  
                                 <input type="hidden" value="<%= rpp %>" name="rpp" />
-                                <input type="hidden" value="<%= sortedBy %>" name="sort_by" />
-                                <input type="hidden" value="<%= order %>" name="order" />
+                                <input type="hidden" value="<%= Utils.addEntities(sortedBy) %>" name="sort_by" />
+                                <input type="hidden" value="<%= Utils.addEntities(order) %>" name="order" />
 <% if (appliedFilters.size() > 0 ) { %>                                
 		<div class="discovery-search-appliedFilters">
 		<span><fmt:message key="jsp.search.filter.applied" /></span>
@@ -275,7 +275,7 @@
 			for (DiscoverySearchFilter searchFilter : availableFilters)
 			{
 			    String fkey = "jsp.search.filter."+searchFilter.getIndexFieldName();
-			    %><option value="<%= searchFilter.getIndexFieldName() %>"><fmt:message key="<%= fkey %>"/></option><%
+			    %><option value="<%= Utils.addEntities(searchFilter.getIndexFieldName()) %>"><fmt:message key="<%= fkey %>"/></option><%
 			}
 		%>
 		</select>
@@ -284,14 +284,14 @@
 			for (String opt : options)
 			{
 			    String fkey = "jsp.search.filter.op."+opt;
-			    %><option value="<%= opt %>"><fmt:message key="<%= fkey %>"/></option><%
+			    %><option value="<%= Utils.addEntities(opt) %>"><fmt:message key="<%= fkey %>"/></option><%
 			}
 		%>
 		</select>
 		<input type="text" id="filterquery" name="filterquery" size="45" required="required" />
 		<input type="hidden" value="<%= rpp %>" name="rpp" />
-		<input type="hidden" value="<%= sortedBy %>" name="sort_by" />
-		<input type="hidden" value="<%= order %>" name="order" />
+		<input type="hidden" value="<%= Utils.addEntities(sortedBy) %>" name="sort_by" />
+		<input type="hidden" value="<%= Utils.addEntities(order) %>" name="order" />
 		<input class="btn btn-default" type="submit" value="<fmt:message key="jsp.search.filter.add"/>" onclick="return validateFilters()" />
 		</form>
 		</div>        
@@ -339,7 +339,7 @@
                {
                    String selected = (sortBy.equals(sortedBy) ? "selected=\"selected\"" : "");
                    String mKey = "search.sort-by." + sortBy;
-                   %> <option value="<%= sortBy %>" <%= selected %>><fmt:message key="<%= mKey %>"/></option><%
+                   %> <option value="<%= Utils.addEntities(sortBy) %>" <%= selected %>><fmt:message key="<%= mKey %>"/></option><%
                }
 %>
                </select>
