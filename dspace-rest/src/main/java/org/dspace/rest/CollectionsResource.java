@@ -97,8 +97,8 @@ public class CollectionsResource extends Resource
     @Path("/{collection_id}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public org.dspace.rest.common.Collection getCollection(@PathParam("collection_id") String collectionId,
-            @QueryParam("expand") String expand, @QueryParam("itemsLimit") @DefaultValue("100") Integer itemsLimit,
-            @QueryParam("itemsOffset") @DefaultValue("0") Integer itemsOffset, @QueryParam("userIP") String user_ip,
+            @QueryParam("expand") String expand, @QueryParam("limit") @DefaultValue("100") Integer itemsLimit,
+            @QueryParam("offset") @DefaultValue("0") Integer itemsOffset, @QueryParam("userIP") String user_ip,
             @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
     {
