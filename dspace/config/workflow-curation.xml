@@ -27,7 +27,7 @@
  <!-- the tasks are all performed immediately. Otherwise, the                -->
  <!-- tasks are placed on a queue named by the attribute value.              -->
  <!-- You may add any number of tasks to a flowstep.  Each task              -->
- <!-- element has a mandatory name attribute and 2 optional, repeateable     -->
+ <!-- element has a mandatory name attribute and 2 optional, repeatable     -->
  <!-- properties. The task name attribute must match the plugin              -->
  <!-- manager name given the task in dspace.cfg. The 'workflow' element      -->
  <!-- describes what workflow actions can be taken upon completion of the    -->

@@ -60,7 +60,7 @@
     -->
     <aspects>
         <!--
-            @deprecated: the Artifact Browser has been devided into ViewArtifacts,
+            @deprecated: the Artifact Browser has been divided into ViewArtifacts,
             BrowseArtifacts, SearchArtifacts
             <aspect name="Artifact Browser" path="resource://aspects/ArtifactBrowser/" />
         -->
