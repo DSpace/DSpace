@@ -890,6 +890,7 @@
         <message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.filter.button">Filtrovat</message>
         <message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.loading">Prosím, čekejte na načítání řízeného slovníku.</message>
         <message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.error">Vyskytl se problém s načtením řízeného slovníku. Zkuste to, prosím, znovu později.</message>
+	<message key="xmlui.Submission.submit.DescribeStep.missing_field">Vyplňte prosím všechna pole.</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.UFALLicenseStep -->
 	<message key="xmlui.Submission.submit.NA">N/A</message>
@@ -1766,7 +1767,7 @@
 	<message key="xmlui.administrative.item.ConfirmItemForm.title">Potvrzení</message>
 	<message key="xmlui.administrative.item.ConfirmItemForm.trail">Potvrzení</message>
 	<message key="xmlui.administrative.item.ConfirmItemForm.head1">Změnit záznam: {0}</message>
-	<message key="xmlui.administrative.item.ConfirmItemForm.para_delete"><p><b>Jste si jistý, že chcete na vždy vymazat tento záznam?</b>
+	<message key="xmlui.administrative.item.ConfirmItemForm.para_delete"><p><b>Jste si jistý, že chcete na vždy vymazat tento záznam?</b></p>
 		<p>Ve většině případů by záznamy <b>NEMĚLY</b> být trvale mazány. Jestliže již byl záznam publikován, měl by zůstat dostupný.</p>
 		<p>Ve vzácných případe může být potřeba záznam <b>VYŘADIT</b>. Data vyřazených záznamů jsou uchována, ale
 			záznam již není veřejně dostupný. V případě, že záznam je vyřazen z důvodu duplicit, by bylo vhodné přesměrovat Handle na původní záznam.

@@ -102,6 +102,8 @@ public class DescribeStep extends AbstractSubmissionStep
         message("xmlui.Submission.submit.DescribeStep.series_name");
     protected static final Message T_report_no=
         message("xmlui.Submission.submit.DescribeStep.report_no");
+    protected static final Message T_missing_field =
+            message("xmlui.Submission.submit.DescribeStep.missing_field");
         
         /**
      * A shared resource of the inputs reader. The 'inputs' are the
@@ -489,7 +491,7 @@ public class DescribeStep extends AbstractSubmissionStep
                     if (displayValue!=null && displayValue.length()>0)
                     {
 
-                        describeSection.addLabel(input.getLabel());
+                        describeSection.addLabel(message(input.getLabel()));
                         if (mam.isAuthorityControlled(value.schema, value.element, value.qualifier))
                         {
                             String confidence = (value.authority != null && value.authority.length() > 0) ?
@@ -602,22 +604,15 @@ public class DescribeStep extends AbstractSubmissionStep
                 }
         }
                 // Setup the full name
-                fullName.setLabel(dcInput.getLabel());
-                fullName.setHelp(cleanHints(dcInput.getHints()));
+                fullName.setLabel(message(dcInput.getLabel()));
+                fullName.setHelp(message(dcInput.getHints()));
                 if (dcInput.isRequired())
                 {
                     fullName.setRequired();
                 }
                 if (isFieldInError(fieldName))
                 {
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
-                    {
-                        fullName.addError(dcInput.getWarning());
-                    }
-                    else
-                    {
-                        fullName.addError(T_required_field);
-                    }
+                    setFieldWarning(dcInput, fullName);
                 }
                 if (dcInput.isRepeatable() && !readonly)
                 {
@@ -681,22 +676,15 @@ public class DescribeStep extends AbstractSubmissionStep
                 Text day = fullDate.addText(fieldName+"_day");
 
                 // Set up the full field
-                fullDate.setLabel(dcInput.getLabel());
-                fullDate.setHelp(cleanHints(dcInput.getHints()));
+                fullDate.setLabel(message(dcInput.getLabel()));
+                fullDate.setHelp(message(dcInput.getHints()));
                 if (dcInput.isRequired())
                 {
                     fullDate.setRequired();
                 }
                 if (isFieldInError(fieldName))
                 {
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
-                    {
-                        fullDate.addError(dcInput.getWarning());
-                    }
-                    else
-                    {
-                        fullDate.addError(T_required_field);
-                    }
+                    setFieldWarning(dcInput, fullDate);
                 }
                 if (dcInput.isRepeatable() && !readonly)
                 {
@@ -792,22 +780,15 @@ public class DescribeStep extends AbstractSubmissionStep
                 Text number = fullSeries.addText(fieldName+"_number");
 
                 // Setup the full field.
-                fullSeries.setLabel(dcInput.getLabel());
-                fullSeries.setHelp(cleanHints(dcInput.getHints()));
+                fullSeries.setLabel(message(dcInput.getLabel()));
+                fullSeries.setHelp(message(dcInput.getHints()));
                 if (dcInput.isRequired())
                 {
                     fullSeries.setRequired();
                 }
                 if (isFieldInError(fieldName))
                 {
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
-                    {
-                        fullSeries.addError(dcInput.getWarning());
-                    }
-                    else
-                    {
-                        fullSeries.addError(T_required_field);
-                    }
+                    setFieldWarning(dcInput, fullSeries);
                 }
                 if (dcInput.isRepeatable() && !readonly)
                 {
@@ -870,28 +851,21 @@ public class DescribeStep extends AbstractSubmissionStep
         {
                 String rend = dcInput.getRendsAsString();
                 rend += " submit-qualdrop";
-            
+
                 Composite qualdrop = form.addItem().addComposite(fieldName, rend);
                 Select qual = qualdrop.addSelect(fieldName+"_qualifier");
                 Text value = qualdrop.addText(fieldName+"_value");
 
                 // Setup the full field.
-                qualdrop.setLabel(dcInput.getLabel());
-                qualdrop.setHelp(cleanHints(dcInput.getHints()));
+                qualdrop.setLabel(message(dcInput.getLabel()));
+                qualdrop.setHelp(message(dcInput.getHints()));
                 if (dcInput.isRequired())
                 {
                     qualdrop.setRequired();
                 }
                 if (isFieldInError(fieldName))
                 {
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
-                    {
-                        qualdrop.addError(dcInput.getWarning());
-                    }
-                    else
-                    {
-                        qualdrop.addError(T_required_field);
-                    }
+                    setFieldWarning(dcInput, qualdrop);
                 }
                 if (dcInput.isRepeatable() && !readonly)
                 {
@@ -909,13 +883,13 @@ public class DescribeStep extends AbstractSubmissionStep
                     qual.setDisabled();
                     value.setDisabled();
                 }
-                
+
                 // Setup the possible options
                 @SuppressWarnings("unchecked") // This cast is correct
                 java.util.List<String> pairs = dcInput.getPairs();
                 for (int i = 0; i < pairs.size(); i += 2)
                 {
-                        String display = pairs.get(i);
+                        Message display = message(pairs.get(i));
                         String returnValue = pairs.get(i+1);
                         qual.addOption(returnValue,display);
                 }
@@ -959,8 +933,8 @@ public class DescribeStep extends AbstractSubmissionStep
                 TextArea textArea = form.addItem().addTextArea(fieldName, rend);
 
                 // Setup the text area
-                textArea.setLabel(dcInput.getLabel());
-                textArea.setHelp(cleanHints(dcInput.getHints()));
+                textArea.setLabel(message(dcInput.getLabel()));
+                textArea.setHelp(message(dcInput.getHints()));
                 String fieldKey = MetadataAuthorityManager.makeFieldKey(dcInput.getSchema(), dcInput.getElement(), dcInput.getQualifier());
                 boolean isAuth = MetadataAuthorityManager.getManager().isAuthorityControlled(fieldKey);
                 if (isAuth)
@@ -980,14 +954,7 @@ public class DescribeStep extends AbstractSubmissionStep
                 }
                 if (isFieldInError(fieldName))
                 {
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
-                    {
-                        textArea.addError(dcInput.getWarning());
-                    }
-                    else
-                    {
-                        textArea.addError(T_required_field);
-                    }
+                    setFieldWarning(dcInput, textArea);
                 }
                 if (dcInput.isRepeatable() && !readonly)
                 {
@@ -1069,22 +1036,15 @@ public class DescribeStep extends AbstractSubmissionStep
                 Select select = form.addItem().addSelect(fieldName, rend);
 
                 //Setup the select field
-                select.setLabel(dcInput.getLabel());
-                select.setHelp(cleanHints(dcInput.getHints()));
+                select.setLabel(message(dcInput.getLabel()));
+                select.setHelp(message(dcInput.getHints()));
                 if (dcInput.isRequired())
                 {
                     select.setRequired();
                 }
                 if (isFieldInError(fieldName))
                 {
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
-                    {
-                        select.addError(dcInput.getWarning());
-                    }
-                    else
-                    {
-                        select.addError(T_required_field);
-                    }
+                    setFieldWarning(dcInput, select);
                 }
                 if (dcInput.isRepeatable() || dcValues.length > 1)
                 {
@@ -1142,22 +1102,15 @@ public class DescribeStep extends AbstractSubmissionStep
                 Select select = form.addItem().addSelect(fieldName, rend);
 
                 //Setup the select field
-                select.setLabel(dcInput.getLabel());
-                select.setHelp(cleanHints(dcInput.getHints()));
+                select.setLabel(message(dcInput.getLabel()));
+                select.setHelp(message(dcInput.getHints()));
                 if (dcInput.isRequired())
                 {
                     select.setRequired();
                 }
                 if (isFieldInError(fieldName))
                 {
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
-                    {
-                        select.addError(dcInput.getWarning());
-                    }
-                    else
-                    {
-                        select.addError(T_required_field);
-                    }
+                    setFieldWarning(dcInput, select);
                 }
                 if (dcInput.isRepeatable() || dcValues.length > 1)
                 {
@@ -1171,13 +1124,13 @@ public class DescribeStep extends AbstractSubmissionStep
                 {
                     select.setDisabled();
                 }
-                
+
                 // Setup the possible options
                 @SuppressWarnings("unchecked") // This cast is correct
                 java.util.List<String> pairs = dcInput.getPairs();
                 for (int i = 0; i < pairs.size(); i += 2)
                 {
-                        String display = pairs.get(i);
+                        Message display = message(pairs.get(i));
                         String value   = pairs.get(i+1);
                         select.addOption(value,display);
                 }
@@ -1235,22 +1188,15 @@ public class DescribeStep extends AbstractSubmissionStep
                 }
                 
                 //      Setup the field
-                listField.setLabel(dcInput.getLabel());
-                listField.setHelp(cleanHints(dcInput.getHints()));
+                listField.setLabel(message(dcInput.getLabel()));
+                listField.setHelp(message(dcInput.getHints()));
                 if (dcInput.isRequired())
                 {
                     listField.setRequired();
                 }
                 if (isFieldInError(fieldName))
                 {
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
-                    {
-                        listField.addError(dcInput.getWarning());
-                    }
-                    else
-                    {
-                        listField.addError(T_required_field);
-                    }
+                    setFieldWarning(dcInput, listField);
                 }
 
         
@@ -1258,7 +1204,7 @@ public class DescribeStep extends AbstractSubmissionStep
                 java.util.List<String> pairs = dcInput.getPairs();
                 for (int i = 0; i < pairs.size(); i += 2)
                 {
-                        String display = pairs.get(i);
+                        Message display = message(pairs.get(i));
                         String value   = pairs.get(i+1);
                         
                         if(listField instanceof CheckBox)
@@ -1372,18 +1318,13 @@ public class DescribeStep extends AbstractSubmissionStep
             }
 
             // Setup the full name
-            composite.setLabel(dcInput.getLabel());
-            composite.setHelp(cleanHints(dcInput.getHints()));
+            composite.setLabel(message(dcInput.getLabel()));
+            composite.setHelp(message(dcInput.getHints()));
             if (dcInput.isRequired()) {
                     composite.setRequired();
             }
             if (isFieldInError(fieldName) || regexError.containsKey(fieldName)) {
-                    if (dcInput.getWarning() != null
-                                    && dcInput.getWarning().length() > 0) {
-                            composite.addError(dcInput.getWarning());
-                    } else {
-                            composite.addError("Fill all the fields, please.");
-                    }
+                setFieldWarning(dcInput, composite, true, T_missing_field);
             }
             if (dcInput.isRepeatable() && !readonly) {
                     composite.enableAddOperation();
@@ -1544,8 +1485,8 @@ public class DescribeStep extends AbstractSubmissionStep
             }
             
                 // Setup the select field
-                text.setLabel(dcInput.getLabel());
-                text.setHelp(cleanHints(dcInput.getHints()));
+                text.setLabel(message(dcInput.getLabel()));
+                text.setHelp(message(dcInput.getHints()));
                 String fieldKey = MetadataAuthorityManager.makeFieldKey(dcInput.getSchema(), dcInput.getElement(), dcInput.getQualifier());
                 boolean isAuth = MetadataAuthorityManager.getManager().isAuthorityControlled(fieldKey);
                 if (isAuth)
@@ -1582,16 +1523,7 @@ public class DescribeStep extends AbstractSubmissionStep
 
                 if (isFieldInError(fieldName))
                 {
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
-                    {
-                        text.addError(dcInput.getWarning());
-                    }
-                    else
-                    {
-                        if ( !regexp_warning_issued || dcInput.isRequired() ) {
-                            text.addError(T_required_field);
-                        }
-                    }
+                    setFieldWarning(dcInput, text, !regexp_warning_issued || dcInput.isRequired(), T_required_field);
                 }
 
 
@@ -1665,39 +1597,6 @@ public class DescribeStep extends AbstractSubmissionStep
         }
         
         /**
-         * There is a problem with the way hints are handled. The class that we use to
-         * read the input-forms.xml configuration will append and prepend HTML to hints.
-         * This causes all sorts of confusion when inserting into the DRI page, so this
-         * method will strip that extra HTML and just leave the cleaned comments.
-         *
-         *
-         * However this method will not remove naughty or sexual innuendoes from the
-         * field's hints.
-         *
-         *
-         * @param dirtyHints HTML-ized hints
-         * @return Hints without HTML.
-         */
-        private static final String HINT_HTML_PREFIX = "<tr><td colspan=\"4\" class=\"submitFormHelp\">";
-        private static final String HINT_HTML_POSTFIX = "</td></tr>";
-        private String cleanHints(String dirtyHints)
-        {
-                String clean = (dirtyHints!=null ? dirtyHints : "");
-
-                if (clean.startsWith(HINT_HTML_PREFIX))
-                {
-                        clean = clean.substring(HINT_HTML_PREFIX.length());
-                }
-
-                if (clean.endsWith(HINT_HTML_POSTFIX))
-                {
-                        clean = clean.substring(0,clean.length() - HINT_HTML_POSTFIX.length());
-                }
-
-                return clean;
-        }
-             
-        /**
          * Adds hidden field with the name of the element to jump to using js after page reload
          * 
          * @param div
@@ -1761,4 +1660,19 @@ public class DescribeStep extends AbstractSubmissionStep
     		
     		return fields;
     	}
+
+        private void setFieldWarning(DCInput dcInput, Field field) throws WingException {
+            setFieldWarning(dcInput, field, true, T_required_field);
+        }
+
+        private void setFieldWarning(DCInput dcInput, Field field, boolean useDefault, Message defaultMessage) throws WingException {
+            if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
+            {
+                field.addError(message(dcInput.getWarning()));
+            }
+            else if (useDefault)
+            {
+                field.addError(defaultMessage);
+            }
+        }
 }
