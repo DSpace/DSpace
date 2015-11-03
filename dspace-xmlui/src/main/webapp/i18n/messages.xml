@@ -2936,5 +2936,249 @@
   <!-- homepage -->
   <message key="homepage.most_viewed_items">Most Viewed Items</message>
   <message key="homepage.top_week">Top Last Week</message>
+
+	<!-- input-forms.xml -->
+	<message key="input_forms.field.dc.type.label">Select type of your resource</message>
+	<message key="input_forms.field.dc.type.hint">Type of the resource: "Corpus" refers to text, speech and multimodal corpora.
+		"Lexical Conceptual Resource" includes lexica, ontologies, dictionaries, word lists etc.
+		"language Description" covers language models and grammars.
+		"Technology / Tool / Service" is used for tools, systems, system components etc.
+	</message>
+	<message key="input_forms.field.dc.type.required">Please select a resource type for your submission.</message>
+	<message key="input_forms.field.dc.title.label">Title</message>
+	<message key="input_forms.field.dc.title.hint">Enter the main title of the item in English.</message>
+	<message key="input_forms.field.dc.title.required">You must enter a main title for this item.</message>
+	<message key="input_forms.field.dc.source.uri.label">Project URL</message>
+	<message key="input_forms.field.dc.source.uri.hint">Enter the project url.</message>
+	<message key="input_forms.field.dc.source.uri.required"/>
+	<message key="input_forms.field.local.demo.uri.label">Demo URL</message>
+	<message key="input_forms.field.local.demo.uri.hint">A url with samples of the resource or, in the case of tools,
+		of samples of the output.
+	</message>
+	<message key="input_forms.field.local.demo.uri.required"/>
+	<message key="input_forms.field.dc.date.issued.label">Date issued</message>
+	<message key="input_forms.field.dc.date.issued.hint">Please give the date when the submission data were issued if any e.g., 2014-01-21 or at least
+		the year.
+	</message>
+	<message key="input_forms.field.dc.date.issued.required">You must enter the date or at least the year in a valid format.</message>
+	<message key="input_forms.field.local.hidden.label">Should this item be hidden from browse/search?</message>
+	<message key="input_forms.field.local.hidden.hint">Indicate whether you want to hide this item from browse and search. Combine with "Upload cmdi"
+		for weblicht submissions.
+	</message>
+	<message key="input_forms.field.local.hidden.required"/>
+	<message key="input_forms.field.local.hasMetadata.label">Are you going to upload cmdi file?</message>
+	<message key="input_forms.field.local.hasMetadata.hint">Indicate whether you will upload cmdi file in the next step. Combine with "hide" for weblicht
+		submissions.
+	</message>
+	<message key="input_forms.field.local.hasMetadata.required"/>
+	<message key="input_forms.field.dc.contributor.author.label">Authors</message>
+	<message key="input_forms.field.dc.contributor.author.hint">Enter the names of the authors of this item. Start typing the author's last name and use
+		autocomplete form that will appear if applicable. End your input by pressing ESC if you don't
+		want to use the preselected value.
+	</message>
+	<message key="input_forms.field.dc.contributor.author.required">Please add author(s)</message>
+	<message key="input_forms.field.dc.publisher.label">Publisher</message>
+	<message key="input_forms.field.dc.publisher.hint">Enter the name of the publisher of the previously issued instance of this item, or your home
+		institution. Start typing the publisher and use autocomplete form that will appear if
+		applicable. End your input by pressing ESC if you don't want to use the preselected value.
+	</message>
+	<message key="input_forms.field.dc.publisher.required">You must enter the name of the publisher.</message>
+	<message key="input_forms.field.local.contact.person.label">Contact person</message>
+	<message key="input_forms.field.local.contact.person.hint">Person to contact in case of any issues with this submission.</message>
+	<message key="input_forms.field.local.contact.person.required">Please fill all the fields for the contact person.</message>
+	<message key="input_forms.field.local.sponsor.label">Funding</message>
+	<message key="input_forms.field.local.sponsor.hint">Acknowledge sponsors and funding that supported work described by this submission.</message>
+	<message key="input_forms.field.dc.description.label">Description</message>
+	<message key="input_forms.field.dc.description.hint">Enter a description of the submitted data.</message>
+	<message key="input_forms.field.dc.description.required">Please give us a description</message>
+	<message key="input_forms.field.dc.language.iso.label">Language</message>
+	<message key="input_forms.field.dc.language.iso.hint">Select the language of the main content of the item. Multiple languages are possible. Start
+		typing the language and use autocomplete form that will appear if applicable.
+	</message>
+	<message key="input_forms.field.dc.language.iso.required">Please choose a language for the resource.</message>
+	<message key="input_forms.field.dc.language.iso1.label">Language</message>
+	<message key="input_forms.field.dc.language.iso1.hint">Select the spoken language (in ISO 639-3 format) of the main content of the item (use "N/A" if
+		not applicable). Multiple languages are possible. Start typing the language and use autocomplete
+		form that will appear.
+	</message>
+	<message key="input_forms.field.dc.language.iso1.required"/>
+	<message key="input_forms.field.dc.subject.label">Subject Keywords</message>
+	<message key="input_forms.field.dc.subject.hint">Enter appropriate subject keyword or phrase and press the Add button. You can repeat it for
+		multiple keywords or use separators i.e., comma and semicolon, which will split it accordingly.
+		Start typing the keyword and use autocomplete form that will appear. End your input by pressing
+		ESC if you don't want to use the preselected value.
+	</message>
+	<message key="input_forms.field.dc.subject.required">Please enter at least one subject related to your submission</message>
+	<message key="input_forms.field.local.size.info.label">Size</message>
+	<message key="input_forms.field.local.size.info.hint">You can state the extent of the submitted data, eg. the number of tokens.</message>
+	<message key="input_forms.field.metashare.ResourceInfo#ContentInfo.mediaType.label">Media type</message>
+	<message key="input_forms.field.metashare.ResourceInfo#ContentInfo.mediaType.hint">Media type of the main content of the item e.g., "text" for
+		textual corpora or "audio" for audio recordings.
+	</message>
+	<message key="input_forms.field.metashare.ResourceInfo#ContentInfo.mediaType.required">Media type is required</message>
+	<message key="input_forms.field.metashare.ResourceInfo#ContentInfo.mediaType1.label">Media type</message>
+	<message key="input_forms.field.metashare.ResourceInfo#ContentInfo.mediaType1.hint">Media type of the main content of the item e.g., "text" for
+		textual corpora or "audio" for audio recordings.
+	</message>
+	<message key="input_forms.field.metashare.ResourceInfo#ContentInfo.mediaType1.required">Media type is required</message>
+	<message key="input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType.label">Detailed type</message>
+	<message key="input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType.hint"/>
+	<message key="input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType.required">Choose one of the types</message>
+	<message key="input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType1.label">Detailed type</message>
+	<message key="input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType1.hint"/>
+	<message key="input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType1.required">Choose one of the types</message>
+	<message key="input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType2.label">Detailed type</message>
+	<message key="input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType2.hint"/>
+	<message key="input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType2.required">Choose one of the types</message>
+	<message key="input_forms.field.metashare.ResourceInfo#ResourceComponentType#ToolServiceInfo.languageDependent.label">Language Dependent</message>
+	<message key="input_forms.field.metashare.ResourceInfo#ResourceComponentType#ToolServiceInfo.languageDependent.hint">Indicate whether the operation of the tool or service is
+		language dependent or not
+	</message>
+	<message key="input_forms.field.metashare.ResourceInfo#ResourceComponentType#ToolServiceInfo.languageDependent.required">Please indicate whether the tool is language dependent</message>
+	<message key="input_forms.field.dc.contributor.author1.label">One: Authors</message>
+	<message key="input_forms.field.dc.contributor.author1.hint">Enter the names of the author(s) of this item.</message>
+	<message key="input_forms.field.dc.contributor.author1.required"/>
+	<message key="input_forms.field.local.submission.note.label">Note</message>
+	<message key="input_forms.field.local.submission.note.hint">Leave a note for the editors/reviewers</message>
+	<message key="input_forms.field.local.submission.note.required"/>
+	<message key="input_forms.field.dc.relation.replaces.label">Replaces</message>
+	<message key="input_forms.field.dc.relation.replaces.hint">URL to a related resource that is supplanted, displaced, or superseded by the described
+		resource.
+	</message>
+	<message key="input_forms.field.dc.relation.replaces.required"/>
+	<message key="input_forms.field.dc.relation.isreplacedby.label">Is replaced by</message>
+	<message key="input_forms.field.dc.relation.isreplacedby.hint">A related resource that supplants, displaces, or supersedes the described resource.</message>
+	<message key="input_forms.field.dc.relation.isreplacedby.required"/>
+	<message key="input_forms.field.local.embargo.termslift.label">Embargo lift date</message>
+	<message key="input_forms.field.local.embargo.termslift.hint">Date that the resource will become available e.g., 2014-01-21</message>
+	<message key="input_forms.field.local.embargo.termslift.required"/>
+	<message key="input_forms.value_pairs.common_identifiers.issn">ISSN</message>
+	<message key="input_forms.value_pairs.common_identifiers.other">Other</message>
+	<message key="input_forms.value_pairs.common_identifiers.ismn">ISMN</message>
+	<message key="input_forms.value_pairs.common_identifiers.govdoc">Gov't Doc #</message>
+	<message key="input_forms.value_pairs.common_identifiers.uri">URI</message>
+	<message key="input_forms.value_pairs.common_identifiers.isbn">ISBN</message>
+	<message key="input_forms.value_pairs.common_types.N/A">N/A</message>
+	<message key="input_forms.value_pairs.common_types.corpus">Corpus</message>
+	<message key="input_forms.value_pairs.common_types.lexicalConceptualResource">Lexical conceptual</message>
+	<message key="input_forms.value_pairs.common_types.languageDescription">Language description</message>
+	<message key="input_forms.value_pairs.common_types.toolService">Technology / Tool / Service</message>
+	<message key="input_forms.value_pairs.metashare_mediums.N/A">N/A</message>
+	<message key="input_forms.value_pairs.metashare_mediums.webExecutable">Web Executable</message>
+	<message key="input_forms.value_pairs.metashare_mediums.paperCopy">Paper copy</message>
+	<message key="input_forms.value_pairs.metashare_mediums.hardDisk">HardDisk</message>
+	<message key="input_forms.value_pairs.metashare_mediums.bluRay">Blu Ray</message>
+	<message key="input_forms.value_pairs.metashare_mediums.DVD-R">DVD-R</message>
+	<message key="input_forms.value_pairs.metashare_mediums.CD-ROM">CD-ROM</message>
+	<message key="input_forms.value_pairs.metashare_mediums.downloadable">Download</message>
+	<message key="input_forms.value_pairs.metashare_mediums.accessibleThroughInterface">Accessible Through Interface</message>
+	<message key="input_forms.value_pairs.metashare_mediums.other">other</message>
+	<message key="input_forms.value_pairs.metashare_validation.N/A">N/A</message>
+	<message key="input_forms.value_pairs.metashare_validation.True">True</message>
+	<message key="input_forms.value_pairs.metashare_validation.False">False</message>
+	<message key="input_forms.value_pairs.metashare_media_corpus_lcr.N/A">N/A</message>
+	<message key="input_forms.value_pairs.metashare_media_corpus_lcr.text">text</message>
+	<message key="input_forms.value_pairs.metashare_media_corpus_lcr.audio">audio</message>
+	<message key="input_forms.value_pairs.metashare_media_corpus_lcr.video">video</message>
+	<message key="input_forms.value_pairs.metashare_media_corpus_lcr.image">image</message>
+	<message key="input_forms.value_pairs.metashare_media_ld.N/A">N/A</message>
+	<message key="input_forms.value_pairs.metashare_media_ld.text">text</message>
+	<message key="input_forms.value_pairs.metashare_media_ld.video">video</message>
+	<message key="input_forms.value_pairs.metashare_media_ld.image">image</message>
+	<message key="input_forms.value_pairs.metashare_detailed_toolService.N/A">N/A</message>
+	<message key="input_forms.value_pairs.metashare_detailed_toolService.tool">tool</message>
+	<message key="input_forms.value_pairs.metashare_detailed_toolService.service">service</message>
+	<message key="input_forms.value_pairs.metashare_detailed_toolService.platform">platform</message>
+	<message key="input_forms.value_pairs.metashare_detailed_toolService.suiteOfTools">suiteOfTools</message>
+	<message key="input_forms.value_pairs.metashare_detailed_toolService.infrastructure">infrastructure</message>
+	<message key="input_forms.value_pairs.metashare_detailed_toolService.architecture">architecture</message>
+	<message key="input_forms.value_pairs.metashare_detailed_toolService.nlpDevelopmentEnvironment">nlpDevelopmentEnvironment</message>
+	<message key="input_forms.value_pairs.metashare_detailed_toolService.other">other</message>
+	<message key="input_forms.value_pairs.metashare_detailed_lexicalConceptualResource.N/A">N/A</message>
+	<message key="input_forms.value_pairs.metashare_detailed_lexicalConceptualResource.wordList">wordList</message>
+	<message key="input_forms.value_pairs.metashare_detailed_lexicalConceptualResource.computationalLexicon">computationalLexicon</message>
+	<message key="input_forms.value_pairs.metashare_detailed_lexicalConceptualResource.ontology">ontology</message>
+	<message key="input_forms.value_pairs.metashare_detailed_lexicalConceptualResource.wordnet">wordnet</message>
+	<message key="input_forms.value_pairs.metashare_detailed_lexicalConceptualResource.thesaurus">thesaurus</message>
+	<message key="input_forms.value_pairs.metashare_detailed_lexicalConceptualResource.framenet">framenet</message>
+	<message key="input_forms.value_pairs.metashare_detailed_lexicalConceptualResource.terminilogicalResource">terminilogicalResource</message>
+	<message key="input_forms.value_pairs.metashare_detailed_lexicalConceptualResource.machineReadableDictionary">machineReadableDictionary</message>
+	<message key="input_forms.value_pairs.metashare_detailed_lexicalConceptualResource.lexicon">lexicon</message>
+	<message key="input_forms.value_pairs.metashare_detailed_lexicalConceptualResource.other">other</message>
+	<message key="input_forms.value_pairs.metashare_detailed_languageDescription.N/A">N/A</message>
+	<message key="input_forms.value_pairs.metashare_detailed_languageDescription.grammar">grammar</message>
+	<message key="input_forms.value_pairs.metashare_detailed_languageDescription.other">other</message>
+	<message key="input_forms.value_pairs.metashare_funding.N/A">N/A</message>
+	<message key="input_forms.value_pairs.metashare_funding.euFunds">EU</message>
+	<message key="input_forms.value_pairs.metashare_funding.ownFunds">Own funds</message>
+	<message key="input_forms.value_pairs.metashare_funding.nationalFunds">National</message>
+	<message key="input_forms.value_pairs.metashare_funding.Other">other</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.N/A">N/A</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.terms">terms</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.entries">entries</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.turns">turns</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.utterances">utterances</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.articles">articles</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.files">files</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.items">items</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.seconds">seconds</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.elements">elements</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.units">units</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.minutes">minutes</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.hours">hours</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.texts">texts</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.sentences">sentences</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.pages">pages</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.bytes">bytes</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.tokens">tokens</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.words">words</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.keywords">keywords</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.idiomaticExpressions">idiomaticExpressions</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.neologisms">neologisms</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.multiWordUnits">multiWordUnits</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.expressions">expressions</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.synsets">synsets</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.classes">classes</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.concepts">concepts</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.lexicalTypes">lexicalTypes</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.phoneticUnits">phoneticUnits</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.syntacticUnits">syntacticUnits</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.semanticUnits">semanticUnits</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.predicates">predicates</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.phonemes">phonemes</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.diphones">diphones</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.T-HPairs">T-HPairs</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.syllables">syllables</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.frames">frames</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.images">images</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.kb">kb</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.mb">mb</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.gb">gb</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.rb">rb</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.shots">shots</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.unigrams">unigrams</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.bigrams">bigrams</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.trigrams">trigrams</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.4-grams">4-grams</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.5-grams">5-grams</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.n-grams">n-grams</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.rules">rules</message>
+	<message key="input_forms.value_pairs.metashare_sizeunit.other">other</message>
+	<message key="input_forms.value_pairs.metashare_languageDependent.true">Yes</message>
+	<message key="input_forms.value_pairs.metashare_languageDependent.false">No</message>
+	<message key="input_forms.value_pairs.hidden_list.hidden">Yes</message>
+	<message key="input_forms.value_pairs.hidden_list.false">No</message>
+	<message key="input_forms.complex_definitions.contact_person.1_givenname">Contact person's given name</message>
+	<message key="input_forms.complex_definitions.contact_person.2_surname">Contact person's surname</message>
+	<message key="input_forms.complex_definitions.contact_person.2_surname">Family name</message>
+	<message key="input_forms.complex_definitions.contact_person.3_email">Contact person's email</message>
+	<message key="input_forms.complex_definitions.contact_person.4_affiliation">Contact person's institution name</message>
+	<message key="input_forms.complex_definitions.contact_person.4_affiliation">Contact person's institution name</message>
+	<message key="input_forms.complex_definitions.funding.4_type">Funding type</message>
+	<message key="input_forms.complex_definitions.funding.2_code">Grant no. or funding project code</message>
+	<message key="input_forms.complex_definitions.funding.1_orgname">Funding organization</message>
+	<message key="input_forms.complex_definitions.funding.3_projname">Funding project name</message>
+	<message key="input_forms.complex_definitions.funding.5_openaire_id">EU Project Identifier (OpenAIRE)</message>
+	<message key="input_forms.complex_definitions.sizeInfo.2_unit">Unit</message>
 </catalogue>
 

@@ -1,7 +1,5 @@
 <?xml version="1.0"?>
 <!DOCTYPE input-forms SYSTEM "input-forms.dtd">
-
-
 <input-forms>
 
     <!-- The form-map maps collection handles to forms. DSpace does not       -->
@@ -50,27 +48,23 @@
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>type</dc-element>
-                    <dc-qualifier></dc-qualifier>
+                    <dc-qualifier/>
                     <repeatable>false</repeatable>
-                    <label>Select type of your resource</label>
+                    <label>input_forms.field.dc.type.label</label>
                     <input-type value-pairs-name="common_types">dropdown</input-type>
-                    <hint>Type of the resource: "Corpus" refers to text, speech and multimodal corpora.
-                        "Lexical Conceptual Resource" includes lexica, ontologies, dictionaries, word lists etc.
-                        "language Description" covers language models and grammars.
-                        "Technology / Tool / Service" is used for tools, systems, system components etc.
-                    </hint>
-                    <required>Please select a resource type for your submission.</required>
+                    <hint>input_forms.field.dc.type.hint</hint>
+                    <required>input_forms.field.dc.type.required</required>
                 </field>
 
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>title</dc-element>
-                    <dc-qualifier></dc-qualifier>
+                    <dc-qualifier/>
                     <repeatable>false</repeatable>
-                    <label>Title</label>
+                    <label>input_forms.field.dc.title.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the main title of the item in English.</hint>
-                    <required>You must enter a main title for this item.</required>
+                    <hint>input_forms.field.dc.title.hint</hint>
+                    <required>input_forms.field.dc.title.required</required>
                 </field>
 
                 <field>
@@ -78,10 +72,10 @@
                     <dc-element>source</dc-element>
                     <dc-qualifier>uri</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Project URL</label>
+                    <label>input_forms.field.dc.source.uri.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the project url.</hint>
-                    <required></required>
+                    <hint>input_forms.field.dc.source.uri.hint</hint>
+                    <required>input_forms.field.dc.source.uri.required</required>
                     <regexp>http.*</regexp>
                     <regexp-warning>The supplied url must start with http/https</regexp-warning>
                 </field>
@@ -91,12 +85,10 @@
                     <dc-element>demo</dc-element>
                     <dc-qualifier>uri</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Demo URL</label>
+                    <label>input_forms.field.local.demo.uri.label</label>
                     <input-type>onebox</input-type>
-                    <hint>A url with samples of the resource or, in the case of tools,
-                        of samples of the output.
-                    </hint>
-                    <required></required>
+                    <hint>input_forms.field.local.demo.uri.hint</hint>
+                    <required>input_forms.field.local.demo.uri.required</required>
                     <regexp>http.*</regexp>
                     <regexp-warning>The supplied url must start with http/https</regexp-warning>
                 </field>
@@ -106,25 +98,21 @@
                     <dc-element>date</dc-element>
                     <dc-qualifier>issued</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Date issued</label>
+                    <label>input_forms.field.dc.date.issued.label</label>
                     <input-type>FormattedDate</input-type>
-                    <hint>Please give the date when the submission data were issued if any e.g., 2014-01-21 or at least
-                        the year.
-                    </hint>
-                    <required>You must enter the date or at least the year in a valid format.</required>
+                    <hint>input_forms.field.dc.date.issued.hint</hint>
+                    <required>input_forms.field.dc.date.issued.required</required>
                 </field>
 
                 <field>
                     <dc-schema>local</dc-schema>
                     <dc-element>hidden</dc-element>
-                    <dc-qualifier></dc-qualifier>
+                    <dc-qualifier/>
                     <repeatable>false</repeatable>
-                    <label>Should this item be hidden from browse/search?</label>
+                    <label>input_forms.field.local.hidden.label</label>
                     <input-type value-pairs-name="hidden_list">list</input-type>
-                    <hint>Indicate whether you want to hide this item from browse and search. Combine with "Upload cmdi"
-                        for weblicht submissions.
-                    </hint>
-                    <required></required>
+                    <hint>input_forms.field.local.hidden.hint</hint>
+                    <required>input_forms.field.local.hidden.required</required>
                     <acl>
                         policy=deny,action=read,grantee-type=user,grantee-id=*
                     </acl>
@@ -133,15 +121,13 @@
                 <field>
                     <dc-schema>local</dc-schema>
                     <dc-element>hasMetadata</dc-element>
-                    <dc-qualifier></dc-qualifier>
+                    <dc-qualifier/>
                     <repeatable>false</repeatable>
-                    <label>Are you going to upload cmdi file?</label>
+                    <label>input_forms.field.local.hasMetadata.label</label>
                     <input-type value-pairs-name="metashare_languageDependent">list</input-type>
                     <!-- true/false value -->
-                    <hint>Indicate whether you will upload cmdi file in the next step. Combine with "hide" for weblicht
-                        submissions.
-                    </hint>
-                    <required></required>
+                    <hint>input_forms.field.local.hasMetadata.hint</hint>
+                    <required>input_forms.field.local.hasMetadata.required</required>
                     <acl>
                         policy=deny,action=read,grantee-type=user,grantee-id=*
                     </acl>
@@ -164,29 +150,23 @@
                     <dc-element>contributor</dc-element>
                     <dc-qualifier>author</dc-qualifier>
                     <repeatable>true</repeatable>
-                    <label>Authors</label>
+                    <label>input_forms.field.dc.contributor.author.label</label>
                     <input-type>name</input-type>
-                    <hint>Enter the names of the authors of this item. Start typing the author's last name and use
-                        autocomplete form that will appear if applicable. End your input by pressing ESC if you don't
-                        want to use the preselected value.
-                    </hint>
+                    <hint>input_forms.field.dc.contributor.author.hint</hint>
                     <autocomplete>solr-author_ac-specific</autocomplete>
-                    <required>Please add author(s)</required>
+                    <required>input_forms.field.dc.contributor.author.required</required>
                 </field>
 
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>publisher</dc-element>
-                    <dc-qualifier></dc-qualifier>
+                    <dc-qualifier/>
                     <repeatable>true</repeatable>
-                    <label>Publisher</label>
+                    <label>input_forms.field.dc.publisher.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the name of the publisher of the previously issued instance of this item, or your home
-                        institution. Start typing the publisher and use autocomplete form that will appear if
-                        applicable. End your input by pressing ESC if you don't want to use the preselected value.
-                    </hint>
+                    <hint>input_forms.field.dc.publisher.hint</hint>
                     <autocomplete>solr-publisher_ac</autocomplete>
-                    <required>You must enter the name of the publisher.</required>
+                    <required>input_forms.field.dc.publisher.required</required>
                 </field>
 
                 <field>
@@ -194,10 +174,10 @@
                     <dc-element>contact</dc-element>
                     <dc-qualifier>person</dc-qualifier>
                     <repeatable>true</repeatable>
-                    <label>Contact person</label>
+                    <label>input_forms.field.local.contact.person.label</label>
                     <input-type complex-definition-ref="contact_person">complex</input-type>
-                    <hint>Person to contact in case of any issues with this submission.</hint>
-                    <required>Please fill all the fields for the contact person.</required>
+                    <hint>input_forms.field.local.contact.person.hint</hint>
+                    <required>input_forms.field.local.contact.person.required</required>
                 </field>
 
 
@@ -205,9 +185,9 @@
                     <dc-schema>local</dc-schema>
                     <dc-element>sponsor</dc-element>
                     <repeatable>true</repeatable>
-                    <label>Funding</label>
+                    <label>input_forms.field.local.sponsor.label</label>
                     <input-type complex-definition-ref="funding">complex</input-type>
-                    <hint>Acknowledge sponsors and funding that supported work described by this submission.</hint>
+                    <hint>input_forms.field.local.sponsor.hint</hint>
                 </field>
 
 
@@ -218,12 +198,12 @@
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>description</dc-element>
-                    <dc-qualifier></dc-qualifier>
+                    <dc-qualifier/>
                     <repeatable>false</repeatable>
-                    <label>Description</label>
+                    <label>input_forms.field.dc.description.label</label>
                     <input-type>textarea</input-type>
-                    <hint>Enter a description of the submitted data.</hint>
-                    <required>Please give us a description</required>
+                    <hint>input_forms.field.dc.description.hint</hint>
+                    <required>input_forms.field.dc.description.required</required>
                 </field>
 
 
@@ -232,14 +212,12 @@
                     <dc-element>language</dc-element>
                     <dc-qualifier>iso</dc-qualifier>
                     <repeatable>true</repeatable>
-                    <label>Language</label>
+                    <label>input_forms.field.dc.language.iso.label</label>
                     <type-bind>corpus,lexicalConceptualResource,languageDescription</type-bind>
                     <input-type>onebox</input-type>
-                    <hint>Select the language of the main content of the item. Multiple languages are possible. Start
-                        typing the language and use autocomplete form that will appear if applicable.
-                    </hint>
+                    <hint>input_forms.field.dc.language.iso.hint</hint>
                     <autocomplete>json_static-iso_langs.json</autocomplete>
-                    <required>Please choose a language for the resource.</required>
+                    <required>input_forms.field.dc.language.iso.required</required>
                 </field>
 
                 <field>
@@ -247,33 +225,26 @@
                     <dc-element>language</dc-element>
                     <dc-qualifier>iso</dc-qualifier>
                     <repeatable>true</repeatable>
-                    <label>Language</label>
+                    <label>input_forms.field.dc.language.iso1.label</label>
                     <type-bind>toolService</type-bind>
                     <input-type>onebox</input-type>
-                    <hint>Select the spoken language (in ISO 639-3 format) of the main content of the item (use "N/A" if
-                        not applicable). Multiple languages are possible. Start typing the language and use autocomplete
-                        form that will appear.
-                    </hint>
+                    <hint>input_forms.field.dc.language.iso1.hint</hint>
                     <autocomplete>json_static-iso_langs.json</autocomplete>
-                    <required></required>
+                    <required>input_forms.field.dc.language.iso1.required</required>
                 </field>
 
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>subject</dc-element>
-                    <dc-qualifier></dc-qualifier>
+                    <dc-qualifier/>
                     <!-- An input-type of twobox MUST be marked as repeatable -->
                     <repeatable>true</repeatable>
                     <repeatable-parse>true</repeatable-parse>
-                    <label>Subject Keywords</label>
+                    <label>input_forms.field.dc.subject.label</label>
                     <input-type>twobox</input-type>
-                    <hint>Enter appropriate subject keyword or phrase and press the Add button. You can repeat it for
-                        multiple keywords or use separators i.e., comma and semicolon, which will split it accordingly.
-                        Start typing the keyword and use autocomplete form that will appear. End your input by pressing
-                        ESC if you don't want to use the preselected value.
-                    </hint>
+                    <hint>input_forms.field.dc.subject.hint</hint>
                     <autocomplete>solr-subject_ac</autocomplete>
-                    <required>Please enter at least one subject related to your submission</required>
+                    <required>input_forms.field.dc.subject.required</required>
                 </field>
 
                 <field>
@@ -281,10 +252,10 @@
                     <dc-element>size</dc-element>
                     <dc-qualifier>info</dc-qualifier>
                     <repeatable>true</repeatable>
-                    <label>Size</label>
+                    <label>input_forms.field.local.size.info.label</label>
                     <type-bind>corpus,languageDescription,lexicalConceptualResource</type-bind>
                     <input-type complex-definition-ref="sizeInfo">complex</input-type>
-                    <hint>You can state the extent of the submitted data, eg. the number of tokens.</hint>
+                    <hint>input_forms.field.local.size.info.hint</hint>
                 </field>
 
                 <field>
@@ -292,26 +263,22 @@
                     <dc-element>ResourceInfo#ContentInfo</dc-element>
                     <dc-qualifier>mediaType</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Media type</label>
+                    <label>input_forms.field.metashare.ResourceInfo#ContentInfo.mediaType.label</label>
                     <type-bind>corpus,lexicalConceptualResource</type-bind>
                     <input-type value-pairs-name="metashare_media_corpus_lcr">dropdown</input-type>
-                    <hint>Media type of the main content of the item e.g., "text" for
-                        textual corpora or "audio" for audio recordings.
-                    </hint>
-                    <required>Media type is required</required>
+                    <hint>input_forms.field.metashare.ResourceInfo#ContentInfo.mediaType.hint</hint>
+                    <required>input_forms.field.metashare.ResourceInfo#ContentInfo.mediaType.required</required>
                 </field>
                 <field>
                     <dc-schema>metashare</dc-schema>
                     <dc-element>ResourceInfo#ContentInfo</dc-element>
                     <dc-qualifier>mediaType</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Media type</label>
+                    <label>input_forms.field.metashare.ResourceInfo#ContentInfo.mediaType1.label</label>
                     <type-bind>languageDescription</type-bind>
                     <input-type value-pairs-name="metashare_media_ld">dropdown</input-type>
-                    <hint>Media type of the main content of the item e.g., "text" for
-                        textual corpora or "audio" for audio recordings.
-                    </hint>
-                    <required>Media type is required</required>
+                    <hint>input_forms.field.metashare.ResourceInfo#ContentInfo.mediaType1.hint</hint>
+                    <required>input_forms.field.metashare.ResourceInfo#ContentInfo.mediaType1.required</required>
                 </field>
 
                 <!-- Help field... different values based on resource type -->
@@ -320,33 +287,33 @@
                     <dc-element>ResourceInfo#ContentInfo</dc-element>
                     <dc-qualifier>detailedType</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Detailed type</label>
+                    <label>input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType.label</label>
                     <type-bind>toolService</type-bind>
                     <input-type value-pairs-name="metashare_detailed_toolService">dropdown</input-type>
-                    <hint></hint>
-                    <required>Choose one of the types</required>
+                    <hint>input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType.hint</hint>
+                    <required>input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType.required</required>
                 </field>
                 <field>
                     <dc-schema>metashare</dc-schema>
                     <dc-element>ResourceInfo#ContentInfo</dc-element>
                     <dc-qualifier>detailedType</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Detailed type</label>
+                    <label>input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType1.label</label>
                     <type-bind>languageDescription</type-bind>
                     <input-type value-pairs-name="metashare_detailed_languageDescription">dropdown</input-type>
-                    <hint></hint>
-                    <required>Choose one of the types</required>
+                    <hint>input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType1.hint</hint>
+                    <required>input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType1.required</required>
                 </field>
                 <field>
                     <dc-schema>metashare</dc-schema>
                     <dc-element>ResourceInfo#ContentInfo</dc-element>
                     <dc-qualifier>detailedType</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Detailed type</label>
+                    <label>input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType2.label</label>
                     <type-bind>lexicalConceptualResource</type-bind>
                     <input-type value-pairs-name="metashare_detailed_lexicalConceptualResource">dropdown</input-type>
-                    <hint></hint>
-                    <required>Choose one of the types</required>
+                    <hint>input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType2.hint</hint>
+                    <required>input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType2.required</required>
                 </field>
                 <!-- -->
 
@@ -355,13 +322,11 @@
                     <dc-element>ResourceInfo#ResourceComponentType#ToolServiceInfo</dc-element>
                     <dc-qualifier>languageDependent</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Language Dependent</label>
+                    <label>input_forms.field.metashare.ResourceInfo#ResourceComponentType#ToolServiceInfo.languageDependent.label</label>
                     <type-bind>toolService</type-bind>
                     <input-type value-pairs-name="metashare_languageDependent">list</input-type>
-                    <hint>Indicate whether the operation of the tool or service is
-                        language dependent or not
-                    </hint>
-                    <required>Please indicate whether the tool is language dependent</required>
+                    <hint>input_forms.field.metashare.ResourceInfo#ResourceComponentType#ToolServiceInfo.languageDependent.hint</hint>
+                    <required>input_forms.field.metashare.ResourceInfo#ResourceComponentType#ToolServiceInfo.languageDependent.required</required>
                 </field>
             </page>
         </form>
@@ -373,10 +338,10 @@
                     <dc-element>contributor</dc-element>
                     <dc-qualifier>author</dc-qualifier>
                     <repeatable>true</repeatable>
-                    <label>One: Authors</label>
+                    <label>input_forms.field.dc.contributor.author1.label</label>
                     <input-type>name</input-type>
-                    <hint>Enter the names of the author(s) of this item.</hint>
-                    <required></required>
+                    <hint>input_forms.field.dc.contributor.author1.hint</hint>
+                    <required>input_forms.field.dc.contributor.author1.required</required>
                 </field>
             </page>
         </form>
@@ -402,10 +367,10 @@
                     <dc-element>submission</dc-element>
                     <dc-qualifier>note</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Note</label>
+                    <label>input_forms.field.local.submission.note.label</label>
                     <input-type>textarea</input-type>
-                    <hint>Leave a note for the editors/reviewers</hint>
-                    <required></required>
+                    <hint>input_forms.field.local.submission.note.hint</hint>
+                    <required>input_forms.field.local.submission.note.required</required>
                 </field>
 
                 <!-- DC.Relation.Replaces -->
@@ -414,13 +379,11 @@
                     <dc-element>relation</dc-element>
                     <dc-qualifier>replaces</dc-qualifier>
                     <repeatable>true</repeatable>
-                    <label>Replaces</label>
+                    <label>input_forms.field.dc.relation.replaces.label</label>
                     <input-type>onebox</input-type>
-                    <hint>URL to a related resource that is supplanted, displaced, or superseded by the described
-                        resource.
-                    </hint>
+                    <hint>input_forms.field.dc.relation.replaces.hint</hint>
                     <autocomplete>solr-handle</autocomplete>
-                    <required></required>
+                    <required>input_forms.field.dc.relation.replaces.required</required>
                     <component-label> </component-label>
                     <collapsible>Special fields</collapsible>
                     <acl>
@@ -434,11 +397,11 @@
                     <dc-element>relation</dc-element>
                     <dc-qualifier>isreplacedby</dc-qualifier>
                     <repeatable>true</repeatable>
-                    <label>Is replaced by</label>
+                    <label>input_forms.field.dc.relation.isreplacedby.label</label>
                     <input-type>onebox</input-type>
-                    <hint>A related resource that supplants, displaces, or supersedes the described resource.</hint>
+                    <hint>input_forms.field.dc.relation.isreplacedby.hint</hint>
                     <autocomplete>solr-handle</autocomplete>
-                    <required></required>
+                    <required>input_forms.field.dc.relation.isreplacedby.required</required>
                     <component-label> </component-label>
                     <acl>
                         policy=deny,action=read,grantee-type=user,grantee-id=*
@@ -451,10 +414,10 @@
                     <dc-element>embargo</dc-element>
                     <dc-qualifier>termslift</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Embargo lift date</label>
+                    <label>input_forms.field.local.embargo.termslift.label</label>
                     <input-type>onebox</input-type>
-                    <hint>Date that the resource will become available e.g., 2014-01-21</hint>
-                    <required></required>
+                    <hint>input_forms.field.local.embargo.termslift.hint</hint>
+                    <required>input_forms.field.local.embargo.termslift.required</required>
                     <regexp>\d\d\d\d-\d\d-\d\d</regexp>
                     <regexp-warning>The supplied date does not follow our date pattern \d\d\d\d-\d\d-\d\d e.g.,
                         2014-01-21
@@ -484,53 +447,52 @@
     <!-- stores the associated stored-values in the database.                  -->
 
     <form-value-pairs>
-        <value-pairs value-pairs-name="common_identifiers"
-                     dc-term="identifier">
+        <value-pairs value-pairs-name="common_identifiers" dc-term="identifier">
             <pair>
-                <displayed-value>ISSN</displayed-value>
+                <displayed-value>input_forms.value_pairs.common_identifiers.issn</displayed-value>
                 <stored-value>issn</stored-value>
             </pair>
             <pair>
-                <displayed-value>Other</displayed-value>
+                <displayed-value>input_forms.value_pairs.common_identifiers.other</displayed-value>
                 <stored-value>other</stored-value>
             </pair>
             <pair>
-                <displayed-value>ISMN</displayed-value>
+                <displayed-value>input_forms.value_pairs.common_identifiers.ismn</displayed-value>
                 <stored-value>ismn</stored-value>
             </pair>
             <pair>
-                <displayed-value>Gov't Doc #</displayed-value>
+                <displayed-value>input_forms.value_pairs.common_identifiers.govdoc</displayed-value>
                 <stored-value>govdoc</stored-value>
             </pair>
             <pair>
-                <displayed-value>URI</displayed-value>
+                <displayed-value>input_forms.value_pairs.common_identifiers.uri</displayed-value>
                 <stored-value>uri</stored-value>
             </pair>
             <pair>
-                <displayed-value>ISBN</displayed-value>
+                <displayed-value>input_forms.value_pairs.common_identifiers.isbn</displayed-value>
                 <stored-value>isbn</stored-value>
             </pair>
         </value-pairs>
 
         <value-pairs value-pairs-name="common_types" dc-term="type">
             <pair>
-                <displayed-value>N/A</displayed-value>
-                <stored-value></stored-value>
+                <displayed-value>input_forms.value_pairs.common_types.N/A</displayed-value>
+                <stored-value/>
             </pair>
             <pair>
-                <displayed-value>Corpus</displayed-value>
+                <displayed-value>input_forms.value_pairs.common_types.corpus</displayed-value>
                 <stored-value>corpus</stored-value>
             </pair>
             <pair>
-                <displayed-value>Lexical conceptual</displayed-value>
+                <displayed-value>input_forms.value_pairs.common_types.lexicalConceptualResource</displayed-value>
                 <stored-value>lexicalConceptualResource</stored-value>
             </pair>
             <pair>
-                <displayed-value>Language description</displayed-value>
+                <displayed-value>input_forms.value_pairs.common_types.languageDescription</displayed-value>
                 <stored-value>languageDescription</stored-value>
             </pair>
             <pair>
-                <displayed-value>Technology / Tool / Service</displayed-value>
+                <displayed-value>input_forms.value_pairs.common_types.toolService</displayed-value>
                 <stored-value>toolService</stored-value>
             </pair>
             <!--<pair> <displayed-value>Evaluation package</displayed-value> <stored-value>evaluationPackage</stored-value>
@@ -547,208 +509,202 @@
         <!-- taken from the metashare standard -->
         <value-pairs value-pairs-name="metashare_mediums" dc-term="">
             <pair>
-                <displayed-value>N/A</displayed-value>
-                <stored-value></stored-value>
+                <displayed-value>input_forms.value_pairs.metashare_mediums.N/A</displayed-value>
+                <stored-value/>
             </pair>
             <pair>
-                <displayed-value>Web Executable</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_mediums.webExecutable</displayed-value>
                 <stored-value>webExecutable</stored-value>
             </pair>
             <pair>
-                <displayed-value>Paper copy</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_mediums.paperCopy</displayed-value>
                 <stored-value>paperCopy</stored-value>
             </pair>
             <pair>
-                <displayed-value>HardDisk</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_mediums.hardDisk</displayed-value>
                 <stored-value>hardDisk</stored-value>
             </pair>
             <pair>
-                <displayed-value>Blu Ray</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_mediums.bluRay</displayed-value>
                 <stored-value>bluRay</stored-value>
             </pair>
             <pair>
-                <displayed-value>DVD-R</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_mediums.DVD-R</displayed-value>
                 <stored-value>DVD-R</stored-value>
             </pair>
             <pair>
-                <displayed-value>CD-ROM</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_mediums.CD-ROM</displayed-value>
                 <stored-value>CD-ROM</stored-value>
             </pair>
             <pair>
-                <displayed-value>Download</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_mediums.downloadable</displayed-value>
                 <stored-value>downloadable</stored-value>
             </pair>
             <pair>
-                <displayed-value>Accessible Through Interface</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_mediums.accessibleThroughInterface</displayed-value>
                 <stored-value>accessibleThroughInterface</stored-value>
             </pair>
             <pair>
-                <displayed-value>other</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_mediums.other</displayed-value>
                 <stored-value>other</stored-value>
             </pair>
         </value-pairs>
 
         <!-- taken from the metashare standard -->
-        <value-pairs value-pairs-name="metashare_validation"
-                     dc-term="">
+        <value-pairs value-pairs-name="metashare_validation" dc-term="">
             <pair>
-                <displayed-value>N/A</displayed-value>
-                <stored-value></stored-value>
+                <displayed-value>input_forms.value_pairs.metashare_validation.N/A</displayed-value>
+                <stored-value/>
             </pair>
             <pair>
-                <displayed-value>True</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_validation.True</displayed-value>
                 <stored-value>True</stored-value>
             </pair>
             <pair>
-                <displayed-value>False</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_validation.False</displayed-value>
                 <stored-value>False</stored-value>
             </pair>
         </value-pairs>
 
         <!-- used for media types -->
-        <value-pairs value-pairs-name="metashare_media_corpus_lcr"
-                     dc-term="">
+        <value-pairs value-pairs-name="metashare_media_corpus_lcr" dc-term="">
             <pair>
-                <displayed-value>N/A</displayed-value>
-                <stored-value></stored-value>
+                <displayed-value>input_forms.value_pairs.metashare_media_corpus_lcr.N/A</displayed-value>
+                <stored-value/>
             </pair>
             <pair>
-                <displayed-value>text</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_media_corpus_lcr.text</displayed-value>
                 <stored-value>text</stored-value>
             </pair>
             <pair>
-                <displayed-value>audio</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_media_corpus_lcr.audio</displayed-value>
                 <stored-value>audio</stored-value>
             </pair>
             <pair>
-                <displayed-value>video</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_media_corpus_lcr.video</displayed-value>
                 <stored-value>video</stored-value>
             </pair>
             <pair>
-                <displayed-value>image</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_media_corpus_lcr.image</displayed-value>
                 <stored-value>image</stored-value>
             </pair>
         </value-pairs>
 
-        <value-pairs value-pairs-name="metashare_media_ld"
-                     dc-term="">
+        <value-pairs value-pairs-name="metashare_media_ld" dc-term="">
             <pair>
-                <displayed-value>N/A</displayed-value>
-                <stored-value></stored-value>
+                <displayed-value>input_forms.value_pairs.metashare_media_ld.N/A</displayed-value>
+                <stored-value/>
             </pair>
             <pair>
-                <displayed-value>text</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_media_ld.text</displayed-value>
                 <stored-value>text</stored-value>
             </pair>
             <pair>
-                <displayed-value>video</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_media_ld.video</displayed-value>
                 <stored-value>video</stored-value>
             </pair>
             <pair>
-                <displayed-value>image</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_media_ld.image</displayed-value>
                 <stored-value>image</stored-value>
             </pair>
         </value-pairs>
 
         <!-- used for "detailed type" -->
-        <value-pairs value-pairs-name="metashare_detailed_toolService"
-                     dc-term="">
+        <value-pairs value-pairs-name="metashare_detailed_toolService" dc-term="">
             <pair>
-                <displayed-value>N/A</displayed-value>
-                <stored-value></stored-value>
+                <displayed-value>input_forms.value_pairs.metashare_detailed_toolService.N/A</displayed-value>
+                <stored-value/>
             </pair>
             <pair>
-                <displayed-value>tool</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_detailed_toolService.tool</displayed-value>
                 <stored-value>tool</stored-value>
             </pair>
             <pair>
-                <displayed-value>service</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_detailed_toolService.service</displayed-value>
                 <stored-value>service</stored-value>
             </pair>
             <pair>
-                <displayed-value>platform</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_detailed_toolService.platform</displayed-value>
                 <stored-value>platform</stored-value>
             </pair>
             <pair>
-                <displayed-value>suiteOfTools</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_detailed_toolService.suiteOfTools</displayed-value>
                 <stored-value>suiteOfTools</stored-value>
             </pair>
             <pair>
-                <displayed-value>infrastructure</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_detailed_toolService.infrastructure</displayed-value>
                 <stored-value>infrastructure</stored-value>
             </pair>
             <pair>
-                <displayed-value>architecture</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_detailed_toolService.architecture</displayed-value>
                 <stored-value>architecture</stored-value>
             </pair>
             <pair>
-                <displayed-value>nlpDevelopmentEnvironment</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_detailed_toolService.nlpDevelopmentEnvironment</displayed-value>
                 <stored-value>nlpDevelopmentEnvironment</stored-value>
             </pair>
             <pair>
-                <displayed-value>other</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_detailed_toolService.other</displayed-value>
                 <stored-value>other</stored-value>
             </pair>
         </value-pairs>
-        <value-pairs value-pairs-name="metashare_detailed_lexicalConceptualResource"
-                     dc-term="">
+        <value-pairs value-pairs-name="metashare_detailed_lexicalConceptualResource" dc-term="">
             <pair>
-                <displayed-value>N/A</displayed-value>
-                <stored-value></stored-value>
+                <displayed-value>input_forms.value_pairs.metashare_detailed_lexicalConceptualResource.N/A</displayed-value>
+                <stored-value/>
             </pair>
             <pair>
-                <displayed-value>wordList</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_detailed_lexicalConceptualResource.wordList</displayed-value>
                 <stored-value>wordList</stored-value>
             </pair>
             <pair>
-                <displayed-value>computationalLexicon</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_detailed_lexicalConceptualResource.computationalLexicon</displayed-value>
                 <stored-value>computationalLexicon</stored-value>
             </pair>
             <pair>
-                <displayed-value>ontology</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_detailed_lexicalConceptualResource.ontology</displayed-value>
                 <stored-value>ontology</stored-value>
             </pair>
             <pair>
-                <displayed-value>wordnet</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_detailed_lexicalConceptualResource.wordnet</displayed-value>
                 <stored-value>wordnet</stored-value>
             </pair>
             <pair>
-                <displayed-value>thesaurus</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_detailed_lexicalConceptualResource.thesaurus</displayed-value>
                 <stored-value>thesaurus</stored-value>
             </pair>
             <pair>
-                <displayed-value>framenet</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_detailed_lexicalConceptualResource.framenet</displayed-value>
                 <stored-value>framenet</stored-value>
             </pair>
             <pair>
-                <displayed-value>terminilogicalResource</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_detailed_lexicalConceptualResource.terminilogicalResource</displayed-value>
                 <stored-value>terminilogicalResource</stored-value>
             </pair>
             <pair>
-                <displayed-value>machineReadableDictionary</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_detailed_lexicalConceptualResource.machineReadableDictionary</displayed-value>
                 <stored-value>machineReadableDictionary</stored-value>
             </pair>
             <pair>
-                <displayed-value>lexicon</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_detailed_lexicalConceptualResource.lexicon</displayed-value>
                 <stored-value>lexicon</stored-value>
             </pair>
             <pair>
-                <displayed-value>other</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_detailed_lexicalConceptualResource.other</displayed-value>
                 <stored-value>other</stored-value>
             </pair>
         </value-pairs>
-        <value-pairs value-pairs-name="metashare_detailed_languageDescription"
-                     dc-term="">
+        <value-pairs value-pairs-name="metashare_detailed_languageDescription" dc-term="">
             <pair>
-                <displayed-value>N/A</displayed-value>
-                <stored-value></stored-value>
+                <displayed-value>input_forms.value_pairs.metashare_detailed_languageDescription.N/A</displayed-value>
+                <stored-value/>
             </pair>
             <pair>
-                <displayed-value>grammar</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_detailed_languageDescription.grammar</displayed-value>
                 <stored-value>grammar</stored-value>
             </pair>
             <pair>
-                <displayed-value>other</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_detailed_languageDescription.other</displayed-value>
                 <stored-value>other</stored-value>
             </pair>
         </value-pairs>
@@ -756,256 +712,253 @@
         <!-- taken from the metashare standard -->
         <value-pairs value-pairs-name="metashare_funding" dc-term="">
             <pair>
-                <displayed-value>N/A</displayed-value>
-                <stored-value></stored-value>
+                <displayed-value>input_forms.value_pairs.metashare_funding.N/A</displayed-value>
+                <stored-value/>
             </pair>
             <pair>
-                <displayed-value>EU</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_funding.euFunds</displayed-value>
                 <stored-value>euFunds</stored-value>
             </pair>
             <pair>
-                <displayed-value>Own funds</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_funding.ownFunds</displayed-value>
                 <stored-value>ownFunds</stored-value>
             </pair>
             <pair>
-                <displayed-value>National</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_funding.nationalFunds</displayed-value>
                 <stored-value>nationalFunds</stored-value>
             </pair>
             <pair>
-                <displayed-value>other</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_funding.Other</displayed-value>
                 <stored-value>Other</stored-value>
             </pair>
         </value-pairs>
 
         <!-- taken from the metashare standard -->
-        <value-pairs value-pairs-name="metashare_sizeunit"
-                     dc-term="">
+        <value-pairs value-pairs-name="metashare_sizeunit" dc-term="">
             <pair>
-                <displayed-value>N/A</displayed-value>
-                <stored-value></stored-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.N/A</displayed-value>
+                <stored-value/>
             </pair>
 
             <pair>
-                <displayed-value>terms</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.terms</displayed-value>
                 <stored-value>terms</stored-value>
             </pair>
             <pair>
-                <displayed-value>entries</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.entries</displayed-value>
                 <stored-value>entries</stored-value>
             </pair>
             <pair>
-                <displayed-value>turns</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.turns</displayed-value>
                 <stored-value>turns</stored-value>
             </pair>
             <pair>
-                <displayed-value>utterances</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.utterances</displayed-value>
                 <stored-value>utterances</stored-value>
             </pair>
             <pair>
-                <displayed-value>articles</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.articles</displayed-value>
                 <stored-value>articles</stored-value>
             </pair>
             <pair>
-                <displayed-value>files</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.files</displayed-value>
                 <stored-value>files</stored-value>
             </pair>
             <pair>
-                <displayed-value>items</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.items</displayed-value>
                 <stored-value>items</stored-value>
             </pair>
             <pair>
-                <displayed-value>seconds</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.seconds</displayed-value>
                 <stored-value>seconds</stored-value>
             </pair>
             <pair>
-                <displayed-value>elements</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.elements</displayed-value>
                 <stored-value>elements</stored-value>
             </pair>
             <pair>
-                <displayed-value>units</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.units</displayed-value>
                 <stored-value>units</stored-value>
             </pair>
             <pair>
-                <displayed-value>minutes</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.minutes</displayed-value>
                 <stored-value>minutes</stored-value>
             </pair>
             <pair>
-                <displayed-value>hours</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.hours</displayed-value>
                 <stored-value>hours</stored-value>
             </pair>
             <pair>
-                <displayed-value>texts</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.texts</displayed-value>
                 <stored-value>texts</stored-value>
             </pair>
             <pair>
-                <displayed-value>sentences</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.sentences</displayed-value>
                 <stored-value>sentences</stored-value>
             </pair>
             <pair>
-                <displayed-value>pages</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.pages</displayed-value>
                 <stored-value>pages</stored-value>
             </pair>
             <pair>
-                <displayed-value>bytes</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.bytes</displayed-value>
                 <stored-value>bytes</stored-value>
             </pair>
             <pair>
-                <displayed-value>tokens</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.tokens</displayed-value>
                 <stored-value>tokens</stored-value>
             </pair>
             <pair>
-                <displayed-value>words</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.words</displayed-value>
                 <stored-value>words</stored-value>
             </pair>
             <pair>
-                <displayed-value>keywords</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.keywords</displayed-value>
                 <stored-value>keywords</stored-value>
             </pair>
             <pair>
-                <displayed-value>idiomaticExpressions</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.idiomaticExpressions</displayed-value>
                 <stored-value>idiomaticExpressions</stored-value>
             </pair>
             <pair>
-                <displayed-value>neologisms</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.neologisms</displayed-value>
                 <stored-value>neologisms</stored-value>
             </pair>
             <pair>
-                <displayed-value>multiWordUnits</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.multiWordUnits</displayed-value>
                 <stored-value>multiWordUnits</stored-value>
             </pair>
             <pair>
-                <displayed-value>expressions</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.expressions</displayed-value>
                 <stored-value>expressions</stored-value>
             </pair>
             <pair>
-                <displayed-value>synsets</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.synsets</displayed-value>
                 <stored-value>synsets</stored-value>
             </pair>
             <pair>
-                <displayed-value>classes</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.classes</displayed-value>
                 <stored-value>classes</stored-value>
             </pair>
             <pair>
-                <displayed-value>concepts</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.concepts</displayed-value>
                 <stored-value>concepts</stored-value>
             </pair>
             <pair>
-                <displayed-value>lexicalTypes</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.lexicalTypes</displayed-value>
                 <stored-value>lexicalTypes</stored-value>
             </pair>
             <pair>
-                <displayed-value>phoneticUnits</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.phoneticUnits</displayed-value>
                 <stored-value>phoneticUnits</stored-value>
             </pair>
             <pair>
-                <displayed-value>syntacticUnits</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.syntacticUnits</displayed-value>
                 <stored-value>syntacticUnits</stored-value>
             </pair>
             <pair>
-                <displayed-value>semanticUnits</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.semanticUnits</displayed-value>
                 <stored-value>semanticUnits</stored-value>
             </pair>
             <pair>
-                <displayed-value>predicates</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.predicates</displayed-value>
                 <stored-value>predicates</stored-value>
             </pair>
             <pair>
-                <displayed-value>phonemes</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.phonemes</displayed-value>
                 <stored-value>phonemes</stored-value>
             </pair>
             <pair>
-                <displayed-value>diphones</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.diphones</displayed-value>
                 <stored-value>diphones</stored-value>
             </pair>
             <pair>
-                <displayed-value>T-HPairs</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.T-HPairs</displayed-value>
                 <stored-value>T-HPairs</stored-value>
             </pair>
             <pair>
-                <displayed-value>syllables</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.syllables</displayed-value>
                 <stored-value>syllables</stored-value>
             </pair>
             <pair>
-                <displayed-value>frames</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.frames</displayed-value>
                 <stored-value>frames</stored-value>
             </pair>
             <pair>
-                <displayed-value>images</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.images</displayed-value>
                 <stored-value>images</stored-value>
             </pair>
             <pair>
-                <displayed-value>kb</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.kb</displayed-value>
                 <stored-value>kb</stored-value>
             </pair>
             <pair>
-                <displayed-value>mb</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.mb</displayed-value>
                 <stored-value>mb</stored-value>
             </pair>
             <pair>
-                <displayed-value>gb</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.gb</displayed-value>
                 <stored-value>gb</stored-value>
             </pair>
             <pair>
-                <displayed-value>rb</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.rb</displayed-value>
                 <stored-value>rb</stored-value>
             </pair>
             <pair>
-                <displayed-value>shots</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.shots</displayed-value>
                 <stored-value>shots</stored-value>
             </pair>
             <pair>
-                <displayed-value>unigrams</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.unigrams</displayed-value>
                 <stored-value>unigrams</stored-value>
             </pair>
             <pair>
-                <displayed-value>bigrams</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.bigrams</displayed-value>
                 <stored-value>bigrams</stored-value>
             </pair>
             <pair>
-                <displayed-value>trigrams</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.trigrams</displayed-value>
                 <stored-value>trigrams</stored-value>
             </pair>
             <pair>
-                <displayed-value>4-grams</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.4-grams</displayed-value>
                 <stored-value>4-grams</stored-value>
             </pair>
             <pair>
-                <displayed-value>5-grams</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.5-grams</displayed-value>
                 <stored-value>5-grams</stored-value>
             </pair>
             <pair>
-                <displayed-value>n-grams</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.n-grams</displayed-value>
                 <stored-value>n-grams</stored-value>
             </pair>
             <pair>
-                <displayed-value>rules</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.rules</displayed-value>
                 <stored-value>rules</stored-value>
             </pair>
             <pair>
-                <displayed-value>other</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_sizeunit.other</displayed-value>
                 <stored-value>other</stored-value>
             </pair>
         </value-pairs>
 
-        <value-pairs value-pairs-name="metashare_languageDependent"
-                     dc-term="">
+        <value-pairs value-pairs-name="metashare_languageDependent" dc-term="">
             <pair>
-                <displayed-value>Yes</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_languageDependent.true</displayed-value>
                 <stored-value>true</stored-value>
             </pair>
             <pair>
-                <displayed-value>No</displayed-value>
+                <displayed-value>input_forms.value_pairs.metashare_languageDependent.false</displayed-value>
                 <stored-value>false</stored-value>
             </pair>
         </value-pairs>
-        <value-pairs value-pairs-name="hidden_list"
-                     dc-term="">
+        <value-pairs value-pairs-name="hidden_list" dc-term="">
             <pair>
-                <displayed-value>Yes</displayed-value>
+                <displayed-value>input_forms.value_pairs.hidden_list.hidden</displayed-value>
                 <stored-value>hidden</stored-value>
             </pair>
             <pair>
-                <displayed-value>No</displayed-value>
+                <displayed-value>input_forms.value_pairs.hidden_list.false</displayed-value>
                 <stored-value>false</stored-value>
             </pair>
         </value-pairs>
@@ -1015,43 +968,26 @@
     <form-complex-definitions>
         <!-- currently only text and dropbox -->
         <definition name="contact_person">
-            <input name="1_givenname" type="text" label="Contact person's given name" required="true" />
-            <input name="2_surname" type="text" label="Contact person's surname" help="Family name" required="true"/>
-            <input name="3_email" type="text" label="Contact person's email" regexp="[^@]+@[^\.@]+\.[^@]+" required="true"/>
-            <input name="4_affiliation" type="text" label="Contact person's institution name"
-                   autocomplete="solr-publisher_ac" required="true"/>
+            <input name="1_givenname" type="text" label="input_forms.complex_definitions.contact_person.1_givenname" required="true"/>
+            <input name="2_surname" type="text" label="input_forms.complex_definitions.contact_person.2_surname" help="input_forms.complex_definitions.contact_person.2_surname" required="true"/>
+            <input name="3_email" type="text" label="input_forms.complex_definitions.contact_person.3_email" regexp="[^@]+@[^\.@]+\.[^@]+" required="true"/>
+            <input name="4_affiliation" type="text" label="input_forms.complex_definitions.contact_person.4_affiliation" autocomplete="solr-publisher_ac" required="true"/>
 
-            <input name="4_affiliation" type="text" label="Contact person's institution name"
-                   autocomplete="solr-publisher_ac" required="true"/>
+            <input name="4_affiliation" type="text" label="input_forms.complex_definitions.contact_person.4_affiliation" autocomplete="solr-publisher_ac" required="true"/>
 
         </definition>
 
         <definition name="funding">
-            <input name="4_type" type="dropdown" label="Funding type" pairs="metashare_funding"
-                   class="openaire-type-map" required="true" />
-            <input name="2_code"
-                   placeholder="Start typing the name/number of the grant..."
-                   type="text"
-                   label="Grant no. or funding project code"
-                   class="openaire-code-autocomplete"
-                   autocomplete="solr-local.sponsor_ac"
-                    required="true" />
-            <input name="1_orgname" type="text" label="Funding organization" required="true" />
-            <input name="3_projname" type="text" label="Funding project name" autocomplete="solr-local.sponsor_ac" required="true" />
-            <input name="5_openaire_id"
-                   value=""
-                   type="text"
-                   readonly="true"
-                   label="EU Project Identifier (OpenAIRE)"
-                   placeholder="Filled out automatically..."
-                   mapped-to-if-not-default="dc.relation"
-                   class="openaire-id"
-                    />
+            <input name="4_type" type="dropdown" label="input_forms.complex_definitions.funding.4_type" pairs="metashare_funding" class="openaire-type-map" required="true"/>
+            <input name="2_code" placeholder="Start typing the name/number of the grant..." type="text" label="input_forms.complex_definitions.funding.2_code" class="openaire-code-autocomplete" autocomplete="solr-local.sponsor_ac" required="true"/>
+            <input name="1_orgname" type="text" label="input_forms.complex_definitions.funding.1_orgname" required="true"/>
+            <input name="3_projname" type="text" label="input_forms.complex_definitions.funding.3_projname" autocomplete="solr-local.sponsor_ac" required="true"/>
+            <input name="5_openaire_id" value="" type="text" readonly="true" label="input_forms.complex_definitions.funding.5_openaire_id" placeholder="Filled out automatically..." mapped-to-if-not-default="dc.relation" class="openaire-id"/>
         </definition>
 
         <definition name="sizeInfo">
             <input name="1_size" type="text" regexp="\d+.?\d*" required="true"/>
-            <input name="2_unit" type="dropdown" pairs="metashare_sizeunit" label="Unit" required="true"/>
+            <input name="2_unit" type="dropdown" pairs="metashare_sizeunit" label="input_forms.complex_definitions.sizeInfo.2_unit" required="true"/>
         </definition>
     </form-complex-definitions>
 
