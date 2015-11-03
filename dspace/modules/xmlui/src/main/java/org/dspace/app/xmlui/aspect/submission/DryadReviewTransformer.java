@@ -24,6 +24,7 @@ import org.dspace.utils.DSpace;
 import org.dspace.workflow.DryadWorkflowUtils;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowRequirementsManager;
+import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -52,11 +53,13 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
     protected static final Message T_workflow_title = message("xmlui.Submission.general.workflow.title");
     private static final Message T_head_has_part = message("xmlui.ArtifactBrowser.ItemViewer.head_hasPart");
     private static final Message T_in_workflow = message("xmlui.DryadItemSummary.in_workflow");
+    private static final Message T_not_in_review = message("xmlui.DryadItemSummary.not_in_review");
 
 
     private WorkflowItem wfItem;
     private boolean authorized;
     private boolean currentlyInReview;
+    private String requestDoi;
     List<Item> dataFiles = new ArrayList<Item>();
 
     @Override
@@ -71,18 +74,19 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
         // 1. wfID + token
         // 2. provisional DOI (since it is not yet public)
 
-        String requestDoi = request.getParameter("doi");
+        requestDoi = request.getParameter("doi");
         if(requestDoi != null) {
+            authorized = true;
             loadWFItemByDOI(requestDoi);
             if(wfItem == null) {
                 // Not found
                 return;
             }
             // DOI was found. Set authorized true and the reviewerToken for downloads
-            authorized = true;
             String reviewerKey = getItemToken();
             request.getSession().setAttribute("reviewerToken", reviewerKey);
         } else {
+            requestDoi = "";
             // DOI not present, require token
             String token = request.getParameter("token");
             if (token != null) {
@@ -152,62 +156,67 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
             throw new AuthorizeException("You are not authorized to review the submission");
         }
         if (!currentlyInReview) {
-            throw new AuthorizeException("The submission is not currently in review");
-        }
-        Request request = ObjectModelHelper.getRequest(objectModel);
-
-        Division div = body.addInteractiveDivision("main-div", contextPath + "/review", Division.METHOD_POST, "");
-
-        // Adding message for withdrawn or workflow item
-        addWarningMessage(wfItem.getItem(), div);
-
-        //Add an overview of the item in question
-        String showfull = request.getParameter("submit_full_item_info");
-
-        // if the user selected showsimple, remove showfull.
-        if (showfull != null && request.getParameter("submit_simple_item_info") != null)
-            showfull = null;
-
-
-        DCValue[] vals = wfItem.getItem().getMetadata("dc.title");
-        ReferenceSet referenceSet = null;
-
-        if (showfull == null) {
-            referenceSet = div.addReferenceSet("narf", ReferenceSet.TYPE_SUMMARY_VIEW);
-            if (vals != null && vals[0] != null)
-                referenceSet.setHead(vals[0].value);
-            else
-                referenceSet.setHead(T_workflow_head);
-            div.addPara().addButton("submit_full_item_info").setValue(T_showfull);
+            Division div = body.addDivision("not_in_review");
+            Para p = div.addPara();
+            p.addContent(T_not_in_review);
+            requestDoi = requestDoi.replace("doi:","");
+            String archivedURL = ConfigurationManager.getProperty("doi.hostname") + "/" + requestDoi;
+            p.addXref(archivedURL,archivedURL);
         } else {
-            referenceSet = div.addReferenceSet("narf", ReferenceSet.TYPE_DETAIL_VIEW);
-            if (vals != null && vals[0] != null)
-                referenceSet.setHead(vals[0].value);
-            else
-                referenceSet.setHead(T_workflow_head);
-            div.addPara().addButton("submit_simple_item_info").setValue(T_showsimple);
+            Request request = ObjectModelHelper.getRequest(objectModel);
 
-            div.addHidden("submit_full_item_info").setValue("true");
-        }
+            Division div = body.addInteractiveDivision("main-div", contextPath + "/review", Division.METHOD_POST, "");
+
+            // Adding message for withdrawn or workflow item
+            addWarningMessage(wfItem.getItem(), div);
+
+            //Add an overview of the item in question
+            String showfull = request.getParameter("submit_full_item_info");
+
+            // if the user selected showsimple, remove showfull.
+            if (showfull != null && request.getParameter("submit_simple_item_info") != null)
+                showfull = null;
 
 
+            DCValue[] vals = wfItem.getItem().getMetadata("dc.title");
+            ReferenceSet referenceSet = null;
 
-        // adding the dataFile
-        org.dspace.app.xmlui.wing.element.Reference itemRef = referenceSet.addReference(wfItem.getItem());
-        if (wfItem.getItem().getMetadata("dc.relation.haspart").length > 0) {
-            ReferenceSet hasParts;
-            hasParts = itemRef.addReferenceSet("embeddedView", null, "hasPart");
-            hasParts.setHead(T_head_has_part);
+            if (showfull == null) {
+                referenceSet = div.addReferenceSet("narf", ReferenceSet.TYPE_SUMMARY_VIEW);
+                if (vals != null && vals[0] != null)
+                    referenceSet.setHead(vals[0].value);
+                else
+                    referenceSet.setHead(T_workflow_head);
+                div.addPara().addButton("submit_full_item_info").setValue(T_showfull);
+            } else {
+                referenceSet = div.addReferenceSet("narf", ReferenceSet.TYPE_DETAIL_VIEW);
+                if (vals != null && vals[0] != null)
+                    referenceSet.setHead(vals[0].value);
+                else
+                    referenceSet.setHead(T_workflow_head);
+                div.addPara().addButton("submit_simple_item_info").setValue(T_showsimple);
 
-            if (dataFiles.size() == 0) retrieveDataFiles(wfItem.getItem());
-
-            for (Item obj : dataFiles) {
-                hasParts.addReference(obj);
+                div.addHidden("submit_full_item_info").setValue("true");
             }
-        }
 
-        div.addHidden("token").setValue(request.getParameter("token"));
-        div.addHidden("wfID").setValue(String.valueOf(wfItem.getID()));
+
+            // adding the dataFile
+            org.dspace.app.xmlui.wing.element.Reference itemRef = referenceSet.addReference(wfItem.getItem());
+            if (wfItem.getItem().getMetadata("dc.relation.haspart").length > 0) {
+                ReferenceSet hasParts;
+                hasParts = itemRef.addReferenceSet("embeddedView", null, "hasPart");
+                hasParts.setHead(T_head_has_part);
+
+                if (dataFiles.size() == 0) retrieveDataFiles(wfItem.getItem());
+
+                for (Item obj : dataFiles) {
+                    hasParts.addReference(obj);
+                }
+            }
+
+            div.addHidden("token").setValue(request.getParameter("token"));
+            div.addHidden("wfID").setValue(String.valueOf(wfItem.getID()));
+        }
     }
 
     private void loadWFItemByDOI(String doi) throws IOException {
