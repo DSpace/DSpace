@@ -84,6 +84,9 @@
   <filter-mapping>
     <filter-name>admin-only</filter-name>
     <url-pattern>/dspace-admin/*</url-pattern>
+    <!-- Ensure this filter is triggered both for client requests and for internal forwards/redirects -->
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
   </filter-mapping>
 
   <filter-mapping>
