@@ -151,7 +151,6 @@ public class DryadEmailSubmission extends HttpServlet {
                     } catch (Exception details) {
                         DryadGmailService.addErrorLabelForMessageWithId(mID);
                         LOGGER.info("Exception thrown while processing message " + mID + ": " + details.getMessage() + ", " + details.getClass().getName() + details.getStackTrace().toString());
-//                        throw new RuntimeException(details);
                     }
                     DryadGmailService.removeJournalLabelForMessageWithId(mID);
                 }
@@ -398,10 +397,65 @@ public class DryadEmailSubmission extends HttpServlet {
             if ((manuscript != null) && (JournalUtils.manuscriptIsValid(context, manuscript))) {
                 // edit the manuscript ID to the canonical one:
                 manuscript.manuscriptId = JournalUtils.getCanonicalManuscriptID(context, manuscript);
-
                 JournalUtils.writeManuscriptToDB(context, manuscript);
+                LOGGER.debug ("this ms has status " + manuscript.status);
+                Boolean approved = null;
 
-                JournalUtils.writeManuscriptToXMLFile(context, manuscript);
+                if (manuscript.status.equals(Manuscript.STATUS_ACCEPTED)) {
+                    approved = true;
+                } else if (manuscript.status.equals(Manuscript.STATUS_REJECTED)) {
+                    approved = false;
+                } else if (manuscript.status.equals(Manuscript.STATUS_NEEDS_REVISION)) {
+                    approved = false;
+                } else if (manuscript.status.equals(Manuscript.STATUS_PUBLISHED)) {
+                    approved = true;
+                }
+
+                if (approved != null) {
+                    try {
+                        DSpaceKernelImpl kernelImpl = null;
+                        try {
+                            kernelImpl = DSpaceKernelInit.getKernel(null);
+                            if (!kernelImpl.isRunning())
+                            {
+                                kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
+                            }
+                        } catch (Exception ex) {
+                            // Failed to start so destroy it and log and throw an exception
+                            try {
+                                if(kernelImpl != null) {
+                                    kernelImpl.destroy();
+                                }
+                            } catch (Exception e1) {
+                                // Nothing to do
+                            }
+                            LOGGER.error("Error Initializing DSpace kernel in ManuscriptReviewStatusChangeHandler", ex);
+                        }
+
+                        if (manuscript.dryadDataDOI != null) {
+                            LOGGER.debug("running ApproveRejectReview ("+approved + ", " + manuscript.dryadDataDOI + ")");
+                            ApproveRejectReviewItem.reviewItemDOI(approved, manuscript.dryadDataDOI);
+                        } else if (manuscript.manuscriptId != null) {
+                            LOGGER.debug("running ApproveRejectReview Item (" + approved + ", " + manuscript.manuscriptId + ")");
+                            ApproveRejectReviewItem.reviewItem(approved, manuscript.manuscriptId);
+                        }
+                    } catch (ApproveRejectReviewItemException e) {
+                        // we need to compare manuscript's authors with workflow items from the same journal.
+                        WorkflowItem[] workflowItems = findMatchingWorkflowItems(context, manuscript);
+                        for (int i=0; i<workflowItems.length; i++) {
+                            ApproveRejectReviewItem.reviewItem(approved, workflowItems[i].getID());
+                        }
+                        // somehow we need to note that this item did not find a match
+                        LOGGER.debug("need to look for ms in workflow");
+                        // we need to compare manuscript's authors with workflow items from the same journal.
+                        WorkflowItem[] workflowItems = WorkflowItem.findAllByJournalName(context, journalName);
+                        String itemlist = "";
+                        for (int i=0;i<workflowItems.length;i++) {
+                            itemlist = itemlist + workflowItems[i].getID() + " ";
+                        }
+                        throw new ApproveRejectReviewItemException("Found items for " + journalName + ": " + itemlist);
+                    }
+                }
             } else {
                 throw new SubmissionException("Parser could not validly parse the message");
             }
