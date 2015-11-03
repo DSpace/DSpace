@@ -446,14 +446,6 @@ public class DryadEmailSubmission extends HttpServlet {
                             ApproveRejectReviewItem.reviewItem(approved, workflowItems[i].getID());
                         }
                         // somehow we need to note that this item did not find a match
-                        LOGGER.debug("need to look for ms in workflow");
-                        // we need to compare manuscript's authors with workflow items from the same journal.
-                        WorkflowItem[] workflowItems = WorkflowItem.findAllByJournalName(context, journalName);
-                        String itemlist = "";
-                        for (int i=0;i<workflowItems.length;i++) {
-                            itemlist = itemlist + workflowItems[i].getID() + " ";
-                        }
-                        throw new ApproveRejectReviewItemException("Found items for " + journalName + ": " + itemlist);
                     }
                 }
             } else {
