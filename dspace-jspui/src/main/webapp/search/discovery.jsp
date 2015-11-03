@@ -34,6 +34,7 @@
   --%>
 
 <%@page import="org.dspace.core.Utils"%>
+<%@page import="com.coverity.security.Escape"%>
 <%@page import="org.dspace.discovery.configuration.DiscoverySearchFilterFacet"%>
 <%@page import="org.dspace.app.webui.util.UIUtil"%>
 <%@page import="java.util.HashMap"%>
@@ -213,7 +214,7 @@
 				<%
 					for (DiscoverySearchFilter searchFilter : availableFilters)
 					{
-					    String fkey = "jsp.search.filter."+searchFilter.getIndexFieldName();
+					    String fkey = "jsp.search.filter." + Escape.uriParam(searchFilter.getIndexFieldName());
 					    %><option value="<%= Utils.addEntities(searchFilter.getIndexFieldName()) %>"<% 
 					            if (filter[0].equals(searchFilter.getIndexFieldName()))
 					            {
@@ -224,7 +225,7 @@
 					}
 					if (!found)
 					{
-					    String fkey = "jsp.search.filter."+filter[0];
+					    String fkey = "jsp.search.filter." + Escape.uriParam(filter[0]);
 					    %><option value="<%= Utils.addEntities(filter[0]) %>" selected="selected"><fmt:message key="<%= fkey %>"/></option><%
 					}
 				%>
@@ -233,7 +234,7 @@
 				<%
 					for (String opt : options)
 					{
-					    String fkey = "jsp.search.filter.op."+opt;
+					    String fkey = "jsp.search.filter.op." + Escape.uriParam(opt);
 					    %><option value="<%= Utils.addEntities(opt) %>"<%= opt.equals(filter[1])?" selected=\"selected\"":"" %>><fmt:message key="<%= fkey %>"/></option><%
 					}
 				%>
@@ -274,7 +275,7 @@
 		<%
 			for (DiscoverySearchFilter searchFilter : availableFilters)
 			{
-			    String fkey = "jsp.search.filter."+searchFilter.getIndexFieldName();
+			    String fkey = "jsp.search.filter." + Escape.uriParam(searchFilter.getIndexFieldName());
 			    %><option value="<%= Utils.addEntities(searchFilter.getIndexFieldName()) %>"><fmt:message key="<%= fkey %>"/></option><%
 			}
 		%>
@@ -283,7 +284,7 @@
 		<%
 			for (String opt : options)
 			{
-			    String fkey = "jsp.search.filter.op."+opt;
+			    String fkey = "jsp.search.filter.op." + Escape.uriParam(opt);
 			    %><option value="<%= Utils.addEntities(opt) %>"><fmt:message key="<%= fkey %>"/></option><%
 			}
 		%>
@@ -338,7 +339,7 @@
                for (String sortBy : sortOptions)
                {
                    String selected = (sortBy.equals(sortedBy) ? "selected=\"selected\"" : "");
-                   String mKey = "search.sort-by." + sortBy;
+                   String mKey = "search.sort-by." + Utils.addEntities(sortBy);
                    %> <option value="<%= Utils.addEntities(sortBy) %>" <%= selected %>><fmt:message key="<%= mKey %>"/></option><%
                }
 %>
