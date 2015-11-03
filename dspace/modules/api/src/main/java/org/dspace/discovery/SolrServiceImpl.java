@@ -969,7 +969,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         }
 
         if (field.equals("dc.contributor.author") && (meta.authority != null)) {
-            Pattern orcidPat = Pattern.compile("\\d{4}-\\d{4}-\\d{4}-\\d{4}");
+            Pattern orcidPat = Pattern.compile("\\d{4}-\\d{4}-\\d{4}-\\d{3}[0-9X]");
             log.debug("orcidPat is " + orcidPat.toString());
             Matcher m = orcidPat.matcher(meta.authority);
             if (m.find()) {

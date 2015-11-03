@@ -92,13 +92,10 @@ public class OdinsHamr extends AbstractCurationTask {
     public int perform(DSpaceObject dso) throws IOException {
         log.info("performing ODIN's Hamr task " + total++);
 
-        String handle = "\"[no handle found]\"";
-        String itemDOI = "\"[no item DOI found]\"";
-        String articleDOI = "";
-
         try {
             context = new Context();
-            } catch (SQLException e) {
+            context.turnOffAuthorisationSystem();
+        } catch (SQLException e) {
             log.fatal("Unable to open database connection", e);
             return Curator.CURATE_FAIL;
         }
@@ -107,130 +104,143 @@ public class OdinsHamr extends AbstractCurationTask {
             // output headers for the CSV file that will be created by processing all items in this collection
             report("itemDOI, articleDOI, orcidID, orcidName, dspaceORCID, dspaceName");
         } else if (dso.getType() == Constants.ITEM) {
-            Item item = (Item)dso;
+            Item item = (Item) dso;
+            String handle = item.getHandle();
+            log.info("handle = " + handle);
 
-            try {
-                handle = item.getHandle();
-                log.info("handle = " + handle);
-
-                if (handle == null) {
-                    // this item is still in workflow - no handle assigned
-                    context.abort();
-                    return Curator.CURATE_SKIP;
-                }
-
-                // item DOI
-                DCValue[] vals = item.getMetadata("dc.identifier");
-                if (vals.length == 0) {
-                    setResult("Object has no dc.identifier available " + handle);
-                    log.error("Skipping -- no dc.identifier available for " + handle);
-                    context.abort();
-                    return Curator.CURATE_SKIP;
-                } else {
-                    for(int i = 0; i < vals.length; i++) {
-                        if (vals[i].value.startsWith("doi:")) {
-                            itemDOI = vals[i].value;
-                        }
-                    }
-                }
-                log.debug("itemDOI = " + itemDOI);
-
-                // article DOI
-                vals = item.getMetadata("dc.relation.isreferencedby");
-                if (vals.length == 0) {
-                    log.debug("Object has no articleDOI (dc.relation.isreferencedby) " + handle);
-                    articleDOI = "";
-                } else {
-                    articleDOI = vals[0].value;
-                }
-                    log.debug("articleDOI = " + articleDOI);
-
-
-                // DSpace names
-                List<DCValue> dspaceBios = new ArrayList<DCValue>();
-                vals = item.getMetadata("dc.contributor.author");
-                if (vals.length == 0) {
-                    log.error("Object has no dc.contributor.author available in DSpace" + handle);
-                } else {
-                    for(int i = 0; i < vals.length; i++) {
-                        dspaceBios.add(vals[i]);
-                    }
-                }
-
-                // ORCID names
-                List<Bio> orcidBios = retrieveOrcids(itemDOI);
-
-                if(articleDOI != null && articleDOI.length() > 0) {
-                    List<Bio> articleBios = retrieveOrcids(articleDOI);
-                    for(Bio bio : articleBios) {
-                        if(!containsName(orcidBios, bio)) {
-                            orcidBios.add(bio);
-                        }
-                    }
-                }
-
-                // reconcile names between DSpace and ORCID
-                HashMap<DCValue,Bio> mappedNames = doHamrMatch(dspaceBios, orcidBios);
-
-                // output the resultant mappings
-                Iterator dspaceBiosIterator = dspaceBios.iterator();
-
-                List<DCValue> authors = new ArrayList<DCValue>();
-
-                while(dspaceBiosIterator.hasNext()) {
-                    DCValue dspaceBio = (DCValue) dspaceBiosIterator.next();
-                    DCValue authorMetadata = dspaceBio.copy();
-                    authors.add(authorMetadata);
-
-                    // if there was a hamr match, update this particular author with Orcid as authority.
-                    if (mappedNames.containsKey(dspaceBio)) {
-                        Bio mappedOrcidEntry = (Bio)mappedNames.get(dspaceBio);
-                        Bio mappedDSpaceEntry = createBio("", dspaceBio.value);
-                        double hamrScore = hamrScore(mappedDSpaceEntry,mappedOrcidEntry);
-                        report(itemDOI + ", " + articleDOI + ", " + mappedOrcidEntry.getOrcid() + ", \"" + getName(mappedOrcidEntry) + "\", " +
-                                mappedDSpaceEntry.getOrcid() + ", \"" + getName(mappedDSpaceEntry) + "\", " + hamrScore);
-
-                        // if hamrScore is greater or = to 0.7, then add this to new metadata:
-
-                        if (hamrScore(mappedDSpaceEntry,mappedOrcidEntry) >= 0.7) {
-                            authorMetadata.authority = AuthorityValueGenerator.GENERATE + "orcid" + AuthorityValueGenerator.SPLIT + mappedOrcidEntry.getOrcid();
-                            authorMetadata.confidence = Choices.CF_UNCERTAIN;
-                            item.addMetadata("dc", "description", "provenance", null, "ORCID authority added to " + getName(mappedDSpaceEntry) + " with a confidence of CF_UNCERTAIN: OdinsHamr match score " + hamrScore + " on " + DCDate.getCurrent().toString() + " (GMT)");
-                        }
-                        setResult("Last processed item = " + handle + " -- " + itemDOI);
-                    }
-                }
-
-                item.clearMetadata("dc","contributor","author",null);
-                for (DCValue auth : authors) {
-                    item.addMetadata("dc", "contributor", "author", null, auth.value, auth.authority, auth.confidence);
-                }
-                item.update();
-                log.info(handle + " done.");
-            } catch (Exception e) {
-                log.fatal("Skipping -- Exception in processing " + handle, e);
-                setResult("Object has a fatal error: " + handle + "\n" + e.getMessage());
-                report("Object has a fatal error: " + handle + "\n" + e.getMessage());
-
+            if (handle == null) {
+                // this item is still in workflow - no handle assigned
                 context.abort();
                 return Curator.CURATE_SKIP;
             }
-        } else {
-            log.info("Skipping -- non-item DSpace object");
-            setResult("Object skipped (not an item)");
-            context.abort();
-            return Curator.CURATE_SKIP;
+            // article DOI
+            String articleDOI = "";
+            DCValue[] vals = item.getMetadata("dc.relation.isreferencedby");
+            if (vals.length == 0) {
+                log.debug("Object has no articleDOI (dc.relation.isreferencedby) " + handle);
+                articleDOI = "";
+            } else {
+                articleDOI = vals[0].value;
+            }
+            log.debug("articleDOI = " + articleDOI);
+
+            int result = compareItemToORCID(item, articleDOI);
+            if (result != Curator.CURATE_SUCCESS) {
+                return result;
             }
 
-        try {
-            context.complete();
+            // process this item's files too
+            try {
+                Item[] files = DryadWorkflowUtils.getDataFiles(context, item);
+                for (int i = 0; i < files.length; i++) {
+                    result = compareItemToORCID(files[i], articleDOI);
+                }
             } catch (SQLException e) {
-            log.fatal("Unable to close database connection", e);
-        }
+                log.error("database error on files for package " + handle, e);
+            }
 
+            try {
+                context.restoreAuthSystemState();
+                context.complete();
+            } catch (SQLException e) {
+                log.fatal("Unable to close database connection", e);
+            }
+        }
         log.info("ODIN's Hamr complete");
         return Curator.CURATE_SUCCESS;
-	}
+    }
+
+    private int compareItemToORCID(Item item, String articleDOI) {
+        String handle = item.getHandle();
+        String itemDOI = "\"[no item DOI found]\"";
+        try {
+            // item DOI
+            DCValue[] vals = item.getMetadata("dc.identifier");
+            if (vals.length == 0) {
+                setResult("Object has no dc.identifier available " + handle);
+                log.error("Skipping -- no dc.identifier available for " + handle);
+                context.abort();
+                return Curator.CURATE_SKIP;
+            } else {
+                for(int i = 0; i < vals.length; i++) {
+                    if (vals[i].value.startsWith("doi:")) {
+                        itemDOI = vals[i].value;
+                    }
+                }
+            }
+            log.debug("itemDOI = " + itemDOI);
+
+            // DSpace names
+            List<DCValue> dspaceBios = new ArrayList<DCValue>();
+            vals = item.getMetadata("dc.contributor.author");
+            if (vals.length == 0) {
+                log.error("Object has no dc.contributor.author available in DSpace" + handle);
+            } else {
+                for(int i = 0; i < vals.length; i++) {
+                    dspaceBios.add(vals[i]);
+                }
+            }
+
+            // ORCID names
+            List<Bio> orcidBios = retrieveOrcids(itemDOI);
+
+            if(articleDOI != null && articleDOI.length() > 0) {
+                List<Bio> articleBios = retrieveOrcids(articleDOI);
+                for(Bio bio : articleBios) {
+                    if(!containsName(orcidBios, bio)) {
+                        orcidBios.add(bio);
+                    }
+                }
+            }
+
+            // reconcile names between DSpace and ORCID
+            HashMap<DCValue,Bio> mappedNames = doHamrMatch(dspaceBios, orcidBios);
+
+            // output the resultant mappings
+            Iterator dspaceBiosIterator = dspaceBios.iterator();
+
+            List<DCValue> authors = new ArrayList<DCValue>();
+
+            while(dspaceBiosIterator.hasNext()) {
+                DCValue dspaceBio = (DCValue) dspaceBiosIterator.next();
+                DCValue authorMetadata = dspaceBio.copy();
+                authors.add(authorMetadata);
+
+                // if there was a hamr match, update this particular author with Orcid as authority.
+                if (mappedNames.containsKey(dspaceBio)) {
+                    Bio mappedOrcidEntry = (Bio)mappedNames.get(dspaceBio);
+                    Bio mappedDSpaceEntry = createBio("", dspaceBio.value);
+                    double hamrScore = hamrScore(mappedDSpaceEntry,mappedOrcidEntry);
+                    report(itemDOI + ", " + articleDOI + ", " + mappedOrcidEntry.getOrcid() + ", \"" + getName(mappedOrcidEntry) + "\", " +
+                            mappedDSpaceEntry.getOrcid() + ", \"" + getName(mappedDSpaceEntry) + "\", " + hamrScore);
+
+                    // if hamrScore is greater or = to 0.7, then add this to new metadata:
+
+                    if (hamrScore(mappedDSpaceEntry,mappedOrcidEntry) >= 0.7) {
+                        authorMetadata.authority = AuthorityValueGenerator.GENERATE + "orcid" + AuthorityValueGenerator.SPLIT + mappedOrcidEntry.getOrcid();
+                        authorMetadata.confidence = Choices.CF_UNCERTAIN;
+                        item.addMetadata("dc", "description", "provenance", null, "ORCID authority added to " + getName(mappedDSpaceEntry) + " with a confidence of CF_UNCERTAIN: OdinsHamr match score " + hamrScore + " on " + DCDate.getCurrent().toString() + " (GMT)");
+                    }
+                    setResult("Last processed item = " + handle + " -- " + itemDOI);
+                }
+            }
+
+            item.clearMetadata("dc","contributor","author",null);
+            for (DCValue auth : authors) {
+                item.addMetadata("dc", "contributor", "author", null, auth.value, auth.authority, auth.confidence);
+            }
+            item.update();
+            log.info(handle + " done.");
+        } catch (Exception e) {
+            log.fatal("Skipping -- Exception in processing " + handle, e);
+            setResult("Object has a fatal error: " + handle + "\n" + e.getMessage());
+            report("Object has a fatal error: " + handle + "\n" + e.getMessage());
+
+            context.abort();
+            return Curator.CURATE_SKIP;
+        }
+        return Curator.CURATE_SUCCESS;
+    }
 
 
     /**

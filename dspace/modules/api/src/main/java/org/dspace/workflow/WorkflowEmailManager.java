@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.mail.MessagingException;
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
@@ -113,17 +115,24 @@ public class WorkflowEmailManager {
             }else{
                 email.addArgument("");
             }
-            String manuScriptIdentifier = "";
-            DCValue[] manuScripIdentifiers = i.getMetadata(MetadataSchema.DC_SCHEMA, "identifier", "manuscriptNumber", Item.ANY);
-            if(0 < manuScripIdentifiers.length){
-                manuScriptIdentifier = manuScripIdentifiers[0].value;
+            String manuscriptIdentifier = "";
+            DCValue[] manuscriptIdentifiers = i.getMetadata(MetadataSchema.DC_SCHEMA, "identifier", "manuscriptNumber", Item.ANY);
+            if(0 < manuscriptIdentifiers.length){
+                manuscriptIdentifier = manuscriptIdentifiers[0].value;
             }
 
-	    if(manuScriptIdentifier.length() == 0) {
-		manuScriptIdentifier = "none available";
-	    }
+            if(manuscriptIdentifier.length() == 0) {
+                manuscriptIdentifier = "none available";
+            }
+            email.addArgument(manuscriptIdentifier);
 
-            email.addArgument(manuScriptIdentifier);
+            // add a DOI URL as well:
+            String doi_url = "";
+            Matcher doimatcher = Pattern.compile("doi:(.+)").matcher(datapackageDoi);
+            if (doimatcher.find()) {
+                doi_url = "http://dx.doi.org/" + doimatcher.group(1);
+            }
+            email.addArgument(doi_url);
 
             email.send();
         }
