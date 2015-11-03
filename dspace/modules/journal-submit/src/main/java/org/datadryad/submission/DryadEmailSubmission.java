@@ -4,6 +4,8 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.datadryad.rest.models.Manuscript;
+import org.datadryad.rest.models.Author;
+import org.datadryad.rest.models.AuthorsList;
 import org.dspace.JournalUtils;
 import org.dspace.content.authority.Concept;
 import org.dspace.core.ConfigurationManager;
@@ -12,6 +14,11 @@ import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.workflow.ApproveRejectReviewItem;
 import org.dspace.workflow.ApproveRejectReviewItemException;
+import org.dspace.servicemanager.DSpaceKernelImpl;
+import org.dspace.servicemanager.DSpaceKernelInit;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.content.Item;
+import org.dspace.content.DCValue;
 
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
@@ -25,8 +32,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.lang.Runtime;
+import java.lang.RuntimeException;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -408,6 +417,40 @@ public class DryadEmailSubmission extends HttpServlet {
                 throw new RuntimeException("Context.complete threw an exception, aborting instead");
             }
         }
+    }
+
+    private WorkflowItem[] findMatchingWorkflowItems(Context context, Manuscript manuscript) {
+        String journalName = manuscript.organization.organizationName;
+        WorkflowItem[] workflowItems = null;
+        try {
+            workflowItems = WorkflowItem.findAllByJournalName(context, journalName);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        ArrayList<WorkflowItem> matchingItems = new ArrayList<WorkflowItem>();
+        for (int i=0;i<workflowItems.length;i++) {
+            // count number of authors and number of matched authors: if equal, this is a match.
+            int numMatched = 0;
+            Item item = workflowItems[i].getItem();
+            DCValue[] itemAuthors = item.getMetadata("dc", "contributor", "author", Item.ANY);
+            for (int j=0;j<itemAuthors.length;j++) {
+                for (Author a : manuscript.authors.author) {
+                    int score = JournalUtils.computeLevenshteinDistance(itemAuthors[j].value, a.fullName());
+                    if (score > 0.7) {
+                        numMatched++;
+                        break;
+                    }
+                }
+            }
+            if (numMatched == itemAuthors.length) {
+                matchingItems.add(workflowItems[i]);
+                LOGGER.debug ("ms " + manuscript.title + " matches");
+            } else {
+                LOGGER.debug ("ms " + manuscript.title + " does not match: " + numMatched + "/" + itemAuthors.length);
+            }
+        }
+        return matchingItems.toArray(new WorkflowItem[matchingItems.size()]);
     }
 
     private EmailParser getEmailParser(String myParsingScheme) throws SubmissionException {
