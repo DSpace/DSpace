@@ -41,6 +41,7 @@ import org.dspace.authority.orcid.model.BioName;
 import org.dspace.authority.AuthorityValueGenerator;
 import org.dspace.content.authority.Choices;
 import org.dspace.JournalUtils;
+import org.dspace.workflow.DryadWorkflowUtils;
 
 import org.apache.log4j.Logger;
 
