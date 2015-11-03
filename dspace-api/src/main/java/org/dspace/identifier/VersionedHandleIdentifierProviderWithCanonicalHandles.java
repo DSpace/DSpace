@@ -35,9 +35,9 @@ import java.util.List;
  * @author Ben Bosman (ben at atmire dot com)
  */
 @Component
-public class VersionedHandleIdentifierProvider extends IdentifierProvider {
+public class VersionedHandleIdentifierProviderWithCanonicalHandles extends IdentifierProvider {
     /** log4j category */
-    private static Logger log = Logger.getLogger(VersionedHandleIdentifierProvider.class);
+    private static Logger log = Logger.getLogger(VersionedHandleIdentifierProviderWithCanonicalHandles.class);
 
     /** Prefix registered to no one */
     static final String EXAMPLE_PREFIX = "123456789";
