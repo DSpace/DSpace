@@ -268,7 +268,7 @@ public class Concept extends AuthorityObject
 
         // Remove any mappings
         DatabaseManager.updateQuery(myContext,
-                "DELETE FROM concept2term WHERE concept_id= ? "+
+                "DELETE FROM concept2term WHERE concept_id= ? " +
                         "AND term_id= ? AND role_id=1", getID(), t.getID());
 
         DatabaseManager.setConstraintImmediate(myContext, "concept2term_term_id_fkey");
@@ -418,7 +418,7 @@ public class Concept extends AuthorityObject
             throws SQLException
     {
         ArrayList<Concept> concepts = new ArrayList<Concept>();
-        TableRowIterator row = DatabaseManager.query(context,"select * from concept where LOWER(identifier) like ?", identifier);
+        TableRowIterator row = DatabaseManager.query(context, "select * from concept where LOWER(identifier) like ?", identifier);
 
         if (row == null)
         {
@@ -437,12 +437,12 @@ public class Concept extends AuthorityObject
     }
 
     /**
-     * Find the concept by its name - assumes name is unique
+     * Find concepts by journalID
      *
      * @param context
      * @param journalID
      *
-     * @return the named Concept, or null if not found
+     * @return List of concepts matching the journalID
      */
 
     public static ArrayList<Concept> findByJournalID(Context context, String journalID)
@@ -456,17 +456,49 @@ public class Concept extends AuthorityObject
         journal_field_id = mdf.getFieldID();
         TableRowIterator row = DatabaseManager.query(context, "select c.* from concept as c, conceptmetadatavalue as cmv where upper(cmv.text_value) = ? and cmv.parent_id = c.id and cmv.field_id = ?;", journalID.toUpperCase(), journal_field_id);
 
-        if (row == null)
-        {
-            return null;
-        }
-        else
-        {
-
-            while(row.hasNext())
-            {
+        if (row != null) {
+            while(row.hasNext()) {
                 concepts.add(new Concept(context,row.next()));
+            }
+        }
+        return concepts;
+    }
 
+    public String getFullName(Context context) throws SQLException, AuthorizeException {
+        MetadataSchema mds = MetadataSchema.find(context, "journal");
+        MetadataField mdf = MetadataField.findByElement(context, mds.getSchemaID(), "fullname", null);
+        log.debug("journal fullname field ID is " + mdf.getFieldID());
+        TableRowIterator row = DatabaseManager.query(context, "select cmv.text_value from concept as c, conceptmetadatavalue as cmv where cmv.parent_id = c.id and c.id=? and cmv.field_id=?", this.getID(), mdf.getFieldID());
+        String result = null;
+        if (row.hasNext()) {
+            result = row.next().getStringColumn("text_value");
+        }
+        return result;
+    }
+
+    /**
+     * Find concepts by full journal name
+     *
+     * @param context
+     * @param journalName
+     *
+     * @return a list of concepts matching the journal name
+     */
+
+    public static ArrayList<Concept> findByJournalName(Context context, String journalName)
+            throws SQLException, AuthorizeException
+    {
+        ArrayList<Concept> concepts = new ArrayList<Concept>();
+        String schema = "journal";
+        String element = "fullName";
+        MetadataSchema mds = MetadataSchema.find(context, schema);
+        MetadataField mdf = MetadataField.findByElement(context, mds.getSchemaID(), element, null);
+        journal_field_id = mdf.getFieldID();
+        TableRowIterator row = DatabaseManager.query(context, "select c.* from concept as c, conceptmetadatavalue as cmv where upper(cmv.text_value) = ? and cmv.parent_id = c.id and cmv.field_id = ?;", journalName.toUpperCase(), journal_field_id);
+
+        if (row != null) {
+            while(row.hasNext()) {
+                concepts.add(new Concept(context,row.next()));
             }
         }
         return concepts;
