@@ -172,6 +172,8 @@ INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, elemen
 INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (136, 9, 'manuscriptNumberIgnorePattern', NULL, NULL);
 INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (137, 9, 'description', NULL, NULL);
 INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (138, 9, 'memberName', NULL, NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (139, 9, 'customerID', NULL, NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (140, 9, 'paymentPlanType', NULL, NULL);
 
 
 --
