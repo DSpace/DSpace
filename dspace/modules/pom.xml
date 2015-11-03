@@ -11,7 +11,7 @@
 		<groupId>org.dspace</groupId>
 		<artifactId>dspace-parent</artifactId>
 		<version>1.7.4-SNAPSHOT</version>
-		<relativePath>../..</relativePath>
+		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
     <properties>

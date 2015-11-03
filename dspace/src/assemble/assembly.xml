@@ -41,8 +41,16 @@
 			<excludes>
 				<exclude>src</exclude>
 				<exclude>config/dspace.cfg</exclude>
-			</excludes>
+				<exclude>config/modules/**</exclude>
+        </excludes>
 		</fileSet>
+        <fileSet>
+            <outputDirectory>.</outputDirectory>
+            <includes>
+                <include>config/modules/**</include>
+            </includes>
+            <filtered>true</filtered>
+        </fileSet>
 	</fileSets>
 
 	<files>
@@ -70,12 +78,11 @@
 			
 			<binaries>
 				<includeDependencies>false</includeDependencies>
-				<outputDirectory>webapps/</outputDirectory>
-			   <outputFileNameMapping>${artifactId}/</outputFileNameMapping>
+				<outputDirectory>webapps/${module.artifactId}</outputDirectory>
             <unpack>true</unpack>
          </binaries>
-         
 		</moduleSet>
 	</moduleSets>
+
 
 </assembly>
