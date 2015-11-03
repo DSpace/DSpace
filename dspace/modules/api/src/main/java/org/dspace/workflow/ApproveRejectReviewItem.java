@@ -124,11 +124,19 @@ public class ApproveRejectReviewItem {
         try {
             c = new Context();
             c.turnOffAuthorisationSystem();
-            List<DSpaceObject> manuscriptItems =
-                    getSearchService().search(c, "dc.identifier.manuscriptNumber: " + manuscriptNumber, 0, 2, false);
-            if(manuscriptItems.size() > 0){
-                wfi = WorkflowItem.findByItemId(c, manuscriptItems.get(0).getID());
-                reviewItem(c, approved, wfi);
+            ItemIterator manuscriptItems = Item.findByMetadataField(c, "dc", "identifier", "manuscriptNumber", manuscriptNumber, false);
+            if (manuscriptItems.hasNext()) {
+                while (manuscriptItems.hasNext()) {
+                    Item ms = manuscriptItems.next();
+                    wfi = WorkflowItem.findByItemId(c, ms.getID());
+                    if (wfi != null) {
+                        try {
+                            reviewItem(c, approved, wfi);
+                        } catch (ApproveRejectReviewItemException e) {
+                            log.debug("WorkflowItem " + wfi.getID() + " is not a claimed task");
+                        }
+                    }
+                }
             } else {
                 throw new ApproveRejectReviewItemException("No item found with manuscript number: " + manuscriptNumber);
             }
