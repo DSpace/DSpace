@@ -176,6 +176,10 @@ public class EmailParser {
         manuscript.keywords.addAll(parseClassificationList((String) dataForXML.remove(CLASSIFICATION)));
         manuscript.manuscriptId = (String) dataForXML.remove(MANUSCRIPT);
         manuscript.status = dataForXML.remove(ARTICLE_STATUS).toLowerCase();
+        if (!Manuscript.MANUSCRIPT_STATUSES.contains(manuscript.status)) {
+            manuscript.status = Manuscript.STATUS_SUBMITTED;
+        }
+
         manuscript.title = (String) dataForXML.remove(ARTICLE_TITLE);
         manuscript.publicationDOI = null;
         manuscript.publicationDate = null;
