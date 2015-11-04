@@ -11,6 +11,10 @@
  * It will be included in all color schemes
  */
 
+.word-break {
+    -ms-word-break: normal;
+    word-break  : normal;
+}
 
 /*************************** header  *******************************/
 .navbar{
