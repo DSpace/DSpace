@@ -156,6 +156,9 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
             throw new AuthorizeException("You are not authorized to review the submission");
         }
         if (!currentlyInReview) {
+            if (requestDoi.equals("")) {
+                throw new AuthorizeException("Malformed DOI or package does not exist");
+            }
             Division div = body.addDivision("not_in_review");
             Para p = div.addPara();
             p.addContent(T_not_in_review);
@@ -230,6 +233,8 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
             DSpaceObject obj = dis.resolve(context, doi);
             if (obj instanceof Item) {
                 wfItem = WorkflowItem.findByItemId(context, obj.getID());
+            } else {
+                requestDoi = "";
             }
         } catch (IdentifierNotFoundException e) {
             log.error(e);
