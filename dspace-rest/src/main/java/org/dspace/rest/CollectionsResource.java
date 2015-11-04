@@ -518,6 +518,8 @@ public class CollectionsResource extends Resource
 
             collectionService.delete(context, dspaceCollection);
             collectionService.update(context, dspaceCollection);
+
+            context.complete();
         }
         catch (ContextException e)
         {
