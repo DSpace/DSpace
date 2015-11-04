@@ -47,6 +47,7 @@
 <%@page import="org.dspace.discovery.DiscoverResult"%>
 <%@page import="org.dspace.content.DSpaceObject"%>
 <%@page import="java.util.List"%>
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
@@ -184,11 +185,11 @@
     }
 %>                                </select><br/>
                                 <label for="query"><fmt:message key="jsp.search.results.searchfor"/></label>
-                                <input type="text" size="50" name="query" value="<%= (query==null ? "" : Utils.addEntities(escapeHtml(query)) %>"/>
+                                <input type="text" size="50" name="query" value="<%= (query==null ? "" : Utils.addEntities(StringEscapeUtils.escapeHtml(query))) %>"/>
                                 <input type="submit" value="<fmt:message key="jsp.general.go"/>" />
                                 <input type="hidden" value="<%= rpp %>" name="rpp" />
-                                <input type="hidden" value="<%= sortedBy %>" name="sort_by" />
-                                <input type="hidden" value="<%= order %>" name="order" />
+                                <input type="hidden" value="<%= Utils.addEntities(sortedBy) %>" name="sort_by" />
+                                <input type="hidden" value="<%= Utils.addEntities(order) %>" name="order" />
 <% if (appliedFilters.size() > 0 ) { %>                                
 		<div class="discovery-search-appliedFilters">
 		<span><fmt:message key="jsp.search.filter.applied" /></span>
@@ -264,7 +265,7 @@
 			for (DiscoverySearchFilter searchFilter : availableFilters)
 			{
 			    String fkey = "jsp.search.filter."+searchFilter.getIndexFieldName();
-			    %><option value="<%= searchFilter.getIndexFieldName() %>"><fmt:message key="<%= fkey %>"/></option><%
+			    %><option value="<%= Utils.addEntities(searchFilter.getIndexFieldName()) %>"><fmt:message key="<%= fkey %>"/></option><%
 			}
 		%>
 		</select>
@@ -273,14 +274,14 @@
 			for (String opt : options)
 			{
 			    String fkey = "jsp.search.filter.op."+opt;
-			    %><option value="<%= opt %>"><fmt:message key="<%= fkey %>"/></option><%
+			    %><option value="<%= Utils.addEntities(opt) %>"><fmt:message key="<%= fkey %>"/></option><%
 			}
 		%>
 		</select>
 		<input type="text" id="filterquery" name="filterquery" size="45"/>
         <input type="hidden" value="<%= rpp %>" name="rpp" />
-        <input type="hidden" value="<%= sortedBy %>" name="sort_by" />
-        <input type="hidden" value="<%= order %>" name="order" />
+		<input type="hidden" value="<%= Utils.addEntities(sortedBy) %>" name="sort_by" />
+		<input type="hidden" value="<%= Utils.addEntities(order) %>" name="order" />
 		<input type="submit" value="<fmt:message key="jsp.search.filter.add"/>" />
 		</form>
 		</div>        
@@ -328,7 +329,7 @@
                {
                    String selected = (sortBy.equals(sortedBy) ? "selected=\"selected\"" : "");
                    String mKey = "search.sort-by." + sortBy;
-                   %> <option value="<%= sortBy %>" <%= selected %>><fmt:message key="<%= mKey %>"/></option><%
+                   %> <option value="<%= Utils.addEntities(sortBy) %>" <%= selected %>><fmt:message key="<%= mKey %>"/></option><%
                }
 %>
                </select>
