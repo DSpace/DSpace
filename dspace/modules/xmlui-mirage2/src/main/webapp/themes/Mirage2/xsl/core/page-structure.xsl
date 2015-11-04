@@ -132,7 +132,7 @@
                                </div>
                                <div id="footer-dsa">
                                  <a href="https://assessment.datasealofapproval.org/assessment_175/seal/html/">
-                                   <img border="0" src="{$theme-path}/images/dsa.gif" alt="dsa_logo" width="80"/>
+                                   <img border="0" src="{$theme-path}/images/dsa.png" alt="dsa_logo" width="80"/>
                                  </a>
                                </div>
                              </div>
