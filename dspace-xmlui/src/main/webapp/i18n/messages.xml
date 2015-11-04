@@ -3168,17 +3168,17 @@
 	<message key="input_forms.value_pairs.metashare_languageDependent.false">No</message>
 	<message key="input_forms.value_pairs.hidden_list.hidden">Yes</message>
 	<message key="input_forms.value_pairs.hidden_list.false">No</message>
-	<message key="input_forms.complex_definitions.contact_person.1_givenname">Contact person's given name</message>
-	<message key="input_forms.complex_definitions.contact_person.2_surname">Contact person's surname</message>
-	<message key="input_forms.complex_definitions.contact_person.2_surname">Family name</message>
-	<message key="input_forms.complex_definitions.contact_person.3_email">Contact person's email</message>
-	<message key="input_forms.complex_definitions.contact_person.4_affiliation">Contact person's institution name</message>
-	<message key="input_forms.complex_definitions.contact_person.4_affiliation">Contact person's institution name</message>
-	<message key="input_forms.complex_definitions.funding.4_type">Funding type</message>
-	<message key="input_forms.complex_definitions.funding.2_code">Grant no. or funding project code</message>
-	<message key="input_forms.complex_definitions.funding.1_orgname">Funding organization</message>
-	<message key="input_forms.complex_definitions.funding.3_projname">Funding project name</message>
-	<message key="input_forms.complex_definitions.funding.5_openaire_id">EU Project Identifier (OpenAIRE)</message>
-	<message key="input_forms.complex_definitions.sizeInfo.2_unit">Unit</message>
+	<message key="input_forms.complex_definitions.contact_person.1_givenname.label">Contact person's given name</message>
+	<message key="input_forms.complex_definitions.contact_person.2_surname.label">Contact person's surname</message>
+	<message key="input_forms.complex_definitions.contact_person.2_surname.help">Family name</message>
+	<message key="input_forms.complex_definitions.contact_person.3_email.label">Contact person's email</message>
+	<message key="input_forms.complex_definitions.contact_person.4_affiliation.label">Contact person's institution name</message>
+	<message key="input_forms.complex_definitions.contact_person.4_affiliation.label">Contact person's institution name</message>
+	<message key="input_forms.complex_definitions.funding.4_type.label">Funding type</message>
+	<message key="input_forms.complex_definitions.funding.2_code.label">Grant no. or funding project code</message>
+	<message key="input_forms.complex_definitions.funding.1_orgname.label">Funding organization</message>
+	<message key="input_forms.complex_definitions.funding.3_projname.label">Funding project name</message>
+	<message key="input_forms.complex_definitions.funding.5_openaire_id.label">EU Project Identifier (OpenAIRE)</message>
+	<message key="input_forms.complex_definitions.sizeInfo.2_unit.label">Unit</message>
 </catalogue>
 
