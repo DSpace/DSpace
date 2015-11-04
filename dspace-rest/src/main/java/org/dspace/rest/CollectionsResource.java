@@ -355,7 +355,7 @@ public class CollectionsResource extends Resource
             workspaceItem.update();
 
             // Index item to browse.
-            org.dspace.browse.IndexBrowse browse = new org.dspace.browse.IndexBrowse();
+            org.dspace.browse.IndexBrowse browse = new org.dspace.browse.IndexBrowse(context);
             browse.indexItem(dspaceItem);
 
             log.trace("Installing item to collection(id=" + collectionId + ").");
