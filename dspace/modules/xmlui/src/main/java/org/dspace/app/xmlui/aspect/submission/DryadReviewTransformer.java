@@ -233,16 +233,18 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
             DSpaceObject obj = dis.resolve(context, doi);
             if (obj instanceof Item) {
                 wfItem = WorkflowItem.findByItemId(context, obj.getID());
-            } else {
-                requestDoi = "";
             }
         } catch (IdentifierNotFoundException e) {
+            requestDoi = "";
             log.error(e);
         } catch (IdentifierNotResolvableException e) {
+            requestDoi = "";
             log.error(e);
         } catch (SQLException e) {
+            requestDoi = "";
             log.error(e);
         } catch (AuthorizeException e) {
+            requestDoi = "";
             log.error(e);
         }
     }
