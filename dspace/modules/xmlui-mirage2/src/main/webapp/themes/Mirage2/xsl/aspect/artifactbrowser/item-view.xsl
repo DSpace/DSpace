@@ -567,6 +567,21 @@
                     <xsl:if test="(position() div 2 mod 2 = 0)">even </xsl:if>
                     <xsl:if test="(position() div 2 mod 2 = 1)">odd </xsl:if>
                 </xsl:attribute>
+
+                <!-- DATASHARE code start -->
+                <td>
+                  <xsl:variable name="label">
+                    <xsl:text>xmlui.dri2xhtml.METS-1.0.item-</xsl:text>
+                    <xsl:value-of select="./@element"/>
+                    <xsl:if test="./@qualifier">
+                      <xsl:text>-</xsl:text>
+                      <xsl:value-of select="./@qualifier"/>
+                    </xsl:if>
+                  </xsl:variable>
+                  <i18n:text><xsl:value-of select="$label"/></i18n:text>
+                </td>
+                <!-- DATASHARE code end -->
+
                 <td class="label-cell">
                     <xsl:value-of select="./@mdschema"/>
                     <xsl:text>.</xsl:text>
