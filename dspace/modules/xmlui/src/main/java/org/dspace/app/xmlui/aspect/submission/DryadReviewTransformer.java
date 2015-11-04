@@ -222,6 +222,10 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
     private void loadWFItemByDOI(String doi) throws IOException {
         wfItem = null;
         DOIIdentifierProvider dis = new DSpace().getSingletonService(DOIIdentifierProvider.class);
+
+        if (!doi.startsWith("doi:")) {
+            doi = "doi:" + doi;
+        }
         try {
             DSpaceObject obj = dis.resolve(context, doi);
             if (obj instanceof Item) {
