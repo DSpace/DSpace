@@ -226,6 +226,11 @@ header .navbar-brand img {
     width: 6em;
 }
 
+/* remove subject classification lookup */
+input[name='lookup_dc_subject_classification']{
+    display: none;
+}
+
 /*************************** item view *******************************/
 .item-summary-view-metadata h5{
     font-weight: bold;
