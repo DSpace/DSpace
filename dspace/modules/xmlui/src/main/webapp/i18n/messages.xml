@@ -2232,7 +2232,7 @@
     <message key="xmlui.dri2xhtml.METS-1.0.item-date-updated">Date Updated</message>
     <message key="xmlui.dri2xhtml.METS-1.0.item-date-issued">Date Issued</message>
     <message key="xmlui.dri2xhtml.METS-1.0.item-identifier-citation">Citation</message>
-   	<message key="xmlui.dri2xhtml.METS-1.0.item-identifier-uri">Permanent Identifier</message>
+   	<message key="xmlui.dri2xhtml.METS-1.0.item-identifier-uri">Persistent Identifier</message>
     <message key="xmlui.dri2xhtml.METS-1.0.item-description-abstract">Dataset Description (abstract)</message>
     <message key="xmlui.dri2xhtml.METS-1.0.item-description-provenance">Provenance</message>
     <message key="xmlui.dri2xhtml.METS-1.0.item-description-tableofcontents">Dataset Description (TOC)</message>
