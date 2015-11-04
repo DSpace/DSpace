@@ -49,7 +49,12 @@ public class DateUntilFilter extends DSpaceFilter
     @Override
     public SolrFilterResult buildSolrQuery()
     {
-        String format = dateProvider.format(date).replace("Z", ".999Z"); // Tweak to set the millisecon
+        String format = dateProvider.format(date).replace("Z", ".999Z"); // Tweak to set the milliseconds
+        // if date has timestamp of 00:00:00, switch it to refer to end of day
+        if (format.substring(11, 19).equals("00:00:00"))
+        {
+            format = format.substring(0, 11) + "23:59:59" + format.substring(19);
+        }
         return new SolrFilterResult("item.lastmodified:[* TO "
                 + ClientUtils.escapeQueryChars(format) + "]");
     }
