@@ -482,7 +482,7 @@
     <xsl:template name="itemSummaryView-DIM-type">
       <xsl:if test="dim:field[@element='type' and descendant::text()]">
         <div class="simple-item-view-type word-break item-page-field-wrapper table">
-          <h5>Data Type</h5>
+          <h5>Type</h5>
           <xsl:for-each select="dim:field[@element='type']">
             <xsl:copy-of select="./node()"/>
             <xsl:if test="count(following-sibling::dim:field[@element='type']) != 0">
@@ -507,7 +507,7 @@
     <xsl:template name="itemSummaryView-DIM-publisher">
       <xsl:if test="dim:field[@element='publisher' and descendant::text()]">
         <div class="simple-item-view-publisher item-page-field-wrapper table">
-          <h5>Data Publisher</h5>
+          <h5>Publisher</h5>
           <xsl:for-each select="dim:field[@element='publisher']">
             <xsl:copy-of select="./node()"/>
           </xsl:for-each>
