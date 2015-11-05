@@ -8,16 +8,18 @@
 package org.dspace.storage.bitstore;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.checker.service.ChecksumHistoryService;
@@ -78,146 +80,118 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     @Autowired(required = true)
     protected ChecksumHistoryService checksumHistoryService;
 
-	/**
-	 * The asset store locations. The information for each GeneralFile in the
-	 * array comes from dspace.cfg, so see the comments in that file.
-	 *
-	 * If an array element refers to a conventional (non_SRB) asset store, the
-	 * element will be a LocalFile object (similar to a java.io.File object)
-	 * referencing a local directory under which the bitstreams are stored.
-	 *
-	 * If an array element refers to an SRB asset store, the element will be an
-	 * SRBFile object referencing an SRB 'collection' (directory) under which
-	 * the bitstreams are stored.
-	 *
-	 * An SRBFile object is obtained by (1) using dspace.cfg properties to
-	 * create an SRBAccount object (2) using the account to create an
-	 * SRBFileSystem object (similar to a connection) (3) using the
-	 * SRBFileSystem object to create an SRBFile object
-	 */
-    protected GeneralFile[] assetStores;
+    /** asset stores */
+	private static BitStore[] stores;
 
-    /** The asset store to use for new bitstreams */
-    protected int incoming;
-
-    // These settings control the way an identifier is hashed into
-    // directory and file names
-    //
-    // With digitsPerLevel 2 and directoryLevels 3, an identifier
-    // like 12345678901234567890 turns into the relative name
-    // /12/34/56/12345678901234567890.
-    //
-    // You should not change these settings if you have data in the
-    // asset store, as the BitstreamStorageManager will be unable
-    // to find your existing data.
-    protected final int digitsPerLevel = 2;
-
-    protected final int directoryLevels = 3;
+    /** The index of the asset store to use for new bitstreams */
+    private static int incoming;
 
 	/**
 	 * This prefix string marks registered bitstreams in internal_id
 	 */
 	protected final String REGISTERED_FLAG = "-R";
 
+	/** default asset store implementation */
+	private static final String DEFAULT_STORE_PREFIX = "ds:";
+	private static final String DEFAULT_STORE_IMPL = "org.dspace.storage.bitstore.DSBitStore";
+
     /* Read in the asset stores from the config. */
     @Override
     public void afterPropertiesSet() {
-        List<Object> stores = new ArrayList<Object>();
+        ArrayList list = new ArrayList();
 
-		// 'assetstore.dir' is always store number 0
-		String sAssetstoreDir = ConfigurationManager
-				.getProperty("assetstore.dir");
- 
-		// see if conventional assetstore or srb
-		if (sAssetstoreDir != null) {
-			stores.add(sAssetstoreDir); // conventional (non-srb)
-		} else if (ConfigurationManager.getProperty("srb.host") != null) {
-			stores.add(new SRBAccount( // srb
-					ConfigurationManager.getProperty("srb.host"),
-					ConfigurationManager.getIntProperty("srb.port"),
-					ConfigurationManager.getProperty("srb.username"),
-					ConfigurationManager.getProperty("srb.password"),
-					ConfigurationManager.getProperty("srb.homedirectory"),
-					ConfigurationManager.getProperty("srb.mdasdomainname"),
-					ConfigurationManager
-							.getProperty("srb.defaultstorageresource"),
-					ConfigurationManager.getProperty("srb.mcatzone")));
-		} else {
-			log.error("No default assetstore");
-		}
-
-		// read in assetstores .1, .2, ....
-		for (int i = 1;; i++) { // i == 0 is default above
-			sAssetstoreDir = ConfigurationManager.getProperty("assetstore.dir."
-					+ i);
-
-			// see if 'i' conventional assetstore or srb
-			if (sAssetstoreDir != null) { 		// conventional (non-srb)
-				stores.add(sAssetstoreDir);
-			} else if (ConfigurationManager.getProperty("srb.host." + i)
-					!= null) { // srb
-				stores.add(new SRBAccount(
-						ConfigurationManager.getProperty("srb.host." + i),
-						ConfigurationManager.getIntProperty("srb.port." + i),
-						ConfigurationManager.getProperty("srb.username." + i),
-						ConfigurationManager.getProperty("srb.password." + i),
-						ConfigurationManager
-								.getProperty("srb.homedirectory." + i),
-						ConfigurationManager
-								.getProperty("srb.mdasdomainname." + i),
-						ConfigurationManager
-								.getProperty("srb.defaultstorageresource." + i),
-						ConfigurationManager.getProperty("srb.mcatzone." + i)));
-			} else {
-				break; // must be at the end of the assetstores
+        // Load the backwards compatible assetstore.dir's
+		list = initLegacyAssetstore(list);
+		
+		// if not already configured, configure asset stores
+		for (int j = 0; j < 100; j++)
+		{
+			String assetCfg = ConfigurationManager.getProperty("assetstore." + j);
+            log.info("Looking for config for assetstore." + j);
+			if (assetCfg == null)
+			{
+				// no more stores configured - assumes sequential assignment
+				break;
+			}
+			if (!list.contains(j))
+			{
+				initStore(assetCfg, list);
 			}
 		}
 
-		// convert list to array
-		// the elements (objects) in the list are class
-		//   (1) String - conventional non-srb assetstore
-		//   (2) SRBAccount - srb assetstore
-		assetStores = new GeneralFile[stores.size()];
-		for (int i = 0; i < stores.size(); i++) {
-			Object o = stores.get(i);
-			if (o == null) { // I don't know if this can occur
-				log.error("Problem with assetstore " + i);
-			}
-			if (o instanceof String) {
-				assetStores[i] = new LocalFile((String) o);
-			} else if (o instanceof SRBAccount) {
-				SRBFileSystem srbFileSystem = null;
-				try {
-					srbFileSystem = new SRBFileSystem((SRBAccount) o);
-				} catch (NullPointerException e) {
-					log.error("No SRBAccount for assetstore " + i);
-				} catch (IOException e) {
-					log.error("Problem getting SRBFileSystem for assetstore"
-							+ i);
-				}
-				if (srbFileSystem == null) {
-					log.error("SRB FileSystem is null for assetstore " + i);
-				}
-				String sSRBAssetstore = null;
-				if (i == 0) { // the zero (default) assetstore has no suffix
-					sSRBAssetstore = ConfigurationManager
-							.getProperty("srb.parentdir");
-				} else {
-					sSRBAssetstore = ConfigurationManager
-							.getProperty("srb.parentdir." + i);
-				}
-				if (sSRBAssetstore == null) {
-					log.error("srb.parentdir is undefined for assetstore " + i);
-				}
-				assetStores[i] = new SRBFile(srbFileSystem, sSRBAssetstore);
-			} else {
-				log.error("Unexpected " + o.getClass().toString()
-						+ " with assetstore " + i);
-			}
-		}
-
+        log.info("LIST: " + ArrayUtils.toString(list));
+		stores = (BitStore[])list.toArray(new BitStore[list.size()]);
         // Read asset store to put new files in. Default is 0.
         incoming = ConfigurationManager.getIntProperty("assetstore.incoming");
+    }
+
+    /**
+     * Backwards compatibility for legacy assetstore.dir and assetstore.dir.#
+     * @param list
+     * @return
+     */
+    private static ArrayList initLegacyAssetstore(ArrayList list) {
+        String storeDir = ConfigurationManager.getProperty("assetstore.dir");
+        if (StringUtils.isEmpty(storeDir))
+        {
+            log.info("No default assetstore.dir");
+        }
+        else
+        {
+            initStore(DEFAULT_STORE_PREFIX + storeDir, list);
+            // read any further ones, starting at 1, since assetstore.dir is 0
+            for (int i = 1;; i++)
+            {
+                storeDir = ConfigurationManager.getProperty("assetstore.dir." + i);
+                if (StringUtils.isEmpty(storeDir))
+                {
+                    break;
+                }
+                initStore(DEFAULT_STORE_PREFIX + storeDir, list);
+            }
+        }
+
+        return list;
+    }
+
+    /**
+     *
+     * assetstore.<#>=<short-name>:<param>
+     * bitstore.<short-name>.class=<implementation-class-canonical-name>
+     * @param storeConfig
+     * @param list
+     */
+    private static void initStore(String storeConfig, List list)
+    {
+        log.info("Init BitStore:" + storeConfig);
+		// create and initialize an asset store
+        String[] storeConfigArray = storeConfig.split(":");
+        if(storeConfigArray.length == 2) {
+            String prefix = storeConfigArray[0];
+            String config = storeConfigArray[1];
+
+            String className = ConfigurationManager.getProperty("bitstore." + prefix + ".class");
+            if (StringUtils.isEmpty(className) || DEFAULT_STORE_PREFIX.equals(prefix))
+            {
+                // use default implementation class if none explicitly defined
+                className = DEFAULT_STORE_IMPL;
+            }
+
+            log.info("BitStore name: " + className);
+            try
+            {
+                BitStore store = (BitStore)Class.forName(className).newInstance();
+                store.init(config);
+                list.add(store);
+            }
+            catch (Exception e)
+            {
+                log.error("Cannot instantiate store class: " + className + ", exception: " + e.getMessage(), e);
+            }
+
+        } else {
+            log.info("Odd bitstore config: [" + storeConfig + "]");
+        }
     }
 
     @Override
@@ -236,48 +210,11 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
          */
         bitstream.setStoreNumber(incoming);
 
-
-        // Where on the file system will this new bitstream go?
-		GeneralFile file = getFile(bitstream);
-
-        // Make the parent dirs if necessary
-		GeneralFile parent = file.getParentFile();
-
-        if (!parent.exists())
-        {
-            parent.mkdirs();
-        }
-
-        //Create the corresponding file and open it
-        file.createNewFile();
-
-		GeneralFileOutputStream fos = FileFactory.newFileOutputStream(file);
-
-		// Read through a digest input stream that will work out the MD5
-        DigestInputStream dis = null;
-
-        try
-        {
-            dis = new DigestInputStream(is, MessageDigest.getInstance("MD5"));
-        }
-        // Should never happen
-        catch (NoSuchAlgorithmException nsae)
-        {
-            log.warn("Caught NoSuchAlgorithmException", nsae);
-        }
-
-        Utils.bufferedCopy(dis, fos);
-        fos.close();
-        is.close();
-
-        bitstream.setSizeBytes(file.length());
-
-        if (dis != null)
-        {
-            bitstream.setChecksum(Utils.toHex(dis.getMessageDigest()
-                    .digest()));
-            bitstream.setChecksumAlgorithm("MD5");
-        }
+        //For efficiencies sake, PUT is responsible for setting bitstream size_bytes, checksum, and checksum_algorithm
+        stores[incoming].put(bitstream, is);
+        //bitstream.setSizeBytes(file.length());
+        //bitstream.setChecksum(Utils.toHex(dis.getMessageDigest().digest()));
+        //bitstream.setChecksumAlgorithm("MD5");
         
         bitstream.setDeleted(false);
         try {
@@ -285,6 +222,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
             context.turnOffAuthorisationSystem();
             bitstreamService.update(context, bitstream);
         } catch (AuthorizeException e) {
+            log.error(e);
             //Can never happen since we turn off authorization before we update
         } finally {
             context.restoreAuthSystemState();
@@ -294,8 +232,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
 
         if (log.isDebugEnabled())
         {
-            log.debug("Stored bitstream " + bitstreamId + " in file "
-                    + file.getAbsolutePath());
+            log.debug("Stored bitstreamID " + bitstreamId);
         }
 
         return bitstreamId;
@@ -328,103 +265,37 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
         bitstream.setStoreNumber(assetstore);
         bitstreamService.update(context, bitstream);
 
-		// get a reference to the file
-		GeneralFile file = getFile(bitstream);
+        Map wantedMetadata = new HashMap();
+        wantedMetadata.put("size_bytes", null);
+        wantedMetadata.put("checksum", null);
+        wantedMetadata.put("checksum_algorithm", null);
 
-		// read through a DigestInputStream that will work out the MD5
-		//
-		// DSpace refers to checksum, writes it in METS, and uses it as an
-		// AIP filename (!), but never seems to validate with it. Furthermore,
-		// DSpace appears to hardcode the algorithm to MD5 in some places--see 
-		// METSExport.java.
-		//
-		// To remain compatible with DSpace we calculate an MD5 checksum on 
-		// LOCAL registered files. But for REMOTE (e.g. SRB) files we 
-		// calculate an MD5 on just the fileNAME. The reasoning is that in the 
-		// case of a remote file, calculating an MD5 on the file itself will
-		// generate network traffic to read the file's bytes. In this case it 
-		// would be better have a proxy process calculate MD5 and store it as 
-		// an SRB metadata attribute so it can be retrieved simply from SRB.
-		//
-		// TODO set this up as a proxy server process so no net activity
-		
-		// FIXME this is a first class HACK! for the reasons described above
-		if (file instanceof LocalFile) 
-		{
+        Map receivedMetadata = stores[assetstore].about(bitstream, wantedMetadata);
+        if(MapUtils.isEmpty(receivedMetadata)) {
+            String message = "Not able to register bitstream:" + bitstream.getID() + " at path: " + bitstreamPath;
+            log.error(message);
+            throw new IOException(message);
+        } else {
+            if(receivedMetadata.containsKey("checksum_algorithm")) {
+                bitstream.setChecksumAlgorithm(receivedMetadata.get("checksum_algorithm").toString());
+            }
 
-			// get MD5 on the file for local file
-			DigestInputStream dis = null;
-			try 
-			{
-				dis = new DigestInputStream(FileFactory.newFileInputStream(file), 
-						MessageDigest.getInstance("MD5"));
-			} 
-			catch (NoSuchAlgorithmException e) 
-			{
-				log.warn("Caught NoSuchAlgorithmException", e);
-				throw new IOException("Invalid checksum algorithm", e);
-			}
-			catch (IOException e) 
-			{
-				log.error("File: " + file.getAbsolutePath() 
-						+ " to be registered cannot be opened - is it "
-						+ "really there?");
-				throw e;
-			}
-			final int BUFFER_SIZE = 1024 * 4;
-			final byte[] buffer = new byte[BUFFER_SIZE];
-			while (true) 
-			{
-				final int count = dis.read(buffer, 0, BUFFER_SIZE);
-				if (count == -1) 
-				{
-					break;
-				}
-			}
-            bitstream.setChecksum(Utils.toHex(dis.getMessageDigest()
-                    .digest()));
-			dis.close();
-		} 
-		else if (file instanceof SRBFile)
-		{
-			if (!file.exists())
-			{
-				log.error("File: " + file.getAbsolutePath() 
-						+ " is not in SRB MCAT");
-				throw new IOException("File is not in SRB MCAT");
-			}
+            if(receivedMetadata.containsKey("checksum")) {
+                bitstream.setChecksum(receivedMetadata.get("checksum").toString());
+            }
 
-			// get MD5 on just the filename (!) for SRB file
-			int iLastSlash = bitstreamPath.lastIndexOf('/');
-			String sFilename = bitstreamPath.substring(iLastSlash + 1);
-			MessageDigest md = null;
-			try 
-			{
-				md = MessageDigest.getInstance("MD5");
-			} 
-			catch (NoSuchAlgorithmException e) 
-			{
-				log.error("Caught NoSuchAlgorithmException", e);
-				throw new IOException("Invalid checksum algorithm", e);
-			}
-			bitstream.setChecksum(Utils.toHex(md.digest(sFilename.getBytes())));
-		}
-		else
-		{
-			throw new IOException("Unrecognized file type - "
-					+ "not local, not SRB");
-		}
+            if(receivedMetadata.containsKey("size_bytes")) {
+                bitstream.setSizeBytes(Long.valueOf(receivedMetadata.get("size_bytes").toString()));
+            }
+        }
 
-		bitstream.setChecksumAlgorithm("MD5");
-		bitstream.setSizeBytes(file.length());
 		bitstream.setDeleted(false);
         bitstreamService.update(context, bitstream);
 
 		UUID bitstreamId = bitstream.getID();
-		if (log.isDebugEnabled()) 
+		if (log.isDebugEnabled())
 		{
-			log.debug("Stored bitstream " + bitstreamId + " in file "
-					+ file.getAbsolutePath());
+			log.debug("Registered bitstream " + bitstreamId + " at location " + bitstreamPath);
 		}
 		return bitstreamId;
 	}
@@ -443,8 +314,8 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     public InputStream retrieve(Context context, Bitstream bitstream)
             throws SQLException, IOException
     {
-		GeneralFile file = getFile(bitstream);
-		return (file != null) ? FileFactory.newFileInputStream(file) : null;
+        Integer storeNumber = bitstream.getStoreNumber();
+        return stores[storeNumber].get(bitstream);
     }
 
     @Override
@@ -461,12 +332,16 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
             for (Bitstream bitstream : storage)
             {
                 UUID bid = bitstream.getID();
-				GeneralFile file = getFile(bitstream);
+                Map wantedMetadata = new HashMap();
+                wantedMetadata.put("size_bytes", null);
+                wantedMetadata.put("modified", null);
+                Map receivedMetadata = stores[bitstream.getStoreNumber()].about(bitstream, wantedMetadata);
+
 
                 // Make sure entries which do not exist are removed
-                if (file == null || !file.exists())
+                if (MapUtils.isEmpty(receivedMetadata))
                 {
-                    log.debug("file is null");
+                    log.debug("bitstore.about is empty, so file is not present");
                     if (deleteDbRecords)
                     {
                         log.debug("deleting record");
@@ -486,7 +361,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
 
                 // This is a small chance that this is a file which is
                 // being stored -- get it next time.
-                if (isRecent(file))
+                if (isRecent(Long.valueOf(receivedMetadata.get("modified").toString())))
                 {
                 	log.debug("file is recent");
                     continue;
@@ -515,11 +390,9 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
                 // Since versioning allows for multiple bitstreams, check if the internal identifier isn't used on another place
                 if(0 < bitstreamService.findDuplicateInternalIdentifier(context, bitstream).size())
                 {
-                    boolean success = file.delete();
+                    stores[bitstream.getStoreNumber()].remove(bitstream);
 
-                    String message = ("Deleted bitstream " + bid + " (file "
-                                + file.getAbsolutePath() + ") with result "
-                                + success);
+                    String message = ("Deleted bitstreamID " + bid + ", internalID " + bitstream.getInternalId());
                     if (log.isDebugEnabled())
                     {
                         log.debug(message);
@@ -527,18 +400,6 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
                     if (verbose)
                     {
                         System.out.println(message);
-                    }
-
-                    // if the file was deleted then
-                    // try deleting the parents
-                    // Otherwise the cleanup script is set to
-                    // leave the db records then the file
-                    // and directories have already been deleted
-                    // if this is turned off then it still looks like the
-                    // file exists
-                    if( success )
-                    {
-                        deleteParents(file);
                     }
                 }
 
@@ -593,6 +454,62 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
 
 	}
 
+    /**
+     * Migrates all assets off of one assetstore to another
+     * @param assetstoreSource
+     * @param assetstoreDestination
+     */
+    public void migrate(Context context, Integer assetstoreSource, Integer assetstoreDestination, boolean deleteOld, Integer batchCommitSize) {
+        //Find all the bitstreams on the old source, copy it to new destination, update store_number, save, remove old
+
+        try {
+            Iterator<Bitstream> allBitstreamsInSource = bitstreamService.findByStoreNumber(context, assetstoreSource);
+            Integer processedCounter = 0;
+
+            while (allBitstreamsInSource.hasNext()) {
+                Bitstream bitstream = allBitstreamsInSource.next();
+                log.info("Copying bitstream:" + bitstream.getID() + " from assetstore[" + assetstoreSource + "] to assetstore[" + assetstoreDestination + "] Name:" + bitstream.getName() + ", SizeBytes:" + bitstream.getSize());
+
+                InputStream inputStream = retrieve(context, bitstream);
+                stores[assetstoreDestination].put(bitstream, inputStream);
+                bitstream.setStoreNumber(assetstoreDestination);
+                bitstreamService.update(context, bitstream);
+
+                if (deleteOld) {
+                    log.info("Removing bitstream:" + bitstream.getID() + " from assetstore[" + assetstoreSource + "]");
+                    stores[assetstoreSource].remove(bitstream);
+                }
+
+                processedCounter++;
+                //modulo
+                if ((processedCounter % batchCommitSize) == 0) {
+                    log.info("Migration Commit Checkpoint: " + processedCounter);
+                    context.dispatchEvents();
+                }
+            }
+
+            log.info("Assetstore Migration from assetstore[" + assetstoreSource + "] to assetstore[" + assetstoreDestination + "] completed. " + processedCounter + " objects were transferred.");
+
+        } catch (SQLException e) {
+            log.error(e);
+        } catch (IOException e) {
+            log.error(e);
+        } catch (AuthorizeException e) {
+            log.error(e);
+        }
+    }
+
+    public void printStores(Context context) {
+        try {
+            for (int i = 0; i < stores.length; i++) {
+                long countBitstreams = bitstreamService.countByStoreNumber(context, i);
+                System.out.println("store[" + i + "] == " + stores[i].getClass().getSimpleName() + ", which has " + countBitstreams + " # of bitstreams.");
+            }
+            System.out.println("Incoming assetstore is store[" + incoming + "]");
+        } catch (SQLException e) {
+            log.error(e);
+        }
+    }
 
     ////////////////////////////////////////
     // Internal methods
@@ -601,163 +518,20 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     /**
      * Return true if this file is too recent to be deleted, false otherwise.
      * 
-     * @param file
-     *            The file to check
+     * @param lastModified
+     *            The time asset was last modified
      * @return True if this file is too recent to be deleted
      */
-    protected boolean isRecent(GeneralFile file)
+    protected boolean isRecent(Long lastModified)
     {
-        long lastmod = file.lastModified();
         long now = new java.util.Date().getTime();
 
-        if (lastmod >= now)
+        if (lastModified >= now)
         {
             return true;
         }
 
         // Less than one hour old
-        return (now - lastmod) < (1 * 60 * 1000);
+        return (now - lastModified) < (1 * 60 * 1000);
     }
-
-    /**
-     * Delete empty parent directories.
-     * 
-     * @param file
-     *            The file with parent directories to delete
-     */
-    protected synchronized void deleteParents(GeneralFile file)
-    {
-        if (file == null )
-        {
-            return;
-        }
- 
-		GeneralFile tmp = file;
-
-        for (int i = 0; i < directoryLevels; i++)
-        {
-
-			GeneralFile directory = tmp.getParentFile();
-			GeneralFile[] files = directory.listFiles();
-
-            // Only delete empty directories
-            if (files.length != 0)
-            {
-                break;
-            }
-
-            directory.delete();
-            tmp = directory;
-        }
-    }
-
-    /**
-     * Return the file corresponding to a bitstream. It's safe to pass in
-     * <code>null</code>.
-     * 
-     * @param bitstream
-     *            the database table row for the bitstream. Can be
-     *            <code>null</code>
-     * 
-     * @return The corresponding file in the file system, or <code>null</code>
-     * 
-     * @exception IOException
-     *                If a problem occurs while determining the file
-     */
-    protected GeneralFile getFile(Bitstream bitstream) throws IOException
-    {
-        // Check that bitstream is not null
-        if (bitstream == null)
-        {
-            return null;
-        }
-
-        // Get the store to use
-        int storeNumber = bitstream.getStoreNumber();
-
-        // Default to zero ('assetstore.dir') for backwards compatibility
-        if (storeNumber == -1)
-        {
-            storeNumber = 0;
-        }
-
-		GeneralFile assetstore = assetStores[storeNumber];
-
-		// turn the internal_id into a file path relative to the assetstore
-		// directory
-		String sInternalId = bitstream.getInternalId();
-
-		// there are 4 cases:
-		// -conventional bitstream, conventional storage
-		// -conventional bitstream, srb storage
-		// -registered bitstream, conventional storage
-		// -registered bitstream, srb storage
-		// conventional bitstream - dspace ingested, dspace random name/path
-		// registered bitstream - registered to dspace, any name/path
-		String sIntermediatePath = null;
-		if (isRegisteredBitstream(sInternalId)) {
-			sInternalId = sInternalId.substring(REGISTERED_FLAG.length());
-			sIntermediatePath = "";
-		} else {
-			
-			// Sanity Check: If the internal ID contains a
-			// pathname separator, it's probably an attempt to
-			// make a path traversal attack, so ignore the path
-			// prefix.  The internal-ID is supposed to be just a
-			// filename, so this will not affect normal operation.
-			if (sInternalId.contains(File.separator))
-            {
-                sInternalId = sInternalId.substring(sInternalId.lastIndexOf(File.separator) + 1);
-            }
-			
-			sIntermediatePath = getIntermediatePath(sInternalId);
-		}
-
-		StringBuilder bufFilename = new StringBuilder();
-		if (assetstore instanceof LocalFile) {
-			bufFilename.append(assetstore.getCanonicalPath());
-			bufFilename.append(File.separator);
-			bufFilename.append(sIntermediatePath);
-			bufFilename.append(sInternalId);
-			if (log.isDebugEnabled()) {
-				log.debug("Local filename for " + sInternalId + " is "
-						+ bufFilename.toString());
-			}
-			return new LocalFile(bufFilename.toString());
-		}
-		if (assetstore instanceof SRBFile) {
-			bufFilename.append(sIntermediatePath);
-			bufFilename.append(sInternalId);
-			if (log.isDebugEnabled()) {
-				log.debug("SRB filename for " + sInternalId + " is "
-						+ ((SRBFile) assetstore).toString()
-						+ bufFilename.toString());
-			}
-			return new SRBFile((SRBFile) assetstore, bufFilename.toString());
-		}
-		return null;
-    }
-
-	/**
-	 * Return the intermediate path derived from the internal_id. This method
-	 * splits the id into groups which become subdirectories.
-	 *
-	 * @param iInternalId
-	 *            The internal_id
-	 * @return The path based on the id without leading or trailing separators
-	 */
-	protected String getIntermediatePath(String iInternalId) {
-		StringBuilder buf = new StringBuilder();
-		for (int i = 0; i < directoryLevels; i++) {
-			int digits = i * digitsPerLevel;
-			if (i > 0) {
-				buf.append(File.separator);
-			}
-			buf.append(iInternalId.substring(digits, digits
-							+ digitsPerLevel));
-		}
-		buf.append(File.separator);
-		return buf.toString();
-	}
-
 }

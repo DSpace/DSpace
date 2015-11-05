@@ -111,4 +111,18 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
 
         return iterate(query);
     }
+
+    @Override
+    public Iterator<Bitstream> findByStoreNumber(Context context, Integer storeNumber) throws SQLException {
+        Query query = createQuery(context, "select b from Bitstream b where b.storeNumber = :storeNumber");
+        query.setParameter("storeNumber", storeNumber);
+        return iterate(query);
+    }
+
+    @Override
+    public Long countByStoreNumber(Context context, Integer storeNumber) throws SQLException {
+        Criteria criteria = createCriteria(context, Bitstream.class);
+        criteria.add(Restrictions.eq("storeNumber", storeNumber));
+        return countLong(criteria);
+    }
 }

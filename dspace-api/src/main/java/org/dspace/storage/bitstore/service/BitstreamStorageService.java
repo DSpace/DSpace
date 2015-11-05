@@ -146,4 +146,21 @@ public interface BitstreamStorageService {
 
     public Bitstream clone(Context context, Bitstream bitstream) throws SQLException, IOException, AuthorizeException;
 
+    /**
+     * Print out (log/out) a listing of the assetstores configured, and how many assets they contain
+     * @param context
+     * @throws SQLException
+     */
+    public void printStores(Context context) throws SQLException;
+
+    /**
+     * Migrate all the assets from assetstoreSource to assetstoreDestination
+     * @param context
+     * @param assetstoreSource
+     * @param assetstoreDestination
+     * @param deleteOld
+     * @param batchCommitSize
+     */
+    public void migrate(Context context, Integer assetstoreSource, Integer assetstoreDestination, boolean deleteOld, Integer batchCommitSize);
+
 }

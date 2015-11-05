@@ -392,6 +392,16 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     }
 
     @Override
+    public Iterator<Bitstream> findByStoreNumber(Context context, Integer storeNumber) throws SQLException {
+        return bitstreamDAO.findByStoreNumber(context, storeNumber);
+    }
+
+    @Override
+    public Long countByStoreNumber(Context context, Integer storeNumber) throws SQLException {
+        return bitstreamDAO.countByStoreNumber(context, storeNumber);
+    }
+
+    @Override
     public Bitstream findByIdOrLegacyId(Context context, String id) throws SQLException {
         if(StringUtils.isNumeric(id))
         {
