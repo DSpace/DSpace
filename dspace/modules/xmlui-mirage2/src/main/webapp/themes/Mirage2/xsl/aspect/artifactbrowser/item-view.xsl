@@ -70,6 +70,11 @@
         <!-- Generate the bitstream information from the file section -->
         <xsl:choose>
             <xsl:when test="./mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL' or @USE='LICENSE']/mets:file">
+
+              <!-- DATASHARE - start -->
+              <xsl:call-template name="downloadAllButton"/>
+              <!-- DATASHARE - end -->
+
                 <h3><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text></h3>
                 <div class="file-list">
                     <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL' or @USE='LICENSE' or @USE='CC-LICENSE']">
@@ -118,6 +123,9 @@
                     <xsl:call-template name="itemSummaryView-DIM-type"/>
                     <xsl:call-template name="itemSummaryView-DIM-creators"/>
                     <xsl:call-template name="itemSummaryView-DIM-publisher"/>
+                    <xsl:call-template name="itemSummaryView-DIM-isversionof"/>
+                    <xsl:call-template name="itemSummaryView-DIM-isreferencedby"/>
+
                     <xsl:if test="$ds_item_view_toggle_url != ''">
                         <xsl:call-template name="itemSummaryView-show-full"/>
                     </xsl:if>
@@ -332,16 +340,7 @@
         <xsl:choose>
             <xsl:when test="//mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL' or @USE='LICENSE']/mets:file">
               <!-- DATASHARE - start -->
-              <xsl:if test="$document/dri:meta/dri:pageMeta/dri:metadata[@element='download-all-file']">
-                <div id="item-page-download-all">
-                  <a>
-                    <xsl:attribute name="href">
-                      <xsl:value-of select="$document/dri:meta/dri:pageMeta/dri:metadata[@element='download-all-file']"/>
-                    </xsl:attribute>
-                    <xsl:text>Download DataSet</xsl:text>
-                  </a>
-                </div>
-              </xsl:if>
+              <xsl:call-template name="downloadAllButton"/>
 
                 <div class="item-page-field-wrapper table">
                     <!-- <h5> -->
@@ -537,6 +536,50 @@
               <br/>
             </xsl:if>
           </xsl:for-each>
+        </div>
+      </xsl:if>
+    </xsl:template>
+    <xsl:template name="itemSummaryView-DIM-isversionof">
+      <xsl:if test="dim:field[@element='relation' and @qualifier='isversionof' and descendant::text()]">
+        <xsl:variable name="ivf" select="dim:field[@element='relation' and @qualifier='isversionof']"></xsl:variable>
+        <xsl:if test="starts-with($ivf, 'http') or starts-with($ivf, 'doi')">
+          <div class="simple-item-view-isversionof word-break item-page-field-wrapper table">
+          <h5>Relation (Is Version Of)</h5>
+          <a>
+            <xsl:attribute name="href">
+              <xsl:value-of select="$ivf"/>
+            </xsl:attribute>
+            <xsl:value-of select="$ivf"/>
+          </a>
+          </div>
+        </xsl:if>
+      </xsl:if>
+    </xsl:template>
+    <xsl:template name="itemSummaryView-DIM-isreferencedby">
+      <xsl:if test="dim:field[@element='relation' and @qualifier='isreferencedby' and descendant::text()]">
+        <xsl:variable name="irb" select="dim:field[@element='relation' and @qualifier='isreferencedby']"></xsl:variable>
+        <xsl:if test="starts-with($irb, 'http://')">
+          <div class="simple-item-view-isreferencedby word-break item-page-field-wrapper table">
+            <h5>Relation (Is Referenced By)</h5>
+            <a>
+              <xsl:attribute name="href">
+                <xsl:value-of select="$irb"/>
+              </xsl:attribute>
+              <xsl:value-of select="$irb"/>
+            </a>
+          </div>
+        </xsl:if>
+      </xsl:if>
+    </xsl:template>
+    <xsl:template name="downloadAllButton">
+      <xsl:if test="$document/dri:meta/dri:pageMeta/dri:metadata[@element='download-all-file']">
+        <div id="item-page-download-all">
+          <a>
+            <xsl:attribute name="href">
+              <xsl:value-of select="$document/dri:meta/dri:pageMeta/dri:metadata[@element='download-all-file']"/>
+            </xsl:attribute>
+            <img alt="Download All" src="{$theme-path}/images/download-all.png"/>
+          </a>
         </div>
       </xsl:if>
     </xsl:template>
