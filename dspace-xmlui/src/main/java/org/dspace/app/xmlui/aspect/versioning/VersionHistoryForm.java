@@ -64,7 +64,7 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
 
     public void addBody(Body body) throws WingException, SQLException, AuthorizeException
     {
-        boolean isItemView=parameters.getParameterAsInteger("itemID",-1) == -1;
+        boolean isItemView=parameters.getParameter("itemID",null) == null;
         Item item = getItem();
 
         if(item==null || !authorizeService.isAdmin(this.context, item.getOwningCollection()))
@@ -106,7 +106,7 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
     {
         try
         {
-            if(parameters.getParameterAsInteger("itemID",-1) == -1)
+            if(parameters.getParameter("itemID",null) == null)
             {
                 DSpaceObject dso;
                 dso = HandleUtil.obtainHandle(objectModel);

@@ -102,6 +102,7 @@ implements DOIConnector
     
     protected String USERNAME;
     protected String PASSWORD;
+    @Autowired
     protected HandleService handleService;
     
     public DataCiteConnector()
@@ -109,7 +110,6 @@ implements DOIConnector
         this.xwalk = null;
         this.USERNAME = null;
         this.PASSWORD = null;
-        this.handleService = HandleServiceFactory.getInstance().getHandleService();
     }
     
     /**

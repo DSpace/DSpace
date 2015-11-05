@@ -10,12 +10,12 @@ package org.dspace.statistics;
 import org.apache.log4j.Logger;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.model.Event;
+import org.dspace.statistics.factory.StatisticsServiceFactory;
 import org.dspace.statistics.service.SolrLoggerService;
 import org.dspace.usage.AbstractUsageEventListener;
 import org.dspace.usage.UsageEvent;
 import org.dspace.usage.UsageSearchEvent;
 import org.dspace.usage.UsageWorkflowEvent;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -29,15 +29,18 @@ public class SolrLoggerUsageEventListener extends AbstractUsageEventListener {
 
 	private static Logger log = Logger.getLogger(SolrLoggerUsageEventListener.class);
 
-    @Autowired(required = true)
     protected SolrLoggerService solrLoggerService;
+
+	public SolrLoggerUsageEventListener() {
+        solrLoggerService = StatisticsServiceFactory.getInstance().getSolrLoggerService();
+	}
 
 	@Override
 	public void receiveEvent(Event event) {
 
 		if(event instanceof UsageEvent)
 		{
-			log.debug("Usage event received " + ((UsageEvent)event).getName());
+			log.debug("Usage event received " + event.getName());
 			try{
 			    UsageEvent ue = (UsageEvent)event;
 			

@@ -368,7 +368,7 @@ public class UploadWithEmbargoStep extends UploadStep
                 String fileDescription =  (String) request.getAttribute(param + "-description");
                 if(fileDescription==null ||fileDescription.length()==0)
                 {
-                    request.getParameter("description");
+                    fileDescription = request.getParameter("description");
                 }
 
                 // if information wasn't passed by User Interface, we had a problem
@@ -513,8 +513,8 @@ public class UploadWithEmbargoStep extends UploadStep
         }
         // FORM: UploadStep SELECTED OPERATION: go to EditBitstreamPolicies
         else if (buttonPressed.startsWith("submit_editPolicy_")){
-            String bitstreamID = buttonPressed.substring("submit_editPolicy_".length());
-            Bitstream b = bitstreamService.find(context, Util.getUUIDParameter(request, bitstreamID));
+            UUID bitstreamID = UUID.fromString(buttonPressed.substring("submit_editPolicy_".length()));
+            Bitstream b = bitstreamService.find(context, bitstreamID);
             subInfo.setBitstream(b);
             return STATUS_EDIT_POLICIES;
         }

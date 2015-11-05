@@ -88,7 +88,7 @@ public class VersionNoticeTransformer extends AbstractDSpaceTransformer {
 
         if(history != null){
             Version latestVersion = retrieveLatestVersion(history, item);
-            if(latestVersion != null && latestVersion.getItem().equals(item))
+            if(latestVersion != null && !latestVersion.getItem().equals(item))
             {
                 //We have a newer version
                 Item latestVersionItem = latestVersion.getItem();

@@ -93,7 +93,7 @@ public class VersioningItemHome implements ItemHomeProcessor {
 
 			if (latestVersion != null) {
 				if (latestVersion != null && latestVersion.getItem() != null
-						&& latestVersion.getItem().getID().equals(item.getID())) {
+						&& !latestVersion.getItem().getID().equals(item.getID())) {
 					// We have a newer version
 					Item latestVersionItem = latestVersion.getItem();
 					if (latestVersionItem.isArchived()) {

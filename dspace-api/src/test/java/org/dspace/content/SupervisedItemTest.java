@@ -15,9 +15,12 @@ import org.dspace.content.service.WorkspaceItemService;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.AbstractUnitTest;
+import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
@@ -38,33 +41,18 @@ public class SupervisedItemTest extends AbstractUnitTest
     /** log4j category */
     private static final Logger log = Logger.getLogger(SupervisedItemTest.class);
 
-    /**
-     * SupervisedItem instance for the tests
-     */
-    private WorkspaceItem si;
-
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
     protected SupervisedItemService supervisedItemService = ContentServiceFactory.getInstance().getSupervisedItemService();
-    protected WorkspaceItemService workspaceItem = ContentServiceFactory.getInstance().getWorkspaceItemService();
+    protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
     protected SupervisorService supervisorService = EPersonServiceFactory.getInstance().getSupervisorService();
 
+    protected UUID communityId;
+    protected UUID groupId;
+    protected int workspaceItemId;
 
-    private Collection collection;
-    private Community owningCommunity;
-
-
-    /**
-     * Group instance for the tests
-     */
-    private Group gr;
-
-    /**
-     * WorkspaceItem instance for the tests
-     */
-    private WorkspaceItem wi;
 
     /**
      * This method will be run before every test as per @Before. It will
@@ -82,27 +70,26 @@ public class SupervisedItemTest extends AbstractUnitTest
         {
             //we have to create a new community in the database
             context.turnOffAuthorisationSystem();
-            this.owningCommunity = communityService.create(null, context);
-            this.collection = collectionService.create(context, owningCommunity);
-            wi = workspaceItem.create(context, collection, false);
-            gr = groupService.create(context);
-            groupService.addMember(context, gr, context.getCurrentUser());
+            Community owningCommunity = communityService.create(null, context);
+            Collection collection = collectionService.create(context, owningCommunity);
+            WorkspaceItem si = workspaceItemService.create(context, collection, false);
+            Group gr = groupService.create(context);
+            EPerson currentUser = context.getCurrentUser();
+            groupService.addMember(context, gr, currentUser);
             groupService.update(context, gr);
 
             //set a supervisor as editor
-            supervisorService.add(context, gr, wi, 1);
+            supervisorService.add(context, gr, si, 1);
 
-            List<WorkspaceItem> found = supervisedItemService.getAll(context);
-            for(WorkspaceItem sia: found)
-            {
-                if(sia.getID() == wi.getID())
-                {
-                    si = sia;
-                }
-            }
+            communityId = owningCommunity.getID();
+            workspaceItemId = si.getID();
+            groupId = gr.getID();
 
             //we need to commit the changes so we don't block the table for testing
             context.restoreAuthSystemState();
+            context.complete();
+            context = new Context();
+            context.setCurrentUser(currentUser);
         } catch (AuthorizeException ex)
         {
             log.error("Authorization Error in init", ex);
@@ -128,15 +115,12 @@ public class SupervisedItemTest extends AbstractUnitTest
     {
         try {
             context.turnOffAuthorisationSystem();
-            communityService.delete(context, owningCommunity);
+            communityService.delete(context, communityService.find(context, communityId));
             context.restoreAuthSystemState();
         } catch (SQLException | AuthorizeException | IOException ex) {
             log.error("SQL Error in destroy", ex);
             fail("SQL Error in destroy: " + ex.getMessage());
         }
-        si = null;
-        wi = null;
-        gr = null;
         super.destroy();
     }
 
@@ -153,7 +137,7 @@ public class SupervisedItemTest extends AbstractUnitTest
         boolean added = false;
         for(WorkspaceItem sia: found)
         {
-            if(sia.equals(si))
+            if(sia.getID() == workspaceItemId)
             {
                 added = true;
             }
@@ -167,10 +151,10 @@ public class SupervisedItemTest extends AbstractUnitTest
     @Test
     public void testGetSupervisorGroups_Context_int() throws Exception
     {
-        List<Group> found = si.getSupervisorGroups();
+        List<Group> found = workspaceItemService.find(context, workspaceItemId).getSupervisorGroups();
         assertThat("testGetSupervisorGroups_Context_int 0", found, notNullValue());
         assertTrue("testGetSupervisorGroups_Context_int 1", found.size() == 1);
-        assertThat("testGetSupervisorGroups_Context_int 2", found.get(0).getID(), equalTo(gr.getID()));
+        assertThat("testGetSupervisorGroups_Context_int 2", found.get(0).getID(), equalTo(groupId));
     }
 
     /**
@@ -179,14 +163,14 @@ public class SupervisedItemTest extends AbstractUnitTest
     @Test
     public void testGetSupervisorGroups_0args() throws Exception 
     {
-        List<Group> found = si.getSupervisorGroups();
+        List<Group> found = workspaceItemService.find(context, workspaceItemId).getSupervisorGroups();
         assertThat("testGetSupervisorGroups_0args 0", found, notNullValue());
         assertTrue("testGetSupervisorGroups_0args 1", found.size() == 1);
 
         boolean added = false;
         for(Group g: found)
         {
-            if(g.equals(gr))
+            if(g.getID().equals(groupId))
             {
                 added = true;
             }
@@ -212,7 +196,7 @@ public class SupervisedItemTest extends AbstractUnitTest
         boolean added = false;
         for(WorkspaceItem sia: found)
         {
-            if(sia.equals(si))
+            if(sia.getID() == workspaceItemId)
             {
                 added = true;
             }

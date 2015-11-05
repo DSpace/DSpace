@@ -134,7 +134,7 @@ public class HandleIdentifierProvider extends IdentifierProvider {
         }
 
         try{
-            return handleService.createHandle(context, dso, null);
+            return handleService.createHandle(context, dso);
         }catch (Exception e){
             log.error(LogManager.getHeader(context, "Error while attempting to create handle", "Item id: " + dso.getID()), e);
             throw new RuntimeException("Error while attempting to create identifier for Item id: " + dso.getID());
