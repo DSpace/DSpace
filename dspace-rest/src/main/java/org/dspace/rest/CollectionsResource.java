@@ -717,7 +717,7 @@ public class CollectionsResource extends Resource
         }
         else
         {
-            log.info("Collection was found with id(" + collection.getId() + ").");
+            log.info("Collection was found with id(" + collection.getUUID() + ").");
         }
         return collection;
     }

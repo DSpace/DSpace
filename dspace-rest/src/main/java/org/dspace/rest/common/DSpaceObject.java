@@ -29,8 +29,6 @@ import java.util.UUID;
  */
 @XmlRootElement(name = "dspaceobject")
 public class DSpaceObject {
-    //legacyID
-    private Integer id;
 
     private String uuid;
 
@@ -49,21 +47,12 @@ public class DSpaceObject {
     }
 
     public DSpaceObject(org.dspace.content.DSpaceObject dso, ServletContext servletContext) {
-        //setId(); legacyID
         setUUID(dso.getID().toString());
         setName(dso.getName());
         setHandle(dso.getHandle());
         DSpaceObjectService dspaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(dso);
         setType(dspaceObjectService.getTypeText(dso).toLowerCase());
         link = createLink(servletContext);
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getName(){
@@ -116,6 +105,6 @@ public class DSpaceObject {
     }
 
     private String createLink(ServletContext context){
-        return context.getContextPath() + "/" + English.plural(getType()) + "/" + getId();
+        return context.getContextPath() + "/" + English.plural(getType()) + "/" + getUUID();
     }
 }

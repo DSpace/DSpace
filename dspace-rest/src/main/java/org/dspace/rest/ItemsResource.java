@@ -567,7 +567,7 @@ public class ItemsResource extends Resource
             processFinally(context);
         }
 
-        log.info("Bitstream(id=" + bitstream.getId() + ") was successfully added into item(id=" + itemId + ").");
+        log.info("Bitstream(id=" + bitstream.getUUID() + ") was successfully added into item(id=" + itemId + ").");
         return bitstream;
     }
 
