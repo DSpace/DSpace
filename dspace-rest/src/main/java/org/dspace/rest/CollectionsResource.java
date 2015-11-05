@@ -274,9 +274,10 @@ public class CollectionsResource extends Resource
             Iterator<org.dspace.content.Item> dspaceItems = itemService.findByCollection(context, dspaceCollection);
             for (int i = 0; (dspaceItems.hasNext()) && (i < (limit + offset)); i++)
             {
+                org.dspace.content.Item dspaceItem = dspaceItems.next();
+
                 if (i >= offset)
                 {
-                    org.dspace.content.Item dspaceItem = dspaceItems.next();
                     if (itemService.isItemListedForUser(context, dspaceItem))
                     {
                         items.add(new Item(dspaceItem, expand, context));
@@ -518,6 +519,8 @@ public class CollectionsResource extends Resource
 
             collectionService.delete(context, dspaceCollection);
             collectionService.update(context, dspaceCollection);
+
+            context.complete();
         }
         catch (ContextException e)
         {
@@ -536,8 +539,7 @@ public class CollectionsResource extends Resource
         {
             processException("Could not delete collection(id=" + collectionId + "), IOException. Message: " + e, context);
         }
-        finally
-        {
+        finally {
             processFinally(context);
         }
 
@@ -641,8 +643,7 @@ public class CollectionsResource extends Resource
             processException("Could not delete item(id=" + itemId + ") in collection(id=" + collectionId
                     + "), IOException. Message: " + e, context);
         }
-        finally
-        {
+        finally {
             processFinally(context);
         }
 

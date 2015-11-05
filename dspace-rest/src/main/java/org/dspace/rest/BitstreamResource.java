@@ -628,6 +628,8 @@ public class BitstreamResource extends Resource
 
             log.trace("Deleting bitstream from all bundles.");
             bitstreamService.delete(context, dspaceBitstream);
+
+            context.complete();
         }
         catch (SQLException e)
         {
