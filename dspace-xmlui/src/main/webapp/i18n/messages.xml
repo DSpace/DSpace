@@ -2950,12 +2950,10 @@
 	<message key="input_forms.field.dc.title.required">You must enter a main title for this item.</message>
 	<message key="input_forms.field.dc.source.uri.label">Project URL</message>
 	<message key="input_forms.field.dc.source.uri.hint">Enter the project url.</message>
-	<message key="input_forms.field.dc.source.uri.required"/>
 	<message key="input_forms.field.local.demo.uri.label">Demo URL</message>
 	<message key="input_forms.field.local.demo.uri.hint">A url with samples of the resource or, in the case of tools,
 		of samples of the output.
 	</message>
-	<message key="input_forms.field.local.demo.uri.required"/>
 	<message key="input_forms.field.dc.date.issued.label">Date issued</message>
 	<message key="input_forms.field.dc.date.issued.hint">Please give the date when the submission data were issued if any e.g., 2014-01-21 or at least
 		the year.
@@ -2965,12 +2963,10 @@
 	<message key="input_forms.field.local.hidden.hint">Indicate whether you want to hide this item from browse and search. Combine with "Upload cmdi"
 		for weblicht submissions.
 	</message>
-	<message key="input_forms.field.local.hidden.required"/>
 	<message key="input_forms.field.local.hasMetadata.label">Are you going to upload cmdi file?</message>
 	<message key="input_forms.field.local.hasMetadata.hint">Indicate whether you will upload cmdi file in the next step. Combine with "hide" for weblicht
 		submissions.
 	</message>
-	<message key="input_forms.field.local.hasMetadata.required"/>
 	<message key="input_forms.field.dc.contributor.author.label">Authors</message>
 	<message key="input_forms.field.dc.contributor.author.hint">Enter the names of the authors of this item. Start typing the author's last name and use
 		autocomplete form that will appear if applicable. End your input by pressing ESC if you don't
@@ -3001,7 +2997,6 @@
 		not applicable). Multiple languages are possible. Start typing the language and use autocomplete
 		form that will appear.
 	</message>
-	<message key="input_forms.field.dc.language.iso1.required"/>
 	<message key="input_forms.field.dc.subject.label">Subject Keywords</message>
 	<message key="input_forms.field.dc.subject.hint">Enter appropriate subject keyword or phrase and press the Add button. You can repeat it for
 		multiple keywords or use separators i.e., comma and semicolon, which will split it accordingly.
@@ -3022,13 +3017,10 @@
 	</message>
 	<message key="input_forms.field.metashare.ResourceInfo#ContentInfo.mediaType1.required">Media type is required</message>
 	<message key="input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType.label">Detailed type</message>
-	<message key="input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType.hint"/>
 	<message key="input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType.required">Choose one of the types</message>
 	<message key="input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType1.label">Detailed type</message>
-	<message key="input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType1.hint"/>
 	<message key="input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType1.required">Choose one of the types</message>
 	<message key="input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType2.label">Detailed type</message>
-	<message key="input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType2.hint"/>
 	<message key="input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType2.required">Choose one of the types</message>
 	<message key="input_forms.field.metashare.ResourceInfo#ResourceComponentType#ToolServiceInfo.languageDependent.label">Language Dependent</message>
 	<message key="input_forms.field.metashare.ResourceInfo#ResourceComponentType#ToolServiceInfo.languageDependent.hint">Indicate whether the operation of the tool or service is
@@ -3037,21 +3029,16 @@
 	<message key="input_forms.field.metashare.ResourceInfo#ResourceComponentType#ToolServiceInfo.languageDependent.required">Please indicate whether the tool is language dependent</message>
 	<message key="input_forms.field.dc.contributor.author1.label">One: Authors</message>
 	<message key="input_forms.field.dc.contributor.author1.hint">Enter the names of the author(s) of this item.</message>
-	<message key="input_forms.field.dc.contributor.author1.required"/>
 	<message key="input_forms.field.local.submission.note.label">Note</message>
 	<message key="input_forms.field.local.submission.note.hint">Leave a note for the editors/reviewers</message>
-	<message key="input_forms.field.local.submission.note.required"/>
 	<message key="input_forms.field.dc.relation.replaces.label">Replaces</message>
 	<message key="input_forms.field.dc.relation.replaces.hint">URL to a related resource that is supplanted, displaced, or superseded by the described
 		resource.
 	</message>
-	<message key="input_forms.field.dc.relation.replaces.required"/>
 	<message key="input_forms.field.dc.relation.isreplacedby.label">Is replaced by</message>
 	<message key="input_forms.field.dc.relation.isreplacedby.hint">A related resource that supplants, displaces, or supersedes the described resource.</message>
-	<message key="input_forms.field.dc.relation.isreplacedby.required"/>
 	<message key="input_forms.field.local.embargo.termslift.label">Embargo lift date</message>
 	<message key="input_forms.field.local.embargo.termslift.hint">Date that the resource will become available e.g., 2014-01-21</message>
-	<message key="input_forms.field.local.embargo.termslift.required"/>
 	<message key="input_forms.value_pairs.common_identifiers.issn">ISSN</message>
 	<message key="input_forms.value_pairs.common_identifiers.other">Other</message>
 	<message key="input_forms.value_pairs.common_identifiers.ismn">ISMN</message>

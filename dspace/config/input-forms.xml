@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE input-forms SYSTEM "input-forms.dtd">
 <input-forms>
 
@@ -75,7 +75,7 @@
                     <label>input_forms.field.dc.source.uri.label</label>
                     <input-type>onebox</input-type>
                     <hint>input_forms.field.dc.source.uri.hint</hint>
-                    <required>input_forms.field.dc.source.uri.required</required>
+                    <required/>
                     <regexp>http.*</regexp>
                     <regexp-warning>The supplied url must start with http/https</regexp-warning>
                 </field>
@@ -88,7 +88,7 @@
                     <label>input_forms.field.local.demo.uri.label</label>
                     <input-type>onebox</input-type>
                     <hint>input_forms.field.local.demo.uri.hint</hint>
-                    <required>input_forms.field.local.demo.uri.required</required>
+                    <required/>
                     <regexp>http.*</regexp>
                     <regexp-warning>The supplied url must start with http/https</regexp-warning>
                 </field>
@@ -112,7 +112,7 @@
                     <label>input_forms.field.local.hidden.label</label>
                     <input-type value-pairs-name="hidden_list">list</input-type>
                     <hint>input_forms.field.local.hidden.hint</hint>
-                    <required>input_forms.field.local.hidden.required</required>
+                    <required/>
                     <acl>
                         policy=deny,action=read,grantee-type=user,grantee-id=*
                     </acl>
@@ -127,7 +127,7 @@
                     <input-type value-pairs-name="metashare_languageDependent">list</input-type>
                     <!-- true/false value -->
                     <hint>input_forms.field.local.hasMetadata.hint</hint>
-                    <required>input_forms.field.local.hasMetadata.required</required>
+                    <required/>
                     <acl>
                         policy=deny,action=read,grantee-type=user,grantee-id=*
                     </acl>
@@ -230,7 +230,7 @@
                     <input-type>onebox</input-type>
                     <hint>input_forms.field.dc.language.iso1.hint</hint>
                     <autocomplete>json_static-iso_langs.json</autocomplete>
-                    <required>input_forms.field.dc.language.iso1.required</required>
+                    <required/>
                 </field>
 
                 <field>
@@ -290,7 +290,7 @@
                     <label>input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType.label</label>
                     <type-bind>toolService</type-bind>
                     <input-type value-pairs-name="metashare_detailed_toolService">dropdown</input-type>
-                    <hint>input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType.hint</hint>
+                    <hint/>
                     <required>input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType.required</required>
                 </field>
                 <field>
@@ -301,7 +301,7 @@
                     <label>input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType1.label</label>
                     <type-bind>languageDescription</type-bind>
                     <input-type value-pairs-name="metashare_detailed_languageDescription">dropdown</input-type>
-                    <hint>input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType1.hint</hint>
+                    <hint/>
                     <required>input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType1.required</required>
                 </field>
                 <field>
@@ -312,7 +312,7 @@
                     <label>input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType2.label</label>
                     <type-bind>lexicalConceptualResource</type-bind>
                     <input-type value-pairs-name="metashare_detailed_lexicalConceptualResource">dropdown</input-type>
-                    <hint>input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType2.hint</hint>
+                    <hint/>
                     <required>input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType2.required</required>
                 </field>
                 <!-- -->
@@ -341,7 +341,7 @@
                     <label>input_forms.field.dc.contributor.author1.label</label>
                     <input-type>name</input-type>
                     <hint>input_forms.field.dc.contributor.author1.hint</hint>
-                    <required>input_forms.field.dc.contributor.author1.required</required>
+                    <required/>
                 </field>
             </page>
         </form>
@@ -370,7 +370,7 @@
                     <label>input_forms.field.local.submission.note.label</label>
                     <input-type>textarea</input-type>
                     <hint>input_forms.field.local.submission.note.hint</hint>
-                    <required>input_forms.field.local.submission.note.required</required>
+                    <required/>
                 </field>
 
                 <!-- DC.Relation.Replaces -->
@@ -383,7 +383,7 @@
                     <input-type>onebox</input-type>
                     <hint>input_forms.field.dc.relation.replaces.hint</hint>
                     <autocomplete>solr-handle</autocomplete>
-                    <required>input_forms.field.dc.relation.replaces.required</required>
+                    <required/>
                     <component-label> </component-label>
                     <collapsible>Special fields</collapsible>
                     <acl>
@@ -401,7 +401,7 @@
                     <input-type>onebox</input-type>
                     <hint>input_forms.field.dc.relation.isreplacedby.hint</hint>
                     <autocomplete>solr-handle</autocomplete>
-                    <required>input_forms.field.dc.relation.isreplacedby.required</required>
+                    <required/>
                     <component-label> </component-label>
                     <acl>
                         policy=deny,action=read,grantee-type=user,grantee-id=*
@@ -417,7 +417,7 @@
                     <label>input_forms.field.local.embargo.termslift.label</label>
                     <input-type>onebox</input-type>
                     <hint>input_forms.field.local.embargo.termslift.hint</hint>
-                    <required>input_forms.field.local.embargo.termslift.required</required>
+                    <required/>
                     <regexp>\d\d\d\d-\d\d-\d\d</regexp>
                     <regexp-warning>The supplied date does not follow our date pattern \d\d\d\d-\d\d-\d\d e.g.,
                         2014-01-21
@@ -968,26 +968,26 @@
     <form-complex-definitions>
         <!-- currently only text and dropbox -->
         <definition name="contact_person">
-            <input name="1_givenname" type="text" label="input_forms.complex_definitions.contact_person.1_givenname" required="true"/>
-            <input name="2_surname" type="text" label="input_forms.complex_definitions.contact_person.2_surname" help="input_forms.complex_definitions.contact_person.2_surname" required="true"/>
-            <input name="3_email" type="text" label="input_forms.complex_definitions.contact_person.3_email" regexp="[^@]+@[^\.@]+\.[^@]+" required="true"/>
-            <input name="4_affiliation" type="text" label="input_forms.complex_definitions.contact_person.4_affiliation" autocomplete="solr-publisher_ac" required="true"/>
+            <input name="1_givenname" type="text" label="input_forms.complex_definitions.contact_person.1_givenname.label" required="true"/>
+            <input name="2_surname" type="text" label="input_forms.complex_definitions.contact_person.2_surname.label" help="input_forms.complex_definitions.contact_person.2_surname.help" required="true"/>
+            <input name="3_email" type="text" label="input_forms.complex_definitions.contact_person.3_email.label" regexp="[^@]+@[^\.@]+\.[^@]+" required="true"/>
+            <input name="4_affiliation" type="text" label="input_forms.complex_definitions.contact_person.4_affiliation.label" autocomplete="solr-publisher_ac" required="true"/>
 
-            <input name="4_affiliation" type="text" label="input_forms.complex_definitions.contact_person.4_affiliation" autocomplete="solr-publisher_ac" required="true"/>
+            <input name="4_affiliation" type="text" label="input_forms.complex_definitions.contact_person.4_affiliation.label" autocomplete="solr-publisher_ac" required="true"/>
 
         </definition>
 
         <definition name="funding">
-            <input name="4_type" type="dropdown" label="input_forms.complex_definitions.funding.4_type" pairs="metashare_funding" class="openaire-type-map" required="true"/>
-            <input name="2_code" placeholder="Start typing the name/number of the grant..." type="text" label="input_forms.complex_definitions.funding.2_code" class="openaire-code-autocomplete" autocomplete="solr-local.sponsor_ac" required="true"/>
-            <input name="1_orgname" type="text" label="input_forms.complex_definitions.funding.1_orgname" required="true"/>
-            <input name="3_projname" type="text" label="input_forms.complex_definitions.funding.3_projname" autocomplete="solr-local.sponsor_ac" required="true"/>
-            <input name="5_openaire_id" value="" type="text" readonly="true" label="input_forms.complex_definitions.funding.5_openaire_id" placeholder="Filled out automatically..." mapped-to-if-not-default="dc.relation" class="openaire-id"/>
+            <input name="4_type" type="dropdown" label="input_forms.complex_definitions.funding.4_type.label" pairs="metashare_funding" class="openaire-type-map" required="true"/>
+            <input name="2_code" placeholder="Start typing the name/number of the grant..." type="text" label="input_forms.complex_definitions.funding.2_code.label" class="openaire-code-autocomplete" autocomplete="solr-local.sponsor_ac" required="true"/>
+            <input name="1_orgname" type="text" label="input_forms.complex_definitions.funding.1_orgname.label" required="true"/>
+            <input name="3_projname" type="text" label="input_forms.complex_definitions.funding.3_projname.label" autocomplete="solr-local.sponsor_ac" required="true"/>
+            <input name="5_openaire_id" value="" type="text" readonly="true" label="input_forms.complex_definitions.funding.5_openaire_id.label" placeholder="Filled out automatically..." mapped-to-if-not-default="dc.relation" class="openaire-id"/>
         </definition>
 
         <definition name="sizeInfo">
             <input name="1_size" type="text" regexp="\d+.?\d*" required="true"/>
-            <input name="2_unit" type="dropdown" pairs="metashare_sizeunit" label="input_forms.complex_definitions.sizeInfo.2_unit" required="true"/>
+            <input name="2_unit" type="dropdown" pairs="metashare_sizeunit" label="input_forms.complex_definitions.sizeInfo.2_unit.label" required="true"/>
         </definition>
     </form-complex-definitions>
 
