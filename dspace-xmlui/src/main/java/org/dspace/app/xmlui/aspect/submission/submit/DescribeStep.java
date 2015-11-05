@@ -1268,7 +1268,7 @@ public class DescribeStep extends AbstractSubmissionStep
                         java.util.List<String> pairs = definition.getValuePairsForInput(name);
                         for (int i = 0; i < pairs.size(); i += 2)
                         {
-                            String display = pairs.get(i);
+                            Message display = message(pairs.get(i));
                             String value   = pairs.get(i+1);
                             select.addOption(value,display);
                         }
@@ -1280,13 +1280,13 @@ public class DescribeStep extends AbstractSubmissionStep
                 if (null == field) {
                     continue;
                 }
-                Message label = message(input_map.get("label"));
+                String label = input_map.get("label");
                 if(label != null){
-                    field.setLabel(label);
+                    field.setLabel(message(label));
                 }
-                Message help = message(input_map.get("help"));
+                String help = input_map.get("help");
                 if(help != null){
-                    field.setHelp(help);
+                    field.setHelp(message(help));
                 }
                 String placeholder = input_map.get("placeholder");
                 if(placeholder != null){
