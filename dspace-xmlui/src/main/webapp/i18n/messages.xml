@@ -555,6 +555,7 @@
 	<message key="xmlui.EPerson.EditProfile.invalid_item">Invalid item</message>
 	<message key="xmlui.EPerson.EditProfile.head_identify">Identify</message>
 	<message key="xmlui.EPerson.EditProfile.head_security">Security</message>
+	<message key="xmlui.EPerson.EditProfile.signed_licenses">Licenses you signed</message>
 
 	<!-- org.dspace.app.xmlui.eperson.EPersonUtils.java -->
 	<message key="xmlui.EPerson.EPersonUtils.register_verify_email">Verify Email</message>
@@ -931,6 +932,8 @@
     <message key="xmlui.Submission.submit.UFALLicenseStep.review_no_file">No file was uploaded in the upload step. There is no restriction on the metadata.</message>    
     <message key="xmlui.Submission.submit.UFALLicenseStep.review_license_error">License specified by you was not found in the database. This is most likely due to an error please contact administrators.</message>
 	<message key="xmlui.Submission.submit.UFALLicenseStep.option_placeholder">Select a License ...</message>
+	<message key="xmlui.Submission.submit.UFALLicenseStep.select_head">Select the resource license</message>
+	<message key="xmlui.Submission.submit.UFALLicenseStep.or_label">- OR -</message>
 
     
     <!-- cz.cuni.mff.ufal.UFALLicenceAgreement -->
@@ -2923,10 +2926,15 @@
   <message key="xmlui.UFAL.artifactbrowser.item-contains-one-file">This item contains {0} file ({1}).</message>
   <message key="xmlui.UFAL.artifactbrowser.item-contains-many-files">This item contains {0} files ({1}).</message>
   <message key="xmlui.UFAL.artifactbrowser.item-contains-no-files">This item contains no files.</message>
+  <message key="xmlui.UFAL.artifactbrowser.filters.add_filters">Advanced Search</message>
+  <message key="xmlui.UFAL.artifactbrowser.filters.clear">Clear All</message>
+  <message key="xmlui.UFAL.artifactbrowser.filters.selected">Selected Filters</message>
 
   <!-- UFAL/lib/xsl/aspect/artifactbrowser/item-view.xsl -->
   <message key="xmlui.UFAL.artifactbrowser.item-download-all-files">Download all files in item ({0})</message>
   <message key="xmlui.UFAL.artifactbrowser.item-download-file">Download file</message>
+  <message key="xmlui.UFAL.artifactbrowser.acknowledgement">Acknowledgement</message>
+  <message key="xmlui.UFAL.artifactbrowser.authors">Authors</message>
 
 	<!-- UFAL/lib/xsl/core/navigation.xsl -->
 	<message key="xmlui.UFAL.navigation.menu_head">What can you do?</message>
@@ -3170,6 +3178,7 @@
 	<message key="input_forms.complex_definitions.contact_person.4_affiliation.label">Contact person's institution name</message>
 	<message key="input_forms.complex_definitions.contact_person.4_affiliation.label">Contact person's institution name</message>
 	<message key="input_forms.complex_definitions.funding.4_type.label">Funding type</message>
+	<message key="input_forms.complex_definitions.funding.2_code.placeholder">Start typing the name/number of the grant...</message>
 	<message key="input_forms.complex_definitions.funding.2_code.label">Grant no. or funding project code</message>
 	<message key="input_forms.complex_definitions.funding.1_orgname.label">Funding organization</message>
 	<message key="input_forms.complex_definitions.funding.3_projname.label">Funding project name</message>

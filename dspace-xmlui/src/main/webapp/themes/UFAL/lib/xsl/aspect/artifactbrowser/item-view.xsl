@@ -182,7 +182,7 @@
 					<dl id="item-authors" class="dl-horizontal" style="clear:both;">
 					<dt style="text-align: left">
 						<i class="fa fa-pencil">&#160;</i>
-						<span>Authors</span>
+						<span><i18n:text>xmlui.UFAL.artifactbrowser.authors</i18n:text></span>
 					</dt>
 					<dd style="padding-right: 40px;">
 					<xsl:choose>
@@ -534,7 +534,7 @@
 				<dl id="item-sponsor" class="dl-horizontal">
 					<dt style="text-align: left">
 						<i class="fa fa-money">&#160;</i>
-						<xsl:text>Acknowledgement</xsl:text>
+						<i18n:text>xmlui.UFAL.artifactbrowser.acknowledgement</i18n:text>
 					</dt>
 					<dd>
 						<xsl:variable name="my_elem">

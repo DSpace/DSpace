@@ -136,10 +136,15 @@
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_language">Kód jazyka</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_keyword">Klíčové slovo</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_hasfile">Obsahuje soubory</message>
-	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.hasfile">Obsahuje soubory</message>
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_branding">Komunita</message>
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.hasfile">Obsahuje soubory</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.branding">Komunita</message>
-
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.author">Autor</message>
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.title">Název</message>
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subject">Předmět</message>
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dateIssued">Datum publikování</message>
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.rights">Práva</message>
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.type">Typ</message>
 
 	<!--  some common other possibilities for Advanced Search Fields -->
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_contributor">Přispěvatel</message>
@@ -325,7 +330,7 @@
 	<message key="xmlui.ArtifactBrowser.Navigation.browse_subject">Klíčová slova</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.browse_dateissued">Dle data publikování</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.browse_dateaccessioned">Dle data zaslání</message>
-	<message key="xmlui.ArtifactBrowser.Navigation.browse_rights">Nálepky práv</message>
+	<message key="xmlui.ArtifactBrowser.Navigation.browse_rights">Dle práv</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.head_this_collection">Tato kolekce</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.head_this_community">Tato komunita</message>
 
@@ -561,7 +566,8 @@
 	<message key="xmlui.EPerson.EditProfile.invalid_item">Neplatný záznam</message>
 	<message key="xmlui.EPerson.EditProfile.head_identify">Identifikace</message>
 	<message key="xmlui.EPerson.EditProfile.head_security">Bezpečnost</message>
-	
+	<message key="xmlui.EPerson.EditProfile.signed_licenses">Podepsané licence</message>
+
 	<!-- org.dspace.app.xmlui.eperson.EPersonUtils.java -->
 	<message key="xmlui.EPerson.EPersonUtils.register_verify_email">Ověření emailu</message>
 	<message key="xmlui.EPerson.EPersonUtils.register_create_profile">Vytvořit profil</message>
@@ -936,6 +942,8 @@
 	<message key="xmlui.Submission.submit.UFALLicenseStep.review_no_file">V předchozích krocích nebyl nahrán soubor. Na metadata samotná nelze licence aplikovat.</message>
 	<message key="xmlui.Submission.submit.UFALLicenseStep.review_license_error">Vámi zvolená licence nebyla v databázi nalezena. Nejspíše se jedná o chybu. Kontaktujte prosím správce.</message>
 	<message key="xmlui.Submission.submit.UFALLicenseStep.option_placeholder">Zvolte licenci ...</message>
+	<message key="xmlui.Submission.submit.UFALLicenseStep.select_head">Vyberte licenci záznamu</message>
+	<message key="xmlui.Submission.submit.UFALLicenseStep.or_label">- NEBO -</message>
 
 
 	<!-- cz.cuni.mff.ufal.UFALLicenceAgreement -->
@@ -2977,13 +2985,6 @@
     <message key="xmlui.ArtifactBrowser.AbstractSearch.type_department_browse">Prohlížení dle oddělení</message>
     <message key="xmlui.ArtifactBrowser.AbstractSearch.type_dateissued_dt_browse">Prohlížení dle data publikování</message>
 
-    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.author">Autor</message>
-    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.title">Název</message>
-    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subject">Předmět</message>
-    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dateIssued">Datum publikování</message>
-
-
-
     <message key="xmlui.dri2xhtml.structural.pagination-info.nototal">Zobrazují se záznamy {0}-{1}</message>
 
     <message key="xmlui.Discovery.AbstractSearch.type_author">Filtrovat dle: Autora</message>
@@ -3033,7 +3034,8 @@
 	<message key="xmlui.Discovery.SimpleSearch.filter.notcontains">neobsahuje</message>
     <message key="xmlui.Discovery.SimpleSearch.filter.notequals">nerovná se</message>
     <message key="xmlui.Discovery.SimpleSearch.filter.notauthority">nemá ID</message>
-    
+	<message key="xmlui.Discovery.SimpleSearch.filter.notavailable">není dostupné</message>
+
     <message key="xmlui.Discovery.RelatedItems.head">Související záznamy</message>
     <message key="xmlui.Discovery.RelatedItems.help">Zobrazují se záznamy příbuzné na základě názvu, autora a předmětu.</message>
 
@@ -3196,10 +3198,15 @@
 	<message key="xmlui.UFAL.artifactbrowser.item-contains-one-file">Tento záznam obsahuje {0} soubor ({1}).</message>
 	<message key="xmlui.UFAL.artifactbrowser.item-contains-many-files">Tento záznam obsahuje {0} souborů ({1}).</message>
 	<message key="xmlui.UFAL.artifactbrowser.item-contains-no-files">Tento záznam neobsahuje soubory.</message>
+	<message key="xmlui.UFAL.artifactbrowser.filters.add_filters">Rozšířené hledání</message>
+	<message key="xmlui.UFAL.artifactbrowser.filters.clear">Zrušit vše</message>
+	<message key="xmlui.UFAL.artifactbrowser.filters.selected">Vybrané filtry</message>
 
 	<!-- UFAL/lib/xsl/aspect/artifactbrowser/item-view.xsl -->
 	<message key="xmlui.UFAL.artifactbrowser.item-download-all-files">Stáhnout všechny soubory záznamu ({0})</message>
 	<message key="xmlui.UFAL.artifactbrowser.item-download-file">Stáhnout soubor</message>
+	<message key="xmlui.UFAL.artifactbrowser.acknowledgement">Sponzoři</message>
+	<message key="xmlui.UFAL.artifactbrowser.authors">Autoři</message>
 
 	<!-- DisplayShareLink -->
 	<message key="xmlui.aspect.submission.submit.DisplayShareLink.title">Sdílet odkaz</message>
@@ -3212,7 +3219,7 @@
 
 	<!-- UFAL/lib/xsl/core/forms.xsl -->
 	<message key="xmlui.UFAL.forms.licenseStep.accepted">Přijmuto</message>
-	<message key="xmlui.UFAL.forms.licenseStep.click">Kliknutím přijměte</message>
+	<message key="xmlui.UFAL.forms.licenseStep.click">Přijmout</message>
 
 	<!-- Homepage -->
     <message key="homepage.carousel.quote">&#x201E;Na světě by mělo být jen jedno velké úložiště umění, které by umělec obohatil svými díly a při prezentaci získal přesně, co žádal... &#x201D;</message>
@@ -3430,6 +3437,7 @@
 	<message key="input_forms.complex_definitions.contact_person.4_affiliation.label">Organizace kontaktní osoby</message>
 	<message key="input_forms.complex_definitions.contact_person.4_affiliation.label">Organizace kontaktní osoby</message>
 	<message key="input_forms.complex_definitions.funding.4_type.label">Druh financí</message>
+	<message key="input_forms.complex_definitions.funding.2_code.placeholder">Začněte psát jméno/číslo grantu...</message>
 	<message key="input_forms.complex_definitions.funding.2_code.label">Číslo grantu, nebo kód financujícího projektu</message>
 	<message key="input_forms.complex_definitions.funding.1_orgname.label">Financující organizace</message>
 	<message key="input_forms.complex_definitions.funding.3_projname.label">Zdroj financí (jméno projektku)</message>

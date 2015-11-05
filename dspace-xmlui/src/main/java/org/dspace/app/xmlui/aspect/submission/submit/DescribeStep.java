@@ -1290,7 +1290,7 @@ public class DescribeStep extends AbstractSubmissionStep
                 }
                 String placeholder = input_map.get("placeholder");
                 if(placeholder != null){
-                    field.setPlaceholder(placeholder);
+                    field.setPlaceholder(message(placeholder));
                 }
                 String field_readonly = input_map.get("readonly");
                 if(field_readonly != null && field_readonly.equals("true")){
