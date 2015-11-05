@@ -75,14 +75,6 @@ public interface CachingService {
     public String getStatus(String cacheName);
 
     /**
-     * Clears all caches.
-     * Generally there is no reason to call this.
-     * 
-     * @throws SecurityException if the current user does not have super user permissions
-     */
-    public void resetCaches();
-
-    /**
      * Unbinds all request caches.  Destroys the caches completely.
      * You should not call this unless you know what you are doing;
      * it is handled automatically by the system.

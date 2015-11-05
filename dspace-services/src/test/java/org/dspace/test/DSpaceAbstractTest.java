@@ -54,11 +54,6 @@ public abstract class DSpaceAbstractTest {
     public static void _destroyKernel() {
         if (kernel != null) {
             // cleanup the kernel
-            try {
-                kernel.destroy();
-            } catch (Exception e) {
-                // keep going
-            }
             kernel.destroy();
         }
         // must null things out or JUnit will not clean them up

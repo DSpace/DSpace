@@ -194,30 +194,6 @@ public class CachingServiceTest extends DSpaceAbstractKernelTest {
     }
 
     /**
-     * Test method for {@link org.dspace.services.caching.CachingServiceImpl#resetCaches()}.
-     */
-    @Test
-    public void testResetCaches() {
-        cachingService.resetCaches();
-
-        // now add new cache
-        Cache c1 = cachingService.getCache("org.dspace.aztest.new", null);
-        assertNotNull(c1);
-        c1.put("AZ", "aaron.zeckoski");
-        c1.put("BZ", "becky.zeckoski");
-        assertEquals("aaron.zeckoski", c1.get("AZ"));
-        assertEquals(null, c1.get("CZ"));
-        assertEquals(2, c1.size());
-
-        cachingService.resetCaches();
-
-        assertEquals(null, c1.get("AZ"));
-        assertEquals(0, c1.size());
-        
-        c1 = null;
-    }
-
-    /**
      * Test method for {@link org.dspace.services.caching.CachingServiceImpl#destroyCache(java.lang.String)}.
      */
     @Test
