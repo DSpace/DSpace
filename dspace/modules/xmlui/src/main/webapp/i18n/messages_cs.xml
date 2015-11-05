@@ -738,7 +738,8 @@
 	<message key="xmlui.Submission.general.showsimple">Zobrazit minimální záznam</message>
 	<message key="xmlui.Submission.general.default.title">Příspěvek</message>
 	<message key="xmlui.Submission.general.default.trail">Příspěvek</message>
-	
+	<message key="xmlui.Submission.general.submission.save_share">Uložit a Sdílet</message>
+
 	<!-- org.dspace.app.xmlui.submission.CollectionViewer -->
 	<message key="xmlui.Submission.CollectionViewer.link1">Zaslat do této kolekce nový záznam</message>
 	
@@ -934,6 +935,7 @@
 	<message key="xmlui.Submission.submit.UFALLicenseStep.license_not_supported">Vybraná licence není momentálně podporována. Prosím následujte kroky popsané v části "Žádná z daných licencí mi nevyhovuje".</message>
 	<message key="xmlui.Submission.submit.UFALLicenseStep.review_no_file">V předchozích krocích nebyl nahrán soubor. Na metadata samotná nelze licence aplikovat.</message>
 	<message key="xmlui.Submission.submit.UFALLicenseStep.review_license_error">Vámi zvolená licence nebyla v databázi nalezena. Nejspíše se jedná o chybu. Kontaktujte prosím správce.</message>
+	<message key="xmlui.Submission.submit.UFALLicenseStep.option_placeholder">Zvolte licenci ...</message>
 
 
 	<!-- cz.cuni.mff.ufal.UFALLicenceAgreement -->
@@ -1004,7 +1006,7 @@
         <message key="xmlui.Submission.submit.EditPolicyStep.head">Upravit politiku</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.UploadStep -->
-	<message key="xmlui.Submission.submit.UploadStep.head">Nahrat soubory</message>
+	<message key="xmlui.Submission.submit.UploadStep.head">Nahrát soubory</message>
 	<message key="xmlui.Submission.submit.UploadStep.file">Soubor</message>
 	<message key="xmlui.Submission.submit.UploadStep.file_help">Prosím, zadejte plnou cestu k souboru na vašem počítači, která odpovídá vašemu záznamu. Po kliknutí na „Procházet...“ se zobrazí nové okno, které vám umožní vybrat soubor z vašeho počítače.</message>
 	<message key="xmlui.Submission.submit.UploadStep.file_local_head">Přidat soubory z URI</message>
@@ -3204,6 +3206,13 @@
 	<message key="xmlui.aspect.submission.submit.DisplayShareLink.trail">Sdílet odkaz</message>
 	<message key="xmlui.aspect.submission.submit.DisplayShareLink.head">Sdílet odkaz</message>
 	<message key="xmlui.aspect.submission.submit.DisplayShareLink.para">Chcete-li tento záznam předat někomu jinému, předejte tento odkaz: <span class="linkify">{0}</span></message>
+
+	<!-- UFAL/lib/xsl/core/navigation.xsl -->
+	<message key="xmlui.UFAL.navigation.menu_head">Kde začít?</message>
+
+	<!-- UFAL/lib/xsl/core/forms.xsl -->
+	<message key="xmlui.UFAL.forms.licenseStep.accepted">Přijmuto</message>
+	<message key="xmlui.UFAL.forms.licenseStep.click">Kliknutím přijměte</message>
 
 	<!-- Homepage -->
     <message key="homepage.carousel.quote">&#x201E;Na světě by mělo být jen jedno velké úložiště umění, které by umělec obohatil svými díly a při prezentaci získal přesně, co žádal... &#x201D;</message>

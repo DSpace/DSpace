@@ -322,7 +322,7 @@
                 <a>
                         <i class="fa fa-question-circle">&#160;</i>
                         <span class="menu-text">
-                                What can you do?
+							<i18n:text>xmlui.UFAL.navigation.menu_head</i18n:text>
                         </span>
                 </a>
                 <ul class="submenu" style="padding-bottom: 8px;">

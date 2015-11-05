@@ -1304,7 +1304,7 @@
         </xsl:template>
         
         <xsl:template match="dri:field[@id='aspect.submission.StepTransformer.field.decision']" priority="10">        	
-                <input type="checkbox" data-toggle="toggle" data-on="Accepted" data-off="Click to accept" data-onstyle="success" data-offstyle="danger" data-width="130" data-height="30">
+                <input type="checkbox" data-toggle="toggle" data-on="xmlui.UFAL.forms.licenseStep.accepted" data-off="xmlui.UFAL.forms.licenseStep.click" data-onstyle="success" data-offstyle="danger" data-width="130" data-height="30" i18n:attr="data-on data-off">
                         <xsl:call-template name="standardAttributes" />
                         <xsl:attribute name="name"><xsl:value-of select="@n"/></xsl:attribute>
                         <xsl:attribute name="value"><xsl:value-of select="dri:option/@returnValue"/></xsl:attribute>

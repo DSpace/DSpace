@@ -67,6 +67,7 @@ public class UFALLicenseStep extends LicenseStep {
 	protected static final Message T_license_not_supported = message("xmlui.Submission.submit.UFALLicenseStep.license_not_supported");
 	protected static final Message T_review_msg= message("xmlui.Submission.submit.UFALLicenseStep.review_no_file");
 	protected static final Message T_review_license_error= message("xmlui.Submission.submit.UFALLicenseStep.review_license_error");
+	protected static final Message T_license_select_placeholder= message("xmlui.Submission.submit.UFALLicenseStep.option_placeholder");
 
 	
 	//
@@ -211,7 +212,7 @@ public class UFALLicenseStep extends LicenseStep {
 				if(selected_license!=null && selected_license[0].equals("")) selected_license = null;
 				int selectedId = (selected_license != null && selected_license.length > 0) ? Integer.parseInt(selected_license[0]) : -1;
 
-				license_select.addOption(true, "", "Select a License ...");
+				license_select.addOption(true, "", T_license_select_placeholder);
 				
 				for (LicenseDefinition license_def : license_defs) {
 					boolean selected = license_def.getLicenseId() == selectedId;

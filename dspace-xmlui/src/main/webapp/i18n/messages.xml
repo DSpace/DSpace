@@ -930,6 +930,7 @@
     <message key="xmlui.Submission.submit.UFALLicenseStep.license_not_supported">The selected license is not supported at the moment. Please follow the procedure described under section "None of these licenses suits your needs".</message>
     <message key="xmlui.Submission.submit.UFALLicenseStep.review_no_file">No file was uploaded in the upload step. There is no restriction on the metadata.</message>    
     <message key="xmlui.Submission.submit.UFALLicenseStep.review_license_error">License specified by you was not found in the database. This is most likely due to an error please contact administrators.</message>
+	<message key="xmlui.Submission.submit.UFALLicenseStep.option_placeholder">Select a License ...</message>
 
     
     <!-- cz.cuni.mff.ufal.UFALLicenceAgreement -->
@@ -2926,6 +2927,13 @@
   <!-- UFAL/lib/xsl/aspect/artifactbrowser/item-view.xsl -->
   <message key="xmlui.UFAL.artifactbrowser.item-download-all-files">Download all files in item ({0})</message>
   <message key="xmlui.UFAL.artifactbrowser.item-download-file">Download file</message>
+
+	<!-- UFAL/lib/xsl/core/navigation.xsl -->
+	<message key="xmlui.UFAL.navigation.menu_head">What can you do?</message>
+
+	<!-- UFAL/lib/xsl/core/forms.xsl -->
+	<message key="xmlui.UFAL.forms.licenseStep.accepted">Accepted</message>
+	<message key="xmlui.UFAL.forms.licenseStep.click">Click to accept</message>
 
   <!-- DisplayShareLink -->
   <message key="xmlui.aspect.submission.submit.DisplayShareLink.title">Share link</message>
