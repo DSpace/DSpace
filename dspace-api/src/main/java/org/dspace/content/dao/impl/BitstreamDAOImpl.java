@@ -18,6 +18,7 @@ import org.dspace.core.AbstractHibernateDSODAO;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
 
@@ -65,8 +66,12 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
 //                    + "bitstream.bitstream_format_id = bitstreamformatregistry.bitstream_format_id "
 //                    + "where not exists( select 'x' from most_recent_checksum "
 //                    + "where most_recent_checksum.bitstream_id = bitstream.bitstream_id )"
-        Criteria criteria = createCriteria(context, Bitstream.class)
-            .add(Subqueries.propertyNotIn("id", DetachedCriteria.forClass(MostRecentChecksum.class)));
+
+        DetachedCriteria d = DetachedCriteria.forClass(MostRecentChecksum.class, "mrc");
+        d.setProjection(Projections.projectionList().add(Projections.property("mrc.bitstream")));
+
+        Criteria criteria = createCriteria(context, Bitstream.class, "b")
+            .add(Subqueries.propertyNotIn("b.id", d));
 
         @SuppressWarnings("unchecked")
         List<Bitstream> result = (List<Bitstream>) criteria.list();

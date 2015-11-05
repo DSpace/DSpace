@@ -7,10 +7,12 @@
  */
 package org.dspace.checker;
 
+import org.apache.log4j.Logger;
 import org.dspace.content.Bitstream;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.Date;
 
 /**
@@ -22,6 +24,7 @@ import java.util.Date;
 @Table(name="most_recent_checksum")
 public class MostRecentChecksum implements Serializable
 {
+    private static final Logger log = Logger.getLogger(MostRecentChecksum.class);
 
     @Id
     @OneToOne
@@ -68,7 +71,32 @@ public class MostRecentChecksum implements Serializable
      */
     protected MostRecentChecksum()
     {
+    }
 
+    public MostRecentChecksum(Bitstream bitstream) {
+        try {
+            setToBeProcessed(!bitstream.isDeleted());
+
+            if (bitstream.getChecksum() == null) {
+                setCurrentChecksum("");
+                setExpectedChecksum("");
+            } else {
+                setCurrentChecksum(bitstream.getChecksum());
+                setExpectedChecksum(bitstream.getChecksum());
+            }
+            setProcessStartDate(new Date());
+            setProcessEndDate(new Date());
+            if (bitstream.getChecksumAlgorithm() == null) {
+                bitstream.setChecksumAlgorithm("MD5");
+            } else {
+                bitstream.setChecksumAlgorithm(bitstream.getChecksumAlgorithm());
+            }
+            setMatchedPrevChecksum(true);
+
+        } catch (SQLException e) {
+            log.error(e);
+            //log
+        }
     }
 
     public Bitstream getBitstream() {

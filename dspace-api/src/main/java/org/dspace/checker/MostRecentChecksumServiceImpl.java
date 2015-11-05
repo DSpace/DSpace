@@ -7,6 +7,7 @@
  */
 package org.dspace.checker;
 
+import org.apache.log4j.Logger;
 import org.dspace.checker.dao.MostRecentChecksumDAO;
 import org.dspace.checker.service.ChecksumResultService;
 import org.dspace.checker.service.MostRecentChecksumService;
@@ -28,6 +29,8 @@ import java.util.List;
  */
 public class MostRecentChecksumServiceImpl implements MostRecentChecksumService
 {
+    private static final Logger log = Logger.getLogger(MostRecentChecksumServiceImpl.class);
+
     @Autowired(required = true)
     protected MostRecentChecksumDAO mostRecentChecksumDAO;
 
@@ -40,7 +43,7 @@ public class MostRecentChecksumServiceImpl implements MostRecentChecksumService
     @Override
     public MostRecentChecksum getNonPersistedObject()
     {
-        return new MostRecentChecksum();
+        return new MostRecentChecksum(new Bitstream());
     }
 
     @Override
@@ -107,27 +110,9 @@ public class MostRecentChecksumServiceImpl implements MostRecentChecksumService
         List<Bitstream> unknownBitstreams = bitstreamService.findBitstreamsWithNoRecentChecksum(context);
         for (Bitstream bitstream : unknownBitstreams)
         {
-            MostRecentChecksum mostRecentChecksum = mostRecentChecksumDAO.create(context, new MostRecentChecksum());
-            mostRecentChecksum.setBitstream(bitstream);
-            //Only process if our bitstream isn't deleted
-            mostRecentChecksum.setToBeProcessed(!bitstream.isDeleted());
-            if(bitstream.getChecksum() == null)
-            {
-                mostRecentChecksum.setCurrentChecksum("");
-                mostRecentChecksum.setExpectedChecksum("");
-            }else{
-                mostRecentChecksum.setCurrentChecksum(bitstream.getChecksum());
-                mostRecentChecksum.setExpectedChecksum(bitstream.getChecksum());
-            }
-            mostRecentChecksum.setProcessStartDate(new Date());
-            mostRecentChecksum.setProcessEndDate(new Date());
-            if(bitstream.getChecksumAlgorithm() == null)
-            {
-                bitstream.setChecksumAlgorithm("MD5");
-            }else{
-                bitstream.setChecksumAlgorithm(bitstream.getChecksumAlgorithm());
-            }
-            mostRecentChecksum.setMatchedPrevChecksum(true);
+            log.info(bitstream + " " + bitstream.getID().toString() + " " + bitstream.getName());
+            MostRecentChecksum mostRecentChecksum = mostRecentChecksumDAO.create(context, new MostRecentChecksum(bitstream));
+
             ChecksumResult checksumResult;
             if(bitstream.isDeleted())
             {
