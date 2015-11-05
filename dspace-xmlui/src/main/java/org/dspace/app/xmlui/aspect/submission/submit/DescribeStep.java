@@ -1280,11 +1280,11 @@ public class DescribeStep extends AbstractSubmissionStep
                 if (null == field) {
                     continue;
                 }
-                String label = input_map.get("label");
+                Message label = message(input_map.get("label"));
                 if(label != null){
                     field.setLabel(label);
                 }
-                String help = input_map.get("help");
+                Message help = message(input_map.get("help"));
                 if(help != null){
                     field.setHelp(help);
                 }
