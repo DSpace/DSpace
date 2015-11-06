@@ -1086,6 +1086,7 @@
 			<xsl:attribute name="onfocus">javascript:tFocus(this);</xsl:attribute>
 		</xsl:if>
         <xsl:if test="dri:params/@placeholder">
+			<xsl:attribute name="i18n:attr">placeholder</xsl:attribute>
             <xsl:attribute name="placeholder"><xsl:value-of select="dri:params/@placeholder"/></xsl:attribute>
         </xsl:if>
 	</xsl:template>

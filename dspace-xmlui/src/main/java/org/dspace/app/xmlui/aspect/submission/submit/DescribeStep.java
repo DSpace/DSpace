@@ -1290,7 +1290,8 @@ public class DescribeStep extends AbstractSubmissionStep
                 }
                 String placeholder = input_map.get("placeholder");
                 if(placeholder != null){
-                    field.setPlaceholder(message(placeholder));
+                    //This is translated in themes/UFAL/lib/xsl/core/forms.xsl:~1089
+                    field.setPlaceholder(placeholder);
                 }
                 String field_readonly = input_map.get("readonly");
                 if(field_readonly != null && field_readonly.equals("true")){

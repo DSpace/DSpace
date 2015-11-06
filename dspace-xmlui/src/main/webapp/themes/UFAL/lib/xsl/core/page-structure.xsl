@@ -324,7 +324,7 @@
 		                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='search'][@qualifier='simpleURL']"/>
 		            </xsl:attribute>
 		            <div class="input-group input-group-sm">
-	                <input type="text" class="form-control small-search-input" placeholder="Search">
+	                <input type="text" class="form-control small-search-input" placeholder="xmlui.general.search" i18n:attr="placeholder">
 	                     <xsl:attribute name="name">
 	                         <xsl:value-of
 	                                 select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='search'][@qualifier='queryField']"/>

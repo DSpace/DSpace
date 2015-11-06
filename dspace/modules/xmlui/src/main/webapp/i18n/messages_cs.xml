@@ -144,7 +144,9 @@
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subject">Předmět</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dateIssued">Datum publikování</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.rights">Práva</message>
-	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.type">Typ</message>
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.publisher">Vydavatel</message>
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.language">Jazyk</message>
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.type">Druh</message>
 
 	<!--  some common other possibilities for Advanced Search Fields -->
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_contributor">Přispěvatel</message>
@@ -2935,7 +2937,8 @@
     <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dc.type_filter">Typ obsahu</message>
     <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dc.date.issued">Datum publikování</message>
     <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dateIssued">Datum publikování</message>
-
+	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_rights">Práva</message>
+	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_type">Druh</message>
 
     <!-- Site Leve Recently Added Content -->
     <message key="xmlui.ArtifactBrowser.SiteViewer.head_recent_submissions">Nedávno přidané</message>
@@ -2994,6 +2997,7 @@
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subject">Předmět</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subject_filter">Předmět</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dateIssued.year">Datum publikování</message>
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.rights_filter">Práva</message>
 
 
     <message key="xmlui.Discovery.AbstractSearch.startswith">Začíná písmeny</message>
