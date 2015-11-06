@@ -30,10 +30,6 @@
     </properties>
 
     <build>
-        <filters>
-            <!-- Filter using the properties file defined by dspace-parent POM -->
-            <filter>${filters.file}</filter>
-        </filters>
         <!-- Centrally manage the versions of all plugins used below -->
         <pluginManagement>
             <plugins>

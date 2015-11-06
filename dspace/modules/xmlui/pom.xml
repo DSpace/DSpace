@@ -21,14 +21,6 @@
         <root.basedir>${basedir}/../../..</root.basedir>
     </properties>
 
-    <build>
-        <filters>
-            <!-- Filter using the properties file defined by dspace-parent POM -->
-            <filter>${filters.file}</filter>
-        </filters>
-
-    </build>
-
     <profiles>
         <profile>
             <id>oracle-support</id>
