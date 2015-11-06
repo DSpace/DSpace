@@ -112,7 +112,8 @@
                     <xsl:variable name="gear"
                                   select="//dri:div[@id='aspect.artifactbrowser.ConfigurableBrowse.div.browse-controls'
                                   or @id='aspect.administrative.WithdrawnItems.div.browse-controls'
-                                  or @id='aspect.administrative.PrivateItems.div.browse-controls']"/>
+                                  or @id='aspect.administrative.PrivateItems.div.browse-controls'
+                                  or @id='aspect.discovery.SearchFacetFilter.div.browse-controls']"/>
                     <xsl:choose>
                         <xsl:when test="$position = 'top' and $gear">
                             <div class="row">
@@ -208,6 +209,7 @@
                     </xsl:if>
 
                 </div>
+                <ul class="ds-artifact-list list-unstyled"></ul>
             </xsl:when>
             <xsl:when test=". = 'masked'">
                 <div class="pagination-masked clearfix {$position}">
@@ -412,7 +414,8 @@
                 <xsl:for-each
                         select="//dri:div[@id='aspect.artifactbrowser.ConfigurableBrowse.div.browse-controls'
                         or @id='aspect.administrative.WithdrawnItems.div.browse-controls'
-                        or @id='aspect.administrative.PrivateItems.div.browse-controls']//dri:field[@type='select']">
+                        or @id='aspect.administrative.PrivateItems.div.browse-controls'
+                        or @id='aspect.discovery.SearchFacetFilter.div.browse-controls']//dri:field[@type='select']">
                     <xsl:if test="position() > 1">
                         <li class="divider"/>
                     </xsl:if>
