@@ -18,6 +18,21 @@
 
     <!-- Place all DSpace core service bean definitions below here -->
 
+    <!-- PROPERTY PLACEHOLDER SETUP -->
+    <!-- The following two beans are a cool trick. They let us use dynamic properties
+         like ${dspace.dir} within our Spring bean XML configuration files. These
+         property values are then dynamically loaded via our DSpaceConfigurationService. -->
+    <!-- First, configure a property placeholder. This lets us use properties like ${..} within Spring bean configs -->
+    <bean id="propertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="properties" ref="dspaceConfigurationFactoryBean"/>
+    </bean>
+    <!-- Next, wire it up to use our DSpaceConfigurationFactoryBean. This bean will use our configured
+         DSpace ConfigurationService for all property substitution in Spring XML files -->
+    <bean id="dspaceConfigurationFactoryBean" class="org.dspace.servicemanager.config.DSpaceConfigurationFactoryBean">
+       <constructor-arg ref="org.dspace.services.ConfigurationService" />
+    </bean>
+    <!-- end PROPERTY PLACEHOLDER SETUP-->
+
     <!-- CACHING service beans -->
     <bean id="org.dspace.services.CachingService" class="org.dspace.services.caching.CachingServiceImpl" />
 
