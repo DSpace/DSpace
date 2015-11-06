@@ -414,7 +414,7 @@
             <xsl:value-of select="substring-after(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='curRequestURI'],/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI'])"/>
         </xsl:variable>
 		<xsl:variable name="currentLocale">
-			<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='currentLocale']"/>
+			<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='currentLocale']"/>
 		</xsl:variable>
         <xsl:if test="count(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='supportedLocale']) &gt; 1">
             <div id="ds-language-selection">

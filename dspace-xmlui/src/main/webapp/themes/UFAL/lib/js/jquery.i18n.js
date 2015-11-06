@@ -32,10 +32,10 @@
          * @param  property_list i18n_dict : The dictionary to use for translation.
          */
         load: function(locale, i18n_dict) {
-            if(locale === null || locale === ""){
+            if(!locale){
                 locale = this.default;
             }
-            if (this.dicts[locale] !== null) {
+            if (this.dicts[locale]) {
                 $.extend(this.dicts[locale], i18n_dict);
             } else {
                 this.dicts[locale] = i18n_dict;
@@ -55,7 +55,7 @@
          */
         _: function (str) {
             currentLocale = $("#ds-language-selection").attr("data-locale");
-            if(currentLocale === null || currentLocale === ""){
+            if(!currentLocale){
                 currentLocale = this.default;
             }
             dict = this.dicts[currentLocale];
