@@ -21,8 +21,7 @@ import org.junit.Test;
  * Tests for Plugin Service.
  * <P>
  * NOTE: Plugin definitions/configurations which are used for this test are
- * defined in /data/dspaceFolder/dspace.cfg.more (and are added into the
- * final test dspace.cfg file)
+ * defined in /src/test/data/dspaceFolder/config/local.cfg
  *
  * @author Tim Donohue
  */
@@ -37,7 +36,7 @@ public class PluginServiceTest extends AbstractDSpaceTest
     @Test
     public void testGetAllPluginNames()
     {
-        // Get all plugins defined from List interface (see dspace.cfg.more)
+        // Get all plugins defined from List interface (see test local.cfg)
         String[] names = pluginService.getAllPluginNames(java.util.List.class);
 
         // There should be exactly 3 List plugins
@@ -62,7 +61,7 @@ public class PluginServiceTest extends AbstractDSpaceTest
         assertNull("Plugin 2 doesn't exist", plugin);
 
         // Test for one plugin that is "selfnamed"
-        // The DCInputAuthority plugin enabled in dspace.cfg.more reads all <form-value-pairs> in input-forms.xml
+        // The DCInputAuthority plugin enabled in test local.cfg reads all <form-value-pairs> in input-forms.xml
         // and defines a self named plugin for each. So, we SHOULD have a "common_types" plugin.
         plugin = pluginService.getNamedPlugin(org.dspace.content.authority.ChoiceAuthority.class, "common_types");
         assertNotNull("Plugin 3 exists", plugin);
@@ -112,7 +111,7 @@ public class PluginServiceTest extends AbstractDSpaceTest
         // There should be four of them
         assertEquals("Plugin count", 4, plugins.length);
 
-        // They should be in an EXACT ORDER (as defined in dspace.cfg.more)
+        // They should be in an EXACT ORDER (as defined in test local.cfg)
         assertTrue("Plugin 0 is ArrayList", plugins[0] instanceof java.util.ArrayList);
         assertTrue("Plugin 1 is LinkedList", plugins[1] instanceof java.util.LinkedList);
         assertTrue("Plugin 2 is Stack", plugins[2] instanceof java.util.Stack);

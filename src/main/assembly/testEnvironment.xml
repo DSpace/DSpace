@@ -24,17 +24,6 @@
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
 
-    <fileSets>
-      <!-- Copy src/main/resources/dspace-test.cfg to test config directory -->
-      <fileSet>
-         <directory>src/main/resources</directory>
-         <outputDirectory>dspace/config</outputDirectory>
-         <includes>
-            <include>dspace-test.cfg</include>
-         </includes>
-      </fileSet>
-    </fileSets>
-
     <!-- NOTE: first file in wins when using maven-assembly-plugin. So, overridden
          files have to be included first. -->
     <moduleSets>
@@ -96,25 +85,6 @@
                     <fileSet>
                         <directory>solr</directory>
                         <outputDirectory>solr</outputDirectory>
-                    </fileSet>
-                </fileSets>
-            </sources>
-        </moduleSet>
-        <!-- Finally, copy the 'dspace.cfg.more' from the 'dspace-api' into
-             the root directory of the ZIP. This config will be merged/weaved
-             into the default dspace.cfg (see fileweaver maven plugin) -->
-        <moduleSet>
-            <includes>
-                <include>org.dspace:dspace-api</include>
-            </includes>
-            <sources>
-                <outputDirectoryMapping>/</outputDirectoryMapping>
-                <fileSets>
-                    <fileSet>
-                        <directory>src/test/data</directory>
-                        <includes>
-                            <include>dspace.cfg.more</include>
-                        </includes>
                     </fileSet>
                 </fileSets>
             </sources>

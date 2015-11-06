@@ -84,7 +84,7 @@ public class DSpaceControlledVocabularyTest extends AbstractDSpaceTest
         String locale = null;
         // This "farm" Controlled Vocab is included in TestEnvironment data 
         // (under /src/test/data/dspaceFolder/) and it should be auto-loaded
-        // by test configs in /src/test/data/dspace.cfg.more
+        // by test configs in /src/test/data/dspaceFolder/config/local.cfg
         DSpaceControlledVocabulary instance = (DSpaceControlledVocabulary)
                 CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(Class.forName(PLUGIN_INTERFACE), "farm");
         assertNotNull(instance);
