@@ -24,6 +24,17 @@
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
 
+    <fileSets>
+      <!-- Copy src/main/resources/dspace-test.cfg to test config directory -->
+      <fileSet>
+         <directory>src/main/resources</directory>
+         <outputDirectory>dspace/config</outputDirectory>
+         <includes>
+            <include>dspace-test.cfg</include>
+         </includes>
+      </fileSet>
+    </fileSets>
+
     <!-- NOTE: first file in wins when using maven-assembly-plugin. So, overridden
          files have to be included first. -->
     <moduleSets>
@@ -40,11 +51,10 @@
             <sources>
                 <outputDirectoryMapping>dspace</outputDirectoryMapping>
                 <fileSets>
-                    <!-- First, copy over custom/overridden configs, filtering each of them -->
+                    <!-- First, copy over custom/overridden configs -->
                     <fileSet>
                         <directory>src/test/data/dspaceFolder/config</directory>
                         <outputDirectory>config</outputDirectory>
-                        <filtered>true</filtered>
                     </fileSet>
                     <!-- Then copy over everything else (EXCEPT configs) -->
                     <fileSet>
@@ -73,7 +83,6 @@
                         <includes>
                             <include>config/**</include>
                         </includes>
-                        <filtered>true</filtered>
                     </fileSet>
                     <!-- Then add in other necessary directories -->
                     <fileSet>
