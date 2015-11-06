@@ -440,7 +440,8 @@
         </xsl:variable>
         <script type="text/javascript" src="{concat($protocol, 'ajax.googleapis.com/ajax/libs/jquery/', $jqueryVersion ,'/jquery.min.js')}">&#160;</script>
         <script type="text/javascript" src="{$theme-path}/lib/js/jquery-ui.js">&#160;</script>
-      
+        <script type="text/javascript" src="{$theme-path}/lib/js/jquery.i18n.min.js">&#160;</script>
+
         <script type="text/javascript" src="{concat($aaiURL, '/discojuice/discojuice-2.1.en.min.js')}">&#160;</script>
         <script type="text/javascript" src="{concat($aaiURL, '/aai.js')}">&#160;</script>
 
