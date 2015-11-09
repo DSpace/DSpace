@@ -14,6 +14,7 @@
                 xmlns:xlink="http://www.w3.org/TR/xlink/" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:xalan="http://xml.apache.org/xalan" xmlns:datetime="http://exslt.org/dates-and-times"
                 xmlns:encoder="xalan://java.net.URLEncoder" exclude-result-prefixes="xalan strings encoder datetime"
+                xmlns:util="org.dspace.app.xmlui.utils.XSLUtils"
                 version="1.0" xmlns:strings="http://exslt.org/strings"
                 xmlns:confman="org.dspace.core.ConfigurationManager">
 
@@ -62,7 +63,7 @@
           <tbody>
           <tr>
             <th>Title</th>
-            <th><xsl:value-of select=".//dim:field[@element='title']"/></th>        
+            <th><xsl:value-of select="util:shortenString(.//dim:field[@element='title'], 50, 5)"/></th>
 	    <!-- Download count -->
 	    <xsl:variable name="downloads" select=".//dim:field[@element='dryad'][@qualifier='downloads']"/>
 	    <xsl:if test="$downloads > 0">
@@ -111,25 +112,29 @@
                       </xsl:choose>
                 </xsl:attribute>
 
-                <xsl:value-of select="mets:FLocat/@xlink:title"/>
+                <xsl:value-of select="util:getShortFileName(mets:FLocat/@xlink:title, 50)"/>
                 <!-- File Size -->
                 <span class="bitstream-filesize">
 		  <xsl:text> (</xsl:text>
                     <xsl:choose>
                         <xsl:when test="@SIZE &lt; 1000">
                             <xsl:value-of select="@SIZE"/>
+                            <xsl:text> </xsl:text>
                             <i18n:text>xmlui.dri2xhtml.METS-1.0.size-bytes</i18n:text>
                         </xsl:when>
                         <xsl:when test="@SIZE &lt; 1000000">
                             <xsl:value-of select="substring(string(@SIZE div 1000),1,5)"/>
+                            <xsl:text> </xsl:text>
                             <i18n:text>xmlui.dri2xhtml.METS-1.0.size-kilobytes</i18n:text>
                         </xsl:when>
                         <xsl:when test="@SIZE &lt; 1000000000">
                             <xsl:value-of select="substring(string(@SIZE div 1000000),1,5)"/>
+                            <xsl:text> </xsl:text>
                             <i18n:text>xmlui.dri2xhtml.METS-1.0.size-megabytes</i18n:text>
                         </xsl:when>
                         <xsl:otherwise>
                             <xsl:value-of select="substring(string(@SIZE div 1000000000),1,5)"/>
+                            <xsl:text> </xsl:text>
                             <i18n:text>xmlui.dri2xhtml.METS-1.0.size-gigabytes</i18n:text>
                         </xsl:otherwise>
                     </xsl:choose>
