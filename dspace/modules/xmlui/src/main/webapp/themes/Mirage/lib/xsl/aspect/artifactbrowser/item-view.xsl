@@ -446,28 +446,9 @@
                         <xsl:text>:</xsl:text>
                     </span>
                     <span>
-                        <xsl:choose>
-                            <xsl:when test="@SIZE &lt; 1000">
-                                <xsl:value-of select="@SIZE"/>
-                                <xsl:text> </xsl:text>
-                                <i18n:text>xmlui.dri2xhtml.METS-1.0.size-bytes</i18n:text>
-                            </xsl:when>
-                            <xsl:when test="@SIZE &lt; 1000000">
-                                <xsl:value-of select="substring(string(@SIZE div 1000),1,5)"/>
-                                <xsl:text> </xsl:text>
-                                <i18n:text>xmlui.dri2xhtml.METS-1.0.size-kilobytes</i18n:text>
-                            </xsl:when>
-                            <xsl:when test="@SIZE &lt; 1000000000">
-                                <xsl:value-of select="substring(string(@SIZE div 1000000),1,5)"/>
-                                <xsl:text> </xsl:text>
-                                <i18n:text>xmlui.dri2xhtml.METS-1.0.size-megabytes</i18n:text>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:value-of select="substring(string(@SIZE div 1000000000),1,5)"/>
-                                <xsl:text> </xsl:text>
-                                <i18n:text>xmlui.dri2xhtml.METS-1.0.size-gigabytes</i18n:text>
-                            </xsl:otherwise>
-                        </xsl:choose>
+                        <xsl:call-template name="fileSizeString">
+                            <xsl:with-param name="size" select="@SIZE"/>
+                        </xsl:call-template>
                     </span>
                 </div>
                 <!-- Lookup File Type description in local messages.xml based on MIME Type.

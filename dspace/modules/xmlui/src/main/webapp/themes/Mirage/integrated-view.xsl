@@ -114,31 +114,12 @@
 
                 <xsl:value-of select="util:getShortFileName(mets:FLocat/@xlink:title, 50)"/>
                 <!-- File Size -->
-                <span class="bitstream-filesize">
-		  <xsl:text> (</xsl:text>
-                    <xsl:choose>
-                        <xsl:when test="@SIZE &lt; 1000">
-                            <xsl:value-of select="@SIZE"/>
-                            <xsl:text> </xsl:text>
-                            <i18n:text>xmlui.dri2xhtml.METS-1.0.size-bytes</i18n:text>
-                        </xsl:when>
-                        <xsl:when test="@SIZE &lt; 1000000">
-                            <xsl:value-of select="substring(string(@SIZE div 1000),1,5)"/>
-                            <xsl:text> </xsl:text>
-                            <i18n:text>xmlui.dri2xhtml.METS-1.0.size-kilobytes</i18n:text>
-                        </xsl:when>
-                        <xsl:when test="@SIZE &lt; 1000000000">
-                            <xsl:value-of select="substring(string(@SIZE div 1000000),1,5)"/>
-                            <xsl:text> </xsl:text>
-                            <i18n:text>xmlui.dri2xhtml.METS-1.0.size-megabytes</i18n:text>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <xsl:value-of select="substring(string(@SIZE div 1000000000),1,5)"/>
-                            <xsl:text> </xsl:text>
-                            <i18n:text>xmlui.dri2xhtml.METS-1.0.size-gigabytes</i18n:text>
-                        </xsl:otherwise>
-                    </xsl:choose>
-		    <xsl:text>)</xsl:text></span></a>
+                <xsl:text> (</xsl:text>
+                <xsl:call-template name="fileSizeString">
+                    <xsl:with-param name="size" select="@SIZE"/>
+                </xsl:call-template>
+                <xsl:text>)</xsl:text>
+              </a>
             </td>
           </tr>
 
