@@ -47,6 +47,32 @@
         </xsl:if>
     </xsl:template>
 
+    <xsl:template name="fileSizeString">
+        <xsl:param name="size"/>
+        <xsl:choose>
+            <xsl:when test="$size &lt; 1000">
+                <xsl:value-of select="@SIZE"/>
+                <xsl:text> </xsl:text>
+                <i18n:text>xmlui.dri2xhtml.METS-1.0.size-bytes</i18n:text>
+            </xsl:when>
+            <xsl:when test="$size &lt; 1000000">
+                <xsl:value-of select="substring(string($size div 1000),1,5)"/>
+                <xsl:text> </xsl:text>
+                <i18n:text>xmlui.dri2xhtml.METS-1.0.size-kilobytes</i18n:text>
+            </xsl:when>
+            <xsl:when test="$size &lt; 1000000000">
+                <xsl:value-of select="substring(string($size div 1000000),1,5)"/>
+                <xsl:text> </xsl:text>
+                <i18n:text>xmlui.dri2xhtml.METS-1.0.size-megabytes</i18n:text>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="substring(string($size div 1000000000),1,5)"/>
+                <xsl:text> </xsl:text>
+                <i18n:text>xmlui.dri2xhtml.METS-1.0.size-gigabytes</i18n:text>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
     <!--  This template can parse names and normalize the output; it works
 on names with last name first (comma delimited). -->
     <xsl:template name="name-parse-reverse">
