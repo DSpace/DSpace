@@ -91,7 +91,7 @@ function createFileUploadDialog(files) {
 		modal_body.append("<br />");
 	}
 	jModal.find("#js-su-button").click(function() {
-		jQuery('#js-su-button').button('disable');
+		$(this).prop('disabled', true);
 		xhrs = [];
 		for ( var i = 0; i < files.length; i++) {
 			var file = files[i];
