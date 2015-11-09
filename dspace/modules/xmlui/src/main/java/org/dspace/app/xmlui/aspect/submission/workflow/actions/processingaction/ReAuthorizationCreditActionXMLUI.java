@@ -104,7 +104,7 @@ public class ReAuthorizationCreditActionXMLUI extends AbstractXMLUIAction {
                 Scheme scheme = Scheme.findByIdentifier(context, ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName"));
                 Concept[] concepts = Concept.findByPreferredLabel(context,shoppingCart.getJournal(),scheme.getID());
                 if(concepts!=null&&concepts.length!=0){
-                    AuthorityMetadataValue[] metadataValues = concepts[0].getMetadata("internal", "journal", "customerId", Item.ANY);
+                    AuthorityMetadataValue[] metadataValues = concepts[0].getMetadata("internal", "journal", "customerID", Item.ANY);
                     if(metadataValues!=null&&metadataValues.length>0){
                         try{
                             success = AssociationAnywhere.tallyCredit(context, metadataValues[0].value, DOIIdentifierProvider.getDoiValue(item));
