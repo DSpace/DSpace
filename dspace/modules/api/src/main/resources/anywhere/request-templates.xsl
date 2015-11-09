@@ -5,6 +5,7 @@
     <xsl:param name="customerID"/>
     <xsl:param name="date"/>
     <xsl:param name="transactionType"/>
+    <xsl:param name="transactionDescription"/>
     <xsl:param name="creditsAccepted"/>
 
     <xsl:template match="/load-credit">
@@ -43,6 +44,7 @@
             <vendor-id><xsl:value-of select="$username"/></vendor-id>
             <vendor-password><xsl:value-of select="$password"/></vendor-password>
             <cust-id><xsl:value-of select="$customerID"/></cust-id>
+	    <descr1><xsl:value-of select="$transactionDescription"/></descr1>
             <trans-type><xsl:value-of select="$transactionType"/></trans-type>
             <trans-date><xsl:value-of select="$date"/></trans-date>
             <cred-accepted><xsl:value-of select="$creditsAccepted"/></cred-accepted>
