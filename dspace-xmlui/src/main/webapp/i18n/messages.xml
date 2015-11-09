@@ -37,11 +37,13 @@
 	<message key="xmlui.general.untitled">Untitled</message>
         <message key="xmlui.general.perform">Perform</message>
         <message key="xmlui.general.queue">Queue</message>
+	<message key="xmlui.general.here">here</message>
 
         <!-- Keys which are used by exception2dri.xsl on error pages -->
         <message key="xmlui.error.contact_msg">Please contact the site administrator if you wish to report this error. If possible, please  provide details about what you were doing at the time this error occurred.</message>
         <message key="xmlui.error.contact">Contact site administrator</message>
         <message key="xmlui.error.show_stack">Show underlying error stack</message>
+		<message key="xmlui.error.site_administrator">site administrator</message>
 
 	<!--
 		Page not found keys
@@ -2935,6 +2937,8 @@
   <message key="xmlui.UFAL.artifactbrowser.item-download-file">Download file</message>
   <message key="xmlui.UFAL.artifactbrowser.acknowledgement">Acknowledgement</message>
   <message key="xmlui.UFAL.artifactbrowser.authors">Authors</message>
+  <message key="xmlui.UFAL.artifactbrowser.project.code">Project code: {0}</message>
+  <message key="xmlui.UFAL.artifactbrowser.project.name">Project name: {0}</message>
 
 	<!-- UFAL/lib/xsl/core/navigation.xsl -->
 	<message key="xmlui.UFAL.navigation.menu_head">What can you do?</message>

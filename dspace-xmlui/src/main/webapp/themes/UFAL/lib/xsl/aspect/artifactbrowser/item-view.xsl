@@ -562,10 +562,20 @@
 														<p class="funding-org"><xsl:value-of select="."/></p>
 													</xsl:when>
 													<xsl:when test="position()=2">
-														<p class="funding-code"><xsl:value-of select="concat('Project code: ',.)"/></p>
+														<p class="funding-code">
+															<i18n:translate>
+																<i18n:text>xmlui.UFAL.artifactbrowser.project.code</i18n:text>
+																<i18n:param><xsl:value-of select="."/></i18n:param>
+															</i18n:translate>
+														</p>
 													</xsl:when>
 													<xsl:when test="position()=3">
-														<p class="funding-name"><xsl:value-of select="concat('Project name: ',.)"/></p>
+														<p class="funding-name">
+															<i18n:translate>
+																<i18n:text>xmlui.UFAL.artifactbrowser.project.name</i18n:text>
+																<i18n:param><xsl:value-of select="."/></i18n:param>
+															</i18n:translate>
+														</p>
 													</xsl:when>
 												</xsl:choose>
 											</xsl:for-each>

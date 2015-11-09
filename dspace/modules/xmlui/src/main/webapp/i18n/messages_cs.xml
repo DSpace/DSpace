@@ -41,11 +41,13 @@
 	<message key="xmlui.general.untitled">Nepojmenovaný</message>
 	<message key="xmlui.general.perform">Vykonat</message>
 	<message key="xmlui.general.queue">Fronta</message>
-	
+	<message key="xmlui.general.here">zde</message>
+
         <!-- Keys which are used by exception2dri.xsl on error pages -->
         <message key="xmlui.error.contact_msg">Pokud chcete nahlásit tuto chybu, prosím kontaktujte správce. Pokud je to možné, uveďte prosím podrobnosti o tom, co jste dělali v době, kdy k této chybě došlo.</message>
         <message key="xmlui.error.contact">Kontaktovat správce</message>
         <message key="xmlui.error.show_stack">Zobrazit podrobnosti této chyby</message>
+		<message key="xmlui.error.site_administrator">správce</message>
 
 	<!-- 
 		Page not found keys 
@@ -3211,6 +3213,8 @@
 	<message key="xmlui.UFAL.artifactbrowser.item-download-file">Stáhnout soubor</message>
 	<message key="xmlui.UFAL.artifactbrowser.acknowledgement">Sponzoři</message>
 	<message key="xmlui.UFAL.artifactbrowser.authors">Autoři</message>
+	<message key="xmlui.UFAL.artifactbrowser.project.code">Kód projektu: {0}</message>
+	<message key="xmlui.UFAL.artifactbrowser.project.name">Jméno projektu: {0}</message>
 
 	<!-- DisplayShareLink -->
 	<message key="xmlui.aspect.submission.submit.DisplayShareLink.title">Sdílet odkaz</message>

@@ -65,7 +65,13 @@ public class InvalidContinuationTransformer extends AbstractDSpaceTransformer im
     
     private static final Message T_dspace_home =
         message("xmlui.general.dspace_home");
-    
+
+    private static final Message T_site_admin =
+            message("xmlui.error.site_administrator");
+
+    private static final Message T_here =
+            message("xmlui.general.here");
+
     
     /** Where the body element is stored while we wait to see if it is empty */
     private SAXEvent bodyEvent;
@@ -178,12 +184,12 @@ public class InvalidContinuationTransformer extends AbstractDSpaceTransformer im
         String login = contextPath+"/login";
         Item item = list.addItem();
         item.addHighlight("").addContent(T_head);
-        item.addXref(login, "here", "signon");
+        item.addXref(login, T_here, "signon");
                 
         String contact = contextPath+"/contact";
         item = list.addItem();
         item.addHighlight("").addContent(T_para1);
-        item.addXref(contact, "site administrator");
+        item.addXref(contact, T_site_admin);
         
         list.addItem(null, "fa fa-warning fa-5x hangright").addContent(" ");
         
