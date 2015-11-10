@@ -2,6 +2,7 @@
 	- [Features](#Features)
 	- [Abstraction of input format](#Abstraction-input-format)
 	- [What it can't do](#cant-do)
+	- [Relation with BTE](#bte)
 - [Implementation of an import source](#Example-implementation)
 	- [Inherited methods](#Inherited-methods)
 	- [Metadata mapping](#Mapping)
@@ -25,6 +26,12 @@ This type set will also be used by the framework to use the correct MetadataFiel
 ## What it can't do <a name="cant-do"></a> ##
 
 - import remote records directly as DSpace items
+
+## Relation with BTE <a name="bte"></a> ##
+
+While there is some overlap between this framework and BTE, this framework supports some features that are hard to implement using the BTE. It has explicit support to deal with network failure and throttling imposed by the data source. It also has explicit support for distinguishing between network caused errors and invalid requests to the source.
+Furthermore the framework doesn't impose any restrictions on the format in which the data is retrieved. It uses java generics to support different source record types. A reference implementation of using XML records is provided for which a set of metadata can be generated from any xpath expression (or composite of xpath expressions). 
+Unless 'advanced' processing is necessary (e.g. lookup of authors in an LDAP directory) this metadata mapping can be simply configured using spring. No code changes necessary. A mixture of advanced and simple (xpath) mapping is also possible.
 
 # Implementation of an import source <a name="Example-implementation"></a> #
 
