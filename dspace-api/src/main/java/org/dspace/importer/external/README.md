@@ -5,7 +5,7 @@
 - [Implementation of an import source](#Example-implementation)
 	- [Inherited methods](#Inherited-methods)
 	- [Metadata mapping](#Mapping)
-	- [Examples](#Examples)
+
 
 # Introduction <a name="Introduction"></a> #
 
@@ -58,7 +58,14 @@ Each DSpace metadata field that will be used for the mapping must first be confi
     </bean>
 ```
 
-Now this metadata field can be used to create a mapping. To add a mapping for the "dc.title" field declared above, a new spring bean configuration of class *org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor* needs to be added. This bean expects 2 property values:
+Now this metadata field can be used to create a mapping. To add a mapping for the "dc.title" field declared above, a new spring bean configuration of a class class *org.dspace.importer.external.metadatamapping.contributor.MetadataContributor* needs to be added. This interface contains a type argument. 
+The type needs to match the type used in the implementation of AbstractImportSourceService.  The responsibility of each MetadataContributor implementation is to generate a set of metadata from the retrieved document. How it does that is completely opaque to the AbstractImportSourceService but it is assumed that only one entity (i.e. item)  is fed to the metadatum contributor.
+
+
+For example ```java  SimpleXpathMetadatumContributor implements MetadataContributor<OMElement>``` can parse a fragment of xml and generate one or more metadata values.
+
+
+This bean expects 2 property values:
 
 - field: A reference to the configured spring bean of the DSpace metadata field. e.g. the "dc.title" bean declared above. 
 - query: The xpath expression used to select the record value returned by the remote source.
@@ -83,7 +90,7 @@ Multiple record fields can also be combined into one value. To implement a combi
     </bean>
 ```
 
-Note that namespaces used in the xpath queries are configured in bean "FullprefixMapping" in the same spring file.
+Note that namespace prefixes used in the xpath queries are configured in bean "FullprefixMapping" in the same spring file.
 
 ```xml
     <util:map id="FullprefixMapping" key-type="java.lang.String" value-type="java.lang.String">
@@ -128,8 +135,3 @@ Each contributor must also be added to the "MetadataFieldMap" used by the *Metad
 
 Note that the single field mappings used for the combined author mapping are not added to this list. 
 
-## Example <a name="Example"></a> ##
-
-An example of an importer implementation is *org.dspace.importer.external.scidir.ScidirImportSourceServiceImpl*.
-
-An example of a spring configuration file can be found at [dspace.dir]/config/spring/api/scidir-services.xml.
