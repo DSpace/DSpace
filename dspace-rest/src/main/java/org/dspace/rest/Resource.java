@@ -165,7 +165,7 @@ public class Resource
         if ((context != null) && (context.isValid()))
         {
             context.abort();
-            log.error("Something get wrong. Aborting context in finally statement.");
+            log.error("Something went wrong. Aborting context in finally statement.");
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
