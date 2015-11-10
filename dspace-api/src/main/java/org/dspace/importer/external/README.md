@@ -102,7 +102,7 @@ Then create a new list in the spring configuration containing references to all 
 	</util:list>{{/code}}
 ```
 
-Finally create a spring bean configuration of class *org.dspace.importer.external.metadatamapping.contributor.CombinedMetadatumContributo*. This bean expects 3 values:
+Finally create a spring bean configuration of class *org.dspace.importer.external.metadatamapping.contributor.CombinedMetadatumContributor*. This bean expects 3 values:
 
 - field: A reference to the configured spring bean of the DSpace metadata field. e.g. the "dc.title" bean declared above. 
 - metadatumContributors: A reference to the list containing all the single record field mappings that need to be combined. 
