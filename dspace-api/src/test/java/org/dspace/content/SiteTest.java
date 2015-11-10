@@ -8,6 +8,8 @@
 package org.dspace.content;
 
 import org.dspace.AbstractUnitTest;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.SiteService;
 import org.dspace.core.ConfigurationManager;
 import java.sql.SQLException;
 import org.dspace.core.Constants;
@@ -31,6 +33,8 @@ public class SiteTest extends AbstractUnitTest
      */
     private Site s;
 
+    private SiteService siteService = ContentServiceFactory.getInstance().getSiteService();
+
     /**
      * This method will be run before every test as per @Before. It will
      * initialize resources required for the tests.
@@ -47,11 +51,9 @@ public class SiteTest extends AbstractUnitTest
         {
             //we have to create a new community in the database
             context.turnOffAuthorisationSystem();
-            int id = 0;
-            this.s = (Site) Site.find(context, id);          
+            this.s = (Site) siteService.findSite(context);
             //we need to commit the changes so we don't block the table for testing
             context.restoreAuthSystemState();
-            context.commit();
         }
         catch (SQLException ex)
         {
@@ -90,7 +92,7 @@ public class SiteTest extends AbstractUnitTest
     @Test
     public void testGetID() 
     {
-        assertTrue("testGetID 0", s.getID() == Site.SITE_ID);
+        assertTrue("testGetID 0", s.getID() != null);
     }
 
     /**
@@ -100,7 +102,7 @@ public class SiteTest extends AbstractUnitTest
     public void testGetHandle()
     {
         assertThat("testGetHandle 0", s.getHandle(), equalTo(ConfigurationManager.getProperty("handle.prefix")
-                +"/"+String.valueOf(Site.SITE_ID)));
+                +"/0"));
     }
 
     /**
@@ -110,7 +112,7 @@ public class SiteTest extends AbstractUnitTest
     public void testGetSiteHandle()
     {
         assertThat("testGetSiteHandle 0", s.getHandle(), equalTo(ConfigurationManager.getProperty("handle.prefix")
-                +"/"+String.valueOf(Site.SITE_ID)));
+                +"/0"));
     }
 
     /**
@@ -120,29 +122,9 @@ public class SiteTest extends AbstractUnitTest
     public void testSiteFind() throws Exception
     {
         int id = 0;
-        Site found = (Site)Site.find(context, id);
+        Site found = (Site)siteService.findSite(context);
         assertThat("testSiteFind 0",found, notNullValue());
         assertThat("testSiteFind 1",found, equalTo(s));
-    }
-
-    /**
-     * Test of delete method, of class Site.
-     */
-    @Test
-    public void testDelete() throws Exception
-    {
-        //The method is empty
-        s.delete();
-    }
-
-    /**
-     * Test of update method, of class Site.
-     */
-    @Test
-    public void testUpdate() throws Exception
-    {
-        //the method is empty
-        s.update();
     }
 
     /**
@@ -152,6 +134,7 @@ public class SiteTest extends AbstractUnitTest
     public void testGetName() 
     {
         assertThat("testGetName 0",s.getName(), equalTo(ConfigurationManager.getProperty("dspace.name")));
+        assertThat("testGetName 1",siteService.getName(s), equalTo(ConfigurationManager.getProperty("dspace.name")));
     }
 
 

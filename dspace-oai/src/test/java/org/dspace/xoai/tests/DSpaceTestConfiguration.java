@@ -15,7 +15,7 @@ import org.dspace.xoai.services.api.cache.XOAICacheService;
 import org.dspace.xoai.services.api.config.XOAIManagerResolver;
 import org.dspace.xoai.services.api.context.ContextService;
 import org.dspace.xoai.services.api.context.ContextServiceException;
-import org.dspace.xoai.services.api.database.EarliestDateResolver;
+import org.dspace.xoai.services.api.EarliestDateResolver;
 import org.dspace.xoai.services.api.xoai.IdentifyResolver;
 import org.dspace.xoai.services.api.xoai.ItemRepositoryResolver;
 import org.dspace.xoai.services.api.xoai.SetRepositoryResolver;

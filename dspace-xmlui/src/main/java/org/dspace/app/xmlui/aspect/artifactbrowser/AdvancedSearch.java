@@ -120,7 +120,7 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
 		DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if ((dso instanceof Collection) || (dso instanceof Community))
         {
-	        HandleUtil.buildHandleTrail(dso,pageMeta,contextPath, true);
+	        HandleUtil.buildHandleTrail(context, dso,pageMeta,contextPath, true);
 		} 
 		
         pageMeta.addTrail().addContent(T_trail);

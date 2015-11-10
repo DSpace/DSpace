@@ -52,8 +52,8 @@ Installation:
 2.  Add a call for the detectmobile.js and cookies.js file in the header 
     of your current main theme.xsl file.
     It should look like:
-    <script type="text/javascript" src="/themes/mobile/lib/detectmobile.js">&#160;</script>
     <script type="text/javascript" src="/themes/mobile/lib/cookies.js">&#160;</script>
+    <script type="text/javascript" src="/themes/mobile/lib/detectmobile.js">&#160;</script>
     * In this file, we also add a "View mobile site" link in the footer
     section, which allows users to view the full site on their
     mobile devices.  The cookies.js file saves this preference 

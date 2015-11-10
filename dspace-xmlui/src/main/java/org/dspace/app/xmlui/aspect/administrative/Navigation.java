@@ -21,7 +21,8 @@ import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
-import org.dspace.app.itemexport.ItemExport;
+import org.dspace.app.itemexport.factory.ItemExportServiceFactory;
+import org.dspace.app.itemexport.service.ItemExportService;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
@@ -31,13 +32,20 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.GroupService;
 import org.xml.sax.SAXException;
 
 /**
@@ -92,7 +100,15 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 	
 	/** exports available for download */
 	java.util.List<String> availableExports = null;
-	
+
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    
+    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+   	protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+    protected ItemExportService itemExportService = ItemExportServiceFactory.getInstance().getItemExportService();
+
 	 /**
      * Generate the unique cache key.
      *
@@ -147,12 +163,12 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 		        try {
 		            DSpaceValidity validity = new DSpaceValidity();
 		            
-		            validity.add(eperson);
+		            validity.add(context, eperson);
 		            
-		            Group[] groups = Group.allMemberGroups(context, eperson);
+		            java.util.List<Group> groups = groupService.allMemberGroups(context, eperson);
 		            for (Group group : groups)
 		            {
-		            	validity.add(group);
+		            	validity.add(context, group);
 		            }
 		            
 		            this.validity = validity.complete();
@@ -178,7 +194,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         {
             try
             {
-                availableExports = ItemExport.getExportsAvailable(context.getCurrentUser());
+                availableExports = itemExportService.getExportsAvailable(context.getCurrentUser());
             }
             catch (Exception e)
             {
@@ -208,18 +224,18 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         }
 
         //Check if a system administrator
-        boolean isSystemAdmin = AuthorizeManager.isAdmin(this.context);
+        boolean isSystemAdmin = authorizeService.isAdmin(this.context);
 
         // Context Administrative options
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
     	if (dso instanceof Item)
     	{
     		Item item = (Item) dso;
-    		if (item.canEdit())
+    		if (itemService.canEdit(this.context, item))
     		{
                     context.setHead(T_context_head);
                     context.addItem().addXref(contextPath+"/admin/item?itemID="+item.getID(), T_context_edit_item);
-                    if (AuthorizeManager.isAdmin(this.context, dso))
+                    if (authorizeService.isAdmin(this.context, dso))
                     {
                         context.addItem().addXref(contextPath+"/admin/export?itemID="+item.getID(), T_context_export_item );
                         context.addItem().addXref(contextPath+ "/csv/handle/"+dso.getHandle(),T_context_export_metadata );
@@ -231,12 +247,12 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     		Collection collection = (Collection) dso;
     		
     		// can they admin this collection?
-            if (collection.canEditBoolean(true))
+            if (collectionService.canEditBoolean(this.context, collection, true))
             {
             	context.setHead(T_context_head);
             	context.addItemXref(contextPath+"/admin/collection?collectionID=" + collection.getID(), T_context_edit_collection);            	
             	context.addItemXref(contextPath+"/admin/mapper?collectionID="+collection.getID(), T_context_item_mapper); 
-            	if (AuthorizeManager.isAdmin(this.context, dso))
+            	if (authorizeService.isAdmin(this.context, dso))
                 {
                     context.addItem().addXref(contextPath+"/admin/export?collectionID="+collection.getID(), T_context_export_collection );
                     context.addItem().addXref(contextPath+ "/csv/handle/"+dso.getHandle(),T_context_export_metadata );
@@ -248,11 +264,11 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     		Community community = (Community) dso;
     		
     		// can they admin this collection?
-            if (community.canEditBoolean())
+            if (communityService.canEditBoolean(this.context, community))
             {
             	context.setHead(T_context_head);
             	context.addItemXref(contextPath+"/admin/community?communityID=" + community.getID(), T_context_edit_community); 
-            	if (AuthorizeManager.isAdmin(this.context, dso))
+            	if (authorizeService.isAdmin(this.context, dso))
                 {
                     context.addItem().addXref(contextPath + "/admin/export?communityID=" + community.getID(), T_context_export_community);
                 }
@@ -260,7 +276,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             }
             
             // can they add to this community?
-            if (AuthorizeManager.authorizeActionBoolean(this.context, community,Constants.ADD))
+            if (authorizeService.authorizeActionBoolean(this.context, community, Constants.ADD))
             {
             	context.setHead(T_context_head);
             	context.addItemXref(contextPath+"/admin/collection?createNew&communityID=" + community.getID(), T_context_create_collection);
@@ -322,7 +338,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     	if (dso instanceof Item)
     	{
     		Item item = (Item) dso;
-    		if (item.canEdit())
+    		if (itemService.canEdit(this.context, item))
     		{   			
     			context.addItem().addXref(contextPath+"/admin/item?itemID="+item.getID(), T_context_edit_item);
     			options++;
@@ -334,7 +350,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     		
     		
     		// can they admin this collection?
-            if (AuthorizeManager.authorizeActionBoolean(this.context, collection, Constants.ADMIN))
+            if (authorizeService.authorizeActionBoolean(this.context, collection, Constants.ADMIN))
             {            	
             	context.addItemXref(contextPath+"/admin/collection?collectionID=" + collection.getID(), T_context_edit_collection);
             	context.addItemXref(contextPath+"/admin/mapper?collectionID="+collection.getID(), T_context_item_mapper);            	
@@ -346,14 +362,14 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     		Community community = (Community) dso;
     		
     		// can they admin this collection?
-            if (community.canEditBoolean())
+            if (communityService.canEditBoolean(this.context, community))
             {           	
             	context.addItemXref(contextPath+"/admin/community?communityID=" + community.getID(), T_context_edit_community);
             	options++;
             }
             
             // can they add to this community?
-            if (AuthorizeManager.authorizeActionBoolean(this.context, community,Constants.ADD))
+            if (authorizeService.authorizeActionBoolean(this.context, community, Constants.ADD))
             {        	
             	context.addItemXref(contextPath+"/admin/collection?createNew&communityID=" + community.getID(), T_context_create_collection);         	
             	context.addItemXref(contextPath+"/admin/community?createNew&communityID=" + community.getID(), T_context_create_subcommunity);
@@ -361,7 +377,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             }
     	}
     	
-    	if (("community-list".equals(this.sitemapURI) || "".equals(this.sitemapURI)) && AuthorizeManager.isAdmin(this.context))
+    	if (("community-list".equals(this.sitemapURI) || "".equals(this.sitemapURI)) && authorizeService.isAdmin(this.context))
     	{
             context.addItemXref(contextPath+"/admin/community?createNew", T_context_create_community);
             options++;

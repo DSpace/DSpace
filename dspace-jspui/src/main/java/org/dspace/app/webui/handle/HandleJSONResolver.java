@@ -21,7 +21,8 @@ import org.dspace.app.webui.json.JSONRequest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 
 import com.google.gson.Gson;
 
@@ -29,6 +30,12 @@ public class HandleJSONResolver extends JSONRequest
 {
     private static final Logger log = Logger
             .getLogger(HandleJSONResolver.class);
+
+	private HandleService handleService;
+
+	public HandleJSONResolver() {
+		handleService = HandleServiceFactory.getInstance().getHandleService();
+	}
 
     public void doJSONRequest(Context context, HttpServletRequest request,
             HttpServletResponse resp) throws AuthorizeException, IOException
@@ -53,7 +60,7 @@ public class HandleJSONResolver extends JSONRequest
                     resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
                     return;
                 }
-                String url = HandleManager.resolveToURL(context, handle);
+                String url = handleService.resolveToURL(context, handle);
                 // Only an array or an abject is valid JSON. A simple string
                 // isn't. An object always uses key value pairs, so we use an
                 // array.
@@ -69,7 +76,7 @@ public class HandleJSONResolver extends JSONRequest
             else if (reqPath.equals("listprefixes"))
             {
                 List<String> prefixes = new ArrayList<String>();
-                prefixes.add(HandleManager.getPrefix());
+                prefixes.add(handleService.getPrefix());
                 String additionalPrefixes = ConfigurationManager
                         .getProperty("handle.additional.prefixes");
                 if (StringUtils.isNotBlank(additionalPrefixes))
@@ -96,7 +103,7 @@ public class HandleJSONResolver extends JSONRequest
                     return;
                 }
 
-                List<String> handlelist = HandleManager.getHandlesForPrefix(
+                List<String> handlelist = handleService.getHandlesForPrefix(
                         context, prefix);
                 jsonString = gson.toJson(handlelist);
             }

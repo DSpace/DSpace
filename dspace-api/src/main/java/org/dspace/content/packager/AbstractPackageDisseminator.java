@@ -12,8 +12,10 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
 import org.dspace.content.crosswalk.CrosswalkException;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 
@@ -21,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -55,6 +58,9 @@ public abstract class AbstractPackageDisseminator
 {
     /**  List of all successfully disseminated package files */
     private List<File> packageFileList = new ArrayList<File>();
+
+    protected final CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    protected final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
     /**
      * Recursively export one or more DSpace Objects as a series of packages.
@@ -128,7 +134,7 @@ public abstract class AbstractPackageDisseminator
                     case Constants.COLLECTION :
                         //Also find all Items in this Collection and disseminate
                         Collection collection = (Collection) dso;
-                        ItemIterator iterator = collection.getItems();
+                        Iterator<Item> iterator = itemService.findByCollection(context, collection);
                         while(iterator.hasNext())
                         {
                             Item item = iterator.next();
@@ -142,32 +148,32 @@ public abstract class AbstractPackageDisseminator
                     case Constants.COMMUNITY :
                         //Also find all SubCommunities in this Community and disseminate
                         Community community = (Community) dso;
-                        Community[] subcommunities = community.getSubcommunities();
-                        for(int i=0; i<subcommunities.length; i++)
+                        List<Community> subcommunities = community.getSubcommunities();
+                        for (Community subcommunity : subcommunities)
                         {
                             //disseminate all sub-communities (recursively!)
-                            String childFileName = pkgDirectory + PackageUtils.getPackageName(subcommunities[i], fileExtension);
-                            disseminateAll(context, subcommunities[i], params, new File(childFileName));
+                            String childFileName = pkgDirectory + PackageUtils.getPackageName(subcommunity, fileExtension);
+                            disseminateAll(context, subcommunity, params, new File(childFileName));
                         }
 
                         //Also find all Collections in this Community and disseminate
-                        Collection[] collections = community.getCollections();
-                        for(int i=0; i<collections.length; i++)
+                        List<Collection> collections = community.getCollections();
+                        for(int i=0; i<collections.size(); i++)
                         {
                             //disseminate all collections (recursively!)
-                            String childFileName = pkgDirectory + PackageUtils.getPackageName(collections[i], fileExtension);
-                            disseminateAll(context, collections[i], params, new File(childFileName));
+                            String childFileName = pkgDirectory + PackageUtils.getPackageName(collections.get(i), fileExtension);
+                            disseminateAll(context, collections.get(i), params, new File(childFileName));
                         }
 
                         break;
                     case Constants.SITE :
                         //Also find all top-level Communities and disseminate
-                        Community[] topCommunities = Community.findAllTop(context);
-                        for(int i=0; i<topCommunities.length; i++)
+                        List<Community> topCommunities = communityService.findAllTop(context);
+                        for (Community topCommunity : topCommunities)
                         {
                             //disseminate all top-level communities (recursively!)
-                            String childFileName = pkgDirectory + PackageUtils.getPackageName(topCommunities[i], fileExtension);
-                            disseminateAll(context, topCommunities[i], params, new File(childFileName));
+                            String childFileName = pkgDirectory + PackageUtils.getPackageName(topCommunity, fileExtension);
+                            disseminateAll(context, topCommunity, params, new File(childFileName));
                         }
 
                         break;

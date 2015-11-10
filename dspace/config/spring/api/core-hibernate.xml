@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd" default-lazy-init="true">
+
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean" lazy-init="true">
+        <property name="configLocation" value="file:${dspace.dir}/config/hibernate.cfg.xml"/>
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" lazy-init="true" destroy-method="close">
+        <property name="driverClassName" value="${db.driver}"/>
+        <property name="url" value="${db.url}"/>
+        <property name="username" value="${db.username}"/>
+        <property name="password" value="${db.password}"/>
+        <property name="maxWaitMillis" value="${db.maxwait}"/>
+        <property name="maxIdle" value="${db.maxidle}"/>
+        <property name="maxTotal" value="${db.maxconnections}"/>
+    </bean>
+
+</beans>

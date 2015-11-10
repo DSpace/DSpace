@@ -21,6 +21,8 @@ import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.BitstreamFormat;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamFormatService;
 
 /**
  * Confirm the deletion of bitstream formats by listing to-be-deleted
@@ -56,6 +58,8 @@ public class DeleteBitstreamFormatsConfirm extends AbstractDSpaceTransformer
 		message("xmlui.administrative.registries.DeleteBitstreamFormatsConfirm.column3");
 
 
+	protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
+
 	
 	
 	public void addPageMeta(PageMeta pageMeta) throws WingException
@@ -75,7 +79,7 @@ public class DeleteBitstreamFormatsConfirm extends AbstractDSpaceTransformer
 		ArrayList<BitstreamFormat> formats = new ArrayList<BitstreamFormat>();
 		for (String id : idsString.split(","))
 		{
-			BitstreamFormat format = BitstreamFormat.find(context,Integer.valueOf(id));
+			BitstreamFormat format = bitstreamFormatService.find(context,Integer.valueOf(id));
 			formats.add(format);
 		}
  

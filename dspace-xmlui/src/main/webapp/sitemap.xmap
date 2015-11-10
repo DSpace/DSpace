@@ -184,7 +184,7 @@
                         <map:selector name="AuthenticatedSelector" src="org.dspace.app.xmlui.aspect.general.AuthenticatedSelector"/>
                 </map:selectors>
                 <map:readers default="resource">
-                    <map:reader name="resource" src="org.apache.cocoon.reading.ResourceReader"
+                    <map:reader name="resource" src="org.dspace.app.xmlui.cocoon.SafeResourceReader"
                             logger="sitemap.reader.resource" pool-max="32">
                             <expires>3600000</expires> <!-- 1000 * 60 * 60 = 3600000 = One hour -->
                     </map:reader>
@@ -644,6 +644,14 @@
                         This will allow your globally static HTML docs to load static CSS or images. -->
                     <map:match pattern="static/*/**">
                         <map:read src="static/{1}/{2}"/>
+                    </map:match>
+
+                    <!-- DSpace does not have any paths beginning with numbers (0-9). If one is accessed,
+                         assume that it is an identifier & redirect it. This also avoids an internal
+                         error, where the XMLUI AspectMatcher wrongly assumes numbers at beginning
+                         of path are direct references to individual Aspects in the aspect chain.-->
+                    <map:match type="regexp" pattern="(^[0-9]+\/?.*$)">
+                        <map:redirect-to uri="{request:contextPath}/handle/{1}" permanent="yes"/>
                     </map:match>
 
                 </map:pipeline>

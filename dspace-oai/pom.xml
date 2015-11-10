@@ -16,7 +16,7 @@
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/..</root.basedir>
         <spring.version>3.2.5.RELEASE</spring.version>
-        <xoai.version>3.2.9</xoai.version>
+        <xoai.version>3.2.10</xoai.version>
         <jtwig.version>2.0.1</jtwig.version>
     </properties>
 
@@ -34,15 +34,8 @@
                     <!-- In version 2.1-alpha-1, this was incorrectly named warSourceExcludes -->
                     <packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
                     <warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
-                    <webResources>
-                        <resource>
-                            <filtering>true</filtering>
-                            <directory>${basedir}/src/main/webapp</directory>
-                            <includes>
-                                <include>WEB-INF/web.xml</include>
-                            </includes>
-                        </resource>
-                    </webResources>
+                    <!-- Filter the web.xml -->
+                    <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                 </configuration>
                 <executions>
                     <execution>
@@ -84,7 +77,7 @@
     <dependencies>
         <!-- OAI Data Provider Framework -->
         <dependency>
-            <groupId>com.lyncode</groupId>
+            <groupId>org.dspace</groupId>
             <artifactId>xoai</artifactId>
             <version>${xoai.version}</version>
         </dependency>

@@ -49,7 +49,7 @@ public class PubmedService
 
     private static final Logger log = Logger.getLogger(PubmedService.class);
 
-    private int timeout = 1000;
+    protected int timeout = 1000;
 
     public void setTimeout(int timeout)
     {
@@ -98,7 +98,7 @@ public class PubmedService
 
     public List<Record> search(String query) throws IOException, HttpException
     {
-        List<Record> results = null;
+        List<Record> results = new ArrayList<>();
         if (!ConfigurationManager.getBooleanProperty(SubmissionLookupService.CFG_MODULE, "remoteservice.demo"))
         {
             HttpGet method = null;

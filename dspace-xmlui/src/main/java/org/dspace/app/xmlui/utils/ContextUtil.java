@@ -8,6 +8,7 @@
 package org.dspace.app.xmlui.utils;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -16,9 +17,12 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.log4j.Logger;
-import org.dspace.authenticate.AuthenticationManager;
+import org.dspace.authenticate.AuthenticationServiceImpl;
+import org.dspace.authenticate.factory.AuthenticateServiceFactory;
+import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.eperson.Group;
 
 /**
  * Miscellaneous UI utility methods methods for managing DSpace context.
@@ -39,7 +43,8 @@ public class ContextUtil
     /** Where the context is stored on an HTTP Request object */
     public static final String DSPACE_CONTEXT = "dspace.context";
 
-    
+    protected static final AuthenticationService authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
+
     /**
      * Obtain a new context object. If a context object has already been created
      * for this HTTP request, it is re-used, otherwise it is created.
@@ -95,12 +100,12 @@ public class ContextUtil
             AuthenticationUtil.resumeLogin(context, request);
 
             // Set any special groups - invoke the authentication mgr.
-            int[] groupIDs = AuthenticationManager.getSpecialGroups(context, request);
+            List<Group> groups = authenticationService.getSpecialGroups(context, request);
 
-            for (int i = 0; i < groupIDs.length; i++)
+            for (int i = 0; i < groups.size(); i++)
             {
-                context.setSpecialGroup(groupIDs[i]);
-                log.debug("Adding Special Group id="+String.valueOf(groupIDs[i]));
+                context.setSpecialGroup(groups.get(i).getID());
+                log.debug("Adding Special Group id="+String.valueOf(groups.get(i).getID()));
             }
 
             // Set the session ID and IP address

@@ -7,6 +7,10 @@
  */
 package org.dspace.versioning;
 
+import org.hibernate.proxy.HibernateProxyHelper;
+
+import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,21 +20,70 @@ import java.util.List;
  * @author Mark Diggory (markd at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
  */
-public interface VersionHistory {
+@Entity
+@Table(name="versionhistory")
+public class VersionHistory {
 
-    public Version getLatestVersion();
-    public Version getFirstVersion();
-    public List<Version> getVersions();
-    public int getVersionHistoryId();
-    public Version getPrevious(Version version);
-    public Version getNext(Version version);
-    public boolean hasNext(Version version);
-    public void add(Version version);
-    public Version getVersion(org.dspace.content.Item item);
-    public boolean hasNext(org.dspace.content.Item item);
-    public boolean isFirstVersion(Version version);
-    public boolean isLastVersion(Version version);
-    public void remove(Version version);
-    public boolean isEmpty();
-    public int size();
+    @Id
+    @Column(name="versionhistory_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="versionhistory_seq")
+    @SequenceGenerator(name="versionhistory_seq", sequenceName="versionhistory_seq", allocationSize = 1)
+    private int id;
+
+    //We use fetchtype eager for versions since we always require our versions when loading the history
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "versionHistory")
+    @OrderBy(value = "versionNumber desc")
+    private List<Version> versions = new ArrayList<Version>();
+
+    public int getId() {
+        return id;
+    }
+
+    public List<Version> getVersions() {
+        return versions;
+    }
+
+    void setVersions(List<Version> versions) {
+        this.versions = versions;
+    }
+
+    void addVersionAtStart(Version version)
+    {
+        this.versions.add(0, version);
+    }
+
+    void removeVersion(Version version) {
+        this.versions.remove(version);
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(o);
+        if (getClass() != objClass)
+        {
+            return false;
+        }
+
+        final VersionHistory that = (VersionHistory)o;
+        if (this.getId() != that.getId())
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int hash=7;
+        hash=79*hash+ this.getId();
+        return hash;
+    }
+
 }

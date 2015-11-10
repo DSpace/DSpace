@@ -7,26 +7,15 @@
  */
 package org.dspace.app.webui.jsptag;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.dspace.app.itemmarking.ItemMarkingExtractor;
-import org.dspace.app.itemmarking.ItemMarkingInfo;
-import org.dspace.app.webui.util.UIUtil;
-import org.dspace.browse.*;
-import org.dspace.content.Bitstream;
-import org.dspace.content.DCDate;
-import org.dspace.content.Metadatum;
-import org.dspace.content.Item;
-import org.dspace.content.Thumbnail;
-import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.Utils;
-import org.dspace.storage.bitstore.BitstreamStorageManager;
-import org.dspace.sort.SortOption;
-import org.dspace.utils.DSpace;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -34,14 +23,30 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import javax.servlet.jsp.tagext.TagSupport;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.sql.SQLException;
-import java.util.StringTokenizer;
-import org.dspace.content.authority.MetadataAuthorityManager;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.dspace.app.webui.util.UIUtil;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.browse.BrowseException;
+import org.dspace.browse.BrowseIndex;
+import org.dspace.browse.BrowseInfo;
+import org.dspace.browse.CrossLinks;
+import org.dspace.content.Bitstream;
+import org.dspace.content.DCDate;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.Thumbnail;
+import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
+import org.dspace.content.authority.service.MetadataAuthorityService;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.ItemService;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.core.Utils;
+import org.dspace.sort.SortOption;
 
 /**
  * Tag for display a list of items
@@ -55,7 +60,7 @@ public class BrowseListTag extends TagSupport
     private static Logger log = Logger.getLogger(BrowseListTag.class);
 
     /** Items to display */
-    private transient BrowseItem[] items;
+    private transient List<Item> items;
 
     /** Row to highlight, -1 for no row */
     private int highlightRow = -1;
@@ -99,6 +104,12 @@ public class BrowseListTag extends TagSupport
     private transient BrowseInfo browseInfo;
 
     private static final long serialVersionUID = 8091584920304256107L;
+    
+    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    
+    private MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
+
+    private BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
     static
     {
@@ -419,19 +430,11 @@ public class BrowseListTag extends TagSupport
             out.print("</tr>");
 
             // now output each item row
-            for (int i = 0; i < items.length; i++)
+            for (Item item : items)
             {
             	out.print("<tr>"); 
                 // now prepare the XHTML frag for this division
                 String rOddOrEven;
-                if (i == highlightRow)
-                {
-                    rOddOrEven = "highlight";
-                }
-                else
-                {
-                    rOddOrEven = ((i & 1) == 1 ? "odd" : "even");
-                }
 
                 for (int colIdx = 0; colIdx < fieldArr.length; colIdx++)
                 {
@@ -457,55 +460,55 @@ public class BrowseListTag extends TagSupport
                     String qualifier = tokens[2];
 
                     // first get hold of the relevant metadata for this column
-                    Metadatum[] metadataArray;
+                    List<MetadataValue> metadataArray;
                     if (qualifier.equals("*"))
                     {
-                        metadataArray = items[i].getMetadata(schema, element, Item.ANY, Item.ANY);
+                        metadataArray = itemService.getMetadata(item, schema, element, Item.ANY, Item.ANY);
                     }
                     else if (qualifier.equals(""))
                     {
-                        metadataArray = items[i].getMetadata(schema, element, null, Item.ANY);
+                        metadataArray = itemService.getMetadata(item, schema, element, null, Item.ANY);
                     }
                     else
                     {
-                        metadataArray = items[i].getMetadata(schema, element, qualifier, Item.ANY);
+                        metadataArray = itemService.getMetadata(item, schema, element, qualifier, Item.ANY);
                     }
 
                     // save on a null check which would make the code untidy
                     if (metadataArray == null)
                     {
-                    	metadataArray = new Metadatum[0];
+                    	metadataArray = new ArrayList<MetadataValue>();
                     }
 
                     // now prepare the content of the table division
                     String metadata = "-";
                     if (field.equals("thumbnail"))
                     {
-                        metadata = getThumbMarkup(hrq, items[i]);
+                        metadata = getThumbMarkup(hrq, item);
                     }
                     else  if (field.startsWith("mark_"))
                     {
-                        metadata = UIUtil.getMarkingMarkup(hrq, items[i], field);
+                        metadata = UIUtil.getMarkingMarkup(hrq, item, field);
                     }
-                    else if (metadataArray.length > 0)
+                    else if (metadataArray.size() > 0)
                     {
                         // format the date field correctly
                         if (isDate[colIdx])
                         {
-                            DCDate dd = new DCDate(metadataArray[0].value);
+                            DCDate dd = new DCDate(metadataArray.get(0).getValue());
                             metadata = UIUtil.displayDate(dd, false, false, hrq);
                         }
                         // format the title field correctly for withdrawn and private items (ie. don't link)
-                        else if (field.equals(titleField) && items[i].isWithdrawn())
+                        else if (field.equals(titleField) && item.isWithdrawn())
                         {
-                            metadata = Utils.addEntities(metadataArray[0].value);
+                            metadata = Utils.addEntities(metadataArray.get(0).getValue());
                         }
                         // format the title field correctly (as long as the item isn't withdrawn, link to it)
                         else if (field.equals(titleField))
                         {
                             metadata = "<a href=\"" + hrq.getContextPath() + "/handle/"
-                            + items[i].getHandle() + "\">"
-                            + Utils.addEntities(metadataArray[0].value)
+                            + item.getHandle() + "\">"
+                            + Utils.addEntities(metadataArray.get(0).getValue())
                             + "</a>";
                         }
                         // format all other fields
@@ -514,13 +517,13 @@ public class BrowseListTag extends TagSupport
                         	// limit the number of records if this is the author field (if
                         	// -1, then the limit is the full list)
                         	boolean truncated = false;
-                        	int loopLimit = metadataArray.length;
+                        	int loopLimit = metadataArray.size();
                         	if (isAuthor[colIdx])
                         	{
-                        		int fieldMax = (authorLimit == -1 ? metadataArray.length : authorLimit);
-                        		loopLimit = (fieldMax > metadataArray.length ? metadataArray.length : fieldMax);
-                        		truncated = (fieldMax < metadataArray.length);
-                        		log.debug("Limiting output of field " + field + " to " + Integer.toString(loopLimit) + " from an original " + Integer.toString(metadataArray.length));
+                        		int fieldMax = (authorLimit == -1 ? metadataArray.size() : authorLimit);
+                        		loopLimit = (fieldMax > metadataArray.size() ? metadataArray.size() : fieldMax);
+                        		truncated = (fieldMax < metadataArray.size());
+                        		log.debug("Limiting output of field " + field + " to " + Integer.toString(loopLimit) + " from an original " + Integer.toString(metadataArray.size()));
                         	}
 
                             StringBuffer sb = new StringBuffer();
@@ -532,17 +535,17 @@ public class BrowseListTag extends TagSupport
                             	{
                                     String argument;
                                     String value;
-                                    if (metadataArray[j].authority != null &&
-                                            metadataArray[j].confidence >= MetadataAuthorityManager.getManager()
-                                                .getMinConfidence(metadataArray[j].schema, metadataArray[j].element, metadataArray[j].qualifier))
+                                    if (metadataArray.get(j).getAuthority() != null &&
+                                            metadataArray.get(j).getConfidence() >= metadataAuthorityService
+                                                .getMinConfidence(metadataArray.get(j).getMetadataField()))
                                     {
                                         argument = "authority";
-                                        value = metadataArray[j].authority;
+                                        value = metadataArray.get(j).getAuthority();
                                     }
                                     else
                                     {
                                         argument = "value";
-                                        value = metadataArray[j].value;
+                                        value = metadataArray.get(j).getValue();
                                     }
                             		if (viewFull[colIdx])
                             		{
@@ -551,10 +554,10 @@ public class BrowseListTag extends TagSupport
                             		startLink = "<a href=\"" + hrq.getContextPath() + "/browse?type=" + browseType[colIdx] + "&amp;" +
                                         argument + "=" + URLEncoder.encode(value,"UTF-8");
 
-                                    if (metadataArray[j].language != null)
+                                    if (metadataArray.get(j).getLanguage() != null)
                                     {
                                         startLink = startLink + "&amp;" +
-                                            argument + "_lang=" + URLEncoder.encode(metadataArray[j].language, "UTF-8");
+                                            argument + "_lang=" + URLEncoder.encode(metadataArray.get(j).getLanguage(), "UTF-8");
 									}
 
                                     if ("authority".equals(argument))
@@ -568,7 +571,7 @@ public class BrowseListTag extends TagSupport
                             		endLink = "</a>";
                             	}
                             	sb.append(startLink);
-                                sb.append(Utils.addEntities(metadataArray[j].value));
+                                sb.append(Utils.addEntities(metadataArray.get(j).getValue()));
                                 sb.append(endLink);
                                 if (j < (loopLimit - 1))
                                 {
@@ -587,7 +590,7 @@ public class BrowseListTag extends TagSupport
                 	//click in order to access the item page
                     else if (field.equals(titleField)){
                     	String undefined = LocaleSupport.getLocalizedMessage(pageContext, "itemlist.title.undefined");
-                    	if (items[i].isWithdrawn())
+                    	if (item.isWithdrawn())
                         {
                             metadata = "<span style=\"font-style:italic\">("+undefined+")</span>";
                         }
@@ -595,7 +598,7 @@ public class BrowseListTag extends TagSupport
                         else
                         {
                             metadata = "<a href=\"" + hrq.getContextPath() + "/handle/"
-                            + items[i].getHandle() + "\">"
+                            + item.getHandle() + "\">"
                             + "<span style=\"font-style:italic\">("+undefined+")</span>"
                             + "</a>";
                         }
@@ -615,8 +618,8 @@ public class BrowseListTag extends TagSupport
                     }
 
                     String id = "t" + Integer.toString(colIdx + 1);
-                    out.print("<td headers=\"" + id + "\" class=\""
-                    		+ rOddOrEven + "Row" + cOddOrEven[colIdx] + "Col" + markClass + "\" " + extras + ">"
+                    out.print("<td headers=\"" + id + "\" "
+                    		+ extras + ">"
                     	+ (emph[colIdx] ? "<strong>" : "") + metadata + (emph[colIdx] ? "</strong>" : "")
                     	+ "</td>");
                 }
@@ -626,10 +629,9 @@ public class BrowseListTag extends TagSupport
                 {
                     String id = "t" + Integer.toString(cOddOrEven.length + 1);
 
-                    out.print("<td headers=\"" + id + "\" class=\""
-                        + rOddOrEven + "Row" + cOddOrEven[cOddOrEven.length - 2] + "Col\" nowrap>"
+                    out.print("<td headers=\"" + id + "\" nowrap=\"nowrap\">"
                         + "<form method=\"get\" action=\"" + hrq.getContextPath() + "/tools/edit-item\">"
-                        + "<input type=\"hidden\" name=\"handle\" value=\"" + items[i].getHandle() + "\" />"
+                        + "<input type=\"hidden\" name=\"handle\" value=\"" + item.getHandle() + "\" />"
                         + "<input type=\"submit\" value=\"Edit Item\" /></form>"
                         + "</td>");
                 }
@@ -640,14 +642,10 @@ public class BrowseListTag extends TagSupport
             // close the table
             out.println("</table>");
         }
-        catch (IOException ie)
-        {
-            throw new JspException(ie);
-        } catch (BrowseException e)
+        catch (AuthorizeException | IOException | BrowseException e)
         {
         	throw new JspException(e);
         }
-
         return SKIP_BODY;
     }
 
@@ -688,9 +686,9 @@ public class BrowseListTag extends TagSupport
      *
      * @return the items
      */
-    public BrowseItem[] getItems()
+    public List<Item> getItems()
     {
-        return (BrowseItem[]) ArrayUtils.clone(items);
+        return items;
     }
 
     /**
@@ -699,9 +697,9 @@ public class BrowseListTag extends TagSupport
      * @param itemsIn
      *            the items
      */
-    public void setItems(BrowseItem[] itemsIn)
+    public void setItems(List<Item> itemsIn)
     {
-        items = (BrowseItem[]) ArrayUtils.clone(itemsIn);
+        items = itemsIn;
     }
 
     /**
@@ -811,7 +809,7 @@ public class BrowseListTag extends TagSupport
      * the search/browse
      */
     private String getScalingAttr(HttpServletRequest hrq, Bitstream bitstream)
-            throws JspException
+            throws JspException, AuthorizeException
     {
         BufferedImage buf;
 
@@ -819,8 +817,7 @@ public class BrowseListTag extends TagSupport
         {
             Context c = UIUtil.obtainContext(hrq);
 
-            InputStream is = BitstreamStorageManager.retrieve(c, bitstream
-                    .getID());
+            InputStream is = bitstreamService.retrieve(c, bitstream);
 
             //AuthorizeManager.authorizeAction(bContext, this, Constants.READ);
             // 	read in bitstream's image
@@ -869,13 +866,13 @@ public class BrowseListTag extends TagSupport
     }
 
     /* generate the (X)HTML required to show the thumbnail */
-    private String getThumbMarkup(HttpServletRequest hrq, BrowseItem item)
-            throws JspException
+    private String getThumbMarkup(HttpServletRequest hrq, Item item)
+            throws JspException, AuthorizeException
     {
     	try
     	{
             Context c = UIUtil.obtainContext(hrq);
-            Thumbnail thumbnail = ItemService.getThumbnail(c, item.getID(), linkToBitstream);
+            Thumbnail thumbnail = itemService.getThumbnail(c, item, linkToBitstream);
 
             if (thumbnail == null)
     		{

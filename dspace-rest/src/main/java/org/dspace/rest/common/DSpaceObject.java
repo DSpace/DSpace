@@ -8,12 +8,16 @@
 package org.dspace.rest.common;
 
 import org.atteo.evo.inflector.English;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.DSpaceObjectService;
+import org.dspace.rest.Resource;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -24,7 +28,10 @@ import java.util.List;
  */
 @XmlRootElement(name = "dspaceobject")
 public class DSpaceObject {
+    //legacyID
     private Integer id;
+
+    private String uuid;
 
     private String name;
     private String handle;
@@ -41,10 +48,12 @@ public class DSpaceObject {
     }
 
     public DSpaceObject(org.dspace.content.DSpaceObject dso) {
-        setId(dso.getID());
+        //setId(); legacyID
+        setUUID(dso.getID().toString());
         setName(dso.getName());
         setHandle(dso.getHandle());
-        setType(dso.getTypeText().toLowerCase());
+        DSpaceObjectService dspaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(dso);
+        setType(dspaceObjectService.getTypeText(dso).toLowerCase());
     }
 
     public Integer getId() {
@@ -72,8 +81,7 @@ public class DSpaceObject {
     }
 
     public String getLink() {
-        //TODO, get actual contextPath of /rest/
-        return "/RESTapi/" + English.plural(getType()) + "/" + getId();
+        return Resource.getServletContextPath() + "/" + English.plural(getType()) + "/" + getId();
     }
 
     public String getType() {
@@ -95,5 +103,13 @@ public class DSpaceObject {
 
     public void addExpand(String expandableAttribute) {
         this.expand.add(expandableAttribute);
+    }
+
+    public String getUUID() {
+        return uuid;
+    }
+
+    public void setUUID(String uuid) {
+        this.uuid = uuid;
     }
 }

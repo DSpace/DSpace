@@ -42,6 +42,11 @@ public abstract class AbstractRecentSubmissionTransformer extends AbstractDSpace
      */
     protected DiscoverResult queryResults;
 
+    /**
+     * The maximum number of recent submissions read from configuration.
+     */
+    protected int maxRecentSubmissions;
+
     /** Cached validity object */
     private SourceValidity validity;
 
@@ -88,13 +93,13 @@ public abstract class AbstractRecentSubmissionTransformer extends AbstractDSpace
 	            DSpaceValidity validity = new DSpaceValidity();
 
 	            // Add the actual collection;
-	            validity.add(dso);
+	            validity.add(context, dso);
 
                 getRecentlySubmittedItems(dso);
                 if(queryResults != null){
                     List<DSpaceObject> resultingObjects = queryResults.getDspaceObjects();
                     for(DSpaceObject resultObject : resultingObjects){
-                        validity.add(resultObject);
+                        validity.add(context, resultObject);
                     }
                     validity.add("numFound:" + resultingObjects.size());
                 }
@@ -132,7 +137,8 @@ public abstract class AbstractRecentSubmissionTransformer extends AbstractDSpace
 
             DiscoveryRecentSubmissionsConfiguration recentSubmissionConfiguration = discoveryConfiguration.getRecentSubmissionConfiguration();
             if(recentSubmissionConfiguration != null){
-                queryArgs.setMaxResults(recentSubmissionConfiguration.getMax());
+                maxRecentSubmissions = recentSubmissionConfiguration.getMax();
+                queryArgs.setMaxResults(maxRecentSubmissions);
                 String sortField = SearchUtils.getSearchService().toSortFieldIndex(recentSubmissionConfiguration.getMetadataSortField(), recentSubmissionConfiguration.getType());
                 if(sortField != null){
                     queryArgs.setSortField(
@@ -171,6 +177,7 @@ public abstract class AbstractRecentSubmissionTransformer extends AbstractDSpace
     public void recycle() {
         queryResults = null;
         validity = null;
+        maxRecentSubmissions = 0;
         super.recycle();
     }
 

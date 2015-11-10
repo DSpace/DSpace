@@ -14,6 +14,7 @@ import java.util.Map;
 public class SimpleDCMetadata
 {
     private Map<String, String> dublinCore = new HashMap<String, String>();
+
     private Map<String, String> atom = new HashMap<String, String>();
 
     public void addDublinCore(String element, String value)

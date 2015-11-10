@@ -18,6 +18,7 @@ import java.io.OutputStream;
 import java.util.Arrays;
 
 import org.apache.log4j.Logger;
+import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Utils;
 
@@ -48,7 +49,7 @@ public class XPDF2Text extends MediaFilter
     private static Logger log = Logger.getLogger(XPDF2Text.class);
 
     // Command to get text from pdf; @infile@, @COMMAND@ are placeholders
-    private static final String XPDF_PDFTOTEXT_COMMAND[] =
+    protected static final String XPDF_PDFTOTEXT_COMMAND[] =
     {
         "@COMMAND@", "-q", "-enc", "UTF-8", "@infile@", "-"
     };
@@ -57,27 +58,32 @@ public class XPDF2Text extends MediaFilter
     // executable path that comes from DSpace config at runtime.
     private String pdftotextPath = null;
 
+    @Override
     public String getFilteredName(String oldFilename)
     {
         return oldFilename + ".txt";
     }
 
+    @Override
     public String getBundleName()
     {
         return "TEXT";
     }
 
+    @Override
     public String getFormatString()
     {
         return "Text";
     }
 
+    @Override
     public String getDescription()
     {
         return "Extracted Text";
     }
 
-    public InputStream getDestinationStream(InputStream sourceStream)
+    @Override
+    public InputStream getDestinationStream(Item currentItem, InputStream sourceStream, boolean verbose)
             throws Exception
     {
         // get configured value for path to XPDF command:

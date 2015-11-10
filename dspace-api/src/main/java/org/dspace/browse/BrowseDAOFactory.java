@@ -9,7 +9,6 @@ package org.dspace.browse;
 
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.storage.rdbms.DatabaseManager;
 
 /**
  * Factory class to generate DAOs based on the configuration
@@ -75,47 +74,5 @@ public class BrowseDAOFactory
         {
             throw new BrowseException("The configuration for browseCreateDAO is invalid: "+className, e);
         }
-	}
-
-    /**
-     * Get an instance of the relevant Read Only DAO class, which will
-     * conform to the BrowseItemDAO interface
-     *
-     * @param context	the DSpace context
-     * @return			the relevant DAO
-     * @throws BrowseException
-     */
-    public static BrowseItemDAO getItemInstance(Context context)
-        throws BrowseException
-    {
-        if (! DatabaseManager.isOracle())
-        {
-            return new BrowseItemDAOPostgres(context);
-        }
-        else
-        {
-            return new BrowseItemDAOOracle(context);
-        }
-    }
-
-    /**
-	 * Get an instance of the relevant DAO Utilities class, which will
-	 * conform to the BrowseDAOUtils interface
-	 * 
-	 * @param context	the DSpace context
-	 * @return			the relevant DAO
-	 * @throws BrowseException
-	 */
-	public static BrowseDAOUtils getUtils(Context context)
-		throws BrowseException
-	{
-		if (! DatabaseManager.isOracle())
-		{
-			return new BrowseDAOUtilsPostgres();
-		}
-		else
-		{
-            return new BrowseDAOUtilsOracle();
-		}
 	}
 }

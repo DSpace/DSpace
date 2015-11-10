@@ -23,6 +23,9 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -64,6 +67,10 @@ public class ContainerAdapter extends AbstractAdapter
     /** Current DSpace context **/
     private Context dspaceContext;
 
+    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+   	protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    
+    
     /**
      * Construct a new CommunityCollectionMETSAdapter.
      * 
@@ -255,14 +262,14 @@ public class ContainerAdapter extends AbstractAdapter
             {
                 Collection collection = (Collection) dso;
                 
-                String description = collection.getMetadata("introductory_text");
-                String description_abstract = collection.getMetadata("short_description");
-                String description_table = collection.getMetadata("side_bar_text");
+                String description = collectionService.getMetadata(collection, "introductory_text");
+                String description_abstract = collectionService.getMetadata(collection, "short_description");
+                String description_table = collectionService.getMetadata(collection, "side_bar_text");
                 String identifier_uri = "http://hdl.handle.net/" + collection.getHandle();
-                String provenance = collection.getMetadata("provenance_description");
-                String rights = collection.getMetadata("copyright_text");
-                String rights_license = collection.getMetadata("license");
-                String title = collection.getMetadata("name");
+                String provenance = collectionService.getMetadata(collection, "provenance_description");
+                String rights = collectionService.getMetadata(collection, "copyright_text");
+                String rights_license = collectionService.getMetadata(collection, "license");
+                String title = collectionService.getMetadata(collection, "name");
                 
                 createField("dc","description",null,null,description);
                 createField("dc","description","abstract",null,description_abstract);
@@ -292,12 +299,12 @@ public class ContainerAdapter extends AbstractAdapter
             {
                 Community community = (Community) dso;
                 
-                String description = community.getMetadata("introductory_text");
-                String description_abstract = community.getMetadata("short_description");
-                String description_table = community.getMetadata("side_bar_text");
+                String description = communityService.getMetadata(community, "introductory_text");
+                String description_abstract = communityService.getMetadata(community, "short_description");
+                String description_table = communityService.getMetadata(community, "side_bar_text");
                 String identifier_uri = "http://hdl.handle.net/" + community.getHandle();
-                String rights = community.getMetadata("copyright_text");
-                String title = community.getMetadata("name");
+                String rights = communityService.getMetadata(community, "copyright_text");
+                String title = communityService.getMetadata(community, "name");
                 
                 createField("dc","description",null,null,description);
                 createField("dc","description","abstract",null,description_abstract);
@@ -382,7 +389,7 @@ public class ContainerAdapter extends AbstractAdapter
             // ///////////////////////////////
             // Send the actual XML content
             try {
-	    		Element dissemination = crosswalk.disseminateElement(dso);
+	    		Element dissemination = crosswalk.disseminateElement(dspaceContext, dso);
 	
 	    		SAXFilter filter = new SAXFilter(contentHandler, lexicalHandler, namespaces);
 	    		// Allow the basics for XML
@@ -438,7 +445,8 @@ public class ContainerAdapter extends AbstractAdapter
      *   </fileGrp>
      * </fileSec>
      */
-    protected void renderFileSection() throws SAXException
+    @Override
+    protected void renderFileSection(Context context) throws SAXException, SQLException
     {
     	AttributeMap attributes;
     	
@@ -461,7 +469,7 @@ public class ContainerAdapter extends AbstractAdapter
             // Add the actual file element
             String fileID = getFileID(logo);
             String groupID = getGroupFileID(logo);
-            renderFile(null, logo, fileID, groupID);
+            renderFile(context, null, logo, fileID, groupID);
             
             // ////////////////////////////////
             // End th file group and file section

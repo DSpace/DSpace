@@ -19,6 +19,7 @@ import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
+import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 
 /**
@@ -30,6 +31,7 @@ import org.dspace.core.ConfigurationManager;
  */
 public class BrandedPreviewJPEGFilter extends MediaFilter
 {
+    @Override
     public String getFilteredName(String oldFilename)
     {
         return oldFilename + ".preview.jpg";
@@ -39,6 +41,7 @@ public class BrandedPreviewJPEGFilter extends MediaFilter
      * @return String bundle name
      *  
      */
+    @Override
     public String getBundleName()
     {
         return "BRANDED_PREVIEW";
@@ -47,6 +50,7 @@ public class BrandedPreviewJPEGFilter extends MediaFilter
     /**
      * @return String bitstreamformat
      */
+    @Override
     public String getFormatString()
     {
         return "JPEG";
@@ -55,6 +59,7 @@ public class BrandedPreviewJPEGFilter extends MediaFilter
     /**
      * @return String description
      */
+    @Override
     public String getDescription()
     {
         return "Generated Branded Preview";
@@ -67,7 +72,8 @@ public class BrandedPreviewJPEGFilter extends MediaFilter
      * 
      * @return InputStream the resulting input stream
      */
-    public InputStream getDestinationStream(InputStream source)
+    @Override
+    public InputStream getDestinationStream(Item currentItem, InputStream source, boolean verbose)
             throws Exception
     {
         // read in bitstream's image
@@ -92,7 +98,7 @@ public class BrandedPreviewJPEGFilter extends MediaFilter
 
         // if verbose flag is set, print out dimensions
         // to STDOUT
-        if (MediaFilterManager.isVerbose)
+        if (verbose)
         {
             System.out.println("original size: " + xsize + "," + ysize);
         }
@@ -105,7 +111,7 @@ public class BrandedPreviewJPEGFilter extends MediaFilter
 
             // if verbose flag is set, print out extracted text
             // to STDOUT
-            if (MediaFilterManager.isVerbose)
+            if (verbose)
             {
                 System.out.println("x scale factor: " + scaleFactor);
             }
@@ -117,7 +123,7 @@ public class BrandedPreviewJPEGFilter extends MediaFilter
 
             // if verbose flag is set, print out extracted text
             // to STDOUT
-            if (MediaFilterManager.isVerbose)
+            if (verbose)
             {
                 System.out.println("new size: " + xsize + "," + ysize);
             }
@@ -135,7 +141,7 @@ public class BrandedPreviewJPEGFilter extends MediaFilter
         }
 
         // if verbose flag is set, print details to STDOUT
-        if (MediaFilterManager.isVerbose)
+        if (verbose)
         {
             System.out.println("created thumbnail size: " + xsize + ", "
                     + ysize);
@@ -170,7 +176,7 @@ public class BrandedPreviewJPEGFilter extends MediaFilter
         Brand brand = new Brand((int) xsize, brandHeight, new Font(brandFont, Font.PLAIN, brandFontPoint), 5);
 		BufferedImage brandImage = brand.create(ConfigurationManager.getProperty("webui.preview.brand"),
 												ConfigurationManager.getProperty("webui.preview.brand.abbrev"),
-												MediaFilterManager.getCurrentItem() == null ? "" : "hdl:" + MediaFilterManager.getCurrentItem().getHandle());
+                                                currentItem == null ? "" : "hdl:" + currentItem.getHandle());
 		
 		g2d.drawImage(brandImage, (int)0, (int)ysize, (int) xsize, (int) 20, null);
 

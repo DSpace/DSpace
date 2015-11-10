@@ -10,6 +10,7 @@ package org.dspace.browse;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Interface for any class wishing to provide a browse storage later.  This particular
@@ -47,10 +48,10 @@ public interface BrowseCreateDAO
 	 * @param	itemID	the database id of the item to remove the index for
 	 * @throws BrowseException
 	 */
-	public void deleteByItemID(String table, int itemID) throws BrowseException;
+	public void deleteByItemID(String table, UUID itemID) throws BrowseException;
 
-    public void deleteCommunityMappings(int itemID) throws BrowseException;
-    public void updateCommunityMappings(int itemID) throws BrowseException;
+    public void deleteCommunityMappings(UUID itemID) throws BrowseException;
+    public void updateCommunityMappings(UUID itemID) throws BrowseException;
 
 	
 	/**
@@ -74,7 +75,7 @@ public interface BrowseCreateDAO
 	 * @param sortCols	an Integer-String map of sort column numbers and values
 	 * @throws BrowseException
 	 */
-    public void insertIndex(String table, int itemID, Map<Integer, String> sortCols) throws BrowseException;
+    public void insertIndex(String table, UUID itemID, Map<Integer, String> sortCols) throws BrowseException;
 
     /**
      * Updates an index record into the given table for the given item id.  The Map should contain
@@ -98,7 +99,7 @@ public interface BrowseCreateDAO
      * @return true if the record is updated, false if not found
      * @throws BrowseException
      */
-    public boolean updateIndex(String table, int itemID, Map<Integer, String> sortCols) throws BrowseException;
+    public boolean updateIndex(String table, UUID itemID, Map<Integer, String> sortCols) throws BrowseException;
 
     /**
 	 * Get the browse index's internal id for the location of the given string
@@ -158,7 +159,7 @@ public interface BrowseCreateDAO
      * @return the ids of any distinct records that have been unmapped
      * @throws BrowseException
      */
-    public MappingResults updateDistinctMappings(String table, int itemID, Set<Integer> distinctIDs) throws BrowseException;
+    public MappingResults updateDistinctMappings(String table, UUID itemID, Set<Integer> distinctIDs) throws BrowseException;
 
 	/**
 	 * Find out of a given table exists.
@@ -307,7 +308,7 @@ public interface BrowseCreateDAO
 	 */
 	public String createCommunityView(String table, String view, boolean execute) throws BrowseException;
 
-    public List<Integer> deleteMappingsByItemID(String mapTable, int itemID) throws BrowseException;
+    public List<Integer> deleteMappingsByItemID(String mapTable, UUID itemID) throws BrowseException;
 	
 	/**
 	 * Create the table which will hold the distinct metadata values that appear in multiple

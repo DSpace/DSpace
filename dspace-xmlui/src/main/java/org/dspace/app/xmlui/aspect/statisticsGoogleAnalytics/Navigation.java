@@ -18,7 +18,9 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.AuthorizeServiceImpl;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Constants;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
@@ -42,6 +44,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
     private static final Message T_statistics_head = message("xmlui.statisticsGoogleAnalytics.Navigation.title");
     private static final Message T_statistics_view = message("xmlui.statisticsGoogleAnalytics.Navigation.usage.view");
+
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
     public Serializable getKey() {
         return null;
@@ -87,7 +91,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
     protected boolean displayStatsType(Context context, DSpaceObject dso) throws SQLException {
         ConfigurationService cs = new DSpace().getConfigurationService();
-        return !cs.getPropertyAsType("google-analytics.authorization.admin.usage", Boolean.TRUE) || AuthorizeManager.isAdmin(context, dso);
+        return !cs.getPropertyAsType("google-analytics.authorization.admin.usage", Boolean.TRUE) || authorizeService.isAdmin(context, dso);
 
     }
 }

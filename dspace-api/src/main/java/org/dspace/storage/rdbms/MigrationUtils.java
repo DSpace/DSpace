@@ -8,7 +8,6 @@
 package org.dspace.storage.rdbms;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -42,27 +41,34 @@ public class MigrationUtils
         // First, in order to drop the appropriate Database constraint, we
         // must determine the unique name of the constraint. As constraint
         // naming is DB specific, this is dependent on our DB Type
-        DatabaseMetaData meta = connection.getMetaData();
-        // NOTE: We use "findDbKeyword()" here as it won't cause
-        // DatabaseManager.initialize() to be called (which in turn re-calls Flyway)
-        String dbtype = DatabaseManager.findDbKeyword(meta);
+        String dbtype = connection.getMetaData().getDatabaseProductName();
         String constraintName = null;
         String constraintNameSQL = null;
-        switch(dbtype)
+        boolean cascade = false;
+        switch(dbtype.toLowerCase())
         {
-            case DatabaseManager.DBMS_POSTGRES:
+            case "postgres":
+            case "postgresql":
                 // In Postgres, constraints are always named:
                 // {tablename}_{columnname(s)}_{suffix}
                 // see: http://stackoverflow.com/a/4108266/3750035
-                constraintName = StringUtils.lowerCase(tableName) + "_" + StringUtils.lowerCase(columnName) + "_" + StringUtils.lowerCase(constraintSuffix);
+                constraintName = StringUtils.lowerCase(tableName);
+                if(!StringUtils.equals(constraintSuffix, "pkey"))
+                {
+                    constraintName += "_" + StringUtils.lowerCase(columnName);
+                }
+
+                constraintName += "_" + StringUtils.lowerCase(constraintSuffix);
+                cascade = true;
                 break;
-            case DatabaseManager.DBMS_ORACLE:
+            case "oracle":
                 // In Oracle, constraints are listed in the USER_CONS_COLUMNS table
                 constraintNameSQL = "SELECT CONSTRAINT_NAME " +
                                     "FROM USER_CONS_COLUMNS " +
                                     "WHERE TABLE_NAME = ? AND COLUMN_NAME = ?";
+                cascade = true;
                 break;
-            case DatabaseManager.DBMS_H2:
+            case "h2":
                 // In H2, constraints are listed in the "information_schema.constraints" table
                 constraintNameSQL = "SELECT DISTINCT CONSTRAINT_NAME " +
                                     "FROM information_schema.constraints " +
@@ -99,6 +105,9 @@ public class MigrationUtils
         {
             // This drop constaint SQL should be the same in all databases
             String dropConstraintSQL = "ALTER TABLE " + tableName + " DROP CONSTRAINT " + constraintName;
+            if(cascade){
+                dropConstraintSQL += " CASCADE";
+            }
 
             PreparedStatement statement = connection.prepareStatement(dropConstraintSQL);
             try

@@ -109,7 +109,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 	            DSpaceValidity validity = new DSpaceValidity();
 	            
 	            // Add the actual collection;
-	            validity.add(collection);
+	            validity.add(context, collection);
 	
 	            this.validity = validity.complete();
 	        }
@@ -139,7 +139,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
         Collection collection = (Collection) dso;
 
         // Set the page title
-        String name = collection.getMetadata("name");
+        String name = collection.getName();
         if (name == null || name.length() == 0)
         {
             pageMeta.addMetadata("title").addContent(T_untitled);
@@ -150,7 +150,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
         }
 
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
-        HandleUtil.buildHandleTrail(collection,pageMeta,contextPath);
+        HandleUtil.buildHandleTrail(context, collection,pageMeta,contextPath);
         
         // Add RSS links if available
         String formats = ConfigurationManager.getProperty("webui.feed.formats");
@@ -190,7 +190,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 
         // Build the collection viewer division.
         Division home = body.addDivision("collection-home", "primary repository collection");
-        String name = collection.getMetadata("name");
+        String name = collection.getName();
         if (name == null || name.length() == 0)
         {
             home.setHead(T_untitled);

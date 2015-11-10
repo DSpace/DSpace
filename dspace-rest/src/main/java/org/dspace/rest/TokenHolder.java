@@ -8,16 +8,21 @@
 package org.dspace.rest;
 
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeException;
+import org.dspace.authenticate.AuthenticationMethod;
+import org.dspace.authenticate.factory.AuthenticateServiceFactory;
+import org.dspace.authenticate.service.AuthenticationService;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.rest.common.User;
 
 /**
@@ -30,13 +35,15 @@ import org.dspace.rest.common.User;
 public class TokenHolder
 {
 
+
     private static final Logger log = Logger.getLogger(TokenHolder.class);
 
     public static String TOKEN_HEADER = "rest-dspace-token";
 
-    private static Map<String, String> tokens = new HashMap<String, String>(); // Map with pair Email,token
-
-    private static Map<String, EPerson> persons = new HashMap<String, EPerson>(); // Map with pair token,Eperson
+    /**
+     * Collection holding the auth-token, and the corresponding EPerson's UUID
+     */
+    private static BiMap<String, UUID> tokenPersons = HashBiMap.create();
 
     /**
      * Login user into rest api. It check user credentials if they are okay.
@@ -53,43 +60,37 @@ public class TokenHolder
      */
     public static String login(User user) throws WebApplicationException
     {
+        AuthenticationService authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
+        EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
+
         org.dspace.core.Context context = null;
         String token = null;
 
         try
         {
             context = new org.dspace.core.Context();
-            EPerson dspaceUser = EPerson.findByEmail(context, user.getEmail());
 
-            if ((dspaceUser == null) || (!dspaceUser.checkPassword(user.getPassword())))
+            int status = authenticationService.authenticate(context, user.getEmail(), user.getPassword(), null, null);
+            if (status == AuthenticationMethod.SUCCESS)
             {
-                token = null;
-            }
-            else if (tokens.containsKey(user.getEmail()))
-            {
-                token = tokens.get(user.getEmail());
-            }
-            else
-            {
-                token = generateToken();
-                persons.put(token, dspaceUser);
-                tokens.put(user.getEmail(), token);
+                EPerson ePerson = epersonService.findByEmail(context, user.getEmail());
+                synchronized (TokenHolder.class) {
+                    if (tokenPersons.inverse().containsKey(ePerson.getID())) {
+                        token = tokenPersons.inverse().get(ePerson.getID());
+                    } else {
+                        token = generateToken();
+                        tokenPersons.put(token, ePerson.getID());
+                    }
+                }
             }
 
-            log.trace("User(" + user.getEmail() + ") has been logged.");
+            log.trace("User(" + user.getEmail() + ") has been logged in.");
             context.complete();
-
         }
         catch (SQLException e)
         {
             context.abort();
             log.error("Could not read user from database. Message:" + e);
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        }
-        catch (AuthorizeException e)
-        {
-            context.abort();
-            log.error("Could not find user, AuthorizeException. Message:" + e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
         finally
@@ -113,9 +114,17 @@ public class TokenHolder
      * @return Return instance of EPerson if is token right, otherwise it
      *         returns NULL.
      */
-    public static EPerson getEPerson(String token)
+    public static synchronized EPerson getEPerson(String token)
     {
-        return persons.get(token);
+        try {
+            EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
+            UUID epersonID = tokenPersons.get(token);
+            Context context = new Context();
+            return epersonService.find(context, epersonID);
+        } catch (SQLException e) {
+            log.error(e);
+            return null;
+        }
     }
 
     /**
@@ -125,19 +134,18 @@ public class TokenHolder
      *            Token under which is stored eperson.
      * @return Return true if was all okay, otherwise return false.
      */
-    public static boolean logout(String token)
+    public static synchronized boolean logout(String token)
     {
-        if ((token == null) || (persons.get(token) == null))
+        if ((token == null) || (! tokenPersons.containsKey(token)))
         {
             return false;
         }
-        String email = persons.get(token).getEmail();
-        EPerson person = persons.remove(token);
-        if (person == null)
+
+        UUID personID = tokenPersons.remove(token);
+        if (personID == null)
         {
             return false;
         }
-        tokens.remove(email);
         return true;
     }
 

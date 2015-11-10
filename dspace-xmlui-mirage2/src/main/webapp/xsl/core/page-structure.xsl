@@ -218,8 +218,7 @@
                         <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='serverPort']"/>
                         <xsl:value-of select="$context-path"/>
                         <xsl:text>/</xsl:text>
-                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='opensearch'][@qualifier='context']"/>
-                        <xsl:text>description.xml</xsl:text>
+                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='opensearch'][@qualifier='autolink']"/>
                     </xsl:attribute>
                     <xsl:attribute name="title" >
                         <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='opensearch'][@qualifier='shortName']"/>
@@ -262,7 +261,7 @@
 
             <xsl:text disable-output-escaping="yes">&lt;!--[if lt IE 9]&gt;
                 &lt;script src="</xsl:text><xsl:value-of select="concat($theme-path, 'vendor/html5shiv/dist/html5shiv.js')"/><xsl:text disable-output-escaping="yes">"&gt;&#160;&lt;/script&gt;
-                &lt;script src="</xsl:text><xsl:value-of select="concat($theme-path, 'vendor/respond/respond.min.js')"/><xsl:text disable-output-escaping="yes">"&gt;&#160;&lt;/script&gt;
+                &lt;script src="</xsl:text><xsl:value-of select="concat($theme-path, 'vendor/respond/dest/respond.min.js')"/><xsl:text disable-output-escaping="yes">"&gt;&#160;&lt;/script&gt;
                 &lt;![endif]--&gt;</xsl:text>
 
             <!-- Modernizr enables HTML5 elements & feature detects -->
@@ -696,7 +695,7 @@
                     <hr/>
                     <div class="col-xs-7 col-sm-8">
                         <div>
-                            <a href="http://www.dspace.org/" target="_blank">DSpace software</a> copyright&#160;&#169;&#160;2002-2013&#160; <a href="http://www.duraspace.org/" target="_blank">Duraspace</a>
+                            <a href="http://www.dspace.org/" target="_blank">DSpace software</a> copyright&#160;&#169;&#160;2002-2015&#160; <a href="http://www.duraspace.org/" target="_blank">DuraSpace</a>
                         </div>
                         <div class="hidden-print">
                             <a>
@@ -816,7 +815,7 @@
             <script src="{$theme-path}{@src}">&#160;</script>
         </xsl:for-each>
 
-        <!-- Add javascipt specified in DRI -->
+        <!-- Add javascript specified in DRI -->
         <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][not(@qualifier)]">
             <script>
                 <xsl:attribute name="src">
@@ -856,17 +855,21 @@
             <xsl:call-template name="choiceLookupPopUpSetup"/>
         </xsl:if>
 
+        <xsl:call-template name="addJavascript-google-analytics" />
+    </xsl:template>
+
+    <xsl:template name="addJavascript-google-analytics">
         <!-- Add a google analytics script if the key is present -->
         <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']">
             <script><xsl:text>
-                  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-                  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-                  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-                  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-                  ga('create', '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']"/><xsl:text>', '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='serverName']"/><xsl:text>');
-                  ga('send', 'pageview');
-           </xsl:text></script>
+                ga('create', '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']"/><xsl:text>', '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='serverName']"/><xsl:text>');
+                ga('send', 'pageview');
+            </xsl:text></script>
         </xsl:if>
     </xsl:template>
 

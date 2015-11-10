@@ -30,9 +30,12 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.identifier.DOI;
 import org.dspace.services.ConfigurationService;
 import org.jdom.Document;
@@ -99,6 +102,8 @@ implements DOIConnector
     
     protected String USERNAME;
     protected String PASSWORD;
+    @Autowired
+    protected HandleService handleService;
     
     public DataCiteConnector()
     {
@@ -234,6 +239,7 @@ implements DOIConnector
     }
 
     
+    @Override
     public boolean isDOIReserved(Context context, String doi)
             throws DOIIdentifierException
     {
@@ -359,11 +365,12 @@ implements DOIConnector
                     throw new DOIIdentifierException("Received a http status code 200 without a response content.",
                             DOIIdentifierException.BAD_ANSWER);
                 }
-                
+
+                DSpaceObjectService<DSpaceObject> dSpaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(dso);
                 String dsoUrl = null;
                 try
                 {
-                    dsoUrl = HandleManager.resolveToURL(context, dso.getHandle());
+                    dsoUrl = handleService.resolveToURL(context, dso.getHandle());
                 }
                 catch (SQLException e)
                 {
@@ -376,7 +383,7 @@ implements DOIConnector
                     // the handle of the dso was not found in our db?!
                     log.error("The HandleManager was unable to find the handle "
                             + "of a DSpaceObject in the database!?! "
-                            + "Type: {} ID: {}", dso.getTypeText(), dso.getID());
+                            + "Type: {} ID: {}", dSpaceObjectService.getTypeText(dso), dso.getID());
                     throw new RuntimeException("The HandleManager was unable to "
                             + "find the handle of a DSpaceObject in the database!");
                 }
@@ -467,7 +474,9 @@ implements DOIConnector
         }
 
         this.prepareXwalk();
-        
+
+        DSpaceObjectService<DSpaceObject> dSpaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(dso);
+
         if (!this.xwalk.canDisseminate(dso))
         {
             log.error("Crosswalk " + this.CROSSWALK_NAME 
@@ -475,7 +484,7 @@ implements DOIConnector
                     + " and ID " + dso.getID() + ". Giving up reserving the DOI "
                     + doi + ".");
             throw new DOIIdentifierException("Cannot disseminate "
-                    + dso.getTypeText() + "/" + dso.getID()
+                    + dSpaceObjectService.getTypeText(dso) + "/" + dso.getID()
                     + " using crosswalk " + this.CROSSWALK_NAME + ".",
                     DOIIdentifierException.CONVERSION_ERROR);
         }
@@ -483,15 +492,15 @@ implements DOIConnector
         Element root = null;
         try
         {
-            root = xwalk.disseminateElement(dso);
+            root = xwalk.disseminateElement(context, dso);
         }
         catch (AuthorizeException ae)
         {
             log.error("Caught an AuthorizeException while disseminating DSO "
                     + "with type " + dso.getType() + " and ID " + dso.getID()
                     + ". Giving up to reserve DOI " + doi + ".", ae);
-            throw new DOIIdentifierException("AuthorizeException occurred while "
-                    + "converting " + dso.getTypeText() + "/" + dso.getID()
+            throw new DOIIdentifierException("AuthorizeException occured while "
+                    + "converting " + dSpaceObjectService.getTypeText(dso) + "/" + dso.getID()
                     + " using crosswalk " + this.CROSSWALK_NAME + ".", ae,
                     DOIIdentifierException.CONVERSION_ERROR);
         }
@@ -500,8 +509,8 @@ implements DOIConnector
             log.error("Caught an CrosswalkException while reserving a DOI ("
                     + doi + ") for DSO with type " + dso.getType() + " and ID " 
                     + dso.getID() + ". Won't reserve the doi.", ce);
-            throw new DOIIdentifierException("CrosswalkException occurred while "
-                    + "converting " + dso.getTypeText() + "/" + dso.getID()
+            throw new DOIIdentifierException("CrosswalkException occured while "
+                    + "converting " + dSpaceObjectService.getTypeText(dso) + "/" + dso.getID()
                     + " using crosswalk " + this.CROSSWALK_NAME + ".", ce,
                     DOIIdentifierException.CONVERSION_ERROR);
         }
@@ -526,7 +535,7 @@ implements DOIConnector
         else if (!metadataDOI.equals(doi.substring(DOI.SCHEME.length())))
         {
             // FIXME: that's not an error. If at all, it is worth logging it.
-            throw new DOIIdentifierException("DSO with type " + dso.getTypeText()
+            throw new DOIIdentifierException("DSO with type " + dSpaceObjectService.getTypeText(dso)
                     + " and id " + dso.getID() + " already has DOI "
                     + metadataDOI + ". Won't reserve DOI " + doi + " for it.");
         }
@@ -612,7 +621,7 @@ implements DOIConnector
         try
         {
             resp = this.sendDOIPostRequest(doi, 
-                    HandleManager.resolveToURL(context, dso.getHandle()));
+                    handleService.resolveToURL(context, dso.getHandle()));
         }
         catch (SQLException e)
         {
@@ -1014,7 +1023,7 @@ implements DOIConnector
             Element alternateIdentifier = it.next();
             try
             {
-                handle = HandleManager.resolveUrlToHandle(context,
+                handle = handleService.resolveUrlToHandle(context,
                         alternateIdentifier.getText());
             }
             catch (SQLException e)

@@ -14,7 +14,9 @@ import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,8 +32,8 @@ import org.apache.log4j.Logger;
 import org.dspace.app.itemmarking.ItemMarkingExtractor;
 import org.dspace.app.itemmarking.ItemMarkingInfo;
 import org.dspace.app.util.Util;
-import org.dspace.authenticate.AuthenticationManager;
-import org.dspace.browse.BrowseItem;
+import org.dspace.authenticate.factory.AuthenticateServiceFactory;
+import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DCDate;
@@ -43,6 +45,9 @@ import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.utils.DSpace;
 
 /**
@@ -63,6 +68,20 @@ public class UIUtil extends Util
 	 * Pattern used to get file.ext from filename (which can be a path)
 	 */
 	private static Pattern p = Pattern.compile("[^/]*$");
+	
+	   private static boolean initialized = false;
+	    
+	private static AuthenticationService authenticationService;
+
+	private static EPersonService personService;
+	
+	private static synchronized void initialize() {
+		if (initialized) {
+			return;
+		}
+		authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
+		personService = EPersonServiceFactory.getInstance().getEPersonService();
+	}
 
     /**
      * Obtain a new context object. If a context object has already been created
@@ -78,6 +97,7 @@ public class UIUtil extends Util
     public static Context obtainContext(HttpServletRequest request)
             throws SQLException
     {
+    	initialize();
 
         //Set encoding to UTF-8, if not set yet
         //This avoids problems of using the HttpServletRequest
@@ -106,7 +126,7 @@ public class UIUtil extends Util
             HttpSession session = request.getSession();
 
             // See if a user has authentication
-            Integer userID = (Integer) session.getAttribute(
+            UUID userID = (UUID) session.getAttribute(
                     "dspace.current.user.id");
 
             if (userID != null)
@@ -114,7 +134,7 @@ public class UIUtil extends Util
                 String remAddr = (String)session.getAttribute("dspace.current.remote.addr");
                 if (remAddr != null && remAddr.equals(request.getRemoteAddr()))
                 {
-                	EPerson e = EPerson.find(c, userID.intValue());
+                	EPerson e = personService.find(c, userID);
 
                 	Authenticate.loggedIn(c, request, e);
                 }
@@ -127,12 +147,12 @@ public class UIUtil extends Util
             }
 
             // Set any special groups - invoke the authentication mgr.
-            int[] groupIDs = AuthenticationManager.getSpecialGroups(c, request);
+            List<Group> groups = authenticationService.getSpecialGroups(c, request);
 
-            for (int i = 0; i < groupIDs.length; i++)
+            for (Group g : groups)
             {
-                c.setSpecialGroup(groupIDs[i]);
-                log.debug("Adding Special Group id="+String.valueOf(groupIDs[i]));
+                c.setSpecialGroup(g.getID());
+                log.debug("Adding Special Group id="+g.getID().toString());
             }
 
             // Set the session ID and IP address
@@ -177,6 +197,8 @@ public class UIUtil extends Util
      */
     public static Community getCommunityLocation(HttpServletRequest request)
     {
+    	initialize();
+    	
         return ((Community) request.getAttribute("dspace.community"));
     }
 
@@ -192,6 +214,8 @@ public class UIUtil extends Util
      */
     public static Collection getCollectionLocation(HttpServletRequest request)
     {
+    	initialize();
+    	
         return ((Collection) request.getAttribute("dspace.collection"));
     }
 
@@ -206,6 +230,8 @@ public class UIUtil extends Util
      */
     public static void storeOriginalURL(HttpServletRequest request)
     {
+    	initialize();
+    	
         String orig = (String) request.getAttribute("dspace.original.url");
 
         if (orig == null)
@@ -231,6 +257,8 @@ public class UIUtil extends Util
      */
     public static String getOriginalURL(HttpServletRequest request)
     {
+    	initialize();
+    	
         // Make sure there's a URL in the attribute
         storeOriginalURL(request);
 
@@ -253,6 +281,8 @@ public class UIUtil extends Util
      */
     public static String displayDate(DCDate d, boolean time, boolean localTime, HttpServletRequest request)
     {
+    	initialize();
+    	
         return d.displayDate(time, localTime, getSessionLocale(request));
             }
 
@@ -266,6 +296,8 @@ public class UIUtil extends Util
      */
     public static String getRequestLogInfo(HttpServletRequest request)
     {
+    	initialize();
+    	
         StringBuilder report = new StringBuilder();
 
         report.append("-- URL Was: ").append(getOriginalURL(request)).append("\n").toString();
@@ -312,6 +344,8 @@ public class UIUtil extends Util
     public static Locale getSessionLocale(HttpServletRequest request)
 
     {
+    	initialize();
+    	
         String paramLocale = request.getParameter("locale");
         Locale sessionLocale = null;
         Locale supportedLocale = null;
@@ -369,6 +403,8 @@ public class UIUtil extends Util
      */
     public static void sendAlert(HttpServletRequest request, Exception exception)
     {
+    	initialize();
+    	
         String logInfo = UIUtil.getRequestLogInfo(request);
         Context c = (Context) request.getAttribute("dspace.context");
         Locale locale = getSessionLocale(request);
@@ -444,7 +480,8 @@ public class UIUtil extends Util
 	public static void setBitstreamDisposition(String filename, HttpServletRequest request,
 			HttpServletResponse response)
 	{
-
+		initialize();
+		
 		String name = filename;
 
 		Matcher m = p.matcher(name);
@@ -494,20 +531,16 @@ public class UIUtil extends Util
     public static String getMarkingMarkup(HttpServletRequest hrq, DSpaceObject dso, String markType)
             throws JspException
     {
+    	initialize();
+    	
     	try
     	{
     		String contextPath = hrq.getContextPath();
     		
             Context c = UIUtil.obtainContext(hrq);
             
-            Item item = null;
-    		if (dso instanceof BrowseItem){
-    			item = Item.find(c, dso.getID());
-    		}
-    		else if (dso instanceof Item){
-    			item = (Item)dso;
-    		}
-    		
+            Item item = (Item) dso;
+
             String mark = markType.replace("mark_", "");
             
             ItemMarkingExtractor markingExtractor = new DSpace()

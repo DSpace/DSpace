@@ -18,6 +18,8 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -30,7 +32,10 @@ import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -45,6 +50,10 @@ public class GenerateSitemaps
 {
     /** Logger */
     private static Logger log = Logger.getLogger(GenerateSitemaps.class);
+
+    private static final CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    private static final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    private static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
     public static void main(String[] args) throws Exception
     {
@@ -178,88 +187,71 @@ public class GenerateSitemaps
 
         Context c = new Context();
 
-        Community[] comms = Community.findAll(c);
+        List<Community> comms = communityService.findAll(c);
 
-        for (int i = 0; i < comms.length; i++)
-        {
-            String url = handleURLStem + comms[i].getHandle();
+        for (Community comm : comms) {
+            String url = handleURLStem + comm.getHandle();
 
-            if (makeHTMLMap)
-            {
+            if (makeHTMLMap) {
                 html.addURL(url, null);
             }
-            if (makeSitemapOrg)
-            {
+            if (makeSitemapOrg) {
                 sitemapsOrg.addURL(url, null);
             }
         }
 
-        Collection[] colls = Collection.findAll(c);
+        List<Collection> colls = collectionService.findAll(c);
 
-        for (int i = 0; i < colls.length; i++)
-        {
-            String url = handleURLStem + colls[i].getHandle();
+        for (Collection coll : colls) {
+            String url = handleURLStem + coll.getHandle();
 
-            if (makeHTMLMap)
-            {
+            if (makeHTMLMap) {
                 html.addURL(url, null);
             }
-            if (makeSitemapOrg)
-            {
+            if (makeSitemapOrg) {
                 sitemapsOrg.addURL(url, null);
             }
         }
 
-        ItemIterator allItems = Item.findAll(c);
-        try
+        Iterator<Item> allItems = itemService.findAll(c);
+        int itemCount = 0;
+
+        while (allItems.hasNext())
         {
-            int itemCount = 0;
-
-            while (allItems.hasNext())
-            {
-                Item i = allItems.next();
-                String url = handleURLStem + i.getHandle();
-                Date lastMod = i.getLastModified();
-
-                if (makeHTMLMap)
-                {
-                    html.addURL(url, lastMod);
-                }
-                if (makeSitemapOrg)
-                {
-                    sitemapsOrg.addURL(url, lastMod);
-                }
-                i.decache();
-
-                itemCount++;
-            }
+            Item i = allItems.next();
+            String url = handleURLStem + i.getHandle();
+            Date lastMod = i.getLastModified();
 
             if (makeHTMLMap)
             {
-                int files = html.finish();
-                log.info(LogManager.getHeader(c, "write_sitemap",
-                        "type=html,num_files=" + files + ",communities="
-                                + comms.length + ",collections=" + colls.length
-                                + ",items=" + itemCount));
+                html.addURL(url, lastMod);
             }
-
             if (makeSitemapOrg)
             {
-                int files = sitemapsOrg.finish();
-                log.info(LogManager.getHeader(c, "write_sitemap",
-                        "type=html,num_files=" + files + ",communities="
-                                + comms.length + ",collections=" + colls.length
-                                + ",items=" + itemCount));
+                sitemapsOrg.addURL(url, lastMod);
             }
+
+            itemCount++;
         }
-        finally
+
+        if (makeHTMLMap)
         {
-            if (allItems != null)
-            {
-                allItems.close();
-            }
+            int files = html.finish();
+            log.info(LogManager.getHeader(c, "write_sitemap",
+                    "type=html,num_files=" + files + ",communities="
+                            + comms.size() + ",collections=" + colls.size()
+                            + ",items=" + itemCount));
         }
-        
+
+        if (makeSitemapOrg)
+        {
+            int files = sitemapsOrg.finish();
+            log.info(LogManager.getHeader(c, "write_sitemap",
+                    "type=html,num_files=" + files + ",communities="
+                            + comms.size() + ",collections=" + colls.size()
+                            + ",items=" + itemCount));
+        }
+
         c.abort();
     }
 

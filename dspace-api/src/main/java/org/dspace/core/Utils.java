@@ -16,7 +16,6 @@ import java.math.BigInteger;
 import java.rmi.dgc.VMID;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.regex.Matcher;

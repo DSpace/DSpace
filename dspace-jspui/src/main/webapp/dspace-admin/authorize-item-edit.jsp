@@ -55,6 +55,8 @@
 <%@ page import="org.dspace.core.Constants"           %>
 <%@ page import="org.dspace.eperson.EPerson"          %>
 <%@ page import="org.dspace.eperson.Group"            %>
+<%@ page import="org.dspace.authorize.factory.AuthorizeServiceFactory" %>
+<%@ page import="org.dspace.authorize.service.ResourcePolicyService" %>
 
 
 <%
@@ -64,7 +66,7 @@
         (List<ResourcePolicy>) request.getAttribute("item_policies");
 
     // get bitstreams and corresponding policy lists
-    Bundle [] bundles      = (Bundle [])request.getAttribute("bundles");
+    List<Bundle> bundles      = (List<Bundle>)request.getAttribute("bundles");
     Map bundle_policies    = (Map)request.getAttribute("bundle_policies"   );
     Map bitstream_policies = (Map)request.getAttribute("bitstream_policies");
 %>
@@ -107,6 +109,7 @@
             <th class="oddRowOddCol">&nbsp;</th>
         </tr>
 <%
+    ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
     String row = "even";
     for (ResourcePolicy rp : item_policies)
     {
@@ -114,7 +117,7 @@
         <tr>
             <td class="<%= row %>RowOddCol"><%= rp.getID() %></td>
             <td class="<%= row %>RowEvenCol">
-                    <%= rp.getActionText() %>
+                    <%= resourcePolicyService.getActionText(rp) %>
             </td>
             <td class="<%= row %>RowOddCol">
                     <%= (rp.getEPerson() == null ? "..." : rp.getEPerson().getEmail() ) %>  
@@ -139,10 +142,10 @@
     </div>
  </div>
 <%
-    for( int b = 0; b < bundles.length; b++ )
+    for( int b = 0; b < bundles.size(); b++ )
     {
-        Bundle myBun = bundles[b];
-        List<ResourcePolicy> myPolicies = (List<ResourcePolicy>)bundle_policies.get(new Integer(myBun.getID()));
+        Bundle myBun = bundles.get(b);
+        List<ResourcePolicy> myPolicies = (List<ResourcePolicy>)bundle_policies.get(myBun.getID());
 
         // display add policy
         // display bundle header w/ID
@@ -180,7 +183,7 @@
         <tr>
             <td class="<%= row %>RowOddCol"><%= rp.getID() %></td>
             <td class="<%= row %>RowEvenCol">
-                    <%= rp.getActionText() %>
+                    <%= resourcePolicyService.getActionText(rp) %>
             </td>
             <td class="<%= row %>RowOddCol">
                     <%= (rp.getEPerson() == null ? "..." : rp.getEPerson().getEmail() ) %>  
@@ -204,12 +207,12 @@
 %>
     </table>
 <%
-        Bitstream [] bitstreams = myBun.getBitstreams();
+        List<Bitstream> bitstreams = myBun.getBitstreams();
                 
-        for( int s = 0; s < bitstreams.length; s++ )
+        for( int s = 0; s < bitstreams.size(); s++ )
         {
-            Bitstream myBits = bitstreams[s];
-            myPolicies  = (List)bitstream_policies.get(new Integer(myBits.getID()));
+            Bitstream myBits = bitstreams.get(s);
+            myPolicies  = (List)bitstream_policies.get(myBits.getID());
 
             // display bitstream header w/ID, filename
             // 'add policy'
@@ -248,7 +251,7 @@
         <tr>
             <td class="<%= row %>RowOddCol"><%= rp.getID() %></td>
             <td class="<%= row %>RowEvenCol">
-                    <%= rp.getActionText() %>
+                    <%= resourcePolicyService.getActionText(rp) %>
             </td>
             <td class="<%= row %>RowOddCol">
                     <%= (rp.getEPerson() == null ? "..." : rp.getEPerson().getEmail() ) %>  

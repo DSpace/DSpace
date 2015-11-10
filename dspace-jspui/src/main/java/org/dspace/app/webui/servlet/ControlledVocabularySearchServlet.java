@@ -24,10 +24,13 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.search.DSQuery;
 import org.dspace.search.QueryArgs;
 import org.dspace.search.QueryResults;
@@ -51,6 +54,16 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
     // the jsp that will show the search results
     private static final String RESULTS_JSP = "/controlledvocabulary/results.jsp";
 
+    private HandleService handleService;
+    
+    private CommunityService communityService;
+    
+    @Override
+    public void init() throws ServletException {
+    	super.init();
+    	handleService = HandleServiceFactory.getInstance().getHandleService(); 
+        communityService = ContentServiceFactory.getInstance().getCommunityService();
+    }
     /**
      * Handles requests
      */
@@ -193,7 +206,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         else
         {
             // Get all communities for dropdown box
-            Community[] communities = Community.findAll(context);
+            List<Community> communities = communityService.findAll(context);
             request.setAttribute("community.array", communities);
 
             qResults = DSQuery.doQuery(context, qArgs);
@@ -238,7 +251,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         {
             String myhandle = itemHandles.get(i);
 
-            Object o = HandleManager.resolveToObject(context, myhandle);
+            Object o = handleService.resolveToObject(context, myhandle);
 
             resultsItems[i] = (Item) o;
 
@@ -253,7 +266,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         {
             String myhandle = collectionHandles.get(i);
 
-            Object o = HandleManager.resolveToObject(context, myhandle);
+            Object o = handleService.resolveToObject(context, myhandle);
 
             resultsCollections[i] = (Collection) o;
 
@@ -268,7 +281,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         {
             String myhandle = communityHandles.get(i);
 
-            Object o = HandleManager.resolveToObject(context, myhandle);
+            Object o = handleService.resolveToObject(context, myhandle);
 
             resultsCommunities[i] = (Community) o;
 

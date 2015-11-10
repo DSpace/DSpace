@@ -7,23 +7,23 @@
  */
 package org.dspace.app.webui.jsptag;
 
-import org.dspace.app.webui.util.UIUtil;
-
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.Metadatum;
-import org.dspace.content.Item;
-
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
+
+import org.dspace.app.webui.util.UIUtil;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
+import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 
 /**
  * <p>
@@ -40,6 +40,8 @@ public class ItemPreviewTag extends TagSupport
     private transient Item item;
 
     private static final long serialVersionUID = -5535762797556685631L;
+    
+    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
     public ItemPreviewTag()
     {
@@ -79,18 +81,19 @@ public class ItemPreviewTag extends TagSupport
         
         // Only shows 1 preview image at the moment (the first encountered) regardless
         // of the number of bundles/bitstreams of this type
-        Bundle[] bundles = item.getBundles("BRANDED_PREVIEW");
+        List<Bundle> bundles = itemService.getBundles(item, "BRANDED_PREVIEW");
         
-        if (bundles.length > 0)
+        if (bundles.size() > 0)
         {
-        	Bitstream[] bitstreams = bundles[0].getBitstreams();
+        	List<Bitstream> bitstreams = bundles.get(0).getBitstreams();
         	
             HttpServletRequest request = (HttpServletRequest)pageContext.getRequest();
             out.println("<br/><p align=\"center\">");
-            out.println("<img src=\""
+            Bitstream bitstream = bitstreams.get(0);
+			out.println("<img src=\""
             		    + request.getContextPath() + "/retrieve/"
-            		    + bitstreams[0].getID() + "/"
-            		    + UIUtil.encodeBitstreamName(bitstreams[0].getName(),
+            		    + bitstream.getID() + "/"
+            		    + UIUtil.encodeBitstreamName(bitstream.getName(),
             		    		  Constants.DEFAULT_ENCODING)
             		    + "\"/>");
             
@@ -98,22 +101,22 @@ public class ItemPreviewTag extends TagSupport
             String s = ConfigurationManager.getProperty("webui.preview.dc");
             if (s != null)
             {
-            	Metadatum[] dcValue;
+            	String dcValue;
             	
             	int i = s.indexOf('.');
             	
             	if (i == -1)
             	{
-            		dcValue = item.getDC(s, Item.ANY, Item.ANY);
+            		dcValue = itemService.getMetadataFirstValue(item, "dc", s,  Item.ANY, Item.ANY);
             	}
             	else
             	{
-            		dcValue = item.getDC(s.substring(0,1), s.substring(i + 1), Item.ANY);
+            		dcValue = itemService.getMetadataFirstValue(item, "dc", s.substring(0,1), s.substring(i + 1), Item.ANY);
             	}
             	
-            	if (dcValue.length > 0)
+            	if (dcValue != null)
             	{
-            		out.println("<br/>" + dcValue[0].value);
+            		out.println("<br/>" + dcValue);
             	}
             }
             

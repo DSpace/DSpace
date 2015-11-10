@@ -104,7 +104,8 @@
 
     <xsl:template match="dri:div[@id = 'aspect.artifactbrowser.ConfigurableBrowse.div.browse-controls'
     or @id='aspect.administrative.WithdrawnItems.div.browse-controls'
-    or @id='aspect.administrative.PrivateItems.div.browse-controls']">
+    or @id='aspect.administrative.PrivateItems.div.browse-controls'
+    or @id='aspect.discovery.SearchFacetFilter.div.browse-controls']">
         <div>
             <xsl:call-template name="copy-attributes"/>
                 <xsl:attribute name="rend">
