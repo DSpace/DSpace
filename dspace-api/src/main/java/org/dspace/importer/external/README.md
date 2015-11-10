@@ -18,7 +18,9 @@ This documentation explains the features and the usage of the importer framework
 
 ## Abstraction of input format <a name="Abstraction-input-format"></a> ##
 
-The importer framework does not enforce a specific input format. Each importer implementation defines which input format it expects from a remote source. 
+The importer framework does not enforce a specific input format. Each importer implementation defines which input format it expects from a remote source.
+The import framework uses generics to achieve this. Each importer implementation will have a type set of the record type it receives from the remote source's response. 
+This type set will also be used by the framework to use the correct MetadataFieldMapping for a certain implementation. Read [Implementation of an import source](#Example-implementation) for more information.
 
 ## What it can't do <a name="cant-do"></a> ##
 
@@ -32,7 +34,7 @@ One can also choose to implement class *org.dspace.importer.external.service.oth
 
 A third option is to implement class *org.dspace.importer.external.service.AbstractImportSourceService*. This class already implements both the Imports interface and Source class. AbstractImportSourceService has a generic type set 'RecordType'. In the importer implementation this type set should be the class of the records received from the remote source's response (e.g. when using axiom to get the records from the remote source's XML response, the importer implementation's type set is *org.apache.axiom.om.OMElement*). 
 
-Implementing the AbstractImportSourceService allows the importer implementation to use the framework's build-in support to transform a record received from the remote source to an object of class *org.dspace.importer.external.datamodel.ImportRecord* containing DSpace metadata fields.
+Implementing the AbstractImportSourceService allows the importer implementation to use the framework's build-in support to transform a record received from the remote source to an object of class *org.dspace.importer.external.datamodel.ImportRecord* containing DSpace metadata fields, as explained here: [Metadata mapping](#Mapping).
 
 ## Inherited methods <a name="Inherited-methods"></a> ##
 
@@ -68,7 +70,7 @@ Now this metadata field can be used to create a mapping. To add a mapping for th
     </bean>
 ```
 
-Multiple record fields can also be combined into one value. To implement a combined mapping first create a "*SimpleXpathMetadatumContributor*" as explained above for each part of the field. 
+Multiple record fields can also be combined into one value. To implement a combined mapping first create a *SimpleXpathMetadatumContributor* as explained above for each part of the field. 
 
 ```xml
     <bean id="lastNameContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
@@ -91,7 +93,7 @@ Note that namespaces used in the xpath queries are configured in bean "Fullprefi
     </util:map>
 ```
 
-Then create a new list in the spring configuration containing references to all "*SimpleXpathMetadatumContributor*" beans that need to be combined.
+Then create a new list in the spring configuration containing references to all *SimpleXpathMetadatumContributor* beans that need to be combined.
 
 ```xml
 	<util:list id="combinedauthorList" value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor" list-class="java.util.LinkedList">
@@ -114,7 +116,7 @@ Finally create a spring bean configuration of class *org.dspace.importer.externa
     </bean>
 ```
 
-Each contributor must also be added to the "MetadataFieldMap" used by the "*MetadataFieldMapping*" implementation. Each entry of this map maps a metadata field bean to a contributor. For the contributors created above this results in the following configuration:
+Each contributor must also be added to the "MetadataFieldMap" used by the *MetadataFieldMapping* implementation. Each entry of this map maps a metadata field bean to a contributor. For the contributors created above this results in the following configuration:
 
 ```xml
     <util:map id="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
