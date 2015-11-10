@@ -47,8 +47,6 @@
       <fileSet>
          <directory>config</directory>
          <outputDirectory>config</outputDirectory>
-         <!-- Filter all config files -->
-         <filtered>true</filtered>
       </fileSet>
       <!-- Then, copy over all other necessary directories -->
       <fileSet>

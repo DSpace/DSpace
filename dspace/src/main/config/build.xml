@@ -355,9 +355,6 @@ Common usage:
         -->
         <copy todir="config-temp" preservelastmodified="true" overwrite="true" failonerror="false">
             <fileset dir="config" excludes="dspace.cfg" />
-            <filterchain>
-                <expandproperties />
-            </filterchain>
         </copy>
         <echo file='config-temp/ant.properties' message='ant.version = ${ant.version}'/>
 
@@ -772,9 +769,6 @@ Common usage:
 
         <copy todir="${dspace.dir}/config" preservelastmodified="true" failonerror="false">
             <fileset dir="config" excludes="dspace.cfg" />
-            <filterchain>
-                <expandproperties />
-            </filterchain>
         </copy>
 
         <copy file="${config}" tofile="${dspace.dir}/config/dspace.cfg" preservelastmodified="true" />
