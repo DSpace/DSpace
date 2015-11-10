@@ -22,7 +22,7 @@ The importer framework does not enforce a specific input format. Each importer i
 
 ## What it can't do <a name="cant-do"></a> ##
 
-- import remote records as DSpace items
+- import remote records directly as DSpace items
 
 # Implementation of an import source <a name="Example-implementation"></a> #
 
