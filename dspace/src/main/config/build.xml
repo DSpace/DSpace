@@ -506,16 +506,13 @@ Common usage:
         <mkdir dir="solr-config-temp" />
 
         <!--
-        Prepare properly filtered files
+        Prepare configuration files
         -->
         <copy todir="solr-config-temp" preservelastmodified="true" overwrite="true" failonerror="false">
             <fileset dir="solr">
                 <!-- exclude all "data" directories from being overwritten -->
                 <exclude name="**/data/**"/>
             </fileset>
-            <filterchain>
-                <expandproperties />
-            </filterchain>
         </copy>
 
     </target>
