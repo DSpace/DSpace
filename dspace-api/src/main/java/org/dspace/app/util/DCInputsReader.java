@@ -7,15 +7,19 @@
  */
 package org.dspace.app.util;
 
-import java.io.File;
-import java.util.*;
-
-import org.xml.sax.SAXException;
-import org.w3c.dom.*;
-import javax.xml.parsers.*;
-
 import org.dspace.content.MetadataSchema;
 import org.dspace.core.ConfigurationManager;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.FactoryConfigurationError;
+import java.io.File;
+import java.util.*;
 
 /**
  * Submission form generator for DSpace. Reads and parses the installation
@@ -132,7 +136,11 @@ public class DCInputsReader
                 throw new DCInputsReaderException("Error creating submission forms: "+e);
         }
     }
-   
+
+    public static String getFormDefFile() {
+        return FORM_DEF_FILE;
+    }
+
     public Iterator<String> getPairsNameIterator()
     {
         return valuePairs.keySet().iterator();
