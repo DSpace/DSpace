@@ -412,13 +412,13 @@ public class AssociationAnywhere {
         return null;
     }
 
-    private static void changeConceptMetadataValue(Concept concept, String field, String value)
+    private static void changeConceptMetadataValue(Concept concept,String field,String value)
     {
-        AuthorityMetadataValue[] metadataValues = concept.getMetadata("journal", field, null, Item.ANY);
+        AuthorityMetadataValue[] metadataValues = concept.getMetadata("internal","journal",field, Item.ANY);
         if(metadataValues==null||metadataValues.length==0)
         {
-            concept.addMetadata("journal", field, "en", value, null,-1);
-        }
+	    concept.addMetadata("internal","journal",field,"en",value,null,-1);
+	}
         else{
 
             for(AuthorityMetadataValue authorityMetadataValue:metadataValues)
@@ -426,7 +426,7 @@ public class AssociationAnywhere {
                 if(!authorityMetadataValue.value.equals(value))
                 {
                     concept.clearMetadata("internal","journal",field, Item.ANY);
-                    concept.addMetadata("internal","journal",field,"en",value,null,-1);
+		    concept.addMetadata("internal","journal",field,"en",value,null,-1);
                     break;
                 }
             }
