@@ -168,7 +168,6 @@ public class AssociationAnywhere {
         }
         catch (Exception e) {
             log.error("errors when loading customer information:" + e.getMessage(), e);
-            e.printStackTrace();
         }
 
         return null;
@@ -176,13 +175,15 @@ public class AssociationAnywhere {
 
 
     /**
-     * Deduct Credit from Association Anywhere for the specified Journal.
+     * Tally a Credit in Association Anywhere for the specified Journal.
      *
-     * @param customerId Journal Id in Association Anywhere.
-     * @return status of response.
+     * @param context A DSpace Context
+     * @param customerId the Journal's customerId in Association Anywhere.
+     * @param dataPackageDOI the DOI of a data package being tallied
+     * @return status of response from Association Anywhere
      * @throws AssociationAnywhereException
      */
-    public static String tallyCredit(Context context, String customerId, String dataPackageID) throws AssociationAnywhereException {
+    public static String tallyCredit(Context context, String customerId, String dataPackageDOI) throws AssociationAnywhereException {
         log.debug("tallying one credit for customerId " + customerId);
         
         if("test".equals(customerId))
@@ -195,7 +196,7 @@ public class AssociationAnywhere {
         try {
             String requestUrl =  ConfigurationManager.getProperty("association.anywhere.url")
 		+ "/CENCREDWEBSVCLIB.INS_CREDIT_XML?p_input_xml_doc="
-		+ URLEncoder.encode(createRequest(context, customerId, dataPackageID, "update-credit"));
+		+ URLEncoder.encode(createRequest(context, customerId, dataPackageDOI, "update-credit"));
 	    log.debug("AA URL is " + requestUrl);
             HttpClient client = new HttpClient();
             GetMethod get = new GetMethod(requestUrl);
@@ -233,7 +234,7 @@ public class AssociationAnywhere {
         Scheme scheme = Scheme.findByIdentifier(context,ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName"));
         for(Concept concept : scheme.getConcepts())
         {
-            for(AuthorityMetadataValue value : concept.getMetadata("internal", "journal", "customerId",AuthorityMetadataValue.ANY))
+            for(AuthorityMetadataValue value : concept.getMetadata("internal", "journal", "customerID",AuthorityMetadataValue.ANY))
             {
                 updateConcept(context, concept, value.getValue());
             }
@@ -246,18 +247,10 @@ public class AssociationAnywhere {
      * @param customerId
      * @throws Exception
      */
-    private static void updateConcept(Context context, String customerId)
+    private static void updateConcept(Context context, String customerID)
             throws Exception {
-
-        Scheme scheme = Scheme.findByIdentifier(context,ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName"));
-        for(Concept concept : scheme.getConcepts())
-        {
-            for(AuthorityMetadataValue value : concept.getMetadata("internal", "journal", "customerId",AuthorityMetadataValue.ANY))
-            {
-                if(customerId != null && customerId.equals(value.getValue()))
-                    updateConcept(context, concept, value.getValue());
-            }
-        }
+	Concept concept = JournalUtils.getJournalConceptByCustomerID(context, customerID);
+	updateConcept(context, concept, customerID);
     }
 
     /**
@@ -272,22 +265,22 @@ public class AssociationAnywhere {
      * @param customerId
      * @throws Exception
      */
-    private static void updateConcept(Context context, Concept concept, String customerId)
+    private static void updateConcept(Context context, Concept concept, String customerID)
             throws Exception {
 
-        if(customerId==null)
+        if(customerID==null)
         {
-            throw new AssociationAnywhereException("customerId cannot be null");
+            throw new AssociationAnywhereException("customerID cannot be null");
         }
 
-        String credit = getCredit(context, customerId);
-        Document customerInfo = loadCustomerInfo(context, customerId);
+        String credit = getCredit(context, customerID);
+        Document customerInfo = loadCustomerInfo(context, customerID);
         String result = printDocument(customerInfo);
 
         String classSubclassDescr = getStringValue(customerInfo, "//classSubclassDescr");
         String statusCode = getStringValue(customerInfo, "//statusCode");
 
-        changeConceptMetadataValue(concept,"customerId",customerId);
+        changeConceptMetadataValue(concept,"customerID",customerID);
 
         if(classSubclassDescr!=null&&classSubclassDescr.contains("Subscription"))
         {
@@ -419,12 +412,12 @@ public class AssociationAnywhere {
         return null;
     }
 
-    private static void changeConceptMetadataValue(Concept concept,String field,String value)
+    private static void changeConceptMetadataValue(Concept concept, String field, String value)
     {
-        AuthorityMetadataValue[] metadataValues = concept.getMetadata("internal","journal",field, Item.ANY);
+        AuthorityMetadataValue[] metadataValues = concept.getMetadata("journal", field, null, Item.ANY);
         if(metadataValues==null||metadataValues.length==0)
         {
-            concept.addMetadata("internal","journal",field,"en",value,null,-1);
+            concept.addMetadata("journal", field, "en", value, null,-1);
         }
         else{
 
