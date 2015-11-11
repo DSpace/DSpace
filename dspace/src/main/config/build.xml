@@ -63,9 +63,9 @@ Common usage:
 
     <!-- Default configurations to use.  This may be overridden. -->
     <!-- First, the default localized config file -->
-    <property name="config" value="config/local.cfg" />
+    <property name="local-config" value="config/local.cfg" />
     <!-- Next, the default dspace.cfg -->
-    <property name="dspace-config" value="config/dspace.cfg" />
+    <property name="config" value="config/dspace.cfg" />
 
     <!-- Give user a chance to override without editing this file
        (and without typing -D each time s/he compiles it) -->
@@ -74,8 +74,8 @@ Common usage:
     <!-- Load the configurations -->
     <!-- In Ant, properties are immutable, so the first one "wins". In this case,
          we load the local.cfg FIRST, so that its settings are used by default. -->
+    <property file="${local-config}" />
     <property file="${config}" />
-    <property file="${dspace-config}" />
 
     <!-- Timestamp date used when creating backup directories -->
     <tstamp>
@@ -328,7 +328,7 @@ Common usage:
         <!--
         Copy designated dspace.cfg
         -->
-        <copy file="${dspace-config}" tofile="config-temp/dspace.cfg" preservelastmodified="true" />
+        <copy file="${config}" tofile="config-temp/dspace.cfg" preservelastmodified="true" />
 
         <!--
         If designated config isn't the one in config/dspace.cfg then lets put a copy of that next to it
@@ -761,7 +761,7 @@ Common usage:
             <fileset dir="config" excludes="dspace.cfg" />
         </copy>
 
-        <copy file="${dspace-config}" tofile="${dspace.dir}/config/dspace.cfg" preservelastmodified="true" />
+        <copy file="${config}" tofile="${dspace.dir}/config/dspace.cfg" preservelastmodified="true" />
 
         <echo file='${dspace.dir}/config/ant.properties' message='ant.version = ${ant.version}'/>
 
