@@ -51,8 +51,6 @@
                         <artifactId>maven-war-plugin</artifactId>
                         <configuration>
                             <archiveClasses>false</archiveClasses>
-                            <!-- Filter the web.xml -->
-                            <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                             <overlays>
                                 <!--
                                    the priority of overlays is determined here
@@ -107,8 +105,6 @@
                         <artifactId>maven-war-plugin</artifactId>
                         <configuration>
                             <archiveClasses>false</archiveClasses>
-                            <!-- Filter the web.xml -->
-                            <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                             <overlays>
                                 <!--
                                    the priority of overlays is determined here

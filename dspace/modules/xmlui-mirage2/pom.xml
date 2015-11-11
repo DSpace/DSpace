@@ -142,8 +142,6 @@
                 <configuration>
                     <archiveClasses>false</archiveClasses>
                     <warSourceExcludes>themes/**</warSourceExcludes>
-                    <!-- Filter the web.xml -->
-                    <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                     <webResources>
                         <resource>
                             <directory>${project.build.directory}/themes</directory>

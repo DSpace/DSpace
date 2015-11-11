@@ -59,8 +59,6 @@
                             </excludes>
                         </overlay>
                     </overlays>
-                    <!-- Filter the web.xml -->
-                    <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                 </configuration>
                 <executions>
                     <execution>
