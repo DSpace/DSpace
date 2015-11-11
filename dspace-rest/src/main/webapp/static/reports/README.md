@@ -1,39 +1,43 @@
-#---------------------------------------------------------------#
-#--------------------REST CONFIGURATIONS------------------------#
-#---------------------------------------------------------------#
-# These configs are used by the REST module                     #
-#---------------------------------------------------------------#
+This project is intended as an optional add-on to DSpace to provide Quality Control Reporting for Collection Managers.
 
-# record stats in DSpace statistics module
-stats = true
+These reports utilize the DSpace REST API to provide a Collection Manager with
 
-#------------------------------------------------------------------#
-# REST API Reporting Tools                                         #
-#------------------------------------------------------------------#
-# This project is intended as an optional add-on to DSpace to provide 
-# Quality Control Reporting for Collection Managers.       
-#
-# See https://github.com/DSpace-Labs/DSpace-REST-Reports
-#                                                                  
-# These reports utilize the DSpace REST API to provide a Collection 
-# Manager with
-#  - an overview of their collections
-#  - a tool to query metadata for consistency
-#
-# When deploying the DSpace REST API, and institution may choose to 
-# make the API publicly accessible or to restrict access to the API. 
-# If these reports are deployed in a protected manner, the reporting 
-# tools can be configured to bypass DSpace authorization when 
-# reporting on collections and items. 
+* an overview of their collections
+* a tool to query metadata for consistency
 
-##### Enable/disable authorization for the reporting tools. #####
+When deploying the DSpace REST API, and institution may choose to make the API publicly accessible or to restrict access to the API.
+If these reports are deployed in a protected manner, the reporting tools can be configured to bypass DSpace authorization when reporting on collections and items.
+
+## Sample Screen Shots
+The wiki for this project contains screenshots that illustrate the capabilities of these reports.
+
+[Report Screenshots](https://github.com/DSpace-Labs/DSpace-REST-Reports/wiki)
+
+## Pre-requisites
+* **DSpace6** including https://github.com/DSpace/DSpace/pull/1086
+* **DSpace5** See [Using this code with DSpace5](https://github.com/DSpace-Labs/DSpace-REST-Reports/wiki/Using-these-reports-with-DSpace-5)
+* Determine the access that you will grant to your REST api since these reporting tools can be configured to run without authentication.
+* Install this code into dspace/modules/xmlui/src/main/webapp/static/rest (or to a path of your choosing)
+* Update the dspace/config/modules/rest.cfg 
+* [Enabling Sortable Report Tables](https://github.com/DSpace-Labs/DSpace-REST-Reports/wiki/Enabling-Sortable-Report-Tables)
+
+## rest.cfg: Configure the REST Reporting features
+
+#### Enable/Disable object authorization for report calls
+
+```
+# Enable/disable authorization for the reporting tools.
 # By default, the DSpace REST API will only return communities/collections/items that are accessible to a particular user.
 # If the REST API has been deployed in a protected manner, the reporting tools can be configured to bypass authorization checks.
 # This will allow all items/collections/communities to be returned to the report user.
 # Set the rest-reporting-authenticate option to false to bypass authorization
 rest-reporting-authenticate = false
+```
 
-##### Configure the report pages that can be requested by name #####
+#### Configure the report pages that can be requested by name
+
+```
+# Configure the report pages that can be requested by name
 # Create a map of named reports that are available to a report tool user
 # Each map entry should be prefixed with rest-report-url 
 #   The map key is a name for a report
@@ -42,16 +46,19 @@ rest-reporting-authenticate = false
 # If a request is sent to /rest/reports/[report key], the request will be re-directed to the specified URL
 # 
 # This project currently contains 2 sample reports.  Eventually, additional reports could be introduced through this mechanism.
-rest-report-url.collections = static/reports/index.html
-rest-report-url.item-query = static/reports/query.html
-#rest-report-url.custom = 
+rest-report-url.collections = ../static/rest/index.html
+rest-report-url.item-query = ../static/rest/query.html
+```
 
 ##### database specific way to format a regex SQL clause #####
+```
 # The REST Report Tools may pass a regular expression test to the database.  
 # The following configuration setting will construct a SQL regular expression test appropriate to your database engine
 rest-regex-clause = text_value ~ ?
+```
 
-##### Configure REST Report Filters #####
+#### Configure the list of filters that are useful to your repository managers.
+```
 # A filter contains a set of tests that will be applied to an item to determine its inclusion in a particular report.
 # Private items and withdrawn items are frequently excluded from DSpace reports.
 # Additional filters can be configured to examine other item properties.
@@ -71,9 +78,10 @@ plugin.sequence.org.dspace.rest.filter.ItemFilterList = \
         org.dspace.rest.filter.ItemFilterDefsPerm
 
 #     org.dspace.rest.filter.ItemFilterDefsMeta,\
-
-##### Configuration Settings used by REST Report Filters #####
-
+```
+#### Configure settings used by REST report filters
+_Only define the settings used by the filters that you have enabled_
+```
 # Define the set of supported bitstream bundle names for your repository as a comma separated list
 rest-report-supp-bundles = ORIGINAL,THUMBNAIL,TEXT,LICENSE
 
@@ -109,8 +117,12 @@ rest-report-thumbnail-min-size = 400
 # The ImageMagick Thumbnail generator tags the thumbnails it has created with a standard description.
 # This description identifies thumbnails that can safely be re-generated.
 rest-report-gen-thumbnail-desc = Generated Thumbnail
+```
 
-#### Metadata Filtering by Regular Expression ##### 
+#### Metadata Filtering
+_If org.dspace.rest.filter.ItemFilterDefsMeta is enabled, the following regular expressions will be used_
+
+```
 # Used by org.dspace.rest.filter.ItemFilterDefsMeta
 # This class filters items based on metadata properties.
 # These filters are useful for filtering a small set of items.  These filters will be inefficient as a query tool.
@@ -139,3 +151,6 @@ rest-report-regex-xml-entity = ^.*&#.*$
 
 # regex to identify non ascii characters in metadata
 rest-report-regex-non-ascii = ^.*[^\\p{ASCII}].*$
+
+```
+
