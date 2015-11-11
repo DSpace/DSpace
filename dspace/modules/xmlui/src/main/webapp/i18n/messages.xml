@@ -2084,7 +2084,7 @@
         <message key="xmlui.administrative.CurateForm.title">System Curation Tasks</message>
         <message key="xmlui.administrative.CurateForm.trail">Curation Tasks</message>
         <message key="xmlui.administrative.CurateForm.object_label_name">Handle of MOspace Object</message>
-        <message key="xmlui.administrative.CurateForm.object_hint">Hint: Enter [your-handle-prefix]/0 to run a task across entire site (not all tasks may support this capability)</message>
+        <message key="xmlui.administrative.CurateForm.object_hint">Hint: Enter 10355/0 to run a task across all of MOspace (not all tasks may support this capability)</message>
         <message key="xmlui.administrative.CurateForm.task_label_name">Task</message>
         <message key="xmlui.administrative.CurateForm.overall_help">The curation system lets you run routine content operations on a repository object - this may be the entire site or a specific community, collection or item.</message>
         <message key="xmlui.administrative.CurateForm.curation_mode_help">There are two modes for executing curation tasks: you can perform the task immediately, or you can queue it for deferred execution.</message>
