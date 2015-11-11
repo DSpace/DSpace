@@ -42,6 +42,14 @@
             <exclude>LICENSE_HEADER</exclude>
          </excludes>
       </fileSet>
+      <!-- If local.cfg is in the root folder, copy it to config folder -->
+      <fileSet>
+         <directory>..</directory>
+         <outputDirectory>config</outputDirectory>
+         <includes>
+            <include>local.cfg</include>
+         </includes>
+      </fileSet>
       <!-- Copy necessary subdirectories to resulting directory -->
       <!-- First, copy over our configurations -->
       <fileSet>
