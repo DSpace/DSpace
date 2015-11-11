@@ -437,17 +437,6 @@ public class Concept extends AuthorityObject
     }
 
 
-   /**
-     * Find concepts by a journalID in the concept metadata. The journalID is Dryad's 
-     * abbreviation for the journal name.
-     *
-     * @return the matching Concepts, or null if not found
-     */
-    public static ArrayList<Concept> findByJournalID(Context context, String journalID)
-	throws SQLException, AuthorizeException {
-	findByConceptMetadata(context, journalID, "journal", "journalID");
-    }
-
     /**
      * Find concepts by a metadata value in the concept metadata.
      *
