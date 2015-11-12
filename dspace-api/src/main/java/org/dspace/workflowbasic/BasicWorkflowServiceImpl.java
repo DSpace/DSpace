@@ -419,6 +419,11 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
 
         //Gather our old data for launching the workflow event
         int oldState = workflowItem.getState();
+        
+        // in case we don't want to inform reviewers about tasks returned to
+        // the pool by other reviewers, we'll ne to know whether they were owned
+        // before. => keep this information before setting the new owner.
+        EPerson oldOwner = workflowItem.getOwner();
 
         workflowItem.setState(newstate);
 
@@ -443,8 +448,13 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
                 createTasks(context, workflowItem, epa);
                 workflowItemService.update(context, workflowItem);
 
-                // email notification
-                notifyGroupOfTask(context, workflowItem, mygroup, epa);
+                if (ConfigurationManager.getBooleanProperty("workflow", "notify.returned.tasks", true)
+                        || oldState != WFSTATE_STEP1
+                        || oldOwner == null)
+                {
+                    // email notification
+                    notifyGroupOfTask(context, workflowItem, mygroup, epa);
+                }                
             }
             else
             {
@@ -484,8 +494,13 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
                 //  timestamp, and add them to the list
                 createTasks(context, workflowItem, epa);
 
-                // email notification
-                notifyGroupOfTask(context, workflowItem, mygroup, epa);
+                if (ConfigurationManager.getBooleanProperty("workflow", "notify.returned.tasks", true) 
+                        || oldState != WFSTATE_STEP2
+                        || oldOwner == null)
+                {
+                    // email notification
+                    notifyGroupOfTask(context, workflowItem, mygroup, epa);
+                }
             }
             else
             {
@@ -521,8 +536,13 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
                 //  timestamp, and add them to the list
                 createTasks(context, workflowItem, epa);
 
-                // email notification
-                notifyGroupOfTask(context, workflowItem, mygroup, epa);
+                if (ConfigurationManager.getBooleanProperty("workflow", "notify.returned.tasks", true)
+                        || oldState != WFSTATE_STEP3
+                        || oldOwner == null)
+                {
+                    // email notification
+                    notifyGroupOfTask(context, workflowItem, mygroup, epa);
+                }
             }
             else
             {
