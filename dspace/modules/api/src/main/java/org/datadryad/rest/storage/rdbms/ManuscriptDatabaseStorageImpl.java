@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Date;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectReader;
@@ -180,6 +181,8 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             row.setColumn(COLUMN_ORGANIZATION_ID, organizationId);
             row.setColumn(COLUMN_MSID, manuscript.manuscriptId);
             row.setColumn(COLUMN_JSON_DATA, json_data);
+            row.setColumn(COLUMN_DATE_ADDED, new Date());
+            row.setColumn(COLUMN_STATUS, manuscript.status);
             return row;
         } else {
             return null;
