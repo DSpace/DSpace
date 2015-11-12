@@ -1,3 +1,10 @@
+/*
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 This project is intended as an optional add-on to DSpace to provide Quality Control Reporting for Collection Managers.
 
 These reports utilize the DSpace REST API to provide a Collection Manager with
