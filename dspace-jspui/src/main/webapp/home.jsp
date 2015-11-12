@@ -15,30 +15,22 @@
   -    recent.submissions - RecetSubmissions
   --%>
 
-<%@page import="org.dspace.core.Utils"%>
-<%@page import="org.dspace.content.Bitstream"%>
+<%@page import="org.dspace.app.webui.util.UIUtil"%>
+<%@page import="org.dspace.browse.ItemCounter"%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
-<%@ page import="java.io.File" %>
-<%@ page import="java.util.Enumeration"%>
-<%@ page import="java.util.Locale"%>
-<%@ page import="javax.servlet.jsp.jstl.core.*" %>
-<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
-<%@ page import="org.dspace.core.I18nUtil" %>
-<%@ page import="org.dspace.app.webui.util.UIUtil" %>
-<%@ page import="org.dspace.app.webui.components.RecentSubmissions" %>
 <%@ page import="org.dspace.content.Community" %>
-<%@ page import="org.dspace.core.ConfigurationManager" %>
-<%@ page import="org.dspace.core.NewsManager" %>
-<%@ page import="org.dspace.browse.ItemCounter" %>
-<%@ page import="org.dspace.content.Metadatum" %>
-<%@ page import="org.dspace.content.Item" %>
+<%@ page import="org.dspace.core.ConfigurationManager"%>
+<%@ page import="org.dspace.core.NewsManager"%>
 <%@ page import="ua.edu.sumdu.essuir.statistics.EssuirStatistics" %>
 <%@ page import="ua.edu.sumdu.essuir.statistics.StatisticData" %>
+<%@ page import="javax.servlet.jsp.jstl.core.Config" %>
+<%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+<%@ page import="java.util.Locale" %>
 
 <%
     Community[] communities = (Community[]) request.getAttribute("communities");
@@ -61,8 +53,6 @@
     }
     
     ItemCounter ic = new ItemCounter(UIUtil.obtainContext(request));
-
-    RecentSubmissions submissions = (RecentSubmissions) request.getAttribute("recent.submissions");
 %>
 
 <dspace:layout locbar="nolink" titlekey="jsp.home.title" feedData="<%= feedData %>">
@@ -132,62 +122,46 @@
 		</table>
 	</div>
 
-<div class="container row">
-<%
-if (communities != null && communities.length != 0)
-{
-%>
-	<div class="col-md-4">		
-               <h3><fmt:message key="jsp.home.com1"/></h3>
-                <p><fmt:message key="jsp.home.com2"/></p>
-				<div class="list-group">
-<%
-	boolean showLogos = ConfigurationManager.getBooleanProperty("jspui.home-page.logos", true);
-    for (int j = 0; j < communities.length; j++)
-    {
-%><div class="list-group-item row">
-<%  
-		Bitstream logo = communities[j].getLogo();
-		if (showLogos && logo != null) { %>
-	<div class="col-md-3">
-        <img alt="Logo" class="img-responsive" src="<%= request.getContextPath() %>/retrieve/<%= logo.getID() %>" /> 
-	</div>
-	<div class="col-md-9">
-<% } else { %>
-	<div class="col-md-12">
-<% }  %>		
-		<h4 class="list-group-item-heading"><a href="<%= request.getContextPath() %>/handle/<%= communities[j].getHandle() %>"><%= communities[j].getMetadata("name") %></a>
-<%
-        if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
-        {
-%>
-		<span class="badge pull-right"><%= ic.getCount(communities[j]) %></span>
-<%
-        }
+	<div class="jumbotron">
+		<table class="miscTable" width="100%" align="center">
+			<tr>
+				<td class="oddRowEvenCol">
+					<h3><fmt:message key="jsp.home.com1"/></h3>
+					<!--                  <p><fmt:message key="jsp.home.com2"/></p> -->
 
-%>
-		</h4>
-		<p><%= communities[j].getMetadata("short_description") %></p>
-    </div>
-</div>                            
-<%
-    }
-%>
-	</div>
-	</div>
-<%
-}
-%>
-	<%
-    	int discovery_panel_cols = 8;
-    	int discovery_facet_cols = 4;
-    %>
-	<%@ include file="discovery/static-sidebar-facet.jsp" %>
-</div>
 
-<div class="row">
-	<%@ include file="discovery/static-tagcloud-facet.jsp" %>
-</div>
-	
-</div>
+					<%
+						if (communities.length != 0)
+						{
+					%>
+					<table border="0" cellpadding="2">
+						<%
+
+							for (i = 0; i < communities.length; i++)
+							{
+						%>                  <tr>
+						<td class="standard">
+							<a href="<%= request.getContextPath() %>/handle/<%= communities[i].getHandle() %>"><%= communities[i].getMetadata("name") %></a>
+							<%
+								if (ConfigurationManager.getBooleanProperty("webui.strengths.show"))
+								{
+							%>
+							<span class="badge"><%= ic.getCount(communities[i]) %></span>
+							<%
+								}
+
+							%>
+						</td>
+					</tr>
+						<%
+							}
+						%>
+					</table>
+					<%
+						}
+					%>
+				</td>
+			</tr>
+		</table>
+	</div>
 </dspace:layout>

@@ -106,7 +106,7 @@ public class DCInputsReader
     }
 
 
-    private void buildInputs(String fileName)
+    protected void buildInputs(String fileName)
          throws DCInputsReaderException
     {
         whichForms = new HashMap<String, String>();
