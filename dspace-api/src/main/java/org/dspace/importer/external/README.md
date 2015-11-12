@@ -1,7 +1,7 @@
 - [Introduction](#Introduction)
 	- [Features](#Features)
 	- [Abstraction of input format](#Abstraction-input-format)
-	- [What it can't do](#cant-do)
+	- [Transformation to DSpace item](#transformation)
 	- [Relation with BTE](#bte)
 - [Implementation of an import source](#Example-implementation)
 	- [Inherited methods](#Inherited-methods)
@@ -23,15 +23,18 @@ The importer framework does not enforce a specific input format. Each importer i
 The import framework uses generics to achieve this. Each importer implementation will have a type set of the record type it receives from the remote source's response. 
 This type set will also be used by the framework to use the correct MetadataFieldMapping for a certain implementation. Read [Implementation of an import source](#Example-implementation) for more information.
 
-## What it can't do <a name="cant-do"></a> ##
+## Transformation to DSpace item <a name="transformation"></a> ##
 
-- import remote records directly as DSpace items
+The framework produces an 'ImportRecord' that is completely decoupled from DSPace. It contains a set of metadata DTO's that contain the notion of schema,element and qualifier. The specific implementation is responsible for populating this set. It is then very simple to create a DSPace item from this list.
 
 ## Relation with BTE <a name="bte"></a> ##
 
 While there is some overlap between this framework and BTE, this framework supports some features that are hard to implement using the BTE. It has explicit support to deal with network failure and throttling imposed by the data source. It also has explicit support for distinguishing between network caused errors and invalid requests to the source.
 Furthermore the framework doesn't impose any restrictions on the format in which the data is retrieved. It uses java generics to support different source record types. A reference implementation of using XML records is provided for which a set of metadata can be generated from any xpath expression (or composite of xpath expressions). 
 Unless 'advanced' processing is necessary (e.g. lookup of authors in an LDAP directory) this metadata mapping can be simply configured using spring. No code changes necessary. A mixture of advanced and simple (xpath) mapping is also possible.
+
+This design is also in line with the roadmap to create a Modular Framework as detailed in [https://wiki.duraspace.org/display/DSPACE/Design+-+Module+Framework+and+Registry](This design is also in line with the roadmap to create a Modular Framework as detailed in https://wiki.duraspace.org/display/DSPACE/Design+-+Module+Framework+and+Registry)
+This modular design also allows it to be completely independent of the user interface layer, be it JSPUI, XMLUI, command line or the result of the new UI projects: [https://wiki.duraspace.org/display/DSPACE/Design+-+Single+UI+Project](https://wiki.duraspace.org/display/DSPACE/Design+-+Single+UI+Project)
 
 # Implementation of an import source <a name="Example-implementation"></a> #
 
