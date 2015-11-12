@@ -1,8 +1,10 @@
 /*
-  Created by Terry Brady, Georgetown University Library
-  This code is an optional add-on for DSpace.
-  https://github.com/DSpace-Labs/DSpace-REST-Reports
-*/
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 var Report = function() {
 	var self = this;
 	this.COLL_LIMIT = 500;
