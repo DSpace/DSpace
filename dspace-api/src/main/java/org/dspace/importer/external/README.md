@@ -33,7 +33,7 @@ While there is some overlap between this framework and BTE, this framework suppo
 Furthermore the framework doesn't impose any restrictions on the format in which the data is retrieved. It uses java generics to support different source record types. A reference implementation of using XML records is provided for which a set of metadata can be generated from any xpath expression (or composite of xpath expressions). 
 Unless 'advanced' processing is necessary (e.g. lookup of authors in an LDAP directory) this metadata mapping can be simply configured using spring. No code changes necessary. A mixture of advanced and simple (xpath) mapping is also possible.
 
-This design is also in line with the roadmap to create a Modular Framework as detailed in [https://wiki.duraspace.org/display/DSPACE/Design+-+Module+Framework+and+Registry](This design is also in line with the roadmap to create a Modular Framework as detailed in https://wiki.duraspace.org/display/DSPACE/Design+-+Module+Framework+and+Registry)
+This design is also in line with the roadmap to create a Modular Framework as detailed in [https://wiki.duraspace.org/display/DSPACE/Design+-+Module+Framework+and+Registry](https://wiki.duraspace.org/display/DSPACE/Design+-+Module+Framework+and+Registry)
 This modular design also allows it to be completely independent of the user interface layer, be it JSPUI, XMLUI, command line or the result of the new UI projects: [https://wiki.duraspace.org/display/DSPACE/Design+-+Single+UI+Project](https://wiki.duraspace.org/display/DSPACE/Design+-+Single+UI+Project)
 
 # Implementation of an import source <a name="Example-implementation"></a> #
