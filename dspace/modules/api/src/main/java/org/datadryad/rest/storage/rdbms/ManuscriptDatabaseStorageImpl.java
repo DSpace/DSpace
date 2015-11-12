@@ -45,6 +45,9 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     // active is stored as String because DatabaseManager doesn't support Boolean
     static final String COLUMN_ACTIVE = "active";
     static final String COLUMN_JSON_DATA = "json_data";
+    static final String COLUMN_STATUS = "status";
+    static final String COLUMN_DATE_ADDED = "date_added";
+
     static final int DEFAULT_LIMIT = 1000;
 
     static final List<String> MANUSCRIPT_COLUMNS = Arrays.asList(
@@ -53,7 +56,10 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             COLUMN_MSID,
             COLUMN_VERSION,
             COLUMN_ACTIVE,
-            COLUMN_JSON_DATA);
+            COLUMN_JSON_DATA,
+            COLUMN_STATUS,
+            COLUMN_DATE_ADDED
+            );
 
     private static final Integer NOT_FOUND = -1;
     static final String ACTIVE_TRUE = String.valueOf(true);
