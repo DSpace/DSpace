@@ -332,9 +332,9 @@ public class DryadEmailSubmission extends HttpServlet {
                 continue;
             }
 
-            Matcher journalCodeMatcher = Pattern.compile("^\\s*>*\\s*(Journal Code):\\s*([a-zA-Z]+)").matcher(line);
+            Matcher journalCodeMatcher = Pattern.compile("^\\s*>*\\s*(Journal Code):\\s*(.+)").matcher(line);
             if (journalCodeMatcher.find()) {
-                journalCode = journalCodeMatcher.group(2);
+                journalCode = JournalUtils.cleanJournalCode(journalCodeMatcher.group(2));
                 dryadContentStarted = true;
             }
 
@@ -372,9 +372,7 @@ public class DryadEmailSubmission extends HttpServlet {
             if (journalCode == null) {
                 throw new SubmissionException("Journal Name " + journalName + " did not match a known Journal Name");
             }
-
             // find the associated concept and initialize the parser variable.
-            journalCode = JournalUtils.cleanJournalCode(journalCode);
             try {
                 concept = JournalUtils.getJournalConceptByShortID(context, journalCode);
             } catch (SQLException e) {
