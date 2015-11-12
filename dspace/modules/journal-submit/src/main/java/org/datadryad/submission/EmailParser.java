@@ -91,6 +91,9 @@ public class EmailParser {
         fieldToXMLTagMap.put("ISSN", ISSN);
         fieldToXMLTagMap.put("ms dryad doi", DRYAD_DOI);
         fieldToXMLTagMap.put("contact author orcid", CORRESPONDING_AUTHOR_ORCID);
+
+        // unnecessary fields
+        fieldToXMLTagMap.put("Dryad author url", UNNECESSARY);
     }
 
     /** The Pattern for dryad_ id. */
