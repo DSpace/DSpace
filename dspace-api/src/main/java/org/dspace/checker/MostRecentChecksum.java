@@ -87,9 +87,9 @@ public class MostRecentChecksum implements Serializable
             setProcessStartDate(new Date());
             setProcessEndDate(new Date());
             if (bitstream.getChecksumAlgorithm() == null) {
-                bitstream.setChecksumAlgorithm("MD5");
+                setChecksumAlgorithm("MD5");
             } else {
-                bitstream.setChecksumAlgorithm(bitstream.getChecksumAlgorithm());
+                setChecksumAlgorithm(bitstream.getChecksumAlgorithm());
             }
             setMatchedPrevChecksum(true);
 

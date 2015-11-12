@@ -7,20 +7,16 @@
  */
 package org.dspace.content.dao.impl;
 
-import org.dspace.checker.MostRecentChecksum;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.dao.BitstreamDAO;
-import org.dspace.core.Context;
 import org.dspace.core.AbstractHibernateDSODAO;
+import org.dspace.core.Context;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.criterion.Subqueries;
 
 import java.sql.SQLException;
 import java.util.Iterator;
@@ -67,15 +63,8 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
 //                    + "where not exists( select 'x' from most_recent_checksum "
 //                    + "where most_recent_checksum.bitstream_id = bitstream.bitstream_id )"
 
-        DetachedCriteria d = DetachedCriteria.forClass(MostRecentChecksum.class, "mrc");
-        d.setProjection(Projections.projectionList().add(Projections.property("mrc.bitstream")));
-
-        Criteria criteria = createCriteria(context, Bitstream.class, "b")
-            .add(Subqueries.propertyNotIn("b.id", d));
-
-        @SuppressWarnings("unchecked")
-        List<Bitstream> result = (List<Bitstream>) criteria.list();
-        return result;
+        Query query = createQuery(context, "select b from Bitstream b where b not in (select c.bitstream from MostRecentChecksum c)");
+        return query.list();
     }
 
     @Override
