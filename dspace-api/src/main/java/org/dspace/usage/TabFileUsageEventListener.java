@@ -15,33 +15,36 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.apache.log4j.Logger;
-
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.services.model.Event;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Serialize AbstractUsageEvent data to a file as Tab deliminated. Requires
+ * Serialize AbstractUsageEvent data to a file as Tab delimited. Requires
  * configuration:  in dspace.cfg specify the path to the file as the value of
  * {@code usageEvent.tabFileLogger.file}.
  * 
  * @author Mark H. Wood
  * @author Mark Diggory
- * @version $Revision: 3734 $
  */
-public class TabFileUsageEventListener extends AbstractUsageEventListener
+public class TabFileUsageEventListener
+        extends AbstractUsageEventListener
 {
-	
-    /** log4j category */
-    private static Logger errorLog = Logger
+    /** log category. */
+    private static final Logger errorLog = LoggerFactory
             .getLogger(TabFileUsageEventListener.class);
 
-    /** File on which to write event records */
-    static PrintWriter log = null;
+    /** File on which to write event records. */
+    private static PrintWriter log = null;
+
+    /** Usual string format for dates. */
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat(
+            "yyyyMMdd'T'HHmmssSSS");
 
     public TabFileUsageEventListener()
     {
-
         if (null == log)
         {
             boolean appending;
@@ -50,8 +53,8 @@ public class TabFileUsageEventListener extends AbstractUsageEventListener
                     .getProperty("usageEvent.tabFileLogger.file");
             if (null == logPath)
             {
-                errorLog
-                        .error("UsageEventTabFileLogger unconfigured, will not log events");
+                errorLog.error("{} unconfigured, will not log events",
+                        TabFileUsageEventListener.class.getName());
                 return;
             }
 
@@ -70,18 +73,22 @@ public class TabFileUsageEventListener extends AbstractUsageEventListener
             }
             catch (FileNotFoundException e)
             {
-                errorLog
-                        .error(
-                                "UsageEventTabFileLogger cannot open file, will not log events",
-                                e);
+                errorLog.error("{} cannot open file, will not log events:  {}",
+                                TabFileUsageEventListener.class.getName(),
+                                e.getMessage());
                 return;
             }
 
             if (!appending)
             {
-                log.println("date event objectType objectId sessionId sourceAddress eperson");
+                log.println("date"
+                        + '\t' + "event"
+                        + '\t' + "objectType"
+                        + '\t' + "objectId"
+                        + '\t' + "sessionId"
+                        + '\t' + "sourceAddress"
+                        + '\t' + "eperson");
             }
-            
         }
     }
     
@@ -97,20 +104,19 @@ public class TabFileUsageEventListener extends AbstractUsageEventListener
                 return;
             }
 	
-	        SimpleDateFormat dateFormat = new SimpleDateFormat(
-	                "yyyyMMdd'T'HHmmssSSS");
+            log.append(dateFormat.format(new Date()));
+	        log.append('\t').append(ue.getName()); // event type
+	        log.append('\t').append(Constants.typeText[ue.getObject().getType()]);
+	        log.append('\t').append(ue.getObject().getID().toString());
+	        log.append('\t').append(ue.getRequest().getSession().getId());
+	        log.append('\t').append(ue.getRequest().getRequestURI());
 	
-	        String string = dateFormat.format(new Date());
-	        string += "\t" + ue.getName(); // event type
-	        string += "\t" + ue.getObject().getType();
-	        string += "\t" + ue.getObject().getID();
-	        string += "\t" + ue.getRequest().getSession().getId();
-	        string += "\t" + ue.getRequest().getRequestURI();
+	        String epersonName = (null == ue.getContext().getCurrentUser()
+                    ? "anonymous"
+                    : ue.getContext().getCurrentUser().getEmail());
+	        log.append('\t').append(epersonName);
 	
-	        String epersonName = (null == ue.getContext().getCurrentUser() ? "anonymous" : ue.getContext().getCurrentUser().getEmail());
-	        string += "\t" + epersonName;
-	
-	        log.println(string);
+	        log.println();
 	        log.flush();
 		}
 	}
