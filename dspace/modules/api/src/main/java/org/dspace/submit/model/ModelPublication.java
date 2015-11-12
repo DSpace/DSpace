@@ -21,6 +21,9 @@ import org.apache.log4j.Logger;
 
 import org.dspace.core.ConfigurationManager;
 import org.dspace.submit.bean.PublicationBean;
+import org.dspace.content.authority.Concept;
+import org.datadryad.rest.models.Manuscript;
+import org.dspace.JournalUtils;
 import org.w3c.dom.*;
 import javax.xml.parsers.*;
 

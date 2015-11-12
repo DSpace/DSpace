@@ -165,9 +165,19 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
     @Override
     protected void addResults(StoragePath path, List<Organization> organizations, String searchParam, Integer limit) throws StorageException {
         try {
+            ArrayList<Organization> allOrgs = new ArrayList<Organization>();
             Context context = getContext();
-            organizations.addAll(getOrganizations(context));
+            allOrgs.addAll(getOrganizations(context));
             completeContext(context);
+            if (searchParam != null) {
+                for (Organization org : allOrgs) {
+                    if (org.organizationCode.equals(searchParam)) {
+                        organizations.add(org);
+                    }
+                }
+            } else {
+                organizations.addAll(allOrgs);
+            }
         } catch (SQLException ex) {
             throw new StorageException("Exception reading organizations", ex);
         }

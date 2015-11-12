@@ -1,15 +1,17 @@
 package org.datadryad.submission;
 
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.List;
-import java.util.regex.Pattern;
-
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.jdom.input.SAXBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
+import org.datadryad.rest.models.Address;
+import org.datadryad.rest.models.Author;
+import org.datadryad.rest.models.Manuscript;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The interface of submission e-mail parsing classes
@@ -18,10 +20,78 @@ import org.slf4j.LoggerFactory;
  * @author Kevin S. Clarke
  * @author Peter E. Midford
  * @author Dan Leehr
+ * @author Daisie Huang
  */
-public abstract class EmailParser {
+public class EmailParser {
 
-	private static Logger LOGGER = LoggerFactory.getLogger(EmailParser.class);
+	protected static Logger LOGGER = Logger.getLogger(EmailParser.class);
+
+    protected Manuscript manuscript;
+    protected Map<String, String> dataForXML = new LinkedHashMap<String, String>();
+
+    // required XML tags that correspond to parts of Manuscript
+    public static final String JOURNAL_CODE = "Journal_Code";
+    public static final String JOURNAL = "Journal";
+    public static final String ABSTRACT = "Abstract";
+    public static final String AUTHORS = "Authors";
+    public static final String ARTICLE_STATUS = "Article_Status";
+    public static final String MANUSCRIPT = "Manuscript_ID";
+    public static final String ARTICLE_TITLE = "Article_Title";
+    public static final String CORRESPONDING_AUTHOR = "Corresponding_Author";
+    public static final String CORRESPONDING_AUTHOR_ORCID = "Corresponding_Author_ORCID";
+    public static final String EMAIL = "Email";
+    public static final String ADDRESS_LINE_1 = "Address_Line_1";
+    public static final String ADDRESS_LINE_2 = "Address_Line_2";
+    public static final String ADDRESS_LINE_3 = "Address_Line_3";
+    public static final String CITY = "City";
+    public static final String STATE = "State";
+    public static final String COUNTRY = "Country";
+    public static final String ZIP = "Zip";
+    public static final String CLASSIFICATION = "Classification";
+
+    // commonly-used XML tags:
+    public static final String ISSN = "ISSN";
+    public static final String ORCID = "ORCID";
+    public static final String RESEARCHER_ID = "Researcher_ID";
+    public static final String DRYAD_DOI = "Dryad_DOI";
+
+    // Parsers that deal with specific and unneeded fields should assign fields to the UNNECESSARY tag:
+    public static final String UNNECESSARY = "Unnecessary";
+
+    // The field to XML-tag mapping table.
+    protected static Map<String, String> fieldToXMLTagMap = new LinkedHashMap<String,String>();
+
+    static {
+        // commonly-used field names for required tags for Manuscript
+        fieldToXMLTagMap.put("abstract", ABSTRACT);
+        fieldToXMLTagMap.put("journal", JOURNAL);
+        fieldToXMLTagMap.put("journal name",JOURNAL);
+        fieldToXMLTagMap.put("journal code", JOURNAL_CODE);
+        fieldToXMLTagMap.put("article status", ARTICLE_STATUS);
+        fieldToXMLTagMap.put("manuscript number", MANUSCRIPT);
+        fieldToXMLTagMap.put("ms dryad id",MANUSCRIPT);
+        fieldToXMLTagMap.put("ms reference number",MANUSCRIPT);
+        fieldToXMLTagMap.put("ms title",ARTICLE_TITLE);
+        fieldToXMLTagMap.put("article title", ARTICLE_TITLE);
+        fieldToXMLTagMap.put("ms authors",AUTHORS);
+        fieldToXMLTagMap.put("all authors", AUTHORS);
+        fieldToXMLTagMap.put("classification description", CLASSIFICATION);
+        fieldToXMLTagMap.put("keywords",CLASSIFICATION);
+        fieldToXMLTagMap.put("contact author",CORRESPONDING_AUTHOR);
+        fieldToXMLTagMap.put("contact author email",EMAIL);
+        fieldToXMLTagMap.put("contact author address 1",ADDRESS_LINE_1);
+        fieldToXMLTagMap.put("contact author address 2",ADDRESS_LINE_2);
+        fieldToXMLTagMap.put("contact author address 3",ADDRESS_LINE_3);
+        fieldToXMLTagMap.put("contact author city",CITY);
+        fieldToXMLTagMap.put("contact author state",STATE);
+        fieldToXMLTagMap.put("contact author country",COUNTRY);
+        fieldToXMLTagMap.put("contact author zip/postal code",ZIP);
+
+        // commonly-used field names for optional XML tags
+        fieldToXMLTagMap.put("ISSN", ISSN);
+        fieldToXMLTagMap.put("ms dryad doi", DRYAD_DOI);
+        fieldToXMLTagMap.put("contact author orcid", CORRESPONDING_AUTHOR_ORCID);
+    }
 
     /** The Pattern for dryad_ id. */
     /** Valid characters for Manuscript IDs, per DataCite conventions
@@ -35,183 +105,286 @@ public abstract class EmailParser {
 
     protected static Pattern Pattern4MS_Dryad_ID = Pattern.compile("(([a-zA-Z0-9-._:]|(/[a-zA-Z0-9]))+)(\\s*)(.*)");
 
-	public abstract ParsingResult parseMessage(List<String> aMessage);
+	public void parseMessage(List<String> message) {
+        XMLValue currValue = new XMLValue();
+        for (String line : message) {
+            if (StringUtils.stripToNull(line) != null) {
+                // match field names
+                XMLValue thisLine = parseLineToXMLValue(line);
+                if (thisLine.key == null) {
+                    if (currValue.key != null) {
+                        currValue.value = currValue.value + " " + thisLine.value;
+                        dataForXML.put(currValue.key,currValue.value);
+                    }
+                } else {
+                    currValue = thisLine;
+                    dataForXML.put(currValue.key, currValue.value);
+                }
+            }
+        }
+
+        // if article status says "in review", it's the same as a submission
+        if (dataForXML.get(ARTICLE_STATUS).equalsIgnoreCase("in review")) {
+            dataForXML.put(ARTICLE_STATUS,Manuscript.STATUS_SUBMITTED);
+        }
+
+        // remove any unnecessary tags
+        dataForXML.remove(UNNECESSARY);
+
+        // remove empty tags
+        ArrayList<String> removeTags = new ArrayList<String>();
+        for (String key : dataForXML.keySet()) {
+            if (StringUtils.stripToNull(dataForXML.get(key)) == null) {
+                removeTags.add(key);
+            }
+        }
+
+        for (String key : removeTags) {
+            dataForXML.remove(key);
+        }
+
+        // some tags should only have one word in them:
+        if (dataForXML.get(MANUSCRIPT) != null) {
+            dataForXML.put(MANUSCRIPT, dataForXML.get(MANUSCRIPT).split("\\s", 2)[0]);
+        }
+        if (dataForXML.get(JOURNAL_CODE) != null) {
+            dataForXML.put(JOURNAL_CODE, dataForXML.get(JOURNAL_CODE).split("\\s", 2)[0]);
+        }
+        // for debugging
+        for (String s : dataForXML.keySet()) {
+            LOGGER.debug(">>" + s + ":" + dataForXML.get(s));
+        }
+
+        parseSpecificTags();
+        createManuscript();
+        return;
+    }
+
+    // This method is to be overwritten by subclasses that need to do extra processing of specific tags.
+    protected void parseSpecificTags() {
+        return;
+    }
+
+    private void createManuscript() {
+        manuscript = new Manuscript();
+
+        manuscript.manuscript_abstract = (String) dataForXML.remove(ABSTRACT);
+        String authorstring = (String) dataForXML.remove(AUTHORS);
+        manuscript.authors.author = parseAuthorList(authorstring);
+
+        manuscript.dryadDataDOI = null;
+        manuscript.keywords.addAll(parseClassificationList((String) dataForXML.remove(CLASSIFICATION)));
+        manuscript.manuscriptId = (String) dataForXML.remove(MANUSCRIPT);
+        manuscript.status = dataForXML.remove(ARTICLE_STATUS).toLowerCase();
+        manuscript.title = (String) dataForXML.remove(ARTICLE_TITLE);
+        manuscript.publicationDOI = null;
+        manuscript.publicationDate = null;
+        manuscript.dataReviewURL = null;
+        manuscript.dataAvailabilityStatement = null;
+
+        manuscript.organization.organizationCode = dataForXML.remove(JOURNAL_CODE);
+        manuscript.organization.organizationName = dataForXML.remove(JOURNAL);
+
+        manuscript.correspondingAuthor.author = parseAuthor((String) dataForXML.remove(CORRESPONDING_AUTHOR));
+        manuscript.correspondingAuthor.email = parseEmailAddress((String) dataForXML.remove(EMAIL));
+        manuscript.correspondingAuthor.author.identifier = (String) dataForXML.remove(CORRESPONDING_AUTHOR_ORCID);
+        if (manuscript.correspondingAuthor.author.identifier != null) {
+            manuscript.correspondingAuthor.author.identifierType = "ORCID";
+        }
+
+        manuscript.correspondingAuthor.address = new Address();
+        manuscript.correspondingAuthor.address.addressLine1 = (String) dataForXML.remove(ADDRESS_LINE_1);
+        manuscript.correspondingAuthor.address.addressLine2 = (String) dataForXML.remove(ADDRESS_LINE_2);
+        manuscript.correspondingAuthor.address.addressLine3 = (String) dataForXML.remove(ADDRESS_LINE_3);
+        manuscript.correspondingAuthor.address.city = (String) dataForXML.remove(CITY);
+        manuscript.correspondingAuthor.address.state = (String) dataForXML.remove(STATE);
+        manuscript.correspondingAuthor.address.country = (String) dataForXML.remove(COUNTRY);
+        manuscript.correspondingAuthor.address.zip = (String) dataForXML.remove(ZIP);
+        manuscript.dryadDataDOI = (String) dataForXML.remove(DRYAD_DOI);
+        manuscript.optionalProperties = dataForXML;
+    }
+
+    public Manuscript getManuscript() {
+        return manuscript;
+    }
+
+    public void setManuscript(Manuscript ms) {
+        manuscript = ms;
+    }
+
+
+    public static String parseEmailAddress(String emailString) {
+        String email = emailString;
+        if (email != null) {
+            String[] emails = emailString.split("[;,]\\s*", 2);
+            email = emails[0];
+            // sometimes email addresses come in the format "name <email@address>"
+            Matcher namepattern = Pattern.compile(".*<(.+@.+)>.*").matcher(emailString);
+            if (namepattern.find()) {
+                email = namepattern.group(1);
+            }
+        }
+        return email;
+    }
+
+    public static Author parseAuthor(String authorString) {
+        Author author = new Author();
+        // initialize to empty strings, in case there isn't actually anything in the authorString.
+        author.givenNames = "";
+        author.familyName = "";
+        String suffix = "";
+
+        if (authorString != null) {
+            authorString = StringUtils.stripToEmpty(authorString);
+            // Remove any leading title, like Dr.
+            authorString = authorString.replaceAll("^[D|M]+rs*\\.*\\s*","");
+            // is there a comma in the name?
+            // it could either be lastname, firstname, or firstname lastname, title
+            Matcher namepattern = Pattern.compile("^(.+),\\s*(.*)$").matcher(authorString);
+            if (namepattern.find()) {
+                if (namepattern.group(2).matches("(Jr\\.*|Sr\\.*|III)")) {
+                    // if it's a suffix situation, then group 2 will say something like "Jr"
+                    // if this is the case, it's actually a firstname lastname situation.
+                    // the last name will be the last word in group 1 + ", " + suffix.
+                    suffix = ", " + namepattern.group(2);
+                    authorString = namepattern.group(1);
+                } else if (namepattern.group(2).matches("(Ph|J)\\.*D\\.*|M\\.*[DAS]c*\\.*")) {
+                    // if it's a title situation, group 2 will say something like "PhD" or "MD"
+                    // there are probably more titles that might happen here, but we can't deal with that.
+                    // throw this away.
+                    authorString = namepattern.group(1);
+                } else {
+                    author.givenNames = namepattern.group(2);
+                    author.familyName = namepattern.group(1);
+                    return author;
+                }
+            }
+
+            // if it's firstname lastname
+            namepattern = Pattern.compile("^(.+) +(.*)$").matcher(authorString);
+            if (namepattern.find()) {
+                author.givenNames = namepattern.group(1);
+                author.familyName = namepattern.group(2) + suffix;
+            } else {
+                // there is only one word in the name: assign it to the familyName?
+                author.familyName = authorString;
+                author.givenNames = null;
+            }
+        }
+        return author;
+    }
 
     /**
-     * Strips characters that can't be output to XML.  Implementation from
-     * http://blog.mark-mclaren.info/2007/02/invalid-xml-characters-when-valid-utf8_5873.html.
-     * In
-     * @param inputString string to sanitize
-     * @return String after removing certain control characters and other
-     * characters that cause XML building to fail.
-     *
-     * Prior to stripping the non valid XML characters, issues were seen when
-     * decoding special characters from quoted-printable encoded messages.
-     * The control characters (e.g. 0xB) that prefix the specials were still
-     * in the String.
-     *
-     * This method strips out these control characters, as well as others
-     * that may prevent XML output.
+     * Author lists generally come as either last, first; last, first
+     * or as first last, first last and first last (sometimes with the Oxford comma before the 'and' token)
      */
-    private static String stripNonValidXMLCharacters(String inputString) {
-        if(inputString == null || inputString.length() == 0) {
-            return "";
-        }
-        StringBuilder builder = new StringBuilder();
-        char c;
-        // Check for XML-valid characters
-        for (int i=0; i < inputString.length(); i++) {
-            c = inputString.charAt(i);
-            if ((c == 0x9) ||
-                (c == 0xA) ||
-                (c == 0xD) ||
-                ((c >= 0x20) && (c <= 0xD7FF)) ||
-                ((c >= 0xE000) && (c <= 0xFFFD)) ||
-                ((c >= 0x10000) && (c <= 0x10FFFF))) {
-                builder.append(c);
-            }
-        }
-        return builder.toString();
-    }
-        
-	protected static String getStrippedText(String aInputString) {
-		SAXBuilder builder = new SAXBuilder();
-		// We have to replace characters used for XML syntax with entity refs
-		String text = aInputString.replace("&", "&amp;").replace("<", "&lt;")
-				.replace(">", "&gt;").replace("\"", "&quot;")
-				.replace("'", "&apos;");
-                
-        text = stripNonValidXMLCharacters(text);
+    public static List<Author> parseAuthorList (String authorString) {
+        ArrayList<Author> authorList = new ArrayList<Author>();
 
-		// Check that we have well-formed XML
-		try {
-			Reader reader = new StringReader("<s>" + text + "</s>");
-			builder.build(reader).getRootElement().getValue();
-			
-			// If we do, though, use our text string which has the entity refs;
-			// they don't come out of our getValue() call above...
-			return text.replaceAll("\\s+", " ");
-		}
-		catch (Exception details) {
-            if (LOGGER.isWarnEnabled()) {
-                LOGGER.warn("The following couldn't be parsed: \n" + text
-                            + "\n" + details.getMessage());
+        if (authorString != null) {
+            ArrayList<String> authorStrings = new ArrayList<String>();
+
+            // first check to see if the authors are semicolon-separated
+            String[] authors = authorString.split("\\s*;\\s*");
+
+            // if it didn't have semicolons, it must have commas
+            if (authors.length == 1) {
+                authors = authorString.split("\\s*,\\s*");
+                // although, if there was only one author and it was listed as lastname, firstname, it'd have a comma too...
+                if (authors.length == 2) {
+                    authorStrings.add(authors[1] + " " + authors[0]);
+                    authors = new String[0];
+                }
             }
 
-            return aInputString; // just return what we're given if problems
-		}
-	}
+            for (int i = 0; i < authors.length; i++) {
+                if (authors[i] != null) {
+                    authorStrings.add(authors[i]);
+                }
+            }
 
-	public static String flipName(String aName) {
-		if (aName == null || aName.trim().equals("") || aName.contains(",")) {
-			return aName;
-		}
 
-		// a very simplistic first pass at this... you'd think there'd be a
-		// OSS name parser out there already, but I'm not finding one...
-		String[] parts = aName.split("\\s+");
-		StringBuilder builder = new StringBuilder(parts[parts.length - 1]);
-
-		builder.append(", ");
-
-		for (int index = 0; index < parts.length - 1; index++) {
-			builder.append(parts[index]).append(' ');
-		}
-
-		return builder.toString();
-	}
-	
-	/**
-     * A couple of higher level processing methods that handle common variants of keyword, author and corresponding authors
-	 */
-
-	/**
-	 * Keyword lists generally come as either keyword phrase, keyword phrase,... 
-	 * or as Major phrase, minor phrase; Major phrase, minor phrase
-	 * but occasionally keyword phrase; keyword phrase
-	 */
-	public static String[] processKeywordList(String keywords){
-            String unescapedKeywords = StringEscapeUtils.unescapeXml(keywords);
-	    final boolean hasSemicolons = unescapedKeywords.contains(";");
-	    String[] keywordArray = null;
-	    if (hasSemicolons){
-                keywordArray = unescapedKeywords.split(";");
+            // check to see if the last element was actually two names separated by "and"
+            // or is actually the last name prefixed by "and" (because of an Oxford comma)
+            String lastElement = authorStrings.remove(authorStrings.size()-1);
+            Matcher namepattern = Pattern.compile("^\\s*(.*?)\\s*and\\s+(.*)\\s*$").matcher(lastElement);
+            if (namepattern.find()) {
+                if (!StringUtils.stripToEmpty(namepattern.group(1)).isEmpty()) {
+                    authorStrings.add(namepattern.group(1));
+                }
+                if (!StringUtils.stripToEmpty(namepattern.group(2)).isEmpty()) {
+                    authorStrings.add(namepattern.group(2));
+                }
             } else {
-                //is this sufficient - will either split at commas or return singleton string
-                keywordArray = unescapedKeywords.split(",");
+                authorStrings.add(lastElement);
             }
-	    for (int i = 0; i< keywordArray.length; i++) {
-	        keywordArray[i] = getStrippedText(StringUtils.stripToEmpty(keywordArray[i]));
-            }
-	    return keywordArray;
-	}
-	
-	/**
-	 * Author lists general come as either last, first; last, first
-	 * or as first last, first last and first last (sometimes with the Oxford comma before the 'and' token)
-	 */
-	public static String[] processAuthorList(String authors){
-        // Unescape the authors list since it may contain escaped-xml characters
-        // these would include semicolons (e.g. &amp; ) which should not be treated
-        // as a delimiter
-        String unescapedAuthors = StringEscapeUtils.unescapeXml(authors);
-        final boolean hasSemicolons = unescapedAuthors.contains(";");
-	    final boolean hasCommas = unescapedAuthors.contains(",");
-	    final boolean hasLineBreaks = unescapedAuthors.contains("\n");
-        String[] authorArray = null;
-        if (hasSemicolons){
-            authorArray = unescapedAuthors.split(";");
-            if (hasCommas){
-                for (int i = 0; i< authorArray.length; i++){
-                    authorArray[i] = getStrippedText(StringUtils.stripToEmpty(authorArray[i]));
-                }
-            }
-            else{
-                for (int i = 0; i< authorArray.length; i++){
-                    authorArray[i] = StringUtils.stripToEmpty(flipName(getStrippedText(StringUtils.stripToEmpty(authorArray[i]))));
-                }
-            }
-        }
-        else if (hasCommas){
-            authorArray = unescapedAuthors.split(",");
-            // distinguish single author from author list
-            if (authorArray.length > 2 || StringUtils.stripToEmpty(authorArray[0]).contains(" ")){
-                for (int i = 0; i< authorArray.length-1; i++){
-                    authorArray[i] = StringUtils.stripToEmpty(flipName(getStrippedText(StringUtils.stripToEmpty(authorArray[i]))));
-                }
-                int lastAuthor = authorArray.length-1;
-                if (lastAuthor > 0 && StringUtils.stripToEmpty(authorArray[lastAuthor]).startsWith("and "))
-                    authorArray[lastAuthor] = StringUtils.stripToEmpty(flipName(getStrippedText(StringUtils.stripToEmpty(authorArray[lastAuthor]).substring(4))));
-                else
-                    authorArray[lastAuthor] = StringUtils.stripToEmpty(flipName(getStrippedText(authorArray[lastAuthor])));
-            }
-            else{
-                authorArray = new String[1];
-                authorArray[0] = authors;
-            }
-        }
-        else if (hasLineBreaks){
-            authorArray = unescapedAuthors.split("\n");
-            for (int i = 0; i< authorArray.length; i++){
-                authorArray[i] = StringUtils.stripToEmpty(flipName(getStrippedText(StringUtils.stripToEmpty(authorArray[i]))));
-            }
-            authorArray[0] = "found line breaks";
-        }
-        else {  //either a single author (first last) or two authors (first last and first last)
-            authorArray = unescapedAuthors.split(" and ");
-            for (int i = 0; i< authorArray.length; i++){
-                authorArray[i] = StringUtils.stripToEmpty(flipName(getStrippedText(StringUtils.stripToEmpty(authorArray[i]))));
-            }
-        }
-        return authorArray;
-	}
-	
-	/**
-	 * Corresponding author - the element is fairly involved, but perhaps keeping the name field unaltered will suffice?
-	 */
 
-	public static String processCorrespondingAuthorName(String authorName){
-	    return StringUtils.stripToEmpty(StringEscapeUtils.unescapeXml(authorName));
-	}
+            // process these authors
+            for (String s : authorStrings) {
+                authorList.add(parseAuthor(s));
+            }
+        }
 
+        return authorList;
+    }
+
+    public static List<String> parseClassificationList(String classification) {
+        ArrayList<String> classificationList = new ArrayList<String>();
+
+        if (classification != null) {
+            // first check to see if the keywords are semicolon-separated
+            String[] classifications = classification.split("\\s*;\\s*");
+
+            // if it didn't have semicolons, it must have commas
+            if (classifications.length == 1) {
+                classifications = classification.split("\\s*,\\s*");
+            }
+
+            for (int i = 0; i < classifications.length; i++) {
+                if (classifications[i] != null) {
+                    classificationList.add(classifications[i]);
+                }
+            }
+        }
+        return classificationList;
+    }
+
+    // given a line, checks to see if line starts with a defined field. If so, returns an XMLValue with a key and value
+    // if there are no regex matches, it must be a line that belongs to the previous key. Return an XMLValue with a null key.
+    private XMLValue parseLineToXMLValue (String line) {
+        XMLValue result = new XMLValue();
+        result.key = null;
+        result.value = StringUtils.stripToEmpty(line);
+
+        //first, clean up lines of characters that we don't deal with well, like '*' for formatting
+        result.value = result.value.replaceAll("\\*", "");
+
+        //if the line has a URL, replace the colon for now.
+        result.value = result.value.replaceAll("://","*");
+
+        Matcher fieldpattern = Pattern.compile("^\\s*(.*?):\\s*(.*)$").matcher(result.value);
+        if (fieldpattern.find()) {
+            // there is a colon in the line. Let's see if it matches any of our fields.
+            for (String field : fieldToXMLTagMap.keySet()) {
+                // try regex for each field
+                String XMLkey = fieldToXMLTagMap.get(field);
+
+                if (fieldpattern.group(1).toLowerCase().equalsIgnoreCase(field.toLowerCase())) {
+                    result.key = XMLkey;
+                    result.value = StringUtils.stripToEmpty(fieldpattern.group(2));
+                    break;
+                }
+            }
+            if (result.key == null) {
+                LOGGER.warn("Found unknown field: <<" + fieldpattern.group(1) + ">>");
+            }
+        }
+        result.value = result.value.replaceAll("\\*","://");
+        return result;
+    }
+
+    protected class XMLValue {
+        String key;
+        String value;
+    }
 }

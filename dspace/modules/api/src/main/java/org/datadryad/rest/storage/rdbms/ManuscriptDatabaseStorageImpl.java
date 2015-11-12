@@ -14,6 +14,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectReader;
 import org.codehaus.jackson.map.ObjectWriter;
 import org.datadryad.rest.models.Manuscript;
+import org.datadryad.rest.models.Organization;
 import org.datadryad.rest.storage.AbstractManuscriptStorage;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
@@ -138,6 +139,20 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         }
     }
 
+    private static Organization getOrganizationFromInternalId(Context context, Integer internalId) throws SQLException {
+        Organization organization = new Organization();
+        String table = "organization";
+        String query = "SELECT * FROM organization where organization_id = ?";
+        TableRow row = DatabaseManager.querySingleTable(context, table, query, internalId);
+        if(row != null) {
+            organization.organizationCode = row.getStringColumn("code");
+            organization.organizationName = row.getStringColumn("name");
+            return organization;
+        } else {
+            return null;
+        }
+    }
+
     private static Integer getManuscriptInternalId(Context context, String msid, Integer organizationId) throws SQLException {
         String query = "SELECT * FROM manuscript where msid like ? and organization_id = ? and active = ?";
         TableRow row = DatabaseManager.querySingleTable(context, MANUSCRIPT_TABLE, query, msid, organizationId, ACTIVE_TRUE);
@@ -178,6 +193,9 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and organization_id = ? and active = ?";
             TableRow row = DatabaseManager.querySingleTable(context, MANUSCRIPT_TABLE, query, msid, organizationId, ACTIVE_TRUE);
             Manuscript manuscript = manuscriptFromTableRow(row);
+            if (manuscript != null) {
+                manuscript.organization.organizationCode = organizationCode;
+            }
             return manuscript;
         }
     }
@@ -193,7 +211,9 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             TableRowIterator rows = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, organizationId, ACTIVE_TRUE, limit);
             while(rows.hasNext()) {
                 TableRow row = rows.next();
-                manuscripts.add(manuscriptFromTableRow(row));
+                Manuscript manuscript = manuscriptFromTableRow(row);
+                manuscript.organization = getOrganizationFromInternalId(context, organizationId);
+                manuscripts.add(manuscript);
             }
             return manuscripts;
         }
@@ -212,7 +232,9 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             TableRowIterator rows = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, organizationId, ACTIVE_TRUE, queryParam, limit);
             while(rows.hasNext()) {
                 TableRow row = rows.next();
-                manuscripts.add(manuscriptFromTableRow(row));
+                Manuscript manuscript = manuscriptFromTableRow(row);
+                manuscript.organization = getOrganizationFromInternalId(context, organizationId);
+                manuscripts.add(manuscript);
             }
             return manuscripts;
         }
@@ -235,14 +257,10 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         String query = "SELECT * FROM MANUSCRIPT WHERE msid = ? and organization_id = ? and active = ?";
         TableRow existingRow = DatabaseManager.querySingleTable(context, MANUSCRIPT_TABLE, query, msid, organizationId, ACTIVE_TRUE);
 
-        // deactivate the existing row
-        existingRow.setColumn(COLUMN_ACTIVE, ACTIVE_FALSE);
-
-        TableRow newRow = tableRowFromManuscript(manuscript, organizationId);
-        if(existingRow != null && newRow != null) {
-            updateTableRow(existingRow, newRow);
-            DatabaseManager.update(context, existingRow); // Deactivates old version
-            DatabaseManager.insert(context, newRow);
+        if(existingRow != null) {
+            String json_data = writer.writeValueAsString(manuscript);
+            existingRow.setColumn(COLUMN_JSON_DATA, json_data);
+            DatabaseManager.update(context, existingRow);
         }
     }
 
