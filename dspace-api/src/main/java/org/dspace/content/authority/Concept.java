@@ -268,7 +268,7 @@ public class Concept extends AuthorityObject
 
         // Remove any mappings
         DatabaseManager.updateQuery(myContext,
-                "DELETE FROM concept2term WHERE concept_id= ? "+
+                "DELETE FROM concept2term WHERE concept_id= ? " +
                         "AND term_id= ? AND role_id=1", getID(), t.getID());
 
         DatabaseManager.setConstraintImmediate(myContext, "concept2term_term_id_fkey");
@@ -418,7 +418,7 @@ public class Concept extends AuthorityObject
             throws SQLException
     {
         ArrayList<Concept> concepts = new ArrayList<Concept>();
-        TableRowIterator row = DatabaseManager.query(context,"select * from concept where LOWER(identifier) like ?", identifier);
+        TableRowIterator row = DatabaseManager.query(context, "select * from concept where LOWER(identifier) like ?", identifier);
 
         if (row == null)
         {
@@ -446,26 +446,38 @@ public class Concept extends AuthorityObject
             throws SQLException, AuthorizeException
     {
         ArrayList<Concept> concepts = new ArrayList<Concept>();
-	try {
-	    MetadataSchema mds = MetadataSchema.find(context, metadataSchema);
-	    MetadataField mdf = MetadataField.findByElement(context, mds.getSchemaID(), metadataElement, null);
-	    int target_field_id = mdf.getFieldID();
-	    log.info ("looking up concept metadata for " + searchString + " in field number " + target_field_id);
-	    TableRowIterator row = DatabaseManager.query(context, "select c.* from concept as c, conceptmetadatavalue as cmv where upper(cmv.text_value) = ? and cmv.parent_id = c.id and cmv.field_id = ?;", searchString, target_field_id);
+        try {
+            MetadataSchema mds = MetadataSchema.find(context, metadataSchema);
+            MetadataField mdf = MetadataField.findByElement(context, mds.getSchemaID(), metadataElement, null);
+            int target_field_id = mdf.getFieldID();
+            log.info ("looking up concept metadata for " + searchString + " in field number " + target_field_id);
+            TableRowIterator row = DatabaseManager.query(context, "select c.* from concept as c, conceptmetadatavalue as cmv where upper(cmv.text_value) = ? and cmv.parent_id = c.id and cmv.field_id = ?;", searchString, target_field_id);
 
 
-	    if (row == null) {
-		    return null;
-	    } else {
-		while(row.hasNext()) {
-		    concepts.add(new Concept(context,row.next()));
-		}
-	    }
-	} catch (NullPointerException e) {
-	    log.error("Unable to find concept by metadata: search=" + searchString + ", schema=" + metadataSchema + ", element=" + metadataElement, e);
-	}
+            if (row == null) {
+                return null;
+            } else {
+            while(row.hasNext()) {
+                concepts.add(new Concept(context,row.next()));
+            }
+            }
+        } catch (NullPointerException e) {
+            log.error("Unable to find concept by metadata: search=" + searchString + ", schema=" + metadataSchema + ", element=" + metadataElement, e);
+        }
 
-	return concepts;
+        return concepts;
+    }
+
+    public String getFullName(Context context) throws SQLException, AuthorizeException {
+        MetadataSchema mds = MetadataSchema.find(context, "journal");
+        MetadataField mdf = MetadataField.findByElement(context, mds.getSchemaID(), "fullname", null);
+        log.debug("journal fullname field ID is " + mdf.getFieldID());
+        TableRowIterator row = DatabaseManager.query(context, "select cmv.text_value from concept as c, conceptmetadatavalue as cmv where cmv.parent_id = c.id and c.id=? and cmv.field_id=?", this.getID(), mdf.getFieldID());
+        String result = null;
+        if (row.hasNext()) {
+            result = row.next().getStringColumn("text_value");
+        }
+        return result;
     }
 
     /**

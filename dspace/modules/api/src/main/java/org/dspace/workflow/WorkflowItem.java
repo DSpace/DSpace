@@ -174,6 +174,28 @@ public class WorkflowItem implements InProgressSubmission {
         return wfArray;
     }
 
+    public static WorkflowItem[] findAllByJournalName(Context c, String journalName) throws SQLException, AuthorizeException, IOException {
+        List<WorkflowItem> wfItems = new ArrayList<WorkflowItem>();
+
+        TableRowIterator tri = DatabaseManager.queryTable(c, "workflowitem",
+                "SELECT workflowitem.* FROM workflowitem, metadatavalue, metadatafieldregistry WHERE workflowitem.item_id=metadatavalue.item_id" +
+                        " AND metadatafieldregistry.element='publicationName' AND metadatafieldregistry.metadata_field_id=metadatavalue.metadata_field_id AND metadatavalue.text_value = ?", journalName);
+
+        // make a list of workflow items
+        while (tri.hasNext())
+        {
+            TableRow row = tri.next();
+            WorkflowItem wi = new WorkflowItem(c, row);
+            wfItems.add(wi);
+        }
+
+        tri.close();
+
+        WorkflowItem[] wfArray = new WorkflowItem[wfItems.size()];
+        wfArray = (WorkflowItem[]) wfItems.toArray(wfArray);
+
+        return wfArray;
+    }
 
     public static WorkflowItem findByItemId(Context context, int itemId) throws SQLException, AuthorizeException, IOException {
         TableRow row = DatabaseManager.querySingleTable(context, "workflowitem", "SELECT * FROM workflowitem WHERE item_id= ?", itemId);

@@ -4,6 +4,8 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.datadryad.rest.models.Manuscript;
+import org.datadryad.rest.models.Author;
+import org.datadryad.rest.models.AuthorsList;
 import org.dspace.JournalUtils;
 import org.dspace.content.authority.Concept;
 import org.dspace.core.ConfigurationManager;
@@ -12,6 +14,11 @@ import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.workflow.ApproveRejectReviewItem;
 import org.dspace.workflow.ApproveRejectReviewItemException;
+import org.dspace.servicemanager.DSpaceKernelImpl;
+import org.dspace.servicemanager.DSpaceKernelInit;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.content.Item;
+import org.dspace.content.DCValue;
 
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
@@ -25,8 +32,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.lang.Runtime;
+import java.lang.RuntimeException;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -142,7 +151,6 @@ public class DryadEmailSubmission extends HttpServlet {
                     } catch (Exception details) {
                         DryadGmailService.addErrorLabelForMessageWithId(mID);
                         LOGGER.info("Exception thrown while processing message " + mID + ": " + details.getMessage() + ", " + details.getClass().getName() + details.getStackTrace().toString());
-//                        throw new RuntimeException(details);
                     }
                     DryadGmailService.removeJournalLabelForMessageWithId(mID);
                 }
@@ -376,6 +384,7 @@ public class DryadEmailSubmission extends HttpServlet {
             }
 
             // at this point, concept is not null.
+            journalName = concept.getFullName(context);
             try {
                 parser = getEmailParser(JournalUtils.getParsingScheme(concept));
                 parser.parseMessage(dryadContent);
@@ -388,10 +397,57 @@ public class DryadEmailSubmission extends HttpServlet {
             if ((manuscript != null) && (JournalUtils.manuscriptIsValid(context, manuscript))) {
                 // edit the manuscript ID to the canonical one:
                 manuscript.manuscriptId = JournalUtils.getCanonicalManuscriptID(context, manuscript);
-
                 JournalUtils.writeManuscriptToDB(context, manuscript);
+                LOGGER.debug ("this ms has status " + manuscript.status);
+                Boolean approved = null;
 
-                JournalUtils.writeManuscriptToXMLFile(context, manuscript);
+                if (manuscript.status.equals(Manuscript.STATUS_ACCEPTED)) {
+                    approved = true;
+                } else if (manuscript.status.equals(Manuscript.STATUS_REJECTED)) {
+                    approved = false;
+                } else if (manuscript.status.equals(Manuscript.STATUS_NEEDS_REVISION)) {
+                    approved = false;
+                } else if (manuscript.status.equals(Manuscript.STATUS_PUBLISHED)) {
+                    approved = true;
+                }
+
+                if (approved != null) {
+                    try {
+                        DSpaceKernelImpl kernelImpl = null;
+                        try {
+                            kernelImpl = DSpaceKernelInit.getKernel(null);
+                            if (!kernelImpl.isRunning())
+                            {
+                                kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
+                            }
+                        } catch (Exception ex) {
+                            // Failed to start so destroy it and log and throw an exception
+                            try {
+                                if(kernelImpl != null) {
+                                    kernelImpl.destroy();
+                                }
+                            } catch (Exception e1) {
+                                // Nothing to do
+                            }
+                            LOGGER.error("Error Initializing DSpace kernel in ManuscriptReviewStatusChangeHandler", ex);
+                        }
+
+                        if (manuscript.dryadDataDOI != null) {
+                            LOGGER.debug("running ApproveRejectReview ("+approved + ", " + manuscript.dryadDataDOI + ")");
+                            ApproveRejectReviewItem.reviewItemDOI(approved, manuscript.dryadDataDOI);
+                        } else if (manuscript.manuscriptId != null) {
+                            LOGGER.debug("running ApproveRejectReview Item (" + approved + ", " + manuscript.manuscriptId + ")");
+                            ApproveRejectReviewItem.reviewItem(approved, manuscript.manuscriptId);
+                        }
+                    } catch (ApproveRejectReviewItemException e) {
+                        // we need to compare manuscript's authors with workflow items from the same journal.
+                        WorkflowItem[] workflowItems = findMatchingWorkflowItems(context, manuscript);
+                        for (int i=0; i<workflowItems.length; i++) {
+                            ApproveRejectReviewItem.reviewItem(approved, workflowItems[i].getID());
+                        }
+                        // somehow we need to note that this item did not find a match
+                    }
+                }
             } else {
                 throw new SubmissionException("Parser could not validly parse the message");
             }
@@ -408,6 +464,40 @@ public class DryadEmailSubmission extends HttpServlet {
                 throw new RuntimeException("Context.complete threw an exception, aborting instead");
             }
         }
+    }
+
+    private WorkflowItem[] findMatchingWorkflowItems(Context context, Manuscript manuscript) {
+        String journalName = manuscript.organization.organizationName;
+        WorkflowItem[] workflowItems = null;
+        try {
+            workflowItems = WorkflowItem.findAllByJournalName(context, journalName);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        ArrayList<WorkflowItem> matchingItems = new ArrayList<WorkflowItem>();
+        for (int i=0;i<workflowItems.length;i++) {
+            // count number of authors and number of matched authors: if equal, this is a match.
+            int numMatched = 0;
+            Item item = workflowItems[i].getItem();
+            DCValue[] itemAuthors = item.getMetadata("dc", "contributor", "author", Item.ANY);
+            for (int j=0;j<itemAuthors.length;j++) {
+                for (Author a : manuscript.authors.author) {
+                    int score = JournalUtils.computeLevenshteinDistance(itemAuthors[j].value, a.fullName());
+                    if (score > 0.7) {
+                        numMatched++;
+                        break;
+                    }
+                }
+            }
+            if (numMatched == itemAuthors.length) {
+                matchingItems.add(workflowItems[i]);
+                LOGGER.debug ("ms " + manuscript.title + " matches");
+            } else {
+                LOGGER.debug ("ms " + manuscript.title + " does not match: " + numMatched + "/" + itemAuthors.length);
+            }
+        }
+        return matchingItems.toArray(new WorkflowItem[matchingItems.size()]);
     }
 
     private EmailParser getEmailParser(String myParsingScheme) throws SubmissionException {
