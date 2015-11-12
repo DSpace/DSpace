@@ -16,6 +16,10 @@ public class Author {
     public String identifierType;
     public Author() {}
     public final String fullName() {
-        return familyName + ", " + givenNames;
+        String name = familyName;
+        if (givenNames != null) {
+            name = familyName + ", " + givenNames;
+        }
+        return name;
     }
 }

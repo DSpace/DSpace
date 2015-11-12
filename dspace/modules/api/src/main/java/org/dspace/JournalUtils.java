@@ -1,21 +1,37 @@
 package org.dspace;
 
 import org.apache.log4j.Logger;
-import org.dspace.content.Item;
+import org.datadryad.rest.converters.ManuscriptToLegacyXMLConverter;
+import org.datadryad.rest.models.Manuscript;
+import org.datadryad.rest.models.Author;
+import org.datadryad.rest.models.Organization;
+import org.datadryad.rest.storage.StorageException;
+import org.datadryad.rest.storage.StoragePath;
+import org.datadryad.rest.storage.rdbms.ManuscriptDatabaseStorageImpl;
+import org.datadryad.rest.storage.rdbms.OrganizationDatabaseStorageImpl;
 import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
+import org.dspace.content.Item;
 import org.dspace.content.authority.AuthorityMetadataValue;
 import org.dspace.content.authority.Concept;
 import org.dspace.content.authority.Scheme;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.workflow.DryadWorkflowUtils;
+import org.dspace.submit.bean.PublicationBean;
+import org.dspace.submit.model.ModelPublication;
 
+import javax.xml.bind.JAXBException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * User: lantian @ atmire . com
@@ -198,6 +214,38 @@ public class JournalUtils {
         return null;
     }
 
+    public static String getCanonicalManuscriptID(Context context, Manuscript manuscript) {
+        return getCanonicalManuscriptID(context, manuscript.manuscriptId, manuscript.organization.organizationCode);
+    }
+
+    public static String getCanonicalManuscriptID(Context context, String manuscriptId, String journalCode) {
+        String canonicalID = manuscriptId;
+        String regex = null;
+        try {
+            Concept concept = getJournalConceptByShortID(context, journalCode);
+            AuthorityMetadataValue[] vals = concept.getMetadata("journal","manuscriptNumberIgnorePattern",null, Item.ANY);
+            if(vals != null && vals.length > 0) {
+                regex = vals[0].getValue();
+                Matcher manuscriptMatcher = Pattern.compile(regex).matcher(canonicalID);
+                if (manuscriptMatcher.find()) {
+                    canonicalID = manuscriptMatcher.group(1);
+                } else {
+                    canonicalID = null;
+                }
+            } else {
+                // there is no regex specified, just use the manuscript.
+                canonicalID = manuscriptId;
+            }
+        } catch(Exception e) {
+            log.error(e.getMessage(),e);
+        }
+        return canonicalID;
+    }
+
+    public static Boolean manuscriptIsValid(Context context, Manuscript manuscript) {
+        Boolean result = manuscript.isValid() && (getCanonicalManuscriptID(context, manuscript) != null);
+        return result;
+    }
 
     public static String getFullName(Concept concept) {
         AuthorityMetadataValue[] vals = concept.getMetadata("journal","fullname",null, Item.ANY);
@@ -443,7 +491,6 @@ public class JournalUtils {
     public static Map<String, String> findJournalProperties(Context c, String journal){
         Map<String, String> myJournalProperties = new HashMap<String, String>();
 
-
         try {
             String publicationNameProp = ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName");
             Scheme scheme = Scheme.findByIdentifier(c, publicationNameProp);
@@ -481,8 +528,176 @@ public class JournalUtils {
                 action == JournalUtils.RecommendedBlackoutAction.JOURNAL_NOT_INTEGRATED);
     }
 
+    public static void writeManuscriptToXMLFile(Context context, Manuscript manuscript) throws StorageException {
+        try {
+            log.debug ("looking for metadatadir for " + manuscript.organization.organizationCode);
+            Concept concept = JournalUtils.getJournalConceptByShortID(context, manuscript.organization.organizationCode);
+            if (concept != null) {
+                String filename = JournalUtils.escapeFilename(manuscript.manuscriptId + ".xml");
+                File file = new File(JournalUtils.getMetadataDir(concept), filename);
+                FileOutputStream outputStream = null;
+
+                try {
+                    outputStream = new FileOutputStream(file);
+                } catch (FileNotFoundException e) {
+                    log.warn("couldn't open a file to write", e);
+                }
+
+                if (outputStream != null) {
+                    try {
+                        ManuscriptToLegacyXMLConverter.convertToInternalXML(manuscript, outputStream);
+                        log.info("wrote xml to file " + file.getAbsolutePath());
+                    } catch (JAXBException e) {
+                        log.warn("couldn't convert to XML");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new StorageException(e);
+        }
+    }
+
+    public static void writeManuscriptToDB(Context context, Manuscript manuscript) throws StorageException {
+        String journalCode = cleanJournalCode(manuscript.organization.organizationCode);
+        StoragePath storagePath = new StoragePath();
+        storagePath.addPathElement(Organization.ORGANIZATION_CODE, journalCode);
+        storagePath.addPathElement(Manuscript.MANUSCRIPT_ID, manuscript.manuscriptId);
+
+        ManuscriptDatabaseStorageImpl manuscriptStorage = new ManuscriptDatabaseStorageImpl();
+        List<Manuscript> manuscripts = getManuscriptsMatchingID(journalCode, manuscript.manuscriptId);
+        // if there isn't a manuscript already in the db, create it. Otherwise, update.
+        if (manuscripts.size() == 0) {
+            try {
+                manuscriptStorage.create(storagePath, manuscript);
+            } catch (StorageException ex) {
+                log.error("Exception creating manuscript", ex);
+            }
+        } else {
+            try {
+                manuscriptStorage.update(storagePath, manuscript);
+            } catch (StorageException ex) {
+                log.error("Exception updating manuscript", ex);
+            }
+        }
+    }
+
+    public static void createOrganizationinDB(Context context, Organization organization) throws StorageException {
+        // normalize with all caps for the code:
+        organization.organizationCode = cleanJournalCode(organization.organizationCode);
+
+        StoragePath storagePath = new StoragePath();
+        storagePath.addPathElement(Organization.ORGANIZATION_CODE, organization.organizationCode);
+
+        // check to see if this organization exists in the database: if not, add it.
+        OrganizationDatabaseStorageImpl organizationStorage = new OrganizationDatabaseStorageImpl();
+        List<Organization> orgs = organizationStorage.getResults(storagePath, organization.organizationCode, 0);
+        if (orgs.size() == 0) {
+            try {
+                log.info("creating an organization " + organization.organizationCode);
+                organizationStorage.create(storagePath, organization);
+            } catch (StorageException ex) {
+                log.error("Exception creating organizations", ex);
+            }
+        }
+    }
+
+    public static List<Manuscript> getManuscriptsMatchingID(String journalCode, String manuscriptId) {
+        journalCode = cleanJournalCode(journalCode);
+        ArrayList<Manuscript> manuscripts = new ArrayList<Manuscript>();
+        StoragePath storagePath = new StoragePath();
+        storagePath.addPathElement(Organization.ORGANIZATION_CODE, journalCode);
+
+        try {
+            OrganizationDatabaseStorageImpl organizationStorage = new OrganizationDatabaseStorageImpl();
+            List<Organization> orgs = organizationStorage.getResults(storagePath, journalCode, 0);
+            if (orgs.size() > 0) {
+                ManuscriptDatabaseStorageImpl manuscriptStorage = new ManuscriptDatabaseStorageImpl();
+                storagePath.addPathElement(Manuscript.MANUSCRIPT_ID, manuscriptId);
+                manuscripts.addAll(manuscriptStorage.getResults(storagePath, manuscriptId, 10));
+            }
+        } catch (StorageException e) {
+            log.error("Exception getting manuscripts", e);
+        }
+        return manuscripts;
+    }
+
+    public static PublicationBean getPublicationBeanFromManuscript(Manuscript manuscript) {
+        PublicationBean pBean = new PublicationBean();
+        pBean.setManuscriptNumber(manuscript.manuscriptId);
+        pBean.setJournalID(cleanJournalCode(manuscript.organization.organizationCode));
+        pBean.setJournalName(manuscript.organization.organizationName);
+        pBean.setTitle(manuscript.title);
+        pBean.setAbstract(manuscript.manuscript_abstract);
+        pBean.setCorrespondingAuthor(manuscript.correspondingAuthor.author.givenNames + " " + manuscript.correspondingAuthor.author.familyName);
+        pBean.setEmail(manuscript.correspondingAuthor.email);
+        String issn = manuscript.optionalProperties.get("ISSN");
+        if (issn != null) {
+            pBean.setJournalISSN(issn);
+        }
+        ArrayList<String> authorstrings = new ArrayList<String>();
+        for (Author a : manuscript.authors.author) {
+
+            authorstrings.add(a.givenNames + " " + a.familyName);
+        }
+        pBean.setAuthors(authorstrings);
+        ArrayList<String> subjectKeywords = new ArrayList<String>();
+        for (String keyword : manuscript.keywords) {
+            subjectKeywords.add(keyword);
+        }
+        pBean.setSubjectKeywords(subjectKeywords);
+        String ttext = manuscript.status;
+
+        pBean.setStatus(ttext);
+        if(ttext.equals("submitted") ||
+                ttext.equals("in review")   ||
+                ttext.equals("under review")  ||
+                ttext.equals("revision in review") ||
+                ttext.equals("revision under review")
+                ) {
+            pBean.setSkipReviewStep(false);
+        } else if(ttext.equals("accepted") ||
+                ttext.startsWith("reject") ||
+                ttext.equals("open reject") ||
+                ttext.equals("transferred") ||
+                ttext.equals("needs revision")) {
+            pBean.setSkipReviewStep(true);
+        }
+        return pBean;
+    }
+
+    public static PublicationBean getPublicationBeanFromManuscriptStorage (String manuscriptNumber, String selectedJournalId) {
+        PublicationBean pBean = null;
+        Context context = null;
+        try {
+            context = new Context();
+            Concept journalConcept = JournalUtils.getJournalConceptByShortID(context, selectedJournalId);
+            // canonicalize the manuscriptNumber:
+            manuscriptNumber = JournalUtils.getCanonicalManuscriptID(context, manuscriptNumber, selectedJournalId);
+            // first, look for a matching manuscript in the database:
+            List<Manuscript> manuscripts = JournalUtils.getManuscriptsMatchingID(selectedJournalId,manuscriptNumber);
+            if (manuscripts.size() > 0) {
+                log.info("found manuscript " + manuscriptNumber + " in database");
+                pBean = JournalUtils.getPublicationBeanFromManuscript(manuscripts.get(0));
+            } else {
+                // if nothing, look in the metadata directory:
+                String journalPath = "";
+                journalPath = JournalUtils.getMetadataDir(journalConcept);
+                pBean = ModelPublication.getDataFromPublisherFile(manuscriptNumber, selectedJournalId, journalPath);
+                log.info("found manuscript " + manuscriptNumber + " in file");
+            }
+            context.complete();
+        } catch (Exception e) {
+            if (context != null) {
+                context.abort();
+            }
+            //invalid journalID
+            log.error("Error getting parameters for invalid JournalID: " + selectedJournalId, e);
+        }
+        return pBean;
+    }
+
+
     public static String cleanJournalCode(String journalCode) {
         return journalCode.replaceAll("[^a-zA-Z0-9]", "").toUpperCase();
     }
-
 }

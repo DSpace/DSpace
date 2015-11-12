@@ -6,14 +6,18 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.datadryad.rest.models.Author;
 import org.datadryad.rest.models.Manuscript;
 
+import java.lang.String;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  *
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 @XmlRootElement(name="DryadEmailSubmission")
 public class LegacyManuscript {
-    public String Abstract;
     public String Journal;
+    public String Journal_Code;
     public String Article_Status;
     public LegacyAuthorsList Authors = new LegacyAuthorsList();
     public LegacySubmissionMetadata Submission_Metadata = new LegacySubmissionMetadata();
@@ -23,11 +27,14 @@ public class LegacyManuscript {
     public String Address_Line_2;
     public String Address_Line_3;
     public String City, State, Country, Zip;
+    public String Abstract;
     public LegacyClassifications Classification = new LegacyClassifications();
+    public Map<String,String> optionalProperties;
 
     public LegacyManuscript() {}
-    public LegacyManuscript(Manuscript manuscript, String journalName) {
-        this.Journal = journalName;
+    public LegacyManuscript(Manuscript manuscript) {
+        this.Journal = manuscript.organization.organizationName;
+        this.Journal_Code = manuscript.organization.organizationCode;
         this.Submission_Metadata.Manuscript = manuscript.manuscriptId;
         this.Submission_Metadata.Article_Title = manuscript.title;
         this.Article_Status = manuscript.status;
@@ -50,9 +57,9 @@ public class LegacyManuscript {
             }
         }
         this.Abstract = manuscript.manuscript_abstract;
-        for(String keyword : manuscript.getKeywords()) {
+        this.optionalProperties = manuscript.optionalProperties;
+        for(String keyword : manuscript.keywords) {
             this.Classification.keyword.add(keyword);
         }
     }
-
 }

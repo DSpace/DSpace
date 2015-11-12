@@ -28,11 +28,7 @@ public class ManuscriptToLegacyXMLConverter {
     }
 
     public static void convertToInternalXML(Manuscript manuscript, OutputStream outputStream) throws JAXBException {
-        String journalName = null;
-        if(manuscript.organization != null) {
-            journalName = manuscript.organization.organizationName;
-        }
-        LegacyManuscript legacyManuscript = new LegacyManuscript(manuscript, journalName);
+        LegacyManuscript legacyManuscript = new LegacyManuscript(manuscript);
         JAXBContext context = JAXBContext.newInstance(LegacyManuscript.class);
         Marshaller marshaller = context.createMarshaller();
         // Encoding is UTF-8 by default - http://docs.oracle.com/javaee/5/api/javax/xml/bind/Marshaller.html

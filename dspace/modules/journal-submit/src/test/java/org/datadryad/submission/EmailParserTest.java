@@ -2,12 +2,15 @@ package org.datadryad.submission;
 
 import static org.junit.Assert.*;
 import junit.framework.TestCase;
+import org.datadryad.rest.models.Author;
 
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.util.List;
 
 
 /**
@@ -36,143 +39,113 @@ public class EmailParserTest extends TestCase{
 
     @Test
     public void testProcessKeywordList(){
-        String[] test1 = EmailParser.processKeywordList("Ecology: evolutionary; Evolution: social; Foraging: social; Foraging: theory; Methods: computer simulations;");
+        List<String> test1 = EmailParser.parseClassificationList("Ecology: evolutionary; Evolution: social; Foraging: social; Foraging: theory; Methods: computer simulations;");
         assertNotNull(test1);
-        assertEquals(5,test1.length);
-        assertEquals("Ecology: evolutionary",test1[0]);
-        assertEquals("Evolution: social",test1[1]);
-        assertEquals("Foraging: social",test1[2]);
-        assertEquals("Foraging: theory",test1[3]);
-        assertEquals("Methods: computer simulations",test1[4]);
-        test1 = EmailParser.processKeywordList("Extinction, reproductive fitness, negative selection, devolution, genetic variation , heterosis, embryonic abortion, norm of reaction, habitat attenuation, habitat dissolution");
+        assertEquals(5,test1.size());
+        assertEquals("Ecology: evolutionary",test1.get(0));
+        assertEquals("Evolution: social",test1.get(1));
+        assertEquals("Foraging: social",test1.get(2));
+        assertEquals("Foraging: theory",test1.get(3));
+        assertEquals("Methods: computer simulations",test1.get(4));
+        test1 = EmailParser.parseClassificationList("Extinction, reproductive fitness, negative selection, devolution, genetic variation , heterosis, embryonic abortion, norm of reaction, habitat attenuation, habitat dissolution");
         assertNotNull(test1);
-        assertEquals(10,test1.length);
-        assertEquals("Extinction",test1[0]);
-        assertEquals("reproductive fitness",test1[1]);
-        assertEquals("negative selection",test1[2]);
-        assertEquals("devolution",test1[3]);
-        assertEquals("genetic variation",test1[4]);
-        assertEquals("heterosis",test1[5]);
-        assertEquals("embryonic abortion",test1[6]);
-        assertEquals("norm of reaction",test1[7]);
-        assertEquals("habitat attenuation",test1[8]);
-        assertEquals("habitat dissolution",test1[9]);
+        assertEquals(10,test1.size());
+        assertEquals("Extinction",test1.get(0));
+        assertEquals("reproductive fitness",test1.get(1));
+        assertEquals("negative selection",test1.get(2));
+        assertEquals("devolution",test1.get(3));
+        assertEquals("genetic variation",test1.get(4));
+        assertEquals("heterosis",test1.get(5));
+        assertEquals("embryonic abortion",test1.get(6));
+        assertEquals("norm of reaction",test1.get(7));
+        assertEquals("habitat attenuation",test1.get(8));
+        assertEquals("habitat dissolution",test1.get(9));
     }
     
     @Test
     public void testProcessAuthorList() {
-        String[] test1 = EmailParser.processAuthorList("Pawel Lichocki; Danesh Tarapore, Dr.; Laurent Keller, Prof.; Dario Floreano, Prof.");
+        List<Author> test1 = EmailParser.parseAuthorList("Pawel Lichocki; Dr. Danesh Tarapore; Laurent Keller, PhD; Dario Floreano, Ph.D.");
         assertNotNull(test1);
-        assertEquals(4,test1.length);
-        assertEquals("Pawel Lichocki",test1[0]);
-        assertEquals("Danesh Tarapore, Dr.",test1[1]);
-        assertEquals("Laurent Keller, Prof.",test1[2]);
-        assertEquals("Dario Floreano, Prof.",test1[3]);
-        test1 = EmailParser.processAuthorList("Wiens, Delbert; Slaton, Michele");
+        for(Author a : test1) {
+            System.out.println("test1 has " + a.fullName());
+        }
+        assertEquals(4,test1.size());
+        assertEquals("Lichocki, Pawel",test1.get(0).fullName());
+        assertEquals("Tarapore, Danesh", test1.get(1).fullName());
+        assertEquals("Keller, Laurent", test1.get(2).fullName());
+        assertEquals("Floreano, Dario", test1.get(3).fullName());
+        test1 = EmailParser.parseAuthorList("Wiens, Delbert; Slaton, Michele");
         assertNotNull(test1);
-        assertEquals(2,test1.length);
-        assertEquals("Wiens, Delbert",test1[0]);
-        assertEquals("Slaton, Michele",test1[1]);
-        test1 = EmailParser.processAuthorList("Awaya, Akira; MURAYAMA, Koji");
+        for(Author a : test1) {
+            System.out.println("test1 has " + a.fullName());
+        }
+        assertEquals(2,test1.size());
+        assertEquals("Wiens, Delbert", test1.get(0).fullName());
+        assertEquals("Slaton, Michele",test1.get(1).fullName());
+        test1 = EmailParser.parseAuthorList("Thierry Brevault");
         assertNotNull(test1);
-        assertEquals(2,test1.length);
-        assertEquals("Awaya, Akira",test1[0]);
-        assertEquals("MURAYAMA, Koji",test1[1]);
-        test1 = EmailParser.processAuthorList("Thierry Brevault");
+        for(Author a : test1) {
+            System.out.println("test1 has " + a.fullName());
+        }
+        assertEquals(1,test1.size());
+        assertEquals("Brevault, Thierry",test1.get(0).fullName());
+        test1 = EmailParser.parseAuthorList("Riou, Samuel; Combreau, Olivier; Judas, Jacky; Lawrence, Mark; Pitra, Christian");
         assertNotNull(test1);
-        assertEquals(1,test1.length);
-        assertEquals("Brevault, Thierry",test1[0]);
-        test1 = EmailParser.processAuthorList("Menzel, Florian; Schmitt, Thomas");
+        for(Author a : test1) {
+            System.out.println("test1 has " + a.fullName());
+        }
+        assertEquals(5, test1.size());
+        assertEquals("Riou, Samuel",test1.get(0).fullName());
+        assertEquals("Combreau, Olivier",test1.get(1).fullName());
+        assertEquals("Judas, Jacky", test1.get(2).fullName());
+        assertEquals("Lawrence, Mark",test1.get(3).fullName());
+        assertEquals("Pitra, Christian",test1.get(4).fullName());
+        test1 = EmailParser.parseAuthorList("Veselin Kostadinov");
         assertNotNull(test1);
-        assertEquals(2,test1.length);
-        assertEquals("Menzel, Florian",test1[0]);
-        assertEquals("Schmitt, Thomas",test1[1]);
-        //Line break separated author lists work, but don't seem to be testable
-//        test1 = EmailParser.processAuthorList("Wenhui Nie " +
-//        "Jinhuan Wang " +
-//        "Weiting Su " +
-//        "Ding Wang " +
-//        "Alongkoad Tanomtong " +
-//        "Polina Perelman " +
-//        "Alexander Graphodatsky" +
-//        "Fengtang Yang");
-//        assertNotNull(test1);
-//        //assertEquals(8,test1.length);
-//        for(String s : test1)
-//            System.out.print(s + "|");
-//        System.out.println();
-        test1 = EmailParser.processAuthorList("Hodgins, Kathryn; Rieseberg, Loren");
+        for(Author a : test1) {
+            System.out.println("test1 has " + a.fullName());
+        }
+        assertEquals(1,test1.size());
+        assertEquals("Kostadinov, Veselin",test1.get(0).fullName());
+        test1 = EmailParser.parseAuthorList("Elizabeth Garrett, Frances Parker, and Winslow Parker");
         assertNotNull(test1);
-        assertEquals(2,test1.length);
-        assertEquals("Hodgins, Kathryn",test1[0]);
-        assertEquals("Rieseberg, Loren",test1[1]);
-        test1 = EmailParser.processAuthorList("Riou, Samuel; Combreau, Olivier; Judas, Jacky; Lawrence, Mark; Pitra, Christian");
+        for(Author a : test1) {
+            System.out.println("test1 has " + a.fullName());
+        }
+        assertEquals(3,test1.size());
+        assertEquals("Garrett, Elizabeth",test1.get(0).fullName());
+        assertEquals("Parker, Frances",test1.get(1).fullName());
+        assertEquals("Parker, Winslow", test1.get(2).fullName());
+        test1 = EmailParser.parseAuthorList("J. David");
         assertNotNull(test1);
-        assertEquals(5,test1.length);
-        assertEquals("Riou, Samuel",test1[0]);
-        assertEquals("Combreau, Olivier",test1[1]);
-        assertEquals("Judas, Jacky",test1[2]);
-        assertEquals("Lawrence, Mark",test1[3]);
-        assertEquals("Pitra, Christian",test1[4]);
-        test1 = EmailParser.processAuthorList("Flight, Patrick; O'Brien, Megan; Schmidt, Paul; Rand, David");
+        for(Author a : test1) {
+            System.out.println("test1 has " + a.fullName());
+        }
+        assertEquals(1,test1.size());
+        assertEquals("David, J.",test1.get(0).fullName());
+        test1 = EmailParser.parseAuthorList("Lacy, Robert");
         assertNotNull(test1);
-        assertEquals(4,test1.length);
-        assertEquals("Flight, Patrick",test1[0]);
-        assertEquals("O&apos;Brien, Megan",test1[1]);
-        assertEquals("Schmidt, Paul",test1[2]);
-        assertEquals("Rand, David",test1[3]);
-        test1 = EmailParser.processAuthorList("Loiseau, Claire; Harrigan, Ryan; Robert, Alexandre; Bowie, Rauri; Thomassen, Henri; Smith, Thomas; Sehgal, Ravinder");
+        for(Author a : test1) {
+            System.out.println("test1 has " + a.fullName());
+        }
+        assertEquals(1,test1.size());
+        assertEquals("Lacy, Robert",test1.get(0).fullName());
+        test1 = EmailParser.parseAuthorList("Bono, Sonny; Cher");
         assertNotNull(test1);
-        assertEquals(7,test1.length);
-        assertEquals("Loiseau, Claire",test1[0]);
-        assertEquals("Harrigan, Ryan",test1[1]);
-        assertEquals("Robert, Alexandre",test1[2]);
-        assertEquals("Bowie, Rauri",test1[3]);
-        assertEquals("Thomassen, Henri",test1[4]);
-        assertEquals("Smith, Thomas",test1[5]);
-        assertEquals("Sehgal, Ravinder",test1[6]);
-        test1 = EmailParser.processAuthorList("Yan, Chi; Sun, Genlou");
+        for(Author a : test1) {
+            System.out.println("test1 has " + a.fullName());
+        }
+        assertEquals(2,test1.size());
+        assertEquals("Bono, Sonny",test1.get(0).fullName());
+        assertEquals("Cher",test1.get(1).fullName());
+        test1 = EmailParser.parseAuthorList("Sonny Bono and Cher");
         assertNotNull(test1);
-        assertEquals(2,test1.length);
-        assertEquals("Yan, Chi",test1[0]);
-        assertEquals("Sun, Genlou",test1[1]);
-        test1 = EmailParser.processAuthorList("Veselin Kostadinov");
-        assertNotNull(test1);
-        assertEquals(1,test1.length);
-        assertEquals("Kostadinov, Veselin",test1[0]);
-        test1 = EmailParser.processAuthorList("Elizabeth Garrett, Frances Parker, and Winslow Parker");
-        assertNotNull(test1);
-        assertEquals(3,test1.length);
-        assertEquals("Garrett, Elizabeth",test1[0]);
-        assertEquals("Parker, Frances",test1[1]);
-        assertEquals("Parker, Winslow",test1[2]);
-        test1 = EmailParser.processAuthorList("J. David");
-        assertNotNull(test1);
-        assertEquals(1,test1.length);
-        assertEquals("David, J.",test1[0]);
-        test1 = EmailParser.processAuthorList("Micheal Head");
-        assertNotNull(test1);
-        assertEquals(1,test1.length);
-        assertEquals("Head, Micheal",test1[0]);
-        test1 = EmailParser.processAuthorList("David Lindenmayer, Jeff Wood, Lachlan McBurney, Damian Michael," + "\n" +
-                                              "Mason Crane, Christopher MacGregor, Rebecca Montague-Drake, Philip Gibbons," + "\n" +
-                                              "and Sam Banks");
-        assertNotNull(test1);
-        assertEquals(9,test1.length);
-        assertEquals("Lindenmayer, David",test1[0]);
-        assertEquals("Wood, Jeff",test1[1]);
-        assertEquals("McBurney, Lachlan",test1[2]);
-        assertEquals("Michael, Damian",test1[3]);
-        assertEquals("Crane, Mason",test1[4]);
-        assertEquals("MacGregor, Christopher",test1[5]);
-        assertEquals("Montague-Drake, Rebecca",test1[6]);
-        assertEquals("Gibbons, Philip",test1[7]);
-        assertEquals("Banks, Sam",test1[8]);
-        test1 = EmailParser.processAuthorList("Lacy, Robert");
-        assertNotNull(test1);
-        assertEquals(1,test1.length);
-        assertEquals("Lacy, Robert",test1[0]);
-
+        for(Author a : test1) {
+            System.out.println("test1 has " + a.fullName());
+        }
+        assertEquals(2,test1.size());
+        assertEquals("Bono, Sonny",test1.get(0).fullName());
+        assertEquals("Cher",test1.get(1).fullName());
     }
 
 
