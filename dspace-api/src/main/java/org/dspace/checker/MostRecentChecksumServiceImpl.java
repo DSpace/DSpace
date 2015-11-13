@@ -43,7 +43,7 @@ public class MostRecentChecksumServiceImpl implements MostRecentChecksumService
     @Override
     public MostRecentChecksum getNonPersistedObject()
     {
-        return new MostRecentChecksum(new Bitstream());
+        return new MostRecentChecksum();
     }
 
     @Override

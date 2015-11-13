@@ -15,7 +15,6 @@ import java.io.*;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -91,7 +90,7 @@ public class DSBitStore implements BitStore
      */
 	public InputStream get(Bitstream bitstream) throws IOException
 	{
-		return new FileInputStream(getFile(bitstream.getInternalId()));
+		return new FileInputStream(getFile(bitstream));
 	}
 
     /**
@@ -111,7 +110,7 @@ public class DSBitStore implements BitStore
      */
 	public void put(Bitstream bitstream, InputStream in) throws IOException
 	{
-		File file = getFile(bitstream.getInternalId());
+		File file = getFile(bitstream);
 
 		// Make the parent dirs if necessary
 		File parent = file.getParentFile();
@@ -162,7 +161,7 @@ public class DSBitStore implements BitStore
 	public Map about(Bitstream bitstream, Map attrs) throws IOException
 	{
 		// potentially expensive, since it may calculate the checksum
-		File file = getFile(bitstream.getInternalId());
+		File file = getFile(bitstream);
 		if (file != null && file.exists())
 		{
 		    if (attrs.containsKey("size_bytes"))
@@ -216,7 +215,7 @@ public class DSBitStore implements BitStore
      */
 	public void remove(Bitstream bitstream) throws IOException
 	{
-		File file = getFile(bitstream.getInternalId());
+		File file = getFile(bitstream);
 		if (file != null)
 		{
 		    if (file.delete())
@@ -264,48 +263,94 @@ public class DSBitStore implements BitStore
             tmp = directory;
         }
     }
-	
-	/**
-	 * Return the File for the passed internal_id.
-	 *
-	 * @param id
-	 *            The internal_id
-	 * @return The file resolved from the id
-	 */
-	private File getFile(String id) throws IOException
-	{
-		StringBuffer sb = new StringBuffer();
-		sb.append(baseDir.getCanonicalPath());
-		sb.append(File.separator);
-		sb.append(getIntermediatePath(id));
-		sb.append(id);
-		if (log.isDebugEnabled())
-		{
-			log.debug("Local filename for " + id + " is " + sb.toString());
-		}
-		return new File(sb.toString());
-	}
-	
-	/**
-	 * Return the path derived from the internal_id. This method
-	 * splits the id into groups which become subdirectories.
-	 *
-	 * @param id
-	 *            The internal_id
-	 * @return The path based on the id without leading or trailing separators
-	 */
-	private static String getIntermediatePath(String id)
-	{
-		StringBuffer buf = new StringBuffer();
-		for (int i = 0; i < directoryLevels; i++) {
-			int digits = i * digitsPerLevel;
-			if (i > 0)
-			{
-				buf.append(File.separator);
-			}
-			buf.append(id.substring(digits, digits	+ digitsPerLevel));
-		}
-		buf.append(File.separator);
-		return buf.toString();
-	}
+
+    /**
+     * Return the file corresponding to a bitstream. It's safe to pass in
+     * <code>null</code>.
+     *
+     * @param bitstream
+     *            the database table row for the bitstream. Can be
+     *            <code>null</code>
+     *
+     * @return The corresponding file in the file system, or <code>null</code>
+     *
+     * @exception IOException
+     *                If a problem occurs while determining the file
+     */
+    protected File getFile(Bitstream bitstream) throws IOException
+    {
+        // Check that bitstream is not null
+        if (bitstream == null)
+        {
+            return null;
+        }
+
+        // turn the internal_id into a file path relative to the assetstore
+        // directory
+        String sInternalId = bitstream.getInternalId();
+
+        // there are 4 cases:
+        // -conventional bitstream, conventional storage
+        // -conventional bitstream, srb storage
+        // -registered bitstream, conventional storage
+        // -registered bitstream, srb storage
+        // conventional bitstream - dspace ingested, dspace random name/path
+        // registered bitstream - registered to dspace, any name/path
+        String sIntermediatePath = null;
+        if (isRegisteredBitstream(sInternalId)) {
+            sInternalId = sInternalId.substring(REGISTERED_FLAG.length());
+            sIntermediatePath = "";
+        } else {
+
+            // Sanity Check: If the internal ID contains a
+            // pathname separator, it's probably an attempt to
+            // make a path traversal attack, so ignore the path
+            // prefix.  The internal-ID is supposed to be just a
+            // filename, so this will not affect normal operation.
+            if (sInternalId.contains(File.separator))
+            {
+                sInternalId = sInternalId.substring(sInternalId.lastIndexOf(File.separator) + 1);
+            }
+
+            sIntermediatePath = getIntermediatePath(sInternalId);
+        }
+
+        StringBuilder bufFilename = new StringBuilder();
+        bufFilename.append(baseDir.getCanonicalFile());
+        bufFilename.append(File.separator);
+        bufFilename.append(sIntermediatePath);
+        bufFilename.append(sInternalId);
+        if (log.isDebugEnabled()) {
+            log.debug("Local filename for " + sInternalId + " is "
+                    + bufFilename.toString());
+        }
+        return new File(bufFilename.toString());
+    }
+
+    /**
+     * Return the intermediate path derived from the internal_id. This method
+     * splits the id into groups which become subdirectories.
+     *
+     * @param iInternalId
+     *            The internal_id
+     * @return The path based on the id without leading or trailing separators
+     */
+    protected String getIntermediatePath(String iInternalId) {
+        StringBuilder buf = new StringBuilder();
+        for (int i = 0; i < directoryLevels; i++) {
+            int digits = i * digitsPerLevel;
+            if (i > 0) {
+                buf.append(File.separator);
+            }
+            buf.append(iInternalId.substring(digits, digits
+                    + digitsPerLevel));
+        }
+        buf.append(File.separator);
+        return buf.toString();
+    }
+
+    protected final String REGISTERED_FLAG = "-R";
+    public boolean isRegisteredBitstream(String internalId) {
+        return internalId.startsWith(REGISTERED_FLAG);
+    }
 }

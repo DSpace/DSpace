@@ -302,12 +302,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
 
 	@Override
     public boolean isRegisteredBitstream(String internalId) {
-	    if (internalId.substring(0, REGISTERED_FLAG.length())
-	            .equals(REGISTERED_FLAG)) 
-	    {
-	        return true;
-	    }
-	    return false;
+        return internalId.startsWith(REGISTERED_FLAG);
 	}
 
     @Override

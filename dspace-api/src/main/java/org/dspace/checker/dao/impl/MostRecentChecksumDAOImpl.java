@@ -107,7 +107,7 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
         criteria.add(Restrictions.eq("toBeProcessed", true));
         criteria.addOrder(Order.asc("processEndDate")).addOrder(Order.asc("bitstream.id"));
         criteria.setMaxResults(1);
-        return uniqueResult(criteria);
+        return singleResult(criteria);
     }
 
     @Override
@@ -126,7 +126,7 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
                 ));
         criteria.addOrder(Order.asc("processEndDate")).addOrder(Order.asc("bitstream.id"));
         criteria.setMaxResults(1);
-        return uniqueResult(criteria);
+        return singleResult(criteria);
     }
 
     @Override
