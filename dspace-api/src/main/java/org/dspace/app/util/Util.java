@@ -20,6 +20,7 @@ import java.util.Properties;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang.StringUtils;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
@@ -249,6 +250,10 @@ public class Util {
     public static UUID getUUIDParameter(HttpServletRequest request, String param)
     {
         String val = request.getParameter(param);
+        if (StringUtils.isEmpty(val))
+        {
+            return null;
+        }
 
         try
         {
