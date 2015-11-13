@@ -1410,15 +1410,21 @@ public class DescribeStep extends AbstractSubmissionStep
             //fill the form
             int i = 0;
             for (Field field : fields.values()) {
-                String value = values.get(i);
-                Instance instance = field.addInstance();
-                //XXX: Branching on type
-                if(field instanceof Select){
-                    instance.setOptionSelected(value);
-                } else{
-                    instance.setValue(value);
+                try {
+                    String value = values.get(i);
+                    Instance instance = field.addInstance();
+                    //XXX: Branching on type
+                    if (field instanceof Select) {
+                        instance.setOptionSelected(value);
+                    } else {
+                        instance.setValue(value);
+                    }
+                    ++i;
+                } catch (IndexOutOfBoundsException e){
+                    //someone possibly added a new field to this complex input
+                    //we might be starting a new version
+                    break;
                 }
-                ++i;
             }
         }
 
