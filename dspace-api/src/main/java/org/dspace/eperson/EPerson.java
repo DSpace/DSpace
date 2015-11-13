@@ -64,7 +64,7 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport
     private String digestAlgorithm;
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "epeople")
-    private List<Group> groups = new ArrayList<>();
+    private final List<Group> groups = new ArrayList<>();
 
     /** The e-mail field (for sorting) */
     public static final int EMAIL = 1;
@@ -82,7 +82,7 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport
     public static final int LANGUAGE = 5;
 
     @Transient
-    protected EPersonService ePersonService;
+    protected transient EPersonService ePersonService;
 
     protected EPerson() {
     }

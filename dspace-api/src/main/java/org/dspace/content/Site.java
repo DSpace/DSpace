@@ -26,7 +26,7 @@ public class Site extends DSpaceObject
 {
 
     @Transient
-    private SiteService siteService;
+    private transient SiteService siteService;
 
     /**
      * Get the type of this object, found in Constants

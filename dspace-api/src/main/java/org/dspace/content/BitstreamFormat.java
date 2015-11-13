@@ -7,6 +7,7 @@
  */
 package org.dspace.content;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -31,7 +32,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="bitstreamformatregistry")
-public class BitstreamFormat
+public class BitstreamFormat implements Serializable
 {
 
     @Id
@@ -71,7 +72,7 @@ public class BitstreamFormat
     private List<String> fileExtensions;
 
     @Transient
-    private BitstreamFormatService bitstreamFormatService;
+    private transient BitstreamFormatService bitstreamFormatService;
 
     /**
      * The "unknown" support level - for bitstream formats that are unknown to
@@ -109,7 +110,7 @@ public class BitstreamFormat
      * 
      * @return the short description
      */
-    public final String getShortDescription()
+    public String getShortDescription()
     {
         return shortDescription;
     }
@@ -127,7 +128,7 @@ public class BitstreamFormat
      * 
      * @return the description
      */
-    public final String getDescription()
+    public String getDescription()
     {
         return description;
     }
@@ -139,7 +140,7 @@ public class BitstreamFormat
      * @param s
      *            the new description
      */
-    public final void setDescription(String s)
+    public void setDescription(String s)
     {
         this.description = s;
     }
@@ -172,7 +173,7 @@ public class BitstreamFormat
      * 
      * @return the support level
      */
-    public final int getSupportLevel()
+    public int getSupportLevel()
     {
         return supportLevel;
     }
@@ -194,7 +195,7 @@ public class BitstreamFormat
      * 
      * @return <code>true</code> if the bitstream format is an internal type
      */
-    public final boolean isInternal()
+    public boolean isInternal()
     {
         return internal;
     }
@@ -206,7 +207,7 @@ public class BitstreamFormat
      *            pass in <code>true</code> if the bitstream format is an
      *            internal type
      */
-    public final void setInternal(boolean b)
+    public void setInternal(boolean b)
     {
         internal = b;
     }
