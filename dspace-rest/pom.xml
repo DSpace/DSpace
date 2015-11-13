@@ -146,6 +146,19 @@
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
         </dependency>
+
+        <!-- because of event listeners-->
+        <dependency>
+            <groupId>cz.cuni.mff.ufal.dspace</groupId>
+            <artifactId>b2safe-dspace</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-oai</artifactId>
+            <classifier>classes</classifier>
+        </dependency>
+
     </dependencies>
 
 </project>
