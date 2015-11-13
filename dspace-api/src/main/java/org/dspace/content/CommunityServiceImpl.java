@@ -202,13 +202,14 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
             canEdit(context, community);
         }
 
-                // First, delete any existing logo
-        if (community.getLogo() != null)
+        // First, delete any existing logo
+        Bitstream oldLogo = community.getLogo();
+        if (oldLogo != null)
         {
             log.info(LogManager.getHeader(context, "remove_logo",
                     "community_id=" + community.getID()));
             community.setLogo(null);
-            bitstreamService.delete(context, community.getLogo());
+            bitstreamService.delete(context, oldLogo);
         }
 
         if (is != null)
