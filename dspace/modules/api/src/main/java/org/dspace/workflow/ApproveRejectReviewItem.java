@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import javax.mail.MessagingException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import org.dspace.core.Constants;
 import org.dspace.identifier.DOIIdentifierProvider;
@@ -120,6 +121,7 @@ public class ApproveRejectReviewItem {
 
     public static void reviewItem(Boolean approved, String manuscriptNumber) throws ApproveRejectReviewItemException  {
         WorkflowItem wfi = null;
+        ArrayList workflowItems = new ArrayList<WorkflowItem>();
         Context c = null;
         try {
             c = new Context();
@@ -130,16 +132,13 @@ public class ApproveRejectReviewItem {
                     Item ms = manuscriptItems.next();
                     wfi = WorkflowItem.findByItemId(c, ms.getID());
                     if (wfi != null) {
-                        try {
-                            reviewItem(c, approved, wfi);
-                        } catch (ApproveRejectReviewItemException e) {
-                            log.debug("WorkflowItem " + wfi.getID() + " is not a claimed task");
-                        }
+                        workflowItems.add(wfi);
                     }
                 }
             } else {
                 throw new ApproveRejectReviewItemException("No item found with manuscript number: " + manuscriptNumber);
             }
+            reviewItems(c,approved,workflowItems);
         } catch (SQLException ex) {
             throw new ApproveRejectReviewItemException(ex);
         } catch (AuthorizeException ex) {
@@ -181,6 +180,16 @@ public class ApproveRejectReviewItem {
                 } finally {
                     c = null;
                 }
+            }
+        }
+    }
+
+    public static void reviewItems(Context c, Boolean approved, List<WorkflowItem> workflowItems) throws ApproveRejectReviewItemException {
+        for (WorkflowItem wfi : workflowItems) {
+            try {
+                reviewItem(c, approved, wfi);
+            } catch (ApproveRejectReviewItemException e) {
+                throw new ApproveRejectReviewItemException("WorkflowItem " + wfi.getID() + " is not a claimed task", e);
             }
         }
     }
