@@ -253,10 +253,7 @@ public class OdinsHamr extends AbstractCurationTask {
             return 1.0;
         }
 
-        int maxlen = Math.max(getName(bio1).length(), getName(bio2).length());
-        int editlen = JournalUtils.computeLevenshteinDistance(getName(bio1), getName(bio2));
-
-        return (double)(maxlen-editlen)/(double)maxlen;
+        return JournalUtils.getHamrScore(getName(bio1), getName(bio2));
     }
     
     /**

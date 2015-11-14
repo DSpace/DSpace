@@ -25,6 +25,7 @@ import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.lang.Math;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -705,7 +706,7 @@ public class JournalUtils {
      Levenshtein distance algorithm, borrowed from
      http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance
      **/
-    public static int computeLevenshteinDistance(CharSequence str1, CharSequence str2) {
+    private static int computeLevenshteinDistance(CharSequence str1, CharSequence str2) {
         int[][] distance = new int[str1.length() + 1][str2.length() + 1];
 
         for (int i = 0; i <= str1.length(); i++)
@@ -729,4 +730,10 @@ public class JournalUtils {
         return Math.min(Math.min(a, b), c);
     }
 
+    public static double getHamrScore(String name1, String name2) {
+        int maxlen = Math.max(name1.length(), name2.length());
+        int editlen = computeLevenshteinDistance(name1, name2);
+
+        return (double)(maxlen-editlen)/(double)maxlen;
+    }
 }
