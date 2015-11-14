@@ -5,6 +5,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchService;
 import org.dspace.utils.DSpace;
@@ -21,6 +22,7 @@ import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierNotFoundException;
 import org.dspace.identifier.IdentifierNotResolvableException;
 import org.dspace.identifier.IdentifierService;
+import org.dspace.eperson.EPerson;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -184,16 +186,25 @@ public class ApproveRejectReviewItem {
             }
             //Check for a valid task
             // There must be a claimed actions & it must be in the review stage, else it isn't a valid workflowitem
+            Item item = wfi.getItem();
             if (claimedTasks == null || claimedTasks.isEmpty() || !claimedTasks.get(0).getActionID().equals("reviewAction")) {
-                throw new ApproveRejectReviewItemException("Item not found or not in review");
+                log.debug ("Item " + item.getID() + " not found or not in review");
             } else {
                 ClaimedTask claimedTask = claimedTasks.get(0);
-                Workflow workflow = WorkflowFactory.getWorkflow(wfi.getCollection());
-                WorkflowActionConfig actionConfig = workflow.getStep(claimedTask.getStepID()).getActionConfig(claimedTask.getActionID());
+                if (approved) {
+                    Workflow workflow = WorkflowFactory.getWorkflow(wfi.getCollection());
+                    WorkflowActionConfig actionConfig = workflow.getStep(claimedTask.getStepID()).getActionConfig(claimedTask.getActionID());
 
-                wfi.getItem().addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "step", "approved", null, approved.toString());
+                    item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "step", "approved", null, approved.toString());
 
-                WorkflowManager.doState(c, c.getCurrentUser(), null, claimedTask.getWorkflowItemID(), workflow, actionConfig);
+                    WorkflowManager.doState(c, c.getCurrentUser(), null, claimedTask.getWorkflowItemID(), workflow, actionConfig);
+                    log.debug("Item " + item.getID() + " pushed through");
+                } else {
+                    c.turnOffAuthorisationSystem();
+                    WorkspaceItem wsi = WorkflowManager.rejectWorkflowItem(c, wfi, EPerson.find(c, claimedTask.getOwnerID()), null, "The associated manuscript has been rejected by the journal.", true);
+                    c.restoreAuthSystemState();
+                    log.debug("Item " + item.getID() + " was rejected");
+                }
             }
         } catch (SQLException ex) {
             throw new ApproveRejectReviewItemException(ex);

@@ -18,6 +18,7 @@ import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.content.Item;
+import org.dspace.content.ItemIterator;
 import org.dspace.content.DCValue;
 
 import javax.mail.MessagingException;
@@ -33,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.lang.Runtime;
 import java.lang.RuntimeException;
+import java.lang.reflect.Array;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.ArrayList;
@@ -412,41 +414,41 @@ public class DryadEmailSubmission extends HttpServlet {
                 }
 
                 if (approved != null) {
+                    DSpaceKernelImpl kernelImpl = null;
                     try {
-                        DSpaceKernelImpl kernelImpl = null;
+                        kernelImpl = DSpaceKernelInit.getKernel(null);
+                        if (!kernelImpl.isRunning())
+                        {
+                            kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
+                        }
+                    } catch (Exception ex) {
+                        // Failed to start so destroy it and log and throw an exception
                         try {
-                            kernelImpl = DSpaceKernelInit.getKernel(null);
-                            if (!kernelImpl.isRunning())
-                            {
-                                kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
+                            if(kernelImpl != null) {
+                                kernelImpl.destroy();
                             }
-                        } catch (Exception ex) {
-                            // Failed to start so destroy it and log and throw an exception
-                            try {
-                                if(kernelImpl != null) {
-                                    kernelImpl.destroy();
-                                }
-                            } catch (Exception e1) {
-                                // Nothing to do
-                            }
-                            LOGGER.error("Error Initializing DSpace kernel in ManuscriptReviewStatusChangeHandler", ex);
+                        } catch (Exception e1) {
+                            // Nothing to do
                         }
-
-                        if (manuscript.dryadDataDOI != null) {
-                            LOGGER.debug("running ApproveRejectReview ("+approved + ", " + manuscript.dryadDataDOI + ")");
-                            ApproveRejectReviewItem.reviewItemDOI(approved, manuscript.dryadDataDOI);
-                        } else if (manuscript.manuscriptId != null) {
-                            LOGGER.debug("running ApproveRejectReview Item (" + approved + ", " + manuscript.manuscriptId + ")");
-                            ApproveRejectReviewItem.reviewItem(approved, manuscript.manuscriptId);
-                        }
-                    } catch (ApproveRejectReviewItemException e) {
-                        // we need to compare manuscript's authors with workflow items from the same journal.
-                        WorkflowItem[] workflowItems = findMatchingWorkflowItems(context, manuscript);
-                        for (int i=0; i<workflowItems.length; i++) {
-                            ApproveRejectReviewItem.reviewItem(approved, workflowItems[i].getID());
-                        }
-                        // somehow we need to note that this item did not find a match
+                        LOGGER.error("Error Initializing DSpace kernel in ManuscriptReviewStatusChangeHandler", ex);
                     }
+
+                    ArrayList<WorkflowItem> workflowItems = new ArrayList<WorkflowItem>();
+
+                    if (manuscript.dryadDataDOI != null) {
+                        try {
+                            WorkflowItem wfi = WorkflowItem.findByDOI(context, manuscript.dryadDataDOI);
+                            if (wfi != null) {
+                                workflowItems.add(wfi);
+                            }
+                        } catch (ApproveRejectReviewItemException e) {
+                            LOGGER.debug ("no workflow items matched DOI " + manuscript.dryadDataDOI);
+                        }
+                    }
+
+                    workflowItems.addAll(WorkflowItem.findAllByManuscript(context, manuscript));
+                    LOGGER.debug("found " + workflowItems.size() + " items that match");
+                    ApproveRejectReviewItem.reviewItems(context, approved, workflowItems);
                 }
             } else {
                 throw new SubmissionException("Parser could not validly parse the message");
@@ -464,40 +466,6 @@ public class DryadEmailSubmission extends HttpServlet {
                 throw new RuntimeException("Context.complete threw an exception, aborting instead");
             }
         }
-    }
-
-    private WorkflowItem[] findMatchingWorkflowItems(Context context, Manuscript manuscript) {
-        String journalName = manuscript.organization.organizationName;
-        WorkflowItem[] workflowItems = null;
-        try {
-            workflowItems = WorkflowItem.findAllByJournalName(context, journalName);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        ArrayList<WorkflowItem> matchingItems = new ArrayList<WorkflowItem>();
-        for (int i=0;i<workflowItems.length;i++) {
-            // count number of authors and number of matched authors: if equal, this is a match.
-            int numMatched = 0;
-            Item item = workflowItems[i].getItem();
-            DCValue[] itemAuthors = item.getMetadata("dc", "contributor", "author", Item.ANY);
-            for (int j=0;j<itemAuthors.length;j++) {
-                for (Author a : manuscript.authors.author) {
-                    int score = JournalUtils.computeLevenshteinDistance(itemAuthors[j].value, a.fullName());
-                    if (score > 0.7) {
-                        numMatched++;
-                        break;
-                    }
-                }
-            }
-            if (numMatched == itemAuthors.length) {
-                matchingItems.add(workflowItems[i]);
-                LOGGER.debug ("ms " + manuscript.title + " matches");
-            } else {
-                LOGGER.debug ("ms " + manuscript.title + " does not match: " + numMatched + "/" + itemAuthors.length);
-            }
-        }
-        return matchingItems.toArray(new WorkflowItem[matchingItems.size()]);
     }
 
     private EmailParser getEmailParser(String myParsingScheme) throws SubmissionException {
