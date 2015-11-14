@@ -128,6 +128,11 @@ public class EmailParser {
             dataForXML.put(ARTICLE_STATUS,Manuscript.STATUS_SUBMITTED);
         }
 
+        // if article status says "rejected w/o review", it's the same as a rejection
+        if (dataForXML.get(ARTICLE_STATUS).equalsIgnoreCase("rejected w/o review")) {
+            dataForXML.put(ARTICLE_STATUS,Manuscript.STATUS_REJECTED);
+        }
+
         // remove any unnecessary tags
         dataForXML.remove(UNNECESSARY);
 
