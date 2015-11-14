@@ -143,6 +143,9 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         if(selectedJournalId!=null){
             String journalPath = "";
             try{
+                Concept journalConcept = JournalUtils.getJournalConceptByShortID(context, selectedJournalId);
+                journalPath = JournalUtils.getMetadataDir(journalConcept);
+                journalName = JournalUtils.getFullName(journalConcept);
                 pBean = JournalUtils.getPublicationBeanFromManuscriptStorage(manuscriptNumber, selectedJournalId);
                 manuscriptStatus = pBean.getStatus();
             }catch (Exception e)
