@@ -83,28 +83,9 @@ public class ApproveRejectReviewItem {
         try {
             c = new Context();
             c.turnOffAuthorisationSystem();
-            IdentifierService identifierService = getIdentifierService();
-            DSpaceObject object = null;
-            try {
-                object = identifierService.resolve(c, dataPackageDOI);
-                if (object == null) {
-                    throw new ApproveRejectReviewItemException("DOI " + dataPackageDOI + " resolved to null item");
-                }
-                if (object.getType() != Constants.ITEM) {
-                    throw new ApproveRejectReviewItemException("DOI " + dataPackageDOI + " resolved to a non item DSpace Object");
-                }
-            } catch (IdentifierNotFoundException ex) {
-                throw new ApproveRejectReviewItemException(ex);
-            } catch (IdentifierNotResolvableException ex) {
-                throw new ApproveRejectReviewItemException(ex);
-            }
-            wfi = WorkflowItem.findByItemId(c, object.getID());
+            wfi = WorkflowItem.findByDOI(c, dataPackageDOI);
             reviewItem(c, approved, wfi);
-        } catch (AuthorizeException ex) {
-            throw new ApproveRejectReviewItemException(ex);
         } catch (SQLException ex) {
-            throw new ApproveRejectReviewItemException(ex);
-        } catch (IOException ex) {
             throw new ApproveRejectReviewItemException(ex);
         } finally {
             if(c != null) {
@@ -189,7 +170,7 @@ public class ApproveRejectReviewItem {
             try {
                 reviewItem(c, approved, wfi);
             } catch (ApproveRejectReviewItemException e) {
-                throw new ApproveRejectReviewItemException("WorkflowItem " + wfi.getID() + " is not a claimed task", e);
+                throw new ApproveRejectReviewItemException("Exception caught while reviewing item " + wfi.getItem().getID() + ": " +e.getMessage(), e);
             }
         }
     }
@@ -227,12 +208,6 @@ public class ApproveRejectReviewItem {
         } catch (WorkflowException ex) {
             throw new ApproveRejectReviewItemException(ex);
         }
-    }
-
-    private static IdentifierService getIdentifierService() {
-        DSpace dspace = new DSpace();
-        org.dspace.kernel.ServiceManager manager = dspace.getServiceManager() ;
-        return manager.getServiceByName(IdentifierService.class.getName(), IdentifierService.class);
     }
 
     private static SearchService getSearchService() {
