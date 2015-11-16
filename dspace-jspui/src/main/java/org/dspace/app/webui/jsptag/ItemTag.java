@@ -7,26 +7,6 @@
  */
 package org.dspace.app.webui.jsptag;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.jstl.fmt.LocaleSupport;
-import javax.servlet.jsp.tagext.TagSupport;
-
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.DCInputsReaderException;
@@ -36,19 +16,23 @@ import org.dspace.app.webui.util.StyleSelection;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.browse.BrowseException;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
+import org.dspace.content.*;
 import org.dspace.content.Collection;
-import org.dspace.content.DCDate;
-import org.dspace.content.Metadatum;
-import org.dspace.content.Item;
 import org.dspace.content.authority.MetadataAuthorityManager;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.I18nUtil;
-import org.dspace.core.PluginManager;
-import org.dspace.core.Utils;
+import org.dspace.core.*;
+import org.dspace.handle.HandleManager;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.jstl.fmt.LocaleSupport;
+import javax.servlet.jsp.tagext.TagSupport;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * <P>
@@ -625,6 +609,7 @@ public class ItemTag extends TagSupport
         listCollections();
 
         out.println("</table><br/>");
+        listStatistics();
 
         listBitstreams();
 
@@ -1153,4 +1138,148 @@ public class ItemTag extends TagSupport
         }
         return null;
     }
+
+    private void listStatistics() throws IOException {
+    JspWriter out = pageContext.getOut();
+
+    HttpServletRequest request = (HttpServletRequest) pageContext
+            .getRequest();
+
+    out.println("<table align=\"center\" class=\"reportBlock\" style=\"border-spacing: 25px 0px;\">\n" +
+            "\t <tr>\n" +
+            "\t\t<td valign=\"top\" class=\"panel panel-info\">\n" +
+            "\t\t<table width=\"400\">");
+    out.println("<tr class=\"reportOddRow submitFormHelp alert alert-info\" valign=\"top\"><th colspan=\"2\" style=\"text-align: center;\">" +
+            LocaleSupport.getLocalizedMessage(pageContext, "metadata.viewed") +
+            "</th></tr>");
+
+    String[][] views = ua.edu.sumdu.essuir.statistics.EssuirStatistics.updateItem(request, item.getID(), 0.8);
+
+    if (views != null) {
+        for (int i = 0; i < views.length; i++) {
+            out.println("<tr>");
+            out.print("<td style=\"padding-left: 10px;\">\n" +
+                    "<img src=\"/flags/");
+            if (!views[i][0].toLowerCase().equals(new String("ua"))){
+                out.print(views[i][0].toLowerCase());
+            } else{
+                out.print("uk");
+            }
+            String tmp = org.dspace.statistics.util.LocationUtils.getCountryName(views[i][0], UIUtil.getSessionLocale(request));
+            out.print(".gif\">\n" +
+                    (tmp.equals("--") ? LocaleSupport.getLocalizedMessage(pageContext, "metadata.country.other") : tmp) +
+                    "</td>");
+            out.println("<td width=\"120\" style=\"padding-left: 15px;\">" + views[i][1] + "</td>");
+            out.println("</tr>");
+        }
+    } else {
+        out.println("<tr><td colspan=\"2\">No available statistics</td></tr>");
+    }
+
+    out.println("</table>\n" +
+            "\t\t</td>");
+    out.println("<td valign=\"top\" class=\"panel panel-info\">\n" +
+            "\t\t\t<table width=\"400\">");
+    out.println("<tr class=\"reportOddRow submitFormHelp alert alert-info\" valign=\"top\"><th colspan=\"2\" style=\"text-align: center;\">" +
+            LocaleSupport.getLocalizedMessage(pageContext, "metadata.downloaded") + "</th></tr>");
+    String[][] downloads = ua.edu.sumdu.essuir.statistics.EssuirStatistics.selectBitstreamByCountries(request, item.getID(), 0);
+    if (downloads != null) {
+        List<String[]> tempDownloads = new ArrayList(Arrays.asList(downloads));
+        for (int i = 0; i < tempDownloads.size() - 1; i++) {
+            for (int j = i + 1; j < tempDownloads.size(); j++) {
+                if(tempDownloads.get(i)[0].equals(tempDownloads.get(j)[0])){
+                    tempDownloads.get(i)[1] = Integer.valueOf(Integer.parseInt(tempDownloads.get(i)[1]) + Integer.parseInt(tempDownloads.get(j)[1])).toString();
+                    tempDownloads.remove(j);
+                    j--;
+                }
+            }
+        }
+        for (int i = 0; i < tempDownloads.size(); i++) {
+            out.println("<tr>");
+            out.print("<td style=\"padding-left: 10px;\">\n" +
+                    "<img src=\"/flags/");
+            if (!tempDownloads.get(i)[0].toLowerCase().equals(new String("ua"))) {
+                out.print(tempDownloads.get(i)[0].toLowerCase());
+            } else {
+                out.print("uk");
+            }
+            String tmp = org.dspace.statistics.util.LocationUtils.getCountryName(tempDownloads.get(i)[0], UIUtil.getSessionLocale(request));
+            out.print(".gif\">\n" +
+                    (tmp.equals("--") ? LocaleSupport.getLocalizedMessage(pageContext, "metadata.country.other") : tmp) +
+                    "</td>");
+            out.println("<td width=\"120\" style=\"padding-left: 15px;\">" + tempDownloads.get(i)[1] + "</td>");
+            out.println("</tr>");
+        }
+    } else {
+        out.println("<tr><td colspan=\"2\">" + LocaleSupport.getLocalizedMessage(pageContext, "metadata.no-available-statistics")+ "</td></tr>");
+    }
+
+    out.println("</table>\n" +
+            "\t\t</td>\t\t\n" +
+            "\t</tr>\n" +
+            "</table>");
+    out.println("<br/>");
+
+    String ip = request.getRemoteAddr();
+    if(!ip.substring(0,7).equals("192.168")){
+
+        String handle = item.getHandle();
+
+        out.println("<div style=\"text-align: center;\">\n" +
+                "\t<div class=\"HeaderShareButtons\" style=\"display: inline-flex;\">");
+        // VK button
+        out.println("<div class=\"vk\">\n" +
+                "\t\t<!-- Put this script tag to the <head> of your page -->\n" +
+                "\t\t\t<script type=\"text/javascript\" src=\"//vk.com/js/api/openapi.js?116\"></script>\n" +
+                "\t\t\t<script type=\"text/javascript\">\n" +
+                "\t\t\t  VK.init({apiId: 4787414, onlyWidgets: true});\n" +
+                "\t\t\t</script>\n" +
+                "\t\t\t<!-- Put this div tag to the place, where the Like block will be -->\n" +
+                "\t\t\t<div id=\"vk_like\"></div>\n" +
+                "\t\t\t<script type=\"text/javascript\">\n" +
+                "\t\t\tVK.Widgets.Like(\"vk_like\", {type: \"button\"});\n" +
+                "\t\t\tlikes.getList();\n" +
+                "\t\t\t</script>\n" +
+                "\t\t</div>");
+        // Facebook button
+        out.print("<div class=\"facebook\" style=\"padding-top: 1px;\">\n" +
+                "\t\t\t<div id=\"fb-root\"></div>\n" +
+                "\t\t\t\t<script>(function(d, s, id) {\n" +
+                "\t\t\t\t  var js, fjs = d.getElementsByTagName(s)[0];\n" +
+                "\t\t\t\t  if (d.getElementById(id)) return;\n" +
+                "\t\t\t\t  js = d.createElement(s); js.id = id;\n" +
+                "\t\t\t\t  js.src = \"//connect.facebook.net/");
+        if (UIUtil.getSessionLocale(request).getLanguage().equals(new Locale("uk").getLanguage())) {
+            out.print("uk_UA");
+        } else if (UIUtil.getSessionLocale(request).getLanguage().equals(new Locale("ru").getLanguage())) {
+            out.print("ru_RU");
+        } else if (UIUtil.getSessionLocale(request).getLanguage().equals(new Locale("en").getLanguage())) {
+            out.print("en_US");
+        }
+        out.println("/sdk.js#xfbml=1&version=v2.0\";\n" +
+                "\t\t\t\t  fjs.parentNode.insertBefore(js, fjs);\n" +
+                "\t\t\t\t}(document, 'script', 'facebook-jssdk'));</script>\n" +
+                "\n" +
+                "\t\t\t\t<div class=\"fb-like\" data-href=\"" + HandleManager.getCanonicalForm(handle) + "\" data-width=\"150\" data-layout=\"button_count\" data-action=\"like\" data-show-faces=\"true\" data-share=\"false\"></div>\n" +
+                "\t\t</div>");
+        // Google button
+        out.println("<div class=\"google\" style=\"padding-top: 1px; padding-left: 36px;\">\n" +
+                "\t\t\t<!-- Вставьте этот тег в заголовке страницы или непосредственно перед закрывающим тегом основной части. -->\n" +
+                "\t\t\t<script src=\"https://apis.google.com/js/platform.js\" async defer>\n" +
+                "\t\t\t  {lang: \'" + UIUtil.getSessionLocale(request).getLanguage() + "\'}\n" +
+                "\t\t\t</script>\n" +
+                "\t\t\t<!-- Поместите этот тег туда, где должна отображаться кнопка \"Поделиться\". -->\n" +
+                "\t\t\t<div class=\"g-plus\" data-action=\"share\" data-annotation=\"bubble\" data-href=\"" + HandleManager.getCanonicalForm(handle) + "\"></div>\n" +
+                "\t\t</div>");
+        //Twitter button
+        out.println("<div class=\"twitter\" style=\"padding-top: 1px; padding-left: 36px;\">\n" +
+                "\t\t\t<a href=\"https://twitter.com/share\" class=\"twitter-share-button\" data-hashtags=\"SumDU\">Tweet</a>\n" +
+                "\t\t\t<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>\n" +
+                "\t\t</div>");
+
+        out.println("\t</div>\n" +
+                "</div>");
+        out.println("<br/>");
+    }
+}
 }

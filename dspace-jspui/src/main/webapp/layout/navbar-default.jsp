@@ -109,7 +109,13 @@
 				%>
 
                  <%-- End of dynamic browse indices --%>
-            </ul>
+                 <li class="divider"></li>
+                 <li><a href="<%= request.getContextPath() %>/recent-items.jsp"><fmt:message key="jsp.collection-home.recentsub"/></a></li>
+                 <li><a href="<%= request.getContextPath() %>/top10items.jsp"><fmt:message key="jsp.top50items"/></a></li>
+                 <li><a href="<%= request.getContextPath() %>/top10authors.jsp"><fmt:message key="jsp.top10authors"/></a></li>
+                 <li><a href="<%= request.getContextPath() %>/faq.jsp"><fmt:message key="jsp.layout.navbar-default.faq"/></a></li>
+                 <li><a href="<%= request.getContextPath() %>/stat/pubstat"><fmt:message key="jsp.layout.navbar-admin.statistics"/></a></li>
+             </ul>
           </li>
           <li class="<%= ( currentPage.endsWith( "/help" ) ? "active" : "" ) %>"><dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") %>"><fmt:message key="jsp.layout.navbar-default.help"/></dspace:popup></li>
        </ul>
