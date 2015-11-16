@@ -11,7 +11,9 @@
 #     (see "include =" settings near the end of dspace.cfg for full list)
 #
 # You may also specify additional configuration files to load by simply adding:
+#
 # include = [file-path]
+#
 # The [file-path] should be relative to the [dspace]/config/ folder, e.g.
 # include = modules/authentication-ldap.cfg
 #
@@ -19,6 +21,8 @@
 # will only override another configuration if it has the EXACT SAME key/name.
 # For example, including "dspace.dir" in this local.cfg will override the
 # default value of "dspace.dir" in the dspace.cfg file.
+# Similarly, including "oai.solr.url" in this local.cfg will override the
+# default value of "oai.solr.url" in the modules/oai.cfg file.
 #
 
 ##########################
@@ -172,12 +176,32 @@ db.schema = public
 # port number of proxy server
 #http.proxy.port =
 
-#####################
-# LOGLEVEL SETTINGS #
-#####################
-loglevel.other = INFO
-# loglevel.other: Log level for other third-party tools/APIs used by DSpace
-# Possible values (from most to least info): DEBUG, INFO, WARN, ERROR, FATAL
-loglevel.dspace = INFO
-# loglevel.dspace: Log level for all DSpace-specific code (org.dspace.*)
-# Possible values (from most to least info): DEBUG, INFO, WARN, ERROR, FATAL
+##########################
+# AUTHENTICATION METHODS #
+##########################
+# EXAMPLE OVERRIDE:
+# Override the default authentication method(s) defined in authentication.cfg
+# by defining your own custom ordered list in this local.cfg.
+#
+# By default, all of these methods are commented out and DSpace will use the
+# settings from authentication.cfg. But you may uncomment whichever plugins you
+# need in order to change the default settings (or reorder them below).
+#
+# You may also copy default settings from the corresponding authentication-*.cfg
+# configuration file and override them in this local.cfg.
+
+# IP-based authentication/authorization. See authentication-ip.cfg for default configuration.
+#plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.IPAuthentication
+
+# LDAP authentication/authorization. See authentication-ldap.cfg for default configuration.
+#plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.LDAPAuthentication
+
+# Shibboleth authentication/authorization. See authentication-shibboleth.cfg for default configuration.
+#plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.ShibAuthentication
+
+# X.509 certificate authentication. See authentication-x509.cfg for default configuration.
+#plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.X509Authentication
+
+# Authentication by Password (encrypted in DSpace's database). See authentication-password.cfg for default configuration.
+# Enabled by default in authentication.cfg
+#plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.PasswordAuthentication
