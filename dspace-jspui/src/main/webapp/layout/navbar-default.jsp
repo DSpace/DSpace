@@ -87,72 +87,99 @@
        </div>
        <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
          <ul class="nav navbar-nav">
-           <li class="<%= currentPage.endsWith("/home.jsp")? "active" : "" %>"><a href="<%= request.getContextPath() %>/"><span class="glyphicon glyphicon-home"></span> <fmt:message key="jsp.layout.navbar-default.home"/></a></li>
-                
-           <li class="dropdown">
-             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><fmt:message key="jsp.layout.navbar-default.browse"/> <b class="caret"></b></a>
-             <ul class="dropdown-menu">
-               <li><a href="<%= request.getContextPath() %>/community-list"><fmt:message key="jsp.layout.navbar-default.communities-collections"/></a></li>
-				<li class="divider"></li>
-        <li class="dropdown-header"><fmt:message key="jsp.layout.navbar-default.browseitemsby"/></li>
-				<%-- Insert the dynamic browse indices here --%>
-				
-				<%
-					for (int i = 0; i < bis.length; i++)
-					{
-						BrowseIndex bix = bis[i];
-						String key = "browse.menu." + bix.getName();
-					%>
-				      			<li><a href="<%= request.getContextPath() %>/browse?type=<%= bix.getName() %>"><fmt:message key="<%= key %>"/></a></li>
-					<%	
-					}
-				%>
+            <li class="<%= currentPage.endsWith("/home.jsp")? "active" : "" %>"><a href="<%= request.getContextPath() %>/"><span class="glyphicon glyphicon-home"></span> <fmt:message key="jsp.layout.navbar-default.home"/></a></li>
 
-                 <%-- End of dynamic browse indices --%>
-                 <li class="divider"></li>
-                 <li><a href="<%= request.getContextPath() %>/recent-items.jsp"><fmt:message key="jsp.collection-home.recentsub"/></a></li>
-                 <li><a href="<%= request.getContextPath() %>/top10items.jsp"><fmt:message key="jsp.top50items"/></a></li>
-                 <li><a href="<%= request.getContextPath() %>/top10authors.jsp"><fmt:message key="jsp.top10authors"/></a></li>
-                 <li><a href="<%= request.getContextPath() %>/faq.jsp"><fmt:message key="jsp.layout.navbar-default.faq"/></a></li>
-                 <li><a href="<%= request.getContextPath() %>/stat/pubstat"><fmt:message key="jsp.layout.navbar-admin.statistics"/></a></li>
-             </ul>
-          </li>
-          <li class="<%= ( currentPage.endsWith( "/help" ) ? "active" : "" ) %>"><dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") %>"><fmt:message key="jsp.layout.navbar-default.help"/></dspace:popup></li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><fmt:message key="jsp.layout.navbar-default.browse"/> <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                    <li><a href="<%= request.getContextPath() %>/community-list"><fmt:message key="jsp.layout.navbar-default.communities-collections"/></a></li>
+                    <li class="divider"></li>
+                    <li class="dropdown-header"><fmt:message key="jsp.layout.navbar-default.browseitemsby"/></li>
+                     <%-- Insert the dynamic browse indices here --%>
+
+                     <%
+                        for (int i = 0; i < bis.length; i++)
+                        {
+                            BrowseIndex bix = bis[i];
+                            String key = "browse.menu." + bix.getName();
+                    %>
+                    <li><a href="<%= request.getContextPath() %>/browse?type=<%= bix.getName() %>"><fmt:message key="<%= key %>"/></a></li>
+                    <%
+                        }
+                    %>
+
+                    <%-- End of dynamic browse indices --%>
+                    <li class="divider"></li>
+                    <li><a href="<%= request.getContextPath() %>/recent-items.jsp"><fmt:message key="jsp.collection-home.recentsub"/></a></li>
+                    <li><a href="<%= request.getContextPath() %>/top10items.jsp"><fmt:message key="jsp.top50items"/></a></li>
+                    <li><a href="<%= request.getContextPath() %>/top10authors.jsp"><fmt:message key="jsp.top10authors"/></a></li>
+                    <li><a href="<%= request.getContextPath() %>/faq.jsp"><fmt:message key="jsp.layout.navbar-default.faq"/></a></li>
+                    <li><a href="<%= request.getContextPath() %>/stat/pubstat"><fmt:message key="jsp.layout.navbar-admin.statistics"/></a></li>
+                </ul>
+            </li>
+            <li class="<%= ( currentPage.endsWith( "/help" ) ? "active" : "" ) %>"><dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") %>"><fmt:message key="jsp.layout.navbar-default.help"/></dspace:popup></li>
+            <li class="google" style="padding-top: 15px; padding-left: 25px;">
+                <!-- Поместите этот тег туда, где должна отображаться кнопка +1. -->
+                <div class="g-plusone" data-annotation="inline" data-width="200" data-href="http://essuir.sumdu.edu.ua"></div>
+
+                <!-- Поместите этот тег за последним тегом виджета кнопка +1. -->
+                <script type="text/javascript">
+                    window.___gcfg = {lang: '<%= UIUtil.getSessionLocale(request).getLanguage() %>'};
+                        (function() {
+                            var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+                            po.src = 'https://apis.google.com/js/platform.js';
+                            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+                        })();
+                </script>
+            </li>
        </ul>
 
        <div class="nav navbar-nav navbar-right">
 		<ul class="nav navbar-nav navbar-right">
          <li class="dropdown">
-         <%
-    if (user != null)
-    {
-		%>
-		<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> <fmt:message key="jsp.layout.navbar-default.loggedin">
-		      <fmt:param><%= StringUtils.abbreviate(navbarEmail, 20) %></fmt:param>
-		  </fmt:message> <b class="caret"></b></a>
-		<%
-    } else {
-		%>
-             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> <fmt:message key="jsp.layout.navbar-default.sign"/> <b class="caret"></b></a>
-	<% } %>             
+             <%
+                 if (user != null)
+                 {
+             %>
+             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> <fmt:message key="jsp.layout.navbar-default.loggedin">
+                 <fmt:param><%= StringUtils.abbreviate(navbarEmail, 35) %></fmt:param>
+             </fmt:message> <b class="caret"></b></a>
              <ul class="dropdown-menu">
-               <li><a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.layout.navbar-default.users"/></a></li>
-               <li><a href="<%= request.getContextPath() %>/subscribe"><fmt:message key="jsp.layout.navbar-default.receive"/></a></li>
-               <li><a href="<%= request.getContextPath() %>/profile"><fmt:message key="jsp.layout.navbar-default.edit"/></a></li>
+                 <li><a href="<%= request.getContextPath() %>/mydspace"><fmt:message key="jsp.layout.navbar-default.users"/></a></li>
+                 <li><a href="<%= request.getContextPath() %>/subscribe"><fmt:message key="jsp.layout.navbar-default.receive"/></a></li>
+                 <li><a href="<%= request.getContextPath() %>/profile"><fmt:message key="jsp.layout.navbar-default.edit"/></a></li>
 
-		<%
-		  if (isAdmin)
-		  {
-		%>
-			   <li class="divider"></li>  
-               <li><a href="<%= request.getContextPath() %>/dspace-admin"><fmt:message key="jsp.administer"/></a></li>
-		<%
-		  }
-		  if (user != null) {
-		%>
-		<li><a href="<%= request.getContextPath() %>/logout"><span class="glyphicon glyphicon-log-out"></span> <fmt:message key="jsp.layout.navbar-default.logout"/></a></li>
-		<% } %>
+                 <%
+                     String userEmail = "";
+
+                     if (user != null)
+                         userEmail = user.getEmail().toLowerCase();
+
+                     if (isAdmin || userEmail.equals("library_ssu@ukr.net") || userEmail.equals("libconsult@rambler.ru")) {
+                 %>
+                 <li class="divider"></li>
+                 <li><a href="<%= request.getContextPath() %>/home_stat.jsp"><fmt:message key="jsp.layout.navbar-admin.report"/></a></li>
+                 <li><a href="<%= request.getContextPath() %>/authors.jsp"><fmt:message key="jsp.layout.navbar-admin.autocomplete"/></a></li>
+                 <li><a href="<%= request.getContextPath() %>/upload/manage.jsp"><fmt:message key="jsp.layout.navbar-admin.remote"/></a></li>
+                 <%
+                     }
+                     if (isAdmin)
+                     {
+                 %>
+                 <li class="divider"></li>
+                 <li><a href="<%= request.getContextPath() %>/dspace-admin"><fmt:message key="jsp.administer"/></a></li>
+                 <%
+                     }
+                     if (user != null) {
+                 %>
+                 <li><a href="<%= request.getContextPath() %>/logout"><span class="glyphicon glyphicon-log-out"></span> <fmt:message key="jsp.layout.navbar-default.logout"/></a></li>
+                 <% } %>
              </ul>
+             <%
+             } else {
+             %>
+             <a href="/password-login"><span class="glyphicon glyphicon-user"></span> <fmt:message key="jsp.layout.navbar-default.sign"/> </a>
+             <% } %>
            </li>
           </ul>
           
