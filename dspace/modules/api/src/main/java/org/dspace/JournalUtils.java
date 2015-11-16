@@ -230,7 +230,7 @@ public class JournalUtils {
                 if (manuscriptMatcher.find()) {
                     canonicalID = manuscriptMatcher.group(1);
                 } else {
-                    canonicalID = null;
+                    log.error ("Manuscript " + manuscriptId + " does not match with the regex provided for " + journalCode);
                 }
             } else {
                 // there is no regex specified, just use the manuscript.
