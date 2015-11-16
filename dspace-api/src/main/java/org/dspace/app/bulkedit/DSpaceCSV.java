@@ -9,12 +9,8 @@ package org.dspace.app.bulkedit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.authority.AuthorityValue;
-import org.dspace.app.bulkedit.DSpaceCSVLine;
-import org.dspace.app.bulkedit.MetadataImport;
-import org.dspace.app.bulkedit.MetadataImportInvalidHeadingException;
 import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.authority.service.AuthorityValueService;
-import org.dspace.content.Collection;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -73,10 +69,10 @@ public class DSpaceCSV implements Serializable
     /** The authority separator in an escaped form for using in regexes */
     protected String escapedAuthoritySeparator;
 
-    protected final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-    protected final MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
-    protected final MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
-    protected final AuthorityValueService authorityValueService = AuthorityServiceFactory.getInstance().getAuthorityValueService();
+    protected transient final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected transient final MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
+    protected transient final MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
+    protected transient final AuthorityValueService authorityValueService = AuthorityServiceFactory.getInstance().getAuthorityValueService();
 
 
     /** Whether to export all metadata such as handles and provenance information */
@@ -262,16 +258,16 @@ public class DSpaceCSV implements Serializable
         setAuthoritySeparator();
 
         // Create the headings
-        headings = new ArrayList<String>();
+        headings = new ArrayList<>();
 
         // Create the blank list of items
-        lines = new ArrayList<DSpaceCSVLine>();
+        lines = new ArrayList<>();
 
         // Initialise the counter
         counter = 0;
 
         // Set the metadata fields to ignore
-        ignore = new HashMap<String, String>();
+        ignore = new HashMap<>();
         String toIgnore = ConfigurationManager.getProperty("bulkedit", "ignore-on-export");
         if ((toIgnore == null) || ("".equals(toIgnore.trim())))
         {
@@ -495,7 +491,7 @@ public class DSpaceCSV implements Serializable
 
         // Split up on field separator
         String[] parts = line.split(escapedFieldSeparator);
-        ArrayList<String> bits = new ArrayList<String>();
+        ArrayList<String> bits = new ArrayList<>();
         bits.addAll(Arrays.asList(parts));
 
         // Merge parts with embedded separators
@@ -624,7 +620,7 @@ public class DSpaceCSV implements Serializable
         // Create the headings line
         String[] csvLines = new String[counter + 1];
         csvLines[0] = "id" + fieldSeparator + "collection";
-        List<String> headingsCopy = new ArrayList<String>(headings);
+        List<String> headingsCopy = new ArrayList<>(headings);
         Collections.sort(headingsCopy);
         for (String value : headingsCopy)
         {
@@ -701,10 +697,11 @@ public class DSpaceCSV implements Serializable
      *
      * @return The formatted String as a csv
      */
+    @Override
     public final String toString()
     {
         // Return the csv as one long string
-        StringBuffer csvLines = new StringBuffer();
+        StringBuilder csvLines = new StringBuilder();
         String[] lines = this.getCSVLinesAsStringArray();
         for (String line : lines)
         {
