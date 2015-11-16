@@ -151,10 +151,10 @@
   </listener>
 
   <!-- Load Spring applicationContext -->
-  <listener>
+ <!-- <listener>
       <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
   </listener>
-  
+  -->
   <!-- Servlets -->
 
   <servlet>
@@ -493,7 +493,27 @@
     <servlet-name>shibboleth-login</servlet-name>
     <url-pattern>/shibboleth-login</url-pattern>
   </servlet-mapping>
- 
+
+    <servlet>
+        <servlet-name>dsrequest</servlet-name>
+        <servlet-class>ua.edu.sumdu.essuir.servlet.RequestServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+    <servlet-name>dsrequest</servlet-name>
+    <url-pattern>/dsrequest</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>uploader</servlet-name>
+        <servlet-class>ua.edu.sumdu.essuir.servlet.UploadServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>uploader</servlet-name>
+        <url-pattern>/upload/upload</url-pattern>
+    </servlet-mapping>
+
   <!-- Servlet Mappings -->
 
   <servlet-mapping>
