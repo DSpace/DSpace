@@ -8,6 +8,8 @@
 
 package org.dspace.rdf.conversion;
 
+import com.google.api.client.repackaged.com.google.common.base.Throwables;
+import com.google.api.client.util.Sets;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -16,12 +18,22 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
+import org.apache.abdera.i18n.iri.IRI;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.jena.iri.IRIFactory;
 import org.apache.log4j.Logger;
 
 /**
@@ -391,13 +403,30 @@ public class MetadataRDFMapping {
     protected String parseResourceGenerator(Resource resourceGenerator, 
             String value, String dsoIRI)
     {
-        if (resourceGenerator.isURIResource() 
+        if (resourceGenerator.isURIResource()
                 && resourceGenerator.equals(DMRM.DSpaceObjectIRI))
         {
             return dsoIRI;
         }
 
-        return parseValueProcessor(resourceGenerator, value);
+        return getSafeIRI(parseValueProcessor(resourceGenerator, value));
+    }
+
+    private static String getSafeIRI(final String input) {
+        if (input == null) {
+            return null;
+        }
+        try {
+            URI.create(input);
+            return input;
+        } catch (IllegalArgumentException e) {
+            return input
+                    .replaceAll("\\[", "%5B")
+                    .replaceAll("\\]", "%5D")
+                    .replaceAll(" ", "%20")
+                    .replaceAll("\\(", "%28")
+                    .replaceAll("\\)", "%29");
+        }
     }
     
     protected Literal parseLiteralGenerator(Model m, Resource literalGenerator, 
