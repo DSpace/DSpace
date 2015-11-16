@@ -22,15 +22,16 @@ import java.util.*;
 public class DSpaceCSVLine implements Serializable
 {
     /** The item id of the item represented by this line. -1 is for a new item */
-    private UUID id;
+    private final UUID id;
 
     /** The elements in this line in a hashtable, keyed by the metadata type */
-    private Map<String, ArrayList> items;
+    private final Map<String, ArrayList> items;
 
-    protected final AuthorityValueService authorityValueService = AuthorityServiceFactory.getInstance().getAuthorityValueService();
+    protected transient final AuthorityValueService authorityValueService
+            = AuthorityServiceFactory.getInstance().getAuthorityValueService();
 
     /** ensuring that the order-sensible columns of the csv are processed in the correct order */
-    private final Comparator<? super String> headerComparator = new Comparator<String>() {
+    private transient final Comparator<? super String> headerComparator = new Comparator<String>() {
         @Override
         public int compare(String md1, String md2) {
             // The metadata coming from an external source should be processed after the others
@@ -60,7 +61,7 @@ public class DSpaceCSVLine implements Serializable
     {
         // Store the ID + separator, and initialise the hashtable
         this.id = itemId;
-        items = new TreeMap<String, ArrayList>(headerComparator);
+        items = new TreeMap<>(headerComparator);
 //        this.items = new HashMap<String, ArrayList>();
     }
 
@@ -71,7 +72,7 @@ public class DSpaceCSVLine implements Serializable
     {
         // Set the ID to be null, and initialise the hashtable
         this.id = null;
-        this.items = new TreeMap<String, ArrayList>(headerComparator);
+        this.items = new TreeMap<>(headerComparator);
     }
 
     /**
@@ -149,6 +150,7 @@ public class DSpaceCSVLine implements Serializable
      * Write this line out as a CSV formatted string, in the order given by the headings provided
      *
      * @param headings The headings which define the order the elements must be presented in
+     * @param fieldSeparator
      * @return The CSV formatted String
      */
     protected String toCSV(List<String> headings, String fieldSeparator)
@@ -177,6 +179,7 @@ public class DSpaceCSVLine implements Serializable
      * Internal method to create a CSV formatted String joining a given set of elements
      *
      * @param values The values to create the string from
+     * @param valueSeparator
      * @return The line as a CSV formatted String
      */
     protected String valueToCSV(List<String> values, String valueSeparator)
