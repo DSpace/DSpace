@@ -6,19 +6,14 @@
 # {3}  Description of task
 # {4}  link to 'my DSpace' page 
 #
-Subject: DSpace: You have a new task
+Subject: Вы получили новое задание по рецензированию
 
-A new item has been submitted:
 
-Title:        {0}
-Collection:   {1}
-Submitted by: {2}
+Был добавлен новый материал - {0} в коллекцию
+{1}  пользователем {2} .
 
-{3}
+Ваша задача - просмотреть предоставленный материал и утвердить или отклонить его, указав причину.
+Выполнить это задание вы можете со страницы Мой архив
+электронных ресурсов: {4}
 
-To claim this task, please visit your "My DSpace"
-page:  {4}
-
-Many thanks!
-
-DSpace
+Библиотека СумГУ
