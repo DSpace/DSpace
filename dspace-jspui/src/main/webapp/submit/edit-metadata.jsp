@@ -74,7 +74,7 @@
         String link = "";
         boolean enabled = ConfigurationManager.getBooleanProperty("webui.controlledvocabulary.enable");
         boolean useWithCurrentField = vocabulary != null && ! "".equals(vocabulary);
-        
+
         if (enabled && useWithCurrentField && !readonly)
         {
                         // Deal with the issue of _0 being removed from fieldnames in the configurable submission system
@@ -82,7 +82,7 @@
                         {
                                 fieldName = fieldName.substring(0, fieldName.length() - 2);
                         }
-                        link = 
+                        link =
                         "<a href='javascript:void(null);' onclick='javascript:popUp(\"" +
                                 contextPath + "/controlledvocabulary/controlledvocabulary.jsp?ID=" +
                                 fieldName + "&amp;vocabulary=" + vocabulary + "\")'>" +
@@ -100,7 +100,7 @@
         boolean enabled = ConfigurationManager.getBooleanProperty("webui.controlledvocabulary.enable");
         boolean useWithCurrentField = vocabulary != null && !"".equals(vocabulary);
         boolean has = false;
-        
+
         if (enabled && useWithCurrentField)
         {
                 has = true;
@@ -129,7 +129,7 @@
         }
         return null;
     }
-    
+
     // Render the choice/authority controlled entry, or, if not indicated,
     // returns the given default inputBlock
     StringBuffer doAuthority(PageContext pageContext, String fieldName,
@@ -159,17 +159,17 @@
 
             String confidenceSymbol = confidenceValue == unknownConfidence ? "blank" : Choices.getConfidenceText(confidenceValue).toLowerCase();
             String confIndID = fieldInput+"_confidence_indicator_id";
-            
+
             if (authority)
-            { 
+            {
                 sb.append(" <img id=\""+confIndID+"\" title=\"")
                   .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.authority.confidence.description."+confidenceSymbol))
-                  .append("\" class=\"pull-left ds-authority-confidence cf-")                  
+                  .append("\" class=\"pull-left ds-authority-confidence cf-")
                   // set confidence to cf-blank if authority is empty
                   .append(authorityValue==null||authorityValue.length()==0 ? "blank" : confidenceSymbol)
                   .append(" \" src=\"").append(contextPath).append("/image/confidence/invisible.gif\" />");
-                  
-                   
+
+
                 sb.append("<input type=\"text\" value=\"").append(authorityValue!=null?authorityValue:"")
                   .append("\" id=\"").append(authorityName)
                   .append("\" name=\"").append(authorityName).append("\" class=\"ds-authority-value form-control\"/>")
@@ -177,8 +177,8 @@
                   .append("\" id=\"").append(confidenceName)
                   .append("\" name=\"").append(confidenceName)
                   .append("\" class=\"ds-authority-confidence-input\"/>");
-                  
-                
+
+
             }
 
             // suggest is not supported for name input type
@@ -247,7 +247,7 @@
                   .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.tools.lookup.lookup"))
                   .append("\"><span class=\"glyphicon glyphicon-search\"></span></button>");
             }
-            
+
         }
         else if (inputBlock != null)
             sb = inputBlock;
@@ -260,7 +260,7 @@
       throws java.io.IOException
     {
    	  String authorityType = getAuthorityType(pageContext, fieldName, collectionID);
-    	
+
       Metadatum[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
       int fieldCount = defaults.length + fieldCountIncr;
       StringBuffer headers = new StringBuffer();
@@ -271,12 +271,12 @@
       StringBuffer name = new StringBuffer();
       StringBuffer first = new StringBuffer();
       StringBuffer last = new StringBuffer();
-      
+
       if (fieldCount == 0)
          fieldCount = 1;
 
       sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">").append(label).append("</label>");
-	  sb.append("<div class=\"col-md-10\">");     
+	  sb.append("<div class=\"col-md-10\">");
       for (int i = 0; i < fieldCount; i++)
       {
     	 sb.append("<div class=\"row col-md-12\">");
@@ -306,7 +306,7 @@
             auth = "";
             conf = unknownConfidence;
          }
-         
+
          sb.append("<span class=\"col-md-5\"><input placeholder=\"")
            .append(Utils.addEntities(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.lastname")))
            .append("\" class=\"form-control\" type=\"text\" name=\"")
@@ -328,15 +328,15 @@
              sb.append("disabled=\"disabled\" ");
          }
          sb.append("value=\"")
-           .append(dpn.getFirstNames()).append("\"/></span>");         
-         
+           .append(dpn.getFirstNames()).append("\"/></span>");
+
          if ("lookup".equalsIgnoreCase(authorityType))
     	 {
              sb.append(doAuthority(pageContext, fieldName, i, fieldCount, fieldName,
                      auth, conf, true, repeatable, defaults, null, collectionID));
              sb.append("</div>");
     	 }
-         
+
 
          if (repeatable && !readonly && i < defaults.length)
          {
@@ -361,8 +361,8 @@
               .append("_add\" value=\"")
               .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
               .append("\"><span class=\"glyphicon glyphicon-plus\"></span>&nbsp;&nbsp;"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add")+"</button>");
-         }         
-         sb.append("</div>");   
+         }
+         sb.append("</div>");
       }
 	  sb.append("</div></div><br/>");
       out.write(sb.toString());
@@ -385,65 +385,20 @@
       sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">")
         .append(label)
         .append("</label><div class=\"col-md-10\">");
-      
+
       for (int i = 0; i < fieldCount; i++)
       {
          if (i < defaults.length)
             dateIssued = new org.dspace.content.DCDate(defaults[i].value);
          else
             dateIssued = new org.dspace.content.DCDate("");
-    
+
          sb.append("<div class=\"row col-md-12\"><div class=\"input-group col-md-10\"><div class=\"row\">")
-			.append("<span class=\"input-group col-md-6\"><span class=\"input-group-addon\">")
-         	.append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.month"))
-            .append("</span><select class=\"form-control\" name=\"")
-            .append(fieldName)
-            .append("_month");
-         if (repeatable && i>0)
-         {
-            sb.append('_').append(i);
-         }
-         if (readonly)
-         {
-             sb.append("\" disabled=\"disabled");
-         }
-         sb.append("\"><option value=\"-1\"")
-            .append((dateIssued.getMonth() == -1 ? " selected=\"selected\"" : ""))
-//          .append(">(No month)</option>");
-            .append(">")
-            .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.no_month"))
-            .append("</option>");
-            
-         for (int j = 1; j < 13; j++)
-         {
-            sb.append("<option value=\"")
-              .append(j)
-              .append((dateIssued.getMonth() == j ? "\" selected=\"selected\"" : "\"" ))
-              .append(">")
-              .append(org.dspace.content.DCDate.getMonthName(j,I18nUtil.getSupportedLocale(request.getLocale())))
-              .append("</option>");
-         }
-    
-         sb.append("</select></span>")
-	            .append("<span class=\"input-group col-md-2\"><span class=\"input-group-addon\">")
-                .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.day"))
-                .append("</span><input class=\"form-control\" type=\"text\" name=\"")
-            .append(fieldName)
-            .append("_day");
-         if (repeatable && i>0)
-            sb.append("_").append(i);
-         if (readonly)
-         {
-             sb.append("\" disabled=\"disabled");
-         }
-         sb.append("\" size=\"2\" maxlength=\"2\" value=\"")
-            .append((dateIssued.getDay() > 0 ?
-                     String.valueOf(dateIssued.getDay()) : "" ))
-                .append("\"/></span><span class=\"input-group col-md-4\"><span class=\"input-group-addon\">")
+                .append("</span><span class=\"input-group col-md-4\"><span class=\"input-group-addon\">")
                 .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.year"))
                 .append("</span><input class=\"form-control\" type=\"text\" name=\"")
-            .append(fieldName)
-            .append("_year");
+                .append(fieldName)
+                .append("_year");
          if (repeatable && i>0)
             sb.append("_").append(i);
          if (readonly)
@@ -454,7 +409,7 @@
             .append((dateIssued.getYear() > 0 ?
                  String.valueOf(dateIssued.getYear()) : "" ))
             .append("\"/></span></div></div>\n");
-    
+
          if (repeatable && !readonly && i < defaults.length)
          {
             // put a remove button next to filled in values
@@ -500,7 +455,7 @@
       sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">")
       	.append(label)
       	.append("</label><div class=\"col-md-10\">");
-      
+
       for (int i = 0; i < fieldCount; i++)
       {
          if (i < defaults.length)
@@ -561,7 +516,7 @@
          sb.append("</div>");
       }
       sb.append("</div></div><br/>");
-      
+
       out.write(sb.toString());
     }
 
@@ -583,7 +538,7 @@
       sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">")
       	.append(label)
       	.append("</label><div class=\"col-md-10\">");
-      
+
       for (int i = 0; i < fieldCount; i++)
       {
          if (i < defaults.length)
@@ -622,8 +577,8 @@
          }
 
          sb.append("</div>");
-           
-         
+
+
          if (repeatable && !readonly && i < defaults.length)
          {
             // put a remove button next to filled in values
@@ -649,7 +604,7 @@
          sb.append("</div>");
       }
       sb.append("</div></div><br/>");
-      
+
       out.write(sb.toString());
     }
 
@@ -671,7 +626,7 @@
       sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">")
         .append(label)
         .append("</label>");
-      sb.append("<div class=\"col-md-10\">");  
+      sb.append("<div class=\"col-md-10\">");
       for (int i = 0; i < fieldCount; i++)
       {
            if (i < defaults.length)
@@ -689,7 +644,7 @@
 
            sb.append("<div class=\"row col-md-12\">");
            String fieldNameIdx = fieldName + ((repeatable && i != fieldCount-1)?"_" + (i+1):"");
-           
+
            sb.append("<div class=\"col-md-10\">");
            if (authorityType != null)
            {
@@ -702,9 +657,9 @@
              .append(val +"\"")
              .append((hasVocabulary(vocabulary)&&closedVocabulary) || readonly?" disabled=\"disabled\" ":"")
              .append("/>")
-			 .append(doControlledVocabulary(fieldNameIdx, pageContext, vocabulary, readonly))             
+			 .append(doControlledVocabulary(fieldNameIdx, pageContext, vocabulary, readonly))
              .append("</div>");
-           
+
            if (authorityType != null)
            {
         	   sb.append("<div class=\"col-md-2\">");
@@ -712,7 +667,7 @@
                               fieldName, auth, conf, false, repeatable,
                               defaults, null, collectionID));
            	   sb.append("</div></div>");
-           }             
+           }
 
           if (repeatable && !readonly && i < defaults.length)
           {
@@ -739,7 +694,7 @@
         }
       sb.append("</div>");
       sb.append("</div><br/>");
-	  
+
       out.write(sb.toString());
     }
 
@@ -765,7 +720,7 @@
       for (int i = 0; i < fieldCount; i++)
       {
      	 sb.append("<div class=\"row col-md-12\">");
-    	  
+
          if(i != fieldCount)
          {
              //param is field name and index, starting from 1 (e.g. myfield_2)
@@ -776,7 +731,7 @@
              //param is just the field name
              fieldParam = fieldName;
          }
-                 
+
          if (i < defaults.length)
          {
            sb.append("<span class=\"col-md-4\"><input class=\"form-control\" type=\"text\" name=\"")
@@ -786,7 +741,7 @@
              .append("\"")
              .append((hasVocabulary(vocabulary)&&closedVocabulary) || readonly?" disabled=\"disabled\" ":"")
              .append("\" />");
-          
+
            sb.append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly));
            sb.append("</span>");
           if (!readonly)
@@ -814,7 +769,7 @@
              .append("</span>\n")
              .append("<span class=\"col-md-2\">&nbsp;</span>");
          }
-         
+
          i++;
 
          if(i != fieldCount)
@@ -827,7 +782,7 @@
                          //param is just the field name
                          fieldParam = fieldName;
                  }
-        
+
                  if (i < defaults.length)
                  {
                    sb.append("<span class=\"col-md-4\"><input class=\"form-control\" type=\"text\" name=\"")
@@ -837,7 +792,7 @@
                          .append("\"")
                          .append((hasVocabulary(vocabulary)&&closedVocabulary) || readonly?" disabled=\"disabled\" ":"")
                          .append("/>");
-                   sb.append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly));      
+                   sb.append(doControlledVocabulary(fieldParam, pageContext, vocabulary, readonly));
                    sb.append("</span>");
                    if (!readonly)
                    {
@@ -851,7 +806,7 @@
                    }
                    else {
                  	  sb.append("<span class=\"col-md-2\">&nbsp;</span>");
-                   }              
+                   }
                  }
                  else
                  {
@@ -871,13 +826,13 @@
                        .append("\"><span class=\"glyphicon glyphicon-plus\"></span>&nbsp;&nbsp;"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add")+"</button>\n");
                    }
                  }
-       sb.append("</div>");          
+       sb.append("</div>");
       }
       sb.append("</div></div><br/>");
       out.write(sb.toString());
     }
-    
-    
+
+
 
     void doQualdropValue(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, DCInputSet inputs, boolean repeatable, boolean required,
@@ -892,7 +847,7 @@
           String unfilteredFieldName = unfiltered[i].element;
           if(unfiltered[i].qualifier != null && unfiltered[i].qualifier.length()>0)
               unfilteredFieldName += "." + unfiltered[i].qualifier;
-              
+
               if ( ! inputs.isFieldPresent(unfilteredFieldName) )
               {
                       filtered.add( unfiltered[i] );
@@ -949,7 +904,7 @@
              .append(q)
              .append("</option>");
          }
-      
+
          // do the input box
          sb.append("</select></span><input class=\"form-control\" type=\"text\" name=\"")
            .append(fieldName)
@@ -1041,7 +996,7 @@
       sb.append("</select></span></div><br/>");
       out.write(sb.toString());
     }
-    
+
     void doChoiceSelect(javax.servlet.jsp.JspWriter out, PageContext pageContext, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable, boolean required,
       boolean readonly, List valueList, String label, int collectionID)
@@ -1064,7 +1019,7 @@
     }
 
 
-    
+
     /** Display Checkboxes or Radio buttons, depending on if repeatable! **/
     void doList(javax.servlet.jsp.JspWriter out, Item item,
             String fieldName, String schema, String element, String qualifier, boolean repeatable,
@@ -1073,7 +1028,7 @@
           {
                 Metadatum[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
                 int valueCount = valueList.size();
-                
+
             StringBuffer sb = new StringBuffer();
             String display, value;
             int j;
@@ -1087,7 +1042,7 @@
 			sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">")
         	  .append(label)
         	  .append("</label>");
-     		
+
             sb.append("<div class=\"col-md-10\">");
 
             if(numColumns > 1)
@@ -1097,14 +1052,14 @@
 
             //flag that lets us know when we are in Column2
             boolean inColumn2 = false;
-            
+
             //loop through all values
             for (int i = 0; i < valueList.size(); i += 2)
             {
                    //get display value and actual value
 	               display = (String)valueList.get(i);
                    value = (String)valueList.get(i+1);
-         
+
                    boolean checked = false;
                    //check if this value has been selected previously
                    for (j = 0; j < defaults.length; j++)
@@ -1115,11 +1070,11 @@
                         	break;
                         }
 	               }
-           
+
                    // print input field
                    sb.append("<div class=\"input-group\"><span class=\"input-group-addon\">");
                    sb.append("<input type=\"");
-                   
+
                    //if repeatable, print a Checkbox, otherwise print Radio buttons
                    if(repeatable)
                       sb.append("checkbox");
@@ -1137,12 +1092,12 @@
                                  .append(value.replaceAll("\"", "&quot;"))
                                  .append("\">");
                    sb.append("</span>");
-                   
+
                    //print display name immediately after input
                    sb.append("<span class=\"form-control\">")
                      .append(display)
                      .append("</span></div>");
-                   
+
                            // if we are writing values in two columns,
                            // then start column 2 after half of the values
                    if((numColumns == 2) && (i+2 >= (valueList.size()/2)) && !inColumn2)
@@ -1152,11 +1107,11 @@
                         sb.append("<div class=\"row col-md-"+(12 / numColumns)+"\">");
                         inColumn2 = true;
                    }
-                   
+
             }//end for each value
 
             sb.append("</div></div></div><br/>");
-            
+
             out.write(sb.toString());
           }//end doList
 %>
@@ -1179,7 +1134,7 @@
     Integer pageNumStr =
         (Integer) request.getAttribute("submission.page");
     int pageNum = pageNumStr.intValue();
-    
+
     // for later use, determine whether we are in submit or workflow mode
     String scope = si.isInWorkflow() ? "workflow" : "submit";
 
@@ -1242,10 +1197,10 @@
      {
 %>
         <p><fmt:message key="jsp.submit.edit-metadata.info2"/></p>
-    
+
 <%
      }
- 
+
 	 int pageIdx = pageNum - 1;
      DCInput[] inputs = inputSet.getPageRows(pageIdx, si.getSubmissionItem().hasMultipleTitles(),
                                                 si.getSubmissionItem().isPublishedBefore() );
@@ -1274,16 +1229,16 @@
        String dcElement = inputs[z].getElement();
        String dcQualifier = inputs[z].getQualifier();
        String dcSchema = inputs[z].getSchema();
-       
+
        String fieldName;
        int fieldCountIncr;
        boolean repeatable;
        String vocabulary;
 	   boolean required;
-	   
+
        vocabulary = inputs[z].getVocabulary();
        required = inputs[z].isRequired();
-       
+
        if (dcQualifier != null && !dcQualifier.equals("*"))
           fieldName = dcSchema + "_" + dcElement + '_' + dcQualifier;
        else
@@ -1340,7 +1295,7 @@
        String inputType = inputs[z].getInputType();
        String label = inputs[z].getLabel();
        boolean closedVocabulary = inputs[z].isClosedVocabulary();
-       
+
        if (inputType.equals("name"))
        {
            doPersonalName(out, item, fieldName, dcSchema, dcElement, dcQualifier,
@@ -1380,7 +1335,7 @@
        else if (inputType.equals("twobox"))
        {
                         doTwoBox(out, item, fieldName, dcSchema, dcElement, dcQualifier,
-                                 repeatable, required, readonly, fieldCountIncr, label, pageContext, 
+                                 repeatable, required, readonly, fieldCountIncr, label, pageContext,
                                  vocabulary, closedVocabulary);
        }
        else if (inputType.equals("list"))
@@ -1394,10 +1349,10 @@
                                  repeatable, required, readonly, fieldCountIncr, label, pageContext, vocabulary,
                                  closedVocabulary, collectionID);
        }
-       
+
      } // end of 'for rows'
 %>
-        
+
 <%-- Hidden fields needed for SubmissionController servlet to know which item to deal with --%>
         <%= SubmissionController.getSubmissionParameters(context, request) %>
 <div class="row">
@@ -1414,7 +1369,7 @@
 				<input class="btn btn-primary col-md-6" type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.edit-metadata.next"/>"/>
     <%  }  %>
     		</div><br/>
-</div>    		
+</div>
     </form>
 
 </dspace:layout>
