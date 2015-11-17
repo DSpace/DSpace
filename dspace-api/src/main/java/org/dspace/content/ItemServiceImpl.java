@@ -27,6 +27,8 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.event.Event;
 import org.dspace.handle.service.HandleService;
+import org.dspace.harvest.HarvestedItem;
+import org.dspace.harvest.service.HarvestedItemService;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.IdentifierService;
 import org.dspace.versioning.service.VersioningService;
@@ -80,6 +82,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     protected IdentifierService identifierService;
     @Autowired(required = true)
     protected VersioningService versioningService;
+    @Autowired(required = true)
+    protected HarvestedItemService harvestedItemService;
 
     @Override
     public Thumbnail getThumbnail(Context context, Item item, boolean requireOriginal) throws SQLException {
@@ -592,6 +596,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         context.addEvent(new Event(Event.DELETE, Constants.ITEM, item.getID(),
                 item.getHandle(), getIdentifiers(context, item)));
+
+        HarvestedItem harvestedItem = harvestedItemService.find(context, item);
+        if(harvestedItem!=null){
+            harvestedItemService.delete(context,harvestedItem);
+        }
 
 
         log.info(LogManager.getHeader(context, "delete_item", "item_id="
