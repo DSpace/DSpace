@@ -383,6 +383,14 @@ public class OAIHarvester {
                 }
 				ourContext.dispatchEvents();
 			}
+            // If we got to this point, it means the harvest was completely successful
+            Date finishTime = new Date();
+            long timeTaken = finishTime.getTime() - startTime.getTime();
+            harvestRow.setHarvestStartTime(startTime);
+            harvestRow.setHarvestMessage("Harvest from " + oaiSource + " successful");
+            harvestRow.setHarvestStatus(HarvestedCollection.STATUS_READY);
+            log.info("Harvest from " + oaiSource + " successful. The process took " + timeTaken + " milliseconds.");
+            harvestedCollection.update(ourContext, harvestRow);
 		}
 		catch (HarvestingException hex) {
 			log.error("Harvesting error occurred while processing an OAI record: " + hex.getMessage());
@@ -404,20 +412,13 @@ public class OAIHarvester {
 			return;
 		}
 		finally {
+            // Make sure to complete ourContext so that the actual changes are persisted to the database
 			harvestedCollection.update(ourContext, harvestRow);
             ourContext.turnOffAuthorisationSystem();
 			collectionService.update(ourContext, targetCollection);
+            ourContext.complete();
 			ourContext.restoreAuthSystemState();
 		}
-
-		// If we got to this point, it means the harvest was completely successful
-		Date finishTime = new Date();
-		long timeTaken = finishTime.getTime() - startTime.getTime();
-		harvestRow.setHarvestStartTime(startTime);
-		harvestRow.setHarvestMessage("Harvest from " + oaiSource + " successful");
-		harvestRow.setHarvestStatus(HarvestedCollection.STATUS_READY);
-		log.info("Harvest from " + oaiSource + " successful. The process took " + timeTaken + " milliseconds.");
-		harvestedCollection.update(ourContext, harvestRow);
 	}
 
     /**
@@ -592,7 +593,7 @@ public class OAIHarvester {
 				itemService.addMetadata(ourContext, item, "dc", "description", "provenance", "en", provenanceMsg);
 
 		itemService.update(ourContext, item);
-		harvestedItemService.update(ourContext, hi);
+        harvestedItemService.update(ourContext, hi);
 		long timeTaken = new Date().getTime() - timeStart.getTime();
 		log.info("Item " + item.getHandle() + "(" + item.getID() + ")" + " has been ingested. The whole process took: " + timeTaken + " ms. ");
 
