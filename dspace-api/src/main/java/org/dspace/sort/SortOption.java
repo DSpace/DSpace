@@ -322,7 +322,21 @@ public class SortOption
         
         return null;
     }
-    
+    /**
+     * Get the number of sort option by it's name
+     * @param name
+     * @throws SortException
+     */
+    public static int getSortOptionNumber(String name) throws SortException {
+        for (SortOption option : SortOption.getSortOptions())
+        {
+            if (name.equals(option.getName()))
+            {
+                return option.getNumber();
+            }
+        }
+        return 0;
+    }
     /**
      * Get the default sort option - initially, just the first one defined.
      * @throws SortException

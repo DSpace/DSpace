@@ -7,23 +7,19 @@
  */
 package org.dspace.app.webui.components;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.app.webui.util.UIUtil;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.browse.*;
 import org.dspace.content.Collection;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.plugin.CollectionHomeProcessor;
 import org.dspace.plugin.PluginException;
-import org.dspace.browse.BrowseEngine;
-import org.dspace.browse.BrowseIndex;
-import org.dspace.browse.BrowseInfo;
-import org.dspace.browse.BrowserScope;
-import org.dspace.browse.BrowseException;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 
 /**
@@ -41,32 +37,25 @@ public class CollectionItemList implements CollectionHomeProcessor
     private static final int etal    = ConfigurationManager.getIntProperty("webui.browse.author-limit", -1);
     // the number of items to display per page
     private static final int perpage = ConfigurationManager.getIntProperty("webui.collectionhome.perpage", 20);
-    // whether does use "dateaccessioned" as a sort option
-    //   If true and the sort option "dateaccessioned" exists, use "dateaccessioned" as a sort option.
+    // whether does use "dateissued" as a sort option
+    //   If true and the sort option "dateissued" exists, use "dateissued" as a sort option.
     //   Otherwise use the sort option pertaining the specified browse index
-    private static boolean useDateaccessioned = ConfigurationManager.getBooleanProperty("webui.collectionhome.use.dateaccessioned", true);
-    // the number of sort option "dateaccessioned"
+    private static boolean useDateissued = ConfigurationManager.getBooleanProperty("webui.collectionhome.use.dateissued", true);
+    // the number of sort option "dateissued"
     private static int number = -1;
 
     static
     {
         if (name == null)
         {
-            name = "title";
+            name = "dateissued";
         }
-        
-        if (useDateaccessioned)
+
+        if (useDateissued)
         {
             try
             {
-                for (SortOption option : SortOption.getSortOptions())
-                {
-                    if ("dateaccessioned".equals(option.getName()))
-                    {
-                        number = option.getNumber();
-                        break;
-                    }
-                }
+                number = SortOption.getSortOptionNumber("dateissued");
             }
             catch (SortException e)
             {
