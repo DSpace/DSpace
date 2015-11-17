@@ -69,7 +69,7 @@ public class HierarchyResource extends Resource {
 		
         try {
             context = createContext(getUser(headers));
-            if (!ConfigurationManager.getBooleanProperty("rest", "rest-hierarchy-authenticate", false)) {
+            if (!ConfigurationManager.getBooleanProperty("rest", "rest-hierarchy-authenticate", true)) {
                 context.turnOffAuthorisationSystem();            	
             }
 
@@ -82,6 +82,7 @@ public class HierarchyResource extends Resource {
 
     		return repo;
         } catch (Exception e) {
+        	e.printStackTrace();
             log.error(e.getMessage());
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
 		} finally {
@@ -106,18 +107,18 @@ public class HierarchyResource extends Resource {
 		List<HierarchyCommunity> parentComms = new ArrayList<HierarchyCommunity>();
 		parent.setCommunities(parentComms);
 		for(Community comm: communities) {
-			HierarchyCommunity dgcomm = new HierarchyCommunity(""+comm.getID(), comm.getName(), comm.getHandle());
-			parentComms.add(dgcomm);
+			HierarchyCommunity mycomm = new HierarchyCommunity(comm.getID().toString(), comm.getName(), comm.getHandle());
+			parentComms.add(mycomm);
 			List<Collection> colls = comm.getCollections();
 			if (colls.size() > 0) {
 				List<HierarchyCollection> myColls = new ArrayList<HierarchyCollection>();
-				dgcomm.setCollections(myColls);
+				mycomm.setCollections(myColls);
 				for(Collection coll: colls) {
-					HierarchyCollection dgcoll = new HierarchyCollection(""+coll.getID(), coll.getName(), coll.getHandle());
-					myColls.add(dgcoll);
+					HierarchyCollection mycoll = new HierarchyCollection(coll.getID().toString(), coll.getName(), coll.getHandle());
+					myColls.add(mycoll);
 				}
 			}
-			processCommunity(dgcomm, comm.getSubcommunities());
+			processCommunity(mycomm, comm.getSubcommunities());
 		}		
 		
 	}
