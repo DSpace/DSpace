@@ -225,7 +225,7 @@ public class JournalUtils {
         String regex = null;
         try {
             Concept concept = getJournalConceptByShortID(context, journalCode);
-            AuthorityMetadataValue[] vals = concept.getMetadata("journal","manuscriptNumberIgnorePattern",null, Item.ANY);
+            AuthorityMetadataValue[] vals = concept.getMetadata("journal","canonicalManuscriptNumberPattern",null, Item.ANY);
             if(vals != null && vals.length > 0) {
                 regex = vals[0].getValue();
                 Matcher manuscriptMatcher = Pattern.compile(regex).matcher(canonicalID);
