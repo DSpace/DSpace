@@ -10,23 +10,18 @@ package org.dspace.app.webui.jsptag;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.app.itemmarking.ItemMarkingExtractor;
-import org.dspace.app.itemmarking.ItemMarkingInfo;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.browse.*;
-import org.dspace.content.Bitstream;
-import org.dspace.content.DCDate;
-import org.dspace.content.Metadatum;
-import org.dspace.content.Item;
-import org.dspace.content.Thumbnail;
+import org.dspace.content.*;
+import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
-import org.dspace.storage.bitstore.BitstreamStorageManager;
+import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
-import org.dspace.utils.DSpace;
+import org.dspace.storage.bitstore.BitstreamStorageManager;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -41,7 +36,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.StringTokenizer;
-import org.dspace.content.authority.MetadataAuthorityManager;
 
 /**
  * Tag for display a list of items
@@ -548,6 +542,7 @@ public class BrowseListTag extends TagSupport
                             		{
                             			argument = "vfocus";
                             		}
+                                    String sortParameters = "&amp;"+"sort_by=" + Integer.toString(SortOption.getSortOptionNumber("dateissued")) + "&amp;"+"order=DESC";
                             		startLink = "<a href=\"" + hrq.getContextPath() + "/browse?type=" + browseType[colIdx] + "&amp;" +
                                         argument + "=" + URLEncoder.encode(value,"UTF-8");
 
@@ -646,6 +641,8 @@ public class BrowseListTag extends TagSupport
         } catch (BrowseException e)
         {
         	throw new JspException(e);
+        } catch (SortException e) {
+            throw new JspException(e);
         }
 
         return SKIP_BODY;
