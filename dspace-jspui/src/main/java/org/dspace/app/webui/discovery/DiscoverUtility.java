@@ -7,32 +7,23 @@
  */
 package org.dspace.app.webui.discovery;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.discovery.DiscoverFacetField;
-import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.*;
 import org.dspace.discovery.DiscoverQuery.SORT_ORDER;
-import org.dspace.discovery.DiscoverResult;
-import org.dspace.discovery.SearchServiceException;
-import org.dspace.discovery.SearchUtils;
-import org.dspace.discovery.configuration.DiscoveryConfiguration;
-import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
-import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
-import org.dspace.discovery.configuration.DiscoverySortConfiguration;
-import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
+import org.dspace.discovery.configuration.*;
 import org.dspace.handle.HandleManager;
+
+import javax.servlet.http.HttpServletRequest;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DiscoverUtility
 {
@@ -658,18 +649,20 @@ public class DiscoverUtility
                     // add the already selected facet so to have a full
                     // top list
                     // if possible
-                    int limit = 0;
-                    if (type==TYPE_FACETS){
-                    	limit = facetLimit + 1 + alreadySelected;
+                    if (facet.getIndexFieldName().equals("author")) {
+                        queryArgs.addFacetField(new DiscoverFacetField(facet
+                                .getIndexFieldName(),
+                                DiscoveryConfigurationParameters.TYPE_TEXT,
+                                (facetPage + 1) * 3 * facetLimit + alreadySelected + 10, facet
+                                .getSortOrder(), 0));
+                    } else {
+                        queryArgs.addFacetField(new DiscoverFacetField(facet
+                                .getIndexFieldName(),
+                                DiscoveryConfigurationParameters.TYPE_TEXT,
+                                facetLimit + 1 + alreadySelected, facet
+                                .getSortOrder(), facetPage * facetLimit
+                        ));
                     }
-                    else 
-                    	limit = facetLimit;
-                    
-                    queryArgs.addFacetField(new DiscoverFacetField(facet
-                            .getIndexFieldName(),
-                            DiscoveryConfigurationParameters.TYPE_TEXT,
-                           limit, facet
-                                    .getSortOrder(), facetPage * facetLimit));
                 }
             }
         }
