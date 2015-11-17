@@ -111,9 +111,9 @@
                     <%-- End of dynamic browse indices --%>
                     <li class="divider"></li>
                     <li><a href="<%= request.getContextPath() %>/recent-items.jsp"><fmt:message key="jsp.collection-home.recentsub"/></a></li>
-                    <li><a href="<%= request.getContextPath() %>/top10items.jsp"><fmt:message key="jsp.top50items"/></a></li>
-                    <li><a href="<%= request.getContextPath() %>/top10authors.jsp"><fmt:message key="jsp.top10authors"/></a></li>
-                    <li><a href="<%= request.getContextPath() %>/faq.jsp"><fmt:message key="jsp.layout.navbar-default.faq"/></a></li>
+                    <li><a href="<%= request.getContextPath() %>/top-ranks/top10items.jsp"><fmt:message key="jsp.top50items"/></a></li>
+                    <li><a href="<%= request.getContextPath() %>/top-ranks/top10authors.jsp"><fmt:message key="jsp.top10authors"/></a></li>
+                    <li><a href="<%= request.getContextPath() %>/info-pages/faq.jsp"><fmt:message key="jsp.layout.navbar-default.faq"/></a></li>
                     <li><a href="<%= request.getContextPath() %>/stat/pubstat"><fmt:message key="jsp.layout.navbar-admin.statistics"/></a></li>
                 </ul>
             </li>

@@ -137,6 +137,7 @@ public class BrowseListTag extends TagSupport
 
     public int doStartTag() throws JspException
     {
+        String locale = UIUtil.getSessionLocale((HttpServletRequest) pageContext.getRequest()).toString();
         JspWriter out = pageContext.getOut();
         HttpServletRequest hrq = (HttpServletRequest) pageContext.getRequest();
 
@@ -511,6 +512,7 @@ public class BrowseListTag extends TagSupport
                         	int loopLimit = metadataArray.length;
                         	if (isAuthor[colIdx])
                         	{
+                                metadataArray = ua.edu.sumdu.essuir.cache.AuthorCache.getLocalizedAuthors(metadataArray, locale);
                         		int fieldMax = (authorLimit == -1 ? metadataArray.length : authorLimit);
                         		loopLimit = (fieldMax > metadataArray.length ? metadataArray.length : fieldMax);
                         		truncated = (fieldMax < metadataArray.length);
