@@ -232,7 +232,7 @@ public class JournalUtils {
                 if (manuscriptMatcher.find()) {
                     canonicalID = manuscriptMatcher.group(1);
                 } else {
-                    canonicalID = null;
+                    log.error("Manuscript " + manuscriptId + " does not match with the regex provided for " + journalCode);
                 }
             } else {
                 // there is no regex specified, just use the manuscript.
@@ -242,11 +242,6 @@ public class JournalUtils {
             log.error(e.getMessage(),e);
         }
         return canonicalID;
-    }
-
-    public static Boolean manuscriptIsValid(Context context, Manuscript manuscript) {
-        Boolean result = manuscript.isValid() && (getCanonicalManuscriptID(context, manuscript) != null);
-        return result;
     }
 
     public static String getFullName(Concept concept) {
@@ -380,7 +375,7 @@ public class JournalUtils {
     }
 
     public static String getDescription(Concept concept) {
-        AuthorityMetadataValue[] vals = concept.getMetadata("journal","description",null, Item.ANY);
+        AuthorityMetadataValue[] vals = concept.getMetadata("journal", "description", null, Item.ANY);
         if(vals != null && vals.length > 0)
             return vals[0].value;
 
@@ -388,7 +383,7 @@ public class JournalUtils {
     }
 
     public static String getMemberName(Concept concept) {
-        AuthorityMetadataValue[] vals = concept.getMetadata("journal","memberName",null, Item.ANY);
+        AuthorityMetadataValue[] vals = concept.getMetadata("journal", "memberName", null, Item.ANY);
         if(vals != null && vals.length > 0)
             return vals[0].value;
 
