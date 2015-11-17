@@ -10,23 +10,17 @@ package org.dspace.app.webui.jsptag;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.app.itemmarking.ItemMarkingExtractor;
-import org.dspace.app.itemmarking.ItemMarkingInfo;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.browse.*;
-import org.dspace.content.Bitstream;
-import org.dspace.content.DCDate;
-import org.dspace.content.Metadatum;
-import org.dspace.content.Item;
-import org.dspace.content.Thumbnail;
+import org.dspace.content.*;
+import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
-import org.dspace.storage.bitstore.BitstreamStorageManager;
 import org.dspace.sort.SortOption;
-import org.dspace.utils.DSpace;
+import org.dspace.storage.bitstore.BitstreamStorageManager;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -41,7 +35,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.StringTokenizer;
-import org.dspace.content.authority.MetadataAuthorityManager;
 
 /**
  * Tag for display a list of items
@@ -143,6 +136,7 @@ public class BrowseListTag extends TagSupport
 
     public int doStartTag() throws JspException
     {
+        String locale = UIUtil.getSessionLocale((HttpServletRequest) pageContext.getRequest()).toString();
         JspWriter out = pageContext.getOut();
         HttpServletRequest hrq = (HttpServletRequest) pageContext.getRequest();
 
@@ -517,6 +511,7 @@ public class BrowseListTag extends TagSupport
                         	int loopLimit = metadataArray.length;
                         	if (isAuthor[colIdx])
                         	{
+                                metadataArray = ua.edu.sumdu.essuir.cache.AuthorCache.getLocalizedAuthors(metadataArray, locale);
                         		int fieldMax = (authorLimit == -1 ? metadataArray.length : authorLimit);
                         		loopLimit = (fieldMax > metadataArray.length ? metadataArray.length : fieldMax);
                         		truncated = (fieldMax < metadataArray.length);

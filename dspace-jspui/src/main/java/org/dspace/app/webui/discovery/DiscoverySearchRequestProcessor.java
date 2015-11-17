@@ -7,24 +7,6 @@
  */
 package org.dspace.app.webui.discovery;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.bulkedit.DSpaceCSV;
@@ -37,15 +19,8 @@ import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.I18nUtil;
-import org.dspace.core.LogManager;
+import org.dspace.content.*;
+import org.dspace.core.*;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.SearchServiceException;
@@ -55,6 +30,20 @@ import org.dspace.discovery.configuration.DiscoverySearchFilter;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.w3c.dom.Document;
+import ua.edu.sumdu.essuir.cache.AuthorCache;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.SQLException;
+import java.util.*;
 
 public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
 {
@@ -149,6 +138,12 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
         {
             qResults = SearchUtils.getSearchService().search(context,
                     container, queryArgs);
+            String locale = UIUtil.getSessionLocale(request).toString();
+
+            int facetPage = UIUtil.getIntParameter(request, "author_page");
+            if (facetPage == -1)
+                facetPage = 0;
+            AuthorCache.makeLocalizedAuthors(qResults.getFacetResult("author"), locale, facetPage);
         }
         catch (SearchServiceException e)
         {
@@ -341,7 +336,14 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
         {
             qResults = SearchUtils.getSearchService().search(context, scope,
                     queryArgs);
-            
+            String locale = UIUtil.getSessionLocale(request).toString();
+
+            int facetPage = UIUtil.getIntParameter(request, "author_page");
+            if (facetPage == -1)
+                facetPage = 0;
+
+            AuthorCache.makeLocalizedAuthors(qResults.getFacetResult("author"), locale, facetPage);
+
             List<Community> resultsListComm = new ArrayList<Community>();
             List<Collection> resultsListColl = new ArrayList<Collection>();
             List<Item> resultsListItem = new ArrayList<Item>();
