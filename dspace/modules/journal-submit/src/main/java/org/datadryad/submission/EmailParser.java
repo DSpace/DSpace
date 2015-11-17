@@ -123,16 +123,6 @@ public class EmailParser {
             }
         }
 
-        // if article status says "in review", it's the same as a submission
-        if (dataForXML.get(ARTICLE_STATUS).equalsIgnoreCase("in review")) {
-            dataForXML.put(ARTICLE_STATUS,Manuscript.STATUS_SUBMITTED);
-        }
-
-        // if article status says "transferred", it's the same as a rejection
-        if (dataForXML.get(ARTICLE_STATUS).equalsIgnoreCase("transferred")) {
-            dataForXML.put(ARTICLE_STATUS,Manuscript.STATUS_REJECTED);
-        }
-
         // remove any unnecessary tags
         dataForXML.remove(UNNECESSARY);
 
@@ -180,7 +170,7 @@ public class EmailParser {
         manuscript.dryadDataDOI = null;
         manuscript.keywords.addAll(parseClassificationList((String) dataForXML.remove(CLASSIFICATION)));
         manuscript.manuscriptId = (String) dataForXML.remove(MANUSCRIPT);
-        manuscript.status = dataForXML.remove(ARTICLE_STATUS).toLowerCase();
+        manuscript.setStatus(dataForXML.remove(ARTICLE_STATUS).toLowerCase());
         manuscript.title = (String) dataForXML.remove(ARTICLE_TITLE);
         manuscript.publicationDOI = null;
         manuscript.publicationDate = null;

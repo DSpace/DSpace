@@ -640,21 +640,11 @@ public class JournalUtils {
             subjectKeywords.add(keyword);
         }
         pBean.setSubjectKeywords(subjectKeywords);
-        String ttext = manuscript.status;
 
-        pBean.setStatus(ttext);
-        if(ttext.equals("submitted") ||
-                ttext.equals("in review")   ||
-                ttext.equals("under review")  ||
-                ttext.equals("revision in review") ||
-                ttext.equals("revision under review")
-                ) {
+        pBean.setStatus(manuscript.getStatus());
+        if (manuscript.isSubmitted()) {
             pBean.setSkipReviewStep(false);
-        } else if(ttext.equals("accepted") ||
-                ttext.startsWith("reject") ||
-                ttext.equals("open reject") ||
-                ttext.equals("transferred") ||
-                ttext.equals("needs revision")) {
+        } else if (manuscript.isAccepted() || manuscript.isRejected()) {
             pBean.setSkipReviewStep(true);
         }
         return pBean;
