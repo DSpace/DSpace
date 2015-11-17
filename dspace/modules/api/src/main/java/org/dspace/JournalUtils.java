@@ -1,6 +1,7 @@
 package org.dspace;
 
 import org.apache.log4j.Logger;
+import org.apache.commons.lang.StringUtils;
 import org.datadryad.rest.converters.ManuscriptToLegacyXMLConverter;
 import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.models.Author;
@@ -702,37 +703,11 @@ public class JournalUtils {
         return journalCode.replaceAll("[^a-zA-Z0-9]", "").toUpperCase();
     }
 
-    /**
-     Levenshtein distance algorithm, borrowed from
-     http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance
-     **/
-    private static int computeLevenshteinDistance(CharSequence str1, CharSequence str2) {
-        int[][] distance = new int[str1.length() + 1][str2.length() + 1];
-
-        for (int i = 0; i <= str1.length(); i++)
-            distance[i][0] = i;
-        for (int j = 1; j <= str2.length(); j++)
-            distance[0][j] = j;
-
-        for (int i = 1; i <= str1.length(); i++)
-            for (int j = 1; j <= str2.length(); j++)
-                distance[i][j] = minimum(
-                        distance[i - 1][j] + 1,
-                        distance[i][j - 1] + 1,
-                        distance[i - 1][j - 1] + ((str1.charAt(i - 1) == str2.charAt(j - 1)) ? 0 : 1));
-
-        return distance[str1.length()][str2.length()];
-    }
-    /**
-     Computes a minimum between three integers.
-     **/
-    private static int minimum(int a, int b, int c) {
-        return Math.min(Math.min(a, b), c);
-    }
-
+    // getHamrScore compares two author names to each other.
+    // In practice, it seems that a score of 0.7 or higher generally indicates a good match.
     public static double getHamrScore(String name1, String name2) {
         int maxlen = Math.max(name1.length(), name2.length());
-        int editlen = computeLevenshteinDistance(name1, name2);
+        int editlen = StringUtils.getLevenshteinDistance(name1, name2);
 
         return (double)(maxlen-editlen)/(double)maxlen;
     }
