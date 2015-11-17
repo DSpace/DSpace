@@ -72,6 +72,23 @@
     border: 1px solid #c67605;
     color: #fff;
 }
+.tree li.parent_li>i:hover {
+    background-color: #df8505;
+    border: 1px solid #c67605;
+    color: #fff;
+}
+.tree li.parent_li>i:hover+ul li::after {
+    border-top-color: #f89406;
+}
+.tree li.parent_li>i:hover+ul li::before {
+    border-left-color: #f89406;
+}
+.tree li.parent_li>i:hover+ul li span {
+    background: #fddfb3;
+    border: 1px solid #faa937;
+    color: #000;
+}
+
 .tree li.parent_li>span:hover+ul li::after {
     border-top-color: #f89406;
 }
@@ -90,7 +107,9 @@
     border: 0;
 }
 
-
+.community-badge {
+    margin-left: 10px;
+}
 [class^="icon-"], [class*=" icon-"] {
     display: inline-block;
     width: 14px;

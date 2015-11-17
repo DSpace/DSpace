@@ -57,7 +57,7 @@
         out.println( "<li>" );
         Collection[] cols = (Collection[]) collectionMap.get(c.getID());
         if (cols != null && cols.length > 0) {
-            out.println("<span><i class=\"icon-minus-sign\" style = \"font-size:22px;\"></i></span>");
+            out.println("<span class=\"badge\"><i class=\"icon-minus-sign\" style = \"font-size:22px;\"></i></span>");
         }
         Bitstream logo = c.getLogo();
         if (showLogos && logo != null)
@@ -70,7 +70,7 @@
         	+ c.getHandle() + "\">" + c.getMetadata("name") + "</a>");
         if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
         {
-            out.println(" <span class=\"badge\">" + ic.getCount(c) + "</span>");
+            out.println("<div class=\"community-badge badge\">" + ic.getCount(c) + "</div>");
         }
 		if (StringUtils.isNotBlank(c.getMetadata("short_description")))
 		{
@@ -96,7 +96,7 @@
 
 				if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
                 {
-                    out.println(" <span class=\"badge\">" + ic.getCount(cols[j]) + "</span>");
+                    out.println("<div class=\"community-badge badge\">" + ic.getCount(cols[j]) + "</div>");
                 }
 				if (StringUtils.isNotBlank(cols[j].getMetadata("short_description")))
 				{
@@ -154,17 +154,17 @@
 
             $('.tree li.parent_li > .icon-plus-sign').on('click', function (e) {
                 var children = $(this).parent('li.parent_li').find(' > ul > li');
-                console.log("show");
                 children.show('fast');
                 $(this).attr('title', 'Collapse this branch').find(' > i').addClass('icon-minus-sign').removeClass('icon-plus-sign');
-            }
+                e.stopPropagation();
+            });
             $('.tree li.parent_li > .icon-minus-sign').on('click', function (e) {
                 var children = $(this).parent('li.parent_li').find(' > ul > li');
-                console.log("hide");
                 children.hide('fast');
                 $(this).attr('title', 'Expand this branch').find(' > i').addClass('icon-plus-sign').removeClass('icon-minus-sign');
-            }
-            e.stopPropagation();
+                e.stopPropagation();
+            });
+
 
         });
     </script>
