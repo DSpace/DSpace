@@ -142,7 +142,7 @@
         if (admin_button)  // admin edit button
         { %>
         <dspace:sidebar>
-            <div class="panel panel-warning">
+            <div class="panel panel-warning" style="position: fixed;">
             	<div class="panel-heading"><fmt:message key="jsp.admintools"/></div>
             	<div class="panel-body">
                 <form method="get" action="<%= request.getContextPath() %>/tools/edit-item">
