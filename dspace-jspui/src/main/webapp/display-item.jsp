@@ -257,11 +257,13 @@
        <fmt:message key="jsp.display-item.suggest"/></a>
 <%
         }
+    if (admin_button) {
 %>
     <a class="statisticsLink  btn btn-primary" href="<%= request.getContextPath() %>/handle/<%= handle %>/statistics"><fmt:message key="jsp.display-item.display-statistics"/></a>
 
     <%-- SFX Link --%>
 <%
+    }
     if (ConfigurationManager.getProperty("sfx.server.url") != null)
     {
         String sfximage = ConfigurationManager.getProperty("sfx.server.image_url");
