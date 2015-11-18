@@ -54,7 +54,11 @@
     		Map collectionMap, Map subcommunityMap) throws ItemCountException, IOException, SQLException
     {
 		boolean showLogos = ConfigurationManager.getBooleanProperty("jspui.community-list.logos", true);
-        out.println( "<li class=\"media well\">" );
+        out.println( "<li>" );
+        Collection[] cols = (Collection[]) collectionMap.get(c.getID());
+        if (cols != null && cols.length > 0) {
+            out.println("<span class=\"badge\"><i class=\"icon-minus-sign\" style = \"font-size:22px;\"></i></span>");
+        }
         Bitstream logo = c.getLogo();
         if (showLogos && logo != null)
         {
@@ -62,27 +66,25 @@
         		+ c.getHandle() + "\"><img class=\"media-object img-responsive\" src=\"" + 
         		request.getContextPath() + "/retrieve/" + logo.getID() + "\" alt=\"community logo\"></a>");
         }
-        out.println( "<div class=\"media-body\"><h4 class=\"media-heading\"><a href=\"" + request.getContextPath() + "/handle/" 
+        out.println( "<a href=\"" + request.getContextPath() + "/handle/"
         	+ c.getHandle() + "\">" + c.getMetadata("name") + "</a>");
         if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
         {
-            out.println(" <span class=\"badge\">" + ic.getCount(c) + "</span>");
+            out.println("<div class=\"community-badge badge\">" + ic.getCount(c) + "</div>");
         }
-		out.println("</h4>");
 		if (StringUtils.isNotBlank(c.getMetadata("short_description")))
 		{
 			out.println(c.getMetadata("short_description"));
 		}
-		out.println("<br>");
         // Get the collections in this community
-        Collection[] cols = (Collection[]) collectionMap.get(c.getID());
+
         if (cols != null && cols.length > 0)
         {
-            out.println("<ul class=\"media-list\">");
+            out.println("<ul>");
             for (int j = 0; j < cols.length; j++)
             {
-                out.println("<li class=\"media well\">");
-                
+                out.println("<li>");
+
                 Bitstream logoCol = cols[j].getLogo();
                 if (showLogos && logoCol != null)
                 {
@@ -90,17 +92,16 @@
                 		+ cols[j].getHandle() + "\"><img class=\"media-object img-responsive\" src=\"" + 
                 		request.getContextPath() + "/retrieve/" + logoCol.getID() + "\" alt=\"collection logo\"></a>");
                 }
-                out.println("<div class=\"media-body\"><h4 class=\"media-heading\"><a href=\"" + request.getContextPath() + "/handle/" + cols[j].getHandle() + "\">" + cols[j].getMetadata("name") +"</a>");
+                out.println("<a href=\"" + request.getContextPath() + "/handle/" + cols[j].getHandle() + "\">" + cols[j].getMetadata("name") +"</a>");
+
 				if(ConfigurationManager.getBooleanProperty("webui.strengths.show"))
                 {
-                    out.println(" [" + ic.getCount(cols[j]) + "]");
+                    out.println("<div class=\"community-badge badge\">" + ic.getCount(cols[j]) + "</div>");
                 }
-				out.println("</h4>");
 				if (StringUtils.isNotBlank(cols[j].getMetadata("short_description")))
 				{
 					out.println(cols[j].getMetadata("short_description"));
 				}
-				out.println("</div>");
                 out.println("</li>");
             }
             out.println("</ul>");
@@ -108,16 +109,15 @@
 
         // Get the sub-communities in this community
         Community[] comms = (Community[]) subcommunityMap.get(c.getID());
-        if (comms != null && comms.length > 0)
-        {
-            out.println("<ul class=\"media-list\">");
-            for (int k = 0; k < comms.length; k++)
-            {
-               showCommunity(comms[k], out, request, ic, collectionMap, subcommunityMap);
+
+        if (comms != null && comms.length > 0) {
+
+            out.println("<ul>");
+            for (int k = 0; k < comms.length; k++) {
+                showCommunity(comms[k], out, request, ic, collectionMap, subcommunityMap);
             }
-            out.println("</ul>"); 
+            out.println("</ul>");
         }
-        out.println("</div>");
         out.println("</li>");
     }
 %>
@@ -148,11 +148,31 @@
 %>
 	<h1><fmt:message key="jsp.community-list.title"/></h1>
 	<p><fmt:message key="jsp.community-list.text1"/></p>
+    <script>
+        $(function () {
+            $('.tree li:has(ul)').addClass('parent_li').find(' > span').attr('title', 'Collapse this branch');
 
+            $('.tree li.parent_li > .icon-plus-sign').on('click', function (e) {
+                var children = $(this).parent('li.parent_li').find(' > ul > li');
+                children.show('fast');
+                $(this).attr('title', 'Collapse this branch').find(' > i').addClass('icon-minus-sign').removeClass('icon-plus-sign');
+                e.stopPropagation();
+            });
+            $('.tree li.parent_li > .icon-minus-sign').on('click', function (e) {
+                var children = $(this).parent('li.parent_li').find(' > ul > li');
+                children.hide('fast');
+                $(this).attr('title', 'Expand this branch').find(' > i').addClass('icon-plus-sign').removeClass('icon-minus-sign');
+                e.stopPropagation();
+            });
+
+
+        });
+    </script>
 <% if (communities.length != 0)
 {
 %>
-    <ul class="media-list">
+    <div  class = "tree well">
+    <ul>
 <%
         for (int i = 0; i < communities.length; i++)
         {
@@ -160,7 +180,7 @@
         }
 %>
     </ul>
- 
+    </div>
 <% }
 %>
 </dspace:layout>
