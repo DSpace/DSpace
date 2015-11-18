@@ -389,7 +389,7 @@ public class DryadEmailSubmission extends HttpServlet {
                 // edit the manuscript ID to the canonical one:
                 manuscript.manuscriptId = JournalUtils.getCanonicalManuscriptID(context, manuscript);
 
-                JournalUtils.writeManuscriptToDB(context, manuscript);
+                //JournalUtils.writeManuscriptToDB(context, manuscript);
 
                 JournalUtils.writeManuscriptToXMLFile(context, manuscript);
             } else {
