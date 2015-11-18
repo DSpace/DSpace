@@ -194,12 +194,7 @@
 										<xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
 									</xsl:if>
 									<a>
-								<xsl:attribute name="href">
-									<xsl:copy-of select="$contextPath"/>
-									/browse?value=
-									<xsl:copy-of select="node()" />
-									&amp;type=author
-								</xsl:attribute>
+								<xsl:attribute name="href"><xsl:copy-of select="$contextPath"/>/browse?value=<xsl:copy-of select="node()" />&amp;type=author</xsl:attribute>
 								<xsl:copy-of select="node()" />
 								</a>
 
@@ -213,12 +208,8 @@
 						<xsl:when test="dim:field[@element='creator']">
 							<xsl:for-each select="dim:field[@element='creator']">
 								<a>
-								<xsl:attribute name="href">
-									<xsl:copy-of select="$contextPath"/>
-									/browse?value=
-									<xsl:copy-of select="node()" />
-									&amp;type=author
-								</xsl:attribute>
+								<xsl:attribute name="href"><xsl:copy-of select="$contextPath"/>/browse?value=<xsl:copy-of select="node()" />&amp;type=author</xsl:attribute>
+
 								<xsl:copy-of select="node()" />
 								</a>
 								<xsl:if
@@ -341,12 +332,7 @@
 					</dt>
 					<dd>
 						<a>
-							<xsl:attribute name="href">
-								<xsl:copy-of select="$contextPath"/>
-								/browse?value=
-								<xsl:value-of select="dim:field[@element='type'][not(@qualifier)][1]/node()" />
-								&amp;type=type
-							</xsl:attribute>
+							<xsl:attribute name="href"><xsl:copy-of select="$contextPath"/>/browse?value=<xsl:value-of select="dim:field[@element='type'][not(@qualifier)][1]/node()" />&amp;type=type</xsl:attribute>
 							<xsl:value-of select="dim:field[@element='type'][not(@qualifier)][1]/node()" />
 						</a>							
 					</dd>
@@ -414,12 +400,7 @@
 							<xsl:for-each
 								select="dim:field[@element='language'][@qualifier='iso']">
 								<a>
-									<xsl:attribute name="href">
-										<xsl:copy-of select="$contextPath"/>
-										/browse?value=
-										<xsl:copy-of select="isocodes:getLangForCode(node())" />
-										&amp;type=language
-									</xsl:attribute>
+									<xsl:attribute name="href"><xsl:copy-of select="$contextPath"/>/browse?value=<xsl:copy-of select="isocodes:getLangForCode(node())" />&amp;type=language</xsl:attribute>
 									<span class="language-iso-code"><xsl:copy-of select="isocodes:getLangForCode(node())" /></span>									
 								</a>
 								<xsl:if
@@ -531,12 +512,7 @@
 						<xsl:for-each
 							select="dim:field[@element='publisher' and not(@qualifier)]">
 							<a>
-								<xsl:attribute name="href">
-									<xsl:copy-of select="$contextPath"/>
-									/browse?value=
-									<xsl:copy-of select="./node()" />
-									&amp;type=publisher
-								</xsl:attribute>
+								<xsl:attribute name="href"><xsl:copy-of select="$contextPath"/>/browse?value=<xsl:copy-of select="./node()" />&amp;type=publisher</xsl:attribute>
 								<xsl:copy-of select="./node()" />									
 							</a>													
 							<xsl:if
@@ -626,12 +602,7 @@
 							select="dim:field[@element='subject' and not(@qualifier)]">
 							<span class="tag">
 								<a class="label label-primary">
-									<xsl:attribute name="href">
-										<xsl:copy-of select="$contextPath"/>
-										/browse?value=
-										<xsl:copy-of select="node()" />
-										&amp;type=subject
-									</xsl:attribute>
+									<xsl:attribute name="href"><xsl:copy-of select="$contextPath"/>/browse?value=<xsl:copy-of select="node()" />&amp;type=subject</xsl:attribute>
 									<xsl:copy-of select="node()" />
 								</a>
 							</span>														
@@ -656,10 +627,8 @@
 						<xsl:for-each select="$ufal-collection-references">
 							<span><a>
 							<xsl:variable name="collection" select="document(concat('cocoon:/',./@url))" />							
-							<xsl:attribute name="href">									
-									<xsl:value-of select="$collection/mets:METS/@OBJID" />									
-								</xsl:attribute>
-								<xsl:copy-of select="$collection/mets:METS/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='title'][1]" />
+							<xsl:attribute name="href"><xsl:value-of select="$collection/mets:METS/@OBJID" /></xsl:attribute>
+							<xsl:copy-of select="$collection/mets:METS/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='title'][1]" />
 							</a></span>
 							<xsl:if test="count(following-sibling::dri:reference) != 0">
 								<xsl:text>, </xsl:text>
@@ -706,8 +675,7 @@
 				<dl class="dl-horizontal">
 					<dt style="text-align: left">
 						<a class="btn btn-link" style="padding-left:0">
-						<xsl:attribute name="href"><xsl:value-of
-							select="$ds_item_view_toggle_url" /></xsl:attribute>
+							<xsl:attribute name="href"><xsl:value-of select="$ds_item_view_toggle_url" /></xsl:attribute>
 							<i18n:text>xmlui.ArtifactBrowser.ItemViewer.show_full</i18n:text>
 						</a>					
 					</dt>
@@ -861,8 +829,7 @@
 			<div class="thumbnail" style="margin-bottom: 10px;">
 				<a>
 					<xsl:attribute name="href">
-                        <xsl:value-of
-						select="mets:FLocat[@LOCTYPE='URL']/@xlink:href" />
+                        <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href" />
                     </xsl:attribute>
 					<xsl:choose>
 						<xsl:when test="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/mets:file[@GROUPID=current()/@GROUPID]">
@@ -917,8 +884,7 @@
 				</dl>
 				<a class="label label-info">
 					<xsl:attribute name="href">
-                        <xsl:value-of
-						select="mets:FLocat[@LOCTYPE='URL']/@xlink:href" />
+                        <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href" />
                     </xsl:attribute>				
                     <i class="fa fa-chevron-circle-down">&#160;</i>
                     <i18n:translate>
@@ -1048,10 +1014,7 @@
                                 <ul class="dropdown-menu" role="menu" aria-labelledby="export-dropdown">
                                         <li role="presentation">
                                                 <a role="menuitem" tabindex="-1" target="_blank">
-                                                        <xsl:attribute name="href">
-                                                        <xsl:value-of select="$reportURL" />
-                                                        <xsl:text disable-output-escaping="yes">&amp;format=XML</xsl:text>
-                                                        </xsl:attribute>
+                                                        <xsl:attribute name="href"><xsl:value-of select="$reportURL" /><xsl:text disable-output-escaping="yes">&amp;format=XML</xsl:text></xsl:attribute>
                                                         XML
                                                 </a>
                                         </li>
