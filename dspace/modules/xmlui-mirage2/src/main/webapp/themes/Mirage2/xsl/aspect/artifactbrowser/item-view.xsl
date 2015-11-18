@@ -470,7 +470,7 @@
         <div class="simple-item-view-date-available word-break item-page-field-wrapper table">
           <h5>Date Available</h5>
           <xsl:for-each select="dim:field[@element='date' and @qualifier='available']">
-            <xsl:copy-of select="./node()"/>
+            <xsl:copy-of select="substring(./node(), 1, 10)"/>
             <xsl:if test="count(following-sibling::dim:field[@element='date' and @qualifier='available']) != 0">
               <br/>
             </xsl:if>
@@ -612,7 +612,7 @@
                 </xsl:attribute>
 
                 <!-- DATASHARE code start -->
-                <td>
+                <td class="label-cell">
                   <xsl:variable name="label">
                     <xsl:text>xmlui.dri2xhtml.METS-1.0.item-</xsl:text>
                     <xsl:value-of select="./@element"/>
