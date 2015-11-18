@@ -7,6 +7,7 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.app.xmlui.wing.element.Item;
+import org.dspace.app.xmlui.utils.XSLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.core.ConfigurationManager;
@@ -270,7 +271,7 @@ public class OverviewStep extends AbstractStep {
     private boolean renderDatasetItem(boolean submissionNotFinished, List dataSetList, org.dspace.content.Item dataset, InProgressSubmission wsDataset) throws WingException, SQLException {
         Item dataItem = dataSetList.addItem();
 
-        String datasetTitle = wsDataset.getItem().getName();
+        String datasetTitle = XSLUtils.getShortFileName(wsDataset.getItem().getName(), 50);
         if(datasetTitle == null)
             datasetTitle = "Untitled";
 

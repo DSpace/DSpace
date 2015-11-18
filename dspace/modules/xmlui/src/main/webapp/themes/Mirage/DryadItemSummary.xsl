@@ -157,74 +157,36 @@
                     </p>
                     <div class="citation-sample">
                         <xsl:call-template name="make-author-string"/>
-                        <xsl:choose>
-                            <xsl:when test="$meta[@element='date'][@qualifier='issued']">
-                                <xsl:value-of select="$meta[@element='date'][@qualifier='issued']"/>
-                            </xsl:when>
-                            <xsl:when test="$meta[@element='dateIssued'][@qualifier='package']">
-                                <xsl:value-of
-                                        select="$meta[@element='dateIssued'][@qualifier='package']"/>
-                            </xsl:when>
-                        </xsl:choose>
-                        <xsl:text> </xsl:text>
-                        <xsl:variable name="title"
-                                      select="$meta[@element='title'][@qualifier='package']"/>
-                        <xsl:value-of select="$title"/>
-                        <span>
-                            <i18n:text>xmlui.DryadItemSummary.dryadRepo</i18n:text>
-                        </span>
-                        <!-- if Item not_archived don't add the link. -->
-                        <xsl:variable name="id" select="$meta[@element='identifier'][@qualifier='package']"/>
-			<xsl:text> </xsl:text>
-                        <xsl:choose>
-                            <xsl:when
-                                    test="not(/mets:METS/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@mdschema='dc'][@element='date' ][@qualifier='accessioned'])">
+                        <xsl:call-template name="package-citation">
+                            <xsl:with-param name="package_doi">
+                                <xsl:variable name="id" select="$meta[@element='identifier'][@qualifier='package']"/>
                                 <xsl:choose>
                                     <xsl:when test="starts-with($id, 'doi')">
-                                        <xsl:value-of  select="concat('http://dx.doi.org/', substring-after($id, 'doi:'))"/>
+                                        <xsl:value-of
+                                                select="concat('http://dx.doi.org/', substring-after($id, 'doi:'))"/>
                                     </xsl:when>
                                     <xsl:when test="starts-with($id,'http://dx.doi')">
-                                      <xsl:value-of select="$id"/>
+                                        <xsl:value-of select="$id"/>
                                     </xsl:when>
                                     <xsl:otherwise>
                                         <xsl:value-of select="concat('http://hdl.handle.net/', $id)"/>
                                     </xsl:otherwise>
                                 </xsl:choose>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <a>
-                                    <!-- link -->
-                                    <xsl:attribute name="href">
-                                        <xsl:choose>
-                                            <xsl:when test="starts-with($id, 'doi')">
-                                                <xsl:value-of
-                                                        select="concat('http://dx.doi.org/', substring-after($id, 'doi:'))"/>
-                                            </xsl:when>
-                                            <xsl:when test="starts-with($id,'http://dx.doi')">
-                                               <xsl:value-of select="$id"/>
-                                             </xsl:when>
-                                            <xsl:otherwise>
-                                                <xsl:value-of select="concat('http://hdl.handle.net/', $id)"/>
-                                            </xsl:otherwise>
-                                        </xsl:choose>
-                                    </xsl:attribute>
 
-                                    <!-- text -->
-                                    <xsl:choose>
-                                        <xsl:when test="starts-with($id, 'doi')">
-                                            <xsl:value-of 
-                                                        select="concat('http://dx.doi.org/', substring-after($id, 'doi:'))"/>
-                                        </xsl:when>
-                                        <xsl:when test="starts-with($id,'http://dx.doi')">
-                                           <xsl:value-of select="$id"/>
-                                         </xsl:when>
-                                        <xsl:otherwise>
-                                            <xsl:value-of select="concat('http://hdl.handle.net/', $id)"/>
-                                        </xsl:otherwise>
-                                    </xsl:choose>
-                                </a>
-                            </xsl:otherwise>
-                        </xsl:choose>
+                            </xsl:with-param>
+                            <xsl:with-param name="date">
+                                <xsl:choose>
+                                    <xsl:when test="$meta[@element='date'][@qualifier='issued']">
+                                        <xsl:value-of select="$meta[@element='date'][@qualifier='issued']"/>
+                                    </xsl:when>
+                                    <xsl:when test="$meta[@element='dateIssued'][@qualifier='package']">
+                                        <xsl:value-of select="$meta[@element='dateIssued'][@qualifier='package']"/>
+                                    </xsl:when>
+                                </xsl:choose>
+                            </xsl:with-param>
+                            <xsl:with-param name="title" select="$meta[@element='title'][@qualifier='package']"/>
+                            <xsl:with-param name="date_accessioned" select="/mets:METS/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@mdschema='dc'][@element='date' ][@qualifier='accessioned']"/>
+                        </xsl:call-template>
                     </div>
                     <!-- only show citation/share if viewing from page with real handle (not in process) -->
                     <xsl:if
@@ -437,85 +399,26 @@
                         </p>
                         <div class="citation-sample">
                             <xsl:call-template name="make-author-string"/>
-                            <xsl:choose>
-                                <xsl:when test=".//dim:field[@element='date'][@qualifier='issued']">
-                                    <xsl:text> </xsl:text>
-                                    <xsl:value-of
-                                            select="concat('(', substring(.//dim:field[@element='date'][@qualifier='issued'], 1, 4), ') ')"/>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <xsl:text>. </xsl:text>
-                                </xsl:otherwise>
-                            </xsl:choose>
-                            <xsl:choose>
-                                <xsl:when test="not(.//dim:field[@element='title'])">
-                                    <xsl:text> </xsl:text>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <xsl:variable name="title"
-                                                  select=".//dim:field[@element='title']/node()"/>
-                                    <xsl:if test="not(starts-with($title, 'Data from: '))">
-                                        <i18n:text>xmlui.DryadItemSummary.dataFrom</i18n:text>
-                                    </xsl:if>
-                                    <xsl:value-of select="$title"/>
-                                    <xsl:variable name="titleEndChar"
-                                                  select="substring($title, string-length($title), 1)"/>
+                            <xsl:call-template name="package-citation">
+                                <xsl:with-param name="date" select=".//dim:field[@element='date'][@qualifier='issued']"/>
+                                <xsl:with-param name="title" select=".//dim:field[@element='title']"/>
+                                <xsl:with-param name="date_accessioned" select="/mets:METS/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@mdschema='dc'][@element='date' ][@qualifier='accessioned']"/>
+                                <xsl:with-param name="package_doi">
                                     <xsl:choose>
-                                        <xsl:when test="$titleEndChar != '.' and $titleEndChar != '?'">
-                                            <xsl:text>. </xsl:text>
+                                        <xsl:when test="$my_doi">
+                                            <xsl:value-of
+                                                    select="concat('http://dx.doi.org/', substring-after($my_doi, 'doi:'))"/>
+                                        </xsl:when>
+                                        <xsl:when test="$my_full_doi">
+                                            <xsl:value-of select="$my_full_doi"/>
                                         </xsl:when>
                                         <xsl:otherwise>
-                                            <xsl:text>&#160;</xsl:text>
+                                            <xsl:value-of select="$my_uri"/>
                                         </xsl:otherwise>
                                     </xsl:choose>
-                                </xsl:otherwise>
-                            </xsl:choose>
-                            <span>
-                                <i18n:text>xmlui.DryadItemSummary.dryadRepo</i18n:text>
-                            </span>
-
-                            <!-- if Item not_archived don't add the link. -->
-                            <xsl:choose>
-                                <xsl:when
-                                        test="not(/mets:METS/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@mdschema='dc'][@element='date' ][@qualifier='accessioned'])">
-                                    <xsl:value-of select="$my_doi"/>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <a>
-                                        <!-- href -->
-                                        <xsl:attribute name="href">
-                                            <xsl:choose>
-                                                <xsl:when test="$my_doi">
-                                                    <xsl:value-of
-                                                            select="concat('http://dx.doi.org/', substring-after($my_doi, 'doi:'))"/>
-                                                </xsl:when>
-                                                <xsl:when test="$my_full_doi">
-                                                  <xsl:value-of select="$my_full_doi"/>
-                                                </xsl:when>
-                                                <xsl:otherwise>
-                                                    <xsl:value-of select="$my_uri"/>
-                                                </xsl:otherwise>
-                                            </xsl:choose>
-                                        </xsl:attribute>
-
-                                        <!-- text -->
-                                        <xsl:choose>
-                                            <xsl:when test="$my_doi">
-                                                <xsl:value-of
-                                                            select="concat('http://dx.doi.org/', substring-after($my_doi, 'doi:'))"/>
-                                            </xsl:when>
-                                           <xsl:when test="$my_full_doi">
-                                              <xsl:value-of select="$my_full_doi"/>
-                                            </xsl:when>
-                                            <xsl:otherwise>
-                                                <xsl:value-of select="$my_uri"/>
-                                            </xsl:otherwise>
-                                        </xsl:choose>
-
-                                    </a>
-                                </xsl:otherwise>
-                            </xsl:choose>
-                        </div>
+                                </xsl:with-param>
+                            </xsl:call-template>
+                       </div>
                     </xsl:if>
                     <!-- only show citation/share if viewing from page with real handle (not in process) -->
                     <xsl:if
@@ -1332,6 +1235,73 @@
               (DSpace deposit license hidden by default) -->
         <xsl:apply-templates select="mets:fileSec/mets:fileGrp[@USE='CC-LICENSE']"/>
 
+    </xsl:template>
+
+    <xsl:template name="package-citation">
+        <xsl:param name="date"/>
+        <xsl:param name="title"/>
+        <xsl:param name="date_accessioned"/>
+        <xsl:param name="package_doi"/>
+
+        <xsl:choose>
+            <xsl:when test="string-length($date) > 0">
+                <xsl:text> </xsl:text>
+                <xsl:choose>
+                    <xsl:when test="not(starts-with($date, '('))">
+                        <xsl:value-of select="concat('(', substring($date, 1, 4), ')')"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="$date"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+                <xsl:text> </xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:text>. </xsl:text>
+            </xsl:otherwise>
+        </xsl:choose>
+        <xsl:choose>
+            <xsl:when test="not($title)">
+                <xsl:text> </xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:if test="not(starts-with($title, 'Data from: '))">
+                    <i18n:text>xmlui.DryadItemSummary.dataFrom</i18n:text>
+                </xsl:if>
+                <xsl:variable name="clean-title" select="normalize-space($title)"/>
+                <xsl:value-of select="$clean-title"/>
+                <xsl:variable name="titleEndChar" select="substring($clean-title, string-length($clean-title), 1)"/>
+                <xsl:choose>
+                    <xsl:when test="$titleEndChar != '.' and $titleEndChar != '?'">
+                        <xsl:text>. </xsl:text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:text> </xsl:text>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:otherwise>
+        </xsl:choose>
+        <span>
+            <i18n:text>xmlui.DryadItemSummary.dryadRepo</i18n:text>
+        </span>
+
+        <!-- if Item not_archived don't add the link. -->
+        <xsl:choose>
+            <xsl:when test="not($date_accessioned)">
+                <xsl:value-of select="$package_doi"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <a>
+                    <!-- href -->
+                    <xsl:attribute name="href">
+                        <xsl:value-of select="$package_doi"/>
+                    </xsl:attribute>
+
+                    <!-- text -->
+                    <xsl:value-of select="$package_doi"/>
+                </a>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
     <!-- this generates the linked journal image - should find a way to drive this from the DryadJournalSubmission.properties file -->
