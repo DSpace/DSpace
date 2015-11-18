@@ -10,6 +10,8 @@ package org.dspace.rest;
 
 
 import org.apache.log4j.Logger;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Site;
@@ -43,6 +45,7 @@ public class HierarchyResource extends Resource {
     private static Logger log = Logger.getLogger(HierarchyResource.class);
     protected SiteService siteService = ContentServiceFactory.getInstance().getSiteService();
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
     /**
     * @param headers
@@ -69,7 +72,7 @@ public class HierarchyResource extends Resource {
 		
         try {
             context = createContext(getUser(headers));
-            if (!ConfigurationManager.getBooleanProperty("rest", "rest-hierarchy-authenticate", true)) {
+            if (ConfigurationManager.getBooleanProperty("rest", "rest-hierarchy-authenticate", true) == false) {
                 context.turnOffAuthorisationSystem();            	
             }
 
@@ -78,7 +81,7 @@ public class HierarchyResource extends Resource {
             repo.setName("Repository");
             repo.setHandle(site.getHandle());
     		List<Community> dspaceCommunities = communityService.findAllTop(context);
-    		processCommunity(repo, dspaceCommunities);
+    		processCommunity(context, repo, dspaceCommunities);
 
     		return repo;
         } catch (Exception e) {
@@ -97,7 +100,7 @@ public class HierarchyResource extends Resource {
     }
     
 	
-	private void processCommunity(HierarchyCommunity parent, List<Community> communities) throws SQLException {
+	private void processCommunity(org.dspace.core.Context context, HierarchyCommunity parent, List<Community> communities) throws SQLException {
 		if (communities == null){
 			return;
 		}
@@ -107,6 +110,9 @@ public class HierarchyResource extends Resource {
 		List<HierarchyCommunity> parentComms = new ArrayList<HierarchyCommunity>();
 		parent.setCommunities(parentComms);
 		for(Community comm: communities) {
+			if (!authorizeService.authorizeActionBoolean(context, comm, org.dspace.core.Constants.READ)) {
+				continue;
+			}
 			HierarchyCommunity mycomm = new HierarchyCommunity(comm.getID().toString(), comm.getName(), comm.getHandle());
 			parentComms.add(mycomm);
 			List<Collection> colls = comm.getCollections();
@@ -114,11 +120,14 @@ public class HierarchyResource extends Resource {
 				List<HierarchyCollection> myColls = new ArrayList<HierarchyCollection>();
 				mycomm.setCollections(myColls);
 				for(Collection coll: colls) {
+					if (!authorizeService.authorizeActionBoolean(context, coll, org.dspace.core.Constants.READ)) {
+						continue;
+					}
 					HierarchyCollection mycoll = new HierarchyCollection(coll.getID().toString(), coll.getName(), coll.getHandle());
 					myColls.add(mycoll);
 				}
 			}
-			processCommunity(mycomm, comm.getSubcommunities());
+			processCommunity(context, mycomm, comm.getSubcommunities());
 		}		
 		
 	}
