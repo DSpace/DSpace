@@ -90,7 +90,7 @@
 					{
 						String type = typesLocale.get(typeLocale);
 						String query = "";
-						java.util.StringTokenizer tokens = new java.util.StringTokenizer(type);
+						java.util.StringTokenizer tokens = new java.util.StringTokenizer(typeLocale);
 
 						while (tokens.hasMoreTokens()) {
 							query += "+" + tokens.nextToken();
