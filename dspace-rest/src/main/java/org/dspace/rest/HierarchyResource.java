@@ -40,6 +40,7 @@ import java.util.List;
  * @author Terry Brady, Georgetown University
  */
 @Path("/hierarchy")
+@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 public class HierarchyResource extends Resource {
     private static Logger log = Logger.getLogger(HierarchyResource.class);
     protected SiteService siteService = ContentServiceFactory.getInstance().getSiteService();
