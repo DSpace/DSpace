@@ -40,25 +40,21 @@ import org.dspace.core.Context;
 public class MetadataFieldRegistryServlet extends DSpaceServlet
 {
     /** Logger */
-    private static Logger log = Logger.getLogger(MetadataFieldRegistryServlet.class);
-    private String clazz = "org.dspace.app.webui.servlet.admin.MetadataFieldRegistryServlet";
-    
-    private MetadataFieldService fieldService;
-    
-    private MetadataSchemaService schemaService;
-    
-    @Override
-    public void init() throws ServletException {
-    	super.init();
-    	fieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
-    	schemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
-    }
+    private static final Logger log = Logger.getLogger(MetadataFieldRegistryServlet.class);
+    private static final String clazz = "org.dspace.app.webui.servlet.admin.MetadataFieldRegistryServlet";
+
+    private final transient MetadataFieldService fieldService
+             = ContentServiceFactory.getInstance().getMetadataFieldService();
+
+    private final transient MetadataSchemaService schemaService
+             = ContentServiceFactory.getInstance().getMetadataSchemaService();
 
     /**
      * @see org.dspace.app.webui.servlet.DSpaceServlet#doDSGet(org.dspace.core.Context,
      *      javax.servlet.http.HttpServletRequest,
      *      javax.servlet.http.HttpServletResponse)
      */
+    @Override
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -73,6 +69,7 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
      *      javax.servlet.http.HttpServletRequest,
      *      javax.servlet.http.HttpServletResponse)
      */
+    @Override
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException

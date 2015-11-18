@@ -47,26 +47,22 @@ import org.dspace.eperson.service.GroupService;
  */
 public class EPersonAdminServlet extends DSpaceServlet
 {
-	private EPersonService personService;
+	private final transient EPersonService personService
+             = EPersonServiceFactory.getInstance().getEPersonService();
 	
-	private GroupService groupService;
+	private final transient GroupService groupService
+             = EPersonServiceFactory.getInstance().getGroupService();
 	
-	private AuthenticationService authenticationService;
+	private final transient AuthenticationService authenticationService
+             = AuthenticateServiceFactory.getInstance().getAuthenticationService();
 	
-	private AccountService accountService;
-	
-	@Override
-	public void init() throws ServletException {
-		super.init();
-		personService = EPersonServiceFactory.getInstance().getEPersonService();
-		groupService = EPersonServiceFactory.getInstance().getGroupService();
-		authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
-		accountService = EPersonServiceFactory.getInstance().getAccountService();
-	}
+	private final transient AccountService accountService
+             = EPersonServiceFactory.getInstance().getAccountService();
 	
     /** Logger */
-    private static Logger log = Logger.getLogger(EPersonAdminServlet.class);
+    private static final Logger log = Logger.getLogger(EPersonAdminServlet.class);
     
+    @Override
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -74,6 +70,7 @@ public class EPersonAdminServlet extends DSpaceServlet
         showMain(context, request, response);
     }
 
+    @Override
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -321,7 +318,7 @@ public class EPersonAdminServlet extends DSpaceServlet
             // Check the EPerson exists
             if (e == null)
             {
-                request.setAttribute("no_eperson_selected", new Boolean(true));
+                request.setAttribute("no_eperson_selected", Boolean.TRUE);
                 showMain(context, request, response);
             }
             // Only super administrators can login as someone else.

@@ -48,14 +48,10 @@ public class BitstreamFormatRegistry extends DSpaceServlet
     /** User wants to create a new format */
     public static final int CREATE = 4;
 
-    private BitstreamFormatService bitstreamFormatService;
+    private final transient BitstreamFormatService bitstreamFormatService
+             = ContentServiceFactory.getInstance().getBitstreamFormatService();
     
     @Override
-    public void init() throws ServletException {
-    	super.init();
-    	bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
-    }
-    
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -64,6 +60,7 @@ public class BitstreamFormatRegistry extends DSpaceServlet
         showFormats(context, request, response);
     }
 
+    @Override
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -86,7 +83,7 @@ public class BitstreamFormatRegistry extends DSpaceServlet
                     && request.getParameter("internal").equals("true"));
 
             // Separate comma-separated extensions
-            List<String> extensions = new LinkedList<String>();
+            List<String> extensions = new LinkedList<>();
             String extParam = request.getParameter("extensions");
 
             while (extParam.length() > 0)

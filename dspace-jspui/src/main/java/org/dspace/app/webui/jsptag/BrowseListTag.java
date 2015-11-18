@@ -57,10 +57,10 @@ import org.dspace.sort.SortOption;
 public class BrowseListTag extends TagSupport
 {
 	 /** log4j category */
-    private static Logger log = Logger.getLogger(BrowseListTag.class);
+    private static final Logger log = Logger.getLogger(BrowseListTag.class);
 
     /** Items to display */
-    private transient List<Item> items;
+    private List<Item> items;
 
     /** Row to highlight, -1 for no row */
     private int highlightRow = -1;
@@ -105,11 +105,14 @@ public class BrowseListTag extends TagSupport
 
     private static final long serialVersionUID = 8091584920304256107L;
     
-    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-    
-    private MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
+    transient private final ItemService itemService
+            = ContentServiceFactory.getInstance().getItemService();
 
-    private BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    transient private final MetadataAuthorityService metadataAuthorityService
+            = ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
+
+    transient private final BitstreamService bitstreamService
+            = ContentServiceFactory.getInstance().getBitstreamService();
 
     static
     {
@@ -152,6 +155,7 @@ public class BrowseListTag extends TagSupport
         super();
     }
 
+    @Override
     public int doStartTag() throws JspException
     {
         JspWriter out = pageContext.getOut();
@@ -477,7 +481,7 @@ public class BrowseListTag extends TagSupport
                     // save on a null check which would make the code untidy
                     if (metadataArray == null)
                     {
-                    	metadataArray = new ArrayList<MetadataValue>();
+                    	metadataArray = new ArrayList<>();
                     }
 
                     // now prepare the content of the table division
@@ -758,6 +762,7 @@ public class BrowseListTag extends TagSupport
         emphColumn = emphColumnIn;
     }
 
+    @Override
     public void release()
     {
         highlightRow = -1;
@@ -885,12 +890,12 @@ public class BrowseListTag extends TagSupport
         		Bitstream original = thumbnail.getOriginal();
         		String link = hrq.getContextPath() + "/bitstream/" + item.getHandle() + "/" + original.getSequenceID() + "/" +
         						UIUtil.encodeBitstreamName(original.getName(), Constants.DEFAULT_ENCODING);
-        		thumbFrag.append("<a target=\"_blank\" href=\"" + link + "\" />");
+        		thumbFrag.append("<a target=\"_blank\" href=\"").append(link).append("\" />");
         	}
         	else
         	{
         		String link = hrq.getContextPath() + "/handle/" + item.getHandle();
-        		thumbFrag.append("<a href=\"" + link + "\" />");
+        		thumbFrag.append("<a href=\"").append(link).append("\" />");
         	}
 
         	Bitstream thumb = thumbnail.getThumb();

@@ -38,17 +38,13 @@ import org.dspace.eperson.service.GroupService;
  */
 public class GroupEditServlet extends DSpaceServlet
 {
-	private GroupService groupService;
+	private final transient GroupService groupService
+             = EPersonServiceFactory.getInstance().getGroupService();
+
+	private final transient EPersonService personService
+             = EPersonServiceFactory.getInstance().getEPersonService();
 	
-	private EPersonService personService;
-	
-	@Override
-	public void init() throws ServletException {
-		super.init();
-		groupService = EPersonServiceFactory.getInstance().getGroupService();
-		personService = EPersonServiceFactory.getInstance().getEPersonService();
-	}
-	
+    @Override
     protected void doDSGet(Context c, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -56,6 +52,7 @@ public class GroupEditServlet extends DSpaceServlet
         doDSPost(c, request, response);
     }
 
+    @Override
     protected void doDSPost(Context c, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -116,8 +113,8 @@ public class GroupEditServlet extends DSpaceServlet
                 {
                     // some epeople were listed, now make group's epeople match
                     // given epeople
-                    Set<UUID> memberSet = new HashSet<UUID>();
-                    Set<UUID> epersonIDSet = new HashSet<UUID>();
+                    Set<UUID> memberSet = new HashSet<>();
+                    Set<UUID> epersonIDSet = new HashSet<>();
 
                     // add all members to a set
                     for (EPerson m :  members)
@@ -164,8 +161,8 @@ public class GroupEditServlet extends DSpaceServlet
                 {
                     // some groups were listed, now make group's member groups
                     // match given group IDs
-                    Set<UUID> memberSet = new HashSet<UUID>();
-                    Set<UUID> groupIDSet = new HashSet<UUID>();
+                    Set<UUID> memberSet = new HashSet<>();
+                    Set<UUID> groupIDSet = new HashSet<>();
 
                     // add all members to a set
                     for (Group g : membergroups)

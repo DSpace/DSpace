@@ -44,7 +44,6 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
-import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -96,40 +95,33 @@ public class CollectionWizardServlet extends DSpaceServlet
     public static final int PERM_ADMIN = 15;
 
     /** Logger */
-    private static Logger log = Logger.getLogger(CollectionWizardServlet.class);
+    private static final Logger log = Logger.getLogger(CollectionWizardServlet.class);
 
-    private CollectionService collectionService;
+    private final transient CollectionService collectionService
+             = ContentServiceFactory.getInstance().getCollectionService();
     
-    private CommunityService communityService;
+    private final transient CommunityService communityService
+             = ContentServiceFactory.getInstance().getCommunityService();
     
-    private ItemService itemService;
+    private final transient ItemService itemService
+             = ContentServiceFactory.getInstance().getItemService();
     
-    private GroupService groupService;
+    private final transient GroupService groupService
+             = EPersonServiceFactory.getInstance().getGroupService();
     
-    private EPersonService personService;
+    private final transient EPersonService personService
+             = EPersonServiceFactory.getInstance().getEPersonService();
     
-    private BitstreamService bitstreamService;
+    private final transient BitstreamService bitstreamService
+             = ContentServiceFactory.getInstance().getBitstreamService();
     
-	private BitstreamFormatService bitstreamFormatService;
+	private final transient BitstreamFormatService bitstreamFormatService
+             = ContentServiceFactory.getInstance().getBitstreamFormatService();
 	
-	private MetadataFieldService metadataFieldService;
-	
-	private MetadataSchemaService metadataSchemaService;
+	private final transient MetadataFieldService metadataFieldService
+             = ContentServiceFactory.getInstance().getMetadataFieldService();
     
     @Override
-    public void init() throws ServletException {
-    	super.init();
-    	collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    	communityService = ContentServiceFactory.getInstance().getCommunityService();
-    	itemService = ContentServiceFactory.getInstance().getItemService();
-    	bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
-    	bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
-    	groupService = EPersonServiceFactory.getInstance().getGroupService();
-    	personService = EPersonServiceFactory.getInstance().getEPersonService();
-    	metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
-    	metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
-    }
-    
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -141,6 +133,7 @@ public class CollectionWizardServlet extends DSpaceServlet
         doDSPost(context, request, response);
     }
 
+    @Override
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -664,7 +657,7 @@ public class CollectionWizardServlet extends DSpaceServlet
             // be an anonymous one.
             if (anonReadPols.size() == 0)
             {
-                request.setAttribute("permission", Integer.valueOf(PERM_READ));
+                request.setAttribute("permission", PERM_READ);
                 JSPManager.showJSP(request, response,
                         "/dspace-admin/wizard-permissions.jsp");
 
@@ -677,7 +670,7 @@ public class CollectionWizardServlet extends DSpaceServlet
             // defined
             if (collection.getSubmitters() != null)
             {
-                request.setAttribute("permission", Integer.valueOf(PERM_SUBMIT));
+                request.setAttribute("permission", PERM_SUBMIT);
                 JSPManager.showJSP(request, response,
                         "/dspace-admin/wizard-permissions.jsp");
 
@@ -690,7 +683,7 @@ public class CollectionWizardServlet extends DSpaceServlet
             // defined
             if (collection.getWorkflowStep1() != null)
             {
-                request.setAttribute("permission", Integer.valueOf(PERM_WF1));
+                request.setAttribute("permission", PERM_WF1);
                 JSPManager.showJSP(request, response,
                         "/dspace-admin/wizard-permissions.jsp");
 
@@ -703,7 +696,7 @@ public class CollectionWizardServlet extends DSpaceServlet
             // defined
             if (collection.getWorkflowStep2() != null)
             {
-                request.setAttribute("permission", Integer.valueOf(PERM_WF2));
+                request.setAttribute("permission", PERM_WF2);
                 JSPManager.showJSP(request, response,
                         "/dspace-admin/wizard-permissions.jsp");
 
@@ -716,7 +709,7 @@ public class CollectionWizardServlet extends DSpaceServlet
             // defined
             if (collection.getWorkflowStep3() != null)
             {
-                request.setAttribute("permission", Integer.valueOf(PERM_WF3));
+                request.setAttribute("permission", PERM_WF3);
                 JSPManager.showJSP(request, response,
                         "/dspace-admin/wizard-permissions.jsp");
 
@@ -729,7 +722,7 @@ public class CollectionWizardServlet extends DSpaceServlet
             // administrator group
             if (collection.getAdministrators() != null)
             {
-                request.setAttribute("permission", Integer.valueOf(PERM_ADMIN));
+                request.setAttribute("permission", PERM_ADMIN);
                 JSPManager.showJSP(request, response,
                         "/dspace-admin/wizard-permissions.jsp");
 

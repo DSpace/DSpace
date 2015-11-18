@@ -20,6 +20,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authenticate.AuthenticationMethod;
+import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
@@ -38,16 +39,12 @@ import org.dspace.core.LogManager;
 public class LDAPServlet extends DSpaceServlet
 {
     /** log4j logger */
-    private static Logger log = Logger.getLogger(LDAPServlet.class);
-    
-    private AuthenticationService authenticationService;
-    
-    @Override
-    public void init() throws ServletException {
-    	super.init();
-    	
-    }
+    private static final Logger log = Logger.getLogger(LDAPServlet.class);
 
+    private final transient AuthenticationService authenticationService
+            = AuthenticateServiceFactory.getInstance().getAuthenticationService();
+
+    @Override
     protected void doDSGet(Context context,
         HttpServletRequest request,
         HttpServletResponse response)
@@ -66,6 +63,7 @@ public class LDAPServlet extends DSpaceServlet
     }
 
 
+    @Override
     protected void doDSPost(Context context,
         HttpServletRequest request,
         HttpServletResponse response)
