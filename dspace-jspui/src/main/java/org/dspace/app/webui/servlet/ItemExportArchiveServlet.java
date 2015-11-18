@@ -38,15 +38,10 @@ import org.dspace.core.Utils;
  */
 public class ItemExportArchiveServlet extends DSpaceServlet {
 	/** log4j category */
-	private static Logger log = Logger.getLogger(ItemExportArchiveServlet.class);
+	private static final Logger log = Logger.getLogger(ItemExportArchiveServlet.class);
 	
-	private ItemExportService itemExportService;
-
-	@Override
-	public void init() throws ServletException {
-		super.init();
-		itemExportService = ItemExportServiceFactory.getInstance().getItemExportService();
-	}
+	private final transient ItemExportService itemExportService
+             = ItemExportServiceFactory.getInstance().getItemExportService();
 	
 	@Override
 	protected void doDSGet(Context context, HttpServletRequest request,

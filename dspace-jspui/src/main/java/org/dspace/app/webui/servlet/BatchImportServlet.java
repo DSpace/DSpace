@@ -43,19 +43,14 @@ import org.dspace.utils.DSpace;
 public class BatchImportServlet extends DSpaceServlet
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(BatchImportServlet.class);
+    private static final Logger log = Logger.getLogger(BatchImportServlet.class);
     
-    private CollectionService collectionService;
+    private final transient CollectionService collectionService
+             = ContentServiceFactory.getInstance().getCollectionService();
 
-    private ItemImportService itemImportService;
+    private final transient ItemImportService itemImportService
+             = ItemImportServiceFactory.getInstance().getItemImportService();
     
-    @Override
-    public void init() throws ServletException {
-    	super.init();
-    	collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    	itemImportService = ItemImportServiceFactory.getInstance().getItemImportService();
-    	
-    }
     /**
      * Respond to a post request for metadata bulk importing via csv
      *
@@ -68,6 +63,7 @@ public class BatchImportServlet extends DSpaceServlet
      * @throws SQLException
      * @throws AuthorizeException
      */
+    @Override
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -93,7 +89,7 @@ public class BatchImportServlet extends DSpaceServlet
     	    	List<Collection> collections = null;
     	    	String colIdS = wrapper.getParameter("colId");
     	    	if (colIdS!=null){
-    	    		collections = new ArrayList<Collection>();
+    	    		collections = new ArrayList<>();
     	    		collections.add(collectionService.findByIdOrLegacyId(context, colIdS));
 
     	    	}
@@ -257,6 +253,7 @@ public class BatchImportServlet extends DSpaceServlet
      * @throws SQLException
      * @throws AuthorizeException
      */
+    @Override
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -265,7 +262,7 @@ public class BatchImportServlet extends DSpaceServlet
 		List<Collection> collections = null;
 		String colIdS = request.getParameter("colId");
 		if (colIdS!=null){
-			collections = new ArrayList<Collection>();
+			collections = new ArrayList<>();
 			collections.add(collectionService.findByIdOrLegacyId(context, colIdS));
 
 		}
@@ -305,7 +302,7 @@ public class BatchImportServlet extends DSpaceServlet
     protected List<String> getRepeatedParameter(HttpServletRequest request,
             String metadataField, String param)
     {
-        List<String> vals = new LinkedList<String>();
+        List<String> vals = new LinkedList<>();
 
         int i = 1;    //start index at the first of the previously entered values
         boolean foundLast = false;

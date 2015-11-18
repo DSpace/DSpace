@@ -41,25 +41,21 @@ public class SuperviseServlet extends org.dspace.app.webui.servlet.DSpaceServlet
 {
     
      /** log4j category */
-    private static Logger log = Logger.getLogger(SuperviseServlet.class);
+    private static final Logger log = Logger.getLogger(SuperviseServlet.class);
     
-    private GroupService groupService;
+    private final transient GroupService groupService
+             = EPersonServiceFactory.getInstance().getGroupService();
     
-    private SupervisorService supervisorService;
+    private final transient SupervisorService supervisorService
+             = EPersonServiceFactory.getInstance().getSupervisorService();
     
-    private SupervisedItemService supervisedItemService;
+    private final transient SupervisedItemService supervisedItemService
+             = ContentServiceFactory.getInstance().getSupervisedItemService();
     
-    private WorkspaceItemService workspaceItemService;
+    private final transient WorkspaceItemService workspaceItemService
+             = ContentServiceFactory.getInstance().getWorkspaceItemService();
     
     @Override
-    public void init() throws ServletException {
-    	super.init();
-    	groupService = EPersonServiceFactory.getInstance().getGroupService();
-    	supervisedItemService = ContentServiceFactory.getInstance().getSupervisedItemService();
-    	supervisorService = EPersonServiceFactory.getInstance().getSupervisorService();
-    	workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-    }
-    
     protected void doDSGet(Context c, 
         HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
@@ -68,6 +64,7 @@ public class SuperviseServlet extends org.dspace.app.webui.servlet.DSpaceServlet
         doDSPost(c, request, response);
     }
     
+    @Override
     protected void doDSPost(Context c, 
         HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException

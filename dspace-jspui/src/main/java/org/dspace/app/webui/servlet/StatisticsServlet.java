@@ -28,8 +28,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.factory.AuthorizeServiceFactory;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 
@@ -42,13 +40,7 @@ import org.dspace.core.Context;
  */
 public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServlet
 {
-	private AuthorizeService authorizeService;
-	
-	@Override
-	public void init() throws ServletException {
-		super.init();
-		authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
-	}
+    @Override
     protected void doDSGet(Context c, 
         HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
@@ -57,6 +49,7 @@ public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServle
         doDSPost(c, request, response);
     }
     
+    @Override
     protected void doDSPost(Context c, 
         HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
@@ -109,7 +102,7 @@ public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServle
 
         try
         {
-            List<Date> monthsList = new ArrayList<Date>();
+            List<Date> monthsList = new ArrayList<>();
 
             Pattern monthly = Pattern.compile("report-([0-9][0-9][0-9][0-9]-[0-9]+)\\.html");
             Pattern general = Pattern.compile("report-general-([0-9]+-[0-9]+-[0-9]+)\\.html");

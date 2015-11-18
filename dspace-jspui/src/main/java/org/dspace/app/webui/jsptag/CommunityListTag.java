@@ -27,7 +27,7 @@ import org.dspace.content.Community;
 public class CommunityListTag extends TagSupport
 {
     /** Communities to display */
-    private transient List<Community> communities;
+    private List<Community> communities;
 
     private static final long serialVersionUID = 5788338729470292501L;
 
@@ -36,6 +36,7 @@ public class CommunityListTag extends TagSupport
         super();
     }
 
+    @Override
     public int doStartTag() throws JspException
     {
         JspWriter out = pageContext.getOut();
@@ -106,6 +107,7 @@ public class CommunityListTag extends TagSupport
         communities = communitiesIn;
     }
 
+    @Override
     public void release()
     {
         communities = null;

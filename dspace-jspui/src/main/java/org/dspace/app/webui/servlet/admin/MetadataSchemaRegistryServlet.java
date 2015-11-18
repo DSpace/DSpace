@@ -37,17 +37,14 @@ import org.dspace.core.Context;
 public class MetadataSchemaRegistryServlet extends DSpaceServlet
 {
     /** Logger */
-    private static Logger log = Logger.getLogger(MetadataSchemaRegistryServlet.class);
-    private String clazz = "org.dspace.app.webui.servlet.admin.MetadataSchemaRegistryServlet";
+    private static final Logger log = Logger.getLogger(MetadataSchemaRegistryServlet.class);
 
-    private MetadataSchemaService schemaService;
+    private static final String clazz = "org.dspace.app.webui.servlet.admin.MetadataSchemaRegistryServlet";
+
+    private final transient MetadataSchemaService schemaService
+             = ContentServiceFactory.getInstance().getMetadataSchemaService();
     
     @Override
-    public void init() throws ServletException {
-    	super.init();
-    	schemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
-    }
-    
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -56,6 +53,7 @@ public class MetadataSchemaRegistryServlet extends DSpaceServlet
         showSchemas(context, request, response);
     }
 
+    @Override
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
