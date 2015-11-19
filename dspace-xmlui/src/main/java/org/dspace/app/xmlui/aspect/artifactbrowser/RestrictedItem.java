@@ -168,7 +168,7 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
                 if (handle == null || "".equals(handle)) {
                     identifier = "internal ID: " + dso.getID();
                 } else {
-                    identifier = "hdl:" + handle;
+                    identifier = dso.getName() + " (hdl:" + handle + ")";
                 }
 
                 // check why the item is restricted.
