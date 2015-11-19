@@ -63,14 +63,6 @@
                     <xsl:text>]</xsl:text>
                 </xsl:if>
             </h4>
-            <xsl:variable name="abstract" select="$data/dim:field[@element = 'description' and @qualifier='abstract']/node()"/>
-            <xsl:if test="$abstract and string-length($abstract[1]) &gt; 0">
-                <div class="artifact-info">
-                    <span class="short-description text-muted">
-                        <xsl:value-of select="util:shortenString($abstract, 220, 10)"/>
-                    </span>
-                </div>
-            </xsl:if>
         </div>
     </xsl:template>
 

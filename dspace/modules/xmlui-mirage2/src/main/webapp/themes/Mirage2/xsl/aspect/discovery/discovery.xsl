@@ -122,13 +122,6 @@
                     <xsl:text>]</xsl:text>
                 </xsl:if>
             </a>
-            <div class="artifact-info">
-            <xsl:if test="dri:list[@n=(concat($handle, ':dc.description.abstract'))]/dri:item">
-                <p>
-                    <xsl:apply-templates select="dri:list[@n=(concat($handle, ':dc.description.abstract'))]/dri:item[1]"/>
-                </p>
-            </xsl:if>
-        </div>
 
         </div>
     </xsl:template>
