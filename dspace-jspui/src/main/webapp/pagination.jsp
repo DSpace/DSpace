@@ -9,6 +9,12 @@
 
     int leftPage = Math.max(1, currentPage - 2);
     int rightPage = Math.min(totalPages, currentPage + 2);
+    if(currentPage == 1 && bi.hasPrevPage()) {
+        currentPage = 2;
+    }
+    if(totalPages == 1 && bi.hasPrevPage()) {
+        totalPages = 2;
+    }
 %>
 
 
@@ -56,13 +62,3 @@
 
 
     </ul>
-
-<%--
-
-
-Per page: <%= perPage %> <br/>
-Total publications: <%= totalPublications %><br/>
-From: <%= from %><br/>
-To: <%= to %><br/>
-Total pages: <%= totalPages %><br/>
---%>

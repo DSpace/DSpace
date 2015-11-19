@@ -246,23 +246,6 @@
                     <fmt:param value="<%= Integer.toString(bi.getFinish()) %>"/>
                     <fmt:param value="<%= Integer.toString(bi.getTotal()) %>"/>
                 </fmt:message>
-
-                    <%--  do the top previous and next page links --%>
-            <%--    <%
-                    if (bi.hasPrevPage()) {
-                %>
-                <a class="pull-left" href="<%= prev %>"><fmt:message key="browse.single.prev"/></a>&nbsp;
-                <%
-                    }
-                %>
-
-                <%
-                    if (bi.hasNextPage()) {
-                %>
-                &nbsp;<a class="pull-right" href="<%= next %>"><fmt:message key="browse.single.next"/></a>
-                <%
-                    }
-                %>--%>
             </div>
 
             <ul class="list-group">
@@ -284,28 +267,7 @@
             </ul>
                 <%-- give us the bottom report on what we are looking at --%>
             <div class="panel-footer text-center">
-                <%--<fmt:message key="browse.single.range">
-                    <fmt:param value="<%= Integer.toString(bi.getStart()) %>"/>
-                    <fmt:param value="<%= Integer.toString(bi.getFinish()) %>"/>
-                    <fmt:param value="<%= Integer.toString(bi.getTotal()) %>"/>
-                </fmt:message>--%>
                 <%@ include file="../pagination.jsp" %>
-                    <%--  do the bottom previous and next page links --%>
-               <%-- <%
-                    if (bi.hasPrevPage()) {
-                %>
-                <a class="pull-left" href="<%= prev %>"><fmt:message key="browse.single.prev"/></a>&nbsp;
-                <%
-                    }
-                %>
-
-                <%
-                    if (bi.hasNextPage()) {
-                %>
-                &nbsp;<a class="pull-right" href="<%= next %>"><fmt:message key="browse.single.next"/></a>
-                <%
-                    }
-                %>--%>
             </div>
         </div>
     </div>
