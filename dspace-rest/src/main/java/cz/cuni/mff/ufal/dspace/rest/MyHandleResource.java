@@ -39,17 +39,9 @@ public class MyHandleResource extends Resource {
             TableRowIterator tri = DatabaseManager.query(context, query, params);
             List<TableRow> rows = tri.toList();
             for(TableRow row : rows){
-                //similar to HandlePlugin
-                String[] splits = row.getStringColumn("url").split(HandlePlugin.magicBean, 6);
-                String url = splits[splits.length - 1];
-                String title = splits[1];
-                String repository = splits[2];
-                String submitdate = splits[3];
-                String reportemail = splits[4];
+                String magicURL = row.getStringColumn("url");
                 String hdl = row.getStringColumn("handle");
-                Handle handle = new Handle(hdl, url, title, repository,
-                                            submitdate, reportemail, hdl.split("/",2)[1].split("-",2)[0]);
-                result.add(handle);
+                result.add(new Handle(hdl, magicURL));
             }
             context.complete();
         } catch (SQLException e) {
@@ -74,9 +66,8 @@ public class MyHandleResource extends Resource {
                     magicURL += HandlePlugin.magicBean + part;
                 }
                 String hdl = createHandle(subprefix, magicURL, context);
-                handle.handle = hdl;
                 context.complete();
-                return handle;
+                return new Handle(hdl, magicURL);
             }catch (SQLException e){
                 processException("Could not create handle, SQLException. Message: " + e.getMessage(), context);
             }
