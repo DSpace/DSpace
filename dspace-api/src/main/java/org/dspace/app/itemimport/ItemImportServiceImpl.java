@@ -1682,7 +1682,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         //Close zip file
         zf.close();
         
-        if(sourceDirForZip != sourcedir) {
+        if(!StringUtils.equals(sourceDirForZip, sourcedir)) {
             sourcedir = sourceDirForZip;
             System.out.println("Set sourceDir using path inside of Zip: " + sourcedir);
             log.info("Set sourceDir using path inside of Zip: " + sourcedir);
