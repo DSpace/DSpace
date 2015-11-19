@@ -272,6 +272,22 @@ lr.xmlui.user.showlanguage = false
 
 #mind the documentation for oai/cite and the respective apache rewrite
 lr.repository.identifier = lindat.mff.cuni.cz 
+lr.repository.sampleIdentifier = oai:lindat.mff.cuni.cz:11858/00-097C-0000-0001-487A-4
+
+####
+#
+# description-olac.xml
+####
+lr.description.archiveURL = http://lindat.cz/
+lr.description.participant.name = Jozef Misutka
+lr.description.institution = Institute of Formal and Applied Linguistics
+lr.description.institutionURL = http://ufal.mff.cuni.cz
+lr.description.shortLocation = Prague, Czech Republic
+lr.description.location = Malostranské náměstí 25,118 00 Prague, Czech Republic
+lr.description.synopsis = http://lindat.cz
+lr.desription.access = https://lindat.mff.cuni.cz/repository/xmlui/page/about
+lr.description.archivalSubmissionPolicy = https://lindat.mff.cuni.cz/repository/xmlui/page/about
+
 
 ############################################
 #

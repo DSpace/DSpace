@@ -4,5 +4,5 @@
       <scheme>oai</scheme>
       <repositoryIdentifier>${lr.repository.identifier}</repositoryIdentifier>
       <delimiter>:</delimiter>
-      <sampleIdentifier>oai:lindat.mff.cuni.cz:11858/00-097C-0000-0001-487A-4</sampleIdentifier>
+      <sampleIdentifier>${lr.repository.sampleIdentifier}</sampleIdentifier>
    </oai-identifier>
