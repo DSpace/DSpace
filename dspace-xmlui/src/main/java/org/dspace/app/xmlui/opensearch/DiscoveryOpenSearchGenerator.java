@@ -19,9 +19,6 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.xml.dom.DOMStreamer;
-import org.dspace.app.util.OpenSearchServiceImpl;
-import org.dspace.app.util.factory.UtilServiceFactory;
-import org.dspace.app.util.service.OpenSearchService;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.FeedUtils;
 import org.dspace.content.DSpaceObject;
@@ -63,8 +60,6 @@ public class DiscoveryOpenSearchGenerator extends AbstractOpenSearchGenerator
 
     /** the  search service to use */
     private SearchService searchService = null;
-
-    protected OpenSearchService openSearchService = UtilServiceFactory.getInstance().getOpenSearchService();
 
     /**
      * Setup the Discovery search service. Other paramas are setup in superclass's methods
