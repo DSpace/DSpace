@@ -94,6 +94,7 @@
 
     Boolean showItems = (Boolean) request.getAttribute("show.items");
     boolean show_items = showItems != null ? showItems.booleanValue() : false;
+    boolean isSinglePage = false;
 %>
 
 <dspace:layout locbar="commLink" title="<%= name %>" feedData="<%= feedData %>">
@@ -268,7 +269,9 @@
     <%
         }
     %>
-    <%@ include file="pagination.jsp" %>
+    <nav role = "pagination">
+        <%@ include file="pagination.jsp" %>
+    </nav>
     <%-- give us the bottom report on what we are looking at --%>
     <%--<div class="browse_range">--%>
         <%--<fmt:message key="jsp.collection-home.content.range">--%>

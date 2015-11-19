@@ -13,12 +13,15 @@
 
 
     <ul class="cd-pagination no-space move-buttons custom-icons">
-        <li class="button">
-            <a href="<%= prev %>"
-                <% if(!bi.hasPrevPage()) { %>
-                  class = "disabled"
-                <% } %>
-            ><fmt:message key="pagination.prev"/></a></li>
+        <% if(!isSinglePage) { %>
+            <li class="button">
+                <a href="<%= prev %>"
+                    <% if(!bi.hasPrevPage()) { %>
+                      class = "disabled"
+                    <% } %>
+                ><fmt:message key="pagination.prev"/></a>
+            </li>
+        <% } %>
 
         <% if(leftPage > 1) {%>
             <li><a href="<%= linkBase %>" <% if(1 == currentPage) { %> class="current" <% } %> >1</a></li>
@@ -41,13 +44,15 @@
              <li><a href="<%= linkBase + "offset=" + Integer.valueOf(perPage * (totalPages - 1)).toString() %>" <% if(totalPages == currentPage) { %> class="current" <% } %> ><%= totalPages %></a></li>
         <%  }  %>
 
-
-        <li class="button">
-            <a href="<%= next %>"
-                <% if(!bi.hasNextPage()) { %>
-                    class = "disabled"
-                 <% } %>
-             ><fmt:message key="pagination.next"/></a></li>
+        <% if(!isSinglePage) { %>
+            <li class="button">
+                <a href="<%= next %>"
+                    <% if(!bi.hasNextPage()) { %>
+                        class = "disabled"
+                     <% } %>
+                 ><fmt:message key="pagination.next"/></a>
+            </li>
+        <% } %>
 
 
     </ul>

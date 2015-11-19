@@ -8,7 +8,7 @@
 
 --%>
 <%--
-  - 
+  -
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
@@ -22,6 +22,7 @@
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.DCDate" %>
+<%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="java.net.URLEncoder" %>
 <%@ page import="org.dspace.core.Utils" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
@@ -79,6 +80,8 @@
     // prepare the next and previous links
     String next = sharedLink;
     String prev = sharedLink;
+    boolean isSinglePage = true;
+    linkBase = sharedLink + "&amp;";
 
     if (bi.hasNextPage()) {
         next = next + "&amp;offset=" + bi.getNextOffset();
@@ -245,7 +248,7 @@
                 </fmt:message>
 
                     <%--  do the top previous and next page links --%>
-                <%
+            <%--    <%
                     if (bi.hasPrevPage()) {
                 %>
                 <a class="pull-left" href="<%= prev %>"><fmt:message key="browse.single.prev"/></a>&nbsp;
@@ -259,7 +262,7 @@
                 &nbsp;<a class="pull-right" href="<%= next %>"><fmt:message key="browse.single.next"/></a>
                 <%
                     }
-                %>
+                %>--%>
             </div>
 
             <ul class="list-group">
@@ -281,14 +284,14 @@
             </ul>
                 <%-- give us the bottom report on what we are looking at --%>
             <div class="panel-footer text-center">
-                <fmt:message key="browse.single.range">
+                <%--<fmt:message key="browse.single.range">
                     <fmt:param value="<%= Integer.toString(bi.getStart()) %>"/>
                     <fmt:param value="<%= Integer.toString(bi.getFinish()) %>"/>
                     <fmt:param value="<%= Integer.toString(bi.getTotal()) %>"/>
-                </fmt:message>
-
+                </fmt:message>--%>
+                <%@ include file="../pagination.jsp" %>
                     <%--  do the bottom previous and next page links --%>
-                <%
+               <%-- <%
                     if (bi.hasPrevPage()) {
                 %>
                 <a class="pull-left" href="<%= prev %>"><fmt:message key="browse.single.prev"/></a>&nbsp;
@@ -302,7 +305,7 @@
                 &nbsp;<a class="pull-right" href="<%= next %>"><fmt:message key="browse.single.next"/></a>
                 <%
                     }
-                %>
+                %>--%>
             </div>
         </div>
     </div>

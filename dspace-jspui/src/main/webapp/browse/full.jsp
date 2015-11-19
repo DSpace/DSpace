@@ -112,6 +112,7 @@
 
     String next = sharedLink;
     String prev = sharedLink;
+    boolean isSinglePage = false;
     linkBase = sharedLink + "&amp;";
 
     if (bi.hasNextPage()) {
