@@ -10,7 +10,6 @@ package org.dspace.app.xmlui.aspect.submission.submit;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
-import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -38,7 +37,7 @@ import java.sql.SQLException;
  *
  */
 public class AccessStepUtil extends AbstractDSpaceTransformer {
-     Context context=null;
+    private Context context=null;
 
     protected static final Message T_name =message("xmlui.Submission.submit.AccessStep.name");
 	protected static final Message T_name_help = message("xmlui.Submission.submit.AccessStep.name_help");

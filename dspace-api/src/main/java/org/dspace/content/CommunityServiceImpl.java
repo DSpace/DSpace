@@ -24,7 +24,6 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.event.Event;
-import org.dspace.handle.service.HandleService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -50,8 +49,6 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
     @Autowired(required = true)
     protected CollectionService collectionService;
-    @Autowired(required = true)
-    protected HandleService handleService;
     @Autowired(required = true)
     protected GroupService groupService;
     @Autowired(required = true)

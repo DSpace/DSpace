@@ -8,7 +8,6 @@
 package org.dspace.versioning;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.WorkspaceItemService;
@@ -39,8 +38,6 @@ public class DefaultItemVersionProvider extends AbstractVersionProvider implemen
     protected VersionHistoryService versionHistoryService;
     @Autowired(required = true)
     protected IdentifierService identifierService;
-    @Autowired(required = true)
-    protected AuthorizeService authorizeService;
 
     @Override
     public Item createNewItemAndAddItInWorkspace(Context context, Item nativeItem) {
