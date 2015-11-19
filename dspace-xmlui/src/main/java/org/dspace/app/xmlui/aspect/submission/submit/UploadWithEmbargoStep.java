@@ -293,7 +293,7 @@ public class UploadWithEmbargoStep extends UploadStep
                 
                 // If this bitstream is already marked as the primary bitstream
                 // mark it as such.
-                if(bundles.get(0).getPrimaryBitstream() != null &&  bundles.get(0).getPrimaryBitstream().equals(id)) {
+                if(bundles.get(0).getPrimaryBitstream() != null && bundles.get(0).getPrimaryBitstream().getID().equals(id)) {
                     primary.setOptionSelected(String.valueOf(id));
                 }
 	        	
