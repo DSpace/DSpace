@@ -6,6 +6,7 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.app.xmlui.wing.element.Item;
+import org.dspace.app.xmlui.utils.XSLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.identifier.DOIIdentifierProvider;
@@ -62,7 +63,7 @@ public class DepositConfirmedStep extends AbstractSubmissionStep{
 
         int i = 0;
         for (org.dspace.content.Item dataFile : dataFiles){
-            addPara(dataFileDiv, " " + dataFile.getName());
+            addPara(dataFileDiv, " " + XSLUtils.getShortFileName(dataFile.getName(), 50));
         }
 
     }

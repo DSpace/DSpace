@@ -123,9 +123,20 @@ public class EmailParser {
             }
         }
 
-        // if article status says "in review", it's the same as a submission
-        if (dataForXML.get(ARTICLE_STATUS).equalsIgnoreCase("in review")) {
-            dataForXML.put(ARTICLE_STATUS,Manuscript.STATUS_SUBMITTED);
+        // make sure there's a status:
+        if (dataForXML.get(ARTICLE_STATUS) != null) {
+            // if article status says "in review", it's the same as a submission
+            if (dataForXML.get(ARTICLE_STATUS).equalsIgnoreCase("in review")) {
+                dataForXML.put(ARTICLE_STATUS, Manuscript.STATUS_SUBMITTED);
+            }
+
+            // if article status says "rejected w/o review", it's the same as a rejection
+            if (dataForXML.get(ARTICLE_STATUS).equalsIgnoreCase("rejected w/o review")) {
+                dataForXML.put(ARTICLE_STATUS, Manuscript.STATUS_REJECTED);
+            }
+        } else {
+            // default status: assume it's a submission email if not otherwise specified.
+            dataForXML.put(ARTICLE_STATUS, Manuscript.STATUS_ACCEPTED);
         }
 
         // if article status says "transferred", it's the same as a rejection

@@ -6,6 +6,7 @@ import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.Message;
+import org.dspace.app.xmlui.utils.XSLUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.Item;
@@ -113,8 +114,8 @@ public class DescribeDatasetStep extends AbstractSubmissionStep {
             fileItem.addHighlight("head").addContent(message("xmlui.Submission.submit.UploadStep.column5"));
             fileItem.addHighlight("head").addContent(message("xmlui.Submission.submit.UploadStep.column7"));
 
-            fileItem.addHighlight("content").addXref(url, fileFound.getName());
-            fileItem.addHighlight("content").addContent((fileFound.getSize() / 1000) + "Kb");
+            fileItem.addHighlight("content").addXref(url, XSLUtils.getShortFileName(fileFound.getName(), 25));
+            fileItem.addHighlight("content").addContent((fileFound.getSize() / 1000) + " Kb");
             fileItem.addHighlight("content").addContent(fileFound.getFormat().getDescription());
             fileItem.addHidden("remove_dataset_id").setValue("" + fileFound.getID());
             fileItem.addHidden("dataset_id_present").setValue("" + fileFound.getID());
