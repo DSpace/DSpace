@@ -54,6 +54,7 @@
         <link rel="stylesheet" href="<%= request.getContextPath() %>/css/discovery.css" type="text/css" />
 	    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/jquery-ui-1.10.3.custom/redmond/jquery-ui-1.10.3.custom.min.css" type="text/css" />
         <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/treeview.css" type="text/css"/>
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/pagination.css">
 <%
     if (!"NONE".equals(feedRef))
     {
@@ -64,7 +65,7 @@
 <%
         }
     }
-    
+
     if (osLink)
     {
 %>
@@ -78,7 +79,7 @@
 <%
         }
 %>
-        
+
 	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/jquery/jquery-1.10.2.min.js'></script>
 	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/jquery/jquery-ui-1.10.3.custom.min.js'></script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/utils.js"></script>

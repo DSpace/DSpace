@@ -142,7 +142,7 @@
         if (admin_button)  // admin edit button
         { %>
         <dspace:sidebar>
-            <div class="panel panel-warning">
+            <div class="panel panel-warning" style="position: fixed;">
             	<div class="panel-heading"><fmt:message key="jsp.admintools"/></div>
             	<div class="panel-body">
                 <form method="get" action="<%= request.getContextPath() %>/tools/edit-item">
@@ -257,11 +257,13 @@
        <fmt:message key="jsp.display-item.suggest"/></a>
 <%
         }
+    if (admin_button) {
 %>
     <a class="statisticsLink  btn btn-primary" href="<%= request.getContextPath() %>/handle/<%= handle %>/statistics"><fmt:message key="jsp.display-item.display-statistics"/></a>
 
     <%-- SFX Link --%>
 <%
+    }
     if (ConfigurationManager.getProperty("sfx.server.url") != null)
     {
         String sfximage = ConfigurationManager.getProperty("sfx.server.image_url");
