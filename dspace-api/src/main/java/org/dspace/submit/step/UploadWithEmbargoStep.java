@@ -34,8 +34,6 @@ import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.*;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.curate.Curator;
@@ -76,7 +74,6 @@ public class UploadWithEmbargoStep extends UploadStep
     /** log4j logger */
     private static Logger log = Logger.getLogger(UploadWithEmbargoStep.class);
 
-    protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
     protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
     protected ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();

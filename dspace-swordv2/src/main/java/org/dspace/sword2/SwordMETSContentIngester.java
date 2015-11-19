@@ -20,12 +20,10 @@ import org.dspace.content.packager.PackageIngester;
 import org.dspace.content.packager.PackageParameters;
 import org.dspace.content.packager.PackageUtils;
 import org.dspace.content.service.CollectionService;
-import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
-import org.dspace.handle.HandleServiceImpl;
 
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
@@ -45,9 +43,6 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester
 
     protected CollectionService collectionService = ContentServiceFactory
             .getInstance().getCollectionService();
-
-    protected ItemService itemService = ContentServiceFactory.getInstance()
-            .getItemService();
 
     protected HandleService handleService = HandleServiceFactory.getInstance()
             .getHandleService();

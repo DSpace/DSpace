@@ -23,7 +23,6 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.SubscribeService;
 import org.dspace.event.Event;
-import org.dspace.handle.service.HandleService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -58,8 +57,6 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     @Autowired(required = true)
     protected GroupService groupService;
 
-    @Autowired(required = true)
-    protected HandleService handleService;
     @Autowired(required = true)
     protected LicenseService licenseService;
     @Autowired(required = true)

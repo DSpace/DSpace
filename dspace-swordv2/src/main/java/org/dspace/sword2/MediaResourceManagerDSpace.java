@@ -14,8 +14,6 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -34,9 +32,6 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
 
     protected AuthorizeService authorizeService = AuthorizeServiceFactory
             .getInstance().getAuthorizeService();
-
-    protected BitstreamService bitstreamService = ContentServiceFactory
-            .getInstance().getBitstreamService();
 
     private VerboseDescription verboseDescription = new VerboseDescription();
 
