@@ -16,7 +16,7 @@ section h2 {
 }
 @media only screen and (min-width: 1170px) {
   section h2 {
-    margin: 4em auto 0;
+    /*margin: 4em auto 0;*/
   }
 }
 
@@ -32,7 +32,7 @@ nav[role="pagination"] {
 .cd-pagination {
   width: 90%;
   max-width: 768px;
-  margin: 2em auto 4em;
+  /*margin: 2em auto 4em;*/
   text-align: center;
 }
 .cd-pagination li {
@@ -97,11 +97,7 @@ nav[role="pagination"] {
     display: inline-block;
   }
 }
-@media only screen and (min-width: 1170px) {
-  .cd-pagination {
-    margin: 4em auto 8em;
-  }
-}
+
 
 /* --------------------------------
 
@@ -113,7 +109,7 @@ No space - remove distance between list items
   max-width: none;
   display: inline-block;
   border-radius: 0.25em;
-  border: 1px solid #e6e6e6;
+  /*border: 1px solid #e6e6e6;*/
 }
 .cd-pagination.no-space:after {
   content: "";

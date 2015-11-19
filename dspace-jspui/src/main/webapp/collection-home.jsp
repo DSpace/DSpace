@@ -210,17 +210,17 @@
         BrowseIndex bix = bi.getBrowseIndex();
 
         // prepare the next and previous links
-        String linkBase = request.getContextPath() + "/handle/" + collection.getHandle();
+        String linkBase = request.getContextPath() + "/handle/" + collection.getHandle() + "?";
 
         String next = linkBase;
         String prev = linkBase;
 
         if (bi.hasNextPage()) {
-            next = next + "?offset=" + bi.getNextOffset();
+            next = next + "offset=" + bi.getNextOffset();
         }
 
         if (bi.hasPrevPage()) {
-            prev = prev + "?offset=" + bi.getPrevOffset();
+            prev = prev + "offset=" + bi.getPrevOffset();
         }
 
         String bi_name_key = "browse.menu." + bi.getSortOption().getName();

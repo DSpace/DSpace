@@ -11,7 +11,7 @@
     int rightPage = Math.min(totalPages, currentPage + 2);
 %>
 
-<nav role="pagination">
+
     <ul class="cd-pagination no-space move-buttons custom-icons">
         <li class="button">
             <a href="<%= prev %>"
@@ -28,7 +28,7 @@
         <%  }  %>
 
         <% for(int i = leftPage; i <= rightPage; i++) {
-                String link = linkBase + "?offset=" + Integer.valueOf(perPage * (i - 1)).toString();
+                String link = linkBase + "offset=" + Integer.valueOf(perPage * (i - 1)).toString();
 
         %>
             <li><a href="<%= link %>" <% if(i == currentPage) { %> class="current" <% } %> > <%= i %></a></li>
@@ -38,7 +38,7 @@
             <% if(rightPage < totalPages - 1) {%>
                 <li><span>...</span></li>
             <%  }  %>
-             <li><a href="<%= linkBase + "?offset=" + Integer.valueOf(perPage * (totalPages - 1)).toString() %>" <% if(totalPages == currentPage) { %> class="current" <% } %> ><%= totalPages %></a></li>
+             <li><a href="<%= linkBase + "offset=" + Integer.valueOf(perPage * (totalPages - 1)).toString() %>" <% if(totalPages == currentPage) { %> class="current" <% } %> ><%= totalPages %></a></li>
         <%  }  %>
 
 
@@ -51,7 +51,7 @@
 
 
     </ul>
-</nav>
+
 <%--
 
 

@@ -112,6 +112,7 @@
 
     String next = sharedLink;
     String prev = sharedLink;
+    linkBase = sharedLink + "&amp;";
 
     if (bi.hasNextPage()) {
         next = next + "&amp;offset=" + bi.getNextOffset();
@@ -394,23 +395,6 @@
                 <fmt:param value="<%= Integer.toString(bi.getFinish()) %>"/>
                 <fmt:param value="<%= Integer.toString(bi.getTotal()) %>"/>
             </fmt:message>
-
-                <%--  do the top previous and next page links --%>
-            <%
-                if (bi.hasPrevPage()) {
-            %>
-            <a class="pull-left" href="<%= prev %>"><fmt:message key="browse.full.prev"/></a>&nbsp;
-            <%
-                }
-            %>
-
-            <%
-                if (bi.hasNextPage()) {
-            %>
-            &nbsp;<a class="pull-right" href="<%= next %>"><fmt:message key="browse.full.next"/></a>
-            <%
-                }
-            %>
         </div>
 
             <%-- output the results using the browselist tag --%>
@@ -432,28 +416,7 @@
         %>
             <%-- give us the bottom report on what we are looking at --%>
         <div class="panel-footer text-center">
-            <fmt:message key="browse.full.range">
-                <fmt:param value="<%= Integer.toString(bi.getStart()) %>"/>
-                <fmt:param value="<%= Integer.toString(bi.getFinish()) %>"/>
-                <fmt:param value="<%= Integer.toString(bi.getTotal()) %>"/>
-            </fmt:message>
-
-                <%--  do the bottom previous and next page links --%>
-            <%
-                if (bi.hasPrevPage()) {
-            %>
-            <a class="pull-left" href="<%= prev %>"><fmt:message key="browse.full.prev"/></a>&nbsp;
-            <%
-                }
-            %>
-
-            <%
-                if (bi.hasNextPage()) {
-            %>
-            &nbsp;<a class="pull-right" href="<%= next %>"><fmt:message key="browse.full.next"/></a>
-            <%
-                }
-            %>
+            <%@ include file="../pagination.jsp" %>
         </div>
     </div>
     <%-- dump the results for debug (uncomment to enable) --%>
