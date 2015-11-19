@@ -325,11 +325,11 @@
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.head_collection">This collection is restricted</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.head_item">This item is restricted</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.head_bitstream">This bitstream is restricted</message>
-	<message key="xmlui.ArtifactBrowser.RestrictedItem.para_resource">You do not have the credentials to access the restricted resource.</message>
-	<message key="xmlui.ArtifactBrowser.RestrictedItem.para_community">You do not have the credentials to access the restricted community <b>{0}</b>.</message>
-	<message key="xmlui.ArtifactBrowser.RestrictedItem.para_collection">You do not have the credentials to access the restricted collection <b>{0}</b>.</message>
-	<message key="xmlui.ArtifactBrowser.RestrictedItem.para_item">You do not have the credentials to access the restricted item <b>{0}</b>.</message>
-	<message key="xmlui.ArtifactBrowser.RestrictedItem.para_bitstream">You do not have the credentials to access the restricted bitstream <b>{0}</b>.</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.para_resource">This resource is restricted. If you have a login to access this resource: <ol><li>Proceed to the login screen and log in.</li><li>Use your browser's back button to return to this page.</li></ol></message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.para_community">Items in this community are restricted. If you have a login to access the items in this community: <ol><li>Proceed to the login screen and log in.</li><li>Use your browser's back button to return to this page.</li>. <li>Once on the page, refresh/reload the page to access the items in this community.</li></ol></message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.para_collection">Items in this collection are restricted. If you have a login to access this collection: <ol><li>Proceed to the login screen and log in.</li><li>Use your browser's back button to return to this page.</li><li>Once on the page, refresh/reload the page to access the items in this collection.</li></ol></message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.para_item">This item is restricted. If you have a login to access this item: <ol><li>Proceed to the login screen and log in.</li><li>Use your browser's back button to return to this page.</li><li>Once on the page, refresh/reload the page to access the item.</li></ol></message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.para_bitstream">This bitstream is restricted. If you have a login to access this bitstream: <ol><li>Proceed to the login screen and log in.</li><li>Use your browser's back button to return to this page.</li><li>Once on the page, refresh/reload the page to access the bitstream.</li></ol></message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.type_collection">collection</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.type_community">community</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.type_bitstream">bitstream</message>
