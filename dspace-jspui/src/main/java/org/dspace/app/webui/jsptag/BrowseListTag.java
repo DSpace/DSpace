@@ -22,6 +22,8 @@ import org.dspace.core.Utils;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
 import org.dspace.storage.bitstore.BitstreamStorageManager;
+import ua.edu.sumdu.essuir.statistics.EssuirStatistics;
+import ua.edu.sumdu.essuir.utils.EssuirUtils;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -35,6 +37,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
+import java.util.Hashtable;
 import java.util.StringTokenizer;
 
 /**
@@ -411,7 +414,47 @@ public class BrowseListTag extends TagSupport
                         + (emph[emph.length - 2] ? "</strong>" : "") + "</th>");
             }
 
+            // my column header - Type
+            String id = "t" + Integer.toString(cOddOrEven.length + 1);
+            String css = "oddRow" + cOddOrEven[cOddOrEven.length - 2] + "Col";
+
+            // output the header
+            out.print("<th id=\"" + id +  "\" class=\"" + css + "\">"
+                    + LocaleSupport.getLocalizedMessage(pageContext, "metadata.dc.type")
+                    + "</th>");
+
+            // my column header - Views
+            id = "t" + Integer.toString(cOddOrEven.length + 2);
+            css = "oddRow" + cOddOrEven[cOddOrEven.length - 1] + "Col";
+
+            // output the header
+            out.print("<th id=\"" + id +  "\" class=\"" + css + "\">"
+                    + LocaleSupport.getLocalizedMessage(pageContext, "metadata.viewed")
+                    + "</th>");
+
+            // my column header - Downloads
+            id = "t" + Integer.toString(cOddOrEven.length + 3);
+            css = "oddRow" + cOddOrEven[cOddOrEven.length - 2] + "Col";
+
+            // output the header
+            out.print("<th id=\"" + id +  "\" class=\"" + css + "\">"
+                    + LocaleSupport.getLocalizedMessage(pageContext, "org.dspace.app.webui.jsptag.ItemTag.downloads")
+                    + "</th>");
+
             out.print("</tr>");
+
+            // item ids
+            int[] ids = new int[items.length];
+            String[] types = new String[items.length];
+            for (int i = 0; i < ids.length; i++) {
+                ids[i] = items[i].getID();
+                Metadatum[] itemType = items[i].getMetadata("dc", "type", Item.ANY, Item.ANY);
+                types[i] = (itemType.length == 0) ? "" : EssuirUtils.getTypeLocalized(itemType[0].value, locale);
+            }
+
+            // statistics
+            Hashtable<Integer, Long> statViews = EssuirStatistics.getViewStatistics(ids);
+            Hashtable<Integer, Long> statDownloads = EssuirStatistics.getDownloadStatistics(ids);
 
             // now output each item row
             for (int i = 0; i < items.length; i++)
@@ -611,7 +654,7 @@ public class BrowseListTag extends TagSupport
                     	markClass = " "+field+"_tr";
                     }
 
-                    String id = "t" + Integer.toString(colIdx + 1);
+                    id = "t" + Integer.toString(colIdx + 1);
                     out.print("<td headers=\"" + id + "\" class=\""
                     		+ rOddOrEven + "Row" + cOddOrEven[colIdx] + "Col" + markClass + "\" " + extras + ">"
                     	+ (emph[colIdx] ? "<strong>" : "") + metadata + (emph[colIdx] ? "</strong>" : "")
@@ -621,7 +664,7 @@ public class BrowseListTag extends TagSupport
                 // Add column for 'edit item' links
                 if (linkToEdit)
                 {
-                    String id = "t" + Integer.toString(cOddOrEven.length + 1);
+                    id = "t" + Integer.toString(cOddOrEven.length + 1);
 
                     out.print("<td headers=\"" + id + "\" class=\""
                         + rOddOrEven + "Row" + cOddOrEven[cOddOrEven.length - 2] + "Col\" nowrap>"
@@ -630,7 +673,29 @@ public class BrowseListTag extends TagSupport
                         + "<input type=\"submit\" value=\"Edit Item\" /></form>"
                         + "</td>");
                 }
+                // my column element - Type
+                id = "t" + Integer.toString(cOddOrEven.length + 1);
 
+                out.print("<td headers=\"" + id + "\" class=\""
+                        + rOddOrEven + "Row" + cOddOrEven[cOddOrEven.length - 2] + "Col\" nowrap align=\"center\">"
+                        + types[i]
+                        + "</td>");
+
+                // my column element - Views
+                id = "t" + Integer.toString(cOddOrEven.length + 2);
+
+                out.print("<td headers=\"" + id + "\" class=\""
+                        + rOddOrEven + "Row" + cOddOrEven[cOddOrEven.length - 1] + "Col\" nowrap align=\"center\">"
+                        + statViews.get(items[i].getID())
+                        + "</td>");
+
+                // my column element - Downloads
+                id = "t" + Integer.toString(cOddOrEven.length + 3);
+
+                out.print("<td headers=\"" + id + "\" class=\""
+                        + rOddOrEven + "Row" + cOddOrEven[cOddOrEven.length - 2] + "Col\" nowrap align=\"center\">"
+                        + statDownloads.get(items[i].getID())
+                        + "</td>");
                 out.println("</tr>");
             }
 
