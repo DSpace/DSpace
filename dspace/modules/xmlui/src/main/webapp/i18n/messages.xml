@@ -318,7 +318,7 @@
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.advisor">Advisor</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.RestrictedItem.java -->
-	<message key="xmlui.ArtifactBrowser.RestrictedItem.title">This resource is restricted</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.title">--> This resource is restricted</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.trail">Restricted</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.head_resource">This resource is restricted</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.head_community">This community is restricted</message>
