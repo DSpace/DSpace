@@ -223,14 +223,14 @@ public class JournalUtils {
         String regex = null;
         try {
             Concept concept = getJournalConceptByShortID(context, journalCode);
-            AuthorityMetadataValue[] vals = concept.getMetadata("journal","manuscriptNumberIgnorePattern",null, Item.ANY);
+            AuthorityMetadataValue[] vals = concept.getMetadata("journal","canonicalManuscriptNumberPattern",null, Item.ANY);
             if(vals != null && vals.length > 0) {
                 regex = vals[0].getValue();
                 Matcher manuscriptMatcher = Pattern.compile(regex).matcher(canonicalID);
                 if (manuscriptMatcher.find()) {
                     canonicalID = manuscriptMatcher.group(1);
                 } else {
-                    canonicalID = null;
+                    log.error("Manuscript " + manuscriptId + " does not match with the regex provided for " + journalCode);
                 }
             } else {
                 // there is no regex specified, just use the manuscript.
@@ -240,11 +240,6 @@ public class JournalUtils {
             log.error(e.getMessage(),e);
         }
         return canonicalID;
-    }
-
-    public static Boolean manuscriptIsValid(Context context, Manuscript manuscript) {
-        Boolean result = manuscript.isValid() && (getCanonicalManuscriptID(context, manuscript) != null);
-        return result;
     }
 
     public static String getFullName(Concept concept) {
@@ -378,7 +373,7 @@ public class JournalUtils {
     }
 
     public static String getDescription(Concept concept) {
-        AuthorityMetadataValue[] vals = concept.getMetadata("journal","description",null, Item.ANY);
+        AuthorityMetadataValue[] vals = concept.getMetadata("journal", "description", null, Item.ANY);
         if(vals != null && vals.length > 0)
             return vals[0].value;
 
@@ -386,7 +381,7 @@ public class JournalUtils {
     }
 
     public static String getMemberName(Concept concept) {
-        AuthorityMetadataValue[] vals = concept.getMetadata("journal","memberName",null, Item.ANY);
+        AuthorityMetadataValue[] vals = concept.getMetadata("journal", "memberName", null, Item.ANY);
         if(vals != null && vals.length > 0)
             return vals[0].value;
 
@@ -645,21 +640,11 @@ public class JournalUtils {
             subjectKeywords.add(keyword);
         }
         pBean.setSubjectKeywords(subjectKeywords);
-        String ttext = manuscript.status;
 
-        pBean.setStatus(ttext);
-        if(ttext.equals("submitted") ||
-                ttext.equals("in review")   ||
-                ttext.equals("under review")  ||
-                ttext.equals("revision in review") ||
-                ttext.equals("revision under review")
-                ) {
+        pBean.setStatus(manuscript.getStatus());
+        if (manuscript.isSubmitted()) {
             pBean.setSkipReviewStep(false);
-        } else if(ttext.equals("accepted") ||
-                ttext.startsWith("reject") ||
-                ttext.equals("open reject") ||
-                ttext.equals("transferred") ||
-                ttext.equals("needs revision")) {
+        } else if (manuscript.isAccepted() || manuscript.isRejected()) {
             pBean.setSkipReviewStep(true);
         }
         return pBean;

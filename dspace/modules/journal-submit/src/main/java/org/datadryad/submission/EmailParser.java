@@ -126,27 +126,6 @@ public class EmailParser {
             }
         }
 
-        // make sure there's a status:
-        if (dataForXML.get(ARTICLE_STATUS) != null) {
-            // if article status says "in review", it's the same as a submission
-            if (dataForXML.get(ARTICLE_STATUS).equalsIgnoreCase("in review")) {
-                dataForXML.put(ARTICLE_STATUS, Manuscript.STATUS_SUBMITTED);
-            }
-
-            // if article status says "rejected w/o review", it's the same as a rejection
-            if (dataForXML.get(ARTICLE_STATUS).equalsIgnoreCase("rejected w/o review")) {
-                dataForXML.put(ARTICLE_STATUS, Manuscript.STATUS_REJECTED);
-            }
-        } else {
-            // default status: assume it's a submission email if not otherwise specified.
-            dataForXML.put(ARTICLE_STATUS, Manuscript.STATUS_ACCEPTED);
-        }
-
-        // if article status says "transferred", it's the same as a rejection
-        if (dataForXML.get(ARTICLE_STATUS).equalsIgnoreCase("transferred")) {
-            dataForXML.put(ARTICLE_STATUS,Manuscript.STATUS_REJECTED);
-        }
-
         // remove any unnecessary tags
         dataForXML.remove(UNNECESSARY);
 
@@ -194,7 +173,7 @@ public class EmailParser {
         manuscript.dryadDataDOI = null;
         manuscript.keywords.addAll(parseClassificationList((String) dataForXML.remove(CLASSIFICATION)));
         manuscript.manuscriptId = (String) dataForXML.remove(MANUSCRIPT);
-        manuscript.status = dataForXML.remove(ARTICLE_STATUS).toLowerCase();
+        manuscript.setStatus(dataForXML.remove(ARTICLE_STATUS).toLowerCase());
         manuscript.title = (String) dataForXML.remove(ARTICLE_TITLE);
         manuscript.publicationDOI = null;
         manuscript.publicationDate = null;

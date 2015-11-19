@@ -14,6 +14,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -28,13 +29,32 @@ public class Manuscript {
     public static final String STATUS_REJECTED = "rejected";
     public static final String STATUS_NEEDS_REVISION = "needs revision";
     public static final String STATUS_PUBLISHED = "published";
+    public static final String STATUS_INVALID = "invalid";
 
-    public static final List<String> MANUSCRIPT_STATUSES = Arrays.asList(
+    public static final List<String> SUBMITTED_STATUSES = Arrays.asList(
             STATUS_SUBMITTED,
-            STATUS_ACCEPTED,
+            "revision in review",
+            "revision under review",
+            "in review"
+    );
+
+    public static final List<String> ACCEPTED_STATUSES = Arrays.asList(
+            STATUS_ACCEPTED
+    );
+
+    public static final List<String> REJECTED_STATUSES = Arrays.asList(
             STATUS_REJECTED,
             STATUS_NEEDS_REVISION,
+            "transferred",
+            "rejected w/o review"
+    );
+
+    public static final List<String> PUBLISHED_STATUSES = Arrays.asList(
             STATUS_PUBLISHED
+    );
+
+    public static final List<String> NEEDS_REVISION_STATUSES = Arrays.asList(
+            STATUS_NEEDS_REVISION
     );
 
     static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -45,8 +65,8 @@ public class Manuscript {
     public CorrespondingAuthor correspondingAuthor = new CorrespondingAuthor();
     public String dryadDataDOI;
     public List<String> keywords = new ArrayList<String>();
-    public String manuscriptId;
-    public String status;
+    public String manuscriptId = "";
+    private String status = STATUS_ACCEPTED; // STATUS_ACCEPTED is the default
     public String title;
     public String publicationDOI;
     public Date publicationDate;
@@ -61,21 +81,100 @@ public class Manuscript {
     }
 
     @JsonIgnore
+    private static final Logger log = Logger.getLogger(Manuscript.class);
+
+    @JsonIgnore
     public Organization organization = new Organization();
 
     @JsonIgnore
-    public Boolean isValid() {
-        // TODO: Check other validations
-        // if corresponding author present, must be one of the authors
-        // Required fields are: manuscriptID, status, authors (though author identifiers are optional), and title. All other fields are optional.
+    public void setStatus(String newStatus) {
+        if (newStatus != null) {
+            this.status = newStatus;
+        } else {
+            this.status = "";
+        }
+    }
 
-        return (
-                (manuscriptId != null && manuscriptId.length() > 0) &&
-                (status != null && status.length() > 0) &&
-                (authors != null && authors.author != null && authors.author.size() > 0) &&
-                (title != null && title.length() > 0) &&
-                MANUSCRIPT_STATUSES.contains(status)
-                );
+    @JsonIgnore
+    public String getStatus() {
+        if (isAccepted()) {
+            return STATUS_ACCEPTED;
+        }
+        if (isRejected()) {
+            return STATUS_REJECTED;
+        }
+        if (isSubmitted()) {
+            return STATUS_SUBMITTED;
+        }
+        if (isPublished()) {
+            return STATUS_PUBLISHED;
+        }
+
+        // default is STATUS_ACCEPTED
+        return STATUS_INVALID;
+    }
+
+    // return what the status really said:
+    @JsonIgnore
+    public String getLiteralStatus() {
+        return this.status;
+    }
+
+    @JsonIgnore
+    public Boolean isValid() {
+        // Required fields are: manuscriptID, status, authors (though author identifiers are optional), and title. All other fields are optional.
+        if ((manuscriptId == null) || (manuscriptId.length() == 0)) {
+            log.debug("Manuscript is invalid: Manuscript ID not available");
+            return false;
+        }
+
+        if ((status == null) || (status.length() == 0)) {
+            log.debug("Manuscript is invalid: Article Status not available");
+            return false;
+        }
+
+        if ((authors == null) || (authors.author == null) || (authors.author.size() == 0)) {
+            log.debug("Manuscript is invalid: Authors not available");
+            return false;
+        }
+
+        if ((title == null) || (title.length() == 0)) {
+            log.debug("Manuscript is invalid: Title not available");
+            return false;
+        }
+
+        if (getStatus().equals(STATUS_INVALID)) {
+            log.debug("Manuscript is invalid: Article Status " + status + " does not correspond to an accepted value");
+            return false;
+        }
+
+        // TODO: if corresponding author present, must be one of the authors
+        return true;
+    }
+
+    @JsonIgnore
+    public Boolean isSubmitted() {
+        return SUBMITTED_STATUSES.contains(status);
+    }
+
+    @JsonIgnore
+    public Boolean isAccepted() {
+        return ACCEPTED_STATUSES.contains(status);
+    }
+
+    @JsonIgnore
+    public Boolean isRejected() {
+        return REJECTED_STATUSES.contains(status);
+    }
+
+    @JsonIgnore
+    public Boolean isNeedsRevision() {
+        return NEEDS_REVISION_STATUSES.contains(status);
+    }
+
+    @JsonIgnore
+    public Boolean isPublished() {
+        return PUBLISHED_STATUSES.contains(status);
     }
 
     public void configureTestValues() {
@@ -120,10 +219,5 @@ public class Manuscript {
         }
         this.status = STATUS_SUBMITTED;
         this.title = "Title of article 1";
-    }
-
-    @JsonIgnore
-    public Boolean isRejected() {
-        return STATUS_REJECTED.equals(this.status) || STATUS_NEEDS_REVISION.equals(this.status);
     }
 }
