@@ -121,7 +121,10 @@
     </xsl:template>
 
     <xsl:template match="mets:METS" mode="community-browser">
+       	<span class="glyphicon glyphicon-folder-close"  aria-hidden="true" style="padding-right: 4px;"></span>   
         <xsl:variable name="dim" select="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim"/>
+
+
         <xref target="{@OBJID}" n="community-browser-link">
             <xsl:value-of select="$dim/dim:field[@element='title']"/>
         </xref>

@@ -43,9 +43,10 @@
     <xsl:template name="communitySummaryList-DIM">
         <xsl:variable name="data" select="./mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim"/>
         <div class="artifact-description">
-            <h4 class="artifact-title">
+            <p class="artifact-title">
                 <a href="{@OBJID}">
-                    <span class="Z3988">
+               		<span class="glyphicon glyphicon-folder-close"  aria-hidden="true" style="padding-right: 4px;"></span>   
+				    <span class="Z3988">
                         <xsl:choose>
                             <xsl:when test="string-length($data/dim:field[@element='title'][1]) &gt; 0">
                                 <xsl:value-of select="$data/dim:field[@element='title'][1]"/>
@@ -62,7 +63,7 @@
                     <xsl:value-of select="$data/dim:field[@element='format'][@qualifier='extent'][1]"/>
                     <xsl:text>]</xsl:text>
                 </xsl:if>
-            </h4>
+            </p>
         </div>
     </xsl:template>
 
@@ -71,6 +72,7 @@
         <xsl:variable name="data" select="./mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim"/>
         <span class="bold">
             <a href="{@OBJID}">
+               	<span class="glyphicon glyphicon-folder-close"  aria-hidden="true" style="padding-right: 4px;"></span>   
                 <xsl:choose>
                     <xsl:when test="string-length($data/dim:field[@element='title'][1]) &gt; 0">
                         <xsl:value-of select="$data/dim:field[@element='title'][1]"/>
