@@ -337,7 +337,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                 collection.setWorkflowStep3(group);
                 break;
             default:
-                new IllegalAccessException("Illegal step count: " + step);
+                throw new IllegalArgumentException("Illegal step count: " + step);
         }
     }
 
