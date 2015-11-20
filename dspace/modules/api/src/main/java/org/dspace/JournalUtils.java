@@ -555,10 +555,12 @@ public class JournalUtils {
     }
 
     public static void writeManuscriptToDB(Context context, Manuscript manuscript) throws StorageException {
-        String journalCode = cleanJournalCode(manuscript.organization.organizationCode);
+        String journalCode = cleanJournalCode(manuscript.organization.organizationCode).toUpperCase();
         StoragePath storagePath = new StoragePath();
         storagePath.addPathElement(Organization.ORGANIZATION_CODE, journalCode);
         storagePath.addPathElement(Manuscript.MANUSCRIPT_ID, manuscript.manuscriptId);
+
+        createOrganizationinDB(context,manuscript.organization);
 
         ManuscriptDatabaseStorageImpl manuscriptStorage = new ManuscriptDatabaseStorageImpl();
         List<Manuscript> manuscripts = getManuscriptsMatchingID(journalCode, manuscript.manuscriptId);
@@ -580,7 +582,7 @@ public class JournalUtils {
 
     public static void createOrganizationinDB(Context context, Organization organization) throws StorageException {
         // normalize with all caps for the code:
-        organization.organizationCode = cleanJournalCode(organization.organizationCode);
+        organization.organizationCode = cleanJournalCode(organization.organizationCode).toUpperCase();
 
         StoragePath storagePath = new StoragePath();
         storagePath.addPathElement(Organization.ORGANIZATION_CODE, organization.organizationCode);
