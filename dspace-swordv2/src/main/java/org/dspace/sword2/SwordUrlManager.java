@@ -516,8 +516,6 @@ public class SwordUrlManager
             // the bitstream id is the part up to the first "/"
             int firstSlash = bitstreamParts.indexOf("/");
             String bid = bitstreamParts.substring(0, firstSlash);
-            String fn = bitstreamParts.substring(firstSlash + 1);
-
             Bitstream bitstream = bitstreamService
                     .findByIdOrLegacyId(context, bid);
             return bitstream;

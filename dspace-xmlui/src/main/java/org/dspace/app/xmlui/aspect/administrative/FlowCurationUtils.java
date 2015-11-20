@@ -328,7 +328,7 @@ public class FlowCurationUtils
     
     public static Select getTaskSelectOptions(Select select, String curateGroup) throws WingException
     {
-    	String key = new String();
+    	String key;
     	String[] values = null;
         Iterator<String> iterator = null;
         if (groupedTasks.isEmpty())
@@ -357,7 +357,7 @@ public class FlowCurationUtils
                     while (innerIterator.hasNext())
                     {
                     	String optionValue = innerIterator.next().trim();
-                    	String optionText  = new String("");
+                    	String optionText;
                     	// out.print("Value: " + value + ": OptionValue: " + optionValue + ". Does value.trim().equals(optionValue)? " + value.equals(opti$
                     	if (optionValue.equals(value.trim()))
                     	{	

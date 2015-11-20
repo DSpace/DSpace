@@ -83,7 +83,7 @@ public class MetadataSchemaRegistryServlet extends DSpaceServlet
 				if (id.equals(""))
                 {
                     // Create a new metadata schema
-                    MetadataSchema schema = schemaService.create(context, name, namespace);
+                    schemaService.create(context, name, namespace);
                     showSchemas(context, request, response);
                     context.complete();
                 }

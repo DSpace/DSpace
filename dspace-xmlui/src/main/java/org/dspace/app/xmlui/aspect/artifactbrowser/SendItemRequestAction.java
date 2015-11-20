@@ -107,7 +107,6 @@ public class SendItemRequestAction extends AbstractAction
         
         Item item = (Item) dso;
         String title = "";
-        String titleDC = item.getName();
         Bitstream bitstream = bitstreamService.find(context, UUID.fromString(bitstreamId));
 
         RequestItemAuthor requestItemAuthor = new DSpace()

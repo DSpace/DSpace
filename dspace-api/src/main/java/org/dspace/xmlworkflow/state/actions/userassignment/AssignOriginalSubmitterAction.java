@@ -89,7 +89,6 @@ public class AssignOriginalSubmitterAction extends UserSelectionAction{
     @Override
     public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request) throws SQLException, AuthorizeException, IOException, WorkflowException {
         EPerson submitter = wfi.getSubmitter();
-        Step currentStep = getParent().getStep();
         WorkflowActionConfig nextAction = getParent().getStep().getNextAction(this.getParent());
         //Retrieve the action which has a user interface
         while(nextAction != null && !nextAction.requiresUI()){

@@ -87,8 +87,6 @@ public class DiscoveryOpenSearchGenerator extends AbstractOpenSearchGenerator
             	Context context = ContextUtil.obtainContext(objectModel);
                 DiscoverQuery queryArgs = new DiscoverQuery();
 
-            	Request request = ObjectModelHelper.getRequest(objectModel);
-                
             	// Sets the query
                 queryArgs.setQuery(query);
                 // start -1 because Solr indexing starts at 0 and OpenSearch

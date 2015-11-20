@@ -69,8 +69,6 @@ public class ItemRequestResponseAction extends AbstractAction
         String token = parameters.getParameter("token","");
         String decision = request.getParameter("decision");
         String isSent = request.getParameter("isSent");
-        String message = request.getParameter("message");
-
         //contactPerson:requester or contactPerson:author
         String contactPerson = request.getParameter("contactPerson");
 

@@ -836,7 +836,7 @@ public class OAIHarvester {
 
         // First, see if we can contact the target server at all.
     	try {
-    		Identify idenTest = new Identify(oaiSource);
+    		new Identify(oaiSource);
     	}
     	catch (Exception ex) {
     		errorSet.add(OAI_ADDRESS_ERROR + ": OAI server could not be reached.");

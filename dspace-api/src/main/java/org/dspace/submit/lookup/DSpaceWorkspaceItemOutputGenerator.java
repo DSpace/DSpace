@@ -425,7 +425,7 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator
 
             if (mdfield == null)
             {
-                mdfield = metadataFieldService.create(context, mdschema, element, qualifier,
+                metadataFieldService.create(context, mdschema, element, qualifier,
                         "Campo utilizzato per la cache del provider submission-lookup: "
                                 + schema);
                 create = true;

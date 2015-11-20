@@ -641,11 +641,6 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             {
                 return currentValsStored;
             }
-
-            // We have at least one document good
-            SolrDocument document = response.getResults().get(0);
-            // System.out.println("HERE");
-            // Get the info we need
         }
         catch (SolrServerException e)
         {

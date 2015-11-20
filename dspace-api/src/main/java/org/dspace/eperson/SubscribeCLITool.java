@@ -134,8 +134,6 @@ public class SubscribeCLITool {
         // Truncation will actually pass in "Midnight of yesterday in UTC", which will be,
         // at least in CDT, "7pm, the day before yesterday, in my current timezone".
         cal.add(Calendar.HOUR, -24);
-        Date thisTimeYesterday = cal.getTime();
-
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);

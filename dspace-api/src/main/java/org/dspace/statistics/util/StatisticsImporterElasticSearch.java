@@ -115,7 +115,6 @@ public class StatisticsImporterElasticSearch {
 
             DNSCache dnsCache = new DNSCache(2500, 0.75f, 2500);
             Object fromCache;
-            Random rand = new Random();
 
             ContentServiceFactory contentServiceFactory = ContentServiceFactory.getInstance();
             while ((line = input.readLine()) != null)

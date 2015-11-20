@@ -1260,7 +1260,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 	        }
 
 	        // now add the bitstream
-	        bs = bitstreamService.register(c, assetstore, bitstreamPath);
+	        bs = bitstreamService.register(c, targetBundle, assetstore, bitstreamPath);
 
 	        // set the name to just the filename
 	        int iLastSlash = bitstreamPath.lastIndexOf('/');
