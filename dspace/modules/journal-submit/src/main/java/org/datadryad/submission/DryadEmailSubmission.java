@@ -398,16 +398,16 @@ public class DryadEmailSubmission extends HttpServlet {
                 // edit the manuscript ID to the canonical one:
                 manuscript.manuscriptId = JournalUtils.getCanonicalManuscriptID(context, manuscript);
                 JournalUtils.writeManuscriptToDB(context, manuscript);
-                LOGGER.debug ("this ms has status " + manuscript.status);
+                LOGGER.debug ("this ms has status " + manuscript.getStatus());
                 Boolean approved = null;
 
-                if (manuscript.status.equals(Manuscript.STATUS_ACCEPTED)) {
+                if (manuscript.isApproved()) {
                     approved = true;
-                } else if (manuscript.status.equals(Manuscript.STATUS_REJECTED)) {
+                } else if (manuscript.isRejected()) {
                     approved = false;
-                } else if (manuscript.status.equals(Manuscript.STATUS_NEEDS_REVISION)) {
+                } else if (manuscript.isNeedsRevision()) {
                     approved = false;
-                } else if (manuscript.status.equals(Manuscript.STATUS_PUBLISHED)) {
+                } else if (manuscript.isPublished()) {
                     approved = true;
                 }
 
