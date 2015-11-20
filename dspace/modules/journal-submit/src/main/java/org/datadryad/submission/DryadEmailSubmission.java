@@ -401,7 +401,7 @@ public class DryadEmailSubmission extends HttpServlet {
                 LOGGER.debug ("this ms has status " + manuscript.getStatus());
                 Boolean approved = null;
 
-                if (manuscript.isApproved()) {
+                if (manuscript.isAccepted()) {
                     approved = true;
                 } else if (manuscript.isRejected()) {
                     approved = false;
