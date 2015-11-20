@@ -182,7 +182,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             row.setColumn(COLUMN_MSID, manuscript.manuscriptId);
             row.setColumn(COLUMN_JSON_DATA, json_data);
             row.setColumn(COLUMN_DATE_ADDED, new Date());
-            row.setColumn(COLUMN_STATUS, manuscript.status);
+            row.setColumn(COLUMN_STATUS, manuscript.getStatus());
             return row;
         } else {
             return null;
