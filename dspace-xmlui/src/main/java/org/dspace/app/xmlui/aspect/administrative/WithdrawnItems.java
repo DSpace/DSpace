@@ -220,8 +220,6 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
 
         pageMeta.addMetadata("title").addContent(getTitleMessage(info));
 
-        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
 
         pageMeta.addTrail().addContent(getTrailMessage(info));

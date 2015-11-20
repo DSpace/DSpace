@@ -236,7 +236,6 @@ public class CCLicenseStep extends AbstractProcessingStep
             throws ServletException, IOException, SQLException,
             AuthorizeException {
        
-        String ccLicenseUrl = request.getParameter("cc_license_url");
         HttpSession session = request.getSession();
     	Map<String, String> map = new HashMap<String, String>();
     	String licenseclass = (request.getParameter("licenseclass_chooser") != null) ? request.getParameter("licenseclass_chooser") : "";

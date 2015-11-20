@@ -677,7 +677,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
                 owningCollection = inProgressSubmission.getCollection();
             }
 
-            addLicense(context, item, license, (Collection) ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getParentObject(context, dso)
+            addLicense(context, item, license, owningCollection
                     , params);
 
             // FIXME ?
