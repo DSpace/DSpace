@@ -121,7 +121,10 @@
     </xsl:template>
 
     <xsl:template match="mets:METS" mode="community-browser">
+       	<span class="glyphicon glyphicon-folder-close"  aria-hidden="true" style="padding-right: 4px;"></span>   
         <xsl:variable name="dim" select="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim"/>
+
+
         <xref target="{@OBJID}" n="community-browser-link">
             <xsl:value-of select="$dim/dim:field[@element='title']"/>
         </xref>
@@ -136,12 +139,6 @@
         </xsl:if>
 
         <xsl:variable name="description" select="$dim/dim:field[@element='description'][@qualifier='abstract']"/>
-        <xsl:if test="string-length($description/text()) > 0">
-            <p rend="hidden-xs">
-                <xsl:value-of select="$description"/>
-            </p>
-        </xsl:if>
-
 
     </xsl:template>
     
