@@ -61,13 +61,12 @@ public class ManuscriptReviewStatusChangeHandler implements HandlerInterface<Man
             throw new HandlerException("Cannot process change, DSpace Kernel is not running");
         }
 
-        String status = manuscript.status;
-        if(Manuscript.STATUS_SUBMITTED.equals(status)) {
+        if (manuscript.isSubmitted()) {
             // Do nothing for submitted
-        } else if(Manuscript.STATUS_ACCEPTED.equals(status) || Manuscript.STATUS_PUBLISHED.equals(status)) {
+        } else if (manuscript.isAccepted() || manuscript.isPublished()) {
             // accept for accepted or published
             accept(manuscript);
-        } else if (Manuscript.STATUS_REJECTED.equals(status) || Manuscript.STATUS_NEEDS_REVISION.equals(status)) {
+        } else if (manuscript.isRejected() || manuscript.isNeedsRevision()) {
             // reject for rejected or needs revision
             reject(manuscript);
         }
