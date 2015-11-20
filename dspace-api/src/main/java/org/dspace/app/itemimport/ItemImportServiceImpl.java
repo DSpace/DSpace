@@ -1658,7 +1658,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     //regex supports either windows or *nix file paths
                     String[] entryChunks = entry.getName().split("/|\\\\");
                     if(entryChunks.length > 2) {
-                        if(sourceDirForZip == sourcedir) {
+                        if(StringUtils.equals(sourceDirForZip, sourcedir)) {
                             sourceDirForZip = sourcedir + "/" + entryChunks[0];
                         }
                     }
