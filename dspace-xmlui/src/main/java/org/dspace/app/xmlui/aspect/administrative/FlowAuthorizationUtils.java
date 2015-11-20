@@ -258,6 +258,9 @@ public class FlowAuthorizationUtils {
                         .authorizeManageItemPolicy(context, (Item) (bitstreamService.getParentObject(context, (Bitstream) policyParent)));
 			        break;
 				}
+			default:
+				//If we can't find a parent the policy will receive a NULL dspace object, this is not something we want.
+				throw new IllegalArgumentException("Invalid DSpaceObject type provided");
 			}
 			policy = resourcePolicyService.create(context);
 			policy.setdSpaceObject(policyParent);

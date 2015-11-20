@@ -919,7 +919,6 @@ public class ItemsResource extends Resource
         // Must used own style.
         if ((metadata.length < 2) || (metadata.length > 3))
         {
-            context.abort();
             log.error("Finding failed, bad metadata key.");
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }

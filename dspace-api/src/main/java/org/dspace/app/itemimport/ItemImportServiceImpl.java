@@ -1840,6 +1840,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 					
 					List<Collection> finalCollections = null;
 					if (theOwningCollection != null){
+                        finalCollections = new ArrayList<>();
 						finalCollections.add(theOwningCollection);
                         finalCollections.addAll(collectionList);
 					}

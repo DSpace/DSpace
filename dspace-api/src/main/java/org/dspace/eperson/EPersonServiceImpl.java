@@ -99,7 +99,11 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
     @Override
     public List<EPerson> search(Context context, String query) throws SQLException {
-        if(StringUtils.isBlank(query)) query = null;
+        if(StringUtils.isBlank(query))
+        {
+            //If we don't have a query, just return everything.
+            return findAll(context, EPerson.EMAIL);
+        }
         return search(context, query, -1, -1);
     }
 
@@ -116,7 +120,10 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         } catch(IllegalArgumentException e) {
             MetadataField firstNameField = metadataFieldService.findByElement(context, "eperson", "firstname", null);
             MetadataField lastNameField = metadataFieldService.findByElement(context, "eperson", "lastname", null);
-            if (StringUtils.isBlank(query)) query = null;
+            if (StringUtils.isBlank(query))
+            {
+                query = null;
+            }
             return ePersonDAO.search(context, query, Arrays.asList(firstNameField, lastNameField), Arrays.asList(firstNameField, lastNameField), offset, limit);
         }
     }

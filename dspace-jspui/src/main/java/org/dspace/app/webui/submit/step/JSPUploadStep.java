@@ -217,11 +217,11 @@ public class JSPUploadStep extends JSPStep
                 size = bitstream.getSize();
                 url = request.getContextPath() + "/retrieve/" + bitstreamID
                         + "/" + UIUtil.encodeBitstreamName(bitstreamName);
+                jsonResponse.addUploadFileStatus(bitstreamName, bitstreamID, size,
+                        url, status);
+                response.getWriter().print(gson.toJson(jsonResponse));
+                response.flushBuffer();
             }
-            jsonResponse.addUploadFileStatus(bitstreamName, bitstreamID, size,
-                    url, status);
-            response.getWriter().print(gson.toJson(jsonResponse));
-            response.flushBuffer();
             return;
         }
 
