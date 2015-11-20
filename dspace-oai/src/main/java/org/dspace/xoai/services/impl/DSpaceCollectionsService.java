@@ -25,12 +25,11 @@ import org.dspace.content.service.CommunityService;
 
 public class DSpaceCollectionsService implements CollectionsService {
 
-    private ContextService contextService;
     private static final CommunityService communityService
             = ContentServiceFactory.getInstance().getCommunityService();
 
     @Override
-    public List<UUID> getAllSubCollections(UUID communityId)
+    public List<UUID> getAllSubCollections(ContextService contextService, UUID communityId)
             throws SQLException
     {
         Queue<Community> comqueue = new LinkedList<>();

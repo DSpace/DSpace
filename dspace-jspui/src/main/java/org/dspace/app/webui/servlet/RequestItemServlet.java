@@ -311,14 +311,16 @@ public class RequestItemServlet extends DSpaceServlet
         {
 			Item item = requestItem.getItem();
 			String title = "";
+			String handle = "";
 			if (item != null) {
 				title = itemService.getMetadataFirstValue(item, "dc", "title", null, Item.ANY);
 				if (title == null) {
 					title = "";
 				}
+				handle = item.getHandle();
 			}
             request.setAttribute("request-name", requestItem.getReqName());
-            request.setAttribute("handle", item.getHandle());
+            request.setAttribute("handle", handle);
             request.setAttribute("title", title);
             
             JSPManager.showJSP(request, response,

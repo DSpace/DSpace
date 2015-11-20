@@ -227,7 +227,11 @@ public class MetadataConverterPlugin implements ConverterPlugin
             }
             config.read(is, "file://" + mappingPath, FileUtils.guessLang(mappingPath));
             try {
-                is.close();
+                // Make sure that we have an input stream to avoid NullPointer
+                if(is != null)
+                {
+                    is.close();
+                }
             }
             catch (IOException ex)
             {

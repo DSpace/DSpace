@@ -95,6 +95,12 @@ public class AssignOriginalSubmitterAction extends UserSelectionAction{
         while(nextAction != null && !nextAction.requiresUI()){
             nextAction = nextAction.getStep().getNextAction(nextAction);
         }
+        if(nextAction == null)
+        {
+            //Should never occur, but just in case
+            log.error("Could not find next action for step with id: " + step.getId() + " to assign a submitter to. Aborting the action.");
+            throw new IllegalStateException();
+        }
 
         createTaskForEPerson(c, wfi, step, nextAction, submitter);
 

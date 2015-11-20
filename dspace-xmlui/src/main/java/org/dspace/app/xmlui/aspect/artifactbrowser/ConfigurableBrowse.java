@@ -273,9 +273,16 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
            HttpServletResponse response = (HttpServletResponse)objectModel
 		.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
 	    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
         }
 
         BrowseInfo info = getBrowseInfo();
+        if(info == null)
+        {
+            HttpServletResponse response = (HttpServletResponse)objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+ 	        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
 
         String type = info.getBrowseIndex().getName();
 
