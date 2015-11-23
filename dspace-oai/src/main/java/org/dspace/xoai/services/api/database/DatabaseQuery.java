@@ -59,7 +59,8 @@ public class DatabaseQuery {
         if (total == null) {
             try
             {
-                total = DatabaseManager.querySingle(context, countQuery, countParameters).getIntColumn("count");
+                Object[] parameters = countParameters.toArray(new Object[countParameters.size()]);
+                total = DatabaseManager.querySingle(context, countQuery, parameters).getIntColumn("count");
             }
             catch (SQLException e1)
             {
