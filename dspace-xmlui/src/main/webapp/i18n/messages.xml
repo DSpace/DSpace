@@ -240,7 +240,10 @@
 	<message key="xmlui.ArtifactBrowser.ItemViewer.show_full">Show full item record</message>
 
 	<message key="xmlui.ArtifactBrowser.ItemViewer.withdrawn">This item has been withdrawn and is no longer available.</message>
-	<message key="xmlui.ArtifactBrowser.ItemViewer.elsevier_embed">Elsevier embed page</message>
+	<message key="xmlui.ArtifactBrowser.ItemViewer.elsevier_embed">Publisher version</message>
+	<message key="xmlui.ArtifactBrowser.ItemViewer.elsevier_embed_view">View publisher version</message>
+	<message key="xmlui.ArtifactBrowser.ItemViewer.elsevier_embed_access">You have access</message>
+	<message key="xmlui.ArtifactBrowser.ItemViewer.elsevier_embed_noaccess">Check access options</message>
 	<message key="xmlui.ArtifactBrowser.ItemViewer.elsevier_entitlement">entitlement</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.Navigation.java -->
@@ -2220,6 +2223,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-description">Description</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-viewOpen">View/<wbr/>Open</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-no-files">There are no files associated with this item.</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-files-access">Access</message>
 
 	<message key="xmlui.dri2xhtml.METS-1.0.size-bytes">bytes</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.size-kilobytes">Kb</message>
@@ -2512,7 +2516,7 @@
     <message key="xmlui.scidir.live-import.head">Elsevier Import</message>
     <message key="xmlui.scidir.live-import.hint">Fill in at least one of the following fields.</message>
     <message key="xmlui.scidir.live-import.affiliation">affiliation</message>
-    <message key="xmlui.scidir.live-import.affiliation_hint"><p>The name of the institution the publication is conntected to.</p><p>Example: "broad institute"</p></message>
+    <message key="xmlui.scidir.live-import.affiliation_hint"><p>The name of the institution the publication is connected to.</p><p>Example: "broad institute"</p></message>
     <message key="xmlui.scidir.live-import.title">title</message>
     <message key="xmlui.scidir.live-import.title_hint"><p>The publication's title.</p><p>Example: "Integrating phenotypic small-molecule profiling and human genetics"</p></message>
     <message key="xmlui.scidir.live-import.author">author</message>

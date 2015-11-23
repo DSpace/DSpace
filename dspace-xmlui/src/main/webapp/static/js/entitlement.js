@@ -44,20 +44,9 @@
                     var entitledString = String(document['entitled']);
                     var link = document['link']['@href'];
 
-                    function insertLink() {
-                        wrapper.removeClass('hidden');
-                        entitlementLink.attr('href', link);
-                        entitlementLink.attr('target', '_blank');
-                        entitlementLink.text(link);
-                    }
-
-                    if (entitledString === 'false') {
-                        insertLink();
-                    }
-
                     if (entitledString === 'true' || entitledString === 'open_access') {
-                        insertLink();
-                        wrapper.append(' (Accessible) ');
+                        $('#elsevier-embed-wrapper').find('.noaccess').addClass("hidden");
+                        $('#elsevier-embed-wrapper').find('.access').removeClass("hidden");
                     }
                 }
 

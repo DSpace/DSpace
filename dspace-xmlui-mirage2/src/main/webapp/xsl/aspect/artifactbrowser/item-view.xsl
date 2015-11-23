@@ -19,30 +19,30 @@
 -->
 
 <xsl:stylesheet
-    xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
-    xmlns:dri="http://di.tamu.edu/DRI/1.0/"
-    xmlns:mets="http://www.loc.gov/METS/"
-    xmlns:dim="http://www.dspace.org/xmlns/dspace/dim"
-    xmlns:xlink="http://www.w3.org/TR/xlink/"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
-    xmlns:atom="http://www.w3.org/2005/Atom"
-    xmlns:ore="http://www.openarchives.org/ore/terms/"
-    xmlns:oreatom="http://www.openarchives.org/ore/atom/"
-    xmlns="http://www.w3.org/1999/xhtml"
-    xmlns:xalan="http://xml.apache.org/xalan"
-    xmlns:encoder="xalan://java.net.URLEncoder"
-    xmlns:util="org.dspace.app.xmlui.utils.XSLUtils"
-    xmlns:jstring="java.lang.String"
-    xmlns:rights="http://cosimo.stanford.edu/sdr/metsrights/"
-    xmlns:confman="org.dspace.core.ConfigurationManager"
-    exclude-result-prefixes="xalan encoder i18n dri mets dim xlink xsl util jstring rights confman">
+        xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
+        xmlns:dri="http://di.tamu.edu/DRI/1.0/"
+        xmlns:mets="http://www.loc.gov/METS/"
+        xmlns:dim="http://www.dspace.org/xmlns/dspace/dim"
+        xmlns:xlink="http://www.w3.org/TR/xlink/"
+        xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+        xmlns:atom="http://www.w3.org/2005/Atom"
+        xmlns:ore="http://www.openarchives.org/ore/terms/"
+        xmlns:oreatom="http://www.openarchives.org/ore/atom/"
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:xalan="http://xml.apache.org/xalan"
+        xmlns:encoder="xalan://java.net.URLEncoder"
+        xmlns:util="org.dspace.app.xmlui.utils.XSLUtils"
+        xmlns:jstring="java.lang.String"
+        xmlns:rights="http://cosimo.stanford.edu/sdr/metsrights/"
+        xmlns:confman="org.dspace.core.ConfigurationManager"
+        exclude-result-prefixes="xalan encoder i18n dri mets dim xlink xsl util jstring rights confman">
 
     <xsl:output indent="yes"/>
 
     <xsl:template name="itemSummaryView-DIM">
         <!-- Generate the info about the item from the metadata section -->
         <xsl:apply-templates select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim"
-        mode="itemSummaryView-DIM"/>
+                             mode="itemSummaryView-DIM"/>
 
         <xsl:copy-of select="$SFXLink" />
 
@@ -325,32 +325,32 @@
 
     <xsl:template name="itemSummaryView-DIM-file-section">
         <xsl:choose>
-            <xsl:when test="//mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL' or @USE='LICENSE']/mets:file">
+            <xsl:when test="//mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL' or @USE='LICENSE']/mets:file or $DRI//dri:div[@n='item-view']//dri:p[@n='elsevier-embed-page']">
                 <div class="item-page-field-wrapper table word-break">
                     <h5>
                         <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-viewOpen</i18n:text>
                     </h5>
 
                     <xsl:variable name="label-1">
-                            <xsl:choose>
-                                <xsl:when test="confman:getProperty('mirage2.item-view.bitstream.href.label.1')">
-                                    <xsl:value-of select="confman:getProperty('mirage2.item-view.bitstream.href.label.1')"/>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <xsl:text>label</xsl:text>
-                                </xsl:otherwise>
-                            </xsl:choose>
+                        <xsl:choose>
+                            <xsl:when test="confman:getProperty('mirage2.item-view.bitstream.href.label.1')">
+                                <xsl:value-of select="confman:getProperty('mirage2.item-view.bitstream.href.label.1')"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:text>label</xsl:text>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </xsl:variable>
 
                     <xsl:variable name="label-2">
-                            <xsl:choose>
-                                <xsl:when test="confman:getProperty('mirage2.item-view.bitstream.href.label.2')">
-                                    <xsl:value-of select="confman:getProperty('mirage2.item-view.bitstream.href.label.2')"/>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <xsl:text>title</xsl:text>
-                                </xsl:otherwise>
-                            </xsl:choose>
+                        <xsl:choose>
+                            <xsl:when test="confman:getProperty('mirage2.item-view.bitstream.href.label.2')">
+                                <xsl:value-of select="confman:getProperty('mirage2.item-view.bitstream.href.label.2')"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:text>title</xsl:text>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </xsl:variable>
 
                     <xsl:for-each select="//mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL' or @USE='LICENSE']/mets:file">
@@ -364,6 +364,8 @@
                             <xsl:with-param name="size" select="@SIZE" />
                         </xsl:call-template>
                     </xsl:for-each>
+
+                    <xsl:apply-templates select="$DRI//dri:div[@n='item-view']//dri:p[@n='elsevier-embed-page']" mode="apply"/>
                 </div>
             </xsl:when>
             <!-- Special case for handling ORE resource maps stored as DSpace bitstreams -->
@@ -457,7 +459,7 @@
 
         <span class="Z3988">
             <xsl:attribute name="title">
-                 <xsl:call-template name="renderCOinS"/>
+                <xsl:call-template name="renderCOinS"/>
             </xsl:attribute>
             &#xFEFF; <!-- non-breaking space to force separating the end tag -->
         </span>
@@ -465,26 +467,26 @@
     </xsl:template>
 
     <xsl:template match="dim:field" mode="itemDetailView-DIM">
-            <tr>
-                <xsl:attribute name="class">
-                    <xsl:text>ds-table-row </xsl:text>
-                    <xsl:if test="(position() div 2 mod 2 = 0)">even </xsl:if>
-                    <xsl:if test="(position() div 2 mod 2 = 1)">odd </xsl:if>
-                </xsl:attribute>
-                <td class="label-cell">
-                    <xsl:value-of select="./@mdschema"/>
+        <tr>
+            <xsl:attribute name="class">
+                <xsl:text>ds-table-row </xsl:text>
+                <xsl:if test="(position() div 2 mod 2 = 0)">even </xsl:if>
+                <xsl:if test="(position() div 2 mod 2 = 1)">odd </xsl:if>
+            </xsl:attribute>
+            <td class="label-cell">
+                <xsl:value-of select="./@mdschema"/>
+                <xsl:text>.</xsl:text>
+                <xsl:value-of select="./@element"/>
+                <xsl:if test="./@qualifier">
                     <xsl:text>.</xsl:text>
-                    <xsl:value-of select="./@element"/>
-                    <xsl:if test="./@qualifier">
-                        <xsl:text>.</xsl:text>
-                        <xsl:value-of select="./@qualifier"/>
-                    </xsl:if>
-                </td>
-            <td class="word-break">
-              <xsl:copy-of select="./node()"/>
+                    <xsl:value-of select="./@qualifier"/>
+                </xsl:if>
             </td>
-                <td><xsl:value-of select="./@language"/></td>
-            </tr>
+            <td class="word-break">
+                <xsl:copy-of select="./node()"/>
+            </td>
+            <td><xsl:value-of select="./@language"/></td>
+        </tr>
     </xsl:template>
 
     <!-- don't render the item-view-toggle automatically in the summary view, only when it gets called -->
@@ -496,32 +498,32 @@
     <xsl:template match="dri:div[@n='item-view']/dri:head" priority="5">
     </xsl:template>
 
-   <xsl:template match="mets:fileGrp[@USE='CONTENT']">
+    <xsl:template match="mets:fileGrp[@USE='CONTENT']">
         <xsl:param name="context"/>
         <xsl:param name="primaryBitstream" select="-1"/>
-            <xsl:choose>
-                <!-- If one exists and it's of text/html MIME type, only display the primary bitstream -->
-                <xsl:when test="mets:file[@ID=$primaryBitstream]/@MIMETYPE='text/html'">
-                    <xsl:apply-templates select="mets:file[@ID=$primaryBitstream]">
-                        <xsl:with-param name="context" select="$context"/>
-                    </xsl:apply-templates>
-                </xsl:when>
-                <!-- Otherwise, iterate over and display all of them -->
-                <xsl:otherwise>
-                    <xsl:apply-templates select="mets:file">
-                     	<!--Do not sort any more bitstream order can be changed-->
-                        <xsl:with-param name="context" select="$context"/>
-                    </xsl:apply-templates>
-                </xsl:otherwise>
-            </xsl:choose>
+        <xsl:choose>
+            <!-- If one exists and it's of text/html MIME type, only display the primary bitstream -->
+            <xsl:when test="mets:file[@ID=$primaryBitstream]/@MIMETYPE='text/html'">
+                <xsl:apply-templates select="mets:file[@ID=$primaryBitstream]">
+                    <xsl:with-param name="context" select="$context"/>
+                </xsl:apply-templates>
+            </xsl:when>
+            <!-- Otherwise, iterate over and display all of them -->
+            <xsl:otherwise>
+                <xsl:apply-templates select="mets:file">
+                    <!--Do not sort any more bitstream order can be changed-->
+                    <xsl:with-param name="context" select="$context"/>
+                </xsl:apply-templates>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
-   <xsl:template match="mets:fileGrp[@USE='LICENSE']">
+    <xsl:template match="mets:fileGrp[@USE='LICENSE']">
         <xsl:param name="context"/>
         <xsl:param name="primaryBitstream" select="-1"/>
-            <xsl:apply-templates select="mets:file">
-                        <xsl:with-param name="context" select="$context"/>
-            </xsl:apply-templates>
+        <xsl:apply-templates select="mets:file">
+            <xsl:with-param name="context" select="$context"/>
+        </xsl:apply-templates>
     </xsl:template>
 
     <xsl:template match="mets:file">
@@ -569,7 +571,7 @@
                         </xsl:attribute>
                         <xsl:value-of select="util:shortenString(mets:FLocat[@LOCTYPE='URL']/@xlink:title, 30, 5)"/>
                     </dd>
-                <!-- File size always comes in bytes and thus needs conversion -->
+                    <!-- File size always comes in bytes and thus needs conversion -->
                     <dt>
                         <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-size</i18n:text>
                         <xsl:text>:</xsl:text>
@@ -594,10 +596,10 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </dd>
-                <!-- Lookup File Type description in local messages.xml based on MIME Type.
-         In the original DSpace, this would get resolved to an application via
-         the Bitstream Registry, but we are constrained by the capabilities of METS
-         and can't really pass that info through. -->
+                    <!-- Lookup File Type description in local messages.xml based on MIME Type.
+             In the original DSpace, this would get resolved to an application via
+             the Bitstream Registry, but we are constrained by the capabilities of METS
+             and can't really pass that info through. -->
                     <dt>
                         <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-format</i18n:text>
                         <xsl:text>:</xsl:text>
@@ -609,7 +611,7 @@
                                 <xsl:text>/</xsl:text>
                                 <xsl:choose>
                                     <xsl:when test="contains(@MIMETYPE,';')">
-                                <xsl:value-of select="substring-before(substring-after(@MIMETYPE,'/'),';')"/>
+                                        <xsl:value-of select="substring-before(substring-after(@MIMETYPE,'/'),';')"/>
                                     </xsl:when>
                                     <xsl:otherwise>
                                         <xsl:value-of select="substring-after(@MIMETYPE,'/')"/>
@@ -619,8 +621,8 @@
                             </xsl:with-param>
                         </xsl:call-template>
                     </dd>
-                <!-- Display the contents of 'Description' only if bitstream contains a description -->
-                <xsl:if test="mets:FLocat[@LOCTYPE='URL']/@xlink:label != ''">
+                    <!-- Display the contents of 'Description' only if bitstream contains a description -->
+                    <xsl:if test="mets:FLocat[@LOCTYPE='URL']/@xlink:label != ''">
                         <dt>
                             <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-description</i18n:text>
                             <xsl:text>:</xsl:text>
@@ -631,7 +633,7 @@
                             </xsl:attribute>
                             <xsl:value-of select="util:shortenString(mets:FLocat[@LOCTYPE='URL']/@xlink:label, 30, 5)"/>
                         </dd>
-                </xsl:if>
+                    </xsl:if>
                 </dl>
             </div>
 
@@ -647,7 +649,7 @@
             </div>
         </div>
 
-</xsl:template>
+    </xsl:template>
 
     <xsl:template name="view-open">
         <a>
@@ -667,10 +669,10 @@
                 <xsl:value-of select="rights:UserName"/>
                 <xsl:choose>
                     <xsl:when test="rights:UserName/@USERTYPE = 'GROUP'">
-                       <xsl:text> (group)</xsl:text>
+                        <xsl:text> (group)</xsl:text>
                     </xsl:when>
                     <xsl:when test="rights:UserName/@USERTYPE = 'INDIVIDUAL'">
-                       <xsl:text> (individual)</xsl:text>
+                        <xsl:text> (individual)</xsl:text>
                     </xsl:when>
                 </xsl:choose>
                 <xsl:if test="position() != last()">, </xsl:if>
@@ -692,8 +694,8 @@
 
     <xsl:template name="getFileIcon">
         <xsl:param name="mimetype"/>
-            <i aria-hidden="true">
-                <xsl:attribute name="class">
+        <i aria-hidden="true">
+            <xsl:attribute name="class">
                 <xsl:text>glyphicon </xsl:text>
                 <xsl:choose>
                     <xsl:when test="contains(mets:FLocat[@LOCTYPE='URL']/@xlink:href,'isAllowed=n')">
@@ -703,8 +705,8 @@
                         <xsl:text> glyphicon-file</xsl:text>
                     </xsl:otherwise>
                 </xsl:choose>
-                </xsl:attribute>
-            </i>
+            </xsl:attribute>
+        </i>
         <xsl:text> </xsl:text>
     </xsl:template>
 
@@ -740,5 +742,47 @@
         <i18n:text i18n:key="{$mimetype-key}"><xsl:value-of select="$mimetype"/></i18n:text>
     </xsl:template>
 
+    <xsl:template match="//dri:div[@n='item-view']//dri:p[@n='elsevier-embed-page']"/>
+    <xsl:template match="//dri:div[@n='item-view']//dri:p[@n='elsevier-embed-page']" mode="apply" >
+        <div id="elsevier-embed-wrapper">
+
+            <xsl:variable name="pii-url">
+                <xsl:value-of select="confman:getProperty('elsevier-sciencedirect', 'ui.article.url')"/>
+                <xsl:text>/pii/</xsl:text>
+                <xsl:value-of select="$DRI//dri:metadata[@element='window.DSpace' and @qualifier='item_pii']"/>
+            </xsl:variable>
+
+            <div class="access hidden">
+                    <div>
+                        <a>
+                            <xsl:attribute name="href">
+                                <xsl:value-of select="dri:xref/@target"/>
+                            </xsl:attribute>
+                            <i aria-hidden="true" class="glyphicon  glyphicon-file"></i>
+                            <xsl:text> </xsl:text>
+                            <i18n:text>xmlui.ArtifactBrowser.ItemViewer.elsevier_embed</i18n:text>
+                            <xsl:text> (</xsl:text>
+                            <i18n:text>xmlui.ArtifactBrowser.ItemViewer.elsevier_embed_access</i18n:text>
+                            <xsl:text>)</xsl:text>
+                        </a>
+                    </div>
+                </div>
+                <div class="noaccess">
+                    <div>
+                        <a>
+                            <xsl:attribute name="href">
+                                <xsl:value-of select="$pii-url"/>
+                            </xsl:attribute>
+                            <i aria-hidden="true" class="glyphicon  glyphicon-lock"></i>
+                            <xsl:text> </xsl:text>
+                            <i18n:text>xmlui.ArtifactBrowser.ItemViewer.elsevier_embed</i18n:text>
+                            <xsl:text> (</xsl:text>
+                            <i18n:text>xmlui.ArtifactBrowser.ItemViewer.elsevier_embed_noaccess</i18n:text>
+                            <xsl:text>)</xsl:text>
+                        </a>
+                    </div>
+                </div>
+        </div>
+    </xsl:template>
 
 </xsl:stylesheet>

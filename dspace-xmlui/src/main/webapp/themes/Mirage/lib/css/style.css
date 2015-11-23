@@ -1584,3 +1584,8 @@ ol.ds-ordered-list ol.ds-ordered-list ol.ds-ordered-list {
     font-size: 18px;
     font-weight: bold;
 }
+
+#elsevier-embed-wrapper .checkmark{
+    color: green;
+    margin-left:4px;
+}
