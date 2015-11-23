@@ -198,10 +198,10 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport
     /**
      * Set the EPerson's netid
      * 
-     * @param s
+     * @param netid
      *            the new netid
      */
-    public void setNetid(String s) {
+    public void setNetid(String netid) {
         this.netid = netid;
         setModified();
     }
