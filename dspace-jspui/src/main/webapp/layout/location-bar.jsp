@@ -27,7 +27,23 @@
 <%@ page import="org.dspace.core.I18nUtil" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Locale" %>
+<script>
+    function changeLanguage(locale){
+        var linkToPage = parent.location.origin + parent.location.pathname + parent.location.search;
 
+        if(linkToPage.search('locale=') > 0) {
+            var reg1 = /locale=[a-z]{2}/;
+            linkToPage = linkToPage.replace(reg1, "locale=" + locale);
+        } else {
+            var glue = "&";
+            if(parent.location.search.length == 0) {
+                glue = "?";
+            }
+            linkToPage = linkToPage + glue + "locale="+locale;
+        }
+        window.location.href = linkToPage;
+    }
+</script>
 
 <%
     Locale[] supportedLocales = I18nUtil.getSupportedLocales();
@@ -44,8 +60,7 @@
             {
         %>
         <a href="#" class ="langChangeOn"
-           onclick="javascript:document.repost.locale.value='<%=supportedLocales[i].toString()%>';
-                   document.repost.submit();">
+           onclick="changeLanguage('<%=supportedLocales[i].toString()%>');">
             <img width="20px" height="14px" src="/flags/<%=supportedLocales[i].toString()%>.gif" alt="<%= supportedLocales[i].getDisplayLanguage(supportedLocales[i])%>"/>
         </a>
         <%
