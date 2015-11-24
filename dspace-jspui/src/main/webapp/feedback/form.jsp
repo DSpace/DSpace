@@ -68,7 +68,7 @@
         <div class="form-group">
             <label for="temail" class="col-sm-4 control-label"><fmt:message key="jsp.feedback.form.email"/></label>
             <div class="col-sm-6">
-                <input type="text" name="email" id="temail" class="form-control"" value="<%=StringEscapeUtils.escapeHtml(email)%>" />
+                <input type="text" name="email" id="temail" class="form-control" value="<%=StringEscapeUtils.escapeHtml(email)%>" />
             </div>
         </div>
         <div class="form-group">
