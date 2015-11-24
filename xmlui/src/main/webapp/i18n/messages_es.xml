@@ -2054,6 +2054,7 @@ La vista resumen de la comunidad no está actualmente en uso o implementada. Est
 <message key="xmlui.dri2xhtml.METS-1.0.item-availability-linked">Link externo</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-availability-linked-help">El documento se encuentra alojado en un sitio web externo a SEDICI</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-availability-no-fulltext">Sin texto completo</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-audience">Contexto de uso</message>
 
 
 	<!-- Internationalization elements specific to the Qualified Dublin Core metadata handler.

@@ -846,7 +846,7 @@
 					<label>Compilador</label>
 					<input-type>onebox</input-type>
 					<hint>Persona que realizó el trabajo de compilación (sólo si aplica)</hint>
-					<type-bind>Libro</type-bind>
+					<type-bind>Libro,Objeto de aprendizaje</type-bind>
 					<visibility>workflow</visibility>
 				</field>
 				
@@ -868,10 +868,10 @@
 					<dc-schema>sedici</dc-schema>
 					<dc-element>contributor</dc-element>
 					<repeatable>true</repeatable>
-					<label>Otros colaboradores del Libro</label>
-					<input-type value-pairs-name="common_libro_contributors">qualdrop_value</input-type>
-					<hint>Otros colaboradores del libro</hint>
-					<type-bind>Libro</type-bind>
+					<label>Otros colaboradores</label>
+					<input-type value-pairs-name="common_libro_oa_contributors">qualdrop_value</input-type>
+					<hint>Otros colaboradores</hint>
+					<type-bind>Libro,Objeto de aprendizaje</type-bind>
 					<visibility>workflow</visibility>
 				</field>
 				
@@ -1025,6 +1025,16 @@
 				    </hint>
 				    <type-bind>Objeto Fisico</type-bind>
 				</field>
+				
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>audience</dc-element>
+					<repeatable>true</repeatable>
+					<label>Contexto de uso</label>
+					<input-type>onebox</input-type>
+					<hint>Entorno educativo típico en el que se usará el material</hint>
+					<type-bind>Objeto de aprendizaje</type-bind>
+				</field>
 
 			</page>
 
@@ -1137,7 +1147,7 @@
 			</pair>
 		</value-pairs>
 
-		<value-pairs value-pairs-name="common_libro_contributors" dc-term="identifier">
+		<value-pairs value-pairs-name="common_libro_oa_contributors" dc-term="identifier">
 			<pair>
 				<displayed-value>Editor</displayed-value>
 				<stored-value>editor</stored-value>
@@ -1322,6 +1332,10 @@
 			<pair>
 				<displayed-value>Programa</displayed-value>
 				<stored-value>Programa</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Objeto de aprendizaje</displayed-value>
+				<stored-value>Objeto de aprendizaje</stored-value>
 			</pair>
 		</value-pairs>
 

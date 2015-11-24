@@ -573,6 +573,12 @@
 			<xsl:with-param name="name" select="'coverage-temporal'"/>
 			<xsl:with-param name="elements" select="dim:field[@element='coverage' and @qualifier='temporal'] "/>
 		</xsl:call-template>
+		
+		<!-- dc.audience -->
+		<xsl:call-template name="render-normal-field">
+			<xsl:with-param name="name" select="'audience'"/>
+			<xsl:with-param name="elements" select="dim:field[@element='audience']"/>
+		</xsl:call-template>
 
 		<!-- format row -->
 		<xsl:call-template name="render-normal-field">

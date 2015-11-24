@@ -174,6 +174,11 @@
 				<dc:description><xsl:value-of select="." /></dc:description>
 			</xsl:for-each>
 			
+			<!-- dc.audience = description -->
+			<xsl:for-each select="doc:metadata/doc:element[@name='dcterms']/doc:element[@name='audience']/doc:element/doc:field[@name='value']">
+				<dc:description><xsl:value-of select="." /></dc:description>
+			</xsl:for-each>
+			
 			<!--driver.type = type -->
 			<xsl:for-each select="doc:metadata/doc:element[@name='driver']/doc:element[@name='type']/doc:element/doc:field[@name='value']">
 				<dc:type><xsl:value-of select="." /></dc:type>

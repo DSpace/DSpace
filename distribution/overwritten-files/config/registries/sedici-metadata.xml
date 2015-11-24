@@ -436,6 +436,13 @@
 		<qualifier>updated</qualifier>
 		<scope_note></scope_note>
 	</dc-type>
+	
+	<dc-type>
+	  	<schema>dc</schema>
+	  	<element>audience</element>
+	  	<!-- unqualified -->
+	  	<scope_note>A class of entity for whom the resource is intended or useful. The real namespace for this metadata is "dcterms" instead "dc".</scope_note>
+  	</dc-type>
 
 
 </dspace-dc-types>
