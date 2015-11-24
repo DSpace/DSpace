@@ -19,6 +19,12 @@
  * in this package and others, for doing common tasks.
  * </p>
  *
+ * <p>
+ * To add a usage event listener to the bus, configure it as a new {@code <bean>}
+ * in a web application's {@code applicationContext.xml} and inject the
+ * {@code EventService}, as with the stock listeners.
+ * </p>
+ *
  * @see org.dspace.statistics.ElasticSearchLoggerEventListener
  * @see org.dspace.google.GoogleRecorderEventListener
  * @see org.dspace.statistics.SolrLoggerUsageEventListener
