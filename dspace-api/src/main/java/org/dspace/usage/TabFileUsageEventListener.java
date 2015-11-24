@@ -45,22 +45,27 @@ public class TabFileUsageEventListener
             "yyyyMMdd'T'HHmmssSSS");
 
     /** File on which to write event records. */
-    private final PrintWriter eventLog;
+    private PrintWriter eventLog;
+
+    /** Is this instance initialized? */
+    private boolean initialized = false;
 
     /**
-     * Construct a usage event listener for writing TSV records to a file.
+     * Set up a usage event listener for writing TSV records to a file.
      */
-    public TabFileUsageEventListener()
+    private void init()
     {
-        ConfigurationService cfg = new DSpace().getConfigurationService();
+        ConfigurationService configurationService
+                = new DSpace().getConfigurationService();
 
-        String logPath = cfg.getPropertyAsType("usageEvent.tabFileLogger.file",
+        String logPath = configurationService.getPropertyAsType(
+                "usageEvent.tabFileLogger.file",
                 "usage-events.tsv");
 
         String logDir = null;
         if (!new File(logPath).isAbsolute())
         {
-            logDir = cfg.getProperty("log.dir");
+            logDir = configurationService.getProperty("log.dir");
         }
 
         File logFile = new File(logDir, logPath);
@@ -68,6 +73,7 @@ public class TabFileUsageEventListener
         {
             eventLog = new PrintWriter(new OutputStreamWriter(
                     new FileOutputStream(logFile, true)));
+            errorLog.debug("Writing to {}", logFile.getAbsolutePath());
         }
         catch (FileNotFoundException e)
         {
@@ -87,11 +93,16 @@ public class TabFileUsageEventListener
                     + '\t' + "sourceAddress"
                     + '\t' + "eperson");
         }
+
+        initialized = true;
     }
     
     @Override
     public synchronized void receiveEvent(Event event)
     {
+        if (!initialized)
+            init();
+
         if (errorLog.isDebugEnabled())
             errorLog.debug("got: {}", event.toString());
 
@@ -108,7 +119,7 @@ public class TabFileUsageEventListener
             .append('\t').append(Constants.typeText[ue.getObject().getType()])
             .append('\t').append(ue.getObject().getID().toString())
             .append('\t').append(ue.getRequest().getSession().getId())
-            .append('\t').append(ue.getRequest().getRequestURI());
+            .append('\t').append(ue.getRequest().getRemoteAddr());
 
         String epersonName = (null == ue.getContext().getCurrentUser()
                 ? "anonymous"
