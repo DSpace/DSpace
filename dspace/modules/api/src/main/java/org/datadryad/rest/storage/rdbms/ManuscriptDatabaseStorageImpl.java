@@ -128,6 +128,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         if(row != null) {
             String json_data = row.getStringColumn(COLUMN_JSON_DATA);
             Manuscript manuscript = reader.readValue(json_data);
+            manuscript.setStatus(row.getStringColumn(COLUMN_STATUS));
             if (manuscript.organization == null) {
                 manuscript.organization = new Organization();
             }
