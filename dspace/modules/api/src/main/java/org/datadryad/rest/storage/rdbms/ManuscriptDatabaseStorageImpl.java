@@ -190,14 +190,6 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         }
     }
 
-    // Replaces JSON data with new data and increments version
-    private static void updateTableRow(final TableRow oldRow, TableRow newRow) {
-        Integer version = oldRow.getIntColumn(COLUMN_VERSION);
-        version++;
-        newRow.setColumn(COLUMN_VERSION, version);
-        newRow.setColumn(COLUMN_ACTIVE, ACTIVE_TRUE);
-    }
-
     private static Manuscript getManuscriptById(Context context, String msid, String organizationCode) throws SQLException, IOException {
         Integer organizationId = getOrganizationInternalId(context, organizationCode);
         if(organizationId == NOT_FOUND) {
@@ -273,6 +265,8 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         if(existingRow != null) {
             String json_data = writer.writeValueAsString(manuscript);
             existingRow.setColumn(COLUMN_JSON_DATA, json_data);
+            existingRow.setColumn(COLUMN_STATUS, manuscript.getStatus());
+            existingRow.setColumn(COLUMN_DATE_ADDED, new Date());
             DatabaseManager.update(context, existingRow);
         }
     }
