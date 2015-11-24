@@ -270,7 +270,7 @@
         }
     %>
     <nav role = "pagination">
-        <%@ include file="pagination.jsp" %>
+        <%@ include file="pagination/pagination.jsp" %>
     </nav>
     <%-- give us the bottom report on what we are looking at --%>
     <%--<div class="browse_range">--%>

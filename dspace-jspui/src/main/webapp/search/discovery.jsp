@@ -48,6 +48,7 @@
 <%@page import="org.dspace.sort.SortOption"%>
 <%@page import="ua.edu.sumdu.essuir.utils.DCInputReader"%>
 <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="org.dspace.core.ConfigurationManager" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
 		   prefix="fmt" %>
@@ -505,76 +506,7 @@
 
 
 	%>
-	<hr/>
-	<div class="discovery-result-pagination row container">
-		<%
-			long lastHint = qResults.getStart()+qResults.getMaxResults() <= qResults.getTotalSearchResults()?
-					qResults.getStart()+qResults.getMaxResults():qResults.getTotalSearchResults();
-		%>
-			<%-- <p align="center">Results <//%=qResults.getStart()+1%>-<//%=qResults.getStart()+qResults.getHitHandles().size()%> of --%>
-		<div class="alert alert-info"><fmt:message key="jsp.search.results.results">
-			<fmt:param><%=qResults.getStart()+1%></fmt:param>
-			<fmt:param><%=lastHint%></fmt:param>
-			<fmt:param><%=qResults.getTotalSearchResults()%></fmt:param>
-			<fmt:param><%=(float) qResults.getSearchTime() / 1000%></fmt:param>
-		</fmt:message></div>
-		<ul class="pagination pull-right">
-			<%
-				if (pageFirst != pageCurrent)
-				{
-			%><li><a href="<%= prevURL %>"><fmt:message key="jsp.search.general.previous" /></a></li><%
-		}
-		else
-		{
-		%><li class="disabled"><span><fmt:message key="jsp.search.general.previous" /></span></li><%
-			}
 
-			if (pageFirst != 1)
-			{
-		%><li><a href="<%= firstURL %>">1</a></li><li>...</li><%
-			}
-
-			for( long q = pageFirst; q <= pageLast; q++ )
-			{
-				String myLink = "<li><a href=\""
-						+ baseURL;
-
-
-				if( q == pageCurrent )
-				{
-					myLink = "<li class=\"active\"><span>" + q + "</span></li>";
-				}
-				else
-				{
-					myLink = myLink
-							+ (q-1) * qResults.getMaxResults()
-							+ "\">"
-							+ q
-							+ "</a></li>";
-				}
-		%>
-
-			<%= myLink %>
-
-			<%
-				}
-
-				if (pageTotal > pageLast)
-				{
-			%><li class="disabled"><span>...</span></li><li><a href="<%= lastURL %>"><%= pageTotal %></a></li><%
-			}
-			if (pageTotal > pageCurrent)
-			{
-		%><li><a href="<%= nextURL %>"><fmt:message key="jsp.search.general.next" /></a></li><%
-		}
-		else
-		{
-		%><li class="disabled"><span><fmt:message key="jsp.search.general.next" /></span></li><%
-			}
-		%>
-		</ul>
-		<!-- give a content to the div -->
-	</div>
 	<div class="discovery-result-results">
 		<% if (communities.length > 0 ) { %>
 		<div class="panel panel-info">
@@ -597,75 +529,8 @@
 		</div>
 		<% } %>
 	</div>
-	<%-- if the result page is enought long... --%>
-	<% if ((communities.length + collections.length + items.length) > 10) {%>
-	<%-- show again the navigation info/links --%>
-	<div class="discovery-result-pagination row container">
-			<%-- <p align="center">Results <//%=qResults.getStart()+1%>-<//%=qResults.getStart()+qResults.getHitHandles().size()%> of --%>
-		<div class="alert alert-info"><fmt:message key="jsp.search.results.results">
-			<fmt:param><%=qResults.getStart()+1%></fmt:param>
-			<fmt:param><%=lastHint%></fmt:param>
-			<fmt:param><%=qResults.getTotalSearchResults()%></fmt:param>
-			<fmt:param><%=(float) qResults.getSearchTime() / 1000 %></fmt:param>
-		</fmt:message></div>
-		<ul class="pagination pull-right">
-			<%
-				if (pageFirst != pageCurrent)
-				{
-			%><li><a href="<%= prevURL %>"><fmt:message key="jsp.search.general.previous" /></a></li><%
-		}
-		else
-		{
-		%><li class="disabled"><span><fmt:message key="jsp.search.general.previous" /></span></li><%
-			}
+	<%@include file="../pagination/pagination-search.jsp"%>
 
-			if (pageFirst != 1)
-			{
-		%><li><a href="<%= firstURL %>">1</a></li><li class="disabled"><span>...</span></li><%
-			}
-
-			for( long q = pageFirst; q <= pageLast; q++ )
-			{
-				String myLink = "<li><a href=\""
-						+ baseURL;
-
-
-				if( q == pageCurrent )
-				{
-					myLink = "<li class=\"active\"><span>" + q + "</span></li>";
-				}
-				else
-				{
-					myLink = myLink
-							+ (q-1) * qResults.getMaxResults()
-							+ "\">"
-							+ q
-							+ "</a></li>";
-				}
-		%>
-
-			<%= myLink %>
-
-			<%
-				}
-
-				if (pageTotal > pageLast)
-				{
-			%><li class="disabled"><span>...</span></li><li><a href="<%= lastURL %>"><%= pageTotal %></a></li><%
-			}
-			if (pageTotal > pageCurrent)
-			{
-		%><li><a href="<%= nextURL %>"><fmt:message key="jsp.search.general.next" /></a></li><%
-		}
-		else
-		{
-		%><li class="disabled"><span><fmt:message key="jsp.search.general.next" /></span></li><%
-			}
-		%>
-		</ul>
-		<!-- give a content to the div -->
-	</div>
-	<% } %>
 	<% } %>
 	<dspace:sidebar>
 		<%

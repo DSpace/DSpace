@@ -289,7 +289,7 @@
                     <fmt:param value="<%= Integer.toString(bi.getFinish()) %>"/>
                     <fmt:param value="<%= Integer.toString(bi.getTotal()) %>"/>
                 </fmt:message>--%>
-                <%@ include file="../pagination.jsp" %>
+                <%@ include file="../pagination/pagination.jsp" %>
                     <%--  do the bottom previous and next page links --%>
                <%-- <%
                     if (bi.hasPrevPage()) {
