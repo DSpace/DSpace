@@ -113,7 +113,7 @@
 
     <%-- Build the header (careful use of spacing) --%>
     <h2>
-        <fmt:message key="browse.single.header"><fmt:param value="<%= scope %>"/></fmt:message> <fmt:message
+        <fmt:message key="browse.single.header"><fmt:param value="<%= scope %>"/></fmt:message>&nbsp;<fmt:message
             key="<%= typeKey %>"/>
     </h2>
 
