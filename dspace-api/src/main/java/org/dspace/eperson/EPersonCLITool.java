@@ -417,7 +417,7 @@ public class EPersonCLITool {
             for (EPerson person : ePersonService.findAll(context, EPerson.EMAIL))
             {
                 System.out.printf("%s\t%s/%s\t%s, %s\n",
-                        person.getID(),
+                        person.getID().toString(),
                         person.getEmail(),
                         person.getNetid(),
                         person.getLastName(), person.getFirstName()); // TODO more user details
