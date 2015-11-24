@@ -7,26 +7,21 @@
  */
 package org.dspace.app.webui.servlet;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.sql.SQLException;
-import java.util.Date;
+import org.apache.commons.validator.EmailValidator;
+import org.apache.log4j.Logger;
+import org.dspace.app.webui.util.JSPManager;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.*;
+import org.dspace.eperson.EPerson;
 
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
-import org.apache.commons.validator.EmailValidator;
-import org.dspace.app.webui.util.JSPManager;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
-import org.dspace.core.Email;
-import org.dspace.core.I18nUtil;
-import org.dspace.core.LogManager;
-import org.dspace.eperson.EPerson;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.sql.SQLException;
+import java.util.Date;
 
 /**
  * Servlet for handling user feedback
@@ -41,7 +36,7 @@ public class FeedbackServlet extends DSpaceServlet
     private static Logger log = Logger.getLogger(FeedbackServlet.class);
 
     protected void doDSGet(Context context, HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException,
+                           HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
         // Obtain information from request
@@ -53,7 +48,7 @@ public class FeedbackServlet extends DSpaceServlet
 
         String basicHost = "";
         if (host.equals("localhost") || host.equals("127.0.0.1")
-        		|| host.equals(InetAddress.getLocalHost().getHostAddress()))
+                || host.equals(InetAddress.getLocalHost().getHostAddress()))
         {
             basicHost = host;
         }
@@ -151,7 +146,7 @@ public class FeedbackServlet extends DSpaceServlet
     }
 
     protected void doDSPost(Context context, HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException,
+                            HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
         // Treat as a GET

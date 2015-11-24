@@ -64,24 +64,25 @@
 <%
     }
 %>
-    <form action="<%= request.getContextPath() %>/feedback" method="post">
-        <center>
-            <table>
-                <tr>
-                    <td class="submitFormLabel"><label for="temail"><fmt:message key="jsp.feedback.form.email"/></label></td>
-                    <td><input type="text" name="email" id="temail" size="50" value="<%=StringEscapeUtils.escapeHtml(email)%>" /></td>
-                </tr>
-                <tr>
-                    <td class="submitFormLabel"><label for="tfeedback"><fmt:message key="jsp.feedback.form.comment"/></label></td>
-                    <td><textarea name="feedback" id="tfeedback" rows="6" cols="50"><%=StringEscapeUtils.escapeHtml(feedback)%></textarea></td>
-                </tr>
-                <tr>
-                    <td colspan="2" align="center">
-                    <input type="submit" name="submit" value="<fmt:message key="jsp.feedback.form.send"/>" />
-                    </td>
-                </tr>
-            </table>
-        </center>
+    <form action="<%= request.getContextPath() %>/feedback" method="post" class="form-horizontal">
+        <div class="form-group">
+            <label for="temail" class="col-sm-4 control-label"><fmt:message key="jsp.feedback.form.email"/></label>
+            <div class="col-sm-6">
+                <input type="text" name="email" id="temail" class="form-control" value="<%=StringEscapeUtils.escapeHtml(email)%>" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="tfeedback" class="col-sm-4 control-label"><fmt:message key="jsp.feedback.form.comment"/></label>
+            <div class="col-sm-6">
+                <textarea name="feedback" id="tfeedback" class="form-control" rows="3"><%=StringEscapeUtils.escapeHtml(feedback)%></textarea>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-4 col-sm-6">
+                <input type="submit" name="submit" value="<fmt:message key="jsp.feedback.form.send"/>"  class="btn btn-default"/>
+            </div>
+        </div>
     </form>
 
 </dspace:layout>
