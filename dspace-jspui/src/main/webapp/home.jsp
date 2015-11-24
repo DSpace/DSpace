@@ -51,7 +51,7 @@
     {
         feedData = "ALL:" + ConfigurationManager.getProperty("webui.feed.formats");
     }
-    
+
     ItemCounter ic = new ItemCounter(UIUtil.obtainContext(request));
 %>
 
@@ -88,23 +88,12 @@
 					int i = 0;
 					for (String typeLocale : typesLocale.keySet())
 					{
-						String type = typesLocale.get(typeLocale);
-						String query = "";
-						java.util.StringTokenizer tokens = new java.util.StringTokenizer(typeLocale);
-
-						while (tokens.hasMoreTokens()) {
-							query += "+" + tokens.nextToken();
-						}
-
-						if (query.length() > 0)
-							query = query.substring(1);
-
 				%>
 				<td class="standard" width="25%">
-					<a href="<%= request.getContextPath() %>/simple-search?query=&filtername=type&filtertype=equals&filterquery=<%= query %>&rpp=20&sort_by=dc.date.issued_dt&order=desc"><%= typeLocale %></a>
+					<a href="<%= request.getContextPath() %>/simple-search?query=&filtername=type&filtertype=equals&filterquery=<%= typesLocale.get(typeLocale) %>&rpp=20&sort_by=dc.date.issued_dt&order=desc"><%= typeLocale %></a>
 					<%
 					%>
-					<span class="badge"><%= types.get(type) %></span>
+					<span class="badge"><%= types.get(typesLocale.get(typeLocale)) %></span>
 					<%
 					%>
 				</td>
