@@ -323,7 +323,12 @@
 
                 var runAfterJSImports = new FnArray();
             </script>
-
+			
+			<xsl:if test="/dri:document/dri:body/dri:div[@n='item-view']">
+				<!-- ALTMETRIC JS -->
+	            <script type='text/javascript' src='https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js'>&#160;</script>
+			</xsl:if>
+			
             <!-- Add the title in -->
             <xsl:variable name="page_title" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title']" />
             <title>

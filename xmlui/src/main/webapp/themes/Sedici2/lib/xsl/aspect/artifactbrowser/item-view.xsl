@@ -64,7 +64,58 @@
     	</xsl:call-template>    			
     </xsl:template>
     
+    <xsl:template name="showExternalServices">
+    	<xsl:param name="metadataFields"/>
+    		
+    		<xsl:variable name="title" select="$metadataFields[@element='title' and @mdschema='dc']/text()"/>
+    		<xsl:variable name="handle" select="$metadataFields[@element='identifier' and @qualifier='uri' and @mdschema='dc']/text()"/>
+    		<xsl:if test="$metadataFields">
+		    	<div class="external-services-bar">
+		    		<!-- ALTMETRIC service -->
+					<div id="altmetric-container">
+						<div class="altmetric-embed" data-badge-type='4' data-badge-popover="bottom">
+							<xsl:choose>
+								<xsl:when test="$metadataFields[@element='identifier' and @qualifier='doi' and @mdschema='sedici']">
+									<xsl:attribute name="data-doi">
+										<xsl:value-of select="$metadataFields[@element='identifier' and @qualifier='doi' and @mdschema='sedici']/text()"/>
+									</xsl:attribute>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:attribute name="data-handle">
+										<xsl:value-of select="substring-after($handle,'http://hdl.handle.net/')"/>
+									</xsl:attribute>
+								</xsl:otherwise>
+							</xsl:choose>
+							&#160;
+						</div>
+					</div>
+					<!-- BASE-SEARCH service -->
+		    		<div id="base-search-net">
+		    			<a target="_blank" title="View registry in BASE">
+		    				<xsl:attribute name="href">
+		    					<xsl:value-of select="'http://www.base-search.net/Search/Results?q='"/>
+		    					<xsl:value-of select="exts:encodeURL(concat('tit:',$title ,' dccoll:ftunivlaplata'))"/>
+		    					<xsl:value-of select="'&amp;lem=1&amp;type=all&amp;refid=dclink&amp;l=es'"/>
+		    				</xsl:attribute>
+		    				<span><xsl:text>BASE</xsl:text></span>
+		    			</a>
+		    		</div>
+		    		<!-- GOOGLE SCHOLAR service -->
+		    		<div id="google-scholar-search">
+		    			<a target="_blank" title="View citations in Google Scholar">
+		    				<xsl:attribute name="href">
+		    					<xsl:value-of select="concat('http://scholar.google.com/scholar?q=allintitle%3A&quot;', exts:encodeURL($title),'&quot;')"/>
+		    				</xsl:attribute>
+		    				<span><xsl:text>GoogleScholar</xsl:text></span>
+		    			</a>
+		    		</div>
+		    	</div>
+		    </xsl:if>
+    </xsl:template>
+    
     <xsl:template name="showSocialBar">
+    	<xsl:variable name="title" select="dim:field[@element='title' and @mdschema='dc']/text()"/>
+    	<xsl:variable name="sedici_url" select="concat('http://sedici.unlp.edu.ar/handle/', substring-after(dim:field[@element='identifier' and @qualifier='uri' and @mdschema='dc']/text(),'http://hdl.handle.net/'))"/>
     	<div class="share-bar">
 		        <div id="fb-root">
 		        	<xsl:comment>&#160;</xsl:comment>
@@ -74,6 +125,24 @@
 		        </div>
 		    	<div id="share_tw">
 		    		<xsl:text>&#160;</xsl:text>
+		    	</div>
+		    	<!-- MENDELEY IMPORT service -->
+	    		<div id="import_mendeley">
+	    			<a target="_blank" title="Add this article to your Mendeley library">
+	    				<xsl:attribute name="href">
+	    					<xsl:value-of select="concat('https://www.mendeley.com/import/?url=',exts:encodeURL($sedici_url))"/>
+	    				</xsl:attribute>
+	    				<span><xsl:text>&#160;</xsl:text></span>
+	    			</a>
+	    		</div>
+	    		<!-- RESEARCH GATE -->
+		    	<div id="share_research_gate">
+		    		<a target="_blank" title="Share on ResearchGate">
+		    			<xsl:attribute name="href">
+		    				<xsl:value-of select="concat('https://www.researchgate.net/go.Share.html?url=',exts:encodeURL($sedici_url),'&amp;title=',exts:encodeURL($title))"/>
+		    			</xsl:attribute>
+		    			<span><xsl:text>&#160;</xsl:text></span>
+		    		</a>
 		    	</div>
 		</div>
     </xsl:template>
@@ -586,7 +655,12 @@
 		</xsl:if>
 
 		<xsl:apply-templates select="/mets:METS" mode="generate-bitstream"/>
-
+		
+		<!-- Mostramos los servicios externos -->
+        <xsl:call-template name="showExternalServices">
+        	<xsl:with-param name="metadataFields" select="//dim:field"/>
+        </xsl:call-template>
+		
 		<!-- date.available row -->
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'date-accessioned'" />

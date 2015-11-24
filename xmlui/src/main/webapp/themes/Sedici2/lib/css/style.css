@@ -3954,6 +3954,30 @@ table.dropdown-table.ui-accordion tr:hover td{
   font-size: 10px;
 }
 
+.external-services-bar div {
+    float: left;
+    display: inline;
+}
+
+#base-search-net,#google-scholar-search{
+  margin: -3px 0 0 8px;
+}
+#base-search-net a span{
+    background: url("../../images/icon_base_search_net.png") no-repeat scroll left top;
+    padding: 1px 0 0 18px;
+}
+
+#base-search-net a span:hover,#google-scholar-search a span:hover{
+    opacity: 0.8;
+}
+
+#google-scholar-search a span{
+  background: url("../../images/icon_google_scholar.png") no-repeat scroll left top;
+  padding: 1px 0 0 18px;
+  margin: 0 0 0 10px;
+}
+
+
 /*Social bar styles*/
  .share-bar>div {
        display:inline-block;
@@ -3963,3 +3987,17 @@ table.dropdown-table.ui-accordion tr:hover td{
        float: right; 
        clear: right;
     }
+  .share-bar>div a span {
+    padding: 5px 0 4px 20px;
+  }
+  
+  .share-bar>div a span:hover {
+     opacity: 0.8;
+  }
+  .share-bar>div#share_research_gate a span {
+    background: url("../../images/icon_researchgate_24x24.png") no-repeat scroll left top;
+    border-radius: 5px;
+  }
+  .share-bar>div#import_mendeley a span {
+    background: url("../../images/icon_mendeley_24x24.png") no-repeat scroll left top;
+  }
