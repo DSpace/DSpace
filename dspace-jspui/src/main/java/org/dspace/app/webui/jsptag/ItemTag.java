@@ -34,6 +34,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static ua.edu.sumdu.essuir.utils.EssuirUtils.getTypeLocalized;
+
 /**
  * <P>
  * JSP tag for displaying an item.
@@ -42,19 +44,19 @@ import java.util.regex.Pattern;
  * The fields that are displayed can be configured in <code>dspace.cfg</code>
  * using the <code>webui.itemdisplay.(style)</code> property. The form is
  * </P>
- * 
+ *
  * <PRE>
- * 
+ *
  * &lt;schema prefix&gt;.&lt;element&gt;[.&lt;qualifier&gt;|.*][(date)|(link)], ...
- * 
+ *
  * </PRE>
- * 
+ *
  * <P>
  * For example:
  * </P>
- * 
+ *
  * <PRE>
- * 
+ *
  * dc.title = Dublin Core element 'title' (unqualified)
  * dc.title.alternative = DC element 'title', qualifier 'alternative'
  * dc.title.* = All fields with Dublin Core element 'title' (any or no qualifier)
@@ -62,106 +64,106 @@ import java.util.regex.Pattern;
  * dc.date.issued(date) = DC date.issued, render as a date
  * dc.identifier.doi(doi) = DC identifier.doi, render as link to http://dx.doi.org
  * dc.identifier.hdl(handle) = DC identifier.hanlde, render as link to http://hdl.handle.net
- * dc.relation.isPartOf(resolver) = DC relation.isPartOf, render as link to the base url of the resolver 
- *                                  according to the specified urn in the metadata value (doi:xxxx, hdl:xxxxx, 
+ * dc.relation.isPartOf(resolver) = DC relation.isPartOf, render as link to the base url of the resolver
+ *                                  according to the specified urn in the metadata value (doi:xxxx, hdl:xxxxx,
  *                                  urn:issn:xxxx, etc.)
- * 
+ *
  * </PRE>
- * 
+ *
  * <P>
  * When using "resolver" in webui.itemdisplay to render identifiers as resolvable
- * links, the base URL is taken from <code>webui.resolver.<n>.baseurl</code> 
+ * links, the base URL is taken from <code>webui.resolver.<n>.baseurl</code>
  * where <code>webui.resolver.<n>.urn</code> matches the urn specified in the metadata value.
  * The value is appended to the "baseurl" as is, so the baseurl need to end with slash almost in any case.
  * If no urn is specified in the value it will be displayed as simple text.
- * 
+ *
  * <PRE>
- * 
+ *
  * webui.resolver.1.urn = doi
  * webui.resolver.1.baseurl = http://dx.doi.org/
  * webui.resolver.2.urn = hdl
  * webui.resolver.2.baseurl = http://hdl.handle.net/
- * 
+ *
  * </PRE>
- * 
- * For the doi and hdl urn defaults values are provided, respectively http://dx.doi.org/ and 
- * http://hdl.handle.net/ are used.<br> 
- * 
+ *
+ * For the doi and hdl urn defaults values are provided, respectively http://dx.doi.org/ and
+ * http://hdl.handle.net/ are used.<br>
+ *
  * If a metadata value with style: "doi", "handle" or "resolver" matches a URL
  * already, it is simply rendered as a link with no other manipulation.
  * </P>
- * 
+ *
  * <PRE>
- * 
+ *
  * <P>
  * If an item has no value for a particular field, it won't be displayed. The
  * name of the field for display will be drawn from the current UI dictionary,
  * using the key:
  * </P>
- * 
+ *
  * <PRE>
- * 
+ *
  * &quot;metadata.&lt;style.&gt;.&lt;field&gt;&quot;
- * 
+ *
  * e.g. &quot;metadata.thesis.dc.title&quot; &quot;metadata.thesis.dc.contributor.*&quot;
  * &quot;metadata.thesis.dc.date.issued&quot;
- * 
- * 
+ *
+ *
  * if this key is not found will be used the more general one
- * 
+ *
  * &quot;metadata.&lt;field&gt;&quot;
- * 
+ *
  * e.g. &quot;metadata.dc.title&quot; &quot;metadata.dc.contributor.*&quot;
  * &quot;metadata.dc.date.issued&quot;
- * 
+ *
  * </PRE>
- * 
+ *
  * <P>
  * You need to specify which strategy use for select the style for an item.
  * </P>
- * 
+ *
  * <PRE>
- * 
+ *
  * plugin.single.org.dspace.app.webui.util.StyleSelection = \
  *                      org.dspace.app.webui.util.CollectionStyleSelection
  *                      #org.dspace.app.webui.util.MetadataStyleSelection
- * 
+ *
  * </PRE>
- * 
+ *
  * <P>
  * With the Collection strategy you can also specify which collections use which
  * views.
  * </P>
- * 
+ *
  * <PRE>
- * 
+ *
  * webui.itemdisplay.&lt;style&gt;.collections = &lt;collection handle&gt;, ...
- * 
+ *
  * </PRE>
- * 
+ *
  * <P>
  * FIXME: This should be more database-driven
  * </P>
- * 
+ *
  * <PRE>
- * 
+ *
  * webui.itemdisplay.thesis.collections = 123456789/24, 123456789/35
- * 
+ *
  * </PRE>
- * 
+ *
  * <P>
  * With the Metadata strategy you MUST specify which metadata use as name of the
  * style.
  * </P>
- * 
+ *
  * <PRE>
- * 
+ *
  * webui.itemdisplay.metadata-style = schema.element[.qualifier|.*]
- * 
+ *
  * e.g. &quot;dc.type&quot;
- * 
+ *
  * </PRE>
- * 
+ *
  * @author Robert Tansley
  * @version $Revision$
  */
@@ -190,13 +192,13 @@ public class ItemTag extends TagSupport
     private static Logger log = Logger.getLogger(ItemTag.class);
 
     private StyleSelection styleSelection = (StyleSelection) PluginManager.getSinglePlugin(StyleSelection.class);
-    
+
     /** Hashmap of linked metadata to browse, from dspace.cfg */
     private static Map<String,String> linkedMetadata;
-    
+
     /** Hashmap of urn base url resolver, from dspace.cfg */
     private static Map<String,String> urn2baseurl;
-    
+
     /** regex pattern to capture the style of a field, ie <code>schema.element.qualifier(style)</code> */
     private Pattern fieldStylePatter = Pattern.compile(".*\\((.*)\\)");
 
@@ -248,7 +250,7 @@ public class ItemTag extends TagSupport
             urn2baseurl.put("hdl",HANDLE_DEFAULT_BASEURL);
         }
     }
-    
+
     public ItemTag()
     {
         super();
@@ -292,7 +294,7 @@ public class ItemTag extends TagSupport
 
     /**
      * Get the item this tag should display
-     * 
+     *
      * @return the item
      */
     public Item getItem()
@@ -302,7 +304,7 @@ public class ItemTag extends TagSupport
 
     /**
      * Set the item this tag should display
-     * 
+     *
      * @param itemIn
      *            the item to display
      */
@@ -313,7 +315,7 @@ public class ItemTag extends TagSupport
 
     /**
      * Get the collections this item is in
-     * 
+     *
      * @return the collections
      */
     public Collection[] getCollections()
@@ -323,7 +325,7 @@ public class ItemTag extends TagSupport
 
     /**
      * Set the collections this item is in
-     * 
+     *
      * @param collectionsIn
      *            the collections
      */
@@ -334,7 +336,7 @@ public class ItemTag extends TagSupport
 
     /**
      * Get the style this tag should display
-     * 
+     *
      * @return the style
      */
     public String getStyle()
@@ -344,7 +346,7 @@ public class ItemTag extends TagSupport
 
     /**
      * Set the style this tag should display
-     * 
+     *
      * @param styleIn
      *            the Style to display
      */
@@ -380,7 +382,7 @@ public class ItemTag extends TagSupport
 
         /*
          * Break down the configuration into fields and display them
-         * 
+         *
          * FIXME?: it may be more efficient to do some processing once, perhaps
          * to a more efficient intermediate class, but then it would become more
          * difficult to reload the configuration "on the fly".
@@ -401,7 +403,7 @@ public class ItemTag extends TagSupport
             if (fieldStyleMatcher.matches()){
                 style = fieldStyleMatcher.group(1);
             }
-            
+
             String browseIndex;
             try
             {
@@ -423,7 +425,7 @@ public class ItemTag extends TagSupport
 				isDisplay = style.equals("inputform");
                 isResolver = style.contains("resolver") || urn2baseurl.keySet().contains(style);
                 field = field.replaceAll("\\("+style+"\\)", "");
-            } 
+            }
 
             // Get the separate schema + element + qualifier
 
@@ -448,7 +450,7 @@ public class ItemTag extends TagSupport
 
             // FIXME: Still need to fix for metadata language?
             Metadatum[] values = item.getMetadata(schema, element, qualifier, Item.ANY);
-            
+
             if (values.length > 0)
             {
                 out.print("<tr><td class=\"metadataFieldLabel\">");
@@ -467,29 +469,29 @@ public class ItemTag extends TagSupport
                     label = LocaleSupport.getLocalizedMessage(pageContext,
                             "metadata." + field);
                 }
-                
+
                 out.print(label);
                 out.print(":&nbsp;</td><td class=\"metadataFieldValue\">");
-                
+
                 //If the values are in controlled vocabulary and the display value should be shown
                 if (isDisplay){
                     List<String> displayValues = new ArrayList<String>();
-                   
+
 
                     displayValues = Util.getControlledVocabulariesDisplayValueLocalized(item, values, schema, element, qualifier, sessionLocale);
-                                
+
                         if (displayValues != null && !displayValues.isEmpty())
                         {
                             for (int d = 0; d < displayValues.size(); d++)
                             {
                                 out.print(displayValues.get(d));
                                 if (d<displayValues.size()-1)  out.print(" <br/>");
-                                
+
                             }
                         }
                     out.print("</td>");
                     continue;
-                 }   
+                 }
                 for (int j = 0; j < values.length; j++)
                 {
                     if (values[j] != null && values[j].value != null)
@@ -511,8 +513,11 @@ public class ItemTag extends TagSupport
                                 out.print("<br />");
                             }
                         }
-
-                        if (isLink)
+                        if (field.startsWith("dc.type"))
+                        {
+                            String locale = sessionLocale.toString();
+                            out.print(getTypeLocalized(values[j].value, locale));
+                        } else if (isLink)
                         {
                             out.print("<a href=\"" + values[j].value + "\">"
                                     + Utils.addEntities(values[j].value) + "</a>");
@@ -756,7 +761,7 @@ public class ItemTag extends TagSupport
         	Bundle[] bundles = item.getBundles("ORIGINAL");
 
         	boolean filesExist = false;
-            
+
             for (Bundle bnd : bundles)
             {
             	filesExist = bnd.getBitstreams().length > 0;
@@ -765,7 +770,7 @@ public class ItemTag extends TagSupport
             		break;
             	}
             }
-            
+
             // if user already has uploaded at least one file
         	if (!filesExist)
         	{
@@ -859,8 +864,8 @@ public class ItemTag extends TagSupport
                     out.print("\">");
                     out.print(primaryBitstream.getName());
                     out.print("</a>");
-                    
-                    
+
+
             		if (multiFile)
             		{
             			out.print("</td><td headers=\"t2\" class=\"standard\">");
@@ -885,13 +890,13 @@ public class ItemTag extends TagSupport
                         + LocaleSupport.getLocalizedMessage(pageContext,
                                 "org.dspace.app.webui.jsptag.ItemTag.view")
                         + "</a></td></tr>");
-            	}	
+            	}
             	else
             	{
             		Context context = UIUtil
 							.obtainContext(request);
             		boolean showRequestCopy = false;
-            		if ("all".equalsIgnoreCase(ConfigurationManager.getProperty("request.item.type")) || 
+            		if ("all".equalsIgnoreCase(ConfigurationManager.getProperty("request.item.type")) ||
             				("logged".equalsIgnoreCase(ConfigurationManager.getProperty("request.item.type")) &&
             						context.getCurrentUser() != null))
 					{
@@ -937,7 +942,7 @@ public class ItemTag extends TagSupport
             					out.print(bsLink);
             					out.print(bitstreams[k].getName());
                                 out.print("</a>");
-                                
+
 
             					if (multiFile)
             					{
@@ -994,7 +999,7 @@ public class ItemTag extends TagSupport
                                                             pageContext,
                                                             "org.dspace.app.webui.jsptag.ItemTag.view")
                                             + "</a>");
-            					
+
 								try {
 									if (showRequestCopy && !AuthorizeManager
 											.authorizeActionBoolean(context,
@@ -1090,18 +1095,18 @@ public class ItemTag extends TagSupport
 
     /**
      * Return the browse index related to the field. <code>null</code> if the field is not a browse field
-     * (look for <cod>webui.browse.link.<n></code> in dspace.cfg) 
-     * 
+     * (look for <cod>webui.browse.link.<n></code> in dspace.cfg)
+     *
      * @param field
-     * @return the browse index related to the field. Null otherwise 
-     * @throws BrowseException 
+     * @return the browse index related to the field. Null otherwise
+     * @throws BrowseException
      */
     private String getBrowseField(String field) throws BrowseException
     {
         for (String indexName : linkedMetadata.keySet())
-        {            
+        {
             StringTokenizer bw_dcf = new StringTokenizer(linkedMetadata.get(indexName), ".");
-            
+
             String[] bw_tokens = { "", "", "" };
             int i = 0;
             while(bw_dcf.hasMoreTokens())
@@ -1112,9 +1117,9 @@ public class ItemTag extends TagSupport
             String bw_schema = bw_tokens[0];
             String bw_element = bw_tokens[1];
             String bw_qualifier = bw_tokens[2];
-            
+
             StringTokenizer dcf = new StringTokenizer(field, ".");
-            
+
             String[] tokens = { "", "", "" };
             int j = 0;
             while(dcf.hasMoreTokens())
@@ -1128,7 +1133,7 @@ public class ItemTag extends TagSupport
             if (schema.equals(bw_schema) // schema match
                     && element.equals(bw_element) // element match
                     && (
-                              (bw_qualifier != null) && ((qualifier != null && qualifier.equals(bw_qualifier)) // both not null and equals 
+                              (bw_qualifier != null) && ((qualifier != null && qualifier.equals(bw_qualifier)) // both not null and equals
                                       || bw_qualifier.equals("*")) // browse link with jolly
                            || (bw_qualifier == null && qualifier == null)) // both null
                         )

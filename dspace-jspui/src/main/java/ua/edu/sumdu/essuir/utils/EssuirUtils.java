@@ -13,16 +13,16 @@ import java.util.Hashtable;
 
 public class EssuirUtils {
 	private static Logger logger = Logger.getLogger(EssuirUtils.class);
-	
-	
+
+
 	public static Hashtable<String, Long> getTypesCount() {
 		Hashtable<String, Long> types = new Hashtable<String, Long>();
-		
+
 		try {
 	        Connection c = null;
 	        try {
 	            Class.forName(ConfigurationManager.getProperty("db.driver"));
-        
+
         	    c = DriverManager.getConnection(ConfigurationManager.getProperty("db.url"),
                 	                            ConfigurationManager.getProperty("db.username"),
                         	                    ConfigurationManager.getProperty("db.password"));
@@ -38,16 +38,16 @@ public class EssuirUtils {
 	            while (resSet.next()) {
 		            types.put(resSet.getString("text_value"), resSet.getLong("cnts"));
         	    }
-	
+
         	    s.close();
 	        } finally {
-	            if (c != null) 
+	            if (c != null)
 	                c.close();
 	        }
 		} catch (Exception e) {
 			logger.error(e);
 		}
-		
+
 		return types;
 	}
 
@@ -68,4 +68,16 @@ public class EssuirUtils {
 		String result = typesTable.get(type);
 		return result == null ? type : result;
 	}
+
+	public static String getLanguageLocalized(String lang, String locale) {
+		java.util.Hashtable<String, String> langTable = new java.util.Hashtable<String, String>();
+		java.util.List vList = DCInputReader.getInputsReader(locale).getPairs("common_iso_languages");
+
+		for (int i = 0; i < vList.size(); i += 2)
+			langTable.put((String) vList.get(i + 1), (String) vList.get(i));
+
+		String result = langTable.get(lang);
+		return result == null ? lang : result;
+	}
+
 }
