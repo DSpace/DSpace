@@ -202,17 +202,6 @@
                 <option>1960</option>
                 <option>1950</option>
             </select>
-            <%--<select name="month">
-                <option selected="selected" value="-1"><fmt:message key="browse.nav.month"/></option>
-                <%
-                    for (int i = 1; i <= 12; i++) {
-                %>
-                <option value="<%= i %>"><%= DCDate.getMonthName(i, UIUtil.getSessionLocale(request)) %>
-                </option>
-                <%
-                    }
-                %>
-            </select>--%>
             <input type="submit" class="btn btn-default" value="<fmt:message key="browse.nav.go"/>"/>
             <br/>
             <label for="starts_with"><fmt:message key="browse.nav.type-year"/></label>
