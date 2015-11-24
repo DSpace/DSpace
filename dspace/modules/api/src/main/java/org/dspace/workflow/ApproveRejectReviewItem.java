@@ -23,6 +23,8 @@ import org.dspace.identifier.IdentifierNotFoundException;
 import org.dspace.identifier.IdentifierNotResolvableException;
 import org.dspace.identifier.IdentifierService;
 import org.dspace.eperson.EPerson;
+import org.datadryad.rest.models.Manuscript;
+import org.dspace.workflow.WorkflowItem;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -43,7 +45,7 @@ public class ApproveRejectReviewItem {
         Options options = new Options();
 
         options.addOption("m", "manuscriptnumber", true, "The manuscript number");
-	    options.addOption("i", "wfitemid", true, "The workflow item id");
+        options.addOption("i", "wfitemid", true, "The workflow item id");
         options.addOption("a", "approved", true, "Whether or not the the application will be approved, can either be true or false");
         options.addOption("h", "help", false, "help");
 
@@ -55,7 +57,7 @@ public class ApproveRejectReviewItem {
             myhelp.printHelp("ItemImport\n", options);
         }
         Boolean approved;
-	
+
         if(line.hasOption('a')){
             approved = Boolean.valueOf(line.getOptionValue('a'));
         }else{
@@ -65,8 +67,8 @@ public class ApproveRejectReviewItem {
         }
 
         if(line.hasOption('m')){
-	        // get a WorkflowItem using a manuscript number
-	        String manuscriptNumber = line.getOptionValue('m');
+            // get a WorkflowItem using a manuscript number
+            String manuscriptNumber = line.getOptionValue('m');
             reviewItem(approved, manuscriptNumber);
         } else if(line.hasOption('i')) {
             // get a WorkflowItem using a workflow ID
@@ -121,7 +123,7 @@ public class ApproveRejectReviewItem {
             } else {
                 throw new ApproveRejectReviewItemException("No item found with manuscript number: " + manuscriptNumber);
             }
-            reviewItems(c,approved,workflowItems);
+            reviewItems(c, approved, workflowItems);
         } catch (SQLException ex) {
             throw new ApproveRejectReviewItemException(ex);
         } catch (AuthorizeException ex) {
@@ -172,9 +174,63 @@ public class ApproveRejectReviewItem {
             try {
                 reviewItem(c, approved, wfi);
             } catch (ApproveRejectReviewItemException e) {
-                throw new ApproveRejectReviewItemException("Exception caught while reviewing item " + wfi.getItem().getID() + ": " +e.getMessage(), e);
+                throw new ApproveRejectReviewItemException("Exception caught while reviewing item " + wfi.getItem().getID() + ": " + e.getMessage(), e);
             }
         }
+    }
+
+    public static void reviewManuscript(Manuscript manuscript) throws ApproveRejectReviewItemException {
+        Context c = null;
+        try {
+            c = new Context();
+            c.turnOffAuthorisationSystem();
+            Boolean approved = statusIsApproved(manuscript.getStatus());
+
+            ArrayList<WorkflowItem> workflowItems = new ArrayList<WorkflowItem>();
+
+            if (manuscript.dryadDataDOI != null) {
+                try {
+                    WorkflowItem wfi = WorkflowItem.findByDOI(c, manuscript.dryadDataDOI);
+                    if (wfi != null) {
+                        workflowItems.add(wfi);
+                    }
+                } catch (ApproveRejectReviewItemException e) {
+    //                LOGGER.debug ("no workflow items matched DOI " + manuscript.dryadDataDOI);
+                }
+            }
+
+            workflowItems.addAll(WorkflowItem.findAllByManuscript(c, manuscript));
+    //        LOGGER.debug("found " + workflowItems.size() + " items that match");
+            ApproveRejectReviewItem.reviewItems(c, approved, workflowItems);
+        } catch (SQLException ex) {
+            throw new ApproveRejectReviewItemException(ex);
+        } finally {
+            if(c != null) {
+                try {
+                    c.complete();
+                } catch (SQLException ex) {
+                    // Swallow it
+                } finally {
+                    c = null;
+                }
+            }
+        }
+    }
+
+    private static boolean statusIsApproved(String status) throws ApproveRejectReviewItemException {
+        Boolean approved = null;
+        if (Manuscript.statusIsAccepted(status)) {
+            approved = true;
+        } else if (Manuscript.statusIsRejected(status)) {
+            approved = false;
+        } else if (Manuscript.statusIsNeedsRevision(status)) {
+            approved = false;
+        } else if (Manuscript.statusIsPublished(status)) {
+            approved = true;
+        } else {
+            throw new ApproveRejectReviewItemException("Status " + status + " is neither approved nor rejected");
+        }
+        return approved;
     }
 
     private static void reviewItem(Context c, Boolean approved, WorkflowItem wfi) throws ApproveRejectReviewItemException {

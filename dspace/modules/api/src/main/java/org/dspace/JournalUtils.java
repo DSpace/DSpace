@@ -646,6 +646,7 @@ public class JournalUtils {
         pBean.setSubjectKeywords(subjectKeywords);
 
         pBean.setStatus(manuscript.getStatus());
+        log.debug("manuscript has status " + manuscript.getStatus());
         if (manuscript.isSubmitted()) {
             pBean.setSkipReviewStep(false);
         } else if (manuscript.isAccepted() || manuscript.isRejected()) {
