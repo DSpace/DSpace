@@ -103,7 +103,7 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
     }
 
     private static Organization getOrganizationByCode(Context context, String code) throws SQLException {
-        String query = "SELECT * FROM ORGANIZATION WHERE code = ?";
+        String query = "SELECT * FROM ORGANIZATION WHERE UPPER(code) = UPPER(?)";
         TableRow row = DatabaseManager.querySingleTable(context, ORGANIZATION_TABLE, query, code);
         return organizationFromTableRow(row);
     }
