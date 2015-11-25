@@ -141,7 +141,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     private static Integer getOrganizationInternalId(Context context, String organizationCode) throws SQLException {
         // Look up organization id from code
         String table = "organization";
-        String query = "SELECT * FROM organization where code like ?";
+        String query = "SELECT * FROM ORGANIZATION WHERE UPPER(code) = UPPER(?)";
         TableRow row = DatabaseManager.querySingleTable(context, table, query, organizationCode);
         if(row != null) {
             return row.getIntColumn("organization_id");
