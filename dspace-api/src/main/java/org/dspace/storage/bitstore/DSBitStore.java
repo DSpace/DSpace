@@ -90,7 +90,13 @@ public class DSBitStore implements BitStore
      */
 	public InputStream get(Bitstream bitstream) throws IOException
 	{
-		return new FileInputStream(getFile(bitstream));
+        try {
+            return new FileInputStream(getFile(bitstream));
+        } catch (Exception e)
+        {
+            log.error("get(" + bitstream.getInternalId() + ")", e);
+            throw new IOException(e);
+        }
 	}
 
     /**
@@ -110,39 +116,41 @@ public class DSBitStore implements BitStore
      */
 	public void put(Bitstream bitstream, InputStream in) throws IOException
 	{
-		File file = getFile(bitstream);
+        try {
+            File file = getFile(bitstream);
 
-		// Make the parent dirs if necessary
-		File parent = file.getParentFile();
-        if (!parent.exists())
-        {
-            parent.mkdirs();
+            // Make the parent dirs if necessary
+            File parent = file.getParentFile();
+            if (!parent.exists()) {
+                parent.mkdirs();
+            }
+            //Create the corresponding file and open it
+            file.createNewFile();
+
+            FileOutputStream fos = new FileOutputStream(file);
+
+            // Read through a digest input stream that will work out the MD5
+            DigestInputStream dis = null;
+
+            try {
+                dis = new DigestInputStream(in, MessageDigest.getInstance(CSA));
+            }
+            // Should never happen
+            catch (NoSuchAlgorithmException nsae) {
+                log.warn("Caught NoSuchAlgorithmException", nsae);
+            }
+
+            Utils.bufferedCopy(dis, fos);
+            fos.close();
+            in.close();
+
+            bitstream.setSizeBytes(file.length());
+            bitstream.setChecksum(Utils.toHex(dis.getMessageDigest().digest()));
+            bitstream.setChecksumAlgorithm(CSA);
+        } catch (Exception e) {
+            log.error("put(" + bitstream.getInternalId() + ", inputstream)", e);
+            throw new IOException(e);
         }
-        //Create the corresponding file and open it
-        file.createNewFile();
-
-		FileOutputStream fos = new FileOutputStream(file);
-
-		// Read through a digest input stream that will work out the MD5
-        DigestInputStream dis = null;
-
-        try
-        {
-            dis = new DigestInputStream(in, MessageDigest.getInstance(CSA));
-        }
-        // Should never happen
-        catch (NoSuchAlgorithmException nsae)
-        {
-            log.warn("Caught NoSuchAlgorithmException", nsae);
-        }
-
-        Utils.bufferedCopy(dis, fos);
-        fos.close();
-        in.close();
-
-        bitstream.setSizeBytes(file.length());
-        bitstream.setChecksum(Utils.toHex(dis.getMessageDigest().digest()));
-        bitstream.setChecksumAlgorithm(CSA);
 	}
 	
     /**
@@ -160,49 +168,45 @@ public class DSBitStore implements BitStore
      */
 	public Map about(Bitstream bitstream, Map attrs) throws IOException
 	{
-		// potentially expensive, since it may calculate the checksum
-		File file = getFile(bitstream);
-		if (file != null && file.exists())
-		{
-		    if (attrs.containsKey("size_bytes"))
-		    {
-		        attrs.put("size_bytes", file.length());
-		    }
-		    if (attrs.containsKey("checksum"))
-		    {
-		        // generate checksum by reading the bytes
-			    DigestInputStream dis = null;
-			    try
-			    {
-				    FileInputStream fis = new FileInputStream(file);
-				    dis = new DigestInputStream(fis, MessageDigest.getInstance(CSA));
-			    }
-			    catch (NoSuchAlgorithmException e)
-			    {
-				    log.warn("Caught NoSuchAlgorithmException", e);
-				    throw new IOException("Invalid checksum algorithm");
-			    }
-			    final int BUFFER_SIZE = 1024 * 4;
-			    final byte[] buffer = new byte[BUFFER_SIZE];
-			    while (true)
-			    {
-				    final int count = dis.read(buffer, 0, BUFFER_SIZE);
-				    if (count == -1)
-				    {
-					    break;
-				    }
-			    }
-			    attrs.put("checksum", Utils.toHex(dis.getMessageDigest().digest()));
-			    attrs.put("checksum_algorithm", CSA);
-			    dis.close();
-		    }
-			if (attrs.containsKey("modified"))
-			{
-			    attrs.put("modified", String.valueOf(file.lastModified()));
-			}
-			return attrs;
-		}
-		return null;
+        try {
+            // potentially expensive, since it may calculate the checksum
+            File file = getFile(bitstream);
+            if (file != null && file.exists()) {
+                if (attrs.containsKey("size_bytes")) {
+                    attrs.put("size_bytes", file.length());
+                }
+                if (attrs.containsKey("checksum")) {
+                    // generate checksum by reading the bytes
+                    DigestInputStream dis = null;
+                    try {
+                        FileInputStream fis = new FileInputStream(file);
+                        dis = new DigestInputStream(fis, MessageDigest.getInstance(CSA));
+                    } catch (NoSuchAlgorithmException e) {
+                        log.warn("Caught NoSuchAlgorithmException", e);
+                        throw new IOException("Invalid checksum algorithm");
+                    }
+                    final int BUFFER_SIZE = 1024 * 4;
+                    final byte[] buffer = new byte[BUFFER_SIZE];
+                    while (true) {
+                        final int count = dis.read(buffer, 0, BUFFER_SIZE);
+                        if (count == -1) {
+                            break;
+                        }
+                    }
+                    attrs.put("checksum", Utils.toHex(dis.getMessageDigest().digest()));
+                    attrs.put("checksum_algorithm", CSA);
+                    dis.close();
+                }
+                if (attrs.containsKey("modified")) {
+                    attrs.put("modified", String.valueOf(file.lastModified()));
+                }
+                return attrs;
+            }
+            return null;
+        } catch (Exception e) {
+            log.error("about(" + bitstream.getInternalId() + ")", e);
+            throw new IOException(e);
+        }
 	}
 
     /**
@@ -215,17 +219,18 @@ public class DSBitStore implements BitStore
      */
 	public void remove(Bitstream bitstream) throws IOException
 	{
-		File file = getFile(bitstream);
-		if (file != null)
-		{
-		    if (file.delete())
-		    {
-			    deleteParents(file);
-		    }
-		}
-        else
-        {
-        	log.warn("Attempt to remove non-existent asset. ID: " + bitstream.getInternalId());
+        try {
+            File file = getFile(bitstream);
+            if (file != null) {
+                if (file.delete()) {
+                    deleteParents(file);
+                }
+            } else {
+                log.warn("Attempt to remove non-existent asset. ID: " + bitstream.getInternalId());
+            }
+        } catch (Exception e) {
+            log.error("remove(" + bitstream.getInternalId() + ")", e);
+            throw new IOException(e);
         }
 	}
 	
