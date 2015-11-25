@@ -21,6 +21,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.*;
 import org.dspace.handle.HandleManager;
+import ua.edu.sumdu.essuir.statistics.EssuirStatistics;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
@@ -833,13 +834,16 @@ public class ItemTag extends TagSupport
                                 + "</th>");
         		}
 
-        		out.println("<th id=\"t3\" class=\"standard\">"
-                    + LocaleSupport.getLocalizedMessage(pageContext,
-                            "org.dspace.app.webui.jsptag.ItemTag.filesize")
-                    + "</th><th id=\"t4\" class=\"standard\">"
-                    + LocaleSupport.getLocalizedMessage(pageContext,
-                            "org.dspace.app.webui.jsptag.ItemTag.fileformat")
-                    + "</th><th>&nbsp;</th></tr>");
+                out.println("<th id=\"t3\" class=\"standard\">"
+                        + LocaleSupport.getLocalizedMessage(pageContext,
+                        "org.dspace.app.webui.jsptag.ItemTag.filesize")
+                        + "</th><th id=\"t4\" class=\"standard\">"
+                        + LocaleSupport.getLocalizedMessage(pageContext,
+                        "org.dspace.app.webui.jsptag.ItemTag.fileformat")
+                        + "</th><th id=\"t4\" class=\"standard\">"
+                        + LocaleSupport.getLocalizedMessage(pageContext,
+                        "org.dspace.app.webui.jsptag.ItemTag.downloads")
+                        + "</th><th>&nbsp;</th></tr>");
 
             	// if primary bitstream is html, display a link for only that one to
             	// HTMLServlet
@@ -859,8 +863,7 @@ public class ItemTag extends TagSupport
                     out.print("/html/");
                     out.print(handle + "/");
                     out
-                        .print(UIUtil.encodeBitstreamName(primaryBitstream
-                                .getName(), Constants.DEFAULT_ENCODING));
+                        .print(UIUtil.encodeBitstreamName(primaryBitstream.getName(), Constants.DEFAULT_ENCODING));
                     out.print("\">");
                     out.print(primaryBitstream.getName());
                     out.print("</a>");
@@ -878,8 +881,9 @@ public class ItemTag extends TagSupport
                     out.print(UIUtil.formatFileSize(primaryBitstream.getSize()));
                     out.print("</td><td headers=\"t4\" class=\"standard\">");
             		out.print(primaryBitstream.getFormatDescription());
-            		out
-                        .print("</td><td class=\"standard\"><a class=\"btn btn-primary\" target=\"_blank\" href=\"");
+                    out.print("</td><td headers=\"t4\" class=\"standard\">");
+                    out.print(EssuirStatistics.selectBitstream(request, item.getID(), primaryBitstream.getSequenceID()));
+            		out.print("</td><td class=\"standard\"><a class=\"btn btn-primary\" target=\"_blank\" href=\"");
             		out.print(request.getContextPath());
             		out.print("/html/");
             		out.print(handle + "/");
@@ -959,9 +963,11 @@ public class ItemTag extends TagSupport
             					out
                                 .print("</td><td headers=\"t4\" class=\"standard\">");
             					out.print(bitstreams[k].getFormatDescription());
-            					out
-                                    .print("</td><td class=\"standard\" align=\"center\">");
 
+                                out.print("</td><td headers=\"t4\" class=\"standard\">");
+                                out.print(EssuirStatistics.selectBitstream(request, item.getID(), bitstreams[k].getSequenceID()));
+
+                                out.print("</td><td class=\"standard\" align=\"center\">");
             					// is there a thumbnail bundle?
             					if ((thumbs.length > 0) && showThumbs)
             					{
