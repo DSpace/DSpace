@@ -19,7 +19,6 @@ public class MetadataWebServiceDataInfo {
 
    	public MetadataWebServiceDataInfo(MetadataWebService metadataWebService, String xpsrc, String label, String mapping, String field) {
    		this.xpsrc = xpsrc;
-   		this.expr = expr;
    		this.label = label;
    		this.mapping = mapping;
    		if (field != null) {
