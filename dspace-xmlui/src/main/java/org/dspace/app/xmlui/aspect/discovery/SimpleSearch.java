@@ -243,10 +243,10 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         Select typeSelect = row.addCell("", Cell.ROLE_DATA, "selection").addSelect("filter_relational_operator_" + index);
         typeSelect.addOption(StringUtils.equals(relationalOperator, "contains"), "contains", T_filter_contain);
         typeSelect.addOption(StringUtils.equals(relationalOperator, "equals"), "equals", T_filter_equals);
-        typeSelect.addOption(StringUtils.equals(relationalOperator, "authority"), "authority", T_filter_authority);
+//        typeSelect.addOption(StringUtils.equals(relationalOperator, "authority"), "authority", T_filter_authority);
         typeSelect.addOption(StringUtils.equals(relationalOperator, "notcontains"), "notcontains", T_filter_notcontain);
         typeSelect.addOption(StringUtils.equals(relationalOperator, "notequals"), "notequals", T_filter_notequals);
-        typeSelect.addOption(StringUtils.equals(relationalOperator, "notauthority"), "notauthority", T_filter_notauthority);
+//        typeSelect.addOption(StringUtils.equals(relationalOperator, "notauthority"), "notauthority", T_filter_notauthority);
          
 
 
