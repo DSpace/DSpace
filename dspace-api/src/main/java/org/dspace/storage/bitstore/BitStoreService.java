@@ -23,13 +23,10 @@ public interface BitStoreService
 {
 	/**
      * Initialize the asset store
-     * 
-     * @param config
-     *        String used to characterize configuration - may be a configuration
-     *        value, or the name of a config file containing such values
+     *
      */
-	public void init(String config) throws IOException;
-	
+	public void init() throws IOException;
+
 	/**
      * Return an identifier unique to this asset store instance
      * 

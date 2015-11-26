@@ -21,13 +21,12 @@ import org.apache.log4j.Logger;
 import org.dspace.content.Bitstream;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Utils;
+import org.springframework.beans.factory.annotation.Required;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * Asset store using Amazon's Simple Storage Service (S3).
@@ -44,7 +43,11 @@ public class S3BitStoreService implements BitStoreService
     
     /** Checksum algorithm */
     private static final String CSA = "MD5";
-    
+
+    private String awsAccessKey;
+    private String awsSecretKey;
+    private String awsRegionName;
+
     /** container for all the assets */
 	private String bucketName = null;
 
@@ -53,50 +56,28 @@ public class S3BitStoreService implements BitStoreService
 	
 	/** S3 service */
 	private AmazonS3 s3Service = null;
-		
-	public S3BitStoreService()
-	{
-	}
-	
-	/**
+
+    public S3BitStoreService()
+    {
+    }
+
+    /**
      * Initialize the asset store
      * S3 Requires:
      *  - access key
      *  - secret key
      *  - bucket name
-     *  - Region (optional)
-     * 
-     * @param config
-     *        String used to characterize configuration - may be a configuration
-     *        value, or the name of a config file containing such values
      */
-	public void init(String config) throws IOException
-	{
-        // load configs
-		Properties props = new Properties();
-		try
-		{
-		    props.load(new FileInputStream(config));
-		}
-		catch(Exception e)
-		{
-            log.error(e);
-			throw new IOException("Exception loading properties. Config: " + config + ", exception: " + e.getMessage());
-		}
-
-        // access / secret
-        String awsAccessKey = props.getProperty("aws_access_key_id");
-        String awsSecretKey = props.getProperty("aws_secret_access_key");
-        if(StringUtils.isBlank(awsAccessKey) || StringUtils.isBlank(awsSecretKey)) {
+    public void init() throws IOException {
+        if(StringUtils.isBlank(getAwsAccessKey()) || StringUtils.isBlank(getAwsSecretKey())) {
             log.warn("Empty S3 access or secret");
         }
 
         // init client
-        AWSCredentials awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretKey);
+        AWSCredentials awsCredentials = new BasicAWSCredentials(getAwsAccessKey(), getAwsSecretKey());
         s3Service = new AmazonS3Client(awsCredentials);
 
         // bucket name
-        bucketName = props.getProperty("bucketName");
         if(StringUtils.isEmpty(bucketName)) {
             bucketName = "dspace-asset-" + ConfigurationManager.getProperty("dspace.hostname");
             log.warn("S3 BucketName is not configured, setting default: " + bucketName);
@@ -117,23 +98,21 @@ public class S3BitStoreService implements BitStoreService
         }
 
         // region
-        String regionName = props.getProperty("aws_region");
-        if(StringUtils.isNotBlank(regionName)) {
+        if(StringUtils.isNotBlank(awsRegionName)) {
             try {
-                Regions regions = Regions.fromName(regionName);
+                Regions regions = Regions.fromName(awsRegionName);
                 Region region = Region.getRegion(regions);
                 s3Service.setRegion(region);
                 log.info("S3 Region set to: " + region.getName());
             } catch (IllegalArgumentException e) {
-                log.warn("Invalid aws_region");
+                log.warn("Invalid aws_region: " + awsRegionName);
             }
         }
 
-        //subfolder within bucket
-        subfolder = props.getProperty("subfolder");
+        log.info("AWS S3 Assetstore ready to go! bucket:"+bucketName);
+    }
+	
 
-        log.debug("AWS S3 Assetstore ready to go!");
-	}
 	
 	/**
      * Return an identifier unique to this asset store instance
@@ -288,6 +267,49 @@ public class S3BitStoreService implements BitStoreService
         } else {
             return id;
         }
+    }
+
+    public String getAwsAccessKey() {
+        return awsAccessKey;
+    }
+
+    @Required
+    public void setAwsAccessKey(String awsAccessKey) {
+        this.awsAccessKey = awsAccessKey;
+    }
+
+    public String getAwsSecretKey() {
+        return awsSecretKey;
+    }
+
+    @Required
+    public void setAwsSecretKey(String awsSecretKey) {
+        this.awsSecretKey = awsSecretKey;
+    }
+
+    public String getAwsRegionName() {
+        return awsRegionName;
+    }
+
+    public void setAwsRegionName(String awsRegionName) {
+        this.awsRegionName = awsRegionName;
+    }
+
+    @Required
+    public String getBucketName() {
+        return bucketName;
+    }
+
+    public void setBucketName(String bucketName) {
+        this.bucketName = bucketName;
+    }
+
+    public String getSubfolder() {
+        return subfolder;
+    }
+
+    public void setSubfolder(String subfolder) {
+        this.subfolder = subfolder;
     }
 
 	/**

@@ -161,6 +161,6 @@ public interface BitstreamStorageService {
      * @param deleteOld
      * @param batchCommitSize
      */
-    public void migrate(Context context, Integer assetstoreSource, Integer assetstoreDestination, boolean deleteOld, Integer batchCommitSize);
+    public void migrate(Context context, Integer assetstoreSource, Integer assetstoreDestination, boolean deleteOld, Integer batchCommitSize) throws IOException, SQLException, AuthorizeException;
 
 }

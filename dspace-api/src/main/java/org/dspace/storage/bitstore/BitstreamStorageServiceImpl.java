@@ -7,14 +7,7 @@
  */
 package org.dspace.storage.bitstore;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.util.*;
-
 import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.checker.service.ChecksumHistoryService;
@@ -22,13 +15,16 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.BitstreamService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
-
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * <P>
@@ -69,116 +65,20 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     protected ChecksumHistoryService checksumHistoryService;
 
     /** asset stores */
-	private static BitStoreService[] stores;
+    private Map<Integer, BitStoreService> stores = new HashMap<Integer, BitStoreService>();
 
     /** The index of the asset store to use for new bitstreams */
-    private static int incoming;
+    private int incoming;
 
 	/**
 	 * This prefix string marks registered bitstreams in internal_id
 	 */
 	protected final String REGISTERED_FLAG = "-R";
 
-	/** default asset store implementation */
-	private static final String DEFAULT_STORE_PREFIX = "ds:";
-	private static final String DEFAULT_STORE_IMPL = "org.dspace.storage.bitstore.DSBitStore";
-
-    /* Read in the asset stores from the config. */
     @Override
-    public void afterPropertiesSet() {
-        ArrayList list = new ArrayList();
-
-        // Load the backwards compatible assetstore.dir's
-		list = initLegacyAssetstore(list);
-		
-		// if not already configured, configure asset stores
-		for (int j = 0; j < 100; j++)
-		{
-			String assetCfg = ConfigurationManager.getProperty("assetstore." + j);
-            log.info("Looking for config for assetstore." + j);
-			if (assetCfg == null)
-			{
-				// no more stores configured - assumes sequential assignment
-				break;
-			}
-			if (!list.contains(j))
-			{
-				initStore(assetCfg, list);
-			}
-		}
-
-        log.info("LIST: " + ArrayUtils.toString(list));
-		stores = (BitStoreService[])list.toArray(new BitStoreService[list.size()]);
-        // Read asset store to put new files in. Default is 0.
-        incoming = ConfigurationManager.getIntProperty("assetstore.incoming");
-    }
-
-    /**
-     * Backwards compatibility for legacy assetstore.dir and assetstore.dir.#
-     * @param list
-     * @return
-     */
-    private static ArrayList initLegacyAssetstore(ArrayList list) {
-        String storeDir = ConfigurationManager.getProperty("assetstore.dir");
-        if (StringUtils.isEmpty(storeDir))
-        {
-            log.info("No default assetstore.dir");
-        }
-        else
-        {
-            initStore(DEFAULT_STORE_PREFIX + storeDir, list);
-            // read any further ones, starting at 1, since assetstore.dir is 0
-            for (int i = 1;; i++)
-            {
-                storeDir = ConfigurationManager.getProperty("assetstore.dir." + i);
-                if (StringUtils.isEmpty(storeDir))
-                {
-                    break;
-                }
-                initStore(DEFAULT_STORE_PREFIX + storeDir, list);
-            }
-        }
-
-        return list;
-    }
-
-    /**
-     *
-     * assetstore.<#>=<short-name>:<param>
-     * bitstore.<short-name>.class=<implementation-class-canonical-name>
-     * @param storeConfig
-     * @param list
-     */
-    private static void initStore(String storeConfig, List list)
-    {
-        log.info("Init BitStore:" + storeConfig);
-		// create and initialize an asset store
-        String[] storeConfigArray = storeConfig.split(":");
-        if(storeConfigArray.length == 2) {
-            String prefix = storeConfigArray[0];
-            String config = storeConfigArray[1];
-
-            String className = ConfigurationManager.getProperty("bitstore." + prefix + ".class");
-            if (StringUtils.isEmpty(className) || DEFAULT_STORE_PREFIX.equals(prefix))
-            {
-                // use default implementation class if none explicitly defined
-                className = DEFAULT_STORE_IMPL;
-            }
-
-            log.info("BitStore name: " + className);
-            try
-            {
-                BitStoreService store = (BitStoreService)Class.forName(className).newInstance();
-                store.init(config);
-                list.add(store);
-            }
-            catch (Exception e)
-            {
-                log.error("Cannot instantiate store class: " + className + ", exception: " + e.getMessage(), e);
-            }
-
-        } else {
-            log.info("Odd bitstore config: [" + storeConfig + "]");
+    public void afterPropertiesSet() throws Exception {
+        for(Map.Entry<Integer, BitStoreService> storeEntry : stores.entrySet()) {
+            storeEntry.getValue().init();
         }
     }
 
@@ -199,7 +99,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
         bitstream.setStoreNumber(incoming);
 
         //For efficiencies sake, PUT is responsible for setting bitstream size_bytes, checksum, and checksum_algorithm
-        stores[incoming].put(bitstream, is);
+        stores.get(incoming).put(bitstream, is);
         //bitstream.setSizeBytes(file.length());
         //bitstream.setChecksum(Utils.toHex(dis.getMessageDigest().digest()));
         //bitstream.setChecksumAlgorithm("MD5");
@@ -258,7 +158,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
         wantedMetadata.put("checksum", null);
         wantedMetadata.put("checksum_algorithm", null);
 
-        Map receivedMetadata = stores[assetstore].about(bitstream, wantedMetadata);
+        Map receivedMetadata = stores.get(assetstore).about(bitstream, wantedMetadata);
         if(MapUtils.isEmpty(receivedMetadata)) {
             String message = "Not able to register bitstream:" + bitstream.getID() + " at path: " + bitstreamPath;
             log.error(message);
@@ -298,7 +198,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
             throws SQLException, IOException
     {
         Integer storeNumber = bitstream.getStoreNumber();
-        return stores[storeNumber].get(bitstream);
+        return stores.get(storeNumber).get(bitstream);
     }
 
     @Override
@@ -318,7 +218,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
                 Map wantedMetadata = new HashMap();
                 wantedMetadata.put("size_bytes", null);
                 wantedMetadata.put("modified", null);
-                Map receivedMetadata = stores[bitstream.getStoreNumber()].about(bitstream, wantedMetadata);
+                Map receivedMetadata = stores.get(bitstream.getStoreNumber()).about(bitstream, wantedMetadata);
 
 
                 // Make sure entries which do not exist are removed
@@ -373,7 +273,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
                 // Since versioning allows for multiple bitstreams, check if the internal identifier isn't used on another place
                 if(0 < bitstreamService.findDuplicateInternalIdentifier(context, bitstream).size())
                 {
-                    stores[bitstream.getStoreNumber()].remove(bitstream);
+                    stores.get(bitstream.getStoreNumber()).remove(bitstream);
 
                     String message = ("Deleted bitstreamID " + bid + ", internalID " + bitstream.getInternalId());
                     if (log.isDebugEnabled())
@@ -442,56 +342,63 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
      * @param assetstoreSource
      * @param assetstoreDestination
      */
-    public void migrate(Context context, Integer assetstoreSource, Integer assetstoreDestination, boolean deleteOld, Integer batchCommitSize) {
+    public void migrate(Context context, Integer assetstoreSource, Integer assetstoreDestination, boolean deleteOld, Integer batchCommitSize) throws IOException, SQLException, AuthorizeException {
         //Find all the bitstreams on the old source, copy it to new destination, update store_number, save, remove old
+        Iterator<Bitstream> allBitstreamsInSource = bitstreamService.findByStoreNumber(context, assetstoreSource);
+        Integer processedCounter = 0;
 
-        try {
-            Iterator<Bitstream> allBitstreamsInSource = bitstreamService.findByStoreNumber(context, assetstoreSource);
-            Integer processedCounter = 0;
+        while (allBitstreamsInSource.hasNext()) {
+            Bitstream bitstream = allBitstreamsInSource.next();
+            log.info("Copying bitstream:" + bitstream.getID() + " from assetstore[" + assetstoreSource + "] to assetstore[" + assetstoreDestination + "] Name:" + bitstream.getName() + ", SizeBytes:" + bitstream.getSize());
 
-            while (allBitstreamsInSource.hasNext()) {
-                Bitstream bitstream = allBitstreamsInSource.next();
-                log.info("Copying bitstream:" + bitstream.getID() + " from assetstore[" + assetstoreSource + "] to assetstore[" + assetstoreDestination + "] Name:" + bitstream.getName() + ", SizeBytes:" + bitstream.getSize());
+            InputStream inputStream = retrieve(context, bitstream);
+            stores.get(assetstoreDestination).put(bitstream, inputStream);
+            bitstream.setStoreNumber(assetstoreDestination);
+            bitstreamService.update(context, bitstream);
 
-                InputStream inputStream = retrieve(context, bitstream);
-                stores[assetstoreDestination].put(bitstream, inputStream);
-                bitstream.setStoreNumber(assetstoreDestination);
-                bitstreamService.update(context, bitstream);
-
-                if (deleteOld) {
-                    log.info("Removing bitstream:" + bitstream.getID() + " from assetstore[" + assetstoreSource + "]");
-                    stores[assetstoreSource].remove(bitstream);
-                }
-
-                processedCounter++;
-                //modulo
-                if ((processedCounter % batchCommitSize) == 0) {
-                    log.info("Migration Commit Checkpoint: " + processedCounter);
-                    context.dispatchEvents();
-                }
+            if (deleteOld) {
+                log.info("Removing bitstream:" + bitstream.getID() + " from assetstore[" + assetstoreSource + "]");
+                stores.get(assetstoreSource).remove(bitstream);
             }
 
-            log.info("Assetstore Migration from assetstore[" + assetstoreSource + "] to assetstore[" + assetstoreDestination + "] completed. " + processedCounter + " objects were transferred.");
-
-        } catch (SQLException e) {
-            log.error(e);
-        } catch (IOException e) {
-            log.error(e);
-        } catch (AuthorizeException e) {
-            log.error(e);
+            processedCounter++;
+            //modulo
+            if ((processedCounter % batchCommitSize) == 0) {
+                log.info("Migration Commit Checkpoint: " + processedCounter);
+                context.dispatchEvents();
+            }
         }
+
+        log.info("Assetstore Migration from assetstore[" + assetstoreSource + "] to assetstore[" + assetstoreDestination + "] completed. " + processedCounter + " objects were transferred.");
     }
 
     public void printStores(Context context) {
         try {
-            for (int i = 0; i < stores.length; i++) {
-                long countBitstreams = bitstreamService.countByStoreNumber(context, i);
-                System.out.println("store[" + i + "] == " + stores[i].getClass().getSimpleName() + ", which has " + countBitstreams + " # of bitstreams.");
+
+            for(Integer storeNumber : stores.keySet()) {
+                long countBitstreams = bitstreamService.countByStoreNumber(context, storeNumber);
+                System.out.println("store[" + storeNumber + "] == " + stores.get(storeNumber).getClass().getSimpleName() + ", which has " + countBitstreams + " bitstreams.");
             }
             System.out.println("Incoming assetstore is store[" + incoming + "]");
         } catch (SQLException e) {
             log.error(e);
         }
+    }
+
+    public int getIncoming() {
+        return incoming;
+    }
+
+    public void setIncoming(int incoming) {
+        this.incoming = incoming;
+    }
+
+    public void setStores(Map<Integer, BitStoreService> stores) {
+        this.stores = stores;
+    }
+
+    public Map<Integer, BitStoreService> getStores() {
+        return stores;
     }
 
     ////////////////////////////////////////

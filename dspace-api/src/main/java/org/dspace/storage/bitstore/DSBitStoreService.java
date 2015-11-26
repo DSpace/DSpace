@@ -46,27 +46,24 @@ public class DSBitStoreService implements BitStoreService
     
     // Checksum algorithm
     private static final String CSA = "MD5";
-    
+
     /** the asset directory */
-	private File baseDir = null;
+	private File baseDir;
 	
 	public DSBitStoreService()
 	{
 	}
-	
+
 	/**
      * Initialize the asset store
-     * 
-     * @param config
-     *        String used to characterize configuration - the name
-     *        of the directory root of the asset store
+     *
      */
-	public void init(String config)
+	public void init()
 	{
 		// the config string contains just the asset store directory path
-		baseDir = new File(config);
+        //set baseDir?
 	}
-	
+
 	/**
      * Return an identifier unique to this asset store instance
      * 
@@ -357,5 +354,13 @@ public class DSBitStoreService implements BitStoreService
     protected final String REGISTERED_FLAG = "-R";
     public boolean isRegisteredBitstream(String internalId) {
         return internalId.startsWith(REGISTERED_FLAG);
+    }
+
+    public File getBaseDir() {
+        return baseDir;
+    }
+
+    public void setBaseDir(File baseDir) {
+        this.baseDir = baseDir;
     }
 }

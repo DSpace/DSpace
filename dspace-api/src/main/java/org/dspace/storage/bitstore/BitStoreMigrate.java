@@ -109,6 +109,7 @@ public class BitStoreMigrate {
         catch (Exception e)
         {
             log.fatal("Caught exception:", e);
+            System.out.println("Exception during BitStoreMigrate: " + e.getMessage());
             System.exit(1);
         }
     }
