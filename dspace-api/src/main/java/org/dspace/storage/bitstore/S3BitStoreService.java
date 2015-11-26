@@ -26,8 +26,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
@@ -39,10 +37,10 @@ import java.util.Properties;
  * @author Richard Rodgers, Peter Dietz
  */ 
 
-public class S3BitStore implements BitStore
+public class S3BitStoreService implements BitStoreService
 {
     /** log4j log */
-    private static Logger log = Logger.getLogger(S3BitStore.class);
+    private static Logger log = Logger.getLogger(S3BitStoreService.class);
     
     /** Checksum algorithm */
     private static final String CSA = "MD5";
@@ -56,7 +54,7 @@ public class S3BitStore implements BitStore
 	/** S3 service */
 	private AmazonS3 s3Service = null;
 		
-	public S3BitStore()
+	public S3BitStoreService()
 	{
 	}
 	
@@ -329,7 +327,7 @@ public class S3BitStore implements BitStore
 			System.out.println("Missing arguments - exiting");
 			return;
 		}
-		S3BitStore store = new S3BitStore();
+		S3BitStoreService store = new S3BitStoreService();
 
         AWSCredentials awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
 

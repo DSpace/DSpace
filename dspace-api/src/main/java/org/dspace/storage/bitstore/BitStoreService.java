@@ -19,7 +19,7 @@ import java.util.Map;
  * @author Richard Rodgers, Peter Dietz
  */
 
-public interface BitStore
+public interface BitStoreService
 {
 	/**
      * Initialize the asset store

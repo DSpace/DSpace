@@ -7,13 +7,8 @@
  */
 package org.dspace.storage.bitstore;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -32,13 +27,6 @@ import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
 
-import edu.sdsc.grid.io.FileFactory;
-import edu.sdsc.grid.io.GeneralFile;
-import edu.sdsc.grid.io.GeneralFileOutputStream;
-import edu.sdsc.grid.io.local.LocalFile;
-import edu.sdsc.grid.io.srb.SRBAccount;
-import edu.sdsc.grid.io.srb.SRBFile;
-import edu.sdsc.grid.io.srb.SRBFileSystem;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -81,7 +69,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     protected ChecksumHistoryService checksumHistoryService;
 
     /** asset stores */
-	private static BitStore[] stores;
+	private static BitStoreService[] stores;
 
     /** The index of the asset store to use for new bitstreams */
     private static int incoming;
@@ -120,7 +108,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
 		}
 
         log.info("LIST: " + ArrayUtils.toString(list));
-		stores = (BitStore[])list.toArray(new BitStore[list.size()]);
+		stores = (BitStoreService[])list.toArray(new BitStoreService[list.size()]);
         // Read asset store to put new files in. Default is 0.
         incoming = ConfigurationManager.getIntProperty("assetstore.incoming");
     }
@@ -180,7 +168,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
             log.info("BitStore name: " + className);
             try
             {
-                BitStore store = (BitStore)Class.forName(className).newInstance();
+                BitStoreService store = (BitStoreService)Class.forName(className).newInstance();
                 store.init(config);
                 list.add(store);
             }

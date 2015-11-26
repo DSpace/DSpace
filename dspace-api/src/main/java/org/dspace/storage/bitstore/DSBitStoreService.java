@@ -25,10 +25,10 @@ import java.util.Map;
  * @author Peter Breton, Robert Tansley, Richard Rodgers, Peter Dietz
  */
 
-public class DSBitStore implements BitStore
+public class DSBitStoreService implements BitStoreService
 {
     /** log4j log */
-    private static Logger log = Logger.getLogger(DSBitStore.class);
+    private static Logger log = Logger.getLogger(DSBitStoreService.class);
     
     // These settings control the way an identifier is hashed into
     // directory and file names
@@ -50,7 +50,7 @@ public class DSBitStore implements BitStore
     /** the asset directory */
 	private File baseDir = null;
 	
-	public DSBitStore()
+	public DSBitStoreService()
 	{
 	}
 	
