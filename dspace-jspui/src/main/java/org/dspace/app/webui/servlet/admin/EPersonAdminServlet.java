@@ -7,17 +7,6 @@
  */
 package org.dspace.app.webui.servlet.admin;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Locale;
-
-import javax.mail.MessagingException;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.servlet.jsp.jstl.core.Config;
-
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.Authenticate;
@@ -35,18 +24,28 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.EPersonDeletionException;
 import org.dspace.eperson.Group;
 
+import javax.mail.MessagingException;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.servlet.jsp.jstl.core.Config;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Locale;
+
 /**
  * Servlet for editing and creating e-people
- * 
+ *
  * @author David Stuve
  * @version $Revision$
  */
 public class EPersonAdminServlet extends DSpaceServlet
 {
-        
+
     /** Logger */
     private static Logger log = Logger.getLogger(EPersonAdminServlet.class);
-    
+
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -81,24 +80,24 @@ public class EPersonAdminServlet extends DSpaceServlet
             // edit an eperson
             EPerson e = EPerson.find(context, UIUtil.getIntParameter(request,
                     "eperson_id"));
-            
+
             // Check the EPerson exists
             if (e == null)
             {
             	request.setAttribute("no_eperson_selected", Boolean.TRUE);
             	showMain(context, request, response);
             }
-            else 
-            {            
+            else
+            {
 	            // what groups is this person a member of?
 	            Group[] groupMemberships = Group.allMemberGroups(context, e);
-	
+
 	            request.setAttribute("eperson", e);
 	            request.setAttribute("group.memberships", groupMemberships);
-	
+
 	            JSPManager.showJSP(request, response,
 	                    "/dspace-admin/eperson-edit.jsp");
-	
+
 	            context.complete();
             }
         }
@@ -113,6 +112,8 @@ public class EPersonAdminServlet extends DSpaceServlet
             String oldEmail = e.getEmail();
             String newEmail = request.getParameter("email").trim();
             String netid = request.getParameter("netid");
+            String chairid = request.getParameter("chair_id");
+            String position = request.getParameter("position");
 
             if (!newEmail.equals(oldEmail))
             {
@@ -144,23 +145,20 @@ public class EPersonAdminServlet extends DSpaceServlet
                     // FIXME: More data-driven?
                     e.setMetadata("phone", request.getParameter("phone")
                             .equals("") ? null : request.getParameter("phone"));
- 
+
                     e.setMetadata("language", request.getParameter("language")
                            .equals("") ? null : request.getParameter("language"));
-                    
-                    e.setCanLogIn((request.getParameter("can_log_in") != null)
-                            && request.getParameter("can_log_in")
-                                    .equals("true"));
 
-                    e.setRequireCertificate((request
-                            .getParameter("require_certificate") != null)
-                            && request.getParameter("require_certificate")
-                                    .equals("true"));
+                    e.setCanLogIn((request.getParameter("can_log_in") != null) && request.getParameter("can_log_in").equals("true"));
 
+                    e.setRequireCertificate((request.getParameter("require_certificate") != null) && request.getParameter("require_certificate").equals("true"));
+                    e.setChair(chairid == null ? -1 : Integer.parseInt(chairid));
+
+                    e.setPosition(position == null ? "" : position);
                     e.update();
 
                     if (button.equals("submit_resetpassword"))
-                    {                        
+                    {
                         try
                         {
                             resetPassword(context, request, response, e);
@@ -210,20 +208,16 @@ public class EPersonAdminServlet extends DSpaceServlet
                                 .getParameter("lastname"));
 
                 // FIXME: More data-driven?
-                e.setMetadata("phone",
-                        request.getParameter("phone").equals("") ? null
-                                : request.getParameter("phone"));
-                
-                e.setMetadata("language", request.getParameter("language")
-                        .equals("") ? null : request.getParameter("language"));
-                         
-                e.setCanLogIn((request.getParameter("can_log_in") != null)
-                        && request.getParameter("can_log_in").equals("true"));
+                e.setMetadata("phone", request.getParameter("phone").equals("") ? null : request.getParameter("phone"));
 
-                e.setRequireCertificate((request
-                        .getParameter("require_certificate") != null)
-                        && request.getParameter("require_certificate").equals(
-                                "true"));
+                e.setMetadata("language", request.getParameter("language").equals("") ? null : request.getParameter("language"));
+
+                e.setCanLogIn((request.getParameter("can_log_in") != null) && request.getParameter("can_log_in").equals("true"));
+
+                e.setRequireCertificate((request.getParameter("require_certificate") != null) && request.getParameter("require_certificate").equals("true"));
+                e.setChair(chairid == null ? -1 : Integer.parseInt(chairid));
+
+                e.setPosition(position == null ? "" : position);
 
                 e.update();
 
@@ -239,13 +233,13 @@ public class EPersonAdminServlet extends DSpaceServlet
                                 .showJSP(request, response,
                                         "/dspace-admin/eperson-resetpassword-error.jsp");
                         return;
-                    }                   
+                    }
                 }
-                
+
                 showMain(context, request, response);
                 context.complete();
             }
-            
+
 
 
         }
@@ -254,17 +248,17 @@ public class EPersonAdminServlet extends DSpaceServlet
             // Start delete process - go through verification step
             EPerson e = EPerson.find(context, UIUtil.getIntParameter(request,
                     "eperson_id"));
-            
+
             // Check the EPerson exists
             if (e == null)
             {
             	request.setAttribute("no_eperson_selected", Boolean.TRUE);
             	showMain(context, request, response);
             }
-            else 
-            {       
+            else
+            {
 	            request.setAttribute("eperson", e);
-	
+
 	            JSPManager.showJSP(request, response,
 	                    "/dspace-admin/eperson-confirm-delete.jsp");
             }
@@ -294,7 +288,7 @@ public class EPersonAdminServlet extends DSpaceServlet
         {
             if (!ConfigurationManager.getBooleanProperty("webui.user.assumelogin", false))
             {
-                throw new AuthorizeException("Turn on webui.user.assumelogin to activate Login As feature");                
+                throw new AuthorizeException("Turn on webui.user.assumelogin to activate Login As feature");
             }
             EPerson e = EPerson.find(context, UIUtil.getIntParameter(request,
                     "eperson_id"));
@@ -306,40 +300,40 @@ public class EPersonAdminServlet extends DSpaceServlet
             }
             // Only super administrators can login as someone else.
             else if (!AuthorizeManager.isAdmin(context))
-            {                
+            {
                 throw new AuthorizeException("Only site administrators may assume login as another user.");
             }
             else
             {
-                
+
                 log.info(LogManager.getHeader(context, "login-as",
                         "current_eperson="
                                 + context.getCurrentUser().getFullName()
                                 + ", id=" + context.getCurrentUser().getID()
                                 + ", as_eperson=" + e.getFullName() + ", id="
                                 + e.getID()));
-                
+
                 // Just to be double be sure, make sure the administrator
                 // is the one who actually authenticated himself.
                 HttpSession session = request.getSession(false);
-                Integer authenticatedID = (Integer) session.getAttribute("dspace.current.user.id"); 
+                Integer authenticatedID = (Integer) session.getAttribute("dspace.current.user.id");
                 if (context.getCurrentUser().getID() != authenticatedID)
-                {                                         
-                    throw new AuthorizeException("Only authenticated users who are administrators may assume the login as another user.");                    
+                {
+                    throw new AuthorizeException("Only authenticated users who are administrators may assume the login as another user.");
                 }
-                
+
                 // You may not assume the login of another super administrator
                 Group administrators = Group.find(context,1);
                 if (administrators.isMember(e))
-                {                    
+                {
                     JSPManager.showJSP(request, response,
                             "/dspace-admin/eperson-loginas-error.jsp");
                     return;
                 }
-                               
+
                 // store a reference to the authenticated admin
                 session.setAttribute("dspace.previous.user.id", authenticatedID);
-                
+
                 // Logged in OK.
                 Authenticate.loggedIn(context, request, e);
 

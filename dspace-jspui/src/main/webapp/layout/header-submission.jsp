@@ -54,6 +54,7 @@
 	    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/bootstrap.min.css" type="text/css" />
 	    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/bootstrap-theme.min.css" type="text/css" />
 	    <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/dspace-theme.css" type="text/css" />
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/pagination.css">
 <%
     if (!"NONE".equals(feedRef))
     {
@@ -64,7 +65,7 @@
 <%
         }
     }
-    
+
     if (osLink)
     {
 %>
@@ -78,7 +79,7 @@
 <%
         }
 %>
-        
+
 	<script type='text/javascript' src="<%= request.getContextPath() %>/static/js/jquery/jquery-1.10.2.min.js"></script>
 	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/jquery/jquery-ui-1.10.3.custom.min.js'></script>
 	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/bootstrap/bootstrap.min.js'></script>
@@ -110,7 +111,7 @@
 		<%
 		    }
     %>
-    
+
 
 <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!--[if lt IE 9]>
@@ -123,7 +124,7 @@
     <%-- HACK: marginwidth, marginheight: for non-CSS compliant Netscape browser --%>
     <body class="undernavigation">
 <a class="sr-only" href="#content">Skip navigation</a>
-<header class="navbar navbar-inverse navbar-fixed-top">    
+<header class="navbar navbar-inverse navbar-fixed-top">
     <%
     if (!navbar.equals("off"))
     {
@@ -139,7 +140,7 @@
         <div class="container">
             <dspace:include page="/layout/navbar-minimal.jsp" />
         </div>
-<%    	
+<%
     }
 %>
 </header>
@@ -152,7 +153,7 @@
 %>
 <div class="container" style = "position:relative;">
                 <dspace:include page="/layout/location-bar.jsp" />
-</div>                
+</div>
 <%
     }
 %>
@@ -163,4 +164,4 @@
 <% if (request.getAttribute("dspace.layout.sidebar") != null) { %>
 	<div class="row">
 		<div class="col-md-9">
-<% } %>		
+<% } %>

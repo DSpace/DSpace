@@ -7,13 +7,6 @@
  */
 package org.dspace.app.webui.servlet;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
@@ -22,9 +15,15 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.SQLException;
+
 /**
  * Servlet for handling editing user profiles
- * 
+ *
  * @author Robert Tansley
  * @version $Revision$
  */
@@ -109,44 +108,60 @@ public class EditProfileServlet extends DSpaceServlet
      * Update a user's profile information with the information in the given
      * request. This assumes that authentication has occurred. This method
      * doesn't write the changes to the database (i.e. doesn't call update.)
-     * 
+     *
      * @param eperson
      *            the e-person
      * @param request
      *            the request to get values from
-     * 
+     *
      * @return true if the user supplied all the required information, false if
      *         they left something out.
      */
     public static boolean updateUserProfile(EPerson eperson,
-            HttpServletRequest request)
+                                            HttpServletRequest request)
     {
         // Get the parameters from the form
         String lastName = request.getParameter("last_name");
         String firstName = request.getParameter("first_name");
         String phone = request.getParameter("phone");
         String language = request.getParameter("language");
+        int chairid = Integer.parseInt(request.getParameter("chair_id") == null ? "-1" : request.getParameter("chair_id"));
+        String position = request.getParameter("position");
 
         // Update the eperson
         eperson.setFirstName(firstName);
         eperson.setLastName(lastName);
         eperson.setMetadata("phone", phone);
         eperson.setLanguage(language);
+        eperson.setChair(chairid);
+        eperson.setPosition(position == null ? "" : position);
 
         // Check all required fields are there
-        return (!StringUtils.isEmpty(lastName) && !StringUtils.isEmpty(firstName));
+        if ((lastName == null) || lastName.equals("") ||
+                (firstName == null) || firstName.equals("") ||
+                (phone == null) || phone.equals("") ||
+                (language == null) || language.equals("") ||
+                (position == null) || position.equals("") ||
+                (chairid < 1))
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
 
     /**
      * Set an eperson's password, if the passwords they typed match and are
      * acceptible. If all goes well and the password is set, null is returned.
      * Otherwise the problem is returned as a String.
-     * 
+     *
      * @param eperson
      *            the eperson to set the new password for
      * @param request
      *            the request containing the new password
-     * 
+     *
      * @return true if everything went OK, or false
      */
     public static boolean confirmAndSetPassword(EPerson eperson,

@@ -47,12 +47,20 @@
 <%@ page import="org.dspace.eperson.EPerson, org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.eperson.Group"   %>
 <%@ page import="org.dspace.core.Utils" %>
+<%@ page import="org.dspace.core.Context" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
+<%@ page import="org.dspace.storage.rdbms.DatabaseManager" %>
+<%@ page import="org.dspace.storage.rdbms.TableRowIterator" %>
+<%@ page import="org.dspace.storage.rdbms.TableRow" %>
+<%@ page import="java.sql.SQLException" %>
+
+
 
 <%
     EPerson eperson = (EPerson) request.getAttribute("eperson");
 
 	Group [] groupMemberships = null;
-	if(request.getAttribute("group.memberships") != null)
+    if(request.getAttribute("group.memberships") != null)
 	{
 		groupMemberships = (Group []) request.getAttribute("group.memberships");
 	}
@@ -63,9 +71,12 @@
     String phone     = eperson.getMetadata("phone");
     String netid = eperson.getNetid();
     String language     = eperson.getMetadata("language");
+    int chairid = eperson.getChair();
+    String position = eperson.getPosition();
+
     boolean emailExists = (request.getAttribute("email_exists") != null);
 
-    boolean ldap_enabled = ConfigurationManager.getBooleanProperty("authentication-ldap", "enable");
+    boolean ldap_enabled = ConfigurationManager.getBooleanProperty("ldap.enable");
 %>
 
 <dspace:layout style="submission" titlekey="jsp.dspace-admin.eperson-edit.title"
@@ -83,7 +94,7 @@
         </fmt:message>
         <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#epeople\"%>"><fmt:message key="jsp.help"/></dspace:popup>
         </h1>
-  
+
 
 <% if (emailExists)
 	{ %><p class="alert alert-warning">
@@ -94,7 +105,7 @@
     <form method="post" action="">
 
 		<div class="row">
-            <%-- <td>Email:</td> --%>         
+            <%-- <td>Email:</td> --%>
             <label class="col-md-2" for="temail"><fmt:message key="jsp.dspace-admin.eperson-edit.email"/></label>
             <div class="col-md-6">
             	<input type="hidden" name="eperson_id" value="<%=eperson.getID()%>"/>
@@ -108,9 +119,9 @@
             <div class="col-md-6">
 				<input class="form-control" name="lastname" id="tlastname" size="24" value="<%=lastName == null ? "" : Utils.addEntities(lastName) %>"/>
 			</div>
-       </div>     
+       </div>
 
-        <div class="row">           
+        <div class="row">
             <%-- <td>First Name:</td> --%>
             <label class="col-md-2" for="tfirstname"><fmt:message key="jsp.dspace-admin.eperson.general.firstname"/></label>
             <div class="col-md-6">
@@ -132,12 +143,12 @@
             <label class="col-md-2" for="tphone"><fmt:message key="jsp.dspace-admin.eperson-edit.phone"/></label>
             <div class="col-md-6">
 				<input class="form-control" name="phone" id="tphone" size="24" value="<%=phone == null ? "" : Utils.addEntities(phone) %>"/>
-			</div>  
+			</div>
   		</div>
-  		
-  		<div class="row">          
+
+  		<div class="row">
             <label class="col-md-2" for="tlanguage"><fmt:message key="jsp.register.profile-form.language.field"/></label>
-            <div class="col-md-6">            
+            <div class="col-md-6">
        		<select class="form-control" name="language" id="tlanguage">
 <%
 		Locale[] supportedLocales = I18nUtil.getSupportedLocales();
@@ -146,7 +157,7 @@
         {
         	String lang = supportedLocales[i].toString();
         	String selected = "";
-        	
+
         	if (language == null || language.equals(""))
         	{ if(lang.equals(I18nUtil.getSupportedLocale(request.getLocale()).getLanguage()))
         		{
@@ -164,6 +175,143 @@
         	</select>
         	</div>
    		</div>
+        <script type="text/javascript" src="../static/js/linkedselect.js"></script>
+
+        <%
+            Context context = UIUtil.obtainContext(request);
+
+            int faculty = -1;
+            int startIndex = 0;
+            int count;
+
+            StringBuilder sb = new StringBuilder();
+
+            StringBuilder sb1 = new StringBuilder();
+            StringBuilder sb2 = new StringBuilder();
+            try {
+
+
+                TableRowIterator tri = null;
+
+                int faculty_id;
+                try {
+                    tri = DatabaseManager.query(context, "SELECT faculty_id, chair_id, chair_name " +
+                            "  FROM chair " +
+                            "  ORDER BY faculty_id, chair_id ");
+
+                    faculty_id = 0;
+                    count = 0;
+                    sb.setLength(0);
+
+                    while (tri.hasNext()) {
+                        TableRow row = tri.next();
+
+                        if (row.getIntColumn("faculty_id") != faculty_id && faculty_id > 0) {
+
+                            sb1.append("'faculty_" + faculty_id + "':{");
+                            sb1.append(sb.substring(0, sb.length() - 1));
+                            sb1.append("},\n");
+
+                            sb.setLength(0);
+                            count = 0;
+                        }
+
+
+                        faculty_id = row.getIntColumn("faculty_id");
+
+                        if (row.getIntColumn("chair_id") == chairid) {
+                            startIndex = count;
+                            faculty = faculty_id;
+                        }
+
+                        sb.append("'" + row.getIntColumn("chair_id") + "':");
+                        sb.append("'" + row.getStringColumn("chair_name") + "',");
+
+                        sb2.append("'" + row.getIntColumn("chair_id") + "':{},");
+
+                        count++;
+                    }
+
+
+                    if (faculty_id > 0) {
+                        sb1.append("'faculty_" + faculty_id + "':{");
+                        sb1.append(sb.substring(0, sb.length() - 1));
+                        sb1.append("},\n");
+                    }
+
+                } finally {
+                    if (tri != null)
+                        tri.close();
+                }
+            } catch (SQLException e) {
+        %><%=e.toString()%><%
+        }
+
+        sb.setLength(0);
+
+        sb.append("<select class=\"form-control\" name=\"faculty\" id=\"faculty\"><option value=\"0\"></option>");
+        try {
+            TableRowIterator tri = null;
+            int i = 1;
+            try {
+                tri = DatabaseManager.query(context, "SELECT faculty_id, faculty_name FROM faculty ORDER BY faculty_id ");
+
+                while (tri.hasNext()) {
+                    TableRow row = tri.next();
+
+                    i = row.getIntColumn("faculty_id");
+
+                    sb.append("<option value=\"faculty_" + i)
+                            .append(faculty == i ? "\" selected=\"selected\"" : "" )
+                            .append("\">" + row.getStringColumn("faculty_name") + "</option>");
+                }
+            } finally {
+                if (tri != null)
+                    tri.close();
+            }
+        } catch (SQLException e) {
+    %><%=e.toString()%><%
+        }
+
+        sb.append("</select>");
+    %>
+
+        <div class="row">
+                <%-- <td>Faculty:</td> --%>
+            <label class="col-md-2" for="faculty"><fmt:message key="jsp.dspace-admin.eperson.general.faculty"/></label>
+            <div class="col-md-6">
+                <%=sb.toString()%>
+            </div>
+        </div>
+
+        <div class="row">
+                <%-- <td>Chair:</td> --%>
+            <label class="col-md-2" for="chair_id"><fmt:message key="jsp.dspace-admin.eperson.general.chair"/></label>
+            <div class="col-md-6">
+                <select class="form-control" name="chair_id" id="chair_id"></select>
+
+                <script type="text/javascript">
+                    var syncList1 = new syncList;
+
+                    startIndex = <%=startIndex %>;
+
+                    syncList1.dataList = {
+                        <%=sb1.toString()%>
+                        <%=sb2.substring(0, sb2.length() - 1)%>
+                    };
+
+                    syncList1.sync("faculty","chair_id");
+                </script>
+            </div>
+        </div>
+
+        <div class="row">
+                <%-- <td>Position:</td> --%>
+            <label class="col-md-2" for="tposition"><fmt:message key="jsp.dspace-admin.eperson.general.position"/></label>
+            <div class="col-md-6">
+                <input class="form-control" name="position" id="tposition" size="24" value="<%=position == null ? "" : Utils.addEntities(position) %>"/>
+            </div>
+        </div>
    		<div class="row">
    		<%-- <td>Can Log In:</td> --%>
             <label class="col-md-2" for="tcan_log_in"><fmt:message key="jsp.dspace-admin.eperson-edit.can"/></label>
@@ -186,7 +334,7 @@
                     <%-- <input type="submit" name="submit_delete" value="Delete EPerson..."> --%>
                     <input class="btn btn-danger" type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.general.delete"/>" />
          </div>
-	
+
     </form>
 
 <%
@@ -195,16 +343,16 @@
 %>
 	<br/>
 	<br/>
-	
+
 	<h3><fmt:message key="jsp.dspace-admin.eperson-edit.groups"/></h3>
-	
-	<div class="row">    
+
+	<div class="row">
     <ul>
 	<%  for(int i=0; i<groupMemberships.length; i++)
      	{
         String myLink = groupMemberships[i].getName();
         String args   = "submit_edit&amp;group_id="+groupMemberships[i].getID();
-        
+
         myLink = "<a href=\""
         +request.getContextPath()
         +"/tools/group-edit?"+args+"\">" + myLink + "</a>";
@@ -213,6 +361,6 @@
 	<%  } %>
     </ul>
     </div>
-<% } %>  
+<% } %>
 
 </dspace:layout>
