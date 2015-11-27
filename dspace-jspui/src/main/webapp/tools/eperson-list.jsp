@@ -188,21 +188,6 @@ function clearEPeople()
 
 	</form>
 
-<%-- Controls for jumping around list--%>
-<%--<div class="span12" style="text-align:center">--%>
-	<%--<ul class="pagination">--%>
-			<%--<li><a href="<%= jumpLink %>0"><fmt:message key="jsp.tools.eperson-list.jump.first"/></a></li>--%>
-			<%--<li><a href="<%= jumpLink %><%= jumpFiveBack %>"><fmt:message key="jsp.tools.eperson-list.jump.five-back"/></a></li>--%>
-			<%--<li><a href="<%= jumpLink %><%= jumpOneBack %>"><fmt:message key="jsp.tools.eperson-list.jump.one-back"/></a></li>--%>
-			<%--<li><a href="<%= jumpLink %><%= jumpOneForward %>"><fmt:message key="jsp.tools.eperson-list.jump.one-forward"/></a></li>--%>
-			<%--<li><a href="<%= jumpLink %><%= jumpFiveForward %>"><fmt:message key="jsp.tools.eperson-list.jump.five-forward"/></a></li>--%>
-			<%--<li><a href="<%= jumpLink %><%= jumpEnd %>"><fmt:message key="jsp.tools.eperson-list.jump.last"/></a></li>--%>
-	<%--</ul>--%>
-<%--</div--%>
-<%--<br/>--%>
-
-	<%--<form method="get" action=""> &lt;%&ndash; Will never actually be posted, it's just so buttons will appear &ndash;%&gt;--%>
-
     <table class="table table-striped" align="center" summary="Epeople list">
 <% if (search != null && !search.equals(""))
    {  %>
@@ -283,10 +268,6 @@ function clearEPeople()
         String email = StringEscapeUtils.escapeXml(StringEscapeUtils.escapeJavaScript(e.getEmail()));
 %>
   <tr>
-			<%--<td headers="t1">--%>
-			    <%--<input class="btn btn-success" type="button" value="<%--%>
-			<%--if (multiple) { %><fmt:message key="jsp.tools.general.add"/><% }--%>
-			<%--else {          %><fmt:message key="jsp.tools.general.select"/><% } %>" onclick="javascript:<%= clearList %>addEPerson(<%= e.getID() %>, '<%= email %>', '<%= fullname %>');<%= closeWindow %>"/></td>--%>
 			<form method="post" action="<%= request.getContextPath() %>/dspace-admin/edit-epeople">
 				<td headers="t1"><%= e.getID() %></td>
 				<td headers="t2"><%= (e.getEmail() == null ? "" : Utils.addEntities(e.getEmail())) %></td>
@@ -329,10 +310,5 @@ function clearEPeople()
 	</ul>
 </div>
 
-	<%-- <p align="center"><input type="button" value="Close" onClick="window.close();"/></p> --%>
-	<%--<p align="center">--%>
-		<%--<input type="button" class="btn btn-danger" value="<fmt:message key="jsp.tools.eperson-list.close.button"/>" onclick="window.close();"/>--%>
-			<%--</p>--%>
-
-	<%--</form>--%>
+	<%@include file="../pagination/pagination-users.jsp"%>
 </dspace:layout>
