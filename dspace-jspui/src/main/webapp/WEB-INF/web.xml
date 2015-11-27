@@ -18,7 +18,7 @@
   -
   - 'dspace.dir' will be replaced with the directory where DSpace is installed
   -->
-  
+
   <display-name>DSpace Web UI</display-name>
 
 
@@ -40,26 +40,26 @@
     <param-name>dspace.dir</param-name>
     <param-value>${dspace.dir}</param-value>
   </context-param>
-  
+
   <context-param>
     <param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
     <param-value>Messages</param-value>
   </context-param>
-  
+
   <context-param>
     <param-name>contextConfigLocation</param-name>
     <param-value>/WEB-INF/spring/*.xml</param-value>
   </context-param>
-  
+
 
   <!-- Filters -->
-  
+
   <!-- session/request filter (from util), handles setting up requests and sessions correctly -->
   <filter>
     <filter-name>dspace.request</filter-name>
     <filter-class>org.dspace.utils.servlet.DSpaceWebappServletFilter</filter-class>
   </filter>
-    
+
   <filter>
     <filter-name>admin-only</filter-name>
     <filter-class>org.dspace.app.webui.filter.AdminOnlyFilter</filter-class>
@@ -69,7 +69,7 @@
     <filter-name>registered-only</filter-name>
     <filter-class>org.dspace.app.webui.filter.RegisteredOnlyFilter</filter-class>
   </filter>
-  
+
   <filter>
       <filter-name>rdf-content-negotiation</filter-name>
       <filter-class>org.dspace.rdf.negotiation.NegotiationFilter</filter-class>
@@ -80,7 +80,7 @@
         <filter-name>dspace.request</filter-name>
         <url-pattern>/*</url-pattern>
   </filter-mapping>
-    
+
   <filter-mapping>
     <filter-name>admin-only</filter-name>
     <url-pattern>/dspace-admin/*</url-pattern>
@@ -95,7 +95,7 @@
     <filter-name>registered-only</filter-name>
     <url-pattern>/tools/*</url-pattern>
   </filter-mapping>
-    
+
   <filter-mapping>
     <filter-name>registered-only</filter-name>
     <url-pattern>/profile</url-pattern>
@@ -125,7 +125,7 @@
       <filter-name>rdf-content-negotiation</filter-name>
       <url-pattern>/handle/*</url-pattern>
   </filter-mapping>
- 
+
 
   <!--
        DSpace Kernel startup listener. This listener is in charge of initializing/starting the
@@ -135,14 +135,14 @@
   <listener>
      <listener-class>org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener</listener-class>
   </listener>
-  
+
   <!-- Listener to clean up Commons-FileUpload -->
   <listener>
      <listener-class>
         org.apache.commons.fileupload.servlet.FileCleanerCleanup
      </listener-class>
   </listener>
-  
+
   <!-- Listener to initialise / clean up the application -->
   <listener>
      <listener-class>
@@ -214,14 +214,14 @@
 
   <servlet>
     <servlet-name>edit-epeople</servlet-name>
-    <servlet-class>org.dspace.app.webui.servlet.admin.EPersonAdminServlet</servlet-class>
+    <servlet-class>org.dspace.app.webui.servlet.admin.EPersonListServlet</servlet-class>
   </servlet>
 
   <servlet>
     <servlet-name>edit-item</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.admin.EditItemServlet</servlet-class>
   </servlet>
-  
+
   <servlet>
     <servlet-name>edit-news</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.admin.NewsEditServlet</servlet-class>
@@ -241,12 +241,12 @@
     <servlet-name>group-select-list</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.admin.GroupListServlet</servlet-class>
   </servlet>
-  
+
   <servlet>
     <servlet-name>curate</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.admin.CurateServlet</servlet-class>
   </servlet>
-  
+
   <servlet>
     <servlet-name>feed</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.FeedServlet</servlet-class>
@@ -314,7 +314,7 @@
     <servlet-name>batchimport</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.BatchImportServlet</servlet-class>
   </servlet>
-  
+
   <servlet>
     <servlet-name>metadata-field-registry</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.admin.MetadataFieldRegistryServlet</servlet-class>
@@ -334,7 +334,7 @@
     <servlet-name>openURL</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.OpenURLServlet</servlet-class>
   </servlet>
-  
+
   <servlet>
     <servlet-name>open-search</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.OpenSearchServlet</servlet-class>
@@ -354,7 +354,7 @@
     <servlet-name>certificate-login</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.X509CertificateServlet</servlet-class>
   </servlet>
-  
+
   <servlet>
     <servlet-name>profile</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.EditProfileServlet</servlet-class>
@@ -373,12 +373,12 @@
     <servlet-name>retrieve</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.RetrieveServlet</servlet-class>
   </servlet>
-  
+
   <servlet>
     <servlet-name>simple-search</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.SimpleSearchServlet</servlet-class>
   </servlet>
-  
+
   <servlet>
     <servlet-name>sitemap</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.SitemapServlet</servlet-class>
@@ -407,7 +407,7 @@
     <servlet-name>subscribe</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.SubscribeServlet</servlet-class>
   </servlet>
-  
+
   <servlet>
     <servlet-name>suggest</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.SuggestServlet</servlet-class>
@@ -437,7 +437,7 @@
     <servlet-name>controlledvocabulary</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.ControlledVocabularyServlet</servlet-class>
   </servlet>
-  
+
   <servlet>
     <servlet-name>subject-search</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.ControlledVocabularySearchServlet</servlet-class>
@@ -451,7 +451,7 @@
   <servlet>
     <servlet-name>sherpapolicy</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.SHERPAPublisherPolicyServlet</servlet-class>
-  </servlet>  
+  </servlet>
 
   <servlet>
       <servlet-name>SearchResultLogServlet</servlet-name>
@@ -463,7 +463,7 @@
     <servlet-name>shibboleth-login</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.ShibbolethServlet</servlet-class>
   </servlet>
-  
+
   <servlet>
   	<servlet-name>json</servlet-name>
   	<servlet-class>org.dspace.app.webui.servlet.JSONServlet</servlet-class>
@@ -483,12 +483,12 @@
     <servlet-name>version-history</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.VersionHistoryServlet</servlet-class>
   </servlet>
-  
+
   <servlet>
     <servlet-name>request-item</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.RequestItemServlet</servlet-class>
   </servlet>
-    	
+
   <servlet-mapping>
     <servlet-name>shibboleth-login</servlet-name>
     <url-pattern>/shibboleth-login</url-pattern>
@@ -575,7 +575,7 @@
     <servlet-name>edit-item</servlet-name>
     <url-pattern>/tools/edit-item</url-pattern>
   </servlet-mapping>
-  
+
   <servlet-mapping>
     <servlet-name>edit-news</servlet-name>
     <url-pattern>/dspace-admin/news-edit</url-pattern>
@@ -590,27 +590,27 @@
     <servlet-name>eperson-list</servlet-name>
     <url-pattern>/tools/eperson-list</url-pattern>
   </servlet-mapping>
-  
+
   <servlet-mapping>
     <servlet-name>group-select-list</servlet-name>
     <url-pattern>/tools/group-select-list</url-pattern>
   </servlet-mapping>
-  
+
   <servlet-mapping>
     <servlet-name>curate</servlet-name>
     <url-pattern>/dspace-admin/curate</url-pattern>
   </servlet-mapping>
-  
+
   <servlet-mapping>
     <servlet-name>curate</servlet-name>
     <url-pattern>/tools/curate</url-pattern>
   </servlet-mapping>
-  
+
  <servlet-mapping>
     <servlet-name>itemmap</servlet-name>
     <url-pattern>/tools/itemmap</url-pattern>
   </servlet-mapping>
-  
+
   <servlet-mapping>
     <servlet-name>feed</servlet-name>
     <url-pattern>/feed/*</url-pattern>
@@ -675,7 +675,7 @@
     <servlet-name>batchimport</servlet-name>
     <url-pattern>/dspace-admin/batchimport</url-pattern>
   </servlet-mapping>
-  
+
   <servlet-mapping>
     <servlet-name>metadata-field-registry</servlet-name>
     <url-pattern>/dspace-admin/metadata-field-registry</url-pattern>
@@ -695,7 +695,7 @@
     <servlet-name>openURL</servlet-name>
     <url-pattern>/openURL</url-pattern>
   </servlet-mapping>
-  
+
   <servlet-mapping>
     <servlet-name>open-search</servlet-name>
     <url-pattern>/open-search/*</url-pattern>
@@ -715,7 +715,7 @@
     <servlet-name>certificate-login</servlet-name>
     <url-pattern>/certificate-login</url-pattern>
   </servlet-mapping>
-  
+
   <servlet-mapping>
     <servlet-name>profile</servlet-name>
     <url-pattern>/profile</url-pattern>
@@ -735,7 +735,7 @@
     <servlet-name>simple-search</servlet-name>
     <url-pattern>/simple-search</url-pattern>
   </servlet-mapping>
-  
+
   <servlet-mapping>
     <servlet-name>sitemap</servlet-name>
     <url-pattern>/sitemap</url-pattern>
@@ -760,7 +760,7 @@
     <servlet-name>subscribe</servlet-name>
     <url-pattern>/subscribe</url-pattern>
   </servlet-mapping>
-  
+
   <servlet-mapping>
     <servlet-name>suggest</servlet-name>
     <url-pattern>/suggest</url-pattern>
@@ -785,12 +785,12 @@
     <servlet-name>workspace</servlet-name>
     <url-pattern>/workspace</url-pattern>
   </servlet-mapping>
-  
+
   <servlet-mapping>
     <servlet-name>controlledvocabulary</servlet-name>
     <url-pattern>/controlledvocabulary</url-pattern>
   </servlet-mapping>
-  
+
   <servlet-mapping>
     <servlet-name>subject-search</servlet-name>
     <url-pattern>/subject-search</url-pattern>
@@ -805,7 +805,7 @@
     <servlet-name>sherpapolicy</servlet-name>
     <url-pattern>/tools/sherpaPolicy</url-pattern>
   </servlet-mapping>
-    
+
   <servlet-mapping>
   	<servlet-name>json</servlet-name>
   	<url-pattern>/json/*</url-pattern>
@@ -825,17 +825,17 @@
     <servlet-name>version-item</servlet-name>
     <url-pattern>/tools/version</url-pattern>
   </servlet-mapping>
-  
+
   <servlet-mapping>
     <servlet-name>version-history</servlet-name>
     <url-pattern>/tools/history</url-pattern>
   </servlet-mapping>
-  
+
   <servlet-mapping>
     <servlet-name>request-item</servlet-name>
     <url-pattern>/request-item</url-pattern>
   </servlet-mapping>
-  
+
   <!-- Icon MIME type -->
   <mime-mapping>
     <extension>ico</extension>
@@ -865,14 +865,14 @@
     <taglib-uri>http://java.sun.com/jsp/jstl/fmt</taglib-uri>
     <taglib-location>/WEB-INF/fmt.tld</taglib-location>
   </taglib>
-  
+
   <!-- DSpace JSP Tag Library -->
   <taglib>
     <taglib-uri>http://www.dspace.org/dspace-tags.tld</taglib-uri>
     <taglib-location>/WEB-INF/dspace-tags.tld</taglib-location>
   </taglib>
-  
+
   </jsp-config>
-  
+
 
 </web-app>
