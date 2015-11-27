@@ -165,7 +165,6 @@ public class BitstreamResource extends Resource
         {
             context = createContext(getUser(headers));
             org.dspace.content.Bitstream dspaceBitstream = findBitstream(context, bitstreamId, org.dspace.core.Constants.READ);
-            //TODO why isn't the above used...
             policies = new Bitstream(dspaceBitstream,"policies", context).getPolicies();
 
             context.complete();
