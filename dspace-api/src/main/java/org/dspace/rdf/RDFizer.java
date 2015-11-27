@@ -489,7 +489,6 @@ public class RDFizer {
                 builder.append(argument);
             }
             String argumentsLine = builder.toString().trim();
-            argumentsLine.substring(0, argumentsLine.length() - 1);
             System.err.print("Cannot recognize the following argument");
             if (remainingArgs.length >= 2) System.err.print("s");
             System.err.println(": " + argumentsLine + ".");
