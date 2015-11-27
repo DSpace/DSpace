@@ -202,52 +202,11 @@ function clearEPeople()
    else
    {  %>
         <tr>
-
-            <%--<th id="t1">&nbsp;</th>--%>
-            <th id="t1"><%
-                if (sortBy == EPerson.ID)
-                {
-                    %><fmt:message key="jsp.tools.eperson-list.th.id"/><span class="glyphicon glyphicon-arrow-down"><%
-                }
-                else
-                {
-                    %><a href="<%= sortLink %>id"><fmt:message key="jsp.tools.eperson-list.th.id" /></a><%
-                }
-            %></th>
-            <th id="t2"><%
-                if (sortBy == EPerson.EMAIL)
-                {
-                    %><fmt:message key="jsp.tools.eperson-list.th.email"/><span class="glyphicon glyphicon-arrow-down"><%
-                }
-                else
-                {
-                    %><a href="<%= sortLink %>email"><fmt:message key="jsp.tools.eperson-list.th.email" /></a><%
-                }
-            %></th>
-            <%-- <th class="oddRowEvenCol"><%= sortBy == EPerson.LASTNAME ? "<strong>Last Name &uarr;</strong>" : "<a href=\"" + sortLink + "lastname\">Last Name</a>" %></th> --%>
-            <th id="t3"><%
-                if (sortBy == EPerson.LASTNAME)
-                {
-                    %><fmt:message key="jsp.tools.eperson-list.th.lastname"/><span class="glyphicon glyphicon-arrow-down"><%
-                }
-                else
-                {
-                    %><a href="<%= sortLink %>lastname"><fmt:message key="jsp.tools.eperson-list.th.lastname" /></a><%
-                }
-            %></th>
-
+            <th id="t1"><fmt:message key="jsp.tools.eperson-list.th.id" /></th>
+            <th id="t2"><fmt:message key="jsp.tools.eperson-list.th.email" /></th>
+            <th id="t3"><fmt:message key="jsp.tools.eperson-list.th.lastname" /></th>
             <th id="t4"><fmt:message key="jsp.tools.eperson-list.th.firstname"/></th>
-
-             <th id="t5"><%
-                if (sortBy == EPerson.LANGUAGE)
-                {
-                    %><fmt:message key="jsp.tools.eperson-list.th.language"/><span class="glyphicon glyphicon-arrow-down"></span><%
-                }
-                else
-                {
-                    %><a href="<%= sortLink %>language"><fmt:message key="jsp.tools.eperson-list.th.language" /></a><%
-                }
-            %></th>
+             <th id="t5"><fmt:message key="jsp.tools.eperson-list.th.language" /></th>
 			<th id="t6">&nbsp;</th>
         </tr>
 <%  }
@@ -294,21 +253,10 @@ function clearEPeople()
     </table>
 
 <br/>
-
-	<form name="epersongroup" method="post" action="" class = "pull-right">
-		<input class="btn btn-success" type="submit" name="submit_add" value="<fmt:message key="jsp.dspace-admin.eperson-main.add"/>" />
-	</form>
-<%-- Controls for jumping around list--%>
-<div class="span12" style="text-align:center">
-	<ul class="pagination">
-			<li><a href="<%= jumpLink %>0"><fmt:message key="jsp.tools.eperson-list.jump.first"/></a></li>
-			<li><a href="<%= jumpLink %><%= jumpFiveBack %>"><fmt:message key="jsp.tools.eperson-list.jump.five-back"/></a></li>
-			<li><a href="<%= jumpLink %><%= jumpOneBack %>"><fmt:message key="jsp.tools.eperson-list.jump.one-back"/></a></li>
-			<li><a href="<%= jumpLink %><%= jumpOneForward %>"><fmt:message key="jsp.tools.eperson-list.jump.one-forward"/></a></li>
-			<li><a href="<%= jumpLink %><%= jumpFiveForward %>"><fmt:message key="jsp.tools.eperson-list.jump.five-forward"/></a></li>
-			<li><a href="<%= jumpLink %><%= jumpEnd %>"><fmt:message key="jsp.tools.eperson-list.jump.last"/></a></li>
-	</ul>
-</div>
-
+	<div class="row" style="margin-bottom: 10px;">
+		<form name="epersongroup" method="post" action="" class = "pull-right">
+			<input class="btn btn-success" type="submit" name="submit_add" value="<fmt:message key="jsp.dspace-admin.eperson-main.add"/>" />
+		</form>
+	</div>
 	<%@include file="../pagination/pagination-users.jsp"%>
 </dspace:layout>
