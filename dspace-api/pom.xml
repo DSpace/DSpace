@@ -89,7 +89,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.9</version>
+                <version>1.9.1</version>
                 <executions>
                     <execution>
                         <phase>validate</phase>
@@ -103,7 +103,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>buildnumber-maven-plugin</artifactId>
-                <version>1.3</version>
+                <version>1.4</version>
                 <executions>
                     <execution>
                         <phase>validate</phase>
@@ -113,6 +113,7 @@
                     </execution>
                 </executions>
             </plugin>
+
         </plugins>
     </build>
 
@@ -136,6 +137,7 @@
                 </plugins>
             </build>
         </profile>
+
         <!-- If Unit Testing is enabled, then setup the Unit Test Environment.
              See also the 'skiptests' profile in Parent POM. -->
         <profile>
@@ -156,6 +158,18 @@
                     <plugin>
                         <artifactId>maven-dependency-plugin</artifactId>
                         <version>2.8</version>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/testing</outputDirectory>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.dspace</groupId>
+                                    <artifactId>dspace-parent</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+                                    <classifier>testEnvironment</classifier>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
                         <executions>
                             <execution>
                                 <id>setupTestEnvironment</id>
@@ -163,18 +177,13 @@
                                 <goals>
                                     <goal>unpack</goal>
                                 </goals>
-                                <configuration>
-                                    <outputDirectory>${project.build.directory}/testing</outputDirectory>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>org.dspace</groupId>
-                                            <artifactId>dspace-parent</artifactId>
-                                            <version>${project.version}</version>
-                                            <type>zip</type>
-                                            <classifier>testEnvironment</classifier>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>setupIntegrationTestEnvironment</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
                             </execution>
                         </executions>
                     </plugin>
@@ -196,7 +205,7 @@
                         <executions>
                             <execution>
                                 <id>setproperty</id>
-                                <phase>generate-test-resources</phase>
+                                <phase>generate-test-resources</phase> <!-- XXX I think this should be 'initialize' - MHW -->
                                 <goals>
                                     <goal>execute</goal>
                                 </goals>
@@ -259,7 +268,16 @@
                                 <phase>process-test-resources</phase>
                                 <configuration>
                                     <target>
+                                        <!-- Ant task to copy dspace.cfg.woven to location of test dspace.cfg file -->
                                         <copy file="${agnostic.build.dir}/testing/dspace.cfg.woven" tofile="${agnostic.build.dir}/testing/dspace/config/dspace.cfg" />
+                                        <!-- Now, do one final filter of our Test configs, replacing any remaining "${dspace.dir}"
+                                             placeholders, with the full path of our Unit Test directory -->
+                                        <!-- NOTE: This final filtering is necessary, because dspace.dir doesn't get filled out
+                                             in our test dspace.cfg until Fileweaver runs above. -->
+                                        <replace dir="${agnostic.build.dir}/testing/dspace/config/" value="${agnostic.build.dir}/testing/dspace">
+                                            <include name="**/*"/>
+                                            <replacetoken>${dspace.dir}</replacetoken>
+                                        </replace>
                                     </target>
                                 </configuration>
                                 <goals>
@@ -269,9 +287,22 @@
                         </executions>
                     </plugin>
 
-                    <!-- Run Unit/Integration Testing! This plugin just kicks off the tests (when enabled). -->
+                    <!-- Run Unit Testing! This plugin just kicks off the tests (when enabled). -->
                     <plugin>
                         <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <!-- Specify the dspace.cfg file to use for test environment -->
+                                <dspace.configuration>${agnostic.build.dir}/testing/dspace/config/dspace.cfg</dspace.configuration>
+                                <!-- Turn off any DSpace logging -->
+                                <dspace.log.init.disable>true</dspace.log.init.disable>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </plugin>
+
+                    <!-- Run Integration Testing! This plugin just kicks off the tests (when enabled). -->
+                    <plugin>
+                        <artifactId>maven-failsafe-plugin</artifactId>
                         <configuration>
                             <systemPropertyVariables>
                                 <!-- Specify the dspace.cfg file to use for test environment -->
@@ -289,6 +320,18 @@
 
 
     <dependencies>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+        </dependency>
+        <dependency>
+        	<groupId>org.hibernate</groupId>
+        	<artifactId>hibernate-ehcache</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>handle</artifactId>
@@ -335,8 +378,8 @@
             <artifactId>commons-collections</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-dbcp</groupId>
-            <artifactId>commons-dbcp</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-dbcp2</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-fileupload</groupId>
@@ -352,8 +395,8 @@
             <artifactId>commons-lang</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-pool</groupId>
-            <artifactId>commons-pool</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-validator</groupId>
@@ -569,7 +612,7 @@
 
 
         <dependency>
-            <groupId>postgresql</groupId>
+            <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
         </dependency>
 		
@@ -595,7 +638,7 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>3.0</version>
+            <version>3.2.1</version>
         </dependency>
 
         <!-- Google Analytics -->
@@ -604,12 +647,20 @@
             <artifactId>google-api-services-analytics</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.google.api-client</groupId>
+            <artifactId>google-api-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.http-client</groupId>
+            <artifactId>google-http-client</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.google.http-client</groupId>
             <artifactId>google-http-client-jackson2</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.oauth-client</groupId>
-            <artifactId>google-oauth-client-jetty</artifactId>
+            <artifactId>google-oauth-client</artifactId>
         </dependency>
         <!-- FindBugs -->
         <dependency>

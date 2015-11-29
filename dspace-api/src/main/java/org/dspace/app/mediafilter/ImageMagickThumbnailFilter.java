@@ -16,11 +16,11 @@ import java.util.regex.PatternSyntaxException;
 
 import javax.imageio.ImageIO;
 
-import org.dspace.app.mediafilter.MediaFilter;
-import org.dspace.app.mediafilter.SelfRegisterInputFormats;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
@@ -36,12 +36,13 @@ import org.dspace.core.ConfigurationManager;
  */
 public abstract class ImageMagickThumbnailFilter extends MediaFilter implements SelfRegisterInputFormats
 {
-	private static int width = 180;
-	private static int height = 120;
-        private static boolean flatten = true;
+	protected static int width = 180;
+    protected static int height = 120;
+	private static boolean flatten = true;
 	static String bitstreamDescription = "IM Thumbnail";
 	static final String defaultPattern = "Generated Thumbnail";
 	static Pattern replaceRegex = Pattern.compile(defaultPattern);
+    protected final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 	
 	static {
 		String pre = ImageMagickThumbnailFilter.class.getName();
@@ -60,13 +61,13 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter implements 
 		} catch(PatternSyntaxException e) {
 			System.err.println("Invalid thumbnail replacement pattern: "+e.getMessage());
 		}
-		
 	}
 	
 	public ImageMagickThumbnailFilter() {
 	}
 	
 	
+    @Override
     public String getFilteredName(String oldFilename)
     {
         return oldFilename + ".jpg";
@@ -76,6 +77,7 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter implements 
      * @return String bundle name
      *  
      */
+    @Override
     public String getBundleName()
     {
         return "THUMBNAIL";
@@ -84,6 +86,7 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter implements 
     /**
      * @return String bitstreamformat
      */
+    @Override
     public String getFormatString()
     {
         return "JPEG";
@@ -92,12 +95,13 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter implements 
     /**
      * @return String bitstreamDescription
      */
+    @Override
     public String getDescription()
     {
         return bitstreamDescription;
     }
 
-    public static File inputStreamToTempFile(InputStream source, String prefix, String suffix) throws IOException {
+    public File inputStreamToTempFile(InputStream source, String prefix, String suffix) throws IOException {
 		File f = File.createTempFile(prefix, suffix);
 		f.deleteOnExit();
     	FileOutputStream fos = new FileOutputStream(f);
@@ -112,7 +116,7 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter implements 
 		return f;
     }
     
-    public static File getThumbnailFile(File f) throws IOException, InterruptedException, IM4JavaException {
+    public File getThumbnailFile(File f, boolean verbose) throws IOException, InterruptedException, IM4JavaException {
     	File f2 = new File(f.getParentFile(), f.getName() + ".jpg");
     	f2.deleteOnExit();
     	ConvertCmd cmd = new ConvertCmd();
@@ -120,14 +124,14 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter implements 
 		op.addImage(f.getAbsolutePath());
 		op.thumbnail(width, height);
 		op.addImage(f2.getAbsolutePath());
-        if (MediaFilterManager.isVerbose) {
+        if (verbose) {
 		    System.out.println("IM Thumbnail Param: "+op);
         }
 		cmd.run(op);
 		return f2;
     }
     
-    public static File getImageFile(File f, int page) throws IOException, InterruptedException, IM4JavaException {
+    public File getImageFile(File f, int page, boolean verbose) throws IOException, InterruptedException, IM4JavaException {
     	File f2 = new File(f.getParentFile(), f.getName() + ".jpg");
     	f2.deleteOnExit();
     	ConvertCmd cmd = new ConvertCmd();
@@ -139,20 +143,21 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter implements 
                     op.flatten();
                 }
 		op.addImage(f2.getAbsolutePath());
-        if (MediaFilterManager.isVerbose) {
+        if (verbose) {
 		    System.out.println("IM Image Param: "+op);
         }
 		cmd.run(op);
 		return f2;
     }
     
-    public boolean preProcessBitstream(Context c, Item item, Bitstream source)
+    @Override
+    public boolean preProcessBitstream(Context c, Item item, Bitstream source, boolean verbose)
             throws Exception
     {
     	String nsrc = source.getName();
-    	for(Bundle b: item.getBundles("THUMBNAIL")) {
+    	for(Bundle b: itemService.getBundles(item, "THUMBNAIL")) {
     		for(Bitstream bit: b.getBitstreams()) {
-    			String n = bit.getName();
+                String n = bit.getName();
     			if (n != null) {
     				if (nsrc != null) {
     					if (!n.startsWith(nsrc)) continue;
@@ -162,13 +167,13 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter implements 
     	    	//If anything other than a generated thumbnail is found, halt processing
     	    	if (description != null) {
         	    	if (replaceRegex.matcher(description).matches()) {
-        	            if (MediaFilterManager.isVerbose) {
+        	            if (verbose) {
         	    		    System.out.println(description + " " + nsrc + " matches pattern and is replacable.");
         	            }
         	    		continue;
         	    	}
         	    	if (description.equals(bitstreamDescription)) {
-        	            if (MediaFilterManager.isVerbose) {
+        	            if (verbose) {
         	    		    System.out.println(bitstreamDescription + " " + nsrc + " is replacable.");
         	            }
         	    		continue;    	    		
@@ -183,16 +188,19 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter implements 
         return true; //assume that the thumbnail is a custom one
     }
 
+     @Override
      public String[] getInputMIMETypes()
     {
         return ImageIO.getReaderMIMETypes();
     }
 
+    @Override
     public String[] getInputDescriptions()
     {
         return null;
     }
 
+    @Override
     public String[] getInputExtensions()
     {
         return ImageIO.getReaderFileSuffixes();

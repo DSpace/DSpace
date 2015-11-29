@@ -132,7 +132,7 @@
 				<option value="-1"><fmt:message key="jsp.dspace-admin.batchmetadataimport.select"/></option>
  <% 
  		for (Collection collection : collections){
-				String selected = ((owningCollectionID != null) && (owningCollectionID == collection.getID())) ? "selected" : "";
+				String selected = ((owningCollectionID != null) && (owningCollectionID.equals(collection.getID()))) ? "selected" : "";
 %> 			
  				<option <%= selected %> value="<%= collection.getID() %>"><%= collection.getName() %></option>	
  <%

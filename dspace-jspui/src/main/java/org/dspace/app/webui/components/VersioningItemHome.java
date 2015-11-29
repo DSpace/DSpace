@@ -17,11 +17,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.VersionUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.plugin.ItemHomeProcessor;
 import org.dspace.plugin.PluginException;
 import org.dspace.versioning.Version;
@@ -32,6 +34,15 @@ public class VersioningItemHome implements ItemHomeProcessor {
 	/** log4j category */
 	private static Logger log = Logger.getLogger(VersioningItemHome.class);
 
+	private ItemService itemService;
+	
+	private HandleService handleService; 
+	
+	public VersioningItemHome() {
+		handleService = HandleServiceFactory.getInstance().getHandleService();
+		itemService = ContentServiceFactory.getInstance().getItemService();
+	}
+	
 	@Override
 	public void process(Context context, HttpServletRequest request,
 			HttpServletResponse response, Item item) throws PluginException,
@@ -49,22 +60,16 @@ public class VersioningItemHome implements ItemHomeProcessor {
 		String latestVersionURL = null;
 		if (versioningEnabled) {
 			try {
-				if(item.canEdit()) {
+				if(itemService.canEdit(context, item)) {
 					if (VersionUtil.isLatest(context, item) && item.isArchived()) {
 						hasVersionButton = true;
 					}
 				}
-			} catch (SQLException e) {
-				throw new PluginException(e.getMessage());
-			}
-
-			if (VersionUtil.hasVersionHistory(context, item)) {
-				hasVersionHistory = true;
-				history = VersionUtil.retrieveVersionHistory(context, item);
-				for(Version versRow : history.getVersions()) {  
-					
-		            //Skip items currently in submission
-		            try {
+				if (VersionUtil.hasVersionHistory(context, item)) {
+					hasVersionHistory = true;
+					history = VersionUtil.retrieveVersionHistory(context, item);
+					for(Version versRow : history.getVersions()) {  
+						//Skip items currently in submission
 						if(VersionUtil.isItemInSubmission(context, versRow.getItem()))
 						{
 						    continue;
@@ -72,10 +77,10 @@ public class VersioningItemHome implements ItemHomeProcessor {
 						else {
 							historyVersions.add(versRow);
 						}
-					} catch (SQLException e) {
-						throw new PluginException(e.getMessage());
 					}
 				}
+			} catch (SQLException e) {
+				throw new PluginException(e.getMessage());
 			}
 
 			// Check if we have a history for the item
@@ -87,8 +92,8 @@ public class VersioningItemHome implements ItemHomeProcessor {
 			}
 
 			if (latestVersion != null) {
-				if (latestVersion != null
-						&& latestVersion.getItemID() != item.getID()) {
+				if (latestVersion != null && latestVersion.getItem() != null
+						&& !latestVersion.getItem().getID().equals(item.getID())) {
 					// We have a newer version
 					Item latestVersionItem = latestVersion.getItem();
 					if (latestVersionItem.isArchived()) {
@@ -96,8 +101,8 @@ public class VersioningItemHome implements ItemHomeProcessor {
 						// a new version is available
 						newVersionAvailable = true;
 						try {
-							latestVersionURL = HandleManager.resolveToURL(
-									context, latestVersionItem.getHandle());
+							latestVersionURL = handleService.resolveToURL(
+                                    context, latestVersionItem.getHandle());
 						} catch (SQLException e) {
 							throw new PluginException(e.getMessage());
 						}

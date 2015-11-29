@@ -9,23 +9,18 @@ package org.dspace.app.webui.jsptag;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.ResourceBundle;
 
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.tagext.TagSupport;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.tagext.TagSupport;
 
 import org.dspace.app.util.CollectionDropDown;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.content.Collection;
-import org.dspace.content.Community;
 import org.dspace.core.Context;
 
 /**
@@ -47,7 +42,7 @@ public class SelectCollectionTag extends TagSupport
     private String id;
 
     /** the collection id */
-    private int collection = -1;
+    private String collection = null;
 
     public SelectCollectionTag()
     {
@@ -63,7 +58,7 @@ public class SelectCollectionTag extends TagSupport
         {
             HttpServletRequest hrq = (HttpServletRequest) pageContext.getRequest();
             Context context = UIUtil.obtainContext(hrq);
-            Collection[] collections = (Collection[]) hrq.getAttribute("collections");
+            List<Collection> collections = (List<Collection>) hrq.getAttribute("collections");
 
             sb.append("<select");
             if (name != null)
@@ -83,13 +78,13 @@ public class SelectCollectionTag extends TagSupport
             ResourceBundle msgs = ResourceBundle.getBundle("Messages", context.getCurrentLocale());
             String firstOption = msgs.getString("jsp.submit.start-lookup-submission.select.collection.defaultoption");
             sb.append("<option value=\"-1\"");
-            if (collection == -1) sb.append(" selected=\"selected\"");
+            if (collection == null) sb.append(" selected=\"selected\"");
             sb.append(">").append(firstOption).append("</option>\n");
 
             for (Collection coll : collections)
             {
                 sb.append("<option value=\"").append(coll.getID()).append("\"");
-                if (collection == coll.getID())
+                if (collection.equals(coll.getID().toString()))
                 {
                     sb.append(" selected=\"selected\"");
                 }
@@ -142,12 +137,12 @@ public class SelectCollectionTag extends TagSupport
         this.id = id;
     }
 
-    public int getCollection()
+    public String getCollection()
     {
         return collection;
     }
 
-    public void setCollection(int collection)
+    public void setCollection(String collection)
     {
         this.collection = collection;
     }
@@ -157,7 +152,7 @@ public class SelectCollectionTag extends TagSupport
         klass = null;
         name = null;
         id = null;
-        collection = -1;
+        collection = null;
     }
 }
 

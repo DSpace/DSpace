@@ -31,6 +31,8 @@
 <%@ page import="org.dspace.app.util.DCInputsReader" %>
 <%@ page import="org.dspace.app.util.SubmissionInfo" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
+<%@ page import="org.dspace.content.service.ItemService" %>
+<%@ page import="org.dspace.content.factory.ContentServiceFactory" %>
 
 
 <%
@@ -421,7 +423,16 @@
             testChunks: true,
             throttleProgressCallbacks:1,
             method: "multipart",
-            query:{workspace_item_id:'<%= subInfo.getSubmissionItem().getID()%>'}
+            <%
+            if (subInfo.isInWorkflow())
+            {
+            %>
+                query:{workflow_id:'<%= subInfo.getSubmissionItem().getID()%>'}
+            <%
+            } else {
+            %>
+                query:{workspace_item_id:'<%= subInfo.getSubmissionItem().getID()%>'}
+            <%}%>
           });
         // Resumable.js isn't supported, fall back on a different method
 
@@ -541,13 +552,14 @@
 	<br/>
 		<%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
         <%= SubmissionController.getSubmissionParameters(context, request) %>
-        <% 
+        <%
+			ItemService itemService = ContentServiceFactory.getInstance().getItemService();
         	int col = 0; 
 			if(!SubmissionController.isFirstStep(request, subInfo))
 			{
 				col++;
 			}
-			if (!fileRequired || subInfo.getSubmissionItem().getItem().hasUploadedFiles())
+			if (!fileRequired || itemService.hasUploadedFiles(subInfo.getSubmissionItem().getItem()))
             {
 				col++;
             }
@@ -561,7 +573,7 @@
                         <input class="btn btn-default col-md-<%= 12 / (col + 2) %>" type="submit" name="<%=AbstractProcessingStep.CANCEL_BUTTON%>" value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>" />
                     <%
                         //if upload is set to optional, or user returned to this page after pressing "Add Another File" button
-                    	if (!fileRequired || subInfo.getSubmissionItem().getItem().hasUploadedFiles())
+                    	if (!fileRequired || itemService.hasUploadedFiles(subInfo.getSubmissionItem().getItem()))
                         {
                     %>
                                 <input class="btn btn-warning col-md-<%= 12 / (col + 2) %>" type="submit" name="<%=UploadStep.SUBMIT_SKIP_BUTTON%>" value="<fmt:message key="jsp.submit.choose-file.skip"/>" />

@@ -13,19 +13,25 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.*;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.eperson.EPerson;
 import org.dspace.utils.DSpace;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
-import org.dspace.versioning.VersioningService;
+import org.dspace.versioning.factory.VersionServiceFactory;
+import org.dspace.versioning.service.VersioningService;
 import org.dspace.workflow.WorkflowItem;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.workflow.WorkflowItemService;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 
 import java.sql.SQLException;
+import java.util.*;
 
 /**
  *
@@ -49,13 +55,19 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
     private static final Message T_submit_delete = message("xmlui.aspect.versioning.VersionHistoryForm.delete");
     private static final Message T_legend = message("xmlui.aspect.versioning.VersionHistoryForm.legend");
 
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    protected VersioningService versioningService = VersionServiceFactory.getInstance().getVersionService();
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+    protected WorkflowItemService workflowItemService = WorkflowServiceFactory.getInstance().getWorkflowItemService();
+
 
     public void addBody(Body body) throws WingException, SQLException, AuthorizeException
     {
-        boolean isItemView=parameters.getParameterAsInteger("itemID",-1) == -1;
+        boolean isItemView=parameters.getParameter("itemID",null) == null;
         Item item = getItem();
 
-        if(item==null || !AuthorizeManager.isAdmin(this.context, item.getOwningCollection()))
+        if(item==null || !authorizeService.isAdmin(this.context, item.getOwningCollection()))
         {
             if(isItemView)
             {
@@ -94,7 +106,7 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
     {
         try
         {
-            if(parameters.getParameterAsInteger("itemID",-1) == -1)
+            if(parameters.getParameter("itemID",null) == null)
             {
                 DSpaceObject dso;
                 dso = HandleUtil.obtainHandle(objectModel);
@@ -104,7 +116,7 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
                 }
                 return (Item) dso;
             }else{
-                return Item.find(context, parameters.getParameterAsInteger("itemID", -1));
+                return itemService.find(context, UUID.fromString(parameters.getParameter("itemID", null)));
             }
         } catch (SQLException e) {
             throw new WingException(e);
@@ -113,10 +125,9 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
 
     }
 
-    private VersionHistory retrieveVersionHistory(Item item) throws WingException
+    private VersionHistory retrieveVersionHistory(Item item) throws WingException, SQLException
     {
-        VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
-        return versioningService.findVersionHistory(context, item.getID());
+        return versioningService.findVersionHistory(context, item);
     }
 
 
@@ -163,13 +174,13 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
                 {
                     CheckBox remove = row.addCell().addCheckBox("remove");
 				    remove.setLabel("remove");
-				    remove.addOption(version.getVersionId());
+				    remove.addOption(version.getId());
                 }
 
                 row.addCell().addContent(version.getVersionNumber());
                 addItemIdentifier(row.addCell(), item, version);
 
-                EPerson editor = version.getEperson();
+                EPerson editor = version.getEPerson();
                 row.addCell().addXref("mailto:" + editor.getEmail(), editor.getFullName());
                 row.addCell().addContent(new DCDate(version.getVersionDate()).toString());
                 row.addCell().addContent(version.getSummary());
@@ -177,7 +188,7 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
 
                 if(!isItemView)
                 {
-                    row.addCell().addXref(contextPath + "/item/versionhistory?versioning-continue="+knot.getId()+"&versionID="+version.getVersionId() +"&itemID="+ version.getItem().getID() + "&submit_update", T_submit_update);
+                    row.addCell().addXref(contextPath + "/item/versionhistory?versioning-continue="+knot.getId()+"&versionID="+version.getId() +"&itemID="+ version.getItem().getID() + "&submit_update", T_submit_update);
                 }
             }
         }
@@ -186,15 +197,8 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
 
     private boolean isItemInSubmission(Item item) throws SQLException
     {
-        WorkspaceItem workspaceItem = WorkspaceItem.findByItem(context, item);
-        InProgressSubmission workflowItem;
-        if(ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow"))
-        {
-            workflowItem = XmlWorkflowItem.findByItem(context, item);
-        }else{
-            workflowItem = WorkflowItem.findByItem(context, item);
-        }
-
+        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, item);
+        WorkflowItem workflowItem = workflowItemService.findByItem(context, item);
         return workspaceItem != null || workflowItem != null;
     }
 
@@ -202,11 +206,11 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
     {
         String itemHandle = version.getItem().getHandle();
 
-        Metadatum[] identifiers = version.getItem().getMetadata(MetadataSchema.DC_SCHEMA, "identifier", null, Item.ANY);
+        java.util.List<MetadataValue> identifiers = itemService.getMetadata(version.getItem(), MetadataSchema.DC_SCHEMA, "identifier", null, Item.ANY);
         String itemIdentifier=null;
-        if(identifiers!=null && identifiers.length > 0)
+        if(identifiers!=null && identifiers.size() > 0)
         {
-            itemIdentifier = identifiers[0].value;
+            itemIdentifier = identifiers.get(0).getValue();
         }
 
         if(itemIdentifier!=null)
@@ -216,7 +220,7 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
             cell.addXref(contextPath + "/handle/" + itemHandle, itemHandle);
         }
 
-        if(item.getID()==version.getItemID())
+        if(item.equals(version.getItem()))
         {
             cell.addContent("*");
         }

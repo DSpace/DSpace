@@ -9,8 +9,8 @@ package org.dspace.app.webui.submit.step;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -32,7 +32,10 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
-import org.dspace.content.FormatIdentifier;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -40,8 +43,6 @@ import org.dspace.submit.step.UploadStep;
 import org.dspace.utils.DSpace;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 
 /**
  * Upload step for DSpace JSP-UI. Handles the pages that revolve around uploading files
@@ -105,6 +106,12 @@ public class JSPUploadStep extends JSPStep
 
     /** log4j logger */
     private static Logger log = Logger.getLogger(JSPUploadStep.class);
+    
+    private BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
+    
+    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    
+    private BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
     /**
      * Do any pre-processing to determine which JSP (if any) is used to generate
@@ -199,7 +206,7 @@ public class JSPUploadStep extends JSPStep
             response.setContentType("text/html");
             JSONUploadResponse jsonResponse = new JSONUploadResponse();
             String bitstreamName = null;
-            int bitstreamID = -1;
+            UUID bitstreamID = null;
             long size = 0;
             String url = null;
             if (subInfo.getBitstream() != null)
@@ -210,11 +217,11 @@ public class JSPUploadStep extends JSPStep
                 size = bitstream.getSize();
                 url = request.getContextPath() + "/retrieve/" + bitstreamID
                         + "/" + UIUtil.encodeBitstreamName(bitstreamName);
+                jsonResponse.addUploadFileStatus(bitstreamName, bitstreamID, size,
+                        url, status);
+                response.getWriter().print(gson.toJson(jsonResponse));
+                response.flushBuffer();
             }
-            jsonResponse.addUploadFileStatus(bitstreamName, bitstreamID, size,
-                    url, status);
-            response.getWriter().print(gson.toJson(jsonResponse));
-            response.flushBuffer();
             return;
         }
 
@@ -222,14 +229,14 @@ public class JSPUploadStep extends JSPStep
         if (buttonPressed.equalsIgnoreCase(UploadStep.SUBMIT_SKIP_BUTTON) ||
             (buttonPressed.equalsIgnoreCase(UploadStep.SUBMIT_UPLOAD_BUTTON) && !fileRequired))
         {
-            Bundle[] bundles = subInfo.getSubmissionItem().getItem()
-                    .getBundles("ORIGINAL");
+            List<Bundle> bundles = itemService
+                    .getBundles(subInfo.getSubmissionItem().getItem(), "ORIGINAL");
 
             boolean fileAlreadyUploaded = false;
             
             for (Bundle bnd : bundles)
             {
-            	fileAlreadyUploaded = bnd.getBitstreams().length > 0;
+            	fileAlreadyUploaded = bnd.getBitstreams().size() > 0;
             	if (fileAlreadyUploaded)
             	{
             		break;
@@ -375,8 +382,8 @@ public class JSPUploadStep extends JSPStep
             // Which bitstream does the user want to describe?
             try
             {
-                int id = Integer.parseInt(buttonPressed.substring(16));
-                bitstream = Bitstream.find(context, id);
+                UUID id = UUID.fromString(buttonPressed.substring(16));
+                bitstream = bitstreamService.find(context, id);
             }
             catch (NumberFormatException nfe)
             {
@@ -406,8 +413,8 @@ public class JSPUploadStep extends JSPStep
             // Which bitstream does the user want to describe?
             try
             {
-                int id = Integer.parseInt(buttonPressed.substring(14));
-                bitstream = Bitstream.find(context, id);
+                UUID id = UUID.fromString(buttonPressed.substring(14));
+                bitstream = bitstreamService.find(context, id);
             }
             catch (NumberFormatException nfe)
             {
@@ -467,7 +474,7 @@ public class JSPUploadStep extends JSPStep
             boolean justUploaded) throws SQLException, ServletException,
             IOException
     {
-        Bundle[] bundles = subInfo.getSubmissionItem().getItem().getBundles(
+        List<Bundle> bundles = itemService.getBundles(subInfo.getSubmissionItem().getItem(),
                 "ORIGINAL");
         
         boolean fileAlreadyUploaded = false;
@@ -476,7 +483,7 @@ public class JSPUploadStep extends JSPStep
         {
 	        for (Bundle bnd : bundles)
 	        {
-	        	fileAlreadyUploaded = bnd.getBitstreams().length > 0;
+	        	fileAlreadyUploaded = bnd.getBitstreams().size() > 0;
 	        	if (fileAlreadyUploaded)
 	        	{
 	        		break;
@@ -605,12 +612,12 @@ public class JSPUploadStep extends JSPStep
             JSPManager.showIntegrityError(request, response);
         }
 
-        BitstreamFormat[] formats = BitstreamFormat.findNonInternal(context);
+        List<BitstreamFormat> formats = bitstreamFormatService.findNonInternal(context);
 
         request.setAttribute("bitstream.formats", formats);
 
         // What does the system think it is?
-        BitstreamFormat guess = FormatIdentifier.guessFormat(context, subInfo
+        BitstreamFormat guess = bitstreamFormatService.guessFormat(context, subInfo
                 .getBitstream());
 
         request.setAttribute("guessed.format", guess);

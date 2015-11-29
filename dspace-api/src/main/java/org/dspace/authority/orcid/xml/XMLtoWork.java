@@ -77,6 +77,7 @@ public class XMLtoWork extends Converter {
     protected String WORK_SOURCE = "work-source";
 
 
+    @Override
     public List<Work> convert(Document document) {
         List<Work> result = new ArrayList<Work>();
 

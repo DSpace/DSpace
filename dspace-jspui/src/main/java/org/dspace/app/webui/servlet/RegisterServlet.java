@@ -7,15 +7,9 @@
  */
 package org.dspace.app.webui.servlet;
 
-import com.sun.mail.smtp.SMTPAddressFailedException;
-import org.apache.log4j.Logger;
-import org.dspace.app.webui.util.JSPManager;
-import org.dspace.app.webui.util.UIUtil;
-import org.dspace.authenticate.AuthenticationManager;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.*;
-import org.dspace.eperson.AccountManager;
-import org.dspace.eperson.EPerson;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Hashtable;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
@@ -25,9 +19,21 @@ import javax.naming.directory.InitialDirContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Hashtable;
+
+import org.apache.log4j.Logger;
+import org.dspace.app.webui.util.JSPManager;
+import org.dspace.app.webui.util.UIUtil;
+import org.dspace.authenticate.factory.AuthenticateServiceFactory;
+import org.dspace.authenticate.service.AuthenticationService;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
+import org.dspace.core.LogManager;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.AccountService;
+
+import com.sun.mail.smtp.SMTPAddressFailedException;
 
 /**
  * Servlet for handling user registration and forgotten passwords.
@@ -48,7 +54,7 @@ import java.util.Hashtable;
  * servlet then displays the "edit profile" or "edit password" screen as
  * appropriate.
  */
-public class RegisterServlet extends DSpaceServlet
+public class RegisterServlet extends EditProfileServlet
 {
     /** Logger */
     private static Logger log = Logger.getLogger(RegisterServlet.class);
@@ -68,10 +74,17 @@ public class RegisterServlet extends DSpaceServlet
     /** ldap is enabled */
     private boolean ldap_enabled;
 
-    public void init()
+    private AuthenticationService authenticationService;
+    
+    private AccountService accountService;
+    
+    public void init() throws ServletException
     {
+    	super.init();
         registering = getInitParameter("register").equalsIgnoreCase("true");
         ldap_enabled = ConfigurationManager.getBooleanProperty("authentication-ldap", "enable");
+        authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
+        accountService = EPersonServiceFactory.getInstance().getAccountService();
     }
 
     protected void doDSGet(Context context, HttpServletRequest request,
@@ -110,13 +123,13 @@ public class RegisterServlet extends DSpaceServlet
         else
         {
             // We have a token. Find out who the it's for
-            String email = AccountManager.getEmail(context, token);
+            String email = accountService.getEmail(context, token);
 
             EPerson eperson = null;
 
             if (email != null)
             {
-                eperson = EPerson.findByEmail(context, email);
+                eperson = personService.findByEmail(context, email);
             }
 
             // Both forms need an EPerson object (if any)
@@ -129,7 +142,7 @@ public class RegisterServlet extends DSpaceServlet
             {
                 // Indicate if user can set password
                 boolean setPassword =
-                    AuthenticationManager.allowSetPassword(context, request, email);
+                    authenticationService.allowSetPassword(context, request, email);
                 request.setAttribute("set.password", Boolean.valueOf(setPassword));
 
                 // Forward to "personal info page"
@@ -219,11 +232,11 @@ public class RegisterServlet extends DSpaceServlet
         
         String netid = request.getParameter("netid");
         String password = request.getParameter("password");
-        EPerson eperson = EPerson.findByEmail(context, email);
+        EPerson eperson = personService.findByEmail(context, email);
         EPerson eperson2 = null;
         if (netid!=null)
         {
-            eperson2 = EPerson.findByNetid(context, netid.toLowerCase());
+            eperson2 = personService.findByNetid(context, netid.toLowerCase());
         }
 
         try
@@ -244,7 +257,7 @@ public class RegisterServlet extends DSpaceServlet
                     // Find out from site authenticator whether this email can
                     // self-register
                     boolean canRegister =
-                        AuthenticationManager.canSelfRegister(context, request, email);
+                        authenticationService.canSelfRegister(context, request, email);
 
                     if (canRegister)
                     {
@@ -257,7 +270,7 @@ public class RegisterServlet extends DSpaceServlet
 
                             try
                             {
-                                AccountManager.sendRegistrationInfo(context, email);
+                                accountService.sendRegistrationInfo(context, email);
                             }
                             catch (javax.mail.SendFailedException e)
                             {
@@ -369,7 +382,7 @@ public class RegisterServlet extends DSpaceServlet
                     log.info(LogManager.getHeader(context,
                             "sendtoken_forgotpw", "email=" + email));
 
-                    AccountManager.sendForgotPasswordInfo(context, email);
+                    accountService.sendForgotPasswordInfo(context, email);
                     JSPManager.showJSP(request, response,
                             "/register/password-token-sent.jsp");
 
@@ -430,7 +443,7 @@ public class RegisterServlet extends DSpaceServlet
         String token = request.getParameter("token");
 
         // Get the email address
-        String email = AccountManager.getEmail(context, token);
+        String email = accountService.getEmail(context, token);
         String netid = request.getParameter("netid");
         if ((netid!=null)&&(email==null))
         {
@@ -454,12 +467,12 @@ public class RegisterServlet extends DSpaceServlet
         EPerson eperson = null;
         if (email!=null)
         {
-            eperson = EPerson.findByEmail(context, email);
+            eperson = personService.findByEmail(context, email);
         }
         EPerson eperson2 = null;
         if (netid!=null)
         {
-            eperson2 = EPerson.findByNetid(context, netid.toLowerCase());
+            eperson2 = personService.findByNetid(context, netid.toLowerCase());
         }
         if (eperson2 !=null)
         {
@@ -472,13 +485,13 @@ public class RegisterServlet extends DSpaceServlet
             // FIXME: TEMPORARILY need to turn off authentication, as usually
             // only site admins can create e-people
             context.setIgnoreAuthorization(true);
-            eperson = EPerson.create(context);
+            eperson = personService.create(context);
             eperson.setEmail(email);
             if (netid!=null)
             {
                 eperson.setNetid(netid.toLowerCase());
             }
-            eperson.update();
+            personService.update(context, eperson);
             context.setIgnoreAuthorization(false);
         }
 
@@ -488,21 +501,21 @@ public class RegisterServlet extends DSpaceServlet
         context.setCurrentUser(eperson);
 
         // Set the user profile info
-        boolean infoOK = EditProfileServlet.updateUserProfile(eperson, request);
+        boolean infoOK = updateUserProfile(context, eperson, request);
 
         eperson.setCanLogIn(true);
         eperson.setSelfRegistered(true);
 
         // Give site auth a chance to set/override appropriate fields
-        AuthenticationManager.initEPerson(context, request, eperson);
+        authenticationService.initEPerson(context, request, eperson);
 
         // If the user set a password, make sure it's OK
         boolean passwordOK = true;
         if (!eperson.getRequireCertificate() && netid==null &&
-            AuthenticationManager.allowSetPassword(context, request,
-                eperson.getEmail()))
+            authenticationService.allowSetPassword(context, request,
+                    eperson.getEmail()))
         {
-            passwordOK = EditProfileServlet.confirmAndSetPassword(eperson,
+            passwordOK = confirmAndSetPassword(eperson,
                     request);
         }
 
@@ -515,11 +528,11 @@ public class RegisterServlet extends DSpaceServlet
             // delete the token
             if (token!=null)
             {
-                AccountManager.deleteToken(context, token);
+                accountService.deleteToken(context, token);
             }
             
             // Update user record
-            eperson.update();
+            personService.update(context, eperson);
 
             request.setAttribute("eperson", eperson);
 
@@ -535,7 +548,7 @@ public class RegisterServlet extends DSpaceServlet
             request.setAttribute("password.problem", Boolean.valueOf(!passwordOK));
 
             // Indicate if user can set password
-            boolean setPassword = AuthenticationManager.allowSetPassword(
+            boolean setPassword = authenticationService.allowSetPassword(
                     context, request, email);
             request.setAttribute("set.password", Boolean.valueOf(setPassword));
 
@@ -566,7 +579,7 @@ public class RegisterServlet extends DSpaceServlet
         String token = request.getParameter("token");
 
         // Get the eperson associated with the password change
-        EPerson eperson = AccountManager.getEPerson(context, token);
+        EPerson eperson = accountService.getEPerson(context, token);
 
         // If the token isn't valid, show an error
         if (eperson == null)
@@ -587,7 +600,7 @@ public class RegisterServlet extends DSpaceServlet
         context.setCurrentUser(eperson);
 
         // Confirm and set the password
-        boolean passwordOK = EditProfileServlet.confirmAndSetPassword(eperson,
+        boolean passwordOK = confirmAndSetPassword(eperson,
                 request);
 
         if (passwordOK)
@@ -595,8 +608,8 @@ public class RegisterServlet extends DSpaceServlet
             log.info(LogManager.getHeader(context, "usedtoken_forgotpw",
                     "email=" + eperson.getEmail()));
 
-            eperson.update();
-            AccountManager.deleteToken(context, token);
+            personService.update(context, eperson);
+            accountService.deleteToken(context, token);
 
             JSPManager.showJSP(request, response,
                     "/register/password-changed.jsp");

@@ -7,10 +7,7 @@
  */
 package org.dspace.browse;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
@@ -104,7 +101,7 @@ public class SolrBrowseDAO implements BrowseDAO
     private String containerIDField = null;
 
     /** the database id of the container we are constraining to */
-    private int containerID = -1;
+    private UUID containerID = null;
 
     /** the column that we are sorting results by */
     private String orderField = null;
@@ -214,7 +211,7 @@ public class SolrBrowseDAO implements BrowseDAO
 
     private void addLocationScopeFilter(DiscoverQuery query)
     {
-        if (containerID > 0)
+        if (containerID != null)
         {
             if (containerIDField.startsWith("collection"))
             {
@@ -286,19 +283,17 @@ public class SolrBrowseDAO implements BrowseDAO
     }
 
     @Override
-    public List doQuery() throws BrowseException
+    public List<Item> doQuery() throws BrowseException
     {
         DiscoverResult resp = getSolrResponse();
 
-        List<BrowseItem> bitems = new ArrayList<BrowseItem>();
+        List<Item> bitems = new ArrayList<>();
         for (DSpaceObject solrDoc : resp.getDspaceObjects())
         {
             // FIXME introduce project, don't retrieve Item immediately when
             // processing the query...
             Item item = (Item) solrDoc;
-            BrowseItem bitem = new BrowseItem(context, item.getID(),
-                    item.isArchived(), item.isWithdrawn(), item.isDiscoverable());
-            bitems.add(bitem);
+            bitems.add(item);
         }
         return bitems;
     }
@@ -361,6 +356,7 @@ public class SolrBrowseDAO implements BrowseDAO
         else
         {
             query.setQuery("bi_" + column + "_sort" + ": {\"" + value + "\" TO *]");
+	        query.addFilterQueries("-(bi_" + column + "_sort" + ":" + value + "*)");
         }
 	    boolean includeUnDiscoverable = itemsWithdrawn || !itemsDiscoverable;
         DiscoverResult resp = null;
@@ -412,7 +408,8 @@ public class SolrBrowseDAO implements BrowseDAO
      * 
      * @see org.dspace.browse.BrowseDAO#getContainerID()
      */
-    public int getContainerID()
+    @Override
+    public UUID getContainerID()
     {
         return containerID;
     }
@@ -422,6 +419,7 @@ public class SolrBrowseDAO implements BrowseDAO
      * 
      * @see org.dspace.browse.BrowseDAO#getContainerIDField()
      */
+    @Override
     public String getContainerIDField()
     {
         return containerIDField;
@@ -432,12 +430,14 @@ public class SolrBrowseDAO implements BrowseDAO
      * 
      * @see org.dspace.browse.BrowseDAO#getContainerTable()
      */
+    @Override
     public String getContainerTable()
     {
         return containerTable;
     }
 
     // FIXME is this in use?
+    @Override
     public String[] getCountValues()
     {
         return null;
@@ -448,6 +448,7 @@ public class SolrBrowseDAO implements BrowseDAO
      * 
      * @see org.dspace.browse.BrowseDAO#getFocusField()
      */
+    @Override
     public String getJumpToField()
     {
         return focusField;
@@ -458,6 +459,7 @@ public class SolrBrowseDAO implements BrowseDAO
      * 
      * @see org.dspace.browse.BrowseDAO#getFocusValue()
      */
+    @Override
     public String getJumpToValue()
     {
         return focusValue;
@@ -468,6 +470,7 @@ public class SolrBrowseDAO implements BrowseDAO
      * 
      * @see org.dspace.browse.BrowseDAO#getLimit()
      */
+    @Override
     public int getLimit()
     {
         return limit;
@@ -478,6 +481,7 @@ public class SolrBrowseDAO implements BrowseDAO
      * 
      * @see org.dspace.browse.BrowseDAO#getOffset()
      */
+    @Override
     public int getOffset()
     {
         return offset;
@@ -488,12 +492,14 @@ public class SolrBrowseDAO implements BrowseDAO
      * 
      * @see org.dspace.browse.BrowseDAO#getOrderField()
      */
+    @Override
     public String getOrderField()
     {
         return orderField;
     }
 
     // is this in use?
+    @Override
     public String[] getSelectValues()
     {
         return null;
@@ -504,6 +510,7 @@ public class SolrBrowseDAO implements BrowseDAO
      * 
      * @see org.dspace.browse.BrowseDAO#getTable()
      */
+    @Override
     public String getTable()
     {
         return table;
@@ -514,6 +521,7 @@ public class SolrBrowseDAO implements BrowseDAO
      * 
      * @see org.dspace.browse.BrowseDAO#getValue()
      */
+    @Override
     public String getFilterValue()
     {
         return value;
@@ -524,6 +532,7 @@ public class SolrBrowseDAO implements BrowseDAO
      * 
      * @see org.dspace.browse.BrowseDAO#getValueField()
      */
+    @Override
     public String getFilterValueField()
     {
         return valueField;
@@ -534,6 +543,7 @@ public class SolrBrowseDAO implements BrowseDAO
      * 
      * @see org.dspace.browse.BrowseDAO#isAscending()
      */
+    @Override
     public boolean isAscending()
     {
         return ascending;
@@ -544,6 +554,7 @@ public class SolrBrowseDAO implements BrowseDAO
      * 
      * @see org.dspace.browse.BrowseDAO#isDistinct()
      */
+    @Override
     public boolean isDistinct()
     {
         return this.distinct;
@@ -554,6 +565,7 @@ public class SolrBrowseDAO implements BrowseDAO
      * 
      * @see org.dspace.browse.BrowseDAO#setAscending(boolean)
      */
+    @Override
     public void setAscending(boolean ascending)
     {
         this.ascending = ascending;
@@ -565,7 +577,8 @@ public class SolrBrowseDAO implements BrowseDAO
      * 
      * @see org.dspace.browse.BrowseDAO#setContainerID(int)
      */
-    public void setContainerID(int containerID)
+    @Override
+    public void setContainerID(UUID containerID)
     {
         this.containerID = containerID;
 
@@ -576,6 +589,7 @@ public class SolrBrowseDAO implements BrowseDAO
      * 
      * @see org.dspace.browse.BrowseDAO#setContainerIDField(java.lang.String)
      */
+    @Override
     public void setContainerIDField(String containerIDField)
     {
         this.containerIDField = containerIDField;
@@ -587,6 +601,7 @@ public class SolrBrowseDAO implements BrowseDAO
      * 
      * @see org.dspace.browse.BrowseDAO#setContainerTable(java.lang.String)
      */
+    @Override
     public void setContainerTable(String containerTable)
     {
         this.containerTable = containerTable;
@@ -594,6 +609,7 @@ public class SolrBrowseDAO implements BrowseDAO
     }
 
     // is this in use?
+    @Override
     public void setCountValues(String[] fields)
     {
         // this.countValues = fields;
@@ -605,6 +621,7 @@ public class SolrBrowseDAO implements BrowseDAO
      * 
      * @see org.dspace.browse.BrowseDAO#setDistinct(boolean)
      */
+    @Override
     public void setDistinct(boolean bool)
     {
         this.distinct = bool;
@@ -616,6 +633,7 @@ public class SolrBrowseDAO implements BrowseDAO
      * 
      * @see org.dspace.browse.BrowseDAO#setEqualsComparator(boolean)
      */
+    @Override
     public void setEqualsComparator(boolean equalsComparator)
     {
         this.equalsComparator = equalsComparator;
@@ -627,6 +645,7 @@ public class SolrBrowseDAO implements BrowseDAO
      * 
      * @see org.dspace.browse.BrowseDAO#setFocusField(java.lang.String)
      */
+    @Override
     public void setJumpToField(String focusField)
     {
         this.focusField = focusField;
@@ -638,6 +657,7 @@ public class SolrBrowseDAO implements BrowseDAO
      * 
      * @see org.dspace.browse.BrowseDAO#setFocusValue(java.lang.String)
      */
+    @Override
     public void setJumpToValue(String focusValue)
     {
         this.focusValue = focusValue;
@@ -649,6 +669,7 @@ public class SolrBrowseDAO implements BrowseDAO
      * 
      * @see org.dspace.browse.BrowseDAO#setLimit(int)
      */
+    @Override
     public void setLimit(int limit)
     {
         this.limit = limit;
@@ -660,6 +681,7 @@ public class SolrBrowseDAO implements BrowseDAO
      * 
      * @see org.dspace.browse.BrowseDAO#setOffset(int)
      */
+    @Override
     public void setOffset(int offset)
     {
         this.offset = offset;
@@ -671,6 +693,7 @@ public class SolrBrowseDAO implements BrowseDAO
      * 
      * @see org.dspace.browse.BrowseDAO#setOrderField(java.lang.String)
      */
+    @Override
     public void setOrderField(String orderField)
     {
         this.orderField = orderField;
@@ -678,6 +701,7 @@ public class SolrBrowseDAO implements BrowseDAO
     }
 
     // is this in use?
+    @Override
     public void setSelectValues(String[] selectValues)
     {
         // this.selectValues = selectValues;
@@ -689,6 +713,7 @@ public class SolrBrowseDAO implements BrowseDAO
      * 
      * @see org.dspace.browse.BrowseDAO#setTable(java.lang.String)
      */
+    @Override
     public void setTable(String table)
     {
         if (table.equals(BrowseIndex.getWithdrawnBrowseIndex().getTableName()))
@@ -702,6 +727,7 @@ public class SolrBrowseDAO implements BrowseDAO
         facetField = table;
     }
 
+    @Override
     public void setFilterMappingTables(String tableDis, String tableMap)
     {
         if (tableDis != null)
@@ -717,6 +743,7 @@ public class SolrBrowseDAO implements BrowseDAO
      * 
      * @see org.dspace.browse.BrowseDAO#setValue(java.lang.String)
      */
+    @Override
     public void setFilterValue(String value)
     {
         this.value = value;
@@ -728,6 +755,7 @@ public class SolrBrowseDAO implements BrowseDAO
      * 
      * @see org.dspace.browse.BrowseDAO#setFilterValuePartial(boolean)
      */
+    @Override
     public void setFilterValuePartial(boolean part)
     {
         this.valuePartial = part;
@@ -739,6 +767,7 @@ public class SolrBrowseDAO implements BrowseDAO
      * 
      * @see org.dspace.browse.BrowseDAO#setValueField(java.lang.String)
      */
+    @Override
     public void setFilterValueField(String valueField)
     {
         this.valueField = valueField;
@@ -750,6 +779,7 @@ public class SolrBrowseDAO implements BrowseDAO
      * 
      * @see org.dspace.browse.BrowseDAO#useEqualsComparator()
      */
+    @Override
     public boolean useEqualsComparator()
     {
         return equalsComparator;

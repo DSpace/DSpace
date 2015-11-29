@@ -60,9 +60,4 @@
 </dspace:layout>
 <%
 	}
-	finally
-	{
-	    if (context != null && context.isValid())
-	        context.abort();
-	}
 %>

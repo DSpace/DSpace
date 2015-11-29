@@ -23,8 +23,8 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.workflow.WorkflowManager;
-import org.dspace.xmlworkflow.XmlWorkflowManager;
+import org.dspace.workflow.WorkflowService;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 
 /**
  * This is the class which defines what happens once a submission completes!
@@ -71,6 +71,7 @@ public class CompleteStep extends AbstractProcessingStep
      *         doPostProcessing() below! (if STATUS_COMPLETE or 0 is returned,
      *         no errors occurred!)
      */
+    @Override
     public int doProcessing(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo)
             throws ServletException, IOException, SQLException,
@@ -81,19 +82,20 @@ public class CompleteStep extends AbstractProcessingStep
                 "Completed submission with id="
                         + subInfo.getSubmissionItem().getID()));
 
+        WorkflowService workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
         // Start the workflow for this Submission
         boolean success = false;
         try
         {
             if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){
                 try{
-                    XmlWorkflowManager.start(context, (WorkspaceItem) subInfo.getSubmissionItem());
+                    workflowService.start(context, (WorkspaceItem) subInfo.getSubmissionItem());
                 }catch (Exception e){
                     log.error(LogManager.getHeader(context, "Error while starting xml workflow", "Item id: " + subInfo.getSubmissionItem().getItem().getID()), e);
                     throw new ServletException(e);
                 }
             }else{
-                WorkflowManager.start(context, (WorkspaceItem) subInfo.getSubmissionItem());
+                workflowService.start(context, (WorkspaceItem) subInfo.getSubmissionItem());
             }
             success = true;
         }
@@ -107,11 +109,7 @@ public class CompleteStep extends AbstractProcessingStep
         // commit changes to database
             if (success)
             {
-                context.commit();
-            }
-            else
-            {
-                context.getDBConnection().rollback();
+                context.dispatchEvents();
             }
         }
         return STATUS_COMPLETE;
@@ -139,6 +137,7 @@ public class CompleteStep extends AbstractProcessingStep
      * 
      * @return the number of pages in this step
      */
+    @Override
     public int getNumberOfPages(HttpServletRequest request,
             SubmissionInfo subInfo) throws ServletException
     {

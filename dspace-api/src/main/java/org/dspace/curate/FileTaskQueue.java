@@ -33,12 +33,12 @@ public class FileTaskQueue implements TaskQueue
 {
     private static Logger log = Logger.getLogger(TaskQueue.class);   
     // base directory for curation task queues
-    private String tqDir = ConfigurationManager.getProperty("curate", "taskqueue.dir");
+    protected String tqDir = ConfigurationManager.getProperty("curate", "taskqueue.dir");
 
     // ticket for queue readers
-    private long readTicket = -1L;
+    protected long readTicket = -1L;
     // list of queues owned by reader
-    private List<Integer> readList = new ArrayList<Integer>();
+    protected List<Integer> readList = new ArrayList<Integer>();
 
     public FileTaskQueue()
     {
@@ -188,7 +188,7 @@ public class FileTaskQueue implements TaskQueue
         }
     }
     
-    private File ensureQueue(String queueName)
+    protected File ensureQueue(String queueName)
     {
         // create directory structures as needed
         File baseDir = new File(tqDir, queueName);

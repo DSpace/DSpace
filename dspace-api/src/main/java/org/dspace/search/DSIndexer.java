@@ -7,7 +7,24 @@
  */
 package org.dspace.search;
 
-import org.apache.commons.cli.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.lang.reflect.Constructor;
+import java.sql.SQLException;
+import java.util.*;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
@@ -24,19 +41,24 @@ import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.Util;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
-import org.dspace.content.authority.ChoiceAuthorityManager;
-import org.dspace.content.authority.MetadataAuthorityManager;
-import org.dspace.core.*;
-import org.dspace.handle.HandleManager;
-import org.dspace.sort.OrderFormat;
+import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
+import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.content.authority.service.MetadataAuthorityService;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.core.Email;
+import org.dspace.core.I18nUtil;
+import org.dspace.core.LogManager;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.sort.SortOption;
-
-import java.io.*;
-import java.lang.reflect.Constructor;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import org.dspace.sort.OrderFormat;
 
 /**
  * DSIndexer contains the methods that index Items and their metadata,
@@ -81,6 +103,15 @@ public class DSIndexer
     private static int batchFlushAfterDocuments = ConfigurationManager.getIntProperty("search.batch.documents", 20);
     private static boolean batchProcessingMode = false;
     static final Version luceneVersion = Version.LATEST;
+    
+    protected static final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    protected static final ChoiceAuthorityService choiceAuthorityService = ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
+    protected static final MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
+    protected static final CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    protected static final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected static final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+            
 
     // Class to hold the index configuration (one instance per config line)
     private static class IndexConfig
@@ -512,35 +543,22 @@ public class DSIndexer
     public static void updateIndex(Context context, boolean force) {
     		try
     		{
-                ItemIterator items = null;
-                try
+                Iterator<Item> items = null;
+                for(items = itemService.findAll(context);items.hasNext();)
                 {
-                    for(items = Item.findAll(context);items.hasNext();)
-                    {
-                        Item item = (Item) items.next();
-                        indexContent(context, item);
-                        item.decache();
-                    }
-                }
-                finally
-                {
-                    if (items != null)
-                    {
-                        items.close();
-                    }
+                    Item item = (Item) items.next();
+                    indexContent(context, item);
                 }
 
-                for (Collection collection : Collection.findAll(context))
+                for (Collection collection : collectionService.findAll(context))
                 {
                     indexContent(context, collection);
-    	            context.removeCached(collection, collection.getID());
                 }
 
-                for (Community community : Community.findAll(context))
+                for (Community community : communityService.findAll(context))
     	        {
                     indexContent(context, community);
-    	            context.removeCached(community, community.getID());
-    	        }
+                }
 
     	        optimizeIndex(context);
     		}
@@ -576,7 +594,7 @@ public class DSIndexer
         		String handle = doc.get("handle");
                 if (!StringUtils.isEmpty(handle))
                 {
-                    DSpaceObject o = HandleManager.resolveToObject(context, handle);
+                    DSpaceObject o = handleService.resolveToObject(context, handle);
 
                     if (o == null)
                     {
@@ -586,7 +604,6 @@ public class DSIndexer
                     }
                     else
                     {
-                        context.removeCached(o, o.getID());
                         log.debug("Keeping: " + handle);
                     }
                 }
@@ -638,7 +655,7 @@ public class DSIndexer
 
     static IndexingTask prepareIndexingTask(Context context, DSpaceObject dso, boolean force) throws SQLException, IOException, DCInputsReaderException
     {
-        String handle = HandleManager.findHandle(context, dso);
+        String handle = handleService.findHandle(context, dso);
         Term term = new Term("handle", handle);
         IndexingTask action = null;
         switch (dso.getType())
@@ -932,26 +949,28 @@ public class DSIndexer
      * @return
      * @throws SQLException
      */
-    private static String buildItemLocationString(Item myitem) throws SQLException
+    private static String buildItemLocationString(Context context, Item myitem) throws SQLException
     {
         // build list of community ids
-        Community[] communities = myitem.getCommunities();
+        List<Community> communities = itemService.getCommunities(context, myitem);
 
         // build list of collection ids
-        Collection[] collections = myitem.getCollections();
+        List<Collection> collections = myitem.getCollections();
 
         // now put those into strings
         StringBuffer location = new StringBuffer();
         int i = 0;
 
-        for (i = 0; i < communities.length; i++)
+        for (i = 0; i < communities.size(); i++)
         {
-            location.append(" m").append(communities[i].getID());
+            Community community = communities.get(i);
+            location.append(" m").append(community.getID());
         }
 
-        for (i = 0; i < collections.length; i++)
+        for (i = 0; i < collections.size(); i++)
         {
-            location.append(" l").append(collections[i].getID());
+            Collection collection = collections.get(i);
+            location.append(" l").append(collection.getID());
         }
 
         return location.toString();
@@ -960,15 +979,15 @@ public class DSIndexer
     private static String buildCollectionLocationString(Collection target) throws SQLException
     {
         // build list of community ids
-        Community[] communities = target.getCommunities();
+        List<Community> communities = target.getCommunities();
 
         // now put those into strings
         StringBuffer location = new StringBuffer();
         int i = 0;
 
-        for (i = 0; i < communities.length; i++)
+        for (i = 0; i < communities.size(); i++)
         {
-            location.append(" m").append(communities[i].getID());
+            location.append(" m").append(communities.get(i).getID());
         }
 
         return location.toString();
@@ -987,7 +1006,7 @@ public class DSIndexer
         Document doc = buildDocument(Constants.COMMUNITY, community.getID(), community.getHandle(), null);
 
         // and populate it
-        String name = community.getMetadata("name");
+        String name = communityService.getMetadata(community, "name");
 
         if (name != null)
         {
@@ -1013,7 +1032,7 @@ public class DSIndexer
         Document doc = buildDocument(Constants.COLLECTION, collection.getID(), collection.getHandle(), location_text);
 
         // and populate it
-        String name = collection.getMetadata("name");
+        String name = collectionService.getMetadata(collection, "name");
 
         if (name != null)
         {
@@ -1033,10 +1052,10 @@ public class DSIndexer
      */
     private static Document buildDocumentForItem(Context context, Item item) throws SQLException, IOException, DCInputsReaderException
     {
-    	String handle = HandleManager.findHandle(context, item);
+    	String handle = handleService.findHandle(context, item);
 
     	// get the location string (for searching by collection & community)
-        String location = buildItemLocationString(item);
+        String location = buildItemLocationString(context, item);
 
         Document doc = buildDocument(Constants.ITEM, item.getID(), handle, location);
 
@@ -1045,52 +1064,46 @@ public class DSIndexer
         int j;
         if (indexConfigArr.length > 0)
         {
-            Metadatum[] mydc;
+            List<MetadataValue> mydc;
 
-            for (int i = 0; i < indexConfigArr.length; i++)
+            for (IndexConfig anIndexConfigArr : indexConfigArr)
             {
                 // extract metadata (ANY is wildcard from Item class)
-                if (indexConfigArr[i].qualifier!= null && indexConfigArr[i].qualifier.equals("*"))
-                {
-                    mydc = item.getMetadata(indexConfigArr[i].schema, indexConfigArr[i].element, Item.ANY, Item.ANY);
-                }
-                else
-                {
-                    mydc = item.getMetadata(indexConfigArr[i].schema, indexConfigArr[i].element, indexConfigArr[i].qualifier, Item.ANY);
+                if (anIndexConfigArr.qualifier != null && anIndexConfigArr.qualifier.equals("*")) {
+                    mydc = itemService.getMetadata(item, anIndexConfigArr.schema, anIndexConfigArr.element, Item.ANY, Item.ANY);
+                } else {
+                    mydc = itemService.getMetadata(item, anIndexConfigArr.schema, anIndexConfigArr.element, anIndexConfigArr.qualifier, Item.ANY);
                 }
 
 
                 //Index the controlled vocabularies localized display values for all localized input-forms.xml (e.g. input-forms_el.xml)
-                if ("inputform".equalsIgnoreCase(indexConfigArr[i].type)){
+                if ("inputform".equalsIgnoreCase(anIndexConfigArr.type)) {
 
                     List<String> newValues = new ArrayList<String>();
-                    Locale[] supportedLocales=I18nUtil.getSupportedLocales();
+                    Locale[] supportedLocales = I18nUtil.getSupportedLocales();
 
                     // Get the display value of the respective stored value
-                    for (int k = 0; k < supportedLocales.length; k++)
-                    {
+                    for (int k = 0; k < supportedLocales.length; k++) {
                         List<String> displayValues = Util
                                 .getControlledVocabulariesDisplayValueLocalized(
-                                        item, mydc, indexConfigArr[i].schema,
-                                        indexConfigArr[i].element,
-                                        indexConfigArr[i].qualifier,
+                                        item, mydc, anIndexConfigArr.schema,
+                                        anIndexConfigArr.element,
+                                        anIndexConfigArr.qualifier,
                                         supportedLocales[k]);
-                        if (displayValues != null && !displayValues.isEmpty())
-                        {
-                            for (int d = 0; d < displayValues.size(); d++)
-                            {
+                        if (displayValues != null && !displayValues.isEmpty()) {
+                            for (int d = 0; d < displayValues.size(); d++) {
                                 newValues.add(displayValues.get(d));
                             }
                         }
 
                     }
 
-                    if (newValues!=null){
-                        for (int m=0;m<newValues.size();m++){
-                            if (!"".equals(newValues.get(m))){
+                    if (newValues != null) {
+                        for (int m = 0; m < newValues.size(); m++) {
+                            if (!"".equals(newValues.get(m))) {
 
-                                String toAdd=(String) newValues.get(m);
-                                doc.add( new Field(indexConfigArr[i].indexName,
+                                String toAdd = (String) newValues.get(m);
+                                doc.add(new Field(anIndexConfigArr.indexName,
                                         toAdd,
                                         Field.Store.NO,
                                         Field.Index.ANALYZED));
@@ -1101,102 +1114,85 @@ public class DSIndexer
                 }
 
 
-             for (j = 0; j < mydc.length; j++)
-                {
-                    if (!StringUtils.isEmpty(mydc[j].value))
-                    {
-                        if ("timestamp".equalsIgnoreCase(indexConfigArr[i].type))
-                        {
-                            Date d = toDate(mydc[j].value);
-                            if (d != null)
-                            {
-                                doc.add( new Field(indexConfigArr[i].indexName,
-                                                   DateTools.dateToString(d, DateTools.Resolution.SECOND),
-                                                   Field.Store.NO,
-                                                   Field.Index.NOT_ANALYZED));
+                for (j = 0; j < mydc.size(); j++) {
+                    MetadataValue metadataValue = mydc.get(j);
+                    MetadataField metadataField = metadataValue.getMetadataField();
+                    if (!StringUtils.isEmpty(metadataValue.getValue())) {
+                        if ("timestamp".equalsIgnoreCase(anIndexConfigArr.type)) {
+                            Date d = toDate(metadataValue.getValue());
+                            if (d != null) {
+                                doc.add(new Field(anIndexConfigArr.indexName,
+                                        DateTools.dateToString(d, DateTools.Resolution.SECOND),
+                                        Field.Store.NO,
+                                        Field.Index.NOT_ANALYZED));
 
-                                doc.add( new Field(indexConfigArr[i].indexName  + ".year",
-                                                    DateTools.dateToString(d, DateTools.Resolution.YEAR),
-                                                    Field.Store.NO,
-                                                    Field.Index.NOT_ANALYZED));
+                                doc.add(new Field(anIndexConfigArr.indexName + ".year",
+                                        DateTools.dateToString(d, DateTools.Resolution.YEAR),
+                                        Field.Store.NO,
+                                        Field.Index.NOT_ANALYZED));
                             }
-                        }
-                        else if ("date".equalsIgnoreCase(indexConfigArr[i].type))
-                        {
-                            Date d = toDate(mydc[j].value);
-                            if (d != null)
-                            {
-                                doc.add( new Field(indexConfigArr[i].indexName,
-                                                   DateTools.dateToString(d, DateTools.Resolution.DAY),
-                                                   Field.Store.NO,
-                                                   Field.Index.NOT_ANALYZED));
+                        } else if ("date".equalsIgnoreCase(anIndexConfigArr.type)) {
+                            Date d = toDate(metadataValue.getValue());
+                            if (d != null) {
+                                doc.add(new Field(anIndexConfigArr.indexName,
+                                        DateTools.dateToString(d, DateTools.Resolution.DAY),
+                                        Field.Store.NO,
+                                        Field.Index.NOT_ANALYZED));
 
-                                doc.add( new Field(indexConfigArr[i].indexName  + ".year",
-                                                    DateTools.dateToString(d, DateTools.Resolution.YEAR),
-                                                    Field.Store.NO,
-                                                    Field.Index.NOT_ANALYZED));
+                                doc.add(new Field(anIndexConfigArr.indexName + ".year",
+                                        DateTools.dateToString(d, DateTools.Resolution.YEAR),
+                                        Field.Store.NO,
+                                        Field.Index.NOT_ANALYZED));
                             }
-                        }
-                        else
-                        {
+                        } else {
                             List<String> variants = null;
-                            if (mydc[j].authority != null && mydc[j].confidence >= MetadataAuthorityManager.getManager()
-                                    .getMinConfidence(mydc[j].schema, mydc[j].element, mydc[j].qualifier))
-                            {
-                                variants = ChoiceAuthorityManager.getManager()
-                                            .getVariants(mydc[j].schema, mydc[j].element, mydc[j].qualifier,
-                                                mydc[j].authority, mydc[j].language);
+                            if (metadataValue.getAuthority() != null && metadataValue.getConfidence() >= metadataAuthorityService
+                                    .getMinConfidence(metadataField)) {
+                                variants = choiceAuthorityService
+                                        .getVariants(metadataValue);
 
-                                doc.add( new Field(indexConfigArr[i].indexName+"_authority",
-                                   mydc[j].authority,
-                                   Field.Store.NO,
-                                   Field.Index.NOT_ANALYZED));
+                                doc.add(new Field(anIndexConfigArr.indexName + "_authority",
+                                        metadataValue.getAuthority(),
+                                        Field.Store.NO,
+                                        Field.Index.NOT_ANALYZED));
 
                                 boolean valueAlreadyIndexed = false;
-                                if (variants != null)
-                                {
-                                    for (String var : variants)
-                                    {
+                                if (variants != null) {
+                                    for (String var : variants) {
                                         // TODO: use a delegate to allow custom 'types' to be used to reformat the field
-                                        doc.add( new Field(indexConfigArr[i].indexName,
-                                                           var,
-                                                           Field.Store.NO,
-                                                           Field.Index.ANALYZED));
-                                        if (var.equals(mydc[j].value))
-                                        {
+                                        doc.add(new Field(anIndexConfigArr.indexName,
+                                                var,
+                                                Field.Store.NO,
+                                                Field.Index.ANALYZED));
+                                        if (var.equals(metadataValue.getValue())) {
                                             valueAlreadyIndexed = true;
-                                        }
-                                        else
-                                        {   // add to default index too...
+                                        } else {   // add to default index too...
                                             // (only variants, main value is already take)
-                                             doc.add( new Field("default",
-                                                       var,
-                                                       Field.Store.NO,
-                                                       Field.Index.ANALYZED));
+                                            doc.add(new Field("default",
+                                                    var,
+                                                    Field.Store.NO,
+                                                    Field.Index.ANALYZED));
                                         }
                                     }
                                 }
 
-                                if (!valueAlreadyIndexed)
-                                {
+                                if (!valueAlreadyIndexed) {
                                     // TODO: use a delegate to allow custom 'types' to be used to reformat the field
-                                    doc.add( new Field(indexConfigArr[i].indexName,
-                                                       mydc[j].value,
-                                                       Field.Store.NO,
-                                                       Field.Index.ANALYZED));
+                                    doc.add(new Field(anIndexConfigArr.indexName,
+                                            metadataValue.getValue(),
+                                            Field.Store.NO,
+                                            Field.Index.ANALYZED));
                                 }
+                            } else {
+                                // TODO: use a delegate to allow custom 'types' to be used to reformat the field
+                                doc.add(new Field(anIndexConfigArr.indexName,
+                                        metadataValue.getValue(),
+                                        Field.Store.NO,
+                                        Field.Index.ANALYZED));
                             }
-                            else
-                            {
-	                            // TODO: use a delegate to allow custom 'types' to be used to reformat the field
-	                            doc.add( new Field(indexConfigArr[i].indexName,
-	                                               mydc[j].value,
-	                                               Field.Store.NO,
-	                                               Field.Index.ANALYZED));
-                        	}
                         }
 
-                        doc.add( new Field("default", mydc[j].value, Field.Store.NO, Field.Index.ANALYZED));
+                        doc.add(new Field("default", metadataValue.getValue(), Field.Store.NO, Field.Index.ANALYZED));
                     }
                 }
             }
@@ -1211,10 +1207,10 @@ public class DSIndexer
             for (SortOption so : SortOption.getSortOptions())
             {
                 String[] somd = so.getMdBits();
-                Metadatum[] dcv = item.getMetadata(somd[0], somd[1], somd[2], Item.ANY);
-                if (dcv.length > 0)
+                List<MetadataValue> dcv = itemService.getMetadata(item, somd[0], somd[1], somd[2], Item.ANY);
+                if (dcv.size() > 0)
                 {
-                    String value = OrderFormat.makeSortString(dcv[0].value, dcv[0].language, so.getType());
+                    String value = OrderFormat.makeSortString(dcv.get(0).getValue(), dcv.get(0).getLanguage(), so.getType());
                     doc.add( new Field("sort_" + so.getName(), value, Field.Store.NO, Field.Index.NOT_ANALYZED) );
                 }
             }
@@ -1230,31 +1226,25 @@ public class DSIndexer
         {
         	// now get full text of any bitstreams in the TEXT bundle
             // trundle through the bundles
-            Bundle[] myBundles = item.getBundles();
+            List<Bundle> myBundles = item.getBundles();
 
-            for (int i = 0; i < myBundles.length; i++)
-            {
-                if ((myBundles[i].getName() != null)
-                        && myBundles[i].getName().equals("TEXT"))
-                {
+            for (Bundle myBundle : myBundles) {
+                if ((myBundle.getName() != null)
+                        && myBundle.getName().equals("TEXT")) {
                     // a-ha! grab the text out of the bitstreams
-                    Bitstream[] myBitstreams = myBundles[i].getBitstreams();
+                    List<Bitstream> bitstreams = myBundle.getBitstreams();
 
-                    for (j = 0; j < myBitstreams.length; j++)
-                    {
-                        try
-                        {
+                    for (j = 0; j < bitstreams.size(); j++)
+                        try {
+                            Bitstream bitstream = bitstreams.get(j);
                             // Add each InputStream to the Indexed Document (Acts like an Append)
-                            doc.add(new Field("default", new BufferedReader(new InputStreamReader(myBitstreams[j].retrieve()))));
+                            doc.add(new Field("default", new BufferedReader(new InputStreamReader(bitstreamService.retrieve(context, bitstream)))));
 
-                            log.debug("  Added BitStream: " + myBitstreams[j].getStoreNumber() + "	" + myBitstreams[j].getSequenceID() + "   " + myBitstreams[j].getName());
-                        }
-                        catch (Exception e)
-                        {
+                            log.debug("  Added BitStream: " + bitstream.getStoreNumber() + "	" + bitstream.getSequenceID() + "   " + bitstream.getName());
+                        } catch (Exception e) {
                             // this will never happen, but compiler is now happy.
-                        	log.error(e.getMessage(),e);
+                            log.error(e.getMessage(), e);
                         }
-                    }
                 }
             }
         }
@@ -1275,7 +1265,7 @@ public class DSIndexer
      *@param handle
      * @param location @return
      */
-    private static Document buildDocument(int type, int id, String handle, String location)
+    private static Document buildDocument(int type, UUID id, String handle, String location)
     {
         Document doc = new Document();
 
@@ -1290,7 +1280,7 @@ public class DSIndexer
 
         // New fields to weaken the dependence on handles, and allow for faster list display
         doc.add(new Field("search.resourcetype", Integer.toString(type), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field("search.resourceid",   Integer.toString(id),   Field.Store.YES, Field.Index.NO));
+        doc.add(new Field("search.resourceid",   id.toString(),   Field.Store.YES, Field.Index.NO));
 
         // want to be able to search for handle, so use keyword
         // (not tokenized, but it is indexed)

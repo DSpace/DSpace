@@ -478,7 +478,7 @@
               <filter class="solr.StopFilterFactory" ignoreCase="true"
                       words="stopwords.txt"/>
               <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
-              ￼￼￼￼￼  </analyzer>
+          </analyzer>
       </fieldType>
  </types>
 
@@ -520,7 +520,7 @@
    <field name="fulltext" type="text" indexed="true" stored="true" multiValued="true"/>
 
     <!-- Internal DSpace Object ID -->
-   <field name="search.resourceid" type="sint" indexed="true" stored="true" required="true" omitNorms="true" />
+   <field name="search.resourceid" type="string" indexed="true" stored="true" required="true" omitNorms="true" />
 
     <!-- Internal DSpaceObject Type ID -->
    <field name="search.resourcetype" type="sint" indexed="true" stored="true" required="true" omitNorms="true" />
@@ -548,6 +548,7 @@
 
     <!-- used by the DSpace Discovery Solr Indexer to track the last time a document was indexed -->
    <field name="SolrIndexer.lastIndexed" type="date" indexed="true" stored="true" default="NOW" multiValued="false" omitNorms="true" />
+   <field name="lastModified" type="date" indexed="true" stored="true" default="NOW" multiValued="false" omitNorms="true" />
 
    <!-- Custom Mapping to assure ds.creator is placed into dc.contributor.author by defualt -->
    <!--<copyField source="dc.creator" dest="dc.contributor.author"/>-->
@@ -631,7 +632,7 @@
  <defaultSearchField>search_text</defaultSearchField>
 
  <!-- SolrQueryParser configuration: defaultOperator="AND|OR" -->
- <solrQueryParser defaultOperator="OR"/>
+ <solrQueryParser defaultOperator="AND"/>
 
   <!-- copyField commands copy one field to another at the time a document
         is added to the index.  It's used either to index the same field differently,

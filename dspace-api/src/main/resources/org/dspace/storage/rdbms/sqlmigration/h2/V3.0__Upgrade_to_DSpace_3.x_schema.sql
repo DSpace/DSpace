@@ -19,7 +19,7 @@ ALTER TABLE resourcepolicy ADD COLUMN rptype VARCHAR2(30);
 ALTER TABLE resourcepolicy ADD COLUMN rpdescription VARCHAR2(100);
 
 
-ALTER TABLE item ADD COLUMN discoverable NUMBER(1);
+ALTER TABLE item ADD COLUMN discoverable BOOLEAN;
 
 CREATE TABLE versionhistory
 (

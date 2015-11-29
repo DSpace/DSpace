@@ -9,6 +9,7 @@ package org.dspace.app.xmlui.aspect.administrative.authorization;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
@@ -22,10 +23,15 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.Group;
 
@@ -65,8 +71,13 @@ public class EditContainerPolicies extends AbstractDSpaceTransformer
 	
 	private static final Message T_dspace_home =
 		message("xmlui.general.dspace_home");
-	
-	
+
+    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    protected ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
+
+
 		
 	public void addPageMeta(PageMeta pageMeta) throws WingException
     {
@@ -81,7 +92,7 @@ public class EditContainerPolicies extends AbstractDSpaceTransformer
 	{
 		/* Get and setup our parameters */
         int containerType = parameters.getParameterAsInteger("containerType",-1);
-        int containerID = parameters.getParameterAsInteger("containerID",-1);
+        UUID containerID = UUID.fromString(parameters.getParameter("containerID", null));
         int highlightID = parameters.getParameterAsInteger("highlightID",-1);
         String baseURL = contextPath+"/admin/epeople?administrative-continue="+knot.getId();
         
@@ -92,15 +103,15 @@ public class EditContainerPolicies extends AbstractDSpaceTransformer
 		
 		if (containerType == Constants.COLLECTION)
 	    {
-			Collection col = Collection.find(context, containerID); 
-			main.setHead(T_main_head_collection.parameterize(col.getMetadata("name"),col.getHandle(),col.getID()));
-			policies = (ArrayList<ResourcePolicy>)AuthorizeManager.getPolicies(context, col);
+			Collection col = collectionService.find(context, containerID);
+			main.setHead(T_main_head_collection.parameterize(collectionService.getMetadata(col, "name"),col.getHandle(),col.getID()));
+			policies = (ArrayList<ResourcePolicy>) authorizeService.getPolicies(context, col);
 	    }
 		else 
 		{
-			Community com = Community.find(context, containerID);
-			main.setHead(T_main_head_community.parameterize(com.getMetadata("name"),com.getHandle(),com.getID()));
-			policies = (ArrayList<ResourcePolicy>)AuthorizeManager.getPolicies(context, com);
+			Community com = communityService.find(context, containerID);
+			main.setHead(T_main_head_community.parameterize(communityService.getMetadata(com, "name"), com.getHandle(), com.getID()));
+			policies = (ArrayList<ResourcePolicy>) authorizeService.getPolicies(context, com);
 		}
 		
 		/* Adding a new policy link */
@@ -135,7 +146,7 @@ public class EditContainerPolicies extends AbstractDSpaceTransformer
                 Group policyGroup = policy.getGroup();
 
                 row.addCell().addXref(baseURL + "&submit_edit&policy_id=" + policy.getID(), String.valueOf(policy.getID()));
-                row.addCell().addXref(baseURL + "&submit_edit&policy_id=" + policy.getID(), policy.getActionText());
+                row.addCell().addXref(baseURL + "&submit_edit&policy_id=" + policy.getID(), resourcePolicyService.getActionText(policy));
                 if (policyGroup != null) {
                     Cell groupCell = row.addCell();
                     groupCell.addContent(policyGroup.getName());

@@ -10,18 +10,19 @@ package org.dspace.discovery;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.SolrInputDocument;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.service.GroupService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Restriction plugin that ensures that indexes all the resource policies.
@@ -35,18 +36,23 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
 
     private static final Logger log = Logger.getLogger(SolrServiceResourceRestrictionPlugin.class);
 
+    @Autowired(required = true)
+    protected AuthorizeService authorizeService;
+    @Autowired(required = true)
+    protected GroupService groupService;
+
     @Override
     public void additionalIndex(Context context, DSpaceObject dso, SolrInputDocument document) {
         try {
-            List<ResourcePolicy> policies = AuthorizeManager.getPoliciesActionFilter(context, dso, Constants.READ);
+            List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, dso, Constants.READ);
             for (ResourcePolicy resourcePolicy : policies) {
                 String fieldValue;
-                if(resourcePolicy.getGroupID() != -1){
+                if(resourcePolicy.getGroup() != null){
                     //We have a group add it to the value
-                    fieldValue = "g" + resourcePolicy.getGroupID();
+                    fieldValue = "g" + resourcePolicy.getGroup().getID();
                 }else{
                     //We have an eperson add it to the value
-                    fieldValue = "e" + resourcePolicy.getEPersonID();
+                    fieldValue = "e" + resourcePolicy.getEPerson().getID();
 
                 }
 
@@ -60,7 +66,7 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
     @Override
     public void additionalSearchParameters(Context context, DiscoverQuery discoveryQuery, SolrQuery solrQuery) {
     	try {
-            if(!AuthorizeManager.isAdmin(context)){
+            if(!authorizeService.isAdmin(context)){
             	StringBuilder resourceQuery = new StringBuilder();
                 //Always add the anonymous group id to the query
                 resourceQuery.append("read:(g0");
@@ -70,9 +76,9 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
                 }
 
                 //Retrieve all the groups the current user is a member of !
-                Set<Integer> groupIds = Group.allMemberGroupIDs(context, currentUser);
-                for (Integer groupId : groupIds) {
-                    resourceQuery.append(" OR g").append(groupId);
+                List<Group> groups = groupService.allMemberGroups(context, currentUser);
+                for (Group group : groups) {
+                    resourceQuery.append(" OR g").append(group.getID());
                 }
 
                 resourceQuery.append(")");

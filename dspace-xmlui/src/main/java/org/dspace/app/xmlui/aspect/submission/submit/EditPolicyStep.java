@@ -78,11 +78,11 @@ public class EditPolicyStep extends AbstractStep
 
         // if come from EditBitstreamPolicies
         if(bitstream!=null)
-            div.addHidden("bitstream_id").setValue(bitstream.getID());
+            div.addHidden("bitstream_id").setValue(bitstream.getID().toString());
 
         AccessStepUtil asu = new AccessStepUtil(context);
 
-        asu.addListGroups(Integer.toString(resourcePolicy.getGroupID()), edit, errorFlag, collection);
+        asu.addListGroups(String.valueOf(resourcePolicy.getGroup()), edit, errorFlag, collection);
 
         // radio buttons: Item will be visible / Embargo Access + date
         String selectedRadio=Integer.toString(AccessStep.RADIO_OPEN_ACCESS_ITEM_VISIBLE);

@@ -79,21 +79,21 @@
         <name>embargo-lifter</name>
         <description>Embargo manager tool used to check, list and lift embargoes</description>
         <step>
-            <class>org.dspace.embargo.EmbargoManager</class>
+            <class>org.dspace.embargo.EmbargoCLITool</class>
         </step>
     </command>
     <command>
         <name>export</name>
         <description>Export items or collections</description>
         <step>
-            <class>org.dspace.app.itemexport.ItemExport</class>
+            <class>org.dspace.app.itemexport.ItemExportCLITool</class>
         </step>
     </command>
     <command>
         <name>filter-media</name>
         <description>Perform the media filtering to extract full text from documents and to create thumbnails</description>
         <step>
-            <class>org.dspace.app.mediafilter.MediaFilterManager</class>
+            <class>org.dspace.app.mediafilter.MediaFilterCLITool</class>
         </step>
     </command>
     <command>
@@ -114,7 +114,7 @@
         <name>import</name>
         <description>Import items into DSpace</description>
         <step>
-            <class>org.dspace.app.itemimport.ItemImport</class>
+            <class>org.dspace.app.itemimport.ItemImportCLITool</class>
         </step>
     </command>
     <command>
@@ -207,7 +207,7 @@
         <name>migrate-embargo</name>
         <description>Embargo manager tool used to migrate old version of Embargo to the new one included in dspace3</description>
         <step>
-            <class>org.dspace.embargo.EmbargoManager</class>
+            <class>org.dspace.embargo.EmbargoCLITool</class>
         </step>
     </command>
     <command>
@@ -371,7 +371,7 @@
         <name>sub-daily</name>
         <description>Send daily subscription notices</description>
         <step>
-            <class>org.dspace.eperson.Subscribe</class>
+            <class>org.dspace.eperson.SubscribeCLITool</class>
         </step>
     </command>
     <command>
@@ -392,7 +392,7 @@
         <name>user</name>
         <description>Manipulate a normal user account</description>
         <step>
-            <class>org.dspace.eperson.EPerson</class>
+            <class>org.dspace.eperson.EPersonCLITool</class>
         </step>
     </command>
     <command>

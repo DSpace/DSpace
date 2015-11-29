@@ -373,6 +373,7 @@ header {
 
 .pagination {
     width: 100%;
+    font-size: larger;
 }
 
 .pagination-info {
@@ -455,4 +456,12 @@ header {
   background-color: $almost-white;
   color: $text-color;
   border: 1px solid $text-color;
+}
+
+.didYouMean {
+    margin-bottom: $line-height-computed / 2;
+
+    a {
+        font-weight: bold;
+    }
 }

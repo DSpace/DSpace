@@ -11,6 +11,8 @@ import org.dspace.statistics.Dataset;
 import org.dspace.statistics.content.filter.StatisticsFilter;
 import org.dspace.core.Context;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.dspace.statistics.factory.StatisticsServiceFactory;
+import org.dspace.statistics.service.SolrLoggerService;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -30,11 +32,14 @@ public abstract class StatisticsData {
     private List<DatasetGenerator> datasetgenerators;
 
     private List<StatisticsFilter> filters;
+    protected final SolrLoggerService solrLoggerService;
+
 
     /** Construct a blank query factory. */
     protected StatisticsData() {
         datasetgenerators = new ArrayList<DatasetGenerator>(2);
         filters = new ArrayList<StatisticsFilter>();
+        solrLoggerService = StatisticsServiceFactory.getInstance().getSolrLoggerService();
     }
 
     /** Wrap an existing Dataset in an unconfigured query factory. */
@@ -42,6 +47,7 @@ public abstract class StatisticsData {
         this.dataset = dataset;
         datasetgenerators = new ArrayList<DatasetGenerator>(2);
         filters = new ArrayList<StatisticsFilter>();
+        solrLoggerService = StatisticsServiceFactory.getInstance().getSolrLoggerService();
     }
 
     /** Augment the list of facets (generators). */

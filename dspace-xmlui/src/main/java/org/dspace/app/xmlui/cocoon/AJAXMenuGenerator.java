@@ -8,13 +8,22 @@
 package org.dspace.app.xmlui.cocoon;
 
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.UUID;
 
 import org.apache.cocoon.ProcessingException;
+import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.generation.AbstractGenerator;
+import org.dspace.app.xmlui.utils.ContextUtil;
+import org.dspace.content.Collection;
+import org.dspace.content.authority.ChoiceAuthorityServiceImpl;
 import org.dspace.content.authority.Choices;
-import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.ChoicesXMLGenerator;
 
+import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
+import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.xml.sax.SAXException;
 
 import org.apache.log4j.Logger;
@@ -29,6 +38,9 @@ public class AJAXMenuGenerator extends AbstractGenerator
 {
     private static Logger log = Logger.getLogger(AJAXMenuGenerator.class);
 
+    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected ChoiceAuthorityService choiceAuthorityService = ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
+
     /**
      * Generate the AJAX response Document.
      *
@@ -42,36 +54,40 @@ public class AJAXMenuGenerator extends AbstractGenerator
     public void generate()
         throws IOException, SAXException, ProcessingException
     {
-        int start = 0;
-        int limit = 1000;
-        int collection = -1;
-        String format = parameters.getParameter("format",null);
-        String field = parameters.getParameter("field",null);
-        String sstart = parameters.getParameter("start",null);
-        if (sstart != null && sstart.length() > 0)
-        {
-            start = Integer.parseInt(sstart);
+        try {
+            int start = 0;
+            int limit = 1000;
+            Collection collection = null;
+            String format = parameters.getParameter("format",null);
+            String field = parameters.getParameter("field",null);
+            String sstart = parameters.getParameter("start",null);
+            if (sstart != null && sstart.length() > 0)
+            {
+                start = Integer.parseInt(sstart);
+            }
+            String slimit = parameters.getParameter("limit",null);
+            if (slimit != null && slimit.length() > 0)
+            {
+                limit = Integer.parseInt(slimit);
+            }
+            String scoll = parameters.getParameter("collection",null);
+            if (scoll != null && scoll.length() > 0)
+            {
+                collection = collectionService.find(ContextUtil.obtainContext(ObjectModelHelper.getRequest(objectModel)), UUID.fromString(scoll));
+            }
+            String query = parameters.getParameter("query",null);
+
+            // localization
+            String locale = parameters.getParameter("locale",null);
+            log.debug("AJAX menu generator: field="+field+", query="+query+", start="+sstart+", limit="+slimit+", format="+format+", field="+field+", query="+query+", start="+sstart+", limit="+slimit+", format="+format+", locale = "+locale);
+
+            Choices result = choiceAuthorityService.getMatches(field, query, collection, start, limit, locale, true);
+
+            log.debug("Result count = "+result.values.length+", default="+result.defaultSelected);
+
+            ChoicesXMLGenerator.generate(result, format, contentHandler);
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
         }
-        String slimit = parameters.getParameter("limit",null);
-        if (slimit != null && slimit.length() > 0)
-        {
-            limit = Integer.parseInt(slimit);
-        }
-        String scoll = parameters.getParameter("collection",null);
-        if (scoll != null && scoll.length() > 0)
-        {
-            collection = Integer.parseInt(scoll);
-        }
-        String query = parameters.getParameter("query",null);
-
-        // localization
-        String locale = parameters.getParameter("locale",null);
-        log.debug("AJAX menu generator: field="+field+", query="+query+", start="+sstart+", limit="+slimit+", format="+format+", field="+field+", query="+query+", start="+sstart+", limit="+slimit+", format="+format+", locale = "+locale);
-
-        Choices result = ChoiceAuthorityManager.getManager().getMatches(field, query, collection, start, limit, locale, true);
-
-        log.debug("Result count = "+result.values.length+", default="+result.defaultSelected);
-
-        ChoicesXMLGenerator.generate(result, format, contentHandler);
     }
 }

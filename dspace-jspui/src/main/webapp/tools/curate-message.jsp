@@ -1,3 +1,5 @@
+<%@ page import="org.dspace.app.webui.util.CurateTaskResult" %>
+
 <%--
 
     The contents of this file are subject to the license and copyright

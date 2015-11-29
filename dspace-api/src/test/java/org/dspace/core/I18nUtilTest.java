@@ -8,7 +8,6 @@
 
 package org.dspace.core;
 
-import java.sql.SQLException;
 import java.util.Locale;
 import org.junit.After;
 import org.junit.AfterClass;

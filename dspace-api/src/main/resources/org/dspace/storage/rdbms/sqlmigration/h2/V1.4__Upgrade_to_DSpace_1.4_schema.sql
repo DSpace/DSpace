@@ -136,13 +136,13 @@ CREATE TABLE checksum_results
 CREATE TABLE most_recent_checksum 
 (
     bitstream_id INTEGER PRIMARY KEY,
-    to_be_processed NUMBER(1) NOT NULL,
+    to_be_processed BOOLEAN NOT NULL,
     expected_checksum VARCHAR(64) NOT NULL,
     current_checksum VARCHAR(64) NOT NULL,
     last_process_start_date TIMESTAMP NOT NULL,
     last_process_end_date TIMESTAMP NOT NULL,
     checksum_algorithm VARCHAR(64) NOT NULL,
-    matched_prev_checksum NUMBER(1) NOT NULL,
+    matched_prev_checksum BOOLEAN NOT NULL,
     result VARCHAR(64) REFERENCES checksum_results(result_code)
 );
 
@@ -150,11 +150,11 @@ CREATE TABLE most_recent_checksum
 -- A row will be inserted into this table every
 -- time a checksum is re-calculated.
 
-CREATE SEQUENCE checksum_history_seq;
+CREATE SEQUENCE checksum_history_check_id_seq;
 
 CREATE TABLE checksum_history 
 (
-    check_id INTEGER PRIMARY KEY,
+    check_id BIGINT PRIMARY KEY,
     bitstream_id INTEGER,
     process_start_date TIMESTAMP,
     process_end_date TIMESTAMP,

@@ -24,7 +24,8 @@
 
 <%@ page import="org.dspace.app.webui.util.JSPManager" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
-<%@ page import="org.dspace.authenticate.AuthenticationManager" %>
+<%@ page import="org.dspace.authenticate.factory.AuthenticateServiceFactory" %>
+<%@ page import="org.dspace.authenticate.service.AuthenticationService" %>
 <%@ page import="org.dspace.authenticate.AuthenticationMethod" %>
 <%@ page import="org.dspace.core.Context" %>
 <%@ page import="org.dspace.core.LogManager" %>
@@ -39,11 +40,10 @@
     <table border="0" width="90%">
         <tr>
             <td align="left">
-                <%-- <H1>Log In to DSpace</H1> --%>
                 <h1><fmt:message key="jsp.login.chooser.heading"/></h1>
             </td>
             <td align="right" class="standard">
-                <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#login\" %>"><fmt:message key="jsp.help"/></dspace:popup>
+                <dspace:popup page='<%= LocaleSupport.getLocalizedMessage(pageContext, "help.index") + "#login" %>'><fmt:message key="jsp.help"/></dspace:popup>
             </td>
         </tr>
     </table>
@@ -54,7 +54,8 @@
           <h2><fmt:message key="jsp.login.chooser.chooseyour"/></h2>
           <ul>
 <%
-    Iterator ai = AuthenticationManager.authenticationMethodIterator();
+    AuthenticationService authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
+    Iterator ai = authenticationService.authenticationMethodIterator();
     AuthenticationMethod am;
     Context context = null;
     try
@@ -64,9 +65,9 @@
     	String url = null;
     	while (ai.hasNext())
     	{
-        am = (AuthenticationMethod)ai.next();
-        if ((url = am.loginPageURL(context, request, response)) != null)
-        {
+            am = (AuthenticationMethod)ai.next();
+            if ((url = am.loginPageURL(context, request, response)) != null)
+            {
 %>
             <li><p><strong><a href="<%= url %>">
 		<%-- This kludge is necessary because fmt:message won't
@@ -74,7 +75,7 @@
                 <%= javax.servlet.jsp.jstl.fmt.LocaleSupport.getLocalizedMessage(pageContext, am.loginPageTitle(context)) %>
                         </a></strong></p></li>
 <%
-        }
+            }
         }
     }
     catch(SQLException se)
@@ -89,11 +90,7 @@
         UIUtil.sendAlert(request, se);
         JSPManager.showInternalError(request, response);
     }
-    finally 
-    {
-    	context.abort();
-    }
-  
+
 %>
           </ul>
         </td>

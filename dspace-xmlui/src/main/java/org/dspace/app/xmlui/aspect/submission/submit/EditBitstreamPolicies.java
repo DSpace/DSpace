@@ -90,7 +90,7 @@ public class EditBitstreamPolicies extends AbstractStep
             addPolicy.setValue(T_submit_add_policy);
         }
 
-        div.addHidden("bitstream_id").setValue(submissionInfo.getBitstream().getID());
+        div.addHidden("bitstream_id").setValue(submissionInfo.getBitstream().getID().toString());
 
         // Note, not standard control actions, this page just goes back to the upload step.
         Item actions = form.addItem();

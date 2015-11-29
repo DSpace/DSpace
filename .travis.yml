@@ -1,4 +1,5 @@
 language: java
+sudo: false
 
 env: 
   # Give Maven 1GB of memory to work with
@@ -31,13 +32,13 @@ install: "echo 'Skipping install stage, dependencies will be downloaded during b
 # 2. Assemble DSpace
 script:
   # 1. [Install & Unit Test] Check source code licenses and run source code Unit Tests
-  #    (This explicitly skips building the 'dspace' assembly module, since we only want to do that ONCE.)
   #        license:check => Validate all source code license headers
   #        -Dmaven.test.skip=false => Enable DSpace Unit Tests
-  #        -P !dspace => SKIP full DSpace assembly (will do below)
+  #        -DskipITs=false         => Enable DSpace Integration Tests
+  #        -P !assembly            => Skip normal assembly (as it can be memory intensive)
   #        -B => Maven batch/non-interactive mode (recommended for CI)
   #        -V => Display Maven version info before build
-  - "mvn clean install license:check -Dmaven.test.skip=false -P !dspace -B -V"
+  - "mvn clean install license:check -Dmaven.test.skip=false -DskipITs=false -P !assembly -B -V"
   # 2. [Assemble DSpace] Ensure assembly process works (from [src]/dspace/), including Mirage 2
   #        -Dmirage2.on=true => Build Mirage2
   #        -Dmirage2.deps.included=false => Don't include Mirage2 build dependencies (We installed them in before_install)

@@ -9,6 +9,7 @@ package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.UUID;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +21,8 @@ import org.dspace.app.webui.util.UIUtil;
 import org.dspace.app.webui.util.VersionUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 
 /**
@@ -33,14 +36,21 @@ public class VersionItemServlet extends DSpaceServlet
 
     /** log4j category */
     private static Logger log = Logger.getLogger(VersionItemServlet.class);
-
+    
+    private ItemService itemService;
+    
+    @Override
+    public void init() throws ServletException {
+    	super.init();
+    	itemService = ContentServiceFactory.getInstance().getItemService();
+    }
 
     protected void doDSGet(Context context, HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
-        Integer itemID = UIUtil.getIntParameter(request,"itemID");
-        Item item = Item.find(context,itemID);
+        UUID itemID = UIUtil.getUUIDParameter(request,"itemID");
+        Item item = itemService.find(context,itemID);
         String submit = UIUtil.getSubmitButton(request,"submit");
         if (submit!=null && submit.equals("submit")){
             request.setAttribute("itemID", itemID);
@@ -51,7 +61,7 @@ public class VersionItemServlet extends DSpaceServlet
         
         String summary = request.getParameter("summary");
         if (submit!=null && submit.equals("submit_version")){                        
-            Integer wsid = VersionUtil.processCreateNewVersion(context, itemID, summary);            
+            Integer wsid = VersionUtil.processCreateNewVersion(context, item.getID(), summary);            
             response.sendRedirect(request.getContextPath()+"/submit?resume=" + wsid);
             context.complete();
             return;

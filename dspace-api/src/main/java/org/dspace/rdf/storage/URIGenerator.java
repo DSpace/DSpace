@@ -8,6 +8,9 @@
 package org.dspace.rdf.storage;
 
 import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
+
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 
@@ -40,7 +43,7 @@ public interface URIGenerator {
      * @return May return null, if no URI could be generated.
      * @see org.dspace.rdf.RDFUtil#generateIdentifier(Context, DSpaceObject)
      */
-    public String generateIdentifier(Context context, int type, int id, String handle, String[] identifiers)
+    public String generateIdentifier(Context context, int type, UUID id, String handle, List<String> identifiers)
             throws SQLException;
     
     /**
