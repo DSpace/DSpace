@@ -70,6 +70,7 @@ public class ItemExportCLITool {
                 "sequence number to begin exporting items with");
         options.addOption("z", "zip", true, "export as zip file (specify filename e.g. export.zip)");
         options.addOption("h", "help", false, "help");
+        options.addOption("x", "exclude-bitstreams", false, "do not export bitstreams");
 
         CommandLine line = parser.parse(options, argv);
 
@@ -135,6 +136,12 @@ public class ItemExportCLITool {
         {
             zip = true;
             zipFileName = line.getOptionValue('z');
+        }
+
+        boolean excludeBitstreams = false;
+        if (line.hasOption('x'))
+        {
+        	excludeBitstreams = true;
         }
 
         // now validate the args
@@ -234,14 +241,14 @@ public class ItemExportCLITool {
                 System.out.println("Exporting from collection: " + myIDString);
                 items = itemService.findByCollection(c, mycollection);
             }
-            itemExportService.exportAsZip(c, items, destDirName, zipFileName, seqStart, migrate);
+            itemExportService.exportAsZip(c, items, destDirName, zipFileName, seqStart, migrate, excludeBitstreams);
         }
         else
         {
             if (myItem != null)
             {
                 // it's only a single item
-                itemExportService.exportItem(c, Collections.singletonList(myItem).iterator(), destDirName, seqStart, migrate);
+                itemExportService.exportItem(c, Collections.singletonList(myItem).iterator(), destDirName, seqStart, migrate, excludeBitstreams);
             }
             else
             {
@@ -249,7 +256,7 @@ public class ItemExportCLITool {
 
                 // it's a collection, so do a bunch of items
                 Iterator<Item> i = itemService.findByCollection(c, mycollection);
-                itemExportService.exportItem(c, i, destDirName, seqStart, migrate);
+                itemExportService.exportItem(c, i, destDirName, seqStart, migrate, excludeBitstreams);
             }
         }
 
