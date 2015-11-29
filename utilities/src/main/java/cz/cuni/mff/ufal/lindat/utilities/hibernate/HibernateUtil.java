@@ -27,17 +27,15 @@ public class HibernateUtil {
 	static Logger log = Logger.getLogger(HibernateUtil.class);
 
 	private static SessionFactory sessionFactory;
+	
+	private static boolean initialized = false;
 
 	private Session session = null;
 	private Transaction transaction = null;
 
-	static void init() {
-
-		if (Variables.databaseURL == null) {
-			log.error("The databaseURL is not set, are the Variables initialized?");
-			log.error("Initial SessionFactory creation failed.");
-			return;
-		}
+	public synchronized static void init(){
+		
+		if(initialized) return;
 
 		try {
 
@@ -49,6 +47,10 @@ public class HibernateUtil {
 					Variables.databasePassword);
 			cfg.setProperty("show_sql", "true");
 			sessionFactory = cfg.configure().buildSessionFactory();
+			HibernateUtil test = new HibernateUtil();
+			test.openSession();
+			test.clone();
+			initialized = true;
 
 		} catch (Exception e) {
 			log.error("Initial SessionFactory creation failed.", e);
@@ -61,9 +63,6 @@ public class HibernateUtil {
 
 	public static SessionFactory getSessionFactory() {
 		log.debug("Requesting Hibernate SessionFactory");
-		if (sessionFactory == null) {
-			init();
-		}
 		return sessionFactory;
 	}
 
@@ -409,5 +408,7 @@ public class HibernateUtil {
 	}
 
 }
+
+
 
 

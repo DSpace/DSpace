@@ -8,13 +8,20 @@
 package org.dspace.app.util;
 
 import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
 import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.utils.DSpace;
 import org.apache.log4j.Logger;
+
+import cz.cuni.mff.ufal.lindat.utilities.interfaces.IFunctionalities;
 
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletContextEvent;
 
 import java.beans.Introspector;
+import java.io.File;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.Driver;
@@ -44,6 +51,8 @@ public class DSpaceContextListener implements ServletContextListener
     public void contextInitialized(ServletContextEvent event)
     {
 
+    	log.info("Context initialized by xmlui");
+    	
         // On Windows, URL caches can cause problems, particularly with undeployment
         // So, here we attempt to disable them if we detect that we are running on Windows
         try
@@ -133,6 +142,20 @@ public class DSpaceContextListener implements ServletContextListener
         } catch (IllegalAccessException ex) {
             event.getServletContext().log("Can't create webapp MBean:  " + ex.getMessage());
         }
+        
+        
+        
+    	try{
+    		String className = ConfigurationManager.getProperty("lr", "lr.utilities.functionalityManager.class");
+			Class<IFunctionalities> functionalities = (Class<IFunctionalities>) Class.forName(className);
+			Method init = functionalities.getMethod("init", String.class);
+			String lr_cfg = ConfigurationManager.getProperty("dspace.dir") + File.separator + "config/modules/lr.cfg";
+			init.invoke(null, lr_cfg);
+    	} catch(Exception ex) {
+    		log.error(ex.getMessage(), ex);
+    	}
+        
+        
     }
 
     /**
@@ -171,5 +194,17 @@ public class DSpaceContextListener implements ServletContextListener
         {
             log.error("Failed to cleanup ClassLoader for webapp", e);
         }
+        
+    	try{
+    		String className = ConfigurationManager.getProperty("lr", "lr.utilities.functionalityManager.class");
+			Class<IFunctionalities> functionalities = (Class<IFunctionalities>) Class.forName(className);
+			Method shutdown = functionalities.getMethod("shutdown");
+			shutdown.invoke(null);
+    	} catch(Exception ex) {
+    		log.error(ex.getMessage(), ex);
+    	}
+        
     }
 }
+
+
