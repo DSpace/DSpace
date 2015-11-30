@@ -29,13 +29,23 @@ public class MyHandleResource extends Resource {
     @GET
     @Path("/handles/magic")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Handle[] getHandles(){
+    public Handle[] getHandles(@QueryParam("limit") @DefaultValue("10") Integer limit,
+                               @QueryParam("offset") @DefaultValue("0") Integer offset){
         org.dspace.core.Context context = null;
+        if (limit == null || limit < 0 || offset == null || offset < 0)
+        {
+            log.warn("offset/limit was badly set, using default values.");
+            limit = 10;
+            offset = 0;
+        }
+        //compute the actual offset in rows
+        offset *= limit;
         List<Handle> result = new ArrayList<>();
         try {
             context = new org.dspace.core.Context();
-            String query = "select * from handle where url like '" + HandlePlugin.magicBean + "%';";
-            String[] params = new String[0];
+            String query = "select * from handle where url like '" + HandlePlugin.magicBean + "%' " +
+                    "order by handle_id limit ? offset ?;";
+            Integer[] params = new Integer[]{limit, offset};
             TableRowIterator tri = DatabaseManager.query(context, query, params);
             List<TableRow> rows = tri.toList();
             for(TableRow row : rows){
