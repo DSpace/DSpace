@@ -52,6 +52,15 @@ public class SHERPAService
         while(numberOfTries<maxNumberOfTries && sherpaResponse==null) {
             numberOfTries++;
 
+            if (log.isDebugEnabled())
+            {
+                log.debug(String.format("Trying to contact SHERPA/RoMEO - attempt %d of %d; timeout is %d; sleep between timeouts is %d",
+                        numberOfTries,
+                        maxNumberOfTries,
+                        timeout,
+                        sleepBetweenTimeouts));
+            }
+
             try {
                 Thread.sleep(sleepBetweenTimeouts);
 
@@ -84,7 +93,7 @@ public class SHERPAService
                 else
                     sherpaResponse = new SHERPAResponse("SHERPA/RoMEO returned no response");
             } catch (Exception e) {
-                log.error(e.getMessage(),e);
+                log.warn("Encountered exception while contacting SHERPA/RoMEO: " + e.getMessage(), e);
             }
         }
 
