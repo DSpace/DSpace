@@ -50,9 +50,6 @@ public class BatchImportUpload extends AbstractDSpaceTransformer {
     @Override
     public void addBody(Body body) throws SAXException, WingException, SQLException
     {
-        // Get list of changes
-        Request request = ObjectModelHelper.getRequest(objectModel);
-
         // DIVISION: batch-import
         Division div = body.addInteractiveDivision("batch-import",contextPath + "/admin/batchimport", Division.METHOD_MULTIPART,"primary administrative");
         div.setHead(T_head1);

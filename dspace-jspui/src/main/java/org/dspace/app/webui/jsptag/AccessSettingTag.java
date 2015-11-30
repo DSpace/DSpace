@@ -79,7 +79,7 @@ public class AccessSettingTag extends TagSupport
 
     public int doStartTag() throws JspException
     {
-        String legend = LocaleSupport.getLocalizedMessage(pageContext, "org.dspace.app.webui.jsptag.access-setting.legend");
+//        String legend = LocaleSupport.getLocalizedMessage(pageContext, "org.dspace.app.webui.jsptag.access-setting.legend");
         String label_name = LocaleSupport.getLocalizedMessage(pageContext, "org.dspace.app.webui.jsptag.access-setting.label_name");
         String label_group = LocaleSupport.getLocalizedMessage(pageContext, "org.dspace.app.webui.jsptag.access-setting.label_group");
         String label_embargo = LocaleSupport.getLocalizedMessage(pageContext, "org.dspace.app.webui.jsptag.access-setting.label_embargo");

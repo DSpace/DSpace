@@ -296,8 +296,6 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester
 
             // for some reason, DSpace will not give you the handle automatically,
             // so we have to look it up
-            String handle = handleService.findHandle(context, installedItem);
-
             verboseDescription.append("Replace successful");
 
             result.setItem(installedItem);

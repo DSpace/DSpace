@@ -843,8 +843,6 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
     {
         // get the things out of the service that we need
         Context context = swordContext.getContext();
-        SwordUrlManager urlManager = swordConfig
-                .getUrlManager(swordContext.getContext(), swordConfig);
 
         // is the content acceptable?  If not, this will throw an error
         this.isAcceptable(swordConfig, context, deposit, item);
@@ -897,8 +895,6 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
 
         // get the things out of the service that we need
         Context context = swordContext.getContext();
-        SwordUrlManager urlManager = swordConfig
-                .getUrlManager(swordContext.getContext(), swordConfig);
 
         // is the content acceptable to the items?  If not, this will throw an error
         for (Item item : items)
@@ -971,8 +967,6 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
     {
         // get the things out of the service that we need
         Context context = swordContext.getContext();
-        SwordUrlManager urlManager = swordConfig
-                .getUrlManager(swordContext.getContext(), swordConfig);
 
         // is the content acceptable?  If not, this will throw an error
         this.isAcceptable(swordConfig, context, deposit, item);

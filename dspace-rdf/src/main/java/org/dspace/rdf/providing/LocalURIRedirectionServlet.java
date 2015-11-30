@@ -62,9 +62,7 @@ public class LocalURIRedirectionServlet extends HttpServlet
         String[] path = request.getPathInfo().substring(1).split("/");
 
         String handle = path[0] + "/" + path[1];
-        String dspaceURL = 
-                    (new DSpace()).getConfigurationService().getProperty("dspace.url");
-        
+
         // Prepare content negotiation
         int requestedMimeType = Negotiator.negotiate(request.getHeader(ACCEPT_HEADER_NAME));
         

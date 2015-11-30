@@ -347,8 +347,7 @@ public class GoogleMetadata
         {
             configFilter = configFilter.trim();
         }
-        ArrayList<ArrayList<String>> parsedOptions = new ArrayList<ArrayList<String>>();
-        parsedOptions = parseOptions(configFilter);
+        ArrayList<ArrayList<String>> parsedOptions = parseOptions(configFilter);
 
         if (log.isDebugEnabled())
         {

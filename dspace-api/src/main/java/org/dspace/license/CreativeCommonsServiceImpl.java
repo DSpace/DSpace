@@ -179,7 +179,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
         	bs_format = bitstreamFormatService.findByShortDescription(context, "License");
         }
 
-        Bitstream bs = bitstreamService.create(context, licenseStm);
+        Bitstream bs = bitstreamService.create(context, bundle, licenseStm);
         bs.setSource(context, CC_BS_SOURCE);
         bs.setName(context, (mimeType != null &&
                     (mimeType.equalsIgnoreCase("text/xml") ||
@@ -270,7 +270,6 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     @Override
     public String fetchLicenseRdf(String ccResult) {
     	StringWriter result 			= new StringWriter();
-    	String licenseRdfString 		= new String("");
         try {
     		InputStream inputstream = new ByteArrayInputStream(ccResult.getBytes("UTF-8"));
     		templates.newTransformer().transform(new StreamSource(inputstream), new StreamResult(result));
