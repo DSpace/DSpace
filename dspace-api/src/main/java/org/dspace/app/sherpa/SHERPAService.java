@@ -94,6 +94,10 @@ public class SHERPAService
                     sherpaResponse = new SHERPAResponse("SHERPA/RoMEO returned no response");
             } catch (Exception e) {
                 log.warn("Encountered exception while contacting SHERPA/RoMEO: " + e.getMessage(), e);
+            } finally {
+                if (method != null) {
+                    method.releaseConnection();
+                }
             }
         }
 
