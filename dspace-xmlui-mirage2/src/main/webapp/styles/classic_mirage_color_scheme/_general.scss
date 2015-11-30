@@ -464,3 +464,9 @@ header {
         font-weight: bold;
     }
 }
+
+@media print {
+	a[href]:after {
+		content: none !important;
+	}
+}
