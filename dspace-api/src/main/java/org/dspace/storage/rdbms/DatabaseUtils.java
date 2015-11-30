@@ -368,7 +368,7 @@ public class DatabaseUtils
      *      DataSource object initialized by DatabaseManager
      * @return initialized Flyway object
      */
-    private static Flyway setupFlyway(DataSource datasource)
+    private synchronized static Flyway setupFlyway(DataSource datasource)
     {
         if (flywaydb==null)
         {
