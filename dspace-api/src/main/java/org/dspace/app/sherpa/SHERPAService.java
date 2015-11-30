@@ -53,7 +53,7 @@ public class SHERPAService
             numberOfTries++;
 
             try {
-                Thread.sleep(sleepBetweenTimeouts * (numberOfTries-1));
+                Thread.sleep(sleepBetweenTimeouts);
 
                 URIBuilder uriBuilder = new URIBuilder(endpoint);
                 uriBuilder.addParameter("issn", query);
