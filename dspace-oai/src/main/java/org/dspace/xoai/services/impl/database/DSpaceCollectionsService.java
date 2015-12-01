@@ -13,6 +13,7 @@ import org.dspace.content.Item;
 import org.dspace.xoai.services.api.context.ContextService;
 import org.dspace.xoai.services.api.context.ContextServiceException;
 import org.dspace.xoai.services.api.database.CollectionsService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import java.util.Queue;
 
 public class DSpaceCollectionsService implements CollectionsService {
 
+    @Autowired
     private ContextService contextService;
 
     public List<Integer> getAllSubCollections(int communityId)
