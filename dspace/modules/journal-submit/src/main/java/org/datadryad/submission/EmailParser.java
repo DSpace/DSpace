@@ -110,6 +110,10 @@ public class EmailParser {
 
 	public void parseMessage(List<String> message) {
         XMLValue currValue = new XMLValue();
+
+        // set a default status of ACCEPTED:
+        dataForXML.put(ARTICLE_STATUS, Manuscript.STATUS_ACCEPTED);
+
         for (String line : message) {
             if (StringUtils.stripToNull(line) != null) {
                 // match field names
