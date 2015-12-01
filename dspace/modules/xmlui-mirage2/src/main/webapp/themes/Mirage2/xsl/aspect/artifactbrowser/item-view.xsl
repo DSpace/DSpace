@@ -625,7 +625,7 @@
                 </td>
                 <!-- DATASHARE code end -->
 
-                <td class="label-cell">
+                <td>
                     <xsl:value-of select="./@mdschema"/>
                     <xsl:text>.</xsl:text>
                     <xsl:value-of select="./@element"/>
