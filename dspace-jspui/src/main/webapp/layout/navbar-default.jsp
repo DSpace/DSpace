@@ -54,9 +54,9 @@
     {
         navbarEmail = user.getEmail();
     }
-    
+
     // get the browse indices
-    
+
 	BrowseIndex[] bis = BrowseIndex.getBrowseIndices();
     BrowseInfo binfo = (BrowseInfo) request.getAttribute("browse.info");
     String browseCurrent = "";
@@ -158,8 +158,8 @@
                      if (isAdmin || userEmail.equals("library_ssu@ukr.net") || userEmail.equals("libconsult@rambler.ru")) {
                  %>
                  <li class="divider"></li>
-                 <li><a href="<%= request.getContextPath() %>/home_stat.jsp"><fmt:message key="jsp.layout.navbar-admin.report"/></a></li>
-                 <li><a href="<%= request.getContextPath() %>/authors.jsp"><fmt:message key="jsp.layout.navbar-admin.autocomplete"/></a></li>
+                 <li><a href="<%= request.getContextPath() %>/stat/home-stat.jsp"><fmt:message key="jsp.layout.navbar-admin.report"/></a></li>
+                 <li><a href="<%= request.getContextPath() %>/info-pages/authors.jsp"><fmt:message key="jsp.layout.navbar-admin.autocomplete"/></a></li>
                  <li><a href="<%= request.getContextPath() %>/upload/manage.jsp"><fmt:message key="jsp.layout.navbar-admin.remote"/></a></li>
                  <%
                      }
@@ -182,7 +182,7 @@
              <% } %>
            </li>
           </ul>
-          
+
 	<%-- Search Box --%>
 	<form method="get" action="<%= request.getContextPath() %>/simple-search" class="navbar-form navbar-right">
 	    <div class="form-group">
@@ -193,7 +193,7 @@
 <%
 			if (ConfigurationManager.getBooleanProperty("webui.controlledvocabulary.enable"))
 			{
-%>        
+%>
               <br/><a href="<%= request.getContextPath() %>/subject-search"><fmt:message key="jsp.layout.navbar-default.subjectsearch"/></a>
 <%
             }
