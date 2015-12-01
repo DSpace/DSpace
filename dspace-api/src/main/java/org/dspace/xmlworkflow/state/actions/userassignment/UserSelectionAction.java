@@ -67,7 +67,7 @@ public abstract class UserSelectionAction extends Action {
      * @throws SQLException ...
      * @throws AuthorizeException thrown if the current user isn't authorized
      */
-    public abstract void regenerateTasks(Context c, XmlWorkflowItem wfi, RoleMembers roleMembers) throws SQLException, AuthorizeException;
+    public abstract void regenerateTasks(Context c, XmlWorkflowItem wfi, RoleMembers roleMembers) throws SQLException, AuthorizeException, IOException;
 
     /**
      * Verifies if the user selection action is valid
