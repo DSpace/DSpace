@@ -21,14 +21,14 @@
  </submission-map>
 
 
- 
+
  <!-- The 'step-definitions' allows you to define steps which you may wish -->
  <!-- to "share" amongst multiple submission-item definitions.  In order to-->
  <!-- share the same step definition, you can refer to it by its unique id -->
  <!-- defined in this section.  EVERY 'step' in this section MUST have a   -->
  <!-- unique identifier in the 'id' attribute!                             -->
  <!--                                                                      -->
- <!-- Each <step> REQUIRES the following attributes (@) and properties:    --> 
+ <!-- Each <step> REQUIRES the following attributes (@) and properties:    -->
  <!-- @id                - The unique identifier for this step             -->
  <!-- 																	   -->
  <!-- <processing-class> - The class which will process all information for-->
@@ -79,24 +79,24 @@
      <!-- Since this is a "special step", it is *automatically* added at the -->
      <!-- beginning of each 'submission-process' (therefore it should not be -->
      <!-- referenced by any of the below 'submission-process' tags).  Also as-->
-     <!-- a special step, it is currently NEVER editable in a workflow.      -->                              
-     <step id="collection">
-       <heading></heading> <!--can specify heading, if you want it to appear in Progress Bar-->
+     <!-- a special step, it is currently NEVER editable in a workflow.      -->
+    <!-- <step id="collection">
+       <heading></heading> &lt;!&ndash;can specify heading, if you want it to appear in Progress Bar&ndash;&gt;
 	   <processing-class>org.dspace.submit.step.SelectCollectionStep</processing-class>
        <jspui-binding>org.dspace.app.webui.submit.step.JSPSelectCollectionStep</jspui-binding>
        <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.SelectCollectionStep</xmlui-binding>
        <workflow-editable>false</workflow-editable>
-     </step>
-     
-	 <!-- Uncomment this to make available the bibliographic import from external source - note ONLY for JSPUI -->     
-	 <!-- <step id="collection">
-       <heading></heading> can specify heading, if you want it to appear in Progress Bar
+     </step>-->
+
+	 <!-- Uncomment this to make available the bibliographic import from external source - note ONLY for JSPUI -->
+	 <step id="collection">
+       <heading></heading> <!--can specify heading, if you want it to appear in Progress Bar-->
 	   <processing-class>org.dspace.submit.step.StartSubmissionLookupStep</processing-class>
        <jspui-binding>org.dspace.app.webui.submit.step.JSPStartSubmissionLookupStep</jspui-binding>
        <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.SelectCollectionStep</xmlui-binding>
        <workflow-editable>false</workflow-editable>
-     </step> -->
-   
+     </step>
+
      <!-- The "complete" step is a "special step" which is *REQUIRED* to be-->
      <!-- in this section!  In DSpace, when a submission is completed,       -->
      <!-- a workflow is automatically kicked off (if one exists)             -->
@@ -105,14 +105,14 @@
      <!-- Since this is a "special step", it is *automatically* added at the -->
      <!-- end of each 'submission-process' (therefore it should not be       -->
      <!-- referenced by any of the below 'submission-process' tags).  Also as-->
-     <!-- a special step, it is currently NEVER editable in a workflow.      -->                               
+     <!-- a special step, it is currently NEVER editable in a workflow.      -->
      <step id="complete">
        <heading>submit.progressbar.complete</heading>
        <processing-class>org.dspace.submit.step.CompleteStep</processing-class>
        <jspui-binding>org.dspace.app.webui.submit.step.JSPCompleteStep</jspui-binding>
        <workflow-editable>false</workflow-editable>
      </step>
-   
+
      <!-- This is the Sample Step which utilizes the JSPSampleStep class-->
      <step id="sample">
        <heading>Sample</heading>
@@ -136,7 +136,7 @@
  <!-- be defined in <step-definitions> above), or defined completely here. -->
  <!--                                                                      -->
  <!-- If the step is not referred to by 'id', then the <step> REQUIRES the -->
- <!-- following properties are defined:                                    --> 
+ <!-- following properties are defined:                                    -->
  <!-- <processing-class> - The class which will process all information for-->
  <!--             this step. The class must implement the                  -->
  <!--             'org.dspace.app.webui.submit.JSPStep' interface AND      -->
@@ -175,29 +175,29 @@
  <!--				 "true" or "false".				                       -->
  <!--                                                                      -->
  <submission-definitions>
-   
+
    <!--This "traditional" process defines the DEFAULT item submission process-->
    <submission-process name="traditional">
-     
+
      <!--Uncommment to display the SAMPLE step as your first step-->
      <!--<step id="sample"/>-->
 
-	 <!-- Step 1. Since DSpace 4.0, the initial questions has been disabled. Metadata are shown exactly as 
+	 <!-- Step 1. Since DSpace 4.0, the initial questions has been disabled. Metadata are shown exactly as
 	 	  required in input-forms and items are assumed to have always multiple-files attached.
 	      If re-enable the initial questions step you should comment out this step-->
 	 <step>
 		<processing-class>org.dspace.submit.step.SkipInitialQuestionsStep</processing-class>
 	 </step>
-          
+
      <!--Disabled by default Since DSpace 4.0: Step 1 will be to gather initial information
 	  <step>
 	    <heading>submit.progressbar.initial-questions</heading>
 		<processing-class>org.dspace.submit.step.InitialQuestionsStep</processing-class>
-		<jspui-binding>org.dspace.app.webui.submit.step.JSPInitialQuestionsStep</jspui-binding>   	    
+		<jspui-binding>org.dspace.app.webui.submit.step.JSPInitialQuestionsStep</jspui-binding>
 		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.InitialQuestionsStep</xmlui-binding>
 	    <workflow-editable>true</workflow-editable>
 	  </step> -->
-      
+
       <!--Step 2 will be to Describe the item.-->
       <step>
         <heading>submit.progressbar.describe</heading>
@@ -225,10 +225,10 @@
 		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.UploadStep</xmlui-binding>
         <workflow-editable>true</workflow-editable>
       </step>
-      
+
 
        <!-- Step 4 Upload Item with Embargo Features
-            to enable this step, please make sure to comment-out the previous step "UploadStep"  
+            to enable this step, please make sure to comment-out the previous step "UploadStep"
        <step>
            <heading>submit.progressbar.upload</heading>
            <processing-class>org.dspace.submit.step.UploadWithEmbargoStep</processing-class>
@@ -269,7 +269,7 @@
       </step>
 
 
-     
+
    </submission-process>
 
  </submission-definitions>
