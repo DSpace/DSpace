@@ -469,7 +469,7 @@
                     </xsl:attribute>
                 </xsl:otherwise>
             </xsl:choose>
-            <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"/>
+            <span class="glyphicon glyphicon-folder-close" aria-hidden="true"/>
         </button>
     </xsl:template>
 
@@ -492,7 +492,7 @@
                     </xsl:attribute>
                 </xsl:otherwise>
             </xsl:choose>
-            <span class="glyphicon glyphicon-minus-sign" aria-hidden="true"/>
+            <span class="glyphicon glyphicon-folder-open" aria-hidden="true"/>
         </button>
     </xsl:template>
 
