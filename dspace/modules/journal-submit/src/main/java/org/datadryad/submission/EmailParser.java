@@ -133,6 +133,11 @@ public class EmailParser {
             dataForXML.put(ARTICLE_STATUS,Manuscript.STATUS_REJECTED);
         }
 
+        // if article status says "transferred", it's the same as a rejection
+        if (dataForXML.get(ARTICLE_STATUS).equalsIgnoreCase("transferred")) {
+            dataForXML.put(ARTICLE_STATUS,Manuscript.STATUS_REJECTED);
+        }
+
         // remove any unnecessary tags
         dataForXML.remove(UNNECESSARY);
 
