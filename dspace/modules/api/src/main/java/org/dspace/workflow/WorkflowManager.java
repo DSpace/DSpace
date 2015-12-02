@@ -455,7 +455,7 @@ public class WorkflowManager {
      *            Context
      * @param wi
      *            WorkflowItem to operate on
-     * @param e
+     * @param ePerson
      *            EPerson doing the operation
      * @param action the action which triggered this reject
      * @param rejection_message
@@ -465,7 +465,7 @@ public class WorkflowManager {
      * @throws java.sql.SQLException ...
      * @throws org.dspace.authorize.AuthorizeException ...
      */
-    public static WorkspaceItem rejectWorkflowItem(Context c, WorkflowItem wi, EPerson e, Action action,
+    public static WorkspaceItem rejectWorkflowItem(Context c, WorkflowItem wi, EPerson ePerson, Action action,
             String rejection_message, boolean sendMail) throws SQLException, AuthorizeException,
             IOException
     {
@@ -500,15 +500,16 @@ public class WorkflowManager {
         }
 
         // Here's what happened
-        if(action != null){
-            // Get user's name + email address
-            String usersName = getEPersonName(e);
-            String provDescription = action.getProvenanceStartId() + " Rejected by " + usersName + ", reason: "
-                    + rejection_message + " on " + now + " (GMT) ";
-
-            // Add to item as a DC field
-            myitem.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
+        String provDescription = "";
+        if(action != null) {
+            provDescription = action.getProvenanceStartId() + " ";
         }
+        // Get user's name + email address
+        provDescription = provDescription + "Rejected by " + getEPersonName(ePerson) + ", reason: "
+                + rejection_message + " on " + now + " (GMT) ";
+
+        // Add to item as a DC field
+        myitem.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
 
         myitem.update();
 
@@ -517,13 +518,13 @@ public class WorkflowManager {
 
         if(sendMail){
             // notify that it's been rejected
-            WorkflowEmailManager.notifyOfReject(c, wi, e, rejection_message);
+            WorkflowEmailManager.notifyOfReject(c, wi, ePerson, rejection_message);
         }
 
         log.info(LogManager.getHeader(c, "reject_workflow", "workflow_item_id="
                 + wi.getID() + "item_id=" + wi.getItem().getID()
                 + "collection_id=" + wi.getCollection().getID() + "eperson_id="
-                + (e == null ? "" :  e.getID())));
+                + (ePerson == null ? "" : ePerson.getID())));
 
         return wsi;
     }
@@ -579,7 +580,7 @@ public class WorkflowManager {
     {
         String submitter = e.getFullName();
 
-        submitter = submitter + "(" + e.getEmail() + ")";
+        submitter = submitter + " (" + e.getEmail() + ")";
 
         return submitter;
     }

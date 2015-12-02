@@ -7,6 +7,7 @@ import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.discovery.SearchService;
 import org.dspace.utils.DSpace;
 import org.dspace.workflow.actions.WorkflowActionConfig;
@@ -223,7 +224,7 @@ public class ApproveRejectReviewItem {
                 log.debug ("Item " + item.getID() + " not found or not in review");
             } else {
                 ClaimedTask claimedTask = claimedTasks.get(0);
-                if (approved) {
+                if (approved) { // approve
                     Workflow workflow = WorkflowFactory.getWorkflow(wfi.getCollection());
                     WorkflowActionConfig actionConfig = workflow.getStep(claimedTask.getStepID()).getActionConfig(claimedTask.getActionID());
 
@@ -231,11 +232,11 @@ public class ApproveRejectReviewItem {
 
                     WorkflowManager.doState(c, c.getCurrentUser(), null, claimedTask.getWorkflowItemID(), workflow, actionConfig);
                     log.debug("Item " + item.getID() + " pushed through");
-                } else {
+                } else { // reject
                     c.turnOffAuthorisationSystem();
-                    WorkspaceItem wsi = WorkflowManager.rejectWorkflowItem(c, wfi, EPerson.find(c, claimedTask.getOwnerID()), null, "The associated manuscript has been rejected by the journal.", true);
+                    String reason = "The journal with which your data submission is associated has notified us that your manuscript is no longer being considered for publication. If you feel this has happened in error, please contact us at help@datadryad.org.";
+                    WorkspaceItem wsi = WorkflowManager.rejectWorkflowItem(c, wfi, EPerson.findByEmail(c, ConfigurationManager.getProperty("system.curator.account")), null, reason, true);
                     c.restoreAuthSystemState();
-                    log.debug("Item " + item.getID() + " was rejected");
                 }
             }
         } catch (SQLException ex) {
