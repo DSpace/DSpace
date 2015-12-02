@@ -623,9 +623,11 @@ public class JournalUtils {
         pBean.setAbstract(manuscript.manuscript_abstract);
         pBean.setCorrespondingAuthor(manuscript.correspondingAuthor.author.givenNames + " " + manuscript.correspondingAuthor.author.familyName);
         pBean.setEmail(manuscript.correspondingAuthor.email);
-        String issn = manuscript.optionalProperties.get("ISSN");
-        if (issn != null) {
-            pBean.setJournalISSN(issn);
+        if (manuscript.optionalProperties != null) {
+            String issn = manuscript.optionalProperties.get("ISSN");
+            if (issn != null) {
+                pBean.setJournalISSN(issn);
+            }
         }
         ArrayList<String> authorstrings = new ArrayList<String>();
         for (Author a : manuscript.authors.author) {
