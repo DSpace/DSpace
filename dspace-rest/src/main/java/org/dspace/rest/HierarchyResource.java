@@ -78,7 +78,7 @@ public class HierarchyResource extends Resource {
 
             Site site = siteService.findSite(context);
             repo.setId(site.getID().toString());
-            repo.setName("Repository");
+            repo.setName(site.getName());
             repo.setHandle(site.getHandle());
     		List<Community> dspaceCommunities = communityService.findAllTop(context);
     		processCommunity(context, repo, dspaceCommunities);
