@@ -287,7 +287,7 @@ public class WorkflowManager {
     public static void deleteAllTasks(Context c, WorkflowItem wi) throws SQLException, AuthorizeException {
         deleteAllPooledTasks(c, wi);
 
-        List<ClaimedTask> allClaimedTasks = ClaimedTask.findByWorkflowId(c,wi.getID());
+        List<ClaimedTask> allClaimedTasks = ClaimedTask.findByWorkflowId(c, wi.getID());
         for(ClaimedTask task: allClaimedTasks){
             deleteClaimedTask(c, wi, task);
         }
@@ -407,10 +407,10 @@ public class WorkflowManager {
     }
 
     private static void addPolicyToItem(Context context, Item item, int type, EPerson epa) throws AuthorizeException, SQLException {
-        AuthorizeManager.addPolicy(context ,item, type, epa);
+        AuthorizeManager.addPolicy(context, item, type, epa);
         Bundle[] bundles = item.getBundles();
         for (Bundle bundle : bundles) {
-            AuthorizeManager.addPolicy(context ,bundle, type, epa);
+            AuthorizeManager.addPolicy(context, bundle, type, epa);
             Bitstream[] bits = bundle.getBitstreams();
             for (Bitstream bit : bits) {
                 AuthorizeManager.addPolicy(context, bit, type, epa);
@@ -487,17 +487,6 @@ public class WorkflowManager {
 
         // Get current date
         String now = DCDate.getCurrent().toString();
-        org.dspace.content.Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, myitem);
-        if(dataFiles!=null){
-            for(Item dataFile:dataFiles) {
-                if(dataFile.getMetadata("internal", "workflow", "submitted", Item.ANY).length == 0){
-                    //A newly (re-)submitted publication
-                    dataFile.addMetadata("internal", "workflow", "submitted", null, Boolean.TRUE.toString());
-                    myitem.update();
-                }
-            }
-
-        }
 
         // Here's what happened
         String provDescription = "";

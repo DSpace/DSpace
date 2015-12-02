@@ -235,7 +235,17 @@ public class ApproveRejectReviewItem {
                 } else { // reject
                     c.turnOffAuthorisationSystem();
                     String reason = "The journal with which your data submission is associated has notified us that your manuscript is no longer being considered for publication. If you feel this has happened in error, please contact us at help@datadryad.org.";
-                    WorkspaceItem wsi = WorkflowManager.rejectWorkflowItem(c, wfi, EPerson.findByEmail(c, ConfigurationManager.getProperty("system.curator.account")), null, reason, true);
+                    EPerson ePerson = EPerson.findByEmail(c, ConfigurationManager.getProperty("system.curator.account"));
+                    //Also reject all the data files
+                    Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, wfi.getItem());
+                    for (Item dataFile : dataFiles) {
+                        try {
+                            WorkflowManager.rejectWorkflowItem(c, WorkflowItem.findByItemId(c, dataFile.getID()), ePerson, null, reason, false);
+                        } catch (Exception e) {
+                            throw new IOException(e);
+                        }
+                    }
+                    WorkspaceItem wsi = WorkflowManager.rejectWorkflowItem(c, wfi, ePerson, null, reason, true);
                     c.restoreAuthSystemState();
                 }
             }
