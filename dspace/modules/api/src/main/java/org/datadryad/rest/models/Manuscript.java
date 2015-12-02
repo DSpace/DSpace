@@ -86,7 +86,6 @@ public class Manuscript {
     @JsonIgnore
     public Organization organization = new Organization();
 
-    @JsonIgnore
     public void setStatus(String newStatus) {
         if (newStatus != null) {
             this.status = newStatus;
@@ -95,7 +94,6 @@ public class Manuscript {
         }
     }
 
-    @JsonIgnore
     public String getStatus() {
         if (isAccepted()) {
             return STATUS_ACCEPTED;
