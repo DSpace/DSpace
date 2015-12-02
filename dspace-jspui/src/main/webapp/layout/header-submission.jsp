@@ -81,11 +81,16 @@
 %>
 
 	<script type='text/javascript' src="<%= request.getContextPath() %>/static/js/jquery/jquery-1.10.2.min.js"></script>
+        <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/jquery-migrate.js"></script>
 	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/jquery/jquery-ui-1.10.3.custom.min.js'></script>
 	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/bootstrap/bootstrap.min.js'></script>
 	<script type='text/javascript' src='<%= request.getContextPath() %>/static/js/holder.js'></script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/utils.js"></script>
     <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/choice-support.js"> </script>
+
+    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/jquery.autocomplete.js"></script>
+    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/jquery.keyboard.js"></script>
+    <script type="text/javascript"> jQuery(function(){jQuery('input.keyboard_layout').keyboardLayout();});</script>
 
     <%--Gooogle Analytics recording.--%>
     <%
