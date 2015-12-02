@@ -37,7 +37,7 @@ public class LegacyManuscript {
         this.Journal_Code = manuscript.organization.organizationCode;
         this.Submission_Metadata.Manuscript = manuscript.manuscriptId;
         this.Submission_Metadata.Article_Title = manuscript.title;
-        this.Article_Status = manuscript.status;
+        this.Article_Status = manuscript.getLiteralStatus();
         for(Author author : manuscript.authors.author) {
             this.Authors.Author.add(author.fullName());
         }
