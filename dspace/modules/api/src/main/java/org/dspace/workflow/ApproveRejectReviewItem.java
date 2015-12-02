@@ -6,6 +6,8 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.MetadataSchema;
+import org.dspace.content.DCDate;
 import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.discovery.SearchService;
@@ -231,7 +233,10 @@ public class ApproveRejectReviewItem {
                     item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "step", "approved", null, approved.toString());
 
                     WorkflowManager.doState(c, c.getCurrentUser(), null, claimedTask.getWorkflowItemID(), workflow, actionConfig);
-                    log.debug("Item " + item.getID() + " pushed through");
+
+                    // Add provenance to item
+                    item.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", "Approved by ApproveRejectReviewItem on " + DCDate.getCurrent().toString() + " (GMT)");
+                    item.update();
                 } else { // reject
                     c.turnOffAuthorisationSystem();
                     String reason = "The journal with which your data submission is associated has notified us that your manuscript is no longer being considered for publication. If you feel this has happened in error, please contact us at help@datadryad.org.";
