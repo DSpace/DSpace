@@ -341,8 +341,8 @@ ALTER TABLE Subscription RENAME COLUMN collection_id to collection_legacy_id;
 ALTER TABLE Subscription ADD COLUMN collection_id UUID REFERENCES Collection(uuid);
 UPDATE Subscription SET collection_id = (SELECT collection.uuid FROM collection WHERE Subscription.collection_legacy_id = collection.collection_id);
 ALTER TABLE Subscription DROP COLUMN collection_legacy_id;
-CREATE INDEX Subscription_person on Susbscription(eperson_id);
-CREATE INDEX Subscription_collection on Susbscription(collection_id);
+CREATE INDEX Subscription_person on Subscription(eperson_id);
+CREATE INDEX Subscription_collection on Subscription(collection_id);
 
 -- Migrate versionitem
 ALTER TABLE versionitem RENAME COLUMN eperson_id to eperson_legacy_id;
@@ -416,7 +416,7 @@ ALTER TABLE workspaceitem ADD COLUMN collection_id UUID REFERENCES Collection(uu
 ALTER TABLE workspaceitem ADD CONSTRAINT workspaceitem_collection_id_fk FOREIGN KEY (collection_id) REFERENCES collection;
 UPDATE workspaceitem SET collection_id = (SELECT collection.uuid FROM collection WHERE workspaceitem.collection_legacy_id = collection.collection_id);
 ALTER TABLE workspaceitem DROP COLUMN collection_legacy_id;
-CREATE INDEX workspaceitem on workspaceitem(collection_id);
+CREATE INDEX workspaceitem_coll on workspaceitem(collection_id);
 
 UPDATE workspaceitem SET multiple_titles = FALSE WHERE multiple_titles IS NULL;
 UPDATE workspaceitem SET published_before = FALSE WHERE published_before IS NULL;
