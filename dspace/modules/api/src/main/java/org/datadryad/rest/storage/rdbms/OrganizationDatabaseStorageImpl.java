@@ -171,7 +171,7 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
             completeContext(context);
             if (searchParam != null) {
                 for (Organization org : allOrgs) {
-                    if (org.organizationCode.equals(searchParam)) {
+                    if (org.organizationCode.equalsIgnoreCase(searchParam)) {
                         organizations.add(org);
                     }
                 }
