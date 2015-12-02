@@ -81,30 +81,7 @@ public class ApproveRejectReviewItem {
         }
     }
 
-    public static void reviewItemDOI(Boolean approved, String dataPackageDOI) throws ApproveRejectReviewItemException {
-        WorkflowItem wfi = null;
-        Context c = null;
-        try {
-            c = new Context();
-            c.turnOffAuthorisationSystem();
-            wfi = WorkflowItem.findByDOI(c, dataPackageDOI);
-            reviewItem(c, approved, wfi);
-        } catch (SQLException ex) {
-            throw new ApproveRejectReviewItemException(ex);
-        } finally {
-            if(c != null) {
-                try {
-                    c.complete();
-                } catch (SQLException ex) {
-                    // Swallow it
-                } finally {
-                    c = null;
-                }
-            }
-        }
-    }
-
-    public static void reviewItem(Boolean approved, String manuscriptNumber) throws ApproveRejectReviewItemException  {
+    private static void reviewItem(Boolean approved, String manuscriptNumber) throws ApproveRejectReviewItemException  {
         WorkflowItem wfi = null;
         ArrayList workflowItems = new ArrayList<WorkflowItem>();
         Context c = null;
@@ -143,7 +120,7 @@ public class ApproveRejectReviewItem {
         }
     }
 
-    public static void reviewItem(Boolean approved, Integer workflowItemId) throws ApproveRejectReviewItemException {
+    private static void reviewItem(Boolean approved, Integer workflowItemId) throws ApproveRejectReviewItemException {
         Context c = null;
         try {
             c = new Context();
@@ -200,7 +177,6 @@ public class ApproveRejectReviewItem {
             }
 
             workflowItems.addAll(WorkflowItem.findAllByManuscript(c, manuscript));
-    //        LOGGER.debug("found " + workflowItems.size() + " items that match");
             ApproveRejectReviewItem.reviewItems(c, approved, workflowItems);
         } catch (SQLException ex) {
             throw new ApproveRejectReviewItemException(ex);
