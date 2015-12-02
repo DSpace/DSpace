@@ -556,9 +556,7 @@ public class JournalUtils {
 
     public static void writeManuscriptToDB(Context context, Manuscript manuscript) throws StorageException {
         String journalCode = cleanJournalCode(manuscript.organization.organizationCode).toUpperCase();
-        StoragePath storagePath = new StoragePath();
-        storagePath.addPathElement(Organization.ORGANIZATION_CODE, journalCode);
-        storagePath.addPathElement(Manuscript.MANUSCRIPT_ID, manuscript.manuscriptId);
+        StoragePath storagePath = StoragePath.createManuscriptPath(journalCode, manuscript.manuscriptId);
 
         createOrganizationinDB(context,manuscript.organization);
 
@@ -583,9 +581,7 @@ public class JournalUtils {
     public static void createOrganizationinDB(Context context, Organization organization) throws StorageException {
         // normalize with all caps for the code:
         organization.organizationCode = cleanJournalCode(organization.organizationCode).toUpperCase();
-
-        StoragePath storagePath = new StoragePath();
-        storagePath.addPathElement(Organization.ORGANIZATION_CODE, organization.organizationCode);
+        StoragePath storagePath = StoragePath.createOrganizationPath(organization.organizationCode);
 
         // check to see if this organization exists in the database: if not, add it.
         OrganizationDatabaseStorageImpl organizationStorage = new OrganizationDatabaseStorageImpl();
@@ -603,15 +599,13 @@ public class JournalUtils {
     public static List<Manuscript> getManuscriptsMatchingID(String journalCode, String manuscriptId) {
         journalCode = cleanJournalCode(journalCode);
         ArrayList<Manuscript> manuscripts = new ArrayList<Manuscript>();
-        StoragePath storagePath = new StoragePath();
-        storagePath.addPathElement(Organization.ORGANIZATION_CODE, journalCode);
+        StoragePath storagePath = StoragePath.createManuscriptPath(journalCode, manuscriptId);
 
         try {
             OrganizationDatabaseStorageImpl organizationStorage = new OrganizationDatabaseStorageImpl();
             List<Organization> orgs = organizationStorage.getResults(storagePath, journalCode, 0);
             if (orgs.size() > 0) {
                 ManuscriptDatabaseStorageImpl manuscriptStorage = new ManuscriptDatabaseStorageImpl();
-                storagePath.addPathElement(Manuscript.MANUSCRIPT_ID, manuscriptId);
                 manuscripts.addAll(manuscriptStorage.getResults(storagePath, manuscriptId, 10));
             }
         } catch (StorageException e) {

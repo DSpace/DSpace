@@ -120,8 +120,7 @@ public class OrganizationDatabaseStorageImplTest extends ContextUnitTest {
     @Test
     public void testCreateObject() throws Exception {
         log.info("createObject");
-        StoragePath path = new StoragePath();
-        path.addPathElement("organizationCode", TEST_ORGANIZATION_CODE_2);
+        StoragePath path = StoragePath.createOrganizationPath(TEST_ORGANIZATION_CODE_2);
         OrganizationDatabaseStorageImpl instance = new OrganizationDatabaseStorageImpl();
         Organization organization = instance.readObject(path);
         assertNull("Object must not exist before creating", organization);
@@ -138,8 +137,7 @@ public class OrganizationDatabaseStorageImplTest extends ContextUnitTest {
     public void testUpdateObject() throws Exception {
         log.info("updateObject");
         OrganizationDatabaseStorageImpl instance = new OrganizationDatabaseStorageImpl();
-        StoragePath path = new StoragePath();
-        path.addPathElement("organizationCode", TEST_ORGANIZATION_CODE_1);
+        StoragePath path = StoragePath.createOrganizationPath(TEST_ORGANIZATION_CODE_1);
         Organization organization = instance.readObject(path);
         assertNotNull("Object must exist before updating", organization);
         organization.organizationName = TEST_ORGANIZATION_NAME_2;
@@ -156,8 +154,7 @@ public class OrganizationDatabaseStorageImplTest extends ContextUnitTest {
     public void testReadObject() throws Exception {
         log.info("readObject");
         // Read object requires full storage path
-        StoragePath path = new StoragePath();
-        path.addPathElement("organizationCode", TEST_ORGANIZATION_CODE_1);
+        StoragePath path = StoragePath.createOrganizationPath(TEST_ORGANIZATION_CODE_1);
         OrganizationDatabaseStorageImpl instance = new OrganizationDatabaseStorageImpl();
         String expectedName = TEST_ORGANIZATION_NAME_1;
         Organization result = instance.readObject(path);
@@ -172,8 +169,7 @@ public class OrganizationDatabaseStorageImplTest extends ContextUnitTest {
     public void testDeleteObject() throws Exception {
         log.info("deleteObject");
         // Delete object requires full storage path
-        StoragePath path = new StoragePath();
-        path.addPathElement("organizationCode", TEST_ORGANIZATION_CODE_1);
+        StoragePath path = StoragePath.createOrganizationPath(TEST_ORGANIZATION_CODE_1);
         OrganizationDatabaseStorageImpl instance = new OrganizationDatabaseStorageImpl();
         instance.deleteObject(path);
         Organization dummyOrganization = new Organization();

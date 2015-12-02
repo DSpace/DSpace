@@ -34,7 +34,7 @@ public class ManuscriptJSONStorageImpl extends AbstractManuscriptStorage {
 
     private File getSubdirectory(StoragePath path) {
         if(path.size() >= 1) {
-            String organizationCodeDirectory = path.get(0).value;
+            String organizationCodeDirectory = path.getOrganizationCode();
             File directory = new File(this.storageDirectory, organizationCodeDirectory);
             return directory;
         } else {
@@ -44,7 +44,7 @@ public class ManuscriptJSONStorageImpl extends AbstractManuscriptStorage {
 
     private String getBaseFileName(StoragePath path) {
         if(path.size() >= 2) {
-            String manuscriptId = path.get(1).value;
+            String manuscriptId = path.getManuscriptId();
             return manuscriptId;
         } else {
             return null;
