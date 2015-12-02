@@ -7,6 +7,7 @@
  */
 package org.dspace.content;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "workspaceitem")
-public class WorkspaceItem implements InProgressSubmission
+public class WorkspaceItem implements InProgressSubmission, Serializable
 {
 
     @Id
@@ -67,7 +68,7 @@ public class WorkspaceItem implements InProgressSubmission
             joinColumns = {@JoinColumn(name = "workspace_item_id") },
             inverseJoinColumns = {@JoinColumn(name = "eperson_group_id") }
     )
-    private List<Group> supervisorGroups = new ArrayList<>();
+    private final List<Group> supervisorGroups = new ArrayList<>();
 
 
     /**
@@ -131,6 +132,7 @@ public class WorkspaceItem implements InProgressSubmission
      * @param o The other workspace item to compare to
      * @return If they are equal or not
      */
+    @Override
     public boolean equals(Object o) {
         if (this == o)
         {
@@ -150,6 +152,7 @@ public class WorkspaceItem implements InProgressSubmission
         return true;
     }
 
+    @Override
     public int hashCode()
     {
         return new HashCodeBuilder().append(getID()).toHashCode();

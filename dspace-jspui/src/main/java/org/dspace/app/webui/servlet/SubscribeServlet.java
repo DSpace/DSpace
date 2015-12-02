@@ -36,17 +36,13 @@ import org.dspace.eperson.service.SubscribeService;
  */
 public class SubscribeServlet extends DSpaceServlet
 {
-	private SubscribeService subscribeService;
-	
-	private CollectionService collectionService;
-	
-	@Override
-	public void init() throws ServletException {
-		super.init();
-		subscribeService = EPersonServiceFactory.getInstance().getSubscribeService();
-		collectionService = ContentServiceFactory.getInstance().getCollectionService();
-	}
-	
+	private final transient SubscribeService subscribeService
+            = EPersonServiceFactory.getInstance().getSubscribeService();
+
+	private final transient CollectionService collectionService
+            = ContentServiceFactory.getInstance().getCollectionService();
+
+    @Override
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -55,6 +51,7 @@ public class SubscribeServlet extends DSpaceServlet
         showSubscriptions(context, request, response, false);
     }
 
+    @Override
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -144,7 +141,7 @@ public class SubscribeServlet extends DSpaceServlet
 
         request.setAttribute("availableSubscriptions", avail);
         request.setAttribute("subscriptions", subs);
-        request.setAttribute("updated", Boolean.valueOf(updated));
+        request.setAttribute("updated", updated);
 
         JSPManager.showJSP(request, response, "/mydspace/subscriptions.jsp");
     }

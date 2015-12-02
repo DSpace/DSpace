@@ -77,47 +77,43 @@ public class EditCommunitiesServlet extends DSpaceServlet
     /** User wants to create a collection */
     public static final int START_CREATE_COLLECTION = 6;
 
-    /** User commited community edit or creation */
+    /** User committed community edit or creation */
     public static final int CONFIRM_EDIT_COMMUNITY = 7;
 
     /** User confirmed community deletion */
     public static final int CONFIRM_DELETE_COMMUNITY = 8;
 
-    /** User commited collection edit or creation */
+    /** User committed collection edit or creation */
     public static final int CONFIRM_EDIT_COLLECTION = 9;
 
     /** User wants to delete a collection */
     public static final int CONFIRM_DELETE_COLLECTION = 10;
 
     /** Logger */
-    private static Logger log = Logger.getLogger(EditCommunitiesServlet.class);
+    private static final Logger log = Logger.getLogger(EditCommunitiesServlet.class);
 
-    private CommunityService communityService;
+    private final transient CommunityService communityService
+             = ContentServiceFactory.getInstance().getCommunityService();
     
-    private static CollectionService collectionService;
+    private static final transient CollectionService collectionService
+             = ContentServiceFactory.getInstance().getCollectionService();
     
-    private BitstreamFormatService bitstreamFormatService;
+    private final transient BitstreamFormatService bitstreamFormatService
+             = ContentServiceFactory.getInstance().getBitstreamFormatService();
     
-    private BitstreamService bitstreamService;
+    private final transient BitstreamService bitstreamService
+             = ContentServiceFactory.getInstance().getBitstreamService();
     
-    private HarvestedCollectionService harvestedCollectionService;
+    private final transient HarvestedCollectionService harvestedCollectionService
+             = HarvestServiceFactory.getInstance().getHarvestedCollectionService();
 
-    private static AuthorizeService authorizeService; 
+    private static final transient AuthorizeService myAuthorizeService
+            = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     
-    private GroupService groupService;
+    private final transient GroupService groupService
+             = EPersonServiceFactory.getInstance().getGroupService();
     
     @Override
-    public void init() throws ServletException {
-    	super.init();
-    	communityService = ContentServiceFactory.getInstance().getCommunityService();
-    	collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    	bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
-    	bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
-    	harvestedCollectionService = HarvestServiceFactory.getInstance().getHarvestedCollectionService();
-    	authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
-    	groupService = EPersonServiceFactory.getInstance().getGroupService();
-    }
-    
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -126,6 +122,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
         showControls(context, request, response);
     }
 
+    @Override
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -333,7 +330,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             request.setAttribute("admin_remove_button", Boolean.FALSE);
         }
         
-        if (authorizeService.authorizeActionBoolean(context, community, Constants.DELETE))
+        if (myAuthorizeService.authorizeActionBoolean(context, community, Constants.DELETE))
         {
             request.setAttribute("delete_button", Boolean.TRUE);
         }
@@ -350,7 +347,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
         catch (AuthorizeException authex) {
             request.setAttribute("policy_button", Boolean.FALSE);
         }
-        if (authorizeService.isAdmin(context, community))
+        if (myAuthorizeService.isAdmin(context, community))
         {
             request.setAttribute("admin_community", Boolean.TRUE);
         }
@@ -373,7 +370,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
     static void storeAuthorizeAttributeCollectionEdit(Context context,
             HttpServletRequest request, Collection collection) throws SQLException
     {
-        if (authorizeService.isAdmin(context, collection))
+        if (myAuthorizeService.isAdmin(context, collection))
         {
             request.setAttribute("admin_collection", Boolean.TRUE);
         }
@@ -427,7 +424,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             request.setAttribute("template_button", Boolean.FALSE);
         }
         
-        if (authorizeService.authorizeActionBoolean(context, collectionService.getParentObject(context, collection), Constants.REMOVE))
+        if (myAuthorizeService.authorizeActionBoolean(context, collectionService.getParentObject(context, collection), Constants.REMOVE))
         {
             request.setAttribute("delete_button", Boolean.TRUE);
         }
@@ -993,7 +990,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             // Identify the format
             BitstreamFormat bf = bitstreamFormatService.guessFormat(context, logoBS);
             logoBS.setFormat(context, bf);
-            authorizeService.addPolicy(context, logoBS, Constants.WRITE, context.getCurrentUser());
+            myAuthorizeService.addPolicy(context, logoBS, Constants.WRITE, context.getCurrentUser());
             bitstreamService.update(context, logoBS);
 
             String jsp;
@@ -1020,7 +1017,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
                 jsp = "/tools/edit-collection.jsp";
             }
             
-            if (authorizeService.isAdmin(context, dso))
+            if (myAuthorizeService.isAdmin(context, dso))
             {
                 // set a variable to show all buttons
                 request.setAttribute("admin_button", Boolean.TRUE);

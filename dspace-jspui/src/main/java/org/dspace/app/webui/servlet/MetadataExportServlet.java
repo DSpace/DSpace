@@ -43,18 +43,13 @@ import org.dspace.handle.service.HandleService;
 public class MetadataExportServlet extends DSpaceServlet
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(MetadataExportServlet.class);
-    
-    private HandleService handleService;
-    
-    private ItemService itemService;
-    
-    @Override
-    public void init() throws ServletException {
-    	super.init();
-    	handleService = HandleServiceFactory.getInstance().getHandleService();
-    	itemService = ContentServiceFactory.getInstance().getItemService();
-    }
+    private static final Logger log = Logger.getLogger(MetadataExportServlet.class);
+
+    private final transient HandleService handleService
+             = HandleServiceFactory.getInstance().getHandleService();
+
+    private final transient ItemService itemService
+             = ContentServiceFactory.getInstance().getItemService();
 
     /**
      * Respond to a post request
@@ -68,6 +63,7 @@ public class MetadataExportServlet extends DSpaceServlet
      * @throws SQLException
      * @throws AuthorizeException
      */
+    @Override
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -83,7 +79,7 @@ public class MetadataExportServlet extends DSpaceServlet
             {
                 if (thing.getType() == Constants.ITEM)
                 {
-                    List<Item> item = new ArrayList<Item>();
+                    List<Item> item = new ArrayList<>();
                     item.add((Item) thing);
                     exporter = new MetadataExport(context, item.iterator(), false);
                 }

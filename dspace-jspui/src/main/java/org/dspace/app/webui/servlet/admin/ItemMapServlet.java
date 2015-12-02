@@ -46,20 +46,19 @@ import org.dspace.core.PluginManager;
  */
 public class ItemMapServlet extends DSpaceServlet
 {
-    private SearchRequestProcessor internalLogic;
+    private transient SearchRequestProcessor internalLogic;
 
-    private CollectionService collectionService;
+    private final transient CollectionService collectionService
+             = ContentServiceFactory.getInstance().getCollectionService();
     
-    private ItemService itemService;
-    
+    private final transient ItemService itemService
+             = ContentServiceFactory.getInstance().getItemService();
+
     /** Logger */
-    private static Logger log = Logger.getLogger(ItemMapServlet.class);
+    private static final Logger log = Logger.getLogger(ItemMapServlet.class);
 
-    public void init() throws ServletException
+    public ItemMapServlet()
     {
-        super.init();
-        collectionService = ContentServiceFactory.getInstance().getCollectionService();
-        itemService = ContentServiceFactory.getInstance().getItemService();
     	try
         {
             internalLogic = (SearchRequestProcessor) PluginManager
@@ -68,7 +67,7 @@ public class ItemMapServlet extends DSpaceServlet
         catch (PluginConfigurationError e)
         {
             log.warn(
-                    "ItemMapServlet not properly configurated, please configure the SearchRequestProcessor plugin",
+                    "ItemMapServlet not properly configured -- please configure the SearchRequestProcessor plugin",
                     e);
         }
         if (internalLogic == null)
@@ -77,6 +76,7 @@ public class ItemMapServlet extends DSpaceServlet
         }
     }
 
+    @Override
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws java.sql.SQLException,
             javax.servlet.ServletException, java.io.IOException,
@@ -85,6 +85,7 @@ public class ItemMapServlet extends DSpaceServlet
         doDSPost(context, request, response);
     }
 
+    @Override
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws java.sql.SQLException,
             javax.servlet.ServletException, java.io.IOException,
@@ -125,9 +126,9 @@ public class ItemMapServlet extends DSpaceServlet
     		// also holds for interruption by pressing 'Cancel'
     		int count_native = 0; // # of items owned by this collection
     		int count_import = 0; // # of virtual items
-    		Map<UUID, Item> myItems = new HashMap<UUID, Item>(); // # for the browser
-    		Map<UUID, Collection> myCollections = new HashMap<UUID, Collection>(); // collections for list
-    		Map<UUID, Integer> myCounts = new HashMap<UUID, Integer>(); // counts for each collection
+    		Map<UUID, Item> myItems = new HashMap<>(); // # for the browser
+    		Map<UUID, Collection> myCollections = new HashMap<>(); // collections for list
+    		Map<UUID, Integer> myCounts = new HashMap<>(); // counts for each collection
     		
     		// get all items from that collection, add them to a hash
     		Iterator<Item> i = itemService.findAllByCollection(context, myCollection);
@@ -157,16 +158,16 @@ public class ItemMapServlet extends DSpaceServlet
                 if (myCollections.containsKey(cKey))
                 {
                     Integer x = myCounts.get(cKey);
-                    int myCount = x.intValue() + 1;
+                    int myCount = x + 1;
 
                     // increment count for that collection
-                    myCounts.put(cKey, Integer.valueOf(myCount));
+                    myCounts.put(cKey, myCount);
                 }
                 else
                 {
                     // store and initialize count
                     myCollections.put(cKey, owningCollection);
-                    myCounts.put(cKey, Integer.valueOf(1));
+                    myCounts.put(cKey, 1);
                 }
 
                 // store the item
@@ -180,8 +181,8 @@ public class ItemMapServlet extends DSpaceServlet
     		// sort items - later
     		// show page
     		request.setAttribute("collection", myCollection);
-    		request.setAttribute("count_native", Integer.valueOf(count_native));
-    		request.setAttribute("count_import", Integer.valueOf(count_import));
+    		request.setAttribute("count_native", count_native);
+    		request.setAttribute("count_import", count_import);
     		request.setAttribute("items", myItems);
     		request.setAttribute("collections", myCollections);
     		request.setAttribute("collection_counts", myCounts);
@@ -203,7 +204,7 @@ public class ItemMapServlet extends DSpaceServlet
     		// get item IDs to remove
     		List<UUID> itemIDs = Util.getUUIDParameters(request, "item_ids");
     		String message = "remove";
-    		LinkedList<UUID> removedItems = new LinkedList<UUID>();
+    		LinkedList<UUID> removedItems = new LinkedList<>();
     		
                 if (itemIDs == null)
                 {
@@ -250,7 +251,7 @@ public class ItemMapServlet extends DSpaceServlet
     		// get item IDs to add
     		List<UUID> itemIDs = Util.getUUIDParameters(request, "item_ids");
     		String message = "added";
-    		LinkedList<UUID> addedItems = new LinkedList<UUID>();
+    		LinkedList<UUID> addedItems = new LinkedList<>();
     		
     		
     		if (itemIDs == null)
@@ -317,7 +318,7 @@ public class ItemMapServlet extends DSpaceServlet
     		
     		// now find all imported items from that collection
     		// seemingly inefficient, but database should have this query cached
-            Map<UUID, Item> items = new HashMap<UUID, Item>();
+            Map<UUID, Item> items = new HashMap<>();
     		Iterator<Item> i = itemService.findAllByCollection(context, myCollection);
             while (i.hasNext())
             {

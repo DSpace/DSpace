@@ -61,22 +61,19 @@ public class DSpaceServlet extends HttpServlet
      */
 
     /** log4j category */
-    private static Logger log = Logger.getLogger(DSpaceServlet.class);
+    private static final Logger log = Logger.getLogger(DSpaceServlet.class);
 
-    protected AuthorizeService authorizeService;
+    protected transient AuthorizeService authorizeService
+             = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
     @Override
-    public void init() throws ServletException {
-    	super.init();
-        authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
-    }
-    
     protected void doGet(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException
     {
         processRequest(request, response);
     }
 
+    @Override
     protected void doPost(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException
     {

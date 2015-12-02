@@ -42,7 +42,7 @@ public class SelectGroupTag extends TagSupport
 	private boolean multiple;
 	
 	/** Which groups are initially in the list? */
-	private transient Group[] groups;
+	private Group[] groups;
 
     private static final long serialVersionUID = -3330389128849427302L; 
 
@@ -89,6 +89,7 @@ public class SelectGroupTag extends TagSupport
 	}
 
 	
+    @Override
 	public void release()
 	{
 		multiple = false;
@@ -96,6 +97,7 @@ public class SelectGroupTag extends TagSupport
 	}
 
 
+    @Override
 	public int doStartTag()
 		throws JspException
 	{
