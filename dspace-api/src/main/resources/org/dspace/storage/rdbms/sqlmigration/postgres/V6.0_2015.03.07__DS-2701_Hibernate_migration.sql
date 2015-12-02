@@ -214,8 +214,8 @@ ALTER TABLE item2bundle DROP COLUMN bundle_legacy_id;
 ALTER TABLE item2bundle DROP COLUMN item_legacy_id;
 ALTER TABLE item2bundle DROP COLUMN id;
 ALTER TABLE item2bundle add primary key (bundle_id,item_id);
-CREATE TABLE item2bundle_bundle on item2bundle(bundle_id);
-CREATE TABLE item2bundle_item on item2bundle(item_id);
+CREATE INDEX item2bundle_bundle on item2bundle(bundle_id);
+CREATE INDEX item2bundle_item on item2bundle(item_id);
 
 --Migrate Bundle2Bitsteam
 ALTER TABLE bundle2bitstream RENAME COLUMN bundle_id to bundle_legacy_id;
