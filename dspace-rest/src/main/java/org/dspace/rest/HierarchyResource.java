@@ -65,7 +65,7 @@ public class HierarchyResource extends Resource {
     @Produces({MediaType.APPLICATION_XML})
     public HierarchyRepository getHierarchy(
     		@QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
-    		@Context HttpHeaders headers, @Context HttpServletRequest request) throws UnsupportedEncodingException {
+    		@Context HttpHeaders headers, @Context HttpServletRequest request) throws UnsupportedEncodingException, WebApplicationException {
 		
 		org.dspace.core.Context context = null;
 		HierarchyRepository repo = new HierarchyRepository();
@@ -82,12 +82,8 @@ public class HierarchyResource extends Resource {
             repo.setHandle(site.getHandle());
     		List<Community> dspaceCommunities = communityService.findAllTop(context);
     		processCommunity(context, repo, dspaceCommunities);
-
-    		return repo;
-        } catch (Exception e) {
-        	e.printStackTrace();
-            log.error(e.getMessage());
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+         } catch (Exception e) {
+        	processException(e.getMessage(), context);
 		} finally {
             if(context != null) {
                 try {
@@ -97,7 +93,8 @@ public class HierarchyResource extends Resource {
                 }
             }
         }
-    }
+   		return repo;
+   }
     
 	
 	private void processCommunity(org.dspace.core.Context context, HierarchyCommunity parent, List<Community> communities) throws SQLException {
