@@ -4,6 +4,8 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.datadryad.rest.models.Manuscript;
+import org.datadryad.rest.models.Author;
+import org.datadryad.rest.models.AuthorsList;
 import org.dspace.JournalUtils;
 import org.dspace.content.authority.Concept;
 import org.dspace.core.ConfigurationManager;
@@ -12,6 +14,12 @@ import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.workflow.ApproveRejectReviewItem;
 import org.dspace.workflow.ApproveRejectReviewItemException;
+import org.dspace.servicemanager.DSpaceKernelImpl;
+import org.dspace.servicemanager.DSpaceKernelInit;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.content.Item;
+import org.dspace.content.ItemIterator;
+import org.dspace.content.DCValue;
 
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
@@ -25,8 +33,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.lang.Runtime;
+import java.lang.RuntimeException;
+import java.lang.reflect.Array;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -142,7 +153,6 @@ public class DryadEmailSubmission extends HttpServlet {
                     } catch (Exception details) {
                         DryadGmailService.addErrorLabelForMessageWithId(mID);
                         LOGGER.info("Exception thrown while processing message " + mID + ": " + details.getMessage() + ", " + details.getClass().getName() + details.getStackTrace().toString());
-//                        throw new RuntimeException(details);
                     }
                     DryadGmailService.removeJournalLabelForMessageWithId(mID);
                 }
@@ -374,6 +384,7 @@ public class DryadEmailSubmission extends HttpServlet {
             }
 
             // at this point, concept is not null.
+            journalName = concept.getFullName(context);
             try {
                 parser = getEmailParser(JournalUtils.getParsingScheme(concept));
                 parser.parseMessage(dryadContent);
@@ -386,10 +397,57 @@ public class DryadEmailSubmission extends HttpServlet {
             if ((manuscript != null) && (manuscript.isValid())) {
                 // edit the manuscript ID to the canonical one:
                 manuscript.manuscriptId = JournalUtils.getCanonicalManuscriptID(context, manuscript);
+                JournalUtils.writeManuscriptToDB(context, manuscript);
+                LOGGER.debug ("this ms has status " + manuscript.getStatus());
+                Boolean approved = null;
 
-                //JournalUtils.writeManuscriptToDB(context, manuscript);
+                if (manuscript.isAccepted()) {
+                    approved = true;
+                } else if (manuscript.isRejected()) {
+                    approved = false;
+                } else if (manuscript.isNeedsRevision()) {
+                    approved = false;
+                } else if (manuscript.isPublished()) {
+                    approved = true;
+                }
 
-                JournalUtils.writeManuscriptToXMLFile(context, manuscript);
+                if (approved != null) {
+                    DSpaceKernelImpl kernelImpl = null;
+                    try {
+                        kernelImpl = DSpaceKernelInit.getKernel(null);
+                        if (!kernelImpl.isRunning())
+                        {
+                            kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
+                        }
+                    } catch (Exception ex) {
+                        // Failed to start so destroy it and log and throw an exception
+                        try {
+                            if(kernelImpl != null) {
+                                kernelImpl.destroy();
+                            }
+                        } catch (Exception e1) {
+                            // Nothing to do
+                        }
+                        LOGGER.error("Error Initializing DSpace kernel in ManuscriptReviewStatusChangeHandler", ex);
+                    }
+
+                    ArrayList<WorkflowItem> workflowItems = new ArrayList<WorkflowItem>();
+
+                    if (manuscript.dryadDataDOI != null) {
+                        try {
+                            WorkflowItem wfi = WorkflowItem.findByDOI(context, manuscript.dryadDataDOI);
+                            if (wfi != null) {
+                                workflowItems.add(wfi);
+                            }
+                        } catch (ApproveRejectReviewItemException e) {
+                            LOGGER.debug ("no workflow items matched DOI " + manuscript.dryadDataDOI);
+                        }
+                    }
+
+                    workflowItems.addAll(WorkflowItem.findAllByManuscript(context, manuscript));
+                    LOGGER.debug("found " + workflowItems.size() + " items that match");
+                    ApproveRejectReviewItem.reviewItems(context, approved, workflowItems);
+                }
             } else {
                 throw new SubmissionException("Parser could not validly parse the message");
             }

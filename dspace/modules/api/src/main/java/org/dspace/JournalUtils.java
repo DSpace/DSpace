@@ -1,6 +1,7 @@
 package org.dspace;
 
 import org.apache.log4j.Logger;
+import org.apache.commons.lang.StringUtils;
 import org.datadryad.rest.converters.ManuscriptToLegacyXMLConverter;
 import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.models.Author;
@@ -25,6 +26,7 @@ import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.lang.Math;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -553,10 +555,10 @@ public class JournalUtils {
     }
 
     public static void writeManuscriptToDB(Context context, Manuscript manuscript) throws StorageException {
-        String journalCode = cleanJournalCode(manuscript.organization.organizationCode);
-        StoragePath storagePath = new StoragePath();
-        storagePath.addPathElement(Organization.ORGANIZATION_CODE, journalCode);
-        storagePath.addPathElement(Manuscript.MANUSCRIPT_ID, manuscript.manuscriptId);
+        String journalCode = cleanJournalCode(manuscript.organization.organizationCode).toUpperCase();
+        StoragePath storagePath = StoragePath.createManuscriptPath(journalCode, manuscript.manuscriptId);
+
+        createOrganizationinDB(context,manuscript.organization);
 
         ManuscriptDatabaseStorageImpl manuscriptStorage = new ManuscriptDatabaseStorageImpl();
         List<Manuscript> manuscripts = getManuscriptsMatchingID(journalCode, manuscript.manuscriptId);
@@ -578,10 +580,8 @@ public class JournalUtils {
 
     public static void createOrganizationinDB(Context context, Organization organization) throws StorageException {
         // normalize with all caps for the code:
-        organization.organizationCode = cleanJournalCode(organization.organizationCode);
-
-        StoragePath storagePath = new StoragePath();
-        storagePath.addPathElement(Organization.ORGANIZATION_CODE, organization.organizationCode);
+        organization.organizationCode = cleanJournalCode(organization.organizationCode).toUpperCase();
+        StoragePath storagePath = StoragePath.createOrganizationPath(organization.organizationCode);
 
         // check to see if this organization exists in the database: if not, add it.
         OrganizationDatabaseStorageImpl organizationStorage = new OrganizationDatabaseStorageImpl();
@@ -599,15 +599,13 @@ public class JournalUtils {
     public static List<Manuscript> getManuscriptsMatchingID(String journalCode, String manuscriptId) {
         journalCode = cleanJournalCode(journalCode);
         ArrayList<Manuscript> manuscripts = new ArrayList<Manuscript>();
-        StoragePath storagePath = new StoragePath();
-        storagePath.addPathElement(Organization.ORGANIZATION_CODE, journalCode);
+        StoragePath storagePath = StoragePath.createManuscriptPath(journalCode, manuscriptId);
 
         try {
             OrganizationDatabaseStorageImpl organizationStorage = new OrganizationDatabaseStorageImpl();
             List<Organization> orgs = organizationStorage.getResults(storagePath, journalCode, 0);
             if (orgs.size() > 0) {
                 ManuscriptDatabaseStorageImpl manuscriptStorage = new ManuscriptDatabaseStorageImpl();
-                storagePath.addPathElement(Manuscript.MANUSCRIPT_ID, manuscriptId);
                 manuscripts.addAll(manuscriptStorage.getResults(storagePath, manuscriptId, 10));
             }
         } catch (StorageException e) {
@@ -625,9 +623,11 @@ public class JournalUtils {
         pBean.setAbstract(manuscript.manuscript_abstract);
         pBean.setCorrespondingAuthor(manuscript.correspondingAuthor.author.givenNames + " " + manuscript.correspondingAuthor.author.familyName);
         pBean.setEmail(manuscript.correspondingAuthor.email);
-        String issn = manuscript.optionalProperties.get("ISSN");
-        if (issn != null) {
-            pBean.setJournalISSN(issn);
+        if (manuscript.optionalProperties != null) {
+            String issn = manuscript.optionalProperties.get("ISSN");
+            if (issn != null) {
+                pBean.setJournalISSN(issn);
+            }
         }
         ArrayList<String> authorstrings = new ArrayList<String>();
         for (Author a : manuscript.authors.author) {
@@ -684,5 +684,14 @@ public class JournalUtils {
 
     public static String cleanJournalCode(String journalCode) {
         return journalCode.replaceAll("[^a-zA-Z0-9]", "").toUpperCase();
+    }
+
+    // getHamrScore compares two author names to each other.
+    // In practice, it seems that a score of 0.7 or higher generally indicates a good match.
+    public static double getHamrScore(String name1, String name2) {
+        int maxlen = Math.max(name1.length(), name2.length());
+        int editlen = StringUtils.getLevenshteinDistance(name1, name2);
+
+        return (double)(maxlen-editlen)/(double)maxlen;
     }
 }

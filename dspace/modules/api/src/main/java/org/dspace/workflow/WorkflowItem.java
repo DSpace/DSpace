@@ -1,18 +1,26 @@
 package org.dspace.workflow;
 
 import org.apache.log4j.Logger;
+import org.datadryad.rest.models.Author;
+import org.datadryad.rest.models.Manuscript;
+import org.dspace.JournalUtils;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Collection;
-import org.dspace.content.InProgressSubmission;
-import org.dspace.content.Item;
+import org.dspace.content.*;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.identifier.IdentifierNotFoundException;
+import org.dspace.identifier.IdentifierNotResolvableException;
+import org.dspace.identifier.IdentifierService;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.utils.DSpace;
 
 import java.io.IOException;
+import java.lang.Boolean;
+import java.lang.RuntimeException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -174,6 +182,28 @@ public class WorkflowItem implements InProgressSubmission {
         return wfArray;
     }
 
+    public static WorkflowItem[] findAllByJournalName(Context c, String journalName) throws SQLException, AuthorizeException, IOException {
+        List<WorkflowItem> wfItems = new ArrayList<WorkflowItem>();
+
+        TableRowIterator tri = DatabaseManager.queryTable(c, "workflowitem",
+                "SELECT workflowitem.* FROM workflowitem, metadatavalue, metadatafieldregistry WHERE workflowitem.item_id=metadatavalue.item_id" +
+                        " AND metadatafieldregistry.element='publicationName' AND metadatafieldregistry.metadata_field_id=metadatavalue.metadata_field_id AND metadatavalue.text_value = ?", journalName);
+
+        // make a list of workflow items
+        while (tri.hasNext())
+        {
+            TableRow row = tri.next();
+            WorkflowItem wi = new WorkflowItem(c, row);
+            wfItems.add(wi);
+        }
+
+        tri.close();
+
+        WorkflowItem[] wfArray = new WorkflowItem[wfItems.size()];
+        wfArray = (WorkflowItem[]) wfItems.toArray(wfArray);
+
+        return wfArray;
+    }
 
     public static WorkflowItem findByItemId(Context context, int itemId) throws SQLException, AuthorizeException, IOException {
         TableRow row = DatabaseManager.querySingleTable(context, "workflowitem", "SELECT * FROM workflowitem WHERE item_id= ?", itemId);
@@ -201,6 +231,93 @@ public class WorkflowItem implements InProgressSubmission {
 
     }
 
+    public static WorkflowItem findByDOI(Context c, String dataPackageDOI) throws ApproveRejectReviewItemException {
+        WorkflowItem wfi = null;
+        c.turnOffAuthorisationSystem();
+        IdentifierService identifierService = getIdentifierService();
+        DSpaceObject object = null;
+        try {
+            object = identifierService.resolve(c, dataPackageDOI);
+            if (object == null) {
+                throw new ApproveRejectReviewItemException("DOI " + dataPackageDOI + " resolved to null item");
+            }
+            if (object.getType() != Constants.ITEM) {
+                throw new ApproveRejectReviewItemException("DOI " + dataPackageDOI + " resolved to a non item DSpace Object");
+            }
+            wfi = WorkflowItem.findByItemId(c, object.getID());
+        } catch (IdentifierNotFoundException ex) {
+            throw new ApproveRejectReviewItemException(ex);
+        } catch (IdentifierNotResolvableException ex) {
+            throw new ApproveRejectReviewItemException(ex);
+        } catch (SQLException ex) {
+            throw new ApproveRejectReviewItemException(ex);
+        } catch (AuthorizeException ex) {
+            throw new ApproveRejectReviewItemException(ex);
+        } catch (IOException ex) {
+            throw new ApproveRejectReviewItemException(ex);
+        }
+        c.restoreAuthSystemState();
+        return wfi;
+    }
+
+    public static List<WorkflowItem> findAllByManuscript(Context context, Manuscript manuscript) throws ApproveRejectReviewItemException {
+        String journalName = manuscript.organization.organizationName;
+        WorkflowItem[] workflowItems = null;
+        ArrayList<WorkflowItem> matchingItems = new ArrayList<WorkflowItem>();
+
+        try {
+            workflowItems = WorkflowItem.findAllByJournalName(context, journalName);
+            for (int i=0;i<workflowItems.length;i++) {
+                Boolean matched = false;
+                WorkflowItem wfi = workflowItems[i];
+                Item item = wfi.getItem();
+                // check to see if this matches by msid:
+                DCValue[] msids = item.getMetadata("dc", "identifier", "manuscriptNumber", Item.ANY);
+                for (int j=0; j<msids.length; j++) {
+                    String canonicalMsID = JournalUtils.getCanonicalManuscriptID(context, msids[j].value,manuscript.organization.organizationCode);
+                    if (manuscript.manuscriptId.equals(msids[j].value)) {
+                        log.debug("matched " + item.getID() + " by msid");
+                        matched = true;
+                    }
+                }
+
+                if (matched == false) {
+                    // count number of authors and number of matched authors: if equal, this is a match.
+                    if (manuscript.authors.author.size() > 0) {
+                        int numMatched = 0;
+                        DCValue[] itemAuthors = item.getMetadata("dc", "contributor", "author", Item.ANY);
+                        for (int j = 0; j < itemAuthors.length; j++) {
+                            for (Author a : manuscript.authors.author) {
+                                double score = JournalUtils.getHamrScore(itemAuthors[j].value, a.fullName());
+                                if (score > 0.7) {
+                                    log.debug("author " + itemAuthors[j].value + " matched " + a.fullName() + " with a score of " + score);
+                                    numMatched++;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (numMatched == itemAuthors.length) {
+                            matched = true;
+                            log.debug("matched " + item.getID() + " by authors");
+                        }
+                    }
+                }
+
+                if (matched) {
+                    matchingItems.add(wfi);
+                }
+            }
+        } catch (SQLException ex) {
+            throw new ApproveRejectReviewItemException(ex);
+        } catch (AuthorizeException ex) {
+            throw new ApproveRejectReviewItemException(ex);
+        } catch (IOException ex) {
+            throw new ApproveRejectReviewItemException(ex);
+        }
+
+        return matchingItems;
+    }
 
     /**
      * Update the workflow item, including the unarchived item.
@@ -304,4 +421,11 @@ public class WorkflowItem implements InProgressSubmission {
         // Delete item
         item.delete();
     }
+
+    private static IdentifierService getIdentifierService() {
+        DSpace dspace = new DSpace();
+        org.dspace.kernel.ServiceManager manager = dspace.getServiceManager() ;
+        return manager.getServiceByName(IdentifierService.class.getName(), IdentifierService.class);
+    }
+
 }

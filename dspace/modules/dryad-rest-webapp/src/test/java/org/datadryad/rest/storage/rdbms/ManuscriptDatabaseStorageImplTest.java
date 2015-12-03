@@ -32,11 +32,9 @@ public class ManuscriptDatabaseStorageImplTest extends ContextUnitTest {
     private StoragePath manuscriptPath2 = new StoragePath();
 
     public ManuscriptDatabaseStorageImplTest() {
-        collectionPath.addPathElement("organizationCode", TEST_ORGANIZATION_CODE);
-        manuscriptPath1.addPathElement("organizationCode", TEST_ORGANIZATION_CODE);
-        manuscriptPath1.addPathElement("manuscriptId", TEST_MANUSCRIPT_ID_1);
-        manuscriptPath2.addPathElement("organizationCode", TEST_ORGANIZATION_CODE);
-        manuscriptPath2.addPathElement("manuscriptId", TEST_MANUSCRIPT_ID_2);
+        collectionPath = StoragePath.createOrganizationPath(TEST_ORGANIZATION_CODE);
+        manuscriptPath1 = StoragePath.createManuscriptPath(TEST_ORGANIZATION_CODE, TEST_MANUSCRIPT_ID_1);
+        manuscriptPath2 = StoragePath.createManuscriptPath(TEST_ORGANIZATION_CODE, TEST_MANUSCRIPT_ID_2);
     }
 
     @Before
