@@ -28,6 +28,7 @@ import org.dspace.identifier.IdentifierService;
 import org.dspace.eperson.EPerson;
 import org.datadryad.rest.models.Manuscript;
 import org.dspace.workflow.WorkflowItem;
+import org.datadryad.api.DryadDataPackage;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -222,6 +223,7 @@ public class ApproveRejectReviewItem {
             //Check for a valid task
             // There must be a claimed actions & it must be in the review stage, else it isn't a valid workflowitem
             Item item = wfi.getItem();
+            DryadDataPackage dataPackage = DryadDataPackage.findByWorkflowItemId(c, wfi.getID());
             if (claimedTasks == null || claimedTasks.isEmpty() || !claimedTasks.get(0).getActionID().equals("reviewAction")) {
                 log.debug ("Item " + item.getID() + " not found or not in review");
             } else {
@@ -233,7 +235,7 @@ public class ApproveRejectReviewItem {
                     item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "step", "approved", null, approved.toString());
 
                     WorkflowManager.doState(c, c.getCurrentUser(), null, claimedTask.getWorkflowItemID(), workflow, actionConfig);
-
+                    associateWithManuscript(dataPackage, manuscript);
                     // Add provenance to item
                     item.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", "Approved by ApproveRejectReviewItem on " + DCDate.getCurrent().toString() + " (GMT)");
                     item.update();
@@ -251,6 +253,7 @@ public class ApproveRejectReviewItem {
                         }
                     }
                     WorkspaceItem wsi = WorkflowManager.rejectWorkflowItem(c, wfi, ePerson, null, reason, true);
+                    disassociateFromManuscript(dataPackage, manuscript);
                     c.restoreAuthSystemState();
                 }
             }
@@ -273,6 +276,51 @@ public class ApproveRejectReviewItem {
         DSpace dspace = new DSpace();
         org.dspace.kernel.ServiceManager manager = dspace.getServiceManager() ;
         return manager.getServiceByName(SearchService.class.getName(),SearchService.class);
+    }
+
+    private void associateWithManuscript(DryadDataPackage dataPackage, Manuscript manuscript) throws SQLException {
+        // set publication DOI
+        dataPackage.setPublicationDOI(manuscript.publicationDOI);
+        // set Manuscript ID
+        dataPackage.setManuscriptNumber(manuscript.manuscriptId);
+        // union keywords
+        List<String> manuscriptKeywords = manuscript.keywords;
+        dataPackage.addKeywords(manuscriptKeywords);
+        // set title
+        if(manuscript.title != null) {
+            dataPackage.setTitle(prefixTitle(manuscript.title));
+        }
+        // set abstract
+        if(manuscript.manuscript_abstract != null) {
+            dataPackage.setAbstract(manuscript.manuscript_abstract);
+        }
+        // set publicationDate
+        dataPackage.setBlackoutUntilDate(manuscript.publicationDate);
+    }
+
+    private void disassociateFromManuscript(DryadDataPackage dataPackage, Manuscript manuscript) throws SQLException {
+        // clear publication DOI
+        dataPackage.setPublicationDOI(null);
+        // clear Manuscript ID
+        dataPackage.setManuscriptNumber(null);
+        // disjoin keywords
+        List<String> packageKeywords = dataPackage.getKeywords();
+        List<String> manuscriptKeywords = manuscript.keywords;
+        List<String> prunedKeywords = subtractList(packageKeywords, manuscriptKeywords);
+
+        dataPackage.setKeywords(prunedKeywords);
+        // clear publicationDate
+        dataPackage.setBlackoutUntilDate(null);
+    }
+
+    private static List<String> subtractList(List<String> list1, List<String> list2) {
+        List<String> list = new ArrayList<String>(list1);
+        for(String string : list2) {
+            if(list.contains(string)) {
+                list.remove(string);
+            }
+        }
+        return list;
     }
 
 }

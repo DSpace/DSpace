@@ -98,31 +98,9 @@ public class ManuscriptMetadataSynchronizationHandler implements HandlerInterfac
 
     private void processChange(Manuscript manuscript) throws HandlerException {
         try {
-            Context context = getContext();
-            DryadDataPackage dataPackage = null;
-            try {
-                 dataPackage = findDataPackage(manuscript, context);
-            } catch (HandlerException ex) {
-                // Lookup threw an exception
-                abortContext(context);
-                context = null;
-                throw ex;
-            }
-            if(dataPackage == null) {
-                abortContext(context);
-                context = null;
-                throw new HandlerException("Data package not found for manuscript: " + manuscript.manuscriptId);
-            }
-            // Check if rejected or accepted
-            if(manuscript.isRejected()) {
-                disassociateFromManuscript(dataPackage, manuscript);
-            } else {
-                associateWithManuscript(dataPackage, manuscript);
-            }
-            completeContext(context);
-            context = null;
-        } catch (SQLException ex) {
-            throw new HandlerException("SQLException updating Data Package with metadata", ex);
+            ApproveRejectReviewItem.reviewManuscript(manuscript);
+        } catch (ApproveRejectReviewItemException ex) {
+            throw new HandlerException("Exception handling acceptance notice for manuscript " + manuscript.manuscriptId, ex);
         }
     }
 
@@ -136,48 +114,4 @@ public class ManuscriptMetadataSynchronizationHandler implements HandlerInterfac
      * @param manuscript
      * @throws SQLException
      */
-    private void associateWithManuscript(DryadDataPackage dataPackage, Manuscript manuscript) throws SQLException {
-        // set publication DOI
-        dataPackage.setPublicationDOI(manuscript.publicationDOI);
-        // set Manuscript ID
-        dataPackage.setManuscriptNumber(manuscript.manuscriptId);
-        // union keywords
-        List<String> manuscriptKeywords = manuscript.keywords;
-        dataPackage.addKeywords(manuscriptKeywords);
-        // set title
-        if(manuscript.title != null) {
-            dataPackage.setTitle(prefixTitle(manuscript.title));
-        }
-        // set abstract
-        if(manuscript.manuscript_abstract != null) {
-            dataPackage.setAbstract(manuscript.manuscript_abstract);
-        }
-        // set publicationDate
-        dataPackage.setBlackoutUntilDate(manuscript.publicationDate);
-    }
-
-    private void disassociateFromManuscript(DryadDataPackage dataPackage, Manuscript manuscript) throws SQLException {
-        // clear publication DOI
-        dataPackage.setPublicationDOI(null);
-        // clear Manuscript ID
-        dataPackage.setManuscriptNumber(null);
-        // disjoin keywords
-        List<String> packageKeywords = dataPackage.getKeywords();
-        List<String> manuscriptKeywords = manuscript.keywords;
-        List<String> prunedKeywords = subtractList(packageKeywords, manuscriptKeywords);
-        
-        dataPackage.setKeywords(prunedKeywords);
-        // clear publicationDate
-        dataPackage.setBlackoutUntilDate(null);
-    }
-
-    private static List<String> subtractList(List<String> list1, List<String> list2) {
-        List<String> list = new ArrayList<String>(list1);
-        for(String string : list2) {
-            if(list.contains(string)) {
-                list.remove(string);
-            }
-        }
-        return list;
-    }
 }
