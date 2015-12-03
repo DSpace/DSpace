@@ -221,9 +221,10 @@ public class ApproveRejectReviewItem {
                 claimedTasks = ClaimedTask.findByWorkflowId(c, wfi.getID());
             }
             //Check for a valid task
-            // There must be a claimed actions & it must be in the review stage, else it isn't a valid workflowitem
+            // There must be a claimedTask & it must be in the review stage, else it isn't a review workflowitem
             Item item = wfi.getItem();
             DryadDataPackage dataPackage = DryadDataPackage.findByWorkflowItemId(c, wfi.getID());
+            associateWithManuscript(dataPackage, manuscript);
             if (claimedTasks == null || claimedTasks.isEmpty() || !claimedTasks.get(0).getActionID().equals("reviewAction")) {
                 log.debug ("Item " + item.getID() + " not found or not in review");
             } else {
@@ -235,7 +236,6 @@ public class ApproveRejectReviewItem {
                     item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "step", "approved", null, approved.toString());
 
                     WorkflowManager.doState(c, c.getCurrentUser(), null, claimedTask.getWorkflowItemID(), workflow, actionConfig);
-                    associateWithManuscript(dataPackage, manuscript);
                     // Add provenance to item
                     item.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", "Approved by ApproveRejectReviewItem on " + DCDate.getCurrent().toString() + " (GMT)");
                     item.update();
