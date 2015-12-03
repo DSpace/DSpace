@@ -400,8 +400,8 @@
                 <h1 class="ds-div-head">Recently integrated journals</h1>
                 <div id="recently_integrated_journals" class="ds-static-div primary">
                     <div class="container">
-        				<!-- Development -->
-		  				<a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Adevelopment%5C%7C%5C%7C%5C%7CDevelopment"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-DEVELOPMENT_cover.png" alt="Development" /></a>
+						<!-- Development -->
+						<a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Adevelopment%5C%7C%5C%7C%5C%7CDevelopment"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-DEVELOPMENT_cover.png" alt="Development" /></a>
 						<!-- American Journal of Botany -->
 						<a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aamerican%5C+journal%5C+of%5C+botany%5C%7C%5C%7C%5C%7CAmerican%5C+Journal%5C+of%5C+Botany"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-AMJBOTCover.png" alt="American Journal of Botany" /></a>
                         <!-- International Journal of Plant Sciences -->
