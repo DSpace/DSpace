@@ -68,12 +68,12 @@
     <div class="row">
     <div class="col-md-6"> 
 	    <label for="eperson_id"><fmt:message key="jsp.tools.group-edit.eperson"/></label>
-	    <dspace:selecteperson multiple="true" selected="<%= epeople %>"/> 
+	    <dspace:selecteperson multiple="true" selected="<%= epeople.toArray(new EPerson[epeople.size()]) %>"/>
     </div>
     
     <div class="col-md-6">
 	    <label for="eperson_id"><fmt:message key="jsp.tools.group-edit.group"/></label>
-	    <dspace:selectgroup   multiple="true" selected="<%= groups  %>"/>
+	    <dspace:selectgroup   multiple="true" selected="<%= groups.toArray(new Group[groups.size()])  %>"/>
 	</div>
 	</div>
 	<br/>
