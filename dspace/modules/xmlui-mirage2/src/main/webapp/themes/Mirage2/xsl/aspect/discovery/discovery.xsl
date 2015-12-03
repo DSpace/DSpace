@@ -105,7 +105,7 @@
         <xsl:variable name="metsDoc" select="document($externalMetadataUrl)"/>
 
         <div class="community-browser-row">
-           	<span class="glyphicon glyphicon-folder-close"  aria-hidden="true"></span>
+       		&#8227;   
             <a href="{$metsDoc/mets:METS/@OBJID}">
                 <xsl:choose>
                     <xsl:when test="dri:list[@n=(concat($handle, ':dc.title')) and descendant::text()]">
@@ -469,7 +469,7 @@
                     </xsl:attribute>
                 </xsl:otherwise>
             </xsl:choose>
-            <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"/>
+            <span class="glyphicon glyphicon-folder-close" aria-hidden="true"/>
         </button>
     </xsl:template>
 
@@ -492,7 +492,7 @@
                     </xsl:attribute>
                 </xsl:otherwise>
             </xsl:choose>
-            <span class="glyphicon glyphicon-minus-sign" aria-hidden="true"/>
+            <span class="glyphicon glyphicon-folder-open" aria-hidden="true"/>
         </button>
     </xsl:template>
 

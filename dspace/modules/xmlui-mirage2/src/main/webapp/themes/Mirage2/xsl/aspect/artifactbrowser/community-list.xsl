@@ -45,7 +45,7 @@
         <div class="artifact-description">
             <p class="artifact-title">
                 <a href="{@OBJID}">
-               		<span class="glyphicon glyphicon-folder-close"  aria-hidden="true" style="padding-right: 4px;"></span>   
+       				&#8227;   
 				    <span class="Z3988">
                         <xsl:choose>
                             <xsl:when test="string-length($data/dim:field[@element='title'][1]) &gt; 0">
@@ -72,7 +72,7 @@
         <xsl:variable name="data" select="./mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim"/>
         <span class="bold">
             <a href="{@OBJID}">
-               	<span class="glyphicon glyphicon-folder-close"  aria-hidden="true" style="padding-right: 4px;"></span>   
+       				&#8227;   
                 <xsl:choose>
                     <xsl:when test="string-length($data/dim:field[@element='title'][1]) &gt; 0">
                         <xsl:value-of select="$data/dim:field[@element='title'][1]"/>
@@ -103,8 +103,8 @@
     <xsl:template match="dri:field[@rend = 'community-browser-toggle-button']">
         <p class="toggler-wrap">
             <a class="btn btn-default btn-sm toggler collapsed" href="javascript:void(0)" role="button"  data-target="{@value}">
-                <i class="glyphicon glyphicon-minus open-icon hidden" aria-hidden="true"/>
-                <i class="glyphicon glyphicon-plus closed-icon" aria-hidden="true"/>
+                <i class="glyphicon glyphicon-folder-open open-icon hidden" aria-hidden="true"/>
+                <i class="glyphicon glyphicon-folder-close closed-icon" aria-hidden="true"/>
             </a>
         </p>
 
