@@ -182,6 +182,9 @@ public class WorkflowEmailManager {
 
             email.addRecipient(wi.getSubmitter().getEmail());
 
+            // email the eperson who rejected this as well
+            email.addRecipient(e.getEmail());
+
             email.addArgument(title);
             email.addArgument(dataFileTitles);
             email.addArgument(rejector);
