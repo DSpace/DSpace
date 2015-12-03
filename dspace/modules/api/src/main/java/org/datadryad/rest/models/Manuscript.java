@@ -171,40 +171,6 @@ public class Manuscript {
     }
 
     @JsonIgnore
-    public void setStatus(String newStatus) {
-        if (newStatus != null) {
-            this.status = newStatus;
-        } else {
-            this.status = "";
-        }
-    }
-
-    @JsonIgnore
-    public String getStatus() {
-        if (isAccepted()) {
-            return STATUS_ACCEPTED;
-        }
-        if (isRejected()) {
-            return STATUS_REJECTED;
-        }
-        if (isSubmitted()) {
-            return STATUS_SUBMITTED;
-        }
-        if (isPublished()) {
-            return STATUS_PUBLISHED;
-        }
-
-        // default is STATUS_ACCEPTED
-        return STATUS_INVALID;
-    }
-
-    // return what the status really said:
-    @JsonIgnore
-    public String getLiteralStatus() {
-        return this.status;
-    }
-
-    @JsonIgnore
     public Boolean isValid() {
         // Required fields are: manuscriptID, status, authors (though author identifiers are optional), and title. All other fields are optional.
         if ((manuscriptId == null) || (manuscriptId.length() == 0)) {
