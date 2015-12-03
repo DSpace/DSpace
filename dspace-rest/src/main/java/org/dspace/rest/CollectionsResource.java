@@ -42,6 +42,7 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.rest.common.Collection;
 import org.dspace.rest.common.Item;
+import org.dspace.rest.common.Long;
 import org.dspace.rest.common.MetadataEntry;
 import org.dspace.rest.exceptions.ContextException;
 import org.dspace.usage.UsageEvent;
@@ -60,7 +61,32 @@ public class CollectionsResource extends Resource
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
     protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
 
-    private static Logger log = Logger.getLogger(CollectionsResource.class);
+    private static final Logger log = Logger.getLogger(CollectionsResource.class);
+
+    /**
+     * Returns the number of Collection objects.
+     *
+     * @return number of Collection objects in the database.
+     */
+    @GET
+    @Path("/count")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    public Long countCollections(@Context HttpHeaders headers)
+    {
+        org.dspace.core.Context context = null;
+        long count = -1;
+        try {
+            context = createContext(getUser(headers));
+            count = collectionService.countTotal(context);
+            context.complete();
+        } catch (ContextException | SQLException e) {
+            processException("Could not count Collection -- " + e, context);
+        } finally {
+            processFinally(context);
+        }
+
+        return new Long(count);
+    }
 
     /**
      * Return instance of collection with passed id. You can add more properties

@@ -17,6 +17,7 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.eperson.EPerson;
 import org.dspace.rest.common.Collection;
 import org.dspace.rest.common.Community;
+import org.dspace.rest.common.Long;
 import org.dspace.rest.exceptions.ContextException;
 import org.dspace.usage.UsageEvent;
 
@@ -43,8 +44,32 @@ public class CommunitiesResource extends Resource
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    private static final Logger log = Logger.getLogger(CommunitiesResource.class);
 
-    private static Logger log = Logger.getLogger(CommunitiesResource.class);
+    /**
+     * Returns the number of Community objects.
+     *
+     * @return number of Community objects in the database.
+     */
+    @GET
+    @Path("/count")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    public Long countCommmunities(@Context HttpHeaders headers)
+    {
+        org.dspace.core.Context context = null;
+        long count = -1;
+        try {
+            context = createContext(getUser(headers));
+            count = communityService.countTotal(context);
+            context.complete();
+        } catch (ContextException | SQLException e) {
+            processException("Could not count Community -- " + e, context);
+        } finally {
+            processFinally(context);
+        }
+
+        return new Long(count);
+    }
 
     /**
      * Returns community with basic properties. If you want more, use expand

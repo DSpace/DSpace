@@ -19,6 +19,7 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.rest.common.Bitstream;
 import org.dspace.rest.common.Item;
+import org.dspace.rest.common.Long;
 import org.dspace.rest.common.MetadataEntry;
 import org.dspace.rest.exceptions.ContextException;
 import org.dspace.usage.UsageEvent;
@@ -59,6 +60,35 @@ public class ItemsResource extends Resource
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
 
     private static final Logger log = Logger.getLogger(ItemsResource.class);
+
+    /**
+     * Returns the number of Item objects.
+     *
+     * @param archived count (default) archived or not archived Items?
+     * @param withdrawn count withdrawn or (default) not withdrawn Items?
+     * @return number of Item objects in the database.
+     */
+    @GET
+    @Path("/count")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    public Long countItems(@Context HttpHeaders headers,
+            @DefaultValue("true") @QueryParam("archived") boolean archived,
+            @DefaultValue("false") @QueryParam("withdrawn") boolean withdrawn)
+    {
+        org.dspace.core.Context context = null;
+        long count = -1;
+        try {
+            context = createContext(getUser(headers));
+            count = itemService.countItems(context, archived, withdrawn);
+            context.complete();
+        } catch (ContextException | SQLException e) {
+            processException("Could not count Item -- " + e, context);
+        } finally {
+            processFinally(context);
+        }
+
+        return new Long(count);
+    }
 
     /**
      * Return item properties without metadata and bitstreams. You can add
