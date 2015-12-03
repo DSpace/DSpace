@@ -446,7 +446,7 @@ public class DryadEmailSubmission extends HttpServlet {
 
                     workflowItems.addAll(WorkflowItem.findAllByManuscript(context, manuscript));
                     LOGGER.debug("found " + workflowItems.size() + " items that match");
-                    ApproveRejectReviewItem.reviewItems(context, approved, workflowItems);
+                    ApproveRejectReviewItem.reviewItems(context, approved, workflowItems, manuscript);
                 }
             } else {
                 throw new SubmissionException("Parser could not validly parse the message");

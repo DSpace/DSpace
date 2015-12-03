@@ -11,6 +11,8 @@ import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.storage.StoragePath;
 import org.dspace.core.Context;
 import org.dspace.identifier.IdentifierException;
+import org.dspace.workflow.ApproveRejectReviewItem;
+import org.dspace.workflow.ApproveRejectReviewItemException;
 
 /**
  * Extracts metadata from manuscript objects and places in corresponding Dryad
@@ -103,15 +105,4 @@ public class ManuscriptMetadataSynchronizationHandler implements HandlerInterfac
             throw new HandlerException("Exception handling acceptance notice for manuscript " + manuscript.manuscriptId, ex);
         }
     }
-
-    private static String prefixTitle(String title) {
-        return String.format("Data from: %s", title);
-    }
-
-    /**
-     * Copies manuscript metadata into a dryad data package
-     * @param dataPackage
-     * @param manuscript
-     * @throws SQLException
-     */
 }

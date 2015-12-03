@@ -104,7 +104,7 @@ public class ApproveRejectReviewItem {
             } else {
                 throw new ApproveRejectReviewItemException("No item found with manuscript number: " + manuscriptNumber);
             }
-            reviewItems(c, approved, workflowItems);
+            reviewItems(c, approved, workflowItems, null);
         } catch (SQLException ex) {
             throw new ApproveRejectReviewItemException(ex);
         } catch (AuthorizeException ex) {
@@ -130,7 +130,7 @@ public class ApproveRejectReviewItem {
             c = new Context();
             c.turnOffAuthorisationSystem();
             WorkflowItem wfi = WorkflowItem.find(c, workflowItemId);
-            reviewItem(c, approved, wfi);
+            reviewItem(c, approved, wfi, null);
         } catch (SQLException ex) {
             throw new ApproveRejectReviewItemException(ex);
         } catch (AuthorizeException ex) {
@@ -150,10 +150,10 @@ public class ApproveRejectReviewItem {
         }
     }
 
-    public static void reviewItems(Context c, Boolean approved, List<WorkflowItem> workflowItems) throws ApproveRejectReviewItemException {
+    public static void reviewItems(Context c, Boolean approved, List<WorkflowItem> workflowItems, Manuscript manuscript) throws ApproveRejectReviewItemException {
         for (WorkflowItem wfi : workflowItems) {
             try {
-                reviewItem(c, approved, wfi);
+                reviewItem(c, approved, wfi, manuscript);
             } catch (ApproveRejectReviewItemException e) {
                 throw new ApproveRejectReviewItemException("Exception caught while reviewing item " + wfi.getItem().getID() + ": " + e.getMessage(), e);
             }
@@ -181,7 +181,7 @@ public class ApproveRejectReviewItem {
             }
 
             workflowItems.addAll(WorkflowItem.findAllByManuscript(c, manuscript));
-            ApproveRejectReviewItem.reviewItems(c, approved, workflowItems);
+            reviewItems(c, approved, workflowItems, manuscript);
         } catch (SQLException ex) {
             throw new ApproveRejectReviewItemException(ex);
         } finally {
@@ -213,7 +213,7 @@ public class ApproveRejectReviewItem {
         return approved;
     }
 
-    private static void reviewItem(Context c, Boolean approved, WorkflowItem wfi) throws ApproveRejectReviewItemException {
+    private static void reviewItem(Context c, Boolean approved, WorkflowItem wfi, Manuscript manuscript) throws ApproveRejectReviewItemException {
 	// get a List of ClaimedTasks, using the WorkflowItem
         List<ClaimedTask> claimedTasks = null;
         try {
@@ -278,39 +278,50 @@ public class ApproveRejectReviewItem {
         return manager.getServiceByName(SearchService.class.getName(),SearchService.class);
     }
 
-    private void associateWithManuscript(DryadDataPackage dataPackage, Manuscript manuscript) throws SQLException {
-        // set publication DOI
-        dataPackage.setPublicationDOI(manuscript.publicationDOI);
-        // set Manuscript ID
-        dataPackage.setManuscriptNumber(manuscript.manuscriptId);
-        // union keywords
-        List<String> manuscriptKeywords = manuscript.keywords;
-        dataPackage.addKeywords(manuscriptKeywords);
-        // set title
-        if(manuscript.title != null) {
-            dataPackage.setTitle(prefixTitle(manuscript.title));
+
+    /**
+     * Copies manuscript metadata into a dryad data package
+     * @param dataPackage
+     * @param manuscript
+     * @throws SQLException
+     */
+    private static void associateWithManuscript(DryadDataPackage dataPackage, Manuscript manuscript) throws SQLException {
+        if (manuscript != null) {
+            // set publication DOI
+            dataPackage.setPublicationDOI(manuscript.publicationDOI);
+            // set Manuscript ID
+            dataPackage.setManuscriptNumber(manuscript.manuscriptId);
+            // union keywords
+            List<String> manuscriptKeywords = manuscript.keywords;
+            dataPackage.addKeywords(manuscriptKeywords);
+            // set title
+            if (manuscript.title != null) {
+                dataPackage.setTitle(prefixTitle(manuscript.title));
+            }
+            // set abstract
+            if (manuscript.manuscript_abstract != null) {
+                dataPackage.setAbstract(manuscript.manuscript_abstract);
+            }
+            // set publicationDate
+            dataPackage.setBlackoutUntilDate(manuscript.publicationDate);
         }
-        // set abstract
-        if(manuscript.manuscript_abstract != null) {
-            dataPackage.setAbstract(manuscript.manuscript_abstract);
-        }
-        // set publicationDate
-        dataPackage.setBlackoutUntilDate(manuscript.publicationDate);
     }
 
-    private void disassociateFromManuscript(DryadDataPackage dataPackage, Manuscript manuscript) throws SQLException {
-        // clear publication DOI
-        dataPackage.setPublicationDOI(null);
-        // clear Manuscript ID
-        dataPackage.setManuscriptNumber(null);
-        // disjoin keywords
-        List<String> packageKeywords = dataPackage.getKeywords();
-        List<String> manuscriptKeywords = manuscript.keywords;
-        List<String> prunedKeywords = subtractList(packageKeywords, manuscriptKeywords);
+    private static void disassociateFromManuscript(DryadDataPackage dataPackage, Manuscript manuscript) throws SQLException {
+        if (manuscript != null) {
+            // clear publication DOI
+            dataPackage.setPublicationDOI(null);
+            // clear Manuscript ID
+            dataPackage.setManuscriptNumber(null);
+            // disjoin keywords
+            List<String> packageKeywords = dataPackage.getKeywords();
+            List<String> manuscriptKeywords = manuscript.keywords;
+            List<String> prunedKeywords = subtractList(packageKeywords, manuscriptKeywords);
 
-        dataPackage.setKeywords(prunedKeywords);
-        // clear publicationDate
-        dataPackage.setBlackoutUntilDate(null);
+            dataPackage.setKeywords(prunedKeywords);
+            // clear publicationDate
+            dataPackage.setBlackoutUntilDate(null);
+        }
     }
 
     private static List<String> subtractList(List<String> list1, List<String> list2) {
@@ -323,4 +334,8 @@ public class ApproveRejectReviewItem {
         return list;
     }
 
+
+    private static String prefixTitle(String title) {
+        return String.format("Data from: %s", title);
+    }
 }
