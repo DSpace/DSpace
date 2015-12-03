@@ -45,4 +45,8 @@ CREATE TABLE rest_resource_authz
   eperson_id INTEGER not null REFERENCES eperson(eperson_id),
   http_method VARCHAR(8) not null,
   resource_path VARCHAR(1024) not null
-)
+);
+
+-- modifications added by daisieh on 11/11/15
+ALTER TABLE manuscript ADD COLUMN date_added DATE DEFAULT current_date;
+ALTER TABLE manuscript ADD COLUMN status text;

@@ -52,8 +52,7 @@ public class OrganizationResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getOrganization(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode) {
-        StoragePath path = new StoragePath();
-        path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
+        StoragePath path = StoragePath.createOrganizationPath(organizationCode);
         try {
             Organization organization = organizationStorage.findByPath(path);
             if(organization == null) {
@@ -94,8 +93,7 @@ public class OrganizationResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateOrganization(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode, Organization organization) {
-        StoragePath path = new StoragePath();
-        path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
+        StoragePath path = StoragePath.createOrganizationPath(organizationCode);
         // Check required fields
         if(organization.isValid()) {
             try {
@@ -116,8 +114,7 @@ public class OrganizationResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteOrganization(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode) {
-        StoragePath path = new StoragePath();
-        path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
+        StoragePath path = StoragePath.createOrganizationPath(organizationCode);
         try {
             organizationStorage.deleteByPath(path);
         } catch (StorageException ex) {

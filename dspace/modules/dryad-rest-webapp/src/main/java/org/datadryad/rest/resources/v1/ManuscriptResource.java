@@ -49,8 +49,7 @@ public class ManuscriptResource {
     public Response getManuscripts(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode, @QueryParam("search") String searchParam, @QueryParam("count") Integer resultParam) {
         try {
             // Returning a list requires POJO turned on
-            StoragePath path = new StoragePath();
-            path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
+            StoragePath path = StoragePath.createOrganizationPath(organizationCode);
             return Response.ok(manuscriptStorage.getResults(path, searchParam, resultParam)).build();
         } catch (StorageException ex) {
             log.error("Exception getting manuscripts", ex);
@@ -64,9 +63,7 @@ public class ManuscriptResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getManuscript(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode, @PathParam(Manuscript.MANUSCRIPT_ID) String manuscriptId) {
         try {
-            StoragePath manuscriptPath = new StoragePath();
-            manuscriptPath.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
-            manuscriptPath.addPathElement(Manuscript.MANUSCRIPT_ID, manuscriptId);
+            StoragePath manuscriptPath = StoragePath.createManuscriptPath(organizationCode, manuscriptId);
             Manuscript manuscript = manuscriptStorage.findByPath(manuscriptPath);
             if(manuscript == null) {
                 ErrorsResponse error = ResponseFactory.makeError("Manuscript with ID " + manuscriptId + " does not exist", "Manuscript not found", uriInfo, Status.NOT_FOUND.getStatusCode());
@@ -85,8 +82,7 @@ public class ManuscriptResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createManuscript(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode, Manuscript manuscript) {
-        StoragePath organizationPath = new StoragePath();
-        organizationPath.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
+        StoragePath organizationPath = StoragePath.createOrganizationPath(organizationCode);
         if(manuscript.isValid()) {
             try {
                 // Find the organization in database first.
@@ -113,13 +109,10 @@ public class ManuscriptResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateManuscript(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode, @PathParam(Manuscript.MANUSCRIPT_ID) String manuscriptId, Manuscript manuscript) {
-        StoragePath path = new StoragePath();
-        path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
-        path.addPathElement(Manuscript.MANUSCRIPT_ID, manuscriptId);
+        StoragePath path = StoragePath.createManuscriptPath(organizationCode, manuscriptId);
         if(manuscript.isValid()) {
             try {
-                StoragePath organizationPath = new StoragePath();
-                organizationPath.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
+                StoragePath organizationPath = StoragePath.createOrganizationPath(organizationCode);
                 manuscript.organization = organizationStorage.findByPath(organizationPath);
                 manuscriptStorage.update(path, manuscript);
             } catch (StorageException ex) {
@@ -141,9 +134,7 @@ public class ManuscriptResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteManuscript(@PathParam(Organization.ORGANIZATION_CODE) String organizationCode, @PathParam(Manuscript.MANUSCRIPT_ID) String manuscriptId) {
-        StoragePath path = new StoragePath();
-        path.addPathElement(Organization.ORGANIZATION_CODE, organizationCode);
-        path.addPathElement(Manuscript.MANUSCRIPT_ID, manuscriptId);
+        StoragePath path = StoragePath.createManuscriptPath(organizationCode, manuscriptId);
         try {
             manuscriptStorage.deleteByPath(path);
         } catch (StorageException ex) {

@@ -86,7 +86,6 @@ public class Manuscript {
     @JsonIgnore
     public Organization organization = new Organization();
 
-    @JsonIgnore
     public void setStatus(String newStatus) {
         if (newStatus != null) {
             this.status = newStatus;
@@ -95,7 +94,6 @@ public class Manuscript {
         }
     }
 
-    @JsonIgnore
     public String getStatus() {
         if (isAccepted()) {
             return STATUS_ACCEPTED;
@@ -118,6 +116,58 @@ public class Manuscript {
     @JsonIgnore
     public String getLiteralStatus() {
         return this.status;
+    }
+
+    // check the status of a manuscript, regardless of what the literal status is
+    @JsonIgnore
+    public Boolean isSubmitted() {
+        return statusIsSubmitted(status);
+    }
+
+    @JsonIgnore
+    public Boolean isAccepted() {
+        return statusIsAccepted(status);
+    }
+
+    @JsonIgnore
+    public Boolean isRejected() {
+        return statusIsRejected(status);
+    }
+
+    @JsonIgnore
+    public Boolean isNeedsRevision() {
+        return statusIsNeedsRevision(status);
+    }
+
+    @JsonIgnore
+    public Boolean isPublished() {
+        return statusIsPublished(status);
+    }
+
+    // Convenience methods to compare status strings anywhere to known statuses.
+    @JsonIgnore
+    public static Boolean statusIsSubmitted(String status) {
+        return SUBMITTED_STATUSES.contains(status);
+    }
+
+    @JsonIgnore
+    public static Boolean statusIsAccepted(String status) {
+        return ACCEPTED_STATUSES.contains(status);
+    }
+
+    @JsonIgnore
+    public static Boolean statusIsRejected(String status) {
+        return REJECTED_STATUSES.contains(status);
+    }
+
+    @JsonIgnore
+    public static Boolean statusIsNeedsRevision(String status) {
+        return NEEDS_REVISION_STATUSES.contains(status);
+    }
+
+    @JsonIgnore
+    public static Boolean statusIsPublished(String status) {
+        return PUBLISHED_STATUSES.contains(status);
     }
 
     @JsonIgnore
@@ -150,31 +200,6 @@ public class Manuscript {
 
         // TODO: if corresponding author present, must be one of the authors
         return true;
-    }
-
-    @JsonIgnore
-    public Boolean isSubmitted() {
-        return SUBMITTED_STATUSES.contains(status);
-    }
-
-    @JsonIgnore
-    public Boolean isAccepted() {
-        return ACCEPTED_STATUSES.contains(status);
-    }
-
-    @JsonIgnore
-    public Boolean isRejected() {
-        return REJECTED_STATUSES.contains(status);
-    }
-
-    @JsonIgnore
-    public Boolean isNeedsRevision() {
-        return NEEDS_REVISION_STATUSES.contains(status);
-    }
-
-    @JsonIgnore
-    public Boolean isPublished() {
-        return PUBLISHED_STATUSES.contains(status);
     }
 
     public void configureTestValues() {

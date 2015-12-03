@@ -34,7 +34,7 @@ public class OrganizationJSONStorageImpl extends AbstractOrganizationStorage {
 
     private File getSubdirectory(StoragePath path) {
         if(path.size() >= 1) {
-            String organizationCode = path.get(0).value;
+            String organizationCode = path.getOrganizationCode();
             return getSubdirectory(organizationCode);
         } else {
             return this.storageDirectory;
@@ -48,7 +48,7 @@ public class OrganizationJSONStorageImpl extends AbstractOrganizationStorage {
 
     private String getBaseFileName(StoragePath path) {
         if(path.size() >= 1) {
-            String organizationCode = path.get(0).value;
+            String organizationCode = path.getOrganizationCode();
             return organizationCode;
         } else {
             return null;

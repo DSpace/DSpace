@@ -2440,7 +2440,7 @@ public class Item extends DSpaceObject
      *
      */
     public static ItemIterator findByMetadataField(Context context,
-                                                   String schema, String element, String qualifier, String value)
+                                                   String schema, String element, String qualifier, String value, Boolean in_archive)
             throws SQLException, AuthorizeException, IOException
     {
         MetadataSchema mds = MetadataSchema.find(context, schema);
@@ -2455,8 +2455,11 @@ public class Item extends DSpaceObject
                     "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
         }
 
-        String query = "SELECT item.* FROM metadatavalue,item WHERE item.in_archive='1' "+
-                "AND item.item_id = metadatavalue.item_id AND metadata_field_id = ?";
+        String query = "SELECT item.* FROM metadatavalue,item WHERE "+
+                "item.item_id = metadatavalue.item_id AND metadata_field_id = ?";
+        if (in_archive) {
+            query += " AND item.in_archive='1'";
+        }
         TableRowIterator rows = null;
         if (Item.ANY.equals(value))
         {
@@ -2470,7 +2473,28 @@ public class Item extends DSpaceObject
         return new ItemIterator(context, rows);
     }
 
-    public DSpaceObject getAdminObject(int action) throws SQLException
+    /**
+     * Returns an iterator of Items possessing the passed metadata field, or only
+     * those matching the passed value, if value is not Item.ANY
+     * NOTE: only searches items in the archive
+     *
+     * @param context DSpace context object
+     * @param schema metadata field schema
+     * @param element metadata field element
+     * @param qualifier metadata field qualifier
+     * @param value field value or Item.ANY to match any value
+     * @return an iterator over the items matching that authority value
+     * @throws SQLException, AuthorizeException, IOException
+     *
+     */
+    public static ItemIterator findByMetadataField(Context context,
+                                                   String schema, String element, String qualifier, String value)
+            throws SQLException, AuthorizeException, IOException
+    {
+        return findByMetadataField(context, schema, element, qualifier, value, true);
+    }
+
+        public DSpaceObject getAdminObject(int action) throws SQLException
     {
         DSpaceObject adminObject = null;
         Collection collection = getOwningCollection();

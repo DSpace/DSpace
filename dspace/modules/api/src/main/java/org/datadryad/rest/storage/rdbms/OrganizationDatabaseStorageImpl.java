@@ -102,8 +102,8 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
         }
     }
 
-    private static Organization getOrganizationByCode(Context context, String code) throws SQLException {
-        String query = "SELECT * FROM ORGANIZATION WHERE code = ?";
+    public static Organization getOrganizationByCode(Context context, String code) throws SQLException {
+        String query = "SELECT * FROM ORGANIZATION WHERE UPPER(code) = UPPER(?)";
         TableRow row = DatabaseManager.querySingleTable(context, ORGANIZATION_TABLE, query, code);
         return organizationFromTableRow(row);
     }
@@ -171,7 +171,7 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
             completeContext(context);
             if (searchParam != null) {
                 for (Organization org : allOrgs) {
-                    if (org.organizationCode.equals(searchParam)) {
+                    if (org.organizationCode.equalsIgnoreCase(searchParam)) {
                         organizations.add(org);
                     }
                 }
@@ -196,7 +196,7 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
 
     @Override
     protected Organization readObject(StoragePath path) throws StorageException {
-        String organizationCode = path.getValuePath().get(0);
+        String organizationCode = path.getOrganizationCode();
         try {
             Context context = getContext();
             Organization organization = getOrganizationByCode(context, organizationCode);
@@ -209,7 +209,7 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
 
     @Override
     protected void deleteObject(StoragePath path) throws StorageException {
-        String organizationCode = path.getValuePath().get(0);
+        String organizationCode = path.getOrganizationCode();
 
         try {
             Context context = getContext();
