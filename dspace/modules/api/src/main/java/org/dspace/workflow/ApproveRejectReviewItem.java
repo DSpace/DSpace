@@ -288,12 +288,18 @@ public class ApproveRejectReviewItem {
     private static void associateWithManuscript(DryadDataPackage dataPackage, Manuscript manuscript) throws SQLException {
         if (manuscript != null) {
             // set publication DOI
-            dataPackage.setPublicationDOI(manuscript.publicationDOI);
+            if (manuscript.publicationDOI != null) {
+                dataPackage.setPublicationDOI(manuscript.publicationDOI);
+            }
             // set Manuscript ID
-            dataPackage.setManuscriptNumber(manuscript.manuscriptId);
+            if (manuscript.manuscriptId != null) {
+                dataPackage.setManuscriptNumber(manuscript.manuscriptId);
+            }
             // union keywords
-            List<String> manuscriptKeywords = manuscript.keywords;
-            dataPackage.addKeywords(manuscriptKeywords);
+            if (manuscript.keywords.size() > 0) {
+                List<String> manuscriptKeywords = manuscript.keywords;
+                dataPackage.addKeywords(manuscriptKeywords);
+            }
             // set title
             if (manuscript.title != null) {
                 dataPackage.setTitle(prefixTitle(manuscript.title));
@@ -303,7 +309,9 @@ public class ApproveRejectReviewItem {
                 dataPackage.setAbstract(manuscript.manuscript_abstract);
             }
             // set publicationDate
-            dataPackage.setBlackoutUntilDate(manuscript.publicationDate);
+            if (manuscript.publicationDate != null) {
+                dataPackage.setBlackoutUntilDate(manuscript.publicationDate);
+            }
         }
     }
 
