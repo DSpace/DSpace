@@ -229,6 +229,7 @@ public class ApproveRejectReviewItem {
                 log.debug ("Item " + item.getID() + " not found or not in review");
             } else {
                 ClaimedTask claimedTask = claimedTasks.get(0);
+                c.turnOffAuthorisationSystem();
                 if (approved) { // approve
                     Workflow workflow = WorkflowFactory.getWorkflow(wfi.getCollection());
                     WorkflowActionConfig actionConfig = workflow.getStep(claimedTask.getStepID()).getActionConfig(claimedTask.getActionID());
@@ -240,7 +241,6 @@ public class ApproveRejectReviewItem {
                     item.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", "Approved by ApproveRejectReviewItem on " + DCDate.getCurrent().toString() + " (GMT)");
                     item.update();
                 } else { // reject
-                    c.turnOffAuthorisationSystem();
                     String reason = "The journal with which your data submission is associated has notified us that your manuscript is no longer being considered for publication. If you feel this has happened in error, please contact us at help@datadryad.org.";
                     EPerson ePerson = EPerson.findByEmail(c, ConfigurationManager.getProperty("system.curator.account"));
                     //Also reject all the data files
@@ -254,8 +254,8 @@ public class ApproveRejectReviewItem {
                     }
                     WorkspaceItem wsi = WorkflowManager.rejectWorkflowItem(c, wfi, ePerson, null, reason, true);
                     disassociateFromManuscript(dataPackage, manuscript);
-                    c.restoreAuthSystemState();
                 }
+                c.restoreAuthSystemState();
             }
         } catch (SQLException ex) {
             throw new ApproveRejectReviewItemException(ex);
