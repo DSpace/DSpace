@@ -78,6 +78,7 @@ public class AddBitstreamForm extends AbstractDSpaceTransformer
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
         pageMeta.addTrailLink(contextPath + "/admin/item", T_item_trail);
         pageMeta.addTrail().addContent(T_trail);
+        pageMeta.addMetadata("include-library", "datepicker");
         pageMeta.addMetadata("javascript", "static").addContent("static/js/editItemUtil.js");
     }
 
@@ -127,10 +128,13 @@ public class AddBitstreamForm extends AbstractDSpaceTransformer
 
             //file.setRequired();
             
-            // 
-    		Text fileLocal = upload.addItem().addText("file_local");
-    		fileLocal.setLabel(T_file);
-    		fileLocal.setHelp(T_file_local_help);
+            //
+            if (AuthorizeManager.isAdmin(context)) {
+                List uploadLocal = upload.addList("submit-upload-local", List.TYPE_FORM, "alert alert-admin");
+                Text fileLocal = uploadLocal.addItem().addText("file_local");
+                fileLocal.setLabel(T_file);
+                fileLocal.setHelp(T_file_local_help);
+            }
 	        //
             
 
