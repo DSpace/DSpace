@@ -276,6 +276,10 @@ public class WorkflowEmailManager {
 
             // Get the collection
             Collection coll = wi.getCollection();
+
+            // Get the package DOI
+            String doi = DOIIdentifierProvider.getDoiValue(wi.getItem());
+
             for(EPerson recipient : recipients) {
                 Locale supportedLocale = I18nUtil.getEPersonLocale(recipient);
                 Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, "payment_needs_reauthorization"));
