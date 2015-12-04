@@ -72,6 +72,7 @@ public class EditBitstreamForm extends AbstractDSpaceTransformer
 		pageMeta.addTrailLink(contextPath + "/admin/item",T_item_trail);
 		pageMeta.addTrail().addContent(T_trail);
         pageMeta.addMetadata("javascript", "static").addContent("static/js/editItemUtil.js");
+		pageMeta.addMetadata("include-library", "datepicker");
 	}
 
 	public void addBody(Body body) throws SAXException, WingException,

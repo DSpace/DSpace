@@ -116,6 +116,7 @@ public class EditPolicyForm extends AbstractDSpaceTransformer
         pageMeta.addTrail().addContent(T_policyList_trail);
         pageMeta.addTrail().addContent(T_trail);
 
+        pageMeta.addMetadata("include-library", "datepicker");
         pageMeta.addMetadata("javascript", "static").addContent("static/js/editPolicyForm.js");
     }
 
