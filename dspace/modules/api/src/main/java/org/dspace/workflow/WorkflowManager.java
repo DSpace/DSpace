@@ -482,6 +482,10 @@ public class WorkflowManager {
             workflowItemRole.delete();
         }
 
+        if (ePerson == null) {
+            ePerson = c.getCurrentUser();
+        }
+
         // rejection provenance
         Item myitem = wi.getItem();
 
