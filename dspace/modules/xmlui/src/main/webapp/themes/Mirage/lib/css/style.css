@@ -1820,6 +1820,7 @@ img.pub-cover {
 .publication-header .pub-title {
     font-size: 1.2em;
     font-weight: bold;
+    width: 100%;
 }
 .citation-sample {
     background-color: #ddd;
