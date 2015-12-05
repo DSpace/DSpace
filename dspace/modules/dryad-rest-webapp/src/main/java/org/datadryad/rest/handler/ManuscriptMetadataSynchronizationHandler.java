@@ -100,7 +100,7 @@ public class ManuscriptMetadataSynchronizationHandler implements HandlerInterfac
 
     private void processChange(Manuscript manuscript) throws HandlerException {
         try {
-            if (manuscript.statusIsSubmitted()) {
+            if (manuscript.isSubmitted()) {
                 // if it's just a submitted notice, there is no metadata to synchronize.
                 return;
             }
