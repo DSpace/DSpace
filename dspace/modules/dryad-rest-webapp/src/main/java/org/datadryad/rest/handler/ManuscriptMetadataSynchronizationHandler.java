@@ -75,7 +75,7 @@ public class ManuscriptMetadataSynchronizationHandler implements HandlerInterfac
      * @throws HandlerException if an error occurred during the lookup
      */
     private static DryadDataPackage findDataPackage(Manuscript manuscript, Context context) throws HandlerException {
-        String doi = manuscript.dryadDataDOI;
+        String doi = manuscript.getDryadDataDOI();
         String reviewerURL = manuscript.dataReviewURL;
         String manuscriptId = manuscript.manuscriptId;
         DryadDataPackage dataPackage = null;

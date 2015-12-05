@@ -169,9 +169,9 @@ public class ApproveRejectReviewItem {
 
             ArrayList<WorkflowItem> workflowItems = new ArrayList<WorkflowItem>();
 
-            if (manuscript.dryadDataDOI != null) {
+            if (manuscript.getDryadDataDOI() != null) {
                 try {
-                    WorkflowItem wfi = WorkflowItem.findByDOI(c, manuscript.dryadDataDOI);
+                    WorkflowItem wfi = WorkflowItem.findByDOI(c, manuscript.getDryadDataDOI());
                     if (wfi != null) {
                         workflowItems.add(wfi);
                     }
@@ -275,7 +275,7 @@ public class ApproveRejectReviewItem {
     private static SearchService getSearchService() {
         DSpace dspace = new DSpace();
         org.dspace.kernel.ServiceManager manager = dspace.getServiceManager() ;
-        return manager.getServiceByName(SearchService.class.getName(),SearchService.class);
+        return manager.getServiceByName(SearchService.class.getName(), SearchService.class);
     }
 
 

@@ -433,14 +433,14 @@ public class DryadEmailSubmission extends HttpServlet {
 
                     ArrayList<WorkflowItem> workflowItems = new ArrayList<WorkflowItem>();
 
-                    if (manuscript.dryadDataDOI != null) {
+                    if (manuscript.getDryadDataDOI() != null) {
                         try {
-                            WorkflowItem wfi = WorkflowItem.findByDOI(context, manuscript.dryadDataDOI);
+                            WorkflowItem wfi = WorkflowItem.findByDOI(context, manuscript.getDryadDataDOI());
                             if (wfi != null) {
                                 workflowItems.add(wfi);
                             }
                         } catch (ApproveRejectReviewItemException e) {
-                            LOGGER.debug ("no workflow items matched DOI " + manuscript.dryadDataDOI);
+                            LOGGER.debug ("no workflow items matched DOI " + manuscript.getDryadDataDOI());
                         }
                     }
 

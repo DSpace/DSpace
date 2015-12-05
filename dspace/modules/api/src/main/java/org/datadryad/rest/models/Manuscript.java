@@ -10,11 +10,15 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.apache.log4j.Logger;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.identifier.DOIIdentifierProvider;
 
 /**
  *
@@ -63,7 +67,7 @@ public class Manuscript {
     public String manuscript_abstract;
     public AuthorsList authors = new AuthorsList();
     public CorrespondingAuthor correspondingAuthor = new CorrespondingAuthor();
-    public String dryadDataDOI;
+    private String dryadDataDOI;
     public List<String> keywords = new ArrayList<String>();
     public String manuscriptId = "";
     private String status = STATUS_ACCEPTED; // STATUS_ACCEPTED is the default
@@ -85,6 +89,15 @@ public class Manuscript {
 
     @JsonIgnore
     public Organization organization = new Organization();
+
+    public void setDryadDataDOI(String newDOI) {
+        this.dryadDataDOI = newDOI;
+    }
+
+    public String getDryadDataDOI() {
+        // find the first instance of a Dryad DOI in these three fields (in this order of priority)
+        return findDryadDOI(dryadDataDOI + "," + dataReviewURL + "," + dataAvailabilityStatement);
+    }
 
     public void setStatus(String newStatus) {
         if (newStatus != null) {
@@ -200,6 +213,16 @@ public class Manuscript {
 
         // TODO: if corresponding author present, must be one of the authors
         return true;
+    }
+
+    private static String findDryadDOI(String searchString) {
+        // we need to look for anything matching the form doi:10.5061/dryad.xxxx as well as dx.doi.org/10.5061/dryad.xxxx
+        Matcher manuscriptMatcher = Pattern.compile(Pattern.quote(DOIIdentifierProvider.getDryadDOIPrefix()) + "[a-zA-Z0-9]+").matcher(searchString);
+        if (manuscriptMatcher.find()) {
+            return "doi:" + manuscriptMatcher.group(0);
+        } else {
+            return null;
+        }
     }
 
     public void configureTestValues() {

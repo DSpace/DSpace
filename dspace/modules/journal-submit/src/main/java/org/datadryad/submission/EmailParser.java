@@ -174,7 +174,6 @@ public class EmailParser {
         String authorstring = (String) dataForXML.remove(AUTHORS);
         manuscript.authors.author = parseAuthorList(authorstring);
 
-        manuscript.dryadDataDOI = null;
         manuscript.keywords.addAll(parseClassificationList((String) dataForXML.remove(CLASSIFICATION)));
         manuscript.manuscriptId = (String) dataForXML.remove(MANUSCRIPT);
         manuscript.setStatus(dataForXML.remove(ARTICLE_STATUS).toLowerCase());
@@ -202,7 +201,7 @@ public class EmailParser {
         manuscript.correspondingAuthor.address.state = (String) dataForXML.remove(STATE);
         manuscript.correspondingAuthor.address.country = (String) dataForXML.remove(COUNTRY);
         manuscript.correspondingAuthor.address.zip = (String) dataForXML.remove(ZIP);
-        manuscript.dryadDataDOI = (String) dataForXML.remove(DRYAD_DOI);
+        manuscript.setDryadDataDOI((String) dataForXML.remove(DRYAD_DOI));
         manuscript.optionalProperties = dataForXML;
     }
 
