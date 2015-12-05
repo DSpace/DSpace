@@ -411,6 +411,7 @@ public class DryadEmailSubmission extends HttpServlet {
                     approved = true;
                 }
 
+                // if the status was "submitted," approved will still be null and we won't try to process any items.
                 if (approved != null) {
                     DSpaceKernelImpl kernelImpl = null;
                     try {
@@ -433,20 +434,20 @@ public class DryadEmailSubmission extends HttpServlet {
 
                     ArrayList<WorkflowItem> workflowItems = new ArrayList<WorkflowItem>();
 
-                    if (manuscript.dryadDataDOI != null) {
+                    if (manuscript.getDryadDataDOI() != null) {
                         try {
-                            WorkflowItem wfi = WorkflowItem.findByDOI(context, manuscript.dryadDataDOI);
+                            WorkflowItem wfi = WorkflowItem.findByDOI(context, manuscript.getDryadDataDOI());
                             if (wfi != null) {
                                 workflowItems.add(wfi);
                             }
                         } catch (ApproveRejectReviewItemException e) {
-                            LOGGER.debug ("no workflow items matched DOI " + manuscript.dryadDataDOI);
+                            LOGGER.debug ("no workflow items matched DOI " + manuscript.getDryadDataDOI());
                         }
                     }
 
                     workflowItems.addAll(WorkflowItem.findAllByManuscript(context, manuscript));
                     LOGGER.debug("found " + workflowItems.size() + " items that match");
-                    ApproveRejectReviewItem.reviewItems(context, approved, workflowItems);
+                    ApproveRejectReviewItem.reviewItems(context, approved, workflowItems, manuscript);
                 }
             } else {
                 throw new SubmissionException("Parser could not validly parse the message");

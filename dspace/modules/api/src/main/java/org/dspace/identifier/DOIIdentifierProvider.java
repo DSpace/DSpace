@@ -62,9 +62,9 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
     private String myDataFileColl;
 
-    private String myLocalPartPrefix;
+    private static String myLocalPartPrefix;
 
-    private String myDoiPrefix;
+    private static String myDoiPrefix;
     private String myBlackoutURL;
 
     private int mySuffixVarLength;
@@ -102,6 +102,9 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         identifierMetadata.qualifier = null;
     }
 
+    public static String getDryadDOIPrefix() {
+        return myDoiPrefix + "/" + myLocalPartPrefix;
+    }
 
     public boolean supports(String identifier)
     {

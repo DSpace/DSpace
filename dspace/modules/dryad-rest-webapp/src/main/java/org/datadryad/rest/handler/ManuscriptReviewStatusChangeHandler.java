@@ -61,6 +61,10 @@ public class ManuscriptReviewStatusChangeHandler implements HandlerInterface<Man
             throw new HandlerException("Cannot process change, DSpace Kernel is not running");
         }
         try {
+            if (manuscript.isSubmitted()) {
+                // if it's just a submitted notice, there is no status to change.
+                return;
+            }
             ApproveRejectReviewItem.reviewManuscript(manuscript);
         } catch (ApproveRejectReviewItemException ex) {
             throw new HandlerException("Exception handling acceptance notice for manuscript " + manuscript.manuscriptId, ex);

@@ -28,6 +28,7 @@ import org.dspace.identifier.IdentifierService;
 import org.dspace.eperson.EPerson;
 import org.datadryad.rest.models.Manuscript;
 import org.dspace.workflow.WorkflowItem;
+import org.datadryad.api.DryadDataPackage;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -103,7 +104,7 @@ public class ApproveRejectReviewItem {
             } else {
                 throw new ApproveRejectReviewItemException("No item found with manuscript number: " + manuscriptNumber);
             }
-            reviewItems(c, approved, workflowItems);
+            reviewItems(c, approved, workflowItems, null);
         } catch (SQLException ex) {
             throw new ApproveRejectReviewItemException(ex);
         } catch (AuthorizeException ex) {
@@ -129,7 +130,7 @@ public class ApproveRejectReviewItem {
             c = new Context();
             c.turnOffAuthorisationSystem();
             WorkflowItem wfi = WorkflowItem.find(c, workflowItemId);
-            reviewItem(c, approved, wfi);
+            reviewItem(c, approved, wfi, null);
         } catch (SQLException ex) {
             throw new ApproveRejectReviewItemException(ex);
         } catch (AuthorizeException ex) {
@@ -149,10 +150,10 @@ public class ApproveRejectReviewItem {
         }
     }
 
-    public static void reviewItems(Context c, Boolean approved, List<WorkflowItem> workflowItems) throws ApproveRejectReviewItemException {
+    public static void reviewItems(Context c, Boolean approved, List<WorkflowItem> workflowItems, Manuscript manuscript) throws ApproveRejectReviewItemException {
         for (WorkflowItem wfi : workflowItems) {
             try {
-                reviewItem(c, approved, wfi);
+                reviewItem(c, approved, wfi, manuscript);
             } catch (ApproveRejectReviewItemException e) {
                 throw new ApproveRejectReviewItemException("Exception caught while reviewing item " + wfi.getItem().getID() + ": " + e.getMessage(), e);
             }
@@ -168,9 +169,9 @@ public class ApproveRejectReviewItem {
 
             ArrayList<WorkflowItem> workflowItems = new ArrayList<WorkflowItem>();
 
-            if (manuscript.dryadDataDOI != null) {
+            if (manuscript.getDryadDataDOI() != null) {
                 try {
-                    WorkflowItem wfi = WorkflowItem.findByDOI(c, manuscript.dryadDataDOI);
+                    WorkflowItem wfi = WorkflowItem.findByDOI(c, manuscript.getDryadDataDOI());
                     if (wfi != null) {
                         workflowItems.add(wfi);
                     }
@@ -180,7 +181,7 @@ public class ApproveRejectReviewItem {
             }
 
             workflowItems.addAll(WorkflowItem.findAllByManuscript(c, manuscript));
-            ApproveRejectReviewItem.reviewItems(c, approved, workflowItems);
+            reviewItems(c, approved, workflowItems, manuscript);
         } catch (SQLException ex) {
             throw new ApproveRejectReviewItemException(ex);
         } finally {
@@ -212,7 +213,7 @@ public class ApproveRejectReviewItem {
         return approved;
     }
 
-    private static void reviewItem(Context c, Boolean approved, WorkflowItem wfi) throws ApproveRejectReviewItemException {
+    private static void reviewItem(Context c, Boolean approved, WorkflowItem wfi, Manuscript manuscript) throws ApproveRejectReviewItemException {
 	// get a List of ClaimedTasks, using the WorkflowItem
         List<ClaimedTask> claimedTasks = null;
         try {
@@ -220,8 +221,10 @@ public class ApproveRejectReviewItem {
                 claimedTasks = ClaimedTask.findByWorkflowId(c, wfi.getID());
             }
             //Check for a valid task
-            // There must be a claimed actions & it must be in the review stage, else it isn't a valid workflowitem
+            // There must be a claimedTask & it must be in the review stage, else it isn't a review workflowitem
             Item item = wfi.getItem();
+            DryadDataPackage dataPackage = DryadDataPackage.findByWorkflowItemId(c, wfi.getID());
+            associateWithManuscript(dataPackage, manuscript);
             if (claimedTasks == null || claimedTasks.isEmpty() || !claimedTasks.get(0).getActionID().equals("reviewAction")) {
                 log.debug ("Item " + item.getID() + " not found or not in review");
             } else {
@@ -234,7 +237,6 @@ public class ApproveRejectReviewItem {
                     item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "step", "approved", null, approved.toString());
 
                     WorkflowManager.doState(c, c.getCurrentUser(), null, claimedTask.getWorkflowItemID(), workflow, actionConfig);
-
                     // Add provenance to item
                     item.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", "Approved by ApproveRejectReviewItem on " + DCDate.getCurrent().toString() + " (GMT)");
                     item.update();
@@ -251,6 +253,7 @@ public class ApproveRejectReviewItem {
                         }
                     }
                     WorkspaceItem wsi = WorkflowManager.rejectWorkflowItem(c, wfi, ePerson, null, reason, true);
+                    disassociateFromManuscript(dataPackage, manuscript);
                 }
                 c.restoreAuthSystemState();
             }
@@ -272,7 +275,75 @@ public class ApproveRejectReviewItem {
     private static SearchService getSearchService() {
         DSpace dspace = new DSpace();
         org.dspace.kernel.ServiceManager manager = dspace.getServiceManager() ;
-        return manager.getServiceByName(SearchService.class.getName(),SearchService.class);
+        return manager.getServiceByName(SearchService.class.getName(), SearchService.class);
     }
 
+
+    /**
+     * Copies manuscript metadata into a dryad data package
+     * @param dataPackage
+     * @param manuscript
+     * @throws SQLException
+     */
+    private static void associateWithManuscript(DryadDataPackage dataPackage, Manuscript manuscript) throws SQLException {
+        if (manuscript != null) {
+            // set publication DOI
+            if (manuscript.publicationDOI != null) {
+                dataPackage.setPublicationDOI(manuscript.publicationDOI);
+            }
+            // set Manuscript ID
+            if (manuscript.manuscriptId != null) {
+                dataPackage.setManuscriptNumber(manuscript.manuscriptId);
+            }
+            // union keywords
+            if (manuscript.keywords.size() > 0) {
+                List<String> manuscriptKeywords = manuscript.keywords;
+                dataPackage.addKeywords(manuscriptKeywords);
+            }
+            // set title
+            if (manuscript.title != null) {
+                dataPackage.setTitle(prefixTitle(manuscript.title));
+            }
+            // set abstract
+            if (manuscript.manuscript_abstract != null) {
+                dataPackage.setAbstract(manuscript.manuscript_abstract);
+            }
+            // set publicationDate
+            if (manuscript.publicationDate != null) {
+                dataPackage.setBlackoutUntilDate(manuscript.publicationDate);
+            }
+        }
+    }
+
+    private static void disassociateFromManuscript(DryadDataPackage dataPackage, Manuscript manuscript) throws SQLException {
+        if (manuscript != null) {
+            // clear publication DOI
+            dataPackage.setPublicationDOI(null);
+            // clear Manuscript ID
+            dataPackage.setManuscriptNumber(null);
+            // disjoin keywords
+            List<String> packageKeywords = dataPackage.getKeywords();
+            List<String> manuscriptKeywords = manuscript.keywords;
+            List<String> prunedKeywords = subtractList(packageKeywords, manuscriptKeywords);
+
+            dataPackage.setKeywords(prunedKeywords);
+            // clear publicationDate
+            dataPackage.setBlackoutUntilDate(null);
+        }
+    }
+
+    private static List<String> subtractList(List<String> list1, List<String> list2) {
+        List<String> list = new ArrayList<String>(list1);
+        for(String string : list2) {
+            if(list.contains(string)) {
+                list.remove(string);
+            }
+        }
+        return list;
+    }
+
+
+    private static String prefixTitle(String title) {
+        return String.format("Data from: %s", title);
+    }
 }

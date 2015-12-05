@@ -558,7 +558,7 @@ public class JournalUtils {
         String journalCode = cleanJournalCode(manuscript.organization.organizationCode).toUpperCase();
         StoragePath storagePath = StoragePath.createManuscriptPath(journalCode, manuscript.manuscriptId);
 
-        createOrganizationinDB(context,manuscript.organization);
+        createOrganizationinDB(context, manuscript.organization);
 
         ManuscriptDatabaseStorageImpl manuscriptStorage = new ManuscriptDatabaseStorageImpl();
         List<Manuscript> manuscripts = getManuscriptsMatchingID(journalCode, manuscript.manuscriptId);
@@ -618,30 +618,41 @@ public class JournalUtils {
         PublicationBean pBean = new PublicationBean();
         pBean.setManuscriptNumber(manuscript.manuscriptId);
         pBean.setJournalID(cleanJournalCode(manuscript.organization.organizationCode));
-        pBean.setJournalName(manuscript.organization.organizationName);
         pBean.setTitle(manuscript.title);
-        pBean.setAbstract(manuscript.manuscript_abstract);
-        pBean.setCorrespondingAuthor(manuscript.correspondingAuthor.author.givenNames + " " + manuscript.correspondingAuthor.author.familyName);
-        pBean.setEmail(manuscript.correspondingAuthor.email);
-        if (manuscript.optionalProperties != null) {
-            String issn = manuscript.optionalProperties.get("ISSN");
-            if (issn != null) {
-                pBean.setJournalISSN(issn);
-            }
-        }
+        pBean.setStatus(manuscript.getStatus());
+
         ArrayList<String> authorstrings = new ArrayList<String>();
         for (Author a : manuscript.authors.author) {
 
             authorstrings.add(a.givenNames + " " + a.familyName);
         }
         pBean.setAuthors(authorstrings);
+
+        // the rest of the fields are optional:
+        if (manuscript.organization.organizationName != null) {
+            pBean.setJournalName(manuscript.organization.organizationName);
+        }
+        if (manuscript.manuscript_abstract != null) {
+            pBean.setAbstract(manuscript.manuscript_abstract);
+        }
+        if (manuscript.correspondingAuthor.author != null) {
+            pBean.setCorrespondingAuthor(manuscript.correspondingAuthor.author.givenNames + " " + manuscript.correspondingAuthor.author.familyName);
+        }
+        if (manuscript.correspondingAuthor.email != null) {
+            pBean.setEmail(manuscript.correspondingAuthor.email);
+        }
+        if (manuscript.optionalProperties != null) {
+            String issn = manuscript.optionalProperties.get("ISSN");
+            if (issn != null) {
+                pBean.setJournalISSN(issn);
+            }
+        }
         ArrayList<String> subjectKeywords = new ArrayList<String>();
         for (String keyword : manuscript.keywords) {
             subjectKeywords.add(keyword);
         }
         pBean.setSubjectKeywords(subjectKeywords);
 
-        pBean.setStatus(manuscript.getStatus());
         if (manuscript.isSubmitted()) {
             pBean.setSkipReviewStep(false);
         } else if (manuscript.isAccepted() || manuscript.isRejected()) {
