@@ -100,6 +100,10 @@ public class ManuscriptMetadataSynchronizationHandler implements HandlerInterfac
 
     private void processChange(Manuscript manuscript) throws HandlerException {
         try {
+            if (manuscript.statusIsSubmitted()) {
+                // if it's just a submitted notice, there is no metadata to synchronize.
+                return;
+            }
             ApproveRejectReviewItem.reviewManuscript(manuscript);
         } catch (ApproveRejectReviewItemException ex) {
             throw new HandlerException("Exception handling acceptance notice for manuscript " + manuscript.manuscriptId, ex);

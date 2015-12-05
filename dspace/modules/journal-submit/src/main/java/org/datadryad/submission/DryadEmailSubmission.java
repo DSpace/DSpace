@@ -411,6 +411,7 @@ public class DryadEmailSubmission extends HttpServlet {
                     approved = true;
                 }
 
+                // if the status was "submitted," approved will still be null and we won't try to process any items.
                 if (approved != null) {
                     DSpaceKernelImpl kernelImpl = null;
                     try {
