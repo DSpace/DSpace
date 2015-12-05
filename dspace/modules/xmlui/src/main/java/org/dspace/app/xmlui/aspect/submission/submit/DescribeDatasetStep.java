@@ -114,7 +114,7 @@ public class DescribeDatasetStep extends AbstractSubmissionStep {
             fileItem.addHighlight("head").addContent(message("xmlui.Submission.submit.UploadStep.column5"));
             fileItem.addHighlight("head").addContent(message("xmlui.Submission.submit.UploadStep.column7"));
 
-            fileItem.addHighlight("content").addXref(url, XSLUtils.getShortFileName(fileFound.getName(), 25));
+            fileItem.addHighlight("content").addXref(url, XSLUtils.getShortFileName(fileFound.getName(), 50));
             fileItem.addHighlight("content").addContent((fileFound.getSize() / 1000) + " Kb");
             fileItem.addHighlight("content").addContent(fileFound.getFormat().getDescription());
             fileItem.addHidden("remove_dataset_id").setValue("" + fileFound.getID());

@@ -1820,7 +1820,7 @@ img.pub-cover {
 .publication-header .pub-title {
     font-size: 1.2em;
     font-weight: bold;
-    width: 100%;
+    word-wrap: break-word;
 }
 .citation-sample {
     background-color: #ddd;
@@ -1845,6 +1845,7 @@ table.package-file-description {
     -moz-box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
     -webkit-box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+    table-layout:fixed;
 }
 table.package-file-description th:first-child {
     width: 120px;
@@ -1854,6 +1855,7 @@ table.package-file-description th {
     font-weight: bold;
     text-align: left;
     vertical-align: top;
+    word-wrap:break-word;
 }
 table.package-metadata th:first-child,
 table.package-file-description th:first-child {
