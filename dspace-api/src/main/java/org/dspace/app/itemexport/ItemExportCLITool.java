@@ -70,6 +70,9 @@ public class ItemExportCLITool {
                 "sequence number to begin exporting items with");
         options.addOption("z", "zip", true, "export as zip file (specify filename e.g. export.zip)");
         options.addOption("h", "help", false, "help");
+
+        // as pointed out by Peter Dietz this provides similar functionality to export metadata
+        // but it is needed since it directly exports to Simple Archive Format (SAF)
         options.addOption("x", "exclude-bitstreams", false, "do not export bitstreams");
 
         CommandLine line = parser.parse(options, argv);
