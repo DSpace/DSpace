@@ -27,15 +27,9 @@ public interface DOIConnector {
     public boolean isDOIReserved(Context context, String doi)
             throws DOIIdentifierException;
     
-    public boolean isDOIReserved(Context context, DSpaceObject dso, String doi)
-            throws DOIIdentifierException;
-    
     public boolean isDOIRegistered(Context context, String doi)
             throws DOIIdentifierException;
     
-    public boolean isDOIRegistered(Context context, DSpaceObject dso, String doi)
-            throws DOIIdentifierException;
-
     /**
      * Sends the DELETE-Request to the DOI registry.
      * 
