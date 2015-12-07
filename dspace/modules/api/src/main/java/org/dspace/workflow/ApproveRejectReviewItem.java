@@ -50,6 +50,7 @@ public class ApproveRejectReviewItem {
 
         options.addOption("m", "manuscriptnumber", true, "The manuscript number");
         options.addOption("i", "wfitemid", true, "The workflow item id");
+        options.addOption("j", "journalcode", true, "The journal code");
         options.addOption("a", "approved", true, "Whether or not the the application will be approved, can either be true or false");
         options.addOption("h", "help", false, "help");
 
@@ -73,7 +74,14 @@ public class ApproveRejectReviewItem {
         if(line.hasOption('m')){
             // get a WorkflowItem using a manuscript number
             String manuscriptNumber = line.getOptionValue('m');
-            reviewItem(approved, manuscriptNumber);
+            String journalCode = line.getOptionValue('j');
+            if (journalCode == null) {
+                System.out.println("No journal code was given. This is needed to match the manuscript number with an item in review.");
+                System.exit(1);
+            }
+            Manuscript manuscript = new Manuscript(manuscriptNumber, approved ? Manuscript.STATUS_ACCEPTED : Manuscript.STATUS_REJECTED);
+            manuscript.organization.organizationCode = journalCode;
+            reviewManuscript(manuscript);
         } else if(line.hasOption('i')) {
             // get a WorkflowItem using a workflow ID
             Integer wfItemId = Integer.parseInt(line.getOptionValue('i'));
@@ -82,45 +90,6 @@ public class ApproveRejectReviewItem {
             System.out.println("No manuscript number or workflow ID was given. One of these must be provided to identify the correct item in the review stage.");
             System.exit(1);
             return;
-        }
-    }
-
-    private static void reviewItem(Boolean approved, String manuscriptNumber) throws ApproveRejectReviewItemException  {
-        WorkflowItem wfi = null;
-        ArrayList workflowItems = new ArrayList<WorkflowItem>();
-        Context c = null;
-        try {
-            c = new Context();
-            c.turnOffAuthorisationSystem();
-            ItemIterator manuscriptItems = Item.findByMetadataField(c, "dc", "identifier", "manuscriptNumber", manuscriptNumber, false);
-            if (manuscriptItems.hasNext()) {
-                while (manuscriptItems.hasNext()) {
-                    Item ms = manuscriptItems.next();
-                    wfi = WorkflowItem.findByItemId(c, ms.getID());
-                    if (wfi != null) {
-                        workflowItems.add(wfi);
-                    }
-                }
-            } else {
-                throw new ApproveRejectReviewItemException("No item found with manuscript number: " + manuscriptNumber);
-            }
-            reviewItems(c, approved, workflowItems, null);
-        } catch (SQLException ex) {
-            throw new ApproveRejectReviewItemException(ex);
-        } catch (AuthorizeException ex) {
-            throw new ApproveRejectReviewItemException(ex);
-        } catch (IOException ex) {
-            throw new ApproveRejectReviewItemException(ex);
-        } finally {
-            if(c != null) {
-                try {
-                    c.complete();
-                } catch (SQLException ex) {
-                    // Swallow it
-                } finally {
-                    c = null;
-                }
-            }
         }
     }
 
