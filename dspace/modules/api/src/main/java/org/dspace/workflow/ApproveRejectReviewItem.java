@@ -150,7 +150,7 @@ public class ApproveRejectReviewItem {
         }
     }
 
-    public static void reviewItems(Context c, Boolean approved, List<WorkflowItem> workflowItems, Manuscript manuscript) throws ApproveRejectReviewItemException {
+    private static void reviewItems(Context c, Boolean approved, List<WorkflowItem> workflowItems, Manuscript manuscript) throws ApproveRejectReviewItemException {
         for (WorkflowItem wfi : workflowItems) {
             try {
                 reviewItem(c, approved, wfi, manuscript);
