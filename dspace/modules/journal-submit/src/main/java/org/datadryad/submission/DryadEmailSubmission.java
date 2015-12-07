@@ -384,7 +384,7 @@ public class DryadEmailSubmission extends HttpServlet {
             }
 
             // at this point, concept is not null.
-            journalName = concept.getFullName(context);
+            journalName = JournalUtils.getFullName(concept);
             try {
                 parser = getEmailParser(JournalUtils.getParsingScheme(concept));
                 parser.parseMessage(dryadContent);

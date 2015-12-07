@@ -468,18 +468,6 @@ public class Concept extends AuthorityObject
         return concepts;
     }
 
-    public String getFullName(Context context) throws SQLException, AuthorizeException {
-        MetadataSchema mds = MetadataSchema.find(context, "journal");
-        MetadataField mdf = MetadataField.findByElement(context, mds.getSchemaID(), "fullname", null);
-        log.debug("journal fullname field ID is " + mdf.getFieldID());
-        TableRowIterator row = DatabaseManager.query(context, "select cmv.text_value from concept as c, conceptmetadatavalue as cmv where cmv.parent_id = c.id and c.id=? and cmv.field_id=?", this.getID(), mdf.getFieldID());
-        String result = null;
-        if (row.hasNext()) {
-            result = row.next().getStringColumn("text_value");
-        }
-        return result;
-    }
-
     /**
      * Finds all concepts in the site
      *
