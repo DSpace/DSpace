@@ -105,8 +105,8 @@
         <xsl:variable name="metsDoc" select="document($externalMetadataUrl)"/>
 
         <div class="community-browser-row">
-       		&#8227;   
             <a href="{$metsDoc/mets:METS/@OBJID}">
+       		<hi rend="glyphicon glyphicon-play">&#160;</hi>   
                 <xsl:choose>
                     <xsl:when test="dri:list[@n=(concat($handle, ':dc.title')) and descendant::text()]">
                         <xsl:apply-templates select="dri:list[@n=(concat($handle, ':dc.title'))]/dri:item"/>
