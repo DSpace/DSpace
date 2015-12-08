@@ -37,8 +37,6 @@ public class HandleIdentifierProvider extends IdentifierProvider {
     /** Prefix registered to no one */
     protected static final String EXAMPLE_PREFIX = "123456789";
 
-    protected String[] supportedPrefixes = new String[]{"info:hdl", "hdl", "http://"};
-
     @Autowired(required = true)
     protected HandleService handleService;
     @Autowired(required = true)
@@ -52,23 +50,21 @@ public class HandleIdentifierProvider extends IdentifierProvider {
     @Override
     public boolean supports(String identifier)
     {
-        for(String prefix : supportedPrefixes){
-            if(identifier.startsWith(prefix))
-            {
-                return true;
-            }
+        String prefix = handleService.getPrefix();
+        String handleResolver = ConfigurationManager.getProperty("handle.canonical.prefix");
+        if (identifier == null)
+        {
+            return false;
         }
-
-        try {
-            String outOfUrl = retrieveHandleOutOfUrl(identifier);
-            if(outOfUrl != null)
-            {
-                return true;
-            }
-        } catch (SQLException e) {
-            log.error(e.getMessage(), e);
+        if (identifier.startsWith(prefix)
+                || identifier.startsWith(handleResolver)
+                || identifier.startsWith("http://hdl.handle.net/")
+                || identifier.startsWith("hdl:")
+                || identifier.startsWith("info:hdl"))
+        {
+            return true;
         }
-
+        
         return false;
     }
 

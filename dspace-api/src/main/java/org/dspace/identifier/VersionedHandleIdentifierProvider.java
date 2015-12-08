@@ -48,8 +48,6 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
 
     private static final char DOT = '.';
 
-    private String[] supportedPrefixes = new String[]{"info:hdl", "hdl", "http://"};
-
     @Autowired(required = true)
     private VersioningService versionService;
 
@@ -71,24 +69,21 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
     @Override
     public boolean supports(String identifier)
     {
-        for(String prefix : supportedPrefixes)
+        String prefix = handleService.getPrefix();
+        String handleResolver = ConfigurationManager.getProperty("handle.canonical.prefix");
+        if (identifier == null)
         {
-            if(identifier.startsWith(prefix))
-            {
-                return true;
-            }
+            return false;
         }
-
-        try {
-            String outOfUrl = retrieveHandleOutOfUrl(identifier);
-            if(outOfUrl != null)
-            {
-                return true;
-            }
-        } catch (SQLException e) {
-            log.error(e.getMessage(), e);
+        if (identifier.startsWith(prefix)
+                || identifier.startsWith(handleResolver)
+                || identifier.startsWith("http://hdl.handle.net/")
+                || identifier.startsWith("hdl:")
+                || identifier.startsWith("info:hdl"))
+        {
+            return true;
         }
-
+        
         return false;
     }
 

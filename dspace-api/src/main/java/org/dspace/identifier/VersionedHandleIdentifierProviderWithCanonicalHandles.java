@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
+import org.apache.commons.lang.StringUtils;
 
 /**
  *
@@ -43,8 +44,6 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
     static final String EXAMPLE_PREFIX = "123456789";
 
     private static final char DOT = '.';
-
-    private String[] supportedPrefixes = new String[]{"info:hdl", "hdl", "http://"};
 
     @Autowired(required = true)
     private VersioningService versionService;
@@ -67,24 +66,21 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
     @Override
     public boolean supports(String identifier)
     {
-        for(String prefix : supportedPrefixes)
+        String prefix = handleService.getPrefix();
+        String handleResolver = ConfigurationManager.getProperty("handle.canonical.prefix");
+        if (identifier == null)
         {
-            if(identifier.startsWith(prefix))
-            {
-                return true;
-            }
+            return false;
         }
-
-        try {
-            String outOfUrl = retrieveHandleOutOfUrl(identifier);
-            if(outOfUrl != null)
-            {
-                return true;
-            }
-        } catch (SQLException e) {
-            log.error(e.getMessage(), e);
+        if (identifier.startsWith(prefix)
+                || identifier.startsWith(handleResolver)
+                || identifier.startsWith("http://hdl.handle.net/")
+                || identifier.startsWith("hdl:")
+                || identifier.startsWith("info:hdl"))
+        {
+            return true;
         }
-
+        
         return false;
     }
 
@@ -105,19 +101,35 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
                     String canonical = getCanonical(context, item);
                     // Modify Canonical: 12345/100 will point to the new item
                     handleService.modifyHandleDSpaceObject(context, canonical, item);
-
-                    // in case of first version we have to modify the previous metadata to be xxxx.1
+                    
+                    // we have to replace the canonical handle within the 
+                    // metadata of the previous item
+        
                     Version version = versionService.getVersion(context, item);
                     Version previous;
-                    boolean isFirstVersion;
+                    String previousItemHandle = null;
                     try {
                         previous = versionHistoryService.getPrevious(context, history, version);
-                        isFirstVersion = versionHistoryService.isFirstVersion(context, history, previous);
+                        if (previous != null)
+                        {
+                            previousItemHandle = handleService.findHandle(context, previous.getItem());
+                        }
                     } catch (SQLException ex) {
                         throw new RuntimeException("A problem with the database connection occured.", ex);
                     }
-                    if (isFirstVersion)
+                    if (previous != null)
                     {
+                        // Check if our previous item doesn't have a handle anymore.
+                        // This occurs only when a switch has been made from 
+                        // the standard handle identifier provider to the 
+                        // versioned one, in this case no "versioned handle" is 
+                        // reserved so we need to create one
+                        if (previousItemHandle == null)
+                        {
+                            previousItemHandle = makeIdentifierBasedOnHistory(context, previous.getItem(), canonical, history);
+                        }
+                        // remove the canonical handle from the metadata of the
+                        // previous item an add the versioned handle
                         try{
                             //If we have a reviewer he/she might not have the rights to edit the metadata of this item, so temporarly grant them.
                             context.turnOffAuthorisationSystem();
@@ -125,14 +137,6 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
                         }finally {
                             context.restoreAuthSystemState();
                         }
-
-                    }
-                    // Check if our previous item hasn't got a handle anymore.
-                    // This only occurs when a switch has been made from the standard handle identifier provider
-                    // to the versioned one, in this case no "versioned handle" is reserved so we need to create one
-                    if(previous != null && handleService.findHandle(context, previous.getItem()) == null){
-                        makeIdentifierBasedOnHistory(context, previous.getItem(), canonical, history);
-
                     }
                 }
                 populateHandleMetadata(context, item);
@@ -351,7 +355,7 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
 
     }
 
-    public static String retrieveHandleOutOfUrl(String url) throws SQLException
+    public static String retrieveHandleOutOfUrl(String url)
     {
         // We can do nothing with this, return null
         if (!url.contains("/")) return null;
@@ -489,9 +493,33 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
     protected void modifyHandleMetadata(Context context, Item item, String handle)
             throws SQLException, IOException, AuthorizeException
     {
+        // we want to exchange the old handle against the new one. To do so, we 
+        // load all identifiers, clear the metadata field, re add all 
+        // identifiers which are not from type handle and add the new handle.
         String handleref = getCanonicalForm(handle);
+        List<MetadataValue> identifiers = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "identifier", "uri", Item.ANY);
         itemService.clearMetadata(context, item, MetadataSchema.DC_SCHEMA, "identifier", "uri", Item.ANY);
-        itemService.addMetadata(context, item, MetadataSchema.DC_SCHEMA, "identifier", "uri", null, handleref);
+        for (MetadataValue identifier : identifiers)
+        {
+            if (this.supports(identifier.getValue()))
+            {
+                // ignore handles
+                log.warn("Removing identifier " + identifier.getValue());
+                continue;
+            }
+            log.warn("Preserving identifier " + identifier.getValue());
+            itemService.addMetadata(context, 
+                    item,
+                    identifier.getMetadataField(),
+                    identifier.getLanguage(),
+                    identifier.getValue(),
+                    identifier.getAuthority(),
+                    identifier.getConfidence());
+        }
+        if (!StringUtils.isEmpty(handleref))
+        {
+            itemService.addMetadata(context, item, MetadataSchema.DC_SCHEMA, "identifier", "uri", null, handleref);
+        }
         itemService.update(context, item);
     }
 }
