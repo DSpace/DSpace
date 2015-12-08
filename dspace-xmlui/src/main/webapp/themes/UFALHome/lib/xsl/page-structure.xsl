@@ -528,12 +528,7 @@
 									<xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
 								</xsl:if>
                                 <a>
-									<xsl:attribute name="href">
-										<xsl:copy-of select="$context-path"/>
-										/browse?value=
-										<xsl:copy-of select="node()" />
-										&amp;type=author
-									</xsl:attribute>
+									<xsl:attribute name="href"><xsl:copy-of select="$context-path"/>/browse?value=<xsl:copy-of select="node()" />&amp;type=author</xsl:attribute>
 									<xsl:copy-of select="node()" />
 								</a>                                
 							</span>
@@ -546,12 +541,7 @@
 					<xsl:when test="dim:field[@element='creator']">
 						<xsl:for-each select="dim:field[@element='creator']">
                             <a>
-                                <xsl:attribute name="href">
-                                    <xsl:copy-of select="$context-path"/>
-                                    /browse?value=
-                                    <xsl:copy-of select="node()" />
-                                    &amp;type=author
-                                </xsl:attribute>
+                                <xsl:attribute name="href"><xsl:copy-of select="$context-path"/>/browse?value=<xsl:copy-of select="node()" />&amp;type=author</xsl:attribute>
                                 <xsl:copy-of select="node()" />
                             </a>                                
 							<xsl:if
@@ -657,10 +647,7 @@
 								<li class="no-padding">
 									<strong>
 									<a class="btn btn-link btn-small no-padding">
-									<xsl:attribute name="href">
-		                                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='search'][@qualifier='advancedURL']" />
-		                                <xsl:text>?advance</xsl:text>
-		                            </xsl:attribute>
+									<xsl:attribute name="href"><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='search'][@qualifier='advancedURL']" /><xsl:text>?advance</xsl:text></xsl:attribute>
 									<i18n:text>xmlui.dri2xhtml.structural.search-advanced</i18n:text>
 									</a>
 									</strong>

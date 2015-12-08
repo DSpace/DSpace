@@ -58,9 +58,7 @@
 							<xsl:for-each select="dri:item/dri:xref">
 								<li>
 									<a>										
-										<xsl:attribute name="href">
-											<xsl:value-of select="@target" />
-										</xsl:attribute>
+										<xsl:attribute name="href"><xsl:value-of select="@target" /></xsl:attribute>
 										<span class="wordbreak">
 												<xsl:apply-templates select="./node()"/>
 										</span>
@@ -253,12 +251,7 @@
              <xsl:if test="dim:field[@element='publisher']">
              	<xsl:for-each select="dim:field[@element='publisher']">
                     <a class="publisher">
-                        <xsl:attribute name="href">
-                            <xsl:copy-of select="$context-path"/>
-                            /browse?value=
-                            <xsl:copy-of select="./node()"/>
-                            &amp;type=publisher
-                        </xsl:attribute>
+                        <xsl:attribute name="href"><xsl:copy-of select="$context-path"/>/browse?value=<xsl:copy-of select="./node()"/>&amp;type=publisher</xsl:attribute>
                         <xsl:copy-of select="./node()"/>
                     </a>
 					<xsl:if
@@ -294,12 +287,7 @@
                                     <xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
                                 </xsl:if>
                                 <a>
-									<xsl:attribute name="href">
-										<xsl:copy-of select="$context-path"/>
-										/browse?value=
-										<xsl:copy-of select="node()" />
-										&amp;type=author
-									</xsl:attribute>
+									<xsl:attribute name="href"><xsl:copy-of select="$context-path"/>/browse?value=<xsl:copy-of select="node()" />&amp;type=author</xsl:attribute>
 									<xsl:copy-of select="node()" />
 								</a>                                
                             </span>
@@ -312,12 +300,7 @@
                     <xsl:when test="dim:field[@element='creator']">
                         <xsl:for-each select="dim:field[@element='creator']">
                         	<a>
-								<xsl:attribute name="href">
-									<xsl:copy-of select="$context-path"/>
-									/browse?value=
-									<xsl:copy-of select="node()" />
-									&amp;type=author
-								</xsl:attribute>
+								<xsl:attribute name="href"><xsl:copy-of select="$context-path"/>/browse?value=<xsl:copy-of select="node()" />&amp;type=author</xsl:attribute>
 								<xsl:copy-of select="node()" />
 							</a>                            
                             <xsl:if
