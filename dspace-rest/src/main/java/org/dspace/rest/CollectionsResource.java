@@ -109,7 +109,7 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext(getUser(headers), request);
 
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId, org.dspace.core.Constants.READ);
             writeStats(dspaceCollection, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
@@ -178,7 +178,7 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext(getUser(headers), request);
 
             if (!((limit != null) && (limit >= 0) && (offset != null) && (offset >= 0)))
             {
@@ -264,7 +264,7 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext(getUser(headers), request);
 
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId, org.dspace.core.Constants.READ);
             writeStats(dspaceCollection, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
@@ -345,7 +345,7 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext(getUser(headers), request);
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId,
                     org.dspace.core.Constants.WRITE);
 
@@ -440,7 +440,7 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext(getUser(headers), request);
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId,
                     org.dspace.core.Constants.WRITE);
 
@@ -510,7 +510,7 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext(getUser(headers), request);
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId,
                     org.dspace.core.Constants.DELETE);
 
@@ -580,7 +580,7 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext(getUser(headers), request);
 
             org.dspace.content.Collection dspaceCollection = collectionService.findByIdOrLegacyId(context, collectionId);
             org.dspace.content.Item item = itemService.findByIdOrLegacyId(context, itemId);
@@ -668,7 +668,7 @@ public class CollectionsResource extends Resource
     @Path("/find-collection")
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Collection findCollectionByName(String name, @Context HttpHeaders headers) throws WebApplicationException
+    public Collection findCollectionByName(String name, @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
     {
         log.info("Searching for first collection with name=" + name + ".");
         org.dspace.core.Context context = null;
@@ -676,7 +676,7 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext(getUser(headers), request);
 
             List<org.dspace.content.Collection> dspaceCollections = collectionService.findAll(context);
             //TODO, this would be more efficient with a findByName query
