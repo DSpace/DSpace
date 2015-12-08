@@ -624,7 +624,7 @@ public class JournalUtils {
         ArrayList<String> authorstrings = new ArrayList<String>();
         for (Author a : manuscript.authors.author) {
 
-            authorstrings.add(a.givenNames + " " + a.familyName);
+            authorstrings.add(a.familyName + ", " + a.givenNames);
         }
         pBean.setAuthors(authorstrings);
 
