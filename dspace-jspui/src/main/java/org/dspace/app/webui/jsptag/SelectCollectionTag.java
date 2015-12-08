@@ -7,31 +7,22 @@
  */
 package org.dspace.app.webui.jsptag;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
+import org.dspace.app.webui.util.UIUtil;
+import org.dspace.content.Collection;
+import org.dspace.core.Context;
 
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.tagext.TagSupport;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
-
-import org.dspace.app.util.CollectionDropDown;
-import org.dspace.app.webui.util.UIUtil;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.core.Context;
+import javax.servlet.jsp.tagext.TagSupport;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ResourceBundle;
 
 /**
  * Renders select element to select collection with parent community
  * object.
- * 
+ *
  * @author Keiji Suzuki
  */
 public class SelectCollectionTag extends TagSupport
@@ -93,7 +84,7 @@ public class SelectCollectionTag extends TagSupport
                 {
                     sb.append(" selected=\"selected\"");
                 }
-                sb.append(">").append(CollectionDropDown.collectionPath(coll)).append("</option>\n");
+                sb.append(">").append(coll.getName()).append("</option>\n");
             }
 
             sb.append("</select>\n");
@@ -108,7 +99,7 @@ public class SelectCollectionTag extends TagSupport
         {
             throw new JspException(e);
         }
-        
+
         return SKIP_BODY;
     }
 
