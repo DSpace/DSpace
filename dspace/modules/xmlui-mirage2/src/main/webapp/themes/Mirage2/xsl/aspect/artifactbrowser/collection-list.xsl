@@ -44,8 +44,8 @@
         <div class="artifact-description">
             <p class="artifact-title">
                 <a href="{@OBJID}">
-       				&#8227;   
                     <span class="Z3988">
+       				<span class="glyphicon glyphicon-arrow-right">&#160;</span>   
                         <xsl:choose>
                             <xsl:when test="string-length($data/dim:field[@element='title'][1]) &gt; 0">
                                 <xsl:value-of select="$data/dim:field[@element='title'][1]"/>
