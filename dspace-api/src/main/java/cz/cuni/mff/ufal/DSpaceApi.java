@@ -12,6 +12,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 
 import cz.cuni.mff.ufal.dspace.AbstractPIDService;
+
 import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.authorize.AuthorizeException;
@@ -51,8 +52,7 @@ public class DSpaceApi {
 
 		IFunctionalities manager = null;
 
-		String className = ConfigurationManager.getProperty(
-				"lr", "lr.utilities.functionalityManager.class"); // cz.cuni.mff.ufal.lindat.utilities.HibernateFunctionalityManager
+		String className = ConfigurationManager.getProperty("lr", "lr.utilities.functionalityManager.class"); // cz.cuni.mff.ufal.lindat.utilities.HibernateFunctionalityManager
 
 		try {
 
@@ -62,7 +62,7 @@ public class DSpaceApi {
 			Class<IFunctionalities> functionalities = (Class<IFunctionalities>) Class.forName(className);
 			Constructor<IFunctionalities> constructor = functionalities.getConstructor(String.class);
 			ConfigurationService configurationService = new DSpace().getConfigurationService();
-			String lr_cfg = configurationService.getProperty("dspace.dir") + File.separator + "config/modules/lr.cfg";
+			String lr_cfg = configurationService.getProperty("dspace.dir") + File.separator + "config/modules/lr.cfg";			
 			manager = constructor.newInstance(lr_cfg);
 
 			log.debug("Class " + className + " loaded successfully");
@@ -461,5 +461,6 @@ public class DSpaceApi {
     }
     
 }
+
 
 
