@@ -46,7 +46,7 @@
             <p class="artifact-title">
                 <a href="{@OBJID}">
 				    <span class="Z3988">
-       				<hi rend="glyphicon glyphicon-play">&#160;</hi>   
+       				<span class="glyphicon glyphicon-arrow-right">&#160;</span>   
                         <xsl:choose>
                             <xsl:when test="string-length($data/dim:field[@element='title'][1]) &gt; 0">
                                 <xsl:value-of select="$data/dim:field[@element='title'][1]"/>
@@ -72,7 +72,7 @@
         <xsl:variable name="data" select="./mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim"/>
         <span class="bold">
             <a href="{@OBJID}">
-       				<span class="glyphicon glyphicon-play">&#160;</span>   
+       				<span class="glyphicon glyphicon-arrow-right">&#160;</span>   
                 <xsl:choose>
                     <xsl:when test="string-length($data/dim:field[@element='title'][1]) &gt; 0">
                         <xsl:value-of select="$data/dim:field[@element='title'][1]"/>

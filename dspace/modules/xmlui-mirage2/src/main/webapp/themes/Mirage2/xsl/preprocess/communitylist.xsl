@@ -123,7 +123,7 @@
     <xsl:template match="mets:METS" mode="community-browser">
         <xsl:variable name="dim" select="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim"/>
         <xref target="{@OBJID}" n="community-browser-link">
-       		<hi rend="glyphicon glyphicon-play">&#160;</hi>   
+       		<hi rend="glyphicon glyphicon-arrow-right">&#160;</hi>   
             <xsl:value-of select="$dim/dim:field[@element='title']"/>
         </xref>
         <!--Display community strengths (item counts) if they exist-->

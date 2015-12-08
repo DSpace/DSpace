@@ -106,7 +106,7 @@
 
         <div class="community-browser-row">
             <a href="{$metsDoc/mets:METS/@OBJID}">
-       		<hi rend="glyphicon glyphicon-play">&#160;</hi>   
+       		<hi rend="glyphicon glyphicon-arrow-right">&#160;</hi>   
                 <xsl:choose>
                     <xsl:when test="dri:list[@n=(concat($handle, ':dc.title')) and descendant::text()]">
                         <xsl:apply-templates select="dri:list[@n=(concat($handle, ':dc.title'))]/dri:item"/>
