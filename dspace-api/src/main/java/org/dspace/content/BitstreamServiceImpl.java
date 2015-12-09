@@ -41,7 +41,7 @@ import java.util.UUID;
 public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> implements BitstreamService {
 
     /** log4j logger */
-    private static Logger log = Logger.getLogger(BitstreamServiceImpl.class);
+    private static final Logger log = Logger.getLogger(BitstreamServiceImpl.class);
 
 
     @Autowired(required = true)
@@ -294,12 +294,11 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
                 return null;
             }
         }
-        else
-        if(bitstream.getCommunity() != null)
+        else if(bitstream.getCommunity() != null)
         {
             return bitstream.getCommunity();
-        }else
-        if(bitstream.getCollection() != null)
+        }
+        else if(bitstream.getCollection() != null)
         {
             return bitstream.getCollection();
         }
