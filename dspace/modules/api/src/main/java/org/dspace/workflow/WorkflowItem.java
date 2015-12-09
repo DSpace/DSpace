@@ -283,9 +283,9 @@ public class WorkflowItem implements InProgressSubmission {
 
                 if (matched == false) {
                     // count number of authors and number of matched authors: if equal, this is a match.
-                    if (manuscript.authors.author.size() > 0) {
+                    DCValue[] itemAuthors = item.getMetadata("dc", "contributor", "author", Item.ANY);
+                    if (manuscript.authors.author.size() == itemAuthors.length) {
                         int numMatched = 0;
-                        DCValue[] itemAuthors = item.getMetadata("dc", "contributor", "author", Item.ANY);
                         for (int j = 0; j < itemAuthors.length; j++) {
                             for (Author a : manuscript.authors.author) {
                                 double score = JournalUtils.getHamrScore(itemAuthors[j].value, a.fullName());
