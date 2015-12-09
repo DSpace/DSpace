@@ -132,7 +132,7 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
         // Metadata editing is the only type of editing available for a template item.
         boolean editingTemplateItem = false;
         String templateCollectionID = parameters.getParameter("templateCollectionID", null);
-        Collection templateCollection = templateCollectionID == null ? null : collectionService.find(context, UUID.fromString(templateCollectionID));
+        Collection templateCollection = templateCollectionID != null ? null : collectionService.find(context, UUID.fromString(templateCollectionID));
         if (templateCollection != null)
         {
             Item templateItem = templateCollection.getTemplateItem();
