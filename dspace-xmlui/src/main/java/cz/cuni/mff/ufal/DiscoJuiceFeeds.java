@@ -1,29 +1,30 @@
 /* Created for LINDAT/CLARIN */
 package cz.cuni.mff.ufal;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.MalformedURLException;
-import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 
 import org.apache.avalon.framework.parameters.Parameters;
+import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.acting.AbstractAction;
+import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Redirector;
 import org.apache.cocoon.environment.SourceResolver;
+import org.apache.cocoon.generation.AbstractGenerator;
+import org.apache.cocoon.xml.dom.DOMStreamer;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 
@@ -34,188 +35,197 @@ import org.json.simple.parser.ParseException;
 
 import com.maxmind.geoip.Location;
 import com.maxmind.geoip.LookupService;
+import org.w3c.dom.CDATASection;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
-public class DiscoJuiceFeeds extends AbstractAction {
-    /** log4j logger. */
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+
+public class DiscoJuiceFeeds extends AbstractGenerator {
+    /**
+     * log4j logger.
+     */
     private static Logger log = Logger.getLogger(DiscoJuiceFeeds.class);
+
     private static final String discojuiceURL = "https://static.discojuice.org/feeds/";
+
+    private static String feedsContent;
+    private static ReadWriteLock lock = new ReentrantReadWriteLock();
+    private static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+
+    static{
+        executor.scheduleWithFixedDelay(DiscoJuiceFeeds::update,0,
+                ConfigurationManager.getLongProperty("discojuice", "refresh"), TimeUnit.HOURS);
+    }
+
     private static final LookupService locationService;
-    /** contains entityIDs of idps we wish to set the country to something different than discojuice feeds suggests **/
+    /**
+     * contains entityIDs of idps we wish to set the country to something different than discojuice feeds suggests
+     **/
     private static final Set<String> rewriteCountries;
+
     static {
         String dbfile = ConfigurationManager.getProperty("usage-statistics", "dbfile");
         LookupService service = null;
-        if (dbfile != null)
-        {
-            try
-            {
+        if (dbfile != null) {
+            try {
                 service = new LookupService(dbfile,
                         LookupService.GEOIP_STANDARD);
-            }
-            catch (FileNotFoundException fe)
-            {
+            } catch (FileNotFoundException fe) {
                 log.error("The GeoLite Database file is missing (" + dbfile + ")! Solr Statistics cannot generate location based reports! Please see the DSpace installation instructions for instructions to install this file.", fe);
-            }
-            catch (IOException e)
-            {
+            } catch (IOException e) {
                 log.error("Unable to load GeoLite Database file (" + dbfile + ")! You may need to reinstall it. See the DSpace installation instructions for more details.", e);
             }
-        }
-        else
-        {
+        } else {
             log.error("The required 'dbfile' configuration is missing in solr-statistics.cfg!");
         }
         locationService = service;
-        
+
         rewriteCountries = new HashSet<String>();
         String propRewriteCountries = ConfigurationManager.getProperty("discojuice", "rewriteCountries");
-        for(String country : propRewriteCountries.split(",")){
-        	country = country.trim();
-        	rewriteCountries.add(country);
+        for (String country : propRewriteCountries.split(",")) {
+            country = country.trim();
+            rewriteCountries.add(country);
         }
     }
 
-    public Map act(Redirector redirector, SourceResolver resolver,
-            Map objectModel, String source, Parameters parameters)
-            throws Exception {
-
-        File feedsFile = feedsFile();
-        refreshFeedsFile(feedsFile);
-
-        Map<String, String> map = new HashMap<String, String>();
-        map.put("feedsFile", feedsFile.getAbsolutePath());
-
-        return map;
-    }
-
-    public static File feedsFile(){
-        String dspace_dir = ConfigurationManager.getProperty("dspace.dir");
-        File feedsFile = new File(dspace_dir + "/webapps/xmlui/discojuice/feeds/feeds.jsonp");
-        return feedsFile;
-    }
-
-    private void refreshFeedsFile(File feedsFile) throws Exception{
-        String feedsConfig = ConfigurationManager.getProperty("discojuice", "feeds");
-        String shibbolethDiscoFeedUrl = ConfigurationManager.getProperty("lr","lr.shibboleth.discofeed.url");
-
-        if(feedsFile.exists()){
-            Long refreshInterval = new Long(ConfigurationManager.getIntProperty("discojuice", "refresh")*3600000); //hours to millis
-            Date refreshWhen = new Date(feedsFile.lastModified()+refreshInterval);
-            Date now = new Date();
-            if(refreshWhen.before(now)){
-                try{
-                    writeFeedsFile(feedsFile,feedsConfig,shibbolethDiscoFeedUrl);
-                }catch(Exception e){
-                    log.error("The feeds file was not refreshed."); //But we can use the old one
-                }
-            }
-        }else{
-            File parent = feedsFile.getParentFile();
-            if(parent != null && !parent.exists()){
-                parent.mkdirs();
-            }
-            writeFeedsFile(feedsFile,feedsConfig,shibbolethDiscoFeedUrl);
-        }
-    }
-
-    private void writeFeedsFile(File feedsFile,String feedsConfig, String url) throws Exception{
-
-        JSONParser parser = new JSONParser();
-
-        Map<String,JSONObject> shibDiscoEntities = new HashMap<String,JSONObject>();
-        URL shibDiscoFeedUrl = new URL(url);
-        String old_value = "false";
-        //Obtain shibboleths discofeed
+    public static void update(){
+        lock.writeLock().lock();
         try{
-            old_value = System.getProperty("jsse.enableSNIExtension");
-            System.setProperty("jsse.enableSNIExtension", "false");
-            URLConnection conn = shibDiscoFeedUrl.openConnection();
-            conn.setConnectTimeout(5000);
-            conn.setReadTimeout(10000);
-            //Caution does not follow redirects
-            Object obj = parser.parse(new InputStreamReader(conn.getInputStream()));
-            JSONArray entityArray = (JSONArray)obj;
-            Iterator<JSONObject> i = entityArray.iterator();
-            while(i.hasNext()){
-                JSONObject entity = i.next();
-                shibDiscoEntities.put((String)entity.get("entityID"), entity);
-            }
-        }catch(Exception e){
-            log.error("Failed to obtain/parse "+shibDiscoFeedUrl.toString() + "\nCheck timeouts, redirects, shibboleth config.\n" + e);
-            throw e; //Don't continue
+           feedsContent = createFeedsContent();
         }finally {
-        	//true is the default http://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/JSSERefGuide.html
-        	old_value = (old_value == null) ? "true" : old_value;
-        	System.setProperty("jsse.enableSNIExtension", old_value);
+            lock.writeLock().unlock();
         }
+    }
 
-        //String[] feeds = {"edugain", "cesnet"};
-        String[] feeds = feedsConfig.split(",");
+    public String getContentType(boolean jsonp) {
+        if(jsonp) {
+            return "application/javascript;charset=utf-8";
+        }else{
+            return "application/json";
+        }
+    }
 
-        JSONArray filteredEntities = new JSONArray();
-
-        List<String> seenIDs = new ArrayList<String>();
-
-        try{
-            for(String feed:feeds){
-				URLConnection conn = new URL(discojuiceURL+feed.trim()).openConnection();
-				conn.setConnectTimeout(5000);
-				conn.setReadTimeout(10000);
-				Object obj = parser.parse(new InputStreamReader(conn.getInputStream()));
-				JSONArray entityArray = (JSONArray)obj;
-				Iterator<JSONObject> i = entityArray.iterator();
-				while(i.hasNext()){
-					JSONObject entity = i.next();
-					String entityID = (String)entity.get("entityID");
-					if(shibDiscoEntities.containsKey(entityID)){
-						if(rewriteCountries.contains(entityID)){
-							String old_country = (String)entity.remove("country");
-							String new_country = guessCountry(shibDiscoEntities.get(entityID));
-							entity.put("country", new_country);
-							log.info(String.format("For %s changed country from %s to %s", entityID, old_country, new_country));
-						}
-						filteredEntities.add(entity);
-						seenIDs.add(entityID);
-					}
-				}
+    @Override
+    public void generate() throws IOException, SAXException {
+        HttpServletRequest request = ObjectModelHelper.getRequest(objectModel);
+        HttpServletResponse response = ObjectModelHelper.getResponse(objectModel);
+        String callback = request.getParameter("callback");
+        try {
+            Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+            //the root should be ignored by TextSerializer
+            Element root = doc.createElement("ignore_root");
+            lock.readLock().lock();
+            try {
+                if (feedsContent == null || feedsContent.isEmpty()) {
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to obtain feeds.");
+                } else {
+                    boolean jsonp = isNotBlank(callback);
+                    CDATASection cdata;
+                    if(jsonp){
+                        cdata = doc.createCDATASection(callback + '(' + feedsContent + ')');
+                    }else{
+                        cdata = doc.createCDATASection(feedsContent);
+                    }
+                    root.appendChild(cdata);
+                    doc.appendChild(root);
+                    DOMStreamer streamer = new DOMStreamer(contentHandler, lexicalHandler);
+                    streamer.stream(doc);
+                }
+            } finally {
+                lock.readLock().unlock();
             }
-        }catch(SocketTimeoutException ste){
-            log.error(ste);
-        }catch(ParseException pe){
-            log.error(pe);
-        }catch(IOException e){
+        }catch (ParserConfigurationException e){
             log.error(e);
         }
+    }
 
-        //log missed shibboleth entries
-        StringBuilder fromShib = new StringBuilder();
-        for(String entityID:shibDiscoEntities.keySet()){
-            if(!seenIDs.contains(entityID)){
-                JSONObject entity = shibDiscoEntities.get(entityID);
-                if(entity != null){
-                    String country = guessCountry(entity);
-                    entity.put("country", country);
-                    filteredEntities.add(entity);
-                    fromShib.append(entityID);
-                    fromShib.append('\n');
-                }
-            }
-        }
+    public static String createFeedsContent(){
+        String feedsConfig = ConfigurationManager.getProperty("discojuice", "feeds");
+        String shibbolethDiscoFeedUrl = ConfigurationManager.getProperty("lr","lr.shibboleth.discofeed.url");
+        return createFeedsContent(feedsConfig, shibbolethDiscoFeedUrl);
+    }
+    public static String createFeedsContent(String feedsConfig, String shibbolethDiscoFeedUrl){
+        String old_value = System.getProperty("jsse.enableSNIExtension");
+        System.setProperty("jsse.enableSNIExtension", "false");
 
-        if(fromShib.length()>0){
+        //Obtain shibboleths discofeed
+        final Map<String,JSONObject> shibDiscoEntities = DiscoJuiceFeeds.downloadJSON(shibbolethDiscoFeedUrl)
+                .collect(Collectors.toMap(entity -> (String)entity.get("entityID"), Function.identity(),
+                        (oldValue,newValue) -> {
+                            /* System.err.println(String.format("Duplicite entry %s. Keeping first appearance", oldValue.get("entityID")));*/
+                            //We have a lot of duplicites, so just keep the first
+                            return oldValue;
+                        }
+                ));
+
+        //true is the default http://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/JSSERefGuide.html
+        old_value = (old_value == null) ? "true" : old_value;
+        System.setProperty("jsse.enableSNIExtension", old_value);
+
+        Map<String, JSONObject> discoEntities = Arrays.asList(feedsConfig.split(",")).parallelStream()
+                .flatMap(feed -> DiscoJuiceFeeds.downloadJSON(discojuiceURL + feed.trim()))
+                .filter((JSONObject entity) -> {
+                    String entityID = (String)entity.get("entityID");
+                    return shibDiscoEntities.containsKey(entityID);
+                })
+                .map(entity -> {
+                    String entityID = (String)entity.get("entityID");
+                    if(rewriteCountries.contains(entityID)){
+                        String old_country = (String)entity.remove("country");
+                        String new_country = guessCountry(shibDiscoEntities.get(entityID));
+                        entity.put("country", new_country);
+                        log.info(String.format("For %s changed country from %s to %s", entityID, old_country, new_country));
+                    }
+                    return entity;
+                })
+                //again ignore dupes and just use first
+                .collect(Collectors.toMap(entity -> (String)entity.get("entityID"), Function.identity(), (oldValue, newValue) -> oldValue));
+
+        Map<String, JSONObject> onlyInShib = shibDiscoEntities.entrySet().stream()
+                .filter(entry -> discoEntities.containsKey(entry.getKey())) //filter by entityID
+                .map(entry -> {
+                    entry.getValue().put("country", guessCountry(entry.getValue()));
+                    return entry;
+                })
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        discoEntities.putAll(onlyInShib);
+        String fromShib = onlyInShib.keySet().stream().collect(Collectors.joining("\n"));
+
+        //log shibboleth only entries
+        if(fromShib != null && fromShib.length()>0){
             log.info("The following entities were added from shibboleth disco feed.\n" + fromShib.toString());
         }
 
-        FileWriter fw =  new FileWriter(feedsFile);
-        fw.write("dj_md_1(");
-        fw.write(filteredEntities.toJSONString());
-        fw.write(")");
-        fw.flush();
-        fw.close();
-        //System.out.println(filteredEntities.toJSONString());
+        return discoEntities.values().stream().collect(Collectors.toCollection(JSONArray::new)).toJSONString();
     }
 
-    private String guessCountry(JSONObject entity){
+    private static Stream<JSONObject> downloadJSON(String url){
+        JSONParser parser = new JSONParser();
+        try {
+            URLConnection conn = new URL(url).openConnection();
+            conn.setConnectTimeout(5000);
+            conn.setReadTimeout(10000);
+            //Caution does not follow redirects, and even if you set it to http->https is not possible
+            Object obj = parser.parse(new InputStreamReader(conn.getInputStream()));
+            JSONArray entityArray = (JSONArray) obj;
+            Iterator<JSONObject> iterator = entityArray.iterator();
+            Iterable<JSONObject> iterable = () -> iterator;
+            return StreamSupport.stream(iterable.spliterator(),false);
+        }catch (IOException|ParseException e){
+            log.error("Failed to obtain/parse "+ url + "\nCheck timeouts, redirects, shibboleth config.\n" + e);
+        }
+        return Stream.empty();
+    }
+
+    private static String guessCountry(JSONObject entity){
     	if(locationService != null && entity.containsKey("InformationURLs")){
     		JSONArray informationURLs = (JSONArray)entity.get("InformationURLs");
     		if(informationURLs.size() > 0){
@@ -252,10 +262,11 @@ public class DiscoJuiceFeeds extends AbstractAction {
 
     //For testing
     public static void main(String[] args) throws Exception{
-        DiscoJuiceFeeds djf = new DiscoJuiceFeeds();
-        djf.writeFeedsFile(new File("/tmp/feeds.jsonp"),
-            "edugain, dfn, cesnet, surfnet2, haka, kalmar",
-            "lindat.mff.cuni.cz");
+        long startTime = System.currentTimeMillis();
+        String feeds = DiscoJuiceFeeds.createFeedsContent("edugain, dfn, cesnet, surfnet2, haka, kalmar", "https://lindat.mff.cuni.cz/Shibboleth.sso/DiscoFeed");
+        long endTime = System.currentTimeMillis();
+        System.out.println((endTime - startTime)/1000);
+        //System.out.println(feeds);
     }
 
 }

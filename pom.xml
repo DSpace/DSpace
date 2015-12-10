@@ -30,7 +30,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>1.7</java.version>
+        <java.version>1.8</java.version>
         <lucene.version>4.10.2</lucene.version>
         <solr.version>4.10.2</solr.version>
         <jena.version>2.12.0</jena.version>

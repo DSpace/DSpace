@@ -25,6 +25,7 @@
                         <map:generator name="exception" src="cz.cuni.mff.ufal.dspace.app.xmlui.cocoon.generation.EmailExceptionGenerator"/>
                         <map:generator name="AJAXMenuGenerator"
                              src="org.dspace.app.xmlui.cocoon.AJAXMenuGenerator"/>
+                        <map:generator name="DiscoJuiceFeeds" src="cz.cuni.mff.ufal.DiscoJuiceFeeds" />
                 </map:generators>
                 <map:serializers default="xml">
                         <map:serializer logger="sitemap.serializer.xml" mime-type="text/xml; charset=utf-8" name="xml"
@@ -65,6 +66,11 @@
                             <encoding>UTF-8</encoding>
                             <indent>yes</indent>
                         </map:serializer>
+                        <map:serializer name="json" mime-type="application/javascrit;charset=utf-8"
+                                       src="org.apache.cocoon.serialization.TextSerializer">
+                            <encoding>UTF-8</encoding>
+                        </map:serializer>
+
                 </map:serializers>
                 <map:transformers default="xslt">
                         <map:transformer logger="sitemap.transformer.xslt" name="xslt" pool-max="32"
@@ -211,7 +217,6 @@
                         <map:action name="DSpacePropertyFileReader" src="org.dspace.app.xmlui.cocoon.DSpacePropertyFileReader" />
                         <map:action name="PropertyFileReader" src="org.dspace.app.xmlui.cocoon.PropertyFileReader" />
                         <map:action name="CurrentActivityAction" src="org.dspace.app.xmlui.aspect.administrative.CurrentActivityAction" />
-                        <map:action name="DiscoJuiceFeeds" src="cz.cuni.mff.ufal.DiscoJuiceFeeds" />
                 </map:actions>
                 <map:pipes default="caching">
                         <map:pipe name="noncaching" src="org.apache.cocoon.components.pipeline.impl.NonCachingProcessingPipeline">
@@ -264,9 +269,8 @@
                 <!-- ufal dicojuice feeds -->
                 <map:pipeline type="noncaching">
                     <map:match pattern="discojuice/feeds">
-                        <map:act type="DiscoJuiceFeeds">
-                        	<map:read type="resource" src="discojuice/feeds/feeds.jsonp" mime-type="text/javascript; charset=utf-8"/>
-                        </map:act>
+                        <map:generate type="DiscoJuiceFeeds"/>
+                        <map:serialize type="json"/>
                     </map:match>
                 </map:pipeline>
                 <!-- end feeds -->
