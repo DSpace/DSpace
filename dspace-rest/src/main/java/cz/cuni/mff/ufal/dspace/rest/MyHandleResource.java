@@ -26,11 +26,14 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
 public class MyHandleResource extends Resource {
     private static Logger log = Logger.getLogger(MyHandleResource.class);
 
+    public enum ORDER {ASC, asc, DESC, desc}
+
     @GET
     @Path("/handles/magic")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Handle[] getHandles(@QueryParam("limit") @DefaultValue("10") Integer limit,
-                               @QueryParam("offset") @DefaultValue("0") Integer offset){
+                               @QueryParam("offset") @DefaultValue("0") Integer offset,
+                               @QueryParam("order") @DefaultValue("DESC") ORDER order){
         org.dspace.core.Context context = null;
         if (limit == null || limit < 0 || offset == null || offset < 0)
         {
@@ -38,13 +41,16 @@ public class MyHandleResource extends Resource {
             limit = 10;
             offset = 0;
         }
+        if (limit > 100){
+            limit = 100;
+        }
         //compute the actual offset in rows
         offset *= limit;
         List<Handle> result = new ArrayList<>();
         try {
             context = new org.dspace.core.Context();
             String query = "select * from handle where url like '" + HandlePlugin.magicBean + "%' " +
-                    "order by handle_id limit ? offset ?;";
+                    "order by handle_id " + order.toString() + " limit ? offset ?;";
             Integer[] params = new Integer[]{limit, offset};
             TableRowIterator tri = DatabaseManager.query(context, query, params);
             List<TableRow> rows = tri.toList();
