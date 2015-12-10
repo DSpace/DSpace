@@ -15,6 +15,7 @@ import java.util.UUID;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -132,11 +133,11 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
         // Metadata editing is the only type of editing available for a template item.
         boolean editingTemplateItem = false;
         String templateCollectionID = parameters.getParameter("templateCollectionID", null);
-        Collection templateCollection = templateCollectionID == null ? null : collectionService.find(context, UUID.fromString(templateCollectionID));
+        Collection templateCollection = StringUtils.isBlank(templateCollectionID) ? null : collectionService.find(context, UUID.fromString(templateCollectionID));
         if (templateCollection != null)
         {
             Item templateItem = templateCollection.getTemplateItem();
-            if (templateItem != null && templateItem.getID() == itemID)
+            if (templateItem != null && templateItem.getID().equals(itemID))
             {
                 editingTemplateItem = true;
             }
