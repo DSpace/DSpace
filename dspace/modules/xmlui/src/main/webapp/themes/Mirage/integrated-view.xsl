@@ -62,9 +62,9 @@
         <table class="package-file-description">
           <tbody>
           <tr>
-            <th>Title</th>
-            <th><xsl:value-of select="util:shortenString(.//dim:field[@element='title'], 50, 5)"/></th>
-	    <!-- Download count -->
+              <th>Title</th>
+              <th><xsl:value-of select=".//dim:field[@element='title']"/></th>
+              <!-- Download count -->
 	    <xsl:variable name="downloads" select=".//dim:field[@element='dryad'][@qualifier='downloads']"/>
 	    <xsl:if test="$downloads > 0">
 	      <tr>
