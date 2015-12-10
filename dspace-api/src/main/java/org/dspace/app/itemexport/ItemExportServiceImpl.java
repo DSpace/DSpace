@@ -138,9 +138,10 @@ public class ItemExportServiceImpl implements ItemExportService
         {
             // now create a subdirectory
             File itemDir = new File(destDir + "/" + seqStart);
-
-            System.out.println("Exporting Item " + myItem.getID() + " to "
-                    + itemDir);
+            
+            System.out.println("Exporting Item " + myItem.getID() +
+            		(myItem.getHandle() != null ? ", handle " + myItem.getHandle() : "") +
+            		" to " + itemDir);
 
             if (itemDir.exists())
             {
