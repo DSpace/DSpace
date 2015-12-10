@@ -521,18 +521,23 @@
 
                             <!-- all other cases -->
                             <xsl:otherwise>
-                                <xsl:choose>
-                                    <xsl:when test="$help/i18n:text">
-                                        <xsl:call-template name="help-hover">
-                                            <xsl:with-param name="hover" select="$help/i18n:text"/>
-                                        </xsl:call-template>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xsl:call-template name="help-hover">
-                                            <xsl:with-param name="hover" select="$help"/>
-                                        </xsl:call-template>
-                                    </xsl:otherwise>
-                                </xsl:choose>
+                                <span class="help-title">
+                                    <img class="label-mark" src="/themes/Mirage/images/help.jpg">
+                                        <xsl:choose>
+                                            <xsl:when test="$help/i18n:text">
+                                                <xsl:attribute name="title">
+                                                    <xsl:value-of select="$help/i18n:text"/>
+                                                </xsl:attribute>
+                                                <xsl:attribute name="i18n:attr">title</xsl:attribute>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:attribute name="title">
+                                                    <xsl:value-of select="$help"/>
+                                                </xsl:attribute>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </img>
+                                </span>
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:if>
