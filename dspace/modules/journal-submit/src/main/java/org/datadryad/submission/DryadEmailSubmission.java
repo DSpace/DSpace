@@ -384,7 +384,7 @@ public class DryadEmailSubmission extends HttpServlet {
             }
 
             // at this point, concept is not null.
-            journalName = concept.getFullName(context);
+            journalName = JournalUtils.getFullName(concept);
             try {
                 parser = getEmailParser(JournalUtils.getParsingScheme(concept));
                 parser.parseMessage(dryadContent);
@@ -432,22 +432,7 @@ public class DryadEmailSubmission extends HttpServlet {
                         LOGGER.error("Error Initializing DSpace kernel in ManuscriptReviewStatusChangeHandler", ex);
                     }
 
-                    ArrayList<WorkflowItem> workflowItems = new ArrayList<WorkflowItem>();
-
-                    if (manuscript.getDryadDataDOI() != null) {
-                        try {
-                            WorkflowItem wfi = WorkflowItem.findByDOI(context, manuscript.getDryadDataDOI());
-                            if (wfi != null) {
-                                workflowItems.add(wfi);
-                            }
-                        } catch (ApproveRejectReviewItemException e) {
-                            LOGGER.debug ("no workflow items matched DOI " + manuscript.getDryadDataDOI());
-                        }
-                    }
-
-                    workflowItems.addAll(WorkflowItem.findAllByManuscript(context, manuscript));
-                    LOGGER.debug("found " + workflowItems.size() + " items that match");
-                    ApproveRejectReviewItem.reviewItems(context, approved, workflowItems, manuscript);
+                    ApproveRejectReviewItem.reviewManuscript(manuscript);
                 }
             } else {
                 throw new SubmissionException("Parser could not validly parse the message");
