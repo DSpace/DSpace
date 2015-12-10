@@ -1,12 +1,14 @@
 # Failed payment needs reauthorization message
 #
 # {0}  Title of submission
-# {1}  Submitter's name
+# {1}  package DOI
+# {2}  Submitter's name
 #
 Subject: Dryad: Payment needs reauthorization
 
-Dryad submission: {0}
-Submitter: {1}
+Submission Title: {0}
+Dryad DOI: {1}
+Submitter: {2}
 
 Thank you for your submission to Dryad.  Your data package has been curated and approved, but there was an issue processing the Dryad Data Publishing Charge.
 

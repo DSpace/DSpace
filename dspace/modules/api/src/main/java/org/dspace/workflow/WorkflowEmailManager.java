@@ -81,23 +81,15 @@ public class WorkflowEmailManager {
             }
             String dataFileTitles = "";
             String dataFilesDoi = "";
-            String datapackageDoi = "";
-            DCValue doiMetadataField = DOIIdentifierProvider.getIdentifierMetadata();
-            //Ensure that our doi metadata field is read in !
-            if(doiMetadataField.element != null){
-                DCValue[] doiVals = i.getMetadata(doiMetadataField.schema, doiMetadataField.element, doiMetadataField.qualifier, Item.ANY);
-                if(doiVals != null && 0 < doiVals.length){
-                    datapackageDoi = doiVals[0].value;
-                }
+            String datapackageDoi = DOIIdentifierProvider.getDoiValue(i);
+            if (datapackageDoi == null) {
+                datapackageDoi = "";
+            }
 
-                Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, i);
-                for (Item dataFile : dataFiles) {
-                    dataFileTitles += dataFile.getName() + "\n";
-                    doiVals = dataFile.getMetadata(doiMetadataField.schema, doiMetadataField.element, doiMetadataField.qualifier, Item.ANY);
-                    if(doiVals != null && 0 < doiVals.length){
-                        dataFilesDoi += doiVals[0].value + "\n";
-                    }
-                }
+            Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, i);
+            for (Item dataFile : dataFiles) {
+                dataFileTitles += dataFile.getName() + "\n";
+                dataFilesDoi += DOIIdentifierProvider.getDoiValue(dataFile) + "\n";
             }
 
 
@@ -106,14 +98,9 @@ public class WorkflowEmailManager {
             addJournalNotifyOnArchive(i, email);
 
 
-            email.addArgument(title);
-            email.addArgument(datapackageDoi);
-            email.addArgument(dataFileTitles);
-            email.addArgument(dataFilesDoi);
+            String submitter = "";
             if(i.getSubmitter() != null){
-                email.addArgument(i.getSubmitter().getFullName());
-            }else{
-                email.addArgument("");
+                submitter = i.getSubmitter().getFullName();
             }
             String manuscriptIdentifier = "";
             DCValue[] manuscriptIdentifiers = i.getMetadata(MetadataSchema.DC_SCHEMA, "identifier", "manuscriptNumber", Item.ANY);
@@ -124,7 +111,6 @@ public class WorkflowEmailManager {
             if(manuscriptIdentifier.length() == 0) {
                 manuscriptIdentifier = "none available";
             }
-            email.addArgument(manuscriptIdentifier);
 
             // add a DOI URL as well:
             String doi_url = "";
@@ -132,8 +118,14 @@ public class WorkflowEmailManager {
             if (doimatcher.find()) {
                 doi_url = "http://dx.doi.org/" + doimatcher.group(1);
             }
-            email.addArgument(doi_url);
 
+            email.addArgument(title);                 // {0}  Title of data package
+            email.addArgument(datapackageDoi);        // {1}  The doi identifier of the data package
+            email.addArgument(dataFileTitles);        // {2}  The title(s) of the data file(s)
+            email.addArgument(dataFilesDoi);          // {3}  The dois of the data files
+            email.addArgument(submitter);             // {4}  The submitter's full name
+            email.addArgument(manuscriptIdentifier);  // {5}  The manuscript identifier (or "none available" if the metadata doesn't contain one)
+            email.addArgument(doi_url);               // {6}  The formatted dx.doi.org URL
             email.send();
         }
         catch (MessagingException e) {
@@ -169,6 +161,7 @@ public class WorkflowEmailManager {
         {
             // Get the item title
             String title = wi.getItem().getName();
+            String doi = DOIIdentifierProvider.getDoiValue(wi.getItem());
             String dataFileTitles = "";
             Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, wi.getItem());
             for (Item dataFile : dataFiles) {
@@ -185,11 +178,11 @@ public class WorkflowEmailManager {
             // email the eperson who rejected this as well
             email.addRecipient(e.getEmail());
 
-            email.addArgument(title);
-            email.addArgument(dataFileTitles);
-            email.addArgument(rejector);
-            email.addArgument(reason);
-            email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/mydspace");
+            email.addArgument(title);                                                           // {0}  Title of submission
+            email.addArgument(doi);                                                             // {1}  Package DOI
+            email.addArgument(dataFileTitles);                                                  // {2}  Name(s) of the data file(s)
+            email.addArgument(reason);                                                          // {3}  Reason for the rejection
+            email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/mydspace");    // {4}  Link to 'My DSpace' page
 
             email.send();
         }
@@ -283,11 +276,16 @@ public class WorkflowEmailManager {
 
             // Get the collection
             Collection coll = wi.getCollection();
+
+            // Get the package DOI
+            String doi = DOIIdentifierProvider.getDoiValue(wi.getItem());
+
             for(EPerson recipient : recipients) {
                 Locale supportedLocale = I18nUtil.getEPersonLocale(recipient);
                 Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, "payment_needs_reauthorization"));
-                email.addArgument(title);
-                email.addArgument(submitter);
+                email.addArgument(title);      // {0}  Title of submission
+                email.addArgument(doi);        // {1}  package DOI
+                email.addArgument(submitter);  // {2}  Submitter's name
                 email.addRecipient(recipient.getEmail());
                 email.send();
             }
