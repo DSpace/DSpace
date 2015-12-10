@@ -1446,7 +1446,7 @@ function doEditItem(itemID)
 		}
 		else if (cocoon.request.get("submit_metadata"))
 		{
-			doEditItemMetadata(itemID, -1);
+			doEditItemMetadata(itemID, null);
 		}
 		else if (cocoon.request.get("view_item"))
 		{
