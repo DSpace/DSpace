@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import org.jaxen.JaxenException;
@@ -59,6 +60,17 @@ public class CCLookup {
 	private List<CCLicenseField> licenseFields = new ArrayList<CCLicenseField>();
 	
 	static {
+		// if defined, set a proxy server for http requests to Creative
+	        // Commons site
+	        String proxyHost = ConfigurationManager.getProperty("http.proxy.host");
+	        String proxyPort = ConfigurationManager.getProperty("http.proxy.port");
+	
+	        if (StringUtils.isNotBlank(proxyHost) && StringUtils.isNotBlank(proxyPort))
+	        {
+	            System.setProperty("http.proxyHost", proxyHost);
+	            System.setProperty("http.proxyPort", proxyPort);
+	        }
+	        
 		String jurisProp = ConfigurationManager.getProperty("cc.license.jurisdiction");
 		jurisdiction = (jurisProp != null) ? jurisProp : "";
 		
