@@ -762,6 +762,11 @@
                             <xsl:text> </xsl:text>
                             <i18n:text>xmlui.ArtifactBrowser.ItemViewer.elsevier_embed</i18n:text>
                             <xsl:text> (</xsl:text>
+                            <span class="checkmark">
+                                <xsl:text> </xsl:text>
+                                <xsl:text>&#10003;</xsl:text>
+                            </span>
+
                             <i18n:text>xmlui.ArtifactBrowser.ItemViewer.elsevier_embed_access</i18n:text>
                             <xsl:text>)</xsl:text>
                         </a>

@@ -702,18 +702,23 @@
         </xsl:variable>
 
         <div id="elsevier-embed-wrapper" class="clearfix">
-            <div class="thumbnail-wrapper" style="width: {$thumbnail.maxwidth}px;">
-                <img alt="Icon" src="{concat($theme-path, '/images/mime.png')}" style="max-height: {$thumbnail.maxheight}px;">
-                    <xsl:attribute name="src">
-                        <xsl:value-of select="$pii-url"/>
-                        <xsl:text>?apiKey=</xsl:text>
-                        <xsl:value-of select="confman:getProperty('elsevier-sciencedirect', 'api.key')"/>
-                        <xsl:text>&amp;httpAccept=image/png&amp;cdnRedirect=true</xsl:text>
-                    </xsl:attribute>
-                </img>
-            </div>
-            <div class="file-metadata" style="max-height: {$thumbnail.maxheight}px;">
-                <div class="access hidden">
+            <div class="access hidden">
+                <div class="thumbnail-wrapper" style="width: {$thumbnail.maxwidth}px;">
+                    <a>
+                        <xsl:attribute name="href">
+                            <xsl:value-of select="dri:xref/@target"/>
+                        </xsl:attribute>
+                        <img alt="Icon" src="{concat($theme-path, '/images/mime.png')}" style="max-height: {$thumbnail.maxheight}px;">
+                            <xsl:attribute name="src">
+                                <xsl:value-of select="$pii-url"/>
+                                <xsl:text>?apiKey=</xsl:text>
+                                <xsl:value-of select="confman:getProperty('elsevier-sciencedirect', 'api.key')"/>
+                                <xsl:text>&amp;httpAccept=image/png&amp;cdnRedirect=true</xsl:text>
+                            </xsl:attribute>
+                        </img>
+                    </a>
+                </div>
+                <div class="file-metadata" style="max-height: {$thumbnail.maxheight}px;">
                     <div>
                         <a>
                             <xsl:attribute name="href">
@@ -723,17 +728,35 @@
                         </a>
                     </div>
                     <div>
-                        <span>
-                            <i18n:text>xmlui.ArtifactBrowser.ItemViewer.elsevier_embed_access</i18n:text>
-                        </span>
-
                         <span class="checkmark">
                             <xsl:text> </xsl:text>
                             <xsl:text>&#10003;</xsl:text>
                         </span>
+                        <span>
+                            <i18n:text>xmlui.ArtifactBrowser.ItemViewer.elsevier_embed_access</i18n:text>
+                        </span>
                     </div>
                 </div>
-                <div class="noaccess">
+            </div>
+            <div class="noaccess">
+                <div class="thumbnail-wrapper" style="width: {$thumbnail.maxwidth}px;">
+                    <a>
+                        <xsl:attribute name="href">
+                            <xsl:value-of select="confman:getProperty('elsevier-sciencedirect', 'ui.article.url')"/>
+                            <xsl:text>/pii/</xsl:text>
+                            <xsl:value-of select="$DRI//dri:metadata[@element='window.DSpace' and @qualifier='item_pii']"/>
+                        </xsl:attribute>
+                        <img alt="Icon" src="{concat($theme-path, '/images/mime.png')}" style="max-height: {$thumbnail.maxheight}px;">
+                            <xsl:attribute name="src">
+                                <xsl:value-of select="$pii-url"/>
+                                <xsl:text>?apiKey=</xsl:text>
+                                <xsl:value-of select="confman:getProperty('elsevier-sciencedirect', 'api.key')"/>
+                                <xsl:text>&amp;httpAccept=image/png&amp;cdnRedirect=true</xsl:text>
+                            </xsl:attribute>
+                        </img>
+                    </a>
+                </div>
+                <div class="file-metadata" style="max-height: {$thumbnail.maxheight}px;">
                     <div>
                         <a>
                             <xsl:attribute name="href">
