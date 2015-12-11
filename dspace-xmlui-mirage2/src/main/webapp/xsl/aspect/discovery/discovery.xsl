@@ -401,6 +401,7 @@
                     type: '</xsl:text><xsl:value-of select="stringescapeutils:escapeEcmaScript(dri:cell/dri:field[starts-with(@n, 'filtertype')]/dri:value/@option)"/><xsl:text>',
                     relational_operator: '</xsl:text><xsl:value-of select="stringescapeutils:escapeEcmaScript(dri:cell/dri:field[starts-with(@n, 'filter_relational_operator')]/dri:value/@option)"/><xsl:text>',
                     query: '</xsl:text><xsl:value-of select="stringescapeutils:escapeEcmaScript(dri:cell/dri:field[@rend = 'discovery-filter-input']/dri:value)"/><xsl:text>',
+	                display_query: '</xsl:text><xsl:value-of select="stringescapeutils:escapeEcmaScript(util:getDiscoveryFilterDisplay(dri:cell/dri:field[@rend = 'discovery-filter-input']/dri:value))"/><xsl:text>',
                 });
             </xsl:text>
         </script>
