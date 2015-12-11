@@ -189,8 +189,8 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
 
                                     // is there any valid (with appropriate
                                     // confidence) authority key?
-                                    if ((ignoreAuthority && !bi.isAuthorityIndex())
-                                            || (values[x].authority != null && values[x].confidence >= minConfidence))
+									if (!ignoreAuthority && !bi.isAuthorityIndex()
+                                            && values[x].authority != null && values[x].confidence >= minConfidence)
                                     {
                                         distFAuths.add(values[x].authority);
                                         distValuesForAC.add(values[x].value);
