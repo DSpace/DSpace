@@ -88,7 +88,8 @@ public class ItemExportServiceImpl implements ItemExportService
 
     @Override
     public void exportItem(Context c, Iterator<Item> i,
-            String destDirName, int seqStart, boolean migrate) throws Exception
+            String destDirName, int seqStart, boolean migrate,
+            boolean excludeBitstreams) throws Exception
     {
         int mySequenceNumber = seqStart;
         int counter = SUBDIR_LIMIT - 1;
@@ -123,13 +124,13 @@ public class ItemExportServiceImpl implements ItemExportService
             }
 
             System.out.println("Exporting item to " + mySequenceNumber);
-            exportItem(c, i.next(), fullPath, mySequenceNumber, migrate);
+            exportItem(c, i.next(), fullPath, mySequenceNumber, migrate, excludeBitstreams);
             mySequenceNumber++;
         }
     }
 
     protected void exportItem(Context c, Item myItem, String destDirName,
-            int seqStart, boolean migrate) throws Exception
+            int seqStart, boolean migrate, boolean excludeBitstreams) throws Exception
     {
         File destDir = new File(destDirName);
 
@@ -137,9 +138,10 @@ public class ItemExportServiceImpl implements ItemExportService
         {
             // now create a subdirectory
             File itemDir = new File(destDir + "/" + seqStart);
-
-            System.out.println("Exporting Item " + myItem.getID() + " to "
-                    + itemDir);
+            
+            System.out.println("Exporting Item " + myItem.getID() +
+            		(myItem.getHandle() != null ? ", handle " + myItem.getHandle() : "") +
+            		" to " + itemDir);
 
             if (itemDir.exists())
             {
@@ -151,7 +153,7 @@ public class ItemExportServiceImpl implements ItemExportService
             {
                 // make it this far, now start exporting
                 writeMetadata(c, myItem, itemDir, migrate);
-                writeBitstreams(c, myItem, itemDir);
+                writeBitstreams(c, myItem, itemDir, excludeBitstreams);
                 if (!migrate)
                 {
                     writeHandle(c, myItem, itemDir);
@@ -354,8 +356,8 @@ public class ItemExportServiceImpl implements ItemExportService
      * @throws Exception
      *             if there is any problem writing to the export directory
      */
-    protected void writeBitstreams(Context c, Item i, File destDir)
-            throws Exception
+    protected void writeBitstreams(Context c, Item i, File destDir,
+    		boolean excludeBitstreams) throws Exception
     {
         File outFile = new File(destDir, "contents");
 
@@ -389,12 +391,10 @@ public class ItemExportServiceImpl implements ItemExportService
 
                     int myPrefix = 1; // only used with name conflict
 
-                    InputStream is = bitstreamService.retrieve(c, bitstream);
-
                     boolean isDone = false; // done when bitstream is finally
                     // written
 
-                    while (!isDone) {
+                    while (!excludeBitstreams && !isDone) {
                         if (myName.contains(File.separator)) {
                             String dirs = myName.substring(0, myName
                                     .lastIndexOf(File.separator));
@@ -408,22 +408,12 @@ public class ItemExportServiceImpl implements ItemExportService
                         File fout = new File(destDir, myName);
 
                         if (fout.createNewFile()) {
+                        	InputStream is = bitstreamService.retrieve(c, bitstream);
                             FileOutputStream fos = new FileOutputStream(fout);
                             Utils.bufferedCopy(is, fos);
                             // close streams
                             is.close();
                             fos.close();
-
-                            // write the manifest file entry
-                            if (bitstreamService.isRegisteredBitstream(bitstream)) {
-                                out.println("-r -s " + bitstream.getStoreNumber()
-                                        + " -f " + myName +
-                                        "\tbundle:" + bundleName +
-                                        primary + description);
-                            } else {
-                                out.println(myName + "\tbundle:" + bundleName +
-                                        primary + description);
-                            }
 
                             isDone = true;
                         } else {
@@ -435,6 +425,18 @@ public class ItemExportServiceImpl implements ItemExportService
                             myPrefix++;
                         }
                     }
+                    
+                    // write the manifest file entry
+                    if (bitstreamService.isRegisteredBitstream(bitstream)) {
+                        out.println("-r -s " + bitstream.getStoreNumber()
+                                + " -f " + myName +
+                                "\tbundle:" + bundleName +
+                                primary + description);
+                    } else {
+                        out.println(myName + "\tbundle:" + bundleName +
+                                primary + description);
+                    }
+                    
                 }
             }
 
@@ -450,7 +452,9 @@ public class ItemExportServiceImpl implements ItemExportService
     @Override
     public void exportAsZip(Context context, Iterator<Item> items,
                                    String destDirName, String zipFileName,
-                                   int seqStart, boolean migrate) throws Exception
+                                   int seqStart, boolean migrate,
+                                   boolean excludeBitstreams) throws Exception
+                                   
     {
         String workDir = getExportWorkDirectory() +
                          System.getProperty("file.separator") +
@@ -469,7 +473,7 @@ public class ItemExportServiceImpl implements ItemExportService
         }
 
         // export the items using normal export method
-        exportItem(context, items, workDir, seqStart, migrate);
+        exportItem(context, items, workDir, seqStart, migrate, excludeBitstreams);
 
         // now zip up the export directory created above
         zip(workDir, destDirName + System.getProperty("file.separator") + zipFileName);
@@ -716,7 +720,7 @@ public class ItemExportServiceImpl implements ItemExportService
 
 
                             // export the items using normal export method
-                            exportItem(context, iitems, workDir, 1, migrate);
+                            exportItem(context, iitems, workDir, 1, migrate, false);
                         }
 
                         // now zip up the export directory created above
