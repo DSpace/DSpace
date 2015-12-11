@@ -14,9 +14,6 @@ import org.apache.avalon.excalibur.pool.Recyclable;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.xml.dom.DOMStreamer;
-import org.dspace.app.util.OpenSearchServiceImpl;
-import org.dspace.app.util.factory.UtilServiceFactory;
-import org.dspace.app.util.service.OpenSearchService;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.FeedUtils;
 import org.dspace.content.Collection;
@@ -24,7 +21,6 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleServiceImpl;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.search.DSQuery;
@@ -60,7 +56,7 @@ public class StandardOpenSearchGenerator extends AbstractOpenSearchGenerator
 {
 
     protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
-    protected OpenSearchService openSearchService = UtilServiceFactory.getInstance().getOpenSearchService();
+
     /**
      * Generate the search results document.
      * Params have been parsed in superclass's setup() method

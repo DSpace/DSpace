@@ -18,8 +18,6 @@ import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.factory.AuthorizeServiceFactory;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -36,21 +34,13 @@ import org.dspace.core.LogManager;
  */
 public class WorkspaceServlet extends DSpaceServlet
 {
-    
     /** log4j category */
-    private static Logger log = Logger.getLogger(WorkspaceServlet.class);
+    private static final Logger log = Logger.getLogger(WorkspaceServlet.class);
 
-    private AuthorizeService authorizeService;
+    private final transient WorkspaceItemService workspaceItemService
+             = ContentServiceFactory.getInstance().getWorkspaceItemService();
     
-    private WorkspaceItemService workspaceItemService;
-
     @Override
-    public void init() throws ServletException {
-    	super.init();
-    	authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
-    	workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-    }
-    
     protected void doDSGet(Context c, 
         HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
@@ -59,6 +49,7 @@ public class WorkspaceServlet extends DSpaceServlet
         doDSPost(c, request, response);
     }
     
+    @Override
     protected void doDSPost(Context c, 
         HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException

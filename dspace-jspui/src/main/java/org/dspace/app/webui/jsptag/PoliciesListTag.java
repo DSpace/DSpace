@@ -30,19 +30,21 @@ import org.dspace.authorize.service.ResourcePolicyService;
 public class PoliciesListTag extends TagSupport
 {
 	/** log4j category */
-    private static Logger log = Logger.getLogger(PoliciesListTag.class);
+    private static final Logger log = Logger.getLogger(PoliciesListTag.class);
 
     /** Groups to make options list */
     private transient List<ResourcePolicy> policies = null;
-    private transient boolean showButton = true;
+    private boolean showButton = true;
     
-    private ResourcePolicyService policyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
-    
+    private final transient ResourcePolicyService policyService
+            = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
+
     public PoliciesListTag()
     {
         super();
     }
 
+    @Override
     public int doStartTag() throws JspException
     {
         String label_name = LocaleSupport.getLocalizedMessage(pageContext, "org.dspace.app.webui.jsptag.policies-list.label_name");
@@ -137,6 +139,7 @@ public class PoliciesListTag extends TagSupport
     }
 
 
+    @Override
     public void release()
     {
         policies = null;

@@ -85,7 +85,7 @@ public class SelectTargetTransformer extends AbstractDSpaceTransformer
         String urlValue = request.getParameter("url");
         String otherUrlValue = request.getParameter("otherUrl");
         String usernameValue = request.getParameter("username");
-        String passwordValue  = request.getParameter("password");
+//        String passwordValue  = request.getParameter("password");
 
         Division main = body.addInteractiveDivision("service-document", contextPath + "/swordclient", Division.METHOD_POST, "");
         main.setHead(T_main_head.parameterize(handle));

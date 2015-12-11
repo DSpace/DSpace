@@ -35,16 +35,12 @@ public class VersionItemServlet extends DSpaceServlet
 {
 
     /** log4j category */
-    private static Logger log = Logger.getLogger(VersionItemServlet.class);
-    
-    private ItemService itemService;
-    
-    @Override
-    public void init() throws ServletException {
-    	super.init();
-    	itemService = ContentServiceFactory.getInstance().getItemService();
-    }
+    private static final Logger log = Logger.getLogger(VersionItemServlet.class);
 
+    private final transient ItemService itemService =
+            ContentServiceFactory.getInstance().getItemService();
+
+    @Override
     protected void doDSGet(Context context, HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException,
             AuthorizeException
@@ -81,7 +77,7 @@ public class VersionItemServlet extends DSpaceServlet
         
     }
 
-   
+    @Override
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException

@@ -7,6 +7,7 @@
  */
 package org.dspace.checker;
 
+import java.io.Serializable;
 import javax.persistence.*;
 
 /**
@@ -16,7 +17,8 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="checksum_results")
-public final class ChecksumResult
+public class ChecksumResult
+        implements Serializable
 {
     @Id
     @Column(name="result_code")

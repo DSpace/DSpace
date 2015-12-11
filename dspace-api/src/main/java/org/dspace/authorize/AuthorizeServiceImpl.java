@@ -360,9 +360,6 @@ public class AuthorizeServiceImpl implements AuthorizeService
             return false;
         }
 
-        // is eperson set? if not, userid = 0 (anonymous)
-        EPerson e = c.getCurrentUser();
-
         //
         // First, check all Resource Policies directly on this object
         //

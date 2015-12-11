@@ -41,16 +41,12 @@ import org.dspace.core.LogManager;
 public class PasswordServlet extends DSpaceServlet
 {
     /** log4j logger */
-    private static Logger log = Logger.getLogger(PasswordServlet.class);
+    private static final Logger log = Logger.getLogger(PasswordServlet.class);
 
-    private AuthenticationService authenticationService;
+    private final transient AuthenticationService authenticationService
+             = AuthenticateServiceFactory.getInstance().getAuthenticationService();
     
     @Override
-    public void init() throws ServletException {
-    	super.init();
-    	authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
-    }
-    
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -59,6 +55,7 @@ public class PasswordServlet extends DSpaceServlet
         JSPManager.showJSP(request, response, "/login/password.jsp");
     }
 
+    @Override
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException

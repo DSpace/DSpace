@@ -25,7 +25,7 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 
 /**
- * Shibbolize dspace. Follow instruction at 
+ * Shibbolize DSpace. Follow instruction at
  * http://mams.melcoe.mq.edu.au/zope/mams/pubs/Installation/dspace15
  *
  * Pull information from the header as released by Shibboleth target.
@@ -44,16 +44,12 @@ import org.dspace.core.LogManager;
  */
 public class ShibbolethServlet extends DSpaceServlet {
     /** log4j logger */
-    private static Logger log = Logger.getLogger(ShibbolethServlet.class);
+    private static final Logger log = Logger.getLogger(ShibbolethServlet.class);
     
-    private AuthenticationService authenticationService;
+    private final transient AuthenticationService authenticationService
+             = AuthenticateServiceFactory.getInstance().getAuthenticationService();
     
     @Override
-    public void init() throws ServletException {
-    	super.init();
-    	authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
-    }
-    
     protected void doDSGet(Context context,
             HttpServletRequest request,
             HttpServletResponse response)

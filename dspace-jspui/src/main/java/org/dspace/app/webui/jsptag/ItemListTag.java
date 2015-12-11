@@ -55,10 +55,10 @@ import org.dspace.sort.SortOption;
  */
 public class ItemListTag extends TagSupport
 {
-    private static Logger log = Logger.getLogger(ItemListTag.class);
+    private static final Logger log = Logger.getLogger(ItemListTag.class);
 
     /** Items to display */
-    private transient List<Item> items;
+    private List<Item> items;
 
     /** Row to highlight, -1 for no row */
     private int highlightRow = -1;
@@ -101,14 +101,17 @@ public class ItemListTag extends TagSupport
 
     private transient SortOption sortOption = null;
     
-    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    private final transient ItemService itemService
+            = ContentServiceFactory.getInstance().getItemService();
 
     private static final long serialVersionUID = 348762897199116432L;
     
-    private MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
+    private final transient MetadataAuthorityService metadataAuthorityService
+            = ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
 
-    private BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
-    
+    private final transient BitstreamService bitstreamService
+            = ContentServiceFactory.getInstance().getBitstreamService();
+
     static
     {
         getThumbSettings();
@@ -149,6 +152,7 @@ public class ItemListTag extends TagSupport
         super();
     }
 
+    @Override
     public int doStartTag() throws JspException
     {
         JspWriter out = pageContext.getOut();
@@ -430,7 +434,7 @@ public class ItemListTag extends TagSupport
                     // save on a null check which would make the code untidy
                     if (metadataArray == null)
                     {
-                        metadataArray = new ArrayList<MetadataValue>();
+                        metadataArray = new ArrayList<>();
                     }
 
                     // now prepare the content of the table division
@@ -726,6 +730,7 @@ public class ItemListTag extends TagSupport
         emphColumn = emphColumnIn;
     }
 
+    @Override
     public void release()
     {
         highlightRow = -1;

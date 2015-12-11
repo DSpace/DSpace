@@ -83,10 +83,10 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
             joinColumns = {@JoinColumn(name = "collection_id") },
             inverseJoinColumns = {@JoinColumn(name = "community_id") }
     )
-    private List<Community> communities = new ArrayList<>();
+    private final List<Community> communities = new ArrayList<>();
 
     @Transient
-    private CollectionService collectionService;
+    private transient CollectionService collectionService;
 
     // Keys for accessing Collection metadata
     @Transient

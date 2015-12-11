@@ -23,7 +23,6 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.SubscribeService;
 import org.dspace.event.Event;
-import org.dspace.handle.service.HandleService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -42,7 +41,7 @@ import java.util.*;
 public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> implements CollectionService {
 
     /** log4j category */
-    private static Logger log = Logger.getLogger(CollectionServiceImpl.class);
+    private static final Logger log = Logger.getLogger(CollectionServiceImpl.class);
 
     @Autowired(required = true)
     protected CollectionDAO collectionDAO;
@@ -58,8 +57,6 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     @Autowired(required = true)
     protected GroupService groupService;
 
-    @Autowired(required = true)
-    protected HandleService handleService;
     @Autowired(required = true)
     protected LicenseService licenseService;
     @Autowired(required = true)
@@ -135,7 +132,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             return findAuthorized(context, null, actionID);
         }
 
-        List<Collection> myResults = new ArrayList<Collection>();
+        List<Collection> myResults = new ArrayList<>();
 
         if(authorizeService.isAdmin(context))
         {
@@ -340,7 +337,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                 collection.setWorkflowStep3(group);
                 break;
             default:
-                new IllegalAccessException("Illegal step count: " + step);
+                throw new IllegalArgumentException("Illegal step count: " + step);
         }
     }
 
@@ -362,6 +359,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     /**
      * Get the value of a metadata field
      *
+     * @param collection
      * @param field
      *            the name of the metadata field to get
      *
@@ -536,7 +534,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         }
 
         context.addEvent(new Event(Event.ADD, Constants.COLLECTION, collection.getID(),
-                Constants.ITEM, item.getID(), item.getHandle(), 
+                Constants.ITEM, item.getID(), item.getHandle(),
                 getIdentifiers(context, collection)));
     }
 
@@ -549,13 +547,13 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         item.removeCollection(collection);
 
         //Check if we orphaned our poor item
-        if (item.getCollections().size() == 0)
+        if (item.getCollections().isEmpty())
         {
             // Orphan; delete it
             itemService.delete(context, item);
         }
 
-        context.addEvent(new Event(Event.REMOVE, Constants.COLLECTION, 
+        context.addEvent(new Event(Event.REMOVE, Constants.COLLECTION,
                 collection.getID(), Constants.ITEM, item.getID(), item.getHandle(),
                 getIdentifiers(context, collection)));
     }
@@ -736,9 +734,9 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public List<Collection> findAuthorized(Context context, Community community, int actionID) throws SQLException {
-        List<Collection> myResults = new ArrayList<Collection>();
+        List<Collection> myResults = new ArrayList<>();
 
-        List<Collection> myCollections = null;
+        List<Collection> myCollections;
 
         if (community != null)
         {

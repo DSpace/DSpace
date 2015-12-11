@@ -45,7 +45,7 @@ import org.dspace.search.QueryResults;
 public class ControlledVocabularySearchServlet extends DSpaceServlet
 {
     // the log
-    private static Logger log = Logger
+    private static final Logger log = Logger
             .getLogger(ControlledVocabularySearchServlet.class);
 
     // the jsp that displays the HTML version of controlled-vocabulary
@@ -54,19 +54,16 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
     // the jsp that will show the search results
     private static final String RESULTS_JSP = "/controlledvocabulary/results.jsp";
 
-    private HandleService handleService;
+    private final transient HandleService handleService
+             = HandleServiceFactory.getInstance().getHandleService();
     
-    private CommunityService communityService;
+    private final transient CommunityService communityService
+             = ContentServiceFactory.getInstance().getCommunityService();
     
-    @Override
-    public void init() throws ServletException {
-    	super.init();
-    	handleService = HandleServiceFactory.getInstance().getHandleService(); 
-        communityService = ContentServiceFactory.getInstance().getCommunityService();
-    }
     /**
      * Handles requests
      */
+    @Override
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -104,7 +101,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
      */
     private List<String> extractKeywords(HttpServletRequest request)
     {
-        List<String> keywords = new ArrayList<String>();
+        List<String> keywords = new ArrayList<>();
         Enumeration enumeration = request.getParameterNames();
         while (enumeration.hasMoreElements())
         {
@@ -143,9 +140,9 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
             start = 0;
         }
 
-        List<String> itemHandles = new ArrayList<String>();
-        List<String> collectionHandles = new ArrayList<String>();
-        List<String> communityHandles = new ArrayList<String>();
+        List<String> itemHandles = new ArrayList<>();
+        List<String> collectionHandles = new ArrayList<>();
+        List<String> communityHandles = new ArrayList<>();
 
         Item[] resultsItems;
         Collection[] resultsCollections;
@@ -219,7 +216,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
             Integer myType = qResults.getHitTypes().get(i);
 
             // add the handle to the appropriate lists
-            switch (myType.intValue())
+            switch (myType)
             {
             case Constants.ITEM:
                 itemHandles.add(myHandle);
@@ -317,10 +314,10 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         request.setAttribute("communities", resultsCommunities);
         request.setAttribute("collections", resultsCollections);
 
-        request.setAttribute("pagetotal", Integer.valueOf(pageTotal));
-        request.setAttribute("pagecurrent", Integer.valueOf(pageCurrent));
-        request.setAttribute("pagelast", Integer.valueOf(pageLast));
-        request.setAttribute("pagefirst", Integer.valueOf(pageFirst));
+        request.setAttribute("pagetotal", pageTotal);
+        request.setAttribute("pagecurrent", pageCurrent);
+        request.setAttribute("pagelast", pageLast);
+        request.setAttribute("pagefirst", pageFirst);
 
         request.setAttribute("queryresults", qResults);
 
@@ -358,6 +355,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
     /**
      * Handle posts
      */
+    @Override
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException

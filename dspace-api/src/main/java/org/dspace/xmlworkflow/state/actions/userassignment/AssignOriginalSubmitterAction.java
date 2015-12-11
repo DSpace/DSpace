@@ -89,11 +89,16 @@ public class AssignOriginalSubmitterAction extends UserSelectionAction{
     @Override
     public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request) throws SQLException, AuthorizeException, IOException, WorkflowException {
         EPerson submitter = wfi.getSubmitter();
-        Step currentStep = getParent().getStep();
         WorkflowActionConfig nextAction = getParent().getStep().getNextAction(this.getParent());
         //Retrieve the action which has a user interface
         while(nextAction != null && !nextAction.requiresUI()){
             nextAction = nextAction.getStep().getNextAction(nextAction);
+        }
+        if(nextAction == null)
+        {
+            //Should never occur, but just in case
+            log.error("Could not find next action for step with id: " + step.getId() + " to assign a submitter to. Aborting the action.");
+            throw new IllegalStateException();
         }
 
         createTaskForEPerson(c, wfi, step, nextAction, submitter);

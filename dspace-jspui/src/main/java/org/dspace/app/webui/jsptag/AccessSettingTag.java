@@ -42,7 +42,7 @@ import org.dspace.eperson.service.GroupService;
 public class AccessSettingTag extends TagSupport
 {
 	/** log4j category */
-    private static Logger log = Logger.getLogger(AccessSettingTag.class);
+    private static final Logger log = Logger.getLogger(AccessSettingTag.class);
 
     /** is advanced form enabled? */
     private static final boolean advanced = ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
@@ -50,7 +50,7 @@ public class AccessSettingTag extends TagSupport
     /** Name of the restricted group */
     private static final String restrictedGroup = ConfigurationManager.getProperty("webui.submission.restrictstep.groups");
 
-    /** the SubmittionInfo */
+    /** the SubmissionInfo */
     private transient SubmissionInfo subInfo = null;
 
     /** the target DSpaceObject */
@@ -68,18 +68,21 @@ public class AccessSettingTag extends TagSupport
     /** add the policy button */
     private boolean addpolicy = false;
     
-    private AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    private final transient AuthorizeService authorizeService
+            = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
-    private GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+    private final transient GroupService groupService
+            = EPersonServiceFactory.getInstance().getGroupService();
 
     public AccessSettingTag()
     {
         super();
     }
 
+    @Override
     public int doStartTag() throws JspException
     {
-        String legend = LocaleSupport.getLocalizedMessage(pageContext, "org.dspace.app.webui.jsptag.access-setting.legend");
+//        String legend = LocaleSupport.getLocalizedMessage(pageContext, "org.dspace.app.webui.jsptag.access-setting.legend");
         String label_name = LocaleSupport.getLocalizedMessage(pageContext, "org.dspace.app.webui.jsptag.access-setting.label_name");
         String label_group = LocaleSupport.getLocalizedMessage(pageContext, "org.dspace.app.webui.jsptag.access-setting.label_group");
         String label_embargo = LocaleSupport.getLocalizedMessage(pageContext, "org.dspace.app.webui.jsptag.access-setting.label_embargo");
@@ -109,7 +112,7 @@ public class AccessSettingTag extends TagSupport
             }
             else if (rp != null)
             {
-                policies = new ArrayList<ResourcePolicy>();
+                policies = new ArrayList<>();
                 policies.add(rp);
             }
 
@@ -186,7 +189,7 @@ public class AccessSettingTag extends TagSupport
             // Embargo Date
             if (hidden)
             {
-                sb.append("<input name=\"embargo_until_date\" id=\"embargo_until_date_hidden\" type=\"hidden\" value=\"").append(startDate).append("\" />\n");;
+                sb.append("<input name=\"embargo_until_date\" id=\"embargo_until_date_hidden\" type=\"hidden\" value=\"").append(startDate).append("\" />\n");
                 sb.append("<input name=\"reason\" id=\"reason_hidden\" type=\"hidden\" value=\"").append(reason).append("\" />\n");
             }
             else
@@ -365,6 +368,7 @@ public class AccessSettingTag extends TagSupport
         return addpolicy;
     }
 
+    @Override
     public void release()
     {
         dso = null;

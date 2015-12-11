@@ -56,7 +56,6 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
         {
             sc = this.noAuthContext();
             SwordConfigurationDSpace config = (SwordConfigurationDSpace) swordConfig;
-            Context context = sc.getContext();
 
             String acceptContentType = this.getHeader(accept, "Accept", null);
             TreeMap<Float, List<String>> analysed = this
@@ -67,7 +66,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
             SwordStatementDisseminator disseminator = null;
             try
             {
-                disseminator = SwordDisseminatorFactory
+                SwordDisseminatorFactory
                         .getStatementInstance(analysed);
             }
             catch (SwordError swordError)
@@ -732,8 +731,6 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
     {
         // get the things out of the service that we need
         Context context = swordContext.getContext();
-        SwordUrlManager urlManager = swordConfig
-                .getUrlManager(swordContext.getContext(), swordConfig);
 
         // is the content acceptable?  If not, this will throw an error
         this.isAcceptable(swordConfig, context, deposit, item);
@@ -807,8 +804,6 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
     {
         // get the things out of the service that we need
         Context context = swordContext.getContext();
-        SwordUrlManager urlManager = swordConfig
-                .getUrlManager(swordContext.getContext(), swordConfig);
 
         // Obtain the relevant ingester from the factory
         SwordEntryIngester si = SwordIngesterFactory
@@ -852,8 +847,6 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
 
         // get the things out of the service that we need
         Context context = swordContext.getContext();
-        SwordUrlManager urlManager = swordConfig
-                .getUrlManager(swordContext.getContext(), swordConfig);
 
         // Obtain the relevant ingester from the factory
         SwordEntryIngester si = SwordIngesterFactory

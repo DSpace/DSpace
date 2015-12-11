@@ -84,7 +84,7 @@ public class SelectCollectionTag extends TagSupport
             for (Collection coll : collections)
             {
                 sb.append("<option value=\"").append(coll.getID()).append("\"");
-                if (collection == coll.getID().toString())
+                if (collection.equals(coll.getID().toString()))
                 {
                     sb.append(" selected=\"selected\"");
                 }

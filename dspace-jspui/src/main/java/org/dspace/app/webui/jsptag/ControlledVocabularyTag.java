@@ -32,10 +32,11 @@ import org.w3c.dom.Document;
 public class ControlledVocabularyTag extends TagSupport
 {
     // path to the jsp that outputs the results of this tag
-    private static final String CONTROLLEDVOCABULARY_JSPTAG = "/controlledvocabulary/controlledvocabularyTag.jsp";
+    private static final String CONTROLLEDVOCABULARY_JSPTAG
+            = "/controlledvocabulary/controlledvocabularyTag.jsp";
 
     // the log
-    private static Logger log = Logger.getLogger(ControlledVocabularyTag.class);
+    private static final Logger log = Logger.getLogger(ControlledVocabularyTag.class);
 
     // a tag attribute that contains the words used to trim the vocabulary tree
     private String filter;
@@ -46,12 +47,10 @@ public class ControlledVocabularyTag extends TagSupport
     // a tag attribute that specifies the vocabulary to be displayed
     private String vocabulary;
 
-    // an hashtable containing all the loaded vocabularies
-    public Map<String, Document> controlledVocabularies;
-
     /**
      * Process tag
      */
+    @Override
     public int doStartTag() throws JspException
     {
         HttpServletRequest request = (HttpServletRequest) pageContext
@@ -69,7 +68,9 @@ public class ControlledVocabularyTag extends TagSupport
                 + "vocabulary2html.xsl";
 
         // Load vocabularies on startup
-        controlledVocabularies = (Map<String, Document>) pageContext.getServletContext().getAttribute("controlledvocabulary.controlledVocabularies");
+        Map<String, Document> controlledVocabularies
+                = (Map<String, Document>) pageContext.getServletContext()
+                        .getAttribute("controlledvocabulary.controlledVocabularies");
         if (controlledVocabularies == null)
         {
             controlledVocabularies = loadControlledVocabularies(vocabulariesPath);
@@ -112,6 +113,7 @@ public class ControlledVocabularyTag extends TagSupport
     /**
      * End processing tag
      */
+    @Override
     public int doEndTag()
     {
         return EVAL_PAGE;
@@ -168,7 +170,7 @@ public class ControlledVocabularyTag extends TagSupport
      */
     private Map<String, Document> filterVocabularies(Map<String, Document> vocabularies, String vocabularyPrunningXSLT)
     {
-        Map<String, Document> prunnedVocabularies = new HashMap<String, Document>();
+        Map<String, Document> prunnedVocabularies = new HashMap<>();
         for (Map.Entry<String, Document> entry : vocabularies.entrySet())
         {
             prunnedVocabularies.put(entry.getKey(), filterVocabulary(entry.getValue(), vocabularyPrunningXSLT, getFilter()));
@@ -203,7 +205,7 @@ public class ControlledVocabularyTag extends TagSupport
         try
         {
 
-            Map<String, String> parameters = new HashMap<String, String>();
+            Map<String, String> parameters = new HashMap<>();
             parameters.put("allowMultipleSelection", allowMultipleSelection ? "yes" : "no");
             parameters.put("contextPath", contextPath);
             result = XMLUtil.transformDocumentAsString(vocabulary, parameters, controlledVocabulary2HtmlXSLT);
@@ -236,7 +238,7 @@ public class ControlledVocabularyTag extends TagSupport
 
         try
         {
-            Map<String, String> parameters = new HashMap<String, String>();
+            Map<String, String> parameters = new HashMap<>();
             parameters.put("filter", filter);
             return XMLUtil.transformDocument(vocabulary, parameters, vocabularyPrunningXSLT);
         }
@@ -259,11 +261,12 @@ public class ControlledVocabularyTag extends TagSupport
      */
     private static Map<String, Document> loadControlledVocabularies(String directory)
     {
-        Map<String, Document> controlledVocabularies = new HashMap<String, Document>();
+        Map<String, Document> controlledVocabularies = new HashMap<>();
         File dir = new File(directory);
 
         FilenameFilter filter = new FilenameFilter()
         {
+            @Override
             public boolean accept(File dir, String name)
             {
                 return name.endsWith(".xml");

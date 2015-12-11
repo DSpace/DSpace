@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.lang.StringUtils;
 
 import org.dspace.core.ConfigurationManager;
 import org.dspace.sort.SortOption;
@@ -95,17 +96,30 @@ public final class BrowseIndex
     
     /**
      * Create a new BrowseIndex object using the definition from the configuration,
-     * and the number of the configuration option.  The definition should be of
-     * the form:
+     * and the number of the configuration option.  The definition should follow
+     * one of the following forms:
      * 
      * <code>
-     * [name]:[metadata]:[data type]:[display type]
+     * [name]:item:[sort option]:[order]
+     * </code>
+     * 
+     * or
+     * 
+     * <code>
+     * [name]:metadata:[metadata]:[data type]:[order]:[sort option]
      * </code>
      * 
      * [name] is a freetext name for the field
+     * item or metadata defines the display type
      * [metadata] is the usual format of the metadata such as dc.contributor.author
+     * [sort option] is the name of a separately defined sort option
+     * [order] must be either asc or desc
      * [data type] must be either "title", "date" or "text"
-     * [display type] must be either "single" or "full"
+     * 
+     * If you use the first form (to define an index of type item), the order
+     * is facultative. If you use the second form (for type metadata), the order
+     * and sort option are facultative, but you must configure the order if you 
+     * want to configure the sort option.
      * 
      * @param definition	the configuration definition of this index
      * @param number		the configuration number of this index
@@ -120,7 +134,7 @@ public final class BrowseIndex
             this.defaultOrder = SortOption.ASCENDING;
             this.number = number;
 
-            String rx = "(\\w+):(\\w+):([\\w\\.\\*,]+):?(\\w*):?(\\w*)";
+            String rx = "(\\w+):(\\w+):([\\w\\.\\*,]+):?(\\w*):?(\\w*):?(\\w*)";
             Pattern pattern = Pattern.compile(rx);
             Matcher matcher = pattern.matcher(definition);
 
@@ -157,6 +171,30 @@ public final class BrowseIndex
                         if (SortOption.DESCENDING.equalsIgnoreCase(order))
                         {
                             this.defaultOrder = SortOption.DESCENDING;
+                        }
+                    }
+                    
+                    if (matcher.groupCount() > 5)
+                    {
+                        String sortName = matcher.group(6).trim();
+                        if (sortName.length() > 0)
+                        {
+                            for (SortOption so : SortOption.getSortOptions())
+                            {
+                                if (so.getName().equals(sortName))
+                                {
+                                    sortOption = so;
+                                }
+                            }
+
+                            // for backward compatability we ignore the keywords
+                            // single and full here
+                            if (!sortName.equalsIgnoreCase("single")
+                                    && !sortName.equalsIgnoreCase("full")
+                                    && sortOption == null)
+                            {
+                                valid = false;
+                            }
                         }
                     }
 

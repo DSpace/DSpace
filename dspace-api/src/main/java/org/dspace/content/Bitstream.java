@@ -71,7 +71,7 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
     private Collection collection;
 
     @Transient
-    private BitstreamService bitstreamService;
+    private transient BitstreamService bitstreamService;
 
 
     public Bitstream()

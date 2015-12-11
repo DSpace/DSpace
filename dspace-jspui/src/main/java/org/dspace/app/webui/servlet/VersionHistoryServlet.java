@@ -20,8 +20,6 @@ import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.app.webui.util.VersionUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.factory.AuthorizeServiceFactory;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -31,7 +29,6 @@ import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
-import org.dspace.versioning.service.VersioningService;
 
 /**
  * Servlet for handling the operations in the version history page
@@ -43,26 +40,15 @@ public class VersionHistoryServlet extends DSpaceServlet
 {
 
     /** log4j category */
-    private static Logger log = Logger.getLogger(VersionHistoryServlet.class);
-    
-    private AuthorizeService authorizeService;
-    
-    private ItemService itemService;
-    
-    private VersionHistoryService versionHistoryService;
+    private static final Logger log = Logger.getLogger(VersionHistoryServlet.class);
 
-    private VersioningService versioningService;
-    
+    private final transient ItemService itemService
+             = ContentServiceFactory.getInstance().getItemService();
+
+    private final transient VersionHistoryService versionHistoryService
+             = VersionServiceFactory.getInstance().getVersionHistoryService();
+
     @Override
-    public void init() throws ServletException {
-    	super.init();
-    	authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
-    	itemService = ContentServiceFactory.getInstance().getItemService();
-    	versionHistoryService = VersionServiceFactory.getInstance().getVersionHistoryService();
-    	versioningService = VersionServiceFactory.getInstance().getVersionService();
-    }
-
-
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -147,6 +133,7 @@ public class VersionHistoryServlet extends DSpaceServlet
         JSPManager.showJSP(request, response, "/tools/version-history.jsp");
     }
 
+    @Override
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException

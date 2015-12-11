@@ -45,19 +45,15 @@ import org.dspace.handle.service.HandleService;
 public class SuggestServlet extends DSpaceServlet
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(SuggestServlet.class);
+    private static final Logger log = Logger.getLogger(SuggestServlet.class);
     
-    private HandleService handleService;
-    
-    private ItemService itemService;
-    
-    @Override
-    public void init() throws ServletException {
-    	super.init();
-    	handleService = HandleServiceFactory.getInstance().getHandleService();
-    	itemService = ContentServiceFactory.getInstance().getItemService();
-    }
+    private final transient HandleService handleService
+            = HandleServiceFactory.getInstance().getHandleService();
 
+    private final transient ItemService itemService
+             = ContentServiceFactory.getInstance().getItemService();
+
+    @Override
     protected void doDSGet(Context context, HttpServletRequest request,
     					   HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
@@ -239,6 +235,7 @@ public class SuggestServlet extends DSpaceServlet
         }
    }
 
+    @Override
     protected void doDSPost(Context context, HttpServletRequest request,
     						HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException

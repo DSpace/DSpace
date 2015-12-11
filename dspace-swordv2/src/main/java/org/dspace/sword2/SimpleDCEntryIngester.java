@@ -11,7 +11,6 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -28,9 +27,6 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC
 {
     private static final Logger log = Logger
             .getLogger(SimpleDCEntryIngester.class);
-
-    protected ItemService itemService = ContentServiceFactory.getInstance()
-            .getItemService();
 
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory
             .getInstance().getWorkspaceItemService();

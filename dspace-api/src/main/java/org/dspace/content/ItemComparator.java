@@ -17,12 +17,12 @@ import org.dspace.sort.OrderFormat;
 
 /**
  * Compare two Items by their DCValues.
- * 
+ *
  * The DCValues to be compared are specified by the element, qualifier and
  language parameters to the constructor. If the Item has more than one
  matching Metadatum, then the max parameter to the constructor specifies whether
  the maximum or minimum lexicographic value will be used.
- * 
+ *
  * @author Peter Breton
  * @version $Revision$
  */
@@ -40,11 +40,12 @@ public class ItemComparator implements Comparator, Serializable
     /** Whether maximum or minimum value will be used */
     protected boolean max;
 
-    protected ItemService itemService;
+    protected transient ItemService itemService
+            = ContentServiceFactory.getInstance().getItemService();
 
     /**
      * Constructor.
-     * 
+     *
      * @param element
      *            The Dublin Core element
      * @param qualifier
@@ -63,19 +64,18 @@ public class ItemComparator implements Comparator, Serializable
         this.qualifier = qualifier;
         this.language = language;
         this.max = max;
-        this.itemService = ContentServiceFactory.getInstance().getItemService();
     }
 
     /**
      * Compare two Items by checking their DCValues for element, qualifier, and
      * language.
-     * 
+     *
      * <p>
      * Return >= 1 if the first is lexicographically greater than the second; <=
      * -1 if the second is lexicographically greater than the first, and 0
      * otherwise.
      * </p>
-     * 
+     *
      * @param first
      *            The first object to compare. Must be an object of type
      *            org.dspace.content.Item.
@@ -122,11 +122,12 @@ public class ItemComparator implements Comparator, Serializable
      * Return true if the object is equal to this one, false otherwise. Another
      * object is equal to this one if it is also an ItemComparator, and has the
      * same values for element, qualifier, language, and max.
-     * 
+     *
      * @param obj
      *            The object to compare to.
      * @return True if the other object is equal to this one, false otherwise.
      */
+    @Override
     public boolean equals(Object obj)
     {
         if (!(obj instanceof ItemComparator))
@@ -141,13 +142,16 @@ public class ItemComparator implements Comparator, Serializable
                 && equalsWithNull(language, other.language) && (max == other.max);
     }
 
+    @Override
     public int hashCode()
     {
         return new HashCodeBuilder().append(element).append(qualifier).append(language).append(max).toHashCode();
     }
 
     /**
-     * Return true if the first string is equal to the second. Either or both
+     * @param first
+     * @param second
+     * @return true if the first string is equal to the second. Either or both
      * may be null.
      */
     protected boolean equalsWithNull(String first, String second)
@@ -170,7 +174,7 @@ public class ItemComparator implements Comparator, Serializable
      * values, null is returned. If there is exactly one value, then it is
      * returned. Otherwise, either the maximum or minimum lexicographical value
      * is returned; the parameter to the constructor says which.
-     * 
+     *
      * @param item
      *            The item to check
      * @return The chosen value, or null
@@ -180,7 +184,7 @@ public class ItemComparator implements Comparator, Serializable
         // The overall array and each element are guaranteed non-null
         List<MetadataValue> dcvalues = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, element, qualifier, language);
 
-        if (dcvalues.size() == 0)
+        if (dcvalues.isEmpty())
         {
             return null;
         }
@@ -192,7 +196,7 @@ public class ItemComparator implements Comparator, Serializable
 
         // We want to sort using Strings, but also keep track of
         // which Metadatum the value came from.
-        Map<String, Integer> values = new HashMap<String, Integer>();
+        Map<String, Integer> values = new HashMap<>();
 
         for (int i = 0; i < dcvalues.size(); i++)
         {
@@ -204,7 +208,7 @@ public class ItemComparator implements Comparator, Serializable
             }
         }
 
-        if (values.size() == 0)
+        if (values.isEmpty())
         {
             return null;
         }
@@ -220,6 +224,8 @@ public class ItemComparator implements Comparator, Serializable
 
     /**
      * Normalize the title of a Metadatum.
+     * @param value
+     * @return
      */
     protected String normalizeTitle(MetadataValue value)
     {

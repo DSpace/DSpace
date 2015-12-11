@@ -91,26 +91,24 @@ public class VersioningItemHome implements ItemHomeProcessor {
 				throw new PluginException(e.getMessage());
 			}
 
-			if (latestVersion != null) {
-				if (latestVersion != null && latestVersion.getItem() != null
-						&& !latestVersion.getItem().getID().equals(item.getID())) {
-					// We have a newer version
-					Item latestVersionItem = latestVersion.getItem();
-					if (latestVersionItem.isArchived()) {
-						// Available, add a link for the user alerting him that
-						// a new version is available
-						newVersionAvailable = true;
-						try {
-							latestVersionURL = handleService.resolveToURL(
-                                    context, latestVersionItem.getHandle());
-						} catch (SQLException e) {
-							throw new PluginException(e.getMessage());
-						}
-						latestVersionHandle = latestVersionItem.getHandle();
-					} else {
-						// We might be dealing with a workflow/workspace item
-						showVersionWorkflowAvailable = true;
+			if (latestVersion != null && latestVersion.getItem() != null
+					&& !latestVersion.getItem().getID().equals(item.getID())) {
+				// We have a newer version
+				Item latestVersionItem = latestVersion.getItem();
+				if (latestVersionItem.isArchived()) {
+					// Available, add a link for the user alerting him that
+					// a new version is available
+					newVersionAvailable = true;
+					try {
+						latestVersionURL = handleService.resolveToURL(
+								context, latestVersionItem.getHandle());
+					} catch (SQLException e) {
+						throw new PluginException(e.getMessage());
 					}
+					latestVersionHandle = latestVersionItem.getHandle();
+				} else {
+					// We might be dealing with a workflow/workspace item
+					showVersionWorkflowAvailable = true;
 				}
 			}
 		}

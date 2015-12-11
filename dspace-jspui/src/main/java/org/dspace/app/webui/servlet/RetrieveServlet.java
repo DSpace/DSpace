@@ -43,14 +43,15 @@ import org.dspace.utils.DSpace;
 public class RetrieveServlet extends DSpaceServlet
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(RetrieveServlet.class);
+    private static final Logger log = Logger.getLogger(RetrieveServlet.class);
 
     /**
      * Threshold on Bitstream size before content-disposition will be set.
      */
     private int threshold;
     
-    private BitstreamService bitstreamService;
+    private final transient BitstreamService bitstreamService
+             = ContentServiceFactory.getInstance().getBitstreamService();
     
     @Override
 	public void init(ServletConfig arg0) throws ServletException {
@@ -58,9 +59,9 @@ public class RetrieveServlet extends DSpaceServlet
 		super.init(arg0);
 		threshold = ConfigurationManager
 				.getIntProperty("webui.content_disposition_threshold");
-		bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 	}
     
+    @Override
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException

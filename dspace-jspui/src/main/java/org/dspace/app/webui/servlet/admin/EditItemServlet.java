@@ -104,40 +104,36 @@ public class EditItemServlet extends DSpaceServlet
     public static final int PUBLICIZE = 11;
 
     /** Logger */
-    private static Logger log = Logger.getLogger(EditCommunitiesServlet.class);
+    private static final Logger log = Logger.getLogger(EditCommunitiesServlet.class);
 
-    private CollectionService collectionService;
+    private final transient CollectionService collectionService
+             = ContentServiceFactory.getInstance().getCollectionService();
     
-    private ItemService itemService;
+    private final transient ItemService itemService
+             = ContentServiceFactory.getInstance().getItemService();
     
-    private BitstreamFormatService bitstreamFormatService;
+    private final transient BitstreamFormatService bitstreamFormatService
+             = ContentServiceFactory.getInstance().getBitstreamFormatService();
     
-    private BitstreamService bitstreamService;
+    private final transient BitstreamService bitstreamService
+             = ContentServiceFactory.getInstance().getBitstreamService();
     
-    private BundleService bundleService;
+    private final transient BundleService bundleService
+             = ContentServiceFactory.getInstance().getBundleService();
     
-    private HandleService handleService;
+    private final transient HandleService handleService
+             = HandleServiceFactory.getInstance().getHandleService();
     
-    private MetadataFieldService metadataFieldService;
+    private final transient MetadataFieldService metadataFieldService
+             = ContentServiceFactory.getInstance().getMetadataFieldService();
     
-    private MetadataSchemaService metadataSchemaService;
+    private final transient MetadataSchemaService metadataSchemaService
+             = ContentServiceFactory.getInstance().getMetadataSchemaService();
     
-    private CreativeCommonsService creativeCommonsService;
+    private final transient CreativeCommonsService creativeCommonsService
+             = LicenseServiceFactory.getInstance().getCreativeCommonsService();
     
     @Override
-    public void init() throws ServletException {
-    	super.init();
-    	collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    	itemService = ContentServiceFactory.getInstance().getItemService();
-    	bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
-    	bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
-    	bundleService = ContentServiceFactory.getInstance().getBundleService();
-    	handleService = HandleServiceFactory.getInstance().getHandleService();
-    	metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
-    	metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
-    	creativeCommonsService = LicenseServiceFactory.getInstance().getCreativeCommonsService();
-    }
-    
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -197,6 +193,7 @@ public class EditItemServlet extends DSpaceServlet
         }
     }
 
+    @Override
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -308,7 +305,7 @@ public class EditItemServlet extends DSpaceServlet
                         List<Collection> allLinkedCollections = item.getCollections();
                     
                         // get only the collection where the current user has the right permission
-                        List<Collection> authNotLinkedCollections = new ArrayList<Collection>();
+                        List<Collection> authNotLinkedCollections = new ArrayList<>();
                         for (Collection c : allNotLinkedCollections)
                         {
                             if (authorizeService.authorizeActionBoolean(context, c, Constants.ADD))
@@ -317,7 +314,7 @@ public class EditItemServlet extends DSpaceServlet
                             }
                         }
 
-                List<Collection> authLinkedCollections = new ArrayList<Collection>();
+                List<Collection> authLinkedCollections = new ArrayList<>();
                 for (Collection c : allLinkedCollections)
                 {
                     if (authorizeService.authorizeActionBoolean(context, c, Constants.REMOVE))
@@ -466,7 +463,7 @@ public class EditItemServlet extends DSpaceServlet
         List<MetadataField> types = metadataFieldService.findAll(context);
         
         // Get a HashMap of metadata field ids and a field name to display
-        Map<Integer, String> metadataFields = new HashMap<Integer, String>();
+        Map<Integer, String> metadataFields = new HashMap<>();
         
         // Get all existing Schemas
         List<MetadataSchema> schemas = metadataSchemaService.findAll(context);
@@ -620,7 +617,7 @@ public class EditItemServlet extends DSpaceServlet
         Enumeration unsortedParamNames = request.getParameterNames();
 
         // Put them in a list
-        List<String> sortedParamNames = new LinkedList<String>();
+        List<String> sortedParamNames = new LinkedList<>();
 
         while (unsortedParamNames.hasMoreElements())
         {

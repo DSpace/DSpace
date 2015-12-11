@@ -30,18 +30,14 @@ import org.dspace.core.service.LicenseService;
  */
 public class LicenseEditServlet extends DSpaceServlet
 {
-	private LicenseService licenseService;
-	
-	@Override
-	public void init() throws ServletException {
-		super.init();
-		licenseService = CoreServiceFactory.getInstance().getLicenseService();
-	}
+	private final transient LicenseService licenseService
+             = CoreServiceFactory.getInstance().getLicenseService();
 	
     /**
      * Handle GET requests. This does nothing but forwards
      * the request on to the POST handler.
      */
+    @Override
     protected void doDSGet(Context c, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -53,6 +49,7 @@ public class LicenseEditServlet extends DSpaceServlet
     /**
      * Handle the POST requests.
      */
+    @Override
     protected void doDSPost(Context c, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException

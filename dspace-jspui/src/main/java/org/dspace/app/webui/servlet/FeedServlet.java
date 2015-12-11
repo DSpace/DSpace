@@ -28,8 +28,6 @@ import org.apache.log4j.Logger;
 import org.dspace.app.util.SyndicationFeed;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.factory.AuthorizeServiceFactory;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
@@ -43,15 +41,11 @@ import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
-import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
-import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.dspace.eperson.service.GroupService;
-import org.dspace.eperson.service.SubscribeService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.search.Harvest;
@@ -66,7 +60,6 @@ import com.sun.syndication.io.FeedException;
  * Currently supports only RSS feed formats.
  * 
  * @author Ben Bosman, Richard Rodgers
- * @version $Revision$
  */
 public class FeedServlet extends DSpaceServlet
 {
@@ -76,10 +69,10 @@ public class FeedServlet extends DSpaceServlet
 	// one hour in milliseconds
 	private static final long HOUR_MSECS = 60 * 60 * 1000;
     /** log4j category */
-    private static Logger log = Logger.getLogger(FeedServlet.class);
-    private String clazz = "org.dspace.app.webui.servlet.FeedServlet";
+    private static final Logger log = Logger.getLogger(FeedServlet.class);
 
-    
+    private static final String clazz = "org.dspace.app.webui.servlet.FeedServlet";
+
     // are syndication feeds enabled?
     private static boolean enabled = false;
     // number of DSpace items per feed
@@ -96,17 +89,14 @@ public class FeedServlet extends DSpaceServlet
     private static boolean includeAll = true;
     
     // services API
-    private HandleService handleService; 
-    
-    private AuthorizeService authorizeService;
+    private final transient HandleService handleService
+             = HandleServiceFactory.getInstance().getHandleService();
 
-    private SubscribeService subscribeService;
-    
-    private ItemService itemService;
-    
-    private CommunityService communityService;
-    
-    private CollectionService collectionService;
+    private final transient CommunityService communityService
+             = ContentServiceFactory.getInstance().getCommunityService();
+
+    private final transient CollectionService collectionService
+             = ContentServiceFactory.getInstance().getCollectionService();
 
     static
     {
@@ -118,7 +108,7 @@ public class FeedServlet extends DSpaceServlet
             String fmtsStr = ConfigurationManager.getProperty("webui.feed.formats");
             if ( fmtsStr != null )
             {
-                formats = new ArrayList<String>();
+                formats = new ArrayList<>();
                 String[] fmts = fmtsStr.split(",");
                 for (int i = 0; i < fmts.length; i++)
                 {
@@ -130,22 +120,13 @@ public class FeedServlet extends DSpaceServlet
             cacheSize = ConfigurationManager.getIntProperty("webui.feed.cache.size");
             if (cacheSize > 0)
             {
-                feedCache = new HashMap<String, CacheFeed>();
+                feedCache = new HashMap<>();
                 cacheAge = ConfigurationManager.getIntProperty("webui.feed.cache.age");
             }
         }
     }
-    
+
     @Override
-    public void init() throws ServletException {
-        handleService = HandleServiceFactory.getInstance().getHandleService(); 
-        authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
-        subscribeService = EPersonServiceFactory.getInstance().getSubscribeService(); 
-        itemService = ContentServiceFactory.getInstance().getItemService();
-        communityService = ContentServiceFactory.getInstance().getCommunityService();
-        collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    }
-    
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -158,7 +139,7 @@ public class FeedServlet extends DSpaceServlet
         // build label map from localized Messages resource bundle
             Locale locale = request.getLocale();
         ResourceBundle msgs = ResourceBundle.getBundle("Messages", locale);
-        Map<String, String> labelMap = new HashMap<String, String>();
+        Map<String, String> labelMap = new HashMap<>();
         labelMap.put(SyndicationFeed.MSG_UNTITLED, msgs.getString(clazz + ".notitle"));
         labelMap.put(SyndicationFeed.MSG_LOGO_TITLE, msgs.getString(clazz + ".logo.title"));
         labelMap.put(SyndicationFeed.MSG_FEED_DESCRIPTION, msgs.getString(clazz + ".general-feed.description"));
@@ -354,7 +335,7 @@ public class FeedServlet extends DSpaceServlet
                     // Check to see if we can include this item
                 //Group[] authorizedGroups = AuthorizeManager.getAuthorizedGroups(context, results[i], Constants.READ);
                 //boolean added = false;
-                List<Item> items = new ArrayList<Item>();
+                List<Item> items = new ArrayList<>();
                 for (Item result : results)
                     {
                 checkAccess:

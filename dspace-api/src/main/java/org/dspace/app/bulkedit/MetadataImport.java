@@ -483,7 +483,7 @@ public class MetadataImport
                                        ",looking_for_element=" + element +
                                        ",looking_for_qualifier=" + qualifier +
                                        ",looking_for_language=" + language));
-        String[] dcvalues = new String[0];
+        String[] dcvalues;
         if(fromAuthority==null) {
             List<MetadataValue> current = itemService.getMetadata(item, schema, element, qualifier, language);
             dcvalues = new String[current.size()];

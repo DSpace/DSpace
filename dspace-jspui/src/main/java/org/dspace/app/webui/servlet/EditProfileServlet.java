@@ -33,17 +33,12 @@ import org.dspace.eperson.service.EPersonService;
 public class EditProfileServlet extends DSpaceServlet
 {
     /** Logger */
-    private static Logger log = Logger.getLogger(EditProfileServlet.class);
+    private static final Logger log = Logger.getLogger(EditProfileServlet.class);
     
-    protected EPersonService personService;
-    
-    @Override
-    public void init() throws ServletException {
-    	super.init();
-    	personService = EPersonServiceFactory.getInstance().getEPersonService();
-    }
-    
+    protected transient EPersonService personService
+             = EPersonServiceFactory.getInstance().getEPersonService();
 
+    @Override
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -57,6 +52,7 @@ public class EditProfileServlet extends DSpaceServlet
         JSPManager.showJSP(request, response, "/register/edit-profile.jsp");
     }
 
+    @Override
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -99,7 +95,7 @@ public class EditProfileServlet extends DSpaceServlet
             personService.update(context, eperson);
 
             // Show confirmation
-            request.setAttribute("password.updated", Boolean.valueOf(settingPassword));
+            request.setAttribute("password.updated", settingPassword);
             JSPManager.showJSP(request, response,
                     "/register/profile-updated.jsp");
 

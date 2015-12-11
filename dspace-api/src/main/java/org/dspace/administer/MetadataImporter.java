@@ -185,7 +185,7 @@ public class MetadataImporter
         {
             // Schema does not exist - create
             log.info("Registering Schema " + name + " (" + namespace + ")");
-            MetadataSchema schema = metadataSchemaService.create(context, name, namespace);
+            metadataSchemaService.create(context, name, namespace);
         }
         else
         {

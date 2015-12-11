@@ -275,7 +275,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         File outFile = null;
         PrintWriter mapOut = null;
         try {
-            Map<String, String> skipItems = new HashMap<String, String>(); // set of items to skip if in 'resume'
+            Map<String, String> skipItems = new HashMap<>(); // set of items to skip if in 'resume'
             // mode
 
             System.out.println("Adding items from directory: " + sourceDir);
@@ -595,7 +595,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     // read in the map file and generate a hashmap of (file,handle) pairs
     protected Map<String, String> readMapFile(String filename) throws Exception
     {
-        Map<String, String> myHash = new HashMap<String, String>();
+        Map<String, String> myHash = new HashMap<>();
 
         BufferedReader is = null;
         try
@@ -893,7 +893,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     {
         File contentsFile = new File(path + File.separatorChar + filename);
         String line = "";
-        List<String> options = new ArrayList<String>();
+        List<String> options = new ArrayList<>();
 
         System.out.println("\tProcessing contents file: " + contentsFile);
 
@@ -1228,7 +1228,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         Bitstream bs = null;
         String newBundleName = bundleName;
 
-        if (bundleName == null)
+        if (StringUtils.isBlank(bundleName))
         {
             // is it license.txt?
             if (bitstreamPath.endsWith("license.txt"))
@@ -1260,7 +1260,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 	        }
 
 	        // now add the bitstream
-	        bs = bitstreamService.register(c, assetstore, bitstreamPath);
+	        bs = bitstreamService.register(c, targetBundle, assetstore, bitstreamPath);
 
 	        // set the name to just the filename
 	        int iLastSlash = bitstreamPath.lastIndexOf('/');
@@ -1658,7 +1658,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     //regex supports either windows or *nix file paths
                     String[] entryChunks = entry.getName().split("/|\\\\");
                     if(entryChunks.length > 2) {
-                        if(sourceDirForZip == sourcedir) {
+                        if(StringUtils.equals(sourceDirForZip, sourcedir)) {
                             sourceDirForZip = sourcedir + "/" + entryChunks[0];
                         }
                     }
@@ -1682,7 +1682,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         //Close zip file
         zf.close();
         
-        if(sourceDirForZip != sourcedir) {
+        if(!StringUtils.equals(sourceDirForZip, sourcedir)) {
             sourcedir = sourceDirForZip;
             System.out.println("Set sourceDir using path inside of Zip: " + sourcedir);
             log.info("Set sourceDir using path inside of Zip: " + sourcedir);
@@ -1840,6 +1840,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 					
 					List<Collection> finalCollections = null;
 					if (theOwningCollection != null){
+                        finalCollections = new ArrayList<>();
 						finalCollections.add(theOwningCollection);
                         finalCollections.addAll(collectionList);
 					}
@@ -1948,7 +1949,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             return null;
         }
 
-        Map<String, BatchUpload> fileNames = new TreeMap<String, BatchUpload>();
+        Map<String, BatchUpload> fileNames = new TreeMap<>();
 
         for (String fileName : uploadDir.list())
         {
@@ -1963,7 +1964,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
         if (fileNames.size() > 0)
         {
-            return new ArrayList<BatchUpload>(fileNames.values());
+            return new ArrayList<>(fileNames.values());
         }
 
         return null;

@@ -15,6 +15,7 @@ import org.dspace.core.GenericDAO;
  * All DSpaceObject DAO classes should implement this class since it ensures that the T object is of type DSpaceObject
  *
  * @author kevinvandevelde at atmire.com
+ * @param <T>
  */
 public interface DSpaceObjectDAO<T extends DSpaceObject> extends GenericDAO<T> {
 }
