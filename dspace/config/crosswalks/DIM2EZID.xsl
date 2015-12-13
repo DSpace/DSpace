@@ -11,25 +11,25 @@
                 xmlns:dspace="http://www.dspace.org/xmlns/dspace/dim"
                 xmlns="http://datacite.org/schema/kernel-2.2"
                 version="1.0">
-    
+
     <!-- CONFIGURATION -->
     <!-- The content of the following variable will be used as element publisher. -->
-    <xsl:variable name="publisher">My University</xsl:variable>
+    <xsl:param name="publisher">My University</xsl:param>
     <!-- The content of the following variable will be used as element contributor with contributorType datamanager. -->
-    <xsl:variable name="datamanager"><xsl:value-of select="$publisher" /></xsl:variable>
+    <xsl:param name="datamanager"><xsl:value-of select="$publisher" /></xsl:param>
     <!-- The content of the following variable will be used as element contributor with contributorType hostingInstitution. -->
-    <xsl:variable name="hostinginstitution"><xsl:value-of select="$publisher" /></xsl:variable>
+    <xsl:param name="hostinginstitution"><xsl:value-of select="$publisher" /></xsl:param>
     <!-- Please take a look into the DataCite schema documentation if you want to know how to use these elements.
          http://schema.datacite.org -->
-    
-    
+
+
     <!-- DO NOT CHANGE ANYTHING BELOW THIS LINE EXCEPT YOU REALLY KNOW WHAT YOU ARE DOING! -->
-    
+
     <xsl:output method="xml" indent="yes" encoding="utf-8" />
-    
+
     <!-- Don't copy everything by default! -->
     <xsl:template match="@* | text()" />
-    
+
     <xsl:template match="/dspace:dim[@dspaceType='ITEM']">
         <!--
             org.dspace.identifier.doi.DataCiteConnector uses this XSLT to
@@ -42,18 +42,18 @@
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:schemaLocation="http://datacite.org/schema/kernel-2.2 http://schema.datacite.org/meta/kernel-2.2/metadata.xsd">
 
-            <!-- 
+            <!--
                 MANDATORY PROPERTIES
             -->
 
-            <!-- 
+            <!--
                 DataCite (1)
                 Dummy element for DOI identifier, which is not yet assigned.
-            --> 
+            -->
                 <identifier type='DOI'/>
-            <!-- 
+            <!--
                 DataCite (2)
-                Add creator information. 
+                Add creator information.
             -->
             <creators>
                 <xsl:choose>
@@ -68,9 +68,9 @@
                 </xsl:choose>
             </creators>
 
-            <!-- 
+            <!--
                 DataCite (3)
-                Add Title information. 
+                Add Title information.
             -->
             <titles>
                 <xsl:choose>
@@ -82,8 +82,8 @@
                     </xsl:otherwise>
                 </xsl:choose>
             </titles>
-            
-            <!-- 
+
+            <!--
                 DataCite (4)
                 Add Publisher information from configuration above
             -->
@@ -91,7 +91,7 @@
                 <xsl:value-of select="$publisher" />
             </publisher>
 
-            <!-- 
+            <!--
                 DataCite (5)
                 Add PublicationYear information
             -->
@@ -110,31 +110,31 @@
                 </xsl:choose>
             </publicationYear>
 
-            <!-- 
+            <!--
                 OPTIONAL PROPERTIES
             -->
 
-            <!-- 
+            <!--
                 DataCite (6)
                 Template Call for subjects.
-            -->  
+            -->
             <xsl:if test="//dspace:field[@mdschema='dc' and @element='subject']">
                 <subjects>
                     <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='subject']" />
                 </subjects>
             </xsl:if>
 
-            <!-- 
+            <!--
                 DataCite (7)
                 Add contributorType from configuration above.
                 Template Call for Contributors
-            --> 
+            -->
             <contributors>
                 <xsl:element name="contributor">
                     <xsl:attribute name="contributorType">DataManager</xsl:attribute>
                     <xsl:element name="contributorName">
                         <xsl:value-of select="$datamanager"/>
-                    </xsl:element>    
+                    </xsl:element>
                 </xsl:element>
                 <xsl:element name="contributor">
                     <xsl:attribute name="contributorType">HostingInstitution</xsl:attribute>
@@ -145,10 +145,10 @@
                 <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='contributor'][not(@qualifier='author')]" />
             </contributors>
 
-            <!-- 
+            <!--
                 DataCite (8)
                 Template Call for Dates
-            --> 
+            -->
             <xsl:if test="//dspace:field[@mdschema='dc' and @element='date']" >
                 <dates>
                     <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='date']" />
@@ -161,10 +161,10 @@
             <!-- Add resource type. -->
             <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='type']" />
 
-            <!-- 
+            <!--
                  Add alternativeIdentifiers.
                  This element is important as it is used to recognize for which
-                 DSpace object a DOI is reserved for. See below for further 
+                 DSpace object a DOI is reserved for. See below for further
                  information.
             -->
             <xsl:if test="//dspace:field[@mdschema='dc' and @element='identifier' and not(starts-with(., 'http://dx.doi.org/'))]">
@@ -175,18 +175,18 @@
 
             <!-- Add sizes. -->
             <!--
-            <xsl:if test="//dspace:field[@mdschema='dc' and @element='format' and @qualifier='extent']">             
+            <xsl:if test="//dspace:field[@mdschema='dc' and @element='format' and @qualifier='extent']">
                 <sizes>
-                    <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='format' and @qualifier='extent']" />      
+                    <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='format' and @qualifier='extent']" />
                 </sizes>
             </xsl:if>
             -->
 
             <!-- Add formats. -->
             <!--
-            <xsl:if test="//dspace:field[@mdschema='dc' and @element='format']">     
-                <formats>                
-                    <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='format']" />       
+            <xsl:if test="//dspace:field[@mdschema='dc' and @element='format']">
+                <formats>
+                    <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='format']" />
                 </formats>
             </xsl:if>
             -->
@@ -203,7 +203,7 @@
 
         </resource>
     </xsl:template>
-    
+
 
     <!-- Add doi identifier information. -->
     <xsl:template match="dspace:field[@mdschema='dc' and @element='identifier' and starts-with(., 'http://dx.doi.org/')]">
@@ -211,7 +211,7 @@
             <xsl:value-of select="substring(., 19)"/>
         </identifier>
     </xsl:template>
-    
+
     <!-- DataCite (2) :: Creator -->
     <xsl:template match="//dspace:field[@mdschema='dc' and @element='contributor' and @qualifier='author']">
         <creator>
@@ -231,14 +231,14 @@
         </xsl:element>
     </xsl:template>
 
-    <!-- 
+    <!--
         DataCite (6), DataCite (6.1)
         Adds subject and subjectScheme information
-    
-        "This term is intended to be used with non-literal values as defined in the 
-        DCMI Abstract Model (http://dublincore.org/documents/abstract-model/). 
-        As of December 2007, the DCMI Usage Board is seeking a way to express 
-        this intention with a formal range declaration." 
+
+        "This term is intended to be used with non-literal values as defined in the
+        DCMI Abstract Model (http://dublincore.org/documents/abstract-model/).
+        As of December 2007, the DCMI Usage Board is seeking a way to express
+        this intention with a formal range declaration."
         (http://dublincore.org/documents/dcmi-terms/#terms-subject)
     -->
     <xsl:template match="//dspace:field[@mdschema='dc' and @element='subject']">
@@ -250,12 +250,12 @@
         </xsl:element>
     </xsl:template>
 
-    <!-- 
-        DataCite (7), DataCite (7.1) 
+    <!--
+        DataCite (7), DataCite (7.1)
         Adds contributor and contributorType information
     -->
     <xsl:template match="//dspace:field[@mdschema='dc' and @element='contributor'][not(@qualifier='author')]">
-        <xsl:if test="@qualifier='editor'"> 
+        <xsl:if test="@qualifier='editor'">
             <xsl:element name="contributor">
                 <xsl:attribute name="contributorType">Editor</xsl:attribute>
                 <contributorName>
@@ -265,7 +265,7 @@
         </xsl:if>
     </xsl:template>
 
-    <!-- 
+    <!--
         DataCite (8), DataCite (8.1)
         Adds Date and dateType information
     -->
@@ -301,7 +301,7 @@
             </xsl:element>
     </xsl:template>
 
-    <!-- 
+    <!--
         DataCite (9)
         Adds Language information
         Transforming the language flags according to ISO 639-2/B & ISO 639-3
@@ -321,7 +321,7 @@
         </xsl:for-each>
     </xsl:template>
 
-    <!-- 
+    <!--
         DataCite (10), DataCite (10.1)
         Adds resourceType and resourceTypeGeneral information
     -->
@@ -364,7 +364,7 @@
     </xsl:template>
 
     <!--
-        DataCite (11), DataCite (11.1) 
+        DataCite (11), DataCite (11.1)
         Adds AlternativeIdentifier and alternativeIdentifierType information
         Adds all identifiers except the doi.
 
@@ -384,11 +384,11 @@
     </xsl:template>
 
     <!--
-        DataCite (12), DataCite (12.1) 
+        DataCite (12), DataCite (12.1)
         Adds RelatedIdentifier and relatedIdentifierType information
     -->
 
-    <!-- 
+    <!--
         DataCite (13)
         Adds Size information
     -->
@@ -398,7 +398,7 @@
         </xsl:element>
     </xsl:template>
 
-    <!-- 
+    <!--
         DataCite (14)
         Adds Format information
     -->
@@ -408,7 +408,7 @@
         </xsl:element>
     </xsl:template>
 
-    <!-- 
+    <!--
         DataCite (16)
         Adds Rights information
     -->
@@ -417,15 +417,15 @@
             <xsl:value-of select="." />
         </xsl:element>
     </xsl:template>
-    
-    <!-- 
+
+    <!--
         DataCite (17)
         Description
     -->
     <xsl:template match="//dspace:field[@mdschema='dc' and @element='description'][not(@qualifier='provenance')]">
         <xsl:element name="description">
             <xsl:attribute name="descriptionType">
-           	<xsl:choose>           
+           	<xsl:choose>
                     <xsl:when test="@qualifier='abstract'">Abstract</xsl:when>
                	    <xsl:otherwise>Other</xsl:otherwise>
                 </xsl:choose>
@@ -433,5 +433,5 @@
             <xsl:value-of select="." />
         </xsl:element>
     </xsl:template>
-    
+
 </xsl:stylesheet>

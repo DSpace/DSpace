@@ -8,24 +8,33 @@
 
 package org.dspace.identifier;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
+import org.dspace.content.crosswalk.ParameterizedDisseminationCrosswalk;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.services.ConfigurationService;
+import org.dspace.utils.DSpace;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 
 /**
  * Provide XML based metadata crosswalk for EZID Identifier provider module.
- * 
+ *
  * @author mohideen
  */
 
 public class DataCiteXMLCreator
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(DataCiteXMLCreator.class);
+    private static final Logger log = Logger.getLogger(DataCiteXMLCreator.class);
 
     /**
      * Name of crosswalk to convert metadata into DataCite Metadata Scheme.
@@ -37,7 +46,7 @@ public class DataCiteXMLCreator
      * name of the crosswalk is set by {@link setDisseminationCrosswalk(String)
      * setDisseminationCrosswalk} which instantiates the crosswalk.
      */
-    protected DisseminationCrosswalk xwalk;
+    protected ParameterizedDisseminationCrosswalk xwalk;
 
     public String getXMLString(Context context, DSpaceObject dso)
     {
@@ -57,12 +66,26 @@ public class DataCiteXMLCreator
             return null;
         }
 
-        Element root = null;
+        // Set the transform's parameters.
+        // XXX Should the actual list be configurable?
+        ConfigurationService cfg = new DSpace().getConfigurationService();
+        Map<String, String> parameters = new HashMap<>();
+        if (null != cfg.getProperty("identifier.doi.prefix"))
+            parameters.put("prefix", cfg.getProperty("identifier.doi.prefix"));
+        if (null != cfg.getProperty("crosswalk.dissemination.DataCite.publisher"))
+            parameters.put("publisher", cfg.getProperty("crosswalk.dissemination.DataCite.publisher"));
+        if (null != cfg.getProperty("crosswalk.dissemination.DataCite.dataManager"))
+            parameters.put("datamanager", cfg.getProperty("crosswalk.dissemination.DataCite.dataManager"));
+        if (null != cfg.getProperty("crosswalk.dissemination.DataCite.hostingInstitution"))
+            parameters.put("hostinginstitution", cfg.getProperty("crosswalk.dissemination.DataCite.hostingInstitution"));
+
+        // Transform the metadata
+        Element root;
         try
         {
-            root = xwalk.disseminateElement(context, dso);
+            root = xwalk.disseminateElement(context, dso, parameters);
         }
-        catch (Exception e)
+        catch (CrosswalkException | IOException | SQLException | AuthorizeException e)
         {
             log.error(
                     "Exception while crosswolking DSO " + "with type "
@@ -73,13 +96,12 @@ public class DataCiteXMLCreator
         XMLOutputter xOut = new XMLOutputter();
 
         return xOut.outputString(root);
-
     }
 
     /**
      * Set the name of the dissemination crosswalk used to convert the metadata
      * into DataCite Metadata Schema. Used by spring dependency injection.
-     * 
+     *
      * @param CROSSWALK_NAME
      *            The name of the dissemination crosswalk to use.
      */
@@ -93,8 +115,9 @@ public class DataCiteXMLCreator
         if (null != this.xwalk)
             return;
 
-        this.xwalk = (DisseminationCrosswalk) CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(
-                DisseminationCrosswalk.class, this.CROSSWALK_NAME);
+        this.xwalk = (ParameterizedDisseminationCrosswalk) CoreServiceFactory
+                .getInstance().getPluginService()
+                .getNamedPlugin(DisseminationCrosswalk.class, this.CROSSWALK_NAME);
 
         if (this.xwalk == null)
         {

@@ -8,16 +8,24 @@
 package org.dspace.content.crosswalk;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stax.StAXSource;
 
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.SelfNamedPlugin;
 import org.jdom.Namespace;
-import org.jdom.transform.XSLTransformException;
-import org.jdom.transform.XSLTransformer;
 
 /**
  * Configurable XSLT-driven Crosswalk
@@ -81,7 +89,7 @@ import org.jdom.transform.XSLTransformer;
 public abstract class XSLTCrosswalk extends SelfNamedPlugin
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(XSLTCrosswalk.class);
+    private static final Logger log = Logger.getLogger(XSLTCrosswalk.class);
 
     /**
      * DSpace XML Namespace in JDOM form.
@@ -96,16 +104,19 @@ public abstract class XSLTCrosswalk extends SelfNamedPlugin
 
     /**
      * Derive list of plugin name from DSpace configuration entries
-     * for crosswalks. The <em>direction</em> parameter should be either
-     * "dissemination" or "submission", so it looks for keys like
-     * <code>crosswalk.submission.{NAME}.stylesheet</code>
+     * for crosswalks.
+     *
+     * @param direction
+     *  "dissemination" or "submission", so it looks for keys like
+     *  <code>crosswalk.submission.{NAME}.stylesheet</code>
+     * @return names to be given to the plugins of that direction.
      */
     protected static String[] makeAliases(String direction)
     {
         String prefix = CONFIG_PREFIX+direction+".";
         String suffix = CONFIG_STYLESHEET;
 
-        List<String> aliasList = new ArrayList<String>();
+        List<String> aliasList = new ArrayList<>();
         Enumeration<String> pe = (Enumeration<String>)ConfigurationManager.propertyNames();
 
         log.debug("XSLTCrosswalk: Looking for config prefix = "+prefix);
@@ -121,7 +132,7 @@ public abstract class XSLTCrosswalk extends SelfNamedPlugin
         return aliasList.toArray(new String[aliasList.size()]);
     }
 
-    private XSLTransformer transformer = null;
+    private Transformer transformer = null;
     private File transformerFile = null;
     private long transformerLastModified = 0;
 
@@ -131,7 +142,7 @@ public abstract class XSLTCrosswalk extends SelfNamedPlugin
      *    "dissemination"
      * @return transformer or null if there was error initializing.
      */
-    protected XSLTransformer getTransformer(String direction)
+    protected Transformer getTransformer(String direction)
     {
         if (transformerFile == null)
         {
@@ -165,10 +176,18 @@ public abstract class XSLTCrosswalk extends SelfNamedPlugin
             {
                 log.debug((transformer == null ? "Loading " : "Reloading")+
                           getPluginInstanceName()+" XSLT stylesheet from "+transformerFile.toString());
-                transformer = new XSLTransformer(transformerFile);
+                Reader transformReader = new FileReader(transformerFile);
+
+                XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+                XMLStreamReader xsltReader
+                        = inputFactory.createXMLStreamReader(transformReader);
+
+                TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                transformer = transformerFactory.newTransformer(
+                        new StAXSource(xsltReader));
                 transformerLastModified = transformerFile.lastModified();
             }
-            catch (XSLTransformException e)
+            catch (TransformerConfigurationException | XMLStreamException | FileNotFoundException e)
             {
                 log.error("Failed to initialize XSLTCrosswalk("+getPluginInstanceName()+"):"+e.toString());
             }
