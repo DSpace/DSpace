@@ -34,7 +34,6 @@ import java.sql.SQLException;
 @Path("/handle")
 public class HandleResource extends Resource {
     private static Logger log = Logger.getLogger(HandleResource.class);
-    private static org.dspace.core.Context context;
 
     @GET
     @Path("/{prefix}/{suffix}")
@@ -43,6 +42,8 @@ public class HandleResource extends Resource {
             @PathParam("suffix") String suffix, @QueryParam("expand") String expand,
             @Context HttpHeaders headers) throws WebApplicationException{
         org.dspace.core.Context context = null;
+        DSpaceObject result = null;
+
         try {
             context = createContext(getUser(headers));
 
@@ -55,17 +56,23 @@ public class HandleResource extends Resource {
             if(AuthorizeManager.authorizeActionBoolean(context, dso, org.dspace.core.Constants.READ)) {
                 switch(dso.getType()) {
                     case Constants.COMMUNITY:
-                        return new Community((org.dspace.content.Community) dso, expand, context);
+                        result = new Community((org.dspace.content.Community) dso, expand, context);
+                        break;
                     case Constants.COLLECTION:
-                        return new Collection((org.dspace.content.Collection) dso, expand, context, null, null);
+                        result =  new Collection((org.dspace.content.Collection) dso, expand, context, null, null);
+                        break;
                     case Constants.ITEM:
-                        return new Item((org.dspace.content.Item) dso, expand, context);
+                        result =  new Item((org.dspace.content.Item) dso, expand, context);
+                        break;
                     default:
-                        return new DSpaceObject(dso);
+                        result = new DSpaceObject(dso);
                 }
             } else {
                 throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }
+
+            context.complete();
+
         } catch (SQLException e) {
             processException("Could not read handle(" + prefix  + "/" + suffix + "), SQLException. Message: " + e.getMessage(), context);
         } catch (ContextException e) {
@@ -74,6 +81,6 @@ public class HandleResource extends Resource {
            processFinally(context);
         }
 
-        return null;
+        return result;
     }
 }
