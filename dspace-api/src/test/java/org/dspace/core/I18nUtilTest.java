@@ -12,7 +12,6 @@ import java.util.Locale;
 import mockit.Expectations;
 import org.dspace.AbstractDSpaceTest;
 import org.dspace.services.ConfigurationService;
-import org.dspace.utils.DSpace;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -143,7 +142,7 @@ public class I18nUtilTest extends AbstractDSpaceTest
     public void testGetMessage_String()
     {
         System.out.println("getMessage");
-        final ConfigurationService configService = new DSpace().getConfigurationService();
+        final ConfigurationService configService = DSpaceServicesFactory.getInstance().getConfigurationService();
         
         // Override "default.locale" and ensure it is set to US English
         new Expectations(configService.getClass()) {{

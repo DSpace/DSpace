@@ -20,6 +20,7 @@ import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
@@ -40,7 +41,6 @@ import com.sun.syndication.feed.module.opensearch.impl.OpenSearchModuleImpl;
 import com.sun.syndication.io.FeedException;
 import java.util.Arrays;
 import org.dspace.services.ConfigurationService;
-import org.dspace.utils.DSpace;
 
 /**
  * Utility Class with static methods for producing OpenSearch-compliant search results,
@@ -84,7 +84,7 @@ public class OpenSearchServiceImpl implements OpenSearchService, InitializingBea
     @Override
     public void afterPropertiesSet() throws Exception
     {
-        ConfigurationService config = new DSpace().getConfigurationService();
+        ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
     	enabled = config.getBooleanProperty("websvc.opensearch.enable");
         svcUrl = config.getProperty("dspace.url") + "/" +
                  config.getProperty("websvc.opensearch.svccontext");
@@ -214,7 +214,7 @@ public class OpenSearchServiceImpl implements OpenSearchService, InitializingBea
      */
     protected org.jdom.Document getServiceDocument(String scope)
     {
-        ConfigurationService config = new DSpace().getConfigurationService();
+        ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     	Namespace ns = Namespace.getNamespace(osNs);
         Element root = new Element("OpenSearchDescription", ns);

@@ -47,6 +47,7 @@ import org.dspace.app.util.GoogleMetadata;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom.Element;
 import org.jdom.Text;
 import org.jdom.output.XMLOutputter;
@@ -54,7 +55,6 @@ import org.xml.sax.SAXException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.app.xmlui.wing.element.Metadata;
 import org.dspace.core.factory.CoreServiceFactory;
-import org.dspace.utils.DSpace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -212,7 +212,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         /* Temporarily switch to using metadata directly.
          * FIXME Proper fix is to have IdentifierService handle all durable
          * identifiers, whether minted here or elsewhere.
-        List<IdentifierProvider> idPs = new DSpace().getServiceManager()
+        List<IdentifierProvider> idPs = DSpaceServicesFactory.getInstance().getServiceManager()
                 .getServicesByType(IdentifierProvider.class);
         for (IdentifierProvider idP : idPs)
         {
@@ -240,7 +240,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             }
         }
         */
-        String identifierField = new DSpace().getConfigurationService()
+        String identifierField = DSpaceServicesFactory.getInstance().getConfigurationService()
                 .getPropertyAsType("altmetrics.field", "dc.identifier.uri");
         for (MetadataValue uri : ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getMetadataByMetadataString(dso, identifierField))
         {

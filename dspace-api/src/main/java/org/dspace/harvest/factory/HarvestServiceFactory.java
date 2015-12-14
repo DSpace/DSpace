@@ -10,7 +10,7 @@ package org.dspace.harvest.factory;
 import org.dspace.harvest.service.HarvestSchedulingService;
 import org.dspace.harvest.service.HarvestedCollectionService;
 import org.dspace.harvest.service.HarvestedItemService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Abstract factory to get services for the harvest package, use HarvestServiceFactory.getInstance() to retrieve an implementation
@@ -27,6 +27,6 @@ public abstract class HarvestServiceFactory {
 
     public static HarvestServiceFactory getInstance()
     {
-        return new DSpace().getServiceManager().getServiceByName("harvestServiceFactory", HarvestServiceFactory.class);
+        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("harvestServiceFactory", HarvestServiceFactory.class);
     }
 }

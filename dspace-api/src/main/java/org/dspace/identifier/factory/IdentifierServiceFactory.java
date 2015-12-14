@@ -9,7 +9,7 @@ package org.dspace.identifier.factory;
 
 import org.dspace.identifier.service.DOIService;
 import org.dspace.identifier.service.IdentifierService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Abstract factory to get services for the identifier package, use IdentifierServiceFactory.getInstance() to retrieve an implementation
@@ -23,6 +23,6 @@ public abstract class IdentifierServiceFactory {
     public abstract DOIService getDOIService();
 
     public static IdentifierServiceFactory getInstance(){
-        return new DSpace().getServiceManager().getServiceByName("identifierServiceFactory", IdentifierServiceFactory.class);
+        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("identifierServiceFactory", IdentifierServiceFactory.class);
     }
 }

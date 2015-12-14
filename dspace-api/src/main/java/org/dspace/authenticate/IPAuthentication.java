@@ -26,7 +26,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Adds users to special groups based on IP address. Configuration parameter
@@ -85,7 +85,7 @@ public class IPAuthentication implements AuthenticationMethod
         ipMatcherGroupNames = new HashMap<>();
         groupService = EPersonServiceFactory.getInstance().getGroupService();
 
-        List<String> propNames = new DSpace().getConfigurationService().getPropertyKeys("authentication-ip");
+        List<String> propNames = DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyKeys("authentication-ip");
 
         for(String propName : propNames)
         {
@@ -93,7 +93,7 @@ public class IPAuthentication implements AuthenticationMethod
 
             if (nameParts.length == 2)
             {
-                addMatchers(nameParts[1], new DSpace().getConfigurationService().getProperty(propName));
+                addMatchers(nameParts[1], DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(propName));
             }
             else
             {

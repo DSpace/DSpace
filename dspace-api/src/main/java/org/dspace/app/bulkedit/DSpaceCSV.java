@@ -22,7 +22,7 @@ import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.content.authority.Choices;
 import org.dspace.core.Context;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -275,7 +275,7 @@ public class DSpaceCSV implements Serializable
         // Specify default values
         String[] defaultValues = new String[]{"dc.date.accessioned, dc.date.available, " +
                                               "dc.date.updated, dc.description.provenance"};
-        String[] toIgnoreArray = new DSpace().getConfigurationService().getArrayProperty("bulkedit.ignore-on-export", defaultValues);
+        String[] toIgnoreArray = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("bulkedit.ignore-on-export", defaultValues);
         for (String toIgnoreString : toIgnoreArray)
         {
             if (!"".equals(toIgnoreString.trim()))
@@ -310,7 +310,7 @@ public class DSpaceCSV implements Serializable
     private void setValueSeparator()
     {
         // Get the value separator
-        valueSeparator = new DSpace().getConfigurationService().getProperty("bulkedit.valueseparator");
+        valueSeparator = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("bulkedit.valueseparator");
         if ((valueSeparator != null) && (!"".equals(valueSeparator.trim())))
         {
             valueSeparator = valueSeparator.trim();
@@ -339,7 +339,7 @@ public class DSpaceCSV implements Serializable
     private void setFieldSeparator()
     {
         // Get the value separator
-        fieldSeparator =new DSpace().getConfigurationService().getProperty("bulkedit.fieldseparator");
+        fieldSeparator =DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("bulkedit.fieldseparator");
         if ((fieldSeparator != null) && (!"".equals(fieldSeparator.trim())))
         {
             fieldSeparator = fieldSeparator.trim();
@@ -381,7 +381,7 @@ public class DSpaceCSV implements Serializable
     private void setAuthoritySeparator()
     {
         // Get the value separator
-        authoritySeparator = new DSpace().getConfigurationService().getProperty("bulkedit.authorityseparator");
+        authoritySeparator = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("bulkedit.authorityseparator");
         if ((authoritySeparator != null) && (!"".equals(authoritySeparator.trim())))
         {
             authoritySeparator = authoritySeparator.trim();

@@ -19,7 +19,7 @@ import java.util.StringTokenizer;
 import java.util.List;
 import java.util.ArrayList;
 import org.dspace.services.ConfigurationService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 
 
@@ -56,7 +56,7 @@ public class I18nUtil
      */
     public static Locale getDefaultLocale()
     {
-        ConfigurationService config = new DSpace().getConfigurationService();
+        ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
         // First, try configured default locale
         Locale defaultLocale = null;
         if (config.hasProperty("default.locale"))
@@ -126,7 +126,7 @@ public class I18nUtil
      */
     public static Locale[] getSupportedLocales()
     {
-        ConfigurationService config = new DSpace().getConfigurationService();
+        ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
 
         String[] locales = config.getArrayProperty("webui.supported.locales");
         if (locales != null && locales.length>0)
@@ -235,7 +235,7 @@ public class I18nUtil
         String fileName = "";
         final String FORM_DEF_FILE = "input-forms";
         final String FILE_TYPE = ".xml";
-        String defsFilename = new DSpace().getConfigurationService().getProperty("dspace.dir")
+        String defsFilename = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
                 + File.separator + "config" + File.separator + FORM_DEF_FILE;
         fileName =  getFilename(locale, defsFilename, FILE_TYPE);
         return fileName;
@@ -323,7 +323,7 @@ public class I18nUtil
         /** Name of the default license */
         final String DEF_LIC_FILE = "default";
         final String FILE_TYPE = ".license";
-        String defsFilename = new DSpace().getConfigurationService().getProperty("dspace.dir")
+        String defsFilename = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
                 + File.separator + "config" + File.separator + DEF_LIC_FILE;
         
         fileName = getFilename(locale, defsFilename, FILE_TYPE);
@@ -423,7 +423,7 @@ public class I18nUtil
     public static String getEmailFilename(Locale locale, String name)
     {
         String templateName = "";
-        String templateFile = new DSpace().getConfigurationService().getProperty("dspace.dir")
+        String templateFile = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
                 + File.separator + "config" + File.separator + "emails"
                 + File.separator + name;
 

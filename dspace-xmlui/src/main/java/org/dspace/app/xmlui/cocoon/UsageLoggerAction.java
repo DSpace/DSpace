@@ -15,11 +15,10 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.handle.HandleServiceImpl;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageEvent;
-import org.dspace.utils.DSpace;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Redirector;
@@ -71,7 +70,7 @@ public class UsageLoggerAction extends AbstractAction {
 
         try {
         	
-			new DSpace().getEventService().fireEvent(
+            DSpaceServicesFactory.getInstance().getEventService().fireEvent(
 					new UsageEvent(
 							UsageEvent.Action.VIEW,
 							(HttpServletRequest)request,

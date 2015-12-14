@@ -47,8 +47,8 @@ import org.dspace.disseminate.service.CitationDocumentService;
 import org.dspace.eperson.Group;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageEvent;
-import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
 import org.apache.log4j.Logger;
@@ -421,7 +421,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             
             // Log that the bitstream has been viewed, this is non-cached and the complexity
             // of adding it to the sitemap for every possible bitstream uri is not very tractable
-            new DSpace().getEventService().fireEvent(
+            DSpaceServicesFactory.getInstance().getEventService().fireEvent(
                                 new UsageEvent(
                                                 UsageEvent.Action.VIEW,
                                                 ObjectModelHelper.getRequest(objectModel),

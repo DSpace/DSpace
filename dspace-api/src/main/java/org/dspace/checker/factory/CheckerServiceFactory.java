@@ -11,7 +11,7 @@ import org.dspace.checker.service.SimpleReporterService;
 import org.dspace.checker.service.ChecksumHistoryService;
 import org.dspace.checker.service.ChecksumResultService;
 import org.dspace.checker.service.MostRecentChecksumService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Abstract factory to get services for the checker package, use CheckerServiceFactory.getInstance() to retrieve an implementation
@@ -30,6 +30,6 @@ public abstract class CheckerServiceFactory {
 
     public static CheckerServiceFactory getInstance()
     {
-        return new DSpace().getServiceManager().getServiceByName("checkerServiceFactory", CheckerServiceFactory.class);
+        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("checkerServiceFactory", CheckerServiceFactory.class);
     }
 }

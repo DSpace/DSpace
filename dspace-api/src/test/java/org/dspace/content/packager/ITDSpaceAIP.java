@@ -36,7 +36,7 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.WorkflowException;
 import org.junit.*;
 
@@ -65,7 +65,7 @@ public class ITDSpaceAIP extends AbstractUnitTest
     protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
     protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
     protected PluginService pluginService = CoreServiceFactory.getInstance().getPluginService();
-    protected ConfigurationService configService = new DSpace().getConfigurationService();
+    protected ConfigurationService configService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /** InfoMap multiple value separator (see saveObjectInfo() and assertObject* methods) **/
     private static final String valueseparator = "::";

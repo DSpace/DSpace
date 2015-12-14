@@ -19,7 +19,7 @@ import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.KernelStartupCallbackService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Service which simply initializes DSpace logging *after* the kernel starts
@@ -67,7 +67,7 @@ public class LoggerServiceImpl implements KernelStartupCallbackService
              * so do not instantiate another Logging configuration.
              *
              */
-            ConfigurationService config = new DSpace().getConfigurationService();
+            ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
             String dsLogConfiguration = config.getProperty(LOG_CONFIG_PROPERTY);
 
             if (dsLogConfiguration == null || System.getProperty(LOG_DISABLE_PROPERTY) != null)

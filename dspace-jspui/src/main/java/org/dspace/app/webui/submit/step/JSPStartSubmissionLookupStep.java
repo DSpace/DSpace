@@ -30,9 +30,9 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.submit.lookup.SubmissionLookupService;
 import org.dspace.submit.step.StartSubmissionLookupStep;
-import org.dspace.utils.DSpace;
 
 /**
  * Step which controls selecting an item from external database service to auto
@@ -73,7 +73,7 @@ public class JSPStartSubmissionLookupStep extends JSPStep
     private static Logger log = Logger
             .getLogger(JSPStartSubmissionLookupStep.class);
 
-    SubmissionLookupService slService = new DSpace().getServiceManager()
+    SubmissionLookupService slService = DSpaceServicesFactory.getInstance().getServiceManager()
             .getServiceByName(SubmissionLookupService.class.getCanonicalName(),
                     SubmissionLookupService.class);
     

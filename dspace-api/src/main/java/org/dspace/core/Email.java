@@ -38,8 +38,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import org.apache.log4j.Logger;
 import org.dspace.services.ConfigurationService;
-import org.dspace.services.EmailService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Class representing an e-mail message, also used to send e-mails.
@@ -237,7 +236,7 @@ public class Email
      */
     public void send() throws MessagingException, IOException
     {
-        ConfigurationService config = new DSpace().getConfigurationService();
+        ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
 
         // Get the mail configuration properties
         String from = config.getProperty("mail.from.address");
@@ -250,8 +249,7 @@ public class Email
         }
 
         // Get session
-        Session session = new DSpace().getServiceManager().
-                getServicesByType(EmailService.class).get(0).getSession();
+        Session session = DSpaceServicesFactory.getInstance().getEmailService().getSession();
 
         // Create message
         MimeMessage message = new MimeMessage(session);
@@ -465,7 +463,7 @@ public class Email
      */
     public static void main(String[] args)
     {
-        ConfigurationService config = new DSpace().getConfigurationService();
+        ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
         String to = config.getProperty("mail.admin");
         String subject = "DSpace test email";
         String server = config.getProperty("mail.server");

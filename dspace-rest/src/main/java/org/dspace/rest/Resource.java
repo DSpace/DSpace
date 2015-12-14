@@ -22,8 +22,8 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.rest.exceptions.ContextException;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageEvent;
-import org.dspace.utils.DSpace;
 
 /**
  * Superclass of all resource classes in REST API. It has methods for creating
@@ -104,11 +104,11 @@ public class Resource
 
         if ((user_ip == null) || (user_ip.length() == 0))
         {
-            new DSpace().getEventService().fireEvent(new UsageEvent(action, request, context, dspaceObject));
+            DSpaceServicesFactory.getInstance().getEventService().fireEvent(new UsageEvent(action, request, context, dspaceObject));
         }
         else
         {
-            new DSpace().getEventService().fireEvent(
+            DSpaceServicesFactory.getInstance().getEventService().fireEvent(
                     new UsageEvent(action, user_ip, user_agent, xforwardedfor, context, dspaceObject));
         }
 

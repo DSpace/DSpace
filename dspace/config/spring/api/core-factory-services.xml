@@ -13,6 +13,7 @@
     <bean id="mediaFilterServiceFactory" class="org.dspace.app.mediafilter.factory.MediaFilterServiceFactoryImpl"/>
     <bean id="sfxServiceFactory" class="org.dspace.app.sfx.factory.SfxServiceFactoryImpl"/>
     <bean id="appUtilServiceFactory" class="org.dspace.app.util.factory.UtilServiceFactoryImpl"/>
+    <bean id="dSpaceServicesFactory" class="org.dspace.services.factory.DSpaceServicesFactoryImpl"/>
 
 
 

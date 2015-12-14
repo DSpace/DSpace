@@ -7,8 +7,8 @@
  */
 package org.dspace.storage.bitstore.factory;
 
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
-import org.dspace.utils.DSpace;
 
 /**
  * Abstract factory to get services for the storage package, use StorageServiceFactory.getInstance() to retrieve an implementation
@@ -21,6 +21,6 @@ public abstract class StorageServiceFactory {
 
     public static StorageServiceFactory getInstance()
     {
-        return new DSpace().getServiceManager().getServiceByName("storageServiceFactory", StorageServiceFactory.class);
+        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("storageServiceFactory", StorageServiceFactory.class);
     }
 }

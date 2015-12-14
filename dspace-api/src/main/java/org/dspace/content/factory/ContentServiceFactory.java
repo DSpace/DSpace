@@ -11,9 +11,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.*;
-import org.dspace.core.Constants;
-import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 
 import java.util.List;
@@ -101,7 +99,7 @@ public abstract class ContentServiceFactory {
     }
 
     public static ContentServiceFactory getInstance(){
-        return new DSpace().getServiceManager().getServiceByName("contentServiceFactory", ContentServiceFactory.class);
+        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("contentServiceFactory", ContentServiceFactory.class);
     }
 
 }

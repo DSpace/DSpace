@@ -36,10 +36,9 @@ import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
-import org.dspace.handle.HandleServiceImpl;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
  /**
  * This action will send a mail to request a item to administrator when all mandatory data is present.
@@ -109,8 +108,7 @@ public class SendItemRequestAction extends AbstractAction
         String title = "";
         Bitstream bitstream = bitstreamService.find(context, UUID.fromString(bitstreamId));
 
-        RequestItemAuthor requestItemAuthor = new DSpace()
-                .getServiceManager()
+        RequestItemAuthor requestItemAuthor = DSpaceServicesFactory.getInstance().getServiceManager()
                 .getServiceByName(
                         RequestItemAuthorExtractor.class.getName(),
                         RequestItemAuthorExtractor.class

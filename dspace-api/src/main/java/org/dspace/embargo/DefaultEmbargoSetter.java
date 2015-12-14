@@ -26,7 +26,7 @@ import org.dspace.embargo.service.EmbargoService;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.license.CreativeCommonsServiceImpl;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Default plugin implementation of the embargo setting function.
@@ -62,7 +62,7 @@ public class DefaultEmbargoSetter implements EmbargoSetter
     public DCDate parseTerms(Context context, Item item, String terms)
         throws SQLException, AuthorizeException
     {
-        String termsOpen = new DSpace().getConfigurationService().getProperty("embargo.terms.open");
+        String termsOpen = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("embargo.terms.open");
 
     	if (terms != null && terms.length() > 0)
     	{

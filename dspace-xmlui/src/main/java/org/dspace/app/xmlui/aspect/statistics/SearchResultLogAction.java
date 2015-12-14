@@ -18,12 +18,11 @@ import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleServiceImpl;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageEvent;
 import org.dspace.usage.UsageSearchEvent;
-import org.dspace.utils.DSpace;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -73,7 +72,7 @@ public class SearchResultLogAction extends AbstractAction {
             searchEvent.setPage(Integer.parseInt(request.getParameter("page")));
         }
 
-        new DSpace().getEventService().fireEvent(
+        DSpaceServicesFactory.getInstance().getEventService().fireEvent(
                 searchEvent);
 
         return new HashMap();

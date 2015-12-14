@@ -8,7 +8,7 @@
 package org.dspace.handle.factory;
 
 import org.dspace.handle.service.HandleService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Abstract factory to get services for the handle package, use HandleServiceFactory.getInstance() to retrieve an implementation
@@ -21,6 +21,6 @@ public abstract class HandleServiceFactory {
 
     public static HandleServiceFactory getInstance()
     {
-        return new DSpace().getServiceManager().getServiceByName("handleServiceFactory", HandleServiceFactory.class);
+        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("handleServiceFactory", HandleServiceFactory.class);
     }
 }

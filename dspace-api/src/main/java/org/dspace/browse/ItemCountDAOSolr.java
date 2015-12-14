@@ -23,7 +23,7 @@ import org.dspace.discovery.DiscoverResult.FacetResult;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Discovery (Solr) driver implementing ItemCountDAO interface to look up item
@@ -52,11 +52,9 @@ public class ItemCountDAOSolr implements ItemCountDAO
     /** Hold the collection item count obtained from SOLR after the first query **/
     private Map<String, Integer> collectionsCount = null;
     
-    /** DSpace helper services access object */
-    DSpace dspace = new DSpace();
-    
+
     /** Solr search service */
-    SearchService searcher = dspace.getServiceManager().getServiceByName(SearchService.class.getName(), SearchService.class);
+    SearchService searcher = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(SearchService.class.getName(), SearchService.class);
     
     /**
      * Throw an ItemCountException as caching is not supported by ItemCountDAOSolr.

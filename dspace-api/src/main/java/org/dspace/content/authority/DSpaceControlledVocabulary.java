@@ -14,6 +14,7 @@ import java.io.File;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.dspace.content.Collection;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import javax.xml.xpath.XPath;
@@ -27,7 +28,6 @@ import org.apache.log4j.Logger;
 
 import org.dspace.core.SelfNamedPlugin;
 import org.dspace.services.ConfigurationService;
-import org.dspace.utils.DSpace;
 
 /**
  * ChoiceAuthority source that reads the JSPUI-style hierarchical vocabularies
@@ -95,7 +95,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
                     return name.endsWith(".xml");
                 }
             }
-            String vocabulariesPath = new DSpace().getConfigurationService().getProperty("dspace.dir")
+            String vocabulariesPath = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
                     + "/config/controlled-vocabularies/";
             String[] xmlFiles = (new File(vocabulariesPath)).list(new xmlFilter());
             List<String> names = new ArrayList<String>();
@@ -112,7 +112,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
     {
     	if (vocabulary == null)
         {
-            ConfigurationService config = new DSpace().getConfigurationService();
+            ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
 
         	log.info("Initializing " + this.getClass().getName());
         	vocabularyName = this.getPluginInstanceName();

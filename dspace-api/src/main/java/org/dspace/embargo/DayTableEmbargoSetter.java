@@ -15,7 +15,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCDate;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Plugin implementation of the embargo setting function. The parseTerms()
@@ -52,7 +52,7 @@ public class DayTableEmbargoSetter extends DefaultEmbargoSetter
     public DCDate parseTerms(Context context, Item item, String terms)
         throws SQLException, AuthorizeException {
 
-        String termsOpen = new DSpace().getConfigurationService().getProperty("embargo.terms.open");
+        String termsOpen = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("embargo.terms.open");
         Properties termProps = getTermProperties();
 
     	if (terms != null) {
@@ -77,7 +77,7 @@ public class DayTableEmbargoSetter extends DefaultEmbargoSetter
     {
         Properties termProps = new Properties();
 
-        String terms = new DSpace().getConfigurationService().getProperty("embargo.terms.days");
+        String terms = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("embargo.terms.days");
         if (terms != null && terms.length() > 0) {
             for (String term : terms.split(",")) {
                 String[] parts = term.trim().split(":");

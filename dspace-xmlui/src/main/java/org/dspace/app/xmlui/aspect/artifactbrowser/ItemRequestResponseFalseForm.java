@@ -40,7 +40,7 @@ import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -132,8 +132,7 @@ public class ItemRequestResponseFalseForm extends AbstractDSpaceTransformer impl
 		else
 			title = "untitled";
 		
-		RequestItemAuthor author = new DSpace()
-				.getServiceManager()
+		RequestItemAuthor author = DSpaceServicesFactory.getInstance().getServiceManager()
 				.getServiceByName(RequestItemAuthorExtractor.class.getName(),
 						RequestItemAuthorExtractor.class)
 				.getRequestItemAuthor(context, item);

@@ -13,7 +13,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationConverter;
 
 import org.apache.log4j.Logger;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Class for reading the DSpace system configuration. The main configuration is
@@ -49,7 +49,7 @@ public class ConfigurationManager
      */
     public static boolean isConfigured()
     {
-        return new DSpace().getConfigurationService() != null;
+        return DSpaceServicesFactory.getInstance().getConfigurationService() != null;
     }
 
     /**
@@ -59,7 +59,7 @@ public class ConfigurationManager
      */
     public static Properties getProperties()
     {
-        return new DSpace().getConfigurationService().getProperties();
+        return DSpaceServicesFactory.getInstance().getConfigurationService().getProperties();
     }
 
     /**
@@ -72,7 +72,7 @@ public class ConfigurationManager
     public static Properties getProperties(String module)
     {
         // Find subset of Configurations which have been prefixed with the module name
-        Configuration subset = new DSpace().getConfigurationService().getConfiguration().subset(module);
+        Configuration subset = DSpaceServicesFactory.getInstance().getConfigurationService().getConfiguration().subset(module);
 
         // Convert to a Properties object and return it
         return ConfigurationConverter.getProperties(subset);
@@ -89,7 +89,7 @@ public class ConfigurationManager
      */
     public static String getProperty(String property)
     {
-        return new DSpace().getConfigurationService().getProperty(property);
+        return DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(property);
     }
 
     /**
@@ -127,7 +127,7 @@ public class ConfigurationManager
      */
     public static int getIntProperty(String property)
     {
-        return new DSpace().getConfigurationService().getIntProperty(property);
+        return DSpaceServicesFactory.getInstance().getConfigurationService().getIntProperty(property);
     }
 
     /**
@@ -170,7 +170,7 @@ public class ConfigurationManager
      */
     public static int getIntProperty(String property, int defaultValue)
     {
-        return new DSpace().getConfigurationService().getIntProperty(property, defaultValue);
+        return DSpaceServicesFactory.getInstance().getConfigurationService().getIntProperty(property, defaultValue);
     }
 
     /**
@@ -213,7 +213,7 @@ public class ConfigurationManager
      */
     public static long getLongProperty(String property)
     {
-        return new DSpace().getConfigurationService().getLongProperty(property);
+        return DSpaceServicesFactory.getInstance().getConfigurationService().getLongProperty(property);
     }
 
     /**
@@ -256,7 +256,7 @@ public class ConfigurationManager
      */
     public static long getLongProperty(String property, int defaultValue)
     {
-        return new DSpace().getConfigurationService().getLongProperty(property, defaultValue);
+        return DSpaceServicesFactory.getInstance().getConfigurationService().getLongProperty(property, defaultValue);
     }
 
     /**
@@ -301,7 +301,7 @@ public class ConfigurationManager
      */
     public static boolean getBooleanProperty(String property)
     {
-        return new DSpace().getConfigurationService().getBooleanProperty(property);
+        return DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty(property);
     }
 
     /**
@@ -349,7 +349,7 @@ public class ConfigurationManager
      */
     public static boolean getBooleanProperty(String property, boolean defaultValue)
     {
-        return new DSpace().getConfigurationService().getBooleanProperty(property, defaultValue);
+        return DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty(property, defaultValue);
     }
 
     /**
@@ -390,7 +390,7 @@ public class ConfigurationManager
     public static Enumeration<?> propertyNames()
     {
         // Get a list of all property keys, and convert into an Enumeration
-        return java.util.Collections.enumeration(new DSpace().getConfigurationService().getPropertyKeys());
+        return java.util.Collections.enumeration(DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyKeys());
     }
 
     /**
@@ -404,7 +404,7 @@ public class ConfigurationManager
     public static Enumeration<?> propertyNames(String module)
     {
         // Get property keys beginning with this prefix, and convert into an Enumeration
-        return java.util.Collections.enumeration(new DSpace().getConfigurationService().getPropertyKeys(module));
+        return java.util.Collections.enumeration(DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyKeys(module));
     }
 
     /**

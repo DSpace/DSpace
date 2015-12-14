@@ -21,7 +21,7 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * A stackable authentication method
@@ -66,7 +66,7 @@ public class PasswordAuthentication
                                                  throws SQLException
     {
         // Is there anything set in domain.valid?
-        String[] domains = new DSpace().getConfigurationService().getArrayProperty("authentication-password.domain.valid");
+        String[] domains = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("authentication-password.domain.valid");
         if ((domains == null) || (domains.length==0))
         {
             // No conditions set, so must be able to self register
@@ -138,7 +138,7 @@ public class PasswordAuthentication
 		{
 			if (EPersonServiceFactory.getInstance().getEPersonService().getPasswordHash(context.getCurrentUser()) != null && !EPersonServiceFactory.getInstance().getEPersonService().getPasswordHash(context.getCurrentUser()).toString().equals(""))
 			{
-				String groupName = new DSpace().getConfigurationService().getProperty("authentication-password.login.specialgroup");
+				String groupName = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("authentication-password.login.specialgroup");
 				if ((groupName != null) && (!groupName.trim().equals("")))
 				{
 				    Group specialGroup = EPersonServiceFactory.getInstance().getGroupService().findByName(context, groupName);

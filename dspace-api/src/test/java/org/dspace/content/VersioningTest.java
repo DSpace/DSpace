@@ -15,7 +15,6 @@ import org.dspace.content.service.*;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
-import org.dspace.utils.DSpace;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.factory.VersionServiceFactory;
@@ -48,7 +47,6 @@ public class VersioningTest extends AbstractUnitTest {
     private Item originalItem;
     private Item versionedItem;
     private String summary = "Unit test version";
-    private DSpace dspace = new DSpace();
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();

@@ -40,7 +40,7 @@ import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * This class manages the handling of RDF data in DSpace. It generates
@@ -75,7 +75,7 @@ public class RDFizer {
 
     public RDFizer()
     {
-        this.configurationService = new DSpace().getConfigurationService();
+        this.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         this.stdout = false;
         this.verbose = false;
         this.dryrun = false;

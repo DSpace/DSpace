@@ -15,7 +15,7 @@ import org.dspace.rdf.conversion.RDFConverter;
 import org.dspace.rdf.storage.RDFStorage;
 import org.dspace.rdf.storage.URIGenerator;
 import org.dspace.services.ConfigurationService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  *
@@ -115,7 +115,7 @@ public class RDFConfiguration {
     
     public static String[] getDSOTypesToConvert()
     {
-        String dsoTypes = (new DSpace()).getConfigurationService().getProperty(
+        String dsoTypes = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(
                 CONVERTER_DSOTYPES_KEY);
         if (StringUtils.isEmpty(dsoTypes))
         {
@@ -147,7 +147,7 @@ public class RDFConfiguration {
     public static boolean isContentNegotiationEnabled()
     {
         ConfigurationService configurationService = 
-                new DSpace().getConfigurationService();
+                DSpaceServicesFactory.getInstance().getConfigurationService();
         return configurationService.getPropertyAsType(CONTENT_NEGOTIATION_KEY, 
                 false);
     }
@@ -155,14 +155,14 @@ public class RDFConfiguration {
     public static String getPublicSparqlEndpointAddress()
     {
         ConfigurationService configurationService = 
-                    new DSpace().getConfigurationService();
+                    DSpaceServicesFactory.getInstance().getConfigurationService();
         return configurationService.getProperty(SPARQL_ENDPOINT_KEY);
     }
     
     public static String getInternalSparqlEndpointAddress()
     {
         ConfigurationService configurationService = 
-                new DSpace().getConfigurationService();
+                DSpaceServicesFactory.getInstance().getConfigurationService();
         String internalSparqlEndpoint =
                 configurationService.getProperty(STORAGE_SPARQL_ENDPOINT_KEY);
         String externalSparqlEndpoint = 
@@ -175,7 +175,7 @@ public class RDFConfiguration {
     public static String getDSpaceRDFModuleURI()
     {
         ConfigurationService configurationService = 
-                    new DSpace().getConfigurationService();
+                    DSpaceServicesFactory.getInstance().getConfigurationService();
         return configurationService.getProperty(CONTEXT_PATH_KEY);
     }
         
@@ -184,7 +184,7 @@ public class RDFConfiguration {
         if (converter == null)
         {
             ConfigurationService configurationService =
-                    new DSpace().getConfigurationService();
+                    DSpaceServicesFactory.getInstance().getConfigurationService();
             converter = (RDFConverter) initializeClass(configurationService, 
                     RDFCONVERTER_KEY, "RDFConverter");
         }
@@ -204,7 +204,7 @@ public class RDFConfiguration {
         if (generator == null)
         {
             ConfigurationService configurationService = 
-                    new DSpace().getConfigurationService();
+                    DSpaceServicesFactory.getInstance().getConfigurationService();
             generator = (URIGenerator) initializeClass(configurationService, 
                     URIGENERATOR_KEY, "URIGenerator");
         }
@@ -224,7 +224,7 @@ public class RDFConfiguration {
         if (storage == null)
         {
             ConfigurationService configurationService = 
-                    new DSpace().getConfigurationService();
+                    DSpaceServicesFactory.getInstance().getConfigurationService();
             storage = (RDFStorage) initializeClass(configurationService,
                             RDFSTORAGE_KEY, "RDFStorage");
         }
@@ -240,7 +240,7 @@ public class RDFConfiguration {
      */
     public static String[] loadConfigurationArray(String key)
     {
-        ConfigurationService config = new DSpace().getConfigurationService();
+        ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
         if(config.hasProperty(key))
             return config.getArrayProperty(key);
         else

@@ -8,7 +8,7 @@
 package org.dspace.app.itemimport.factory;
 
 import org.dspace.app.itemimport.service.ItemImportService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Abstract factory to get services for the itemimport package, use ItemImportService.getInstance() to retrieve an implementation
@@ -20,6 +20,6 @@ public abstract class ItemImportServiceFactory {
     public abstract ItemImportService getItemImportService();
 
     public static ItemImportServiceFactory getInstance(){
-        return new DSpace().getServiceManager().getServiceByName("itemImportServiceFactory", ItemImportServiceFactory.class);
+        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("itemImportServiceFactory", ItemImportServiceFactory.class);
     }
 }

@@ -29,8 +29,8 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageEvent;
-import org.dspace.utils.DSpace;
 
 /**
  * Servlet for retrieving bitstreams. The bits are simply piped to the user.
@@ -124,7 +124,7 @@ public class RetrieveServlet extends DSpaceServlet
             log.info(LogManager.getHeader(context, "view_bitstream",
                     "bitstream_id=" + bitstream.getID()));
 
-            new DSpace().getEventService().fireEvent(
+            DSpaceServicesFactory.getInstance().getEventService().fireEvent(
             		new UsageEvent(
             				UsageEvent.Action.VIEW,
             				request, 

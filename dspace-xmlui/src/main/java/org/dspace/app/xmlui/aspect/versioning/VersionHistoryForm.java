@@ -21,7 +21,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.eperson.EPerson;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.factory.VersionServiceFactory;
@@ -72,7 +72,7 @@ public class VersionHistoryForm extends AbstractDSpaceTransformer {
             if(isItemView)
             {
                 //Check if only administrators can view the item history
-                if(new DSpace().getConfigurationService().getPropertyAsType("versioning.item.history.view.admin", false))
+                if(DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyAsType("versioning.item.history.view.admin", false))
                 {
                     return;
                 }

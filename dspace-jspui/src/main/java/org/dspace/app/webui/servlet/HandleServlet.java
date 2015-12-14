@@ -52,8 +52,8 @@ import org.dspace.handle.service.HandleService;
 import org.dspace.plugin.CollectionHomeProcessor;
 import org.dspace.plugin.CommunityHomeProcessor;
 import org.dspace.plugin.ItemHomeProcessor;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageEvent;
-import org.dspace.utils.DSpace;
 import org.jdom.Element;
 import org.jdom.Text;
 import org.jdom.output.XMLOutputter;
@@ -468,7 +468,7 @@ public class HandleServlet extends DSpaceServlet
         }
 
         // Fire usage event.
-        new DSpace().getEventService().fireEvent(
+        DSpaceServicesFactory.getInstance().getEventService().fireEvent(
             		new UsageEvent(
             				UsageEvent.Action.VIEW,
             				request,
@@ -559,7 +559,7 @@ public class HandleServlet extends DSpaceServlet
             }
 
             // Fire usage event.
-            new DSpace().getEventService().fireEvent(
+            DSpaceServicesFactory.getInstance().getEventService().fireEvent(
             		new UsageEvent(
             				UsageEvent.Action.VIEW,
             				request,
@@ -700,7 +700,7 @@ public class HandleServlet extends DSpaceServlet
             }
 
             // Fire usage event.
-            new DSpace().getEventService().fireEvent(
+            DSpaceServicesFactory.getInstance().getEventService().fireEvent(
             		new UsageEvent(
             				UsageEvent.Action.VIEW,
             				request,

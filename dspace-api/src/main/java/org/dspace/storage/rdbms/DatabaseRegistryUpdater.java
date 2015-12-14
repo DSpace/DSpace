@@ -14,7 +14,7 @@ import org.dspace.administer.MetadataImporter;
 import org.dspace.administer.RegistryLoader;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.flywaydb.core.api.MigrationInfo;
 import org.flywaydb.core.api.callback.FlywayCallback;
 import org.slf4j.Logger;
@@ -45,7 +45,7 @@ public class DatabaseRegistryUpdater implements FlywayCallback
      */
     private void updateRegistries()
     {
-        ConfigurationService config = new DSpace().getConfigurationService();
+        ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
         Context context = null;
         try
         {

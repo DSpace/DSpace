@@ -24,7 +24,7 @@ import org.dspace.discovery.DiscoverResult.SearchDocument;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  *
@@ -127,9 +127,8 @@ public class SolrBrowseDAO implements BrowseDAO
 
     // administrative attributes for this class
 
-    DSpace dspace = new DSpace();
 
-    SearchService searcher = dspace.getServiceManager().getServiceByName(
+    SearchService searcher = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(
             SearchService.class.getName(), SearchService.class);
 
     private DiscoverResult sResponse = null;
