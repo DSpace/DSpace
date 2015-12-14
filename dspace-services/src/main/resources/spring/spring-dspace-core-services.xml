@@ -56,8 +56,8 @@
     <bean id="org.dspace.services.SessionService" class="org.dspace.services.sessions.SessionRequestServiceImpl" />
     <alias alias="org.dspace.services.RequestService" name="org.dspace.services.SessionService" />
     <!-- SESSION end beans -->
-
-	<!-- EVENTS -->
+    
+    <!-- EVENTS -->
     <bean id="org.dspace.services.EventService" class="org.dspace.services.events.SystemEventService" />
 
     <!-- EMAIL -->
@@ -66,5 +66,8 @@
         <property name="cfg"
                   ref="org.dspace.services.ConfigurationService" />
     </bean>
+
+    <!-- DSpaceServicesFactory (for easy access to above core services) -->
+    <bean id="dSpaceServicesFactory" class="org.dspace.services.factory.DSpaceServicesFactoryImpl"/>
 
 </beans>

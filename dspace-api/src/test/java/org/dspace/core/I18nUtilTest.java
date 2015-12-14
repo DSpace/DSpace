@@ -12,6 +12,7 @@ import java.util.Locale;
 import mockit.Expectations;
 import org.dspace.AbstractDSpaceTest;
 import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
