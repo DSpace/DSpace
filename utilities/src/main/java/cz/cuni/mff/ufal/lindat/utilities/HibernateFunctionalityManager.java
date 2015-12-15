@@ -430,12 +430,12 @@ public class HibernateFunctionalityManager implements IFunctionalities {
 		try {
 			//expecting INSTALL_DIR in args[0]
 			String dspace_path = args[0] + "/config/" + Variables.default_config_file;
-			Variables.init(dspace_path);
+			HibernateFunctionalityManager functionalityManager = new HibernateFunctionalityManager(dspace_path);
 			System.out
 					.println(String
 							.format("\nUsing dspace configuration from %s.\nTrying to connect to %s",
 									dspace_path, Variables.databaseURL));
-			SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+			SessionFactory sessionFactory = functionalityManager.hibernateUtil.getSessionFactory();
 			Session session = sessionFactory.openSession();
 			Query query = session.createSQLQuery("select current_date");
             List result = query.list();
