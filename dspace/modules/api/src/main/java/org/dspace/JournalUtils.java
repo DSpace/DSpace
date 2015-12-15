@@ -2,7 +2,6 @@ package org.dspace;
 
 import org.apache.log4j.Logger;
 import org.apache.commons.lang.StringUtils;
-import org.datadryad.rest.converters.ManuscriptToLegacyXMLConverter;
 import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.models.Author;
 import org.datadryad.rest.models.Organization;
@@ -523,35 +522,6 @@ public class JournalUtils {
         JournalUtils.RecommendedBlackoutAction action = JournalUtils.recommendedBlackoutAction(context, item, collection);
         return (action == JournalUtils.RecommendedBlackoutAction.BLACKOUT_TRUE ||
                 action == JournalUtils.RecommendedBlackoutAction.JOURNAL_NOT_INTEGRATED);
-    }
-
-    public static void writeManuscriptToXMLFile(Context context, Manuscript manuscript) throws StorageException {
-        try {
-            log.debug ("looking for metadatadir for " + manuscript.organization.organizationCode);
-            Concept concept = JournalUtils.getJournalConceptByShortID(context, manuscript.organization.organizationCode);
-            if (concept != null) {
-                String filename = JournalUtils.escapeFilename(manuscript.manuscriptId + ".xml");
-                File file = new File(JournalUtils.getMetadataDir(concept), filename);
-                FileOutputStream outputStream = null;
-
-                try {
-                    outputStream = new FileOutputStream(file);
-                } catch (FileNotFoundException e) {
-                    log.warn("couldn't open a file to write", e);
-                }
-
-                if (outputStream != null) {
-                    try {
-                        ManuscriptToLegacyXMLConverter.convertToInternalXML(manuscript, outputStream);
-                        log.info("wrote xml to file " + file.getAbsolutePath());
-                    } catch (JAXBException e) {
-                        log.warn("couldn't convert to XML");
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            throw new StorageException(e);
-        }
     }
 
     public static void writeManuscriptToDB(Context context, Manuscript manuscript) throws StorageException {
