@@ -558,8 +558,6 @@ public class JournalUtils {
         String journalCode = cleanJournalCode(manuscript.organization.organizationCode).toUpperCase();
         StoragePath storagePath = StoragePath.createManuscriptPath(journalCode, manuscript.manuscriptId);
 
-        createOrganizationinDB(context, manuscript.organization);
-
         ManuscriptDatabaseStorageImpl manuscriptStorage = new ManuscriptDatabaseStorageImpl();
         List<Manuscript> manuscripts = getManuscriptsMatchingID(journalCode, manuscript.manuscriptId);
         // if there isn't a manuscript already in the db, create it. Otherwise, update.
@@ -574,24 +572,6 @@ public class JournalUtils {
                 manuscriptStorage.update(storagePath, manuscript);
             } catch (StorageException ex) {
                 log.error("Exception updating manuscript", ex);
-            }
-        }
-    }
-
-    public static void createOrganizationinDB(Context context, Organization organization) throws StorageException {
-        // normalize with all caps for the code:
-        organization.organizationCode = cleanJournalCode(organization.organizationCode).toUpperCase();
-        StoragePath storagePath = StoragePath.createOrganizationPath(organization.organizationCode);
-
-        // check to see if this organization exists in the database: if not, add it.
-        OrganizationDatabaseStorageImpl organizationStorage = new OrganizationDatabaseStorageImpl();
-        List<Organization> orgs = organizationStorage.getResults(storagePath, organization.organizationCode, 0);
-        if (orgs.size() == 0) {
-            try {
-                log.info("creating an organization " + organization.organizationCode);
-                organizationStorage.create(storagePath, organization);
-            } catch (StorageException ex) {
-                log.error("Exception creating organizations", ex);
             }
         }
     }
