@@ -18,35 +18,35 @@ before_install:
   - mvn help:system
   - export FS=`pwd`
 
-install:
-  - echo "Update settings"
-  - cd $FS/utilities/project_helpers
-  - sed -i'' 's/tomcat.(TOMCAT_VERSION)/travis/' ./config/variable.makefile.example
-  - sed -i'' 's/lr.common.theme = /lr.common.theme = \/tmp\/dspace/' ./config/local.conf.dist
-  - sed -i'' 's/dspace.install.dir = /dspace.install.dir = \/tmp\/dspace/' ./config/local.conf.dist
-  - cd $FS/utilities/project_helpers/config
-  - cp local.conf.dist ../sources/local.properties
-  - cd $FS/utilities/project_helpers/scripts
-  - echo "Creating dspace DB user and initialising databases"
-  - createuser --username=postgres --superuser dspace
-  - make create_databases
-  - echo "Installing prerequisites"
-  - free -m -t
-  - make install_libs
-  - free -m -t
-  - make new_deploy | grep -v "Download"
-  - free -m -t
-  - make print_message
+install: |
+   echo "Update settings" &&
+   cd $FS/utilities/project_helpers &&
+   sed -i'' 's/tomcat.(TOMCAT_VERSION)/travis/' ./config/variable.makefile.example &&
+   sed -i'' 's/lr.common.theme = /lr.common.theme = \/tmp\/dspace/' ./config/local.conf.dist &&
+   sed -i'' 's/dspace.install.dir = /dspace.install.dir = \/tmp\/dspace/' ./config/local.conf.dist &&
+   cd $FS/utilities/project_helpers/config &&
+   cp local.conf.dist ../sources/local.properties &&
+   cd $FS/utilities/project_helpers/scripts &&
+   echo "Creating dspace DB user and initialising databases" &&
+   createuser --username=postgres --superuser dspace &&
+   make create_databases &&
+   echo "Installing prerequisites" &&
+   free -m -t &&
+   make install_libs &&
+   free -m -t &&
+   make new_deploy | grep -v "Download" &&
+   free -m -t &&
+   make print_message
 
 script:
-  - free -m -t
-  - make test_dspace_database
-  - free -m -t
-  - make test_utilities_database
-  - free -m -t
-  - cd $FS/ && mvn -Dmaven.test.skip=false -Dtest=cz.cuni.mff.ufal.dspace.**.*Test,cz.cuni.mff.ufal.*Test -DfailIfNoTests=false test | grep -v "Download"
-  - free -m -t
-  - cd $FS/utilities/project_helpers/scripts
-  - free -m -t
-  - make tests
-  - #make selenium_tests || echo "Tests failed"
+   free -m -t &&
+   make test_dspace_database &&
+   free -m -t &&
+   make test_utilities_database &&
+   free -m -t &&
+   cd $FS/ && mvn -Dmaven.test.skip=false -Dtest=cz.cuni.mff.ufal.dspace.**.*Test,cz.cuni.mff.ufal.*Test -DfailIfNoTests=false test | grep -v "Download" &&
+   free -m -t &&
+   cd $FS/utilities/project_helpers/scripts &&
+   free -m -t &&
+   make tests
+   #make selenium_tests || echo "Tests failed"
