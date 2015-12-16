@@ -11,6 +11,8 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 
+import java.sql.SQLException;
+
 /**
  * Created by monikam on 2/5/15.
  */
@@ -27,7 +29,11 @@ public class BitstreamActionTarget extends ActionTarget {
     protected boolean toHashMap() {
         boolean create = super.toHashMap();
         if (create) {
-            put("mimeType", bit.getFormat().getMIMEType());
+            try {
+                put("mimeType", bit.getFormat(context).getMIMEType());
+            } catch (SQLException e) {
+                put("mimeType", e.getMessage());
+            }
             put("name", bit.getName());
             put("internalId", bit.getInternalId());
             put("size", bit.getSize());

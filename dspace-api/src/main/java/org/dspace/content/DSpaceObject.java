@@ -9,10 +9,20 @@ package org.dspace.content;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.DSpaceObjectService;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.handle.Handle;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.*;
 
 import javax.persistence.*;
@@ -188,4 +198,65 @@ public abstract class DSpaceObject implements Serializable
     protected void setModified() {
         this.modified = true;
     }
+
+    public String toString() {
+        return Constants.typeText[getType()] + "." + getID();
+    }
+
+    /**
+     * expects a two part string as parameter: TYPE.ID, where TYPE is a DSpaceObject type and
+     * ID is the object id, handle,  group name, or Eperson's netid
+     *
+     * returns DSpaceObject that corresponds to string or null
+     * @param str    must have format TYPE.ID
+     * @return
+     */
+    public static DSpaceObject fromString(Context c, String str) throws SQLException {
+        if (str == null) {
+            return null;
+        }
+        String left= null, right = null;
+        int doti = str.indexOf('.');
+        if (doti != -1 && doti < str.length()-1) {
+            left = str.substring(0,doti);
+            right = str.substring(doti+1);
+        }
+
+        if (left == null) {
+            // this could be a handle
+            HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+            return handleService.resolveToObject(c, str);
+        } else {
+            int typeId = Constants.getTypeID(left.toUpperCase());
+            if (typeId == -1) {
+                // not one of the DSPaceObject types
+                return null;
+            }
+
+            try {
+                UUID id = UUID.fromString(right);
+                DSpaceObjectService dSpaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(typeId);
+                return dSpaceObjectService.find(c, id);
+            } catch (NumberFormatException ne) {
+                switch (typeId) {
+                    case Constants.EPERSON: {
+                        EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
+                        DSpaceObject person = epersonService.findByNetid(c, right);
+                        if (person == null) {
+                            person = epersonService.findByEmail(c, right);
+                        }
+                        return person;
+                    }
+                    case Constants.GROUP:
+                        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+                        return groupService.findByName(c, right);
+                    default:
+                        return null;
+                }
+            }
+        }
+    }
+
+
+
 }

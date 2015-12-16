@@ -42,9 +42,6 @@ class Arguments {
     public static String FORMAT = "f";
     public static String FORMAT_LONG = "format";
 
-    public static String GOGO = "g";
-    public static String GOGO_LONG = "GO-GO-GO";
-
     public static String HELP = "h";
     public static String HELP_LONG = "help";
 
@@ -249,11 +246,7 @@ class Arguments {
             dryRun = line.hasOption(DRYRUN);
             doWorkflowItems = line.hasOption(WORKFLOW_ITEM);
 
-            try {
-                c = new Context();
-            } catch (SQLException e) {
-                throw new ParseException("Could not access database");
-            }
+            c = new Context();
 
             String rootObj = line.getOptionValue(ROOT);
             if (rootObj == null || rootObj.isEmpty())

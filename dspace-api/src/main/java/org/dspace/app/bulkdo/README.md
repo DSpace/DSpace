@@ -6,28 +6,19 @@ The org.dspace.app.bulkdo package contains four dspace main commands:
  'tree' at given by dspace object; likewise delete a given policy
 * bulk-meta-data: add a metadata value setting to  or delete the setting from all dspace objects contained in a the
 'tree' at given by dspace object;
-* bulk-bitstream: replace the bitstream file in a given BITSTREAM  dspace object
 
 bulk-list is a powerful list command. Based on its root  parameter, a dspace object, it lists all contained dspace objects
-of a given type including properties selected by command line parameters. The root object can be designated by its
-handle or by its type and id, eg BITSTREAM.1239, ITEM.54, 95678/dspiu738.  Properties may include database ids,
-handle, name, metaData values, policy settings of the listed object itself or of dspace objects that are enclosing
-the listed object. A list of bitstreams can be configured to include the bitstreams id, mimeType, the name of the enclosing bundle,
-as well as the handles of the enclosing item and collection.
+of a given type as well as each object's properties selected by command line parameters. 
+The root object can be designated by its
+handle or by its type and UUID or handle, eg BITSTREAM.1239, ITEM.54, ITEM.95678/dspiu738i, or simply 95678/dspiu738i.  
+Properties may include database UUIDs, handle, name, metaData values, policy settings of the listed object itself or of 
+dspace objects that are enclosing the listed object. A list of bitstreams can for example include the bitstream UUIDs, 
+mimeTypes, the names of enclosing bundles, as well as the handles of the enclosing items and collections.
 
 bulk-pol may be used to ADD or DEL authorization policies. bulk-meta-data modifies individual metadata value settings.
 Both commands use the same logic of selecting which dspace objects to operate on as the bulk-list command.
-Both commands list the results of their actions. A verbose option gives more details. It is also easy to use bulk-list
+Both commands list the results of their actions and a verbose option gives more details. It is also easy to use bulk-list
 to view the status after running either of the two commands.
-
-bulk-bitstream  can replace the file in a single bitstream; I kept the prefix bulk- to indicate that the command
- is related to the other bulk-\* commands. In itself it is not very useful to be able to replace single bitstream
- from the command line. But together with the other bulk-\* commands, especially the lister it becomes possible
- to write scripts that manipulate bitstreams in bulk.
-
-For example using bulk-list, a python script that interprets its output, and bulk-bitstream, I build a utility that grabs all
-pdf bitstreams from a community, prepends a cover pages to each of them, and replaces the original bitstream with the one
-that includes the cover page.
 
 # Examples
 
@@ -306,29 +297,7 @@ list first the setting first, delete the unwanted values and insert the correct 
  object=ITEM.868 parent=COLLECTION.296 pu.department=Art and Archaeology changed=false
 ~~~~
 
-## bulk-bitstream: replacing a bitstream
 
-replace the bitstream in an item's original BUNDLE
-list and note the BITSTREAM that needs to be replaced
-
-** list bitstreams in a given item   **
-~~~~
-> dspace bulk-list -r 88435/dsp01s4655g69q -c BITSTREAM --include 'object,BUNDLE.name,name'
-# org.dspace.app.bulkdo.Lister: Found 0 collections
-# org.dspace.app.bulkdo.Lister: Found 1 items
-# org.dspace.app.bulkdo.Lister: Found 1 bundles
-# org.dspace.app.bulkdo.Lister: Found 1 bitstreams
-# org.dspace.app.bulkdo.Lister: # 1 type=0
- object=BITSTREAM.1133 BUNDLE.name=ORIGINAL name=minkin_daniel.pdf
-~~~~
-
-** replace with bitstream with a new version **
-
-~~~~
-> dspace bulk-bitstream -r BITSTREAM.1133 -c BITSTREAM -b minkin_daniel_fixed.pdf -e monikam
-# org.dspace.app.bulkdo.Bitstreams: minkin_daniel_fixed.pdf(application/pdf) --> BITSTREAM.1133
- object=BITSTREAM.1133 parent= BUNDLE.name= replace=minkin_daniel_fixed.pdf replace.mimeType=application/pdf success= SUCCESS bundles=[BUNDLE.1111]
-~~~~
 # Examples
 
 ## bulk-list; listing dspace objects and their properties
@@ -590,29 +559,6 @@ list first the setting first, delete the unwanted values and insert the correct 
  object=ITEM.868 parent=COLLECTION.296 pu.department=Art and Archaeology changed=false
 ~~~~
 
-## bulk-bitstream: replacing a bitstream
-
-replace the bitstream in an item's original BUNDLE
-list and note the BITSTREAM that needs to be replaced
-
-** list bitstreams in a given item   **
-~~~~
-> dspace bulk-list -r 88435/dsp01s4655g69q -c BITSTREAM --include 'object,BUNDLE.name,name'
-# org.dspace.app.bulkdo.Lister: Found 0 collections
-# org.dspace.app.bulkdo.Lister: Found 1 items
-# org.dspace.app.bulkdo.Lister: Found 1 bundles
-# org.dspace.app.bulkdo.Lister: Found 1 bitstreams
-# org.dspace.app.bulkdo.Lister: # 1 type=0
- object=BITSTREAM.1133 BUNDLE.name=ORIGINAL name=minkin_daniel.pdf
-~~~~
-
-** replace with bitstream with a new version **
-
-~~~~
-> dspace bulk-bitstream -r BITSTREAM.1133 -c BITSTREAM -b minkin_daniel_fixed.pdf -e monikam
-# org.dspace.app.bulkdo.Bitstreams: minkin_daniel_fixed.pdf(application/pdf) --> BITSTREAM.1133
- object=BITSTREAM.1133 parent= BUNDLE.name= replace=minkin_daniel_fixed.pdf replace.mimeType=application/pdf success= SUCCESS bundles=[BUNDLE.1111]
-~~~~
 # Command Usage
 
 ## bulk-list
@@ -714,41 +660,6 @@ usage: org.dspace.app.bulkdo.MetaData
  -r,--root              handle / type.ID
  -c,--class             class: collection, item, bundle, or bitstream
  -v,--verbose           verbose
-
-OPTION include:
-    Default Print Keys: [object, parent]
-    Available Keys depend on the type of object being printed
-        COLLECTION:[object, id, type, exception, name, handle, template]
-        ITEM:[object, id, type, exception, isWithdrawn, handle, name]any
-              metadafield, POLICY.dspace_action
-        BUNDLE:[object, id, type, exception, isEmbargoed, name]
-        BITSTREAM:[object, id, type, exception, mimeType, name, size,
-              internalId, checksum, checksumAlgo]
-        where dspace_action may be one of:  [READ, WRITE, OBSOLETE (DELETE),
-              ADD, REMOVE, WORKFLOW_STEP_1, WORKFLOW_STEP_2, WORKFLOW_STEP_3,
-              WORKFLOW_ABORT, DEFAULT_BITSTREAM_READ, DEFAULT_ITEM_READ, ADMIN]
-```
-
-## bulk-bitstream
-```
-usage: org.dspace.app.bulkdo.Bitstreams
-
- -t,--test                  dryrun - do not actually change anything; default
-                        is false
- -g,--GO-GO-GO          ignore file format incompatibilities
- -W,--doWorkFlowItems   list items in workflow
- -b,--bitstream         file to replace given bitstream
- -e,--eperson           dspace user account (email or netid) used for
-                        authorization to dspace app
- -f,--format            output format: tsv or txt
- -h,--help              help
- -i,--include           include listed object keys/properties in output;
-                        give as comma separated list
- -r,--root              handle / type.ID
- -c,--class             class: collection, item, bundle, or bitstream
- -v,--verbose           verbose
-
-Replace bitstream file in BITSTREAM object defined by root
 
 OPTION include:
     Default Print Keys: [object, parent]

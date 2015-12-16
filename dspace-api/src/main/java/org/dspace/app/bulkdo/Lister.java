@@ -12,13 +12,19 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.dspace.content.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.*;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.WorkflowItemService;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 
 import java.io.OutputStreamWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by monikam on 4/2/14.
@@ -79,8 +85,10 @@ public class Lister {
         ArrayList<ActionTarget>  targets = new ArrayList<ActionTarget>();
         if (rootObject.getType() == Constants.COMMUNITY) {
             Community comm = (Community) rootObject;
-            Collection[] cols = comm.getCollections();
+            CommunityService commService = (CommunityService) ContentServiceFactory.getInstance().getCommunityService();
+            List<Collection> cols = commService.getAllCollections(context, comm);
             targets = ActionTarget.createArray(context, new ActionTarget(context, null, comm), cols);
+
         } else if (rootObject.getType() == Constants.COLLECTION) {
             targets.add(CollectionActionTarget.create(context, null, rootObject));
         }
@@ -96,18 +104,23 @@ public class Lister {
         } else {
             ArrayList<ActionTarget> cols = actionTargets[Constants.COLLECTION];
             if (workflowItem) {
+                WorkflowItemService workflowItemService = WorkflowServiceFactory.getInstance().getWorkflowItemService();
+
                 for (int i = 0; i < cols.size(); i++) {
-                    WorkflowItem[] wis = WorkflowItem.findByCollection(context, (Collection) cols.get(i).getObject());
-                    for (int j = 0; j < wis.length; j++) {
-                        targets.add(ActionTarget.create(context, cols.get(i), wis[j].getItem()));
+                    List<WorkflowItem> wis = workflowItemService.findByCollection(context, (Collection) cols.get(i).getObject());
+                    for (WorkflowItem wi: wis) {
+                        targets.add(ActionTarget.create(context, cols.get(i), wi.getItem()));
                     }
                 }
             } else {
+                CollectionService collService = (CollectionService) ContentServiceFactory.getInstance().getCollectionService();
+                ItemService itemService = (ItemService) ContentServiceFactory.getInstance().getDSpaceObjectService(Constants.ITEM);
                 for (int i = 0; i < cols.size(); i++) {
-                    // items from collections and subcollections ???
-                    ItemIterator iter = ((Collection) cols.get(i).getObject()).getAllItems();
-                    while (iter.hasNext()) {
-                        targets.add(ActionTarget.create(context, cols.get(i), iter.next()));
+                    // items from collections
+                    Iterator<Item> items = itemService.findAllByCollection(context, (Collection) cols.get(i).getObject());
+                    while (items.hasNext())
+                    {
+                        targets.add(ActionTarget.create(context, cols.get(i), items.next()));
                     }
                 }
             }
@@ -124,7 +137,7 @@ public class Lister {
             ArrayList<ActionTarget> items = actionTargets[Constants.ITEM];
             // collect BUNDLES from items
             for (int i = 0; i < items.size(); i++) {
-                Bundle[] bundles = ((Item) items.get(i).getObject()).getBundles();
+                List<Bundle> bundles = ((Item) items.get(i).getObject()).getBundles();
                 for (Bundle bdl : bundles) {
                     targets.add(new BundleActionTarget(context, items.get(i), bdl));
                 }
@@ -142,7 +155,7 @@ public class Lister {
             ArrayList<ActionTarget>  bundles = actionTargets[Constants.BUNDLE];
             // collect BITSTREAMS from bundles
             for (ActionTarget bdl : bundles) {
-                Bitstream[] bits = ((Bundle) bdl.getObject()).getBitstreams();
+                List<Bitstream> bits = ((Bundle) bdl.getObject()).getBitstreams();
                 for (Bitstream bit : bits) {
                     targets.add(new BitstreamActionTarget(context, bdl, bit));
                 }

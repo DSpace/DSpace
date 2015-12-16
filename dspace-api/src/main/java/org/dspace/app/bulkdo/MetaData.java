@@ -12,8 +12,10 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 
 import java.io.OutputStreamWriter;
@@ -48,44 +50,48 @@ public class MetaData {
             p.addKey(beforeKey);
         p.addKey(changedKey);
 
+        ItemService itemService = ContentServiceFactory.getInstance().getItemService();
         Lister lister = new Lister(args.getContext(), args.getRoot(), args.getType());
         ArrayList<ActionTarget> targets = lister.getTargets(args.getType(), args.getWorkflowItemsOnly());
         for (ActionTarget at : targets) {
             Item item = (Item) at.getObject();
-            Metadatum[] vals = item.getMetadata(args.schema, args.element, args.qualifier, Item.ANY);
-            at.put(beforeKey, Metadatum.valuesFor(vals));
+            List<MetadataValue> vals = itemService.getMetadata(item, args.schema, args.element, args.qualifier, null);
+            at.put(beforeKey, MetadataValue.collectValues(vals));
             at.put(changedKey, false);
             switch (args.getAction()) {
                 case Arguments.DO_ADD:
-                    for (i= 0; i < vals.length; i++) {
-                        if (vals[i].value.equals(args.metaData_value)) {
-                            break;
-                        }
+                    // check whether args.metaData_value exists
+                    Boolean hasSameValue = false;
+                    for (MetadataValue v : vals) {
+                        hasSameValue = (v.getValue().equals(args.metaData_value));
+                        if (hasSameValue) break;
                     }
-                    if (i == vals.length) {
-                        item.addMetadata(args.schema, args.element, args.qualifier, null, args.metaData_value);
+                    if (!hasSameValue) {  // could not find value --> so set it
+                        itemService.addMetadata(args.getContext(), (Item) at.getObject(), args.schema, args.element, args.qualifier, Item.ANY, args.metaData_value);
                         at.put(changedKey, true);
                     }
                     break;
                 case Arguments.DO_DEL:
                     List<String> valList = new ArrayList<String>();
-                    for (i= 0; i < vals.length; i++) {
-                        if (!vals[i].value.equals(args.metaData_value)) {
-                            valList.add(vals[i].value);
-                        } else {
+                    for (MetadataValue v : vals) {
+                        if (v.getValue().equals(args.metaData_value)) {
+                            // we will remove
                             at.put(changedKey, true);
+                        } else {
+                            // a keeper
+                            valList.add(v.getValue());
                         }
                     }
-                    item.clearMetadata(args.schema, args.element, args.qualifier, Item.ANY);
-                    String[] valArr = valList.toArray(new String[valList.size()]);
-                    item.addMetadata(args.schema, args.element, args.qualifier, Item.ANY, valArr);
+                    itemService.clearMetadata(args.getContext(), (Item) at.getObject(), args.schema, args.element, args.qualifier, Item.ANY);
+                    itemService.addMetadata(args.getContext(), (Item) at.getObject(), args.schema, args.element, args.qualifier, null,valList);
                     break;
                 default:
                     throw new RuntimeException("Don't know how to " + args.getActionString());
             }
-            item.update();
-            if (!args.getDryRun())
-                args.getContext().commit();
+            if (!args.getDryRun()) {
+                itemService.update(args.getContext(), item);
+                args.getContext().complete();
+            }
             p.println(at);
         }
 

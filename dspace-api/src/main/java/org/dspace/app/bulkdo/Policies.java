@@ -12,8 +12,9 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -47,8 +48,9 @@ public class Policies {
     char action;
     int dspaceActionId;
 
-    Policies(PolicyArguments arguments) throws SQLException {
+    ResourcePolicyService policyService;
 
+    Policies(PolicyArguments arguments) throws SQLException {
         args = arguments;
         action = args.getAction();
         dspaceActionId = args.dspaceActionid;
@@ -56,6 +58,7 @@ public class Policies {
         propertyExists = ActionTarget.POLICY + "."  + Constants.actionText[dspaceActionId];
         property = propertyExists + "." + args.getActionString();
         propertyBefore = propertyExists + "." + "before";
+        policyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
     }
 
     void apply(Printer p, ArrayList<ActionTarget> targets) throws SQLException {
@@ -76,7 +79,8 @@ public class Policies {
     }
 
     private void addPolicyInfo(ActionTarget target, String prop) throws SQLException {
-        List<ResourcePolicy> policies = AuthorizeManager.getPoliciesActionFilter(args.getContext(), target.getObject(), dspaceActionId);
+
+        List<ResourcePolicy> policies = policyService.find(args.getContext(), target.getObject(), dspaceActionId);
         target.put(prop, policies.toArray());
     }
 
@@ -107,10 +111,13 @@ public class Policies {
                     }
                     if (pi == pols.length) {
                         // policy does not yet exist
+                        ResourcePolicy rp = policyService.create(c);
+                        rp.setdSpaceObject(targets.get(i).getObject());
+                        rp.setAction(dspaceActionId);
                         if (who.getType() == Constants.EPERSON) {
-                            AuthorizeManager.addPolicy(c, targets.get(i).getObject(), dspaceActionId, (EPerson) who);
+                            rp.setEPerson((EPerson) who);
                         } else {
-                            AuthorizeManager.addPolicy(c, targets.get(i).getObject(), dspaceActionId, (Group) who);
+                            rp.setGroup((Group) who);
                         }
                         target.put(property, who);
                     }
@@ -119,7 +126,11 @@ public class Policies {
                         ResourcePolicy pol = (ResourcePolicy) pols[pi];
                         if (pol.getGroup() == who || pol.getEPerson() == who) {
                             // found a matching policy ==> delete it
-                            pol.delete();
+                            if (who.getType() == Constants.EPERSON) {
+                                policyService.removeDsoEPersonPolicies(args.getContext(), pol.getdSpaceObject(), (EPerson) who);
+                            } else {
+                                policyService.removeDsoGroupPolicies(args.getContext(), pol.getdSpaceObject(), (Group) who);
+                            }
                             target.put(property, who);
                             // keep going there may be duplicate policies
                         }

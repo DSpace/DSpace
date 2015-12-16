@@ -8,19 +8,24 @@
 package org.dspace.app.bulkdo;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.*;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 
 class ActionTarget {
 
-    private Context context;
+    protected Context context;
     private DSpaceObject obj;
     private HashMap<String, Object> map;
     private ActionTarget up;
@@ -64,14 +69,14 @@ class ActionTarget {
             DSpaceObject up = null;
             switch (obj.getType()) {
                 case Constants.BITSTREAM:
-                    up = ((Bitstream) obj).getBundles()[0];
+                    up = ((Bitstream) obj).getBundles().get(0);
                     break;
                 case Constants.BUNDLE:
-                    up = ((Bundle) obj).getItems()[0];
+                    up = ((Bundle) obj).getItems().get(0);
                     break;
                 case Constants.ITEM:
                 case Constants.COLLECTION:
-                    up = obj.getParentObject();
+                    up = ContentServiceFactory.getInstance().getDSpaceObjectService(obj).getParentObject(context,obj);
                     break;
                 case Constants.COMMUNITY:
                     up = null;
@@ -109,19 +114,12 @@ class ActionTarget {
     }
 
 
-    public static ArrayList<ActionTarget> createArray(Context context, ActionTarget up, DSpaceObject[] objArr) {
+    public static ArrayList<ActionTarget> createArray(Context context, ActionTarget up, List<? extends DSpaceObject> objArr) {
         assert (objArr != null);
-        ArrayList<ActionTarget> arr = new ArrayList<ActionTarget>(objArr.length);
-        for (int i = 0; i < objArr.length; i++)
-            arr.add(create(context, up, objArr[i]));
-        return arr;
-    }
-
-    private static ArrayList<ActionTarget> createsArray(Context context, ActionTarget up, ArrayList<DSpaceObject> objArr) {
-        assert (objArr != null);
-        ArrayList<ActionTarget> arr = new ArrayList<ActionTarget>(objArr.size());
-        for (int i = 0; i < objArr.size(); i++)
-            arr.add(create(context, up, objArr.get(i)));
+        ArrayList<ActionTarget> arr = new ArrayList<ActionTarget>();
+        for (DSpaceObject obj : objArr) {
+            arr.add(create(context, up, obj));
+        }
         return arr;
     }
 
@@ -141,21 +139,25 @@ class ActionTarget {
         return null;
     }
 
-    private String[] getMetadateValue(String field) {
+    private List<String> getMetadateValue(String field) {
         if (obj.getType() == Constants.ITEM) {
-            Metadatum[] values =  ((Item) obj).getMetadataByMetadataString(field);
-            return Metadatum.valuesFor(values);
+            ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+            String[] md = MetadataField.fromString(field);
+            List<MetadataValue> dcValues = itemService.getMetadata((Item) obj, md[0], md[1], md[2], Item.ANY);
+            return MetadataValue.collectValues(dcValues);
         }
         return null;
     }
 
-    private Object getPolicy(String whatPol) throws SQLException {
+    private List<ResourcePolicy> getPolicy(String whatPol) throws SQLException {
         int pol = Constants.getActionID(whatPol);
         if (pol != -1) {
-            return AuthorizeManager.getPoliciesActionFilter(context, obj, pol);
+            ResourcePolicyService service = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
+            return service.find(context, obj, pol);
         }
         return null;
     }
+
 
     public Object get(String key) {
         toHashMap();
@@ -200,7 +202,7 @@ class ActionTarget {
                 try {
                     map.put("type", obj.getType());
                     map.put("id", obj.getID());
-                    map.put("parent", obj.getParentObject());
+                    map.put("parent",  ContentServiceFactory.getInstance().getDSpaceObjectService(obj).getParentObject(context, obj));
                     map.put("up", up);
                 } catch (SQLException e) {
                     map.put("exception", e.getMessage());
@@ -263,7 +265,7 @@ class ItemActionTarget extends ActionTarget {
 class BundleActionTarget extends ActionTarget {
     Bundle bdl;
 
-    static String[] theAvailableKeys = {"isEmbargoed", "name"};
+    static String[] theAvailableKeys = {"name"};
 
     BundleActionTarget(Context context, ActionTarget up, DSpaceObject o) {
         super(context, up, o);
@@ -280,4 +282,3 @@ class BundleActionTarget extends ActionTarget {
         return create;
     }
 }
-

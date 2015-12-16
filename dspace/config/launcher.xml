@@ -1,13 +1,6 @@
 <?xml version="1.0"?>
 <commands>
     <command>
-        <name>bulk-bitstream</name>
-        <description>Replace Bisttream File in a Single Bitstream Object</description>
-        <step>
-            <class>org.dspace.app.bulkdo.Bitstreams</class>
-        </step>
-    </command>
-    <command>
         <name>bulk-list</name>
         <description>Bulk List DSpaceObjects</description>
         <step>
