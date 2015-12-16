@@ -748,7 +748,7 @@
          <dependency>
             <groupId>cz.cuni.mff.ufal.lindat</groupId>
             <artifactId>utilities</artifactId>
-            <version>5.4-SNAPSHOT</version>
+            <version>5.5-SNAPSHOT</version>
          </dependency>
 
          <!-- DSpace core and endorsed Addons -->
