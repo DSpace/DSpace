@@ -37,7 +37,7 @@
 		<xsl:param name="context-name"/>
 		
 		<xsl:variable name="date-prefix">
-			<xsl:if test="($context-name = 'driver') or ($context-name = 'openaire')">
+			<xsl:if test="($context-name = 'driver') or ($context-name = 'openaire') or ($context-name = 'snrd')">
 				<xsl:text>info:eu-repo/date/embargoEnd/</xsl:text>
 			</xsl:if>
 		</xsl:variable>
