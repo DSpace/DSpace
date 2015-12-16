@@ -24,7 +24,7 @@ td.mod, th.mod {width: 200px;}
 td.ititle, th.ititle {width: 600px;}
 
 button:disabled {
-	display:none;
+	background-color:gray;
 }
 input:read-only {
 	background-color: gray;

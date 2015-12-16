@@ -68,14 +68,14 @@ var QueryReport = function() {
 			    data.metadata = $("#show-fields select").val();
 			    self.drawItemFilterTable(data);
 			    self.spinner.stop();
-	  		    $("button").attr("disabled", false);
+	  		    $("button").not("#next,#prev").attr("disabled", false);
 			},
 			error: function(xhr, status, errorThrown) {
 				alert("Error in /rest/filtered-items "+ status+ " " + errorThrown);
 			},
 			complete: function(xhr, status, errorThrown) {
 			    self.spinner.stop();
-	  		    $("button").attr("disabled", false);
+	  		    $("button").not("#next,#prev").attr("disabled", false);
 			}
 		});
 	}
@@ -88,13 +88,13 @@ var QueryReport = function() {
 		self.myHtmlUtil.addTh(tr, "id");
 		self.myHtmlUtil.addTh(tr, "collection");
 		self.myHtmlUtil.addTh(tr, "Item Handle");
-		self.myHtmlUtil.addTh(tr, "dc.title");
+		self.myHtmlUtil.addTh(tr, "dc.title" + self.getLangSuffix());
 		
 		var mdCols = [];
 		if (data.metadata) {
 			$.each(data.metadata, function(index, field) {
 				if (field != "") {
-					self.myHtmlUtil.addTh(tr,field).addClass("returnFields");
+					self.myHtmlUtil.addTh(tr,field + self.getLangSuffix()).addClass("returnFields");
 					mdCols[mdCols.length] = field;			
 				}
 			});			
@@ -130,6 +130,7 @@ var QueryReport = function() {
 		this.displayItems(data["query-annotation"],
 			this.myReportParameters.getOffset(),
 			this.myReportParameters.getLimit(),
+			data["unfiltered-item-count"],
 			function(){
 			    self.myReportParameters.updateOffset(false);
 			    self.runQuery();
@@ -209,7 +210,6 @@ var QueryableMetadataFields = function(report) {
 		  .append($("<option value='q8'>Has non-full text in dc.description.provenance</option>"))
 		  .append($("<option value='q9'>Has empty metadata</option>"))
 		  .append($("<option value='q10'>Has unbreaking metadata in description</option>"))
-		  .append($("<option value='q11'>Has long metadata</option>"))
 		  .append($("<option value='q12'>Has XML entity in metadata</option>"))
 		  .append($("<option value='q13'>Has non-ascii character in metadata</option>"))
 	      .on("change",function(){
@@ -237,8 +237,6 @@ var QueryableMetadataFields = function(report) {
 				  self.drawFilterQuery("*","matches","^\\s*$");						
 			  } else if (val ==  'q10') {
 				  self.drawFilterQuery("dc.description.*","matches","^.*[^\\s]{50,}.*$");						
-			  } else if (val ==  'q11') {
-				  self.drawFilterQuery("*","matches","^((.|\r|\n){100,100}){50,}(.|\r|\n)*$"); //the {100,100}{50,} accommodates postgres limits						
 			  } else if (val ==  'q12') {
 				  self.drawFilterQuery("*","matches","^.*&#.*$");						
 			  } else if (val ==  'q13') {
@@ -250,9 +248,7 @@ var QueryableMetadataFields = function(report) {
 	this.drawFilterQuery = function(pField, pOp, pVal) {
 		var div = $("<div class='metadata'/>").appendTo("#queries");
 		var sel = $("<select class='query-tool' name='query_field[]'/>");
-		var opt = $("<option/>");
-		sel.append(opt);
-		opt = $("<option value='*'>Any Field</option>");
+		var opt = $("<option value='*'>Any Field</option>");
 		sel.append(opt);
 		$.each(self.metadataSchemas, function(index, schema){
 			$.each(schema.fields, function(findex, field) {

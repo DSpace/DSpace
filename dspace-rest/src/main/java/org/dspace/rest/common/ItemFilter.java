@@ -43,6 +43,7 @@ public class ItemFilter {
     private List<ItemFilterQuery> itemFilterQueries = new ArrayList<ItemFilterQuery>();
     private List<MetadataEntry> metadata = new ArrayList<MetadataEntry>();
     private Integer itemCount;
+    private Integer unfilteredItemCount;
     private boolean saveItems = false;
 
     public ItemFilter(){}
@@ -116,6 +117,9 @@ public class ItemFilter {
         if (itemCount == null) {
             itemCount = 0;
         }        
+        if (unfilteredItemCount == null) {
+            unfilteredItemCount = 0;
+        }    
     }    
     
     public boolean hasItemTest() {
@@ -213,6 +217,15 @@ public class ItemFilter {
 
     public void setItemCount(Integer itemCount) {
         this.itemCount = itemCount;
+    }
+
+    @XmlAttribute(name="unfiltered-item-count")
+    public Integer getUnfilteredItemCount() {
+        return unfilteredItemCount;
+    }
+
+    public void setUnfilteredItemCount(Integer unfilteredItemCount) {
+        this.unfilteredItemCount = unfilteredItemCount;
     }
 
     public List<org.dspace.rest.common.Item> getItems() {

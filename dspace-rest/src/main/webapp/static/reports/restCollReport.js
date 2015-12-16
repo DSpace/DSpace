@@ -257,11 +257,11 @@ var CollReport = function() {
 		self.myHtmlUtil.addTh(tr, "Num").addClass("num").addClass("sorttable_numeric");
 		self.myHtmlUtil.addTh(tr, "id");
 		self.myHtmlUtil.addTh(tr, "Handle");
-		self.myHtmlUtil.addTh(tr, "dc.title").addClass("title");
+		self.myHtmlUtil.addTh(tr, "dc.title"  + self.getLangSuffix()).addClass("title");
 		var fields = $("#show-fields select").val();
 		if (fields != null) {
 			$.each(fields, function(index, field){
-				self.myHtmlUtil.addTh(tr, field);		
+				self.myHtmlUtil.addTh(tr, field + self.getLangSuffix());		
 			});		
 		}
 
@@ -306,6 +306,7 @@ var CollReport = function() {
 				self.displayItems(filter + " Items in " + data.name, 
 					offset,
 					self.ITEM_LIMIT,
+					data.numberItems,
 					function(){self.drawItemTable(cid, filter, (offset - self.ITEM_LIMIT < 0) ? 0 : offset - self.ITEM_LIMIT);},
 					function(){self.drawItemTable(cid, filter, offset + self.ITEM_LIMIT);}
 				);

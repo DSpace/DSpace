@@ -47,7 +47,15 @@
     <h3>Limit/Paginate Queries</h3>
     <div id="queries-page">
       <div>
-        <label for="limit">Limit:</label><input id="limit" name="limit" value="100"/>
+        <label for="limit">Limit:</label>
+        <select id="limit" name="limit">
+          <option value="10">10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100" selected>100</option>
+          <option value="250">250</option>
+          <option value="1000">1000</option>
+        </select>
         <label for="offset"> Offset:</label><input id="offset" name="offset" value="0"/>
       </div>
       <div>
