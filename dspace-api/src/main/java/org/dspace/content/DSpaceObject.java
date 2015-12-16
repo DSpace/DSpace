@@ -200,12 +200,16 @@ public abstract class DSpaceObject implements Serializable
     }
 
     public String toString() {
-        return Constants.typeText[getType()] + "." + getID();
+        String ident = getHandle();
+        if (ident == null)
+            ident = "" + getID();
+        return Constants.typeText[getType()] + "." + ident;
     }
 
     /**
-     * expects a two part string as parameter: TYPE.ID, where TYPE is a DSpaceObject type and
-     * ID is the object id, handle,  group name, or Eperson's netid
+     * expects a handle or a two part string as parameter: TYPE.IDENT,
+     * where TYPE is a DSpaceObject type and
+     * IDENT is a UUID, handle,  group name, or Eperson's netid
      *
      * returns DSpaceObject that corresponds to string or null
      * @param str    must have format TYPE.ID
@@ -215,18 +219,16 @@ public abstract class DSpaceObject implements Serializable
         if (str == null) {
             return null;
         }
-        String left= null, right = null;
         int doti = str.indexOf('.');
-        if (doti != -1 && doti < str.length()-1) {
-            left = str.substring(0,doti);
-            right = str.substring(doti+1);
+        HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+        if (doti == -1) {
+            // no '.' ==> assume its a handle
+            return handleService.resolveToObject(c, str);
         }
 
-        if (left == null) {
-            // this could be a handle
-            HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
-            return handleService.resolveToObject(c, str);
-        } else {
+        if (doti > 0 && doti < str.length()-1) {
+            String left = str.substring(0,doti);
+            String right = str.substring(doti+1);
             int typeId = Constants.getTypeID(left.toUpperCase());
             if (typeId == -1) {
                 // not one of the DSPaceObject types
@@ -237,7 +239,7 @@ public abstract class DSpaceObject implements Serializable
                 UUID id = UUID.fromString(right);
                 DSpaceObjectService dSpaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(typeId);
                 return dSpaceObjectService.find(c, id);
-            } catch (NumberFormatException ne) {
+            } catch (IllegalArgumentException ne) {
                 switch (typeId) {
                     case Constants.EPERSON: {
                         EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
@@ -251,11 +253,14 @@ public abstract class DSpaceObject implements Serializable
                         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
                         return groupService.findByName(c, right);
                     default:
-                        return null;
+                        DSpaceObject obj = handleService.resolveToObject(c, right);
+                        return (obj != null && obj.getType() == typeId) ? obj : null;
                 }
             }
         }
+        return null;
     }
+
 
 
 
