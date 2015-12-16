@@ -226,7 +226,7 @@ public class DiscoverUtility
         if (StringUtils.isNotBlank(query))
         {
             // Escape any special characters in this user-entered query
-            query = SearchUtils.getSearchService().escapeQueryChars(query);
+            query = escapeQueryChars(query);
             queryArgs.setQuery(query);
         }
 
@@ -267,6 +267,19 @@ public class DiscoverUtility
 
         return userFilters;
 
+    }
+
+    /**
+     * Escape colon-space sequence in a user-entered query, based on the
+     * underlying search service. This is intended to let end users paste in a
+     * title containing colon-space without requiring them to escape the colon.
+     *
+     * @param query user-entered query string
+     * @return query with colon in colon-space sequence escaped
+     */
+    private static String escapeQueryChars(String query)
+    {
+        return StringUtils.replace(query, ": ", "\\: ");
     }
 
     private static void setPagination(HttpServletRequest request,
