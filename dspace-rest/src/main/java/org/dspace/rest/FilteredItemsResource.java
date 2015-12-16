@@ -171,7 +171,6 @@ public class FilteredItemsResource extends Resource {
         	if (parts.length>2) {
         		qualifier = parts[2];
         	}
-
         	if (Item.ANY.equals(qualifier)) {
     			for(MetadataField mf: metadataFieldService.findFieldsByElementNameUnqualified(context, schema, element)){
         			fields.add(mf);        		    				
