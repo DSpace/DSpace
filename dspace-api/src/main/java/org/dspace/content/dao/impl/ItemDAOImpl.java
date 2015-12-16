@@ -7,19 +7,33 @@
  */
 package org.dspace.content.dao.impl;
 
+import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.dao.ItemDAO;
 import org.dspace.core.Context;
 import org.dspace.core.AbstractHibernateDSODAO;
 import org.dspace.eperson.EPerson;
+import org.hibernate.Criteria;
 import org.hibernate.Query;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.Subqueries;
+import org.hibernate.type.StandardBasicTypes;
+import org.hibernate.type.Type;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Item object.
@@ -29,6 +43,7 @@ import java.util.Iterator;
  * @author kevinvandevelde at atmire.com
  */
 public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDAO {
+    private static final Logger log = Logger.getLogger(ItemDAOImpl.class);
     @Override
     public Iterator<Item> findAll(Context context, boolean archived) throws SQLException {
         Query query = createQuery(context, "FROM Item WHERE inArchive= :in_archive");
@@ -111,6 +126,73 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
             query.setParameter("text_value", value);
         }
         return iterate(query);
+    }
+
+    enum OP {equals,not_equals,like,not_like,contains,doesnt_contain,exists,doesnt_exist,matches,doesnt_match;}
+    
+    @Override
+    public Iterator<Item> findByMetadataQuery(Context context, List<List<MetadataField>> listFieldList, List<String> query_op, List<String> query_val, List<UUID> collectionUuids, String regexClause, int offset, int limit) throws SQLException {
+    	Criteria criteria = createCriteria(context, Item.class, "item");
+    	criteria.setFirstResult(offset);
+    	criteria.setMaxResults(limit);
+    	
+    	if (!collectionUuids.isEmpty()){
+			DetachedCriteria dcollCriteria = DetachedCriteria.forClass(Collection.class, "coll");
+        	dcollCriteria.setProjection(Projections.property("coll.id"));
+        	dcollCriteria.add(Restrictions.eqProperty("coll.id", "item.owningCollection"));
+			dcollCriteria.add(Restrictions.in("coll.id", collectionUuids));
+			criteria.add(Subqueries.exists(dcollCriteria));
+    	}
+    	
+        int index = Math.min(listFieldList.size(), Math.min(query_op.size(), query_val.size()));
+        StringBuilder sb = new StringBuilder();
+
+        for(int i=0; i<index; i++) {
+        	OP op = OP.valueOf(query_op.get(i));
+        	if (op == null) {
+        		log.warn("Skipping Invalid Operator: " + query_op.get(i));
+        		continue;
+        	}
+        	
+        	if (op == OP.matches || op == OP.doesnt_match) {
+        		if (regexClause.isEmpty()) {
+            		log.warn("Skipping Unsupported Regex Operator: " + query_op.get(i));
+            		continue;
+        		}
+        	}
+        	
+        	DetachedCriteria subcriteria = DetachedCriteria.forClass(MetadataValue.class,"mv");
+        	subcriteria.add(Property.forName("mv.dSpaceObject").eqProperty("item.id"));
+        	subcriteria.setProjection(Projections.property("mv.dSpaceObject"));
+        	
+        	if (!listFieldList.get(i).isEmpty()) {
+        		subcriteria.add(Restrictions.in("metadataField", listFieldList.get(i)));
+        	}
+        	
+        	sb.append(op.name() + " ");
+        	if (op == OP.equals || op == OP.not_equals){
+    			subcriteria.add(Property.forName("mv.value").eq(query_val.get(i)));
+    			sb.append(query_val.get(i));
+        	} else if (op == OP.like || op == OP.not_like){
+    			subcriteria.add(Property.forName("mv.value").like(query_val.get(i)));        		        		
+    			sb.append(query_val.get(i));
+        	} else if (op == OP.contains || op == OP.doesnt_contain){
+    			subcriteria.add(Property.forName("mv.value").like("%"+query_val.get(i)+"%"));        		        		
+    			sb.append(query_val.get(i));
+        	} else if (op == OP.matches || op == OP.doesnt_match) {
+            	subcriteria.add(Restrictions.sqlRestriction(regexClause, query_val.get(i), StandardBasicTypes.STRING));
+    			sb.append(query_val.get(i));        		
+        	}
+        	
+        	if (op == OP.exists || op == OP.equals || op == OP.like || op == OP.contains || op == OP.matches) {
+        		criteria.add(Subqueries.exists(subcriteria));
+        	} else {
+        		criteria.add(Subqueries.notExists(subcriteria));        		
+        	}
+        }
+     	log.debug(String.format("Running custom query with %d filters", index));
+
+        return list(criteria).iterator();
     }
 
     @Override
