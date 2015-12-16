@@ -241,7 +241,7 @@
 						<div><span class="publication-date">2015-12-16</span>
 						                            <a href="http://blog.datadryad.org/2015/12/15/new-pricing-structure-with-simplified-terms-and-increased-size-limits/">
 						                                <img alt="" src="/themes/Mirage/images/watering-can.png" />
-						                                <p style="width: 450px; color: #363; font-size: 90%; top: 0px; right: 10px; line-height: 1.2em; position: absolute; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);">Dryad announces new pricing structure for 2016 with simplified terms and increased size limits<br /></p>
+						                                <p style="width: 450px; color: #363; font-size: 90%; top: 0px; right: 10px; line-height: 1.2em; position: absolute; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);">New Dryad pricing structure for 2016 with simplified terms and increased size limits</p>
 						                                <p style="drop-shadow: 4px 4px; position: absolute; right: 40px; bottom: 80px; font-size: 70%; text-align: right; text-shadow: 1px 2px 2px rgba(33, 33, 33, 0.25);">Learn more &#187;</p>
 						                            </a>
 						                        </div>
