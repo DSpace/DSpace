@@ -32,6 +32,35 @@
 
     <xsl:output indent="yes"/>
 
+    <!-- enable Discovery facets only on certain pages -->
+    <xsl:template match="dri:options/dri:list[@id='aspect.discovery.Navigation.list.discovery']" priority="5">
+		<xsl:choose>
+		  <xsl:when test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request' and @qualifier='URI'] = 'discover'">
+			<head>
+				<xsl:call-template name="copy-attributes"/>
+				<xsl:attribute name="rend">
+					<xsl:value-of select="@rend"/>
+					<xsl:text> h5</xsl:text>
+				</xsl:attribute>
+				<xsl:apply-templates/>
+			</head>
+		  </xsl:when>
+		  <xsl:when test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='focus' and @qualifier='containerType'] = 'type:item'">
+			<head>
+				<xsl:call-template name="copy-attributes"/>
+				<xsl:attribute name="rend">
+					<xsl:value-of select="@rend"/>
+					<xsl:text> h5</xsl:text>
+				</xsl:attribute>
+				<xsl:apply-templates/>
+			</head>
+		  </xsl:when>
+		  <xsl:otherwise>
+			<!-- if we do nothing here, the facet list will be eaten, yum, tasty facets, BY DEFAULT, SHOW NO FACETS! -->
+		  </xsl:otherwise>
+		</xsl:choose> 
+    </xsl:template>
+
     <xsl:template match="dri:options/dri:list/dri:head">
         <head>
             <xsl:call-template name="copy-attributes"/>
@@ -43,6 +72,8 @@
         </head>
     </xsl:template>
 
+
+	
     <xsl:template match="dri:options/dri:list/dri:list/dri:head">
         <head>
             <xsl:call-template name="copy-attributes"/>
