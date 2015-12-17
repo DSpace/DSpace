@@ -60,7 +60,12 @@ public class DiscoJuiceFeeds extends AbstractGenerator {
     private static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
     static{
-        executor.scheduleWithFixedDelay(DiscoJuiceFeeds::update,0,
+        executor.scheduleWithFixedDelay(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                DiscoJuiceFeeds.update();
+                                            }
+                                        }, 0,
                 ConfigurationManager.getLongProperty("discojuice", "refresh"), TimeUnit.HOURS);
     }
 
@@ -96,6 +101,7 @@ public class DiscoJuiceFeeds extends AbstractGenerator {
     }
 
     public static void update(){
+        log.info("DiscoJuiceFeeds::update called");
         lock.writeLock().lock();
         try{
            feedsContent = createFeedsContent();
@@ -151,63 +157,69 @@ public class DiscoJuiceFeeds extends AbstractGenerator {
         String shibbolethDiscoFeedUrl = ConfigurationManager.getProperty("lr","lr.shibboleth.discofeed.url");
         return createFeedsContent(feedsConfig, shibbolethDiscoFeedUrl);
     }
+
+    private static Map<String, JSONObject> toMap(JSONArray jsonArray){
+        Map<String, JSONObject> map = new HashMap<>();
+        for(Object entityO : jsonArray){
+            JSONObject entity = (JSONObject) entityO;
+            String entityID = (String) entity.get("entityID");
+            if(!map.containsKey(entityID)){
+                map.put(entityID, entity);
+            }
+        }
+        return map;
+    }
+
     public static String createFeedsContent(String feedsConfig, String shibbolethDiscoFeedUrl){
         String old_value = System.getProperty("jsse.enableSNIExtension");
         System.setProperty("jsse.enableSNIExtension", "false");
 
         //Obtain shibboleths discofeed
-        final Map<String,JSONObject> shibDiscoEntities = DiscoJuiceFeeds.downloadJSON(shibbolethDiscoFeedUrl)
-                .collect(Collectors.toMap(entity -> (String)entity.get("entityID"), Function.identity(),
-                        (oldValue,newValue) -> {
-                            /* System.err.println(String.format("Duplicite entry %s. Keeping first appearance", oldValue.get("entityID")));*/
-                            //We have a lot of duplicites, so just keep the first
-                            return oldValue;
-                        }
-                ));
+        final Map<String,JSONObject> shibDiscoEntities = toMap(DiscoJuiceFeeds.downloadJSON(shibbolethDiscoFeedUrl));
 
         //true is the default http://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/JSSERefGuide.html
         old_value = (old_value == null) ? "true" : old_value;
         System.setProperty("jsse.enableSNIExtension", old_value);
 
-        Map<String, JSONObject> discoEntities = Arrays.asList(feedsConfig.split(",")).parallelStream()
-                .flatMap(feed -> DiscoJuiceFeeds.downloadJSON(discojuiceURL + feed.trim()))
-                .filter((JSONObject entity) -> {
-                    String entityID = (String)entity.get("entityID");
-                    return shibDiscoEntities.containsKey(entityID);
-                })
-                .map(entity -> {
-                    String entityID = (String)entity.get("entityID");
+        Set<String> processedEntities = new HashSet<>();
+        for(String feed : feedsConfig.split(",")){
+            Map<String, JSONObject> feedMap = toMap(DiscoJuiceFeeds.downloadJSON(discojuiceURL + feed.trim()));
+            for (Map.Entry<String, JSONObject> entry: feedMap.entrySet()){
+                String entityID = entry.getKey();
+                JSONObject cdnEntity = entry.getValue();
+                //keep only entities from shibboleth, add only once, but copy geo, icon, country
+                if(shibDiscoEntities.containsKey(entityID) && !processedEntities.contains(entityID)){
+                    JSONObject geo = (JSONObject) cdnEntity.get("geo");
+                    String icon = (String) cdnEntity.get("icon");
+                    String country = (String) cdnEntity.get("country");
+                    JSONObject shibEntity = shibDiscoEntities.get(entityID);
+                    if(geo != null){
+                            shibEntity.put("geo", geo);
+                    }
+                    if(icon != null){
+                            shibEntity.put("icon", icon);
+                    }
+                    if(country != null){
+                            shibEntity.put("country", country);
+                    }
+                    //rewrite countries
                     if(rewriteCountries.contains(entityID)){
-                        String old_country = (String)entity.remove("country");
-                        String new_country = guessCountry(shibDiscoEntities.get(entityID));
-                        entity.put("country", new_country);
+                        String old_country = (String)shibEntity.remove("country");
+                        String new_country = guessCountry(shibEntity);
+                        shibEntity.put("country", new_country);
                         log.info(String.format("For %s changed country from %s to %s", entityID, old_country, new_country));
                     }
-                    return entity;
-                })
-                //again ignore dupes and just use first
-                .collect(Collectors.toMap(entity -> (String)entity.get("entityID"), Function.identity(), (oldValue, newValue) -> oldValue));
-
-        Map<String, JSONObject> onlyInShib = shibDiscoEntities.entrySet().stream()
-                .filter(entry -> discoEntities.containsKey(entry.getKey())) //filter by entityID
-                .map(entry -> {
-                    entry.getValue().put("country", guessCountry(entry.getValue()));
-                    return entry;
-                })
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-        discoEntities.putAll(onlyInShib);
-        String fromShib = onlyInShib.keySet().stream().collect(Collectors.joining("\n"));
-
-        //log shibboleth only entries
-        if(fromShib != null && fromShib.length()>0){
-            log.info("The following entities were added from shibboleth disco feed.\n" + fromShib.toString());
+                    processedEntities.add(entityID);
+                }
+            }
         }
+        JSONArray ret = new JSONArray();
+        ret.addAll(shibDiscoEntities.values());
 
-        return discoEntities.values().stream().collect(Collectors.toCollection(JSONArray::new)).toJSONString();
+        return ret.toJSONString();
     }
 
-    private static Stream<JSONObject> downloadJSON(String url){
+    private static JSONArray downloadJSON(String url){
         JSONParser parser = new JSONParser();
         try {
             URLConnection conn = new URL(url).openConnection();
@@ -215,14 +227,11 @@ public class DiscoJuiceFeeds extends AbstractGenerator {
             conn.setReadTimeout(10000);
             //Caution does not follow redirects, and even if you set it to http->https is not possible
             Object obj = parser.parse(new InputStreamReader(conn.getInputStream()));
-            JSONArray entityArray = (JSONArray) obj;
-            Iterator<JSONObject> iterator = entityArray.iterator();
-            Iterable<JSONObject> iterable = () -> iterator;
-            return StreamSupport.stream(iterable.spliterator(),false);
+            return (JSONArray) obj;
         }catch (IOException|ParseException e){
             log.error("Failed to obtain/parse "+ url + "\nCheck timeouts, redirects, shibboleth config.\n" + e);
         }
-        return Stream.empty();
+        return new JSONArray();
     }
 
     private static String guessCountry(JSONObject entity){
