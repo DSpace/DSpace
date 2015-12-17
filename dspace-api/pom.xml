@@ -302,6 +302,7 @@
                                 <additionalClasspathElement>${root.basedir}/lr-b2safe-dspace/repo/B2SAFE-repository-package/b2safe_rp_pilot/1.0.5/b2safe_rp_pilot-1.0.5.jar</additionalClasspathElement>
                                 <additionalClasspathElement>${root.basedir}/lr-b2safe-dspace/target/b2safe-dspace-${project.version}.jar</additionalClasspathElement>
                                 <additionalClasspathElement>${root.basedir}/dspace-oai/target/dspace-oai-${project.version}-classes.jar</additionalClasspathElement>
+                                <additionalClasspathElement>${root.basedir}/dspace-oai/target/dspace-oai-${project.version}/WEB-INF/lib/xoai-3.2.10.jar</additionalClasspathElement>
                             </additionalClasspathElements>
                         </configuration>
                     </plugin>
