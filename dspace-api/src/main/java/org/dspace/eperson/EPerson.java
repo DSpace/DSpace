@@ -409,4 +409,9 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport
         }
         return ePersonService;
     }
+
+    public String toString() {
+        return Constants.typeText[getType()] + "." + getNetid();
+    }
+
 }

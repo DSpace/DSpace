@@ -195,6 +195,36 @@ public class MetadataField {
         }
     }
 
+
+    public static String[] fromString(String str) {
+
+        String[] bits = str.split("\\.");
+        String schema = bits[0];
+        String element = bits[1];
+        // If there is a language on the element, strip if off
+        if (element.contains("["))
+        {
+            element = element.substring(0, element.indexOf('['));
+        }
+        String qualifier = null;
+        if (bits.length > 2)
+        {
+            qualifier = bits[2];
+
+            // If there is a language, strip if off
+            if (qualifier.contains("["))
+            {
+                qualifier = qualifier.substring(0, qualifier.indexOf('['));
+            }
+        }
+
+        String[] parsed = new String[3];
+        parsed[0] = bits[0];
+        parsed[1] = element;
+        parsed[2] = qualifier;
+        return parsed;
+    }
+
     @Override
     public String toString() {
         return toString('_');

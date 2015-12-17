@@ -1,6 +1,28 @@
 <?xml version="1.0"?>
 <commands>
     <command>
+        <name>bulk-list</name>
+        <description>Bulk List DSpaceObjects</description>
+        <step>
+            <class>org.dspace.app.bulkdo.Lister</class>
+        </step>
+    </command>
+    <command>
+        <name>bulk-meta-data</name>
+        <description>Bulk Replace a MetaData Value in Items</description>
+        <step>
+            <class>org.dspace.app.bulkdo.MetaData</class>
+        </step>
+    </command>
+    <command>
+        <name>bulk-pols</name>
+        <description>Bulk Add or Delete a Policy on a DSpaceObject</description>
+        <step>
+            <class>org.dspace.app.bulkdo.Policies</class>
+        </step>
+    </command>
+
+    <command>
         <name>checker</name>
         <description>Run the checksum checker</description>
         <step>

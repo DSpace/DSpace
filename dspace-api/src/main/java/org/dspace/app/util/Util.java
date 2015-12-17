@@ -546,4 +546,8 @@ public class Util {
 
         return toReturn;
     }
+
+    public static String toString(Object obj, String nullStr) {
+        return (obj == null) ? nullStr : obj.toString();
+    }
 }
