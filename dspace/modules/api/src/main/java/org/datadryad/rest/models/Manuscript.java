@@ -18,6 +18,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
@@ -28,6 +29,7 @@ import org.dspace.identifier.DOIIdentifierProvider;
  * @author1 Dan Leehr <dan.leehr@nescent.org>
  */
 @XmlRootElement
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Manuscript {
     public static final String MANUSCRIPT_ID = "manuscriptId";
 
