@@ -40,7 +40,7 @@
 				<xsl:call-template name="copy-attributes"/>
 				<xsl:attribute name="rend">
 					<xsl:value-of select="@rend"/>
-					<xsl:text> h5</xsl:text>
+					<xsl:text> h6</xsl:text>
 				</xsl:attribute>
 				<xsl:apply-templates/>
 			</head>
@@ -50,7 +50,7 @@
 				<xsl:call-template name="copy-attributes"/>
 				<xsl:attribute name="rend">
 					<xsl:value-of select="@rend"/>
-					<xsl:text> h5</xsl:text>
+					<xsl:text> h6</xsl:text>
 				</xsl:attribute>
 				<xsl:apply-templates/>
 			</head>
@@ -72,7 +72,7 @@
         </head>
     </xsl:template>
 
-
+<!--
 	
     <xsl:template match="dri:options/dri:list/dri:list/dri:head">
         <head>
@@ -85,6 +85,6 @@
         </head>
     </xsl:template>
 
-
+-->
 
 </xsl:stylesheet>
