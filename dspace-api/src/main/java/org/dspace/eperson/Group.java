@@ -230,4 +230,9 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport
         }
         return groupService;
     }
+
+    public String toString() {
+        return Constants.typeText[getType()] + "." + getName();
+    }
+
 }

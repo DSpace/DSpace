@@ -287,4 +287,16 @@ public class ResourcePolicy{
     public void setRpDescription(String description){
         this.rpdescription = description;
     }
+
+    @Override
+    public String toString() {
+        String who = "???";
+        if (getEPerson() != null) {
+            who = getEPerson().toString();
+        } else if (getGroup() != null) {
+            who = getGroup().toString();
+        }
+        return "POLICY" + "(" + who + ")";
+    }
 }
+
