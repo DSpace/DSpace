@@ -14,13 +14,13 @@ import javax.xml.bind.annotation.XmlRootElement;
  * Mainly to know your authentication status
  *
  */
-@XmlRootElement(name = "repository")
-public class HierarchyRepository extends HierarchyCommunity
+@XmlRootElement(name = "site")
+public class HierarchySite extends HierarchyCommunity
 {
-    public HierarchyRepository(){
+    public HierarchySite(){
     }
     
-    public HierarchyRepository(String id, String name, String handle){
+    public HierarchySite(String id, String name, String handle){
     	super(id, name, handle);
     }
 }

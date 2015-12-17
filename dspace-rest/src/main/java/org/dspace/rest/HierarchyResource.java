@@ -20,7 +20,7 @@ import org.dspace.content.service.SiteService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.rest.common.HierarchyCollection;
 import org.dspace.rest.common.HierarchyCommunity;
-import org.dspace.rest.common.HierarchyRepository;
+import org.dspace.rest.common.HierarchySite;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -63,12 +63,12 @@ public class HierarchyResource extends Resource {
      */
 	@GET
     @Produces({MediaType.APPLICATION_XML})
-    public HierarchyRepository getHierarchy(
+    public HierarchySite getHierarchy(
     		@QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
     		@Context HttpHeaders headers, @Context HttpServletRequest request) throws UnsupportedEncodingException, WebApplicationException {
 		
 		org.dspace.core.Context context = null;
-		HierarchyRepository repo = new HierarchyRepository();
+		HierarchySite repo = new HierarchySite();
 		
         try {
             context = createContext(getUser(headers));
