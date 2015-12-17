@@ -7,22 +7,35 @@
  */
 package org.dspace.rest;
 
+import java.net.CookieHandler;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.rest.exceptions.ContextException;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageEvent;
+import org.dspace.utils.DSpace;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Superclass of all resource classes in REST API. It has methods for creating
@@ -64,14 +77,18 @@ public class Resource
      *             log in. Can be caused by AuthorizeException if there was a
      *             problem authorizing the found user.
      */
-    protected static org.dspace.core.Context createContext(EPerson person) throws ContextException
-    {
+    protected static org.dspace.core.Context createContext() throws ContextException, SQLException {
         org.dspace.core.Context context = new org.dspace.core.Context();
         //context.getDBConnection().setAutoCommit(false); // Disable autocommit.
 
-        if (person != null)
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication != null)
         {
-            context.setCurrentUser(person);
+            Collection<SimpleGrantedAuthority> specialGroups = (Collection<SimpleGrantedAuthority>) authentication.getAuthorities();
+            for (SimpleGrantedAuthority grantedAuthority : specialGroups) {
+                context.setSpecialGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, grantedAuthority.getAuthority()).getID());
+            }
+            context.setCurrentUser(EPersonServiceFactory.getInstance().getEPersonService().findByEmail(context, authentication.getName()));
         }
 
         return context;
@@ -218,36 +235,4 @@ public class Resource
         return actionStr;
     }
 
-    /**
-     * Return EPerson based on stored token in headers under
-     * "rest-dspace-token".
-     * 
-     * @param headers
-     *            Only must have "rest-api-token" for successfull return of
-     *            user.
-     * @return Return EPerson logged under token in headers. If token was wrong
-     *         or header rest-dspace-token was missing, returns null.
-     */
-    protected static EPerson getUser(HttpHeaders headers)
-    {
-        List<String> list = headers.getRequestHeader(TokenHolder.TOKEN_HEADER);
-        String token = null;
-        if ((list != null) && (list.size() > 0))
-        {
-            token = list.get(0);
-            return TokenHolder.getEPerson(token);
-        }
-        return null;
-    }
-
-    protected static String getToken(HttpHeaders headers) {
-        List<String> list = headers.getRequestHeader(TokenHolder.TOKEN_HEADER);
-        String token = null;
-        if ((list != null) && (list.size() > 0))
-        {
-            token = list.get(0);
-            return token;
-        }
-        return null;
-    }
 }

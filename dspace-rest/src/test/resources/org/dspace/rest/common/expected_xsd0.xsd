@@ -17,8 +17,6 @@
 
   <xs:element name="status" type="status"/>
 
-  <xs:element name="user" type="user"/>
-
   <xs:complexType name="bitstream">
     <xs:complexContent>
       <xs:extension base="dSpaceObject">
@@ -142,7 +140,6 @@
       <xs:element name="fullname" type="xs:string" minOccurs="0"/>
       <xs:element name="okay" type="xs:boolean"/>
       <xs:element name="sourceVersion" type="xs:string" minOccurs="0"/>
-      <xs:element name="token" type="xs:string" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
 
