@@ -146,4 +146,12 @@ dt, td.label-cell, .detailtable .label-cell {
 	text-align: center;
 }
 
+// fix styling for facets, too
+h3.ds-head, h3.ds-option-set-head {
+	text-align: center;
+	text-transform: uppercase;
+}
 
+h4.ds-head {
+	padding-top: 1em;
+}
