@@ -32,10 +32,13 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
     static final String COLUMN_ID = "organization_id";
     static final String COLUMN_CODE = "code";
     static final String COLUMN_NAME = "name";
+    static final String COLUMN_ISSN = "issn";
     static final List<String> ORGANIZATION_COLUMNS = Arrays.asList(
             COLUMN_ID,
             COLUMN_CODE,
-            COLUMN_NAME);
+            COLUMN_NAME,
+            COLUMN_ISSN
+    );
 
     public OrganizationDatabaseStorageImpl(String configFileName) {
         setConfigFile(configFileName);
@@ -85,6 +88,10 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
             organization.organizationId = row.getIntColumn(COLUMN_ID);
             organization.organizationCode = row.getStringColumn(COLUMN_CODE);
             organization.organizationName = row.getStringColumn(COLUMN_NAME);
+            organization.organizationISSN = row.getStringColumn(COLUMN_ISSN);
+            if (organization.organizationISSN == null) {
+                organization.organizationISSN = "";
+            }
             return organization;
         } else {
             return null;
@@ -92,10 +99,14 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
     }
 
     static TableRow tableRowFromOrganization(Organization organization) {
-        if(organization != null) {
+        if (organization != null) {
             TableRow row = new TableRow(ORGANIZATION_TABLE, ORGANIZATION_COLUMNS);
+            if (organization.organizationId != null) {
+                row.setColumn(COLUMN_ID, organization.organizationId);
+            }
             row.setColumn(COLUMN_CODE, organization.organizationCode);
             row.setColumn(COLUMN_NAME, organization.organizationName);
+            row.setColumn(COLUMN_ISSN, organization.organizationISSN);
             return row;
         } else {
             return null;
@@ -103,45 +114,20 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
     }
 
     public static Organization getOrganizationByCode(Context context, String code) throws SQLException {
-        String query = "SELECT * FROM ORGANIZATION WHERE UPPER(code) = UPPER(?)";
+        String query = "SELECT * FROM " + ORGANIZATION_TABLE + " WHERE UPPER(code) = UPPER(?)";
         TableRow row = DatabaseManager.querySingleTable(context, ORGANIZATION_TABLE, query, code);
         return organizationFromTableRow(row);
     }
 
     private static List<Organization> getOrganizations(Context context) throws SQLException {
         List<Organization> organizations = new ArrayList<Organization>();
-        String query = "SELECT * FROM organization";
+        String query = "SELECT * FROM " + ORGANIZATION_TABLE;
         TableRowIterator rows = DatabaseManager.queryTable(context, ORGANIZATION_TABLE, query);
         while(rows.hasNext()) {
             TableRow row = rows.next();
             organizations.add(organizationFromTableRow(row));
         }
         return organizations;
-    }
-
-    private static void insertOrganization(Context context, Organization organization) throws SQLException {
-        TableRow row = tableRowFromOrganization(organization);
-        if(row != null) {
-            DatabaseManager.insert(context, row);
-        }
-    }
-
-    private static void updateOrganization(Context context, Organization organization) throws SQLException {
-        Organization originalOrganization = getOrganizationByCode(context, organization.organizationCode);
-        TableRow row = tableRowFromOrganization(organization);
-        row.setColumn(COLUMN_ID, originalOrganization.organizationId);
-        if(row != null) {
-            DatabaseManager.update(context, row);
-        }
-    }
-
-    private static void deleteOrganization(Context context, Organization organization) throws SQLException {
-        if(organization.organizationId == null) {
-            throw new SQLException("NULL Column ID");
-        }
-        TableRow row = tableRowFromOrganization(organization);
-        row.setColumn(COLUMN_ID, organization.organizationId);
-        DatabaseManager.delete(context, row);
     }
 
     @Override
@@ -185,13 +171,7 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
 
     @Override
     protected void createObject(StoragePath path, Organization organization) throws StorageException {
-        try {
-            Context context = getContext();
-            insertOrganization(context, organization);
-            completeContext(context);
-        } catch (SQLException ex) {
-            throw new StorageException("Exception saving organization", ex);
-        }
+        throw new StorageException("can't create an organization");
     }
 
     @Override
@@ -209,30 +189,12 @@ public class OrganizationDatabaseStorageImpl extends AbstractOrganizationStorage
 
     @Override
     protected void deleteObject(StoragePath path) throws StorageException {
-        String organizationCode = path.getOrganizationCode();
-
-        try {
-            Context context = getContext();
-            Organization organization = getOrganizationByCode(context, organizationCode);
-            if(organization == null) {
-                throw new StorageException("Organization does not exist");
-            }
-            deleteOrganization(context, organization);
-            completeContext(context);
-        } catch (SQLException ex) {
-            throw new StorageException("Exception deleting organization", ex);
-        }
+        throw new StorageException("can't delete an organization");
     }
 
     @Override
     protected void updateObject(StoragePath path, Organization organization) throws StorageException {
-        try {
-            Context context = getContext();
-            updateOrganization(context, organization);
-            completeContext(context);
-        } catch (SQLException ex) {
-            throw new StorageException("Exception saving organization", ex);
-        }
+        throw new StorageException("can't update an organization");
     }
 
 

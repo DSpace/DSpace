@@ -9,9 +9,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 
 /**
  *
@@ -26,8 +26,8 @@ public class JSONFormatProvider implements ContextResolver<ObjectMapper> {
         this.objectMapper = new ObjectMapper();
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         this.objectMapper
-            .configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            .configure(SerializationConfig.Feature.INDENT_OUTPUT, true)
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .configure(SerializationFeature.INDENT_OUTPUT, true)
             .setDateFormat(df);
     }
 

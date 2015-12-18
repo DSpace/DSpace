@@ -5,9 +5,9 @@ package org.datadryad.rest.handler;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.ObjectWriter;
-import org.codehaus.jackson.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import org.datadryad.rest.storage.StoragePath;
 
 /**
@@ -21,7 +21,7 @@ public class LoggingHandler<T> implements HandlerInterface<T>{
 
     public LoggingHandler() {
         ObjectMapper mapper = new ObjectMapper();
-        mapper.setSerializationConfig(mapper.getSerializationConfig().withDateFormat(new SimpleDateFormat("yyyy-MM-dd")));
+        mapper.setConfig(mapper.getSerializationConfig().with(new SimpleDateFormat("yyyy-MM-dd")));
         this.writer = mapper.writer(new DefaultPrettyPrinter());
     }
 

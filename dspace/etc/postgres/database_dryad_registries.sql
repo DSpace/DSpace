@@ -174,6 +174,7 @@ INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, elemen
 INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (138, 9, 'memberName', NULL, NULL);
 INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (139, 9, 'customerID', NULL, NULL);
 INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (140, 9, 'paymentPlanType', NULL, NULL);
+INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note) VALUES (141, 9, 'issn', NULL, NULL);
 
 UPDATE metadatafieldregistry SET element='canonicalManuscriptNumberPattern' WHERE metadata_field_id=136;
 

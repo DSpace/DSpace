@@ -2,7 +2,6 @@ package org.dspace;
 
 import org.apache.log4j.Logger;
 import org.apache.commons.lang.StringUtils;
-import org.datadryad.rest.converters.ManuscriptToLegacyXMLConverter;
 import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.models.Author;
 import org.datadryad.rest.models.Organization;
@@ -525,40 +524,9 @@ public class JournalUtils {
                 action == JournalUtils.RecommendedBlackoutAction.JOURNAL_NOT_INTEGRATED);
     }
 
-    public static void writeManuscriptToXMLFile(Context context, Manuscript manuscript) throws StorageException {
-        try {
-            log.debug ("looking for metadatadir for " + manuscript.organization.organizationCode);
-            Concept concept = JournalUtils.getJournalConceptByShortID(context, manuscript.organization.organizationCode);
-            if (concept != null) {
-                String filename = JournalUtils.escapeFilename(manuscript.manuscriptId + ".xml");
-                File file = new File(JournalUtils.getMetadataDir(concept), filename);
-                FileOutputStream outputStream = null;
-
-                try {
-                    outputStream = new FileOutputStream(file);
-                } catch (FileNotFoundException e) {
-                    log.warn("couldn't open a file to write", e);
-                }
-
-                if (outputStream != null) {
-                    try {
-                        ManuscriptToLegacyXMLConverter.convertToInternalXML(manuscript, outputStream);
-                        log.info("wrote xml to file " + file.getAbsolutePath());
-                    } catch (JAXBException e) {
-                        log.warn("couldn't convert to XML");
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            throw new StorageException(e);
-        }
-    }
-
     public static void writeManuscriptToDB(Context context, Manuscript manuscript) throws StorageException {
         String journalCode = cleanJournalCode(manuscript.organization.organizationCode).toUpperCase();
         StoragePath storagePath = StoragePath.createManuscriptPath(journalCode, manuscript.manuscriptId);
-
-        createOrganizationinDB(context, manuscript.organization);
 
         ManuscriptDatabaseStorageImpl manuscriptStorage = new ManuscriptDatabaseStorageImpl();
         List<Manuscript> manuscripts = getManuscriptsMatchingID(journalCode, manuscript.manuscriptId);
@@ -574,24 +542,6 @@ public class JournalUtils {
                 manuscriptStorage.update(storagePath, manuscript);
             } catch (StorageException ex) {
                 log.error("Exception updating manuscript", ex);
-            }
-        }
-    }
-
-    public static void createOrganizationinDB(Context context, Organization organization) throws StorageException {
-        // normalize with all caps for the code:
-        organization.organizationCode = cleanJournalCode(organization.organizationCode).toUpperCase();
-        StoragePath storagePath = StoragePath.createOrganizationPath(organization.organizationCode);
-
-        // check to see if this organization exists in the database: if not, add it.
-        OrganizationDatabaseStorageImpl organizationStorage = new OrganizationDatabaseStorageImpl();
-        List<Organization> orgs = organizationStorage.getResults(storagePath, organization.organizationCode, 0);
-        if (orgs.size() == 0) {
-            try {
-                log.info("creating an organization " + organization.organizationCode);
-                organizationStorage.create(storagePath, organization);
-            } catch (StorageException ex) {
-                log.error("Exception creating organizations", ex);
             }
         }
     }

@@ -2,6 +2,8 @@
  */
 package org.datadryad.rest.models;
 
+import java.lang.Exception;
+import java.lang.Override;
 import java.lang.String;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -14,8 +16,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.identifier.DOIIdentifierProvider;
@@ -25,6 +29,7 @@ import org.dspace.identifier.DOIIdentifierProvider;
  * @author1 Dan Leehr <dan.leehr@nescent.org>
  */
 @XmlRootElement
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Manuscript {
     public static final String MANUSCRIPT_ID = "manuscriptId";
 
@@ -222,6 +227,16 @@ public class Manuscript {
             return "doi:" + manuscriptMatcher.group(0);
         } else {
             return null;
+        }
+    }
+
+    @Override
+    public String toString() {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.writeValueAsString(this);
+        } catch (Exception e) {
+            return "";
         }
     }
 

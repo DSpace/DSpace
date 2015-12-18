@@ -15,6 +15,12 @@ public class Author {
     public String identifier;
     public String identifierType;
     public Author() {}
+
+    public Author(String familyName, String givenNames) {
+        this.familyName = familyName;
+        this.givenNames = givenNames;
+    }
+
     public final String fullName() {
         String name = familyName;
         if (givenNames != null) {
