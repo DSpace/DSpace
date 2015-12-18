@@ -130,8 +130,6 @@ public class DryadEmailSubmission extends HttpServlet {
             processMimeMessage(mime);
             toBrowser.close();
         } catch (Exception details) {
-            sendEmailIfConfigured(details);
-
             if (details instanceof SubmissionException) {
                 throw (SubmissionException) details;
             } else {
@@ -226,51 +224,6 @@ public class DryadEmailSubmission extends HttpServlet {
         // schedule email harvesting to happen once an hour
         int timerInterval = Integer.parseInt(ConfigurationManager.getProperty("submit.journal.email.timer"));
         myEmailHarvester.schedule(new DryadEmailSubmissionHarvester(), 0, 1000 * timerInterval);
-    }
-
-    /**
-     * If we're running within DSpace (and not the Maven/Jetty test instance),
-     * we can send email through there using their template system.
-     *
-     * @param aException An exception that was thrown in the process of
-     *                   receiving a journal submission
-     * @throws SubmissionException
-     * @throws IOException
-     */
-    private void sendEmailIfConfigured(Exception aException)
-            throws SubmissionException {
-        try {
-            if (ConfigurationManager.isConfigured()) {
-                String exceptionMessage = aException.toString();
-                StringBuilder message = new StringBuilder(exceptionMessage);
-                String admin = ConfigurationManager.getProperty("mail.admin");
-                String logDir = ConfigurationManager.getProperty("log.dir");
-                Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(Locale.getDefault(), EMAIL_TEMPLATE));
-
-                if (logDir == null || admin == null) {
-                    throw new SubmissionException(
-                            "DSpace mail is not properly configured");
-                }
-
-                for (StackTraceElement trace : aException.getStackTrace()) {
-                    message.append(System.getProperty("line.separator"));
-                    message.append("at ").append(trace.getClass()).append("(");
-                    message.append(trace.getFileName()).append(":");
-                    message.append(trace.getLineNumber()).append(")");
-                }
-
-                email.addRecipient(admin);
-                email.addArgument(message);
-                email.addArgument(logDir + "/journal-submit.log");
-                email.send();
-            }
-        } catch (Exception details) {
-            if (details instanceof SubmissionException) {
-                throw (SubmissionException) details;
-            } else {
-                throw new SubmissionException(details);
-            }
-        }
     }
 
     private void processMimeMessage (MimeMessage mime) throws Exception {
