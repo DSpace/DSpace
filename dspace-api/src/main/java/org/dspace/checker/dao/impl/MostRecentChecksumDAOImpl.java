@@ -78,7 +78,7 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
         Criteria criteria = createCriteria(context, MostRecentChecksum.class);
         criteria.add(
                 Restrictions.and(
-                        Restrictions.eq("result.resultCode", resultCode),
+                        Restrictions.eq("checksumResult.resultCode", resultCode),
                         Restrictions.le("processStartDate", startDate),
                         Restrictions.gt("processStartDate", endDate)
                 )
