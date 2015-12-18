@@ -3,7 +3,7 @@
 package org.datadryad.rest.models;
 
 import javax.xml.bind.annotation.XmlRootElement;
-import org.codehaus.jackson.annotate.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.lang.Object;
 import java.lang.Override;
@@ -13,13 +13,14 @@ import java.lang.Override;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 @XmlRootElement
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Organization {
     public static final String ORGANIZATION_CODE = "organizationCode";
     public Integer organizationId;
     public String organizationCode = "";
     public String organizationName = "";
     public String organizationISSN = "";
-    @JsonIgnore
+
     public Boolean isValid() {
         return (organizationCode != null && organizationCode.length() > 0);
     }

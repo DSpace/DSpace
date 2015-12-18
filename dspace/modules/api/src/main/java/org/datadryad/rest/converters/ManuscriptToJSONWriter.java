@@ -5,9 +5,9 @@ package org.datadryad.rest.converters;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.ObjectWriter;
-import org.codehaus.jackson.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import org.datadryad.rest.models.Manuscript;
 
 /**
@@ -24,7 +24,7 @@ public class ManuscriptToJSONWriter {
 
     static void writeJSON(Manuscript manuscript, OutputStream outputStream) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        mapper.setSerializationConfig(mapper.getSerializationConfig().withDateFormat(new SimpleDateFormat("yyyy-MM-dd")));
+        mapper.setConfig(mapper.getSerializationConfig().with(new SimpleDateFormat("yyyy-MM-dd")));
         ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter());
         writer.writeValue(outputStream, manuscript);
     }
