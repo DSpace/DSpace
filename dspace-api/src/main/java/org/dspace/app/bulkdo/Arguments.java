@@ -30,9 +30,6 @@ class Arguments {
     public static String ACTION = "a";
     public static String ACTION_LONG = "action";
 
-    public static String BITSTREAM_FILE = "b";
-    public static String BITSTREAM_FILE_LONG = "bitstream";
-
     public static String DSPACE_ACTION = "d";
     public static String DSPACE_ACTION_LONG = "dspace_action";
 
@@ -226,8 +223,10 @@ class Arguments {
 
     protected void optionExplainKeys() {
         System.out.println("\tAvailable Keys depend on the type of object being printed");
+        System.out.println("\t\t" + Constants.typeText[Constants.COMMUNITY] + ":" + deepToString(ActionTarget.availableKeys(Constants.COMMUNITY)));
         System.out.println("\t\t" + Constants.typeText[Constants.COLLECTION] + ":" + deepToString(ActionTarget.availableKeys(Constants.COLLECTION)));
-        System.out.println("\t\t" + Constants.typeText[Constants.ITEM] + ":" + deepToString(ActionTarget.availableKeys(Constants.ITEM)) + "any metadafield, POLICY.dspace_action");
+        System.out.println("\t\t" + Constants.typeText[Constants.ITEM] + ":" + deepToString(ActionTarget.availableKeys(Constants.ITEM)) +
+                " any metadafield, POLICY.dspace_action");
         System.out.println("\t\t" + Constants.typeText[Constants.BUNDLE] + ":" + deepToString(ActionTarget.availableKeys(Constants.BUNDLE)));
         System.out.println("\t\t" + Constants.typeText[Constants.BITSTREAM] + ":" + deepToString(ActionTarget.availableKeys(Constants.BITSTREAM)));
         System.out.println("\t\t" + "where dspace_action may be one of:  " + deepToString(Constants.actionText));

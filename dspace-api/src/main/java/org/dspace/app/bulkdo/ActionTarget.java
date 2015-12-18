@@ -62,7 +62,7 @@ class ActionTarget {
             case Constants.COLLECTION:
                 return new CollectionActionTarget(context, container, obj);
             case Constants.COMMUNITY:
-                return new ActionTarget(context, container, obj);
+                return new CommunityActionTarget(context, container, obj);
             default:
                 assert (false);
                 throw new RuntimeException("should never try to create ActionTarget from " + obj);
@@ -113,6 +113,8 @@ class ActionTarget {
                 return (String[]) ArrayUtils.addAll(theAvailableKeys, ItemActionTarget.theAvailableKeys);
             case Constants.COLLECTION:
                 return (String[]) ArrayUtils.addAll(theAvailableKeys, CollectionActionTarget.theAvailableKeys);
+            case Constants.COMMUNITY:
+                return (String[]) ArrayUtils.addAll(theAvailableKeys, CommunityActionTarget.theAvailableKeys);
             default:
                 assert (false);
                 return null;
@@ -162,7 +164,6 @@ class ActionTarget {
         }
         return null;
     }
-
 
     public Object get(String key) {
         toHashMap();
@@ -216,6 +217,27 @@ class ActionTarget {
             return true;
         }
         return false;
+    }
+}
+
+class CommunityActionTarget extends ActionTarget {
+    Community com;
+
+    static String[] theAvailableKeys = {"name", "handle"};
+
+    CommunityActionTarget(Context context, ActionTarget up, DSpaceObject o) {
+        super(context, up, o);
+        com = (Community) o;
+    }
+
+    @Override
+    protected boolean toHashMap() {
+        boolean create = super.toHashMap();
+        if (create) {
+            put("name", com.getName());
+            put("handle", getObject().getHandle());
+        }
+        return create;
     }
 }
 
