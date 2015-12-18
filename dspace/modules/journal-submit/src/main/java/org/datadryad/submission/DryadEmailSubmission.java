@@ -285,13 +285,13 @@ public class DryadEmailSubmission extends HttpServlet {
                 continue;
             }
 
-            Matcher journalCodeMatcher = Pattern.compile("^\\s*>*\\s*(Journal Code):\\s*(.+)").matcher(line);
+            Matcher journalCodeMatcher = Pattern.compile("^\\s*>*\\s*(Journal Code):\\s*(.+)", Pattern.CASE_INSENSITIVE).matcher(line);
             if (journalCodeMatcher.find()) {
                 journalCode = JournalUtils.cleanJournalCode(journalCodeMatcher.group(2));
                 dryadContentStarted = true;
             }
 
-            Matcher journalNameMatcher = Pattern.compile("^\\s*>*\\s*(JOURNAL|Journal Name):\\s*(.+)").matcher(line);
+            Matcher journalNameMatcher = Pattern.compile("^\\s*>*\\s*(JOURNAL|Journal Name):\\s*(.+)", Pattern.CASE_INSENSITIVE).matcher(line);
             if (journalNameMatcher.find()) {
                 journalName = journalNameMatcher.group(2);
                 journalName = StringUtils.stripToEmpty(journalName);
