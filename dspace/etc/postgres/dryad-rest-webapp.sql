@@ -65,7 +65,7 @@ DROP TABLE if EXISTS organization;
 ALTER TABLE manuscript DROP CONSTRAINT if EXISTS manuscript_organization_id_fkey;
 
 CREATE VIEW organization AS
-SELECT journal_code_view.organization_id, code, fullname, issn
+SELECT journal_code_view.organization_id, code, name, issn
 from journal_code_view
   inner join journal_name_view on journal_name_view.organization_id = journal_code_view.organization_id
   left join journal_issn_view on journal_issn_view.organization_id = journal_code_view.organization_id
