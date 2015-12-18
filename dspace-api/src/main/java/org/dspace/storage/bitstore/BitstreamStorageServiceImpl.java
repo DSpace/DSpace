@@ -188,7 +188,17 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
 		return bitstreamId;
 	}
 
-	@Override
+    @Override
+    public Map computeChecksum(Context context, Bitstream bitstream) throws IOException {
+        Map wantedMetadata = new HashMap();
+        wantedMetadata.put("checksum", null);
+        wantedMetadata.put("checksum_algorithm", null);
+
+        Map receivedMetadata = stores.get(bitstream.getStoreNumber()).about(bitstream, wantedMetadata);
+        return receivedMetadata;
+    }
+
+    @Override
     public boolean isRegisteredBitstream(String internalId) {
         return internalId.startsWith(REGISTERED_FLAG);
 	}

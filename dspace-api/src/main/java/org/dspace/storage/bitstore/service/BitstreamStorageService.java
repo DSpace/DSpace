@@ -14,6 +14,7 @@ import org.dspace.core.Context;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -102,6 +103,8 @@ public interface BitstreamStorageService {
    	 */
    	public UUID register(Context context, Bitstream bitstream, int assetstore, String bitstreamPath)
             throws SQLException, IOException, AuthorizeException;
+
+    public Map computeChecksum(Context context, Bitstream bitstream) throws IOException;
 
     /**
    	 * Does the internal_id column in the bitstream row indicate the bitstream

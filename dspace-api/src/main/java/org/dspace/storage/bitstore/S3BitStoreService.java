@@ -87,8 +87,6 @@ public class S3BitStoreService implements BitStoreService
             if(! s3Service.doesBucketExist(bucketName)) {
                 s3Service.createBucket(bucketName);
                 log.info("Creating new S3 Bucket: " + bucketName);
-            } else {
-                log.info("Using existing S3 Bucket: " + bucketName);
             }
         }
         catch (Exception e)
@@ -178,7 +176,7 @@ public class S3BitStoreService implements BitStoreService
             PutObjectResult putObjectResult = s3Service.putObject(putObjectRequest);
 
             bitstream.setSizeBytes(contentLength);
-            bitstream.setChecksum(putObjectResult.getContentMd5());
+            bitstream.setChecksum(putObjectResult.getETag());
             bitstream.setChecksumAlgorithm(CSA);
 
             scratchFile.delete();
@@ -195,6 +193,9 @@ public class S3BitStoreService implements BitStoreService
 
     /**
      * Obtain technical metadata about an asset in the asset store.
+     *
+     * Checksum used is (ETag) hex encoded 128-bit MD5 digest of an object's content as calculated by Amazon S3
+     * (Does not use getContentMD5, as that is 128-bit MD5 digest calculated on caller's side)
      *
      * @param bitstream
      *            The asset to describe
@@ -218,7 +219,7 @@ public class S3BitStoreService implements BitStoreService
                     attrs.put("size_bytes", objectMetadata.getContentLength());
                 }
                 if (attrs.containsKey("checksum")) {
-                    attrs.put("checksum", objectMetadata.getContentMD5());
+                    attrs.put("checksum", objectMetadata.getETag());
                     attrs.put("checksum_algorithm", CSA);
                 }
                 if (attrs.containsKey("modified")) {
