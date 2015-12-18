@@ -25,6 +25,7 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.datadryad.rest.storage.rdbms.OrganizationDatabaseStorageImpl;
+import java.text.SimpleDateFormat;
 
 /**
  *
@@ -33,9 +34,9 @@ import org.datadryad.rest.storage.rdbms.OrganizationDatabaseStorageImpl;
 public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
     private static Logger log = Logger.getLogger(ManuscriptDatabaseStorageImpl.class);
 
-    private static final ObjectMapper mapper = new ObjectMapper();
-    private static final ObjectWriter writer = mapper.writerWithType(Manuscript.class).withDefaultPrettyPrinter();
-    private static final ObjectReader reader = mapper.reader(Manuscript.class);
+    private static final ObjectMapper mapper;
+    private static final ObjectWriter writer;
+    private static final ObjectReader reader;
 
     // Database objects
     static final String MANUSCRIPT_TABLE = "manuscript";
@@ -61,24 +62,31 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             COLUMN_JSON_DATA,
             COLUMN_STATUS,
             COLUMN_DATE_ADDED
-            );
+    );
 
     private static final Integer NOT_FOUND = -1;
     static final String ACTIVE_TRUE = String.valueOf(true);
     static final String ACTIVE_FALSE = String.valueOf(false);
-    
+
+    static {
+        mapper = new ObjectMapper();
+        mapper.setConfig(mapper.getSerializationConfig().with(new SimpleDateFormat("yyyy-MM-dd")));
+        writer = mapper.writerWithType(Manuscript.class).withDefaultPrettyPrinter();
+        reader = mapper.reader(Manuscript.class);
+    }
+
     public ManuscriptDatabaseStorageImpl(String configFileName) {
         setConfigFile(configFileName);
     }
     public ManuscriptDatabaseStorageImpl() {
-        
+
     }
 
     public final void setConfigFile(String configFileName) {
         File configFile = new File(configFileName);
         if (configFile != null) {
-	    if (configFile.exists() && configFile.canRead() && configFile.isFile()) {
-		ConfigurationManager.loadConfig(configFile.getAbsolutePath());
+            if (configFile.exists() && configFile.canRead() && configFile.isFile()) {
+                ConfigurationManager.loadConfig(configFile.getAbsolutePath());
             }
         }
     }
