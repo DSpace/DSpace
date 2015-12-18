@@ -7,19 +7,19 @@
  */
 package org.dspace.app.xmlui.aspect.general;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.cocoon.ProcessingException;
+import org.apache.cocoon.ResourceNotFoundException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
-import org.apache.cocoon.environment.Response;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.util.HashUtil;
+import org.apache.commons.lang.reflect.FieldUtils;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -166,7 +166,7 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
     /** What to add at the end of the body */
     @Override
     public void addBody(Body body) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException, ProcessingException
+        UIException, SQLException, IOException, AuthorizeException, ProcessingException
     {
     	
         Request request = ObjectModelHelper.getRequest(objectModel);
@@ -192,7 +192,7 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
 		}
 	    }
 
-        if (this.bodyEmpty && !found)
+        if (!isRedirect() && this.bodyEmpty && !found)
         {
             Division notFound = body.addDivision("page-not-found","alert alert-error");
             
@@ -230,8 +230,19 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
             //throw new ResourceNotFoundException("Page cannot be found");
 
 			HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
-			httpResponse.setStatus(Response.SC_NOT_FOUND);
+			httpResponse.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
+    }
 
+    private boolean isRedirect() {
+        final HttpServletResponse response = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+        try
+        {
+            return ((int) FieldUtils.readField(response, "statusCode", true)) == HttpServletResponse.SC_TEMPORARY_REDIRECT;
+        }
+        catch (Exception e)
+        {
+            return false;
         }
     }
 

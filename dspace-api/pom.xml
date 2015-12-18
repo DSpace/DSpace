@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>5.4-SNAPSHOT</version>
+        <version>5.5-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -302,6 +302,7 @@
                                 <additionalClasspathElement>${root.basedir}/lr-b2safe-dspace/repo/B2SAFE-repository-package/b2safe_rp_pilot/1.0.5/b2safe_rp_pilot-1.0.5.jar</additionalClasspathElement>
                                 <additionalClasspathElement>${root.basedir}/lr-b2safe-dspace/target/b2safe-dspace-${project.version}.jar</additionalClasspathElement>
                                 <additionalClasspathElement>${root.basedir}/dspace-oai/target/dspace-oai-${project.version}-classes.jar</additionalClasspathElement>
+                                <additionalClasspathElement>${root.basedir}/dspace-oai/target/dspace-oai-${project.version}/WEB-INF/lib/xoai-3.2.10.jar</additionalClasspathElement>
                             </additionalClasspathElements>
                         </configuration>
                     </plugin>
@@ -632,12 +633,20 @@
             <artifactId>google-api-services-analytics</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.google.api-client</groupId>
+            <artifactId>google-api-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.http-client</groupId>
+            <artifactId>google-http-client</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.google.http-client</groupId>
             <artifactId>google-http-client-jackson2</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.oauth-client</groupId>
-            <artifactId>google-oauth-client-jetty</artifactId>
+            <artifactId>google-oauth-client</artifactId>
         </dependency>
         <!-- FindBugs -->
         <dependency>

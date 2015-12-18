@@ -67,7 +67,6 @@ public class Status
         return this.okay;
     }
 
-    @XmlElement(name="okay")
     public void setOkay(boolean okay)
     {
         this.okay = okay;
@@ -78,7 +77,6 @@ public class Status
         return authenticated;
     }
 
-    @XmlElement(name="authenticated")
     public void setAuthenticated(boolean authenticated) {
         this.authenticated = authenticated;
     }
@@ -88,7 +86,6 @@ public class Status
         return email;
     }
 
-    @XmlElement(name="email")
     public void setEmail(String email) {
         this.email = email;
     }
@@ -98,7 +95,6 @@ public class Status
         return fullname;
     }
 
-    @XmlElement(name="fullname")
     public void setFullname(String fullname) {
         this.fullname = fullname;
     }

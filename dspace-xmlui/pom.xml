@@ -11,7 +11,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-parent</artifactId>
-      <version>5.4-SNAPSHOT</version>
+      <version>5.5-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
 
@@ -263,11 +263,6 @@
               <groupId>com.google.http-client</groupId>
               <artifactId>google-http-client-jackson2</artifactId>
           </dependency>
-          <dependency>
-              <groupId>com.google.oauth-client</groupId>
-              <artifactId>google-oauth-client-jetty</artifactId>
-          </dependency>
-
     </dependencies>
 
 </project>

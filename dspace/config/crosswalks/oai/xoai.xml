@@ -33,7 +33,7 @@
 
 		<Context baseurl="openaire_data" name="OpenAIRE data Context">
 		  <!-- <Transformer ref="openaireDataTransformer"/> -->
-		  <Filter red="openaireFilter"/>
+		  <Filter ref="openaireFilter"/>
 		  <Set ref="openaireDataSet"/>
 		  <Format ref="oaidc"/>
 		  <Format ref="oai_datacite"/>

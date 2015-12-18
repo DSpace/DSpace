@@ -488,7 +488,7 @@
               <filter class="solr.StopFilterFactory" ignoreCase="true"
                       words="stopwords.txt"/>
               <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
-              ￼￼￼￼￼  </analyzer>
+          </analyzer>
       </fieldType>
 
     <fieldType name="componentFilter" class="solr.TextField" sortMissingLast="true" omitNorms="true">

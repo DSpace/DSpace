@@ -373,6 +373,7 @@ header {
 
 .pagination {
     width: 100%;
+    font-size: larger;
 }
 
 .pagination-info {
@@ -463,4 +464,10 @@ header {
     a {
         font-weight: bold;
     }
+}
+
+@media print {
+	a[href]:after {
+		content: none !important;
+	}
 }
