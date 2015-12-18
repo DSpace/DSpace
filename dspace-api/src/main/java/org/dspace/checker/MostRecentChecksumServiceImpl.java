@@ -111,8 +111,28 @@ public class MostRecentChecksumServiceImpl implements MostRecentChecksumService
         for (Bitstream bitstream : unknownBitstreams)
         {
             log.info(bitstream + " " + bitstream.getID().toString() + " " + bitstream.getName());
-            MostRecentChecksum mostRecentChecksum = mostRecentChecksumDAO.create(context, new MostRecentChecksum(bitstream));
 
+            MostRecentChecksum mostRecentChecksum = new MostRecentChecksum();
+            mostRecentChecksum.setBitstream(bitstream);
+            //Only process if our bitstream isn't deleted
+            mostRecentChecksum.setToBeProcessed(!bitstream.isDeleted());
+            if(bitstream.getChecksum() == null)
+            {
+                mostRecentChecksum.setCurrentChecksum("");
+                mostRecentChecksum.setExpectedChecksum("");
+            }else{
+                mostRecentChecksum.setCurrentChecksum(bitstream.getChecksum());
+                mostRecentChecksum.setExpectedChecksum(bitstream.getChecksum());
+            }
+            mostRecentChecksum.setProcessStartDate(new Date());
+            mostRecentChecksum.setProcessEndDate(new Date());
+            if(bitstream.getChecksumAlgorithm() == null)
+            {
+                mostRecentChecksum.setChecksumAlgorithm("MD5");
+            }else{
+                mostRecentChecksum.setChecksumAlgorithm(bitstream.getChecksumAlgorithm());
+            }
+            mostRecentChecksum.setMatchedPrevChecksum(true);
             ChecksumResult checksumResult;
             if(bitstream.isDeleted())
             {
@@ -121,6 +141,7 @@ public class MostRecentChecksumServiceImpl implements MostRecentChecksumService
                 checksumResult = checksumResultService.findByCode(context, ChecksumResultCode.CHECKSUM_MATCH);
             }
             mostRecentChecksum.setChecksumResult(checksumResult);
+            mostRecentChecksumDAO.create(context,  mostRecentChecksum);
             mostRecentChecksumDAO.save(context, mostRecentChecksum);
         }
     }
