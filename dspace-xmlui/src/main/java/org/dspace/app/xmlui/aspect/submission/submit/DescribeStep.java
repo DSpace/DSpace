@@ -48,6 +48,7 @@ import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.I18nUtil;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
@@ -99,26 +100,21 @@ public class DescribeStep extends AbstractSubmissionStep
     protected ChoiceAuthorityService choiceAuthorityService = ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
     protected MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
     /**
-     * Ensure that the inputs reader has been initialized, this method may be
-     * called multiple times with no ill-effect.
-     */
-    private static void initializeInputsReader() throws DCInputsReaderException
-    {
-        if (INPUTS_READER == null)
-        {
-            INPUTS_READER = new DCInputsReader();
-        }
-    }
-    
-    /**
      * Return the inputs reader. Note, the reader must have been
      * initialized before the reader can be accessed.
      *
      * @return The input reader.
      */
-    private static DCInputsReader getInputsReader()
+    protected DCInputsReader getInputsReader()
     {
-        return INPUTS_READER;
+        Locale locale = context.getCurrentLocale();
+        String input_forms = I18nUtil.getInputFormsFileName(locale);
+        try {
+            return new DCInputsReader(input_forms);
+        }catch (DCInputsReaderException e){
+            //fixme this will cause NPE down the road...
+            return null;
+        }
     }
     
 
@@ -129,16 +125,6 @@ public class DescribeStep extends AbstractSubmissionStep
         {
                 this.requireSubmission = true;
                 this.requireStep = true;
-                
-                // Ensure that the InputsReader is initialized.
-                try
-                {
-                    initializeInputsReader();
-                }
-                catch (DCInputsReaderException e)
-                {
-                    throw new ServletException(e);
-                }
         }
         
         public void addPageMeta(PageMeta pageMeta) throws SAXException, WingException,
