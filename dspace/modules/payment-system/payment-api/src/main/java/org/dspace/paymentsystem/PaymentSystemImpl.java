@@ -72,10 +72,6 @@ public class PaymentSystemImpl implements PaymentSystemService {
 
                         message("xmlui.PaymentSystem.shoppingcart.order.total");
 
-        protected static final Message T_noInteg=
-
-                        message("xmlui.PaymentSystem.shoppingcart.order.noIntegrateFee");
-
         protected static final Message T_Country=
 
                         message("xmlui.PaymentSystem.shoppingcart.order.country");
@@ -127,7 +123,6 @@ public class PaymentSystemImpl implements PaymentSystemService {
         newShoppingcart.setJournal(null);
         newShoppingcart.setJournalSub(false);
         newShoppingcart.setBasicFee(PaymentSystemConfigurationManager.getCurrencyProperty(currency));
-        newShoppingcart.setNoInteg(PaymentSystemConfigurationManager.getNotIntegratedJournalFeeProperty(currency));
         newShoppingcart.setSurcharge(PaymentSystemConfigurationManager.getSizeFileFeeProperty(currency));
         Double totalPrice =  calculateShoppingCartTotal(context, newShoppingcart, null);
         newShoppingcart.setTotal(totalPrice);
@@ -149,7 +144,6 @@ public class PaymentSystemImpl implements PaymentSystemService {
     public void setCurrency(ShoppingCart shoppingCart,String currency)throws SQLException{
         shoppingCart.setCurrency(currency);
         shoppingCart.setBasicFee(PaymentSystemConfigurationManager.getCurrencyProperty(currency));
-        shoppingCart.setNoInteg(PaymentSystemConfigurationManager.getNotIntegratedJournalFeeProperty(currency));
         shoppingCart.setSurcharge(PaymentSystemConfigurationManager.getSizeFileFeeProperty(currency));
         shoppingCart.update();
         shoppingCart.setModified(false);
@@ -232,22 +226,20 @@ public class PaymentSystemImpl implements PaymentSystemService {
 
     /**
      * Calculate the shopping cart total
-     * @param discount if true, basicFee and nonIntegratedFee are ignored
+     * @param discount if true, basicFee is ignored
      * @param fileSizeSurcharge surcharge to add for large files
      * @param basicFee basic submission fee
-     * @param nonIntegratedFee additional fee for non integrated jounrals
      * @return the shopping cart total, based on the input parameters
      */
     static double calculateTotal(boolean discount,
             double fileSizeSurcharge,
-            double basicFee,
-            double nonIntegratedFee) {
+            double basicFee) {
         double price;
         if(discount) {
             price = fileSizeSurcharge;
         } else {
             // no journal, voucher, or country discount
-            price = basicFee + fileSizeSurcharge + nonIntegratedFee;
+            price = basicFee + fileSizeSurcharge;
         }
         return price;
     }
@@ -257,8 +249,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
         boolean discount = hasDiscount(context,shoppingcart,journal);
         double fileSizeSurcharge = getSurchargeLargeFileFee(context, shoppingcart);
         double basicFee = shoppingcart.getBasicFee();
-        double nonIntegratedFee = getNoIntegrateFee(context, shoppingcart, journal);
-        double price = calculateTotal(discount, fileSizeSurcharge, basicFee, nonIntegratedFee);
+        double price = calculateTotal(discount, fileSizeSurcharge, basicFee);
         return price;
     }
 
@@ -359,53 +350,6 @@ public class PaymentSystemImpl implements PaymentSystemService {
         return shoppingcart.getJournalSub();
     }
 
-    public double getNoIntegrateFee(Context context, ShoppingCart shoppingcart, String journal) throws SQLException {
-        Double totalPrice = new Double(0);
-        if(journal==null){
-            Item item = Item.find(context,shoppingcart.getItem()) ;
-            if(item!=null)
-            {
-                try{
-                    DCValue[] values = item.getMetadata("prism.publicationName");
-                    if(values!=null && values.length > 0){
-                        journal=values[0].value;
-                    }
-                }catch (Exception e)
-                {
-                    log.error("Exception when get journal name in geting no integration fee:", e);
-                }
-            }
-
-        }
-        if(journal!=null)
-        {
-            try{
-
-                Map<String, String> properties = JournalUtils.findJournalProperties(context,journal);
-                if(properties!=null){
-                String subscription = properties.get("integrated");
-                if(subscription==null || !subscription.equals(ShoppingCart.FREE))
-                {
-
-                    totalPrice= shoppingcart.getNoInteg();
-                }
-
-
-            }
-            else
-            {
-                totalPrice= shoppingcart.getNoInteg();
-            }
-            }catch(Exception e){
-                log.error("Exception when get no integration fee:", e);
-            }
-        }
-        else
-        {
-            totalPrice= shoppingcart.getNoInteg();
-        }
-        return totalPrice;
-    }
 
     private boolean voucherValidate(Context context,ShoppingCart shoppingcart){
         VoucherValidationService voucherValidationService = new DSpace().getSingletonService(VoucherValidationService.class);
@@ -522,18 +466,6 @@ public class PaymentSystemImpl implements PaymentSystemService {
             else
             {
                 result += format("Price",symbol+Double.toString(shoppingCart.getBasicFee()));
-            }
-
-            Double noIntegrateFee =  getNoIntegrateFee(c,shoppingCart,null);
-
-            //add the no integrate fee if it is not 0
-            if(!hasDiscount(c,shoppingCart,null)&&noIntegrateFee>0&&!hasDiscount(c,shoppingCart,null))
-            {
-                result += format("Non-integrated submission", "" + noIntegrateFee);
-            }
-            else
-            {
-                result += format("Non-integrated submission", symbol+"0.0");
             }
 
             //add the large file surcharge section
@@ -777,18 +709,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
         {
             info.addItem("price","price").addContent(String.format("%s%.0f", symbol, shoppingCart.getBasicFee()));
         }
-        Double noIntegrateFee =  this.getNoIntegrateFee(context,shoppingCart,null);
 
-        //add the no integrate fee if it is not 0
-        info.addLabel(T_noInteg);
-        if(!this.hasDiscount(context,shoppingCart,null)&&noIntegrateFee>0&&!this.hasDiscount(context,shoppingCart,null))
-        {
-            info.addItem("no-integret","no-integret").addContent(String.format("%s%.0f", symbol, noIntegrateFee));
-        }
-        else
-        {
-            info.addItem("no-integret","no-integret").addContent(symbol+"0");
-        }
         generateSurchargeFeeForm(context,info,manager,shoppingCart);
 
 

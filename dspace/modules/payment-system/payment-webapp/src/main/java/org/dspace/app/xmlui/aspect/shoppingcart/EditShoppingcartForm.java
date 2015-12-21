@@ -88,8 +88,6 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
 
     private static final Message T_name9 =
             message("xmlui.Shoppingcart.EditProfile.name9");
-    private static final Message T_name10 =
-            message("xmlui.Shoppingcart.EditProfile.name10");
     private static final Message T_name11 =
             message("xmlui.Shoppingcart.EditProfile.name11");
 
@@ -217,20 +215,12 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
         }
 
 
-        String surCharge = Double.toString(PaymentSystemConfigurationManager.getNotIntegratedJournalFeeProperty(currency));
+        String surCharge = "";
         Double surCharge1 = shoppingcart.getSurcharge();
         if(!surCharge1.equals(new Double(-1)))
         {
             surCharge = Double.toString(surCharge1);
         }
-
-        String noInteg = Double.toString(PaymentSystemConfigurationManager.getSizeFileFeeProperty(currency));
-        Double noInteg1 = shoppingcart.getNoInteg();
-        if(!noInteg1.equals(new Double(-1)))
-        {
-            noInteg = Double.toString(noInteg1);
-        }
-
 
         if (StringUtils.isNotEmpty(request.getParameter("basicFee")))
         {
@@ -242,12 +232,6 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
             surCharge = request.getParameter("surCharge");
 
         }
-        if (StringUtils.isNotEmpty(request.getParameter("noInteg")))
-        {
-            noInteg = request.getParameter("noInteg");
-
-        }
-
 
         // DIVISION: shoppingcart-edit
         Division edit = body.addInteractiveDivision("shoppingcart-edit",contextPath+"/admin/shoppingcart",Division.METHOD_MULTIPART,"primary administrative shoppingcart");
@@ -340,8 +324,6 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
 
             identity.addLabel(T_name9);
             identity.addItem().addText("basicFee").setValue(basicFee);
-            identity.addLabel(T_name10);
-            identity.addItem().addText("noInteg").setValue(noInteg);
             identity.addLabel(T_name11);
             identity.addItem().addText("surCharge").setValue(surCharge);
 
@@ -361,8 +343,6 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
 
             identity.addLabel(T_name9);
             identity.addItem().addContent(basicFee);
-            identity.addLabel(T_name10);
-            identity.addItem().addContent(noInteg);
             identity.addLabel(T_name11);
             identity.addItem().addContent(surCharge);
         }

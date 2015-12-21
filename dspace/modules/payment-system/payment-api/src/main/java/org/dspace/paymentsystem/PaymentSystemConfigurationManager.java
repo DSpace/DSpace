@@ -28,7 +28,6 @@ public class PaymentSystemConfigurationManager {
     private static Properties country = null;
     private static Properties currency = null;
     private static Properties sizeFileFee = null;
-    private static Properties notIntegratedJournalFee = null;
     private static Properties sizeFileFeeAfter = null;
     private static Properties symbols = null;
     private static Properties symbolISO = null;
@@ -43,9 +42,6 @@ public class PaymentSystemConfigurationManager {
 
     private static String countryList = ConfigurationManager.getProperty("payment-system","dryad.paymentsystem.countries");
 
-
-    private static String notIntegratedJournalFeeList = ConfigurationManager.getProperty("payment-system","dryad.paymentsystem.notIntegratedJournalFee");
-
     private static String sizeFileFeeAfterList = ConfigurationManager.getProperty("payment-system","dryad.paymentsystem.sizeFileFeeAfter");
 
     private static String UnitSize = ConfigurationManager.getProperty("payment-system","dryad.paymentsystem.unitSize");
@@ -57,14 +53,12 @@ public class PaymentSystemConfigurationManager {
         country = new Properties();
         currency = new Properties();
         sizeFileFee = new Properties();
-        notIntegratedJournalFee = new Properties();
         sizeFileFeeAfter = new Properties();
         symbols = new Properties();
         symbolISO = new Properties();
         String[] currencyArray = currencyConfig.split(";");
         String[] prices = priceList.split(";");
         String[] countryArray = countryList.split(";");
-        String[] notIntegratedJournalFees = notIntegratedJournalFeeList.split(";");
         String[] sizeFileFeeAfterArray = sizeFileFeeAfterList.split(";");
         String[] currencySymbolArray = currencySymbolList.split(";");
         String[] currencySymbolISOArray = currencySymbolISOList.split(";");
@@ -89,11 +83,6 @@ public class PaymentSystemConfigurationManager {
             sizeFileFee.setProperty(priceTempArray[0],priceTempArray[1]);
         }
 
-        for(String temp:notIntegratedJournalFees)
-        {
-            String[] tempArray = temp.split(":");
-            notIntegratedJournalFee.setProperty(tempArray[0],tempArray[1]);
-        }
         for(String sizeFileFeeAfterTemp:sizeFileFeeAfterArray)
         {
             String[] temp = sizeFileFeeAfterTemp.split(":");
@@ -151,12 +140,6 @@ public class PaymentSystemConfigurationManager {
         return value;
     }
 
-    public static Double getNotIntegratedJournalFeeProperty(String property)
-    {
-        Double value = Double.parseDouble(notIntegratedJournalFee.getProperty(property));
-        return value;
-    }
-
     public static Double getAllSizeFileFeeAfterProperty(String property)
     {
         Double value = Double.parseDouble(sizeFileFeeAfter.getProperty(property));
@@ -176,11 +159,6 @@ public class PaymentSystemConfigurationManager {
     public static Properties getAllSizeFileFeeProperty()
     {
         return sizeFileFee;
-    }
-
-    public static Properties getAllNotIntegratedJournalFeeProperty()
-    {
-        return notIntegratedJournalFee;
     }
 
     public static Long getMaxFileSize()
