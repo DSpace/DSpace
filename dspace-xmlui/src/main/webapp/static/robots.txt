@@ -11,11 +11,14 @@ Sitemap: ${dspace.url}/htmlmap
 User-agent: *
 # Disable access to Discovery search and filters
 Disallow: /discover
+Disallow: /handle/${handle.prefix}/*/discover
 Disallow: /search-filter
+Disallow: /handle/${handle.prefix}/*/search-filter
 #
 # Optionally uncomment the following line ONLY if sitemaps are working
 # and you have verified that your site is being indexed correctly.
 # Disallow: /browse
+# Disallow: /handle/${handle.prefix}/*/browse
 #
 # If you have configured DSpace (Solr-based) Statistics to be publicly 
 # accessible, then you may not want this content to be indexed
