@@ -67,8 +67,13 @@ DSPACE=/var/dspace
 #0 22 3 * *	dspace	$DSPACE/bin/dspace xoai import -cvo > /dev/null
 
 #actualizo la lista de spiders ips
-#10 6 3 * *	dspace	$DSPACE/bin/dspace stats-util -u 
-#15 4 * * *	dspace	$DSPACE/bin/dspace stats-util -m
+10 6 3 * *	dspace	$DSPACE/bin/dspace stats-util -u > /dev/null
+
+#le agrego la marca isBot a los accesos de bots
+30 21 * * * dspace $DSPACE/bin/dspace stats-util -m  > /dev/null
+
+# Cleanup & Re-Optimize Statistics Core
+30 3 * * * dspace $DSPACE/bin/dspace stats-util -f && $DSPACE/bin/dspace stats-util -o  > /dev/null
 
 #Generate Sitemaps
 0 1,9,17 * * *	dspace	$DSPACE/bin/dspace generate-sitemaps > /dev/null
@@ -86,9 +91,6 @@ DSPACE=/var/dspace
 # ########## STATS ######################
 0 1 * * *	dspace	$DSPACE/bin/dspace stat-general
 0 1 * * *	dspace	$DSPACE/bin/dspace stat-monthly
-# Los reportes son innecesarios para XMLUI
-#0 2 * * *	dspace	$DSPACE/bin/dspace stat-report-general
-#0 2 * * *	dspace	$DSPACE/bin/dspace stat-report-monthly
 
 # ########## POSTGRES ######################
 # Clean up the database nightly at 4.20am 
